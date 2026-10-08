@@ -345,7 +345,7 @@ static lib_i32 descriptor_test_store_layout(void)
         lib_memory_copy(observed, state.memory + 0x0200u, sizeof(observed));
         if (lib_memory_compare(observed, expected[index], sizeof(observed)) != 0) {
             lib_c_fprintf(lib_c_stderr,
-                "M5:T546:DESCRIPTOR store index=%u got=%02x%02x%02x%02x%02x%02x want=%02x%02x%02x%02x%02x%02x\\n",
+                "M5::DESCRIPTOR store index=%u got=%02x%02x%02x%02x%02x%02x want=%02x%02x%02x%02x%02x%02x\\n",
                 (unsigned)index, observed[0], observed[1], observed[2],
                 observed[3], observed[4], observed[5], expected[index][0],
                 expected[index][1], expected[index][2], expected[index][3],
@@ -382,7 +382,7 @@ static lib_i32 descriptor_test_protected_stores(void)
         lib_memory_copy(observed, state.memory + 0x0200u, sizeof(observed));
         if (lib_memory_compare(observed, expected[index], sizeof(observed)) != 0) {
             lib_c_fprintf(lib_c_stderr,
-                "M5:T546:DESCRIPTOR protected-store index=%u got=%02x%02x%02x%02x%02x%02x want=%02x%02x%02x%02x%02x%02x\\n",
+                "M5::DESCRIPTOR protected-store index=%u got=%02x%02x%02x%02x%02x%02x want=%02x%02x%02x%02x%02x%02x\\n",
                 (unsigned)index, observed[0], observed[1], observed[2],
                 observed[3], observed[4], observed[5], expected[index][0],
                 expected[index][1], expected[index][2], expected[index][3],
@@ -540,6 +540,36 @@ static lib_i32 descriptor_test_c7_segment_override_real_mode(void)
     return observed == 0xffffu;
 }
 
+static lib_i32 descriptor_test_paged_physical_gdt(void)
+{
+    static const lib_u8 code[] = {0x8eu,0xd8u,0xf4u};
+    static const lib_u8 gdt[] = {
+        0u,0u,0u,0u,0u,0u,0u,0u,
+        0xffu,0xffu,0u,0u,0u,0x9au,0u,0u,
+        0xffu,0xffu,0u,0u,0u,0x92u,0u,0u
+    };
+    cpu_instruction_fixture state;
+    t_cpu after;
+
+    cpu_instruction_prepare(&state, CORE_MACHINE_CPU_PROFILE_80386);
+    descriptor_enter_protected(&state, 0u);
+    descriptor_set_tables(&state, 0x00008000u, (lib_u16)(sizeof(gdt) - 1u),
+        0u, 0u);
+    lib_memory_copy(state.memory, code, sizeof(code));
+    lib_memory_copy(state.memory + 0x8000u, gdt, sizeof(gdt));
+    lib_memory_copy(state.memory + 0x1000u, (const lib_u32[]){0x00002003u},
+        sizeof(lib_u32));
+    lib_memory_copy(state.memory + 0x2000u, (const lib_u32[]){0x00000003u},
+        sizeof(lib_u32));
+    state.cpu.data.eax = 0x00000010u;
+    state.cpu.data.cr3 = 0x00001000u;
+    state.cpu.data.cr0 |= VCPU_CR0_PG;
+    return descriptor_run(&state, code, sizeof(code), &after) &&
+        after.data.ds.selector == 0x0010u &&
+        state.memory[0x8000u + 16u + 5u] == 0x93u &&
+        state.memory[0x2000u + 8u * sizeof(lib_u32)] == 0u;
+}
+
 lib_i32 main(void)
 {
     const lib_i32 stores = descriptor_test_store_layout();
@@ -550,14 +580,15 @@ lib_i32 main(void)
     const lib_i32 selector_stores = descriptor_test_selector_stores();
     const lib_i32 selector_loads = descriptor_test_selector_loads();
     const lib_i32 c7 = descriptor_test_c7_segment_override_real_mode();
+    const lib_i32 physical_gdt = descriptor_test_paged_physical_gdt();
 
     if (!stores || !protected_stores || !loads || !faults || !memory_faults ||
-        !selector_stores || !selector_loads || !c7) {
-        lib_c_fprintf(lib_c_stderr, "M5:T539:S43:descriptor cpu failed stores=%d protected-stores=%d loads=%d faults=%d memory-faults=%d selector-stores=%d selector-loads=%d c7=%d\n",
+        !selector_stores || !selector_loads || !c7 || !physical_gdt) {
+        lib_c_fprintf(lib_c_stderr, "descriptor cpu failed stores=%d protected-stores=%d loads=%d faults=%d memory-faults=%d selector-stores=%d selector-loads=%d c7=%d physical-gdt=%d\n",
             stores, protected_stores, loads, faults, memory_faults,
-            selector_stores, selector_loads, c7);
+            selector_stores, selector_loads, c7, physical_gdt);
         return 1;
     }
-    lib_c_printf("%s\n", "M5:T539:S43:DESCRIPTOR-SYSTEM-CPU:OK");
+    lib_c_printf("%s\n", "DESCRIPTOR-SYSTEM-CPU:OK");
     return 0;
 }

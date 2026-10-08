@@ -162,6 +162,56 @@ change. Qualification is fresh dual-width configuration, focused Console
 display execution, and full x64/x86 `ctest -j8`; a passing serial run alone is
 insufficient.
 
+## S12 P5 latest eight-package import and full qualification
+
+Owner admission: “可以，准入S任务完成本次导入和全repo测试验收（包括新发布2个exe)”。 Freeze the read-only NXVM source at
+`8d7022ea85a3c656713f588db4ba1d9b2498a873`; its two modified MyNES package
+EXEs are explicitly outside the payload. Copy every path in
+`src/{lib,common,x86,ibmpc}` and `test/{lib,common,x86,ibmpc}` as the shared
+corpus. The latest source changes X86 CPU/FPU WAIT/NPX and timing behavior;
+the matching IBM PC board is byte-identical and leaves the newly optional board
+callbacks unset, so Core's declared FPU fallback preserves the existing board
+contract. No SoftPC App, machine, Compat, or recovered-mirror change is
+authorized.
+
+NXVM S3 also renames shared X86/IBM PC test identities from historical task
+labels to behavior labels. That test-only move includes registrations,
+fixture-private names, result markers, manifests and test paths; it introduces
+no positive App/NXVM product dependency. Import it whole rather than retaining
+a parallel SoftPC test naming dialect.
+
+`test/register.cmake` is part of the shared test corpus and is copied exactly.
+SoftPC's `.gitattributes` receives only `test/register.cmake text eol=lf`:
+NXVM's broad attribute file contains its own private App exceptions and cannot
+be copied wholesale. Existing SoftPC component-LF rules and preserved OpenNT
+CRLF exceptions remain authoritative.
+
+The finite ledger is every path under the eight roots plus the registration
+helper. Each receives exactly one disposition: already-exact, copied-exact,
+upstream-added, or upstream-deleted. Verify the final raw SHA-256/path sets,
+component manifests, corpus/DAG/boundary gates, clean x64/x86 package builds,
+and all background repository tests. Native desktop tests are a separate
+serial result and run only when a desktop interval is reserved; they are never
+silently counted as background coverage. Refresh only the two permitted
+package EXEs; preserve user INI, guest media and snapshots.
+
+Execution record: the frozen raw ledger is exact after import: `src/lib` 109,
+`src/common` 23, `src/x86` 95, `src/ibmpc` 125, `test/lib` 49,
+`test/common` 20, `test/x86` 196, and `test/ibmpc` 235 paths; the shared
+registration helper is also byte-identical. No desktop interval was reserved,
+so desktop tests remain excluded as specified. Both Release package builds
+completed, and the full background repository suite passes 479/479 on x64
+(74.29 seconds) and 479/479 on x86 (224.21 seconds). The first concurrent
+x64 run exposed a root-level fixed-fixture collision in
+`softpc-command-provider-smoke`; the test already uses the build tree as its
+working directory, so its CTest declaration now marks that one resource owner
+`RUN_SERIAL`. A rerun passes without weakening production or shared-component
+tests. This is a root test-scheduling correction, not an eight-component
+corpus fork. The package targets were rebuilt on both widths, but the imported
+CPU/FPU/Core targets are not in SoftPC's product link closure (`softpcvm`
+links `x86-debug`, not `x86-core`); the two generated EXEs were therefore
+restored unchanged rather than committed as timestamp-only churn.
+
 ## S11 eight-package test corpus synchronization
 
 Original owner request: 准入一个s来导入.

@@ -557,7 +557,7 @@ add_executable(softpc-command-provider-smoke test/app-softpc/integration/command
     src/app-softpc/product/composition.c src/app-softpc/product/command.c src/app-softpc/product/keyboard.c)
 target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug common-session common-machine)
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
-set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45
+set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45 RUN_SERIAL TRUE
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 add_executable(softpc-x87-layout-smoke test/app-softpc/unit/machine/x87_layout_smoke.c)
 target_include_directories(softpc-x87-layout-smoke PRIVATE

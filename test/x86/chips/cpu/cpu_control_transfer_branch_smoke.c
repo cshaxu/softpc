@@ -62,6 +62,38 @@ static lib_i32 control_transfer_test_short_jcc(void)
     return 1;
 }
 
+static lib_i32 control_transfer_test_zero_displacement_timing(void)
+{
+    static const core_machine_cpu_profile profiles[] = {
+        CORE_MACHINE_CPU_PROFILE_8086, CORE_MACHINE_CPU_PROFILE_8088,
+        CORE_MACHINE_CPU_PROFILE_80186, CORE_MACHINE_CPU_PROFILE_80286,
+        CORE_MACHINE_CPU_PROFILE_80386
+    };
+    static const lib_u8 nonzero[] = { 0x74u, 0x01u, 0x90u, 0x90u };
+    static const lib_u8 zero[] = { 0x74u, 0x00u, 0x90u };
+
+    for (lib_size index = 0u; index < sizeof(profiles) / sizeof(profiles[0]);
+        ++index) {
+        cpu_instruction_fixture state;
+        core_machine_cpu_timing_result nonzero_timing;
+        core_machine_cpu_timing_result zero_timing;
+        t_cpu after;
+
+        cpu_instruction_prepare(&state, profiles[index]);
+        state.cpu.data.eflags |= VCPU_EFLAGS_ZF;
+        if (!control_transfer_run(&state, nonzero, sizeof(nonzero), &after) ||
+            !core_machine_cpu_timing_select(&state.execution, &nonzero_timing) ||
+            nonzero_timing.source_timing_unallocated) return 0;
+        cpu_instruction_prepare(&state, profiles[index]);
+        state.cpu.data.eflags |= VCPU_EFLAGS_ZF;
+        if (!control_transfer_run(&state, zero, sizeof(zero), &after) ||
+            !core_machine_cpu_timing_select(&state.execution, &zero_timing) ||
+            zero_timing.source_timing_unallocated ||
+            zero_timing.ticks != nonzero_timing.ticks) return 0;
+    }
+    return 1;
+}
+
 static lib_i32 control_transfer_test_jumps_and_near_jcc(void)
 {
     static const lib_u8 code32_jumps[][6] = {
@@ -269,13 +301,14 @@ static lib_i32 control_transfer_test_fault_atomicity_and_profile(void)
 int main(void)
 {
     if (!control_transfer_test_short_jcc()) goto fail_short_jcc;
+    if (!control_transfer_test_zero_displacement_timing()) goto fail_short_jcc;
     if (!control_transfer_test_jumps_and_near_jcc()) goto fail_near_jcc;
     if (!control_transfer_test_loop_and_jcxz()) goto fail_loop;
     if (!control_transfer_test_386_address_forms()) goto fail_address;
     if (!control_transfer_test_fault_atomicity_and_profile()) goto fail_fault;
-    lib_c_printf("%s\n", "M5:T401:S43:LOOP-JCXZ-PROFILES:OK");
-    lib_c_printf("%s\n", "M5:T401:S59:NEAR-JCC-PROFILES:OK");
-    lib_c_printf("%s\n", "M5:T539:S49:CPU-CONTROL-TRANSFER-BRANCH:OK");
+    lib_c_printf("%s\n", "LOOP-JCXZ-PROFILES:OK");
+    lib_c_printf("%s\n", "NEAR-JCC-PROFILES:OK");
+    lib_c_printf("%s\n", "CPU-CONTROL-TRANSFER-BRANCH:OK");
     return 0;
 
 fail_short_jcc:
@@ -293,6 +326,6 @@ fail_address:
 fail_fault:
     lib_c_fprintf(lib_c_stderr, "%s", "fault: ");
 fail:
-    lib_c_fprintf(lib_c_stderr, "%s", "M5:T539:S49:CPU-CONTROL-TRANSFER-BRANCH:FAIL\n");
+    lib_c_fprintf(lib_c_stderr, "%s", "CPU-CONTROL-TRANSFER-BRANCH:FAIL\n");
     return 1;
 }

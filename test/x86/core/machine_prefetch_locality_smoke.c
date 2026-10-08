@@ -2,6 +2,7 @@
 #include "lib/types/file.h"
 
 #include "x86/core/machine.h"
+#include "x86/core/debug_interface.h"
 #include "x86/core/transaction.h"
 #include "x86/core/attachment_interface.h"
 
@@ -295,7 +296,7 @@ static lib_i32 retirement_wait_contract(void)
         machine->cpu_retirement_wait_pending != LIB_FALSE;
     failed |= core_machine_reset(machine) != LIB_STATUS_OK ||
         machine->cpu_cycle_bus_ready != LIB_TRUE;
-    /* A deferred board wait has no physical source disposition until T470 S4.
+    /* A deferred board wait has no physical source disposition until .
      * It must therefore stop before publishing a synthetic physical tick. */
     machine->retirement_time_contract = CORE_MACHINE_RETIREMENT_TIME_PHYSICAL;
     machine->time_axis = (core_machine_time_axis) {
@@ -307,6 +308,43 @@ static lib_i32 retirement_wait_contract(void)
     failed |= core_machine_run(machine, (core_machine_run_budget){0u, 1u},
         &result) != LIB_STATUS_INTERNAL_ERROR || result.elapsed_ticks != 0u ||
         machine->elapsed_ticks != 0u;
+    core_machine_destroy(machine);
+    return !failed;
+}
+
+static lib_i32 faulted_external_wait_contract(void)
+{
+    static const lib_u8 code[] = {0x67u, 0xa4u, 0xf4u};
+    static const lib_u8 source = 0x5au;
+    core_machine_executor_config config = {0};
+    core_machine *machine = LIB_NULL;
+    core_machine_run_result result;
+    lib_status status;
+    lib_i32 failed = 0;
+
+    config.cpu_profile = CORE_MACHINE_CPU_PROFILE_80386;
+    config.transaction_contract.external_access_wait_windows[0] =
+        (core_machine_external_access_wait_window) {
+            CORE_MACHINE_CPU_EXTERNAL_CYCLE_SPACE_MEMORY, 0x100u, 0x100u, 1u};
+    failed |= core_machine_neutral_create(&config, &machine) != LIB_STATUS_OK;
+    failed |= prefetch_reset_mapping(machine) != LIB_STATUS_OK;
+    failed |= core_machine_freeze_execution_providers(machine) != LIB_STATUS_OK;
+    failed |= core_machine_reset(machine) != LIB_STATUS_OK;
+    failed |= core_machine_memory_write(machine, 0x000ffff0u, code, sizeof(code)) !=
+        LIB_STATUS_OK;
+    failed |= core_machine_memory_write(machine, 0x100u, &source, 1u) != LIB_STATUS_OK;
+    machine->maximum_instruction_ticks = 1u;
+    failed |= core_machine_debug_write_register(machine, CORE_MACHINE_DEBUG_ESI, 0x100u) !=
+        LIB_STATUS_OK;
+    failed |= core_machine_debug_write_register(machine, CORE_MACHINE_DEBUG_EDI, 0x00010000u) !=
+        LIB_STATUS_OK;
+    status = core_machine_run(machine, (core_machine_run_budget){0u, 1u},
+        &result);
+    failed |= status != LIB_STATUS_OK;
+    failed |= result.reason != CORE_MACHINE_STOP_BUDGET || result.executed != 0u ||
+        result.ticks != 1u || result.elapsed_ticks != 1u ||
+        machine->elapsed_ticks != 1u || machine->cpu_retirement_wait_pending != LIB_FALSE ||
+        machine->cpu_retirement_wait_retires != LIB_FALSE;
     core_machine_destroy(machine);
     return !failed;
 }
@@ -502,23 +540,24 @@ lib_i32 main(void)
     failed |= !external_cycle_observer_contract();
     failed |= !refresh_external_cycle_contract();
     failed |= !retirement_wait_contract();
+    failed |= !faulted_external_wait_contract();
     failed |= !prefetch_grant_contract();
     failed |= !cecg_port_wait_contract();
     failed |= !d4_cecg_memory_class_contract();
     failed |= !cecg_aperture_wait_contract();
     if (failed != 0) return 1;
-    lib_c_printf("M5:T412:S1:EXTERNAL-READ-LOCALITY:OK\n");
-    lib_c_printf("M5:T413:S1:EXTERNAL-WRITE-BRIDGE:OK\n");
-    lib_c_printf("M5:T414:S1:DATA-READ-LOCALITY:OK\n");
-    lib_c_printf("M5:T415:S1:PAGE-WALK-LOCALITY:OK\n");
-    lib_c_printf("M5:T416:S1:DMA-HOLD-LOCALITY:OK\n");
-    lib_c_printf("M5:T417:S1:REFRESH-LOCALITY:OK\n");
-    lib_c_printf("M5:T418:S1:INSTRUCTION-BOUNDARY-LOCALITY:OK\n");
-    lib_c_printf("M5:T419:S5:EXTERNAL-CYCLE-OVERLAP:OK\n");
-    lib_c_printf("M5:T423:S1:CPU-BOARD-TRANSACTION:OK\n");
-    lib_c_printf("M5:T428:S1:GENERIC-PREFETCH-PRODUCER:OK\n");
-    lib_c_printf("M5:T429:S1:CECG-8BIT-BUS-WAIT:OK\n");
-    lib_c_printf("M5:T429:S2:D4-CECG-MEMORY-CLASS:OK\n");
-    lib_c_printf("M5:T429:S3:CECG-APERTURE-WAIT:OK\n");
+    lib_c_printf("EXTERNAL-READ-LOCALITY:OK\n");
+    lib_c_printf("EXTERNAL-WRITE-BRIDGE:OK\n");
+    lib_c_printf("DATA-READ-LOCALITY:OK\n");
+    lib_c_printf("PAGE-WALK-LOCALITY:OK\n");
+    lib_c_printf("DMA-HOLD-LOCALITY:OK\n");
+    lib_c_printf("REFRESH-LOCALITY:OK\n");
+    lib_c_printf("INSTRUCTION-BOUNDARY-LOCALITY:OK\n");
+    lib_c_printf("EXTERNAL-CYCLE-OVERLAP:OK\n");
+    lib_c_printf("CPU-BOARD-TRANSACTION:OK\n");
+    lib_c_printf("GENERIC-PREFETCH-PRODUCER:OK\n");
+    lib_c_printf("CECG-8BIT-BUS-WAIT:OK\n");
+    lib_c_printf("D4-CECG-MEMORY-CLASS:OK\n");
+    lib_c_printf("CECG-APERTURE-WAIT:OK\n");
     return 0;
 }

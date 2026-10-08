@@ -2,37 +2,36 @@
 
 ## Current Work
 
-M9 T85 S12 has completed its clean-corpus implementation and dual-width
-qualification. All eight shared source/test packages plus the three shared
-test helper scripts are byte-exact to clean NXVM `a397b925c`; package builds
-and full background CTest pass 479/479 on x64 and x86. Delivery P1
-`1f7383f4` is pushed and awaits owner validation. The required S12 delivery
-closure was not yet recorded, so its parallel-test isolation continuation
-remains M9 T85 S12 rather than allocating S13. No production component, API
-or product behavior is in scope.
+M9 T85 S12 continues as P5. The owner admits a complete eight-package refresh
+from clean NXVM `8d7022ea85a3c656713f588db4ba1d9b2498a873`, with dual-width
+full-repository qualification and rebuilt x86/x64 packages. The frozen
+source is read-only; its two uncommitted MyNES EXEs are outside scope. The
+former S12 P4 test-isolation delivery remains pushed at `c6413911`; this
+continuation must preserve that behavior while making the shared registration
+helper LF-canonical.
 
 ## M9 T85 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs a minimal shared-test repair after full `-j8` qualification exposed working-directory contention and native-desktop assumptions. |
-| Objective | Make concurrent shared tests independent without serializing unrelated tests; make the native Console smoke verify restoration against the host's actual supported viewport. |
-| Scope | `test/register.cmake`, root test registration, `test/lib/CMakeLists.txt`, `test/lib/console_broker_display_smoke.c`, affected test manifest and task record only. |
-| Non-goals | No `src/` production change, product behavior/API change, fixed timeout/sleep workaround, broad `RUN_SERIAL`, or host-resolution requirement. |
-| Reference Baseline | SoftPC `29feef48`; the delivered eight-package corpus at NXVM `a397b925c` remains the required source/test baseline. |
-| Candidate Proposal | [S12 P4 parallel isolation](../proposals/m9-windows-101-startup-repair.md#s12-p4-parallel-shared-test-isolation) |
-| Files And ABI Surface | Test registration and Lib test implementation only; no production ABI or source path changes. |
+| Admission And Approval | Owner directs: “可以，准入S任务完成本次导入和全repo测试验收（包括新发布2个exe)”。 This is S12 P5 because S12 remains the one active subtask. |
+| Objective | Import the eight shared packages from frozen clean NXVM `8d7022ea`; retain the verified P4 test-isolation behavior; canonicalize the shared registration helper as LF; qualify the full repository on x64/x86; publish refreshed packages. |
+| Scope | Every path in `src/{lib,common,x86,ibmpc}` and `test/{lib,common,x86,ibmpc}`, `test/register.cmake`, component manifests, and the minimal `.gitattributes` helper rule. |
+| Non-goals | No NXVM product/CMake module import, no MyNES artifact, no App/Core/Compat/mirror adaptation, no local shared-source fork, no user INI/media/snapshot mutation, and no behavior/API invention. |
+| Reference Baseline | SoftPC `c6413911`; clean NXVM shared corpus at `8d7022ea85a3c656713f588db4ba1d9b2498a873`. |
+| Candidate Proposal | [S12 P5 latest eight-package import](../proposals/m9-windows-101-startup-repair.md#s12-p5-latest-eight-package-import-and-full-qualification) |
+| Files And ABI Surface | All eight roots, registration helper and manifests. X86 internal API evolves; no product-facing interface or App receiver changes are authorized. |
 | Applicable Rules | Task Reading Set, current Architecture/Coding/Execution/Document rules, and existing shared test ownership/manifests. |
-| Design | Give each `shared_register_test()` target its own configured working directory. Apply one CTest resource lock only to the desktop-owning Console/Window smokes. Retain concurrent execution for all other tests. Declare the existing live-guest restart proof's full scheduler capacity instead of allowing unrelated CPU-heavy probes to invalidate its bounded UI waits. Derive Console readback/restore extents from the actual supported buffer/viewport rather than asserting a 120×30 terminal. |
-| Verification | Clean reconfigure; x64/x86 `ctest -j8` full suite; focused native Console display smoke on both widths; manifests/boundary checks; package builds. Report concurrency result and actual diff. |
-| Expected Markers | No shared working directory among registered shared tests; only the declared native tests contend for the resource lock; valid 29-row viewport passes restore proof. |
-| Asset Needs | Existing disposable build/test trees only. No INI, snapshot, guest media or package artifact mutation is needed. |
-| Reporting Requirements | Report changed production/test paths and added/removed/net lines, focused and full parallel evidence, pushed P and coordinator review; wait for owner validation. |
-| Stop Conditions | A test requires shared state by contract, CTest cannot create the isolated directory, a native test needs a different host resource, or a test-only repair would alter production behavior. |
-| Exit Criteria | No shared artifact collision, no unsupported viewport assertion, no production delta, all qualifications pass, then commit/push and await owner validation. |
-| Original Owner Request | 全套 `-j8` 验证暴露测试隔离缺口；追加 S 任务做最小修复。 |
-| Similar-Issue Sweep | Inventory all `shared_register_test()` call sites and all Windows desktop-labelled tests; ensure no remaining broad serial property or fixed relative artifact owner conflicts. |
+| Design | Copy the frozen component roots as complete corpora. Copy `test/register.cmake` exactly after applying the narrowly scoped LF rule; do not copy NXVM's whole `.gitattributes`, because its private App path exceptions are not SoftPC policy. New optional X86 board callbacks retain their built-in FPU fallback when the identical IBM PC board leaves them null. |
+| Verification | Frozen raw path/SHA-256 ledger is exact: 109/23/95/125 source and 49/20/196/235 test paths by component; clean x64/x86 package builds; all background repository tests pass 479/479 on x64 (74.29 seconds) and x86 (224.21 seconds). Native desktop tests remain excluded because no desktop interval was reserved. The sole root-level fixed-fixture collision found under concurrent x64 execution is explicitly `RUN_SERIAL`; no shared production/test corpus was locally changed. |
+| Expected Markers | All eight roots and `test/register.cmake` byte-exact to frozen NXVM source; `.gitattributes` makes the helper LF; no product receiver change; every enabled test executable is built and passes on both widths. |
+| Asset Needs | Rebuild only `assets/binary/softpc32.exe` and `assets/binary/softpc64.exe` if their link closure changes; here it does not, so retain the accepted binaries. Preserve user-owned INI, snapshots and guest media. |
+| Reporting Requirements | Report frozen source cleanliness, exact path/hash ledger, production/test added/removed/net lines, background and desktop results separately, package hashes, pushed P and coordinator review; then await owner validation. |
+| Stop Conditions | Frozen source changes, a shared source requires an App/Core/Compat adaptation, a component boundary fails, a background test fails, a desktop suite lacks an owner-reserved desktop interval, or package build fails. |
+| Exit Criteria | Complete exact import, LF-canonical shared helper, dual package builds, passing applicable full tests, manifest/governance/boundary proof, refreshed dual EXEs, complete pushed P and review. |
+| Original Owner Request | 可以，准入S任务完成本次导入和全repo测试验收（包括新发布2个exe)。 |
+| Similar-Issue Sweep | Compare every frozen path in the eight roots plus shared registration; audit all new X86 receiver references outside X86 and all positive test build edges for outward product dependencies. |
 
 ## S12 delivery baseline
 

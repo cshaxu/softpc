@@ -277,6 +277,7 @@ static void _kma_write_physical(core_machine_cpu_execution_context *context, lib
     lib_u32 cpde;
     lib_u32 cpte;
     lib_u8 paging;
+    lib_u8 pde_accessed;
 } t_kma_linear_translation;
 
 /* Validate a linear page translation without publishing page-table side effects. */
@@ -303,6 +304,16 @@ static void _kma_prepare_physical_linear(core_machine_cpu_execution_context *con
         CPU_TRACE_CHECK_RETURN(_SetExcept_PF(_MakePageFaultErrorCode(0, write, (vpl == 3))));
         return;
         CPU_TRACE_BLOCK_END;
+    }
+    /* The 80386 sets the directory Accessed bit while walking its
+     * second-level page table (80386 PRM 5.3.4.3), even when that walk later
+     * finds a protection violation in the page-table entry. */
+    if (!context->preview_mode) {
+        _SetPageEntry_A(cpde);
+        CPU_TRACE_CHECK_RETURN(_kma_write_physical(context, ppde,
+            X86_CPU_REFERENCE_OF(cpde), 4,
+            CORE_MACHINE_CPU_MEMORY_ACCESS_PAGE_TABLE_WRITE));
+        translation->pde_accessed = LIB_TRUE;
     }
     if (vpl == 0x03)
     {
@@ -374,9 +385,12 @@ static void _kma_commit_physical_linear(core_machine_cpu_execution_context *cont
         CPU_TRACE_CALL_END;
         return;
     }
-    _SetPageEntry_A(translation->cpde);
-    CPU_TRACE_CHECK_RETURN(_kma_write_physical(context, translation->ppde,
-        X86_CPU_REFERENCE_OF(translation->cpde), 4, CORE_MACHINE_CPU_MEMORY_ACCESS_PAGE_TABLE_WRITE));
+    if (!translation->pde_accessed) {
+        _SetPageEntry_A(translation->cpde);
+        CPU_TRACE_CHECK_RETURN(_kma_write_physical(context, translation->ppde,
+            X86_CPU_REFERENCE_OF(translation->cpde), 4,
+            CORE_MACHINE_CPU_MEMORY_ACCESS_PAGE_TABLE_WRITE));
+    }
     _SetPageEntry_A(translation->cpte);
     if (write)
         _SetPageEntry_D(translation->cpte);
@@ -929,6 +943,29 @@ static void _m_write_rm(core_machine_cpu_execution_context *context, lib_u8 byte
 
 /* segment accessing unit: _s_ */
 /* kernel segment accessing */
+/* GDTR and IDTR base values name physical memory (80386 PRM 5-15/5-16),
+ * unlike an LDT or TSS descriptor base.  Keep those two table routes outside
+ * the logical-to-linear paging helper. */
+static void _ksa_read_physical_table(core_machine_cpu_execution_context *context,
+    t_cpu_data_sreg *rtable, lib_u32 offset, lib_uptr rdata, lib_u8 byte)
+{
+    const lib_u32 base = rtable->sregtype == SREG_IDTR &&
+        context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80286 ? 0u :
+        rtable->base;
+
+    CPU_TRACE_CALL_BEGIN("_ksa_read_physical_table");
+    CPU_TRACE_CHECK_RETURN(_kma_read_physical(context, base + offset,
+        rdata, byte, context->memory_access_provenance));
+    CPU_TRACE_CALL_END;
+}
+static void _ksa_write_physical_table(core_machine_cpu_execution_context *context,
+    t_cpu_data_sreg *rtable, lib_u32 offset, lib_uptr rdata, lib_u8 byte)
+{
+    CPU_TRACE_CALL_BEGIN("_ksa_write_physical_table");
+    CPU_TRACE_CHECK_RETURN(_kma_write_physical(context, rtable->base + offset,
+        rdata, byte, context->memory_access_provenance));
+    CPU_TRACE_CALL_END;
+}
 static void _ksa_read_idt(core_machine_cpu_execution_context *context, lib_u8 intid, lib_uptr rdata)
 {
     CPU_TRACE_CALL_BEGIN("_s_read_idt");
@@ -938,7 +975,8 @@ static void _ksa_read_idt(core_machine_cpu_execution_context *context, lib_u8 in
         if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286 &&
             X86_CPU_MASK_U16(intid * 4 + 3) > X86_CPU_MASK_U16(cpu_state.data.idtr.limit))
             CPU_TRACE_IMPOSSIBLE_RETURN;
-        CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &cpu_state.data.idtr, (intid * 4), rdata, 4, 0x00, 0));
+        CPU_TRACE_CHECK_RETURN(_ksa_read_physical_table(context,
+            &cpu_state.data.idtr, intid * 4u, rdata, 4u));
         CPU_TRACE_BLOCK_END;
     }
     else
@@ -946,7 +984,8 @@ static void _ksa_read_idt(core_machine_cpu_execution_context *context, lib_u8 in
         CPU_TRACE_BLOCK_BEGIN("CR0_PE(1)");
         if (X86_CPU_MASK_U16(intid * 8 + 7) > X86_CPU_MASK_U16(cpu_state.data.idtr.limit))
             CPU_TRACE_IMPOSSIBLE_RETURN;
-        CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &cpu_state.data.idtr, (intid * 8), rdata, 8, 0x00, 0));
+        CPU_TRACE_CHECK_RETURN(_ksa_read_physical_table(context,
+            &cpu_state.data.idtr, intid * 8u, rdata, 8u));
         CPU_TRACE_BLOCK_END;
     }
     CPU_TRACE_CALL_END;
@@ -980,7 +1019,8 @@ static void _ksa_read_gdt(core_machine_cpu_execution_context *context, lib_u16 s
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(selector));
         CPU_TRACE_BLOCK_END;
     }
-    CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &cpu_state.data.gdtr, _GetSelector_Offset(selector), rdata, 8, 0x00, 1));
+    CPU_TRACE_CHECK_RETURN(_ksa_read_physical_table(context,
+        &cpu_state.data.gdtr, _GetSelector_Offset(selector), rdata, 8u));
     CPU_TRACE_CALL_END;
 }
 static void _ksa_read_xdt(core_machine_cpu_execution_context *context, lib_u16 selector, lib_uptr rdata)
@@ -1023,7 +1063,8 @@ static void _ksa_write_gdt(core_machine_cpu_execution_context *context, lib_u16 
         CPU_TRACE_IMPOSSIBLE_RETURN;
     if (X86_CPU_MASK_U16(_GetSelector_Offset(selector) + 7) > X86_CPU_MASK_U16(cpu_state.data.gdtr.limit))
         CPU_TRACE_IMPOSSIBLE_RETURN;
-    CPU_TRACE_CHECK_RETURN(_kma_write_logical(context, &cpu_state.data.gdtr, _GetSelector_Offset(selector), rdata, 8, 0x00, 1));
+    CPU_TRACE_CHECK_RETURN(_ksa_write_physical_table(context,
+        &cpu_state.data.gdtr, _GetSelector_Offset(selector), rdata, 8u));
     CPU_TRACE_CALL_END;
 }
 static void _ksa_write_xdt(core_machine_cpu_execution_context *context, lib_u16 selector, lib_uptr rdata)
@@ -1064,8 +1105,9 @@ static void _ksa_test_write_xdt(core_machine_cpu_execution_context *context,
         if (X86_CPU_MASK_U16(_GetSelector_Offset(selector) + 7) >
             X86_CPU_MASK_U16(cpu_state.data.gdtr.limit))
             CPU_TRACE_IMPOSSIBLE_RETURN;
-        CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &cpu_state.data.gdtr,
-            _GetSelector_Offset(selector), 8, 1, 0x00, 1));
+        /* A GDT write is a physical table cycle, so there is no page walk to
+         * preflight.  The preceding descriptor read already established its
+         * table bound; _ksa_write_gdt performs the sole physical write. */
     }
     CPU_TRACE_CALL_END;
 }
@@ -1435,7 +1477,8 @@ static lib_u8 _s_check_selector(core_machine_cpu_execution_context *context, lib
 {
     /* 0 = succ, 1 = fail */
     CPU_TRACE_CALL_BEGIN("_s_check_selector");
-    if (_IsSelectorNull(selector))
+    if (_IsSelectorNull(selector) ||
+        (_GetSelector_TI(selector) && !cpu_state.data.ldtr.flagValid))
     {
         CPU_TRACE_CALL_END;
         return LIB_TRUE;
@@ -3571,7 +3614,7 @@ static void _ser_call_far_call_gate(core_machine_cpu_execution_context *context,
     CPU_TRACE_CALL_END;
 }
 static void _ser_task_switch_tss(core_machine_cpu_execution_context *context,
-    lib_u16 newcs, lib_u8 nested);
+    lib_u16 newcs, lib_u8 nested, lib_u8 check_tss_privilege);
 static void _ser_task_return_tss(core_machine_cpu_execution_context *context);
 
 static void _ser_task_gate_descriptor(
@@ -3592,7 +3635,7 @@ static void _ser_task_gate_descriptor(
     if (_IsSelectorNull(target_selector) || _GetSelector_TI(target_selector))
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(target_selector & 0xfffcu));
     CPU_TRACE_CHECK_RETURN(_ser_task_switch_tss(context, target_selector,
-        nested));
+        nested, LIB_FALSE));
     CPU_TRACE_CALL_END;
 }
 
@@ -3627,7 +3670,8 @@ static void _ser_call_far_tss(core_machine_cpu_execution_context *context,
     lib_u16 newcs)
 {
     CPU_TRACE_CALL_BEGIN("_ser_call_far_tss");
-    CPU_TRACE_CHECK_RETURN(_ser_task_switch_tss(context, newcs, LIB_TRUE));
+    CPU_TRACE_CHECK_RETURN(_ser_task_switch_tss(context, newcs, LIB_TRUE,
+        LIB_TRUE));
     CPU_TRACE_CALL_END;
 }
 static void _ser_int_real(core_machine_cpu_execution_context *context, lib_u8 intid, lib_u8 byte)
@@ -4118,6 +4162,32 @@ static void _ser_ret_far_same(core_machine_cpu_execution_context *context, lib_u
     CPU_TRACE_CHECK_RETURN(_kec_ret_far(context, newcs, neweip, parambyte, byte));
     CPU_TRACE_CALL_END;
 }
+static void _ser_return_outer_cleanup_sreg(t_cpu_data_sreg *rsreg,
+    lib_u8 target_cpl)
+{
+    CPU_TRACE_CALL_BEGIN("_ser_return_outer_cleanup_sreg");
+    if (rsreg->flagValid &&
+        (!rsreg->seg.executable || !rsreg->seg.exec.conform) &&
+        rsreg->dpl < target_cpl) {
+        rsreg->flagValid = LIB_FALSE;
+        rsreg->selector = 0u;
+    }
+    CPU_TRACE_CALL_END;
+}
+
+static void _ser_return_outer_cleanup_sregs(
+    core_machine_cpu_execution_context *context, lib_u8 target_cpl)
+{
+    CPU_TRACE_CALL_BEGIN("_ser_return_outer_cleanup_sregs");
+    _ser_return_outer_cleanup_sreg(&cpu_state.data.ds, target_cpl);
+    _ser_return_outer_cleanup_sreg(&cpu_state.data.es, target_cpl);
+    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386) {
+        _ser_return_outer_cleanup_sreg(&cpu_state.data.fs, target_cpl);
+        _ser_return_outer_cleanup_sreg(&cpu_state.data.gs, target_cpl);
+    }
+    CPU_TRACE_CALL_END;
+}
+
 static void _ser_ret_far_outer(core_machine_cpu_execution_context *context,
     lib_u16 newcs, lib_u32 neweip, lib_u16 parambyte,
     lib_u16 byte)
@@ -4169,7 +4239,11 @@ static void _ser_ret_far_outer(core_machine_cpu_execution_context *context,
         &newss_cache, &ss_desc));
     CPU_TRACE_CHECK_RETURN(_s_read_xdt(context, newcs,
         X86_CPU_REFERENCE_OF(code_desc)));
-    if (!_IsDescCodeNonConform(code_desc))
+    if (!_IsDescCode(code_desc) ||
+        (_IsDescCodeNonConform(code_desc) &&
+            _GetDesc_DPL(code_desc) != target_cpl) ||
+        (_IsDescCodeConform(code_desc) &&
+            _GetDesc_DPL(code_desc) > target_cpl))
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
     if (!_IsDescPresent(code_desc))
         CPU_TRACE_CHECK_RETURN(_SetExcept_NP(newcs & 0xfffcu));
@@ -4190,6 +4264,7 @@ static void _ser_ret_far_outer(core_machine_cpu_execution_context *context,
     _MakeCPL(target_cpl);
     cpu_state.data.cs = newcs_cache;
     cpu_state.data.eip = neweip;
+    _ser_return_outer_cleanup_sregs(context, target_cpl);
     CPU_TRACE_CALL_END;
 }
 static void _ser_jmp_far_real(core_machine_cpu_execution_context *context, lib_u16 newcs, lib_u32 neweip, lib_u8 byte)
@@ -4361,6 +4436,24 @@ static void _s_task_cache_descriptor(t_cpu_data_sreg *cache,
     CPU_TRACE_CALL_END;
 }
 
+/* A task switch installs selector values before the corresponding descriptor
+ * checks.  Keep an unavailable cache explicit until its own check succeeds;
+ * late task-switch faults must retain that incoming-task image. */
+static void _s_task_set_unavailable(t_cpu_data_sreg *cache,
+    lib_u16 selector, t_cpu_data_sreg_type sregtype)
+{
+    lib_memory_set(cache, 0, sizeof(*cache));
+    cache->selector = selector;
+    cache->sregtype = sregtype;
+}
+
+static void _s_task_checkpoint(
+    core_machine_cpu_execution_context *context)
+{
+    context->instruction_task_checkpoint = cpu_state;
+    context->instruction_task_switched = LIB_TRUE;
+}
+
 static void _s_task_prepare_ldtr(core_machine_cpu_execution_context *context,
     lib_u16 selector, t_cpu_data_sreg *out_cache)
 {
@@ -4406,7 +4499,7 @@ static void _s_task_read_selector(core_machine_cpu_execution_context *context,
 
 static void _s_task_validate_data_selector(
     core_machine_cpu_execution_context *context, t_cpu_data_sreg *ldtr,
-    lib_u16 selector, t_cpu_data_sreg_type sregtype,
+    lib_u16 selector, t_cpu_data_sreg_type sregtype, lib_u8 cpl,
     t_cpu_data_sreg *out_cache)
 {
     lib_u64 descriptor;
@@ -4421,12 +4514,17 @@ static void _s_task_validate_data_selector(
         CPU_TRACE_CALL_END;
         return;
     }
-    if (_GetSelector_RPL(selector) != 0u) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_TS(selector & 0xfffcu));
-    }
     CPU_TRACE_CHECK_RETURN(_s_task_read_selector(context, ldtr, selector,
         X86_CPU_REFERENCE_OF(descriptor)));
-    if (!_IsDescDataWritable(descriptor) || _GetDesc_DPL(descriptor) != 0u) {
+    if (sregtype == SREG_STACK) {
+        if (!_IsDescDataWritable(descriptor) ||
+            _GetSelector_RPL(selector) != cpl ||
+            _GetDesc_DPL(descriptor) != cpl)
+            CPU_TRACE_CHECK_RETURN(_SetExcept_TS(selector & 0xfffcu));
+    } else if ((!_IsDescData(descriptor) && !_IsDescCodeReadable(descriptor)) ||
+        ((_IsDescData(descriptor) || _IsDescCodeNonConform(descriptor)) &&
+            (_GetSelector_RPL(selector) > _GetDesc_DPL(descriptor) ||
+             cpl > _GetDesc_DPL(descriptor)))) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_TS(selector & 0xfffcu));
     }
     if (!_IsDescPresent(descriptor)) {
@@ -4438,17 +4536,20 @@ static void _s_task_validate_data_selector(
 
 static void _s_task_validate_code_selector(
     core_machine_cpu_execution_context *context, t_cpu_data_sreg *ldtr,
-    lib_u16 selector, lib_u32 eip, t_cpu_data_sreg *out_cache)
+    lib_u16 selector, lib_u32 eip, lib_u8 cpl,
+    t_cpu_data_sreg *out_cache)
 {
     lib_u64 descriptor;
 
     CPU_TRACE_CALL_BEGIN("_s_task_validate_code_selector");
-    if (_IsSelectorNull(selector) || _GetSelector_RPL(selector) != 0u) {
+    if (_IsSelectorNull(selector) || _GetSelector_RPL(selector) != cpl) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_TS(selector & 0xfffcu));
     }
     CPU_TRACE_CHECK_RETURN(_s_task_read_selector(context, ldtr, selector,
         X86_CPU_REFERENCE_OF(descriptor)));
-    if (!_IsDescCodeNonConform(descriptor) || _GetDesc_DPL(descriptor) != 0u) {
+    if (!_IsDescCode(descriptor) ||
+        (_IsDescCodeNonConform(descriptor) && _GetDesc_DPL(descriptor) != cpl) ||
+        (_IsDescCodeConform(descriptor) && _GetDesc_DPL(descriptor) > cpl)) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_TS(selector & 0xfffcu));
     }
     if (!_IsDescPresent(descriptor)) {
@@ -4456,7 +4557,7 @@ static void _s_task_validate_code_selector(
     }
     _s_task_cache_descriptor(out_cache, selector, descriptor, SREG_CODE);
     CPU_TRACE_CHECK_RETURN(_kma_test_logical(context, out_cache, eip, 1u,
-        LIB_FALSE, 0u, LIB_TRUE));
+        LIB_FALSE, cpl, LIB_TRUE));
     CPU_TRACE_CALL_END;
 }
 
@@ -4623,7 +4724,7 @@ static void _s_task_write_state_16(core_machine_cpu_execution_context *context,
 static void _ser_task_transition_tss_plan(
     core_machine_cpu_execution_context *context, lib_u16 newcs,
     lib_u8 nested, lib_u8 returning, lib_u8 old_is_32,
-    lib_u8 new_is_32)
+    lib_u8 new_is_32, lib_u8 check_tss_privilege)
 {
     lib_u64 old_descriptor;
     lib_u64 new_descriptor;
@@ -4641,10 +4742,10 @@ static void _ser_task_transition_tss_plan(
     task_switch_state_32 outgoing32;
     lib_u16 backlink;
     lib_u16 debug_trap = 0u;
+    lib_u8 incoming_cpl;
 
     CPU_TRACE_CALL_BEGIN("_ser_task_transition_tss_plan");
-    if (!_IsProtected || context->cpu_profile < CORE_MACHINE_CPU_PROFILE_80386 ||
-        _GetCPL || _GetSelector_TI(newcs) || _GetSelector_RPL(newcs) != 0u)
+    if (!_IsProtected || _GetSelector_TI(newcs))
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
     if (!cpu_state.data.tr.flagValid || _GetSelector_TI(cpu_state.data.tr.selector))
         CPU_TRACE_CHECK_RETURN(_SetExcept_TS(0));
@@ -4663,7 +4764,8 @@ static void _ser_task_transition_tss_plan(
         (!new_is_32 && ((returning && !_IsDescTSS16Busy(new_descriptor)) ||
         (!returning && (!_IsDescTSS16Avl(new_descriptor) ||
             _IsDescTSS16Busy(new_descriptor))))) ||
-        _GetDesc_DPL(new_descriptor) != 0u)
+        (check_tss_privilege && (_GetDesc_DPL(new_descriptor) < _GetCPL ||
+            _GetDesc_DPL(new_descriptor) < _GetSelector_RPL(newcs))))
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
     if (!_IsDescPresent(new_descriptor))
         CPU_TRACE_CHECK_RETURN(_SetExcept_NP(newcs & 0xfffcu));
@@ -4682,11 +4784,9 @@ static void _ser_task_transition_tss_plan(
     if (nested)
         CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newtr,
             TASK_SWITCH_TSS_BACKLINK_OFFSET, 2u, LIB_TRUE, 0u, LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &cpu_state.data.gdtr,
-        _GetSelector_Offset(cpu_state.data.tr.selector), 8u, LIB_TRUE, 0u,
-        LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &cpu_state.data.gdtr,
-        _GetSelector_Offset(newcs), 8u, LIB_TRUE, 0u, LIB_TRUE));
+    CPU_TRACE_CHECK_RETURN(_ksa_test_write_xdt(context,
+        cpu_state.data.tr.selector));
+    CPU_TRACE_CHECK_RETURN(_ksa_test_write_xdt(context, newcs));
     if (new_is_32) {
         CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &newtr,
             TASK_SWITCH_TSS32_CR3_OFFSET, X86_CPU_REFERENCE_OF(incoming32),
@@ -4694,37 +4794,11 @@ static void _ser_task_transition_tss_plan(
         CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &newtr,
             TASK_SWITCH_TSS32_DEBUG_TRAP_OFFSET, X86_CPU_REFERENCE_OF(debug_trap),
             2u, 0u, LIB_TRUE));
-        if (incoming32.cr3 & ~VCPU_CR3_BASE)
-            CPU_TRACE_CHECK_RETURN(_SetExcept_TS(newcs & 0xfffcu));
-        CPU_TRACE_CHECK_RETURN(_s_task_prepare_ldtr(context,
-            incoming32.ldtr.selector, &newldtr));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_code_selector(context,
-            &newldtr, incoming32.cs.selector, incoming32.eip, &newcs_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming32.ss.selector, SREG_STACK, &newss_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming32.ds.selector, SREG_DATA, &newds_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming32.es.selector, SREG_DATA, &newes_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming32.fs.selector, SREG_DATA, &newfs_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming32.gs.selector, SREG_DATA, &newgs_cache));
-        CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &newss_cache,
-            incoming32.esp, 0u, LIB_FALSE));
+        incoming_cpl = (lib_u8)_GetSelector_RPL(incoming32.cs.selector);
     } else {
         CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &newtr, 0x0eu,
             X86_CPU_REFERENCE_OF(incoming16), sizeof(incoming16), 0u, LIB_TRUE));
-        CPU_TRACE_CHECK_RETURN(_s_task_prepare_ldtr(context, incoming16.ldtr,
-            &newldtr));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_code_selector(context,
-            &newldtr, incoming16.cs, incoming16.ip, &newcs_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming16.ss, SREG_STACK, &newss_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming16.ds, SREG_DATA, &newds_cache));
-        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context,
-            &newldtr, incoming16.es, SREG_DATA, &newes_cache));
+        incoming_cpl = (lib_u8)_GetSelector_RPL(incoming16.cs);
     }
 
     if (old_is_32) {
@@ -4786,7 +4860,6 @@ static void _ser_task_transition_tss_plan(
         cpu_state.data.cr3 = incoming32.cr3;
         cpu_state.data.eip = incoming32.eip;
         cpu_state.data.eflags = _e_eflags_load(context, incoming32.eflags);
-        if (nested) _SetEFLAGS_NT;
         cpu_state.data.eax = incoming32.eax;
         cpu_state.data.ecx = incoming32.ecx;
         cpu_state.data.edx = incoming32.edx;
@@ -4795,42 +4868,88 @@ static void _ser_task_transition_tss_plan(
         cpu_state.data.ebp = incoming32.ebp;
         cpu_state.data.esi = incoming32.esi;
         cpu_state.data.edi = incoming32.edi;
-        cpu_state.data.es = newes_cache;
-        cpu_state.data.cs = newcs_cache;
-        cpu_state.data.ss = newss_cache;
-        cpu_state.data.ds = newds_cache;
-        cpu_state.data.fs = newfs_cache;
-        cpu_state.data.gs = newgs_cache;
+        _s_task_set_unavailable(&cpu_state.data.es, incoming32.es.selector,
+            SREG_DATA);
+        _s_task_set_unavailable(&cpu_state.data.cs, incoming32.cs.selector,
+            SREG_CODE);
+        _s_task_set_unavailable(&cpu_state.data.ss, incoming32.ss.selector,
+            SREG_STACK);
+        _s_task_set_unavailable(&cpu_state.data.ds, incoming32.ds.selector,
+            SREG_DATA);
+        _s_task_set_unavailable(&cpu_state.data.fs, incoming32.fs.selector,
+            SREG_DATA);
+        _s_task_set_unavailable(&cpu_state.data.gs, incoming32.gs.selector,
+            SREG_DATA);
     } else {
-        cpu_state.data.eax = 0xffff0000u | incoming16.ax;
-        cpu_state.data.ecx = 0xffff0000u | incoming16.cx;
-        cpu_state.data.edx = 0xffff0000u | incoming16.dx;
-        cpu_state.data.ebx = 0xffff0000u | incoming16.bx;
-        cpu_state.data.esp = 0xffff0000u | incoming16.sp;
-        cpu_state.data.ebp = 0xffff0000u | incoming16.bp;
-        cpu_state.data.esi = 0xffff0000u | incoming16.si;
-        cpu_state.data.edi = 0xffff0000u | incoming16.di;
+        const lib_u32 high = context->cpu_profile >=
+            CORE_MACHINE_CPU_PROFILE_80386 ? 0xffff0000u : 0u;
+
+        cpu_state.data.eax = high | incoming16.ax;
+        cpu_state.data.ecx = high | incoming16.cx;
+        cpu_state.data.edx = high | incoming16.dx;
+        cpu_state.data.ebx = high | incoming16.bx;
+        cpu_state.data.esp = high | incoming16.sp;
+        cpu_state.data.ebp = high | incoming16.bp;
+        cpu_state.data.esi = high | incoming16.si;
+        cpu_state.data.edi = high | incoming16.di;
         cpu_state.data.eip = incoming16.ip;
         cpu_state.data.eflags = _e_eflags_load(context, incoming16.flags);
-        if (nested) _SetEFLAGS_NT;
-        cpu_state.data.es = newes_cache;
-        cpu_state.data.cs = newcs_cache;
-        cpu_state.data.ss = newss_cache;
-        cpu_state.data.ds = newds_cache;
-        lib_memory_set(&cpu_state.data.fs, 0, sizeof(cpu_state.data.fs));
-        cpu_state.data.fs.sregtype = SREG_DATA;
-        lib_memory_set(&cpu_state.data.gs, 0, sizeof(cpu_state.data.gs));
-        cpu_state.data.gs.sregtype = SREG_DATA;
+        _s_task_set_unavailable(&cpu_state.data.es, incoming16.es, SREG_DATA);
+        _s_task_set_unavailable(&cpu_state.data.cs, incoming16.cs, SREG_CODE);
+        _s_task_set_unavailable(&cpu_state.data.ss, incoming16.ss, SREG_STACK);
+        _s_task_set_unavailable(&cpu_state.data.ds, incoming16.ds, SREG_DATA);
+        _s_task_set_unavailable(&cpu_state.data.fs, 0u, SREG_DATA);
+        _s_task_set_unavailable(&cpu_state.data.gs, 0u, SREG_DATA);
     }
-    cpu_state.data.ldtr = newldtr;
+    _s_task_set_unavailable(&cpu_state.data.ldtr,
+        new_is_32 ? incoming32.ldtr.selector : incoming16.ldtr, SREG_LDTR);
     newtr.sys.type = new_is_32 ? VCPU_DESC_SYS_TYPE_TSS_32_BUSY :
         VCPU_DESC_SYS_TYPE_TSS_16_BUSY;
     cpu_state.data.tr = newtr;
     if (new_is_32) cpu_state.data.dr7 &= ~VCPU_DR7_LOCAL_ENABLE_MASK;
     _SetCR0_TS;
     if (new_is_32 && X86_CPU_GET_LSB(debug_trap)) cpu_state.data.dr6 |= VCPU_DR6_BT;
-    context->instruction_task_checkpoint = cpu_state;
-    context->instruction_task_switched = LIB_TRUE;
+    if (nested) _SetEFLAGS_NT;
+    else if (!returning) _ClrEFLAGS_NT;
+    _s_task_checkpoint(context);
+    CPU_TRACE_CHECK_RETURN(_s_task_prepare_ldtr(context,
+        new_is_32 ? incoming32.ldtr.selector : incoming16.ldtr, &newldtr));
+    cpu_state.data.ldtr = newldtr;
+    _s_task_checkpoint(context);
+    CPU_TRACE_CHECK_RETURN(_s_task_validate_code_selector(context, &newldtr,
+        new_is_32 ? incoming32.cs.selector : incoming16.cs,
+        new_is_32 ? incoming32.eip : incoming16.ip, incoming_cpl,
+        &newcs_cache));
+    cpu_state.data.cs = newcs_cache;
+    _s_task_checkpoint(context);
+    CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
+        new_is_32 ? incoming32.ss.selector : incoming16.ss, SREG_STACK,
+        incoming_cpl, &newss_cache));
+    cpu_state.data.ss = newss_cache;
+    _s_task_checkpoint(context);
+    CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
+        new_is_32 ? incoming32.ds.selector : incoming16.ds, SREG_DATA,
+        incoming_cpl, &newds_cache));
+    cpu_state.data.ds = newds_cache;
+    _s_task_checkpoint(context);
+    CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
+        new_is_32 ? incoming32.es.selector : incoming16.es, SREG_DATA,
+        incoming_cpl, &newes_cache));
+    cpu_state.data.es = newes_cache;
+    _s_task_checkpoint(context);
+    if (new_is_32) {
+        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
+            incoming32.fs.selector, SREG_DATA, incoming_cpl, &newfs_cache));
+        cpu_state.data.fs = newfs_cache;
+        _s_task_checkpoint(context);
+        CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
+            incoming32.gs.selector, SREG_DATA, incoming_cpl, &newgs_cache));
+        cpu_state.data.gs = newgs_cache;
+        _s_task_checkpoint(context);
+    }
+    CPU_TRACE_CHECK_RETURN(_m_test_logical(context, &cpu_state.data.ss,
+        new_is_32 ? incoming32.esp : incoming16.sp, 0u, LIB_FALSE));
+    _s_task_checkpoint(context);
     if (new_is_32 && X86_CPU_GET_LSB(debug_trap)) {
         t_cpu trap_cpu = cpu_state;
 
@@ -4855,17 +4974,9 @@ static void _ser_task_transition_tss_plan(
 }
 
 static void _ser_task_transition_tss(core_machine_cpu_execution_context *context,
-    lib_u16 newcs, lib_u8 nested, lib_u8 returning)
+    lib_u16 newcs, lib_u8 nested, lib_u8 returning,
+    lib_u8 check_tss_privilege)
 {
-    lib_u64 old_descriptor;
-    lib_u64 new_descriptor;
-    t_cpu_data_sreg newtr;
-    t_cpu_data_sreg newldtr;
-    t_cpu_data_sreg newcs_cache;
-    t_cpu_data_sreg newss_cache;
-    t_cpu_data_sreg newds_cache;
-    t_cpu_data_sreg newes_cache;
-    task_switch_state_16 state;
     lib_u64 cross_descriptor;
     lib_u8 old_is_32;
     lib_u8 new_is_32;
@@ -4875,160 +4986,23 @@ static void _ser_task_transition_tss(core_machine_cpu_execution_context *context
         cpu_state.data.tr.flagValid && cpu_state.data.tr.sys.type ==
         VCPU_DESC_SYS_TYPE_TSS_32_BUSY;
     if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 &&
-        cpu_state.data.tr.flagValid && !_GetSelector_TI(newcs) &&
-        _GetSelector_RPL(newcs) == 0u) {
+        !_GetSelector_TI(newcs)) {
         CPU_TRACE_CHECK_RETURN(_s_read_xdt(context, newcs,
             X86_CPU_REFERENCE_OF(cross_descriptor)));
         new_is_32 = _IsDescTSS32Avl(cross_descriptor) ||
             _IsDescTSS32Busy(cross_descriptor);
-        CPU_TRACE_CHECK_RETURN(_ser_task_transition_tss_plan(context,
-            newcs, nested, returning, old_is_32, new_is_32));
-        CPU_TRACE_CALL_END;
-        return;
-    }
-    if (!_IsProtected)
-        CPU_TRACE_IMPOSSIBLE_RETURN;
-    if (_GetCPL || _GetSelector_TI(newcs) || _GetSelector_RPL(newcs) != 0u) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
-    }
-    if (!cpu_state.data.tr.flagValid || _GetSelector_TI(cpu_state.data.tr.selector)) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_TS(0));
-    }
-    CPU_TRACE_CHECK_RETURN(_s_read_xdt(context, cpu_state.data.tr.selector,
-        X86_CPU_REFERENCE_OF(old_descriptor)));
-    if (!_IsDescTSS16Busy(old_descriptor) || !_IsDescPresent(old_descriptor)) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_TS(cpu_state.data.tr.selector & 0xfffcu));
-    }
-    if (cpu_state.data.tr.limit < 0x29u) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_TS(cpu_state.data.tr.selector & 0xfffcu));
-    }
-    CPU_TRACE_CHECK_RETURN(_s_read_xdt(context, newcs,
-        X86_CPU_REFERENCE_OF(new_descriptor)));
-    if ((returning && !_IsDescTSS16Busy(new_descriptor)) ||
-        (!returning && (!_IsDescTSS16Avl(new_descriptor) ||
-            _IsDescTSS16Busy(new_descriptor))) ||
-        _GetDesc_DPL(new_descriptor) != 0u) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
-    }
-    if (!_IsDescPresent(new_descriptor)) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_NP(newcs & 0xfffcu));
-    }
-    _s_task_cache_descriptor(&newtr, newcs, new_descriptor, SREG_TR);
-    if (newtr.limit < 0x2bu) {
-        CPU_TRACE_CHECK_RETURN(_SetExcept_TS(newcs & 0xfffcu));
-    }
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &cpu_state.data.tr,
-        0x0eu, sizeof(state), LIB_TRUE, 0u, LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newtr, 0x0eu, 0x1eu,
-        LIB_FALSE, 0u, LIB_TRUE));
-    if (nested)
-        CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &newtr,
-            TASK_SWITCH_TSS_BACKLINK_OFFSET, 2u, LIB_TRUE, 0u, LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &cpu_state.data.gdtr,
-        _GetSelector_Offset(cpu_state.data.tr.selector), 8u, LIB_TRUE, 0u,
-        LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_kma_test_access(context, &cpu_state.data.gdtr,
-        _GetSelector_Offset(newcs), 8u, LIB_TRUE, 0u, LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_kma_read_logical(context, &newtr, 0x0eu,
-        X86_CPU_REFERENCE_OF(state), sizeof(state), 0u, LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_s_task_prepare_ldtr(context, state.ldtr,
-        &newldtr));
-    CPU_TRACE_CHECK_RETURN(_s_task_validate_code_selector(context, &newldtr,
-        state.cs, state.ip, &newcs_cache));
-    CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
-        state.ss, SREG_STACK, &newss_cache));
-    CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
-        state.ds, SREG_DATA, &newds_cache));
-    CPU_TRACE_CHECK_RETURN(_s_task_validate_data_selector(context, &newldtr,
-        state.es, SREG_DATA, &newes_cache));
-
-    if (!nested)
-        _ClrDescTSSBusy(old_descriptor);
-    if (!returning)
-        _SetDescTSSBusy(new_descriptor);
-    if (nested)
-        CPU_TRACE_CHECK_RETURN(_kma_write_logical(context, &newtr,
-            TASK_SWITCH_TSS_BACKLINK_OFFSET,
-            X86_CPU_REFERENCE_OF(cpu_state.data.tr.selector), 2u, 0u,
-            LIB_TRUE));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x0eu,
-        X86_CPU_REFERENCE_OF(cpu_state.data.ip), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x10u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.flags), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x12u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.ax), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x14u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.cx), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x16u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.dx), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x18u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.bx), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x1au,
-        X86_CPU_REFERENCE_OF(cpu_state.data.sp), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x1cu,
-        X86_CPU_REFERENCE_OF(cpu_state.data.bp), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x1eu,
-        X86_CPU_REFERENCE_OF(cpu_state.data.si), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x20u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.di), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x22u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.es.selector), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x24u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.cs.selector), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x26u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.ss.selector), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x28u,
-        X86_CPU_REFERENCE_OF(cpu_state.data.ds.selector), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_tss(context, 0x2au,
-        X86_CPU_REFERENCE_OF(cpu_state.data.ldtr.selector), 2u));
-    CPU_TRACE_CHECK_RETURN(_s_write_xdt(context, cpu_state.data.tr.selector,
-        X86_CPU_REFERENCE_OF(old_descriptor)));
-    CPU_TRACE_CHECK_RETURN(_s_write_xdt(context, newcs,
-        X86_CPU_REFERENCE_OF(new_descriptor)));
-
-    cpu_state.data.eax = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.ax : state.ax;
-    cpu_state.data.ecx = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.cx : state.cx;
-    cpu_state.data.edx = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.dx : state.dx;
-    cpu_state.data.ebx = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.bx : state.bx;
-    cpu_state.data.esp = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.sp : state.sp;
-    cpu_state.data.ebp = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.bp : state.bp;
-    cpu_state.data.esi = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.si : state.si;
-    cpu_state.data.edi = context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ?
-        0xffff0000u | state.di : state.di;
-    cpu_state.data.eip = state.ip;
-    cpu_state.data.eflags = _e_eflags_load(context, state.flags);
-    if (nested)
-        _SetEFLAGS_NT;
-    cpu_state.data.es = newes_cache;
-    cpu_state.data.cs = newcs_cache;
-    cpu_state.data.ss = newss_cache;
-    cpu_state.data.ds = newds_cache;
-    cpu_state.data.ldtr = newldtr;
-    lib_memory_set(&cpu_state.data.fs, 0, sizeof(cpu_state.data.fs));
-    cpu_state.data.fs.sregtype = SREG_DATA;
-    lib_memory_set(&cpu_state.data.gs, 0, sizeof(cpu_state.data.gs));
-    cpu_state.data.gs.sregtype = SREG_DATA;
-    newtr.sys.type = VCPU_DESC_SYS_TYPE_TSS_16_BUSY;
-    cpu_state.data.tr = newtr;
-    _SetCR0_TS;
-    context->instruction_task_checkpoint = cpu_state;
-    context->instruction_task_switched = LIB_TRUE;
+    } else new_is_32 = LIB_FALSE;
+    CPU_TRACE_CHECK_RETURN(_ser_task_transition_tss_plan(context, newcs,
+        nested, returning, old_is_32, new_is_32, check_tss_privilege));
     CPU_TRACE_CALL_END;
 }
 
 static void _ser_task_switch_tss(core_machine_cpu_execution_context *context,
-    lib_u16 newcs, lib_u8 nested)
+    lib_u16 newcs, lib_u8 nested, lib_u8 check_tss_privilege)
 {
     CPU_TRACE_CALL_BEGIN("_ser_task_switch_tss");
     CPU_TRACE_CHECK_RETURN(_ser_task_transition_tss(context, newcs, nested,
-        LIB_FALSE));
+        LIB_FALSE, check_tss_privilege));
     CPU_TRACE_CALL_END;
 }
 
@@ -5048,7 +5022,7 @@ static void _ser_task_return_tss(core_machine_cpu_execution_context *context)
     if (_IsSelectorNull(backlink) || _GetSelector_TI(backlink))
         CPU_TRACE_CHECK_RETURN(_SetExcept_TS(backlink & 0xfffcu));
     CPU_TRACE_CHECK_RETURN(_ser_task_transition_tss(context, backlink,
-        LIB_FALSE, LIB_TRUE));
+        LIB_FALSE, LIB_TRUE, LIB_FALSE));
     CPU_TRACE_CALL_END;
 }
 /* regular execute control */
@@ -5312,14 +5286,18 @@ static void _ser_iret_protected_outer(core_machine_cpu_execution_context *contex
     }
     CPU_TRACE_CHECK_RETURN(_s_read_xdt(context, newcs,
         X86_CPU_REFERENCE_OF(code_desc)));
-    if (!_IsDescCodeNonConform(code_desc)) {
+    newcpl = (lib_u8)_GetSelector_RPL(newcs);
+    if (!_IsDescCode(code_desc) ||
+        (_IsDescCodeNonConform(code_desc) &&
+            _GetDesc_DPL(code_desc) != newcpl) ||
+        (_IsDescCodeConform(code_desc) &&
+            _GetDesc_DPL(code_desc) > newcpl)) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
     }
     if (!_IsDescPresent(code_desc)) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_NP(newcs & 0xfffcu));
     }
-    newcpl = (lib_u8)_GetSelector_RPL(newcs);
-    if (newcpl <= oldcpl || newcpl != _GetDesc_DPL(code_desc)) {
+    if (newcpl <= oldcpl) {
         CPU_TRACE_CHECK_RETURN(_SetExcept_GP(newcs & 0xfffcu));
     }
     switch (byte)
@@ -5369,6 +5347,7 @@ static void _ser_iret_protected_outer(core_machine_cpu_execution_context *contex
     cpu_state.data.eip = neweip;
     cpu_state.data.eflags = _e_eflags_load(context,
         (cpu_state.data.eflags & flags_mask) | (newflags & ~flags_mask));
+    _ser_return_outer_cleanup_sregs(context, newcpl);
     CPU_TRACE_CALL_END;
 }
 static void _ser_iret_protected_same(core_machine_cpu_execution_context *context,
@@ -5797,7 +5776,7 @@ static void _e_jmp_far(core_machine_cpu_execution_context *context, lib_u16 newc
             CPU_TRACE_CHECK_RETURN(_ser_jmp_far_task_gate(context, newcs));
         else if (_IsDescTSS(descriptor))
             CPU_TRACE_CHECK_RETURN(_ser_task_switch_tss(context, newcs,
-                LIB_FALSE));
+                LIB_FALSE, LIB_TRUE));
         else
         {
             CPU_TRACE_BLOCK_BEGIN("newcs(invalid)");
@@ -8310,6 +8289,33 @@ static lib_bool core_machine_cpu_allows_fpu(core_machine_cpu_profile cpu,
         cpu == CORE_MACHINE_CPU_PROFILE_80386;
 }
 
+static lib_bool core_machine_cpu_wait_test_asserted(
+    const core_machine_cpu_execution_context *context)
+{
+    return context->bus->wait_test_asserted != LIB_NULL &&
+        context->bus->wait_test_asserted(context->bus_context);
+}
+
+static void core_machine_cpu_begin_wait(
+    core_machine_cpu_execution_context *context, cpu_wait_state state)
+{
+    if (state == CPU_WAIT_STATE_ESC_RESTART) {
+        cpu_state = instruction_state.data.oldcpu;
+        context->instruction_wait_stall = LIB_TRUE;
+    }
+    context->wait_state = state;
+    /* The initial CPU-side WAIT row has not yet been published.  The next
+     * re-sample is five clocks after that row, yielding the 3/6 + 5n source
+     * formulas for 8086/8088 and 80186.  ESC restart has no retired WAIT row,
+     * so it starts at the bounded five-clock L2 control cadence instead.
+     * Later CPU profiles retain that cadence until a board gives a stronger
+     * contract. */
+    context->wait_poll_remaining_ticks = state == CPU_WAIT_STATE_ESC_RESTART ?
+        5u : (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80186 ? 6u :
+            context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386 ? 7u : 3u) + 5u;
+    cpu_state.data.flagHalt = LIB_TRUE;
+}
+
 static void FPU_ESCAPE(core_machine_cpu_execution_context *context)
 {
     x86_fpu_escape_action action;
@@ -8332,6 +8338,12 @@ static void FPU_ESCAPE(core_machine_cpu_execution_context *context)
     {
         CPU_TRACE_CHECK_RETURN(UndefinedOpcode(context));
     }
+    if (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80186 &&
+        context->bus->escape_trap_enabled != LIB_NULL &&
+        context->bus->escape_trap_enabled(context->bus_context))
+    {
+        CPU_TRACE_CHECK_RETURN(_SetExcept_NM(0));
+    }
     if (_GetCR0_EM || _GetCR0_TS)
     {
         CPU_TRACE_CHECK_RETURN(_SetExcept_NM(0));
@@ -8345,6 +8357,17 @@ static void FPU_ESCAPE(core_machine_cpu_execution_context *context)
         if (action == X86_FPU_ESCAPE_UNSUPPORTED)
         {
             CPU_TRACE_CHECK_RETURN(_SetExcept_FPU_UNSUPPORTED(0));
+        }
+        else if (context->cpu_profile == CORE_MACHINE_CPU_PROFILE_80286 &&
+            action != X86_FPU_ESCAPE_CONSUME_NONE &&
+            core_machine_cpu_wait_test_asserted(context))
+        {
+            /* 80286 waits for the 80287 BUSY/TEST connection before starting
+             * an ESC command.  Restore the ESC so interrupt return retries
+             * it, and let the existing Core deadline advance the FPU. */
+            core_machine_cpu_begin_wait(context, CPU_WAIT_STATE_ESC_RESTART);
+            CPU_TRACE_CALL_END;
+            return;
         }
         else if (action != X86_FPU_ESCAPE_CONSUME_NONE &&
             !context->preview_mode)
@@ -12624,7 +12647,8 @@ static void WAIT(core_machine_cpu_execution_context *context)
     }
     else
     {
-        (void)x86_fpu_complete_wait(context->fpu);
+        if (core_machine_cpu_wait_test_asserted(context))
+            core_machine_cpu_begin_wait(context, CPU_WAIT_STATE_TEST);
     }
     CPU_TRACE_CALL_END;
 }
@@ -12971,12 +12995,12 @@ static void MOVSB(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _m_movs(context, 1);
+            CPU_TRACE_CHECK_RETURN(_m_movs(context, 1));
         else
         {
             if (cpu_state.data.cx)
             {
-                _m_movs(context, 1);
+                CPU_TRACE_CHECK_RETURN(_m_movs(context, 1));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx)
@@ -13039,12 +13063,12 @@ static void MOVSW(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _m_movs(context, 2);
+            CPU_TRACE_CHECK_RETURN(_m_movs(context, 2));
         else
         {
             if (cpu_state.data.cx)
             {
-                _m_movs(context, 2);
+                CPU_TRACE_CHECK_RETURN(_m_movs(context, 2));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx)
@@ -13111,12 +13135,12 @@ static void CMPSB(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _a_cmps(context, 8);
+            CPU_TRACE_CHECK_RETURN(_a_cmps(context, 8));
         else
         {
             if (cpu_state.data.cx)
             {
-                _a_cmps(context, 8);
+                CPU_TRACE_CHECK_RETURN(_a_cmps(context, 8));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx &&
@@ -13185,12 +13209,12 @@ static void CMPSW(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _a_cmps(context, 16);
+            CPU_TRACE_CHECK_RETURN(_a_cmps(context, 16));
         else
         {
             if (cpu_state.data.cx)
             {
-                _a_cmps(context, 16);
+                CPU_TRACE_CHECK_RETURN(_a_cmps(context, 16));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx &&
@@ -13304,12 +13328,12 @@ static void STOSB(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _m_stos(context, 1);
+            CPU_TRACE_CHECK_RETURN(_m_stos(context, 1));
         else
         {
             if (cpu_state.data.cx)
             {
-                _m_stos(context, 1);
+                CPU_TRACE_CHECK_RETURN(_m_stos(context, 1));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx)
@@ -13372,12 +13396,12 @@ static void STOSW(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _m_stos(context, 2);
+            CPU_TRACE_CHECK_RETURN(_m_stos(context, 2));
         else
         {
             if (cpu_state.data.cx)
             {
-                _m_stos(context, 2);
+                CPU_TRACE_CHECK_RETURN(_m_stos(context, 2));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx)
@@ -13440,12 +13464,12 @@ static void LODSB(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _m_lods(context, 1);
+            CPU_TRACE_CHECK_RETURN(_m_lods(context, 1));
         else
         {
             if (cpu_state.data.cx)
             {
-                _m_lods(context, 1);
+                CPU_TRACE_CHECK_RETURN(_m_lods(context, 1));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx)
@@ -13508,12 +13532,12 @@ static void LODSW(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _m_lods(context, 2);
+            CPU_TRACE_CHECK_RETURN(_m_lods(context, 2));
         else
         {
             if (cpu_state.data.cx)
             {
-                _m_lods(context, 2);
+                CPU_TRACE_CHECK_RETURN(_m_lods(context, 2));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx)
@@ -13580,12 +13604,12 @@ static void SCASB(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _a_scas(context, 8);
+            CPU_TRACE_CHECK_RETURN(_a_scas(context, 8));
         else
         {
             if (cpu_state.data.cx)
             {
-                _a_scas(context, 8);
+                CPU_TRACE_CHECK_RETURN(_a_scas(context, 8));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx &&
@@ -13654,12 +13678,12 @@ static void SCASW(core_machine_cpu_execution_context *context)
     {
         _adv;
         if (instruction_state.data.prefix_rep == PREFIX_REP_NONE)
-            _a_scas(context, 16);
+            CPU_TRACE_CHECK_RETURN(_a_scas(context, 16));
         else
         {
             if (cpu_state.data.cx)
             {
-                _a_scas(context, 16);
+                CPU_TRACE_CHECK_RETURN(_a_scas(context, 16));
                 cpu_state.data.cx--;
             }
             if (cpu_state.data.cx &&
@@ -17186,10 +17210,19 @@ static void LAR_R32_RM32(core_machine_cpu_execution_context *context)
                 case VCPU_DESC_SYS_TYPE_TSS_16_BUSY:
                 case VCPU_DESC_SYS_TYPE_CALLGATE_16:
                 case VCPU_DESC_SYS_TYPE_TASKGATE:
+                case VCPU_DESC_SYS_TYPE_TRAPGATE_16:
+                case VCPU_DESC_SYS_TYPE_INTGATE_16:
+                    _SetEFLAGS_ZF;
+                    break;
                 case VCPU_DESC_SYS_TYPE_TSS_32_AVL:
                 case VCPU_DESC_SYS_TYPE_TSS_32_BUSY:
                 case VCPU_DESC_SYS_TYPE_CALLGATE_32:
-                    _SetEFLAGS_ZF;
+                case VCPU_DESC_SYS_TYPE_TRAPGATE_32:
+                case VCPU_DESC_SYS_TYPE_INTGATE_32:
+                    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386)
+                        _SetEFLAGS_ZF;
+                    else
+                        _ClrEFLAGS_ZF;
                     break;
                 default:
                     _ClrEFLAGS_ZF;
@@ -17211,7 +17244,7 @@ static void LAR_R32_RM32(core_machine_cpu_execution_context *context)
                     break;
                 case 4:
                     CPU_TRACE_BLOCK_BEGIN("OperandSize(4)");
-                    descriptor = (X86_CPU_MASK_U32(descriptor >> 32) & 0x00ffff00);
+                    descriptor = (X86_CPU_MASK_U32(descriptor >> 32) & 0x00f0ff00);
                     CPU_TRACE_CHECK_RETURN(_kma_write_ref(context, instruction_state.data.rr, X86_CPU_REFERENCE_OF(descriptor), 4));
                     CPU_TRACE_BLOCK_END;
                     break;
@@ -17277,9 +17310,14 @@ static void LSL_R32_RM32(core_machine_cpu_execution_context *context)
                 case VCPU_DESC_SYS_TYPE_TSS_16_AVL:
                 case VCPU_DESC_SYS_TYPE_LDT:
                 case VCPU_DESC_SYS_TYPE_TSS_16_BUSY:
+                    _SetEFLAGS_ZF;
+                    break;
                 case VCPU_DESC_SYS_TYPE_TSS_32_AVL:
                 case VCPU_DESC_SYS_TYPE_TSS_32_BUSY:
-                    _SetEFLAGS_ZF;
+                    if (context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80386)
+                        _SetEFLAGS_ZF;
+                    else
+                        _ClrEFLAGS_ZF;
                     break;
                 default:
                     _ClrEFLAGS_ZF;
@@ -18598,6 +18636,22 @@ static void ExecIns(core_machine_cpu_execution_context *context)
     }
     ExecFinal(context);
 }
+
+static void core_machine_cpu_legacy_string_interrupt_resume(
+    core_machine_cpu_execution_context *context)
+{
+    lib_u8 prefixes = 0u;
+
+    if (context->cpu_profile > CORE_MACHINE_CPU_PROFILE_8088 ||
+        !instruction_state.data.flagInsLoop) return;
+    while (prefixes < instruction_state.data.oplen &&
+        _kdf_check_prefix(context, instruction_state.data.opcodes[prefixes]))
+        ++prefixes;
+    if (prefixes > 1u)
+        cpu_state.data.eip = X86_CPU_MASK_U16(
+            instruction_state.data.oldcpu.data.eip + prefixes - 1u);
+}
+
 static void ExecInt(core_machine_cpu_execution_context *context)
 {
     lib_u8 intr = 0x00;
@@ -18616,6 +18670,8 @@ static void ExecInt(core_machine_cpu_execution_context *context)
         /* A queued step trap cannot wake HALT. Recheck delivery inputs after
          * the accepted wake, since handler entry can itself produce an edge. */
         if (!nmi_ready && !intr_ready) return;
+        context->wait_state = CPU_WAIT_STATE_NONE;
+        context->wait_poll_remaining_ticks = 0u;
         cpu_state.data.flagHalt = LIB_FALSE;
     }
     if (debug_first) _debug_deliver_trap(context);
@@ -18627,6 +18683,7 @@ static void ExecInt(core_machine_cpu_execution_context *context)
         context->nmi_pending = LIB_FALSE;
         context->nmi_in_service =
             context->cpu_profile >= CORE_MACHINE_CPU_PROFILE_80286;
+        core_machine_cpu_legacy_string_interrupt_resume(context);
         ExecInit(context);
         _e_intr_n(context, 0x02, _GetOperandSize, LIB_TRUE);
         if (!instruction_state.data.except) {
@@ -18647,6 +18704,7 @@ static void ExecInt(core_machine_cpu_execution_context *context)
             ExecFinal(context);
             return;
         }
+        core_machine_cpu_legacy_string_interrupt_resume(context);
         ExecInit(context);
         _e_intr_n(context, intr, _GetOperandSize, LIB_TRUE);
         if (!instruction_state.data.except) {
@@ -19231,11 +19289,15 @@ void core_machine_cpu_execution_reset(
     context->debug_trap_cause = 0u;
     context->instruction_in_progress = LIB_FALSE;
     context->instruction_fault_delivered = LIB_FALSE;
+    context->instruction_wait_stall = LIB_FALSE;
+    context->wait_state = CPU_WAIT_STATE_NONE;
+    context->wait_poll_remaining_ticks = 0u;
 }
 void core_machine_cpu_execution_refresh(
     core_machine_cpu_execution_context *context)
 {
     context->instruction_fault_delivered = LIB_FALSE;
+    context->instruction_wait_stall = LIB_FALSE;
     if (core_machine_cpu_is_shutdown(context)) {
         /* Shutdown admits NMI, not instructions, INTR or pending debug traps. */
         if (context->shutdown_state == CPU_SHUTDOWN_RESET_ONLY ||
@@ -19263,6 +19325,7 @@ void core_machine_cpu_execution_refresh(
         }
         return;
     }
+    core_machine_cpu_execution_poll_wait(context);
     if (!cpu_state.data.flagHalt)
     {
         context->debug_segment_shadow_before =
