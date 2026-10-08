@@ -536,6 +536,10 @@ add_test(NAME softpc-runtime-restart-boot-smoke
 set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     LABELS "integration")
+# This test drives a live guest through Windows UI transitions with bounded
+# real-time waits. Reserve the requested parallel capacity instead of making
+# those waits depend on unrelated CPU-heavy test processes.
+set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES PROCESSORS 8)
 add_executable(softpc-runtime-input-continuation-smoke
     test/app-softpc/integration/runtime_input_continuation_smoke.c
     test/app-softpc/integration/machine_fixture.c

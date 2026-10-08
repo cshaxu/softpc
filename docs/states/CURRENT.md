@@ -6,23 +6,35 @@ M9 T85 S12 has completed its clean-corpus implementation and dual-width
 qualification. All eight shared source/test packages plus the three shared
 test helper scripts are byte-exact to clean NXVM `a397b925c`; package builds
 and full background CTest pass 479/479 on x64 and x86. Delivery P1
-`1f7383f4` is pushed and awaits owner validation. M9 T85 S13 is admitted for
-parallel-test isolation only; no production component, API or product behavior
-is in scope.
+`1f7383f4` is pushed and awaits owner validation. The required S12 delivery
+closure was not yet recorded, so its parallel-test isolation continuation
+remains M9 T85 S12 rather than allocating S13. No production component, API
+or product behavior is in scope.
 
-## M9 T85 S13 Packet
+## M9 T85 S12 Packet
 
 | Field | Required record |
 | --- | --- |
+| Identifier Mode | Continuation |
 | Admission And Approval | Owner directs a minimal shared-test repair after full `-j8` qualification exposed working-directory contention and native-desktop assumptions. |
 | Objective | Make concurrent shared tests independent without serializing unrelated tests; make the native Console smoke verify restoration against the host's actual supported viewport. |
-| Scope | `test/register.cmake`, `test/lib/CMakeLists.txt`, `test/lib/console_broker_display_smoke.c`, affected test manifest and task record only. |
+| Scope | `test/register.cmake`, root test registration, `test/lib/CMakeLists.txt`, `test/lib/console_broker_display_smoke.c`, affected test manifest and task record only. |
 | Non-goals | No `src/` production change, product behavior/API change, fixed timeout/sleep workaround, broad `RUN_SERIAL`, or host-resolution requirement. |
-| Design | Give each `shared_register_test()` target its own configured working directory. Apply one CTest resource lock only to the desktop-owning Console/Window smokes. Retain concurrent execution for all other tests. Derive Console readback/restore extents from the actual supported buffer/viewport rather than asserting a 120×30 terminal. |
+| Reference Baseline | SoftPC `29feef48`; the delivered eight-package corpus at NXVM `a397b925c` remains the required source/test baseline. |
+| Candidate Proposal | [S12 P4 parallel isolation](../proposals/m9-windows-101-startup-repair.md#s12-p4-parallel-shared-test-isolation) |
+| Files And ABI Surface | Test registration and Lib test implementation only; no production ABI or source path changes. |
+| Applicable Rules | Task Reading Set, current Architecture/Coding/Execution/Document rules, and existing shared test ownership/manifests. |
+| Design | Give each `shared_register_test()` target its own configured working directory. Apply one CTest resource lock only to the desktop-owning Console/Window smokes. Retain concurrent execution for all other tests. Declare the existing live-guest restart proof's full scheduler capacity instead of allowing unrelated CPU-heavy probes to invalidate its bounded UI waits. Derive Console readback/restore extents from the actual supported buffer/viewport rather than asserting a 120×30 terminal. |
 | Verification | Clean reconfigure; x64/x86 `ctest -j8` full suite; focused native Console display smoke on both widths; manifests/boundary checks; package builds. Report concurrency result and actual diff. |
+| Expected Markers | No shared working directory among registered shared tests; only the declared native tests contend for the resource lock; valid 29-row viewport passes restore proof. |
+| Asset Needs | Existing disposable build/test trees only. No INI, snapshot, guest media or package artifact mutation is needed. |
+| Reporting Requirements | Report changed production/test paths and added/removed/net lines, focused and full parallel evidence, pushed P and coordinator review; wait for owner validation. |
+| Stop Conditions | A test requires shared state by contract, CTest cannot create the isolated directory, a native test needs a different host resource, or a test-only repair would alter production behavior. |
 | Exit Criteria | No shared artifact collision, no unsupported viewport assertion, no production delta, all qualifications pass, then commit/push and await owner validation. |
+| Original Owner Request | 全套 `-j8` 验证暴露测试隔离缺口；追加 S 任务做最小修复。 |
+| Similar-Issue Sweep | Inventory all `shared_register_test()` call sites and all Windows desktop-labelled tests; ensure no remaining broad serial property or fixed relative artifact owner conflicts. |
 
-## M9 T85 S12 Packet
+## S12 delivery baseline
 
 | Field | Required record |
 | --- | --- |

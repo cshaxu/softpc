@@ -132,7 +132,7 @@ validation; this record does not close S12 or T85.
 P1 `1f7383f4` contains the complete corpus import, qualification records and
 refreshed dual package executables.
 
-## S13 parallel shared-test isolation
+## S12 P4 parallel shared-test isolation
 
 Admission follows full parallel (`-j8`) qualification: the shared registration
 helper gives many independently launched tests the same working directory, so
@@ -149,11 +149,13 @@ three tests that create/operate a real native Console or Window will use the
 same CTest resource lock; no unrelated test will become serial. The Console
 smoke will determine a legal viewport from the created Console's capabilities,
 then compare restoration of that legal state rather than require a particular
-host font/display geometry. It must retain the existing failure-injection and
-history assertions.
+host font/display geometry. The existing live-guest restart proof will reserve
+the full requested CTest capacity, so its bounded Windows UI waits are not
+made nondeterministic by unrelated CPU-heavy probes. It must retain the
+existing failure-injection and history assertions.
 
 Expected change is roughly 20–35 net test/CMake lines in
-`test/register.cmake`, `test/lib/CMakeLists.txt` and
+`CMakeLists.txt`, `test/register.cmake`, `test/lib/CMakeLists.txt` and
 `test/lib/console_broker_display_smoke.c`, plus the Lib test manifest. No
 `src/` path, public interface, product package or guest asset is authorized to
 change. Qualification is fresh dual-width configuration, focused Console
