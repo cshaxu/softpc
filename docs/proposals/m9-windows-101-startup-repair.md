@@ -129,6 +129,9 @@ case is skipped for a missing binary. The refreshed `softpc64.exe` and
 `softpc32.exe` are delivery artifacts. S12 remains open pending owner manual
 validation; this record does not close S12 or T85.
 
+P1 `1f7383f4` contains the complete corpus import, qualification records and
+refreshed dual package executables.
+
 ## S11 eight-package test corpus synchronization
 
 Original owner request: 准入一个s来导入.

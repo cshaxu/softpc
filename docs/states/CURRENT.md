@@ -5,8 +5,8 @@
 M9 T85 S12 has completed its clean-corpus implementation and dual-width
 qualification. All eight shared source/test packages plus the three shared
 test helper scripts are byte-exact to clean NXVM `a397b925c`; package builds
-and full background CTest pass 479/479 on x64 and x86. The delivery P is being
-recorded and pushed; S12 and T85 remain open awaiting owner validation.
+and full background CTest pass 479/479 on x64 and x86. Delivery P1
+`1f7383f4` is pushed; S12 and T85 remain open awaiting owner validation.
 
 ## M9 T85 S12 Packet
 
