@@ -658,6 +658,20 @@ foreach(probe IN ITEMS platform audio)
     list(APPEND SOFTPC_TEST_TARGETS ${probe_target})
 endforeach()
 get_target_property(shutdown_test_links softpcvm LINK_LIBRARIES)
+add_executable(softpc-presentation-shutdown-smoke
+    test/app-softpc/integration/presentation_shutdown_smoke.c)
+target_include_directories(softpc-presentation-shutdown-smoke PRIVATE src src/app-softpc
+    src/app-softpc/compat src/app-softpc/product)
+get_target_property(shutdown_test_sources softpcvm SOURCES)
+list(REMOVE_ITEM shutdown_test_sources src/app-softpc/product/main.c
+    src/app-softpc/product/firmware.rc)
+target_sources(softpc-presentation-shutdown-smoke PRIVATE ${shutdown_test_sources})
+target_link_libraries(softpc-presentation-shutdown-smoke PRIVATE softpc-machine
+    ${shutdown_test_links})
+add_test(NAME softpc-presentation-shutdown-smoke
+    COMMAND softpc-presentation-shutdown-smoke)
+set_tests_properties(softpc-presentation-shutdown-smoke PROPERTIES LABELS "unit" TIMEOUT 10)
+list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-shutdown-smoke)
 add_executable(softpc-runtime-cursor-smoke test/app-softpc/integration/runtime_cursor_smoke.c)
 target_include_directories(softpc-runtime-cursor-smoke PRIVATE src src/app-softpc/compat src/app-softpc/product)
 get_target_property(cursor_test_sources softpcvm SOURCES)

@@ -215,6 +215,72 @@ static lib_i32 composition_ui_failure_recovers(composition_failure failure)
     return vm_app_destroy(app) == LIB_STATUS_OK && composition_fixture_clean();
 }
 
+static lib_i32 composition_destroy_failure_recovers(void)
+{
+    vm_app *app = LIB_NULL;
+    common_session_options session_options = {0};
+    common_ui_options ui_options = {0};
+
+    composition_fixture_reset(COMPOSITION_FAILURE_NONE);
+    if (vm_app_create(&composition_machine, &app) != LIB_STATUS_OK ||
+        vm_app_compose_machine(app) != LIB_STATUS_OK ||
+        vm_app_compose_control(app, &session_options) != LIB_STATUS_OK ||
+        vm_app_compose_ui(app, &ui_options) != LIB_STATUS_OK) return 0;
+    fixture.shutdown_status = LIB_STATUS_IO_ERROR;
+    if (vm_app_destroy(app) != LIB_STATUS_INTERNAL_ERROR || !fixture.machine.live ||
+        !fixture.common_machine.live || !fixture.session.live || !fixture.ui.live ||
+        fixture.machine_destroy_count != 0u || fixture.common_machine_destroy_count != 0u ||
+        fixture.session_destroy_count != 0u || fixture.ui_destroy_count != 0u) return 0;
+    fixture.shutdown_status = LIB_STATUS_OK;
+    return vm_app_destroy(app) == LIB_STATUS_OK && composition_fixture_clean();
+}
+
+static lib_i32 composition_machine_cleanup_failure_recovers(void)
+{
+    vm_app *app = LIB_NULL;
+
+    composition_fixture_reset(COMPOSITION_FAILURE_MACHINE_BIND);
+    fixture.machine_destroy_status = LIB_STATUS_IO_ERROR;
+    if (vm_app_create(&composition_machine, &app) != LIB_STATUS_OK ||
+        vm_app_compose_machine(app) != LIB_STATUS_INTERNAL_ERROR ||
+        vm_app_common_machine(app) != &fixture.common_machine ||
+        !fixture.common_machine.live || !fixture.machine.live ||
+        fixture.machine_destroy_count != 0u ||
+        vm_app_compose_machine(app) != LIB_STATUS_INVALID_STATE) return 0;
+    fixture.machine_destroy_status = LIB_STATUS_OK;
+    return vm_app_destroy(app) == LIB_STATUS_OK && composition_fixture_clean() &&
+        fixture.common_machine_destroy_count == 2u && fixture.machine_destroy_count == 1u;
+}
+
+static lib_i32 composition_ui_destroy_failure_recovers(lib_bool binding_failed)
+{
+    vm_app *app = LIB_NULL;
+    common_session_options session_options = {0};
+    common_ui_options ui_options = {0};
+
+    composition_fixture_reset(binding_failed ? COMPOSITION_FAILURE_UI_BIND :
+        COMPOSITION_FAILURE_NONE);
+    if (vm_app_create(&composition_machine, &app) != LIB_STATUS_OK ||
+        vm_app_compose_machine(app) != LIB_STATUS_OK ||
+        vm_app_compose_control(app, &session_options) != LIB_STATUS_OK) return 0;
+    fixture.ui_destroy_status = binding_failed ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
+    if (vm_app_compose_ui(app, &ui_options) !=
+            (binding_failed ? LIB_STATUS_INTERNAL_ERROR : LIB_STATUS_OK) ||
+        vm_app_ui(app) != &fixture.ui || !fixture.ui.live) return 0;
+    fixture.ui_destroy_status = LIB_STATUS_IO_ERROR;
+    if (vm_app_destroy(app) != LIB_STATUS_INTERNAL_ERROR ||
+        vm_app_ui(app) != &fixture.ui || !fixture.ui.live ||
+        !fixture.session.live || !fixture.common_machine.live ||
+        !fixture.machine.live || fixture.session_destroy_count != 0u ||
+        fixture.common_machine_destroy_count != 0u ||
+        fixture.machine_destroy_count != 0u) return 0;
+    fixture.ui_destroy_status = LIB_STATUS_OK;
+    return vm_app_destroy(app) == LIB_STATUS_OK && composition_fixture_clean() &&
+        fixture.ui_destroy_count == (binding_failed ? 3u : 2u) &&
+        fixture.session_destroy_count == 1u &&
+        fixture.common_machine_destroy_count == 1u && fixture.machine_destroy_count == 1u;
+}
+
 lib_i32 main(void)
 {
     if (!composition_machine_failure_recovers(
@@ -222,7 +288,11 @@ lib_i32 main(void)
         !composition_machine_failure_recovers(COMPOSITION_FAILURE_MACHINE_BIND) ||
         !composition_control_failure_recovers() ||
         !composition_ui_failure_recovers(COMPOSITION_FAILURE_UI_CREATE) ||
-        !composition_ui_failure_recovers(COMPOSITION_FAILURE_UI_BIND)) return 1;
+        !composition_ui_failure_recovers(COMPOSITION_FAILURE_UI_BIND) ||
+        !composition_destroy_failure_recovers() ||
+        !composition_machine_cleanup_failure_recovers() ||
+        !composition_ui_destroy_failure_recovers(LIB_FALSE) ||
+        !composition_ui_destroy_failure_recovers(LIB_TRUE)) return 1;
     lib_c_printf("APP-COMPOSITION-ATOMICITY:OK\n");
     return 0;
 }

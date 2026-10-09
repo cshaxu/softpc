@@ -2,26 +2,26 @@
 
 ## Current Work
 
-## M9 T85 S14 Packet
+## M9 T85 S17 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs: “好，请你准入一个S任务，原样导入nxvm八组件，并接入 ibmpc/product”。 T85 remains open. |
-| Objective | Import the current read-only NXVM eight-package corpus (`src/{lib,common,x86,ibmpc}`, `test/{lib,common,x86,ibmpc}`), then replace SoftPC’s duplicate Product command/keyboard/composition implementation with the imported `ibmpc/product`. Retain only SoftPC-owned configuration, machine composition, resources, and snapshot/media command extension. Product receives an App-composed private machine/driver lifetime and an App-composed two-field UI choice; it parses no configuration and exposes no request/configuration ABI. |
-| Non-goals | No modification of NXVM; no Core mirror/Compat behavior change; no new Product state machine or App startup-text/configuration seam; no change to the approved common `> ` monitor prompt or shared help heading; no guest media, snapshot, or user INI mutation. |
-| Reference Baseline | SoftPC `cf33d1ccee2b9a887b9dcd74eaa427590ffb53da`; current mutable, read-only NXVM worktree. All eight roots are copied verbatim first; the App-composed machine/UI handoff and its direct test receivers are the only admitted post-import shared delta. |
-| Candidate Proposal | [S14 shared IBM PC Product adoption](../proposals/m9-windows-101-startup-repair.md#s14-shared-ibm-pc-product-adoption) |
-| Files And ABI Surface | Eight exact corpus roots and their manifests/build DAGs; `src/app-softpc/product`, the SoftPC App-private machine-composition boundary, product tests/CMake and source-layout/architecture documentation as required. Product command ABI moves from SoftPC-private callbacks to imported `ibmpc/product` plus a SoftPC extension only. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; no App-to-Compat/Mirror edge. |
-| Verification | Exact eight-root path/SHA comparison to NXVM source except the admitted composed-machine/UI ABI receivers; dual x64/x86 Release package builds; isolated eight-package tests; background full regression; Product command/hotkey/snapshot/media focused tests; manifests, DAG, dependency and documentation gates. |
-| Expected Markers | No duplicate SoftPC command/keyboard/composition path; shared `ibmpc/product` owns Common composition and core command/hotkey policy; SoftPC extension alone owns snapshot/floppy commands; both package EXEs rebuilt. |
-| Asset Needs | Existing build trees only. Preserve `assets/binary/softpc.ini`, guest media and snapshots. Refresh only the dual EXEs after successful verification. |
-| Reporting Requirements | Before/after production/test path and line accounting; frozen NXVM ledger; every retained SoftPC Product file and receiver; exact corpus comparison; dual-width focused/full results; EXE links; pushed complete P; then wait for owner validation. |
-| Stop Conditions | NXVM changes during copy; exact corpus contains an outward dependency or requires a local shared fork; required SoftPC behavior cannot be represented by the approved extension seam; Core/Compat or user-owned asset change becomes necessary. |
-| Exit Criteria | Eight roots exact to the frozen NXVM ledger; SoftPC uses the shared Product with no second command/hotkey/composition implementation; required dual-width qualification and P complete; task remains open pending owner validation. |
-| Original Owner Request | 好，请你准入一个S任务，原样导入nxvm八组件，并接入 ibmpc/product |
-| Similar-Issue Sweep | Sweep App Product code, CMake target ownership and product tests for former SoftPC command/keyboard/composition symbols, direct VM composition, and duplicate snapshot/media parser paths; each hit is removed or receives the sole SoftPC-extension disposition. |
+| Admission And Approval | Owner directs the three-stage component reorganization after closing S16: create Product, rename Common to Emulator, then qualify without the retained x86/ibmpc trees. |
+| Objective | Establish `src/product` and `test/product` as the shared Product component by relocating x86/xasm32, x86/debug and ibmpc/product with matching tests, C11 build ownership, manifests and internal `product_*` vocabulary. |
+| Non-goals | No behavior, ABI, Core/Compat/mirror, configuration, media, snapshot or remaining x86/ibmpc implementation change; do not rename Common in this S; do not link SoftPC to retained x86/ibmpc subsystems. |
+| Reference Baseline | S16 closure on SoftPC main, including its intentional removal of NXVM-private IBM PC configuration code. |
+| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md) |
+| Files And ABI Surface | Relocated `src/x86/{debug,xasm32}`, `src/ibmpc/product`, their `test` subtrees, CMake/manifests and direct consumers. Public component naming changes from `x86_*`/`ibmpc_product_*` only where the moved Product API presently exposes them. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; inward dependency ownership; structural relocation by `git mv`. |
+| Verification | Frozen move ledger; source/test manifests and dependency gates; C11 x64/x86 Product builds and focused tests; no remaining Product link to retained x86/ibmpc paths; architecture/documentation checks. |
+| Expected Markers | `src/product/{debug,xasm32,surface}` and `test/product` own the moved code; all moved symbols/targets use `product_*`; remaining x86 and ibmpc roots retain only their non-Product subsystems. |
+| Asset Needs | No media or configuration changes. Do not refresh package EXEs until a runnable Product integration S requires it. |
+| Reporting Requirements | Before/after source/test path and line ledger; rename-aware move accounting; moved API/target map; dual-width focused evidence; pushed complete P and then owner validation. |
+| Stop Conditions | A move requires an unapproved product behavior/API redesign, creates a product dependency on retained x86/ibmpc hardware paths, or exposes a non-mechanical Common rename requirement. |
+| Exit Criteria | Product exists as one internally named source/test corpus with no duplicate implementation; direct dependencies conform to `lib < emulator ~ [x86 < ibmpc] ~ product`; S18/S19 remain separately admitted. |
+| Original Owner Request | lib -> lib; common -> emulator; x86/xasm32 -> product/xasm32; x86/debug -> product/debug; ibmpc/product -> product/surface; rename matching symbols and test components. |
+| Similar-Issue Sweep | Inventory every CMake target, include, public symbol and test registration below the three moved roots; search for stale `x86-debug`, `x86-xasm32`, `ibmpc-product`, `common_` and old source paths. |
 
 ### S14 executor delivery
 

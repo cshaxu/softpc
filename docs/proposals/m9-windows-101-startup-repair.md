@@ -99,6 +99,52 @@ reports the reader's `Cannot load machine state.` result rather than a paused
 state rejection.  Both Release packages build; the focused Product/boundary
 set passes 5/5 on x64 and x86, and documentation governance passes.
 
+## S16 shared Product ownership and teardown coverage
+
+S14 exposed two distinct ownership mistakes.  First, `src/ibmpc/nxvm/` and
+the paired `test/ibmpc/product/{ini,composed_machine}_smoke.c` encode NXVM INI
+and startup semantics, not IBM-PC Product semantics.  They are removed from
+SoftPC's shared IBM PC roots, including their CMake target and manifest entries.
+NXVM must later move the same code to its App-private layer and remove it from
+its shared roots; until then this intentional removal is the sole recorded
+SoftPC/NXVM IBM-PC corpus delta.  SoftPC neither builds nor runs the adapter.
+
+Second, `vm_app_destroy()` still owns ordered shutdown and retry semantics, but
+S14 removed their direct proofs.  Restore the focused shared composition cases
+for machine shutdown failure, UI-destroy failure, machine-destroy failure, and
+the two UI-binding cleanup paths.  Each must prove that a failed destroy
+retains the live dependency graph and a subsequent retry completes exactly
+once.  Restore the separately App-owned presentation shutdown integration smoke
+under `test/app-softpc/integration`; it validates real Session/provider failure
+handling and must not be misclassified as a shared Product unit test.
+
+No production behavior or API changes are admitted.  The finite sweep is all
+references to `nxvm_`, `vm_app_ini_`, `NXVM.ini`, `ibmpc-nxvm-adapter`, retained
+fixture failure fields, and the former integration test target.  Qualification
+is x64/x86 Release package builds, focused restored tests, the IBM-PC suite,
+background product regressions, manifests/DAG/dependency gates and documentation
+governance.  Package EXEs may refresh only after all required proof passes;
+user-owned INI, media and snapshots remain untouched.
+
+### S16 delivery
+
+The ten NXVM-private production/test paths, their shared adapter target and
+their manifest records are gone from SoftPC's IBM PC corpus.  The resulting
+intentional NXVM delta is limited to those paths and must be eliminated upstream
+by moving them into NXVM's App layer, not by restoring them here.  The shared
+composition smoke again proves shutdown, machine cleanup, UI cleanup and
+binding-cleanup failure retention followed by exactly-once retry.  The
+App-owned presentation-shutdown smoke again drives the real Product entry,
+Session and SoftPC composition with a fake UI for exit, Console failure, KVM
+delivery failure and terminal UI teardown failure.
+
+Both Release package EXEs built.  Focused restored proofs pass on x64 and x86;
+the complete x64 IBM PC suite passes 174/174.  The owner redirected work before
+the independently compiling x86 whole-suite/background phase completed, so S16
+does not claim that unrun qualification.  Manifest and IBM PC dependency gates
+pass on both widths.  This is an owner-directed S closure, not a claim that
+the interrupted full test phase passed.
+
 ## S12 current NXVM corpus refresh and four-suite verification
 
 Original owner request: 没关系，没关系，你可以准入一个新的 S 任务，把 NXVM 的所有有差异的部分导入进来，然后再跑这个测试，四个测试。
