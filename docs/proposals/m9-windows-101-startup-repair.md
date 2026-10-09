@@ -17,7 +17,11 @@ debug entry, keyboard hotkeys, Common Machine/Session/UI composition and
 teardown. SoftPC retains only its `softpc.ini` loader and path policy, its VM
 machine-composition adapter, PE resource, and an App extension for the approved
 snapshot/floppy commands. The shared monitor prompt remains `> ` and its
-approved generic help heading remains unchanged.
+approved generic help heading remains unchanged. Product owns the fixed
+monitor preamble: App supplies only its identity line, then Product prints
+`Built on <compile-date> <compile-time>` with a blank line before and after it
+before opening the help menu. This is fixed presentation, not an App-provided
+startup-text/configuration seam.
 
 The import freezes a complete path/SHA-256 ledger from NXVM’s mutable but
 read-only worktree before copy. Its eight source/test roots must match that
@@ -59,6 +63,22 @@ label pass: x64 476/476 and x86 476/476.  Product command, composition,
 entry, corpus and manifest tests pass on both widths; source/DAG/boundary and
 documentation gates pass.  Package EXEs are refreshed.  This is the executor
 delivery record; T85 remains open awaiting owner validation.
+
+### S14 P2 startup-preamble correction
+
+The initial S14 import accidentally reduced the historic monitor preamble to
+the identity line. Restore the stable Product-owned sequence
+`<identity>\n\nBuilt on <date> <time>\n\n<help>` directly in the shared entry
+path. The definition ABI remains unchanged: App continues to supply only the
+identity, composed machine and composed UI values. Rebuild both packages and
+run the entry/Product smoke coverage before pushing the corrected P.
+
+Delivered P2 changes one Product source path and its manifest record; no App,
+Common, Lib, Core/Compat, configuration or public ABI path changes. The x64
+and x86 Release package targets both rebuild successfully. On each width the
+focused Product/boundary set passes 5/5 (`softpc-product-boundary-negative`,
+`softpc-command-provider-smoke`, `ibmpc.command`, `ibmpc.entry`,
+`ibmpc.manifest`), and `ibmpc-verify` passes its manifest and DAG checks.
 
 ## S12 current NXVM corpus refresh and four-suite verification
 

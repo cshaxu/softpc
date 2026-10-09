@@ -9,7 +9,7 @@
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner directs: “好，请你准入一个S任务，原样导入nxvm八组件，并接入 ibmpc/product”。 T85 remains open. |
 | Objective | Import the current read-only NXVM eight-package corpus (`src/{lib,common,x86,ibmpc}`, `test/{lib,common,x86,ibmpc}`), then replace SoftPC’s duplicate Product command/keyboard/composition implementation with the imported `ibmpc/product`. Retain only SoftPC-owned configuration, machine composition, resources, and snapshot/media command extension. Product receives an App-composed private machine/driver lifetime and an App-composed two-field UI choice; it parses no configuration and exposes no request/configuration ABI. |
-| Non-goals | No modification of NXVM; no Core mirror/Compat behavior change; no new Product state machine; no change to the approved common `> ` monitor prompt or shared help heading; no guest media, snapshot, or user INI mutation. |
+| Non-goals | No modification of NXVM; no Core mirror/Compat behavior change; no new Product state machine or App startup-text/configuration seam; no change to the approved common `> ` monitor prompt or shared help heading; no guest media, snapshot, or user INI mutation. |
 | Reference Baseline | SoftPC `cf33d1ccee2b9a887b9dcd74eaa427590ffb53da`; current mutable, read-only NXVM worktree. All eight roots are copied verbatim first; the App-composed machine/UI handoff and its direct test receivers are the only admitted post-import shared delta. |
 | Candidate Proposal | [S14 shared IBM PC Product adoption](../proposals/m9-windows-101-startup-repair.md#s14-shared-ibm-pc-product-adoption) |
 | Files And ABI Surface | Eight exact corpus roots and their manifests/build DAGs; `src/app-softpc/product`, the SoftPC App-private machine-composition boundary, product tests/CMake and source-layout/architecture documentation as required. Product command ABI moves from SoftPC-private callbacks to imported `ibmpc/product` plus a SoftPC extension only. |
@@ -32,6 +32,13 @@ machine and registers its snapshot/floppy extension.  There is no retained
 SoftPC command/keyboard/composition implementation.  The six neutral shared
 roots are byte-identical to current NXVM; the IBM PC Product receivers are the
 admitted SoftPC adaptation, with no NXVM runtime dependency.
+
+P2 restores the missed monitor preamble without expanding the Product ABI:
+the App-provided identity is followed by the shared fixed `Built on <date>
+<time>` line and the two required blank-line separators before the help menu.
+It changes one Product source path plus its manifest record; focused x64/x86
+Product/boundary tests and both package builds pass. P2 is awaiting owner
+validation with S14; it does not close T85.
 
 Both Release packages build.  Background CTest excluding native desktop tests
 passes x64 476/476 and x86 476/476 after the x86 `ibmpc.command` smoke declares

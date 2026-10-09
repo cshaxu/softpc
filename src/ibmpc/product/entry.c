@@ -26,7 +26,11 @@ lib_i32 vm_app_run(const vm_app_definition *definition)
         definition->machine.machine == LIB_NULL ||
         definition->machine.bind == LIB_NULL || definition->machine.destroy == LIB_NULL)
         return 1;
-    lib_c_printf("%s\n", definition->name);
+    /* The App supplies only its product identity.  Product owns the stable
+     * monitor preamble and its spacing before it opens the shared command
+     * provider. */
+    lib_c_printf("%s\n\nBuilt on %s %s\n\n", definition->name,
+        __DATE__, __TIME__);
     if (definition->ui.display != COMMON_SESSION_DISPLAY_CONSOLE &&
         definition->ui.display != COMMON_SESSION_DISPLAY_WINDOW) {
         definition->machine.destroy(definition->machine.machine);
