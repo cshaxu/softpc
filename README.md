@@ -101,6 +101,16 @@ Use `ninja-gcc-x86-release`, `ninja-package-x86`, `ninja-tests-x86` and
 in build and background-test presets use a bounded eight jobs; desktop tests
 remain serial and explicit.
 
+### Optional compiler cache
+
+When `ccache` is already available on `PATH`, the opt-in
+`ninja-ccache-gcc-x64-release` and `ninja-ccache-gcc-x86-release` configure
+presets use it as the C compiler launcher. Their matching build and test
+presets start with `ninja-ccache-`. The cache is developer-local rather than a
+repository artifact; its Windows default is `%LOCALAPPDATA%\\ccache`, or set
+`CCACHE_DIR` to choose another local directory. The regular Ninja and
+Makefiles routes do not require or use ccache.
+
 ## Build and package details
 
 All generated build state belongs under the repository's single `build/`

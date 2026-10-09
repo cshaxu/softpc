@@ -37,8 +37,13 @@ Rename the component-local `common_*` interfaces, targets, directories,
 manifests and all direct consumers to `emulator_*`.  This is mechanical naming
 and ownership normalization: lifecycle/session/UI semantics must not change.
 
-## S20 — qualification without retired machine subsystems
+## S20 — optional Ninja compiler-cache route
 
-Build and test Lib, Emulator and Product on x64/x86, then run the product
-regression suite. Package builds and EXE refresh occur here only if source
-integration is runnable and all required checks pass.
+Keep the regular Ninja and Makefiles presets dependency-free. Add a separate,
+opt-in `ninja-ccache-*` preset family that invokes the existing C compiler
+through `ccache`; it neither places cache entries in the repository nor
+changes product compilation, runtime or package behavior. Measure x64/x86
+cold and warm full rebuilds with a disposable cache directory, and separately
+measure CTest to distinguish compiler-cache benefit from test execution time.
+Do not retain the route if its configured cache cannot prove correct dual-width
+builds and the expected warm-cache compilation improvement.

@@ -53,6 +53,24 @@
         "CMAKE_C_COMPILER": "gcc",
         "SOFTPC_ARTIFACT_ARCHITECTURE": "x86"
       }
+    },
+    {
+      "name": "ninja-ccache-gcc-x64-release",
+      "displayName": "Ninja GCC x64 release with optional ccache",
+      "inherits": "ninja-gcc-x64-release",
+      "binaryDir": "${sourceDir}/build/ninja-ccache-gcc-x64-release",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER_LAUNCHER": "ccache"
+      }
+    },
+    {
+      "name": "ninja-ccache-gcc-x86-release",
+      "displayName": "Ninja GCC x86 release with optional ccache",
+      "inherits": "ninja-gcc-x86-release",
+      "binaryDir": "${sourceDir}/build/ninja-ccache-gcc-x86-release",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER_LAUNCHER": "ccache"
+      }
     }
   ],
   "buildPresets": [
@@ -63,13 +81,19 @@
     { "name": "ninja-package-x64", "configurePreset": "ninja-gcc-x64-release", "targets": ["softpcvm"], "jobs": 8 },
     { "name": "ninja-package-x86", "configurePreset": "ninja-gcc-x86-release", "targets": ["softpcvm"], "jobs": 8 },
     { "name": "ninja-tests-x64", "configurePreset": "ninja-gcc-x64-release", "jobs": 8 },
-    { "name": "ninja-tests-x86", "configurePreset": "ninja-gcc-x86-release", "jobs": 8 }
+    { "name": "ninja-tests-x86", "configurePreset": "ninja-gcc-x86-release", "jobs": 8 },
+    { "name": "ninja-ccache-package-x64", "configurePreset": "ninja-ccache-gcc-x64-release", "targets": ["softpcvm"], "jobs": 8 },
+    { "name": "ninja-ccache-package-x86", "configurePreset": "ninja-ccache-gcc-x86-release", "targets": ["softpcvm"], "jobs": 8 },
+    { "name": "ninja-ccache-tests-x64", "configurePreset": "ninja-ccache-gcc-x64-release", "jobs": 8 },
+    { "name": "ninja-ccache-tests-x86", "configurePreset": "ninja-ccache-gcc-x86-release", "jobs": 8 }
   ],
   "testPresets": [
     { "name": "test-x64", "configurePreset": "mingw-gcc-x64-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } }, "execution": { "jobs": 8 } },
     { "name": "test-x86", "configurePreset": "mingw-gcc-x86-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } }, "execution": { "jobs": 8 } },
     { "name": "ninja-test-x64", "configurePreset": "ninja-gcc-x64-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } }, "execution": { "jobs": 8 } },
     { "name": "ninja-test-x86", "configurePreset": "ninja-gcc-x86-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } }, "execution": { "jobs": 8 } },
+    { "name": "ninja-ccache-test-x64", "configurePreset": "ninja-ccache-gcc-x64-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } }, "execution": { "jobs": 8 } },
+    { "name": "ninja-ccache-test-x86", "configurePreset": "ninja-ccache-gcc-x86-release", "output": { "outputOnFailure": true }, "filter": { "exclude": { "label": "desktop" } }, "execution": { "jobs": 8 } },
     { "name": "test-desktop-x64", "configurePreset": "mingw-gcc-x64-release", "output": { "outputOnFailure": true }, "filter": { "include": { "label": "desktop" } }, "execution": { "jobs": 1 } },
     { "name": "test-desktop-x86", "configurePreset": "mingw-gcc-x86-release", "output": { "outputOnFailure": true }, "filter": { "include": { "label": "desktop" } }, "execution": { "jobs": 1 } }
   ]

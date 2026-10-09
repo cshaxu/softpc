@@ -2,49 +2,55 @@
 
 ## Current Work
 
-## M9 T85 S19 Packet
+## M9 T85 S20 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's two-S objective directs the second S after the completed Ninja route: rename shared Common source/test to Emulator and fully qualify it before owner validation. |
-| Objective | Mechanically relocate `src/common` to `src/emulator` and `test/common` to `test/emulator`; rename all component-local interfaces, symbols, targets, paths, manifests and direct consumers from `common`/`common_*` to `emulator`/`emulator_*`. |
-| Non-goals | No lifecycle, UI, executor, VM/Core/Compat, configuration, media, snapshot or guest-behavior change. Do not retain a compatibility alias or duplicate Common implementation. |
-| Reference Baseline | `9eb2d220`, S18 P1: bounded Ninja route and background-test isolation. |
-| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s19--rename-common-to-emulator) |
-| Files And ABI Surface | `src/common` and `test/common` move with `git mv`; every direct C/CMake/doc consumer updates. The public shared component vocabulary intentionally changes from `common_*`/`common-*` to `emulator_*`/`emulator-*`. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; one-way `lib < emulator < product` dependency rule; structural relocation by `git mv`. |
-| Verification | Search ledger for retired source/test paths, symbols and target spellings; source/test manifests and corpus/dependency gates; Ninja and Makefiles x64/x86 build; background CTest excluding desktop; package builds and both EXEs. |
-| Expected Markers | Only `src/emulator` and `test/emulator` exist; all live includes use `emulator/...`; targets and public values are `emulator-*`/`emulator_*`; no compatibility forwarding layer remains. |
-| Asset Needs | Refresh `assets/binary/softpc32.exe` and `softpc64.exe` only after dual-width package verification. Preserve user-owned `softpc.ini` and all media. |
-| Reporting Requirements | Rename-aware path/line ledger; public API/target map; all stale-name search dispositions; x64/x86 build/test evidence; P commit/push and then owner validation. |
-| Stop Conditions | Any non-mechanical behavior difference, hidden external consumer, or required compatibility alias; stop rather than retain parallel Common/Emulator paths. |
-| Exit Criteria | One Emulator implementation/test corpus replaces Common completely; all direct consumers compile against it; all stated gates/builds/tests pass on both widths; package EXEs are refreshed and worktree is clean. |
-| Original Owner Request | 第二个S任务：将公共组件common的src和test都改名为emulator，并修复所有的内部符号，全量编译测试提交推送后等我验收。 |
-| Similar-Issue Sweep | Search tracked live code/build/docs for `src/emulator`, `test/emulator`, `emulator/`, `emulator_`, `EMULATOR_`, `emulator-*` and component-boundary prose. Every hit is renamed, retained only as historical fact, or explicitly documented. |
+| Admission And Approval | Owner admits a new S: introduce ccache compiler-cache optimization and verify compilation/test performance improvement. |
+| Objective | Add optional x64/x86 Ninja ccache presets, document their local-only cache contract, and measure cold versus warm full builds plus independent full test duration. |
+| Non-goals | Do not require ccache for Quick Start; do not cache test results, alter compiler/toolchain/product behavior, add a daemon, remote cache, source transformation, or change user configuration/media. |
+| Reference Baseline | `e6001412`, S19 P1: Common renamed to Emulator; regular Ninja and Makefiles routes already pass dual-width qualification. |
+| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20--optional-ninja-compiler-cache-route) |
+| Files And ABI Surface | `CMakePresets.json`, root build instructions and task/proposal records only. Public runtime and source API are unchanged. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; existing Ninja eight-job cap; generated cache/build directories remain disposable. |
+| Verification | Validate preset JSON and configuration; use a dedicated disposable `CCACHE_DIR`; measure cold/warm x64/x86 full test-target builds and record ccache statistics; run dual-width background CTest excluding desktop. |
+| Expected Markers | Default Ninja/Makefiles commands remain dependency-free; ccache is opt-in through `ninja-ccache-*`; cache directory is absent from the repository and all source/artifact paths. |
+| Asset Needs | No artifact refresh is required: no package source/link input changes. Preserve `assets/binary/softpc.ini`, media and existing EXEs. |
+| Reporting Requirements | Cold/warm wall-clock measurements, cache hit/miss statistics, full-test timings, configured cache location/disposal proof, changed-path/line accounting and P commit/push followed by owner validation. |
+| Stop Conditions | ccache changes output behavior, cannot correctly launch both MinGW widths, fails a dual-width build/test, or delivers no meaningful warm-cache benefit. |
+| Exit Criteria | Optional dual-width ccache route is documented and proven; normal routes remain intact; cold/warm evidence and full regression are recorded; worktree is clean after push. |
+| Original Owner Request | 准入一个新的S，引入ccache编译缓存优化并验证编译和测试性能是否提高。 |
+| Similar-Issue Sweep | Inspect all checked-in build/test presets and instructions for accidental mandatory ccache use, cache-in-repository paths, unbounded job changes or claims that compiler caching accelerates test execution. |
 
-### S19 planned delivery
+### S20 planned delivery
 
-The move is one mechanical vocabulary migration.  Public names intentionally
-change with component ownership; no adapter headers, compatibility aliases or
-second targets survive.  Product, App and test fixtures consume the renamed
-Emulator interface directly.  Historical records retain their original
-spelling as facts, but active architecture and build documentation use the
-new component name.
+The cache route stays product-external: it is a compiler launcher selected
+only by its named optional presets, with cache output held in the
+developer-selected `CCACHE_DIR` during measurement and the local ccache
+default thereafter. Regular Ninja and Makefiles retain their existing,
+dependency-free invocation and output behavior.
 
-### S19 delivery awaiting owner validation
+### S20 delivery awaiting owner validation
 
-The single Emulator corpus now replaces Common: `src/emulator` and
-`test/emulator` are the only shared paths, and all direct targets, public
-symbols, manifests, tests and active documentation use `emulator`. No Common
-compatibility path remains. The dependency gate now enforces
-`lib < emulator < product`.
+The optional `ninja-ccache-*` configure, build and background-test presets
+use only `CMAKE_C_COMPILER_LAUNCHER=ccache`; normal Ninja and Makefiles do not
+mention ccache. A dedicated disposable cache measured near-cold full builds at
+475.05 seconds on x64 and 219.93 seconds on x86 (the initial probe left 15 of
+430 cacheable calls already present). After cleaning build outputs while
+retaining that cache, the same full rebuilds took 58.46 and 38.04 seconds:
+about 88% and 83% faster. The formal presets subsequently built at 33.18 and
+36.15 seconds with 71.91% cumulative cache hits.
 
-Ninja and Makefiles both configure and package x64/x86 successfully. Ninja
-background CTest passes 129/129 on each width (native desktop tests excluded
-by preset); component, manifest, corpus, boundary and documentation gates
-pass. `assets/binary/softpc32.exe` and `softpc64.exe` were refreshed. P is
-pending; owner validation and any T85 closure decision remain outstanding.
+The cache does not cache test results: dual background CTest passed 129/129,
+at 146.48 seconds on x64 and 138.44 seconds on x86, excluding desktop tests.
+The 0.28 GiB measurement cache and all S20 build trees are disposable and are
+removed after recording this evidence. No package EXE is refreshed because
+source and link inputs are unchanged. P is pending; T85 remains open.
+
+M9 T85 S19 is closed by the owner-directed admission of this next S; its
+delivered rename evidence is retained in the
+[S19 closure](../history/M9-T85-S19-emulator-rename-closure.md).
 
 ### S14 executor delivery
 
