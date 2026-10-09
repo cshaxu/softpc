@@ -177,7 +177,7 @@ if(NOT shared_product_composition MATCHES "common_session_create" OR
     message(FATAL_ERROR "Shared Product must compose, not implement, common session control")
 endif()
 
-# Product code may compose Common/x86 through root contracts, but never reach
+# Product code may compose Common/Product through root contracts, but never reach
 # their implementation, private helper, or source file. Keeping this
 # allow-list small makes the post-extraction ownership boundary executable.
 set(allowed_common_product_contracts
@@ -186,6 +186,8 @@ set(allowed_common_product_contracts
     "common/ui/ui_interface.h"
     "product/debug/debug_interface.h"
     "product/debug/protocol_interface.h"
+    "product/surface/entry_interface.h"
+    "product/surface/machine_interface.h"
     "product/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
@@ -193,21 +195,21 @@ file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
 foreach(source IN LISTS product_common_consumers)
     file(STRINGS "${source}" common_include_lines REGEX
-        "#[ \t]*include[ \t]+[<\"](common|x86)/[^>\"]+[>\"]")
+        "#[ \t]*include[ \t]+[<\"](common|product)/[^>\"]+[>\"]")
     foreach(include_line IN LISTS common_include_lines)
         string(REGEX REPLACE
-            ".*[<\"]((common|x86)/[^>\"]+)[>\"].*" "\\1" common_contract
+            ".*[<\"]((common|product)/[^>\"]+)[>\"].*" "\\1" common_contract
             "${include_line}")
         list(FIND allowed_common_product_contracts "${common_contract}"
             common_contract_index)
         if(common_contract_index EQUAL -1)
             message(FATAL_ERROR
-                "Product reaches a non-public Common/x86 boundary: ${source}: ${include_line}")
+                "Product reaches a non-public Common/Product boundary: ${source}: ${include_line}")
         endif()
     endforeach()
     file(READ "${source}" common_product_source)
-    if(common_product_source MATCHES "(common|x86)/[A-Za-z0-9_/-]+\\.c")
-        message(FATAL_ERROR "Product includes a Common/x86 implementation: ${source}")
+    if(common_product_source MATCHES "(common|product)/[A-Za-z0-9_/-]+\\.c")
+        message(FATAL_ERROR "Product includes a Common/Product implementation: ${source}")
     endif()
 endforeach()
 

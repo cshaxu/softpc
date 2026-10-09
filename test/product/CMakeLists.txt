@@ -14,6 +14,11 @@ if(NOT TARGET product-surface)
     add_subdirectory("${PRODUCT_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/product")
 endif()
 include("${CMAKE_CURRENT_LIST_DIR}/../register.cmake")
+
+add_test(NAME product.test-boundaries COMMAND "${CMAKE_COMMAND}"
+    "-DTEST_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" "-DTEST_LAYER=product"
+    -P "${CMAKE_CURRENT_LIST_DIR}/../verify_test_boundaries.cmake")
+set_tests_properties(product.test-boundaries PROPERTIES LABELS "unit;product" TIMEOUT 30)
 set(SHARED_PRODUCT_TEST_TARGETS)
 
 shared_register_test(product debug_output product-debug)
@@ -42,10 +47,21 @@ add_test(NAME product.surface-composition COMMAND product-surface-composition-sm
 set_tests_properties(product.surface-composition PROPERTIES LABELS "unit;product" TIMEOUT 30)
 list(APPEND SHARED_PRODUCT_TEST_TARGETS product-surface-composition-smoke)
 
-add_test(NAME product.build-smoke COMMAND "${CMAKE_COMMAND}"
-    "-DPRODUCT_ROOT=${PRODUCT_ROOT}" "-DPROBE_ROOT=${CMAKE_CURRENT_BINARY_DIR}/build-smoke"
-    -P "${CMAKE_CURRENT_LIST_DIR}/surface/build_smoke.cmake")
-set_tests_properties(product.build-smoke PROPERTIES LABELS "unit;product" TIMEOUT 30)
+add_test(NAME product.corpus COMMAND "${CMAKE_COMMAND}"
+    "-DPRODUCT_ROOT=${PRODUCT_ROOT}" -P "${PRODUCT_ROOT}/verify_corpus.cmake")
+set_tests_properties(product.corpus PROPERTIES LABELS "unit;product" TIMEOUT 30)
+add_test(NAME product.corpus-negative COMMAND "${CMAKE_COMMAND}"
+    "-DPRODUCT_ROOT=${PRODUCT_ROOT}" "-DPROBE_ROOT=${CMAKE_CURRENT_BINARY_DIR}/corpus-negative"
+    -P "${CMAKE_CURRENT_LIST_DIR}/verify_negative.cmake")
+set_tests_properties(product.corpus-negative PROPERTIES LABELS "unit;product" TIMEOUT 30)
+add_test(NAME product.test-manifest COMMAND "${CMAKE_COMMAND}"
+    "-DPRODUCT_ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
+    -P "${PRODUCT_ROOT}/verify_manifest.cmake")
+set_tests_properties(product.test-manifest PROPERTIES LABELS "unit;product" TIMEOUT 30)
+add_test(NAME product.test-types-boundary COMMAND "${CMAKE_COMMAND}"
+    "-DTEST_ROOTS=${CMAKE_CURRENT_SOURCE_DIR}"
+    -P "${CMAKE_CURRENT_LIST_DIR}/../verify_types_boundary.cmake")
+set_tests_properties(product.test-types-boundary PROPERTIES LABELS "unit;product" TIMEOUT 30)
 add_test(NAME product.manifest COMMAND "${CMAKE_COMMAND}"
     "-DPRODUCT_ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
     -P "${PRODUCT_ROOT}/verify_manifest.cmake")

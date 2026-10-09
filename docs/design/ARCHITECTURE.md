@@ -178,21 +178,15 @@ native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing product.
-Shared unit suites live in test/lib, test/common and test/x86. The reusable
-six-directory set is src/lib, src/common, src/x86,
-test/lib, test/common, test/x86. The neutral four-directory subset excludes x86
-entirely. Each corpus/suite owns its build and manifest; none may require an
-importing product's adapters or firmware. Common source and tests build without
-x86. Each test package owns its fixtures; it may consume inward production
-APIs but never another package's tests or an outer package. Generic test tools
-live directly in test/. Architecture protocols and CLI assertions remain in
-test/x86; PC assembly checks belong to src/ibmpc and test/ibmpc. This fourth
-layer consumes inward production APIs only and owns its own test fixtures.
-SoftPC imports/builds it without replacing its original execution backend or
-linking IBM PC machine into the SoftPC executable. SoftPC does link the shared
-IBM PC Product layer for command/hotkey/Common composition, while retaining its
-own machine adapter. The complete PC import set adds these two directories to
-the reusable inner six-directory set.
+Shared unit suites live in test/lib, test/common and test/product. The reusable
+six-directory set is src/lib, src/common, src/product, test/lib, test/common
+and test/product. Each corpus/suite owns its build and manifest; none may
+require an importing product's adapters or firmware. Each test package owns its
+fixtures; it may consume inward production APIs but never another package's
+tests or an outer package. Generic test tools live directly in test/. The
+dependency rule is direct: Lib has no outer dependency; Common consumes Lib;
+Product consumes Lib and Common. This rule is checked both at public-header and
+CMake target-link boundaries.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.

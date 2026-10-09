@@ -17,11 +17,6 @@ src/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
-  x86/
-    core/        shared CPU executor and neutral machine construction
-    chips/       shared x86/PC device implementations
-  ibmpc/{board-common,board-at,board-xt,machine}/
-    shared PC construction, not SoftPC's executor
   product/{xasm32,debug,surface}/
     shared assembly/debug policy and session/UI composition
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
@@ -32,16 +27,12 @@ Directories appear only in their admitted migration task.
 Common never contains win32/linux directories or platform-selected source.
 Its independent source verification lives with the Common corpus; unit tests
 live in test/common, never src/common/test. Lib tests and their fixtures live
-in test/lib. x86 source owns its own manifest/build/DAG and never becomes a
-Common dependency. test/x86 owns retained Core/chip tests and uses only its
-own fixtures. `src/product` and `test/product` own the moved CLI, debugger,
-assembly and surface corpus. The retained IBM PC machine may consume the public
-Product Debug protocol, but Product never depends on retained x86 or IBM PC
-code. Each suite has its own CMake entry and manifest. All ten source/test
-packages select C11 with extensions disabled, in
+in test/lib. `src/product` and `test/product` own the shared CLI, debugger,
+assembly and surface corpus. Each suite has its own CMake entry and manifest.
+All six source/test packages select C11 with extensions disabled, in
 both standalone and embedded builds. GNU/Clang shared builds use
 -Wall -Wextra -Wpedantic -Werror. This owner-approved shared-corpus baseline
-supersedes the general standalone C17 rule only for these ten directories;
+supersedes the general standalone C17 rule only for these six directories;
 App/Core retain their existing language settings. Package-local build settings
 do not propagate warning policy or a new language requirement into the product.
 Only Lib provides the underlying platform implementation.
@@ -98,7 +89,7 @@ not a claim that every test labelled unit is isolated. Product fixtures and
 checks live beside their owner: test/app-softpc/integration/machine_fixture.c/h is the
 single product driver/Common assembly fixture, snapshot orchestration is in
 test/app-softpc/integration, and product static gates are in tools/checks. Test execution is summarized in test/README.md.
-The reusable test/lib, test/common and test/x86 packages are not destinations
+The reusable test/lib, test/common and test/product packages are not destinations
 for product-owned fixtures.
 
 Root CMake assigns all `src/app-softpc/machine/*.c` to `softpc-vm`; other targets link it

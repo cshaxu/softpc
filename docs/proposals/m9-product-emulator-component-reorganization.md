@@ -5,14 +5,13 @@
 The reusable stack becomes:
 
 ```text
-lib < emulator ~ [x86 < ibmpc] ~ product
+lib < emulator < product
 ```
 
-`lib` remains the innermost platform capability layer.  `emulator` is the
-renamed neutral machine/UI/session layer.  The remaining `x86` and `ibmpc`
-trees stay available as independent machine/hardware components, but SoftPC
-will no longer use them.  `product` is the outer shared application-facing
-surface: command/debug policy, assembly utility and session/UI composition.
+`lib` remains the innermost platform capability layer. `emulator` is the
+renamed neutral machine/UI/session layer. `product` is the outer shared
+application-facing surface: command/debug policy, assembly utility and
+session/UI composition.
 
 This is a structural reorganization, not a new runtime path.  Every move uses
 `git mv`; exactly one implementation remains after each move.
@@ -25,12 +24,11 @@ Move their test owners into `test/product`.  Rename the moved component's
 internal/public symbols, target names, test registrations, manifest entries
 and direct references to `product_*`, so its vocabulary matches its ownership.
 
-The retained x86 and ibmpc components must no longer contain, build or export
-the moved Product code. Product must not link either retained component.
-`ibmpc/machine` may instead consume `product/debug` as its external debug
-protocol. SoftPC's current integration must use Product only; it must not
-start linking the retained x86 CPU/device or IBM PC board/machine
-implementations. This S does not rename `common`.
+After relocation, delete the now-unused `src/x86`, `src/ibmpc`, `test/x86` and
+`test/ibmpc` trees, their CMake entry points and their obsolete Product build
+helpers. Product's corpus gate verifies the positive dependency rule: Lib has
+no outer dependency, Emulator may consume Lib only, and Product may consume
+Lib or Emulator only. This S does not rename `common`.
 
 ## S18 — rename Common to Emulator
 
@@ -42,7 +40,5 @@ and ownership normalization: lifecycle/session/UI semantics must not change.
 ## S19 — qualification without retired machine subsystems
 
 Build and test Lib, Emulator and Product on x64/x86, then run the product
-regression suite with the retained x86/ibmpc test trees explicitly excluded.
-The retained trees remain checked in but are outside this Product-stack
-qualification.  Package builds and EXE refresh occur here only if source
+regression suite. Package builds and EXE refresh occur here only if source
 integration is runnable and all required checks pass.

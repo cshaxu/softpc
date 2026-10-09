@@ -7,33 +7,34 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs the three-stage component reorganization after closing S16: create Product, rename Common to Emulator, then qualify without the retained x86/ibmpc trees. |
-| Objective | Establish `src/product` and `test/product` as the shared Product component by relocating `src/x86/{xasm32,debug}` and `src/ibmpc/product` with matching tests, C11 build ownership, manifests and internal `product_*` vocabulary. |
-| Non-goals | No behavior, ABI, Core/Compat/mirror, configuration, media, snapshot or remaining x86/ibmpc implementation change; do not rename Common in this S; do not link SoftPC to retained x86/ibmpc subsystems. |
+| Admission And Approval | Owner directs the component reorganization: create Product, remove the unused x86/ibmpc components, rename Common to Emulator, then qualify the resulting three-component stack. |
+| Objective | Establish `src/product` and `test/product` as the shared Product component by relocating `src/x86/{xasm32,debug}` and `src/ibmpc/product`, then remove the unused x86/ibmpc source and test trees. Preserve C11 build ownership, manifests and internal `product_*` vocabulary. |
+| Non-goals | No behavior, ABI, Core/Compat/mirror, configuration, media or snapshot change; do not rename Common in this S. |
 | Reference Baseline | S16 closure on SoftPC main, including its intentional removal of NXVM-private IBM PC configuration code. |
 | Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md) |
-| Files And ABI Surface | Relocated `src/x86/{debug,xasm32}`, `src/ibmpc/product`, their `test` subtrees, CMake/manifests and direct consumers. Public component naming changes from `x86_*`/`ibmpc_product_*` to `product_*` only where the moved Product API presently exposes them. |
+| Files And ABI Surface | Relocated `src/x86/{debug,xasm32}`, `src/ibmpc/product`, their `test` subtrees, deleted unused `src/{x86,ibmpc}` and `test/{x86,ibmpc}` trees, CMake/manifests and direct consumers. Public component naming changes from `x86_*`/`ibmpc_product_*` to `product_*` only where the moved Product API presently exposes them. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; inward dependency ownership; structural relocation by `git mv`. |
-| Verification | Frozen move ledger; source/test manifests and dependency gates; C11 x64/x86 Product builds and focused tests; no Product link to retained x86/ibmpc paths; the permitted reverse `ibmpc/machine -> product/debug` edge; architecture/documentation checks. |
-| Expected Markers | `src/product/{debug,xasm32,surface}` and `test/product` own the moved code; all moved symbols/targets use `product_*`; remaining x86 and ibmpc roots retain only their non-Product subsystems. |
+| Verification | Frozen move/deletion ledger; source/test manifests and dependency gates; C11 x64/x86 Product builds and focused tests; exact Lib/Common/Product one-way dependency checks; architecture/documentation checks. |
+| Expected Markers | `src/product/{debug,xasm32,surface}` and `test/product` own the moved code; all moved symbols/targets use `product_*`; `src` and `test` contain no x86 or ibmpc component root. |
 | Asset Needs | No media or configuration changes. Do not refresh package EXEs until a runnable Product integration S requires it. |
 | Reporting Requirements | Before/after source/test path and line ledger; rename-aware move accounting; moved API/target map; dual-width focused evidence; pushed complete P and then owner validation. |
-| Stop Conditions | A move requires an unapproved product behavior/API redesign, creates a product dependency on retained x86/ibmpc hardware paths, or exposes a non-mechanical Common rename requirement. |
-| Exit Criteria | Product exists as one internally named source/test corpus with no duplicate implementation; direct dependencies conform to `lib < emulator ~ [x86 < ibmpc] ~ product`; S18/S19 remain separately admitted. |
+| Stop Conditions | A move/delete requires an unapproved product behavior/API redesign or exposes a non-mechanical Common rename requirement. |
+| Exit Criteria | Product exists as one internally named source/test corpus with no duplicate implementation; direct dependencies conform to `lib < common < product` (renamed `lib < emulator < product` in S18); S18/S19 remain separately admitted. |
 | Original Owner Request | lib -> lib; common -> emulator; x86/xasm32 -> product/xasm32; x86/debug -> product/debug; ibmpc/product -> product/surface; rename matching symbols and test components. |
-| Similar-Issue Sweep | Inventory every CMake target, include, public symbol and test registration below the three moved roots; search for stale `x86-debug`, `x86-xasm32`, `ibmpc-product`, `common_` and old source paths. |
+| Similar-Issue Sweep | Inventory every CMake target, include, public symbol and test registration below the moved/deleted roots; search for stale `x86-debug`, `x86-xasm32`, `ibmpc-product`, `ibmpc_`, `common_` and old source paths. |
 
 ### S17 delivery
 
 Product now owns the moved Debug, xasm32 and surface implementations and their
-tests; the retained x86 and IBM PC roots no longer build those owners. Product
-has no source or target edge to either retained root. The only permitted reverse
-edge is `ibmpc/machine -> product/debug`, which supplies IBM PC's external debug
-protocol. The existing root boundary checker now rejects `common -> product`,
-`product -> x86`, and `product -> ibmpc` directly.
+tests. The obsolete x86/IBM PC source and test components, their root CMake
+entries and the dead IBM PC firmware build helpers are removed. Product's
+portable corpus admits only Lib, Common and Product edges; its source and
+target-link checks enforce that one-way graph. S18 renames the same Common
+edge to Emulator mechanically.
 
-Product manifest/corpus gates pass on x64 and x86. Its focused 12-test suite
-passes on both widths. The retained x86 and IBM PC corpus gates pass on x64.
+Product manifest/corpus gates, including source and target-link negative
+coverage, pass on x64 and x86. Its focused 16-test suite passes on both
+widths; the standalone Product suite passes 16/16.
 No package executable, INI, snapshot or guest medium is delivered by this S.
 S17 awaits owner validation; S18 remains unadmitted.
 
@@ -431,17 +432,19 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   holds the +421/-409 (net +12) source/test/build/tool ledger and EXE hashes.
 - Accepted T73 implementation 879c30ac, actual-change review ad665a86.
   Owner manual S5 testing passed. Closure changes documents only.
-- Shared source corpora are src/lib, src/common, src/x86; matching suites are
-  test/lib, test/common, test/x86. The six-directory set serves x86 products;
-  the four Lib/Common directories build/test with x86 absent.
+- Shared source corpora are src/lib, src/common, src/product; matching suites
+  are test/lib, test/common, test/product. The six-directory set is ordered
+  `lib < common < product`; each outer component consumes only its inward
+  public contracts.
 - Common contains machine/session/ui only. Machine retains one executor and
   copied opaque 128/1536-byte debug transport with its existing paused lease.
-  x86/debug owns CPU protocol and DOS/X CLI; x86/xasm32 owns assembly/disassembly.
-  VM validates x86 requests; App explicitly connects optional x86 capabilities.
+  Product Debug owns CPU protocol and DOS/X CLI; Product xasm32 owns
+  assembly/disassembly. VM validates product debug requests; App explicitly
+  connects Product capabilities.
 - Lib and test/lib are unchanged by T73. Host-PC key identity and existing KVM
   capacities are retained; receiving adapters own guest input mapping.
 - Final background x64 110/110 (181.72s), x86 110/110 (165.87s); both Release
-  builds passed. Five desktop cases per width were excluded. Native Common/x86
+  builds passed. Five desktop cases per width were excluded. Native Common
   tests each passed 50 repetitions per width. Owner testing does not imply
   those excluded automated cases or Linux/NEC integration were exercised.
 - Isolated neutral copy: Lib 41/41, Common 18/18. Isolated six-directory copy:

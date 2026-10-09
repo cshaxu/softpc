@@ -54,13 +54,9 @@ enable_testing()
 
 add_subdirectory(src/common)
 add_subdirectory(src/product)
-add_subdirectory(src/x86)
-add_subdirectory(src/ibmpc)
 add_subdirectory(test/lib)
 add_subdirectory(test/common)
 add_subdirectory(test/product)
-add_subdirectory(test/x86)
-add_subdirectory(test/ibmpc)
 target_link_libraries(softpc-machine PRIVATE storage base audio)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly
