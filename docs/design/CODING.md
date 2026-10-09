@@ -13,7 +13,7 @@ src/
       {ccpu,cvidc,bios,cmos,system,keymouse}/
     machine/
       concrete machine backend, driver, input, debug, trace; public vm_interface.h
-  common/
+  emulator/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
@@ -24,9 +24,9 @@ src/
 ```
 
 Directories appear only in their admitted migration task.
-Common never contains win32/linux directories or platform-selected source.
-Its independent source verification lives with the Common corpus; unit tests
-live in test/common, never src/common/test. Lib tests and their fixtures live
+Emulator never contains win32/linux directories or platform-selected source.
+Its independent source verification lives with the Emulator corpus; unit tests
+live in test/emulator, never src/emulator/test. Lib tests and their fixtures live
 in test/lib. `src/product` and `test/product` own the shared CLI, debugger,
 assembly and surface corpus. Each suite has its own CMake entry and manifest.
 All six source/test packages select C11 with extensions disabled, in
@@ -36,9 +36,9 @@ supersedes the general standalone C17 rule only for these six directories;
 App/Core retain their existing language settings. Package-local build settings
 do not propagate warning policy or a new language requirement into the product.
 Only Lib provides the underlying platform implementation.
-Shared `lib/types` is header-only. Its top level contains common C/compiler
+Shared `lib/types` is header-only. Its top level contains emulator C/compiler
 vocabulary; explicit `win32/` and `linux/` headers group external platform
-declarations by purpose. Common types headers never select an OS. Only the
+declarations by purpose. Emulator types headers never select an OS. Only the
 owning component's corresponding platform implementation imports these
 platform headers. Compiler selection for atomic primitives remains permitted.
 Other components' `win32/` and `linux/` directories are implementation-only.
@@ -59,19 +59,19 @@ callbacks and larger functional adaptations. `app-softpc/machine` owns the injec
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `app-softpc/product` owns SoftPC configuration, private machine composition,
 resources and the snapshot/media extension. Shared `product/surface` owns the
-product CLI/hotkey policy and Common composition; it receives an already
+product CLI/hotkey policy and Emulator composition; it receives an already
 composed machine/driver lifetime and two UI choices, never a SoftPC config.
 It owns entity assembly, event wiring, the blocking session run and teardown,
 without a separate state machine, command table or debugger. Main loads config.
 Only app-softpc/product/composed_machine.c may include machine/vm_interface.h; no shared Product file may include Compat
 or MVDM, and no other product file may include VM. VM's public header exposes only
-copied options, opaque identity and existing Common/Lib contracts. Compat
-does not depend on app, VM or Common. Historical same-name replacement headers
-remain isolated; no generic compat wrapper layer is retained. `common/machine` owns the one generic
+copied options, opaque identity and existing Emulator/Lib contracts. Compat
+does not depend on app, VM or Emulator. Historical same-name replacement headers
+remain isolated; no generic compat wrapper layer is retained. `emulator/machine` owns the one generic
 executor, lifecycle/input queues, run generation and copied-frame publication.
-`common/session` owns the control FIFO,
+`emulator/session` owns the control FIFO,
 completed-fact reduction, prompt scheduling and dispatch to injected machine/
-UI adapters. `common/ui` owns monitor/KVM composition and Console handoff.
+UI adapters. `emulator/ui` owns monitor/KVM composition and Console handoff.
 `lib` owns copied-value platform mechanics:
 mailbox, host input normalization, action registration, console/window loops,
 routing, geometry, capture, clock, synchronization, and storage. It never
@@ -87,9 +87,9 @@ machine, compatibility host and recovered-mirror units; test/app-softpc/integrat
 frame and package flows. Historical CTest labels remain execution selectors,
 not a claim that every test labelled unit is isolated. Product fixtures and
 checks live beside their owner: test/app-softpc/integration/machine_fixture.c/h is the
-single product driver/Common assembly fixture, snapshot orchestration is in
+single product driver/Emulator assembly fixture, snapshot orchestration is in
 test/app-softpc/integration, and product static gates are in tools/checks. Test execution is summarized in test/README.md.
-The reusable test/lib, test/common and test/product packages are not destinations
+The reusable test/lib, test/emulator and test/product packages are not destinations
 for product-owned fixtures.
 
 Root CMake assigns all `src/app-softpc/machine/*.c` to `softpc-vm`; other targets link it

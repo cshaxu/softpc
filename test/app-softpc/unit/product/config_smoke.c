@@ -22,7 +22,7 @@ lib_status lib_storage_file_read_owned(const char *path, lib_size limit,
 int main(void)
 {
     app_startup_config config = { {0}, {0}, {0}, {0}, 16u * 1024u * 1024u,
-        COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
+        EMULATOR_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
         LIB_STORAGE_MEDIUM_OVERLAY };
     char path[SOFTPC_CONFIG_PATH_MAX] = "disk.img";
     input = "# comment\r\n; comment\r\nfloppy = \"disk.img\"\r\n"
@@ -31,7 +31,7 @@ int main(void)
     assert(app_load_startup_config("unused", &config));
     assert(lib_text_compare(config.floppy_path, "disk.img") == 0);
     assert(config.memory_bytes == 32u * 1024u * 1024u);
-    assert(config.presentation == COMMON_SESSION_DISPLAY_WINDOW);
+    assert(config.presentation == EMULATOR_SESSION_DISPLAY_WINDOW);
     assert(config.console_control == 0);
     assert(config.floppy_mode == LIB_STORAGE_MEDIUM_READONLY);
     assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY);
@@ -44,7 +44,7 @@ int main(void)
     assert(app_load_startup_config("unused", &config));
     assert(config.floppy_mode == LIB_STORAGE_MEDIUM_DIRECT);
     assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY);
-    assert(config.presentation == COMMON_SESSION_DISPLAY_CONSOLE);
+    assert(config.presentation == EMULATOR_SESSION_DISPLAY_CONSOLE);
     assert(config.console_control == 1);
     input = "media_mode=overlay\n";
     assert(!app_load_startup_config("unused", &config));

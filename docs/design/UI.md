@@ -114,7 +114,7 @@ bits or inject a guest page fault. Real addresses mean segment*16+offset;
 linear addresses are not protected-mode selector addresses.
 I/O commands perform one byte access through the original device dispatcher;
 reads may have device side effects and are not retried. Assembly/disassembly
-uses common xasm32. Plain `g` requests normal resume; `t` counts successfully
+uses emulator xasm32. Plain `g` requests normal resume; `t` counts successfully
 completed original CPU instructions and addressed `g` stops before its target.
 REP is one instruction, faults do not retire an instruction, and interrupts
 and guest TF retain their original behavior (trace can enter their handlers).
@@ -177,7 +177,7 @@ full-work-area rectangle.
 
 SoftPC distinguishes static `display=console|window`, the active component set
 `{window_enabled, console_enabled}`, and the one Current Console Object bound
-by the broker. `common/ui` owns the cooked monitor logical Console and selects it or
+by the broker. `emulator/ui` owns the cooked monitor logical Console and selects it or
 the KVM raw VM object through the broker. A monitor never implements SoftPC
 hotkeys; it accepts normal line
 commands only.
@@ -220,7 +220,7 @@ transaction, not by focusing a window.
 When a running view needs both surfaces, control completes Console ownership
 work before creating Window or unfreezing an existing Window. This orders the
 foreground requests without retries, timers or platform calls in SoftPC.
-While that Window exists, Common UI consumes raw VM-Console mouse events;
+While that Window exists, Emulator UI consumes raw VM-Console mouse events;
 Window is the sole guest-mouse surface. Raw Console keyboard, text and hotkey
 events continue normally, and raw Console mouse resumes when Window is gone.
 

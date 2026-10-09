@@ -2,50 +2,49 @@
 
 ## Current Work
 
-## M9 T85 S18 Packet
+## M9 T85 S19 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S to introduce a Ninja management layer and improve build/test efficiency. |
-| Objective | Establish an isolated, bounded-parallel Ninja x64/x86 developer build/test route and remove background-test working-directory collisions that currently prevent safe CTest parallelism. |
-| Non-goals | No runtime, ABI, Core/Compat/mirror, configuration, media, snapshot or package-output behavior change. Keep the existing MinGW Makefiles package route. No compiler-cache service is introduced. |
-| Reference Baseline | `288d9319`, S17 P2: Product established and retired x86/ibmpc roots removed. Current Makefile presets and default background CTest execution are serial. |
-| Candidate Proposal | [Ninja build and test acceleration](../proposals/m9-ninja-build-acceleration.md) |
-| Files And ABI Surface | `CMakePresets.json`, root test registration/working-directory declarations, build/test documentation and the active/proposal records. The S also repairs stale Common/test-Common manifests and the retired-component cases in the shared boundary selftest discovered by the new parallel run. No public C interface changes. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; existing package/INI ownership; background-versus-desktop test separation. |
-| Verification | Fresh Ninja x64/x86 configure; bounded-parallel Ninja build; background CTest with no desktop UI; a focused collision proof; existing Makefiles package configuration/build smoke; manifest, dependency and documentation gates. |
-| Expected Markers | Separate `build/ninja-*` trees; unchanged Makefile preset paths; bounded build/test parallelism; artifact-writing background tests have unique ignored working directories. |
-| Asset Needs | No media or configuration changes. Do not refresh package EXEs: no runnable product source changes are expected. |
-| Reporting Requirements | Before/after preset/test-registration diff and line ledger; serial/parallel timing evidence; every isolated test/work-directory disposition; x64/x86 evidence; pushed complete P and owner validation. |
-| Stop Conditions | A test cannot be isolated without changing product semantics, a Ninja route needs a private toolchain path or changes artifact/package behavior, or measured evidence shows no safe improvement. |
-| Exit Criteria | Ninja developer builds and bounded-parallel background tests are reproducible on both widths, Makefile package builds remain available, all background artifact writers have an isolated or explicitly serialized disposition, and no desktop test is accidentally admitted. |
-| Original Owner Request | 准入一个新S，引入Ninja管理层次，提高效率。 |
-| Similar-Issue Sweep | Inventory all CTest working directories, relative artifact writers, `RUN_SERIAL`/resource locks and preset build/test execution settings. Each collision candidate is isolated, intentionally serialized or recorded with a reason. |
+| Admission And Approval | Owner's two-S objective directs the second S after the completed Ninja route: rename shared Common source/test to Emulator and fully qualify it before owner validation. |
+| Objective | Mechanically relocate `src/common` to `src/emulator` and `test/common` to `test/emulator`; rename all component-local interfaces, symbols, targets, paths, manifests and direct consumers from `common`/`common_*` to `emulator`/`emulator_*`. |
+| Non-goals | No lifecycle, UI, executor, VM/Core/Compat, configuration, media, snapshot or guest-behavior change. Do not retain a compatibility alias or duplicate Common implementation. |
+| Reference Baseline | `9eb2d220`, S18 P1: bounded Ninja route and background-test isolation. |
+| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s19--rename-common-to-emulator) |
+| Files And ABI Surface | `src/common` and `test/common` move with `git mv`; every direct C/CMake/doc consumer updates. The public shared component vocabulary intentionally changes from `common_*`/`common-*` to `emulator_*`/`emulator-*`. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; one-way `lib < emulator < product` dependency rule; structural relocation by `git mv`. |
+| Verification | Search ledger for retired source/test paths, symbols and target spellings; source/test manifests and corpus/dependency gates; Ninja and Makefiles x64/x86 build; background CTest excluding desktop; package builds and both EXEs. |
+| Expected Markers | Only `src/emulator` and `test/emulator` exist; all live includes use `emulator/...`; targets and public values are `emulator-*`/`emulator_*`; no compatibility forwarding layer remains. |
+| Asset Needs | Refresh `assets/binary/softpc32.exe` and `softpc64.exe` only after dual-width package verification. Preserve user-owned `softpc.ini` and all media. |
+| Reporting Requirements | Rename-aware path/line ledger; public API/target map; all stale-name search dispositions; x64/x86 build/test evidence; P commit/push and then owner validation. |
+| Stop Conditions | Any non-mechanical behavior difference, hidden external consumer, or required compatibility alias; stop rather than retain parallel Common/Emulator paths. |
+| Exit Criteria | One Emulator implementation/test corpus replaces Common completely; all direct consumers compile against it; all stated gates/builds/tests pass on both widths; package EXEs are refreshed and worktree is clean. |
+| Original Owner Request | 第二个S任务：将公共组件common的src和test都改名为emulator，并修复所有的内部符号，全量编译测试提交推送后等我验收。 |
+| Similar-Issue Sweep | Search tracked live code/build/docs for `src/emulator`, `test/emulator`, `emulator/`, `emulator_`, `EMULATOR_`, `emulator-*` and component-boundary prose. Every hit is renamed, retained only as historical fact, or explicitly documented. |
 
-### S18 delivery (pending owner validation)
+### S19 planned delivery
 
-This delivery adds separate Ninja build trees and bounded eight-way build/test
-presets for each width.  It leaves the established MinGW Makefiles presets in
-place.  It also assigns each background App test a disposable build-tree
-working directory unless that test deliberately consumes checked-in source
-media or is already process-serial; desktop tests remain excluded from the
-background presets.
+The move is one mechanical vocabulary migration.  Public names intentionally
+change with component ownership; no adapter headers, compatibility aliases or
+second targets survive.  Product, App and test fixtures consume the renamed
+Emulator interface directly.  Historical records retain their original
+spelling as facts, but active architecture and build documentation use the
+new component name.
 
-No package executable, INI, snapshot, guest medium, runtime source or public
-C interface changes are delivered by this S.  The only test-corpus correction
-is to replace deleted x86/IBM-PC boundary cases with the current Product layer
-and refresh the two stale manifest entries that otherwise make the existing
-Common checks fail.
+### S19 delivery awaiting owner validation
 
-Fresh Ninja configuration succeeds on both widths.  The x64 Ninja background
-Common/Product set passes 36/36; the Makefiles path passes the changed
-configuration/boundary/manifest and representative App smoke set 8/8.  On the
-same warm App 1--8 batch, serial CTest took 10.66 seconds and bounded
-eight-way CTest took 8.07 seconds; this is evidence for the chosen scheduling,
-not a durable benchmark.  The x86 Ninja route configures, builds representative
-Common/Product targets and passes its focused five-test set.  No package EXE
-is retained from the verification build.
+The single Emulator corpus now replaces Common: `src/emulator` and
+`test/emulator` are the only shared paths, and all direct targets, public
+symbols, manifests, tests and active documentation use `emulator`. No Common
+compatibility path remains. The dependency gate now enforces
+`lib < emulator < product`.
+
+Ninja and Makefiles both configure and package x64/x86 successfully. Ninja
+background CTest passes 129/129 on each width (native desktop tests excluded
+by preset); component, manifest, corpus, boundary and documentation gates
+pass. `assets/binary/softpc32.exe` and `softpc64.exe` were refreshed. P is
+pending; owner validation and any T85 closure decision remain outstanding.
 
 ### S14 executor delivery
 
@@ -84,7 +83,7 @@ closure decision, remains outstanding.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner explicitly directs: “直接原样导入八组件吧，完成以后编译测试提交推送后等我验证，跑全量测试。” NXVM remains read-only. |
-| Objective | Exactly import all eight shared source/test packages from clean NXVM HEAD `a397b925c48b629908869d295dfd97316acb6b8f`; qualify test/lib, test/common, test/x86, test/ibmpc independently on both widths. |
+| Objective | Exactly import all eight shared source/test packages from clean NXVM HEAD `a397b925c48b629908869d295dfd97316acb6b8f`; qualify test/lib, test/emulator, test/x86, test/ibmpc independently on both widths. |
 | Non-goals | No original SoftPC CPU/device replacement, App/Core or mirror change, Lib/Common private fork, guest media/config/snapshot edit, upstream write, desktop testing or invented manual acceptance. |
 | Reference Baseline | SoftPC `4c36853c`; prior exact corpus `43e9700e`; NXVM clean HEAD `a397b925c48b629908869d295dfd97316acb6b8f`, verified with no uncommitted changes before copying. |
 | Candidate Proposal | [S12 synchronization](../proposals/m9-windows-101-startup-repair.md#s12-current-nxvm-corpus-refresh-and-four-suite-verification) |
@@ -189,7 +188,7 @@ Serial hidden-background CTest passes 122/122 on x64 and x86. Package EXEs
 remain the accepted P1 artifacts. [S9 closure](../history/M9-T84-S9-input-reset-closure.md).
 
 M9 T84 S10 is owner-accepted and closed. It synchronizes complete `test/lib`
-and `test/common` to read-only NXVM `0c71110b0`, including deletion of the
+and `test/emulator` to read-only NXVM `0c71110b0`, including deletion of the
 Common-private Window reset smoke in favor of canonical Lib-owner coverage.
 P1 `bbdc1d68` passes exact 71-path equality and serial x64/x86 background
 CTest 121/121. [S10 closure](../history/M9-T84-S10-shared-test-corpus-sync-closure.md).
@@ -355,7 +354,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   Desktop tests excluded; no Linux runtime claim. Isolated task outputs removed;
   package EXEs refreshed; Lib/Core/x86, INI/media unchanged. S5 accepted for continuation.
   Executor `c7c42ea5` pushed; actual-change review retained in
-  [S5 evidence](../history/M9-T80-S5-common-types-gate.md).
+  [S5 evidence](../history/M9-T80-S5-emulator-types-gate.md).
 
 - S4: frame publication skips 0 on u32 wrap; Session's two ordering sites share
   one private modular comparator. Production +16/-4 (net +12), tests +69/-0;
@@ -441,8 +440,8 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
   holds the +421/-409 (net +12) source/test/build/tool ledger and EXE hashes.
 - Accepted T73 implementation 879c30ac, actual-change review ad665a86.
   Owner manual S5 testing passed. Closure changes documents only.
-- Shared source corpora are src/lib, src/common, src/product; matching suites
-  are test/lib, test/common, test/product. The six-directory set is ordered
+- Shared source corpora are src/lib, src/emulator, src/product; matching suites
+  are test/lib, test/emulator, test/product. The six-directory set is ordered
   `lib < common < product`; each outer component consumes only its inward
   public contracts.
 - Common contains machine/session/ui only. Machine retains one executor and

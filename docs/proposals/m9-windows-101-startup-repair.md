@@ -341,8 +341,8 @@ silently counted as background coverage. Refresh only the two permitted
 package EXEs; preserve user INI, guest media and snapshots.
 
 Execution record: the frozen raw ledger is exact after import: `src/lib` 109,
-`src/common` 23, `src/x86` 95, `src/ibmpc` 125, `test/lib` 49,
-`test/common` 20, `test/x86` 196, and `test/ibmpc` 235 paths; the shared
+`src/emulator` 23, `src/x86` 95, `src/ibmpc` 125, `test/lib` 49,
+`test/emulator` 20, `test/x86` 196, and `test/ibmpc` 235 paths; the shared
 registration helper is also byte-identical. No desktop interval was reserved,
 so desktop tests remain excluded as specified. Both Release package builds
 completed, and the full background repository suite passes 479/479 on x64
@@ -398,7 +398,7 @@ The longest observed x64 pass was about 1.6 seconds for command-provider and
 presentation shutdown in 0.65 seconds.
 
 Source review found no second shutdown owner or uncompleted wait in scope.
-`common_machine_shutdown()` signals both command and resume before joining the
+`emulator_machine_shutdown()` signals both command and resume before joining the
 executor; the product Audio owner cancels its native writable wait before its
 own join; and presentation-shutdown's fake UI fixture starts no native
 presentation worker. No timeout was relaxed and no retry, polling, delay, ABI,
@@ -524,7 +524,7 @@ Lib six code units, +198/-3, net +195:
 
 Common four code units, +313/-12, net +301:
 
-- common_machine_smoke.c: published-frame run-generation queries.
+- emulator_machine_smoke.c: published-frame run-generation queries.
 - composition_smoke.c: create failure cleanup and copied monitor/control events.
 - session_frame_smoke.c: complete publication copy and invalid-frame rejection.
 - session_monitor_smoke.c: lifecycle dispatch, invalid inputs and creation cleanup.
@@ -737,55 +737,55 @@ helper, and recomputing C/H dependency closure. A failed new test is not silentl
 deleted or weakened. Full background regression and manifests/DAG/docs gate
 must pass. No desktop or Linux acceptance is claimed.
 
-- Keep/register: `board-common/composition/core_machine_80186_decoder_inventory_runner.c`.
-- Keep/register: `board-common/composition/core_machine_80286_decoder_inventory_runner.c`.
-- Keep/register: `board-common/composition/core_machine_80286_protected_mode_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_80386_decoder_inventory_runner.c`.
-- Keep/register: `board-common/composition/core_machine_call_gate_privilege_entry_board_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_fs_gs_stack_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_legacy_alu_s2_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_legacy_lock_s1_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_movx_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_operand_address_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_protected_16_call_gate_board_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_protected_16_external_board_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_protected_16_gate_board_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_protected_16_outer_board_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_protected_16_outer_iret_board_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_protected_ud_delivery_s1_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_real_exception_final_s1_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_real_ud_delivery_s1_smoke.c`.
-- Keep/register: `board-common/composition/core_machine_segment_selector_smoke.c`.
-- Keep/register: `board-common/composition/cpu_fault_diagnostic_smoke.c`.
-- Keep/register: `board-common/composition/cpu_fpu_profile_closure_smoke.c`.
-- Keep/register: `board-common/composition/cpu_fpu_profile_smoke.c`.
-- Keep/register: `board-common/composition/machine_fpu_escape_smoke.c`.
-- Keep/register: `board-common/composition/machine_protected_privilege_board_smoke.c`.
-- Keep/register: `board-common/composition/machine_task_switch32_paging_smoke.c`.
-- Keep/register: `board-common/composition/support/protected_16_bootstrap_fixture.h`.
+- Keep/register: `board-emulator/composition/core_machine_80186_decoder_inventory_runner.c`.
+- Keep/register: `board-emulator/composition/core_machine_80286_decoder_inventory_runner.c`.
+- Keep/register: `board-emulator/composition/core_machine_80286_protected_mode_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_80386_decoder_inventory_runner.c`.
+- Keep/register: `board-emulator/composition/core_machine_call_gate_privilege_entry_board_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_fs_gs_stack_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_legacy_alu_s2_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_legacy_lock_s1_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_movx_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_operand_address_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_protected_16_call_gate_board_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_protected_16_external_board_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_protected_16_gate_board_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_protected_16_outer_board_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_protected_16_outer_iret_board_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_protected_ud_delivery_s1_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_real_exception_final_s1_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_real_ud_delivery_s1_smoke.c`.
+- Keep/register: `board-emulator/composition/core_machine_segment_selector_smoke.c`.
+- Keep/register: `board-emulator/composition/cpu_fault_diagnostic_smoke.c`.
+- Keep/register: `board-emulator/composition/cpu_fpu_profile_closure_smoke.c`.
+- Keep/register: `board-emulator/composition/cpu_fpu_profile_smoke.c`.
+- Keep/register: `board-emulator/composition/machine_fpu_escape_smoke.c`.
+- Keep/register: `board-emulator/composition/machine_protected_privilege_board_smoke.c`.
+- Keep/register: `board-emulator/composition/machine_task_switch32_paging_smoke.c`.
+- Keep/register: `board-emulator/composition/support/protected_16_bootstrap_fixture.h`.
 - Remove: `board-at/boot_fixture.c` (12 lines).
 - Remove: `board-at/boot_fixture.h` (7 lines).
 - Remove: `board-at/command_fixture.h` (34 lines).
 - Remove: `board-at/state_fixture.c` (38 lines).
 - Remove: `board-at/state_fixture.h` (9 lines).
-- Remove: `board-common/boot_fixture.c` (86 lines).
-- Remove: `board-common/boot_fixture.h` (33 lines).
-- Remove: `board-common/cmos_fixture.c` (39 lines).
-- Remove: `board-common/cmos_fixture.h` (11 lines).
-- Remove: `board-common/composition/machine_80186_timing_manifest_runner.c` (1943 lines).
-- Remove: `board-common/composition/machine_8086_timing_manifest_runner.c` (4492 lines).
-- Remove: `board-common/composition_fixture.c` (168 lines).
-- Remove: `board-common/composition_fixture.h` (77 lines).
-- Remove: `board-common/controller_fixture.c` (113 lines).
-- Remove: `board-common/controller_fixture.h` (33 lines).
-- Remove: `board-common/kbc_state_fixture.c` (19 lines).
-- Remove: `board-common/kbc_state_fixture.h` (9 lines).
-- Remove: `board-common/video_topology_fixture.c` (10 lines).
-- Remove: `board-common/video_topology_fixture.h` (7 lines).
+- Remove: `board-emulator/boot_fixture.c` (86 lines).
+- Remove: `board-emulator/boot_fixture.h` (33 lines).
+- Remove: `board-emulator/cmos_fixture.c` (39 lines).
+- Remove: `board-emulator/cmos_fixture.h` (11 lines).
+- Remove: `board-emulator/composition/machine_80186_timing_manifest_runner.c` (1943 lines).
+- Remove: `board-emulator/composition/machine_8086_timing_manifest_runner.c` (4492 lines).
+- Remove: `board-emulator/composition_fixture.c` (168 lines).
+- Remove: `board-emulator/composition_fixture.h` (77 lines).
+- Remove: `board-emulator/controller_fixture.c` (113 lines).
+- Remove: `board-emulator/controller_fixture.h` (33 lines).
+- Remove: `board-emulator/kbc_state_fixture.c` (19 lines).
+- Remove: `board-emulator/kbc_state_fixture.h` (9 lines).
+- Remove: `board-emulator/video_topology_fixture.c` (10 lines).
+- Remove: `board-emulator/video_topology_fixture.h` (7 lines).
 - Remove: `board-xt/boot_fixture.c` (13 lines).
 - Remove: `board-xt/boot_fixture.h` (9 lines).
 - Remove: `machine/composition/vm_debug_authority_smoke.c` (41 lines).
-- Remove: `machine/support/common_machine_fixture.h` (98 lines).
+- Remove: `machine/support/emulator_machine_fixture.h` (98 lines).
 - Remove: `machine/support/guest_display.h` (53 lines).
 - Remove: `machine/support/guest_input.h` (57 lines).
 - Remove: `machine/support/media.h` (26 lines).
@@ -889,7 +889,7 @@ no-ready output does not publish, and identical complete text after restart
 publishes with sequence wrap still skipping zero. Native reset separately
 confirms identical text is published for the new generation.
 
-Sweep commands: rg frame_buffers/invalidate_published_frame in src/common;
+Sweep commands: rg frame_buffers/invalidate_published_frame in src/emulator;
 rg copy_frame assignments in src and test. The sole invalidation helper serves
 cold/reset entry and successful state restoration. Initial zero allocation and
 final release retain their distinct resource responsibilities. Publish clears
@@ -1297,8 +1297,8 @@ two test scheduling lines and their manifest hash, no new external code or
 license claim. NXVM stays read-only and is never a build/runtime dependency.
 
 Finite ledger: SoftPC's 227 existing six-root paths are the frozen universe.
-The 219 exact-shared paths comprise all src/lib (109), src/common (23),
-test/lib (51), test/common (20), plus ten src/x86 and six test/x86 files.
+The 219 exact-shared paths comprise all src/lib (109), src/emulator (23),
+test/lib (51), test/emulator (20), plus ten src/x86 and six test/x86 files.
 The shared test/register.cmake helper is also exact. Before import only
 test/lib/CMakeLists.txt and its manifest differ within that subset.
 
@@ -1712,7 +1712,7 @@ measure their additional cost in a complete product.
 
 A separate x64 run, after the measurement runs, was attached read-only by GDB
 for two stack checkpoints. One executor stack is ccpu.constprop ->
-c_cpu_simulate -> softpc_machine_run -> vm_driver_run -> common_machine_worker
+c_cpu_simulate -> softpc_machine_run -> vm_driver_run -> emulator_machine_worker
 -> base_sync_platform_main. Another has d_mem above that same chain. Main is
 sleeping in the probe and native pool workers are waiting. Runtime reads show
 ienabled = 0, pacing_enabled = 1 and pacing_instructions = 24032271. No variable

@@ -153,9 +153,9 @@ int app_load_startup_config(const char *path,
             if (!app_copy_value(config->printer_output_path, value)) goto invalid;
         } else if (lib_text_compare(key, "display") == 0) {
             if (lib_text_compare(value, "console") == 0)
-                config->presentation = COMMON_SESSION_DISPLAY_CONSOLE;
+                config->presentation = EMULATOR_SESSION_DISPLAY_CONSOLE;
             else if (lib_text_compare(value, "window") == 0)
-                config->presentation = COMMON_SESSION_DISPLAY_WINDOW;
+                config->presentation = EMULATOR_SESSION_DISPLAY_WINDOW;
             else goto invalid;
         } else if (lib_text_compare(key, "console_control") == 0) {
             if (lib_text_compare(value, "0") == 0) config->console_control = 0;

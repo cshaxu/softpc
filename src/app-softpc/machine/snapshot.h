@@ -21,7 +21,7 @@ typedef struct softpc_snapshot {
 } softpc_snapshot;
 
 /* VM-private state image for S4 roundtrip proof.  Later sections encode these
-   copied values; this type is deliberately not a public Common payload. */
+   copied values; this type is deliberately not a public Emulator payload. */
 typedef struct softpc_snapshot_image {
     softpc_ccpu_archive ccpu;
     softpc_media_archive *media;

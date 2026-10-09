@@ -1,6 +1,6 @@
 # Product ownership, including relative include paths. Shared corpora are inputs,
 # never modified by this product-specific check.
-foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat product common lib app-softpc/softpc.new)
+foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat product emulator lib app-softpc/softpc.new)
     file(GLOB_RECURSE sources "${SOFTPC_SOURCE_DIR}/src/${owner}/*.[ch]")
     foreach(source IN LISTS sources)
         file(RELATIVE_PATH relative "${SOFTPC_SOURCE_DIR}/src" "${source}")
@@ -42,15 +42,15 @@ foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat p
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(owner STREQUAL "app-softpc/compat")
-                if(dependency MATCHES "^(app-softpc/(product|machine)|common|product)/")
+                if(dependency MATCHES "^(app-softpc/(product|machine)|emulator|product)/")
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(dependency MATCHES "^app-softpc/" AND
                    NOT (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^app-softpc/(softpc[.]new|compat)/"))
                 message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
-            elseif((owner STREQUAL "lib" AND dependency MATCHES "^(common|product)/") OR
-                   (owner STREQUAL "common" AND dependency MATCHES "^product/") OR
-                   (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^(common|lib|product)/"))
+            elseif((owner STREQUAL "lib" AND dependency MATCHES "^(emulator|product)/") OR
+                   (owner STREQUAL "emulator" AND dependency MATCHES "^product/") OR
+                   (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^(emulator|lib|product)/"))
                 message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
             endif()
         endforeach()

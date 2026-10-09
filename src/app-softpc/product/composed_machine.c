@@ -4,7 +4,7 @@
 #include "composed_machine.h"
 #include "machine/vm_interface.h"
 
-static lib_status softpc_product_bind(void *machine, common_machine *common);
+static lib_status softpc_product_bind(void *machine, emulator_machine *emulator);
 static void softpc_product_destroy(void *machine);
 
 lib_status softpc_product_compose_machine(const app_startup_config *config,
@@ -37,10 +37,10 @@ lib_status softpc_product_compose_machine(const app_startup_config *config,
     return LIB_STATUS_OK;
 }
 
-static lib_status softpc_product_bind(void *machine, common_machine *common)
+static lib_status softpc_product_bind(void *machine, emulator_machine *emulator)
 {
     (void)machine;
-    (void)common;
+    (void)emulator;
     return LIB_STATUS_OK;
 }
 

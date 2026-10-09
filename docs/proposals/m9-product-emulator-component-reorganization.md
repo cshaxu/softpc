@@ -28,7 +28,7 @@ After relocation, delete the now-unused `src/x86`, `src/ibmpc`, `test/x86` and
 `test/ibmpc` trees, their CMake entry points and their obsolete Product build
 helpers. Product's corpus gate verifies the positive dependency rule: Lib has
 no outer dependency, Emulator may consume Lib only, and Product may consume
-Lib or Emulator only. This S does not rename `common`.
+Lib or Emulator only. This S does not rename Common.
 
 ## S19 — rename Common to Emulator
 

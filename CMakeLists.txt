@@ -52,10 +52,10 @@ target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
 add_subdirectory(src/lib)
 enable_testing()
 
-add_subdirectory(src/common)
+add_subdirectory(src/emulator)
 add_subdirectory(src/product)
 add_subdirectory(test/lib)
-add_subdirectory(test/common)
+add_subdirectory(test/emulator)
 add_subdirectory(test/product)
 target_link_libraries(softpc-machine PRIVATE storage base audio)
 
@@ -72,7 +72,7 @@ add_library(softpc-vm OBJECT
 target_include_directories(softpc-vm PUBLIC src)
 target_compile_definitions(softpc-vm PRIVATE _CRT_SECURE_NO_WARNINGS
     SOFTPC_STANDALONE=1 SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
-target_link_libraries(softpc-vm PUBLIC softpc-machine common-machine storage kvm-base)
+target_link_libraries(softpc-vm PUBLIC softpc-machine emulator-machine storage kvm-base)
 if(WIN32)
     target_link_libraries(softpc-vm PRIVATE user32 gdi32)
 endif()
@@ -493,7 +493,7 @@ add_test(NAME softpc-media-snapshot-smoke COMMAND softpc-media-snapshot-smoke)
 set_tests_properties(softpc-media-snapshot-smoke PROPERTIES TIMEOUT 20
     LABELS "unit" WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(softpc-snapshot-transaction-smoke PRIVATE softpc-vm
-    common-machine)
+    emulator-machine)
 add_test(NAME softpc-snapshot-transaction-smoke
     COMMAND softpc-snapshot-transaction-smoke)
 set_tests_properties(softpc-snapshot-transaction-smoke PROPERTIES
@@ -512,10 +512,10 @@ set_tests_properties(softpc-snapshot-boundary-smoke PROPERTIES TIMEOUT 15)
 add_executable(softpc-runtime-smoke
     test/app-softpc/integration/runtime_smoke.c
     test/app-softpc/integration/machine_fixture.c
-    src/common/session/control.c
-    src/common/session/presentation_plan.c
-    src/common/session/control_state.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
+    src/emulator/session/control.c
+    src/emulator/session/presentation_plan.c
+    src/emulator/session/control_state.c)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
 target_include_directories(softpc-runtime-smoke PRIVATE test/integration src/app-softpc/product)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
@@ -523,9 +523,9 @@ set_tests_properties(softpc-runtime-smoke PROPERTIES
 add_executable(softpc-runtime-restart-boot-smoke
     test/app-softpc/integration/runtime_restart_boot_smoke.c
     test/app-softpc/integration/machine_fixture.c
-    src/common/session/control.c)
+    src/emulator/session/control.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
-    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
+    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
 target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE test/integration src/app-softpc/product)
 add_test(NAME softpc-runtime-restart-boot-smoke
     COMMAND softpc-runtime-restart-boot-smoke)
@@ -539,9 +539,9 @@ set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES PROCESSORS 8)
 add_executable(softpc-runtime-input-continuation-smoke
     test/app-softpc/integration/runtime_input_continuation_smoke.c
     test/app-softpc/integration/machine_fixture.c
-    src/common/session/control.c)
+    src/emulator/session/control.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
+    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
     test/integration src/app-softpc/product)
 add_test(NAME softpc-runtime-input-continuation-smoke
@@ -550,7 +550,7 @@ set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-provider-smoke test/app-softpc/integration/command_provider_smoke.c
     src/app-softpc/product/extensions.c)
-target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm product-debug common-session common-machine product-surface-command product-surface-keyboard)
+target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm product-debug emulator-session emulator-machine product-surface-command product-surface-keyboard)
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
 set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45 RUN_SERIAL TRUE
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")

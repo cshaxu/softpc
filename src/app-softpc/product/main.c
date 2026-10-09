@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
     char config_path[SOFTPC_CONFIG_PATH_MAX];
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
-        COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
+        EMULATOR_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
         LIB_STORAGE_MEDIUM_OVERLAY };
     product_surface_definition definition;
     app_composed_machine machine;

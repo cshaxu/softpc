@@ -6,7 +6,7 @@
 
 #define SOFTPC_EXTENSION_PATH_CAPACITY 1024u
 
-static void softpc_extension_message(common_session_command_result *out,
+static void softpc_extension_message(emulator_session_command_result *out,
     const char *message)
 {
     (void)lib_c_snprintf((char *)out->text, sizeof(out->text), "%s\r\n\r\n",
@@ -62,9 +62,9 @@ static lib_status softpc_extension_snapshot_read(void *context,
         bytes, byte_count);
 }
 
-static void softpc_extension_save(common_machine *machine,
-    common_session_machine_state state, const char *path,
-    common_session_command_result *out)
+static void softpc_extension_save(emulator_machine *machine,
+    emulator_session_machine_state state, const char *path,
+    emulator_session_command_result *out)
 {
     lib_storage_file_writer *writer = LIB_NULL;
     lib_status status;
@@ -73,16 +73,16 @@ static void softpc_extension_save(common_machine *machine,
         softpc_extension_message(out, "Usage: save <file>");
         return;
     }
-    if (state != COMMON_SESSION_MACHINE_RUNNING &&
-        state != COMMON_SESSION_MACHINE_PAUSED) {
+    if (state != EMULATOR_SESSION_MACHINE_RUNNING &&
+        state != EMULATOR_SESSION_MACHINE_PAUSED) {
         softpc_extension_message(out, "Machine is stopped; use start before save.");
         return;
     }
     status = lib_storage_file_writer_open(path, LIB_STORAGE_FILE_WRITER_TRUNCATE,
         &writer);
     if (status == LIB_STATUS_OK)
-        status = common_machine_read_state(machine,
-            &(common_machine_state_writer){ softpc_extension_snapshot_write, writer });
+        status = emulator_machine_read_state(machine,
+            &(emulator_machine_state_writer){ softpc_extension_snapshot_write, writer });
     if (writer != LIB_NULL && lib_storage_file_writer_close(writer) != LIB_STATUS_OK &&
         status == LIB_STATUS_OK)
         status = LIB_STATUS_IO_ERROR;
@@ -90,9 +90,9 @@ static void softpc_extension_save(common_machine *machine,
         "Machine saved and paused." : "Cannot save machine state.");
 }
 
-static void softpc_extension_load(common_machine *machine,
-    common_session_machine_state state, const char *path,
-    common_session_command_result *out)
+static void softpc_extension_load(emulator_machine *machine,
+    emulator_session_machine_state state, const char *path,
+    emulator_session_command_result *out)
 {
     lib_storage_file_reader *reader = LIB_NULL;
     lib_status status;
@@ -102,19 +102,19 @@ static void softpc_extension_load(common_machine *machine,
         return;
     }
     /* Monitor INIT was historically the same load-safe condition as STOPPED.
-     * The shared Product delegates this product-only command with Common's
+     * The shared Product delegates this product-only command with Emulator's
      * original state, so preserve that command contract here. */
-    if (state != COMMON_SESSION_MACHINE_INIT &&
-        state != COMMON_SESSION_MACHINE_STOPPED) {
-        softpc_extension_message(out, state == COMMON_SESSION_MACHINE_RUNNING ?
+    if (state != EMULATOR_SESSION_MACHINE_INIT &&
+        state != EMULATOR_SESSION_MACHINE_STOPPED) {
+        softpc_extension_message(out, state == EMULATOR_SESSION_MACHINE_RUNNING ?
             "Machine is running; stop it before load." :
             "Machine is paused; stop it before load.");
         return;
     }
     status = lib_storage_file_reader_open(path, &reader);
     if (status == LIB_STATUS_OK)
-        status = common_machine_write_state(machine,
-            &(common_machine_state_reader){ softpc_extension_snapshot_read, reader });
+        status = emulator_machine_write_state(machine,
+            &(emulator_machine_state_reader){ softpc_extension_snapshot_read, reader });
     if (reader != LIB_NULL && lib_storage_file_reader_close(reader) != LIB_STATUS_OK &&
         status == LIB_STATUS_OK)
         status = LIB_STATUS_IO_ERROR;
@@ -136,16 +136,16 @@ static lib_bool softpc_extension_mode(const char *text,
     return LIB_TRUE;
 }
 
-static void softpc_extension_floppy(common_machine *machine,
-    common_session_machine_state state, char *arguments,
-    common_session_command_result *out)
+static void softpc_extension_floppy(emulator_machine *machine,
+    emulator_session_machine_state state, char *arguments,
+    emulator_session_command_result *out)
 {
     char *operation;
     char *rest;
     char *mode;
     lib_storage_medium_mode medium_mode;
 
-    if (state == COMMON_SESSION_MACHINE_RUNNING) {
+    if (state == EMULATOR_SESSION_MACHINE_RUNNING) {
         softpc_extension_message(out, "Cannot change floppy media now.");
         return;
     }
@@ -156,7 +156,7 @@ static void softpc_extension_floppy(common_machine *machine,
     }
     if (lib_text_compare(operation, "eject") == 0 && *rest == '\0') {
         softpc_extension_message(out,
-            common_machine_set_removable_media(machine, LIB_NULL,
+            emulator_machine_set_removable_media(machine, LIB_NULL,
                 LIB_STORAGE_MEDIUM_OVERLAY) ? "Floppy ejected." : "Cannot eject floppy.");
         return;
     }
@@ -168,13 +168,13 @@ static void softpc_extension_floppy(common_machine *machine,
         return;
     }
     softpc_extension_message(out,
-        common_machine_set_removable_media(machine, rest, medium_mode) ?
+        emulator_machine_set_removable_media(machine, rest, medium_mode) ?
         "Floppy inserted." : "Cannot insert floppy.");
 }
 
-static lib_bool softpc_extension_submit(void *context, common_machine *machine,
-    common_session_machine_state state, const char *line,
-    common_session_command_result *out)
+static lib_bool softpc_extension_submit(void *context, emulator_machine *machine,
+    emulator_session_machine_state state, const char *line,
+    emulator_session_command_result *out)
 {
     char buffer[SOFTPC_EXTENSION_PATH_CAPACITY];
     char *command;
@@ -189,7 +189,7 @@ static lib_bool softpc_extension_submit(void *context, common_machine *machine,
     lib_memory_copy(buffer, line, length + 1u);
     if (!softpc_extension_split(softpc_extension_trim(buffer), &command, &arguments))
         return LIB_FALSE;
-    *out = (common_session_command_result){0};
+    *out = (emulator_session_command_result){0};
     if (lib_text_compare(command, "save") == 0) {
         softpc_extension_save(machine, state, arguments, out);
         return LIB_TRUE;

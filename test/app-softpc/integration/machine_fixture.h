@@ -4,7 +4,7 @@
 #include "machine/driver.h"
 
 typedef struct softpc_machine_fixture {
-    common_machine *machine;
+    emulator_machine *machine;
     vm_driver *driver;
 } softpc_machine_fixture;
 

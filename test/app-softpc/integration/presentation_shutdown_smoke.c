@@ -1,5 +1,5 @@
 #include "lib/types/types_interface.h"
-#include "common/ui/ui_interface.h"
+#include "emulator/ui/ui_interface.h"
 #include "product/surface/entry_interface.h"
 #include "product/config.h"
 #include "product/composed_machine.h"
@@ -7,9 +7,9 @@
 #include <assert.h>
 #include <stdio.h>
 
-struct common_ui { common_ui_options options; };
+struct emulator_ui { emulator_ui_options options; };
 
-static common_ui surface;
+static emulator_ui surface;
 static lib_u32 scenario;
 static lib_u32 requests;
 static lib_u32 destroyed;
@@ -25,33 +25,33 @@ static void create_image(const char *path)
     assert(fclose(file) == 0);
 }
 
-lib_status common_ui_create(common_ui **out_ui, const common_ui_options *options)
+lib_status emulator_ui_create(emulator_ui **out_ui, const emulator_ui_options *options)
 {
     surface.options = *options;
     *out_ui = &surface;
     return LIB_STATUS_OK;
 }
 
-lib_status common_ui_destroy(common_ui *ui)
+lib_status emulator_ui_destroy(emulator_ui *ui)
 {
     assert(ui == &surface && requests == 1u);
     ++destroyed;
     return scenario == 3u ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-lib_status common_ui_request_monitor_line(common_ui *ui)
+lib_status emulator_ui_request_monitor_line(emulator_ui *ui)
 {
-    common_ui_event event = {0};
+    emulator_ui_event event = {0};
 
     assert(ui == &surface && ++requests == 1u);
     if (scenario == 0u || scenario == 3u) {
-        event.kind = COMMON_UI_EVENT_MONITOR_LINE;
+        event.kind = EMULATOR_UI_EVENT_MONITOR_LINE;
         lib_memory_copy(event.value.line.text, "exit", 5u);
         event.value.line.length = 4u;
     } else if (scenario == 1u) {
-        event.kind = COMMON_UI_EVENT_CONSOLE_FAILED;
+        event.kind = EMULATOR_UI_EVENT_CONSOLE_FAILED;
     } else {
-        event.kind = COMMON_UI_EVENT_KVM_DELIVERY_FAILED;
+        event.kind = EMULATOR_UI_EVENT_KVM_DELIVERY_FAILED;
         event.value.delivery_failure.source_identity = 1u;
         event.value.delivery_failure.status = LIB_STATUS_IO_ERROR;
     }
@@ -59,7 +59,7 @@ lib_status common_ui_request_monitor_line(common_ui *ui)
     return LIB_STATUS_OK;
 }
 
-lib_status common_ui_write_monitor(common_ui *ui, const char *text)
+lib_status emulator_ui_write_monitor(emulator_ui *ui, const char *text)
 {
     assert(ui == &surface);
     if (lib_text_find_substring(text, "input failed") ||
@@ -67,17 +67,17 @@ lib_status common_ui_write_monitor(common_ui *ui, const char *text)
     return LIB_STATUS_OK;
 }
 
-void common_ui_set_run_generation(common_ui *ui, lib_u32 generation)
+void emulator_ui_set_run_generation(emulator_ui *ui, lib_u32 generation)
 { (void)ui; (void)generation; assert(0); }
 
-lib_status common_ui_apply_action(common_ui *ui, common_ui_action action,
-    common_ui_state state)
+lib_status emulator_ui_apply_action(emulator_ui *ui, emulator_ui_action action,
+    emulator_ui_state state)
 { (void)ui; (void)action; (void)state; assert(0); return LIB_STATUS_IO_ERROR; }
 
-lib_status common_ui_set_state(common_ui *ui, common_ui_state state)
+lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state state)
 { (void)ui; (void)state; assert(0); return LIB_STATUS_IO_ERROR; }
 
-lib_status common_ui_publish_frame(common_ui *ui, const kvm_window_frame *frame,
+lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *frame,
     const kvm_console_character_map *characters, lib_u32 sequence,
     lib_bool window, lib_bool console, lib_bool status)
 {
@@ -87,10 +87,10 @@ lib_status common_ui_publish_frame(common_ui *ui, const kvm_window_frame *frame,
     return LIB_STATUS_IO_ERROR;
 }
 
-lib_status common_ui_release_window_mouse(common_ui *ui)
+lib_status emulator_ui_release_window_mouse(emulator_ui *ui)
 { (void)ui; assert(0); return LIB_STATUS_IO_ERROR; }
 
-lib_status common_ui_cancel_monitor_line(common_ui *ui, lib_bool *completed)
+lib_status emulator_ui_cancel_monitor_line(emulator_ui *ui, lib_bool *completed)
 { (void)ui; (void)completed; assert(0); return LIB_STATUS_IO_ERROR; }
 
 int main(void)
@@ -101,7 +101,7 @@ int main(void)
 
     create_image(path);
     lib_text_copy(config.floppy_path, path);
-    config.presentation = COMMON_SESSION_DISPLAY_WINDOW;
+    config.presentation = EMULATOR_SESSION_DISPLAY_WINDOW;
     config.floppy_mode = LIB_STORAGE_MEDIUM_READONLY;
     config.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(app_startup_compose_ui(&config, &definition.ui) == LIB_STATUS_OK);

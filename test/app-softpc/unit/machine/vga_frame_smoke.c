@@ -601,8 +601,8 @@ static void verify_driver_geometry(softpc_machine *machine)
         640, 640, 640, 0, 752
     };
     vm_driver *adapter = NULL;
-    common_machine_driver driver;
-    common_machine_frame *frame = lib_allocate(sizeof(*frame));
+    emulator_machine_driver driver;
+    emulator_machine_frame *frame = lib_allocate(sizeof(*frame));
     unsigned index, pass;
     assert(frame != NULL);
     assert(vm_driver_create(&adapter, machine) == LIB_STATUS_OK);

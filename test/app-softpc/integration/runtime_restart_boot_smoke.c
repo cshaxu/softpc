@@ -21,11 +21,11 @@ typedef struct runtime_frame_probe {
     } \
 } while (0)
 
-static int wait_for_state(common_machine *runtime, common_machine_state state)
+static int wait_for_state(emulator_machine *runtime, emulator_machine_state state)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     do {
-        if (common_machine_state_get(runtime) == state) return 1;
+        if (emulator_machine_state_get(runtime) == state) return 1;
         softpc_test_sleep_milliseconds(10u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
@@ -67,7 +67,7 @@ static int wait_for_frame_of_run(const runtime_frame_probe *probe,
 /* This test consumes the copied runtime snapshot, never the original video
  * surface.  A real command prompt is the owner-observed post-BIOS fact for
  * this installed image; CS merely leaving F000 is not an adequate proxy. */
-static int frame_has_dos_prompt(const common_machine_frame *frame)
+static int frame_has_dos_prompt(const emulator_machine_frame *frame)
 {
     lib_u32 row;
 
@@ -87,13 +87,13 @@ static int frame_has_dos_prompt(const common_machine_frame *frame)
     return 0;
 }
 
-static void report_last_frame(common_machine *runtime)
+static void report_last_frame(emulator_machine *runtime)
 {
-    common_machine_frame frame;
+    emulator_machine_frame frame;
     lib_u32 row;
 
-    if (!common_machine_copy_published_frame(runtime, &frame,
-            common_machine_run_generation(runtime))) return;
+    if (!emulator_machine_copy_published_frame(runtime, &frame,
+            emulator_machine_run_generation(runtime))) return;
     fprintf(stderr, "last frame: valid=%u graphics=%u text=%ux%u sequence=%lu\n",
         (unsigned int)frame.window.valid, (unsigned int)frame.window.graphics,
         (unsigned int)frame.window.text.base.text_columns, (unsigned int)frame.window.text.base.text_rows,
@@ -114,25 +114,25 @@ static void report_last_frame(common_machine *runtime)
     }
 }
 
-static int wait_for_dos_prompt(common_machine *runtime, DWORD timeout_ms)
+static int wait_for_dos_prompt(emulator_machine *runtime, DWORD timeout_ms)
 {
-    common_machine_frame frame;
+    emulator_machine_frame frame;
     lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
 
     do {
-        if (common_machine_copy_published_frame(runtime, &frame,
-                common_machine_run_generation(runtime)) && frame_has_dos_prompt(&frame))
+        if (emulator_machine_copy_published_frame(runtime, &frame,
+                emulator_machine_run_generation(runtime)) && frame_has_dos_prompt(&frame))
             return 1;
         softpc_test_sleep_milliseconds(10u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
-static int run_reaches_post_bios(common_machine *runtime,
+static int run_reaches_post_bios(emulator_machine *runtime,
     runtime_frame_probe *probe, lib_u32 run_generation,
     lib_u32 prior_sequence)
 {
-    if (!wait_for_state(runtime, COMMON_MACHINE_RUNNING)) goto failed;
+    if (!wait_for_state(runtime, EMULATOR_MACHINE_RUNNING)) goto failed;
     /* This is deliberately stronger than an executor/IP check: a new cold
      * run must commit a copied frame tagged with its own run generation.
      * Otherwise the product layer could retain the previous run's surface
@@ -145,16 +145,16 @@ static int run_reaches_post_bios(common_machine *runtime,
 
 failed:
     fprintf(stderr, "runtime restart boot check failed: run=%lu state=%d\n",
-        (unsigned long)run_generation, (int)common_machine_state_get(runtime));
+        (unsigned long)run_generation, (int)emulator_machine_state_get(runtime));
     report_last_frame(runtime);
     return 0;
 }
 
-static int enter_windows(common_machine *runtime)
+static int enter_windows(emulator_machine *runtime)
 {
     const lib_u32 keys[] = { 'W', 'I', 'N', KVM_KEY_ENTER };
     const lib_u32 scans[] = { 0x11u, 0x17u, 0x31u, 0x1cu };
-    common_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
+    emulator_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     lib_u64 deadline;
     int graphics = 0, running = 1;
     if (frame == NULL) return 0;
@@ -164,20 +164,20 @@ static int enter_windows(common_machine *runtime)
         event.data.key.key = keys[index];
         event.data.key.scan_code = scans[index];
         event.data.key.pressed = 1u;
-        if (!common_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
+        if (!emulator_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
         event.data.key.pressed = 0u;
-        if (!common_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
+        if (!emulator_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
     }
     /* Observe through startup, not merely its first splash frame. The fixed
        installed image remains overlay-only and the normal executor owns time. */
     deadline = softpc_test_clock_milliseconds() + 15000u;
     do {
-        if (common_machine_state_get(runtime) != COMMON_MACHINE_RUNNING) {
+        if (emulator_machine_state_get(runtime) != EMULATOR_MACHINE_RUNNING) {
             running = 0;
             break;
         }
-        if (common_machine_copy_published_frame(runtime, frame,
-                common_machine_run_generation(runtime)) && frame->window.graphics)
+        if (emulator_machine_copy_published_frame(runtime, frame,
+                emulator_machine_run_generation(runtime)) && frame->window.graphics)
             graphics = frame->window.image.width == 640u && frame->window.image.height == 480u;
         softpc_test_sleep_milliseconds(10u);
     } while (softpc_test_clock_milliseconds() < deadline);
@@ -185,17 +185,17 @@ static int enter_windows(common_machine *runtime)
     return running && graphics;
 }
 
-static int send_key(common_machine *runtime, lib_u32 key, lib_u32 scan, int down)
+static int send_key(emulator_machine *runtime, lib_u32 key, lib_u32 scan, int down)
 {
     kvm_input_event event = { 0 };
     event.type = KVM_EVENT_KEY;
     event.data.key.key = key;
     event.data.key.scan_code = scan;
     event.data.key.pressed = down != 0;
-    return common_machine_enqueue_input(runtime, &event);
+    return emulator_machine_enqueue_input(runtime, &event);
 }
 
-static int tap_key(common_machine *runtime, lib_u32 key, lib_u32 scan)
+static int tap_key(emulator_machine *runtime, lib_u32 key, lib_u32 scan)
 {
     if (!send_key(runtime, key, scan, 1) || !send_key(runtime, key, scan, 0))
         return 0;
@@ -203,16 +203,16 @@ static int tap_key(common_machine *runtime, lib_u32 key, lib_u32 scan)
     return 1;
 }
 
-static int wait_for_mode(common_machine *runtime, int graphics, lib_u32 after)
+static int wait_for_mode(emulator_machine *runtime, int graphics, lib_u32 after)
 {
-    common_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
+    emulator_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     int matched = 0;
     if (frame == NULL) return 0;
     do {
-        if (common_machine_state_get(runtime) != COMMON_MACHINE_RUNNING) break;
-        if (common_machine_copy_published_frame(runtime, frame,
-                common_machine_run_generation(runtime)) && frame->sequence > after &&
+        if (emulator_machine_state_get(runtime) != EMULATOR_MACHINE_RUNNING) break;
+        if (emulator_machine_copy_published_frame(runtime, frame,
+                emulator_machine_run_generation(runtime)) && frame->sequence > after &&
             frame->window.valid && (frame->window.graphics != 0u) == graphics) {
             matched = 1;
             break;
@@ -223,7 +223,7 @@ static int wait_for_mode(common_machine *runtime, int graphics, lib_u32 after)
     return matched;
 }
 
-static int type_command(common_machine *runtime, const char *text)
+static int type_command(emulator_machine *runtime, const char *text)
 {
     static const lib_u32 scans[] = {
         0x1e, 0x30, 0x2e, 0x20, 0x12, 0x21, 0x22, 0x23, 0x17,
@@ -239,9 +239,9 @@ static int type_command(common_machine *runtime, const char *text)
     return tap_key(runtime, KVM_KEY_ENTER, 0x1c);
 }
 
-static int prompt_roundtrip(common_machine *runtime, int windowed)
+static int prompt_roundtrip(emulator_machine *runtime, int windowed)
 {
-    common_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
+    emulator_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     int succeeded = 0;
     if (frame == NULL) return 0;
     /* Program Manager File/Run, through the ordinary machine input queue. */
@@ -250,14 +250,14 @@ static int prompt_roundtrip(common_machine *runtime, int windowed)
         !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
         !tap_key(runtime, 'R', 0x13)) goto done;
     softpc_test_sleep_milliseconds(300u);
-    if (!common_machine_copy_published_frame(runtime, frame,
-            common_machine_run_generation(runtime)) ||
+    if (!emulator_machine_copy_published_frame(runtime, frame,
+            emulator_machine_run_generation(runtime)) ||
         !type_command(runtime, windowed ? "DOSPMPTW.PIF" : "DOSPRMPT.PIF")) goto done;
     softpc_test_sleep_milliseconds(2000u);
     if (!wait_for_mode(runtime, windowed, frame->sequence)) goto done;
     for (unsigned i = 0; i < 6u; ++i) {
-        if (!common_machine_copy_published_frame(runtime, frame,
-                common_machine_run_generation(runtime))) goto done;
+        if (!emulator_machine_copy_published_frame(runtime, frame,
+                emulator_machine_run_generation(runtime))) goto done;
         lib_u32 prior = frame->sequence;
         if (!send_key(runtime, KVM_KEY_ALT, 0x38, 1) ||
             !tap_key(runtime, KVM_KEY_ENTER, 0x1c) ||
@@ -265,11 +265,11 @@ static int prompt_roundtrip(common_machine *runtime, int windowed)
             !wait_for_mode(runtime, windowed ^ ((i & 1u) == 0u), prior)) goto done;
         /* Let rendering/input continue after the first mode notification. */
         softpc_test_sleep_milliseconds(1000u);
-        if (common_machine_state_get(runtime) != COMMON_MACHINE_RUNNING) goto done;
+        if (emulator_machine_state_get(runtime) != EMULATOR_MACHINE_RUNNING) goto done;
         if (!type_command(runtime, "CLS")) goto done;
     }
-    if (!common_machine_copy_published_frame(runtime, frame,
-            common_machine_run_generation(runtime)) ||
+    if (!emulator_machine_copy_published_frame(runtime, frame,
+            emulator_machine_run_generation(runtime)) ||
         !type_command(runtime, "EXIT")) goto done;
     softpc_test_sleep_milliseconds(2000u);
     if (!wait_for_mode(runtime, 1, frame->sequence)) goto done;
@@ -285,7 +285,7 @@ int main(void)
     softpc_machine_options options = { 0 };
     softpc_machine *machine = NULL;
     softpc_machine_fixture fixture = { 0 };
-    common_machine *runtime;
+    emulator_machine *runtime;
     lib_u32 generation;
     lib_u32 sequence;
     unsigned int cycle;
@@ -298,10 +298,10 @@ int main(void)
     REQUIRE(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     REQUIRE(softpc_machine_fixture_create(machine, &fixture));
     runtime = fixture.machine;
-    common_machine_set_frame_sink(runtime, receive_frame, &frame_probe);
+    emulator_machine_set_frame_sink(runtime, receive_frame, &frame_probe);
 
-    REQUIRE(common_machine_start(runtime));
-    generation = common_machine_run_generation(runtime);
+    REQUIRE(emulator_machine_start(runtime));
+    generation = emulator_machine_run_generation(runtime);
     REQUIRE(generation != 0u);
     REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
         generation, 0u));
@@ -319,7 +319,7 @@ int main(void)
         fprintf(stderr, "DOS idle CPU: %.2f ms over 2000 ms\n",
             (double)(cpu_ticks(&kernel, &user) - before) / 10000.0);
         REQUIRE(cpu_ticks(&kernel, &user) - before < 5000000u);
-        REQUIRE(common_machine_state_get(runtime) == COMMON_MACHINE_RUNNING);
+        REQUIRE(emulator_machine_state_get(runtime) == EMULATOR_MACHINE_RUNNING);
     }
     sequence = (lib_u32)InterlockedCompareExchange(
         &frame_probe.last_sequence, 0, 0);
@@ -328,12 +328,12 @@ int main(void)
        Console to the cooked monitor.  Repeat that exact public path: reset
        bugs often appear only after one or more prior controller lifetimes. */
     for (cycle = 0u; cycle < 3u; ++cycle) {
-        REQUIRE(common_machine_pause(runtime));
-        REQUIRE(wait_for_state(runtime, COMMON_MACHINE_PAUSED));
-        REQUIRE(common_machine_stop(runtime));
-        REQUIRE(wait_for_state(runtime, COMMON_MACHINE_STOPPED));
-        REQUIRE(common_machine_start(runtime));
-        generation = common_machine_run_generation(runtime);
+        REQUIRE(emulator_machine_pause(runtime));
+        REQUIRE(wait_for_state(runtime, EMULATOR_MACHINE_PAUSED));
+        REQUIRE(emulator_machine_stop(runtime));
+        REQUIRE(wait_for_state(runtime, EMULATOR_MACHINE_STOPPED));
+        REQUIRE(emulator_machine_start(runtime));
+        generation = emulator_machine_run_generation(runtime);
         REQUIRE(generation != 0u);
         REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
             generation, sequence));
@@ -344,13 +344,13 @@ int main(void)
     REQUIRE(enter_windows(runtime));
     REQUIRE(prompt_roundtrip(runtime, 0));
     REQUIRE(prompt_roundtrip(runtime, 1));
-    REQUIRE(common_machine_stop(runtime));
-    REQUIRE(wait_for_state(runtime, COMMON_MACHINE_STOPPED));
-    REQUIRE(common_machine_start(runtime));
+    REQUIRE(emulator_machine_stop(runtime));
+    REQUIRE(wait_for_state(runtime, EMULATOR_MACHINE_STOPPED));
+    REQUIRE(emulator_machine_start(runtime));
     REQUIRE(run_reaches_post_bios(runtime, &frame_probe,
-        common_machine_run_generation(runtime), sequence));
-    REQUIRE(common_machine_stop(runtime));
-    REQUIRE(wait_for_state(runtime, COMMON_MACHINE_STOPPED));
+        emulator_machine_run_generation(runtime), sequence));
+    REQUIRE(emulator_machine_stop(runtime));
+    REQUIRE(wait_for_state(runtime, EMULATOR_MACHINE_STOPPED));
     softpc_machine_fixture_destroy(&fixture);
     softpc_machine_destroy(machine);
     return 0;

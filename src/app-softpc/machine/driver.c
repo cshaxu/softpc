@@ -50,14 +50,14 @@ struct vm_driver {
     softpc_debug_state debug;
     softpc_snapshot capture;
     softpc_snapshot_image captured_image;
-    common_machine_state_writer state_writer;
+    emulator_machine_state_writer state_writer;
     lib_status state_read_status;
     lib_bool state_read_ready;
     softpc_snapshot_image staged_image;
     lib_bool restore_pending;
     lib_bool restore_active;
     lib_bool restore_rendezvous_pending;
-    common_machine_executor_callback executor_callback;
+    emulator_machine_executor_callback executor_callback;
     void *executor_context;
 };
 
@@ -191,7 +191,7 @@ static lib_bool vm_driver_run(void *opaque)
             softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
             LIB_STATUS_OK;
         /* The restored CPU has an exact continuation boundary.  Let its first
-           checkpoint enter Common's already-requested pause rendezvous before
+           checkpoint enter Emulator's already-requested pause rendezvous before
            decoding another guest instruction. */
         if (result) {
             driver->restore_active = LIB_FALSE;
@@ -232,7 +232,7 @@ static void vm_driver_set_heartbeat(void *opaque, lib_bool enabled)
 }
 
 static void vm_driver_set_executor_callback(void *opaque,
-    common_machine_executor_callback callback, void *callback_context)
+    emulator_machine_executor_callback callback, void *callback_context)
 {
     vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL) return;
@@ -258,7 +258,7 @@ static void vm_driver_deliver_input(void *opaque,
 }
 
 static lib_status vm_driver_copy_graphics(vm_driver *driver,
-    common_machine_frame *frame)
+    emulator_machine_frame *frame)
 {
     const void *bits;
     const void *info;
@@ -303,7 +303,7 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
 }
 
 static lib_status vm_driver_copy_text(vm_driver *driver,
-    common_machine_frame *frame)
+    emulator_machine_frame *frame)
 {
     const void *surface;
     lib_u32 columns;
@@ -378,7 +378,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     return LIB_STATUS_OK;
 }
 
-static lib_status vm_driver_copy_frame(void *opaque, common_machine_frame *frame)
+static lib_status vm_driver_copy_frame(void *opaque, emulator_machine_frame *frame)
 {
     vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || frame == NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -435,7 +435,7 @@ static void vm_driver_cancel_debug(void *opaque)
 }
 
 static lib_status vm_driver_begin_state_read(void *opaque,
-    const common_machine_state_writer *writer)
+    const emulator_machine_state_writer *writer)
 {
     vm_driver *driver = (vm_driver *)opaque;
     if (driver == NULL || writer == NULL || writer->write == NULL)
@@ -469,7 +469,7 @@ static lib_bool vm_driver_take_state_read_result(void *opaque,
 }
 
 static lib_status vm_driver_write_state(void *opaque,
-    const common_machine_state_reader *reader)
+    const emulator_machine_state_reader *reader)
 {
     vm_driver *driver = opaque;
     softpc_snapshot_image staged = {0};
@@ -513,10 +513,10 @@ void vm_driver_destroy(vm_driver *driver)
 }
 
 void vm_driver_describe(vm_driver *driver,
-    common_machine_driver *out_driver)
+    emulator_machine_driver *out_driver)
 {
     if (out_driver == NULL) return;
-    *out_driver = (common_machine_driver) { 0 };
+    *out_driver = (emulator_machine_driver) { 0 };
     out_driver->context = driver;
     out_driver->reset = vm_driver_reset;
     out_driver->run = vm_driver_run;

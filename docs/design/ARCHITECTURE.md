@@ -4,11 +4,11 @@
 
 ```text
 app/main                    entry/config validation -> app/composition
-app/composition             assembly: existing Common + vm public interface
-app/config, command, keyboard  configuration and CLI/hotkey policy -> Common/Lib
+app/composition             assembly: existing Emulator + vm public interface
+app/config, command, keyboard  configuration and CLI/hotkey policy -> Emulator/Lib
 
-common/session -> common/ui       control and monitor/KVM composition
-common/session -> common/machine  sole generic executor and copied facts
+emulator/session -> emulator/ui       control and monitor/KVM composition
+emulator/session -> emulator/machine  sole generic executor and copied facts
 product/debug + product/xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
@@ -32,15 +32,15 @@ and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
 `app-softpc/compat/` owns original host callbacks, host resources and port ABI adaptations,
 but no product machine lifecycle/configuration or guest-visible device state.
-`common/session` is the sole owner of the product-neutral control queue,
+`emulator/session` is the sole owner of the product-neutral control queue,
 desired/actual reduction, prompt scheduling and dispatch order. It receives
 the SoftPC CLI and machine adapter as injected callbacks; it does not parse
-configuration or interpret machine internals. `common/ui` is the sole owner
+configuration or interpret machine internals. `emulator/ui` is the sole owner
 of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app-softpc/product/` owns SoftPC configuration parsing, private machine
 composition, resources and its snapshot/media command extension. Shared
-`product/surface` owns CLI/debug semantics, hotkey policy, Common entity
+`product/surface` owns CLI/debug semantics, hotkey policy, Emulator entity
 assembly, session execution and teardown. App passes it an already composed
 private machine/driver lifetime and the two UI choices only; shared Product
 does not parse configuration or see media, memory or model fields.
@@ -55,8 +55,8 @@ Only app-softpc/product/composed_machine.c consumes machine/vm_interface.h; no s
 the original mirror. `app-softpc/machine/` owns the concrete machine backend, initialization/reset/teardown
 sequence, driver, frame/input conversion and debugger request preflight.
 Its implementation calls Compat and the original machine while its
-public interface exposes only copied options and Common/Lib contracts.
-Compat never calls app or Common. `common/machine` owns the
+public interface exposes only copied options and Emulator/Lib contracts.
+Compat never calls app or Emulator. `emulator/machine` owns the
 single generic executor, request/input queues, run generation and copied-frame
 publication; its injected VM driver calls the SoftPC machine boundary.
 
@@ -79,8 +79,8 @@ to this same corpus at its current app-softpc/softpc.new location.
 
 These are ownership boundaries, not six mandatory forwarding layers. Device
 I/O follows original MVDM host callbacks into Compat and then Lib storage;
-Common machine schedules execution, not individual disk reads/writes. Original
-CPU debug observations call the VM observer symbols without importing Common
+Emulator machine schedules execution, not individual disk reads/writes. Original
+CPU debug observations call the VM observer symbols without importing Emulator
 or App implementation. Such callbacks do not transfer CPU state ownership.
 
 All VM C sources belong to one `softpc-vm` OBJECT target. App and product
@@ -100,7 +100,7 @@ Compat's narrow CCPU ABI and host support declarations are internal contracts.
 Existing original declarations are reused where applicable; the narrow CPU
 contract avoids leaking original CPU macros into the VM adapter. Declaration
 consolidation does not add forwarding functions, duplicate state or change the
-original device ABI. Lib, Common and x86 remain product-independent; none may
+original device ABI. Lib, Emulator and x86 remain product-independent; none may
 import App, VM, Compat or MVDM.
 
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
@@ -109,16 +109,16 @@ consumes and produces copied host values only. It owns
 the generic mailbox mechanics, independent console/window message loops,
 host-input normalization, registered-chord matching, mouse capture, clock,
 synchronization,
-storage primitives and bounded PCM playback. Common machine owns its executor queue; VM converts
+storage primitives and bounded PCM playback. Emulator machine owns its executor queue; VM converts
 copied input to the original machine protocol; app supplies product command
-and hotkey policy to Common session. SoftPC publishes each admitted shared-library change as the
+and hotkey policy to Emulator session. SoftPC publishes each admitted shared-library change as the
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
 `product/xasm32` is an imported x86 copied byte/text assembly capability and
 `product/debug` is an imported x86 debug command capability. SoftPC exposes
 it through its injected app command binding, not through a second input loop.
-`product/debug` depends on `common/machine`'s optional paused-state adapter and
+`product/debug` depends on `emulator/machine`'s optional paused-state adapter and
 on `product/xasm32`; neither component may create an executor, own a Console,
 or add a product command path. Import hashes remain provenance evidence; the
 S9 integration changes to these components form the updated downstream corpus.
@@ -165,7 +165,7 @@ translate native records before the event reaches the shared contract; only
 the VM guest binding may translate that neutral value to a product's
 guest-input protocol.
 
-The common-machine executor alone invokes state-access/execution driver hooks
+The emulator-machine executor alone invokes state-access/execution driver hooks
 and compatibility work. Control callers may also invoke the driver's thread-safe
 stop/wake signals. Input producers enqueue records and signal it. The
 executor publishes complete text or graphic frame snapshots; frontends consume
@@ -173,19 +173,19 @@ only those snapshots.
 
 ## Shared Console And KVM Composition
 
-Common is platform-independent source: it has no platform subdirectories,
+Emulator is platform-independent source: it has no platform subdirectories,
 native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing product.
-Shared unit suites live in test/lib, test/common and test/product. The reusable
-six-directory set is src/lib, src/common, src/product, test/lib, test/common
+Shared unit suites live in test/lib, test/emulator and test/product. The reusable
+six-directory set is src/lib, src/emulator, src/product, test/lib, test/emulator
 and test/product. Each corpus/suite owns its build and manifest; none may
 require an importing product's adapters or firmware. Each test package owns its
 fixtures; it may consume inward production APIs but never another package's
 tests or an outer package. Generic test tools live directly in test/. The
-dependency rule is direct: Lib has no outer dependency; Common consumes Lib;
-Product consumes Lib and Common. This rule is checked both at public-header and
+dependency rule is direct: Lib has no outer dependency; Emulator consumes Lib;
+Product consumes Lib and Emulator. This rule is checked both at public-header and
 CMake target-link boundaries.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
@@ -204,10 +204,10 @@ split into `kvm-base` (copied KVM values, one event-construction path,
 private-mailbox helpers, and source-local generic hotkey matcher),
 `kvm-window` (one Window lifecycle), and `kvm-console` (one VM Console lifecycle).
 The latter creates an optional logical VM Console object but neither KVM
-component opens or registers the process Console. `common/ui` owns the monitor
+component opens or registers the process Console. `emulator/ui` owns the monitor
 object, decides which KVM components exist from injected actions and asks the broker
 to replace the current object. SoftPC app policy derives and injects those
-actions; common/ui does not interpret their product meaning.
+actions; emulator/ui does not interpret their product meaning.
 
 The library's only direct component edges are:
 
@@ -239,13 +239,13 @@ implementation; neither sibling components nor root forwarding headers may
 include them. The exception is `types/{win32,linux}`, which supplies shared
 external vocabulary to matching platform sources. Existing Windows input
 normalization support is declared by kvm-base root interfaces and implemented
-only by kvm-base; callers never reach its platform headers. Common normalization
+only by kvm-base; callers never reach its platform headers. Emulator normalization
 delegates raw decoding to same-shape selected platform functions; Window-only
 message decoding and key-state queries remain in kvm-window. This support API
 is not an application input API.
 
-Common session control is the sole product-state writer. VM, broker, and KVM
-workers only enqueue copied events/completions to its common-owned queue. The control thread
+Emulator session control is the sole product-state writer. VM, broker, and KVM
+workers only enqueue copied events/completions to its emulator-owned queue. The control thread
 derives runtime commands independently from the required component instances,
 using config, frame route, and completed actual state; a derived action is
 control-private and is never a shared VM/presenter intent. Runtime owns the
@@ -270,13 +270,13 @@ snapshot even when a modifier make was not observed in that instance; no
 additional source-local modifier-participation restriction is imposed.
 
 Every `kvm-window` and `kvm-console` instance owns private control/frame/input
-mailboxes and its own native worker(s). Their common mailbox mechanics live in
+mailboxes and its own native worker(s). Their emulator mailbox mechanics live in
 `kvm-base`; the mailbox instances remain per-component implementation details,
 never public handles or shared KVM infrastructure. SoftPC invokes the specific
 component API it has chosen; components communicate back only through the
 copied input-queue entry supplied at creation.
 
-The common control FIFO transports a consumer-owned nonzero kind and bounded
+The emulator control FIFO transports a consumer-owned nonzero kind and bounded
 opaque payload. Only STOP is a shared terminal transport marker; Window owns
 its title/freeze/release encoding and worker validation. Console has no ordinary
 control commands and rejects unknown records. Native leaf APIs remain typed;
@@ -290,13 +290,13 @@ Both text and graphics decode colours directly into the same comparison helper. 
 frames and recreated surfaces invalidate fully; same-size mode changes compare
 actual pixels. Cursor overlays invalidate their old/new rectangles separately.
 Native invalidations accumulate until paint. No previous-frame cache is added.
-Console stores common text fields and caller-supplied character maps only.
+Console stores emulator text fields and caller-supplied character maps only.
 Shared text uses one array of four-byte cells, each holding a glyph index,
 glyph bank, foreground and background palette indices. VM alone decodes device colour/bank bits; KVM leaves select resources
 from explicit independent values. Logical Console also carries separate colour
 indices; only its native broker packs them for the host API. This changes no
 mailbox, readiness, graphics or lifecycle policy.
-Common machine publishes complete snapshots on driver display change (including
+Emulator machine publishes complete snapshots on driver display change (including
 palette/geometry), preserving no-frame readiness and text comparison. Upstream
 latest-wins is independent of leaf transport: an older notice may select the
 latest complete frame without losing damage. VM alone supplies SoftPC character
@@ -313,19 +313,19 @@ and pending frames. No new input can precede that reset. Rollback uses the same
 helper; RESET is not activation success or permanent KVM source retirement.
 Cooked rollback restores only an unfinished line request observed after reader
 join; ordinary cooked activation remains explicitly armed by the caller.
-Common session alone holds pending_line through consumption of the copied line
+Emulator session alone holds pending_line through consumption of the copied line
 event. Provider prompt readiness is level-triggered; notifications and explicit
 requests are handled even while that line is pending. Frame events drive display,
 not input admission. Notification output cancels and joins an unfinished cooked
 read through the broker's existing retirement path; completed queued commands survive.
-Common UI forwards this operation without new state. Confirmed broker handoff
+Emulator UI forwards this operation without new state. Confirmed broker handoff
 also clears pending_line, never a desired-state change alone.
 Win32 broker isolates raw frame output from the original cooked screen buffer.
 The broker selects and restores native display metadata inside its existing
 output transaction, before reader startup; same-mode replacements do not switch
 screens. Frame output does not shrink the native window to its fixed cell grid.
 The original cooked text/cursor/scrollback remain native-owned, not copied or
-reconstructed by common/UI. Broker disposal restores that original buffer.
+reconstructed by emulator/UI. Broker disposal restores that original buffer.
 Window displacement retains integer remainders
 internally without changing the copied input ABI. Post-start worker exits share
 one failure/retirement cleanup path; startup failure remains distinct. Unexpected
@@ -385,7 +385,7 @@ timeout scheduling.
 Task owns cancellation and entry/context, embedded in one platform allocation.
 The native thread directly invokes that entry; root task destroy joins before
 releasing cancellation and disposing the allocation. Cancellation/join/destroy
-return status; failure retains ownership. Common machine propagates shutdown
+return status; failure retains ownership. Emulator machine propagates shutdown
 failure so its owner cannot release live callback targets or the driver.
 
 Synchronous request rejection returns `lib_status`, with normal wait outcomes

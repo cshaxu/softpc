@@ -97,12 +97,12 @@ static lib_status snapshot_file_read(void *opaque, lib_u8 *bytes,
         LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-static lib_bool wait_for_state(common_machine *machine,
-    common_machine_state expected)
+static lib_bool wait_for_state(emulator_machine *machine,
+    emulator_machine_state expected)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
     do {
-        if (common_machine_state_get(machine) == expected) return LIB_TRUE;
+        if (emulator_machine_state_get(machine) == expected) return LIB_TRUE;
         softpc_test_sleep_milliseconds(10u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return LIB_FALSE;
@@ -186,13 +186,13 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
     return LIB_TRUE;
 }
 
-static lib_bool snapshot_has_pixels(common_machine *machine, lib_u8 colour)
+static lib_bool snapshot_has_pixels(emulator_machine *machine, lib_u8 colour)
 {
-    common_machine_frame *frame = lib_allocate_zero(1, sizeof(*frame));
+    emulator_machine_frame *frame = lib_allocate_zero(1, sizeof(*frame));
     lib_bool found = LIB_FALSE;
     if (frame == NULL) return LIB_FALSE;
-    if (common_machine_copy_published_frame(machine, frame,
-            common_machine_run_generation(machine)) && frame->window.graphics) {
+    if (emulator_machine_copy_published_frame(machine, frame,
+            emulator_machine_run_generation(machine)) && frame->window.graphics) {
         lib_size i;
         found = LIB_TRUE;
         for (i = 0; i < frame->window.image.height * frame->window.image.stride; ++i)
@@ -202,7 +202,7 @@ static lib_bool snapshot_has_pixels(common_machine *machine, lib_u8 colour)
     return found;
 }
 
-static lib_bool snapshot_wait_for_pixels(common_machine *machine, lib_u8 colour)
+static lib_bool snapshot_wait_for_pixels(emulator_machine *machine, lib_u8 colour)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     do {
@@ -216,10 +216,10 @@ static int snapshot_run_transaction(void)
 {
     const char *path = "softpc-snapshot-transaction-smoke.img";
     softpc_machine_options options = { 0 };
-    common_machine_driver description = { 0 };
+    emulator_machine_driver description = { 0 };
     softpc_machine *product = NULL;
     vm_driver *driver = NULL;
-    common_machine *machine = NULL;
+    emulator_machine *machine = NULL;
     snapshot_bytes stream = { 0 };
     snapshot_bytes retained = { 0 };
     softpc_snapshot_image expected = { 0 };
@@ -228,32 +228,32 @@ static int snapshot_run_transaction(void)
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
     assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
     vm_driver_describe(driver, &description);
-    assert(common_machine_create(&machine, &description) == LIB_STATUS_OK);
+    assert(emulator_machine_create(&machine, &description) == LIB_STATUS_OK);
 
-    assert(common_machine_start(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(emulator_machine_start(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
     assert(snapshot_wait_for_pixels(machine, 0x0c));
-    assert(common_machine_pause(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_PAUSED));
+    assert(emulator_machine_pause(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_PAUSED));
     assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
     /* Ordinary pause is not assumed to be a CCPU archive boundary. The
        existing state-read request privately advances to VM's checkpoint. */
-    assert(common_machine_read_state(machine,
-        &(common_machine_state_writer) { snapshot_write, &stream }) ==
+    assert(emulator_machine_read_state(machine,
+        &(emulator_machine_state_writer) { snapshot_write, &stream }) ==
         LIB_STATUS_OK);
     assert(stream.count != 0u);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     assert(snapshot_has_pixels(machine, 0x0c));
     /* The just-completed archive keeps its VM-owned checkpoint image alive
        until resume, so this second paused save must not run the guest again. */
-    assert(common_machine_read_state(machine,
-        &(common_machine_state_writer) { snapshot_write, &retained }) ==
+    assert(emulator_machine_read_state(machine,
+        &(emulator_machine_state_writer) { snapshot_write, &retained }) ==
         LIB_STATUS_OK);
-    assert(retained.count == stream.count && common_machine_state_get(machine) ==
-        COMMON_MACHINE_PAUSED);
+    assert(retained.count == stream.count && emulator_machine_state_get(machine) ==
+        EMULATOR_MACHINE_PAUSED);
     assert(snapshot_media_bytes(LIB_TRUE, LIB_TRUE));
-    assert(common_machine_stop(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
+    assert(emulator_machine_stop(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_STOPPED));
 
     /* The fixed layout begins with guest RAM size, not a host-width/version tag. */
     assert(stream.count >= 12u);
@@ -262,14 +262,14 @@ static int snapshot_run_transaction(void)
         softpc_machine_memory_bytes(product), snapshot_read, &stream) ==
         LIB_STATUS_OK);
     stream.offset = 0u;
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_read, &stream }) ==
+    assert(emulator_machine_write_state(machine,
+        &(emulator_machine_state_reader) { snapshot_read, &stream }) ==
         LIB_STATUS_OK);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
         softpc_ccpu_archive observed = { 0 };
         assert(softpc_ccpu_archive_capture(&observed));
-        /* A restored image must reach Common's pause rendezvous before an
+        /* A restored image must reach Emulator's pause rendezvous before an
            executor tick can advance guest state. */
         assert(lib_memory_compare(&expected.ccpu.registers, &observed.registers,
             sizeof(observed.registers)) == 0);
@@ -282,8 +282,8 @@ static int snapshot_run_transaction(void)
         softpc_ccpu_archive_dispose(&observed);
     }
     assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
-    assert(common_machine_stop(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
+    assert(emulator_machine_stop(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_STOPPED));
 
     /* A declared payload boundary must be consumed exactly, never ignored. */
     {
@@ -292,37 +292,37 @@ static int snapshot_run_transaction(void)
         snapshot_set_u64_le(stream.bytes + 4u, core_bytes + 1u);
     }
     stream.offset = 0u;
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_read, &stream }) !=
+    assert(emulator_machine_write_state(machine,
+        &(emulator_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_STOPPED);
     snapshot_set_u64_le(stream.bytes + 4u,
         snapshot_get_u64_le(stream.bytes + 4u) - 1u);
 
     stream.bytes[0] ^= 0xffu;
     stream.offset = 0u;
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_read, &stream }) !=
+    assert(emulator_machine_write_state(machine,
+        &(emulator_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_STOPPED);
     stream.bytes[0] ^= 0xffu;
     stream.offset = 0u;
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_read, &stream }) ==
+    assert(emulator_machine_write_state(machine,
+        &(emulator_machine_state_reader) { snapshot_read, &stream }) ==
         LIB_STATUS_OK);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
-        common_machine_frame frame = { 0 };
-        assert(common_machine_copy_published_frame(machine, &frame,
-            common_machine_run_generation(machine)));
+        emulator_machine_frame frame = { 0 };
+        assert(emulator_machine_copy_published_frame(machine, &frame,
+            emulator_machine_run_generation(machine)));
         assert(frame.window.valid != 0u);
     }
-    assert(common_machine_resume(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
-    assert(common_machine_stop(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
+    assert(emulator_machine_resume(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
+    assert(emulator_machine_stop(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_STOPPED));
 
-    common_machine_destroy(machine);
+    emulator_machine_destroy(machine);
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
     softpc_snapshot_image_dispose(&expected);
@@ -336,10 +336,10 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path,
     lib_bool empty)
 {
     softpc_machine_options options;
-    common_machine_driver description = { 0 };
+    emulator_machine_driver description = { 0 };
     softpc_machine *product = NULL;
     vm_driver *driver = NULL;
-    common_machine *machine = NULL;
+    emulator_machine *machine = NULL;
     FILE *file;
 
     assert(snapshot_write_media(media_path));
@@ -347,14 +347,14 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path,
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
     assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
     vm_driver_describe(driver, &description);
-    assert(common_machine_create(&machine, &description) == LIB_STATUS_OK);
+    assert(emulator_machine_create(&machine, &description) == LIB_STATUS_OK);
     file = fopen(snapshot_path, "wb");
     assert(file != NULL);
-    assert(common_machine_start(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(emulator_machine_start(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
     assert(snapshot_wait_for_pixels(machine, 0x0c));
-    assert(common_machine_pause(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_PAUSED));
+    assert(emulator_machine_pause(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_PAUSED));
     assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
     if (empty)
         assert(softpc_machine_set_floppy(product, NULL,
@@ -363,14 +363,14 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path,
        format and an empty media slot, including cross-process/width load. */
     assert(softpc_device_snapshot_restore_floppy_host(
         &(softpc_device_floppy_host_state){{3u, 0u}}));
-    assert(common_machine_resume(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
-    assert(common_machine_read_state(machine,
-        &(common_machine_state_writer) { snapshot_file_write, file }) ==
+    assert(emulator_machine_resume(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
+    assert(emulator_machine_read_state(machine,
+        &(emulator_machine_state_writer) { snapshot_file_write, file }) ==
         LIB_STATUS_OK);
     assert(fclose(file) == 0);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
-    common_machine_destroy(machine);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
+    emulator_machine_destroy(machine);
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
     return 0;
@@ -380,10 +380,10 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
     lib_bool expect_success, lib_bool empty)
 {
     softpc_machine_options options;
-    common_machine_driver description = { 0 };
+    emulator_machine_driver description = { 0 };
     softpc_machine *product = NULL;
     vm_driver *driver = NULL;
-    common_machine *machine = NULL;
+    emulator_machine *machine = NULL;
     FILE *file = fopen(snapshot_path, "rb");
 
     assert(file != NULL);
@@ -398,28 +398,28 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
     assert(softpc_machine_create(&options, &product) == SOFTPC_MACHINE_OK);
     assert(vm_driver_create(&driver, product) == LIB_STATUS_OK);
     vm_driver_describe(driver, &description);
-    assert(common_machine_create(&machine, &description) == LIB_STATUS_OK);
+    assert(emulator_machine_create(&machine, &description) == LIB_STATUS_OK);
     if (!expect_success) {
-        assert(common_machine_write_state(machine,
-            &(common_machine_state_reader) { snapshot_file_read, file }) !=
+        assert(emulator_machine_write_state(machine,
+            &(emulator_machine_state_reader) { snapshot_file_read, file }) !=
             LIB_STATUS_OK);
-        assert(common_machine_state_get(machine) == COMMON_MACHINE_STOPPED);
+        assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_STOPPED);
         assert(fclose(file) == 0);
-        common_machine_destroy(machine);
+        emulator_machine_destroy(machine);
         vm_driver_destroy(driver);
         softpc_machine_destroy(product);
         assert(remove(startup_media_path) == 0);
         return 0;
     }
-    assert(common_machine_write_state(machine,
-        &(common_machine_state_reader) { snapshot_file_read, file }) ==
+    assert(emulator_machine_write_state(machine,
+        &(emulator_machine_state_reader) { snapshot_file_read, file }) ==
         LIB_STATUS_OK);
     assert(fclose(file) == 0);
-    assert(common_machine_state_get(machine) == COMMON_MACHINE_PAUSED);
+    assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
-        common_machine_frame frame = { 0 };
-        assert(common_machine_copy_published_frame(machine, &frame,
-            common_machine_run_generation(machine)));
+        emulator_machine_frame frame = { 0 };
+        assert(emulator_machine_copy_published_frame(machine, &frame,
+            emulator_machine_run_generation(machine)));
         assert(frame.window.valid != 0u);
     }
     assert(snapshot_has_pixels(machine, 0x0c));
@@ -432,24 +432,24 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
         if (empty) assert(media.medium == NULL);
         else assert(snapshot_media_bytes(LIB_FALSE, LIB_FALSE));
     }
-    assert(common_machine_resume(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_RUNNING));
+    assert(emulator_machine_resume(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
     {
         kvm_input_event event = { 0 };
         event.type = KVM_EVENT_KEY;
         event.data.key.key = KVM_KEY_ENTER;
         event.data.key.scan_code = 0x1c;
         event.data.key.pressed = 1;
-        assert(common_machine_enqueue_input(machine, &event));
+        assert(emulator_machine_enqueue_input(machine, &event));
         event.data.key.pressed = 0;
-        assert(common_machine_enqueue_input(machine, &event));
+        assert(emulator_machine_enqueue_input(machine, &event));
         /* The restored CPU must redraw every pixel through its actual video
            write rules, not merely retain the first reconstructed frame. */
         assert(snapshot_wait_for_pixels(machine, 0x0a));
     }
-    assert(common_machine_stop(machine));
-    assert(wait_for_state(machine, COMMON_MACHINE_STOPPED));
-    common_machine_destroy(machine);
+    assert(emulator_machine_stop(machine));
+    assert(wait_for_state(machine, EMULATOR_MACHINE_STOPPED));
+    emulator_machine_destroy(machine);
     vm_driver_destroy(driver);
     softpc_machine_destroy(product);
     assert(remove(startup_media_path) == 0);

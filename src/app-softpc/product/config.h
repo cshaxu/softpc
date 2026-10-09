@@ -1,7 +1,7 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-#include "common/session/session_interface.h"
+#include "emulator/session/session_interface.h"
 #include "product/surface/entry_interface.h"
 #include "lib/storage/medium_interface.h"
 
@@ -13,7 +13,7 @@ typedef struct app_startup_config {
     char serial_output_path[SOFTPC_CONFIG_PATH_MAX];
     char printer_output_path[SOFTPC_CONFIG_PATH_MAX];
     lib_u32 memory_bytes;
-    common_session_display presentation;
+    emulator_session_display presentation;
     int console_control;
     lib_storage_medium_mode floppy_mode;
     lib_storage_medium_mode hard_disk_mode;

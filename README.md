@@ -189,10 +189,10 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 - `src/app-softpc/softpc.new/` may contain narrow, reviewable compiler/host-ABI
   source diffs at the affected point; it contains no new machine policy.
 - `src/app-softpc/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
-- `src/app-softpc/machine/` — SoftPC backend adaptation to the existing Common machine contract.
+- `src/app-softpc/machine/` — SoftPC backend adaptation to the existing Emulator machine contract.
 - `src/app-softpc/product/` — configuration, product CLI/hotkey policy and entity assembly;
   only main consumes the VM public interface.
-- `src/common/` — shared machine executor, session control and UI composition.
+- `src/emulator/` — shared machine executor, session control and UI composition.
 - `src/x86/` — optional shared x86 debugger and assembly/disassembly components.
 - `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
 - `test/unit/`, `test/app-softpc/integration/`, `test/support/` — self-contained unit,

@@ -149,14 +149,14 @@ foreach(retired_machine_source IN ITEMS
         message(FATAL_ERROR "Application retains a second machine implementation: ${retired_machine_source}")
     endif()
 endforeach()
-if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/machine/machine.c")
-    message(FATAL_ERROR "Common machine source is missing")
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/emulator/machine/machine.c")
+    message(FATAL_ERROR "Emulator machine source is missing")
 endif()
-if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c")
-    message(FATAL_ERROR "Common UI source is missing")
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/emulator/ui/ui.c")
+    message(FATAL_ERROR "Emulator UI source is missing")
 endif()
-if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/common/session/session.c")
-    message(FATAL_ERROR "Common session source is missing")
+if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/src/emulator/session/session.c")
+    message(FATAL_ERROR "Emulator session source is missing")
 endif()
 foreach(retired_session_source IN ITEMS
     "src/app-softpc/product/control.c"
@@ -172,44 +172,44 @@ foreach(retired_session_source IN ITEMS
     endif()
 endforeach()
 file(READ "${SOFTPC_SOURCE_DIR}/src/product/surface/composition.c" shared_product_composition)
-if(NOT shared_product_composition MATCHES "common_session_create" OR
-   shared_product_composition MATCHES "common_session_(queue|state|reconciler)_")
-    message(FATAL_ERROR "Shared Product must compose, not implement, common session control")
+if(NOT shared_product_composition MATCHES "emulator_session_create" OR
+   shared_product_composition MATCHES "emulator_session_(queue|state|reconciler)_")
+    message(FATAL_ERROR "Shared Product must compose, not implement, emulator session control")
 endif()
 
-# Product code may compose Common/Product through root contracts, but never reach
+# Product code may compose Emulator/Product through root contracts, but never reach
 # their implementation, private helper, or source file. Keeping this
 # allow-list small makes the post-extraction ownership boundary executable.
-set(allowed_common_product_contracts
-    "common/machine/machine_interface.h"
-    "common/session/session_interface.h"
-    "common/ui/ui_interface.h"
+set(allowed_emulator_product_contracts
+    "emulator/machine/machine_interface.h"
+    "emulator/session/session_interface.h"
+    "emulator/ui/ui_interface.h"
     "product/debug/debug_interface.h"
     "product/debug/protocol_interface.h"
     "product/surface/entry_interface.h"
     "product/surface/machine_interface.h"
     "product/xasm32/xasm32_interface.h")
-file(GLOB_RECURSE product_common_consumers
+file(GLOB_RECURSE product_emulator_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/machine/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
-foreach(source IN LISTS product_common_consumers)
-    file(STRINGS "${source}" common_include_lines REGEX
-        "#[ \t]*include[ \t]+[<\"](common|product)/[^>\"]+[>\"]")
-    foreach(include_line IN LISTS common_include_lines)
+foreach(source IN LISTS product_emulator_consumers)
+    file(STRINGS "${source}" emulator_include_lines REGEX
+        "#[ \t]*include[ \t]+[<\"](emulator|product)/[^>\"]+[>\"]")
+    foreach(include_line IN LISTS emulator_include_lines)
         string(REGEX REPLACE
-            ".*[<\"]((common|product)/[^>\"]+)[>\"].*" "\\1" common_contract
+            ".*[<\"]((emulator|product)/[^>\"]+)[>\"].*" "\\1" emulator_contract
             "${include_line}")
-        list(FIND allowed_common_product_contracts "${common_contract}"
-            common_contract_index)
-        if(common_contract_index EQUAL -1)
+        list(FIND allowed_emulator_product_contracts "${emulator_contract}"
+            emulator_contract_index)
+        if(emulator_contract_index EQUAL -1)
             message(FATAL_ERROR
-                "Product reaches a non-public Common/Product boundary: ${source}: ${include_line}")
+                "Product reaches a non-public Emulator/Product boundary: ${source}: ${include_line}")
         endif()
     endforeach()
-    file(READ "${source}" common_product_source)
-    if(common_product_source MATCHES "(common|product)/[A-Za-z0-9_/-]+\\.c")
-        message(FATAL_ERROR "Product includes a Common/Product implementation: ${source}")
+    file(READ "${source}" emulator_product_source)
+    if(emulator_product_source MATCHES "(emulator|product)/[A-Za-z0-9_/-]+\\.c")
+        message(FATAL_ERROR "Product includes a Emulator/Product implementation: ${source}")
     endif()
 endforeach()
 
@@ -315,24 +315,24 @@ endif()
 # Component selection is application policy.  Shared KVM must not retain the
 # removed unified runner or a target router.
 file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/main.c" app_main_source)
-file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/emulator/ui/ui.c" emulator_ui_source)
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
    app_main_source MATCHES "kvm_presenter|kvm_run" OR
    shared_product_composition MATCHES "kvm_presenter|kvm_run" OR
-   common_ui_source MATCHES "kvm_presenter|kvm_run")
+   emulator_ui_source MATCHES "kvm_presenter|kvm_run")
     message(FATAL_ERROR "Standalone retains the removed unified KVM route")
 endif()
 
-# Console Broker owns only native Console I/O. Common UI owns its logical
+# Console Broker owns only native Console I/O. Emulator UI owns its logical
 # Console and line sink, and binds it through the public broker API.
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/console-broker/console_interface.h" console_broker_public)
 file(READ "${SOFTPC_SOURCE_DIR}/src/lib/console-broker/console.c" console_broker_source)
-file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_console_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/emulator/ui/ui.c" emulator_ui_console_source)
 if(console_broker_public MATCHES "console_broker_cooked" OR
    console_broker_source MATCHES "console_broker_cooked" OR
-   common_ui_console_source MATCHES "console_broker_cooked" OR
-   NOT common_ui_console_source MATCHES "console_broker_replace" OR
-   NOT common_ui_console_source MATCHES "console_broker_request_cooked_line")
+   emulator_ui_console_source MATCHES "console_broker_cooked" OR
+   NOT emulator_ui_console_source MATCHES "console_broker_replace" OR
+   NOT emulator_ui_console_source MATCHES "console_broker_request_cooked_line")
     message(FATAL_ERROR "Console broker retains monitor-specific ownership")
 endif()
 
@@ -503,11 +503,11 @@ foreach(source IN LISTS standalone_owner_sources)
 endforeach()
 
 # Shared Product owns the one callback-safe teardown path.  The App hands it a
-# composed private machine but never recreates Common teardown locally.
+# composed private machine but never recreates Emulator teardown locally.
 file(READ "${SOFTPC_SOURCE_DIR}/src/product/surface/composition.c" composition_source)
 foreach(required_teardown IN ITEMS
-    "common_machine_shutdown" "common_ui_destroy" "common_session_destroy"
-    "common_machine_destroy" "machine.bind" "machine.destroy")
+    "emulator_machine_shutdown" "emulator_ui_destroy" "emulator_session_destroy"
+    "emulator_machine_destroy" "machine.bind" "machine.destroy")
     string(FIND "${composition_source}" "${required_teardown}" teardown_index)
     if(teardown_index EQUAL -1)
         message(FATAL_ERROR "Shared Product is missing teardown step: ${required_teardown}")
@@ -526,14 +526,14 @@ foreach(source IN LISTS shared_provider_sources)
     endif()
 endforeach()
 
-# Common UI owns KVM/broker teardown; App/Compat must not add a second owner.
+# Emulator UI owns KVM/broker teardown; App/Compat must not add a second owner.
 file(GLOB app_shutdown_sources "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.c"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.c")
 set(checked_shutdown "kvm_(window|console)_destroy|console_broker_destroy")
 foreach(source IN LISTS app_shutdown_sources)
     file(STRINGS "${source}" shutdown_lines REGEX "(${checked_shutdown})[ \t]*\\(")
     foreach(line IN LISTS shutdown_lines)
-        message(FATAL_ERROR "KVM/broker teardown bypasses Common UI: ${source}: ${line}")
+        message(FATAL_ERROR "KVM/broker teardown bypasses Emulator UI: ${source}: ${line}")
     endforeach()
 endforeach()
 

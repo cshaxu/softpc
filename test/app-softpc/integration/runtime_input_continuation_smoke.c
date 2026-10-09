@@ -24,17 +24,17 @@ static int runtime_input_wait_for_byte(softpc_machine *machine,
     return 0;
 }
 
-static int runtime_input_wait_for_state(common_machine *runtime,
-    common_machine_state expected, lib_u64 deadline)
+static int runtime_input_wait_for_state(emulator_machine *runtime,
+    emulator_machine_state expected, lib_u64 deadline)
 {
     do {
-        if (common_machine_state_get(runtime) == expected) return 1;
+        if (emulator_machine_state_get(runtime) == expected) return 1;
         softpc_test_sleep_milliseconds(1u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
 }
 
-static int runtime_input_enqueue_key(common_machine *runtime, lib_u16 scan,
+static int runtime_input_enqueue_key(emulator_machine *runtime, lib_u16 scan,
     lib_u32 key, lib_u8 pressed)
 {
     kvm_input_event event = { 0 };
@@ -43,7 +43,7 @@ static int runtime_input_enqueue_key(common_machine *runtime, lib_u16 scan,
     event.data.key.scan_code = scan;
     event.data.key.key = key;
     event.data.key.pressed = pressed;
-    return common_machine_enqueue_input(runtime, &event);
+    return emulator_machine_enqueue_input(runtime, &event);
 }
 
 int main(void)
@@ -70,7 +70,7 @@ int main(void)
     softpc_machine_options options = { image_path, NULL };
     softpc_machine *machine = NULL;
     softpc_machine_fixture fixture = { 0 };
-    common_machine *runtime;
+    emulator_machine *runtime;
     lib_u64 deadline;
     lib_u8 delivered = 0u;
     lib_u8 stale_input = 0u;
@@ -89,7 +89,7 @@ int main(void)
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_fixture_create(machine, &fixture));
     runtime = fixture.machine;
-    assert(common_machine_start(runtime));
+    assert(emulator_machine_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
         softpc_test_clock_milliseconds() + 5000u, NULL));
     softpc_test_sleep_milliseconds(250u);
@@ -104,19 +104,19 @@ int main(void)
     deadline = softpc_test_clock_milliseconds() + 1000u;
     assert(runtime_input_wait_for_byte(machine, 0x502u, 0x01u, deadline,
         &delivered));
-    assert(common_machine_state_get(runtime) == COMMON_MACHINE_RUNNING);
+    assert(emulator_machine_state_get(runtime) == EMULATOR_MACHINE_RUNNING);
 
     /* Paused is a monitor/control state, not a second guest-input mode.  A
        release is as much a guest record as a make: it must be rejected here.
        Clear the exact-scan marker while stopped; after the next cold run, it
        must remain clear. Unlike a total IRQ count, ordinary boot-controller
        records cannot make this assertion flaky. */
-    assert(common_machine_pause(runtime));
-    assert(runtime_input_wait_for_state(runtime, COMMON_MACHINE_PAUSED,
+    assert(emulator_machine_pause(runtime));
+    assert(runtime_input_wait_for_state(runtime, EMULATOR_MACHINE_PAUSED,
         softpc_test_clock_milliseconds() + 5000u));
     assert(!runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
-    assert(common_machine_stop(runtime));
-    assert(runtime_input_wait_for_state(runtime, COMMON_MACHINE_STOPPED,
+    assert(emulator_machine_stop(runtime));
+    assert(runtime_input_wait_for_state(runtime, EMULATOR_MACHINE_STOPPED,
         softpc_test_clock_milliseconds() + 5000u));
     /* Guest RAM survives a reset. Clear the boot marker while stopped, so
        the next wait proves that the next cold run reached this boot sector
@@ -126,7 +126,7 @@ int main(void)
         sizeof(delivered)) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_write_physical(machine, 0x502u, &stale_input,
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
-    assert(common_machine_start(runtime));
+    assert(emulator_machine_start(runtime));
     assert(runtime_input_wait_for_byte(machine, 0x501u, 0x55u,
         softpc_test_clock_milliseconds() + 5000u, NULL));
     softpc_test_sleep_milliseconds(250u);
@@ -134,7 +134,7 @@ int main(void)
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
     assert(stale_input == 0u);
 
-    assert(common_machine_stop(runtime));
+    assert(emulator_machine_stop(runtime));
     softpc_machine_fixture_destroy(&fixture);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(image_path));
