@@ -52,7 +52,7 @@ pacman -S --needed git mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-cma
 git clone https://github.com/cshaxu/softpc.git
 cd softpc
 cmake --preset mingw-gcc-x64-release
-cmake --build --preset package-x64 --parallel
+cmake --build --preset package-x64
 ./assets/binary/softpc64.exe
 ```
 
@@ -63,7 +63,7 @@ still `assets/binary/softpc64.exe`, beside the user-owned `softpc.ini`.
 To run the background regression suite instead of launching the VM:
 
 ```sh
-cmake --build --preset tests-x64 --parallel
+cmake --build --preset tests-x64
 ctest --preset test-x64
 ```
 
@@ -77,12 +77,29 @@ pacman -S --needed git mingw-w64-i686-toolchain mingw-w64-i686-cmake
 git clone https://github.com/cshaxu/softpc.git
 cd softpc
 cmake --preset mingw-gcc-x86-release
-cmake --build --preset package-x86 --parallel
+cmake --build --preset package-x86
 ./assets/binary/softpc32.exe
 ```
 
 The shell selects the matching GCC through `PATH`; no personal drive path or
 repository-specific toolchain variable is required.
+
+### Faster local Ninja route
+
+The default Makefiles presets remain the conservative package route.  For
+faster local incremental builds, Ninja uses a separate build directory and the
+same compiler and Release flags:
+
+```sh
+cmake --preset ninja-gcc-x64-release
+cmake --build --preset ninja-tests-x64
+ctest --preset ninja-test-x64
+```
+
+Use `ninja-gcc-x86-release`, `ninja-package-x86`, `ninja-tests-x86` and
+`ninja-test-x86` from an MSYS2 MINGW32 shell for the 32-bit route.  All checked
+in build and background-test presets use a bounded eight jobs; desktop tests
+remain serial and explicit.
 
 ## Build and package details
 

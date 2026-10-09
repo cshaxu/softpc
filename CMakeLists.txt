@@ -755,3 +755,24 @@ add_test(NAME softpc-build-ownership-negative COMMAND "${CMAKE_COMMAND}"
     "-DSOFTPC_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/tools/checks/build_ownership.cmake")
 set_tests_properties(softpc-build-ownership-negative PROPERTIES LABELS "unit")
+
+# Parallel background tests must not share generated media, snapshots or probe
+# files.  Source-root execution remains only where the test deliberately reads
+# checked-in input; command-provider is already globally serial because it
+# exercises the process-wide machine admission.
+set(SOFTPC_SOURCE_ROOT_TESTS
+    softpc-runtime-restart-boot-smoke
+    softpc-command-provider-smoke)
+get_property(softpc_registered_tests DIRECTORY PROPERTY TESTS)
+foreach(softpc_registered_test IN LISTS softpc_registered_tests)
+    get_test_property(${softpc_registered_test} LABELS softpc_registered_labels)
+    list(FIND softpc_registered_labels "desktop" softpc_desktop_label)
+    list(FIND SOFTPC_SOURCE_ROOT_TESTS ${softpc_registered_test} softpc_source_root_test)
+    if(softpc_desktop_label EQUAL -1 AND softpc_source_root_test EQUAL -1)
+        set(softpc_test_work_directory
+            "${CMAKE_CURRENT_BINARY_DIR}/test/app-softpc/${softpc_registered_test}")
+        file(MAKE_DIRECTORY "${softpc_test_work_directory}")
+        set_tests_properties(${softpc_registered_test} PROPERTIES
+            WORKING_DIRECTORY "${softpc_test_work_directory}")
+    endif()
+endforeach()

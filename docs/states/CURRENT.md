@@ -2,41 +2,50 @@
 
 ## Current Work
 
-## M9 T85 S17 Packet
+## M9 T85 S18 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs the component reorganization: create Product, remove the unused x86/ibmpc components, rename Common to Emulator, then qualify the resulting three-component stack. |
-| Objective | Establish `src/product` and `test/product` as the shared Product component by relocating `src/x86/{xasm32,debug}` and `src/ibmpc/product`, then remove the unused x86/ibmpc source and test trees. Preserve C11 build ownership, manifests and internal `product_*` vocabulary. |
-| Non-goals | No behavior, ABI, Core/Compat/mirror, configuration, media or snapshot change; do not rename Common in this S. |
-| Reference Baseline | S16 closure on SoftPC main, including its intentional removal of NXVM-private IBM PC configuration code. |
-| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md) |
-| Files And ABI Surface | Relocated `src/x86/{debug,xasm32}`, `src/ibmpc/product`, their `test` subtrees, deleted unused `src/{x86,ibmpc}` and `test/{x86,ibmpc}` trees, CMake/manifests and direct consumers. Public component naming changes from `x86_*`/`ibmpc_product_*` to `product_*` only where the moved Product API presently exposes them. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; inward dependency ownership; structural relocation by `git mv`. |
-| Verification | Frozen move/deletion ledger; source/test manifests and dependency gates; C11 x64/x86 Product builds and focused tests; exact Lib/Common/Product one-way dependency checks; architecture/documentation checks. |
-| Expected Markers | `src/product/{debug,xasm32,surface}` and `test/product` own the moved code; all moved symbols/targets use `product_*`; `src` and `test` contain no x86 or ibmpc component root. |
-| Asset Needs | No media or configuration changes. Do not refresh package EXEs until a runnable Product integration S requires it. |
-| Reporting Requirements | Before/after source/test path and line ledger; rename-aware move accounting; moved API/target map; dual-width focused evidence; pushed complete P and then owner validation. |
-| Stop Conditions | A move/delete requires an unapproved product behavior/API redesign or exposes a non-mechanical Common rename requirement. |
-| Exit Criteria | Product exists as one internally named source/test corpus with no duplicate implementation; direct dependencies conform to `lib < common < product` (renamed `lib < emulator < product` in S18); S18/S19 remain separately admitted. |
-| Original Owner Request | lib -> lib; common -> emulator; x86/xasm32 -> product/xasm32; x86/debug -> product/debug; ibmpc/product -> product/surface; rename matching symbols and test components. |
-| Similar-Issue Sweep | Inventory every CMake target, include, public symbol and test registration below the moved/deleted roots; search for stale `x86-debug`, `x86-xasm32`, `ibmpc-product`, `ibmpc_`, `common_` and old source paths. |
+| Admission And Approval | Owner admits a new S to introduce a Ninja management layer and improve build/test efficiency. |
+| Objective | Establish an isolated, bounded-parallel Ninja x64/x86 developer build/test route and remove background-test working-directory collisions that currently prevent safe CTest parallelism. |
+| Non-goals | No runtime, ABI, Core/Compat/mirror, configuration, media, snapshot or package-output behavior change. Keep the existing MinGW Makefiles package route. No compiler-cache service is introduced. |
+| Reference Baseline | `288d9319`, S17 P2: Product established and retired x86/ibmpc roots removed. Current Makefile presets and default background CTest execution are serial. |
+| Candidate Proposal | [Ninja build and test acceleration](../proposals/m9-ninja-build-acceleration.md) |
+| Files And ABI Surface | `CMakePresets.json`, root test registration/working-directory declarations, build/test documentation and the active/proposal records. The S also repairs stale Common/test-Common manifests and the retired-component cases in the shared boundary selftest discovered by the new parallel run. No public C interface changes. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; existing package/INI ownership; background-versus-desktop test separation. |
+| Verification | Fresh Ninja x64/x86 configure; bounded-parallel Ninja build; background CTest with no desktop UI; a focused collision proof; existing Makefiles package configuration/build smoke; manifest, dependency and documentation gates. |
+| Expected Markers | Separate `build/ninja-*` trees; unchanged Makefile preset paths; bounded build/test parallelism; artifact-writing background tests have unique ignored working directories. |
+| Asset Needs | No media or configuration changes. Do not refresh package EXEs: no runnable product source changes are expected. |
+| Reporting Requirements | Before/after preset/test-registration diff and line ledger; serial/parallel timing evidence; every isolated test/work-directory disposition; x64/x86 evidence; pushed complete P and owner validation. |
+| Stop Conditions | A test cannot be isolated without changing product semantics, a Ninja route needs a private toolchain path or changes artifact/package behavior, or measured evidence shows no safe improvement. |
+| Exit Criteria | Ninja developer builds and bounded-parallel background tests are reproducible on both widths, Makefile package builds remain available, all background artifact writers have an isolated or explicitly serialized disposition, and no desktop test is accidentally admitted. |
+| Original Owner Request | 准入一个新S，引入Ninja管理层次，提高效率。 |
+| Similar-Issue Sweep | Inventory all CTest working directories, relative artifact writers, `RUN_SERIAL`/resource locks and preset build/test execution settings. Each collision candidate is isolated, intentionally serialized or recorded with a reason. |
 
-### S17 delivery
+### S18 delivery (pending owner validation)
 
-Product now owns the moved Debug, xasm32 and surface implementations and their
-tests. The obsolete x86/IBM PC source and test components, their root CMake
-entries and the dead IBM PC firmware build helpers are removed. Product's
-portable corpus admits only Lib, Common and Product edges; its source and
-target-link checks enforce that one-way graph. S18 renames the same Common
-edge to Emulator mechanically.
+This delivery adds separate Ninja build trees and bounded eight-way build/test
+presets for each width.  It leaves the established MinGW Makefiles presets in
+place.  It also assigns each background App test a disposable build-tree
+working directory unless that test deliberately consumes checked-in source
+media or is already process-serial; desktop tests remain excluded from the
+background presets.
 
-Product manifest/corpus gates, including source and target-link negative
-coverage, pass on x64 and x86. Its focused 16-test suite passes on both
-widths; the standalone Product suite passes 16/16.
-No package executable, INI, snapshot or guest medium is delivered by this S.
-S17 awaits owner validation; S18 remains unadmitted.
+No package executable, INI, snapshot, guest medium, runtime source or public
+C interface changes are delivered by this S.  The only test-corpus correction
+is to replace deleted x86/IBM-PC boundary cases with the current Product layer
+and refresh the two stale manifest entries that otherwise make the existing
+Common checks fail.
+
+Fresh Ninja configuration succeeds on both widths.  The x64 Ninja background
+Common/Product set passes 36/36; the Makefiles path passes the changed
+configuration/boundary/manifest and representative App smoke set 8/8.  On the
+same warm App 1--8 batch, serial CTest took 10.66 seconds and bounded
+eight-way CTest took 8.07 seconds; this is evidence for the chosen scheduling,
+not a durable benchmark.  The x86 Ninja route configures, builds representative
+Common/Product targets and passes its focused five-test set.  No package EXE
+is retained from the verification build.
 
 ### S14 executor delivery
 

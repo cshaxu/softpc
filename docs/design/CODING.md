@@ -118,8 +118,9 @@ The two GNU package presets explicitly select Release with `-O3 -DNDEBUG`,
 including when reusing an existing build cache. Tests separately undefine
 NDEBUG so their operations and assertions remain live in optimized builds.
 
-Default `ctest --preset test-x64` and `test-x86` run background tests only:
-they exclude the `desktop` label. Real Window/Console tests use explicit
+Default `ctest --preset test-x64` and `test-x86` run background tests only
+with a bounded eight-way schedule: they exclude the `desktop` label. Real
+Window/Console tests use explicit
 `test-desktop-x64` or `test-desktop-x86` presets, serially and only during a
 reserved desktop testing period. Do not use an unfiltered CTest invocation
 for background work; standalone suites use `-LE desktop`. Build/test commands

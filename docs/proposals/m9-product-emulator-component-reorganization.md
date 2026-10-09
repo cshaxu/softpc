@@ -30,14 +30,14 @@ helpers. Product's corpus gate verifies the positive dependency rule: Lib has
 no outer dependency, Emulator may consume Lib only, and Product may consume
 Lib or Emulator only. This S does not rename `common`.
 
-## S18 — rename Common to Emulator
+## S19 — rename Common to Emulator
 
 Rename `src/common` and `test/common` to `src/emulator` and `test/emulator`.
 Rename the component-local `common_*` interfaces, targets, directories,
 manifests and all direct consumers to `emulator_*`.  This is mechanical naming
 and ownership normalization: lifecycle/session/UI semantics must not change.
 
-## S19 — qualification without retired machine subsystems
+## S20 — qualification without retired machine subsystems
 
 Build and test Lib, Emulator and Product on x64/x86, then run the product
 regression suite. Package builds and EXE refresh occur here only if source
