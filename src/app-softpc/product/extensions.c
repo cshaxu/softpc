@@ -101,7 +101,11 @@ static void softpc_extension_load(common_machine *machine,
         softpc_extension_message(out, "Usage: load <file>");
         return;
     }
-    if (state != COMMON_SESSION_MACHINE_STOPPED) {
+    /* Monitor INIT was historically the same load-safe condition as STOPPED.
+     * The shared Product delegates this product-only command with Common's
+     * original state, so preserve that command contract here. */
+    if (state != COMMON_SESSION_MACHINE_INIT &&
+        state != COMMON_SESSION_MACHINE_STOPPED) {
         softpc_extension_message(out, state == COMMON_SESSION_MACHINE_RUNNING ?
             "Machine is running; stop it before load." :
             "Machine is paused; stop it before load.");

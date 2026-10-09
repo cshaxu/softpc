@@ -40,6 +40,14 @@ It changes one Product source path plus its manifest record; focused x64/x86
 Product/boundary tests and both package builds pass. P2 is awaiting owner
 validation with S14; it does not close T85.
 
+P3 restores the prior initial snapshot-load command contract in the
+App-owned extension: Common `INIT` and `STOPPED` both admit `load`; successful
+loading still reaches the existing paused completion.  This corrects the
+extension's direct Common-state interpretation only and adds its focused
+provider proof; it does not alter Common, Lib, shared Product or any ABI. Both
+Release packages and the focused x64/x86 Product/boundary set pass; P3 awaits
+owner validation with S14.
+
 Both Release packages build.  Background CTest excluding native desktop tests
 passes x64 476/476 and x86 476/476 after the x86 `ibmpc.command` smoke declares
 its actual Console entry point.  Corpus, manifest, Product, dependency and

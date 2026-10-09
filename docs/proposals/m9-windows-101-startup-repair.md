@@ -80,6 +80,25 @@ focused Product/boundary set passes 5/5 (`softpc-product-boundary-negative`,
 `softpc-command-provider-smoke`, `ibmpc.command`, `ibmpc.entry`,
 `ibmpc.manifest`), and `ibmpc-verify` passes its manifest and DAG checks.
 
+### S14 P3 initial snapshot-load correction
+
+The App-owned snapshot extension receives Common's original machine state,
+whereas the retired SoftPC command adapter had already translated monitor
+`INIT` into its command-level stopped condition.  Its first implementation
+accepted only `STOPPED`, so a valid initial `load` was rejected and its fallback
+wording incorrectly called INIT “paused”.  Restore the original command
+contract locally: `load` accepts `INIT` and `STOPPED`, rejects `RUNNING` and
+`PAUSED`, and relies on the existing Common Machine load completion to reach
+`PAUSED`.  Add a provider smoke that sends `load` in INIT and proves it reaches
+the state-reader path.  No Common, Lib, shared Product, Core/Compat, ABI or
+configuration change is required.
+
+Delivered P3 changes two App-owned C paths: the extension admits `INIT`, and
+the existing real provider smoke proves that an INIT load of a missing file
+reports the reader's `Cannot load machine state.` result rather than a paused
+state rejection.  Both Release packages build; the focused Product/boundary
+set passes 5/5 on x64 and x86, and documentation governance passes.
+
 ## S12 current NXVM corpus refresh and four-suite verification
 
 Original owner request: 没关系，没关系，你可以准入一个新的 S 任务，把 NXVM 的所有有差异的部分导入进来，然后再跑这个测试，四个测试。

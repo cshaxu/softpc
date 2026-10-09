@@ -830,6 +830,13 @@ int main(void)
     assert(app_command_provider_initialize(&commands, machine,
         COMMON_SESSION_DISPLAY_WINDOW, &extensions,
         &provider) == LIB_STATUS_OK);
+    /* The monitor begins in INIT. SoftPC load retains its historic
+       INIT-as-stopped admission rule; a missing file proves the extension
+       does not reject INIT as paused before it reaches file handling. */
+    submit(&provider, COMMON_SESSION_MACHINE_INIT,
+        "load missing-snapshot.spcs", &result);
+    assert(lib_text_find_substring(result.text, "Cannot load machine state.") != NULL &&
+        result.arm_prompt);
     {
         const char *rejected[] = { "start", "pause", "resume", "reset", "stop",
             "save state", "load state", "floppy eject" };
@@ -1006,7 +1013,9 @@ int main(void)
         "load missing-snapshot.spcs", &result);
     assert(lib_text_find_substring(result.text, "Cannot load machine state.") != NULL &&
         result.arm_prompt);
-    submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
+    /* A valid initial load reaches the actual Common state reader and
+       preserves its established paused completion. */
+    submit(&provider, COMMON_SESSION_MACHINE_INIT,
         "load debug-commands-smoke.spcs", &result);
     assert(result.arm_prompt &&
         lib_text_find_substring(result.text, "Machine loaded and paused.") != NULL);
