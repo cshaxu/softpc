@@ -1,5 +1,6 @@
 #include "lib/types/types_interface.h"
-#include "ibmpc/product/factory.c"
+#include "ibmpc/nxvm/composed_machine_interface.h"
+#include "ibmpc/machine/machine_interface.h"
 
 static lib_u32 phase;
 static lib_u32 releases;
@@ -79,34 +80,35 @@ lib_i32 main(void)
 {
     const vm_app_machine_binding binding = {.name = "fixture", .cpu = CORE_MACHINE_CPU_PROFILE_80386,
         .floppy_format = VM_MACHINE_FLOPPY_FORMAT_1200K, .bios_count = 2u, .prepare = prepare};
-    vm_session_request request = {.display = "console", .floppy = {"disk"},
+    nxvm_startup_config request = {.ui = {.display = COMMON_SESSION_DISPLAY_CONSOLE}, .floppy = {"disk"},
         .floppy_count = 1u, .floppy_mode = {LIB_STORAGE_MEDIUM_READONLY},
         .fixed_disk = {"hard"}, .fixed_disk_count = 1u,
         .fixed_disk_mode = {LIB_STORAGE_MEDIUM_OVERLAY}, .memory_bytes = 1024u};
     vm_machine_config config;
     const vm_machine_config empty = {0};
-    vm_app_factory factory;
+    app_composed_machine machine;
+    vm_app_machine_composition composition = {
+        .binding = &binding, .startup = &request};
     common_machine_driver driver;
     vm_app_information info;
     vm_app_speed app_speed;
-    void *machine;
     const lib_status expected[] = {LIB_STATUS_OK, LIB_STATUS_UNSUPPORTED,
         LIB_STATUS_NO_MEMORY, LIB_STATUS_INVALID_STATE};
 
     lib_memory_set(&config, 0xff, sizeof(config));
-    if (vm_app_configure_machine(&binding, LIB_NULL, &config) != LIB_STATUS_INVALID_ARGUMENT ||
+    if (vm_app_build_machine_config(&binding, LIB_NULL, &config) != LIB_STATUS_INVALID_ARGUMENT ||
         lib_memory_compare(&config, &empty, sizeof(config)) != 0 ||
-        vm_app_configure_machine(LIB_NULL, &request, &config) != LIB_STATUS_INVALID_ARGUMENT ||
-        vm_app_configure_machine(&binding, &request, LIB_NULL) != LIB_STATUS_INVALID_ARGUMENT)
+        vm_app_build_machine_config(LIB_NULL, &request, &config) != LIB_STATUS_INVALID_ARGUMENT ||
+        vm_app_build_machine_config(&binding, &request, LIB_NULL) != LIB_STATUS_INVALID_ARGUMENT)
         return 1;
-    vm_app_configure_factory(&binding, &factory);
     for (phase = 0u; phase < 4u; ++phase) {
         releases = creations = descriptions = 0u;
-        machine = &candidate;
-        if (factory.prepare(factory.context, &request, &machine, &driver) != expected[phase])
+        machine = (app_composed_machine){0};
+        if (vm_app_nxvm_compose_machine(&composition, &machine) != expected[phase])
             return 2;
-        if (phase == 0u) factory.destroy(machine);
-        if ((phase != 0u && (machine != LIB_NULL || driver.context != LIB_NULL)) ||
+        if (phase == 0u) machine.destroy(machine.machine);
+        driver = machine.driver;
+        if ((phase != 0u && (machine.machine != LIB_NULL || driver.context != LIB_NULL)) ||
             releases != (phase == 1u ? 0u : 1u) ||
             creations != (phase == 1u ? 0u : 1u) ||
             descriptions != (phase == 1u || phase == 2u ? 0u : 1u)) return 3;
@@ -118,17 +120,19 @@ lib_i32 main(void)
         observed.floppy_mode[0] != LIB_STORAGE_MEDIUM_READONLY ||
         observed.fixed_disk_image[0] != (const char *)request.fixed_disk[0] ||
         observed.fixed_disk_mode[0] != LIB_STORAGE_MEDIUM_OVERLAY) return 4;
-    if (factory.information(factory.context, (vm_machine *)&candidate, &info) != LIB_STATUS_OK ||
+    if (vm_app_nxvm_compose_machine(&composition, &machine) != LIB_STATUS_OK ||
+        machine.information(machine.context, (vm_machine *)&candidate, &info) != LIB_STATUS_OK ||
         info.machine_name != binding.name || lib_text_compare(info.cpu_name, "80386") != 0 ||
         info.memory_bytes != 1024u || info.fixed_disk_cylinders != 40u ||
         info.fixed_disk_image_bytes != 4096u || info.floppy_image_bytes != 360u ||
         !info.floppy_media_inserted || !info.fixed_disk_present ||
         !info.fixed_disk_media_connected || !info.external_firmware) return 5;
-    if (factory.set_speed(&candidate, VM_APP_SPEED_TURBO) != LIB_STATUS_OK ||
+    if (machine.set_speed(&candidate, VM_APP_SPEED_TURBO) != LIB_STATUS_OK ||
         speed != VM_MACHINE_SPEED_TURBO ||
-        factory.get_speed(&candidate, &app_speed) != LIB_STATUS_OK ||
+        machine.get_speed(&candidate, &app_speed) != LIB_STATUS_OK ||
         app_speed != VM_APP_SPEED_TURBO ||
-        factory.set_speed(&candidate, VM_APP_SPEED_STANDARD) != LIB_STATUS_OK ||
+        machine.set_speed(&candidate, VM_APP_SPEED_STANDARD) != LIB_STATUS_OK ||
         speed != VM_MACHINE_SPEED_STANDARD) return 6;
+    machine.destroy(machine.machine);
     return 0;
 }

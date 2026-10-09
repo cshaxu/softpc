@@ -29,7 +29,7 @@ foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat c
             if(owner STREQUAL "app-softpc/product")
                 if(dependency MATCHES "^host/" OR
                    (dependency MATCHES "^app-softpc/(machine|compat|softpc[.]new)/" AND NOT
-                    (relative STREQUAL "app-softpc/product/composition.c" AND dependency STREQUAL "app-softpc/machine/vm_interface.h")))
+                    (relative STREQUAL "app-softpc/product/composed_machine.c" AND dependency STREQUAL "app-softpc/machine/vm_interface.h")))
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(owner STREQUAL "app-softpc/machine")

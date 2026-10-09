@@ -1,5 +1,65 @@
 # Windows 1.01 startup diagnosis and repair
 
+## S14 shared IBM PC Product adoption
+
+The owner retains optional `serial_output=` and `printer_output=`. SoftPC App
+parses its configuration once, then composes an opaque private machine lifetime
+with a complete Common driver and separately composes the two UI choices
+(`display`, `console_control`). Product receives neither a configuration path
+nor a configuration/request structure: it only consumes those two already
+composed values to create Common Machine, Session and UI. This is not a
+SoftPC-global cache or a second parse.
+
+Owner admits T85 S14 to freeze and exactly import the current read-only NXVM
+eight-package corpus, then adopt its `ibmpc/product` layer for SoftPC. The
+shared Product becomes the sole owner of common monitor lifecycle commands,
+debug entry, keyboard hotkeys, Common Machine/Session/UI composition and
+teardown. SoftPC retains only its `softpc.ini` loader and path policy, its VM
+machine-composition adapter, PE resource, and an App extension for the approved
+snapshot/floppy commands. The shared monitor prompt remains `> ` and its
+approved generic help heading remains unchanged.
+
+The import freezes a complete path/SHA-256 ledger from NXVM’s mutable but
+read-only worktree before copy. Its eight source/test roots must match that
+ledger exactly after import; no NXVM directory may become a build/runtime
+dependency. SoftPC Product code is then reduced by removing its duplicate
+command, keyboard and composition implementation rather than retaining a
+compatibility forwarding path. The extension may parse only the commands that
+the shared Product explicitly reports as unrecognized; it cannot override
+lifecycle, debug, help or hotkeys.
+
+The required evidence is exact corpus comparison; x64/x86 Release packages;
+isolated eight-package suites; background full regression; focused Product
+command, hotkey, snapshot and media tests; and source/DAG/documentation gates.
+Both package EXEs are refreshed. User INI, guest media and snapshots remain
+untouched. A complete P is pushed and awaits owner validation; this admission
+does not close T85.
+
+### S14 delivery record
+
+SoftPC now enters the shared `ibmpc/product` through two App-composed values:
+an opaque private machine lifetime with its complete Common driver, and the
+two-value UI choice.  The former SoftPC-local command, keyboard and Common
+composition implementation is deleted.  The shared Product owns the monitor,
+Debug, hotkey policy and Common Machine/Session/UI lifetime; SoftPC retains
+only private INI/path handling, private machine construction and the
+snapshot/floppy extension.
+
+The current NXVM comparison is exact for `src/{lib,common,x86}` and
+`test/{lib,common,x86}`.  `ibmpc` differs only at the admitted Product/App
+composition receivers and their manifests: SoftPC replaces NXVM's private
+factory/request/INI seams with the composed-machine/UI handoff and retains the
+SoftPC command grammar and extension.  No NXVM directory is a build or runtime
+dependency.  A MinGW x86-only test declaration explicitly selects the Console
+entry point for the imported `ibmpc.command` smoke; it has a C `main()` but
+links native Window libraries.
+
+Dual Release builds and background tests excluding the existing native desktop
+label pass: x64 476/476 and x86 476/476.  Product command, composition,
+entry, corpus and manifest tests pass on both widths; source/DAG/boundary and
+documentation gates pass.  Package EXEs are refreshed.  This is the executor
+delivery record; T85 remains open awaiting owner validation.
+
 ## S12 current NXVM corpus refresh and four-suite verification
 
 Original owner request: 没关系，没关系，你可以准入一个新的 S 任务，把 NXVM 的所有有差异的部分导入进来，然后再跑这个测试，四个测试。

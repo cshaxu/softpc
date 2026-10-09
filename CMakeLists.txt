@@ -54,6 +54,7 @@ enable_testing()
 
 add_subdirectory(src/common)
 add_subdirectory(src/x86)
+add_subdirectory(src/ibmpc)
 add_subdirectory(test/lib)
 add_subdirectory(test/common)
 add_subdirectory(test/x86)
@@ -308,12 +309,11 @@ target_compile_definitions(softpc-machine PRIVATE
 add_executable(softpcvm
     src/app-softpc/product/main.c
     src/app-softpc/product/config.c
-    src/app-softpc/product/composition.c
-    src/app-softpc/product/keyboard.c
-    src/app-softpc/product/command.c
+    src/app-softpc/product/composed_machine.c
+    src/app-softpc/product/extensions.c
     src/app-softpc/product/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-vm)
-target_link_libraries(softpcvm PRIVATE types storage kvm-base common-ui common-session common-machine x86-debug)
+target_link_libraries(softpcvm PRIVATE ibmpc-product types storage)
 
 # The standalone distribution keeps its two host-width launchers together.
 # The adjacent softpc.ini is deliberately user-owned configuration, never a
@@ -515,10 +515,9 @@ add_executable(softpc-runtime-smoke
     test/app-softpc/integration/runtime_smoke.c
     test/app-softpc/integration/machine_fixture.c
     src/common/session/control.c
-    src/app-softpc/product/keyboard.c
     src/common/session/presentation_plan.c
     src/common/session/control_state.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console ibmpc-product-keyboard)
 target_include_directories(softpc-runtime-smoke PRIVATE test/integration src/app-softpc/product)
 add_test(NAME softpc-runtime-smoke COMMAND softpc-runtime-smoke)
 set_tests_properties(softpc-runtime-smoke PROPERTIES
@@ -526,10 +525,9 @@ set_tests_properties(softpc-runtime-smoke PROPERTIES
 add_executable(softpc-runtime-restart-boot-smoke
     test/app-softpc/integration/runtime_restart_boot_smoke.c
     test/app-softpc/integration/machine_fixture.c
-    src/common/session/control.c
-    src/app-softpc/product/keyboard.c)
+    src/common/session/control.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
-    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
+    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console ibmpc-product-keyboard)
 target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE test/integration src/app-softpc/product)
 add_test(NAME softpc-runtime-restart-boot-smoke
     COMMAND softpc-runtime-restart-boot-smoke)
@@ -543,10 +541,9 @@ set_tests_properties(softpc-runtime-restart-boot-smoke PROPERTIES PROCESSORS 8)
 add_executable(softpc-runtime-input-continuation-smoke
     test/app-softpc/integration/runtime_input_continuation_smoke.c
     test/app-softpc/integration/machine_fixture.c
-    src/common/session/control.c
-    src/app-softpc/product/keyboard.c)
+    src/common/session/control.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console)
+    softpc-vm common-machine types console console-broker storage kvm-base kvm-window kvm-console ibmpc-product-keyboard)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE
     test/integration src/app-softpc/product)
 add_test(NAME softpc-runtime-input-continuation-smoke
@@ -554,36 +551,17 @@ add_test(NAME softpc-runtime-input-continuation-smoke
 set_tests_properties(softpc-runtime-input-continuation-smoke PROPERTIES
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-command-provider-smoke test/app-softpc/integration/command_provider_smoke.c
-    src/app-softpc/product/composition.c src/app-softpc/product/command.c src/app-softpc/product/keyboard.c)
-target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug common-session common-machine)
+    src/app-softpc/product/extensions.c)
+target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug common-session common-machine ibmpc-product-command ibmpc-product-keyboard)
 add_test(NAME softpc-command-provider-smoke COMMAND softpc-command-provider-smoke)
 set_tests_properties(softpc-command-provider-smoke PROPERTIES LABELS "unit" TIMEOUT 45 RUN_SERIAL TRUE
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_executable(softpc-x87-layout-smoke test/app-softpc/unit/machine/x87_layout_smoke.c)
 target_include_directories(softpc-x87-layout-smoke PRIVATE
     src src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
 target_compile_definitions(softpc-x87-layout-smoke PRIVATE LITTLEND SOFTPC_STANDALONE)
 add_test(NAME softpc-x87-layout-smoke COMMAND softpc-x87-layout-smoke)
 set_tests_properties(softpc-x87-layout-smoke PROPERTIES LABELS "unit")
-add_executable(softpc-command-smoke test/app-softpc/unit/product/command_smoke.c
-    src/app-softpc/product/command.c
-    src/common/session/control_state.c
-    src/common/session/presentation_plan.c)
-target_link_libraries(softpc-command-smoke PRIVATE x86-debug common-machine)
-target_include_directories(softpc-command-smoke PRIVATE src/app-softpc/product src/app-softpc/compat src)
-add_test(NAME softpc-command-smoke COMMAND softpc-command-smoke)
-set_tests_properties(softpc-command-smoke PROPERTIES
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-add_executable(softpc-keyboard-smoke test/app-softpc/unit/product/keyboard_smoke.c src/app-softpc/product/keyboard.c)
-target_include_directories(softpc-keyboard-smoke PRIVATE src src/app-softpc)
-target_link_libraries(softpc-keyboard-smoke PRIVATE kvm-base)
-if(MSVC)
-    target_compile_options(softpc-keyboard-smoke PRIVATE /UNDEBUG)
-else()
-    target_compile_options(softpc-keyboard-smoke PRIVATE -UNDEBUG)
-endif()
-add_test(NAME softpc-keyboard-smoke COMMAND softpc-keyboard-smoke)
-set_tests_properties(softpc-keyboard-smoke PROPERTIES LABELS "unit")
 add_test(NAME softpc-standalone-source-boundary
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/standalone_source_boundary.cmake")
@@ -679,16 +657,7 @@ foreach(probe IN ITEMS platform audio)
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
     list(APPEND SOFTPC_TEST_TARGETS ${probe_target})
 endforeach()
-add_executable(softpc-presentation-shutdown-smoke test/app-softpc/integration/presentation_shutdown_smoke.c)
-target_include_directories(softpc-presentation-shutdown-smoke PRIVATE src src/app-softpc/compat src/app-softpc/product)
-get_target_property(shutdown_test_sources softpcvm SOURCES)
-list(REMOVE_ITEM shutdown_test_sources src/app-softpc/product/main.c src/app-softpc/product/firmware.rc src/app-softpc/product/composition.c)
-target_sources(softpc-presentation-shutdown-smoke PRIVATE ${shutdown_test_sources})
 get_target_property(shutdown_test_links softpcvm LINK_LIBRARIES)
-target_link_libraries(softpc-presentation-shutdown-smoke PRIVATE ${shutdown_test_links})
-add_test(NAME softpc-presentation-shutdown-smoke COMMAND softpc-presentation-shutdown-smoke)
-set_tests_properties(softpc-presentation-shutdown-smoke PROPERTIES LABELS "unit" TIMEOUT 10)
-list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-shutdown-smoke)
 add_executable(softpc-runtime-cursor-smoke test/app-softpc/integration/runtime_cursor_smoke.c)
 target_include_directories(softpc-runtime-cursor-smoke PRIVATE src src/app-softpc/compat src/app-softpc/product)
 get_target_property(cursor_test_sources softpcvm SOURCES)
@@ -698,7 +667,6 @@ target_link_libraries(softpc-runtime-cursor-smoke PRIVATE ${shutdown_test_links}
 add_test(NAME softpc-runtime-cursor-smoke COMMAND softpc-runtime-cursor-smoke)
 set_tests_properties(softpc-runtime-cursor-smoke PROPERTIES LABELS "unit")
 list(APPEND SOFTPC_TEST_TARGETS softpc-runtime-cursor-smoke)
-list(APPEND SOFTPC_TEST_TARGETS softpc-command-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-provider-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-x87-layout-smoke)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
@@ -734,7 +702,6 @@ set(SOFTPC_UNIT_TESTS
     softpc-snapshot-boundary-smoke
     softpc-runtime-smoke
     softpc-runtime-input-continuation-smoke
-    softpc-command-smoke
     softpc-standalone-source-boundary
     softpc-documentation-governance)
 

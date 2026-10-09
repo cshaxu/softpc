@@ -2,9 +2,42 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T85. S13
-retired two unconfirmed shutdown observations after bounded dual-width
-reproduction and lifecycle-owner review.
+## M9 T85 S14 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner directs: “好，请你准入一个S任务，原样导入nxvm八组件，并接入 ibmpc/product”。 T85 remains open. |
+| Objective | Import the current read-only NXVM eight-package corpus (`src/{lib,common,x86,ibmpc}`, `test/{lib,common,x86,ibmpc}`), then replace SoftPC’s duplicate Product command/keyboard/composition implementation with the imported `ibmpc/product`. Retain only SoftPC-owned configuration, machine composition, resources, and snapshot/media command extension. Product receives an App-composed private machine/driver lifetime and an App-composed two-field UI choice; it parses no configuration and exposes no request/configuration ABI. |
+| Non-goals | No modification of NXVM; no Core mirror/Compat behavior change; no new Product state machine; no change to the approved common `> ` monitor prompt or shared help heading; no guest media, snapshot, or user INI mutation. |
+| Reference Baseline | SoftPC `cf33d1ccee2b9a887b9dcd74eaa427590ffb53da`; current mutable, read-only NXVM worktree. All eight roots are copied verbatim first; the App-composed machine/UI handoff and its direct test receivers are the only admitted post-import shared delta. |
+| Candidate Proposal | [S14 shared IBM PC Product adoption](../proposals/m9-windows-101-startup-repair.md#s14-shared-ibm-pc-product-adoption) |
+| Files And ABI Surface | Eight exact corpus roots and their manifests/build DAGs; `src/app-softpc/product`, the SoftPC App-private machine-composition boundary, product tests/CMake and source-layout/architecture documentation as required. Product command ABI moves from SoftPC-private callbacks to imported `ibmpc/product` plus a SoftPC extension only. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; no App-to-Compat/Mirror edge. |
+| Verification | Exact eight-root path/SHA comparison to NXVM source except the admitted composed-machine/UI ABI receivers; dual x64/x86 Release package builds; isolated eight-package tests; background full regression; Product command/hotkey/snapshot/media focused tests; manifests, DAG, dependency and documentation gates. |
+| Expected Markers | No duplicate SoftPC command/keyboard/composition path; shared `ibmpc/product` owns Common composition and core command/hotkey policy; SoftPC extension alone owns snapshot/floppy commands; both package EXEs rebuilt. |
+| Asset Needs | Existing build trees only. Preserve `assets/binary/softpc.ini`, guest media and snapshots. Refresh only the dual EXEs after successful verification. |
+| Reporting Requirements | Before/after production/test path and line accounting; frozen NXVM ledger; every retained SoftPC Product file and receiver; exact corpus comparison; dual-width focused/full results; EXE links; pushed complete P; then wait for owner validation. |
+| Stop Conditions | NXVM changes during copy; exact corpus contains an outward dependency or requires a local shared fork; required SoftPC behavior cannot be represented by the approved extension seam; Core/Compat or user-owned asset change becomes necessary. |
+| Exit Criteria | Eight roots exact to the frozen NXVM ledger; SoftPC uses the shared Product with no second command/hotkey/composition implementation; required dual-width qualification and P complete; task remains open pending owner validation. |
+| Original Owner Request | 好，请你准入一个S任务，原样导入nxvm八组件，并接入 ibmpc/product |
+| Similar-Issue Sweep | Sweep App Product code, CMake target ownership and product tests for former SoftPC command/keyboard/composition symbols, direct VM composition, and duplicate snapshot/media parser paths; each hit is removed or receives the sole SoftPC-extension disposition. |
+
+### S14 executor delivery
+
+The shared `ibmpc/product` now owns the sole SoftPC command, hotkey and Common
+composition path.  The App supplies only `app_composed_machine` and
+`app_composed_ui`; it alone parses `softpc.ini`, constructs the private
+machine and registers its snapshot/floppy extension.  There is no retained
+SoftPC command/keyboard/composition implementation.  The six neutral shared
+roots are byte-identical to current NXVM; the IBM PC Product receivers are the
+admitted SoftPC adaptation, with no NXVM runtime dependency.
+
+Both Release packages build.  Background CTest excluding native desktop tests
+passes x64 476/476 and x86 476/476 after the x86 `ibmpc.command` smoke declares
+its actual Console entry point.  Corpus, manifest, Product, dependency and
+documentation gates pass.  P is pending; owner validation, and only then any
+closure decision, remains outstanding.
 
 ## S12 delivery baseline
 

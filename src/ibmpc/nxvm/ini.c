@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 
-#include "ibmpc/product/ini_interface.h"
+#include "ibmpc/nxvm/ini_interface.h"
 #include "lib/storage/file_interface.h"
 
 #define VM_APP_INI_MAX_BYTES (64u * 1024u)
@@ -99,17 +99,17 @@ static lib_i32 vm_app_ini_memory(const lib_u8 *value, lib_size *out_bytes)
     return 1;
 }
 
-static lib_i32 vm_app_ini_medium(vm_session_request *request, lib_i32 floppy,
+static lib_i32 vm_app_ini_medium(nxvm_startup_config *request, lib_i32 floppy,
     lib_size slot, const lib_u8 *directory, lib_u8 *value)
 {
     lib_u8 *separator;
     const lib_u8 *path;
     const lib_u8 *mode;
-    lib_u8 (*paths)[VM_SESSION_REQUEST_PATH_MAX];
+    lib_u8 (*paths)[NXVM_STARTUP_PATH_MAX];
     lib_storage_medium_mode *modes;
     lib_size *count;
 
-    if (request == LIB_NULL || value == LIB_NULL || slot >= VM_SESSION_REQUEST_MEDIA_SLOT_COUNT)
+    if (request == LIB_NULL || value == LIB_NULL || slot >= NXVM_STARTUP_MEDIA_SLOT_COUNT)
         return 0;
     separator = LIB_NULL;
     {
@@ -124,16 +124,16 @@ static lib_i32 vm_app_ini_medium(vm_session_request *request, lib_i32 floppy,
     modes = floppy ? request->floppy_mode : request->fixed_disk_mode;
     count = floppy ? &request->floppy_count : &request->fixed_disk_count;
     if (slot != *count || paths[slot][0] != '\0' || !vm_app_ini_path(paths[slot],
-            VM_SESSION_REQUEST_PATH_MAX, directory, path) || !vm_app_ini_mode(mode,
+            NXVM_STARTUP_PATH_MAX, directory, path) || !vm_app_ini_mode(mode,
             &modes[slot])) return 0;
     *count = slot + 1u;
     return 1;
 }
 
 lib_status vm_app_ini_parse(const lib_u8 *directory, const lib_u8 *name,
-    lib_u8 *document, vm_session_request *out_request)
+    lib_u8 *document, nxvm_startup_config *out_request)
 {
-    vm_session_request request = {0};
+    nxvm_startup_config request = {0};
     lib_u8 *line;
     lib_u8 *cursor;
     lib_u8 section[16] = {0};
@@ -142,13 +142,10 @@ lib_status vm_app_ini_parse(const lib_u8 *directory, const lib_u8 *name,
     lib_i32 console_control_seen = 0;
 
     if (out_request == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_request = (vm_session_request) {0};
+    *out_request = (nxvm_startup_config) {0};
     if (directory == LIB_NULL || name == LIB_NULL || document == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    if (!vm_app_ini_copy(request.file_name, sizeof(request.file_name), name))
-        return LIB_STATUS_INVALID_ARGUMENT;
-    (void)vm_app_ini_copy(request.display, sizeof(request.display),
-        (const lib_u8 *)"console");
+    request.ui.display = COMMON_SESSION_DISPLAY_CONSOLE;
     request.floppy_mode[0u] = LIB_STORAGE_MEDIUM_OVERLAY;
     request.floppy_mode[1u] = LIB_STORAGE_MEDIUM_OVERLAY;
     request.fixed_disk_mode[0u] = LIB_STORAGE_MEDIUM_OVERLAY;
@@ -183,16 +180,20 @@ lib_status vm_app_ini_parse(const lib_u8 *directory, const lib_u8 *name,
             memory_seen = 1;
         } else if (lib_text_compare((const char *)section, "presentation") == 0 &&
             lib_text_compare((const char *)key, "display") == 0) {
-            if (display_seen || (lib_text_compare((const char *)value, "console") != 0 &&
-                lib_text_compare((const char *)value, "window") != 0) ||
-                !vm_app_ini_copy(request.display, sizeof(request.display), value))
-                return LIB_STATUS_INVALID_ARGUMENT;
+            if (display_seen) return LIB_STATUS_INVALID_ARGUMENT;
+            if (lib_text_compare((const char *)value, "console") == 0)
+                request.ui.display = COMMON_SESSION_DISPLAY_CONSOLE;
+            else if (lib_text_compare((const char *)value, "window") == 0)
+                request.ui.display = COMMON_SESSION_DISPLAY_WINDOW;
+            else return LIB_STATUS_INVALID_ARGUMENT;
             display_seen = 1;
         } else if (lib_text_compare((const char *)section, "presentation") == 0 &&
             lib_text_compare((const char *)key, "console_control") == 0) {
             if (console_control_seen) return LIB_STATUS_INVALID_ARGUMENT;
-            if (lib_text_compare((const char *)value, "1") == 0) request.console_control = LIB_TRUE;
-            else if (lib_text_compare((const char *)value, "0") == 0) request.console_control = LIB_FALSE;
+            if (lib_text_compare((const char *)value, "1") == 0)
+                request.ui.console_control = LIB_TRUE;
+            else if (lib_text_compare((const char *)value, "0") == 0)
+                request.ui.console_control = LIB_FALSE;
             else return LIB_STATUS_INVALID_ARGUMENT;
             console_control_seen = 1;
         } else if (lib_text_compare((const char *)section, "media") == 0 && lib_text_compare((const char *)key, "floppy0") == 0) {
@@ -210,19 +211,19 @@ lib_status vm_app_ini_parse(const lib_u8 *directory, const lib_u8 *name,
     return LIB_STATUS_OK;
 }
 
-lib_status vm_app_ini_load(const lib_u8 *path, vm_session_request *out_request)
+lib_status vm_app_ini_load(const lib_u8 *path, nxvm_startup_config *out_request)
 {
     void *bytes = LIB_NULL;
     lib_size byte_count = 0u;
     lib_u8 *document;
-    lib_u8 directory[VM_SESSION_REQUEST_PATH_MAX];
+    lib_u8 directory[NXVM_STARTUP_PATH_MAX];
     lib_u8 *slash;
     lib_status status;
 
     lib_status load_status;
 
     if (out_request == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_request = (vm_session_request) {0};
+    *out_request = (nxvm_startup_config) {0};
     if (path == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     load_status = lib_storage_file_read_owned((const char *)path, VM_APP_INI_MAX_BYTES, &bytes,
         &byte_count);

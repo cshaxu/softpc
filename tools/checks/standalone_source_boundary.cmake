@@ -125,7 +125,9 @@ endif()
 foreach(app_source IN ITEMS
     "src/app-softpc/product/main.c"
     "src/app-softpc/machine/driver.c"
-    "src/app-softpc/product/keyboard.c")
+    "src/app-softpc/product/composed_machine.c"
+    "src/app-softpc/product/extensions.c"
+    "src/ibmpc/product/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
@@ -169,10 +171,10 @@ foreach(retired_session_source IN ITEMS
         message(FATAL_ERROR "Application retains a second session implementation: ${retired_session_source}")
     endif()
 endforeach()
-file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/composition.c" app_session_composition)
-if(NOT app_session_composition MATCHES "common_session_create" OR
-   app_session_composition MATCHES "common_session_(queue|state|reconciler)_")
-    message(FATAL_ERROR "Application must compose, not implement, common session control")
+file(READ "${SOFTPC_SOURCE_DIR}/src/ibmpc/product/composition.c" shared_product_composition)
+if(NOT shared_product_composition MATCHES "common_session_create" OR
+   shared_product_composition MATCHES "common_session_(queue|state|reconciler)_")
+    message(FATAL_ERROR "Shared Product must compose, not implement, common session control")
 endif()
 
 # Product code may compose Common/x86 through root contracts, but never reach
@@ -267,6 +269,10 @@ foreach(source IN LISTS product_lib_consumers)
     file(STRINGS "${source}" include_lines REGEX
         "#[ \t]*include[ \t]+\"lib/[^\"]+\.h\"")
     foreach(include_line IN LISTS include_lines)
+        if(include_line MATCHES "lib/types/file\\.h")
+            # Types owns the neutral ISO C runtime spelling used by Product.
+            continue()
+        endif()
         string(FIND "${include_line}" "_interface.h\"" interface_suffix)
         if(interface_suffix EQUAL -1)
             message(FATAL_ERROR "Non-interface library header crosses a public boundary: ${source}")
@@ -310,7 +316,7 @@ file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/main.c" app_main_source)
 file(READ "${SOFTPC_SOURCE_DIR}/src/common/ui/ui.c" common_ui_source)
 if(EXISTS "${SOFTPC_SOURCE_DIR}/src/lib/ux" OR
    app_main_source MATCHES "kvm_presenter|kvm_run" OR
-   app_session_composition MATCHES "kvm_presenter|kvm_run" OR
+   shared_product_composition MATCHES "kvm_presenter|kvm_run" OR
    common_ui_source MATCHES "kvm_presenter|kvm_run")
     message(FATAL_ERROR "Standalone retains the removed unified KVM route")
 endif()
@@ -494,20 +500,26 @@ foreach(source IN LISTS standalone_owner_sources)
     endif()
 endforeach()
 
-# Product provider registration has one policy-free composition boundary.
-file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/composition.c" composition_source)
-if(NOT composition_source MATCHES "if \\(common_machine_shutdown\\(machine_runtime\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+if \\(common_ui_destroy\\(ui\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}[ \t\r\n]+\\(void\\)common_session_destroy\\(session\\);[ \t\r\n]+app_command_dispose\\(&commands\\);[ \t\r\n]+common_machine_destroy\\(machine_runtime\\);[ \t\r\n]+if \\(vm_destroy\\(machine_driver\\) != LIB_STATUS_OK\\) \\{[^}]*exit\\(EXIT_FAILURE\\);[^}]*\\}")
-    message(FATAL_ERROR "Composition must quiesce callbacks before ordered consumer teardown")
-endif()
+# Shared Product owns the one callback-safe teardown path.  The App hands it a
+# composed private machine but never recreates Common teardown locally.
+file(READ "${SOFTPC_SOURCE_DIR}/src/ibmpc/product/composition.c" composition_source)
+foreach(required_teardown IN ITEMS
+    "common_machine_shutdown" "common_ui_destroy" "common_session_destroy"
+    "common_machine_destroy" "machine.bind" "machine.destroy")
+    string(FIND "${composition_source}" "${required_teardown}" teardown_index)
+    if(teardown_index EQUAL -1)
+        message(FATAL_ERROR "Shared Product is missing teardown step: ${required_teardown}")
+    endif()
+endforeach()
 if(composition_source MATCHES "strcmp|x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
     message(FATAL_ERROR "Composition must not interpret commands, hotkeys or debugger policy")
 endif()
-file(GLOB app_provider_sources "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.c")
-foreach(source IN LISTS app_provider_sources)
-    if(NOT source MATCHES "/composition\\.c$")
+file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/ibmpc/product/*.c")
+foreach(source IN LISTS shared_provider_sources)
+    if(NOT source MATCHES "/command_provider\\.c$")
         file(READ "${source}" contents)
         if(contents MATCHES "\\.handle_hotkey[ \t]*=")
-            message(FATAL_ERROR "Only composition may register the product hotkey provider")
+            message(FATAL_ERROR "Only shared command provider may register the product hotkey provider")
         endif()
     endif()
 endforeach()

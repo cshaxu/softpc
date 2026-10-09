@@ -1,5 +1,7 @@
 #include "config.h"
-#include "composition.h"
+#include "extensions.h"
+#include "composed_machine.h"
+#include "ibmpc/product/entry_interface.h"
 
 #include <stdio.h>
 
@@ -9,7 +11,9 @@ int main(int argc, char **argv)
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
         COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
         LIB_STORAGE_MEDIUM_OVERLAY };
-    lib_status result;
+    vm_app_definition definition;
+    app_composed_machine machine;
+    app_composed_ui ui;
     (void)argv;
 
     if (argc != 1) {
@@ -32,6 +36,16 @@ int main(int argc, char **argv)
         fprintf(stderr, "softpcvm: path in '%s' is too long\n", config_path);
         return 1;
     }
-    result = app_composition_run(&config);
-    return result != LIB_STATUS_OK;
+    if (app_startup_compose_ui(&config, &ui) != LIB_STATUS_OK ||
+        softpc_product_compose_machine(&config, &machine) != LIB_STATUS_OK) {
+        fprintf(stderr, "softpcvm: cannot compose machine\n");
+        return 1;
+    }
+    definition = (vm_app_definition){
+        .name = "Insignia SoftPC",
+        .machine = machine,
+        .ui = ui,
+        .configure_extensions = softpc_product_configure_extensions
+    };
+    return vm_app_run(&definition);
 }

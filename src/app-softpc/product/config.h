@@ -2,6 +2,7 @@
 #define APP_CONFIG_H
 
 #include "common/session/session_interface.h"
+#include "ibmpc/product/entry_interface.h"
 #include "lib/storage/medium_interface.h"
 
 #define SOFTPC_CONFIG_PATH_MAX 1024u
@@ -21,5 +22,7 @@ typedef struct app_startup_config {
 int app_get_config_path(char *path);
 int app_resolve_image_path(char *path, const char *config_path);
 int app_load_startup_config(const char *path, app_startup_config *config);
+lib_status app_startup_compose_ui(const app_startup_config *config,
+    app_composed_ui *out_ui);
 
 #endif

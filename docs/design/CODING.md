@@ -67,13 +67,13 @@ corrections live as reviewable source diffs at their affected points. Generated
 transformed C/H files are not build inputs. `app-softpc/compat` owns original host
 callbacks and larger functional adaptations. `app-softpc/machine` owns the injected SoftPC
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
-`app-softpc/product` owns configuration, entity assembly and product CLI/hotkey policy.
-`command` owns monitor/debug state and command callbacks; `keyboard` owns
-hotkey interpretation and input sequences. `composition` installs their one
-Common provider and coordinates request admission without interpreting input.
+`app-softpc/product` owns SoftPC configuration, private machine composition,
+resources and the snapshot/media extension. Shared `ibmpc/product` owns the
+product CLI/hotkey policy and Common composition; it receives an already
+composed machine/driver lifetime and two UI choices, never a SoftPC config.
 It owns entity assembly, event wiring, the blocking session run and teardown,
 without a separate state machine, command table or debugger. Main loads config.
-Only product/composition.c may include machine/vm_interface.h; no product file may include Compat
+Only app-softpc/product/composed_machine.c may include machine/vm_interface.h; no shared Product file may include Compat
 or MVDM, and no other product file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Common/Lib contracts. Compat
 does not depend on app, VM or Common. Historical same-name replacement headers
@@ -90,8 +90,9 @@ mapping, lifecycle, or hotkey meaning.
 
 ## Build Output Layout
 
-Product tests are classified by ownership: test/app-softpc/unit/product covers configuration,
-commands and key policy; test/app-softpc/unit/{machine,compat,softpc.new} covers concrete
+Product tests are classified by ownership: test/app-softpc/unit/product covers configuration
+and App-specific extensions; test/ibmpc/product covers shared commands, keys and
+composition; test/app-softpc/unit/{machine,compat,softpc.new} covers concrete
 machine, compatibility host and recovered-mirror units; test/app-softpc/integration covers composed worker, command, snapshot,
 frame and package flows. Historical CTest labels remain execution selectors,
 not a claim that every test labelled unit is isolated. Product fixtures and

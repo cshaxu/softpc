@@ -1,5 +1,6 @@
 #include "lib/types/types_interface.h"
-#include "product/composition.h"
+#include "ibmpc/product/command_provider_interface.h"
+#include "product/extensions.h"
 #include "machine/driver.h"
 
 #include <windows.h>
@@ -797,6 +798,7 @@ int main(void)
     common_machine_driver driver = { 0 };
     common_machine *machine = NULL;
     app_command_context commands = { 0 };
+    app_command_extensions extensions = { 0 };
     common_session_command_provider provider = { 0 };
     common_session_command_result result = { 0 };
     common_machine_debug_lease lease;
@@ -823,8 +825,10 @@ int main(void)
     driver.copy_frame = observe_program;
     assert(common_machine_create(&machine, &driver) == LIB_STATUS_OK);
     common_machine_set_state_sink(machine, note_state, &events);
-    assert(app_composition_initialize(&commands, machine,
-        COMMON_SESSION_DISPLAY_WINDOW,
+    assert(softpc_product_configure_extensions(LIB_NULL,
+        &extensions) == LIB_STATUS_OK);
+    assert(app_command_provider_initialize(&commands, machine,
+        COMMON_SESSION_DISPLAY_WINDOW, &extensions,
         &provider) == LIB_STATUS_OK);
     {
         const char *rejected[] = { "start", "pause", "resume", "reset", "stop",
@@ -834,10 +838,10 @@ int main(void)
             assert(result.request == COMMON_SESSION_REQUEST_NONE);
             assert(lib_text_find_substring(result.text, "Machine has failed;") != NULL);
             provider.note_monitor_current(&commands, LIB_TRUE, &result);
-            assert(result.arm_prompt && lib_text_compare(result.prompt, "SoftPC> ") == 0);
+            assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
         }
         submit(&provider, COMMON_SESSION_MACHINE_ERROR, "help", &result);
-        assert(lib_text_find_substring(result.text, "Insignia SoftPC") != NULL);
+        assert(lib_text_find_substring(result.text, "Control your virtual machine") != NULL);
     }
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands && provider.open == app_command_provider_open);
@@ -976,22 +980,23 @@ int main(void)
     wait_for(events.stopped);
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED, "q", &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && lib_text_compare(result.prompt, "SoftPC> ") == 0);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
     /* Product commands use the actual provider, Common rendezvous and VM
        archive; only the test owns these two disposable files. */
     assert(common_machine_start(machine));
     wait_for(events.running);
     submit(&provider, COMMON_SESSION_MACHINE_RUNNING,
         "save debug-commands-smoke.spcs", &result);
-    assert(result.text[0] == '\0' && !result.arm_prompt);
+    assert(result.arm_prompt &&
+        lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
     wait_for(events.paused);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_RUNNING,
         COMMON_SESSION_MACHINE_PAUSED, &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
     submit(&provider, COMMON_SESSION_MACHINE_PAUSED,
         "save debug-commands-smoke.spcs", &result);
-    assert(result.arm_prompt && lib_text_compare(result.prompt, "SoftPC> ") == 0 &&
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0 &&
         lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
     assert(common_machine_stop(machine));
     wait_for(events.stopped);
@@ -1000,15 +1005,16 @@ int main(void)
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
         "load missing-snapshot.spcs", &result);
     assert(lib_text_find_substring(result.text, "Cannot load machine state.") != NULL &&
-        !result.arm_prompt);
+        result.arm_prompt);
     submit(&provider, COMMON_SESSION_MACHINE_STOPPED,
         "load debug-commands-smoke.spcs", &result);
-    assert(result.text[0] == '\0' && !result.arm_prompt);
+    assert(result.arm_prompt &&
+        lib_text_find_substring(result.text, "Machine loaded and paused.") != NULL);
     wait_for(events.paused);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_STOPPED,
         COMMON_SESSION_MACHINE_PAUSED, &result);
     provider.note_monitor_current(&commands, LIB_TRUE, &result);
-    assert(result.arm_prompt && lib_text_find_substring(result.text, "Machine loaded and paused.") != NULL);
+    assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
     assert(common_machine_resume(machine));
     wait_for(events.running);
     provider.note_runtime(&commands, COMMON_SESSION_MACHINE_PAUSED,

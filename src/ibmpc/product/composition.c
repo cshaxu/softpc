@@ -1,11 +1,9 @@
 #include "lib/types/types_interface.h"
 
 #include "ibmpc/product/composition_interface.h"
-#include "ibmpc/product/composition.h"
 
 struct vm_app {
-    vm_app_factory factory;
-    void *machine;
+    app_composed_machine machine;
     common_machine *common_machine;
     common_session *session;
     common_ui *ui;
@@ -47,19 +45,19 @@ static void vm_app_machine_frame_published(void *context, lib_u32 sequence,
         sequence, graphics, run_generation);
 }
 
-lib_status vm_app_create(const vm_app_factory *factory, vm_app **out_app)
+lib_status vm_app_create(const app_composed_machine *machine,
+    vm_app **out_app)
 {
     vm_app *app;
 
     if (out_app == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_app = LIB_NULL;
-    if (factory == LIB_NULL || factory->prepare == LIB_NULL ||
-        factory->bind == LIB_NULL || factory->destroy == LIB_NULL ||
-        factory->information == LIB_NULL || factory->get_speed == LIB_NULL ||
-        factory->set_speed == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (machine == LIB_NULL || machine->machine == LIB_NULL ||
+        machine->bind == LIB_NULL || machine->destroy == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
     app = lib_allocate_zero(1u, sizeof(*app));
     if (app == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    app->factory = *factory;
+    app->machine = *machine;
     *out_app = app;
     return LIB_STATUS_OK;
 }
@@ -82,8 +80,8 @@ lib_status vm_app_destroy(vm_app *app)
     if (shutdown_status != LIB_STATUS_OK)
         return vm_app_status_from_lib(shutdown_status);
     app->common_machine = LIB_NULL;
-    (void)app->factory.bind(app->machine, LIB_NULL);
-    app->factory.destroy(app->machine);
+    (void)app->machine.bind(app->machine.machine, LIB_NULL);
+    app->machine.destroy(app->machine.machine);
     lib_release(app);
     return LIB_STATUS_OK;
 }
@@ -97,36 +95,32 @@ common_machine *vm_app_common_machine(const vm_app *app)
 common_ui *vm_app_ui(const vm_app *app)
 { return app == LIB_NULL ? LIB_NULL : app->ui; }
 
-lib_status vm_app_compose_machine(vm_app *app, const vm_session_request *request)
+lib_status vm_app_compose_machine(vm_app *app)
 {
     common_machine_driver driver;
     void *machine = LIB_NULL;
     common_machine *common_machine = LIB_NULL;
     lib_status status;
 
-    if (app == LIB_NULL || request == LIB_NULL || app->machine != LIB_NULL)
+    if (app == LIB_NULL || app->common_machine != LIB_NULL)
         return LIB_STATUS_INVALID_STATE;
-    status = app->factory.prepare(app->factory.context, request, &machine, &driver);
+    machine = app->machine.machine;
+    driver = app->machine.driver;
+    status = vm_app_status_from_lib(common_machine_create(&common_machine,
+        &driver));
     if (status == LIB_STATUS_OK) {
-        status = vm_app_status_from_lib(common_machine_create(&common_machine,
-            &driver));
-    }
-    if (status == LIB_STATUS_OK) {
-        status = app->factory.bind(machine, common_machine);
+        status = app->machine.bind(machine, common_machine);
     }
     if (status != LIB_STATUS_OK) {
-        (void)app->factory.bind(machine, LIB_NULL);
+        (void)app->machine.bind(machine, LIB_NULL);
         lib_status cleanup_status = common_machine_destroy(common_machine);
 
         if (cleanup_status != LIB_STATUS_OK) {
-            app->machine = machine;
             app->common_machine = common_machine;
             return vm_app_status_from_lib(cleanup_status);
         }
-        app->factory.destroy(machine);
         return status;
     }
-    app->machine = machine;
     app->common_machine = common_machine;
     return LIB_STATUS_OK;
 }
@@ -138,7 +132,8 @@ lib_status vm_app_compose_control(vm_app *app,
     common_session *session = LIB_NULL;
     lib_status status;
 
-    if (app == LIB_NULL || options == LIB_NULL || app->machine == LIB_NULL ||
+    if (app == LIB_NULL || options == LIB_NULL ||
+        app->common_machine == LIB_NULL ||
         app->session != LIB_NULL) return LIB_STATUS_INVALID_STATE;
     resolved = *options;
     resolved.machine = app->common_machine;
@@ -176,18 +171,21 @@ lib_status vm_app_compose_ui(vm_app *app, const common_ui_options *options)
 
 lib_status vm_app_information_read(const vm_app *app, vm_app_information *out_info)
 {
-    return app == LIB_NULL || app->machine == LIB_NULL ? LIB_STATUS_INVALID_STATE :
-        app->factory.information(app->factory.context, app->machine, out_info);
+    return app == LIB_NULL || app->machine.machine == LIB_NULL ? LIB_STATUS_INVALID_STATE :
+        app->machine.information == LIB_NULL ? LIB_STATUS_UNSUPPORTED :
+        app->machine.information(app->machine.context, app->machine.machine, out_info);
 }
 
 lib_status vm_app_speed_read(const vm_app *app, vm_app_speed *out_speed)
 {
-    return app == LIB_NULL || app->machine == LIB_NULL ? LIB_STATUS_INVALID_STATE :
-        app->factory.get_speed(app->machine, out_speed);
+    return app == LIB_NULL || app->machine.machine == LIB_NULL ? LIB_STATUS_INVALID_STATE :
+        app->machine.get_speed == LIB_NULL ? LIB_STATUS_UNSUPPORTED :
+        app->machine.get_speed(app->machine.machine, out_speed);
 }
 
 lib_status vm_app_speed_write(vm_app *app, vm_app_speed speed)
 {
-    return app == LIB_NULL || app->machine == LIB_NULL ? LIB_STATUS_INVALID_STATE :
-        app->factory.set_speed(app->machine, speed);
+    return app == LIB_NULL || app->machine.machine == LIB_NULL ? LIB_STATUS_INVALID_STATE :
+        app->machine.set_speed == LIB_NULL ? LIB_STATUS_UNSUPPORTED :
+        app->machine.set_speed(app->machine.machine, speed);
 }

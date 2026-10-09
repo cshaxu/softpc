@@ -38,11 +38,12 @@ the SoftPC CLI and machine adapter as injected callbacks; it does not parse
 configuration or interpret machine internals. `common/ui` is the sole owner
 of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
-`app-softpc/product/` owns configuration, entity assembly and the SoftPC CLI/hotkey binding.
-Within app, command owns CLI/debug semantics, keyboard owns hotkey semantics,
-and composition creates the entities, wires their callbacks into Common
-session, runs it and performs teardown. Main validates arguments/configuration.
-Composition does not parse commands or hotkey identifiers or add a state machine.
+`app-softpc/product/` owns SoftPC configuration parsing, private machine
+composition, resources and its snapshot/media command extension. Shared
+`ibmpc/product` owns CLI/debug semantics, hotkey policy, Common entity
+assembly, session execution and teardown. App passes it an already composed
+private machine/driver lifetime and the two UI choices only; shared Product
+does not parse configuration or see media, memory or model fields.
 At exit it synchronously shuts down the machine worker with callback targets
 still alive, then destroys UI, session, command/debug, machine and VM in order.
 Machine shutdown and destroy share one stop/join path; shutdown retains storage
@@ -50,7 +51,7 @@ so referenced objects can be released safely before the machine itself.
 UI teardown stops the broker and unbinds output before joining KVM producers;
 failure preserves UI and remaining callback dependencies. App treats that failure
 as terminal rather than releasing Session beneath a live producer.
-Only product/composition.c consumes machine/vm_interface.h; no product source consumes Compat or
+Only app-softpc/product/composed_machine.c consumes machine/vm_interface.h; no shared Product source consumes Compat or
 the original mirror. `app-softpc/machine/` owns the concrete machine backend, initialization/reset/teardown
 sequence, driver, frame/input conversion and debugger request preflight.
 Its implementation calls Compat and the original machine while its
@@ -188,8 +189,10 @@ live directly in test/. Architecture protocols and CLI assertions remain in
 test/x86; PC assembly checks belong to src/ibmpc and test/ibmpc. This fourth
 layer consumes inward production APIs only and owns its own test fixtures.
 SoftPC imports/builds it without replacing its original execution backend or
-linking IBM PC Product into the SoftPC executable. The complete PC import set
-adds these two directories to the reusable inner six-directory set.
+linking IBM PC machine into the SoftPC executable. SoftPC does link the shared
+IBM PC Product layer for command/hotkey/Common composition, while retaining its
+own machine adapter. The complete PC import set adds these two directories to
+the reusable inner six-directory set.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
 adopts it exactly; no runtime or build dependency crosses repositories.

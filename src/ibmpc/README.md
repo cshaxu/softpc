@@ -10,7 +10,7 @@ allowed. Product-facing opaque ABI and hardware algorithms remain unchanged.
 | board-xt | XT PPI/keyboard, DIP and speaker/NMI wiring. |
 | board-at | Immutable AT endpoint grammar, KBC/AUX/A20/reset and planar parity/Port B wiring. |
 | machine | Construction finishing/publication, bounded executor, pacing, copied input/frame/debug adaptation and Storage-backed media lifetime. |
-| product | Shared PC version/identity, INI syntax/request, entry/banner, command/hotkey policy and Common composition with an injected App factory. |
+| product | Shared PC entry/banner rendering, command/hotkey policy and Common composition from App-composed machine and UI values. |
 
 Board families consume only public x86/Core/chip contracts and Types; they
 never read board-common private layouts. Board-common composes their public
@@ -19,9 +19,11 @@ production or observation-enabled Core/board pair. Core alone advances guest
 time and owns the board attachment teardown; the Machine adapter borrows it.
 Media/display provider contexts remain borrowed until teardown, with one
 freeze/publication/rollback path. Concrete topology, firmware, immutable
-machine binding and genuine model-specific state remain App-owned. The four PC
-products share product identity/version declarations in product/version_interface.h;
-build callers inject the single current revision into each fixed executable.
+machine binding and genuine model-specific state remain App-owned. Product
+prints only the App-provided opening text and consumes an already composed
+machine/driver lifetime plus the two UI choices; it neither defines nor reads
+an INI document and does not own an App brand or version format. Build
+callers select each fixed executable's artifact revision.
 
 AT endpoint lookup belongs to board-at. board-common/at_assembly projects those
 explicit endpoints into existing display/RTC/DMA/FDC configurations, preserving
@@ -45,9 +47,10 @@ on board-common. Memory decode, display personality and genuine D4 remain
 model-specific composition, not a 5170 profile inherited and overridden.
 
 Machine consumes board-common, x86/Core/debug, Common Machine and Lib services.
-Product adapts its copied request to the neutral Machine input and consumes
-Machine's public creation/INFO/speed APIs. App supplies only fixed values and
-its actual Profile preparation operation; Machine does not depend on Product.
+App adapts its private configuration to the neutral Machine input, then hands
+Product the resulting composed machine and its public INFO/speed capabilities.
+Product does not receive a copied configuration request; Machine does not
+depend on Product.
 There is no reverse x86 dependency, second queue, native presenter or
 duplicate file backend.
 

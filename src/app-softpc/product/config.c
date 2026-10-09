@@ -176,3 +176,15 @@ invalid:
     lib_release(contents);
     return 0;
 }
+
+lib_status app_startup_compose_ui(const app_startup_config *config,
+    app_composed_ui *out_ui)
+{
+    if (config == NULL || out_ui == NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *out_ui = (app_composed_ui){
+        .display = config->presentation,
+        .console_control = config->console_control != 0 ? LIB_TRUE : LIB_FALSE
+    };
+    return LIB_STATUS_OK;
+}
