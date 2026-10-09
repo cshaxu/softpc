@@ -205,12 +205,12 @@ static lib_bool softpc_extension_submit(void *context, common_machine *machine,
     return LIB_FALSE;
 }
 
-lib_status softpc_product_configure_extensions(vm_app *app,
-    app_command_extensions *out_extensions)
+lib_status softpc_product_configure_extensions(product_surface *app,
+    product_surface_command_extensions *out_extensions)
 {
     (void)app;
     if (out_extensions == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_extensions = (app_command_extensions){
+    *out_extensions = (product_surface_command_extensions){
         .submit = softpc_extension_submit,
         .help_text = "  floppy insert <mode> <image>\r\n"
             "                 insert drive A media while stopped/paused\r\n"

@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "common/ui/ui_interface.h"
-#include "ibmpc/product/entry_interface.h"
+#include "product/surface/entry_interface.h"
 #include "product/config.h"
 #include "product/composed_machine.h"
 
@@ -97,7 +97,7 @@ int main(void)
 {
     const char *path = "presentation-shutdown.img";
     app_startup_config config = {0};
-    vm_app_definition definition = {0};
+    product_surface_definition definition = {0};
 
     create_image(path);
     lib_text_copy(config.floppy_path, path);
@@ -110,7 +110,7 @@ int main(void)
         requests = destroyed = reported = 0u;
         assert(softpc_product_compose_machine(&config, &definition.machine) ==
             LIB_STATUS_OK);
-        assert(vm_app_run(&definition) == (scenario == 0u ? 0 : 1));
+        assert(product_surface_run(&definition) == (scenario == 0u ? 0 : 1));
         assert(destroyed == 1u && reported == (scenario == 1u || scenario == 2u));
     }
     assert(remove(path) == 0);
@@ -120,7 +120,7 @@ int main(void)
     create_image(path);
     assert(softpc_product_compose_machine(&config, &definition.machine) ==
         LIB_STATUS_OK);
-    assert(vm_app_run(&definition) == 1);
+    assert(product_surface_run(&definition) == 1);
     assert(destroyed == 1u && reported == 0u);
     return 0;
 }

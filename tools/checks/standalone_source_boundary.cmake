@@ -127,7 +127,7 @@ foreach(app_source IN ITEMS
     "src/app-softpc/machine/driver.c"
     "src/app-softpc/product/composed_machine.c"
     "src/app-softpc/product/extensions.c"
-    "src/ibmpc/product/keyboard.c")
+    "src/product/surface/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
@@ -171,7 +171,7 @@ foreach(retired_session_source IN ITEMS
         message(FATAL_ERROR "Application retains a second session implementation: ${retired_session_source}")
     endif()
 endforeach()
-file(READ "${SOFTPC_SOURCE_DIR}/src/ibmpc/product/composition.c" shared_product_composition)
+file(READ "${SOFTPC_SOURCE_DIR}/src/product/surface/composition.c" shared_product_composition)
 if(NOT shared_product_composition MATCHES "common_session_create" OR
    shared_product_composition MATCHES "common_session_(queue|state|reconciler)_")
     message(FATAL_ERROR "Shared Product must compose, not implement, common session control")
@@ -184,9 +184,9 @@ set(allowed_common_product_contracts
     "common/machine/machine_interface.h"
     "common/session/session_interface.h"
     "common/ui/ui_interface.h"
-    "x86/debug/debug_interface.h"
-    "x86/debug/protocol_interface.h"
-    "x86/xasm32/xasm32_interface.h")
+    "product/debug/debug_interface.h"
+    "product/debug/protocol_interface.h"
+    "product/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_common_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/machine/*.[ch]"
@@ -502,7 +502,7 @@ endforeach()
 
 # Shared Product owns the one callback-safe teardown path.  The App hands it a
 # composed private machine but never recreates Common teardown locally.
-file(READ "${SOFTPC_SOURCE_DIR}/src/ibmpc/product/composition.c" composition_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/product/surface/composition.c" composition_source)
 foreach(required_teardown IN ITEMS
     "common_machine_shutdown" "common_ui_destroy" "common_session_destroy"
     "common_machine_destroy" "machine.bind" "machine.destroy")
@@ -511,10 +511,10 @@ foreach(required_teardown IN ITEMS
         message(FATAL_ERROR "Shared Product is missing teardown step: ${required_teardown}")
     endif()
 endforeach()
-if(composition_source MATCHES "strcmp|x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
+if(composition_source MATCHES "strcmp|product_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
     message(FATAL_ERROR "Composition must not interpret commands, hotkeys or debugger policy")
 endif()
-file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/ibmpc/product/*.c")
+file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/product/surface/*.c")
 foreach(source IN LISTS shared_provider_sources)
     if(NOT source MATCHES "/command_provider\\.c$")
         file(READ "${source}" contents)

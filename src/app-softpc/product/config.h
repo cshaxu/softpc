@@ -2,7 +2,7 @@
 #define APP_CONFIG_H
 
 #include "common/session/session_interface.h"
-#include "ibmpc/product/entry_interface.h"
+#include "product/surface/entry_interface.h"
 #include "lib/storage/medium_interface.h"
 
 #define SOFTPC_CONFIG_PATH_MAX 1024u

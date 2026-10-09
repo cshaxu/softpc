@@ -8,12 +8,11 @@ set(CMAKE_C_EXTENSIONS OFF)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
-get_filename_component(IBMPC_COMMON_ROOT "${CMAKE_CURRENT_LIST_DIR}/../common" ABSOLUTE)
 if(NOT TARGET x86-core)
     add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../x86" "${CMAKE_CURRENT_BINARY_DIR}/x86")
 endif()
-if(NOT TARGET x86-debug)
-    message(FATAL_ERROR "IBM PC Product requires the existing x86 Debug tools")
+if(NOT TARGET product-debug)
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../product" "${CMAKE_CURRENT_BINARY_DIR}/product")
 endif()
 
 add_library(ibmpc-machine-media STATIC machine/media/fdd.c
@@ -42,7 +41,7 @@ add_library(ibmpc-machine STATIC machine/preparation.c machine/debug.c
 target_include_directories(ibmpc-machine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(ibmpc-machine PUBLIC types base storage
     common-machine ibmpc-machine-media ibmpc-machine-conversion
-    ibmpc-board-common x86-core)
+    ibmpc-board-common x86-core product-debug)
 
 set(ibmpc_board_common_sources
     board-common/floppy.c board-common/rom_validation.c board-common/rom_mapping.c
@@ -81,31 +80,7 @@ add_library(ibmpc-board-xt STATIC board-xt/xt_ppi_keyboard.c)
 target_include_directories(ibmpc-board-xt PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(ibmpc-board-xt PUBLIC types x86-ppi8255)
 
-add_library(ibmpc-product-keyboard STATIC product/keyboard.c)
-target_include_directories(ibmpc-product-keyboard PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(ibmpc-product-keyboard PUBLIC common-machine common-session
-    kvm-base types)
-
-add_library(ibmpc-product-command STATIC product/command.c product/command_provider.c)
-target_include_directories(ibmpc-product-command PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(ibmpc-product-command PUBLIC ibmpc-product-keyboard
-    common-session x86-debug types)
-
-add_library(ibmpc-product-composition STATIC product/composition.c)
-target_include_directories(ibmpc-product-composition PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(ibmpc-product-composition PUBLIC common-session common-ui types)
-
-add_library(ibmpc-product-entry STATIC product/entry.c)
-target_include_directories(ibmpc-product-entry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-
-add_library(ibmpc-product INTERFACE)
-target_link_libraries(ibmpc-product INTERFACE ibmpc-product-entry
-    ibmpc-product-command ibmpc-product-composition ibmpc-product-keyboard
-    common-session common-ui x86-debug types)
-
 add_custom_target(ibmpc-verify
-    COMMAND "${CMAKE_COMMAND}" -DCOMMON_ROOT=${CMAKE_CURRENT_SOURCE_DIR}
-        -P "${IBMPC_COMMON_ROOT}/verify_manifest.cmake"
     COMMAND "${CMAKE_COMMAND}" -DIBMPC_ROOT=${CMAKE_CURRENT_SOURCE_DIR}
         -P "${CMAKE_CURRENT_SOURCE_DIR}/verify_corpus.cmake"
     VERBATIM)

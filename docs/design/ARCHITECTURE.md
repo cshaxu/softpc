@@ -9,7 +9,7 @@ app/config, command, keyboard  configuration and CLI/hotkey policy -> Common/Lib
 
 common/session -> common/ui       control and monitor/KVM composition
 common/session -> common/machine  sole generic executor and copied facts
-x86/debug + x86/xasm32      shared debugger/assembly contracts
+product/debug + product/xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
                          v
@@ -40,7 +40,7 @@ of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app-softpc/product/` owns SoftPC configuration parsing, private machine
 composition, resources and its snapshot/media command extension. Shared
-`ibmpc/product` owns CLI/debug semantics, hotkey policy, Common entity
+`product/surface` owns CLI/debug semantics, hotkey policy, Common entity
 assembly, session execution and teardown. App passes it an already composed
 private machine/driver lifetime and the two UI choices only; shared Product
 does not parse configuration or see media, memory or model fields.
@@ -115,11 +115,11 @@ and hotkey policy to Common session. SoftPC publishes each admitted shared-libra
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
-`x86/xasm32` is an imported x86 copied byte/text assembly capability and
-`x86/debug` is an imported x86 debug command capability. SoftPC exposes
+`product/xasm32` is an imported x86 copied byte/text assembly capability and
+`product/debug` is an imported x86 debug command capability. SoftPC exposes
 it through its injected app command binding, not through a second input loop.
-`x86/debug` depends on `common/machine`'s optional paused-state adapter and
-on `x86/xasm32`; neither component may create an executor, own a Console,
+`product/debug` depends on `common/machine`'s optional paused-state adapter and
+on `product/xasm32`; neither component may create an executor, own a Console,
 or add a product command path. Import hashes remain provenance evidence; the
 S9 integration changes to these components form the updated downstream corpus.
 The control thread serializes lifecycle, media and synchronous debug requests.
@@ -131,7 +131,7 @@ and copied prompts; machine state changes do not select or exit the CLI.
 Machine copies opaque, pointer-free debug requests/results through one fixed slot
 (128-byte request, 1536-byte response), with explicit sizes and no per-request
 allocation. It knows no register, address or operation schema. The independent
-`x86/debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
+`product/debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
 their existing boundaries using aligned local values. Driver validation owns
 protocol sizes and operation limits. Failure returns zero response length and
 does not change caller output bytes; a failed wait requires shutdown before

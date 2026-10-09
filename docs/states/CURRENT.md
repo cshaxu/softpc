@@ -8,13 +8,13 @@
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner directs the three-stage component reorganization after closing S16: create Product, rename Common to Emulator, then qualify without the retained x86/ibmpc trees. |
-| Objective | Establish `src/product` and `test/product` as the shared Product component by relocating x86/xasm32, x86/debug and ibmpc/product with matching tests, C11 build ownership, manifests and internal `product_*` vocabulary. |
+| Objective | Establish `src/product` and `test/product` as the shared Product component by relocating `src/x86/{xasm32,debug}` and `src/ibmpc/product` with matching tests, C11 build ownership, manifests and internal `product_*` vocabulary. |
 | Non-goals | No behavior, ABI, Core/Compat/mirror, configuration, media, snapshot or remaining x86/ibmpc implementation change; do not rename Common in this S; do not link SoftPC to retained x86/ibmpc subsystems. |
 | Reference Baseline | S16 closure on SoftPC main, including its intentional removal of NXVM-private IBM PC configuration code. |
 | Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md) |
-| Files And ABI Surface | Relocated `src/x86/{debug,xasm32}`, `src/ibmpc/product`, their `test` subtrees, CMake/manifests and direct consumers. Public component naming changes from `x86_*`/`ibmpc_product_*` only where the moved Product API presently exposes them. |
+| Files And ABI Surface | Relocated `src/x86/{debug,xasm32}`, `src/ibmpc/product`, their `test` subtrees, CMake/manifests and direct consumers. Public component naming changes from `x86_*`/`ibmpc_product_*` to `product_*` only where the moved Product API presently exposes them. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; C11 corpus contracts; inward dependency ownership; structural relocation by `git mv`. |
-| Verification | Frozen move ledger; source/test manifests and dependency gates; C11 x64/x86 Product builds and focused tests; no remaining Product link to retained x86/ibmpc paths; architecture/documentation checks. |
+| Verification | Frozen move ledger; source/test manifests and dependency gates; C11 x64/x86 Product builds and focused tests; no Product link to retained x86/ibmpc paths; the permitted reverse `ibmpc/machine -> product/debug` edge; architecture/documentation checks. |
 | Expected Markers | `src/product/{debug,xasm32,surface}` and `test/product` own the moved code; all moved symbols/targets use `product_*`; remaining x86 and ibmpc roots retain only their non-Product subsystems. |
 | Asset Needs | No media or configuration changes. Do not refresh package EXEs until a runnable Product integration S requires it. |
 | Reporting Requirements | Before/after source/test path and line ledger; rename-aware move accounting; moved API/target map; dual-width focused evidence; pushed complete P and then owner validation. |
@@ -22,6 +22,20 @@
 | Exit Criteria | Product exists as one internally named source/test corpus with no duplicate implementation; direct dependencies conform to `lib < emulator ~ [x86 < ibmpc] ~ product`; S18/S19 remain separately admitted. |
 | Original Owner Request | lib -> lib; common -> emulator; x86/xasm32 -> product/xasm32; x86/debug -> product/debug; ibmpc/product -> product/surface; rename matching symbols and test components. |
 | Similar-Issue Sweep | Inventory every CMake target, include, public symbol and test registration below the three moved roots; search for stale `x86-debug`, `x86-xasm32`, `ibmpc-product`, `common_` and old source paths. |
+
+### S17 delivery
+
+Product now owns the moved Debug, xasm32 and surface implementations and their
+tests; the retained x86 and IBM PC roots no longer build those owners. Product
+has no source or target edge to either retained root. The only permitted reverse
+edge is `ibmpc/machine -> product/debug`, which supplies IBM PC's external debug
+protocol. The existing root boundary checker now rejects `common -> product`,
+`product -> x86`, and `product -> ibmpc` directly.
+
+Product manifest/corpus gates pass on x64 and x86. Its focused 12-test suite
+passes on both widths. The retained x86 and IBM PC corpus gates pass on x64.
+No package executable, INI, snapshot or guest medium is delivered by this S.
+S17 awaits owner validation; S18 remains unadmitted.
 
 ### S14 executor delivery
 

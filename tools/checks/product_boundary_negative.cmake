@@ -2,7 +2,7 @@ set(product_boundary_script "${CMAKE_CURRENT_LIST_DIR}/product_boundary.cmake")
 set(fixture "${CMAKE_CURRENT_BINARY_DIR}/product-boundary-fixture")
 file(REMOVE_RECURSE "${fixture}")
 file(MAKE_DIRECTORY "${fixture}/src/app-softpc/product" "${fixture}/src/app-softpc/machine" "${fixture}/src/app-softpc/compat"
-    "${fixture}/src/common" "${fixture}/src/lib" "${fixture}/src/x86" "${fixture}/src/app-softpc/softpc.new")
+    "${fixture}/src/product" "${fixture}/src/common" "${fixture}/src/lib" "${fixture}/src/x86" "${fixture}/src/ibmpc" "${fixture}/src/app-softpc/softpc.new")
 file(WRITE "${fixture}/src/app-softpc/machine/vm_interface.h" "#include <common/machine/machine_interface.h>\n")
 file(WRITE "${fixture}/src/app-softpc/product/composed_machine.c" "#include <app-softpc/machine/vm_interface.h>\n")
 file(WRITE "${fixture}/src/app-softpc/product/legal.c" "#include <lib/storage/file_interface.h>\n")
@@ -35,10 +35,12 @@ foreach(pair IN ITEMS "app-softpc/product/config.c|../machine/vm_interface.h" "a
     "lib/boundary.c|../common/machine/machine_interface.h" "lib/boundary.c|../app-softpc/machine/driver.h"
     "lib/boundary.c|app-softpc/compat/platform.h" "lib/boundary.c|app-softpc/softpc.new/base/inc/cpu4.h"
     "app-softpc/softpc.new/core.c|app-softpc/machine/driver.h" "app-softpc/softpc.new/core.c|common/machine/machine_interface.h"
-    "common/control.c|../x86/debug/protocol_interface.h"
-    "lib/boundary.c|x86/debug/protocol_interface.h"
-    "app-softpc/compat/platform.c|x86/debug/protocol_interface.h"
-    "app-softpc/softpc.new/core.c|x86/debug/protocol_interface.h" "x86/probe.c|../app-softpc/machine/driver.h")
+    "common/control.c|../product/debug/protocol_interface.h"
+    "product/surface/probe.c|../../x86/core/machine_interface.h"
+    "product/surface/probe.c|../../ibmpc/machine/machine_interface.h"
+    "lib/boundary.c|product/debug/protocol_interface.h"
+    "app-softpc/compat/platform.c|product/debug/protocol_interface.h"
+    "app-softpc/softpc.new/core.c|product/debug/protocol_interface.h" "x86/probe.c|../app-softpc/machine/driver.h")
     string(REPLACE "|" ";" parts "${pair}")
     list(GET parts 0 path)
     list(GET parts 1 header)

@@ -250,18 +250,6 @@ add_test(NAME unit.core-machine-cpu-context-smoke COMMAND core-machine-cpu-conte
 set_tests_properties(unit.core-machine-cpu-context-smoke PROPERTIES LABELS "unit;x86" TIMEOUT 30)
 list(APPEND SHARED_X86_TEST_TARGETS core-machine-cpu-context-smoke)
 
-if(X86_BUILD_TOOLS)
-shared_register_test(x86 debug_output x86-debug)
-shared_register_test(x86 debug_linear x86-debug)
-shared_register_test(x86 xasm32/xasm32 x86-xasm32)
-shared_register_test(x86 xasm32/xasm32_contract x86-xasm32)
-shared_register_test(x86 xasm32/xasm32_bounds x86-xasm32)
-if(WIN32)
-    shared_register_test(x86 debug_machine x86-debug)
-endif()
-
-endif()
-
 foreach(profile IN ITEMS 80186 80286 80386)
     set(target "x86-decoder-${profile}")
     add_executable(${target}

@@ -1,7 +1,7 @@
 #include "config.h"
 #include "extensions.h"
 #include "composed_machine.h"
-#include "ibmpc/product/entry_interface.h"
+#include "product/surface/entry_interface.h"
 
 #include <stdio.h>
 
@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
         COMMON_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
         LIB_STORAGE_MEDIUM_OVERLAY };
-    vm_app_definition definition;
+    product_surface_definition definition;
     app_composed_machine machine;
     app_composed_ui ui;
     (void)argv;
@@ -41,11 +41,11 @@ int main(int argc, char **argv)
         fprintf(stderr, "softpcvm: cannot compose machine\n");
         return 1;
     }
-    definition = (vm_app_definition){
+    definition = (product_surface_definition){
         .name = "Insignia SoftPC",
         .machine = machine,
         .ui = ui,
         .configure_extensions = softpc_product_configure_extensions
     };
-    return vm_app_run(&definition);
+    return product_surface_run(&definition);
 }

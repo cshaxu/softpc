@@ -26,9 +26,11 @@ internal/public symbols, target names, test registrations, manifest entries
 and direct references to `product_*`, so its vocabulary matches its ownership.
 
 The retained x86 and ibmpc components must no longer contain, build or export
-the moved Product code.  SoftPC's current integration must use Product only;
-it must not start linking the retained x86 CPU/device or IBM PC board/machine
-implementations.  This S does not rename `common`.
+the moved Product code. Product must not link either retained component.
+`ibmpc/machine` may instead consume `product/debug` as its external debug
+protocol. SoftPC's current integration must use Product only; it must not
+start linking the retained x86 CPU/device or IBM PC board/machine
+implementations. This S does not rename `common`.
 
 ## S18 — rename Common to Emulator
 

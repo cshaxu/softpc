@@ -1,6 +1,6 @@
 # Product ownership, including relative include paths. Shared corpora are inputs,
 # never modified by this product-specific check.
-foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat common lib x86 app-softpc/softpc.new)
+foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat product common lib x86 ibmpc app-softpc/softpc.new)
     file(GLOB_RECURSE sources "${SOFTPC_SOURCE_DIR}/src/${owner}/*.[ch]")
     foreach(source IN LISTS sources)
         file(RELATIVE_PATH relative "${SOFTPC_SOURCE_DIR}/src" "${source}")
@@ -32,21 +32,25 @@ foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat c
                     (relative STREQUAL "app-softpc/product/composed_machine.c" AND dependency STREQUAL "app-softpc/machine/vm_interface.h")))
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
+            elseif(owner STREQUAL "product")
+                if(dependency MATCHES "^(app-softpc|x86|ibmpc)/")
+                    message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
+                endif()
             elseif(owner STREQUAL "app-softpc/machine")
                 if(dependency MATCHES "^app-softpc/product/" OR
                    (relative MATCHES "_interface\\.h$" AND dependency MATCHES "^app-softpc/"))
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(owner STREQUAL "app-softpc/compat")
-                if(dependency MATCHES "^(app-softpc/(product|machine)|common|x86)/")
+                if(dependency MATCHES "^(app-softpc/(product|machine)|common|product|x86)/")
                     message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(dependency MATCHES "^app-softpc/" AND
                    NOT (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^app-softpc/(softpc[.]new|compat)/"))
                 message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
-            elseif((owner STREQUAL "lib" AND dependency MATCHES "^(common|x86)/") OR
-                   (owner STREQUAL "common" AND dependency MATCHES "^x86/") OR
-                   (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^(common|lib|x86)/"))
+            elseif((owner STREQUAL "lib" AND dependency MATCHES "^(common|product|x86)/") OR
+                   (owner STREQUAL "common" AND dependency MATCHES "^(product|x86)/") OR
+                   (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^(common|lib|product|x86)/"))
                 message(FATAL_ERROR "Product boundary: ${relative} -> ${dependency}")
             endif()
         endforeach()

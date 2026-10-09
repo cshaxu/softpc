@@ -1,7 +1,7 @@
 #ifndef SOFTPC_PRODUCT_COMPOSED_MACHINE_H
 #define SOFTPC_PRODUCT_COMPOSED_MACHINE_H
 
-#include "ibmpc/product/machine_interface.h"
+#include "product/surface/machine_interface.h"
 
 typedef struct app_startup_config app_startup_config;
 

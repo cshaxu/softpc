@@ -20,10 +20,10 @@ src/
   x86/
     core/        shared CPU executor and neutral machine construction
     chips/       shared x86/PC device implementations
-    xasm32/      imported x86 assembly/disassembly corpus
-    debug/       imported x86 debug corpus over the optional machine adapter
-  ibmpc/{board-common,board-at,board-xt,machine,product}/
-    shared PC construction and product adaptation, not SoftPC's executor
+  ibmpc/{board-common,board-at,board-xt,machine}/
+    shared PC construction, not SoftPC's executor
+  product/{xasm32,debug,surface}/
+    shared assembly/debug policy and session/UI composition
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
 ```
@@ -33,16 +33,15 @@ Common never contains win32/linux directories or platform-selected source.
 Its independent source verification lives with the Common corpus; unit tests
 live in test/common, never src/common/test. Lib tests and their fixtures live
 in test/lib. x86 source owns its own manifest/build/DAG and never becomes a
-Common dependency. test/x86 owns architecture protocols and CLI/assembly tests;
-it owns a minimal injected-driver fixture rather than borrowing test/common.
-The eight source/test directories add src/ibmpc and test/ibmpc as the outer
-PC-specific layer. The six inner directories serve x86 products; src/common, src/lib,
-test/common and test/lib alone serve neutral products. Each suite has its own
-CMake entry and manifest. Product tests remain outside the shared suites.
-All eight shared source/test packages select C11 with extensions disabled, in
+Common dependency. test/x86 owns retained Core/chip tests and uses only its
+own fixtures. `src/product` and `test/product` own the moved CLI, debugger,
+assembly and surface corpus. The retained IBM PC machine may consume the public
+Product Debug protocol, but Product never depends on retained x86 or IBM PC
+code. Each suite has its own CMake entry and manifest. All ten source/test
+packages select C11 with extensions disabled, in
 both standalone and embedded builds. GNU/Clang shared builds use
 -Wall -Wextra -Wpedantic -Werror. This owner-approved shared-corpus baseline
-supersedes the general standalone C17 rule only for these eight directories;
+supersedes the general standalone C17 rule only for these ten directories;
 App/Core retain their existing language settings. Package-local build settings
 do not propagate warning policy or a new language requirement into the product.
 Only Lib provides the underlying platform implementation.
@@ -68,7 +67,7 @@ transformed C/H files are not build inputs. `app-softpc/compat` owns original ho
 callbacks and larger functional adaptations. `app-softpc/machine` owns the injected SoftPC
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `app-softpc/product` owns SoftPC configuration, private machine composition,
-resources and the snapshot/media extension. Shared `ibmpc/product` owns the
+resources and the snapshot/media extension. Shared `product/surface` owns the
 product CLI/hotkey policy and Common composition; it receives an already
 composed machine/driver lifetime and two UI choices, never a SoftPC config.
 It owns entity assembly, event wiring, the blocking session run and teardown,
@@ -91,7 +90,7 @@ mapping, lifecycle, or hotkey meaning.
 ## Build Output Layout
 
 Product tests are classified by ownership: test/app-softpc/unit/product covers configuration
-and App-specific extensions; test/ibmpc/product covers shared commands, keys and
+and App-specific extensions; test/product/surface covers shared commands, keys and
 composition; test/app-softpc/unit/{machine,compat,softpc.new} covers concrete
 machine, compatibility host and recovered-mirror units; test/app-softpc/integration covers composed worker, command, snapshot,
 frame and package flows. Historical CTest labels remain execution selectors,
