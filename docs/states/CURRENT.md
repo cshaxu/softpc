@@ -2,47 +2,12 @@
 
 ## Current Work
 
-M9 T86 S4 is delivered and awaiting owner validation: the complete fresh
-dual-architecture qualification evidence is recorded below and in its audit.
+No implementation subtask is active.
+Open task awaiting owner: T86.
 
-## M9 T86 S4 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S3 and directs a closing S: fully rebuild both package architectures from clean build caches, reuse each architecture's first successful intermediate objects for all links, run every public/non-public and SoftPC integration test, refresh both published EXEs, then perform the T86 closure audit. The owner additionally directs preservation of NXVM's two proven fixture budgets: `lib.types-layout-selftest` 180 seconds and x86-parallel `emulator.verifier-negative` 60 seconds; the shared default remains 30 seconds. |
-| Objective | From one new x64 and one new x86 Ninja build tree, build the complete target graph once per architecture; run the complete CTest inventory including serial native-desktop cases; verify public and App/Core/integration ownership coverage, the two exact fixture budgets, refreshed EXEs and T86 S1--S4 delivery ledger; prepare a truthful T closure recommendation. |
-| Non-goals | Do not weaken product behavior, test assertions or public interfaces to make qualification pass. The owner-approved test-only budget restoration is limited to the named 60/180-second fixtures; no general timeout relaxation, package INI, media, snapshot or CMake policy change is allowed. Do not use Computer Use. Do not reuse an old object/build cache, run a second build after a successful first graph build, or report the result as a manual product acceptance. |
-| Reference Baseline | SoftPC `2f706c37`; T86 S1 Console handoff, S2 App-test ownership normalization, and S3 public-test registration conformance are pushed. Existing user-owned S1 document-archive edits remain outside this S. |
-| Candidate Proposal | [T86 full qualification and closure audit](../proposals/m9-t86-completion-audit.md) |
-| Files And ABI Surface | Task-owned fresh `build/t86-s4-{x64,x86}` evidence trees, refreshed `assets/binary/{softpc32.exe,softpc64.exe}`, S3/S4 closure/audit records and state, plus the owner-approved exact test budgets, the Lib Console reader-handoff repair/proof, and the package fixture's post-raw-activation self-hide. No public interface change. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus ownership; C11 six-package rule; preserve owner configuration/media; long operations run as owned background jobs. |
-| Verification | Remove only the two declared fresh build trees; configure each once with Ninja and its intended compiler; invoke its complete build graph once; record no-op rebuild evidence; run background CTest inventory once and native desktop inventory once, serially, for x64 and x86; verify manifests, corpus/boundary gates, public 87-test label ledger, App/Core/integration labels, documentation governance, EXE hashes and exact commit ancestry. |
-| Expected Markers | Each architecture has one fresh configuration and one complete compile/link graph; subsequent requested target queries are no-op; every registered test passes exactly once in its appropriate background or desktop lane; all public component, non-public App/Core and integration owners are represented; both EXEs derive from `2f706c37` with no INI/media/snapshot change. |
-| Asset Needs | Refresh only `assets/binary/softpc32.exe` and `assets/binary/softpc64.exe`; preserve `assets/binary/softpc.ini`, media and snapshots byte-for-byte. Generated logs and test media remain below the two ignored task build roots. |
-| Reporting Requirements | Record per-width compiler/configuration, first-build target evidence, no-op rebuild result, background/desktop test counts/timing, owner label ledger, EXE hashes, S1--S4 requirement mapping, tracked changed-path accounting and an independent actual-change review. Push one complete qualification P and await explicit owner T closure. |
-| Stop Conditions | A clean build requires a source/test/ABI behavior change; either EXE fails to refresh; an automated desktop test needs Computer Use or changes user desktop state beyond its declared native test scope; a test is absent/unclassified; any user-owned configuration/media changes; or test/build evidence cannot be attributed to the fresh trees. |
-| Exit Criteria | Fresh dual-width full builds, all background and desktop tests, gates and artifact checks pass; S1--S4 finite ledger is independently reviewed; task-owned artifacts/documents are committed/pushed; worktree is clean except existing owner changes; then report the closure recommendation without closing T86 absent explicit owner approval. |
-| Original Owner Request | 非常好，所以现在完成T任务收口审计了吗？（所有组件和2个exe的全面重新编译和发布，所有公共组件和非公共组件的测试完全跑通，以及softpc本身integration测试的全面跑通）？还有，全面重新编译的意思是清理缓存后编译，但是每个组件只能编译一次，第一次后就有缓存所以后续都必须使用第一次编译成功的中间体链接。你做一下这个收口S工作。 |
-| Similar-Issue Sweep | Enumerate CTest JSON on each fresh tree: owner prefix/labels, desktop lane and App integration disposition. Inspect both Ninja logs for duplicated compilation after the first all-target build, EXE provenance and user-asset hashes before/after. |
-
-### S4 delivery awaiting owner validation
-
-The final clean qualification configured one fresh Ninja tree per width and
-built each complete 576-target graph exactly once. Their no-op Ninja queries
-reported no work. x64 passed background 129/129 in 155.41 seconds and desktop
-5/5 in 12.19 seconds; x86 passed background 129/129 in 148.04 seconds and
-desktop 5/5 in 11.96 seconds. Both package Console integration routes passed.
-
-The owner-directed CTest budgets are exact: Lib layout self-test is 180
-seconds and Emulator verifier-negative is 60 seconds, while all other shared
-fixtures retain 30 seconds. The current x64/x86 layout runs took 54.02/54.39
-seconds. `assets/binary/softpc.ini` remains
-`38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D`;
-refreshed x86/x64 EXEs are
-`9A57BA777E951F12F77EB4A6D73B898D81EA4D4C3126E1BDDB2F4D97BA0BD3A8` and
-`39E89B329152E9A211F56E31F6331FD1FDD3714D8AECF0F1B4E9800C59B7928E`.
-The full record is in [the T86 qualification audit](../proposals/m9-t86-completion-audit.md).
+The owner accepts and closes S4's fresh dual-architecture qualification.
+[S4 closure](../history/M9-T86-S4-dual-width-qualification.md) retains its
+packet, evidence and actual-change review.
 
 ## Historical M9 T85 S20 delivery record
 
