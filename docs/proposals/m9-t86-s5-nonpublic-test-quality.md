@@ -179,6 +179,11 @@ routes.  The two package routes remain deliberately excluded: their declared
 desktop resource owns a real native Console/window and cannot be truthfully
 substituted with a background lane.
 
+All 9 repository static checks also pass on both widths: x64 9/9 in 29.69
+seconds and x86 9/9 in 27.51 seconds.  This includes the owner-path boundary,
+negative boundary, manifest/vocabulary, build-ownership and documentation
+governance receivers used by this audit.
+
 The same sweep finds no outward include of a public test corpus, no remaining
 three-or-more-level walk back to `src/`, and no `NDEBUG` bypass under the App
 unit/integration roots.  Remaining direct Win32 headers are owner-local
