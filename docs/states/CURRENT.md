@@ -2,7 +2,10 @@
 
 ## Current Work
 
-## M9 T85 S20 Packet
+No implementation subtask is active. Open task awaiting owner: T85.
+The next admitted work must allocate its next unused S identifier.
+
+## M9 T85 S20 closure record
 
 | Field | Required record |
 | --- | --- |
@@ -50,13 +53,13 @@ SoftPC adaptation is confined to the App Product extension/composition and its
 integration proof.  Dual Release package builds and background CTest pass
 129/129 on each architecture; package INI, media and snapshots are untouched.
 
-### S20 P3 active corrective delivery
+### S20 P3 corrective delivery
 
 Owner acceptance found that P2 incorrectly dropped the existing generic
 Surface opening, and review found its ERROR guard also blocked debugger entry.
-P3 is active under the revised packet above; P2 is not accepted or closed.
+P3 is retained with its corrective evidence; P2 is not accepted or closed.
 
-### S20 P4 delivery awaiting owner validation
+### S20 P4 accepted closure
 
 P4 preserves Machine's one `PAUSED` runtime fact after a successful state
 write.  Product Monitor alone distinguishes an ordinary `RUNNING -> PAUSED`
@@ -71,7 +74,12 @@ pass 5/5 on x64 and x86.  Both Ninja Release package targets rebuild the
 published EXEs: x86 `F859627096569874C1AAD4DD713B2C4E1024F22F41E3EB9EC344F74C1A980F7C`,
 x64 `E7FFCA2BF0DB84B0C89E3857F94F756E73EBC80FE26AAD543A482D175D411369`.
 Production is +1/-2 (net -1); focused test code is +6/-0, with two manifest
-hash replacements.  P4 awaits owner validation.
+hash replacements.  Owner accepts the package behavior; complete executor
+delivery is pushed as `d3bd20f9`.  The actual-change review finds one
+Product-monitor presentation rule, its focused regression proof, two manifest
+updates and the refreshed package EXEs; Machine, Session, App, Core, Compat,
+INI and snapshot format remain unchanged.
+[S20 closure and queue record](../history/M9-Td-S20-s20-closure-and-display-queue.md).
 
 ### S20 delivery awaiting owner validation
 
@@ -540,6 +548,11 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- **M9 Td S20:** Owner accepts T85 S20 P4; its Product-monitor completion
+  repair is closed without closing T85. Two independent display candidates are
+  placed at the queue head: raw-to-cooked Console handoff, then Win3.1 File
+  Manager VGA width transition.
 
 - Owner reports acceptance and approves T80 closure. S7 closes, the proposal
   is archived, and no next task is admitted. This closure changes documents

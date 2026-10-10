@@ -3,9 +3,13 @@
 This is the ordered, unnumbered candidate queue. It neither activates work nor
 allocates a numeric task identifier.
 
-1. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+1. [Raw Console to cooked monitor handoff repair](../proposals/m9-raw-console-cooked-handoff.md)
 
-2. [Product and Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md)
+2. [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md)
+
+3. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+
+4. [Product and Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md)
 
 The unadmitted queue head upgrades the routine selected-mirror comparison from
 OpenNT to XP SP1, with explicit IBM PC/AT adoption and PC-98/Japan/NTVDM
