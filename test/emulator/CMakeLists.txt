@@ -50,8 +50,8 @@ endif()
 set(emulator_composition_work_directory
     "${CMAKE_CURRENT_BINARY_DIR}/test/emulator-test-composition")
 file(MAKE_DIRECTORY "${emulator_composition_work_directory}")
-add_test(NAME emulator.composition COMMAND emulator-test-composition)
-set_tests_properties(emulator.composition PROPERTIES LABELS "unit;emulator" TIMEOUT 30
+add_test(NAME emulator.product/composition COMMAND emulator-test-composition)
+set_tests_properties(emulator.product/composition PROPERTIES LABELS "unit;emulator" TIMEOUT 30
     WORKING_DIRECTORY "${emulator_composition_work_directory}")
 list(APPEND SHARED_EMULATOR_TEST_TARGETS emulator-test-composition)
 shared_register_test(emulator product/monitor emulator-product)

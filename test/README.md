@@ -4,16 +4,17 @@
 | --- | --- |
 | [lib](lib/README.md) | Independently reusable Lib tests and fixtures. |
 | [emulator](emulator/README.md) | Independently reusable neutral Emulator tests and fake machine. |
-| [x86](x86/README.md) | Independently reusable x86 debugger and assembler tests. |
+| [product](product/) | Independently reusable Product command, debugger, assembler and surface tests. |
 | app | Product configuration, command parsing and key bindings. |
 | core | Concrete machine, compatibility host, devices, media and ABI. |
 | integration | Product command/worker/frame/snapshot/shutdown chains and package boot. |
 | checks | Product source, build and package boundary checks. |
 
-Root CMake registers product tests. Existing CTest names and labels are retained
-for compatibility: the historical `unit` label is not a guarantee of isolated
-execution. Self-contained tests create disposable media in their build working
-directory. Only `runtime_restart_boot_smoke` reads the fixed installed image;
+Root CMake registers product tests. Public CTest names begin with their owning
+test root (`lib`, `emulator`, or `product`) and retain any nested test directory;
+the historical `unit` label is not a guarantee of isolated execution.
+Self-contained tests create disposable media in their build working directory.
+Only `runtime_restart_boot_smoke` reads the fixed installed image;
 `package_smoke` exercises the matching packaged EXE and owner configuration.
 They use non-mutating media modes; tests must not overwrite supplied media/INI.
 

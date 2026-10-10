@@ -48,6 +48,17 @@ uses owned background jobs with logs, exit-code files and cleanup. The rule
 change records that requirement repository-wide; it does not alter production,
 test semantics, package configuration or the original raw-to-cooked repair.
 
+### S1 P10: owner-approved shared-test identity and cleanup correction
+
+The owner directs a bounded shared-corpus test correction: every public CTest
+name uses its actual corpus path prefix (`lib`, `emulator`, or `product`),
+without compatibility aliases; nested Product-owner tests retain their
+directory identity. The correction also restores the omitted interrupted-run
+cleanup of the Lib type-layout lock probe. It changes only shared test
+registration, test documentation and manifests; no production source, public
+ABI, user configuration or native Console behavior changes. Rebuilt package
+binaries retain the same production source behavior.
+
 ## Historical M9 T85 S20 delivery record
 
 This retained delivery record is superseded for task state by the

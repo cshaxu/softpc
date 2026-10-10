@@ -40,8 +40,8 @@ else()
 endif()
 set(product_entry_work_directory "${CMAKE_CURRENT_BINARY_DIR}/test/product-test-entry")
 file(MAKE_DIRECTORY "${product_entry_work_directory}")
-add_test(NAME product.entry COMMAND product-test-entry)
-set_tests_properties(product.entry PROPERTIES LABELS "unit;product" TIMEOUT 30
+add_test(NAME product.surface/entry COMMAND product-test-entry)
+set_tests_properties(product.surface/entry PROPERTIES LABELS "unit;product" TIMEOUT 30
     WORKING_DIRECTORY "${product_entry_work_directory}")
 list(APPEND SHARED_PRODUCT_TEST_TARGETS product-test-entry)
 
@@ -50,8 +50,8 @@ target_link_libraries(product-surface-command-smoke PRIVATE product-surface-comm
 if(MINGW)
     target_link_options(product-surface-command-smoke PRIVATE -mconsole)
 endif()
-add_test(NAME product.surface-command COMMAND product-surface-command-smoke)
-set_tests_properties(product.surface-command PROPERTIES LABELS "unit;product" TIMEOUT 30)
+add_test(NAME product.surface/command COMMAND product-surface-command-smoke)
+set_tests_properties(product.surface/command PROPERTIES LABELS "unit;product" TIMEOUT 30)
 list(APPEND SHARED_PRODUCT_TEST_TARGETS product-surface-command-smoke)
 
 add_test(NAME product.corpus COMMAND "${CMAKE_COMMAND}"
