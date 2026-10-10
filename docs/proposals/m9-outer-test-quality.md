@@ -123,3 +123,19 @@ Verification from the final configured trees:
   no `RUN_SERIAL` property on `app-softpc/integration/command_provider_smoke`.
 - Documentation governance and the expanded build-ownership negative gate pass
   on both widths.
+
+### P2 label ownership correction
+
+Post-delivery audit found that the App CTest paths were correct but their
+labels still named only the execution class.  The shared suites use both
+dimensions, so the App suite now uses `unit;app-softpc` or
+`integration;app-softpc`; package tests add that same owner label beside their
+existing `desktop` and width labels.  This adds no target, helper, source or
+execution path.  `ctest -L app-softpc -LE desktop` selects exactly 36 App
+tests and passes 36/36 on x64 and x86.
+
+The App tests intentionally remain registered from the root product build:
+they exercise concrete product targets and their composition, rather than a
+portable source component.  Moving that registration merely to imitate the
+public component directory layout would require extensive absolute-path and
+scope plumbing without removing a dependency or duplicate test.

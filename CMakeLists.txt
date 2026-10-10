@@ -694,8 +694,8 @@ set(SOFTPC_CHECK_CTESTS
     "checks/documentation_governance"
     "checks/documentation_governance/selftest"
     "checks/win32_presentation_manifest")
-set_tests_properties(${SOFTPC_UNIT_CTESTS} PROPERTIES LABELS "unit")
-set_tests_properties(${SOFTPC_INTEGRATION_CTESTS} PROPERTIES LABELS "integration")
+set_tests_properties(${SOFTPC_UNIT_CTESTS} PROPERTIES LABELS "unit;app-softpc")
+set_tests_properties(${SOFTPC_INTEGRATION_CTESTS} PROPERTIES LABELS "integration;app-softpc")
 set_tests_properties(${SOFTPC_CHECK_CTESTS} PROPERTIES LABELS "checks")
 
 add_executable(softpc-package-smoke test/app-softpc/integration/package_smoke.c)
@@ -717,7 +717,7 @@ endif()
 add_test(NAME "app-softpc/integration/package_smoke" COMMAND softpc-package-smoke)
 add_test(NAME "app-softpc/integration/package_smoke/compact_console" COMMAND softpc-package-smoke --compact-console)
 set_tests_properties("app-softpc/integration/package_smoke" "app-softpc/integration/package_smoke/compact_console" PROPERTIES
-    LABELS "integration;desktop;${SOFTPC_TEST_WIDTH_LABEL}"
+    LABELS "integration;app-softpc;desktop;${SOFTPC_TEST_WIDTH_LABEL}"
     TIMEOUT 90
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
