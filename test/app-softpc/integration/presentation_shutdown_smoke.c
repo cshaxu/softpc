@@ -14,6 +14,8 @@ static lib_u32 scenario;
 static lib_u32 requests;
 static lib_u32 destroyed;
 static lib_u32 reported;
+static lib_u32 generations;
+static lib_u32 states;
 
 static void create_image(const char *path)
 {
@@ -68,14 +70,28 @@ lib_status emulator_ui_write_monitor(emulator_ui *ui, const char *text)
 }
 
 void emulator_ui_set_run_generation(emulator_ui *ui, lib_u32 generation)
-{ (void)ui; (void)generation; assert(0); }
+{
+    assert(ui == &surface);
+    (void)generation;
+    ++generations;
+}
 
 lib_status emulator_ui_apply_action(emulator_ui *ui, emulator_ui_action action,
     emulator_ui_state state)
-{ (void)ui; (void)action; (void)state; assert(0); return LIB_STATUS_IO_ERROR; }
+{
+    assert(ui == &surface);
+    (void)action;
+    (void)state;
+    return LIB_STATUS_OK;
+}
 
 lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state state)
-{ (void)ui; (void)state; assert(0); return LIB_STATUS_IO_ERROR; }
+{
+    assert(ui == &surface);
+    (void)state;
+    ++states;
+    return LIB_STATUS_OK;
+}
 
 lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *frame,
     const kvm_console_character_map *characters, lib_u32 sequence,
@@ -107,20 +123,21 @@ int main(void)
     assert(app_startup_compose_ui(&config, &definition.ui) == LIB_STATUS_OK);
     definition.name = "presentation-shutdown";
     for (scenario = 0u; scenario < 3u; ++scenario) {
-        requests = destroyed = reported = 0u;
+        requests = destroyed = reported = generations = states = 0u;
         assert(softpc_product_compose_machine(&config, &definition.machine) ==
             LIB_STATUS_OK);
         assert(product_surface_run(&definition) == (scenario == 0u ? 0 : 1));
-        assert(destroyed == 1u && reported == (scenario == 1u || scenario == 2u));
+        assert(destroyed == 1u && generations != 0u && states != 0u &&
+            reported == (scenario == 1u || scenario == 2u));
     }
     assert(remove(path) == 0);
 
     scenario = 3u;
-    requests = destroyed = reported = 0u;
+    requests = destroyed = reported = generations = states = 0u;
     create_image(path);
     assert(softpc_product_compose_machine(&config, &definition.machine) ==
         LIB_STATUS_OK);
     assert(product_surface_run(&definition) == 1);
-    assert(destroyed == 1u && reported == 0u);
+    assert(destroyed == 1u && generations != 0u && states != 0u && reported == 0u);
     return 0;
 }

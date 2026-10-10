@@ -7,21 +7,21 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S: introduce ccache compiler-cache optimization and verify compilation/test performance improvement. |
-| Objective | Add optional x64/x86 Ninja ccache presets, document their local-only cache contract, and measure cold versus warm full builds plus independent full test duration. |
-| Non-goals | Do not require ccache for Quick Start; do not cache test results, alter compiler/toolchain/product behavior, add a daemon, remote cache, source transformation, or change user configuration/media. |
-| Reference Baseline | `e6001412`, S19 P1: Common renamed to Emulator; regular Ninja and Makefiles routes already pass dual-width qualification. |
-| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20--optional-ninja-compiler-cache-route) |
-| Files And ABI Surface | `CMakePresets.json`, root build instructions and task/proposal records only. Public runtime and source API are unchanged. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; existing Ninja eight-job cap; generated cache/build directories remain disposable. |
-| Verification | Validate preset JSON and configuration; use a dedicated disposable `CCACHE_DIR`; measure cold/warm x64/x86 full test-target builds and record ccache statistics; run dual-width background CTest excluding desktop. |
-| Expected Markers | Default Ninja/Makefiles commands remain dependency-free; ccache is opt-in through `ninja-ccache-*`; cache directory is absent from the repository and all source/artifact paths. |
-| Asset Needs | No artifact refresh is required: no package source/link input changes. Preserve `assets/binary/softpc.ini`, media and existing EXEs. |
-| Reporting Requirements | Cold/warm wall-clock measurements, cache hit/miss statistics, full-test timings, configured cache location/disposal proof, changed-path/line accounting and P commit/push followed by owner validation. |
-| Stop Conditions | ccache changes output behavior, cannot correctly launch both MinGW widths, fails a dual-width build/test, or delivers no meaningful warm-cache benefit. |
-| Exit Criteria | Optional dual-width ccache route is documented and proven; normal routes remain intact; cold/warm evidence and full regression are recorded; worktree is clean after push. |
-| Original Owner Request | 准入一个新的S，引入ccache编译缓存优化并验证编译和测试性能是否提高。 |
-| Similar-Issue Sweep | Inspect all checked-in build/test presets and instructions for accidental mandatory ccache use, cache-in-repository paths, unbounded job changes or claims that compiler caching accelerates test execution. |
+| Admission And Approval | Owner extends S20 with a second, independently verifiable delivery: import NXVM's latest public six-component corpus exactly after a current read-only quality audit. The preceding optional-cache delivery remains recorded and awaits its separate acceptance/closure decision. |
+| Objective | Synchronize `src/{lib,emulator,product}`, `test/{lib,emulator,product}` and the shared `test/register.cmake` with NXVM, then repair the discovered shared Product Surface snapshot-command handoff through one product-neutral App callback. |
+| Non-goals | Do not change NXVM directly; do not add a SoftPC-only parser, executor, Session state machine or compatibility shim; do not change Core, Compat, user INI, guest media or unrelated worktree changes; do not claim manual product acceptance. |
+| Reference Baseline | SoftPC `e8b95b53`; NXVM current worktree at `9f966695e` plus its uncommitted Emulator Product cleanup that removes two redundant failed-bind unbinds and updates the matching manifests/tests. |
+| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20-p2--synchronize-the-current-shared-six-component-corpus) |
+| Files And ABI Surface | The six shared roots and `test/register.cmake`, their manifests/CMake/README files included; narrow App Product and static-boundary-check adaptation is permitted where the imported public Product API removes `product_surface` composition in favor of `emulator_product`. The admitted shared repair adds one Surface callback for already-parsed SAVE/LOAD operations; it reuses Emulator Machine's existing executor rendezvous and adds no SoftPC-only ABI. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; exact shared-corpus boundary; C11 six-package rule; user configuration/media preservation. |
+| Verification | Record a finite upstream path/hash ledger; verify exact equality after import; run corpus/manifest/dependency gates; run proportional x64/x86 builds and background CTest excluding desktop. |
+| Expected Markers | The imported upstream baseline is recorded as byte-identical; the explicitly admitted canonical snapshot-callback delta is listed separately for NXVM adoption. Dependency direction remains `lib < emulator < product`; package configuration/media are untouched. |
+| Asset Needs | Refresh package EXEs only if the synchronized production sources require it; never modify `assets/binary/softpc.ini`, media or snapshots. |
+| Reporting Requirements | Pre/post path and line accounting by source/test root; upstream revision/worktree identity; gate/build/test evidence; refreshed EXE links/hashes if applicable; one complete pushed P followed by owner validation. |
+| Stop Conditions | Upstream source changes during import; a required local parser/shim, Core/Compat change, broken manifest/dependency boundary, or failing dual-width verification requiring behavior design beyond the admitted parsed snapshot callback. |
+| Exit Criteria | Exact six-root/helper equality and stated verification evidence are recorded; task-owned changes are committed and pushed; worktree is clean except preserved owner changes; await owner validation. |
+| Original Owner Request | 好，现在可以准入一个新的S任务，把NXVM公共六组件全部原样导入。 |
+| Similar-Issue Sweep | Compare every source/test path and content hash, including upstream deletions and relocations; inspect all CMake target edges for outward dependencies and all manifests for exact corpus coverage. |
 
 ### S20 planned delivery
 
@@ -30,6 +30,25 @@ only by its named optional presets, with cache output held in the
 developer-selected `CCACHE_DIR` during measurement and the local ccache
 default thereafter. Regular Ninja and Makefiles retain their existing,
 dependency-free invocation and output behavior.
+
+### S20 P2 delivery awaiting owner validation
+
+The six shared roots and `test/register.cmake` were first copied byte-for-byte
+from NXVM `9f966695e` plus its uncommitted Emulator Product cleanup.  The
+admitted follow-up makes one deliberate shared-corpus delta: Surface owns a
+default parsed SAVE/LOAD handler that reports `Feature not implemented.`, while
+an App can register one callback for its existing snapshot implementation.
+SoftPC registers its existing state-I/O route; it no longer reparses these two
+commands.  The callback uses the existing Machine executor rendezvous and adds
+no request queue, Session state or asynchronous completion protocol.
+
+The corresponding canonical paths for NXVM adoption are
+`src/product/surface/{command.c,command_interface.h,command_provider.c}`,
+`src/emulator/product/monitor.c`,
+`test/product/surface/command_smoke.c`, and their manifest records.  Local
+SoftPC adaptation is confined to the App Product extension/composition and its
+integration proof.  Dual Release package builds and background CTest pass
+129/129 on each architecture; package INI, media and snapshots are untouched.
 
 ### S20 delivery awaiting owner validation
 

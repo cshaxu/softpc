@@ -5,7 +5,7 @@
 #include "machine/vm_interface.h"
 
 static lib_status softpc_product_bind(void *machine, emulator_machine *emulator);
-static void softpc_product_destroy(void *machine);
+static lib_status softpc_product_destroy(void *machine);
 
 lib_status softpc_product_compose_machine(const app_startup_config *config,
     app_composed_machine *out_machine)
@@ -30,10 +30,10 @@ lib_status softpc_product_compose_machine(const app_startup_config *config,
         config->printer_output_path;
     status = vm_create(&options, &driver);
     if (status != LIB_STATUS_OK) return status;
-    out_machine->machine = driver;
-    vm_driver_describe(driver, &out_machine->driver);
-    out_machine->bind = softpc_product_bind;
-    out_machine->destroy = softpc_product_destroy;
+    out_machine->composition.machine = driver;
+    vm_driver_describe(driver, &out_machine->composition.driver);
+    out_machine->composition.bind = softpc_product_bind;
+    out_machine->composition.destroy = softpc_product_destroy;
     return LIB_STATUS_OK;
 }
 
@@ -44,7 +44,7 @@ static lib_status softpc_product_bind(void *machine, emulator_machine *emulator)
     return LIB_STATUS_OK;
 }
 
-static void softpc_product_destroy(void *machine)
+static lib_status softpc_product_destroy(void *machine)
 {
-    (void)vm_destroy((vm_driver *)machine);
+    return vm_destroy((vm_driver *)machine);
 }

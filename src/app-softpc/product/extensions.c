@@ -9,10 +9,15 @@
 static void softpc_extension_message(emulator_session_command_result *out,
     const char *message)
 {
-    (void)lib_c_snprintf((char *)out->text, sizeof(out->text), "%s\r\n\r\n",
+    (void)lib_c_snprintf((char *)out->text, sizeof(out->text), "%s\r\n",
         message);
     out->arm_prompt = LIB_TRUE;
 }
+
+static const emulator_product_help_row softpc_extension_help[] = {
+    {"floppy insert <mode> <image>", "insert drive A media while stopped/paused"},
+    {"floppy eject", "eject drive A media while stopped/paused"}
+};
 
 static char *softpc_extension_trim(char *text)
 {
@@ -172,6 +177,23 @@ static void softpc_extension_floppy(emulator_machine *machine,
         "Floppy inserted." : "Cannot insert floppy.");
 }
 
+static lib_bool softpc_extension_submit_snapshot(void *context,
+    emulator_machine *machine, emulator_product_monitor_command command,
+    emulator_session_machine_state state, const char *arguments,
+    emulator_session_command_result *out)
+{
+    (void)context;
+    if (machine == LIB_NULL || arguments == LIB_NULL || out == LIB_NULL)
+        return LIB_FALSE;
+    *out = (emulator_session_command_result){0};
+    if (command == EMULATOR_PRODUCT_MONITOR_COMMAND_SAVE)
+        softpc_extension_save(machine, state, arguments, out);
+    else if (command == EMULATOR_PRODUCT_MONITOR_COMMAND_LOAD)
+        softpc_extension_load(machine, state, arguments, out);
+    else return LIB_FALSE;
+    return LIB_TRUE;
+}
+
 static lib_bool softpc_extension_submit(void *context, emulator_machine *machine,
     emulator_session_machine_state state, const char *line,
     emulator_session_command_result *out)
@@ -190,14 +212,6 @@ static lib_bool softpc_extension_submit(void *context, emulator_machine *machine
     if (!softpc_extension_split(softpc_extension_trim(buffer), &command, &arguments))
         return LIB_FALSE;
     *out = (emulator_session_command_result){0};
-    if (lib_text_compare(command, "save") == 0) {
-        softpc_extension_save(machine, state, arguments, out);
-        return LIB_TRUE;
-    }
-    if (lib_text_compare(command, "load") == 0) {
-        softpc_extension_load(machine, state, arguments, out);
-        return LIB_TRUE;
-    }
     if (lib_text_compare(command, "floppy") == 0) {
         softpc_extension_floppy(machine, state, arguments, out);
         return LIB_TRUE;
@@ -205,18 +219,16 @@ static lib_bool softpc_extension_submit(void *context, emulator_machine *machine
     return LIB_FALSE;
 }
 
-lib_status softpc_product_configure_extensions(product_surface *app,
+lib_status softpc_product_configure_extensions(app_composed_machine *machine,
     product_surface_command_extensions *out_extensions)
 {
-    (void)app;
     if (out_extensions == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_extensions = (product_surface_command_extensions){
+        .context = machine,
         .submit = softpc_extension_submit,
-        .help_text = "  floppy insert <mode> <image>\r\n"
-            "                 insert drive A media while stopped/paused\r\n"
-            "  floppy eject   eject drive A media while stopped/paused\r\n"
-            "  save <file>    save a running or paused machine\r\n"
-            "  load <file>    load a snapshot while stopped\r\n"
+        .submit_snapshot = softpc_extension_submit_snapshot,
+        .help = {softpc_extension_help,
+            sizeof(softpc_extension_help) / sizeof(softpc_extension_help[0])}
     };
     return LIB_STATUS_OK;
 }

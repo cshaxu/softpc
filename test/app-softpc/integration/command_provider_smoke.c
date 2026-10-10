@@ -423,7 +423,6 @@ static void watchpoints(emulator_machine *machine, emulator_machine_debug_lease 
         }
         provider->note_runtime(provider->context, EMULATOR_SESSION_MACHINE_RUNNING,
             EMULATOR_SESSION_MACHINE_PAUSED, &output);
-        provider->note_monitor_current(provider->context, LIB_TRUE, &output);
         assert(lib_text_find_substring(debug_text(&output), "Watch-") && lib_text_find_substring(debug_text(&output), " hit:"));
         assert(output.request == EMULATOR_SESSION_REQUEST_NONE);
         if (kind == PRODUCT_DEBUG_WATCH_EXECUTE) {
@@ -460,7 +459,6 @@ static void watchpoints(emulator_machine *machine, emulator_machine_debug_lease 
     assert(emulator_machine_resume(machine)); wait_for(events->running); wait_for(events->paused);
     provider->note_runtime(provider->context, EMULATOR_SESSION_MACHINE_RUNNING,
         EMULATOR_SESSION_MACHINE_PAUSED, &output);
-    provider->note_monitor_current(provider->context, LIB_TRUE, &output);
     assert(lib_text_find_substring(debug_text(&output), "Write: Lin=00000a00"));
     assert(emulator_machine_debug_acquire(machine, lease) == LIB_STATUS_OK);
 }
@@ -722,7 +720,6 @@ static void trace_cli(emulator_machine *machine, emulator_machine_debug_lease *l
             wait_for(events->paused);
             provider->note_runtime(provider->context, EMULATOR_SESSION_MACHINE_RUNNING,
                 EMULATOR_SESSION_MACHINE_PAUSED, &result);
-            provider->note_monitor_current(provider->context, LIB_TRUE, &result);
             assert(lib_text_find_substring(debug_text(&result), kind ? "EAX=" : "AX=") != NULL);
             assert((lib_text_find_substring(debug_text(&result), "EIP=") != NULL) == (kind != 0u));
             assert(lib_text_find_substring(result.text, "Machine paused.") != NULL);
@@ -745,7 +742,6 @@ static void trace_cli(emulator_machine *machine, emulator_machine_debug_lease *l
         wait_for(events->paused);
         provider->note_runtime(provider->context, EMULATOR_SESSION_MACHINE_RUNNING,
             EMULATOR_SESSION_MACHINE_PAUSED, &result);
-        provider->note_monitor_current(provider->context, LIB_TRUE, &result);
         assert(lib_text_find_substring(debug_text(&result), "instructions executed before the break point."));
         assert(lib_text_find_substring(debug_text(&result), "EAX=") && lib_text_find_substring(debug_text(&result), "EIP=00000701"));
         assert(result.request == (index == 0u ? EMULATOR_SESSION_REQUEST_RESUME :
@@ -844,16 +840,15 @@ int main(void)
             submit(&provider, EMULATOR_SESSION_MACHINE_ERROR, rejected[index], &result);
             assert(result.request == EMULATOR_SESSION_REQUEST_NONE);
             assert(lib_text_find_substring(result.text, "Machine has failed;") != NULL);
-            provider.note_monitor_current(&commands, LIB_TRUE, &result);
             assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
         }
         submit(&provider, EMULATOR_SESSION_MACHINE_ERROR, "help", &result);
         assert(lib_text_find_substring(result.text, "Control your virtual machine") != NULL);
     }
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
-    assert(provider.context == &commands && provider.open == product_surface_command_provider_open);
+    assert(provider.context == &commands.monitor &&
+        provider.open == emulator_product_monitor_provider_open);
     assert(provider.submit_line == product_surface_command_provider_submit_line);
-    assert(provider.begin_external == product_surface_command_provider_begin_external);
     assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         "send-ctrl-alt-del", &result) && result.request == EMULATOR_SESSION_REQUEST_NONE);
     assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
@@ -867,7 +862,6 @@ int main(void)
     for (index = 0u; index < sizeof(inactive) / sizeof(inactive[0]); ++index) {
         submit(&provider, inactive[index], "debug", &result);
         assert(commands.debug_active && result.request == EMULATOR_SESSION_REQUEST_NONE);
-        provider.note_monitor_current(&commands, LIB_TRUE, &result);
         assert(result.arm_prompt && lib_text_compare(result.prompt, "-") == 0);
         submit(&provider, inactive[index], "?", &result);
         assert(lib_text_find_substring(debug_text(&result), "assemble") != NULL);
@@ -878,7 +872,7 @@ int main(void)
     }
     assert(emulator_machine_reset(machine));
     wait_for(events.paused);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_INIT,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_INIT,
         EMULATOR_SESSION_MACHINE_RESET_COMPLETED, &result);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "debug", &result);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "r", &result);
@@ -890,7 +884,6 @@ int main(void)
             .register_id = PRODUCT_DEBUG_EAX }, &value) == LIB_STATUS_OK);
     saved_eax = value.value;
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "r ax", &result);
-    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, ":") == 0);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "1234", &result);
     assert(execute_x86(machine, &lease,
@@ -906,7 +899,6 @@ int main(void)
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "u f000:fff0", &result);
     assert(lib_text_find_substring(debug_text(&result), "F000:FFF0") != NULL);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "a 0:510", &result);
-    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, "0000:0510 ") == 0);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "nop", &result);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED, "", &result);
@@ -918,28 +910,24 @@ int main(void)
     /* With A20 wrapping enabled this is the last ROM byte, not an invalid
      * host pointer. The original SAS bus, not host RAM bounds, decides. */
     assert(lib_text_find_substring(debug_text(&result), "failed") == NULL);
-    assert(provider.handle_hotkey(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
+    assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         "pause-toggle", &result));
     assert(commands.debug_active && result.request == EMULATOR_SESSION_REQUEST_RESUME);
-    /* A second CAP cannot bypass the command transition reservation. */
-    assert(provider.handle_hotkey(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
-        "pause-toggle", &result));
-    assert(result.request == EMULATOR_SESSION_REQUEST_NONE);
     assert(emulator_machine_resume(machine));
     wait_for(events.running);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         EMULATOR_SESSION_MACHINE_RUNNING, &result);
     submit(&provider, EMULATOR_SESSION_MACHINE_RUNNING, "r", &result);
     assert(lib_text_find_substring(debug_text(&result), "must be paused") != NULL && commands.debug_active);
     submit(&provider, EMULATOR_SESSION_MACHINE_RUNNING, "q", &result);
     submit(&provider, EMULATOR_SESSION_MACHINE_RUNNING, "debug", &result);
     assert(commands.debug_active && emulator_machine_state_get(machine) == EMULATOR_MACHINE_RUNNING);
-    assert(provider.handle_hotkey(&commands, EMULATOR_SESSION_MACHINE_RUNNING,
+    assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_RUNNING,
         "pause-toggle", &result));
     assert(result.request == EMULATOR_SESSION_REQUEST_PAUSE);
     assert(emulator_machine_pause(machine));
     wait_for(events.paused);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_RUNNING,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_RUNNING,
         EMULATOR_SESSION_MACHINE_PAUSED, &result);
     assert(execute_x86(machine, &lease,
         &(product_debug_request){0}, &value) == LIB_STATUS_INVALID_STATE);
@@ -962,7 +950,7 @@ int main(void)
         .execution_kind = PRODUCT_DEBUG_EXECUTION_BREAK_LINEAR, .address = 0x12345678u });
     assert(emulator_machine_reset(machine));
     wait_for(events.paused);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         EMULATOR_SESSION_MACHINE_RESET_COMPLETED, &result);
     assert(emulator_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     assert(!access(machine, &lease, (product_debug_request){
@@ -981,12 +969,11 @@ int main(void)
     assert(emulator_machine_resume(machine));
     wait_for(events.running);
     wait_for(program_completed);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         EMULATOR_SESSION_MACHINE_RUNNING, &result);
     assert(emulator_machine_stop(machine));
     wait_for(events.stopped);
     submit(&provider, EMULATOR_SESSION_MACHINE_STOPPED, "q", &result);
-    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
     /* Product commands use the actual provider, Emulator rendezvous and VM
        archive; only the test owns these two disposable files. */
@@ -997,9 +984,8 @@ int main(void)
     assert(result.arm_prompt &&
         lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
     wait_for(events.paused);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_RUNNING,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_RUNNING,
         EMULATOR_SESSION_MACHINE_PAUSED, &result);
-    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED,
         "save debug-commands-smoke.spcs", &result);
@@ -1007,7 +993,7 @@ int main(void)
         lib_text_find_substring(result.text, "Machine saved and paused.") != NULL);
     assert(emulator_machine_stop(machine));
     wait_for(events.stopped);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         EMULATOR_SESSION_MACHINE_STOPPED, &result);
     submit(&provider, EMULATOR_SESSION_MACHINE_STOPPED,
         "load missing-snapshot.spcs", &result);
@@ -1020,17 +1006,16 @@ int main(void)
     assert(result.arm_prompt &&
         lib_text_find_substring(result.text, "Machine loaded and paused.") != NULL);
     wait_for(events.paused);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_STOPPED,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_STOPPED,
         EMULATOR_SESSION_MACHINE_PAUSED, &result);
-    provider.note_monitor_current(&commands, LIB_TRUE, &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
     assert(emulator_machine_resume(machine));
     wait_for(events.running);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_PAUSED,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         EMULATOR_SESSION_MACHINE_RUNNING, &result);
     assert(emulator_machine_stop(machine));
     wait_for(events.stopped);
-    provider.note_runtime(&commands, EMULATOR_SESSION_MACHINE_RUNNING,
+    provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_RUNNING,
         EMULATOR_SESSION_MACHINE_STOPPED, &result);
     product_surface_command_dispose(&commands);
     emulator_machine_destroy(machine);

@@ -171,7 +171,7 @@ foreach(retired_session_source IN ITEMS
         message(FATAL_ERROR "Application retains a second session implementation: ${retired_session_source}")
     endif()
 endforeach()
-file(READ "${SOFTPC_SOURCE_DIR}/src/product/surface/composition.c" shared_product_composition)
+file(READ "${SOFTPC_SOURCE_DIR}/src/emulator/product/composition.c" shared_product_composition)
 if(NOT shared_product_composition MATCHES "emulator_session_create" OR
    shared_product_composition MATCHES "emulator_session_(queue|state|reconciler)_")
     message(FATAL_ERROR "Shared Product must compose, not implement, emulator session control")
@@ -504,7 +504,7 @@ endforeach()
 
 # Shared Product owns the one callback-safe teardown path.  The App hands it a
 # composed private machine but never recreates Emulator teardown locally.
-file(READ "${SOFTPC_SOURCE_DIR}/src/product/surface/composition.c" composition_source)
+file(READ "${SOFTPC_SOURCE_DIR}/src/emulator/product/composition.c" composition_source)
 foreach(required_teardown IN ITEMS
     "emulator_machine_shutdown" "emulator_ui_destroy" "emulator_session_destroy"
     "emulator_machine_destroy" "machine.bind" "machine.destroy")

@@ -34,7 +34,8 @@ foreach(naming_root IN LISTS naming_roots)
     foreach(naming_file IN LISTS naming_files)
         file(RELATIVE_PATH naming_path "${KVM_NAMING_ROOT}" "${naming_file}")
         string(REPLACE "\\" "/" naming_path "${naming_path}")
-        if(naming_path MATCHES "^emulator/ui/" OR naming_path MATCHES "^test/lib/fixtures/")
+        if(naming_path MATCHES "^emulator/ui/" OR naming_path MATCHES "^test/emulator/" OR
+           naming_path MATCHES "^test/lib/fixtures/")
             continue()
         endif()
         if(naming_path MATCHES "(^|/)${retired_prefix}-" OR

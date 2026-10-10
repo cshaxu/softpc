@@ -47,3 +47,30 @@ cold and warm full rebuilds with a disposable cache directory, and separately
 measure CTest to distinguish compiler-cache benefit from test execution time.
 Do not retain the route if its configured cache cannot prove correct dual-width
 builds and the expected warm-cache compilation improvement.
+
+## S20 P2 — synchronize the current shared six-component corpus
+
+Import NXVM's current `src/{lib,emulator,product}` and
+`test/{lib,emulator,product}` byte-for-byte, together with the shared
+`test/register.cmake` helper.  This is a corpus synchronization, not a local
+redesign: remove local files absent upstream and accept upstream moves between
+Emulator and Product as authored.  Preserve App, Core, Compat, user INI,
+media, package assets and every NXVM-external SoftPC path.
+
+Before committing, prove the exact path/hash ledger for all six roots and the
+registration helper, run the component corpus/manifest/dependency gates, then
+perform proportional x64/x86 build and background-test verification.  No local
+shim, compatibility wrapper or SoftPC-only change is permitted inside the six
+shared roots.
+
+The import audit found one shared Product contract gap: Emulator Product
+correctly parses the fixed `save` and `load` commands, while Product Surface
+has no route for an App to implement them. S20 P2 therefore adds one
+Product-neutral callback which receives the already-parsed operation and its
+argument tail. It does not add parsing, a Session request kind, a completion
+queue, an executor or a product-specific fallback. SoftPC registers its
+existing snapshot implementation; another App may explicitly report unsupported.
+The existing Emulator Machine state-I/O calls already enqueue executor work at
+a safe point and synchronously report its completion to the sole control
+caller, so an additional asynchronous completion protocol would duplicate that
+mechanism and is out of scope.

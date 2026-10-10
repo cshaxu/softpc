@@ -3,7 +3,7 @@
 
 #include "product/surface/entry_interface.h"
 
-lib_status softpc_product_configure_extensions(product_surface *app,
+lib_status softpc_product_configure_extensions(app_composed_machine *machine,
     product_surface_command_extensions *out_extensions);
 
 #endif
