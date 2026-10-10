@@ -167,6 +167,13 @@ declared MinGW widths.  The source-boundary, build-ownership and documentation
 governance checks also pass on both widths.  The CTest JSON query verifies the
 47-route count, uniqueness, owner split and working-directory contract.
 
+The complete non-desktop App lane also passes under the declared CTest
+resource scheduler: x64 36/36 in 70.06 seconds and x86 36/36 in 135.32
+seconds.  This covers all 28 unit routes and all 8 background integration
+routes.  The two package routes remain deliberately excluded: their declared
+desktop resource owns a real native Console/window and cannot be truthfully
+substituted with a background lane.
+
 The same sweep finds no outward include of a public test corpus, no remaining
 three-or-more-level walk back to `src/`, and no `NDEBUG` bypass under the App
 unit/integration roots.  Remaining direct Win32 headers are owner-local
