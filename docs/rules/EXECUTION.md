@@ -116,6 +116,18 @@ trace/recording requires a packet-declared ignored path, size/time/no-progress
 budget, process cleanup owner, and retained checkpoint; it is never committed
 as a fixture or product input.
 
+### Long-running execution
+
+An executor must classify a build, test, probe, or package operation as
+long-running before starting it whenever it can exceed the interactive command
+time budget. Long-running work runs as one owned background job with a declared
+log path, exit-code path, timeout/no-progress budget, and cleanup owner.
+Foreground commands may only start or query that job, read bounded log output,
+or run a demonstrably short focused check. They must not run a known long
+operation and rely on an interactive command timeout to stop it. A timeout or
+external termination is inconclusive evidence, never a passed or failed test
+result.
+
 ## User Package Configuration
 
 `assets/binary/softpc.ini` is user-owned package configuration. An agent

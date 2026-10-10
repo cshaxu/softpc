@@ -17,9 +17,8 @@ typedef lib_bool (*product_surface_command_extension_submit)(void *context,
     emulator_machine *machine, emulator_session_machine_state state,
     const char *line, emulator_session_command_result *out);
 
-/* Emulator Product recognizes the shared snapshot grammar.  The selected App
- * owns the machine image and supplies its already-parsed SAVE/LOAD operation;
- * the operation uses Emulator Machine's existing executor rendezvous. */
+/* Emulator Product recognizes the shared snapshot grammar. The selected App
+ * owns the machine image and supplies its already-parsed SAVE/LOAD operation. */
 typedef lib_bool (*product_surface_command_snapshot_submit)(void *context,
     emulator_machine *machine, emulator_product_monitor_command command,
     emulator_session_machine_state state, const char *arguments,

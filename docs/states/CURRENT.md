@@ -27,6 +27,27 @@ policy.
 | Original Owner Request | 准入新T修复console交接问题。 |
 | Similar-Issue Sweep | Inspect every raw/cooked activation, cooked-line request, output selection and backing-surface setup path; distinguish normal cooked-to-cooked activation from raw-to-cooked return. |
 
+### S1 P8: owner-approved shared-corpus synchronization
+
+The owner expands this active repair with a bounded shared-corpus refresh from
+the read-only current NXVM worktree. The six public roots
+`src/{lib,emulator,product}` and `test/{lib,emulator,product}` remain the
+complete universe. Import every current NXVM difference, including its
+component-local manifest-v1 gates and the Product Surface banner-forwarding
+proof; do not import NXVM App/Core code or artifacts. Rebuild both SoftPC
+packages, run Lib/Emulator/Product suites first, then the full non-desktop
+x64/x86 test presets. The original raw-to-cooked native owner validation
+remains an independent T86 exit requirement.
+
+### S1 P9: owner-directed execution-timeout correction
+
+The owner directs a permanent execution-rule correction after the executor
+incorrectly started known long CTest cases in a foreground command subject to
+the host's 30-second limit. All remaining long verification for this packet
+uses owned background jobs with logs, exit-code files and cleanup. The rule
+change records that requirement repository-wide; it does not alter production,
+test semantics, package configuration or the original raw-to-cooked repair.
+
 ## Historical M9 T85 S20 delivery record
 
 This retained delivery record is superseded for task state by the

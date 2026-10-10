@@ -8,15 +8,8 @@ string(CONCAT retired_class "Lib" "U" "x" "Window")
 
 if(EXISTS "${KVM_NAMING_ROOT}/src/lib")
     set(naming_roots
-        "${KVM_NAMING_ROOT}/CMakeLists.txt"
-        "${KVM_NAMING_ROOT}/src/app"
         "${KVM_NAMING_ROOT}/src/lib"
-        "${KVM_NAMING_ROOT}/test/integration"
-        "${KVM_NAMING_ROOT}/test/support"
-        "${KVM_NAMING_ROOT}/test/unit"
-        "${KVM_NAMING_ROOT}/test/lib"
-        "${KVM_NAMING_ROOT}/test/emulator"
-        "${KVM_NAMING_ROOT}/docs/rules")
+        "${KVM_NAMING_ROOT}/test/lib")
 else()
     set(naming_roots "${KVM_NAMING_ROOT}")
 endif()
@@ -34,8 +27,7 @@ foreach(naming_root IN LISTS naming_roots)
     foreach(naming_file IN LISTS naming_files)
         file(RELATIVE_PATH naming_path "${KVM_NAMING_ROOT}" "${naming_file}")
         string(REPLACE "\\" "/" naming_path "${naming_path}")
-        if(naming_path MATCHES "^emulator/ui/" OR naming_path MATCHES "^test/emulator/" OR
-           naming_path MATCHES "^test/lib/fixtures/")
+        if(naming_path MATCHES "^emulator/ui/" OR naming_path MATCHES "^test/lib/fixtures/")
             continue()
         endif()
         if(naming_path MATCHES "(^|/)${retired_prefix}-" OR
