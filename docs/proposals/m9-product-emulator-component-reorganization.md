@@ -92,3 +92,20 @@ continues to forward `debug` and every App extension: entering the debugger is
 independent of machine state, and each receiver owns any later machine-state
 check. Prove both fixed and extension routing at the Emulator monitor boundary.
 Do not change Lib, Core, Compat, user configuration or machine-state ownership.
+
+## S20 P4 — prevent duplicate paused completion after snapshot load
+
+`load` already emits its App-owned successful completion after the synchronous
+Machine state write returns.  Machine correctly also publishes the resulting
+`PAUSED` fact to Session.  Product Monitor must not reinterpret every arrival
+at `PAUSED` as an independent user-requested pause: only `RUNNING -> PAUSED`
+emits `Machine paused.` and requests a prompt.  In particular, `INIT/STOPPED
+-> PAUSED` remains a state fact without a second Product message, so the
+App-owned load completion is the sole user-visible result.
+
+This is a Product Monitor presentation rule, not a Machine event-cause API:
+Machine keeps one truthful state fact, Session keeps its existing reduction,
+and the App retains ownership of successful load wording.  Add focused
+transition assertions for both initial and stopped snapshot restoration; do
+not change Lib, Machine, Session, App, Core, Compat, user configuration or
+snapshot format.

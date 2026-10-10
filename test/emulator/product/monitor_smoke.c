@@ -256,6 +256,12 @@ static void lifecycle_contract(void)
         EMULATOR_SESSION_MACHINE_RUNNING, EMULATOR_SESSION_MACHINE_RESET_COMPLETED, &result);
     lib_test_assert(lib_text_compare(result.text, "Machine reset and paused.\r\n") == 0 &&
         result.arm_prompt);
+    emulator_product_monitor_provider_note_runtime((void *)&provider,
+        EMULATOR_SESSION_MACHINE_STOPPED, EMULATOR_SESSION_MACHINE_PAUSED, &result);
+    lib_test_assert(result.text[0] == '\0' && !result.arm_prompt);
+    emulator_product_monitor_provider_note_runtime((void *)&provider,
+        EMULATOR_SESSION_MACHINE_INIT, EMULATOR_SESSION_MACHINE_PAUSED, &result);
+    lib_test_assert(result.text[0] == '\0' && !result.arm_prompt);
 }
 
 int main(void)

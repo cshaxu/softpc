@@ -7,19 +7,19 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner reopens S20 after acceptance found that P2 removed the startup monitor preamble and its ERROR guard blocked debugger entry. |
-| Objective | Restore the generic Product Surface preamble, narrow ERROR command admission so debugger entry remains available, and add focused non-desktop regression proof. |
-| Non-goals | Do not change NXVM directly; do not add an App-specific banner, parser, executor, Session state machine or compatibility shim; do not change Core, Compat, user INI, guest media or unrelated worktree changes; do not claim manual product acceptance. |
+| Admission And Approval | Owner reopens S20 after acceptance found that P2 removed the startup monitor preamble and its ERROR guard blocked debugger entry; after P3, owner reports duplicate `Machine paused.` output after successful snapshot load and approves the narrowed Product-monitor correction. |
+| Objective | Restore the generic Product Surface preamble, narrow ERROR command admission so debugger entry remains available, and ensure the PAUSED runtime fact after a synchronous snapshot load does not duplicate the App-owned load result. |
+| Non-goals | Do not change NXVM directly; do not add an App-specific banner, parser, executor, Session state machine, Machine event-cause field or compatibility shim; do not change Core, Compat, user INI, guest media or unrelated worktree changes; do not claim manual product acceptance. |
 | Reference Baseline | SoftPC `8cbe40da`; NXVM remains read-only comparison material. |
-| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20-p3--restore-the-neutral-surface-preamble-and-narrow-error-admission) |
-| Files And ABI Surface | `src/product/surface/entry.c`, `src/emulator/product/monitor.c`, their manifests, and the focused Product/Emulator tests. The existing Product name input remains generic; no new ABI or App configuration field is added. |
+| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20-p4--prevent-duplicate-paused-completion-after-snapshot-load) |
+| Files And ABI Surface | `src/product/surface/entry.c`, `src/emulator/product/monitor.c`, their manifests, and the focused Product/Emulator tests. The existing Product name input remains generic; no new ABI, App configuration or Machine event field is added. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; exact shared-corpus boundary; C11 six-package rule; user configuration/media preservation. |
 | Verification | Run Product/Emulator focused tests on x64/x86, corpus/manifest/dependency gates, then proportional dual-width package builds and background CTest excluding desktop. |
-| Expected Markers | Opening output is `<name>\n\nBuilt on <date> <time>\n\n`; ERROR rejects only `start`/`stop`/`pause`/`resume`/`reset`/`save`/`load` while dispatching debug and every App extension; dependency direction remains `lib < emulator < product`; package configuration/media are untouched. |
+| Expected Markers | Opening output is `<name>\n\nBuilt on <date> <time>\n\n`; ERROR rejects only `start`/`stop`/`pause`/`resume`/`reset`/`save`/`load` while dispatching debug and every App extension; only `RUNNING -> PAUSED` creates the generic pause text/prompt; dependency direction remains `lib < emulator < product`; package configuration/media are untouched. |
 | Asset Needs | Refresh package EXEs because production sources change; never modify `assets/binary/softpc.ini`, media or snapshots. |
 | Reporting Requirements | Pre/post path and line accounting by source/test root; focused behavior proof, dual-width evidence, refreshed EXE links/hashes, and one complete pushed P followed by owner validation. |
 | Stop Conditions | A required App-specific API, Core/Compat change, broken manifest/dependency boundary, or failing dual-width verification requiring behavior design beyond the admitted two contracts. |
-| Exit Criteria | The two failed contracts have focused proofs; task-owned changes are committed and pushed; worktree is clean except preserved owner changes; await owner validation. |
+| Exit Criteria | The three failed contracts have focused proofs; task-owned changes are committed and pushed; worktree is clean except preserved owner changes; await owner validation. |
 | Original Owner Request | 同意，请你重开本S任务予以修复。 |
 | Similar-Issue Sweep | Inspect all monitor ERROR routes and Product startup-output owners; record each fixed-command/extension disposition and ensure no other imported path silently removes the monitor opening. |
 
@@ -55,6 +55,23 @@ integration proof.  Dual Release package builds and background CTest pass
 Owner acceptance found that P2 incorrectly dropped the existing generic
 Surface opening, and review found its ERROR guard also blocked debugger entry.
 P3 is active under the revised packet above; P2 is not accepted or closed.
+
+### S20 P4 delivery awaiting owner validation
+
+P4 preserves Machine's one `PAUSED` runtime fact after a successful state
+write.  Product Monitor alone distinguishes an ordinary `RUNNING -> PAUSED`
+completion from `INIT/STOPPED -> PAUSED` restoration, so the App-owned
+`Machine loaded and paused.` result remains the only load completion line and
+the queued runtime fact does not arm a second prompt.  P4 adds only focused
+Emulator monitor coverage and manifest updates; it does not alter Machine,
+Session, App, snapshot format or any public interface.
+
+Focused Emulator monitor, source/test manifest, corpus and boundary checks
+pass 5/5 on x64 and x86.  Both Ninja Release package targets rebuild the
+published EXEs: x86 `F859627096569874C1AAD4DD713B2C4E1024F22F41E3EB9EC344F74C1A980F7C`,
+x64 `E7FFCA2BF0DB84B0C89E3857F94F756E73EBC80FE26AAD543A482D175D411369`.
+Production is +1/-2 (net -1); focused test code is +6/-0, with two manifest
+hash replacements.  P4 awaits owner validation.
 
 ### S20 delivery awaiting owner validation
 

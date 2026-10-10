@@ -308,7 +308,7 @@ void emulator_product_monitor_provider_note_runtime(void *opaque,
     if (completed == EMULATOR_SESSION_MACHINE_RESET_COMPLETED)
         emulator_product_monitor_message(out_result, "Machine reset and paused.");
     else if (completed == EMULATOR_SESSION_MACHINE_PAUSED &&
-        prior != EMULATOR_SESSION_MACHINE_PAUSED)
+        prior == EMULATOR_SESSION_MACHINE_RUNNING)
         emulator_product_monitor_message(out_result, "Machine paused.");
     else if (completed == EMULATOR_SESSION_MACHINE_RUNNING &&
         prior == EMULATOR_SESSION_MACHINE_STOPPED)
@@ -321,7 +321,6 @@ void emulator_product_monitor_provider_note_runtime(void *opaque,
         emulator_product_monitor_message(out_result, "Machine stopped.");
     else if (completed == EMULATOR_SESSION_MACHINE_ERROR)
         emulator_product_monitor_message(out_result, "Machine error.");
-    out_result->arm_prompt = LIB_TRUE;
     emulator_product_monitor_set_prompt(out_result);
 }
 
