@@ -84,8 +84,9 @@ Product tests are classified by ownership: test/app-softpc/unit/product covers c
 and App-specific extensions; test/product/surface covers shared commands, keys and
 composition; test/app-softpc/unit/{machine,compat,softpc.new} covers concrete
 machine, compatibility host and recovered-mirror units; test/app-softpc/integration covers composed worker, command, snapshot,
-frame and package flows. Historical CTest labels remain execution selectors,
-not a claim that every test labelled unit is isolated. Product fixtures and
+frame and package flows. CTest names retain their owner path; labels identify
+the owner and execution class, not a claim that every test labelled unit is
+isolated. Product fixtures and
 checks live beside their owner: test/app-softpc/integration/machine_fixture.c/h is the
 single product driver/Emulator assembly fixture, snapshot orchestration is in
 test/app-softpc/integration, and product static gates are in tools/checks. Test execution is summarized in test/README.md.

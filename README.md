@@ -205,8 +205,11 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 - `src/emulator/` — shared machine executor, session control and UI composition.
 - `src/x86/` — optional shared x86 debugger and assembly/disassembly components.
 - `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
-- `test/unit/`, `test/app-softpc/integration/`, `test/support/` — self-contained unit,
-  fixed-package integration, and shared/diagnostic test support respectively.
+- `test/lib/`, `test/emulator/`, `test/product/` — independently reusable
+  component suites.
+- `test/app-softpc/unit/`, `test/app-softpc/integration/` — SoftPC-specific
+  concrete unit and composed-runtime tests.
+- `tools/checks/` — repository source, build, package and documentation gates.
 
 The standalone core never accepts a product-shell callback or selector
 service. Hardware and firmware behavior is machine-owned state and typed

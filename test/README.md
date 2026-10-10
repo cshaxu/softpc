@@ -5,24 +5,24 @@
 | [lib](lib/README.md) | Independently reusable Lib tests and fixtures. |
 | [emulator](emulator/README.md) | Independently reusable neutral Emulator tests and fake machine. |
 | [product](product/) | Independently reusable Product command, debugger, assembler and surface tests. |
-| app | Product configuration, command parsing and key bindings. |
-| core | Concrete machine, compatibility host, devices, media and ABI. |
-| integration | Product command/worker/frame/snapshot/shutdown chains and package boot. |
-| checks | Product source, build and package boundary checks. |
+| [app-softpc/unit](app-softpc/unit/) | SoftPC configuration and concrete machine/Compat unit tests. |
+| [app-softpc/integration](app-softpc/integration/) | SoftPC composed command, worker, frame, snapshot, shutdown and package flows. |
+| [../tools/checks](../tools/checks/) | Repository source, build, package and documentation boundary checks. |
 
-Root CMake registers product tests. Public CTest names begin with their owning
-test root (`lib`, `emulator`, or `product`) and retain any nested test directory;
-the historical `unit` label is not a guarantee of isolated execution.
+Root CMake registers every suite. Public CTest names begin with their actual
+owner path (`lib`, `emulator`, `product`, `app-softpc`, or `checks`) and retain
+any nested test directory. Labels identify the test owner and execution class;
+they are not a guarantee of isolated execution.
 Self-contained tests create disposable media in their build working directory.
 Only `runtime_restart_boot_smoke` reads the fixed installed image;
 `package_smoke` exercises the matching packaged EXE and owner configuration.
 They use non-mutating media modes; tests must not overwrite supplied media/INI.
 
-`integration/machine_fixture.c/h` assembles one SoftPC driver and Emulator machine
+`app-softpc/integration/machine_fixture.c/h` assembles one SoftPC driver and Emulator machine
 for three worker/boot tests. It owns only these two test objects; callers own
 the original machine. Tests call Emulator directly after assembly. It is not the
 neutral fake machine from test/emulator and is not part of any reusable corpus.
-`integration/snapshot_cross_process.cmake` orchestrates disposable save/load
+`app-softpc/integration/snapshot_cross_process.cmake` orchestrates disposable save/load
 processes using the existing snapshot transaction test.
 
 Configure with `cmake --preset mingw-gcc-x64-release` (or x86), then build with

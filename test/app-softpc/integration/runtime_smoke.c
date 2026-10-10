@@ -1,9 +1,7 @@
 #include "../time.h"
 #include "lib/types/types_interface.h"
 #include "machine_fixture.h"
-#include "emulator/session/control.h"
-#include "emulator/machine/input_queue.h"
-#include "../unit/machine/cleanup.h"
+#include "../cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -91,40 +89,6 @@ int main(void)
         &completion_probe);
     emulator_machine_set_frame_sink(runtime, runtime_frame_probe_receive,
         &completion_probe);
-    /* The product control FIFO must not turn a short input burst into a
-       silently dropped make/break sequence at its old fixed-64 boundary. */
-    {
-        emulator_session_queue storage = { 0 }, *queue = &storage;
-        kvm_input_event event = { 0 };
-        emulator_session_event copied;
-        unsigned int index;
-        assert(emulator_session_queue_initialize(queue));
-        event.type = KVM_EVENT_TEXT;
-        for (index = 0u; index < 96u; ++index) {
-            event.data.text.scalar = index;
-            assert(emulator_session_queue_push_kvm_for_run(queue, &event, 0u));
-        }
-        for (index = 0u; index < 96u; ++index) {
-            assert(emulator_session_queue_take(queue, &copied, 0u));
-            assert(copied.kind == EMULATOR_SESSION_EVENT_KVM_INPUT);
-            assert(copied.value.kvm.data.text.scalar == index);
-        }
-        emulator_session_queue_dispose(queue);
-    }
-    {
-        emulator_machine_input_queue storage = { 0 }, *queue = &storage;
-        kvm_input_event event = { 0 };
-
-        assert(emulator_machine_input_queue_initialize(queue) == LIB_STATUS_OK);
-        event.type = KVM_EVENT_KEY;
-        event.data.key.scan_code = 0x1eu;
-        event.data.key.pressed = 1u;
-        assert(emulator_machine_input_queue_push(queue, &event));
-        assert(emulator_machine_input_queue_pending(queue));
-        emulator_machine_input_queue_clear(queue);
-        assert(!emulator_machine_input_queue_pending(queue));
-        emulator_machine_input_queue_dispose(queue);
-    }
     assert(emulator_machine_start(runtime));
     first_run = emulator_machine_run_generation(runtime);
     assert(first_run != 0u);

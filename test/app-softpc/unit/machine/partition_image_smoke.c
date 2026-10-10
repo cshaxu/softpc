@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
-#include "cleanup.h"
+#include "../../cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

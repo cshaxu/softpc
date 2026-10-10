@@ -2,62 +2,31 @@
 
 ## Current Work
 
-M9 T86 S1 is active: owner validation disproved the first cursor hypothesis;
-repair the raw Console to cooked monitor handoff without changing viewport
-policy.
+M9 T86 S2 is active: normalize the remaining SoftPC-only test corpus to the
+same ownership, identity and isolation standard as the public components. This
+continuation follows T86 S1's delivered Console handoff repair and does not
+alter that repair's product boundary.
 
-## M9 T86 S1 Packet
+## M9 T86 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner admits a new T to repair the raw Console-to-cooked Console handoff after T85 closure. Owner validation reports that the first private reader-start cursor resubmission did not repair native echo placement, and directs continuation within the same broker boundary. |
-| Objective | Reproduce and identify the shared native Console state mismatch that leaves the cooked prompt and its reader/echo on different rows after `start` then CAP returns raw Console control to the cooked monitor; implement only the smallest owner-local correction supported by evidence. |
-| Non-goals | Do not use Computer Use; do not change guest video, Machine, Session command semantics, Product monitor text, App configuration, package INI, guest media or snapshots; do not add polling, retries, a second reader, viewport-forcing workaround or app-specific row policy. |
-| Reference Baseline | SoftPC `f0625d51`; read-only NTVDM64 remains comparison material only. |
-| Candidate Proposal | [Raw Console to cooked monitor handoff repair](../proposals/m9-raw-console-cooked-handoff.md) |
-| Files And ABI Surface | Initially inspect `src/lib/console-broker/win32`, Lib Console contracts, Emulator UI binding order and their existing tests. Any source change must remain behind the existing Console/Broker contract; no public ABI change without owner approval. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus ownership; preserve owner configuration/media; no Computer Use. |
-| Verification | Static transition trace plus a disposable native-Console probe or focused injected test; compare read-only NTVDM64 implementation; if a repair is admitted, run focused x64/x86 tests and proportional package/background verification. |
-| Expected Markers | During cooked surface selection, its saved cursor is explicitly restored before its saved viewport, and there is one reader; raw-to-cooked return has prompt, native echo and cursor on the same logical row; no viewport growth or app-specific row policy. |
-| Asset Needs | May read and launch the existing `assets/binary` executable only without modifying its INI, media or snapshots; any probe output stays disposable under `build/`. |
-| Reporting Requirements | Record exact transition order and native buffer/viewport/cursor facts, NTVDM64 comparison, finite similar-issue sweep and a pre-change estimate before any code edit. Report production/test line counts and dual-width evidence for any delivered repair. |
-| Stop Conditions | Evidence requires a public API change, host-terminal-specific workaround, App-specific rows, guest/video change, or unavailable native Console observation; stop for owner design direction. |
-| Exit Criteria | Root cause and owner are evidenced; the minimal verified repair is committed/pushed with its tests and package EXEs, then owner validates the native Console path before S/T closure. |
-| Original Owner Request | 准入新T修复console交接问题。 |
-| Similar-Issue Sweep | Inspect every raw/cooked activation, cooked-line request, output selection and backing-surface setup path; distinguish normal cooked-to-cooked activation from raw-to-cooked return. |
-
-### S1 P8: owner-approved shared-corpus synchronization
-
-The owner expands this active repair with a bounded shared-corpus refresh from
-the read-only current NXVM worktree. The six public roots
-`src/{lib,emulator,product}` and `test/{lib,emulator,product}` remain the
-complete universe. Import every current NXVM difference, including its
-component-local manifest-v1 gates and the Product Surface banner-forwarding
-proof; do not import NXVM App/Core code or artifacts. Rebuild both SoftPC
-packages, run Lib/Emulator/Product suites first, then the full non-desktop
-x64/x86 test presets. The original raw-to-cooked native owner validation
-remains an independent T86 exit requirement.
-
-### S1 P9: owner-directed execution-timeout correction
-
-The owner directs a permanent execution-rule correction after the executor
-incorrectly started known long CTest cases in a foreground command subject to
-the host's 30-second limit. All remaining long verification for this packet
-uses owned background jobs with logs, exit-code files and cleanup. The rule
-change records that requirement repository-wide; it does not alter production,
-test semantics, package configuration or the original raw-to-cooked repair.
-
-### S1 P10: owner-approved shared-test identity and cleanup correction
-
-The owner directs a bounded shared-corpus test correction: every public CTest
-name uses its actual corpus path prefix (`lib`, `emulator`, or `product`),
-without compatibility aliases; nested Product-owner tests retain their
-directory identity. The correction also restores the omitted interrupted-run
-cleanup of the Lib type-layout lock probe. It changes only shared test
-registration, test documentation and manifests; no production source, public
-ABI, user configuration or native Console behavior changes. Rebuilt package
-binaries retain the same production source behavior.
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner directs the next S task after the read-only audit of every non-public test owner: bring SoftPC-only tests to the same code, configuration, directory, encapsulation, reuse and efficiency standard as the public component suites. |
+| Objective | Remove confirmed duplicate Emulator coverage from App integration, repair App-test helper ownership, isolate all background test output, normalize public CTest identities and ownership labels, and correct live test-layout documentation. |
+| Non-goals | Do not modify Lib, Emulator, Product or App/Core production source; do not change public ABI, package EXEs, package INI, guest media, snapshots, desktop-test behavior or user-visible product semantics; do not use Computer Use. |
+| Reference Baseline | SoftPC `00905b3d`; public corpus remains the exact current NXVM import baseline and is not edited by this task. |
+| Candidate Proposal | [Outer test quality normalization](../proposals/m9-outer-test-quality.md) |
+| Files And ABI Surface | `CMakeLists.txt`, `test/app-softpc/**`, `tools/checks/**` only if its live ownership gate needs a path-name update, root `README.md`, `test/README.md`, `docs/design/CODING.md` only if its current topology text needs correction, and the task proposal/state. No production or public interface file changes. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus ownership; preserve owner configuration/media; long operations run as owned background jobs. |
+| Verification | Before change, record every App/Core test source, root CTest registration, work directory, label and direct Emulator implementation compilation. After change, run CMake configure/build; focused affected App, Emulator and static-gate tests on x64/x86; then owned-background complete non-desktop `test-x64`/`test-x86`. |
+| Expected Markers | App integration no longer re-proves Emulator FIFO behavior or compiles Emulator Session implementation; shared App helpers live at their actual scope; no live `test/integration` CMake path remains; every non-desktop test has a private ignored build working directory; external public CTest names express actual owner paths; labels describe real ownership. |
+| Asset Needs | Read-only checked-in `assets/media/win31_en_installed.img` remains input to the restart test; any generated media/snapshot stays inside its per-test ignored build directory. Never change `assets/binary/softpc.ini`, package executables, media or snapshots. |
+| Reporting Requirements | Record the finite ledger disposition for all App/Core test sources and root checks, pre/post test/CMake line counts, removed duplicate test behavior, retained white-box-test reasons, actual x64/x86 focused/full evidence and one complete pushed P. |
+| Stop Conditions | Any needed production/API change; a removed assertion has no equivalent owning-suite proof; a formerly serial test proves externally shared state even after private work directories; renaming is consumed by a live external contract; or a test cannot access checked-in media through an explicit read-only configuration value. |
+| Exit Criteria | The finite ledger is complete; no confirmed duplicate or stale-path defect remains in scope; x64/x86 verification passes; task changes are committed/pushed; worktree is clean except owner changes; then await owner acceptance before T closure. |
+| Original Owner Request | 很好，现在，对公共组件之外的所有测试组件进行一次代码质量审计，使他们也能达到相同标准：代码质量、配置质量、目录文件结构正确性、移出重复测试提高效率、组件测试的封装性和共用性问题等。准入一个新的S任务修复。 |
+| Similar-Issue Sweep | Enumerate every source under `test/app-softpc`, every root `add_test`, all test-only direct `.c` inclusions, working-directory exceptions, labels, helper includes and live layout references. Each is retained, moved, removed or documented with an owner-local reason. |
 
 ## Historical M9 T85 S20 delivery record
 

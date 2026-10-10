@@ -5,7 +5,8 @@ function(softpc_check_build_source target source)
     endif()
     get_filename_component(path "${source}" ABSOLUTE BASE_DIR "${SOFTPC_SOURCE_DIR}")
     file(RELATIVE_PATH path "${SOFTPC_SOURCE_DIR}" "${path}")
-    if((path MATCHES "^src/app-softpc/machine/" AND NOT target STREQUAL "softpc-vm") OR
+    if((path MATCHES "^src/emulator/" AND target MATCHES "^softpc-") OR
+       (path MATCHES "^src/app-softpc/machine/" AND NOT target STREQUAL "softpc-vm") OR
        (target STREQUAL "softpc-vm" AND NOT path MATCHES "^src/app-softpc/machine/") OR
        (target STREQUAL "softpcvm" AND NOT path MATCHES "^src/app-softpc/product/"))
         message(FATAL_ERROR "Build ownership: ${target} compiles ${path}")
@@ -18,6 +19,7 @@ elseif(CMAKE_SCRIPT_MODE_FILE)
     foreach(sample IN ITEMS "softpc-vm|src/app-softpc/machine/driver.c|0"
         "softpcvm|src/app-softpc/product/composed_machine.c|0" "probe|test/app-softpc/unit/machine/machine_smoke.c|0"
         "softpcvm|src/app-softpc/machine/driver.c|1" "probe|src/app-softpc/machine/debug.c|1"
+        "softpc-runtime-smoke|src/emulator/session/control.c|1"
         "softpc-machine|src/app-softpc/machine/input.c|1" "softpc-vm|src/app-softpc/compat/platform.c|1"
         "softpcvm|src/app-softpc/product/../core/compat/platform.c|1")
         string(REPLACE "|" ";" parts "${sample}")

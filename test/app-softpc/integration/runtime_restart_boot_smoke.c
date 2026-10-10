@@ -291,7 +291,7 @@ int main(void)
     unsigned int cycle;
     runtime_frame_probe frame_probe = { 0 };
 
-    options.hard_disk_path = "assets/media/win31_en_installed.img";
+    options.hard_disk_path = SOFTPC_TEST_RESTART_BOOT_IMAGE;
     options.memory_bytes = 16u * 1024u * 1024u;
     options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;

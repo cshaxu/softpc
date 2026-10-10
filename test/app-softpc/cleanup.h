@@ -1,4 +1,4 @@
-#include "../../time.h"
+#include "time.h"
 #ifndef SOFTPC_TEST_CLEANUP_H
 #define SOFTPC_TEST_CLEANUP_H
 

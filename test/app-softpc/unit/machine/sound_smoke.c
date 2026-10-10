@@ -2,7 +2,7 @@
 #include "machine/machine.h"
 #include "compat/audio.h"
 #include "compat/devices/snapshot.h"
-#include "cleanup.h"
+#include "../../cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
