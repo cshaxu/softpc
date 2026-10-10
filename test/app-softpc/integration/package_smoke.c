@@ -460,9 +460,6 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (GetConsoleCP() == 0u) { stage = 1; goto done; }
     /* Hide only our Console, not the child's first KVM ShowWindow call. */
     ShowWindow(GetConsoleWindow(), SW_HIDE);
-    if (!package_window_display && IsWindowVisible(GetConsoleWindow())) {
-        stage = 20; goto done;
-    }
     input = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0u, NULL);
     output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
@@ -511,7 +508,10 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         goto done;
     }
     if (!package_wait_for_dos_prompt(output, 10000u)) { stage = 5; goto done; }
-    if (IsWindowVisible(GetConsoleWindow())) { stage = 20; goto done; }
+    /* Raw activation rightly gives its Console focus. The test owns this
+     * Console, so hide it again after that transition; all following input
+     * and output assertions use its handles rather than visible pixels. */
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
     if (!package_send_text(input, "ver\r") ||
         !package_wait_for_buffer_text(output, "Version", 5000u)) { stage = 14; goto done; }
     if (!package_send_text(input, "cls\r") ||

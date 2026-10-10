@@ -76,6 +76,7 @@ int main(void)
     lib_test_assert(console_broker_backend_cancel_cooked_line(&b, &completed) == 0 && completed);
     lib_console_release(b.console);
     lib_test_assert(console_broker_backend_deactivate(&b, LIB_NULL) == 0);
+    lib_test_assert(flushes == 3);
     lib_win32_close_handle(entered); lib_win32_close_handle(finish_read); lib_win32_close_handle(delivered);
     return 0;
 }
