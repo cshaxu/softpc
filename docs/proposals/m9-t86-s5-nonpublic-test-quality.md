@@ -129,6 +129,11 @@ route as `app-softpc/integration/<route>`.  It therefore accounts for exactly
 28 unit, 10 integration, and 9 check routes without maintaining a second
 CMake classification list.
 
+The two desktop routes share the exact `softpc-package-desktop` CTest resource
+lock.  They both own the same package output directory and native Console/
+Window, so a label alone is insufficient to prevent an invalid parallel run;
+the lock serializes only this pair rather than all tests.
+
 ## Implementation evidence
 
 - Fresh x64 and x86 MinGW preset configuration succeeds; x86 reports a

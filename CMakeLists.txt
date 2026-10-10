@@ -673,6 +673,7 @@ add_test(NAME "app-softpc/integration/package_smoke/compact_console" COMMAND sof
 set_tests_properties("app-softpc/integration/package_smoke" "app-softpc/integration/package_smoke/compact_console" PROPERTIES
     LABELS "integration;app-softpc;desktop;${SOFTPC_TEST_WIDTH_LABEL}"
     TIMEOUT 90
+    RESOURCE_LOCK "softpc-package-desktop"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(SOFTPC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
