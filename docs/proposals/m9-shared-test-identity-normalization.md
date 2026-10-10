@@ -1,12 +1,12 @@
-# Shared public-test identity normalization
+# Shared public-test registration conformance
 
 ## Observed design defect
 
-The shared test registration helper derives a target name from only the final
-source-path segment. Its public CTest identity must instead retain the complete
-test-relative path. Product also mixes that path-preserving style with manually
-registered dot, underscore and hyphen names. Lib uses a separate `library.*`
-prefix even though its public directory is `lib`.
+The public helper preserves the complete test-relative identity, but 21
+explicit Lib/Emulator script and verifier registrations omit their owner label.
+The latest NXVM worktree attempts to repair that omission by renaming `lib.*`
+to `library.*`, which conflicts with the canonical public directory and the
+approved SoftPC component name.
 
 CTest names are part of the public verification interface: they are used for
 selection, diagnostics and future collision avoidance.  They should identify
@@ -15,9 +15,7 @@ filename or a private directory layout.
 
 ## Intended normalization
 
-Use the public test-relative source identity at each registration site. The
-shared helper constructs the CTest name from the corpus root and that complete
-relative identity. The resulting grammar is:
+Retain every existing public CTest identity. The grammar is:
 
 ```text
 lib.<relative-test-source>
@@ -25,28 +23,31 @@ emulator.<relative-test-source>
 product.<relative-test-source>
 ```
 
-Examples include `emulator.product/monitor`, `emulator.session_monitor`,
+Examples include `lib.manifest`, `emulator.product/monitor`,
 `product.surface/command`, and `product.xasm32/xasm32_contract`. A root-owned
-test has no artificial directory segment. All existing selector names must be
-inventoried and renamed consistently; there must be no hidden aliases or
-duplicate test registrations.
+test has no artificial directory segment. Every entry must retain one owner
+prefix and have labels `unit;<owner>`; `desktop` and resource locks stay
+additive. There are no aliases or duplicate registrations.
 
-The task changes only test registration/build metadata and, where useful,
-test directory/file spelling. It does not alter production code, test behavior,
-component dependency direction, public C interfaces, package behavior, user
-configuration or media.
+The task changes only test registration/build metadata and manifests. One
+Lib fixture reset is rewritten in place to avoid compiler-created giant stack
+temporaries; it preserves the same reset values and assertions. The task does
+not alter production code, test behavior, component dependency direction,
+public C interfaces, package behavior, user configuration or media.
 
 ## Scope and acceptance
 
 The finite universe is every CTest registration defined by
 `test/lib/CMakeLists.txt`, `test/emulator/CMakeLists.txt`,
 `test/product/CMakeLists.txt`, and the shared `test/register.cmake` helper.
-Before editing, record each current name, source, owner and proposed final
-identity; after editing, prove that every selected test has exactly one
-registration, names conform to the grammar, and all public component suites
-pass on x64 and x86.  Preserve the existing desktop labels and resource locks.
+Before editing, record all 87 current public registrations and the 21
+unlabelled entries. After editing, prove every selected test has exactly one
+registration, every name conforms to the existing grammar, every entry has
+`unit;<owner>`, and all public component suites pass standalone and embedded on
+x64 and x86. Preserve existing desktop labels and resource locks.
 
-Do not fold in production refactoring, new test behavior, test-framework
-features, compatibility aliases or unrelated App/Core tests.  If a current
-name is consumed by an external CI contract that cannot move atomically, stop
-for owner direction rather than retaining a second registration.
+Do not fold in production refactoring, new test behavior, compatibility
+aliases, `library.*` renames, unrelated App/Core tests or a new framework. If
+a current name is consumed by an external CI contract that cannot retain its
+existing spelling, stop for owner direction rather than retaining a second
+registration.

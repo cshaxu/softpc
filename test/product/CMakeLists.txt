@@ -73,6 +73,7 @@ add_test(NAME product.manifest COMMAND "${CMAKE_COMMAND}"
     "-DPRODUCT_ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
     -P "${PRODUCT_ROOT}/verify_manifest.cmake")
 set_tests_properties(product.manifest PROPERTIES LABELS "unit;product" TIMEOUT 30)
+shared_verify_test_registration(product)
 
 foreach(target IN LISTS SHARED_PRODUCT_TEST_TARGETS)
     if(MSVC)

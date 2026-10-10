@@ -22,3 +22,21 @@ function(shared_register_test corpus source)
     list(APPEND ${list_name} ${target})
     set(${list_name} "${${list_name}}" PARENT_SCOPE)
 endfunction()
+
+# Explicit script/verifier registrations share the same public contract as
+# smoke registrations.  Check it during configure so a missing owner label
+# cannot silently weaken selection in either standalone or embedded builds.
+function(shared_verify_test_registration corpus)
+    get_property(registered_tests DIRECTORY PROPERTY TESTS)
+    foreach(test_name IN LISTS registered_tests)
+        if(NOT test_name MATCHES "^${corpus}[.]")
+            message(FATAL_ERROR "Shared ${corpus} test has foreign identity: ${test_name}")
+        endif()
+        get_test_property(${test_name} LABELS labels)
+        list(FIND labels unit unit_index)
+        list(FIND labels "${corpus}" owner_index)
+        if(unit_index EQUAL -1 OR owner_index EQUAL -1)
+            message(FATAL_ERROR "Shared ${corpus} test lacks unit/owner labels: ${test_name}")
+        endif()
+    endforeach()
+endfunction()

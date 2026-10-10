@@ -2,31 +2,30 @@
 
 ## Current Work
 
-M9 T86 S2 is active: normalize the remaining SoftPC-only test corpus to the
-same ownership, identity and isolation standard as the public components. This
-continuation follows T86 S1's delivered Console handoff repair and does not
-alter that repair's product boundary.
+M9 T86 S3 is active: complete shared public-test registration conformance.
+It follows the owner-accepted App-test normalization in S2 and preserves the
+public `lib.*`, `emulator.*`, and `product.*` CTest identity grammar.
 
-## M9 T86 S2 Packet
+## M9 T86 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs the next S task after the read-only audit of every non-public test owner: bring SoftPC-only tests to the same code, configuration, directory, encapsulation, reuse and efficiency standard as the public component suites. |
-| Objective | Remove confirmed duplicate Emulator coverage from App integration, repair App-test helper ownership, isolate all background test output, normalize public CTest identities and ownership labels, and correct live test-layout documentation. |
-| Non-goals | Do not modify Lib, Emulator, Product or App/Core production source; do not change public ABI, package EXEs, package INI, guest media, snapshots, desktop-test behavior or user-visible product semantics; do not use Computer Use. |
-| Reference Baseline | SoftPC `00905b3d`; public corpus remains the exact current NXVM import baseline and is not edited by this task. |
-| Candidate Proposal | [Outer test quality normalization](../proposals/m9-outer-test-quality.md) |
-| Files And ABI Surface | `CMakeLists.txt`, `test/app-softpc/**`, `tools/checks/**` only if its live ownership gate needs a path-name update, root `README.md`, `test/README.md`, `docs/design/CODING.md` only if its current topology text needs correction, and the task proposal/state. No production or public interface file changes. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus ownership; preserve owner configuration/media; long operations run as owned background jobs. |
-| Verification | Before change, record every App/Core test source, root CTest registration, work directory, label and direct Emulator implementation compilation. After change, run CMake configure/build; focused affected App, Emulator and static-gate tests on x64/x86; then owned-background complete non-desktop `test-x64`/`test-x86`. |
-| Expected Markers | App integration no longer re-proves Emulator FIFO behavior or compiles Emulator Session implementation; shared App helpers live at their actual scope; no live `test/integration` CMake path remains; every non-desktop test has a private ignored build working directory; external public CTest names express actual owner paths; labels describe real ownership. |
-| Asset Needs | Read-only checked-in `assets/media/win31_en_installed.img` remains input to the restart test; any generated media/snapshot stays inside its per-test ignored build directory. Never change `assets/binary/softpc.ini`, package executables, media or snapshots. |
-| Reporting Requirements | Record the finite ledger disposition for all App/Core test sources and root checks, pre/post test/CMake line counts, removed duplicate test behavior, retained white-box-test reasons, actual x64/x86 focused/full evidence and one complete pushed P. |
-| Stop Conditions | Any needed production/API change; a removed assertion has no equivalent owning-suite proof; a formerly serial test proves externally shared state even after private work directories; renaming is consumed by a live external contract; or a test cannot access checked-in media through an explicit read-only configuration value. |
-| Exit Criteria | The finite ledger is complete; no confirmed duplicate or stale-path defect remains in scope; x64/x86 verification passes; task changes are committed/pushed; worktree is clean except owner changes; then await owner acceptance before T closure. |
-| Original Owner Request | 很好，现在，对公共组件之外的所有测试组件进行一次代码质量审计，使他们也能达到相同标准：代码质量、配置质量、目录文件结构正确性、移出重复测试提高效率、组件测试的封装性和共用性问题等。准入一个新的S任务修复。 |
-| Similar-Issue Sweep | Enumerate every source under `test/app-softpc`, every root `add_test`, all test-only direct `.c` inclusions, working-directory exceptions, labels, helper includes and live layout references. Each is retained, moved, removed or documented with an owner-local reason. |
+| Admission And Approval | Owner accepts S2 and explicitly admits S3: keep `lib` as the Lib component and repair the remaining public-test registration quality issue rather than importing NXVM's uncommitted `library.*` rename. |
+| Objective | Give every shared Lib, Emulator and Product CTest an explicit, truthful `unit;<owner>` label; preserve existing public identities and enforce that component-local registration remains owner-named and owner-labelled in standalone and embedded configuration. Repair the discovered standalone Lib fixture stack exhaustion without changing its test case or assertions. |
+| Non-goals | Do not rename any CTest to `library.*`; do not change production source, public ABI, package EXEs, INI, media, snapshots, desktop behavior, CTest selection semantics, resource locks or timeout policy except retaining an already-required timeout where it is explicitly declared. The one fixture-only reset rewrite is permitted solely to remove compiler-created stack temporaries while preserving identical reset values and assertions. Do not use Computer Use. |
+| Reference Baseline | SoftPC `a987bb5e`; all 21 missing labels are in the shared public registration CMake files. NXVM's readable worktree is comparison evidence only and its uncommitted `library.*` spelling is rejected. |
+| Candidate Proposal | [Shared public-test registration conformance](../proposals/m9-shared-test-identity-normalization.md) |
+| Files And ABI Surface | `test/register.cmake`, `test/{lib,emulator,product}/CMakeLists.txt`, their three test manifests, `test/lib/kvm_window_capture_contract_smoke.c`, the candidate proposal/state/closure record, and only a narrowly-scoped registration verifier if configure-time enforcement cannot be expressed by the existing helper. No production or public interface file changes. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus ownership; C11 six-package rule; preserve owner configuration/media; long operations run as owned background jobs. |
+| Verification | Before change, freeze the 87 public CTest registrations and their names/labels. After change configure standalone Lib, Emulator and Product on x64/x86; assert every public test name begins with its owner and every public test has `unit` plus its owner label; run the three public suites and root focused registration/manifest checks on x64/x86, then complete non-desktop product tests on both widths. Directly prove the repaired capture-contract fixture on x64/x86. |
+| Expected Markers | No `library.*` CTest exists; all 21 prior unlabelled checks are labelled; all 87 public registrations have exactly one owner prefix and `unit;<owner>` labels; desktop labels/resource locks remain additive; a missing owner prefix or label fails configuration rather than silently passing; capture-contract uses no giant frame reset temporary. |
+| Asset Needs | None. Generated test data remains below ignored `build/`. Never change `assets/binary/softpc.ini`, package executables, media or snapshots. |
+| Reporting Requirements | Record the frozen 87-entry registration ledger and prior 21-item defect set; pre/post test-CMake/helper and manifest line counts; retained-name justification; standalone/embedded x64/x86 evidence; complete non-desktop regression evidence; actual changed-path review and one complete pushed P. |
+| Stop Conditions | Any required production/API change; a live external selector that cannot migrate atomically; a public corpus change requiring a local SoftPC-only compatibility alias; a resource lock/desktop label loss; or a standalone configuration that cannot enforce the same rule. |
+| Exit Criteria | All public registrations satisfy the finite ledger, manifests verify, standalone and embedded dual-width suites pass, changes are committed/pushed, and the worktree is clean except owner changes; then await owner acceptance before T closure. |
+| Original Owner Request | 可以，收口S2，准入S3。 |
+| Similar-Issue Sweep | Enumerate every `add_test` in the three public component CMake files and all helper-produced registrations. Record existing identity, owner, label, work-directory and resource-lock disposition; reject `library.*`, unlabelled, duplicate or cross-owner entries. |
 
 ## Historical M9 T85 S20 delivery record
 

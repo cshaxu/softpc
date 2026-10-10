@@ -73,6 +73,15 @@ add_test(NAME emulator.test-types-boundary COMMAND "${CMAKE_COMMAND}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/../verify_types_boundary.cmake")
 add_test(NAME emulator.test-manifest COMMAND "${CMAKE_COMMAND}"
     "-DEMULATOR_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${EMULATOR_ROOT}/verify_manifest.cmake")
+set_tests_properties(
+    emulator.test-boundaries
+    emulator.manifest
+    emulator.corpus
+    emulator.verifier-negative
+    emulator.test-types-boundary
+    emulator.test-manifest
+    PROPERTIES LABELS "unit;emulator")
+shared_verify_test_registration(emulator)
 
 # One suite-owned build entry for importing products.  CTest registration and
 # standalone configuration remain unchanged.
