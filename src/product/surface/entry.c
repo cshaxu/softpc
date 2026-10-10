@@ -69,13 +69,13 @@ lib_i32 product_surface_run(const product_surface_definition *definition)
     product_surface_run_context context = {0};
     lib_i32 result;
 
-    if (definition == LIB_NULL || definition->name == LIB_NULL || definition->banner == LIB_NULL ||
+    if (definition == LIB_NULL || definition->name == LIB_NULL ||
         (definition->ui.display != EMULATOR_SESSION_DISPLAY_CONSOLE &&
          definition->ui.display != EMULATOR_SESSION_DISPLAY_WINDOW)) return 1;
     context.definition = definition;
     context.machine = definition->machine;
     result = emulator_product_run(&(emulator_product_definition){
-        .banner = definition->banner,
+        .banner = definition->name,
         .machine = definition->machine.composition,
         .context = &context,
         .configure_control = product_surface_configure_control,

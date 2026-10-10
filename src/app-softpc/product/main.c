@@ -43,7 +43,6 @@ int main(int argc, char **argv)
     }
     definition = (product_surface_definition){
         .name = "Insignia SoftPC",
-        .banner = "Insignia SoftPC",
         .machine = machine,
         .ui = ui,
         .configure_extensions = softpc_product_configure_extensions
