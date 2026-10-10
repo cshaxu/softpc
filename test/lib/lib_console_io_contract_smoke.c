@@ -36,6 +36,7 @@ static lib_win32_coord native_cursor;
 static lib_win32_coord viewport_limit;
 static lib_bool limit_viewport, fail_viewport_set;
 static lib_bool reject_resize, ignore_resize;
+static lib_u32 resize_attempts;
 static lib_win32_small_rect palette_metadata_window;
 static lib_win32_coord palette_resize_size;
 static lib_bool palette_metadata_received, palette_resize_after_set;
@@ -54,7 +55,7 @@ static lib_win32_bool LIB_WIN32_WINAPI screen_info(lib_win32_handle h, lib_win32
     return LIB_WIN32_TRUE;
 }
 static lib_win32_bool LIB_WIN32_WINAPI resize_buffer(lib_win32_handle h,lib_win32_coord size)
-{ (void)h; if(reject_resize) return LIB_WIN32_FALSE; if(!ignore_resize) buffer_size=size; return LIB_WIN32_TRUE; }
+{ (void)h; ++resize_attempts; if(reject_resize) return LIB_WIN32_FALSE; if(!ignore_resize) buffer_size=size; return LIB_WIN32_TRUE; }
 static lib_win32_bool LIB_WIN32_WINAPI palette_get(lib_win32_handle h, lib_win32_console_screen_buffer_infoex *p)
 { (void)h; ++palette_attempts; p->cbSize=sizeof(*p); p->dwSize=buffer_size; p->srWindow=viewport; return palette_query_ok; }
 static lib_win32_bool LIB_WIN32_WINAPI palette_set(lib_win32_handle h, lib_win32_console_screen_buffer_infoex *p)
@@ -227,6 +228,29 @@ int main(void)
         lib_test_assert(viewport.Left==0 && viewport.Top==0 &&
             viewport.Right==79 && viewport.Bottom==24);
 
+        /* Metadata success is not enough: hosts may silently retain a smaller
+         * backing buffer. Restore the saved buffer before cursor/viewport. */
+        buffer_size = (lib_win32_coord){20,10};
+        viewport = (lib_win32_small_rect){0,0,19,9};
+        viewport_limit = (lib_win32_coord){120,30};
+        palette_resize_after_set=LIB_TRUE;
+        palette_resize_size=(lib_win32_coord){120,29};
+        resize_attempts=0u;
+        native_cursor=(lib_win32_coord){0,0}; cursor_positions=0u;
+        lib_test_assert(console_broker_apply_display(b.output,&saved,LIB_TRUE)==LIB_STATUS_OK);
+        lib_test_assert(resize_attempts==1u && buffer_size.X==120 && buffer_size.Y==60);
+        lib_test_assert(cursor_positions==1u && native_cursor.X==71 && native_cursor.Y==47);
+
+        buffer_size = (lib_win32_coord){20,10};
+        viewport = (lib_win32_small_rect){0,0,19,9};
+        ignore_resize=LIB_TRUE;
+        resize_attempts=0u;
+        native_cursor=(lib_win32_coord){0,0}; cursor_positions=0u;
+        lib_test_assert(console_broker_apply_display(b.output,&saved,LIB_TRUE)==LIB_STATUS_IO_ERROR);
+        lib_test_assert(resize_attempts==1u && cursor_positions==0u);
+        ignore_resize=LIB_FALSE;
+        palette_resize_after_set=LIB_FALSE;
+
         buffer_size = (lib_win32_coord){20,10};
         viewport = (lib_win32_small_rect){0,0,19,9};
         viewport_limit = (lib_win32_coord){120,30};
@@ -271,15 +295,15 @@ int main(void)
     fail_viewport_set=LIB_FALSE;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     lib_test_assert(b.previous_palette[0]==2 && palette_sets==4);
-    /* Palette metadata can change backing geometry. Surface preparation must
-     * query that changed geometry and grow the 24-row buffer for this frame. */
+    /* Palette metadata can silently shrink backing geometry. Display restore
+     * re-establishes its saved 80x30 surface before frame preparation. */
     palette_resize_after_set=LIB_TRUE;
     palette_resize_size=(lib_win32_coord){80,24};
     f.palette[0]=3;
     lib_u32 before_palette_resize=writes;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
-    lib_test_assert(buffer_size.X==80 && buffer_size.Y==25);
-    lib_test_assert(captured_region.Bottom==24 && writes==before_palette_resize+1);
+    lib_test_assert(buffer_size.X==80 && buffer_size.Y==30);
+    lib_test_assert(writes==before_palette_resize);
     palette_resize_after_set=LIB_FALSE;
     /* Native approximation consumes the already normalized scanline range. */
     f.font_height=16; f.cursor_top=14; f.cursor_bottom=15;

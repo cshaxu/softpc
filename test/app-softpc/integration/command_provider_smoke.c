@@ -835,7 +835,7 @@ int main(void)
         result.arm_prompt);
     {
         const char *rejected[] = { "start", "pause", "resume", "reset", "stop",
-            "save state", "load state", "floppy eject" };
+            "save state", "load state" };
         for (unsigned index = 0; index < sizeof(rejected) / sizeof(rejected[0]); ++index) {
             submit(&provider, EMULATOR_SESSION_MACHINE_ERROR, rejected[index], &result);
             assert(result.request == EMULATOR_SESSION_REQUEST_NONE);
@@ -844,6 +844,9 @@ int main(void)
         }
         submit(&provider, EMULATOR_SESSION_MACHINE_ERROR, "help", &result);
         assert(lib_text_find_substring(result.text, "Control your virtual machine") != NULL);
+        submit(&provider, EMULATOR_SESSION_MACHINE_ERROR, "floppy eject", &result);
+        assert(lib_text_find_substring(result.text, "Machine has failed;") == NULL &&
+            result.arm_prompt);
     }
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands.monitor &&
@@ -1008,7 +1011,9 @@ int main(void)
     wait_for(events.paused);
     provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_STOPPED,
         EMULATOR_SESSION_MACHINE_PAUSED, &result);
-    assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
+    /* The successful load already owns its completion and prompt. The queued
+       STOPPED-to-PAUSED fact must not publish a second monitor transaction. */
+    assert(!result.arm_prompt && result.text[0] == '\0');
     assert(emulator_machine_resume(machine));
     wait_for(events.running);
     provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,

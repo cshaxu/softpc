@@ -9,8 +9,8 @@
 typedef struct emulator_product emulator_product;
 
 /* Product-specific code supplies concrete machine and command/UI policy.  The
- * Emulator product owns the invariant process order: machine, Session, UI,
- * run, and reverse-order teardown. App owns its startup banner. */
+ * Emulator product owns the invariant process order: startup banner,
+ * machine, Session, UI, run, and reverse-order teardown. */
 /* The product receives this opaque-machine borrow while emulator_product_run()
  * owns the composition. It must not retain or use it after that function
  * returns. */
@@ -20,6 +20,7 @@ typedef lib_status (*emulator_product_configure_ui)(void *context,
     emulator_ui_options *out_options);
 
 typedef struct emulator_product_definition {
+    const char *banner;
     emulator_product_machine machine;
     void *context;
     emulator_product_configure_control configure_control;

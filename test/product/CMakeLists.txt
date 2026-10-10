@@ -32,8 +32,6 @@ shared_register_test(product xasm32/xasm32_bounds product-xasm32)
 shared_register_test(product surface/keyboard product-surface-keyboard)
 add_executable(product-test-entry surface/entry_smoke.c
     "${PRODUCT_ROOT}/surface/entry.c")
-target_compile_definitions(product-test-entry PRIVATE
-    printf=product_surface_entry_smoke_printf)
 target_link_libraries(product-test-entry PRIVATE types)
 if(MSVC)
     target_compile_options(product-test-entry PRIVATE /UNDEBUG)

@@ -200,6 +200,39 @@ static int package_screen_contains(HANDLE output, const char *needle)
     return lib_text_find_substring(text, needle) != NULL;
 }
 
+/* Raw KVM frames may be larger than a deliberately compact native viewport.
+ * Guest boot progress belongs to the backing frame, not only its visible
+ * top-left cells. Monitor assertions above intentionally remain viewport-only. */
+static int package_buffer_contains(HANDLE output, const char *needle)
+{
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    char text[4096];
+    DWORD read = 0u;
+    COORD origin = { 0, 0 };
+    DWORD count;
+
+    if (output == INVALID_HANDLE_VALUE || needle == NULL) return 0;
+    output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0u, NULL);
+    if (output == INVALID_HANDLE_VALUE) return 0;
+    if (!GetConsoleScreenBufferInfo(output, &info)) {
+        CloseHandle(output);
+        return 0;
+    }
+    count = (DWORD)info.dwSize.X * (DWORD)info.dwSize.Y;
+    if (count >= sizeof(text)) count = sizeof(text) - 1u;
+    if (!ReadConsoleOutputCharacterA(output, text, count, origin, &read)) {
+        CloseHandle(output);
+        return 0;
+    }
+    CloseHandle(output);
+    text[read] = '\0';
+    lib_memory_copy(package_last_screen, text, read + 1u);
+    package_last_screen_width = (DWORD)info.dwSize.X;
+    package_last_screen_length = read;
+    return lib_text_find_substring(text, needle) != NULL;
+}
+
 static void package_report_last_screen(void)
 {
     DWORD offset;
@@ -227,12 +260,47 @@ static int package_wait_for_text(HANDLE output, const char *needle,
     return 0;
 }
 
+static int package_wait_for_buffer_text(HANDLE output, const char *needle,
+    DWORD timeout_ms)
+{
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
+    do {
+        if (package_buffer_contains(output, needle)) return 1;
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
+    return 0;
+}
+
 static int package_wait_for_dos_prompt(HANDLE output, DWORD timeout_ms)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
-        if (package_screen_contains(output, "A:\\>") ||
-            package_screen_contains(output, "C:\\>")) return 1;
+        if (package_buffer_contains(output, "A:\\>") ||
+            package_buffer_contains(output, "C:\\>")) return 1;
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
+    return 0;
+}
+
+/* Text can remain in scrollback after raw-to-cooked selection. Verify the
+ * active line's native cursor instead of accepting an old monitor prompt. */
+static int package_wait_monitor_prompt(HANDLE output, DWORD timeout_ms)
+{
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
+    do {
+        CONSOLE_SCREEN_BUFFER_INFO info;
+        COORD position;
+        char prompt[2];
+        DWORD read;
+
+        if (GetConsoleScreenBufferInfo(output, &info) &&
+            info.dwCursorPosition.X == 2) {
+            position = info.dwCursorPosition;
+            position.X = 0;
+            if (ReadConsoleOutputCharacterA(output, prompt, sizeof(prompt), position,
+                    &read) && read == sizeof(prompt) &&
+                prompt[0] == '>' && prompt[1] == ' ') return 1;
+        }
         softpc_test_sleep_milliseconds(20u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
@@ -242,8 +310,8 @@ static int package_wait_for_absent_dos_prompt(HANDLE output, DWORD timeout_ms)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
-        if (!package_screen_contains(output, "A:\\>") &&
-            !package_screen_contains(output, "C:\\>")) return 1;
+        if (!package_buffer_contains(output, "A:\\>") &&
+            !package_buffer_contains(output, "C:\\>")) return 1;
         softpc_test_sleep_milliseconds(20u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
@@ -274,6 +342,17 @@ static int package_wait_for_absent_text(HANDLE output, const char *needle,
     lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
         if (!package_screen_contains(output, needle)) return 1;
+        softpc_test_sleep_milliseconds(20u);
+    } while (softpc_test_clock_milliseconds() < deadline);
+    return 0;
+}
+
+static int package_wait_for_absent_buffer_text(HANDLE output, const char *needle,
+    DWORD timeout_ms)
+{
+    lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
+    do {
+        if (!package_buffer_contains(output, needle)) return 1;
         softpc_test_sleep_milliseconds(20u);
     } while (softpc_test_clock_milliseconds() < deadline);
     return 0;
@@ -415,7 +494,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         if (!SetConsoleWindowInfo(output, TRUE, &viewport) ||
             !SetConsoleScreenBufferSize(output, extent)) { stage = 19; goto done; }
     }
-    if (!package_wait_for_text(output, "SoftPC>", 5000u)) { stage = 3; goto done; }
+    if (!package_wait_monitor_prompt(output, 5000u)) { stage = 3; goto done; }
     /* Exercise the shipping CLI provider, not only the debug library link.
        Entering before start must leave the machine stopped and permit help. */
     if (!package_compact_console && (!package_send_text(input, "debug\r") ||
@@ -434,14 +513,14 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (!package_wait_for_dos_prompt(output, 10000u)) { stage = 5; goto done; }
     if (IsWindowVisible(GetConsoleWindow())) { stage = 20; goto done; }
     if (!package_send_text(input, "ver\r") ||
-        !package_wait_for_text(output, "Version", 5000u)) { stage = 14; goto done; }
+        !package_wait_for_buffer_text(output, "Version", 5000u)) { stage = 14; goto done; }
     if (!package_send_text(input, "cls\r") ||
-        !package_wait_for_absent_text(output, "Version", 5000u)) { stage = 15; goto done; }
+        !package_wait_for_absent_buffer_text(output, "Version", 5000u)) { stage = 15; goto done; }
     if (!package_send_pause_hotkey(input)) { stage = 6; goto done; }
     /* The product attaches the monitor Console only after PAUSED completion;
        the visible proof is its rearmed cooked prompt, not text written while
        the former VM Console was still Current. */
-    if (!package_wait_for_text(output, "SoftPC>", 5000u)) {
+    if (!package_wait_monitor_prompt(output, 5000u)) {
         stage = 7; goto done;
     }
     /* Debugger column-layout assertions belong to the normal-size route. */
@@ -460,7 +539,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     if (!package_wait_for_absent_dos_prompt(output, 5000u)) {
         stage = 11; goto done;
     }
-    if (!package_wait_for_text(output, "Starting MS-DOS", 10000u)) {
+    if (!package_wait_for_buffer_text(output, "Starting MS-DOS", 10000u)) {
         stage = 12; goto done;
     }
     if (!package_wait_for_dos_prompt(output, 10000u)) { stage = 13; goto done; }

@@ -37,6 +37,27 @@ the read-only NTVDM64 implementation, without importing its different
 frontend architecture. No viewport policy, row constant, retry, state machine
 or public API is added.
 
+### S1 P4: backing-buffer restoration qualification
+
+Full x64 qualification exposed a second owner-local host contract: extended
+display metadata can report success while leaving the backing buffer one row
+smaller than the saved surface. Restoring only a fitted viewport then makes
+surface selection non-deterministic. The same transaction now reads actual
+geometry after metadata, restores the saved backing size once when it differs,
+verifies it, and only then restores the cursor and fitted viewport. Focused
+injected coverage proves both silent-shrink recovery and resize failure. No
+retry policy, surface state, public API or viewport-growth rule is added.
+
+### S1 P5: startup preamble ownership correction
+
+The generic `<product name>\n\nBuilt on <date> <time>\n\n` banner belongs to
+Emulator Product's process order, not Product Surface's command/hotkey/UI
+assembly. App supplies the complete two-line banner; Surface forwards it
+unchanged through the existing composition definition; Emulator Product emits
+it as `%s\n\n` before it creates the machine. This moves one output
+responsibility without making Emulator construct product text, adding an App
+print path, or introducing a second banner.
+
 ## Observed contract failure
 
 After returning from a raw VM Console to the cooked monitor Console, the
