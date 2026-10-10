@@ -52,11 +52,11 @@ retry policy, surface state, public API or viewport-growth rule is added.
 
 The generic `<product name>\n\nBuilt on <date> <time>\n\n` banner belongs to
 Emulator Product's process order, not Product Surface's command/hotkey/UI
-assembly. App supplies the complete two-line banner; Surface forwards it
+assembly. App supplies its product-specific banner string; Surface forwards it
 unchanged through the existing composition definition; Emulator Product emits
-it as `%s\n\n` before it creates the machine. This moves one output
-responsibility without making Emulator construct product text, adding an App
-print path, or introducing a second banner.
+`%s\n\nBuilt on %s %s\n\n` before it creates the machine. This keeps the
+product identity separate from the shared build-line format, without adding an
+App print path or a second banner.
 
 ## Observed contract failure
 

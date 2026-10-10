@@ -8,9 +8,9 @@
 #include "emulator/product/machine_interface.h"
 typedef struct emulator_product emulator_product;
 
-/* Product-specific code supplies concrete machine and command/UI policy.  The
- * Emulator product owns the invariant process order: startup banner,
- * machine, Session, UI, run, and reverse-order teardown. */
+/* Product-specific code supplies concrete machine and command/UI policy. The
+ * App provides its complete opening identity text; Emulator Product owns its
+ * stable monitor formatting, including the build line. */
 /* The product receives this opaque-machine borrow while emulator_product_run()
  * owns the composition. It must not retain or use it after that function
  * returns. */

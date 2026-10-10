@@ -39,7 +39,7 @@ typedef struct composition_fixture {
 } composition_fixture;
 
 static composition_fixture fixture;
-static char opening[128];
+static char opening[256];
 
 int emulator_product_composition_smoke_printf(const char *format, ...)
 {
@@ -403,38 +403,41 @@ static lib_i32 composition_ui_destroy_failure_recovers(lib_bool binding_failed)
         fixture.emulator_machine_destroy_count == 1u && fixture.machine_destroy_count == 1u;
 }
 
-static lib_status composition_run_configure_control(void *context,
+static lib_status composition_configure_control(void *context,
     emulator_machine *machine, emulator_session_options *out_options)
 {
     (void)context;
-    (void)machine;
-    (void)out_options;
+    if (machine == LIB_NULL || out_options == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_options = (emulator_session_options){0};
     return LIB_STATUS_OK;
 }
 
-static lib_status composition_run_configure_ui(void *context,
+static lib_status composition_configure_ui(void *context,
     emulator_ui_options *out_options)
 {
     (void)context;
-    (void)out_options;
+    if (out_options == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *out_options = (emulator_ui_options){0};
     return LIB_STATUS_OK;
 }
 
-static lib_i32 composition_run_prints_opening(void)
+static lib_i32 composition_run_formats_app_opening(void)
 {
     const emulator_product_definition definition = {
-        .banner = "Emulator\n\nBuilt on test",
+        .banner = "Fixture Emulator\nCopyright (C) 2026 Fixture.",
         .machine = composition_machine,
-        .configure_control = composition_run_configure_control,
-        .configure_ui = composition_run_configure_ui
+        .configure_control = composition_configure_control,
+        .configure_ui = composition_configure_ui
     };
     lib_size length;
 
     composition_fixture_reset(COMPOSITION_FAILURE_NONE);
     opening[0] = '\0';
-    if (emulator_product_run(&definition) != 0 || !composition_fixture_clean()) return 0;
+    if (emulator_product_run(&definition) != 0 || !composition_fixture_clean())
+        return 0;
     length = lib_text_length(opening);
-    return lib_text_find_substring(opening, "Emulator\n\nBuilt on test\n\n") == opening &&
+    return lib_text_find_substring(opening,
+        "Fixture Emulator\nCopyright (C) 2026 Fixture.\n\nBuilt on ") == opening &&
         length >= 2u && opening[length - 2u] == '\n' && opening[length - 1u] == '\n';
 }
 
@@ -455,7 +458,7 @@ lib_i32 main(void)
         !composition_machine_cleanup_failure_recovers() ||
         !composition_ui_destroy_failure_recovers(LIB_FALSE) ||
         !composition_ui_destroy_failure_recovers(LIB_TRUE) ||
-        !composition_run_prints_opening()) return 1;
+        !composition_run_formats_app_opening()) return 1;
     lib_c_printf("APP-COMPOSITION-ATOMICITY:OK\n");
     return 0;
 }
