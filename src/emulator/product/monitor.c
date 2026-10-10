@@ -52,6 +52,18 @@ static void emulator_product_monitor_lifecycle_message(
     emulator_product_monitor_set_prompt(out_result);
 }
 
+static lib_bool emulator_product_monitor_requires_machine(
+    emulator_product_monitor_command command)
+{
+    return command == EMULATOR_PRODUCT_MONITOR_COMMAND_START ||
+        command == EMULATOR_PRODUCT_MONITOR_COMMAND_RESUME ||
+        command == EMULATOR_PRODUCT_MONITOR_COMMAND_PAUSE ||
+        command == EMULATOR_PRODUCT_MONITOR_COMMAND_STOP ||
+        command == EMULATOR_PRODUCT_MONITOR_COMMAND_RESET ||
+        command == EMULATOR_PRODUCT_MONITOR_COMMAND_SAVE ||
+        command == EMULATOR_PRODUCT_MONITOR_COMMAND_LOAD;
+}
+
 lib_bool emulator_product_monitor_request_lifecycle(
     const emulator_product_monitor_provider *provider,
     emulator_product_monitor_command command, emulator_session_machine_state state,
@@ -240,11 +252,6 @@ void emulator_product_monitor_provider_submit_line(void *opaque,
         return;
     }
     if (!emulator_product_monitor_parse(line, &command, &arguments)) {
-        if (state == EMULATOR_SESSION_MACHINE_ERROR) {
-            emulator_product_monitor_lifecycle_message(out_result,
-                "Machine has failed; exit and restart the program.");
-            return;
-        }
         if (provider->submit_extension != LIB_NULL &&
             provider->submit_extension(provider->context, state, line, out_result)) {
             emulator_product_monitor_set_prompt(out_result);
@@ -268,7 +275,8 @@ void emulator_product_monitor_provider_submit_line(void *opaque,
         out_result->exit_requested = LIB_TRUE;
         return;
     }
-    if (state == EMULATOR_SESSION_MACHINE_ERROR) {
+    if (state == EMULATOR_SESSION_MACHINE_ERROR &&
+        emulator_product_monitor_requires_machine(command)) {
         emulator_product_monitor_lifecycle_message(out_result,
             "Machine has failed; exit and restart the program.");
         return;

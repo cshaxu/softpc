@@ -10,6 +10,18 @@ static struct emulator_product fixture;
 static lib_u32 failure;
 static lib_u32 created;
 static lib_u32 destroyed;
+static char opening[128];
+
+int product_surface_entry_smoke_printf(const char *format, ...)
+{
+    lib_c_va_list arguments;
+    int result;
+
+    lib_c_va_start(arguments, format);
+    result = lib_c_vsnprintf(opening, sizeof(opening), format, arguments);
+    lib_c_va_end(arguments);
+    return result;
+}
 
 static lib_status fixture_bind(void *machine, emulator_machine *emulator)
 {
@@ -139,6 +151,7 @@ lib_i32 main(void)
     };
     product_surface_definition invalid_ui = definition;
     lib_u32 index;
+    lib_size opening_length;
 
     invalid_ui.ui.display = (emulator_session_display)99;
     if (product_surface_run(LIB_NULL) != 1 || product_surface_run(&invalid_ui) != 1) return 1;
@@ -146,10 +159,15 @@ lib_i32 main(void)
         failure = index;
         fixture.live = LIB_FALSE;
         created = destroyed = 0u;
+        opening[0] = '\0';
         if (product_surface_run(&definition) != (index == 0u ? 0 : 1)) return 2;
         if (index == 1u && (created != 1u || destroyed != 1u)) return 3;
         if (index != 1u && (created != 1u || destroyed != 0u)) return 4;
         if (fixture.live) return 5;
+        opening_length = lib_text_length(opening);
+        if (lib_text_find_substring(opening, "PC\n\nBuilt on ") != opening ||
+            opening_length < 2u || opening[opening_length - 2u] != '\n' ||
+            opening[opening_length - 1u] != '\n') return 6;
     }
     return 0;
 }

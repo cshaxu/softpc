@@ -7,21 +7,21 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner extends S20 with a second, independently verifiable delivery: import NXVM's latest public six-component corpus exactly after a current read-only quality audit. The preceding optional-cache delivery remains recorded and awaits its separate acceptance/closure decision. |
-| Objective | Synchronize `src/{lib,emulator,product}`, `test/{lib,emulator,product}` and the shared `test/register.cmake` with NXVM, then repair the discovered shared Product Surface snapshot-command handoff through one product-neutral App callback. |
-| Non-goals | Do not change NXVM directly; do not add a SoftPC-only parser, executor, Session state machine or compatibility shim; do not change Core, Compat, user INI, guest media or unrelated worktree changes; do not claim manual product acceptance. |
-| Reference Baseline | SoftPC `e8b95b53`; NXVM current worktree at `9f966695e` plus its uncommitted Emulator Product cleanup that removes two redundant failed-bind unbinds and updates the matching manifests/tests. |
-| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20-p2--synchronize-the-current-shared-six-component-corpus) |
-| Files And ABI Surface | The six shared roots and `test/register.cmake`, their manifests/CMake/README files included; narrow App Product and static-boundary-check adaptation is permitted where the imported public Product API removes `product_surface` composition in favor of `emulator_product`. The admitted shared repair adds one Surface callback for already-parsed SAVE/LOAD operations; it reuses Emulator Machine's existing executor rendezvous and adds no SoftPC-only ABI. |
+| Admission And Approval | Owner reopens S20 after acceptance found that P2 removed the startup monitor preamble and its ERROR guard blocked debugger entry. |
+| Objective | Restore the generic Product Surface preamble, narrow ERROR command admission so debugger entry remains available, and add focused non-desktop regression proof. |
+| Non-goals | Do not change NXVM directly; do not add an App-specific banner, parser, executor, Session state machine or compatibility shim; do not change Core, Compat, user INI, guest media or unrelated worktree changes; do not claim manual product acceptance. |
+| Reference Baseline | SoftPC `8cbe40da`; NXVM remains read-only comparison material. |
+| Candidate Proposal | [Product/Emulator component reorganization](../proposals/m9-product-emulator-component-reorganization.md#s20-p3--restore-the-neutral-surface-preamble-and-narrow-error-admission) |
+| Files And ABI Surface | `src/product/surface/entry.c`, `src/emulator/product/monitor.c`, their manifests, and the focused Product/Emulator tests. The existing Product name input remains generic; no new ABI or App configuration field is added. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; exact shared-corpus boundary; C11 six-package rule; user configuration/media preservation. |
-| Verification | Record a finite upstream path/hash ledger; verify exact equality after import; run corpus/manifest/dependency gates; run proportional x64/x86 builds and background CTest excluding desktop. |
-| Expected Markers | The imported upstream baseline is recorded as byte-identical; the explicitly admitted canonical snapshot-callback delta is listed separately for NXVM adoption. Dependency direction remains `lib < emulator < product`; package configuration/media are untouched. |
-| Asset Needs | Refresh package EXEs only if the synchronized production sources require it; never modify `assets/binary/softpc.ini`, media or snapshots. |
-| Reporting Requirements | Pre/post path and line accounting by source/test root; upstream revision/worktree identity; gate/build/test evidence; refreshed EXE links/hashes if applicable; one complete pushed P followed by owner validation. |
-| Stop Conditions | Upstream source changes during import; a required local parser/shim, Core/Compat change, broken manifest/dependency boundary, or failing dual-width verification requiring behavior design beyond the admitted parsed snapshot callback. |
-| Exit Criteria | Exact six-root/helper equality and stated verification evidence are recorded; task-owned changes are committed and pushed; worktree is clean except preserved owner changes; await owner validation. |
-| Original Owner Request | 好，现在可以准入一个新的S任务，把NXVM公共六组件全部原样导入。 |
-| Similar-Issue Sweep | Compare every source/test path and content hash, including upstream deletions and relocations; inspect all CMake target edges for outward dependencies and all manifests for exact corpus coverage. |
+| Verification | Run Product/Emulator focused tests on x64/x86, corpus/manifest/dependency gates, then proportional dual-width package builds and background CTest excluding desktop. |
+| Expected Markers | Opening output is `<name>\n\nBuilt on <date> <time>\n\n`; ERROR rejects only `start`/`stop`/`pause`/`resume`/`reset`/`save`/`load` while dispatching debug and every App extension; dependency direction remains `lib < emulator < product`; package configuration/media are untouched. |
+| Asset Needs | Refresh package EXEs because production sources change; never modify `assets/binary/softpc.ini`, media or snapshots. |
+| Reporting Requirements | Pre/post path and line accounting by source/test root; focused behavior proof, dual-width evidence, refreshed EXE links/hashes, and one complete pushed P followed by owner validation. |
+| Stop Conditions | A required App-specific API, Core/Compat change, broken manifest/dependency boundary, or failing dual-width verification requiring behavior design beyond the admitted two contracts. |
+| Exit Criteria | The two failed contracts have focused proofs; task-owned changes are committed and pushed; worktree is clean except preserved owner changes; await owner validation. |
+| Original Owner Request | 同意，请你重开本S任务予以修复。 |
+| Similar-Issue Sweep | Inspect all monitor ERROR routes and Product startup-output owners; record each fixed-command/extension disposition and ensure no other imported path silently removes the monitor opening. |
 
 ### S20 planned delivery
 
@@ -49,6 +49,12 @@ The corresponding canonical paths for NXVM adoption are
 SoftPC adaptation is confined to the App Product extension/composition and its
 integration proof.  Dual Release package builds and background CTest pass
 129/129 on each architecture; package INI, media and snapshots are untouched.
+
+### S20 P3 active corrective delivery
+
+Owner acceptance found that P2 incorrectly dropped the existing generic
+Surface opening, and review found its ERROR guard also blocked debugger entry.
+P3 is active under the revised packet above; P2 is not accepted or closed.
 
 ### S20 delivery awaiting owner validation
 

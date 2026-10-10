@@ -74,3 +74,21 @@ The existing Emulator Machine state-I/O calls already enqueue executor work at
 a safe point and synchronously report its completion to the sole control
 caller, so an additional asynchronous completion protocol would duplicate that
 mechanism and is out of scope.
+
+## S20 P3 — restore the neutral Surface preamble and narrow ERROR admission
+
+S20 P2 accidentally replaced SoftPC's existing generic Surface opening with
+NXVM's newer App-owned opening arrangement, removing the user-visible
+`<product name>`, blank-line, `Built on <date> <time>`, blank-line preamble.
+Restore the prior Product-neutral Surface behavior: the App supplies the name;
+Surface formats the stable preamble and names no particular product. Add a
+focused entry proof that intercepts this one output sink and verifies the
+required framing without starting a native Console.
+
+The same review found P2's ERROR admission too broad. ERROR rejects only the
+five fixed lifecycle operations (`start`, `stop`, `pause`, `resume`, `reset`)
+and the fixed `save`/`load` operations. It
+continues to forward `debug` and every App extension: entering the debugger is
+independent of machine state, and each receiver owns any later machine-state
+check. Prove both fixed and extension routing at the Emulator monitor boundary.
+Do not change Lib, Core, Compat, user configuration or machine-state ownership.
