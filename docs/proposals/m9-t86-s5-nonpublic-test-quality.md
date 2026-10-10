@@ -146,3 +146,25 @@ CMake classification list.
 
 No Product executable or user-facing asset is rebuilt because every changed
 input is CMake, documentation, or test-only source.
+
+### P3 follow-up audit and correction
+
+The first delivery's prose ledger incorrectly classified the two desktop
+`package_smoke` routes as checks.  The generated CTest JSON proves the correct
+finite split is 28 unit, 10 integration and 9 checks; the complete route
+ledger above now records that fact and each route's owner/disposition.
+
+A second source sweep found two obsolete per-test `assert` macro replacements
+in `runtime_smoke.c` and `snapshot_transaction_smoke.c`.  They predated the
+S5 CMake rule that builds every App test target with assertions enabled even
+in Release.  Keeping them would create two failure mechanisms for the same
+test suite, so both replacements are deleted rather than retained as a
+fallback.  Their normal assertion behavior is rebuilt and run on x64 and x86.
+
+The same sweep finds no outward include of a public test corpus, no remaining
+three-or-more-level walk back to `src/`, and no `NDEBUG` bypass under the App
+unit/integration roots.  Remaining direct Win32 headers are owner-local
+Windows integration or recovered-mirror white-box tests; their assertions use
+native console/window/thread contracts that Lib does not expose as a test
+adapter, so substituting a second wrapper would reduce rather than improve
+test fidelity.

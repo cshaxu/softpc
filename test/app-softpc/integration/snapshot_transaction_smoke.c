@@ -12,15 +12,6 @@
 #ifdef _WIN32
 #include <windows.h>
 
-#undef assert
-#define assert(condition) do { \
-    if (!(condition)) { \
-        fprintf(stderr, "snapshot transaction check failed: %s at line %d\n", \
-            #condition, __LINE__); \
-        return 1; \
-    } \
-} while (0)
-
 typedef struct snapshot_bytes {
     lib_u8 *bytes;
     lib_size count;
