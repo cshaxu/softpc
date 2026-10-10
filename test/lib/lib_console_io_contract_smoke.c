@@ -230,6 +230,16 @@ int main(void)
         buffer_size = (lib_win32_coord){20,10};
         viewport = (lib_win32_small_rect){0,0,19,9};
         viewport_limit = (lib_win32_coord){120,30};
+        native_cursor=(lib_win32_coord){0,0}; cursor_positions=0u;
+        cursor_ok=0;
+        lib_test_assert(console_broker_apply_display(b.output,&saved,LIB_TRUE)==LIB_STATUS_IO_ERROR);
+        lib_test_assert(cursor_positions==1u && native_cursor.X==0 && native_cursor.Y==0);
+        lib_test_assert(viewport.Right==19 && viewport.Bottom==9);
+        cursor_ok=1;
+
+        buffer_size = (lib_win32_coord){20,10};
+        viewport = (lib_win32_small_rect){0,0,19,9};
+        viewport_limit = (lib_win32_coord){120,30};
         fail_viewport_set = LIB_TRUE;
         lib_test_assert(console_broker_apply_display(b.output,&saved,LIB_TRUE)==LIB_STATUS_IO_ERROR);
         lib_test_assert(buffer_size.X==120 && buffer_size.Y==60);
