@@ -5,14 +5,16 @@
 | [lib](lib/README.md) | Independently reusable Lib tests and fixtures. |
 | [emulator](emulator/README.md) | Independently reusable neutral Emulator tests and fake machine. |
 | [product](product/) | Independently reusable Product command, debugger, assembler and surface tests. |
-| [app-softpc/unit](app-softpc/unit/) | SoftPC configuration and concrete machine/Compat unit tests. |
+| [app-softpc/unit](app-softpc/unit/) | SoftPC configuration and owner-local `machine`, `compat`, and preserved `softpc.new` unit tests. |
 | [app-softpc/integration](app-softpc/integration/) | SoftPC composed command, worker, frame, snapshot, shutdown and package flows. |
 | [../tools/checks](../tools/checks/) | Repository source, build, package and documentation boundary checks. |
 
 Root CMake registers every suite. Public CTest names begin with their actual
 owner path (`lib`, `emulator`, `product`, `app-softpc`, or `checks`) and retain
-any nested test directory. Labels identify the test owner and execution class;
-they are not a guarantee of isolated execution.
+any nested test directory. For App tests the registered owner path is also the
+single source of truth for its `unit` or `integration` label. Labels identify
+the test owner and execution class; they are not a guarantee of isolated
+execution.
 Self-contained tests create disposable media in their build working directory.
 Only `runtime_restart_boot_smoke` reads the fixed installed image;
 `package_smoke` exercises the matching packaged EXE and owner configuration.

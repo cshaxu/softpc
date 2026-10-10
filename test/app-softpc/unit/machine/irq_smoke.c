@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
-#include "../../cleanup.h"
+#include "../../fixture_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include "ica.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
-#include "../../../../src/app-softpc/softpc.new/base/ccpu386/c_intr.h"
+#include "app-softpc/softpc.new/base/ccpu386/c_intr.h"
 
 extern void reboot(void);
 extern void host_set_hw_int(void);

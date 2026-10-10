@@ -2,12 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T86.
+M9 T86 S5 is active: non-public test quality audit and repair.
 
-The owner accepts and closes S4's fresh dual-architecture qualification.
-[S4 closure](../history/M9-T86-S4-dual-width-qualification.md) retains its
-packet, evidence and actual-change review.
+## M9 T86 S5 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner directs: “把s5审计清楚并修复，修复高质量，要求不低于nxvm的档次水准”. |
+| Objective | Establish a finite ledger for every non-public App/Core/Compat/mirror unit and integration test, then repair only confirmed quality defects so their naming, CMake registration, fixture ownership, working-directory isolation, component dependency direction and assertion contracts meet the existing public Lib/Emulator/Product test standard. |
+| Non-goals | Do not modify public `src/{lib,emulator,product}` or their test corpora, change production behavior, import NXVM test code solely for visual similarity, weaken assertions/timeouts, or treat recovered-mirror implementation tests as portable component tests. Do not touch user INI, media, snapshots or published EXEs unless a production change becomes separately admitted. |
+| Reference Baseline | SoftPC `786209c9`; T86 S4 is owner-accepted and archived. Public suite conventions are `test/{lib,emulator,product}` and `test/register.cmake`; NXVM is read-only comparison evidence, never a build/test dependency. |
+| Candidate Proposal | [T86 S5 non-public test quality](../proposals/m9-t86-s5-nonpublic-test-quality.md) |
+| Files And ABI Surface | Audit ledger covers `test/app-softpc/{unit,integration}`, root CMake test registration, owned fixtures and `tools/checks` routes that register non-public CTest cases. Expected changes are test/CMake/docs only; no public ABI or runtime behavior change. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus boundary; test ownership/layout rules; C17 App/Core settings; long operations run as owned background jobs. |
+| Verification | Configure-time registration/ownership checks, manifest/governance gates, focused repaired tests on x64/x86, then proportional product background and desktop lanes. If changed CMake affects the test graph, run both lanes under their declared presets. |
+| Expected Markers | Every ledger member has an owner, test kind, executable/route, dependencies, working-directory/resource disposition and duplicate/invalid-test disposition. No non-public fixture imports a public test executable or reaches outward across its allowed source boundary. |
+| Asset Needs | None. Preserve `assets/binary/softpc.ini`, guest media, snapshots and published EXEs byte-for-byte. |
+| Reporting Requirements | Record the finite ledger, each confirmed defect and disposition, pre/post path and line accounting, focused and proportional dual-width evidence, plus an independent actual-change review. Report no issue as fixed without a targeted regression. |
+| Stop Conditions | A finding requires product behavior, shared-corpus semantics, mirror behavior, a user asset, or a new test architecture beyond the existing owner-local fixtures; record it as a separately proposed/queued item rather than folding it in. |
+| Exit Criteria | Ledger is complete; confirmed in-scope test defects are repaired with focused proofs; CMake/test ownership gates and proportional x64/x86 suites pass; one complete P is pushed and reviewed, then await owner validation. |
+| Original Owner Request | 准入新s 对全项目的测试质量进行审计 要求以公共三个测试组件为标准对齐：冗余、重复、错误测试、符号命名不合规、越界、依赖关系等，涵盖所有非公共组件的unit和integration测试。 |
+| Similar-Issue Sweep | Mechanically enumerate CTest JSON, source includes, target links, test paths, test-local helpers, working directories and resource locks; compare every non-public test registration against the public-suite rules and inspect every exception. |
 
 ## Historical M9 T85 S20 delivery record
 

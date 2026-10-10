@@ -332,6 +332,11 @@ add_executable(softpc-machine-smoke test/app-softpc/unit/machine/machine_smoke.c
 add_executable(softpc-config-smoke test/app-softpc/unit/product/config_smoke.c src/app-softpc/product/config.c)
 target_include_directories(softpc-config-smoke PRIVATE src src/app-softpc)
 target_link_libraries(softpc-config-smoke PRIVATE types base)
+if(MSVC)
+    target_compile_options(softpc-config-smoke PRIVATE /UNDEBUG)
+else()
+    target_compile_options(softpc-config-smoke PRIVATE -UNDEBUG)
+endif()
 add_test(NAME "app-softpc/unit/product/config_smoke" COMMAND softpc-config-smoke)
 set_tests_properties("app-softpc/unit/product/config_smoke" PROPERTIES LABELS "unit")
 add_test(NAME "checks/product_boundary_negative" COMMAND ${CMAKE_COMMAND}
@@ -374,7 +379,7 @@ target_include_directories(softpc-printer-smoke PRIVATE
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/printer_smoke" COMMAND softpc-printer-smoke)
 add_executable(softpc-parallel-failure-smoke
-    test/app-softpc/unit/machine/parallel_failure_smoke.c)
+    test/app-softpc/unit/compat/parallel_failure_smoke.c)
 target_link_libraries(softpc-parallel-failure-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-parallel-failure-smoke PRIVATE src src/app-softpc
     $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
@@ -382,18 +387,18 @@ target_compile_definitions(softpc-parallel-failure-smoke PRIVATE
     $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
 set_target_properties(softpc-parallel-failure-smoke PROPERTIES
     C_STANDARD 90 C_EXTENSIONS ON)
-add_test(NAME "app-softpc/unit/machine/parallel_failure_smoke" COMMAND softpc-parallel-failure-smoke)
-set_tests_properties("app-softpc/unit/machine/parallel_failure_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+add_test(NAME "app-softpc/unit/compat/parallel_failure_smoke" COMMAND softpc-parallel-failure-smoke)
+set_tests_properties("app-softpc/unit/compat/parallel_failure_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
 add_executable(softpc-sound-smoke test/app-softpc/unit/machine/sound_smoke.c)
 target_link_libraries(softpc-sound-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-sound-smoke PRIVATE
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/sound_smoke" COMMAND softpc-sound-smoke)
-add_executable(softpc-audio-lifecycle-smoke test/app-softpc/unit/machine/audio_lifecycle_smoke.c)
+add_executable(softpc-audio-lifecycle-smoke test/app-softpc/unit/compat/audio_lifecycle_smoke.c)
 target_link_libraries(softpc-audio-lifecycle-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-audio-lifecycle-smoke PRIVATE src src/app-softpc/compat)
-add_test(NAME "app-softpc/unit/machine/audio_lifecycle_smoke" COMMAND softpc-audio-lifecycle-smoke)
+add_test(NAME "app-softpc/unit/compat/audio_lifecycle_smoke" COMMAND softpc-audio-lifecycle-smoke)
 add_executable(softpc-serial-smoke test/app-softpc/unit/machine/serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-serial-smoke PRIVATE
@@ -406,12 +411,12 @@ target_include_directories(softpc-mouse-smoke PRIVATE
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/mouse_smoke" COMMAND softpc-mouse-smoke)
-add_executable(softpc-keycode-smoke test/app-softpc/unit/machine/keycode_smoke.c)
+add_executable(softpc-keycode-smoke test/app-softpc/unit/compat/keycode_smoke.c)
 target_link_libraries(softpc-keycode-smoke PRIVATE softpc-vm)
-target_include_directories(softpc-keycode-smoke PRIVATE
+target_include_directories(softpc-keycode-smoke PRIVATE src/app-softpc
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
-add_test(NAME "app-softpc/unit/machine/keycode_smoke" COMMAND softpc-keycode-smoke)
+add_test(NAME "app-softpc/unit/compat/keycode_smoke" COMMAND softpc-keycode-smoke)
 add_executable(softpc-vga-frame-smoke test/app-softpc/unit/machine/vga_frame_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
@@ -422,10 +427,10 @@ target_compile_definitions(softpc-vga-frame-smoke PRIVATE
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 add_test(NAME "app-softpc/unit/machine/vga_frame_smoke" COMMAND softpc-vga-frame-smoke)
 add_executable(softpc-text-console-compat-smoke
-    test/app-softpc/unit/machine/text_console_compat_smoke.c)
+    test/app-softpc/unit/compat/text_console_compat_smoke.c)
 target_link_libraries(softpc-text-console-compat-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-text-console-compat-smoke PRIVATE src src/app-softpc)
-add_test(NAME "app-softpc/unit/machine/text_console_compat_smoke"
+add_test(NAME "app-softpc/unit/compat/text_console_compat_smoke"
     COMMAND softpc-text-console-compat-smoke)
 add_executable(softpc-bop-smoke test/app-softpc/unit/machine/bop_smoke.c)
 target_link_libraries(softpc-bop-smoke PRIVATE softpc-vm)
@@ -452,12 +457,12 @@ add_test(NAME "app-softpc/unit/machine/checkpoint_smoke" COMMAND softpc-checkpoi
 set_tests_properties("app-softpc/unit/machine/checkpoint_smoke" PROPERTIES TIMEOUT 15)
 add_executable(softpc-snapshot-transaction-smoke
     test/app-softpc/integration/snapshot_transaction_smoke.c)
-add_executable(softpc-media-snapshot-smoke test/app-softpc/unit/machine/media_snapshot_smoke.c
+add_executable(softpc-media-snapshot-smoke test/app-softpc/unit/compat/media_snapshot_smoke.c
     src/app-softpc/compat/snapshot_stream.c)
 target_include_directories(softpc-media-snapshot-smoke PRIVATE src src/app-softpc)
 target_link_libraries(softpc-media-snapshot-smoke PRIVATE storage)
-add_test(NAME "app-softpc/unit/machine/media_snapshot_smoke" COMMAND softpc-media-snapshot-smoke)
-set_tests_properties("app-softpc/unit/machine/media_snapshot_smoke" PROPERTIES TIMEOUT 20 LABELS "unit")
+add_test(NAME "app-softpc/unit/compat/media_snapshot_smoke" COMMAND softpc-media-snapshot-smoke)
+set_tests_properties("app-softpc/unit/compat/media_snapshot_smoke" PROPERTIES TIMEOUT 20 LABELS "unit")
 target_link_libraries(softpc-snapshot-transaction-smoke PRIVATE softpc-vm
     emulator-machine)
 add_test(NAME "app-softpc/integration/snapshot_transaction_smoke"
@@ -510,12 +515,12 @@ add_executable(softpc-command-provider-smoke test/app-softpc/integration/command
 target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm product-debug emulator-session emulator-machine product-surface-command product-surface-keyboard)
 add_test(NAME "app-softpc/integration/command_provider_smoke" COMMAND softpc-command-provider-smoke)
 set_tests_properties("app-softpc/integration/command_provider_smoke" PROPERTIES LABELS "integration" TIMEOUT 45)
-add_executable(softpc-x87-layout-smoke test/app-softpc/unit/machine/x87_layout_smoke.c)
+add_executable(softpc-x87-layout-smoke test/app-softpc/unit/softpc.new/x87_layout_smoke.c)
 target_include_directories(softpc-x87-layout-smoke PRIVATE
     src src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
 target_compile_definitions(softpc-x87-layout-smoke PRIVATE LITTLEND SOFTPC_STANDALONE)
-add_test(NAME "app-softpc/unit/machine/x87_layout_smoke" COMMAND softpc-x87-layout-smoke)
-set_tests_properties("app-softpc/unit/machine/x87_layout_smoke" PROPERTIES LABELS "unit")
+add_test(NAME "app-softpc/unit/softpc.new/x87_layout_smoke" COMMAND softpc-x87-layout-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/x87_layout_smoke" PROPERTIES LABELS "unit")
 add_test(NAME "checks/standalone_source_boundary"
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/standalone_source_boundary.cmake")
@@ -567,38 +572,38 @@ set(SOFTPC_TEST_TARGETS
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
 )
-add_executable(softpc-sound-state-smoke test/app-softpc/unit/machine/sound_state_smoke.c)
+add_executable(softpc-sound-state-smoke test/app-softpc/unit/softpc.new/sound_state_smoke.c)
 target_include_directories(softpc-sound-state-smoke PRIVATE src src/app-softpc
     $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)
 target_compile_definitions(softpc-sound-state-smoke PRIVATE
     $<TARGET_PROPERTY:softpc-machine-devices,COMPILE_DEFINITIONS>)
 set_target_properties(softpc-sound-state-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
-add_test(NAME "app-softpc/unit/machine/sound_state_smoke" COMMAND softpc-sound-state-smoke)
-set_tests_properties("app-softpc/unit/machine/sound_state_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+add_test(NAME "app-softpc/unit/softpc.new/sound_state_smoke" COMMAND softpc-sound-state-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/sound_state_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
 list(APPEND SOFTPC_TEST_TARGETS softpc-sound-state-smoke)
-add_executable(softpc-audio-first-tone-smoke test/app-softpc/unit/machine/audio_first_tone_smoke.c)
+add_executable(softpc-audio-first-tone-smoke test/app-softpc/unit/compat/audio_first_tone_smoke.c)
 target_link_libraries(softpc-audio-first-tone-smoke PRIVATE base types)
 target_include_directories(softpc-audio-first-tone-smoke PRIVATE src src/app-softpc
     $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
 target_compile_definitions(softpc-audio-first-tone-smoke PRIVATE
     $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
 set_target_properties(softpc-audio-first-tone-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
-add_test(NAME "app-softpc/unit/machine/audio_first_tone_smoke" COMMAND softpc-audio-first-tone-smoke)
-set_tests_properties("app-softpc/unit/machine/audio_first_tone_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+add_test(NAME "app-softpc/unit/compat/audio_first_tone_smoke" COMMAND softpc-audio-first-tone-smoke)
+set_tests_properties("app-softpc/unit/compat/audio_first_tone_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
 list(APPEND SOFTPC_TEST_TARGETS softpc-audio-first-tone-smoke)
-add_executable(softpc-audio-first-delivery-smoke test/app-softpc/unit/machine/audio_first_delivery_smoke.c)
+add_executable(softpc-audio-first-delivery-smoke test/app-softpc/unit/compat/audio_first_delivery_smoke.c)
 target_link_libraries(softpc-audio-first-delivery-smoke PRIVATE base types)
 target_include_directories(softpc-audio-first-delivery-smoke PRIVATE src src/app-softpc
     $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
 target_compile_definitions(softpc-audio-first-delivery-smoke PRIVATE
     $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
 set_target_properties(softpc-audio-first-delivery-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
-add_test(NAME "app-softpc/unit/machine/audio_first_delivery_smoke" COMMAND softpc-audio-first-delivery-smoke)
-set_tests_properties("app-softpc/unit/machine/audio_first_delivery_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+add_test(NAME "app-softpc/unit/compat/audio_first_delivery_smoke" COMMAND softpc-audio-first-delivery-smoke)
+set_tests_properties("app-softpc/unit/compat/audio_first_delivery_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
 list(APPEND SOFTPC_TEST_TARGETS softpc-audio-first-delivery-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
-    add_executable(${probe_target} test/app-softpc/unit/machine/${probe}_failure_smoke.c)
+    add_executable(${probe_target} test/app-softpc/unit/compat/${probe}_failure_smoke.c)
     target_link_libraries(${probe_target} PRIVATE softpc-vm)
     target_include_directories(${probe_target} PRIVATE src src/app-softpc
         $<TARGET_PROPERTY:softpc-machine-compat,INCLUDE_DIRECTORIES>)
@@ -606,8 +611,8 @@ foreach(probe IN ITEMS platform audio)
         $<TARGET_PROPERTY:softpc-machine-compat,COMPILE_DEFINITIONS>)
     # The probes include the actual legacy-facing implementation.
     set_target_properties(${probe_target} PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
-    add_test(NAME "app-softpc/unit/machine/${probe}_failure_smoke" COMMAND ${probe_target})
-    set_tests_properties("app-softpc/unit/machine/${probe}_failure_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+    add_test(NAME "app-softpc/unit/compat/${probe}_failure_smoke" COMMAND ${probe_target})
+    set_tests_properties("app-softpc/unit/compat/${probe}_failure_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
     list(APPEND SOFTPC_TEST_TARGETS ${probe_target})
 endforeach()
 get_target_property(shutdown_test_links softpcvm LINK_LIBRARIES)
@@ -647,57 +652,6 @@ foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     endif()
 endforeach()
 
-set(SOFTPC_UNIT_CTESTS
-    "app-softpc/unit/product/config_smoke"
-    "app-softpc/unit/machine/pit_smoke"
-    "app-softpc/unit/machine/media_snapshot_smoke"
-    "app-softpc/unit/machine/machine_smoke"
-    "app-softpc/unit/machine/dual_media_smoke"
-    "app-softpc/unit/machine/partition_image_smoke"
-    "app-softpc/unit/machine/irq_smoke"
-    "app-softpc/unit/machine/fdc_smoke"
-    "app-softpc/unit/machine/printer_smoke"
-    "app-softpc/unit/machine/sound_smoke"
-    "app-softpc/unit/machine/sound_state_smoke"
-    "app-softpc/unit/machine/audio_lifecycle_smoke"
-    "app-softpc/unit/machine/audio_first_tone_smoke"
-    "app-softpc/unit/machine/audio_first_delivery_smoke"
-    "app-softpc/unit/machine/serial_smoke"
-    "app-softpc/unit/machine/mouse_smoke"
-    "app-softpc/unit/machine/keycode_smoke"
-    "app-softpc/unit/machine/vga_frame_smoke"
-    "app-softpc/unit/machine/text_console_compat_smoke"
-    "app-softpc/unit/machine/bop_smoke"
-    "app-softpc/unit/machine/quick_time_smoke"
-    "app-softpc/unit/machine/lifecycle_smoke"
-    "app-softpc/unit/machine/checkpoint_smoke"
-    "app-softpc/unit/machine/snapshot_boundary_smoke"
-    "app-softpc/unit/machine/platform_failure_smoke"
-    "app-softpc/unit/machine/audio_failure_smoke"
-    "app-softpc/unit/machine/parallel_failure_smoke"
-    "app-softpc/unit/machine/x87_layout_smoke")
-set(SOFTPC_INTEGRATION_CTESTS
-    "app-softpc/integration/snapshot_transaction_smoke"
-    "app-softpc/integration/snapshot_cross_process"
-    "app-softpc/integration/runtime_smoke"
-    "app-softpc/integration/runtime_restart_boot_smoke"
-    "app-softpc/integration/runtime_input_continuation_smoke"
-    "app-softpc/integration/command_provider_smoke"
-    "app-softpc/integration/presentation_shutdown_smoke"
-    "app-softpc/integration/runtime_cursor_smoke")
-set(SOFTPC_CHECK_CTESTS
-    "checks/product_boundary_negative"
-    "checks/standalone_source_boundary"
-    "checks/lib_types_base_convergence"
-    "checks/lib_types_base_convergence_negative"
-    "checks/kvm_naming"
-    "checks/documentation_governance"
-    "checks/documentation_governance/selftest"
-    "checks/win32_presentation_manifest")
-set_tests_properties(${SOFTPC_UNIT_CTESTS} PROPERTIES LABELS "unit;app-softpc")
-set_tests_properties(${SOFTPC_INTEGRATION_CTESTS} PROPERTIES LABELS "integration;app-softpc")
-set_tests_properties(${SOFTPC_CHECK_CTESTS} PROPERTIES LABELS "checks")
-
 add_executable(softpc-package-smoke test/app-softpc/integration/package_smoke.c)
 target_include_directories(softpc-package-smoke PRIVATE src)
 target_link_libraries(softpc-package-smoke PRIVATE base)
@@ -727,14 +681,27 @@ add_test(NAME "checks/build_ownership_negative" COMMAND "${CMAKE_COMMAND}"
     "-DSOFTPC_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/tools/checks/build_ownership.cmake")
 set_tests_properties("checks/build_ownership_negative" PROPERTIES LABELS "checks")
-list(APPEND SOFTPC_CHECK_CTESTS "checks/build_ownership_negative")
 
 # Parallel background tests must not share generated media, snapshots or probe
 # files. Checked-in media is supplied through an explicit read-only path, so
-# every non-desktop test may use a private ignored build directory.
+# every non-desktop test may use a private ignored build directory.  A test's
+# registered owner path is also the one source of truth for its tier labels.
 get_property(softpc_registered_tests DIRECTORY PROPERTY TESTS)
 foreach(softpc_registered_test IN LISTS softpc_registered_tests)
     get_test_property(${softpc_registered_test} LABELS softpc_registered_labels)
+    if(softpc_registered_labels STREQUAL "NOTFOUND")
+        set(softpc_registered_labels)
+    endif()
+    if(softpc_registered_test MATCHES "^app-softpc/unit/")
+        list(APPEND softpc_registered_labels unit app-softpc)
+    elseif(softpc_registered_test MATCHES "^app-softpc/integration/")
+        list(APPEND softpc_registered_labels integration app-softpc)
+    elseif(softpc_registered_test MATCHES "^checks/")
+        list(APPEND softpc_registered_labels checks)
+    endif()
+    list(REMOVE_DUPLICATES softpc_registered_labels)
+    set_tests_properties(${softpc_registered_test} PROPERTIES
+        LABELS "${softpc_registered_labels}")
     list(FIND softpc_registered_labels "desktop" softpc_desktop_label)
     if(softpc_desktop_label EQUAL -1)
         set(softpc_test_work_directory

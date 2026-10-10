@@ -3,7 +3,7 @@
 #include "lib/base/sync_interface.h"
 #include <assert.h>
 #include <stdio.h>
-#include "../../cleanup.h"
+#include "../../fixture_cleanup.h"
 
 static int fail_event, fail_timer, fail_wait, fake_timer, fail_delete;
 static int signal_on_wait;

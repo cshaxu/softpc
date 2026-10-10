@@ -566,6 +566,8 @@ endif()
 file(GLOB_RECURSE unit_test_sources
     "${SOFTPC_SOURCE_DIR}/test/app-softpc/unit/product/*"
     "${SOFTPC_SOURCE_DIR}/test/app-softpc/unit/machine/*"
+    "${SOFTPC_SOURCE_DIR}/test/app-softpc/unit/compat/*"
+    "${SOFTPC_SOURCE_DIR}/test/app-softpc/unit/softpc.new/*"
     "${SOFTPC_SOURCE_DIR}/test/app-softpc/integration/*"
     "${SOFTPC_SOURCE_DIR}/tools/checks/*.cmake")
 list(REMOVE_ITEM unit_test_sources
@@ -588,9 +590,11 @@ endif()
 if(build_definition MATCHES "tests/")
     message(FATAL_ERROR "CMake retains a legacy tests/ source reference")
 endif()
-if(NOT build_definition MATCHES "LABELS \\\"unit\\\"")
-    message(FATAL_ERROR "CMake does not label the unit test tier")
+if(NOT build_definition MATCHES "MATCHES \\\"\\^app-softpc/unit/\\\"" OR
+   NOT build_definition MATCHES "list\\(APPEND softpc_registered_labels unit app-softpc\\)")
+    message(FATAL_ERROR "CMake does not derive the unit test tier from its owner path")
 endif()
-if(NOT build_definition MATCHES "LABELS \\\"integration;")
-    message(FATAL_ERROR "CMake does not label the integration test tier")
+if(NOT build_definition MATCHES "MATCHES \\\"\\^app-softpc/integration/\\\"" OR
+   NOT build_definition MATCHES "list\\(APPEND softpc_registered_labels integration app-softpc\\)")
+    message(FATAL_ERROR "CMake does not derive the integration test tier from its owner path")
 endif()

@@ -1,7 +1,7 @@
-#include "../../time.h"
+#include "../../fixture_time.h"
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
-#include "../../cleanup.h"
+#include "../../fixture_cleanup.h"
 
 #include <assert.h>
 #include <stdio.h>

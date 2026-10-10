@@ -1,9 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "product/config.h"
 #include "lib/storage/file_interface.h"
-#ifdef NDEBUG
-#undef NDEBUG
-#endif
 #include <assert.h>
 
 static const char *input;

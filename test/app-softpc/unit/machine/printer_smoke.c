@@ -1,5 +1,5 @@
 #include "machine/machine.h"
-#include "../../cleanup.h"
+#include "../../fixture_cleanup.h"
 
 #include <assert.h>
 #include <errno.h>

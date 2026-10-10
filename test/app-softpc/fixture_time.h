@@ -1,5 +1,5 @@
-#ifndef SOFTPC_TEST_TIME_H
-#define SOFTPC_TEST_TIME_H
+#ifndef SOFTPC_TEST_FIXTURE_TIME_H
+#define SOFTPC_TEST_FIXTURE_TIME_H
 
 #include "lib/base/clock_interface.h"
 #include "lib/base/sync_interface.h"

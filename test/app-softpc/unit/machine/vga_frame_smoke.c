@@ -1,7 +1,7 @@
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "machine/driver.h"
-#include "../../cleanup.h"
+#include "../../fixture_cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "xt.h"

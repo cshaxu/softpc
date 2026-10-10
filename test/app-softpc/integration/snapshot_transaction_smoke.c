@@ -1,4 +1,4 @@
-#include "../time.h"
+#include "../fixture_time.h"
 #include "lib/types/types_interface.h"
 #include "machine/driver.h"
 #include "machine/snapshot.h"

@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 /* Test the private archive and real Storage without a CPU or media emulator. */
-#include "../../../../src/app-softpc/compat/media_snapshot.c"
+#include "compat/media_snapshot.c"
 #include <assert.h>
 #include <stdio.h>
 
