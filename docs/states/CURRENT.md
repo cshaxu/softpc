@@ -2,10 +2,14 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T85.
-The next admitted work must allocate its next unused S identifier.
+No implementation subtask is active.
 
-## M9 T85 S20 closure record
+## Historical M9 T85 S20 delivery record
+
+This retained delivery record is superseded for task state by the
+[T85 completion audit](../history/M9-T85-completion-audit.md).  In particular,
+the earlier P2/P3 handoff wording below is historical; P4 is accepted and T85
+is closed.
 
 | Field | Required record |
 | --- | --- |
@@ -268,7 +272,11 @@ output/input correctness and fresh-checkout usability. The task-level ledger
 and retained boundary/deferral dispositions are in the
 [T84 completion audit](../history/M9-T84-completion-audit.md).
 
-## T85 Awaiting Owner Direction
+## T85 historical delivery record
+
+The following individual-S records retain their contemporary evidence.  Their
+references to T85 remaining open predate the task-level owner closure recorded
+in the [completion audit](../history/M9-T85-completion-audit.md).
 
 M9 T85 S1 is owner-accepted and closed on 2026-09-28. P1 `fc74d65e`
 repairs mono-painter publication; P2 `ee62ad01` repairs InPort scheduling and
@@ -530,6 +538,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T85 | S1--S20 complete; owner approves task closure. | [Audit](../history/M9-T85-completion-audit.md) |
 | T84 | S1--S12 complete; owner approves task closure. | [Audit](../history/M9-T84-completion-audit.md) |
 | T83 | S1--S6 complete; owner approves task closure. | [Audit](../history/M9-T83-completion-audit.md) |
 | T82 | S1/S2 complete; owner accepts the six-component convergence. | [Audit](../history/M9-T82-completion-audit.md) |
