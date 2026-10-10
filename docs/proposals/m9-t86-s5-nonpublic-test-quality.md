@@ -63,7 +63,8 @@ widths. Record the exact suite/label counts and every excluded case.
 ## Audit ledger and repair disposition
 
 The finite CTest inventory contains 47 non-public routes: 28 App unit tests,
-8 App integration tests, and 11 repository checks. The unit ownership split
+10 App integration tests (including two desktop package routes), and 9
+repository checks. The unit ownership split
 is now `product` 1, `machine` 16, `compat` 9, and preserved `softpc.new` 2.
 Each route has one owner path; root CMake derives its App tier label and
 private build working directory from that same registered path.
@@ -102,6 +103,31 @@ fixture for its three composition tests; the original-C tests retain their
 original ABI vocabulary; no duplicate executable or outward test-suite
 dependency was found. No production, public corpus, user asset, or published
 EXE is changed by this S.
+
+### Complete route ledger
+
+`ctest --show-only=json-v1` is the executable ledger.  The following finite
+route list is its reviewed non-public projection.  Except for the two desktop
+package routes explicitly marked below, each route receives the path-derived
+private `test-work/<route>` directory.  “Direct” means an owner-local probe
+deliberately includes the recovered implementation to inject a native failure
+or assert a preserved ABI detail; it is not a dependency on another test.
+
+| Owner / kind | Routes | Execution dependency and disposition |
+| --- | --- | --- |
+| App Product unit | `app-softpc/unit/product/config_smoke` | App configuration parser plus Lib Types; retained and corrected to compile with assertions enabled. |
+| App Machine unit | `machine_smoke`, `dual_media_smoke`, `partition_image_smoke`, `pit_smoke`, `irq_smoke`, `fdc_smoke`, `printer_smoke`, `sound_smoke`, `serial_smoke`, `mouse_smoke`, `vga_frame_smoke`, `bop_smoke`, `quick_time_smoke`, `lifecycle_smoke`, `checkpoint_smoke`, `snapshot_boundary_smoke` | `app-softpc/unit/machine` fixture and the product's machine/core targets; retained because each asserts a distinct device, lifecycle, snapshot, timing, or presentation contract. |
+| App Compat unit | `parallel_failure_smoke`, `audio_lifecycle_smoke`, `keycode_smoke`, `text_console_compat_smoke`, `media_snapshot_smoke`, `audio_first_tone_smoke`, `audio_first_delivery_smoke`, `platform_failure_smoke`, `audio_failure_smoke` | Direct Compat/native-failure probes plus inward Lib facilities; all moved from the incorrect Machine owner and retained for distinct failure/translation contracts. |
+| Preserved SoftPC mirror unit | `x87_layout_smoke`, `sound_state_smoke` | Direct recovered-host ABI/state probes; retained under `unit/softpc.new`, with original host vocabulary isolated from reusable components. |
+| App integration | `snapshot_transaction_smoke`, `snapshot_cross_process`, `runtime_smoke`, `runtime_restart_boot_smoke`, `runtime_input_continuation_smoke`, `command_provider_smoke`, `presentation_shutdown_smoke`, `runtime_cursor_smoke` | App composition/runtime fixture; retained because each crosses the App/Core boundary. |
+| App desktop integration | `package_smoke`, `package_smoke/compact_console` | Published package executable and native desktop; intentionally retain the package build directory and desktop resource disposition rather than inventing a private fake desktop. |
+| Repository static check | `product_boundary_negative`, `standalone_source_boundary`, `lib_types_base_convergence`, `lib_types_base_convergence_negative`, `kvm_naming`, `documentation_governance`, `documentation_governance/selftest`, `win32_presentation_manifest`, `build_ownership_negative` | CMake/script routes only; retained as the ownership, documentation, boundary, vocabulary, manifest, and negative-contract gates. |
+
+The table abbreviates only the common owner prefix: every bare unit route is
+registered as `app-softpc/unit/<owner>/<route>`, and every bare integration
+route as `app-softpc/integration/<route>`.  It therefore accounts for exactly
+28 unit, 10 integration, and 9 check routes without maintaining a second
+CMake classification list.
 
 ## Implementation evidence
 
