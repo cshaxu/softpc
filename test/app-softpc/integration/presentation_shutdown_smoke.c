@@ -122,6 +122,7 @@ int main(void)
     config.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(app_startup_compose_ui(&config, &definition.ui) == LIB_STATUS_OK);
     definition.name = "presentation-shutdown";
+    definition.banner = definition.name;
     for (scenario = 0u; scenario < 3u; ++scenario) {
         requests = destroyed = reported = generations = states = 0u;
         assert(softpc_product_compose_machine(&config, &definition.machine) ==

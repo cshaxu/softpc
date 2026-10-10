@@ -7,6 +7,7 @@
 
 int main(int argc, char **argv)
 {
+    const char *product_name = "Insignia SoftPC";
     char config_path[SOFTPC_CONFIG_PATH_MAX];
     app_startup_config config = { { 0 }, { 0 }, { 0 }, { 0 }, 16u * 1024u * 1024u,
         EMULATOR_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
@@ -42,7 +43,8 @@ int main(int argc, char **argv)
         return 1;
     }
     definition = (product_surface_definition){
-        .name = "Insignia SoftPC",
+        .name = product_name,
+        .banner = product_name,
         .machine = machine,
         .ui = ui,
         .configure_extensions = softpc_product_configure_extensions

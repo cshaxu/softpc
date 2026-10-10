@@ -135,6 +135,7 @@ lib_i32 main(void)
 {
     const product_surface_definition definition = {
         .name = "PC",
+        .banner = "PC",
         .machine = {.composition = {.machine = &fixture, .bind = fixture_bind,
             .destroy = fixture_destroy}},
         .ui = {.display = EMULATOR_SESSION_DISPLAY_CONSOLE}
@@ -153,7 +154,7 @@ lib_i32 main(void)
         if (index == 1u && (created != 1u || destroyed != 1u)) return 3;
         if (index != 1u && (created != 1u || destroyed != 0u)) return 4;
         if (fixture.live) return 5;
-        if (received_banner != definition.name) return 6;
+        if (received_banner != definition.banner) return 6;
     }
     return 0;
 }
