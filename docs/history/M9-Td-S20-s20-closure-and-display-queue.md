@@ -16,7 +16,7 @@ Machine, Session, App, Core, Compat, INI, guest media or snapshot format.
 
 The owner records two new candidates at the queue head:
 
-1. [Raw Console to cooked monitor handoff repair](../proposals/m9-raw-console-cooked-handoff.md), a shared Console transition defect to investigate against the read-only NTVDM64 evidence.
+1. [Raw Console to cooked monitor handoff repair](M9-T86-S1-raw-console-cooked-handoff.md), a shared Console transition defect to investigate against the read-only NTVDM64 evidence. T86 S1 subsequently completed it.
 2. [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md), a separate producer-side geometry investigation with an explicit prohibition on guest-program special cases.
 
 They are intentionally separate because the first concerns native Console

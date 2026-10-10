@@ -1,8 +1,8 @@
 # M9 T86 S1 delivery record: Console handoff
 
 T86 S1 delivered the raw-Console to cooked-monitor handoff work through P10.
-Its implementation and review history are retained in the active-task proposal
-[Raw Console to cooked monitor handoff repair](../proposals/m9-raw-console-cooked-handoff.md).
+Its admitted repair record is retained in
+[Raw Console to cooked monitor handoff repair](M9-T86-S1-raw-console-cooked-handoff.md).
 
 The delivery restores the saved cooked Console surface cursor only while that
 surface is selected, verifies its backing buffer after extended display
