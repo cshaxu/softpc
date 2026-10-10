@@ -2,15 +2,16 @@
 
 ## Current Work
 
-M9 T86 S1 is implemented and awaiting owner validation: repair the raw Console
-to cooked monitor handoff without changing viewport policy.
+M9 T86 S1 is active: owner validation disproved the first cursor hypothesis;
+repair the raw Console to cooked monitor handoff without changing viewport
+policy.
 
 ## M9 T86 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner admits a new T to repair the raw Console-to-cooked Console handoff after T85 closure. |
+| Admission And Approval | Owner admits a new T to repair the raw Console-to-cooked Console handoff after T85 closure. Owner validation reports that the first private reader-start cursor resubmission did not repair native echo placement, and directs continuation within the same broker boundary. |
 | Objective | Reproduce and identify the shared native Console state mismatch that leaves the cooked prompt and its reader/echo on different rows after `start` then CAP returns raw Console control to the cooked monitor; implement only the smallest owner-local correction supported by evidence. |
 | Non-goals | Do not use Computer Use; do not change guest video, Machine, Session command semantics, Product monitor text, App configuration, package INI, guest media or snapshots; do not add polling, retries, a second reader, viewport-forcing workaround or app-specific row policy. |
 | Reference Baseline | SoftPC `f0625d51`; read-only NTVDM64 remains comparison material only. |
@@ -18,7 +19,7 @@ to cooked monitor handoff without changing viewport policy.
 | Files And ABI Surface | Initially inspect `src/lib/console-broker/win32`, Lib Console contracts, Emulator UI binding order and their existing tests. Any source change must remain behind the existing Console/Broker contract; no public ABI change without owner approval. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus ownership; preserve owner configuration/media; no Computer Use. |
 | Verification | Static transition trace plus a disposable native-Console probe or focused injected test; compare read-only NTVDM64 implementation; if a repair is admitted, run focused x64/x86 tests and proportional package/background verification. |
-| Expected Markers | Before the cooked reader arms, the selected cooked output's current cursor is explicitly re-submitted and there is one reader; raw-to-cooked return has prompt, native echo and cursor on the same logical row; no viewport growth or app-specific row policy. |
+| Expected Markers | During cooked surface selection, its saved cursor is explicitly restored before its saved viewport, and there is one reader; raw-to-cooked return has prompt, native echo and cursor on the same logical row; no viewport growth or app-specific row policy. |
 | Asset Needs | May read and launch the existing `assets/binary` executable only without modifying its INI, media or snapshots; any probe output stays disposable under `build/`. |
 | Reporting Requirements | Record exact transition order and native buffer/viewport/cursor facts, NTVDM64 comparison, finite similar-issue sweep and a pre-change estimate before any code edit. Report production/test line counts and dual-width evidence for any delivered repair. |
 | Stop Conditions | Evidence requires a public API change, host-terminal-specific workaround, App-specific rows, guest/video change, or unavailable native Console observation; stop for owner design direction. |

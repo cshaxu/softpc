@@ -9,7 +9,7 @@ It compares the same ownership point with read-only NTVDM64 and does not make a
 source change until one owner-local contract failure is proven.  User-owned
 package INI, guest media and snapshots remain untouched.
 
-### S1 evidence and repair
+### S1 evidence, rejected hypothesis and corrective repair
 
 The actual handoff is broker-owned: UI activates the cooked binding, Monitor
 writes its prompt, then the broker starts the one `ReadConsole` reader.  The
@@ -20,14 +20,22 @@ ConHost path has a 120x9001 backing buffer and a coherent cursor, while the
 reported Terminal/RDP symptom remains consistent with host-side cursor state
 being stale after buffer selection/reflow.
 
-S1 therefore adds one private broker operation immediately before reader
-creation: query the selected cooked buffer's current cursor and submit that
-same position through the existing Win32 setter.  Failure returns the existing
-I/O status and does not create a reader.  This neither resizes a viewport nor
-adds a retry, reader, state machine, row constant or public API.  NTVDM64 uses
-a larger logical-surface frontend, so it is not a transplant candidate; its
-relevant shared invariant is likewise explicit cursor placement after surface
-selection.
+The first S1 delivery tried to re-submit the currently observed cursor before
+starting `ReadConsole`. Owner validation disproved that hypothesis: the
+newly typed cooked input still echoed above its prompt. That operation merely
+repeated whichever cursor the host already exposed; it did not restore the
+cooked surface's saved cursor as part of selecting that surface.
+
+The corrective repair keeps the two existing buffers and moves the one cursor
+operation to the only correct ownership point: display restoration during
+raw-to-cooked buffer selection. It restores buffer metadata, explicitly sets
+the saved cooked cursor, then restores the saved viewport because moving a
+cursor can scroll it. Frame palette updates use the same metadata helper but
+do not restore a cursor. Reader creation goes back to its single responsibility
+of creating the one reader. This is the same native ordering invariant used by
+the read-only NTVDM64 implementation, without importing its different
+frontend architecture. No viewport policy, row constant, retry, state machine
+or public API is added.
 
 ## Observed contract failure
 
