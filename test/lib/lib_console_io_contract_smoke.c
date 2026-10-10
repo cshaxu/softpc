@@ -32,6 +32,7 @@ static lib_win32_char_info captured_cells[80u * 50u];
 static lib_win32_small_rect captured_region;
 static lib_win32_coord buffer_size={80,30};
 static lib_win32_small_rect viewport={0,0,79,29};
+static lib_win32_coord native_cursor;
 static lib_win32_coord viewport_limit;
 static lib_bool limit_viewport, fail_viewport_set;
 static lib_bool reject_resize, ignore_resize;
@@ -49,6 +50,7 @@ static lib_win32_bool LIB_WIN32_WINAPI screen_info(lib_win32_handle h, lib_win32
         if (p->dwMaximumWindowSize.Y>viewport_limit.Y) p->dwMaximumWindowSize.Y=viewport_limit.Y;
     }
     p->srWindow=viewport;
+    p->dwCursorPosition=native_cursor;
     return LIB_WIN32_TRUE;
 }
 static lib_win32_bool LIB_WIN32_WINAPI resize_buffer(lib_win32_handle h,lib_win32_coord size)
@@ -84,8 +86,9 @@ static lib_win32_bool LIB_WIN32_WINAPI write_cells(lib_win32_handle h, const lib
 static lib_win32_console_cursor_info last_cursor;
 static lib_win32_bool LIB_WIN32_WINAPI cursor_info(lib_win32_handle h, const lib_win32_console_cursor_info *p)
 { (void)h; last_cursor=*p; return cursor_ok; }
+static lib_u32 cursor_positions;
 static lib_win32_bool LIB_WIN32_WINAPI cursor_position(lib_win32_handle h, lib_win32_coord p)
-{ (void)h; (void)p; return cursor_ok; }
+{ (void)h; ++cursor_positions; if (cursor_ok) native_cursor=p; return cursor_ok; }
 static lib_u32 readers_started, mode_sets;
 static lib_win32_bool LIB_WIN32_WINAPI set_mode(lib_win32_handle h, lib_win32_dword mode) { (void)h; (void)mode; ++mode_sets; return LIB_WIN32_TRUE; }
 static lib_win32_bool LIB_WIN32_WINAPI flush_input(lib_win32_handle h) { (void)h; return LIB_WIN32_TRUE; }
@@ -138,8 +141,10 @@ static void cooked_restore(void)
     lib_test_assert(lib_console_set_event_sink(c,receive,LIB_NULL)==LIB_STATUS_OK);
     lib_test_assert(console_broker_backend_activate(&b,c,CONSOLE_BROKER_COOKED_LINES,1,0)==0);
     lib_test_assert(!b.reader && !b.cooked_line_pending && readers_started==0);
+    native_cursor=(lib_win32_coord){17,23}; cursor_positions=0u;
     lib_test_assert(console_broker_backend_request_cooked_line(&b)==0);
-    lib_test_assert(b.reader && b.cooked_line_pending && readers_started==1);
+    lib_test_assert(b.reader && b.cooked_line_pending && readers_started==1 &&
+        cursor_positions==1u && native_cursor.X==17 && native_cursor.Y==23);
     /* Cancellation preserves an unfinished request until join. */
     stop=b.stop_event; input="discarded\r\n"; reads=0; cancel_at=1;
     console_broker_reader(&b); cancel_at=0;
@@ -154,6 +159,13 @@ static void cooked_restore(void)
     lib_test_assert(console_broker_backend_deactivate(&b,&pending)==0 && !pending);
     lib_test_assert(console_broker_backend_activate(&b,c,CONSOLE_BROKER_COOKED_LINES,1,pending)==0);
     lib_test_assert(!b.reader && readers_started==2);
+    lib_test_assert(console_broker_backend_deactivate(&b,&pending)==0 && !pending);
+    cursor_ok=0;
+    native_cursor=(lib_win32_coord){4,5};
+    lib_test_assert(console_broker_backend_activate(&b,c,CONSOLE_BROKER_COOKED_LINES,1,0)==0);
+    lib_test_assert(console_broker_backend_request_cooked_line(&b)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(!b.reader && !b.cooked_line_pending && readers_started==2);
+    cursor_ok=1;
     lib_test_assert(console_broker_backend_deactivate(&b,&pending)==0 && !pending);
     lib_console_release(c);
 }

@@ -362,6 +362,21 @@ static lib_status console_broker_start_reader(console_broker_backend *backend)
     return LIB_STATUS_OK;
 }
 
+/* ReadConsole echoes into the selected screen buffer at its current cursor.
+ * Re-submit that cursor after monitor output and immediately before the one
+ * native line reader starts: selecting an alternate raw buffer or host-side
+ * reflow may otherwise leave the input host with stale cursor state. */
+static lib_status console_broker_sync_cooked_cursor(console_broker_backend *backend)
+{
+    lib_win32_console_screen_buffer_info info;
+
+    if (backend == LIB_NULL ||
+        !lib_win32_get_console_screen_buffer_info(backend->output, &info) ||
+        !lib_win32_set_console_cursor_position(backend->output,
+            info.dwCursorPosition)) return LIB_STATUS_IO_ERROR;
+    return LIB_STATUS_OK;
+}
+
 /* The native raw Console is the input surface. This behavior
  * is coupled to successful raw activation rather than exposed as a product
  * API: the broker owns the one process Console handle and knows whether a
@@ -496,6 +511,8 @@ lib_status console_broker_backend_request_cooked_line(
         if (!lib_win32_close_handle(backend->reader)) return LIB_STATUS_IO_ERROR;
         backend->reader = LIB_NULL;
     }
+    if (console_broker_sync_cooked_cursor(backend) != LIB_STATUS_OK)
+        return LIB_STATUS_IO_ERROR;
     return console_broker_start_reader(backend);
 }
 

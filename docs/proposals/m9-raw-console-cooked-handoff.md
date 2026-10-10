@@ -1,5 +1,34 @@
 # Raw Console to cooked monitor handoff repair
 
+## T86 S1 admission
+
+The owner admits this queue head as M9 T86 S1 on 2026-10-09.  S1 first
+establishes the native transition facts without Computer Use: selected output,
+backing buffer, viewport, cursor, logical monitor extent and reader order.
+It compares the same ownership point with read-only NTVDM64 and does not make a
+source change until one owner-local contract failure is proven.  User-owned
+package INI, guest media and snapshots remain untouched.
+
+### S1 evidence and repair
+
+The actual handoff is broker-owned: UI activates the cooked binding, Monitor
+writes its prompt, then the broker starts the one `ReadConsole` reader.  The
+Win32 contract places `ReadConsole`'s cooked echo at the selected screen
+buffer cursor.  The old last step did not re-submit that cursor after the raw
+buffer had been active.  A disposable native probe confirmed that the ordinary
+ConHost path has a 120x9001 backing buffer and a coherent cursor, while the
+reported Terminal/RDP symptom remains consistent with host-side cursor state
+being stale after buffer selection/reflow.
+
+S1 therefore adds one private broker operation immediately before reader
+creation: query the selected cooked buffer's current cursor and submit that
+same position through the existing Win32 setter.  Failure returns the existing
+I/O status and does not create a reader.  This neither resizes a viewport nor
+adds a retry, reader, state machine, row constant or public API.  NTVDM64 uses
+a larger logical-surface frontend, so it is not a transplant candidate; its
+relevant shared invariant is likewise explicit cursor placement after surface
+selection.
+
 ## Observed contract failure
 
 After returning from a raw VM Console to the cooked monitor Console, the
