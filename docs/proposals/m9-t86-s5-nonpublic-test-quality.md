@@ -161,6 +161,12 @@ in Release.  Keeping them would create two failure mechanisms for the same
 test suite, so both replacements are deleted rather than retained as a
 fallback.  Their normal assertion behavior is rebuilt and run on x64 and x86.
 
+Focused proof: both `app-softpc/integration/runtime_smoke` and
+`app-softpc/integration/snapshot_transaction_smoke` rebuild and pass on both
+declared MinGW widths.  The source-boundary, build-ownership and documentation
+governance checks also pass on both widths.  The CTest JSON query verifies the
+47-route count, uniqueness, owner split and working-directory contract.
+
 The same sweep finds no outward include of a public test corpus, no remaining
 three-or-more-level walk back to `src/`, and no `NDEBUG` bypass under the App
 unit/integration roots.  Remaining direct Win32 headers are owner-local
