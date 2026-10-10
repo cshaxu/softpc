@@ -13,6 +13,11 @@ The concrete SoftPC ownership map is [System Architecture](../design/ARCHITECTUR
   communicate through bounded commands/input and consume copied frame snapshots.
 - Public cross-module interfaces use opaque handles and copied values; they do
   not expose raw CPU, RAM, controller, renderer, or executor state.
+- Component-owned code, tests, CMake/configuration and component documentation
+  obey the inward dependency order `lib < emulator < x86 < app-softpc`. A
+  component may name only itself and tiers to its left. Repository-root
+  assembly and architecture documentation may describe multiple tiers; they
+  are not component-owned dependency declarations.
 - A compatibility adapter replaces an original host boundary; it must not
   reinterpret a device protocol, BIOS service, BOP selector, or guest media.
 - Transitional adapters state their owner, scope, removal condition, and a

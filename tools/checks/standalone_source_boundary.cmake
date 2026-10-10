@@ -120,14 +120,14 @@ endforeach()
 file(GLOB product_entries RELATIVE "${SOFTPC_SOURCE_DIR}/src/app-softpc"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/*")
 if(NOT product_entries STREQUAL "compat;machine;product;softpc.new")
-    message(FATAL_ERROR "Product root must contain Product, Machine, Compat and the original mirror")
+    message(FATAL_ERROR "App Product root must contain Product, Machine, Compat and the original mirror")
 endif()
 foreach(app_source IN ITEMS
     "src/app-softpc/product/main.c"
     "src/app-softpc/machine/driver.c"
     "src/app-softpc/product/composed_machine.c"
     "src/app-softpc/product/extensions.c"
-    "src/product/surface/keyboard.c")
+    "src/x86/product/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
@@ -177,43 +177,43 @@ if(NOT shared_product_composition MATCHES "emulator_session_create" OR
     message(FATAL_ERROR "Shared Product must compose, not implement, emulator session control")
 endif()
 
-# Product code may compose Emulator/Product through root contracts, but never reach
+# App code may compose Emulator Product through root contracts, but never reach
 # their implementation, private helper, or source file. Keeping this
 # allow-list small makes the post-extraction ownership boundary executable.
 set(allowed_emulator_product_contracts
     "emulator/machine/machine_interface.h"
     "emulator/session/session_interface.h"
     "emulator/ui/ui_interface.h"
-    "product/debug/debug_interface.h"
-    "product/debug/protocol_interface.h"
-    "product/surface/entry_interface.h"
-    "product/surface/machine_interface.h"
-    "product/xasm32/xasm32_interface.h")
+    "x86/debug/debug_interface.h"
+    "x86/debug/protocol_interface.h"
+    "x86/product/entry_interface.h"
+    "x86/product/machine_interface.h"
+    "x86/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_emulator_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/machine/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
 foreach(source IN LISTS product_emulator_consumers)
     file(STRINGS "${source}" emulator_include_lines REGEX
-        "#[ \t]*include[ \t]+[<\"](emulator|product)/[^>\"]+[>\"]")
+        "#[ \t]*include[ \t]+[<\"](emulator|x86)/[^>\"]+[>\"]")
     foreach(include_line IN LISTS emulator_include_lines)
         string(REGEX REPLACE
-            ".*[<\"]((emulator|product)/[^>\"]+)[>\"].*" "\\1" emulator_contract
+            ".*[<\"]((emulator|x86)/[^>\"]+)[>\"].*" "\\1" emulator_contract
             "${include_line}")
         list(FIND allowed_emulator_product_contracts "${emulator_contract}"
             emulator_contract_index)
         if(emulator_contract_index EQUAL -1)
             message(FATAL_ERROR
-                "Product reaches a non-public Emulator/Product boundary: ${source}: ${include_line}")
+                "App reaches a non-public Emulator Product boundary: ${source}: ${include_line}")
         endif()
     endforeach()
     file(READ "${source}" emulator_product_source)
-    if(emulator_product_source MATCHES "(emulator|product)/[A-Za-z0-9_/-]+\\.c")
-        message(FATAL_ERROR "Product includes a Emulator/Product implementation: ${source}")
+    if(emulator_product_source MATCHES "(emulator|x86)/[A-Za-z0-9_/-]+\\.c")
+        message(FATAL_ERROR "App includes an Emulator Product implementation: ${source}")
     endif()
 endforeach()
 
-include("${SOFTPC_SOURCE_DIR}/tools/checks/product_boundary.cmake")
+include("${SOFTPC_SOURCE_DIR}/tools/checks/x86_boundary.cmake")
 
 # The imported KVM component consumes copied values only.
 # It cannot acquire SoftPC's runtime, machine, renderer, or original key-map
@@ -231,7 +231,7 @@ foreach(source IN LISTS shared_win32_sources)
 endforeach()
 
 # The checked-in shared corpus must be reusable without exposing either
-# importing product's identity through native class registration or source.
+# importing application's identity through native class registration or source.
 # The standalone CMake project name is an explicit NXVM compatibility
 # exemption and is deliberately not included here.
 file(GLOB_RECURSE shared_identity_sources
@@ -241,7 +241,7 @@ foreach(source IN LISTS shared_identity_sources)
     file(READ "${source}" shared_identity_contents)
     string(TOLOWER "${shared_identity_contents}" normalized_shared_identity)
     if(normalized_shared_identity MATCHES "(softpc|insignia|nxvm)")
-        message(FATAL_ERROR "Shared library leaks importing product identity: ${source}")
+        message(FATAL_ERROR "Shared library leaks importing application identity: ${source}")
     endif()
 endforeach()
 
@@ -263,7 +263,7 @@ endforeach()
 # A shared public contract is visibly named. Product code must not reach a
 # component implementation header. Shared contracts may include a private
 # same-component inline helper where the canonical corpus needs its declarations
-# to compile; that transitive implementation detail is not a product include.
+# to compile; that transitive implementation detail is not a x86 include.
 file(GLOB_RECURSE product_lib_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
@@ -452,7 +452,7 @@ foreach(source IN LISTS standalone_sources)
     file(READ "${source}" contents)
     string(TOLOWER "${contents}" normalized_contents)
     if(normalized_contents MATCHES "(^|[^[:alnum:]_])(mvdm|ntvdm|vdm|wow|vdd|basesrv|csr|dos)([^[:alnum:]_]|$)")
-        message(FATAL_ERROR "Standalone CCPU contains product-shell semantics: ${source}")
+        message(FATAL_ERROR "Standalone CCPU contains x86-shell semantics: ${source}")
     endif()
 endforeach()
 
@@ -513,15 +513,15 @@ foreach(required_teardown IN ITEMS
         message(FATAL_ERROR "Shared Product is missing teardown step: ${required_teardown}")
     endif()
 endforeach()
-if(composition_source MATCHES "strcmp|product_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
+if(composition_source MATCHES "strcmp|x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
     message(FATAL_ERROR "Composition must not interpret commands, hotkeys or debugger policy")
 endif()
-file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/product/surface/*.c")
+file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/x86/product/*.c")
 foreach(source IN LISTS shared_provider_sources)
     if(NOT source MATCHES "/command_provider\\.c$")
         file(READ "${source}" contents)
         if(contents MATCHES "\\.handle_hotkey[ \t]*=")
-            message(FATAL_ERROR "Only shared command provider may register the product hotkey provider")
+            message(FATAL_ERROR "Only shared command provider may register the x86 hotkey provider")
         endif()
     endif()
 endforeach()
@@ -551,7 +551,7 @@ foreach(product_test_root IN ITEMS app core checks)
         -P "${SOFTPC_SOURCE_DIR}/src/lib/verify_kvm_naming.cmake"
         RESULT_VARIABLE naming_result)
     if(NOT naming_result EQUAL 0)
-        message(FATAL_ERROR "Product test KVM naming failed: ${product_test_root}")
+        message(FATAL_ERROR "App test KVM naming failed: ${product_test_root}")
     endif()
 endforeach()
 

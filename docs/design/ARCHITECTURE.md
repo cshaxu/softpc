@@ -9,7 +9,7 @@ app/config, command, keyboard  configuration and CLI/hotkey policy -> Emulator/L
 
 emulator/session -> emulator/ui       control and monitor/KVM composition
 emulator/session -> emulator/machine  sole generic executor and copied facts
-product/debug + product/xasm32      shared debugger/assembly contracts
+x86/debug + x86/xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
                          v
@@ -31,7 +31,7 @@ host endpoint replaces that contract. Narrow compiler, declaration, calling-ABI
 and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
 `app-softpc/compat/` owns original host callbacks, host resources and port ABI adaptations,
-but no product machine lifecycle/configuration or guest-visible device state.
+but no x86 machine lifecycle/configuration or guest-visible device state.
 `emulator/session` is the sole owner of the product-neutral control queue,
 desired/actual reduction, prompt scheduling and dispatch order. It receives
 the SoftPC CLI and machine adapter as injected callbacks; it does not parse
@@ -40,9 +40,9 @@ of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app-softpc/product/` owns SoftPC configuration parsing, private machine
 composition, resources and its snapshot/media command extension. Shared
-`product/surface` owns CLI/debug semantics, hotkey policy, Emulator entity
+`x86/product` owns CLI/debug semantics, hotkey policy, Emulator entity
 assembly, session execution and teardown. App passes it an already composed
-private machine/driver lifetime and the two UI choices only; shared Product
+private machine/driver lifetime and the two UI choices only; shared X86
 does not parse configuration or see media, memory or model fields.
 At exit it synchronously shuts down the machine worker with callback targets
 still alive, then destroys UI, session, command/debug, machine and VM in order.
@@ -51,7 +51,7 @@ so referenced objects can be released safely before the machine itself.
 UI teardown stops the broker and unbinds output before joining KVM producers;
 failure preserves UI and remaining callback dependencies. App treats that failure
 as terminal rather than releasing Session beneath a live producer.
-Only app-softpc/product/composed_machine.c consumes machine/vm_interface.h; no shared Product source consumes Compat or
+Only app-softpc/product/composed_machine.c consumes machine/vm_interface.h; no shared X86 source consumes Compat or
 the original mirror. `app-softpc/machine/` owns the concrete machine backend, initialization/reset/teardown
 sequence, driver, frame/input conversion and debugger request preflight.
 Its implementation calls Compat and the original machine while its
@@ -68,7 +68,7 @@ The Core device archive carries physical A/B types independently of media
 presence. Original FDC/BIOS logic consumes these host capabilities; no frontend
 or guest-version-specific identity correction is involved.
 
-### Product Build And ABI Boundaries
+### x86 Build And ABI Boundaries
 
 Core is only a source grouping of Machine, Compat and softpc.new, not a new
 runtime layer. The relocation preserves the original mirror byte-for-byte.
@@ -83,7 +83,7 @@ Emulator machine schedules execution, not individual disk reads/writes. Original
 CPU debug observations call the VM observer symbols without importing Emulator
 or App implementation. Such callbacks do not transfer CPU state ownership.
 
-All VM C sources belong to one `softpc-vm` OBJECT target. App and product
+All VM C sources belong to one `softpc-vm` OBJECT target. App and x86
 integration tests link it; the exe's own sources are App and resources only.
 The recovered `softpc-machine` archive retains its CCPU/device/Compat OBJECT
 composition. VM objects are explicit because the original CPU calls debug
@@ -100,7 +100,7 @@ Compat's narrow CCPU ABI and host support declarations are internal contracts.
 Existing original declarations are reused where applicable; the narrow CPU
 contract avoids leaking original CPU macros into the VM adapter. Declaration
 consolidation does not add forwarding functions, duplicate state or change the
-original device ABI. Lib, Emulator and x86 remain product-independent; none may
+original device ABI. Lib and Emulator remain ISA-independent; none may
 import App, VM, Compat or MVDM.
 
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
@@ -115,11 +115,11 @@ and hotkey policy to Emulator session. SoftPC publishes each admitted shared-lib
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
-`product/xasm32` is an imported x86 copied byte/text assembly capability and
-`product/debug` is an imported x86 debug command capability. SoftPC exposes
+`x86/xasm32` is an imported x86 copied byte/text assembly capability and
+`x86/debug` is an imported x86 debug command capability. SoftPC exposes
 it through its injected app command binding, not through a second input loop.
-`product/debug` depends on `emulator/machine`'s optional paused-state adapter and
-on `product/xasm32`; neither component may create an executor, own a Console,
+`x86/debug` depends on `emulator/machine`'s optional paused-state adapter and
+on `x86/xasm32`; neither component may create an executor, own a Console,
 or add a product command path. Import hashes remain provenance evidence; the
 S9 integration changes to these components form the updated downstream corpus.
 The control thread serializes lifecycle, media and synchronous debug requests.
@@ -131,7 +131,7 @@ and copied prompts; machine state changes do not select or exit the CLI.
 Machine copies opaque, pointer-free debug requests/results through one fixed slot
 (128-byte request, 1536-byte response), with explicit sizes and no per-request
 allocation. It knows no register, address or operation schema. The independent
-`product/debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
+`x86/debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
 their existing boundaries using aligned local values. Driver validation owns
 protocol sizes and operation limits. Failure returns zero response length and
 does not change caller output bytes; a failed wait requires shutdown before
@@ -145,7 +145,7 @@ chunked LF normalization. No second output owner or input loop is introduced.
 
 T56's owner-approved debug port adds observation calls at original CCPU
 instruction entry and successful completion, including interrupt-shadow
-bypasses. The product driver owns the plan/result and binds it only during
+bypasses. The x86 driver owns the plan/result and binds it only during
 its executor run. A hit parks that same executor through its existing callback;
 the existing copied PAUSED fact reaches session, whose debug provider reads
 the result through the paused rendezvous. No per-instruction frontend events,
@@ -162,7 +162,7 @@ instruction; internal translation/device/debugger reads are outside this boundar
 Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
 translate native records before the event reaches the shared contract; only
-the VM guest binding may translate that neutral value to a product's
+the VM guest binding may translate that neutral value to an architecture's
 guest-input protocol.
 
 The emulator-machine executor alone invokes state-access/execution driver hooks
@@ -177,15 +177,15 @@ Emulator is platform-independent source: it has no platform subdirectories,
 native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
-with the corpus and run independently of the importing product.
-Shared unit suites live in test/lib, test/emulator and test/product. The reusable
-six-directory set is src/lib, src/emulator, src/product, test/lib, test/emulator
-and test/product. Each corpus/suite owns its build and manifest; none may
-require an importing product's adapters or firmware. Each test package owns its
+with the corpus and run independently of the importing x86.
+Shared unit suites live in test/lib, test/emulator and test/x86. The reusable
+six-directory set is src/lib, src/emulator, src/x86, test/lib, test/emulator
+and test/x86. Each corpus/suite owns its build and manifest; none may
+require an importing application's adapters or firmware. Each test package owns its
 fixtures; it may consume inward production APIs but never another package's
 tests or an outer package. Generic test tools live directly in test/. The
 dependency rule is direct: Lib has no outer dependency; Emulator consumes Lib;
-Product consumes Lib and Emulator. This rule is checked both at public-header and
+x86 consumes Lib and Emulator. This rule is checked both at public-header and
 CMake target-link boundaries.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM
@@ -207,7 +207,7 @@ The latter creates an optional logical VM Console object but neither KVM
 component opens or registers the process Console. `emulator/ui` owns the monitor
 object, decides which KVM components exist from injected actions and asks the broker
 to replace the current object. SoftPC app policy derives and injects those
-actions; emulator/ui does not interpret their product meaning.
+actions; emulator/ui does not interpret their x86 meaning.
 
 The library's only direct component edges are:
 
@@ -256,7 +256,7 @@ KVM carries no global configuration generation.
 
 SoftPC passes copied `{chord, identifier}` registrations to each KVM component.
 The components may generically recognize and suppress a registered chord, but
-only enqueue `KVM_HOTKEY(identifier)`; they never execute a product callback or
+only enqueue `KVM_HOTKEY(identifier)`; they never execute a x86 callback or
 interpret pause, reset, guest CAD, or another identifier. Their ordinary input
 and matched-hotkey events are `kvm_input_event` variants, constructed through the
 one `kvm-base` utility path and carrying their source component handle for
@@ -329,7 +329,7 @@ reconstructed by emulator/UI. Broker disposal restores that original buffer.
 Window displacement retains integer remainders
 internally without changing the copied input ABI. Post-start worker exits share
 one failure/retirement cleanup path; startup failure remains distinct. Unexpected
-Console I/O failures are copied events, not product decisions. Broker replacement
+Console I/O failures are copied events, not x86 decisions. Broker replacement
 includes old-binding cleanup before the next transaction can enter. Types owns
 external declarations; actual component consumers own OS linkage requirements.
 
@@ -338,7 +338,7 @@ external declarations; actual component consumers own OS linkage requirements.
 Original BOP instruction decoding and `BOP FE` control flow remain in the
 original CCPU. The compatibility host implements only the finite hardware and
 firmware BOP services actually reached by the selected ROM. DOS, WOW, NTVDM,
-and product-service selectors remain unavailable.
+and x86-service selectors remain unavailable.
 
 ## Timing Boundary
 

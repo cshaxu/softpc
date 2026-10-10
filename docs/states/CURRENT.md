@@ -2,28 +2,28 @@
 
 ## Current Work
 
-M9 T86 S5 is active: non-public test quality audit and repair.
+M9 T86 S6 is active: inward component-boundary audit and repair.
 
-## M9 T86 S5 Packet
+## M9 T86 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs: “把s5审计清楚并修复，修复高质量，要求不低于nxvm的档次水准”. |
-| Objective | Establish a finite ledger for every non-public App/Core/Compat/mirror unit and integration test, then repair only confirmed quality defects so their naming, CMake registration, fixture ownership, working-directory isolation, component dependency direction and assertion contracts meet the existing public Lib/Emulator/Product test standard. |
-| Non-goals | Do not modify public `src/{lib,emulator,product}` or their test corpora, change production behavior, import NXVM test code solely for visual similarity, weaken assertions/timeouts, or treat recovered-mirror implementation tests as portable component tests. Do not touch user INI, media, snapshots or published EXEs unless a production change becomes separately admitted. |
-| Reference Baseline | SoftPC `786209c9`; T86 S4 is owner-accepted and archived. Public suite conventions are `test/{lib,emulator,product}` and `test/register.cmake`; NXVM is read-only comparison evidence, never a build/test dependency. |
-| Candidate Proposal | [T86 S5 non-public test quality](../proposals/m9-t86-s5-nonpublic-test-quality.md) |
-| Files And ABI Surface | Audit ledger covers `test/app-softpc/{unit,integration}`, root CMake test registration, owned fixtures and `tools/checks` routes that register non-public CTest cases. Expected changes are test/CMake/docs only; no public ABI or runtime behavior change. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus boundary; test ownership/layout rules; C17 App/Core settings; long operations run as owned background jobs. |
-| Verification | Configure-time registration/ownership checks, manifest/governance gates, focused repaired tests on x64/x86, then proportional product background and desktop lanes. If changed CMake affects the test graph, run both lanes under their declared presets. |
-| Expected Markers | Every ledger member has an owner, test kind, executable/route, dependencies, working-directory/resource disposition and duplicate/invalid-test disposition. No non-public fixture imports a public test executable or reaches outward across its allowed source boundary. |
-| Asset Needs | None. Preserve `assets/binary/softpc.ini`, guest media, snapshots and published EXEs byte-for-byte. |
-| Reporting Requirements | Record the finite ledger, each confirmed defect and disposition, pre/post path and line accounting, focused and proportional dual-width evidence, plus an independent actual-change review. Report no issue as fixed without a targeted regression. |
-| Stop Conditions | A finding requires product behavior, shared-corpus semantics, mirror behavior, a user asset, or a new test architecture beyond the existing owner-local fixtures; record it as a separately proposed/queued item rather than folding it in. |
-| Exit Criteria | Ledger is complete; confirmed in-scope test defects are repaired with focused proofs; CMake/test ownership gates and proportional x64/x86 suites pass; one complete P is pushed and reviewed, then await owner validation. |
-| Original Owner Request | 准入新s 对全项目的测试质量进行审计 要求以公共三个测试组件为标准对齐：冗余、重复、错误测试、符号命名不合规、越界、依赖关系等，涵盖所有非公共组件的unit和integration测试。 |
-| Similar-Issue Sweep | Mechanically enumerate CTest JSON, source includes, target links, test paths, test-local helpers, working directories and resource locks; compare every non-public test registration against the public-suite rules and inspect every exception. |
+| Admission And Approval | Owner directs: “lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复”, then directs: “product组件整体重命名为x86，原product/surface整体重命名为x86/product 确保符号正确全面改名”. |
+| Objective | Rename the former shared Product corpus to `x86`, with its former Surface subcomponent becoming `x86/product`, then prove and enforce the inward-only dependency order `lib < emulator < x86 < app-softpc` for each component-owned source, test, CMake/configuration and component README. Repair every confirmed outward reference or stale self-verifier without changing runtime behavior. |
+| Non-goals | Do not add a second component hierarchy, alter machine/video/audio behavior, make root composition unable to assemble its layers, or treat repository-level architecture/history documents as a component-local dependency. Do not change user INI, media, snapshots or published EXEs. |
+| Reference Baseline | SoftPC `222b637b`; T86 S5 delivery is pushed and owner-directed S6 supersedes it as active work. The reusable tier names after this admitted rename are `lib`, `emulator`, and `x86`; NXVM remains read-only comparison evidence, never a build/test dependency. |
+| Candidate Proposal | [T86 S6 inward component boundaries](../proposals/m9-t86-s6-inward-component-boundaries.md) |
+| Files And ABI Surface | Rename `src/product` to `src/x86`, `test/product` to `test/x86`, and `src/x86/surface`/`test/x86/surface` to `x86/product`; update all corresponding public symbols, CMake targets/tests, manifests, component gates and current architecture documentation. Also audit `src/{lib,emulator,app-softpc}` and matching tests. No runtime behavior change. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus boundary; test ownership/layout rules; C11 shared-corpus rule; long operations run as owned background jobs. |
+| Verification | Finite path ledger plus source include, component-local CMake target-link, and component-document/configuration scans; negative proof for each prohibited edge; x64/x86 component verifier/check lanes and proportional background CTest excluding desktop. |
+| Expected Markers | Lib has no outward component path/target reference; Emulator has no X86/App reference; X86 has no App reference; App references only itself and inward tiers. Each shared test package obeys the matching rule and does not import another test package. |
+| Asset Needs | Refresh the two published EXEs because the compiled public X86 symbol identity changes; preserve `assets/binary/softpc.ini`, guest media and snapshots byte-for-byte. |
+| Reporting Requirements | Record every checked root and each outward-reference disposition, pre/post path and line accounting, focused negative proof, dual-width verification, and an independent actual-change review. Report no issue as fixed without a targeted regression. |
+| Stop Conditions | A finding needs a changed component topology, public API, runtime behavior, mirror modification, user asset, or a new cross-component capability; record it separately rather than hiding it in a naming/configuration cleanup. |
+| Exit Criteria | The finite root ledger is complete; confirmed outward references are removed or corrected; source/test/config/doc boundaries have automated proof; proportional x64/x86 verification passes; one complete P is pushed and reviewed, then await owner validation. |
+| Original Owner Request | 接下来缺口是内层组件依旧认识外层组件的问题：lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复。 |
+| Similar-Issue Sweep | Mechanically enumerate every component-owned C/H/CMake/README/manifest path; classify canonical includes, target links, CMake source paths, test fixtures, and explicit component path/target references against the four-layer order. |
 
 ## Historical M9 T85 S20 delivery record
 

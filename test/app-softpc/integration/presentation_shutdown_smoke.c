@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "emulator/ui/ui_interface.h"
-#include "product/surface/entry_interface.h"
+#include "x86/product/entry_interface.h"
 #include "product/config.h"
 #include "product/composed_machine.h"
 
@@ -113,7 +113,7 @@ int main(void)
 {
     const char *path = "presentation-shutdown.img";
     app_startup_config config = {0};
-    product_surface_definition definition = {0};
+    x86_product_definition definition = {0};
 
     create_image(path);
     lib_text_copy(config.floppy_path, path);
@@ -127,7 +127,7 @@ int main(void)
         requests = destroyed = reported = generations = states = 0u;
         assert(softpc_product_compose_machine(&config, &definition.machine) ==
             LIB_STATUS_OK);
-        assert(product_surface_run(&definition) == (scenario == 0u ? 0 : 1));
+        assert(x86_product_run(&definition) == (scenario == 0u ? 0 : 1));
         assert(destroyed == 1u && generations != 0u && states != 0u &&
             reported == (scenario == 1u || scenario == 2u));
     }
@@ -138,7 +138,7 @@ int main(void)
     create_image(path);
     assert(softpc_product_compose_machine(&config, &definition.machine) ==
         LIB_STATUS_OK);
-    assert(product_surface_run(&definition) == 1);
+    assert(x86_product_run(&definition) == 1);
     assert(destroyed == 1u && generations != 0u && states != 0u && reported == 0u);
     return 0;
 }

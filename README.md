@@ -4,7 +4,7 @@ Insignia SoftPC is a standalone PC virtual machine revived from the original
 SoftPC machine source. It runs its fixed recovered machine configuration
 without an NTVDM, DOS/WOW, VDD, or Windows NT host process. The machine keeps
 its original ROM-level hardware behavior, including its narrow machine BOP
-table, but has no NTVDM product-service dispatcher.
+table, but has no NTVDM x86-service dispatcher.
 
 The machine shape is fixed: users provide boot media instead of choosing a
 machine profile. Project governance, target architecture, and the ordered
@@ -150,9 +150,9 @@ The current
 core links the detached CCPU, SAS, I/O, PIC, event, original FDC/FLA/GFI,
 fixed-disk BIOS and V7 VGA packages through standalone host ports.  The
 original ROM reaches only machine-resident C services through its historical
-BOP instruction table; it has no NTVDM, DOS/WOW, VDD or product-service
+BOP instruction table; it has no NTVDM, DOS/WOW, VDD or x86-service
 dispatcher.  Fixed firmware, raw-media storage and console/Win32
-presentation are supplied by the standalone VM, not a product host.
+presentation are supplied by the standalone VM, not a x86 host.
 
 Set `floppy_mode` and `hard_disk_mode` independently to choose how each configured image is attached:
 `readonly` passes writes back to the original controller as write-protected,
@@ -192,7 +192,7 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 
 ## Source layout
 
-- `assets/readme/` — owner-provided current product screenshots used by this
+- `assets/readme/` — owner-provided current x86 screenshots used by this
   README; they are documentation assets, not guest media or runtime inputs.
 - `src/app-softpc/softpc.new/` — recovered original SoftPC machine, including the
   embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
@@ -200,17 +200,18 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
   source diffs at the affected point; it contains no new machine policy.
 - `src/app-softpc/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
 - `src/app-softpc/machine/` — SoftPC backend adaptation to the existing Emulator machine contract.
-- `src/app-softpc/product/` — configuration, product CLI/hotkey policy and entity assembly;
+- `src/app-softpc/product/` — configuration, private machine composition and
+  SoftPC-specific command extensions;
   only main consumes the VM public interface.
 - `src/emulator/` — shared machine executor, session control and UI composition.
 - `src/x86/` — optional shared x86 debugger and assembly/disassembly components.
 - `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
-- `test/lib/`, `test/emulator/`, `test/product/` — independently reusable
+- `test/lib/`, `test/emulator/`, `test/x86/` — independently reusable
   component suites.
 - `test/app-softpc/unit/`, `test/app-softpc/integration/` — SoftPC-specific
   concrete unit and composed-runtime tests.
 - `tools/checks/` — repository source, build, package and documentation gates.
 
-The standalone core never accepts a product-shell callback or selector
+The standalone core never accepts a x86-shell callback or selector
 service. Hardware and firmware behavior is machine-owned state and typed
 mechanical outcomes.

@@ -53,10 +53,10 @@ add_subdirectory(src/lib)
 enable_testing()
 
 add_subdirectory(src/emulator)
-add_subdirectory(src/product)
+add_subdirectory(src/x86)
 add_subdirectory(test/lib)
 add_subdirectory(test/emulator)
-add_subdirectory(test/product)
+add_subdirectory(test/x86)
 target_link_libraries(softpc-machine PRIVATE storage base audio)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly
@@ -311,7 +311,7 @@ add_executable(softpcvm
     src/app-softpc/product/extensions.c
     src/app-softpc/product/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-vm)
-target_link_libraries(softpcvm PRIVATE product-surface types storage)
+target_link_libraries(softpcvm PRIVATE x86-product types storage)
 
 # The standalone distribution keeps its two host-width launchers together.
 # The adjacent softpc.ini is deliberately user-owned configuration, never a
@@ -339,10 +339,10 @@ else()
 endif()
 add_test(NAME "app-softpc/unit/product/config_smoke" COMMAND softpc-config-smoke)
 set_tests_properties("app-softpc/unit/product/config_smoke" PROPERTIES LABELS "unit")
-add_test(NAME "checks/product_boundary_negative" COMMAND ${CMAKE_COMMAND}
+add_test(NAME "checks/x86_boundary_negative" COMMAND ${CMAKE_COMMAND}
     -DSOFTPC_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/checks/product_boundary_negative.cmake)
-set_tests_properties("checks/product_boundary_negative" PROPERTIES LABELS "checks")
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/checks/x86_boundary_negative.cmake)
+set_tests_properties("checks/x86_boundary_negative" PROPERTIES LABELS "checks")
 target_link_libraries(softpc-machine-smoke PRIVATE softpc-vm)
 add_test(NAME "app-softpc/unit/machine/machine_smoke" COMMAND softpc-machine-smoke)
 add_executable(softpc-dual-media-smoke test/app-softpc/unit/machine/dual_media_smoke.c)
@@ -483,14 +483,14 @@ set_tests_properties("app-softpc/unit/machine/snapshot_boundary_smoke" PROPERTIE
 add_executable(softpc-runtime-smoke
     test/app-softpc/integration/runtime_smoke.c
     test/app-softpc/integration/machine_fixture.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-product-keyboard)
 target_include_directories(softpc-runtime-smoke PRIVATE src/app-softpc/product)
 add_test(NAME "app-softpc/integration/runtime_smoke" COMMAND softpc-runtime-smoke)
 add_executable(softpc-runtime-restart-boot-smoke
     test/app-softpc/integration/runtime_restart_boot_smoke.c
     test/app-softpc/integration/machine_fixture.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
-    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
+    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-product-keyboard)
 target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE src/app-softpc/product)
 target_compile_definitions(softpc-runtime-restart-boot-smoke PRIVATE
     SOFTPC_TEST_RESTART_BOOT_IMAGE="${CMAKE_CURRENT_SOURCE_DIR}/assets/media/win31_en_installed.img")
@@ -506,13 +506,13 @@ add_executable(softpc-runtime-input-continuation-smoke
     test/app-softpc/integration/runtime_input_continuation_smoke.c
     test/app-softpc/integration/machine_fixture.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console product-surface-keyboard)
+    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-product-keyboard)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE src/app-softpc/product)
 add_test(NAME "app-softpc/integration/runtime_input_continuation_smoke"
     COMMAND softpc-runtime-input-continuation-smoke)
 add_executable(softpc-command-provider-smoke test/app-softpc/integration/command_provider_smoke.c
     src/app-softpc/product/extensions.c)
-target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm product-debug emulator-session emulator-machine product-surface-command product-surface-keyboard)
+target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug emulator-session emulator-machine x86-product-command x86-product-keyboard)
 add_test(NAME "app-softpc/integration/command_provider_smoke" COMMAND softpc-command-provider-smoke)
 set_tests_properties("app-softpc/integration/command_provider_smoke" PROPERTIES LABELS "integration" TIMEOUT 45)
 add_executable(softpc-x87-layout-smoke test/app-softpc/unit/softpc.new/x87_layout_smoke.c)
@@ -543,6 +543,15 @@ add_test(NAME "checks/documentation_governance/selftest"
 add_test(NAME "checks/win32_presentation_manifest"
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/win32_presentation_manifest.cmake")
+add_test(NAME "checks/inward_component_boundaries"
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
+        "${CMAKE_SOURCE_DIR}/tools/checks/inward_component_boundaries.cmake")
+set_tests_properties("checks/inward_component_boundaries" PROPERTIES LABELS "checks")
+add_test(NAME "checks/inward_component_boundaries/selftest"
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+        "-DSELF_TEST_ROOT=${CMAKE_BINARY_DIR}/inward-component-boundaries-selftest" -P
+        "${CMAKE_SOURCE_DIR}/tools/checks/inward_component_boundaries_selftest.cmake")
+set_tests_properties("checks/inward_component_boundaries/selftest" PROPERTIES LABELS "checks")
 
 # Smoke tests intentionally use assert() for both the operation and its
 # postcondition.  Keep those checks live even when validating an optimized

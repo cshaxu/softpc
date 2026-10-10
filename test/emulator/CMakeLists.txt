@@ -72,7 +72,8 @@ add_test(NAME emulator.test-types-boundary COMMAND "${CMAKE_COMMAND}"
     "-DTEST_ROOTS=${CMAKE_CURRENT_SOURCE_DIR}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/../verify_types_boundary.cmake")
 add_test(NAME emulator.test-manifest COMMAND "${CMAKE_COMMAND}"
-    "-DEMULATOR_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" -P "${EMULATOR_ROOT}/verify_manifest.cmake")
+    "-DTEST_ROOT=${CMAKE_CURRENT_SOURCE_DIR}"
+    -P "${CMAKE_CURRENT_LIST_DIR}/../verify_manifest.cmake")
 set_tests_properties(
     emulator.test-boundaries
     emulator.manifest

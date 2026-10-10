@@ -2,18 +2,18 @@
 #include "machine/debug.h"
 #include "compat/ccpu/abi.h"
 #include "compat/platform.h"
-#include "product/debug/protocol_interface.h"
+#include "x86/debug/protocol_interface.h"
 
 
 extern void inb(unsigned short port, unsigned char *value);
 extern void outb(unsigned short port, unsigned char value);
 
-static lib_status softpc_debug_register(const product_debug_request *request,
-    product_debug_response *result)
+static lib_status softpc_debug_register(const x86_debug_request *request,
+    x86_debug_response *result)
 {
-    lib_bool write = request->operation == PRODUCT_DEBUG_WRITE_REGISTER;
+    lib_bool write = request->operation == x86_debug_WRITE_REGISTER;
     switch (request->register_id) {
-#define GENERAL_REGISTER(name) case PRODUCT_DEBUG_##name: \
+#define GENERAL_REGISTER(name) case x86_debug_##name: \
         if (write) c_set##name(request->address); \
         else result->value = c_get##name(); \
         return LIB_STATUS_OK
@@ -29,7 +29,7 @@ static lib_status softpc_debug_register(const product_debug_request *request,
     GENERAL_REGISTER(EFLAGS);
     GENERAL_REGISTER(CR2);
     GENERAL_REGISTER(CR3);
-    case PRODUCT_DEBUG_CR0:
+    case x86_debug_CR0:
         /* MOV_CR raises #GP for PG without PE. Reject before calling the
          * setter so a debugger typo cannot escape into the guest exception. */
         if (write && (request->address & 0x80000001u) == 0x80000000u)
@@ -38,7 +38,7 @@ static lib_status softpc_debug_register(const product_debug_request *request,
         else result->value = c_getCR0();
         return LIB_STATUS_OK;
 #undef GENERAL_REGISTER
-#define SEGMENT_REGISTER(name) case PRODUCT_DEBUG_##name: \
+#define SEGMENT_REGISTER(name) case x86_debug_##name: \
         if (write) return request->address <= 0xffffu && \
             c_set##name((unsigned short)request->address) == 0 ? \
                 LIB_STATUS_OK : LIB_STATUS_INVALID_ARGUMENT; \
@@ -54,10 +54,10 @@ static lib_status softpc_debug_register(const product_debug_request *request,
     }
 }
 
-static product_debug_segment_snapshot softpc_debug_segment(
+static x86_debug_segment_snapshot softpc_debug_segment(
     lib_u16 selector, lib_u32 base, lib_u32 limit, lib_u16 ar)
 {
-    product_debug_segment_snapshot value = { 0 };
+    x86_debug_segment_snapshot value = { 0 };
     value.selector = selector; value.base = base; value.limit = limit;
     value.dpl = (ar >> 5u) & 3u;
     value.type = ar & 15u;
@@ -93,7 +93,7 @@ int softpc_host_debug_begin(void)
     lib_u32 address;
     lib_bool skip;
     if (state == NULL) return 0;
-    if (state->kind == PRODUCT_DEBUG_EXECUTION_NONE && !state->stop_pending &&
+    if (state->kind == x86_debug_EXECUTION_NONE && !state->stop_pending &&
         !state->watches[0].enabled && !state->watches[1].enabled && !state->watches[2].enabled) {
         state->in_instruction = LIB_FALSE;
         return 0;
@@ -102,14 +102,14 @@ int softpc_host_debug_begin(void)
     skip = state->skip_first && state->stopped_address == address;
     state->skip_first = LIB_FALSE;
     if (!state->stop_pending) {
-        state->observation = (product_debug_observation) { 0 };
+        state->observation = (x86_debug_observation) { 0 };
         state->result_ready = LIB_FALSE;
-        if (!skip && state->watches[PRODUCT_DEBUG_WATCH_EXECUTE].enabled &&
-            state->watches[PRODUCT_DEBUG_WATCH_EXECUTE].address == address) {
+        if (!skip && state->watches[x86_debug_WATCH_EXECUTE].enabled &&
+            state->watches[x86_debug_WATCH_EXECUTE].address == address) {
             state->observation.watch_hit = LIB_TRUE;
-            state->observation.watch_kind = PRODUCT_DEBUG_WATCH_EXECUTE;
+            state->observation.watch_kind = x86_debug_WATCH_EXECUTE;
             state->observation.watch_address = address;
-        } else if (skip || state->kind < PRODUCT_DEBUG_EXECUTION_BREAK_REAL ||
+        } else if (skip || state->kind < x86_debug_EXECUTION_BREAK_REAL ||
             address != state->address) {
             state->in_instruction = LIB_TRUE;
             return 0;
@@ -120,7 +120,7 @@ int softpc_host_debug_begin(void)
     state->skip_first = LIB_TRUE;
     state->result_ready = LIB_TRUE;
     state->stop_pending = LIB_TRUE;
-    state->kind = PRODUCT_DEBUG_EXECUTION_NONE;
+    state->kind = x86_debug_EXECUTION_NONE;
     softpc_platform_executor_event();
     return 1;
 }
@@ -130,10 +130,10 @@ void softpc_host_debug_retired(void)
     softpc_debug_state *state = active_debug;
     if (state == NULL) return;
     state->in_instruction = LIB_FALSE;
-    if (state->kind == PRODUCT_DEBUG_EXECUTION_NONE &&
+    if (state->kind == x86_debug_EXECUTION_NONE &&
         !state->watches[0].enabled && !state->watches[1].enabled && !state->watches[2].enabled) return;
     if (state->executed != UINT32_MAX) ++state->executed;
-    if (state->kind == PRODUCT_DEBUG_EXECUTION_TRACE &&
+    if (state->kind == x86_debug_EXECUTION_TRACE &&
         state->executed >= state->target_count) state->stop_pending = LIB_TRUE;
     if (state->observation.watch_hit) state->stop_pending = LIB_TRUE;
 }
@@ -143,9 +143,9 @@ void softpc_host_debug_access(unsigned long address, unsigned long bytes,
     int write, const unsigned char *data, int reversed)
 {
     softpc_debug_state *state = active_debug;
-    product_debug_observation *record;
-    product_debug_watch_kind kind = write ? PRODUCT_DEBUG_WATCH_WRITE :
-        PRODUCT_DEBUG_WATCH_READ;
+    x86_debug_observation *record;
+    x86_debug_watch_kind kind = write ? x86_debug_WATCH_WRITE :
+        x86_debug_WATCH_READ;
     lib_u32 index;
     lib_u64 value = 0;
     if (state == NULL || !state->in_instruction || bytes == 0u) return;
@@ -156,14 +156,14 @@ void softpc_host_debug_access(unsigned long address, unsigned long bytes,
         record->watch_kind = kind;
         record->watch_address = state->watches[kind].address;
     }
-    if (state->kind != PRODUCT_DEBUG_EXECUTION_TRACE && !record->watch_hit) return;
-    if (record->count == PRODUCT_DEBUG_ACCESS_CAPACITY) {
+    if (state->kind != x86_debug_EXECUTION_TRACE && !record->watch_hit) return;
+    if (record->count == x86_debug_ACCESS_CAPACITY) {
         record->truncated = LIB_TRUE;
         return;
     }
     for (index = 0u; index < bytes && index < 8u; ++index)
         value |= (lib_u64)data[reversed ? bytes - 1u - index : index] << (index * 8u);
-    record->accesses[record->count++] = (product_debug_memory_access) {
+    record->accesses[record->count++] = (x86_debug_memory_access) {
         .write = write != 0, .linear = address, .bytes = bytes, .data = value };
 }
 
@@ -175,26 +175,26 @@ unsigned long softpc_host_debug_read(unsigned long address, unsigned long bytes,
 }
 
 lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *state,
-    const product_debug_request *request,
-    product_debug_response *result)
+    const x86_debug_request *request,
+    x86_debug_response *result)
 {
     lib_u32 address;
     lib_bool write;
     if (machine == NULL || state == NULL || request == NULL || result == NULL ||
-        request->bytes > PRODUCT_DEBUG_BYTES)
+        request->bytes > x86_debug_BYTES)
         return LIB_STATUS_INVALID_ARGUMENT;
     lib_memory_set(result, 0, sizeof(*result));
     switch (request->operation) {
-    case PRODUCT_DEBUG_READ_REGISTER:
-    case PRODUCT_DEBUG_WRITE_REGISTER:
+    case x86_debug_READ_REGISTER:
+    case x86_debug_WRITE_REGISTER:
         return softpc_debug_register(request, result);
-    case PRODUCT_DEBUG_GET_CODE_BASE:
+    case x86_debug_GET_CODE_BASE:
         result->value = c_getCS_BASE();
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_GET_CODE_DEFAULT_SIZE:
+    case x86_debug_GET_CODE_DEFAULT_SIZE:
         result->value = (c_getCS_AR() & 0x4000u) != 0u;
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_GET_CPU_SNAPSHOT:
+    case x86_debug_GET_CPU_SNAPSHOT:
 #define SNAPSHOT(lower, upper) result->cpu.lower = softpc_debug_segment( \
         c_get##upper(), c_get##upper##_BASE(), c_get##upper##_LIMIT(), c_get##upper##_AR())
         SNAPSHOT(es, ES); SNAPSHOT(cs, CS); SNAPSHOT(ss, SS);
@@ -212,43 +212,43 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
         result->cpu.idtr.limit = c_getIDT_LIMIT();
         result->cpu.cr0 = c_getCR0(); result->cpu.cr2 = c_getCR2(); result->cpu.cr3 = c_getCR3();
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_READ_PORT:
+    case x86_debug_READ_PORT:
         if (request->bytes != 1u) return LIB_STATUS_INVALID_ARGUMENT;
         inb(request->port, result->data);
         result->value = result->data[0]; result->bytes = 1u;
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_WRITE_PORT:
+    case x86_debug_WRITE_PORT:
         if (request->bytes != 1u || request->address > 0xffu)
             return LIB_STATUS_INVALID_ARGUMENT;
         outb(request->port, (unsigned char)request->address);
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_READ_REAL:
-    case PRODUCT_DEBUG_WRITE_REAL:
-    case PRODUCT_DEBUG_READ_LINEAR:
-    case PRODUCT_DEBUG_WRITE_LINEAR:
-        address = request->operation == PRODUCT_DEBUG_READ_REAL ||
-            request->operation == PRODUCT_DEBUG_WRITE_REAL ?
+    case x86_debug_READ_REAL:
+    case x86_debug_WRITE_REAL:
+    case x86_debug_READ_LINEAR:
+    case x86_debug_WRITE_LINEAR:
+        address = request->operation == x86_debug_READ_REAL ||
+            request->operation == x86_debug_WRITE_REAL ?
             ((lib_u32)request->segment << 4u) + request->offset : request->address;
-        write = request->operation == PRODUCT_DEBUG_WRITE_REAL ||
-            request->operation == PRODUCT_DEBUG_WRITE_LINEAR;
+        write = request->operation == x86_debug_WRITE_REAL ||
+            request->operation == x86_debug_WRITE_LINEAR;
         if (write) lib_memory_copy(result->data, request->data, request->bytes);
         if (!softpc_machine_debug_memory(address, result->data, request->bytes, write))
             return LIB_STATUS_INVALID_ARGUMENT;
         result->bytes = request->bytes;
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_CLEAR_EXECUTION_PLAN:
-        state->kind = PRODUCT_DEBUG_EXECUTION_NONE;
+    case x86_debug_CLEAR_EXECUTION_PLAN:
+        state->kind = x86_debug_EXECUTION_NONE;
         state->executed = 0u;
         state->stop_pending = state->result_ready = LIB_FALSE;
-        state->observation = (product_debug_observation) { 0 };
+        state->observation = (x86_debug_observation) { 0 };
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_SET_EXECUTION_PLAN:
-        if (request->execution_kind < PRODUCT_DEBUG_EXECUTION_TRACE ||
-            request->execution_kind > PRODUCT_DEBUG_EXECUTION_BREAK_LINEAR ||
-            (request->execution_kind == PRODUCT_DEBUG_EXECUTION_TRACE &&
+    case x86_debug_SET_EXECUTION_PLAN:
+        if (request->execution_kind < x86_debug_EXECUTION_TRACE ||
+            request->execution_kind > x86_debug_EXECUTION_BREAK_LINEAR ||
+            (request->execution_kind == x86_debug_EXECUTION_TRACE &&
                 (request->instruction_count == 0u || request->instruction_count > UINT32_MAX)))
             return LIB_STATUS_INVALID_ARGUMENT;
-        address = request->execution_kind == PRODUCT_DEBUG_EXECUTION_BREAK_REAL ?
+        address = request->execution_kind == x86_debug_EXECUTION_BREAK_REAL ?
             ((lib_u32)request->segment << 4u) + request->offset : request->address;
         write = (state->result_ready || state->skip_first) &&
             state->stopped_address == c_getCS_BASE() + c_getEIP();
@@ -258,22 +258,22 @@ lib_status softpc_machine_debug(softpc_machine *machine, softpc_debug_state *sta
         state->executed = 0u;
         state->stop_pending = state->result_ready = LIB_FALSE;
         state->skip_first = write;
-        state->observation = (product_debug_observation) { 0 };
+        state->observation = (x86_debug_observation) { 0 };
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_GET_EXECUTION_RESULT:
+    case x86_debug_GET_EXECUTION_RESULT:
         result->enabled = state->result_ready;
         result->value = state->executed;
         result->observation = state->observation;
         return LIB_STATUS_OK;
-    case PRODUCT_DEBUG_SET_WATCH:
-    case PRODUCT_DEBUG_CLEAR_WATCH:
-    case PRODUCT_DEBUG_GET_WATCH:
-        if ((unsigned)request->watch_kind > PRODUCT_DEBUG_WATCH_EXECUTE)
+    case x86_debug_SET_WATCH:
+    case x86_debug_CLEAR_WATCH:
+    case x86_debug_GET_WATCH:
+        if ((unsigned)request->watch_kind > x86_debug_WATCH_EXECUTE)
             return LIB_STATUS_INVALID_ARGUMENT;
-        if (request->operation == PRODUCT_DEBUG_SET_WATCH) {
+        if (request->operation == x86_debug_SET_WATCH) {
             state->watches[request->watch_kind].address = request->address;
             state->watches[request->watch_kind].enabled = LIB_TRUE;
-        } else if (request->operation == PRODUCT_DEBUG_CLEAR_WATCH)
+        } else if (request->operation == x86_debug_CLEAR_WATCH)
             state->watches[request->watch_kind].enabled = LIB_FALSE;
         result->enabled = state->watches[request->watch_kind].enabled;
         result->value = state->watches[request->watch_kind].address;

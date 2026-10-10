@@ -220,10 +220,10 @@ static lib_bool softpc_extension_submit(void *context, emulator_machine *machine
 }
 
 lib_status softpc_product_configure_extensions(app_composed_machine *machine,
-    product_surface_command_extensions *out_extensions)
+    x86_product_command_extensions *out_extensions)
 {
     if (out_extensions == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    *out_extensions = (product_surface_command_extensions){
+    *out_extensions = (x86_product_command_extensions){
         .context = machine,
         .submit = softpc_extension_submit,
         .submit_snapshot = softpc_extension_submit_snapshot,
