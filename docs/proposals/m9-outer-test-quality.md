@@ -139,3 +139,25 @@ they exercise concrete product targets and their composition, rather than a
 portable source component.  Moving that registration merely to imitate the
 public component directory layout would require extensive absolute-path and
 scope plumbing without removing a dependency or duplicate test.
+
+### Complete App-test ledger
+
+The audited universe is the 41 files below `test/app-softpc` at P2.  Each
+member has one receiver; none is an unregistered orphan.
+
+| Members | Disposition and owner-local reason |
+| --- | --- |
+| `cleanup.h`, `time.h` | Retained as the two App-test-wide helpers.  Cleanup is used by Machine units and composed Integration tests; timing is used only where real executor progress is asserted. |
+| `unit/product/config_smoke.c` | Retained: verifies SoftPC's concrete configuration parsing, which no public Product component may know. |
+| `unit/machine/{machine,dual_media,partition_image,pit,irq,fdc,printer,sound,serial,mouse,keycode,vga_frame,text_console_compat,bop,quick_time,lifecycle,checkpoint,snapshot_boundary,audio_lifecycle,x87_layout}.c` | Retained: each verifies one concrete IBM-PC machine/core boundary, device, media or recovered-mirror contract.  They are not reusable component claims. |
+| `unit/machine/{audio_failure,audio_first_tone,audio_first_delivery,parallel_failure,platform_failure,media_snapshot,sound_state}.c` | Retained as white-box failure/edge proofs.  Their direct implementation includes are intentional local dependency substitution: respectively audio worker failure, first SoftPC tone, first PCM delivery through a fake Lib backend, parallel failure, platform wait failure, media snapshot encoding, and preserved mirror sound state.  They do not duplicate Lib's independent audio contract suite. |
+| `integration/{runtime,runtime_restart_boot,runtime_input_continuation,presentation_shutdown,runtime_cursor,command_provider,snapshot_transaction,package_smoke}.c` | Retained: each executes a composed SoftPC path—driver/executor, boot, input continuation, shutdown, cursor, App extension, transaction, or packaged product—that public components cannot own. |
+| `integration/machine_fixture.{c,h}` | Retained solely for `runtime`, `runtime_restart_boot`, and `runtime_input_continuation`; it assembles one concrete driver plus Emulator machine and has no public abstraction. |
+| `integration/snapshot_cross_process.cmake` | Retained as the paired multi-process snapshot orchestrator; its generated paths now stay under its private working directory. |
+
+The only removed assertions were the Session FIFO burst and Machine input FIFO
+block formerly embedded in `integration/runtime_smoke.c`; their exact owning
+receivers are `test/emulator/control_reconciler_integration_smoke.c` and the
+Emulator input-queue smoke tests.  The build-ownership gate prevents the same
+direct Emulator implementation compilation from returning under any
+`softpc-*` target.
