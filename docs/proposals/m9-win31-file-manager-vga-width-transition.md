@@ -841,14 +841,154 @@ Independent S_* procedure calls must remain calls; only L_* continuations
 within the current procedure are candidates for a local branch. A broader
 source rewrite is not admitted by this investigation.
 
-Smallest confirmed repair is one existing three-line tail-call block replaced
-by one local goto (+1/-3, net -2 before a provenance comment). A consistent
-CHAIN2 write cleanup would touch five files and 38 blocks, nominally +38/-114
-(net -76 before comments), requiring actual nested write/fill/move and pixel
+Smallest confirmed repair is one existing two-line tail-call block replaced
+by one local goto (+1/-2, net -1 with an inline provenance comment). A consistent
+CHAIN2 write cleanup would touch five files and 38 blocks, +38/-76
+(net -38 with inline comments), requiring actual nested write/fill/move and pixel
 oracles before acceptance. It creates no helper, stack object or second writer.
 Because it increases pristine-mirror touched lines, production implementation
 requires owner approval. The active S6 owns this confirmed item; it is removed
 from the deferred TODO rather than left as an unexplained hypothesis.
+
+### S6 per-site validation admission
+
+Owner request: "请你逐项验证！给我完整答案". The frozen units are 38 write
+tail-continuation call sites in sevid016--020 and ten CHAIN2 read sites in
+sevid000/001. Each needs a named owner, target, source line, saved-carrier and
+ENTER/LEAVE disposition, plus runtime reach/variant evidence or an explicit
+uncovered reason. Similar text alone is not proof of a defect. Diagnostics
+remain ignored, background-only, with no product-source or published EXE change.
+
+### S6 per-site qualified result and minimal proposed diff
+
+本节记录 S6 逐项诊断，不是生产修复或全产品验收。冻结范围为上述
+48 个 CHAIN2 续接调用；未把另外 392 个机械相似项纳入修复范围。
+
+逐项对照源代码：48 个目标都是当前过程自己的 L_* 标签，目标到出口之间
+没有建立新局部帧的 ENTER，却执行现有 LEAVE；旧 C 调用重新进入 crules，
+其自动 CopyLocalIUH 从零开始，因而错误恢复静态 LocalIUH。原始 OpenNT
+保留同一调用/包装/恢复形式。这不是 S4 dirty 修复或 x64 类型移植引入。
+
+#### 逐项运行证据与边界
+
+在独立后台进程中完成 192 次隔离实验：48 个位置 × 原调用/局部跳转
+× x86/x64。每次只保留目标位置的旧调用，其余 47 处采用局部跳转，以免
+前面的错误遮挡目标。诊断入口设置非空父局部帧并调用真正的规则表入口；
+该父帧及探针只存在于忽略的诊断副本，不是生产代码或第二条显存路径。
+
+每种宽度的 48 个局部跳转实验都退出 0，恢复父局部帧正确。每种宽度
+旧调用的 48 个目标均实际到达，返回检查都记录 actual=NULL、
+expected=非空。外部表现分为 2 个崩溃、14 个父帧检查失败、32 个最终
+返回 0（内部恢复已错，但后来外层 LEAVE 又恢复它自己的父帧，掩盖错误）。
+两种宽度的分类完全一致。不能把 48 处都描述成正常客户机必然崩溃。
+
+之前较宽的入口矩阵共收集 1664 次进程结果，每种宽度每种变体 416 次。
+旧调用变体每种宽度 252 次正常退出、164 次崩溃；局部跳转变体每种宽度
+316 次正常退出、100 次崩溃。收集进程退出 0 不代表这些实验全通过。
+剩余 100 项的分类在两个宽度一致：
+
+- 96 项为 ModeX 显存来源的复合 move，目标续接尚未到达就调用空的
+  legacy string-read 回调。setReadPointers 没有安装该 bulk 回调，当前
+  CCPU 标量路径也不使用它；探针没有满足这一旧入口的回调前提。
+  代表 GDB 停在地址 0，调用方为 S2629。不凭这些实验提出新的产品补偿。
+- 4 项为读串探针把目的地址设成整数偏移，而该入口要求宿主目的指针。
+  代表 GDB 停在实际存储操作，目标地址为 0x700。隔离实验已统一使用
+  合法目的指针，不把这四项作为镜像代码错误。
+
+这些事实限定了本轮证明：续接作用域/恢复错误已经逐项证明；没有以哈希
+或进程存活替代显存、像素、dirty、snapshot 的完整正确性验收。生产修复
+实施时还需要常设回归和双宽度产品回归。
+
+#### 最小修改
+
+只替换每个两行的 L_* 尾调用块，保留现有标签、ENTER/LEAVE、
+真实 S_* 过程调用和全部读写/dirty 算法。例如：
+
+```diff
+- { extern IUH L21_19if_d();
+- IUH returnValue,v1=0,v2=0,v3=0,v4=0; returnValue=L21_19if_d(v1,v2,v3,v4); return(returnValue); }
++ goto L21_19if_d; /* T88: keep this activation's saved locals. */
+```
+
+示例仅压缩空白便于阅读；拟议实际补丁保留周边原始制表符、语句和注释。
+同一函数局部跳转保留这一调用层已保存的父帧，现有目标负责原有清理。
+不新增 helper/状态/接口，不改变 snapshot 格式，不删除包装函数或重排条件。
+
+校正之前的行数预估：原块是两行而非三行。单点 +1/-2，净 -1；38 个
+写入点为五文件 +38/-76，净 -38；加十个读取点后七文件 +48/-96，净 -48。
+理由标记与 goto 同行，以上包括标记。镜像新差异仍是 48 处原始代码修改，
+不能把净减少代码误说成减少了与 OpenNT 的差异。拟议完整补丁的
+git apply --check 通过，未应用到生产源码。
+
+| 文件 | 位置数 | 新增 | 删除 | 净变动 |
+| --- | ---: | ---: | ---: | ---: |
+| sevid000.c | 6 | 6 | 12 | -6 |
+| sevid001.c | 4 | 4 | 8 | -4 |
+| sevid016.c | 2 | 2 | 4 | -2 |
+| sevid017.c | 7 | 7 | 14 | -7 |
+| sevid018.c | 7 | 7 | 14 | -7 |
+| sevid019.c | 16 | 16 | 32 | -16 |
+| sevid020.c | 6 | 6 | 12 | -6 |
+
+#### 48 项逐项处置
+
+行号指当前未修改生产源码的调用点。所有条目的目标/恢复关系都已与
+原始源码核对；“旧表现”是隔离父帧实验，不是日常客户机发生频率。
+
+| 调用点 | 续接标签 | 所属过程 | 旧表现（x86/x64 相同） | 处置依据 |
+| --- | --- | --- | --- | --- |
+| sevid000.c:828 | L26_1if_d | RdMode0Chain2WordRead | 崩溃 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid000.c:1712 | L26_24if_d | RdMode1Chain2WordRead | 崩溃 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid000.c:1855 | L26_26if_d | RdMode1Chain2StringReadFwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid000.c:1920 | L26_28if_d | RdMode1Chain2StringReadFwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid000.c:937 | L26_3if_d | RdMode0Chain2StringReadFwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid000.c:982 | L26_5if_d | RdMode0Chain2StringReadFwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid001.c:1162 | L26_58if_d | RdMode0Chain2StringReadBwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid001.c:1198 | L26_60if_d | RdMode0Chain2StringReadBwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid001.c:1474 | L26_78if_d | RdMode1Chain2StringReadBwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid001.c:1539 | L26_80if_d | RdMode1Chain2StringReadBwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid016.c:4026 | L21_1if_d | Chain2ModeXByteWrite_00000000 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid016.c:4362 | L21_9if_d | Chain2ModeXFwdByteMove_00000000 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:824 | L21_19if_d | Chain2ModeXWordWrite_00000000 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:1150 | L21_24if_d | Chain2ModeXFwdWordMove_00000000 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:1712 | L21_35if_d | Chain2ModeXByteWrite_00000001 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:2048 | L21_43if_d | Chain2ModeXFwdByteMove_00000001 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:2237 | L21_53if_d | Chain2ModeXWordWrite_00000001 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:2563 | L21_58if_d | Chain2ModeXFwdWordMove_00000001 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid017.c:3153 | L21_69if_d | Chain2ModeXByteWrite_00000002 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:2188 | L21_103if_d | Chain2ModeXByteWrite_00000003 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:2524 | L21_111if_d | Chain2ModeXFwdByteMove_00000003 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:2713 | L21_121if_d | Chain2ModeXWordWrite_00000003 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:3039 | L21_126if_d | Chain2ModeXFwdWordMove_00000003 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:1098 | L21_77if_d | Chain2ModeXFwdByteMove_00000002 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:1287 | L21_87if_d | Chain2ModeXWordWrite_00000002 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid018.c:1613 | L21_92if_d | Chain2ModeXFwdWordMove_00000002 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1184 | L21_137if_d | Chain2ByteFill_Copy | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1339 | L21_141if_d | Chain2ByteMove_Copy_Fwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1296 | L21_143if_d | Chain2ByteMove_Copy_Fwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1369 | L21_147if_d | Chain2ByteMove_Copy_Fwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1401 | L21_149if_d | Chain2ByteMove_Copy_Fwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1491 | L21_153if_d | Chain2WordWrite_Copy | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1604 | L21_155if_d | Chain2WordFill_Copy | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1760 | L21_161if_d | Chain2DwordWrite_Copy | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:1889 | L21_163if_d | Chain2DwordFill_Copy | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:2160 | L21_167if_d | Chain2ModeXBwdByteMove_00000000 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:2433 | L21_177if_d | Chain2ModeXBwdWordMove_00000000 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:2790 | L21_185if_d | Chain2ModeXBwdByteMove_00000001 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:3063 | L21_195if_d | Chain2ModeXBwdWordMove_00000001 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:3420 | L21_203if_d | Chain2ModeXBwdByteMove_00000002 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:3693 | L21_213if_d | Chain2ModeXBwdWordMove_00000002 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid019.c:4050 | L21_221if_d | Chain2ModeXBwdByteMove_00000003 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid020.c:875 | L21_231if_d | Chain2ModeXBwdWordMove_00000003 | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid020.c:1179 | L21_239if_d | Chain2ByteMove_Copy_Bwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid020.c:1137 | L21_241if_d | Chain2ByteMove_Copy_Bwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid020.c:1209 | L21_245if_d | Chain2ByteMove_Copy_Bwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid020.c:1241 | L21_247if_d | Chain2ByteMove_Copy_Bwd | 外层掩盖，返回 0 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+| sevid020.c:1329 | L21_251if_d | Chain2WordMove_Copy_Bwd | 外层恢复失败 | 两宽度已到达；旧恢复错误，局部跳转正确 |
+
+S6 调研给出的建议是统一修复这 48 处已经证明的同类作用域错误，不扩大到
+其他规则文件，不新增任何显存写入分流。生产实施尚待 owner 批准；本轮
+没有修改 src、test、发布 EXE、INI、介质或 snapshot，T88/S6 不自动收口。
 
 ## Repair constraints and acceptance
 

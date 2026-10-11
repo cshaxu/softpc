@@ -2,8 +2,9 @@
 
 ## Current Work
 
-M9 T88 remains open. S6 investigation is complete and awaits owner review of
-the confirmed root cause and original-source repair boundary.
+M9 T88 remains open. S6 completes owner-requested per-site diagnostic validation
+of 38 CHAIN2 write continuations and ten related read continuations; production
+repair awaits owner approval.
 
 S1--S5 are owner-accepted and closed. The accepted implementation baseline is
 `1957dc6d`; the owner reports S5 acceptance and explicitly requests committing
@@ -30,14 +31,14 @@ changes no source, test, EXE, INI or snapshot bytes and requires no rebuild.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests investigating the deferred CHAIN2 crash without leaving an unexplained tail. |
+| Admission And Approval | Owner requests investigating the deferred CHAIN2 crash and then explicitly requires per-site validation and a complete answer. |
 | Objective | Establish the exact failing nested rule, original contract, caller reachability and minimum correct repair boundary. |
 | Non-goals | No production rewrite, additional writer path, shared-component edit, media/INI/EXE modification or Computer Use. |
 | Reference Baseline | e959a21c; original OpenNT is read-only comparison evidence. |
 | Candidate Proposal | [S6 investigation](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-nested-chain2-rule-investigation) |
 | Files And ABI Surface | Existing generated CHAIN2 sources, caller/SAS contracts and an ignored diagnostic test; no production ABI change. |
 | Applicable Rules | Task Reading Set; original-source minimum diff; one machine/writer owner; background owned probes. |
-| Verification | Reproduce through the real writer table, capture nested locals, compare original source, and distinguish direct entry from CPU production callers. |
+| Verification | Freeze all 38 write and ten read continuation sites; verify each owner/target/ENTER/LEAVE relationship, collect individual runtime coverage and compare original and local-branch diagnostic variants on both widths. Distinguish proven restoration defects from legal continuations, unreachable branches and unrelated data faults. |
 | Expected Markers | Pinpoint the first invalid local restoration and account for every caller of the implicated entry; no inference from SIGSEGV alone. |
 | Asset Needs | Preserve accepted EXEs, INI, disks and snapshots. |
 | Reporting Requirements | Explain root cause, proof, reachability and smallest proposed source/test diff; do not claim a production repair from diagnostic evidence. |
@@ -50,13 +51,22 @@ Owned diagnostics stay in ignored build/t88/s6: compiler budget 1800 seconds,
 probe budget 120 seconds, captured stack/local checkpoint at most 1 MiB;
 executor owns child teardown. No native Window is created.
 
-Unmodified source reproduces the same null local restoration on both widths.
+Initial unmodified source reproduces the same null local restoration on both widths.
 Changing one same-function continuation call to a goto in disposable diagnostic
 source removes the crash on both widths. Production, source tests and accepted
 EXEs are unchanged. Source/caller inventory and minimal diff estimates are in
 the [causal result](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-causal-result-and-bounded-repair-proposal).
 The confirmed defect is now owned by S6, not deferred in TODO. No production
 repair or T88 closure is inferred from this investigation.
+
+The 192 isolated continuation experiments complete on x86/x64: all 48 sites
+per width reach their target and show incorrect saved-local restoration with
+the original call; all 48 local-transfer references per width restore correctly.
+Original outward outcomes per width are 2 crashes, 14 failed parent checks and
+32 masked restoration errors. Broader raw-entry probe failures are separately
+classified, not claimed product defects or passing regression. The proposed
+seven-file patch is +48/-96, net -48, including inline markers; it passes
+git apply --check and remains unapplied. See the proposal's per-site result.
 
 ## Historical M9 T85 S20 delivery record
 
