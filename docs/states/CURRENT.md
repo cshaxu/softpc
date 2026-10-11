@@ -2,7 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 T88 S1 is active: Win3.1 File Manager VGA width-transition diagnosis.
+
+## M9 T88 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner re-admits the queue head and requires MTSP discipline. S1 is an observation-and-attribution stage only; any repair requires a separately admitted follow-up S. |
+| Objective | Reproduce and attribute the intermittent roughly double-width-then-shrink host Window transition when Win3.1 opens File Manager. Prove one producer: original renderer, Compat conversion, App/Machine publication, or a documented Lib frame-contract fault. |
+| Non-goals | Do not repair in S1. Do not identify File Manager or Win3.1 in production code; do not use a fixed width, debounce, delay, filter, guest timing change or consumer-side workaround. Do not change user INI, guest media, snapshots, preserved-mirror behavior or shared components without evidence. No Computer Use. |
+| Reference Baseline | SoftPC `e4435510`; T87 is closed. OpenNT and NTVDM64 remain read-only comparison evidence only. |
+| Candidate Proposal | [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md) |
+| Files And ABI Surface | Initially read-only: selected original VGA renderer, App Compat frame conversion, Machine/App publication and Lib Window geometry consumers. A task-owned ignored trace may be added only when static inspection cannot identify the producer; it records dimensions, stride, sequence and display-enable state without changing guest timing. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; one executor/producer rule; long operations run as owned background jobs; MTSP phase gates; no Computer Use. |
+| Verification | Phase 1: record baseline/configuration and deterministic snapshot route. Phase 2: make bounded x64/x86 observation attempts, recording each published geometry transition. Phase 3: correlate every unusual geometry with source state and compare the responsible original route against read-only OpenNT/NTVDM64. Phase 4: recheck the related DOS Prompt width route and issue a separate repair brief only with proven ownership. |
+| Expected Markers | A finite transition ledger classifies every sampled geometry as valid, incomplete or invalid and names exactly one producer. No consumer-side mode filter or guest-program special case exists. |
+| Asset Needs | Preserve package INI, media and snapshots. Use existing assets and a copied task-owned snapshot/configuration only when needed to shorten startup; never modify package assets. No artifact refresh is expected from S1. |
+| Reporting Requirements | Record exact repro route, observed x64/x86 transitions, source ownership disposition, comparison evidence, non-reproduction limit if applicable, and a narrow repair proposal only when attribution is proven. Report every MTSP phase gate before advancing. |
+| Stop Conditions | A mirror behavior change, a new external driver/media, a Lib/Emulator contract expansion, or a repair is required before a sole producer is identified; stop at that gate and request a separate repair S instead of adding a workaround. |
+| Exit Criteria | Both widths have a recorded observation attempt; each sampled transition has a disposition; the responsible layer is proven or the bounded non-reproduction result is recorded; any repair is separately scoped. |
+| Original Owner Request | “重新准入 一定遵循mtsp规范。” |
+| Similar-Issue Sweep | Compare existing Win3.1 DOS Prompt initial-window/fullscreen transition routes and every frame-to-Window geometry publication site; classify each as the same producer fault, a different defect or unaffected. |
 
 ## Historical M9 T85 S20 delivery record
 
