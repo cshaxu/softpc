@@ -1,5 +1,23 @@
 # MVDM / OpenNT 当前差异账本
 
+### T88 S2 V7 扫描解释最小修复
+
+相对 S1 的生产基线，`host/src/nt_graph.c` +1/-1、
+`base/video/vga_mode.c` +6/-1、`base/video/v7_ports.c` +1/-1，
+合计 +8/-3、净增 5 行。仅修改三个显示条件，沿用原 packed 绘制器、
+四平面交错显存、dirty 更新器及硬件指针坐标换算；不增加状态或接口。
+CPU chain4 临时关闭不再使 V7 packed 显示切换为 planar 解释。
+CPU 读写及银行选择中的 chain4 条件保留，普通 VGA/planar 路径不改。
+
+当前三个文件相对 OpenNT 的文本差异分别为 +62/-14、+9/-3、+1/-1；
+这些总数包含已有修复，并非本次新增量。使用 `git diff --no-index
+--numstat` 对照同相对路径原文件统计，不改写下文历史冻结总数。
+新增 owner-local 回归经真实 SR4 端口验证 V7 66h--69h 模式、虚拟行跨度、
+非零起始地址、完整/局部像素、CPU 显存访问和指针寄存器路径。
+验收状态及最终验证见
+[T88 proposal](../../../proposals/m9-win31-file-manager-vga-width-transition.md)。
+Compat 的新 surface 完整性修复属于独立 S3，不在此镜像增量中。
+
 ### T85 S1 InPort 增量
 
 `base/keymouse/mouse.c` 相对 P1 新增 70、删除 80 行；相对

@@ -1295,7 +1295,7 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
             if(get_256_colour_mode())
             {
 #ifdef V7VGA
-                if (get_seq_chain4_mode() && get_chain4_mode())
+                if (get_seq_chain4_mode())
                 {
                     paint_screen = nt_paint_funcs->v7vga_hi_graph;
                     (*nt_init_funcs->vga_hi_graph)();

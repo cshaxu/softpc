@@ -297,6 +297,64 @@ existing App VGA-frame smoke, not four new test executables:
   conversion containing the proposed condition change. Retain those callback
   tests and add an independent expected-coordinate check across SR4 toggles.
 
+### S2 implementation evidence
+
+The frozen repair universe is the three display predicates above. Painter,
+row-byte stride and pointer coordinates use the existing V7 packed convention;
+CPU bank/read/write paths retain their distinct access interpretation. Each
+predicate is exercised by the same owner-local `vga_frame_smoke` receiver.
+No additional production path, state, helper or compatibility fallback exists.
+This evidence does not certify the separate Compat generation contract in S3.
+
+Against S1 `cfa4ae23`, production changes are `nt_graph.c` +1/-1,
+`vga_mode.c` +6/-1 and `v7_ports.c` +1/-1: +8/-3, net +5 lines.
+The estimate was +6/-3 before comments; the actual includes the short byte-unit
+comment and conditional formatting. The existing App VGA smoke adds 101 lines,
+deletes none, and creates no new test executable. Shared components, Compat,
+INI, snapshots and media are unchanged.
+
+The added receiver programs BIOS V7 modes 66/67/68/69, real SR4 enabled/disabled/
+enabled transitions, zero/nonzero CRTC start and the captured 1024-byte virtual
+pitch. It checks complete patterned pixels and one-region dirty repaint against
+an independent backing-byte row oracle, real CPU chain4 address/readback
+differences, and pointer coordinates through the original register receiver.
+Existing standard stride/wrap and legitimate mode matrices are retained. Both
+x64 and x86 focused runs pass. Linking the new test against the retained S1
+behavior fails at the intended width assertion (runtime exit 3), so this is
+not merely an assertion of the new implementation's geometry.
+
+The similar-issue review retains CPU bank selection and CPU read/write receiver
+conditions because they control CPU access, not scanout. Existing screen-pointer
+and wrap branches retain their separate contracts; no speculative fix is added.
+Whole-file differences from OpenNT, including earlier accepted changes, are
+`nt_graph.c` +62/-14, `vga_mode.c` +9/-3 and `v7_ports.c` +1/-1. These must not
+be confused with the +8/-3 incremental S2 repair.
+
+Release builds reuse the regular Ninja intermediate objects, refresh both
+package EXEs, and contain no S1 probe strings. Published SHA256 values are:
+
+- x86: `2D0CBF0916256BE4965A663C47CE913DD2617346ADC037C786627DD7EBDA1CAC`
+- x64: `C9A10C9744A134AF5AA7DFF3958CCC7F6246D1F261715301BEBEC2FDDA92CBF8`
+
+The owned hidden validation job completes with exit 0. On each width, the
+shared suites run first (Lib 48, Emulator 21, x86 15: 84/84), followed by all
+App/checks background tests (47/47): 131/131 per width. Qualified elapsed
+times are x64 59.45 + 71.02 seconds and x86 58.49 + 73.68 seconds. The App
+suite includes snapshot regressions and real Win3.1 boot with six DOS Prompt
+full-screen/window roundtrips and CLS. The initial shared-name filter selected
+zero tests and is explicitly discarded; qualified reruns use the actual dot/
+slash prefixes and `--no-tests=error`.
+
+Five desktop cases per width are intentionally excluded: package smoke and its
+compact-console variant, Lib Window retirement/modal, and native Console
+display. No Computer Use or foreground desktop interaction occurred. The
+owner's File Manager visual acceptance remains pending; these results do not
+claim the complete T88 flicker problem, including S3, is solved. Documentation,
+source-boundary gates and whitespace checks pass. Task logs remain under the
+ignored `build/t88/s2`; disposable negative-proof EXE/media are removed after
+their owned process exits. The regular build intermediates are retained for
+incremental reuse. S2 is delivered for acceptance, not owner-accepted closure.
+
 ### S3: Compat generation readiness
 
 Use the existing DIB bind/update/generation lifecycle to distinguish a newly

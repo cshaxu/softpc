@@ -876,6 +876,106 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     }
 }
 
+static void verify_v7_cpu_scanout(softpc_machine *machine)
+{
+    extern void outb(io_addr port, half_word value);
+    extern IU8 c_sas_hw_at(IU32 addr);
+    extern void c_sas_store(IU32 addr, IU8 value);
+    extern void remove_v7ptr(void);
+    const unsigned modes[] = { 0x66, 0x67, 0x68, 0x69 };
+    const unsigned widths[] = { 640, 640, 720, 800 };
+    const unsigned heights[] = { 400, 480, 540, 600 };
+    unsigned mode, origin, step;
+
+    for (mode = 0; mode < 4; ++mode) {
+        c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)modes[mode]);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        outb(0x3c4, 6); outb(0x3c5, 0xea);
+        outb(0x3c4, 0xf9); outb(0x3c5, 0);
+        /* Include the virtual pitch used by the captured 640-mode driver. */
+        if (mode < 2) {
+            outb(0x3d4, 0x13); outb(0x3d5, 0x80);
+        }
+        unsigned pitch = mode < 2 ? 1024 : widths[mode];
+        unsigned memory_mode = sequencer.memory_mode.as.abyte;
+        outb(0x3c4, 2); outb(0x3c5, 1);
+        outb(0x3ce, 4); outb(0x3cf, 0);
+        for (origin = 0; origin <= 4; origin += 4) {
+            outb(0x3d4, 0x0c); outb(0x3d5, 0);
+            outb(0x3d4, 0x0d); outb(0x3d5, (half_word)origin);
+            /* Enabled, disabled, enabled: use the real SR4 receiver. */
+            for (step = 0; step < 3; ++step) {
+                const void *bits, *info;
+                lib_u32 width, height;
+                unsigned char *surface;
+                unsigned row, address;
+                outb(0x3c4, 4);
+                outb(0x3c5, (half_word)(step == 1 ?
+                    memory_mode & ~8u : memory_mode));
+                host_timer_event(); host_timer_event();
+                assert(softpc_machine_presentation_dib(machine, &bits, &info,
+                    &width, &height));
+                assert(width == widths[mode] && height == heights[mode]);
+                assert(get_offset_per_line() == (int)pitch);
+                assert(get_screen_start() == (int)origin);
+                assert(paint_screen == nt_v7vga_hi_graph_std);
+                surface = (unsigned char *)bits;
+
+                /* CPU access must still select different backing addresses;
+                   display independence must not disable CPU chain4 behavior. */
+                EGA_planes[0x120] = EGA_planes[0x480] = 0;
+                c_sas_store(0xa0120, 0x5a);
+                address = step == 1 ? 0x480 : 0x120;
+                assert(EGA_planes[address] == 0x5a);
+                assert(EGA_planes[step == 1 ? 0x120 : 0x480] == 0);
+                assert(c_sas_hw_at(0xa0120) == 0x5a);
+
+                for (address = 0; address < 4u * EGA_PLANE_SIZE; ++address)
+                    EGA_planes[address] = (unsigned char)(address * 37u +
+                        (address >> 10));
+                setVideodirty_total(20001);
+                vga_graph_update();
+                /* Independent raw-byte row oracle; no corrected test stride
+                   or directly selected painter is supplied to the updater. */
+                for (row = 0; row < height; ++row)
+                    assert(lib_memory_compare(surface + row * width,
+                        EGA_planes + origin + row * pitch, width) == 0);
+                row = height / 2;
+                address = origin + row * pitch + width - 1;
+                EGA_planes[address] ^= 0xff;
+                lib_memory_set(video_copy, 0, 0x8000);
+                video_copy[address >> 2] = 1;
+                setVideodirty_low(address >> 2);
+                setVideodirty_high(address >> 2);
+                setVideodirty_total(1);
+                vga_graph_update();
+                assert(surface[row * width + width - 1] == EGA_planes[address]);
+                for (row = 0; row < height; ++row)
+                    assert(lib_memory_compare(surface + row * width,
+                        EGA_planes + origin + row * pitch, width) == 0);
+
+                /* Program the original pointer registers and invoke its
+                   coordinate conversion, not the already-converted callback. */
+                extensions_controller.interface_control.as_bfld.pointer_bank_select = 0;
+                extensions_controller.pointer_pattern = 0;
+                lib_memory_set(EGA_planes + 0x30000, 0xff, 128);
+                lib_memory_set(EGA_planes + 0x30080, 0, 128);
+                EGA_planes[0x30000] = 0x7f;
+                EGA_planes[0x30080] = 0x80;
+                surface[6u * width + 8u] = 0x35;
+                extensions_controller.cursor_attrs.as_bfld.pointer_enable = 1;
+                outb(0x3c4, 0x9c); outb(0x3c5, 0);
+                outb(0x3c4, 0x9d); outb(0x3c5, 16);
+                outb(0x3c4, 0x9e); outb(0x3c5, 0);
+                outb(0x3c4, 0x9f); outb(0x3c5, 6);
+                assert(surface[6u * width + 8u] == 0xff);
+                remove_v7ptr();
+                extensions_controller.cursor_attrs.as_bfld.pointer_enable = 0;
+            }
+        }
+    }
+}
+
 static void verify_display_stride(void)
 {
     extern boolean choose_vga_display_mode(void);
@@ -1311,6 +1411,7 @@ int main(void)
     verify_snapshot_rebuilds_graphics_surface(machine);
     verify_snapshot_video_writes(machine);
     verify_preserved_v7_modes();
+    verify_v7_cpu_scanout(machine);
     verify_display_stride();
     verify_pointer_update_pixels();
     softpc_machine_destroy(machine);

@@ -2,28 +2,38 @@
 
 ## Current Work
 
-M9 T88 S1 is active: Win3.1 File Manager VGA width-transition diagnosis.
+M9 T88 S2 is implemented and verified, awaiting owner acceptance:
+minimal original-mirror V7 scanout correction. T88 remains open; S3 is not admitted.
 
-## M9 T88 S1 Packet
+## M9 T88 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner re-admits the queue head and requires MTSP discipline. S1 is an observation-and-attribution stage only; any repair requires a separately admitted follow-up S. |
-| Objective | Reproduce and attribute the intermittent roughly double-width-then-shrink host Window transition when Win3.1 opens File Manager. Prove one producer: original renderer, Compat conversion, App/Machine publication, or a documented Lib frame-contract fault. |
-| Non-goals | Do not repair in S1. Do not identify File Manager or Win3.1 in production code; do not use a fixed width, debounce, delay, filter, guest timing change or consumer-side workaround. Do not change user INI, guest media, snapshots, preserved-mirror behavior or shared components without evidence. No Computer Use. |
-| Reference Baseline | SoftPC `e4435510`; T87 is closed. OpenNT and NTVDM64 remain read-only comparison evidence only. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner closes S1 and admits S2: implement the three-condition original-mirror correction, compile/test/publish both EXEs, commit/push and await owner acceptance. S3 Compat repair is separate and not admitted. |
+| Objective | Keep original V7 packed painter, row-byte stride and pointer-coordinate interpretation consistent when CPU chain4 changes without a scanout change. Prove pixels, dirty and CPU access, not only geometry. |
+| Non-goals | No new renderer, helper, state, mode object, width clamp, debounce, delay, guest-specific condition or consumer workaround. Do not modify Compat, shared components, configuration, media or snapshots. Do not repair speculative FC/start/wrap issues or claim S3 completeness. No Computer Use or foreground desktop tests. |
+| Reference Baseline | SoftPC `cfa4ae23` (S1 diagnostic closure); production sources equal `b27bf7d0`. OpenNT and NTVDM64 are read-only comparison evidence, never build/acceptance dependencies. |
 | Candidate Proposal | [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md) |
-| Files And ABI Surface | Selected original VGA renderer, App Compat frame conversion, Machine/App publication and Lib Window geometry consumers. Owner-directed temporary diagnostics record raw/derived geometry, painter selection, DIB generation, completed update and publication readiness; source inserts are reverted after compiling the diagnostic. No production behavior or public ABI changes. Logging may perturb host scheduling but does not intentionally change guest timing. |
+| Files And ABI Surface | Original `host/src/nt_graph.c`, `base/video/vga_mode.c`, `base/video/v7_ports.c`; owner-local `test/app-softpc/unit/machine/vga_frame_smoke.c`; pristine ledger and task records. Existing API/state and CPU access code unchanged. Expected production +6/-3 before comments. Release EXEs replace S1 diagnostic package. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; one executor/producer rule; long operations run as owned background jobs; MTSP phase gates; no Computer Use. |
-| Verification | Phase 1: record baseline/configuration and deterministic snapshot route. Phase 2: make bounded x64/x86 observation attempts, recording each published geometry transition. Phase 3: correlate every unusual geometry with source state and compare the responsible original route against read-only OpenNT/NTVDM64. Phase 4: recheck the related DOS Prompt width route and issue a separate repair brief only with proven ownership. |
-| Expected Markers | A finite transition ledger classifies every sampled geometry as valid, incomplete or invalid and names exactly one producer. No consumer-side mode filter or guest-program special case exists. |
-| Asset Needs | Preserve package INI, media, snapshots and accepted x86 EXE. Owner explicitly requests the diagnostic x64 EXE in assets/binary for manual reproduction; it is not a repaired release. Task-owned build/t88 traces are capped at 20,000 VGA-state records (under 20 MiB), with a two-minute manual-run budget, 900-second owned build budget, retained checkpoints and executor-owned cleanup. One of the three further owner localization runs is completed; two remain. No additional owner run is needed for the captured width attribution. |
-| Reporting Requirements | Record exact repro route, observed x64/x86 transitions, source ownership disposition, comparison evidence, non-reproduction limit if applicable, and a narrow repair proposal only when attribution is proven. Report every MTSP phase gate before advancing. |
-| Stop Conditions | A mirror behavior change, a new external driver/media, a Lib/Emulator contract expansion, or a repair is required before a sole producer is identified; stop at that gate and request a separate repair S instead of adding a workaround. |
-| Exit Criteria | Both widths have a recorded observation attempt; each sampled transition has a disposition; the responsible layer is proven or the bounded non-reproduction result is recorded; any repair is separately scoped. |
-| Original Owner Request | “重新准入 一定遵循mtsp规范。” |
-| Similar-Issue Sweep | Compare existing Win3.1 DOS Prompt initial-window/fullscreen transition routes and every frame-to-Window geometry publication site; classify each as the same producer fault, a different defect or unaffected. |
+| Verification | Phase 1: baseline and minimal diff review. Phase 2: real SR4 port toggles in V7 modes, patterned complete/partial frames, nonzero start, pointer registers, CPU memory access and legitimate mode changes; preserve standard stride/wrap matrix. Phase 3: dual-width incremental Ninja package/test builds, shared suites first then all background tests (`-LE desktop`), snapshot regressions and existing mode roundtrip receivers. Phase 4: review actual diff and publish hashes; owner performs native visual acceptance. |
+| Expected Markers | Supported V7 packed layouts retain geometry/row pixels/pointer coordinates across CPU chain4 changes; CPU access semantics remain distinct and correct. Valid CRT changes still resize. No consumer filter, additional state or public ABI exists. |
+| Asset Needs | Refresh only assets/binary/softpc32.exe and softpc64.exe with probe-free Release builds. Preserve INI/media/snapshots. One owned hidden build/test job at a time uses ignored build/t88/s2 logs/exit files, 1800-second build and 3600-second test budgets; owner is this executor. No new manual localization run or desktop interference. |
+| Reporting Requirements | Pre/post per-file production/test additions, deletions and net changes; pristine delta separate from baseline delta; actual focused/full background results and desktop exclusions; two release hashes/links, complete pushed P and clean workspace; await owner validation. |
+| Stop Conditions | Candidate fails pixel/address/pointer/CPU proof, needs additional production conditions/state or changes outside three original sites, or non-mutating acceptance cannot proceed. Report failure; do not add a fallback or weaken assertions. |
+| Exit Criteria | Minimal three-condition candidate passes both-width focused and required background regression, source/gates and similar-issue review; both probe-free release EXEs published; complete changes committed/pushed and workspace clean. S2 remains delivered awaiting owner acceptance; T88/S3 remain open. |
+| Original Owner Request | “收口S1，准入S2，S2修完以后，编译发布测试提交推送等我验收。” |
+| Similar-Issue Sweep | Search chain4 predicates in original painter, stride, pointer, CPU read/write/bank and wrap paths; corrected three display hits, retained necessary CPU hits, transfer unproved out-of-scope defects only with evidence. Existing standard-mode tests remain unchanged; S3 owns incomplete-generation publication. |
+
+S1 diagnostic closure: [accepted diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
+
+S2 Release builds and focused VGA smoke pass on both widths. Background shared
+84/84 followed by App/checks 47/47 pass per width (131/131); five desktop tests
+are excluded, not counted as passed. The retained S1 behavior fails the new
+width assertion. Snapshot and real Win3.1 mode-roundtrip regressions pass.
+Actual changes and artifact hashes are recorded in the proposal; native visual
+acceptance is pending. No Compat or shared-component production change exists.
 
 ## Historical M9 T85 S20 delivery record
 
