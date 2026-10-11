@@ -83,6 +83,10 @@ extern void vga_split_graph_update(void);
 extern void vga_ac_outb(io_addr port, half_word value);
 
 extern EVID_WRT_POINTERS c_ev_write_ptr;
+extern EVID_WRT_POINTERS chain2_evid[];
+extern IUH r1, r2, r3;
+extern IHP Gdp;
+extern void setMarkPointers(IUH markset);
 static IU32 writer_offset, writer_value;
 
 static void verify_pointer_update_pixels(void)
@@ -976,6 +980,81 @@ static void verify_v7_cpu_scanout(softpc_machine *machine)
     }
 }
 
+static void verify_chain2_dirty_entries(void)
+{
+    const unsigned offsets[] = { 0x100, 0x101, 0x107, 0x2100 };
+    EVID_WRT_POINTERS saved_writer;
+    unsigned marking, mode, entry, group;
+
+    c_setAH(0x6f); c_setAL(5); c_setBX(0x63);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    host_timer_event(); host_timer_event();
+    assert(EGA_CPU.chain == CHAIN2);
+    saved_writer = c_ev_write_ptr;
+
+    /* Exercise all five selected byte writers, parity/group boundaries and
+       CGA bank folding. CCPU string operations use SAS byte/word entry points,
+       not the legacy generated ModeX fill/move nesting. */
+    for (marking = 0; marking < 3; ++marking)
+    for (mode = 0; mode < 5; ++mode)
+    for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
+        unsigned offset = offsets[entry];
+        setMarkPointers(marking == 2 ? 4 : marking);
+        c_ev_write_ptr = chain2_evid[mode];
+        lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
+        setVideodirty_total(0);
+        setVideodirty_low(INT_MAX);
+        setVideodirty_high(-1);
+        r1 = (IUH)Gdp; r2 = offset; r3 = 0xa5;
+        c_ev_write_ptr.b_write(offset, 0xa5);
+        assert(getVideodirty_total() != 0);
+        if (marking == 2) {
+            assert(getVideodirty_low() == (offset >> 3));
+            assert(getVideodirty_high() >= (offset >> 3));
+            assert(getVideodirty_high() <= (offset >> 3) + 1);
+            assert(video_copy[offset >> 3] != 0);
+        } else {
+            for (group = 0; group < EGA_PLANE_SIZE; ++group)
+                assert(video_copy[group] == 0);
+            if (marking == 1)
+                assert(getVideodirty_low() == (offset & 0xdfff));
+        }
+    }
+    /* Bank conversion belongs to the existing marker, not each writer.
+       Probe it without manufacturing a different physical write mapping. */
+    setMarkPointers(4);
+    for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
+        unsigned offset = offsets[entry];
+        lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
+        setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
+        r1 = (IUH)Gdp; r2 = offset; r3 = 0xa5;
+        ((IUH (*)())getVideomark_word())(0, 0, 0, 0);
+        assert(video_copy[offset >> 3] != 0);
+        assert(video_copy[(offset + 1) >> 3] != 0);
+        assert(getVideodirty_low() == (offset >> 3));
+        assert(getVideodirty_high() >= ((offset + 1) >> 3));
+        assert(r2 == offset && r3 == 0xa5);
+    }
+    for (group = 0; group < 2; ++group) {
+        unsigned bank = group ? 0x4000 : 0;
+        setVideov7_bank_vid_copy_off(bank);
+        lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
+        setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
+        r1 = (IUH)Gdp; r2 = 0x100; r3 = 16;
+        ((IUH (*)())getVideomark_string())(0, 0, 0, 0);
+        assert(video_copy[bank + 0x20] != 0 && video_copy[bank + 0x21] != 0);
+        assert(getVideodirty_low() == bank + 0x20);
+        assert(getVideodirty_high() >= bank + 0x21);
+        assert(r2 == 0x100 && r3 == 16);
+        setVideodirty_total(0); r2 = 0x100; r3 = 0;
+        ((IUH (*)())getVideomark_string())(0, 0, 0, 0);
+        assert(getVideodirty_total() == 0);
+    }
+    setVideov7_bank_vid_copy_off(0);
+    c_ev_write_ptr = saved_writer;
+    set_mark_funcs();
+}
+
 static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
 {
     const unsigned modes[] = {
@@ -992,6 +1071,8 @@ static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
     };
     extern void outb(io_addr port, half_word value);
     extern void c_sas_store(IU32 addr, IU8 value);
+    extern void c_sas_storew(IU32 addr, IU16 value);
+    extern void c_sas_storedw(IU32 addr, IU32 value);
     extern void remove_v7ptr(void);
     unsigned pass, index, failures = 0;
 
@@ -1041,6 +1122,13 @@ static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
            Comparing it with a subsequent full repaint detects stale regions. */
         for (address = 0; address < 16; ++address)
             c_sas_store((mode <= 6 ? 0xb8100 : 0xa0100) + address, (IU8)(address ^ 0xa5));
+        c_sas_storew((mode <= 6 ? 0xb8100 : 0xa0100) + 18, 0x5aa5);
+        c_sas_storedw((mode <= 6 ? 0xb8100 : 0xa0100) + 22, 0xa55a5aa5);
+        c_sas_storew((mode <= 6 ? 0xb8100 : 0xa0100) + 37, 0xa55a);
+        c_sas_storedw((mode <= 6 ? 0xb8100 : 0xa0100) + 41, 0x5aa5a55a);
+        /* Dirty dispatch must not remove the Copy writer's address decoding. */
+        assert(EGA_planes[0] == 0 && EGA_planes[1] == 37 &&
+            EGA_planes[2] == 74 && EGA_planes[3] == 111);
         assert(getVideodirty_total() != 0);
         (*update_alg.calc_update)();
         if (lib_memory_compare(incremental, surface, size) == 0) {
@@ -1525,6 +1613,7 @@ int main(void)
     verify_snapshot_video_writes(machine);
     verify_preserved_v7_modes();
     verify_v7_cpu_scanout(machine);
+    verify_chain2_dirty_entries();
     const unsigned colour_resolution_failures = verify_colour_resolution_matrix(machine);
     verify_display_stride();
     verify_pointer_update_pixels();

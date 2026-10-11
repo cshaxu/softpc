@@ -429,7 +429,139 @@ User INI, guest media and snapshots remain unchanged. Shared six-component
 sources/tests remain unchanged. S3 accepts coverage only; T88 is not qualified
 or closed, and the retained failing test prevents an all-green claim.
 
-### S4: Compat generation readiness
+### S4: CHAIN2 dirty-contract repair
+
+Owner admits source-local single-path marking. Replace each of the 28 inline
+CHAIN2 CGA dirty blocks with the same selected byte/word/string marker call
+convention already used by Unchained writers. Retain parameter saves, actual
+memory writes, rule labels outside the removed blocks and all render/update
+algorithms. Every changed site carries DIVERGENCE(T88-CHAIN2-DIRTY).
+Original marking selection supplies CHAIN2 EGA markers accepting CPU offsets
+and producing plane-group/bank bitmap entries; CGA/text retain original marker
+semantics. No helper fallback, second write path or build generator is added.
+
+Finite convergence ledger: sevid016/017/018/019/020 contain respectively
+2/5/5/14/2 blocks. Each must have exactly one selected marker dispatch and
+no retained inline dirty accounting. Verify byte/word/dword write, fill,
+forward/backward move, BIOS copy entry, zero count and odd/even boundaries;
+compare bitmap/bounds, incremental/full pixels, bank switching and CGA/text
+transitions on both widths. Static review covers all 28 replacements; runtime
+proof covers selected byte writers, marker word/range contracts and CCPU SAS
+byte/word/dword calls, not all legacy ModeX compound entry points. An
+exploratory compound-entry crash is separately dispositioned below. Existing
+19-mode forward/reverse matrix remains enabled. Completion requires the
+bounded ledger and background suites green;
+desktop and arbitrary untested register mixtures are not claimed qualified.
+Expected production replacement removes several hundred repetitive lines;
+final accounting distinguishes those deletions from changes to memory writes.
+Evidence is owned in ignored build/t88/s4, with hidden child processes,
+per-phase logs/exits and 1800-second build / 3600-second test budgets; executor
+owns timeout cleanup. Keep regular Ninja intermediates for incremental reuse.
+
+#### S4 implementation and source accounting
+
+The repair leaves all memory-write algorithms intact. Each retired inline
+block now calls the existing selected marker slot and retains the original
+generated call convention. Byte/word markers leave their inputs unchanged;
+range callers restore inputs after count/range normalization. String counts
+are byte counts: word/dword counts multiply by two/four; backward ranges
+begin at the lowest affected byte. Zero ranges do not dispatch a marker.
+No parallel CGA bookkeeping survives. The 56 labels, enum members and local
+wrappers belonging only to the removed dirty comparisons are removed too.
+
+Finite rule ledger (original generated function numbers):
+
+- sevid016: 2625, 2629.
+- sevid017: 2635, 2643, 2647, 2653, 2661.
+- sevid018: 2665, 2671, 2679, 2683, 2689.
+- sevid019: 2696, 2697, 2698, 2699, 2700, 2702, 2703, 2706, 2708,
+  2712, 2714, 2718, 2720, 2724.
+- sevid020: 2726, 2729.
+
+`ev_glue.c` adds three CHAIN2 marker ABI shims sharing one address conversion.
+CPU bytes map to plane offsets in pairs; the original Unchained range marker
+still owns bitmap writes, signed dirty bounds and bank offsets. Its existing
+conservative endpoint coverage is retained, not tightened into a new contract.
+The shims preserve the jcode input carriers after conversion. `gfx_updt.c`
+selects these markers in its existing EGA/CHAIN2 branch. The unsupported
+non-CPU40 configuration retains its original assertion; no standalone branch,
+mode number, guest identity or new renderer is introduced.
+
+An initial experiment using the original C `ega_mark_string()` was discarded:
+its signed/unsigned comparison leaves dirty_high at the initial -1 in this
+CCPU build. The delivered code uses the already-correct C-VID marker instead;
+it does not add a second copy of the bookkeeping implementation.
+
+| Production file | This S added/deleted | Full OpenNT diff before | Full OpenNT diff after |
+| --- | --- | --- | --- |
+| ev_glue.c | +42/-0 | +11/-8 | +53/-8 |
+| sevid016.c | +15/-75 | +651/-650 | +652/-711 |
+| sevid017.c | +41/-208 | +462/-461 | +468/-634 |
+| sevid018.c | +48/-209 | +481/-480 | +494/-654 |
+| sevid019.c | +154/-545 | +608/-604 | +664/-1051 |
+| sevid020.c | +26/-76 | +620/-616 | +632/-678 |
+| gfx_updt.c | +6/-0 | +189/-145 | +195/-145 |
+
+Production total: +332/-1113, net -781. Full original-mirror touched lines
+for these seven files increase from 5986 to 7039 (+1053). Code reduction is
+not mirror-diff reduction: deleting original inline blocks and their labels
+necessarily adds deletions against OpenNT. These counts include pre-existing
+native-width adaptations; they are not all new functional edits.
+
+The existing VGA smoke adds marker-owner/parity/group/bank/zero-count
+receivers and real SAS byte/word/dword writes, including odd/even addresses,
+in all 19 modes, in both mode orders. A prefix guard also verifies that these
+writes cannot mutate the unrelated beginning of the plane store. The source
+gate inventories exactly 28 local divergence markers,
+rejects residual inline CGA accounting and rejects the 56 retired labels.
+No existing assertion is relaxed. There is no new test executable or fixture
+framework. Byte-entry tests cover five writer sets and three marking owners;
+the string/word receiver verifies actual bitmap/bounds and input preservation.
+
+An exploratory direct legacy ModeX compound-entry matrix is not accepted as
+passing qualification. Odd-address dword writes crashed with both original
+inline dirty code restored and the repair applied, with the same nested
+generated rule stack. It exposes a separate old local-carrier issue, not a
+reason to rewrite memory writes inside this dirty-only S. CCPU SAS string
+operations use byte/word calls; the production receiver uses those paths.
+The confirmed old failure is explicitly tracked separately in TODO. This
+delivery does not claim every dormant generated compound rule is functional.
+
+Final verification also caught an implementation error before delivery: the
+old inline dirty segments in Copy word/dword rules 2699/2702 interleave seven
+lines each of address parity/alignment calculation. Those original statements
+are retained verbatim; only their dirty bookkeeping is replaced. Removing them
+left zeroed address locals, making wide writes change the plane-store prefix
+while dirty bounds named the requested offset. The unchanged baseline passed
+the same CGA wide-write matrix on both widths; the corrected implementation
+passes the complete matrix. No assertion is removed or relaxed. This does not
+support rewriting the underlying compound memory algorithms.
+
+Code accounting excludes documents and EXEs: production +332/-1113 (net -781),
+existing VGA test +89/-0, source gate +21/-0; combined +442/-1113 (net -671).
+
+Dual-width regular Ninja Release builds and the complete background selection
+pass: shared Lib/Emulator/X86 84/84 first (x64 57.73 s, x86 57.92 s), then
+App/checks 47/47 (x64 104.50 s, x86 79.83 s). The five native desktop cases
+per width remain excluded, not declared passed. Focused VGA passes on both
+widths (5.15/7.47 s); this includes snapshot video-write/resume coverage,
+the colour/resolution matrix and the new CHAIN2 receivers. No INI, media,
+snapshot or shared-corpus file changes. Documentation/source-boundary gates
+and git diff --check pass. Disposable baseline exports and obsolete probe
+scripts are removed; bounded regression and old-failure evidence is retained
+while T88 remains open. Regular Ninja intermediate caches are preserved.
+
+The final artifact refresh/focused receiver also passes on both widths
+(4.88/7.31 s). Ninja reports recovery of a prematurely ended x86 log and
+rebuilds affected targets; no clean/cache deletion or source change is used
+to conceal that additional build work.
+Published SHA256: x86
+9B3CF4244E8B27D40590A97D5414B000383D9F0808CC6B94FCB8E8FE14057BE2;
+x64 72E99EA137FA24868B9ADDB57C1A7A4561F57F2E9DA487240482BE66427FBC7F.
+Package sizes are 3503170 and 3101412 bytes respectively. S4 awaits owner
+validation; S5 is not admitted and T88 is not closed by this delivery.
+
+### S5: Compat generation readiness
 
 Use the existing DIB bind/update/generation lifecycle to distinguish a newly
 cleared surface from a reconstructed display. Pointer-only damage must not

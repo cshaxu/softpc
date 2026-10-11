@@ -1,13 +1,14 @@
 # Long-Term Review Ledger
 
-- TODO(High): Repair V7 63h/64h incremental repaint disagreement found by T88
-  S3's BIOS colour/resolution matrix. On both x86 and x64, actual CPU writes
-  leave the incremental surface stale while a subsequent full repaint changes
-  it; both mode orders reproduce. Owner accepts closing test-coverage S3, not
-  a production fix. Receiver: original graphics marking/update boundary,
-  subject to source-qualified diagnosis. Admission condition: a separately
-  owner-admitted repair using the retained failing VGA smoke; no assertion
-  weakening, whole-frame fallback or guest/mode special case without evidence.
+- TODO(High): Audit original nested CHAIN2 ModeX compound-rule local carriers.
+  T88 S4's exploratory direct writer-table test crashes on mode-0 odd-address
+  dword write, both with the original inline dirty code restored and with the
+  marker repair applied. The nested generated crules stack reaches a null
+  local-carrier read. This is not proved to trigger through ordinary guest
+  execution; CCPU SAS string operations use byte/word calls. Admission condition:
+  a separate original-path investigation proving caller reachability and saved
+  local-carrier lifetime before any memory-write algorithm or generated ABI
+  change; no second writer path or broad generated-code rewrite.
 
 - TODO(Medium): Investigate intermittent captured mouse escape under RDP.
   Owner reports escape shortly after capture or after variable movement;

@@ -3723,7 +3723,13 @@ set_mark_funcs IFN0()
 					break;
 
 				case CHAIN2:
+					/* DIVERGENCE(T88-CHAIN2-DIRTY): select the EGA
+					 * bitmap marker, not stale CGA/text pointers. */
+#ifdef CPU_40_STYLE
+					SetMarkPointers(4);
+#else
 					assert0( NO, "CHAIN2 in graphics mode !!" );
+#endif
 
 					break;
 

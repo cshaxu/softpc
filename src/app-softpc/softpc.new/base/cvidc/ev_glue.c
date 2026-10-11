@@ -671,6 +671,42 @@ OUTPUT: None.
 
 ====================================================================
 */
+/* DIVERGENCE(T88-CHAIN2-DIRTY): CHAIN2 CPU bytes share a plane offset
+ * in pairs; the selected EGA marker owns bitmap, bounds and bank units. */
+LOCAL IUH chain2_mark_range IFN1(IU32, count)
+{
+	IU32 offset = (IU32)jccc_parm1;
+	IUH saved_parm1 = jccc_parm1, saved_parm2 = jccc_parm2;
+
+	if (count != 0)
+	{
+		jccc_parm1 = offset >> 1;
+		jccc_parm2 = ((offset + count - 1) >> 1) - (offset >> 1) + 1;
+		((IUH (*)())unchained_mark_evid.str_mark)(0, 0, 0, 0);
+		jccc_parm1 = saved_parm1;
+		jccc_parm2 = saved_parm2;
+	}
+	return 0;
+}
+
+LOCAL IUH chain2_mark_byte IFN4(IUH, v1, IUH, v2, IUH, v3, IUH, v4)
+{
+	UNUSED(v1); UNUSED(v2); UNUSED(v3); UNUSED(v4);
+	return chain2_mark_range(1);
+}
+
+LOCAL IUH chain2_mark_word IFN4(IUH, v1, IUH, v2, IUH, v3, IUH, v4)
+{
+	UNUSED(v1); UNUSED(v2); UNUSED(v3); UNUSED(v4);
+	return chain2_mark_range(2);
+}
+
+LOCAL IUH chain2_mark_string IFN4(IUH, v1, IUH, v2, IUH, v3, IUH, v4)
+{
+	UNUSED(v1); UNUSED(v2); UNUSED(v3); UNUSED(v4);
+	return chain2_mark_range((IU32)jccc_parm2);
+}
+
 GLOBAL void
 setMarkPointers IFN1(IUH, markset)
 {
@@ -703,6 +739,12 @@ setMarkPointers IFN1(IUH, markset)
 		setVideomark_byte(chain4_mark_evid.b_mark);
 		setVideomark_word(chain4_mark_evid.w_mark);
 		setVideomark_string(chain4_mark_evid.str_mark);
+		break;
+
+	case 4:	/* CHAIN2 EGA bitmap */
+		setVideomark_byte(chain2_mark_byte);
+		setVideomark_word(chain2_mark_word);
+		setVideomark_string(chain2_mark_string);
 		break;
 
 	}

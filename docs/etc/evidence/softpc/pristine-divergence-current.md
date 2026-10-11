@@ -1037,3 +1037,18 @@ enable latch（不是 EA/AE 端口命令），并使零值寄存器 replay 前�
 执行路径；必须在此处访问原始私有寄存器，Compat 仍拥有 archive 编排。
 实际 Win3.1 恢复后输入及四种显存写模式的验证见
 [S9 P9 记录](../../../history/M9-T63-machine-snapshots.md)。
+
+### T88 S4 CHAIN2 标记契约
+
+Owner 批准单路径 dirty-only 修复。sevid016--020 的 28 处原内联 CGA
+记账替换为既有 selected marker ABI，删除仅属于旧比较区块的 56 个标签及
+局部 wrapper；参数保存、显存写入和绘制算法保留。ev_glue 仅转换 CHAIN2
+CPU 字节到 plane 字节，复用原 Unchained marker 的 bitmap、signed bounds
+与 bank 记账；gfx_updt 在原 EGA/CHAIN2 选择入口接通它。局部标识为
+DIVERGENCE(T88-CHAIN2-DIRTY)，不增加 standalone 行为分支或公共接口。
+
+七份生产文件本 S 增量 +332/-1113，净 -781；相对 OpenNT 的完整增删合计
+由 5986 变成 7039，增加 1053，不能把减少代码量冒充减少镜像 diff。
+逐文件前后数量、全部规则编号和验证边界见
+[S4 ledger](../../../proposals/m9-win31-file-manager-vga-width-transition.md#s4-implementation-and-source-accounting)。
+探索性旧 compound writer 崩溃另列 TODO，不宣称已修复这些未验证的旧算法。

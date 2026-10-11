@@ -2,23 +2,47 @@
 
 ## Current Work
 
-M9 T88 remains open. No implementation subtask is active.
-Open task awaiting owner: T88.
+M9 T88 remains open. S4 CHAIN2 dirty-contract repair is active.
 
 Technical baseline: S3 implementation `c7720bc9`, accepted by the owner as
 colour/resolution regression coverage, not all-green production qualification.
-S1, S2 and S3 are closed; planned Compat generation-readiness S4 is not admitted.
-The newly exposed V7 63h/64h repaint defect is tracked in [TODO](TODO.md),
-with failing assertions retained and separate repair admission required.
+S1, S2 and S3 are closed; planned Compat generation-readiness moves to S5.
+S4 repairs the exposed V7 63h/64h repaint defect; its retained assertions and
+the expanded wide-write matrix pass on both widths. Dual-width background
+qualification passes 131/131 per width; delivery awaits owner acceptance,
+and no S/T closure is inferred.
+
+## M9 T88 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits the original-path, single-marker CHAIN2 repair; no parallel dirty fallback. |
+| Objective | Replace the 28 inline CGA-only dirty blocks with the original selected marker call convention; supply CHAIN2 EGA address/bank marking and preserve CGA/text behavior. |
+| Non-goals | No Lib/Emulator/x86 change, no new renderer, host compensation, build-time transform, guest/mode-number special case, INI/media/snapshot edits or desktop interaction. |
+| Reference Baseline | 65edbbbf2bddf8d1182e30536b27c0c6a828713d; read-only OpenNT source comparison. |
+| Candidate Proposal | [VGA repair](../proposals/m9-win31-file-manager-vga-width-transition.md#s4-chain2-dirty-contract-repair) |
+| Files And ABI Surface | Original sevid016--020.c, ev_glue.c and gfx_updt.c internal marker selection; existing App VGA smoke and original-source gate; no public ABI. |
+| Applicable Rules | Task Reading Set; original-source formatting/divergence accounting; single state owner; execution/background policy; owner-approved source-local repair. |
+| Verification | Dual-width regular Ninja builds; focused VGA receiver, shared suites first then all App/checks background tests. Desktop cases remain explicitly excluded. |
+| Expected Markers | All 28 blocks dispatch once through existing mark slots; CGA/text behavior retained; CHAIN2 EGA bitmap and bounds use plane-group plus bank units; incremental equals full repaint. |
+| Asset Needs | Refresh both assets/binary EXEs only; preserve user configuration/media/snapshots. |
+| Reporting Requirements | Per-file baseline and OpenNT diff counts, local divergence markers, finite entry ledger and tests, actual added/deleted/net production/test lines; pushed complete P, clean worktree, await owner acceptance. |
+| Stop Conditions | New renderer/state/parallel fallback required, unrelated shared change, or unresolved required regression. |
+| Exit Criteria | Required dual-width background evidence and accounting pass; implementation and artifacts committed/pushed; pending owner acceptance, not automatic T closure. |
+| Original Owner Request | 准入一个修改，修改好了以后进行编译测试提交推送后等我验收。 |
+| Similar-Issue Sweep | Enumerate original inline dirty blocks across all selected SEVID units, verify byte/word/range, forward/backward, zero counts, CGA bank folding, EGA write bank and mode transitions; preserve unaffected paths. |
 
 - [S1 diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
 - [S2 packed scanout correction](../history/M9-T88-S2-v7-packed-scanout.md).
 - [S3 coverage acceptance](../history/M9-T88-S3-colour-resolution-coverage.md).
 
-Both package EXEs are refreshed. Shared tests pass 84/84 per width; other
-App/checks receivers pass 46/46. The added VGA matrix remains a known failure
-on both widths. Five desktop cases per width are excluded; no full-green or
-T88 completion claim is made. User INI, guest media and snapshots are unchanged.
+Both package EXEs are refreshed. The focused VGA receiver passes on both
+widths, including all 19 modes in both orders, odd/even wide writes and the
+unrelated plane-prefix guard. Shared suites pass 84/84 per width, followed by
+App/checks 47/47 per width. Five desktop cases per width remain excluded. A separately confirmed
+old nested compound-entry failure is dispositioned in [TODO](TODO.md), not
+declared repaired. User INI, guest media and snapshots are unchanged.
 
 ## Historical M9 T85 S20 delivery record
 
