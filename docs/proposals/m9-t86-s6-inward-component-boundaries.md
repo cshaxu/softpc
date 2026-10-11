@@ -150,3 +150,14 @@ test-manifest ownership helper and the inward-boundary wording. No Lib or
 Emulator production spelling defect was found; test-only lower-case macro
 aliases that replace platform calls remain intentionally lower-case and were
 not renamed.
+
+## S6 P3: X86 command-smoke output correction
+
+Owner validation found one repeated component word in the test-only success
+line: `X86 x86 Product command policy: OK`.  The receiver must emit the single
+canonical identity, `X86 Product command policy: OK`.  This is an output-only
+test repair: no production source, CTest identity, target link, ABI, machine
+behavior or package artifact changes.  `test/x86/MANIFEST.sha256` changes with
+the source so the standalone test-corpus proof remains complete.  The focused
+`x86.product/command` CTest receiver is required on both widths before one
+corrective P is pushed; S6 then remains open for owner validation.
