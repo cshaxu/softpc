@@ -2,28 +2,7 @@
 
 ## Current Work
 
-M9 T87 S1 is active: repository LF convergence.
-
-## M9 T87 S1 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner redirects the not-yet-implemented T87 S1 from the File Manager diagnostic to repository-wide LF alignment after six-corpus convergence. The File Manager candidate returns to the ordered queue. |
-| Objective | Normalize every ordinary tracked text file to LF and make `.gitattributes` enforce that invariant on future checkouts. |
-| Non-goals | Do not normalize `src/app-softpc/softpc.new/`; it is a preserved byte-level source mirror. Do not modify `assets/binary/softpc.ini`, guest media, snapshots, executable artifacts, runtime semantics, API or build behavior. |
-| Reference Baseline | SoftPC `58f037d7`; six shared roots are byte-identical to NXVM at that baseline. |
-| Candidate Proposal | [Repository LF convergence](../proposals/m9-repository-eol-convergence.md) |
-| Files And ABI Surface | `.gitattributes`, tracked non-binary text outside the preserved mirror and user-owned INI, and task/governance documentation. No runtime ABI. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; user package configuration rule. |
-| Verification | Enumerate tracked non-binary paths before/after; outside the two explicit exceptions, prove zero CR bytes; prove six corpus roots remain LF and match NXVM; run documentation governance and configure/build sanity only if a build input is rewritten. |
-| Expected Markers | One default LF policy, two explicit byte-preserving exceptions, no mixed EOL outside them, and no semantic source diff. |
-| Asset Needs | Preserve `assets/binary/softpc.ini`, media, snapshots and EXEs byte-for-byte. |
-| Reporting Requirements | Report pre/post EOL counts by class, every exception, changed path count, semantic-diff check and verification result. |
-| Stop Conditions | Any non-mirror CRLF file is intentionally byte-level evidence, binary misclassified as text, or normalization changes a generated/owned artifact; stop and record the exception rather than rewriting it. |
-| Exit Criteria | All ordinary text is LF; the two exceptions remain untouched; governance and corpus checks pass; the P is committed/pushed and the worktree is clean. |
-| Original Owner Request | “按照规范，应该全项目都是LF是不是？格式差异，你是不是也应该对齐？请你去做。” |
-| Similar-Issue Sweep | Scan every tracked path, classify binary/mirror/user-INI/ordinary text, and reject any remaining CR byte outside explicit exceptions. |
+No implementation subtask is active.
 
 ## Historical M9 T85 S20 delivery record
 
@@ -559,6 +538,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T87 | S1 complete; ordinary repository text converges on LF while the preserved OpenNT mirror and user-owned INI retain explicit CRLF checkout policy. | [Audit](../history/M9-T87-repository-eol-convergence.md) |
 | T86 | S1--S6 complete; owner accepts final six-root convergence and approves task closure. | [Audit](../history/M9-T86-completion-audit.md) |
 | T85 | S1--S20 complete; owner approves task closure. | [Audit](../history/M9-T85-completion-audit.md) |
 | T84 | S1--S12 complete; owner approves task closure. | [Audit](../history/M9-T84-completion-audit.md) |
@@ -579,6 +559,12 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 | T69 | S1--S4 complete; reopened cleanup accepted. | [Audit](../history/M9-T69-completion-audit.md) |
 
 ## Recent Governance
+
+- **M9 Td S21:** T87 S1 closes after the independent actual-change review:
+  61 ordinary working-tree text paths converge to LF, `.gitattributes` makes
+  LF the default, and only the preserved OpenNT mirror plus user-owned package
+  INI retain CRLF checkout policy. The File Manager diagnostic returns to queue
+  head. [T87 audit](../history/M9-T87-repository-eol-convergence.md).
 
 - **M9 Td S20:** Owner accepts T85 S20 P4; its Product-monitor completion
   repair is closed without closing T85. Two independent display candidates are
