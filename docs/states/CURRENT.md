@@ -2,49 +2,23 @@
 
 ## Current Work
 
-M9 T88 S2 is accepted and closed. S3 is active: colour/resolution regression
-coverage. The separate Compat generation repair moves to S4 and is not admitted.
+M9 T88 remains open. No implementation subtask is active.
+Open task awaiting owner: T88.
 
-## M9 T88 S3 Packet
+Technical baseline: S3 implementation `c7720bc9`, accepted by the owner as
+colour/resolution regression coverage, not all-green production qualification.
+S1, S2 and S3 are closed; planned Compat generation-readiness S4 is not admitted.
+The newly exposed V7 63h/64h repaint defect is tracked in [TODO](TODO.md),
+with failing assertions retained and separate repair admission required.
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts/closes S2 and admits S3 regression tests, additionally approves original predicate-order cleanup, then accepts coverage and requests closure after both widths expose 63h/64h failures. Existing Compat repair is deferred to S4. |
-| Objective | Expand existing owner-local VGA smoke over supported BIOS colour/resolution modes; prove repaint consistency and V7 pointer coordinate/movement/background restoration without changing production. |
-| Non-goals | No production semantic, ABI, state, renderer, timing, Lib/Emulator/Compat, configuration, media or snapshot changes. Owner additionally approves restoring original predicate order in v7_ports.c (+1/-1, net zero). No invented validity for arbitrary register combinations, assertion weakening or full hardware certification. No Computer Use or foreground desktop tests. |
-| Reference Baseline | Accepted SoftPC S2 `911c4749`. Original mirror and external repositories are read-only evidence, never build or acceptance dependencies. |
-| Candidate Proposal | [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md) |
-| Files And ABI Surface | Existing test/app-softpc/unit/machine/vga_frame_smoke.c and task records; estimate +100--160 test lines. Owner additionally admits one predicate-order replacement in original base/video/v7_ports.c, +1/-1 net zero, no semantic change. No new test target or reusable package changes. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; one executor/producer rule; long operations run as owned background jobs; MTSP phase gates; no Computer Use. |
-| Verification | Review finite valid-mode ledger; build focused test and dual EXEs; real BIOS mode selection, full/partial repaint consistency and pointer registers; shared suites first then background App/checks regression. Keep discovered failures visible and distinguish coverage acceptance from a green qualification. |
-| Expected Markers | Explicit matrix runs on x86/x64 with all members disposed. 63h/64h remain visible failures pending separate repair; no all-green claim. Pointer and geometry assertions remain enforced. The sole production delta restores predicate order without changing its truth value. |
-| Asset Needs | Reuse existing Ninja intermediates; refresh dual EXEs for the owner-admitted predicate-order change. Preserve INI/media/snapshots; tests use disposable media only. One hidden owned job under ignored build/t88/s3, build budget 1800 seconds, test budget 3600 seconds; owner is this executor. |
-| Reporting Requirements | Pre/post per-file production/test additions, deletions and net changes; pristine delta separate from baseline delta; actual focused/full background results and desktop exclusions; two release hashes/links, complete pushed P and clean workspace; await owner validation. |
-| Stop Conditions | A new assertion reveals a production defect or depends on unsupported state; determine cause, report scope and do not implement production fixes or weaken assertions without admission. |
-| Exit Criteria | Owner accepts test coverage and requests S3 closure despite reported 63h/64h failures. Run and report dual-width background regression, preserve the failing assertions, transfer the discovered defect to an explicit receiver, pass static/documentation gates, commit/push and leave a clean worktree. This closes coverage work, not production correctness or T88 qualification. |
-| Original Owner Request | “这个你加上测试吧 我不希望其他颜色模式或者分辨率下出现bug”；“不 请你准入新的s任务来做 s2验收通过可以收口”。 |
-| Similar-Issue Sweep | Review existing BIOS mode, painter/panning/dirty, hardware-pointer and stride tests; reuse each existing receiver, add missing colour/resolution and pointer movement cases without duplicate targets. Invalid/unsupported combinations are not silently certified. |
+- [S1 diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
+- [S2 packed scanout correction](../history/M9-T88-S2-v7-packed-scanout.md).
+- [S3 coverage acceptance](../history/M9-T88-S3-colour-resolution-coverage.md).
 
-S1 diagnostic closure: [accepted diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
-
-S2 accepted closure: [V7 packed scanout](../history/M9-T88-S2-v7-packed-scanout.md).
-
-S3 progress: the owner-admitted predicate-order cleanup is implemented as
-`get_seq_chain4_mode() && get_256_colour_mode()` (+1/-1, net zero).
-The new x64/x86 BIOS mode matrix exposes incremental/full repaint disagreement in
-V7 63h and 64h, in both forward and reverse mode order. A full repaint changes
-the surface after the same CPU writes that leave the incremental surface stale.
-The final focused test deliberately remains failing on both widths after all
-existing checks and fixture cleanup. All matrix cases ran; 63h/64h failures
-reproduce in both mode orders. Both package builds completed and dual EXEs are
-refreshed. Shared regression passes 84/84 per width; the other App/checks
-receivers pass 46/46 per width. Five desktop cases per width are excluded.
-Temporary fixture ordering and initial parallel timeouts are not qualified
-proof; their disposition is retained in the proposal. The owner accepts S3 as
-coverage delivery, with the defect transferred to TODO. Implementation P and
-its independent closure review follow; T88 remains open. Any further production
-repair requires separate admission under the packet's Stop Conditions.
+Both package EXEs are refreshed. Shared tests pass 84/84 per width; other
+App/checks receivers pass 46/46. The added VGA matrix remains a known failure
+on both widths. Five desktop cases per width are excluded; no full-green or
+T88 completion claim is made. User INI, guest media and snapshots are unchanged.
 
 ## Historical M9 T85 S20 delivery record
 
