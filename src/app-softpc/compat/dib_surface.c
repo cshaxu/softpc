@@ -6,6 +6,7 @@
 #include "host_def.h"
 #include "gmi.h"
 #include "gfx_upd.h"
+#include "egacpu.h"
 #include "dib_surface.h"
 #include "nt_graph.h"
 
@@ -34,6 +35,10 @@ static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
 static SMALL_RECT softpc_dib_pending_dirty;
 static int softpc_dib_pending_dirty_valid;
+/* Pending damage uses bit 1 for body participation in an original full
+   refresh. Pointer/palette damage never establishes a new surface. */
+#define SOFTPC_DIB_BODY_REFRESH 2
+static int softpc_dib_ready;
 static unsigned long softpc_dib_update_depth;
 static unsigned long softpc_dib_generation;
 #define SOFTPC_DIB_PALETTE_HISTORY 8u
@@ -149,7 +154,7 @@ static void softpc_standalone_dib_damage_all(void)
         rect.Top = 0;
         rect.Right = (SHORT)(softpc_dib_width - 1u);
         rect.Bottom = (SHORT)(softpc_dib_height - 1u);
-        (void)softpc_standalone_dib_damage(&rect);
+        (void)softpc_standalone_dib_damage(&rect, FALSE);
     }
 }
 
@@ -268,7 +273,12 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info)
        frame; the enclosing display-update transaction does that at its end. */
     softpc_dib_dirty_valid = 0;
     softpc_dib_pending_dirty_valid = 0;
+    softpc_dib_ready = 0;
     ++softpc_dib_generation;
+    /* A replacement has no preserved pixels. Reuse the original full-refresh
+       request, whose dirty total forces all selected graphics update loops
+       to reconstruct their whole screen, including split/wrapped surfaces. */
+    host_mark_screen_refresh();
     if (getenv("SOFTPC_DIB_TRACE") != NULL) {
         fprintf(stderr, "softpc dib bind %dx%dx%d\n", width, height,
             bits_per_pixel);
@@ -287,6 +297,12 @@ unsigned long softpc_standalone_dib_generation(void)
     return softpc_dib_generation;
 }
 
+int softpc_standalone_dib_body_ready(void)
+{
+    return softpc_dib_ready ||
+        (softpc_dib_pending_dirty_valid & SOFTPC_DIB_BODY_REFRESH) != 0;
+}
+
 void softpc_standalone_dib_end_update(void)
 {
     if (softpc_dib_update_depth == 0u) return;
@@ -297,6 +313,16 @@ void softpc_standalone_dib_end_update(void)
         softpc_dib_pending_dirty_valid = 0;
         return;
     }
+    if (!softpc_dib_ready) {
+        if (!(softpc_dib_pending_dirty_valid & SOFTPC_DIB_BODY_REFRESH)) {
+            softpc_dib_pending_dirty_valid = 0;
+            return;
+        }
+        softpc_dib_ready = 1;
+        softpc_dib_pending_dirty.Left = softpc_dib_pending_dirty.Top = 0;
+        softpc_dib_pending_dirty.Right = (SHORT)(softpc_dib_width - 1u);
+        softpc_dib_pending_dirty.Bottom = (SHORT)(softpc_dib_height - 1u);
+    }
     /* The frame consumer may not have observed the preceding completed
        update yet.  Keep its damage too: the DIB contains the latest pixels,
        while this rectangle describes every changed part of that latest
@@ -306,19 +332,27 @@ void softpc_standalone_dib_end_update(void)
     softpc_dib_pending_dirty_valid = 0;
 }
 
-BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect)
+BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect, BOOL body)
 {
     int own_update;
 
-    if (rect == NULL) return FALSE;
+    if (rect == NULL || rect->Right < rect->Left || rect->Bottom < rect->Top ||
+        rect->Right < 0 || rect->Bottom < 0 ||
+        rect->Left >= (long)softpc_dib_width ||
+        rect->Top >= (long)softpc_dib_height) return FALSE;
     /* Normal original drawing is enclosed by host_start/end_update.  Some
        original host callbacks (for example a hardware-pointer port update)
        are legitimately standalone.  Give every such mutation the same
-       one-record transaction rather than identifying its producer. */
+       one-record transaction, preserving the same damage/commit path. */
     own_update = softpc_dib_update_depth == 0u;
     if (own_update) softpc_standalone_dib_begin_update();
     (void)softpc_standalone_dib_merge(&softpc_dib_pending_dirty,
         &softpc_dib_pending_dirty_valid, rect);
+    /* screen_refresh_required's 1000000 sentinel selects a whole-screen
+       repaint; a successful incremental body patch is not that proof. */
+    if (body && !softpc_dib_ready && softpc_dib_generation != 0u &&
+        getVideodirty_total() >= 1000000L)
+        softpc_dib_pending_dirty_valid |= SOFTPC_DIB_BODY_REFRESH;
     if (getenv("SOFTPC_DIB_TRACE") != NULL) {
         fprintf(stderr, "softpc dib dirty %d,%d-%d,%d\n", (int)rect->Left,
             (int)rect->Top, (int)rect->Right, (int)rect->Bottom);

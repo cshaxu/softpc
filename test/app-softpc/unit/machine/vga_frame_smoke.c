@@ -118,7 +118,10 @@ static void verify_pointer_update_pixels(void)
     EGA_planes[pattern] = 0x7fu;
     EGA_planes[pattern + 128u] = 0x80u;
     lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0x35, stride * height);
-    softpc_standalone_dib_invalidate_all();
+    {
+        SMALL_RECT body = { 0, 0, 63, 47 };
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+    }
 
     /* Exercise the real V7 callbacks and their enclosing host transaction;
        checking the buffer before end_update misses the overwrite regression. */
@@ -153,7 +156,10 @@ static void verify_pointer_update_pixels(void)
     (*paint_v7ptr)(pattern, (word)4, (word)5);
     assert(softpc_standalone_dib_bind(&painter));
     lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0x62, stride * height);
-    softpc_standalone_dib_invalidate_all();
+    {
+        SMALL_RECT body = { 0, 0, 63, 47 };
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+    }
     (*clear_v7ptr)((word)4, (word)5);
     assert(pixels[5u * stride + 4u] == 0x62u);
     lib_memory_copy(EGA_planes + pattern, saved_pattern, sizeof(saved_pattern));
@@ -163,6 +169,86 @@ static void capture_byte_write(IU32 offset, IU32 value)
 {
     writer_offset = offset;
     writer_value = value;
+}
+
+static void verify_dib_generation_readiness(void)
+{
+    BITMAPINFO painter = { 0 };
+    SMALL_RECT body = { 0, 0, 63, 47 };
+    SMALL_RECT patch = { 0, 0, 7, 3 };
+    SMALL_RECT outside = { 64, 48, 65, 49 };
+    PALETTEENTRY palette = { 7, 11, 13, 0 };
+    long left, top, right, bottom;
+    void *bits, *info;
+    unsigned long width, height;
+
+    unsigned char saved_pattern[256];
+    lib_memory_copy(saved_pattern, EGA_planes, sizeof(saved_pattern));
+    lib_memory_set(EGA_planes, 0xff, 128u);
+    lib_memory_set(EGA_planes + 128u, 0, 128u); /* Transparent pointer. */
+    painter.bmiHeader.biSize = sizeof(painter.bmiHeader);
+    painter.bmiHeader.biWidth = 64;
+    painter.bmiHeader.biHeight = -48;
+    painter.bmiHeader.biPlanes = 1;
+    for (unsigned bpp = 1; bpp <= 8; bpp += 7) {
+        painter.bmiHeader.biBitCount = (WORD)bpp;
+        assert(softpc_standalone_dib_bind(&painter));
+        assert(getVideodirty_total() >= 1000000L);
+        host_start_update();
+        (*paint_v7ptr)(0, (word)4, (word)5);
+        host_end_update();
+        assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+        softpc_standalone_dib_set_palette_entries(&palette, 1);
+        softpc_standalone_dib_invalidate_all();
+        assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+
+        /* Neither an empty update, invalid damage nor a partial body update
+           outside the original full-refresh path can establish readiness. */
+        host_start_update();
+        host_end_update();
+        assert(!softpc_standalone_dib_damage(&outside, TRUE));
+        setVideodirty_total(1);
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &patch));
+        assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+
+        host_mark_screen_refresh();
+        host_start_update();
+        host_start_update();
+        lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0xff, bpp == 8 ? 64u * 48u : 8u * 48u);
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+        (*paint_v7ptr)(0, (word)4, (word)5);
+        host_end_update();
+        assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+        /* Original updaters clear dirty before their final host_end_update. */
+        setVideodirty_total(0);
+        host_end_update();
+        assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+        assert(left == 0 && top == 0 && right == 63 && bottom == 47);
+        assert(softpc_standalone_dib_surface(&bits, &info, &width, &height));
+        assert(((const unsigned char *)bits)[0] == (bpp == 8 ? 255 : 1));
+        assert(((const unsigned char *)bits)[64u * 48u - 1u] == (bpp == 8 ? 255 : 1));
+        assert(((const unsigned char *)bits)[5u * 64u + 4u] == (bpp == 8 ? 255 : 1));
+        assert(softpc_standalone_dib_damage(&patch, FALSE));
+        assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+        assert(right == 7 && bottom == 3);
+        softpc_standalone_dib_set_palette_entries(&palette, 1);
+        assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+        assert(right == 63 && bottom == 47);
+
+        /* Same-size bind in a nested transaction also discards the old
+           generation's completed and pending damage, not just its pixels. */
+        host_start_update();
+        host_mark_screen_refresh();
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+        host_start_update();
+        assert(softpc_standalone_dib_bind(&painter));
+        host_end_update();
+        softpc_standalone_dib_set_palette_entries(&palette, 1);
+        (*paint_v7ptr)(0, (word)8, (word)6);
+        host_end_update();
+        assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    }
+    lib_memory_copy(EGA_planes, saved_pattern, sizeof(saved_pattern));
 }
 
 static void capture_word_write(IU32 offset, IU32 value)
@@ -767,7 +853,8 @@ static void verify_driver_geometry(softpc_machine *machine)
         }
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
                 &right, &bottom)) { }
-        softpc_standalone_dib_invalidate_all();
+        host_mark_screen_refresh();
+        host_flush_screen();
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.valid && frame->window.graphics);
         assert(frame->window.image.width == width && frame->window.image.height == height);
@@ -776,7 +863,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         rect.Left = 0; rect.Top = 0;
         rect.Right = (SHORT)((pass ? width / 2u : width) - 1u);
         rect.Bottom = (SHORT)(height - 1u);
-        assert(softpc_standalone_dib_damage(&rect));
+        assert(softpc_standalone_dib_damage(&rect, TRUE));
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.valid && frame->window.graphics);
         if (frame->window.image.width != width || frame->window.image.height != height)
@@ -787,7 +874,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(frame->window.image.stride == width);
         assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
-        assert(softpc_standalone_dib_damage(&rect));
+        assert(softpc_standalone_dib_damage(&rect, TRUE));
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.image.width == width);
         assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
@@ -937,7 +1024,7 @@ static void verify_v7_cpu_scanout(softpc_machine *machine)
                 for (address = 0; address < 4u * EGA_PLANE_SIZE; ++address)
                     EGA_planes[address] = (unsigned char)(address * 37u +
                         (address >> 10));
-                setVideodirty_total(20001);
+                host_mark_screen_refresh();
                 vga_graph_update();
                 /* Independent raw-byte row oracle; no corrected test stride
                    or directly selected painter is supplied to the updater. */
@@ -1115,7 +1202,9 @@ static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
         assert(incremental != NULL);
         for (address = 0; address < 4u * EGA_PLANE_SIZE; ++address)
             EGA_planes[address] = (unsigned char)(address * 37u + (address >> 3));
-        setVideodirty_total(20001);
+        /* Establish the fresh surface through the original refresh request;
+           the later 20001 repaint still covers the update-loop threshold. */
+        host_mark_screen_refresh();
         (*update_alg.calc_update)();
         lib_memory_copy(incremental, surface, size);
         /* Real CPU writes must reach the selected incremental updater.
@@ -1453,6 +1542,7 @@ int main(void)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
         }
+        host_flush_screen();
         softpc_standalone_dib_invalidate_all();
         assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom));
@@ -1509,6 +1599,7 @@ int main(void)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
         }
+        host_flush_screen();
         softpc_standalone_dib_invalidate_all();
         assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom));
@@ -1556,6 +1647,7 @@ int main(void)
         while (softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom)) {
         }
+        host_flush_screen();
         softpc_standalone_dib_invalidate_all();
         assert(softpc_machine_presentation_take_dirty(machine, &left, &top,
             &right, &bottom));
@@ -1617,6 +1709,7 @@ int main(void)
     const unsigned colour_resolution_failures = verify_colour_resolution_matrix(machine);
     verify_display_stride();
     verify_pointer_update_pixels();
+    verify_dib_generation_readiness();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     assert(colour_resolution_failures == 0);

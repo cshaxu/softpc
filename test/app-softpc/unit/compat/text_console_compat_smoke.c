@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <windows.h>
+#include <stdio.h>
 
+#include "machine/machine.h"
 #include "compat/conapi.h"
 #include "compat/dib_surface.h"
 
@@ -42,7 +44,7 @@ static void verify_mono_dib_translation(void)
     assert(softpc_compat_create_graphics_buffer(&binding) != INVALID_HANDLE_VALUE);
     ((unsigned char *)binding.lpBitMap)[0] = 0x80u;
     ((unsigned char *)binding.lpBitMap)[1] = 0x80u;
-    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_damage(&rect, TRUE));
     assert(softpc_standalone_dib_surface(&surface, &surface_info, &width, &height));
     assert(surface_info != &info && width == 9u && height == 1u);
     pixels = (const unsigned char *)surface;
@@ -71,6 +73,11 @@ static void verify_dib_update_transaction(void)
     info.bmiHeader.biBitCount = 8;
     assert(softpc_standalone_dib_bind(&info));
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    rect.Left = rect.Top = 0;
+    rect.Right = 639; rect.Bottom = 479;
+    assert(softpc_standalone_dib_damage(&rect, TRUE));
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    assert(left == 0 && top == 0 && right == 639 && bottom == 479);
 
     ZeroMemory(&palette, sizeof(palette));
     rect.Left = 0;
@@ -79,12 +86,12 @@ static void verify_dib_update_transaction(void)
     rect.Bottom = 6;
     /* A host callback without an enclosing original display update is still
        one complete transaction; no producer-specific outlet is needed. */
-    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_damage(&rect, FALSE));
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     assert(left == 0 && top == 4 && right == 5 && bottom == 6);
 
     softpc_standalone_dib_begin_update();
-    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_damage(&rect, FALSE));
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_set_palette_entries(&palette, 1);
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
@@ -98,7 +105,7 @@ static void verify_dib_update_transaction(void)
     rect.Bottom = 10;
     softpc_standalone_dib_begin_update();
     softpc_standalone_dib_begin_update();
-    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_damage(&rect, FALSE));
     softpc_standalone_dib_end_update();
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_end_update();
@@ -112,14 +119,14 @@ static void verify_dib_update_transaction(void)
     rect.Right = 13;
     rect.Bottom = 14;
     softpc_standalone_dib_begin_update();
-    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_damage(&rect, FALSE));
     softpc_standalone_dib_end_update();
     rect.Left = 15;
     rect.Top = 16;
     rect.Right = 17;
     rect.Bottom = 18;
     softpc_standalone_dib_begin_update();
-    assert(softpc_standalone_dib_damage(&rect));
+    assert(softpc_standalone_dib_damage(&rect, FALSE));
     softpc_standalone_dib_end_update();
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     assert(left == 11 && top == 12 && right == 17 && bottom == 18);
@@ -134,12 +141,20 @@ static void verify_dib_update_transaction(void)
     assert(softpc_standalone_dib_bind(&info));
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     softpc_standalone_dib_invalidate_all();
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    rect.Left = rect.Top = 0;
+    rect.Right = 1279; rect.Bottom = 479;
+    assert(softpc_standalone_dib_damage(&rect, TRUE));
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     assert(left == 0 && top == 0 && right == 1279 && bottom == 479);
 }
 
 int main(void)
 {
+    const char *path = "softpc-text-console-compat.img";
+    softpc_machine_options options = { path, NULL };
+    softpc_machine *machine = NULL;
+    FILE *image = fopen(path, "wb");
     const void *surface;
     const unsigned char *cells;
     unsigned long columns;
@@ -153,6 +168,14 @@ int main(void)
     DWORD written;
     unsigned long index;
 
+    /* Binding requests the original full repaint, so use the actual Machine
+       initialization owner rather than duplicating its C-VID setup here. */
+    assert(image != NULL);
+    assert(fseek(image, 1474560L - 1L, SEEK_SET) == 0);
+    assert(fputc(0, image) == 0);
+    assert(fclose(image) == 0);
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_standalone_dib_init());
     verify_mono_dib_translation();
     verify_dib_update_transaction();
@@ -245,5 +268,7 @@ int main(void)
     assert(written == 0u);
     assert(character_at(cells, 0u, 0u, stride, cell_bytes) == ' ');
 
+    softpc_machine_destroy(machine);
+    assert(remove(path) == 0);
     return 0;
 }

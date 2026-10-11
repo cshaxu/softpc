@@ -24,8 +24,10 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info);
  * damage update remains private until the matching outer end. */
 void softpc_standalone_dib_begin_update(void);
 void softpc_standalone_dib_end_update(void);
-BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect);
+BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect, BOOL body);
 unsigned long softpc_standalone_dib_generation(void);
+/* Pointer composition may follow body painting inside the outer update. */
+int softpc_standalone_dib_body_ready(void);
 int softpc_standalone_text_surface(const void **cells_out,
     unsigned long *columns_out, unsigned long *rows_out,
     unsigned long *stride_out, unsigned long *cell_bytes_out);
@@ -41,6 +43,6 @@ int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
 void softpc_standalone_dib_invalidate_all(void);
 
 #define InvalidateConsoleDIBits(handle, rect) \
-    ((void)(handle), softpc_standalone_dib_damage((rect)))
+    ((void)(handle), softpc_standalone_dib_damage((rect), TRUE))
 
 #endif

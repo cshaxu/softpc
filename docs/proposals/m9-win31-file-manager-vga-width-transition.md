@@ -622,6 +622,168 @@ The finite receiver set is bind plus pointer-only, bind plus palette-only,
 completed body plus pointer, later pointer-only, same-size rebind, nested update,
 no-op/failed conversion and snapshot reconstruction, plus all retained modes.
 
+#### S5 implementation contract and finite ledger
+
+The original `graphicsResize -> CreateConsoleScreenBuffer` path has one
+Compat binding receiver. Bind now invokes the existing
+`host_mark_screen_refresh -> nt_mark_screen_refresh -> screen_refresh_required`
+request: original C-VID dirty total >= 1000000 denotes a full refresh. The
+selected CGA, EGA/VGA normal, split and wrapped update loops choose their
+existing whole-screen branches before calling the body painters. Those
+painters invalidate only after writing their pixels. Their callbacks precede
+the original dirty clear and final host_end_update.
+
+The existing pending-damage validity value carries body participation in
+that original full refresh. At the successful outer completion it establishes
+one DIB-owned ready fact; palette and pointer damage cannot set it. Small
+body updates without the full-refresh request cannot establish readiness.
+The first publication covers the whole surface. This is not qualification
+by bounding-box size, BIOS mode, guest identity, mode-change flag or time.
+No additional renderer, cache, public contract or original-source patch exists.
+The CPU-state query applies only to an actually bound, unready surface:
+pre-initialization text painting shares the invalidation macro but must not
+read uninitialized C-VID state.
+
+Pointer composition reads that same ready fact or this transaction's body
+participation. It cannot save a cleared background before reconstruction and
+restore it over the first completed body. Original draw_v7ptr still performs
+composition after the body, inside the same transaction. No pointer state or
+alternate renderer is introduced. Transparent-pointer pixels are checked in
+both painter formats along with the final body publication.
+
+Frozen coverage units and receivers:
+
+- Fresh 1-bit and 8-bit binding, actual V7 pointer-only update, palette-only
+  output and explicit invalidation: verify_dib_generation_readiness rejects
+  publication before body reconstruction.
+- Empty update, invalid/outside damage and non-full incremental body:
+  the same receiver verifies no readiness or publication is fabricated.
+  Failed damage admission precedes conversion; it is not a simulated allocator
+  failure or proof of arbitrary memory-corruption recovery.
+- Full body, nested completion, original dirty clear before final end,
+  first/last converted pixels and full first dirty: the same receiver checks
+  both painter formats, with no publication at the inner end.
+- Ready pointer/palette changes: verify_pointer_update_pixels covers actual
+  pointer paint/clear callbacks and retained indexed pixels; generation
+  readiness verifies subsequent small damage and full palette invalidation.
+- Same-size rebind within a nested transaction: generation readiness rejects
+  the preceding generation's pending body qualification and pointer damage.
+- Real original rendering and VM publication: verify_driver_geometry uses
+  host_mark_screen_refresh / host_flush_screen before consuming a new surface;
+  full-height half updates retain dimensions and pixel content afterwards.
+- Existing low-level Compat transaction/mono tests initialize through the
+  actual Machine owner, using a disposable 1.44 MiB image in their isolated
+  working directory. They qualify the first full body before testing later
+  small transactions; invalidate_all alone cannot qualify a new binding.
+- Retained colour/resolution, CHAIN2, split/wrap and snapshot paths: existing
+  VGA matrix and snapshot reconstruction/video-write receivers remain required.
+
+The completion predicate is dual-width passing receivers and required shared,
+App and integration regression, published EXEs and a pushed complete delivery.
+Native desktop tests require the separate reserved-input window; unrun tests
+are never declared passed. T88 and S5 await owner acceptance after delivery.
+
+## S5 measured delivery evidence
+
+## Scope and retained ownership
+
+The owner approves implementation, dual-width publication, testing, commit and
+push, followed by owner acceptance. Baseline is `e4ad4bd8`; S4 implementation
+is `7cda5375`. S5 does not close T88.
+
+Compat retains one DIB and one transaction/damage publication path. A fresh
+binding requests the existing original full refresh. A body invalidation in
+that refresh qualifies readiness only after successful outer completion.
+Pointer/palette invalidations cannot qualify a new generation. The pointer
+reads this same fact, including body participation inside the current update,
+so it cannot save a cleared pre-body background and restore it over that body.
+No original updater, machine state, snapshot format or shared API changes.
+
+The finite production receiver ledger is in the
+[proposal](../proposals/m9-win31-file-manager-vga-width-transition.md#s5-implementation-contract-and-finite-ledger).
+Its searched scope is Compat binding/damage, original body invalidation,
+pointer paint/clear, palette invalidation and snapshot reconstruction. Searches
+used `rg` for `softpc_standalone_dib_damage`, `InvalidateConsoleDIBits`,
+`softpc_standalone_dib_bind` and `softpc_standalone_dib_invalidate_all`.
+The single graphics binding receiver is retained; body calls use the existing
+macro, pointer/palette use the same transaction with non-body classification,
+and snapshot reconstruction uses the original refresh/flush before invalidation.
+No additional production receiver or parallel output path was found.
+
+## Actual changed-path accounting
+
+Counts use `git diff --numstat e4ad4bd8` before the delivery commit, excluding
+documentation and EXEs. Production:
+
+- `dib_surface.c`: +38/-4, net +34.
+- `dib_surface.h`: +4/-2, net +2.
+- `v7_pointer.c`: +4/-3, net +1.
+- Total: +46/-9, net +37 across three Compat files.
+
+Tests:
+
+- Existing VGA frame smoke: +100/-7, net +93.
+- Existing text-console Compat smoke: +31/-6, net +25.
+- Total: +131/-13, net +118 across two files.
+
+Combined production/tests: +177/-22, net +155. Original mirror, Machine/App
+production and all six shared source/test roots have zero changed paths.
+The additional ready value is one integer; pending body qualification reuses
+the existing pending-valid integer. No buffer, queue, thread or state machine
+is added. Production is five lines above the upper net estimate because the
+pointer must compose after body but before transaction completion, and invalid
+damage must not qualify readiness. Test growth includes actual Machine-owned
+initialization rather than a duplicated C-VID fixture setup.
+
+## Verification corrections and limits
+
+Initial experiments exposed a C-VID getter being reached by text output before
+CPU initialization. Qualification now requires an actually bound generation.
+The low-level Compat fixture binds graphics and therefore initializes through
+the actual Machine owner with a disposable image in its isolated working
+directory; it does not recreate CPU state itself.
+
+Several old graphics fixtures used `invalidate_all` or replaced the initial
+full-refresh request with dirty total 20001 to publish manually initialized
+surfaces. They now establish the first body via the original refresh request.
+Later 20001-threshold, raw row/stride, pixel, 19-mode, CHAIN2 and split/wrap
+assertions remain. Assertions were not weakened to accommodate readiness.
+
+An early x86 aggregate run failed the timed DOS-prompt roundtrip; independent
+serial three-test qualification then passed on both widths. This is not proof
+of its cause: concurrent architecture scheduling was a hypothesis, not a
+confirmed defect. Final App regression uses sequential architecture jobs.
+No production delay, test timeout relaxation or skipped roundtrip was added.
+
+Regular cached Ninja trees were used without manual cleaning. x86 Ninja
+reported premature-log recovery and rebuilt unchanged targets; this is
+disclosed build behavior, not a source-mirror change or a claim that every
+component compiled once. Owned background logs/exit records remain below
+`build/t88/s5`, with declared build/test budgets of 1800/3600 seconds.
+
+Native desktop tests are separate from background regression. The reserved
+input-window question had no reply at delivery; five tests per width are not
+run or claimed passed. No Computer Use, guest media/configuration edit or
+manual Win3.1 acceptance is claimed. The owner's pre-existing untracked
+snapshot is preserved and excluded from the delivery commit.
+
+Final production-qualified shared suites pass 84/84 per width (x64 90.48 s,
+x86 115.31 s). The final three-test selection passes 3/3 per width (71.24 /
+71.42 s), including the real runtime restart and DOS-prompt roundtrip. Final
+x64/x86 App/checks regression passes 47/47 (84.23 / 85.07 s), bringing each
+background selection to 131/131. Snapshot transaction, cross-process/cross-width,
+media and safe-boundary receivers are part of that App regression.
+
+Published packages:
+
+- x64: 3102540 bytes, SHA-256
+  `45371D8F53C0AD5B4E33039B9721085C7673A4C4B9ECB10B944277FDB28F623C`.
+- x86: 3504300 bytes, SHA-256
+  `93C2EE38FC8975CC7003F6E2F419A531F17F44084B39D66947C64800209C384A`.
+
+Compared with S4, the EXEs grow by 1128/1130 bytes respectively. Published
+files are the existing two package EXEs only. S5 awaits owner acceptance.
+
 ## Repair constraints and acceptance
 
 If the source renderer computes an invalid visible geometry, prefer the

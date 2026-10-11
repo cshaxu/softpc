@@ -2,33 +2,51 @@
 
 ## Current Work
 
-M9 T88 remains open. S5 Compat generation-readiness design is active.
+M9 T88 remains open. S5 Compat generation-readiness delivery awaits owner acceptance.
 
 Technical baseline: S4 implementation `7cda5375`, accepted by the owner's
 admission of the next S. S1--S4 are closed. Background 131/131 and subsequently
 native desktop 5/5 pass on each width, without changing the delivered EXEs.
-S5 is admitted for design first; no production change has begun.
+The owner has approved S5 implementation, dual-width publication and regression,
+followed by commit/push and owner acceptance.
 
 ## M9 T88 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts the preceding delivery and admits S5, requesting its design before implementation. |
+| Admission And Approval | Owner approves the reviewed S5 design and requests implementation, compilation, publication, tests, commit/push, then owner acceptance. |
 | Objective | Keep a newly bound graphics surface unpublished until its original body repaint completes; preserve later pointer-only and palette-only updates on a ready surface. |
-| Non-goals | No Lib/Emulator/x86 change, second renderer/publication path, geometry filter, delay, guest/mode-number special case, snapshot format, INI/media edit or Computer Use. No production implementation in this design turn. |
+| Non-goals | No Lib/Emulator/x86 change, second renderer/publication path, geometry filter, delay, guest/mode-number special case, snapshot format, INI/media edit or Computer Use. |
 | Reference Baseline | 7cda53758c49ae7cba78b7fee39da6d394ea1598; read-only OpenNT comparison when needed. |
 | Candidate Proposal | [VGA repair](../proposals/m9-win31-file-manager-vga-width-transition.md#s5-compat-generation-readiness) |
-| Files And ABI Surface | Compat dib_surface.c/h and v7_pointer.c, existing App VGA smoke; internal damage-origin classification only, no shared/public ABI. No planned original-mirror edit. |
+| Files And ABI Surface | Compat dib_surface.c/h and v7_pointer.c, existing App VGA and text-console Compat smokes; internal damage-origin classification only, no shared/public ABI. No planned original-mirror edit. |
 | Applicable Rules | Task Reading Set; single producer/state owner; original-source minimum diff; background execution and reserved native-desktop rules; preservation of configuration/media. |
 | Verification | Prove bind/repaint readiness and pointer/palette isolation in the existing VGA receiver on both widths; snapshot reconstruction and 19-mode matrix; shared then App background suites; native desktop only in a reserved window. |
 | Expected Markers | Bind invalidates readiness; pointer/palette cannot establish it; successful completed body reconstruction admits a full first publication; later updates retain existing dirty merging. Transaction end alone is not proof of body reconstruction. |
 | Asset Needs | Refresh both assets/binary EXEs only; preserve user configuration/media/snapshots. |
 | Reporting Requirements | Explain the design first; estimate and later measure added/deleted/net code by file, original-mirror delta, dual-width evidence and EXEs; complete pushed implementation followed by owner acceptance. |
 | Stop Conditions | No reliable existing body-reconstruction completion, need for broad original update-loop edits, a second surface/cache/state machine, or a shared-component change. Report instead of guessing from rectangle size or timing. |
-| Exit Criteria | Design reviewed, actual receiver and full regression pass, implementation/artifacts committed/pushed and worktree clean; await owner acceptance before S/T closure. |
-| Original Owner Request | 好的，准入下一个S5，你先给出设计方案。 |
+| Exit Criteria | Design reviewed, actual receiver and required background regression pass, implementation/artifacts committed/pushed and task-owned worktree clean except preserved owner files; await owner acceptance before S/T closure. |
+| Original Owner Request | 批准，请你开始执行，完成后编译、发布、测试、提交、推送后等我验收。 |
 | Similar-Issue Sweep | Inventory body painter invalidation, pointer paint/clear, palette invalidation, bind during an update, nested completion, no-op/failed conversion and snapshot rebuild; each source receives a disposition. |
+
+Owned validation logs and exit records live in ignored build/t88/s5. Build
+phases have a 1800-second budget and test phases a 3600-second budget. The
+executor owns child cleanup; no interactive timeout truncates these phases.
+The owner's untracked assets/binary/snapshot.sol is preserved and excluded
+from this implementation commit.
+
+S5 delivery: Compat production +46/-9 (net +37), tests +131/-13 (net +118).
+The original mirror and six shared roots have no changes. Both Release EXEs
+are rebuilt/published. Final focused selection passes 3/3 and required
+background regression passes 131/131 per width: shared 84/84 followed by
+App/checks 47/47, including snapshot reconstruction/cross-width and Win3.1
+DOS-prompt roundtrips. Five native desktop tests per width were not run because
+the requested reserved-input window was not confirmed; no Computer Use or
+manual acceptance is claimed. Actual accounting, experiment failures,
+finite receiver dispositions and hashes are retained in the
+[S5 delivery evidence](../proposals/m9-win31-file-manager-vga-width-transition.md#s5-measured-delivery-evidence).
 
 - [S1 diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
 - [S2 packed scanout correction](../history/M9-T88-S2-v7-packed-scanout.md).
