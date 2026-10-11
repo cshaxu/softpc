@@ -9,7 +9,7 @@ M9 T86 S6 is active: inward component-boundary audit and repair.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs: “lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复”, then directs: “product组件整体重命名为x86，原product/surface整体重命名为x86/product 确保符号正确全面改名”. S6 P2 admission: “按照你所说的准入S6 P2进行大小写命名规范清理，同时审计所有lib/emulator的同样问题；`x86-product-entry-smoke` 是准确的 target 名 -> 这个命名失误的问题，也对lib和emulator做同样审计和修复。” S6 P3 owner validation observes duplicated X86 command-smoke output and directs its correction. |
+| Admission And Approval | Owner directs: “lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复”, then directs: “product组件整体重命名为x86，原product/surface整体重命名为x86/product 确保符号正确全面改名”. S6 P2 admission: “按照你所说的准入S6 P2进行大小写命名规范清理，同时审计所有lib/emulator的同样问题；`x86-product-entry-smoke` 是准确的 target 名 -> 这个命名失误的问题，也对lib和emulator做同样审计和修复。” S6 P3 owner validation observes duplicated X86 command-smoke output and directs its correction. S6 P4 owner directs current NXVM six-root formatting alignment and confirms the shared roots must obey LF where their current policy requires it. |
 | Objective | Rename the former shared Product corpus to `x86`, with its former Surface subcomponent becoming `x86/product`, then prove and enforce the inward-only dependency order `lib < emulator < x86 < app-softpc` for each component-owned source, test, CMake/configuration and component README. Repair every confirmed outward reference or stale self-verifier without changing runtime behavior. S6 P2 completes the rename by restoring the established C spelling split: types/functions lower-case component prefixes; macros, enum values and include guards upper-case component prefixes; and semantically complete component-owned test target names. |
 | Non-goals | Do not add a second component hierarchy, alter machine/video/audio behavior, make root composition unable to assemble its layers, or treat repository-level architecture/history documents as a component-local dependency. Do not change user INI, media, snapshots or published EXEs. |
 | Reference Baseline | SoftPC `222b637b`; T86 S5 delivery is pushed and owner-directed S6 supersedes it as active work. The reusable tier names after this admitted rename are `lib`, `emulator`, and `x86`; NXVM remains read-only comparison evidence, never a build/test dependency. |
@@ -42,6 +42,13 @@ S6 P3 changes the X86 command-smoke success line from `X86 x86 Product command
 policy: OK` to `X86 Product command policy: OK`; its test manifest is updated
 in the same delivery. The focused X86 Product command receiver passes on x64
 and x86. This corrective P awaits owner validation and does not close S6 or T86.
+
+S6 P4 removes stale `common`/`ibmpc` shared-root attributes in favor of the
+current Emulator roots, restores LF enforcement for all six shared roots, and
+adopts NXVM's test-lib formatting. All six roots are then byte-identical to
+NXVM's current worktree. The preserved SoftPC mirror retains its explicit
+CRLF exceptions. This corrective P awaits owner validation and does not close
+S6 or T86.
 
 ## Historical M9 T85 S20 delivery record
 

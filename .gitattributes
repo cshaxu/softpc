@@ -1,12 +1,10 @@
 # The shared corpus manifest hashes its exact source bytes and requires LF.
 src/lib/** text eol=lf
-src/common/** text eol=lf
+src/emulator/** text eol=lf
 src/x86/** text eol=lf
-src/ibmpc/** text eol=lf
 test/lib/** text eol=lf
-test/common/** text eol=lf
+test/emulator/** text eol=lf
 test/x86/** text eol=lf
-test/ibmpc/** text eol=lf
 test/register.cmake text eol=lf
 
 # The preserved OpenNT mirror is compared as a checkout artifact.  These

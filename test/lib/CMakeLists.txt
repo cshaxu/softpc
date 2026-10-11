@@ -80,10 +80,10 @@ endif()
 add_test(NAME lib.types-layout
         COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${LIB_ROOT}
             -P "${LIB_ROOT}/verify_types_layout.cmake")
-    add_test(NAME lib.test-manifest
-        COMMAND "${CMAKE_COMMAND}" -DTEST_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}
-            -P "${CMAKE_CURRENT_LIST_DIR}/../verify_manifest.cmake")
-    add_test(NAME lib.manifest
+add_test(NAME lib.test-manifest
+    COMMAND "${CMAKE_COMMAND}" -DTEST_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}
+        -P "${CMAKE_CURRENT_LIST_DIR}/../verify_manifest.cmake")
+add_test(NAME lib.manifest
         COMMAND "${CMAKE_COMMAND}" -DLIBRARY_ROOT:PATH=${LIB_ROOT}
             -P "${LIB_ROOT}/verify_manifest.cmake")
     add_test(NAME lib.linux-build-contract

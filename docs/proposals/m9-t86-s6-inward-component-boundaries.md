@@ -161,3 +161,20 @@ behavior or package artifact changes.  `test/x86/MANIFEST.sha256` changes with
 the source so the standalone test-corpus proof remains complete.  The focused
 `x86.product/command` CTest receiver is required on both widths before one
 corrective P is pushed; S6 then remains open for owner validation.
+
+## S6 P4: shared-corpus LF and formatting convergence
+
+The tracked shared roots are `src/{lib,emulator,x86}` and
+`test/{lib,emulator,x86}`.  Their byte-hashed corpus requires LF, but the root
+attributes still named retired `common` and `ibmpc` paths.  As a result, the
+two Emulator manifests could be checked out as CRLF despite their shared-root
+contract.  The repair replaces only those stale patterns with the existing
+Emulator roots, normalizes the six manifest worktree bytes to LF, and imports
+the sole NXVM non-manifest difference: harmless indentation in test-lib's
+manifest registrations.  The retained CRLF rules for the preserved OpenNT
+mirror remain required provenance exceptions and are deliberately untouched.
+
+Proof requires all six local manifest receivers, reconfiguration and focused
+Lib manifest tests on x64/x86, plus a six-root, union-path SHA-256 comparison
+against NXVM's current worktree.  No production target, source behavior,
+machine mirror, user configuration, media or package EXE changes belong here.
