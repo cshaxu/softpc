@@ -355,7 +355,81 @@ ignored `build/t88/s2`; disposable negative-proof EXE/media are removed after
 their owned process exits. The regular build intermediates are retained for
 incremental reuse. S2 is delivered for acceptance, not owner-accepted closure.
 
-### S3: Compat generation readiness
+### S3: Colour/resolution regression coverage
+
+Owner accepts S2 and admits a separate regression step. Frozen coverage is
+standard BIOS graphics 04h/05h/06h/0Dh--13h, V7 graphics 60h--69h, and existing
+text-mode/stride/panning/wrap tests. Cases use real BIOS-programmed modes and
+the original selected update algorithm. Full repaint after a guest-memory write
+must agree with incremental repaint; mode transitions must restore dimensions.
+V7 hardware pointer registers must produce the appropriate packed/non-packed
+coordinate and restore old background on move/removal. Existing CPU-chain4
+packed-mode and independent pixel oracle remain unchanged.
+
+The expected delta is +100--160 lines in the existing App VGA smoke. Owner
+additionally requires preserving original condition order in draw_v7ptr():
+`get_seq_chain4_mode() && get_256_colour_mode()` (+1/-1, net zero, no truth-value
+change). No new target, fixture framework or renderer is introduced. Unsupported
+arbitrary register mixtures are not called valid modes. The completion predicate
+is dual-width focused and background regression plus an explicit disposition
+for each mode class; discovery of a production bug stops implementation and
+requires a separate explained repair. Original Compat S3 moves to S4.
+
+Source-qualified mode dispositions: original ega_set_mode explicitly maps V7
+07h/0Fh to text 00h, so these requests receive exact fallback assertions, not
+graphic-size assumptions. Original video.c's MODE_ENTRY table defines V7 61h
+as 720x540; the initial test's 720x400 assumption was wrong and is corrected
+against that independent source, not merely against observed output.
+
+### S3 accepted coverage disposition
+
+The owner requests S3 closure after the failing matrix is explicitly reported.
+This accepts the added regression coverage, not production correctness. Frozen
+graphics cases are 04/05/06/0D/0E/10/11/12/13 and 60--69, each selected through
+the original BIOS in forward and reverse order on x86/x64 (38 states per width).
+Every state checks explicit dimensions, colour/painter selection and actual CPU
+writes followed by incremental/full pixel comparison. All ten V7 modes also
+check three pointer positions, old-background restoration and removal. Requests
+07/0F have separate exact text-fallback assertions. The matrix collects repaint
+failures; its final assertion follows existing stride/pointer receivers and
+fixture cleanup, so a known repaint failure cannot skip those checks.
+
+Disposition: geometry, painter selection, fallback and hardware-pointer checks
+pass throughout this finite matrix. Incremental/full comparison passes for the
+other 17 graphics modes but fails for 63/64 in both orders and widths. The final
+assertion remains enabled and fails; no mode is excluded, no result is converted
+to success. The production defect is transferred to TODO with a separate repair
+admission condition. It is not folded into Compat generation-readiness S4.
+
+The sole production change restores original predicate order in v7_ports.c,
++1/-1, net zero, without changing truth values. Removing temporary 63h diagnostic
+printing leaves the permanent test delta +115/-0, net +115, in one existing
+test file; no new target, cache, state, public component or runtime path is added.
+
+Background regression reuses the Ninja build trees and refreshes both package
+EXEs. Shared suites pass 84/84 per width, and the other App/checks receivers
+pass 46/46 per width. The added VGA receiver remains a failed test, not a green
+qualification: the final focused rerun records the 63h/64h mismatches and reaches
+its final assertion after existing checks and fixture cleanup. Five desktop
+cases remain excluded by policy. Initial x64 eight-way shared regression times
+out in test-types-boundary-selftest and verifier-negative; the two-way rerun
+passes all 84 without budget changes (64.60 seconds x64, 64.74 seconds x86).
+App/checks totals are 112.57 seconds x64 and 86.81 seconds x86. A temporary
+test-order experiment put a 64x48 isolated pointer fixture before real BIOS
+mode changes and produced a heap exception; it is discarded as invalid fixture
+ordering, not attributed to production. Final ordering retains the original
+terminal pointer fixture and reports repaint failures only after cleanup.
+
+Package SHA256 values:
+
+- x86: `35C7EA49665C7B3F3345981B3E644DE827CE1EB5599AF8A73F580E9281F80D99`
+- x64: `D8D2DD40B9E06F4AEE60E43D3B91482718A06CC147D8CBEBE9E1A33228203D26`
+
+User INI, guest media and snapshots remain unchanged. Shared six-component
+sources/tests remain unchanged. S3 accepts coverage only; T88 is not qualified
+or closed, and the retained failing test prevents an all-green claim.
+
+### S4: Compat generation readiness
 
 Use the existing DIB bind/update/generation lifecycle to distinguish a newly
 cleared surface from a reconstructed display. Pointer-only damage must not

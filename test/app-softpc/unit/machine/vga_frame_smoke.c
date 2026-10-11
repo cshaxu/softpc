@@ -976,6 +976,119 @@ static void verify_v7_cpu_scanout(softpc_machine *machine)
     }
 }
 
+static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
+{
+    const unsigned modes[] = {
+        4, 5, 6, 0x0d, 0x0e, 0x10, 0x11, 0x12, 0x13,
+        0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69
+    };
+    const unsigned widths[] = {
+        640, 640, 640, 640, 640, 640, 640, 640, 640,
+        752, 720, 800, 1024, 1024, 1024, 640, 640, 720, 800
+    };
+    const unsigned heights[] = {
+        400, 400, 400, 400, 400, 350, 480, 480, 400,
+        410, 540, 600, 768, 768, 768, 400, 480, 540, 600
+    };
+    extern void outb(io_addr port, half_word value);
+    extern void c_sas_store(IU32 addr, IU8 value);
+    extern void remove_v7ptr(void);
+    unsigned pass, index, failures = 0;
+
+    /* Original ega_set_mode explicitly maps V7's unsupported mono 07h/0Fh
+       requests to mode 00h. Do not mistake their text surface for graphics. */
+    for (index = 0; index < 2; ++index) {
+        c_setAH(0); c_setAL(index ? 0x0f : 7);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        host_timer_event(); host_timer_event();
+        assert(Currently_emulated_video_mode == 0);
+        assert(!softpc_machine_presentation_is_graphics(machine));
+    }
+
+    /* BIOS-selected states, not invented register mixtures. Reverse order
+       checks that returning from another depth/resolution restores the mode. */
+    for (pass = 0; pass < 2; ++pass)
+    for (index = 0; index < sizeof(modes) / sizeof(modes[0]); ++index) {
+        unsigned entry = pass ? sizeof(modes) / sizeof(modes[0]) - index - 1 : index;
+        unsigned mode = modes[entry], address;
+        const void *bits, *info;
+        lib_u32 width, height;
+        unsigned char *surface, *incremental;
+        lib_size size;
+        c_setAH(mode >= 0x60 ? 0x6f : 0);
+        c_setAL(mode >= 0x60 ? 5 : (unsigned char)mode);
+        c_setBX((unsigned short)mode);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        host_timer_event(); host_timer_event();
+        assert(softpc_machine_presentation_dib(machine, &bits, &info, &width, &height));
+        if (width != widths[entry] || height != heights[entry])
+            fprintf(stderr, "colour matrix mode %02x: %ux%u, expected %ux%u\n",
+                mode, width, height, widths[entry], heights[entry]);
+        assert(width == widths[entry] && height == heights[entry]);
+        assert(!!get_256_colour_mode() == (mode == 0x13 || mode >= 0x66));
+        assert((mode >= 0x66) == (paint_screen == nt_v7vga_hi_graph_std));
+        assert(update_alg.calc_update != NULL);
+        surface = (unsigned char *)bits;
+        size = (lib_size)width * height;
+        incremental = lib_allocate(size);
+        assert(incremental != NULL);
+        for (address = 0; address < 4u * EGA_PLANE_SIZE; ++address)
+            EGA_planes[address] = (unsigned char)(address * 37u + (address >> 3));
+        setVideodirty_total(20001);
+        (*update_alg.calc_update)();
+        lib_memory_copy(incremental, surface, size);
+        /* Real CPU writes must reach the selected incremental updater.
+           Comparing it with a subsequent full repaint detects stale regions. */
+        for (address = 0; address < 16; ++address)
+            c_sas_store((mode <= 6 ? 0xb8100 : 0xa0100) + address, (IU8)(address ^ 0xa5));
+        assert(getVideodirty_total() != 0);
+        (*update_alg.calc_update)();
+        if (lib_memory_compare(incremental, surface, size) == 0) {
+            fprintf(stderr, "colour matrix mode %02x: incremental unchanged\n", mode);
+            ++failures;
+        }
+        lib_memory_copy(incremental, surface, size);
+        setVideodirty_total(20001);
+        (*update_alg.calc_update)();
+        if (lib_memory_compare(incremental, surface, size) != 0) {
+            fprintf(stderr, "colour matrix mode %02x: incremental/full mismatch\n", mode);
+            ++failures;
+            lib_memory_copy(incremental, surface, size);
+        }
+
+        if (mode >= 0x60) {
+            unsigned position, previous = 0;
+            unsigned coordinate_scale = mode >= 0x66 ? 2 : 1;
+            outb(0x3c4, 6); outb(0x3c5, 0xea);
+            extensions_controller.interface_control.as_bfld.pointer_bank_select = 0;
+            extensions_controller.pointer_pattern = 0;
+            lib_memory_set(EGA_planes + 0x30000, 0xff, 128);
+            lib_memory_set(EGA_planes + 0x30080, 0, 128);
+            EGA_planes[0x30000] = 0x7f;
+            EGA_planes[0x30080] = 0x80;
+            extensions_controller.cursor_attrs.as_bfld.pointer_enable = 1;
+            for (position = 0; position < 3; ++position) {
+                unsigned x = position == 2 ? width - 16 : 16 + 8 * position;
+                unsigned y = position == 2 ? height - 16 : 6 + position;
+                unsigned encoded_x = x * coordinate_scale;
+                outb(0x3c4, 0x9c); outb(0x3c5, (half_word)(encoded_x >> 8));
+                outb(0x3c4, 0x9d); outb(0x3c5, (half_word)encoded_x);
+                outb(0x3c4, 0x9e); outb(0x3c5, (half_word)(y >> 8));
+                outb(0x3c4, 0x9f); outb(0x3c5, (half_word)y);
+                assert(surface[y * width + x] == 0xff);
+                if (position)
+                    assert(surface[previous] == incremental[previous]);
+                previous = y * width + x;
+            }
+            remove_v7ptr();
+            extensions_controller.cursor_attrs.as_bfld.pointer_enable = 0;
+            assert(lib_memory_compare(incremental, surface, size) == 0);
+        }
+        lib_release(incremental);
+    }
+    return failures;
+}
+
 static void verify_display_stride(void)
 {
     extern boolean choose_vga_display_mode(void);
@@ -1412,9 +1525,11 @@ int main(void)
     verify_snapshot_video_writes(machine);
     verify_preserved_v7_modes();
     verify_v7_cpu_scanout(machine);
+    const unsigned colour_resolution_failures = verify_colour_resolution_matrix(machine);
     verify_display_stride();
     verify_pointer_update_pixels();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
+    assert(colour_resolution_failures == 0);
     return 0;
 }
