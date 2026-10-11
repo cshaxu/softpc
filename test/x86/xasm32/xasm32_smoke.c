@@ -9,7 +9,7 @@ static lib_u32 dispatch_digest(void)
     static const lib_u8 prefixes[] = {0, 0x66, 0x67};
     lib_u32 hash = 2166136261u;
     lib_u8 code[16];
-    char statement[x86_xasm32_MAX_STATEMENT_BYTES + 1u];
+    char statement[X86_XASM32_MAX_STATEMENT_BYTES + 1u];
     for (lib_u32 opcode = 0; opcode < 256; ++opcode) {
         for (lib_u32 map = 0; map < 2; ++map) {
             for (lib_u32 prefix = 0; prefix < sizeof(prefixes); ++prefix) {
@@ -44,7 +44,7 @@ static lib_u32 dispatch_digest(void)
 int main(void)
 {
     lib_u8 code[16] = {0};
-    char statement[x86_xasm32_MAX_STATEMENT_BYTES + 1u] = {0};
+    char statement[X86_XASM32_MAX_STATEMENT_BYTES + 1u] = {0};
     lib_size length;
     lib_size statement_length;
     lib_size paragraph_length;

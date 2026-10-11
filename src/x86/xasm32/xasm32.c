@@ -13,9 +13,9 @@ static lib_status x86_xasm32_validate_statement(const char *statement,
     for (index = 0u; index < statement_bytes; ++index) {
         if (statement[index] == '\0') return LIB_STATUS_INVALID_ARGUMENT;
         if (statement[index] == '\n' && paragraph) {
-            if (line_bytes > x86_xasm32_MAX_STATEMENT_BYTES) return LIB_STATUS_INVALID_ARGUMENT;
+            if (line_bytes > X86_XASM32_MAX_STATEMENT_BYTES) return LIB_STATUS_INVALID_ARGUMENT;
             line_bytes = 0u;
-        } else if (++line_bytes > x86_xasm32_MAX_STATEMENT_BYTES) {
+        } else if (++line_bytes > X86_XASM32_MAX_STATEMENT_BYTES) {
             return LIB_STATUS_INVALID_ARGUMENT;
         }
     }
@@ -25,8 +25,8 @@ static lib_status x86_xasm32_validate_statement(const char *statement,
 lib_status x86_xasm32_assemble(const char *statement, lib_size statement_bytes,
     lib_u8 *code, lib_size code_capacity, lib_size *out_code_bytes, lib_bool flag32)
 {
-    char local_statement[x86_xasm32_MAX_STATEMENT_BYTES + 1u];
-    lib_u8 local_code[x86_xasm32_MAX_CODE_BYTES];
+    char local_statement[X86_XASM32_MAX_STATEMENT_BYTES + 1u];
+    lib_u8 local_code[X86_XASM32_MAX_CODE_BYTES];
     lib_u8 code_bytes;
     lib_status status;
 
@@ -69,13 +69,13 @@ lib_status x86_xasm32_disassemble(const lib_u8 *code, lib_size code_bytes,
     char *statement, lib_size statement_capacity, lib_size *out_statement_bytes,
     lib_size *out_code_bytes, lib_bool flag32)
 {
-    char local_statement[x86_xasm32_MAX_STATEMENT_BYTES + 1u];
+    char local_statement[X86_XASM32_MAX_STATEMENT_BYTES + 1u];
     lib_u8 decoded_bytes;
     lib_size statement_bytes;
 
     if (code == LIB_NULL || statement == LIB_NULL || out_statement_bytes == LIB_NULL ||
         out_code_bytes == LIB_NULL ||
-        code_bytes < x86_xasm32_MAX_CODE_BYTES || statement_capacity == 0u ||
+        code_bytes < X86_XASM32_MAX_CODE_BYTES || statement_capacity == 0u ||
         (flag32 != LIB_FALSE && flag32 != LIB_TRUE)) return LIB_STATUS_INVALID_ARGUMENT;
     decoded_bytes = dasm32(local_statement, (lib_u8 *)code, flag32);
     statement_bytes = lib_text_length(local_statement);

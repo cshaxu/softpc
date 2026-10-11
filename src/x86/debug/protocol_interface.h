@@ -1,43 +1,43 @@
-#ifndef x86_debug_PROTOCOL_INTERFACE_H
-#define x86_debug_PROTOCOL_INTERFACE_H
+#ifndef X86_DEBUG_PROTOCOL_INTERFACE_H
+#define X86_DEBUG_PROTOCOL_INTERFACE_H
 
 #include "lib/types/types_interface.h"
 
 /* Copied in-process x86 values shared by frontend and CPU adapters.
  * Not a serialized format and not a dependency on the command parser. */
-#define x86_debug_BYTES 32u
+#define X86_DEBUG_BYTES 32u
 
 typedef enum x86_debug_operation {
-    x86_debug_READ_REGISTER,
-    x86_debug_WRITE_REGISTER,
-    x86_debug_READ_LINEAR,
-    x86_debug_WRITE_LINEAR,
-    x86_debug_READ_REAL,
-    x86_debug_WRITE_REAL,
-    x86_debug_READ_PORT,
-    x86_debug_WRITE_PORT,
-    x86_debug_GET_CODE_DEFAULT_SIZE,
-    x86_debug_GET_CODE_BASE,
-    x86_debug_GET_CPU_SNAPSHOT,
-    x86_debug_SET_WATCH,
-    x86_debug_CLEAR_WATCH,
-    x86_debug_GET_WATCH,
-    x86_debug_SET_EXECUTION_PLAN,
-    x86_debug_CLEAR_EXECUTION_PLAN,
-    x86_debug_GET_EXECUTION_RESULT
+    X86_DEBUG_READ_REGISTER,
+    X86_DEBUG_WRITE_REGISTER,
+    X86_DEBUG_READ_LINEAR,
+    X86_DEBUG_WRITE_LINEAR,
+    X86_DEBUG_READ_REAL,
+    X86_DEBUG_WRITE_REAL,
+    X86_DEBUG_READ_PORT,
+    X86_DEBUG_WRITE_PORT,
+    X86_DEBUG_GET_CODE_DEFAULT_SIZE,
+    X86_DEBUG_GET_CODE_BASE,
+    X86_DEBUG_GET_CPU_SNAPSHOT,
+    X86_DEBUG_SET_WATCH,
+    X86_DEBUG_CLEAR_WATCH,
+    X86_DEBUG_GET_WATCH,
+    X86_DEBUG_SET_EXECUTION_PLAN,
+    X86_DEBUG_CLEAR_EXECUTION_PLAN,
+    X86_DEBUG_GET_EXECUTION_RESULT
 } x86_debug_operation;
 
 typedef enum x86_debug_watch_kind {
-    x86_debug_WATCH_READ,
-    x86_debug_WATCH_WRITE,
-    x86_debug_WATCH_EXECUTE
+    X86_DEBUG_WATCH_READ,
+    X86_DEBUG_WATCH_WRITE,
+    X86_DEBUG_WATCH_EXECUTE
 } x86_debug_watch_kind;
 
 typedef enum x86_debug_execution_plan_kind {
-    x86_debug_EXECUTION_NONE,
-    x86_debug_EXECUTION_TRACE,
-    x86_debug_EXECUTION_BREAK_REAL,
-    x86_debug_EXECUTION_BREAK_LINEAR
+    X86_DEBUG_EXECUTION_NONE,
+    X86_DEBUG_EXECUTION_TRACE,
+    X86_DEBUG_EXECUTION_BREAK_REAL,
+    X86_DEBUG_EXECUTION_BREAK_LINEAR
 } x86_debug_execution_plan_kind;
 
 typedef struct x86_debug_segment_snapshot {
@@ -83,10 +83,10 @@ typedef struct x86_debug_request {
     x86_debug_execution_plan_kind execution_kind;
     lib_u64 instruction_count;
     lib_u8 bytes; /* Memory payload size; port I/O explicitly requires 1 (byte). */
-    lib_u8 data[x86_debug_BYTES];
+    lib_u8 data[X86_DEBUG_BYTES];
 } x86_debug_request;
 
-#define x86_debug_ACCESS_CAPACITY 32u
+#define X86_DEBUG_ACCESS_CAPACITY 32u
 typedef struct x86_debug_memory_access {
     lib_bool write;
     lib_u32 linear;
@@ -95,7 +95,7 @@ typedef struct x86_debug_memory_access {
 } x86_debug_memory_access;
 
 typedef struct x86_debug_observation {
-    x86_debug_memory_access accesses[x86_debug_ACCESS_CAPACITY];
+    x86_debug_memory_access accesses[X86_DEBUG_ACCESS_CAPACITY];
     lib_u8 count;
     lib_bool truncated;
     lib_bool watch_hit;
@@ -107,18 +107,18 @@ typedef struct x86_debug_response {
     lib_u32 value;
     lib_bool enabled;
     lib_u8 bytes;
-    lib_u8 data[x86_debug_BYTES];
+    lib_u8 data[X86_DEBUG_BYTES];
     x86_debug_cpu_snapshot cpu;
     x86_debug_observation observation;
 } x86_debug_response;
 
 typedef enum x86_debug_register {
-    x86_debug_EAX, x86_debug_ECX, x86_debug_EDX, x86_debug_EBX,
-    x86_debug_ESP, x86_debug_EBP, x86_debug_ESI, x86_debug_EDI,
-    x86_debug_EIP, x86_debug_EFLAGS, x86_debug_ES, x86_debug_CS,
-    x86_debug_SS, x86_debug_DS, x86_debug_FS, x86_debug_GS,
-    x86_debug_CR0, x86_debug_CR1, x86_debug_CR2, x86_debug_CR3,
-    x86_debug_CR4, x86_debug_REGISTER_COUNT
+    X86_DEBUG_EAX, X86_DEBUG_ECX, X86_DEBUG_EDX, X86_DEBUG_EBX,
+    X86_DEBUG_ESP, X86_DEBUG_EBP, X86_DEBUG_ESI, X86_DEBUG_EDI,
+    X86_DEBUG_EIP, X86_DEBUG_EFLAGS, X86_DEBUG_ES, X86_DEBUG_CS,
+    X86_DEBUG_SS, X86_DEBUG_DS, X86_DEBUG_FS, X86_DEBUG_GS,
+    X86_DEBUG_CR0, X86_DEBUG_CR1, X86_DEBUG_CR2, X86_DEBUG_CR3,
+    X86_DEBUG_CR4, X86_DEBUG_REGISTER_COUNT
 } x86_debug_register;
 
 #endif

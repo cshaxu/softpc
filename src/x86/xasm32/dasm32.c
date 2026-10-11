@@ -189,7 +189,7 @@ static lib_u8 _kdf_check_prefix(dasm32_context *dasmContext, lib_u8 opcode)
 static void _kdf_skip(dasm32_context *dasmContext, lib_u8 byte)
 {
     XASM32_TRACE_CALL_BEGIN("_kdf_skip");
-    if (byte > x86_xasm32_MAX_CODE_BYTES - iop)
+    if (byte > X86_XASM32_MAX_CODE_BYTES - iop)
         XASM32_TRACE_IMPOSSIBLE_RETURN;
     XASM32_TRACE_CHECK_RETURN(iop += byte);
     XASM32_TRACE_CALL_END;

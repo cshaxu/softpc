@@ -7,7 +7,7 @@
 #include "emulator/product/monitor_interface.h"
 #include "x86/product/keyboard_interface.h"
 
-#define x86_product_WINDOW_TEXT_CAPACITY 256u
+#define X86_PRODUCT_WINDOW_TEXT_CAPACITY 256u
 
 typedef struct x86_product_run_context {
     const x86_product_definition *definition;
@@ -15,8 +15,8 @@ typedef struct x86_product_run_context {
     x86_product_command_context command;
     x86_product_command_extensions extensions;
     kvm_hotkey_registry hotkeys;
-    lib_u8 running_title[x86_product_WINDOW_TEXT_CAPACITY];
-    lib_u8 paused_title[x86_product_WINDOW_TEXT_CAPACITY];
+    lib_u8 running_title[X86_PRODUCT_WINDOW_TEXT_CAPACITY];
+    lib_u8 paused_title[X86_PRODUCT_WINDOW_TEXT_CAPACITY];
     lib_u8 graphics_status[EMULATOR_SESSION_TEXT_CAPACITY];
 } x86_product_run_context;
 

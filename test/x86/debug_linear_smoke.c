@@ -14,23 +14,23 @@ static lib_status execute_x86(emulator_machine *m, const emulator_machine_debug_
 {
     (void)m; (void)lease;
     *result = (x86_debug_response){0};
-    if (request->operation == x86_debug_READ_REGISTER) {
-        if (request->register_id == x86_debug_CS) result->value = code_segment;
-        if (request->register_id == x86_debug_DS) result->value = data_segment;
-    } else if (request->operation == x86_debug_GET_CODE_DEFAULT_SIZE) {
+    if (request->operation == X86_DEBUG_READ_REGISTER) {
+        if (request->register_id == X86_DEBUG_CS) result->value = code_segment;
+        if (request->register_id == X86_DEBUG_DS) result->value = data_segment;
+    } else if (request->operation == X86_DEBUG_GET_CODE_DEFAULT_SIZE) {
         result->value = 1u;
-    } else if (request->operation == x86_debug_READ_LINEAR ||
-               request->operation == x86_debug_WRITE_LINEAR ||
-               request->operation == x86_debug_READ_REAL ||
-               request->operation == x86_debug_WRITE_REAL) {
-        lib_u32 address = request->operation == x86_debug_READ_REAL ||
-            request->operation == x86_debug_WRITE_REAL ?
+    } else if (request->operation == X86_DEBUG_READ_LINEAR ||
+               request->operation == X86_DEBUG_WRITE_LINEAR ||
+               request->operation == X86_DEBUG_READ_REAL ||
+               request->operation == X86_DEBUG_WRITE_REAL) {
+        lib_u32 address = request->operation == X86_DEBUG_READ_REAL ||
+            request->operation == X86_DEBUG_WRITE_REAL ?
             ((lib_u32)request->segment << 4) + request->offset : request->address;
         lib_test_assert(request->bytes != 0u && request->bytes - 1u <= LIB_UINT32_MAX - address);
         lib_test_assert(address >= memory_base && address - memory_base < sizeof(memory));
         lib_test_assert(request->bytes <= sizeof(memory) - (address - memory_base));
-        if (request->operation == x86_debug_WRITE_LINEAR ||
-            request->operation == x86_debug_WRITE_REAL) {
+        if (request->operation == X86_DEBUG_WRITE_LINEAR ||
+            request->operation == X86_DEBUG_WRITE_REAL) {
             lib_test_assert(++writes <= sizeof(memory));
             lib_memory_copy(memory + address - memory_base, request->data, request->bytes);
         } else {
@@ -57,7 +57,7 @@ static lib_status execute(emulator_machine *m, const emulator_machine_debug_leas
 #define emulator_machine_debug_cancel cancel
 #include "x86/debug/command.c"
 
-static X86_DEBUG *debug;
+static x86_debug *debug;
 static x86_debug_result result;
 static const char *submit(const char *line)
 {
@@ -79,7 +79,7 @@ int main(void)
     x86_debug_response response;
     short_response = LIB_TRUE;
     lib_test_assert(command_execute(debug, &(x86_debug_request){
-        .operation = x86_debug_GET_CODE_DEFAULT_SIZE }, &response) != 0);
+        .operation = X86_DEBUG_GET_CODE_DEFAULT_SIZE }, &response) != 0);
     lib_test_assert(debug->access_status == LIB_STATUS_IO_ERROR && response.value == 0u);
     short_response = LIB_FALSE;
     lib_test_assert(x86_debug_open(debug, (emulator_machine *)debug) == LIB_STATUS_OK);

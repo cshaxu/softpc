@@ -1,13 +1,13 @@
-#ifndef x86_product_COMMAND_H
-#define x86_product_COMMAND_H
+#ifndef X86_PRODUCT_COMMAND_H
+#define X86_PRODUCT_COMMAND_H
 
 #include "emulator/product/monitor_interface.h"
 #include "emulator/session/session_interface.h"
 #include "emulator/machine/machine_interface.h"
 #include "x86/debug/debug_interface.h"
 
-#define x86_product_COMMAND_TEXT_CAPACITY 2048u
-#define x86_product_COMMAND_PATH_CAPACITY 1024u
+#define X86_PRODUCT_COMMAND_TEXT_CAPACITY 2048u
+#define X86_PRODUCT_COMMAND_PATH_CAPACITY 1024u
 
 /* Optional App commands are deliberately outside the shared command grammar.
  * Session owns monitor admission, prompt timing and lifecycle dispatch; an
@@ -37,9 +37,9 @@ typedef struct x86_product_command_extensions {
 /* The app chooses its CLI. Session continues owning dispatch and Console I/O. */
 typedef struct x86_product_command_context {
     emulator_machine *machine;
-    X86_DEBUG *debug;
+    x86_debug *debug;
     lib_bool debug_active;
-    char debug_prompt[x86_debug_PROMPT_CAPACITY];
+    char debug_prompt[X86_DEBUG_PROMPT_CAPACITY];
     emulator_product_monitor_provider monitor;
     x86_product_command_extensions extensions;
 } x86_product_command_context;

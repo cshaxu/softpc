@@ -121,3 +121,32 @@ Verification on 2026-10-10:
 The final actual-change review must still inspect the staged rename map and
 the no-outward-reference proof before the P commit.  This delivery then awaits
 owner validation; it does not close T86.
+
+## S6 P2: C spelling and test-target identity
+
+The P1 relocation accidentally inverted the established C spelling split in
+the X86 public debug surface: its opaque type became `X86_DEBUG`, while its
+macros, enum values and include guards became lower-case `x86_debug_*`.
+This is a naming-only defect, but it makes the source differ from the shared
+corpus and obscures which identifiers are values versus types/functions.
+
+The correction has one rule everywhere:
+
+- types and functions use lower-case component prefixes, for example
+  `x86_debug` and `x86_debug_create`;
+- macros, enum values and include guards use upper-case component prefixes,
+  for example `X86_DEBUG_READ_REGISTER` and `X86_XASM32_INTERFACE_H`.
+
+The finite Lib/Emulator/X86 audit also checks explicit test executable names.
+Lib has no manual target whose name loses its owner or subcomponent. Emulator
+has one: `emulator-test-composition` builds `product/composition_smoke.c`, so
+it becomes `emulator-product-composition-smoke`. X86 restores the admitted
+`x86-product-entry-smoke` target and matching isolated work-directory name.
+All are CMake target-name corrections only; CTest identities, target links and
+test behavior remain unchanged.
+
+The deliberate shared-corpus differences after this repair remain the P1
+test-manifest ownership helper and the inward-boundary wording. No Lib or
+Emulator production spelling defect was found; test-only lower-case macro
+aliases that replace platform calls remain intentionally lower-case and were
+not renamed.

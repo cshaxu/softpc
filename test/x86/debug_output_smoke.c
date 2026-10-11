@@ -15,7 +15,7 @@ static void cancel(emulator_machine *machine) { (void)machine; }
 
 int main(void)
 {
-    X86_DEBUG *command;
+    x86_debug *command;
     x86_debug_result result;
     lib_test_assert(x86_debug_create(&command) == LIB_STATUS_OK);
     lib_test_assert(x86_debug_open(command, (emulator_machine *)command) == LIB_STATUS_OK);

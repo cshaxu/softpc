@@ -1,12 +1,12 @@
-#ifndef x86_product_MACHINE_INTERFACE_H
-#define x86_product_MACHINE_INTERFACE_H
+#ifndef X86_PRODUCT_MACHINE_INTERFACE_H
+#define X86_PRODUCT_MACHINE_INTERFACE_H
 
 #include "emulator/product/machine_interface.h"
 
 /* These are IBM PC App extension values, not Emulator Product facts. */
 typedef enum x86_product_speed {
-    x86_product_SPEED_STANDARD,
-    x86_product_SPEED_TURBO
+    X86_PRODUCT_SPEED_STANDARD,
+    X86_PRODUCT_SPEED_TURBO
 } x86_product_speed;
 
 typedef struct x86_product_information {

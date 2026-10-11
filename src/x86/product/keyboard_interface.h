@@ -1,5 +1,5 @@
-#ifndef x86_product_KEYBOARD_H
-#define x86_product_KEYBOARD_H
+#ifndef X86_PRODUCT_KEYBOARD_H
+#define X86_PRODUCT_KEYBOARD_H
 
 #include "emulator/product/monitor_interface.h"
 #include "emulator/session/session_interface.h"

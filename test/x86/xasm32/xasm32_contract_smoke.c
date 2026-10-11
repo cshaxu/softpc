@@ -42,10 +42,10 @@ static lib_bool xasm_output_is_unchanged(const lib_u8 *code,
 int main(void)
 {
     if (!assembly_writes_are_bounded()) return 10;
-    char exact_statement[x86_xasm32_MAX_STATEMENT_BYTES];
-    char overlong_statement[x86_xasm32_MAX_STATEMENT_BYTES + 1u];
+    char exact_statement[X86_XASM32_MAX_STATEMENT_BYTES];
+    char overlong_statement[X86_XASM32_MAX_STATEMENT_BYTES + 1u];
     char statement[8];
-    lib_u8 code[x86_xasm32_MAX_CODE_BYTES];
+    lib_u8 code[X86_XASM32_MAX_CODE_BYTES];
     lib_size result_bytes = 37u;
     lib_size instruction_bytes = 19u;
 

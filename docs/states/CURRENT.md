@@ -9,12 +9,12 @@ M9 T86 S6 is active: inward component-boundary audit and repair.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs: “lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复”, then directs: “product组件整体重命名为x86，原product/surface整体重命名为x86/product 确保符号正确全面改名”. |
-| Objective | Rename the former shared Product corpus to `x86`, with its former Surface subcomponent becoming `x86/product`, then prove and enforce the inward-only dependency order `lib < emulator < x86 < app-softpc` for each component-owned source, test, CMake/configuration and component README. Repair every confirmed outward reference or stale self-verifier without changing runtime behavior. |
+| Admission And Approval | Owner directs: “lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复”, then directs: “product组件整体重命名为x86，原product/surface整体重命名为x86/product 确保符号正确全面改名”. S6 P2 admission: “按照你所说的准入S6 P2进行大小写命名规范清理，同时审计所有lib/emulator的同样问题；`x86-product-entry-smoke` 是准确的 target 名 -> 这个命名失误的问题，也对lib和emulator做同样审计和修复。” |
+| Objective | Rename the former shared Product corpus to `x86`, with its former Surface subcomponent becoming `x86/product`, then prove and enforce the inward-only dependency order `lib < emulator < x86 < app-softpc` for each component-owned source, test, CMake/configuration and component README. Repair every confirmed outward reference or stale self-verifier without changing runtime behavior. S6 P2 completes the rename by restoring the established C spelling split: types/functions lower-case component prefixes; macros, enum values and include guards upper-case component prefixes; and semantically complete component-owned test target names. |
 | Non-goals | Do not add a second component hierarchy, alter machine/video/audio behavior, make root composition unable to assemble its layers, or treat repository-level architecture/history documents as a component-local dependency. Do not change user INI, media, snapshots or published EXEs. |
 | Reference Baseline | SoftPC `222b637b`; T86 S5 delivery is pushed and owner-directed S6 supersedes it as active work. The reusable tier names after this admitted rename are `lib`, `emulator`, and `x86`; NXVM remains read-only comparison evidence, never a build/test dependency. |
 | Candidate Proposal | [T86 S6 inward component boundaries](../proposals/m9-t86-s6-inward-component-boundaries.md) |
-| Files And ABI Surface | Rename `src/product` to `src/x86`, `test/product` to `test/x86`, and `src/x86/surface`/`test/x86/surface` to `x86/product`; update all corresponding public symbols, CMake targets/tests, manifests, component gates and current architecture documentation. Also audit `src/{lib,emulator,app-softpc}` and matching tests. No runtime behavior change. |
+| Files And ABI Surface | Rename `src/product` to `src/x86`, `test/product` to `test/x86`, and `src/x86/surface`/`test/x86/surface` to `x86/product`; update all corresponding public symbols, CMake targets/tests, manifests, component gates and current architecture documentation. Also audit `src/{lib,emulator,app-softpc}` and matching tests. S6 P2 audits all Lib/Emulator/X86 source/test macro, enum, guard and target spellings, then corrects only confirmed naming defects. No runtime behavior change. |
 | Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus boundary; test ownership/layout rules; C11 shared-corpus rule; long operations run as owned background jobs. |
 | Verification | Finite path ledger plus source include, component-local CMake target-link, and component-document/configuration scans; negative proof for each prohibited edge; x64/x86 component verifier/check lanes and proportional background CTest excluding desktop. |
 | Expected Markers | Lib has no outward component path/target reference; Emulator has no X86/App reference; X86 has no App reference; App references only itself and inward tiers. Each shared test package obeys the matching rule and does not import another test package. |
@@ -24,6 +24,19 @@ M9 T86 S6 is active: inward component-boundary audit and repair.
 | Exit Criteria | The finite root ledger is complete; confirmed outward references are removed or corrected; source/test/config/doc boundaries have automated proof; proportional x64/x86 verification passes; one complete P is pushed and reviewed, then await owner validation. |
 | Original Owner Request | 接下来缺口是内层组件依旧认识外层组件的问题：lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复。 |
 | Similar-Issue Sweep | Mechanically enumerate every component-owned C/H/CMake/README/manifest path; classify canonical includes, target links, CMake source paths, test fixtures, and explicit component path/target references against the four-layer order. |
+
+S6 P2 restores the shared C spelling convention without behavioral change:
+`x86_debug` is again the lower-case opaque type/function prefix, while
+`X86_DEBUG_*`, `X86_XASM32_*` and `X86_PRODUCT_*` are macros, enum values and
+guards. It also corrects the two explicit test executable identities to
+`x86-product-entry-smoke` and `emulator-product-composition-smoke`. The full
+Lib/Emulator audit found no Lib spelling/target defect and no other Emulator
+defect. Source/test manifest, inward-boundary and documentation gates pass;
+focused X86/Emulator suites pass 36/36 on x64 and x86, and the App debugger
+receiver passes on both widths. A clean owned background validation built each
+width once and then ran the complete non-desktop suite from those artifacts:
+x64 131/131 passed and x86 131/131 passed. Both package EXEs are refreshed. This P2
+delivery awaits owner validation and does not close S6 or T86.
 
 ## Historical M9 T85 S20 delivery record
 

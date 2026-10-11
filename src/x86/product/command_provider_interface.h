@@ -1,5 +1,5 @@
-#ifndef x86_product_COMMAND_PROVIDER_H
-#define x86_product_COMMAND_PROVIDER_H
+#ifndef X86_PRODUCT_COMMAND_PROVIDER_H
+#define X86_PRODUCT_COMMAND_PROVIDER_H
 
 #include "x86/product/command_interface.h"
 

@@ -103,7 +103,7 @@ static void machine_fake_dispose(machine_fake *fake)
 
 typedef struct debug_fake {
     lib_bool register_fixture;
-    lib_u32 registers[x86_debug_REGISTER_COUNT];
+    lib_u32 registers[X86_DEBUG_REGISTER_COUNT];
     lib_u32 real_reads, linear_reads;
     lib_bool memory_fixture;
     lib_u8 memory[8192];
@@ -116,43 +116,43 @@ static lib_status fake_execute_x86(void *opaque,
     debug_fake *fake = (debug_fake *)opaque;
     if (request == LIB_NULL || result == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *result = (x86_debug_response) { .value = request->address };
-    if (fake->memory_fixture && (request->operation == x86_debug_READ_REAL ||
-        request->operation == x86_debug_WRITE_REAL ||
-        request->operation == x86_debug_READ_LINEAR ||
-        request->operation == x86_debug_WRITE_LINEAR)) {
-        lib_u32 address = request->operation == x86_debug_READ_REAL ||
-            request->operation == x86_debug_WRITE_REAL ?
+    if (fake->memory_fixture && (request->operation == X86_DEBUG_READ_REAL ||
+        request->operation == X86_DEBUG_WRITE_REAL ||
+        request->operation == X86_DEBUG_READ_LINEAR ||
+        request->operation == X86_DEBUG_WRITE_LINEAR)) {
+        lib_u32 address = request->operation == X86_DEBUG_READ_REAL ||
+            request->operation == X86_DEBUG_WRITE_REAL ?
             ((lib_u32)request->segment << 4) + request->offset : request->address;
         lib_test_assert(address + request->bytes <= sizeof(fake->memory));
-        if (request->operation == x86_debug_WRITE_REAL ||
-            request->operation == x86_debug_WRITE_LINEAR)
+        if (request->operation == X86_DEBUG_WRITE_REAL ||
+            request->operation == X86_DEBUG_WRITE_LINEAR)
             lib_memory_copy(fake->memory + address, request->data, request->bytes);
         else lib_memory_copy(result->data, fake->memory + address, request->bytes);
         return LIB_STATUS_OK;
     }
     if (fake->register_fixture) {
         switch (request->operation) {
-        case x86_debug_READ_REGISTER:
+        case X86_DEBUG_READ_REGISTER:
             result->value = fake->registers[request->register_id];
             break;
-        case x86_debug_WRITE_REGISTER:
+        case X86_DEBUG_WRITE_REGISTER:
             fake->registers[request->register_id] = request->address;
             break;
-        case x86_debug_READ_REAL:
+        case X86_DEBUG_READ_REAL:
             ++fake->real_reads;
             lib_memory_set(result->data, 0x90, sizeof(result->data));
             break;
-        case x86_debug_READ_LINEAR:
+        case X86_DEBUG_READ_LINEAR:
             ++fake->linear_reads;
             lib_memory_set(result->data, 0x90, sizeof(result->data));
             break;
-        case x86_debug_GET_CODE_BASE:
+        case X86_DEBUG_GET_CODE_BASE:
             result->value = 0x10000000u;
             break;
-        case x86_debug_GET_CODE_DEFAULT_SIZE:
+        case X86_DEBUG_GET_CODE_DEFAULT_SIZE:
             result->value = 1u;
             break;
-        case x86_debug_GET_EXECUTION_RESULT:
+        case X86_DEBUG_GET_EXECUTION_RESULT:
             result->enabled = LIB_TRUE;
             result->value = 1u;
             break;
@@ -190,7 +190,7 @@ static lib_status execute_x86(emulator_machine *machine,
     return status;
 }
 
-static void extended_registers(X86_DEBUG *debug, debug_fake *fake)
+static void extended_registers(x86_debug *debug, debug_fake *fake)
 {
     x86_debug_result result;
     const char *names[] = { "eax", "ecx", "edx", "ebx", "esp", "ebp",
@@ -204,20 +204,20 @@ static void extended_registers(X86_DEBUG *debug, debug_fake *fake)
     fake->register_fixture = LIB_TRUE;
     for (index = 0; index < 10u; ++index)
         fake->registers[index] = 0x12340000u + index;
-    fake->registers[x86_debug_EFLAGS] = 0x37fd7u;
+    fake->registers[X86_DEBUG_EFLAGS] = 0x37fd7u;
     for (index = 0; index < sizeof(commands) / sizeof(commands[0]); ++index) {
         fake->real_reads = fake->linear_reads = 0u;
         lib_test_assert(x86_debug_submit_line(debug, commands[index], &result) == LIB_STATUS_OK);
         if (index >= 4u) {
-            lib_test_assert(result.lifecycle_request == x86_debug_LIFECYCLE_RESUME);
-            lib_test_assert(x86_debug_observe_machine(debug, x86_debug_MACHINE_PAUSED,
+            lib_test_assert(result.lifecycle_request == X86_DEBUG_LIFECYCLE_RESUME);
+            lib_test_assert(x86_debug_observe_machine(debug, X86_DEBUG_MACHINE_PAUSED,
                 LIB_STATUS_OK, &result) == LIB_STATUS_OK);
         }
         lib_test_assert(lib_text_find_substring(result.text, expected) != LIB_NULL);
         lib_test_assert(lib_text_find_substring(result.text, "L22340008 90") != LIB_NULL);
         lib_test_assert(fake->real_reads == 0u && fake->linear_reads == 1u);
     }
-    fake->registers[x86_debug_EFLAGS] = 2u;
+    fake->registers[X86_DEBUG_EFLAGS] = 2u;
     lib_test_assert(x86_debug_submit_line(debug, "xr", &result) == LIB_STATUS_OK);
     lib_test_assert(lib_text_find_substring(result.text,
         "EFL=00000002: vm rf nt IOPL=0 of df if tf sf zf af pf cf \n") != LIB_NULL);
@@ -242,7 +242,7 @@ static void extended_registers(X86_DEBUG *debug, debug_fake *fake)
     lib_test_assert(lib_text_find_substring(result.text, "Data, e, rw, big") != LIB_NULL);
     fake->register_fixture = LIB_FALSE;
 }
-static void transcript(X86_DEBUG *debug, const char *line,
+static void transcript(x86_debug *debug, const char *line,
     const char *text, const char *prompt)
 {
     x86_debug_result result;
@@ -254,10 +254,10 @@ static void transcript(X86_DEBUG *debug, const char *line,
     lib_test_assert(lib_text_compare_n(result.text, text, length) == 0 &&
         result.text[length] == '\0');
     lib_test_assert(result.prompt_ready && lib_text_compare(result.prompt, prompt) == 0);
-    lib_test_assert(result.lifecycle_request == x86_debug_LIFECYCLE_NONE);
+    lib_test_assert(result.lifecycle_request == X86_DEBUG_LIFECYCLE_NONE);
 }
 
-static void original_cli(X86_DEBUG *debug, debug_fake *fake)
+static void original_cli(x86_debug *debug, debug_fake *fake)
 {
     x86_debug_result result;
     const char *names[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "ip" };
@@ -283,10 +283,10 @@ static void original_cli(X86_DEBUG *debug, debug_fake *fake)
     }
     transcript(debug, "xr eax", "EAX 89AB1234\n", ":");
     transcript(debug, "12345678", "", "-");
-    lib_test_assert(fake->registers[x86_debug_EAX] == 0x12345678u);
+    lib_test_assert(fake->registers[X86_DEBUG_EAX] == 0x12345678u);
     transcript(debug, "rf", "", "NV UP DI PL NZ NA PO NC  -");
     transcript(debug, "cy", "", "-");
-    lib_test_assert((fake->registers[x86_debug_EFLAGS] & 1u) != 0u);
+    lib_test_assert((fake->registers[X86_DEBUG_EFLAGS] & 1u) != 0u);
     transcript(debug, "e0:500", "", "0000:0500  00.");
     transcript(debug, "ab", "", "-");
     lib_test_assert(fake->memory[0x500] == 0xab);
@@ -344,20 +344,20 @@ static void original_cli(X86_DEBUG *debug, debug_fake *fake)
     lib_test_assert(lib_text_compare_n(result.text, "L00001000", 9) == 0);
     fake->memory_fixture = LIB_FALSE;
     lib_test_assert(x86_debug_submit_line(debug, "g", &result) == LIB_STATUS_OK);
-    lib_test_assert(result.lifecycle_request == x86_debug_LIFECYCLE_RESUME);
-    lib_test_assert(x86_debug_observe_machine(debug, x86_debug_MACHINE_PAUSED,
+    lib_test_assert(result.lifecycle_request == X86_DEBUG_LIFECYCLE_RESUME);
+    lib_test_assert(x86_debug_observe_machine(debug, X86_DEBUG_MACHINE_PAUSED,
         LIB_STATUS_OK, &result) == LIB_STATUS_OK);
     lib_test_assert(lib_text_find_substring(result.text, "AX=") && !lib_text_find_substring(result.text, "EAX="));
     for (lib_u32 linear = 0; linear < 2u; ++linear) {
         lib_test_assert(x86_debug_submit_line(debug, linear ? "xt 2" : "t 2", &result) == LIB_STATUS_OK);
         for (lib_u32 step = 0; step < 2u; ++step) {
-            lib_test_assert(x86_debug_observe_machine(debug, x86_debug_MACHINE_PAUSED,
+            lib_test_assert(x86_debug_observe_machine(debug, X86_DEBUG_MACHINE_PAUSED,
                 LIB_STATUS_OK, &result) == LIB_STATUS_OK);
             lib_size length = lib_text_length(result.text);
             lib_test_assert(length != 0u && result.text[length - 1u] != '\r' &&
                 result.text[length - 1u] != '\n');
             lib_test_assert(result.lifecycle_request == (step == 0u ?
-                x86_debug_LIFECYCLE_RESUME : x86_debug_LIFECYCLE_NONE));
+                X86_DEBUG_LIFECYCLE_RESUME : X86_DEBUG_LIFECYCLE_NONE));
         }
     }
     fake->register_fixture = fake->memory_fixture = LIB_FALSE;
@@ -371,7 +371,7 @@ int main(void)
     emulator_machine *machine = LIB_NULL;
     emulator_machine_debug_lease lease = { 0 };
     x86_debug_response debug_result = { 0 };
-    X86_DEBUG *debug = LIB_NULL;
+    x86_debug *debug = LIB_NULL;
     x86_debug_result debug_command_result = { 0 };
 
     machine_fake_initialize(&fake, &driver);
@@ -403,7 +403,7 @@ int main(void)
     lib_test_assert(emulator_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     lib_test_assert(execute_x86(machine, &lease,
         &(x86_debug_request) {
-            .operation = x86_debug_READ_REGISTER,
+            .operation = X86_DEBUG_READ_REGISTER,
             .address = 0x1234u }, &debug_result) == LIB_STATUS_OK);
     lib_test_assert(debug_result.value == 0x1234u &&
         lib_win32_interlocked_compare_exchange(&fake.debug_calls, 0, 0) == 1);

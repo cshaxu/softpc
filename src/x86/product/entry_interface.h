@@ -1,5 +1,5 @@
-#ifndef x86_product_ENTRY_INTERFACE_H
-#define x86_product_ENTRY_INTERFACE_H
+#ifndef X86_PRODUCT_ENTRY_INTERFACE_H
+#define X86_PRODUCT_ENTRY_INTERFACE_H
 
 #include "x86/product/command_interface.h"
 #include "x86/product/machine_interface.h"

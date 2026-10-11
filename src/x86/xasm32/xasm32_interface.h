@@ -1,10 +1,10 @@
-#ifndef x86_xasm32_INTERFACE_H
-#define x86_xasm32_INTERFACE_H
+#ifndef X86_XASM32_INTERFACE_H
+#define X86_XASM32_INTERFACE_H
 
 #include "lib/types/types_interface.h"
 
-#define x86_xasm32_MAX_STATEMENT_BYTES 255u
-#define x86_xasm32_MAX_CODE_BYTES 15u
+#define X86_XASM32_MAX_STATEMENT_BYTES 255u
+#define X86_XASM32_MAX_CODE_BYTES 15u
 
 lib_status x86_xasm32_assemble(const char *statement, lib_size statement_bytes,
     lib_u8 *code, lib_size code_capacity, lib_size *out_code_bytes, lib_bool flag32);

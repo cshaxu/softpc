@@ -70,7 +70,7 @@ static lib_bool x86_product_command_submit_fixed(void *opaque,
     return LIB_FALSE;
 }
 
-_Static_assert(EMULATOR_SESSION_PROMPT_CAPACITY >= x86_debug_PROMPT_CAPACITY,
+_Static_assert(EMULATOR_SESSION_PROMPT_CAPACITY >= X86_DEBUG_PROMPT_CAPACITY,
                "Session prompt must hold debugger continuation prompts");
 
 static void x86_product_command_set_prompt(const x86_product_command_context *command,
@@ -94,10 +94,10 @@ static void x86_product_command_copy_debug(x86_product_command_context *command,
         x86_debug_close(command->debug);
         command->debug_active = LIB_FALSE;
     }
-    if (result->lifecycle_request == x86_debug_LIFECYCLE_RESUME &&
+    if (result->lifecycle_request == X86_DEBUG_LIFECYCLE_RESUME &&
         state == EMULATOR_SESSION_MACHINE_PAUSED)
         out->request = EMULATOR_SESSION_REQUEST_RESUME;
-    else if (result->lifecycle_request != x86_debug_LIFECYCLE_NONE)
+    else if (result->lifecycle_request != X86_DEBUG_LIFECYCLE_NONE)
         (void)lib_c_snprintf(out->text, sizeof(out->text), "Debug lifecycle request is not applicable.");
 }
 
@@ -140,8 +140,8 @@ void x86_product_command_provider_note_runtime(void *opaque,
     emulator_product_monitor_provider_note_runtime(monitor, prior, completed, out);
     if (command->debug_active)
     {
-        x86_debug_machine_state state = completed == EMULATOR_SESSION_MACHINE_PAUSED ? x86_debug_MACHINE_PAUSED : completed == EMULATOR_SESSION_MACHINE_RUNNING ? x86_debug_MACHINE_RUNNING
-                                                                                                                                                                  : x86_debug_MACHINE_STOPPED;
+        x86_debug_machine_state state = completed == EMULATOR_SESSION_MACHINE_PAUSED ? X86_DEBUG_MACHINE_PAUSED : completed == EMULATOR_SESSION_MACHINE_RUNNING ? X86_DEBUG_MACHINE_RUNNING
+                                                                                                                                                                  : X86_DEBUG_MACHINE_STOPPED;
         x86_debug_result result = {0};
         if (x86_debug_observe_machine(command->debug, state, LIB_STATUS_OK, &result) != LIB_STATUS_OK)
         {
