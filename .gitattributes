@@ -1,3 +1,17 @@
+# Text outside the preserved source mirror and user-owned package INI has one
+# repository spelling: LF.  This keeps source, tests, build rules and
+# documentation portable and makes formatting-only diffs visible.
+* text=auto eol=lf
+
+# The package INI is user-owned configuration.  Its existing Windows spelling
+# is retained and agents must not rewrite or normalize it.
+assets/binary/softpc.ini text eol=crlf
+
+# The selected OpenNT mirror is a byte-level comparison corpus.  Its original
+# line endings are evidence rather than project formatting and are restored as
+# CRLF on every checkout.
+src/app-softpc/softpc.new/** text eol=crlf
+
 # The shared corpus manifest hashes its exact source bytes and requires LF.
 src/lib/** text eol=lf
 src/emulator/** text eol=lf
@@ -6,18 +20,4 @@ test/lib/** text eol=lf
 test/emulator/** text eol=lf
 test/x86/** text eol=lf
 test/register.cmake text eol=lf
-
-# The preserved OpenNT mirror is compared as a checkout artifact.  These
-# content-identical files retain their original CRLF bytes on every checkout.
-src/core/softpc.new/base/ccpu386/c_bsic.c text eol=crlf
-src/core/softpc.new/base/ccpu386/c_prot.c text eol=crlf
-src/core/softpc.new/base/ccpu386/c_seg.c text eol=crlf
-src/core/softpc.new/base/ccpu386/c_tsksw.c text eol=crlf
-src/core/softpc.new/base/ccpu386/in.c text eol=crlf
-src/core/softpc.new/base/ccpu386/jmp.c text eol=crlf
-src/core/softpc.new/base/ccpu386/mov.c text eol=crlf
-src/core/softpc.new/base/ccpu386/out.c text eol=crlf
-src/core/softpc.new/base/inc/egavideo.h text eol=crlf
-src/core/softpc.new/base/inc/gfx_upd.h text eol=crlf
-src/core/softpc.new/base/system/illegalp.c text eol=crlf
 src/core/softpc.new/base/video/ega_vide.c text eol=crlf

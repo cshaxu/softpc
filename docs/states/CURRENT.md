@@ -2,28 +2,28 @@
 
 ## Current Work
 
-M9 T87 S1 is active: Win3.1 File Manager VGA width-transition diagnosis.
+M9 T87 S1 is active: repository LF convergence.
 
 ## M9 T87 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner accepts T86 S6, directs that T86 close after current NXVM six-root alignment, then admits the queue head: investigate the intermittent Win3.1 File Manager host-Window width flash. |
-| Objective | Reproduce and attribute the roughly double-width-then-shrink host Window transition when Win3.1 opens File Manager. Establish one producing owner: original renderer, Compat conversion, App/VM frame publication, or a documented Lib frame-contract failure. |
-| Non-goals | Do not repair the defect in S1; do not identify File Manager, Win3.1, a fixed host width, or use a size debounce/delay/filter. Do not change guest timing, user INI, media, snapshots, preserved mirror behavior or shared components without evidence. |
-| Reference Baseline | SoftPC `0efc3715`; T86 is owner-accepted and closed by this admission. OpenNT and NTVDM64 are read-only source comparison evidence only. |
-| Candidate Proposal | [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md) |
-| Files And ABI Surface | Initially read-only: selected Core VGA renderer, Compat frame conversion, VM/App presentation publication, and Lib Window geometry consumers. A task-owned ignored trace may be introduced only if existing observation cannot identify the producing transition; it records dimensions, stride, sequence and display-enable state without changing guest timing. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; one executor/producer rule; long operations run as owned background jobs; no Computer Use. |
-| Verification | Reproduce/observe the documented File Manager startup route on x64 and x86; correlate transition records with source state; compare the responsible original path with read-only OpenNT/NTVDM64 evidence; recheck the related DOS Prompt width route. |
-| Expected Markers | A finite transition ledger identifies whether each unusual published geometry is valid, incomplete or invalid, and names its sole producing owner. No consumer-side mode filter or guest-program special case exists. |
-| Asset Needs | Preserve user package INI, guest media and snapshots. Use package binaries and existing Win3.1 media only as read-only test inputs; no artifact refresh is expected from S1. |
-| Reporting Requirements | Record exact repro route, observed x64/x86 transitions, source ownership disposition, comparison evidence, whether the issue reproduces, and a narrow follow-up repair proposal only when attribution is proven. |
-| Stop Conditions | The evidence requires a mirror behavior change, a new external driver/media, a Lib/Emulator contract expansion, or a product fix before a sole producer is identified; stop and request a separate repair S instead of adding a workaround. |
-| Exit Criteria | Both widths have a recorded observation attempt; every sampled transition has a disposition; the responsible layer is proven or the non-reproduction limit is honestly recorded; any repair is separately scoped. |
-| Original Owner Request | “调查win31里打开file manager出现的屏闪问题（intermittent，但是应该有一半的机会出现）”。 |
-| Similar-Issue Sweep | Compare the existing Win3.1 DOS Prompt initial-window/fullscreen transition routes and every Frame-to-Window geometry publication site; classify them as the same producer fault, a different defect, or unaffected. |
+| Admission And Approval | Owner redirects the not-yet-implemented T87 S1 from the File Manager diagnostic to repository-wide LF alignment after six-corpus convergence. The File Manager candidate returns to the ordered queue. |
+| Objective | Normalize every ordinary tracked text file to LF and make `.gitattributes` enforce that invariant on future checkouts. |
+| Non-goals | Do not normalize `src/app-softpc/softpc.new/`; it is a preserved byte-level source mirror. Do not modify `assets/binary/softpc.ini`, guest media, snapshots, executable artifacts, runtime semantics, API or build behavior. |
+| Reference Baseline | SoftPC `58f037d7`; six shared roots are byte-identical to NXVM at that baseline. |
+| Candidate Proposal | [Repository LF convergence](../proposals/m9-repository-eol-convergence.md) |
+| Files And ABI Surface | `.gitattributes`, tracked non-binary text outside the preserved mirror and user-owned INI, and task/governance documentation. No runtime ABI. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; user package configuration rule. |
+| Verification | Enumerate tracked non-binary paths before/after; outside the two explicit exceptions, prove zero CR bytes; prove six corpus roots remain LF and match NXVM; run documentation governance and configure/build sanity only if a build input is rewritten. |
+| Expected Markers | One default LF policy, two explicit byte-preserving exceptions, no mixed EOL outside them, and no semantic source diff. |
+| Asset Needs | Preserve `assets/binary/softpc.ini`, media, snapshots and EXEs byte-for-byte. |
+| Reporting Requirements | Report pre/post EOL counts by class, every exception, changed path count, semantic-diff check and verification result. |
+| Stop Conditions | Any non-mirror CRLF file is intentionally byte-level evidence, binary misclassified as text, or normalization changes a generated/owned artifact; stop and record the exception rather than rewriting it. |
+| Exit Criteria | All ordinary text is LF; the two exceptions remain untouched; governance and corpus checks pass; the P is committed/pushed and the worktree is clean. |
+| Original Owner Request | “按照规范，应该全项目都是LF是不是？格式差异，你是不是也应该对齐？请你去做。” |
+| Similar-Issue Sweep | Scan every tracked path, classify binary/mirror/user-INI/ordinary text, and reject any remaining CR byte outside explicit exceptions. |
 
 ## Historical M9 T85 S20 delivery record
 
