@@ -2,53 +2,28 @@
 
 ## Current Work
 
-M9 T86 S6 is active: inward component-boundary audit and repair.
+M9 T87 S1 is active: Win3.1 File Manager VGA width-transition diagnosis.
 
-## M9 T86 S6 Packet
+## M9 T87 S1 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner directs: “lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复”, then directs: “product组件整体重命名为x86，原product/surface整体重命名为x86/product 确保符号正确全面改名”. S6 P2 admission: “按照你所说的准入S6 P2进行大小写命名规范清理，同时审计所有lib/emulator的同样问题；`x86-product-entry-smoke` 是准确的 target 名 -> 这个命名失误的问题，也对lib和emulator做同样审计和修复。” S6 P3 owner validation observes duplicated X86 command-smoke output and directs its correction. S6 P4 owner directs current NXVM six-root formatting alignment and confirms the shared roots must obey LF where their current policy requires it. |
-| Objective | Rename the former shared Product corpus to `x86`, with its former Surface subcomponent becoming `x86/product`, then prove and enforce the inward-only dependency order `lib < emulator < x86 < app-softpc` for each component-owned source, test, CMake/configuration and component README. Repair every confirmed outward reference or stale self-verifier without changing runtime behavior. S6 P2 completes the rename by restoring the established C spelling split: types/functions lower-case component prefixes; macros, enum values and include guards upper-case component prefixes; and semantically complete component-owned test target names. |
-| Non-goals | Do not add a second component hierarchy, alter machine/video/audio behavior, make root composition unable to assemble its layers, or treat repository-level architecture/history documents as a component-local dependency. Do not change user INI, media, snapshots or published EXEs. |
-| Reference Baseline | SoftPC `222b637b`; T86 S5 delivery is pushed and owner-directed S6 supersedes it as active work. The reusable tier names after this admitted rename are `lib`, `emulator`, and `x86`; NXVM remains read-only comparison evidence, never a build/test dependency. |
-| Candidate Proposal | [T86 S6 inward component boundaries](../proposals/m9-t86-s6-inward-component-boundaries.md) |
-| Files And ABI Surface | Rename `src/product` to `src/x86`, `test/product` to `test/x86`, and `src/x86/surface`/`test/x86/surface` to `x86/product`; update all corresponding public symbols, CMake targets/tests, manifests, component gates and current architecture documentation. Also audit `src/{lib,emulator,app-softpc}` and matching tests. S6 P2 audits all Lib/Emulator/X86 source/test macro, enum, guard and target spellings, then corrects only confirmed naming defects. No runtime behavior change. |
-| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; shared-corpus boundary; test ownership/layout rules; C11 shared-corpus rule; long operations run as owned background jobs. |
-| Verification | Finite path ledger plus source include, component-local CMake target-link, and component-document/configuration scans; negative proof for each prohibited edge; x64/x86 component verifier/check lanes and proportional background CTest excluding desktop. |
-| Expected Markers | Lib has no outward component path/target reference; Emulator has no X86/App reference; X86 has no App reference; App references only itself and inward tiers. Each shared test package obeys the matching rule and does not import another test package. |
-| Asset Needs | Refresh the two published EXEs because the compiled public X86 symbol identity changes; preserve `assets/binary/softpc.ini`, guest media and snapshots byte-for-byte. |
-| Reporting Requirements | Record every checked root and each outward-reference disposition, pre/post path and line accounting, focused negative proof, dual-width verification, and an independent actual-change review. Report no issue as fixed without a targeted regression. |
-| Stop Conditions | A finding needs a changed component topology, public API, runtime behavior, mirror modification, user asset, or a new cross-component capability; record it separately rather than hiding it in a naming/configuration cleanup. |
-| Exit Criteria | The finite root ledger is complete; confirmed outward references are removed or corrected; source/test/config/doc boundaries have automated proof; proportional x64/x86 verification passes; one complete P is pushed and reviewed, then await owner validation. |
-| Original Owner Request | 接下来缺口是内层组件依旧认识外层组件的问题：lib不得有任何代码 测试 配置 文档引用其他组件；emulator只可以认识自己和lib；x86只可以认识自己和emulator和lib；app-softpc同理。这个原则对src和test都有效。请审计和修复。 |
-| Similar-Issue Sweep | Mechanically enumerate every component-owned C/H/CMake/README/manifest path; classify canonical includes, target links, CMake source paths, test fixtures, and explicit component path/target references against the four-layer order. |
-
-S6 P2 restores the shared C spelling convention without behavioral change:
-`x86_debug` is again the lower-case opaque type/function prefix, while
-`X86_DEBUG_*`, `X86_XASM32_*` and `X86_PRODUCT_*` are macros, enum values and
-guards. It also corrects the two explicit test executable identities to
-`x86-product-entry-smoke` and `emulator-product-composition-smoke`. The full
-Lib/Emulator audit found no Lib spelling/target defect and no other Emulator
-defect. Source/test manifest, inward-boundary and documentation gates pass;
-focused X86/Emulator suites pass 36/36 on x64 and x86, and the App debugger
-receiver passes on both widths. A clean owned background validation built each
-width once and then ran the complete non-desktop suite from those artifacts:
-x64 131/131 passed and x86 131/131 passed. Both package EXEs are refreshed. This P2
-delivery awaits owner validation and does not close S6 or T86.
-
-S6 P3 changes the X86 command-smoke success line from `X86 x86 Product command
-policy: OK` to `X86 Product command policy: OK`; its test manifest is updated
-in the same delivery. The focused X86 Product command receiver passes on x64
-and x86. This corrective P awaits owner validation and does not close S6 or T86.
-
-S6 P4 removes stale `common`/`ibmpc` shared-root attributes in favor of the
-current Emulator roots, restores LF enforcement for all six shared roots, and
-adopts NXVM's test-lib formatting. All six roots are then byte-identical to
-NXVM's current worktree. The preserved SoftPC mirror retains its explicit
-CRLF exceptions. This corrective P awaits owner validation and does not close
-S6 or T86.
+| Identifier Mode | New |
+| Admission And Approval | Owner accepts T86 S6, directs that T86 close after current NXVM six-root alignment, then admits the queue head: investigate the intermittent Win3.1 File Manager host-Window width flash. |
+| Objective | Reproduce and attribute the roughly double-width-then-shrink host Window transition when Win3.1 opens File Manager. Establish one producing owner: original renderer, Compat conversion, App/VM frame publication, or a documented Lib frame-contract failure. |
+| Non-goals | Do not repair the defect in S1; do not identify File Manager, Win3.1, a fixed host width, or use a size debounce/delay/filter. Do not change guest timing, user INI, media, snapshots, preserved mirror behavior or shared components without evidence. |
+| Reference Baseline | SoftPC `0efc3715`; T86 is owner-accepted and closed by this admission. OpenNT and NTVDM64 are read-only source comparison evidence only. |
+| Candidate Proposal | [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md) |
+| Files And ABI Surface | Initially read-only: selected Core VGA renderer, Compat frame conversion, VM/App presentation publication, and Lib Window geometry consumers. A task-owned ignored trace may be introduced only if existing observation cannot identify the producing transition; it records dimensions, stride, sequence and display-enable state without changing guest timing. |
+| Applicable Rules | Task Reading Set; Execution, Architecture, Coding and Documentation Rules; preserved-mirror rule; one executor/producer rule; long operations run as owned background jobs; no Computer Use. |
+| Verification | Reproduce/observe the documented File Manager startup route on x64 and x86; correlate transition records with source state; compare the responsible original path with read-only OpenNT/NTVDM64 evidence; recheck the related DOS Prompt width route. |
+| Expected Markers | A finite transition ledger identifies whether each unusual published geometry is valid, incomplete or invalid, and names its sole producing owner. No consumer-side mode filter or guest-program special case exists. |
+| Asset Needs | Preserve user package INI, guest media and snapshots. Use package binaries and existing Win3.1 media only as read-only test inputs; no artifact refresh is expected from S1. |
+| Reporting Requirements | Record exact repro route, observed x64/x86 transitions, source ownership disposition, comparison evidence, whether the issue reproduces, and a narrow follow-up repair proposal only when attribution is proven. |
+| Stop Conditions | The evidence requires a mirror behavior change, a new external driver/media, a Lib/Emulator contract expansion, or a product fix before a sole producer is identified; stop and request a separate repair S instead of adding a workaround. |
+| Exit Criteria | Both widths have a recorded observation attempt; every sampled transition has a disposition; the responsible layer is proven or the non-reproduction limit is honestly recorded; any repair is separately scoped. |
+| Original Owner Request | “调查win31里打开file manager出现的屏闪问题（intermittent，但是应该有一半的机会出现）”。 |
+| Similar-Issue Sweep | Compare the existing Win3.1 DOS Prompt initial-window/fullscreen transition routes and every Frame-to-Window geometry publication site; classify them as the same producer fault, a different defect, or unaffected. |
 
 ## Historical M9 T85 S20 delivery record
 
@@ -584,6 +559,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T86 | S1--S6 complete; owner accepts final six-root convergence and approves task closure. | [Audit](../history/M9-T86-completion-audit.md) |
 | T85 | S1--S20 complete; owner approves task closure. | [Audit](../history/M9-T85-completion-audit.md) |
 | T84 | S1--S12 complete; owner approves task closure. | [Audit](../history/M9-T84-completion-audit.md) |
 | T83 | S1--S6 complete; owner approves task closure. | [Audit](../history/M9-T83-completion-audit.md) |
