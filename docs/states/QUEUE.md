@@ -3,10 +3,13 @@
 This is the ordered, unnumbered candidate queue. It neither activates work nor
 allocates a numeric task identifier.
 
-1. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+1. [MVDM mirror and Compat boundary convergence](../proposals/m9-mvdm-compat-boundary-convergence.md)
+2. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
 
-The XP candidate upgrades the routine selected-mirror comparison from OpenNT
-to XP SP1, with explicit IBM PC/AT adoption and PC-98/Japan/NTVDM exclusions.
+The queue head converges standalone host adaptation into Compat while preserving
+the original MVDM machine owners. The XP candidate upgrades the routine
+selected-mirror comparison from OpenNT to XP SP1, with explicit IBM PC/AT
+adoption and PC-98/Japan/NTVDM exclusions.
 
 Already admitted, not a queue candidate:
 [Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md).
