@@ -2,45 +2,45 @@
 
 ## Current Work
 
-M9 T88 remains open. S4 CHAIN2 dirty-contract repair is active.
+M9 T88 remains open. S5 Compat generation-readiness design is active.
 
-Technical baseline: S3 implementation `c7720bc9`, accepted by the owner as
-colour/resolution regression coverage, not all-green production qualification.
-S1, S2 and S3 are closed; planned Compat generation-readiness moves to S5.
-S4 repairs the exposed V7 63h/64h repaint defect; its retained assertions and
-the expanded wide-write matrix pass on both widths. Dual-width background
-qualification passes 131/131 per width; delivery awaits owner acceptance,
-and no S/T closure is inferred.
+Technical baseline: S4 implementation `7cda5375`, accepted by the owner's
+admission of the next S. S1--S4 are closed. Background 131/131 and subsequently
+native desktop 5/5 pass on each width, without changing the delivered EXEs.
+S5 is admitted for design first; no production change has begun.
 
-## M9 T88 S4 Packet
+## M9 T88 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the original-path, single-marker CHAIN2 repair; no parallel dirty fallback. |
-| Objective | Replace the 28 inline CGA-only dirty blocks with the original selected marker call convention; supply CHAIN2 EGA address/bank marking and preserve CGA/text behavior. |
-| Non-goals | No Lib/Emulator/x86 change, no new renderer, host compensation, build-time transform, guest/mode-number special case, INI/media/snapshot edits or desktop interaction. |
-| Reference Baseline | 65edbbbf2bddf8d1182e30536b27c0c6a828713d; read-only OpenNT source comparison. |
-| Candidate Proposal | [VGA repair](../proposals/m9-win31-file-manager-vga-width-transition.md#s4-chain2-dirty-contract-repair) |
-| Files And ABI Surface | Original sevid016--020.c, ev_glue.c and gfx_updt.c internal marker selection; existing App VGA smoke and original-source gate; no public ABI. |
-| Applicable Rules | Task Reading Set; original-source formatting/divergence accounting; single state owner; execution/background policy; owner-approved source-local repair. |
-| Verification | Dual-width regular Ninja builds; focused VGA receiver, shared suites first then all App/checks background tests. Desktop cases remain explicitly excluded. |
-| Expected Markers | All 28 blocks dispatch once through existing mark slots; CGA/text behavior retained; CHAIN2 EGA bitmap and bounds use plane-group plus bank units; incremental equals full repaint. |
+| Admission And Approval | Owner accepts the preceding delivery and admits S5, requesting its design before implementation. |
+| Objective | Keep a newly bound graphics surface unpublished until its original body repaint completes; preserve later pointer-only and palette-only updates on a ready surface. |
+| Non-goals | No Lib/Emulator/x86 change, second renderer/publication path, geometry filter, delay, guest/mode-number special case, snapshot format, INI/media edit or Computer Use. No production implementation in this design turn. |
+| Reference Baseline | 7cda53758c49ae7cba78b7fee39da6d394ea1598; read-only OpenNT comparison when needed. |
+| Candidate Proposal | [VGA repair](../proposals/m9-win31-file-manager-vga-width-transition.md#s5-compat-generation-readiness) |
+| Files And ABI Surface | Compat dib_surface.c/h and v7_pointer.c, existing App VGA smoke; internal damage-origin classification only, no shared/public ABI. No planned original-mirror edit. |
+| Applicable Rules | Task Reading Set; single producer/state owner; original-source minimum diff; background execution and reserved native-desktop rules; preservation of configuration/media. |
+| Verification | Prove bind/repaint readiness and pointer/palette isolation in the existing VGA receiver on both widths; snapshot reconstruction and 19-mode matrix; shared then App background suites; native desktop only in a reserved window. |
+| Expected Markers | Bind invalidates readiness; pointer/palette cannot establish it; successful completed body reconstruction admits a full first publication; later updates retain existing dirty merging. Transaction end alone is not proof of body reconstruction. |
 | Asset Needs | Refresh both assets/binary EXEs only; preserve user configuration/media/snapshots. |
-| Reporting Requirements | Per-file baseline and OpenNT diff counts, local divergence markers, finite entry ledger and tests, actual added/deleted/net production/test lines; pushed complete P, clean worktree, await owner acceptance. |
-| Stop Conditions | New renderer/state/parallel fallback required, unrelated shared change, or unresolved required regression. |
-| Exit Criteria | Required dual-width background evidence and accounting pass; implementation and artifacts committed/pushed; pending owner acceptance, not automatic T closure. |
-| Original Owner Request | 准入一个修改，修改好了以后进行编译测试提交推送后等我验收。 |
-| Similar-Issue Sweep | Enumerate original inline dirty blocks across all selected SEVID units, verify byte/word/range, forward/backward, zero counts, CGA bank folding, EGA write bank and mode transitions; preserve unaffected paths. |
+| Reporting Requirements | Explain the design first; estimate and later measure added/deleted/net code by file, original-mirror delta, dual-width evidence and EXEs; complete pushed implementation followed by owner acceptance. |
+| Stop Conditions | No reliable existing body-reconstruction completion, need for broad original update-loop edits, a second surface/cache/state machine, or a shared-component change. Report instead of guessing from rectangle size or timing. |
+| Exit Criteria | Design reviewed, actual receiver and full regression pass, implementation/artifacts committed/pushed and worktree clean; await owner acceptance before S/T closure. |
+| Original Owner Request | 好的，准入下一个S5，你先给出设计方案。 |
+| Similar-Issue Sweep | Inventory body painter invalidation, pointer paint/clear, palette invalidation, bind during an update, nested completion, no-op/failed conversion and snapshot rebuild; each source receives a disposition. |
 
 - [S1 diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
 - [S2 packed scanout correction](../history/M9-T88-S2-v7-packed-scanout.md).
 - [S3 coverage acceptance](../history/M9-T88-S3-colour-resolution-coverage.md).
+- [S4 accepted repair](../history/M9-T88-S4-chain2-dirty-contract.md).
 
 Both package EXEs are refreshed. The focused VGA receiver passes on both
 widths, including all 19 modes in both orders, odd/even wide writes and the
 unrelated plane-prefix guard. Shared suites pass 84/84 per width, followed by
-App/checks 47/47 per width. Five desktop cases per width remain excluded. A separately confirmed
+App/checks 47/47 per width. The subsequent owner-requested desktop run passes
+5/5 per width (12.19/11.64 s), bringing the registered selection to 136/136
+per width. A separately confirmed
 old nested compound-entry failure is dispositioned in [TODO](TODO.md), not
 declared repaired. User INI, guest media and snapshots are unchanged.
 

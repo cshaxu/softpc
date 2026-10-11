@@ -558,8 +558,11 @@ to conceal that additional build work.
 Published SHA256: x86
 9B3CF4244E8B27D40590A97D5414B000383D9F0808CC6B94FCB8E8FE14057BE2;
 x64 72E99EA137FA24868B9ADDB57C1A7A4561F57F2E9DA487240482BE66427FBC7F.
-Package sizes are 3503170 and 3101412 bytes respectively. S4 awaits owner
-validation; S5 is not admitted and T88 is not closed by this delivery.
+Package sizes are 3503170 and 3101412 bytes respectively. Subsequently the
+owner-requested native desktop tests pass 5/5 per width, without Computer Use
+or artifact changes. The owner accepts S4 by admitting S5 for design first;
+[acceptance record](../history/M9-T88-S4-chain2-dirty-contract.md).
+T88 remains open.
 
 ### S5: Compat generation readiness
 
@@ -582,6 +585,42 @@ damage, later pointer-only movement, replacement of an already complete
 generation, and failed/incomplete update. Run dual-width focused and full
 required regression, snapshot resume and Win3.1 DOS Prompt roundtrips; publish
 both EXEs, report actual added/deleted/net lines and await owner acceptance.
+
+#### S5 design brief
+
+Both original body painters and V7 pointer port updates use host_start/end_update;
+therefore update depth reaching zero cannot establish body reconstruction.
+The existing body-painter InvalidateConsoleDIBits macro is the natural owner-local
+classification boundary. Pointer paint/clear and palette invalidation continue
+to merge damage but cannot qualify a freshly bound generation.
+
+Keep one generation-owned readiness fact in the existing DIB owner, cleared
+on bind even for identical dimensions. Reuse transaction-local pending damage
+to record body participation; successful outer completion may establish
+readiness only after the original reconstruction is proved complete. Conversion
+failure must not establish readiness. Before that, consume no publishable dirty;
+after it, preserve pointer-only and palette-only publication and existing merge
+semantics. A first successful publication must expose the whole rebuilt surface.
+No extra bitmap, previous-frame cache, timer, queue, generation counter or
+consumer-side filter is proposed. No pending-mode flag or dirty bounding-box
+size is treated as a substitute for body reconstruction.
+
+Before implementing this qualification, audit every graphics bind/resize route
+against the original full-refresh trigger: a small successful body paint alone
+must not be mistaken for a reconstructed new surface. If an existing completion
+cannot supply that fact, stop and report the exact missing contract instead of
+adding an inferred readiness workaround. Snapshot restoration keeps its original
+host_mark_screen_refresh / host_flush_screen path and must pass the same rule;
+palette/invalidate_all alone cannot manufacture restoration success.
+
+Refined estimate: three Compat production files (dib_surface.c/h, v7_pointer.c),
+approximately +25--40/-8--15 lines, net +10--32; existing VGA test +60--120 lines.
+This is slightly wider than the initial estimate because body, pointer and
+palette currently share the same damage API. Original-mirror diff is expected
+to remain +0/-0. This is a design estimate, not measured implementation.
+The finite receiver set is bind plus pointer-only, bind plus palette-only,
+completed body plus pointer, later pointer-only, same-size rebind, nested update,
+no-op/failed conversion and snapshot reconstruction, plus all retained modes.
 
 ## Repair constraints and acceptance
 
