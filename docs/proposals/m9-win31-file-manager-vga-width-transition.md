@@ -782,7 +782,10 @@ Published packages:
   `93C2EE38FC8975CC7003F6E2F419A531F17F44084B39D66947C64800209C384A`.
 
 Compared with S4, the EXEs grow by 1128/1130 bytes respectively. Published
-files are the existing two package EXEs only. S5 awaits owner acceptance.
+files are the existing two package EXEs only. The owner subsequently reports
+S5 acceptance and requests including the existing snapshot unchanged in P2.
+[S5 acceptance and asset record](../history/M9-T88-S5-compat-generation-readiness.md).
+T88 remains open; no next S is admitted.
 
 ## Repair constraints and acceptance
 
