@@ -2,13 +2,13 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T88.
+M9 T88 remains open. S6 investigation is complete and awaits owner review of
+the confirmed root cause and original-source repair boundary.
 
 S1--S5 are owner-accepted and closed. The accepted implementation baseline is
 `1957dc6d`; the owner reports S5 acceptance and explicitly requests committing
-the previously untracked snapshot unchanged. T88 remains open; no next S or
-queue candidate is admitted.
+the previously untracked snapshot unchanged. The owner now admits S6
+investigation; no queue candidate or production repair is admitted.
 
 S5 changes only three Compat production files (+46/-9, net +37) and two
 existing tests (+131/-13, net +118), with the two rebuilt package EXEs.
@@ -24,6 +24,39 @@ changes no source, test, EXE, INI or snapshot bytes and requires no rebuild.
 - [S4 accepted repair](../history/M9-T88-S4-chain2-dirty-contract.md).
 - [S5 acceptance](../history/M9-T88-S5-compat-generation-readiness.md).
 - [Retained proposal and receiver ledger](../proposals/m9-win31-file-manager-vga-width-transition.md).
+
+## M9 T88 S6 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests investigating the deferred CHAIN2 crash without leaving an unexplained tail. |
+| Objective | Establish the exact failing nested rule, original contract, caller reachability and minimum correct repair boundary. |
+| Non-goals | No production rewrite, additional writer path, shared-component edit, media/INI/EXE modification or Computer Use. |
+| Reference Baseline | e959a21c; original OpenNT is read-only comparison evidence. |
+| Candidate Proposal | [S6 investigation](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-nested-chain2-rule-investigation) |
+| Files And ABI Surface | Existing generated CHAIN2 sources, caller/SAS contracts and an ignored diagnostic test; no production ABI change. |
+| Applicable Rules | Task Reading Set; original-source minimum diff; one machine/writer owner; background owned probes. |
+| Verification | Reproduce through the real writer table, capture nested locals, compare original source, and distinguish direct entry from CPU production callers. |
+| Expected Markers | Pinpoint the first invalid local restoration and account for every caller of the implicated entry; no inference from SIGSEGV alone. |
+| Asset Needs | Preserve accepted EXEs, INI, disks and snapshots. |
+| Reporting Requirements | Explain root cause, proof, reachability and smallest proposed source/test diff; do not claim a production repair from diagnostic evidence. |
+| Stop Conditions | New device algorithm, second writer path or broad generated ABI rewrite would be required; report before implementing. |
+| Exit Criteria | A source-and-runtime causal explanation and explicit disposition of the TODO; any production repair requires separate approval. |
+| Original Owner Request | 你调查下怎么回事，别留个尾巴 |
+| Similar-Issue Sweep | Same-file continuation wrappers and ENTER/LEAVE local restoration in all generated CHAIN2 rules; distinguish independent procedure calls from continuations. |
+
+Owned diagnostics stay in ignored build/t88/s6: compiler budget 1800 seconds,
+probe budget 120 seconds, captured stack/local checkpoint at most 1 MiB;
+executor owns child teardown. No native Window is created.
+
+Unmodified source reproduces the same null local restoration on both widths.
+Changing one same-function continuation call to a goto in disposable diagnostic
+source removes the crash on both widths. Production, source tests and accepted
+EXEs are unchanged. Source/caller inventory and minimal diff estimates are in
+the [causal result](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-causal-result-and-bounded-repair-proposal).
+The confirmed defect is now owned by S6, not deferred in TODO. No production
+repair or T88 closure is inferred from this investigation.
 
 ## Historical M9 T85 S20 delivery record
 

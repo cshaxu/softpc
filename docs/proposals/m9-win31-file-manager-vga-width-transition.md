@@ -787,6 +787,69 @@ S5 acceptance and requests including the existing snapshot unchanged in P2.
 [S5 acceptance and asset record](../history/M9-T88-S5-compat-generation-readiness.md).
 T88 remains open; no next S is admitted.
 
+## S6 nested CHAIN2 rule investigation
+
+The owner admits investigation of the deferred compound-entry crash. Scope is
+the exact dword-to-word nested failure, original ENTER/LEAVE and continuation
+contract, all analogous CHAIN2 continuations and actual CPU/SAS call sites.
+Production/source tests remain unchanged during diagnosis; ignored probes reuse
+existing link inputs and an isolated disposable test image. Completion needs
+runtime locals/stack evidence, comparison with original OpenNT, caller
+reachability and a minimal repair proposal, not a speculative writer rewrite.
+
+### S6 causal result and bounded repair proposal
+
+Both widths reproduce the direct mode-0 odd-address dword write crash with
+unmodified production source and debug symbols for sevid017. The first failing
+read is sevid017.c:1323 in S_2637_Chain2ModeXDwordWrite_00000000, immediately
+after S_2631_Chain2ModeXWordWrite_00000000 returns. LocalIUH is null; the dword
+activation's CopyLocalIUH still contains its non-null saved outer carrier.
+
+The odd-word branch calls L21_19if_d as a C function. Its wrapper re-enters
+crules at the continuation ID, initializing the automatic CopyLocalIUH to
+null without ENTER_SECTION. The continuation frees the word carrier and
+assigns that null to the shared static LocalIUH. It returns to the dword
+activation, which dereferences null. OpenNT sevid017 contains the same wrapper,
+call and ENTER/LEAVE mechanism; SAVED means static in both trees. This is a
+generated continuation-frame defect, not an x64 pointer-width error, dirty
+marker regression or allocation failure.
+
+A disposable diagnostic changes only this tail transfer to
+`goto L21_19if_d;`, preserving the word activation's saved parent carrier.
+The original variant crashes at the same source read on x86 and x64; the
+one-transfer variant reaches the end and exits 0 on both widths. This proves
+the causal repair boundary, not all dword data semantics. No diagnostic source
+is a product build input, and no production source or published EXE is changed.
+An initial GDB script reports an error after the positive process exits because
+there is no stack; the qualified positive rerun invokes the EXE directly and
+requires its actual exit 0. The qualified matrix supervisor exits 0.
+
+Current production reachability is separately accounted for: phy_w32 performs
+two phy_w16 calls; CCPU SAS fills/moves loop over scalar byte/word operations.
+The selected C_VID Glue_writes table registers only byte/word write, fill and
+move handlers. No current App production caller of write_dword_ev_glue is
+found. Odd word scalar output may reset the static carrier on return but has
+no nested generated caller consuming it in that CPU path. The directly
+invoked dword table entry is a real low-level defect, not a demonstrated normal
+guest crash. This does not certify every indirect legacy entry as unreachable.
+
+The mechanical sweep finds 440 same-function tail-continuation calls across
+31 generated files. Forty-eight are in CHAIN2 procedures: ten read continuations
+in sevid000/001 and 38 write continuations in sevid016--020 (2/7/7/16/6).
+These are candidates of the same defect form, not 440 proven crashing cases.
+Independent S_* procedure calls must remain calls; only L_* continuations
+within the current procedure are candidates for a local branch. A broader
+source rewrite is not admitted by this investigation.
+
+Smallest confirmed repair is one existing three-line tail-call block replaced
+by one local goto (+1/-3, net -2 before a provenance comment). A consistent
+CHAIN2 write cleanup would touch five files and 38 blocks, nominally +38/-114
+(net -76 before comments), requiring actual nested write/fill/move and pixel
+oracles before acceptance. It creates no helper, stack object or second writer.
+Because it increases pristine-mirror touched lines, production implementation
+requires owner approval. The active S6 owns this confirmed item; it is removed
+from the deferred TODO rather than left as an unexplained hypothesis.
+
 ## Repair constraints and acceptance
 
 If the source renderer computes an invalid visible geometry, prefer the

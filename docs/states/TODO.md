@@ -1,15 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(High): Audit original nested CHAIN2 ModeX compound-rule local carriers.
-  T88 S4's exploratory direct writer-table test crashes on mode-0 odd-address
-  dword write, both with the original inline dirty code restored and with the
-  marker repair applied. The nested generated crules stack reaches a null
-  local-carrier read. This is not proved to trigger through ordinary guest
-  execution; CCPU SAS string operations use byte/word calls. Admission condition:
-  a separate original-path investigation proving caller reachability and saved
-  local-carrier lifetime before any memory-write algorithm or generated ABI
-  change; no second writer path or broad generated-code rewrite.
-
 - TODO(Medium): Investigate intermittent captured mouse escape under RDP.
   Owner reports escape shortly after capture or after variable movement;
   re-entry sometimes controls the guest without clicking and sometimes does not.
