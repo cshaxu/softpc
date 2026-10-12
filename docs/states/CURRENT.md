@@ -2,17 +2,22 @@
 
 ## Current Work
 
-T89 S3 is owner-accepted and closed. T89 S4 is admitted and active:
-final retained-port audit and task-level qualification. T89 remains open.
+No implementation subtask is active. Open task awaiting owner: T89.
+S3 is owner-accepted and closed. S4 audit/comment repair and background
+qualification are delivered for review; native desktop qualification remains
+unscheduled. S4 and T89 are not closed.
 
-S3 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
+S4 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
 background tests (131/131 per width), including eight background App integration
-cases, plus eight focused cases. Five native desktop tests per width were not
+cases. S3 also passed eight focused cases. Five native desktop tests per width were not
 run. Owner INI, disks and snapshots remain unchanged. The last accepted runnable
 baseline is `1c698a9c`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
 and [S3 delivery/accounting](../history/M9-T89-S3-host-header-policy.md).
+The [S4 audit](../history/M9-T89-S4-retained-port-audit.md) accounts for all
+36 original directives and whole-T counts: production +48/-78 (net -30),
+build/tests +88/-7 (net +81), original-mirror diff reduced by 58 lines.
 
-## M9 T89 S4 Packet
+## T89 S4 retained delivery brief
 
 | Field | Required record |
 | --- | --- |

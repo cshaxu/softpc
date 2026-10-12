@@ -743,11 +743,9 @@ void reset()
 		hfx_driver_termination();	/* ..then each driver */
 		hfx_driver_initialisation();
 #endif
-		/* mouse_io.c installs the historical DOS INT 33/BOP driver.  It is
-		 * not the recovered Bus Mouse controller (which is initialised below
-		 * by mouse_init()), and advertising it after a warm reset makes guest
-		 * setup software select a host-era mouse profile.  A standalone VM
-		 * keeps only physical-device semantics. */
+		/* These calls manage DOS mouse-driver instance storage, not INT 33
+		 * installation.  Standalone omits that software driver; physical
+		 * mouse hardware is initialised separately by mouse_init() below. */
 #ifndef SOFTPC_STANDALONE
 		mouse_driver_termination();	/* ..then each driver */
 		mouse_driver_initialisation();
