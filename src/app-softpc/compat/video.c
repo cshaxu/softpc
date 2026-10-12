@@ -88,14 +88,14 @@ int softpc_platform_presentation_fonts(lib_u8 *primary, lib_u8 *secondary,
     height = get_char_height();
     font = (unsigned long)get_prim_font_index() & 7u;
     secondary_font = (unsigned long)get_sec_font_index() & 7u;
-    lib_memory_set(primary, 0, 256u * 16u);
-    lib_memory_set(secondary, 0, 256u * 16u);
+    lib_memory_set(primary, 0, 256u * FONT_MAX_HEIGHT);
+    lib_memory_set(secondary, 0, 256u * FONT_MAX_HEIGHT);
     *height_out = height;
     *attribute_select_out = get_attrib_font_select() ? 1u : 0u;
     /* Preserve unsupported metadata for the receiving frame validator. No
        glyph may be copied beyond the fixed destination bank. Zero means the
        existing default height, not an unsupported font. */
-    if (height > 16u) return 1;
+    if (height > FONT_MAX_HEIGHT) return 1;
     if (height == 0u) height = 16u;
     for (character = 0u; character < 256u; ++character)
     {
@@ -107,8 +107,8 @@ int softpc_platform_presentation_fonts(lib_u8 *primary, lib_u8 *secondary,
                                  ((unsigned long)FONT_MAX_HEIGHT * character << 2);
         for (row = 0u; row < height; ++row)
         {
-            primary[character * 16u + row] = source[row << 2];
-            secondary[character * 16u + row] = secondary_source[row << 2];
+            primary[character * FONT_MAX_HEIGHT + row] = source[row << 2];
+            secondary[character * FONT_MAX_HEIGHT + row] = secondary_source[row << 2];
         }
     }
     return 1;

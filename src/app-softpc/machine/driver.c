@@ -9,6 +9,9 @@
 
 #include <windows.h>
 
+_Static_assert(KVM_WINDOW_FONT_GLYPHS == 256u && KVM_WINDOW_FONT_HEIGHT == 32u,
+    "Window glyph slots must match the machine presentation contract");
+
 /* Traditional PC glyph approximation belongs to this machine adapter, not Lib. */
 static const lib_u16 vm_driver_pc_glyphs[256] = {
     0x0020u, 0x263au, 0x263bu, 0x2665u, 0x2666u, 0x2663u, 0x2660u, 0x2022u,
@@ -120,7 +123,7 @@ void vm_driver_cursor_shape(kvm_text_frame *frame, lib_u32 percent)
 {
     lib_u32 height = frame->font_height;
     lib_u32 lines;
-    if (height == 0u) height = KVM_WINDOW_FONT_HEIGHT;
+    if (height == 0u) height = KVM_TEXT_FONT_DEFAULT_HEIGHT;
     if (percent == 0u || percent > 100u) percent = 100u;
     lines = (height * percent + 99u) / 100u;
     frame->cursor_top = (lib_u8)(height - lines);

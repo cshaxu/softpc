@@ -768,9 +768,17 @@ static void verify_driver_geometry(softpc_machine *machine)
                 c_sas_store(0x485u, 32u);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
                 assert(frame->window.text.base.font_height == saved_height);
-                set_char_height(17u);
+                {
+                    const unsigned heights[] = {17u, 24u, 32u};
+                    for (unsigned h = 0; h < sizeof(heights)/sizeof(heights[0]); ++h) {
+                        set_char_height(heights[h]);
+                        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                        assert(frame->window.text.base.font_height == heights[h]);
+                    }
+                }
+                set_char_height(33u);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
-                assert(frame->window.text.base.font_height == 17u);
+                assert(frame->window.text.base.font_height == 33u);
                 set_char_height(0u);
                 assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
                 assert(frame->window.text.base.font_height == 0u);
@@ -1454,8 +1462,8 @@ int main(void)
     /* The standalone front end gets its glyphs from the original loaded
        EGA/VGA font plane, never a host-installed TrueType font. */
     {
-        unsigned char font[256u * 16u];
-        unsigned char secondary_font[256u * 16u];
+        unsigned char font[256u * FONT_MAX_HEIGHT];
+        unsigned char secondary_font[256u * FONT_MAX_HEIGHT];
         lib_u32 font_height = 0;
         lib_u32 attribute_font_select = 0;
         unsigned int row;
@@ -1464,8 +1472,47 @@ int main(void)
             secondary_font, &font_height, &attribute_font_select));
         assert(font_height == 16u);
         for (row = 0u; row < font_height; ++row)
-            populated |= font[(unsigned int)'A' * 16u + row];
+            populated |= font[(unsigned int)'A' * FONT_MAX_HEIGHT + row];
         assert(populated != 0u);
+        /* Exercise the actual producer, including bank offsets and padding.
+           Restore every touched guest byte/register before subsequent cases. */
+        {
+            const unsigned heights[] = {0u, 8u, 14u, 16u, 24u, 32u, 33u};
+            unsigned saved_primary = get_prim_font_index();
+            unsigned saved_secondary = get_sec_font_index();
+            unsigned char saved[2][FONT_MAX_HEIGHT];
+            unsigned char *planes[2] = {
+                EGA_planes + FONT_BASE_ADDR + (255u * FONT_MAX_HEIGHT << 2),
+                EGA_planes + FONT_BASE_ADDR + (0x4000u << 2) + (255u * FONT_MAX_HEIGHT << 2)
+            };
+            _Static_assert(FONT_MAX_HEIGHT == KVM_WINDOW_FONT_HEIGHT,
+                "Original and copied glyph slots must agree");
+            set_prim_font_index(0u);
+            set_sec_font_index(1u);
+            for (unsigned bank = 0; bank < 2u; ++bank)
+                for (row = 0; row < FONT_MAX_HEIGHT; ++row) {
+                    saved[bank][row] = planes[bank][row << 2];
+                    planes[bank][row << 2] = (unsigned char)(1u + row + bank * 32u);
+                }
+            for (unsigned h = 0; h < sizeof(heights)/sizeof(heights[0]); ++h) {
+                unsigned active = heights[h] ? heights[h] : 16u;
+                set_char_height(heights[h]);
+                assert(softpc_machine_presentation_fonts(machine, font,
+                    secondary_font, &font_height, &attribute_font_select));
+                assert(font_height == heights[h]);
+                for (row = 0; row < FONT_MAX_HEIGHT; ++row) {
+                    unsigned visible = active <= FONT_MAX_HEIGHT && row < active;
+                    assert(font[255u * FONT_MAX_HEIGHT + row] == (visible ? 1u + row : 0u));
+                    assert(secondary_font[255u * FONT_MAX_HEIGHT + row] == (visible ? 33u + row : 0u));
+                }
+            }
+            for (unsigned bank = 0; bank < 2u; ++bank)
+                for (row = 0; row < FONT_MAX_HEIGHT; ++row)
+                    planes[bank][row << 2] = saved[bank][row];
+            set_char_height(16u);
+            set_prim_font_index(saved_primary);
+            set_sec_font_index(saved_secondary);
+        }
     }
 
     /* The C-VID mode-transition path can emit an empty text repaint.  The

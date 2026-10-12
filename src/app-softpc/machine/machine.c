@@ -490,7 +490,7 @@ int softpc_machine_presentation_cursor(const softpc_machine *machine,
 }
 
 int softpc_machine_presentation_fonts(const softpc_machine *machine,
-    lib_u8 primary[256u * 16u], lib_u8 secondary[256u * 16u],
+    lib_u8 primary[256u * 32u], lib_u8 secondary[256u * 32u],
     lib_u32 *height_out, lib_u32 *attribute_select_out)
 {
     unsigned long height;
