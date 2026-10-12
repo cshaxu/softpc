@@ -3,9 +3,11 @@
 ## Target Ownership
 
 ```text
-app/main                    entry/config validation -> app/composition
-app/composition             assembly: existing Emulator + vm public interface
-app/config, command, keyboard  configuration and CLI/hotkey policy -> Emulator/Lib
+app-softpc/product/main             entry/config validation -> x86/product
+app-softpc/product/composed_machine private machine/driver composition
+app-softpc/product/config, extensions  INI and snapshot/media commands
+x86/product                        debugger and X86 CLI/hotkey policy
+emulator/product                   neutral monitor, assembly and session lifetime
 
 emulator/session -> emulator/ui       control and monitor/KVM composition
 emulator/session -> emulator/machine  sole generic executor and copied facts
@@ -40,9 +42,10 @@ of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app-softpc/product/` owns SoftPC configuration parsing, private machine
 composition, resources and its snapshot/media command extension. Shared
-`x86/product` owns CLI/debug semantics, hotkey policy, Emulator entity
-assembly, session execution and teardown. App passes it an already composed
-private machine/driver lifetime and the two UI choices only; shared X86
+`x86/product` owns X86 CLI/debug semantics and hotkey policy; it delegates
+neutral monitor, entity assembly, session execution and teardown to
+`emulator/product`. App passes an already composed
+private machine/driver lifetime and the two UI choices; shared X86
 does not parse configuration or see media, memory or model fields.
 At exit it synchronously shuts down the machine worker with callback targets
 still alive, then destroys UI, session, command/debug, machine and VM in order.
@@ -126,7 +129,7 @@ The control thread serializes lifecycle, media and synchronous debug requests.
 Debug requests are copied into the machine's existing command rendezvous and
 executed by the parked executor, never by the calling frontend. The machine
 checks paused state and the lease again there; callbacks must not synchronously
-reenter this control-thread API. `app/command` owns debugger selection
+reenter this control-thread API. `x86/product/command` owns debugger selection
 and copied prompts; machine state changes do not select or exit the CLI.
 Machine copies opaque, pointer-free debug requests/results through one fixed slot
 (128-byte request, 1536-byte response), with explicit sizes and no per-request
@@ -138,7 +141,7 @@ does not change caller output bytes; a failed wait requires shutdown before
 reusing the slot. Plan cancellation remains distinct from request completion.
 
 Debug owns growable command output; its public result borrows that text until
-the next producing call/open/destroy. The App binding forwards it as Session's
+the next producing call/open/destroy. The X86 command binding forwards it as Session's
 borrowed additional text, valid until the next provider invocation. Session
 consumes it synchronously through its existing output/reader transaction with
 chunked LF normalization. No second output owner or input loop is introduced.
@@ -226,12 +229,14 @@ control/input ABI requires them, never its leaf-support worker/mailbox or
 input support interfaces. Cross-component support contracts use the same
 `_interface.h` naming rule but have an explicitly narrower consumer set.
 
-`audio` owns bounded copied PCM submission and native-output lifecycle. Its
-Windows delivery worker owns one shared WASAPI endpoint and waits only on its
-endpoint event or cancellation; it has no producer worker, synthesis, emulator
-clock or guest-device protocol. A consumer supplies PCM blocks and retains all
-timing policy. A native-output failure is observable to that consumer; no
-platform silently discards samples as successful playback.
+`audio` owns a bounded copied-PCM FIFO and one stream worker that drains it
+through the native output adapter. The Windows adapter owns one shared WASAPI
+endpoint and waits on its event or cancellation; it adds no second worker.
+Lib owns neither synthesis, emulator clock nor guest-device protocol. Compat's
+speaker worker supplies synthesized PCM and owns tone timing; an output failure
+ends that worker with one diagnostic, while shutdown cancellation stays silent.
+There is no automatic retry or restart. A native-output failure is observable
+to the consumer; no platform silently discards samples as successful playback.
 
 All cross-component contracts are declared at the owning component root.
 Each component's `win32/` and `linux/` files are exclusively its own platform

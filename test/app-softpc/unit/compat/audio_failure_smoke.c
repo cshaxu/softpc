@@ -4,6 +4,30 @@
 
 #include "lib/base/sync_interface.h"
 #include "lib/audio/stream_interface.h"
+#include "lib/types/file.h"
+
+static unsigned reports;
+static lib_status reported;
+static lib_bool cancelled;
+static int fault; /* 1: flush, 2: wait, 3: reset, 4: cancelled writable wait */
+
+static int fake_report(lib_c_file *file, const char *format, ...)
+{
+    lib_c_va_list arguments;
+    assert(file == lib_c_stderr);
+    assert(lib_text_compare(format, "SoftPC audio output failed: %d\n") == 0);
+    lib_c_va_start(arguments, format);
+    reported = (lib_status)va_arg(arguments, int);
+    lib_c_va_end(arguments);
+    ++reports;
+    return 0;
+}
+
+static lib_bool fake_task_cancelled(const base_sync_task *task)
+{ (void)task; return cancelled; }
+
+static lib_status fake_request_cancel(base_sync_task *task)
+{ assert(task != NULL); cancelled = LIB_TRUE; return LIB_STATUS_OK; }
 
 static unsigned clears;
 static unsigned flushes;
@@ -125,7 +149,7 @@ static lib_status fake_flush(lib_audio_stream *stream)
 {
     assert(stream == (lib_audio_stream *)1);
     ++flushes;
-    return LIB_STATUS_OK;
+    return fault == 1 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
 static lib_status fake_clear(lib_audio_stream *stream)
@@ -139,6 +163,7 @@ static lib_status fake_wait_writable(lib_audio_stream *stream)
 {
     assert(stream == (lib_audio_stream *)1);
     ++writable_waits;
+    if (fault == 4) return LIB_STATUS_INVALID_STATE;
     if (scenario == 4 && writable_waits == 1u) {
         test_request_stop();
         return LIB_STATUS_OK;
@@ -160,6 +185,7 @@ static base_sync_wait_result fake_wait(base_sync_event *const *events,
     (void)task;
     assert(count == 2u);
     ++waits;
+    if (fault == 2) return BASE_SYNC_WAIT_FAULT;
     if (waits == 1u) {
         assert(timeout == LIB_UINT32_MAX);
         *index = 1u;
@@ -172,7 +198,7 @@ static base_sync_wait_result fake_wait(base_sync_event *const *events,
 static lib_status fake_reset(base_sync_event *event)
 {
     assert(event == (base_sync_event *)2);
-    return LIB_STATUS_OK;
+    return fault == 3 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
 static lib_status fake_signal(base_sync_event *event)
@@ -201,7 +227,14 @@ static lib_status fake_signal(base_sync_event *event)
 #define base_sync_event_reset fake_reset
 #define base_sync_event_signal fake_signal
 #define base_sync_event_destroy fake_event_destroy
+#define base_sync_task_cancelled fake_task_cancelled
+#define base_sync_task_request_cancel fake_request_cancel
+#undef lib_c_fprintf
+#define lib_c_fprintf fake_report
 #include "compat/audio.c"
+#undef lib_c_fprintf
+#undef base_sync_task_request_cancel
+#undef base_sync_task_cancelled
 #undef base_sync_event_destroy
 #undef base_sync_event_signal
 #undef base_sync_event_reset
@@ -226,6 +259,7 @@ static void test_request_stop(void)
 
 int main(void)
 {
+    unsigned finite;
     initialization_step = stream_create_step = task_create_step = 0u;
     event_create_count = 0u;
     scenario = 0;
@@ -251,7 +285,8 @@ int main(void)
     clears = flushes = enqueues = waits = writable_waits = 0u;
     last_frame_count = 0u;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 5u && clears == 0u && flushes == 0u && waits == 2u);
+    assert(enqueues == 5u && clears == 0u && flushes == 0u && waits == 1u);
+    assert(reports == 1u && reported == LIB_STATUS_IO_ERROR);
 
     scenario = 1;
     clears = flushes = enqueues = waits = writable_waits = 0u;
@@ -260,7 +295,8 @@ int main(void)
     softpc_speaker_request.duration = INFINITE;
     ++softpc_speaker_request.generation;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 1u && clears == 0u && flushes == 0u && waits == 2u);
+    assert(enqueues == 1u && clears == 0u && flushes == 0u && waits == 1u);
+    assert(reports == 2u && reported == LIB_STATUS_IO_ERROR);
 
     scenario = 2;
     clears = flushes = enqueues = waits = writable_waits = 0u;
@@ -269,8 +305,9 @@ int main(void)
     softpc_speaker_request.duration = INFINITE;
     ++softpc_speaker_request.generation;
     softpc_speaker_worker(NULL, NULL);
-    assert(enqueues == 2u && clears == 0u && flushes == 0u && waits == 2u &&
+    assert(enqueues == 2u && clears == 0u && flushes == 0u && waits == 1u &&
         first_sample[0] == 12000 && first_sample[1] == -12000);
+    assert(reports == 3u && reported == LIB_STATUS_IO_ERROR);
 
     scenario = 0;
     clears = flushes = enqueues = waits = writable_waits = 0u;
@@ -318,6 +355,40 @@ int main(void)
     softpc_speaker_worker(NULL, NULL);
     assert(enqueues == 5u && clears == 0u && flushes == 1u &&
         writable_waits == 1u && waits == 2u);
+
+    assert(reports == 3u); /* Successful tones and normal cancellation are quiet. */
+    for (fault = 1; fault <= 4; ++fault) {
+        for (finite = 0u; finite < 2u; ++finite) {
+            clears = flushes = enqueues = waits = writable_waits = reports = 0u;
+            scenario = 0;
+            cancelled = fault == 4;
+            softpc_speaker_request = (softpc_speaker_tone){440u,
+                finite ? 1000u : INFINITE, 1u};
+            if (fault == 1) {
+                /* Both a finite tail and continuous gate-off must check flush. */
+                if (finite) softpc_speaker_request.duration = 1u;
+                else scenario = 3;
+            }
+            softpc_speaker_onset_pending = LIB_FALSE;
+            softpc_speaker_worker(NULL, NULL);
+            assert(reports == (fault == 4 ? 0u : 1u));
+            if (reports) assert(reported == LIB_STATUS_IO_ERROR);
+            assert(waits == 1u && softpc_speaker_request.frequency == 0u);
+        }
+    }
+    /* A silent gate-off has the same checked flush path. */
+    fault = 1;
+    reports = waits = 0u;
+    softpc_speaker_worker(NULL, NULL);
+    assert(reports == 1u && waits == 1u);
+    /* INVALID_STATE without cancellation is a real failure, not a shutdown. */
+    fault = 4;
+    cancelled = LIB_FALSE;
+    reports = waits = enqueues = 0u;
+    softpc_speaker_request = (softpc_speaker_tone){440u, INFINITE, 1u};
+    softpc_speaker_worker(NULL, NULL);
+    assert(reports == 1u && reported == LIB_STATUS_INVALID_STATE);
+    fault = 0;
 
     softpc_speaker_task = (base_sync_task *)&task_storage;
     softpc_speaker_stop = (base_sync_event *)1;

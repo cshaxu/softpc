@@ -43,6 +43,14 @@ int main(void)
     assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_READONLY);
     assert(config.presentation == EMULATOR_SESSION_DISPLAY_CONSOLE);
     assert(config.console_control == 1);
+    input = "floppy_mode=overlay\nhard_disk_mode=direct\n";
+    assert(app_load_startup_config("unused", &config));
+    assert(config.floppy_mode == LIB_STORAGE_MEDIUM_OVERLAY);
+    assert(config.hard_disk_mode == LIB_STORAGE_MEDIUM_DIRECT);
+    input = "floppy_mode=READONLY\n";
+    assert(!app_load_startup_config("unused", &config));
+    input = "hard_disk_mode=invalid\n";
+    assert(!app_load_startup_config("unused", &config));
     input = "media_mode=overlay\n";
     assert(!app_load_startup_config("unused", &config));
     input = "memory_mb=0";

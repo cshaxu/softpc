@@ -5,6 +5,7 @@
 #include "lib/base/clock_interface.h"
 #include "lib/base/sync_interface.h"
 #include "lib/audio/stream_interface.h"
+#include "lib/types/file.h"
 #include <stdio.h>
 
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
@@ -181,9 +182,10 @@ static lib_status softpc_speaker_submit_finite(lib_audio_stream *stream,
         if (status != LIB_STATUS_OK && status != LIB_STATUS_LIMIT_EXCEEDED)
             return status;
         frames_remaining -= accepted;
-        if (status == LIB_STATUS_LIMIT_EXCEEDED &&
-            lib_audio_stream_wait_writable(stream) != LIB_STATUS_OK)
-            return LIB_STATUS_IO_ERROR;
+        if (status == LIB_STATUS_LIMIT_EXCEEDED) {
+            status = lib_audio_stream_wait_writable(stream);
+            if (status != LIB_STATUS_OK) return status;
+        }
     }
     return lib_audio_stream_flush(stream);
 }
@@ -207,6 +209,7 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
     lib_u32 event_index;
     lib_u32 phase;
     lib_audio_stream *stream;
+    lib_status status = LIB_STATUS_OK;
     UNUSED(unused);
     waits[0] = softpc_speaker_stop;
     waits[1] = softpc_speaker_wake;
@@ -214,56 +217,60 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
     stream = softpc_speaker_stream;
     for (;;)
     {
-        if (base_sync_wait_any(waits, 2u, task, UINT32_MAX, &event_index) !=
-            BASE_SYNC_WAIT_SIGNALED || event_index == 0u) break;
-        if (base_sync_event_reset(softpc_speaker_wake) != LIB_STATUS_OK) break;
+        base_sync_wait_result waited = base_sync_wait_any(waits, 2u, task,
+            UINT32_MAX, &event_index);
+        if (waited == BASE_SYNC_WAIT_CANCELLED) return;
+        if (waited != BASE_SYNC_WAIT_SIGNALED) {
+            status = LIB_STATUS_IO_ERROR;
+            goto failed;
+        }
+        if (event_index == 0u) return;
+        status = base_sync_event_reset(softpc_speaker_wake);
+        if (status != LIB_STATUS_OK) goto failed;
         for (;;) {
             softpc_speaker_tone request;
             softpc_speaker_tone current;
             lib_bool onset_pending;
-            lib_status status;
             lib_u32 accepted;
 
             onset_pending = softpc_speaker_take_request(&request);
             if (request.frequency == 0u) {
                 /* A normal gate-off ends synthesis, but never retracts PCM
                    already accepted by the single Audio delivery stream. */
-                (void)lib_audio_stream_flush(stream);
+                status = lib_audio_stream_flush(stream);
+                if (status != LIB_STATUS_OK) goto failed;
                 break;
             }
             if (request.frequency != 0u && request.duration != INFINITE) {
                 status = softpc_speaker_submit_finite(stream, &request,
                     onset_pending == LIB_FALSE, &phase);
-                if (status != LIB_STATUS_OK) {
-                    softpc_speaker_stop_request();
-                    break;
-                }
+                if (status != LIB_STATUS_OK) goto failed;
                 softpc_speaker_complete_finite(&request);
                 break;
             }
             status = softpc_speaker_submit(stream, request.frequency,
                 SOFTPC_SPEAKER_BLOCK_FRAMES, &phase, &accepted);
             if (status != LIB_STATUS_OK && status != LIB_STATUS_LIMIT_EXCEEDED)
-            {
-                softpc_speaker_stop_request();
-                break;
-            }
-            if (status == LIB_STATUS_LIMIT_EXCEEDED &&
-                lib_audio_stream_wait_writable(stream) !=
-                LIB_STATUS_OK) {
-                softpc_speaker_stop_request();
-                break;
+                goto failed;
+            if (status == LIB_STATUS_LIMIT_EXCEEDED) {
+                status = lib_audio_stream_wait_writable(stream);
+                if (status != LIB_STATUS_OK) goto failed;
             }
             softpc_speaker_read_request(&current);
             if (current.generation != request.generation) {
                 if (current.frequency == 0u) {
-                    (void)lib_audio_stream_flush(stream);
+                    status = lib_audio_stream_flush(stream);
+                    if (status != LIB_STATUS_OK) goto failed;
                     break;
                 }
                 phase = 0u;
             }
         }
     }
+failed:
+    softpc_speaker_stop_request();
+    if (status != LIB_STATUS_INVALID_STATE || !base_sync_task_cancelled(task))
+        lib_c_fprintf(lib_c_stderr, "SoftPC audio output failed: %d\n", (int)status);
 }
 
 lib_status softpc_platform_audio_start(void)
@@ -324,6 +331,8 @@ lib_status softpc_platform_audio_shutdown(void)
 
     if (softpc_speaker_task != NULL)
     {
+        status = base_sync_task_request_cancel(softpc_speaker_task);
+        if (status != LIB_STATUS_OK) return status;
         /* wait_writable blocks on native completion, not the task cancel
            event; clear the producer request before joining it. */
         softpc_speaker_write_request(0u, 0u);

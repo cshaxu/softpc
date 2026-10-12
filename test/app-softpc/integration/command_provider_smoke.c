@@ -990,6 +990,15 @@ int main(void)
     provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_RUNNING,
         EMULATOR_SESSION_MACHINE_PAUSED, &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0);
+    /* A second save must capture paused edits, not reuse the first image. */
+    assert(emulator_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
+    (void)access(machine, &lease, (x86_debug_request){
+        .operation = X86_DEBUG_WRITE_REAL, .offset = 0x520u, .bytes = 2u,
+        .data = {0xeb, 0xfe} });
+    setreg(machine, &lease, X86_DEBUG_CS, 0u);
+    setreg(machine, &lease, X86_DEBUG_EIP, 0x520u);
+    setreg(machine, &lease, X86_DEBUG_EAX, 0x2468ace0u);
+    memory_word(machine, &lease, 0x680u, 0x13579bdfu);
     submit(&provider, EMULATOR_SESSION_MACHINE_PAUSED,
         "save debug-commands-smoke.spcs", &result);
     assert(result.arm_prompt && lib_text_compare(result.prompt, "> ") == 0 &&
@@ -1014,6 +1023,14 @@ int main(void)
     /* The successful load already owns its completion and prompt. The queued
        STOPPED-to-PAUSED fact must not publish a second monitor transaction. */
     assert(!result.arm_prompt && result.text[0] == '\0');
+    assert(emulator_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
+    assert(reg(machine, &lease, X86_DEBUG_EAX) == 0x2468ace0u);
+    {
+        x86_debug_response saved = access(machine, &lease, (x86_debug_request){
+            .operation = X86_DEBUG_READ_LINEAR, .address = 0x680u, .bytes = 4u });
+        assert(saved.data[0] == 0xdf && saved.data[1] == 0x9b &&
+            saved.data[2] == 0x57 && saved.data[3] == 0x13);
+    }
     assert(emulator_machine_resume(machine));
     wait_for(events.running);
     provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,

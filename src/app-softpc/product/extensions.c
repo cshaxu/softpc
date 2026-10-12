@@ -3,6 +3,7 @@
 #include "lib/storage/file_interface.h"
 
 #include "extensions.h"
+#include "config.h"
 
 #define SOFTPC_EXTENSION_PATH_CAPACITY 1024u
 
@@ -53,11 +54,23 @@ static lib_bool softpc_extension_split(char *text, char **out_command,
     return **out_command != '\0';
 }
 
+typedef struct softpc_snapshot_output {
+    const char *path;
+    lib_storage_file_writer *writer;
+} softpc_snapshot_output;
+
 static lib_status softpc_extension_snapshot_write(void *context,
     const lib_u8 *bytes, lib_size byte_count)
 {
-    return lib_storage_file_writer_write((lib_storage_file_writer *)context,
-        bytes, byte_count);
+    softpc_snapshot_output *output = context;
+    lib_status status;
+    if (byte_count == 0u) return LIB_STATUS_OK;
+    if (output->writer == LIB_NULL) {
+        status = lib_storage_file_writer_open(output->path,
+            LIB_STORAGE_FILE_WRITER_TRUNCATE, &output->writer);
+        if (status != LIB_STATUS_OK) return status;
+    }
+    return lib_storage_file_writer_write(output->writer, bytes, byte_count);
 }
 
 static lib_status softpc_extension_snapshot_read(void *context,
@@ -71,7 +84,7 @@ static void softpc_extension_save(emulator_machine *machine,
     emulator_session_machine_state state, const char *path,
     emulator_session_command_result *out)
 {
-    lib_storage_file_writer *writer = LIB_NULL;
+    softpc_snapshot_output output = {path, LIB_NULL};
     lib_status status;
 
     if (*path == '\0') {
@@ -83,12 +96,10 @@ static void softpc_extension_save(emulator_machine *machine,
         softpc_extension_message(out, "Machine is stopped; use start before save.");
         return;
     }
-    status = lib_storage_file_writer_open(path, LIB_STORAGE_FILE_WRITER_TRUNCATE,
-        &writer);
-    if (status == LIB_STATUS_OK)
-        status = emulator_machine_read_state(machine,
-            &(emulator_machine_state_writer){ softpc_extension_snapshot_write, writer });
-    if (writer != LIB_NULL && lib_storage_file_writer_close(writer) != LIB_STATUS_OK &&
+    status = emulator_machine_read_state(machine,
+        &(emulator_machine_state_writer){ softpc_extension_snapshot_write, &output });
+    if (output.writer != LIB_NULL &&
+        lib_storage_file_writer_close(output.writer) != LIB_STATUS_OK &&
         status == LIB_STATUS_OK)
         status = LIB_STATUS_IO_ERROR;
     softpc_extension_message(out, status == LIB_STATUS_OK ?
@@ -127,20 +138,6 @@ static void softpc_extension_load(emulator_machine *machine,
         "Machine loaded and paused." : "Cannot load machine state.");
 }
 
-static lib_bool softpc_extension_mode(const char *text,
-    lib_storage_medium_mode *out_mode)
-{
-    if (lib_text_compare(text, "readonly") == 0)
-        *out_mode = LIB_STORAGE_MEDIUM_READONLY;
-    else if (lib_text_compare(text, "direct") == 0)
-        *out_mode = LIB_STORAGE_MEDIUM_DIRECT;
-    else if (lib_text_compare(text, "overlay") == 0)
-        *out_mode = LIB_STORAGE_MEDIUM_OVERLAY;
-    else
-        return LIB_FALSE;
-    return LIB_TRUE;
-}
-
 static void softpc_extension_floppy(emulator_machine *machine,
     emulator_session_machine_state state, char *arguments,
     emulator_session_command_result *out)
@@ -167,7 +164,7 @@ static void softpc_extension_floppy(emulator_machine *machine,
     }
     if (lib_text_compare(operation, "insert") != 0 ||
         !softpc_extension_split(rest, &mode, &rest) || *rest == '\0' ||
-        !softpc_extension_mode(mode, &medium_mode)) {
+        !app_parse_media_mode(mode, &medium_mode)) {
         softpc_extension_message(out,
             "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
         return;

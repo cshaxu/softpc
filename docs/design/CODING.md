@@ -6,7 +6,7 @@ The current source tree is:
 src/
   app-softpc/
     product/
-      main.c, config.c, command.c, composition.c, keyboard.c, firmware.rc
+      main.c, config.c, composed_machine.c, extensions.c, firmware.rc
     softpc.new/
     compat/
       original host callback C/H files and port ABI support
@@ -14,6 +14,7 @@ src/
     machine/
       concrete machine backend, driver, input, debug, trace; public vm_interface.h
   emulator/
+    product/     neutral monitor, composition and session lifetime
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
@@ -59,10 +60,10 @@ callbacks and larger functional adaptations. `app-softpc/machine` owns the injec
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `app-softpc/product` owns SoftPC configuration, private machine composition,
 resources and the snapshot/media extension. Shared `x86/product` owns the
-X86 CLI/hotkey policy and Emulator composition; it receives an already
+X86 CLI/hotkey policy and delegates composition to `emulator/product`; it receives an already
 composed machine/driver lifetime and two UI choices, never a SoftPC config.
-It owns entity assembly, event wiring, the blocking session run and teardown,
-without a separate state machine, command table or debugger. Main loads config.
+Emulator Product owns entity assembly, event wiring, the blocking session run
+and teardown; it does not interpret machine configuration. Main loads config.
 Only app-softpc/product/composed_machine.c may include machine/vm_interface.h; no shared X86 file may include Compat
 or MVDM, and no other X86 file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Emulator/Lib contracts. Compat

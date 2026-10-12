@@ -2,10 +2,38 @@
 
 ## Current Work
 
-No implementation subtask is active. T89 is owner-accepted and closed.
+No implementation subtask is active. Open task awaiting owner: T90.
+S1's five repairs are implemented and verified; owner acceptance remains pending.
+Both Release EXEs are refreshed. Each width passed 84 shared + 48 other
+background tests and all five native desktop cases (137/137).
+See the [S1 delivery and diff ledger](../history/M9-T90-S1-nonmirror-quality-cleanup.md).
+T89 remains owner-accepted and closed.
+
+## M9 T90 S1 Retained Delivery Brief
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits an independent T for all five audited quality items and explicitly includes native desktop tests. |
+| Objective | Remove obsolete snapshot READY reuse, report terminal Compat audio errors once, share App mode parsing, delay save-file creation until first write, and correct architecture descriptions. |
+| Non-goals | No mirror or shared-six implementation change, snapshot-format change, retry/rollback framework, automatic T closure, INI/media modification or Computer Use. |
+| Reference Baseline | 1684475c, accepted T89. |
+| Candidate Proposal | [Retained five-item quality repair](../history/M9-T90-nonmirror-quality-cleanup-proposal.md). |
+| Files And ABI Surface | App product, machine driver, Compat audio, existing owner tests and design documentation; no public ABI change. |
+| Applicable Rules | Task Reading Set, architecture/coding/execution/documentation governance skills, inward dependencies, Types authority and hidden supervised execution. |
+| Verification | Focused failure/content tests, dual Release builds and EXE publication; each width shared background first, other background next, then five native desktop tests serially in reserved period; gates, hashes and actual diff review. |
+| Expected Markers | Five ledger items proved, repeated snapshots contain current state, pre-write failure preserves old file, audio failure reports once but shutdown cancellation does not. |
+| Asset Needs | Reuse Ninja trees; ignored build/t90/s1 logs and owned fixtures only. Hidden supervisor: 30 minutes per build, 20 minutes per suite, 20 MiB per phase; kill only owned timed-out trees and report inconclusive. |
+| Reporting Requirements | Estimate production net -10 to +15 lines, tests +120 to +240; report actual additions/deletions/net by component, unchanged mirror/shared roots, dual EXE links and separate desktop results. |
+| Stop Conditions | Need for mirror/shared changes, competing worktree edits, incompatible semantics, unreserved desktop or failures outside this finite scope. |
+| Exit Criteria | All five items implemented and audited, required builds/tests pass, EXEs published, complete P committed/pushed, stop for owner acceptance. |
+| Original Owner Request | 准入一个独立的T任务，完成以上5项代码质量治理工作；完成后编译发布测试提交推送后等我验收。原生桌面测试也一起安排起来！ |
+| Similar-Issue Sweep | Review all snapshot begin/result branches, Compat audio worker error exits, both App media parsers and save output lifecycle; retain existing safe-boundary and teardown owners. |
+
+## Accepted T89 Baseline
 
 S1--S5 are closed. Owner approved T89 closure after the final desktop
-qualification. No next task is admitted.
+qualification, before T90 admission.
 [Completion audit](../history/M9-T89-completion-audit.md).
 
 S4 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other

@@ -39,7 +39,7 @@ static char *app_find_comment(char *text)
     return NULL;
 }
 
-static int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
+int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
 {
     if (lib_text_compare(value, "readonly") == 0)
         *out = LIB_STORAGE_MEDIUM_READONLY;

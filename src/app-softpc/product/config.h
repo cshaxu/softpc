@@ -20,6 +20,7 @@ typedef struct app_startup_config {
 } app_startup_config;
 
 int app_get_config_path(char *path);
+int app_parse_media_mode(const char *value, lib_storage_medium_mode *out);
 int app_resolve_image_path(char *path, const char *config_path);
 int app_load_startup_config(const char *path, app_startup_config *config);
 lib_status app_startup_compose_ui(const app_startup_config *config,
