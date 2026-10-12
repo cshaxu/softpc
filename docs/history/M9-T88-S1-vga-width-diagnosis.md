@@ -34,7 +34,7 @@ was consumed; attribution needs no further manual diagnostic run.
 
 The exact original/derived state, limitations, similar-issue disposition and
 separate S2/S3 briefs remain in the
-[task proposal](../proposals/m9-win31-file-manager-vga-width-transition.md).
+[task proposal](M9-T88-win31-file-manager-vga-width-transition.md).
 Missing FC recalculation and direct CRTC start selection were not established
 as causes of this captured failure and are not speculative repair targets.
 

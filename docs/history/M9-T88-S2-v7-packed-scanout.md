@@ -14,6 +14,6 @@ Both Release packages build; focused tests pass on x86/x64. The new receiver
 fails with the retained S1 behaviour. Shared 84/84 then App/checks 47/47 pass
 per width, excluding five desktop tests. Original-mode, pixel, dirty, CPU
 address, pointer, snapshot and Win3.1 roundtrip evidence and artifact hashes
-are retained in the [proposal](../proposals/m9-win31-file-manager-vga-width-transition.md).
+are retained in the [proposal](M9-T88-win31-file-manager-vga-width-transition.md).
 This is bounded S2 acceptance, not a claim that the separate incomplete-generation
 publication defect or every arbitrary VGA register combination is solved.

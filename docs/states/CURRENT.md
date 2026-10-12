@@ -2,87 +2,15 @@
 
 ## Current Work
 
-M9 T88 remains open. S6's owner-approved seven-file, 48-site local-continuation
-repair is implemented and fully test-qualified. P4 supplements P3 with all ten
-owner-requested native desktop results; delivery awaits owner acceptance.
+No implementation subtask is active. Owner accepts S6 and approves T88 closure.
+S1--S6 are closed; no next queue candidate is admitted.
 
-S1--S5 are owner-accepted and closed. The accepted implementation baseline is
-`1957dc6d`; the owner reports S5 acceptance and explicitly requests committing
-the previously untracked snapshot unchanged. The owner now admits S6
-investigation and now its bounded production repair; no queue candidate is admitted.
-
-S5 changes only three Compat production files (+46/-9, net +37) and two
-existing tests (+131/-13, net +118), with the two rebuilt package EXEs.
-Original mirror and six shared roots are unchanged. Dual-width background
-regression passes 131/131 per width; five native desktop cases per width were
-not run for S5 and are not claimed passed. Owner manual acceptance is now
-recorded separately from automated evidence. This acceptance/asset commit
-changes no source, test, EXE, INI or snapshot bytes and requires no rebuild.
-
-- [S1 diagnosis](../history/M9-T88-S1-vga-width-diagnosis.md).
-- [S2 packed scanout correction](../history/M9-T88-S2-v7-packed-scanout.md).
-- [S3 coverage acceptance](../history/M9-T88-S3-colour-resolution-coverage.md).
-- [S4 accepted repair](../history/M9-T88-S4-chain2-dirty-contract.md).
-- [S5 acceptance](../history/M9-T88-S5-compat-generation-readiness.md).
-- [Retained proposal and receiver ledger](../proposals/m9-win31-file-manager-vga-width-transition.md).
-
-## M9 T88 S6 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner requests per-site validation, then explicitly approves the seven-file/48-site minimal repair after clarification that removing original lines increases mirror diff. |
-| Objective | Preserve the current activation's saved local carrier at the 48 proven CHAIN2 continuations, with no alternate writer or changed device algorithm. |
-| Non-goals | No production rewrite, extra writer path, shared-component edit, media/INI/snapshot modification or Computer Use; do not sweep other generated families. |
-| Reference Baseline | 21220ac1; original OpenNT is read-only comparison evidence. |
-| Candidate Proposal | [S6 investigation](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-nested-chain2-rule-investigation) |
-| Files And ABI Surface | sevid000/001/016--020; owner-local VGA regression, its native-rule test translation unit, root CMake and source gate; no production ABI change. |
-| Applicable Rules | Task Reading Set; original-source minimum diff; one machine/writer owner; background owned probes. |
-| Verification | Retain per-site/focused and 131/131 background results per width; owner authorizes reserved desktop qualification on f1d394ca: run exactly five desktop-labelled cases per width, serially, without Computer Use or rebuild. Record all individual exits and retain failure evidence if any. |
-| Expected Markers | Exactly 48 local goto replacements, unchanged real S_* calls and pixel/dirty algorithms; no old tail call at any frozen site; nested entries return and preserve scalar results. |
-| Asset Needs | Publish rebuilt softpc32.exe/softpc64.exe in assets/binary; preserve INI, disks and snapshots. |
-| Reporting Requirements | Actual production/test additions/deletions/net and mirror-diff delta; dual-width focused/full-background results, EXE hashes and complete pushed P; await manual acceptance. |
-| Stop Conditions | New device algorithm, second writer path or broad generated ABI rewrite would be required; report before implementing. |
-| Exit Criteria | Minimal repair, focused/background and all five native desktop cases pass both widths, applicable gates pass, unchanged published EXEs retain their P3 hashes, evidence P pushed and worktree clean; owner acceptance remains separate. |
-| Original Owner Request | 批准；完成后编译、发布、测试、提交、推送，然后等我验收。 |
-| Similar-Issue Sweep | Same-file continuation wrappers and ENTER/LEAVE local restoration in all generated CHAIN2 rules; distinguish independent procedure calls from continuations. |
-
-Owned diagnostics stay in ignored build/t88/s6: compiler budget 1800 seconds,
-probe budget 120 seconds, captured stack/local checkpoint at most 1 MiB;
-executor owns child teardown. Those earlier diagnostic probes create no native
-Window. Owner-authorized desktop qualification runs native tests serially with
-1800-second phase budgets, owned teardown and no Computer Use.
-
-Initial unmodified source reproduces the same null local restoration on both widths.
-Changing one same-function continuation call to a goto in disposable diagnostic
-source removes the crash on both widths. Production, source tests and accepted
-EXEs are unchanged. Source/caller inventory and minimal diff estimates are in
-the [causal result](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-causal-result-and-bounded-repair-proposal).
-The confirmed defect is now owned by S6, not deferred in TODO. No production
-repair or T88 closure is inferred from this investigation.
-
-The 192 isolated continuation experiments complete on x86/x64: all 48 sites
-per width reach their target and show incorrect saved-local restoration with
-the original call; all 48 local-transfer references per width restore correctly.
-Original outward outcomes per width are 2 crashes, 14 failed parent checks and
-32 masked restoration errors. Broader raw-entry probe failures are separately
-classified, not claimed product defects or passing regression. The proposed
-seven-file patch is +48/-96, net -48, including inline markers; its application
-was subsequently approved and completed in P3. See the proposal's per-site result.
-
-P3 has no extra production changes: real calls, read/write/dirty algorithms,
-snapshot format and shared six roots remain unchanged. Test/build/gate changes
-are +142/-1, net +141. Original mirror delta across the seven files is +144
-changed lines (8490 to 8634). Both background cohorts pass 131/131 per width,
-including snapshot/integration; latest focused VGA also passes both widths.
-At P3 delivery five desktop tests per width were not run or claimed passed.
-Owner subsequently requires their serial native qualification: x64 5/5 in
-11.88 s and x86 5/5 in 12.04 s, all successful on the unchanged f1d394ca
-artifacts. Complete registered coverage now passes 136/136 per width.
-Package EXEs are
-rebuilt and published (x64 3094348 bytes, x86 3494060); hashes and per-path
-accounting are in the proposal P3 record. Snapshot, disks and INI are unchanged.
-S6/T88 are not closed; manual acceptance remains pending.
+The latest accepted runnable source is f1d394ca, qualified by a10fce4f:
+x64/x86 each pass all 136 registered tests (131 background plus five serial
+native desktop cases), without Computer Use. Closure changes documents only;
+published EXEs, owner INI, disks and snapshot remain unchanged.
+[T88 completion audit](../history/M9-T88-completion-audit.md) records the
+finite task ledger, final changed paths, mirror accounting and remaining debt.
 
 ## Historical M9 T85 S20 delivery record
 
@@ -445,6 +373,11 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 ## Current Technical Baseline
 
+- T88 closes after owner acceptance of S1--S6 and explicit task closure.
+  Mirror: 12 files +388/-1212 net -824; Compat: three files +46/-9 net +37.
+  No shared-root or snapshot-format change. Final x64/x86 136/136 qualification
+  and accepted EXE hashes are in [the audit](../history/M9-T88-completion-audit.md).
+
 - Owner closes T83 after S1--S6 delivery and admits T84 for bounded 80x50
   text frames. [T83 completion audit](../history/M9-T83-completion-audit.md)
   preserves scope and verification; this admission changes documents only.
@@ -618,6 +551,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T88 | S1--S6 complete; owner accepts final mirror/Compat video repairs and approves closure; x64/x86 136/136. | [Audit](../history/M9-T88-completion-audit.md) |
 | T87 | S1 complete; ordinary repository text converges on LF while the preserved OpenNT mirror and user-owned INI retain explicit CRLF checkout policy. | [Audit](../history/M9-T87-repository-eol-convergence.md) |
 | T86 | S1--S6 complete; owner accepts final six-root convergence and approves task closure. | [Audit](../history/M9-T86-completion-audit.md) |
 | T85 | S1--S20 complete; owner approves task closure. | [Audit](../history/M9-T85-completion-audit.md) |

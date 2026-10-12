@@ -12,7 +12,7 @@ One DIB-owned readiness fact and the original full-refresh/update path remain;
 there is no alternate renderer, queue, timer or guest-specific filter.
 
 The finite receiver ledger and actual changed-path review are retained in the
-[S5 evidence](../proposals/m9-win31-file-manager-vga-width-transition.md#s5-measured-delivery-evidence).
+[S5 evidence](M9-T88-win31-file-manager-vga-width-transition.md#s5-measured-delivery-evidence).
 Both Release builds and focused 3/3 pass per width. Background shared 84/84
 followed by App/checks 47/47 gives 131/131 per width, including snapshot and
 Win3.1 DOS-prompt roundtrips. Five native desktop tests per width were not run

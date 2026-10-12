@@ -13,7 +13,7 @@ ordering in v7_ports.c, +1/-1 net zero; the existing App VGA test adds 115 lines
 deletes none. Combined code delta is +116/-1, net +115. No new target, state,
 public API, renderer, Lib/Emulator/Compat code or shared corpus is added.
 
-The [proposal's S3 ledger](../proposals/m9-win31-file-manager-vga-width-transition.md#s3-accepted-coverage-disposition)
+The [proposal's S3 ledger](M9-T88-win31-file-manager-vga-width-transition.md#s3-accepted-coverage-disposition)
 records 19 BIOS graphics modes in both orders per architecture, exact 07/0F
 fallback behavior, CPU write/incremental/full comparisons, and ten V7 modes'
 pointer movement/background restoration. Geometry and pointer checks pass;

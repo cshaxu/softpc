@@ -15,8 +15,8 @@ CPU 读写及银行选择中的 chain4 条件保留，普通 VGA/planar 路径�
 新增 owner-local 回归经真实 SR4 端口验证 V7 66h--69h 模式、虚拟行跨度、
 非零起始地址、完整/局部像素、CPU 显存访问和指针寄存器路径。
 验收状态及最终验证见
-[T88 proposal](../../../proposals/m9-win31-file-manager-vga-width-transition.md)。
-Compat 的新 surface 完整性修复属于独立 S3，不在此镜像增量中。
+[T88 proposal](../../../history/M9-T88-win31-file-manager-vga-width-transition.md)。
+Compat 的新 surface 完整性修复最终由独立 S5 承接，不在此镜像增量中。
 
 ### T85 S1 InPort 增量
 
@@ -1050,7 +1050,7 @@ DIVERGENCE(T88-CHAIN2-DIRTY)，不增加 standalone 行为分支或公共接口�
 七份生产文件本 S 增量 +332/-1113，净 -781；相对 OpenNT 的完整增删合计
 由 5986 变成 7039，增加 1053，不能把减少代码量冒充减少镜像 diff。
 逐文件前后数量、全部规则编号和验证边界见
-[S4 ledger](../../../proposals/m9-win31-file-manager-vga-width-transition.md#s4-implementation-and-source-accounting)。
+[S4 ledger](../../../history/M9-T88-win31-file-manager-vga-width-transition.md#s4-implementation-and-source-accounting)。
 探索性旧 compound writer 崩溃另列 TODO，不宣称已修复这些未验证的旧算法。
 
 ### T88 S6 CHAIN2 续接作用域修复
@@ -1078,6 +1078,6 @@ DIVERGENCE(T88-CHAIN2-DIRTY)，不增加 standalone 行为分支或公共接口�
 
 原始镜像 diff 增删合计 8490→8634；代码净减少不能解释成减少了镜像 diff。
 48 项源代码和运行证明、常设回归及验收边界由
-[S6 记录](../../../proposals/m9-win31-file-manager-vga-width-transition.md#s6-per-site-qualified-result-and-minimal-proposed-diff)
+[S6 记录](../../../history/M9-T88-win31-file-manager-vga-width-transition.md#s6-per-site-qualified-result-and-minimal-proposed-diff)
 承接。不扩展修复其他生成规则家族，也不宣称所有 legacy compound
 入口的算法或生产可达性已经完整认证。

@@ -13,7 +13,7 @@ CHAIN2 plane/bank conversion reuses the original Unchained bitmap marker.
 Production +332/-1113 (net -781), test +89/-0, gate +21/-0; combined code
 net -671. Full OpenNT touched-line delta increases by 1053, not decreases.
 The finite rule ledger and limits are in the
-[proposal](../proposals/m9-win31-file-manager-vga-width-transition.md#s4-implementation-and-source-accounting).
+[proposal](M9-T88-win31-file-manager-vga-width-transition.md#s4-implementation-and-source-accounting).
 
 Dual Release builds and background 131/131 per width pass. At the owner's
 subsequent request, native desktop tests run serially without Computer Use:

@@ -12,8 +12,5 @@ selected-mirror comparison from OpenNT to XP SP1, with explicit IBM PC/AT
 adoption and PC-98/Japan/NTVDM exclusions.
 
 Already admitted, not a queue candidate:
-[Win3.1 File Manager VGA width-transition repair](../proposals/m9-win31-file-manager-vga-width-transition.md).
-Its current task status is owned solely by [CURRENT](CURRENT.md).
-
 [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md).
 Its current task status is owned solely by [CURRENT](CURRENT.md).

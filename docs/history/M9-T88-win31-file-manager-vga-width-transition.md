@@ -1,5 +1,9 @@
 # Win3.1 File Manager VGA width-transition repair
 
+Archived after owner-approved T88 closure on 2026-10-11. Historical open,
+planned and deferred statements below describe their original delivery stage;
+the [completion audit](M9-T88-completion-audit.md) records final dispositions.
+
 ## Observed contract failure
 
 With Window presentation, starting Windows 3.1 File Manager can make the
@@ -700,7 +704,7 @@ so it cannot save a cleared pre-body background and restore it over that body.
 No original updater, machine state, snapshot format or shared API changes.
 
 The finite production receiver ledger is in the
-[proposal](../proposals/m9-win31-file-manager-vga-width-transition.md#s5-implementation-contract-and-finite-ledger).
+[proposal](M9-T88-win31-file-manager-vga-width-transition.md#s5-implementation-contract-and-finite-ledger).
 Its searched scope is Compat binding/damage, original body invalidation,
 pointer paint/clear, palette invalidation and snapshot reconstruction. Searches
 used `rg` for `softpc_standalone_dib_damage`, `InvalidateConsoleDIBits`,
