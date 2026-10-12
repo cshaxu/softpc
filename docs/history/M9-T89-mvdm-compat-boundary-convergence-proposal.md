@@ -1,4 +1,7 @@
-# M9: MVDM Mirror and Compat Boundary Convergence
+# M9 T89: MVDM Mirror and Compat Boundary Convergence (archived proposal)
+
+T89 is owner-accepted and closed. The design and admission wording below is
+retained historically; see the [completion audit](M9-T89-completion-audit.md).
 
 ## T89 S1 design recommendation
 

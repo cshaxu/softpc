@@ -5,7 +5,7 @@
 Original owner request: "批准开始s2".
 Baseline: `9bd90cf91e98bd8ace69606f954ac6e4ac6f86a6`.
 The owner admits the S2 portion of the
-[proposal](../proposals/m9-mvdm-compat-boundary-convergence.md), following
+[proposal](M9-T89-mvdm-compat-boundary-convergence-proposal.md), following
 the [S1 audit](M9-T89-S1-mirror-compat-convergence.md).
 [CURRENT](../states/CURRENT.md) alone owns current acceptance status.
 

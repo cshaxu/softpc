@@ -65,3 +65,10 @@ rebuilding solely to update governance.
 S5 is delivered for owner acceptance. T89 has no remaining planned
 implementation or test work, but remains open pending the owner's closure
 decision. No automatic next task is admitted.
+
+## Owner acceptance
+
+Owner: "批准收口 然后队列任务列一下". Reviewed delivery f8fe518f:
+documentation-only changes, actual dual-width desktop results, unchanged
+artifact hashes and S4 background evidence. S5 is accepted and closed;
+the separate T-level audit records T89 closure. No next task is admitted.

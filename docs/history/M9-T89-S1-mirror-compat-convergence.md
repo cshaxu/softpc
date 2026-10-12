@@ -6,7 +6,7 @@ Owner request: "准入队列1的T任务，并进入S1审计、调研和设计，
 
 Baseline: `3c2e6e6939651187f17b97495b6018f82f258667` (accepted T88).
 The [current record](../states/CURRENT.md) owns status; the
-[proposal](../proposals/m9-mvdm-compat-boundary-convergence.md) defines the
+[proposal](M9-T89-mvdm-compat-boundary-convergence-proposal.md) defines the
 eleven-group finite review universe. S1 investigates/designs only. Later
 source-changing steps require their own admission.
 
@@ -24,7 +24,7 @@ original-mirror diff estimates. T88's accepted fixes are retained.
 | Objective | Audit the finite mirror/Compat universe against source peers and compiled owners; select minimal responsibility-preserving migrations. |
 | Non-goals | No production repair, shared change, user INI/media/snapshot modification or S2 implementation. |
 | Reference Baseline | SoftPC 3c2e6e6939651187f17b97495b6018f82f258667; read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
-| Candidate Proposal | [Mirror/Compat convergence](../proposals/m9-mvdm-compat-boundary-convergence.md). |
+| Candidate Proposal | [Mirror/Compat convergence](M9-T89-mvdm-compat-boundary-convergence-proposal.md). |
 | Files And ABI Surface | Eleven member groups, Compat endpoints, CMake source/include selection and focused tests; diagnostic files only under ignored build/t89/s1. |
 | Applicable Rules | Task Reading Set and linked execution/architecture/coding/document governance skills; source research and mirror-diff policy. |
 | Verification | Complete token/peer/owner ledger, source call-chain audit, guest INT33 probe and focused baseline tests on both widths; documentation and whitespace gates. |

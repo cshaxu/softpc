@@ -2,11 +2,11 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T89.
+No implementation subtask is active. T89 is owner-accepted and closed.
 
-S4 is owner-accepted and closed. S5 completes the outstanding desktop
-qualification and final review; delivered for owner acceptance, not automatic
-T closure. [S5 evidence](../history/M9-T89-S5-desktop-qualification.md).
+S1--S5 are closed. Owner approved T89 closure after the final desktop
+qualification. No next task is admitted.
+[Completion audit](../history/M9-T89-completion-audit.md).
 
 S4 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
 background tests (131/131 per width), including eight background App integration
@@ -28,7 +28,7 @@ build/tests +88/-7 (net +81), original-mirror diff reduced by 58 lines.
 | Objective | Run the five existing native desktop cases per width, reconcile with accepted background evidence and prepare the final T89 closure decision. |
 | Non-goals | No new functionality, production/test/build implementation, guest media, INI, cache repair or XP migration; no Computer Use and no automatic T closure. |
 | Reference Baseline | d1583eda accepted S4; whole-T comparison 3c2e6e69; S4 ledger and artifact hashes remain authoritative. |
-| Candidate Proposal | [Mirror/Compat convergence](../proposals/m9-mvdm-compat-boundary-convergence.md). |
+| Candidate Proposal | [Archived Mirror/Compat convergence](../history/M9-T89-mvdm-compat-boundary-convergence-proposal.md). |
 | Files And ABI Surface | Existing CTest desktop entries, accepted binaries and task records. No ABI or source changes planned. |
 | Applicable Rules | Task Reading Set, linked governance skills, minimum original-mirror diff, sole original state owner, inward dependencies and source research policy. |
 | Verification | Confirm five desktop entries per width with CTest -N; then serial -L desktop --no-tests=error in a reserved period. Cover both package variants, Window retirement/modal and Console display. Reconcile with S4's 131 background passes per width, actual Git diff and artifact hashes. |
@@ -587,6 +587,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T89 | S1--S5 owner-accepted and closed; mirror/Compat convergence, dual-width 136/136 qualification. | [Audit](../history/M9-T89-completion-audit.md) |
 | T88 | S1--S6 complete; owner accepts final mirror/Compat video repairs and approves closure; x64/x86 136/136. | [Audit](../history/M9-T88-completion-audit.md) |
 | T87 | S1 complete; ordinary repository text converges on LF while the preserved OpenNT mirror and user-owned INI retain explicit CRLF checkout policy. | [Audit](../history/M9-T87-repository-eol-convergence.md) |
 | T86 | S1--S6 complete; owner accepts final six-root convergence and approves task closure. | [Audit](../history/M9-T86-completion-audit.md) |
