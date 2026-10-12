@@ -3,7 +3,8 @@
 ## Current Work
 
 M9 T88 remains open. S6's owner-approved seven-file, 48-site local-continuation
-repair is implemented and verified; P3 delivery awaits owner acceptance.
+repair is implemented and fully test-qualified. P4 supplements P3 with all ten
+owner-requested native desktop results; delivery awaits owner acceptance.
 
 S1--S5 are owner-accepted and closed. The accepted implementation baseline is
 `1957dc6d`; the owner reports S5 acceptance and explicitly requests committing
@@ -37,18 +38,20 @@ changes no source, test, EXE, INI or snapshot bytes and requires no rebuild.
 | Candidate Proposal | [S6 investigation](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-nested-chain2-rule-investigation) |
 | Files And ABI Surface | sevid000/001/016--020; owner-local VGA regression, its native-rule test translation unit, root CMake and source gate; no production ABI change. |
 | Applicable Rules | Task Reading Set; original-source minimum diff; one machine/writer owner; background owned probes. |
-| Verification | Retain the 192 per-site diagnostic results; permanently gate all 48 local transfers; exercise real nested CHAIN2 entries with valid native-pointer inputs on x86/x64, then both full background CTest suites including snapshot/integration. Desktop tests require reserved access and are reported separately. |
+| Verification | Retain per-site/focused and 131/131 background results per width; owner authorizes reserved desktop qualification on f1d394ca: run exactly five desktop-labelled cases per width, serially, without Computer Use or rebuild. Record all individual exits and retain failure evidence if any. |
 | Expected Markers | Exactly 48 local goto replacements, unchanged real S_* calls and pixel/dirty algorithms; no old tail call at any frozen site; nested entries return and preserve scalar results. |
 | Asset Needs | Publish rebuilt softpc32.exe/softpc64.exe in assets/binary; preserve INI, disks and snapshots. |
 | Reporting Requirements | Actual production/test additions/deletions/net and mirror-diff delta; dual-width focused/full-background results, EXE hashes and complete pushed P; await manual acceptance. |
 | Stop Conditions | New device algorithm, second writer path or broad generated ABI rewrite would be required; report before implementing. |
-| Exit Criteria | Minimal repair and owner-local regression pass both widths, applicable gates pass, published EXEs match rebuilt outputs, complete P pushed and worktree clean; owner acceptance remains separate. |
+| Exit Criteria | Minimal repair, focused/background and all five native desktop cases pass both widths, applicable gates pass, unchanged published EXEs retain their P3 hashes, evidence P pushed and worktree clean; owner acceptance remains separate. |
 | Original Owner Request | 批准；完成后编译、发布、测试、提交、推送，然后等我验收。 |
 | Similar-Issue Sweep | Same-file continuation wrappers and ENTER/LEAVE local restoration in all generated CHAIN2 rules; distinguish independent procedure calls from continuations. |
 
 Owned diagnostics stay in ignored build/t88/s6: compiler budget 1800 seconds,
 probe budget 120 seconds, captured stack/local checkpoint at most 1 MiB;
-executor owns child teardown. No native Window is created.
+executor owns child teardown. Those earlier diagnostic probes create no native
+Window. Owner-authorized desktop qualification runs native tests serially with
+1800-second phase budgets, owned teardown and no Computer Use.
 
 Initial unmodified source reproduces the same null local restoration on both widths.
 Changing one same-function continuation call to a goto in disposable diagnostic
@@ -72,7 +75,11 @@ snapshot format and shared six roots remain unchanged. Test/build/gate changes
 are +142/-1, net +141. Original mirror delta across the seven files is +144
 changed lines (8490 to 8634). Both background cohorts pass 131/131 per width,
 including snapshot/integration; latest focused VGA also passes both widths.
-Five desktop tests per width were not run or claimed passed. Package EXEs are
+At P3 delivery five desktop tests per width were not run or claimed passed.
+Owner subsequently requires their serial native qualification: x64 5/5 in
+11.88 s and x86 5/5 in 12.04 s, all successful on the unchanged f1d394ca
+artifacts. Complete registered coverage now passes 136/136 per width.
+Package EXEs are
 rebuilt and published (x64 3094348 bytes, x86 3494060); hashes and per-path
 accounting are in the proposal P3 record. Snapshot, disks and INI are unchanged.
 S6/T88 are not closed; manual acceptance remains pending.

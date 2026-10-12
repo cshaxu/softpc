@@ -1065,6 +1065,31 @@ snapshot.sol 的 SHA-256 仍为
 `D171247173D4954CC41F4A17A606985FF71F9EA0337C5AD1FA2F6DB31E8F6594`；
 没有配置或介质变化。本 P3 完整交付后等待 owner 验收，S6/T88 保持开放。
 
+### S6 P4 complete native desktop qualification
+
+Owner requires all five previously excluded native desktop cases on both
+architectures before acceptance. On the unchanged f1d394ca sources/artifacts,
+the existing CTest desktop selection runs serially, x64 then x86, without
+Computer Use, rebuilding, changed test criteria or a 30-second cutoff. Each
+phase has an owned hidden supervisor, captured stdout/stderr, actual exit
+record and 1800-second declared outer budget.
+
+| Registered desktop case | x64 | x86 |
+| --- | --- | --- |
+| app-softpc/integration/package_smoke | Passed | Passed |
+| app-softpc/integration/package_smoke/compact_console | Passed | Passed |
+| lib.kvm_window_retirement | Passed | Passed |
+| lib.kvm_window_modal | Passed | Passed |
+| lib.console_broker_display | Passed | Passed |
+
+x64 finishes 5/5 in 11.88 seconds; x86 finishes 5/5 in 12.04 seconds. Both
+CTest invocations and the supervisor exit 0. Together with P3's 131/131
+background cohorts, all 136 registered tests are covered and pass per width;
+the registration counts are checked again, not inferred from old task totals.
+Artifact hashes retain the P3 values above. Source, tests, build configuration,
+INI, media and snapshot are unchanged. P4 commits evidence/state documents
+only; S6/T88 remain open pending owner acceptance, not automatically closed.
+
 ## Repair constraints and acceptance
 
 If the source renderer computes an invalid visible geometry, prefer the
