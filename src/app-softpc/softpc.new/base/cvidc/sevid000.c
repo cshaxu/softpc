@@ -825,8 +825,7 @@ switch ( id )
 	*((IU32	*)&(r22)	+	REGLONG)	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
 	*((IUH	*)&(r20))	=	(IS32)(1284)	;	
 	*(UOFF_15_8(	(LocalIUH+2)	))	=	*((IU8	*)((*((IHPE *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IHPE)))	)	+	*((IHPE	*)&(r22)))	)	;
-	{	extern	IUH	L26_1if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L26_1if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L26_1if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_0if_f_id	:
 		L26_0if_f:	;	
@@ -934,8 +933,7 @@ switch ( id )
 	else
 	if	((*((IU32	*)(LocalIUH+1)	+	REGLONG)	&	(1	<<	*((IU32	*)&(r20)	+	REGLONG)))	==	0)	goto	L26_2if_f;	
 	*((IUH	*)(LocalIUH+4))	=	(IS32)(3)	;	
-	{	extern	IUH	L26_3if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L26_3if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L26_3if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_2if_f_id	:
 		L26_2if_f:	;	
@@ -979,8 +977,7 @@ switch ( id )
 	if	(*((IU32	*)(LocalIUH+6)	+	REGLONG)	>	*((IU32	*)&(r20)	+	REGLONG))	goto	L26_6w_t;	
 	case	L26_7w_d_id	:
 		L26_7w_d:	;	
-	{	extern	IUH	L26_5if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L26_5if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L26_5if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_4if_f_id	:
 		L26_4if_f:	;	
@@ -1709,8 +1706,7 @@ switch ( id )
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r21)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*(UOFF_15_8(	(LocalIUH+2)	))	=	*(UOFF_15_8(	(LocalIUH+2)	))	&	*((IU8	*)(LocalIUH+3)	+	REGBYTE);	
-	{	extern	IUH	L26_24if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L26_24if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L26_24if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_23if_f_id	:
 		L26_23if_f:	;	
@@ -1852,8 +1848,7 @@ switch ( id )
 	else
 	if	((*((IU32	*)(LocalIUH+1)	+	REGLONG)	&	(1	<<	*((IU32	*)&(r21)	+	REGLONG)))	==	0)	goto	L26_25if_f;	
 	*((IUH	*)(LocalIUH+4))	=	(IS32)(3)	;	
-	{	extern	IUH	L26_26if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L26_26if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L26_26if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_25if_f_id	:
 		L26_25if_f:	;	
@@ -1917,8 +1912,7 @@ switch ( id )
 	if	(*((IU32	*)(LocalIUH+6)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L26_29w_t;	
 	case	L26_30w_d_id	:
 		L26_30w_d:	;	
-	{	extern	IUH	L26_28if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L26_28if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L26_28if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_27if_f_id	:
 		L26_27if_f:	;	

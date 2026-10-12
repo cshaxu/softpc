@@ -2,14 +2,13 @@
 
 ## Current Work
 
-M9 T88 remains open. S6 completes owner-requested per-site diagnostic validation
-of 38 CHAIN2 write continuations and ten related read continuations; production
-repair awaits owner approval.
+M9 T88 remains open. S6's owner-approved seven-file, 48-site local-continuation
+repair is implemented and verified; P3 delivery awaits owner acceptance.
 
 S1--S5 are owner-accepted and closed. The accepted implementation baseline is
 `1957dc6d`; the owner reports S5 acceptance and explicitly requests committing
 the previously untracked snapshot unchanged. The owner now admits S6
-investigation; no queue candidate or production repair is admitted.
+investigation and now its bounded production repair; no queue candidate is admitted.
 
 S5 changes only three Compat production files (+46/-9, net +37) and two
 existing tests (+131/-13, net +118), with the two rebuilt package EXEs.
@@ -31,20 +30,20 @@ changes no source, test, EXE, INI or snapshot bytes and requires no rebuild.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests investigating the deferred CHAIN2 crash and then explicitly requires per-site validation and a complete answer. |
-| Objective | Establish the exact failing nested rule, original contract, caller reachability and minimum correct repair boundary. |
-| Non-goals | No production rewrite, additional writer path, shared-component edit, media/INI/EXE modification or Computer Use. |
-| Reference Baseline | e959a21c; original OpenNT is read-only comparison evidence. |
+| Admission And Approval | Owner requests per-site validation, then explicitly approves the seven-file/48-site minimal repair after clarification that removing original lines increases mirror diff. |
+| Objective | Preserve the current activation's saved local carrier at the 48 proven CHAIN2 continuations, with no alternate writer or changed device algorithm. |
+| Non-goals | No production rewrite, extra writer path, shared-component edit, media/INI/snapshot modification or Computer Use; do not sweep other generated families. |
+| Reference Baseline | 21220ac1; original OpenNT is read-only comparison evidence. |
 | Candidate Proposal | [S6 investigation](../proposals/m9-win31-file-manager-vga-width-transition.md#s6-nested-chain2-rule-investigation) |
-| Files And ABI Surface | Existing generated CHAIN2 sources, caller/SAS contracts and an ignored diagnostic test; no production ABI change. |
+| Files And ABI Surface | sevid000/001/016--020; owner-local VGA regression, its native-rule test translation unit, root CMake and source gate; no production ABI change. |
 | Applicable Rules | Task Reading Set; original-source minimum diff; one machine/writer owner; background owned probes. |
-| Verification | Freeze all 38 write and ten read continuation sites; verify each owner/target/ENTER/LEAVE relationship, collect individual runtime coverage and compare original and local-branch diagnostic variants on both widths. Distinguish proven restoration defects from legal continuations, unreachable branches and unrelated data faults. |
-| Expected Markers | Pinpoint the first invalid local restoration and account for every caller of the implicated entry; no inference from SIGSEGV alone. |
-| Asset Needs | Preserve accepted EXEs, INI, disks and snapshots. |
-| Reporting Requirements | Explain root cause, proof, reachability and smallest proposed source/test diff; do not claim a production repair from diagnostic evidence. |
+| Verification | Retain the 192 per-site diagnostic results; permanently gate all 48 local transfers; exercise real nested CHAIN2 entries with valid native-pointer inputs on x86/x64, then both full background CTest suites including snapshot/integration. Desktop tests require reserved access and are reported separately. |
+| Expected Markers | Exactly 48 local goto replacements, unchanged real S_* calls and pixel/dirty algorithms; no old tail call at any frozen site; nested entries return and preserve scalar results. |
+| Asset Needs | Publish rebuilt softpc32.exe/softpc64.exe in assets/binary; preserve INI, disks and snapshots. |
+| Reporting Requirements | Actual production/test additions/deletions/net and mirror-diff delta; dual-width focused/full-background results, EXE hashes and complete pushed P; await manual acceptance. |
 | Stop Conditions | New device algorithm, second writer path or broad generated ABI rewrite would be required; report before implementing. |
-| Exit Criteria | A source-and-runtime causal explanation and explicit disposition of the TODO; any production repair requires separate approval. |
-| Original Owner Request | 你调查下怎么回事，别留个尾巴 |
+| Exit Criteria | Minimal repair and owner-local regression pass both widths, applicable gates pass, published EXEs match rebuilt outputs, complete P pushed and worktree clean; owner acceptance remains separate. |
+| Original Owner Request | 批准；完成后编译、发布、测试、提交、推送，然后等我验收。 |
 | Similar-Issue Sweep | Same-file continuation wrappers and ENTER/LEAVE local restoration in all generated CHAIN2 rules; distinguish independent procedure calls from continuations. |
 
 Owned diagnostics stay in ignored build/t88/s6: compiler budget 1800 seconds,
@@ -65,8 +64,18 @@ the original call; all 48 local-transfer references per width restore correctly.
 Original outward outcomes per width are 2 crashes, 14 failed parent checks and
 32 masked restoration errors. Broader raw-entry probe failures are separately
 classified, not claimed product defects or passing regression. The proposed
-seven-file patch is +48/-96, net -48, including inline markers; it passes
-git apply --check and remains unapplied. See the proposal's per-site result.
+seven-file patch is +48/-96, net -48, including inline markers; its application
+was subsequently approved and completed in P3. See the proposal's per-site result.
+
+P3 has no extra production changes: real calls, read/write/dirty algorithms,
+snapshot format and shared six roots remain unchanged. Test/build/gate changes
+are +142/-1, net +141. Original mirror delta across the seven files is +144
+changed lines (8490 to 8634). Both background cohorts pass 131/131 per width,
+including snapshot/integration; latest focused VGA also passes both widths.
+Five desktop tests per width were not run or claimed passed. Package EXEs are
+rebuilt and published (x64 3094348 bytes, x86 3494060); hashes and per-path
+accounting are in the proposal P3 record. Snapshot, disks and INI are unchanged.
+S6/T88 are not closed; manual acceptance remains pending.
 
 ## Historical M9 T85 S20 delivery record
 

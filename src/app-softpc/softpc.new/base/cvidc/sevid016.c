@@ -4023,8 +4023,7 @@ switch ( id )
 	*((IU8	*)((*((IHPE	*)&(r20)))	+	*((IHPE	*)&(r22)))	)	=	*((IU8	*)(LocalIUH+2)	+	REGBYTE)	;	
 	case	L21_2if_f_id	:
 		L21_2if_f:	;	
-	{	extern	IUH	L21_1if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_1if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_1if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_0if_f_id	:
 		L21_0if_f:	;	
@@ -4359,8 +4358,7 @@ switch ( id )
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_13if_f_id	:
 		L21_13if_f:	;	
-	{	extern	IUH	L21_9if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_9if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_9if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_8if_f_id	:
 		L21_8if_f:	;	

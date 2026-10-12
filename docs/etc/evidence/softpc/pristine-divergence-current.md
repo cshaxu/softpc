@@ -1052,3 +1052,32 @@ DIVERGENCE(T88-CHAIN2-DIRTY)，不增加 standalone 行为分支或公共接口�
 逐文件前后数量、全部规则编号和验证边界见
 [S4 ledger](../../../proposals/m9-win31-file-manager-vga-width-transition.md#s4-implementation-and-source-accounting)。
 探索性旧 compound writer 崩溃另列 TODO，不宣称已修复这些未验证的旧算法。
+
+### T88 S6 CHAIN2 续接作用域修复
+
+上述 S4 的暂留项现由 T88 S6 接管，不再是 TODO。Owner 在逐项诊断后明确
+批准扩大镜像 diff：只将 sevid000/001/016--020 的 48 个同过程 L_* 尾调用
+改为局部 goto，保持当前 activation 的 CopyLocalIUH/CopyLocalFPH。
+真实 S_* 过程调用、既有包装函数、显存读写及 dirty 算法保持原样；标记
+为同行 `T88: keep this activation's saved locals.`，没有新 ABI 或分流。
+
+相对 S6 诊断基线 21220ac1，生产为七文件 +48/-96，净 -48。按 Git
+默认文本对比并忽略 CR 行尾，这七文件相对原始 OpenNT 的账目如下；
+前置临时副本的 blob 已逐一与 21220ac1 对应原文件核对一致。
+
+| 文件 | 修前新增/删除 | 修后新增/删除 | 增删合计变化 |
+| --- | --- | --- | ---: |
+| sevid000.c | 476/475 | 482/487 | +18 |
+| sevid001.c | 451/450 | 455/458 | +12 |
+| sevid016.c | 652/711 | 654/715 | +6 |
+| sevid017.c | 468/634 | 475/648 | +21 |
+| sevid018.c | 494/654 | 501/668 | +21 |
+| sevid019.c | 664/1051 | 680/1083 | +48 |
+| sevid020.c | 632/678 | 638/690 | +18 |
+| 合计 | 3837/4653 | 3885/4749 | +144 |
+
+原始镜像 diff 增删合计 8490→8634；代码净减少不能解释成减少了镜像 diff。
+48 项源代码和运行证明、常设回归及验收边界由
+[S6 记录](../../../proposals/m9-win31-file-manager-vga-width-transition.md#s6-per-site-qualified-result-and-minimal-proposed-diff)
+承接。不扩展修复其他生成规则家族，也不宣称所有 legacy compound
+入口的算法或生产可达性已经完整认证。

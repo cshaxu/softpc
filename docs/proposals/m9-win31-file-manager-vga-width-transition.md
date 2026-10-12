@@ -932,7 +932,7 @@ git apply --check 通过，未应用到生产源码。
 
 #### 48 项逐项处置
 
-行号指当前未修改生产源码的调用点。所有条目的目标/恢复关系都已与
+行号指 S6 诊断基线 21220ac1 的调用点。所有条目的目标/恢复关系都已与
 原始源码核对；“旧表现”是隔离父帧实验，不是日常客户机发生频率。
 
 | 调用点 | 续接标签 | 所属过程 | 旧表现（x86/x64 相同） | 处置依据 |
@@ -989,6 +989,81 @@ git apply --check 通过，未应用到生产源码。
 S6 调研给出的建议是统一修复这 48 处已经证明的同类作用域错误，不扩大到
 其他规则文件，不新增任何显存写入分流。生产实施尚待 owner 批准；本轮
 没有修改 src、test、发布 EXE、INI、介质或 snapshot，T88/S6 不自动收口。
+
+### S6 P3 owner-approved implementation
+
+Owner 批准同一提交统一清理 38 个写入和十个读取续接点；在明确说明
+这会增加与原始镜像的差异后，Owner 再次明确回答“批准”，要求完成编译、
+发布、测试、提交、推送后等待验收。以下实施记录承接 P2 诊断，不将其
+未改生产源码的历史事实误当作 P3 当前状态。
+
+实际生产修改恰为七文件 +48/-96，净 -48，包含同行理由注释；每个旧
+两行 L_* 尾调用块换成一行同过程 goto。包装函数、真实 S_* 调用、
+显存读写、dirty、snapshot 格式和所有公共六组件均未改变。逐点检查
+48 个替换都对应原调用，没有额外生产变化。与原始 OpenNT 的七文件
+增删合计 8490→8634，增加 144；逐文件账目见
+[pristine ledger](../etc/evidence/softpc/pristine-divergence-current.md#t88-s6-chain2-续接作用域修复)。
+
+常设证明复用现有 VGA case，不增加产品入口或重复测试组件：
+
+- 16 组 ModeX dword/双 word 分解对照覆盖四种写入方式、四种地址余数。
+  这是该规则实际使用的嵌套调用组合；上层值取 0xA5 保持 legacy
+  wrapper 的既有值宽度语义，不夹带数据算法修订。
+- 264 组 byte/word/dword 写入、fill 和双向 move 配置各重放两遍，
+  比较完整 plane 数据；每次复合调用后再执行一个普通 byte 哨兵调用。
+  五种 writer 都覆盖四种地址余数；RAM 来源使用真实原生指针，Copy
+  move 额外覆盖原有 video 来源，不安装缺失的 ModeX bulk 回调。
+- 56 组 byte/word/dword 读取和双向 string-read 配置各重放两遍，
+  对照结果并检查目的缓冲区两端 canary；字符串覆盖两种既有布局 flag。
+- 独立 test 翻译单元仅承接原生宽度 C-VID 寄存器 ABI，避免改变 CPU
+  fixture 的 guest-width IUH。它只链接进既有 VGA test，不进入产品。
+- 原有源码门禁逐点核对全部 48 个 local transfer，并拒绝恢复为旧的
+  returnValue=L_* 调用；没有把其他生成家族的机械候选自动升级为修复。
+
+开发阶段先补齐新 fixture 缺失的 EGA 容量头声明；初始把所有 writer 的
+dword 都假定为两个 word 的 oracle 也未通过。源码核对后将该分解断言
+限定于真正用此分解的 ModeX，Copy 原有内联四字节算法保持不动，仅作
+续接/重放验证。不能把此测试修正宣称为认证了 Copy 的全部硬件算法，
+也不为了让这个过宽断言通过而扩大生产补丁。
+
+测试、构建和门禁四路径共 +142/-1，净 +141：native-rule fixture
++116/-0，现有 VGA test 接线 +2/-0，root CMake +3/-1，既有源码门禁
++21/-0。生产与这些验证代码合计 +190/-97，净 +93；文档与 EXE 不计入
+该代码账目。不会以生产净减少 48 行掩盖验证代码的增加。
+
+后台作业分别声明 build 1800 秒、suite 3600 秒预算，保留日志和退出码，
+退出由启动方负责，不做 30 秒截断。复用现有 Ninja build 树和已编译的
+未变对象；x86 原有 Ninja 日志尾部恢复触发完整 578-step 构建，成功后
+测试继续复用其产物。最后的 EOF 空行清理后 focused 重编又遇到同一
+日志恢复，触发 305-step 重建；这属于现有 cache 的实际例外，不宣称
+全部对象本轮只编译一次，也未新建另一套 build 树或主动清空缓存。
+早期 fixture 失败
+不计为通过；最终资格只采用修正后当前 source 对应的 focused/full 结果。
+
+最终资格：两种架构各有 84/84 共享测试、47/47 App/门禁测试通过，
+合计 131/131 后台测试。最新 native fixture 的 focused VGA 结果也在
+两种架构通过。App cohort 覆盖 snapshot transaction/cross-process、
+snapshot boundary、runtime restart、input continuation、command provider
+和 presentation shutdown；VGA cohort 保留 CGA/EGA/VGA/V7、颜色/分辨率、
+pointer/dirty 和 snapshot surface 重建矩阵。五项原生 desktop 测试每种
+架构未跑，不冒称 136/136 或人工 Win3.1 验收通过。
+
+源码门禁、文档门禁和 git diff --check 通过。构建日志中的新 fixture
+初期失败已修正，最终结果只认当前源码对应的重跑；没有修改生产算法
+来绕过测试。忽略区的诊断临时 compiler inputs/objects 已清理，正式
+Ninja 中间体和有用诊断证据保留，测试与发布不依赖这些临时输入。
+
+发布产物：
+
+- x64：3094348 bytes，SHA-256
+  `99D8F132642A0A776E0F1E4FE6635D081FA3CE6CD145067AD171E3EF633259E3`。
+- x86：3494060 bytes，SHA-256
+  `386DE2AF207FA40845029D3540FC26212B47BC5CCE2F1B7D7035A5731D752D47`。
+
+相对已接受 S5 产物，x64 减少 8192 bytes，x86 减少 10240 bytes。
+snapshot.sol 的 SHA-256 仍为
+`D171247173D4954CC41F4A17A606985FF71F9EA0337C5AD1FA2F6DB31E8F6594`；
+没有配置或介质变化。本 P3 完整交付后等待 owner 验收，S6/T88 保持开放。
 
 ## Repair constraints and acceptance
 

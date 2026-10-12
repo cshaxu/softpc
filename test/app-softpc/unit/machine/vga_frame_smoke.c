@@ -1069,6 +1069,7 @@ static void verify_v7_cpu_scanout(softpc_machine *machine)
 
 static void verify_chain2_dirty_entries(void)
 {
+    extern void softpc_test_chain2_continuations(void);
     const unsigned offsets[] = { 0x100, 0x101, 0x107, 0x2100 };
     EVID_WRT_POINTERS saved_writer;
     unsigned marking, mode, entry, group;
@@ -1138,6 +1139,7 @@ static void verify_chain2_dirty_entries(void)
         assert(getVideodirty_total() == 0);
     }
     setVideov7_bank_vid_copy_off(0);
+    softpc_test_chain2_continuations();
     c_ev_write_ptr = saved_writer;
     set_mark_funcs();
 }

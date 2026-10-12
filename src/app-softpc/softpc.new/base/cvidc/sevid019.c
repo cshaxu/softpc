@@ -1181,8 +1181,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)(LocalIUH+4))	=	(IS32)(3)	;	
-	{	extern	IUH	L21_137if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_137if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_137if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_136if_f_id	:
 		L21_136if_f:	;	
@@ -1293,8 +1292,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)(LocalIUH+7))	=	(IS32)(3)	;	
-	{	extern	IUH	L21_143if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_143if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_143if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_142if_f_id	:
 		L21_142if_f:	;	
@@ -1336,8 +1334,7 @@ switch ( id )
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_144w_t;	
 	case	L21_145w_d_id	:
 		L21_145w_d:	;	
-	{	extern	IUH	L21_141if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_141if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_141if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_140if_f_id	:
 		L21_140if_f:	;	
@@ -1366,8 +1363,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r21))	;	
 	*((IUH	*)(LocalIUH+7))	=	(IS32)(3)	;	
-	{	extern	IUH	L21_147if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_147if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_147if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_146if_f_id	:
 		L21_146if_f:	;	
@@ -1398,8 +1394,7 @@ switch ( id )
 	 * Keep that contract on x86/x64 by making the literal an IUH too. */
 	if	((*((IUH	*)(LocalIUH+1))	&	((IUH)1	<<	*((IUH	*)&(r20))))	==	0)	goto	L21_148if_f;
 	*((IUH	*)(LocalIUH+8))	=	(IS32)(3)	;	
-	{	extern	IUH	L21_149if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_149if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_149if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_148if_f_id	:
 		L21_148if_f:	;	
@@ -1488,8 +1483,7 @@ switch ( id )
 	if	(*((ISH	*)(LocalIUH+2))	!=		*((ISH	*)&(r20)))	goto	L21_152if_f;	
 	*((IUH	*)&(r21))	=	(IS32)(1)	;	
 	*((IU32	*)(LocalIUH+3)	+	REGLONG)	=	*((IU32	*)(LocalIUH+3)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	;		
-	{	extern	IUH	L21_153if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_153if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_153if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_152if_f_id	:
 		L21_152if_f:	;	
@@ -1601,8 +1595,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 		L21_157w_d:	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	;	
 	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	=	*(UOFF_15_8(	(LocalIUH+1)	))	;
-	{	extern	IUH	L21_155if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_155if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_155if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_154if_f_id	:
 		L21_154if_f:	;	
@@ -1757,8 +1750,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IUH	*)&(r21))	=	(IS32)(3)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r21))	+	*((IUH	*)(LocalIUH+2))	;		
 	*((IU32	*)(LocalIUH+3)	+	REGLONG)	=	*((IU32	*)(LocalIUH+3)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
-	{	extern	IUH	L21_161if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_161if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_161if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_160if_f_id	:
 		L21_160if_f:	;	
@@ -1886,8 +1878,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)&(r20))	=	(IS32)(3)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r21))	;	
-	{	extern	IUH	L21_163if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_163if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_163if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_162if_f_id	:
 		L21_162if_f:	;	
@@ -2157,8 +2148,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_171if_f_id	:
 		L21_171if_f:	;	
-	{	extern	IUH	L21_167if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_167if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_167if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_166if_f_id	:
 		L21_166if_f:	;	
@@ -2430,8 +2420,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_179w_t;	
 	case	L21_180w_d_id	:
 		L21_180w_d:	;	
-	{	extern	IUH	L21_177if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_177if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_177if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_176if_f_id	:
 		L21_176if_f:	;	
@@ -2787,8 +2776,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_189if_f_id	:
 		L21_189if_f:	;	
-	{	extern	IUH	L21_185if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_185if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_185if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_184if_f_id	:
 		L21_184if_f:	;	
@@ -3060,8 +3048,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_197w_t;	
 	case	L21_198w_d_id	:
 		L21_198w_d:	;	
-	{	extern	IUH	L21_195if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_195if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_195if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_194if_f_id	:
 		L21_194if_f:	;	
@@ -3417,8 +3404,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_207if_f_id	:
 		L21_207if_f:	;	
-	{	extern	IUH	L21_203if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_203if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_203if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_202if_f_id	:
 		L21_202if_f:	;	
@@ -3690,8 +3676,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_215w_t;	
 	case	L21_216w_d_id	:
 		L21_216w_d:	;	
-	{	extern	IUH	L21_213if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_213if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_213if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_212if_f_id	:
 		L21_212if_f:	;	
@@ -4047,8 +4032,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_225if_f_id	:
 		L21_225if_f:	;	
-	{	extern	IUH	L21_221if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_221if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_221if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_220if_f_id	:
 		L21_220if_f:	;	

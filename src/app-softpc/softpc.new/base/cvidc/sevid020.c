@@ -872,8 +872,7 @@ switch ( id )
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_233w_t;	
 	case	L21_234w_d_id	:
 		L21_234w_d:	;	
-	{	extern	IUH	L21_231if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_231if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_231if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_230if_f_id	:
 		L21_230if_f:	;	
@@ -1134,8 +1133,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)(LocalIUH+7))	=	(IS32)(1)	;	
-	{	extern	IUH	L21_241if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_241if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_241if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_240if_f_id	:
 		L21_240if_f:	;	
@@ -1176,8 +1174,7 @@ switch ( id )
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_242w_t;	
 	case	L21_243w_d_id	:
 		L21_243w_d:	;	
-	{	extern	IUH	L21_239if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_239if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_239if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_238if_f_id	:
 		L21_238if_f:	;	
@@ -1206,8 +1203,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r21))	;	
 	*((IUH	*)(LocalIUH+7))	=	(IS32)(1)	;	
-	{	extern	IUH	L21_245if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_245if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_245if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_244if_f_id	:
 		L21_244if_f:	;	
@@ -1238,8 +1234,7 @@ switch ( id )
 	 * Keep that contract on x86/x64 by making the literal an IUH too. */
 	if	((*((IUH	*)(LocalIUH+1))	&	((IUH)1	<<	*((IUH	*)&(r20))))	==	0)	goto	L21_246if_f;
 	*((IUH	*)(LocalIUH+8))	=	(IS32)(1)	;	
-	{	extern	IUH	L21_247if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_247if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_247if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_246if_f_id	:
 		L21_246if_f:	;	
@@ -1326,8 +1321,7 @@ switch ( id )
 	/*	j_state	(IS32)(-2013004225),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16643)	;
-	{	extern	IUH	L21_251if_d()	;	
-	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_251if_d(v1,v2,v3,v4);	return(returnValue);	}	
+	goto L21_251if_d; /* T88: keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_250if_f_id	:
 		L21_250if_f:	;	

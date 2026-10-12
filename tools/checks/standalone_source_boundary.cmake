@@ -608,6 +608,27 @@ endforeach()
 if(NOT chain2_marker_count EQUAL 28)
     message(FATAL_ERROR "CHAIN2 marker ledger must contain exactly 28 entries")
 endif()
+# T88 S6: continuation transfers stay in their owning activation.
+foreach(record IN ITEMS
+    "sevid000.c:L26_1if_d,L26_3if_d,L26_5if_d,L26_24if_d,L26_26if_d,L26_28if_d"
+    "sevid001.c:L26_58if_d,L26_60if_d,L26_78if_d,L26_80if_d"
+    "sevid016.c:L21_1if_d,L21_9if_d"
+    "sevid017.c:L21_19if_d,L21_24if_d,L21_35if_d,L21_43if_d,L21_53if_d,L21_58if_d,L21_69if_d"
+    "sevid018.c:L21_77if_d,L21_87if_d,L21_92if_d,L21_103if_d,L21_111if_d,L21_121if_d,L21_126if_d"
+    "sevid019.c:L21_137if_d,L21_143if_d,L21_141if_d,L21_147if_d,L21_149if_d,L21_153if_d,L21_155if_d,L21_161if_d,L21_163if_d,L21_167if_d,L21_177if_d,L21_185if_d,L21_195if_d,L21_203if_d,L21_213if_d,L21_221if_d"
+    "sevid020.c:L21_231if_d,L21_241if_d,L21_239if_d,L21_245if_d,L21_247if_d,L21_251if_d")
+    string(REPLACE ":" ";" fields "${record}")
+    list(GET fields 0 unit)
+    list(GET fields 1 labels)
+    string(REPLACE "," ";" labels "${labels}")
+    file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/softpc.new/base/cvidc/${unit}" rules)
+    foreach(label IN LISTS labels)
+        if(NOT rules MATCHES "goto ${label}; /\\* T88: keep this activation's saved locals\\. \\*/" OR
+           rules MATCHES "returnValue[ \t]*=[ \t]*${label}\\(")
+            message(FATAL_ERROR "CHAIN2 continuation loses its local activation: ${unit}/${label}")
+        endif()
+    endforeach()
+endforeach()
 if(build_definition MATCHES "tests/")
     message(FATAL_ERROR "CMake retains a legacy tests/ source reference")
 endif()

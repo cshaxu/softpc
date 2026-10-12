@@ -417,7 +417,9 @@ target_include_directories(softpc-keycode-smoke PRIVATE src/app-softpc
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/compat/keycode_smoke" COMMAND softpc-keycode-smoke)
-add_executable(softpc-vga-frame-smoke test/app-softpc/unit/machine/vga_frame_smoke.c)
+add_executable(softpc-vga-frame-smoke
+    test/app-softpc/unit/machine/vga_frame_smoke.c
+    test/app-softpc/unit/machine/chain2_rule_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/app-softpc/softpc.new/host/inc
