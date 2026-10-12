@@ -2,8 +2,9 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner accepts S6 and approves T88 closure.
-S1--S6 are closed; no next queue candidate is admitted.
+No implementation subtask is active. Open task awaiting owner: T89.
+S1 audit/research/design is delivered for review; S1 is not owner-closed and
+S2 is not admitted. T88 S1--S6 remain closed.
 
 The latest accepted runnable source is f1d394ca, qualified by a10fce4f:
 x64/x86 each pass all 136 registered tests (131 background plus five serial
@@ -11,6 +12,15 @@ native desktop cases), without Computer Use. Closure changes documents only;
 published EXEs, owner INI, disks and snapshot remain unchanged.
 [T88 completion audit](../history/M9-T88-completion-audit.md) records the
 finite task ledger, final changed paths, mirror accounting and remaining debt.
+
+S1 accounts for 36 standalone directives in 14 mirror files. Eight unchanged
+focused tests pass on each architecture, plus default/initialized guest INT33
+diagnostics on both widths. Production, test suites, build configuration and
+published EXEs are unchanged. The [T89 record](../history/M9-T89-mirror-compat-convergence.md)
+contains the executed brief and evidence. The
+[revised proposal](../proposals/m9-mvdm-compat-boundary-convergence.md)
+recommends bounded existing-endpoint/header work and explicit retained ports;
+it rejects moving PIC state to Compat or implicitly enabling a DOS driver.
 
 ## Historical M9 T85 S20 delivery record
 

@@ -1,6 +1,46 @@
 # M9: MVDM Mirror and Compat Boundary Convergence
 
-## Objective
+## T89 S1 design recommendation
+
+Owner admitted this candidate as T89 and requested S1 audit/research/design.
+The [T89 record](../history/M9-T89-mirror-compat-convergence.md) freezes all
+36 standalone directives across 14 mirror files and gives each an original
+behavior, current behavior, chosen owner, receiver and disposition.
+[CURRENT](../states/CURRENT.md) alone owns admission/acceptance status.
+
+The executable recommendation is narrower than the original candidate below:
+
+1. **S2: reuse existing endpoints.** Restore original conapi.h spelling in
+   four painters through the already-present Compat header; use original
+   KeyMsgToKeyCode from Compat and delete the extra Scan-1 lookup ABI/header;
+   move the standalone build definition from host_def.h to concrete CMake
+   target contracts, including their test consumers. Estimated mirror
+   +1/-28, net -27; production overall net reduction about 31--42 lines.
+2. **S3: isolate only host-header policy.** Two small Compat headers include
+   original cfpu_def.h/nt_graph.h and override only FENV/lock macros. Restore
+   those two original macro blocks, retaining endian and painter declarations.
+   Estimated mirror +1/-28, net -27; overall production net increase about
+   18--38 lines. Requires explicit acceptance of this small ownership tradeoff.
+3. **S4: verify retained ports and close the finite ledger.** Preserve original
+   PIC/PPI state and algorithms, current NT audio endpoint selection, renderer
+   transaction/lifecycle/geometry and 64 KiB I/O selection. Correct the reset
+   comment: mouse instance initialization does not install a DOS driver.
+   Perform full task audit and qualification; no planned hardware rewrite.
+
+Only S1 is admitted. Subsequent admission approves the narrowed disposition
+standard: every member is either simplified or explicitly retained with an
+owner/receiver. Removing every standalone token is not an exit condition.
+Do not move PIC predicates to Compat or enable a guest DOS driver as a
+structural cleanup. NIDDB initialization succeeds on both widths, but leaves
+INT33 and omitted mouse BOP registration unchanged. Synthetic guest INT33
+probes and eight existing focused tests per width pass; no DOS-driver package
+or Windows guest acceptance is claimed by those probes.
+
+The record contains per-file accounting, concrete include-order requirements,
+test gaps and all retained-port reasons. No source implementation has occurred
+in S1; accepted T88 artifacts and repairs remain unchanged.
+
+## Original candidate objective (superseded by the S1 recommendation)
 
 Remove standalone-only implementation selection from the selected
 `src/app-softpc/softpc.new/` mirror wherever the original machine algorithm
@@ -46,8 +86,8 @@ normal hardware state branch is in scope.
 - Do not remove a mirror difference solely to lower a line count.
 - Do not change Lib, Common, x86, guest media, user INI, snapshots, or package
   policy without separate evidence and approval.
-- Do not fold the T88 V7 repaint TODO into this work; its source-qualified
-  display defect remains independently owned.
+- Preserve the accepted T88 V7/CHAIN2 and Compat publication repairs. T88
+  is closed; no unhandled repaint TODO is inferred from this old candidate.
 
 ## Destination Model and Examples
 
@@ -85,7 +125,10 @@ The converged design puts `host_audio_set_tone()` behind the selected Compat
 ABI.  The original state machine calls one endpoint; only Compat decides how
 that endpoint reaches native audio.
 
-## Proposed Serial Work
+## Pre-admission serial hypothesis (superseded)
+
+The following is retained to explain what S1 tested and rejected; it is not
+the current implementation sequence. The recommendation above replaces it.
 
 ### S1 — Freeze the branch ledger and prove mouse-driver reachability
 
@@ -174,7 +217,7 @@ committed diff before requesting owner acceptance.
 
 Stop for owner direction if a proposed cleanup requires a guest-visible
 semantic choice, proves that a required guest device has no standalone host
-contract, needs a Lib/Common/x86 API change, or conflicts with the separately
-tracked V7 repaint repair.  A failed attempt to remove a branch is evidence to
+contract, needs a Lib/Common/x86 API change, or conflicts with accepted T88
+behavior. A failed attempt to remove a branch is evidence to
 retain a narrowly documented port ABI, not permission to reintroduce a second
 machine/device/renderer implementation.

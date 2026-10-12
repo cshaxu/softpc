@@ -3,14 +3,16 @@
 This is the ordered, unnumbered candidate queue. It neither activates work nor
 allocates a numeric task identifier.
 
-1. [MVDM mirror and Compat boundary convergence](../proposals/m9-mvdm-compat-boundary-convergence.md)
-2. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+1. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
 
-The queue head converges standalone host adaptation into Compat while preserving
-the original MVDM machine owners. The XP candidate upgrades the routine
+The XP candidate upgrades the routine
 selected-mirror comparison from OpenNT to XP SP1, with explicit IBM PC/AT
 adoption and PC-98/Japan/NTVDM exclusions.
 
 Already admitted, not a queue candidate:
+[MVDM mirror and Compat boundary convergence](../proposals/m9-mvdm-compat-boundary-convergence.md).
+Its T89 S1 design-review status is in [CURRENT](CURRENT.md).
+
+Previously admitted:
 [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md).
 Its current task status is owned solely by [CURRENT](CURRENT.md).
