@@ -1,6 +1,6 @@
 # M9 T90 S1: Non-mirror quality cleanup delivery
 
-Status: implemented and verified, awaiting owner acceptance. T90 is open.
+Status: S1 and T90 owner-accepted and closed on 2026-10-11.
 Baseline: `1684475c` (accepted T89). The
 [retained proposal](M9-T90-nonmirror-quality-cleanup-proposal.md) defines the finite five-item scope.
 
@@ -106,5 +106,23 @@ Published SHA-256:
 - softpc64.exe: `c44181ff263fa9e6520d260bd98ce4323f310a3d026f14e06afb753c2a1832dc`
 
 Executable sizes change by +1,082 bytes (x86), +57 bytes (x64). INI, disks,
-snapshots, public manifests and queue order are unchanged. This delivery is not
-owner acceptance or T closure.
+snapshots, public manifests and queue order are unchanged by the implementation.
+
+## T90 completion audit and owner acceptance
+
+Owner: “验收通过。TODO：RDP 下鼠标偶发逃出捕获窗口。已经修复，可以删掉。
+据此，TODO和QUEUE都各自只有一条任务。请你照此提交推送”。
+
+Coordinator review checked the actual `1684475c..dae5d2bb` production changes,
+the five-item requirement ledger, test evidence and both published hashes.
+All five items map to the existing owners and focused proofs above; the only
+admitted S is S1, and all its exit criteria are met. Both background and native
+desktop qualification succeeded on x64/x86 (137/137 each), followed by owner
+acceptance. There is no unfinished T90 item or new debt to transfer.
+
+The RDP TODO is removed on the owner's confirmation of its prior repair, not
+claimed as a T90 code change or a new reproduction. The remaining null BOP TODO
+and XP SP1 Queue candidate are outside T90 and remain unadmitted. Each ledger
+now has exactly one pending item. S1 and T90 close without admitting a successor.
+This P2 changes documentation only; the accepted binaries and implementation
+remain `dae5d2bb`, so no redundant rebuild or runtime test is required.

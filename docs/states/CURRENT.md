@@ -2,12 +2,15 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T90.
-S1's five repairs are implemented and verified; owner acceptance remains pending.
+No implementation subtask is active. T90 is owner-accepted and closed.
+S1's five repairs were accepted on 2026-10-11; runnable baseline is `dae5d2bb`.
 Both Release EXEs are refreshed. Each width passed 84 shared + 48 other
 background tests and all five native desktop cases (137/137).
 See the [S1 delivery and diff ledger](../history/M9-T90-S1-nonmirror-quality-cleanup.md).
 T89 remains owner-accepted and closed.
+The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
+TODO retains only the null BOP investigation; Queue retains only the XP SP1
+mirror upgrade. No next task is admitted.
 
 ## M9 T90 S1 Retained Delivery Brief
 
@@ -615,6 +618,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T90 | S1 owner-accepted and closed; five non-mirror quality repairs, dual-width 137/137 including native desktop. | [Audit](../history/M9-T90-S1-nonmirror-quality-cleanup.md#t90-completion-audit-and-owner-acceptance) |
 | T89 | S1--S5 owner-accepted and closed; mirror/Compat convergence, dual-width 136/136 qualification. | [Audit](../history/M9-T89-completion-audit.md) |
 | T88 | S1--S6 complete; owner accepts final mirror/Compat video repairs and approves closure; x64/x86 136/136. | [Audit](../history/M9-T88-completion-audit.md) |
 | T87 | S1 complete; ordinary repository text converges on LF while the preserved OpenNT mirror and user-owned INI retain explicit CRLF checkout policy. | [Audit](../history/M9-T87-repository-eol-convergence.md) |
