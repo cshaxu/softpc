@@ -4,11 +4,12 @@
 
 No implementation subtask is active.
 Open task awaiting owner: T91.
-S1 implementation is delivered in `62ec8e06`; coordinator actual-change review
-passes. Both Release EXEs are refreshed. Each width passes 84 shared + 48 other
+S1 is owner-accepted and closed on 2026-10-12. Implementation is delivered in
+`62ec8e06`; coordinator review is recorded in `9611f5b6`.
+Both Release EXEs are refreshed. Each width passes 84 shared + 48 other
 background tests and all five native desktop cases (137/137).
 The six packages match reviewed NXVM `73d7967244` byte-for-byte (246 files).
-S1/T91 remain open pending owner acceptance; no closure is claimed.
+T91 remains open by explicit owner instruction; no next S is admitted.
 See the [delivery review](../history/M9-T91-S1-nxvm-shared-glyph-import.md)
 and [retained proposal](../history/M9-T91-nxvm-shared-glyph-import-proposal.md).
 T90 is owner-accepted and closed.

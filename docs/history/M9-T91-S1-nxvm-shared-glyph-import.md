@@ -1,6 +1,6 @@
 # M9 T91 S1: Shared glyph-contract import delivery
 
-Status: implemented and verified; waiting for owner acceptance, not closed.
+Status: S1 owner-accepted and closed on 2026-10-12; T91 remains open.
 Executor P1: `62ec8e06e4c704fc46179abd40035a2b2c8e52cc`, pushed to main.
 Baseline: `cc7365a686338d44b9537422ec3e77661bfebf48`.
 Upstream: `73d7967244c1591038d0c2f4dcec819192d809a1`.
@@ -79,3 +79,14 @@ Published SHA256:
 
 Coordinator disposition: delivery satisfies technical qualification. Wait for
 owner testing; neither S1 nor T91 is closed by this review.
+
+## Owner acceptance and S1 closure
+
+Owner: "验收通过 收口本s 保持本t开放".
+S1 is closed following the pushed executor delivery, coordinator review
+(`9611f5b6`), complete dual-width qualification and owner acceptance.
+The admitted exact-import and receiving-adaptation ledger is satisfied; no
+S1 item is deferred. T91 remains open, with no active or newly admitted S.
+This closure changes documentation only, preserving the tested source, both
+EXEs, user configuration and media. Documentation governance and whitespace
+checks are rerun; no redundant build or runtime test is needed.
