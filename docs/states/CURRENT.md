@@ -2,21 +2,24 @@
 
 ## Current Work
 
-T89 S4 is owner-accepted and closed. S5 is admitted for the outstanding native
-desktop qualification and final T-level review. Waiting for a reserved desktop
-period before running those tests; no desktop execution has started. T89 remains open.
+No implementation subtask is active. Open task awaiting owner: T89.
+
+S4 is owner-accepted and closed. S5 completes the outstanding desktop
+qualification and final review; delivered for owner acceptance, not automatic
+T closure. [S5 evidence](../history/M9-T89-S5-desktop-qualification.md).
 
 S4 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
 background tests (131/131 per width), including eight background App integration
-cases. S3 also passed eight focused cases. Five native desktop tests per width were not
-run. Owner INI, disks and snapshots remain unchanged. The last accepted runnable
+cases. S3 also passed eight focused cases. S5 now passes all five native desktop
+tests per width without retry: combined qualification is 136/136 per width.
+Owner INI, disks and snapshots remain unchanged. The last accepted runnable
 baseline is `d1583eda`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
 and [S3 delivery/accounting](../history/M9-T89-S3-host-header-policy.md).
 The [S4 audit](../history/M9-T89-S4-retained-port-audit.md) accounts for all
 36 original directives and whole-T counts: production +48/-78 (net -30),
 build/tests +88/-7 (net +81), original-mirror diff reduced by 58 lines.
 
-## M9 T89 S5 Packet
+## M9 T89 S5 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |
