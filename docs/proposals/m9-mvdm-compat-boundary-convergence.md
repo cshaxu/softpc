@@ -28,7 +28,13 @@ The executable recommendation is narrower than the original candidate below:
    comment: mouse instance initialization does not install a DOS driver.
    Perform full task audit and qualification; no planned hardware rewrite.
 
-S2 and S3 are owner-accepted and closed; S4 is now admitted. The admission preserves
+4. **S5: complete outstanding qualification.** After owner acceptance of S4,
+   run the five existing native desktop tests on each width in a reserved
+   desktop period, reuse the accepted build artifacts, and reconcile the
+   results with S4's background qualification and final ledger. No planned
+   code changes; no additional machine feature or baseline migration.
+
+S2 through S4 are owner-accepted and closed; S5 is now admitted. The admission preserves
 the narrowed disposition
 standard: every member is either simplified or explicitly retained with an
 owner/receiver. Removing every standalone token is not an exit condition.

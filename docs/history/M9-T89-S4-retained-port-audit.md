@@ -116,3 +116,13 @@ background delivery does not waive it or close T89. S4's audit/comment repair
 and background qualification are delivered for review, with this condition
 explicitly retained in CURRENT. Existing RDP capture and historical BOP TODOs
 remain unchanged and outside T89; the XP mirror proposal stays queued.
+
+## Owner acceptance and S4 closure
+
+Owner: "验收通过 收口 准入next s task". Coordinator reviewed d1583eda's
+actual comment-only production diff, the completed supervisor exit record,
+both artifact hashes and the finite ledger against the accepted scope. S4 is
+accepted and closed. Native desktop tests remain unrun; acceptance does not
+waive them. The next S5 carries only this remaining qualification and T-level
+closure review, not new functionality. T89 stays open. No EXE, INI or media
+is changed by this closure/admission.

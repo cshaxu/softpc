@@ -2,41 +2,40 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T89.
-S3 is owner-accepted and closed. S4 audit/comment repair and background
-qualification are delivered for review; native desktop qualification remains
-unscheduled. S4 and T89 are not closed.
+T89 S4 is owner-accepted and closed. S5 is admitted for the outstanding native
+desktop qualification and final T-level review. Waiting for a reserved desktop
+period before running those tests; no desktop execution has started. T89 remains open.
 
 S4 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
 background tests (131/131 per width), including eight background App integration
 cases. S3 also passed eight focused cases. Five native desktop tests per width were not
 run. Owner INI, disks and snapshots remain unchanged. The last accepted runnable
-baseline is `1c698a9c`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
+baseline is `d1583eda`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
 and [S3 delivery/accounting](../history/M9-T89-S3-host-header-policy.md).
 The [S4 audit](../history/M9-T89-S4-retained-port-audit.md) accounts for all
 36 original directives and whole-T counts: production +48/-78 (net -30),
 build/tests +88/-7 (net +81), original-mirror diff reduced by 58 lines.
 
-## T89 S4 retained delivery brief
+## M9 T89 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 收口s3 准入s4. S3 accepted; execute the final retained-port review from the S1 recommendation. |
-| Objective | Reconcile every one of S1's 36 directives across 14 files, verify retained owners, correct the reset comment and audit whole-T changes and regression evidence. |
-| Non-goals | No new CPU/device, audio, renderer, mouse driver, snapshot format, threading or shared API behavior; no user INI/media changes, cache repair or automatic T closure. |
-| Reference Baseline | 1c698a9c accepted S3; whole-T comparison 3c2e6e69; read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
+| Admission And Approval | Owner: 验收通过 收口 准入next s task. Close accepted S4 and admit only the outstanding whole-T qualification as S5. |
+| Objective | Run the five existing native desktop cases per width, reconcile with accepted background evidence and prepare the final T89 closure decision. |
+| Non-goals | No new functionality, production/test/build implementation, guest media, INI, cache repair or XP migration; no Computer Use and no automatic T closure. |
+| Reference Baseline | d1583eda accepted S4; whole-T comparison 3c2e6e69; S4 ledger and artifact hashes remain authoritative. |
 | Candidate Proposal | [Mirror/Compat convergence](../proposals/m9-mvdm-compat-boundary-convergence.md). |
-| Files And ABI Surface | All fourteen ledger files and immediate Compat/build/test consumers read-only; reset.c explanatory comment and task/proposal records only planned edits. No ABI change. |
+| Files And ABI Surface | Existing CTest desktop entries, accepted binaries and task records. No ABI or source changes planned. |
 | Applicable Rules | Task Reading Set, linked governance skills, minimum original-mirror diff, sole original state owner, inward dependencies and source research policy. |
-| Verification | Frozen occurrence/owner/receiver ledger, original-peer comparisons and whole-T diff; dual incremental builds, shared-first background full suites including eight App integration tests; native desktop suite remains separately scheduled, not silently counted as passed. |
-| Expected Markers | Original PIC/PPI, sound state, renderer and I/O extent remain sole owners; all removed or retained directives have evidence and no disguised duplicate machine state. |
-| Asset Needs | Refresh both package EXEs only as needed by the normal build. Ignored build/t89/s4 hidden supervisor/log/exit evidence; build budget 30 minutes, test phase 20 minutes, output 20 MiB per phase, executor-owned cleanup. Preserve cached intermediates and user assets. |
-| Reporting Requirements | Runtime logic +0/-0; reset comment estimate +3/-6, measured before final report; no planned test/build changes. Report whole-T production/test counts and mirror diff separately. |
-| Stop Conditions | Required new behavior/state/API, copied algorithm, increased original-mirror diff beyond comment correction, or an unaccounted ledger member. Native desktop execution requires a reserved testing period. |
-| Exit Criteria | Finite audit and dual background qualification complete, measured changes and artifacts recorded, governance checks pass, complete P committed/pushed for owner review; separately identify desktop qualification still needed for whole-T closure. |
-| Original Owner Request | 收口s3 准入s4 |
-| Similar-Issue Sweep | Re-scan every mirror standalone directive and immediate endpoint; identify retained ports versus obsolete policy, verify S2/S3 removals and reset initialization versus installation semantics. |
+| Verification | Confirm five desktop entries per width with CTest -N; then serial -L desktop --no-tests=error in a reserved period. Cover both package variants, Window retirement/modal and Console display. Reconcile with S4's 131 background passes per width, actual Git diff and artifact hashes. |
+| Expected Markers | Ten actual desktop outcomes, no skipped cases counted as passes, unchanged accepted artifacts and complete finite T89 ledger. |
+| Asset Needs | Reuse accepted dual EXEs and intermediates; no redundant rebuild solely for governance. Hidden owned supervisor under ignored build/t89/s5, captured logs/exit codes, 20 minutes per architecture and 20 MiB output; native test windows may appear. Preserve user INI/media. |
+| Reporting Requirements | Expected production +0/-0, tests/build +0/-0; documentation and bounded evidence only. Report background versus desktop outcomes separately and retain whole-T counts. |
+| Stop Conditions | No reserved desktop period, unavailable interactive desktop, test failure needing code changes, artifact drift or unrelated host interference. Do not waive assertions, retry away a failure or modify code without a scoped decision. |
+| Exit Criteria | Dual desktop qualification complete, evidence and whole-T requirements reviewed, governance checks pass, complete P committed/pushed for owner closure decision. |
+| Original Owner Request | 验收通过 收口 准入next s task |
+| Similar-Issue Sweep | Verify the exact desktop-labelled test inventory on both widths and every remaining S4 qualification exclusion; no new test mechanism or implementation path. |
 
 [S1's audit](../history/M9-T89-S1-mirror-compat-convergence.md) remains the
 finite 36-directive/14-file ledger. S4 verifies its final dispositions.
