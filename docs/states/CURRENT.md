@@ -2,45 +2,44 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T89.
-T89 S2 is owner-accepted and closed. S3 is implemented and verified, awaiting
-owner acceptance. S4 is not admitted.
+T89 S3 is owner-accepted and closed. T89 S4 is admitted and active:
+final retained-port audit and task-level qualification. T89 remains open.
 
 S3 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
 background tests (131/131 per width), including eight background App integration
 cases, plus eight focused cases. Five native desktop tests per width were not
 run. Owner INI, disks and snapshots remain unchanged. The last accepted runnable
-baseline is `90850aab`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
+baseline is `1c698a9c`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
 and [S3 delivery/accounting](../history/M9-T89-S3-host-header-policy.md).
 
-## T89 S3 retained delivery brief
+## M9 T89 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 验收通过 收口s任务 准入下一个s. Admit the next proposed narrow host-header ownership step after S2. |
-| Objective | Move only host FENV operations and renderer lock policy to small Compat headers, restoring the corresponding original header macro blocks. |
-| Non-goals | No FPU layout/guest arithmetic, CPU/device, renderer geometry/transaction, snapshot format, threading, shared API, user INI or media changes; no full copied header or NT API emulation. |
-| Reference Baseline | 90850aab, accepted T89 S2; read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
+| Admission And Approval | Owner: 收口s3 准入s4. S3 accepted; execute the final retained-port review from the S1 recommendation. |
+| Objective | Reconcile every one of S1's 36 directives across 14 files, verify retained owners, correct the reset comment and audit whole-T changes and regression evidence. |
+| Non-goals | No new CPU/device, audio, renderer, mouse driver, snapshot format, threading or shared API behavior; no user INI/media changes, cache repair or automatic T closure. |
+| Reference Baseline | 1c698a9c accepted S3; whole-T comparison 3c2e6e69; read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
 | Candidate Proposal | [Mirror/Compat convergence](../proposals/m9-mvdm-compat-boundary-convergence.md). |
-| Files And ABI Surface | Original host/inc/cfpu_def.h and nt_graph.h; small Compat header overrides including the originals; CMake include ordering, FPU/renderer tests and owner checks. |
+| Files And ABI Surface | All fourteen ledger files and immediate Compat/build/test consumers read-only; reset.c explanatory comment and task/proposal records only planned edits. No ABI change. |
 | Applicable Rules | Task Reading Set, linked governance skills, minimum original-mirror diff, sole original state owner, inward dependencies and source research policy. |
-| Verification | First audit actual include resolution for every affected production/test target. Test four rounding modes and floating exceptions as well as layouts; renderer/cursor and snapshot regressions. Dual incremental builds, shared-first background full suites and App integration; native desktop evidence separately reported. |
-| Expected Markers | Exactly one set of original types/declarations; unchanged eight host FENV operations and no-op single-executor lock contract, no copied algorithm, state or second execution path. |
-| Asset Needs | Only refresh the two package EXEs after implementation. Use ignored build/t89/s3 bounded hidden jobs/logs with exit records; build budget 30 minutes, test phase 20 minutes, output budget 20 MiB per phase, executor owns child cleanup; preserve intermediates and user assets. |
-| Reporting Requirements | Mirror estimate +1/-28, net -27; two Compat headers +45--65/-0; total production net +18--38. Build/tests estimate +40--80/-2--8. Report actual production/test and OpenNT diff separately. |
-| Stop Conditions | Required new behavior/state/interface, copied full header, increased original-mirror diff, expanded scope beyond the two macro groups, or costs materially exceeding the stated small ownership tradeoff. |
-| Exit Criteria | Review actual diff and include provenance; dual focused/background qualification, publish both EXEs, governance checks, complete implementation P committed/pushed and await owner acceptance. |
-| Original Owner Request | 验收通过 收口s任务 准入下一个s |
-| Similar-Issue Sweep | All cfpu_def.h/nt_graph.h include sites, eight FENV macro consumers, GrabMutex/RelMutex consumers, production and independent test include-order selection; retain unrelated mirror ABI differences. |
+| Verification | Frozen occurrence/owner/receiver ledger, original-peer comparisons and whole-T diff; dual incremental builds, shared-first background full suites including eight App integration tests; native desktop suite remains separately scheduled, not silently counted as passed. |
+| Expected Markers | Original PIC/PPI, sound state, renderer and I/O extent remain sole owners; all removed or retained directives have evidence and no disguised duplicate machine state. |
+| Asset Needs | Refresh both package EXEs only as needed by the normal build. Ignored build/t89/s4 hidden supervisor/log/exit evidence; build budget 30 minutes, test phase 20 minutes, output 20 MiB per phase, executor-owned cleanup. Preserve cached intermediates and user assets. |
+| Reporting Requirements | Runtime logic +0/-0; reset comment estimate +3/-6, measured before final report; no planned test/build changes. Report whole-T production/test counts and mirror diff separately. |
+| Stop Conditions | Required new behavior/state/API, copied algorithm, increased original-mirror diff beyond comment correction, or an unaccounted ledger member. Native desktop execution requires a reserved testing period. |
+| Exit Criteria | Finite audit and dual background qualification complete, measured changes and artifacts recorded, governance checks pass, complete P committed/pushed for owner review; separately identify desktop qualification still needed for whole-T closure. |
+| Original Owner Request | 收口s3 准入s4 |
+| Similar-Issue Sweep | Re-scan every mirror standalone directive and immediate endpoint; identify retained ports versus obsolete policy, verify S2/S3 removals and reset initialization versus installation semantics. |
 
 [S1's audit](../history/M9-T89-S1-mirror-compat-convergence.md) remains the
-finite 36-directive/14-file ledger. S3 implements only the two admitted
-host-header groups. The accepted S2 reduced original-mirror diff by 27 lines;
+finite 36-directive/14-file ledger. S4 verifies its final dispositions.
+The accepted S2 reduced original-mirror diff by 27 lines;
 S3 actual production +39/-28, net +11; build/tests/checks +49/-1, net +48.
 Its two original-header diffs fall from 70 to 41 added-plus-removed lines
-against OpenNT, a reduction of 29. The record above retains the admitted
-estimate; the linked S3 delivery owns actual results and evidence.
+against OpenNT, a reduction of 29. The linked S3 delivery owns its actual
+results and evidence; S4 does not reopen that accepted implementation.
 
 ## Historical M9 T85 S20 delivery record
 

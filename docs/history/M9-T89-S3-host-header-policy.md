@@ -108,3 +108,12 @@ and tests, owner INI, media and snapshots are unchanged.
 
 P1 delivers implementation, tests, artifacts and this audit together. Owner
 acceptance, S3 closure and admission of S4 are not inferred from these tests.
+
+## Owner acceptance and S3 closure
+
+Owner: "收口s3 准入s4". Coordinator reviewed the actual 1c698a9c diff,
+both artifact hashes, completed hidden-supervisor exit record and the measured
+production/mirror counts against the admitted boundary. S3 is accepted and
+closed. The five native desktop exclusions per width remain explicitly
+unverified, not silently converted to passes. CURRENT admits S4's final
+retained-port review; T89 is not closed by this transition.
