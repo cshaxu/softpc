@@ -20,14 +20,15 @@ The executable recommendation is narrower than the original candidate below:
    original cfpu_def.h/nt_graph.h and override only FENV/lock macros. Restore
    those two original macro blocks, retaining endian and painter declarations.
    Estimated mirror +1/-28, net -27; overall production net increase about
-   18--38 lines. Requires explicit acceptance of this small ownership tradeoff.
+   18--38 lines. The owner's next-S admission accepts this bounded ownership
+   tradeoff; larger changes still require renewed direction.
 3. **S4: verify retained ports and close the finite ledger.** Preserve original
    PIC/PPI state and algorithms, current NT audio endpoint selection, renderer
    transaction/lifecycle/geometry and 64 KiB I/O selection. Correct the reset
    comment: mouse instance initialization does not install a DOS driver.
    Perform full task audit and qualification; no planned hardware rewrite.
 
-S2 is now admitted after the S1 design delivery. Subsequent admission approves
+S2 is owner-accepted and closed; S3 is now admitted. The admission preserves
 the narrowed disposition
 standard: every member is either simplified or explicitly retained with an
 owner/receiver. Removing every standalone token is not an exit condition.
@@ -39,7 +40,7 @@ or Windows guest acceptance is claimed by those probes.
 
 The record contains per-file accounting, concrete include-order requirements,
 test gaps and all retained-port reasons. S1 changed no production source;
-S2's current implementation and qualification status belongs to CURRENT.
+Current implementation and qualification status belongs to CURRENT.
 
 ## Original candidate objective (superseded by the S1 recommendation)
 

@@ -2,51 +2,41 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T89.
-S2 is implemented and verified, awaiting owner acceptance; S3 is not admitted.
-T88 S1--S6 remain closed.
+T89 S2 is owner-accepted and closed. T89 S3 is admitted; implementation has
+not started. T89 remains open. S4 is not admitted.
 
-## T89 S2 delivery brief
+The accepted runnable baseline is `90850aab`: x64/x86 each pass 84 shared
+then 47 other background tests (131/131 per width), including eight background
+App integration cases. Five native desktop tests per width were not run in
+S2. Owner acceptance does not turn that omission into a claimed test pass.
+Both published EXEs, owner INI, disks and snapshots are unchanged by this
+governance transition. See the [S2 closure record](../history/M9-T89-S2-existing-endpoint-cleanup.md).
+
+## M9 T89 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 批准开始s2. Implement only the approved existing-endpoint cleanup. |
-| Objective | Restore four original conapi includes, reuse KeyMsgToKeyCode for Compat scan input, remove the duplicate lookup ABI, and make standalone selection a concrete build contract. |
-| Non-goals | No S3 header overlays, hardware behavior change, shared-component change, user configuration/media/snapshot edits, or automatic T closure. |
-| Reference Baseline | 9bd90cf9; accepted runnable T88 source f1d394ca and qualification a10fce4f. |
+| Admission And Approval | Owner: 验收通过 收口s任务 准入下一个s. Admit the next proposed narrow host-header ownership step after S2. |
+| Objective | Move only host FENV operations and renderer lock policy to small Compat headers, restoring the corresponding original header macro blocks. |
+| Non-goals | No FPU layout/guest arithmetic, CPU/device, renderer geometry/transaction, snapshot format, threading, shared API, user INI or media changes; no full copied header or NT API emulation. |
+| Reference Baseline | 90850aab, accepted T89 S2; read-only OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
 | Candidate Proposal | [Mirror/Compat convergence](../proposals/m9-mvdm-compat-boundary-convergence.md). |
-| Files And ABI Surface | Four original painters, nt_keycd.c, host_def.h, Compat keyboard/platform/input.h, root CMake and owner-local keyboard/build tests. KeyMsgToKeyCode remains the sole key table owner. |
-| Applicable Rules | Task Reading Set; execution, architecture, coding and documentation governance; original mirror formatting and minimum diff; inward dependencies. |
-| Verification | Dual incremental builds using existing intermediates; key table/OOB and real make/break ingress; concrete macro ownership check; shared-first background full tests and App integration on both widths. Native desktop tests separately reported, not implicit background proof. |
-| Expected Markers | No duplicate Scan-1 ABI, unchanged key tables/invalid-input semantics, same painter ABI and compile profile, no second input or renderer route. |
-| Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; ignored build/t89/s2 logs and owned hidden supervisor, 30-minute build and 20-minute test budgets, terminate owned children on timeout; preserve reusable build intermediates. |
-| Reporting Requirements | Estimated production +7--12/-43--49, net -31--42; report actual production/test and original-mirror counts separately, test evidence and two EXE links. |
-| Stop Conditions | Changed guest semantics, expanded mirror diff, new shared API or unexpected ownership requirement. |
-| Exit Criteria | Implement, actual-change audit, dual build/background regression, documentation gates, publish both EXEs, commit/push complete P and wait for owner acceptance. |
-| Original Owner Request | 批准开始s2 |
-| Similar-Issue Sweep | All duplicate scan lookup declarations/callers, conapi conditional includes and standalone macro definitions/consumer targets. |
+| Files And ABI Surface | Original host/inc/cfpu_def.h and nt_graph.h; small Compat header overrides including the originals; CMake include ordering, FPU/renderer tests and owner checks. |
+| Applicable Rules | Task Reading Set, linked governance skills, minimum original-mirror diff, sole original state owner, inward dependencies and source research policy. |
+| Verification | First audit actual include resolution for every affected production/test target. Test four rounding modes and floating exceptions as well as layouts; renderer/cursor and snapshot regressions. Dual incremental builds, shared-first background full suites and App integration; native desktop evidence separately reported. |
+| Expected Markers | Exactly one set of original types/declarations; unchanged eight host FENV operations and no-op single-executor lock contract, no copied algorithm, state or second execution path. |
+| Asset Needs | Only refresh the two package EXEs after implementation. Use ignored build/t89/s3 bounded hidden jobs/logs with exit records; build budget 30 minutes, test phase 20 minutes, output budget 20 MiB per phase, executor owns child cleanup; preserve intermediates and user assets. |
+| Reporting Requirements | Mirror estimate +1/-28, net -27; two Compat headers +45--65/-0; total production net +18--38. Build/tests estimate +40--80/-2--8. Report actual production/test and OpenNT diff separately. |
+| Stop Conditions | Required new behavior/state/interface, copied full header, increased original-mirror diff, expanded scope beyond the two macro groups, or costs materially exceeding the stated small ownership tradeoff. |
+| Exit Criteria | Review actual diff and include provenance; dual focused/background qualification, publish both EXEs, governance checks, complete implementation P committed/pushed and await owner acceptance. |
+| Original Owner Request | 验收通过 收口s任务 准入下一个s |
+| Similar-Issue Sweep | All cfpu_def.h/nt_graph.h include sites, eight FENV macro consumers, GrabMutex/RelMutex consumers, production and independent test include-order selection; retain unrelated mirror ABI differences. |
 
-The latest owner-accepted runnable source remains f1d394ca, qualified by
-a10fce4f. T89 S2 publishes new x64/x86 EXEs for owner testing: each passes
-84 shared tests then 47 other background tests, including all eight background
-App integration cases. Five native desktop tests per width were not run in S2;
-the older T88 desktop result is not claimed as current proof. Owner INI,
-disks and snapshots are unchanged. Production is +6/-45 (net -39);
-build/tests/checks are +39/-6 (net +33). The six touched mirror files have
-27 fewer added+removed lines against OpenNT. See the
-[S2 delivery record](../history/M9-T89-S2-existing-endpoint-cleanup.md).
-[T88 completion audit](../history/M9-T88-completion-audit.md) records the
-finite task ledger, final changed paths, mirror accounting and remaining debt.
-
-S1 accounts for 36 standalone directives in 14 mirror files. Eight unchanged
-focused tests pass on each architecture, plus default/initialized guest INT33
-diagnostics on both widths. Production, test suites, build configuration and
-published EXEs are unchanged. The [T89 record](../history/M9-T89-S1-mirror-compat-convergence.md)
-contains the executed brief and evidence. The
-[revised proposal](../proposals/m9-mvdm-compat-boundary-convergence.md)
-recommends bounded existing-endpoint/header work and explicit retained ports;
-it rejects moving PIC state to Compat or implicitly enabling a DOS driver.
+[S1's audit](../history/M9-T89-S1-mirror-compat-convergence.md) remains the
+finite 36-directive/14-file ledger. S3 implements only the two admitted
+host-header groups. The accepted S2 reduced original-mirror diff by 27 lines;
+S3 estimates are not reported as already achieved.
 
 ## Historical M9 T85 S20 delivery record
 

@@ -13,8 +13,8 @@ Objective: reuse existing painter and keyboard endpoints, remove the redundant
 lookup interface and move standalone selection to the concrete build target.
 Non-goals: S3 overlays, guest behavior changes, shared-component edits,
 new hardware or renderer paths, user configuration/media/snapshot changes.
-The executed packet and verification contract are retained in CURRENT's
-S2 delivery brief. The preliminary estimate was production +7--12/-43--49,
+The executed packet is retained in CURRENT at implementation commit 90850aab;
+this record retains its scope and verification. The preliminary estimate was production +7--12/-43--49,
 net -31--42; mirror approximately +1/-28, net -27.
 
 ## Actual implementation and finite ledger
@@ -136,3 +136,14 @@ Owner INI, guest media and snapshots are unchanged. Small supervisor/log
 evidence is retained under ignored build space; no new diagnostic executable
 or raw trace is shipped. S2 is delivered for owner acceptance; S3 and T89
 closure are not inferred.
+
+## Owner acceptance and S2 closure
+
+Owner request: "验收通过 收口s任务 准入下一个s".
+Coordinator re-reviewed the actual 90850aab changed paths, preserved keyboard
+semantics, production/mirror counts, completed supervisor exit record and
+published artifact hashes against the admitted S2 boundary. The background
+qualification and native desktop exclusion remain exactly as reported above.
+S2 is accepted and closed; the next S3 header-policy migration is admitted in
+CURRENT. This closure/admission changes documents only, not code or binaries.
+T89 remains open; no S3 implementation or T-level acceptance is claimed.
