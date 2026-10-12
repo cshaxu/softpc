@@ -2,13 +2,15 @@
 
 ## Current Work
 
-M9 T91 S1 is active: audit then import the latest NXVM shared six packages.
-Import and receiving adaptation are implemented; both Release EXEs are refreshed.
-Each width passes 84 shared + 48 other background tests and all five native
-desktop cases (137/137). Executor delivery is ready for commit/push, followed
-by coordinator actual-change review and owner acceptance; no closure is claimed.
-The [admission and audit](../proposals/m9-nxvm-shared-glyph-capacity-import.md)
-records the working-tree baseline and the required SoftPC producer adaptation.
+No implementation subtask is active.
+Open task awaiting owner: T91.
+S1 implementation is delivered in `62ec8e06`; coordinator actual-change review
+passes. Both Release EXEs are refreshed. Each width passes 84 shared + 48 other
+background tests and all five native desktop cases (137/137).
+The six packages match reviewed NXVM `73d7967244` byte-for-byte (246 files).
+S1/T91 remain open pending owner acceptance; no closure is claimed.
+See the [delivery review](../history/M9-T91-S1-nxvm-shared-glyph-import.md)
+and [retained proposal](../history/M9-T91-nxvm-shared-glyph-import-proposal.md).
 T90 is owner-accepted and closed.
 S1's five repairs were accepted on 2026-10-11; runnable baseline is `dae5d2bb`.
 Both Release EXEs are refreshed. Each width passed 84 shared + 48 other
@@ -19,7 +21,7 @@ The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
 TODO retains only the null BOP investigation; Queue retains only the XP SP1
 mirror upgrade. Neither item is part of T91.
 
-## M9 T91 S1 Packet
+## M9 T91 S1 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |
@@ -28,7 +30,7 @@ mirror upgrade. Neither item is part of T91.
 | Objective | Import the reviewed NXVM six roots exactly and adapt the existing SoftPC font producer/default-height consumer; qualify and deliver for owner acceptance. |
 | Non-goals | No NXVM writes, mirror change, unrelated cleanup, INI/media/snapshot mutation, new rendering path or automatic closure. |
 | Reference Baseline | SoftPC cc7365a6; reviewed clean NXVM 73d7967244c1591038d0c2f4dcec819192d809a1 supersedes the initial uncommitted audit. |
-| Candidate Proposal | [Shared glyph-capacity import](../proposals/m9-nxvm-shared-glyph-capacity-import.md). |
+| Candidate Proposal | [Shared glyph-capacity import](../history/M9-T91-nxvm-shared-glyph-import-proposal.md). |
 | Files And ABI Surface | Six shared source/test roots; Window copied font slots change from 16 to 32 bytes. SoftPC Compat font producer, Machine declarations and owning tests need matched layout. |
 | Applicable Rules | Task Reading Set, four governance skills, inward dependencies, Lib Types, source research policy and hidden supervised execution. |
 | Verification | Audit all path/hash differences and manifests first. Import phase: focused glyph/consumer checks, dual Release builds and refreshed EXEs, shared tests before other background tests, native desktop separately in reserved period, then actual diff review. |
