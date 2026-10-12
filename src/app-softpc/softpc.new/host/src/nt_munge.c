@@ -24,11 +24,7 @@
 #include "egagraph.h"
 #include "egaports.h"
 #include "vgaports.h"
-#ifdef SOFTPC_STANDALONE
-#include "dib_surface.h"
-#else
 #include <conapi.h>
-#endif
 #include "nt_graph.h"
 
 /*(

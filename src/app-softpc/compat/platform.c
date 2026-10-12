@@ -33,7 +33,6 @@
 #include "dib_surface.h"
 #include "nt_graph.h"
 #include "lifecycle.h"
-#include "input.h"
 #include "hdd_media.h"
 #include "audio.h"
 #include "c_main.h"

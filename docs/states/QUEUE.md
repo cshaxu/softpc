@@ -11,7 +11,7 @@ adoption and PC-98/Japan/NTVDM exclusions.
 
 Already admitted, not a queue candidate:
 [MVDM mirror and Compat boundary convergence](../proposals/m9-mvdm-compat-boundary-convergence.md).
-Its T89 S1 design-review status is in [CURRENT](CURRENT.md).
+Its T89 implementation status is in [CURRENT](CURRENT.md).
 
 Previously admitted:
 [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md).

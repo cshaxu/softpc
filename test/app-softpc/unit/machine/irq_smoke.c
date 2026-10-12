@@ -11,6 +11,7 @@
 #include "ica.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
+#include "compat/platform.h"
 #include "app-softpc/softpc.new/base/ccpu386/c_intr.h"
 
 extern void reboot(void);
@@ -73,6 +74,26 @@ static void verify_keyboard_read_releases_irq(void)
     assert((irr & 0x02u) == 0u);
 }
 
+static void verify_scan_input(void)
+{
+    half_word status, value;
+    unsigned released;
+    /* Actual Compat ingress through the original keyboard controller. The
+       ROM has selected translated Scan-1 output; make/break must survive. */
+    for (released = 0; released < 2; ++released) {
+        unsigned char scan = (unsigned char)(0x1eu | (released << 7));
+        assert(softpc_platform_keyboard_scancode(scan));
+        inb(0x64u, &status);
+        assert((status & 1u) != 0u);
+        inb(0x60u, &value);
+        assert(value == scan);
+    }
+    assert(!softpc_platform_keyboard_scancode(0x54u));
+    assert(!softpc_platform_keyboard_scancode(0xd4u));
+    inb(0x64u, &status);
+    assert((status & 1u) == 0u);
+}
+
 int main(void)
 {
     const char *path = "softpc-machine-irq-smoke.img";
@@ -120,6 +141,7 @@ int main(void)
         sizeof(ticks)) == SOFTPC_MACHINE_OK);
     assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
     verify_rejected_interrupt(machine);
+    verify_scan_input();
     verify_keyboard_read_releases_irq();
 
     /* The original 8042 output-port pulse requests a CPU reset through the

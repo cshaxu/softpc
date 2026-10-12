@@ -2,7 +2,7 @@
 #include "host_def.h"
 #include "platform.h"
 #include "keyboard.h"
-#include "input.h"
+#include "nt_uis.h"
 #include "keyba.h"
 
 extern void host_key_down(int key);
@@ -58,6 +58,8 @@ int softpc_platform_keyboard_key(int key, int released)
 
 int softpc_platform_keyboard_scancode(IU8 scan_code)
 {
-    int key = softpc_host_scan1_to_key((unsigned int)(scan_code & 0x7fu));
-    return softpc_platform_keyboard_key(key, (scan_code & 0x80u) != 0u);
+    KEY_EVENT_RECORD event = { 0 };
+    event.wVirtualScanCode = scan_code & 0x7fu;
+    return softpc_platform_keyboard_key(KeyMsgToKeyCode(&event),
+        (scan_code & 0x80u) != 0u);
 }

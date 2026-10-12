@@ -3,7 +3,7 @@
 ## T89 S1 design recommendation
 
 Owner admitted this candidate as T89 and requested S1 audit/research/design.
-The [T89 record](../history/M9-T89-mirror-compat-convergence.md) freezes all
+The [T89 record](../history/M9-T89-S1-mirror-compat-convergence.md) freezes all
 36 standalone directives across 14 mirror files and gives each an original
 behavior, current behavior, chosen owner, receiver and disposition.
 [CURRENT](../states/CURRENT.md) alone owns admission/acceptance status.
@@ -27,7 +27,8 @@ The executable recommendation is narrower than the original candidate below:
    comment: mouse instance initialization does not install a DOS driver.
    Perform full task audit and qualification; no planned hardware rewrite.
 
-Only S1 is admitted. Subsequent admission approves the narrowed disposition
+S2 is now admitted after the S1 design delivery. Subsequent admission approves
+the narrowed disposition
 standard: every member is either simplified or explicitly retained with an
 owner/receiver. Removing every standalone token is not an exit condition.
 Do not move PIC predicates to Compat or enable a guest DOS driver as a
@@ -37,8 +38,8 @@ probes and eight existing focused tests per width pass; no DOS-driver package
 or Windows guest acceptance is claimed by those probes.
 
 The record contains per-file accounting, concrete include-order requirements,
-test gaps and all retained-port reasons. No source implementation has occurred
-in S1; accepted T88 artifacts and repairs remain unchanged.
+test gaps and all retained-port reasons. S1 changed no production source;
+S2's current implementation and qualification status belongs to CURRENT.
 
 ## Original candidate objective (superseded by the S1 recommendation)
 

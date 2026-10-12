@@ -3,20 +3,46 @@
 ## Current Work
 
 No implementation subtask is active. Open task awaiting owner: T89.
-S1 audit/research/design is delivered for review; S1 is not owner-closed and
-S2 is not admitted. T88 S1--S6 remain closed.
+S2 is implemented and verified, awaiting owner acceptance; S3 is not admitted.
+T88 S1--S6 remain closed.
 
-The latest accepted runnable source is f1d394ca, qualified by a10fce4f:
-x64/x86 each pass all 136 registered tests (131 background plus five serial
-native desktop cases), without Computer Use. Closure changes documents only;
-published EXEs, owner INI, disks and snapshot remain unchanged.
+## T89 S2 delivery brief
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 批准开始s2. Implement only the approved existing-endpoint cleanup. |
+| Objective | Restore four original conapi includes, reuse KeyMsgToKeyCode for Compat scan input, remove the duplicate lookup ABI, and make standalone selection a concrete build contract. |
+| Non-goals | No S3 header overlays, hardware behavior change, shared-component change, user configuration/media/snapshot edits, or automatic T closure. |
+| Reference Baseline | 9bd90cf9; accepted runnable T88 source f1d394ca and qualification a10fce4f. |
+| Candidate Proposal | [Mirror/Compat convergence](../proposals/m9-mvdm-compat-boundary-convergence.md). |
+| Files And ABI Surface | Four original painters, nt_keycd.c, host_def.h, Compat keyboard/platform/input.h, root CMake and owner-local keyboard/build tests. KeyMsgToKeyCode remains the sole key table owner. |
+| Applicable Rules | Task Reading Set; execution, architecture, coding and documentation governance; original mirror formatting and minimum diff; inward dependencies. |
+| Verification | Dual incremental builds using existing intermediates; key table/OOB and real make/break ingress; concrete macro ownership check; shared-first background full tests and App integration on both widths. Native desktop tests separately reported, not implicit background proof. |
+| Expected Markers | No duplicate Scan-1 ABI, unchanged key tables/invalid-input semantics, same painter ABI and compile profile, no second input or renderer route. |
+| Asset Needs | Refresh assets/binary/softpc32.exe and softpc64.exe only; ignored build/t89/s2 logs and owned hidden supervisor, 30-minute build and 20-minute test budgets, terminate owned children on timeout; preserve reusable build intermediates. |
+| Reporting Requirements | Estimated production +7--12/-43--49, net -31--42; report actual production/test and original-mirror counts separately, test evidence and two EXE links. |
+| Stop Conditions | Changed guest semantics, expanded mirror diff, new shared API or unexpected ownership requirement. |
+| Exit Criteria | Implement, actual-change audit, dual build/background regression, documentation gates, publish both EXEs, commit/push complete P and wait for owner acceptance. |
+| Original Owner Request | 批准开始s2 |
+| Similar-Issue Sweep | All duplicate scan lookup declarations/callers, conapi conditional includes and standalone macro definitions/consumer targets. |
+
+The latest owner-accepted runnable source remains f1d394ca, qualified by
+a10fce4f. T89 S2 publishes new x64/x86 EXEs for owner testing: each passes
+84 shared tests then 47 other background tests, including all eight background
+App integration cases. Five native desktop tests per width were not run in S2;
+the older T88 desktop result is not claimed as current proof. Owner INI,
+disks and snapshots are unchanged. Production is +6/-45 (net -39);
+build/tests/checks are +39/-6 (net +33). The six touched mirror files have
+27 fewer added+removed lines against OpenNT. See the
+[S2 delivery record](../history/M9-T89-S2-existing-endpoint-cleanup.md).
 [T88 completion audit](../history/M9-T88-completion-audit.md) records the
 finite task ledger, final changed paths, mirror accounting and remaining debt.
 
 S1 accounts for 36 standalone directives in 14 mirror files. Eight unchanged
 focused tests pass on each architecture, plus default/initialized guest INT33
 diagnostics on both widths. Production, test suites, build configuration and
-published EXEs are unchanged. The [T89 record](../history/M9-T89-mirror-compat-convergence.md)
+published EXEs are unchanged. The [T89 record](../history/M9-T89-S1-mirror-compat-convergence.md)
 contains the executed brief and evidence. The
 [revised proposal](../proposals/m9-mvdm-compat-boundary-convergence.md)
 recommends bounded existing-endpoint/header work and explicit retained ports;

@@ -439,14 +439,7 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 
 
 
-#ifdef SOFTPC_STANDALONE
-/* Scan-1 callers share the original table with KeyMsgToKeyCode. */
-int softpc_host_scan1_to_key(unsigned int scan_code)
-{
-    return scan_code < sizeof(Scan1ToKeynum) ?
-        Scan1ToKeynum[scan_code] : 0;
-}
-#else
+#ifndef SOFTPC_STANDALONE
 /*  BiosKeyToInputRecord
  *
  *  Translates Bios Buffer Keys to win32 console type of key_events.

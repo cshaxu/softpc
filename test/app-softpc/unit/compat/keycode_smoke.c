@@ -4,7 +4,6 @@
 #include <windows.h>
 
 #include "nt_uis.h"
-#include "compat/input.h"
 
 static void check_original_table(unsigned count, DWORD flags, DWORD expected)
 {
@@ -18,8 +17,6 @@ static void check_original_table(unsigned count, DWORD flags, DWORD expected)
         event.dwControlKeyState = flags;
         key = KeyMsgToKeyCode(&event);
         fingerprint = (fingerprint ^ key) * 16777619u;
-        if (flags == 0u)
-            assert(softpc_host_scan1_to_key(scan) == key);
         for (modifiers = 0; modifiers < 8; ++modifiers) {
             event.dwControlKeyState = flags |
                 ((modifiers & 1) ? SHIFT_PRESSED : 0) |
@@ -50,7 +47,6 @@ int main(void)
        external source dependency. Fingerprints are FNV-1a over key numbers. */
     check_original_table(133u, 0u, 0x63e314e3u);
     check_original_table(84u, ENHANCED_KEY, 0x26270444u);
-    assert(softpc_host_scan1_to_key(133u) == 0);
     /* The standalone frontends feed these original nt_keycd tables, not a
        locally maintained Win32-to-PC map.  Keep ordinary and E0-extended
        keys distinct: their Scan-1 values overlap but their SoftPC key

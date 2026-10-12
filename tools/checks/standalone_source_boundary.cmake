@@ -588,6 +588,17 @@ if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/test/app-softpc/integration/package_smoke.c"
     message(FATAL_ERROR "Missing fixed-package integration runner")
 endif()
 
+# The original lookup owns both VM key records and Compat Scan-1 ingress.
+file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/softpc.new/host/src/nt_keycd.c" keycodes)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/keyboard.c" keyboard)
+file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/softpc.new/host/inc/host_def.h" host_profile)
+if(keycodes MATCHES "softpc_host_scan1_to_key" OR
+   NOT keyboard MATCHES "KeyMsgToKeyCode" OR
+   host_profile MATCHES "#define SOFTPC_STANDALONE" OR
+   EXISTS "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/input.h")
+    message(FATAL_ERROR "Retired standalone lookup/header profile remains")
+endif()
+
 # T88: every CHAIN2 rule uses the selected marker, never inline CGA accounting.
 set(chain2_marker_count 0)
 foreach(unit IN ITEMS 016 017 018 019 020)

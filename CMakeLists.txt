@@ -301,8 +301,8 @@ target_include_directories(softpc-machine PRIVATE
     src/app-softpc/softpc.new/base/inc
     src/app-softpc/softpc.new/base/ccpu386
     src/app-softpc/softpc.new/base/cvidc)
-target_compile_definitions(softpc-machine PRIVATE
-    SOFTPC_STANDALONE=1 SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
+target_compile_definitions(softpc-machine PUBLIC SOFTPC_STANDALONE=1
+    PRIVATE SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 
 add_executable(softpcvm
     src/app-softpc/product/main.c

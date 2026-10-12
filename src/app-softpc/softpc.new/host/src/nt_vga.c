@@ -29,11 +29,7 @@
 #include "egacpu.h"
 #include "egaports.h"
 #include "host_rrr.h"
-#ifdef SOFTPC_STANDALONE
-#include "dib_surface.h"
-#else
 #include "conapi.h"
-#endif
 
 #include "nt_graph.h"
 

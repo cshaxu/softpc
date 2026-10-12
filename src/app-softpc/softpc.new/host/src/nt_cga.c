@@ -38,11 +38,7 @@
 #include "debug.h"
 #include "config.h"
 #include "host_rrr.h"
-#ifdef SOFTPC_STANDALONE
-#include "dib_surface.h"
-#else
 #include "conapi.h"
-#endif
 
 #include "nt_graph.h"
 #include "nt_cga.h"
