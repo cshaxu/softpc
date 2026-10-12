@@ -2,17 +2,18 @@
 
 ## Current Work
 
-T89 S2 is owner-accepted and closed. T89 S3 is admitted; implementation has
-not started. T89 remains open. S4 is not admitted.
+No implementation subtask is active. Open task awaiting owner: T89.
+T89 S2 is owner-accepted and closed. S3 is implemented and verified, awaiting
+owner acceptance. S4 is not admitted.
 
-The accepted runnable baseline is `90850aab`: x64/x86 each pass 84 shared
-then 47 other background tests (131/131 per width), including eight background
-App integration cases. Five native desktop tests per width were not run in
-S2. Owner acceptance does not turn that omission into a claimed test pass.
-Both published EXEs, owner INI, disks and snapshots are unchanged by this
-governance transition. See the [S2 closure record](../history/M9-T89-S2-existing-endpoint-cleanup.md).
+S3 P1 refreshes both package EXEs: x64/x86 each pass 84 shared then 47 other
+background tests (131/131 per width), including eight background App integration
+cases, plus eight focused cases. Five native desktop tests per width were not
+run. Owner INI, disks and snapshots remain unchanged. The last accepted runnable
+baseline is `90850aab`; see the [S2 closure](../history/M9-T89-S2-existing-endpoint-cleanup.md)
+and [S3 delivery/accounting](../history/M9-T89-S3-host-header-policy.md).
 
-## M9 T89 S3 Packet
+## T89 S3 retained delivery brief
 
 | Field | Required record |
 | --- | --- |
@@ -36,7 +37,10 @@ governance transition. See the [S2 closure record](../history/M9-T89-S2-existing
 [S1's audit](../history/M9-T89-S1-mirror-compat-convergence.md) remains the
 finite 36-directive/14-file ledger. S3 implements only the two admitted
 host-header groups. The accepted S2 reduced original-mirror diff by 27 lines;
-S3 estimates are not reported as already achieved.
+S3 actual production +39/-28, net +11; build/tests/checks +49/-1, net +48.
+Its two original-header diffs fall from 70 to 41 added-plus-removed lines
+against OpenNT, a reduction of 29. The record above retains the admitted
+estimate; the linked S3 delivery owns actual results and evidence.
 
 ## Historical M9 T85 S20 delivery record
 

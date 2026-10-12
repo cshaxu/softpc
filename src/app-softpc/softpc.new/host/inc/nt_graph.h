@@ -209,10 +209,6 @@ IMPORT COLOURTAB defaultColours;
 IMPORT COLOURTAB monoColours;
 
 /*:::::::::::::::::::::::::::::: Mutex macros ::::::::::::::::::::::::::::::*/
-#ifdef SOFTPC_STANDALONE
-#define GrabMutex(mutex) ((void)(mutex))
-#define RelMutex(mutex) ((void)(mutex))
-#else
 #define GrabMutex(mutex)    { DWORD dwGMErr;                               \
             dwGMErr = WaitForSingleObject(mutex,INFINITE);                 \
             assert4(dwGMErr == WAIT_OBJECT_0,                              \
@@ -221,7 +217,6 @@ IMPORT COLOURTAB monoColours;
             }
 
 #define RelMutex(mutex) ReleaseMutex(mutex);
-#endif
 
 
 

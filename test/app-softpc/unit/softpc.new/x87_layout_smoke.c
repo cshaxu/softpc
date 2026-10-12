@@ -4,6 +4,40 @@
 
 #include <assert.h>
 
+static void verify_host_environment(void)
+{
+    fenv_t saved;
+    assert(fegetenv(&saved) == 0);
+    HostSetRoundToNearest();
+    assert(fegetround() == FE_TONEAREST);
+    HostSetRoundDown();
+    assert(fegetround() == FE_DOWNWARD);
+    HostSetRoundUp();
+    assert(fegetround() == FE_UPWARD);
+    HostSetRoundToZero();
+    assert(fegetround() == FE_TOWARDZERO);
+
+    HostClearExceptions();
+    assert(!HostGetOverflowException());
+    assert(!HostGetUnderflowException());
+    assert(!HostGetPrecisionException());
+    assert(feraiseexcept(FE_OVERFLOW) == 0);
+    assert(HostGetOverflowException());
+    assert(!HostGetUnderflowException());
+    HostClearExceptions();
+    assert(feraiseexcept(FE_UNDERFLOW) == 0);
+    assert(HostGetUnderflowException());
+    assert(!HostGetOverflowException());
+    HostClearExceptions();
+    assert(feraiseexcept(FE_INEXACT) == 0);
+    assert(HostGetPrecisionException());
+    assert(!HostGetOverflowException());
+    assert(!HostGetUnderflowException());
+    HostClearExceptions();
+    assert(fetestexcept(FE_ALL_EXCEPT) == 0);
+    assert(fesetenv(&saved) == 0);
+}
+
 int main(void)
 {
     const float singles[] = { 1.0f, -1.5f, 0.0f };
@@ -18,6 +52,7 @@ int main(void)
     FP80 fp80 = {0};
     FPU_I64 i64;
     unsigned i;
+    verify_host_environment();
     assert(sizeof(FP32) == 4 && sizeof(FP64HI) == 4 && sizeof(FP64) == 8);
     assert(sizeof(FP80SE) == 2 && sizeof(FPU_I64) == 8);
     assert(offsetof(FP64, mant_lo) == 0 && offsetof(FP64, hiword) == 4);

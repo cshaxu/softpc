@@ -1412,6 +1412,9 @@ int main(void)
     lib_u32 width = 0;
     lib_u32 height = 0;
 
+    /* No native mutex is owned by the single-executor renderer. */
+    GrabMutex(NULL);
+    RelMutex(NULL);
     make_boot_disk(path);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);

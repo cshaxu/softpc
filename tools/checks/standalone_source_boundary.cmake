@@ -537,6 +537,14 @@ foreach(source IN LISTS app_shutdown_sources)
     endforeach()
 endforeach()
 
+# Host policy stays outside the original type/declaration headers.
+foreach(header IN ITEMS cfpu_def.h nt_graph.h)
+    file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/softpc.new/host/inc/${header}" original_header)
+    if(original_header MATCHES "SOFTPC_STANDALONE")
+        message(FATAL_ERROR "Host policy returned to the mirror: ${header}")
+    endif()
+endforeach()
+
 # GDP/SAS vocabulary comes from the retained original headers, never a copy.
 file(GLOB_RECURSE duplicate_original_headers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/gdpvar.h"

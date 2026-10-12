@@ -422,6 +422,7 @@ add_executable(softpc-vga-frame-smoke
     test/app-softpc/unit/machine/chain2_rule_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
+    src/app-softpc/compat
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 target_compile_definitions(softpc-vga-frame-smoke PRIVATE
@@ -519,7 +520,8 @@ add_test(NAME "app-softpc/integration/command_provider_smoke" COMMAND softpc-com
 set_tests_properties("app-softpc/integration/command_provider_smoke" PROPERTIES LABELS "integration" TIMEOUT 45)
 add_executable(softpc-x87-layout-smoke test/app-softpc/unit/softpc.new/x87_layout_smoke.c)
 target_include_directories(softpc-x87-layout-smoke PRIVATE
-    src src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+    src src/app-softpc/compat/ccpu
+    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
 target_compile_definitions(softpc-x87-layout-smoke PRIVATE LITTLEND SOFTPC_STANDALONE)
 add_test(NAME "app-softpc/unit/softpc.new/x87_layout_smoke" COMMAND softpc-x87-layout-smoke)
 set_tests_properties("app-softpc/unit/softpc.new/x87_layout_smoke" PROPERTIES LABELS "unit")
