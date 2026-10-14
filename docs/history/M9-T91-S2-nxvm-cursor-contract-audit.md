@@ -2,6 +2,8 @@
 
 Owner request: "准入一个新的s任务 请你审计nxvm最新6组件，代码质量情况 是否可原样导入".
 Scope is audit only; no import or runtime modification. T91 remains open.
+Owner approved proceeding with this audited import on 2026-10-13; the audit
+is accepted and implementation is admitted separately as S3.
 SoftPC baseline: `9295da5c`; previous imported NXVM: `73d7967244`.
 Reviewed NXVM: `97d3cf9482913f2a0e0872158149ff646a563f3c`, clean working tree.
 

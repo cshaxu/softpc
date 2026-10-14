@@ -97,7 +97,7 @@ int main(void)
                 frame->window.text.base.cursor_column < KVM_TEXT_COLUMNS &&
                 frame->window.text.base.cursor_row >= 0 &&
                 frame->window.text.base.cursor_row < KVM_TEXT_ROWS &&
-                frame->window.text.base.cursor_visible != 0u && frame->window.text.base.cursor_phase != 0u) {
+                frame->window.text.base.cursor_mode == KVM_CURSOR_HOST && frame->window.text.base.cursor_phase != 0u) {
                 cursor_seen = 1;
                 break;
             }

@@ -374,7 +374,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
         if (status != LIB_STATUS_OK) return status;
     }
     vm_driver_cursor_shape(&frame->window.text.base, cursor_size);
-    frame->window.text.base.cursor_visible = column >= 0 && row >= 0;
+    frame->window.text.base.cursor_mode = column >= 0 && row >= 0 ? KVM_CURSOR_HOST : KVM_CURSOR_DISABLED;
     frame->window.text.base.cursor_phase = 1u;
     lib_memory_copy(frame->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
     lib_memory_copy(frame->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));

@@ -2,11 +2,12 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T91.
-S2 audit is delivered for review: NXVM 97d3cf948 has 18 changed shared files,
-with no blocking source-review finding. Exact import needs three SoftPC
-receiving files adapted to cursor_mode; no import is performed or admitted.
+M9 T91 S3 is active: import the approved NXVM cursor ownership contract,
+adapt SoftPC receivers and qualify both released executables.
+Both builds and complete 137-test inventories per width pass, including the
+reserved native desktop recheck. Initial input-contaminated failures are retained
+in the evidence. Delivery commit/push and coordinator review are next; no closure.
+S2 audit is accepted as the basis for this import on 2026-10-13.
 See the [S2 audit](../history/M9-T91-S2-nxvm-cursor-contract-audit.md).
 S1 is owner-accepted and closed on 2026-10-12. Implementation is delivered in
 `62ec8e06`; coordinator review is recorded in `9611f5b6`.
@@ -25,6 +26,27 @@ T89 remains owner-accepted and closed.
 The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
 TODO retains only the null BOP investigation; Queue retains only the XP SP1
 mirror upgrade. Neither item is part of T91.
+
+## M9 T91 S3 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves import, compilation, deployment, tests, commit/push and waiting for acceptance. |
+| Objective | Import all six roots exactly from audited NXVM and preserve SoftPC HOST cursor semantics. |
+| Non-goals | No NXVM writes, mirror/Compat/snapshot changes, user configuration/media edits or new blink owner. |
+| Reference Baseline | SoftPC 2ea997fe; NXVM 97d3cf9482913f2a0e0872158149ff646a563f3c. |
+| Candidate Proposal | [S2 exact-import audit](../history/M9-T91-S2-nxvm-cursor-contract-audit.md). |
+| Files And ABI Surface | Six source/test roots; App driver and two integration fixtures use cursor_mode instead of cursor_visible. |
+| Applicable Rules | Reading Set and four governance skills; exact shared corpus, Types authority, inward dependencies, hidden supervised execution. |
+| Verification | Recheck upstream hashes; dual Release builds; all shared tests first, other unit/integration tests next; five desktop cases per width separately with owner reservation; inspect committed diff. |
+| Expected Markers | 246 exact files; HOST for present cursor and DISABLED for absent cursor; each width complete 137-test inventory. |
+| Asset Needs | Reuse Ninja intermediates; ignored build/t91/s3 logs. Hidden supervisor, 30-minute build/20-minute suite bounds and 20 MiB per phase; preserve guest assets. |
+| Reporting Requirements | Separate imported/shared and receiving code additions/deletions/net; dual EXE links and actual tests. |
+| Stop Conditions | Upstream drift, unrelated failure, mirror requirement or unreserved desktop use. |
+| Exit Criteria | Complete tested delivery pushed, coordinator actual-change review, wait for owner acceptance. |
+| Original Owner Request | 批准开始导入，完成后编译、部署、测试、提交、推送后等我验收。 |
+| Similar-Issue Sweep | Search every shared/App cursor field reference; keep native Compat/Console booleans and original mirror distinct. |
 
 ## M9 T91 S2 Retained Delivery Brief
 

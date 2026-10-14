@@ -171,3 +171,56 @@ font loop, one frame publisher and no new resource/state lifecycle. The
 current six roots remain byte-identical to the frozen upstream. User assets
 and mirror have no diff. Full execution evidence is retained in the packet's
 ignored T91/S1 final logs; first-run failure logs are retained separately.
+
+## S3 approved cursor-contract import
+
+Owner: "批准开始导入，完成后编译、部署、测试、提交、推送后等我验收。"
+S2 reviewed NXVM 97d3cf9482913f2a0e0872158149ff646a563f3c; this continuation
+imports that clean six-root corpus exactly. The finite universe remains 246
+shared files, with 18 changed paths and no additions/deletions relative to S1.
+Source notices and build boundaries are unchanged. No new external runtime or
+build dependency is admitted. The audit's source-quality recommendation is
+not substituted for local build and runtime qualification.
+
+The complete receiving change is three one-line replacements: Machine driver
+maps existing position validity to HOST/DISABLED; runtime_cursor_smoke selects
+HOST; runtime_smoke now proves the real copied DOS frame explicitly uses HOST.
+Cursor phase remains constant as before. Compat's native visibility boolean
+and original-controller set_cursor_visible are different contracts and remain
+unchanged. Search of all non-mirror App source/tests found no other removed
+shared-field use. No new state, helper, rendering or timer path is added locally.
+
+Measured source/test diff before delivery: shared production +45/-12 (net +33),
+App production +1/-1 (net zero); shared tests +79/-19 (net +60), App tests
++2/-2 (net zero). Shared totals including READMEs/manifests are +145/-47.
+Both architectures reuse their existing Ninja graphs and publish only the two
+EXEs. Full shared background suites precede all other background tests; the
+owner reserved the native desktop period for the five cases per width.
+Both builds and background suites passed: x64 shared 84/84 (68.70 s), other
+48/48 (97.10 s); x86 shared 84/84 (73.71 s), other 48/48 (75.09 s).
+The first reserved desktop run passed all three x64 Lib cases, but both package
+cases failed: stage 14 showed `aver` instead of injected `ver`; compact stage 5
+showed `xstart` and `iao`, neither sent by the script. These are input-contamination
+indicators, not proof of a production regression or proof of its absence.
+No concurrent emulator/CTest process remained when inspected. The supervisor
+stopped before x86 desktop. Original logs are retained; a fresh explicitly
+input-idle period is requested before a controlled retest. Full qualification,
+delivery commit/push and owner acceptance remain pending.
+
+The owner confirmed a fresh input-idle period. With no code or test changes,
+the full serial desktop recheck passed x64 5/5 (12.32 s) and x86 5/5 (12.96 s).
+Combined final coverage is 137/137 per width; first-run failure evidence remains
+separate. This supports input contamination, without claiming its exact external
+source was identified. All required tests now pass; no cases are waived.
+
+Published SHA256 for S3:
+
+- x86: CF504B2E72233445E9197AF66C28854DA70DAA7340314E580AEA21838A3E8310
+- x64: FF3B770B4656D83152A3146242868BF1652375D4753DEBD74637AA487FC5D8B8
+
+Both EXEs are rebuilt and deployed. Size changes are +574 bytes for x86 and
++573 bytes for x64. Source and test code totals are +46/-13 (net +33) and
++81/-21 (net +60), respectively. The only local receiving production change
+is one replaced line. All original mirror/Compat/configuration/media paths
+remain unchanged. Implementation is ready for the complete executor P delivery;
+coordinator review and owner acceptance are separate remaining steps.

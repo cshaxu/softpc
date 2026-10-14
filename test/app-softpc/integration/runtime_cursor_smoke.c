@@ -7,7 +7,7 @@
 int main(void)
 {
     static kvm_window_frame frame = { .valid = 1, .text.base = { .text_columns = 80, .text_rows = 25,
-        .cursor_column=3, .cursor_row=7, .cursor_visible=1 } };
+        .cursor_column=3, .cursor_row=7, .cursor_mode=KVM_CURSOR_HOST } };
     const unsigned heights[] = {0,8,14,16,24,32};
     const unsigned sizes[] = {0,1,12,20,50,100,101};
     static lib_u32 pixels[640 * 25 * KVM_WINDOW_FONT_HEIGHT];
