@@ -4,12 +4,16 @@
 
 No implementation subtask is active.
 Open task awaiting owner: T91.
+S2 audit is delivered for review: NXVM 97d3cf948 has 18 changed shared files,
+with no blocking source-review finding. Exact import needs three SoftPC
+receiving files adapted to cursor_mode; no import is performed or admitted.
+See the [S2 audit](../history/M9-T91-S2-nxvm-cursor-contract-audit.md).
 S1 is owner-accepted and closed on 2026-10-12. Implementation is delivered in
 `62ec8e06`; coordinator review is recorded in `9611f5b6`.
 Both Release EXEs are refreshed. Each width passes 84 shared + 48 other
 background tests and all five native desktop cases (137/137).
 The six packages match reviewed NXVM `73d7967244` byte-for-byte (246 files).
-T91 remains open by explicit owner instruction; no next S is admitted.
+T91 remains open by explicit owner instruction.
 See the [delivery review](../history/M9-T91-S1-nxvm-shared-glyph-import.md)
 and [retained proposal](../history/M9-T91-nxvm-shared-glyph-import-proposal.md).
 T90 is owner-accepted and closed.
@@ -21,6 +25,27 @@ T89 remains owner-accepted and closed.
 The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
 TODO retains only the null BOP investigation; Queue retains only the XP SP1
 mirror upgrade. Neither item is part of T91.
+
+## M9 T91 S2 Retained Delivery Brief
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits a new S to audit latest NXVM six-component code quality and exact-import readiness. |
+| Objective | Account for every changed shared path and examine cursor ownership, compatibility, tests and inward dependencies. |
+| Non-goals | No source import, NXVM writes, fixes, EXE rebuild or runtime/desktop testing. |
+| Reference Baseline | SoftPC 9295da5c; imported NXVM 73d7967244; current NXVM 97d3cf9482913f2a0e0872158149ff646a563f3c, initially clean. |
+| Candidate Proposal | [Retained shared import scope](../history/M9-T91-nxvm-shared-glyph-import-proposal.md). |
+| Files And ABI Surface | src/test lib, emulator and x86; changed text cursor schema and SoftPC receiving uses. Documentation only locally. |
+| Applicable Rules | Reading Set; execution, documentation, architecture and coding governance; Lib Types and inward dependencies. |
+| Verification | File/hash inventory, all changed source/test hunks, manifest validation, receiving-use search and source-level lifecycle analysis; distinguish this from runtime qualification. |
+| Expected Markers | Exact diff totals, justified findings, import verdict and explicit receiving adaptation. |
+| Asset Needs | Read-only external repository; no guest media or foreground automation. |
+| Reporting Requirements | Per-component additions/deletions/net and actionable code-quality assessment. |
+| Stop Conditions | Upstream drift requires recheck; no unapproved import or external writes. |
+| Exit Criteria | Evidence-backed audit delivered for owner decision; T stays open. |
+| Original Owner Request | 准入一个新的s任务 请你审计nxvm最新6组件，代码质量情况 是否可原样导入 |
+| Similar-Issue Sweep | All cursor mode/phase consumers, host timer, Console conversion, frame comparison, manifest/build boundaries and App producers. |
 
 ## M9 T91 S1 Retained Delivery Brief
 
