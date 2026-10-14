@@ -4,11 +4,12 @@
 
 No implementation subtask is active.
 Open task awaiting owner: T91.
-S3 is delivered in `e96b2983`, with coordinator actual-change review passed.
+S3 is owner-accepted and closed on 2026-10-13. Implementation is delivered in
+`e96b2983`; coordinator actual-change review is recorded in `74b45795`.
 Both builds and all 137 tests per width pass, including the reserved desktop
 recheck. Initial unexpected-input failures remain recorded, not hidden.
 Six roots match NXVM `97d3cf948` exactly (246 files). Dual EXEs are refreshed.
-S3 and T91 remain open for owner acceptance; no closure is claimed.
+T91 remains open by explicit owner instruction; no next S is admitted.
 See the [S3 delivery](../history/M9-T91-S3-nxvm-cursor-contract-import.md).
 S2 audit is accepted as the basis for this import on 2026-10-13.
 See the [S2 audit](../history/M9-T91-S2-nxvm-cursor-contract-audit.md).

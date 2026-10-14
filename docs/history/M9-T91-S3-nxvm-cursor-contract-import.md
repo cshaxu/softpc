@@ -1,6 +1,6 @@
 # M9 T91 S3: Cursor-contract import delivery
 
-Status: implemented and verified, waiting for owner acceptance. T91 stays open.
+Status: owner-accepted and closed on 2026-10-13. T91 stays open.
 Owner: "批准开始导入，完成后编译、部署、测试、提交、推送后等我验收。"
 Baseline: `2ea997fe`; executor P1: `e96b2983`, pushed to main.
 Upstream: `97d3cf9482913f2a0e0872158149ff646a563f3c`.
@@ -65,3 +65,17 @@ Published SHA256:
 EXE size increases are 574 bytes (x86) and 573 bytes (x64). Shared text schemas
 grow eight bytes; the outer Window frame size remains unchanged. Coordinator
 accepts the technical delivery; owner acceptance and S/T closure remain pending.
+
+## Owner acceptance and S3 closure
+
+On 2026-10-13 the owner confirmed: "验收通过，批准收口S3，保持T91开放。"
+S3 is closed against the P1 implementation `e96b2983` and P2 coordinator review
+`74b45795`. All admitted import, adaptation, build, deployment and test outcomes
+are verified above, with no waived tests or outstanding S3 work. The initial
+desktop failures and unchanged-code successful recheck remain part of the record.
+
+T91 stays open; no next S is admitted. This closure changes only governance
+records, verified by the documentation and whitespace gates. Production code,
+shared manifests, both published EXEs, user configuration and media are unchanged;
+the qualified builds and runtime tests are not rerun for this documentation-only
+closure.
