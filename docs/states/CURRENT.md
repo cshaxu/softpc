@@ -2,18 +2,21 @@
 
 ## Current Work
 
-M9 T91 S3 is active: import the approved NXVM cursor ownership contract,
-adapt SoftPC receivers and qualify both released executables.
-Both builds and complete 137-test inventories per width pass, including the
-reserved native desktop recheck. Initial input-contaminated failures are retained
-in the evidence. Delivery commit/push and coordinator review are next; no closure.
+No implementation subtask is active.
+Open task awaiting owner: T91.
+S3 is delivered in `e96b2983`, with coordinator actual-change review passed.
+Both builds and all 137 tests per width pass, including the reserved desktop
+recheck. Initial unexpected-input failures remain recorded, not hidden.
+Six roots match NXVM `97d3cf948` exactly (246 files). Dual EXEs are refreshed.
+S3 and T91 remain open for owner acceptance; no closure is claimed.
+See the [S3 delivery](../history/M9-T91-S3-nxvm-cursor-contract-import.md).
 S2 audit is accepted as the basis for this import on 2026-10-13.
 See the [S2 audit](../history/M9-T91-S2-nxvm-cursor-contract-audit.md).
 S1 is owner-accepted and closed on 2026-10-12. Implementation is delivered in
 `62ec8e06`; coordinator review is recorded in `9611f5b6`.
 Both Release EXEs are refreshed. Each width passes 84 shared + 48 other
 background tests and all five native desktop cases (137/137).
-The six packages match reviewed NXVM `73d7967244` byte-for-byte (246 files).
+The S1 six-package baseline was reviewed NXVM `73d7967244` (246 files).
 T91 remains open by explicit owner instruction.
 See the [delivery review](../history/M9-T91-S1-nxvm-shared-glyph-import.md)
 and [retained proposal](../history/M9-T91-nxvm-shared-glyph-import-proposal.md).
@@ -27,7 +30,7 @@ The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
 TODO retains only the null BOP investigation; Queue retains only the XP SP1
 mirror upgrade. Neither item is part of T91.
 
-## M9 T91 S3 Packet
+## M9 T91 S3 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |
