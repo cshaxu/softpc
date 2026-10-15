@@ -9,6 +9,8 @@ All 997 XP paths are accounted for; the 498 retained mirror files remain
 unchanged. See the [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 S2-S6 are not admitted. Source rights must be resolved before copying; S5 also
 requires the missing standalone OPL/MIDI output decision. T92 remains open.
+Executor audit `2616deb8` is pushed; its coordinator actual-change review is
+recorded in the linked proposal. S1 awaits owner acceptance.
 
 ## M9 T92 S1 Packet
 

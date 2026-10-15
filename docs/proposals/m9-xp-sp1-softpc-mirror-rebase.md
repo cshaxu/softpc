@@ -345,6 +345,27 @@ The executor delivery is documentation/research metadata only. Owner review
 of the recommendation is required before admitting a source-changing batch;
 neither S1 delivery nor the metadata commit closes T92.
 
+## S1 Coordinator Actual-Change Review
+
+Reviewed pushed executor commit `2616deb80ad710bc27c0fd1ed8cd270280b1d489`
+against the original audit objective and CURRENT packet. Its five changed
+paths are the report, two metadata ledgers, this proposal and CURRENT:
++1,853/-13 documentation/metadata lines, net +1,840; production/test/asset
+changes are zero. The ledgers contain 498 and 499 unique members, not source
+payloads. Their union and frozen-object identities were rechecked, and the
+86 changed retained paths match the semantic table exactly.
+
+The review accepts this as a source-audit delivery, not permission to import
+the XP tree verbatim. IBM PC sound remains required and explicitly not ready
+for implementation until the missing output solution and rights decisions;
+CD-ROM declarations are not misreported as an implementation. The local CPU,
+C-VID, input, media, frame and snapshot safeguards are retained in the plan.
+Known XP regressions have named corrections and test obligations. Scope and
+runtime qualification limits are explicit. No whole-core correctness or fresh
+EXE qualification is inferred from documentation gates or source comparison.
+
+S1 is ready for owner review; T92 remains open, with no later S admitted.
+
 ## Verification
 
 Each source-changing S provides source-selection proof that excluded paths and
