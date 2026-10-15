@@ -42,17 +42,13 @@
 #define VIRTUALISATION
 #endif
 
-#ifdef NTVDM
-#define getIOInAdapter(ioaddr) (Ios_in_adapter_table[ioaddr & (PC_IO_MEM_SIZE-1)])
-#define getIOOutAdapter(ioaddr) (Ios_out_adapter_table[ioaddr & (PC_IO_MEM_SIZE-1)])
-#endif
 
 /*
- * 
+ *
  * ============================================================================
  * Global data
  * ============================================================================
- * 
+ *
  */
 
 /*
@@ -128,11 +124,11 @@ GLOBAL IOS_FUNC_OUTSD	Ios_outsd_function[IO_MAX_NUMBER_ADAPTORS];
 #endif
 
 /*
- * 
+ *
  * ============================================================================
  * Local Subroutines
  * ============================================================================
- * 
+ *
  */
 
 #define BIT_NOT_SET(vector, bit)		\
@@ -167,7 +163,9 @@ LOCAL void io_empty_inb IFN2(io_addr, io_address, half_word *, value)
 		SET_THE_BIT(ios_empty_in, (IU16)io_address);
 	}
 #endif /* PROD */
-	*value = IO_EMPTY_PORT_BYTE_VALUE;
+
+        *value = IO_EMPTY_PORT_BYTE_VALUE;
+
 }
 
 /*
@@ -184,7 +182,6 @@ LOCAL void io_empty_outb IFN2(io_addr, io_address, half_word, value)
 #ifdef PROD
 	UNUSED(io_address);
 #else
-
 	if (BIT_NOT_SET(ios_empty_out, (IU16)io_address))
 	{
 		/* First time for this port */
@@ -192,7 +189,7 @@ LOCAL void io_empty_outb IFN2(io_addr, io_address, half_word, value)
 		SET_THE_BIT(ios_empty_out, (IU16)io_address);
 	}
 #endif /* PROD */
-	/* Do nothing! */
+
 }
 
 /*
@@ -286,8 +283,8 @@ LOCAL void generic_outd IFN2(io_addr, io_address, double_word, value)
 {
 	word low, high;
 
-	low = value & 0xffff;
-	high = (value & 0xffff0000) >> 16;
+	low = (word)(value & 0xffff);
+	high = (word)((value & 0xffff0000) >> 16);
 
 	(*Ios_outw_function[Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)]]) (io_address, low);
 	io_address += 2;
@@ -305,10 +302,6 @@ LOCAL void generic_outd IFN2(io_addr, io_address, double_word, value)
 */
 
 /* MS NT monitor uses these string routines {in,out}s{b,w} string io support */
-#if defined(NTVDM) && defined(MONITOR)
-#undef LOCAL
-#define LOCAL
-#endif	/* NTVDM & MONITOR */
 
 LOCAL void generic_insb IFN3(io_addr, io_address, half_word *, valarray,
 	word, count)
@@ -410,44 +403,13 @@ LOCAL VOID generic_outsd IFN3(io_addr, io_address, double_word *, valarray, word
 #endif
 
 /* ensure any more LOCAL routines remain LOCAL */
-#if defined(NTVDM) && defined(MONITOR)
-#undef LOCAL
-#define LOCAL static
-/*
- *  string byte handlers for monitor
- */
-VOID insb IFN3(io_addr, io_address, half_word *, valarray, word, count)
-{
-    (*Ios_insb_function[getIOInAdapter(io_address)])
-            (io_address, valarray, count);
-}
-
-VOID outsb IFN3(io_addr, io_address, half_word *, valarray,word, count)
-{
-    (*Ios_outsb_function[getIOInAdapter(io_address)])
-            (io_address, valarray, count);
-}
-
-VOID insw IFN3(io_addr, io_address, word *, valarray, word, count)
-{
-    (*Ios_insw_function[getIOInAdapter(io_address)])
-            (io_address, valarray, count);
-}
-
-VOID outsw IFN3(io_addr, io_address, word *, valarray, word, count)
-{
-    (*Ios_outsw_function[getIOInAdapter(io_address)])
-            (io_address, valarray, count);
-}
-
-#endif	/* NTVDM & MONITOR */
 
 /*
- * 
+ *
  * ============================================================================
  * Global Subroutines
  * ============================================================================
- * 
+ *
  */
 
 /*(
@@ -521,7 +483,7 @@ GLOBAL void	outb IFN2(io_addr, io_address, half_word, value)
 #ifdef VIRTUALISATION
 	value32 = value;
 
-	if (IOVirtualised(io_address, &value32, BIOS_OUTB_OFFSET, (sizeof(IU8)))) 
+	if (IOVirtualised(io_address, &value32, BIOS_OUTB_OFFSET, (sizeof(IU8))))
 		return;
 	else
 #endif /* VIRTUALISATION */
@@ -598,7 +560,7 @@ GLOBAL void	outw IFN2(io_addr, io_address, word, value)
 #ifdef VIRTUALISATION
 	value32 = value;
 
-	if (IOVirtualised(io_address, &value32, BIOS_OUTW_OFFSET, (sizeof(IU16)))) 
+	if (IOVirtualised(io_address, &value32, BIOS_OUTW_OFFSET, (sizeof(IU16))))
 		return;
 	else
 #endif /* VIRTUALISATION */
@@ -632,7 +594,7 @@ GLOBAL void	ind IFN2(io_addr, io_address, IU32 *, value)
 	value32 = 0;
 #endif	/* SYNCH_TIMERS */
 
-	if (IOVirtualised(io_address, &value32, BIOS_IND_OFFSET, (sizeof(IU32)))) 
+	if (IOVirtualised(io_address, &value32, BIOS_IND_OFFSET, (sizeof(IU32))))
 	{
 		*value = value32;
 	}
@@ -663,17 +625,17 @@ GLOBAL void	outd IFN2(io_addr, io_address, IU32, value)
 	sub_note_trace2( IOS_VERBOSE, "outd( %x, %x )", io_address, value );
 
 #ifdef VIRTUALISATION
-	if (IOVirtualised(io_address, &value, BIOS_OUTD_OFFSET, (sizeof(IU32)))) 
+	if (IOVirtualised(io_address, &value, BIOS_OUTD_OFFSET, (sizeof(IU32))))
 		return;
 	else
 #endif /* VIRTUALISATION */
 	{
 		word temp;
 
-		temp = value & 0xffff;
+		temp = (word)(value & 0xffff);
 		outw(io_address,temp);
 		io_address +=2;
-		temp = (value >> 16);
+		temp = (word)((value >> 16));
 		outw(io_address,temp);
 	}
 }
@@ -715,11 +677,11 @@ void            (*func) ();
     OUTPUT:
 ==============================================================================
 )*/
-GLOBAL void	io_define_in_routines IFN5(half_word, adapter, 
-					   IOS_FUNC_INB, inb_func, 
-					   IOS_FUNC_INW, inw_func, 
-					   IOS_FUNC_INSB, insb_func, 
-					   IOS_FUNC_INSW, insw_func) 
+GLOBAL void	io_define_in_routines IFN5(half_word, adapter,
+					   IOS_FUNC_INB, inb_func,
+					   IOS_FUNC_INW, inw_func,
+					   IOS_FUNC_INSB, insb_func,
+					   IOS_FUNC_INSW, insw_func)
 {
 	/*
 	 *	Preset defaultable entries to default value.
@@ -864,19 +826,6 @@ GLOBAL VOID	io_define_ind_routine IFN3(half_word, adapter,
     OUTPUT:
 ==============================================================================
 )*/
-#ifdef NTVDM
-GLOBAL BOOL	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
-	half_word, mode)
-{
-	if (mode & IO_READ){
-		Ios_in_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
-	}
-	if (mode & IO_WRITE){
-		Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
-	}
-	return TRUE;
-}
-#else
 GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 	half_word, mode)
 {
@@ -887,7 +836,6 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 		Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
 	}
 }
-#endif
 
 
 /*(
@@ -898,26 +846,12 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
     OUTPUT:
 ==============================================================================
 )*/
-#ifdef NTVDM
-GLOBAL void     io_disconnect_port IFN2(io_addr, io_address, half_word, adapter)
-{
-        if (adapter != Ios_in_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] &&
-            adapter != Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)])
-           {
-            return;
-           }
-
-        Ios_in_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = EMPTY_ADAPTOR;
-        Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = EMPTY_ADAPTOR;
-}
-#else
 GLOBAL void	io_disconnect_port IFN2(io_addr, io_address, half_word, adapter)
 {
 	UNUSED(adapter);
 	Ios_in_adapter_table[io_address] = EMPTY_ADAPTOR;
 	Ios_out_adapter_table[io_address] = EMPTY_ADAPTOR;
 }
-#endif	/* NTVDM */
 
 
 /*(
@@ -1002,20 +936,3 @@ GLOBAL void	io_init IFN0()
 }
 
 
-#ifdef NTVDM
-GLOBAL char GetExtIoInAdapter (io_addr ioaddr)
-{
-#ifndef PROD
-    printf("GetExtIoInAdapter(%x) called\n",ioaddr);
-#endif
-    return EMPTY_ADAPTOR;
-}
-
-GLOBAL char GetExtIoOutAdapter (io_addr ioaddr)
-{
-#ifndef PROD
-    printf("GetExtIoOutAdapter(%x) called\n",ioaddr);
-#endif
-    return EMPTY_ADAPTOR;
-}
-#endif /* NTVDM */

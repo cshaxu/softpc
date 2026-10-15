@@ -462,6 +462,10 @@ add_test(NAME "app-softpc/unit/machine/device_contract_disk"
     COMMAND softpc-device-contract-smoke disk)
 add_test(NAME "app-softpc/unit/machine/device_contract_rom"
     COMMAND softpc-device-contract-smoke rom)
+add_test(NAME "app-softpc/unit/machine/device_contract_descriptor"
+    COMMAND softpc-device-contract-smoke descriptor)
+add_test(NAME "app-softpc/unit/machine/device_contract_cmos"
+    COMMAND softpc-device-contract-smoke cmos)
 add_executable(softpc-quick-time-smoke test/app-softpc/unit/machine/quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-quick-time-smoke PRIVATE

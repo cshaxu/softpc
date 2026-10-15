@@ -1,0 +1,1329 @@
+path	xp_first	xp_last	disposition
+base/bios/cmos_bis.c	1	54	include
+base/bios/cmos_bis.c	55	55	profile: #ifndef NTVDM
+base/bios/cmos_bis.c	56	124	include
+base/bios/cmos_bis.c	125	125	profile: #ifndef NTVDM
+base/bios/cmos_bis.c	126	194	include
+base/bios/tape_io.c	1	6	profile: #if defined(JAPAN) && defined(i386)
+base/bios/tape_io.c	7	38	include
+base/bios/tape_io.c	39	41	profile: #if defined(JAPAN) && defined(i386)
+base/bios/tape_io.c	42	65	include
+base/bios/tape_io.c	66	77	profile: #if defined(JAPAN) && defined(i386)
+base/bios/tape_io.c	78	121	include
+base/bios/tape_io.c	122	124	profile: #if defined(NTVDM) && defined(MONITOR)
+base/bios/tape_io.c	125	139	include
+base/bios/tape_io.c	140	142	profile: #if 0 /* I'm sure we've all had enough of this one */
+base/bios/tape_io.c	143	149	include
+base/bios/tape_io.c	150	155	profile: #if defined(JAPAN) && defined(i386)
+base/bios/tape_io.c	156	161	include
+base/bios/tape_io.c	162	247	profile: #if defined(JAPAN) && defined(i386)
+base/bios/tape_io.c	248	295	include
+base/bios/tape_io.c	296	301	profile: #ifdef NTVDM
+base/bios/tape_io.c	302	304	include
+base/bios/tape_io.c	305	305	profile: #ifdef NTVDM
+base/bios/tape_io.c	306	388	include
+base/bios/tape_io.c	389	392	profile: #if defined(NTVDM) && defined(MONITOR)
+base/bios/tape_io.c	393	394	include
+base/bios/tape_io.c	395	395	profile: #if defined(NTVDM) && defined(MONITOR)
+base/bios/tape_io.c	396	412	include
+base/bios/tape_io.c	413	427	profile: #ifdef JAPAN
+base/bios/tape_io.c	428	454	include
+base/bios/tape_io.c	455	552	profile: #if defined(JAPAN) && defined(i386)
+base/comms/com.c	1	32	include
+base/comms/com.c	33	35	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/com.c	36	61	include
+base/comms/com.c	62	62	profile: #ifndef NEC_98
+base/comms/com.c	63	63	include
+base/comms/com.c	64	64	profile: #ifndef NEC_98
+base/comms/com.c	65	65	include
+base/comms/com.c	66	70	profile: #if defined(NEC_98)
+base/comms/com.c	71	87	include
+base/comms/com.c	88	125	profile: #if defined(NEC_98)
+base/comms/com.c	126	137	include
+base/comms/com.c	138	145	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	146	167	include
+base/comms/com.c	168	171	profile: #ifdef NTVDM
+base/comms/com.c	172	174	include
+base/comms/com.c	175	177	profile: #ifdef NTVDM
+base/comms/com.c	178	178	include
+base/comms/com.c	179	179	profile: #ifdef NTVDM
+base/comms/com.c	180	180	profile: #if defined(NEC_98)
+base/comms/com.c	181	206	include
+base/comms/com.c	207	207	profile: #ifndef NEC_98
+base/comms/com.c	208	208	include
+base/comms/com.c	209	209	profile: #ifndef NEC_98
+base/comms/com.c	210	216	include
+base/comms/com.c	217	219	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	220	312	include
+base/comms/com.c	313	347	profile: #if defined(NEC_98)
+base/comms/com.c	348	356	include
+base/comms/com.c	357	357	profile: #ifndef NTVDM
+base/comms/com.c	358	358	include
+base/comms/com.c	359	359	profile: #ifndef NTVDM
+base/comms/com.c	360	383	include
+base/comms/com.c	384	389	profile: #ifdef NTVDM
+base/comms/com.c	390	390	profile: #if defined(NEC_98)
+base/comms/com.c	391	397	include
+base/comms/com.c	398	454	profile: #if defined(NEC_98)
+base/comms/com.c	455	550	include
+base/comms/com.c	551	557	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	558	574	include
+base/comms/com.c	575	575	profile: #if defined(NEC_98)
+base/comms/com.c	576	576	include
+base/comms/com.c	577	611	profile: #if defined(NEC_98)
+base/comms/com.c	612	621	include
+base/comms/com.c	622	624	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	625	645	include
+base/comms/com.c	646	648	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	649	653	include
+base/comms/com.c	654	654	profile: #if defined(NEC_98)
+base/comms/com.c	655	655	include
+base/comms/com.c	656	676	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	677	711	include
+base/comms/com.c	712	720	profile: #if defined(NEC_98)
+base/comms/com.c	721	727	include
+base/comms/com.c	728	728	profile: #if defined(NEC_98)
+base/comms/com.c	729	730	include
+base/comms/com.c	731	741	profile: #if defined(NEC_98)
+base/comms/com.c	742	742	profile: #ifndef NTVDM
+base/comms/com.c	743	751	include
+base/comms/com.c	752	752	profile: #ifndef NTVDM
+base/comms/com.c	753	753	profile: #if defined(NEC_98)
+base/comms/com.c	754	755	include
+base/comms/com.c	756	969	profile: #if defined(NEC_98)
+base/comms/com.c	970	976	profile: #ifdef NTVDM
+base/comms/com.c	977	1094	profile: #if defined(NEC_98)
+base/comms/com.c	1095	1101	include
+base/comms/com.c	1102	1104	profile: #ifdef NTVDM
+base/comms/com.c	1105	1114	include
+base/comms/com.c	1115	1115	profile: #ifndef NTVDM
+base/comms/com.c	1116	1120	include
+base/comms/com.c	1121	1127	profile: #ifndef NTVDM
+base/comms/com.c	1128	1154	include
+base/comms/com.c	1155	1179	profile: #ifdef NTVDM
+base/comms/com.c	1180	1180	include
+base/comms/com.c	1181	1181	profile: #ifndef NTVDM
+base/comms/com.c	1182	1211	include
+base/comms/com.c	1212	1212	profile: #ifndef NTVDM
+base/comms/com.c	1213	1312	include
+base/comms/com.c	1313	1322	profile: #ifdef NTVDM
+base/comms/com.c	1323	1378	include
+base/comms/com.c	1379	1381	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	1382	1426	include
+base/comms/com.c	1427	1427	profile: #ifndef NTVDM
+base/comms/com.c	1428	1447	include
+base/comms/com.c	1448	1489	profile: #ifndef NTVDM
+base/comms/com.c	1490	1535	include
+base/comms/com.c	1536	1538	profile: #ifdef NTVDM
+base/comms/com.c	1539	1547	include
+base/comms/com.c	1548	1550	profile: #ifdef NTVDM
+base/comms/com.c	1551	1614	include
+base/comms/com.c	1615	1615	profile: #ifndef NTVDM
+base/comms/com.c	1616	1616	include
+base/comms/com.c	1617	1617	profile: #ifndef NTVDM
+base/comms/com.c	1618	1644	include
+base/comms/com.c	1645	1647	profile: #ifdef NTVDM
+base/comms/com.c	1648	1674	include
+base/comms/com.c	1675	1685	profile: #ifdef NTVDM
+base/comms/com.c	1686	1689	include
+base/comms/com.c	1690	1690	profile: #ifndef NTVDM
+base/comms/com.c	1691	1691	include
+base/comms/com.c	1692	1692	profile: #ifndef NTVDM
+base/comms/com.c	1693	1714	include
+base/comms/com.c	1715	1743	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	1744	1767	include
+base/comms/com.c	1768	1768	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	1769	1770	include
+base/comms/com.c	1771	1788	profile: #ifdef NTVDM
+base/comms/com.c	1789	1929	include
+base/comms/com.c	1930	1932	profile: #ifdef NTVDM
+base/comms/com.c	1933	1933	include
+base/comms/com.c	1934	1934	profile: #if defined(NEC_98)
+base/comms/com.c	1935	2059	include
+base/comms/com.c	2060	2115	profile: #if defined(NEC_98)
+base/comms/com.c	2116	2116	include
+base/comms/com.c	2117	2181	profile: #ifdef  NTVDM
+base/comms/com.c	2182	2196	include
+base/comms/com.c	2197	2197	profile: #ifdef  NTVDM
+base/comms/com.c	2198	2261	include
+base/comms/com.c	2262	2262	profile: #if defined(NEC_98)
+base/comms/com.c	2263	2263	include
+base/comms/com.c	2264	2264	profile: #ifdef NTVDM
+base/comms/com.c	2265	2265	profile: #ifndef NEC_98
+base/comms/com.c	2266	2295	profile: #ifdef NTVDM
+base/comms/com.c	2296	2296	profile: #ifndef NEC_98
+base/comms/com.c	2297	2299	profile: #ifdef NTVDM
+base/comms/com.c	2300	2300	profile: #ifndef NEC_98
+base/comms/com.c	2301	2307	profile: #ifdef NTVDM
+base/comms/com.c	2308	2308	profile: #ifndef NEC_98
+base/comms/com.c	2309	2311	profile: #ifdef NTVDM
+base/comms/com.c	2312	2320	include
+base/comms/com.c	2321	2339	profile: #if defined(NEC_98)
+base/comms/com.c	2340	2465	include
+base/comms/com.c	2466	2466	profile: #if defined(NEC_98)
+base/comms/com.c	2467	2467	include
+base/comms/com.c	2468	2484	profile: #if defined(NEC_98)
+base/comms/com.c	2485	2501	include
+base/comms/com.c	2502	2502	profile: #if defined(NEC_98)
+base/comms/com.c	2503	2508	include
+base/comms/com.c	2509	2513	profile: #if defined(NEC_98)
+base/comms/com.c	2514	2516	include
+base/comms/com.c	2517	2517	profile: #if defined(NEC_98)
+base/comms/com.c	2518	2519	include
+base/comms/com.c	2520	2523	profile: #ifdef NTVDM
+base/comms/com.c	2524	2526	profile: #if defined(NEC_98)
+base/comms/com.c	2527	2527	profile: #ifdef NTVDM
+base/comms/com.c	2528	2528	profile: #if defined(NEC_98)
+base/comms/com.c	2529	2532	profile: #ifdef NTVDM
+base/comms/com.c	2533	2536	profile: #if defined(NEC_98)
+base/comms/com.c	2537	2538	profile: #ifdef NTVDM
+base/comms/com.c	2539	2539	profile: #if defined(NEC_98)
+base/comms/com.c	2540	2541	profile: #ifdef NTVDM
+base/comms/com.c	2542	2556	include
+base/comms/com.c	2557	2560	profile: #if defined(NEC_98)
+base/comms/com.c	2561	2562	include
+base/comms/com.c	2563	2563	profile: #if defined(NEC_98)
+base/comms/com.c	2564	2584	include
+base/comms/com.c	2585	2632	profile: #if defined(NEC_98)
+base/comms/com.c	2633	2638	include
+base/comms/com.c	2639	2639	profile: #if defined(NEC_98)
+base/comms/com.c	2640	2640	include
+base/comms/com.c	2641	2664	profile: #if defined(NEC_98)
+base/comms/com.c	2665	2688	include
+base/comms/com.c	2689	2689	profile: #if defined(NEC_98)
+base/comms/com.c	2690	2713	include
+base/comms/com.c	2714	2717	profile: #if defined(NEC_98)
+base/comms/com.c	2718	2719	include
+base/comms/com.c	2720	2720	profile: #if defined(NEC_98)
+base/comms/com.c	2721	2721	include
+base/comms/com.c	2722	2748	profile: #if defined(NEC_98)
+base/comms/com.c	2749	2749	profile: #ifndef NTVDM
+base/comms/com.c	2750	2750	profile: #if defined(NEC_98)
+base/comms/com.c	2751	2753	profile: #ifndef NTVDM
+base/comms/com.c	2754	2760	profile: #if defined(NEC_98)
+base/comms/com.c	2761	2762	include
+base/comms/com.c	2763	2772	profile: #if defined(NEC_98)
+base/comms/com.c	2773	2797	include
+base/comms/com.c	2798	2798	profile: #ifndef NTVDM
+base/comms/com.c	2799	2825	include
+base/comms/com.c	2826	2834	profile: #ifndef NTVDM
+base/comms/com.c	2835	2835	include
+base/comms/com.c	2836	2836	profile: #if defined(NEC_98)
+base/comms/com.c	2837	2837	include
+base/comms/com.c	2838	2918	profile: #if defined(NEC_98)
+base/comms/com.c	2919	2921	profile: #ifdef NTVDM
+base/comms/com.c	2922	2922	profile: #if defined(NEC_98)
+base/comms/com.c	2923	2923	profile: #ifdef NTVDM
+base/comms/com.c	2924	2928	profile: #if defined(NEC_98)
+base/comms/com.c	2929	2931	profile: #ifdef NTVDM
+base/comms/com.c	2932	2932	profile: #if defined(NEC_98)
+base/comms/com.c	2933	2933	profile: #ifdef NTVDM
+base/comms/com.c	2934	2939	profile: #if defined(NEC_98)
+base/comms/com.c	2940	2942	profile: #ifdef NTVDM
+base/comms/com.c	2943	2943	profile: #if defined(NEC_98)
+base/comms/com.c	2944	2944	profile: #ifdef NTVDM
+base/comms/com.c	2945	2949	profile: #if defined(NEC_98)
+base/comms/com.c	2950	2952	profile: #ifdef NTVDM
+base/comms/com.c	2953	2953	profile: #if defined(NEC_98)
+base/comms/com.c	2954	2954	profile: #ifdef NTVDM
+base/comms/com.c	2955	2964	profile: #if defined(NEC_98)
+base/comms/com.c	2965	2965	include
+base/comms/com.c	2966	2966	profile: #ifndef NEC_98
+base/comms/com.c	2967	2995	include
+base/comms/com.c	2996	2998	profile: #ifdef NTVDM
+base/comms/com.c	2999	2999	include
+base/comms/com.c	3000	3000	profile: #ifdef NTVDM
+base/comms/com.c	3001	3005	include
+base/comms/com.c	3006	3008	profile: #ifdef NTVDM
+base/comms/com.c	3009	3009	include
+base/comms/com.c	3010	3010	profile: #ifdef NTVDM
+base/comms/com.c	3011	3014	include
+base/comms/com.c	3015	3017	profile: #ifdef NTVDM
+base/comms/com.c	3018	3018	include
+base/comms/com.c	3019	3019	profile: #ifdef NTVDM
+base/comms/com.c	3020	3025	include
+base/comms/com.c	3026	3028	profile: #ifdef NTVDM
+base/comms/com.c	3029	3029	include
+base/comms/com.c	3030	3030	profile: #ifdef NTVDM
+base/comms/com.c	3031	3035	include
+base/comms/com.c	3036	3038	profile: #ifdef NTVDM
+base/comms/com.c	3039	3039	include
+base/comms/com.c	3040	3040	profile: #ifdef NTVDM
+base/comms/com.c	3041	3044	include
+base/comms/com.c	3045	3047	profile: #ifdef NTVDM
+base/comms/com.c	3048	3048	include
+base/comms/com.c	3049	3049	profile: #ifdef NTVDM
+base/comms/com.c	3050	3055	include
+base/comms/com.c	3056	3062	profile: #ifdef NTVDM
+base/comms/com.c	3063	3066	include
+base/comms/com.c	3067	3067	profile: #ifndef NEC_98
+base/comms/com.c	3068	3068	include
+base/comms/com.c	3069	3097	profile: #if defined(NEC_98)
+base/comms/com.c	3098	3156	include
+base/comms/com.c	3157	3157	profile: #if defined(NEC_98)
+base/comms/com.c	3158	3158	include
+base/comms/com.c	3159	3187	profile: #if defined(NEC_98)
+base/comms/com.c	3188	3240	include
+base/comms/com.c	3241	3241	profile: #if defined(NEC_98)
+base/comms/com.c	3242	3242	include
+base/comms/com.c	3243	3243	profile: #ifndef NEC_98
+base/comms/com.c	3244	3401	include
+base/comms/com.c	3402	3402	profile: #ifndef NEC_98
+base/comms/com.c	3403	3428	include
+base/comms/com.c	3429	3431	profile: #ifdef NTVDM
+base/comms/com.c	3432	3434	include
+base/comms/com.c	3435	3437	profile: #ifdef NTVDM
+base/comms/com.c	3438	3441	include
+base/comms/com.c	3442	3444	profile: #ifdef NTVDM
+base/comms/com.c	3445	3447	include
+base/comms/com.c	3448	3450	profile: #ifdef NTVDM
+base/comms/com.c	3451	3462	include
+base/comms/com.c	3463	3525	profile: #if defined(NEC_98)
+base/comms/com.c	3526	3549	include
+base/comms/com.c	3550	3553	profile: #ifdef NTVDM
+base/comms/com.c	3554	3594	include
+base/comms/com.c	3595	3603	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/comms/com.c	3604	3640	include
+base/comms/com.c	3641	3641	profile: #if defined(NEC_98)
+base/comms/com.c	3642	3649	include
+base/comms/com.c	3650	3656	profile: #if defined(NEC_98)
+base/comms/com.c	3657	3674	include
+base/comms/com.c	3675	3675	profile: #if defined(NEC_98)
+base/comms/com.c	3676	3677	include
+base/comms/com.c	3678	3686	profile: #if defined(NEC_98)
+base/comms/com.c	3687	3696	profile: #ifdef NTVDM
+base/comms/com.c	3697	3698	profile: #if defined(NEC_98)
+base/comms/com.c	3699	3699	profile: #ifdef NTVDM
+base/comms/com.c	3700	3711	profile: #if defined(NEC_98)
+base/comms/com.c	3712	3716	profile: #if 0
+base/comms/com.c	3717	3776	profile: #if defined(NEC_98)
+base/comms/com.c	3777	3780	include
+base/comms/com.c	3781	3784	profile: #ifdef NTVDM
+base/comms/com.c	3785	3788	include
+base/comms/com.c	3789	3798	profile: #ifdef NTVDM
+base/comms/com.c	3799	3800	include
+base/comms/com.c	3801	3801	profile: #ifdef NTVDM
+base/comms/com.c	3802	3814	include
+base/comms/com.c	3815	3815	profile: #ifndef NTVDM
+base/comms/com.c	3816	3817	include
+base/comms/com.c	3818	3821	profile: #ifndef NTVDM
+base/comms/com.c	3822	3824	include
+base/comms/com.c	3825	3825	profile: #if defined(NEC_98)
+base/comms/com.c	3826	3835	include
+base/comms/com.c	3836	3838	profile: #ifdef NTVDM
+base/comms/com.c	3839	3847	include
+base/comms/com.c	3848	3850	profile: #ifdef NTVDM
+base/comms/com.c	3851	3852	include
+base/comms/com.c	3853	3857	profile: #ifdef NTVDM
+base/comms/com.c	3858	3891	profile: #if defined(NEC_98)
+base/comms/com.c	3892	3907	profile: #ifdef NTVDM
+base/comms/com.c	3908	3908	profile: #if defined(NEC_98)
+base/comms/com.c	3909	3925	profile: #ifdef NTVDM
+base/comms/com.c	3926	3929	profile: #if defined(NEC_98)
+base/comms/com.c	3930	3931	profile: #ifdef NTVDM
+base/comms/com.c	3932	3932	profile: #if defined(NEC_98)
+base/comms/com.c	3933	3953	profile: #ifdef NTVDM
+base/comms/com.c	3954	4009	include
+base/comms/com.c	4010	4015	profile: #if defined(NEC_98)
+base/comms/com.c	4016	4019	include
+base/comms/com.c	4020	4020	profile: #if defined(NEC_98)
+base/comms/com.c	4021	4023	include
+base/comms/com.c	4024	4061	profile: #if defined(NEC_98)
+base/comms/com.c	4062	4096	include
+base/comms/com.c	4097	4097	profile: #if defined(NEC_98)
+base/comms/com.c	4098	4106	include
+base/comms/com.c	4107	4131	profile: #if defined(NEC_98)
+base/comms/com.c	4132	4161	include
+base/comms/com.c	4162	4162	profile: #if defined(NEC_98)
+base/comms/com.c	4163	4526	include
+base/comms/printer.c	1	128	include
+base/comms/printer.c	129	129	profile: #ifndef NEC_98
+base/comms/printer.c	130	132	include
+base/comms/printer.c	133	133	profile: #ifndef NEC_98
+base/comms/printer.c	134	142	include
+base/comms/printer.c	143	166	profile: #if defined(NEC_98)
+base/comms/printer.c	167	196	include
+base/comms/printer.c	197	197	profile: #if defined(NEC_98)
+base/comms/printer.c	198	198	include
+base/comms/printer.c	199	199	profile: #ifndef NEC_98
+base/comms/printer.c	200	206	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	207	207	profile: #ifndef NEC_98
+base/comms/printer.c	208	211	include
+base/comms/printer.c	212	215	profile: #if defined(NTVDM)
+base/comms/printer.c	216	263	include
+base/comms/printer.c	264	268	profile: #if defined(NEC_98)
+base/comms/printer.c	269	286	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	287	296	include
+base/comms/printer.c	297	297	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	298	301	include
+base/comms/printer.c	302	302	profile: #if defined(NEC_98)
+base/comms/printer.c	303	311	include
+base/comms/printer.c	312	314	profile: #if defined(NEC_98)
+base/comms/printer.c	315	319	include
+base/comms/printer.c	320	320	profile: #if defined(NEC_98)
+base/comms/printer.c	321	322	include
+base/comms/printer.c	323	334	profile: #if defined(NEC_98)
+base/comms/printer.c	335	349	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	350	362	include
+base/comms/printer.c	363	363	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	364	364	profile: #if defined(NEC_98)
+base/comms/printer.c	365	365	include
+base/comms/printer.c	366	368	profile: #if defined(NEC_98)
+base/comms/printer.c	369	369	include
+base/comms/printer.c	370	370	profile: #if defined(NEC_98)
+base/comms/printer.c	371	371	include
+base/comms/printer.c	372	372	profile: #ifndef NEC_98
+base/comms/printer.c	373	386	include
+base/comms/printer.c	387	387	profile: #ifndef NEC_98
+base/comms/printer.c	388	390	include
+base/comms/printer.c	391	394	profile: #if defined(NEC_98)
+base/comms/printer.c	395	396	include
+base/comms/printer.c	397	397	profile: #if defined(NEC_98)
+base/comms/printer.c	398	399	include
+base/comms/printer.c	400	406	profile: #if defined(NEC_98)
+base/comms/printer.c	407	409	include
+base/comms/printer.c	410	418	profile: #if defined(NTVDM)
+base/comms/printer.c	419	458	include
+base/comms/printer.c	459	459	profile: #if defined(NEC_98)
+base/comms/printer.c	460	460	include
+base/comms/printer.c	461	464	profile: #if defined(NEC_98)
+base/comms/printer.c	465	469	include
+base/comms/printer.c	470	470	profile: #if defined(NEC_98)
+base/comms/printer.c	471	472	include
+base/comms/printer.c	473	473	profile: #ifndef NEC_98
+base/comms/printer.c	474	475	include
+base/comms/printer.c	476	476	profile: #ifndef NEC_98
+base/comms/printer.c	477	478	include
+base/comms/printer.c	479	481	profile: #if defined(NEC_98)
+base/comms/printer.c	482	482	include
+base/comms/printer.c	483	483	profile: #if defined(NEC_98)
+base/comms/printer.c	484	484	include
+base/comms/printer.c	485	487	profile: #if defined(NEC_98)
+base/comms/printer.c	488	519	include
+base/comms/printer.c	520	553	profile: #if defined(NTVDM)
+base/comms/printer.c	554	556	include
+base/comms/printer.c	557	557	profile: #if defined(NEC_98)
+base/comms/printer.c	558	559	include
+base/comms/printer.c	560	563	profile: #if defined(NEC_98)
+base/comms/printer.c	564	564	include
+base/comms/printer.c	565	567	profile: #if defined(NTVDM)
+base/comms/printer.c	568	569	include
+base/comms/printer.c	570	570	profile: #if defined(NEC_98)
+base/comms/printer.c	571	571	include
+base/comms/printer.c	572	613	profile: #if defined(NEC_98)
+base/comms/printer.c	614	622	include
+base/comms/printer.c	623	627	profile: #if defined(NEC_98)
+base/comms/printer.c	628	643	include
+base/comms/printer.c	644	644	profile: #if defined(NEC_98)
+base/comms/printer.c	645	645	include
+base/comms/printer.c	646	646	profile: #ifndef NEC_98
+base/comms/printer.c	647	657	profile: #if defined(NTVDM)
+base/comms/printer.c	658	658	profile: #ifndef NEC_98
+base/comms/printer.c	659	673	include
+base/comms/printer.c	674	681	profile: #if defined(NEC_98)
+base/comms/printer.c	682	692	include
+base/comms/printer.c	693	695	profile: #if defined(NTVDM) && !defined(MONITOR)
+base/comms/printer.c	696	697	include
+base/comms/printer.c	698	698	profile: #if defined(NTVDM) && !defined(MONITOR)
+base/comms/printer.c	699	703	include
+base/comms/printer.c	704	704	profile: #if defined(NEC_98)
+base/comms/printer.c	705	708	include
+base/comms/printer.c	709	712	profile: #if defined(NEC_98)
+base/comms/printer.c	713	714	include
+base/comms/printer.c	715	715	profile: #if defined(NEC_98)
+base/comms/printer.c	716	716	include
+base/comms/printer.c	717	719	profile: #if defined(NEC_98)
+base/comms/printer.c	720	720	include
+base/comms/printer.c	721	721	profile: #if defined(NEC_98)
+base/comms/printer.c	722	729	include
+base/comms/printer.c	730	734	profile: #if defined(NEC_98)
+base/comms/printer.c	735	736	include
+base/comms/printer.c	737	737	profile: #if defined(NEC_98)
+base/comms/printer.c	738	740	include
+base/comms/printer.c	741	741	profile: #ifndef NEC_98
+base/comms/printer.c	742	750	profile: #if defined(NTVDM)
+base/comms/printer.c	751	751	profile: #ifndef NEC_98
+base/comms/printer.c	752	752	include
+base/comms/printer.c	753	753	profile: #ifndef NEC_98
+base/comms/printer.c	754	758	include
+base/comms/printer.c	759	759	profile: #ifndef NEC_98
+base/comms/printer.c	760	761	include
+base/comms/printer.c	762	762	profile: #ifndef NEC_98
+base/comms/printer.c	763	768	include
+base/comms/printer.c	769	769	profile: #ifndef NEC_98
+base/comms/printer.c	770	777	include
+base/comms/printer.c	778	780	profile: #if defined(NEC_98)
+base/comms/printer.c	781	781	include
+base/comms/printer.c	782	782	profile: #if defined(NEC_98)
+base/comms/printer.c	783	790	include
+base/comms/printer.c	791	793	profile: #if defined(NEC_98)
+base/comms/printer.c	794	794	include
+base/comms/printer.c	795	795	profile: #if defined(NEC_98)
+base/comms/printer.c	796	818	include
+base/comms/printer.c	819	824	profile: #if defined(NEC_98)
+base/comms/printer.c	825	825	profile: #if 1
+base/comms/printer.c	826	834	profile: #if defined(NEC_98)
+base/comms/printer.c	835	840	profile: #if 1
+base/comms/printer.c	841	847	profile: #if defined(NEC_98)
+base/comms/printer.c	848	848	include
+base/comms/printer.c	849	851	profile: #if defined(NTVDM)
+base/comms/printer.c	852	855	include
+base/comms/printer.c	856	858	profile: #if defined(NTVDM) && !defined(MONITOR)
+base/comms/printer.c	859	859	include
+base/comms/printer.c	860	860	profile: #if defined(NTVDM) && !defined(MONITOR)
+base/comms/printer.c	861	871	include
+base/comms/printer.c	872	872	profile: #if defined(NEC_98)
+base/comms/printer.c	873	887	include
+base/comms/printer.c	888	902	profile: #if defined(NEC_98)
+base/comms/printer.c	903	909	include
+base/comms/printer.c	910	921	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	922	940	include
+base/comms/printer.c	941	945	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	946	947	include
+base/comms/printer.c	948	948	profile: #if defined(NEC_98)
+base/comms/printer.c	949	950	include
+base/comms/printer.c	951	961	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	962	962	profile: #ifndef NEC_98
+base/comms/printer.c	963	1004	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	1005	1005	profile: #ifndef NEC_98
+base/comms/printer.c	1006	1007	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer.c	1008	1010	include
+base/comms/printer.c	1011	1011	profile: #ifndef NEC_98
+base/comms/printer.c	1012	1024	profile: #ifdef NTVDM
+base/comms/printer.c	1025	1025	profile: #ifndef NEC_98
+base/comms/printer.c	1026	1063	include
+base/comms/printer.c	1064	1101	profile: #if defined(NEC_98)
+base/comms/printer_.c	1	2	profile: #if defined(NEC_98)
+base/comms/printer_.c	3	65	include
+base/comms/printer_.c	66	68	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer_.c	69	69	include
+base/comms/printer_.c	70	72	profile: #if defined(NTVDM)
+base/comms/printer_.c	73	87	include
+base/comms/printer_.c	88	90	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer_.c	91	112	include
+base/comms/printer_.c	113	130	profile: #ifdef NTVDM
+base/comms/printer_.c	131	201	include
+base/comms/printer_.c	202	203	NT-only-LPT-BOP-declaration
+base/comms/printer_.c	204	204	include
+base/comms/printer_.c	205	226	profile: #if defined(NTVDM) && defined(MONITOR)
+base/comms/printer_.c	227	227	include
+base/comms/printer_.c	228	245	profile: #if defined(NTVDM)
+base/comms/printer_.c	246	246	profile: #if defined(NEC_98)
+base/comms/rs232_io.c	1	59	include
+base/comms/rs232_io.c	60	62	profile: #if defined(NEC_98)
+base/comms/rs232_io.c	63	66	include
+base/comms/rs232_io.c	67	67	profile: #if defined(NEC_98)
+base/comms/rs232_io.c	68	72	include
+base/comms/rs232_io.c	73	73	profile: #ifndef NEC_98
+base/comms/rs232_io.c	74	297	include
+base/comms/rs232_io.c	298	298	profile: #ifndef NEC_98
+base/comms/rs232_io.c	299	300	include
+base/disks/diskbios.c	1	6	profile: #if defined(NEC_98)
+base/disks/diskbios.c	7	53	include
+base/disks/diskbios.c	54	56	profile: #if defined(NEC_98)
+base/disks/diskbios.c	57	78	include
+base/disks/diskbios.c	79	136	profile: #if defined(NEC_98)
+base/disks/diskbios.c	137	221	include
+base/disks/diskbios.c	222	231	profile: #if defined(NEC_98)
+base/disks/diskbios.c	232	290	include
+base/disks/diskbios.c	291	382	profile: #if defined(NEC_98)
+base/disks/diskbios.c	383	385	include
+base/disks/diskbios.c	386	386	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/disks/diskbios.c	387	388	include
+base/disks/diskbios.c	389	389	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/disks/diskbios.c	390	396	include
+base/disks/diskbios.c	397	397	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/disks/diskbios.c	398	438	include
+base/disks/diskbios.c	439	439	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/disks/diskbios.c	440	440	include
+base/disks/diskbios.c	441	451	profile: #ifdef NTVDM /* True for all NT VDMs */
+base/disks/diskbios.c	452	492	include
+base/disks/diskbios.c	493	493	profile: #if defined(NEC_98)
+base/disks/diskbios.c	494	741	include
+base/disks/diskbios.c	742	766	profile: #if defined(NEC_98)
+base/disks/diskbios.c	767	789	include
+base/disks/diskbios.c	790	790	profile: #if defined(NEC_98)
+base/disks/diskbios.c	791	793	include
+base/disks/diskbios.c	794	821	profile: #if defined(NEC_98)
+base/disks/diskbios.c	822	846	include
+base/disks/diskbios.c	847	847	profile: #if defined(NEC_98)
+base/disks/diskbios.c	848	853	include
+base/disks/diskbios.c	854	857	profile: #if defined(NEC_98)
+base/disks/diskbios.c	858	858	include
+base/disks/diskbios.c	859	861	profile: #if defined(NEC_98)
+base/disks/diskbios.c	862	862	include
+base/disks/diskbios.c	863	863	profile: #if defined(NEC_98)
+base/disks/diskbios.c	864	864	include
+base/disks/diskbios.c	865	891	profile: #if defined(NEC_98)
+base/disks/diskbios.c	892	892	include
+base/disks/diskbios.c	893	893	profile: #ifndef NEC_98
+base/disks/diskbios.c	894	894	include
+base/disks/diskbios.c	895	895	profile: #ifndef NEC_98
+base/disks/diskbios.c	896	899	include
+base/disks/diskbios.c	900	902	profile: #if defined(NEC_98)
+base/disks/diskbios.c	903	903	include
+base/disks/diskbios.c	904	904	profile: #if defined(NEC_98)
+base/disks/diskbios.c	905	907	include
+base/disks/diskbios.c	908	916	profile: #if defined(NEC_98)
+base/disks/diskbios.c	917	921	include
+base/disks/diskbios.c	922	922	profile: #if defined(NEC_98)
+base/disks/diskbios.c	923	933	include
+base/disks/diskbios.c	934	934	profile: #ifndef NEC_98
+base/disks/diskbios.c	935	938	include
+base/disks/diskbios.c	939	939	profile: #ifndef NEC_98
+base/disks/diskbios.c	940	940	include
+base/disks/diskbios.c	941	992	profile: #if defined(NEC_98)
+base/disks/diskbios.c	993	1001	include
+base/disks/diskbios.c	1002	1002	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1003	1003	include
+base/disks/diskbios.c	1004	1004	profile: #ifndef NEC_98
+base/disks/diskbios.c	1005	1015	include
+base/disks/diskbios.c	1016	1016	profile: #ifndef NEC_98
+base/disks/diskbios.c	1017	1017	include
+base/disks/diskbios.c	1018	1030	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1031	1042	include
+base/disks/diskbios.c	1043	1043	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1044	1044	include
+base/disks/diskbios.c	1045	1063	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1064	1087	include
+base/disks/diskbios.c	1088	1088	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1089	1093	include
+base/disks/diskbios.c	1094	1096	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1097	1097	include
+base/disks/diskbios.c	1098	1098	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1099	1143	include
+base/disks/diskbios.c	1144	1244	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1245	1282	include
+base/disks/diskbios.c	1283	1283	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1284	1288	include
+base/disks/diskbios.c	1289	1388	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1389	1431	include
+base/disks/diskbios.c	1432	1432	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1433	1434	include
+base/disks/diskbios.c	1435	1477	profile: #if defined(NEC_98)
+base/disks/diskbios.c	1478	2091	include
+base/disks/diskbios.c	2092	2140	profile: #if defined(NEC_98)
+base/disks/fdisk.c	1	1553	include
+base/disks/fdisk.c	1554	1556	profile: #if 0
+base/disks/fdisk.c	1557	1557	include
+base/disks/fdisk.c	1558	1558	profile: #if 0
+base/disks/fdisk.c	1559	1573	include
+base/disks/fdisk.c	1574	1574	profile: #ifndef NEC_98
+base/disks/fdisk.c	1575	1637	include
+base/disks/fdisk.c	1638	1638	profile: #ifndef NEC_98
+base/disks/fdisk.c	1639	1648	include
+base/disks/fdisk.c	1649	1652	profile: #if 0
+base/disks/fdisk.c	1653	1654	include
+base/disks/fdisk.c	1655	1655	profile: #if 0
+base/disks/fdisk.c	1656	1678	include
+base/disks/fdisk.c	1679	1679	profile: #ifndef NEC_98
+base/disks/fdisk.c	1680	1756	include
+base/disks/fdisk.c	1757	1757	profile: #ifndef NEC_98
+base/disks/fdisk.c	1758	1761	include
+base/disks/fdisk.c	1762	1762	profile: #ifndef NEC_98
+base/disks/fdisk.c	1763	1812	include
+base/disks/fdisk.c	1813	1813	profile: #ifndef NEC_98
+base/disks/fdisk.c	1814	1925	include
+base/disks/fla.c	1	293	include
+base/disks/fla.c	294	294	profile: #ifndef NEC_98
+base/disks/fla.c	295	454	include
+base/disks/fla.c	455	455	profile: #ifndef NEC_98
+base/disks/fla.c	456	460	include
+base/disks/fla.c	461	461	profile: #ifndef NEC_98
+base/disks/fla.c	462	722	include
+base/disks/fla.c	723	723	profile: #ifndef NEC_98
+base/disks/fla.c	724	748	include
+base/disks/fla.c	749	822	profile: #ifdef NTVDM
+base/disks/fla.c	823	897	include
+base/disks/fla.c	898	898	profile: #ifdef NTVDM
+base/disks/fla.c	899	1145	include
+base/disks/fla.c	1146	1146	profile: #ifndef NEC_98
+base/disks/fla.c	1147	1179	include
+base/disks/fla.c	1180	1180	profile: #ifndef NEC_98
+base/disks/fla.c	1181	1181	include
+base/disks/floppy.c	1	6	profile: #if defined(NEC_98)
+base/disks/floppy.c	7	120	include
+base/disks/floppy.c	121	123	profile: #if defined(NEC_98)
+base/disks/floppy.c	124	143	include
+base/disks/floppy.c	144	192	profile: #if defined(NEC_98)
+base/disks/floppy.c	193	197	include
+base/disks/floppy.c	198	227	profile: #if defined(NEC_98)
+base/disks/floppy.c	228	255	include
+base/disks/floppy.c	256	256	profile: #if defined(NEC_98)
+base/disks/floppy.c	257	257	include
+base/disks/floppy.c	258	260	profile: #ifdef NTVDM
+base/disks/floppy.c	261	299	include
+base/disks/floppy.c	300	346	profile: #if defined(NEC_98)
+base/disks/floppy.c	347	391	include
+base/disks/floppy.c	392	392	profile: #ifndef NEC_98
+base/disks/floppy.c	393	482	include
+base/disks/floppy.c	483	483	profile: #ifndef NEC_98
+base/disks/floppy.c	484	505	include
+base/disks/floppy.c	506	948	profile: #if defined(NEC_98)
+base/disks/floppy.c	949	984	include
+base/disks/floppy.c	985	985	profile: #if defined(NEC_98)
+base/disks/floppy.c	986	989	include
+base/disks/floppy.c	990	1433	profile: #if defined(NEC_98)
+base/disks/floppy.c	1434	1469	include
+base/disks/floppy.c	1470	1470	profile: #if defined(NEC_98)
+base/disks/floppy.c	1471	1474	include
+base/disks/floppy.c	1475	1915	profile: #if defined(NEC_98)
+base/disks/floppy.c	1916	1951	include
+base/disks/floppy.c	1952	1952	profile: #if defined(NEC_98)
+base/disks/floppy.c	1953	1970	include
+base/disks/floppy.c	1971	2167	profile: #if defined(NEC_98)
+base/disks/floppy.c	2168	2168	profile: #if 1                                                                    // NEC 941110
+base/disks/floppy.c	2169	2169	profile: #if defined(NEC_98)
+base/disks/floppy.c	2170	2172	profile: #if 1                                                                    // NEC 941110
+base/disks/floppy.c	2173	2247	profile: #if defined(NEC_98)
+base/disks/floppy.c	2248	2354	include
+base/disks/floppy.c	2355	2355	profile: #if defined(NEC_98)
+base/disks/floppy.c	2356	2372	include
+base/disks/floppy.c	2373	2380	profile: #if defined(NEC_98)
+base/disks/floppy.c	2381	2383	include
+base/disks/floppy.c	2384	2384	profile: #if defined(NEC_98)
+base/disks/floppy.c	2385	2427	include
+base/disks/floppy.c	2428	2431	profile: #ifdef NTVDM
+base/disks/floppy.c	2432	2433	include
+base/disks/floppy.c	2434	2434	profile: #ifdef NTVDM
+base/disks/floppy.c	2435	2809	include
+base/disks/floppy.c	2810	2813	profile: #ifdef NTVDM
+base/disks/floppy.c	2814	2815	include
+base/disks/floppy.c	2816	2816	profile: #ifdef NTVDM
+base/disks/floppy.c	2817	2955	include
+base/disks/floppy.c	2956	2961	profile: #ifdef NTVDM
+base/disks/floppy.c	2962	2965	include
+base/disks/floppy.c	2966	2966	profile: #ifdef NTVDM
+base/disks/floppy.c	2967	3018	include
+base/disks/floppy.c	3019	3021	profile: #ifdef NTVDM
+base/disks/floppy.c	3022	3022	include
+base/disks/floppy.c	3023	3023	profile: #ifdef NTVDM
+base/disks/floppy.c	3024	3058	include
+base/disks/floppy.c	3059	3061	profile: #ifdef NTVDM
+base/disks/floppy.c	3062	3062	include
+base/disks/floppy.c	3063	3063	profile: #ifdef NTVDM
+base/disks/floppy.c	3064	3224	include
+base/disks/floppy.c	3225	3228	profile: #ifdef NTVDM
+base/disks/floppy.c	3229	3230	include
+base/disks/floppy.c	3231	3231	profile: #ifdef NTVDM
+base/disks/floppy.c	3232	3261	include
+base/disks/floppy.c	3262	3269	profile: #ifdef NTVDM
+base/disks/floppy.c	3270	3274	include
+base/disks/floppy.c	3275	3275	profile: #ifdef NTVDM
+base/disks/floppy.c	3276	3283	include
+base/disks/floppy.c	3284	3291	profile: #ifdef NTVDM
+base/disks/floppy.c	3292	3296	include
+base/disks/floppy.c	3297	3297	profile: #ifdef NTVDM
+base/disks/floppy.c	3298	3304	include
+base/disks/floppy.c	3305	3312	profile: #ifdef NTVDM
+base/disks/floppy.c	3313	3317	include
+base/disks/floppy.c	3318	3318	profile: #ifdef NTVDM
+base/disks/floppy.c	3319	3371	include
+base/disks/floppy.c	3372	3372	profile: #ifndef NEC_98
+base/disks/floppy.c	3373	3382	include
+base/disks/floppy.c	3383	3383	profile: #ifndef NTVDM
+base/disks/floppy.c	3384	3441	include
+base/disks/floppy.c	3442	3483	profile: #ifndef NTVDM
+base/disks/floppy.c	3484	3503	include
+base/disks/floppy.c	3504	3504	profile: #ifndef NEC_98
+base/disks/floppy.c	3505	3508	include
+base/disks/floppy.c	3509	3509	profile: #ifndef NEC_98
+base/disks/floppy.c	3510	3555	include
+base/disks/floppy.c	3556	3556	profile: #ifndef NEC_98
+base/disks/floppy.c	3557	3560	include
+base/disks/floppy.c	3561	3561	profile: #ifndef NEC_98
+base/disks/floppy.c	3562	3608	include
+base/disks/floppy.c	3609	3609	profile: #ifndef NEC_98
+base/disks/floppy.c	3610	3613	include
+base/disks/floppy.c	3614	3614	profile: #ifndef NEC_98
+base/disks/floppy.c	3615	3639	include
+base/disks/floppy.c	3640	3640	profile: #ifndef NEC_98
+base/disks/floppy.c	3641	3664	include
+base/disks/floppy.c	3665	3665	profile: #ifndef NEC_98
+base/disks/floppy.c	3666	3727	include
+base/disks/floppy.c	3728	3728	profile: #ifndef NEC_98
+base/disks/floppy.c	3729	3732	include
+base/disks/floppy.c	3733	3733	profile: #ifndef NEC_98
+base/disks/floppy.c	3734	3784	include
+base/disks/floppy.c	3785	3785	profile: #ifndef NTVDM
+base/disks/floppy.c	3786	3792	include
+base/disks/floppy.c	3793	3793	profile: #ifndef NTVDM
+base/disks/floppy.c	3794	3795	include
+base/disks/floppy.c	3796	3796	profile: #ifndef NEC_98
+base/disks/floppy.c	3797	4273	include
+base/disks/floppy.c	4274	4277	profile: #ifdef NTVDM
+base/disks/floppy.c	4278	4279	include
+base/disks/floppy.c	4280	4280	profile: #ifdef NTVDM
+base/disks/floppy.c	4281	4329	include
+base/disks/floppy.c	4330	4333	profile: #ifdef NTVDM
+base/disks/floppy.c	4334	4335	include
+base/disks/floppy.c	4336	4336	profile: #ifdef NTVDM
+base/disks/floppy.c	4337	4362	include
+base/disks/floppy.c	4363	4363	profile: #ifndef NEC_98
+base/disks/floppy.c	4364	4424	include
+base/disks/floppy.c	4425	4425	profile: #ifndef NEC_98
+base/disks/floppy.c	4426	4487	include
+base/disks/floppy.c	4488	4491	profile: #ifdef NTVDM
+base/disks/floppy.c	4492	4493	include
+base/disks/floppy.c	4494	4494	profile: #ifdef NTVDM
+base/disks/floppy.c	4495	4519	include
+base/disks/floppy.c	4520	4520	profile: #ifndef NEC_98
+base/disks/floppy.c	4521	4552	include
+base/disks/floppy.c	4553	4553	profile: #ifndef NEC_98
+base/disks/floppy.c	4554	4733	include
+base/disks/floppy.c	4734	4737	profile: #ifdef NTVDM
+base/disks/floppy.c	4738	4739	include
+base/disks/floppy.c	4740	4740	profile: #ifdef NTVDM
+base/disks/floppy.c	4741	4757	include
+base/disks/floppy.c	4758	4761	profile: #ifdef NTVDM
+base/disks/floppy.c	4762	4763	include
+base/disks/floppy.c	4764	4764	profile: #ifdef NTVDM
+base/disks/floppy.c	4765	4829	include
+base/disks/floppy.c	4830	4830	profile: #ifndef NEC_98
+base/disks/floppy.c	4831	4901	include
+base/disks/floppy.c	4902	4902	profile: #ifndef NEC_98
+base/disks/floppy.c	4903	4906	include
+base/disks/floppy.c	4907	4907	profile: #ifndef NEC_98
+base/disks/floppy.c	4908	4923	include
+base/disks/floppy.c	4924	4924	profile: #ifndef NEC_98
+base/disks/floppy.c	4925	5089	include
+base/disks/floppy.c	5090	5731	profile: #if defined(NEC_98)
+base/disks/floppy.c	5732	5732	profile: #if 1                                                                    // NEC 941110
+base/disks/floppy.c	5733	5734	profile: #if defined(NEC_98)
+base/disks/floppy.c	5735	5737	profile: #if 1                                                                    // NEC 941110
+base/disks/floppy.c	5738	5834	profile: #if defined(NEC_98)
+base/disks/floppy.c	5835	5835	profile: #if 1                                                           // NEC 941110
+base/disks/floppy.c	5836	5836	profile: #if defined(NEC_98)
+base/disks/floppy.c	5837	5839	profile: #if 1                                                           // NEC 941110
+base/disks/floppy.c	5840	5878	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	1	6	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	7	67	include
+base/disks/floppy_i.c	68	70	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	71	71	include
+base/disks/floppy_i.c	72	75	profile: #ifdef NTVDM
+base/disks/floppy_i.c	76	76	include
+base/disks/floppy_i.c	77	162	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	163	170	include
+base/disks/floppy_i.c	171	176	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	177	180	include
+base/disks/floppy_i.c	181	181	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	182	190	include
+base/disks/floppy_i.c	191	225	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	226	298	include
+base/disks/floppy_i.c	299	299	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	300	307	include
+base/disks/floppy_i.c	308	360	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	361	401	include
+base/disks/floppy_i.c	402	402	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	403	410	include
+base/disks/floppy_i.c	411	430	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	431	503	include
+base/disks/floppy_i.c	504	504	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	505	510	include
+base/disks/floppy_i.c	511	523	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	524	533	include
+base/disks/floppy_i.c	534	534	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	535	540	include
+base/disks/floppy_i.c	541	552	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	553	565	include
+base/disks/floppy_i.c	566	570	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	571	572	include
+base/disks/floppy_i.c	573	573	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	574	578	include
+base/disks/floppy_i.c	579	579	profile: #ifndef NEC_98
+base/disks/floppy_i.c	580	580	include
+base/disks/floppy_i.c	581	583	profile: #ifdef NTVDM
+base/disks/floppy_i.c	584	584	include
+base/disks/floppy_i.c	585	585	profile: #ifdef NTVDM
+base/disks/floppy_i.c	586	586	include
+base/disks/floppy_i.c	587	587	profile: #ifndef NEC_98
+base/disks/floppy_i.c	588	589	include
+base/disks/floppy_i.c	590	590	profile: #ifndef NEC_98
+base/disks/floppy_i.c	591	598	include
+base/disks/floppy_i.c	599	599	profile: #ifndef NEC_98
+base/disks/floppy_i.c	600	604	include
+base/disks/floppy_i.c	605	607	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	608	608	include
+base/disks/floppy_i.c	609	609	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	610	611	include
+base/disks/floppy_i.c	612	617	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	618	658	include
+base/disks/floppy_i.c	659	662	profile: #ifdef NTVDM
+base/disks/floppy_i.c	663	664	include
+base/disks/floppy_i.c	665	665	profile: #ifdef NTVDM
+base/disks/floppy_i.c	666	691	include
+base/disks/floppy_i.c	692	695	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	696	696	include
+base/disks/floppy_i.c	697	697	profile: #ifndef NTVDM
+base/disks/floppy_i.c	698	698	include
+base/disks/floppy_i.c	699	699	profile: #ifndef NTVDM
+base/disks/floppy_i.c	700	700	include
+base/disks/floppy_i.c	701	701	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	702	704	include
+base/disks/floppy_i.c	705	727	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	728	762	include
+base/disks/floppy_i.c	763	763	profile: #ifndef NTVDM /* prevent floppies showing up in bios data area */
+base/disks/floppy_i.c	764	781	include
+base/disks/floppy_i.c	782	782	profile: #ifndef NTVDM /* prevent floppies showing up in bios data area */
+base/disks/floppy_i.c	783	783	include
+base/disks/floppy_i.c	784	784	profile: #if defined(NEC_98)
+base/disks/floppy_i.c	785	786	include
+base/disks/floppy_i.c	787	1179	profile: #if defined(NEC_98)
+base/disks/gfi.c	1	379	include
+base/disks/gfi_mpty.c	1	299	include
+base/inc/base_def.h	1	276	include
+base/inc/bios.h	1	357	include
+base/inc/bios.h	358	358	profile: #ifndef NTVDM
+base/inc/bios.h	359	359	include
+base/inc/bios.h	360	360	profile: #ifndef NTVDM
+base/inc/bios.h	361	364	include
+base/inc/bios.h	365	365	profile: #ifndef NTVDM
+base/inc/bios.h	366	366	include
+base/inc/bios.h	367	367	profile: #ifndef NTVDM
+base/inc/bios.h	368	381	include
+base/inc/bios.h	382	390	profile: #ifdef NTVDM
+base/inc/bios.h	391	395	profile: #ifdef JAPAN
+base/inc/bios.h	396	396	profile: #ifdef NTVDM
+base/inc/bios.h	397	415	include
+base/inc/bios.h	416	600	profile: #if defined(NEC_98)
+base/inc/config.h	1	272	include
+base/inc/config.h	273	279	profile: #if defined(NTVDM)
+base/inc/config.h	280	367	include
+base/inc/config.h	368	368	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/inc/config.h	369	377	include
+base/inc/config.h	378	378	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/inc/config.h	379	389	include
+base/inc/config.h	390	390	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/inc/config.h	391	393	include
+base/inc/config.h	394	394	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/inc/config.h	395	419	include
+base/inc/dma.h	1	202	include
+base/inc/dma.h	203	235	profile: #if defined(NEC_98)
+base/inc/dma.h	236	290	include
+base/inc/dma.h	291	293	profile: #if defined(NEC_98)
+base/inc/dma.h	294	313	include
+base/inc/dma.h	314	316	profile: #if defined(NEC_98)
+base/inc/dma.h	317	317	include
+base/inc/dma.h	318	318	profile: #if defined(NEC_98)
+base/inc/dma.h	319	353	include
+base/inc/dma.h	354	359	profile: #if defined(NEC_98)
+base/inc/dma.h	360	374	include
+base/inc/dma.h	375	375	profile: #if defined(NEC_98)
+base/inc/dma.h	376	564	include
+base/inc/dma.h	565	576	profile: #ifdef NTVDM
+base/inc/floppy.h	1	186	include
+base/inc/floppy.h	187	192	profile: #ifdef NTVDM
+base/inc/floppy.h	193	195	include
+base/inc/floppy.h	196	196	profile: #ifdef NTVDM
+base/inc/floppy.h	197	431	include
+base/inc/floppy.h	432	434	profile: #if defined(NEC_98)
+base/inc/floppy.h	435	435	include
+base/inc/floppy.h	436	436	profile: #if defined(NEC_98)
+base/inc/floppy.h	437	577	include
+base/inc/floppy.h	578	587	profile: #ifdef NTVDM
+base/inc/gfi.h	1	502	include
+base/inc/gfi.h	503	505	profile: #ifdef NTVDM
+base/inc/gfi.h	506	618	include
+base/inc/host_lpt.h	1	4	include
+base/inc/host_lpt.h	5	20	profile: #if defined(NEC_98)         // NEC {
+base/inc/host_lpt.h	21	150	include
+base/inc/host_lpt.h	151	154	profile: #if defined(NTVDM)
+base/inc/host_lpt.h	155	160	include
+base/inc/host_lpt.h	161	163	profile: #if defined (NTVDM) && defined(MONITOR)
+base/inc/host_lpt.h	164	179	include
+base/inc/host_lpt.h	180	180	profile: #if defined(NEC_98)         // NEC {
+base/inc/host_lpt.h	181	184	include
+base/inc/ios.h	1	28	include
+base/inc/ios.h	29	35	profile: #ifdef NTVDM
+base/inc/ios.h	36	37	include
+base/inc/ios.h	38	300	profile: #if defined(NEC_98)
+base/inc/ios.h	301	641	include
+base/inc/ios.h	642	642	sound-deferred
+base/inc/ios.h	643	643	include
+base/inc/ios.h	644	658	profile: #ifdef NTVDM    /* Spare slots for user supplied VDDs */
+base/inc/ios.h	659	667	include
+base/inc/ios.h	668	668	sound-deferred
+base/inc/ios.h	669	675	include
+base/inc/ios.h	676	676	profile: #ifdef NTVDM    /* Spare slots for user supplied VDDs */
+base/inc/ios.h	677	705	include
+base/inc/ios.h	706	706	profile: #if defined(NEC_98)
+base/inc/ios.h	707	707	include
+base/inc/ios.h	708	710	profile: #if defined(NEC_98)
+base/inc/ios.h	711	820	include
+base/inc/ios.h	821	824	profile: #ifdef NTVDM
+base/inc/ios.h	825	826	include
+base/inc/ios.h	827	827	profile: #ifdef NTVDM
+base/inc/ios.h	828	869	include
+base/inc/printer.h	1	30	include
+base/inc/printer.h	31	42	profile: #if defined(NEC_98)
+base/inc/printer.h	43	70	include
+base/inc/printer.h	71	73	profile: #if defined(NTVDM)
+base/inc/printer.h	74	74	profile: #if defined(NEC_98)
+base/inc/printer.h	75	76	include
+base/inc/rs232.h	1	21	include
+base/inc/rs232.h	22	22	profile: #ifndef NEC_98
+base/inc/rs232.h	23	44	include
+base/inc/rs232.h	45	253	profile: #ifndef NEC_98
+base/inc/rs232.h	254	279	include
+base/inc/rs232.h	280	303	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	304	325	include
+base/inc/rs232.h	326	326	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	327	394	include
+base/inc/rs232.h	395	397	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	398	398	include
+base/inc/rs232.h	399	399	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	400	406	include
+base/inc/rs232.h	407	409	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	410	410	include
+base/inc/rs232.h	411	411	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	412	453	include
+base/inc/rs232.h	454	480	profile: #if defined(NEC_98)
+base/inc/rs232.h	481	513	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	514	519	include
+base/inc/rs232.h	520	522	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	523	527	include
+base/inc/rs232.h	528	528	profile: #if defined(NEC_98)
+base/inc/rs232.h	529	540	include
+base/inc/rs232.h	541	553	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	554	560	include
+base/inc/rs232.h	561	563	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	564	578	include
+base/inc/rs232.h	579	583	profile: #ifdef NTVDM
+base/inc/rs232.h	584	585	include
+base/inc/rs232.h	586	586	profile: #ifdef NTVDM
+base/inc/rs232.h	587	587	include
+base/inc/rs232.h	588	592	profile: #ifdef NTVDM
+base/inc/rs232.h	593	594	include
+base/inc/rs232.h	595	595	profile: #ifdef NTVDM
+base/inc/rs232.h	596	600	include
+base/inc/rs232.h	601	605	profile: #if defined(NEC_98)
+base/inc/rs232.h	606	611	include
+base/inc/rs232.h	612	612	profile: #if defined(NEC_98)
+base/inc/rs232.h	613	613	include
+base/inc/rs232.h	614	619	profile: #if defined(NTVDM) && defined(FIFO_ON)
+base/inc/rs232.h	620	644	include
+base/inc/rs232.h	645	647	profile: #ifdef NTVDM
+base/inc/rs232.h	648	648	include
+base/inc/rs232.h	649	658	profile: #if defined(NEC_98)
+base/inc/rs232.h	659	678	include
+base/inc/rs232.h	679	679	profile: #if defined(NEC_98)
+base/inc/rs232.h	680	704	include
+base/inc/tape_io.h	1	34	include
+base/inc/tape_io.h	35	40	profile: #ifdef JAPAN
+base/inc/tape_io.h	41	118	include
+base/support/ios.c	1	44	include
+base/support/ios.c	45	51	profile: #ifdef NTVDM
+base/support/ios.c	52	165	include
+base/support/ios.c	166	171	profile: #if defined(NEC_98)
+base/support/ios.c	172	177	include
+base/support/ios.c	178	178	profile: #if defined(NEC_98)
+base/support/ios.c	179	180	include
+base/support/ios.c	181	195	profile: #ifdef NTVDM
+base/support/ios.c	196	197	VDD-only-shell
+base/support/ios.c	198	198	include
+base/support/ios.c	199	199	VDD-only-shell
+base/support/ios.c	200	216	include
+base/support/ios.c	217	223	profile: #if defined(NEC_98)
+base/support/ios.c	224	229	include
+base/support/ios.c	230	230	profile: #if defined(NEC_98)
+base/support/ios.c	231	232	include
+base/support/ios.c	233	244	profile: #ifdef NTVDM
+base/support/ios.c	245	356	include
+base/support/ios.c	357	360	profile: #if defined(NTVDM) && defined(MONITOR)
+base/support/ios.c	361	461	include
+base/support/ios.c	462	492	profile: #if defined(NTVDM) && defined(MONITOR)
+base/support/ios.c	493	915	include
+base/support/ios.c	916	928	profile: #ifdef NTVDM
+base/support/ios.c	929	938	include
+base/support/ios.c	939	939	profile: #ifdef NTVDM
+base/support/ios.c	940	949	include
+base/support/ios.c	950	962	profile: #ifdef NTVDM
+base/support/ios.c	963	968	include
+base/support/ios.c	969	969	profile: #ifdef NTVDM
+base/support/ios.c	970	1053	include
+base/support/ios.c	1054	1070	profile: #ifdef NTVDM
+base/support/time_day.c	1	6	profile: #if defined(NEC_98)
+base/support/time_day.c	7	92	include
+base/support/time_day.c	93	96	profile: #if defined(NEC_98)
+base/support/time_day.c	97	102	include
+base/support/time_day.c	103	109	profile: #ifdef NTVDM
+base/support/time_day.c	110	114	include
+base/support/time_day.c	115	115	profile: #ifdef NTVDM
+base/support/time_day.c	116	127	include
+base/support/time_day.c	128	128	profile: #if defined(NEC_98)
+base/support/time_day.c	129	141	include
+base/support/time_day.c	142	286	profile: #if defined(NEC_98)
+base/support/time_day.c	287	307	include
+base/support/time_day.c	308	319	profile: #ifdef NTVDM
+base/support/time_day.c	320	360	include
+base/support/time_day.c	361	361	profile: #ifdef NTVDM
+base/support/time_day.c	362	373	include
+base/support/time_day.c	374	374	profile: #ifndef NTVDM
+base/support/time_day.c	375	379	include
+base/support/time_day.c	380	380	profile: #ifndef NTVDM
+base/support/time_day.c	381	383	include
+base/support/time_day.c	384	384	profile: #ifndef NTVDM
+base/support/time_day.c	385	387	include
+base/support/time_day.c	388	388	profile: #ifndef NTVDM
+base/support/time_day.c	389	398	include
+base/support/time_day.c	399	399	profile: #ifndef NTVDM
+base/support/time_day.c	400	415	include
+base/support/time_day.c	416	416	profile: #ifndef NTVDM
+base/support/time_day.c	417	440	include
+base/support/time_day.c	441	441	profile: #ifndef NTVDM
+base/support/time_day.c	442	444	include
+base/support/time_day.c	445	445	profile: #ifndef NTVDM
+base/support/time_day.c	446	455	include
+base/support/time_day.c	456	456	profile: #ifndef NTVDM
+base/support/time_day.c	457	472	include
+base/support/time_day.c	473	473	profile: #ifndef NTVDM
+base/support/time_day.c	474	556	include
+base/support/time_day.c	557	557	profile: #if defined(NEC_98)
+base/support/time_day.c	558	559	include
+base/support/time_day.c	560	578	profile: #if defined(NEC_98)
+base/support/time_day.c	579	581	include
+base/support/time_day.c	582	582	profile: #ifndef NEC_98
+base/support/time_day.c	583	585	include
+base/support/time_day.c	586	586	profile: #ifndef NTVDM
+base/support/time_day.c	587	668	include
+base/support/time_day.c	669	669	profile: #ifndef NTVDM
+base/support/time_day.c	670	670	profile: #ifndef NEC_98
+base/support/time_day.c	671	684	include
+base/support/time_day.c	685	685	profile: #ifndef NTVDM
+base/support/time_day.c	686	916	include
+base/support/time_day.c	917	917	profile: #ifndef NEC_98
+base/support/time_day.c	918	942	include
+base/support/time_day.c	943	943	profile: #ifndef NEC_98
+base/support/time_day.c	944	944	include
+base/support/time_day.c	945	945	profile: #ifndef NTVDM
+base/support/time_day.c	946	949	include
+base/support/time_day.c	950	950	profile: #ifndef NEC_98
+base/support/time_day.c	951	951	profile: #ifndef NTVDM
+base/support/time_day.c	952	981	include
+base/support/time_day.c	982	982	profile: #ifndef NTVDM
+base/support/time_day.c	983	983	profile: #ifndef NEC_98
+base/support/time_day.c	984	987	include
+base/support/time_day.c	988	988	profile: #ifndef NEC_98
+base/support/time_day.c	989	1011	profile: #ifdef NTVDM
+base/support/time_day.c	1012	1012	profile: #ifndef NEC_98
+base/system/at_dma.c	1	49	include
+base/system/at_dma.c	50	50	sound-deferred
+base/system/at_dma.c	51	51	include
+base/system/at_dma.c	52	57	profile: #if defined(NEC_98)
+base/system/at_dma.c	58	138	include
+base/system/at_dma.c	139	142	profile: #if defined(NEC_98)
+base/system/at_dma.c	143	146	include
+base/system/at_dma.c	147	147	profile: #if defined(NEC_98)
+base/system/at_dma.c	148	163	include
+base/system/at_dma.c	164	164	profile: #ifndef NEC_98
+base/system/at_dma.c	165	166	include
+base/system/at_dma.c	167	167	profile: #ifndef NEC_98
+base/system/at_dma.c	168	169	include
+base/system/at_dma.c	170	170	profile: #ifndef NEC_98
+base/system/at_dma.c	171	176	include
+base/system/at_dma.c	177	177	profile: #ifndef NEC_98
+base/system/at_dma.c	178	190	include
+base/system/at_dma.c	191	193	sound-deferred
+base/system/at_dma.c	194	198	profile: #if defined(NEC_98)
+base/system/at_dma.c	199	201	include
+base/system/at_dma.c	202	202	profile: #if defined(NEC_98)
+base/system/at_dma.c	203	204	include
+base/system/at_dma.c	205	205	profile: #ifndef NEC_98
+base/system/at_dma.c	206	212	include
+base/system/at_dma.c	213	213	profile: #ifndef NEC_98
+base/system/at_dma.c	214	219	include
+base/system/at_dma.c	220	222	sound-deferred
+base/system/at_dma.c	223	227	profile: #if defined(NEC_98)
+base/system/at_dma.c	228	230	include
+base/system/at_dma.c	231	231	profile: #if defined(NEC_98)
+base/system/at_dma.c	232	233	include
+base/system/at_dma.c	234	234	profile: #ifndef NEC_98
+base/system/at_dma.c	235	241	include
+base/system/at_dma.c	242	242	profile: #ifndef NEC_98
+base/system/at_dma.c	243	245	include
+base/system/at_dma.c	246	246	profile: #ifndef NEC_98
+base/system/at_dma.c	247	247	include
+base/system/at_dma.c	248	248	profile: #ifndef NEC_98
+base/system/at_dma.c	249	254	include
+base/system/at_dma.c	255	255	profile: #ifndef NEC_98
+base/system/at_dma.c	256	256	include
+base/system/at_dma.c	257	257	profile: #ifndef NEC_98
+base/system/at_dma.c	258	281	include
+base/system/at_dma.c	282	284	profile: #if defined(NEC_98)
+base/system/at_dma.c	285	294	include
+base/system/at_dma.c	295	295	profile: #if defined(NEC_98)
+base/system/at_dma.c	296	308	include
+base/system/at_dma.c	309	314	profile: #if defined(NEC_98)
+base/system/at_dma.c	315	318	include
+base/system/at_dma.c	319	319	profile: #if defined(NEC_98)
+base/system/at_dma.c	320	321	include
+base/system/at_dma.c	322	322	profile: #ifndef NEC_98
+base/system/at_dma.c	323	330	include
+base/system/at_dma.c	331	331	profile: #ifndef NEC_98
+base/system/at_dma.c	332	337	include
+base/system/at_dma.c	338	343	profile: #if defined(NEC_98)
+base/system/at_dma.c	344	347	include
+base/system/at_dma.c	348	348	profile: #if defined(NEC_98)
+base/system/at_dma.c	349	350	include
+base/system/at_dma.c	351	351	profile: #ifndef NEC_98
+base/system/at_dma.c	352	359	include
+base/system/at_dma.c	360	360	profile: #ifndef NEC_98
+base/system/at_dma.c	361	363	include
+base/system/at_dma.c	364	364	profile: #ifndef NEC_98
+base/system/at_dma.c	365	365	include
+base/system/at_dma.c	366	366	profile: #ifndef NEC_98
+base/system/at_dma.c	367	371	include
+base/system/at_dma.c	372	372	profile: #ifndef NEC_98
+base/system/at_dma.c	373	373	include
+base/system/at_dma.c	374	374	profile: #ifndef NEC_98
+base/system/at_dma.c	375	380	include
+base/system/at_dma.c	381	381	profile: #ifndef NEC_98
+base/system/at_dma.c	382	382	include
+base/system/at_dma.c	383	383	profile: #ifndef NEC_98
+base/system/at_dma.c	384	397	include
+base/system/at_dma.c	398	398	profile: #ifndef NEC_98
+base/system/at_dma.c	399	399	include
+base/system/at_dma.c	400	400	profile: #ifndef NEC_98
+base/system/at_dma.c	401	407	include
+base/system/at_dma.c	408	408	profile: #ifndef NEC_98
+base/system/at_dma.c	409	409	include
+base/system/at_dma.c	410	410	profile: #ifndef NEC_98
+base/system/at_dma.c	411	415	include
+base/system/at_dma.c	416	416	profile: #ifndef NEC_98
+base/system/at_dma.c	417	417	include
+base/system/at_dma.c	418	418	profile: #ifndef NEC_98
+base/system/at_dma.c	419	429	include
+base/system/at_dma.c	430	430	profile: #ifndef NEC_98
+base/system/at_dma.c	431	431	include
+base/system/at_dma.c	432	432	profile: #ifndef NEC_98
+base/system/at_dma.c	433	437	include
+base/system/at_dma.c	438	438	profile: #ifndef NEC_98
+base/system/at_dma.c	439	439	include
+base/system/at_dma.c	440	440	profile: #ifndef NEC_98
+base/system/at_dma.c	441	454	include
+base/system/at_dma.c	455	455	profile: #ifndef NEC_98
+base/system/at_dma.c	456	457	include
+base/system/at_dma.c	458	458	profile: #ifndef NEC_98
+base/system/at_dma.c	459	470	include
+base/system/at_dma.c	471	481	profile: #if defined(NEC_98)
+base/system/at_dma.c	482	523	include
+base/system/at_dma.c	524	524	profile: #if defined(NEC_98)
+base/system/at_dma.c	525	538	include
+base/system/at_dma.c	539	539	profile: #ifndef NEC_98
+base/system/at_dma.c	540	540	include
+base/system/at_dma.c	541	541	profile: #ifndef NEC_98
+base/system/at_dma.c	542	553	include
+base/system/at_dma.c	554	568	profile: #if defined(NEC_98)
+base/system/at_dma.c	569	616	include
+base/system/at_dma.c	617	617	profile: #if defined(NEC_98)
+base/system/at_dma.c	618	848	include
+base/system/at_dma.c	849	863	profile: #ifdef NTVDM
+base/system/at_dma.c	864	1024	include
+base/system/at_dma.c	1025	1028	profile: #if defined(NEC_98)
+base/system/at_dma.c	1029	1032	include
+base/system/at_dma.c	1033	1033	profile: #if defined(NEC_98)
+base/system/at_dma.c	1034	1039	include
+base/system/at_dma.c	1040	1043	profile: #if defined(NEC_98)
+base/system/at_dma.c	1044	1045	include
+base/system/at_dma.c	1046	1046	profile: #if defined(NEC_98)
+base/system/at_dma.c	1047	1047	include
+base/system/cmos.c	1	116	include
+base/system/cmos.c	117	120	profile: #ifdef NTVDM
+base/system/cmos.c	121	386	include
+base/system/cmos.c	387	387	profile: #ifndef NTVDM
+base/system/cmos.c	388	388	include
+base/system/cmos.c	389	393	profile: #ifndef NTVDM
+base/system/cmos.c	394	394	include
+base/system/cmos.c	395	404	profile: #ifdef NTVDM
+base/system/cmos.c	405	427	include
+base/system/cmos.c	428	428	profile: #ifndef NTVDM
+base/system/cmos.c	429	432	include
+base/system/cmos.c	433	433	profile: #ifndef NTVDM
+base/system/cmos.c	434	462	include
+base/system/cmos.c	463	463	profile: #ifndef NTVDM
+base/system/cmos.c	464	476	include
+base/system/cmos.c	477	477	profile: #ifndef NTVDM
+base/system/cmos.c	478	507	include
+base/system/cmos.c	508	514	profile: #ifdef NTVDM
+base/system/cmos.c	515	674	include
+base/system/cmos.c	675	675	profile: #ifndef NTVDM
+base/system/cmos.c	676	676	include
+base/system/cmos.c	677	677	profile: #ifndef NTVDM
+base/system/cmos.c	678	681	include
+base/system/cmos.c	682	682	profile: #ifndef NTVDM
+base/system/cmos.c	683	683	include
+base/system/cmos.c	684	684	profile: #ifndef NTVDM
+base/system/cmos.c	685	693	include
+base/system/cmos.c	694	721	profile: #ifdef NTVDM
+base/system/cmos.c	722	739	include
+base/system/cmos.c	740	740	profile: #ifdef NTVDM
+base/system/cmos.c	741	966	include
+base/system/cmos.c	967	967	profile: #ifndef NTVDM
+base/system/cmos.c	968	970	include
+base/system/cmos.c	971	971	profile: #ifndef NTVDM
+base/system/cmos.c	972	972	include
+base/system/cmos.c	973	973	profile: #ifndef NTVDM
+base/system/cmos.c	974	977	include
+base/system/cmos.c	978	978	profile: #ifndef NTVDM
+base/system/cmos.c	979	1135	include
+base/system/cmos.c	1136	1175	profile: #ifdef NTVDM
+base/system/cmos.c	1176	1208	include
+base/system/cmos.c	1209	1212	profile: #ifdef NTVDM
+base/system/cmos.c	1213	1228	include
+base/system/cmos.c	1229	1229	profile: #ifdef NTVDM
+base/system/cmos.c	1230	1318	include
+base/system/illegalp.c	1	63	include
+base/system/illegalp.c	64	66	profile: #if defined(NTVDM) && defined(MONITOR)
+base/system/illegalp.c	67	83	include
+base/system/illegalp.c	84	87	profile: #ifdef NTVDM
+base/system/illegalp.c	88	98	include
+base/system/illegalp.c	99	99	profile: #ifndef NTVDM
+base/system/illegalp.c	100	106	include
+base/system/illegalp.c	107	120	profile: #ifndef NTVDM
+base/system/illegalp.c	121	139	include
+base/system/illegalp.c	140	140	profile: #ifndef NTVDM
+base/system/illegalp.c	141	185	include
+base/system/illegalp.c	186	186	profile: #ifndef NTVDM
+base/system/illegalp.c	187	395	include
+host/inc/host_def.h	1	100	include
+host/inc/host_def.h	101	103	profile: #if defined(NEC_98)
+host/inc/host_def.h	104	104	include
+host/inc/host_def.h	105	105	profile: #if defined(NEC_98)
+host/inc/host_def.h	106	108	include
+host/inc/host_def.h	109	111	profile: #if defined(NEC_98)
+host/inc/host_def.h	112	112	include
+host/inc/host_def.h	113	113	profile: #if defined(NEC_98)
+host/inc/host_def.h	114	216	include
+host/inc/host_def.h	217	219	profile: #ifdef ARCX86
+host/inc/host_def.h	220	237	include
+host/inc/host_gen.h	1	91	include
+host/inc/host_inc.h	1	26	include
+host/inc/host_inc.h	27	47	profile: #ifdef NTVDM
+host/inc/host_inc.h	48	48	NT-type-alias-reset
+host/inc/host_inc.h	49	49	profile: #ifdef NTVDM
+host/inc/host_inc.h	50	50	NT-type-alias-reset
+host/inc/host_inc.h	51	63	profile: #ifdef NTVDM
+host/inc/host_inc.h	64	65	NT-type-alias-reset
+host/inc/host_inc.h	66	71	profile: #ifdef NTVDM
+host/inc/host_inc.h	72	73	include
+host/inc/host_inc.h	74	74	profile: #ifdef NTVDM
+host/inc/host_inc.h	75	76	include
+host/inc/host_rrr.h	1	40	include
+host/inc/host_rrr.h	41	41	NT-native-menu-resource
+host/inc/host_rrr.h	42	42	include
+host/inc/host_rrr.h	43	44	NT-native-menu-resource
+host/inc/host_rrr.h	45	48	include
+host/inc/insignia.h	1	229	include
+host/inc/monregs.h	1	116	existing-unselected-NT-host-file
+host/inc/nt_pif.h	1	388	existing-unselected-NT-host-file
+host/inc/nt_reset.h	1	20	existing-unselected-NT-host-file
+host/inc/nt_uis.h	1	89	include
+host/inc/nt_uis.h	90	90	NT-native-UI-resource
+host/inc/nt_uis.h	91	93	profile: #ifdef DBCS
+host/inc/nt_uis.h	94	103	include
+host/inc/nt_uis.h	104	104	NT-native-UI-resource
+host/inc/nt_uis.h	105	113	include
+host/inc/nt_uis.h	114	116	profile: #ifdef DBCS     /* this should go to US build also */
+host/inc/nt_uis.h	117	117	include
+host/inc/nt_uis.h	118	121	NT-native-UI-resource
+host/inc/nt_uis.h	122	122	include

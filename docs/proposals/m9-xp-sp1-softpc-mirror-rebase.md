@@ -29,6 +29,16 @@ proof that useful IBM PC semantics should be excluded.
 
 ### Owner execution update (2026-10-15)
 
+The owner subsequently states “批准导入xp源码。” This is the requested owner
+direction under the source-admission stop condition, not a claim that a
+third-party license was discovered. Import only fixed XP commit
+a2f6d7c93aa4f11efc51147566d5961c59a8ef89 from
+Source/XPSP1/NT/base/mvdm/softpc.new to the same relative paths under
+src/app-softpc/softpc.new, preserving existing Microsoft/Insignia notices.
+The fixed root/selected subtree contain no separately named license file.
+No new license, altered notice or redistribution assertion is introduced.
+S3's path ledger, local fixes, profile exclusions and tests bound this import.
+
 Original direction: “我可以async验收，请你继续自动准入下一个和后续的各个S，
 只在T任务收口前等我。” Subsequent S tasks no longer wait for individual manual
 acceptance: complete implementation, required verification, pushed P and
@@ -46,8 +56,8 @@ Target: src/app-softpc/softpc.new
 OpenNT: opennt-src-2/nt/private/mvdm/softpc.new @ 5e4619ab6
 ```
 
-At closure, the ordinary mirror review and divergence gate is **XP SP1 ->
-`src/app-softpc/softpc.new`**. OpenNT remains a frozen lineage and migration
+At closure, the ordinary mirror review and divergence gate is **the necessary
+XP SP1 subset -> `src/app-softpc/softpc.new`**. OpenNT remains a frozen lineage and migration
 comparison source; it is not the routine acceptance baseline.
 
 The selected product remains one normal i386 IBM PC/AT/V7 machine:
@@ -103,20 +113,23 @@ runtime dependencies.
 ## Per-Path Destination Model
 
 S1 assigns every retained mirror path and every XP-only candidate one of these
-four outcomes. The choice is based on the selected IBM PC/AT projection and
-the smallest maintainable XP-to-local diff, not on its A/B text label.
+four outcomes. The choice is based on selected IBM PC/AT requirements,
+not on minimizing whole-file XP differences or its A/B text label.
 
 | Outcome | Meaning | Required proof |
 | --- | --- | --- |
-| **XP file** | Adopt the XP SP1 file unchanged because its selected profile semantics are wanted and it has no local adaptation to retain. | Selected-source proof, dual-width build, focused subsystem regression. |
-| **XP file + local patch** | Use the XP file as the mirror basis and reapply only necessary standalone/x64/port-ABI changes as explicit, reviewable XP-to-local diffs. | Exact local patch rationale, ownership proof, dual-width and focused behavior proof. |
-| **XP hunk + current remainder** | Retain the current file only when profile-pruning or structural separation makes a whole XP file less simple; take every accepted XP hunk explicitly. | Hunk map showing excluded branches and no lost selected-machine behavior. |
+| **XP necessary subset** | Include only reviewed required XP ranges, preserving XP formatting; an entire file qualifies only if all its content is justified. | Inclusion/exclusion ranges, dependencies, dual-width build and focused regression. |
+| **XP necessary subset + local patch** | Reapply necessary standalone/x64/port-ABI and accepted functional fixes to that same subset. Never exclude a range merely because it has a local modification. | Exact patch rationale, ownership and runtime proof. |
+| **Existing out-of-scope remainder** | Exclude newly introduced unrelated XP changes. Owner additionally permits removal of proven useless existing conditional branches within the migration scope; do not infer uselessness merely from a false condition. | Dependency proof and symmetric necessary-subset accounting, no new host/device route. |
 | **Do not introduce** | Omit a path or XP change that is solely foreign hardware or product-host support and has no selected standalone value; classify regional IBM PC changes separately. | Explicit exclusion record and build-source proof. |
 
-The default is **XP file** or **XP file + local patch** when that produces the
-smaller, more legible final XP-to-local difference. “Do not introduce” applies
-to a file that is useless to the standalone selected profile; it is not a
-reason to retain OpenNT implementations of useful IBM PC/AT hardware.
+Necessary-source selection is mandatory within retained files. A false guard
+does not justify foreign hardware, regional-host or NTVDM product imports.
+Resolve shared declarations/data explicitly; do not erase all conditionals.
+Extraction is migration/audit work only, never a build-time source transform.
+Report separately S-start delta, patches against the necessary XP subset and
+excluded upstream content. Existing unrelated content is not silently cleaned
+up. Sound Blaster remains a separate candidate.
 
 ## Known Semantic Starting Points
 
@@ -229,9 +242,244 @@ complete P, actual-change review and evidence; await owner acceptance.
 
 ### S3 — XP-first mechanical and controller/BIOS basis
 
-Adopt the approved XP basis for low-risk representation, CMOS, printer,
-GFI/FDC, disk/floppy and BIOS candidates. Prefer whole XP files plus explicit
-standalone patches where that is simpler than retaining an OpenNT body. Keep
+#### Owner-directed necessary-subset correction
+
+Original request: “请立即纠正 T92 当前 XP 源码导入方案。先暂停后续导入和提交，
+审计当前未提交改动；不要整体撤销已有正确修复，也不要干扰用户改动。”
+The owner requires necessary XP source, not whole retained files; exclude new
+foreign model/regional/NTVDM product bodies, retain valid XP/core and local
+repairs, and adopt XP formatting for selected ranges. Preserve shared data
+dependencies, avoid blanket preprocessor deletion, new runtime branches and
+unrelated historical cleanup; keep sound separate. The subsequent owner amendment
+allows deleting proven useless existing conditional branches within the migration
+scope, while preserving the minimal necessary-subset difference. Record ranges at
+the fixed revision, count S-start/local-subset/exclusion deltas separately,
+then complete dual builds, all tests, publication, pushed P and actual-change
+review. Async serial S acceptance remains; T closure still waits for the owner.
+
+The earlier whole-file policy and its +7,118 production net addition were
+wrong. No S3 implementation commit was made. Its old test results do not
+qualify the corrected subset. The working source was backed up only as ignored
+audit evidence, not rolled back wholesale. The 24-file regional correction
+removes 7,053 lines including new branch delimiters, retaining the IBM PC
+arms. A second pass excludes VDD dynamic loading, Sound Blaster adapter-number
+changes, WOW fields, native NT menu/UI changes and other NT-only semantic
+updates. The first corrected checkpoint retained existing unneeded branches.
+The owner now permits their evidenced removal, without new runtime selection.
+
+Conditional-cleanup checkpoint: first review covers base/bios/tape_io.c and
+base/bios/cmos_bis.c. Remove the unselected NTVDM A20/configuration branches,
+their private declaration and a disabled trace, plus the NTVDM exclusion around
+the selected CMOS time implementation: expected +0/-20. Keep CPU/PM/segmentation
+conditions and source notices. Compare actual x86/x64 preprocessor output before
+and after, then include the final candidate in the full S3 regression. This is
+an initial bounded cleanup, not a claim that all 38 paths have been cleaned.
+Actual result: +0/-20, net -20; the four x86/x64 preprocessor outputs for these
+two files are byte-identical before/after. Regenerated necessary-subset accounting
+remains +681/-23: the deletion removes only excluded text, not a required local
+patch. The updated range ledger records the new source positions. Other existing
+At that first checkpoint, NTVDM ranges in 22 files remained under dependency
+review rather than being automatically deleted; the reviewed groups below
+supersede this intermediate status.
+At this checkpoint the cumulative S3 production delta is +1,794/-1,790, net +4.
+Both incremental device builds and all five device-contract cases per width pass
+after cleanup. No new full-suite or refreshed
+package claim is made for this intermediate source candidate.
+
+Next reviewed cleanup group: diskbios.c, fla.c, at_dma.c, illegalp.c, time_day.c
+and dma.h, expected +0/-201. Remove only the independently listed NTVDM ranges:
+NT hard-disk hiding, asynchronous FDC completion, VDD DMA accessor and declaration,
+NT clock acquisition and exception presentation. The synchronous AT/FDC/DMA/clock
+implementations remain. Source search finds no outside fdc_command_completed
+caller or dmaGetAdaptor consumer. Compare each affected translation unit's actual
+dual-width preprocessed output before/after, then run the final S3 regression.
+Actual second-group deletion is +0/-201; all ten preprocessor comparisons are
+byte-identical. The necessary-subset local delta remains +681/-23. Together with
+the BIOS cleanup this removes 221 lines across eight files without increasing
+the functional subset patch. Both device builds and all five focused tests per
+width pass. Remaining conditional ranges are not
+yet removed. Full S3 delivery and publication are still outstanding.
+
+Final reviewed NTVDM cleanup group: 16 files, expected +0/-1,375. It covers
+com.c/printer.c/printer_.c, floppy.c/floppy_i.c, bios.h/config.h/floppy.h/gfi.h/
+host_lpt.h/ios.h/printer.h/rs232.h, ios.c, cmos.c and host_inc.h. Delete only
+the reviewed NTVDM range records and the two declaration/alias exclusions
+nested inside those same arms. Retain the actual UART/parallel/FDC/RTC paths,
+native pointer adaptations, snapshots, bit-order and CPU conditions. NT's
+physical-host locking, WOW dispatch, alternate ROM locations, VDD slots,
+Windows header aliases and alternate RTC owner are not SoftPC dependencies.
+Fourteen actual device translation units are preprocessed for each width
+before/after, including consumers of the changed declarations. Final dual
+builds and all registered shared/App/background/desktop tests follow this group.
+Actual final-group deletion is +0/-1,375, matching the estimate. The three groups
+together remove 1,596 lines in 24 files; no replacement implementation is added.
+The final post-cleanup 28 preprocessor comparisons all pass byte-for-byte.
+The x64 build, five device cases and 90 shared tests pass; the full-regression
+supervisor continues with App tests and x86. Published EXEs are not yet a
+qualified final delivery while this run remains incomplete.
+Final source accounting against S3 start is 34 production files (33 mirror and
+one Compat), +1,759/-3,331, net -1,572. Git's aligned add/delete counts differ
+from subtracting removed lines from the previous hunk totals; the net change
+is consistent. The independent necessary-XP-subset comparison is still
++681/-23, net +658. The retained mixed DELAYED_INTS || NTVDM condition is not
+dead code: its shared delayed-interrupt body remains selected by that separate
+feature, so it is not deleted or rewritten just to remove the symbol spelling.
+
+The review universe is exactly 38 paths: the original 37 XP-changed assigned
+paths plus selected cmos.c. [XP ranges](../etc/evidence/softpc/xp-sp1-s3-subset-ranges.tsv)
+partition each pinned XP file; [local ranges](../etc/evidence/softpc/xp-sp1-s3-local-ranges.tsv)
+record the corresponding independent selection of current files.
+[Per-file counts](../etc/evidence/softpc/xp-sp1-s3-subset-files.tsv) include
+the XP subset SHA-256 and local added/removed lines. Line numbers are one-based,
+inclusive, after CRLF-to-LF only; retained text is otherwise unchanged.
+Concatenate include ranges in order, append LF after each line and compare
+with git diff --no-index --numstat. Empty projections have one final LF for
+the recorded hash. These are audit metadata, not build source generation.
+
+Selection rejects NEC_98/JAPAN/KOREA/DBCS/ARCX86 and NTVDM-only arms;
+unknown/shared conditions stay intact. Literal constant branches are reduced
+symmetrically in audit only. The NT-only monregs/nt_pif/nt_reset headers have
+no selected build consumers; retained old bodies are not deleted. Conversely,
+Ninja dependencies show host_inc, host_rrr and nt_uis ARE included: only their
+specific unused alias-reset/menu/resource additions are excluded, never the
+whole headers. Source uses of the three old menu resource declarations are
+declarations only. Independent explicit exclusions cover the two DMA sound
+queries/header, Sound Blaster adapter constant, NT LPT BOP declarations and
+VDD-only dispatch scaffolding. This selection does not depend on whether a
+line differs locally. Full local snapshot/ABI repairs remain in comparison.
+
+| File(s), relative to softpc.new | Required XP adoption and exclusion rationale |
+| --- | --- |
+| base/bios/cmos_bis.c | Byte-valued CMOS port arguments; preserve XP format. |
+| base/bios/tape_io.c | Full descriptor limit/A20 declarations; exclude Japan NT virtual-memory/BIOS services; retain configuration-table segment and correct helper ABI. |
+| base/comms/com.c, base/inc/rs232.h | Existing UART widths/prototypes; exclude PC-98 8251 state, ports, baud and IRQ implementation; retain UART snapshots and all intptr_t calls. |
+| base/comms/printer.c | Existing PC parallel status widths; exclude PC-98 printer implementation and new changes in NT-only callbacks; retain snapshots. |
+| base/comms/printer_.c | Selected BIOS formatting; exclude new foreign wrapper and NT-only BOP declarations; remove the proven unused old NT arm under the owner amendment. |
+| base/comms/rs232_io.c | Existing INT 14h byte/port widths; no PC-98 route. |
+| base/disks/diskbios.c | Existing AT BIOS register widths; exclude PC-98 BIOS services, retain S2 full CX:DX split rather than XP truncation. |
+| base/disks/fdisk.c | AT geometry/ROM-byte casts and XP format; retain HDD snapshots; remove only new PC-98 wrappers. |
+| base/disks/fla.c | FDC byte casts/XP format; preserve callback declaration and snapshot handlers, no new controller. |
+| base/disks/floppy.c, base/disks/floppy_i.c | PC floppy declarations, byte writes and conditional retry label; exclude PC-98 BIOS/ports/transfer implementation. |
+| base/disks/gfi.c, base/disks/gfi_mpty.c | Existing result/config-index widths and XP format; same media backend. |
+| base/inc/base_def.h, base/inc/config.h | XP comments; no configuration policy change. |
+| base/inc/bios.h | XP declaration spelling and format; no new PC-98 BIOS area or Japan/Korea BOP declarations. Existing unrelated declarations remain, not new services. |
+| base/inc/dma.h, base/inc/floppy.h | PC declarations/layout; exclude PC-98 register/port arms and unused NT VDD/ROM declarations while preserving selected DMA and floppy contracts. |
+| base/inc/gfi.h | XP byte-valued FDC packet setters; same command schema. |
+| base/inc/host_lpt.h, base/inc/printer.h | PC declarations/XP format; no PC-98 one-port ABI. |
+| base/inc/ios.h | XP formatting, retain full standalone I/O space; exclude PC-98 maps, new sound slot and associated VDD slot changes. |
+| base/inc/tape_io.h | No necessary change; exclude new Japan BIOS constants. Original DOS EOF handling remains separately visible. |
+| base/support/ios.c | Existing word output casts/XP format; exclude new dynamic VDD loader/retry and remove the unused old NT dispatch arms; preserve normal I/O table owner. |
+| base/support/time_day.c | CMOS daylight bit cast/XP format; exclude PC-98 clock services. |
+| base/system/at_dma.c | XP selected AT body/format, S2 reload retained; exclude sound-position hooks and PC-98 ports, retain private adapter and snapshots. |
+| base/system/cmos.c | Two comparison fixes transferred from XP cmosnt.c; retain cmos.c owner, topology and snapshots. |
+| base/system/illegalp.c | Correct defined() syntax and byte writes in existing path. |
+| host/inc/host_def.h | Preserve selected declarations/ABI; no new PC-98 port counts or ARCX86 emulation-ROM declaration. Returns to baseline. |
+| host/inc/host_gen.h | XP word-stack cast/format; no alternate CPU path. |
+| host/inc/host_inc.h | Remove unused NT Windows-header/alias arm; retain selected standard host includes. |
+| host/inc/host_rrr.h, host/inc/monregs.h, host/inc/nt_pif.h | No required new semantic changes; retain previous content, reject new NT/region host changes. |
+| host/inc/insignia.h | XP spelling/pragma; retain native pointer and generated C-VID word ABI. Remove accidental duplicate STRINGIFY guard. |
+| host/inc/nt_reset.h, host/inc/nt_uis.h | Only selected XP whitespace remains; reject new WOW session/NT resource semantics. |
+
+First corrected checkpoint accounting against S3-start 5ba0a557: production 32 files
+(31 mirror plus one Compat), +1,794/-1,770, net +24; tests +91/-0 and root
+CMake +4/-0. This is not a claim of +24 new functionality: XP formatting is
+included, notably at_dma.c and ios.h. The necessary-subset local difference is
++681/-23, net +658, mostly pre-existing snapshots and ABI adaptations. It
+also explicitly counts the BIOS capacity repair, descriptor declaration,
+CMOS correction and small whitespace/EOF differences. It is not the S delta.
+
+The excluded-XP ledger counts 8,991 lines, including original out-of-profile
+content and selection delimiters, NOT 8,991 newly introduced lines. The same
+projection excludes 1,899 pre-existing local lines from functional comparison;
+these were retained at the first corrected checkpoint. The subsequently approved
+cleanup removes reviewed portions, accounted separately above. Do not subtract
+the XP and prior-local exclusion totals to invent a patch
+size. The actual corrective worktree reduction is reported separately.
+The full-file source notices are preserved, including headers omitted from
+the functional comparison; no license text is removed or changed.
+
+The first corrected subset passed 148/148 registered tests on each width:
+90 shared, 53 other background and five native desktop cases. This evidence
+predates the subsequent BIOS conditional cleanup; its renewed qualification is
+pending. Initial whole-file x64 passed its
+background suites; x86's only later failure was an erroneous pending S3 record
+under history, causing the gate to demand S4. The draft is now ignored evidence
+until closure; CURRENT stays S3 and the documentation gate passes. Neither
+that bookkeeping failure nor an earlier merge fault is hidden by the new run.
+
+Superseded whole-file checkpoint (2026-10-15): the three-way import covered the
+37 assigned files, plus cmos.c and the existing descriptor adapter. Estimate
+approximately +8,900/-2,000 production lines before final compiler review;
+most additions are upstream guarded source, not newly selected devices.
+Overlap resolutions preserve the S2 disk split, DMA snapshot functions,
+FDC callback declaration and native-pointer/C-VID scalar ABI. The single
+legacy non-ASCII comment in com.c is preserved byte-for-byte during import;
+DOS EOF bytes are removed as compiler input adaptation, not whitespace cleanup.
+Focused descriptor/CMOS proof is estimated at +100-180 test lines, using the
+existing device fixture. Final accounting will distinguish local delta and
+XP-relative retained patches; preview is not build or runtime qualification.
+
+Implementation checkpoint: first x64 build passed, but all five device tests
+faulted on startup at host_com_ioctl's output write. A repeated-text merge
+mistakenly treated a pointer-width patch at another call as proof that
+flush_input's original intptr_t cast had survived. It had not. Restoring the
+existing cast made all five ordinary CTest device cases pass; a debugger-only
+pass was not accepted. Positional git merge-file review replaced substring
+presence as the migration proof and also corrected a misplaced, unselected
+NEC_98 closing guard in printer_.c. This is an executor merge defect, not an
+XP device-policy defect. First failure logs remain retained separately.
+
+The new descriptor case checks 0xffff, 0x12345 and 0xffffffff decoded limits,
+adjacent sentinels, actual AH=87 copying above 1 MiB, A20 restoration and flags.
+CMOS tests use the existing POST/read/write entry points for valid and corrupt
+low/high bytes. They prove resulting bytes, not whether an invisible redundant
+CMOS correction branch executed: that precedence repair also requires source
+inspection. No claim ties these defects to an earlier user-reported symptom.
+
+#### S3 final executor audit (verified delivery)
+
+| Requirement | Actual implementation/evidence | Status |
+| --- | --- | --- |
+| Fixed necessary XP subset | The 38-path XP/local range ledgers partition the selected files at the pinned revision; every include/exclude interval and subset hash is recorded. | Source audit complete |
+| Preserve accepted local behavior | Existing UART/HDD/FDC/CMOS/printer snapshots, native-width casts and I/O width remain in the local patch comparison; no shared-package or snapshot-schema change. | Source audit and final regression pass |
+| Preserve S2 repairs | Disk capacity uses 16-bit CX:DX split; DMA reload restores address/count; V7 and ROM files are unchanged in S3. | Source checked; full regression passes both widths |
+| Avoid unnecessary host/device imports | New PC-98/regional/VDD/sound/WOW payload rejected; 1,596 lines of independently reviewed old NTVDM/dead conditional content removed. | Implemented |
+| Cleanup does not alter selected code | Fourteen actual translation units per architecture have byte-identical preprocessor output before/after final conditional cleanup. | 28/28 comparisons pass |
+| Descriptor and CMOS correctness | Existing descriptor decoder ABI now exposes sys_addr limit; two CMOS mask comparisons fixed in selected cmos.c; two owner-local test cases added. | Five device cases pass both widths |
+| Full regression and publication | Shared suites first, then other unit/integration, then five reserved desktop cases per width; assets/binary is the existing CMake executable output. | Each width passes 90 shared + 53 other + 5 desktop, 148/148; both EXEs refreshed |
+| Protected boundaries | Git changed-path check shows no public src/test package, INI, media or snapshot edit; external references remain read-only. | Checked |
+| P delivery and independent role review | Commit/push only after qualification; coordinator reviews actual executor commit separately. | Pending |
+
+Counted source delta: mirror 33 files +1,757/-3,329 (net -1,572), Compat one
+file +2/-2 (net zero), tests one file +91/-0, root CMake +4/-0. Total counted
+production/test/build +1,854/-3,331, net -1,477. Documents, range ledgers and
+EXEs are not disguised as production-code lines. Relative necessary-XP-subset
+patches are independently +681/-23, including historical local repairs rather
+than only S3 work. Selected XP formatting is preserved, including whitespace
+that the original mirror exception permits; non-mirror diff checking passes.
+
+Both final Release builds pass and refresh the existing package output. The
+x86 Ninja graph again reports `premature end of file; recovering` and rebuilds
+584 steps; no deliberate clean/cache deletion was performed. This build-cache
+observation is not treated as a device failure or silently repaired in S3.
+Verified final-candidate SHA-256 values:
+
+- softpc32.exe: `5bca801ef022a5fd987ce0b019bbcf2cba845dd8467a663dab645eeb20e7dd89`
+- softpc64.exe: `cdf400443abb60bffe0198477371b1260c4c2afba8cc2ecb2fa26778b4561134`
+
+The final hidden supervisor exits zero, and every configure/build/preprocess/
+focused/shared/App/desktop exit record is zero. Shared elapsed times are
+x64 52.56 s and x86 52.04 s; other background 96.72 s and 75.21 s; native
+desktop 13.29 s and 14.00 s. Focused device cases repeat five members of the
+148 registered tests and are not double-counted. Actual package startup and
+native Console/Window paths passed; no new manual Win3.x/Win95 guest session
+or real sound-device qualification is claimed. INI, media, snapshots and all
+public packages are unchanged. Documentation and non-mirror whitespace gates
+pass. Earlier failed merge and superseded qualification records remain distinct.
+
+Adopt the approved necessary XP subset for representation, CMOS, printer,
+GFI/FDC, disk/floppy and BIOS. Exclude newly introduced unneeded host/product
+branches, retain required local patches and selected XP formatting. Keep
 the selected image media contract and prove floppy-only, hard-disk-only and
 dual-media operation as applicable. Include the AT DMA auto-init address reload
 fix, but not the unresolved Sound Blaster host-position hooks. Explicitly
@@ -484,6 +732,6 @@ a runtime, build or package dependency.
 Stop for owner direction if an intended XP adoption needs a new product host,
 second device implementation, unreviewed source-rights conclusion, new binary
 or firmware asset, or a guest-visible semantic choice not covered by the
-admitted S. A failed whole-file migration falls back to the explicit XP-hunk
-plus-current-remainder outcome; it does not silently retain OpenNT as the
-mirror basis.
+admitted S. The necessary-subset policy applies to every subsequent batch;
+whole-file similarity never overrides exclusion decisions or permits a silent
+return to OpenNT as the selected functional baseline.

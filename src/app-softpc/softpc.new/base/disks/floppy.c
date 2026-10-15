@@ -1,5 +1,8 @@
 #include "insignia.h"
 #include "host_def.h"
+
+extern void host_simulate();
+
 /*
  * SoftPC Revision 3.0
  *
@@ -45,7 +48,7 @@
  *
  *
  * Notes	: For a detailed description of the IBM Floppy Disk Adaptor,
- *		  and the INTEL Controller chips refer to the following 
+ *		  and the INTEL Controller chips refer to the following
  *		  documents:
  *
  *		  - IBM PC/XT Technical Reference Manual
@@ -56,7 +59,7 @@
  *				(Section 6-478 FDC 8272A)
  *
  * Mods:
- *      Tim September 1991. nec_term() changed two error code returns. 
+ *      Tim September 1991. nec_term() changed two error code returns.
  * 	Helps Dos give correct error messages when no floppy in drive.
  */
 
@@ -129,6 +132,7 @@
 #include "cmosbios.h"
 #include "rtc_bios.h"
 
+
 /*
  *	Definition of the diskette operation function jump table
  */
@@ -162,14 +166,11 @@ void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 	fl_set_media,
 };
 
-#ifdef NTVDM
-extern UTINY number_of_floppy;
-#endif    /* NTVDM */
 
 /*
  *	Functions defined later
  */
- 
+
 LOCAL half_word get_parm IPT1(int, index);
 LOCAL cmos_type IPT2(int, drive, half_word *, type);
 LOCAL wait_int IPT0();
@@ -523,7 +524,7 @@ void fl_disk_format IFN1(int, drive)
 
 	/*
 	 *	Establish the default format for the size of drive, unless
-	 *	this has already been set up via previous calls to 
+	 *	this has already been set up via previous calls to
 	 *	diskette_io()
 	 */
 
@@ -576,7 +577,7 @@ void fl_disk_format IFN1(int, drive)
 
 
 			/*
-			 *	Send the remainder of the format 
+			 *	Send the remainder of the format
 			 *	parameters to the FDC
 			 */
 
@@ -658,20 +659,15 @@ void fl_disk_parms IFN1(int, drive)
 	if (equip_flag.bits.diskette_present == 0)
 		setDL(0);
 	else
-		setDL(equip_flag.bits.max_diskette + 1);
+		setDL((UCHAR)(equip_flag.bits.max_diskette + 1));
 
 
 	/*
 	 *	Set up drive dependent parameters
 	 */
 
-#ifdef NTVDM
-	if (    (equip_flag.bits.diskette_present == 1)
-	     && (drive < number_of_floppy))
-#else
 	if (    (equip_flag.bits.diskette_present == 1)
 	     && (drive < MAX_FLOPPY))
-#endif /* NTVDM */
 	{
 
 		if (! high_density(drive))
@@ -796,7 +792,7 @@ void fl_disk_parms IFN1(int, drive)
 
 
 	/*
-	 *	Arrive here if "drive" is invalid or if its type 
+	 *	Arrive here if "drive" is invalid or if its type
 	 *	could not be determined
 	 */
 
@@ -1047,13 +1043,8 @@ void fl_set_media IFN1(int, drive)
 	half_word dt_drive_type;
 	half_word lastrate;
 	word md_segment, md_offset;
-#ifdef NTVDM
-	sys_addr dt_start = dr_type_addr;
-	sys_addr dt_end = dr_type_addr + DR_CNT * DR_SIZE_OF_ENTRY;
-#else
 	sys_addr dt_start = DR_TYPE_ADDR;
 	sys_addr dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
-#endif
 	sys_addr md_table;
 
 	translate_new(drive);
@@ -1146,13 +1137,13 @@ void fl_set_media IFN1(int, drive)
  * in the status byte. If they differ
  * set BIOS RATE STATUS byte to reflect old rate status
  * for this drive as it may have been altered by an
- * access to the other drive. This may result in a call 
- * to send_rate not being performed because the old 
- * rate status (possibly for the other drive) matching the 
+ * access to the other drive. This may result in a call
+ * to send_rate not being performed because the old
+ * rate status (possibly for the other drive) matching the
  * new data rate for this drive, when actually the last rate
- * attempted for this drive was different. Thus the 
- * controller for this drive is at an old rate (for low 
- * density say) and we are assuming it has been previously 
+ * attempted for this drive was different. Thus the
+ * controller for this drive is at an old rate (for low
+ * density say) and we are assuming it has been previously
  * set to the updated (high) state when it has not!
  * In all this will ensure the updated data rate being sent
  * for the drive concerned !
@@ -1193,17 +1184,10 @@ LOCAL dr_type_check IFN3(half_word, drive_type, word *, seg_ptr, word *, off_ptr
 	half_word dt_drive_type;
 	sys_addr dt_start, dt_end;
 
-#ifdef NTVDM
-	*seg_ptr = dr_type_seg;
-
-	dt_start = dr_type_addr;
-	dt_end = dr_type_addr + DR_CNT * DR_SIZE_OF_ENTRY;
-#else
 	*seg_ptr = DISKETTE_IO_1_SEGMENT;
 
 	dt_start = DR_TYPE_ADDR;
 	dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
-#endif  /* NTVDM */
 
 	while (dt_start < dt_end)
 	{
@@ -1256,11 +1240,7 @@ LOCAL void translate_new IFN1(int, drive)
 
 	sas_load(DRIVE_CAPABILITY, &hf_cntrl);
 
-#ifdef NTVDM
-	if (high_density(drive) && (drive < number_of_floppy))
-#else
 	if (high_density(drive) && (drive < MAX_FLOPPY))
-#endif /* NTVDM */
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
 		if (disk_state == 0)
@@ -1287,7 +1267,7 @@ LOCAL void translate_new IFN1(int, drive)
 void translate_old IFN1(int, drive)
 {
 	/*
-	 *	Translates diskette state locations from new 
+	 *	Translates diskette state locations from new
 	 *	architecture to compatible mode
 	 */
 	half_word hf_cntrl, disk_state, mode, drive_type;
@@ -1296,11 +1276,7 @@ void translate_old IFN1(int, drive)
 	sas_load(DRIVE_CAPABILITY, &hf_cntrl);
 	sas_load(FDD_STATUS+drive, &disk_state);
 
-#ifdef NTVDM
-	if (high_density(drive) && (drive < number_of_floppy) && (disk_state != 0))
-#else
 	if (high_density(drive) && (drive < MAX_FLOPPY) && (disk_state != 0))
-#endif  /* NTVDM */
 
 	{
 		/*
@@ -1413,7 +1389,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 	int sectors_transferred;
 	word md_segment, md_offset;
 	/*
-	 *	Establish initial data rate, then loop through each 
+	 *	Establish initial data rate, then loop through each
 	 *	possible data rate
 	 */
 	translate_new(drive);
@@ -1421,14 +1397,14 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 	while ((! high_density(drive)) || med_change(drive) == SUCCESS)
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
-		data_rate = disk_state & RS_MASK;
+		data_rate = (half_word)(disk_state & RS_MASK);
 		if (cmos_type(drive, &drive_type) != FAILURE)
 		{
 			/*
 			 *	Check CMOS value against what is really
 			 *	known about the drive
 			 */
-			/* 
+			/*
 			 * The original code here had a very bad case of "Bad-C"
 			 * if-if-else troubles, but replacing the code with
 			 * the switch statement originally intended breaks
@@ -1462,13 +1438,8 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 				 *	Try to find parameter table entry with
 				 *	right drive type and current data rate
 				 */
-#ifdef NTVDM
-				dt_start = dr_type_addr;
-				dt_end = dr_type_addr + DR_CNT * DR_SIZE_OF_ENTRY;
-#else
 				dt_start = DR_TYPE_ADDR;
 				dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
-#endif /* NTVDM */
 				while (dt_start < dt_end)
 				{
 					/*
@@ -1499,20 +1470,11 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 					/*
 					 *	Assume media matches drive
 					 */
-#ifdef NTVDM
-					md_segment = dr_type_seg;
-					md_offset = dr_type_off;
-					if ((disk_state & DC_80_TRACK) == 0)
-						md_offset += MD_TBL1_OFFSET;
-					else
-						md_offset += MD_TBL3_OFFSET;
-#else
 					md_segment = DISKETTE_IO_1_SEGMENT;
 					if ((disk_state & DC_80_TRACK) == 0)
 						md_offset = MD_TBL1_OFFSET;
 					else
 						md_offset = MD_TBL3_OFFSET;
-#endif  /* NTVDM */
 						
 				}
 			}
@@ -1521,20 +1483,11 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 				/*
 				 *	Assume media matches drive
 				 */
-#ifdef NTVDM
-				md_segment = dr_type_seg;
-				md_offset = dr_type_off;
-				if ((disk_state & DC_80_TRACK) == 0)
-					md_offset += MD_TBL1_OFFSET;
-				else
-					md_offset += MD_TBL3_OFFSET;
-#else
 				md_segment = DISKETTE_IO_1_SEGMENT;
 				if ((disk_state & DC_80_TRACK) == 0)
 					md_offset = MD_TBL1_OFFSET;
 				else
 					md_offset = MD_TBL3_OFFSET;
-#endif	/* NTVDM */
 			}
 		}
 		else
@@ -1542,20 +1495,11 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 			/*
 			 *	Assume media matches drive
 			 */
-#ifdef NTVDM
-			md_segment = dr_type_seg;
-			md_offset = dr_type_off;
-			if ((disk_state & DC_80_TRACK) == 0)
-				md_offset += MD_TBL1_OFFSET;
-			else
-				md_offset += MD_TBL3_OFFSET;
-#else
 			md_segment = DISKETTE_IO_1_SEGMENT;
 			if ((disk_state & DC_80_TRACK) == 0)
 				md_offset = MD_TBL1_OFFSET;
 			else
 				md_offset = MD_TBL3_OFFSET;
-#endif /* NTVDM */
 		}
 
 		/*
@@ -1619,7 +1563,6 @@ LOCAL void setup_state IFN1(int, drive)
 	if (high_density(drive))
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
-#ifndef NTVDM
 		if ((disk_state & FS_MEDIA_DET) == 0)
 		{
 
@@ -1678,48 +1621,6 @@ if( cmos_type( drive, &drive_type ) != FAILURE ){
 
                         }
 
-#else /* NTVDM */
-
-		if ((disk_state & FS_MEDIA_DET) == 0)
-		{
-
-    if( cmos_type( drive, &drive_type ) != FAILURE ){
-	switch( drive_type ){
-		case GFI_DRIVE_TYPE_360:
-		case GFI_DRIVE_TYPE_720:
-			start_rate =
-			end_rate = RS_250;
-			break;
-
-		case GFI_DRIVE_TYPE_12:
-			start_rate = RS_300;	/* different to Real BIOS */
-			end_rate   = RS_500;
-			break;
-		case GFI_DRIVE_TYPE_144:
-			start_rate = RS_500;	/* same as Real BIOS */
-			end_rate   = RS_250;
-			break;
-/*
- * We don't know what the real BIOS does here.  These values work
- * fine.  Any code in rd_wr_vf that gets confused will drop out to
- * default high density values if neither of the following two
- * rates work.
- */
-
-		case GFI_DRIVE_TYPE_288:
-			start_rate = RS_1000;
-			end_rate   = RS_300;
-			break;
-		default:
-			always_trace1( "setup_state(): Bad Drive from CMOS:%x",
-			                drive_type );
-			break;
-	}
-    }else{
-	always_trace0( "setup_state(): CMOS read failure: Drive Type" );
-    }
-
-#endif /* NTVDM */
 
 			/*
 			 *	Set up disk state with current data
@@ -1806,7 +1707,7 @@ LOCAL med_change IFN1(int, drive)
 			return(SUCCESS);
 
 		/*
-		 *	Media has been changed - set media state to 
+		 *	Media has been changed - set media state to
 		 *	undetermined
 		 */
 		sas_load(FDD_STATUS+drive, &disk_state);
@@ -1868,7 +1769,7 @@ LOCAL void send_rate IFN1(int, drive)
 		 *	the floppy adapter
 		 */
 
-		outb(DISKETTE_DCR_REG, (disk_state >> 6));
+		outb(DISKETTE_DCR_REG, (IU8)(disk_state >> 6));
 	}
 }
 
@@ -1888,7 +1789,7 @@ LOCAL chk_lastrate IFN1(int, drive)
 	
 	sas_load(RATE_STATUS, &lastrate);
 	sas_load(FDD_STATUS+drive, &disk_state);
-	return((lastrate & RS_MASK) != (disk_state & RS_MASK) 
+	return((lastrate & RS_MASK) != (disk_state & RS_MASK)
 			? SUCCESS : FAILURE);
 }
 
@@ -1915,7 +1816,7 @@ LOCAL dma_setup IFN1(half_word, dma_mode)
 	outb(DMA_WRITE_MODE_REG, dma_mode);
 
 	/*
-	 *	Output the address to the DMA adapter as a page address 
+	 *	Output the address to the DMA adapter as a page address
 	 *	and 16 bit offset
 	 */
 	if (dma_mode == BIOS_DMA_VERIFY)
@@ -1980,7 +1881,7 @@ LOCAL fmtdma_set IFN0()
 	outb(DMA_WRITE_MODE_REG, BIOS_DMA_WRITE);
 
 	/*
-	 *	Output the address to the DMA adapter as a page address 
+	 *	Output the address to the DMA adapter as a page address
 	 *	and 16 bit offset
 	 */
 	dma_address.all = effective_addr(getES(), getBX());
@@ -2011,7 +1912,6 @@ LOCAL fmtdma_set IFN0()
 	 *	for wrapping of the bottom 16 bits of the address
 	 */
 
-#ifndef NTVDM
 	/* we don't have to worry about this on NT */
 	outb(DMA_WRITE_ONE_MASK_BIT, DMA_DISKETTE_CHANNEL);
 	if (((long)dma_address.words.low + (long)byte_count.X) > 0xffff)
@@ -2019,7 +1919,6 @@ LOCAL fmtdma_set IFN0()
 		sas_store(FLOPPY_STATUS, FS_DMA_BOUNDARY);
 		return(FAILURE);
 	}
-#endif
 
 	return(SUCCESS);
 }
@@ -2027,7 +1926,7 @@ LOCAL fmtdma_set IFN0()
 LOCAL void nec_init IFN2(int, drive, FDC_CMD_BLOCK *, fcbp)
 {
 	/*
-	 *	This routine seeks to the requested track and 
+	 *	This routine seeks to the requested track and
 	 *	initialises the FDC for the read/write/verify
 	 *	operation.
 	 */
@@ -2046,7 +1945,7 @@ LOCAL void nec_init IFN2(int, drive, FDC_CMD_BLOCK *, fcbp)
 LOCAL void rwv_com IFN2(word, md_segment, word, md_offset)
 {
 	/*
-	 *	This routine send read/write/verify parameters to the 
+	 *	This routine send read/write/verify parameters to the
 	 *	FDC
 	 */
 	half_word md_gap;
@@ -2091,7 +1990,7 @@ LOCAL nec_term IFN0()
 		/*
 		 *	Result phase completed
 		 */
-		if ((get_r0_ST0(fl_nec_status) & 
+		if ((get_r0_ST0(fl_nec_status) &
 			(ST0_INTERRUPT_CODE_0 | ST0_INTERRUPT_CODE_1)) != 0)
 		{
 			/*
@@ -2111,35 +2010,35 @@ LOCAL nec_term IFN0()
 			else
 			{
 				/*
-				 *	Abnormal termination - set 
+				 *	Abnormal termination - set
 				 *	diskette status up accordingly
 				 */
-				if (get_r0_ST1(fl_nec_status) & 
+				if (get_r0_ST1(fl_nec_status) &
 						ST1_END_OF_CYLINDER)
 				{
 					diskette_status |= FS_SECTOR_NOT_FOUND;
 				}
-				else if (get_r0_ST1(fl_nec_status) & 
+				else if (get_r0_ST1(fl_nec_status) &
 						ST1_DATA_ERROR)
 				{
 					diskette_status |= FS_CRC_ERROR;
 				}
-				else if (get_r0_ST1(fl_nec_status) & 
+				else if (get_r0_ST1(fl_nec_status) &
 						ST1_OVERRUN)
 				{
 					diskette_status |= FS_DMA_ERROR;
 				}
-				else if (get_r0_ST1(fl_nec_status) & 
+				else if (get_r0_ST1(fl_nec_status) &
 						ST1_NO_DATA)
 				{
 					diskette_status |= FS_FDC_ERROR; /* Tim Sept 91, was FS_SECTOR_NOT_FOUND */
 				}
-				else if (get_r0_ST1(fl_nec_status) & 
+				else if (get_r0_ST1(fl_nec_status) &
 						ST1_NOT_WRITEABLE)
 				{
 					diskette_status |= FS_WRITE_PROTECTED;
 				}
-				else if (get_r0_ST1(fl_nec_status) & 
+				else if (get_r0_ST1(fl_nec_status) &
 						ST1_MISSING_ADDRESS_MARK)
 				{
 					diskette_status |= FS_BAD_ADDRESS_MARK;
@@ -2219,7 +2118,7 @@ LOCAL retry IFN1(int, drive)
 		if ((disk_state & FS_MEDIA_DET) == 0)
 		{
 			sas_load(RATE_STATUS, &lastrate);
-			if ((data_rate = (disk_state & RS_MASK)) != 
+			if ((data_rate = (half_word)((disk_state & RS_MASK))) !=
 					((lastrate << 4) & RS_MASK))
 			{
 				/*
@@ -2284,7 +2183,7 @@ LOCAL void setup_end IFN1(int, sectors_transferred)
 {
 	/*
 	 *	Restore MOTOR_COUNT to parameter provided in table;
-	 *	set return status values and sectors transferred, 
+	 *	set return status values and sectors transferred,
 	 *	where applicable
 	 */
 	half_word diskette_status;
@@ -2308,7 +2207,7 @@ LOCAL void setup_end IFN1(int, sectors_transferred)
 		 *	Operation succeeded
 		 */
 		if (sectors_transferred != IGNORE_SECTORS_TRANSFERRED)
-			setAL(sectors_transferred);
+			setAL((UCHAR)(sectors_transferred));
 		setCF(0);
 	}
 }
@@ -2341,7 +2240,7 @@ LOCAL setup_dbl IFN1(int, drive)
 				 *	Try reading ids from cylinder 2 to
 				 *	the last cylinder on both heads. If
 				 *	the putative track number disagrees
-				 *	with what is on the disk, then 
+				 *	with what is on the disk, then
 				 *	double stepping is required
 				 */
 				if ((disk_state & DC_80_TRACK) == 0)
@@ -2361,7 +2260,7 @@ LOCAL setup_dbl IFN1(int, drive)
 						LOAD_RESULT_BLOCK;
 						sas_store(FDD_TRACK+drive,
   						    get_r0_cyl(fl_nec_status));
-						if ((track/2) != 
+						if ((track/2) !=
 					 	    get_r0_cyl(fl_nec_status))
 						{
 							disk_state |= FS_DOUBLE_STEP;
@@ -2486,7 +2385,7 @@ LOCAL void motor_on IFN1(int, drive)
 	{
 		/*
 		 *	Notify OS that BIOS is about to wait for motor
-		 *	start up 
+		 *	start up
 		 */
 #ifndef	JOKER
 		word savedAX, savedCX, savedDX, savedCS, savedIP;
@@ -2499,13 +2398,8 @@ LOCAL void motor_on IFN1(int, drive)
 
 		setAH(INT15_DEVICE_BUSY);
 		setAL(INT15_DEVICE_FLOPPY_MOTOR);
-#ifdef NTVDM
-		setCS(int15_seg);
-		setIP(int15_off);
-#else
 		setCS(RCPU_INT15_SEGMENT);
 		setIP(RCPU_INT15_OFFSET);
-#endif /* NTVDM */
 
 		host_simulate();
 
@@ -2555,13 +2449,8 @@ LOCAL void motor_on IFN1(int, drive)
 		setAH(INT15_WAIT);
 		setCX(0);
 		setDX(1);
-#ifdef NTVDM
-		setCS(int15_seg);
-		setIP(int15_off);
-#else
 		setCS(RCPU_INT15_SEGMENT);
 		setIP(RCPU_INT15_OFFSET);
-#endif /* NTVDM */
 
 		host_simulate();
 
@@ -2609,7 +2498,7 @@ LOCAL turn_on IFN1(int, drive)
 	 *	Get existing and desired drive select and motor on
 	 */
 	sas_load(MOTOR_STATUS, &motor_status);
-	drive_select = motor_status & MS_DRIVE_SELECT_MASK;
+	drive_select = (half_word)(motor_status & MS_DRIVE_SELECT_MASK);
 	drive_select_desired = (drive << 4);
 	motor_on_desired = (1 << drive);
 
@@ -2620,7 +2509,7 @@ LOCAL turn_on IFN1(int, drive)
 		 *	Store desired motor status
 		 */
 		status_desired = motor_on_desired | drive_select_desired;
-		old_motor_on = motor_status & MS_MOTOR_ON_MASK;
+		old_motor_on = (half_word)(motor_status & MS_MOTOR_ON_MASK);
 		motor_status &= ~MS_DRIVE_SELECT_MASK;
 		motor_status |= status_desired;
 		sas_store(MOTOR_STATUS, motor_status);
@@ -2629,7 +2518,7 @@ LOCAL turn_on IFN1(int, drive)
 		 *	Switch on motor of selected drive via a write
 		 *	to the floppy adapter's Digital Output Register
 		 */
-		new_motor_on = motor_status & MS_MOTOR_ON_MASK;
+		new_motor_on = (half_word)(motor_status & MS_MOTOR_ON_MASK);
 		setIF(1);
 		diskette_dor_reg = motor_status << 4;
 		diskette_dor_reg |= (motor_status & MS_DRIVE_SELECT_MASK) >> 4;
@@ -2711,13 +2600,8 @@ LOCAL void hd_wait IFN1(int, drive)
 	setCX(0);
 	setDX(1);
 
-#ifdef NTVDM
-	setCS(int15_seg);
-	setIP(int15_off);
-#else
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
-#endif /* NTVDM */
 
 	host_simulate();
 
@@ -2782,14 +2666,14 @@ LOCAL seek IFN2(int, drive, int, track)
 	/*
 	 *	This routine will move the head on the named drive
 	 *	to the named track. If the drive has not been accessed
-	 *	since the drive reset command was issued, the drive 
+	 *	since the drive reset command was issued, the drive
 	 *	will be recalibrated
 	 */
 	half_word seek_status, disk_track, disk_state;
 	FDC_CMD_BLOCK fdc_cmd_block[MAX_COMMAND_LEN];
 	int status;
 
-	note_trace2(FLOPBIOS_VERBOSE, "diskette_io:seek(drive=%d,track=%d)", 
+	note_trace2(FLOPBIOS_VERBOSE, "diskette_io:seek(drive=%d,track=%d)",
 							drive, track);
 
 	/*
@@ -2801,7 +2685,7 @@ LOCAL seek IFN2(int, drive, int, track)
 		/*
 		 *	Update the seek status and recalibrate
 		 */
-		sas_store(SEEK_STATUS, seek_status | (1 << drive));
+		sas_store(SEEK_STATUS, (IU8)(seek_status | (1 << drive)));
 		if (recal(drive) != SUCCESS)
 		{
 			sas_store(FLOPPY_STATUS, FS_OK);
@@ -2841,7 +2725,7 @@ LOCAL seek IFN2(int, drive, int, track)
 		 */
 		return(SUCCESS);
 	}
-	sas_store(FDD_TRACK+drive, track);
+	sas_store(FDD_TRACK+drive, (IU8)track);
 
 	/*
 	 *	Do the seek and check the results
@@ -2853,7 +2737,7 @@ LOCAL seek IFN2(int, drive, int, track)
 	put_c8_head(fdc_cmd_block, 0);
 	put_c8_pad1(fdc_cmd_block, 0);
 	nec_output(fdc_cmd_block[1]);
-	put_c8_new_cyl(fdc_cmd_block, track);
+	put_c8_new_cyl(fdc_cmd_block, ((unsigned char)track));
 	nec_output(fdc_cmd_block[2]);
 	status = chk_stat_2();
 
@@ -2905,7 +2789,7 @@ LOCAL chk_stat_2 IFN0()
 		if (results() != FAILURE)
 		{
 
-			if ((get_r3_ST0(fl_nec_status) & (ST0_SEEK_END | ST0_INTERRUPT_CODE_0)) 
+			if ((get_r3_ST0(fl_nec_status) & (ST0_SEEK_END | ST0_INTERRUPT_CODE_0))
 				!= (ST0_SEEK_END | ST0_INTERRUPT_CODE_0))
 			{
 				return(SUCCESS);
@@ -2955,13 +2839,8 @@ LOCAL wait_int IFN0()
 	setAH(INT15_DEVICE_BUSY);
 	setAL(INT15_DEVICE_FLOPPY);
 
-#ifdef NTVDM
-	setCS(int15_seg);
-	setIP(int15_off);
-#else
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
-#endif  /* NTVDM */
 
 	host_simulate();
 
@@ -2973,17 +2852,14 @@ LOCAL wait_int IFN0()
 	 *	Call sub-cpu to do the "wait" for interrupt, saving
 	 *	registers that would otherwise be corrupted
 	 */
+#ifdef FLOPPIES_KEEP_TRYING
    try_again:
+#endif
 	savedCS = getCS();
 	savedIP = getIP();
 
-#ifdef NTVDM
-	setCS(wait_int_seg);
-	setIP(wait_int_off);
-#else
 	setCS(RCPU_WAIT_INT_SEGMENT);
 	setIP(RCPU_WAIT_INT_OFFSET);
-#endif /* NTVDM */
 
 	host_simulate();
 
@@ -3049,6 +2925,7 @@ LOCAL wait_int IFN0()
 
 LOCAL results IFN0()
 {
+
 	/*
 	 *	This routine will read anything that the FDC controller
 	 *	returns following an interrupt
@@ -3066,7 +2943,7 @@ LOCAL results IFN0()
 		if (count++ >= FDC_TIME_OUT)
 		{
 			/*
-			 *	Expect to return here when there is a 
+			 *	Expect to return here when there is a
 			 *	time out (not an FDC error)
 			 */
 			sas_load(FLOPPY_STATUS, &diskette_status);
@@ -3077,7 +2954,7 @@ LOCAL results IFN0()
 			return(FAILURE);
 		}
 		inb(DISKETTE_STATUS_REG, &diskette_status_reg);
-	} while ((diskette_status_reg & (DSR_RQM | DSR_DIO)) 
+	} while ((diskette_status_reg & (DSR_RQM | DSR_DIO))
 						!= (DSR_RQM | DSR_DIO));
 
 	/*
@@ -3165,7 +3042,7 @@ void drive_detect IFN1(int, drive)
 	 */
 	note_trace1( GFI_VERBOSE, "drive_detect():start: DRIVE %x", drive );
 	motor_on(drive);
-	if (    (recal(drive) == SUCCESS) 
+	if (    (recal(drive) == SUCCESS)
              && (seek(drive, FDD_CLONK_TRACK) == SUCCESS))
 	{
 		track = FDD_JUDDER_TRACK + 1;
@@ -3286,7 +3163,7 @@ void fl_diskette_setup IFN0()
 		
 		translate_old(drive);
 	}
-	 
+	
 	/*
 	 *	Force an immediate recalibrate
 	 */

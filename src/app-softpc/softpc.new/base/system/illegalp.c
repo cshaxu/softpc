@@ -61,9 +61,6 @@ LOCAL VOID where IFN3(CHAR *, string, word, cs, LIN_ADDR, ip)
 		sas_hw_at(ea+3),sas_hw_at(ea+4));
 }
 
-#if defined(NTVDM) && defined(MONITOR)
-#define GetInstructionPointer()     getEIP()
-#endif
 
 
 void illegal_op()
@@ -81,10 +78,6 @@ void illegal_op_int()
 	CHAR string[100];
 	word cs, ip;
 
-#ifdef NTVDM
-        UCHAR opcode;
-        double_word ea;
-#endif
 
 	/* the cs and ip of the faulting instruction should be on the top of the stack */
 	sys_addr stack;
@@ -96,7 +89,6 @@ void illegal_op_int()
 
 	where(string, cs, ip);
 
-#ifndef NTVDM
 #ifdef PROD
 	host_error(EG_BAD_OP, ERR_QU_CO_RE, string);
 #else  /* PROD */
@@ -104,20 +96,6 @@ void illegal_op_int()
 	force_yoda();
 #endif /* PROD */
 
-#else /* NTVDM */
-#ifdef PROD
-#if define(MONITOR) || define(CPU_40_STYLE)
-        host_error(EG_BAD_OP, ERR_QU_CO_RE, string);
-#else
-        ea = effective_addr(cs, ip);
-        opcode = sas_hw_at(ea);
-        if (opcode == 0x66 || opcode == 0x67)
-            host_error(EG_BAD_OP386, ERR_QU_CO_RE, string);
-        else
-            host_error(EG_BAD_OP, ERR_QU_CO_RE, string);
-#endif /* MONITOR */
-#endif /* PROD */
-#endif /* NTVDM */
 
 
 
@@ -125,19 +103,18 @@ void illegal_op_int()
 	/* we don't know how many bytes this instr should be, so guess 1 */
 	if (ip == 0xffff) {
 		cs ++;
-		sas_store (stack+2, cs & 0xff);
-		sas_store (stack+3, (cs >> 8) & 0xff);
+		sas_store (stack+2, (IU8)(cs & 0xff));
+		sas_store (stack+3, (IU8)((cs >> 8) & 0xff));
 	}
 	ip ++;
-	sas_store (stack , ip & 0xff);
-	sas_store (stack+1, (ip >> 8) & 0xff);
+	sas_store (stack , (IU8)(ip & 0xff));
+	sas_store (stack+1, (IU8)((ip >> 8) & 0xff));
 	unexpected_int();
 }
 
 
 void illegal_dvr_bop IFN0()
 {
-#ifndef NTVDM
 	sys_addr bop_addr;
 	CHAR buf[256];
 
@@ -183,7 +160,6 @@ void illegal_dvr_bop IFN0()
 	}
 	host_error(EG_DRIVER_MISMATCH, ERR_CONT, buf);
 	setCF(0);
-#endif /* ! NTVDM */
 }
 
 
@@ -213,7 +189,7 @@ GLOBAL void trace_msg_bop IFN0()
 {
 	sys_addr ea, ofs;
 
-	/* 
+	/*
 	Stack frame expected:
 	N.B. VxDs lives in a flat segment, (mostly) protected mode world!
 	This code expects the address to have been converted to a base-0
@@ -264,7 +240,7 @@ LOCAL void print_msg IFN1( IU32, ofs )
 			p[1] = sas_hw_at(ofs+1);
 			if (('A' <= p[1]) && (p[1] <= 'Z'))
 				p[1] += 'a' - 'A';
-			if (p[0] == 'e') 
+			if (p[0] == 'e')
 			{
 				/* may be esp, esi, eax, etc... */
 

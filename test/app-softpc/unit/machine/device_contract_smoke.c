@@ -7,6 +7,8 @@
 #include "ios.h"
 #include "dma.h"
 #include "bios.h"
+#include "cmos.h"
+#include "sas.h"
 
 #undef const
 #include <assert.h>
@@ -26,6 +28,91 @@ extern ISM32 c_setDS(IU16 value);
 extern void c_setSP(IU16 value);
 extern void search_for_roms(void);
 extern IU8 *c_GetPhyAdd(IU32 address);
+extern ISM32 c_setES(IU16 value);
+extern void c_setSI(IU16 value);
+extern ISM32 c_getZF(void);
+extern ISM32 c_getIF(void);
+extern void retrieve_descr_fields(half_word *ar, sys_addr *base,
+    sys_addr *limit, sys_addr descriptor_address);
+
+static void verify_descriptor(softpc_machine *machine)
+{
+    static const struct {
+        unsigned char bytes[8];
+        sys_addr base, limit;
+    } cases[] = {
+        { { 0xff, 0xff, 0, 0, 0x10, 0x92, 0, 0 }, 0x100000, 0xffff },
+        { { 0x45, 0x23, 0, 0, 0x10, 0x92, 1, 0 }, 0x100000, 0x12345 },
+        { { 0xff, 0xff, 0, 0, 0, 0x92, 0x8f, 0 }, 0, 0xffffffff }
+    };
+    unsigned index, wrapping;
+    for (index = 0; index != sizeof(cases) / sizeof(cases[0]); ++index) {
+        struct { sys_addr before, value, after; } limit = {
+            0x13572468, 0xa5a5a5a5, 0x24681357
+        };
+        sys_addr base = 0;
+        half_word ar = 0;
+        assert(softpc_machine_write_physical(machine, 0x600,
+            cases[index].bytes, 8) == SOFTPC_MACHINE_OK);
+        retrieve_descr_fields(&ar, &base, &limit.value, 0x600);
+        assert(ar == 0x92 && base == cases[index].base);
+        assert(limit.value == cases[index].limit);
+        assert(limit.before == 0x13572468 && limit.after == 0x24681357);
+    }
+    for (wrapping = 0; wrapping != 2; ++wrapping) {
+        unsigned char table[32] = { 0 }, source[32], result[32];
+        lib_memory_copy(table + 16, cases[0].bytes, 8);
+        lib_memory_copy(table + 24, cases[0].bytes, 8);
+        table[27] = 0x10; /* destination base 0x101000 */
+        for (index = 0; index != sizeof(source); ++index)
+            source[index] = (unsigned char)(index + 0x61);
+        sas_disable_20_bit_wrapping();
+        assert(softpc_machine_write_physical(machine, 0x600, table, 32) ==
+            SOFTPC_MACHINE_OK);
+        assert(softpc_machine_write_physical(machine, 0x100000, source, 32) ==
+            SOFTPC_MACHINE_OK);
+        lib_memory_set(result, 0, sizeof(result));
+        assert(softpc_machine_write_physical(machine, 0x101000, result, 32) ==
+            SOFTPC_MACHINE_OK);
+        if (wrapping) sas_enable_20_bit_wrapping();
+        c_setES(0);
+        c_setSI(0x600);
+        c_setAX(0x8700);
+        c_setCX(16);
+        c_setCF(1);
+        cassette_io();
+        assert(c_getAX() == 0 && c_getCF() == 0);
+        assert(c_getZF() == 1 && c_getIF() == 1);
+        assert(!!sas_twenty_bit_wrapping_enabled() == (int)wrapping);
+        sas_disable_20_bit_wrapping();
+        assert(softpc_machine_read_physical(machine, 0x101000, result, 32) ==
+            SOFTPC_MACHINE_OK);
+        assert(lib_memory_compare(source, result, 32) == 0);
+    }
+}
+
+static void verify_cmos(void)
+{
+    half_word low, high, value;
+    unsigned corrupt;
+    /* The fixture has more than 256 KiB of extended memory: comparing a
+       byte with the unmasked full KiB value must not be the contract. */
+    assert((sas_memory_size() - 0x100000) / 1024 > 255);
+    cmos_post();
+    assert(cmos_read_byte(CMOS_E_M_S_LO, &low) == 0);
+    assert(cmos_read_byte(CMOS_E_M_S_HI, &high) == 0);
+    assert((unsigned)low + 256u * high ==
+        (sas_memory_size() - 0x100000) / 1024);
+    for (corrupt = 0; corrupt != 4; ++corrupt) {
+        assert(cmos_write_byte(CMOS_E_M_S_LO,
+            (half_word)(low ^ ((corrupt & 1) ? 0x5a : 0))) == 0);
+        assert(cmos_write_byte(CMOS_E_M_S_HI,
+            (half_word)(high ^ ((corrupt & 2) ? 0xa5 : 0))) == 0);
+        cmos_post();
+        assert(cmos_read_byte(CMOS_E_M_S_LO, &value) == 0 && value == low);
+        assert(cmos_read_byte(CMOS_E_M_S_HI, &value) == 0 && value == high);
+    }
+}
 
 static void dma_word(io_addr port, IU16 value)
 {
@@ -180,6 +267,10 @@ int main(int argc, char **argv)
         verify_dma(machine);
     else if (lib_text_compare(argv[1], "rom") == 0)
         verify_rom(machine);
+    else if (lib_text_compare(argv[1], "descriptor") == 0)
+        verify_descriptor(machine);
+    else if (lib_text_compare(argv[1], "cmos") == 0)
+        verify_cmos();
     else {
         assert(lib_text_compare(argv[1], "disk") == 0);
         verify_disk(machine);

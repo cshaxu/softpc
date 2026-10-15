@@ -99,7 +99,7 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
 #endif
 
 #ifndef STRINGIFY
-#define STRINGIFY(x)	#x
+#define STRINGIFY(x)    #x
 #endif
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)   /* Types already defined by windows */
@@ -233,5 +233,7 @@ typedef int BOOL;	/* only defined in windows */
 
 #endif  /* ANSI */
 
+
+#pragma warning (3:4013)
 
 #endif /* _INSIGNIA_H */

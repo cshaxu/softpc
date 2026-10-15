@@ -30,9 +30,6 @@ static char SccsID[]="@(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd."
  */
 #include <stdio.h>
 #include <ctype.h>
-#if defined(NTVDM) && defined(MONITOR)
-#include <malloc.h>
-#endif
 #include TypesH
 #include StringH
 
@@ -61,6 +58,8 @@ static char SccsID[]="@(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd."
 #endif /* GISP_CPU */
 
 LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
+
+
 /*
  * =====================================================================
  * The rs232 adaptor state
@@ -68,7 +67,7 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
  */
 
 /*
- * batch_size, current_count 
+ * batch_size, current_count
  *	The IRET_HOOKS parameters batch_size and curr_count are used to prevent
  *	the number of interrupts that are emulated in one batch getting too
  *	large. When we reach the batch size we'll unhook the interrupt, and
@@ -77,6 +76,7 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
  *	These variables are used to prevent multiple quick events or batches
  *	running at once on a single adapter.
  */
+
 static struct ADAPTER_STATE
 {
 	BUFFER_REG tx_buffer;
@@ -88,14 +88,6 @@ static struct ADAPTER_STATE
 	MODEM_CONTROL_REG modem_control_reg;
 	LINE_STATUS_REG line_status_reg;
 	MODEM_STATUS_REG modem_status_reg;
-#if defined(NTVDM) && defined(FIFO_ON)
-    FIFO_CONTROL_REG  fifo_control_reg;
-    FIFORXDATA  rx_fifo[FIFO_BUFFER_SIZE];
-    half_word   rx_fifo_write_counter;
-    half_word   rx_fifo_read_counter;
-    half_word   fifo_trigger_counter;
-    int fifo_timeout_interrupt_state;
-#endif
 	half_word scratch;      /* scratch register */
 
 	int break_state;        /* either OFF or ON */
@@ -118,18 +110,10 @@ static struct ADAPTER_STATE
 	IBOOL batch_running;
 	IBOOL qev_running;
 #endif /* IRET_HOOKS */
-#ifdef NTVDM
-    MODEM_STATUS_REG last_modem_status_value;
-    int modem_status_changed;
-#endif
 } adapter_state[NUM_SERIAL_PORTS];
 
 
-#ifdef NTVDM
-#define MODEM_STATE_CHANGE()	asp->modem_status_changed = TRUE;
-#else
 #define MODEM_STATE_CHANGE()
-#endif
 
 
 #ifdef IRET_HOOKS
@@ -164,9 +148,6 @@ static LINE_CONTROL_REG LCRFlushMask;
  *	them static.
  */
 
-#if defined(NTVDM) && defined(FIFO_ON)
-static half_word    level_to_counter[4] = { 1, 4, 8, 14};
-#endif
 
 /*
  * The delay needed in microseconds between receiving 2 characters
@@ -239,9 +220,7 @@ int       com_dbg_pollcount = 0;
 #endif /* !PROD */
 
 GLOBAL void recv_char IPT1(long, adapter);
-#ifndef NTVDM
 static void do_wait_on_send IPT1(long, adapter);
-#endif
 extern IBOOL tx_pacing_enabled;
 
 /*
@@ -384,9 +363,7 @@ LOCAL IBOOL psFlushEnabled[NUM_SERIAL_PORTS];	/* TRUE if PostScript flushing
 IBOOL tx_pacing_enabled = FALSE;
 
 GLOBAL void recv_char IPT1(long, adapter);
-#ifndef NTVDM
 static void do_wait_on_send IPT1(long, adapter);
-#endif
 
 /*
  * =====================================================================
@@ -402,9 +379,7 @@ static void raise_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void clear_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void com_flush_input IPT1(int, adapter);
 static void com_send_not_finished IPT1(int, adapter);
-#ifndef NTVDM
 static void do_wait_on_send IPT1(long, adapter);
-#endif
 void   com_inb IPT2(io_addr, port, half_word *, value);
 void   com_outb IPT2(io_addr, port, half_word, value);
 void   com_recv_char IPT1(int, adapter);
@@ -429,18 +404,13 @@ GLOBAL VOID com_init IPT1(int, adapter);
 void   com_post IPT1(int, adapter);
 void   com_close IPT1(int, adapter);
 LOCAL void next_batch IPT1(long, l_adapter);
-#ifdef NTVDM
-static void lsr_change(struct ADAPTER_STATE *asp, unsigned int error);
-#ifdef FIFO_ON
-static void recv_char_from_fifo(struct ADAPTER_STATE *asp);
-#endif
-#endif
 
 /*
  * =====================================================================
  * Subsidiary functions - for interrupt emulation
  * =====================================================================
  */
+
 
 static void raise_rls_interrupt IFN1(struct ADAPTER_STATE *, asp)
 {
@@ -537,13 +507,6 @@ static void generate_iir IFN1(struct ADAPTER_STATE *, asp)
 		asp->int_id_reg.bits.interrupt_ID = RDA_INT;
 		asp->int_id_reg.bits.no_int_pending = 0;
 	}
-#if defined(NTVDM) && defined(FIFO_ON)
-    else if (asp->fifo_timeout_interrupt_state == ON)
-    {
-        asp->int_id_reg.bits.interrupt_ID = FIFO_INT;
-        asp->int_id_reg.bits.no_int_pending = 0;
-    }
-#endif
 	else if ( asp->tx_holding_register_empty_interrupt_state == ON )
 	{
 		asp->int_id_reg.bits.interrupt_ID = THRE_INT;
@@ -571,10 +534,7 @@ static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)
 	if ( ( asp->receiver_line_status_interrupt_state      == OFF )
 	&&   ( asp->data_available_interrupt_state            == OFF )
 	&&   ( asp->tx_holding_register_empty_interrupt_state == OFF )
-	&&   ( asp->modem_status_interrupt_state              == OFF ) 
-#if defined(NTVDM) && defined(FIFO_ON)
-    &&   (asp->fifo_timeout_interrupt_state               == OFF )
-#endif
+	&&   ( asp->modem_status_interrupt_state              == OFF )
        )
 	{
 #ifndef DELAYED_INTS
@@ -595,36 +555,13 @@ static void clear_interrupt IFN1(struct ADAPTER_STATE *, asp)
 	if ( ( asp->receiver_line_status_interrupt_state      == OFF )
 	&&   ( asp->data_available_interrupt_state            == OFF )
 	&&   ( asp->tx_holding_register_empty_interrupt_state == OFF )
-	&&   ( asp->modem_status_interrupt_state              == OFF ) 
-#if defined(NTVDM) && defined(FIFO_ON)
-    &&   ( asp->fifo_timeout_interrupt_state              == OFF )
-#endif
+	&&   ( asp->modem_status_interrupt_state              == OFF )
        )
 	{
 		ica_clear_int(0, asp->hw_interrupt_priority);
 	}
 }
-#if defined(NTVDM) && defined(FIFO_ON)
 
-static void raise_fifo_timeout_interrupt(struct ADAPTER_STATE *asp)
-{
-    if (( asp->modem_control_reg.bits.OUT2 == 0 ) &&
-        ( asp->loopback_state == OFF ))
-        return;
-
-    /*
-     * Check if data available interrupt is enabled
-     */
-    if ( asp->int_enable_reg.bits.data_available == 0 )
-        return;
-
-    /*
-     * Raise interrupt
-     */
-    raise_interrupt(asp);
-    asp->fifo_timeout_interrupt_state = ON;
-}
-#endif
 
 
 
@@ -638,16 +575,16 @@ static void com_flush_input IFN1(int, adapter)
 {
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];
 	int finished, error_mask;
-	long input_ready = 0; 
+	long input_ready = 0;
 
 	sure_note_trace1(RS232_VERBOSE, "flushing the input for COM%c",
 		adapter+'1');
 	finished=FALSE;
-	while(!finished) 
+	while(!finished)
 	{
 		host_com_ioctl(adapter, HOST_COM_INPUT_READY,
 			(intptr_t)&input_ready);
-		if (input_ready) 
+		if (input_ready)
 		{
 			host_com_read(adapter, (UTINY *)&asp->rx_buffer,
 				&error_mask);
@@ -669,7 +606,6 @@ static void com_send_not_finished IFN1(int, adapter)
 }
 
 
-#ifndef NTVDM
 static void do_wait_on_send IFN1(long, adapter)
 {
 	extern	void	host_com_send_delay_done IPT2(long, p1, int, p2);
@@ -679,7 +615,6 @@ static void do_wait_on_send IFN1(long, adapter)
 	set_xmit_char_status(asp);
 	host_com_send_delay_done(adapter, TX_delay[asp->com_baud_ind]);
 }
-#endif
 
 
 void com_inb IFN2(io_addr, port, half_word *, value)
@@ -689,9 +624,6 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	long input_ready = 0;
 	boolean adapter_was_critical;
 
-#ifdef NTVDM
-    if((port & 0x7) != RS232_MSR) host_com_lock(adapter);
-#endif /* NTVDM */
 
 	switch(port & 0x7)
 	{
@@ -702,19 +634,11 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 			/*
 			 * Read of rx buffer
 			 */
-#ifndef NTVDM
 			if (!(asp->had_first_read))
 			{
 				com_flush_input(adapter);
 				asp->had_first_read=TRUE;
 			}
-#else /* NTVDM is defined */
-            //Flushing on first read removes characters from
-            //the communications system that are needed !!!!
-            //This assumes that the first read from the comms
-            //system will return one character only. This is
-            //a false assumption under NT windows.
-#endif /* !NTVDM */
 			*value = asp->rx_buffer;
 		
 			adapter_was_critical =
@@ -742,33 +666,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 				 */
 				if (adapter_was_critical)
 				{
-#ifdef NTVDM
-#ifdef FIFO_ON
-                    if (asp->fifo_control_reg.bits.enabled) {
-                    recv_char_from_fifo(asp);
-                    *value = asp->rx_buffer;
-                    host_com_fifo_char_read(adapter);
-                    if (asp->rx_fifo_write_counter)
-                        /* say this if we have more char in
-                           the buffer to be deliveried
-                        */
-                        asp->line_status_reg.bits.data_ready = 1;
-                    else
-                        host_com_char_read(adapter,
-                            asp->int_enable_reg.bits.data_available);
-                    }
-                    else
-                    host_com_char_read(adapter,
-                       asp->int_enable_reg.bits.data_available
-                       );
-#else /* !FIFO_ON */
-                    host_com_char_read(adapter,
-                    asp->int_enable_reg.bits.data_available
-                    );
-#endif /* !FIFO_ON */
-#endif /* NTVDM */
 
-#ifndef NTVDM
 #ifdef IRET_HOOKS
 					if (!asp->batch_running) {
 						asp->batch_running = TRUE;
@@ -799,7 +697,6 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 					else
 						com_critical_reset(adapter);
 #endif /* IRET_HOOKS */
-#endif /* !NTVDM */
 				}
 
 
@@ -818,7 +715,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #endif /* IRET_HOOKS */
 		}
 		else
-			*value = asp->divisor_latch.byte.LSByte;
+			*value = (IU8)(asp->divisor_latch.byte.LSByte);
 #ifdef SHORT_TRACE
 		if ( io_verbose & RS232_VERBOSE )
 		{
@@ -846,7 +743,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		if (asp->line_control_reg.bits.DLAB == 0)
 			*value = asp->int_enable_reg.all;
 		else
-			*value = asp->divisor_latch.byte.MSByte;
+			*value = (IU8)(asp->divisor_latch.byte.MSByte);
 #ifdef SHORT_TRACE
 		if ( io_verbose & RS232_VERBOSE )
 		{
@@ -900,16 +797,6 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		break;
 	
 	case RS232_LCR:
-#ifdef NTVDM
-        /* Before returning the information on the current configuation
-           of the serial link make sure the System comms port is open */
-
-        {
-            extern int host_com_open(int adapter);
-
-            host_com_open(adapter);
-        }
-#endif
 
 
 		*value = asp->line_control_reg.all;
@@ -966,12 +853,9 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		asp->line_status_reg.bits.break_interrupt = 0;
 		asp->receiver_line_status_interrupt_state = OFF;
 		clear_interrupt(asp);
-#if defined(NTVDM) && defined(FIFO_ON)
-        asp->fifo_timeout_interrupt_state = OFF;
-#endif
 	
 #ifdef SHORT_TRACE
-		if ((!asp->line_status_reg.bits.tx_holding_empty) || 
+		if ((!asp->line_status_reg.bits.tx_holding_empty) ||
 			(!asp->line_status_reg.bits.tx_shift_empty))
 		{
 			IDLE_comlpt();
@@ -1014,7 +898,6 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	
 	case RS232_MSR:
 
-#ifndef NTVDM
 		if (asp->loopback_state == OFF)
 		{
                 com_modem_change(adapter);
@@ -1035,48 +918,6 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 
 		host_com_msr_callback (adapter, asp->modem_status_reg.all);
 		clear_interrupt(asp);
-#else
-		if(!asp->modem_status_changed && asp->loopback_state == OFF)
-		{
-		    *value = asp->last_modem_status_value.all;
-		}
-		else
-		{
-		    host_com_lock(adapter);
-		    asp->modem_status_changed = TRUE;
-
-		    /* if the adapter is not opened yet, just return POST
-		       value.
-		     */
-		    if (host_com_check_adapter(adapter)) {
-			if(asp->loopback_state == OFF)
-			{
-			    com_modem_change(adapter);
-			    asp->modem_status_changed = FALSE;
-
-			}
-			else
-			{
-			    asp->modem_status_reg.bits.CTS = asp->modem_control_reg.bits.RTS;
-			    asp->modem_status_reg.bits.DSR = asp->modem_control_reg.bits.DTR;
-			    asp->modem_status_reg.bits.RI = asp->modem_control_reg.bits.OUT1;
-			    asp->modem_status_reg.bits.RLSD = asp->modem_control_reg.bits.OUT2;
-			}
-		    }
-
-		    *value = asp->modem_status_reg.all;
-
-		    asp->modem_status_reg.bits.delta_CTS = 0;
-		    asp->modem_status_reg.bits.delta_DSR = 0;
-		    asp->modem_status_reg.bits.delta_RLSD = 0;
-		    asp->modem_status_reg.bits.TERI = 0;
-		    asp->modem_status_interrupt_state = OFF;
-		    host_com_msr_callback (adapter, asp->modem_status_reg.all);
-		    clear_interrupt(asp);
-		    asp->last_modem_status_value.all = asp->modem_status_reg.all;
-		    host_com_unlock(adapter);
-		}
-#endif /* ifndef NTVDM */
 
 
 #ifdef SHORT_TRACE
@@ -1123,9 +964,6 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	}
 #endif
 
-#ifdef NTVDM
-	if((port & 0x7) != RS232_MSR) host_com_unlock(adapter);
-#endif NTVDM
 }
 
 
@@ -1135,9 +973,6 @@ void com_outb IFN2(io_addr, port, half_word, value)
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];
 	int	i;
 
-#ifdef NTVDM
-	host_com_lock(adapter);
-#endif NTVDM
 
 
 #ifndef PROD
@@ -1180,7 +1015,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #if defined (DELAYED_INTS) || defined (NTVDM)
 				set_xmit_char_status(asp);
 #else
-					if(tx_pacing_enabled) 
+					if(tx_pacing_enabled)
 						add_q_event_t(do_wait_on_send,
 					            TX_delay[asp->com_baud_ind], adapter);
 					else
@@ -1202,9 +1037,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		else
 		{
 			asp->divisor_latch.byte.LSByte = value;
-#ifndef NTVDM
 			set_baud_rate(adapter);
-#endif
 		}
 #ifdef SHORT_TRACE
 		if ( io_verbose & RS232_VERBOSE )
@@ -1232,9 +1065,6 @@ void com_outb IFN2(io_addr, port, half_word, value)
 	case RS232_IER:
 		if (asp->line_control_reg.bits.DLAB == 0)
 		{
-#ifdef NTVDM
-            int org_da = asp->int_enable_reg.bits.data_available;
-#endif
 			asp->int_enable_reg.all = value & 0xf;
 			/*
 			 * Kill off any pending interrupts for those items
@@ -1262,24 +1092,11 @@ void com_outb IFN2(io_addr, port, half_word, value)
 			/* lower int line if no outstanding interrupts */
 			clear_interrupt(asp);
 
-#ifdef NTVDM
-		       // Inform the host interface if the status of the
-		       // data available interrupt has changed
-
-		       if(org_da != asp->int_enable_reg.bits.data_available)
-		       {
-			       host_com_da_int_change(adapter,
-					   asp->int_enable_reg.bits.data_available,
-					   asp->line_status_reg.bits.data_ready);
-		       }
-#endif /* NTVDM */
 		}
 		else
 		{
 			asp->divisor_latch.byte.MSByte = value;
-#ifndef NTVDM
 			set_baud_rate(adapter);
-#endif /* NTVDM */
 		}
 #ifdef SHORT_TRACE
 		if ( io_verbose & RS232_VERBOSE )
@@ -1302,37 +1119,8 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #endif
 		break;
 		
-#if defined(NTVDM) && defined(FIFO_ON)
-    case RS232_FIFO:
-        {
-        FIFO_CONTROL_REG    new_reg;
-        new_reg.all = value;
-        if (new_reg.bits.enabled != asp->fifo_control_reg.bits.enabled)
-        {
-            /* fifo enable state change, clear the fifo */
-            asp->rx_fifo_write_counter = 0;
-            asp->rx_fifo_read_counter = 0;
-
-        }
-        if (new_reg.bits.enabled != 0) {
-            asp->fifo_trigger_counter = level_to_counter[new_reg.bits.trigger_le
-vel];
-            if (new_reg.bits.rx_reset) {
-            asp->rx_fifo_write_counter = 0;
-            asp->rx_fifo_read_counter = 0;
-            }
-            asp->int_id_reg.bits.fifo_enabled = 3;
-        }
-        else {
-            asp->fifo_control_reg.bits.enabled = 0;
-            asp->int_id_reg.bits.fifo_enabled = 0;
-        }
-        asp->fifo_control_reg.all = new_reg.all;
-        break;
-        }
-#else /* !(NTVDM && FIFO_ON) */
 	case RS232_IIR:
-		/* 
+		/*
 		 * Essentially a READ ONLY register
 		 */
 #ifdef SHORT_TRACE
@@ -1355,27 +1143,8 @@ vel];
 		}
 #endif
 		break;
-#endif /* NTVDM && FIFO_ON */
 
 	case RS232_LCR:
-#ifdef NTVDM
-        /* The NT host code attempts to distinguish between applications
-           that probe the UART and those that use it. Probes of the UART
-           will not cause the systems comms port to be opened. The NT
-           host code inherits the line settings from NT when the system
-           comms port is opened. Therefore before an application reads
-           or writes to the divisor bytes or the LCR the system
-           comms port must be opened. This prevents the application
-           reading incorrect values for the divisor bytes and writes
-           to the divisor bytes getting overwritten by the system
-           defaults. */
-
-        {
-            extern int host_com_open(int adapter);
-
-            host_com_open(adapter);
-        }
-#endif /* NTVDM */
 
 		if ((value & LCRFlushMask.all)
 		!= (asp->line_control_reg.all & LCRFlushMask.all))
@@ -1444,7 +1213,7 @@ vel];
 	case RS232_LSR:
 		i = asp->line_status_reg.bits.tx_shift_empty;   /* READ ONLY */
 		asp->line_status_reg.all = value;
-		asp->line_status_reg.bits.tx_shift_empty = i;
+		asp->line_status_reg.bits.tx_shift_empty = (unsigned char)i;
 #ifdef SHORT_TRACE
 		if ( io_verbose & RS232_VERBOSE )
 		{
@@ -1491,7 +1260,7 @@ vel];
 #endif
 		/* DrDOS writes to this reg after setting int on MSR change
 		 * and expects to get an interrupt back!!! So we will oblige.
-		 * Writing to this reg only seems to affect the delta bits 
+		 * Writing to this reg only seems to affect the delta bits
 		 * (bits 0-3) of the reg.
 		 */
 		if ((value & 0xf) != (asp->modem_status_reg.all & 0xf))
@@ -1517,9 +1286,6 @@ vel];
 	}
 
 
-#ifdef NTVDM
-	host_com_unlock(adapter);
-#endif
 }
 
 
@@ -1646,71 +1412,7 @@ next_batch IFN1 (long, dummy)
  * =====================================================================
  */
 
-#ifdef  NTVDM
-// This code has been added for the MS project!!!!!!!
 
-
-void com_recv_char(int adapter)
-{
-    struct ADAPTER_STATE *asp = &adapter_state[adapter];
-    int error;
-
-#ifdef FIFO_ON
-    if(asp->fifo_control_reg.bits.enabled) {
-    /* pull data from serial driver until the fifo is full or
-       there are no more data
-    */
-    asp->rx_fifo_read_counter = 0;
-
-    asp->rx_fifo_write_counter = host_com_read_char(adapter,
-                   asp->rx_fifo,
-                   FIFO_BUFFER_SIZE
-                   );
-    /* if the total chars in the fifo is more than or equalt to the trigger
-       count, raise a RDA int, otherwise, raise a fifo time out int.
-       We will continue to delivery char available in the fifo until
-       the rx_fifo_write_counter reaches zero every time the application
-       read out the byte we put in rx_buffer
-    */
-    if (asp->rx_fifo_write_counter) {
-        /* we have at least one byte to delivery */
-        asp->line_status_reg.bits.data_ready = 1;
-        if (asp->rx_fifo_write_counter >= asp->fifo_trigger_counter)
-        raise_rda_interrupt(asp);
-        else
-        raise_fifo_timeout_interrupt(asp);
-    }
-    }
-    else
-#endif
-
-    {
-    error = 0;
-    host_com_read(adapter, (char *)&asp->rx_buffer, &error);
-    if (error != 0)
-    {
-        lsr_change(asp, error);
-                raise_rls_interrupt(asp);
-        }
-    set_recv_char_status(asp);
-    }
-}
-#ifdef FIFO_ON
-static void recv_char_from_fifo(struct ADAPTER_STATE *asp)
-{
-    int error;
-
-    asp->rx_buffer = asp->rx_fifo[asp->rx_fifo_read_counter].data;
-    error = asp->rx_fifo[asp->rx_fifo_read_counter++].error;
-    if (error != 0) {
-    lsr_change(asp, error);
-    raise_rls_interrupt(asp);
-    }
-    asp->rx_fifo_write_counter--;
-}
-#endif
-
-#else /* NTVDM */
 
 void com_recv_char IFN1(int, adapter)
 {
@@ -1726,12 +1428,11 @@ void com_recv_char IFN1(int, adapter)
 		recv_char((long)adapter);
 	}
 }
-#endif /* NTVDM */
 
 /*
  * BCN 2151 - recv_char must use long param to match add_event function prototype
  */
-GLOBAL void 
+GLOBAL void
 recv_char IFN1(long, adapt_long)
 {
 	int adapter = adapt_long;
@@ -1791,50 +1492,7 @@ recv_char IFN1(long, adapt_long)
 	}
 #endif
 }
-#ifdef NTVDM
-static void lsr_change(struct ADAPTER_STATE *asp, unsigned int new_lsr)
-{
-    if (new_lsr & HOST_COM_OVERRUN_ERROR)
-    asp->line_status_reg.bits.overrun_error = 1;
-    if (new_lsr & HOST_COM_FRAMING_ERROR)
-    asp->line_status_reg.bits.framing_error = 1;
-    if (new_lsr & HOST_COM_PARITY_ERROR)
-    asp->line_status_reg.bits.parity_error = 1;
-    if (new_lsr & HOST_COM_BREAK_RECEIVED)
-    asp->line_status_reg.bits.break_interrupt = 1;
-/* we have no control of serial driver fifo enable/disabled states
-   we may receive a fifo error even the application doesn't enable it.
-   fake either framing or parity error
-*/
-    if (new_lsr & HOST_COM_FIFO_ERROR)
-#ifdef FIFO_ON
-    if (asp->fifo_control_reg.bits.enabled)
-        asp->line_status_reg.bits.fifo_error = 1;
-    else if (asp->line_control_reg.bits.parity_enabled == PARITYENABLE_OFF)
-        asp->line_status_reg.bits.framing_error = 1;
-    else
-        asp->line_status_reg.bits.parity_error = 1;
-#else
-    if (asp->line_control_reg.bits.parity_enabled == PARITYENABLE_OFF)
-        asp->line_status_reg.bits.framing_error = 1;
-    else
-        asp->line_status_reg.bits.parity_error = 1;
-#endif
 
-}
-
-void com_lsr_change(int adapter)
-{
-    int new_lsr;
-    struct ADAPTER_STATE *asp = &adapter_state[adapter];
-
-    new_lsr = -1;
-    host_com_ioctl(adapter, HOST_COM_LSR, (long)&new_lsr);
-    if (new_lsr !=  -1)
-    lsr_change(asp, new_lsr);
-}
-
-#endif /* NTVDM */
 
 /*
  * One of the modem control input lines has changed state
@@ -1999,19 +1657,6 @@ static void set_xmit_char_status IFN1(struct ADAPTER_STATE *, asp)
 	raise_thre_interrupt(asp);
 }
 
-#ifdef NTVDM
-GLOBAL void tx_shift_register_empty(int adapter)
-{
-    struct ADAPTER_STATE *asp = &adapter_state[adapter];
-    asp->line_status_reg.bits.tx_shift_empty = 1;
-}
-GLOBAL void tx_holding_register_empty(int adapter)
-{
-    struct ADAPTER_STATE *asp = &adapter_state[adapter];
-    asp->line_status_reg.bits.tx_holding_empty = 1;
-    raise_thre_interrupt(asp);
-}
-#endif
 
 /*
  * =====================================================================
@@ -2051,10 +1696,10 @@ static void set_break IFN1(int, adapter)
  * AT, but are theoretically possible) */
 
 static word valid_latches[] =
-{ 
-	1, 	2, 	3, 	6, 	12, 	16, 	24, 	32, 
-	48, 	58, 	64, 	96, 	192,	384, 	768, 	857, 
-	1047, 	1536, 	2304 
+{
+	1, 	2, 	3, 	6, 	12, 	16, 	24, 	32,
+	48, 	58, 	64, 	96, 	192,	384, 	768, 	857,
+	1047, 	1536, 	2304
 };
 
 #if !defined(PROD) || defined(IRET_HOOKS)
@@ -2083,30 +1728,32 @@ static IUM32 bauds[] =
 #endif /* !PROD or IRET_HOOKS*/
 
 static word speeds[] =
-{ 
-	HOST_COM_B115200, 
-	HOST_COM_B57600, 
-	HOST_COM_B38400, 
-	HOST_COM_B19200, 
-	HOST_COM_B9600, 
-	HOST_COM_B7200, 
-	HOST_COM_B4800, 
+{
+	HOST_COM_B115200,
+	HOST_COM_B57600,
+	HOST_COM_B38400,
+	HOST_COM_B19200,
+	HOST_COM_B9600,
+	HOST_COM_B7200,
+	HOST_COM_B4800,
 	HOST_COM_B3600,
-	HOST_COM_B2400, 
-	HOST_COM_B2000, 
-	HOST_COM_B1800, 
-	HOST_COM_B1200, 
-	HOST_COM_B600, 
-	HOST_COM_B300, 
-	HOST_COM_B150, 
-	HOST_COM_B134, 
+	HOST_COM_B2400,
+	HOST_COM_B2000,
+	HOST_COM_B1800,
+	HOST_COM_B1200,
+	HOST_COM_B600,
+	HOST_COM_B300,
+	HOST_COM_B150,
+	HOST_COM_B134,
 	HOST_COM_B110,
-	HOST_COM_B75, 
-	HOST_COM_B50 
+	HOST_COM_B75,
+	HOST_COM_B50
 };
 
-static int no_valid_latches = 
+static int no_valid_latches =
 	(int)(sizeof(valid_latches)/sizeof(valid_latches[0]));
+
+
 
 static void set_baud_rate IFN1(int, adapter)
 {
@@ -2121,7 +1768,7 @@ static void set_baud_rate IFN1(int, adapter)
 	 * For IRET hooks, we need to determine the batch size from
 	 * the line speed, and an idea of how many quick events
 	 * we can get per second. We add one to alow us to catch-up!
-	 * Hence 
+	 * Hence
 	 * batch size = line_speed (in bits per second)
 	 *	/ number of bits in a byte
 	 *	* number of quick events ticks per second (normally 1000000)
@@ -2133,7 +1780,6 @@ static void set_baud_rate IFN1(int, adapter)
 
 	com_flush_input(adapter);
 
-#ifndef NTVDM
 
 	/*
 	 * Check for valid divisor latch
@@ -2161,16 +1807,8 @@ static void set_baud_rate IFN1(int, adapter)
 #endif /* VARIABLE_TICK_COMMS */
 #endif /* IRET_HOOKS */
 	}
-#else /* NTVDM */
-    //The host is not limited in the baud rates that it supports
-
-    if(asp->divisor_latch.all)
-        /* baudrate = clock frequency / (diviso * 16) by taking
-           frequency as 1.8432 MHZ
-        */
-        host_com_ioctl(adapter,HOST_COM_BAUD,115200/asp->divisor_latch.all);
-#endif /* NTVDM */
 }
+
 
 static void set_line_control IFN2(int, adapter, int, value)
 {
@@ -2183,7 +1821,7 @@ static void set_line_control IFN2(int, adapter, int, value)
 	LINE_CONTROL_REG newLCR;
 	int newParity, parity;
 	
-	newLCR.all = value;
+	newLCR.all = (unsigned char)value;
 
 	/*
 	 * Set up the number of data bits
@@ -2201,76 +1839,45 @@ static void set_line_control IFN2(int, adapter, int, value)
 			newLCR.bits.no_of_stop_bits + 1);
 
 	/* What are new settings to check for a difference */
-#ifdef NTVDM
-	if (newLCR.bits.parity_enabled == PARITYENABLE_OFF)
-#else
 	if (newLCR.bits.parity_enabled == PARITY_OFF)
-#endif
 	{
 		newParity = HOST_COM_PARITY_NONE;
 	}
 	else if (newLCR.bits.stick_parity == PARITY_STICK)
 	{
-#ifdef NTVDM
-		newParity = newLCR.bits.even_parity == EVENPARITY_ODD ?
-#else
 		newParity = newLCR.bits.even_parity == PARITY_ODD ?
-#endif
 			HOST_COM_PARITY_MARK : HOST_COM_PARITY_SPACE;
 	}
 	else /* regular parity */
 	{
-#ifdef NTVDM
-		newParity = newLCR.bits.even_parity == EVENPARITY_ODD ?
-#else
 		newParity = newLCR.bits.even_parity == PARITY_ODD ?
-#endif
 			HOST_COM_PARITY_ODD : HOST_COM_PARITY_EVEN;
 	}
 
 	/*
 	 * Try to make sense of the current parity setting
 	 */
-#ifdef NTVDM
-	if (asp->line_control_reg.bits.parity_enabled == PARITYENABLE_OFF)
-#else
 	if (asp->line_control_reg.bits.parity_enabled == PARITY_OFF)
-#endif
 	{
 		parity = HOST_COM_PARITY_NONE;
 	}
 	else if (asp->line_control_reg.bits.stick_parity == PARITY_STICK)
 	{
-#ifdef NTVDM
-		parity = asp->line_control_reg.bits.even_parity == EVENPARITY_ODD ?
-#else
 		parity = asp->line_control_reg.bits.even_parity == PARITY_ODD ?
-#endif
 			HOST_COM_PARITY_MARK : HOST_COM_PARITY_SPACE;
 	}
 	else /* regular parity */
 	{
-#ifdef NTVDM
-		parity = asp->line_control_reg.bits.even_parity == EVENPARITY_ODD ?
-#else
 		parity = asp->line_control_reg.bits.even_parity == PARITY_ODD ?
-#endif
 			HOST_COM_PARITY_ODD : HOST_COM_PARITY_EVEN;
 	}
 
 	if (newParity != parity)
 		host_com_ioctl(adapter, HOST_COM_PARITY, newParity);
 
-#ifdef NTVDM
-    //Change in the status of the DLAB selection bit, now is the time
-    //to change the baud rate.
-
-    if(!newLCR.bits.DLAB && asp->line_control_reg.bits.DLAB)
-        set_baud_rate(adapter);
-#endif
 
 	/* finally update the current line control settings */
-	asp->line_control_reg.all = value;
+	asp->line_control_reg.all = (unsigned char)value;
 }
 
 static void set_dtr IFN1(int, adapter)
@@ -2402,7 +2009,7 @@ static void set_out1 IFN1(int, adapter)
 		asp->out1_state = ON;
 		if (asp->loopback_state == OFF)
 		{
-			/* 
+			/*
 			 * In the real adapter, this modem control output
 			 * signal is not connected; so no real modem
 			 * control change is required
@@ -2421,7 +2028,7 @@ static void set_out1 IFN1(int, adapter)
 		asp->out1_state = OFF;
 		if (asp->loopback_state == OFF)
 		{
-			/* 
+			/*
 			 * In the real adapter, this modem control output
 			 * signal is not connected; so no real modem control
 			 * change is required
@@ -2459,7 +2066,7 @@ static void set_out2 IFN1(int, adapter)
 		asp->out2_state = ON;
 		if (asp->loopback_state == OFF)
 		{
-			/* 
+			/*
 			 * In the real adapter, this modem control output
 			 * signal is used to determine whether the
 			 * communications card should send interrupts; so
@@ -2488,7 +2095,7 @@ static void set_out2 IFN1(int, adapter)
 		asp->out2_state = OFF;
 		if (asp->loopback_state == OFF)
 		{
-			/* 
+			/*
 			 * In the real adapter, this modem control output signal
 			 * is used to determine whether the communications
 			 * card should send interrupts; so no real modem
@@ -2571,28 +2178,16 @@ static void super_trace IFN1(char *, string)
 
 void com1_flush_printer IFN0()
 {
-#ifdef NTVDM
-	host_com_lock(COM1);
-#endif
 
 	host_com_ioctl(COM1, HOST_COM_FLUSH, 0);
 
-#ifdef NTVDM
-       host_com_unlock(COM1);
-#endif
 }
 
 void com2_flush_printer IFN0()
 {
-#ifdef NTVDM
-	host_com_lock(COM2);
-#endif
 
        host_com_ioctl(COM2, HOST_COM_FLUSH, 0);
 
-#ifdef NTVDM
-       host_com_unlock(COM2);
-#endif
 }
 
 
@@ -2629,10 +2224,6 @@ static void com_reset IFN1(int, adapter)
 	 */
 	asp->int_enable_reg.all = 0;
 
-#ifdef NTVDM
-        // Tell host side the state of the data available interrupt
-    host_com_da_int_change(adapter,asp->int_enable_reg.bits.data_available,0);
-#endif /* NTVDM */
 
 	
 	asp->int_id_reg.all = 0;
@@ -2674,15 +2265,6 @@ static void com_reset IFN1(int, adapter)
 	asp->rts_state = ON;
 	asp->out1_state = ON;
 	asp->out2_state = ON;
-#if defined(NTVDM) && defined(FIFO_ON)
-    /* disable fifo */
-    asp->fifo_control_reg.all = 0;
-    asp->int_id_reg.bits.fifo_enabled = 0;
-    asp->rx_fifo_write_counter = 0;
-    asp->rx_fifo_read_counter = 0;
-    asp->fifo_trigger_counter = 1;
-    asp->fifo_timeout_interrupt_state = OFF;
-#endif
 		
 	/*
 	 * Reset adapter synchronisation
@@ -2728,13 +2310,13 @@ static void com_reset IFN1(int, adapter)
 #define COM4_ADAPTOR 0
 #endif
 
-static int com_adaptor[4] = {COM1_ADAPTOR,COM2_ADAPTOR,
+static IU8 com_adaptor[4] = {COM1_ADAPTOR,COM2_ADAPTOR,
                              COM3_ADAPTOR,COM4_ADAPTOR};
-static int port_start[4] = {RS232_COM1_PORT_START,
+static io_addr port_start[4] = {RS232_COM1_PORT_START,
 				RS232_COM2_PORT_START,
 				RS232_COM3_PORT_START,
 				RS232_COM4_PORT_START};
-static int port_end[4] = {RS232_COM1_PORT_END,
+static io_addr port_end[4] = {RS232_COM1_PORT_END,
                           RS232_COM2_PORT_END,
                           RS232_COM3_PORT_END,
                           RS232_COM4_PORT_END};
@@ -2752,48 +2334,27 @@ GLOBAL VOID com_init IFN1(int, adapter)
 {
 	io_addr i;
 
-#ifdef NTVDM
-	host_com_lock(adapter);
-	host_com_disable_open(adapter,TRUE);
-#endif
 
 	adapter_state[adapter].had_first_read = FALSE;
 	
 	/* Set up the IO chip select logic for this adaptor */
-#ifdef NTVDM
-    {
-        extern BOOL VDMForWOW;
-        extern void wow_com_outb(io_addr port, half_word value);
-        extern void wow_com_inb(io_addr port, half_word *value);
-
-            io_define_inb(com_adaptor[adapter],VDMForWOW ? wow_com_inb: com_inb)
-;
-            io_define_outb(com_adaptor[adapter],VDMForWOW ? wow_com_outb: com_outb);
-        }
-#else
 	io_define_inb(com_adaptor[adapter], com_inb);
 	io_define_outb(com_adaptor[adapter], com_outb);
-#endif /* NTVDM */
- 
+
 	for(i = port_start[adapter]; i <= port_end[adapter]; i++)
 		io_connect_port(i, com_adaptor[adapter], IO_READ_WRITE);
-         
+
 
 	adapter_state[adapter].hw_interrupt_priority = int_pri[adapter];
- 
+
 	/* reset adapter state */
 	host_com_reset(adapter);
 
 	/* reset adapter state */
 	com_reset(adapter);
 
-#ifndef NTVDM
 	/* Should we enable TX pacing ? */
 	tx_pacing_enabled = host_getenv("TX_PACING_ENABLED") ? TRUE : FALSE;
-#else /* not NTVDM */
-	host_com_disable_open(adapter,FALSE);
-	host_com_unlock(adapter);
-#endif
 
 	return;
 }
@@ -2804,12 +2365,9 @@ void com_post IFN1(int, adapter)
 	sas_storew( BIOS_VAR_START + (2*adapter), port_start[adapter]);
 	sas_store(timeout[adapter] , (half_word)1 );
 }
- 
+
 void com_close IFN1(int, adapter)
 {
-#ifdef NTVDM
-	host_com_lock(adapter);
-#endif
 
 #ifndef PROD
 	if (com_trace_fd)
@@ -2817,74 +2375,10 @@ void com_close IFN1(int, adapter)
 	com_trace_fd = NULL;
 #endif
 	/* reset host specific communications channel */
-	config_activate(C_COM1_NAME + adapter, FALSE);
+	config_activate((UTINY)(C_COM1_NAME + adapter), FALSE);
 
-#ifdef NTVDM
-	host_com_unlock(adapter);
-#endif
 }
 
-#ifdef NTVDM
-
-/*********************************************************/
-/* Com extentions - DAB (MS-project) */
-
-GLOBAL void SyncBaseLineSettings(int adapter,DIVISOR_LATCH *divisor_latch,
-                 LINE_CONTROL_REG *LCR_reg)
-{
-    register struct ADAPTER_STATE *asp = &adapter_state[adapter];
-
-    //Setup baud rate control register
-    asp->divisor_latch.all = (*divisor_latch).all;
-
-    //Setup line control settings
-    asp->line_control_reg.bits.word_length = (*LCR_reg).bits.word_length;
-    asp->line_control_reg.bits.no_of_stop_bits = (*LCR_reg).bits.no_of_stop_bits
-;
-    asp->line_control_reg.bits.parity_enabled = (*LCR_reg).bits.parity_enabled;
-    asp->line_control_reg.bits.stick_parity = (*LCR_reg).bits.stick_parity;
-    asp->line_control_reg.bits.even_parity = (*LCR_reg).bits.even_parity;
-}
-
-GLOBAL void setup_RTSDTR(int adapter)
-{
-    struct ADAPTER_STATE *asp = &adapter_state[adapter];
-
-    host_com_ioctl(adapter,asp->dtr_state == ON ? HOST_COM_SDTR : HOST_COM_CDTR,
-0);
-    host_com_ioctl(adapter,asp->rts_state == ON ? HOST_COM_SRTS : HOST_COM_CRTS,
-0);
-}
-
-GLOBAL int AdapterReadyForCharacter(int adapter)
-{
-    BOOL AdapterReady = FALSE;
-
-    /*......................................... Are RX interrupts enabled */
-
-    if(adapter_state[adapter].line_status_reg.bits.data_ready == 0 &&
-       adapter_state[adapter].data_available_interrupt_state == OFF)
-    {
-        AdapterReady = TRUE;
-    }
-
-    return(AdapterReady);
-}
-
-// This function returns the ICA controller and line used to generate
-// interrupts on a adapter. This information is used to register a EOI
-// hook.
-
-
-GLOBAL void com_int_data(int adapter,int *controller, int *line)
-{
-    struct ADAPTER_STATE *asp = &adapter_state[adapter];
-
-    *controller = 0;                            // Controller ints raised on
-    *line = (int) asp->hw_interrupt_priority;   // Line ints raised on
-}
-
-#endif /* NTVDM */
 
 #ifdef PS_FLUSHING
 /*(
@@ -2997,7 +2491,7 @@ int com_reg_dump ()
 	/* dump com1 emulations registers */
 	struct ADAPTER_STATE *asp = &adapter_state[COM1];
 
-	printf ("TX %2x RX %2x IER %2x IIR %2x LCR %2x MCR %2x LSR %2x MSR %2x \n", 
+	printf ("TX %2x RX %2x IER %2x IIR %2x LCR %2x MCR %2x LSR %2x MSR %2x \n",
 		(asp->tx_buffer), (asp->rx_buffer), (asp->int_enable_reg.all),
 		(asp->int_id_reg.all), (asp->line_control_reg.all),
 		(asp->modem_control_reg.all), (asp->line_status_reg.all),
@@ -3016,7 +2510,7 @@ int com_reg_dump ()
 	        asp->tx_holding_register_empty_interrupt_state);
 	printf(" modem_status_interrupt_state		%d\n",
 	        asp->modem_status_interrupt_state);
-	printf(" hw_interrupt_priority		%d\n", 
+	printf(" hw_interrupt_priority		%d\n",
 	        asp->hw_interrupt_priority);
 	printf(" com_baud_delay		%d\n had_first_read		%d\n",
 	        TX_delay[asp->com_baud_ind], asp->had_first_read);
@@ -3051,14 +2545,14 @@ int com_p_reg ()
 	return (0);
 }
 
-int conv_com_reg (com_reg)
+io_addr conv_com_reg (com_reg)
 char *com_reg;
 {
-	int loop;
+	io_addr loop;
 
 	for (loop = 0; loop < 7; loop++)
 		if (!strcmp (port_debugs[loop], com_reg))
-			return (loop+RS232_COM1_PORT_START);
+			return (loop+(io_addr)RS232_COM1_PORT_START);
 	return (0);
 }
 
@@ -3150,11 +2644,11 @@ int com_run_file ()
 			case 'O':
 				/* outb */
 				/* convert com_register to COM1 address com_register */
-				com_outb (port, val);
+				com_outb (port, (IU8)val);
 				printf ("outb (%s, %x)\n", com_reg, val);
 				break;
 			default:
-				/* crap */
+				
 				break;
 		}
 		line ++;
@@ -3291,7 +2785,7 @@ FILE *fd;
 	fprintf(fd, "\nAll bytes dumped.\n");
 }
 
-com_save_rxbytes IFN2(int, n, CHAR *, buf)
+void com_save_rxbytes IFN2(int, n, CHAR *, buf)
 {
 	int tc, bs;
 
@@ -3307,7 +2801,7 @@ com_save_rxbytes IFN2(int, n, CHAR *, buf)
 	}
 }
 
-com_save_txbyte IFN1(CHAR, value)
+void com_save_txbyte IFN1(CHAR, value)
 {
 	if (com_save_tx)
 	{
@@ -3317,7 +2811,7 @@ com_save_txbyte IFN1(CHAR, value)
 	}
 }
 
-static struct 
+static struct
 {
 	char *name;
 	int (*fn)();

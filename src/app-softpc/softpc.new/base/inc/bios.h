@@ -3,7 +3,7 @@
  *
  * Title	: BIOS definitions
  *
- * Description	: Defintions for users of the BIOS 
+ * Description	: Defintions for users of the BIOS
  *
  * Author	: Henry Nash
  *
@@ -13,7 +13,7 @@
  *
  * Mods: (r2.21): Added an external declaration of rom_basic().
  */
- 
+
 /* SccsID[]="@(#)bios.h	1.47 06/28/95 Copyright Insignia Solutions Ltd."; */
 
 /*
@@ -23,7 +23,7 @@
  */
 
 /*
- * The following define the BOP call numbers for the BIOS functions. 
+ * The following define the BOP call numbers for the BIOS functions.
  */
 
 #define BIOS_RESET		0x0
@@ -129,7 +129,7 @@
  * The Bios Reset Flag
  */
 
-#define RESET_FLAG	BIOS_VAR_START + 0x72  
+#define RESET_FLAG	BIOS_VAR_START + 0x72
 
 #define DISK_STATUS	BIOS_VAR_START + 0x74
 #define HF_NUM		BIOS_VAR_START + 0x75
@@ -139,7 +139,7 @@
 /*
  * Bios Buffer space
  */
- 
+
 typedef union {
                  word wd;
                  struct {
@@ -147,7 +147,7 @@ typedef union {
                           half_word ch;
                         } byte;
                } KEY_OCCURRENCE;
- 
+
 #define BIOS_KB_BUFFER_START    (BIOS_VAR_START + 0x80)
 #define BIOS_KB_BUFFER_END      (BIOS_VAR_START + 0x82)
 #define BIOS_KB_BUFFER_HEAD     (BIOS_VAR_START + 0x1a)
@@ -176,162 +176,162 @@ typedef union {
  * ============================================================================
  */
 
-extern void (*BIOS[])();
+extern void (*BIOS[]) IPT0();
 
 #ifndef bop
 #define bop(n) (*BIOS[n])()
 #endif /* bop */
 
 #ifdef PTY
-extern void com_bop_pty();
+extern void com_bop_pty IPT0();
 #endif
 
 #ifdef GEN_DRVR
-extern void gen_driver_io();
+extern void gen_driver_io IPT0();
 #endif
 
 #ifdef LIM
-extern void emm_init();
-extern void emm_io();
-extern void return_from_call();
+extern void emm_init IPT0();
+extern void emm_io IPT0();
+extern void return_from_call IPT0();
 #endif
 
 #ifdef SUSPEND
-extern void send_script();
+extern void send_script IPT0();
 #endif
 
-#ifdef CDROM 
-extern void cdrom_ord_fns();
-extern void cdrom_ext_fns();
-extern void bcdrom_io();
+#ifdef CDROM
+extern void cdrom_ord_fns IPT0();
+extern void cdrom_ext_fns IPT0();
+extern void bcdrom_io IPT0();
 #endif /* CDROM */
 
-extern void worm_init();
-extern void worm_io();
+extern void worm_init IPT0();
+extern void worm_io IPT0();
 
-extern void cmd_install();
-extern void cmd_load();
+extern void cmd_install IPT0();
+extern void cmd_load IPT0();
 
 #ifdef DPMI
-extern void DPMI_2F();
-extern void DPMI_31();
-extern void DPMI_general();
-extern void DPMI_int();
-extern void DPMI_r0_int();
-extern void DPMI_exc();
-extern void DPMI_4B();
+extern void DPMI_2F IPT0();
+extern void DPMI_31 IPT0();
+extern void DPMI_general IPT0();
+extern void DPMI_int IPT0();
+extern void DPMI_r0_int IPT0();
+extern void DPMI_exc IPT0();
+extern void DPMI_4B IPT0();
 #endif
 
-extern void reset();
-extern void illegal_bop();
-extern void illegal_op_int();
-extern void illegal_dvr_bop();
-extern void video_io();
-extern void equipment();
-extern void memory_size();
-extern void diskette_io();
-extern void diskette_int();
-extern void disk_int();
-extern void not_supported();
-extern void rom_basic();
-extern void keyboard_io(); 
-extern void keyboard_int(); 
-extern void printer_io(); 
-extern void bootstrap(); 
-extern void time_of_day();
-extern void kb_idle_poll();
-extern void time_int();
-extern void disk_io(); 
-extern void print_screen(); 
-extern void rs232_io(); 
-extern void dummy_int();
-extern void unexpected_int();
-extern void Get_build_id();
+extern void reset IPT0();
+extern void illegal_bop IPT0();
+extern void illegal_op_int IPT0();
+extern void illegal_dvr_bop IPT0();
+extern void video_io IPT0();
+extern void equipment IPT0();
+extern void memory_size IPT0();
+extern void diskette_io IPT0();
+extern void diskette_int IPT0();
+extern void disk_int IPT0();
+extern void not_supported IPT0();
+extern void rom_basic IPT0();
+extern void keyboard_io IPT0();
+extern void keyboard_int IPT0();
+extern void printer_io IPT0();
+extern void bootstrap IPT0();
+extern void time_of_day IPT0();
+extern void kb_idle_poll IPT0();
+extern void time_int IPT0();
+extern void disk_io IPT0();
+extern void print_screen IPT0();
+extern void rs232_io IPT0();
+extern void dummy_int IPT0();
+extern void unexpected_int IPT0();
+extern void Get_build_id IPT0();
 
-#ifdef WIN_VTD 
+#ifdef WIN_VTD
 extern void VtdTickSync IPT0();
 #endif /* WIN_VTD */
 
 #ifdef EGG
-extern void ega_video_io();
+extern void ega_video_io IPT0();
 #endif
 
-extern void re_direct();
-extern void D11_int();
-extern void int_287();
+extern void re_direct IPT0();
+extern void D11_int IPT0();
+extern void int_287 IPT0();
 
-extern void mouse_install1();
-extern void mouse_install2();
-extern void mouse_int1();
-extern void mouse_int2();
-extern void mouse_io_interrupt();
-extern void mouse_io_language();
-extern void mouse_video_io();
-extern void mouse_EM_callback();
+extern void mouse_install1 IPT0();
+extern void mouse_install2 IPT0();
+extern void mouse_int1 IPT0();
+extern void mouse_int2 IPT0();
+extern void mouse_io_interrupt IPT0();
+extern void mouse_io_language IPT0();
+extern void mouse_video_io IPT0();
+extern void mouse_EM_callback IPT0();
 
-extern void host_mouse_install1();
-extern void host_mouse_install2();
+extern void host_mouse_install1 IPT0();
+extern void host_mouse_install2 IPT0();
 
-extern void time_of_day_init();
-extern void keyboard_init();
+extern void time_of_day_init IPT0();
+extern void keyboard_init IPT0();
 
-extern void cassette_io();
+extern void cassette_io IPT0();
 
-extern void fl_operation1();
-extern void fl_operation2();
-extern void fl_operation3();
-extern void fl_reset2();
-extern void fl_dummy();
+extern void fl_operation1 IPT0();
+extern void fl_operation2 IPT0();
+extern void fl_operation3 IPT0();
+extern void fl_reset2 IPT0();
+extern void fl_dummy IPT0();
 
-extern void hda_command_check();	/* HD-dr */
+extern void hda_command_check IPT0();	/* HD-dr */
 
-extern void host_unsimulate();
+extern void host_unsimulate IPT0();
 
-extern void bootstrap1();
-extern void bootstrap2();
-extern void bootstrap3();
+extern void bootstrap1 IPT0();
+extern void bootstrap2 IPT0();
+extern void bootstrap3 IPT0();
 
 #ifdef NOVELL
-extern void DriverInitialize();
-extern void DriverReadPacket();
-extern void DriverSendPacket();
-extern void DriverMulticastChange();
-extern void DriverCloseSocket();
-extern void DriverReset();
-extern void DriverShutdown();
-extern void DriverAddProtocol();
-extern void DriverChangePromiscuous() ;
-extern void DriverOpenSocket() ;
-extern void DriverCloseSocket() ;
+extern void DriverInitialize IPT0();
+extern void DriverReadPacket IPT0();
+extern void DriverSendPacket IPT0();
+extern void DriverMulticastChange IPT0();
+extern void DriverCloseSocket IPT0();
+extern void DriverReset IPT0();
+extern void DriverShutdown IPT0();
+extern void DriverAddProtocol IPT0();
+extern void DriverChangePromiscuous IPT0() ;
+extern void DriverOpenSocket IPT0() ;
+extern void DriverCloseSocket IPT0() ;
 #ifdef NOVELL_CFM
-extern void DriverCheckForMore() ;
+extern void DriverCheckForMore IPT0() ;
 #endif
 #ifdef V4CLIENT
-extern void DriverChangeIntStatus() ;
+extern void DriverChangeIntStatus IPT0() ;
 #endif	/* V4CLIENT */
 #endif
 
 #ifdef	MSWDVR
-extern void ms_windows();
-extern void msw_mouse();
-extern void msw_copy();
-extern void msw_copyInit();
-extern void msw_keybd();
+extern void ms_windows IPT0();
+extern void msw_mouse IPT0();
+extern void msw_copy IPT0();
+extern void msw_copyInit IPT0();
+extern void msw_keybd IPT0();
 #endif
 
 #ifdef	NOVELL_IPX
-extern void IPXResInit ();
-extern void IPXResEntry ();
-extern void IPXResInterrupt ();
+extern void IPXResInit  IPT0();
+extern void IPXResEntry  IPT0();
+extern void IPXResInterrupt  IPT0();
 #endif
 
 #ifdef	NOVELL_TCPIP
-extern void TCPResInit ();
-extern void TCPResEntry ();
+extern void TCPResInit  IPT0();
+extern void TCPResEntry  IPT0();
 #endif
 
 #ifdef WINSOCK
-extern void ISWSEntry();
+extern void ISWSEntry IPT0();
 #endif /* WINSOCK */
 
 #ifdef SWINAPI
@@ -355,40 +355,26 @@ extern void msw_sound IPT0();
 
 #ifdef ANSI
 extern void host_reset(void);
-#ifndef NTVDM
 extern void reboot(void);
-#endif /* ! NTVDM */
 extern void display_string(char *);
 extern void clear_string(void);
 #else
-extern void host_reset();
-#ifndef NTVDM
-extern void reboot();
-#endif /* ! NTVDM */
-extern void display_string();
-extern void clear_string();
+extern void host_reset IPT0();
+extern void reboot IPT0();
+extern void display_string IPT0();
+extern void clear_string IPT0();
 #endif /* ANSI */
 
 #ifdef ANSI
 extern void smeg_collect_data(void);
 extern void smeg_freeze_data(void);
 #else
-extern void smeg_collect_data();
-extern void smeg_freeze_data();
+extern void smeg_collect_data IPT0();
+extern void smeg_freeze_data IPT0();
 #endif /* ANSI */
 
 extern void softpc_version IPT0();
 
-#ifdef NTVDM
-/* MS bop stubs */
-extern void MS_bop_0(void), MS_bop_1(void), MS_bop_2(void);
-extern void MS_bop_3(void), MS_bop_4(void), MS_bop_5(void);
-extern void MS_bop_6(void), MS_bop_7(void), MS_bop_8(void);
-extern void MS_bop_9(void), MS_bop_A(void), MS_bop_B(void);
-extern void MS_bop_C(void), MS_bop_D(void), MS_bop_E(void);
-extern void MS_bop_F(void);
-extern void switch_to_real_mode(void);
-#endif	/* NTVDM */
 
 #ifdef GISP_CPU
 extern void hg_bop_handler IPT0();
@@ -407,3 +393,4 @@ IMPORT int soft_reset;
 #if	defined(SPC386) && defined(WDCTRL_BOP)
 extern void wdctrl_bop IPT0();
 #endif	/* SPC386 && WDCTRL_BOP */
+

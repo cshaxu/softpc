@@ -2,7 +2,6 @@
 
 #ifndef _HOST_LPT_H
 #define _HOST_LPT_H
-
 /*[
 	Name:		host_lpt.h
 	Derived From:	Base 2.0
@@ -133,19 +132,12 @@ IMPORT	BOOL		host_print_doc IPT1(int,adapter);
 IMPORT	void		host_reset_print IPT1(int,adapter);
 IMPORT	void		host_print_auto_feed IPT2(int,adapter, BOOL,auto_feed);
 
-#if defined(NTVDM)
-IMPORT	BOOLEAN 	host_set_lpt_direct_access(int adapter, BOOLEAN direct_access);
-IMPORT	UCHAR		host_read_printer_status_port(int adapter);
-#endif
 
 #ifdef PS_FLUSHING
 IMPORT void host_lpt_enable_autoflush IPT1(IS32, adapter);
 IMPORT void host_lpt_disable_autoflush IPT1(IS32, adapter);
 #endif	/* PS_FLUSHING */
 
-#if defined (NTVDM) && defined(MONITOR)
-IMPORT void host_printer_setup_table(sys_addr table_addr, word nPorts, word * lptStatusPortAddr);
-#endif
 
 #define	HOST_LPT_BUSY	(1 << 0)
 #define	HOST_LPT_PEND	(1 << 1)
@@ -161,6 +153,7 @@ IMPORT void host_printer_setup_table(sys_addr table_addr, word nPorts, word * lp
 #define LPT3			2
 
 #define	number_for_adapter(adapter)	(adapter + 1)
+
 
 #endif /* _HOST_LPT_H */
 

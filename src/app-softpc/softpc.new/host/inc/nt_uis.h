@@ -88,7 +88,6 @@ extern HANDLE GHModule;	  /* Holds currently run processes module handle */
 #define ED_WOWPROMPT    333     // special prompt for wow
 #define ED_WOWTITLE     334     // title message for win16 subsystem
 
-
 #define ED_BADSYSFILE   336
 #define ED_INITMEMERR   337
 #define ED_INITTMPFILE  338
@@ -106,5 +105,6 @@ extern HANDLE GHModule;	  /* Holds currently run processes module handle */
 #define IDS_BURRRR         502      /* Frozen graphics window '-FROZEN' */
 
 #define EXIT_NO_CLOSE      503      /* Console window title - Inactive */
+
 
 /* entries from 1000+ are reserved for host errors. See host\inc\host_rrr.h */

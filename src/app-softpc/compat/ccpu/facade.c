@@ -29,14 +29,14 @@ IU32 c_effective_addr IFN2(IU16, selector, IU32, offset)
  * already owns descriptor decoding; this compatibility entry only exposes
  * that decoded state under the older mechanical interface. */
 void retrieve_descr_fields IFN4(half_word *, ar, sys_addr *, base,
-    word *, limit, sys_addr, descriptor_address)
+    sys_addr *, limit, sys_addr, descriptor_address)
 {
     CPU_DESCR descriptor;
 
     read_descriptor_linear(descriptor_address, &descriptor);
     *ar = descriptor.AR;
     *base = descriptor.base;
-    *limit = (word)descriptor.limit;
+    *limit = descriptor.limit;
 }
 
 #endif /* !PIG */

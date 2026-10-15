@@ -56,9 +56,5 @@ extern void printer_psflush_change IPT2(IU8,hostID, IBOOL,apply);
 #define LPT2_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x79)
 #define LPT3_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x7a)
 
-#if defined(NTVDM)
-extern void printer_is_being_closed(int adapter);
-#endif
-
 
 #endif

@@ -71,7 +71,7 @@ WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
  * before the later config items that refer to them
  *
  * EG if C_EXTEND_MAX_SIZE is not validated before then the check in
- * C_EXTENDED_MEM_SIZE is against whatever crap max was malloced.
+ * C_EXTENDED_MEM_SIZE is against whatever max was malloced.
  *
  * =====================================================================
  * 	To avoid backwards compatibility problems,
@@ -270,13 +270,6 @@ WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 #define C_CMOS			135
 #endif
 
-#if defined(NTVDM)
-#define C_VDMLPT1_NAME		140
-#define C_VDMLPT2_NAME		(C_VDMLPT1_NAME + 1)
-#define C_VDMLPT3_NAME		(C_VDMLPT1_NAME + 2)
-#define C_COM_SYNCWRITE 	C_VDMLPT3_NAME + 1
-#define C_COM_TXBUFFER_SIZE	C_COM_SYNCWRITE + 1
-#endif
 
 
 /* Host-specific entries in the message catalogue start at
@@ -365,7 +358,6 @@ typedef struct _resource_node
 extern void config IPT0();
 extern void *config_inquire IPT2(UTINY, hostID, ConfigValues *, values);
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 extern void config_get IPT2(UTINY, hostID, ConfigValues **, values);
 extern void config_unget IPT1(UTINY, hostID);
 extern void config_unget_all IPT0();
@@ -375,7 +367,6 @@ extern void IPT0config_get_all();
 extern BOOL config_reboot_check IPT0();
 extern SHORT config_check IPT2(UTINY, hostID, ErrDataPtr, errDataP);
 extern void config_store IPT0();
-#endif
 
 extern void config_activate IPT2(UTINY, hostID, BOOL, reqState);
 extern void config_set_active IPT2(UTINY, hostID, BOOL, state);
@@ -387,11 +378,9 @@ extern UTINY find_hostID IPT1(CHAR *, name);
 extern CHAR *find_optionname IPT1(UTINY, hostID);
 extern void host_config_init IPT1(OptionDescription *, common_defs);
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 extern SHORT host_read_resource_file IPT2(BOOL, system, ErrDataPtr, err_buf);
 extern SHORT host_write_resource_file IPT2(LineNode *, head,
                                            ErrDataPtr, err_buf);
-#endif
 
 extern void *host_inquire_extn IPT2(UTINY, hostID, ConfigValues *, values);
 extern SHORT host_runtime_inquire IPT1(UTINY, what);

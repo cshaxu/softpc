@@ -200,6 +200,7 @@ typedef union
 } DMA_MODE;
 #endif
 
+
 /* DMA Mode register mode bit settings */
 #define DMA_DEMAND_MODE		0
 #define DMA_SINGLE_MODE		1
@@ -514,15 +515,3 @@ IMPORT int dma_request IPT3(half_word, port, char *, hw_buffer, word, length);
  */
 IMPORT VOID dma_enquire IPT3(half_word, channel, sys_addr *, address, word *, length);
 
-#ifdef NTVDM
-/*
- * BOOL dmaGetAdaptor
- *
- * Used by MS for third party Vdds to retrieve current DMA settings
- *
- * entry: void
- * exit : DMA_ADAPT * , pointer to the DMA_ADAPT structure
- *
- */
-DMA_ADAPT *dmaGetAdaptor();
-#endif	/* NTVDM */

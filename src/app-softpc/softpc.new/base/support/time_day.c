@@ -85,25 +85,16 @@ static char SccsID[]="@(#)time_day.c	1.27 4/20/94 Copyright Insignia Solutions L
  * ===========================================================================
  */
 
-
 #ifdef XTSFD
 #    define DAY_COUNT	BIOS_VAR_START + 0xCE
 #endif
 
 
-#ifdef NTVDM
-
-BOOL UpDateInProgress(void);
-#define UPDATE_IN_PROGRESS      UpDateInProgress()
-IMPORT VOID host_init_bda_timer(void);
-
-#else
 
 #define UPDATE_IN_PROGRESS      ( cmos_read(CMOS_REG_A ) & 0x80 )
 static sys_addr user_timer_int_vector;
 static IVT_ENTRY standard_user_timer_int_vector;
 static IVT_ENTRY compatibility_user_timer_int_vector;
-#endif
 
 #ifdef ANSI
 LOCAL void get_host_timestamp(word *, word *, half_word *);
@@ -129,6 +120,7 @@ LOCAL void get_host_time();
 
 void time_of_day()
 {
+
     /*
      * BIOS function to return the number of PC interrupts since boot.
      */
@@ -149,18 +141,6 @@ void time_of_day()
     switch (getAH()) {
 	case 0x00:			/* Get time	*/
 
-#ifdef NTVDM
-            sas_loadw(TIMER_LOW, &low);
-	    setDX(low);
-
-            sas_loadw(TIMER_HIGH, &high);
-	    setCX(high);
-
-            sas_load(TIMER_OVFL, &overflow);
- 	    setAL(overflow);
-            sas_store(TIMER_OVFL, 0);   /* Always write zero after read */
-
-#else   /* ! NTVDM */
 #ifndef PROD
 	if (host_getenv("TIME_OF_DAY_FRIG") == NULL){
 #endif
@@ -202,7 +182,6 @@ void time_of_day()
 	    sas_store(TIMER_OVFL, 0);	/* Always write zero after read	*/
 	}
 #endif
-#endif /* NTVDM */
 
 	    break;
 
@@ -215,32 +194,27 @@ void time_of_day()
 	    sas_storew(TIMER_HIGH, getCX());
 	    sas_store(TIMER_OVFL, 0);
 
-#ifndef NTVDM
 	    /*
 	     * Also the host timestamp
 	     */
 
 	    write_host_timestamp(getDX(), getCX());
-#endif
 	    break;
 	case 2:	/* read the real time clock	*/
 
-#ifndef NTVDM
 #ifndef PROD
 	if (host_getenv("TIME_OF_DAY_FRIG") == NULL){
-#endif
 #endif
 		if( UPDATE_IN_PROGRESS )
 			setCF(1);
 		else
 		{
 			setDH( cmos_read( CMOS_SECONDS ) );
-			setDL( cmos_read( CMOS_REG_B ) & 1 );	/* DSE bit	*/
+			setDL( (UCHAR)(cmos_read( CMOS_REG_B ) & 1) );	/* DSE bit	*/
 			setCL( cmos_read( CMOS_MINUTES ) );
 			setCH( cmos_read( CMOS_HOURS ) );
 			setCF(0);
 		}
-#ifndef NTVDM
 #ifndef PROD
 	}else{
 	    SAVED int first=1;
@@ -256,7 +230,6 @@ void time_of_day()
 			setCH( 1 );
 			setCF(0);
 	}
-#endif
 #endif
 		break;
 
@@ -282,10 +255,8 @@ void time_of_day()
 
 	case 4:	/* read the date from the real time clock	*/
 
-#ifndef NTVDM
 #ifndef PROD
 	if (host_getenv("TIME_OF_DAY_FRIG") == NULL){
-#endif
 #endif
 		if( UPDATE_IN_PROGRESS )
 			setCF(1);
@@ -297,7 +268,6 @@ void time_of_day()
 			setCH( cmos_read( CMOS_CENTURY ) );
 			setCF(0);
 		}
-#ifndef NTVDM
 #ifndef PROD
 	}else{
 	    SAVED int first=1;
@@ -313,7 +283,6 @@ void time_of_day()
 			setCH( 19 );
 			setCF(0);
 	}
-#endif
 #endif
 		break;
 
@@ -406,7 +375,6 @@ void time_int()
     /*
      * NT port does everything in 16 bit int08 handler
      */
-#ifndef NTVDM
 
     /*
      * The BIOS timer interrupt routine.
@@ -472,7 +440,7 @@ void time_int()
 
 
 	/*
-	 * Provided FLA is not busy, then actually turn the motor off.  
+	 * Provided FLA is not busy, then actually turn the motor off.
 	 */
 
   	if (!fla_busy)
@@ -489,7 +457,6 @@ void time_int()
 		exec_sw_interrupt(USER_TIMER_INT_SEGMENT,
 				  USER_TIMER_INT_OFFSET);
 	}
-#endif	/* NTVDM */
 }
 
 /*
@@ -504,7 +471,6 @@ void time_int()
  *  Most of the compensation to readjust tics according
  *  to the time of day stuff is not needed
  */
-#ifndef NTVDM
 /*
  * The routines get_host_timestamp() and write_host_timestamp() are used to
  * override the BIOS record of time, since timer events are known to be lost.
@@ -563,9 +529,9 @@ half_word *overflow;
     /*
 	 * TMM 8/1/92:
 	 * -----------
-	 * 
+	 *
 	 * If someone changes the date forwards by >= 24 hours then we should set
-	 * the overflow flag and ensure that we don't return an interval greater 
+	 * the overflow flag and ensure that we don't return an interval greater
 	 * than 24 hours. If the date has changed by >= 48 hours then we will have
 	 * lost a day. So we put up a panel to tell the user.
 	 *
@@ -587,11 +553,11 @@ half_word *overflow;
      */
 
 	days = interval.tv_sec / (24 * 60 * 60);
-    
+
 	if (days >= 1)
     {
 		/*
-		 * Someone has set the clock forwards, or we have been frozen for a 
+		 * Someone has set the clock forwards, or we have been frozen for a
 		 * couple of days. Ensure that the interval is not more than 24 hours,
 		 * adjust the time_stamp to take care of the lost days.
 		 */
@@ -762,12 +728,10 @@ word *low, *hi;		/* outputs */
     *hi = ticks >> 16;
 }
 
-#endif  /* ifndef NTVDM */
 
 
 void time_of_day_init()
 {
-#ifndef NTVDM
     int hour, minutes, sec;		/* Current host time */
     word low, hi;		/* Host time in PC ticks */
 
@@ -798,31 +762,7 @@ void time_of_day_init()
 	
     user_timer_int_vector = BIOS_USER_TIMER_INT * 4;
 
-#endif  /* NTVDM */
 }
 
 
 
-#ifdef NTVDM
-
-/*
- *  NTVDM: the rtc is setup so that the UIP bit is set on a cmos
- *  port read if the cmos ports haven't been touched for at least
- *  1 second. The IBM pc bios routine for accessing the clock
- *  polls RegA for UIP bit in a tight loop 600h times before
- *  failing the call. This means that MOST of the time the int1ah
- *  rtc fns almost never fail! To mimic this behaviour we poll
- *  the port until success, since we know that our rtc will clear
- *  UIP bit very quickly.
- */
-BOOL UpDateInProgress(void)
-{
-
-   while (cmos_read(CMOS_REG_A) & 0x80) {
-       Sleep(0);  // give other threads a chance to work
-       }
-
-   return FALSE;
-
-}
-#endif

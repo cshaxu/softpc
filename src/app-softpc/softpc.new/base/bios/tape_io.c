@@ -30,7 +30,6 @@
  */
 #include <stdio.h>
 #include TypesH
-
 /*
  * SoftPC include files
  */
@@ -48,6 +47,8 @@
 #include "debug.h"
 #include "quick_ev.h"
 
+extern void xmsEnableA20Wrapping(void);
+extern void xmsDisableA20Wrapping(void);
 
 #define ONE_MEGABYTE    (1024 * 1024)
 #define SIXTY_FOUR_K    (64 * 1024)
@@ -71,7 +72,7 @@ void cassette_io()
 #ifdef PM
 #ifndef	CPU_30_STYLE
 IMPORT void retrieve_descr_fields IPT4(half_word *, AR, sys_addr *, base,
-	word *, limit, sys_addr, descr_addr);
+	sys_addr *, limit, sys_addr, descr_addr);
 #endif	/* not CPU_30_STYLE */
 half_word cmos_u_m_s_hi;
 half_word cmos_u_m_s_lo;
@@ -80,8 +81,8 @@ sys_addr  source;
 sys_addr  source_base;
 sys_addr  target;
 #if (!defined(PROD) || !defined(CPU_30_STYLE))
-word      source_limit;
-word      target_limit;
+sys_addr      source_limit;
+sys_addr      target_limit;
 #endif
 sys_addr  target_base;
 sys_addr byte_count;   /* Max size is 0x8000 * 2 = 10000 */
@@ -97,9 +98,6 @@ half_word target_AR;
 	half_word	mask,		/* interrupt mask			*/
 			alarm;		/* value read from alarm register	*/	
 
-#if defined(NTVDM) && defined(MONITOR)
-        IMPORT word conf_15_seg, conf_15_off;
-#endif /* NTVDM & MONITOR */
         /*
          *	Determine function
          */
@@ -110,14 +108,11 @@ half_word target_AR;
         case INT15_PROGRAM_TERMINATION:
         case INT15_REQUEST_KEY:
         case INT15_DEVICE_BUSY:
-		setAH( 0 );   
+		setAH( 0 );
                 setCF( 0 );
                 break;
 
 	case INT15_EMS_DETERMINE:
-#if 0 /* I'm sure we've all had enough of this one */
-                always_trace0("INT15 Extended Memory Access");
-#endif
 #ifdef PM
                 outb(CMOS_PORT, CMOS_U_M_S_LO);
                 inb(CMOS_DATA, &cmos_u_m_s_lo);
@@ -179,16 +174,9 @@ half_word target_AR;
 		/* Go to it */
 		if (sas_twenty_bit_wrapping_enabled())
 		{
-#ifdef NTVDM
-			/* call xms functions to deal with A20 line */
-			xmsDisableA20Wrapping();
-			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
-			xmsEnableA20Wrapping();
-#else
 			sas_disable_20_bit_wrapping();
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
 			sas_enable_20_bit_wrapping();
-#endif /* NTVDM */
 		}
 		else
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
@@ -272,16 +260,11 @@ half_word target_AR;
 	case INT15_INTERRUPT_COMPLETE:
 		break;
 	case INT15_CONFIGURATION:
-#if defined(NTVDM) && defined(MONITOR)
-		setES( conf_15_seg );
-		setBX( conf_15_off );
-#else
 		/* The C handler executes in the caller's CPU context; getCS() is
 		 * therefore the guest caller's segment, not the ROM segment.  C0
 		 * must point at the original BIOS configuration table at F000:E6F5. */
 		setES( CONF_TABLE_SEGMENT );
 		setBX( CONF_TABLE_OFFSET );
-#endif
 		setAH( 0 );
 		setCF( 0 );
 		break;

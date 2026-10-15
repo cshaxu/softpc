@@ -184,16 +184,9 @@
 #define	RS_1000	(3 << 6)
 #define	RS_MASK	(RS_300 | RS_250)
 
-#ifdef	NTVDM
-/* On NT, don't cycle through RS_1000. Why? */
-#define	next_rate(rate) (rate == RS_1000? RS_500: \
-			(rate == RS_500 ? RS_250: \
-			(rate == RS_250 ? RS_300: RS_500)))
-#else
 #define	next_rate(rate)	(rate == RS_500 ? RS_250: \
 			(rate == RS_250 ? RS_300: \
 			(rate == RS_300 ? RS_1000: RS_500)))
-#endif
 
 /*
  *	Unused high density floppy variables
@@ -571,13 +564,3 @@ extern void host_flip_real_floppy_ind ();
 
 extern void ((*(fl_fnc_tab[]))());
 
-#ifdef NTVDM
-/*
- * NT can't assume the presence and placings of SoftPC ROMs.
- * These variables initialised from ntio.sys
- */
-extern word int15_seg, int15_off;
-extern word wait_int_seg, wait_int_off;
-extern word dr_type_seg, dr_type_off;
-extern sys_addr dr_type_addr;
-#endif /* NTVDM */

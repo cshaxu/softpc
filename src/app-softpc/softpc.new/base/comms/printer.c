@@ -141,24 +141,24 @@ static char SccsID[] = "@(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions
 
 static half_word output_reg[NUM_PARALLEL_PORTS];
 static half_word control_reg[NUM_PARALLEL_PORTS];
-#define NOTBUSY		0x80
-#define ACK		0x40
-#define PEND		0x20
-#define SELECT		0x10
-#define ERROR		0x08
+#define NOTBUSY		(IU8)0x80
+#define ACK		(IU8)0x40
+#define PEND		(IU8)0x20
+#define SELECT		(IU8)0x10
+#define ERROR		(IU8)0x08
 
 static half_word status_reg[NUM_PARALLEL_PORTS];
-#define IRQ		0x10
-#define SELECT_IN	0x08
-#define INIT_P		0x04
-#define AUTO_FEED	0x02
-#define STROBE		0x01
+#define IRQ		(IU8)0x10
+#define SELECT_IN	(IU8)0x08
+#define INIT_P		(IU8)0x04
+#define AUTO_FEED	(IU8)0x02
+#define STROBE		(IU8)0x01
 
 LOCAL IU8 retryErrorCount = 0;   /* num status inb before clearing ERROR */
 
-static int state[NUM_PARALLEL_PORTS]; /* state control variable */
+static IU8 state[NUM_PARALLEL_PORTS]; /* state control variable */
 /*
- * set up arrays of all port addresses 
+ * set up arrays of all port addresses
  */
 static io_addr port_start[] = {LPT1_PORT_START,LPT2_PORT_START,LPT3_PORT_START};
 static io_addr port_end[] = {LPT1_PORT_END, LPT2_PORT_END, LPT3_PORT_END};
@@ -170,21 +170,10 @@ static sys_addr timeout_address[] = {LPT1_TIMEOUT_ADDRESS, LPT2_TIMEOUT_ADDRESS,
 static q_ev_handle handle_for_out_event[NUM_PARALLEL_PORTS];
 static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
 
-#if defined(NTVDM) && defined(MONITOR)
-/* sudeepb 24-Jan-1993 for printing performance for x86 */
-sys_addr lp16BitPrtBuf;
-sys_addr lp16BitPrtId;
-sys_addr lp16BitPrtCount;
-sys_addr lp16BitPrtBusy;
-#endif
 
 #define STATE_READY     0
 #define STATE_OUT       1
 #define STATE_OUTA      2
-#if defined(NTVDM)
-#define STATE_DATA	3
-#define STATE_DONGLE	4
-#endif
 
 /*
  * State transitions:
@@ -295,7 +284,7 @@ const softpc_device_parallel_controller_state *state_in;
 
 /*
  * ============================================================================
- * Internal functions & macros 
+ * Internal functions & macros
  * ============================================================================
  */
 
@@ -310,24 +299,6 @@ const softpc_device_parallel_controller_state *state_in;
  * Defines and variables to handle tables stored in 16-bit code for NT
  * monitors.
  */
-#if defined(NTVDM) && defined(MONITOR)
-
-static BOOL intel_setup = FALSE;
-
-static sys_addr status_addr;
-static sys_addr control_addr;
-static sys_addr state_addr;
-
-#define get_status(adap)	(sas_hw_at_no_check(status_addr+(adap)))
-#define set_status(adap,val)	(sas_store_no_check(status_addr+(adap),(val)))
-
-#define get_control(adap)	(sas_hw_at_no_check(control_addr+(adap)))
-#define set_control(adap,val)	(sas_store_no_check(control_addr+(adap),(val)))
-
-#define get_state(adap)		(sas_hw_at_no_check(state_addr+(adap)))
-#define set_state(adap,val)	(sas_store_no_check(state_addr+(adap),(val)))
-
-#else /* NTVDM && MONITOR */
 
 #define get_status(adap)	(status_reg[adapter])
 #define set_status(adap,val)	(status_reg[adapter] = (val))
@@ -338,16 +309,14 @@ static sys_addr state_addr;
 #define get_state(adap)		(state[adapter])
 #define set_state(adap,val)	(state[adapter] = (val))
 
-#endif /* NTVDM && MONITOR */
 
 static void printer_inb IPT2(io_addr, port, half_word *, value);
 static void printer_outb IPT2(io_addr, port, half_word, value);
 static void notbusy_check IPT1(int,adapter);
 
-
 /*
  * ============================================================================
- * External functions 
+ * External functions
  * ============================================================================
  */
 
@@ -360,24 +329,9 @@ void printer_post IFN1(int,adapter)
 	sas_store(timeout_address[adapter], (half_word)0x14 );		/* timeout */
 }
 
-#if defined(NTVDM) && defined(MONITOR)
-static void lpr_state_outa_event IFN1(long,adapter) 
-{ 
-	set_status(adapter, get_status(adapter) | ACK);
-	set_state(adapter, STATE_READY);
-}
 
-static void lpr_state_out_event IFN1(long,adapter)
+static void lpr_state_outa_event IFN1(long,adapter)
 {
-	set_status(adapter, get_status(adapter) & ~ACK);
-	set_state(adapter, STATE_OUTA); 
-	handle_for_outa_event[adapter]=add_q_event_t(lpr_state_outa_event,HOST_PRINTER_DELAY,adapter); 
-} 
-
-#else	/* NTVDM && MONITOR */
-
-static void lpr_state_outa_event IFN1(long,adapter) 
-{ 
 	set_high(status_reg[adapter],ACK);
 	state[adapter]=STATE_READY;
 }
@@ -385,10 +339,9 @@ static void lpr_state_outa_event IFN1(long,adapter)
 static void lpr_state_out_event IFN1(long,adapter)
 {
 	set_low(status_reg[adapter], ACK);
-	state[adapter]=STATE_OUTA; 
-	handle_for_outa_event[adapter]=add_q_event_t(lpr_state_outa_event,HOST_PRINTER_DELAY,adapter); 
-} 
-#endif	/* NTVDM && MONITOR */
+	state[adapter]=STATE_OUTA;
+	handle_for_outa_event[adapter]=add_q_event_t(lpr_state_outa_event,HOST_PRINTER_DELAY,adapter);
+}
 
 static void printer_inb IFN2(io_addr,port, half_word *,value)
 {
@@ -416,15 +369,6 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 	case STATUS_OFFSET:
 		switch(get_state(adapter))
 		{
-#if defined(NTVDM)
-		case STATE_DONGLE:
-			/* read directly from the port for Dongle */
-			*value = host_read_printer_status_port(adapter);
-			set_status(adapter, *value);
-			break;
-		case STATE_DATA:
-
-#endif
 
 		case STATE_READY:
 			notbusy_check(adapter);
@@ -436,7 +380,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
                         if (retryErrorCount > 0)
                             retryErrorCount--;
                         else
-                            set_status(adapter, get_status(adapter) | ERROR);
+                            set_status(adapter, (IU8)(get_status(adapter) | ERROR));
 			break;
     	case STATE_OUT:
 			*value = get_status(adapter) | STATUS_REG_MASK;
@@ -460,8 +404,8 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 #endif
 			break;
     	default:	
-			note_trace1(PRINTER_VERBOSE, 
-			            "<pinb() - unknown state %x>", 
+			note_trace1(PRINTER_VERBOSE,
+			            "<pinb() - unknown state %x>",
 			            get_state(adapter));
 			break;
 		}
@@ -475,8 +419,6 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 	}
 	note_trace3(PRINTER_VERBOSE, "<pinb() %x, ret %x, state %x>",
 		    port, *value, get_state(adapter));
-
-
 }
 
 static void printer_outb IFN2(io_addr,port, half_word,value)
@@ -513,52 +455,16 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 
 	switch(get_state(adapter))
 	{
-#if defined(NTVDM)
-	case STATE_DONGLE:
-	    if (port == DATA_OFFSET) {
-		output_reg[adapter] = value;
-		host_print_byte(adapter, value);
-		break;
-	    }
-	    // fall through
-	case STATE_DATA:
-		if (port == DATA_OFFSET) {
-		    if (host_set_lpt_direct_access(adapter, TRUE)) {
-			host_print_byte(adapter, output_reg[adapter]);
-			host_print_byte(adapter, value);
-			set_state(adapter, STATE_DONGLE);
-			/* Write char to internal buffer */
-			output_reg[adapter] = value;
-		    }
-		    else {
-			    /* unable to open the lpt for direct access,
-			       mark the device busy */
-
-#if !defined(MONITOR)
-			set_low(status_reg[adapter], NOTBUSY);
-#else /* NTVDM && !MONITOR */
-			set_status(adapter, 0x7F);
-#endif
-
-
-		    }
-		    break;
-		}
-
-	// fall through
-#endif
 	case STATE_OUT:
 	case STATE_OUTA:
 	case STATE_READY:
 		switch(port)
 		{
 		case DATA_OFFSET:
-#if defined(NTVDM)
-			set_state(adapter, STATE_DATA);
-#endif
 			/* Write char to internal buffer */
 			output_reg[adapter] = value;
 			break;
+
 		case STATUS_OFFSET:
 			/* Not possible */
 			break;
@@ -584,17 +490,6 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 
 			if (low_high(old_control, value, STROBE))
 			{
-#if defined(NTVDM)
-			    if (get_state(adapter) == STATE_DONGLE) {
-				host_set_lpt_direct_access(adapter, FALSE);
-				/* pass through to print out the last byte
-				 * which we have sent it out the data port
-				 * while we are in DONGLE state.
-				 */
-
-				set_state(adapter, STATE_READY);
-			    }
-#endif
 
 #ifdef PS_FLUSHING
 				/*
@@ -612,21 +507,17 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 				 	*/
                                 	if(host_print_byte(adapter,output_reg[adapter]) == FALSE)
 					{
-				    		set_status(adapter, get_status(adapter) & ~ERROR); /* active Low */
+				    		set_status(adapter, (IU8)(get_status(adapter) & ~ERROR)); /* active Low */
 				    		/* NTVDM had here(?): set_status(adapter, ACK|PEND|SELECT|ERROR); */
 				    		/* two status inbs before we clear ERROR */
-				    		retryErrorCount = 2;  
+				    		retryErrorCount = 2;
 					}
 					else
 					{
                                     		/* clear ERROR condition */
-                                    		set_status(adapter, get_status(adapter) | ERROR);
-#if defined(NTVDM) && !defined(MONITOR)
-				    		set_low(status_reg[adapter], NOTBUSY);
-#else /* NTVDM && !MONITOR */
+                                    		set_status(adapter, (IU8)(get_status(adapter) | ERROR));
 				    		set_status(adapter,
-					       	get_status(adapter) & ~NOTBUSY);
-#endif /* NTVDM && !MONITOR */
+					       	(IU8)(get_status(adapter) & ~NOTBUSY));
 				    		set_state(adapter, STATE_OUT);
 #ifndef DELAYED_INTS
 				    		handle_for_out_event[adapter]=add_q_event_t(lpr_state_out_event,HOST_PRINTER_DELAY,adapter);
@@ -644,7 +535,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 					/*
 					 * Application is using
 					 * interrupts, so we can't
-					 * rely on INBs being 
+					 * rely on INBs being
 					 * used to check the
 					 * printer status.
 					 */
@@ -653,15 +544,6 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 				}
 			}
 
-#if defined(NTVDM)
-			else if (low_high(old_control, value, IRQ) &&
-				 get_state(adapter) == STATE_DONGLE) {
-
-				host_set_lpt_direct_access(adapter, FALSE);
-				set_state(adapter, STATE_READY);
-			}
-
-#endif
 
 #ifndef	PROD
 			if (old_control & IRQ)
@@ -689,7 +571,7 @@ void printer_status_changed IFN1(int,adapter)
 
 /*
  * ============================================================================
- * Internal functions 
+ * Internal functions
  * ============================================================================
  */
 
@@ -718,18 +600,11 @@ static void notbusy_check IFN1(int,adapter)
 
 	/* <chrisP 11Sep91> allow not busy at leading edge of ack pulse too */
 	if (	 (get_state(adapter) == STATE_READY ||
-#if defined(NTVDM)
-		  get_state(adapter) == STATE_DATA ||
-#endif
 		  get_state(adapter) == STATE_OUTA)
 	     &&	!(get_status(adapter) & NOTBUSY)
 	     &&	!(host_lpt_status(adapter) & HOST_LPT_BUSY))
 	{
-#if defined(NTVDM) && !defined(MONITOR)
-		set_high(status_reg[adapter], NOTBUSY);
-#else /* NTVDM && !MONITOR */
-		set_status(adapter, get_status(adapter) | NOTBUSY);
-#endif /* NTVDM && !MONITOR */
+		set_status(adapter, (IU8)(get_status(adapter) | NOTBUSY));
 
 #ifndef	PROD
 		if (io_verbose & PRINTER_VERBOSE)
@@ -763,18 +638,6 @@ void printer_init IFN1(int,adapter)
 	for(i = port_start[adapter]; i < port_end[adapter]; i++)
 		io_connect_port(i,lpt_adapter[adapter],IO_READ_WRITE);
 
-#if defined(NTVDM) && defined(MONITOR)
-	/*
-	 * If we know the addresses of the 16-bit variables write directly
-	 * to them, otherwise save the value until we do.
-	 */
-	if (intel_setup)
-	{
-	    set_status(adapter, 0xDF);
-	    set_control(adapter, 0xEC);
-	}
-	else
-#endif /* NTVDM && MONITOR */
 	{
 	    control_reg[adapter] = 0xEC;
 	    status_reg[adapter] = 0xDF;
@@ -794,84 +657,10 @@ void printer_init IFN1(int,adapter)
 	/* host_print_doc(adapter); */
 	host_print_auto_feed(adapter, FALSE);
 
-#if defined(NTVDM) && defined(MONITOR)
-	if (intel_setup)
-	    set_state(adapter, STATE_READY);
-	else
-#endif /* NTVDM && MONITOR */
 	    state[adapter] = STATE_READY;
 
 } /* end of printer_init() */
 
-#if defined(NTVDM) && defined(MONITOR)
-/*
-** Store 16-bit address of status table and fill it with current values.
-*/
-#ifdef ANSI
-void printer_setup_table(sys_addr table_addr)
-#else /* ANSI */
-void printer_setup_table(table_addr)
-sys_addr table_addr;
-#endif /* ANSI */
-{
-    int i;
-    sys_addr lp16BufSize;
-    unsigned int cbBuf;
-    word    lptBasePortAddr[NUM_PARALLEL_PORTS];
-
-    if (!intel_setup)
-    {
-
-	/*
-	 * Store the addresses of the tables resident in 16-bit code. These
-	 * are:
-	 *	status register		(NUM_PARALLEL_PORTS bytes)
-	 *	state register		(NUM_PARALLEL_PORTS bytes)
-	 *	control register	(NUM_PARALLEL_PORTS bytes)
-	 *	host_lpt_status		(NUM_PARALLEL_PORTS bytes)
-	 *
-	 * Then transfer any values which have already been set up into the
-	 * variables. This is in case printer_init has been called prior to
-	 * this function.
-	 */
-	status_addr = table_addr;
-	state_addr = table_addr + NUM_PARALLEL_PORTS;
-        control_addr = table_addr + 2 * NUM_PARALLEL_PORTS;
-	for (i = 0; i < NUM_PARALLEL_PORTS; i++)
-	{
-	    set_status(i, status_reg[i]);
-	    set_state(i, state[i]);
-	    set_control(i, control_reg[i]);
-	    lptBasePortAddr[i] = port_start[i];
-	}
-
-	/* Let host know where host_lpt_status is stored in 16-bit code. */
-	host_printer_setup_table(table_addr, NUM_PARALLEL_PORTS, lptBasePortAddr);
-/* sudeepb 24-Jan-1993 for printing performance for x86 */
-        lp16BufSize = table_addr + 4 * NUM_PARALLEL_PORTS;
-        cbBuf = (sas_w_at_no_check(lp16BufSize));
-        lp16BitPrtBuf = table_addr + (4 * NUM_PARALLEL_PORTS) + 2;
-        lp16BitPrtId  = lp16BitPrtBuf + cbBuf;
-        lp16BitPrtCount = lp16BitPrtId + 1;
-        lp16BitPrtBusy =  lp16BitPrtCount + 2;
-	intel_setup = TRUE;
-    }
-}
-#endif /* NTVDM && MONITOR */
-
-#endif 
-
-#ifdef NTVDM
-void printer_is_being_closed(int adapter)
-{
-
-#if defined(MONITOR)
-	set_state(adapter, STATE_READY);
-#else
-	state[adapter] = STATE_READY;
-
-#endif
-}
 
 #endif
 
@@ -912,3 +701,4 @@ GLOBAL void printer_psflush_change IFN2(
             host_lpt_enable_autoflush(adapter);
 }
 #endif	/* PS_FLUSHING */
+

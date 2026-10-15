@@ -67,30 +67,6 @@ typedef union {
       } INT_ENABLE_REG;
 #endif
 
-#if defined(NTVDM) && defined(FIFO_ON)
-#ifdef BIT_ORDER2
-typedef union {
-    half_word all;
-    struct {
-         HALF_WORD_BIT_FIELD no_int_pending:1;
-         HALF_WORD_BIT_FIELD interrupt_ID:3;
-         HALF_WORD_BIT_FIELD pad:2;
-         HALF_WORD_BIT_FIELD fifo_enabled:2;
-           } bits;
-      } INT_ID_REG;
-#endif
-#ifdef BIT_ORDER1
-typedef union {
-    half_word all;
-    struct {
-         HALF_WORD_BIT_FIELD fifo_enabled:2;
-         HALF_WORD_BIT_FIELD pad:2;
-         HALF_WORD_BIT_FIELD interrupt_ID:3;
-         HALF_WORD_BIT_FIELD no_int_pending:1;
-           } bits;
-      } INT_ID_REG;
-#endif
-#else   /* NTVDM */
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -113,7 +89,6 @@ typedef union {
       } INT_ID_REG;
 #endif
 
-#endif  /* ifdef NTVDM */
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -182,11 +157,7 @@ typedef union {
 		 HALF_WORD_BIT_FIELD break_interrupt:1;
 		 HALF_WORD_BIT_FIELD tx_holding_empty:1;
 		 HALF_WORD_BIT_FIELD tx_shift_empty:1;
-#if defined(NTVDM) && defined(FIFO_ON)
-		 HALF_WORD_BIT_FIELD fifo_error:1;
-#else
 		 HALF_WORD_BIT_FIELD pad:1;
-#endif
 	       } bits;
       } LINE_STATUS_REG;
 #endif
@@ -194,11 +165,7 @@ typedef union {
 typedef union {
  	half_word all;
 	struct {
-#if defined(NTVDM) && defined(FIFO_ON)
-		 HALF_WORD_BIT_FIELD fifo_error:1;
-#else
 		 HALF_WORD_BIT_FIELD pad:1;
-#endif
 		 HALF_WORD_BIT_FIELD tx_shift_empty:1;
 		 HALF_WORD_BIT_FIELD tx_holding_empty:1;
 		 HALF_WORD_BIT_FIELD break_interrupt:1;
@@ -241,48 +208,12 @@ typedef union {
       } MODEM_STATUS_REG;
 #endif
 
-#if defined(NTVDM) && defined(FIFO_ON)
-/* refer to NS 16550A data sheet for fifo control register description
-   DMA is not supported because so far there are not such a COMM adapter with
-   DMA channel  out there
-*/
-#ifdef BIT_ORDER2
-typedef union {
-    half_word all;
-    struct {
-         HALF_WORD_BIT_FIELD enabled:1;
-         HALF_WORD_BIT_FIELD rx_reset:1;
-         HALF_WORD_BIT_FIELD tx_reset:1;
-         HALF_WORD_BIT_FIELD dma_mode_selected:1;
-         HALF_WORD_BIT_FIELD pad:2;
-         HALF_WORD_BIT_FIELD trigger_level:2;
-           } bits;
-      } FIFO_CONTROL_REG;
-#endif
-#ifdef BIT_ORDER1
-typedef union {
-    half_word all;
-    struct {
-         HALF_WORD_BIT_FIELD trigger_level:2;
-         HALF_WORD_BIT_FIELD pad:2;
-         HALF_WORD_BIT_FIELD dma_mode_selected:1
-         HALF_WORD_BIT_FIELD tx_reset:1;
-         HALF_WORD_BIT_FIELD rx_reset:1
-         HALF_WORD_BIT_FIELD enabled:1;
-           } bits;
-      } FIFO_CONTROL_REG;
-#endif
-
-#endif
 
 /* register select code definitions follow: */
 
 #define RS232_TX_RX	0
 #define RS232_IER	1
 #define RS232_IIR	2
-#if defined(NTVDM) && defined(FIFO_ON)
-#define RS232_FIFO  2
-#endif
 #define RS232_LCR	3
 #define RS232_MCR	4
 #define RS232_LSR	5
@@ -300,19 +231,6 @@ typedef union {
 #define NO_GO_SPEED 1  /* We can't emulate requested line speed */
 #define NO_GO_LINE  2  /* We can't emulate requested line setup */
 
-#if defined(NTVDM) && defined(FIFO_ON)
-/* fifo size defined in NS16550 data sheet */
-#define FIFO_SIZE   16
-/* the real fifo size in our simulation code. Increase this will get
-   a better performance(# rx interrupts going down and read call count to
-   the serial driver also going down). However, if application is using
-   h/w handshaking, we may still delivery extra chars to it. This may provoke
-   the app. By using 16bytes fifo, we are safe because the application
-   must have logic to handle it.
-*/
-
-#define FIFO_BUFFER_SIZE    FIFO_SIZE
-#endif
 
 #define OFF 0
 #define ON 1
@@ -320,9 +238,6 @@ typedef union {
 #define	change_state(external_state, internal_state) \
 	((external_state == internal_state) ? LEAVE_ALONE : external_state)
 
-#if defined(NTVDM) && defined(FIFO_ON)
-#define FIFO_INT 6   /* fifo rda time out interrupt ID */
-#endif
 
 #define RLS_INT 3     /* receiver line status interrupt ID */
 #define RDA_INT 2     /* data available interrupt ID */
@@ -338,23 +253,11 @@ typedef union {
 #define STOP2 1       /* line control setting for one and a half or two
                          stop bits */
 
-#ifdef NTVDM
-// collision with winbase.h PARITY_ON define
-#define PARITYENABLE_ON 1   /* line control setting for parity enabled */
-#define PARITYENABLE_OFF 0  /* line control setting for parity disabled */
-#else
 #define PARITY_ON 1   /* line control setting for parity enabled */
 #define PARITY_OFF 0  /* line control setting for parity disabled */
-#endif
 
-#ifdef NTVDM
-// collision with winbase.h PARITY_ODD define
-#define EVENPARITY_ODD 0  /* line control setting for odd parity */
-#define EVENPARITY_EVEN 1 /* line control setting for even parity */
-#else
 #define PARITY_ODD 0  /* line control setting for odd parity */
 #define PARITY_EVEN 1 /* line control setting for even parity */
-#endif
 
 #define PARITY_STICK 1  /* line control setting for stick(y) parity */
 
@@ -367,12 +270,6 @@ typedef union {
 #define COM4 3
 #endif
 
-#if defined(NTVDM) && defined(FIFO_ON)
-typedef     struct _FIFORXDATA{
-    half_word   data;
-    half_word   error;
-}FIFORXDATA, *PFIFORXDATA;
-#endif
 
 /*
  * ============================================================================
@@ -391,20 +288,13 @@ extern void com_outb IPT2(io_addr, port, half_word, value);
 extern void com_recv_char IPT1(int, adapter);
 extern void recv_char IPT1(long, adapter);
 extern void com_modem_change IPT1(int, adapter);
-extern int com_save_rxbytes IPT2(int,n, CHAR *,buf);
-extern int com_save_txbyte IPT1(CHAR,value);
+extern void com_save_rxbytes IPT2(int,n, CHAR *,buf);
+extern void com_save_txbyte IPT1(CHAR,value);
 
 #ifdef PS_FLUSHING
 extern void com_psflush_change IPT2(IU8,hostID, IBOOL,apply);
 #endif	/* PS_FLUSHING */
 
-#ifdef NTVDM
-extern void com_lsr_change(int adapter);
-extern void SyncBaseLineSettings(int adapter,DIVISOR_LATCH *divisor_latch,
-		 LINE_CONTROL_REG *LCR_reg);
-extern void tx_shift_register_empty(int adapter);
-extern void tx_holding_register_empty(int adapter);
-#endif
 
 #if (NUM_SERIAL_PORTS > 2)
 #define	adapter_for_port(port) \

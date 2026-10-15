@@ -116,10 +116,6 @@ static half_word cmos[CMOS_SIZE];
 
 static half_word *cmos_register = &cmos[CMOS_SHUT_DOWN];
 
-#ifdef NTVDM
-unsigned long   dwTickCount,dwAccumulativeMilSec;
-extern unsigned long GetTickCount (VOID);
-#endif
 
 #ifdef TEST_HARNESS
 unsigned long   io_verbose = 0;
@@ -386,24 +382,8 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 
 GLOBAL void cmos_inb IFN2(io_addr, port, half_word *, value)
 {
-#ifndef NTVDM
 IMPORT ADAPTER_STATE adapter_state[2];
-#else
-IMPORT VDMVIRTUALICA VirtualIca[];
-#define ADAPTER_STATE VDMVIRTUALICA
-#define adapter_state VirtualIca
-#endif /* !NTVDM */
 
-#ifdef NTVDM
-	/*
-	** Tim September 92, hack for DEC 450ST
-	*/
-	if( port==0x78 )
-	{
-		*value = 0;
-		return;
-	}
-#endif
 	port = port & CMOS_BIT_MASK;	/* clear unused bits */
 
 	if (port == CMOS_DATA)
@@ -427,12 +407,10 @@ IMPORT VDMVIRTUALICA VirtualIca[];
 		}
 		else if (cmos_index < CMOS_REG_A)
 		{
-#ifndef NTVDM
 #ifndef PROD
 			if (host_getenv("TIME_OF_DAY_FRIG") == NULL)
 			{
 #endif /* !PROD */
-#endif /* !NTVDM */
 
 				switch (cmos_index)
 				{
@@ -462,7 +440,6 @@ IMPORT VDMVIRTUALICA VirtualIca[];
 				default:
 					break;
 				}
-#ifndef NTVDM
 #ifndef PROD
 			} else
 			{
@@ -476,7 +453,6 @@ IMPORT VDMVIRTUALICA VirtualIca[];
 				*cmos_register = 1;
 			}
 #endif /* !PROD */
-#endif /* !NTVDM */
 
 			*value = *cmos_register;
 		}
@@ -507,13 +483,6 @@ GLOBAL void cmos_outb IFN2(io_addr, port, half_word, value)
 		500000
 	};
 
-#ifdef NTVDM
-	/*
-	** Tim September 92, hack for DEC 450ST
-	*/
-	if( port == 0x78 )
-	    return;
-#endif /* NTVDM */
 
 	port = port & CMOS_BIT_MASK;	/* clear unused bits */
 
@@ -674,16 +643,12 @@ GLOBAL void rtc_tick IFN0()
 		 */
 		 
 		cmos[CMOS_REG_C] ^= C_UF;
-#ifndef NTVDM
 		cmos[CMOS_REG_A] |= UIP;	/* Set the bit */
-#endif
 		break;
 
 	case 1:
 		cmos[CMOS_REG_C] ^= C_UF;
-#ifndef NTVDM
 		cmos[CMOS_REG_A] &= ~UIP;	/* Clear it again */
-#endif
 		break;
 
 	case 17:
@@ -693,34 +658,6 @@ GLOBAL void rtc_tick IFN0()
 			/* User is updating user_time */
 		} else
 		{
-#ifdef NTVDM
-        /* sudeepb 08-Jul-1993 Old code assumed rtc-tick will be called */
-        /* 20 times a second. This is not true under NTVDM. So we have  */
-        /* to keep track of time seperately and add to the cmos time.   */
-unsigned long dwTemp;
-                    dwTemp =  GetTickCount();
-                    dwAccumulativeMilSec += (dwTemp - dwTickCount);
-                    dwTickCount = dwTemp;
-                    ht->tm_sec = (ULONG) ht->tm_sec +
-                                        (dwAccumulativeMilSec / 1000);
-                    dwAccumulativeMilSec = dwAccumulativeMilSec % 1000;
-                    if (ht->tm_sec >= 60)
-                    {
-                            ht->tm_min += (ht->tm_sec / 60);
-                            ht->tm_sec = (ht->tm_sec % 60);
-                            if (ht->tm_min >= 60)
-                            {
-                                    ht->tm_hour++;
-                                    ht->tm_min -= 60;
-                                    if (ht->tm_hour == 25)
-                                    {
-                                            ht->tm_hour = 0;
-                                            ht->tm_mday++;
-                                            /* Kop out at this point */
-                                    }
-                            }
-                    }
-#else /* NTVDM */
 			/* simple update - add 1 second to time */
 			ht->tm_sec++;
 			if (ht->tm_sec == 60)
@@ -739,7 +676,6 @@ unsigned long dwTemp;
 					}
 				}
 			}
-#endif /* NTVDM */
 		}
 		break;
 
@@ -966,18 +902,14 @@ GLOBAL void cmos_init IFN0()
 	cmos_io_attach();
 #endif
 
-#ifndef NTVDM
 #ifndef PROD
 	if (host_getenv("TIME_OF_DAY_FRIG") == NULL)
 #endif	/* PROD */
-#endif	/* NTVDM */
 		rtc_int_enabled = TRUE;
-#ifndef NTVDM
 #ifndef PROD
 	else
 		rtc_int_enabled = FALSE;
 #endif	/* PROD */
-#endif	/* NTVDM */
 
 	rtc_init();
 }
@@ -1050,9 +982,9 @@ GLOBAL void cmos_post IFN0()
 
 	/* Check the extended memory */
 	if ((cmos[CMOS_E_M_S_LO] !=
-	     ((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 10) & 0xff) ||
+	     (((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 10) & 0xff)) ||
 	    (cmos[CMOS_E_M_S_HI] !=
-	     ((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 18) & 0xff))
+	     (((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 18) & 0xff)))
 		cmos_err |= BAD_XMS;
 
 	/* Ignore the Contents of the Drive C and Drive D extended bytes */
@@ -1132,46 +1064,6 @@ GLOBAL void cmos_update IFN0()
 #endif
 }
 
-#ifdef NTVDM
-/* NTVDM build does rtc recalibration on rtc_tick */
-GLOBAL void  rtc_init IFN0()
-{
-	long            bintim;
-
-	cmos_count = 0;
-	bintim = host_time((long *) 0);
-        ht = host_localtime(&bintim);
-#ifdef NTVDM
-        dwTickCount = GetTickCount ();
-        dwAccumulativeMilSec = 0;
-#endif
-
-	/* Set Up the cmos time bytes to be in BCD by default */
-	bin2bcd = yes_bin2bcd;
-	bcd2bin = yes_bcd2bin;
-	data_mode_yes = TRUE;
-
-	/* Set Up the cmos hour bytes to be 24 hour by default */
-	_24to12 = no_24to12;
-	_12to24 = no_12to24;
-	twenty4_hour_clock = TRUE;
-
-	cmos[CMOS_SECONDS] = (*bin2bcd) (ht->tm_sec);
-        cmos[CMOS_MINUTES] = (*bin2bcd) (ht->tm_min);
-	cmos[CMOS_HOURS] = (*_24to12) ((*bin2bcd) (ht->tm_hour));
-	cmos[CMOS_DAY_WEEK] = (*bin2bcd) (ht->tm_wday + 1);
-	cmos[CMOS_MONTH] = (*bin2bcd) (ht->tm_mon + 1);
-	cmos[CMOS_YEAR] = (*bin2bcd) (ht->tm_year);
-	cmos[CMOS_CENTURY] = (*bin2bcd) (19);
-
-	set_alarm();
-}
-
-
-
-
-
-#else
 
 LOCAL void
 sync_rtc_to_host_time IFN1( long, param )
@@ -1205,10 +1097,6 @@ sync_rtc_to_host_time IFN1( long, param )
 
 GLOBAL void  rtc_init IFN0()
 {
-#ifdef NTVDM
-        dwTickCount = GetTickCount ();
-        dwAccumulativeMilSec = 0;
-#endif
 
 	/* Set Up the cmos time bytes to be in BCD by default */
 	bin2bcd = yes_bin2bcd;
@@ -1225,7 +1113,6 @@ GLOBAL void  rtc_init IFN0()
 	set_alarm();
 }
 
-#endif	/* NTVDM */
 
 /*(
 ========================= cmos_clear_shutdown_byte ============================

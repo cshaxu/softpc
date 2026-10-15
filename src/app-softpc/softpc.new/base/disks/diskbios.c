@@ -214,10 +214,8 @@ void disk_post IFN0()
 	UTINY diag;
 	UTINY disks;
 	UTINY ndisks;
-#if !(defined(NTVDM) && defined(MONITOR))
 	USHORT diskette_offset;
 	USHORT diskette_seg;
-#endif /* !(NTVDM && MONITOR) */
 	int i;
 
 	/*
@@ -225,7 +223,6 @@ void disk_post IFN0()
 	 */
 	 diag = rcmos (CMOS_DIAG);
 
-#if !(defined(NTVDM) && defined(MONITOR))
 	/* We don't want this section if running on NTVDM MONITOR */
 
 	 drive1notwiredup = ~0;
@@ -267,19 +264,7 @@ void disk_post IFN0()
 	 */
 	 wcmos (CMOS_DIAG, diag & ~HF_FAIL);
 
-#endif  /* !(NTVDM && MONITOR) */
 
-#ifdef NTVDM	/* True for all NT VDMs */
-	/*
-	 * Microsoft NT VDM specfic change:
-	 * Fake up no hard disks in CMOS and consequently BIOS RAM
-	 * because we don't want apps accessing the real hard disk
-	 * under NT.
-	 *
-	 */
-	wcmos(CMOS_DISK, (half_word) (NO_HARD_C | NO_HARD_D));
-
-#endif	/* NTVDM */
 
 	/*
 	 * read cmos disk byte for configured drives. Note we don't
@@ -319,7 +304,7 @@ void disk_post IFN0()
 	else
 	{
 		sas_store (HF_NUM, 0);
-		wcmos (CMOS_DIAG, diag | HF_FAIL);
+		wcmos (CMOS_DIAG, (UTINY)(diag | HF_FAIL));
 	}
 }
 
@@ -344,7 +329,7 @@ LOCAL void hd_reset IFN2(int, drive, int, diag)
 	/*
 	 * set up drive id
 	 */
-	setDL (0x80 + drive);
+	setDL ((UCHAR)(0x80 + drive));
 
 	/*
 	 * set the drive parameters
@@ -359,7 +344,7 @@ LOCAL void hd_reset IFN2(int, drive, int, diag)
 	disk_io ();
 
 	if (getCF () && !drive)
-		wcmos (CMOS_DIAG, diag | HF_FAIL);
+		wcmos (CMOS_DIAG, (UTINY)(diag | HF_FAIL));
 }
 
 #ifndef PROD
@@ -371,7 +356,7 @@ INPUT PARAMS	:
 	i		encoded flag indicating type of tracing information
 			asking to be output
 */
-LOCAL BOOL relevant IFN1(int, i)
+LOCAL BOOL relevant IFN1(IU32, i)
 {
 	if ((i & disktraceinfo) == i)
 		return ~0;
@@ -527,9 +512,8 @@ void setdisktrace IFN0()
 	int value;
 
 /* make the compiler happy */
-#if defined(NTVDM) && defined(MONITOR)
 	value = 0;
-#endif
+
 	printf ("select disk trace mask\n");
 	printf ("\tcmnd info\t%x\n",CMDINFO);
 	printf ("\texec info\t%x\n",XINFO);
@@ -630,7 +614,6 @@ void disk_io IFN0()
 #ifndef PROD
 	int ax,bx,cx,dx,es;
 #endif
-
 
 	IDLE_disk();
 
@@ -772,7 +755,7 @@ LOCAL void return_status IFN0()
 /*0x02 disk read sector(s) */
 LOCAL void disk_read IFN0()
 {
-	long offset; 
+	long offset;
 	host_addr inbuf;
 	sys_addr pdata;
 
@@ -820,7 +803,7 @@ LOCAL void disk_write IFN0()
 	sys_addr pdata;
 
 	/* check for read_only disk */
-	if (!config_get_active(C_HARD_DISK1_NAME + com.drive))
+	if (!config_get_active((IU8)(C_HARD_DISK1_NAME + com.drive)))
 	{
 		werror (ERROR_READ_ONLY_MEDIA);	/* floppy write prot */
 		wstatus (STATUS_ERROR);
@@ -913,12 +896,12 @@ LOCAL void get_drive_params IFN0()
 			setDL (1);
 
 		/* number of heads 0 - max */
-		setDH (dpb[com.drive].heads - 1);
+		setDH ((UCHAR)(dpb[com.drive].heads - 1));
 
 		/* number of cylinders is max addressable - 0th - diagnostic */
 		maxcylinder = dpb[com.drive].cyls - 2;
-		setCH (maxcylinder & 0xff);
-		setCL (dpb[com.drive].sectors | ((maxcylinder >> 8) << 6));
+		setCH ((UCHAR)(maxcylinder & 0xff));
+		setCL ((UCHAR) (dpb[com.drive].sectors | ((maxcylinder >> 8) << 6)));
 
 		/* we are happy */
 		wstatus (STATUS_CLEAR);
@@ -1080,14 +1063,14 @@ LOCAL UTINY rcmos IFN1(int, index)
 {
 	UTINY value;
 
-	cmos_outb (CMOS_PORT, index);
+	cmos_outb (CMOS_PORT, (UTINY)index);
 	cmos_inb (CMOS_DATA, &value);
 	return value;
 }
 
 LOCAL void wcmos IFN2(int,index,UTINY,value)
 {
-	cmos_outb (CMOS_PORT, index);
+	cmos_outb (CMOS_PORT, (UTINY)index);
 	cmos_outb (CMOS_DATA, value);
 }
 
@@ -1108,7 +1091,7 @@ LOCAL void getdpb IFN1(int, drive)
 	/* read IVT to get address of disk parameter block */
 	offset = sas_w_at(ivt);
 	segment = sas_w_at(ivt + 2);
-	pdpb = effective_addr ((unsigned long) segment, offset);
+	pdpb = effective_addr ((unsigned short) segment, offset);
 
 	/* read the relevant params */
 	dpb[drive].cyls = sas_w_at(pdpb);
@@ -1158,8 +1141,8 @@ LOCAL long dosearchid IFN0()
 	 * sector ok? (assumes all tracks have been formatted with sector ids
 	 * 1 - nsecspertrack which is DOS standard)
 	 */
-	if (com.start_sector == 0 || 
-		com.start_sector > dpb[com.drive].sectors || 
+	if (com.start_sector == 0 ||
+		com.start_sector > dpb[com.drive].sectors ||
 		com.sectors <= 0)
 	{
 		return (IDMISMATCH);
@@ -1323,7 +1306,7 @@ GLOBAL void wdctrl_bop IFN0()
 	if (check_drive (com.drive) &&
 		command >= BDC_READ && command <= BDC_WRITE)
 	{
-		long offset; 
+		long offset;
 		host_addr buf;
 		IU8	*phys_addr;
 		
@@ -1377,7 +1360,7 @@ GLOBAL void wdctrl_bop IFN0()
 		/* This path used by wdrminit.asm to check bop is there and is
 		 * reading data OK.
 		 */
-		long offset; 
+		long offset;
 		host_addr buf;
 		sys_addr pdata;
 
@@ -1472,3 +1455,5 @@ else if (command == 5)
 		getCF()?'1':'0',(unsigned)rstatus());
 }
 #endif	/* WDCTRL_BOP */
+
+
