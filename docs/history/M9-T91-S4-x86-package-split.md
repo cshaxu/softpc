@@ -1,6 +1,6 @@
 # M9 T91 S4: Split X86 tools, PC product and NXVM contracts
 
-Status: coordinator-reviewed delivery, waiting for owner acceptance.
+Status: owner-accepted and closed on 2026-10-15.
 T91 stays open. Qualification date: 2026-10-15.
 Executor P1: `8046b085`, pushed to main.
 
@@ -153,3 +153,17 @@ Review accepts the technical delivery, not owner acceptance or S/T closure.
 The source/test package split is intentionally no longer byte-identical to
 NXVM's old six-root layout. NXVM-only declarations remain available for its
 later adoption; no NXVM Core code has been imported. T91 remains open.
+
+## Owner acceptance and S4 closure
+
+Owner confirmed: "验收通过，收口S4" on 2026-10-15.
+S4 closes against executor P1 `8046b085` and coordinator review P2 `ffe0a702`.
+The requested three-way source/test split, symbol and consumer migration,
+preserved NXVM contracts, dual EXE publication and complete 150/150 tests per
+architecture are accounted for above. There is no deferred S4 work.
+
+This closure changes only status and history records. Production, tests, both
+accepted EXEs, owner configuration and media remain unchanged; no rebuild or
+runtime rerun is necessary for this documentation-only closure. Documentation
+governance and whitespace checks are rerun. T91 stays open, with no next S
+admitted; Queue and TODO retain their existing unrelated entries.

@@ -2,8 +2,8 @@
 
 ## Current Work
 
-No implementation subtask is active. T91 S4 is delivered and coordinator-reviewed;
-owner acceptance is pending. T91 remains open.
+No implementation subtask is active. T91 S4 is owner-accepted and closed.
+T91 remains open; no next S is admitted.
 Open task awaiting owner: T91.
 
 ## M9 T91 S4 Retained Delivery Brief
@@ -31,8 +31,9 @@ Open task awaiting owner: T91.
 S4 splits source and test ownership into x86-debug, x86-ibmpc and x86-nxvm.
 Executor P1 `8046b085` is pushed; its actual-change review is retained with S4.
 Both EXEs are refreshed. All 150 tests per architecture pass; initial migration
-gate/build failures are retained in the delivery record. Owner acceptance is
-pending; neither S4 nor T91 is declared closed.
+gate/build failures are retained in the delivery record. Owner accepted and
+closed S4 on 2026-10-15, against P1 `8046b085` and review P2 `ffe0a702`.
+T91 remains open.
 S3 is owner-accepted and closed on 2026-10-13. Implementation is delivered in
 `e96b2983`; coordinator actual-change review is recorded in `74b45795`.
 Both builds and all 137 tests per width pass, including the reserved desktop
