@@ -2,12 +2,11 @@
 
 ## Target Ownership
 
-T91 S4 refines the former single X86 tier into x86-debug, x86-ibmpc and
-x86-nxvm, with matching independent test packages. x86-debug depends only on
+The former single X86 tier is split into x86-debug and x86-ibmpc,
+with matching independent test packages. x86-debug depends only on
 Lib and Emulator; x86-ibmpc adds the debugger dependency and owns existing PC
-product interaction. x86-nxvm preserves only the prior NXVM-specific speed/info
-contract and depends on Lib/Emulator, not the PC shell. SoftPC never links or
-includes x86-nxvm. No machine/device implementation is moved or duplicated.
+product interaction. NXVM-specific speed/info contracts are not part of this
+repository's reusable packages. No machine/device implementation is duplicated.
 This is the owner-admitted decomposition of the existing tier, not permission
 for inward packages or their tests/configuration/docs to know outward owners.
 
@@ -190,15 +189,15 @@ native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing x86.
-Shared unit suites mirror lib, emulator, x86-debug, x86-ibmpc and x86-nxvm
-under test/. These five src/test pairs form ten reusable directories.
+Shared unit suites mirror lib, emulator, x86-debug and x86-ibmpc
+under test/. These four src/test pairs form eight reusable directories.
 Each corpus/suite owns its build and manifest; none may
 require an importing application's adapters or firmware. Each test package owns its
 fixtures; it may consume inward production APIs but never another package's
 tests or an outer package. Generic test tools live directly in test/. The
 dependency rule is direct: Lib has no outer dependency; Emulator consumes Lib;
-x86-debug consumes Lib and Emulator; x86-ibmpc also consumes x86-debug;
-x86-nxvm currently consumes only Lib and Emulator. This rule is checked at public-header and
+x86-debug consumes Lib and Emulator; x86-ibmpc also consumes x86-debug.
+This rule is checked at public-header and
 CMake target-link boundaries.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM

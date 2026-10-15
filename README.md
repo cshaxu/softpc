@@ -206,10 +206,8 @@ presets; see [test execution](docs/design/CODING.md#build-output-layout).
 - `src/emulator/` — shared machine executor, session control and UI composition.
 - `src/x86-debug/` — shared x86 debugger and assembly/disassembly components.
 - `src/x86-ibmpc/` — shared PC product commands, hotkeys and entry.
-- `src/x86-nxvm/` — retained NXVM-specific contracts; not used by SoftPC.
 - `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
-- `test/lib/`, `test/emulator/`, `test/x86-debug/`, `test/x86-ibmpc/`,
-  `test/x86-nxvm/` — independently reusable
+- `test/lib/`, `test/emulator/`, `test/x86-debug/`, `test/x86-ibmpc/` — independently reusable
   component suites.
 - `test/app-softpc/unit/`, `test/app-softpc/integration/` — SoftPC-specific
   concrete unit and composed-runtime tests.

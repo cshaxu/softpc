@@ -2,9 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active. T91 S4 is owner-accepted and closed.
-T91 remains open; no next S is admitted.
+No implementation subtask is active. T91 S5 is verified for delivery and
+coordinator review, pending owner acceptance. S4 is closed; T91 stays open.
 Open task awaiting owner: T91.
+
+## M9 T91 S5 Retained Delivery Brief
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly admits deletion of src/x86-nxvm and test/x86-nxvm. |
+| Objective | Retain only the eight reusable source/test components used by SoftPC; remove unused NXVM contracts and their registrations. |
+| Non-goals | No surviving production behavior change, external repository write, INI/media edit or rule-file change. |
+| Reference Baseline | 3af19559, accepted S4. |
+| Candidate Proposal | [Removal ledger and qualification](../history/M9-T91-S5-unused-nxvm-package-removal.md). |
+| Files And ABI Surface | Ten unused package files, root CMake, test and source boundary gates, current layout documents. |
+| Applicable Rules | Reading Set; execution, architecture, coding and documentation governance. |
+| Verification | Dual incremental Release builds; all remaining shared and App background tests; dependency inventory and absence sweep; documentation and whitespace gates. No native implementation changes: retain S4 desktop qualification without claiming a fresh run. |
+| Expected Markers | Eight reusable roots, no active NXVM-package references, 138 background tests per width; accepted desktop binaries unchanged or explicitly accounted for. |
+| Asset Needs | Existing Ninja graphs and EXEs; hidden supervisor under build/t91/s5, 30-minute build/20-minute suite budgets; preserve INI and guest assets. |
+| Reporting Requirements | Deleted files, production/test/build additions/deletions/net, actual build/test outcomes and artifact hashes. |
+| Stop Conditions | Surviving production dependency on removed package, unrelated edits or behavioral failure. |
+| Exit Criteria | Tested removal, complete P push, coordinator actual-change review, wait for owner acceptance; T stays open. |
+| Original Owner Request | 好。准入一个新S，删掉这俩没用的组件。 |
+| Similar-Issue Sweep | All NXVM package paths/symbols/targets in source, tests, scripts, build registration and current design; historical records remain factual. |
 
 ## M9 T91 S4 Retained Delivery Brief
 
@@ -28,6 +49,12 @@ Open task awaiting owner: T91.
 | Similar-Issue Sweep | Search old paths/targets/symbols, private speed/info leakage, outward source/test/build/document dependencies and cross-suite fixtures. |
 
 ## Recent acceptance
+S5 removes the unused NXVM source/test pair; only eight reusable roots remain.
+Both Release build graphs pass; x64/x86 each pass all 138 background tests.
+Native desktop tests are not rerun in S5; S4's 5/5 per width remains separate
+prior evidence. x64 EXE is unchanged; x86 EXE is refreshed after Ninja's cache
+recovery rebuild. Owner configuration and media remain unchanged. S5 waits
+for review and owner acceptance, not automatic closure.
 S4 splits source and test ownership into x86-debug, x86-ibmpc and x86-nxvm.
 Executor P1 `8046b085` is pushed; its actual-change review is retained with S4.
 Both EXEs are refreshed. All 150 tests per architecture pass; initial migration

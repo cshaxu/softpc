@@ -5,7 +5,7 @@ if(NOT DEFINED SOFTPC_SOURCE_DIR OR NOT DEFINED SELF_TEST_ROOT)
 endif()
 
 file(REMOVE_RECURSE "${SELF_TEST_ROOT}")
-foreach(component IN ITEMS lib emulator x86-debug x86-ibmpc x86-nxvm app-softpc)
+foreach(component IN ITEMS lib emulator x86-debug x86-ibmpc app-softpc)
     file(MAKE_DIRECTORY "${SELF_TEST_ROOT}/src/${component}")
     file(MAKE_DIRECTORY "${SELF_TEST_ROOT}/test/${component}")
 endforeach()

@@ -1,6 +1,6 @@
 # X86 ownership, including relative include paths. Shared corpora are inputs,
 # never modified by this X86-specific check.
-foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat x86-debug x86-ibmpc x86-nxvm emulator lib app-softpc/softpc.new)
+foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat x86-debug x86-ibmpc emulator lib app-softpc/softpc.new)
     file(GLOB_RECURSE sources "${SOFTPC_SOURCE_DIR}/src/${owner}/*.[ch]")
     foreach(source IN LISTS sources)
         file(RELATIVE_PATH relative "${SOFTPC_SOURCE_DIR}/src" "${source}")
@@ -32,7 +32,7 @@ foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat x
                     (relative STREQUAL "app-softpc/product/composed_machine.c" AND dependency STREQUAL "app-softpc/machine/vm_interface.h")))
                     message(FATAL_ERROR "x86 boundary: ${relative} -> ${dependency}")
                 endif()
-            elseif(owner MATCHES "^x86-(debug|ibmpc|nxvm)$")
+            elseif(owner MATCHES "^x86-(debug|ibmpc)$")
                 if(dependency MATCHES "^app-softpc/")
                     message(FATAL_ERROR "x86 boundary: ${relative} -> ${dependency}")
                 endif()
@@ -42,15 +42,15 @@ foreach(owner IN ITEMS app-softpc/product app-softpc/machine app-softpc/compat x
                     message(FATAL_ERROR "x86 boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(owner STREQUAL "app-softpc/compat")
-                if(dependency MATCHES "^(app-softpc/(product|machine)|emulator|x86-debug|x86-ibmpc|x86-nxvm)/")
+                if(dependency MATCHES "^(app-softpc/(product|machine)|emulator|x86-debug|x86-ibmpc)/")
                     message(FATAL_ERROR "x86 boundary: ${relative} -> ${dependency}")
                 endif()
             elseif(dependency MATCHES "^app-softpc/" AND
                    NOT (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^app-softpc/(softpc[.]new|compat)/"))
                 message(FATAL_ERROR "x86 boundary: ${relative} -> ${dependency}")
-            elseif((owner STREQUAL "lib" AND dependency MATCHES "^(emulator|x86-debug|x86-ibmpc|x86-nxvm)/") OR
-                   (owner STREQUAL "emulator" AND dependency MATCHES "^x86-(debug|ibmpc|nxvm)/") OR
-                   (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^(emulator|lib|x86-debug|x86-ibmpc|x86-nxvm)/"))
+            elseif((owner STREQUAL "lib" AND dependency MATCHES "^(emulator|x86-debug|x86-ibmpc)/") OR
+                   (owner STREQUAL "emulator" AND dependency MATCHES "^x86-(debug|ibmpc)/") OR
+                   (owner STREQUAL "app-softpc/softpc.new" AND dependency MATCHES "^(emulator|lib|x86-debug|x86-ibmpc)/"))
                 message(FATAL_ERROR "x86 boundary: ${relative} -> ${dependency}")
             endif()
         endforeach()

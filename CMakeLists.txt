@@ -55,12 +55,10 @@ enable_testing()
 add_subdirectory(src/emulator)
 add_subdirectory(src/x86-debug)
 add_subdirectory(src/x86-ibmpc)
-add_subdirectory(src/x86-nxvm)
 add_subdirectory(test/lib)
 add_subdirectory(test/emulator)
 add_subdirectory(test/x86-debug)
 add_subdirectory(test/x86-ibmpc)
-add_subdirectory(test/x86-nxvm)
 target_link_libraries(softpc-machine PRIVATE storage base audio)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly

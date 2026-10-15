@@ -195,10 +195,10 @@ file(GLOB_RECURSE product_emulator_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
 foreach(source IN LISTS product_emulator_consumers)
     file(STRINGS "${source}" emulator_include_lines REGEX
-        "#[ \t]*include[ \t]+[<\"](emulator|x86-debug|x86-ibmpc|x86-nxvm)/[^>\"]+[>\"]")
+        "#[ \t]*include[ \t]+[<\"](emulator|x86-debug|x86-ibmpc)/[^>\"]+[>\"]")
     foreach(include_line IN LISTS emulator_include_lines)
         string(REGEX REPLACE
-            ".*[<\"]((emulator|x86-debug|x86-ibmpc|x86-nxvm)/[^>\"]+)[>\"].*" "\\1" emulator_contract
+            ".*[<\"]((emulator|x86-debug|x86-ibmpc)/[^>\"]+)[>\"].*" "\\1" emulator_contract
             "${include_line}")
         list(FIND allowed_emulator_product_contracts "${emulator_contract}"
             emulator_contract_index)
@@ -208,7 +208,7 @@ foreach(source IN LISTS product_emulator_consumers)
         endif()
     endforeach()
     file(READ "${source}" emulator_product_source)
-    if(emulator_product_source MATCHES "(emulator|x86-debug|x86-ibmpc|x86-nxvm)/[A-Za-z0-9_/-]+\\.c")
+    if(emulator_product_source MATCHES "(emulator|x86-debug|x86-ibmpc)/[A-Za-z0-9_/-]+\\.c")
         message(FATAL_ERROR "App includes an Emulator Product implementation: ${source}")
     endif()
 endforeach()

@@ -6,13 +6,12 @@
 | [emulator](emulator/README.md) | Independently reusable neutral Emulator tests and fake machine. |
 | [x86-debug](x86-debug/) | Independent debugger and assembler tests. |
 | [x86-ibmpc](x86-ibmpc/) | Independent PC entry, command and keyboard tests. |
-| [x86-nxvm](x86-nxvm/) | Preserved NXVM speed/information contract tests. |
 | [app-softpc/unit](app-softpc/unit/) | SoftPC configuration and owner-local `machine`, `compat`, and preserved `softpc.new` unit tests. |
 | [app-softpc/integration](app-softpc/integration/) | SoftPC composed command, worker, frame, snapshot, shutdown and package flows. |
 | [../tools/checks](../tools/checks/) | Repository source, build, package and documentation boundary checks. |
 
 Root CMake registers every suite. Public CTest names begin with their actual
-owner path (`lib`, `emulator`, `x86-debug`, `x86-ibmpc`, `x86-nxvm`,
+owner path (`lib`, `emulator`, `x86-debug`, `x86-ibmpc`,
 `app-softpc`, or `checks`) and retain
 any nested test directory. For App tests the registered owner path is also the
 single source of truth for its `unit` or `integration` label. Labels identify

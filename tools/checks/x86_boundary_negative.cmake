@@ -2,7 +2,7 @@ set(x86_boundary_script "${CMAKE_CURRENT_LIST_DIR}/x86_boundary.cmake")
 set(fixture "${CMAKE_CURRENT_BINARY_DIR}/x86-boundary-fixture")
 file(REMOVE_RECURSE "${fixture}")
 file(MAKE_DIRECTORY "${fixture}/src/app-softpc/product" "${fixture}/src/app-softpc/machine" "${fixture}/src/app-softpc/compat"
-    "${fixture}/src/x86-debug" "${fixture}/src/x86-ibmpc" "${fixture}/src/x86-nxvm"
+    "${fixture}/src/x86-debug" "${fixture}/src/x86-ibmpc"
     "${fixture}/src/emulator" "${fixture}/src/lib" "${fixture}/src/app-softpc/softpc.new")
 file(WRITE "${fixture}/src/app-softpc/machine/vm_interface.h" "#include <emulator/machine/machine_interface.h>\n")
 file(WRITE "${fixture}/src/app-softpc/product/composed_machine.c" "#include <app-softpc/machine/vm_interface.h>\n")
