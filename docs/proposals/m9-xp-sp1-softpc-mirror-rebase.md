@@ -393,6 +393,31 @@ These repairs have source and fixture evidence; they are not identified as
 the cause of any earlier user-observed Windows/DOS symptom. No fresh manual
 guest installation or hardware-output claim is made.
 
+### S2 coordinator actual-change review
+
+Reviewed pushed executor e884ff9bbf64e0e5dd5a98902c07a8afc4f277ba against
+the original four repair requirements, active packet and applicable rules.
+The actual 14 changed paths contain exactly three production repairs, two
+test C files, root test registration, two package EXEs and six documentation
+paths. Production/test/build accounting matches +237/-8, net +229; the other
+text changes are governance/evidence, not hidden runtime expansion.
+
+The DMA change replaces only the duplicated reload, the BIOS change leaves
+geometry and mounting untouched, and the V7 change leaves its existing
+draw/clear/update calls intact. ROM production is unchanged. Tests exercise
+original entry points and the fixed marker/return contracts, with generated
+inputs confined to isolated build working directories. CF prototypes match
+the original cpu4gen declarations. Decrement VERIFY does not certify the
+separately recorded reverse-copy implementation. No shared package or
+user-owned configuration/media changed.
+
+The full-run and final focused exit records are zero. Both widths passed
+146/146 including native desktop cases; final rechecks pass 7/7 each.
+Initial fixture mistakes, the clock assertion failure, cache-recovery rebuilds
+and retained TODO limitations remain disclosed. This accepts the S2 delivery
+for owner verification, not S closure, whole-core qualification or permission
+to import unresolved XP payloads. T92 remains open.
+
 ## S1 Executor Verification
 
 On 2026-10-15 the final immutable-object recheck passed: the retained and

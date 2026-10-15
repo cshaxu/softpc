@@ -21,8 +21,9 @@ neither implemented nor claimed by T92.
   objective. DMA/disk/V7 red cases precede the +7/-7 production repair; a
   generated ROM protects full CS without a production change. Dual-width
   full tests pass 146/146 each, including five desktop cases per width.
-  Detailed qualification, initial failures, counts and hashes are in the
-  proposal. Delivery review and owner acceptance remain distinct from closure.
+  Executor e884ff9b is pushed; the actual-change review, qualification,
+  initial failures, counts and hashes are in the proposal. S2 awaits owner
+  acceptance; neither S2 nor T92 is automatically closed.
 - S3-S6: planned migration and final qualification, not implemented.
 
 ## Closure standard

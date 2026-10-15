@@ -12,9 +12,11 @@ Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
 new Sound Blaster capability transfers to the first unnumbered Queue candidate.
 S2 independently repairs DMA, disk BIOS and V7 and guards ROM CS; S3-S5
 migrate controller/BIOS, input/timing and video; S6 qualifies the XP baseline.
-S2 implementation and full dual-width tests are complete; delivery review is
-in progress. Each width passed 90 shared + 51 other background + 5 desktop
-tests (146/146), with both EXEs refreshed. S3-S6 remain planned.
+S2 executor delivery e884ff9b is pushed and its coordinator actual-change
+review is recorded in the proposal. Each width passed 90 shared + 51 other
+background + 5 desktop tests (146/146), with both EXEs refreshed; final
+focused/gate rechecks pass 7/7 each. S2 awaits owner acceptance, not closure.
+S3-S6 remain planned.
 Source rights must be resolved before
 copying XP payloads. S2 repairs existing code, without importing XP bodies.
 T92 remains open; sound is not a T92 exit claim.
