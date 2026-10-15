@@ -1,7 +1,8 @@
 # M9 T91 S5: Remove the unused NXVM package pair
 
-Status: verified executor delivery, pending coordinator review and owner acceptance.
+Status: coordinator-reviewed delivery, pending owner acceptance.
 T91 remains open. Qualification date: 2026-10-15.
+Executor P1: `1f0c0f53`, pushed to main.
 
 Owner request: "好。准入一个新S，删掉这俩没用的组件。"
 Admitted scope and active status are in CURRENT. Baseline: 3af19559.
@@ -86,3 +87,19 @@ already matches the current build and is not replaced for cosmetic purposes.
 Executor delivery includes all deletion/registration/documentation work and the
 updated artifact. Coordinator reviews the actual pushed commit next; S5 waits
 for owner acceptance, while T91 stays open.
+
+## Coordinator actual-change review
+
+After P1 push the same session switched roles and reviewed the committed diff,
+original deletion request, surviving-root identity, final test exits and artifact
+hashes. Exactly the ten admitted package files are deleted; no replacement or
+external-repository dependency is added. Remaining eight source/test roots and
+App sources are unchanged. The only asset difference is the disclosed x86 EXE.
+INI/media are untouched. Current-path/symbol sweep has no remaining hits;
+historical records retain the previous facts. Both negative boundary assertions
+are preserved with live App examples. All 138 background cases pass per width.
+
+The technical delivery satisfies the admitted scope. Native desktop results
+are explicitly prior S4 evidence, not freshly executed S5 tests. Documentation
+governance and whitespace validation pass. Owner S5 acceptance and T91 closure
+are not inferred from this coordinator review.

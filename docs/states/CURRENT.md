@@ -2,8 +2,8 @@
 
 ## Current Work
 
-No implementation subtask is active. T91 S5 is verified for delivery and
-coordinator review, pending owner acceptance. S4 is closed; T91 stays open.
+No implementation subtask is active. T91 S5 is delivered and coordinator-reviewed,
+pending owner acceptance. S4 is closed; T91 stays open.
 Open task awaiting owner: T91.
 
 ## M9 T91 S5 Retained Delivery Brief
@@ -53,8 +53,8 @@ S5 removes the unused NXVM source/test pair; only eight reusable roots remain.
 Both Release build graphs pass; x64/x86 each pass all 138 background tests.
 Native desktop tests are not rerun in S5; S4's 5/5 per width remains separate
 prior evidence. x64 EXE is unchanged; x86 EXE is refreshed after Ninja's cache
-recovery rebuild. Owner configuration and media remain unchanged. S5 waits
-for review and owner acceptance, not automatic closure.
+recovery rebuild. Owner configuration and media remain unchanged. Executor P1
+`1f0c0f53` is pushed and reviewed; S5 waits for owner acceptance, not automatic closure.
 S4 splits source and test ownership into x86-debug, x86-ibmpc and x86-nxvm.
 Executor P1 `8046b085` is pushed; its actual-change review is retained with S4.
 Both EXEs are refreshed. All 150 tests per architecture pass; initial migration
