@@ -7,8 +7,12 @@ T92 S1 source audit and migration recommendation is delivered for owner review.
 No core import or runtime change is authorized by this audit step.
 All 997 XP paths are accounted for; the 498 retained mirror files remain
 unchanged. See the [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
-S2-S6 are not admitted. Source rights must be resolved before copying; S5 also
-requires the missing standalone OPL/MIDI output decision. T92 remains open.
+Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
+new Sound Blaster capability transfers to the first unnumbered Queue candidate.
+S2 independently repairs DMA, disk BIOS and V7 and guards ROM CS; S3-S5
+migrate controller/BIOS, input/timing and video; S6 qualifies the XP baseline.
+S2-S6 are planned, not admitted for implementation. Source rights must be
+resolved before copying. T92 remains open; sound is not a T92 exit claim.
 Executor audit `2616deb8` is pushed; its coordinator actual-change review is
 recorded in the linked proposal. S1 awaits owner acceptance.
 
@@ -113,7 +117,7 @@ See the [S1 delivery and diff ledger](../history/M9-T90-S1-nonmirror-quality-cle
 T89 remains owner-accepted and closed.
 The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
 TODO retains only the null BOP investigation. The former XP SP1 queue head is
-now admitted as T92; no unadmitted queue candidate remains.
+now admitted as T92; the owner-approved sound follow-on is first in Queue.
 
 ## M9 T91 S3 Retained Delivery Brief
 

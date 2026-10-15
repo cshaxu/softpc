@@ -1,5 +1,13 @@
 # XP SP1 SoftPC 逐文件语义审计
 
+规划更新（2026-10-15）：本报告保留审计时的批次标签与原始统计。
+经所有者批准，原 S2/S3/S4 对应当前 T92 S3/S4/S5；原 S5 声卡义务
+转入独立队首 proposal。新增 T92 S2 单独处理 DMA、硬盘容量、V7，
+并增加 ROM CS 防回归。尤其 read_dasd 的原 /256、%256 拆分也需修复，
+不能仅拒绝 XP 的 UCHAR 转换。此为补充修复要求，尚非实施或动态验证。
+当前计划见 [核心 proposal](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+及 [声音 proposal](../../../proposals/m9-xp-sound-blaster-standalone.md)。
+
 ## T92 S1 源差异审计与迁移建议（2026-10-15）
 
 当前任务状态以 CURRENT 为准。以下是重新读取固定 Git 对象取得的新证据；

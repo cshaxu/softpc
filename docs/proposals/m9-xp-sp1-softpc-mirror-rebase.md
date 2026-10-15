@@ -124,6 +124,38 @@ starting hypotheses only.
 | Original `nt_*` host endpoints | XP NTVDM host implementations are excluded as host implementations. A self-contained selected-machine algorithm may be moved only with an explicit Compat/Machine owner and proof. |
 | PC-98, non-x86, regional host services | Exclude foreign hardware and product-host dependencies; classify regional IBM PC hardware/table improvements separately. |
 
+## Owner-approved two-task split (2026-10-15)
+
+Original owner direction: “总体来说，按照你的划分，请你整理文档、队列，
+划分为2个T和合适的各个S任务。” The supplied four-item repair brief is
+captured below as a separate planned S2. This update admits planning only,
+not production changes, source import, or automatic S1 acceptance.
+
+T92 owns existing-core XP baseline migration and its necessary corrections.
+The [XP Sound Blaster candidate](m9-xp-sound-blaster-standalone.md) owns new
+DSP/FM/MIDI capability and is first in Queue, without allocating a T number.
+T92 may close without sound only after accounting for this explicit owner-
+approved transfer; it must not claim sound support. The earlier S1 audit's
+batch identifiers are frozen evidence: old S2/S3/S4 map to new S3/S4/S5,
+old S5 moves to the sound candidate, and S6 retains final qualification.
+
+## CMOS implementation clarification
+
+Pinned XP contains BOTH base/system/cmos.c and base/system/cmosnt.c.
+XP base/system/sources.inc selects cmosnt.c; local CMakeLists.txt selects
+cmos.c. The latter retains the general SoftPC host-callback implementation;
+cmosnt.c is a substantial NT-integrated RTC implementation, not just a rename:
+it includes nt.h/windows.h/nt_eoi.h, Rtl time conversion, GetLocalTime,
+host_ica_lock/unlock, delayed IRQ delivery and the host-driven RtcTick path.
+The local cmos.c already carries media-topology and snapshot adaptations.
+
+The current build choice is proven; the original author's historical motive
+is not independently established. Keeping the existing selected owner avoids
+introducing the NT timing/interrupt implementation. The two comparison fixes
+are not merely inspiration: the same precedence defect is present in the
+selected cmos.c. S3 transfers and tests those expressions locally; it does not
+copy cmosnt.c or assert that all of its RTC differences are irrelevant.
+
 ## Proposed Serial Work
 
 ### S1 — Current XP migration ledger and source admission
@@ -135,7 +167,56 @@ destination outcome, selected-profile reachability, required local patch,
 owner, and test receiver. Record external-source admission facts before the
 first payload enters the tree. No runtime source changes occur in S1.
 
-### S2 — XP-first mechanical and controller/BIOS basis
+### S2 — Independent original-device repairs and ROM narrowing regression
+
+Re-read current source and applicable authorities before implementation.
+The owner's supplied audit is a repair requirement, not implemented or dynamic
+proof. Scope is three production files under softpc.new and owner-local tests;
+rom.c stays unchanged if the current correct semantics are confirmed.
+
+1. **DMA auto-init, base/system/at_dma.c:** keep the first count reload and
+   replace the duplicated second reload with base_address -> current_address.
+   Exercise actual DMA transfers through terminal count and a second round,
+   auto-init disabled, increment/decrement and both controller widths where
+   reachable. Do not import SB position hooks or audio/NTVDM wiring.
+2. **INT 13h AH=15h, base/disks/diskbios.c read_dasd:** trace BIOS/BOP returns
+   and capacity computation first, then split sector count into high/low
+   16-bit CX:DX, not current /256 and %256. OpenNT is already wrong; rejecting
+   XP's UCHAR cast alone is insufficient. Tests enter the actual command path,
+   independently calculate expected registers, AH/CF, distinguish 8/16-bit
+   splitting, cross 65,536 sectors, and cover absent drives. Geometry, mode
+   and mounting policy are unchanged.
+3. **V7 register 0xA5, base/video/v7_ports.c:** parenthesize both 0x80 masks
+   in the enable transition comparison, retaining existing draw/clear and
+   host_start_update/host_end_update. Port-write tests cover off->on, on->off,
+   unchanged enable bit and other attribute changes without a false transition.
+4. **ROM CS, base/system/rom.c do_search_for_roms:** preserve current
+   setCS((addr & 0xf0000) >> 4); do not import XP's UCHAR narrowing or edit
+   production merely for symmetry. A test-generated minimal valid ROM must
+   prove full 16-bit initialization CS, without external firmware or assets.
+   Record the retained expression as a necessary XP-local correction.
+
+Provisional production estimate: approximately +5/-5 lines (net zero), three
+mirror files; confirm exact statement layout before admission. Test estimate:
++150–300/-0 lines across about 2–4 owner-local fixtures/registration paths,
+net +150–300, subject to existing harness reuse. Do not expand a test framework
+to meet this estimate. Before coding provide a file-by-file brief; afterwards
+report actual production/test additions, deletions, net and OpenNT/XP divergence.
+
+Use one existing path; no fallback, special case, duplicated device logic,
+unrelated formatting, condition reordering or EOL changes. No Lib/Emulator/
+public X86 changes without approval, no user INI/media/snapshot edits.
+Sweep newly narrowed conversions; report other findings for admission rather
+than silently expanding S2. Distinguish source proof, tests and real guest
+reproduction; do not attribute prior user symptoms to these defects without
+evidence. S3/S4/S5 must preserve these repairs when applying XP bodies.
+
+Deliver dual-width background builds, refreshed assets/binary EXEs, targeted
+tests and required full shared/App unit/integration regression. Arrange native
+desktop tests under execution rules without Computer Use. Commit/push the
+complete P, actual-change review and evidence; await owner acceptance.
+
+### S3 — XP-first mechanical and controller/BIOS basis
 
 Adopt the approved XP basis for low-risk representation, CMOS, printer,
 GFI/FDC, disk/floppy and BIOS candidates. Prefer whole XP files plus explicit
@@ -159,7 +240,7 @@ A20 restoration and flags. Do not mistake the current matching word-pointer
 ABI for an already demonstrated stack overwrite, or import the separate NT
 virtual-memory path as its fix.
 
-### S3 — XP-first input, reset, IRQ, ROM and timing basis
+### S4 — XP-first input, reset, IRQ, ROM and timing basis
 
 Perform the nontrivial three-way migrations for reset, keyboard/mouse, PIC,
 ROM and timer by subsystem. Preserve required standalone topology in explicit
@@ -173,109 +254,12 @@ and repair XP's omitted set-3 reverse[0x5d]=14 entry in the existing table.
 Test per-key type commands and reset as well as make/break; do not silently
 import a new key that cannot receive its own attributes.
 
-### S4 — XP-first C-VID and video basis
+### S5 — XP-first C-VID and video basis
 
 Migrate selected VGA/EGA/CGA/V7 source and declarations to the XP basis,
 excluding product presentation routes while retaining the standalone copied
 frame/surface path through the appropriate local owner. Verify CGA, EGA, VGA
 and V7 mode, cursor, port and frame behavior on both host widths.
-
-### S5 — XP AT ISA Sound Blaster source and standalone attachment
-
-S1 has established that XP's FM path depends on a native FM device and
-NtVdmControl, not a software OPL-to-PCM generator. The final S5 design must
-explicitly account for that missing standalone capability rather than promise
-a complete sound card through file copying alone. AT DMA already calls the XP
-sound position hook in its normal path; migrate those changes with their
-device/host owner, not as an independent low-risk representation change.
-
-Evaluate XP-only Sound Blaster paths as an IBM PC/AT capability batch, not as
-PC-98 work and not as an unrelated greenfield device. Bring accepted
-XP-derived device-model files into the XP mirror, while explicitly excluding
-VDD/`NtVdmControl`, NTVDM DMA/port hooks and other product-host material.
-Attach the resulting device through repository-owned standalone boundaries for
-ISA port decode, DMA, IRQ, DSP, FM/AdLib, mixer and audio output. The device
-model remains XP-derived; only its host attachment is standalone-owned.
-Account explicitly for the SbTerminate and SbCloseDevices obligations found
-in XP's unselected terminat.c and nt_reset.c, plus initialization after reset
-in nt_msscs.c and closure before host blocking in nt_event.c: attach these
-obligations to the existing machine lifecycle, distinguishing device state
-from host resource lifetime. Attach device teardown and host
-resource closure to the existing lifecycle, without importing a second NTVDM
-main/reset/worker path. Verify reset, stop, destruction and snapshot alongside
-first playback; port registration alone is not complete sound-card adoption.
-
-The MIDI/mixer audit adds explicit prerequisites: UART-output-only MPU scope,
-a real MIDI output/synthesis destination separate from PCM Audio, full-message
-tail delivery, native-width host pointers, bounded buffer ownership, zero-volume
-correctness and independent master/channel gain. Do not preserve XP's 5-second
-INQUEUE polling loop or reuse its global host-volume controls as device mixing.
-The linked audit records the concrete source defects. S5 requires a bounded
-device/host design before implementation; importing seven files alone cannot
-satisfy the IBM PC sound capability requirement.
-
-#### Concrete standalone design and admission boundary
-
-Keep one guest-visible device owner in the XP-derived files. Port dispatch,
-DSP command parsing, DMA transfer count/address, IRQ assertion/acknowledgement,
-MPU parser and mixer registers are executor-owned. Do not put a second copy of
-those fields or a command interpreter in Compat. Replace only NT host seams:
-NtVdmControl/VDD registration, WinMM handles/buffers, native volume, worker
-completion and wall-clock reads. Preserve original source paths and mark each
-host seam in the XP divergence ledger; no whole-file standalone-only fork.
-
-Use existing device timing delivery and quick-event infrastructure, not host
-playback position as a second guest DMA clock. Audio callbacks cannot read or
-advance guest RAM/DMA/IRQ. PCM delivery carries copied samples outwards; a
-host completion only reports sink capacity/failure, never raises a guest IRQ.
-S5 must prove this timing contract with DMA count/IRQ observations, including
-host output stalled, pause/resume and restore. Actual chunk size and pacing
-must be selected by that proof, not a new fixed Sleep or nominal CPU frequency.
-
-The existing Lib stream accepts copied interleaved i16 PCM, up to 512 frames
-per enqueue, at 22050/44100/48000 Hz, with authoritative accepted-frame count.
-Unsigned DSP samples, ADPCM state, device sample rate and master/channel gains
-are device semantics; conversion/mixing occurs before this boundary. The
-private output adapter handles partial enqueue, wait cancellation and explicit
-tail flush. Do not reinterpret queue acceptance as audible completion or use
-Lib readiness as the guest clock. Do not change the accepted PC-speaker onset
-handoff merely to attach a second source; any shared output refactoring needs
-first/second playback and concurrent-speaker regression.
-
-Machine initialization/reset/stop/destruction invoke the same device entry and
-host-resource lifecycle. Snapshot captures fixed-width device/parser/sample
-phase and pending-event state at the existing executor safe point; pointer,
-WinMM handle, native queue and already-heard samples are not archive data.
-Restore reconstructs host output and cancels stale-generation PCM. Existing
-snapshot safe-point, single executor and cross-width format remain authorities.
-No version compatibility is implied for a format extended with a new device.
-
-Known file boundary: seven XP candidate files (6,097 reference lines), existing
-at_dma.c/ios.h port integration, Compat audio/host seams, Machine lifecycle,
-device snapshot records/codec and owner-local tests. Lib/Emulator/X86 product
-APIs do not need SB-specific fields. A neutral MIDI host backend, if selected,
-is a separate public-capability decision, not permission to put WinMM calls in
-guest protocol code. A software OPL engine likewise needs its own reviewed
-origin or implementation design; XP's native FM route supplies neither.
-
-**S1's executable verdict is that S5 is not yet source-import-ready.** Before
-admitting its implementation, the owner must select and admit the OPL/MIDI
-output solution and resolve source rights. S2-S4 can be reviewed independently
-after their source-admission gate. This is not deletion or deferral of sound
-from T92: S5 stays required for the full capability objective, and T92 cannot
-claim complete sound or close that obligation after a DSP-only demonstration.
-No defensible final source-line estimate for a missing synthesis backend is
-available from this XP tree. Report the known seven-file reference size and
-the precise interface list above; do not invent a small implementation budget.
-
-The S5 proof must include reset ACK/version, single and auto-init DMA, count
-readback and IRQ acknowledgement, unsigned PCM/implemented ADPCM samples,
-zero/master/channel gain and register readback, a one-message MIDI stream and
-SysEx/realtime boundaries, FM timer/register and actual PCM output, first and
-repeated playback, stop/cancel/teardown, and cross-width restore of an active
-transfer. Unsupported XP operations remain explicitly unsupported; no SB16 or
-recording claim is made. These tests observe ports/state/PCM, not just UI text
-or a human hearing one tone.
 
 ### S6 — XP baseline gate and OpenNT lineage freeze
 
@@ -287,10 +271,10 @@ audit; it cannot silently redefine the mirror.
 ## S1 File-Scope And Diff Accounting Checkpoint
 
 The current audit now assigns all 86 XP-changed retained paths to batches:
-S2 owns 37, S3 owns 18, S4 owns 31. The report's path table is the precise file
+S3 owns 37, S4 owns 18, S5 owns 31 (the audit's original S2/S3/S4 labels). The report's path table is the precise file
 list, not a request to rewrite every listed file. The 74 local-only paths have
 unchanged XP/OpenNT bases: preserve their accepted patches in place, with the
-explicit exception of S2's two CMOS comparison corrections. The 338 identical
+explicit exception of S3's two CMOS comparison corrections. The 338 identical
 paths need no content edit. S6 changes reference accounting, not those bodies.
 The linked 499-path unretained ledger accounts for every remaining XP path;
 only the seven Sound Blaster files are new device-model import candidates.
@@ -300,9 +284,9 @@ that exact 86-path table, are:
 
 | Batch | Changed retained paths | Added | Removed | Net |
 | --- | ---: | ---: | ---: | ---: |
-| S2 | 37 | 8,838 | 1,712 | +7,126 |
-| S3 | 18 | 8,475 | 5,890 | +2,585 |
-| S4 | 31 | 12,945 | 3,748 | +9,197 |
+| S3 | 37 | 8,838 | 1,712 | +7,126 |
+| S4 | 18 | 8,475 | 5,890 | +2,585 |
+| S5 | 31 | 12,945 | 3,748 | +9,197 |
 
 These are reference-diff measurements, not final implementation estimates:
 they include guarded PC-98/regional/NT host text, and do not preserve local
@@ -314,8 +298,8 @@ actual additions/deletions/net against both the preceding local commit and XP.
 Do not present the 6,097-line SB source volume as an estimate of working audio.
 
 The precise known extra corrections beyond an XP body are intentionally small:
-S2 rejects the disk CX truncation, synchronizes one descriptor-helper declaration
-and two Compat lines, and transfers two CMOS comparisons; S3 rejects ROM CS and
+S2 corrects the disk CX:DX split; S3 preserves that correction instead of XP narrowing, synchronizes one descriptor-helper declaration
+and two Compat lines, and transfers two CMOS comparisons; S4 rejects ROM CS and
 mouse BX truncation, preserves the keycode bounds correction and fills one set-3
 reverse-table slot. These are in addition to retaining existing local patches,
 not replacements for them. Sound-card attachment remains the larger independent
@@ -356,7 +340,7 @@ payloads. Their union and frozen-object identities were rechecked, and the
 86 changed retained paths match the semantic table exactly.
 
 The review accepts this as a source-audit delivery, not permission to import
-the XP tree verbatim. IBM PC sound remains required and explicitly not ready
+the XP tree verbatim. At the time of this review IBM PC sound remained required within T92 and explicitly not ready
 for implementation until the missing output solution and rights decisions;
 CD-ROM declarations are not misreported as an implementation. The local CPU,
 C-VID, input, media, frame and snapshot safeguards are retained in the plan.
