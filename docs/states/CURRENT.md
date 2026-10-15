@@ -15,8 +15,10 @@ migrate controller/BIOS, input/timing and video; S6 qualifies the XP baseline.
 S2 executor delivery e884ff9b is pushed and its coordinator actual-change
 review is recorded in the proposal. Each width passed 90 shared + 51 other
 background + 5 desktop tests (146/146), with both EXEs refreshed; final
-focused/gate rechecks pass 7/7 each. S2 awaits owner acceptance, not closure.
-S3-S6 remain planned.
+focused/gate rechecks pass 7/7 each. On 2026-10-15 the owner authorizes async
+acceptance and automatic serial admission through S6, waiting only before
+T92 closure. S2 is implementation-closed on that delegated basis, not marked
+as manually tested by the owner. S3 is admitted; S4-S6 remain serial successors.
 Source rights must be resolved before
 copying XP payloads. S2 repairs existing code, without importing XP bodies.
 T92 remains open; sound is not a T92 exit claim.
@@ -24,7 +26,28 @@ Executor audit `2616deb8` is pushed; its coordinator actual-change review is
 recorded in the linked proposal. Proceeding to S2 does not claim runtime
 qualification of the source audit or close T92.
 
-## M9 T92 S2 Packet
+## M9 T92 S3 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner authorizes automatic admission and execution of subsequent S tasks with async acceptance, waiting only before T closure, on 2026-10-15. |
+| Objective | Migrate the 37 S3-assigned XP-changed retained paths and selected CMOS corrections to the XP-first mechanical/controller/BIOS basis, preserving necessary local patches. |
+| Non-goals | No sound, S4/S5 subsystem migration, shared-package change, user INI/media edit, new device owner or unresolved external-source copy. |
+| Reference Baseline | cc8509f1 with S2 implementation e884ff9b; fixed XP and OpenNT revisions in the proposal. |
+| Candidate Proposal | [S3 migration scope](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s3--xp-first-mechanical-and-controllerbios-basis). |
+| Files And ABI Surface | Exact 37-path S1 ledger assignment; selected cmos.c comparison fixes; tape_io descriptor-limit declaration and its existing Compat helper must agree. No public ABI expansion. |
+| Applicable Rules | Task Reading Set, execution/documentation/architecture/coding governance, source-research policy and minimal explicit mirror patches. |
+| Verification | Source/provenance admission before copying; per-file three-way ledger; descriptor/CMOS/media focused regressions; dual Release builds, shared then other background tests, separately reserved native desktop cases. |
+| Expected Markers | Every selected file has a justified XP/local disposition; S2 fixes survive; full-width descriptor limits, CMOS byte checks and existing media/snapshot contracts pass. |
+| Asset Needs | Existing Ninja intermediates and disposable generated fixtures in ignored build/t92/s3; hidden jobs with 30-minute build/20-minute suite budgets and 30 MiB log cap; executor owns cleanup. |
+| Reporting Requirements | Pre-change file/hunk estimates before payload edits; actual added/deleted/net code and mirror differences; dual artifacts, test outcomes, pushed P and separate actual-change review. |
+| Stop Conditions | Unresolved source notice/license/admission terms currently prevent XP payload copy; also stop for new device paths, public ABI expansion or unapproved guest semantics. |
+| Exit Criteria | Verified and pushed implementation plus coordinator review permit automatic S4 admission under owner delegation; owner async feedback remains actionable; only T closure waits for acceptance. |
+| Original Owner Request | 我可以async验收，请你继续自动准入下一个和后续的各个S，只在T任务收口前等我。 |
+| Similar-Issue Sweep | Width conversions and descriptor pointer/value pairs, CMOS masked-byte comparisons, selected controller/BIOS paths and preserved S2 fixes; report out-of-scope findings without silent expansion. |
+
+## M9 T92 S2 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |

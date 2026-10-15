@@ -27,6 +27,16 @@ proof that useful IBM PC semantics should be excluded.
 
 ## Objective
 
+### Owner execution update (2026-10-15)
+
+Original direction: “我可以async验收，请你继续自动准入下一个和后续的各个S，
+只在T任务收口前等我。” Subsequent S tasks no longer wait for individual manual
+acceptance: complete implementation, required verification, pushed P and
+coordinator actual-change review, then admit the next serial S. S2 meets that
+technical handoff standard; no owner manual-pass result is invented. T92
+closure still requires the owner. This changes the acceptance cadence, not
+the external-source admission policy or the separate sound-task scope.
+
 Upgrade the repository-owned selected SoftPC mirror from its OpenNT/NT4
 baseline to the frozen XP SP1 SoftPC baseline:
 
