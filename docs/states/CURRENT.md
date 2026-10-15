@@ -3,8 +3,12 @@
 ## Current Work
 
 T91 and S5 are owner-accepted and closed on 2026-10-15.
-T92 S1 is admitted: XP SP1 SoftPC source audit and migration design only.
-No core import or runtime change is authorized by this first audit step.
+T92 S1 source audit and migration recommendation is delivered for owner review.
+No core import or runtime change is authorized by this audit step.
+All 997 XP paths are accounted for; the 498 retained mirror files remain
+unchanged. See the [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
+S2-S6 are not admitted. Source rights must be resolved before copying; S5 also
+requires the missing standalone OPL/MIDI output decision. T92 remains open.
 
 ## M9 T92 S1 Packet
 
