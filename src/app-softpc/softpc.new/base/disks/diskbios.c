@@ -1045,8 +1045,8 @@ LOCAL void read_dasd IFN0()
 
 	/* set the number of blocks */
 	blocks = (dpb[com.drive].cyls - 1) * dpb[com.drive].heads * dpb[com.drive].sectors;
-	setCX (blocks / 256);
-	setDX (blocks % 256);
+	setCX (blocks / 65536);
+	setDX (blocks % 65536);
 
 	/* fixed disk exists */
 	setAH (3);

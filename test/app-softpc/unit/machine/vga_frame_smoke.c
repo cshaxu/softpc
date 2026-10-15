@@ -43,6 +43,7 @@ typedef struct {
 
 /* Direct original-renderer probes use the existing detached DIB, not a UI. */
 extern unsigned char *EGA_planes;
+extern void outb(io_addr port, half_word value);
 extern void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
@@ -97,7 +98,7 @@ static void verify_pointer_update_pixels(void)
     const unsigned char *pixels;
     unsigned long width, height;
     unsigned char saved_pattern[256];
-    const sys_addr pattern = 0;
+    const sys_addr pattern = 0x30000;
     const unsigned long stride = 64u;
     long left, top, right, bottom;
     PALETTEENTRY palette = { 0 };
@@ -162,6 +163,30 @@ static void verify_pointer_update_pixels(void)
     }
     (*clear_v7ptr)((word)4, (word)5);
     assert(pixels[5u * stride + 4u] == 0x62u);
+    /* Enable transitions must reach the existing painter through port A5,
+       not only via the direct callback tests above. Position zero avoids
+       changing the mode-specific horizontal coordinate interpretation. */
+    outb(0x3c4, 6); outb(0x3c5, 0xea);
+    outb(0x3c4, 0xa5); outb(0x3c5, 0);
+    extensions_controller.interface_control.as_bfld.pointer_bank_select = 0;
+    outb(0x3c4, 0x94); outb(0x3c5, 0);
+    outb(0x3c4, 0x9c); outb(0x3c5, 0);
+    outb(0x3c4, 0x9d); outb(0x3c5, 0);
+    outb(0x3c4, 0x9e); outb(0x3c5, 0);
+    outb(0x3c4, 0x9f); outb(0x3c5, 0);
+    (void)softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom);
+    outb(0x3c4, 0xa5); outb(0x3c5, 0x80);
+    assert(pixels[0] == 0xff);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    outb(0x3c5, 0x80);
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    outb(0x3c5, 0x81);
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    outb(0x3c5, 1);
+    assert(pixels[0] == 0x62);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    outb(0x3c5, 0);
+    assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     lib_memory_copy(EGA_planes + pattern, saved_pattern, sizeof(saved_pattern));
 }
 

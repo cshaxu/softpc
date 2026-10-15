@@ -3,20 +3,47 @@
 ## Current Work
 
 T91 and S5 are owner-accepted and closed on 2026-10-15.
-T92 S1 source audit and migration recommendation is delivered for owner review.
-No core import or runtime change is authorized by this audit step.
-All 997 XP paths are accounted for; the 498 retained mirror files remain
-unchanged. See the [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
+T92 S1 source audit is the reviewed planning baseline. The owner's subsequent
+implementation goal admits S2's bounded original-device repair work.
+All 997 XP paths are accounted for. S2 now changes three of the 498 retained
+mirror files by +7/-7; no XP body has been imported. See the
+[T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
 new Sound Blaster capability transfers to the first unnumbered Queue candidate.
 S2 independently repairs DMA, disk BIOS and V7 and guards ROM CS; S3-S5
 migrate controller/BIOS, input/timing and video; S6 qualifies the XP baseline.
-S2-S6 are planned, not admitted for implementation. Source rights must be
-resolved before copying. T92 remains open; sound is not a T92 exit claim.
+S2 implementation and full dual-width tests are complete; delivery review is
+in progress. Each width passed 90 shared + 51 other background + 5 desktop
+tests (146/146), with both EXEs refreshed. S3-S6 remain planned.
+Source rights must be resolved before
+copying XP payloads. S2 repairs existing code, without importing XP bodies.
+T92 remains open; sound is not a T92 exit claim.
 Executor audit `2616deb8` is pushed; its coordinator actual-change review is
-recorded in the linked proposal. S1 awaits owner acceptance.
+recorded in the linked proposal. Proceeding to S2 does not claim runtime
+qualification of the source audit or close T92.
 
-## M9 T92 S1 Packet
+## M9 T92 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner directs implementation of the existing-core XP migration goal after approving the two-task plan and supplying the independent repair brief. |
+| Objective | Correct DMA auto-init address reload, INT 13h AH=15h sector-count splitting and V7 cursor enable comparison; protect correct ROM CS from later XP narrowing. |
+| Non-goals | No bulk XP payload import, sound wiring, shared-package changes, new device path, user INI/media/snapshot edit or unrelated mirror formatting. |
+| Reference Baseline | f55428f8; retained XP/OpenNT pins and audit ledgers in the proposal. |
+| Candidate Proposal | [S2 repair brief](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s2--independent-original-device-repairs-and-rom-narrowing-regression). |
+| Files And ABI Surface | Three original files at_dma.c, diskbios.c, v7_ports.c; ROM production unchanged; App owner-local device tests and root build registration. No public ABI change. |
+| Applicable Rules | Full Task Reading Set; execution/documentation/architecture/coding governance, source-research policy, single executor and minimal mirror diff. |
+| Verification | Red/green tests through actual DMA, BIOS command, V7 port and ROM initialization paths; both Release builds and refreshed EXEs; shared suites then all other unit/integration tests; reserved native desktop tests separately. |
+| Expected Markers | Second DMA round starts at base address; 16-bit CX:DX/AH/CF correct; cursor transitions invoke existing drawing/clear path; ROM initialization observes full CS. |
+| Asset Needs | Disposable generated media/ROM only beneath build/t92/s2; existing Ninja graphs reused. Long jobs hidden with log/exit files, 30-minute build and 20-minute suite budgets, 30 MiB log cap; executor owns cleanup. |
+| Reporting Requirements | Before/after production/test file counts, added/deleted/net lines, OpenNT and XP mirror delta, red/green evidence, regression results, EXE hashes and links. |
+| Stop Conditions | Need for another device path, shared ABI change, unadmitted source payload, unsupported hardware assumption or unexplained regression. Desktop work waits for reservation. |
+| Exit Criteria | Complete repair and required qualification, executor P commit/push, coordinator actual-change review, then owner acceptance; T stays open. |
+| Original Owner Request | 按照治理规范和执行规范，单人双角色模式，实现现有softpc核心迁移到winxp源码的基线上。 Supplement: independent DMA/disk/V7 repairs and ROM-CS regression from the owner brief. |
+| Similar-Issue Sweep | Narrowed register setters and equivalent DMA reload/enable comparisons in selected original device paths; report other findings without expanding S2. |
+
+## M9 T92 S1 Retained Audit Brief
 
 | Field | Required record |
 | --- | --- |

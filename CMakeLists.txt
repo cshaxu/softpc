@@ -450,6 +450,18 @@ target_include_directories(softpc-bop-smoke PRIVATE
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/bop_smoke" COMMAND softpc-bop-smoke)
+add_executable(softpc-device-contract-smoke
+    test/app-softpc/unit/machine/device_contract_smoke.c)
+target_link_libraries(softpc-device-contract-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-device-contract-smoke PRIVATE
+    src/app-softpc/softpc.new/host/inc
+    src/app-softpc/softpc.new/base/inc)
+add_test(NAME "app-softpc/unit/machine/device_contract_dma"
+    COMMAND softpc-device-contract-smoke dma)
+add_test(NAME "app-softpc/unit/machine/device_contract_disk"
+    COMMAND softpc-device-contract-smoke disk)
+add_test(NAME "app-softpc/unit/machine/device_contract_rom"
+    COMMAND softpc-device-contract-smoke rom)
 add_executable(softpc-quick-time-smoke test/app-softpc/unit/machine/quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-quick-time-smoke PRIVATE
@@ -585,6 +597,7 @@ set(SOFTPC_TEST_TARGETS
     softpc-vga-frame-smoke
     softpc-text-console-compat-smoke
     softpc-bop-smoke
+    softpc-device-contract-smoke
     softpc-quick-time-smoke
     softpc-lifecycle-smoke
     softpc-checkpoint-smoke

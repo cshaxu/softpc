@@ -1,5 +1,20 @@
 # MVDM / OpenNT 当前差异账本
 
+### T92 S2 原始设备最小修复
+
+相对 f55428f8，at_dma.c +4/-4、diskbios.c +2/-2、v7_ports.c +1/-1，
+合计 +7/-7、净零行；镜像增删差异增加 14 行。分别恢复 DMA 自动重装地址、
+正确拆分 CX:DX 16 位扇区数、明确 V7 启用位比较优先级。
+rom.c 不改；新增生成 ROM 的完整 CS 防回归测试。
+
+这三个文件相对固定 OpenNT 基线的总差异分别为 +84/-4、+2/-2、+2/-2，
+合计 +88/-8，包含已有快照及视频修复。相对固定 XP 基线为
++835/-877、+23/-689、+36/-48，合计 +894/-1614；这些是升级前的
+整文件差异，不能理解为本次引入量或已完成 XP 迁移。
+计数使用同相对路径的 git diff --no-index --numstat；XP 三文件对象哈希
+已与 a2f6d7c93 固定对象核对一致。源码、测试及最终资格见
+[T92 proposal](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s2-implementation-and-qualification-2026-10-15)。
+
 ### T88 S2 V7 扫描解释最小修复
 
 相对 S1 的生产基线，`host/src/nt_graph.c` +1/-1、

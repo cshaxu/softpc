@@ -2,9 +2,10 @@
 
 ## Admission checkpoint (2026-10-15)
 
-Owner admits T92 after accepting and closing T91. Only S1, the source audit
-and migration design, is active; CURRENT owns its executable packet. The
-following import batches remain planned, not silently executed by admission.
+Owner admits T92 after accepting and closing T91. S1 supplies the source audit
+and migration design; the subsequent owner implementation objective activates
+S2's independent original-device repairs. CURRENT owns its executable packet.
+The following XP import batches remain planned, not silently executed by admission.
 The current accepted baseline is `087e512f`, with 498 retained mirror paths.
 
 Both reference HEADs match the pinned revisions below. However, the XP local
@@ -312,6 +313,85 @@ retained/unretained ledgers. The final decision is to proceed by subsystem,
 preserve local fixes, carry explicit XP bug corrections, and stop before any
 source copy lacking admission or any sound implementation lacking the above
 backend decision. Audit completion does not waive either stop condition.
+
+## S2 implementation and qualification (2026-10-15)
+
+The three production repairs use the existing device paths, +7/-7 net zero:
+four DMA address-reload lines, two BIOS capacity-split lines and one V7 enable
+comparison. ROM production remains unchanged. No shared package, snapshot
+format, configuration, media or new device implementation is changed.
+
+The owner-local fixture programs real DMA ports and calls dma_request on both
+controllers, with two-round auto-init and non-auto terminal-count checks.
+Disk cases dispatch through BIOS[BIOS_DISK_IO], using guest-owned geometry
+tables and independent expected CX:DX values, plus absent-drive AH/CF checks.
+The V7 fixture writes the actual A5 port and checks drawing, clearing, repeated
+enable and unrelated-bit changes. A generated checksummed option ROM records
+CS through the real initialization/return path; host firmware installation
+does not pretend that guest bus writes can modify read-only ROM.
+
+The x64 old-code DMA, disk and V7 cases fail their intended assertions; all
+four focused tests pass after repair. Initial fixture compile, assertions,
+media setup and ROM-installation mistakes were corrected and are not described
+as production defects. Full dual-width qualification subsequently passed.
+The first x64 run passed all 90 shared tests and 49/51 remaining tests. It
+exposed a forbidden string.h/direct-memory use in the new fixture (corrected
+to existing Lib Types functions) and the old machine_smoke low-byte clock
+assertion. Neither failure is silently treated as a pass.
+
+Final full-run result: each width passes 90 shared background tests, 51 other
+background unit/integration/gate tests and five reserved native desktop tests,
+146/146 per width. x64 phase wall times are 46.70s / 72.55s / 13.77s;
+x86 is 48.31s / 69.26s / 13.22s. This includes snapshot and package integration.
+Desktop cases are package_smoke, compact_console, kvm_window_retirement,
+kvm_window_modal and console_broker_display. No Computer Use was used.
+The clock test passed unchanged in the final full runs; its fragile oracle
+remains explicit deferred test debt, not a claim that retries fixed it.
+
+Source review also found a separate decrement-copy concern in at_dma.c;
+its disposition is in TODO. S2 uses actual decrement VERIFY transfers for
+address/count reload and increment READ for data movement on both controllers;
+it does not claim reverse data-copy correctness. The production estimate is
+corrected to +7/-7 before any explanatory comments (four DMA, two disk, one V7
+line replacements), rather than the earlier approximate +5/-5.
+
+Changed-path accounting against f55428f8: production three C files +7/-7,
+net zero; two test C files +217/-1, net +216; root CMake registration +13/-0.
+Total production/test/build +237/-8, net +229. The new fixture is 191 lines;
+no generated firmware or external disk is committed. The OpenNT/XP whole-file
+counts (including prior local fixes) are in the pristine-divergence ledger.
+
+The finite similar-issue sweep covers the single auto_init terminal-count
+branch in at_dma.c, masked hexadecimal equality expressions in base/system
+and base/video, and UCHAR casts on setCS/setCX/setBX in base. Commands use
+`rg` for these patterns and read the complete matched branches. The repaired
+reload retains both count bytes and both address bytes; the masked comparison
+pattern has no remaining matches; the register-cast pattern has no local
+matches. The known CMOS comparisons remain assigned to S3, and XP-only ROM
+CS/mouse BX truncation remains an explicit S4 rejection. DMA reverse-copy
+and the pre-existing clock-test oracle are recorded in TODO, not silently
+fixed here. These bounded checks are not a whole-core correctness claim.
+
+The x86 Ninja graph reported recovery from a prematurely ended cache log and
+rebuilt 584 edges; no cache deletion or manual duplicate build was requested.
+The final targeted x86 build reported the same cache recovery and rebuilt
+304 edges. This is an execution-cost issue, not a source change or failed test.
+The x64 graph reused its existing intermediates. Both package EXEs were
+refreshed; final targeted rechecks cover the fixture's exact CPU CF prototypes
+and absent-drive register assertions after the full build.
+Both final targeted runs pass 7/7 (four device cases and three static gates),
+x64 6.40s and x86 8.74s. Full-suite evidence is retained separately from these
+post-review focused results. Documentation governance and staged whitespace
+checks pass. Final shared source/test roots and user INI/media have no diff.
+
+SHA-256 of the refreshed package:
+
+- softpc32.exe: `3bb7a8dfa2e0f1247178c7df108b5e0861c99d17831661f3723101258507ce61`
+- softpc64.exe: `3601a64e0855bf324565d9fa9933b85471c523a99409611d2452faf89b456ef6`
+
+These repairs have source and fixture evidence; they are not identified as
+the cause of any earlier user-observed Windows/DOS symptom. No fresh manual
+guest installation or hardware-output claim is made.
 
 ## S1 Executor Verification
 

@@ -9,7 +9,7 @@ allocates a numeric task identifier.
    implementation; assign a T number only upon admission after core migration.
 
 The XP SP1 SoftPC mirror baseline upgrade was owner-admitted as T92 on
-2026-10-15. Its active S1 audit is governed by [CURRENT](CURRENT.md), not this queue.
+2026-10-15. Its active packet is governed by [CURRENT](CURRENT.md), not this queue.
 
 Previously admitted:
 [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md).

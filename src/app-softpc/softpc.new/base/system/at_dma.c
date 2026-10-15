@@ -692,10 +692,10 @@ GLOBAL	int	dma_request	IFN3(half_word, channel, char *, hw_buffer,
 				dcp->current_count[chan][1] =
 					dcp->base_count[chan][1];
 
-				dcp->current_count[chan][0] =
-					dcp->base_count[chan][0];
-				dcp->current_count[chan][1] =
-					dcp->base_count[chan][1];
+				dcp->current_address[chan][0] =
+					dcp->base_address[chan][0];
+				dcp->current_address[chan][1] =
+					dcp->base_address[chan][1];
 			}
 			else
 			{
