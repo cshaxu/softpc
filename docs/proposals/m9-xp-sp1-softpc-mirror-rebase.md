@@ -552,6 +552,21 @@ virtual-memory path as its fix.
 
 ### S4 — XP-first input, reset, IRQ, ROM and timing basis
 
+S4 is automatically admitted after S3 P2 actual-change review under the owner's
+serial async authority. Its frozen candidate universe is 18 relative paths:
+base/bios/reset.c; base/ccpu386/fpu.c; base/inc/{ica.h,mouse.h,sas.h};
+base/keymouse/{keyba.c,keybd_io.c,mouse.c,mouse_io.c,ppi.c};
+base/system/{ica.c,idetect.c,rom.c,timer.c,timestrb.c,unexp_nt.c};
+host/src/{nt_keycd.c,nt_sound.c}. A candidate is an audit obligation, not
+permission to import its entire XP file. Initial audit changes no production
+or test code (+0/-0). Before payload edits, give per-path disposition and
+quantified source/test estimates based on the actual selected hunks.
+Preserve the accepted InPort Win1/Win3 behavior, IRQ/event-wait/snapshot hooks,
+zero-delay protection and current ROM CS width. Exclude XP's UCHAR truncation
+of ROM CS and mouse BX, foreign-machine and product-host routes. nt_sound.c
+does not authorize Sound Blaster integration. Use positional three-way review,
+not substring matching, following the S3 merge-defect lesson.
+
 Perform the nontrivial three-way migrations for reset, keyboard/mouse, PIC,
 ROM and timer by subsystem. Preserve required standalone topology in explicit
 local patches. `nt_keycd.c` and `keyba.c` include Pause/NumLock/Ctrl-Alt-Del and

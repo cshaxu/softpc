@@ -18,8 +18,10 @@ registered tests per width, including five native desktop cases; both EXEs are
 refreshed. Executor P1 89b67c44 is pushed. Coordinator actual-change review finds
 two leftover imported A20 declarations in tape_io.c. They are removed; renewed
 dual builds and 148/148 tests per width pass, including all ten desktop cases.
-The corrective P awaits delivery and actual-change review before closure or
-S4 admission. See the
+Corrective P2 3cf6906a is pushed and coordinator actual-change review passes.
+S3 is implementation-closed under the owner's async delegation; S4 is now
+admitted for source audit and bounded input/timing migration. This is not an
+invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
 new Sound Blaster capability transfers to the first unnumbered Queue candidate.
@@ -31,7 +33,8 @@ background + 5 desktop tests (146/146), with both EXEs refreshed; final
 focused/gate rechecks pass 7/7 each. On 2026-10-15 the owner authorizes async
 acceptance and automatic serial admission through S6, waiting only before
 T92 closure. S2 is implementation-closed on that delegated basis, not marked
-as manually tested by the owner. S3 is admitted; S4-S6 remain serial successors.
+as manually tested by the owner. S3 is closed; S4 is active and S5-S6 remain
+serial successors.
 Owner explicitly approves XP source import on 2026-10-15. The pinned source,
 original notices and local-patch ledger govern S3; no third-party license or
 redistribution grant is inferred. S2 repaired existing code without XP bodies.
@@ -40,26 +43,26 @@ Executor audit `2616deb8` is pushed; its coordinator actual-change review is
 recorded in the linked proposal. Proceeding to S2 does not claim runtime
 qualification of the source audit or close T92.
 
-## M9 T92 S3 Packet
+## M9 T92 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner authorizes automatic admission and execution of subsequent S tasks with async acceptance, waiting only before T closure, on 2026-10-15. |
-| Objective | Correct the uncommitted 37-path S3 import to the necessary XP controller/BIOS source subset; preserve selected XP formatting, CMOS/descriptor fixes and necessary existing local patches. Owner also permits deleting proven unused pre-existing conditional branches within this migration, with symmetric XP-subset accounting and dependency proof. |
-| Non-goals | No sound, S4/S5 subsystem migration, shared-package change, user INI/media edit, new device owner or unresolved external-source copy. |
-| Reference Baseline | cc8509f1 with S2 implementation e884ff9b; fixed XP and OpenNT revisions in the proposal. |
-| Candidate Proposal | [S3 migration scope](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s3--xp-first-mechanical-and-controllerbios-basis). |
-| Files And ABI Surface | Exact 37-path S1 ledger assignment; selected cmos.c comparison fixes; tape_io descriptor-limit declaration and its existing Compat helper must agree. No public ABI expansion. |
+| Objective | Audit and migrate the necessary XP input/reset/IRQ/ROM/timing subset in the 18 S4 candidates; preserve accepted local input, snapshot and timing behavior. Prove usefulness before retaining XP branches or deleting existing unused conditionals. |
+| Non-goals | No Sound Blaster integration, S5 video migration, public-package change, user INI/media/snapshot edit or second device path. |
+| Reference Baseline | S3 P2 3cf6906a; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and OpenNT revisions in the proposal. |
+| Candidate Proposal | [S4 migration scope](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s4--xp-first-input-reset-irq-rom-and-timing-basis). |
+| Files And ABI Surface | 18 paths listed in the S4 admission brief; owner-local tests and root registration as needed. No public ABI expansion. Audit first; quantified payload brief precedes source edits. |
 | Applicable Rules | Task Reading Set, execution/documentation/architecture/coding governance, source-research policy and minimal explicit mirror patches. |
-| Verification | Per-file/hunk inclusion and exclusion ledger against pinned XP; compare local patches against the necessary subset without hiding modifications; descriptor/CMOS/media regressions; dual Release builds, shared then other background tests, separately reserved desktop cases. |
-| Expected Markers | Every selected file has a justified XP/local disposition; S2 fixes survive; full-width descriptor limits, CMOS byte checks and existing media/snapshot contracts pass. |
-| Asset Needs | Existing Ninja intermediates and disposable generated fixtures in ignored build/t92/s3; hidden jobs with 30-minute build/20-minute suite budgets and 30 MiB log cap; executor owns cleanup. |
+| Verification | Independent XP/local range ledgers; scan-set translation/type/reset and mouse/IRQ/timing/ROM tests; dual Release builds and refreshed EXEs, shared then all other background tests and reserved desktop cases. |
+| Expected Markers | Useful XP input improvements retained, set-3 reverse mapping complete, ROM CS and mouse BX not truncated; accepted InPort, snapshot, IRQ and event-wait behavior preserved. |
+| Asset Needs | Reuse Ninja intermediates; disposable audit/test fixtures under ignored build/t92/s4; hidden jobs with 30-minute build/20-minute suite/10-minute desktop budgets and 30 MiB log cap; executor owns cleanup. |
 | Reporting Requirements | Pre-change file/hunk estimates before payload edits; actual added/deleted/net code and mirror differences; dual artifacts, test outcomes, pushed P and separate actual-change review. |
 | Stop Conditions | Owner source-import direction is recorded; stop for conflicting/new source terms, new device paths, public ABI expansion or unapproved guest semantics. |
-| Exit Criteria | Verified and pushed implementation plus coordinator review permit automatic S4 admission under owner delegation; owner async feedback remains actionable; only T closure waits for acceptance. |
+| Exit Criteria | Verified and pushed implementation plus separate coordinator actual-change review permit automatic S5 admission under owner delegation; only T closure waits for acceptance. |
 | Original Owner Request | 请立即纠正 T92 当前 XP 源码导入方案。采用必要源码子集，不是保留文件就整文件导入。先暂停后续导入和提交，审计当前未提交改动；不要整体撤销已有正确修复，也不要干扰用户改动。各 S 可顺序推进，只在 T 任务正式收口前等待确认。 |
-| Similar-Issue Sweep | Width conversions and descriptor pointer/value pairs, CMOS masked-byte comparisons, selected controller/BIOS paths and preserved S2 fixes; report out-of-scope findings without silent expansion. |
+| Similar-Issue Sweep | Keyboard forward/reverse table consistency, narrowed register setters, conditional host-only declarations, selected mouse/IRQ/timer contracts; disposition every hit without expanding scope silently. |
 
 ## M9 T92 S2 Retained Delivery Brief
 
