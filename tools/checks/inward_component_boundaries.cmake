@@ -4,7 +4,7 @@ if(NOT DEFINED SOFTPC_SOURCE_DIR)
     message(FATAL_ERROR "SOFTPC_SOURCE_DIR is required")
 endif()
 
-set(component_names lib emulator x86 app-softpc)
+set(component_names lib emulator x86-debug x86-ibmpc x86-nxvm app-softpc)
 
 function(component_level component out_level)
     list(FIND component_names "${component}" level)
@@ -55,11 +55,13 @@ function(check_component_root relative_root owner)
                 require_inward("${owner}" "emulator"
                     "${relative_root}/${path}" "CMake target")
             endif()
-            string(FIND "${text}" "x86-" x86_target_index)
-            if(NOT "${x86_target_index}" EQUAL -1)
-                require_inward("${owner}" "x86"
-                    "${relative_root}/${path}" "CMake target")
-            endif()
+            foreach(component IN ITEMS x86-debug x86-ibmpc x86-nxvm)
+                string(FIND "${text}" "${component}-" component_target_index)
+                if(NOT component_target_index EQUAL -1)
+                    require_inward("${owner}" "${component}"
+                        "${relative_root}/${path}" "CMake target")
+                endif()
+            endforeach()
             string(FIND "${text}" "softpc-" softpc_target_index)
             if(NOT "${softpc_target_index}" EQUAL -1)
                 require_inward("${owner}" "app-softpc"

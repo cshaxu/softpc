@@ -2,14 +2,42 @@
 
 ## Current Work
 
-No implementation subtask is active.
+No implementation subtask is active. T91 S4 is verified and being delivered
+for coordinator review and owner acceptance. T91 remains open.
 Open task awaiting owner: T91.
+
+## M9 T91 S4 Retained Delivery Brief
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly admits the three-way source/test split. |
+| Objective | Move debugger to x86-debug/product, assembler to x86-debug/xasm32, shared PC shell to x86-ibmpc/product, and retain NXVM-only contracts in x86-nxvm/product. |
+| Non-goals | No Core import, runtime policy change, mirror/Compat change, or modification of NXVM. |
+| Reference Baseline | SoftPC 7d2ca0f6; current shared roots previously matched NXVM byte-for-byte. |
+| Candidate Proposal | [S4 design, convergence ledger and qualification](../history/M9-T91-S4-x86-package-split.md). |
+| Files And ABI Surface | Three source/test packages, App includes, build/link names, manifests, boundary gates and current layout docs. Public symbols follow their new owners; no compatibility aliases. |
+| Applicable Rules | Execution, architecture, coding and documentation authorities; existing X86 tier is refined by this admitted split. No rule files edited. |
+| Verification | Six standalone configure/dry-run build graphs; compile once in each existing aggregate graph; x64/x86 Release builds; each width 97 shared + 48 other background + 5 reserved desktop tests pass (150/150). |
+| Expected Markers | All registered tests pass; old paths absent; speed/info only in x86-nxvm; two refreshed EXEs. |
+| Asset Needs | Refresh only package EXEs; preserve INI, media and snapshots. Ignored evidence under build/t91/s4; hidden supervised jobs, 30-minute build and 20-minute test limits, bounded logs. |
+| Reporting Requirements | Before/after source/test counts, relocation-aware diff, unchanged runtime semantics, actual test results and dual EXE links. |
+| Stop Conditions | Public behavior changes, unexpected user edits, or failure requiring a second runtime path. |
+| Exit Criteria | Complete import-independent split, all required validation, executor P push and coordinator actual-change review; wait for owner acceptance. T91 remains open. |
+| Original Owner Request | Split x86/debug -> x86-debug/product; x86/xasm32 -> x86-debug/xasm32; x86/product -> x86-ibmpc/product plus retained NXVM-only x86-nxvm/product; split matching tests. |
+| Similar-Issue Sweep | Search old paths/targets/symbols, private speed/info leakage, outward source/test/build/document dependencies and cross-suite fixtures. |
+
+## Recent acceptance
+S4 splits source and test ownership into x86-debug, x86-ibmpc and x86-nxvm.
+Both EXEs are refreshed. All 150 tests per architecture pass; initial migration
+gate/build failures are retained in the delivery record. Owner acceptance is
+pending; neither S4 nor T91 is declared closed.
 S3 is owner-accepted and closed on 2026-10-13. Implementation is delivered in
 `e96b2983`; coordinator actual-change review is recorded in `74b45795`.
 Both builds and all 137 tests per width pass, including the reserved desktop
 recheck. Initial unexpected-input failures remain recorded, not hidden.
-Six roots match NXVM `97d3cf948` exactly (246 files). Dual EXEs are refreshed.
-T91 remains open by explicit owner instruction; no next S is admitted.
+At S3 delivery, six roots matched NXVM `97d3cf948` exactly (246 files).
+S4 intentionally supersedes that directory/symbol layout, not its behavior.
 See the [S3 delivery](../history/M9-T91-S3-nxvm-cursor-contract-import.md).
 S2 audit is accepted as the basis for this import on 2026-10-13.
 See the [S2 audit](../history/M9-T91-S2-nxvm-cursor-contract-audit.md).

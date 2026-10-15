@@ -2,16 +2,25 @@
 
 ## Target Ownership
 
+T91 S4 refines the former single X86 tier into x86-debug, x86-ibmpc and
+x86-nxvm, with matching independent test packages. x86-debug depends only on
+Lib and Emulator; x86-ibmpc adds the debugger dependency and owns existing PC
+product interaction. x86-nxvm preserves only the prior NXVM-specific speed/info
+contract and depends on Lib/Emulator, not the PC shell. SoftPC never links or
+includes x86-nxvm. No machine/device implementation is moved or duplicated.
+This is the owner-admitted decomposition of the existing tier, not permission
+for inward packages or their tests/configuration/docs to know outward owners.
+
 ```text
-app-softpc/product/main             entry/config validation -> x86/product
+app-softpc/product/main             entry/config validation -> x86-ibmpc/product
 app-softpc/product/composed_machine private machine/driver composition
 app-softpc/product/config, extensions  INI and snapshot/media commands
-x86/product                        debugger and X86 CLI/hotkey policy
+x86-ibmpc/product                        debugger and X86 CLI/hotkey policy
 emulator/product                   neutral monitor, assembly and session lifetime
 
 emulator/session -> emulator/ui       control and monitor/KVM composition
 emulator/session -> emulator/machine  sole generic executor and copied facts
-x86/debug + x86/xasm32      shared debugger/assembly contracts
+x86-debug/product + x86-debug/xasm32      shared debugger/assembly contracts
                          |
                  injected existing driver callbacks
                          v
@@ -42,7 +51,7 @@ of the monitor logical Console, broker, raw VM Console and Window/KVM
 instances; it receives only copied product policy and returns copied events.
 `app-softpc/product/` owns SoftPC configuration parsing, private machine
 composition, resources and its snapshot/media command extension. Shared
-`x86/product` owns X86 CLI/debug semantics and hotkey policy; it delegates
+`x86-ibmpc/product` owns X86 CLI/debug semantics and hotkey policy; it delegates
 neutral monitor, entity assembly, session execution and teardown to
 `emulator/product`. App passes an already composed
 private machine/driver lifetime and the two UI choices; shared X86
@@ -118,23 +127,23 @@ and hotkey policy to Emulator session. SoftPC publishes each admitted shared-lib
 canonical corpus for NXVM to adopt exactly; the projects do not maintain
 parallel variants.
 
-`x86/xasm32` is an imported x86 copied byte/text assembly capability and
-`x86/debug` is an imported x86 debug command capability. SoftPC exposes
+`x86-debug/xasm32` is an imported x86 copied byte/text assembly capability and
+`x86-debug/product` is an imported x86 debug command capability. SoftPC exposes
 it through its injected app command binding, not through a second input loop.
-`x86/debug` depends on `emulator/machine`'s optional paused-state adapter and
-on `x86/xasm32`; neither component may create an executor, own a Console,
+`x86-debug/product` depends on `emulator/machine`'s optional paused-state adapter and
+on `x86-debug/xasm32`; neither component may create an executor, own a Console,
 or add a product command path. Import hashes remain provenance evidence; the
 S9 integration changes to these components form the updated downstream corpus.
 The control thread serializes lifecycle, media and synchronous debug requests.
 Debug requests are copied into the machine's existing command rendezvous and
 executed by the parked executor, never by the calling frontend. The machine
 checks paused state and the lease again there; callbacks must not synchronously
-reenter this control-thread API. `x86/product/command` owns debugger selection
+reenter this control-thread API. `x86-ibmpc/product/command` owns debugger selection
 and copied prompts; machine state changes do not select or exit the CLI.
 Machine copies opaque, pointer-free debug requests/results through one fixed slot
 (128-byte request, 1536-byte response), with explicit sizes and no per-request
 allocation. It knows no register, address or operation schema. The independent
-`x86/debug/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
+`x86-debug/product/protocol_interface.h` owns x86 vocabulary; frontend and VM adapt at
 their existing boundaries using aligned local values. Driver validation owns
 protocol sizes and operation limits. Failure returns zero response length and
 does not change caller output bytes; a failed wait requires shutdown before
@@ -181,14 +190,15 @@ native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and
 Types atomics. Its complete manifest and source/build dependency gate travel
 with the corpus and run independently of the importing x86.
-Shared unit suites live in test/lib, test/emulator and test/x86. The reusable
-six-directory set is src/lib, src/emulator, src/x86, test/lib, test/emulator
-and test/x86. Each corpus/suite owns its build and manifest; none may
+Shared unit suites mirror lib, emulator, x86-debug, x86-ibmpc and x86-nxvm
+under test/. These five src/test pairs form ten reusable directories.
+Each corpus/suite owns its build and manifest; none may
 require an importing application's adapters or firmware. Each test package owns its
 fixtures; it may consume inward production APIs but never another package's
 tests or an outer package. Generic test tools live directly in test/. The
 dependency rule is direct: Lib has no outer dependency; Emulator consumes Lib;
-x86 consumes Lib and Emulator. This rule is checked both at public-header and
+x86-debug consumes Lib and Emulator; x86-ibmpc also consumes x86-debug;
+x86-nxvm currently consumes only Lib and Emulator. This rule is checked at public-header and
 CMake target-link boundaries.
 
 SoftPC's checked-in `lib/` corpus is the shared-library source of truth. NXVM

@@ -2,7 +2,7 @@
 #define VM_DEBUG_H
 
 #include "machine/machine.h"
-#include "x86/debug/protocol_interface.h"
+#include "x86-debug/product/protocol_interface.h"
 
 /* Product driver owns this state; only its executor accesses it. */
 typedef struct softpc_debug_state {

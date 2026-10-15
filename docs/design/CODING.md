@@ -18,8 +18,12 @@ src/
     ui/          broker, monitor Console and KVM composition
     session/     neutral control FIFO, reduction and UI dispatch
     machine/     generic executor, lifecycle/input queues and frame publication
-  x86/{xasm32,debug,product}/
-    shared assembly/debug policy and session/UI composition
+  x86-debug/{xasm32,product}/
+    shared x86 assembly and debugger
+  x86-ibmpc/product/
+    shared PC command/hotkey policy and session/UI composition
+  x86-nxvm/product/
+    retained NXVM-only information/speed contracts, not linked by SoftPC
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
 ```
@@ -28,12 +32,12 @@ Directories appear only in their admitted migration task.
 Emulator never contains win32/linux directories or platform-selected source.
 Its independent source verification lives with the Emulator corpus; unit tests
 live in test/emulator, never src/emulator/test. Lib tests and their fixtures live
-in test/lib. `src/x86` and `test/x86` own the shared CLI, debugger,
-assembly and surface corpus. Each suite has its own CMake entry and manifest.
-All six source/test packages select C11 with extensions disabled, in
+in test/lib. Each of x86-debug, x86-ibmpc and x86-nxvm has matching src/test
+directories, an independent CMake entry, boundary checks and manifest.
+All ten source/test packages select C11 with extensions disabled, in
 both standalone and embedded builds. GNU/Clang shared builds use
 -Wall -Wextra -Wpedantic -Werror. This owner-approved shared-corpus baseline
-supersedes the general standalone C17 rule only for these six directories;
+supersedes the general standalone C17 rule only for these ten directories;
 App/Core retain their existing language settings. Package-local build settings
 do not propagate warning policy or a new language requirement into the x86.
 Only Lib provides the underlying platform implementation.
@@ -59,7 +63,7 @@ transformed C/H files are not build inputs. `app-softpc/compat` owns original ho
 callbacks and larger functional adaptations. `app-softpc/machine` owns the injected SoftPC
 driver, guest-input/frame conversion, debug adaptation and diagnostic trace.
 `app-softpc/product` owns SoftPC configuration, private machine composition,
-resources and the snapshot/media extension. Shared `x86/product` owns the
+resources and the snapshot/media extension. Shared `x86-ibmpc/product` owns the
 X86 CLI/hotkey policy and delegates composition to `emulator/product`; it receives an already
 composed machine/driver lifetime and two UI choices, never a SoftPC config.
 Emulator Product owns entity assembly, event wiring, the blocking session run
@@ -82,7 +86,7 @@ mapping, lifecycle, or hotkey meaning.
 ## Build Output Layout
 
 X86 tests are classified by ownership: test/app-softpc/unit/product covers configuration
-and App-specific extensions; test/x86/product covers shared commands, keys and
+and App-specific extensions; test/x86-ibmpc/product covers shared commands, keys and
 composition; test/app-softpc/unit/{machine,compat,softpc.new} covers concrete
 machine, compatibility host and recovered-mirror units; test/app-softpc/integration covers composed worker, command, snapshot,
 frame and package flows. CTest names retain their owner path; labels identify
@@ -91,8 +95,8 @@ isolated. X86 fixtures and
 checks live beside their owner: test/app-softpc/integration/machine_fixture.c/h is the
 single product driver/Emulator assembly fixture, snapshot orchestration is in
 test/app-softpc/integration, and x86 static gates are in tools/checks. Test execution is summarized in test/README.md.
-The reusable test/lib, test/emulator and test/x86 packages are not destinations
-for X86-owned fixtures.
+The reusable test/lib, test/emulator, test/x86-debug, test/x86-ibmpc and
+test/x86-nxvm packages are not destinations for App-owned fixtures.
 
 Root CMake assigns all `src/app-softpc/machine/*.c` to `softpc-vm`; other targets link it
 instead of copying its implementation list. The original machine OBJECT

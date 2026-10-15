@@ -53,10 +53,14 @@ add_subdirectory(src/lib)
 enable_testing()
 
 add_subdirectory(src/emulator)
-add_subdirectory(src/x86)
+add_subdirectory(src/x86-debug)
+add_subdirectory(src/x86-ibmpc)
+add_subdirectory(src/x86-nxvm)
 add_subdirectory(test/lib)
 add_subdirectory(test/emulator)
-add_subdirectory(test/x86)
+add_subdirectory(test/x86-debug)
+add_subdirectory(test/x86-ibmpc)
+add_subdirectory(test/x86-nxvm)
 target_link_libraries(softpc-machine PRIVATE storage base audio)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly
@@ -311,7 +315,7 @@ add_executable(softpcvm
     src/app-softpc/product/extensions.c
     src/app-softpc/product/firmware.rc)
 target_link_libraries(softpcvm PRIVATE softpc-vm)
-target_link_libraries(softpcvm PRIVATE x86-product types storage)
+target_link_libraries(softpcvm PRIVATE x86-ibmpc-product types storage)
 
 # The standalone distribution keeps its two host-width launchers together.
 # The adjacent softpc.ini is deliberately user-owned configuration, never a
@@ -493,14 +497,14 @@ set_tests_properties("app-softpc/unit/machine/snapshot_boundary_smoke" PROPERTIE
 add_executable(softpc-runtime-smoke
     test/app-softpc/integration/runtime_smoke.c
     test/app-softpc/integration/machine_fixture.c)
-target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-product-keyboard)
+target_link_libraries(softpc-runtime-smoke PRIVATE softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-ibmpc-product-keyboard)
 target_include_directories(softpc-runtime-smoke PRIVATE src/app-softpc/product)
 add_test(NAME "app-softpc/integration/runtime_smoke" COMMAND softpc-runtime-smoke)
 add_executable(softpc-runtime-restart-boot-smoke
     test/app-softpc/integration/runtime_restart_boot_smoke.c
     test/app-softpc/integration/machine_fixture.c)
 target_link_libraries(softpc-runtime-restart-boot-smoke PRIVATE
-    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-product-keyboard)
+    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-ibmpc-product-keyboard)
 target_include_directories(softpc-runtime-restart-boot-smoke PRIVATE src/app-softpc/product)
 target_compile_definitions(softpc-runtime-restart-boot-smoke PRIVATE
     SOFTPC_TEST_RESTART_BOOT_IMAGE="${CMAKE_CURRENT_SOURCE_DIR}/assets/media/win31_en_installed.img")
@@ -516,13 +520,13 @@ add_executable(softpc-runtime-input-continuation-smoke
     test/app-softpc/integration/runtime_input_continuation_smoke.c
     test/app-softpc/integration/machine_fixture.c)
 target_link_libraries(softpc-runtime-input-continuation-smoke PRIVATE
-    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-product-keyboard)
+    softpc-vm emulator-machine types console console-broker storage kvm-base kvm-window kvm-console x86-ibmpc-product-keyboard)
 target_include_directories(softpc-runtime-input-continuation-smoke PRIVATE src/app-softpc/product)
 add_test(NAME "app-softpc/integration/runtime_input_continuation_smoke"
     COMMAND softpc-runtime-input-continuation-smoke)
 add_executable(softpc-command-provider-smoke test/app-softpc/integration/command_provider_smoke.c
     src/app-softpc/product/extensions.c src/app-softpc/product/config.c)
-target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug emulator-session emulator-machine x86-product-command x86-product-keyboard)
+target_link_libraries(softpc-command-provider-smoke PRIVATE softpc-vm x86-debug-product emulator-session emulator-machine x86-ibmpc-product-command x86-ibmpc-product-keyboard)
 add_test(NAME "app-softpc/integration/command_provider_smoke" COMMAND softpc-command-provider-smoke)
 set_tests_properties("app-softpc/integration/command_provider_smoke" PROPERTIES LABELS "integration" TIMEOUT 45)
 add_executable(softpc-x87-layout-smoke test/app-softpc/unit/softpc.new/x87_layout_smoke.c)

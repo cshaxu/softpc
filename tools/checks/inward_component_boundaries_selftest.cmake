@@ -5,39 +5,39 @@ if(NOT DEFINED SOFTPC_SOURCE_DIR OR NOT DEFINED SELF_TEST_ROOT)
 endif()
 
 file(REMOVE_RECURSE "${SELF_TEST_ROOT}")
-foreach(component IN ITEMS lib emulator x86 app-softpc)
+foreach(component IN ITEMS lib emulator x86-debug x86-ibmpc x86-nxvm app-softpc)
     file(MAKE_DIRECTORY "${SELF_TEST_ROOT}/src/${component}")
     file(MAKE_DIRECTORY "${SELF_TEST_ROOT}/test/${component}")
 endforeach()
 file(WRITE "${SELF_TEST_ROOT}/src/lib/probe.h"
-    "#include \"x86/product/entry_interface.h\"\n")
+    "#include \"x86-ibmpc/product/entry_interface.h\"\n")
 execute_process(COMMAND "${CMAKE_COMMAND}"
     "-DSOFTPC_SOURCE_DIR=${SELF_TEST_ROOT}"
     -P "${SOFTPC_SOURCE_DIR}/tools/checks/inward_component_boundaries.cmake"
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
-if(result EQUAL 0 OR NOT "${output}${error}" MATCHES "lib -> x86")
+if(result EQUAL 0 OR NOT "${output}${error}" MATCHES "lib ->[ \r\n]+x86-ibmpc")
     message(FATAL_ERROR "Expected Lib outward-include rejection: ${output}${error}")
 endif()
 
 file(REMOVE "${SELF_TEST_ROOT}/src/lib/probe.h")
 file(WRITE "${SELF_TEST_ROOT}/test/emulator/README.md"
-    "See src/x86 for details.\n")
+    "See src/x86-debug for details.\n")
 execute_process(COMMAND "${CMAKE_COMMAND}"
     "-DSOFTPC_SOURCE_DIR=${SELF_TEST_ROOT}"
     -P "${SOFTPC_SOURCE_DIR}/tools/checks/inward_component_boundaries.cmake"
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
-if(result EQUAL 0 OR NOT "${output}${error}" MATCHES "emulator -> x86")
+if(result EQUAL 0 OR NOT "${output}${error}" MATCHES "emulator ->[ \r\n]+x86-debug")
     message(FATAL_ERROR "Expected Emulator outward-document rejection: ${output}${error}")
 endif()
 
 file(REMOVE "${SELF_TEST_ROOT}/test/emulator/README.md")
-file(WRITE "${SELF_TEST_ROOT}/src/x86/CMakeLists.txt"
-    "target_link_libraries(x86-probe PRIVATE softpc-vm)\n")
+file(WRITE "${SELF_TEST_ROOT}/src/x86-debug/CMakeLists.txt"
+    "target_link_libraries(x86-debug-probe PRIVATE softpc-vm)\n")
 execute_process(COMMAND "${CMAKE_COMMAND}"
     "-DSOFTPC_SOURCE_DIR=${SELF_TEST_ROOT}"
     -P "${SOFTPC_SOURCE_DIR}/tools/checks/inward_component_boundaries.cmake"
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error)
-if(result EQUAL 0 OR NOT "${output}${error}" MATCHES "x86 -> app-softpc")
+if(result EQUAL 0 OR NOT "${output}${error}" MATCHES "x86-debug ->[ \r\n]+app-softpc")
     message(FATAL_ERROR "Expected X86 outward-target rejection: ${output}${error}")
 endif()
 

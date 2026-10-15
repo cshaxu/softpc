@@ -1,5 +1,5 @@
 #include "lib/types/types_interface.h"
-#include "x86/product/command_provider_interface.h"
+#include "x86-ibmpc/product/command_provider_interface.h"
 #include "product/extensions.h"
 #include "machine/driver.h"
 
@@ -793,8 +793,8 @@ int main(void)
     vm_driver *adapter = NULL;
     emulator_machine_driver driver = { 0 };
     emulator_machine *machine = NULL;
-    x86_product_command_context commands = { 0 };
-    x86_product_command_extensions extensions = { 0 };
+    x86_ibmpc_product_command_context commands = { 0 };
+    x86_ibmpc_product_command_extensions extensions = { 0 };
     emulator_session_command_provider provider = { 0 };
     emulator_session_command_result result = { 0 };
     emulator_machine_debug_lease lease;
@@ -823,7 +823,7 @@ int main(void)
     emulator_machine_set_state_sink(machine, note_state, &events);
     assert(softpc_product_configure_extensions(LIB_NULL,
         &extensions) == LIB_STATUS_OK);
-    assert(x86_product_command_provider_initialize(&commands, machine,
+    assert(x86_ibmpc_product_command_provider_initialize(&commands, machine,
         EMULATOR_SESSION_DISPLAY_WINDOW, &extensions,
         &provider) == LIB_STATUS_OK);
     /* The monitor begins in INIT. SoftPC load retains its historic
@@ -851,7 +851,7 @@ int main(void)
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands.monitor &&
         provider.open == emulator_product_monitor_provider_open);
-    assert(provider.submit_line == x86_product_command_provider_submit_line);
+    assert(provider.submit_line == x86_ibmpc_product_command_provider_submit_line);
     assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         "send-ctrl-alt-del", &result) && result.request == EMULATOR_SESSION_REQUEST_NONE);
     assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
@@ -1039,7 +1039,7 @@ int main(void)
     wait_for(events.stopped);
     provider.note_runtime(provider.context, EMULATOR_SESSION_MACHINE_RUNNING,
         EMULATOR_SESSION_MACHINE_STOPPED, &result);
-    x86_product_command_dispose(&commands);
+    x86_ibmpc_product_command_dispose(&commands);
     emulator_machine_destroy(machine);
     vm_driver_destroy(adapter);
     softpc_machine_destroy(product);

@@ -127,7 +127,7 @@ foreach(app_source IN ITEMS
     "src/app-softpc/machine/driver.c"
     "src/app-softpc/product/composed_machine.c"
     "src/app-softpc/product/extensions.c"
-    "src/x86/product/keyboard.c")
+    "src/x86-ibmpc/product/keyboard.c")
     if(NOT EXISTS "${SOFTPC_SOURCE_DIR}/${app_source}")
         message(FATAL_ERROR "Standalone application source is missing: ${app_source}")
     endif()
@@ -184,21 +184,21 @@ set(allowed_emulator_product_contracts
     "emulator/machine/machine_interface.h"
     "emulator/session/session_interface.h"
     "emulator/ui/ui_interface.h"
-    "x86/debug/debug_interface.h"
-    "x86/debug/protocol_interface.h"
-    "x86/product/entry_interface.h"
-    "x86/product/machine_interface.h"
-    "x86/xasm32/xasm32_interface.h")
+    "x86-debug/product/debug_interface.h"
+    "x86-debug/product/protocol_interface.h"
+    "x86-ibmpc/product/entry_interface.h"
+    "x86-ibmpc/product/machine_interface.h"
+    "x86-debug/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_emulator_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/machine/*.[ch]"
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
 foreach(source IN LISTS product_emulator_consumers)
     file(STRINGS "${source}" emulator_include_lines REGEX
-        "#[ \t]*include[ \t]+[<\"](emulator|x86)/[^>\"]+[>\"]")
+        "#[ \t]*include[ \t]+[<\"](emulator|x86-debug|x86-ibmpc|x86-nxvm)/[^>\"]+[>\"]")
     foreach(include_line IN LISTS emulator_include_lines)
         string(REGEX REPLACE
-            ".*[<\"]((emulator|x86)/[^>\"]+)[>\"].*" "\\1" emulator_contract
+            ".*[<\"]((emulator|x86-debug|x86-ibmpc|x86-nxvm)/[^>\"]+)[>\"].*" "\\1" emulator_contract
             "${include_line}")
         list(FIND allowed_emulator_product_contracts "${emulator_contract}"
             emulator_contract_index)
@@ -208,7 +208,7 @@ foreach(source IN LISTS product_emulator_consumers)
         endif()
     endforeach()
     file(READ "${source}" emulator_product_source)
-    if(emulator_product_source MATCHES "(emulator|x86)/[A-Za-z0-9_/-]+\\.c")
+    if(emulator_product_source MATCHES "(emulator|x86-debug|x86-ibmpc|x86-nxvm)/[A-Za-z0-9_/-]+\\.c")
         message(FATAL_ERROR "App includes an Emulator Product implementation: ${source}")
     endif()
 endforeach()
@@ -516,7 +516,7 @@ endforeach()
 if(composition_source MATCHES "strcmp|x86_debug_|pause-toggle|send-ctrl-alt-del|send-alt-enter")
     message(FATAL_ERROR "Composition must not interpret commands, hotkeys or debugger policy")
 endif()
-file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/x86/product/*.c")
+file(GLOB shared_provider_sources "${SOFTPC_SOURCE_DIR}/src/x86-ibmpc/product/*.c")
 foreach(source IN LISTS shared_provider_sources)
     if(NOT source MATCHES "/command_provider\\.c$")
         file(READ "${source}" contents)

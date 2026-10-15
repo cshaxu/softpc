@@ -2,7 +2,7 @@
 #include "machine/debug.h"
 #include "compat/ccpu/abi.h"
 #include "compat/platform.h"
-#include "x86/debug/protocol_interface.h"
+#include "x86-debug/product/protocol_interface.h"
 
 
 extern void inb(unsigned short port, unsigned char *value);

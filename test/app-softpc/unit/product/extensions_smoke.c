@@ -61,7 +61,7 @@ int main(void)
     char identity;
     emulator_machine *machine = (emulator_machine *)&identity;
     emulator_session_command_result result;
-    x86_product_command_extensions extensions;
+    x86_ibmpc_product_command_extensions extensions;
     lib_storage_file_writer *file = LIB_NULL;
     unsigned index;
 
