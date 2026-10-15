@@ -7,7 +7,9 @@ base/bios/cmos_bis.c	126	194	include
 base/bios/tape_io.c	1	6	profile: #if defined(JAPAN) && defined(i386)
 base/bios/tape_io.c	7	38	include
 base/bios/tape_io.c	39	41	profile: #if defined(JAPAN) && defined(i386)
-base/bios/tape_io.c	42	65	include
+base/bios/tape_io.c	42	58	include
+base/bios/tape_io.c	59	60	NT-only-A20-helper-declaration
+base/bios/tape_io.c	61	65	include
 base/bios/tape_io.c	66	77	profile: #if defined(JAPAN) && defined(i386)
 base/bios/tape_io.c	78	121	include
 base/bios/tape_io.c	122	124	profile: #if defined(NTVDM) && defined(MONITOR)

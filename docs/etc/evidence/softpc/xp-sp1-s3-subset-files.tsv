@@ -1,6 +1,6 @@
 path	xp_lines	xp_excluded	previous_unselected	local_unselected	xp_subset_sha256	local_add	local_remove
 base/bios/cmos_bis.c	194	2	2	0	c0ffdef5940818550d90929ea34911fa29a71701678fbb085d648f62d4c25d87	0	0
-base/bios/tape_io.c	552	244	18	0	779584f2b395b5bf72d790be605f2af4c1cb3d403eb2f7f12e447ce54cc184e1	5	2
+base/bios/tape_io.c	552	246	18	0	4623a9ecfd744fff1d0e0d4a44e3232ef5d0e5b7ca08b24920b311e3540bded2	5	2
 base/comms/com.c	4526	1774	516	0	4f5ce4d681f180d0ecb6fd76182e549425e08669f9795af4ab1d315ad3e75709	133	3
 base/comms/printer.c	1101	475	208	0	f56278e2ef4431dc0c8231f0d04d48b1e13c88da11a7b29b2ded735a4cf52d59	78	0
 base/comms/printer_.c	246	72	69	0	6de2cec55fad46f21aad8de5ac8f6a480a2c1373e99c20490530bdffe417efb6	0	1

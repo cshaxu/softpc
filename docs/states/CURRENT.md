@@ -15,7 +15,11 @@ five native desktop cases. Owner subsequently permits removal of proven useless
 pre-existing conditional branches within the migration scope. This cleanup is
 complete for the reviewed groups. The final candidate separately passes 148/148
 registered tests per width, including five native desktop cases; both EXEs are
-refreshed. S3 remains active pending executor push and coordinator review. See the
+refreshed. Executor P1 89b67c44 is pushed. Coordinator actual-change review finds
+two leftover imported A20 declarations in tape_io.c. They are removed; renewed
+dual builds and 148/148 tests per width pass, including all ten desktop cases.
+The corrective P awaits delivery and actual-change review before closure or
+S4 admission. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
 new Sound Blaster capability transfers to the first unnumbered Queue candidate.

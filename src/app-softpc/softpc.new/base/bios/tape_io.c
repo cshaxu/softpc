@@ -47,8 +47,6 @@
 #include "debug.h"
 #include "quick_ev.h"
 
-extern void xmsEnableA20Wrapping(void);
-extern void xmsDisableA20Wrapping(void);
 
 #define ONE_MEGABYTE    (1024 * 1024)
 #define SIXTY_FOUR_K    (64 * 1024)

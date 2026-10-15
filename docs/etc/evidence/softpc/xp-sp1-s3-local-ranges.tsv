@@ -1,6 +1,6 @@
 path	local_first	local_last	disposition
 base/bios/cmos_bis.c	1	192	include
-base/bios/tape_io.c	1	311	include
+base/bios/tape_io.c	1	309	include
 base/comms/com.c	1	2882	include
 base/comms/printer.c	1	704	include
 base/comms/printer_.c	1	173	include

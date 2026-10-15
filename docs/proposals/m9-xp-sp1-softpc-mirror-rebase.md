@@ -477,6 +477,57 @@ or real sound-device qualification is claimed. INI, media, snapshots and all
 public packages are unchanged. Documentation and non-mirror whitespace gates
 pass. Earlier failed merge and superseded qualification records remain distinct.
 
+#### S3 coordinator actual-change review of executor P1
+
+Executor `89b67c44` is pushed. The coordinator inspected its changed paths,
+source/Compat ABI pair, source additions, protected-tree diff, subset ledger,
+EXE hashes and final zero exit records. P1's full tests pass, but the actual
+source-addition review finds two newly imported xms A20 helper declarations in
+tape_io.c left behind after deleting their NTVDM callers. These declarations
+are unnecessary in that translation unit and must not survive merely to match
+an unfiltered XP file. Remove exactly those two lines, preserve surrounding XP
+spacing, and independently exclude them from the XP necessary subset. The
+existing guarded declarations/callers in sas.h/keyba.c belong to S4, not this
+repair. No implementation or ABI changes. Repeat the dual build/full regression
+and publish a complete corrective P before accepting S3. This is a review
+finding, not a guest-visible failure; closure and S4 admission remain pending.
+
+#### S3 corrective executor P2 accounting
+
+The actual corrective production diff is tape_io.c +0/-2: only the two
+unused A20 declarations are removed. Their surrounding XP spacing and the
+selected AH=87 implementation are unchanged. The XP range ledger excludes
+these declarations independently; it does not erase a local implementation
+patch from comparison. XP excluded lines are now 8,993; the frozen previous
+local unselected count remains 1,899. Necessary-subset local patches remain
++681/-23.
+
+Cumulative S3 production against 5ba0a557 is +1,757/-3,331, net -1,574:
+33 mirror paths +1,755/-3,329 and one Compat path +2/-2. The one test path
+remains +91/-0 and root CMake +4/-0, making counted production/test/build
++1,852/-3,331, net -1,479. This supersedes P1's cumulative totals, not its
+historical verification record. The corrective delivery repeats both builds
+and the full registered suites before commit; no additional runtime behavior
+or public API is introduced.
+
+Corrective qualification is complete: both Release builds pass; each width
+passes 90 shared, 53 other background and five native desktop tests (148/148).
+The focused five-device subset also passes on both widths. All supervisor and
+phase exit records are zero. Shared/App/desktop wall times are x64
+50.77/97.92/16.03 seconds and x86 64.42/71.35/15.42 seconds. No Computer Use,
+INI/media/snapshot edit or new manual guest-session claim is involved.
+Corrective package SHA-256:
+
+- softpc32.exe: `269f738ee4b52c1227f1babecfc4a6acfcca216e1427cff92e2d0700dbab4f01`
+- softpc64.exe: `84447c00e1630bf570315dca3047cd9242023d61bca9383e267a4da617b01ca9`
+
+The similar-issue recheck finds no xms A20 helper reference in tape_io.c;
+the four guarded declarations/calls in sas.h/keyba.c are explicitly assigned
+to S4. The XP/local range changes affect only this two-line exclusion and the
+resulting source length/hash. Documentation governance and non-mirror
+whitespace checks pass. Executor P2 is ready for push and separate actual-change
+review; S3 closure is not inferred from test results alone.
+
 Adopt the approved necessary XP subset for representation, CMOS, printer,
 GFI/FDC, disk/floppy and BIOS. Exclude newly introduced unneeded host/product
 branches, retain required local patches and selected XP formatting. Keep
