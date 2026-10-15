@@ -1,7 +1,8 @@
 # M9 T91 S4: Split X86 tools, PC product and NXVM contracts
 
-Status: verified executor delivery, pending coordinator review and owner
-acceptance. T91 stays open. Qualification date: 2026-10-15.
+Status: coordinator-reviewed delivery, waiting for owner acceptance.
+T91 stays open. Qualification date: 2026-10-15.
+Executor P1: `8046b085`, pushed to main.
 
 ## Original request
 
@@ -131,3 +132,24 @@ Published SHA256:
 The executor P includes the complete implementation, qualification and both
 artifacts. A separate coordinator actual-commit review follows its push;
 owner acceptance is still required before S4 closure.
+
+## Coordinator actual-change review
+
+After the P1 push, the same session switched from executor to coordinator and
+reviewed the actual committed path/diff inventory against the original request,
+the finite ledger, all test exit records and published EXE hashes. The 18-file
+normalized comparison and the original 34-line machine contract confirm that
+this is relocation/namespace separation, not replacement of runtime algorithms.
+App main still passes product_name to the existing banner field; snapshot and
+extension implementations retain their callbacks and behavior. No unrelated
+source, configuration, media or external-repository changes are present.
+
+Both architecture results are 150/150, including all native desktop tests;
+the six separate configure/dry-run graphs are not misrepresented as extra
+compiled runtime qualifications. The initial failed migration checks remain
+disclosed above. Documentation governance and whitespace checks pass.
+
+Review accepts the technical delivery, not owner acceptance or S/T closure.
+The source/test package split is intentionally no longer byte-identical to
+NXVM's old six-root layout. NXVM-only declarations remain available for its
+later adoption; no NXVM Core code has been imported. T91 remains open.
