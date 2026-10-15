@@ -1,8 +1,13 @@
 # M9 T91 S5: Remove the unused NXVM package pair
 
-Status: coordinator-reviewed delivery, pending owner acceptance.
-T91 remains open. Qualification date: 2026-10-15.
+Status: owner-accepted and closed on 2026-10-15.
+T91 is also owner-closed. Qualification date: 2026-10-15.
 Executor P1: `1f0c0f53`, pushed to main.
+
+Owner acceptance: "好，验收通过，收口本T，准入队列下一任务：导入winxp的softpc核心。"
+Closure accepts P1 and coordinator review `087e512f`; no S5 work remains.
+This closure is documentation-only; accepted binaries and test results below
+are unchanged. The next task is a separate T92 source audit.
 
 Owner request: "好。准入一个新S，删掉这俩没用的组件。"
 Admitted scope and active status are in CURRENT. Baseline: 3af19559.

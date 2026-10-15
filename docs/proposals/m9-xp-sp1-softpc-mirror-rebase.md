@@ -1,5 +1,20 @@
 # M9: XP SP1 SoftPC Mirror Baseline Upgrade
 
+## Admission checkpoint (2026-10-15)
+
+Owner admits T92 after accepting and closing T91. Only S1, the source audit
+and migration design, is active; CURRENT owns its executable packet. The
+following import batches remain planned, not silently executed by admission.
+The current accepted baseline is `087e512f`, with 498 retained mirror paths.
+
+Both reference HEADs match the pinned revisions below. However, the XP local
+index reports staged removals and untracked replacement paths under softpc.new.
+S1 must audit committed Git objects at the pinned revision, not assume that
+working-tree bytes are pristine. Do not reset or otherwise modify that external
+repository. Existing historical counts below require recomputation against
+the accepted T91 endpoint. Source notices and admission findings must be
+resolved before any later source copy; this checkpoint imports nothing.
+
 ## Objective
 
 Upgrade the repository-owned selected SoftPC mirror from its OpenNT/NT4

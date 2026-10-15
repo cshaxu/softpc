@@ -2,9 +2,30 @@
 
 ## Current Work
 
-No implementation subtask is active. T91 S5 is delivered and coordinator-reviewed,
-pending owner acceptance. S4 is closed; T91 stays open.
-Open task awaiting owner: T91.
+T91 and S5 are owner-accepted and closed on 2026-10-15.
+T92 S1 is admitted: XP SP1 SoftPC source audit and migration design only.
+No core import or runtime change is authorized by this first audit step.
+
+## M9 T92 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner accepts T91 and admits the next queued XP SoftPC core task on 2026-10-15. |
+| Objective | Establish the immutable XP/OpenNT/current three-way migration ledger and executable import batches for the selected IBM PC/AT/V7 profile. |
+| Non-goals | No source import, runtime edits, public package changes, EXE refresh, media/configuration changes or external repository writes in S1. |
+| Reference Baseline | SoftPC 087e512fc4bb02225d3d8cb519a12ef87aa489ac; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89; OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
+| Candidate Proposal | [XP SP1 selected mirror upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md). |
+| Files And ABI Surface | Audit all 498 retained mirror paths and relevant XP-only candidates; enumerate Compat/port ABI consequences without modifying interfaces. |
+| Applicable Rules | Task Reading Set, execution/documentation governance, architecture/coding rules and source-research-policy; source admission precedes any later copy. |
+| Verification | Reproducible immutable-object inventory, three-way diff classification, selected-profile branch review, source/notice provenance and documentation/whitespace gates. No runtime qualification claimed. |
+| Expected Markers | Every retained path has an explicit disposition; necessary local fixes are preserved; later batches have bounded file lists and tests. |
+| Asset Needs | Read-only reference repositories; ignored evidence under build/t92/s1. Hidden supervised audit jobs: 10-minute/time and 30 MiB/log limits, executor owns cleanup and checkpointing. No guest asset needed. |
+| Reporting Requirements | Per-batch files, additions/deletions/net and mirror divergence estimates; authority for changes, exclusions, risks and executable recommendation. |
+| Stop Conditions | Unresolved provenance/licensing before import, unavailable immutable source, or a proposed loss of accepted behavior; no blind working-tree replacement. |
+| Exit Criteria | Complete source ledger and source-admission findings, explicit S2-S6 scope/verification plan, coordinator review and committed report for owner decision. |
+| Original Owner Request | 好，验收通过，收口本T，准入队列下一任务：导入winxp的softpc核心。 |
+| Similar-Issue Sweep | All selected CCPU, C-VID, BIOS, input, device and host boundaries; distinguish XP fixes, excluded host routes and existing local fixes, including snapshot state. |
 
 ## M9 T91 S5 Retained Delivery Brief
 
@@ -54,13 +75,13 @@ Both Release build graphs pass; x64/x86 each pass all 138 background tests.
 Native desktop tests are not rerun in S5; S4's 5/5 per width remains separate
 prior evidence. x64 EXE is unchanged; x86 EXE is refreshed after Ninja's cache
 recovery rebuild. Owner configuration and media remain unchanged. Executor P1
-`1f0c0f53` is pushed and reviewed; S5 waits for owner acceptance, not automatic closure.
+`1f0c0f53` is pushed and reviewed in `087e512f`; owner accepts S5 and T91 on 2026-10-15.
 S4 splits source and test ownership into x86-debug, x86-ibmpc and x86-nxvm.
 Executor P1 `8046b085` is pushed; its actual-change review is retained with S4.
 Both EXEs are refreshed. All 150 tests per architecture pass; initial migration
 gate/build failures are retained in the delivery record. Owner accepted and
 closed S4 on 2026-10-15, against P1 `8046b085` and review P2 `ffe0a702`.
-T91 remains open.
+T91 is now closed; see the [completion audit](../history/M9-T91-completion-audit.md).
 S3 is owner-accepted and closed on 2026-10-13. Implementation is delivered in
 `e96b2983`; coordinator actual-change review is recorded in `74b45795`.
 Both builds and all 137 tests per width pass, including the reserved desktop
@@ -75,7 +96,7 @@ S1 is owner-accepted and closed on 2026-10-12. Implementation is delivered in
 Both Release EXEs are refreshed. Each width passes 84 shared + 48 other
 background tests and all five native desktop cases (137/137).
 The S1 six-package baseline was reviewed NXVM `73d7967244` (246 files).
-T91 remains open by explicit owner instruction.
+T91 was kept open at S1 delivery and is now owner-closed.
 See the [delivery review](../history/M9-T91-S1-nxvm-shared-glyph-import.md)
 and [retained proposal](../history/M9-T91-nxvm-shared-glyph-import-proposal.md).
 T90 is owner-accepted and closed.
@@ -85,8 +106,8 @@ background tests and all five native desktop cases (137/137).
 See the [S1 delivery and diff ledger](../history/M9-T90-S1-nonmirror-quality-cleanup.md).
 T89 remains owner-accepted and closed.
 The owner confirms the RDP capture escape issue is fixed; its TODO is removed.
-TODO retains only the null BOP investigation; Queue retains only the XP SP1
-mirror upgrade. Neither item is part of T91.
+TODO retains only the null BOP investigation. The former XP SP1 queue head is
+now admitted as T92; no unadmitted queue candidate remains.
 
 ## M9 T91 S3 Retained Delivery Brief
 
@@ -757,6 +778,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T91 | Owner accepted and closed 2026-10-15; all S1-S5 obligations complete. | [Completion audit](../history/M9-T91-completion-audit.md) |
 | T90 | S1 owner-accepted and closed; five non-mirror quality repairs, dual-width 137/137 including native desktop. | [Audit](../history/M9-T90-S1-nonmirror-quality-cleanup.md#t90-completion-audit-and-owner-acceptance) |
 | T89 | S1--S5 owner-accepted and closed; mirror/Compat convergence, dual-width 136/136 qualification. | [Audit](../history/M9-T89-completion-audit.md) |
 | T88 | S1--S6 complete; owner accepts final mirror/Compat video repairs and approves closure; x64/x86 136/136. | [Audit](../history/M9-T88-completion-audit.md) |

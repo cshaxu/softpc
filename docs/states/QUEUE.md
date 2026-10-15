@@ -3,11 +3,10 @@
 This is the ordered, unnumbered candidate queue. It neither activates work nor
 allocates a numeric task identifier.
 
-1. [XP SP1 SoftPC mirror baseline upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+No unadmitted candidates remain.
 
-The XP candidate upgrades the routine
-selected-mirror comparison from OpenNT to XP SP1, with explicit IBM PC/AT
-adoption and PC-98/Japan/NTVDM exclusions.
+The XP SP1 SoftPC mirror baseline upgrade was owner-admitted as T92 on
+2026-10-15. Its active S1 audit is governed by [CURRENT](CURRENT.md), not this queue.
 
 Previously admitted:
 [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md).
