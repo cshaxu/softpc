@@ -579,6 +579,135 @@ unchanged LIB_WIN32_AUDIO_STREAM_FLAGS SDK aliases remain. Executor delivery
 [S2 record](../history/M9-T93-S2-pcm-relocation.md) closes this step and CURRENT
 admits S3 under the continued goal. T93 remains open.
 
+### S3 native-stage checkpoint (not a delivery)
+
+The first implementation stage changes PCM private/native code, Types
+declarations and root rate/short-tail behavior, not Compat. Production is
+currently +299/-28 across six C/H files; two Lib units and two affected
+App fixtures are +374/-20. These
+are interim counts, not the final S3 estimate or completion account.
+
+- The Windows backend counts only successfully released input frames;
+  initial silence is not submitted input. Its consumed result is input
+  submitted minus native padding, clamped at zero while priming remains.
+  Padding exceeding endpoint capacity returns I/O failure in all three
+  observation/submission paths rather than looping on impossible geometry.
+- Progress waiting reuses the same render/interruption event pair. No
+  additional thread, polling timer or output queue is added.
+- IAudioStreamVolume is acquired/released on the existing worker. Channel
+  gains map 0..65535 to 0..1; there is no system/session volume change.
+- Native unsupported-format errors remain UNSUPPORTED, distinct from I/O
+  failures. Zero rates and byte-rate overflow are rejected before allocation.
+- Linux retains truthful unsupported capability for these operations.
+
+The real Windows adapter is tested with injected SDK calls, not a reimplemented
+adapter. x64/x86 targeted builds and lib.audio/pcm/win32_platform pass. Tests
+cover seven rates (3921, 8000, 11025, 12345, 22050, 44100, 48000), mono/stereo,
+priming mixed with input, final consumption without another enqueue, underrun,
+clear, committed prefix before interruption, counter overflow, invalid padding,
+zero/full/intermediate gains, unsupported format and each initialization call
+failure. Types-layout, manifests and whitespace checks also pass. This proves
+native mechanics under injection, not root-worker notification or audibility.
+
+The root now admits representable nonzero rates and submits any available
+prefix, bounded by the existing batch size. A three-frame public enqueue
+reaches the injected native writer without flush or a second producer call.
+The clear regression explicitly holds the native writer before cancellation;
+it no longer relies on the removed batching delay. Ordered delivery assertions
+count frames/content, not scheduler-dependent batch counts. Root/native PCM
+and the existing Compat first-delivery test each pass 50 consecutive runs per
+width (150 runs each architecture). This is not a physical playback claim.
+
+Startup now reuses control_done for the native admission result. Creation
+publishes the task handle under the mutex before the worker can cancel it on
+startup-signal failure. The creator waits on completion/cancellation and joins
+before cleanup; an unproven worker exit never permits freeing its context.
+Tests cover unsupported attach, failed startup signal, null failed outputs and
+successful later creation. Gain uses the existing synchronous control slot and
+same native worker; tests cover channel validation, zero/unity, inactive gain
+and terminal native failure. After these changes all three targeted tests pass
+another 50 repetitions per width. No App production or guest behavior is changed.
+
+The public progress result now copies epoch and accepted/submitted/consumed
+input-frame counters. Existing generation ownership becomes that 64-bit epoch;
+clear cancels old ranges and rejects epoch overflow. Observation validates
+monotonicity and bounds, and discards results captured for an older epoch.
+The worker waits on native progress while a submitted tail remains, even when
+its producer FIFO is empty. Enqueue interrupts that wait when new input arrives;
+control requests use their existing interruption. There is no polling observer.
+The optional wake callback is borrowed, invoked under the stream mutex and
+must not reenter the stream. Replacing/unregistering quiesces the old context;
+callback failure becomes terminal and wakes existing synchronous waiters.
+Registration immediately reports current readiness, avoiding a missed prior
+completion. Flush still proves submission, not physical audio consumption.
+Tests separate submitted and consumed counts and drive a final native event
+without another producer call. They also exercise enqueue during native wait,
+clear cancellation, accepted/epoch overflow and failed sink notification.
+All three targeted tests again pass 50 repetitions per width. Initial full
+qualification exposed the machine sound test's incomplete native adapter
+replacement: missing new symbols caused the linker to extract the real native
+leaf and report duplicate definitions. Its existing fixture now supplies the
+new progress operations and rejects unexpected gain/wait calls; no production
+path changes for that repair. The search for platform-create/attach overrides
+finds exactly this fixture and the already updated Compat first-delivery one.
+Full dual qualification subsequently passes; the original failure is recorded
+above rather than counted as success. See the final executor evidence below.
+
+### S3 executor qualification
+
+Counted against reviewed S2 endpoint 520f8b5b using `git diff --numstat`:
+
+| Production path under src/lib | Added | Deleted | Net |
+| --- | ---: | ---: | ---: |
+| audio/pcm/stream.c | 162 | 24 | +138 |
+| audio/pcm/stream.h | 10 | 1 | +9 |
+| audio/pcm/stream_interface.h | 32 | 2 | +30 |
+| audio/pcm/win32/stream.c | 71 | 1 | +70 |
+| audio/pcm/linux/stream.c | 20 | 0 | +20 |
+| types/win32/audio.h | 4 | 0 | +4 |
+| Total | 299 | 28 | +271 |
+
+Tests: Lib stream +218/-14, Lib native adapter +95/-4, App Compat first-delivery
++28/-0, App machine sound +33/-2: total +374/-20, net +354. Two hash manifests
+are metadata, excluded from code totals. App/Compat production, Emulator,
+shared X86, mirror, configuration, media and snapshots are unchanged; mirror
+delta is zero. No obsolete second backend/worker/FIFO was introduced.
+
+Qualification on both widths uses existing Ninja intermediates, shared suites
+before other background suites, then serial reserved native desktop tests:
+
+| Evidence | x64 | x86 |
+| --- | --- | --- |
+| Release package and all test targets | pass | pass |
+| Shared background | 90/90, 40.14 s | 90/90, 42.76 s |
+| Other unit/integration/checks | 55/55, 101.07 s | 55/55, 70.06 s |
+| Native desktop | 5/5, 13.98 s | 5/5, 13.95 s |
+| Registered total | 150/150 | 150/150 |
+
+The final targeted PCM/root/Compat delivery set also passes 50 repetitions
+of each case per width. Root tests exercise public APIs and real worker/FIFO
+with an injected native endpoint; native tests execute the real Windows adapter
+with SDK calls injected. Existing machine sound tests retain real PIT/PPI and
+Compat/Lib delivery. These prove those boundaries, not physical audibility or
+XP DSP integration (which remains S6). Linux has truthful unsupported stubs,
+not a claimed tested output backend. Manifest, Types ownership, whitespace and
+documentation gates pass. The x86 Ninja build reported a premature log end and
+automatically rebuilt 584 steps; no agent cache purge or forced clean occurred.
+
+Published SHA-256:
+
+- softpc64.exe: `50C7167640CDAD7879840BDF0EC749BE460AD767155FB099164F72FAEBC07764`
+- softpc32.exe: `199CFEC4C4848C1C47717C777B494CA5B49EE92DA98C35A9A2B30EB8EFD88F85`
+
+Finite review covers six production files, four tests, two manifests and the
+two package artifacts. Existing options remain two fields, so old callers do
+not read uninitialized optional callbacks. The old native startup/queue owners
+remain authoritative. All native fixture overrides found by the create/attach
+search are updated. Clear epoch checks prevent stale native observations from
+being published as current; the pending-wait clear test covers cancellation,
+not an exhaustive proof of every concurrent schedule. No owner manual audio
+acceptance is inferred. Executor push and separate actual-change review follow.
+
 ## Official host-contract references
 
 - [WASAPI padding](https://learn.microsoft.com/en-us/windows/win32/api/audioclient/nf-audioclient-iaudioclient-getcurrentpadding):

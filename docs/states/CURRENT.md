@@ -49,6 +49,29 @@ The owner authorizes native desktop test scheduling without repeated approval
 requests; background operations remain hidden and Computer Use remains forbidden.
 No manual audio acceptance is inferred.
 
+S3 implementation is verified, pending executor commit and coordinator review. Its PCM stage has
+submitted/consumed accounting, native progress-event wait, per-channel stream
+gain, format-error classification and arithmetic validation. The existing
+native adapter unit passes on x64/x86 with seven rates, priming/tail/clear,
+partial-failure and gain coverage. The root admission now accepts representable
+nonzero PCM rates rather than only three fixed rates; root and native PCM
+tests both pass on x64/x86 (2/2 each), including seven rates in mono/stereo
+and zero/byte-rate overflow rejection. This is mocked endpoint evidence, not
+proof of every physical endpoint's rate support. Short prefixes now submit
+without flush or subsequent input. Root/native PCM and Compat first-delivery
+tests each pass 50 repetitions per width; clear retains deterministic discard
+coverage. Native startup now completes before create publishes a stream;
+attach rejection and failed startup signaling are covered. The public channel
+gain request reuses the existing control slot and worker. The same three
+targeted tests pass another 50 repetitions each on both widths after these
+changes. Copied epoch/accepted/submitted/consumed progress and a borrowed wake
+sink are now integrated into the existing worker. Final-tail consumption,
+enqueue interruption of a tail wait, clear cancellation, counter limits and
+sink failure pass the same repeated dual-width targeted set. Both Release
+builds pass; each width passes 90 shared, 55 other background and five native
+desktop tests (150/150). Both package EXEs are refreshed and hashed in the
+proposal. No manual hearing result, Linux runtime result or S3 closure is claimed.
+
 ## M9 T93 S3 Packet
 
 | Field | Required record |

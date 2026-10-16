@@ -20,6 +20,7 @@ typedef IMMDevice lib_win32_audio_device;
 typedef IAudioClient lib_win32_audio_client;
 typedef IAudioRenderClient lib_win32_audio_render_client;
 typedef IAudioCaptureClient lib_win32_audio_capture_client;
+typedef IAudioStreamVolume lib_win32_audio_stream_volume;
 
 #define lib_win32_co_initialize_ex CoInitializeEx
 #define lib_win32_co_uninitialize CoUninitialize
@@ -46,6 +47,8 @@ typedef IAudioCaptureClient lib_win32_audio_capture_client;
 #define lib_win32_audio_capture_client_get_buffer IAudioCaptureClient_GetBuffer
 #define lib_win32_audio_capture_client_release_buffer IAudioCaptureClient_ReleaseBuffer
 #define lib_win32_audio_capture_client_release IAudioCaptureClient_Release
+#define lib_win32_audio_stream_volume_set_all IAudioStreamVolume_SetAllVolumes
+#define lib_win32_audio_stream_volume_release IAudioStreamVolume_Release
 #define LIB_WIN32_CLSCTX_ALL CLSCTX_ALL
 #define LIB_WIN32_COINIT_MULTITHREADED COINIT_MULTITHREADED
 #define LIB_WIN32_E_RENDER eRender
@@ -57,5 +60,6 @@ typedef IAudioCaptureClient lib_win32_audio_capture_client;
 #define LIB_WIN32_AUDIO_STREAM_FLAGS_LOOPBACK AUDCLNT_STREAMFLAGS_LOOPBACK
 #define LIB_WIN32_AUDIO_BUFFER_FLAGS_SILENT AUDCLNT_BUFFERFLAGS_SILENT
 #define LIB_WIN32_WAVE_FORMAT_PCM WAVE_FORMAT_PCM
+#define LIB_WIN32_AUDIO_UNSUPPORTED_FORMAT AUDCLNT_E_UNSUPPORTED_FORMAT
 
 #endif

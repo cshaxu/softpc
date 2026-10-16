@@ -35,6 +35,26 @@ lib_status audio_pcm_stream_platform_wait_writable(audio_pcm_stream_platform *pl
 lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *platform)
 { return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED; }
 
+lib_status audio_pcm_stream_platform_wait_progress(audio_pcm_stream_platform *platform)
+{ return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED; }
+
+lib_status audio_pcm_stream_platform_progress(audio_pcm_stream_platform *platform,
+    lib_u64 *out_submitted, lib_u64 *out_consumed)
+{
+    if (out_submitted == LIB_NULL || out_consumed == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *out_submitted = *out_consumed = 0u;
+    return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED;
+}
+
+lib_status audio_pcm_stream_platform_set_gain(audio_pcm_stream_platform *platform,
+    const lib_u16 *gains, lib_u32 channel_count)
+{
+    if (platform == LIB_NULL || gains == LIB_NULL || channel_count < 1u || channel_count > 2u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return LIB_STATUS_UNSUPPORTED;
+}
+
 lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform)
 { return platform == LIB_NULL ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED; }
 

@@ -14,6 +14,7 @@ enum {
 typedef enum audio_pcm_stream_control {
     AUDIO_PCM_STREAM_CONTROL_NONE,
     AUDIO_PCM_STREAM_CONTROL_CLEAR,
+    AUDIO_PCM_STREAM_CONTROL_GAIN,
     AUDIO_PCM_STREAM_CONTROL_FLUSH
 } audio_pcm_stream_control;
 
@@ -27,8 +28,11 @@ struct lib_audio_pcm_stream {
     lib_i16 samples[AUDIO_PCM_STREAM_QUEUE_CAPACITY * 2u];
     lib_u32 head;
     lib_u32 count;
-    lib_u32 generation;
+    lib_audio_pcm_progress progress;
+    lib_audio_pcm_notify notify;
+    void *notify_context;
     lib_u32 channel_count;
+    lib_u16 gains[2];
     audio_pcm_stream_control control;
     lib_atomic_i32 wait_cancelled;
     lib_bool active;
@@ -42,6 +46,11 @@ void audio_pcm_stream_platform_worker_detach(audio_pcm_stream_platform *platform
 lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *out_accepted_frames);
 lib_status audio_pcm_stream_platform_wait_writable(audio_pcm_stream_platform *platform);
+lib_status audio_pcm_stream_platform_wait_progress(audio_pcm_stream_platform *platform);
+lib_status audio_pcm_stream_platform_progress(audio_pcm_stream_platform *platform,
+    lib_u64 *out_submitted, lib_u64 *out_consumed);
+lib_status audio_pcm_stream_platform_set_gain(audio_pcm_stream_platform *platform,
+    const lib_u16 *gains, lib_u32 channel_count);
 lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *platform);
 lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform);
 lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platform);

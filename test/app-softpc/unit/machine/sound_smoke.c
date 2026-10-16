@@ -24,7 +24,7 @@ extern ULONG BeepLastDuration;
 /* This smoke links the real Core, Compat and Lib Audio worker.  Only the
    final platform leaf is replaced so it records actual Lib delivery for two
    complete AUDIO.COM-equivalent runs without opening a host audio device. */
-struct audio_pcm_stream_platform { lib_bool live; };
+struct audio_pcm_stream_platform { lib_bool live; lib_u64 submitted; };
 static struct audio_pcm_stream_platform audio_probe_platform;
 static volatile LONG audio_probe_phase;
 static volatile LONG audio_probe_first_delivery;
@@ -47,6 +47,7 @@ lib_status audio_pcm_stream_platform_create(const lib_audio_pcm_stream_options *
     assert(options != NULL && out_platform != NULL);
     assert(options->sample_rate == 48000u && options->channel_count == 1u);
     audio_probe_platform.live = LIB_TRUE;
+    audio_probe_platform.submitted = 0u;
     *out_platform = &audio_probe_platform;
     return LIB_STATUS_OK;
 }
@@ -105,6 +106,7 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
     if (non_silent != LIB_FALSE && phase == 5)
         (void)InterlockedAdd(&audio_probe_program_fast_frames, (LONG)frame_count);
     *accepted = frame_count;
+    platform->submitted += frame_count;
     return LIB_STATUS_OK;
 }
 
@@ -122,7 +124,36 @@ lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *plat
 { assert(platform == &audio_probe_platform); return LIB_STATUS_OK; }
 
 lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform)
-{ assert(platform == &audio_probe_platform); return LIB_STATUS_OK; }
+{
+    assert(platform == &audio_probe_platform);
+    platform->submitted = 0u;
+    return LIB_STATUS_OK;
+}
+
+lib_status audio_pcm_stream_platform_progress(audio_pcm_stream_platform *platform,
+    lib_u64 *submitted, lib_u64 *consumed)
+{
+    assert(platform == &audio_probe_platform);
+    *submitted = *consumed = platform->submitted;
+    return LIB_STATUS_OK;
+}
+
+lib_status audio_pcm_stream_platform_wait_progress(audio_pcm_stream_platform *platform)
+{
+    (void)platform;
+    assert(0); /* This fixture consumes each accepted block immediately. */
+    return LIB_STATUS_INVALID_STATE;
+}
+
+lib_status audio_pcm_stream_platform_set_gain(audio_pcm_stream_platform *platform,
+    const lib_u16 *gains, lib_u32 channel_count)
+{
+    (void)platform;
+    (void)gains;
+    (void)channel_count;
+    assert(0); /* Speaker output does not request native gain. */
+    return LIB_STATUS_INVALID_STATE;
+}
 
 lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platform)
 {

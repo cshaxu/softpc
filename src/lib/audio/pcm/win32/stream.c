@@ -5,11 +5,13 @@
 struct audio_pcm_stream_platform {
     lib_win32_audio_client *client;
     lib_win32_audio_render_client *renderer;
+    lib_win32_audio_stream_volume *volume;
     lib_win32_handle render_ready;
     lib_win32_handle interruption;
     lib_u32 sample_rate;
     lib_u32 channel_count;
     lib_win32_uint32 buffer_frames;
+    lib_u64 submitted_frames;
     lib_bool com_initialized;
     lib_bool attached;
 };
@@ -26,12 +28,22 @@ static const lib_win32_guid audio_client_interface = {
 static const lib_win32_guid audio_render_client_interface = {
     0xf294acfcu, 0x3146u, 0x4483u, { 0xa7u, 0xbfu, 0xadu, 0xdcu,
     0xa7u, 0xc2u, 0x60u, 0xe2u } };
+static const lib_win32_guid audio_stream_volume_interface = {
+    0x93014887u, 0x242du, 0x4068u, { 0x8au, 0x15u, 0xcfu, 0x5eu,
+    0x93u, 0xb9u, 0x0fu, 0xe3u } };
 
 static lib_status audio_pcm_stream_win32_status(lib_win32_hresult result)
-{ return result >= 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR; }
+{
+    if (result == LIB_WIN32_AUDIO_UNSUPPORTED_FORMAT) return LIB_STATUS_UNSUPPORTED;
+    return result >= 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
 
 static void audio_pcm_stream_release_endpoint(audio_pcm_stream_platform *platform)
 {
+    if (platform->volume != LIB_NULL) {
+        (void)lib_win32_audio_stream_volume_release(platform->volume);
+        platform->volume = LIB_NULL;
+    }
     if (platform->renderer != LIB_NULL) {
         (void)lib_win32_audio_render_client_release(platform->renderer);
         platform->renderer = LIB_NULL;
@@ -45,6 +57,7 @@ static void audio_pcm_stream_release_endpoint(audio_pcm_stream_platform *platfor
         platform->render_ready = LIB_NULL;
     }
     platform->buffer_frames = 0u;
+    platform->submitted_frames = 0u;
 }
 
 static lib_status audio_pcm_stream_wait_event(audio_pcm_stream_platform *platform)
@@ -67,6 +80,10 @@ lib_status audio_pcm_stream_platform_create(const lib_audio_pcm_stream_options *
 
     if (options == LIB_NULL || out_platform == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_platform = LIB_NULL;
+    if (options->channel_count < 1u || options->channel_count > 2u ||
+        options->sample_rate == 0u || options->sample_rate >
+            LIB_UINT32_MAX / (options->channel_count * sizeof(lib_i16)))
+        return LIB_STATUS_INVALID_ARGUMENT;
     platform = lib_allocate_zero(1u, sizeof(*platform));
     if (platform == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     platform->sample_rate = options->sample_rate;
@@ -135,6 +152,9 @@ lib_status audio_pcm_stream_platform_worker_attach(audio_pcm_stream_platform *pl
     status = audio_pcm_stream_win32_status(lib_win32_audio_client_get_service(platform->client,
         &audio_render_client_interface, (void **)&platform->renderer));
     if (status != LIB_STATUS_OK) goto fail;
+    status = audio_pcm_stream_win32_status(lib_win32_audio_client_get_service(platform->client,
+        &audio_stream_volume_interface, (void **)&platform->volume));
+    if (status != LIB_STATUS_OK) goto fail;
     {
         lib_win32_byte *silence = LIB_NULL;
 
@@ -186,6 +206,7 @@ lib_status audio_pcm_stream_platform_wait_writable(audio_pcm_stream_platform *pl
         status = audio_pcm_stream_win32_status(lib_win32_audio_client_get_current_padding(
             platform->client, &padding));
         if (status != LIB_STATUS_OK) return status;
+        if (padding > platform->buffer_frames) return LIB_STATUS_IO_ERROR;
         if (padding < platform->buffer_frames) return LIB_STATUS_OK;
         status = audio_pcm_stream_wait_event(platform);
         if (status != LIB_STATUS_OK) return status;
@@ -199,6 +220,50 @@ lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *plat
         LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
+lib_status audio_pcm_stream_platform_wait_progress(audio_pcm_stream_platform *platform)
+{
+    if (platform == LIB_NULL || platform->attached == LIB_FALSE)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    return audio_pcm_stream_wait_event(platform);
+}
+
+lib_status audio_pcm_stream_platform_progress(audio_pcm_stream_platform *platform,
+    lib_u64 *out_submitted, lib_u64 *out_consumed)
+{
+    lib_win32_uint32 padding;
+    lib_status status;
+
+    if (out_submitted == LIB_NULL || out_consumed == LIB_NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *out_submitted = *out_consumed = 0u;
+    if (platform == LIB_NULL || platform->attached == LIB_FALSE)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    status = audio_pcm_stream_win32_status(lib_win32_audio_client_get_current_padding(
+        platform->client, &padding));
+    if (status != LIB_STATUS_OK) return status;
+    if (padding > platform->buffer_frames) return LIB_STATUS_IO_ERROR;
+    *out_submitted = platform->submitted_frames;
+    /* Priming silence precedes all input and is never counted as submitted.
+     * Any remaining priming frames therefore clamp consumption to zero. */
+    *out_consumed = platform->submitted_frames > padding ?
+        platform->submitted_frames - padding : 0u;
+    return LIB_STATUS_OK;
+}
+
+lib_status audio_pcm_stream_platform_set_gain(audio_pcm_stream_platform *platform,
+    const lib_u16 *gains, lib_u32 channel_count)
+{
+    float levels[2];
+    lib_u32 channel;
+
+    if (platform == LIB_NULL || platform->attached == LIB_FALSE || gains == LIB_NULL ||
+        channel_count != platform->channel_count) return LIB_STATUS_INVALID_ARGUMENT;
+    for (channel = 0u; channel < channel_count; ++channel)
+        levels[channel] = (float)gains[channel] / 65535.0f;
+    return audio_pcm_stream_win32_status(lib_win32_audio_stream_volume_set_all(
+        platform->volume, channel_count, levels));
+}
+
 lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *out_accepted_frames)
 {
@@ -207,6 +272,8 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
     if (platform == LIB_NULL || platform->attached == LIB_FALSE || samples == LIB_NULL ||
         out_accepted_frames == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_accepted_frames = 0u;
+    if (frame_count > LIB_UINT64_MAX - platform->submitted_frames)
+        return LIB_STATUS_LIMIT_EXCEEDED;
     while (submitted < frame_count) {
         lib_win32_uint32 padding;
         lib_win32_uint32 writable;
@@ -214,6 +281,7 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
         lib_status status = audio_pcm_stream_win32_status(
             lib_win32_audio_client_get_current_padding(platform->client, &padding));
         if (status != LIB_STATUS_OK) return status;
+        if (padding > platform->buffer_frames) return LIB_STATUS_IO_ERROR;
         if (padding >= platform->buffer_frames) {
             status = audio_pcm_stream_wait_event(platform);
             if (status != LIB_STATUS_OK) return status;
@@ -230,6 +298,7 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
             platform->renderer, writable, 0u));
         if (status != LIB_STATUS_OK) return status;
         submitted += writable;
+        platform->submitted_frames += writable;
         *out_accepted_frames = submitted;
     }
     return LIB_STATUS_OK;
@@ -247,6 +316,7 @@ lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform)
     if (status != LIB_STATUS_OK) return status;
     status = audio_pcm_stream_win32_status(lib_win32_audio_client_reset(platform->client));
     if (status != LIB_STATUS_OK) return status;
+    platform->submitted_frames = 0u;
     (void)lib_win32_reset_event(platform->render_ready);
     return audio_pcm_stream_win32_status(lib_win32_audio_client_start(platform->client));
 }

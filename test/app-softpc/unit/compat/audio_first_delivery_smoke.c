@@ -5,6 +5,7 @@
 
 struct audio_pcm_stream_platform {
     lib_bool delivered_non_silent_pcm;
+    lib_u64 submitted;
 };
 
 static audio_pcm_stream_platform first_platform;
@@ -19,6 +20,7 @@ lib_status audio_pcm_stream_platform_create(const lib_audio_pcm_stream_options *
     assert(options != LIB_NULL && out_platform != LIB_NULL);
     assert(options->sample_rate == 48000u && options->channel_count == 1u);
     first_platform.delivered_non_silent_pcm = LIB_FALSE;
+    first_platform.submitted = 0u;
     *out_platform = &first_platform;
     return LIB_STATUS_OK;
 }
@@ -42,6 +44,7 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
     assert(platform == &first_platform && samples != LIB_NULL);
     assert(frame_count != 0u && frame_count <= AUDIO_PCM_STREAM_PLAY_BATCH &&
         out_accepted_frames != LIB_NULL);
+    platform->submitted += frame_count;
     for (index = 0u; index < frame_count; ++index) {
         if (samples[index] > 0) saw_positive = LIB_TRUE;
         if (samples[index] < 0) saw_negative = LIB_TRUE;
@@ -73,7 +76,32 @@ lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *plat
 lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform)
 {
     assert(platform == &first_platform);
+    platform->submitted = 0u;
     return LIB_STATUS_OK;
+}
+
+lib_status audio_pcm_stream_platform_progress(audio_pcm_stream_platform *platform,
+    lib_u64 *submitted, lib_u64 *consumed)
+{
+    *submitted = *consumed = platform->submitted;
+    return LIB_STATUS_OK;
+}
+
+lib_status audio_pcm_stream_platform_wait_progress(audio_pcm_stream_platform *platform)
+{
+    (void)platform;
+    assert(0); /* This fixture consumes immediately. */
+    return LIB_STATUS_INVALID_STATE;
+}
+
+lib_status audio_pcm_stream_platform_set_gain(audio_pcm_stream_platform *platform,
+    const lib_u16 *gains, lib_u32 channel_count)
+{
+    (void)platform;
+    (void)gains;
+    (void)channel_count;
+    assert(0); /* The speaker never changes native stream gain. */
+    return LIB_STATUS_INVALID_STATE;
 }
 
 lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platform)
