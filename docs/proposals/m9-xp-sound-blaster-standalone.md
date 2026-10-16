@@ -706,7 +706,9 @@ remain authoritative. All native fixture overrides found by the create/attach
 search are updated. Clear epoch checks prevent stale native observations from
 being published as current; the pending-wait clear test covers cancellation,
 not an exhaustive proof of every concurrent schedule. No owner manual audio
-acceptance is inferred. Executor push and separate actual-change review follow.
+acceptance is inferred. Executor `b31b6e17` is pushed; the separate
+[actual-change review](../history/M9-T93-S3-neutral-pcm-contract.md) accepts S3
+and admits S4 under the continuing goal. T93 remains open.
 
 ## Official host-contract references
 

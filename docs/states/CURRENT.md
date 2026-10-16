@@ -3,7 +3,9 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S3 is active: complete the neutral PCM host contract. S2 structural
+T93 S4 is active: neutral host MIDI and truthful raw-FM capability. S3 PCM
+executor b31b6e17 is pushed and actual-change reviewed, with both widths
+passing 150/150 tests including all ten native desktop cases. S2 structural
 relocation is verified and reviewed in 7f642848. Host-output
 directions are recorded below; no sound payload/backend change is imported. Final T92 executor
 `48caa854` and review `93d0b8d6` are pushed. Both Release packages and
@@ -49,7 +51,8 @@ The owner authorizes native desktop test scheduling without repeated approval
 requests; background operations remain hidden and Computer Use remains forbidden.
 No manual audio acceptance is inferred.
 
-S3 implementation is verified, pending executor commit and coordinator review. Its PCM stage has
+S3 implementation is closed under delegated sequential acceptance after
+executor b31b6e17 and separate actual-change review. Its PCM stage has
 submitted/consumed accounting, native progress-event wait, per-channel stream
 gain, format-error classification and arithmetic validation. The existing
 native adapter unit passes on x64/x86 with seven rates, priming/tail/clear,
@@ -70,28 +73,28 @@ enqueue interruption of a tail wait, clear cancellation, counter limits and
 sink failure pass the same repeated dual-width targeted set. Both Release
 builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
-proposal. No manual hearing result, Linux runtime result or S3 closure is claimed.
+proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S3 Packet
+## M9 T93 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal and sequential-execution authorization; S2 executor 7f642848 reviewed with dual 150/150 qualification. |
-| Objective | Add native rate admission, accepted/submitted/consumed progress with reset epoch, event notification, per-stream gain and immediate bounded short-tail submission to the existing PCM path. |
-| Non-goals | No MIDI/FM implementation, XP import, Emulator behavior change, new worker/FIFO/backend, user INI/media/snapshot change or external repository write. |
-| Reference Baseline | S2 executor 7f642848 and its dual package baseline. |
-| Candidate Proposal | [S3 PCM brief](../proposals/m9-xp-sound-blaster-standalone.md#s3--complete-the-neutral-pcm-contract). |
-| Files And ABI Surface | PCM public/private/root/native files, Types audio declarations, PCM tests and affected consumer test fixtures; manifests and contract docs. Refresh exact estimates before editing. |
-| Applicable Rules | Task Reading Set, single-agent executor/coordinator review, C11 shared packages, Types authority and inward ownership; one existing worker/FIFO/WASAPI path. |
-| Verification | Rate/native admission, short tails, counters/priming/underrun, clear epoch, partial acceptance, gain and failures/cancellation; existing first-tone proofs; dual Release publication, shared then other background suites and native desktop tests. |
-| Expected Markers | True host consumption rather than accepted-frame completion; final-tail progress without a new producer command or polling observer; existing clients retain their playback semantics. |
-| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s3 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
+| Admission And Approval | Owner's active goal and sequential-execution authorization; S3 executor b31b6e17 reviewed with dual 150/150 qualification. |
+| Objective | Add neutral host MIDI short/SysEx output, bounded ownership and completion/reset semantics; expose raw FM acquisition as unsupported where no genuine host facility exists. |
+| Non-goals | No software synthesizer, sound bank, XP device import, Emulator change, guest protocol in Lib, user INI/media/snapshot change or external repository write. |
+| Reference Baseline | S3 executor b31b6e17 and its dual package baseline. |
+| Candidate Proposal | [S4 MIDI/FM brief](../proposals/m9-xp-sound-blaster-standalone.md#s4--neutral-midi-output-and-honest-fm-capability). |
+| Files And ABI Surface | New audio/midi and audio/fm public/private/native files, Types WinMM declarations, owner-local tests, build/verifiers/manifests and contract docs. MIDI +300-550 production lines, FM +30-70, tests +300-500; refine file census before edits. |
+| Applicable Rules | Task Reading Set, single-agent executor/coordinator review, C11 shared packages, Types authority and inward ownership; no invented FM rendering or second guest state owner. |
+| Verification | Immediate short message, bounded copied SysEx ownership, full capacity, synchronous/asynchronous completion, reset/close failures, optional volume and absent capability; dual Release publication, shared then other background suites and native desktop tests. |
+| Expected Markers | Event-driven host completion, no polling or external synth dependency; host absence/unsupported remains distinguishable from successful output. Existing PCM/PC-speaker behavior retained. |
+| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s4 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
 | Reporting Requirements | Pre/post production/test add-delete-net and public-contract audit, focused/full evidence and EXE hashes; push complete P then actual-change review. |
-| Stop Conditions | A second playback/state owner, unapproved Emulator pause-hook change, undocumented completion inference, unrelated user changes or external dependency. |
-| Exit Criteria | Complete PCM contract and qualification pushed/reviewed; proceed to S4 under goal authorization, T closure waits for owner. |
+| Stop Conditions | A second device/state owner, unapproved Emulator behavior change, fake FM success, undocumented buffer lifetime, unrelated user changes or external dependency. |
+| Exit Criteria | Neutral MIDI/FM contract and qualification pushed/reviewed; proceed to S5 under goal authorization, T closure waits for owner. |
 | Original Owner Request | 单人双角色模式按照治理规范和质量规范，构建新的 lib/audio 的公共组件 (src+test)，然后导入xp mvdm源代码，为stadalone softpc实现完整xp-ntvdm-parity音频功能 |
-| Similar-Issue Sweep | All submission/readiness/progress/clear/cancellation paths, rate and size arithmetic, initialization failure and stream gain; keep direct-edge and Types gates intact. |
+| Similar-Issue Sweep | Short/long admission, native callback ordering, copied buffer lifetime, pending reset/destruction, capability/error classification and stream/device volume scope; keep direct-edge and Types gates intact. |
 
 ## M9 T93 S1 Retained Design Brief
 
