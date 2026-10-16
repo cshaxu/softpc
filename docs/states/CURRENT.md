@@ -14,9 +14,20 @@ including all ten native desktop tests, with refreshed EXEs and unchanged
 public corpora/user configuration. The checkpoint timeout remains explicit
 test-reliability debt, not a claimed repair. See the
 [S8 closure](../history/M9-T93-S8-xp-midi-fm-attachment.md).
-S9 is now the sole active subtask: portable sound-state archives and final
-qualification. First checkpoint: enumerate device fields, event/EOI ownership
-and host reconstruction before changing the existing archive codec.
+The owner overrides the prior sequential admission: S8 stays closed; the
+unimplemented archive packet initially moved to S10 and must not proceed now.
+The owner now approves splitting the neutrality work into multiple S tasks.
+S9 remains the sole active subtask: read-only audit and bounded design.
+Planned S10-S14 cover input, paths, interface text, PCM lifecycle and capture
+respectively; the archive task moves to S15. These are planned, not concurrent
+implementation admissions. See the proposal for scope and acceptance budgets.
+The owner now requires every S delivery to build, test, commit and push, then
+wait for explicit acceptance. Prior delegated sequential admission is revoked:
+do not admit the next S automatically. S9 audit/design and dual-width
+qualification are delivered locally and awaiting commit/review, then owner
+acceptance. Each width passed 165/165 with zero skips, including five native
+desktop cases. S10 remains planned, not active.
+No S9 archive production changes occurred before this owner-directed reorder.
 The following S8 checkpoints are retained evidence, not active work:
 XP MIDI/FM device attachment through existing
 Lib capabilities. The first checkpoint is the pinned-source subset and port/
@@ -55,7 +66,8 @@ run passed, not that the earlier intermittent timeout has been explained.
 Executor 980984d0 is pushed and actual-change reviewed as recorded above.
 The proposal records focused evidence and pending coverage. Public
 eight-directory changes are not planned. Sound-state serialization stays
-in S9; T93 is open.
+in S15; T93 is open. Earlier retained S9 archive references below describe
+the prior numbering, superseded by this explicit owner reorder.
 S6 executor `065ac9ed` is pushed and actual-change reviewed; S6 closes under
 delegated sequential acceptance. Dual-width 160/160 qualification includes
 all ten native desktop cases and refreshed EXEs. The required post-edit
@@ -211,21 +223,21 @@ proposal. No manual hearing or Linux runtime result is claimed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner delegates automatic sequential S execution until T closure; S8 is delivered and actual-change reviewed. Host-MIDI approximation and no-host FM remain approved. |
-| Objective | Preserve active DSP/DMA/Mixer/FM and partial MIDI continuation through the existing portable machine snapshot path; finish T-level qualification. |
-| Non-goals | No Lib snapshot API, second device state owner, software synthesis, user INI/media mutation or automatic T closure. |
-| Reference Baseline | Pushed S8 executor 980984d0; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and existing necessary-subset ledgers. |
-| Candidate Proposal | [S9 portable archive](../proposals/m9-xp-sound-blaster-standalone.md#s9--portable-archive-and-final-qualification). |
-| Files And ABI Surface | Existing Compat device archive/types, sound owner capture/restore and event/EOI rebinding, machine snapshot integration, owner-local regressions and mirror records. Enumerate exact state before editing. |
+| Admission And Approval | Owner inserts the neutrality audit after S8, then approves: 好 请拆分为多个s任务. S9 is audit/design; S10-S14 are planned repairs and archives move to S15. S8 remains closed. |
+| Objective | Deliver a read-only cross-component contract audit and low-coupling repair breakdown with compatibility, file, diff and proof budgets. |
+| Non-goals | No production changes in S9; no App migration, archive work, backend replacement, software synthesis, new platform backend, user configuration/media change or NXVM write. |
+| Reference Baseline | Pushed S8 review 3f6e7cb3; accepted executor 980984d0 and dual-width 165/165 qualification. |
+| Candidate Proposal | [S9 platform neutrality](../proposals/m9-xp-sound-blaster-standalone.md#s9--shared-component-platform-neutrality). |
+| Files And ABI Surface | Read-only src/test pairs for lib, emulator, x86-debug and x86-ibmpc, including configuration and documentation. Planning edits only in CURRENT and the existing proposal; no App modifications. |
 | Applicable Rules | Task Reading Set, architecture/coding and source/research policy; single-agent dual-role execution; necessary-source subset, Types authority and inward dependencies. |
-| Verification | Uninterrupted/restored active DMA and pending IRQ, partial MIDI and logical notes, pause/debug/save/resume/reset/destroy, malformed archive and cross-width matrix; cached dual Release, shared then all other tests and ten native desktop cases. |
-| Expected Markers | Fixed-width field codec, no host pointers/handles in snapshots; one device owner and existing scheduler; exact emulated continuation versus approximate audible MIDI explicitly separated. |
+| Verification | Audit findings checked against producers/consumers and existing tests. S9 cached dual builds and complete receiving qualification pass 165/165 per width (95 shared, 65 other, five desktop), zero skips. Documentation/diff checks pass. These unchanged-baseline tests do not prove the planned repairs. |
+| Expected Markers | Neutral public contracts; native operations confined to their existing platform owners; Lib Types authority; explicit unsupported capability, no fake success or parallel fallback implementation. |
 | Asset Needs | Hidden supervised build/t93/s9 jobs with log/exit files; 1800s build, 1200s suite, 30 MiB logs; executor cleanup. Reuse cached trees, no Computer Use; native desktop scheduling preapproved. Disposable generated fixtures only. |
-| Reporting Requirements | Before/after source subset and local add/delete/net counts, tests and mirror diff; separate source exclusion from local repair; dual EXE links and actual-change review. |
-| Stop Conditions | Missing sound-state ownership, unserializable callback without existing identity mapping, unapproved public change or alternate implementation, failed required test; resolve before delivery. |
-| Exit Criteria | Finite sound-field and callback ledger fully mapped to codec/reconstruction/exclusion with tests; dual artifacts and full regression; executor push and actual-change review, then owner T acceptance. |
-| Original Owner Request | 我可以async验收，请你继续自动准入下一个和后续的各个S，只在T任务收口前等我。 |
-| Similar-Issue Sweep | Inventory every sound static/global, scheduler callback, EOI hook and host-progress reference; each has capture/reconstruct/exclusion reason and focused proof. |
+| Reporting Requirements | Audit findings with exact ownership and evidence; implementation brief with per-component added/deleted/net estimates before edits; actual diff/test/artifact accounting and separate actual-change review. |
+| Stop Conditions | Unjustified abstraction, product-specific public API, new backend scope, behavior change without authority or failed required regression; resolve before delivery. |
+| Exit Criteria | Bounded audit and repair sequence delivered with all seven requested contract areas assigned, risks and non-changes explicit; documentation checks and actual-change review. No repair or T closure claimed by planning completion. |
+| Original Owner Request | 先不要转入S9.S8收口后停下来，准入一个新的公共组件的平台中立化审计和修复S任务，S9顺延到S10 |
+| Similar-Issue Sweep | Native headers/types/functions, platform macros, product names, build links, unsupported paths and test assumptions; distinguish legitimate platform leaves and x86 semantics from host-platform leakage. |
 
 ## M9 T93 S1 Retained Design Brief
 

@@ -58,3 +58,8 @@ explicit. Public corpora and owner assets other than the two EXEs are unchanged.
 The eight admitted S8 units have evidence; the unexplained timeout is not
 claimed fixed. S8 closes under delegated sequential acceptance, with S9 as
 the sole next active packet. This does not close T93 or the overall goal.
+
+Subsequent owner correction: the archive step above was not implemented and
+is postponed to S10. The owner inserts shared-component platform-neutrality
+audit/repair as S9. S8 closure and its delivered artifacts are unchanged;
+CURRENT and the updated proposal own the new ordering.

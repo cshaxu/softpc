@@ -26,7 +26,7 @@ owners; revise the serial plan and proof requirements. No production/test
 edits, EXE refresh, INI/media changes or claimed playback result in S1.
 Current source baseline is accepted T92, HEAD at admission 6ac9bf0b9.
 The original design proposed S2-S8. The owner's subsequent shared-quality
-insertion below expands the remaining sequence through S9; CURRENT alone
+insertions below expand the remaining sequence through S15; CURRENT alone
 records which step is active or completed.
 
 This revision replaces contradictory draft designs rather than appending a
@@ -2442,7 +2442,182 @@ deletions. The S6 header/DSP subset remains unchanged; S8 adds declarations and
 one Mixer forwarding call there. Final tests/publication/review are still
 required; this accounting alone does not qualify S8.
 
-### S9 — portable archive and final qualification
+### S9 — shared-component platform neutrality
+
+Owner-directed reorder after S8 closure:
+
+> 先不要转入S9.S8收口后停下来，准入一个新的公共组件的平台中立化审计和修复S任务，S9顺延到S10
+
+The archive admission in 3f6e7cb3 is superseded before any archive implementation.
+S8 stays closed. Earlier S9 references in retained checkpoint narratives mean
+the former archive step, initially S10 and now S15; they do not authorize concurrent work.
+
+Audit the eight public directories: src/test for lib, emulator, x86-debug and
+x86-ibmpc. Include public declarations, neutral implementation, native leaves,
+build/test registration and component documentation. Fixed coverage units:
+(1) exported host types/contracts; (2) native function/header ownership and
+Types authority; (3) inward dependency/product independence; (4) platform
+selection and unsupported semantics; (5) platform assumptions in tests;
+(6) duplicated platform paths or unnecessary abstraction; (7) build/package
+portability declarations; (8) receiving regression and artifact qualification.
+
+Each finding must distinguish legitimate platform implementation from leakage.
+Windows backends need not become platform-free; x86 guest semantics are not
+the same as host-platform binding. Do not replace WASAPI/WinMM, rename PCM to
+a backend name, invent silent fallback success or build another state owner.
+NXVM remains read-only comparison material, not a build dependency.
+
+Start with read-only inventory and report concrete repair targets, examples,
+affected files and added/deleted/net estimates before production edits. Scope
+and line estimates are pending that inventory, not invented at admission.
+Prefer removing leaks/duplicates within existing ownership over adding a new
+generic framework. Preserve behavior and test all affected callers. Delivery
+requires cached x86/x64 builds, all shared and receiving tests including native
+desktop cases, refreshed EXEs, executor push and actual-change review. No new
+platform runtime support is claimed without running it. The owner subsequently
+approves splitting this work: "好 请拆分为多个s任务". S9 is read-only audit and
+design; S10-S14 below are planned repairs, not simultaneous admissions.
+
+#### Approved repair breakdown and evidence boundaries
+
+S9 read-only audit disposition: Console native records and ambiguous KVM physical
+identity map to S10; path encoding and platform directory rules map to S11;
+Console/Window string interpretation maps to S12; PCM progress/lifetime maps
+to S13; capture obligations and final Emulator/X86 review map to S14. These
+seven requested areas form the finite design-audit universe. MIDI's documented
+device-wide volume and FM's truthful UNSUPPORTED need no new implementation.
+No broad Emulator/X86 native API leakage was established by the inspected
+interfaces and token scan; assembly DWORD strings are guest semantics.
+These are source observations, not dynamic reproductions or proof of future
+repairs. Existing capture failure tests must be retained rather than duplicated.
+S9 changes no production/test code (+0/-0, net zero), mirror or user configuration,
+media and snapshots. Build publication is accounted separately below.
+
+#### S9 executor qualification
+
+Cached dual Release builds pass. x64 Ninja reports no work; x86 rebuilds and
+publishes softpc32.exe. Each width passes 95 shared, 65 remaining unit/integration
+and five native desktop cases: 165/165, zero failures/skips. Fourteen JUnit
+reports and terminal exit 0 were inspected. This is receiving-baseline proof,
+not implementation or playback proof for any S10-S15 change. No Computer Use.
+An initial runner failed before build because Windows PowerShell lacked
+Get-FileHash; the installed PowerShell 7 runner completed the full qualification.
+The launch failure is not counted as a test failure or hidden retry of a test.
+
+Published SHA-256:
+
+- softpc32.exe: 60E60848AD7E0112295D335F16EE58D5761086B894046CA5E7D7F9B309B14BB8
+- softpc64.exe: BA980E0F46C63BF7F1DD86F872BA08E05102727DCE36368597D67F2E74C473E8
+
+Only the x86 artifact differs from the baseline; x64 is already current.
+User INI hash is unchanged. Production/test code +0/-0, net zero; no mirror
+diff. Current planning changes, S8 reorder annotation and this evidence are
+delivered together. S9 awaits owner acceptance; S10 must not auto-start.
+
+Owner delivery override: "好 批准照此办理 每个s任务完了都要编译测试提交推送后等我验收 不得自动准入下一条".
+This supersedes earlier delegated sequential admission. Each S, including the
+current design delivery, is built/tested and pushed before waiting for owner
+acceptance. No following S starts automatically.
+
+All repairs are limited to the eight public source/test directories and their
+configuration/documentation. No app-softpc changes or new OS backends. S9
+findings are source evidence, not dynamic reproductions. Native implementation
+is legitimate; neutral public values, lifetime and caller duties are the target.
+Emulator/X86 need no speculative production rewrite. Each implementation starts
+with an actual file/caller census and refined added/deleted/net budget, then
+finishes with owner-local tests, same-class sweep, Types/dependency/manifest
+checks, cached dual builds, both EXEs, shared tests first, remaining unit and
+integration tests, all ten native desktop tests, commit/push and actual-change
+review. No Computer Use, foreground long jobs or timeout-based termination.
+Estimates below exclude documentation, manifests and artifacts; they are design
+budgets, not measured diffs. Later admission must resolve behavior choices before
+editing, rather than treating this breakdown as approval of silent changes.
+
+### S10 — neutral Console and KVM input
+
+Own Console raw-key/raw-mouse contracts and KVM physical-key semantics together.
+Current Console publishes native VK, UTF-16 units and native mouse masks;
+KVM Console then normalizes them. Move conversion to the existing platform
+boundary, reuse normalization rather than duplicate it, and locate shared
+declarations without Console depending on KVM. Define Unicode scalar delivery,
+repeat count, cell positions, neutral buttons, PC physical encoding and unavailable
+physical identity. Preserve left/right modifiers, keypad, hotkeys and reset.
+Audit special Pause/Print Screen representation before claiming full equivalence.
+Files: Console interface/broker, Types input declarations, KVM input adapters
+and Console receiver, corresponding fixtures; roughly 10-15 production paths.
+Budget: production +180-300/-150-250, paired net +30-50;
+tests +180-300/-60-100, net approximately +120-200.
+Proof: surrogate pairs/malformed sequences, repeats, modifiers/keypad, no-physical
+text, buttons/cell motion and reset through actual producer/consumer boundaries.
+Public raw records may change; existing logical behavior must not silently change.
+
+### S11 — UTF-8 paths and native directory rules
+
+Own Base executable directory and Storage read/write path interpretation.
+Current generic directory extraction applies Windows rules to POSIX; reader
+uses CreateFileA while writer uses narrow fopen. Define UTF-8 path bytes and
+capacity/failure contracts, put native root/separator handling in existing
+platform leaves, and apply the same encoding to reads and writes. Binary file
+contents remain untouched. Explicitly limit POSIX non-UTF-8 name support.
+No general path framework or App configuration repair.
+Files: Base process, Storage reader/writer/platform files, private Types adapters
+and tests; roughly 7-10 production paths. Production +180-280/-80-140,
+paired net +100-140; tests +120-200/-20-40, net approximately +100-160.
+Proof: Windows drive/UNC roots, POSIX slash roots and backslash names, Unicode
+paths, malformed UTF-8, byte capacity, unchanged failure output and read/write
+roundtrip. ASCII behavior stays; old ANSI bytes are a disclosed compatibility
+change. Any mandatory App migration is a stop/report condition, not scope creep.
+
+### S12 — UTF-8 Console text and Window titles
+
+Own text/line/title encoding, reusing S11's necessary conversion primitives
+without a second converter. Replace locale-dependent public interpretation at
+the existing Windows boundaries; do not mechanically replace internal ASCII
+device names or convert arbitrary byte payloads. Define byte capacities and
+partial-operation/error semantics before implementation.
+Files: Console broker text/line paths, Window title paths, private Types and
+tests; roughly 5-8 production paths. Production +160-260/-60-100,
+paired net +100-160; tests +140-220/-20-40, net approximately +120-180.
+Proof: ASCII, non-ASCII and supplementary scalars, malformed input, conversion
+capacity boundaries, line completion and output errors. Shared callers must
+not select ANSI versus Console code pages. No App edits.
+
+### S13 — PCM progress and lifecycle contract
+
+Keep PCM/WASAPI ownership and existing counters. Define accepted/submitted/
+consumed without requiring padding knowledge; move backend-only format limits
+to the backend while retaining arithmetic validation. Resolve destroy's
+sub-batch-only flush special case with one explicit lifetime rule.
+Proposed rule is explicit flush for submission, clear for discard, destroy for
+stop/release; it changes short-tail destruction behavior and must be confirmed
+in the admission brief. Flush is NOT proof of audible playback or a drain.
+No new drain API or recovery machine. Existing SB close clears first; speaker
+shutdown calls destroy directly, so compatibility must be tested, not assumed.
+Files: PCM interface/common/Win32 implementation and fixtures, roughly 3-4
+production paths. Production +15-35/-25-45, paired net about -10;
+tests +80-140/-20-40, net approximately +60-100.
+Proof: short/whole batches, blocked backend, cancellation, epochs/counter
+monotonicity and failures. MIDI already documents device-wide volume and
+optional support; FM unsupported remains valid. No gratuitous MIDI/FM change.
+
+### S14 — capture boundary and shared-contract completion audit
+
+Describe capture/release/conflict/failure neutrally; native third-party mixing
+restrictions belong in platform integration documentation. First prove whether
+two Lib Windows can race query/register, then add only necessary coordination
+inside the existing owner. No new registration framework or warning-only fix.
+Existing capture tests already cover query/register/remove errors, foreign
+registration refusal and not removing a replacement owner; reuse them.
+Files: Window interface/private mouse implementation and tests/docs, roughly
+2-4 production paths. Production +0-35/-0-10, net 0-35;
+tests +70-120/-0-20, approximate net +50-120, refined after concurrency proof.
+Proof: deterministic competing Lib acquisitions and existing failure/release
+paths, without claiming to control third-party native calls. Finish a finite
+ledger mapping all seven owner-requested audit areas to S10-S14 fixes or justified
+unchanged contracts, including Emulator/X86 interfaces and build/test boundaries.
+No new Linux/macOS support claim. Complete receiving qualification before S15.
+
+### S15 — portable archive and final qualification
 
 Extend existing device capture/restore and fixed-width codec, not Lib archive
 APIs. Reconstruct host handles and progress origin, approximate MIDI state,
