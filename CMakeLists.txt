@@ -572,6 +572,13 @@ add_test(NAME "checks/documentation_governance/selftest"
 add_test(NAME "checks/win32_presentation_manifest"
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/win32_presentation_manifest.cmake")
+add_test(NAME "checks/xp_mirror"
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
+        "${CMAKE_SOURCE_DIR}/tools/checks/xp_mirror.cmake")
+add_test(NAME "checks/xp_mirror/selftest"
+    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+        "-DSELF_TEST_ROOT=${CMAKE_BINARY_DIR}/xp-mirror-selftest" -P
+        "${CMAKE_SOURCE_DIR}/tools/checks/xp_mirror_selftest.cmake")
 add_test(NAME "checks/inward_component_boundaries"
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/inward_component_boundaries.cmake")

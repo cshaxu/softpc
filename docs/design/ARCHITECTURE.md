@@ -34,10 +34,14 @@ No app -> Compat/MVDM edge; only composition -> VM; no VM/Compat -> app edge.
 ```
 
 `app-softpc/softpc.new` is the repository-owned selected recovered-machine layout.
-It retains original relative paths and names for every included file so T14 can
-compare them with the read-only OpenNT reference. It is a selected source
-subset: wholly host-specific NT endpoint files may be absent when a standalone
-host endpoint replaces that contract. Narrow compiler, declaration, calling-ABI
+It retains original relative paths and names. T92 upgrades the routine baseline
+to the necessary subset of XP SP1 revision
+`a2f6d7c93aa4f11efc51147566d5961c59a8ef89`; OpenNT comparisons remain frozen
+migration lineage. The [current mirror manifest](../etc/evidence/softpc/xp-sp1-current-manifest.tsv)
+separates upstream, selected-subset and local identity. Unneeded machine/host
+branches may be excluded within files, with reviewed ranges; real local repairs
+remain visible patches. No external checkout is a build or test dependency.
+Narrow compiler, declaration, calling-ABI
 and pointer-representation corrections may be direct, source-visible diffs at
 the affected point when they remain mechanical and introduce no machine policy.
 `app-softpc/compat/` owns original host callbacks, host resources and port ABI adaptations,

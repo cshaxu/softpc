@@ -1061,6 +1061,52 @@ whole-file/baseline language. Requalify both package widths and all registered
 tests, then perform the separate T-level requirement audit. Stop before T closure
 for the owner; do not silently promote sound capability or the three TODOs.
 
+#### S6 initial audit and gate checkpoint
+
+No existing whole-mirror routine gate was found. The shared test-manifest
+verifier requires LF-only text and belongs to reusable test packages, so it is
+not modified to accommodate this CRLF mirror. A root-owned CMake check reuses
+the existing CTest check registration conventions instead. The new
+[current manifest](../etc/evidence/softpc/xp-sp1-current-manifest.tsv) records
+all 498 paths, pinned raw XP hashes, selected-subset hashes, local hashes,
+text/binary treatment and patch/selection disposition. Its 127 selected bodies
+reuse S3-S5 range records; the remaining bodies compare against their whole XP
+counterparts. ROMs use exact binary bytes. Text identity normalizes CRLF to LF;
+this does not reformat working files or erase other whitespace differences.
+
+The offline reconstruction reads all fixed XP objects in one read-only Git
+batch; no external path appears in the routine gate. The positive 498-file
+check and small selftest pass. Negative cases reject changed/missing/extra
+files, duplicate/escaping paths, inconsistent local-patch identity and an
+unapproved XP revision. Binary identity and text newline handling are exercised
+separately. An initial fixture failure was CMake's native Windows newline
+conversion of an explicit CRLF string, corrected in the test; no production
+failure is inferred. Registration adds two checks; full requalification and
+the overall migration/lineage audit remain pending. No S6 production C/H edit
+has been made.
+
+The complete fixed-object census now independently confirms 498 retained plus
+499 excluded paths equals all 997 XP paths, with no duplicates or omissions.
+Of the current retained bodies, 375 match their selected XP counterpart and
+123 carry explicit local patches; normalized subset-to-local totals are
++26,267/-23,562. These include historical patches and are not the migration
+cost. Against the frozen T91 source endpoint `087e512f`, T92 changes 76 mirror
+files by +11,244/-18,625 (net -7,381), one Compat file by +2/-2 (net zero), and
+four owner-local tests by +545/-4 (net +541). S6 adds verification metadata and
+root checks separately; it does not rewrite those production bodies.
+
+Current Architecture/Coding descriptions now identify the fixed necessary XP
+subset as the routine baseline. The old upgrade ledger and OpenNT divergence
+report are explicitly historical rather than contradictory live instructions.
+M8's historical roadmap wording and old task reports remain unchanged facts.
+The `.gitattributes` change is comment-only; the mirror's checkout policy and
+the user's INI policy are unchanged. Full S6 qualification now passes all
+150 registered tests per width (the prior 148 plus two mirror checks), including
+all ten reserved desktop cases. Both Release package builds succeed using the
+existing Ninja intermediates. See the [completion audit](../history/M9-T92-completion-audit.md)
+for exact phase times and artifact hashes. S6 executor push and separate
+coordinator actual-change review remain required; T closure waits for the owner.
+
 ## S1 File-Scope And Diff Accounting Checkpoint
 
 The current audit now assigns all 86 XP-changed retained paths to batches:

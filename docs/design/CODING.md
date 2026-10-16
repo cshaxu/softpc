@@ -48,10 +48,13 @@ Other components' `win32/` and `linux/` directories are implementation-only.
 Cross-component declarations belong in root `*_interface.h` files, never in
 platform directories or root headers forwarding to platform implementation.
 `app-softpc/softpc.new` contains the selected repository-owned recovered-source
-subset moved from the former baseline tree. Every retained path and name
-permits a direct T14-ledger comparison with the selected read-only OpenNT
-reference. Wholly host-specific original endpoint files may be intentionally
-absent when the standalone host owns their replacement. Retained files are
+subset moved from the former baseline tree. T92's fixed XP SP1 necessary subset
+is the routine comparison reference; the original OpenNT ledger remains
+historical lineage. Every retained path keeps its original name. The root
+`checks/xp_mirror` test verifies all current bodies against the reviewed
+manifest without reading an external repository. Source-selection ranges and
+local repairs remain separately recorded; source is never transformed at build
+time. Wholly host-specific endpoints may be intentionally absent. Retained files are
 C/H/ASM, required modern build configuration, and selected BIOS/VGA/CMOS
 firmware only. Historical object,
 library, and other compiler intermediate files are forbidden. Narrow,

@@ -1,5 +1,16 @@
 # XP SP1 machine-baseline upgrade ledger
 
+## Historical status
+
+This is the earlier research ledger, retained as lineage rather than current
+implementation instructions. Its old file names, batch order and whole-file
+assumptions are superseded by the [T92 proposal](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md).
+The [current manifest](xp-sp1-current-manifest.tsv) records the pinned XP raw
+objects, necessary subsets and local bodies. The retained/unretained path
+ledgers and S3-S5 range ledgers account for selected and excluded material.
+Existing local repairs are not excluded from comparison to hide divergence.
+Sound Blaster is a separately queued capability, not part of this core upgrade.
+
 ## Scope
 
 Upgrade the standalone machine from its current OpenNT/NT4-era source

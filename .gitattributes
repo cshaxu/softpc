@@ -7,7 +7,7 @@
 # is retained and agents must not rewrite or normalize it.
 assets/binary/softpc.ini text eol=crlf
 
-# The selected OpenNT mirror is a byte-level comparison corpus.  Its original
+# The selected SoftPC mirror is a byte-level comparison corpus.  Its original
 # line endings are evidence rather than project formatting and are restored as
 # CRLF on every checkout.
 src/app-softpc/softpc.new/** text eol=crlf

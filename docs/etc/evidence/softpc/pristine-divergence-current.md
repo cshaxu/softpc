@@ -1,5 +1,11 @@
 # MVDM / OpenNT 当前差异账本
 
+T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与修复沿革，
+不再充当当前镜像验收基准。当前基准为固定 XP SP1 的必要源码子集；见
+[当前身份清单](xp-sp1-current-manifest.tsv) 与
+[T92 子集及本地补丁记录](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md)。
+以下历史数字和语义说明不回写成新的 XP 统计。
+
 ### T92 S2 原始设备最小修复
 
 相对 f55428f8，at_dma.c +4/-4、diskbios.c +2/-2、v7_ports.c +1/-1，

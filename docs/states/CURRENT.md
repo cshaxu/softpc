@@ -34,10 +34,15 @@ save/restore, including modified-palette and buffer-boundary assertions. Its x64
 and x86 runs pass. Final dual-width regression passes 148/148 per architecture,
 including all ten reserved native desktop tests. The 71-path subset/range ledgers
 pass independent pinned-object reconstruction; both package EXEs are refreshed
-and hashed. Executor commit/push and separate actual-change review remain
+and hashed. Executor commit/push and separate actual-change review
 are complete: executor 41aa0bc2 is pushed and coordinator actual-change review
 passes. S5 is implementation-closed under delegated async acceptance; S6 is
 now active for the final XP manifest/gate and T-level qualification.
+S6's initial 498-path manifest reconstruction and the new local-only mirror
+gate/selftest pass. All 997 XP paths reconcile without overlap or omission;
+the active-baseline/lineage documentation is reconciled. Full qualification
+passes all 150 registered tests per width, including all ten native desktop
+cases. S6 executor delivery and separate T-level review remain pending.
 This is not an invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
