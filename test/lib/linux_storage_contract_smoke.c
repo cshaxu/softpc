@@ -38,6 +38,10 @@ static lib_i32 lock_stream(lib_i32 fd, lib_i32 operation)
 
 int main(void)
 {
+    lib_storage_file invalid = { 0 };
+    lib_test_assert(storage_file_platform_open("\xed\xa0\x80", LIB_FALSE, &invalid) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(storage_file_platform_writer_open("\xc0\xaf", LIB_FALSE, &invalid) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(invalid.stream == LIB_NULL && closes == 0u);
     for (lib_i32 write = 0; write != 2; ++write) {
         for (lib_u32 failure = 0u; failure != 2u; ++failure) {
             reject_lock = failure != 0u;

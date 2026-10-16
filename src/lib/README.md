@@ -60,7 +60,7 @@ component on the left:
 
 ```text
 types -> base + console + console-broker + storage + audio/pcm + audio/midi + audio/fm + kvm-base + kvm-window + kvm-console
-base -> console + console-broker + audio/pcm + kvm-base + kvm-console
+base -> console + console-broker + storage + audio/pcm + kvm-base + kvm-console
 console -> console-broker + kvm-console
 kvm-base -> kvm-window + kvm-console
 ```
@@ -78,7 +78,7 @@ lifecycle controller, or public unified presenter API.
   to its platform-neutral base source. Common types headers contain no OS
   selection; platform declaration groups live in `types/win32` and
   `types/linux`. The compiler-only atomic adaptation remains common.
-- `base` owns generic sync/time and depends only on Types. Console and KVM
+- `base` owns generic sync/time, input and UTF-8 scalar validation and depends only on Types. Console and KVM
   frame gates reuse its blocking mutex instead of private implementations.
 - `console` provides the logical Console object. It is a neutral copied-value
   endpoint: it has no native handle, platform input mode, Window, raw Console,
@@ -94,6 +94,12 @@ lifecycle controller, or public unified presenter API.
 - `storage` provides file and byte-medium primitives. Medium and writer own
   embedded file storage; owned-byte reads use a stack file. Closing consumes
   the stream, not its enclosing allocation; failed opens leave it empty.
+  File paths and Base executable directories use UTF-8, not a host code page.
+  Windows converts paths at its native boundary; POSIX names with non-UTF-8
+  bytes are outside the contract. File contents remain arbitrary bytes.
+  Base directory capacity counts UTF-8 bytes including NUL and must fit the
+  full executable path; failure leaves caller output unchanged. Root/separator
+  interpretation belongs to each native implementation, not the shared root.
 - `audio/pcm` (target `audio-pcm`) provides bounded copied PCM playback. The Windows delivery worker
   owns one shared WASAPI endpoint from COM initialization through release and
   waits on its endpoint event without invoking producer code; one concurrent

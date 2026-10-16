@@ -17,10 +17,16 @@ test-reliability debt, not a claimed repair. See the
 The owner overrides the prior sequential admission: S8 stays closed; the
 unimplemented archive packet initially moved to S10 and must not proceed now.
 The owner now approves splitting the neutrality work into multiple S tasks.
-The owner accepts S9 and admits S10 neutral Console/KVM input. S10 is the
-sole active subtask, now verified and awaiting owner acceptance. Executor
+The owner accepts S10 and admits S11 through closure: "验收通过，准入执行S11到收口".
+S10 is closed; S11 UTF-8 paths and native directory rules is the sole active
+subtask, now verified and awaiting the separate actual-change review. Final
+x64/x86 each pass 166/166 with zero skips, including all ten native desktop
+cases; both EXEs are refreshed. S11 changes only Lib source/test contracts
+and governance: production C/H +199/-45 (net +154), tests +160/-39 (net +121).
+User INI, media, snapshots and original mirror remain unchanged. S12 and later
+remain unadmitted. The accepted S10 executor
 e7d37b65 is committed and pushed; the separate coordinator actual-change
-review accepts the delivery, not owner closure. Final x64/x86 qualification passes 165/165 each, zero skips,
+review and subsequent owner acceptance close S10. Its final x64/x86 qualification passes 165/165 each, zero skips,
 including all ten native desktop cases; both EXEs are refreshed. Production
 C/H is +542/-534 (net +8), test C/H +268/-181 (net +87), with zero mirror,
 INI, media or snapshot changes. See the
@@ -36,7 +42,7 @@ do not admit the next S automatically. S9 audit/design and dual-width
 qualification are pushed in executor 896aa2fd and actual-change reviewed;
 S9 is owner-accepted. Each width passed 165/165
 with zero skips, including five native
-desktop cases. S11-S15 remain planned and must not auto-start.
+desktop cases. S12-S15 remain planned and must not auto-start.
 No S9 archive production changes occurred before this owner-directed reorder.
 The following S8 checkpoints are retained evidence, not active work:
 XP MIDI/FM device attachment through existing
@@ -228,26 +234,26 @@ builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
 proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S10 Packet
+## M9 T93 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S9 and admits S10, then explicitly permits necessary SoftPC App changes. Deliver and wait for owner acceptance; no automatic S11 admission. |
-| Objective | Neutral Console input values and specified PC physical-key semantics, with one shared conversion implementation and unchanged guest input behavior. |
-| Non-goals | No broad App platform migration, string/path/audio/capture repairs, archives, new OS backend, compatibility alias layer, user configuration/media edits or NXVM writes. |
-| Reference Baseline | S9 executor 896aa2fd and review 449c0646; both widths 165/165, zero skips. |
-| Candidate Proposal | [S10 neutral input](../proposals/m9-xp-sound-blaster-standalone.md#s10--neutral-console-and-kvm-input). |
-| Files And ABI Surface | Lib Types/Base input definitions and adapters, Console broker and KVM consumers, shared/App input symbol consumers and owner-local tests, CMake/manifests/docs. No mirror changes. |
+| Admission And Approval | Owner accepts S10 and explicitly admits S11 through closure; no automatic S12 admission. |
+| Objective | UTF-8 Base executable directory and Storage read/write paths; native separator/root rules stay in platform leaves. |
+| Non-goals | No App configuration migration, Console text/title/audio/capture repairs, new OS backend, user configuration/media/snapshot edits or NXVM writes. |
+| Reference Baseline | S10 executor e7d37b65 and review 45d6f860; both widths 165/165, zero skips. |
+| Candidate Proposal | [S11 UTF-8 paths](../proposals/m9-xp-sound-blaster-standalone.md#s11--utf-8-paths-and-native-directory-rules). |
+| Files And ABI Surface | Lib Types native encoding vocabulary, Base process/UTF-8 validation and Storage platform files, public path contracts, owner-local tests/manifests/docs. Storage uses the inward Base validator; no outer-layer or mirror changes. |
 | Applicable Rules | Task Reading Set, architecture/coding and source/research policy; single-agent dual-role execution; necessary-source subset, Types authority and inward dependencies. |
-| Verification | Actual broker-to-KVM neutral records, Unicode scalar/surrogate boundaries, repeats, physical identity/keypad/modifiers/special keys, reset and mouse cells/buttons; no-scan virtual-keyboard input. Cached dual builds/publication, shared then all other unit/integration tests and ten desktop cases; Types/dependency/naming/manifests. |
-| Expected Markers | Neutral public contracts; native operations confined to their existing platform owners; Lib Types authority; explicit unsupported capability, no fake success or parallel fallback implementation. |
-| Asset Needs | Hidden supervised build/t93/s10 jobs with log/exit files; 1800s build, 1200s suite, 30 MiB logs; executor cleanup. Reuse cached trees, no Computer Use; native desktop scheduling preapproved. Disposable generated fixtures only. |
+| Verification | Drive/UNC/POSIX roots and backslash names, Unicode file read/write/append/medium roundtrip, malformed UTF-8, byte capacity and unchanged failure output. Cached dual builds/publication, shared then all other unit/integration tests and ten desktop cases; Types/dependency/naming/manifests. |
+| Expected Markers | Same UTF-8 interpretation for reads and writes, explicit invalid/unsupported paths, unchanged byte data and locking; one platform route, no fallback or path framework. |
+| Asset Needs | Hidden supervised build/t93/s11 jobs with log/exit files; 1800s build, 1200s suite, 600s desktop, 30 MiB logs; executor cleanup. Reuse cached trees, no Computer Use; native desktop scheduling preapproved. Disposable generated fixtures only. |
 | Reporting Requirements | Audit findings with exact ownership and evidence; implementation brief with per-component added/deleted/net estimates before edits; actual diff/test/artifact accounting and separate actual-change review. |
 | Stop Conditions | Unjustified abstraction, product-specific public API, new backend scope, behavior change without authority or failed required regression; resolve before delivery. |
-| Exit Criteria | Neutral Console values, one encoding/normalization owner, unchanged guest behavior and no native consumer obligations; focused/full proof, both EXEs, executor commit/push and actual-change review, then wait for owner. |
-| Original Owner Request | 好，准入S10开始执行，完成后编译发布测试提交推送后等我验收。可以改softpc app啊。没说你不能改啊。继续。 |
-| Similar-Issue Sweep | Native headers/types/functions, platform macros, product names, build links, unsupported paths and test assumptions; distinguish legitimate platform leaves and x86 semantics from host-platform leakage. |
+| Exit Criteria | Declared path contracts verified, focused/full proof, both EXEs, executor commit/push and separate actual-change review; owner authorizes S11 closure, T93 stays open. |
+| Original Owner Request | 验收通过，准入执行S11到收口。 |
+| Similar-Issue Sweep | Base/Storage path APIs, narrow native opens, status propagation and root parsing; account for every production hit and distinguish deferred S12 text APIs. |
 
 ## M9 T93 S1 Retained Design Brief
 

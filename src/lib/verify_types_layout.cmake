@@ -119,6 +119,11 @@ foreach(path IN LISTS library_sources)
            body MATCHES "lib_win32_(read_console_input_a|write_console_output_a|register_class_a|create_window_ex_a|dispatch_message_a|peek_message_a)[ \t\r\n]*\\(")
             message(FATAL_ERROR "ANSI input bypasses Unicode record contract: ${path}")
         endif()
+        if((path MATCHES "^base/win32/" AND body MATCHES "lib_win32_get_module_file_name_a[ \t\r\n]*\\(") OR
+           (path MATCHES "^storage/(win32/|file\\.c)" AND
+            body MATCHES "(lib_c_fopen|lib_win32_create_file_a)[ \t\r\n]*\\("))
+            message(FATAL_ERROR "Narrow native path bypasses UTF-8 contract: ${path}")
+        endif()
         if(body MATCHES "(^|[^A-Za-z0-9_])(${external_pattern}|KVM_WIN32_KEY_[A-Za-z0-9_]+)([^A-Za-z0-9_]|$)")
             message(FATAL_ERROR "External vocabulary bypasses types in ${path}: ${CMAKE_MATCH_2}")
         endif()

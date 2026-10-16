@@ -2679,8 +2679,8 @@ authority gates. App's two production edits are vocabulary substitutions only.
 The special-key and RDP-style no-scan cases are injected native-record proofs,
 not a claim of manual testing on every physical/RDP device. Existing actual
 guest runtime/snapshot/package integrations passed; no new Linux presenter or
-all-platform capability parity is claimed. S10 awaits owner acceptance, and
-S11 remains unadmitted.
+all-platform capability parity is claimed. At that delivery S10 awaited owner
+acceptance and S11 was unadmitted; the later owner acceptance supersedes this.
 
 #### S10 coordinator actual-change review
 
@@ -2700,9 +2700,45 @@ width. The production/test C/H counts above match the committed delta;
 no executable code changed after qualification. The source/test interfaces
 must be imported together by other repositories; no compatibility aliases or
 unrelated platform implementation are claimed. This accepts S10's delivery
-for owner testing. S10 is not closed and S11 is not admitted.
+for owner testing. That was the delivery state; the owner subsequently accepted
+S10 and admitted S11 through closure. See the [S10 closure](../history/M9-T93-S10-neutral-input.md).
 
 ### S11 — UTF-8 paths and native directory rules
+
+Admitted after S10 owner acceptance at 45d6f860. Finite convergence ledger:
+Base executable-directory entry (Windows and Linux), Storage existing-file open
+(reader/owned/medium), and Storage writer truncate/append. Every entry must use
+UTF-8, preserve its existing ownership/locking semantics and have focused proof.
+Windows conversion uses Types-owned native API vocabulary; Linux validates UTF-8
+bytes and interprets slash only. No path framework or outward dependency.
+Self-review refinement: the shared scalar validator belongs to Base, not Types.
+Storage explicitly depends inward on Base rather than duplicating validation;
+the exact dependency gate and its exhaustive edge self-test are updated.
+This refines the initial no-new-edge estimate without adding a component,
+state, recovery path or platform adaptation in an outer layer.
+The first dual-width run passed 166/166 each, including ten desktop cases,
+before this ownership correction; it is retained as preliminary proof, not
+qualification of the final layout. Final qualification must be rerun.
+
+Similar-issue census uses the production Base/Storage opens and directory
+entry as the frozen universe: the obsolete Base ANSI module-path declaration
+is removed; Storage's ANSI reader and root narrow writer are replaced; Linux
+retains native byte opens after UTF-8 validation. Reader status now forwards
+INVALID_ARGUMENT/NO_MEMORY rather than collapsing every open failure into I/O.
+All owned-byte, medium and append/truncate routes reach these same native
+boundaries. Static negative checks reject restoring implicit Windows code-page
+opens. Native Console handle names and S12 text/title APIs are not file-path
+entries and are unchanged. App config uses Base plus Storage already, so no
+mandatory App edit was found. Non-ASCII Console command input is still S12's
+encoding boundary, not an end-to-end claim made by S11.
+Failure outputs remain unchanged/null as their existing contracts require.
+Completion requires every entry's focused proof and complete dual-width cached
+qualification, artifacts, pushed delivery and separate actual-change review.
+Malformed input is INVALID_ARGUMENT; an executable with an unrepresentable name
+is UNSUPPORTED; insufficient path capacity is LIMIT_EXCEEDED. ASCII behavior
+is preserved; old code-page byte strings must now be UTF-8. S12 text APIs are
+explicitly outside this finite path ledger. Estimate remains production net
++100–140 and tests net +100–160; count actual C/H separately at delivery.
 
 Own Base executable directory and Storage read/write path interpretation.
 Current generic directory extraction applies Windows rules to POSIX; reader
@@ -2718,6 +2754,57 @@ Proof: Windows drive/UNC roots, POSIX slash roots and backslash names, Unicode
 paths, malformed UTF-8, byte capacity, unchanged failure output and read/write
 roundtrip. ASCII behavior stays; old ANSI bytes are a disclosed compatibility
 change. Any mandatory App migration is a stop/report condition, not scope creep.
+
+#### S11 executor qualification
+
+All entries of the finite path ledger are implemented and verified:
+
+| Entry | Single owner and proof |
+| --- | --- |
+| Windows executable directory | Base native wide query, strict UTF-8 conversion and native root parsing; drive/UNC/extended mixed-case UNC roots, multibyte byte capacity, malformed native surrogate and unchanged failure output. |
+| POSIX executable directory | Actual Linux leaf under controlled readlink; slash roots, literal backslashes, UTF-8 names, capacity and non-UTF-8 rejection. No Linux-host runtime claim. |
+| Existing-file reads and media | Storage native open preserves sharing/locking and stream ownership; reader, owned bytes and all three medium modes pass Unicode and binary-content checks. |
+| Writer truncate/append | The same Storage path conversion feeds wide native binary opens; truncation/append and readback pass. An independent native wide-name open prevents symmetric wrong-encoding false positives. |
+| Invalid encoding and dependency boundary | Malformed UTF-8 matrix, scalar boundaries and null-output checks pass; Base owns validation, Types only native declarations. Exact dependency tests admit Storage-to-Base, not a reverse/outer edge; negative tests reject narrow native path regressions. |
+
+Final cached Release builds and publication passed on x64/x86. Each width
+passed 96 shared, 65 other unit/integration and five native desktop tests:
+166/166, zero failures, disabled or skipped cases. JUnit background durations
+are x64 shared 32s/other 100s and x86 shared 33s/other 87s. Desktop tests ran
+serially after both background suites without Computer Use. The retained first
+full run also passed, but does not substitute for this post-refinement run.
+Ninja again reported its previously observed premature-log recovery on x86;
+this caused a larger rebuild and is not claimed repaired by S11.
+
+Reproducible C/H accounting uses `git diff --numstat --no-renames 45d6f860`
+with new tracked files included, separating generated binaries and metadata:
+
+| Scope | Paths | Added | Deleted | Net |
+| --- | ---: | ---: | ---: | ---: |
+| Lib production C/H | 16 | 199 | 45 | +154 |
+| Lib test C/H | 3 | 160 | 39 | +121 |
+| Lib source build/gates | 3 | 8 | 3 | +5 |
+| Lib test build/gates | 2 | 20 | 2 | +18 |
+| Emulator, X86, App and mirror code | 0 | 0 | 0 | 0 |
+
+The production net is 14 lines above the upper initial estimate: explicit
+Base validation ownership/interface, native conversion failure checks and
+complete extended-UNC root handling are retained instead of duplicate or
+implicit paths. There is no worker, recovery state, platform fallback or path
+framework. No user INI/media/snapshot was changed. The old generic Windows
+directory parser and narrow writer route were removed from neutral roots.
+
+Published SHA-256:
+
+- softpc32.exe: `4BE23D708F0DB7319A5A5CD6190173450098AC8DA0C91DF769CBAF109BFBF3A6`
+- softpc64.exe: `BF5E790708E41A8015E5B8B0E3EB4766096BDC3E267842870AC2C192362D7A18`
+
+Compatibility is deliberate: ASCII names retain behavior; old ANSI-encoded
+non-ASCII path bytes must be converted to UTF-8. POSIX non-UTF-8 names remain
+outside the supported contract. S12's Console text/title encoding and broader
+App portability are not claimed complete. No new deferred defect was found
+inside this finite path ledger. Executor delivery precedes coordinator review
+and owner-authorized closure; T93 remains open and S12 is not admitted.
 
 ### S12 — UTF-8 Console text and Window titles
 

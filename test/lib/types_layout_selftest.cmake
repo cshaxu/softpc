@@ -23,6 +23,8 @@ file(REMOVE "${fixture}/consumer.c" "${fixture}/base/consumer.c" "${fixture}/typ
     "${fixture}/audio/pcm/probe_interface.h"
     "${fixture}/audio/pcm/win32/probe_interface.h"
     "${fixture}/audio/pcm/win32/probe.c")
+file(REMOVE "${fixture}/base/win32/path_probe.c" "${fixture}/storage/win32/path_probe.c"
+    "${fixture}/storage/file.c")
 set(probe "${fixture}/types/probe.h")
 foreach(retired IN ITEMS kvm-base/mailbox_wake_interface.h
         kvm-base/win32/mailbox.c kvm-base/linux/mailbox.c)
@@ -51,6 +53,21 @@ foreach(retired IN ITEMS kvm-base/mailbox_wake_interface.h
     file(WRITE "${fixture}/${retired}" "/* duplicate Event implementation */\n")
     check_layout(fail)
     file(REMOVE "${fixture}/${retired}")
+endforeach()
+check_layout(pass)
+
+# Path boundaries must not return to implicit native code pages.
+foreach(path IN ITEMS base/win32/path_probe.c storage/win32/path_probe.c storage/file.c)
+    get_filename_component(parent "${fixture}/${path}" DIRECTORY)
+    file(MAKE_DIRECTORY "${parent}")
+    if(path MATCHES "^base/")
+        set(call lib_win32_get_module_file_name_a)
+    else()
+        set(call lib_c_fopen)
+    endif()
+    file(WRITE "${fixture}/${path}" "void probe(void) { ${call}(0); }\n")
+    check_layout(fail)
+    file(REMOVE "${fixture}/${path}")
 endforeach()
 check_layout(pass)
 
@@ -86,7 +103,7 @@ set(allowed_types "")
 set(allowed_base types)
 set(allowed_console types base)
 set(allowed_console-broker types base console)
-set(allowed_storage types)
+set(allowed_storage types base)
 set(allowed_audio-pcm types base)
 set(allowed_audio-midi types)
 set(allowed_audio-fm types)

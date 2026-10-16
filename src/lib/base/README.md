@@ -1,7 +1,7 @@
 # base
 
 `base` owns blocking mutexes, events, tasks, wait/cancellation, sleep/yield,
-monotonic clock composition, current-executable directory discovery and native
+monotonic clock composition, UTF-8 validation, current-executable directory discovery and native
 keyboard decoding. It depends only on header-only `types`; no Console,
 KVM, storage or application dependency is permitted. The build selects same-shape
 Win32/Linux implementations. Their headers remain component-local.
@@ -9,6 +9,10 @@ Win32/Linux implementations. Their headers remain component-local.
 Use `sync_interface.h`, `clock_interface.h` and `process_interface.h`.
 `base_process_executable_directory` copies the actual host executable directory
 into a caller buffer; callers append their own product configuration name.
+The output is UTF-8; capacity includes NUL and must fit the full executable
+path. Native root/separator rules belong to the selected platform leaf.
+`text_interface.h` provides stateless UTF-8 scalar validation, shared by native
+directory and file boundaries. It does not normalize paths or own allocations.
 Mutexes require a live object,
 same-thread unlock and no recursion; destroy requires no owner or waiters.
 Events select manual or automatic reset at creation. Signal/reset report native
