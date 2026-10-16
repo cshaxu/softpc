@@ -14,8 +14,9 @@ desktop cases. The initial stale-object failure and corrected full run are
 recorded in the [import ledger](../proposals/m9-xp-sound-blaster-standalone.md#s7-approved-import-continuation).
 Production C/H is +217/-223, net -6; tests are +300/-69, net +231. Public
 production is byte-identical to pinned NXVM; only the retained Monitor test
-matrix and its manifest differ. This delivery awaits push/review and owner
-acceptance; S7 is not closed and S8 remains unadmitted.
+matrix and its manifest differ. Executor 7bb98d79 is pushed and separately
+actual-change reviewed against the packet and qualification evidence. This
+delivery awaits owner acceptance; S7 is not closed and S8 remains unadmitted.
 S6 executor `065ac9ed` is pushed and actual-change reviewed; S6 closes under
 delegated sequential acceptance. Dual-width 160/160 qualification includes
 all ten native desktop cases and refreshed EXEs. The required post-edit
