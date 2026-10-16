@@ -25,6 +25,8 @@ src/
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
     audio/pcm/  copied PCM stream and selected native backend
+    audio/midi/ complete MIDI messages and selected native output
+    audio/fm/   truthful raw-FM capability acquisition
 ```
 
 Directories appear only in their admitted migration task.

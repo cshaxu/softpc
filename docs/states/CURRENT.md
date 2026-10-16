@@ -3,7 +3,12 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S4 is active: neutral host MIDI and truthful raw-FM capability. S3 PCM
+T93 S4 is implemented and verified, pending its complete executor push and
+coordinator review: neutral host MIDI and truthful raw-FM capability. Both
+widths pass 154/154 including all ten native desktop tests; both EXEs are
+refreshed. Production C/H +444/-0 and test C +356/-0; no mirror or existing
+PCM/Compat/Machine/Emulator change. The S4 proposal ledger records native
+capability versus mocked-output evidence and artifact hashes. S3 PCM
 executor b31b6e17 is pushed and actual-change reviewed, with both widths
 passing 150/150 tests including all ten native desktop cases. S2 structural
 relocation is verified and reviewed in 7f642848. Host-output

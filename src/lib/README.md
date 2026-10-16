@@ -55,7 +55,7 @@ An arrow means the component on the right may use the generic contract of the
 component on the left:
 
 ```text
-types -> base + console + console-broker + storage + audio/pcm + kvm-base + kvm-window + kvm-console
+types -> base + console + console-broker + storage + audio/pcm + audio/midi + audio/fm + kvm-base + kvm-window + kvm-console
 base -> console + console-broker + audio/pcm + kvm-base + kvm-console
 console -> console-broker + kvm-console
 kvm-base -> kvm-window + kvm-console
@@ -95,6 +95,14 @@ lifecycle controller, or public unified presenter API.
   waits on its endpoint event without invoking producer code; one concurrent
   waiter may be cancelled without touching queued PCM. Linux explicitly reports
   unsupported. Producers own synthesis, pacing and guest-device semantics.
+- `audio/midi` (target `audio-midi`) sends complete short messages and copied
+  SysEx through the host default MIDI output. Four 4096-byte slots retain native
+  header ownership until completion; event waits do not require a future
+  submission. Ordinary short messages preserve long-message ordering; realtime
+  messages may interleave. Reset stops notes and terminates interrupted SysEx.
+  Optional device volume can affect other clients. Linux reports unsupported.
+- `audio/fm` (target `audio-fm`) exposes raw FM capability acquisition only.
+  Current platforms return UNSUPPORTED/null, not a substitute synthesizer.
 - `kvm-base` provides copied frame/input values, source-local registered-hotkey
   matching, source identities, and private mailbox mechanics.
 - `kvm-window` owns one Window lifecycle; `kvm-console` owns one raw-Console

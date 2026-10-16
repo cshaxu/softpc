@@ -9,6 +9,31 @@
 #include <objbase.h>
 #include <mmdeviceapi.h>
 #include <audioclient.h>
+#include <mmeapi.h>
+
+typedef HMIDIOUT lib_win32_midi_output;
+typedef MIDIHDR lib_win32_midi_header;
+typedef MMRESULT lib_win32_mmresult;
+
+#define lib_win32_midi_out_open midiOutOpen
+#define lib_win32_midi_out_close midiOutClose
+#define lib_win32_midi_out_short midiOutShortMsg
+#define lib_win32_midi_out_long midiOutLongMsg
+#define lib_win32_midi_out_prepare midiOutPrepareHeader
+#define lib_win32_midi_out_unprepare midiOutUnprepareHeader
+#define lib_win32_midi_out_reset midiOutReset
+#define lib_win32_midi_out_get_volume midiOutGetVolume
+#define lib_win32_midi_out_set_volume midiOutSetVolume
+#define LIB_WIN32_MIDI_MAPPER MIDI_MAPPER
+#define LIB_WIN32_CALLBACK_EVENT CALLBACK_EVENT
+#define LIB_WIN32_MIDI_DONE MHDR_DONE
+#define LIB_WIN32_MIDI_PREPARED MHDR_PREPARED
+#define LIB_WIN32_MIDI_IN_QUEUE MHDR_INQUEUE
+#define LIB_WIN32_MIDI_NO_DEVICE MIDIERR_NODEVICE
+#define LIB_WIN32_MM_BAD_DEVICE MMSYSERR_BADDEVICEID
+#define LIB_WIN32_MM_NO_MEMORY MMSYSERR_NOMEM
+#define LIB_WIN32_MM_NOT_SUPPORTED MMSYSERR_NOTSUPPORTED
+#define LIB_WIN32_MM_OK MMSYSERR_NOERROR
 
 typedef HRESULT lib_win32_hresult;
 typedef UINT32 lib_win32_uint32;

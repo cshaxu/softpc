@@ -228,7 +228,7 @@ actions; emulator/ui does not interpret their x86 meaning.
 The library's only direct component edges are:
 
 ```text
-types    -> base + console + console-broker + storage + audio/pcm + kvm-base + kvm-window + kvm-console
+types    -> base + console + console-broker + storage + audio/pcm + audio/midi + audio/fm + kvm-base + kvm-window + kvm-console
 base     -> console + console-broker + audio/pcm + kvm-base + kvm-console
 console  -> console-broker + kvm-console
 kvm-base  -> kvm-window + kvm-console
@@ -250,6 +250,15 @@ speaker worker supplies synthesized PCM and owns tone timing; an output failure
 ends that worker with one diagnostic, while shutdown cancellation stays silent.
 There is no automatic retry or restart. A native-output failure is observable
 to the consumer; no platform silently discards samples as successful playback.
+
+`audio/midi` accepts complete short and bounded copied SysEx messages. Its
+Windows owner submits stable headers directly to WinMM and waits on completion
+or cancellation events, without an additional worker or timed polling. It
+does not own guest byte parsing, synthesis or instrument banks. MIDI volume
+is an optional host-device capability, unlike stream-local PCM gain.
+`audio/fm` exposes raw FM acquisition only; current platforms report
+UNSUPPORTED/null rather than claiming a software synthesizer or MIDI instrument
+is raw FM hardware. Neither audio leaf depends on the other audio leaves.
 
 All cross-component contracts are declared at the owning component root.
 Each component's `win32/` and `linux/` files are exclusively its own platform

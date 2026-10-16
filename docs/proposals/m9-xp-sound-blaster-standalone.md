@@ -411,6 +411,93 @@ optional volume unsupported, FM unsupported/null. Native MIDI smoke must
 distinguish device absence from a successful output call. No promise of
 audible FM or a Linux backend. No SB state in Lib tests.
 
+#### S4 implementation and qualification ledger
+
+Frozen S4 universe: the public MIDI operations listed above, FM acquisition,
+their selected platform implementations, Types/build ownership, four MIDI/FM
+tests and the existing complete dual-width suite. This does not qualify the
+future guest device parser, audible instruments or arbitrary host endpoints.
+Completion requires each row below and the full packet qualification. The
+executor has completed the following evidence; coordinator review follows
+the complete executor commit and push, not this self-report.
+
+The implementation uses four stable WinMM header/data slots, two native
+auto-reset events and no worker, secondary FIFO or periodic polling. Caller
+operations reap completed headers. Accepted final output already belongs to
+WinMM and does not need a subsequent producer call. Ordinary short messages
+wait for preceding long messages; realtime messages bypass that wait. WinMM's
+own short-message call can block and cannot be cancelled by the library event.
+The existing caller-serialization contract is retained.
+
+WinMM reset returns pending headers but does not transmit EOX. The same long
+submission path sends a one-byte EOX continuation only if reset interrupted
+pending SysEx; no public partial-message API or second parser is added.
+Native output failure is terminal; cleanup may still reclaim native ownership.
+Optional MIDI device volume is explicitly not per-stream WASAPI gain.
+FM has only acquisition with UNSUPPORTED/null, without a pretend backend.
+
+| Member | Proof receiver | Current disposition |
+| --- | --- | --- |
+| Complete short/SysEx admission, maximum size, reserved status | midi_output smoke | Dual-width full pass plus 50 repetitions |
+| Four-slot copy lifetime and exhaustion | win32_midi_output smoke | Dual-width full pass plus 50 repetitions |
+| Ordinary/realtime ordering and native completion | win32_midi_output smoke | Dual-width full pass plus 50 repetitions; no audible claim |
+| Reset EOX, terminal errors and close ownership | win32_midi_output smoke | Dual-width full pass plus 50 repetitions, including event creation and wait failures |
+| Absent capability and optional volume | native_midi_output, unsupported_output and native mock | Both native default outputs opened/released; unsupported transport and volume branches pass |
+| FM unsupported/null | midi_output smoke | Dual-width full pass plus 50 repetitions |
+| Inward dependencies and Types authority | exact DAG selftest, types-layout and manifests | All pass; matrix includes every ordered MIDI/FM direct edge |
+| Existing PCM and product behavior | complete shared/background/desktop suites | 154/154 per width, including all ten native desktop cases |
+
+Pre-change estimate remains MIDI +300-550, FM +30-70 and tests +300-500.
+The concrete source census is five MIDI C/H paths, two FM C/H paths and one
+Types header, plus Lib build/edge declarations. Tests add four C files and
+extend registration and the existing exhaustive direct-edge matrix. FM needs
+fewer lines than estimated because there is no legitimate platform transport
+to wrap. No mirror, Compat, Machine or Emulator production changes occur.
+
+First focused build caught an incorrect test-only output helper name; it was
+removed rather than adding a needless Types alias. The corrected initial two
+tests pass on x64 and x86. The real Windows adapter itself compiled in that
+first build. These are source/compiler and mocked transport proofs, not
+manual hearing or guest integration acceptance.
+
+References: Microsoft [midiOutOpen](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutopen),
+[midiOutShortMsg](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutshortmsg)
+and [midiOutReset](https://learn.microsoft.com/en-us/windows/win32/api/mmeapi/nf-mmeapi-midioutreset).
+
+S4 final executor evidence (baseline `1525f4f3`):
+
+- Production C/H: eight paths, +444/-0, net +444 (MIDI 397, FM 22,
+  Types 25). Tests: four C paths, +356/-0, net +356. Build/edge configuration:
+  source two files +22/-5, tests two files +8/-2, reported separately from C/H.
+  Two manifests, design/contract documentation and both EXEs are also updated.
+- No XP/OpenNT mirror diff, existing PCM implementation change, Compat/Machine/
+  Emulator production change, user INI, medium or snapshot modification.
+- Hidden full job passes both Release builds. x64 shared 94/94 (50.31 s),
+  other background 55/55 (93.43 s), desktop 5/5 (14.25 s). x86 shared 94/94
+  (45.70 s), other background 55/55 (72.01 s), desktop 5/5 (14.00 s).
+  The three isolated message/unsupported/native-mock tests each pass 50
+  repetitions on each width. Native default MIDI open/release passes separately.
+- x86 Ninja again reports recovery from a prematurely ended log and rebuilds
+  597 steps successfully. The executor did not purge the build cache or
+  interrupt a build. x64 reuses its existing intermediates (34 steps).
+- Both manifest gates, Types boundary, documentation governance and diff
+  whitespace checks pass. Raw owned logs are disposable after this checkpoint;
+  no trace, external sound bank or external firmware becomes a test input.
+- Published x64: 3,097,633 bytes, SHA-256
+  `2E95B23961221DE7CB0B5F8F3D7DF568A55F4CFFDC651ABF474173642B4ED8A2`.
+  Published x86: 3,498,351 bytes, SHA-256
+  `2F151B30204794604CC2DE9171BF0D658850C8BD275E4B4FD34B861D317D6855`.
+- Similar-issue sweep: source searches for polling/sleep/thread creation,
+  direct WinMM vocabulary and retry paths in the new audio leaves find no
+  polling, extra worker or reopen path. Direct SDK calls remain Types aliases
+  used only by the selected Windows implementation. PCM retains its distinct
+  WASAPI worker/FIFO because PCM and MIDI are different host transports, not
+  duplicate delivery routes. All new public/native failure paths have a
+  disposition in the table above; no additional defect is deferred from S4.
+- Evidence boundaries: compiler/static and mocked transport proofs plus real
+  device open/close are established. No manual hearing, Linux runtime,
+  guest MIDI parser or XP Sound Blaster integration success is claimed here.
+
 ### S5 — original DMA prerequisite repair
 
 Change at_dma.c's existing decrement helpers/split and, only if justified,
