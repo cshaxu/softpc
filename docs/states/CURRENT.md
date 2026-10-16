@@ -18,8 +18,10 @@ The owner overrides the prior sequential admission: S8 stays closed; the
 unimplemented archive packet initially moved to S10 and must not proceed now.
 The owner now approves splitting the neutrality work into multiple S tasks.
 The owner accepts S10 and admits S11 through closure: "验收通过，准入执行S11到收口".
-S10 is closed; S11 UTF-8 paths and native directory rules is the sole active
-subtask, now verified and awaiting the separate actual-change review. Final
+S10 and S11 are closed. S11 executor 33a9c9f7 is pushed and its separate
+coordinator actual-change review passes under the owner's through-closure
+authorization. T93 remains open with no active implementation subtask; S12
+requires a new owner admission. See the [S11 closure](../history/M9-T93-S11-utf8-paths.md). Final
 x64/x86 each pass 166/166 with zero skips, including all ten native desktop
 cases; both EXEs are refreshed. S11 changes only Lib source/test contracts
 and governance: production C/H +199/-45 (net +154), tests +160/-39 (net +121).
@@ -234,7 +236,7 @@ builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
 proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S11 Packet
+## M9 T93 S11 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |
