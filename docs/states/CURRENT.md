@@ -35,7 +35,9 @@ and x86 runs pass. Final dual-width regression passes 148/148 per architecture,
 including all ten reserved native desktop tests. The 71-path subset/range ledgers
 pass independent pinned-object reconstruction; both package EXEs are refreshed
 and hashed. Executor commit/push and separate actual-change review remain
-before S5 closure and S6 admission.
+are complete: executor 41aa0bc2 is pushed and coordinator actual-change review
+passes. S5 is implementation-closed under delegated async acceptance; S6 is
+now active for the final XP manifest/gate and T-level qualification.
 This is not an invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
@@ -48,8 +50,7 @@ background + 5 desktop tests (146/146), with both EXEs refreshed; final
 focused/gate rechecks pass 7/7 each. On 2026-10-15 the owner authorizes async
 acceptance and automatic serial admission through S6, waiting only before
 T92 closure. S2 is implementation-closed on that delegated basis, not marked
-as manually tested by the owner. S3-S4 are closed; S5 is active and S6 remains
-the serial successor.
+as manually tested by the owner. S3-S5 are closed; S6 is the active successor.
 Owner explicitly approves XP source import on 2026-10-15. The pinned source,
 original notices and local-patch ledger govern S3; no third-party license or
 redistribution grant is inferred. S2 repaired existing code without XP bodies.
@@ -58,7 +59,28 @@ Executor audit `2616deb8` is pushed; its coordinator actual-change review is
 recorded in the linked proposal. Proceeding to S2 does not claim runtime
 qualification of the source audit or close T92.
 
-## M9 T92 S5 Packet
+## M9 T92 S6 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner authorizes automatic serial S admission with async acceptance, waiting only before T closure; S5 actual-change review passes. |
+| Objective | Make the pinned XP necessary subset the auditable routine mirror baseline; qualify all retained paths and the complete migrated product. |
+| Non-goals | No new device, sound capability, production rewrite, public-package change, user configuration/media change, or external build dependency. |
+| Reference Baseline | Reviewed S5 executor 41aa0bc2; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and OpenNT pins in the proposal. |
+| Candidate Proposal | [S6 baseline gate](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s6--xp-baseline-gate-and-opennt-lineage-freeze). |
+| Files And ABI Surface | All 498 retained and 499 unretained paths for accounting; existing S3-S5 range ledgers; repository-owned verification/test registration and architecture/provenance docs. No production ABI change. |
+| Applicable Rules | Task Reading Set; execution, coding, architecture and documentation governance; source-research and necessary-subset policy. |
+| Verification | Independent fixed-object reconstruction; complete manifest and negative gate tests; protected-path/diff audit; dual Release artifacts, all shared/other/desktop tests and requirement-by-requirement T audit. |
+| Expected Markers | No unaccounted path; local patches remain visible; routine checks need no external checkout; OpenNT lineage is frozen rather than active baseline. |
+| Asset Needs | Reuse existing Ninja intermediates; bounded ignored build/t92/s6 evidence; hidden build 1800s, suites 1200s, desktop/audit 600s, 30 MiB log cap; executor owns cleanup. |
+| Reporting Requirements | Prechange audit and estimates; added/deleted/net by production/test/metadata; full evidence, artifact hashes, executor push and separate actual-change review. |
+| Stop Conditions | Missing provenance, unexplained selected-source drift, new production behavior, public ABI expansion, or failed qualification. |
+| Exit Criteria | Verified/pushed S6 and coordinator review; T-level audit complete, then wait for owner before formal T closure. |
+| Original Owner Request | 按照治理规范和执行规范，单人双角色模式，实现现有softpc核心迁移到winxp源码的基线上；必要子集，保留真实本地补丁；异步验收，T收口前等待确认。 |
+| Similar-Issue Sweep | Stale OpenNT/whole-file active claims, missing/extra paths, hidden local patches, unpinned reference or external build dependency; disposition each hit. |
+
+## M9 T92 S5 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |

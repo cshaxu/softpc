@@ -1012,12 +1012,54 @@ remain unchanged. Documentation and non-mirror whitespace checks pass; the
 19 explained mirror-format diagnostics remain disclosed above. Executor push
 and a separate coordinator review of the actual commit precede closure.
 
+#### S5 coordinator actual-change review and delegated closure
+
+Reviewed pushed executor `41aa0bc24bac4de61c6a5dd32b4fefb78bde95bb`
+against the admitted 71-path universe and necessary-subset policy. Its 35
+changed paths comprise 27 mirror files, one test, two EXEs and five governance/
+ledger files. The actual diff preserves the original selected renderer,
+T88 marker/geometry changes, fixed text destination stride and snapshot cache
+reset. Removed MONITOR/X86GFX/NTVDM routes are not the application's debugger
+or KVM Window paths. Their dependent original endpoint declarations are removed;
+BIGWIN painters and shared header definitions remain. No second renderer or
+standalone-only behavior branch is added.
+
+The actual new test enters the existing video BIOS dispatcher, compares every
+RGB byte independently against its supplied palette, changes the palette before
+restore, and checks memory boundaries. All final phase exit codes are zero:
+148/148 per width, including ten desktop cases. Package hashes match the
+executor record; origin/main equals the reviewed commit. The independent
+fixed-XP range check, local snapshot-body preservation and non-mirror whitespace/
+documentation gates pass. Source-format exceptions remain explicit.
+No new blocking finding is raised. S5 is implementation-closed under delegated
+async acceptance, not a fresh manual owner acceptance. S6 is admitted next;
+T92 remains open until its separate completion audit and owner confirmation.
+
 ### S6 — XP baseline gate and OpenNT lineage freeze
 
 Make the XP manifest and XP-to-local destination ledger the routine mirror
 gate. Freeze OpenNT-to-XP and OpenNT-to-local reports as migration lineage
 evidence. A new future XP reference revision requires a separately admitted
 audit; it cannot silently redefine the mirror.
+
+S6 starts from the reviewed S5 executor `41aa0bc2`. Its finite universe is
+all 498 retained mirror paths and the existing 499 excluded XP paths, with
+S3/S4/S5 selected ranges taking precedence over whole-file comparison. The
+manifest must distinguish pinned upstream identity, selected-subset identity
+and current local identity; a local fix may not disappear into an exclusion.
+The routine gate must run entirely on checked-in metadata/source, without an
+external repository dependency. Independent migration reconstruction may read
+the fixed external Git objects, but is not a build transformation or runtime.
+
+Expected changes are metadata, one bounded verification path and its negative
+test, root test registration and current architecture/provenance documentation;
+approximately 500 manifest rows, 100-180 verification/test lines and 100-200
+documentation lines. No production C/H changes or new machine feature are
+planned. Audit the existing manifest/gate paths first to reuse their mechanisms.
+Preserve OpenNT reports as historical lineage and correct obsolete active
+whole-file/baseline language. Requalify both package widths and all registered
+tests, then perform the separate T-level requirement audit. Stop before T closure
+for the owner; do not silently promote sound capability or the three TODOs.
 
 ## S1 File-Scope And Diff Accounting Checkpoint
 
