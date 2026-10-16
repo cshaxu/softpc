@@ -83,7 +83,7 @@ static half_word data1_reg = 0,
 		 data2_reg = 0,
 		 mouse_status_reg = 0;
 
-static half_word 
+static half_word
 		 last_button_left  = 0,
 		 last_button_right = 0;
 
@@ -282,12 +282,12 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				/* clear the interrupt */
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 
-				/* 
-				 * read next mouse deltas & buttons 
-				 * into the inport registers 
+				/*
+				 * read next mouse deltas & buttons
+				 * into the inport registers
 				 */
-				data1_reg = delta_x;
-				data2_reg = delta_y;
+				data1_reg = (half_word)delta_x;
+				data2_reg = (half_word)delta_y;
 				mouse_status_reg = 0;
 				mouse_status_reg = (button_left << 2) + (button_right);
 				if (delta_x!=0 || delta_y!=0) {
@@ -295,12 +295,12 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				}
 				if (last_button_right != button_right) {
 					mouse_status_reg |= RIGHT_BUTTON_CHANGE;
-					last_button_right = button_right;
+					last_button_right = (half_word)button_right;
 				}
 
 				if (last_button_left != button_left) {
 					mouse_status_reg |= LEFT_BUTTON_CHANGE;
-					last_button_left = button_left;
+					last_button_left = (half_word)button_left;
 				}
 				delta_x = delta_y = 0;
 			}
@@ -459,7 +459,7 @@ int	Delta_x,Delta_y,left,right;
 
 void mouse_init IFN0()
 {
-    int p;
+    IU16 p;
 
 #ifndef PROD
     if (io_verbose & MOUSE_VERBOSE) {
@@ -478,7 +478,7 @@ void mouse_init IFN0()
     io_define_outb(MOUSE_ADAPTOR, mouse_outb);
 
     for(p = MOUSE_PORT_START; p <= MOUSE_PORT_END; p++) {
-	io_connect_port(p, MOUSE_ADAPTOR, IO_READ_WRITE);
+	io_connect_port(p, MOUSE_ADAPTOR, (IU8)IO_READ_WRITE);
 
 #ifdef KIPPER
 #ifdef CPU_40_STYLE
@@ -491,7 +491,7 @@ void mouse_init IFN0()
 	if (io_verbose & MOUSE_VERBOSE) {
 	    sprintf(buff, "Mouse Port connected: %x", p);
 	    trace(buff,DUMP_NONE);
-	}  
+	}
 #endif
     }
     host_deinstall_host_mouse();

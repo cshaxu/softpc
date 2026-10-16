@@ -567,6 +567,252 @@ of ROM CS and mouse BX, foreign-machine and product-host routes. nt_sound.c
 does not authorize Sound Blaster integration. Use positional three-way review,
 not substring matching, following the S3 merge-defect lesson.
 
+#### S4 immutable-source audit checkpoint
+
+Extract all 18 candidate bodies from the pinned XP/OpenNT Git objects and
+freeze the local side at fbe255cf. The offline three-way inventory records
+raw SHA-256 and normalized line diffs; no external working-tree bytes or
+generated source become build inputs. This checkpoint changes production and
+tests by +0/-0. Full-file churn is not the payload estimate: reset.c,
+mouse_io.c and timer.c include extensive XP formatting and foreign branches.
+
+Initial per-file disposition (range-level extraction remains to be completed):
+
+| Candidate | Selected change / preservation requirement |
+| --- | --- |
+| base/bios/reset.c | XP declarations, selected scalar widths and formatting; retain local attached-floppy topology, native-width configuration access and omission of the software mouse-driver installation. Reject ARCX86/PC-98 startup routes. |
+| base/ccpu386/fpu.c | XP changes one comment only. Keep accepted local FPU implementation and snapshot support; do not describe this as a CPU algorithm upgrade. |
+| base/inc/ica.h | XP hardware additions are PC-98-only; preserve local IRQ ABI. DOS EOF marker is not required C source. |
+| base/inc/mouse.h | XP additions are exclusively PC-98 port/IRQ definitions; do not import them. |
+| base/inc/sas.h | XP adds PC-98 ROM layout. Keep local guest-width memory length and overwrite declaration; audit unused NT-only declarations independently. |
+| base/keymouse/keyba.c | Adopt useful keyboard table changes, key-set representation and initialized temporary pointer; preserve snapshot codec and IRQ1 deassertion. Correct the omitted set-3 inverse entry for key 14 in the existing table. Exclude Korean host-disable policy. |
+| base/keymouse/keybd_io.c | XP adds explicit byte-width stores and declaration. Existing native-pointer repairs are inside the NT setup route; establish complete branch exclusion before deleting that old route. Do not accidentally retain its repair without its caller or remove a shared definition. |
+| base/keymouse/mouse.c | XP byte casts and port type coexist with the accepted InPort free-running timer/HOLD/IRQ and snapshot fixes. Do not restore the old Windows-specific interrupt bursts. |
+| base/keymouse/mouse_io.c | Selected declarations/casts and initialization correction; retain local snapshot/cursor fixes. Reject unconditional SwitchToFullScreen and 8-bit truncation before setBX. Review register-range loop bounds before accepting its type narrowing. |
+| base/keymouse/ppi.c | XP adds PC-98 disabling guards only; selected PPI and local snapshot/speaker behavior must remain. |
+| base/system/ica.c | Selected width casts; retain local PIC/HLT/snapshot corrections. Exclude foreign IRQ mappings and NT hooks. |
+| base/system/idetect.c | Preserve original selected idle algorithm and existing host event wait. XP threshold casts need a range justification because the selected state is int, unlike the NT word fields. No production caller of idle_set/IDLE_set was found beyond its declaration/macro. |
+| base/system/rom.c | Adopt selected declarations and width-explicit byte output; reject ARCX86 host ROM routes and XP setCS UCHAR truncation. Existing ROM regression remains mandatory. |
+| base/system/timer.c | Selected status-byte cast and XP formatting; retain zero-delay quick-event safeguard and complete timer snapshot state/rebasing. No second clock or sound path. |
+| base/system/timestrb.c | PC-98 guard adds no selected behavior; preserve XP indentation of the retained rtc_tick call and existing scheduling. |
+| base/system/unexp_nt.c | XP difference is a DOS EOF marker only; no device behavior to import. |
+| host/src/nt_keycd.c | XP separates NumLock key 90 from Pause key 126 using virtual-key identity. Preserve table bounds checks; verify the actual standalone producer supplies the identity needed by that distinction. Native NT BIOS conversion is not needed. |
+| host/src/nt_sound.c | XP SessionId/Beep endpoint policy is NT-host-only. Retain common tone/state logic and existing PCM endpoint; do not import NT device/session handling or new speaker semantics. |
+
+The keyboard snapshot decoder validates scan_set in 1..3 before assigning
+key_set and serializes through its existing copied integer state, not raw
+sizeof(key_set). Thus adopting XP's byte-sized key_set does not by itself
+require a snapshot schema change; runtime roundtrip proof is still required.
+The added key 14 has set-3 make 0x5d but XP inverse[0x5d] remains zero, so
+the existing per-key-type command would update slot zero rather than key 14.
+This is a source-proven table inconsistency, not a claimed guest reproduction.
+
+Two new narrowing reviews must remain distinct from confirmed defects. The
+mouse register-range loop can wrap CH+CL after conversion to UCHAR, but valid
+controller-register ranges are much smaller; do not claim a valid-input bug
+without demonstrating reachability. idle_set has no selected production caller,
+so its XP word cast is not evidence of a current idle-performance regression.
+The final selection ledger must state their disposition rather than treating
+all XP casts as automatically correct. No production edit has begun at this
+checkpoint; payload estimates follow reviewed subset extraction.
+
+Pause/NumLock producer check: machine/input.c converts KVM_KEY_PAUSE to
+VK_PAUSE and copies both virtual-key and scan identity into KEY_EVENT_RECORD
+before the existing KeyMsgToKeyCode call. Thus XP's Pause exception has the
+required metadata on the real KVM path. The Compat scan-byte-only entry has
+no virtual-key identity and should map 0x45 to NumLock, not fabricate Pause.
+The current keycode fixture fingerprints the old table and never sets a
+virtual-key identity; update its expected table proof deliberately and add
+explicit Pause/NumLock cases, retaining all out-of-range and enhanced-key
+checks. No second translation table or public input API is needed.
+
+#### S4 host-subset review checkpoint
+
+The offline candidate now covers all 18 admitted files, with 16 changed:
++5,848/-8,750, net -2,902 lines against fbe255cf after CRLF normalization.
+These are provisional source-payload counts, not committed production changes
+or final XP-subset patch counts. mouse_io.c (+3,774/-4,239), timer.c
+(+1,199/-1,666), and reset.c (+672/-694) contain substantial XP formatting;
+their textual churn must not be reported as equivalent new device logic.
+Production sources, tests and package EXEs remain unchanged at this checkpoint.
+
+Repository-wide source/test symbol searches confirm that the unused native
+BIOS-to-input conversion in nt_keycd.c is the sole consumer of NULLCHARSCAN;
+aNumPadSCode has only its definition and old header declaration. The selected
+candidate removes that conversion, its tables and excluded NT includes while
+retaining the real KeyMsgToKeyCode path and its accepted bounds checks.
+The matching stale header declarations require disposition before delivery.
+The native Beep handle/open/close names are confined to nt_sound.c's excluded
+endpoint. Its candidate removes those routes but preserves all tone-state
+calculations and the existing softpc_standalone_audio_set_tone call. This is
+not an audio implementation change or Sound Blaster admission.
+
+The unguarded XP AH=4f SwitchToFullScreen request is excluded explicitly;
+conditional projection alone would wrongly retain this NT host policy.
+XP's host_memset declaration uses int for length, whereas the actual Compat
+definition uses unsigned int. The candidate matches that existing ABI with
+a reason marker; no new adapter or API is introduced. Key 14's inverse mapping
+is repaired in the existing table, not a second translation path.
+
+Actual candidate review also caught a three-way merge scope defect: XP's
+ARCX86 alternative leaves a redundant nested block around display_string,
+which would hide the retained local stringLength from its final use. Both
+shell braces are removed together; the retained body and native-width local
+calculation are unchanged. This defect existed only in the offline candidate,
+not a compiled or published source. The final independent XP/local range
+ledger, full local-patch preservation audit and runtime proof remain pending;
+these findings do not constitute S4 qualification.
+
+#### S4 first production slice and focused proof
+
+The reviewed nt_keycd.c subset is now applied, together with removal of the
+two orphaned BiosKeyToInputRecord/aNumPadSCode declarations in nt_uis.h.
+This is a justified S4 dependency follow-through into the header previously
+reviewed by S3, not a new host interface. Production for this slice is
++14/-308, net -294; keycode_smoke.c is +27/-3, net +24. All other S4 source
+candidates remain offline pending their final review and tests.
+
+The test preserves the original mapping fingerprint except for the explicitly
+asserted regular scan-45 change from Pause (126) to NumLock (90), and separately
+checks VK_PAUSE with enhanced/non-enhanced make and break records. Existing
+bounds and modifier invariants remain. x64 failed at the new NumLock assertion
+on the old implementation, then passed after the migration. The initial x86
+build overlapped the source update and passed; it is not admissible old-code
+red evidence. A fresh post-change dual-width job is required, and its results
+must be read independently before claiming both-width qualification.
+
+Further actual-diff inspection caught the candidate's mouse bitmap declaration
+reverting sys_addr to MOUSE_SCREEN_DATA*, despite retaining the fixed local
+byte-address arithmetic. The offline candidate restores sys_addr; no published
+source had that defect. This confirms that conflict resolution alone is not a
+local-patch preservation proof. The redundant NT mouse-buffer declaration and
+PC-98-only explanatory comment are also excluded with their absent consumers.
+XP-retained whitespace currently produces a trailing-space diagnostic in one
+nt_keycd.c table line; this must be accounted separately from functional diff,
+not silently normalized contrary to the selected-source policy.
+
+The independent post-change keycode run completed successfully on both widths
+(one targeted test each). The next applied slice is keyba.c (+81/-698), with
+the selected XP tables, inverse correction and existing snapshot/IRQ repairs.
+irq_smoke.c adds 55 lines using actual controller ports: select sets 1/2/3,
+roundtrip each through the existing keyboard snapshot codec, and verify the
+three per-key type commands for keys 14/56/94/107 change only the addressed key.
+The fixture restores its initial keyboard state before the existing IRQ/reset
+tests. No production test hook, duplicate keyboard map or public API is added.
+Both focused tests pass on x64; the corresponding x86 build/test remains an
+owned background job at this checkpoint. Make/break and complete translation
+coverage, remaining S4 payloads and full regression are still required.
+
+That focused x86 run subsequently completed with both tests passing. The
+fixture initially attempted make/break for all four table identities in all three
+sets using original host_key_down/host_key_up, controller reads and the existing
+continue_output entry; no implementation hook is added. The whole reviewed S4
+candidate is now in the worktree: 17 changed production files, +5,846/-8,752,
+net -2,906; two changed test files, +105/-3, net +102. The 18-file candidate
+universe has two unchanged bodies (mouse.h and ppi.c), plus the two-declaration
+nt_uis.h cleanup described above. CRLF mirror checkout is retained.
+
+A fresh bounded hidden dual-width build and focused run is in progress for
+this combined candidate. Earlier green results qualify only their earlier
+slice, not the new make/break cases or the combined payload. Final independent
+XP range accounting, exhaustive translation proof, full-suite qualification,
+package refresh and coordinator actual-change review remain outstanding.
+
+The combined x64 candidate built, but the new make/break fixture failed on
+set 1 key 14 before any byte was queued. Dispatching the existing quick-event
+queue did not fix it. Temporary diagnostics captured disabled=0, interface=0,
+scanning_discontinued=0, fifo_count=0 and output_full=0. Source inspection
+explains this: XP retains keytypes[14]=6 (not a key), whose make/break lengths
+are zero, despite reserved values in its scan-code tables. This is a fixture
+expectation defect, not evidence for changing production key classification.
+The corrected fixture verifies no output for key 14 and actual make/break
+for 56/94/107 across sets 1/2/3, while retaining the per-key command tests.
+The corrected focused pair subsequently passes on both x64 and x86 (2/2
+each). Temporary diagnostic output is removed. This does not qualify the
+full suite.
+
+The next fixture enumerates all 256 controller translation inputs through
+the original FIFO/output path, using the existing snapshot codec to prepare
+one bounded input at a time. The 255 ordinary outputs have fixed FNV-1a
+fingerprint 9bd36c6f, independently extracted from the pinned XP selected
+IBM-PC table; the test does not load that external source or production table.
+F0 is separately checked as a split break prefix: no output before the next
+byte, followed by Set-2 A (1c) becoming Set-1 break 9e. Initial parsing of the
+unprojected multi-profile source was rejected because it contained more than
+256 initializer entries; only the selected 256-entry table supplies the oracle.
+Fresh focused tests pass on both x64 and x86 (2/2 each), including the full
+translation enumeration. No source edits overlapped that running build.
+After its zero exit and process termination were confirmed, full dual-width
+qualification started: shared background tests, other background tests, then
+the reserved serial native desktop tests. This run qualifies the current
+candidate only; independent subset accounting/review still precedes delivery.
+
+S4 accounting checkpoint: independent projection of the 18 pinned XP bodies
+accounts for 31,371 lines, with 5,416 excluded by explicit conditional or
+unused native-endpoint ranges. The current local bodies differ from that
+subset by +1,389/-188; this includes pre-existing local repairs, not just S4
+new functionality. The baseline-side conditional audit identifies 2,791
+excluded old lines; this is not the entire deletion count because unguarded
+unused host tables and XP formatting changes are counted separately. The two
+orphan declarations removed from nt_uis.h are dependency follow-through and
+are outside this 18-body sum. Native tone callback replacements remain in
+the patch comparison rather than being hidden as excluded functions.
+These review artifacts remain provisional until per-range checking and the
+remaining narrowing dispositions are complete. x64 full background passes
+90/90 shared plus 53/53 other tests. x86 and serial desktop verification are
+still outstanding at this checkpoint; no full-pass or delivery claim follows.
+
+The review ledger is now retained as [per-file subset counts](../etc/evidence/softpc/xp-sp1-s4-subset-files.tsv),
+[pinned XP include/exclude ranges](../etc/evidence/softpc/xp-sp1-s4-subset-ranges.tsv)
+and [pre-S4 conditional ranges](../etc/evidence/softpc/xp-sp1-s4-baseline-ranges.tsv).
+Range numbers address normalized lines of the fixed XP object or fbe255cf
+baseline respectively; hashes address LF-normalized selected XP bytes.
+Every local body remains entirely in the comparison. Baseline conditional
+counts are explicitly not a complete inventory of unguarded obsolete tables.
+The files describe the current candidate; they are not a qualification result.
+
+Review correction, before delivery: the earlier key-14 inverse "repair" was
+inferred from a reserved forward-table value without checking keytypes[14].
+That type is 6, explicitly not a physical key. There is consequently no
+demonstrated valid-key requirement for changing XP reverse[0x5d] from zero
+to 14. Remove this unnecessary new local patch after the active qualification
+run ends; retain the no-output regression and per-key command coverage for
+the actual newly supported keys 56/94/107. Earlier claims of a confirmed
+inverse defect are superseded by this review, not evidence of an XP bug.
+Both review corrections are now applied after the initial full candidate
+passed 148/148 tests on each width, including all ten native desktop tests.
+Final production is +5,843/-8,750, net -2,907; tests are +164/-3, net +161.
+The 18-file XP-subset comparison is +1,389/-189. Sixteen pre-existing device
+snapshot callbacks match their baseline selected bodies after whitespace
+normalization; two timer callbacks differ only in removal of excluded NT
+branches. This is supplemental source proof, not a substitute for runtime
+snapshot tests. Final full qualification is running again against this exact
+candidate, with no source edits during the run. The subset count ledger has
+been regenerated; earlier candidate counts remain historical checkpoints.
+
+The final ledger recheck rereads all 18 XP Git objects at the pinned revision,
+verifies their original SHA-256 values, proves contiguous non-overlapping
+range coverage and reconstructs each selected body byte-for-byte. All three
+tracked TSV files match those outputs. The normal documentation/test diff
+check passes. Mirror diff-check warnings are retained XP whitespace or
+pre-existing local whitespace; four EOF tails match the selected XP tails.
+unexp_nt.c additionally retains the empty line left by removing its DOS EOF
+control byte, accounted as +1 rather than hidden. Thus the mirror-wide
+diff-check command is not claimed clean. Final x64 background is again
+90/90 shared plus 53/53 other tests; x86 and desktop stages remain pending.
+
+Narrowing disposition: AH=F3's valid register ranges are bounded by the
+existing CRTC/SEQ/GRAPH/ATTR capacities (25/4/9/20), so their valid end
+indices fit UCHAR. Keep XP's narrowing; this is not a claim that malformed
+out-of-range requests are validated by the old code. In contrast, idle_set
+documents positive int thresholds and the selected storage is int, whereas
+the excluded NT variant used word storage. Its two new word casts truncate
+otherwise representable thresholds without serving the selected contract.
+Preserve the original int assignments as an explicit local subset patch,
+after the running tests end. No selected production caller was found, so
+this prevents an import regression; it is not a demonstrated current CPU
+idle defect or a reason to alter the accepted host wait implementation.
+
 Perform the nontrivial three-way migrations for reset, keyboard/mouse, PIC,
 ROM and timer by subsystem. Preserve required standalone topology in explicit
 local patches. `nt_keycd.c` and `keyba.c` include Pause/NumLock/Ctrl-Alt-Del and
@@ -574,10 +820,50 @@ scan-set table proof; timer
 includes zero-delay quick-event protection; controller work includes IRQ and
 boot/media proof.
 The seven selected keyboard tables have 60 changed elements. Preserve the
-four new key identities (14/56/94/107), verify all 256 translation inputs,
-and repair XP's omitted set-3 reverse[0x5d]=14 entry in the existing table.
+four changed table identities (14/56/94/107), preserving key 14's non-key
+classification; verify all 256 translation inputs and the valid physical
+keys' set-3 reverse mappings without changing the reserved 0x5d entry.
 Test per-key type commands and reset as well as make/break; do not silently
 import a new key that cannot receive its own attributes.
+
+#### S4 final executor qualification
+
+The final, frozen candidate completes both Release builds and all registered
+tests on 2026-10-15. Each architecture passes 90 shared background tests,
+53 other background unit/integration/gate tests and five native desktop tests:
+148/148 each, with no excluded desktop case. The final supervisor and all
+configure/build/test exit records are zero. Shared/App/desktop elapsed times
+are x64 47.05/96.45/13.03 seconds and x86 51.56/68.95/13.80 seconds.
+This supersedes the intermediate pending statements above, not their retained
+failure/correction history. No source changes overlapped final qualification.
+
+Production accounting against fbe255cf is 17 mirror paths, +5,843/-8,750,
+net -2,907. Two test paths are +164/-3, net +161. The counted production/test
+total is +6,007/-8,753, net -2,746; documentation, ledgers and EXEs are separate.
+The independent 18-body necessary-XP-subset patch is +1,389/-189, including
+accepted historical local repairs. The two orphan nt_uis.h declarations are
+separately accounted dependency cleanup. Excluded XP content is 5,416 lines;
+the pre-S4 conditional ledger identifies 2,791 excluded old lines, not the
+entire deleted-line total. XP formatting churn is not new functionality.
+
+Final package SHA-256:
+
+- softpc32.exe: `eaeae823c62d16a434908a33d8c16f3deb2d77cdb01d54ebe090c25af373ad83`
+- softpc64.exe: `49c0c725c852241c9c5fdd9e97a8cb0f131188664da8464071d58f88cf9e3ce9`
+
+The source audit preserves the reserved non-key 14 without a new inverse-table
+patch, full-width ROM CS/mouse BX and selected int idle thresholds. Actual
+controller tests cover translation, valid-key make/break, per-key commands,
+reset and snapshot roundtrips. The sixteen existing snapshot callback bodies
+also pass the independent selected-source preservation check. These are source
+and automated-test proofs, not a new manual Windows session or physical audio
+claim. No public package, INI, media or snapshot file changed. The final builds
+publish directly to the existing assets/binary executable outputs.
+
+Documentation governance and non-mirror whitespace checks pass. The explicitly
+recorded XP/local mirror whitespace exceptions remain; mirror diff-check is
+not misreported as clean. Executor commit/push and subsequent coordinator
+actual-change review remain required before S4 closure and S5 admission.
 
 ### S5 — XP-first C-VID and video basis
 
@@ -625,8 +911,9 @@ Do not present the 6,097-line SB source volume as an estimate of working audio.
 The precise known extra corrections beyond an XP body are intentionally small:
 S2 corrects the disk CX:DX split; S3 preserves that correction instead of XP narrowing, synchronizes one descriptor-helper declaration
 and two Compat lines, and transfers two CMOS comparisons; S4 rejects ROM CS and
-mouse BX truncation, preserves the keycode bounds correction and fills one set-3
-reverse-table slot. These are in addition to retaining existing local patches,
+mouse BX truncation, preserves the keycode bounds correction and the selected
+int-width idle thresholds. The proposed reserved-key reverse-table patch was
+withdrawn after checking the key classification. These are in addition to retaining existing local patches,
 not replacements for them. Sound-card attachment remains the larger independent
 engineering batch; absent OPL/MIDI backends and unresolved source admission must
 be resolved in its implementation brief, not hidden behind stubs.

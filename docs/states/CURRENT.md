@@ -19,8 +19,12 @@ refreshed. Executor P1 89b67c44 is pushed. Coordinator actual-change review find
 two leftover imported A20 declarations in tape_io.c. They are removed; renewed
 dual builds and 148/148 tests per width pass, including all ten desktop cases.
 Corrective P2 3cf6906a is pushed and coordinator actual-change review passes.
-S3 is implementation-closed under the owner's async delegation; S4 is now
-admitted for source audit and bounded input/timing migration. This is not an
+S3 is implementation-closed under the owner's async delegation. S4's final
+input/timing subset now passes dual Release builds and 148/148 tests per width,
+including all ten native desktop cases; both package EXEs are refreshed.
+Its production delta is +5,843/-8,750 (net -2,907), tests +164/-3 (net +161).
+Executor delivery and separate coordinator actual-change review are pending;
+S4 remains active and S5 is not yet admitted. This is not an
 invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
@@ -56,7 +60,7 @@ qualification of the source audit or close T92.
 | Files And ABI Surface | 18 paths listed in the S4 admission brief; owner-local tests and root registration as needed. No public ABI expansion. Audit first; quantified payload brief precedes source edits. |
 | Applicable Rules | Task Reading Set, execution/documentation/architecture/coding governance, source-research policy and minimal explicit mirror patches. |
 | Verification | Independent XP/local range ledgers; scan-set translation/type/reset and mouse/IRQ/timing/ROM tests; dual Release builds and refreshed EXEs, shared then all other background tests and reserved desktop cases. |
-| Expected Markers | Useful XP input improvements retained, set-3 reverse mapping complete, ROM CS and mouse BX not truncated; accepted InPort, snapshot, IRQ and event-wait behavior preserved. |
+| Expected Markers | Useful XP input improvements retained, valid physical-key set-3 mappings verified without changing reserved non-key 14; ROM CS and mouse BX not truncated; accepted InPort, snapshot, IRQ and event-wait behavior preserved. |
 | Asset Needs | Reuse Ninja intermediates; disposable audit/test fixtures under ignored build/t92/s4; hidden jobs with 30-minute build/20-minute suite/10-minute desktop budgets and 30 MiB log cap; executor owns cleanup. |
 | Reporting Requirements | Pre-change file/hunk estimates before payload edits; actual added/deleted/net code and mirror differences; dual artifacts, test outcomes, pushed P and separate actual-change review. |
 | Stop Conditions | Owner source-import direction is recorded; stop for conflicting/new source terms, new device paths, public ABI expansion or unapproved guest semantics. |

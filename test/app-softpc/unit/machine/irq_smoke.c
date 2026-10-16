@@ -9,13 +9,18 @@
 #include "host_def.h"
 #include "ios.h"
 #include "ica.h"
+#include "quick_ev.h"
 #include "compat/ccpu/abi.h"
 #include "compat/ccpu/lifecycle.h"
 #include "compat/platform.h"
+#include "compat/devices/snapshot.h"
 #include "app-softpc/softpc.new/base/ccpu386/c_intr.h"
 
 extern void reboot(void);
 extern void host_set_hw_int(void);
+extern void host_key_down(int key);
+extern void host_key_up(int key);
+extern void continue_output(void);
 
 static void verify_rejected_interrupt(softpc_machine *machine)
 {
@@ -94,6 +99,136 @@ static void verify_scan_input(void)
     assert((status & 1u) == 0u);
 }
 
+static void keyboard_command(half_word value)
+{
+    half_word status, reply;
+    outb(0x60u, value);
+    inb(0x64u, &status);
+    assert((status & 1u) != 0u);
+    inb(0x60u, &reply);
+    assert(reply == 0xfau);
+}
+
+static half_word keyboard_read(void)
+{
+    half_word status, value;
+    unsigned events;
+    continue_output();
+    inb(0x64u, &status);
+    /* Consecutive bytes use the original delayed-refill/interrupt queue,
+       unlike a single controller command's immediate acknowledgement. */
+    for (events = 0; !(status & 1u) && events != 64; ++events) {
+        dispatch_q_event();
+        inb(0x64u, &status);
+    }
+    assert((status & 1u) != 0u);
+    inb(0x60u, &value);
+    return value;
+}
+
+static void keyboard_expect(half_word expected)
+{
+    assert(keyboard_read() == expected);
+}
+
+static void verify_keyboard_translation(void)
+{
+    softpc_device_keyboard_state saved, state;
+    lib_u32 fingerprint = 2166136261u;
+    unsigned code;
+    assert(softpc_device_snapshot_capture_keyboard(&saved));
+    for (code = 0; code < 256; ++code) {
+        state = saved;
+        state.translating = 1;
+        state.interface_disabled = 0;
+        state.interrupt_enabled = 0;
+        state.output_full = state.pending_8042 = state.waiting_for_upcode = 0;
+        state.status &= ~1u;
+        state.fifo_count = 1;
+        state.fifo[0] = (lib_u16)code;
+        assert(softpc_device_snapshot_restore_keyboard(&state));
+        if (code == 0xf0u) {
+            /* A split break prefix produces no byte until its successor. */
+            continue_output();
+            assert(softpc_device_snapshot_capture_keyboard(&state));
+            assert(state.waiting_for_upcode && !state.output_full);
+            assert(state.fifo_count == 0 && !(state.status & 1u));
+            state.fifo_count = 1;
+            state.fifo[0] = 0x1cu; /* A: Set 2 -> Set 1 break 0x9e. */
+            assert(softpc_device_snapshot_restore_keyboard(&state));
+            keyboard_expect(0x9eu);
+        } else {
+            fingerprint = (fingerprint ^ keyboard_read()) * 16777619u;
+        }
+    }
+    /* Fixed XP IBM-PC translation table, excluding the separately tested
+       F0 control prefix. No production table is read to derive this value. */
+    assert(fingerprint == 0x9bd36c6fu);
+    assert(softpc_device_snapshot_restore_keyboard(&saved));
+}
+
+static void verify_keyboard_sets(void)
+{
+    static const struct { unsigned key; half_word make[3]; } added[] = {
+        { 14, { 0x7d, 0x6a, 0x5d } }, { 56, { 0x73, 0x51, 0x51 } },
+        { 94, { 0x7c, 0x68, 0x68 } }, { 107, { 0x7e, 0x6d, 0x7b } }
+    };
+    softpc_device_keyboard_state saved, state, restored;
+    unsigned set, item, type, key;
+    lib_memory_set(&saved, 0, sizeof(saved));
+    assert(softpc_device_snapshot_capture_keyboard(&saved));
+    /* Disable translation, leaving the physical controller and its normal
+       command/response path in charge. Do not set scan_set through a fixture. */
+    outb(0x64u, 0x60u);
+    outb(0x60u, 0x01u);
+    for (set = 1; set <= 3; ++set) {
+        keyboard_command(0xf0u);
+        keyboard_command((half_word)set);
+        lib_memory_set(&state, 0, sizeof(state));
+        assert(softpc_device_snapshot_capture_keyboard(&state));
+        assert(state.scan_set == (int)set);
+        assert(softpc_device_snapshot_restore_keyboard(&state));
+        lib_memory_set(&restored, 0, sizeof(restored));
+        assert(softpc_device_snapshot_capture_keyboard(&restored));
+        assert(lib_memory_compare(&state, &restored, sizeof(state)) == 0);
+        keyboard_command(0xfau); /* Enable make/break for every set-3 key. */
+        for (item = 0; item < sizeof(added) / sizeof(added[0]); ++item) {
+            half_word code = added[item].make[set - 1];
+            host_key_down((int)added[item].key);
+            /* XP retains key 14 as category 6 (not a physical key) even
+               though its scan tables contain reserved values. */
+            if (added[item].key == 14) {
+                host_key_up((int)added[item].key);
+                assert(softpc_device_snapshot_capture_keyboard(&state));
+                assert(state.fifo_count == 0 && !state.output_full);
+                assert(state.key_down_count[14] == 0);
+                continue;
+            }
+            keyboard_expect(code);
+            host_key_up((int)added[item].key);
+            if (set != 1) keyboard_expect(0xf0u);
+            keyboard_expect(set == 1 ? (half_word)(code | 0x80u) : code);
+        }
+    }
+    for (item = 1; item < sizeof(added) / sizeof(added[0]); ++item)
+    for (type = 1; type <= 3; ++type) {
+        /* First put every key in type 4; the per-key command must alter
+           exactly its own physical key. Reserved key 14 has no inverse. */
+        keyboard_command(0xfau);
+        keyboard_command((half_word)(0xfau + type));
+        keyboard_command(added[item].make[2]);
+        assert(softpc_device_snapshot_capture_keyboard(&state));
+        for (key = 1; key < 127; ++key)
+            assert(state.set_3_key_state[key] ==
+                (key == added[item].key ? type : 4u));
+    }
+    keyboard_command(0xf6u);
+    assert(softpc_device_snapshot_capture_keyboard(&state));
+    assert(state.waiting_for_next_code == 0);
+    assert(state.keyboard_disabled == 0);
+    assert(softpc_device_snapshot_restore_keyboard(&saved));
+}
+
 int main(void)
 {
     const char *path = "softpc-machine-irq-smoke.img";
@@ -142,6 +277,8 @@ int main(void)
     assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
     verify_rejected_interrupt(machine);
     verify_scan_input();
+    verify_keyboard_sets();
+    verify_keyboard_translation();
     verify_keyboard_read_releases_irq();
 
     /* The original 8042 output-port pulse requests a CPU reset through the

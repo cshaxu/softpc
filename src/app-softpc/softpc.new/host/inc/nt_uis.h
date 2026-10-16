@@ -23,8 +23,6 @@ extern HANDLE InstHandle;  /* Holds currently run processes instance handle */
 
 int DisplayErrorTerm(int ErrorNo, DWORD OSErrno, char *Filename, int Lineno);
 BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent);
-BOOL BiosKeyToInputRecord(PKEY_EVENT_RECORD pKeyEvent);
-extern WORD aNumPadSCode[];
 
 
 void RegisterDisplayCursor(HCURSOR newC);

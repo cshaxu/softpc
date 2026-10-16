@@ -1,13 +1,5 @@
-#ifndef SOFTPC_STANDALONE
-#include <nt.h>
-#include <ntrtl.h>
-#include <nturtl.h>
-#include <ntddbeep.h>
-#endif
 #include <windows.h>
-#ifdef SOFTPC_STANDALONE
 #undef PlaySound
-#endif
 #include "insignia.h"
 #include "host_def.h"
 /*
@@ -15,7 +7,7 @@
  *
  * Title	: sg_sound.c
  *
- * Description	: This module provides functions to control sound.  The 
+ * Description	: This module provides functions to control sound.  The
  *		  functions are defined:
  *		
  *		  host_ring_bell(duration)
@@ -24,9 +16,9 @@
  *		  host_enable_timer2_sound()
  *		  host_disable_timer2_sound()
  *
- * Author	: 
+ * Author	:
  *
- * Notes	: 
+ * Notes	:
  */
 
 #include "xt.h"
@@ -39,14 +31,12 @@
 #include "debug.h"
 
 
-#ifdef SOFTPC_STANDALONE
 #include "ica.h"
 #include "timer.h"
 /* One executor owns these transitions; only the NT host endpoint differs. */
 #define host_ica_lock()
 #define host_ica_unlock()
 extern void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration);
-#endif
 IMPORT ULONG GetPerfCounter(VOID);
 
 ULONG FreqT2    = 0;
@@ -57,10 +47,6 @@ ULONG FreqPpi   = 0;
 ULONG ET2TicCount=0;
 ULONG PpiCounting  = 0;
 
-#ifndef SOFTPC_STANDALONE
-HANDLE hBeepDevice = 0;
-ULONG BeepCloseCount = 0;
-#endif
 ULONG BeepLastFreq = 0;
 ULONG BeepLastDuration = 0;
 
@@ -110,59 +96,12 @@ VOID InitSound( BOOL bInit)
     if (!bInit) {
         host_ica_lock();
         LazyBeep(0L, 0L);
-#ifndef SOFTPC_STANDALONE
-        if (hBeepDevice && hBeepDevice != INVALID_HANDLE_VALUE) {
-            CloseHandle(hBeepDevice);
-            hBeepDevice = 0;
-            }
-#endif
         host_ica_unlock();
         return;
         }
 }
 
 
-#ifndef SOFTPC_STANDALONE
-HANDLE OpenBeepDevice(void)
-{
-    OBJECT_ATTRIBUTES ObjectAttributes;
-    UNICODE_STRING NameString;
-    NTSTATUS Status;
-    IO_STATUS_BLOCK IoStatus;
-    HANDLE hBeep;
-
-    RtlInitUnicodeString( &NameString, DD_BEEP_DEVICE_NAME_U );
-    InitializeObjectAttributes( &ObjectAttributes,
-                                &NameString,
-                                0,
-                                NULL,
-                                NULL
-                                );
-
-    Status = NtCreateFile( &hBeep,
-                           FILE_READ_DATA | FILE_WRITE_DATA,
-                           &ObjectAttributes,
-                           &IoStatus,
-                           NULL,
-                           0,
-                           FILE_SHARE_READ | FILE_SHARE_WRITE,
-                           FILE_OPEN_IF,
-                           0,
-                           (PVOID) NULL,
-                           0
-                           );
-
-    if (!NT_SUCCESS( Status )) {
-#ifndef PROD
-	printf("NTVDM: OpenBeepDevice Status=%lx\n",Status);
-#endif
-        hBeep = INVALID_HANDLE_VALUE;
-    }
-
-
-    return hBeep;
-}
-#endif
 
 
 
@@ -181,16 +120,8 @@ HANDLE OpenBeepDevice(void)
  */
 VOID LazyBeep(ULONG Freq, ULONG Duration)
 {
-#ifndef SOFTPC_STANDALONE
-  IO_STATUS_BLOCK     IoStatus;
-  BEEP_SET_PARAMETERS bps;
-#endif
 
   if (Freq != BeepLastFreq || Duration != BeepLastDuration) {
-#ifndef SOFTPC_STANDALONE
-      bps.Frequency = Freq;
-      bps.Duration  = Duration;
-#endif
 
          //
          // If the duration is < 10 ms, then we assume sound is being
@@ -206,31 +137,7 @@ VOID LazyBeep(ULONG Freq, ULONG Duration)
          BeepLastDuration  = Duration;
          }
 
-#ifdef SOFTPC_STANDALONE
       softpc_standalone_audio_set_tone(Freq, Duration);
-#else
-      if (!hBeepDevice) {
-          hBeepDevice = OpenBeepDevice();
-          }
-
-      if (hBeepDevice == INVALID_HANDLE_VALUE) {
-          return;
-          }
-
-      NtDeviceIoControlFile( hBeepDevice,
-                             NULL,
-                             NULL,
-                             NULL,
-                             &IoStatus,
-                             IOCTL_BEEP_SET,
-                             &bps,
-                             sizeof(bps),
-                             NULL,
-                             0
-                             );
-
-      BeepCloseCount = 1000;
-#endif
 
       }
 
@@ -434,16 +341,6 @@ void PlayContinuousTone(void)
 
    PlaySound(FALSE);
 
-#ifndef SOFTPC_STANDALONE
-   if (!BeepLastFreq && !BeepLastDuration &&
-       BeepCloseCount && !--BeepCloseCount)
-     {
-       if (hBeepDevice && hBeepDevice != INVALID_HANDLE_VALUE) {
-           CloseHandle(hBeepDevice);
-           hBeepDevice = 0;
-           }
-       }
-#endif
 
     host_ica_unlock();
 }

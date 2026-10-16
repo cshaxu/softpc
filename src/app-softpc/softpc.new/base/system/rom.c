@@ -16,9 +16,7 @@
 */
 
 #include <stdio.h>
-#if defined(NTVDM) && defined(MONITOR)
 #include <malloc.h>
-#endif
 
 #include TypesH
 #include MemoryH
@@ -45,6 +43,7 @@
 #endif	/* ! CCPU */
 #endif	/* CPU_40_STYLE */
 
+
 #ifndef BIOS1ROM_FILENAME
 #define	BIOS1ROM_FILENAME	"bios1.rom"
 #endif /* BIOS1ROM_FILENAME */
@@ -68,6 +67,7 @@
 #ifndef V7VGAROM_FILENAME
 #define	V7VGAROM_FILENAME	"v7vga.rom"
 #endif /* V7VGAROM_FILENAME */
+
 
 #ifdef 	GISP_SVGA
 #define	GISP_VGAROM_FILENAME         "hwvga.rom"
@@ -97,6 +97,7 @@
 
 #define	ROM_SIGNATURE		0xaa55
 
+
 /* Current SoftPC verion number */
 #define MAJOR_VER	0x03
 #define MINOR_VER	0x00
@@ -117,6 +118,9 @@ extern long host_read_resource (int, char *, host_addr, int ,int);
 #else
 extern long host_read_resource ();
 #endif
+
+extern void host_simulate();
+
 
 /*(
  *=========================== patchCheckSum ================================
@@ -185,7 +189,7 @@ patchCheckSum IFN3(PHY_ADDR, start, PHY_ADDR, length, PHY_ADDR, offset)
 	indicatedLength = sas_PR8(start + 2) * 512;
 	if (indicatedLength != roundedLength) {
 		always_trace3("ROM at 0x%.5lx has incorrect length 0x%.8lx (actually 0x%.8lx)", start, indicatedLength, roundedLength);
-		sas_PW8(start + 2, roundedLength / 512);
+		sas_PW8(start + 2, (IU8)(roundedLength / 512));
 	}
 
 
@@ -200,9 +204,9 @@ patchCheckSum IFN3(PHY_ADDR, start, PHY_ADDR, length, PHY_ADDR, offset)
 	host_free(buffer);
 
 	if (checksum != 0) {
-		always_trace2("ROM at 0x%.8lx has incorrect checksum 0x%.2x", 
+		always_trace2("ROM at 0x%.8lx has incorrect checksum 0x%.2x",
 			start, checksum);
-		sas_PW8(start + offset, 
+		sas_PW8(start + offset,
 			(IU8)((IS8)sas_PR8(start + offset) - checksum));
 	}
 	sas_connect_memory(start, start + roundedLength - 1, SAS_ROM);
@@ -268,7 +272,7 @@ GLOBAL void read_video_rom IFN0()
 		 * Is seems that the V86 manager (or emm386) incorrectly
 		 * maps C6000..C7FFF during initialisation.
 		 * We round up the video ROM to 32Kb to avoid this problem,
-		 * which reduces the amount of "upper memory" RAM available to 
+		 * which reduces the amount of "upper memory" RAM available to
 		 * dos extenders by 12K.
 		 */
 		if (romLength < (32*1024))
@@ -280,7 +284,7 @@ GLOBAL void read_video_rom IFN0()
 
 GLOBAL void rom_init IFN0()
 {
-#if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+
 	 /*
      * Fill up all of ROM (Intel C0000 upwards) with bad op-codes.
      * This is the Expansion ROM and the BIOS ROM.
@@ -307,7 +311,7 @@ GLOBAL void rom_init IFN0()
 
 	/* Load the video rom. */
 	read_video_rom();
-    
+
 	/* load the rom bios */
 #ifdef GISP_SVGA
 	if ((ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL) == CGA )
@@ -328,26 +332,13 @@ GLOBAL void rom_init IFN0()
 
 #endif		/* GISP_SVGA */
 
-#else	/* !NTVDM | (NTVDM & !X86GFX) */
-
-	/*
-	 * Now tell the CPU what it's not allowed to write over...
-	 *
-	 * These used to be done for everyone, but now they're only done for NT
-	 * as everyone else should have done it inside read_rom.
-	 */
-	sas_connect_memory (BIOS_START, 0xFFFFFL, SAS_ROM);
-#ifdef EGG
-	sas_connect_memory (EGA_ROM_START, EGA_ROM_END-1, SAS_ROM);
-#endif
-#endif /* !NTVDM | (NTVDM & !X86GFX) */
 
 	host_rom_init();
 }
 
 LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 {
-#if !(defined(NTVDM) && defined(MONITOR))
+
 	host_addr tmp;
 	long size = 0;
 
@@ -377,10 +368,8 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 #endif
 
     return( size );
-#else
-    return ( 0L );
-#endif	/* !(NTVDM && MONITOR) */
 }
+
 
 LOCAL	half_word	do_rom_checksum IFN1(sys_addr, addr)
 {
@@ -392,7 +381,7 @@ LOCAL	half_word	do_rom_checksum IFN1(sys_addr, addr)
 	for (; addr<last_byte_addr; addr++)
 		sum += sas_hw_at(addr);
 
-	return( sum % 0x100 );
+	return( (half_word)(sum % 0x100) );
 }
 
 LOCAL	VOID	do_search_for_roms IFN3(sys_addr, start_addr,
@@ -424,7 +413,7 @@ LOCAL	VOID	do_search_for_roms IFN3(sys_addr, start_addr,
 				savedCS = getCS();
 				savedIP = getIP();
 				setCS((addr & 0xf0000) >> 4);
-				setIP((addr & 0xffff));
+				setIP((USHORT)((addr & 0xffff)));
 				host_simulate();
 				setCS(savedCS);
 				setIP(savedIP);
@@ -440,7 +429,6 @@ LOCAL	VOID	do_search_for_roms IFN3(sys_addr, start_addr,
 
 GLOBAL void search_for_roms IFN0()
 {
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
 #ifndef GISP_SVGA
 /*
         First search for adaptor ROM modules
@@ -454,21 +442,17 @@ GLOBAL void search_for_roms IFN0()
     do_search_for_roms(EXPANSION_ROM_START,
                                 EXPANSION_ROM_END, EXPANSION_ROM_INCREMENT);
 #endif 		/* GISP_SVGA */
-#endif	/* !NTVDM | (NTVDM & !X86GFX) */
 }
 
 
 GLOBAL void rom_checksum IFN0()
 {
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
 	patchCheckSum(BIOS_START, PC_MEM_SIZE - BIOS_START,
 				0xfffff - BIOS_START);
-#endif	/* !NTVDM | (NTVDM & !X86GFX) */
 }
 
 GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 {
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
 	UTINY	old_val;
 
 	/*
@@ -502,7 +486,7 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 	}
 
 #endif /* macintosh */
- 
+
 	/* The page might not be present (Arrggghhhh!!!!!)
 	** so we can't do anything sensible and must give
 	** up. We print an error though.
@@ -552,9 +536,9 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 	 * inited, then the sas_connect will drop out to yoda.
 	 */
 
-	if (Length_of_M_area == 0) 
+	if (Length_of_M_area == 0)
 		return;
- 
+
 	old_val = sas_hw_at( addr );
 
 	/* Optimisation - don't upset the world if the value is unchanged.
@@ -585,7 +569,6 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 
 #endif	/* CPU_40_STYLE */
 
-#endif	/* !NTVDM | (NTVDM & !X86GFX) */
 }
 
 #ifndef GISP_SVGA
@@ -595,7 +578,7 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
  * post-write checks. Since all 3.0 and later CPUs do
  * pre-write checks they're no longer needed.
  */
- 
+
 #if !(defined(NTVDM) & defined(MONITOR))
 void update_romcopy IFN1(long, addr)
 {
@@ -622,7 +605,6 @@ sys_addr  cur_loc;
 
 GLOBAL void display_string IFN1(char *, string_ptr)
 {
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
 	/*
 	 * Put the message "*string_ptr" in the ROM
 	 * scratch area where the drivers know where
@@ -639,7 +621,7 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 
 	/* In a paging environment, we must be careful as a
 	** the ROM area could have been copied and/or mapped
-	** as read only. We must alter the memory which is 
+	** as read only. We must alter the memory which is
 	** currently at the linear address of the ROM (whether
 	** that is actually our rom or a RAM copy of it). We
 	** must force this alteration despite any protection
@@ -647,7 +629,7 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 	*/
 
 	/* get a host pointer to the memory behind the required
-	** linear address. 
+	** linear address.
 	*/
 	hostPtr = getPtrToLinAddrByte(cur_loc);
 
@@ -707,7 +689,6 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 	sas_disconnect_memory(DOS_SCRATCH_PAD, DOS_SCRATCH_PAD_END);
 	cur_loc -= strlen(string_ptr);
 #endif /* CPU_40_STYLE */
-#endif	/* !NTVDM | !MONITOR */
 	cur_loc += (sys_addr)stringLength;
 }
 

@@ -50,7 +50,8 @@
 #define CPU_DISK_INT   		5
 #define CPU_DISKETTE_INT   	6
 #define CPU_PRINTER_INT   	7
- 
+
+
 /* Different lines for the AT */
 #define CPU_PRINTER2_INT	5
 
@@ -103,41 +104,6 @@ extern IU8 ica_scan_irr IPT1(IU32, adapter);
 extern void ica_interrupt_cpu IPT2(IU32, adapter, IU32, line);
 extern void ica_eoi IPT3(IU32, adapter, IS32 *, line, IBOOL, rotate);
 
-#if defined (NTVDM)
-
-#ifdef MONITOR
-extern void ica_iret_hook_called IPT1(IU32, line);
-extern void ica_iret_hook_control IPT3(IU32, adapter, IU32, line, IBOOL, enable);
-#endif
-
-VOID ica_RestartInterrupts(ULONG);
-extern IS32 ica_intack IPT1(IU32 *, hook_addr);
-
-extern void ica_clear_int(IU32 adapter, IU32 line);
-extern void ica_inb(io_addr port, IU8 *val);
-extern void ica_outb(io_addr port, IU8 val);
-extern void ica_hw_interrupt(IU32 adapter, IU32 line_no, IS32 call_count);
-
-
-
-
-/*
- *  The NTVDM ica adapter structure has been moved to \nt\private\inc\vdm.h
- *  and is almost identical to the standard softpc ica adapter structure.
- *  It was Extracted to make it visible clearly from the monitor\kernel on
- *  x86
- *
- *  Notable differences:
- *  1. added ica_delayedints field for ntvdm's implementaion of delayed ints
- *  2. type definitions have change to match win32
- *  3. ADAPTER_STATE has been renamed to VDMVIRTUALICA
- *  4. Does not implement CPU_40 iret hooks
- *
- */
-#include <vdm.h>
-extern VDMVIRTUALICA VirtualIca[];
-
-#else   /* ndef NTVDM */
 
 extern void SWPIC_clear_int IPT2(IU32, adapter, IU32, line_no);
 extern void SWPIC_init_funcptrs IPT0();
@@ -202,10 +168,8 @@ typedef struct {
 /* 'no callback' define for action_interrupt callbacks */
 #define NO_ICA_CALLBACK ((ICA_CALLBACK) 0L)
 
-#endif  /* NTVDM */
 
 
-#if !defined(NTVDM)
 #ifdef  REAL_ICA
 
 extern void host_ica_hw_interrupt IPT3(IU32, adap, IU32, line, IS32, cnt);
@@ -238,7 +202,6 @@ extern void (*ica_hw_interrupt_func) IPT3(IU32, adapter, IU32, line_no,
 extern void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
 
 #endif  /* REAL_ICA */
-#endif  /* !NTVDM */
 
 #ifdef GISP_CPU
 /*

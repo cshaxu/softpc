@@ -1,4 +1,4 @@
-/*************************************************************************** 
+/***************************************************************************
  *									   *
  *  MODULE	: nt_keycd.c						   *
  *									   *
@@ -8,11 +8,6 @@
  *									   *
  ****************************************************************************/
 /* Standalone uses the original key tables, without NT BIOS conversion. */
-#ifndef SOFTPC_STANDALONE
-#include <nt.h>
-#include <ntrtl.h>
-#include <nturtl.h>
-#endif
 
 #include "windows.h"
 
@@ -25,9 +20,9 @@
 /*@ACW=======================================================================
 
 Microsoft now use scan code set 1 as their base scan code set. This means that
-we had to change ours also. Not only that, two tables are needed now: one to 
+we had to change ours also. Not only that, two tables are needed now: one to
 hold the regular keyset, the other to hold the ENHANCED key options. Scan code
-set 1 differs to scan code set 3 in that some scan codes are the same for 
+set 1 differs to scan code set 3 in that some scan codes are the same for
 different keystrokes. So when an enhanced bit is set in the KEY_EVENT_RECORD.
 dwControlKeyState, a second (very sparse) table is substituted for the regular
 one.
@@ -42,7 +37,7 @@ BYTE Scan1ToKeynum[] =
 
 
     UNDEFINED,		//  0x0		
-    110,		//  0x1		Escape 
+    110,		//  0x1		Escape
     2,			//  0x2		1 !
     3,			//  0x3		2 @
     4,			//  0x4		3 #
@@ -110,7 +105,7 @@ BYTE Scan1ToKeynum[] =
     119,		//  0x42	F8
     120,		//  0x43	F9
     121,		//  0x44	F10
-    126,		//  0x45	Break Key
+    90, 		//  0x45	Numlock and Pause both have ScanCode 45
     125,		//  0x46	Scroll Lock
     91,			//  0x47	Keypad Home 7
     96,			//  0x48	Keypad Up 8
@@ -267,7 +262,7 @@ BYTE Scan1ToKeynumExtended[] =
     79,			//  0x4b	Extended 4b Left
     UNDEFINED,		//  0x4c	
     89,			//  0x4d	Extended 4d Right
-    UNDEFINED,		//  0x4e	 
+    UNDEFINED,		//  0x4e	
     81,			//  0x4f	Extended 4f End
     84,			//  0x50	Extended 50 Down
     86,			//  0x51	Extended 51 Page Down
@@ -275,129 +270,6 @@ BYTE Scan1ToKeynumExtended[] =
     76,			//  0x53	Extended 53 Delete
 
 };
-
-
-
-/*
- *  Table for translating BiosBuffer scan codes with special
- *  NULL ascii chars, and their associated control flags
- *  If it is not in this table The Bios scan code should
- *  be the same as the win32 Scan code.
- */
-#define FIRST_NULLCHARSCAN      0x54
-#define LAST_NULLCHARSCAN       0xa6
-
-typedef struct _NullAsciiCharScan {
-    WORD    wWinSCode;
-    DWORD   dwControlState;
-} NULLCHARSCAN;
-
-NULLCHARSCAN aNullCharScan[] =
-{
-// WinSCode    dwControlState           BiosSCode      Keys
-
-      0x3b,    SHIFT_PRESSED,           //  0x54       Shift+F1
-      0x3c,    SHIFT_PRESSED,           //  0x55       Shift+F2
-      0x3d,    SHIFT_PRESSED,           //  0x56       Shift+F3
-      0x3e,    SHIFT_PRESSED,           //  0x57       Shift+F4
-      0x3f,    SHIFT_PRESSED,           //  0x58       Shift+F5
-      0x40,    SHIFT_PRESSED,           //  0x59       Shift+F6
-      0x41,    SHIFT_PRESSED,           //  0x5a       Shift+F7
-      0x42,    SHIFT_PRESSED,           //  0x5b       Shift+F8
-      0x43,    SHIFT_PRESSED,           //  0x5c       Shift+F9
-      0x44,    SHIFT_PRESSED,           //  0x5d       Shift+F10
-      0x3b,    LEFT_CTRL_PRESSED,       //  0x5e       Ctrl+F1
-      0x3c,    LEFT_CTRL_PRESSED,       //  0x5f       Ctrl+F2
-      0x3d,    LEFT_CTRL_PRESSED,       //  0x60       Ctrl+F3
-      0x3e,    LEFT_CTRL_PRESSED,       //  0x61       Ctrl+F4
-      0x3f,    LEFT_CTRL_PRESSED,       //  0x62       Ctrl+F5
-      0x40,    LEFT_CTRL_PRESSED,       //  0x63       Ctrl+F6
-      0x41,    LEFT_CTRL_PRESSED,       //  0x64       Ctrl+F7
-      0x42,    LEFT_CTRL_PRESSED,       //  0x65       Ctrl+F8
-      0x43,    LEFT_CTRL_PRESSED,       //  0x66       Ctrl+F9
-      0x44,    LEFT_CTRL_PRESSED,       //  0x67       Ctrl+F10
-      0x3b,    LEFT_ALT_PRESSED,        //  0x68       Alt+F1
-      0x3c,    LEFT_ALT_PRESSED,        //  0x69       Alt+F2
-      0x3d,    LEFT_ALT_PRESSED,        //  0x6a       Alt+F3
-      0x3e,    LEFT_ALT_PRESSED,        //  0x6b       Alt+F4
-      0x3f,    LEFT_ALT_PRESSED,        //  0x6c       Alt+F5
-      0x40,    LEFT_ALT_PRESSED,        //  0x6d       Alt+F6
-      0x41,    LEFT_ALT_PRESSED,        //  0x6e       Alt+F7
-      0x42,    LEFT_ALT_PRESSED,        //  0x6f       Alt+F8
-      0x43,    LEFT_ALT_PRESSED,        //  0x70       Alt+F9
-      0x44,    LEFT_ALT_PRESSED,        //  0x71       Alt+F10
-      0,       0,                       //  0x72       Ctrl+PrtSc
-      0x4b,    LEFT_CTRL_PRESSED,       //  0x73       Ctrl+Left
-      0x4d,    LEFT_CTRL_PRESSED,       //  0x74       Ctrl+Right
-      0x4f,    LEFT_CTRL_PRESSED,       //  0x75       Ctrl+End
-      0x51,    LEFT_CTRL_PRESSED,       //  0x76       Ctrl+PgDn
-      0x47,    LEFT_CTRL_PRESSED,       //  0x77       Ctrl+Home
-      0x2,     LEFT_ALT_PRESSED,        //  0x78       Alt+1
-      0x3,     LEFT_ALT_PRESSED,        //  0x79       Alt+2
-      0x4,     LEFT_ALT_PRESSED,        //  0x7a       Alt+3
-      0x5,     LEFT_ALT_PRESSED,        //  0x7b       Alt+4
-      0x6,     LEFT_ALT_PRESSED,        //  0x7c       Alt+5
-      0x7,     LEFT_ALT_PRESSED,        //  0x7d       Alt+6
-      0x8,     LEFT_ALT_PRESSED,        //  0x7e       Alt+7
-      0x9,     LEFT_ALT_PRESSED,        //  0x7f       Alt+8
-      0xa,     LEFT_ALT_PRESSED,        //  0x80       Alt+9
-      0xb,     LEFT_ALT_PRESSED,        //  0x81       Alt+0
-      0xc,     LEFT_ALT_PRESSED,        //  0x82       Alt+-
-      0xd,     LEFT_ALT_PRESSED,        //  0x83       Alt+=
-      0x49,    LEFT_CTRL_PRESSED,       //  0x84       Ctrl+PgUp
-      0,       0,                       //  0x85       ?????
-      0,       0,                       //  0x86       ?????
-      0x85,    SHIFT_PRESSED,           //  0x87       Shift+F11
-      0x86,    SHIFT_PRESSED,           //  0x88       Shift+F12
-      0x85,    LEFT_CTRL_PRESSED,       //  0x89       Ctrl+F11
-      0x86,    LEFT_CTRL_PRESSED,       //  0x8a       Ctrl+F12
-      0x85,    LEFT_ALT_PRESSED,        //  0x8b       Alt+F11
-      0x86,    LEFT_ALT_PRESSED,        //  0x8c       Alt+F12
-      0x48,    LEFT_CTRL_PRESSED,       //  0x8d       Ctrl+Up
-      0x4a,    LEFT_CTRL_PRESSED,       //  0x8e       Ctrl+-
-      0x4c,    LEFT_CTRL_PRESSED,       //  0x8f       Ctrl+5
-      0x4e,    LEFT_CTRL_PRESSED,       //  0x90       Ctrl++
-      0x50,    LEFT_CTRL_PRESSED,       //  0x91       Ctrl+Down
-      0x52,    LEFT_CTRL_PRESSED,       //  0x92       Ctrl+Ins
-      0x53,    LEFT_CTRL_PRESSED,       //  0x93       Ctrl+Del
-      0,       0,                       //  0x94       ?????
-      0,       0,                       //  0x95       ?????
-      0,       0,                       //  0x96       ?????
-      0x47,    LEFT_ALT_PRESSED,        //  0x97       Alt+Home
-      0x48,    LEFT_ALT_PRESSED,        //  0x98       Alt+Up
-      0x49,    LEFT_ALT_PRESSED,        //  0x99       Alt+PgUp
-      0,       0,                       //  0x9a       ?????
-      0x4b,    LEFT_ALT_PRESSED,        //  0x9b       Alt+Left
-      0,       0,                       //  0x9c       ?????
-      0x4d,    LEFT_ALT_PRESSED,        //  0x9d       Alt+Right
-      0,       0,                       //  0x9e       ?????
-      0x4f,    LEFT_ALT_PRESSED,        //  0x9f       Alt+End
-      0x50,    LEFT_ALT_PRESSED,        //  0xa0       Alt+Down
-      0x51,    LEFT_ALT_PRESSED,        //  0xa1       Alt+PgDn
-      0x52,    LEFT_ALT_PRESSED,        //  0xa2       Alt+Ins
-      0x53,    LEFT_ALT_PRESSED,        //  0xa3       Alt+Del
-      0,       0,                       //  0xa4       ?????
-      0xf,     LEFT_ALT_PRESSED,        //  0xa5       Alt+Tab
-      0x1c,    LEFT_ALT_PRESSED         //  0xa6       Alt+Enter
-};
-
-
-WORD aNumPadSCode[] = // index by VK_NUMPAD0 as zero offset
-{
-    0x52,      // VK_NUMPAD0 - 60
-    0x4f,      // VK_NUMPAD1   61
-    0x50,      // VK_NUMPAD2   62
-    0x51,      // VK_NUMPAD3   63
-    0x4b,      // VK_NUMPAD4   64
-    0x4c,      // VK_NUMPAD5   65
-    0x4d,      // VK_NUMPAD6   66
-    0x47,      // VK_NUMPAD7   67
-    0x48,      // VK_NUMPAD8   68
-    0x49       // VK_NUMPAD9   69
-};
-
-
-
 
 
 
@@ -415,9 +287,16 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
     /*:::::::::::::::::::::::::::::::::::: do we need the enhanced key set ? */
     /* Correct original one-past-end guards: byte count is exclusive. */
 
+
+    // Both Pause and Numlock have ScanCode==0x45,
+    // so simple table lookup by ScanCode doesn't work
+    // use wVirtualKeyCode to check for Pause
+    if(KeyEvent->wVirtualScanCode == 0x45 && KeyEvent->wVirtualKeyCode == VK_PAUSE) {
+       return 126;
+    }
+
     if(!(KeyEvent->dwControlKeyState & ENHANCED_KEY))
     {
-
 	/*............................... the regular keyset is what we need */
 
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynum)
@@ -439,174 +318,3 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 
 
 
-#ifndef SOFTPC_STANDALONE
-/*  BiosKeyToInputRecord
- *
- *  Translates Bios Buffer Keys to win32 console type of key_events.
- *
- *  entry: pKeyEvent                     - addr of KEY_EVENT structure
- *         pKeyEvent->uChar.AsciiChar    - Bios Buffer character
- *         pKeyEvent->wVirtualScanCode   - Bios Buffer scan code
- *
- *  exit: all KEY_EVENT fields are filled in.
- *        The AsciiChar has been converted to unicode
- *
- *  If a character is not in the current keyboard layout
- *  we return TRUE with: dwControlKeyState |= NUMLOCK_ON;
- *                       wVirtualKeyCode   = VK_MENU;
- *                       wVirtualScanCode  = 0x38;
- *                       OemChar (not unicode)
- */
-BOOL BiosKeyToInputRecord(PKEY_EVENT_RECORD pKeyEvent)
-{
-    USHORT   KeyState;
-    NTSTATUS Status;
-    UCHAR    AsciiChar=(UCHAR)pKeyEvent->uChar.AsciiChar;
-    WCHAR    UnicodeChar;
-
-    pKeyEvent->wRepeatCount = 1;
-    pKeyEvent->wVirtualKeyCode = 0;
-    pKeyEvent->dwControlKeyState = 0;
-
-        // we treat 0xF0 Ascii Char as NULL char just like the bios
-    if (AsciiChar == 0xF0 && pKeyEvent->wVirtualScanCode) {
-        AsciiChar = 0;
-        }
-
-
-      // convert oem char to unicode character, cause we can do it more
-      // efficiently than console (already going thru char by char).
-    Status = RtlOemToUnicodeN(&UnicodeChar,
-                              sizeof(WCHAR),
-                              NULL,
-                              &AsciiChar,
-                              1 );
-    if (!NT_SUCCESS(Status)) {
-        return FALSE;
-        }
-
-
-
-           // Convert BiosBuffer ScanCode for  NULL asciiChars to
-           // windows scan code
-    if ( (!AsciiChar) &&
-         pKeyEvent->wVirtualScanCode >= FIRST_NULLCHARSCAN &&
-         pKeyEvent->wVirtualScanCode <= LAST_NULLCHARSCAN  )
-       {
-         pKeyEvent->wVirtualScanCode -= FIRST_NULLCHARSCAN;
-         pKeyEvent->dwControlKeyState = aNullCharScan[pKeyEvent->wVirtualScanCode].dwControlState;
-         pKeyEvent->wVirtualScanCode  = aNullCharScan[pKeyEvent->wVirtualScanCode].wWinSCode;
-         }
-
-
-            // Some CTRL-Extended keys have special bios scan codes
-            // These scan codes are not recognized by windows. Change
-            // to a windows compatible scan code, and set CTRL flag
-    else if (AsciiChar == 0xE0 && pKeyEvent->wVirtualScanCode)  {
-        pKeyEvent->dwControlKeyState = ENHANCED_KEY;
-        if (AsciiChar == 0xE0) {
-            pKeyEvent->dwControlKeyState |= LEFT_CTRL_PRESSED;
-            switch (pKeyEvent->wVirtualScanCode) {
-              case 0x73: pKeyEvent->wVirtualScanCode = 0x4B;
-                         break;
-              case 0x74: pKeyEvent->wVirtualScanCode = 0x4D;
-                         break;
-              case 0x75: pKeyEvent->wVirtualScanCode = 0x4f;
-                         break;
-              case 0x76: pKeyEvent->wVirtualScanCode = 0x51;
-                         break;
-              case 0x77: pKeyEvent->wVirtualScanCode = 0x47;
-                         break;
-              case 0x84: pKeyEvent->wVirtualScanCode = 0x49;
-                         break;
-              case 0x8D: pKeyEvent->wVirtualScanCode = 0x48;
-                         break;
-              case 0x91: pKeyEvent->wVirtualScanCode = 0x50;
-                         break;
-              case 0x92: pKeyEvent->wVirtualScanCode = 0x52;
-                         break;
-              case 0x93: pKeyEvent->wVirtualScanCode = 0x53;
-                         break;
-
-              default: // the rest should have correct scan codes
-                       // but not CTRL bit
-                    pKeyEvent->dwControlKeyState &= ~LEFT_CTRL_PRESSED;
-              }
-            }
-
-        AsciiChar   = 0;
-        UnicodeChar = 0;
-        }
-
-
-            // The keypad "/" and the keypad "enter" special cases
-
-    else if (pKeyEvent->wVirtualScanCode == 0xE0)  {
-        pKeyEvent->dwControlKeyState = ENHANCED_KEY;
-        if (AsciiChar == 0x2f) {               // is keypad "/"
-            pKeyEvent->wVirtualScanCode = 0x35;
-            pKeyEvent->wVirtualKeyCode  = VK_DIVIDE;
-            }
-        else {                    // is keypad enter   chars == 0xd, 0xa
-            pKeyEvent->wVirtualScanCode = 0x1C;
-            pKeyEvent->wVirtualKeyCode  = VK_RETURN;
-            if (AsciiChar == 0xA) {
-                pKeyEvent->dwControlKeyState |= LEFT_CTRL_PRESSED;
-                }
-            }
-        }
-
-
-
-        // get control flags\VirtualKey for normal ascii characters,
-
-    else if (AsciiChar &&
-              pKeyEvent->wVirtualScanCode != 0x01 &&  // ESC
-              pKeyEvent->wVirtualScanCode != 0x0E &&  // Backspace
-              pKeyEvent->wVirtualScanCode != 0x0F &&  // Tab
-              pKeyEvent->wVirtualScanCode != 0x1C )   // Enter
-        {
-
-        KeyState = (USHORT) VkKeyScanW(UnicodeChar);
-
-        if (KeyState == 0xFFFF)  {
-             /*  fail means not a physical key (ALT-NUMPAD entry sequence)
-              *  Proper emeulation requires that we generate it by doing
-              *  ALT-NUMLOCK-xxx-NUMLOCK-ALT.
-              *  We shortcut this by sending console, the final key event.
-              *  hoping that apps won't notice the difference.
-              */
-            pKeyEvent->wVirtualScanCode  = 0;
-            pKeyEvent->wVirtualKeyCode   = VK_MENU;  // dummy opt
-            }
-        else {
-            pKeyEvent->wVirtualKeyCode   = (WORD)LOBYTE(KeyState);
-            if (KeyState & 0x100)
-                pKeyEvent->dwControlKeyState |= SHIFT_PRESSED;
-            if (KeyState & 0x200)
-                pKeyEvent->dwControlKeyState |= LEFT_CTRL_PRESSED;
-            if (KeyState & 0x400)
-                pKeyEvent->dwControlKeyState |= LEFT_ALT_PRESSED;
-
-              // some keys get mapped to different scan codes (NUMPAD)
-              // so get matching scan code
-            pKeyEvent->wVirtualScanCode  = MapVirtualKey(pKeyEvent->wVirtualKeyCode,0);
-            }
-        }
-
-
-      // Get a Virtual KeyCode, if we don't have one yet
-    if (!pKeyEvent->wVirtualKeyCode)  {
-        pKeyEvent->wVirtualKeyCode = MapVirtualKey(pKeyEvent->wVirtualScanCode,3);
-        if (!pKeyEvent->wVirtualKeyCode) {
-             return FALSE;
-             }
-        }
-
-    pKeyEvent->uChar.UnicodeChar = UnicodeChar;
-
-
-    return TRUE;
-}
-
-#endif /* SOFTPC_STANDALONE */

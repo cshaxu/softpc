@@ -88,6 +88,7 @@ static char SccsID[]="@(#)keybd_io.c	1.35 06/27/95 Copyright Insignia Solutions 
 #include "debug.h"
 #include "idetect.h"
 
+extern void host_simulate();
 
 /*
  * ============================================================================
@@ -142,13 +143,6 @@ static sys_addr alt_table;
  * or assumed location.
  */
 
-#if defined(NTVDM) && defined(LOCAL)
-/*
- * Make static fns and globals visible to win32 debuggers
- */
-#undef LOCAL
-#define LOCAL
-#endif
 
 #ifndef GISP_SVGA
 LOCAL word int15_seg = RCPU_INT15_SEGMENT,
@@ -187,56 +181,7 @@ LOCAL word rcpu_poll_offset  = RCPU_POLL_OFFSET;
 IMPORT VOID  HostAllowKbdInt();  /* Allow keybd Ints without an IRET */
 #endif /* IRET_HOOKS && GISP_CPU */
 
-#ifdef NTVDM
-
-#include "error.h"
-
-GLOBAL word wait_int_seg = RCPU_WAIT_INT_SEGMENT;
-GLOBAL word wait_int_off = RCPU_WAIT_INT_OFFSET;
-GLOBAL word dr_type_seg = DR_TYPE_SEGMENT;
-GLOBAL word dr_type_off = DR_TYPE_OFFSET;
-GLOBAL sys_addr dr_type_addr = DR_TYPE_ADDR;
-/* Global var to indicate whether keyboard bios or hardware owns the keyboard mutex. */
-GLOBAL BOOL bBiosOwnsKbdHdw;
-IMPORT ULONG WaitKbdHdw(ULONG dwTimeOut);
-IMPORT VOID  HostReleaseKbd();
-IMPORT VOID  HostResetKbdNotFullEvent();
-IMPORT VOID  HostSetKbdNotFullEvent();
-GLOBAL VOID  TryKbdInt(VOID);
-IMPORT VOID  ResumeTimerThread(VOID);
-IMPORT VOID  WaitIfIdle(VOID);
-
-
-#define FREEKBDHDW()	bBiosOwnsKbdHdw = \
-                      ( bBiosOwnsKbdHdw ? HostReleaseKbd(), FALSE : FALSE )
-
-
-/* for optimizing timer hardware interrupt generation defined in timer.c */
-extern word TimerInt08Seg;
-extern word TimerInt08Off;
-extern word TimerInt1CSeg;
-extern word TimerInt1COff;
-extern word KbdInt09Seg;
-extern word KbdInt09Off;
-extern BOOL VDMForWOW;
-
-void Keyb16Request(half_word BopFnCode);
-
-/* optimizes 16 bit handler */
-extern word *pICounter;
-extern word *pCharPollsPerTick;
-extern word *pShortIdle;
-extern word *pIdleNoActivity;
-
-
-extern half_word * stream_io_buffer;
-extern word * stream_io_dirty_count_ptr;
-extern word stream_io_buffer_size;
-extern sys_addr stream_io_bios_busy_sysaddr;
-
-#else
 #define FREEKBDHDW()	/* Nothing for conventional SoftPC */
-#endif	/* NTVDM */
 
 /*
  * Mix in global defined data as well.
@@ -261,37 +206,7 @@ GLOBAL word rcpu_int4A_off = RCPU_INT4A_OFFSET;
 GLOBAL word dummy_int_seg = 0;
 GLOBAL word dummy_int_off = 0;
 
-#ifdef NTVDM
-GLOBAL word int13h_vector_off;
-GLOBAL word int13h_vector_seg;
-GLOBAL word int13h_caller_off;
-GLOBAL word int13h_caller_seg;
-#endif /* NTVDM */
 
-#if defined(NTVDM) && defined(MONITOR)
-/*
-** Microsoft special.
-** These variables are set below in kb_setup_vectors(), to addresses
-** passed by NTIO.SYS via BOP 5F -> MS_bop_F() -> kb_setup_vectors()
-** Tim June 92.
-*/
-/*
-** New ntio.sys variables for video ROM matching. Tim August 92.
-*/
-GLOBAL word int10_seg=0;
-GLOBAL word int10_caller=0;
-GLOBAL word int10_vector=0; /* Address of native int 10*/
-GLOBAL word useHostInt10=0; /* var that chooses between host video ROM or BOPs */
-GLOBAL word babyModeTable=0; /* Address of small mode table lives in ntio.sys */
-GLOBAL word changing_mode_flag=0; /* ntio.sys var to indicate vid mode change */
-GLOBAL word vga1b_seg = 0;
-GLOBAL word vga1b_off = 0;   /* VGA capability table normally in ROM */
-GLOBAL word conf_15_off = 0;
-GLOBAL word conf_15_seg = 0; /* INT15 config table normally in ROM */
-
-void printer_setup_table(sys_addr table_addr);
-
-#endif /* NTVDM & MONITOR */
 
 extern int soft_reset   ;	/* set for ctl-alt-dels			*/
 
@@ -541,9 +456,6 @@ LOCAL VOID check_indicators IFN1(IBOOL, eoi)
 
 	var_kb_flag_2 = (var_kb_flag_2 & 0xf8) | indicators;
 	sas_store_no_check(kb_flag_2, var_kb_flag_2);
-#ifdef NTVDM
-	host_kb_light_on (indicators);
-#endif
 
 #ifdef	GISP_CPU
 	/*
@@ -582,7 +494,7 @@ LOCAL VOID check_indicators IFN1(IBOOL, eoi)
 #endif	/* NTVDM or GISP_CPU */
 
 			/* turn off update indicator and error flag	*/
-			sas_store_no_check (kb_flag_2, sas_hw_at_no_check(kb_flag_2) & ~(KB_PR_LED + KB_ERR));
+			sas_store_no_check (kb_flag_2, (IU8)(sas_hw_at_no_check(kb_flag_2) & ~(KB_PR_LED + KB_ERR)));
 		}
 	}
 }
@@ -627,7 +539,7 @@ LOCAL VOID K26A IFN0()
 LOCAL VOID K26 IFN0()
 {
 	/* Reset last char H.C. flag */
-	sas_store_no_check(kb_flag_3, sas_hw_at_no_check(kb_flag_3) & ~(LC_E0 + LC_E1));
+	sas_store_no_check(kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) & ~(LC_E0 + LC_E1)));
 
 	/* (same as K26A()) */
 	outb(0x20, 0x20);
@@ -635,7 +547,6 @@ LOCAL VOID K26 IFN0()
 }
 
 
-#ifndef NTVDM
 
 LOCAL VOID INT15 IFN0()
 {
@@ -653,29 +564,10 @@ LOCAL VOID INT15 IFN0()
 	setIP(saveIP);
 }
 
-#else	/* NTVDM */
 
-void INT15(void);
-word sp_int15_handler_seg = 0;
-word sp_int15_handler_off = 0;
-
-#endif	/* NTVDM */
-
-#ifndef NTVDM
 #define BEEP(message)           always_trace0(message);         \
 				host_alarm(250000L);		\
 				K26A()
-#else   /* NTVDM */
-/* NTVDM code size is too large, change this often used macro
- * to a function, as the call overhead is not justified
- */
-void BEEP(char *message)
-{
-    note_trace0(BIOS_KB_VERBOSE,message);
-    host_alarm(250000L);
-    K26A();
-}
-#endif	/* NTVDM */
 
 
 
@@ -697,7 +589,6 @@ void BEEP(char *message)
 ** on the Mac from 38K to 12K!) After all, it isn't as if keyboards are
 ** highly speed sensitive!
 */
-#ifndef NTVDM
 
 LOCAL VOID PutInBufferFunc IFN2(half_word, s, half_word, v)
 {
@@ -728,49 +619,11 @@ LOCAL VOID PutInBufferFunc IFN2(half_word, s, half_word, v)
 }
 
 
-#else   /* NTVDM */
-
-
-/* <tur> NT's PutInBuffer seems to be slightly different to PutInBufferFunc above. */
-/* So I'm Not Touching it! (Is this a good expansion of "NT"? :-) */
-
-/* Our code size is too large, change this often used macro
- * to a function, as the call overhead is not justified
- */
-
-void NtPutInBuffer(half_word s, half_word v)
-{
-        word    buffer_head, buffer_tail, buffer_ptr;
-
-        buffer_tail = sas_w_at_no_check(BIOS_KB_BUFFER_TAIL);
-        buffer_head = sas_w_at_no_check(BIOS_KB_BUFFER_HEAD);
-        buffer_ptr = inc_buffer_ptr(/* from: */buffer_tail);
-
-        if (buffer_ptr == buffer_head) {
-                BEEP("BIOS keyboard buffer overflow");
-        }
-        else {
-                sas_store_no_check(BIOS_VAR_START + buffer_tail, v);
-                sas_store_no_check(BIOS_VAR_START + buffer_tail+1, s);
-                sas_storew_no_check(BIOS_KB_BUFFER_TAIL, buffer_ptr);
-                setAX(0x9102);
-                INT15();
-      K26();
-      setIF(0);
-        }
-
-   exit_from_kbd_int();
-}
-
-#define PUT_IN_BUFFER(s, v) NtPutInBuffer(s,v); return
-#endif	/* NTVDM */
 
 
 /* <tur 17-Jun-93> Eurrgh; macros with embedded "return"s! */
 
-#ifndef NTVDM
 #define PUT_IN_BUFFER(s, v)		PutInBufferFunc(s,v); return
-#endif	/* !NTVDM */
 
 LOCAL VOID CheckAndPutInBufferFunc IFN2(half_word, s,half_word, v)
 {
@@ -779,11 +632,7 @@ LOCAL VOID CheckAndPutInBufferFunc IFN2(half_word, s,half_word, v)
 		exit_from_kbd_int();
 	}
 	else {
-#ifndef NTVDM
 		PutInBufferFunc(s, v);
-#else /* NTVDM */
-		NtPutInBuffer(s, v);
-#endif /* !NTVDM */
 	}
 }
 
@@ -795,7 +644,7 @@ LOCAL VOID PAUSE IFN0()
 	word   CS_save;        /* tmp. store for CS value      */
 	word   IP_save;        /* tmp. store for IP value      */
 
-	sas_store_no_check(kb_flag_1, sas_hw_at_no_check(kb_flag_1) | HOLD_STATE);
+	sas_store_no_check(kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) | HOLD_STATE));
 
 	outb(KEYBA_STATUS_CMD, ENA_KBD);
 	outb(0x20, 0x20);
@@ -807,13 +656,10 @@ LOCAL VOID PAUSE IFN0()
 
 	do {
 #if defined(IRET_HOOKS)  && defined(GISP_CPU)
-		HostAllowKbdInt();	/* Allow a keypress to generate an interrupt */ 
+		HostAllowKbdInt();	/* Allow a keypress to generate an interrupt */
 #endif /* IRET_HOOKS && GISP_CPU */
 
 
-#if defined(NTVDM)
-                IDLE_waitio();
-#endif
 
 		setCS(rcpu_nop_segment);
 		setIP(rcpu_nop_offset);
@@ -826,20 +672,16 @@ LOCAL VOID PAUSE IFN0()
 	outb(KEYBA_STATUS_CMD, ENA_KBD);
 }
 
-#ifndef NTVDM
 static int re_entry_level=0;
-#endif
 
 /*
 ** All exits from keyboard_int() call this first.
 */
 LOCAL void exit_from_kbd_int IFN0()
 {
-#ifndef NTVDM
 	--re_entry_level;
 	if( re_entry_level >= 4 )
 		always_trace1("ERROR: KBD INT bad exit level %d", re_entry_level);
-#endif
 	note_trace0( BIOS_KB_VERBOSE, "KBD BIOS - END" );
 	setIF( 0 );
 	FREEKBDHDW();	/* JonLe NTVDM Mod */
@@ -854,57 +696,22 @@ void keyboard_int IFN0()
 				chr,		/* ASCII char code		*/
 				last_kb_flag_3,	/* kb_flag_3 saved		*/
 				mask;
-#ifdef	NTVDM
-	word		IP_save,
-                        buffer_head,    /* ptr. to head of kb buffer */
-			buffer_tail;	/* ptr. to tail of kb buffer */
-	half_word		BopFnCode;
-#endif	/* NTVDM */
 
 
 
         boolean                 upper;          /* flag indicating upper case   */
 
-#ifdef NTVDM
-        BopFnCode = getAH();
-        if (BopFnCode) {
-            Keyb16Request(BopFnCode);
-            return;
-            }
-#endif
-#ifndef NTVDM
 	++re_entry_level;
 	if( re_entry_level > 4 ){
 		always_trace1("ERROR: KBD BIOS re-entered at level %d\n", re_entry_level-1);
 	}
-#endif
 	setIF(0);
         note_trace0(BIOS_KB_VERBOSE,"KBD BIOS start");
 
-#ifdef NTVDM            /* JonLe keyboard mod */
-        bBiosOwnsKbdHdw = !WaitKbdHdw(5000);
-#endif  /* NTVDM */
 
 	/* disable keyboard	*/
 	outb(KEYBA_STATUS_CMD, DIS_KBD);
 
-#ifdef NTVDM
-          /*
-           *  CarbonCopy traces int 9 in order to gain control
-           *  over where the kbd data is coming from (the physical kbd
-           *  or the serial link) The kbd_inb instruction must be visible
-           *  in the 16 bit code via int 1 tracing, for CarbonCopy to work.
-           *  interrupts should be kept off.
-           */
-        if (getTF()) {
-            IP_save = getIP();
-            setIP(IP_save + 4);  /* adavance by 4 bytes, pop ax, jmp iret_com */
-            host_simulate();
-            setIP(IP_save);
-            code = getAL();
-            }
-        else
-#endif
             inb(KEYBA_IO_BUFFERS, &code);                           /* get scan_code        */
 
 	/* call recursive CPU to handle int 15 call	*/
@@ -923,14 +730,14 @@ void keyboard_int IFN0()
 
 	if ( code == KB_RESEND )					/* check for resend	*/
 	{
-		sas_store_no_check (kb_flag_2, sas_hw_at_no_check(kb_flag_2) | KB_FE);
+		sas_store_no_check (kb_flag_2, (IU8)(sas_hw_at_no_check(kb_flag_2) | KB_FE));
 		K26();
 		exit_from_kbd_int();return;
 	}
 
 	if( code == KB_ACK )						/* check for acknowledge	*/
 	{
-		sas_store_no_check (kb_flag_2, sas_hw_at_no_check(kb_flag_2) | KB_FA);
+		sas_store_no_check (kb_flag_2, (IU8)(sas_hw_at_no_check(kb_flag_2) | KB_FA));
 		K26();
 		exit_from_kbd_int();return;
 	}
@@ -950,12 +757,12 @@ void keyboard_int IFN0()
 		if ( sas_hw_at_no_check(kb_flag) & RD_ID )	/* is read_id flag on	*/
 		{
 			if( code == ID_1 )				/* is this the 1st ID char.	*/
-				sas_store_no_check (kb_flag_3, sas_hw_at_no_check(kb_flag_3) | LC_AB);
-			sas_store_no_check (kb_flag_3, sas_hw_at_no_check(kb_flag_3) & ~RD_ID);
+				sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) | LC_AB));
+			sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) & ~RD_ID));
 		}
 		else
 		{
-			sas_store_no_check (kb_flag_3, sas_hw_at_no_check(kb_flag_3) & ~LC_AB);
+			sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) & ~LC_AB));
 			if( code != ID_2A )				/* is this the 2nd ID char.	*/
 			{
 				if( code == ID_2 )
@@ -963,7 +770,7 @@ void keyboard_int IFN0()
 					/* should we set NUM LOCK	*/
 					if( last_kb_flag_3 & SET_NUM_LK )
 					{
-						sas_store_no_check (kb_flag, sas_hw_at_no_check(kb_flag) | NUM_STATE);
+						sas_store_no_check (kb_flag, (IU8)(sas_hw_at_no_check(kb_flag) | NUM_STATE));
 						check_indicators(1);
 					}
 				}
@@ -973,7 +780,7 @@ void keyboard_int IFN0()
 					exit_from_kbd_int();return;
 				}
 			}
-			sas_store_no_check (kb_flag_3, sas_hw_at_no_check(kb_flag_3) | KBX);	/* enhanced kbd found	*/
+			sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) | KBX));	/* enhanced kbd found	*/
 		}
 		K26();
 		exit_from_kbd_int();return;
@@ -981,14 +788,14 @@ void keyboard_int IFN0()
 
 	if( code == MC_E0 )						/* general marker code?	*/
 	{
-		sas_store_no_check(kb_flag_3, sas_hw_at_no_check(kb_flag_3) | ( LC_E0 + KBX ));
+		sas_store_no_check(kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) | ( LC_E0 + KBX )));
 		K26A();
 		exit_from_kbd_int();return;
 	}
 
 	if( code == MC_E1 )						/* the pause key ?	*/
 	{
-		sas_store_no_check (kb_flag_3, sas_hw_at_no_check (kb_flag_3) | ( LC_E1 + KBX ));
+		sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check (kb_flag_3) | ( LC_E1 + KBX )));
 		K26A();
 		exit_from_kbd_int();return;
 	}
@@ -1031,7 +838,7 @@ void keyboard_int IFN0()
 	{
 		if( code_save & 0x80 )					/* check for break code	*/
 		{
-			sas_store_no_check(kb_flag_1, sas_hw_at_no_check(kb_flag_1) & ~SYS_SHIFT);
+			sas_store_no_check(kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) & ~SYS_SHIFT));
 			K26A();
 			/* call recursive CPU to call INT 15	*/
 			setAX(0x8501);
@@ -1043,7 +850,7 @@ void keyboard_int IFN0()
 			K26();
 			exit_from_kbd_int();return;
 		}
-		sas_store_no_check (kb_flag_1, sas_hw_at_no_check(kb_flag_1) | SYS_SHIFT);
+		sas_store_no_check (kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) | SYS_SHIFT));
 		K26A();
 		/* call recursive CPU to call INT 15	*/
 		setAX(0x8500);
@@ -1063,19 +870,19 @@ void keyboard_int IFN0()
 		{
 			if (mask >= SCROLL_SHIFT)			/* is this a toggle key	*/
 			{
-				sas_store_no_check (kb_flag_1, sas_hw_at_no_check(kb_flag_1) & ~mask);
+				sas_store_no_check (kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) & ~mask));
 				K26();
 				exit_from_kbd_int();return;
 			}
 
-			sas_store_no_check (kb_flag, sas_hw_at_no_check(kb_flag) & ~mask);	/* turn off shift bit	*/
+			sas_store_no_check (kb_flag, (IU8)(sas_hw_at_no_check(kb_flag) & ~mask));	/* turn off shift bit	*/
 			if( mask >= CTL_SHIFT)				/* alt or ctl ?		*/
 			{
 				if( sas_hw_at_no_check (kb_flag_3) & LC_E0 )			/* 2nd alt or ctl ?	*/
-					sas_store_no_check (kb_flag_3, sas_hw_at_no_check(kb_flag_3) & ~mask);
+					sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) & ~mask));
 				else
-					sas_store_no_check (kb_flag_1, sas_hw_at_no_check(kb_flag_1) & ~(mask >> 2));
-				sas_store_no_check (kb_flag, sas_hw_at_no_check(kb_flag) | ((((sas_hw_at_no_check(kb_flag) >>2 ) | sas_hw_at(kb_flag_1)) << 2) & (ALT_SHIFT + CTL_SHIFT)));
+					sas_store_no_check (kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) & ~(mask >> 2)));
+				sas_store_no_check (kb_flag, (IU8)(sas_hw_at_no_check(kb_flag) | ((((sas_hw_at_no_check(kb_flag) >>2 ) | sas_hw_at(kb_flag_1)) << 2) & (ALT_SHIFT + CTL_SHIFT))));
 			}
 			if(code != (ALT_KEY + 0x80))			/* alt shift release ?	*/
 			{
@@ -1093,20 +900,17 @@ void keyboard_int IFN0()
 			sas_store_no_check(alt_input, 0);		/* Zero the ALT_INPUT char */
 			/* At this point, the ALT input char (now in "code") should be put in the buffer. */
                         PUT_IN_BUFFER(0, code);
-#ifdef NTVDM
-                        return;
-#endif
 		}
 		/* SHIFT MAKE FOUND, DETERMINE SET OR TOGGLE	*/
 		if( mask < SCROLL_SHIFT )
 		{
-			sas_store_no_check (kb_flag, sas_hw_at_no_check(kb_flag) | mask);
+			sas_store_no_check (kb_flag, (IU8)(sas_hw_at_no_check(kb_flag) | mask));
 			if ( mask & (CTL_SHIFT + ALT_SHIFT) )
 			{
 				if( sas_hw_at_no_check(kb_flag_3) & LC_E0 )	/* one of the new keys ?*/
-					sas_store_no_check(kb_flag_3, sas_hw_at_no_check(kb_flag_3) | mask);		/* set right, ctl alt	*/
+					sas_store_no_check(kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3) | mask));		/* set right, ctl alt	*/
 				else
-					sas_store_no_check (kb_flag_1,sas_hw_at_no_check(kb_flag_1) | (mask >> 2));	/* set left, ctl alt	*/
+					sas_store_no_check (kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) | (mask >> 2)));	/* set left, ctl alt	*/
 			}
 			K26();
 			exit_from_kbd_int();return;
@@ -1137,8 +941,8 @@ void keyboard_int IFN0()
 				K26();
 				exit_from_kbd_int();return;
 			}
-			sas_store_no_check (kb_flag_1, sas_hw_at_no_check(kb_flag_1) | mask);				/* set and toggle flags	*/
-			sas_store_no_check ( kb_flag, sas_hw_at_no_check(kb_flag) ^ mask);
+			sas_store_no_check (kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) | mask));				/* set and toggle flags	*/
+			sas_store_no_check ( kb_flag, (IU8)(sas_hw_at_no_check(kb_flag) ^ mask));
 			if( mask & (CAPS_SHIFT + NUM_SHIFT + SCROLL_SHIFT) )
 				check_indicators(1);
 
@@ -1158,7 +962,7 @@ label1:	/* TEST FOR HOLD STATE */
 	if( sas_hw_at_no_check(kb_flag_1) & HOLD_STATE )		/* in hold state ?	*/
 	{
 		if( code != NUM_KEY )
-			sas_store_no_check (kb_flag_1, sas_hw_at_no_check(kb_flag_1) & ~HOLD_STATE);
+			sas_store_no_check (kb_flag_1, (IU8)(sas_hw_at_no_check(kb_flag_1) & ~HOLD_STATE));
 		K26();
 		exit_from_kbd_int();return;
 	}
@@ -1175,11 +979,7 @@ label2:	/* NOT IN HOLD STATE	*/
 		/* TEST FOR RESET KEY SEQUENCE (CTL ALT DEL)	*/
 		if( (sas_hw_at_no_check(kb_flag) & CTL_SHIFT ) && (code == DEL_KEY) )
                 {
-#ifndef NTVDM
                         reboot();
-#else
-                        K26();
-#endif
 			exit_from_kbd_int();return;
 		}
 		/* IN ALTERNATE SHIFT, RESET NOT FOUND	*/
@@ -1203,9 +1003,9 @@ label2:	/* NOT IN HOLD STATE	*/
 		{
 			if( sas_hw_at_no_check(kb_flag_3) & LC_E0 )	/* one of the new keys ?	*/
 			{
-                                PUT_IN_BUFFER((code + 80), 0 );
+                                PUT_IN_BUFFER((IU8)(code + 80), 0 );
                         }
-			sas_store_no_check (alt_input, sas_hw_at_no_check(alt_input) * 10 + i);
+			sas_store_no_check (alt_input, (IU8)(sas_hw_at_no_check(alt_input) * 10 + i));
 			K26();
 			exit_from_kbd_int();return;
 		}
@@ -1224,12 +1024,12 @@ label2:	/* NOT IN HOLD STATE	*/
                 }
 		if( code < BS_KEY )
 		{
-                        PUT_IN_BUFFER((code + 118), 0);
+                        PUT_IN_BUFFER((IU8)(code + 118), 0);
                 }
 		/* TRANSLATE ALTERNATE SHIFT PSEUDO SCAN CODES	*/
 		if((code == F11_M) || (code == F12_M) )		/* F11 or F12		*/
 		{
-                        PUT_IN_BUFFER((code + 52), 0 );
+                        PUT_IN_BUFFER((IU8)(code + 52), 0 );
                 }
 		if( sas_hw_at_no_check(kb_flag_3) & LC_E0 )	/* one of the new keys ?*/
 		{
@@ -1239,7 +1039,7 @@ label2:	/* NOT IN HOLD STATE	*/
                         }
 			if( code == DEL_KEY )
 			{
-				PUT_IN_BUFFER(( code + 80), 0 );
+				PUT_IN_BUFFER((IU8)( code + 80), 0 );
                         }
 			if( code == KEY_PAD_SLASH )
 			{
@@ -1254,7 +1054,7 @@ label2:	/* NOT IN HOLD STATE	*/
                 }
 		if( code <= F10_KEY )
 		{
-			PUT_IN_BUFFER( (code + 45), 0 );
+			PUT_IN_BUFFER( (IU8)(code + 45), 0 );
                 }
 		K26();
 		exit_from_kbd_int();return;
@@ -1331,7 +1131,7 @@ label2:	/* NOT IN HOLD STATE	*/
 
 				exec_sw_interrupt(int05_seg, int05_off);
 
-				sas_store_no_check (kb_flag_3, sas_hw_at_no_check(kb_flag_3)& ~(LC_E0 + LC_E1));
+				sas_store_no_check (kb_flag_3, (IU8)(sas_hw_at_no_check(kb_flag_3)& ~(LC_E0 + LC_E1)));
 				exit_from_kbd_int();return;
 			}
 		}
@@ -1484,54 +1284,6 @@ void kb_idle_poll()
 }
 
 
-#ifdef NTVDM
-   /*
-    *  Ntvdm has a 16-bit int 16 handler
-    *  it requires a few services for idle
-    *  detection from softpc...
-    *
-    */
-void keyboard_io()
-{
-   switch (getAH()) {
-           /*
-            * The 16 bit thread has not reached idle status yet
-            * but it is polling the kbd, so do some brief waits.
-            */
-     case 0:
-       WaitIfIdle();
-#ifndef NTVDM
-       if (!WaitKbdHdw(0)) {
-           TryKbdInt();
-           HostReleaseKbd();
-	   }
-#endif /* NTVDM */
-       break;
-
-           /*
-            *  App wants to idle, so consult idle algorithm
-            */
-     case 1:
-       IDLE_poll();
-       break;
-
-            /*
-             * App is starting a waitio
-             */
-     case 2:
-       IDLE_waitio();
-       break;
-
-            /*
-             *  update the keyboard lights,
-             */
-     case 3:
-       host_kb_light_on (getAL());
-       break;
-     }
-}
-
-#else
 void keyboard_io()
 {
     /*
@@ -1838,7 +1590,6 @@ void keyboard_io()
 	break;
     }
 }
-#endif
 
 #ifdef SEGMENTATION
 /*
@@ -1853,6 +1604,7 @@ void keyboard_post()
 {
 
      /* Set up BIOS keyboard variables */
+
 
 /* Initialize the keyboard table pointers */
 	shift_keys = K6;
@@ -1893,280 +1645,3 @@ void keyboard_init()
 
 
 
-#ifdef NTVDM
-
-/*:::::::::::::::::::::::::::::::::::::::::::::::: Map in new keyboard tables */
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::: Set interrupt vectors */
-/*
-** The Microsoft NTIO.SYS calls this func via BOP 5F to pass
-** interesting addresses to our C BIOS.
-*/
-
-#if defined(MONITOR)
-
-IMPORT UTINY getNtScreenState IPT0();
-#endif
-
-
-void kb_setup_vectors(void)
-{
-   word        KbdSeg, w;
-   word       *pkio_table;
-   double_word phy_base;
-
-
-   KbdSeg     = getDS();
-   /*
-    * DIVERGENCE(MVDM-HOST-DIV-059): effective_addr is a fixed-width guest
-    * physical number, not a host pointer.  The original function already
-    * uses Start_of_M_area as the selected SoftPC SAS backing store below;
-    * use that same native-width backing path for every table pointer rather
-    * than converting the guest number directly to a host address.
-    */
-   phy_base   = effective_addr(getCS(), getSI());
-   pkio_table = (word *)(Start_of_M_area + phy_base);
-
-      /* IDLE variables */
-    sas_loadw((sys_addr)(phy_base + 12 * sizeof(word)), &w);
-    pICounter		  = (word *) (Start_of_M_area + ((KbdSeg<<4)+w));
-    pCharPollsPerTick	  = (word *) (Start_of_M_area + ((KbdSeg<<4)+w+4));
-    pMinConsecutiveTicks = (word *)  (Start_of_M_area + ((KbdSeg<<4)+w+8));
-
-#if defined(MONITOR)
-   phy_base   = (double_word)KbdSeg << 4;
-
-     /* key tables */
-   shift_keys  =  phy_base + *pkio_table++;
-   shift_masks =  phy_base + *pkio_table++;
-   ctl_n_table =  phy_base + *pkio_table++;
-   ctl_f_table =  phy_base + *pkio_table++;
-   lowercase   =  phy_base + *pkio_table++;
-   uppercase   =  phy_base + *pkio_table++;
-   alt_table   =  phy_base + *pkio_table++;
-
-   dummy_int_seg        = KbdSeg;         /* dummy int, iret routine */
-   dummy_int_off        = *pkio_table++;
-   int05_seg            = KbdSeg;         /* print screen caller */
-   int05_off            = *pkio_table++;
-   int15_seg            = KbdSeg;         /* int 15 caller */
-   int15_off            = *pkio_table++;
-   rcpu_nop_segment     = KbdSeg;         /* cpu nop */
-   rcpu_nop_offset      = *pkio_table++;
-   sp_int15_handler_seg = KbdSeg;         /* int 15 handler */
-   sp_int15_handler_off = *pkio_table++;
-   pkio_table++;                          /* iDle variables, done above */
-   rcpu_int4A_seg       = KbdSeg;
-   rcpu_int4A_off       = *pkio_table++;   /* real time clock */
-
-   int1b_seg    = KbdSeg;         /* kbd break handler */
-   int1b_off    = *pkio_table++;
-   int10_seg    = KbdSeg;
-   int10_caller = *pkio_table++;
-   int10_vector = *pkio_table++;
-
-   /*
-   ** Address of data in keyboard.sys, Tim August 92.
-   **
-   ** useHostInt10 is a one byte variable. 1 means use host video BIOS,
-   ** (ie. full-screen), 0 means use SoftPC video BIOS (ie. windowed).
-   ** babyModeTable is a mini version of the table in ROM that contains
-   ** all the VGA register values for all the modes. The keyboard.sys
-   ** version only has two entries; for 40 column text mode and 80
-   ** column text mode.
-   */
-   useHostInt10  = *pkio_table++;
-   sas_store_no_check((sys_addr)(phy_base + useHostInt10), getNtScreenState());
-   babyModeTable = (int10_seg << 4) + *pkio_table++;
-   changing_mode_flag = *pkio_table++;	/* indicates trying to change vid mode*/
-
-    /* Initialise printer status table. */
-   printer_setup_table(effective_addr(KbdSeg, *pkio_table++));
-   wait_int_off = *pkio_table++;
-   wait_int_seg = KbdSeg;
-   dr_type_seg = KbdSeg;
-   dr_type_off = *pkio_table++;
-   dr_type_addr = (sys_addr)dr_type_seg * 16L + (sys_addr)dr_type_off;
-   vga1b_seg = KbdSeg;
-   vga1b_off = *pkio_table++; /* VGA capability table (normally lives in ROM) */
-   conf_15_seg = KbdSeg;
-   conf_15_off = *pkio_table++; /* INT15 config table (normally in ROM) */
-
-   TimerInt08Seg = KbdSeg;
-   TimerInt08Off = *pkio_table++;
-   int13h_vector_seg = KbdSeg;
-   int13h_caller_seg = KbdSeg;
-   int13h_vector_off = *pkio_table++;
-   int13h_caller_off = *pkio_table++;
-   stream_io_buffer_size = *pkio_table++;
-    stream_io_buffer = (half_word *)(Start_of_M_area +
-        effective_addr(*pkio_table++, 0));
-    stream_io_dirty_count_ptr = (word *)(Start_of_M_area +
-        effective_addr(KbdSeg, *pkio_table++));
-   stream_io_bios_busy_sysaddr = effective_addr(KbdSeg, *pkio_table++);
-#ifndef PROD
-   if (*pkio_table != getAX()) {
-       always_trace0("ERROR: KbdVectorTable!");
-       }
-#endif
-   TimerInt1CSeg = KbdSeg;
-   TimerInt1COff = dummy_int_off;
-
-#else    /* ndef MONITOR */
-
-     /* kbd bios callout optimization */
-    sas_loadw(0x15*4,     &sp_int15_handler_off);
-    sas_loadw(0x15*4 + 2, &sp_int15_handler_seg);
-
-     /* timer hardware interrupt optimizations */
-    sas_loadw(0x08*4,     &TimerInt08Off);
-    sas_loadw(0x08*4 + 2, &TimerInt08Seg);
-    sas_loadw(0x1C*4,     &TimerInt1COff);
-    sas_loadw(0x1C*4 + 2, &TimerInt1CSeg);
-
-    sas_loadw(0x13 * 4, &int13h_vector_off);
-    sas_loadw(0x13 * 4 + 2, &int13h_vector_seg);
-    int13h_caller_seg = KbdSeg;
-    dr_type_seg = KbdSeg;
-    sas_loadw((sys_addr)(phy_base + 27 * sizeof(word)), &int13h_caller_off);
-    sas_loadw((sys_addr)(phy_base + 22 * sizeof(word)), &dr_type_off);
-    dr_type_addr = effective_addr(dr_type_seg, dr_type_off);
-
-#endif /* MONITOR */
-
-    sas_loadw(0x09*4,     &KbdInt09Off);
-    sas_loadw(0x09*4 + 2, &KbdInt09Seg);
-
-    ResumeTimerThread();
-}
-
-
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Int15 caller */
-
-
-/*
- *  Gives chance for other parts of NTVDM to
- *  update the kbd i15 kbd callout optimization
- */
-void UpdateKbdInt15(word Seg,word Off)
-{
-    word int15Off, int15Seg;
-
-    /* make sure nobody has hooked since the last time */
-    /* we stored the i15 vector */
-    sas_loadw(0x15*4 ,    &int15Off);
-    sas_loadw(0x15*4 + 2, &int15Seg);
-    if(int15Off != sp_int15_handler_off || int15Seg != sp_int15_handler_seg)
-      {
-#ifndef PROD
-       printf("NTVDM: UpdateKbdInt15 Nuking I15 offsets\n");
-#endif
-       sp_int15_handler_off = sp_int15_handler_seg = 0;
-       return;
-       }
-
-    sp_int15_handler_off = Off;
-    sp_int15_handler_seg = Seg;
-}
-
-
-
-IMPORT void (*BIOS[])();
-
-void INT15(void)
-{
-    ULONG ul;
-    word CS_save, IP_save;
-    word int15Off, int15Seg;
-
-    /*:::::::::::::::::::::::::::::::::: Get location of current 15h handler */
-    sas_loadw(0x15*4 ,    &int15Off);
-    sas_loadw(0x15*4 + 2, &int15Seg);
-
-    /*:::::::::::::::::::::: Does the 15h vector point to the softpc handler */
-    ul = (ULONG)getAH();
-    if((ul == 0x4f || ul == 0x91) &&
-       int15Off == sp_int15_handler_off &&
-       int15Seg == sp_int15_handler_seg)
-    {
-        (BIOS[0x15])();             /* Call int15 handler defined in base */
-    }
-    else
-    {
-        /*::::::::::::::::::::::::::::::::::::::::::::::: Call int15 handler */
-        ul = (ULONG)bBiosOwnsKbdHdw;
-        if (bBiosOwnsKbdHdw)  {
-            bBiosOwnsKbdHdw = FALSE;
-            HostReleaseKbd();
-            }
-        CS_save = getCS();          /* Save current CS,IP settings */
-	IP_save = getIP();
-        setCS(int15_seg);
-        setIP(int15_off);
-	host_simulate();	    /* Call int15 handler */
-        setCS(CS_save);             /* Restore CS,IP */
-        setIP(IP_save);
-        if (ul)
-            bBiosOwnsKbdHdw = !WaitKbdHdw(5000);
-    }
-}
-
-
-/*
- *  32 bit services for kb16.com, the international 16 bit
- *  interrupt 9 service handler.
- *
- */
-void Keyb16Request(half_word BopFnCode)
-{
-
-	/*
-	 * upon entry to kb16, take ownership of kbd
-	 *		       disable the kbd
-	 *		       disable interrupts
-	 */
-    if (BopFnCode == 1) {
-	bBiosOwnsKbdHdw = !WaitKbdHdw(5000);
-	outb(KEYBA_STATUS_CMD, DIS_KBD);
-	setIF(1);
-	}
-
-	/* K26A type exit from i9 handler */
-    else if (BopFnCode == 2) {
-	if (getBH()) {	/* bl == do beep */
-	    host_alarm(250000L);
-	    }
-
-	outb(0x20, 0x20);    /* eoi */
-
-	if (getBL()) {	     /* got character ? do device post */
-	    setAX(0x9102);
-	    INT15();
-	    }
-	outb(KEYBA_STATUS_CMD, ENA_KBD);
-	if (bBiosOwnsKbdHdw) {
-	    bBiosOwnsKbdHdw = FALSE;
-	    HostReleaseKbd();
-	    }
-	}
-
-	/* K27A exit notify */
-    else if (BopFnCode == 3) {
-	outb(0x20, 0x20);
-	outb(KEYBA_STATUS_CMD, ENA_KBD);
-	if (bBiosOwnsKbdHdw) {
-	    bBiosOwnsKbdHdw = FALSE;
-	    HostReleaseKbd();
-	    }
-	}
-
-	/* K27A exit notify */
-    else if (BopFnCode == 4) {
-	outb(KEYBA_STATUS_CMD, ENA_KBD);
-	if (bBiosOwnsKbdHdw) {
-	    bBiosOwnsKbdHdw = FALSE;
-	    HostReleaseKbd();
-	    }
-	}
-}
-
-#endif /* NTVDM */

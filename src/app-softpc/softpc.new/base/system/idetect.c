@@ -22,7 +22,7 @@ REVISION HISTORY        :
 First version           : 31-Aug-89, simplified Phil's idea, and
 			  produced an interface.
 
-SUBMODULE NAME          : 
+SUBMODULE NAME          :
 
 SOURCE FILE NAME        : idetect.c
 
@@ -52,7 +52,7 @@ SccsID = @(#)idetect.c  1.11 10/11/93 Copyright Insignia Solutions Ltd.
 ---------------------------------------------------------------------
 [1.2 DATATYPES FOR [1.1] (if not basic C types)]
 
-	STRUCTURES/TYPEDEFS/ENUMS: 
+	STRUCTURES/TYPEDEFS/ENUMS:
 		
 ---------------------------------------------------------------------
 [1.3 INTERMODULE IMPORTS]
@@ -70,13 +70,13 @@ SccsID = @(#)idetect.c  1.11 10/11/93 Copyright Insignia Solutions Ltd.
 =====================================================================
 GLOBAL                  int idle_no_video
 
-PURPOSE                 cleared by gvi layer, and video bios ; 
+PURPOSE                 cleared by gvi layer, and video bios ;
 			set by this interface every time tick.
 			keeps track of video activity.
 
 GLOBAL                  int idle_no_disk
 
-PURPOSE                 cleared by disk bios ; 
+PURPOSE                 cleared by disk bios ;
 			set by this interface every time tick.
 			keeps track of video activity.
 
@@ -93,7 +93,7 @@ PROCEDURE         :     void idle_ctl((int)flag)
 
 PURPOSE           :     enable/disable idle detect.
 		
-PARAMETERS         
+PARAMETERS
 
 	flag      :     0       - disable
 			other   - enable.
@@ -107,7 +107,7 @@ PROCEDURE         :     void idetect((int)event)
 
 PURPOSE           :     idle detect interface.
 		
-PARAMETERS         
+PARAMETERS
 
 	event     :     IDLE_INIT       - initialise (clears all
 					  counters)
@@ -132,10 +132,10 @@ PROCEDURE         :     void idle_set((int)minpoll, (int)minperiod)
 
 PURPOSE           :     configure parameters for idling.
 		
-PARAMETERS         
+PARAMETERS
 
 	minpoll   :     0       - don't change
-			other   - specify minimum #.of unsuccessful kybd 
+			other   - specify minimum #.of unsuccessful kybd
 				  polls to be made in 1 time tick
 				  to qualify as an idle time period.
 	minperiod :     0       - don't change
@@ -162,16 +162,8 @@ ERROR RECOVERY    :     bad values ignored.
 #include "xt.h"
 #include "timer.h"
 
-#ifdef NTVDM
-/* NT configuration flag showing user request for idle support */
-IMPORT BOOL IdleDisabledFromPIF;
-IMPORT BOOL ExternalWaitRequest;
-IMPORT BOOL VDMForWOW;
-IMPORT void WaitIfIdle(void);
-IMPORT VOID PrioWaitIfIdle(half_word);
-#endif  /* NTVDM */
 
-/* [3.2 INTERMODULE EXPORTS]                                            */ 
+/* [3.2 INTERMODULE EXPORTS]                                            */
 #include "idetect.h"
 
 /*
@@ -185,13 +177,8 @@ IMPORT VOID PrioWaitIfIdle(half_word);
 
 
 /* [5.1.3 PROCEDURE() DECLARATIONS]                                     */
-#ifdef NTVDM
-void idle_kybd_poll();
-void idle_tick();
-#else
         LOCAL void idle_kybd_poll();
         LOCAL void idle_tick();
-#endif
 
 
 /* -------------------------------------------------------------------
@@ -199,7 +186,6 @@ void idle_tick();
 
    [5.2.1 INTERNAL DATA DEFINITIONS                                     */
 
-#ifndef NTVDM
 int idle_no_video;
 int idle_no_comlpt;
 int idle_no_disk;
@@ -211,33 +197,6 @@ static int minConsecutiveTicks = 12;
 static int minFailedPolls = 10;
 
 
-#else
-/* DIVERGENCE MVDM-HOST-DIV-024: The exact NT4 relative include assumes the
- * original private\\mvdm directory depth.  This owner-rooted mirror obtains
- * the same selected vdm.h declaration carrier through its declared ABI path;
- * no algorithm or declaration is changed. */
-#include <vdm.h>
-  
-/*  NTVDM
- *  Some of our static global variables are located in 16 bit memory area
- *  so we reference as pointers, inititializaed by kb_setup_vectors
- */
-word minFailedPolls = 8;
-word ienabled = 0;
-word ShortIdle=0;
-word IdleNoActivity = 0;
-
-
-word *pICounter;
-#define i_counter (*pICounter)
-
-word *pCharPollsPerTick;
-#define nCharPollsPerTick (*pCharPollsPerTick)
-
-word *pMinConsecutiveTicks;
-#define minConsecutiveTicks (*pMinConsecutiveTicks)
-
-#endif  /* NTVDM */
 
 /* [5.2.2 INTERNAL PROCEDURE DEFINITIONS]                               */
 
@@ -250,7 +209,6 @@ PURPOSE         :       called from keyboard BIOS as result of
 */
 
 
-#ifndef NTVDM
 #ifdef SMEG
 #include "smeg_head.h"
 
@@ -284,42 +242,7 @@ LOCAL void my_host_release_timeslice()
     /* re-count polls in next tick */
     nCharPollsPerTick = 0;
 }
-#endif  /* NTVDM */
 
-#ifdef NTVDM
-/*
- * NT uses a slightly modified algorithum to attempt to catch screen updating
- * apps. It also supports Idling calls from VDDs and thus must test which
- * thread requests the idle.
- */
-void idle_kybd_poll(void)
-{
-
-	/*
-	 *  We don't support wow apps reading the kbd
-	 *  if a wow app comes here we must prevent them
-	 *  from hogging the CPU, so we will always do
-	 *  and idle no matter what.
-	 */
-	if (VDMForWOW) {
-	    host_release_timeslice();
-	    return;
-	    }
-
-	/* go idle if enough consecutive PC timer interrupts
-	 * have elapsed during which time unsuccessful polling has
-	 * occurred at a large enough rate for each tick.
-	 */
-
-        if (i_counter >= minConsecutiveTicks)
-        {
-            host_release_timeslice();
-            }
-
-	/* another unsuccessful poll ! */
-	nCharPollsPerTick++;
-}
-#else
 LOCAL void idle_kybd_poll()
 {
 	/* go idle if enough consecutive PC timer interrupts
@@ -334,7 +257,6 @@ LOCAL void idle_kybd_poll()
 	/* another unsuccessful poll ! */
 	nCharPollsPerTick++;
 }
-#endif
 
 /*
 ======================================================================
@@ -348,54 +270,6 @@ PURPOSE         :       check polling activity and graphics activity
 ======================================================================
 */
 
-#ifdef NTVDM
-void idle_tick(void)
-{
-        /* Has another thread asked us to idle? */
-	if (ExternalWaitRequest)
-	{
-	    WaitIfIdle();
-	    ExternalWaitRequest = FALSE;
-	}
-#ifdef MONITOR
-    if(*pNtVDMState & VDM_IDLEACTIVITY)
-       {
-       *pNtVDMState &= ~ VDM_IDLEACTIVITY;
-       IdleNoActivity = 0;
-       }
-#endif
-        if (IdleNoActivity)
-        {
-            /* no graphics or comms/lpt activity has occurred...
-	     * see whether enough polling of kybd has occurred
-	     * to kick off the idling counter.
-	     */
-	    if (nCharPollsPerTick >= minFailedPolls) {
-		i_counter++;
-		if (ShortIdle) {
-		    PrioWaitIfIdle(94);
-		}
-	    }
-	}
-	else
-        {
-
-
-            /*
-             *  Check for apps which cheat idle detection by updating
-             *  clocks on the screen causing video activity.
-             */
-            ShortIdle = nCharPollsPerTick >= minFailedPolls && i_counter >= 8;
-
-            /* invalidate all accumulated ticks */
-            i_counter = 0;
-            IdleNoActivity = 1;
-	}
-
-        nCharPollsPerTick = 0;
-}
-
-#else  /* NTVDM */
 LOCAL void idle_tick()
 {
 	if (idle_no_video && idle_no_disk && idle_no_comlpt)
@@ -420,7 +294,6 @@ LOCAL void idle_tick()
 
 	nCharPollsPerTick = 0;
 }
-#endif
 
 /*
 7.INTERMODULE INTERFACE IMPLEMENTATION :
@@ -435,38 +308,23 @@ LOCAL void idle_tick()
 void idetect (event)
 int event;
 {
-#ifndef NTVDM
 	if (!ienabled)
             return;
-#endif
 
 	switch (event)
 	{
 	/* application waiting for input - go idle */
 	case IDLE_WAITIO:
-#ifdef NTVDM
-#ifdef MONITOR
-		*pNtVDMState &= ~VDM_IDLEACTIVITY;
-#endif
-		IdleNoActivity = 1;
-                PrioWaitIfIdle(10);
-		break;
-#else
 		my_host_release_timeslice();
-#endif
 		/* fall thru to idle init */
 
 	/* initialise flags and counter */
 	case IDLE_INIT:
 		nCharPollsPerTick = 0;
 		i_counter = 0;
-#ifdef NTVDM
-                IdleNoActivity = 1;
-#else
 		idle_no_video = 1;
 		idle_no_disk = 1;
 		idle_no_comlpt = 1;
-#endif
 		break;
 
 	/* application polling for keyboard input */
@@ -494,16 +352,5 @@ int minpoll, minperiod;
 void idle_ctl (flag)
 int flag;
 {
-#ifdef NTVDM
-#ifdef PIG
-    ienabled = 0;
-#else
-    if (IdleDisabledFromPIF)    /* configured setting overrides normal control*/
-	ienabled = 0;
-    else
 	ienabled = flag;
-#endif /* PIG */
-#else
-	ienabled = flag;
-#endif  /* NTVDM */
 }

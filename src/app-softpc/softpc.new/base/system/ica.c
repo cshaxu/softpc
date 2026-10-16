@@ -68,8 +68,8 @@
  *		     another interrupt is requested. If the chip is in Automatic
  *		     EOI mode then all of the interrupts will be generated in
  *		     one burst.
- *		  
- *                5a) A further enhancement is provided such that a delay 
+ *		
+ *                5a) A further enhancement is provided such that a delay
  *                   (a number of Intel instructions) can be requested before
  *		     the interrupt takes effect. This delay applies to every
  *		     interrupt if more than one is requested.
@@ -88,7 +88,7 @@
  *		  When an unsupported mode is set, it is remembered for
  *		  diagnostic purposes, even though it is not acted upon.
  *
- * Modifications for Revision 2.0 : 
+ * Modifications for Revision 2.0 :
  *                1) Restrictions 1 and 6 are lifted. The PC-AT contains two
  *                   8259A interrupt controllers. The first (ICA 0) is in Master
  *                   mode, and the second (ICA 1) is in slave mode, and its
@@ -145,10 +145,8 @@ LOCAL char SccsID[]="@(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd.";
 /* these ports have iret hooks enabled automatically - others will have to
  * define hooked_irets as parts of their configuration
  */
-#if !defined(NTVDM)
 #if defined(CPU_40_STYLE) || defined(GISP_CPU)
 #define HOOKED_IRETS    /* switch on IRET hooks */
-#endif
 #endif
 
 /*
@@ -174,7 +172,6 @@ extern void host_sigio_event IPT0();
  * ============================================================================
  */
 
-#if !defined(NTVDM)
 /*
  *  Table of function pointers to access PIC routines
  */
@@ -183,7 +180,6 @@ void (*ica_outb_func) IPT2(io_addr, port, IU8, value);
 void (*ica_hw_interrupt_func) IPT3(IU32, adapter, IU32, line_no,
 	IS32, call_count);
 void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
-#endif
 
 #if defined (CPU_40_STYLE) || defined (NTVDM)
 #define ICA_INTACK_REJECT       -1
@@ -199,82 +195,6 @@ char icamsgbuf[132];	/* Text buffer for debug messages */
  * ============================================================================
  */
 
-#ifdef NTVDM
-
-#include <nt_eoi.h>
-
-/*
- *  Risc 486 ntvdm does not use iret hooks
- *  x86 ntvdm (monitor) uses iret hooks only on comms
- *  and does not require protect mode enable\disable
- *  control over selectors, as app code cannot switch to
- *  protect mode without going thru dpmi.
- *
- *
- *  NTVDM has to export ICA definition for host and for X86 kernel.
- *  To make the namings of these externally referenced type/var more
- *  sensible but leaving the code substantially as the SoftPC base,
- *  use macros to 'edit' the adapter_state variable and type.
- *
- */
-VDMVIRTUALICA VirtualIca[2];
-#define adapter_state VirtualIca
-#define ADAPTER_STATE VDMVIRTUALICA
-#define EOI_HOOKS       /* switch on EOI hooks */
-
-
-
-
-
-/*
- * for ntvdm and x86 build, this variable is shared between ntvdm and
- * the kernel(the kernel dispatches h/w interrupt and handles iret
- * hook inside kernel)
- */
-
-#ifdef MONITOR
-extern  ULONG iretHookMask;
-extern  ULONG iretHookActive;
-#endif
-
-
-/*
- * noop the ica_lock_set fns, since ntvdm uses a real critical section
- */
-
-#define ica_lock_set(x)
-#define ica_lock_inc()
-#define ica_lock_dec()
-
-
-/*
- *  noop the swpic fnptrs
- */
-
-#define SWPIC_inb          ica_inb
-#define SWPIC_outb         ica_outb
-#define SWPIC_hw_interrupt ica_hw_interrupt
-#define SWPIC_clear_int    ica_clear_int
-
-
-//
-// to be removed:
-//
-// ica_hw_interrupt_func is referenced by emulator libs, so depsite the
-// fact that we have removed the swpic function ptrs, we still
-// have to provide a fn ptr for the emulator.
-//
-void
-(*ica_hw_interrupt_func)(
-    IU32 adapter,
-    IU32 line_no,
-    IS32 call_count
-    )
-    = ica_hw_interrupt;
-
-
-
-#else   /* !NTVDM */
 
 /* regular SoftPC definitions for ica */
 ADAPTER_STATE adapter_state[2];
@@ -301,7 +221,6 @@ LOCAL IUM8      ica_lock;
 #define	ica_lock_inc()	ica_lock++
 #define ica_lock_dec()  ica_lock--
 
-#endif  /* NTVDM */
 
 #ifdef HOOKED_IRETS		/* iret hook related variables */
 LOCAL IBOOL  iretHooksEnabled = FALSE;
@@ -369,7 +288,6 @@ IS32 ica_accept IPT1(IU32, adapter);
 extern IU32 ica_iret_hook_needed IPT1(IU32, line);
 #endif
 
-#if !defined (NTVDM)
 void
 SWPIC_init_funcptrs IFN0()
 {
@@ -381,7 +299,6 @@ SWPIC_init_funcptrs IFN0()
 	ica_hw_interrupt_func		= SWPIC_hw_interrupt;
 	ica_clear_int_func		= SWPIC_clear_int;
 }
-#endif
 
 /*
  *	Please note that ica_eoi is called by SUN_VA code and thus needs to
@@ -438,7 +355,7 @@ ica_eoi IFN3(IU32, adapter, IS32 *, line, IBOOL, rotate)
 #endif
 
     if (rotate && (*line >= 0))
-	asp->ica_hipri = (*line + 1) & 0x07;
+	asp->ica_hipri = (USHORT)((*line + 1) & 0x07);
 
 #ifdef EOI_HOOKS
     /*
@@ -481,18 +398,8 @@ ica_scan_irr IFN1(IU32, adapter)
     IUM8 bit, irr_and_not_imr, active_isr;
     IUM8 iret_hook_mask;
 
-#if defined (NTVDM)
-
-#ifdef MONITOR
-    iret_hook_mask = (IU8)((iretHookActive | DelayIrqLine) >> (adapter << 3));
-#else
-    iret_hook_mask = (IU8)(DelayIrqLine >> (adapter << 3));
-#endif
-
-#else  /* !NTVDM */
     /* if iret hooks are not being used, iretHookActive will always be 0 */
     iret_hook_mask = (IU8)(iretHookActive >> (adapter << 3));
-#endif
 
     /*
      * A bit can only cause an int if it is set in the IRR
@@ -580,13 +487,10 @@ IS32 ica_accept IFN1(IU32, adapter)
 	 * on line 7, but this is not neccessary and can cause problems
 	 * for some programs (eg DOOM with a mouse)
 	 */
-#if 0
-        line1 = 7;
-#endif
 
 	/* Skip spurious ints. These are any that are caused by clearing an
 	 * int when the cpu has already registered that there is an int to
-	 * service. 
+	 * service.
 	 *
 	 * This used to be "#if defined(NTVDM) && defined(MONITOR)"
 	 * and tried to remove the performance impact on the monitor.
@@ -658,7 +562,7 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
     if (asp->ica_cpu_int)
     {
 #ifndef PROD
-	if ((io_verbose & ICA_VERBOSE) && (asp->ica_int_line != line))
+	if ((io_verbose & ICA_VERBOSE) && ((IU32)(asp->ica_int_line) != line))
 	{
 	    sprintf(icamsgbuf,"******* INT LINE ALREADY HIGH %c line=%d ****", (adapter == ICA_MASTER? 'M': 'S'), asp->ica_int_line);
 	    trace(icamsgbuf, DUMP_NONE);	
@@ -700,10 +604,6 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
         host_cpu_interrupt();
 #endif
 
-#ifdef NTVDM
-        /* call wow routine to check for application unable to service ints */
-        WOWIdle(FALSE);
-#endif
 
     }
     else
@@ -738,14 +638,14 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
 
 /*
  * ============================================================================
- * External functions 
+ * External functions
  * ============================================================================
  */
 void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 {
 #ifndef PROD
     char *reg_name;
-#endif /* nPROD */    
+#endif /* nPROD */
     IU32 adapter       = adapter_for_port(port);
     ADAPTER_STATE *asp = &adapter_state[adapter];
 
@@ -820,7 +720,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 	    *value = asp->ica_imr;
 #ifndef PROD
 	    reg_name = "IMR";
-#endif /* nPROD */	    
+#endif /* nPROD */	
 	}
 
 #ifndef PROD
@@ -887,7 +787,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
      * If we get an ICW1 then we are into initialisation
      */
 
-    if (((port & 1) == 0) && (value & 0x10))		/****  ICW1  ****/
+    if (((port & 1) == 0) && (value & 0x10))            /****  ICW1  ****/
     {
         asp->ica_irr  = 0;	/* Clear all pending interrupts		*/
         asp->ica_isr  = 0;	/* Clear all in-progress interrupts	*/
@@ -929,7 +829,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
     switch(sequence[adapter])
     {
     case  0:			/* We are expecting an OCW	*/
-	if (port & 1)		/* Odd address -> OCW1		*/
+        if (port & 1)           /* Odd address -> OCW1          */
 	{
 	    asp->ica_imr = value & 0xff;
 #ifndef PROD
@@ -1076,7 +976,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 
 /**/
     case  2:			/* We are expecting a ICW2		*/
-	if (!(port & 1))	/* Should be odd address, so check	*/
+        if (!(port & 1))        /* Should be odd address, so check      */
 	{
 #ifndef PROD
 	    sprintf(icamsgbuf, "ica_outb: bad port (%x) while awaiting ICW2",
@@ -1106,7 +1006,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 
 /**/
     case  3:			/* We are expecting a ICW3		*/
-	if (!(port & 1))	/* Should be odd address, so check	*/
+        if (!(port & 1))        /* Should be odd address, so check      */
 	{
 #ifndef PROD
 	    sprintf(icamsgbuf, "ica_outb: bad port (%x) while awaiting ICW3",
@@ -1133,7 +1033,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 
 /**/
     case  4:			/* We are expecting a ICW4		*/
-	if (!(port & 1))	/* Should be odd address, so check	*/
+        if (!(port & 1))        /* Should be odd address, so check      */
 	{
 #ifndef PROD
 	    sprintf(icamsgbuf, "ica_outb: bad port (%x) while awaiting ICW4",
@@ -1283,7 +1183,6 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
      * leaves both primitive & real lock styles intact.
      */
 
-#ifndef NTVDM
     if (!host_ica_real_locks())
     {
 	if (ica_lock_inc())
@@ -1299,7 +1198,6 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
 		return;
 	}
     }
-#endif
 
 #if defined (CPU_40_STYLE) && !defined(NTVDM)
     depth = asp->isr_depth[line_no];
@@ -1496,19 +1394,6 @@ ica_intack IFN0()
     }
 
 
-#if defined (NTVDM)
-
-#ifdef MONITOR
-    *hook_address = host_iret_bop_table_addr(line);
-    if (*hook_address) {
-        iretHookActive |= 1 << line;
-        }
-#else
-    *hook_address = 0;
-#endif
-
-
-#else
 #ifdef HOOKED_IRETS
     /* check whether IRET Hook required for interrupt on this line.
      * If IRET trapping mechanism is via bops on stack then this may
@@ -1531,7 +1416,6 @@ ica_intack IFN0()
 #endif	/* CPU_40_STYLE */
     }
 #endif  /* HOOKED_IRETS */
-#endif  /* !NTVDM */
 
     host_ica_unlock();		/* real lock if supported */
 
@@ -1539,7 +1423,6 @@ ica_intack IFN0()
 }
 
 
-#ifndef NTVDM
 #ifdef CPU_40_STYLE
 
 /*(
@@ -1769,57 +1652,9 @@ cancel_action_interrupt IFN2(IU32, adapter, IU32, line)
 }
 #endif  /* CPU_40_STYLE */
 
-#endif  /* !NTVDM */
 
 
 
-#if defined(NTVDM)
-
-#ifdef MONITOR
-/*
- *  Assumes caller has ica lock
- */
-
-GLOBAL void
-ica_iret_hook_called IFN1(IU32, abs_line)
-{
-     int i;
-     IU32 adapter = abs_line >> 3;
-
-     iretHookActive &= ~(1 << abs_line);
-     if ((i = ica_scan_irr(adapter)) & 0x80)
-          ica_interrupt_cpu(adapter, i & 0x07);
-}
-
-
-GLOBAL void
-ica_iret_hook_control IFN3(IU32, adapter, IU32, line, IBOOL, enable)
-{
-      int mask = 1 << (line + (adapter << 3));
-
-      host_ica_lock();
-
-      if (enable)
-          iretHookMask |= mask;
-      else
-          iretHookMask &= ~mask;
-
-      host_ica_unlock();
-}
-#else
-
-/*
- *  obsolete, to be removed... but the current ntvdm emulator libs ref
- * */
-
-GLOBAL void
-ica_iret_hook_called IFN1(IU32, abs_line)
-{
-    return; // do nothing!
-}
-#endif
-
-#endif   /* NTVDM */
 
 
 #ifdef HOOKED_IRETS
@@ -1844,7 +1679,7 @@ GLOBAL IU32 ica_iret_hook_needed IFN1(IU32, line)
 		/* Line not hooked. */
 		return 0;
 
-	/* if iret hooks implemented via bops, check bop table addresses ok */ 
+	/* if iret hooks implemented via bops, check bop table addresses ok */
         if (host_bop_style_iret_hooks()) {
             iretHookActive |= ireq_mask;
             return(host_iret_bop_table_addr(line));
@@ -2024,10 +1859,6 @@ ica_check_stale_iret_hook IFN0()
 #define INIT0_ICW3	(IU8)0x04	
 #define INIT0_ICW4      (IU8)0x01
 
-#ifdef NTVDM
-#define INIT0_OCW1      (IU8)0x0
-
-#else
 
 /* POST leaves some int lines masked out (including comms and lpt lines) */
 /* The setting of the bits is spread out throughout the real POST code
@@ -2036,7 +1867,6 @@ ica_check_stale_iret_hook IFN0()
  * DOS (eg OS/2 or coherent etc.)
  */
 #define INIT0_OCW1      (IU8)0xb8
-#endif /* NTVDM */
 
 void ica0_post IFN0()
 {
@@ -2053,15 +1883,10 @@ void ica0_init IFN0()
 
     /*
      * Set up the IO chip select logic for adapter 0. (Master).
-     */  
+     */
 
-#ifdef NTVDM
-    io_define_inb(ICA0_ADAPTOR, ica_inb);
-    io_define_outb(ICA0_ADAPTOR, ica_outb);
-#else
     io_define_inb(ICA0_ADAPTOR, ica_inb_func);
     io_define_outb(ICA0_ADAPTOR, ica_outb_func);
-#endif
 
     for(i = ICA0_PORT_START; i <= ICA0_PORT_END; i++)
         io_connect_port(i, ICA0_ADAPTOR, IO_READ_WRITE);
@@ -2069,7 +1894,6 @@ void ica0_init IFN0()
     adapter_state[ICA_MASTER].ica_master = TRUE;
 
 
-#ifndef NTVDM
 
 #ifdef CPU_40_STYLE
     for (i = 0; i < 8; i++)
@@ -2088,7 +1912,6 @@ void ica0_init IFN0()
     iretHooksEnabled = TRUE;
 #endif
 
-#endif  /* !NTVDM */
 
 }
 
@@ -2128,15 +1951,10 @@ void ica1_init IFN0()
 
     /*
      * Set up the IO chip select logic for adapter 1. (Slave).
-     */  
+     */
 
-#ifdef NTVDM
-    io_define_inb(ICA1_ADAPTOR, ica_inb);
-    io_define_outb(ICA1_ADAPTOR, ica_outb);
-#else
     io_define_inb(ICA1_ADAPTOR, ica_inb_func);
     io_define_outb(ICA1_ADAPTOR, ica_outb_func);
-#endif
 
     for(i = ICA1_PORT_START; i <= ICA1_PORT_END; i++)
         io_connect_port(i, ICA1_ADAPTOR, IO_READ_WRITE);
@@ -2327,7 +2145,7 @@ ica_dump IFN1(IU32, adapter)
 	    int j;
 	    int progress[8];
 	    IBOOL some_progress = FALSE;
-	    
+	
 	    for (j = 0; j < 8; j++)
 	    {
 		    if (asp->isr_depth[j] >= i)
@@ -2352,7 +2170,7 @@ ica_dump IFN1(IU32, adapter)
 	    int j;
 	    int decay[8];
 	    IBOOL some_decay = FALSE;
-	    
+	
 	    for (j = 0; j < 8; j++)
 	    {
 		    if (asp->isr_depth[j] >= i)

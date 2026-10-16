@@ -1,0 +1,1436 @@
+path	xp_first	xp_last	disposition
+base/bios/reset.c	1	97	include
+base/bios/reset.c	98	98	profile: #ifndef NTVDM
+base/bios/reset.c	99	99	include
+base/bios/reset.c	100	100	profile: #ifndef NTVDM
+base/bios/reset.c	101	151	include
+base/bios/reset.c	152	168	profile: #if defined(NEC_98)
+base/bios/reset.c	169	186	include
+base/bios/reset.c	187	326	profile: #if defined(NEC_98)
+base/bios/reset.c	327	433	include
+base/bios/reset.c	434	434	profile: #if defined(NEC_98)
+base/bios/reset.c	435	672	include
+base/bios/reset.c	673	673	profile: #ifndef NTVDM
+base/bios/reset.c	674	678	include
+base/bios/reset.c	679	679	profile: #ifndef NTVDM
+base/bios/reset.c	680	683	include
+base/bios/reset.c	684	684	profile: #ifndef NEC_98
+base/bios/reset.c	685	689	include
+base/bios/reset.c	690	692	profile: #ifdef NTVDM
+base/bios/reset.c	693	879	include
+base/bios/reset.c	880	880	profile: #ifndef NEC_98
+base/bios/reset.c	881	884	include
+base/bios/reset.c	885	885	profile: #ifndef NTVDM
+base/bios/reset.c	886	918	include
+base/bios/reset.c	919	926	profile: #ifdef NTVDM
+base/bios/reset.c	927	927	include
+base/bios/reset.c	928	928	profile: #ifndef NTVDM
+base/bios/reset.c	929	944	include
+base/bios/reset.c	945	949	profile: #if defined(NEC_98)
+base/bios/reset.c	950	950	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)
+base/bios/reset.c	951	953	profile: #ifdef ARCX86
+base/bios/reset.c	954	960	include
+base/bios/reset.c	961	961	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)
+base/bios/reset.c	962	962	profile: #if defined(NEC_98)
+base/bios/reset.c	963	963	include
+base/bios/reset.c	964	964	profile: #ifndef NTVDM
+base/bios/reset.c	965	972	include
+base/bios/reset.c	973	973	profile: #ifndef NTVDM
+base/bios/reset.c	974	974	include
+base/bios/reset.c	975	978	profile: #if defined(NEC_98)
+base/bios/reset.c	979	994	include
+base/bios/reset.c	995	1010	profile: #if defined(NEC_98)
+base/bios/reset.c	1011	1026	include
+base/bios/reset.c	1027	1037	profile: #ifdef NTVDM
+base/bios/reset.c	1038	1044	include
+base/bios/reset.c	1045	1045	profile: #ifdef NTVDM
+base/bios/reset.c	1046	1064	include
+base/bios/reset.c	1065	1065	profile: #if defined(NEC_98)
+base/bios/reset.c	1066	1072	include
+base/bios/reset.c	1073	1073	profile: #ifndef NEC_98
+base/bios/reset.c	1074	1074	include
+base/bios/reset.c	1075	1075	profile: #ifndef NEC_98
+base/bios/reset.c	1076	1078	include
+base/bios/reset.c	1079	1081	profile: #if defined(NEC_98)
+base/bios/reset.c	1082	1082	include
+base/bios/reset.c	1083	1083	profile: #ifndef NEC_98
+base/bios/reset.c	1084	1084	include
+base/bios/reset.c	1085	1085	profile: #ifndef NEC_98
+base/bios/reset.c	1086	1093	include
+base/bios/reset.c	1094	1094	profile: #ifndef NEC_98
+base/bios/reset.c	1095	1095	profile: #ifndef NTVDM   /* No signon for NTVDM - transparent integration */
+base/bios/reset.c	1096	1188	include
+base/bios/reset.c	1189	1189	profile: #ifndef NTVDM   /* No signon for NTVDM - transparent integration */
+base/bios/reset.c	1190	1192	include
+base/bios/reset.c	1193	1193	profile: #ifndef NEC_98
+base/bios/reset.c	1194	1199	include
+base/bios/reset.c	1200	1202	profile: #if defined(NEC_98)
+base/bios/reset.c	1203	1203	include
+base/bios/reset.c	1204	1204	profile: #if defined(NEC_98)
+base/bios/reset.c	1205	1206	include
+base/bios/reset.c	1207	1207	profile: #ifndef NEC_98
+base/bios/reset.c	1208	1208	include
+base/bios/reset.c	1209	1209	profile: #ifndef NEC_98
+base/bios/reset.c	1210	1216	include
+base/bios/reset.c	1217	1217	profile: #ifndef NEC_98
+base/bios/reset.c	1218	1220	include
+base/bios/reset.c	1221	1223	profile: #ifndef NEC_98
+base/bios/reset.c	1224	1282	include
+base/bios/reset.c	1283	1285	profile: #ifdef NTVDM
+base/bios/reset.c	1286	1286	include
+base/bios/reset.c	1287	1287	profile: #ifndef NTVDM
+base/bios/reset.c	1288	1288	include
+base/bios/reset.c	1289	1289	profile: #ifndef NTVDM
+base/bios/reset.c	1290	1295	include
+base/bios/reset.c	1296	1300	profile: #ifdef  NTVDM
+base/bios/reset.c	1301	1335	include
+base/bios/reset.c	1336	1760	profile: #if defined(NEC_98)
+base/ccpu386/fpu.c	1	5948	include
+base/inc/ica.h	1	47	include
+base/inc/ica.h	48	50	profile: #if defined(NEC_98)
+base/inc/ica.h	51	56	include
+base/inc/ica.h	57	60	profile: #if defined(NEC_98)
+base/inc/ica.h	61	113	include
+base/inc/ica.h	114	148	profile: #if defined (NTVDM)
+base/inc/ica.h	149	212	include
+base/inc/ica.h	213	213	profile: #if defined (NTVDM)
+base/inc/ica.h	214	215	include
+base/inc/ica.h	216	216	profile: #if !defined(NTVDM)
+base/inc/ica.h	217	248	include
+base/inc/ica.h	249	249	profile: #if !defined(NTVDM)
+base/inc/ica.h	250	262	include
+base/inc/ica.h	263	263	DOS-EOF-marker
+base/inc/mouse.h	1	21	include
+base/inc/mouse.h	22	37	profile: #if defined(NEC_98)
+base/inc/mouse.h	38	44	include
+base/inc/mouse.h	45	45	profile: #if defined(NEC_98)
+base/inc/mouse.h	46	121	include
+base/inc/sas.h	1	94	include
+base/inc/sas.h	95	102	profile: #ifdef NTVDM
+base/inc/sas.h	103	207	include
+base/inc/sas.h	208	216	profile: #ifdef NTVDM
+base/inc/sas.h	217	337	include
+base/inc/sas.h	338	341	profile: #if defined(NEC_98)
+base/inc/sas.h	342	346	include
+base/inc/sas.h	347	347	profile: #if defined(NEC_98)
+base/inc/sas.h	348	349	include
+base/inc/sas.h	350	352	profile: #if defined(NEC_98)
+base/inc/sas.h	353	354	include
+base/inc/sas.h	355	355	profile: #if defined(NEC_98)
+base/inc/sas.h	356	362	include
+base/inc/sas.h	363	366	profile: #if defined(NEC_98)
+base/inc/sas.h	367	403	include
+base/inc/sas.h	404	407	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/inc/sas.h	408	1097	include
+base/inc/sas.h	1098	1245	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1	104	include
+base/keymouse/keyba.c	105	174	profile: #ifdef NTVDM
+base/keymouse/keyba.c	175	207	include
+base/keymouse/keyba.c	208	210	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	211	211	include
+base/keymouse/keyba.c	212	212	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	213	224	include
+base/keymouse/keyba.c	225	225	profile: #ifndef NTVDM
+base/keymouse/keyba.c	226	226	include
+base/keymouse/keyba.c	227	227	profile: #ifndef NTVDM
+base/keymouse/keyba.c	228	230	include
+base/keymouse/keyba.c	231	233	profile: #if defined(KOREA)
+base/keymouse/keyba.c	234	274	include
+base/keymouse/keyba.c	275	279	profile: #ifdef NTVDM /* JonLe NT Mod */
+base/keymouse/keyba.c	280	282	include
+base/keymouse/keyba.c	283	283	profile: #ifdef NTVDM /* JonLe NT Mod */
+base/keymouse/keyba.c	284	291	include
+base/keymouse/keyba.c	292	297	profile: #ifdef NTVDM
+base/keymouse/keyba.c	298	326	include
+base/keymouse/keyba.c	327	337	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	338	348	include
+base/keymouse/keyba.c	349	349	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	350	351	include
+base/keymouse/keyba.c	352	358	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	359	359	include
+base/keymouse/keyba.c	360	360	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	361	388	include
+base/keymouse/keyba.c	389	394	profile: #ifdef NTVDM  /* JonLe NTVDM Mod:remove repeat related vars */
+base/keymouse/keyba.c	395	398	include
+base/keymouse/keyba.c	399	399	profile: #ifdef NTVDM  /* JonLe NTVDM Mod:remove repeat related vars */
+base/keymouse/keyba.c	400	412	include
+base/keymouse/keyba.c	413	413	profile: #ifndef NTVDM
+base/keymouse/keyba.c	414	414	include
+base/keymouse/keyba.c	415	415	profile: #ifndef NTVDM
+base/keymouse/keyba.c	416	417	include
+base/keymouse/keyba.c	418	418	profile: #ifndef NTVDM
+base/keymouse/keyba.c	419	419	include
+base/keymouse/keyba.c	420	420	profile: #ifndef NTVDM
+base/keymouse/keyba.c	421	444	include
+base/keymouse/keyba.c	445	475	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	476	491	include
+base/keymouse/keyba.c	492	495	profile: #ifdef JAPAN
+base/keymouse/keyba.c	496	497	include
+base/keymouse/keyba.c	498	498	profile: #ifdef JAPAN
+base/keymouse/keyba.c	499	516	include
+base/keymouse/keyba.c	517	517	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	518	540	include
+base/keymouse/keyba.c	541	554	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	555	564	include
+base/keymouse/keyba.c	565	565	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	566	605	include
+base/keymouse/keyba.c	606	608	profile: #ifdef JAPAN
+base/keymouse/keyba.c	609	609	include
+base/keymouse/keyba.c	610	610	profile: #ifdef JAPAN
+base/keymouse/keyba.c	611	659	include
+base/keymouse/keyba.c	660	665	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	666	666	profile: #if 1                                             // for 106 keyboard 950407
+base/keymouse/keyba.c	667	668	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	669	672	profile: #if 1                                             // for 106 keyboard 950407
+base/keymouse/keyba.c	673	679	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	680	689	include
+base/keymouse/keyba.c	690	690	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	691	694	include
+base/keymouse/keyba.c	695	699	profile: #ifdef JAPAN
+base/keymouse/keyba.c	700	702	include
+base/keymouse/keyba.c	703	703	profile: #ifdef JAPAN
+base/keymouse/keyba.c	704	1060	include
+base/keymouse/keyba.c	1061	1063	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	1064	1072	include
+base/keymouse/keyba.c	1073	1075	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1076	1082	include
+base/keymouse/keyba.c	1083	1085	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1086	1104	include
+base/keymouse/keyba.c	1105	1113	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1114	1115	include
+base/keymouse/keyba.c	1116	1131	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1132	1134	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1135	1135	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1136	1136	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1137	1237	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1238	1244	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1245	1249	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1250	1250	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1251	1260	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1261	1263	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1264	1264	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1265	1265	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1266	1270	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1271	1274	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1275	1275	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1276	1276	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1277	1285	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1286	1331	include
+base/keymouse/keyba.c	1332	1336	profile: #ifdef  JAPAN
+base/keymouse/keyba.c	1337	1344	include
+base/keymouse/keyba.c	1345	1347	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1348	1348	include
+base/keymouse/keyba.c	1349	1349	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1350	1373	include
+base/keymouse/keyba.c	1374	1374	profile: #ifndef NEC_98
+base/keymouse/keyba.c	1375	1381	profile: #ifdef JAPAN
+base/keymouse/keyba.c	1382	1382	profile: #ifndef NEC_98
+base/keymouse/keyba.c	1383	1386	include
+base/keymouse/keyba.c	1387	1387	profile: #ifndef NEC_98
+base/keymouse/keyba.c	1388	1425	profile: #ifdef JAPAN
+base/keymouse/keyba.c	1426	1426	profile: #ifndef NEC_98
+base/keymouse/keyba.c	1427	1468	include
+base/keymouse/keyba.c	1469	1469	profile: #ifndef NEC_98
+base/keymouse/keyba.c	1470	1504	include
+base/keymouse/keyba.c	1505	1505	profile: #ifndef NEC_98
+base/keymouse/keyba.c	1506	1544	include
+base/keymouse/keyba.c	1545	1558	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1559	1562	include
+base/keymouse/keyba.c	1563	1563	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1564	1599	include
+base/keymouse/keyba.c	1600	1602	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1603	1604	include
+base/keymouse/keyba.c	1605	1608	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1609	1612	include
+base/keymouse/keyba.c	1613	1632	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1633	1642	include
+base/keymouse/keyba.c	1643	1645	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1646	1652	include
+base/keymouse/keyba.c	1653	1653	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1654	1840	include
+base/keymouse/keyba.c	1841	1841	profile: #ifndef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	1842	1842	include
+base/keymouse/keyba.c	1843	1846	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1847	1847	include
+base/keymouse/keyba.c	1848	1848	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	1849	1855	include
+base/keymouse/keyba.c	1856	1858	profile: #ifndef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	1859	1864	include
+base/keymouse/keyba.c	1865	1865	profile: #ifndef NTVDM
+base/keymouse/keyba.c	1866	1866	include
+base/keymouse/keyba.c	1867	1867	profile: #ifndef NTVDM
+base/keymouse/keyba.c	1868	1897	include
+base/keymouse/keyba.c	1898	1898	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	1899	1902	include
+base/keymouse/keyba.c	1903	1903	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	1904	1908	include
+base/keymouse/keyba.c	1909	1911	profile: #ifdef NTVDM
+base/keymouse/keyba.c	1912	2033	include
+base/keymouse/keyba.c	2034	2036	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2037	2074	include
+base/keymouse/keyba.c	2075	2086	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2087	2087	include
+base/keymouse/keyba.c	2088	2088	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2089	2119	include
+base/keymouse/keyba.c	2120	2120	profile: #ifndef NEC_98
+base/keymouse/keyba.c	2121	2122	include
+base/keymouse/keyba.c	2123	2123	profile: #ifndef NEC_98
+base/keymouse/keyba.c	2124	2137	include
+base/keymouse/keyba.c	2138	2140	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2141	2143	include
+base/keymouse/keyba.c	2144	2144	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2145	2147	include
+base/keymouse/keyba.c	2148	2148	profile: #ifndef NTVDM /* JonLe Mod */
+base/keymouse/keyba.c	2149	2161	include
+base/keymouse/keyba.c	2162	2169	profile: #ifndef NTVDM /* JonLe Mod */
+base/keymouse/keyba.c	2170	2196	include
+base/keymouse/keyba.c	2197	2197	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2198	2200	include
+base/keymouse/keyba.c	2201	2201	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2202	2214	include
+base/keymouse/keyba.c	2215	2215	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2216	2216	include
+base/keymouse/keyba.c	2217	2217	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2218	2252	include
+base/keymouse/keyba.c	2253	2253	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2254	2254	include
+base/keymouse/keyba.c	2255	2255	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2256	2282	include
+base/keymouse/keyba.c	2283	2283	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2284	2286	include
+base/keymouse/keyba.c	2287	2287	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2288	2297	include
+base/keymouse/keyba.c	2298	2298	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2299	2299	include
+base/keymouse/keyba.c	2300	2300	profile: #ifndef NTVDM  /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2301	2363	include
+base/keymouse/keyba.c	2364	2364	profile: #ifndef NTVDM
+base/keymouse/keyba.c	2365	2368	include
+base/keymouse/keyba.c	2369	2369	profile: #ifndef NTVDM
+base/keymouse/keyba.c	2370	2374	include
+base/keymouse/keyba.c	2375	2402	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2403	2405	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2406	2406	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2407	2407	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2408	2482	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2483	2486	include
+base/keymouse/keyba.c	2487	2489	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2490	2490	include
+base/keymouse/keyba.c	2491	2491	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2492	2558	include
+base/keymouse/keyba.c	2559	2559	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	2560	2565	include
+base/keymouse/keyba.c	2566	2569	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2570	2573	include
+base/keymouse/keyba.c	2574	2644	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2645	2697	include
+base/keymouse/keyba.c	2698	2701	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2702	2702	include
+base/keymouse/keyba.c	2703	2703	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2704	2710	include
+base/keymouse/keyba.c	2711	2713	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2714	2714	include
+base/keymouse/keyba.c	2715	2715	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2716	2771	include
+base/keymouse/keyba.c	2772	2776	profile: #if defined(KOREA)
+base/keymouse/keyba.c	2777	2842	include
+base/keymouse/keyba.c	2843	2843	profile: #ifndef NTVDM
+base/keymouse/keyba.c	2844	2844	include
+base/keymouse/keyba.c	2845	2845	profile: #ifndef NTVDM
+base/keymouse/keyba.c	2846	2865	include
+base/keymouse/keyba.c	2866	2866	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	2867	2875	include
+base/keymouse/keyba.c	2876	2883	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2884	2890	include
+base/keymouse/keyba.c	2891	2891	profile: #ifdef NTVDM
+base/keymouse/keyba.c	2892	3025	include
+base/keymouse/keyba.c	3026	3030	profile: #ifdef NTVDM
+base/keymouse/keyba.c	3031	3049	include
+base/keymouse/keyba.c	3050	3053	profile: #ifdef NTVDM
+base/keymouse/keyba.c	3054	3057	include
+base/keymouse/keyba.c	3058	3077	profile: #ifdef NTVDM
+base/keymouse/keyba.c	3078	3079	include
+base/keymouse/keyba.c	3080	3080	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3081	3097	include
+base/keymouse/keyba.c	3098	3098	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3099	3103	include
+base/keymouse/keyba.c	3104	3119	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3120	3120	include
+base/keymouse/keyba.c	3121	3129	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3130	3136	include
+base/keymouse/keyba.c	3137	3137	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3138	3138	include
+base/keymouse/keyba.c	3139	3143	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3144	3146	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3147	3147	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3148	3148	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3149	3160	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3161	3166	include
+base/keymouse/keyba.c	3167	3169	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3170	3170	include
+base/keymouse/keyba.c	3171	3171	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3172	3229	include
+base/keymouse/keyba.c	3230	3230	profile: #ifdef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3231	3241	include
+base/keymouse/keyba.c	3242	3247	profile: #ifdef NTVDM
+base/keymouse/keyba.c	3248	3248	include
+base/keymouse/keyba.c	3249	3257	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3258	3275	include
+base/keymouse/keyba.c	3276	3276	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3277	3277	include
+base/keymouse/keyba.c	3278	3278	profile: #ifndef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3279	3282	include
+base/keymouse/keyba.c	3283	3292	profile: #ifndef NTVDM /* JonLe NTVDM Mod */
+base/keymouse/keyba.c	3293	3295	include
+base/keymouse/keyba.c	3296	3296	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3297	3342	include
+base/keymouse/keyba.c	3343	3343	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3344	3355	include
+base/keymouse/keyba.c	3356	3358	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3359	3359	include
+base/keymouse/keyba.c	3360	3360	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3361	3361	include
+base/keymouse/keyba.c	3362	3362	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3363	3364	include
+base/keymouse/keyba.c	3365	3365	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3366	3409	include
+base/keymouse/keyba.c	3410	3410	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3411	3447	include
+base/keymouse/keyba.c	3448	3448	profile: #ifndef NEC_98
+base/keymouse/keyba.c	3449	3449	include
+base/keymouse/keyba.c	3450	3450	profile: #ifndef NEC_98
+base/keymouse/keyba.c	3451	3462	include
+base/keymouse/keyba.c	3463	3469	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3470	3474	include
+base/keymouse/keyba.c	3475	3475	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3476	3485	include
+base/keymouse/keyba.c	3486	3488	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3489	3491	include
+base/keymouse/keyba.c	3492	3492	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3493	3505	include
+base/keymouse/keyba.c	3506	3518	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3519	3527	include
+base/keymouse/keyba.c	3528	3528	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3529	3542	include
+base/keymouse/keyba.c	3543	3551	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3552	3570	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3571	3587	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3588	3588	profile: #if defined(NEC_98)
+base/keymouse/keyba.c	3589	3600	profile: #ifndef NTVDM
+base/keymouse/keyba.c	3601	3601	include
+base/keymouse/keyba.c	3602	3619	profile: #if defined(NEC_98)
+base/keymouse/keybd_io.c	1	145	include
+base/keymouse/keybd_io.c	146	152	profile: #if defined(NTVDM) && defined(LOCAL)
+base/keymouse/keybd_io.c	153	190	include
+base/keymouse/keybd_io.c	191	233	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	234	234	profile: #ifndef NEC_98
+base/keymouse/keybd_io.c	235	238	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	239	239	profile: #ifndef NEC_98
+base/keymouse/keybd_io.c	240	241	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	242	242	include
+base/keymouse/keybd_io.c	243	243	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	244	267	include
+base/keymouse/keybd_io.c	268	273	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	274	277	profile: #if defined(JAPAN) && defined(NTVDM) && !defined(NEC_98)
+base/keymouse/keybd_io.c	278	278	include
+base/keymouse/keybd_io.c	279	302	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/keybd_io.c	303	551	include
+base/keymouse/keybd_io.c	552	554	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	555	645	include
+base/keymouse/keybd_io.c	646	646	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	647	663	include
+base/keymouse/keybd_io.c	664	670	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	671	671	include
+base/keymouse/keybd_io.c	672	672	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	673	675	include
+base/keymouse/keybd_io.c	676	686	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	687	707	include
+base/keymouse/keybd_io.c	708	708	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	709	738	include
+base/keymouse/keybd_io.c	739	774	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	775	778	include
+base/keymouse/keybd_io.c	779	779	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	780	780	include
+base/keymouse/keybd_io.c	781	781	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	782	789	include
+base/keymouse/keybd_io.c	790	790	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	791	791	include
+base/keymouse/keybd_io.c	792	794	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	795	821	include
+base/keymouse/keybd_io.c	822	824	profile: #if defined(NTVDM)
+base/keymouse/keybd_io.c	825	836	include
+base/keymouse/keybd_io.c	837	837	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	838	838	include
+base/keymouse/keybd_io.c	839	839	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	840	845	include
+base/keymouse/keybd_io.c	846	846	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	847	849	include
+base/keymouse/keybd_io.c	850	850	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	851	864	include
+base/keymouse/keybd_io.c	865	870	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	871	875	include
+base/keymouse/keybd_io.c	876	882	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	883	883	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	884	887	include
+base/keymouse/keybd_io.c	888	888	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	889	891	include
+base/keymouse/keybd_io.c	892	894	profile: #ifdef NTVDM            /* JonLe keyboard mod */
+base/keymouse/keybd_io.c	895	898	include
+base/keymouse/keybd_io.c	899	915	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	916	1103	include
+base/keymouse/keybd_io.c	1104	1106	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1107	1185	include
+base/keymouse/keybd_io.c	1186	1186	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	1187	1187	include
+base/keymouse/keybd_io.c	1188	1190	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	1191	1494	include
+base/keymouse/keybd_io.c	1495	1503	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1504	1516	profile: #ifdef JAPAN
+base/keymouse/keybd_io.c	1517	1517	profile: #ifndef NEC_98
+base/keymouse/keybd_io.c	1518	1518	profile: #ifdef JAPAN
+base/keymouse/keybd_io.c	1519	1519	profile: #ifndef NEC_98
+base/keymouse/keybd_io.c	1520	1520	profile: #ifdef JAPAN
+base/keymouse/keybd_io.c	1521	1527	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1528	1528	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	1529	1532	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1533	1533	profile: #ifndef NTVDM
+base/keymouse/keybd_io.c	1534	1556	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1557	1572	profile: #if defined(JAPAN)  && !defined(NEC_98)
+base/keymouse/keybd_io.c	1573	1575	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1576	1881	include
+base/keymouse/keybd_io.c	1882	1882	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	1883	1897	include
+base/keymouse/keybd_io.c	1898	1957	profile: #if defined(NEC_98)
+base/keymouse/keybd_io.c	1958	1980	include
+base/keymouse/keybd_io.c	1981	1981	profile: #if defined(NEC_98)
+base/keymouse/keybd_io.c	1982	1998	include
+base/keymouse/keybd_io.c	1999	2093	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	2094	2096	profile: #if defined(JAPAN) && !defined(NEC_98)
+base/keymouse/keybd_io.c	2097	2100	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	2101	2101	profile: #ifndef NEC_98
+base/keymouse/keybd_io.c	2102	2105	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	2106	2108	profile: #ifdef JAPAN
+base/keymouse/keybd_io.c	2109	2109	profile: #ifndef NEC_98
+base/keymouse/keybd_io.c	2110	2136	profile: #ifdef NTVDM
+base/keymouse/keybd_io.c	2137	2140	profile: #if defined(JAPAN) && defined(NTVDM) && !defined(NEC_98)
+base/keymouse/keybd_io.c	2141	2280	profile: #ifdef NTVDM
+base/keymouse/mouse.c	1	83	include
+base/keymouse/mouse.c	84	95	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	96	112	include
+base/keymouse/mouse.c	113	138	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	139	188	include
+base/keymouse/mouse.c	189	189	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	190	194	include
+base/keymouse/mouse.c	195	281	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	282	462	include
+base/keymouse/mouse.c	463	463	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	464	479	include
+base/keymouse/mouse.c	480	483	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	484	485	include
+base/keymouse/mouse.c	486	486	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	487	502	include
+base/keymouse/mouse.c	503	511	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	512	512	include
+base/keymouse/mouse.c	513	513	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	514	514	include
+base/keymouse/mouse.c	515	527	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	528	555	include
+base/keymouse/mouse.c	556	564	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	565	565	include
+base/keymouse/mouse.c	566	566	profile: #if defined(NEC_98)
+base/keymouse/mouse.c	567	584	include
+base/keymouse/mouse_io.c	1	105	include
+base/keymouse/mouse_io.c	106	152	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	153	155	profile: #ifdef JAPAN
+base/keymouse/mouse_io.c	156	180	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	181	761	include
+base/keymouse/mouse_io.c	762	762	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	763	767	include
+base/keymouse/mouse_io.c	768	768	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	769	989	include
+base/keymouse/mouse_io.c	990	993	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	994	996	profile: #ifdef JAPAN
+base/keymouse/mouse_io.c	997	1049	include
+base/keymouse/mouse_io.c	1050	1058	profile: #ifdef JAPAN
+base/keymouse/mouse_io.c	1059	1077	include
+base/keymouse/mouse_io.c	1078	1083	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1084	1088	include
+base/keymouse/mouse_io.c	1089	1089	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1090	1107	include
+base/keymouse/mouse_io.c	1108	1111	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1112	1116	include
+base/keymouse/mouse_io.c	1117	1117	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1118	1125	include
+base/keymouse/mouse_io.c	1126	1126	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/keymouse/mouse_io.c	1127	1159	include
+base/keymouse/mouse_io.c	1160	1162	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/keymouse/mouse_io.c	1163	1172	include
+base/keymouse/mouse_io.c	1173	1175	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1176	1176	include
+base/keymouse/mouse_io.c	1177	1179	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1180	1205	include
+base/keymouse/mouse_io.c	1206	1208	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1209	1209	include
+base/keymouse/mouse_io.c	1210	1212	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1213	1227	include
+base/keymouse/mouse_io.c	1228	1228	excluded-PC98-comment
+base/keymouse/mouse_io.c	1229	1229	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1230	1234	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1235	1235	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1236	1244	include
+base/keymouse/mouse_io.c	1245	1245	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1246	1250	include
+base/keymouse/mouse_io.c	1251	1251	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1252	1552	include
+base/keymouse/mouse_io.c	1553	1608	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	1609	1612	include
+base/keymouse/mouse_io.c	1613	1613	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1614	1684	include
+base/keymouse/mouse_io.c	1685	1685	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1686	1729	include
+base/keymouse/mouse_io.c	1730	1740	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/keymouse/mouse_io.c	1741	1753	include
+base/keymouse/mouse_io.c	1754	1756	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1757	1764	include
+base/keymouse/mouse_io.c	1765	1765	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	1766	1772	include
+base/keymouse/mouse_io.c	1773	1775	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	1776	1779	include
+base/keymouse/mouse_io.c	1780	1782	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	1783	1783	include
+base/keymouse/mouse_io.c	1784	1784	unused-NT-mouse-buffer-declaration
+base/keymouse/mouse_io.c	1785	1787	include
+base/keymouse/mouse_io.c	1788	1788	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	1789	1797	include
+base/keymouse/mouse_io.c	1798	1820	unused-NT-fullscreen-host-policy
+base/keymouse/mouse_io.c	1821	1831	include
+base/keymouse/mouse_io.c	1832	1837	profile: #ifdef JAPAN
+base/keymouse/mouse_io.c	1838	1856	include
+base/keymouse/mouse_io.c	1857	1859	profile: #ifdef JAPAN
+base/keymouse/mouse_io.c	1860	1871	include
+base/keymouse/mouse_io.c	1872	1874	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	1875	1879	include
+base/keymouse/mouse_io.c	1880	1882	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	1883	1925	include
+base/keymouse/mouse_io.c	1926	1937	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	1938	2085	include
+base/keymouse/mouse_io.c	2086	2086	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2087	2087	include
+base/keymouse/mouse_io.c	2088	2091	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2092	2092	include
+base/keymouse/mouse_io.c	2093	2093	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2094	2094	include
+base/keymouse/mouse_io.c	2095	2097	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2098	2164	include
+base/keymouse/mouse_io.c	2165	2165	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2166	2167	include
+base/keymouse/mouse_io.c	2168	2173	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2174	2244	include
+base/keymouse/mouse_io.c	2245	2245	profile: #if !defined(NTVDM) || !defined(MONITOR)
+base/keymouse/mouse_io.c	2246	2261	include
+base/keymouse/mouse_io.c	2262	2262	profile: #if !defined(NTVDM) || !defined(MONITOR)
+base/keymouse/mouse_io.c	2263	2302	include
+base/keymouse/mouse_io.c	2303	2303	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	2304	2305	include
+base/keymouse/mouse_io.c	2306	2310	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	2311	2417	include
+base/keymouse/mouse_io.c	2418	2418	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2419	2420	include
+base/keymouse/mouse_io.c	2421	2423	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2424	2428	include
+base/keymouse/mouse_io.c	2429	2505	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	2506	2626	include
+base/keymouse/mouse_io.c	2627	2627	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	2628	2656	include
+base/keymouse/mouse_io.c	2657	2657	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2658	2677	include
+base/keymouse/mouse_io.c	2678	2701	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2702	2708	include
+base/keymouse/mouse_io.c	2709	2709	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2710	2723	include
+base/keymouse/mouse_io.c	2724	2724	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2725	2737	include
+base/keymouse/mouse_io.c	2738	2738	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2739	2739	include
+base/keymouse/mouse_io.c	2740	2740	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	2741	2777	include
+base/keymouse/mouse_io.c	2778	2780	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	2781	2875	include
+base/keymouse/mouse_io.c	2876	2878	profile: #if defined(MONITOR) && defined(NTVDM)
+base/keymouse/mouse_io.c	2879	2884	include
+base/keymouse/mouse_io.c	2885	2885	profile: #if !defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))
+base/keymouse/mouse_io.c	2886	2889	include
+base/keymouse/mouse_io.c	2890	2890	profile: #if !defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))
+base/keymouse/mouse_io.c	2891	2958	include
+base/keymouse/mouse_io.c	2959	2961	profile: #if defined(MONITOR) && defined(NTVDM)
+base/keymouse/mouse_io.c	2962	3017	include
+base/keymouse/mouse_io.c	3018	3018	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	3019	3036	include
+base/keymouse/mouse_io.c	3037	3037	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	3038	3038	include
+base/keymouse/mouse_io.c	3039	3041	profile: #if defined(NTVDM) && defined(X86GFX)
+base/keymouse/mouse_io.c	3042	3063	include
+base/keymouse/mouse_io.c	3064	3064	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	3065	3073	include
+base/keymouse/mouse_io.c	3074	3074	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	3075	3077	profile: #if defined(NTVDM) && defined(X86GFX)
+base/keymouse/mouse_io.c	3078	3119	include
+base/keymouse/mouse_io.c	3120	3146	profile: #if defined(NTVDM)
+base/keymouse/mouse_io.c	3147	3253	include
+base/keymouse/mouse_io.c	3254	3263	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	3264	3302	include
+base/keymouse/mouse_io.c	3303	3312	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	3313	3377	include
+base/keymouse/mouse_io.c	3378	3378	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	3379	3438	include
+base/keymouse/mouse_io.c	3439	3439	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	3440	3727	include
+base/keymouse/mouse_io.c	3728	3732	profile: #if defined (NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	3733	3769	include
+base/keymouse/mouse_io.c	3770	3779	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	3780	3783	include
+base/keymouse/mouse_io.c	3784	3787	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	3788	3798	include
+base/keymouse/mouse_io.c	3799	3806	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	3807	3809	include
+base/keymouse/mouse_io.c	3810	3812	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	3813	3817	include
+base/keymouse/mouse_io.c	3818	3818	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	3819	3870	include
+base/keymouse/mouse_io.c	3871	3876	profile: #if defined(NTVDM) && defined(MONITOR)
+base/keymouse/mouse_io.c	3877	3885	include
+base/keymouse/mouse_io.c	3886	3886	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	3887	4076	include
+base/keymouse/mouse_io.c	4077	4077	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4078	4098	include
+base/keymouse/mouse_io.c	4099	4099	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4100	4127	include
+base/keymouse/mouse_io.c	4128	4130	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4131	4132	include
+base/keymouse/mouse_io.c	4133	4133	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4134	4141	include
+base/keymouse/mouse_io.c	4142	4147	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4148	4155	include
+base/keymouse/mouse_io.c	4156	4156	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4157	4171	include
+base/keymouse/mouse_io.c	4172	4175	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4176	4179	include
+base/keymouse/mouse_io.c	4180	4180	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4181	4225	include
+base/keymouse/mouse_io.c	4226	4231	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4232	4235	include
+base/keymouse/mouse_io.c	4236	4236	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4237	4251	include
+base/keymouse/mouse_io.c	4252	4252	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	4253	4265	include
+base/keymouse/mouse_io.c	4266	4266	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	4267	4300	include
+base/keymouse/mouse_io.c	4301	4305	profile: #ifdef KOREA
+base/keymouse/mouse_io.c	4306	4306	include
+base/keymouse/mouse_io.c	4307	4307	profile: #ifdef KOREA
+base/keymouse/mouse_io.c	4308	4353	include
+base/keymouse/mouse_io.c	4354	4356	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4357	4359	include
+base/keymouse/mouse_io.c	4360	4363	profile: #ifdef NTVDM
+base/keymouse/mouse_io.c	4364	4366	include
+base/keymouse/mouse_io.c	4367	4367	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	4368	4370	include
+base/keymouse/mouse_io.c	4371	4371	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	4372	4381	include
+base/keymouse/mouse_io.c	4382	4382	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4383	4422	include
+base/keymouse/mouse_io.c	4423	4423	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4424	4433	include
+base/keymouse/mouse_io.c	4434	4434	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4435	4475	include
+base/keymouse/mouse_io.c	4476	4476	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4477	4486	include
+base/keymouse/mouse_io.c	4487	4487	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4488	4532	include
+base/keymouse/mouse_io.c	4533	4533	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4534	4543	include
+base/keymouse/mouse_io.c	4544	4544	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4545	4563	include
+base/keymouse/mouse_io.c	4564	4564	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4565	4574	include
+base/keymouse/mouse_io.c	4575	4575	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4576	4613	include
+base/keymouse/mouse_io.c	4614	4614	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4615	4624	include
+base/keymouse/mouse_io.c	4625	4625	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4626	4663	include
+base/keymouse/mouse_io.c	4664	4664	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4665	4674	include
+base/keymouse/mouse_io.c	4675	4675	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4676	4723	include
+base/keymouse/mouse_io.c	4724	4724	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4725	4734	include
+base/keymouse/mouse_io.c	4735	4735	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4736	4763	include
+base/keymouse/mouse_io.c	4764	4764	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4765	4774	include
+base/keymouse/mouse_io.c	4775	4775	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4776	4828	include
+base/keymouse/mouse_io.c	4829	4829	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4830	4839	include
+base/keymouse/mouse_io.c	4840	4840	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4841	4850	include
+base/keymouse/mouse_io.c	4851	4851	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4852	4861	include
+base/keymouse/mouse_io.c	4862	4862	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4863	4888	include
+base/keymouse/mouse_io.c	4889	4889	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4890	4899	include
+base/keymouse/mouse_io.c	4900	4900	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4901	4925	include
+base/keymouse/mouse_io.c	4926	4926	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4927	4936	include
+base/keymouse/mouse_io.c	4937	4937	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4938	4952	include
+base/keymouse/mouse_io.c	4953	4953	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4954	4963	include
+base/keymouse/mouse_io.c	4964	4964	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4965	4996	include
+base/keymouse/mouse_io.c	4997	4997	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	4998	5007	include
+base/keymouse/mouse_io.c	5008	5008	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5009	5128	include
+base/keymouse/mouse_io.c	5129	5129	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5130	5139	include
+base/keymouse/mouse_io.c	5140	5140	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5141	5159	include
+base/keymouse/mouse_io.c	5160	5160	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5161	5222	include
+base/keymouse/mouse_io.c	5223	5223	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5224	5249	include
+base/keymouse/mouse_io.c	5250	5250	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5251	5254	include
+base/keymouse/mouse_io.c	5255	5255	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5256	5273	include
+base/keymouse/mouse_io.c	5274	5274	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5275	5311	include
+base/keymouse/mouse_io.c	5312	5312	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5313	5345	include
+base/keymouse/mouse_io.c	5346	5346	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5347	5351	include
+base/keymouse/mouse_io.c	5352	5352	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	5353	5366	include
+base/keymouse/mouse_io.c	5367	5367	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	5368	5374	include
+base/keymouse/mouse_io.c	5375	5375	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5376	5376	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	5377	5468	include
+base/keymouse/mouse_io.c	5469	5469	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	5470	5470	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5471	5477	include
+base/keymouse/mouse_io.c	5478	5478	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5479	5479	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	5480	5556	include
+base/keymouse/mouse_io.c	5557	5557	profile: #ifndef NTVDM
+base/keymouse/mouse_io.c	5558	5558	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5559	5601	include
+base/keymouse/mouse_io.c	5602	5602	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5603	5642	include
+base/keymouse/mouse_io.c	5643	5643	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5644	5650	include
+base/keymouse/mouse_io.c	5651	5651	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5652	5664	include
+base/keymouse/mouse_io.c	5665	5665	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5666	5735	include
+base/keymouse/mouse_io.c	5736	5736	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5737	5921	include
+base/keymouse/mouse_io.c	5922	5922	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5923	5928	include
+base/keymouse/mouse_io.c	5929	5929	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	5930	6004	include
+base/keymouse/mouse_io.c	6005	6005	profile: #ifndef NEC_98
+base/keymouse/mouse_io.c	6006	6801	include
+base/keymouse/ppi.c	1	68	include
+base/keymouse/ppi.c	69	69	profile: #ifndef NTVDM
+base/keymouse/ppi.c	70	70	include
+base/keymouse/ppi.c	71	71	profile: #ifndef NTVDM
+base/keymouse/ppi.c	72	86	include
+base/keymouse/ppi.c	87	87	profile: #ifndef NEC_98
+base/keymouse/ppi.c	88	108	include
+base/keymouse/ppi.c	109	109	profile: #ifndef NEC_98
+base/keymouse/ppi.c	110	113	include
+base/keymouse/ppi.c	114	114	profile: #ifndef NEC_98
+base/keymouse/ppi.c	115	138	include
+base/keymouse/ppi.c	139	139	profile: #ifndef NTVDM
+base/keymouse/ppi.c	140	150	include
+base/keymouse/ppi.c	151	151	profile: #ifndef NTVDM
+base/keymouse/ppi.c	152	169	include
+base/keymouse/ppi.c	170	178	profile: #ifdef NTVDM
+base/keymouse/ppi.c	179	181	include
+base/keymouse/ppi.c	182	182	profile: #ifndef NEC_98
+base/keymouse/ppi.c	183	195	include
+base/keymouse/ppi.c	196	196	profile: #ifndef NEC_98
+base/keymouse/ppi.c	197	204	include
+base/keymouse/ppi.c	205	205	profile: #ifndef NEC_98
+base/keymouse/ppi.c	206	206	include
+base/system/ica.c	1	147	include
+base/system/ica.c	148	148	profile: #if !defined(NTVDM)
+base/system/ica.c	149	151	include
+base/system/ica.c	152	152	profile: #if !defined(NTVDM)
+base/system/ica.c	153	175	include
+base/system/ica.c	176	176	profile: #if !defined(NTVDM)
+base/system/ica.c	177	184	include
+base/system/ica.c	185	185	profile: #if !defined(NTVDM)
+base/system/ica.c	186	200	include
+base/system/ica.c	201	276	profile: #ifdef NTVDM
+base/system/ica.c	277	302	include
+base/system/ica.c	303	303	profile: #ifdef NTVDM
+base/system/ica.c	304	370	include
+base/system/ica.c	371	371	profile: #if !defined (NTVDM)
+base/system/ica.c	372	382	include
+base/system/ica.c	383	383	profile: #if !defined (NTVDM)
+base/system/ica.c	384	482	include
+base/system/ica.c	483	491	profile: #if defined (NTVDM)
+base/system/ica.c	492	493	include
+base/system/ica.c	494	494	profile: #if defined (NTVDM)
+base/system/ica.c	495	581	include
+base/system/ica.c	582	584	profile: #if 0
+base/system/ica.c	585	701	include
+base/system/ica.c	702	705	profile: #ifdef NTVDM
+base/system/ica.c	706	872	include
+base/system/ica.c	873	875	profile: #if defined(NEC_98)
+base/system/ica.c	876	876	include
+base/system/ica.c	877	877	profile: #if defined(NEC_98)
+base/system/ica.c	878	892	include
+base/system/ica.c	893	895	profile: #if defined(NEC_98)
+base/system/ica.c	896	896	include
+base/system/ica.c	897	897	profile: #if defined(NEC_98)
+base/system/ica.c	898	938	include
+base/system/ica.c	939	941	profile: #if defined(NEC_98)
+base/system/ica.c	942	942	include
+base/system/ica.c	943	943	profile: #if defined(NEC_98)
+base/system/ica.c	944	1089	include
+base/system/ica.c	1090	1092	profile: #if defined(NEC_98)
+base/system/ica.c	1093	1093	include
+base/system/ica.c	1094	1094	profile: #if defined(NEC_98)
+base/system/ica.c	1095	1123	include
+base/system/ica.c	1124	1126	profile: #if defined(NEC_98)
+base/system/ica.c	1127	1127	include
+base/system/ica.c	1128	1128	profile: #if defined(NEC_98)
+base/system/ica.c	1129	1154	include
+base/system/ica.c	1155	1157	profile: #if defined(NEC_98)
+base/system/ica.c	1158	1158	include
+base/system/ica.c	1159	1159	profile: #if defined(NEC_98)
+base/system/ica.c	1160	1225	include
+base/system/ica.c	1226	1250	profile: #if defined(NEC_98)
+base/system/ica.c	1251	1273	include
+base/system/ica.c	1274	1274	profile: #if defined(NEC_98)
+base/system/ica.c	1275	1334	include
+base/system/ica.c	1335	1335	profile: #ifndef NTVDM
+base/system/ica.c	1336	1350	include
+base/system/ica.c	1351	1351	profile: #ifndef NTVDM
+base/system/ica.c	1352	1536	include
+base/system/ica.c	1537	1549	profile: #if defined (NTVDM)
+base/system/ica.c	1550	1571	include
+base/system/ica.c	1572	1572	profile: #if defined (NTVDM)
+base/system/ica.c	1573	1579	include
+base/system/ica.c	1580	1580	profile: #ifndef NTVDM
+base/system/ica.c	1581	1809	include
+base/system/ica.c	1810	1810	profile: #ifndef NTVDM
+base/system/ica.c	1811	1813	include
+base/system/ica.c	1814	1860	profile: #if defined(NTVDM)
+base/system/ica.c	1861	2053	include
+base/system/ica.c	2054	2059	profile: #if defined(NEC_98)
+base/system/ica.c	2060	2062	include
+base/system/ica.c	2063	2066	profile: #ifdef NTVDM
+base/system/ica.c	2067	2074	include
+base/system/ica.c	2075	2075	profile: #ifdef NTVDM
+base/system/ica.c	2076	2076	profile: #if defined(NEC_98)
+base/system/ica.c	2077	2094	include
+base/system/ica.c	2095	2098	profile: #ifdef NTVDM
+base/system/ica.c	2099	2100	include
+base/system/ica.c	2101	2101	profile: #ifdef NTVDM
+base/system/ica.c	2102	2102	include
+base/system/ica.c	2103	2105	profile: #if defined(NEC_98)
+base/system/ica.c	2106	2106	include
+base/system/ica.c	2107	2107	profile: #if defined(NEC_98)
+base/system/ica.c	2108	2112	include
+base/system/ica.c	2113	2113	profile: #ifndef NTVDM
+base/system/ica.c	2114	2131	include
+base/system/ica.c	2132	2132	profile: #ifndef NTVDM
+base/system/ica.c	2133	2137	include
+base/system/ica.c	2138	2144	profile: #if defined(NEC_98)
+base/system/ica.c	2145	2159	include
+base/system/ica.c	2160	2160	profile: #if defined(NEC_98)
+base/system/ica.c	2161	2181	include
+base/system/ica.c	2182	2185	profile: #ifdef NTVDM
+base/system/ica.c	2186	2187	include
+base/system/ica.c	2188	2188	profile: #ifdef NTVDM
+base/system/ica.c	2189	2189	include
+base/system/ica.c	2190	2192	profile: #if defined(NEC_98)
+base/system/ica.c	2193	2193	include
+base/system/ica.c	2194	2194	profile: #if defined(NEC_98)
+base/system/ica.c	2195	2317	include
+base/system/idetect.c	1	164	include
+base/system/idetect.c	165	172	profile: #ifdef NTVDM
+base/system/idetect.c	173	187	include
+base/system/idetect.c	188	191	profile: #ifdef NTVDM
+base/system/idetect.c	192	193	include
+base/system/idetect.c	194	194	profile: #ifdef NTVDM
+base/system/idetect.c	195	201	include
+base/system/idetect.c	202	202	profile: #ifndef NTVDM
+base/system/idetect.c	203	213	include
+base/system/idetect.c	214	220	profile: #ifndef NTVDM
+base/system/idetect.c	221	225	profile: #if defined(NEC_98)
+base/system/idetect.c	226	231	profile: #ifndef NTVDM
+base/system/idetect.c	232	234	profile: #if defined(NEC_98)
+base/system/idetect.c	235	235	profile: #ifndef NTVDM
+base/system/idetect.c	236	236	profile: #if defined(NEC_98)
+base/system/idetect.c	237	238	profile: #ifndef NTVDM
+base/system/idetect.c	239	241	profile: #if defined(NEC_98)
+base/system/idetect.c	242	242	profile: #ifndef NTVDM
+base/system/idetect.c	243	243	profile: #if defined(NEC_98)
+base/system/idetect.c	244	245	profile: #ifndef NTVDM
+base/system/idetect.c	246	248	profile: #if defined(NEC_98)
+base/system/idetect.c	249	249	profile: #ifndef NTVDM
+base/system/idetect.c	250	250	profile: #if defined(NEC_98)
+base/system/idetect.c	251	253	profile: #ifndef NTVDM
+base/system/idetect.c	254	265	include
+base/system/idetect.c	266	266	profile: #ifndef NTVDM
+base/system/idetect.c	267	299	include
+base/system/idetect.c	300	300	profile: #ifndef NTVDM
+base/system/idetect.c	301	301	include
+base/system/idetect.c	302	335	profile: #ifdef NTVDM
+base/system/idetect.c	336	349	include
+base/system/idetect.c	350	350	profile: #ifdef NTVDM
+base/system/idetect.c	351	363	include
+base/system/idetect.c	364	411	profile: #ifdef NTVDM
+base/system/idetect.c	412	435	include
+base/system/idetect.c	436	436	profile: #ifdef NTVDM
+base/system/idetect.c	437	450	include
+base/system/idetect.c	451	451	profile: #ifndef NTVDM
+base/system/idetect.c	452	453	include
+base/system/idetect.c	454	454	profile: #ifndef NTVDM
+base/system/idetect.c	455	459	include
+base/system/idetect.c	460	467	profile: #ifdef NTVDM
+base/system/idetect.c	468	468	include
+base/system/idetect.c	469	469	profile: #ifdef NTVDM
+base/system/idetect.c	470	475	include
+base/system/idetect.c	476	478	profile: #ifdef NTVDM
+base/system/idetect.c	479	481	include
+base/system/idetect.c	482	482	profile: #ifdef NTVDM
+base/system/idetect.c	483	509	include
+base/system/idetect.c	510	519	profile: #ifdef NTVDM
+base/system/idetect.c	520	520	include
+base/system/idetect.c	521	521	profile: #ifdef NTVDM
+base/system/idetect.c	522	522	include
+base/system/rom.c	1	45	include
+base/system/rom.c	46	59	profile: #if defined(NEC_98)
+base/system/rom.c	60	84	include
+base/system/rom.c	85	85	profile: #if defined(NEC_98)
+base/system/rom.c	86	114	include
+base/system/rom.c	115	118	profile: #if defined(NEC_98)
+base/system/rom.c	119	142	include
+base/system/rom.c	143	148	profile: #if defined(NEC_98)
+base/system/rom.c	149	250	include
+base/system/rom.c	251	251	profile: #ifndef NEC_98
+base/system/rom.c	252	264	include
+base/system/rom.c	265	270	profile: #ifdef ARCX86
+base/system/rom.c	271	271	include
+base/system/rom.c	272	272	profile: #ifdef ARCX86
+base/system/rom.c	273	314	include
+base/system/rom.c	315	315	profile: #ifndef NEC_98
+base/system/rom.c	316	319	include
+base/system/rom.c	320	340	profile: #if defined(NEC_98)
+base/system/rom.c	341	341	include
+base/system/rom.c	342	342	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	343	389	include
+base/system/rom.c	390	391	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	392	402	profile: #ifdef ARCX86
+base/system/rom.c	403	409	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	410	410	profile: #ifdef ARCX86
+base/system/rom.c	411	415	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	416	417	include
+base/system/rom.c	418	418	profile: #if defined(NEC_98)
+base/system/rom.c	419	422	include
+base/system/rom.c	423	452	profile: #if defined(NEC_98)
+base/system/rom.c	453	453	include
+base/system/rom.c	454	454	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/system/rom.c	455	483	include
+base/system/rom.c	484	485	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/system/rom.c	486	507	profile: #ifdef ARCX86
+base/system/rom.c	508	508	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/system/rom.c	509	509	profile: #ifdef ARCX86
+base/system/rom.c	510	511	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/system/rom.c	512	512	profile: #if defined(NEC_98)
+base/system/rom.c	513	514	include
+base/system/rom.c	515	542	profile: #if defined(NEC_98)
+base/system/rom.c	543	601	include
+base/system/rom.c	602	602	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/system/rom.c	603	615	include
+base/system/rom.c	616	616	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/system/rom.c	617	621	include
+base/system/rom.c	622	622	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	623	624	include
+base/system/rom.c	625	625	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	626	629	include
+base/system/rom.c	630	630	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	631	746	include
+base/system/rom.c	747	747	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/system/rom.c	748	783	include
+base/system/rom.c	784	784	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+base/system/rom.c	785	787	profile: #ifdef ARCX86
+base/system/rom.c	788	869	include
+base/system/rom.c	870	870	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+base/system/rom.c	871	888	include
+base/system/timer.c	1	80	include
+base/system/timer.c	81	89	profile: #ifdef NTVDM
+base/system/timer.c	90	107	include
+base/system/timer.c	108	116	profile: #ifdef NTVDM
+base/system/timer.c	117	118	include
+base/system/timer.c	119	119	profile: #ifdef NTVDM
+base/system/timer.c	120	184	include
+base/system/timer.c	185	188	profile: #if defined(NEC_98)
+base/system/timer.c	189	189	include
+base/system/timer.c	190	190	profile: #if defined(NEC_98)
+base/system/timer.c	191	253	include
+base/system/timer.c	254	254	profile: #ifndef NTVDM
+base/system/timer.c	255	260	include
+base/system/timer.c	261	261	profile: #ifndef NTVDM
+base/system/timer.c	262	374	include
+base/system/timer.c	375	377	profile: #ifdef NTVDM
+base/system/timer.c	378	379	include
+base/system/timer.c	380	380	profile: #ifdef NTVDM
+base/system/timer.c	381	386	include
+base/system/timer.c	387	387	profile: #ifndef NTVDM
+base/system/timer.c	388	389	include
+base/system/timer.c	390	390	profile: #ifndef NTVDM
+base/system/timer.c	391	397	include
+base/system/timer.c	398	398	profile: #ifndef NTVDM
+base/system/timer.c	399	400	include
+base/system/timer.c	401	401	profile: #ifndef NTVDM
+base/system/timer.c	402	404	include
+base/system/timer.c	405	405	profile: #ifndef NTVDM
+base/system/timer.c	406	414	include
+base/system/timer.c	415	415	profile: #ifndef NTVDM
+base/system/timer.c	416	416	include
+base/system/timer.c	417	446	profile: #if defined(NTVDM)
+base/system/timer.c	447	481	include
+base/system/timer.c	482	482	profile: #if defined(NTVDM)
+base/system/timer.c	483	489	include
+base/system/timer.c	490	490	profile: #if !defined(NTVDM)
+base/system/timer.c	491	496	include
+base/system/timer.c	497	497	profile: #if !defined(NTVDM)
+base/system/timer.c	498	498	include
+base/system/timer.c	499	503	profile: #if defined(NTVDM)
+base/system/timer.c	504	525	include
+base/system/timer.c	526	530	profile: #if defined(NEC_98)
+base/system/timer.c	531	542	include
+base/system/timer.c	543	543	profile: #ifndef NTVDM
+base/system/timer.c	544	552	include
+base/system/timer.c	553	553	profile: #ifndef NTVDM
+base/system/timer.c	554	562	include
+base/system/timer.c	563	563	profile: #ifndef NTVDM
+base/system/timer.c	564	565	include
+base/system/timer.c	566	566	profile: #ifndef NTVDM
+base/system/timer.c	567	572	include
+base/system/timer.c	573	573	profile: #ifndef NTVDM
+base/system/timer.c	574	582	include
+base/system/timer.c	583	583	profile: #ifndef NTVDM
+base/system/timer.c	584	602	include
+base/system/timer.c	603	605	profile: #if defined(NEC_98)
+base/system/timer.c	606	606	include
+base/system/timer.c	607	607	profile: #if defined(NEC_98)
+base/system/timer.c	608	629	include
+base/system/timer.c	630	632	profile: #ifdef  NTVDM
+base/system/timer.c	633	633	include
+base/system/timer.c	634	634	profile: #ifdef  NTVDM
+base/system/timer.c	635	644	include
+base/system/timer.c	645	647	profile: #ifdef NTVDM
+base/system/timer.c	648	648	include
+base/system/timer.c	649	649	profile: #ifdef NTVDM
+base/system/timer.c	650	654	include
+base/system/timer.c	655	657	profile: #ifdef NTVDM
+base/system/timer.c	658	658	include
+base/system/timer.c	659	659	profile: #ifdef NTVDM
+base/system/timer.c	660	661	include
+base/system/timer.c	662	664	profile: #if defined(NEC_98)
+base/system/timer.c	665	665	include
+base/system/timer.c	666	666	profile: #if defined(NEC_98)
+base/system/timer.c	667	704	include
+base/system/timer.c	705	707	profile: #ifdef NTVDM
+base/system/timer.c	708	708	include
+base/system/timer.c	709	709	profile: #ifdef NTVDM
+base/system/timer.c	710	716	include
+base/system/timer.c	717	717	profile: #ifndef NEC_98
+base/system/timer.c	718	719	include
+base/system/timer.c	720	720	profile: #ifndef NEC_98
+base/system/timer.c	721	723	profile: #ifdef NTVDM
+base/system/timer.c	724	727	include
+base/system/timer.c	728	730	profile: #if defined(NEC_98)
+base/system/timer.c	731	732	include
+base/system/timer.c	733	733	profile: #if defined(NEC_98)
+base/system/timer.c	734	744	include
+base/system/timer.c	745	747	profile: #ifdef NTVDM
+base/system/timer.c	748	748	include
+base/system/timer.c	749	749	profile: #ifdef NTVDM
+base/system/timer.c	750	750	include
+base/system/timer.c	751	756	profile: #if defined(NEC_98)
+base/system/timer.c	757	765	include
+base/system/timer.c	766	766	profile: #ifndef NTVDM
+base/system/timer.c	767	770	include
+base/system/timer.c	771	771	profile: #ifndef NTVDM
+base/system/timer.c	772	772	include
+base/system/timer.c	773	799	profile: #ifdef NTVDM
+base/system/timer.c	800	807	include
+base/system/timer.c	808	808	profile: #ifndef NTVDM
+base/system/timer.c	809	823	include
+base/system/timer.c	824	824	profile: #ifndef NTVDM
+base/system/timer.c	825	849	include
+base/system/timer.c	850	852	profile: #if defined(NEC_98)
+base/system/timer.c	853	853	include
+base/system/timer.c	854	854	profile: #if defined(NEC_98)
+base/system/timer.c	855	966	include
+base/system/timer.c	967	967	profile: #ifndef NTVDM
+base/system/timer.c	968	969	include
+base/system/timer.c	970	970	profile: #ifndef NTVDM
+base/system/timer.c	971	1032	include
+base/system/timer.c	1033	1033	profile: #ifndef NTVDM
+base/system/timer.c	1034	1034	include
+base/system/timer.c	1035	1035	profile: #ifndef NTVDM
+base/system/timer.c	1036	1063	include
+base/system/timer.c	1064	1066	profile: #ifdef NTVDM
+base/system/timer.c	1067	1067	include
+base/system/timer.c	1068	1068	profile: #ifndef NTVDM
+base/system/timer.c	1069	1078	include
+base/system/timer.c	1079	1079	profile: #ifndef NTVDM
+base/system/timer.c	1080	1082	include
+base/system/timer.c	1083	1088	profile: #if defined(NTVDM) && !defined(PROD)
+base/system/timer.c	1089	1098	include
+base/system/timer.c	1099	1113	profile: #ifdef NTVDM
+base/system/timer.c	1114	1117	include
+base/system/timer.c	1118	1118	profile: #ifdef NTVDM
+base/system/timer.c	1119	1339	include
+base/system/timer.c	1340	1342	profile: #if defined(NEC_98)
+base/system/timer.c	1343	1343	include
+base/system/timer.c	1344	1344	profile: #if defined(NEC_98)
+base/system/timer.c	1345	1367	include
+base/system/timer.c	1368	1373	profile: #ifdef NTVDM
+base/system/timer.c	1374	1376	include
+base/system/timer.c	1377	1377	profile: #ifdef NTVDM
+base/system/timer.c	1378	1710	include
+base/system/timer.c	1711	1717	profile: #if defined(NEC_98)
+base/system/timer.c	1718	1793	include
+base/system/timer.c	1794	1794	profile: #ifndef NTVDM
+base/system/timer.c	1795	1803	include
+base/system/timer.c	1804	1806	profile: #if defined(NEC_98)
+base/system/timer.c	1807	1821	include
+base/system/timer.c	1822	1828	profile: #if defined(NEC_98)
+base/system/timer.c	1829	1829	include
+base/system/timer.c	1830	1830	profile: #if defined(NEC_98)
+base/system/timer.c	1831	1833	include
+base/system/timer.c	1834	1840	profile: #if defined(NEC_98)
+base/system/timer.c	1841	1841	include
+base/system/timer.c	1842	1842	profile: #if defined(NEC_98)
+base/system/timer.c	1843	1858	include
+base/system/timer.c	1859	1859	profile: #ifndef NTVDM
+base/system/timer.c	1860	1863	include
+base/system/timer.c	1864	1864	profile: #ifndef NTVDM
+base/system/timer.c	1865	1866	include
+base/system/timer.c	1867	1867	profile: #ifndef NTVDM
+base/system/timer.c	1868	1868	include
+base/system/timer.c	1869	1871	profile: #if defined(NEC_98)
+base/system/timer.c	1872	1879	include
+base/system/timer.c	1880	1882	profile: #ifdef NTVDM
+base/system/timer.c	1883	1884	include
+base/system/timer.c	1885	1885	profile: #ifdef NTVDM
+base/system/timer.c	1886	1888	include
+base/system/timer.c	1889	1891	profile: #if defined(NEC_98)
+base/system/timer.c	1892	1892	include
+base/system/timer.c	1893	1893	profile: #if defined(NEC_98)
+base/system/timer.c	1894	1909	include
+base/system/timer.c	1910	1912	profile: #ifdef NTVDM
+base/system/timer.c	1913	1914	include
+base/system/timer.c	1915	1915	profile: #ifdef NTVDM
+base/system/timer.c	1916	1919	include
+base/system/timer.c	1920	1922	profile: #ifdef NTVDM
+base/system/timer.c	1923	1934	include
+base/system/timer.c	1935	1935	profile: #ifndef NTVDM
+base/system/timer.c	1936	2031	include
+base/system/timer.c	2032	2057	profile: #ifndef NTVDM
+base/system/timer.c	2058	2060	profile: #if defined(NEC_98)
+base/system/timer.c	2061	2097	profile: #ifndef NTVDM
+base/system/timer.c	2098	2100	profile: #if defined(NEC_98)
+base/system/timer.c	2101	2136	profile: #ifndef NTVDM
+base/system/timer.c	2137	2137	profile: #if defined(NEC_98)
+base/system/timer.c	2138	2159	profile: #ifndef NTVDM
+base/system/timer.c	2160	2162	profile: #if defined(NEC_98)
+base/system/timer.c	2163	2163	profile: #ifndef NTVDM
+base/system/timer.c	2164	2164	profile: #if defined(NEC_98)
+base/system/timer.c	2165	2170	profile: #ifndef NTVDM
+base/system/timer.c	2171	2173	profile: #if defined(NEC_98)
+base/system/timer.c	2174	2174	profile: #ifndef NTVDM
+base/system/timer.c	2175	2175	profile: #if defined(NEC_98)
+base/system/timer.c	2176	2193	profile: #ifndef NTVDM
+base/system/timer.c	2194	2195	include
+base/system/timer.c	2196	2196	profile: #ifndef NTVDM
+base/system/timer.c	2197	2235	include
+base/system/timer.c	2236	2236	profile: #ifndef NTVDM
+base/system/timer.c	2237	2293	include
+base/system/timer.c	2294	2310	profile: #ifdef NTVDM
+base/system/timer.c	2311	2339	include
+base/system/timer.c	2340	2340	profile: #ifdef NTVDM
+base/system/timer.c	2341	2351	include
+base/system/timer.c	2352	2357	profile: #ifdef NTVDM
+base/system/timer.c	2358	2361	profile: #if defined(NEC_98)
+base/system/timer.c	2362	2401	profile: #ifdef NTVDM
+base/system/timer.c	2402	2409	profile: #if defined(NEC_98)
+base/system/timer.c	2410	2410	profile: #ifdef NTVDM
+base/system/timer.c	2411	2411	profile: #if defined(NEC_98)
+base/system/timer.c	2412	2491	profile: #ifdef NTVDM
+base/system/timer.c	2492	2508	include
+base/system/timer.c	2509	2511	profile: #if defined(NEC_98)
+base/system/timer.c	2512	2512	include
+base/system/timer.c	2513	2513	profile: #if defined(NEC_98)
+base/system/timer.c	2514	2584	include
+base/system/timer.c	2585	2587	profile: #if defined(NEC_98)
+base/system/timer.c	2588	2590	include
+base/system/timer.c	2591	2597	profile: #if defined(NEC_98)
+base/system/timer.c	2598	2598	include
+base/system/timer.c	2599	2599	profile: #if defined(NEC_98)
+base/system/timer.c	2600	2610	include
+base/system/timer.c	2611	2611	profile: #ifdef NTVDM
+base/system/timer.c	2612	2614	include
+base/system/timer.c	2615	2615	profile: #ifndef NTVDM
+base/system/timer.c	2616	2692	include
+base/system/timer.c	2693	2693	profile: #ifndef NTVDM
+base/system/timer.c	2694	2773	include
+base/system/timer.c	2774	2774	profile: #ifndef NTVDM
+base/system/timer.c	2775	2806	include
+base/system/timer.c	2807	2807	profile: #ifndef NTVDM
+base/system/timer.c	2808	2838	include
+base/system/timer.c	2839	2844	profile: #if defined(NEC_98)
+base/system/timer.c	2845	2845	profile: #ifndef NTVDM
+base/system/timer.c	2846	2851	profile: #if defined(NEC_98)
+base/system/timer.c	2852	2852	profile: #ifndef NTVDM
+base/system/timer.c	2853	2854	profile: #if defined(NEC_98)
+base/system/timer.c	2855	2871	include
+base/system/timer.c	2872	2872	profile: #ifndef NTVDM
+base/system/timer.c	2873	2874	include
+base/system/timer.c	2875	2875	profile: #ifndef NTVDM
+base/system/timer.c	2876	2876	include
+base/system/timer.c	2877	2877	profile: #if defined(NEC_98)
+base/system/timer.c	2878	2883	include
+base/system/timer.c	2884	2888	profile: #ifdef NTVDM
+base/system/timer.c	2889	2891	include
+base/system/timer.c	2892	2892	profile: #ifdef NTVDM
+base/system/timer.c	2893	2898	include
+base/system/timer.c	2899	2899	profile: #ifndef NTVDM
+base/system/timer.c	2900	2901	include
+base/system/timer.c	2902	2902	profile: #ifndef NTVDM
+base/system/timer.c	2903	2904	include
+base/system/timer.c	2905	2905	profile: #if !defined (NTVDM)
+base/system/timer.c	2906	2944	include
+base/system/timer.c	2945	2945	profile: #if !defined (NTVDM)
+base/system/timer.c	2946	2957	include
+base/system/timer.c	2958	2962	profile: #if defined(NEC_98)
+base/system/timer.c	2963	2965	include
+base/system/timer.c	2966	2966	profile: #if defined(NEC_98)
+base/system/timer.c	2967	2971	include
+base/system/timer.c	2972	2975	profile: #if defined(NEC_98)
+base/system/timer.c	2976	2979	include
+base/system/timer.c	2980	2980	profile: #ifndef NTVDM
+base/system/timer.c	2981	2982	include
+base/system/timer.c	2983	2985	profile: #ifndef NTVDM
+base/system/timer.c	2986	2992	include
+base/system/timer.c	2993	2993	profile: #if !defined(NTVDM)
+base/system/timer.c	2994	3014	include
+base/system/timer.c	3015	3015	profile: #if !defined(NTVDM)
+base/system/timer.c	3016	3019	include
+base/system/timer.c	3020	3022	profile: #if defined(NEC_98)
+base/system/timer.c	3023	3027	include
+base/system/timer.c	3028	3046	profile: #if defined(NEC_98)
+base/system/timer.c	3047	3056	include
+base/system/timer.c	3057	3057	profile: #if defined(NEC_98)
+base/system/timer.c	3058	3091	include
+base/system/timestrb.c	1	85	include
+base/system/timestrb.c	86	86	profile: #ifndef NTVDM
+base/system/timestrb.c	87	88	include
+base/system/timestrb.c	89	89	profile: #ifndef NEC_98
+base/system/timestrb.c	90	90	include
+base/system/timestrb.c	91	91	profile: #ifndef NEC_98
+base/system/timestrb.c	92	98	include
+base/system/timestrb.c	99	99	profile: #ifndef NTVDM
+base/system/timestrb.c	100	122	include
+base/system/unexp_nt.c	1	95	include
+base/system/unexp_nt.c	96	96	DOS-EOF-marker
+host/src/nt_keycd.c	1	9	include
+host/src/nt_keycd.c	10	12	unused-NT-native-header
+host/src/nt_keycd.c	13	20	include
+host/src/nt_keycd.c	21	35	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	36	50	include
+host/src/nt_keycd.c	51	259	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	260	260	profile: #if 1
+host/src/nt_keycd.c	261	261	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	262	264	profile: #if 1
+host/src/nt_keycd.c	265	287	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	288	288	profile: #if 1                                             //NEC98 for 106 keyboard
+host/src/nt_keycd.c	289	289	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	290	292	profile: #if 1                                             //NEC98 for 106 keyboard
+host/src/nt_keycd.c	293	295	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	296	296	profile: #if 1                                             //NEC98 for 106 keyboard
+host/src/nt_keycd.c	297	297	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	298	300	profile: #if 1                                             //NEC98 for 106 keyboard
+host/src/nt_keycd.c	301	310	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	311	405	include
+host/src/nt_keycd.c	406	410	profile: #ifdef JAPAN
+host/src/nt_keycd.c	411	412	include
+host/src/nt_keycd.c	413	413	profile: #ifdef JAPAN
+host/src/nt_keycd.c	414	433	include
+host/src/nt_keycd.c	434	450	profile: #ifdef JAPAN
+host/src/nt_keycd.c	451	465	include
+host/src/nt_keycd.c	466	466	profile: #ifdef JAPAN
+host/src/nt_keycd.c	467	573	include
+host/src/nt_keycd.c	574	574	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	575	577	include
+host/src/nt_keycd.c	578	700	unused-NT-BIOS-input-conversion-tables
+host/src/nt_keycd.c	701	713	include
+host/src/nt_keycd.c	714	718	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	719	728	include
+host/src/nt_keycd.c	729	738	profile: #ifdef JAPAN
+host/src/nt_keycd.c	739	739	include
+host/src/nt_keycd.c	740	786	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	787	793	include
+host/src/nt_keycd.c	794	803	profile: #ifdef JAPAN
+host/src/nt_keycd.c	804	805	include
+host/src/nt_keycd.c	806	815	profile: #if defined(NEC_98)
+host/src/nt_keycd.c	816	827	include
+host/src/nt_keycd.c	828	995	unused-NT-BIOS-input-conversion
+host/src/nt_sound.c	1	4	unused-NT-native-header
+host/src/nt_sound.c	5	34	include
+host/src/nt_sound.c	35	44	profile: #if defined(NEC_98)
+host/src/nt_sound.c	45	50	include
+host/src/nt_sound.c	51	51	profile: #ifndef NEC_98
+host/src/nt_sound.c	52	58	include
+host/src/nt_sound.c	59	59	profile: #ifndef NEC_98
+host/src/nt_sound.c	60	60	include
+host/src/nt_sound.c	61	62	unused-NT-Beep-handle
+host/src/nt_sound.c	63	123	include
+host/src/nt_sound.c	124	166	unused-NT-Beep-open
+host/src/nt_sound.c	167	244	include
+host/src/nt_sound.c	245	245	profile: #ifndef NEC_98
+host/src/nt_sound.c	246	257	include
+host/src/nt_sound.c	258	258	profile: #ifndef NEC_98
+host/src/nt_sound.c	259	273	include
+host/src/nt_sound.c	274	274	profile: #ifndef NEC_98
+host/src/nt_sound.c	275	296	include
+host/src/nt_sound.c	297	297	profile: #ifndef NEC_98
+host/src/nt_sound.c	298	306	include
+host/src/nt_sound.c	307	307	profile: #ifndef NEC_98
+host/src/nt_sound.c	308	324	include
+host/src/nt_sound.c	325	325	profile: #ifndef NEC_98
+host/src/nt_sound.c	326	332	include
+host/src/nt_sound.c	333	333	profile: #ifndef NEC_98
+host/src/nt_sound.c	334	409	include
+host/src/nt_sound.c	410	410	profile: #ifndef NEC_98
+host/src/nt_sound.c	411	423	include
+host/src/nt_sound.c	424	424	profile: #ifndef NEC_98
+host/src/nt_sound.c	425	453	include
+host/src/nt_sound.c	454	454	profile: #ifndef NEC_98
+host/src/nt_sound.c	455	456	include
+host/src/nt_sound.c	457	513	profile: #if defined(NEC_98)

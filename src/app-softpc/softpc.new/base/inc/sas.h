@@ -94,14 +94,6 @@ extern void sas_term IPT0();
 
 extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
 
-#ifdef NTVDM
-#ifdef CCPU
-extern IU8 *c_GetLinAdd IPT1(IU32, lin_addr);
-#define NtGetPtrToLinAddrByte(x) c_GetLinAdd(x)
-#else /* !CCPU */
-extern IU8 *NtGetPtrToLinAddrByte IPT1(IU32, lin_addr);
-#endif /* CCPU */
-#endif /* NTVDM */
 
 /*
  * TEMPORARY FOR NT!!!!!
@@ -207,15 +199,6 @@ extern void sas_connect_memory IPT3(sys_addr, low, sys_addr, high,
 	half_word, type);
 extern void sas_overwrite_memory IPT2(sys_addr, addr, int, type);
 
-#ifdef NTVDM
-/* We call xms functions(which in turn, will call sas functions) to
-   manage the A20 line wrapping. The reason is that we want to keep
-   the A20 line current state in himem.sys so that we don't have to
-   bop to 32 bits side to get the state.
-*/
-extern void xmsEnableA20Wrapping(void);
-extern void xmsDisableA20Wrapping(void);
-#endif  /* NTVDM */
 
 extern half_word sas_memory_type IPT1(sys_addr, addr);
 extern void sas_enable_20_bit_wrapping IPT0();
@@ -353,6 +336,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #define	START_SEGMENT		0xF000		/* 8088 start address */
 #define	START_OFFSET		0xFFF0
 
+
 /*
  * The follwoing are the offsets for the entry points to the
  * BIOS function calls.  These will be loaded into the interrupt vector
@@ -389,10 +373,6 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #define EXTEND_CHAR_OFFSET	0x0000
 #define MOUSE_VIDEO_IO_OFFSET	0xED80
 
-#if defined(NTVDM) && !defined(X86GFX)
-#define MOUSE_IO_INTERRUPT_SEGMENT  0xF000
-#define MOUSE_IO_INTERRUPT_OFFSET   0xED00
-#endif
 
 #define KEYBOARD_BREAK_INT_OFFSET   0xFF35
 #define PRINT_SCREEN_INT_OFFSET	    0xFF3B
@@ -1082,3 +1062,4 @@ typedef union   {
 		} IVT_ENTRY;
 #endif
 #endif /* BACK_M */
+

@@ -16,7 +16,12 @@ static void check_original_table(unsigned count, DWORD flags, DWORD expected)
         event.wVirtualScanCode = (WORD)scan;
         event.dwControlKeyState = flags;
         key = KeyMsgToKeyCode(&event);
-        fingerprint = (fingerprint ^ key) * 16777619u;
+        /* XP corrects regular scan 45 from Pause to NumLock. Keep the old
+           fingerprint for every other entry, with this change explicit. */
+        if (scan == 0x45u && flags == 0u)
+            assert(key == 90u);
+        fingerprint = (fingerprint ^
+            ((scan == 0x45u && flags == 0u) ? 126u : key)) * 16777619u;
         for (modifiers = 0; modifiers < 8; ++modifiers) {
             event.dwControlKeyState = flags |
                 ((modifiers & 1) ? SHIFT_PRESSED : 0) |
@@ -41,12 +46,31 @@ static BYTE app_keycode(WORD scan_code, DWORD control_state)
     return KeyMsgToKeyCode(&event);
 }
 
+static void check_pause_numlock(void)
+{
+    KEY_EVENT_RECORD event;
+    unsigned enhanced, released;
+    lib_memory_set(&event, 0, sizeof(event));
+    event.wVirtualScanCode = 0x45;
+    for (enhanced = 0; enhanced != 2; ++enhanced)
+    for (released = 0; released != 2; ++released) {
+        event.dwControlKeyState = enhanced ? ENHANCED_KEY : 0;
+        event.bKeyDown = !released;
+        event.wVirtualKeyCode = VK_PAUSE;
+        assert(KeyMsgToKeyCode(&event) == 126u);
+    }
+    event.dwControlKeyState = 0;
+    event.wVirtualKeyCode = VK_NUMLOCK;
+    assert(KeyMsgToKeyCode(&event) == 90u);
+}
+
 int main(void)
 {
-    /* All original table entries, without a second mapping table or an
-       external source dependency. Fingerprints are FNV-1a over key numbers. */
+    /* Original entries plus the explicit XP correction, without a duplicate
+       mapping table. Fingerprints are FNV-1a over key numbers. */
     check_original_table(133u, 0u, 0x63e314e3u);
     check_original_table(84u, ENHANCED_KEY, 0x26270444u);
+    check_pause_numlock();
     /* The standalone frontends feed these original nt_keycd tables, not a
        locally maintained Win32-to-PC map.  Keep ordinary and E0-extended
        keys distinct: their Scan-1 values overlap but their SoftPC key

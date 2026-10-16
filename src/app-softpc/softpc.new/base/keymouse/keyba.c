@@ -1,4 +1,4 @@
-#include "insignia.h" 
+#include "insignia.h"
 #include "host_def.h"
 /*
  * SoftPC Version 2.0
@@ -10,8 +10,8 @@
  *		kbd_inb(port,val)
  *		int port;
  *		half_word *val;
- *				provides the next scan code from the 
- *				keyboard controller (8042), or the 
+ *				provides the next scan code from the
+ *				keyboard controller (8042), or the
  *				status byte of the controller, depending
  *				on the port accessed.
  *		kbd_outb(port,val)
@@ -103,54 +103,6 @@ static char SccsID[]="@(#)keyba.c	1.57 06/22/95 Copyright Insignia Solutions Ltd
 #endif	/* KBD_CONT_DELAY */
 
 
-#ifdef NTVDM
-#include "idetect.h"
-#include "nt_eoi.h"
-
-/* exported for NT host event code */
-GLOBAL VOID KbdResume(VOID);
-GLOBAL BOOL bPifFastPaste=TRUE;
-
-
-/* imported from NT host code */
-IMPORT ULONG  WaitKbdHdw(ULONG dwTimeOut);
-IMPORT ULONG  KbdHdwFull;
-
-IMPORT VOID  HostReleaseKbd(VOID);
-
-/* imported from keybd_io.c */
-IMPORT int bios_buffer_size(void);
-
-IMPORT BOOL bBiosOwnsKbdHdw; // our kbd bios code owns the Keyboard Mutex
-word KbdInt09Seg;
-word KbdInt09Off;
-
-#undef LOCAL
-#define LOCAL
-
-// local state variables for kbd interrupt regulation
-VOID KbdIntDelay(VOID);
-BOOL bBiosBufferSpace = TRUE;
-BOOL bKbdIntHooked = FALSE;
-char KbdData = -1;
-BOOL bKbdEoiPending = TRUE;   // Kbd interrupts blocked until KbdResume invoked
-BOOL bDelayIntPending = FALSE;
-BOOL bForceDelayInts = FALSE;
-ULONG LastKbdInt=0;
-
-// The Brazilian ABNT keyboard has 104 keys, 2 more than 'usual'
-//
-// Key Number   Set 1   Set 2   Set 3   Character
-// ----------   ------ ------- -------  ---------------
-//     56        0x73    0x51    0x51   NumPad .
-//    107        0x7E    0x6D    0x7B   / ? Degree Sign
-// 
-// See also ..\..\host\src\nt_keycd.c and
-//          ..\..\..\dos\v86\cmd\keyb\keybi9c.asm
-//
-#define BRAZILIAN_ABNT_KBD
-
-#endif	/* NTVDM */
 
 
 
@@ -197,9 +149,10 @@ extern void wait_for_ack_from_kb();
 GLOBAL VOID ( *host_key_down_fn_ptr )();
 GLOBAL VOID ( *host_key_up_fn_ptr )();
 
-#ifndef NTVDM
 GLOBAL VOID ( *do_key_repeats_fn_ptr )();
-#endif	/* NTVDM */
+
+
+
 
 /*
  * 6805 code buffer:
@@ -229,7 +182,7 @@ GLOBAL VOID ( *do_key_repeats_fn_ptr )();
  * 3 bytes of event data per character).
  */
 
-/* 
+/*
    18.5.92 MG !!! TEMPORARY HACK !!! To fix windows bugs in Notepad and Word,
    set the buffer to 2k. Windows crashes when the keyboard buffer overflows,
    so we delay this for as long as sensible. It will still crash if you type
@@ -241,15 +194,9 @@ GLOBAL VOID ( *do_key_repeats_fn_ptr )();
    20.5.92 MG - took out the hack - see below.
 */
 
-#ifdef NTVDM	/* JonLe NT Mod */
-#define	BUFF_6805_VMAX	496
-#define	BUFF_6805_PMAX	512
-#define	BUFF_6805_PMASK	(BUFF_6805_PMAX - 1)
-#else
 #define	BUFF_6805_VMAX	48
 #define	BUFF_6805_PMAX	64
 #define	BUFF_6805_PMASK	(BUFF_6805_PMAX - 1)
-#endif	/* NTVDM */
 
 #ifndef macintosh
 static half_word buff_6805[BUFF_6805_PMAX];
@@ -258,12 +205,6 @@ static half_word *buff_6805=NULL;
 #endif /* macintosh */
 static int buff_6805_in_ptr,buff_6805_out_ptr;
 
-#ifdef NTVDM
-static unsigned char key_marker_value = 0;
-static unsigned char key_marker_buffer[BUFF_6805_PMAX];
-int LastKeyDown= -1;
-void Reset6805and8042(void);
-#endif
 
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 extern IBOOL HostDelayKbdInt IPT1(char, scancode);
@@ -272,7 +213,7 @@ extern void HostResetKdbInts IPT0();
 
 #endif /* IRET_HOOKS && GISP_CPU */
 
-/* 
+/*
    20.5.92 MG
 
    Real fix for my temporary hack in the last edition of this file.
@@ -335,15 +276,10 @@ int held_event_count;
 int held_event_key[HELD_EVENT_MAX];
 int held_event_type[HELD_EVENT_MAX];
 
-#ifdef NTVDM 	/* JonLe NTVDM Mod:remove repeat related vars */
-int scan_code_6805_size,key_set;
-int input_port_val;
-int waiting_for_next_code, waiting_for_next_8042_code, num_lock_on;
-#else
-int scan_code_6805_size,key_set,repeat_delay_target,repeat_target,repeat_delay_count,repeat_count;
+int scan_code_6805_size,repeat_delay_target,repeat_target,repeat_delay_count,repeat_count;
+half_word key_set;
 int typematic_key, input_port_val;
 int typematic_key_valid,waiting_for_next_code, waiting_for_next_8042_code, num_lock_on;
-#endif	/* NTVDM */
 int shift_on, l_shift_on, r_shift_on;
 int ctrl_on, l_ctrl_on, r_ctrl_on;
 int alt_on, l_alt_on, r_alt_on;
@@ -357,14 +293,10 @@ half_word *scan_code_6805_array;
 
 #ifdef PM
 int gate_a20_status;
-#ifndef NTVDM
 long reset_was_by_kbd = FALSE;
 #endif
-#endif
 
-#ifndef NTVDM
 LOCAL q_ev_handle       refillDelayedHandle = 0;
-#endif
 
 half_word current_light_pattern;
 
@@ -405,20 +337,12 @@ static half_word keytypes[127] =
   0,0,0,0,0,0,0,0,0,0,  /* 20-29 */
   0,0,0,0,0,0,0,0,0,0,  /* 30-39 */
   0,0,0,0,0,0,0,0,0,0,  /* 40-49 */
-#ifdef BRAZILIAN_ABNT_KBD
-  0,0,0,0,0,0,0,0,0,6,  /* 50-59 */
-#else
-  0,0,0,0,0,0,6,0,0,6,  /* 50-59 */
-#endif
+  0,0,0,0,0,0,0,0,0,6,  /* 50-59 (*56) */
   0,0,1,6,1,6,6,6,6,6,  /* 60-69 */
   6,6,6,6,6,2,2,6,6,2,  /* 70-79 */
   2,2,6,2,2,2,2,6,6,2,  /* 80-89 */
-  0,0,0,0,6,3,0,0,0,0,  /* 90-99 */
-#ifdef BRAZILIAN_ABNT_KBD
-  0,0,0,0,0,0,0,0,1,6,  /* 100-109 */
-#else
-  0,0,0,0,0,0,0,6,1,6,  /* 100-109 */
-#endif
+  0,0,0,0,0,3,0,0,0,0,  /* 90-99 (*94) */
+  0,0,0,0,0,0,0,0,1,6,  /* 100-109 (*107) */
   0,6,0,0,0,0,0,0,0,0,  /* 110-119 */
   0,0,0,0,4,0,5         /* 120-126 */
 };
@@ -491,19 +415,19 @@ static int set_3_break_sizes [13]=
 
 #endif
 
+/*
+ * Map Scancode Set 2 into Scancode Set 1 values: index into this table with
+ * a scancode set 2 to get the corresponding scancode set 1 value.
+ * Non-existent Set 2 scancodes have entry == Set 2 value (trans_8042[x] == x)
+ */
 static half_word trans_8042 [256] =
-{ 0xff,0x43,0x02,0x3f,0x3d,0x3b,0x3c,0x58,0x08,0x44,0x42,0x40,0x3e,0x0f,0x29,0x0f,		/* 00-0f */
-  0x10,0x38,0x2a,0x13,0x1d,0x10,0x02,0x17,0x18,0x19,0x2c,0x1f,0x1e,0x11,0x03,0x1f,		/* 10-1f */
-  0x20,0x2e,0x2d,0x20,0x12,0x05,0x04,0x27,0x28,0x39,0x2f,0x21,0x14,0x13,0x06,0x2f,		/* 20-2f */
-  0x30,0x31,0x30,0x23,0x22,0x15,0x07,0x37,0x38,0x39,0x32,0x24,0x16,0x08,0x09,0x3f,		/* 30-3f */
-  0x40,0x33,0x25,0x17,0x18,0x0b,0x0a,0x47,0x48,0x34,0x35,0x26,0x27,0x19,0x0c,0x4f,		/* 40-4f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x50,0x73,0x28,0x53,0x1a,0x0d,0x56,0x57,0x3a,0x36,0x1c,0x1b,0x5c,0x2b,0x5e,0x5f,		/* 50-5f */
-  0x60,0x56,0x62,0x63,0x64,0x65,0x0e,0x67,0x68,0x4f,0x6a,0x4b,0x47,0x7e,0x6e,0x6f,		/* 60-6f */
-#else
-  0x50,0x51,0x28,0x53,0x1a,0x0d,0x56,0x57,0x3a,0x36,0x1c,0x1b,0x5c,0x2b,0x5e,0x5f,		/* 50-5f */
-  0x60,0x56,0x62,0x63,0x64,0x65,0x0e,0x67,0x68,0x4f,0x6a,0x4b,0x47,0x6d,0x6e,0x6f,		/* 60-6f */
-#endif
+{ 0xff,0x43,0x02,0x3f,0x3d,0x3b,0x3c,0x58,0x64,0x44,0x42,0x40,0x3e,0x0f,0x29,0x59,		/* 00-0f */
+  0x65,0x38,0x2a,0x70,0x1d,0x10,0x02,0x5A,0x66,0x71,0x2c,0x1f,0x1e,0x11,0x03,0x5b,		/* 10-1f */
+  0x20,0x2e,0x2d,0x20,0x12,0x05,0x04,0x5c,0x68,0x39,0x2f,0x21,0x14,0x13,0x06,0x5d,		/* 20-2f */
+  0x69,0x31,0x30,0x23,0x22,0x15,0x07,0x5e,0x6a,0x72,0x32,0x24,0x16,0x08,0x09,0x5f,		/* 30-3f */
+  0x6b,0x33,0x25,0x17,0x18,0x0b,0x0a,0x60,0x6c,0x34,0x35,0x26,0x27,0x19,0x0c,0x61,		/* 40-4f */
+  0x6d,0x73,0x28,0x74,0x1a,0x0d,0x62,0x6e,0x3a,0x36,0x1c,0x1b,0x75,0x2b,0x6e,0x76,		/* 50-5f */
+  0x55,0x56,0x77,0x78,0x79,0x7a,0x0e,0x7b,0x7c,0x4f,0x7d,0x4b,0x47,0x7e,0x7f,0x6f,    		/* 60-6f */
   0x52,0x53,0x50,0x4c,0x4d,0x48,0x01,0x45,0x57,0x4e,0x51,0x4a,0x37,0x49,0x46,0x54,		/* 70-7f */
   0x80,0x81,0x82,0x41,0x54,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,		/* 80-8f */
   0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,		/* 90-9f */
@@ -516,23 +440,18 @@ static half_word trans_8042 [256] =
 };
 
 #ifndef REAL_KBD
+/*
+ * Index with Scancode Set 3 to get keyboard position number.
+ */
 static half_word set_3_reverse_lookup [256]=
 { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x70,0x6e,0x00,0x00,0x00,0x00,0x10,0x01,0x71,		/* 00-0f */
   0x00,0x3a,0x2c,0x2d,0x1e,0x11,0x02,0x72,0x00,0x3c,0x2e,0x20,0x1f,0x12,0x03,0x73,		/* 10-1f */
   0x00,0x30,0x2f,0x21,0x13,0x05,0x04,0x74,0x00,0x3d,0x31,0x22,0x15,0x14,0x06,0x75,		/* 20-2f */
   0x00,0x33,0x32,0x24,0x23,0x16,0x07,0x76,0x00,0x3e,0x34,0x25,0x17,0x08,0x09,0x77,		/* 30-3f */
   0x00,0x35,0x26,0x18,0x19,0x0b,0x0a,0x78,0x00,0x36,0x37,0x27,0x28,0x1a,0x0c,0x79,		/* 40-4f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x00,0x38,0x29,0x2a,0x1b,0x0d,0x7a,0x7c,0x40,0x39,0x2b,0x1c,0x1d,0x00,0x7b,0x7d,		/* 50-5f */
-#else
-  0x00,0x00,0x29,0x2a,0x1b,0x0d,0x7a,0x7c,0x40,0x39,0x2b,0x1c,0x1d,0x00,0x7b,0x7d,		/* 50-5f */
-#endif
-  0x54,0x4f,0x7e,0x53,0x4c,0x51,0x0f,0x4b,0x00,0x5d,0x59,0x5c,0x5b,0x56,0x50,0x55,		/* 60-6f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x63,0x68,0x62,0x61,0x66,0x60,0x5a,0x5f,0x00,0x6c,0x67,0x6b,0x6a,0x65,0x64,0x00,		/* 70-7f */
-#else
-  0x63,0x68,0x62,0x61,0x66,0x60,0x5a,0x5f,0x00,0x6c,0x67,0x00,0x6a,0x65,0x64,0x00,		/* 70-7f */
-#endif
+  0x00,0x38,0x29,0x2a,0x1b,0x0d,0x7a,0x7c,0x40,0x39,0x2b,0x1c,0x1d,0x00,0x7b,0x7d,		/* 50-5f (*56) */
+  0x54,0x4f,0x7e,0x53,0x4c,0x51,0x0f,0x4b,0x5e,0x5d,0x59,0x5c,0x5b,0x56,0x50,0x55,		/* 60-6f (*94) */
+  0x63,0x68,0x62,0x61,0x66,0x60,0x5a,0x5f,0x00,0x6c,0x67,0x6b,0x6a,0x65,0x64,0x00,		/* 70-7f (*107) */
   0x00,0x00,0x00,0x00,0x69,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,		/* 80-8f */
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,		/* 90-9f */
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,		/* a0-af */
@@ -543,79 +462,54 @@ static half_word set_3_reverse_lookup [256]=
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 		/* f0-ff */
 };
 
+/*
+ * index by key number to get default key state:
+ *   0 = not a key, 1 = typematic,  2 = make/break,  3 = make only
+ */
 static half_word set_3_default_key_state [127]=
-{ 0x00,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0x01,		/* 00-0f */
+{ 0x00,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,		/* 00-0f */
   0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x02,0x01,		/* 10-1f */
   0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x02,0x01,0x01,0x01,		/* 20-2f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x02,0x02,0x00,0x02,0x01,0x03,0x00,		/* 30-3f */
-#else
-  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0x02,0x02,0x00,0x02,0x01,0x03,0x00,		/* 30-3f */
-#endif
+  0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x02,0x02,0x00,0x02,0x01,0x03,0x00,		/* 30-3f (*56) */
   0x03,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0x01,0x00,0x00,0x01,		/* 40-4f */
-  0x03,0x03,0x00,0x01,0x01,0x03,0x03,0x00,0x00,0x01,0x03,0x03,0x03,0x03,0x00,0x03,		/* 50-5f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x01,0x03,0x03,0x00,0x03,0x00,		/* 60-6f */
-#else
-  0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x01,0x00,0x03,0x00,0x03,0x00,		/* 60-6f */
-#endif
+  0x03,0x03,0x00,0x01,0x01,0x03,0x03,0x00,0x00,0x01,0x03,0x03,0x03,0x03,0x03,0x03,		/* 50-5f */
+  0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x01,0x01,0x03,0x00,0x03,0x00,		/* 60-6f (*107) */
   0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03,0x03           		/* 70-7d */
 };
 
+/*
+ * Index by key number, to get scancode set 1 (0 if none)
+ */
 static half_word most_set_1_make_codes [127]=
-{ 0x00,0x29,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x00,0x0e,		/* 00-0f */
+{ 0x00,0x29,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x7d,0x0e,		/* 00-0f */
   0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x2b,0x3a,0x1e,		/* 10-1f */
   0x1f,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x2b,0x1c,0x2a,0x56,0x2c,0x2d,		/* 20-2f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x2e,0x2f,0x30,0x31,0x32,0x33,0x34,0x35,0x73,0x36,0x1d,0x00,0x38,0x39,0x38,0x00,		/* 30-3f */
-#else
-  0x2e,0x2f,0x30,0x31,0x32,0x33,0x34,0x35,0x00,0x36,0x1d,0x00,0x38,0x39,0x38,0x00,		/* 30-3f */
-#endif
+  0x2e,0x2f,0x30,0x31,0x32,0x33,0x34,0x35,0x73,0x36,0x1d,0x00,0x38,0x39,0x38,0x00,		/* 30-3f (*56) */
   0x1d,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x52,0x53,0x00,0x00,0x4b,		/* 40-4f */
-  0x47,0x4f,0x00,0x48,0x50,0x49,0x51,0x00,0x00,0x4d,0x45,0x47,0x4b,0x4f,0x00,0x35,		/* 50-5f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x48,0x4c,0x50,0x52,0x37,0x49,0x4d,0x51,0x53,0x4a,0x4e,0x7e,0x1c,0x00,0x01,0x00,		/* 60-6f */
-#else
-  0x48,0x4c,0x50,0x52,0x37,0x49,0x4d,0x51,0x53,0x4a,0x4e,0x00,0x1c,0x00,0x01,0x00,		/* 60-6f */
-#endif
+  0x47,0x4f,0x00,0x48,0x50,0x49,0x51,0x00,0x00,0x4d,0x45,0x47,0x4b,0x4f,0x7c,0x35,		/* 50-5f */
+  0x48,0x4c,0x50,0x52,0x37,0x49,0x4d,0x51,0x53,0x4a,0x4e,0x7e,0x1c,0x00,0x01,0x00,		/* 60-6f (*107) */
   0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x58,0x00,0x46,0x00			/* 70-7e */
 };
 
 static half_word most_set_2_make_codes [127]=
-{ 0x00,0x0e,0x16,0x1e,0x26,0x25,0x2e,0x36,0x3d,0x3e,0x46,0x45,0x4e,0x55,0x00,0x66,		/* 00-0f */
+{ 0x00,0x0e,0x16,0x1e,0x26,0x25,0x2e,0x36,0x3d,0x3e,0x46,0x45,0x4e,0x55,0x6a,0x66,		/* 00-0f */
   0x0d,0x15,0x1d,0x24,0x2d,0x2c,0x35,0x3c,0x43,0x44,0x4d,0x54,0x5b,0x5d,0x58,0x1c,		/* 10-1f */
   0x1b,0x23,0x2b,0x34,0x33,0x3b,0x42,0x4b,0x4c,0x52,0x5d,0x5a,0x12,0x61,0x1a,0x22,		/* 20-2f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x21,0x2a,0x32,0x31,0x3a,0x41,0x49,0x4a,0x51,0x59,0x14,0x00,0x11,0x29,0x11,0x00,		/* 30-3f */
-#else
-  0x21,0x2a,0x32,0x31,0x3a,0x41,0x49,0x4a,0x00,0x59,0x14,0x00,0x11,0x29,0x11,0x00,		/* 30-3f */
-#endif
+  0x21,0x2a,0x32,0x31,0x3a,0x41,0x49,0x4a,0x51,0x59,0x14,0x00,0x11,0x29,0x11,0x00,		/* 30-3f (*56) */
   0x14,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x70,0x71,0x00,0x00,0x6b,		/* 40-4f */
-  0x6c,0x69,0x00,0x75,0x72,0x7d,0x7a,0x00,0x00,0x74,0x77,0x6c,0x6b,0x69,0x00,0x4a,		/* 50-5f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x75,0x73,0x72,0x70,0x7c,0x7d,0x74,0x7a,0x71,0x7b,0x79,0x6d,0x5a,0x00,0x76,0x00,		/* 60-6f */
-#else
-  0x75,0x73,0x72,0x70,0x7c,0x7d,0x74,0x7a,0x71,0x7b,0x79,0x00,0x5a,0x00,0x76,0x00,		/* 60-6f */
-#endif
+  0x6c,0x69,0x00,0x75,0x72,0x7d,0x7a,0x00,0x00,0x74,0x77,0x6c,0x6b,0x69,0x68,0x4a,		/* 50-5f */
+  0x75,0x73,0x72,0x70,0x7c,0x7d,0x74,0x7a,0x71,0x7b,0x79,0x6d,0x5a,0x00,0x76,0x00,		/* 60-6f (*107) */
   0x05,0x06,0x04,0x0c,0x03,0x0b,0x83,0x0a,0x01,0x09,0x78,0x07,0x00,0x7e,0x00			/* 70-7e */
 };
 
 static half_word most_set_3_make_codes [127]=
-{ 0x00,0x0e,0x16,0x1e,0x26,0x25,0x2e,0x36,0x3d,0x3e,0x46,0x45,0x4e,0x55,0x00,0x66,		/* 00-0f */
+{ 0x00,0x0e,0x16,0x1e,0x26,0x25,0x2e,0x36,0x3d,0x3e,0x46,0x45,0x4e,0x55,0x5d,0x66,		/* 00-0f */
   0x0d,0x15,0x1d,0x24,0x2d,0x2c,0x35,0x3c,0x43,0x44,0x4d,0x54,0x5b,0x5c,0x14,0x1c,		/* 10-1f */
   0x1b,0x23,0x2b,0x34,0x33,0x3b,0x42,0x4b,0x4c,0x52,0x53,0x5a,0x12,0x13,0x1a,0x22,		/* 20-2f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x21,0x2a,0x32,0x31,0x3a,0x41,0x49,0x4a,0x51,0x59,0x11,0x00,0x19,0x29,0x39,0x00,		/* 30-3f */
-#else
-  0x21,0x2a,0x32,0x31,0x3a,0x41,0x49,0x4a,0x00,0x59,0x11,0x00,0x19,0x29,0x39,0x00,		/* 30-3f */
-#endif
+  0x21,0x2a,0x32,0x31,0x3a,0x41,0x49,0x4a,0x51,0x59,0x11,0x00,0x19,0x29,0x39,0x00,		/* 30-3f (*56) */
   0x58,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x67,0x64,0x00,0x00,0x61,		/* 40-4f */
-  0x6e,0x65,0x00,0x63,0x60,0x6f,0x6d,0x00,0x00,0x6a,0x76,0x6c,0x6b,0x69,0x00,0x77,		/* 50-5f */
-#ifdef BRAZILIAN_ABNT_KBD
-  0x75,0x73,0x72,0x70,0x7e,0x7d,0x74,0x7a,0x71,0x84,0x7c,0x7b,0x79,0x00,0x08,0x00,		/* 60-6f */
-#else
-  0x75,0x73,0x72,0x70,0x7e,0x7d,0x74,0x7a,0x71,0x84,0x7c,0x00,0x79,0x00,0x08,0x00,		/* 60-6f */
-#endif
+  0x6e,0x65,0x00,0x63,0x60,0x6f,0x6d,0x00,0x00,0x6a,0x76,0x6c,0x6b,0x69,0x68,0x77,		/* 50-5f */
+  0x75,0x73,0x72,0x70,0x7e,0x7d,0x74,0x7a,0x71,0x84,0x7c,0x7b,0x79,0x00,0x08,0x00,		/* 60-6f (*107) */
   0x07,0x0f,0x17,0x1f,0x27,0x2f,0x37,0x3f,0x47,0x4f,0x56,0x5e,0x57,0x5f,0x62			/* 70-7e */
 };
 
@@ -696,7 +590,7 @@ static half_word set_3_extra_bk_codes []=
 #endif
 
 static half_word buff_overrun_6805 [4]=
-{ 
+{
   0,0xff,0,0
 };
 
@@ -960,9 +854,6 @@ LOCAL VOID add_to_6805_buff IFN2(half_word,code,int, immediate)
       }
    calc_buff_6805_left();
 
-#ifdef NTVDM	/* JonLe NTVDM Mod */
-   KbdHdwFull = BUFF_6805_VMAX - free_6805_buff_size;
-#endif	/* NTVDM */
 
    } /* end of add_to_6805_buff */
 
@@ -972,9 +863,6 @@ half_word ch;
 
 ch=buff_6805[buff_6805_out_ptr];
 
-#ifdef NTVDM
-	key_marker_buffer[buff_6805_out_ptr]=0;
-#endif
 
 if (buff_6805_out_ptr != buff_6805_in_ptr)
 	{
@@ -982,9 +870,6 @@ if (buff_6805_out_ptr != buff_6805_in_ptr)
 	}
 calc_buff_6805_left();
 
-#ifdef NTVDM
-   KbdHdwFull = BUFF_6805_VMAX - free_6805_buff_size;
-#endif	/* NTVDM */
 
 return (ch);
 } /* end of remove_from_6805_buff */
@@ -1004,171 +889,13 @@ LOCAL VOID clear_buff_6805 IFN0()
 	buff_6805_in_ptr=buff_6805_out_ptr;
 	free_6805_buff_size=BUFF_6805_VMAX;
 
-#ifdef NTVDM
-    KbdHdwFull = BUFF_6805_VMAX - free_6805_buff_size;
-
-    /* Clear key marker buffer */
-    {
-	register int loop = sizeof(key_marker_buffer) / sizeof(unsigned char);
-	while(--loop >= 0) key_marker_buffer[loop] = 0;
-    }
-#endif	/* NTVDM */
 }
 
-#ifdef NTVDM
-
-#define ONECHARCODEMASK (0x80)
-
-LOCAL VOID mark_key_codes_6805_buff IFN1(int, start)
-{
-   static int start_offset;
-
-   /* Room in buffer */
-   if(((buff_6805_out_ptr -1)& BUFF_6805_PMASK) != buff_6805_in_ptr)
-   {
-
-	/* Bump key start/end marker is start of seq */
-	if(start)
-	{
-	    start_offset = buff_6805_in_ptr;
-	    if(++key_marker_value > 127) key_marker_value = 1;
-	}
-	else
-	{
-	    /* End of seq, mark first & last byte */
-
-	    if(start_offset != buff_6805_in_ptr)
-	    {
-
-		key_marker_buffer[start_offset] = key_marker_value;
-
-		if(((buff_6805_in_ptr -1)& BUFF_6805_PMASK) == start_offset)
-		{
-		key_marker_buffer[(buff_6805_in_ptr -1)& BUFF_6805_PMASK] =
-				  key_marker_value | ONECHARCODEMASK;
-		}
-		else
-		{
-		/* mult byte seq */
-
-		key_marker_buffer[(buff_6805_in_ptr -1)& BUFF_6805_PMASK] =
-				  key_marker_value;
-		}
-	    }
-	}
-   }
-}
-
-/*
- * This function returns the number of keys in the 6805 buffers
- * and also clears down these buffers 
- */
-
-GLOBAL int keys_in_6805_buff(int *part_key_transferred)
-{
-    int keys_in_buffer = held_event_count;  /* key to yet processed by adapter */
-    int tmp_6805_out_ptr;
-    char last_marker = 0;
-
-    *part_key_transferred = FALSE;
-
-    for(tmp_6805_out_ptr = buff_6805_out_ptr;
-	tmp_6805_out_ptr != buff_6805_in_ptr;
-	tmp_6805_out_ptr = (tmp_6805_out_ptr +1) & BUFF_6805_PMASK)
-    {
-	if(key_marker_buffer[tmp_6805_out_ptr] != 0)
-	{
-	    if(last_marker == 0)
-	    {
-		/* start of key seq found */
-		if(key_marker_buffer[tmp_6805_out_ptr] & ONECHARCODEMASK)
-		    keys_in_buffer++; /* one byte seq	    else */
-		    last_marker = key_marker_buffer[tmp_6805_out_ptr];
-	    }
-	    else
-	    {
-		if(key_marker_buffer[tmp_6805_out_ptr] == last_marker)
-		{
-		    keys_in_buffer++;/* End of key seq found, bump key count */
-		    last_marker = 0; /* no longer in middle of key seq */
-		}
-		else
-		{
-		    /* Scan terminate early, part key seq found */
-		    *part_key_transferred = TRUE;
-		    last_marker = key_marker_buffer[tmp_6805_out_ptr];
-		}
-	    }
-	}
-    }
-
-    /* Terminated scan in middle of key seq ??? */
-    if(last_marker) *part_key_transferred = TRUE;
-
-
-    /* Is there currently a key in the one char 8042 buffer */
-    if(output_full)
-    {
-	keys_in_buffer++;
-    }
-
-    Reset6805and8042();
-
-    return(keys_in_buffer);
-}
-
-void Reset6805and8042(void)
-{
-    int key;
-
-    /* Reset 6805 */
-
-    buff_6805_out_ptr=0;
-    clear_buff_6805();
-    current_light_pattern=0;
-
-    //Removed, function call attempts to push characters back into
-    //the keyboard adapter, just as we are trying to reset it.
-    //This problem could be fixed by clearing the keyboard interrupt
-    //line after the following function call (DAB)
-    //host_kb_light_on(7);
-
-    for(key = 0; key < 127; key++)
-    {
-	set_3_key_state [key] = set_3_default_key_state[key];
-	key_down_count[key]=0;
-    }
-
-    waiting_for_next_code=waiting_for_next_8042_code=FALSE;
-
-    shift_on = l_shift_on = r_shift_on = FALSE;
-    ctrl_on = l_ctrl_on = r_ctrl_on = FALSE;
-    alt_on = l_alt_on = r_alt_on = FALSE;
-    waiting_for_upcode = FALSE;
-
-    /* Reset 8042 */
-
-    kbd_status = 0x14;
-    cmd_byte_8042 = 0x45;
-    keyboard_disabled = keyboard_interface_disabled = FALSE;
-    op_port_remembered_bits = 0xc;
-
-    pending_8042 = output_full = in_anomalous_state = FALSE;
-    int_enabled = translating = TRUE;
-    scanning_discontinued = FALSE;
-    held_event_count = 0;
-
-    //Removed by (DAB)
-    //host_kb_light_off (5);
-    num_lock_on = TRUE;
-}
-
-#endif /* NTVDM */
 
 LOCAL VOID calc_buff_6805_left IFN0()
 {
 free_6805_buff_size = BUFF_6805_VMAX-((buff_6805_in_ptr - buff_6805_out_ptr) & BUFF_6805_PMASK);
-if (free_6805_buff_size<0) 
+if (free_6805_buff_size<0)
 	{
 	free_6805_buff_size=0;
 	sure_note_trace0(AT_KBD_VERBOSE,"Keyboard buffer full");
@@ -1363,25 +1090,10 @@ if (scanning_discontinued)
 		always_trace0("host_key_down held event buffer overflow");
 		}
 	}
-#ifdef NTVDM
-else if (!keyboard_disabled) {
-       //
-       // Ignore contiguous repeat keys if keys are still in the 6805
-       // this keeps the apps responsive to the corresponding up key
-       // when it comes.
-       //
-       if (LastKeyDown != key || (KbdHdwFull < 8)) {
-           LastKeyDown = key;
-           key_down_count[key]++;
-           do_host_key_down(key);
-           }
-    }
-#else
 else
 	{
 	do_host_key_down(key);
 	}
-#endif
 }
 
 GLOBAL VOID host_key_up IFN1(int,key)
@@ -1418,39 +1130,12 @@ if (scanning_discontinued)
 		always_trace0("host_key_up held event buffer overflow");
 		}
 	}
-#ifdef NTVDM
-else if (!keyboard_disabled && key_down_count[key]) {
-#else
 else
 	{
-#endif
-#ifdef NTVDM
-       LastKeyDown = -1;
-#endif
 	do_host_key_up(key);
 	}
 }
 
-#ifdef NTVDM
-GLOBAL VOID RaiseAllDownKeys(VOID)
-{
-   int i;
-
-   i = sizeof(key_down_count)/sizeof(int);
-   while (i--) {
-       if (key_down_count[i]) {
-           host_key_up(i);
-           }
-       }
-}
-
-GLOBAL int IsKeyDown(int Key)
-{
-   return  key_down_count[Key];
-}
-
-
-#endif /* NTVDM */
 
 LOCAL VOID do_host_key_down IFN1(int,key)
 {
@@ -1461,9 +1146,6 @@ sure_note_trace1(AT_KBD_VERBOSE,"key down:%d",key);
 if (!keyboard_disabled)
 	{
 
-#ifdef NTVDM
-		mark_key_codes_6805_buff(TRUE);
-#else
 	key_down_count[key]++;
         if (key_down_count[key]==1)
                 {       /* first press */
@@ -1471,7 +1153,6 @@ if (!keyboard_disabled)
 		repeat_count=0;
                 typematic_key_valid=FALSE;
 
-#endif	/* NTVDM */
 		keytype=keytypes[key];
 		overrun=FALSE;
 		if (in_anomalous_state)
@@ -1532,7 +1213,7 @@ if (!keyboard_disabled)
 					anomalous_size=break_sizes[R_SHIFT_ADD];
 					    }
 				    if (scan_code_6805_size+make_sizes[keytype] >free_6805_buff_size)
-					    { 
+					    {
 					    overrun=TRUE;
 					    in_anomalous_state=FALSE;
 					    }
@@ -1566,7 +1247,7 @@ if (!keyboard_disabled)
 					anomalous_size=break_sizes[R_SHIFT_ADD];
 					    }
 				    if (scan_code_6805_size+make_sizes[keytype] >free_6805_buff_size)
-					    { 
+					    {
 					    overrun=TRUE;
 					    in_anomalous_state=FALSE;
 					    }
@@ -1618,7 +1299,7 @@ if (!keyboard_disabled)
 		if (overrun)
 			{
 			if (!sent_overrun)
-				add_to_6805_buff(buff_overrun_6805[key_set], 
+				add_to_6805_buff(buff_overrun_6805[key_set],
 					QUEUED_OUTPUT);
 			sent_overrun=TRUE;
 
@@ -1659,7 +1340,6 @@ if (!keyboard_disabled)
 			    break;
 		    }
 
-#ifndef NTVDM	/* JonLe NTVDM Mod */
 
 		if (key!=126)
 		    {
@@ -1669,18 +1349,13 @@ if (!keyboard_disabled)
 			    typematic_key_valid = TRUE;
 			    }
 		    }
-#else
-		mark_key_codes_6805_buff(FALSE);
-#endif	/* NTVDM */
 
-		if (free_6805_buff_size < BUFF_6805_VMAX) 
+		if (free_6805_buff_size < BUFF_6805_VMAX)
 		    {
 		    codes_to_translate();
 		    }
 
-#ifndef NTVDM
 		} /* end of if first press */
-#endif	/* NTVDM */
 
 	} /* end of if not disabled */
 } /* end of do_host_key_down */
@@ -1707,24 +1382,19 @@ if (!keyboard_disabled)
 		sure_note_trace1( AT_KBD_VERBOSE, "Ignored extra key up:%d", key );
 #endif
 	}
-	else 
+	else
 	{
 		key_down_count[key] =  0;
 
-#ifndef NTVDM 	/* JonLe NTVDM Mod */
 		if ((key==typematic_key) && typematic_key_valid)
 			{
 			typematic_key_valid=FALSE;
 			}
-#endif	/* NTVDM */
 
 		keytype=keytypes[key];
 		overrun=FALSE;
 		if (!(key_set ==3) || (set_3_key_state[key]==2) || (set_3_key_state[key]==4))
 			{
-#ifdef NTVDM
-			mark_key_codes_6805_buff(TRUE);
-#endif
 			switch (keytype)
 				{
 				case 0:
@@ -1735,6 +1405,7 @@ if (!keyboard_disabled)
 					break;
 				case 2:
 					temp_arr_size=0;
+                                        temp_arr_array=(half_word *) -1;
 					if (in_anomalous_state && (anom_key == key))
 						{
 						in_anomalous_state=FALSE;
@@ -1766,10 +1437,12 @@ if (!keyboard_disabled)
 						add_codes_to_6805_buff(scan_code_6805_size,scan_code_6805_array);
 						}
 					scan_code_6805_size=temp_arr_size;
-					scan_code_6805_array=temp_arr_array;
-					break;
+                                        scan_code_6805_array=temp_arr_array;
+                                        break;
+
 				case 3:
 					temp_arr_size=0;
+                                        temp_arr_array=(half_word *) -1;
 					if (in_anomalous_state && (anom_key == key))
 						{
 						in_anomalous_state = FALSE;
@@ -1796,8 +1469,9 @@ if (!keyboard_disabled)
 						add_codes_to_6805_buff(scan_code_6805_size,scan_code_6805_array);
 						}
 					scan_code_6805_size=temp_arr_size;
-					scan_code_6805_array=temp_arr_array;
-					break;
+                                        scan_code_6805_array=temp_arr_array;
+                                        break;
+
 				case 4:
 					if (shift_on || ctrl_on || alt_on)
 						{
@@ -1843,9 +1517,6 @@ if (!keyboard_disabled)
 				{
 				add_codes_to_6805_buff(scan_code_6805_size,scan_code_6805_array);
 				}
-#ifdef NTVDM
-			mark_key_codes_6805_buff(FALSE);
-#endif
 			} /* end of if not set 3 etc. */
 		switch (key)
 			{
@@ -1875,7 +1546,7 @@ if (!keyboard_disabled)
 				break;
 			} /* end of switch */
 
-		if (free_6805_buff_size < BUFF_6805_VMAX) 
+		if (free_6805_buff_size < BUFF_6805_VMAX)
 			{
 			codes_to_translate();
 			}
@@ -1884,20 +1555,7 @@ if (!keyboard_disabled)
 } /* end of do_host_key_up */
 #endif /* REAL_KBD */
 
-#ifdef NTVDM
-        /*
-         *  force filling of Kbd data port just like the real kbd
-         *  since we no longer clear output_full in the Kbd_inb routine
-         */
-LOCAL VOID AddTo6805BuffImm IFN1(half_word,code)
-{
-  add_to_6805_buff(code,IMMEDIATE_OUTPUT);
-  output_full = FALSE;
-  KbdData = -1;
-}
-#else
 #define  AddTo6805BuffImm(code) add_to_6805_buff(code, IMMEDIATE_OUTPUT);
-#endif
 
 LOCAL VOID cmd_to_6805 IFN1(half_word,cmd_code)
 {
@@ -1938,24 +1596,19 @@ if (waiting_for_next_code)
 			sure_note_trace2(AT_KBD_VERBOSE,"Keyboard key type change: key 0x%x, new type %d",cmd_code,set_3_key_type_change_dest);
                         AddTo6805BuffImm(ACK_CODE);
 			key_to_change=set_3_reverse_lookup[cmd_code];
-			set_3_key_state[key_to_change]=set_3_key_type_change_dest;
+			set_3_key_state[key_to_change]=(half_word)set_3_key_type_change_dest;
 			break;
 		case SET_STATUS_INDICATORS_SEQUENCE:
 			if ((cmd_code & 0xf8) == 0)
 			{
 			sure_note_trace1(AT_KBD_VERBOSE,"Changing kbd lights to :%x",cmd_code);
 			AddTo6805BuffImm(ACK_CODE);
-#ifdef NTVDM
-			host_kb_light_on ((cmd_code & 0x07) | 0xf0);
-#else
 			cmd_code &= 0x7;
 			host_kb_light_on (cmd_code);
 			host_kb_light_off ((~cmd_code)&0x7);
-#endif
 			}
 			break;
 		case SET_RATE_DELAY_SEQUENCE:
-#ifndef NTVDM	/* JonLe Mod */
 			if ((cmd_code & 0x80)==0)
 			{
 			repeat_delay_target = (1+((cmd_code>>5)&3))*BASE_DELAY_UNIT;
@@ -1969,14 +1622,6 @@ if (waiting_for_next_code)
 			}
 			sure_note_trace2(AT_KBD_VERBOSE,"Changing kbd rate/delay: rate = %d, dealy=%d ",repeat_target,repeat_delay_target);
 
-#else	/* NTVDM */
-
-			if ((cmd_code & 0x80)==0)
-			{
-                        AddTo6805BuffImm(ACK_CODE);
-			}
-
-#endif	/* NTVDM */
 			break;
 		}
 		waiting_for_next_code = FALSE;
@@ -2004,11 +1649,9 @@ if (waiting_for_next_code)
 			set_3_key_state[key_to_change]=set_3_default_key_state[key_to_change];
 			}
 
-#ifndef NTVDM 	/* JonLe NTVDM Mod */
 		repeat_delay_target=2*BASE_DELAY_UNIT;
 		repeat_target=DEFAULT_REPEAT_TARGET;
 		typematic_key_valid=FALSE;
-#endif	/* NTVDM */
 
 		keyboard_disabled=TRUE;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard disabled");
@@ -2022,9 +1665,7 @@ if (waiting_for_next_code)
 		clear_buff_6805 ();
                 AddTo6805BuffImm(ACK_CODE);
 
-#ifndef NTVDM 	/* JonLe NTVDM Mod */
 		typematic_key_valid=FALSE;
-#endif	/* NTVDM */
 
 		keyboard_disabled=FALSE;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard enabled");
@@ -2060,9 +1701,7 @@ if (waiting_for_next_code)
 		clear_buff_6805 ();
                 AddTo6805BuffImm(ACK_CODE);
 
-#ifndef NTVDM 	/* JonLe NTVDM Mod */
 		typematic_key_valid=FALSE;
-#endif	/* NTVDM */
 
 		next_code_sequence_number=SCAN_CODE_CHANGE_SEQUENCE;
 		held_event_count=0;
@@ -2090,11 +1729,9 @@ if (waiting_for_next_code)
 			set_3_key_state[key_to_change]=set_3_default_key_state[key_to_change];
 			}
 
-#ifndef NTVDM 	/* JonLe NTVDM Mod */
 		repeat_delay_target=2*BASE_DELAY_UNIT;
 		repeat_target=DEFAULT_REPEAT_TARGET;
 		typematic_key_valid=FALSE;
-#endif	/* NTVDM */
 		keyboard_disabled=FALSE;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard set to default (and enabled)");
 		break;
@@ -2105,9 +1742,7 @@ if (waiting_for_next_code)
 		clear_buff_6805 ();
                 AddTo6805BuffImm(ACK_CODE);
 
-#ifndef NTVDM 	/* JonLe NTVDM Mod */
 		typematic_key_valid=FALSE;
-#endif	/* NTVDM */
 
 		next_code_sequence_number=SET_3_KEY_TYPE_SET_SEQUENCE;
 		held_event_count=0;
@@ -2171,121 +1806,15 @@ if (scanning_discontinued && !waiting_for_next_code)
 	}
 #endif
 
-#ifndef NTVDM
-if (free_6805_buff_size < BUFF_6805_VMAX) 
+if (free_6805_buff_size < BUFF_6805_VMAX)
 	{
 	codes_to_translate();
         }
-#endif
 
 } /* end of cmd_to_6805 */
 
 /* interface to interrupts */
 
-#ifdef NTVDM	/* JonLe NTVDM Mod */
-
-
-
-/* KbdIntDelay
- *
- * UNDER ALL CONDITIONS we must provide a SAFE key rate that 16 bit apps
- * can handle. This must be done without looking at the bios buffer,
- * since not all apps use the bios int 9 handler.
- *
- */
-
-LOCAL VOID KbdIntDelay(VOID)
-{
-
-
-       //
-       // Wait until the kbd scancode has been read,
-       // before invoking the next interrupt.
-       //
-   if (bKbdEoiPending)
-       return;
-
-
-   if (int_enabled) {
-       bKbdEoiPending = TRUE;
-
-       if (!bForceDelayInts) {
-           kbd_status |= 1;
-           ica_hw_interrupt(KEYBOARD_INT_ADAPTER, KEYBOARD_INT_LINE, 1);
-           }
-       else {
-           ULONG ulDelay = 2000;
-
-           if (bKbdIntHooked) {
-               ulDelay += 2000;
-               }
-
-           if (KbdHdwFull > 8) {
-               ulDelay += 4000;
-               }
-
-           if (!bBiosBufferSpace) {
-               ulDelay += 4000;
-               }
-
-           if (!bPifFastPaste) {
-               ulDelay <<= 1;
-               }
-
-           bDelayIntPending = TRUE;
-           host_DelayHwInterrupt(KEYBOARD_INT_LINE,
-                                 1,
-                                 ulDelay
-                                 );
-           }
-
-       HostIdleNoActivity();
-       }
-}
-
-
-
-//This function is called by the ICA with the ica lock
-void KbdEOIHook(int IrqLine, int CallCount)
-{
-
-   if (!bKbdEoiPending)  // sanity
-       return;
-
-   if (!bBiosOwnsKbdHdw && WaitKbdHdw(0xffffffff))  {
-       bKbdEoiPending = FALSE;
-       return;
-       }
-
-   bKbdIntHooked = KbdInt09Off != *(word *)(Start_of_M_area+0x09*4) ||
-                   KbdInt09Seg != *(word *)(Start_of_M_area+0x09*4+2);
-
-   bBiosBufferSpace = bBiosOwnsKbdHdw &&
-                      (bios_buffer_size() < (bPifFastPaste ? 8 : 2));
-
-   output_full = FALSE;
-   bKbdEoiPending = FALSE;
-
-   bForceDelayInts = TRUE;
-   continue_output();
-   bForceDelayInts = FALSE;
-
-   if (!bBiosOwnsKbdHdw)
-        HostReleaseKbd();
-}
-
-
-
-
-LOCAL VOID do_q_int(char scancode)
-{
-   output_full = TRUE;
-   output_contents = scancode;
-
-   KbdIntDelay();
-}
-
-#else   /* NTVDM */
 
 LOCAL VOID do_int IFN1(long,scancode)
 {
@@ -2308,7 +1837,7 @@ LOCAL VOID do_q_int IFN1(char,scancode)
 		do_int ((long) scancode);
 	}
 
-#else /* !IRET_HOOKS || !GISP_CPU */ 
+#else /* !IRET_HOOKS || !GISP_CPU */
 
 #ifdef DELAYED_INTS
 	do_int ((long) scancode);
@@ -2358,12 +1887,12 @@ if (typematic_key_valid)
 
 } /* end of do_key_repeats */
 
-#endif	/* NTVDM */
 
 
 LOCAL VOID cmd_to_8042  IFN1(half_word,cmd_code)
 {
 int code_to_send,code_to_send_valid;
+
 
 sure_note_trace1(AT_KBD_VERBOSE,"8042 received cmd:0x%x",cmd_code);
 
@@ -2421,12 +1950,7 @@ if (waiting_for_next_8042_code)
 #ifdef PM
 				   if ( !gate_a20_status )
 				      {
-#ifdef NTVDM
-				      /* call xms function to deal with A20 */
-				      xmsDisableA20Wrapping();
-#else
 				      sas_disable_20_bit_wrapping();
-#endif /* NTVDM */
 				      gate_a20_status = 1;
 					}
 				   }
@@ -2434,11 +1958,7 @@ if (waiting_for_next_8042_code)
 				   {
 				   if ( gate_a20_status )
 				      {
-#ifdef NTVDM
-				      xmsEnableA20Wrapping();
-#else
 				      sas_enable_20_bit_wrapping();
-#endif /* NTVDM */
 				      gate_a20_status = 0;
 				      }
 #else
@@ -2562,9 +2082,7 @@ if (!waiting_for_next_8042_code)
 				{
 				/* pulse the reset line */
 #ifdef PM
-#ifndef NTVDM
 				reset_was_by_kbd = TRUE;
-#endif
 #ifdef CPU_30_STYLE
 				cpu_interrupt(CPU_HW_RESET, 0);
 #else /* CPU_30_STYLE */
@@ -2586,22 +2104,14 @@ else
 	}
 
 	
-/*Is there a valid code to put in the 8042 output buffer? Values written 
+/*Is there a valid code to put in the 8042 output buffer? Values written
   to the 8042 output buffer as a conseqence of a 8042 command do not
-	generate an interrupt. Output generated by 8042 commands must be presented to 
-	the application at the next INB, failure to do so it likely to result in the 
+	generate an interrupt. Output generated by 8042 commands must be presented to
+	the application at the next INB, failure to do so it likely to result in the
   8042 being placed in an unusable state. */
 
 if (code_to_send_valid)
 	{
-#ifdef NTVDM
-        /*
-         *  force filling of Kbd data port just like the real kbd
-         *  since we no longer clear output_full in the Kbd_inb routine
-         */
-        output_full = FALSE;
-        KbdData = -1;
-#else /* NTVDM else */
 
 	/* Transfer 8042 command output to output buffer, overwriting value
 	   already in the buffer. */
@@ -2609,7 +2119,6 @@ if (code_to_send_valid)
 		output_contents = (char)code_to_send;
 		kbd_status |= 1;			/* Character now available! */
 
-#endif /* end of NTVDM else */
 	}
 
 } /* end of cmd_to_8042 */
@@ -2744,11 +2253,6 @@ GLOBAL VOID continue_output IFN0()
 {
 char tempscan;
 
-#ifdef NTVDM
-if (bKbdEoiPending || keyboard_interface_disabled) {
-    return;
-    }
-#endif
 
 if(!output_full)
 	{
@@ -2768,37 +2272,12 @@ if(!output_full)
 			}
 		}
         }
-#ifdef NTVDM
-else
-    KbdIntDelay();
-#endif
 
 } /* end of continuous_output */
 
 
-#ifdef NTVDM
-
-/*  NT port:
- *  the host (nt_event.c) calls this to notify that
- *  it is resuming after blocking, to do any reinitialization
- *  necessary
- *
- *  - resets kbd flow regulators
- */
-GLOBAL VOID KbdResume(VOID)
-{
-    WaitKbdHdw(0xffffffff);
-    bKbdEoiPending = FALSE;
-    bKbdIntHooked = FALSE;
-    bBiosBufferSpace = TRUE;
-    if (!keyboard_interface_disabled && output_full)
-        KbdIntDelay();
-    HostReleaseKbd();
-}
-#endif	/* NTVDM */
 
 
-#ifndef NTVDM
 /* allowRefill -- used in conjunction with the Delayed Quick Event
 ** below (kbd_inb from port 0x60 while the keyboard interface is
 ** enabled.) This is called 10ms after a dubious read from port 0x60
@@ -2934,28 +2413,11 @@ const softpc_device_keyboard_state *state;
 	scan_code_6805_size=0; scan_code_6805_array=NULL;
 	return TRUE;
 }
-#endif
 
 GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 {
 	sure_note_trace1(AT_KBD_VERBOSE,"kbd_inb(%#x)...", port);
 
-#ifdef NTVDM	/* JonLe NTVDM Mod */
-
-     if (!bBiosOwnsKbdHdw && WaitKbdHdw(0xffffffff))  {
-         return;
-         }
-
-
-     if (!(DelayIrqLine & 0x2) || KbdData == -1) {
-         if (bDelayIntPending) {
-             bDelayIntPending = FALSE;
-             kbd_status |= 1;
-             }
-         KbdData = output_contents;
-
-         }
-#endif
 
 	port &= 0x64;
 
@@ -2965,24 +2427,6 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 	}
 	else									/* port == 0x60 */
 
-#ifdef NTVDM	/* JonLe NTVDM Mod */
-
-        {
-
-        *val=KbdData;
-        kbd_status &= 0xfe;
-        sure_note_trace1(AT_KBD_VERBOSE,"scan code read:0x%x",*val);
-
-
-	    // Sloppy keyboard fix is not needed for the NT port. An EOI 
-        // hook is used to control priming of the adapter.
-
-        }
-
-     if (!bBiosOwnsKbdHdw)
-         HostReleaseKbd();
-
-#else	/* not NTVDM */
 
 	{
 		*val=output_contents;
@@ -3047,7 +2491,6 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 		}
 
 	}
-#endif	/* NTVDM */
 
 	sure_note_trace2(AT_KBD_VERBOSE,"...kbd_inb(%#x) returns %#x", port, *val);
 
@@ -3059,12 +2502,6 @@ GLOBAL VOID kbd_outb IFN2(io_addr,port,half_word,val)
 {
 	sure_note_trace2(AT_KBD_VERBOSE,"kbd_outb(%#x, %#x)", port, val);
 
-#ifdef NTVDM
-     if (!bBiosOwnsKbdHdw && WaitKbdHdw(0xffffffff))
-     {
-         return;
-     }
-#endif	/* NTVDM */
 
 	port &= 0x64;
 	if (port == 0x64)
@@ -3079,31 +2516,19 @@ GLOBAL VOID kbd_outb IFN2(io_addr,port,half_word,val)
 			keyboard_interface_disabled=FALSE;
 
 		kbd_status &= 0xf7;
-		if (waiting_for_next_8042_code) 
+		if (waiting_for_next_8042_code)
 			cmd_to_8042(val);
 		else
 			cmd_to_6805(val);
 	}
 
-#ifndef NTVDM	/* JonLe NTVDM Mod */
 
 	if (free_6805_buff_size < BUFF_6805_VMAX)
 		codes_to_translate();
 
-#else   /* NTVDM */
-
-    bForceDelayInts = TRUE;
-	continue_output();
-    bForceDelayInts = FALSE;
-
-        if (!bBiosOwnsKbdHdw)
-             HostReleaseKbd();
-
-#endif	/* NTVDM */
 
 } /*end of kbd_outb */
 
-#ifndef NTVDM
 /* Nothing seems to call this. I've no idea why it's here ... Simion */
 /* I have been assured that these functions are used by sun - gvdl */
 
@@ -3113,7 +2538,7 @@ GLOBAL int status_6805_buffer IFN0()
 
 	free_space = BUFF_6805_VMAX-
 		((buff_6805_in_ptr - buff_6805_out_ptr) & BUFF_6805_PMASK);
-	if (free_space<0) 
+	if (free_space<0)
 	{
 		free_space=0;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard buffer full");
@@ -3150,7 +2575,6 @@ GLOBAL VOID insert_code_into_6805_buf IFN1(half_word,code)
 		codes_to_translate();
 	}
 }
-#endif /* ! NTVDM */
 
 #ifdef SEGMENTATION
 /*
@@ -3165,10 +2589,8 @@ GLOBAL VOID AT_kbd_post IFN0()
 {
 	kbd_status = 0x14;
 
-#ifndef NTVDM
 	/* Clear out any pending keyboard buffer (port 0x60) refill delays */
         refillDelayedHandle = 0;
-#endif
 }
 
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
@@ -3213,7 +2635,6 @@ KbdHookAgain IFN1(IUM32, adapter)
 
 #endif /* IRET_HOOKS && GISP_CPU */
 
-#ifndef NTVDM
 
 GLOBAL VOID AT_kbd_init IFN0()
 {
@@ -3272,7 +2693,7 @@ GLOBAL VOID AT_kbd_init IFN0()
 	repeat_delay_target=2*BASE_DELAY_UNIT;
 	repeat_target=DEFAULT_REPEAT_TARGET;
 #endif
-	typematic_key_valid = waiting_for_next_code = 
+	typematic_key_valid = waiting_for_next_code =
 		waiting_for_next_8042_code=FALSE;
 	shift_on = l_shift_on = r_shift_on=FALSE;
 	ctrl_on = l_ctrl_on = r_ctrl_on=FALSE;
@@ -3318,43 +2739,4 @@ GLOBAL VOID AT_kbd_init IFN0()
 
 } /* end of AT_kbd_init */
 
-#else	/* NTVDM */
 
-GLOBAL VOID AT_kbd_init()
-{
-       int i;
-
-       sure_note_trace0(AT_KBD_VERBOSE,"AT Keyboard initialisation");
-
-       clear_buff_6805 ();
-       key_set=2;
-
-       i = 127;
-       while (i--)
-          set_3_key_state [i] = set_3_default_key_state [i];
-
-       input_port_val=0xbf;
-       kbd_status = 0x10;
-       cmd_byte_8042=0x45;
-       op_port_remembered_bits=0xc;
-
-       int_enabled = translating = TRUE;
-
-       io_define_inb(AT_KEYB_ADAPTOR, kbd_inb);
-       io_define_outb(AT_KEYB_ADAPTOR, kbd_outb);
-
-       for (i=KEYBA_PORT_START;i<=KEYBA_PORT_END;i+=2)
-               io_connect_port(i, AT_KEYB_ADAPTOR, IO_READ_WRITE);
-
-       init_key_arrays();
-
-       num_lock_on = TRUE;
-       host_key_down_fn_ptr = host_key_down;
-       host_key_up_fn_ptr = host_key_up;
-
-       /* Register an EOI hook for the keyboard */
-       RegisterEOIHook(KEYBOARD_INT_LINE,KbdEOIHook);
-
-
-} /* end of AT_kbd_init */
-#endif	/* NTVDM */
