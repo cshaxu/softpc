@@ -24,8 +24,9 @@ implementation admissions. See the proposal for scope and acceptance budgets.
 The owner now requires every S delivery to build, test, commit and push, then
 wait for explicit acceptance. Prior delegated sequential admission is revoked:
 do not admit the next S automatically. S9 audit/design and dual-width
-qualification are delivered locally and awaiting commit/review, then owner
-acceptance. Each width passed 165/165 with zero skips, including five native
+qualification are pushed in executor 896aa2fd and actual-change reviewed;
+S9 awaits owner acceptance, not automatic closure. Each width passed 165/165
+with zero skips, including five native
 desktop cases. S10 remains planned, not active.
 No S9 archive production changes occurred before this owner-directed reorder.
 The following S8 checkpoints are retained evidence, not active work:
