@@ -3,7 +3,8 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S2 is active: existing PCM structural migration only. Host-output
+T93 S3 is active: complete the neutral PCM host contract. S2 structural
+relocation is verified and reviewed in 7f642848. Host-output
 directions are recorded below; no sound payload/backend change is imported. Final T92 executor
 `48caa854` and review `93d0b8d6` are pushed. Both Release packages and
 150/150 tests per width pass, including all ten reserved desktop cases.
@@ -43,31 +44,31 @@ reviewed. The continued owner implementation goal admits S2 below; no S2
 production change was made at admission. S2's PCM relocation is now implemented
 and verified: x64/x86 each pass 150/150 including all ten native desktop cases.
 Both package EXEs are refreshed; no playback behavior changed. Executor
-delivery awaits pushed-commit review before closing S2.
+delivery 7f642848 is pushed and actual-change reviewed; S2 is closed.
 The owner authorizes native desktop test scheduling without repeated approval
 requests; background operations remain hidden and Computer Use remains forbidden.
 No manual audio acceptance is inferred.
 
-## M9 T93 S2 Packet
+## M9 T93 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal directs constructing shared Audio src/test, then XP integration in single-agent dual-role mode; S1 executor 2860b484 is reviewed. |
-| Objective | Move existing PCM source/tests to audio/pcm, rename public/private symbols and build targets, repair all callers without changing playback behavior. |
-| Non-goals | No new PCM semantics, MIDI/FM implementation, XP import, Emulator behavior change, user INI/media/snapshot change or external repository write. |
-| Reference Baseline | S1 executor 2860b484; existing T92 runnable source and dual package baseline. |
-| Candidate Proposal | [S2 migration brief](../proposals/m9-xp-sound-blaster-standalone.md#s2--move-existing-pcm-without-behavior-changes). |
-| Files And ABI Surface | Five Lib audio files, two Lib tests, Compat consumer and four App tests; root/shared build, gates, manifests and layout docs. Symbols and paths change, behavior does not. |
-| Applicable Rules | Task Reading Set, single-agent executor/coordinator review, git mv, C11 shared packages, Types authority and inward ownership. |
-| Verification | Rename-normalized comparison against baseline; no stale aliases; manifests/DAG; dual Release build and publication; shared suites then all other background suites; reserved native desktop tests separately. |
-| Expected Markers | One PCM implementation; unchanged FIFO/submission/lifecycle behavior; original tests retained; both package EXEs refreshed and full results recorded. |
-| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s2 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
-| Reporting Requirements | Before/after rename-aware production/test add-delete-net, moved-line accounting, focused/full test evidence and EXE hashes; commit/push complete P then actual-change review. |
-| Stop Conditions | Required behavior change or unrelated regression; unreserved desktop interaction; unexpected user changes; no opportunistic PCM fix in the move. |
-| Exit Criteria | Structural migration and complete qualification pushed/reviewed; proceed to S3 under goal authorization, T closure waits for owner. |
+| Admission And Approval | Owner's active goal and sequential-execution authorization; S2 executor 7f642848 reviewed with dual 150/150 qualification. |
+| Objective | Add native rate admission, accepted/submitted/consumed progress with reset epoch, event notification, per-stream gain and immediate bounded short-tail submission to the existing PCM path. |
+| Non-goals | No MIDI/FM implementation, XP import, Emulator behavior change, new worker/FIFO/backend, user INI/media/snapshot change or external repository write. |
+| Reference Baseline | S2 executor 7f642848 and its dual package baseline. |
+| Candidate Proposal | [S3 PCM brief](../proposals/m9-xp-sound-blaster-standalone.md#s3--complete-the-neutral-pcm-contract). |
+| Files And ABI Surface | PCM public/private/root/native files, Types audio declarations, PCM tests and affected consumer test fixtures; manifests and contract docs. Refresh exact estimates before editing. |
+| Applicable Rules | Task Reading Set, single-agent executor/coordinator review, C11 shared packages, Types authority and inward ownership; one existing worker/FIFO/WASAPI path. |
+| Verification | Rate/native admission, short tails, counters/priming/underrun, clear epoch, partial acceptance, gain and failures/cancellation; existing first-tone proofs; dual Release publication, shared then other background suites and native desktop tests. |
+| Expected Markers | True host consumption rather than accepted-frame completion; final-tail progress without a new producer command or polling observer; existing clients retain their playback semantics. |
+| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s3 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
+| Reporting Requirements | Pre/post production/test add-delete-net and public-contract audit, focused/full evidence and EXE hashes; push complete P then actual-change review. |
+| Stop Conditions | A second playback/state owner, unapproved Emulator pause-hook change, undocumented completion inference, unrelated user changes or external dependency. |
+| Exit Criteria | Complete PCM contract and qualification pushed/reviewed; proceed to S4 under goal authorization, T closure waits for owner. |
 | Original Owner Request | 单人双角色模式按照治理规范和质量规范，构建新的 lib/audio 的公共组件 (src+test)，然后导入xp mvdm源代码，为stadalone softpc实现完整xp-ntvdm-parity音频功能 |
-| Similar-Issue Sweep | All audio path/include/symbol/target/test-name references, platform boundary detection and manifests; old historical evidence remains historical. |
+| Similar-Issue Sweep | All submission/readiness/progress/clear/cancellation paths, rate and size arithmetic, initialization failure and stream gain; keep direct-edge and Types gates intact. |
 
 ## M9 T93 S1 Retained Design Brief
 

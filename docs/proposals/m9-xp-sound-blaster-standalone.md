@@ -574,8 +574,10 @@ Published EXE SHA-256:
 
 The similar-issue sweep checks stale audio stream API/guard/include/target
 references throughout src, test and root build files. Only the deliberately
-unchanged LIB_WIN32_AUDIO_STREAM_FLAGS SDK aliases remain. The executor
-delivery still requires pushed-commit review before S2 closure.
+unchanged LIB_WIN32_AUDIO_STREAM_FLAGS SDK aliases remain. Executor delivery
+7f642848 is pushed and actual-change reviewed; the
+[S2 record](../history/M9-T93-S2-pcm-relocation.md) closes this step and CURRENT
+admits S3 under the continued goal. T93 remains open.
 
 ## Official host-contract references
 
