@@ -18,8 +18,9 @@ The owner overrides the prior sequential admission: S8 stays closed; the
 unimplemented archive packet initially moved to S10 and must not proceed now.
 The owner now approves splitting the neutrality work into multiple S tasks.
 The owner accepts S9 and admits S10 neutral Console/KVM input. S10 is the
-sole active subtask, now verified and awaiting executor push/review and owner
-acceptance. Final x64/x86 qualification passes 165/165 each, zero skips,
+sole active subtask, now verified and awaiting owner acceptance. Executor
+e7d37b65 is committed and pushed; the separate coordinator actual-change
+review accepts the delivery, not owner closure. Final x64/x86 qualification passes 165/165 each, zero skips,
 including all ten native desktop cases; both EXEs are refreshed. Production
 C/H is +542/-534 (net +8), test C/H +268/-181 (net +87), with zero mirror,
 INI, media or snapshot changes. See the

@@ -2682,6 +2682,26 @@ guest runtime/snapshot/package integrations passed; no new Linux presenter or
 all-platform capability parity is claimed. S10 awaits owner acceptance, and
 S11 remains unadmitted.
 
+#### S10 coordinator actual-change review
+
+After executor `e7d37b65` was pushed, coordinator review checked its actual Git
+delta against S9 `449c0646`, the owner input brief/App authorization and the
+finite ledger above. It verified the relocated decoder and deleted former
+owners, canonical enum values, native/public boundary, reset before reader
+startup, neutral Console delivery, chord physical-code normalization, test
+coverage and exact artifact hashes. The changed Emulator body remains only
+the equivalent flag name; no native obligation moves outward. The inspected
+App/mirror/audio/config/media boundaries match the stated scope.
+
+Both final JUnit sets report 95 shared + 65 other + 5 desktop, zero failures,
+disabled or skipped cases. A final documentation-only clarification and its
+manifest passed an additional three metadata/documentation tests on each
+width. The production/test C/H counts above match the committed delta;
+no executable code changed after qualification. The source/test interfaces
+must be imported together by other repositories; no compatibility aliases or
+unrelated platform implementation are claimed. This accepts S10's delivery
+for owner testing. S10 is not closed and S11 is not admitted.
+
 ### S11 — UTF-8 paths and native directory rules
 
 Own Base executable directory and Storage read/write path interpretation.
