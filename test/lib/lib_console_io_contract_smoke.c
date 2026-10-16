@@ -140,7 +140,10 @@ static void cooked_restore(void)
     lib_test_assert(lib_console_create(&c)==LIB_STATUS_OK);
     lib_test_assert(lib_console_bind_generation(c,1)==LIB_STATUS_OK);
     lib_test_assert(lib_console_set_event_sink(c,receive,LIB_NULL)==LIB_STATUS_OK);
+    b.keyboard.pending_high_surrogate=0xd83d;
+    b.keyboard.pending_repeat_count=2;
     lib_test_assert(console_broker_backend_activate(&b,c,CONSOLE_BROKER_COOKED_LINES,1,0)==0);
+    lib_test_assert(!b.keyboard.pending_high_surrogate && !b.keyboard.pending_repeat_count);
     lib_test_assert(!b.reader && !b.cooked_line_pending && readers_started==0);
     native_cursor=(lib_win32_coord){17,23}; cursor_positions=0u;
     lib_test_assert(console_broker_backend_request_cooked_line(&b)==0);

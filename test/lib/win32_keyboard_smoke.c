@@ -60,26 +60,26 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
     lib_test_assert(kvm_hotkey_registry_register(&registry, trigger, control_alt,
         identifier) == LIB_STATUS_OK);
     kvm_hotkey_matcher_initialize(&capture.matcher, &registry);
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, normalize_and_match, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x1du, LIB_WIN32_KEY_CONTROL, 0u, 0u, KVM_HOTKEY_MODIFIER_CONTROL, 1, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, normalize_and_match, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x38u, LIB_WIN32_KEY_ALT, 0u, 0u, control_alt, 1, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, normalize_and_match, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             (lib_u16)lib_win32_map_virtual_key((lib_win32_uint)trigger, LIB_WIN32_MAPVK_VK_TO_VSC), (lib_u16)trigger, 0u, 0u, control_alt, 1, 1u }));
     lib_test_assert(capture.count == 1u && capture.events[0].type == KVM_EVENT_HOTKEY);
     lib_test_assert(lib_text_compare((const char *)capture.events[0].data.hotkey.identifier, identifier) == 0);
     /* Every make and break in the matched raw chord is private to KVM. */
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, normalize_and_match, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             (lib_u16)lib_win32_map_virtual_key((lib_win32_uint)trigger, LIB_WIN32_MAPVK_VK_TO_VSC), (lib_u16)trigger, 0u, 0u, control_alt, 0, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, normalize_and_match, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x38u, LIB_WIN32_KEY_ALT, 0u, 0u, KVM_HOTKEY_MODIFIER_CONTROL, 0, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, normalize_and_match, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x1du, LIB_WIN32_KEY_CONTROL, 0u, 0u, 0u, 0, 1u }));
     lib_test_assert(capture.count == 1u);
     kvm_hotkey_matcher_discard(&capture.matcher);
@@ -87,39 +87,76 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
 
 int main(void)
 {
+    /* PC set-1 identities distinguish physical sides and keypad keys without
+       requiring a consumer to interpret a native virtual-key value. */
+    const struct {
+        lib_u16 scan, native_key;
+        lib_bool extended;
+        lib_key key;
+    } physical[] = {
+        { 0x2au, LIB_WIN32_KEY_LEFT_SHIFT, LIB_FALSE, LIB_KEY_SHIFT },
+        { 0x36u, LIB_WIN32_KEY_RIGHT_SHIFT, LIB_FALSE, LIB_KEY_SHIFT },
+        { 0x1du, LIB_WIN32_KEY_CONTROL, LIB_FALSE, LIB_KEY_CONTROL },
+        { 0x1du, LIB_WIN32_KEY_CONTROL, LIB_TRUE, LIB_KEY_CONTROL },
+        { 0x1cu, LIB_WIN32_KEY_RETURN, LIB_FALSE, LIB_KEY_ENTER },
+        { 0x1cu, LIB_WIN32_KEY_RETURN, LIB_TRUE, LIB_KEY_ENTER },
+        { 0x47u, LIB_WIN32_KEY_NUMPAD_0 + 7u, LIB_FALSE, LIB_KEY_KEYPAD_7 },
+        { 0x47u, LIB_WIN32_KEY_HOME, LIB_TRUE, LIB_KEY_HOME },
+        { 0x45u, LIB_WIN32_KEY_PAUSE, LIB_FALSE, LIB_KEY_PAUSE },
+        { 0x37u, LIB_WIN32_KEY_SNAPSHOT, LIB_TRUE, LIB_KEY_PRINT_SCREEN }
+    };
+    for (lib_size i = 0; i < sizeof(physical) / sizeof(physical[0]); ++i) {
+        base_keyboard_decoder decoder = { 0 };
+        base_keyboard_record native = {
+            .kind = BASE_KEYBOARD_COMBINED, .scan = physical[i].scan,
+            .key = physical[i].native_key,
+            .flags = physical[i].extended ? LIB_KEY_FLAG_EXTENDED : 0u,
+            .pressed = LIB_TRUE, .repeat_count = 3u
+        };
+        lib_key_input neutral;
+        lib_test_assert(base_keyboard_decode(&decoder, &native, &neutral) ==
+            BASE_KEYBOARD_ACCEPTED);
+        lib_test_assert(neutral.key == physical[i].key && neutral.scalar == 0u &&
+            neutral.scan_code == physical[i].scan &&
+            neutral.extended == physical[i].extended && neutral.repeat_count == 3u);
+        native.pressed = LIB_FALSE;
+        lib_test_assert(base_keyboard_decode(&decoder, &native, &neutral) ==
+            BASE_KEYBOARD_ACCEPTED);
+        lib_test_assert(!neutral.pressed && neutral.repeat_count == 1u);
+    }
     shared_keyboard_capture capture = { 0 };
-    kvm_keyboard_normalizer normalizer = { 0 };
+    base_keyboard_decoder normalizer = { 0 };
     shared_hotkey_capture text = { 0 };
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0xd83du, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0xd83du, .repeat_count=1u }));
     lib_test_assert(text.count == 0u);
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0xde00u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0xde00u, .repeat_count=1u }));
     lib_test_assert(text.count == 1u && text.events[0].type == KVM_EVENT_TEXT &&
         text.events[0].data.text.scalar == 0x1f600u);
     lib_test_assert(!kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0xdc00u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0xdc00u, .repeat_count=1u }));
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0xd800u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0xd800u, .repeat_count=1u }));
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0xd800u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0xd800u, .repeat_count=1u }));
     lib_test_assert(normalizer.pending_high_surrogate == 0xd800u);
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0xd800u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0xd800u, .repeat_count=1u }));
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0x4e00u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0x4e00u, .repeat_count=1u }));
     text.count = 8u;
     lib_test_assert(!kvm_keyboard_submit_record(&normalizer, LIB_NULL, &text, capture_hotkey,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=0x4e00u, .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=0x4e00u, .repeat_count=1u }));
 
     /* The shared component preserves the host physical scan; each project maps it. */
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x1eu, 'A', 0u, 0u, 0u, 1, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x1eu, 'A', 0u, 0u, 0u, 0, 1u }));
     lib_test_assert(capture.count == 2u);
     lib_test_assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);
@@ -129,11 +166,11 @@ int main(void)
     /* Esc is an ordinary original key-table entry (key 110), not a host
        stop command. */
     capture.count = 0u;
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x01u, LIB_WIN32_KEY_ESCAPE, 0u, 0u, 0u, 1, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x01u, LIB_WIN32_KEY_ESCAPE, 0u, 0u, 0u, 0, 1u }));
     lib_test_assert(capture.count == 2u);
     lib_test_assert(capture.keys[0] == 0x01u && capture.releases[0] == 0u);
@@ -143,29 +180,29 @@ int main(void)
        physical scan.  Both KVM leaves use this shared recovery path, so the
        guest still receives the normal Enter make/break pair. */
     capture.count = 0u;
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0u, LIB_WIN32_KEY_RETURN, 0u, 0u, 0u, 1, 1u }));
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0u, LIB_WIN32_KEY_RETURN, 0u, 0u, 0u, 0, 1u }));
     lib_test_assert(capture.count == 2u);
     lib_test_assert(capture.keys[0] == 0x1cu && capture.releases[0] == 0u);
     lib_test_assert(capture.keys[1] == 0x1cu && capture.releases[1] == 1u);
-    lib_test_assert(capture.identities[0] == KVM_KEY_ENTER &&
-        capture.identities[1] == KVM_KEY_ENTER);
+    lib_test_assert(capture.identities[0] == LIB_KEY_ENTER &&
+        capture.identities[1] == LIB_KEY_ENTER);
 
     /* Extended state is a neutral KVM flag, not a copied Win32 control bit. */
     capture.count = 0u;
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
-            0xe04du, LIB_WIN32_KEY_RIGHT, 0u, KVM_INPUT_FLAG_EXTENDED, 0u, 1, 1u }));
-    lib_test_assert(capture.count == 1u && capture.identities[0] == KVM_KEY_RIGHT);
-    lib_test_assert(capture.flags[0] == KVM_KEY_FLAG_EXTENDED);
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
+            0xe04du, LIB_WIN32_KEY_RIGHT, 0u, LIB_KEY_FLAG_EXTENDED, 0u, 1, 1u }));
+    lib_test_assert(capture.count == 1u && capture.identities[0] == LIB_KEY_RIGHT);
+    lib_test_assert(capture.flags[0] == LIB_KEY_FLAG_EXTENDED);
     lib_test_assert(capture.keys[0] == 0x4du);
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
-            0x4du, LIB_WIN32_KEY_RIGHT, 0u, KVM_INPUT_FLAG_EXTENDED, 0u, 1, 1u }));
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
+            0x4du, LIB_WIN32_KEY_RIGHT, 0u, LIB_KEY_FLAG_EXTENDED, 0u, 1, 1u }));
     lib_test_assert(capture.keys[1] == capture.keys[0] && capture.flags[1] == capture.flags[0]);
 
     /* Raw Console input provides its own per-record modifier state.  These
@@ -178,8 +215,8 @@ int main(void)
     /* Window supplies a mask at its own native boundary; the common
        normalizer preserves that value rather than replacing it globally. */
     capture.count = 0u;
-    lib_test_assert(kvm_keyboard_submit_record(&(kvm_keyboard_normalizer){ 0 }, LIB_NULL,
-        &capture, capture_key, &(kvm_keyboard_record){ KVM_KEYBOARD_TRANSITION,
+    lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
+        &capture, capture_key, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x19u, 'P', 0u, 0u, KVM_HOTKEY_MODIFIER_CONTROL |
         KVM_HOTKEY_MODIFIER_ALT, 1, 1u }));
     lib_test_assert(capture.count == 1u);
@@ -188,23 +225,23 @@ int main(void)
 
     /* Only unmapped transitions ask the native adapter for character translation. */
     capture.count = 0;
-    kvm_keyboard_record record = { .kind = KVM_KEYBOARD_TRANSITION, .key = 'A', .pressed = LIB_TRUE };
+    base_keyboard_record record = { .kind = BASE_KEYBOARD_TRANSITION, .key = 'A', .pressed = LIB_TRUE };
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &capture, capture_key, &record) ==
-        KVM_KEYBOARD_ACCEPTED);
+        BASE_KEYBOARD_ACCEPTED);
     record.pressed = LIB_FALSE;
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &capture, capture_key, &record) ==
-        KVM_KEYBOARD_ACCEPTED);
+        BASE_KEYBOARD_ACCEPTED);
     lib_test_assert(capture.count == 2);
     record.key = LIB_WIN32_KEY_PACKET; record.pressed = LIB_TRUE;
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &capture, capture_key, &record) ==
-        KVM_KEYBOARD_UNMAPPED);
+        BASE_KEYBOARD_UNMAPPED);
     lib_test_assert(capture.count == 2);
 
     /* UTF-16 input uses the active host layout to synthesize make/break;
        it never places text directly in guest memory. */
     capture.count = 0u;
     lib_test_assert(kvm_keyboard_submit_record(&normalizer, LIB_NULL, &capture, capture_key,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16=L'a', .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16=L'a', .repeat_count=1u }));
     lib_test_assert(capture.count == 2u);
     lib_test_assert(capture.keys[0] == 0x1eu && capture.releases[0] == 0u);
     lib_test_assert(capture.keys[1] == 0x1eu && capture.releases[1] == 1u);

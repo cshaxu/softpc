@@ -428,7 +428,7 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
     {
         kvm_input_event event = { 0 };
         event.type = KVM_EVENT_KEY;
-        event.data.key.key = KVM_KEY_ENTER;
+        event.data.key.key = LIB_KEY_ENTER;
         event.data.key.scan_code = 0x1c;
         event.data.key.pressed = 1;
         assert(emulator_machine_enqueue_input(machine, &event));

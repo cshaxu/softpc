@@ -152,7 +152,7 @@ failed:
 
 static int enter_windows(emulator_machine *runtime)
 {
-    const lib_u32 keys[] = { 'W', 'I', 'N', KVM_KEY_ENTER };
+    const lib_u32 keys[] = { 'W', 'I', 'N', LIB_KEY_ENTER };
     const lib_u32 scans[] = { 0x11u, 0x17u, 0x31u, 0x1cu };
     emulator_machine_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     lib_u64 deadline;
@@ -236,7 +236,7 @@ static int type_command(emulator_machine *runtime, const char *text)
         lib_u32 scan = *text == '.' ? 0x34u : scans[*text - 'A'];
         if (!tap_key(runtime, key, scan)) return 0;
     }
-    return tap_key(runtime, KVM_KEY_ENTER, 0x1c);
+    return tap_key(runtime, LIB_KEY_ENTER, 0x1c);
 }
 
 static int prompt_roundtrip(emulator_machine *runtime, int windowed)
@@ -245,9 +245,9 @@ static int prompt_roundtrip(emulator_machine *runtime, int windowed)
     int succeeded = 0;
     if (frame == NULL) return 0;
     /* Program Manager File/Run, through the ordinary machine input queue. */
-    if (!send_key(runtime, KVM_KEY_ALT, 0x38, 1) ||
+    if (!send_key(runtime, LIB_KEY_ALT, 0x38, 1) ||
         !tap_key(runtime, 'F', 0x21) ||
-        !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
+        !send_key(runtime, LIB_KEY_ALT, 0x38, 0) ||
         !tap_key(runtime, 'R', 0x13)) goto done;
     softpc_test_sleep_milliseconds(300u);
     if (!emulator_machine_copy_published_frame(runtime, frame,
@@ -259,9 +259,9 @@ static int prompt_roundtrip(emulator_machine *runtime, int windowed)
         if (!emulator_machine_copy_published_frame(runtime, frame,
                 emulator_machine_run_generation(runtime))) goto done;
         lib_u32 prior = frame->sequence;
-        if (!send_key(runtime, KVM_KEY_ALT, 0x38, 1) ||
-            !tap_key(runtime, KVM_KEY_ENTER, 0x1c) ||
-            !send_key(runtime, KVM_KEY_ALT, 0x38, 0) ||
+        if (!send_key(runtime, LIB_KEY_ALT, 0x38, 1) ||
+            !tap_key(runtime, LIB_KEY_ENTER, 0x1c) ||
+            !send_key(runtime, LIB_KEY_ALT, 0x38, 0) ||
             !wait_for_mode(runtime, windowed ^ ((i & 1u) == 0u), prior)) goto done;
         /* Let rendering/input continue after the first mode notification. */
         softpc_test_sleep_milliseconds(1000u);

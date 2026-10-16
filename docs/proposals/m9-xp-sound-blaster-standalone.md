@@ -2544,6 +2544,15 @@ editing, rather than treating this breakdown as approval of silent changes.
 
 ### S10 — neutral Console and KVM input
 
+Owner admission after S9 acceptance additionally permits necessary App input
+adaptation ("可以改softpc app啊"). For S10 only, this supersedes the earlier
+no-App-edit constraint: migrate real consumers, not a compatibility alias layer.
+The initial symbol census finds 26 production/test files using common key or
+mouse vocabulary, including two App production input consumers. Refined
+production budget is +300-450/-250-400 (paired net about +50), plus mechanical
+consumer renaming; tests +180-300/-60-100. Account relocation/renaming separately.
+No broad App platform migration, guest behavior change or mirror edit is admitted.
+
 Own Console raw-key/raw-mouse contracts and KVM physical-key semantics together.
 Current Console publishes native VK, UTF-16 units and native mouse masks;
 KVM Console then normalizes them. Move conversion to the existing platform
@@ -2559,6 +2568,119 @@ tests +180-300/-60-100, net approximately +120-200.
 Proof: surrogate pairs/malformed sequences, repeats, modifiers/keypad, no-physical
 text, buttons/cell motion and reset through actual producer/consumer boundaries.
 Public raw records may change; existing logical behavior must not silently change.
+
+#### S10 implementation and finite review ledger
+
+The frozen scope is neutral input values, their two native producers, the KVM
+delivery entry and every source/test consumer found by the old-symbol census.
+Each member is either migrated with focused proof or unchanged with a stated
+reason. Completion requires this ledger, both full suites and actual-change
+review; it does not claim completion of the separate path/text/audio tasks.
+
+- Types owns the common key/button vocabulary and `lib_key_input`. The old
+  key/button enum body is byte-identical after prefix substitution: no values
+  are reassigned. Source consumers rebuild together; no aliases are retained.
+- Base owns the relocated selected-platform key/layout decoder and the single
+  UTF-16 decoder. The adapter record is explicitly internal native Lib support,
+  not an application input contract. It does not depend on KVM or Console.
+- Console-broker decodes before public delivery and translates native buttons
+  to neutral bits. Mouse fields are absolute screen-buffer cells. Existing
+  KVM support remains left/right only; ignored middle-button behavior is not
+  silently expanded. Focus reset and binding activation discard partial text.
+- KVM owns complete-scalar repetition, existing physical text synthesis and
+  the existing held-key ledger. Console no longer owns a surrogate decoder or
+  native-button conversion. Window reuses the same Base decoder before the
+  same neutral KVM delivery path; no second input state machine is introduced.
+- Emulator's change is the extended-bit symbol only. App input consumers use
+  the moved vocabulary, retaining the existing guest-key/relative-mouse path.
+  X86-IBMPC's injected chord must emit a single-byte physical code and a
+  separate E0 flag, matching actual native input, not duplicate E0 in the code.
+- Linux's existing terminal decoder reports unavailable physical identity as
+  zero and retains TEXT fallback. This is tested as a decoder contract, not
+  advertised as a newly implemented Linux presenter.
+
+Focused fixtures cover real broker output (BMP, paired and malformed UTF-16,
+repeat metadata, physical breaks, right Ctrl, reset and binding handoff), KVM
+Window/Console equivalence, physical sides/keypad/Pause/Print Screen, no-scan
+virtual-keyboard recovery, failed sink delivery and mouse position/buttons.
+The special-key matrix uses actual native decoder inputs, not a second key map.
+
+Similar-issue scans cover all `src`/`test` input symbols, physical-code writers,
+adapter includes and native decoder calls. Old raw VK/UTF-16 fields and native
+mouse field names are removed. Only Base implements native key/layout queries;
+only broker and KVM native-leaf support invoke the shared decoder. The retained
+KVM hotkey enum references canonical Types values for its existing registration
+API, rather than defining a competing encoding. Base dependency and Types
+ownership gates follow the move. No audio, mirror, INI, media or snapshot changes.
+
+The first build found a fixture still accessing removed Console decoder state;
+it now models the broker-owned decoder. Eleven focused x64 tests then passed.
+The next build found an undeclared test-only keypad constant; the fixture now
+uses the declared contiguous native keypad range. Both failures are retained
+as failed attempts, not qualification. Review also added decoder reset at the
+existing activation/flush boundary before any new reader starts.
+
+#### S10 counted changes
+
+Against reviewed S9 `449c0646`, using `git diff --numstat --no-renames` and
+counting production/test C/H separately from CMake/gates, documentation,
+manifests and artifacts. Moves count as deletion plus addition; symbol-only
+consumer edits are not hidden. These figures are not new-logic line counts.
+
+| Component | Production + / - / net | Test C/H + / - / net |
+| --- | --- | --- |
+| Lib | 501 / 493 / +8 | 235 / 148 / +87 |
+| Emulator | 2 / 2 / 0 | 12 / 12 / 0 |
+| X86-Debug | 0 / 0 / 0 | 0 / 0 / 0 |
+| X86-IBMPC | 15 / 15 / 0 | 10 / 10 / 0 |
+| App-SoftPC | 24 / 24 / 0 | 11 / 11 / 0 |
+| Total | 542 / 534 / +8 | 268 / 181 / +87 |
+
+There are 28 production C/H paths (including both sides of moved paths) and
+16 test C/H paths. Three source CMake/gate files add 9/delete 11, net -2;
+two test CMake/gate files add 6/delete 6, net zero. Mirror delta is zero.
+Most gross edits move/rename existing declarations and platform decoding.
+The extra neutral delivery entry replaces Console's native reconstruction;
+the old decoder, private declarations and mouse conversion are removed from
+their former owners. The only added persistent state is the relocated existing
+two-field decoder in the native broker instead of KVM Console, not another
+simultaneous state owner. KVM Window retains its existing per-source decoder.
+
+#### S10 executor qualification
+
+The final cached Ninja builds refresh both package executables. Each architecture
+passes 165/165 with zero skips: 95 shared background tests, 65 other unit/
+integration/gate tests and five serial native desktop cases. Shared suites run
+first; no Computer Use, timeout killing, skipped failure or raised budget was
+used. Final shared wall time is x64 77.39 s / x86 59.93 s; other suites are
+x64 103.77 s / x86 91 s (JUnit integer). The earlier complete qualification
+also passed 165/165 per width; after final modifier/chord cleanup the entire
+qualification was rerun rather than reusing that earlier result.
+
+Evidence is the ignored, bounded S10 final qualification log/exit/JUnit set.
+Ninja again reported its existing premature-log recovery on x86 and rebuilt
+unchanged targets; no manual cache purge occurred. This task does not claim
+to repair that build-cache issue. Initial failed builds remain recorded above.
+Final documentation review corrected the precise decoder reset ordering:
+binding activation clears it before the new reader, not necessarily before
+the logical reset callback. Only README/manifest changed after the full run;
+metadata and documentation gates are rerun before commit.
+
+Published SHA-256:
+
+- softpc32.exe: `621DD465F8EB31E773BE153526E7E3DA3A286B56F108F462727069ACFD0CDD81`
+- softpc64.exe: `D94BCB10D4ACF396E90785CF7ED97EA40B8EEA1F158A85178B82A5653293514C`
+
+The changed Emulator path was separately checked: it only substitutes the
+canonical extended-bit name in the same source-local release match. No native
+API/type, platform branch, new state or dependency was introduced there.
+All four public source/test pairs retain inward dependency, naming and Types
+authority gates. App's two production edits are vocabulary substitutions only.
+The special-key and RDP-style no-scan cases are injected native-record proofs,
+not a claim of manual testing on every physical/RDP device. Existing actual
+guest runtime/snapshot/package integrations passed; no new Linux presenter or
+all-platform capability parity is claimed. S10 awaits owner acceptance, and
+S11 remains unadmitted.
 
 ### S11 — UTF-8 paths and native directory rules
 

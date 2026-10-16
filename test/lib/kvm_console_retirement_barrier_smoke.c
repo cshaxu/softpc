@@ -327,12 +327,14 @@ static void check_input_reset(void)
     lib_test_assert(kvm_console_create(&c,&options)==0);
     lib_console *logical=kvm_console_get_console(c);
     lib_test_assert(lib_console_bind_generation(logical,1)==0);
-    e.value.raw_key=(lib_console_raw_key){ .key=LIB_WIN32_KEY_CONTROL, .scan_code=0x1d, .pressed=LIB_TRUE, .modifiers=1 };
+    e.value.raw_key=(lib_key_input){ .key=LIB_KEY_CONTROL, .scan_code=0x1d, .pressed=LIB_TRUE, .modifiers=1 };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==0);
-    e.value.raw_key=(lib_console_raw_key){ .unicode=0xd83d, .pressed=LIB_TRUE };
+    /* Invalid scalar input is rejected here; UTF-16 buffering/reset is tested
+       at its sole owner in console_broker_reader_failure_smoke. */
+    e.value.raw_key=(lib_key_input){ .scalar=0xd83d, .pressed=LIB_TRUE };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0);
     e.kind=LIB_CONSOLE_EVENT_RAW_MOUSE;
-    e.value.raw_mouse=(lib_console_raw_mouse){ .delta_x=1, .delta_y=1 };
+    e.value.raw_mouse=(lib_console_raw_mouse){ .column=1, .row=1 };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==1);
     lib_test_assert(kvm_console_publish_frame(c,&frame)==0); /* No output sink: pending. */
     lib_test_assert(lib_console_bind_generation(logical,2)==0);
@@ -348,29 +350,25 @@ static void check_input_reset(void)
     lib_test_assert(kvm_component_mailboxes_capture_frame(&c->base.mailboxes,&generation,&copied,sizeof(copied)));
     lib_test_assert(copied.base.text_columns==80);
     e.kind=LIB_CONSOLE_EVENT_RAW_KEY;
-    e.value.raw_key=(lib_console_raw_key){ .unicode=0xde00, .pressed=LIB_TRUE };
+    e.value.raw_key=(lib_key_input){ .scalar=0xde00, .pressed=LIB_TRUE };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==3);
-    e.value.raw_key=(lib_console_raw_key){ .key='A', .scan_code=0x1e, .pressed=LIB_TRUE };
+    e.value.raw_key=(lib_key_input){ .key='A', .scan_code=0x1e, .pressed=LIB_TRUE };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==4);
     lib_test_assert(reset_events[3].type==KVM_EVENT_KEY && reset_events[3].data.key.key=='A');
     e.kind=LIB_CONSOLE_EVENT_RAW_MOUSE;
-    e.value.raw_mouse=(lib_console_raw_mouse){ .delta_x=61, .delta_y=21 };
+    e.value.raw_mouse=(lib_console_raw_mouse){ .column=61, .row=21 };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==5);
     lib_test_assert(reset_events[4].data.mouse.delta_x==0 && reset_events[4].data.mouse.delta_y==0);
-    ++e.value.raw_mouse.delta_x; ++e.value.raw_mouse.delta_y;
-    e.value.raw_mouse.buttons=LIB_WIN32_FROM_LEFT_1ST_BUTTON_PRESSED|LIB_WIN32_RIGHTMOST_BUTTON_PRESSED;
+    ++e.value.raw_mouse.column; ++e.value.raw_mouse.row;
+    e.value.raw_mouse.buttons=LIB_MOUSE_BUTTON_LEFT|LIB_MOUSE_BUTTON_RIGHT;
     lib_test_assert(lib_console_deliver_event(logical,&e)==0);
     lib_test_assert(reset_events[5].data.mouse.delta_x==8 && reset_events[5].data.mouse.delta_y==16);
     lib_test_assert(reset_events[4].data.mouse.buttons==0 && reset_events[5].data.mouse.buttons==
-        (KVM_MOUSE_BUTTON_LEFT|KVM_MOUSE_BUTTON_RIGHT));
+        (LIB_MOUSE_BUTTON_LEFT|LIB_MOUSE_BUTTON_RIGHT));
     lib_test_assert(reset_events[5].data.mouse.relative && reset_events[5].source_identity==
         reset_events[4].source_identity);
-    lib_test_assert(kvm_console_mouse_buttons(0)==0);
-    lib_test_assert(kvm_console_mouse_buttons(LIB_WIN32_FROM_LEFT_1ST_BUTTON_PRESSED)==KVM_MOUSE_BUTTON_LEFT);
-    lib_test_assert(kvm_console_mouse_buttons(LIB_WIN32_RIGHTMOST_BUTTON_PRESSED)==KVM_MOUSE_BUTTON_RIGHT);
-    lib_test_assert(kvm_console_mouse_buttons(LIB_WIN32_FROM_LEFT_2ND_BUTTON_PRESSED)==0);
     e.kind=LIB_CONSOLE_EVENT_RAW_KEY;
-    e.value.raw_key=(lib_console_raw_key){ .key='P', .scan_code=0x19, .pressed=LIB_TRUE, .modifiers=3 };
+    e.value.raw_key=(lib_key_input){ .key='P', .scan_code=0x19, .pressed=LIB_TRUE, .modifiers=3 };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==7);
     lib_test_assert(reset_events[6].type==KVM_EVENT_HOTKEY); /* Accepted snapshot policy survives. */
     lib_test_assert(kvm_console_destroy(c) == LIB_STATUS_OK);

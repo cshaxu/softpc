@@ -17,7 +17,15 @@ test-reliability debt, not a claimed repair. See the
 The owner overrides the prior sequential admission: S8 stays closed; the
 unimplemented archive packet initially moved to S10 and must not proceed now.
 The owner now approves splitting the neutrality work into multiple S tasks.
-S9 remains the sole active subtask: read-only audit and bounded design.
+The owner accepts S9 and admits S10 neutral Console/KVM input. S10 is the
+sole active subtask, now verified and awaiting executor push/review and owner
+acceptance. Final x64/x86 qualification passes 165/165 each, zero skips,
+including all ten native desktop cases; both EXEs are refreshed. Production
+C/H is +542/-534 (net +8), test C/H +268/-181 (net +87), with zero mirror,
+INI, media or snapshot changes. See the
+[S10 delivery](../proposals/m9-xp-sound-blaster-standalone.md#s10-executor-qualification).
+The owner also authorizes necessary SoftPC App consumer
+adaptation, superseding the earlier no-App-edit limit for this input migration.
 Planned S10-S14 cover input, paths, interface text, PCM lifecycle and capture
 respectively; the archive task moves to S15. These are planned, not concurrent
 implementation admissions. See the proposal for scope and acceptance budgets.
@@ -25,9 +33,9 @@ The owner now requires every S delivery to build, test, commit and push, then
 wait for explicit acceptance. Prior delegated sequential admission is revoked:
 do not admit the next S automatically. S9 audit/design and dual-width
 qualification are pushed in executor 896aa2fd and actual-change reviewed;
-S9 awaits owner acceptance, not automatic closure. Each width passed 165/165
+S9 is owner-accepted. Each width passed 165/165
 with zero skips, including five native
-desktop cases. S10 remains planned, not active.
+desktop cases. S11-S15 remain planned and must not auto-start.
 No S9 archive production changes occurred before this owner-directed reorder.
 The following S8 checkpoints are retained evidence, not active work:
 XP MIDI/FM device attachment through existing
@@ -219,25 +227,25 @@ builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
 proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S9 Packet
+## M9 T93 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner inserts the neutrality audit after S8, then approves: 好 请拆分为多个s任务. S9 is audit/design; S10-S14 are planned repairs and archives move to S15. S8 remains closed. |
-| Objective | Deliver a read-only cross-component contract audit and low-coupling repair breakdown with compatibility, file, diff and proof budgets. |
-| Non-goals | No production changes in S9; no App migration, archive work, backend replacement, software synthesis, new platform backend, user configuration/media change or NXVM write. |
-| Reference Baseline | Pushed S8 review 3f6e7cb3; accepted executor 980984d0 and dual-width 165/165 qualification. |
-| Candidate Proposal | [S9 platform neutrality](../proposals/m9-xp-sound-blaster-standalone.md#s9--shared-component-platform-neutrality). |
-| Files And ABI Surface | Read-only src/test pairs for lib, emulator, x86-debug and x86-ibmpc, including configuration and documentation. Planning edits only in CURRENT and the existing proposal; no App modifications. |
+| Admission And Approval | Owner accepts S9 and admits S10, then explicitly permits necessary SoftPC App changes. Deliver and wait for owner acceptance; no automatic S11 admission. |
+| Objective | Neutral Console input values and specified PC physical-key semantics, with one shared conversion implementation and unchanged guest input behavior. |
+| Non-goals | No broad App platform migration, string/path/audio/capture repairs, archives, new OS backend, compatibility alias layer, user configuration/media edits or NXVM writes. |
+| Reference Baseline | S9 executor 896aa2fd and review 449c0646; both widths 165/165, zero skips. |
+| Candidate Proposal | [S10 neutral input](../proposals/m9-xp-sound-blaster-standalone.md#s10--neutral-console-and-kvm-input). |
+| Files And ABI Surface | Lib Types/Base input definitions and adapters, Console broker and KVM consumers, shared/App input symbol consumers and owner-local tests, CMake/manifests/docs. No mirror changes. |
 | Applicable Rules | Task Reading Set, architecture/coding and source/research policy; single-agent dual-role execution; necessary-source subset, Types authority and inward dependencies. |
-| Verification | Audit findings checked against producers/consumers and existing tests. S9 cached dual builds and complete receiving qualification pass 165/165 per width (95 shared, 65 other, five desktop), zero skips. Documentation/diff checks pass. These unchanged-baseline tests do not prove the planned repairs. |
+| Verification | Actual broker-to-KVM neutral records, Unicode scalar/surrogate boundaries, repeats, physical identity/keypad/modifiers/special keys, reset and mouse cells/buttons; no-scan virtual-keyboard input. Cached dual builds/publication, shared then all other unit/integration tests and ten desktop cases; Types/dependency/naming/manifests. |
 | Expected Markers | Neutral public contracts; native operations confined to their existing platform owners; Lib Types authority; explicit unsupported capability, no fake success or parallel fallback implementation. |
-| Asset Needs | Hidden supervised build/t93/s9 jobs with log/exit files; 1800s build, 1200s suite, 30 MiB logs; executor cleanup. Reuse cached trees, no Computer Use; native desktop scheduling preapproved. Disposable generated fixtures only. |
+| Asset Needs | Hidden supervised build/t93/s10 jobs with log/exit files; 1800s build, 1200s suite, 30 MiB logs; executor cleanup. Reuse cached trees, no Computer Use; native desktop scheduling preapproved. Disposable generated fixtures only. |
 | Reporting Requirements | Audit findings with exact ownership and evidence; implementation brief with per-component added/deleted/net estimates before edits; actual diff/test/artifact accounting and separate actual-change review. |
 | Stop Conditions | Unjustified abstraction, product-specific public API, new backend scope, behavior change without authority or failed required regression; resolve before delivery. |
-| Exit Criteria | Bounded audit and repair sequence delivered with all seven requested contract areas assigned, risks and non-changes explicit; documentation checks and actual-change review. No repair or T closure claimed by planning completion. |
-| Original Owner Request | 先不要转入S9.S8收口后停下来，准入一个新的公共组件的平台中立化审计和修复S任务，S9顺延到S10 |
+| Exit Criteria | Neutral Console values, one encoding/normalization owner, unchanged guest behavior and no native consumer obligations; focused/full proof, both EXEs, executor commit/push and actual-change review, then wait for owner. |
+| Original Owner Request | 好，准入S10开始执行，完成后编译发布测试提交推送后等我验收。可以改softpc app啊。没说你不能改啊。继续。 |
 | Similar-Issue Sweep | Native headers/types/functions, platform macros, product names, build links, unsupported paths and test assumptions; distinguish legitimate platform leaves and x86 semantics from host-platform leakage. |
 
 ## M9 T93 S1 Retained Design Brief

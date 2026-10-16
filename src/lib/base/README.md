@@ -1,7 +1,8 @@
 # base
 
 `base` owns blocking mutexes, events, tasks, wait/cancellation, sleep/yield,
-monotonic clock composition and current-executable directory discovery. It depends only on header-only `types`; no Console,
+monotonic clock composition, current-executable directory discovery and native
+keyboard decoding. It depends only on header-only `types`; no Console,
 KVM, storage or application dependency is permitted. The build selects same-shape
 Win32/Linux implementations. Their headers remain component-local.
 
@@ -21,3 +22,13 @@ The owner serializes these operations and never joins from the task itself.
 These are the existing primitives,
 not forwarding aliases for another component. Caller-owned locks retain their
 existing lock order and callback non-reentry requirements.
+
+`input_adapter_interface.h` is internal Lib native-producer support, not an
+application event API. One source-local decoder maps native key records and
+combines UTF-16 pairs before emitting neutral `lib_key_input` values. Definitions
+live in `types/input_values.h`; neither public Console nor KVM events carry
+native virtual keys or UTF-16 units. The selected layout query returns neutral
+physical identity or failure, allowing the consumer's existing TEXT fallback.
+Decoder reset discards an unfinished prefix; repeated characters are expanded
+by the consumer only after complete scalar decoding. Linux terminal keys may
+have no physical identity; no missing presenter is implemented by this decoder.

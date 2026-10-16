@@ -37,6 +37,7 @@ by matching platform implementations. Application-facing
 copied-value APIs are distinct from the leaf-support contracts:
 `kvm-base/worker_interface.h`, `mailbox_interface.h`,
 `kvm-base/input_interface.h` serves only the KVM leaves;
+`base/input_adapter_interface.h` serves native Lib input producers;
 `console/binding_interface.h` serves console-broker binding implementations.
 Other component headers are exclusively component-local. They use short
 names and live directly in their owning directory; no filename carries a
@@ -46,9 +47,10 @@ only application-facing `*_interface.h`, not the leaf-support contracts.
 Types declaration headers are the explicit naming exception. The common types interface includes its own atomic
 vocabulary helper; it never imports platform SDK headers.
 
-Input support owns common normalization and copied-event delivery in kvm-base.
-Its same-signature platform operations decode keys and query physical text
-layout. Window message flags and key-state queries are Window-local. External
+Base input support decodes native keys and UTF-16 into Types-owned neutral
+values. Console-broker publishes those values; KVM owns repetition, physical
+text synthesis and copied-event delivery. Its layout query uses the same Base
+adapter. Window message flags and key-state queries are Window-local. External
 declarations remain types-owned; actual consumers declare OS link libraries.
 
 ## Component graph

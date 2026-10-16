@@ -7,6 +7,7 @@
 #include "lib/console/binding_interface.h"
 #include "lib/console-broker/console_backend.h"
 #include "lib/base/sync_interface.h"
+#include "lib/base/input_adapter_interface.h"
 
 #include "lib/types/win32/console.h"
 
@@ -35,6 +36,7 @@ struct console_broker_backend {
     lib_console *console;
     console_broker_mode mode;
     lib_u32 generation;
+    base_keyboard_decoder keyboard;
     lib_u16 previous[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     lib_u8 previous_foreground[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     lib_u8 previous_background[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
@@ -161,11 +163,11 @@ static lib_u8 console_broker_modifiers(lib_win32_dword state)
 {
     lib_u8 modifiers = 0u;
     if ((state & (LIB_WIN32_LEFT_CTRL_PRESSED | LIB_WIN32_RIGHT_CTRL_PRESSED)) != 0u)
-        modifiers |= LIB_CONSOLE_MODIFIER_CONTROL;
+        modifiers |= LIB_KEY_MODIFIER_CONTROL;
     if ((state & (LIB_WIN32_LEFT_ALT_PRESSED | LIB_WIN32_RIGHT_ALT_PRESSED)) != 0u)
-        modifiers |= LIB_CONSOLE_MODIFIER_ALT;
+        modifiers |= LIB_KEY_MODIFIER_ALT;
     if ((state & LIB_WIN32_SHIFT_PRESSED) != 0u)
-        modifiers |= LIB_CONSOLE_MODIFIER_SHIFT;
+        modifiers |= LIB_KEY_MODIFIER_SHIFT;
     return modifiers;
 }
 
@@ -175,14 +177,16 @@ static lib_status console_broker_emit_key(console_broker_backend *backend,
     lib_console_event event = { 0 };
     event.kind = LIB_CONSOLE_EVENT_RAW_KEY;
     event.binding_generation = backend->generation;
-    event.value.raw_key.key = key->wVirtualKeyCode;
-    event.value.raw_key.unicode = key->uChar.UnicodeChar;
-    event.value.raw_key.scan_code = key->wVirtualScanCode;
-    event.value.raw_key.modifiers = console_broker_modifiers(key->dwControlKeyState);
-    event.value.raw_key.extended =
-        (key->dwControlKeyState & LIB_WIN32_ENHANCED_KEY) != 0u ? LIB_TRUE : LIB_FALSE;
-    event.value.raw_key.pressed = key->bKeyDown ? LIB_TRUE : LIB_FALSE;
-    event.value.raw_key.repeat_count = key->wRepeatCount;
+    base_keyboard_record record = {
+        BASE_KEYBOARD_COMBINED, key->wVirtualScanCode, key->wVirtualKeyCode,
+        key->uChar.UnicodeChar,
+        (key->dwControlKeyState & LIB_WIN32_ENHANCED_KEY) != 0u ? LIB_KEY_FLAG_EXTENDED : 0u,
+        console_broker_modifiers(key->dwControlKeyState),
+        key->bKeyDown ? LIB_TRUE : LIB_FALSE, key->wRepeatCount };
+    if (base_keyboard_decode(&backend->keyboard, &record, &event.value.raw_key) !=
+            BASE_KEYBOARD_ACCEPTED ||
+        (event.value.raw_key.key == 0u && event.value.raw_key.scalar == 0u))
+        return LIB_STATUS_OK;
     return lib_console_deliver_event(backend->console, &event);
 }
 
@@ -192,14 +196,17 @@ static lib_status console_broker_emit_mouse(console_broker_backend *backend,
     lib_console_event event = { 0 };
     event.kind = LIB_CONSOLE_EVENT_RAW_MOUSE;
     event.binding_generation = backend->generation;
-    event.value.raw_mouse.delta_x = mouse->dwMousePosition.X;
-    event.value.raw_mouse.delta_y = mouse->dwMousePosition.Y;
-    event.value.raw_mouse.buttons = mouse->dwButtonState;
+    event.value.raw_mouse.column = mouse->dwMousePosition.X;
+    event.value.raw_mouse.row = mouse->dwMousePosition.Y;
+    event.value.raw_mouse.buttons =
+        ((mouse->dwButtonState & LIB_WIN32_FROM_LEFT_1ST_BUTTON_PRESSED) != 0u ? LIB_MOUSE_BUTTON_LEFT : 0u) |
+        ((mouse->dwButtonState & LIB_WIN32_RIGHTMOST_BUTTON_PRESSED) != 0u ? LIB_MOUSE_BUTTON_RIGHT : 0u);
     return lib_console_deliver_event(backend->console, &event);
 }
 
 static lib_status console_broker_emit_input_reset(console_broker_backend *backend)
 {
+    lib_memory_set(&backend->keyboard, 0, sizeof(backend->keyboard));
     lib_console_event event = { .kind = LIB_CONSOLE_EVENT_INPUT_RESET };
     event.binding_generation = backend->generation;
     return lib_console_deliver_event(backend->console, &event);
@@ -461,6 +468,7 @@ lib_status console_broker_backend_activate(console_broker_backend *backend,
      * starting the new reader. */
     if (!lib_win32_flush_console_input_buffer(backend->input))
         return LIB_STATUS_IO_ERROR;
+    lib_memory_set(&backend->keyboard, 0, sizeof(backend->keyboard));
     /* The broker's output gate covers selection and reader startup. A failed
      * activation is rolled back through this same path, not a second restore
      * implementation. Same-mode replacements leave the display untouched. */

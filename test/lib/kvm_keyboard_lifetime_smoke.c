@@ -44,7 +44,7 @@ static lib_bool capture_event(void *opaque, const kvm_input_event *event)
     c->events[c->count++].source_identity = 0;
     return LIB_TRUE;
 }
-static lib_bool submit(kvm_hotkey_matcher *m, capture *c, kvm_key key, lib_u32 scan,
+static lib_bool submit(kvm_hotkey_matcher *m, capture *c, lib_key key, lib_u32 scan,
     lib_u32 flags, lib_u32 mods, lib_bool down)
 {
     kvm_input_event e = { .type = KVM_EVENT_KEY };
@@ -75,12 +75,12 @@ static void same_input(const capture *left, const capture *right)
 static void permutations(void)
 {
     const lib_u32 orders[6][3] = {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}};
-    const kvm_key triggers[3] = {'P','D','F'};
+    const lib_key triggers[3] = {'P','D','F'};
     for (lib_u32 t = 0; t < 3; ++t)
     for (lib_u32 side = 0; side < 4; ++side)
     for (lib_u32 a = 0; a < 6; ++a)
     for (lib_u32 b = 0; b < 6; ++b) {
-        kvm_key keys[3] = {KVM_KEY_CONTROL, KVM_KEY_ALT, triggers[t]};
+        lib_key keys[3] = {LIB_KEY_CONTROL, LIB_KEY_ALT, triggers[t]};
         lib_u32 scans[3] = {0x1d, 0x38, 0x19};
         lib_u32 flags[3] = {side & 1, (side >> 1) & 1, 0};
         lib_u32 mods = 0, hotkeys = 0, down[3] = {0};
@@ -129,8 +129,8 @@ static void failure_paths(void)
     lib_test_assert(!submit(&matcher, &c, 'A', 0x1e, 0, 0, 1));
     lib_test_assert(c.count == 0);
     kvm_hotkey_matcher_discard(&matcher);
-    lib_test_assert(submit(&matcher, &c, KVM_KEY_CONTROL, 0x1d, 0, 1, 1));
-    lib_test_assert(submit(&matcher, &c, KVM_KEY_ALT, 0x38, 0, 3, 1));
+    lib_test_assert(submit(&matcher, &c, LIB_KEY_CONTROL, 0x1d, 0, 1, 1));
+    lib_test_assert(submit(&matcher, &c, LIB_KEY_ALT, 0x38, 0, 3, 1));
     c.reject_at = 2;
     lib_test_assert(!submit(&matcher, &c, 'A', 0x1e, 0, 3, 1));
     lib_test_assert(!submit(&matcher, &c, 'B', 0x30, 0, 3, 1));
@@ -144,12 +144,12 @@ static void orphan_releases(void)
     capture c = {0};
     lib_test_assert(kvm_hotkey_registry_register(&registry, 'P', 3, "action") == LIB_STATUS_OK);
     kvm_hotkey_matcher_initialize(&matcher, &registry);
-    lib_test_assert(submit(&matcher, &c, KVM_KEY_ENTER, 0x1c, 0, 0, LIB_FALSE));
+    lib_test_assert(submit(&matcher, &c, LIB_KEY_ENTER, 0x1c, 0, 0, LIB_FALSE));
     lib_test_assert(c.attempts == 0 && matcher.held_count == 0);
-    lib_test_assert(submit(&matcher, &c, KVM_KEY_CONTROL, 0x1d, 0, 1, LIB_TRUE));
-    lib_test_assert(submit(&matcher, &c, KVM_KEY_ENTER, 0x1c, 0, 1, LIB_FALSE));
+    lib_test_assert(submit(&matcher, &c, LIB_KEY_CONTROL, 0x1d, 0, 1, LIB_TRUE));
+    lib_test_assert(submit(&matcher, &c, LIB_KEY_ENTER, 0x1c, 0, 1, LIB_FALSE));
     lib_test_assert(c.attempts == 0 && matcher.held_count == 1);
-    lib_test_assert(submit(&matcher, &c, KVM_KEY_CONTROL, 0x1d, 0, 0, LIB_FALSE));
+    lib_test_assert(submit(&matcher, &c, LIB_KEY_CONTROL, 0x1d, 0, 0, LIB_FALSE));
     lib_test_assert(c.count == 2 && matcher.held_count == 0);
     lib_test_assert(submit(&matcher, &c, 'A', 0x1e, 0, 0, LIB_TRUE));
     kvm_hotkey_matcher_discard(&matcher);
@@ -164,17 +164,20 @@ static lib_status no_join(kvm_component *component, lib_u32 timeout_ms)
 { (void)component; (void)timeout_ms; return LIB_STATUS_OK; }
 static void no_dispose(kvm_component *component)
 { kvm_component_mailboxes_destroy(&component->mailboxes); }
+static base_keyboard_decoder console_decoder;
 static void console_record(kvm_console *console, lib_u32 key, lib_u32 scan,
     lib_u32 text, lib_bool down, lib_u32 repeat)
 {
     lib_console_event e = { .kind = LIB_CONSOLE_EVENT_RAW_KEY };
-    e.value.raw_key.key = key; e.value.raw_key.scan_code = scan;
-    e.value.raw_key.unicode = text; e.value.raw_key.pressed = down;
-    e.value.raw_key.repeat_count = repeat;
+    base_keyboard_record record = { BASE_KEYBOARD_COMBINED, (lib_u16)scan,
+        (lib_u16)key, (lib_u16)text, 0u, 0u, down, (lib_u16)repeat };
+    if (base_keyboard_decode(&console_decoder, &record, &e.value.raw_key) != BASE_KEYBOARD_ACCEPTED)
+        return;
     kvm_console_receive_event(console, &e);
 }
 static void adapter_equivalence(lib_u32 scan)
 {
+    lib_memory_set(&console_decoder, 0, sizeof(console_decoder));
     static kvm_window window;
     static kvm_console console;
     static kvm_win32_window_context context;
@@ -293,7 +296,7 @@ static void adapter_equivalence(lib_u32 scan)
                         w.events[i].data.key.pressed == (i % 2 == 0));
             }
             lib_test_assert(context.keyboard_normalizer.pending_high_surrogate == 0 &&
-                console.keyboard.pending_high_surrogate == 0);
+                console_decoder.pending_high_surrogate == 0);
         }
     }
     /* A physical record cancels an unfinished text prefix on both inputs. */
@@ -362,10 +365,10 @@ static void synthesis_lifetimes(void)
     for (lib_u32 side = 0; side < 8; ++side)
     for (lib_u32 trigger = 0; trigger < 2; ++trigger) {
         kvm_hotkey_matcher m;
-        kvm_keyboard_normalizer n = {0};
+        base_keyboard_decoder n = {0};
         capture c = {0};
         void *pair[] = { &m, &c };
-        const kvm_key keys[] = { KVM_KEY_CONTROL, KVM_KEY_ALT, KVM_KEY_SHIFT, 'A' };
+        const lib_key keys[] = { LIB_KEY_CONTROL, LIB_KEY_ALT, LIB_KEY_SHIFT, 'A' };
         const lib_u32 scans[] = {0x1d, 0x38, side & 4 ? 0x36 : 0x2a, 0x1e};
         lib_u32 flags[] = {side & 1, (side >> 1) & 1, 0, 0};
         lib_u32 held = 0;
@@ -376,7 +379,7 @@ static void synthesis_lifetimes(void)
                 ++held;
             }
         lib_u32 first = c.count;
-        kvm_keyboard_record text = { .kind = KVM_KEYBOARD_CHARACTER, .utf16 = 'A', .pressed = LIB_TRUE };
+        base_keyboard_record text = { .kind = BASE_KEYBOARD_CHARACTER, .utf16 = 'A', .pressed = LIB_TRUE };
         for (lib_u32 repeat = 0; repeat < 3; ++repeat)
             lib_test_assert(kvm_keyboard_submit_record(&n, &m, pair, match_normalized, &text));
         lib_test_assert(m.held_count == held);
@@ -393,11 +396,11 @@ static void synthesis_lifetimes(void)
     }
     for (lib_u32 reject = 1; reject <= 4; ++reject) {
         kvm_hotkey_matcher m;
-        kvm_keyboard_normalizer n = {0};
+        base_keyboard_decoder n = {0};
         capture c = { .reject_at = reject };
         void *pair[] = { &m, &c };
         kvm_hotkey_matcher_initialize(&m, LIB_NULL);
-        kvm_keyboard_record text = { .kind = KVM_KEYBOARD_CHARACTER, .utf16 = 'A', .pressed = LIB_TRUE };
+        base_keyboard_record text = { .kind = BASE_KEYBOARD_CHARACTER, .utf16 = 'A', .pressed = LIB_TRUE };
         lib_test_assert(!kvm_keyboard_submit_record(&n, &m, pair, match_normalized, &text));
         lib_test_assert(m.failed && c.attempts == reject);
         lib_test_assert(!kvm_keyboard_submit_record(&n, &m, pair, match_normalized, &text));
@@ -411,17 +414,17 @@ static void physical_identity(void)
     kvm_hotkey_matcher m;
     capture c = {0};
     kvm_hotkey_matcher_initialize(&m, LIB_NULL);
-    lib_test_assert(submit(&m, &c, KVM_KEY_KEYPAD_7, 0x47, 0, 0, 1));
-    lib_test_assert(submit(&m, &c, KVM_KEY_HOME, 0x47, 0, 0, 1));
-    lib_test_assert(m.held_count == 1 && c.events[1].data.key.key == KVM_KEY_KEYPAD_7);
-    lib_test_assert(submit(&m, &c, KVM_KEY_HOME, 0x47, 0, 0, 0));
+    lib_test_assert(submit(&m, &c, LIB_KEY_KEYPAD_7, 0x47, 0, 0, 1));
+    lib_test_assert(submit(&m, &c, LIB_KEY_HOME, 0x47, 0, 0, 1));
+    lib_test_assert(m.held_count == 1 && c.events[1].data.key.key == LIB_KEY_KEYPAD_7);
+    lib_test_assert(submit(&m, &c, LIB_KEY_HOME, 0x47, 0, 0, 0));
     lib_test_assert(m.held_count == 0 && c.count == 3);
-    lib_test_assert(c.events[2].data.key.key == KVM_KEY_KEYPAD_7 && !c.events[2].data.key.pressed);
-    lib_test_assert(submit(&m, &c, KVM_KEY_HOME, 0x47, KVM_KEY_FLAG_EXTENDED, 0, 1));
-    lib_test_assert(submit(&m, &c, KVM_KEY_KEYPAD_7, 0x47, 0, 0, 1));
+    lib_test_assert(c.events[2].data.key.key == LIB_KEY_KEYPAD_7 && !c.events[2].data.key.pressed);
+    lib_test_assert(submit(&m, &c, LIB_KEY_HOME, 0x47, LIB_KEY_FLAG_EXTENDED, 0, 1));
+    lib_test_assert(submit(&m, &c, LIB_KEY_KEYPAD_7, 0x47, 0, 0, 1));
     lib_test_assert(m.held_count == 2);
-    lib_test_assert(submit(&m, &c, KVM_KEY_HOME, 0x47, 0, 0, 0));
-    lib_test_assert(submit(&m, &c, KVM_KEY_HOME, 0x47, KVM_KEY_FLAG_EXTENDED, 0, 0));
+    lib_test_assert(submit(&m, &c, LIB_KEY_HOME, 0x47, 0, 0, 0));
+    lib_test_assert(submit(&m, &c, LIB_KEY_HOME, 0x47, LIB_KEY_FLAG_EXTENDED, 0, 0));
     lib_test_assert(m.held_count == 0);
     lib_test_assert(submit(&m, &c, 'A', 0, 0, 0, 1));
     lib_test_assert(submit(&m, &c, 'B', 0, 0, 0, 1));

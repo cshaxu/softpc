@@ -46,8 +46,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 shared_register_test(lib linux_input_contract types)
 target_sources(lib-test-linux_input_contract PRIVATE
-    "${LIB_ROOT}/kvm-base/input.c" "${LIB_ROOT}/kvm-base/linux/input.c"
-    "${LIB_ROOT}/kvm-base/hotkey.c")
+    "${LIB_ROOT}/kvm-base/input.c" "${LIB_ROOT}/base/linux/input.c"
+    "${LIB_ROOT}/base/input.c" "${LIB_ROOT}/kvm-base/hotkey.c")
 
 if(WIN32)
     shared_register_test(lib audio/pcm/win32_platform types base)

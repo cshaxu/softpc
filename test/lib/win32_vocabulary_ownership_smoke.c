@@ -34,7 +34,8 @@ static lib_win32_key_state fake_key_state(lib_i32 key)
 #define lib_win32_key_scan fake_key_scan
 #include "lib/base/win32/clock.c"
 #include "lib/kvm-window/win32/input.c"
-#include "lib/kvm-base/win32/input.c"
+#include "lib/base/win32/input.c"
+#include "lib/base/input.c"
 #include "lib/kvm-base/input.c"
 #include "lib/kvm-base/hotkey.c"
 
@@ -83,16 +84,16 @@ int main(void)
         lib_u16 key;
         lib_u8 modifiers, expected = 0u;
         lib_u32 count = 0u;
-        kvm_keyboard_normalizer state = { 0 };
-        if (raw & 1u) { expected |= KVM_INPUT_MODIFIER_SHIFT; ++count; }
-        if (raw & 2u) { expected |= KVM_INPUT_MODIFIER_CONTROL; ++count; }
-        if (raw & 4u) { expected |= KVM_INPUT_MODIFIER_ALT; ++count; }
+        base_keyboard_decoder state = { 0 };
+        if (raw & 1u) { expected |= LIB_KEY_MODIFIER_SHIFT; ++count; }
+        if (raw & 2u) { expected |= LIB_KEY_MODIFIER_CONTROL; ++count; }
+        if (raw & 4u) { expected |= LIB_KEY_MODIFIER_ALT; ++count; }
         layout_result = (lib_win32_short)((raw << 8u) | 'A');
-        CHECK(kvm_keyboard_platform_map_scalar('a', &key, &modifiers));
+        CHECK(base_keyboard_platform_map_scalar('a', &key, &modifiers));
         CHECK(key == 'A' && modifiers == expected);
         emitted_count = 0u;
         CHECK(kvm_keyboard_submit_record(&state, LIB_NULL, LIB_NULL, capture,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16='a', .repeat_count=1u }));
         CHECK(emitted_count == count * 2u + 2u);
         CHECK(emitted[count].data.key.key == 'A');
         CHECK(emitted[count].data.key.modifiers == expected);
@@ -104,15 +105,15 @@ int main(void)
     }
     layout_result = -1;
     { lib_u16 key = 99u; lib_u8 modifiers = 99u;
-      CHECK(!kvm_keyboard_platform_map_scalar('a', &key, &modifiers));
+      CHECK(!base_keyboard_platform_map_scalar('a', &key, &modifiers));
       CHECK(key == 99u && modifiers == 99u); }
     /* Layout success is not proof of a representable neutral physical key. */
     {
-        kvm_keyboard_normalizer state = {0};
+        base_keyboard_decoder state = {0};
         layout_result = LIB_WIN32_KEY_OEM_102;
         emitted_count = 0;
         CHECK(kvm_keyboard_submit_record(&state, LIB_NULL, LIB_NULL, capture,
-        &(kvm_keyboard_record){ .kind=KVM_KEYBOARD_CHARACTER, .utf16='<', .repeat_count=3 }));
+        &(base_keyboard_record){ .kind=BASE_KEYBOARD_CHARACTER, .utf16='<', .repeat_count=3 }));
         CHECK(emitted_count == 3);
         for (lib_u32 i = 0; i < emitted_count; ++i)
             CHECK(emitted[i].type == KVM_EVENT_TEXT && emitted[i].data.text.scalar == '<');

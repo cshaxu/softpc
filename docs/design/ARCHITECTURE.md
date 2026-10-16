@@ -264,12 +264,12 @@ All cross-component contracts are declared at the owning component root.
 Each component's `win32/` and `linux/` files are exclusively its own platform
 implementation; neither sibling components nor root forwarding headers may
 include them. The exception is `types/{win32,linux}`, which supplies shared
-external vocabulary to matching platform sources. Existing Windows input
-normalization support is declared by kvm-base root interfaces and implemented
-only by kvm-base; callers never reach its platform headers. Emulator normalization
-delegates raw decoding to same-shape selected platform functions; Window-only
-message decoding and key-state queries remain in kvm-window. This support API
-is not an application input API.
+external vocabulary to matching platform sources. Native input decoding is
+declared by Base's adapter support interface and implemented only by Base;
+callers never reach its platform headers. KVM owns neutral event delivery and
+text synthesis; Window-only message decoding and key-state queries remain in
+kvm-window. Emulator consumes neutral KVM events, not native records. The
+Base adapter support interface is not an application input API.
 
 Emulator session control is the sole product-state writer. VM, broker, and KVM
 workers only enqueue copied events/completions to its emulator-owned queue. The control thread
@@ -424,8 +424,9 @@ failures use the application's status boundary. Accepted KVM requests report
 asynchronous failure through the existing control-queue sink. No alternate
 event path exists.
 
-Both KVM leaves marshal native keyboard records into the same kvm-base record
-entry. It owns physical-versus-text choice and surrogate processing. Native Window
+Native Window and Console-broker records use one Base decoder for physical-
+versus-text choice and surrogate processing. Console publishes neutral values;
+both KVM leaves use the same neutral delivery entry. Native Window
 translation is requested only for unmapped transitions, so physical input has
 no duplicate character stream. Text synthesis borrows the existing matcher
 ledger and releases only keys it introduces, never separately tracking held
@@ -434,6 +435,7 @@ lifetimes for ordinary keys and modifiers alike. Repeats reuse their state;
 a delivered make cannot retrospectively become a consumed chord.
 
 Native adapters copy repetition metadata without expanding UTF-16 units.
-kvm-base owns repetition after complete-character decoding, malformed-prefix
-recovery, and TEXT fallback when either stage of physical mapping is unavailable.
-This changes Console raw metadata, not the application KVM event schema.
+Base owns complete-character decoding and malformed-prefix recovery. KVM owns
+repetition and TEXT fallback when physical mapping is unavailable. Physical
+identity is PC set-1, with zero indicating unavailable, not a native OS scan
+contract. Console raw events and KVM events share the Types-owned key vocabulary.

@@ -260,8 +260,8 @@ static void vm_driver_deliver_input(void *opaque,
     else if (event->type == KVM_EVENT_MOUSE)
         (void)softpc_machine_mouse_input(driver->machine,
             event->data.mouse.delta_x, event->data.mouse.delta_y,
-            (event->data.mouse.buttons & KVM_MOUSE_BUTTON_LEFT) != 0u,
-            (event->data.mouse.buttons & KVM_MOUSE_BUTTON_RIGHT) != 0u);
+            (event->data.mouse.buttons & LIB_MOUSE_BUTTON_LEFT) != 0u,
+            (event->data.mouse.buttons & LIB_MOUSE_BUTTON_RIGHT) != 0u);
 }
 
 static lib_status vm_driver_copy_graphics(vm_driver *driver,

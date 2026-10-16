@@ -5,7 +5,7 @@
  * on the same Console. Detach waits for callbacks; output replacement waits
  * for writes. These gates block instead of busy-waiting. */
 
-#include "lib/types/types_interface.h"
+#include "lib/types/input_values.h"
 
 /* A logical Console is a copied-value endpoint.  It deliberately has no
  * native handle, process ownership, reader, or presentation policy. Console
@@ -35,32 +35,11 @@ typedef enum lib_console_event_kind {
     LIB_CONSOLE_EVENT_INPUT_RESET
 } lib_console_event_kind;
 
-enum {
-    LIB_CONSOLE_MODIFIER_CONTROL = 0x01u,
-    LIB_CONSOLE_MODIFIER_ALT = 0x02u,
-    LIB_CONSOLE_MODIFIER_SHIFT = 0x04u
-};
-
-typedef struct lib_console_raw_key {
-    /* Opaque platform key value, interpreted by the matching KVM adapter.
-     * Windows producers use the SDK virtual-key vocabulary wrapped in types. */
-    lib_u32 key;
-    lib_u32 unicode;
-    lib_u16 scan_code;
-    lib_u8 modifiers;
-    lib_bool extended;
-    lib_bool pressed;
-    /* Copied native repetitions; zero denotes a single record.
-     * The input consumer, not the broker, interprets characters and expands counts. */
-    lib_u16 repeat_count;
-} lib_console_raw_key;
-
 typedef struct lib_console_raw_mouse {
-    /* Raw Console cell position (historical field names), not KVM motion.
-     * buttons is the platform input-record mask. The matching KVM adapter
-     * computes motion and translates buttons before emitting a KVM event. */
-    lib_i32 delta_x;
-    lib_i32 delta_y;
+    /* Absolute zero-based screen-buffer cells, not relative pixel motion.
+     * buttons uses LIB_MOUSE_BUTTON_*; no native input-record bits escape. */
+    lib_i32 column;
+    lib_i32 row;
     lib_u32 buttons;
 } lib_console_raw_mouse;
 
@@ -73,7 +52,7 @@ typedef struct lib_console_event {
     lib_console_event_kind kind;
     lib_u32 binding_generation;
     union {
-        lib_console_raw_key raw_key;
+        lib_key_input raw_key;
         lib_console_raw_mouse raw_mouse;
         lib_console_line line;
     } value;

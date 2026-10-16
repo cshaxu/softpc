@@ -99,8 +99,8 @@ int main(void)
         sizeof(stale_input)) == SOFTPC_MACHINE_OK);
     assert(stale_input == 0u);
 
-    assert(runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 1u));
-    assert(runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
+    assert(runtime_input_enqueue_key(runtime, 0x1du, LIB_KEY_CONTROL, 1u));
+    assert(runtime_input_enqueue_key(runtime, 0x1du, LIB_KEY_CONTROL, 0u));
     deadline = softpc_test_clock_milliseconds() + 1000u;
     assert(runtime_input_wait_for_byte(machine, 0x502u, 0x01u, deadline,
         &delivered));
@@ -114,7 +114,7 @@ int main(void)
     assert(emulator_machine_pause(runtime));
     assert(runtime_input_wait_for_state(runtime, EMULATOR_MACHINE_PAUSED,
         softpc_test_clock_milliseconds() + 5000u));
-    assert(!runtime_input_enqueue_key(runtime, 0x1du, KVM_KEY_CONTROL, 0u));
+    assert(!runtime_input_enqueue_key(runtime, 0x1du, LIB_KEY_CONTROL, 0u));
     assert(emulator_machine_stop(runtime));
     assert(runtime_input_wait_for_state(runtime, EMULATOR_MACHINE_STOPPED,
         softpc_test_clock_milliseconds() + 5000u));

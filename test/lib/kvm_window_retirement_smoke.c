@@ -162,7 +162,7 @@ static void input_scenario(void)
     kvm_win32_window_context *ctx = win32_window_context(created);
     kvm_input_event key = { .type = KVM_EVENT_KEY };
     key.data.key.pressed = LIB_TRUE; key.data.key.scan_code = 0x1d;
-    key.data.key.key = scenario == 7 ? 'A' : KVM_KEY_CONTROL;
+    key.data.key.key = scenario == 7 ? 'A' : LIB_KEY_CONTROL;
     key.data.key.modifiers = KVM_HOTKEY_MODIFIER_CONTROL;
     if (scenario == 7) {
         lib_test_assert(!win32_window_emit_normalized(ctx, &key));
