@@ -3,8 +3,9 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S4 is implemented and verified, pending its complete executor push and
-coordinator review: neutral host MIDI and truthful raw-FM capability. Both
+T93 S5 is active: original DMA decrement/wrap prerequisite. S4 executor
+`46ad2e3f` is pushed and actual-change reviewed; S4 is closed under delegated
+sequential acceptance. It adds neutral host MIDI and truthful raw-FM capability. Both
 widths pass 154/154 including all ten native desktop tests; both EXEs are
 refreshed. Production C/H +444/-0 and test C +356/-0; no mirror or existing
 PCM/Compat/Machine/Emulator change. The S4 proposal ledger records native
@@ -80,26 +81,26 @@ builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
 proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S4 Packet
+## M9 T93 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal and sequential-execution authorization; S3 executor b31b6e17 reviewed with dual 150/150 qualification. |
-| Objective | Add neutral host MIDI short/SysEx output, bounded ownership and completion/reset semantics; expose raw FM acquisition as unsupported where no genuine host facility exists. |
-| Non-goals | No software synthesizer, sound bank, XP device import, Emulator change, guest protocol in Lib, user INI/media/snapshot change or external repository write. |
-| Reference Baseline | S3 executor b31b6e17 and its dual package baseline. |
-| Candidate Proposal | [S4 MIDI/FM brief](../proposals/m9-xp-sound-blaster-standalone.md#s4--neutral-midi-output-and-honest-fm-capability). |
-| Files And ABI Surface | New audio/midi and audio/fm public/private/native files, Types WinMM declarations, owner-local tests, build/verifiers/manifests and contract docs. MIDI +300-550 production lines, FM +30-70, tests +300-500; refine file census before edits. |
-| Applicable Rules | Task Reading Set, single-agent executor/coordinator review, C11 shared packages, Types authority and inward ownership; no invented FM rendering or second guest state owner. |
-| Verification | Immediate short message, bounded copied SysEx ownership, full capacity, synchronous/asynchronous completion, reset/close failures, optional volume and absent capability; dual Release publication, shared then other background suites and native desktop tests. |
-| Expected Markers | Event-driven host completion, no polling or external synth dependency; host absence/unsupported remains distinguishable from successful output. Existing PCM/PC-speaker behavior retained. |
-| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s4 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
-| Reporting Requirements | Pre/post production/test add-delete-net and public-contract audit, focused/full evidence and EXE hashes; push complete P then actual-change review. |
-| Stop Conditions | A second device/state owner, unapproved Emulator behavior change, fake FM success, undocumented buffer lifetime, unrelated user changes or external dependency. |
-| Exit Criteria | Neutral MIDI/FM contract and qualification pushed/reviewed; proceed to S5 under goal authorization, T closure waits for owner. |
+| Admission And Approval | Owner's active goal and sequential-execution authorization; S4 executor 46ad2e3f reviewed with dual 154/154 qualification. S1/S5 proposal explicitly admits the original DMA prerequisite repair. |
+| Objective | Repair the existing DMA decrement-copy and boundary splitting path without a second transfer implementation, preserving address/count/terminal-count behavior needed by XP sound. |
+| Non-goals | No Sound Blaster payload or Lib/Emulator change, no unrelated DMA/controller rewrite, no user INI/media/snapshot change or external repository write. |
+| Reference Baseline | S4 executor 46ad2e3f and its dual package baseline; selected XP source identity and accepted T92 DMA reload repair remain authoritative. |
+| Candidate Proposal | [S5 DMA brief](../proposals/m9-xp-sound-blaster-standalone.md#s5--original-dma-prerequisite-repair). |
+| Files And ABI Surface | Existing softpc.new/base/system/at_dma.c helpers/split, related header only if demonstrated necessary; unit/machine/device_contract_smoke.c and mirror/test manifests. Estimated production +20-50/-10-25 (net -5 to +40), tests +120-220/-0; refine against actual code before edits. |
+| Applicable Rules | Task Reading Set, single-agent executor/coordinator actual-change review, preserved mirror subset/local-patch ledger, one controller owner and no host policy in device code. |
+| Verification | Guarded host buffers and actual dma_request paths across byte/word, READ/WRITE/VERIFY, increment/decrement, wrap, terminal count and auto-reload; dual Release publication, shared then other background suites and native desktop tests. |
+| Expected Markers | Sequential host buffer stays in bounds, guest addresses follow selected direction and controller-width wrap, no extra device state or alternate DMA path; accepted reload fix retained. |
+| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s5 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
+| Reporting Requirements | Pre/post production/test add-delete-net, mirror patch accounting, finite transfer matrix, focused/full evidence and EXE hashes; push complete P then actual-change review. |
+| Stop Conditions | Unexplained DMA caller convention, a second controller implementation, unapproved shared behavior change, unrelated user changes or external dependency. |
+| Exit Criteria | DMA copy/wrap contract verified and pushed/reviewed, corresponding TODO removed only after proof; proceed under goal authorization, T closure waits for owner. |
 | Original Owner Request | 单人双角色模式按照治理规范和质量规范，构建新的 lib/audio 的公共组件 (src+test)，然后导入xp mvdm源代码，为stadalone softpc实现完整xp-ntvdm-parity音频功能 |
-| Similar-Issue Sweep | Short/long admission, native callback ordering, copied buffer lifetime, pending reset/destruction, capability/error classification and stream/device volume scope; keep direct-edge and Types gates intact. |
+| Similar-Issue Sweep | Inspect every dma_request caller and directional helper, guest/host stride, controller byte/word conversion and boundary split; classify every hit and retain the existing increment/reload contracts. |
 
 ## M9 T93 S1 Retained Design Brief
 
