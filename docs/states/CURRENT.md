@@ -2,14 +2,34 @@
 
 ## Current Work
 
-T92 S1-S6 are implementation-closed under the owner's async delegation.
-Open task awaiting owner: T92.
-No implementation subtask is active. T92 remains open awaiting owner acceptance
-and formal closure; no next T is admitted. Final S6 executor `48caa854` is
-pushed and its separate actual-change review passes. Both Release packages and
+The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
+T93 S1 is active: XP Sound Blaster source/output design audit. No sound payload
+or backend has been selected/imported by this admission. Final T92 executor
+`48caa854` and review `93d0b8d6` are pushed. Both Release packages and
 150/150 tests per width pass, including all ten reserved desktop cases.
 See the [T-level audit](../history/M9-T92-completion-audit.md) and
 [S6 review](../history/M9-T92-S6-xp-baseline-qualification.md).
+
+## M9 T93 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner: 验收通过，准入下一个T任务！ on 2026-10-15; closes T92 and admits the queued sound task's design phase. |
+| Objective | Recheck the fixed XP sound subset and design a complete standalone DSP/PCM/Mixer/FM/MIDI integration with one device owner; produce executable later-S briefs. |
+| Non-goals | No production import, new backend dependency, shared-package change, guest asset mutation, or claim of working sound in S1. |
+| Reference Baseline | Accepted T92 endpoint 93d0b8d6; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89, necessary-source-subset policy. |
+| Candidate Proposal | [Sound capability and S1 brief](../proposals/m9-xp-sound-blaster-standalone.md#t93-s1-admission-and-design-brief). |
+| Files And ABI Surface | Audit seven XP sound candidates and existing DMA/port, Compat audio, machine lifecycle/snapshot seams; change planning/evidence only. No ABI change. |
+| Applicable Rules | Task Reading Set; single-agent dual-role execution/documentation governance; architecture/coding and source-research authorities for design. |
+| Verification | Fixed Git-object source recheck, dependency/call-path census, requirement-to-owner/proof matrix, executable estimates, documentation gate and actual-change review. No invented runtime result. |
+| Expected Markers | Explicit PCM/FM/MIDI output destinations, source provenance, one timing/device owner, resource/restore design and no silent unsupported-feature success. |
+| Asset Needs | Read-only upstream Git objects; any long audit uses hidden bounded build/t93/s1 logs, 600-second budget and 30 MiB cap, executor-owned cleanup. No Computer Use. |
+| Reporting Requirements | Prechange scope and estimates; per-file proposed source/test add/delete/net, subset exclusions and patch causes; distinguish established evidence from unresolved decisions. |
+| Stop Conditions | Missing source admission, unapproved backend/public capability, second device/timing path, or unresolved guest semantics. Present choices before implementation. |
+| Exit Criteria | Reviewed source/backend recommendation and complete S2-S4 briefs, documentation proof and pushed executor delivery followed by separate actual-change review; design approval precedes payload implementation. |
+| Original Owner Request | 验收通过，准入下一个T任务！ Queue head retains the complete XP Sound Blaster capability separated from T92, not a DSP-only substitute. |
+| Similar-Issue Sweep | Inventory NTVDM/native-device dependencies, host-pointer narrowing, polling/global-volume assumptions, missing MIDI tails and reset/teardown hooks; assign every finding to an owner or explicit decision. |
 
 The following retained progression records how this baseline was reached:
 
@@ -932,6 +952,7 @@ on 2026-09-25. S2 performs no product-code change; no T84 closure is claimed.
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T92 | Owner accepted and closed 2026-10-15; S1-S6 complete, dual-width 150/150 including all desktop tests. | [Completion audit](../history/M9-T92-completion-audit.md) |
 | T91 | Owner accepted and closed 2026-10-15; all S1-S5 obligations complete. | [Completion audit](../history/M9-T91-completion-audit.md) |
 | T90 | S1 owner-accepted and closed; five non-mirror quality repairs, dual-width 137/137 including native desktop. | [Audit](../history/M9-T90-S1-nonmirror-quality-cleanup.md#t90-completion-audit-and-owner-acceptance) |
 | T89 | S1--S5 owner-accepted and closed; mirror/Compat convergence, dual-width 136/136 qualification. | [Audit](../history/M9-T89-completion-audit.md) |

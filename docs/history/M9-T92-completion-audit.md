@@ -1,8 +1,12 @@
 # M9 T92: XP Core Migration Completion Audit
 
-Status: S1-S6 implementation and verification are complete; S6 executor
-`48caa854` is pushed and its separate actual-change review passes. T92 is ready
-for owner acceptance, not formally closed. Formal T closure waits for the owner.
+Status: owner accepted and closed T92 on 2026-10-15: “验收通过，准入下一个T任务！”
+S1-S6 implementation and verification are complete; S6 executor `48caa854`
+and its separate actual-change review `93d0b8d6` are pushed. The same request
+admits the sound candidate as T93 S1. This handoff changes documentation only;
+accepted EXEs, source, INI, media and snapshots remain unchanged. All original
+requirements and explicit sound transfer are accounted for below. Existing
+TODOs remain independently tracked, not falsely claimed as repaired.
 
 ## Original request and scope
 

@@ -5,8 +5,46 @@
 On 2026-10-15 the owner requests two tasks instead of coupling baseline
 migration and new sound capability. This is the ordered follow-on candidate
 to [T92 core migration](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md); CURRENT and Queue
-own status. No T number or implementation S is allocated before admission.
+own status. The owner accepts T92 and admits this candidate as T93 on 2026-10-15.
 The complete former T92 S5 obligation transfers here, not to TODO or deletion.
+
+## T93 S1 admission and design brief
+
+Original admission: “验收通过，准入下一个T任务！” Accepted input is T92
+endpoint `93d0b8d6`, not an unreviewed upstream working tree. S1 is active;
+later S implementation is not started. The older S1 findings below refer to
+T92's source audit and are inherited evidence to recheck, not completed T93 work.
+
+Audit the seven pinned XP candidates plus their callers and selected existing
+port/DMA/IRQ/audio/lifecycle/snapshot seams. Build a finite feature ledger for
+DSP command/transfer modes, Mixer, FM and MIDI, with each item assigned to
+original device logic, a host output boundary, necessary local repair, or a
+documented unsupported XP operation. Track original notices and excluded host
+branches separately from real local changes.
+
+For PCM, establish sample conversion, enqueue/cancellation, tail delivery and
+PC-speaker coexistence without using host completion as the guest clock. For
+FM and MIDI, compare actual available output implementations and provenance;
+XP's native FM calls are not evidence of a portable synthesizer. Recommend the
+smallest complete solution, identify approval needs and avoid silent stubs.
+
+Design the one executor-owned device state, current port registration route,
+DMA count/IRQ ownership, reset/stop/destruction and fixed-width snapshot state.
+Account for the existing DMA decrement-copy TODO before relying on that path;
+do not silently expand S1 into its production repair. Existing unrelated TODOs
+remain tracked. Derive S2-S4 file lists, add/delete/net estimates and tests from
+these actual dependencies, not from the 6,097-line upstream file size.
+
+S1 estimate: production and test C/H +0/-0; planning/evidence about +80–160
+net lines. Verification is source/call-path and documentation proof, not a
+fresh audio/runtime pass. No new EXE is required for this admission-only edit.
+Every later runnable change still requires dual builds, publication, focused
+and full regression, native desktop scheduling and pushed actual-change review.
+
+Exit: source/dependency ledger, complete output recommendation, lifecycle and
+snapshot ownership, proposed per-S diff and proof matrix. Present unresolved
+backend/source/public-capability decisions for approval before implementation.
+Keep the full sound objective: a PCM-only demonstration cannot close T93.
 
 ## Objective and non-goals
 
