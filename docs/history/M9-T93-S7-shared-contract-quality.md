@@ -102,4 +102,3 @@ Every S7 ledger member has a repair and proof; the mandatory post-edit shared
 quality audit is complete at its stated finite scope. S8 XP MIDI/FM attachment
 is admitted next under the owner's existing sequential authorization. Only
 T-level closure waits for owner confirmation; S9 remains required afterward.
-
