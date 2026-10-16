@@ -3,14 +3,14 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S5 is active: original DMA decrement/wrap prerequisite. The existing
-copy/split repair is implemented (+28/-15 production; +107/-5 tests). The
-expanded real-transfer, host-canary, wrap, reload and ROM-protection test
-passes on x64/x86 after failing against the old copy path. Dual qualification
-passes 94 shared + 55 other + five individually isolated native desktop cases
-per width. Sequential CTest child DLL-initialization failures are retained in
-the proposal and TODO, not claimed fixed. Both EXEs are refreshed; executor
-push and coordinator actual-change review remain pending. S4 executor
+T93 S6 is active: selected XP DSP/PCM/Mixer integration, beginning with the
+exact subset/host-seam review. S5 executor a34f858f is pushed and actual-change
+reviewed; S5 closes under delegated sequential acceptance. Its existing DMA
+copy/split repair is +28/-15 production and +107/-5 tests. Both widths pass
+94 shared + 55 other + five individually isolated native desktop cases.
+Sequential CTest child DLL-initialization failures remain in TODO; they are
+not claimed fixed. Both EXEs are refreshed. S6's shared Emulator pause-hook
+change still requires explicit approval before implementation. S4 executor
 `46ad2e3f` is pushed and actual-change reviewed; S4 is closed under delegated
 sequential acceptance. It adds neutral host MIDI and truthful raw-FM capability. Both
 widths pass 154/154 including all ten native desktop tests; both EXEs are
@@ -88,26 +88,26 @@ builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
 proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S5 Packet
+## M9 T93 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal and sequential-execution authorization; S4 executor 46ad2e3f reviewed with dual 154/154 qualification. S1/S5 proposal explicitly admits the original DMA prerequisite repair. |
-| Objective | Repair the existing DMA decrement-copy and boundary splitting path without a second transfer implementation, preserving address/count/terminal-count behavior needed by XP sound. |
-| Non-goals | No Sound Blaster payload or Lib/Emulator change, no unrelated DMA/controller rewrite, no user INI/media/snapshot change or external repository write. |
-| Reference Baseline | S4 executor 46ad2e3f and its dual package baseline; selected XP source identity and accepted T92 DMA reload repair remain authoritative. |
-| Candidate Proposal | [S5 DMA brief](../proposals/m9-xp-sound-blaster-standalone.md#s5--original-dma-prerequisite-repair). |
-| Files And ABI Surface | Existing softpc.new/base/system/at_dma.c helpers/split, related header only if demonstrated necessary; unit/machine/device_contract_smoke.c and mirror/test manifests. Estimated production +20-50/-10-25 (net -5 to +40), tests +120-220/-0; refine against actual code before edits. |
-| Applicable Rules | Task Reading Set, single-agent executor/coordinator actual-change review, preserved mirror subset/local-patch ledger, one controller owner and no host policy in device code. |
-| Verification | Guarded host buffers and actual dma_request paths across byte/word, READ/WRITE/VERIFY, increment/decrement, wrap, terminal count and auto-reload; dual Release publication, shared then other background suites and native desktop tests. |
-| Expected Markers | Sequential host buffer stays in bounds, guest addresses follow selected direction and controller-width wrap, no extra device state or alternate DMA path; accepted reload fix retained. |
-| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s5 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
-| Reporting Requirements | Pre/post production/test add-delete-net, mirror patch accounting, finite transfer matrix, focused/full evidence and EXE hashes; push complete P then actual-change review. |
-| Stop Conditions | Unexplained DMA caller convention, a second controller implementation, unapproved shared behavior change, unrelated user changes or external dependency. |
-| Exit Criteria | DMA copy/wrap contract verified and pushed/reviewed, corresponding TODO removed only after proof; proceed under goal authorization, T closure waits for owner. |
+| Admission And Approval | Owner's active goal, XP import approval and sequential-execution authorization; S5 executor a34f858f reviewed. This does not approve the separately disclosed shared pause-hook behavior change. |
+| Objective | Attach the necessary XP DSP/PCM/Mixer device subset to the existing DMA/PIC and Lib PCM through Compat; first freeze exact selected ranges and host-seam changes before payload. |
+| Non-goals | No MIDI/FM device integration yet, no software synthesis, no second DMA/device clock, no unrelated shared changes or user INI/media/snapshot mutation. |
+| Reference Baseline | S5 executor a34f858f and published dual EXEs; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 necessary-subset identity and S1 host-call ledger. |
+| Candidate Proposal | [S6 DSP/PCM/Mixer brief](../proposals/m9-xp-sound-blaster-standalone.md#s6--xp-dsppcmmixer-and-host-integration). |
+| Files And ABI Surface | Selected sndblst.h, nt_sb.h, nt_sb.c, nt_sbdsp.c, nt_sbmxr.c; Compat sound host, Machine lifecycle, build and owner-local tests. Estimated XP +1300-2200; local production +250-450/-20-60; tests +300-500. Separate shared pause-hook approval precedes any Emulator edit. |
+| Applicable Rules | Task Reading Set and single-agent dual-role review; pinned necessary-source subset, source-visible local patches, one guest device owner and inward public boundaries. |
+| Verification | Actual DSP ports/reset/version, single/auto/high-speed DMA and IRQ/EOI, speaker/mixer/rate/progress, pause/resume and endpoint failures; dual builds/publication and all shared, other and native desktop tests. |
+| Expected Markers | XP owns guest protocol/state; Compat translates host contracts into existing Lib PCM; no WinMM pointer ABI, VDD loader, new device thread or second timing path. |
+| Asset Needs | Hidden supervised build/t93/s6 logs/exit files and bounded diagnostics; build 1800s, tests 1200s, 30 MiB logs; executor cleanup. Existing Ninja trees and user assets preserved; no Computer Use. |
+| Reporting Requirements | Exact selected-range/host-seam diff before payload; per-owner production/test add-delete-net, mirror patch reasons, finite behavior coverage, EXE hashes and complete pushed P followed by actual-change review. |
+| Stop Conditions | Unresolved XP semantics/ownership, unapproved shared behavior, second execution/timing path, external build dependency, unexpected user changes. |
+| Exit Criteria | Selected DSP/PCM/Mixer integrated and qualified against the admitted contract, complete executor delivery pushed and independently actual-change reviewed. No manual hearing or T closure inferred. |
 | Original Owner Request | 单人双角色模式按照治理规范和质量规范，构建新的 lib/audio 的公共组件 (src+test)，然后导入xp mvdm源代码，为stadalone softpc实现完整xp-ntvdm-parity音频功能 |
-| Similar-Issue Sweep | Inspect every dma_request caller and directional helper, guest/host stride, controller byte/word conversion and boundary split; classify every hit and retain the existing increment/reload contracts. |
+| Similar-Issue Sweep | Inventory every imported host call, pointer cast, async completion, DMA position and IRQ owner; give each XP/native dependency and changed lifecycle path one disposition and focused proof. |
 
 ## M9 T93 S1 Retained Design Brief
 
