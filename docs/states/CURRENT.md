@@ -3,7 +3,7 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S1 is active: XP Sound Blaster source/output design audit. Host-output
+T93 S2 is active: existing PCM structural migration only. Host-output
 directions are recorded below; no sound payload/backend change is imported. Final T92 executor
 `48caa854` and review `93d0b8d6` are pushed. Both Release packages and
 150/150 tests per width pass, including all ten reserved desktop cases.
@@ -23,7 +23,7 @@ phase. TinySoundFont, SoundFont packaging and the approximately 10,000-line
 combined engine recommendation are withdrawn. No such source was imported.
 The owner subsequently prioritizes matching XP over guaranteed audible FM.
 All software-OPL recommendations and software-synthesis archive/budget plans
-are withdrawn too. S1 remains active; those earlier drafts are not authority.
+are withdrawn too. S1 design delivery is reviewed; those earlier drafts are not authority.
 
 FM source audit now reaches XP's Ki386AdlibEmulation: the no-hardware fallback
 only emulates status and does not generate sound. The direct-I/O branch uses
@@ -38,9 +38,32 @@ and stream-local gain; unused XP pause/restart and header APIs are not copied.
 S2-S8 separate relocation, PCM, MIDI/FM host capabilities, DMA repair, XP PCM
 device integration, XP MIDI/FM integration and portable-state qualification.
 The disclosed shared pause-hook behavior change still requires approval in
-its implementation packet. Only the two existing S1 planning files change.
+its implementation packet. S1 executor 2860b484 is pushed and actual-change
+reviewed. The continued owner implementation goal admits S2 below; no S2
+production change has yet been made. No manual audio acceptance is inferred.
 
-## M9 T93 S1 Packet
+## M9 T93 S2 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner's active goal directs constructing shared Audio src/test, then XP integration in single-agent dual-role mode; S1 executor 2860b484 is reviewed. |
+| Objective | Move existing PCM source/tests to audio/pcm, rename public/private symbols and build targets, repair all callers without changing playback behavior. |
+| Non-goals | No new PCM semantics, MIDI/FM implementation, XP import, Emulator behavior change, user INI/media/snapshot change or external repository write. |
+| Reference Baseline | S1 executor 2860b484; existing T92 runnable source and dual package baseline. |
+| Candidate Proposal | [S2 migration brief](../proposals/m9-xp-sound-blaster-standalone.md#s2--move-existing-pcm-without-behavior-changes). |
+| Files And ABI Surface | Five Lib audio files, two Lib tests, Compat consumer and four App tests; root/shared build, gates, manifests and layout docs. Symbols and paths change, behavior does not. |
+| Applicable Rules | Task Reading Set, single-agent executor/coordinator review, git mv, C11 shared packages, Types authority and inward ownership. |
+| Verification | Rename-normalized comparison against baseline; no stale aliases; manifests/DAG; dual Release build and publication; shared suites then all other background suites; reserved native desktop tests separately. |
+| Expected Markers | One PCM implementation; unchanged FIFO/submission/lifecycle behavior; original tests retained; both package EXEs refreshed and full results recorded. |
+| Asset Needs | Existing Ninja intermediates; hidden supervised build/t93/s2 logs/exit files, 1800s build and 1200s suite budgets, 30 MiB logs; executor cleanup. Preserve all user assets. |
+| Reporting Requirements | Before/after rename-aware production/test add-delete-net, moved-line accounting, focused/full test evidence and EXE hashes; commit/push complete P then actual-change review. |
+| Stop Conditions | Required behavior change or unrelated regression; unreserved desktop interaction; unexpected user changes; no opportunistic PCM fix in the move. |
+| Exit Criteria | Structural migration and complete qualification pushed/reviewed; proceed to S3 under goal authorization, T closure waits for owner. |
+| Original Owner Request | 单人双角色模式按照治理规范和质量规范，构建新的 lib/audio 的公共组件 (src+test)，然后导入xp mvdm源代码，为stadalone softpc实现完整xp-ntvdm-parity音频功能 |
+| Similar-Issue Sweep | All audio path/include/symbol/target/test-name references, platform boundary detection and manifests; old historical evidence remains historical. |
+
+## M9 T93 S1 Retained Design Brief
 
 | Field | Required record |
 | --- | --- |
