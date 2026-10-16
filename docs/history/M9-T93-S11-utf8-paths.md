@@ -7,6 +7,10 @@ and authorizes S11 through verified closure, not automatic S12 admission.
 Baseline: 45d6f860. Executor 33a9c9f7 is committed and pushed; subsequent
 coordinator review inspected the actual committed changes and evidence.
 S11 is closed on 2026-10-16. T93 remains open without an active S.
+The first closure document used an equivalent idle sentence instead of the
+gate's exact idle marker; its documentation check failed. A follow-up governance
+correction adds the required idle/open-task markers and reruns that check.
+No production, test implementation or executable changes are involved.
 
 ## Result and ownership
 

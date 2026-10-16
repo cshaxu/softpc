@@ -2,6 +2,9 @@
 
 ## Current Work
 
+No implementation subtask is active.
+Open task awaiting owner: T93.
+
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
 The owner accepts the reopened S7 delivery and admits S8: "验收通过，准入s8".
 S7 is closed; executor 7bb98d79 and review e1e44d0c are pushed. Both widths
