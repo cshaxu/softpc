@@ -3,19 +3,49 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S1 is active: XP Sound Blaster source/output design audit. No sound payload
-or backend has been selected/imported by this admission. Final T92 executor
+T93 S1 is active: XP Sound Blaster source/output design audit. Host-output
+directions are recorded below; no sound payload/backend change is imported. Final T92 executor
 `48caa854` and review `93d0b8d6` are pushed. Both Release packages and
 150/150 tests per width pass, including all ten reserved desktop cases.
 See the [T-level audit](../history/M9-T92-completion-audit.md) and
 [S6 review](../history/M9-T92-S6-xp-baseline-qualification.md).
+
+Owner explicitly admits S1 design: "好的 准入s1设计 不要留下未知".
+The proposal's source-recheck checkpoint records seven pinned XP objects,
+host/DMA/MIDI/mixer exclusions and the host progress/lifecycle contracts.
+S1 now has a per-entry XP PCM/MIDI/FM host-call ledger and proposed S2-S8
+implementation briefs. It is not implementation-qualified. No production/test
+code or package artifact changed.
+
+Owner supersedes the initial software-MIDI choice on 2026-10-15: use host MIDI
+and accept approximate note/controller restoration rather than exact audible
+phase. TinySoundFont, SoundFont packaging and the approximately 10,000-line
+combined engine recommendation are withdrawn. No such source was imported.
+The owner subsequently prioritizes matching XP over guaranteed audible FM.
+All software-OPL recommendations and software-synthesis archive/budget plans
+are withdrawn too. S1 remains active; those earlier drafts are not authority.
+
+FM source audit now reaches XP's Ki386AdlibEmulation: the no-hardware fallback
+only emulates status and does not generate sound. The direct-I/O branch uses
+real ports. Read-only native enumeration here finds one MIDI output, Microsoft
+GS Wavetable Synth (technology 7), and no MOD_FMSYNTH output (technology 4).
+This is not a playback test. The revised proposal keeps WASAPI PCM, adds host
+MIDI, and explicitly reports raw FM as unsupported on current standalone
+platforms; XP-compatible silent device handling stays outside Lib.
+The owner requests audio/pcm, audio/midi and audio/fm ownership planning.
+PCM needs rate admission, real host-consumption progress, short-tail delivery
+and stream-local gain; unused XP pause/restart and header APIs are not copied.
+S2-S8 separate relocation, PCM, MIDI/FM host capabilities, DMA repair, XP PCM
+device integration, XP MIDI/FM integration and portable-state qualification.
+The disclosed shared pause-hook behavior change still requires approval in
+its implementation packet. Only the two existing S1 planning files change.
 
 ## M9 T93 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner: 验收通过，准入下一个T任务！ on 2026-10-15; closes T92 and admits the queued sound task's design phase. |
+| Admission And Approval | Owner admits S1 design, selects host MIDI with approximate restoration and XP fidelity over guaranteed FM sound, then requests an exhaustive PCM/MIDI/FM host-interface ledger and audio leaf/S-task plan. |
 | Objective | Recheck the fixed XP sound subset and design a complete standalone DSP/PCM/Mixer/FM/MIDI integration with one device owner; produce executable later-S briefs. |
 | Non-goals | No production import, new backend dependency, shared-package change, guest asset mutation, or claim of working sound in S1. |
 | Reference Baseline | Accepted T92 endpoint 93d0b8d6; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89, necessary-source-subset policy. |
@@ -23,11 +53,11 @@ See the [T-level audit](../history/M9-T92-completion-audit.md) and
 | Files And ABI Surface | Audit seven XP sound candidates and existing DMA/port, Compat audio, machine lifecycle/snapshot seams; change planning/evidence only. No ABI change. |
 | Applicable Rules | Task Reading Set; single-agent dual-role execution/documentation governance; architecture/coding and source-research authorities for design. |
 | Verification | Fixed Git-object source recheck, dependency/call-path census, requirement-to-owner/proof matrix, executable estimates, documentation gate and actual-change review. No invented runtime result. |
-| Expected Markers | Explicit PCM/FM/MIDI output destinations, source provenance, one timing/device owner, resource/restore design and no silent unsupported-feature success. |
+| Expected Markers | All 24 loaded WinMM entries and FM native operations accounted for; Lib/Compat/device boundaries, no fake FM output, proposed audio/pcm+midi+fm layout, source provenance and S2-S8 proof/budget matrix. |
 | Asset Needs | Read-only upstream Git objects; any long audit uses hidden bounded build/t93/s1 logs, 600-second budget and 30 MiB cap, executor-owned cleanup. No Computer Use. |
 | Reporting Requirements | Prechange scope and estimates; per-file proposed source/test add/delete/net, subset exclusions and patch causes; distinguish established evidence from unresolved decisions. |
 | Stop Conditions | Missing source admission, unapproved backend/public capability, second device/timing path, or unresolved guest semantics. Present choices before implementation. |
-| Exit Criteria | Reviewed source/backend recommendation and complete S2-S4 briefs, documentation proof and pushed executor delivery followed by separate actual-change review; design approval precedes payload implementation. |
+| Exit Criteria | Owner-reviewed host-fidelity design and complete S2-S8 briefs, documentation proof and pushed executor delivery followed by separate actual-change review; no automatic payload admission or S1 closure from this planning revision. |
 | Original Owner Request | 验收通过，准入下一个T任务！ Queue head retains the complete XP Sound Blaster capability separated from T92, not a DSP-only substitute. |
 | Similar-Issue Sweep | Inventory NTVDM/native-device dependencies, host-pointer narrowing, polling/global-volume assumptions, missing MIDI tails and reset/teardown hooks; assign every finding to an owner or explicit decision. |
 
