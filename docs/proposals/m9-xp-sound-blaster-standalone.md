@@ -1560,8 +1560,8 @@ not an already-working scheduling path.
 
 ### S7 — shared contract and quality repair
 
-Planned, owner-authorized next after S6; not yet active or implemented.
-Baseline is the reviewed S6 endpoint, to be frozen at admission. The supplied
+Active after reviewed S6 closure; no S7 implementation is yet claimed.
+Baseline is S6 executor 065ac9ed and its published EXEs. The supplied
 audit is source/reproduction input, not proof of these repairs or a fresh
 full-suite pass. NXVM remains read-only comparison material; no receiving
 repository runtime, audit JSON or build tree becomes a dependency.

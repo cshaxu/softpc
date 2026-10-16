@@ -3,7 +3,14 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S6 remains the sole admitted packet: selected XP DSP/PCM/Mixer integration.
+T93 S7 is the sole admitted packet: prioritized shared-contract/quality repair.
+S6 executor `065ac9ed` is pushed and actual-change reviewed; S6 closes under
+delegated sequential acceptance. Dual-width 160/160 qualification includes
+all ten native desktop cases and refreshed EXEs. The required post-edit
+Emulator audit passes for its +10/-4 production change; broader findings are
+the S7 scope. See the [S6 closure](../history/M9-T93-S6-xp-dsp-pcm-mixer.md).
+The following S6 checkpoints are retained implementation history, not pending
+work or a second active packet.
 The owner explicitly approves pause/resume use of the existing Emulator
 set_heartbeat hook and requires a public-component code-quality audit after
 the change. This clears the prior approval blocker. Source-only DSP/Mixer/EOI checkpoints are retained
@@ -46,12 +53,12 @@ delivery smoke also passes both widths. Final package qualification passes
 160/160 per width (94 shared, 61 other background, five native desktop cases),
 with both EXEs refreshed. The owner-required post-edit Emulator quality audit
 passes for the bounded pause-hook change; known wider findings stay in S7.
-No complete S6 executor commit or actual-change acceptance has been delivered.
+S6 executor and actual-change acceptance are recorded in its closure above.
 Owner now orders the shared-quality repair
 immediately after S6: planned S7 precedes MIDI/FM attachment (renumbered S8)
-and final archive qualification (renumbered S9). S6 remains the only active
-packet; this scheduling instruction does not close it. The [S7 brief](../proposals/m9-xp-sound-blaster-standalone.md#s7--shared-contract-and-quality-repair)
-owns the finding-to-regression ledger; no repair is claimed implemented.
+and final archive qualification (renumbered S9). Following reviewed S6 closure,
+S7 is now the only active packet. The [S7 brief](../proposals/m9-xp-sound-blaster-standalone.md#s7--shared-contract-and-quality-repair)
+owns the finding-to-regression ledger; no S7 repair is yet claimed implemented.
 S5 executor a34f858f is pushed and actual-change
 reviewed; S5 closes under delegated sequential acceptance. Its existing DMA
 copy/split repair is +28/-15 production and +107/-5 tests. Both widths pass
@@ -136,26 +143,26 @@ builds pass; each width passes 90 shared, 55 other background and five native
 desktop tests (150/150). Both package EXEs are refreshed and hashed in the
 proposal. No manual hearing or Linux runtime result is claimed.
 
-## M9 T93 S6 Packet
+## M9 T93 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal, XP import approval and sequential-execution authorization; S5 executor a34f858f reviewed. Owner now explicitly approves the shared pause-hook behavior change and requires a subsequent public-component quality audit. |
-| Objective | Attach the necessary XP DSP/PCM/Mixer device subset to the existing DMA/PIC and Lib PCM through Compat; first freeze exact selected ranges and host-seam changes before payload. |
-| Non-goals | No MIDI/FM device integration yet, no software synthesis, no second DMA/device clock, no unrelated shared changes or user INI/media/snapshot mutation. |
-| Reference Baseline | S5 executor a34f858f and published dual EXEs; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 necessary-subset identity and S1 host-call ledger. |
-| Candidate Proposal | [S6 DSP/PCM/Mixer brief](../proposals/m9-xp-sound-blaster-standalone.md#s6--xp-dsppcmmixer-and-host-integration). |
-| Files And ABI Surface | Selected sndblst.h, nt_sb.h, nt_sb.c, nt_sbdsp.c, nt_sbmxr.c; Compat sound host, Machine lifecycle, build and owner-local tests. Estimated XP +1300-2200; local production +250-450/-20-60; tests +300-500. Approved Emulator pause hook uses the existing callback without new API/state; audit Types, dependencies, naming and single-owner lifecycle afterward. |
-| Applicable Rules | Task Reading Set and single-agent dual-role review; pinned necessary-source subset, source-visible local patches, one guest device owner and inward public boundaries. |
-| Verification | Actual DSP ports/reset/version, single/auto/high-speed DMA and IRQ/EOI, speaker/mixer/rate/progress, pause/resume and endpoint failures; dual builds/publication and all shared, other and native desktop tests. |
-| Expected Markers | XP owns guest protocol/state; Compat translates host contracts into existing Lib PCM; no WinMM pointer ABI, VDD loader, new device thread or second timing path. |
-| Asset Needs | Hidden supervised build/t93/s6 logs/exit files and bounded diagnostics; build 1800s, tests 1200s, 30 MiB logs; executor cleanup. Existing Ninja trees and user assets preserved; no Computer Use. |
-| Reporting Requirements | Exact selected-range/host-seam diff before payload; per-owner production/test add-delete-net, mirror patch reasons, finite behavior coverage, EXE hashes and complete pushed P followed by actual-change review. |
-| Stop Conditions | Unresolved XP semantics/ownership, unapproved shared behavior, second execution/timing path, external build dependency, unexpected user changes. |
-| Exit Criteria | Selected DSP/PCM/Mixer integrated and qualified against the admitted contract, complete executor delivery pushed and independently actual-change reviewed. No manual hearing or T closure inferred. |
-| Original Owner Request | 单人双角色模式按照治理规范和质量规范，构建新的 lib/audio 的公共组件 (src+test)，然后导入xp mvdm源代码，为stadalone softpc实现完整xp-ntvdm-parity音频功能 |
-| Similar-Issue Sweep | Inventory every imported host call, pointer cast, async completion, DMA position and IRQ owner; give each XP/native dependency and changed lifecycle path one disposition and focused proof. |
+| Admission And Approval | Owner orders prioritized shared-quality repair after S6, authorizes sequential S execution, and requires post-edit public-code audit. S6 executor 065ac9ed is pushed and actual-change reviewed. |
+| Objective | Repair confirmed formatting/path contracts and shared naming/Types/verifier gaps in place; preserve one implementation per responsibility and improve owner-local regression proof. |
+| Non-goals | No mirror changes, audio redesign, new manager/retry/rollback framework, NXVM edits or user INI/media/snapshot mutation. No unrelated runtime behavior changes. |
+| Reference Baseline | Reviewed S6 executor 065ac9ed and its dual EXEs; supplied external audit is evidence to recheck, not an implementation or test dependency. |
+| Candidate Proposal | [S7 finding-to-proof ledger](../proposals/m9-xp-sound-blaster-standalone.md#s7--shared-contract-and-quality-repair). |
+| Files And ABI Surface | Lib Base process and Console/Linux naming; Emulator monitor and Types tokens; both X86 source gates, formatting test doubles and warning scope; App config join consumer. Roughly 15-22 production and 6-10 test C/H paths plus gates/build/manifests. Behavior +20-45/-10-25; mechanical naming near-zero net; tests +120-220/-10-30; gates/build +40-90/-15-35. Refresh exact per-file estimate before code edits. |
+| Applicable Rules | Task Reading Set; single-agent executor/coordinator roles; strict C11, Lib Types authority, inward source/test/config/docs boundaries, no second production paths. |
+| Verification | Reproduce old failing boundaries; owner-local formatting/path/negative-gate tests; strict x86/x64 builds and EXE publication; shared suites first then all other unit/integration and ten native desktop tests. |
+| Expected Markers | Required-length checks reject truncation; directory extraction preserves roots only; neutral names and Types tokens; gates reject unowned source and outward links without false bans on valid inward dependencies. |
+| Asset Needs | Hidden supervised build/t93/s7 jobs, logs and exit files; build 1800s, tests 1200s, 30 MiB logs, executor cleanup. Reuse Ninja trees; no Computer Use; desktop scheduling preapproved. |
+| Reporting Requirements | Each ledger finding receives current source/reproduction proof and repair disposition; per-component production/test/gate added/removed/net; post-edit shared-quality audit, full evidence and dual EXE links. |
+| Stop Conditions | Unbounded path semantics, new public policy, second implementation, unrelated user changes, external build dependency or incomplete full qualification. |
+| Exit Criteria | Every S7 ledger member fixed and verified or proven already correct; complete executor P pushed, separate actual-change review and truthful closure. T remains open for owner acceptance. |
+| Original Owner Request | 当前s完成后，优先准入新s修复；后续s任务顺延。批准，修改emulator组件必后必须同样审计公共组件代码规范。 |
+| Similar-Issue Sweep | Refresh formatting-call and raw-NULL inventories excluding comments/literals; audit directory roots and consumer joins, stale names, all source/CMake link forms and gate fixtures; give every hit a repair or explicit in-scope disposition. |
 
 ## M9 T93 S1 Retained Design Brief
 
