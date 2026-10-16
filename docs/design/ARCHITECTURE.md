@@ -209,7 +209,7 @@ adopts it exactly; no runtime or build dependency crosses repositories.
 
 `types` defines universal copied scalar/status values and header-only external
 C/compiler/platform vocabulary. Platform declaration headers contain no
-component policy; base owns synchronization/clock composition, audio owns PCM
+component policy; base owns synchronization/clock composition, audio/pcm owns PCM
 output, and kvm-base owns input
 interpretation. Component platform implementations are selected by the build,
 not by a generic types dispatcher. `console` defines
@@ -228,8 +228,8 @@ actions; emulator/ui does not interpret their x86 meaning.
 The library's only direct component edges are:
 
 ```text
-types    -> base + console + console-broker + storage + audio + kvm-base + kvm-window + kvm-console
-base     -> console + console-broker + kvm-base + kvm-console
+types    -> base + console + console-broker + storage + audio/pcm + kvm-base + kvm-window + kvm-console
+base     -> console + console-broker + audio/pcm + kvm-base + kvm-console
 console  -> console-broker + kvm-console
 kvm-base  -> kvm-window + kvm-console
 ```
@@ -242,7 +242,7 @@ control/input ABI requires them, never its leaf-support worker/mailbox or
 input support interfaces. Cross-component support contracts use the same
 `_interface.h` naming rule but have an explicitly narrower consumer set.
 
-`audio` owns a bounded copied-PCM FIFO and one stream worker that drains it
+`audio/pcm` owns a bounded copied-PCM FIFO and one stream worker that drains it
 through the native output adapter. The Windows adapter owns one shared WASAPI
 endpoint and waits on its event or cancellation; it adds no second worker.
 Lib owns neither synthesis, emulator clock nor guest-device protocol. Compat's

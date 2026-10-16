@@ -24,6 +24,7 @@ src/
     shared PC command/hotkey policy and session/UI composition
   lib/{types,base,console,console-broker,storage,audio,kvm-base,kvm-window,kvm-console}/
     canonical shared platform implementation, delivered for exact NXVM adoption
+    audio/pcm/  copied PCM stream and selected native backend
 ```
 
 Directories appear only in their admitted migration task.

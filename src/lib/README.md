@@ -55,8 +55,8 @@ An arrow means the component on the right may use the generic contract of the
 component on the left:
 
 ```text
-types -> base + console + console-broker + storage + audio + kvm-base + kvm-window + kvm-console
-base -> console + console-broker + audio + kvm-base + kvm-console
+types -> base + console + console-broker + storage + audio/pcm + kvm-base + kvm-window + kvm-console
+base -> console + console-broker + audio/pcm + kvm-base + kvm-console
 console -> console-broker + kvm-console
 kvm-base -> kvm-window + kvm-console
 ```
@@ -90,7 +90,7 @@ lifecycle controller, or public unified presenter API.
 - `storage` provides file and byte-medium primitives. Medium and writer own
   embedded file storage; owned-byte reads use a stack file. Closing consumes
   the stream, not its enclosing allocation; failed opens leave it empty.
-- `audio` provides bounded copied PCM playback. The Windows delivery worker
+- `audio/pcm` (target `audio-pcm`) provides bounded copied PCM playback. The Windows delivery worker
   owns one shared WASAPI endpoint from COM initialization through release and
   waits on its endpoint event without invoking producer code; one concurrent
   waiter may be cancelled without touching queued PCM. Linux explicitly reports

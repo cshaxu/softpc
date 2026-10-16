@@ -506,7 +506,8 @@ boundary remains at S6, not waived by this handoff.
 
 Each runnable S: compile once per width in existing Ninja graphs, publish both
 package EXEs, run shared suites first, all other unit/integration suites next,
-then the five native desktop cases per width during an owner-reserved period.
+then the five native desktop cases per width. The owner authorizes scheduling
+these native tests without repeated approval requests on 2026-10-15.
 Long work is hidden/supervised with declared logs, exit status and budgets;
 no Computer Use or interactive-timeout termination. Do not call a background
 pass a full pass. Preserve INI/media/snapshots and owner edits.
@@ -527,6 +528,54 @@ The earlier source audit remains linked as
 [XP sound evidence](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 S1 source findings are not tests. No new production build or playback was run
 for this revision.
+
+### S2 implementation checkpoint
+
+The frozen S2 universe is the five existing PCM C/H files, two Lib PCM tests,
+Compat audio consumer, four App sound tests, their build registration and
+Lib ownership verification. All twelve C/H bodies equal baseline 14092722
+after only the declared path/symbol/guard substitution. The Win32 SDK aliases
+remain unchanged. No old public alias, root forwarding header, second backend
+or XP source change is retained.
+
+The five production files (793 lines) and two tests moved with git mv.
+The renamed target is audio-pcm; the two test names are
+lib.audio/pcm/stream and lib.audio/pcm/win32_platform. The dependency verifier
+resolves the nested PCM leaf before applying the existing direct-edge and
+private/platform header rules. Its exhaustive edge matrix remains intact;
+new cases check same-leaf private/native access, cross-platform rejection,
+root forwarding rejection and misplaced platform public headers.
+
+Accounting command: git diff -M20% --numstat 14092722, grouped by owner and
+file role, excluding manifests, docs and binary artifacts:
+
+- Production C/H: six files, +166/-166, net 0.
+- Test C: six files, +198/-198, net 0. This exceeds the initial reference-edit
+  estimate because the existing test stubs contain more repeated symbol uses;
+  no test case or behavior changed in those C files.
+- Production build/verifiers: four files, +30/-21, net +9.
+- Test build/verifier regression: two files, +35/-9, net +26.
+- XP mirror: +0/-0. INI, media, snapshots and the other shared source packages
+  are unchanged.
+
+Both Release builds and each width's 90 shared plus 55 other background tests
+pass. The standalone layout self-test also passes. The x86 Ninja invocation
+reported recovery from a premature cache-file ending and rebuilt 584 steps;
+x64 used 45 steps. No manual cache clearing or repeated compiler job was used.
+Native desktop tests pass 5/5 per width: each architecture totals 150/150.
+This includes the existing package startup and presentation roundtrip flows;
+it is not a new manual audibility claim. Documentation and diff checks pass.
+Build/test evidence is retained in the ignored S2 qualification and desktop
+logs until the actual-change review; their result files both report zero.
+Published EXE SHA-256:
+
+- x64: 45CAA737DFAC408EE694768DDCB301CEF5A7A77CA3E33A66A9E7DE14D168CF29.
+- x86: 34A4EB80F0138160E556AD6A25DAA0DFE6CB644DB564C45D7945C4CBA060B96D.
+
+The similar-issue sweep checks stale audio stream API/guard/include/target
+references throughout src, test and root build files. Only the deliberately
+unchanged LIB_WIN32_AUDIO_STREAM_FLAGS SDK aliases remain. The executor
+delivery still requires pushed-commit review before S2 closure.
 
 ## Official host-contract references
 

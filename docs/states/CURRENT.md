@@ -40,7 +40,13 @@ device integration, XP MIDI/FM integration and portable-state qualification.
 The disclosed shared pause-hook behavior change still requires approval in
 its implementation packet. S1 executor 2860b484 is pushed and actual-change
 reviewed. The continued owner implementation goal admits S2 below; no S2
-production change has yet been made. No manual audio acceptance is inferred.
+production change was made at admission. S2's PCM relocation is now implemented
+and verified: x64/x86 each pass 150/150 including all ten native desktop cases.
+Both package EXEs are refreshed; no playback behavior changed. Executor
+delivery awaits pushed-commit review before closing S2.
+The owner authorizes native desktop test scheduling without repeated approval
+requests; background operations remain hidden and Computer Use remains forbidden.
+No manual audio acceptance is inferred.
 
 ## M9 T93 S2 Packet
 

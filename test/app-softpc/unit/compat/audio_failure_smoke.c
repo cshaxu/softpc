@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "lib/base/sync_interface.h"
-#include "lib/audio/stream_interface.h"
+#include "lib/audio/pcm/stream_interface.h"
 #include "lib/types/file.h"
 
 static unsigned reports;
@@ -50,13 +50,13 @@ static char task_storage;
 static base_sync_event *created_events[2];
 static void test_request_stop(void);
 
-static lib_status fake_stream_create(const lib_audio_stream_options *options,
-    lib_audio_stream **stream)
+static lib_status fake_stream_create(const lib_audio_pcm_stream_options *options,
+    lib_audio_pcm_stream **stream)
 {
     assert(options->sample_rate == 48000u && options->channel_count == 1u);
     assert(stream != NULL && *stream == NULL);
     stream_create_step = ++initialization_step;
-    *stream = (lib_audio_stream *)1;
+    *stream = (lib_audio_pcm_stream *)1;
     return LIB_STATUS_OK;
 }
 
@@ -110,9 +110,9 @@ static lib_status fake_task_destroy(base_sync_task *task)
     return shutdown_failure ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-static lib_status fake_stream_destroy(lib_audio_stream **stream)
+static lib_status fake_stream_destroy(lib_audio_pcm_stream **stream)
 {
-    assert(stream != NULL && *stream == (lib_audio_stream *)1);
+    assert(stream != NULL && *stream == (lib_audio_pcm_stream *)1);
     ++stream_destroys;
     *stream = NULL;
     return LIB_STATUS_OK;
@@ -124,7 +124,7 @@ static void fake_event_destroy(base_sync_event *event)
         event == (base_sync_event *)2);
 }
 
-static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
+static lib_status fake_enqueue(lib_audio_pcm_stream *stream, const lib_i16 *samples,
     lib_u32 frames, lib_u32 *accepted)
 {
     (void)stream;
@@ -145,23 +145,23 @@ static lib_status fake_enqueue(lib_audio_stream *stream, const lib_i16 *samples,
     return enqueues > 4u ? LIB_STATUS_LIMIT_EXCEEDED : LIB_STATUS_OK;
 }
 
-static lib_status fake_flush(lib_audio_stream *stream)
+static lib_status fake_flush(lib_audio_pcm_stream *stream)
 {
-    assert(stream == (lib_audio_stream *)1);
+    assert(stream == (lib_audio_pcm_stream *)1);
     ++flushes;
     return fault == 1 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
 
-static lib_status fake_clear(lib_audio_stream *stream)
+static lib_status fake_clear(lib_audio_pcm_stream *stream)
 {
-    assert(stream == (lib_audio_stream *)1);
+    assert(stream == (lib_audio_pcm_stream *)1);
     ++clears;
     return LIB_STATUS_OK;
 }
 
-static lib_status fake_wait_writable(lib_audio_stream *stream)
+static lib_status fake_wait_writable(lib_audio_pcm_stream *stream)
 {
-    assert(stream == (lib_audio_stream *)1);
+    assert(stream == (lib_audio_pcm_stream *)1);
     ++writable_waits;
     if (fault == 4) return LIB_STATUS_INVALID_STATE;
     if (scenario == 4 && writable_waits == 1u) {
@@ -172,9 +172,9 @@ static lib_status fake_wait_writable(lib_audio_stream *stream)
     return LIB_STATUS_IO_ERROR;
 }
 
-static lib_status fake_cancel_wait(lib_audio_stream *stream)
+static lib_status fake_cancel_wait(lib_audio_pcm_stream *stream)
 {
-    assert(stream == (lib_audio_stream *)1);
+    assert(stream == (lib_audio_pcm_stream *)1);
     return LIB_STATUS_OK;
 }
 
@@ -209,13 +209,13 @@ static lib_status fake_signal(base_sync_event *event)
     return LIB_STATUS_OK;
 }
 
-#define lib_audio_stream_enqueue fake_enqueue
-#define lib_audio_stream_create fake_stream_create
-#define lib_audio_stream_clear fake_clear
-#define lib_audio_stream_flush fake_flush
-#define lib_audio_stream_wait_writable fake_wait_writable
-#define lib_audio_stream_cancel_wait fake_cancel_wait
-#define lib_audio_stream_destroy fake_stream_destroy
+#define lib_audio_pcm_stream_enqueue fake_enqueue
+#define lib_audio_pcm_stream_create fake_stream_create
+#define lib_audio_pcm_stream_clear fake_clear
+#define lib_audio_pcm_stream_flush fake_flush
+#define lib_audio_pcm_stream_wait_writable fake_wait_writable
+#define lib_audio_pcm_stream_cancel_wait fake_cancel_wait
+#define lib_audio_pcm_stream_destroy fake_stream_destroy
 #define base_sync_mutex_create fake_mutex_create
 #define base_sync_mutex_destroy fake_mutex_destroy
 #define base_sync_mutex_lock fake_mutex_lock
@@ -242,13 +242,13 @@ static lib_status fake_signal(base_sync_event *event)
 #undef base_sync_task_create
 #undef base_sync_task_destroy
 #undef base_sync_event_create
-#undef lib_audio_stream_clear
-#undef lib_audio_stream_flush
-#undef lib_audio_stream_wait_writable
-#undef lib_audio_stream_cancel_wait
-#undef lib_audio_stream_destroy
-#undef lib_audio_stream_create
-#undef lib_audio_stream_enqueue
+#undef lib_audio_pcm_stream_clear
+#undef lib_audio_pcm_stream_flush
+#undef lib_audio_pcm_stream_wait_writable
+#undef lib_audio_pcm_stream_cancel_wait
+#undef lib_audio_pcm_stream_destroy
+#undef lib_audio_pcm_stream_create
+#undef lib_audio_pcm_stream_enqueue
 #undef base_sync_mutex_unlock
 #undef base_sync_mutex_lock
 #undef base_sync_mutex_destroy
@@ -276,7 +276,7 @@ int main(void)
     softpc_speaker_stop = (base_sync_event *)1;
     softpc_speaker_wake = (base_sync_event *)2;
     softpc_speaker_request_lock = (base_sync_mutex *)1;
-    softpc_speaker_stream = (lib_audio_stream *)1;
+    softpc_speaker_stream = (lib_audio_pcm_stream *)1;
     softpc_speaker_request.frequency = 440u;
     softpc_speaker_request.duration = INFINITE;
     softpc_speaker_request.generation = 1u;
@@ -394,7 +394,7 @@ int main(void)
     softpc_speaker_stop = (base_sync_event *)1;
     softpc_speaker_wake = (base_sync_event *)2;
     softpc_speaker_request_lock = (base_sync_mutex *)1;
-    softpc_speaker_stream = (lib_audio_stream *)1;
+    softpc_speaker_stream = (lib_audio_pcm_stream *)1;
     shutdown_failure = 1;
     task_destroys = stream_destroys = 0u;
     assert(softpc_platform_audio_shutdown() == LIB_STATUS_IO_ERROR);

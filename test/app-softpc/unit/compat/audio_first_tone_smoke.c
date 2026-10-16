@@ -1,29 +1,29 @@
 #include "insignia.h"
 #include "lib/base/sync_interface.h"
-#include "lib/audio/stream_interface.h"
+#include "lib/audio/pcm/stream_interface.h"
 
 #include <assert.h>
 
 static base_sync_event *first_submission;
 static unsigned enqueue_count;
 
-static lib_status fake_audio_create(const lib_audio_stream_options *options,
-    lib_audio_stream **out_stream)
+static lib_status fake_audio_create(const lib_audio_pcm_stream_options *options,
+    lib_audio_pcm_stream **out_stream)
 {
     assert(options != LIB_NULL && options->sample_rate == 48000u);
     assert(options->channel_count == 1u && out_stream != LIB_NULL);
-    *out_stream = (lib_audio_stream *)1;
+    *out_stream = (lib_audio_pcm_stream *)1;
     return LIB_STATUS_OK;
 }
 
-static lib_status fake_audio_enqueue(lib_audio_stream *stream,
+static lib_status fake_audio_enqueue(lib_audio_pcm_stream *stream,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *out_accepted)
 {
     lib_u32 index;
     lib_bool saw_positive = LIB_FALSE;
     lib_bool saw_negative = LIB_FALSE;
 
-    assert(stream == (lib_audio_stream *)1 && samples != LIB_NULL);
+    assert(stream == (lib_audio_pcm_stream *)1 && samples != LIB_NULL);
     assert(frame_count == 512u && out_accepted != LIB_NULL);
     for (index = 0u; index < frame_count; ++index) {
         if (samples[index] > 0) saw_positive = LIB_TRUE;
@@ -40,44 +40,44 @@ static lib_status fake_audio_enqueue(lib_audio_stream *stream,
     return LIB_STATUS_IO_ERROR;
 }
 
-static lib_status fake_audio_clear(lib_audio_stream *stream)
-{ assert(stream == (lib_audio_stream *)1); return LIB_STATUS_OK; }
+static lib_status fake_audio_clear(lib_audio_pcm_stream *stream)
+{ assert(stream == (lib_audio_pcm_stream *)1); return LIB_STATUS_OK; }
 
-static lib_status fake_audio_flush(lib_audio_stream *stream)
-{ assert(stream == (lib_audio_stream *)1); return LIB_STATUS_OK; }
+static lib_status fake_audio_flush(lib_audio_pcm_stream *stream)
+{ assert(stream == (lib_audio_pcm_stream *)1); return LIB_STATUS_OK; }
 
-static lib_status fake_audio_wait_writable(lib_audio_stream *stream)
-{ assert(stream == (lib_audio_stream *)1); return LIB_STATUS_IO_ERROR; }
+static lib_status fake_audio_wait_writable(lib_audio_pcm_stream *stream)
+{ assert(stream == (lib_audio_pcm_stream *)1); return LIB_STATUS_IO_ERROR; }
 
-static lib_status fake_audio_cancel_wait(lib_audio_stream *stream)
-{ assert(stream == (lib_audio_stream *)1); return LIB_STATUS_OK; }
+static lib_status fake_audio_cancel_wait(lib_audio_pcm_stream *stream)
+{ assert(stream == (lib_audio_pcm_stream *)1); return LIB_STATUS_OK; }
 
-static lib_status fake_audio_destroy(lib_audio_stream **stream);
+static lib_status fake_audio_destroy(lib_audio_pcm_stream **stream);
 void fake_host_ppi_state(IU8 value);
 
-static lib_status fake_audio_destroy(lib_audio_stream **stream)
+static lib_status fake_audio_destroy(lib_audio_pcm_stream **stream)
 {
-    assert(stream != LIB_NULL && *stream == (lib_audio_stream *)1);
+    assert(stream != LIB_NULL && *stream == (lib_audio_pcm_stream *)1);
     *stream = LIB_NULL;
     return LIB_STATUS_OK;
 }
 
-#define lib_audio_stream_create fake_audio_create
-#define lib_audio_stream_enqueue fake_audio_enqueue
-#define lib_audio_stream_clear fake_audio_clear
-#define lib_audio_stream_flush fake_audio_flush
-#define lib_audio_stream_wait_writable fake_audio_wait_writable
-#define lib_audio_stream_cancel_wait fake_audio_cancel_wait
-#define lib_audio_stream_destroy fake_audio_destroy
+#define lib_audio_pcm_stream_create fake_audio_create
+#define lib_audio_pcm_stream_enqueue fake_audio_enqueue
+#define lib_audio_pcm_stream_clear fake_audio_clear
+#define lib_audio_pcm_stream_flush fake_audio_flush
+#define lib_audio_pcm_stream_wait_writable fake_audio_wait_writable
+#define lib_audio_pcm_stream_cancel_wait fake_audio_cancel_wait
+#define lib_audio_pcm_stream_destroy fake_audio_destroy
 #define HostPpiState fake_host_ppi_state
 #include "compat/audio.c"
 #undef HostPpiState
-#undef lib_audio_stream_cancel_wait
-#undef lib_audio_stream_destroy
-#undef lib_audio_stream_flush
-#undef lib_audio_stream_clear
-#undef lib_audio_stream_enqueue
-#undef lib_audio_stream_create
+#undef lib_audio_pcm_stream_cancel_wait
+#undef lib_audio_pcm_stream_destroy
+#undef lib_audio_pcm_stream_flush
+#undef lib_audio_pcm_stream_clear
+#undef lib_audio_pcm_stream_enqueue
+#undef lib_audio_pcm_stream_create
 
 BOOL T2State;
 void PlaySound(BOOL pulsed_ppi) { (void)pulsed_ppi; }

@@ -4,7 +4,7 @@
 #include "timer.h"
 #include "lib/base/clock_interface.h"
 #include "lib/base/sync_interface.h"
-#include "lib/audio/stream_interface.h"
+#include "lib/audio/pcm/stream_interface.h"
 #include "lib/types/file.h"
 #include <stdio.h>
 
@@ -40,7 +40,7 @@ static base_sync_event *softpc_speaker_wake;
 static base_sync_event *softpc_speaker_stop;
 static base_sync_task *softpc_speaker_task;
 static base_sync_mutex *softpc_speaker_request_lock;
-static lib_audio_stream *softpc_speaker_stream;
+static lib_audio_pcm_stream *softpc_speaker_stream;
 
 typedef struct softpc_speaker_tone {
     ULONG frequency;
@@ -120,7 +120,7 @@ static void softpc_speaker_stop_request(void)
         base_sync_mutex_unlock(softpc_speaker_request_lock);
 }
 
-static lib_status softpc_speaker_submit(lib_audio_stream *stream,
+static lib_status softpc_speaker_submit(lib_audio_pcm_stream *stream,
     ULONG frequency, lib_u32 frame_count, lib_u32 *phase,
     lib_u32 *out_accepted)
 {
@@ -141,7 +141,7 @@ static lib_status softpc_speaker_submit(lib_audio_stream *stream,
             next_phase -= SOFTPC_SPEAKER_SAMPLE_RATE;
     }
     accepted = 0u;
-    status = lib_audio_stream_enqueue(stream, samples,
+    status = lib_audio_pcm_stream_enqueue(stream, samples,
         frame_count, &accepted);
     if (accepted != frame_count) {
         next_phase = *phase;
@@ -159,7 +159,7 @@ static lib_status softpc_speaker_submit(lib_audio_stream *stream,
     return status;
 }
 
-static lib_status softpc_speaker_submit_finite(lib_audio_stream *stream,
+static lib_status softpc_speaker_submit_finite(lib_audio_pcm_stream *stream,
     const softpc_speaker_tone *request, lib_bool require_current,
     lib_u32 *phase)
 {
@@ -183,11 +183,11 @@ static lib_status softpc_speaker_submit_finite(lib_audio_stream *stream,
             return status;
         frames_remaining -= accepted;
         if (status == LIB_STATUS_LIMIT_EXCEEDED) {
-            status = lib_audio_stream_wait_writable(stream);
+            status = lib_audio_pcm_stream_wait_writable(stream);
             if (status != LIB_STATUS_OK) return status;
         }
     }
-    return lib_audio_stream_flush(stream);
+    return lib_audio_pcm_stream_flush(stream);
 }
 
 static void softpc_speaker_complete_finite(const softpc_speaker_tone *request)
@@ -208,7 +208,7 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
     base_sync_event *waits[2];
     lib_u32 event_index;
     lib_u32 phase;
-    lib_audio_stream *stream;
+    lib_audio_pcm_stream *stream;
     lib_status status = LIB_STATUS_OK;
     UNUSED(unused);
     waits[0] = softpc_speaker_stop;
@@ -237,7 +237,7 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
             if (request.frequency == 0u) {
                 /* A normal gate-off ends synthesis, but never retracts PCM
                    already accepted by the single Audio delivery stream. */
-                status = lib_audio_stream_flush(stream);
+                status = lib_audio_pcm_stream_flush(stream);
                 if (status != LIB_STATUS_OK) goto failed;
                 break;
             }
@@ -253,13 +253,13 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
             if (status != LIB_STATUS_OK && status != LIB_STATUS_LIMIT_EXCEEDED)
                 goto failed;
             if (status == LIB_STATUS_LIMIT_EXCEEDED) {
-                status = lib_audio_stream_wait_writable(stream);
+                status = lib_audio_pcm_stream_wait_writable(stream);
                 if (status != LIB_STATUS_OK) goto failed;
             }
             softpc_speaker_read_request(&current);
             if (current.generation != request.generation) {
                 if (current.frequency == 0u) {
-                    status = lib_audio_stream_flush(stream);
+                    status = lib_audio_pcm_stream_flush(stream);
                     if (status != LIB_STATUS_OK) goto failed;
                     break;
                 }
@@ -275,7 +275,7 @@ failed:
 
 lib_status softpc_platform_audio_start(void)
 {
-    lib_audio_stream_options options;
+    lib_audio_pcm_stream_options options;
     lib_status status;
 
     if (softpc_speaker_task != NULL) return LIB_STATUS_OK;
@@ -284,7 +284,7 @@ lib_status softpc_platform_audio_start(void)
     softpc_speaker_cancel_onset();
     options.sample_rate = SOFTPC_SPEAKER_SAMPLE_RATE;
     options.channel_count = 1u;
-    status = lib_audio_stream_create(&options, &softpc_speaker_stream);
+    status = lib_audio_pcm_stream_create(&options, &softpc_speaker_stream);
     if (status != LIB_STATUS_OK) return status;
     status = base_sync_mutex_create(&softpc_speaker_request_lock);
     if (status != LIB_STATUS_OK) goto fail_stream;
@@ -310,7 +310,7 @@ lib_status softpc_platform_audio_start(void)
 fail_stream:
     base_sync_mutex_destroy(softpc_speaker_request_lock);
     softpc_speaker_request_lock = NULL;
-    (void)lib_audio_stream_destroy(&softpc_speaker_stream);
+    (void)lib_audio_pcm_stream_destroy(&softpc_speaker_stream);
     return status;
 }
 
@@ -337,8 +337,8 @@ lib_status softpc_platform_audio_shutdown(void)
            event; clear the producer request before joining it. */
         softpc_speaker_write_request(0u, 0u);
         softpc_speaker_cancel_onset();
-        lib_audio_stream *stream = softpc_speaker_stream;
-        if (stream != NULL) (void)lib_audio_stream_cancel_wait(stream);
+        lib_audio_pcm_stream *stream = softpc_speaker_stream;
+        if (stream != NULL) (void)lib_audio_pcm_stream_cancel_wait(stream);
         base_sync_event_signal(softpc_speaker_stop);
         base_sync_event_signal(softpc_speaker_wake);
         status = base_sync_task_destroy(softpc_speaker_task);
@@ -349,7 +349,7 @@ lib_status softpc_platform_audio_shutdown(void)
         softpc_speaker_task = NULL;
     }
     if (softpc_speaker_stream != NULL) {
-        status = lib_audio_stream_destroy(&softpc_speaker_stream);
+        status = lib_audio_pcm_stream_destroy(&softpc_speaker_stream);
         if (status != LIB_STATUS_OK) {
             fputs("softpcvm: cannot close audio stream\n", stderr);
             return status; /* The stream documents retryable ownership. */

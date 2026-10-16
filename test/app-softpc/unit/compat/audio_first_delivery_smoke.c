@@ -1,20 +1,20 @@
 #include "insignia.h"
-#include "lib/audio/stream.h"
+#include "lib/audio/pcm/stream.h"
 
 #include <assert.h>
 
-struct audio_stream_platform {
+struct audio_pcm_stream_platform {
     lib_bool delivered_non_silent_pcm;
 };
 
-static audio_stream_platform first_platform;
+static audio_pcm_stream_platform first_platform;
 static base_sync_event *first_delivery;
 static lib_u32 delivery_count;
 
 void HostPpiState(IU8 value);
 
-lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
-    audio_stream_platform **out_platform)
+lib_status audio_pcm_stream_platform_create(const lib_audio_pcm_stream_options *options,
+    audio_pcm_stream_platform **out_platform)
 {
     assert(options != LIB_NULL && out_platform != LIB_NULL);
     assert(options->sample_rate == 48000u && options->channel_count == 1u);
@@ -23,16 +23,16 @@ lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_worker_attach(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_worker_attach(audio_pcm_stream_platform *platform)
 {
     assert(platform == &first_platform);
     return LIB_STATUS_OK;
 }
 
-void audio_stream_platform_worker_detach(audio_stream_platform *platform)
+void audio_pcm_stream_platform_worker_detach(audio_pcm_stream_platform *platform)
 { assert(platform == &first_platform); }
 
-lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
+lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *out_accepted_frames)
 {
     lib_bool saw_positive = LIB_FALSE;
@@ -40,7 +40,7 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     lib_u32 index;
 
     assert(platform == &first_platform && samples != LIB_NULL);
-    assert(frame_count != 0u && frame_count <= AUDIO_STREAM_PLAY_BATCH &&
+    assert(frame_count != 0u && frame_count <= AUDIO_PCM_STREAM_PLAY_BATCH &&
         out_accepted_frames != LIB_NULL);
     for (index = 0u; index < frame_count; ++index) {
         if (samples[index] > 0) saw_positive = LIB_TRUE;
@@ -58,32 +58,32 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_wait_writable(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_wait_writable(audio_pcm_stream_platform *platform)
 {
     assert(platform == &first_platform);
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_cancel_wait(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *platform)
 {
     assert(platform == &first_platform);
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_clear(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform)
 {
     assert(platform == &first_platform);
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_destroy(audio_stream_platform **platform)
+lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platform)
 {
     assert(platform != LIB_NULL && *platform == &first_platform);
     *platform = LIB_NULL;
     return LIB_STATUS_OK;
 }
 
-#include "lib/audio/stream.c"
+#include "lib/audio/pcm/stream.c"
 #include "compat/audio.c"
 
 BOOL T2State;

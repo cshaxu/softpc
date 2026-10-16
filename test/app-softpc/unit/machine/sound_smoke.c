@@ -11,7 +11,7 @@
 #include "host_def.h"
 #include "ios.h"
 #include "timer.h"
-#include "lib/audio/stream.h"
+#include "lib/audio/pcm/stream.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,8 +24,8 @@ extern ULONG BeepLastDuration;
 /* This smoke links the real Core, Compat and Lib Audio worker.  Only the
    final platform leaf is replaced so it records actual Lib delivery for two
    complete AUDIO.COM-equivalent runs without opening a host audio device. */
-struct audio_stream_platform { lib_bool live; };
-static struct audio_stream_platform audio_probe_platform;
+struct audio_pcm_stream_platform { lib_bool live; };
+static struct audio_pcm_stream_platform audio_probe_platform;
 static volatile LONG audio_probe_phase;
 static volatile LONG audio_probe_first_delivery;
 static volatile LONG audio_probe_second_delivery;
@@ -41,8 +41,8 @@ static volatile LONG audio_probe_program_first_frames;
 static volatile LONG audio_probe_program_second_frames;
 static volatile LONG audio_probe_program_fast_frames;
 
-lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
-    audio_stream_platform **out_platform)
+lib_status audio_pcm_stream_platform_create(const lib_audio_pcm_stream_options *options,
+    audio_pcm_stream_platform **out_platform)
 {
     assert(options != NULL && out_platform != NULL);
     assert(options->sample_rate == 48000u && options->channel_count == 1u);
@@ -51,16 +51,16 @@ lib_status audio_stream_platform_create(const lib_audio_stream_options *options,
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_worker_attach(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_worker_attach(audio_pcm_stream_platform *platform)
 {
     assert(platform == &audio_probe_platform);
     return LIB_STATUS_OK;
 }
 
-void audio_stream_platform_worker_detach(audio_stream_platform *platform)
+void audio_pcm_stream_platform_worker_detach(audio_pcm_stream_platform *platform)
 { assert(platform == &audio_probe_platform); }
 
-lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
+lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform,
     const lib_i16 *samples, lib_u32 frame_count, lib_u32 *accepted)
 {
     lib_u32 index;
@@ -108,7 +108,7 @@ lib_status audio_stream_platform_enqueue(audio_stream_platform *platform,
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_wait_writable(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_wait_writable(audio_pcm_stream_platform *platform)
 {
     assert(platform == &audio_probe_platform);
     /* 1024 mono frames at 48kHz take about 21ms.  This keeps the real Lib
@@ -118,13 +118,13 @@ lib_status audio_stream_platform_wait_writable(audio_stream_platform *platform)
     return LIB_STATUS_OK;
 }
 
-lib_status audio_stream_platform_cancel_wait(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_cancel_wait(audio_pcm_stream_platform *platform)
 { assert(platform == &audio_probe_platform); return LIB_STATUS_OK; }
 
-lib_status audio_stream_platform_clear(audio_stream_platform *platform)
+lib_status audio_pcm_stream_platform_clear(audio_pcm_stream_platform *platform)
 { assert(platform == &audio_probe_platform); return LIB_STATUS_OK; }
 
-lib_status audio_stream_platform_destroy(audio_stream_platform **platform)
+lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platform)
 {
     assert(platform != NULL && *platform == &audio_probe_platform);
     audio_probe_platform.live = LIB_FALSE;
