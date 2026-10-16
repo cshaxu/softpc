@@ -15,8 +15,7 @@ static void audio_pcm_stream_notify_locked(lib_audio_pcm_stream *stream)
         if (stream->failure == LIB_STATUS_OK) stream->failure = status;
     }
     if (stream->failure != LIB_STATUS_OK) {
-        (void)base_sync_event_signal(stream->space);
-        (void)base_sync_event_signal(stream->control_done);
+        (void)base_sync_task_request_cancel(stream->worker);
     }
 }
 
@@ -26,6 +25,14 @@ static void audio_pcm_stream_fail_locked(lib_audio_pcm_stream *stream, lib_statu
         stream->failure = status;
         audio_pcm_stream_notify_locked(stream);
     }
+}
+
+static lib_status audio_pcm_stream_signal_locked(lib_audio_pcm_stream *stream,
+    base_sync_event *event)
+{
+    lib_status status = base_sync_event_signal(event);
+    if (status != LIB_STATUS_OK) audio_pcm_stream_fail_locked(stream, status);
+    return status;
 }
 
 static void audio_pcm_stream_observe_progress(lib_audio_pcm_stream *stream, lib_u64 epoch)
@@ -116,8 +123,8 @@ static void audio_pcm_stream_worker(void *context, const base_sync_task *task)
             if (status != LIB_STATUS_OK) audio_pcm_stream_fail_locked(stream, status);
             else if (control == AUDIO_PCM_STREAM_CONTROL_CLEAR)
                 audio_pcm_stream_notify_locked(stream);
+            (void)audio_pcm_stream_signal_locked(stream, stream->control_done);
             base_sync_mutex_unlock(stream->lock);
-            (void)base_sync_event_signal(stream->control_done);
             continue;
         }
         if (have_batch == LIB_FALSE) {
@@ -167,10 +174,10 @@ static void audio_pcm_stream_worker(void *context, const base_sync_task *task)
         if (stream->control == AUDIO_PCM_STREAM_CONTROL_FLUSH &&
             (stream->failure != LIB_STATUS_OK || stream->count == 0u)) {
             stream->control = AUDIO_PCM_STREAM_CONTROL_NONE;
-            (void)base_sync_event_signal(stream->control_done);
+            (void)audio_pcm_stream_signal_locked(stream, stream->control_done);
         }
         if (accepted != 0u || stream->failure != LIB_STATUS_OK)
-            (void)base_sync_event_signal(stream->space);
+            (void)audio_pcm_stream_signal_locked(stream, stream->space);
         base_sync_mutex_unlock(stream->lock);
     }
     audio_pcm_stream_platform_worker_detach(stream->platform);
@@ -350,17 +357,22 @@ lib_status lib_audio_pcm_stream_wait_writable(lib_audio_pcm_stream *stream)
         }
         base_sync_mutex_unlock(stream->lock);
         if (status != LIB_STATUS_OK) return status;
-        result = base_sync_event_wait(stream->space, LIB_UINT32_MAX);
+        result = base_sync_wait_any(&stream->space, 1u, stream->worker,
+            LIB_UINT32_MAX, LIB_NULL);
         if (result != BASE_SYNC_WAIT_SIGNALED) return LIB_STATUS_IO_ERROR;
     }
 }
 
 lib_status lib_audio_pcm_stream_cancel_wait(lib_audio_pcm_stream *stream)
 {
+    lib_status status;
     if (stream == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     lib_atomic_i32_store_explicit(&stream->wait_cancelled, 1,
         LIB_MEMORY_ORDER_RELEASE);
-    return base_sync_event_signal(stream->space);
+    base_sync_mutex_lock(stream->lock);
+    status = audio_pcm_stream_signal_locked(stream, stream->space);
+    base_sync_mutex_unlock(stream->lock);
+    return status;
 }
 
 static lib_status audio_pcm_stream_control_request(lib_audio_pcm_stream *stream,
@@ -400,15 +412,18 @@ static lib_status audio_pcm_stream_control_request(lib_audio_pcm_stream *stream,
             stream->channel_count * sizeof(*gains));
     }
     stream->control = control;
+    status = audio_pcm_stream_signal_locked(stream, stream->wake);
     base_sync_mutex_unlock(stream->lock);
-    if (base_sync_event_signal(stream->wake) != LIB_STATUS_OK) return LIB_STATUS_IO_ERROR;
-    result = base_sync_event_wait(stream->control_done, LIB_UINT32_MAX);
-    if (result != BASE_SYNC_WAIT_SIGNALED) return LIB_STATUS_IO_ERROR;
+    if (status != LIB_STATUS_OK) return status;
+    result = base_sync_wait_any(&stream->control_done, 1u, stream->worker,
+        LIB_UINT32_MAX, LIB_NULL);
     base_sync_mutex_lock(stream->lock);
     status = stream->failure;
+    if (status == LIB_STATUS_OK && result != BASE_SYNC_WAIT_SIGNALED)
+        status = LIB_STATUS_IO_ERROR;
+    if (status == LIB_STATUS_OK && control == AUDIO_PCM_STREAM_CONTROL_CLEAR)
+        status = audio_pcm_stream_signal_locked(stream, stream->space);
     base_sync_mutex_unlock(stream->lock);
-    if (control == AUDIO_PCM_STREAM_CONTROL_CLEAR)
-        (void)base_sync_event_signal(stream->space);
     return status;
 }
 
@@ -444,12 +459,15 @@ lib_status lib_audio_pcm_stream_flush(lib_audio_pcm_stream *stream)
         return LIB_STATUS_IO_ERROR;
     }
     stream->control = AUDIO_PCM_STREAM_CONTROL_FLUSH;
+    status = audio_pcm_stream_signal_locked(stream, stream->wake);
     base_sync_mutex_unlock(stream->lock);
-    if (base_sync_event_signal(stream->wake) != LIB_STATUS_OK) return LIB_STATUS_IO_ERROR;
-    result = base_sync_event_wait(stream->control_done, LIB_UINT32_MAX);
-    if (result != BASE_SYNC_WAIT_SIGNALED) return LIB_STATUS_IO_ERROR;
+    if (status != LIB_STATUS_OK) return status;
+    result = base_sync_wait_any(&stream->control_done, 1u, stream->worker,
+        LIB_UINT32_MAX, LIB_NULL);
     base_sync_mutex_lock(stream->lock);
     status = stream->failure;
+    if (status == LIB_STATUS_OK && result != BASE_SYNC_WAIT_SIGNALED)
+        status = LIB_STATUS_IO_ERROR;
     base_sync_mutex_unlock(stream->lock);
     return status;
 }

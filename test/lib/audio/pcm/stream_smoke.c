@@ -34,6 +34,8 @@ static base_sync_event *native_wait_release;
 static lib_bool native_wait_blocks;
 static lib_bool interrupt_prefix;
 static lib_status signal_status = LIB_STATUS_OK;
+static base_sync_event *failed_signal;
+static lib_bool release_native_on_control_wait;
 static lib_i16 delivered_prefix[6];
 static lib_u32 delivered_count;
 static base_sync_event *idle_wait_entered;
@@ -54,6 +56,8 @@ static lib_status audio_test_notify(void *context)
 static base_sync_wait_result audio_test_wait_any(base_sync_event *const *events,
     lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index)
 {
+    if (release_native_on_control_wait && events[0] == failed_signal)
+        lib_test_assert(base_sync_event_signal(native_wait_release) == LIB_STATUS_OK);
     if (idle_wait_entered != LIB_NULL && task != LIB_NULL &&
         events[0] == worker_wake) {
         ++idle_wait_calls;
@@ -69,6 +73,7 @@ static lib_status audio_test_event_signal(base_sync_event *event)
 {
     lib_status status = signal_status;
 
+    if (event == failed_signal) return LIB_STATUS_IO_ERROR;
     if (status != LIB_STATUS_OK) {
         signal_status = LIB_STATUS_OK;
         return status;
@@ -208,6 +213,65 @@ static lib_status audio_test_task_create(base_sync_task_entry entry,
 #undef base_sync_event_signal
 #undef base_sync_wait_any
 #undef base_sync_task_create
+
+static void control_completion_failure(void)
+{
+    const lib_audio_pcm_stream_options options = {48000u, 2u};
+    const lib_u16 gains[2] = {65535u, 65535u};
+    lib_audio_pcm_stream *stream = LIB_NULL;
+    lib_u32 operation;
+
+    gain_status = LIB_STATUS_OK;
+    for (operation = 0u; operation < 2u; ++operation) {
+        lib_u32 queued, writable;
+        lib_test_assert(lib_audio_pcm_stream_create(&options, &stream) == LIB_STATUS_OK);
+        failed_signal = stream->control_done;
+        lib_test_assert((operation == 0u ? lib_audio_pcm_stream_clear(stream) :
+            lib_audio_pcm_stream_set_gain(stream, gains, 2u)) == LIB_STATUS_IO_ERROR);
+        lib_test_assert(base_sync_task_cancelled(stream->worker));
+        lib_test_assert(lib_audio_pcm_stream_query(stream, &queued, &writable) == LIB_STATUS_IO_ERROR);
+        lib_test_assert(lib_audio_pcm_stream_destroy(&stream) == LIB_STATUS_OK);
+        failed_signal = LIB_NULL;
+    }
+    lib_test_assert(lib_audio_pcm_stream_create(&options, &stream) == LIB_STATUS_OK);
+    failed_signal = stream->wake;
+    lib_test_assert(lib_audio_pcm_stream_clear(stream) == LIB_STATUS_IO_ERROR);
+    lib_test_assert(base_sync_task_cancelled(stream->worker));
+    lib_test_assert(lib_audio_pcm_stream_destroy(&stream) == LIB_STATUS_OK);
+    failed_signal = LIB_NULL;
+    {
+        const lib_i16 samples[2] = {1, -1};
+        lib_u32 accepted;
+        lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
+            &native_wait_entered) == LIB_STATUS_OK);
+        lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET,
+            &native_wait_release) == LIB_STATUS_OK);
+        native_wait_blocks = LIB_TRUE;
+        lib_test_assert(lib_audio_pcm_stream_create(&options, &stream) == LIB_STATUS_OK);
+        lib_test_assert(lib_audio_pcm_stream_enqueue(stream, samples, 1u, &accepted) == LIB_STATUS_OK);
+        lib_test_assert(accepted == 1u);
+        lib_test_assert(base_sync_event_wait(native_wait_entered, 1000u) == BASE_SYNC_WAIT_SIGNALED);
+        failed_signal = stream->control_done;
+        release_native_on_control_wait = LIB_TRUE;
+        lib_test_assert(lib_audio_pcm_stream_flush(stream) == LIB_STATUS_IO_ERROR);
+        lib_test_assert(base_sync_task_join(stream->worker) == LIB_STATUS_OK);
+        lib_test_assert(stream->count == 0u && stream->progress.accepted_frames == 1u);
+        lib_test_assert(lib_audio_pcm_stream_destroy(&stream) == LIB_STATUS_OK);
+        failed_signal = LIB_NULL;
+        release_native_on_control_wait = LIB_FALSE;
+        native_wait_blocks = LIB_FALSE;
+        base_sync_event_destroy(native_wait_entered);
+        base_sync_event_destroy(native_wait_release);
+        native_wait_entered = native_wait_release = LIB_NULL;
+    }
+    lib_test_assert(lib_audio_pcm_stream_create(&options, &stream) == LIB_STATUS_OK);
+    failed_signal = stream->space;
+    lib_test_assert(lib_audio_pcm_stream_cancel_wait(stream) == LIB_STATUS_IO_ERROR);
+    lib_test_assert(base_sync_task_cancelled(stream->worker));
+    lib_test_assert(lib_audio_pcm_stream_clear(stream) == LIB_STATUS_IO_ERROR);
+    lib_test_assert(lib_audio_pcm_stream_destroy(&stream) == LIB_STATUS_OK);
+    failed_signal = LIB_NULL;
+}
 
 int main(void)
 {
@@ -522,5 +586,6 @@ int main(void)
         base_sync_event_destroy(progress_release);
         progress_entered = progress_release = LIB_NULL;
     }
+    control_completion_failure();
     return 0;
 }

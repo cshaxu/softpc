@@ -13,8 +13,8 @@ int main(int argc, char **argv)
         EMULATOR_SESSION_DISPLAY_CONSOLE, 1, LIB_STORAGE_MEDIUM_OVERLAY,
         LIB_STORAGE_MEDIUM_OVERLAY };
     x86_ibmpc_product_definition definition;
-    app_composed_machine machine;
-    app_composed_ui ui;
+    emulator_product_machine machine;
+    x86_ibmpc_product_ui_options ui;
     (void)argv;
 
     if (argc != 1) {

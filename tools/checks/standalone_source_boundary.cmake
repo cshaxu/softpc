@@ -187,7 +187,7 @@ set(allowed_emulator_product_contracts
     "x86-debug/product/debug_interface.h"
     "x86-debug/product/protocol_interface.h"
     "x86-ibmpc/product/entry_interface.h"
-    "x86-ibmpc/product/machine_interface.h"
+    "emulator/product/machine_interface.h"
     "x86-debug/xasm32/xasm32_interface.h")
 file(GLOB_RECURSE product_emulator_consumers
     "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"

@@ -216,7 +216,7 @@ static lib_bool softpc_extension_submit(void *context, emulator_machine *machine
     return LIB_FALSE;
 }
 
-lib_status softpc_product_configure_extensions(app_composed_machine *machine,
+lib_status softpc_product_configure_extensions(emulator_product_machine *machine,
     x86_ibmpc_product_command_extensions *out_extensions)
 {
     if (out_extensions == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;

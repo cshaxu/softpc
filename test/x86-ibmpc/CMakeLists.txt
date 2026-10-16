@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.23)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    project(x86_ibmpc_tests LANGUAGES C)
+    project(shared-test-x86-ibmpc LANGUAGES C)
     enable_testing()
 endif()
 set(CMAKE_C_STANDARD 11)
@@ -22,6 +22,7 @@ set_tests_properties(x86-ibmpc.test-boundaries PROPERTIES LABELS "unit;x86-ibmpc
 set(SHARED_X86_IBMPC_TEST_TARGETS)
 
 shared_register_test(x86-ibmpc product/keyboard x86-ibmpc-product-keyboard)
+shared_register_test(x86-ibmpc product/debug_result x86-ibmpc-product-command)
 add_executable(x86-ibmpc-product-entry-smoke product/entry_smoke.c
     "${CORPUS_ROOT}/product/entry.c")
 target_link_libraries(x86-ibmpc-product-entry-smoke PRIVATE types)

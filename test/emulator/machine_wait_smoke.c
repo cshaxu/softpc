@@ -222,6 +222,8 @@ static lib_bool run(void *context)
     if (frame_status != LIB_STATUS_OK) register_pending();
     if (action != 7u) lib_test_assert(emulator_machine_pause(active));
     executor(executor_context);
+    if (action == 1u || action == 2u || action == 5u)
+        lib_test_assert(!heartbeat); /* Stop from parking never re-enables it. */
     if (action == 6u) {
         lib_test_assert(heartbeat && active->state_read_continuing);
         lib_test_assert(facts == 2u); /* Private continuation emits no RUNNING. */

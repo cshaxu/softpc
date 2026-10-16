@@ -1,5 +1,7 @@
 # Shared Library
 
+Standalone CMake projects are `shared-lib` (source) and `shared-test-lib` (tests).
+
 This package selects C11 without extensions in standalone and embedded builds.
 GNU/Clang builds enable -Wall -Wextra -Wpedantic -Werror in this package only.
 

@@ -181,11 +181,11 @@ invalid:
 }
 
 lib_status app_startup_compose_ui(const app_startup_config *config,
-    app_composed_ui *out_ui)
+    x86_ibmpc_product_ui_options *out_ui)
 {
     if (config == NULL || out_ui == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
-    *out_ui = (app_composed_ui){
+    *out_ui = (x86_ibmpc_product_ui_options){
         .display = config->presentation,
         .console_control = config->console_control != 0 ? LIB_TRUE : LIB_FALSE
     };

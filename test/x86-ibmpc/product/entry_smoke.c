@@ -137,8 +137,8 @@ lib_i32 main(void)
     const x86_ibmpc_product_definition definition = {
         .name = "PC",
         .banner = "PC",
-        .machine = {.composition = {.machine = &fixture, .bind = fixture_bind,
-            .destroy = fixture_destroy}},
+        .machine = {.machine = &fixture, .bind = fixture_bind,
+            .destroy = fixture_destroy},
         .ui = {.display = EMULATOR_SESSION_DISPLAY_CONSOLE}
     };
     x86_ibmpc_product_definition invalid_ui = definition;
@@ -149,8 +149,7 @@ lib_i32 main(void)
     for (index = 0u; index <= 8u; ++index) {
         failure = index;
         fixture.live = LIB_FALSE;
-        created = destroyed = 0u;
-        disposed = title_calls = status_calls = 0u;
+        created = destroyed = disposed = title_calls = status_calls = 0u;
         received_banner = LIB_NULL;
         if (x86_ibmpc_product_run(&definition) != (index == 0u ? 0 : 1)) return 2;
         if (index == 1u && (created != 1u || destroyed != 1u)) return 3;
@@ -161,31 +160,43 @@ lib_i32 main(void)
         if (index == 7u && (title_calls != 1u || status_calls != 0u)) return 8;
         if (index == 8u && (title_calls != 1u || status_calls != 1u)) return 9;
     }
+    {
+        char long_name[4096];
+        x86_ibmpc_product_definition oversized = definition;
+        lib_memory_set(long_name, 'x', sizeof(long_name) - 1u);
+        long_name[sizeof(long_name) - 1u] = '\0';
+        oversized.name = long_name;
+        failure = 0u;
+        created = disposed = title_calls = status_calls = 0u;
+        if (x86_ibmpc_product_run(&oversized) != 1 || fixture.live || created != 1u ||
+            disposed != 1u || title_calls != 1u || status_calls != 0u)
+            return 7;
+    }
     return 0;
 }
 lib_status emulator_product_monitor_format_window_titles(const char *name,
     char *out_running, lib_size running_capacity, char *out_paused,
     lib_size paused_capacity)
 {
-    lib_i32 length;
+    lib_i32 written;
     ++title_calls;
     if (failure == 7u) return LIB_STATUS_LIMIT_EXCEEDED;
-    length = lib_c_snprintf(out_running, running_capacity, "%s", name);
-    if (length < 0 || (lib_size)length >= running_capacity)
+    written = lib_c_snprintf(out_running, running_capacity, "%s", name);
+    if (written < 0 || (lib_size)written >= running_capacity)
         return LIB_STATUS_LIMIT_EXCEEDED;
-    length = lib_c_snprintf(out_paused, paused_capacity, "%s", name);
-    return length < 0 || (lib_size)length >= paused_capacity ?
+    written = lib_c_snprintf(out_paused, paused_capacity, "%s", name);
+    return written < 0 || (lib_size)written >= paused_capacity ?
         LIB_STATUS_LIMIT_EXCEEDED : LIB_STATUS_OK;
 }
 
 lib_status emulator_product_monitor_format_window_status(const char *name,
     emulator_product_help_map hotkeys, char *out_text, lib_size capacity)
 {
-    lib_i32 length;
+    lib_i32 written;
     (void)hotkeys;
     ++status_calls;
     if (failure == 8u) return LIB_STATUS_LIMIT_EXCEEDED;
-    length = lib_c_snprintf(out_text, capacity, "%s", name);
-    return length < 0 || (lib_size)length >= capacity ?
+    written = lib_c_snprintf(out_text, capacity, "%s", name);
+    return written < 0 || (lib_size)written >= capacity ?
         LIB_STATUS_LIMIT_EXCEEDED : LIB_STATUS_OK;
 }

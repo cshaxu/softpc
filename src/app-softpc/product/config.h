@@ -24,6 +24,6 @@ int app_parse_media_mode(const char *value, lib_storage_medium_mode *out);
 int app_resolve_image_path(char *path, const char *config_path);
 int app_load_startup_config(const char *path, app_startup_config *config);
 lib_status app_startup_compose_ui(const app_startup_config *config,
-    app_composed_ui *out_ui);
+    x86_ibmpc_product_ui_options *out_ui);
 
 #endif

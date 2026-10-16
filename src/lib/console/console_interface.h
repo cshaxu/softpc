@@ -8,8 +8,8 @@
 #include "lib/types/types_interface.h"
 
 /* A logical Console is a copied-value endpoint.  It deliberately has no
- * native handle, process ownership, reader, or presentation policy.  Console Broker is
- * the only component that binds one logical object to native Console I/O. */
+ * native handle, process ownership, reader, or presentation policy. Console
+ * Broker alone binds a logical object to native Console I/O. */
 
 /* Fixed storage capacity; each frame supplies its active dimensions. */
 #define LIB_CONSOLE_TEXT_COLUMNS 80u

@@ -1748,10 +1748,238 @@ User INI/media/snapshots are unchanged. Executor delivery and the separate
 actual-change review will create the S7 closure record; these results do
 not claim the pending S8/S9 device/archive work is complete.
 
+#### S7 reopened NXVM audit
+
+Owner request: "先不准入S8，继续S7.请你审计NXVM项目中的最新公共八组件".
+S8 is not active. This continuation changes audit/status documents only;
+prior S7 implementation and qualification remain intact. No upstream import,
+production/test change, build or new runtime result is claimed.
+
+On 2026-10-16 the comparison uses SoftPC 7a523a42 and NXVM HEAD 59aea8649
+plus all current working-tree content, including the new debug_result_smoke.c.
+The upstream index changed from unstaged to staged during inspection; content
+was checked again, so Git commit identity alone is not the audited identity.
+The finite universe is the union of the four src/test pairs: 267 paths,
+206 byte-identical, 58 differing shared paths, two SoftPC-only and one
+NXVM-only. NXVM contains 265 paths, SoftPC 266. Relative to SoftPC the entire
+eight-directory delta is +843/-771, net +72, including manifests/build/docs.
+
+| Pair | Source same / changed / local-only | Test same / changed / local-only / upstream-only | C/H source + / - | C/H test + / - |
+| --- | --- | --- | --- | --- |
+| Lib | 105 / 11 / 0 | 45 / 8 / 1 / 0 | 80 / 53 | 139 / 56 |
+| Emulator | 18 / 12 / 0 | 17 / 5 / 0 / 0 | 248 / 259 | 50 / 102 |
+| x86-debug | 9 / 6 / 0 | 5 / 4 / 0 / 0 | 19 / 12 | 29 / 1 |
+| x86-ibmpc | 5 / 8 / 1 | 2 / 4 / 0 / 1 | 30 / 65 | 75 / 21 |
+
+Method: recursive file SHA-256 comparison; git diff --no-index --stat/--numstat
+between corresponding roots. C/H counts include added/deleted files and
+exclude manifests, build rules and documentation. All changed production C/H
+paths were reviewed; unchanged paths were hash-compared, not re-proven line by
+line. Normalizing LIB_NULL to NULL proves the input queue, Session control/
+state/session and UI differences are only those token substitutions.
+
+Import blockers and required preservation:
+
+1. NXVM machine.c lacks the S6 executor pause disable and continuation enable
+   calls to set_heartbeat. Its header lacks the gate contract, and its
+   machine_wait_smoke lacks pause/capture/debug-stop coverage. SoftPC's driver
+   forwards this gate to Compat and DspSetRunning; replacing it would remove
+   the proven pause contract. This is a missing local repair, not evidence
+   that NXVM recently introduced a new audio regression. Retain/align the S6
+   three-file repair before import. No new runtime reproduction is claimed.
+2. The outer production sources still use raw NULL where S7 uses LIB_NULL;
+   their source gates omit the raw-NULL check. x86-debug still applies
+   -Wno-error=format-truncation to the whole target. These fail SoftPC's
+   admitted quality baseline even though they need not change runtime
+   behavior. Preserve Types vocabulary and strict warning policy.
+3. Both X86 dependency gates inspect only the root CMakeLists and lowercase
+   command spelling, lacking the S7 nested/mixed-case/global/property-link
+   rejection. Existing production links were not found to violate inward
+   ownership; this is a regression-prevention gap, not a claim of an observed
+   outward production dependency. Retain those negative-test-backed guards.
+4. The upstream entry test fixes truncation in its formatting double and adds
+   an oversized-name case, but lacks S7's disposal count and independently
+   injected title/status failure short-circuit assertions. Keep that
+   owner-local failure coverage; an oversized title does not reach the later
+   status failure. Monitor boundary coverage is also narrower (single name,
+   empty hotkey map), although the production truncation checks are correct.
+
+Reasonable upstream improvements, subject to integration qualification:
+
+- PCM completion/wake signal failure uses the existing task cancellation to
+  release synchronous waiters. New deterministic clear/gain/flush/wake/space
+  failure cases accompany it; no second worker or retry mechanism is added.
+- KVM Base resolves shared cursor scanlines once; Console and Window retain
+  their own percentage/pixel conversions. No guest-specific cursor branch.
+- Monitor's fixed command metadata is consolidated. Current groups preserve
+  ERROR rejection for exactly five lifecycle commands plus save/load, leaving
+  debug/general and extension dispatch available. No product-name special case.
+- Debug output failure is finalized by Debug itself, with borrowed static
+  failure text and cancellation; Product consumes the result through one
+  helper. Allocation failure and result-transfer tests accompany the change.
+- Snapshot unsupported output falls back to the existing neutral Monitor
+  rather than a duplicate X86 fallback function. The extension remains usable.
+- The redundant app_composed_machine wrapper is removed in favor of
+  emulator_product_machine; UI options gain an owner-specific name. This is
+  an API migration, not a drop-in replacement: SoftPC's composition, config,
+  extension and main declarations/callers need coordinated edits and tests.
+- Directory-path cases now share the existing native-query test executable.
+  Native discovery remains exercised; ordinary/root/UNC and failure cases
+  remain. Removing the separate fixture is not itself lost native coverage.
+- Retired Console/Linux naming checks move into Lib's component dependency
+  checker. Their removal from verify_kvm_naming alone is not a missing check.
+
+Read-only upstream component-DAG, naming and three outer-source gates pass.
+Passing those gates does not establish the stronger missing S7 checks above.
+No downstream compilation, runtime suite, desktop test or native audio test
+was run in this audit; previous SoftPC qualification cannot certify the new
+upstream changes. Conclusion: useful consolidation, but not ready for blind
+eight-directory overwrite. Resolve the listed preservation gaps and approve
+the App API migration before admitting import. S7 stays open for owner review.
+
+#### S7 NXVM correction re-audit
+
+The owner requests another read-only check after upstream repair. This pass
+uses NXVM e86eb135ea8571c3d7230143fdfadb531a2a7ca9 with a clean worktree at
+both entry and exit; Shared corrective commit is 86175d302. It supersedes the
+import-blocker conclusion of the preceding working-tree audit, not its
+historical findings. SoftPC production/test files remain unchanged.
+
+The 267-path union now has 212 byte-identical paths, 52 changed common paths,
+two SoftPC-only paths and one NXVM-only path. Complete eight-directory delta
+is +750/-489, net +261 including build/docs/manifests. Source/test changed-path
+counts respectively are Lib 11/9, Emulator 7/5, x86-debug 6/4, x86-ibmpc 8/5.
+
+- Machine implementation is now byte-identical to SoftPC. The header retains
+  the execution gate contract. The full pause/capture/debug-stop test returns,
+  with an additional assertion that stop from parking does not re-enable it.
+- Outer Types substitutions and strict Debug warning policy are restored.
+  No target-wide format-truncation exemption remains in the compared CMake.
+- Emulator and both X86 gates now inspect included .cmake files as well as
+  nested CMakeLists. Their negative matrices exercise mixed-case direct links,
+  global links, property-based links and raw NULL. These are stronger in scope
+  than the previous root-only upstream checks.
+- PC entry retains the disposal count and independent title/status failure
+  short-circuit assertions; its oversized-name regression is additional.
+  Directory tests also restore exact-fit/one-byte-short checks for every case.
+
+The local read-only audit ran eight source/negative/DAG/naming checks and
+verified all 257 listed content hashes across eight manifests; all passed.
+These checks used disposable fixtures beneath the existing S7 build workspace,
+never upstream writes. The first foreground collection did not retain terminal
+output; it is not counted as qualification. A subsequent hidden run has explicit
+log/error/zero-exit evidence and is the counted result. No dynamic test or EXE
+build was performed here. Upstream's correction evidence reports 631 units
+per width and receiver integrations, and explicitly retains an initial x86
+MyNES console failure followed by unchanged-code passes; that is upstream
+evidence, not SoftPC qualification or proof that the transient is repaired.
+
+No new blocking defect was identified in the reviewed correction and retained
+consolidations. Import can be admitted, but still requires the coordinated
+SoftPC App API migration described above and complete receiving qualification.
+Monitor's earlier exhaustive capacity matrix remains broader locally than
+the upstream single-name/empty-hotkey tests; preserve its meaningful boundary
+coverage during convergence, without calling this a newly found production
+bug. No import or S8 admission is inferred from this audit.
+
+#### S7 approved import continuation
+
+The owner explicitly reopens the same S7 for import, cached dual-width full
+qualification, publication and push, then owner acceptance. S8 is not admitted.
+The source is clean NXVM e86eb135ea8571c3d7230143fdfadb531a2a7ca9. Pre-change
+estimate: eight-directory +750/-489, net +261; seven App C/H paths need about
+20 substitutions; retain the broader local Monitor capacity matrix. No source
+mirror, Compat device, user INI, disk or snapshot change is admitted.
+
+Import preserves upstream production exactly. The obsolete composed-machine
+wrapper is removed; seven App files directly use emulator_product_machine and
+x86_ibmpc_product_ui_options, on their existing composition path. The standalone
+include gate follows this inward include. The merged process-directory test
+replaces the redundant standalone fixture. The local exhaustive title/status
+capacity matrix remains alongside upstream tests, with its manifest updated.
+
+The timestamp-based Ninja trees are reused without a cache purge or toolchain
+change. These existing trees do not enable a ccache compiler launcher; this
+delivery claims intermediate-object reuse, not ccache hits. Initial file copying
+preserved upstream timestamps: the first x64 run passed 94/95 shared tests but
+the Console retirement fixture linked its old directly compiled Console object
+against new assertions. The normal library object had rebuilt. After identifying
+that stale object, timestamps of changed imported files were refreshed; no
+assertion or production behavior was weakened. Full qualification restarts with
+both initial evidence and the corrected run retained under build/t93/s7/import.
+
+The documentation validator gains an explicit-owner same-step reopen case,
+with rejected-unapproved and accepted-approved fixtures. This implements this
+owner instruction, not an implicit task admission or a blanket reuse exemption.
+
+The finite import ledger contains all 265 paths in the eight directories at
+the pinned source, plus seven App consumers and two local verification tools.
+Every shared production path is byte-identical to upstream. Of all 265 paths,
+263 are identical; only test/emulator/product/monitor_smoke.c and its manifest
+retain the stated local coverage addition. All eight manifests and LF checks
+pass. The completion predicate is both width builds, all 95 shared and 61 other
+tests per width, all ten native desktop cases, protected-path checks, artifact
+hashes, then pushed executor delivery and actual-change review. Runtime proof
+is the local qualification, not upstream reports or this hash comparison.
+
+Changed-path accounting against pre-import 7a523a42, including deleted/new
+paths and CMake/manifests/READMEs in the component totals:
+
+| Directory | Paths | Added | Removed | Net |
+| --- | ---: | ---: | ---: | ---: |
+| src/lib | 11 | 100 | 75 | +25 |
+| src/emulator | 7 | 101 | 101 | 0 |
+| src/x86-debug | 6 | 44 | 26 | +18 |
+| src/x86-ibmpc | 8 | 57 | 82 | -25 |
+| test/lib | 9 | 167 | 95 | +72 |
+| test/emulator | 5 | 76 | 9 | +67 |
+| test/x86-debug | 4 | 80 | 23 | +57 |
+| test/x86-ibmpc | 5 | 129 | 34 | +95 |
+| App composition consumers | 7 | 15 | 15 | 0 |
+| Local verification tools | 2 | 20 | 3 | +17 |
+
+Production C/H alone totals 22 paths, +217/-223, net -6. Test C/H alone totals
+ten paths, +300/-69, net +231. This accounting includes the new debug-result
+fixture, which an unstaged tracked-only diff would omit. No preserved-source
+mirror diff is added. The wider tests exercise the consolidated paths; no second
+runtime implementation is introduced.
+
+Post-edit public-quality review covers every changed C/H hunk and all eight
+source/test boundary, naming, negative-fixture and manifest gates. Emulator's
+single command-description table retains the same ten commands, help order,
+argument policy and seven-command ERROR rejection; extensions/debug remain
+outside that rejection. Machine's heartbeat implementation is unchanged and
+its header still describes the execution gate. PCM faults use the existing
+worker cancellation signal to release waits, not a parallel failure dispatcher.
+KVM shares cursor shape resolution while its leaves retain their own rendering
+and blink responsibility. Debug owns its failure result and cancellation, so
+the PC adapter no longer duplicates that policy. App retains only its concrete
+composition and snapshot/media extensions. The complete receiving regression
+must confirm these source conclusions; no physical audio or Linux-runtime
+claim follows merely from the source review.
+
+Receiving qualification is complete: x64 and x86 each pass 95/95 shared tests,
+61/61 other unit/integration/gate tests, and 5/5 native desktop tests, for
+322/322 across both widths. Shared suites precede the other suites; desktop
+cases run individually after both background passes. No Computer Use or owner
+manual result is counted. The corrected run has qualification.exit=0 and 14
+JUnit files under build/t93/s7/import/run2. The initial failed run remains
+separate. The x86 Ninja build recovered a premature log EOF and rebuilt 613
+steps; no agent cache purge occurred. This is not a claim that all old objects
+were successfully reused. Protected INI and all guest assets remain unchanged.
+
+Published SHA-256:
+
+- softpc32.exe: `A49AA7DBEBD9DBFDF493FE95D4065931BD6CDCCDA83A0EE2873276040615B63E`
+- softpc64.exe: `417F37115812071C5C397F876078913E0F7F267E2420934DA287FDD6E9A09DBB`
+
+S7 remains open for the owner's acceptance of this additional delivery. S8 is
+not admitted and T93 remains open.
+
 ### S8 — XP MIDI/FM device attachment
 
-Admitted after the reviewed S7 closure under delegated sequential execution.
-No S8 production change is claimed at admission.
+Planned after S7; the owner withdrew its automatic admission and reopened S7
+for the upstream audit above. No S8 production change has been made.
 
 Import necessary nt_sbmid.c and nt_sbfm.c subsets, using Lib MIDI and the
 explicit no-host FM policy. Keep one guest parser and fix tail/pointer bounds.

@@ -16,19 +16,19 @@ lib_status base_process_executable_directory(char *output, lib_size capacity)
         while (separator != path && separator[-1] != '/' && separator[-1] != '\\') --separator;
         if (separator == path) status = LIB_STATUS_IO_ERROR;
         else {
-            char *root = path + 1;
-            if (path[1] == ':') root = path + 3;
-            else if ((path[0] == '\\' || path[0] == '/') && path[1] == path[0]) {
-                lib_u32 component;
-                root = path + 2;
-                /* UNC roots contain server/share; extended UNC has a prefix. */
-                if (lib_text_compare_n(root, "?\\UNC\\", 6u) == 0) root += 6;
-                for (component = 0u; component != 2u && root < separator; ++component) {
-                    while (root < separator && *root != '/' && *root != '\\') ++root;
-                    if (root < separator) ++root;
+            char *root_end = path + 1;
+
+            if (path[1] == ':') root_end = path + 3;
+            else if ((path[0] == '\\' && path[1] == '\\') ||
+                (path[0] == '/' && path[1] == '/')) {
+                lib_u32 parts = 0u;
+                root_end = path + (lib_text_compare_n(path, "\\\\?\\UNC\\", 8u) == 0 ? 8 : 2);
+                while (*root_end != '\0' && parts < 2u) {
+                    if (*root_end == '/' || *root_end == '\\') ++parts;
+                    ++root_end;
                 }
             }
-            if (separator > root) --separator;
+            if (separator > root_end) --separator;
             *separator = '\0';
             lib_memory_copy(output, path, lib_text_length(path) + 1u);
         }

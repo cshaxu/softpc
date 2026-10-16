@@ -15,9 +15,7 @@ function(reject source build expected)
     endif()
 endfunction()
 reject("#include <windows.h>\n" "" "Noncanonical")
-file(WRITE "${PROBE_ROOT}/unowned.c" "void unowned(void);\n")
-reject("" "" "Unowned Emulator source path")
-file(REMOVE "${PROBE_ROOT}/unowned.c")
+reject("void *pointer = NULL;\n" "" "Raw CRT vocabulary")
 foreach(header IN ITEMS assert limits stddef stdint stdio stdlib string stdarg
         ctype math stdbool float)
     reject("#include <${header}.h>\n" "" "Noncanonical Emulator include")
@@ -35,7 +33,7 @@ reject("#ifdef _WIN32\n#endif\n" "" "Platform implementation")
 reject("struct hidden { HANDLE event; };\n" "" "Platform implementation")
 reject("pthread_mutex_t gate;\n" "" "Platform implementation")
 foreach(symbol IN ITEMS memset memcpy memmove memcmp memchr strlen strcmp
-        strchr strtok calloc malloc realloc free snprintf NULL)
+        strchr strtok calloc malloc realloc free snprintf)
     reject("void probe(void) { ${symbol}(0); }\n" "" "Raw CRT vocabulary")
     reject("#define LEGACY_${symbol} ${symbol}\n" "" "Raw CRT vocabulary")
 endforeach()
@@ -54,6 +52,24 @@ reject("" "target_link_libraries(emulator-machine PRIVATE user32)\n" "Forbidden 
 reject("" "target_link_libraries(emulator-machine PRIVATE emulator-ui)\n" "Forbidden Emulator edge")
 reject("" "TARGET_LINK_LIBRARIES(emulator-machine PRIVATE emulator-ui)\n" "Forbidden Emulator edge")
 reject("" "if(WIN32)\nendif()\n" "must not select platform")
+foreach(path IN ITEMS nested/CMakeLists.txt nested/links.cmake)
+    file(MAKE_DIRECTORY "${PROBE_ROOT}/nested")
+    foreach(build IN ITEMS
+            "TARGET_LINK_LIBRARIES(emulator-machine PRIVATE emulator-ui)"
+            "LINK_LIBRARIES(emulator-ui)"
+            "set_property(TARGET emulator-machine APPEND PROPERTY LINK_LIBRARIES\n emulator-ui)"
+            "set_target_properties(emulator-machine PROPERTIES INTERFACE_LINK_LIBRARIES\n emulator-ui)")
+        file(WRITE "${PROBE_ROOT}/${path}" "${build}\n")
+        reject("" "include(${path})\n" "Forbidden Emulator edge|Use explicit Emulator")
+    endforeach()
+    file(REMOVE "${PROBE_ROOT}/${path}")
+endforeach()
+foreach(path IN ITEMS probe.c machine/nested/probe.c)
+    file(MAKE_DIRECTORY "${PROBE_ROOT}/machine/nested")
+    file(WRITE "${PROBE_ROOT}/${path}" "/* Unowned source must not be skipped. */\n")
+    reject("" "" "Noncanonical Emulator source")
+    file(REMOVE "${PROBE_ROOT}/${path}")
+endforeach()
 file(WRITE "${PROBE_ROOT}/machine/probe.c"
     "#include \"lib/types/types_interface.h\"\nlib_u32 limit = LIB_UINT32_MAX;\n"
     "lib_size size = LIB_SIZE_MAX;\n/* UINT_MAX */\nconst char *name = \"UINT32_MAX\";\n")

@@ -3,7 +3,7 @@
 
 #include "x86-ibmpc/product/entry_interface.h"
 
-lib_status softpc_product_configure_extensions(app_composed_machine *machine,
+lib_status softpc_product_configure_extensions(emulator_product_machine *machine,
     x86_ibmpc_product_command_extensions *out_extensions);
 
 #endif
