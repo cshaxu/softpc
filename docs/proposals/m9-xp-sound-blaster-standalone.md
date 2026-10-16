@@ -1560,7 +1560,7 @@ not an already-working scheduling path.
 
 ### S7 — shared contract and quality repair
 
-Active after reviewed S6 closure; local implementation checkpoints follow below.
+Closed after reviewed executor b1934914; implementation checkpoints follow below.
 Baseline is S6 executor 065ac9ed and its published EXEs. The supplied
 audit is source/reproduction input, not proof of these repairs or a fresh
 full-suite pass. NXVM remains read-only comparison material; no receiving
@@ -1749,6 +1749,9 @@ actual-change review will create the S7 closure record; these results do
 not claim the pending S8/S9 device/archive work is complete.
 
 ### S8 — XP MIDI/FM device attachment
+
+Admitted after the reviewed S7 closure under delegated sequential execution.
+No S8 production change is claimed at admission.
 
 Import necessary nt_sbmid.c and nt_sbfm.c subsets, using Lib MIDI and the
 explicit no-host FM policy. Keep one guest parser and fix tail/pointer bounds.
