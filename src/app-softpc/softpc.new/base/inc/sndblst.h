@@ -122,6 +122,19 @@ ResetAll(
 #define MIDI_READ_TIMESTAMP_INTERRUPT_WRITE_POLL_UART   0x37
 #define MIDI_WRITE_POLL                         0x38
 
+#define MPU_RESET                               0xFF    // Enables & Sets MIDI to use both ports
+#define MPU_PASSTHROUGH_MODE    0x3F    // Starts dumb mode; only active command is set path
+#define MPU401_DATA_PORT        0x330
+#define MPU401_COMMAND_PORT     0x331
+#define MPU_INTELLIGENT_MODE    0
+#define MPU_UART_MODE           1
+
+#define ADLIB_REGISTER_SELECT_PORT 0x388 // select the register to write data
+#define ADLIB_STATUS_PORT          0x388 // read to determine opl2 status
+#define ADLIB_DATA_PORT            0x389 // write data port
+
+#define AD_MASK             0x04    // adlib register used to control opl2
+
 /*****************************************************************************
 *
 *    #Mixer related definitions

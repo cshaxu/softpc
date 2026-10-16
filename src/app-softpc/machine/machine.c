@@ -4,6 +4,7 @@
 #include "compat/ccpu/abi.h"
 #include "compat/cvidc/gdp_state.h"
 #include "compat/platform.h"
+#include "compat/sb_midi.h"
 #include "compat/dib_surface.h"
 #include "compat/media_snapshot.h"
 #include "lib/storage/medium_interface.h"
@@ -126,6 +127,10 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     if (machine->memory_bytes < SOFTPC_MINIMUM_RAM_BYTES) {
         lib_release(machine);
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    }
+    if (softpc_sb_midi_prepare() != LIB_STATUS_OK) {
+        lib_release(machine);
+        return SOFTPC_MACHINE_IO_ERROR;
     }
     *machine_out = machine;
     return SOFTPC_MACHINE_OK;
@@ -369,6 +374,8 @@ void softpc_machine_request_stop(softpc_machine *machine)
 {
     if (machine != NULL && machine->reset) {
         softpc_ccpu_lifecycle_request_exit();
+        /* Compat retains cancellation failures for SbGetStatus on the executor. */
+        (void)softpc_sb_midi_cancel();
         softpc_platform_request_executor_wake();
     }
 }
@@ -530,6 +537,8 @@ softpc_machine_result softpc_machine_destroy(softpc_machine *machine)
         softpc_gdp_destroy_global();
         sas_term();
     }
+    if (machine != NULL && softpc_sb_midi_dispose() != LIB_STATUS_OK)
+        return SOFTPC_MACHINE_IO_ERROR;
     lib_release(machine);
     return SOFTPC_MACHINE_OK;
 }

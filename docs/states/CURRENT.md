@@ -10,7 +10,40 @@ See the [accepted import ledger](../proposals/m9-xp-sound-blaster-standalone.md#
 and [S7 history](../history/M9-T93-S7-shared-contract-quality.md).
 S8 is the sole active subtask: XP MIDI/FM device attachment through existing
 Lib capabilities. The first checkpoint is the pinned-source subset and port/
-lifecycle audit; no S8 production or test change has yet been made. Public
+lifecycle audit. A local FM subset checkpoint now passes the exhaustive
+index/data/status matrix on both widths. FM now also passes actual I/O-table
+alias/conflict/reset/detach tests through the existing DSP device owner.
+The MIDI device parser now passes both-width complete-message/running-status,
+SysEx/realtime/bounds and retained-tail fixture tests. It is now linked into
+the device archive and actual MPU port dispatch. The combined attachment
+checkpoint passes four focused tests per width, including Mixer gain forwarding
+and host-output failure classification. The Compat host-output adapter also
+passes ownership/backpressure/cancellation/volume fixture tests. Complete
+pause/resume/destruction and native-path qualification remain unfinished.
+Cancellation-failure propagation now passes two focused tests per width: the
+Compat handle lock protects the retained fault, and the existing device status
+path rejects machine execution with an I/O error. No public API changed.
+First full x64 qualification passes 95/95 shared and 64/65 other background
+tests; the sound test's frame-ratio failure also reproduces in isolation.
+A probe proves unequal counting windows across cold-reset host cleanup; the
+bounded three-block measurement correction passes ten repetitions per width.
+Faulted-MIDI stop cleanup and resume admission are now repaired locally;
+the new actual-machine regression fails before repair, and the focused
+device/parser/Compat group passes 3/3 per width after repair. The second full
+x64 run passes 95/95 shared and 63/65 other tests. Both failures are paused-to-
+stopped transitions: a repeated isolated probe proves paused MIDI service
+returns INVALID_STATE before the CCPU stop signal arrives, faulting the run.
+The service now idles successfully while paused; guest-byte admission remains
+rejected. Deterministic device/parser checks pass both widths; both affected
+integrations pass twenty repetitions each on each width. The third full x64
+run passes 95/95 shared and 64/65 other tests: checkpoint_smoke times out.
+Ten isolated repetitions and the unchanged 65-test parallel rerun pass;
+the timeout cause is not established. The fourth complete qualification passes
+165/165 on each width (95 shared, 65 other, five native desktop), no skips.
+Both EXEs are refreshed; user INI/media remain unchanged. This proves that
+run passed, not that the earlier intermittent timeout has been explained.
+Executor final review, commit/push and coordinator acceptance remain pending.
+The proposal records focused evidence and pending coverage. Public
 eight-directory changes are not planned. Sound-state serialization stays
 in S9; T93 is open.
 S6 executor `065ac9ed` is pushed and actual-change reviewed; S6 closes under

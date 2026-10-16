@@ -1991,9 +1991,9 @@ admission. This subsequent P records that review only.
 
 The owner accepts S7 and explicitly admits S8 on 2026-10-16:
 "验收通过，准入s8". This supersedes the prior withdrawal of automatic S8
-admission during the shared import. Baseline is e1e44d0c. No S8 production
-change has yet been made; the initial checkpoint rechecks source ranges,
-dispatch and lifecycle against that accepted baseline.
+admission during the shared import. Baseline is e1e44d0c. The initial checkpoint
+rechecks source ranges, dispatch and lifecycle against that accepted baseline;
+local implementation below is not completed qualification.
 
 Import necessary nt_sbmid.c and nt_sbfm.c subsets, using Lib MIDI and the
 explicit no-host FM policy. Keep one guest parser and fix tail/pointer bounds.
@@ -2028,6 +2028,419 @@ admission, terminal errors and volume; (6) pause/resume/reset/stop/destruction;
 qualification and unchanged speaker/DSP behavior. Each needs a source owner
 and focused regression before S8 can close. Portable active-device archives
 remain S9, not an inferred S8 completion claim.
+
+#### S8 local FM subset checkpoint
+
+The retained nt_sbfm.c implements the selected XP no-host index/status behavior,
+not native FM playback. The pinned file has 366 lines; the retained reference
+selects 84 lines and excludes native NT bindings, port batches, unused timer
+state and driver lifetime. The local body has 63 lines. Its local adjustments
+are portable declarations and the active XP no-host transition rule: B0..BD
+also set immediate-expiry flags, while only register 04 resets them. Kernel
+source is research evidence, not an imported payload. The source ranges are
+recorded in t93-s8-xp-sound-subset-ranges.tsv; the mirror manifest keeps raw,
+selected and local hashes separately. sndblst.h restores original AD_MASK;
+nt_sb.h keeps its S6 subset reference with four local portable FM declarations.
+
+The isolated FM test covers 524,288 index/data/prior-status transitions,
+including repeated reads and reset of the selected register. Both width
+targets build and pass; ignored evidence is build/t93/s8/fm-r2.log and
+fm.exit (0). The first build's missing AD_MASK error is retained in fm.log/
+fm.err, not counted as passing. This proves the selected function semantics
+only: it does not yet prove guest I/O dispatch, lifecycle, host capability
+attachment or MIDI. No EXE was published and no S8 implementation P is ready.
+All eight coverage units above remain required before delivery.
+
+#### S8 local FM port checkpoint
+
+The existing SbPorts binding list now holds absolute addresses, including
+228/229 and 388/389; the same I/O-table preflight checks every binding before
+any is installed. VsbByteIn/Out retain XP's alias remap and final FM dispatch;
+there is no second port registry or state. ResetAll restores ResetFM before
+the existing Mixer/DSP reset. nt_sb.c and sndblst.h selected reference ranges
+now include those exact XP branches/constants; excluded native work stays out.
+
+The existing device_contract_sb_commands regression now checks conflicts at
+each of ten ports without partial attachment, cross-alias writes and reads,
+the unsupported data-read result, idempotent attachment, DSP reset, teardown,
+reattachment and machine cold reset. Both widths build and pass this case and
+the exhaustive isolated FM matrix (2/2 per width). Evidence:
+build/t93/s8/fm-ports-r2.log, fm-ports-x64.xml, fm-ports-x86.xml and
+fm-ports.exit=0. The initial hidden launch vanished without logs or an exit
+record; it is inconclusive, not a failed/passed test. Its missing process was
+checked before a durable hidden launch. Ninja recovered its existing build
+record and rebuilt additional targets; no cache purge was requested.
+
+Cumulative local S8 C/H against admission, including new files: production
++111/-6 (net +105), tests +75/-6 (net +69). This is an unfinished checkpoint,
+not the final mirror-diff or delivery account. Mirror body verification passes
+504 files. Public components, package EXEs and owner assets remain untouched.
+MIDI parsing/output/backpressure and complete sound lifecycle remain active
+work; FM host capability admission and final qualification are not inferred
+from these port tests.
+
+#### S8 local MIDI parser checkpoint
+
+nt_sbmid.c is now a 131-line device parser with one 4096-byte message assembly
+buffer, original running-status/length responsibilities and one pending
+realtime byte. It replaces the old pointer-narrowing CMDHDR ring and native
+MIDIHDR packing, rather than introducing a Compat parser. The pinned 896-line
+file's selected reference retains 446 lines, including the complete original
+BufferMidi and SendMidiRequest bodies: their local replacement is deliberately
+visible in the mirror diff, not hidden as excluded source. Native handle,
+allocation, batch-copy and diagnostic sections are excluded with ranges.
+
+The original send loop excluded LastCommand, delaying the final complete
+message. The new single SendMidiRequest entry submits complete messages now,
+clears them only after acceptance, and can be called without a new guest byte.
+Running status is materialized for Lib's complete-message API. Realtime does
+not consume partial-message bytes; undefined statuses are not sent as invalid
+host messages. Oversized SysEx is consumed through EOX and returns UNSUPPORTED,
+never a valid truncated message. New status aborts an incomplete message.
+
+The 132-line isolated test covers every channel/status family, system-common
+lengths/cancellation, each defined realtime status inside short and SysEx
+messages, malformed interruption, maximum-size and three over-capacity sizes,
+retained short/SysEx/realtime after host rejection, explicit service without
+another guest byte, and parser reset. Both width targets build and pass 1/1;
+evidence is build/t93/s8/midi-parser-r2.log, midi-parser-{x64,x86}.xml and
+midi-parser.exit=0. The first build failed because the test helper name byte
+collided with the original header macro; feed_byte fixes that fixture naming
+error. The initial failure log remains evidence, not a passing run.
+
+The 11-line Compat declaration defines complete-message submission only.
+Its implementation and actual MPU dispatch are not yet present; the parser
+is currently compiled by its isolated test, not linked into the production
+device archive. In particular these fixture results do not prove native
+capacity wake/cancellation, actual note output or pause/stop behavior. Those
+remain mandatory S8 units before deployment. This checkpoint adds +147/-0
+production C/H and +132/-0 test C; no shared component or user asset changed.
+Mirror verification passes 505 bodies; no complete implementation P is ready.
+
+#### S8 local MIDI host-adapter checkpoint
+
+Compat sb_midi.c now owns the one Lib MIDI output and a lifetime mutex used
+only to protect handle publication/destruction against cancel. It does not
+own guest bytes, running status, an output queue or another worker. Complete
+SysEx backpressure waits on the existing Lib completion event; complete short
+messages use Lib's ordering operation. A cancelled submission leaves the
+device message pending. The existing CCPU lifecycle exit request is the
+authority; a stale auto-reset cancellation signal can be consumed without
+inventing another requested-stop flag or timed polling.
+
+Prepare/dispose require quiescent callers. Machine integration must establish
+that lifetime before exposing stop callbacks, then quiesce them before disposal.
+The reset/EOX wait is outside the lifetime mutex and cancellable. Native final
+destruction is serialized against cancellation so a handle cannot be freed
+under cancel; its unavoidable native-call behavior is not claimed interruptible.
+Terminal errors still reach explicit Lib destruction, rather than leaking a
+handle because ordinary reset rejects a faulted output. Failure reporting and
+remaining ownership are distinct. Optional host volume is preserved/restored
+only while still owned; a newer external volume becomes the restore baseline
+before a later guest gain change, or is left alone on close.
+
+The new host-fixture regression covers no-device and repeated-open admission,
+direct short output, event-driven SysEx capacity recovery, cancellation inside
+the wait with the mutex free, existing-exit rejection, stale cancellation,
+reset, optional volume, external volume changes, close-failure retention and
+cleanup after terminal failure. Both widths pass 1/1 after the final volume
+case; evidence is build/t93/s8/midi-output-r2.log, midi-output-{x64,x86}.xml
+and midi-output.exit=0. These are scripted host and synchronization calls,
+not native playback or cross-thread integration evidence. Actual MPU dispatch,
+machine preparation/cancellation/destruction wiring, pause/reset policy and
+the final composed/native regressions remain mandatory.
+
+This checkpoint adds 149 production C lines and 13 header lines (+162/-0),
+plus 136 test C lines (+136/-0). It does not change shared components, package
+EXEs or owner assets. The initial local-host estimate is being consumed by
+explicit cancellation/lifetime/volume handling; final S8 accounting must report
+the complete actual subset and integration cost, not just imported XP lines.
+
+#### S8 MPU attachment and cleanup checkpoints
+
+The production device archive now includes the MIDI parser and Compat output
+adapter. The existing I/O table owns optional MPU 330/331 admission, UART mode,
+ACK/reset and detach; occupied or unsupported optional ports do not steal an
+existing registration. Mixer gain uses the same device owner and host output.
+Native rejection after successful capability admission is an I/O failure,
+distinct from an oversized guest SysEx. No public component changes are made.
+
+The combined real-port/device and parser/output-fixture checkpoint passes four
+tests per width: midi-attachment-{x64,x86}.xml, midi-attachment.log and
+midi-attachment.exit=0 in the admitted S8 evidence directory. This proves the
+bounded port and scripted-host cases, not native playback or complete lifecycle.
+
+A further owner-local regression adds 19 test lines and no production change.
+It checks that a writable-wait I/O error is returned without resubmission, and
+that cancelled disposal does not destroy the output or its guard: reopening is
+rejected, cancellation still reaches the retained output, and subsequent
+quiescent disposal succeeds. Both widths pass 1/1 in midi-cleanup-{x64,x86}.xml;
+midi-cleanup.log and midi-cleanup.exit=0 retain the build/test evidence. These
+are scripted cancellation/ownership proofs, not a concurrent-thread stress test.
+
+Remaining S8 work includes pause/resume note continuity, cancellation-failure
+propagation, native cleanup qualification, explicit FM capability admission,
+oversize-message diagnostics and the complete package regression/publication.
+The checks above do not admit S9 or complete S8.
+
+The cancellation-failure repair now passes focused qualification. Lib's
+cancel-wait operation returns a failed event signal directly; it does not latch
+that cross-thread error in its output. Compat retains the first such failure
+under its existing handle mutex, and SbGetStatus reads it through the existing
+executor failure path. This is host-output failure state, not a second guest
+stop flag or retry mechanism. Fresh output admission/disposal ends that lifetime.
+Cleanup remains permitted after a fault. No shared API is changed. Injected
+tests cover sticky failure despite a later successful cancel, disposal, and
+propagation through device status to machine-run rejection. The owned
+midi-cancel background job passes 2/2 on x64 and x86; both JUnit files and
+midi-cancel.exit=0 record completion. An event-signal failure is not claimed to wake an already
+blocked native wait successfully; native-call termination limits still apply.
+
+The next lifecycle seam was rechecked against the pinned XP nt_sbmid.c:
+ResetMidiDevice (153 onward) waits for native headers and calls midiOutReset;
+CloseMidiDevice invokes that reset before volume/handle cleanup. It has no
+paired suspend/resume state restoration entry. Copying that operation into
+pause would stop notes without reconstructing them. The standalone continuation
+must use the single device-owned MIDI state and restoration policy already
+required by the snapshot design, rather than a separate Compat parser or a
+second pause-only replay log. This source finding is not implementation or
+dynamic proof of pause continuity; that remains an S8 completion requirement.
+
+#### S8 device pause-continuation checkpoint
+
+nt_sbmid.c now retains successfully submitted logical notes and the sustain/
+sostenuto relationships in the device owner. Pause stops host output; resume
+reconstructs sostenuto-captured notes before later notes, restores sustain,
+then releases keys which were only pedal-held. A failed/cancelled restore
+leaves continuation pending; the next actual entry first resets host output
+instead of duplicating a partially submitted prefix. The original parser and
+its partial/complete pending message remain the only guest-byte path.
+
+This is a bounded one-voice-per-channel/key approximation, not restoration of
+native envelopes or multiple stacked voices on one pitch. Unknown vendor SysEx
+and physical instrument state remain subject to the already disclosed host
+MIDI limits. S9 must serialize this same device state, not create a second
+pause/snapshot reconstruction implementation. Controller/channel-mode semantics
+were checked against the MIDI Association's
+[control table](https://midi.org/midi-1-0-control-change-messages) and
+[message summary](https://midi.org/summary-of-midi-1-0-messages).
+
+The expanded parser fixture passes 1/1 on both widths, including repeated
+pause/resume, sostenuto capture ordering, sustain with All Notes Off,
+controller reset, All Sound Off and cancellation after a submitted restore
+prefix. Evidence: midi-pause-r2.log, midi-pause-{x64,x86}.xml and
+midi-pause.exit=0. The parser implementation grows from 131 to 253 lines and
+its test from 132 to 186 lines; these are explicit local continuation changes,
+not additional imported XP source. Full S8 accounting remains required.
+
+The existing heartbeat receiver now calls SbSetRunning for both DSP and MIDI;
+resumption drains a retained complete message without waiting for another
+guest byte. This wiring and its actual machine-entry regression pass four
+focused tests on each width in midi-lifecycle.log and the refreshed
+midi-attachment-{x64,x86}.xml, with midi-attachment.exit=0.
+
+The added owner-local native integration test runs the real parser, Compat
+and Lib WinMM implementation, with only CCPU's quiescent exit predicate fixed
+false. It covers a first note, pause/resume, note-off, a universal identity
+SysEx request, subsequent short-message ordering after cancellation and close.
+Both widths pass, not skip: midi-native-{x64,x86}.xml, midi-native.log and
+midi-native.exit=0. This proves native API/resource integration, not acoustic
+output, concurrent CCPU execution or exact instrument restoration. No public
+Lib files, PCM implementation or WASAPI backend change.
+
+The final input-boundary edit reports oversized SysEx once at EOX via the
+Compat diagnostic endpoint; it neither submits a truncated message nor faults
+the host output. The actual-port test now asserts that diagnostic count and
+unchanged host submission count. That edit still requires the receiving full
+qualification; the earlier logs do not verify it retroactively.
+
+#### S8 first full qualification and cleanup review
+
+The remaining FM capability checkpoint is resolved by the actual public
+contract: audio/fm/output_interface.h exposes acquisition only, explicitly
+returns UNSUPPORTED/null on every current backend, and exposes no register
+transport or output lifetime. SoftPC selects the approved XP no-host branch;
+it does not acquire a phantom handle or add a wrapper around that constant
+capability result. The existing Lib capability regression and actual FM port
+matrix cover distinct boundaries. A future raw backend/transport is a separate
+admission, not silently enabled by this device subset. No audible FM claim is
+made. This clarifies the earlier pending capability-admission wording without
+adding an unused production path.
+
+The first full x64 build and shared suite pass (95/95). Other background
+tests pass 64/65; machine/sound_smoke fails its first/second PCM frame ratio.
+An isolated rerun fails too, so parallel host activity is not assumed causal.
+A temporary endpoint probe records 3072 first-run frames before cold reset,
+11264 after reset, and 3072 second-run frames at comparison. The first counter
+includes the intervening host cleanup while the second does not. The probe is
+removed; the test now counts the same first three complete blocks in both
+executions, publishing each frame count before its delivery count. The existing
+ratio assertions remain. Each width now passes ten consecutive executions
+(sound-window-{x64,x86}.xml and sound-window.exit=0);
+the initial full-suite failure remains retained evidence, not a passing run.
+
+Actual-change review also identifies a device lifecycle gap: SbSetRunning
+skips MIDI pause cleanup when MidiStatus is already faulted, and does not check
+the retained cancellation failure before restoration. Repair must preserve
+normal pause continuity but use existing host close cleanup for a faulted
+stop, retain error reporting and prevent failed output from replaying notes.
+The repair stays in SbSetRunning: fold in the existing Compat cancellation
+status before replay, preserve normal pause/reset, and use the existing close
+operation when stopping a faulted output. No new state or shared API is added.
+The added actual-machine test fails before the repair at the still-open host
+assertion (midi-fault-before.xml), and verifies cancellation-fault and native
+submission-fault stop/close plus rejection of subsequent replay. The
+device/parser/Compat group passes 3/3 on both widths after repair
+(midi-fault-after-{x64,x86}.xml, midi-fault-after.exit=0).
+This is not completed S8 qualification. The full-suite failure and diagnostic
+logs remain separate from subsequent passing targeted evidence.
+
+The second full x64 run passes 95/95 shared and 63/65 other tests. Both failed
+integrations wait for STOPPED after PAUSED. An isolated repeated input test
+reproduces MIDI INVALID_STATE (2), exit predicate false, followed by machine
+ERROR (4), not a timeout of a correctly running stop. The public stop operation
+wakes the parked executor before calling its driver stop signal. On that legal
+interleaving the callback returns without resuming MIDI, and the existing
+platform service executes before CCPU exit is signalled. SendMidiRequest had
+incorrectly classified idle paused service as a host failure.
+
+The repair makes paused service return OK without submitting anything; the
+BufferMidi guest-byte entry explicitly rejects paused admission, preserving
+pending data. Existing MidiRunning remains the sole state. Actual-device tests
+now service between heartbeat-disable and re-enable, and parser tests reject a
+new paused byte. No Emulator ordering, second cancellation flag or retry loop
+is added. Temporary result/state prints are removed. Focused x64 2/2 passes;
+both affected integrations are being repeated twenty times per width before
+another complete qualification. Initial probe compilation lacked stdio for
+the temporary print; the corrected probe built and reproduced the failure.
+
+The repeated integration campaign has a 3600-second total observation budget
+and the existing 30 MiB log limit, distinct from each ordinary 1200-second
+qualification suite. Its first real DOS restart case completes in 66 seconds;
+twenty repetitions on both widths are intentionally not treated as a short
+interactive check. The owned hidden job and child CTest/test processes are
+observed directly; slow boot progress is not a reason to kill or restart them.
+
+Similar-issue review searches SendMidiRequest, MidiSetRunning and SbService
+throughout app-softpc. There is one production service caller in platform.c,
+one device dispatch in nt_sb.c, and the existing parser/heartbeat entries;
+there is no second MIDI dispatch to repair. DspServiceTransfer already returns
+OK when inactive/paused and keeps its existing behavior. Guest-byte admission
+remains separate from idle service. The deterministic actual-device regression
+exercises that distinction without relying on reproducing the thread timing.
+
+#### S8 repeated stop proof and third qualification
+
+The stop-fix campaign completes successfully (exit 0): both affected real
+integrations pass twenty repetitions each on each architecture. Its x64 and
+x86 integration reports record zero failures; the deterministic device/parser
+pair also passes on both widths. This closes the specific paused-service
+regression proof, not the complete S8 qualification.
+
+The automatically following third full run passes x64 build and 95/95 shared
+tests, then 64/65 other tests. checkpoint_smoke is classified as Timeout with
+no diagnostic output. Its configured budget remains 15 seconds; the two prior
+full runs completed it in 11.87 and 10.23 seconds. Ten unchanged isolated
+repetitions pass in 66.93 seconds total. An unchanged full 65-test parallel
+rerun passes in 97.34 seconds, including checkpoint_smoke in 9.59 seconds.
+Neither result establishes the timeout root cause. Native MIDI reset is now
+part of its repeated machine-reset path, but attributing the failure to that
+host call without a stack/timing trace would be speculation.
+
+The failed run, isolated report and parallel rerun remain distinct evidence
+under qualification-r3. No timeout, test assertion or production behavior was
+changed to obtain the rerun. A fourth complete dual-width run is in progress;
+no complete pass or resolved timeout is claimed at this checkpoint.
+
+#### S8 complete fourth qualification
+
+The fourth hidden job completes with qualification.exit=0. Each architecture
+passes 165/165: 95 shared, 65 other background tests, and five individually
+scheduled native desktop cases. All fourteen JUnit reports have zero failures
+and zero skips. Both native MIDI integration cases execute rather than skip;
+this is API/resource-path evidence, not a claim of audible listening or guest
+Windows-driver acceptance. The user INI hash check succeeds and only the two
+package EXEs change under assets.
+
+The x64 checkpoint_smoke completes in 8.86 seconds in this full run. The prior
+timeout remains unexplained and is not relabelled a pass or a fixed defect.
+No product workaround, timeout enlargement or test deletion was used. Final
+coordinator review must consider this retained qualification limitation.
+
+Artifact SHA-256:
+
+- softpc32.exe: A059BAF16D5A630186FEC46895E7ACAF12E19BC2C593E464B8E27FE544D6BA35
+- softpc64.exe: BA980E0F46C63BF7F1DD86F872BA08E05102727DCE36368597D67F2E74C473E8
+
+Ninja reports premature-end-of-file recovery during x86 build and recompiles
+existing objects. No clean/restart was requested; this is not evidence of
+perfect cache reuse. Public eight source/test directories remain unchanged.
+Executor commit/push and coordinator actual-change acceptance are still
+pending; S9 active sound-state serialization is not covered by these passes.
+
+Finite-unit exit evidence (the eight units declared at admission):
+
+| Unit | Retained owner and proof |
+| --- | --- |
+| 1 Source subset | Fixed XP range ledger and 505-body mirror gate; excluded host/kernel code separately accounted. |
+| 2 Port ownership | nt_sb.c sole I/O registration; actual-device MPU/FM aliases, conflict rejection, reset and detach regression. |
+| 3 MIDI parser | nt_sbmid.c sole parser; partial/running-status/realtime and complete-message assertions. |
+| 4 SysEx/tail | Parser bounds/retained-tail tests plus Compat capacity-wait/cancellation fixture and executed native integration. |
+| 5 Host ownership | Compat creation, volume ownership, reset/destroy failures and retained cancellation error tests. |
+| 6 Lifecycle | Device/parser pause/pedal restoration, faulted-stop cleanup, and both real integrations repeated twenty times per width. |
+| 7 FM semantics | Selected XP no-host branch; exhaustive 524288 transitions and real device-port checks; no audible FM claim. |
+| 8 Receiving qualification | Fourth complete run: 165/165 per width, no skips, ten native desktop cases, refreshed package EXEs and unchanged INI. |
+
+All eight admitted units have passing evidence. The third-run checkpoint
+timeout is retained as an explicit test-reliability debt, not silently fixed
+by a retry or used to assert universal scheduling robustness. Its owner and
+investigation trigger are recorded in TODO. It does not replace S9's still
+required active-device archive work.
+
+#### S8 changed-path accounting before final qualification
+
+Against admission fc5469c4, counted with git diff --numstat plus complete new
+C/H files (not omitted as untracked), production is +715/-14, net +701;
+tests are +599/-8, net +591, including the paused-service repair.
+Documentation, manifests, CMake and EXEs are
+excluded from these code totals. Production ownership is:
+
+| Owner | Added | Deleted | Net |
+| --- | ---: | ---: | ---: |
+| SoftPC mirror, six paths | 501 | 11 | +490 |
+| Compat, three paths | 205 | 3 | +202 |
+| Machine, one path | 9 | 0 | +9 |
+
+Six test paths comprise actual port/lifecycle coverage (+148/-6), the existing
+sound measurement correction (+6/-2), FM matrix (+47), parser (+187), Compat
+host fixture (+164), and native MIDI integration (+47). The local cost exceeds
+the initial Compat estimate because cancellation, host-volume ownership and
+cleanup are implemented and tested explicitly. There is no shared-eight
+production/test change, second parser, native worker, MIDI queue or synthesizer.
+
+The six touched mirror files compared with their pinned necessary subsets are
+listed below. These are **current cumulative local patches**, including S6's
+already accepted DSP adaptation, not six new S8 patch costs. The reconstructed
+subset SHA-256 values match the manifest. S6 ranges use xp_first/xp_last; S8
+ranges use start/end. Keeping final empty source lines is necessary for exact
+subset identity; preliminary scratch reconstructions were not accepted counts.
+
+| Mirror path | Added versus XP subset | Deleted versus XP subset |
+| --- | ---: | ---: |
+| base/inc/sndblst.h | 18 | 15 |
+| host/inc/nt_sb.h | 83 | 63 |
+| host/src/nt_sb.c | 124 | 275 |
+| host/src/nt_sbdsp.c | 647 | 1428 |
+| host/src/nt_sbfm.c | 24 | 45 |
+| host/src/nt_sbmid.c | 224 | 413 |
+
+Total cumulative patch is +1120/-2239, net -1119. The four S8 range ledgers
+select 1172 of 2455 upstream lines, excluding 1283 separately: sndblst.h 48,
+nt_sb.c 503, nt_sbfm.c 282, nt_sbmid.c 450. Excluded NT/native loading,
+batching, unused commands and diagnostics are not counted as local functional
+deletions. The S6 header/DSP subset remains unchanged; S8 adds declarations and
+one Mixer forwarding call there. Final tests/publication/review are still
+required; this accounting alone does not qualify S8.
 
 ### S9 — portable archive and final qualification
 

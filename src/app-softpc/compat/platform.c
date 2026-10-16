@@ -219,7 +219,7 @@ int softpc_platform_executor_ready(void)
 {
 #ifdef _WIN32
     return softpc_executor_event != NULL && softpc_clock_timer != NULL &&
-        !softpc_executor_wait_failed && DspGetStatus() == LIB_STATUS_OK;
+        !softpc_executor_wait_failed && SbGetStatus() == LIB_STATUS_OK;
 #else
     return 0;
 #endif
@@ -239,7 +239,7 @@ void softpc_platform_set_boot_clock(int active)
 
 void softpc_platform_set_runtime_heartbeat(int enabled)
 {
-    DspSetRunning(enabled != 0);
+    SbSetRunning(enabled != 0);
     /* Only continuous execution may park in the original keyboard idle path.
        Reset it at run entry; finite instruction-budget runs stay bounded. */
     IDLE_ctl(enabled);
@@ -677,7 +677,7 @@ void softpc_platform_executor_event(void)
     if (softpc_executor_callback != NULL)
         (*softpc_executor_callback)(softpc_executor_callback_context);
     if (!softpc_ccpu_lifecycle_exit_requested() &&
-        DspServiceTransfer() != LIB_STATUS_OK)
+        SbService() != LIB_STATUS_OK)
         softpc_ccpu_lifecycle_request_exit();
     /* The original keyboard polling service may have entered nested
        host_simulate frames.  A standalone stop returns to the outer executor

@@ -59,7 +59,7 @@ add_subdirectory(test/lib)
 add_subdirectory(test/emulator)
 add_subdirectory(test/x86-debug)
 add_subdirectory(test/x86-ibmpc)
-target_link_libraries(softpc-machine PRIVATE storage base audio-pcm)
+target_link_libraries(softpc-machine PRIVATE storage base audio-pcm audio-midi)
 
 # CCPU calls the driver's debug observers, so include the VM objects directly
 # instead of depending on cyclic static-archive extraction order.
@@ -221,6 +221,8 @@ add_library(softpc-machine-devices OBJECT
     src/app-softpc/softpc.new/host/src/nt_sound.c
     src/app-softpc/softpc.new/host/src/nt_sb.c
     src/app-softpc/softpc.new/host/src/nt_sbdsp.c
+    src/app-softpc/softpc.new/host/src/nt_sbfm.c
+    src/app-softpc/softpc.new/host/src/nt_sbmid.c
     src/app-softpc/softpc.new/host/src/nt_sbmxr.c
     src/app-softpc/softpc.new/host/src/nt_munge.c
     src/app-softpc/softpc.new/host/src/nt_cga.c
@@ -241,6 +243,7 @@ add_library(softpc-machine-devices OBJECT
     src/app-softpc/compat/audio.c
     src/app-softpc/compat/eoi.c
     src/app-softpc/compat/sb_pcm.c
+    src/app-softpc/compat/sb_midi.c
     src/app-softpc/compat/platform.c)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
@@ -676,6 +679,41 @@ target_link_libraries(softpc-sb-mixer-smoke PRIVATE types)
 add_test(NAME "app-softpc/unit/softpc.new/sb_mixer_smoke" COMMAND softpc-sb-mixer-smoke)
 set_tests_properties("app-softpc/unit/softpc.new/sb_mixer_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
 list(APPEND SOFTPC_TEST_TARGETS softpc-sb-mixer-smoke)
+add_executable(softpc-sb-fm-smoke
+    test/app-softpc/unit/softpc.new/sb_fm_smoke.c
+    src/app-softpc/softpc.new/host/src/nt_sbfm.c)
+target_include_directories(softpc-sb-fm-smoke PRIVATE src src/app-softpc
+    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+target_link_libraries(softpc-sb-fm-smoke PRIVATE types)
+add_test(NAME "app-softpc/unit/softpc.new/sb_fm_smoke" COMMAND softpc-sb-fm-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/sb_fm_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sb-fm-smoke)
+add_executable(softpc-sb-midi-smoke
+    test/app-softpc/unit/softpc.new/sb_midi_smoke.c
+    src/app-softpc/softpc.new/host/src/nt_sbmid.c)
+target_include_directories(softpc-sb-midi-smoke PRIVATE src src/app-softpc
+    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+target_link_libraries(softpc-sb-midi-smoke PRIVATE types)
+add_test(NAME "app-softpc/unit/softpc.new/sb_midi_smoke" COMMAND softpc-sb-midi-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/sb_midi_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sb-midi-smoke)
+add_executable(softpc-sb-midi-output-smoke
+    test/app-softpc/unit/compat/sb_midi_smoke.c src/app-softpc/compat/sb_midi.c)
+target_include_directories(softpc-sb-midi-output-smoke PRIVATE src src/app-softpc)
+target_link_libraries(softpc-sb-midi-output-smoke PRIVATE types)
+add_test(NAME "app-softpc/unit/compat/sb_midi_smoke" COMMAND softpc-sb-midi-output-smoke)
+set_tests_properties("app-softpc/unit/compat/sb_midi_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sb-midi-output-smoke)
+add_executable(softpc-sb-midi-native-smoke
+    test/app-softpc/integration/sb_midi_native_smoke.c
+    src/app-softpc/softpc.new/host/src/nt_sbmid.c src/app-softpc/compat/sb_midi.c)
+target_include_directories(softpc-sb-midi-native-smoke PRIVATE src src/app-softpc
+    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+target_link_libraries(softpc-sb-midi-native-smoke PRIVATE base audio-midi)
+add_test(NAME "app-softpc/integration/sb_midi_native_smoke" COMMAND softpc-sb-midi-native-smoke)
+set_tests_properties("app-softpc/integration/sb_midi_native_smoke" PROPERTIES
+    LABELS "integration" TIMEOUT 60 SKIP_RETURN_CODE 77 RESOURCE_LOCK native_midi)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sb-midi-native-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
     add_executable(${probe_target} test/app-softpc/unit/compat/${probe}_failure_smoke.c)

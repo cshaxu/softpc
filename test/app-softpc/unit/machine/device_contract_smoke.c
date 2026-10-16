@@ -1,5 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "compat/sb_pcm.h"
+#include "compat/sb_midi.h"
 #include "compat/platform.h"
 #include "machine/machine.h"
 #include "../../fixture_cleanup.h"
@@ -244,6 +245,37 @@ static lib_status sb_gain_status = LIB_STATUS_OK;
 static lib_status sb_open_status = LIB_STATUS_OK, sb_close_status = LIB_STATUS_OK;
 static lib_status sb_active_status = LIB_STATUS_OK;
 static lib_bool sb_output_active = LIB_TRUE;
+static lib_bool sb_midi_opened;
+static lib_status sb_midi_open_status;
+static lib_status sb_midi_cancel_failure;
+static lib_status sb_midi_write_status;
+static lib_u32 sb_midi_writes;
+static lib_u32 sb_midi_oversize_reports;
+void softpc_sb_midi_report_oversize(void) { ++sb_midi_oversize_reports; }
+static lib_u8 sb_midi_message[4096];
+static lib_u32 sb_midi_length;
+static lib_u16 sb_midi_gain;
+lib_status softpc_sb_midi_prepare(void) { return LIB_STATUS_OK; }
+lib_status softpc_sb_midi_open(lib_u16 gain)
+{
+    sb_midi_gain = gain; assert(!sb_midi_opened);
+    if (sb_midi_open_status == LIB_STATUS_OK) sb_midi_opened = LIB_TRUE;
+    return sb_midi_open_status;
+}
+lib_status softpc_sb_midi_close(void) { sb_midi_opened = LIB_FALSE; return LIB_STATUS_OK; }
+lib_status softpc_sb_midi_dispose(void) { return softpc_sb_midi_close(); }
+lib_status softpc_sb_midi_reset(void) { return LIB_STATUS_OK; }
+lib_status softpc_sb_midi_cancel(void) { return LIB_STATUS_OK; }
+lib_status softpc_sb_midi_status(void) { return sb_midi_cancel_failure; }
+lib_status softpc_sb_midi_gain(lib_u16 gain) { sb_midi_gain = gain; return LIB_STATUS_OK; }
+lib_status softpc_sb_midi_write(const lib_u8 *bytes, lib_u32 count)
+{
+    assert(sb_midi_opened && count <= sizeof(sb_midi_message));
+    if (sb_midi_write_status != LIB_STATUS_OK) return sb_midi_write_status;
+    lib_memory_copy(sb_midi_message, bytes, count);
+    sb_midi_length = count; ++sb_midi_writes;
+    return LIB_STATUS_OK;
+}
 lib_status softpc_sb_pcm_open(lib_u32 rate, lib_u16 gain)
 {
     assert(sb_output_rate == 0);
@@ -521,28 +553,109 @@ static void verify_sb_transfer_failures(void)
 static void verify_sb_ports(softpc_machine *machine)
 {
     IU8 value;
-    static const IU16 ports[] = { 0x224, 0x225, 0x226, 0x22a, 0x22c, 0x22e };
+    static const IU16 ports[] = { 0x224, 0x225, 0x226, 0x228, 0x229,
+        0x22a, 0x22c, 0x22e, 0x388, 0x389 };
     unsigned i;
     assert(SbTerminate()); /* Machine reset installed the production device. */
-    io_connect_port(0x224, DMA_ADAPTOR, IO_READ_WRITE);
-    assert(!SbInitialize());
-    assert(Ios_in_adapter_table[0x224] == DMA_ADAPTOR);
-    assert(Ios_in_adapter_table[0x226] == EMPTY_ADAPTOR);
-    io_disconnect_port(0x224, DMA_ADAPTOR);
+    io_connect_port(0x330, DMA_ADAPTOR, IO_READ_WRITE);
+    assert(SbInitialize()); /* An occupied optional MPU does not disable DSP/FM. */
+    assert(Ios_in_adapter_table[0x330] == DMA_ADAPTOR);
+    assert(Ios_in_adapter_table[0x331] == EMPTY_ADAPTOR && !sb_midi_opened);
+    assert(SbTerminate());
+    io_disconnect_port(0x330, DMA_ADAPTOR);
+    sb_midi_open_status = LIB_STATUS_UNSUPPORTED;
+    assert(SbInitialize());
+    assert(Ios_in_adapter_table[0x330] == EMPTY_ADAPTOR);
+    assert(Ios_in_adapter_table[0x331] == EMPTY_ADAPTOR && !sb_midi_opened);
+    assert(SbTerminate());
+    sb_midi_open_status = LIB_STATUS_OK;
+    for (i = 0; i < sizeof(ports) / sizeof(ports[0]); ++i) {
+        unsigned j;
+        io_connect_port(ports[i], DMA_ADAPTOR, IO_READ_WRITE);
+        assert(!SbInitialize());
+        for (j = 0; j < sizeof(ports) / sizeof(ports[0]); ++j) {
+            assert(Ios_in_adapter_table[ports[j]] ==
+                (i == j ? DMA_ADAPTOR : EMPTY_ADAPTOR));
+            assert(Ios_out_adapter_table[ports[j]] ==
+                (i == j ? DMA_ADAPTOR : EMPTY_ADAPTOR));
+        }
+        io_disconnect_port(ports[i], DMA_ADAPTOR);
+    }
     assert(SbInitialize());
     for (i = 0; i < sizeof(ports) / sizeof(ports[0]); ++i) {
         assert(Ios_in_adapter_table[ports[i]] == SNDBLST_ADAPTER);
         assert(Ios_out_adapter_table[ports[i]] == SNDBLST_ADAPTER);
     }
     inb(0x224, &value); assert(value == 0xff);
+    assert(Ios_in_adapter_table[0x330] == SNDBLST_ADAPTER);
+    assert(Ios_out_adapter_table[0x331] == SNDBLST_ADAPTER && sb_midi_opened);
+    sb_midi_writes = 0;
+    outb(0x330, 0x90); outb(0x330, 60); outb(0x330, 127);
+    assert(sb_midi_writes == 0); /* XP ignores intelligent-mode MIDI data. */
+    inb(0x331, &value); assert(value == 0x80);
+    outb(0x331, 0xff);
+    inb(0x331, &value); assert(value == 0x00);
+    inb(0x330, &value); assert(value == 0xfe);
+    inb(0x330, &value); assert(value == 0xff);
+    inb(0x331, &value); assert(value == 0x80);
+    outb(0x331, 0xac); /* No intelligent-mode feature invented. */
+    inb(0x330, &value); assert(value == 0xff);
+    outb(0x331, 0x3f);
+    inb(0x330, &value); assert(value == 0xfe);
+    outb(0x330, 0x90); outb(0x330, 60); outb(0x330, 127);
+    assert(sb_midi_writes == 1 && sb_midi_length == 3);
+    assert(sb_midi_message[0] == 0x90 && sb_midi_message[1] == 60 && sb_midi_message[2] == 127);
+    outb(0x330, 61); outb(0x330, 100);
+    assert(sb_midi_writes == 2 && sb_midi_message[0] == 0x90);
+    outb(0x330, 62); outb(0x331, 0xff); /* Reset cancels incomplete data. */
+    inb(0x330, &value); assert(value == 0xfe);
+    outb(0x330, 100); assert(sb_midi_writes == 2);
+    outb(0x331, MPU_PASSTHROUGH_MODE); inb(0x330, &value);
+    outb(0x330, 0xf0);
+    for (i = 0; i < LIB_AUDIO_MIDI_SYSEX_MAX_BYTES; ++i) outb(0x330, 1);
+    assert(sb_midi_oversize_reports == 0 && sb_midi_writes == 2);
+    outb(0x330, 0xf7);
+    assert(sb_midi_oversize_reports == 1 && sb_midi_writes == 2);
+    assert(SbGetStatus() == LIB_STATUS_OK);
+    outb(0x331, 0x3f); inb(0x330, &value); assert(value == 0xfe);
+    outb(0x330, 100); assert(sb_midi_writes == 2);
     inb(0x22c, &value); assert(value == 0x7f);
+    inb(0x388, &value); assert(value == 6);
+    outb(0x228, 4); outb(0x389, 1); /* Alias selects the same register. */
+    inb(0x388, &value); assert(value == 0xc6);
+    inb(0x228, &value); assert(value == 0xc6);
+    outb(0x388, 4); outb(0x229, 0x82);
+    inb(0x228, &value); assert(value == 0xa0);
+    inb(0x229, &value); assert(value == 0xff); /* XP has no data read. */
+    inb(0x389, &value); assert(value == 0xff);
+    assert(SbInitialize()); /* Repeated admission preserves FM state too. */
+    inb(0x388, &value); assert(value == 0xa0);
     outb(0x224, MIXER_MASTER_VOLUME); outb(0x225, 0x0e);
+    assert(sb_midi_gain == MixerGetMidiGain());
+    outb(0x224, MIXER_FM_VOLUME); outb(0x225, 0x06);
+    assert(sb_midi_gain == MixerGetMidiGain());
+    outb(0x224, MIXER_MASTER_VOLUME);
+    outb(0x331, MPU_PASSTHROUGH_MODE);
+    inb(0x330, &value); assert(value == 0xfe);
+    outb(0x330, 0x90); outb(0x330, 60); outb(0x330, 100);
+    {
+        lib_u32 before = sb_midi_writes;
+        softpc_machine_set_heartbeat(machine, 0);
+        assert(sb_midi_writes == before);
+        assert(SbService() == LIB_STATUS_OK && SbGetStatus() == LIB_STATUS_OK);
+        assert(sb_midi_writes == before); /* Stop handoff may still service a paused device. */
+        softpc_machine_set_heartbeat(machine, 1);
+        assert(sb_midi_writes == before + 33); /* Pedals reset, one held note restored. */
+        softpc_machine_set_heartbeat(machine, 1);
+        assert(sb_midi_writes == before + 33);
+    }
     assert(SbInitialize()); /* Repeated attach must not reset mixer state. */
     inb(0x225, &value); assert(value == 0x0e);
     outb(0x226, 1);
     inb(0x225, &value); assert(value == 0x0e);
     outb(0x226, 0);
     inb(0x22e, &value); assert(value == 0xff);
+    inb(0x388, &value); assert(value == 6);
     inb(0x22a, &value); assert(value == 0xaa);
     inb(0x22e, &value); assert(value == 0x7f);
     outb(0x224, MIXER_MASTER_VOLUME);
@@ -576,11 +689,15 @@ static void verify_sb_ports(softpc_machine *machine)
     sb_close_status = LIB_STATUS_OK;
     assert(SbTerminate()); assert(SbTerminate());
     assert(!bDspActive && sb_output_rate == 0);
+    assert(!sb_midi_opened && Ios_in_adapter_table[0x330] == EMPTY_ADAPTOR);
+    assert(Ios_out_adapter_table[0x331] == EMPTY_ADAPTOR);
     for (i = 0; i < sizeof(ports) / sizeof(ports[0]); ++i) {
         assert(Ios_in_adapter_table[ports[i]] == EMPTY_ADAPTOR);
         assert(Ios_out_adapter_table[ports[i]] == EMPTY_ADAPTOR);
     }
     assert(SbInitialize()); /* Teardown permits a new device lifetime. */
+    inb(0x388, &value); assert(value == 6);
+    outb(0x228, 4); outb(0x229, 3);
     assert(TimeConstant == 0xa6);
     inb(0x22a, &value); assert(value == 0xaa);
     outb(0x226, 0); /* Must not finish the old lifetime's pulse. */
@@ -588,12 +705,37 @@ static void verify_sb_ports(softpc_machine *machine)
     outb(0x22c, DSP_SET_SAMPLE_RATE); outb(0x22c, 0xd3);
     outb(0x226, 1);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    inb(0x388, &value); assert(value == 6);
     assert(TimeConstant == 0xa6);
     inb(0x22a, &value); assert(value == 0xaa);
     outb(0x226, 0);
     inb(0x22e, &value); assert(value == 0x7f);
     for (i = 0; i < sizeof(ports) / sizeof(ports[0]); ++i)
         assert(Ios_in_adapter_table[ports[i]] == SNDBLST_ADAPTER);
+    sb_midi_cancel_failure = LIB_STATUS_IO_ERROR;
+    assert(SbGetStatus() == LIB_STATUS_IO_ERROR);
+    assert(!SbInitialize()); /* Repeated admission cannot hide a host fault. */
+    assert(softpc_machine_run(machine, 1) == SOFTPC_MACHINE_IO_ERROR);
+    {
+        lib_u32 before = sb_midi_writes;
+        softpc_machine_set_heartbeat(machine, 0);
+        assert(!sb_midi_opened); /* A fault must not bypass host stop/close. */
+        softpc_machine_set_heartbeat(machine, 1);
+        assert(sb_midi_writes == before && !sb_midi_opened);
+        assert(SbGetStatus() == LIB_STATUS_IO_ERROR);
+    }
+    sb_midi_cancel_failure = LIB_STATUS_OK;
+    assert(SbTerminate());
+    assert(SbInitialize());
+    outb(0x331, MPU_PASSTHROUGH_MODE);
+    sb_midi_write_status = LIB_STATUS_IO_ERROR;
+    outb(0x330, 0x90); outb(0x330, 60); outb(0x330, 100);
+    assert(SbGetStatus() == LIB_STATUS_IO_ERROR);
+    softpc_machine_set_heartbeat(machine, 0);
+    assert(!sb_midi_opened);
+    sb_midi_write_status = LIB_STATUS_OK;
+    softpc_machine_set_heartbeat(machine, 1);
+    assert(!sb_midi_opened && SbGetStatus() == LIB_STATUS_IO_ERROR);
     assert(SbTerminate());
 }
 

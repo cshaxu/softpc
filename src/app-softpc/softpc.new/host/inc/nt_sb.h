@@ -4,6 +4,21 @@
 
 /* T93: host PCM/status vocabulary is supplied by the Compat boundary. */
 #include "compat/sb_pcm.h"
+#include "compat/sb_midi.h"
+
+/* T93: original FM entry points; one selected no-host status implementation. */
+void ResetFM(void);
+void FMStatusRead(IU8 *data);
+void FMRegisterSelect(IU8 data);
+void FMDataWrite(IU8 data);
+
+/* T93: device byte parsing and explicit pending-message service. */
+void ResetMidiParser(void);
+lib_status BufferMidi(IU8 data);
+lib_status SendMidiRequest(void);
+lib_status SbGetStatus(void);
+lib_status SbService(void);
+void MidiApplyMixer(void);
 
 void ResetMixer(void);
 void
@@ -80,6 +95,8 @@ lib_status DspProcessBlock(void);
 lib_status DspServiceTransfer(void);
 lib_status DspGetStatus(void);
 void DspSetRunning(IBOOL running);
+void SbSetRunning(IBOOL running);
+lib_status MidiSetRunning(IBOOL running);
 lib_status DspPrepareOutput(void);
 lib_status DspCloseOutput(void);
 lib_status DspArmCompletion(IU32 rate);

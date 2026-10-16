@@ -219,6 +219,7 @@ lib_status DspPrepareOutput(void)
 
 void SbApplyMixer(void)
 {
+    MidiApplyMixer();
     if (DspOutputRate != 0 && DspTransferStatus == LIB_STATUS_OK)
         DspTransferStatus = softpc_sb_pcm_set_gain(
             DspSpeakerEnabled ? MixerGetVoiceGain() : 0);

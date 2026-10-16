@@ -1,5 +1,15 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Diagnose intermittent checkpoint_smoke timeout under aggregate
+  parallel execution. T93 S8 third x64 qualification classified it as Timeout
+  with no output; its configured budget is 15 seconds. Ten isolated repeats,
+  an unchanged 65-test parallel rerun, and the fourth complete qualification
+  pass without changing code or budget. This does not establish the cause.
+  Owner: App-SoftPC test lifecycle. Admission condition: bounded phase/native
+  wait instrumentation of the actual checkpoint test under parallel load;
+  preserve the timeout evidence and do not add product retries or simply
+  enlarge the deadline. See the [S8 evidence](../proposals/m9-xp-sound-blaster-standalone.md#s8-repeated-stop-proof-and-third-qualification).
+
 - TODO(Medium): Diagnose native package-test child startup under sequential
   CTest execution. T93 S5 x64/x86 compact-console cases intermittently fail
   before start at stage=1/error=6. A scratch diagnostic reproduces child exit

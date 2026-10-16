@@ -102,12 +102,16 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
         (void)InterlockedIncrement(&audio_probe_second_delivery);
     }
     if (non_silent != LIB_FALSE && phase == 3) {
+        /* Compare the same three complete blocks, not extra output delivered
+           while the following machine reset waits for host cleanup. */
+        if (InterlockedCompareExchange(&audio_probe_program_first_delivery, 0, 0) < 3)
+            (void)InterlockedAdd(&audio_probe_program_first_frames, (LONG)frame_count);
         (void)InterlockedIncrement(&audio_probe_program_first_delivery);
-        (void)InterlockedAdd(&audio_probe_program_first_frames, (LONG)frame_count);
     }
     if (non_silent != LIB_FALSE && phase == 4) {
+        if (InterlockedCompareExchange(&audio_probe_program_second_delivery, 0, 0) < 3)
+            (void)InterlockedAdd(&audio_probe_program_second_frames, (LONG)frame_count);
         (void)InterlockedIncrement(&audio_probe_program_second_delivery);
-        (void)InterlockedAdd(&audio_probe_program_second_frames, (LONG)frame_count);
     }
     if (non_silent != LIB_FALSE && phase == 5)
         (void)InterlockedAdd(&audio_probe_program_fast_frames, (LONG)frame_count);
