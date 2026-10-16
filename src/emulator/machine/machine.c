@@ -388,6 +388,7 @@ static void emulator_machine_executor_event(void *opaque)
     }
     if (lib_atomic_i32_load_explicit(&machine->pause_requested, LIB_MEMORY_ORDER_SEQ_CST) != 0 &&
         lib_atomic_i32_load_explicit(&machine->stop_requested, LIB_MEMORY_ORDER_SEQ_CST) == 0) {
+        machine->driver.set_heartbeat(machine->driver.context, LIB_FALSE);
         lib_atomic_i32_exchange_explicit(&machine->state, EMULATOR_MACHINE_PAUSED, LIB_MEMORY_ORDER_SEQ_CST);
         if (lib_atomic_i32_exchange_explicit(&machine->reset_active, 0, LIB_MEMORY_ORDER_SEQ_CST) != 0)
             emulator_machine_notify_state(machine, EMULATOR_MACHINE_RESET_COMPLETED);
@@ -439,10 +440,12 @@ static void emulator_machine_executor_event(void *opaque)
             }
         }
         if (lib_atomic_i32_load_explicit(&machine->stop_requested,
-                LIB_MEMORY_ORDER_SEQ_CST) == 0 &&
-            !machine->state_read_continuing) {
-            lib_atomic_i32_exchange_explicit(&machine->state, EMULATOR_MACHINE_RUNNING, LIB_MEMORY_ORDER_SEQ_CST);
-            emulator_machine_notify_state(machine, EMULATOR_MACHINE_RUNNING);
+                LIB_MEMORY_ORDER_SEQ_CST) == 0) {
+            machine->driver.set_heartbeat(machine->driver.context, LIB_TRUE);
+            if (!machine->state_read_continuing) {
+                lib_atomic_i32_exchange_explicit(&machine->state, EMULATOR_MACHINE_RUNNING, LIB_MEMORY_ORDER_SEQ_CST);
+                emulator_machine_notify_state(machine, EMULATOR_MACHINE_RUNNING);
+            }
         }
     }
 }

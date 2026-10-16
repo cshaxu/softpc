@@ -30,6 +30,8 @@ extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void host_lpt_close_all(void);
 extern void host_com_close_all(void);
+extern int SbInitialize(void);
+extern int SbTerminate(void);
 extern FILE *trace_file;
 
 #define SOFTPC_FIXED_RAM_BYTES (16ul * 1024ul * 1024ul)
@@ -132,6 +134,9 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
 softpc_machine_result softpc_machine_reset(softpc_machine *machine)
 {
     if (machine == NULL) return SOFTPC_MACHINE_INVALID_ARGUMENT;
+    /* Cancel old DMA/IRQ events before reset recreates their queues/tables. */
+    if (machine->hardware_initialized && !SbTerminate())
+        return SOFTPC_MACHINE_IO_ERROR;
     softpc_ccpu_lifecycle_clear_exit();
     /* A public cold run starts only after the executor completed the prior
        run. CCPU's private asynchronous-event map is not reset by
@@ -191,6 +196,10 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     soft_reset = 0;
     softpc_platform_set_boot_clock(1);
     reset();
+    if (!SbInitialize()) {
+        softpc_platform_set_boot_clock(0);
+        return SOFTPC_MACHINE_IO_ERROR;
+    }
     /* The original reset recreates the keyboard controller, but an IRQ1 that
        was already asserted by the completed standalone run is an interrupt
        line, not controller state.  Drop that line at the cold-run boundary;
@@ -505,10 +514,11 @@ int softpc_machine_presentation_fonts(const softpc_machine *machine,
     return 1;
 }
 
-void softpc_machine_destroy(softpc_machine *machine)
+softpc_machine_result softpc_machine_destroy(softpc_machine *machine)
 {
     if (machine != NULL && machine->hardware_initialized) {
         softpc_platform_set_runtime_heartbeat(0);
+        if (!SbTerminate()) return SOFTPC_MACHINE_IO_ERROR;
         softpc_platform_set_executor_callback(NULL, NULL);
         host_timer_shutdown();
         host_lpt_close_all();
@@ -521,6 +531,7 @@ void softpc_machine_destroy(softpc_machine *machine)
         sas_term();
     }
     lib_release(machine);
+    return SOFTPC_MACHINE_OK;
 }
 
 const char *softpc_machine_result_name(softpc_machine_result result)

@@ -515,3 +515,6 @@ IMPORT int dma_request IPT3(half_word, port, char *, hw_buffer, word, length);
  */
 IMPORT VOID dma_enquire IPT3(half_word, channel, sys_addr *, address, word *, length);
 
+/* T93: XP's existing DMA owner access, now required by the retained DSP. */
+DMA_ADAPT *dmaGetAdaptor(void);
+

@@ -65,6 +65,9 @@ typedef struct emulator_machine_driver {
     lib_bool (*run)(void *context);
     void (*request_stop)(void *context);
     void (*request_wake)(void *context);
+    /* Executor-only execution gate: enabled before run/continuation, disabled
+     * before parking and run cleanup. Repeated disable must be harmless.
+     * State capture may continue without a public RUNNING notification. */
     void (*set_heartbeat)(void *context, lib_bool enabled);
     void (*set_executor_callback)(void *context,
         emulator_machine_executor_callback callback, void *callback_context);

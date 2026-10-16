@@ -219,6 +219,9 @@ add_library(softpc-machine-devices OBJECT
     src/app-softpc/softpc.new/host/src/nt_graph.c
     src/app-softpc/softpc.new/host/src/nt_keycd.c
     src/app-softpc/softpc.new/host/src/nt_sound.c
+    src/app-softpc/softpc.new/host/src/nt_sb.c
+    src/app-softpc/softpc.new/host/src/nt_sbdsp.c
+    src/app-softpc/softpc.new/host/src/nt_sbmxr.c
     src/app-softpc/softpc.new/host/src/nt_munge.c
     src/app-softpc/softpc.new/host/src/nt_cga.c
     src/app-softpc/softpc.new/host/src/nt_vga.c
@@ -236,6 +239,8 @@ add_library(softpc-machine-devices OBJECT
     src/app-softpc/compat/keyboard.c
     src/app-softpc/compat/mouse_instance.c
     src/app-softpc/compat/audio.c
+    src/app-softpc/compat/eoi.c
+    src/app-softpc/compat/sb_pcm.c
     src/app-softpc/compat/platform.c)
 set_target_properties(softpc-ccpu-core PROPERTIES
     C_STANDARD 90
@@ -251,7 +256,7 @@ target_compile_definitions(softpc-ccpu-core PRIVATE
     SOFTPC_CCPU_TLS_SIMSTACK=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_compile_definitions(softpc-machine-devices PRIVATE
-    CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
+    CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD EOI_HOOKS SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})
 target_compile_definitions(softpc-machine-compat PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 SPC386 V7VGA WDCTRL_BOP PROD SOFTPC_STANDALONE=1
@@ -466,6 +471,14 @@ add_test(NAME "app-softpc/unit/machine/device_contract_descriptor"
     COMMAND softpc-device-contract-smoke descriptor)
 add_test(NAME "app-softpc/unit/machine/device_contract_cmos"
     COMMAND softpc-device-contract-smoke cmos)
+add_test(NAME "app-softpc/unit/machine/device_contract_eoi"
+    COMMAND softpc-device-contract-smoke eoi)
+add_test(NAME "app-softpc/unit/machine/device_contract_irq"
+    COMMAND softpc-device-contract-smoke irq)
+add_test(NAME "app-softpc/unit/machine/device_contract_sb_dma"
+    COMMAND softpc-device-contract-smoke sb-dma)
+add_test(NAME "app-softpc/unit/machine/device_contract_sb_commands"
+    COMMAND softpc-device-contract-smoke sb-commands)
 add_executable(softpc-quick-time-smoke test/app-softpc/unit/machine/quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-quick-time-smoke PRIVATE
@@ -647,6 +660,22 @@ set_target_properties(softpc-audio-first-delivery-smoke PROPERTIES C_STANDARD 90
 add_test(NAME "app-softpc/unit/compat/audio_first_delivery_smoke" COMMAND softpc-audio-first-delivery-smoke)
 set_tests_properties("app-softpc/unit/compat/audio_first_delivery_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
 list(APPEND SOFTPC_TEST_TARGETS softpc-audio-first-delivery-smoke)
+add_executable(softpc-sb-pcm-smoke test/app-softpc/unit/compat/sb_pcm_smoke.c
+    src/app-softpc/compat/sb_pcm.c)
+target_include_directories(softpc-sb-pcm-smoke PRIVATE src src/app-softpc)
+target_link_libraries(softpc-sb-pcm-smoke PRIVATE types)
+add_test(NAME "app-softpc/unit/compat/sb_pcm_smoke" COMMAND softpc-sb-pcm-smoke)
+set_tests_properties("app-softpc/unit/compat/sb_pcm_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sb-pcm-smoke)
+add_executable(softpc-sb-mixer-smoke
+    test/app-softpc/unit/softpc.new/sb_mixer_smoke.c
+    src/app-softpc/softpc.new/host/src/nt_sbmxr.c)
+target_include_directories(softpc-sb-mixer-smoke PRIVATE src src/app-softpc
+    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+target_link_libraries(softpc-sb-mixer-smoke PRIVATE types)
+add_test(NAME "app-softpc/unit/softpc.new/sb_mixer_smoke" COMMAND softpc-sb-mixer-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/sb_mixer_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-sb-mixer-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
     add_executable(${probe_target} test/app-softpc/unit/compat/${probe}_failure_smoke.c)

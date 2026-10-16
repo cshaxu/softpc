@@ -3,14 +3,62 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S6 is active: selected XP DSP/PCM/Mixer integration, beginning with the
-exact subset/host-seam review. S5 executor a34f858f is pushed and actual-change
+T93 S6 remains the sole admitted packet: selected XP DSP/PCM/Mixer integration.
+The owner explicitly approves pause/resume use of the existing Emulator
+set_heartbeat hook and requires a public-component code-quality audit after
+the change. This clears the prior approval blocker. Source-only DSP/Mixer/EOI checkpoints are retained
+in the proposal. The approved Emulator pause hook is now implemented locally;
+its deterministic worker regression passes x64/x86. The existing PIC EOI
+callout now has a Compat owner; its real-PIC regression also passes both
+widths. Delayed IRQ eligibility and cancellation now pass real master/slave
+PIC regressions on both widths. The Compat PCM conversion/output seam also
+passes both widths, including failed-startup cleanup and retained ownership;
+DSP lifecycle integration remains unfinished. The XP Mixer subset is now
+retained and passes its dual-width register/gain matrix; real port/DSP output
+integration remains pending, rather than stubbed as successful.
+The selected DSP rate/controller-access functions also pass dual-width real
+DMA-port tests. DSP command parsing also passes dual-width focused regressions,
+including address wrap and real immediate/delayed PIC interrupt delivery;
+the retained virtual DMA-position operation also passes its readiness,
+direction, wrap and block-threshold matrix on both widths;
+frozen guest-block capture and partial PCM-prefix submission also pass both
+widths against actual DMA/memory and a scripted host sink;
+the completion/IRQ/cancellation matrix and explicit time-unit regression
+pass both widths; guest DMA pause/continue now use the real XP state transition,
+with their focused command/reset regression passing both widths;
+DSP/Mixer stream gain and output-format ownership also pass their focused
+dual-width host-fixture regression; real start/stop and EOI continuation now
+pass the DMA/PIC/host-fixture chain on both widths;
+the actual DMA address/count port reads also pass the selected-channel,
+low/high-byte and direction matrix on both widths;
+the actual DSP/Mixer port-handler bodies and ResetAll now replace the last
+protocol fixture override and pass focused dual-width regressions;
+actual I/O-table registration, conflict rejection, detach and reattach now
+pass both widths, including linkage through the production device archive;
+machine initialization/reset/destruction now invoke that device owner, and
+close-failure retention plus real cold-reset regressions pass both widths;
+expanded machine regressions pass 5/5 per width. Executor PCM service and
+failure propagation pass the three focused DMA/DSP regressions per width.
+Compat active/progress failure forwarding also passes both widths. Device-owned
+paused-block retention passes final dual-width focused (3/3) and expanded
+machine (5/5) regression. The real DSP/Compat/Lib-worker first/repeated PCM
+delivery smoke also passes both widths. Final package qualification passes
+160/160 per width (94 shared, 61 other background, five native desktop cases),
+with both EXEs refreshed. The owner-required post-edit Emulator quality audit
+passes for the bounded pause-hook change; known wider findings stay in S7.
+No complete S6 executor commit or actual-change acceptance has been delivered.
+Owner now orders the shared-quality repair
+immediately after S6: planned S7 precedes MIDI/FM attachment (renumbered S8)
+and final archive qualification (renumbered S9). S6 remains the only active
+packet; this scheduling instruction does not close it. The [S7 brief](../proposals/m9-xp-sound-blaster-standalone.md#s7--shared-contract-and-quality-repair)
+owns the finding-to-regression ledger; no repair is claimed implemented.
+S5 executor a34f858f is pushed and actual-change
 reviewed; S5 closes under delegated sequential acceptance. Its existing DMA
 copy/split repair is +28/-15 production and +107/-5 tests. Both widths pass
 94 shared + 55 other + five individually isolated native desktop cases.
 Sequential CTest child DLL-initialization failures remain in TODO; they are
 not claimed fixed. Both EXEs are refreshed. S6's shared Emulator pause-hook
-change still requires explicit approval before implementation. S4 executor
+change is now explicitly approved, with a mandatory quality audit. S4 executor
 `46ad2e3f` is pushed and actual-change reviewed; S4 is closed under delegated
 sequential acceptance. It adds neutral host MIDI and truthful raw-FM capability. Both
 widths pass 154/154 including all ten native desktop tests; both EXEs are
@@ -93,12 +141,12 @@ proposal. No manual hearing or Linux runtime result is claimed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal, XP import approval and sequential-execution authorization; S5 executor a34f858f reviewed. This does not approve the separately disclosed shared pause-hook behavior change. |
+| Admission And Approval | Owner's active goal, XP import approval and sequential-execution authorization; S5 executor a34f858f reviewed. Owner now explicitly approves the shared pause-hook behavior change and requires a subsequent public-component quality audit. |
 | Objective | Attach the necessary XP DSP/PCM/Mixer device subset to the existing DMA/PIC and Lib PCM through Compat; first freeze exact selected ranges and host-seam changes before payload. |
 | Non-goals | No MIDI/FM device integration yet, no software synthesis, no second DMA/device clock, no unrelated shared changes or user INI/media/snapshot mutation. |
 | Reference Baseline | S5 executor a34f858f and published dual EXEs; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 necessary-subset identity and S1 host-call ledger. |
 | Candidate Proposal | [S6 DSP/PCM/Mixer brief](../proposals/m9-xp-sound-blaster-standalone.md#s6--xp-dsppcmmixer-and-host-integration). |
-| Files And ABI Surface | Selected sndblst.h, nt_sb.h, nt_sb.c, nt_sbdsp.c, nt_sbmxr.c; Compat sound host, Machine lifecycle, build and owner-local tests. Estimated XP +1300-2200; local production +250-450/-20-60; tests +300-500. Separate shared pause-hook approval precedes any Emulator edit. |
+| Files And ABI Surface | Selected sndblst.h, nt_sb.h, nt_sb.c, nt_sbdsp.c, nt_sbmxr.c; Compat sound host, Machine lifecycle, build and owner-local tests. Estimated XP +1300-2200; local production +250-450/-20-60; tests +300-500. Approved Emulator pause hook uses the existing callback without new API/state; audit Types, dependencies, naming and single-owner lifecycle afterward. |
 | Applicable Rules | Task Reading Set and single-agent dual-role review; pinned necessary-source subset, source-visible local patches, one guest device owner and inward public boundaries. |
 | Verification | Actual DSP ports/reset/version, single/auto/high-speed DMA and IRQ/EOI, speaker/mixer/rate/progress, pause/resume and endpoint failures; dual builds/publication and all shared, other and native desktop tests. |
 | Expected Markers | XP owns guest protocol/state; Compat translates host contracts into existing Lib PCM; no WinMM pointer ABI, VDD loader, new device thread or second timing path. |

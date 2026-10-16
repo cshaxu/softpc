@@ -38,7 +38,7 @@ foreach(row IN LISTS rows)
     list(GET fields 4 format)
     list(GET fields 5 selection)
     list(GET fields 6 disposition)
-    if(NOT format MATCHES "^(text|binary)$" OR NOT selection MATCHES "^(whole|s3|s4|s5)$"
+    if(NOT format MATCHES "^(text|binary)$" OR NOT selection MATCHES "^(whole|s3|s4|s5|t93-s6)$"
         OR NOT disposition MATCHES "^(XP_SUBSET_IDENTICAL|REVIEWED_LOCAL_PATCH|PRESERVED_LOCAL_PATCH)$")
         message(FATAL_ERROR "XP mirror: invalid disposition ${path}")
     endif()

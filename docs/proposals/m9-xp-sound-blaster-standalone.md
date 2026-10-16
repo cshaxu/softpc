@@ -25,7 +25,9 @@ Design only: audit pinned XP host calls, current Lib contracts and receiving
 owners; revise the serial plan and proof requirements. No production/test
 edits, EXE refresh, INI/media changes or claimed playback result in S1.
 Current source baseline is accepted T92, HEAD at admission 6ac9bf0b9.
-S2-S8 below are proposed implementation steps, not started by this document.
+The original design proposed S2-S8. The owner's subsequent shared-quality
+insertion below expands the remaining sequence through S9; CURRENT alone
+records which step is active or completed.
 
 This revision replaces contradictory draft designs rather than appending a
 second active design. Preserve source findings, but do not treat previous
@@ -139,7 +141,7 @@ Ki386AdlibEmulation explicitly does not output data. It starts with status 0x06
 and models immediate flag changes, not a clock-accurate OPL engine. Its outer
 condition includes registers 0xB0..0xBD as well as 0x04, whereas nt_sbfm.c's
 user-mode status update is nested under 0x04. These are not identical handlers.
-S7 must record which XP branch each test represents and retain one standalone
+S8 must record which XP branch each test represents and retain one standalone
 device handler; do not merge both into independently maintained simulations.
 The selected no-host acceptance reference is the active XP kernel fallback,
 including its observable index/status behavior; translating that requirement
@@ -267,7 +269,7 @@ The first concrete public operation is capability acquisition with an opaque
 FM output; unsupported platform implementations return UNSUPPORTED/null.
 Only admit register-batch/status/reset operations with a real backend and
 documented transport, not a dormant generic plugin scheme. S4 tests the
-unsupported acquisition contract and inward dependencies. S7 handles the
+unsupported acquisition contract and inward dependencies. S8 handles the
 fallback at the XP device owner, not inside this Lib capability.
 
 Thus the three directories are symmetric in responsibility (host capability),
@@ -351,7 +353,7 @@ pending device data; no nonexistent synthesizer phase is invented.
 
 The existing snapshot safe-point and x86/x64 format rules remain authoritative.
 No new version field or legacy-format reader is introduced. Lifecycle cleanup
-is required in every integration S; S8 is combined qualification, not permission
+is required in every integration S; S9 is combined qualification, not permission
 to ship unsafe intermediate teardown.
 
 ## Planned serial S tasks
@@ -360,6 +362,15 @@ These estimates are engineering envelopes, not measured diffs or blanket
 permission to exceed scope. C/H production and tests are separate; build,
 manifests/docs and binary artifacts are counted separately at delivery.
 Every implementation S refreshes its exact file/add/delete brief first.
+
+Owner scheduling revision, 2026-10-15 (original request):
+
+> 要求当前s完成后，优先准入新s修复；后续s任务顺延。
+
+S6 remains active. After its complete executor delivery and actual-change
+review, admit the shared-quality S7 below before the former S7/S8, now S8/S9.
+This is an internal T93 sequence change, not a second active task or a new
+global Queue candidate. Existing completed-S records retain their identifiers.
 
 ### S1 — host-call audit and reviewed design
 
@@ -606,8 +617,9 @@ Wire original ports/DMA/PIC, Lib PCM through Compat sound host files, and
 Machine lifecycle; no NTVDM VDD loader or second device thread.
 Estimated retained XP source +1300-2200/-0; local production +250-450/-20-60,
 net +190-430; tests +300-500/-0. Approximately 12-18 code paths.
-Estimate includes narrow pause-hook implementation if separately approved;
-its Emulator tests add +60-100/-0. Do not silently implement that shared change.
+The owner explicitly approves the narrow pause-hook implementation and requires
+a subsequent public-component quality audit. Its Emulator tests add +60-100/-0;
+the existing callback remains the only execution-activity hook, with no new state/API.
 
 Before payload, publish the exact selected-range/host-seam diff for review,
 especially scheduling and DMA-position mapping. Preserve source behavior where
@@ -619,7 +631,994 @@ first/repeated bursts, no endpoint/stalled endpoint and no use-after-free.
 Compare host progress and guest observations separately. Each changed source
 policy or XP workaround gets an explicit disposition, not a hidden rewrite.
 
-### S7 — XP MIDI/FM device attachment
+#### S6 pinned-source scheduling checkpoint
+
+Read-only recheck at XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89, against
+SoftPC 44cad548 plus the owner-approved S7 planning edits. No XP body is
+imported by this checkpoint and no new device test or playback is claimed.
+The following concrete seams refine the pre-payload review, not its approval.
+
+| Pinned XP source range | Observed behavior | Required receiving path/proof |
+| --- | --- | --- |
+| nt_sbdsp.c:1276-1321 AutoInitEoiHook | EOI can reopen for a changed rate and submits the next Auto block unless DSP-paused. | Use the existing PIC EOI callout; do not make audio completion itself start the next block. Test completion-before-EOI, delayed EOI and paused EOI. |
+| nt_sbdsp.c:1345-1410 DmaDataToDsp | Captures original DMA address/count, checks mask/count, obtains guest data and retains the block size before host delivery. | Preserve guest-address versus host-pointer distinction and frozen transfer ownership. Test masked/no-transfer and snapshot state separately from accepted PCM. |
+| nt_sbdsp.c:1911-1996 DMA accessors | Directly reads/writes the existing controller; restores base address/count on terminal count in auto-init. | Do not import a second DMA model or both advance through dma_request and apply the same progress again. The chosen adapter must prove exactly one count/address advance and reload. |
+| nt_sbdsp.c:2555-2672 StartDspDmaThread | Creates a worker, prepares/reopens output, registers EOI and begins the transfer. | Preserve the device start/EOI policy but replace native-thread scheduling at the host seam with the existing executor. Native worker/event/header ownership stays in Lib. |
+| nt_sbdsp.c:2750-2834 timeout completion | Updates DMA and raises IRQ after a deadline; only conditionally rechecks physical position when the guest has queried DMA, with a bounded rescheduling heuristic. | This is not identical to unconditional consumed-frame completion. Explicitly disposition the XP heuristic before selecting the executor deadline/progress rule; no implicit parity claim from enqueue success or a green PCM test. |
+| nt_sbdsp.c:2883-2898 Auto timing | Adjusts estimated block time for small/large blocks. | Record whether retained guest scheduling or excluded old host workaround, with counter/IRQ evidence; do not silently erase it while importing the parser. |
+| nt_sbdsp.c:2545-2549, 2699-2707 | Header unprepare polls; thread stop waits for native worker exit. | Replace only host ownership/wait mechanics using existing Lib completion/cancellation, not Sleep polling or another guest worker. |
+
+The local PIC already has EOI_HOOKS callouts in ica.c:360-366 and pending-IRQ
+withdrawal notification at 1271-1278; nt_eoi.h already declares the host hook. The current
+Compat search finds no implementation. First assess enabling this existing
+seam and adding its host owner, instead of editing PIC dispatch or adding an
+independent interrupt observer. Registration/withdrawal/no-registration semantics
+need actual tests; existence of the hook is source evidence only.
+
+The local Emulator invokes set_heartbeat at run entry/exit (machine.c:562,
+573), not at its pause rendezvous (391-445). The existing SoftPC receiver
+also resets idle/pacing state, so invoking it at pause/resume is a behavior
+change, not merely adding an audio call. The separately required owner
+approval has now been granted. The focused proof must cover
+ordinary/debug pause, paused snapshot safe-point continuation, reset/stop
+while paused, and exactly ordered enable/disable calls before completion
+facts; never call the enabled hook on a stopped/error exit. No new public
+callback or duplicated pause state is proposed by this checkpoint.
+
+#### S6 approved pause-hook implementation checkpoint
+
+Owner explicitly approves the Emulator change and requires the same public
+code-quality audit afterward. The existing executor rendezvous now disables
+heartbeat before PAUSED/reset completion and enables it before continuation,
+including private snapshot safe-point continuation. Stop/error unwind retains
+the existing final disable. The callback contract explicitly permits repeated
+disable; no heartbeat state cache, new callback or audio dependency is added.
+
+Count against 44cad548: production machine.c +7/-4 and interface comments
++3/-0, total +10/-4 (net +6); worker regression +58/-5 (net +53), excluding
+manifests. The test runs the real worker with scripted waits. It asserts the
+gate at ordinary/debug pause, resume, reset, stop, failed/cancelled wait,
+private snapshot continuation and completion without duplicate public facts.
+Both x64/x86 focused builds and emulator.machine_wait pass. Initial runs
+exposed a test-fixture expectation still assuming unsupported snapshots; the
+successful capture case now has its own callback and expected result. This
+is not guest DSP or whole-S6 qualification. x86 Ninja recovered a premature
+log ending and rebuilt 36 affected inputs; no cache purge was performed.
+
+Post-edit audit: all four production heartbeat calls remain in the same
+Emulator worker/executor owner; the sole App registration still forwards at
+the existing machine boundary. Added values use Lib Types. No include,
+link dependency, public symbol, stored state, lock, queue or platform call
+was added. Emulator corpus/manifest and test dependency checks pass, as do
+documentation governance and diff whitespace checks. Existing broader shared
+quality findings remain assigned to S7, not silently included here.
+
+#### S6 PCM host-boundary implementation checkpoint
+
+Compat sb_pcm.c/h now own one Sound Blaster host stream, separate from the
+PC-speaker stream. The adapter converts bounded unsigned eight-bit samples
+to signed sixteen-bit PCM and preserves Lib's accepted-prefix and error
+results without retrying. Progress copies accepted, submitted and consumed
+counts separately. Its notification only wakes the existing executor; it
+does not touch guest DMA, PIC or DSP state or create a device thread.
+
+Close unregisters the borrowed sink, clears unsounded output and destroys the
+stream in that order. Failed destruction retains the stream and rejects a
+replacement open; cleanup can subsequently release it. This is host-resource
+ownership, not a new guest lifecycle. Machine/DSP teardown integration is
+still pending and is not claimed by the adapter's isolated tests.
+
+The owner-local sb_pcm_smoke compiles the actual adapter with injected Lib
+operations. Both x64 and x86 pass after the failure fixture was corrected:
+the real Lib installs a notification sink even when registration returns an
+existing terminal failure, so the fixture must retain that sink too. Assertions
+now verify unregister-before-clear-before-destroy, failed startup combined
+with failed destruction, retained ownership, and successful later cleanup.
+Existing cases cover exact sample conversion, bounded/partial submission,
+queue-full and host failures, gain/active forwarding and independent progress
+counters. This proves adapter contracts, not real endpoint playback or XP DSP
+delivery. No Lib production change is needed for these failure cases.
+
+#### S6 EOI host-boundary implementation
+
+The existing ica.c EOI_HOOKS sites are enabled by the device target; one
+Compat registry implements RegisterEOIHook, RemoveEOIHook and host_EOI_hook.
+The original nt_eoi.h cannot be imported wholesale as its remaining declarations
+require NTVDM structures and scheduling. Compat eoi.h instead declares the
+three existing host ABI operations; ica.c gains only that include (+1/-0).
+No PIC algorithm is copied into Compat. Registration validates 0..15 and
+non-null hooks, rejects occupied slots without mutation, and removal requires
+the same owner. Negative cancellation counts are dispatched, not discarded.
+The mirrored subset identity stays unchanged; the include is a local patch.
+
+Delayed IRQ is separate from EOI registration: pinned XP sets its delivery
+mask before recording the pending request in the PIC. Queueing the request
+only after timeout is not equivalent. The local quick-event action helper
+also delays request creation and is therefore not a substitute. Its separate
+action-list ownership is unnecessary here.
+
+The selected host adaptation now uses XP's existing quick-event mechanism:
+minimum 1000 delay units, the original 200-unit overhead offset, one pending
+release per IRQ, and repeated calls accumulating only in the original PIC.
+The existing scan combines DelayIrqLine with the retained IRET mask; no
+alternate PIC or request counter is introduced. The callback releases the
+actual IRQ's adapter (irq >> 3), avoiding XP's bit-mask-as-line ambiguity.
+Cancellation deletes the queued release and clears eligibility suppression;
+the device must separately withdraw its request, as in the original contract.
+Scheduling failure leaves the mask and PIC unchanged. NTVDM locks, WOW and
+kernel timers are excluded because all these operations run on the executor.
+The interpreted quick-event delay is not claimed to be an exact physical
+playback deadline. Device reset/stop and archive ownership still need the
+DSP integration and final state-qualification work.
+
+Both x64/x86 real-PIC tests now pass for master IRQ5 and slave IRQ13:
+pending IRR before release, blocked eligibility, two accumulated requests,
+delivery after queue dispatch, cancellation retaining PIC ownership, and
+withdrawal followed by queue dispatch with no stale request. EOI tests still
+pass in the same run. This adds 48 Compat implementation/declaration lines,
+48 test lines and two CMake registration lines over the EOI checkpoint;
+the additional mirror change is +2/-1 (comment plus scan expression).
+
+The real PIC regression passes on x64 and x86: registration bounds/null,
+duplicate and wrong-owner rejection, ordinary/specific/automatic EOI through
+port writes and interrupt acknowledge, redundant EOI suppression, pending
+request withdrawal (-1), and no callback after owner removal. This covers
+master IRQ5, not all PIC modes or sound-device lifecycle. Compat adds 39 C/H
+lines; mirror +1/-0; tests +56/-0; root build/test wiring +4/-1. No new public
+shared API is introduced. The fixed XP mirror gate passes for all 498 bodies.
+Both targeted builds finish successfully; Ninja log recovery caused additional
+unchanged-input rebuilds, not an intentional clean build. No EXE publication,
+full regression, DSP integration or executor delivery is claimed yet.
+
+#### S6 DSP parser and DMA-read import checkpoint
+
+Pinned nt_sbdsp.c has now been re-read through its complete command parser,
+reset, TableMunger, rate selection, DMA accessors and worker completion branch.
+The necessary parser range is 523-987 (read status/data, reset write, byte
+parser and command dispatch); it must not be replaced by a new command table.
+ResetDSP's guest-state assignments at 1031-1064 survive, while native event,
+thread and WaveOut ownership are excluded. GetSamplingRate at 1149-1237 keeps
+the existing clamp and standard-rate rounding. The exact function boundaries
+must be checked against the pinned text when extracting; these ranges are
+source-review locations, not a completed subset manifest.
+
+One additional necessary source repair is confirmed in pinned at_dma.c.
+Its address read tests `port == SbDmaChannel`, although controller-0 address
+ports are 0,2,4,6 and the default channel is 1. Its count read tests
+`port == SbDmaChannel + 2`, which happens to match channel 1's count port 3,
+but is not a general channel mapping. The existing port dispatch already
+derives the channel with `(port-DMA_CH0_ADDRESS)/2` or the corresponding count
+base. Use that derivation for the original SbGetDMAPosition callback, only
+before the low-byte read (`first_last == 0`). No alternate DMA register cache
+or port observer is needed. This is source proof, not a reproduced guest fault.
+Focused proof must verify address/count low-byte refresh, matching high-byte
+stability, unrelated channels, and controller-1 reads without spurious calls.
+
+Other explicit import dispositions:
+
+- The parser's <=0x10 short-block compatibility branch currently bypasses
+  PCM and generates a delayed IRQ; the size is stored as transfer length minus
+  one. Tests must distinguish lengths 1,2,17,18, not silently claim tiny
+  transfers exercise PCM. Any decision to remove that original behavior must
+  be explicit, not hidden in a new host output adapter.
+- TableMunger and the short capture placeholder dereference a guest-derived
+  address as a host pointer. Preserve the guest byte transformation and use
+  existing SAS memory access; never cast that address to a native pointer.
+- Reset-to-exit-high-speed and ordinary reset take different original paths.
+  Preserve that distinction while removing native thread/event waits; no
+  shared Emulator special case belongs here.
+- Worker timeout completion conditionally consults host position only when
+  DMA has been queried. Enqueue success must not complete the DMA block.
+  The exact remaining scheduling policy is still an implementation obligation,
+  not proved by Lib PCM progress tests or the newly passing IRQ tests.
+
+#### S6 Mixer and port-path source checkpoint
+
+The complete 329-line pinned nt_sbmxr.c has now been read. Its retained
+device portion is MixerSettings/MixerState and the existing address/data/reset
+functions (28-210), with the existing setters at 212-328 receiving explicit
+local host-output corrections. This is a candidate selection, not a committed
+subset manifest. Original notice/header remains; the direct windows.h import
+and WinMM handles/calls are host vocabulary, not guest mixer state.
+
+Confirmed source-level dispositions:
+
+- Master and FM decode three bits after shifting by one; Voice decodes two.
+  Preserve raw stored register bytes and those masks. Do not silently upgrade
+  this CT1335 model to an SB16 stereo mixer or manufacture CD audio output.
+- Master/Voice/FM compute level*step-1 (241/283/319). At zero this underflows
+  before channel packing. Both PCM setters then overwrite the same host volume,
+  so writing Voice after Master can defeat master mute. Fix the existing
+  device-side effective-gain calculation, not Lib's gain contract. One
+  recomputation path must serve master/voice/speaker/reopen; no independent
+  Compat mixer-register copy. Preserve/report the positive-level mapping
+  explicitly rather than silently claiming a hardware-calibrated attenuation
+  curve. Exact composed scaling remains part of the pre-payload patch review.
+- MixerDataRead's reset case calls ResetMixer without assigning *data. The
+  real port entry VsbByteIn initializes *data=0xff before dispatch, so this is
+  not proof of an uninitialized public read. Tests must exercise that entry,
+  including reset reads, rather than force a newly invented return byte.
+- Unknown mixer indices leave the previous selection unchanged in the XP
+  switch. Preserve that observable behavior unless a separate, evidenced
+  correction is approved; do not add a generic register-array replacement.
+- SetSpeaker in nt_sbdsp.c writes zero/off or full/on using PreviousWaveVol.
+  Reopening and speaker toggles must recompute from the existing device
+  controls rather than overwrite master mute. Retain the guest DSP command
+  and register owners; classify this as a local output correction.
+
+Port-path review covers nt_sb.c:411-518 (registration/removal) and 520-709
+(DSP/Mixer dispatch and Adlib alias mapping). Reuse io_define_inb/outb and
+io_connect_port; registration/removal must stay balanced on partial failure.
+S6 must not activate the separate MPU/FM handlers prematurely: their receiver
+is S8. DSP busy status in high-speed mode and the port-level default 0xff
+remain original behavior. No software FM or success-only placeholder is
+admitted to make the intermediate link pass.
+
+InitDevices at 300-328 contains NtVdmControl(PM CLI), then PCM resource/device
+admission; failure returns to VsbByteIn with 0xff and causes writes to return
+without dispatch. Optional MIDI initialization failure instead disconnects its
+ports. Exclude the NTVDM control call, but retain an explicit no-PCM-device
+disposition and test it; do not claim XP no-endpoint parity merely because a
+new Lib create returns UNSUPPORTED. Lazy initialization, terminal output failure
+and optional capability absence must not collapse into an automatic reopen
+loop. These are source requirements, not newly passing runtime tests.
+
+Focused receiver tests therefore need actual IO dispatch for reset/index/data,
+all decoded Master x Voice levels (8 x 4), speaker on/off, reserved-bit readback,
+both setter orders, reset/reopen and no-endpoint behavior. Capture the exact
+gain passed to the injected host interface; audibility is not the oracle.
+The finite matrix is a requirement for implementation, not an executed result.
+
+#### S6 Mixer subset implementation checkpoint
+
+The first sound payload now imports the pinned nt_sbmxr.c device, the
+sndblst.h mixer constants and nt_sb.h mixer declarations. Exact selected
+ranges are in [the S6 subset ledger](../etc/evidence/softpc/t93-s6-xp-sound-subset-ranges.tsv).
+Remaining sound-header ranges are deferred to DSP/S8 or excluded native ABI;
+they are not presented as permanently unnecessary guest definitions.
+The current mirror manifest now covers 501 bodies. Its new t93-s6 selection
+label identifies this separate extraction; no build-time transformation or
+external build dependency was introduced.
+
+The existing MixerSettings, MixerState, register selection/read/write and
+reset remain the only mixer state. BYTE/VOID use the existing core IU8/void
+ABI instead of including windows.h. Each original setter stores its original
+raw byte and calls one device-owned SbApplyMixer entry. MixerGetVoiceGain and
+MixerGetMidiGain read that same state. For positive decoded levels the original
+XP scales remain level*8192-1 and level*16384-1; zero now maps to zero. Master
+and channel gains compose as master*channel/65535 using bounded IU32 products.
+This is an explicit output correction, not a hardware-calibrated attenuation
+claim. DSP speaker gating belongs in the pending SbApplyMixer implementation,
+not in a new Compat register cache. No success-only production implementation
+is provided to conceal that pending integration.
+
+Changed-path accounting for this payload: three newly retained production
+files +386/-0, tests +86/-0. Relative to the exact selected XP source, the
+mixer is +47/-65, internal header +16/-12 and constants +0/-0: local patch
+total +63/-77, net -14. The omitted header ranges are separately recorded,
+not charged as local functional deletions. Root CMake/test and provenance
+metadata are excluded from those C/H counts.
+
+The actual imported mixer is compiled in its focused test target, with only
+the pending device-output callback replaced by a test observer. Both x64/x86
+pass all 32 Master/Voice combinations in both setter orders, all 64 Master/FM
+combinations, zero mute, reserved-bit retention, defaults, CD storage without
+host output, unknown-index retention and reset read/write. The expected gain
+table is explicit and uses wider arithmetic than the implementation. Initial
+compilation failed because the test omitted the canonical Types include;
+adding it resolves both builds. This proves the imported register functions,
+not actual I/O port dispatch, speaker gating, endpoint admission, DSP playback
+or snapshot restoration. Those remain S6/S9 integration obligations; this
+checkpoint does not close S6 or publish an EXE.
+
+#### S6 DSP rate and DMA implementation checkpoint
+
+The next selected nt_sbdsp.c payload retains GetSamplingRate, QueryDMA,
+SetDMACountAddr, SetDMAStatus and GetDMATransferAddress, plus their existing
+TimeConstant and controller references. The original dmaGetAdaptor owner
+accessor is restored without the NTVDM conditional; no second controller is
+introduced. The S6 range ledger supersedes S3's exclusions for exactly that
+accessor/prototype. Reconstruction of the earlier S3 selections first matches
+their recorded hashes, then adds the necessary XP ranges. The mirror gate now
+verifies 502 retained bodies.
+
+Host scalar aliases use the existing core types. The internal SB_DMA_INFO is
+a copied observation, not an exposed NTVDM VDD service ABI. SbInitializeDMA
+binds the existing controller and rejects channels outside byte-wide DMA.
+GetDMATransferAddress uses the existing dma_system_address expression and
+returns guest physical address, removing the native Sim32 pointer conversion
+and its 32-bit truncation. The future transfer consumer must use SAS, not cast
+this value to a host pointer. Native diagnostic calls are excluded, not
+replaced by a second logging facility.
+
+The real machine device fixture compiles this selected DSP source directly
+until its port owner is installed. It supplies only SbDmaChannel; all DMA
+register state belongs to the actual controller. x64/x86 each pass the existing
+DMA regression and new DSP DMA regression (2/2). Thirteen rate cases cover
+XP's standard-rate mappings, a nonstandard rate and lower/upper clamping.
+Channels 1 and 3 are programmed through actual ports with all auto-init and
+decrement combinations. Tests verify full address/page/count, mask/mode,
+register writeback observed through ports, terminal-count auto reload versus
+non-auto preservation, request/TC flags and read-to-clear semantics. This is
+not yet proof of DSP command entry or asynchronous PCM/DMA progression.
+
+This increment adds 289 lines of DSP source, nine controller accessor/comment
+lines, thirteen internal declaration lines and three channel declaration lines;
+the existing device test gains 66 lines. No shared component or guest asset
+changes. The complete S6 delivery still requires the original parser, real
+port registration, playback progression and machine lifecycle wiring.
+
+#### S6 DSP command-state implementation checkpoint
+
+The selected DSP payload now includes XP's read/write/reset state machines,
+DspReadStatus/Data, DspResetWrite, DspWrite, WriteCommandByte and TableMunger.
+The original DSP constants accompany them. Ordinary versus high-speed reset
+keeps the XP distinction: ordinary reset restores TimeConstant, while the
+high-speed escape retains it. ResetDSP delegates transfer quiescence to the
+pending executor-owned StopDspTransfer rather than copying XP native events,
+locks or its DMA thread. StartDspTransfer likewise names that pending owner.
+There is no production success stub for either operation.
+
+Native diagnostics and mode-display calls are excluded. Removing diagnostic-only
+default branches leaves explicit breaks, not compiler-extension-only empty
+labels. Capture probing and TableMunger use SAS writes to the guest address;
+no original host-pointer cast remains. The same-issue scan of all retained
+address increments finds four command/probe sites: the two short-block paths
+and both TableMunger bytes now honor the existing controller decrement bit.
+Playback-position/completion increments in yet-unselected XP ranges remain an
+explicit part of the next transfer import, not a claim that they were fixed.
+
+XP's short-block behavior remains deliberately observable: lengths represented
+by SBBlockSize <= 0x10 raise a delayed IRQ without PCM; the zero case does not
+advance DMA. This is preserved source behavior, not a newly introduced
+application-name special case. Large capture remains XP-unimplemented. DSP MIDI
+cases are retained where they existed; no new dispatch rule is invented before
+the separately planned MIDI attachment.
+
+This increment adds 573 DSP lines, 107 constant/header lines and 22 internal
+declaration lines, plus 103 fixture lines. The selected DSP file is now 862
+lines; against its exact current XP subset it is +123/-238 (net -115). Range
+and identity ledgers account for the expanded source selection. The fixture
+observes pending transfer, IRQ, speaker and reset boundaries only in its test
+executable; actual DMA and guest-memory operations are not mocked. It covers
+all 256 identification and reserved-register bytes, version/status progression,
+reset sequencing, high-speed escape, command dispatch, two-byte block lengths,
+short-block direction/count, capture silence and both TableMunger directions.
+Initial compilation exposed a fixture variable named byte colliding with the
+original core macro; it was renamed to observed. The first corrected dual-width
+run passes all three DMA/DSP cases; final post-review verification likewise
+passes all three on each width. No live PCM, port-installation or
+whole-S6 success follows from this focused result.
+
+Follow-up boundary coverage expands the same short-block fixture from four to
+twelve cases: single/auto command, increment/decrement, and ordinary/upper/
+lower 16-bit addresses. Expected addresses are explicit constants; page 2 must
+remain unchanged across wrap. This changes no production code. Dual-width
+background verification passes all three targeted cases on each width. This
+proves the command's controller updates, not asynchronous PCM completion.
+
+The next increment selects pinned DSP lines 1239-1274 (GenerateInterrupt).
+It keeps immediate PIC delivery versus the existing delayed-IRQ host boundary;
+only native type spelling and diagnostics change. The test-only interrupt
+observer is removed. Commands now reach the real PIC and quick-event queue in
+the fixture, with pending IRR, deferred eligibility, interrupt acknowledge and
+EOI checked. Other unfinished transfer/reset host boundaries remain explicit
+test observers. Dual-width verification passes all three targeted DMA/DSP
+cases per width. This increment adds 37 DSP source lines and one declaration;
+the fixture removes its IRQ observer and checks actual controller delivery.
+No full port or PCM integration is inferred.
+
+#### S6 DMA-position implementation checkpoint
+
+Pinned SbGetDMAPosition's active branch advances a virtual position; despite
+its introductory comment it does not call GetWaveOutPosition. Preserve its
+small-block three-quarter threshold, large-block eight-sample reserve,
+near-end increment of two and Single-only PreviousWaveOutPos signal. Removing
+the inactive alternative and DESCENT branch is recorded in the subset ledger,
+not a new guest-name condition. The executor cannot spin awaiting its own
+submission, so the former bWriteBurstStarted wait becomes a readiness guard.
+The original transfer-context fields remain in DSP, not Compat or Lib.
+
+Address distance now uses the DMA direction modulo 16 bits before adding the
+virtual increment; count/address still write through SetDMACountAddr. No
+terminal-count completion or PCM acceptance is manufactured by this query.
+The duplicate SbInterrupt declaration added with the IRQ checkpoint is removed;
+sndblst.h already owns it. This increment is production +95/-1 (net +94) and
+tests +49/-0. The actual DMA-controller fixture covers eight direction/size/
+mode combinations, each with three readiness gates and 100 queries. Expected
+final wrapped addresses/counts are fixed constants, including retained page 2.
+Both architectures pass the three targeted DMA/DSP cases. This proves the
+position operation; original port read-hook attachment and transfer-derived
+initialization remain unfinished, not implied by directly seeded fixture state.
+
+#### S6 transfer receiving sequence, before payload
+
+Re-read pinned DmaDataToDsp (1322-1470), DspProcessBlock (2343-2490),
+StartDspDmaThread (2555-2672), SbGetDMAPosition (2120-2283) and worker
+completion (2711-2919), alongside the current PCM progress/notification
+contract. The receiving sequence is one DSP-owned transfer, driven by the
+existing executor; no Lib callback may mutate its controller or PIC.
+
+1. Start retains the original Single/Auto, high-speed, pause and EOI policy.
+   Capture the DMA address/count/mode/page and block bytes once through SAS.
+   Physical addresses use the existing DMA address conversion, with 16-bit
+   directional wrap. Do not advance the controller while copying or queueing.
+2. Replace native WaveHdr/semaphore ownership with one bounded frozen block
+   and its accepted-prefix cursor. Submit at most the existing PCM submission
+   capacity per call; partial success advances only that prefix. A full FIFO
+   returns to the executor. The existing Lib notification only wakes it; no
+   sleep, busy retry or device worker is introduced. Host errors remain errors,
+   never synthetic playback success.
+3. Once the block is queued, retain XP's virtual-increment initialization from
+   its size and preceding query count. Keep the native accepted-range origin
+   separate from guest DMA progress. Lib accepted/submitted/consumed counters
+   are different observations; no one of them substitutes for all three.
+4. Use the existing quick-event owner for the XP completion deadline. Preserve
+   the Single nominal delay, Auto small-block +1/8 and large-block -BurstSize
+   adjustments. The original conditional position recheck and ten-attempt
+   bound remain explicit DSP scheduling policy. A host epoch change cancels
+   old observations rather than being mistaken for completion.
+5. Completion writes the existing DMA registers once, applies terminal-count
+   reload through the existing accessor, then raises IRQ. Auto waits for the
+   existing EOI callout before copying the next block. Guest PauseDMA retains
+   XP's behavior: it suppresses the next Auto block, not an invented host pause
+   command. Machine pause is separately handled by the approved execution gate.
+6. Reset/stop remove device EOI ownership before withdrawing pending requests,
+   cancel the scheduled completion, discard unsounded host data and quiesce
+   the host callback before release. Preserve ordinary-reset versus high-speed
+   escape. Snapshot serialization of the new pending device work remains S9,
+   not an implicit claim from S6's host tests.
+
+Native format probing is another host-only difference: XP's SetWaveFormat
+tries nearby formats through WinMM. The selected PCM endpoint accepts or
+rejects the requested representable rate; no unreviewed resampler or guessed
+fallback rate belongs in DSP. The existing rounded GetSamplingRate mapping
+remains the guest-to-requested-rate authority. Format rejection must follow
+the device's failed initialization/output path, not silently play at a wrong
+rate. TimeConstant's 0xffff consumed-request sentinel must not be passed back
+to GetSamplingRate; retain the established active rate until a new request.
+
+The next implementation batch is estimated at 250-400 DSP/Compat production
+lines and 100-180 focused test lines, replacing the remaining transfer
+observers as its real operations become linkable. This is not a new S or a
+claim that the receiving sequence has been implemented. Proof must cover
+ordered partial queueing, frozen source data, count/IRQ before and after
+completion, EOI gating, rate changes, cancellation and endpoint failure in
+addition to the already tested command/controller functions.
+
+The first receiving increment now implements frozen block capture and bounded
+prefix submission in the existing DmaDataToDsp/DspProcessBlock path. A 65536
+byte device-owned array replaces native header storage for the maximum DSP
+block, with only its size and accepted cursor retained. SAS reads preserve
+DMA page/direction/wrap; copying and queueing never advance DMA. The original
+query-count increment calculation is retained. Full FIFO yields an incomplete
+block to the executor, and a host error is returned, not converted into IRQ.
+Completion scheduling, start/stop and actual port attachment are still pending.
+
+The focused fixture uses actual guest memory and DMA plus a scripted PCM sink:
+32, 700 and 65536 byte blocks in both directions, source mutation after capture,
+a seven-byte accepted prefix, full FIFO, reported output error, exact remaining
+bytes without duplication, and unchanged DMA registers after complete enqueue.
+The first build caught legacy const-macro pollution of the host declaration;
+the host header is now included before original core headers, preserving the
+public signature. Corrected dual-width verification passes all three targeted
+DMA/DSP cases per width. This increment adds 62 DSP lines and four internal
+header lines, plus 72 test lines, with no production removals. No successful
+native audio or whole-S6 result is claimed by these tests.
+
+The completion increment now owns one cancellable time-based quick event,
+separate from PCM submission readiness. It retains XP Single/Auto delay
+adjustments and the conditional physical-lag check with ten-attempt bound.
+Host progress errors and changed epochs latch failure instead of reporting a
+successful DMA transfer. Completion writes directional address/count once,
+uses the existing terminal-count reload and then raises the existing PIC IRQ.
+The stalled-host flag still requires consumption by the pending start/reopen
+integration; EOI rearming and actual device lifecycle are not yet attached.
+
+The focused 24-case completion matrix covers both directions, controller
+auto-reload on/off and six outcomes: ordinary timeout, queried lag then progress,
+ten stalled checks, changed epoch, host failure and cancellation. It observes
+real DMA/PIC effects with scripted host progress. Initial dual-width state
+tests pass. Self-review then corrected scheduling from the instruction-count
+entry to add_q_event_t, and added a queue-record check for EVENT_TIME and a
+1025-sample/11025-Hz deadline. That new assertion initially contained a hand
+calculation error (94 rather than 93 ms); the corrected rerun passes all three
+focused device cases on each width.
+No wall-clock accuracy or native endpoint playback is inferred from explicit
+test dispatch of the queue. Increment: production +99/-0, tests +89/-0.
+
+#### S6 failure and port-dependency review
+
+Real start/stop failure tests now cover occupied EOI registration (the other
+owner survives), unsupported host open, gain failure before a queued completion
+(no success IRQ), and cancellation of a delayed pending PIC request. They pass
+all three focused cases on both widths before the subsequent subset cleanup.
+
+Port-source review found an unnecessary link dependency retained in the first
+DSP extraction: SB-MIDI cases were placed in switch(DSPWriteState), but use
+command values 0x30..0x38. Every reachable state assignment is in 1..11;
+MidiOutPoll (12) was assigned only inside the unreachable 0x38 state branch.
+The pinned source header explicitly excludes SB-MIDI. The state, its cases
+and BufferMidi declaration/test override are therefore removed from the
+necessary subset, not replaced by a successful empty implementation. The
+MPU MIDI parser remains S8's real work; this does not remove a supported path.
+A regression sends the entire 0x30..0x38 command interval then GET_VERSION,
+checking that unsupported commands neither respond nor consume its next byte.
+That follow-up run passes all three focused cases on both widths. Source
+reachability proof and command regression are distinct; corrupted internal
+enum values are not a guest API.
+
+#### S6 DSP/Mixer port-handler checkpoint
+
+The selected nt_sb.c read/write handlers and ResetAll now replace the final
+device-protocol fixture override. Device IRQ/DMA globals also return to that
+owner. The retained XP defaults are A220/I5/D1; native WinMM loading, NTVDM
+trapping, diagnostic calls and later FM/MPU dispatch are not imported here.
+The exact selected ranges and local type/default-binding changes are accounted
+in the S6 subset ledger and mirror manifest. This checkpoint does not yet
+install the handlers during product machine initialization.
+
+The new handler regression checks reset pulse/AA response, DSP 2.01 response,
+Mixer readback/default restoration, high-speed write-status refusal, blocked
+DSP commands, still-accessible Mixer and reset exit from high-speed mode.
+The first run caught a fixture assumption: its old ResetAll stub omitted
+ResetMixer, so a later test expected the cumulative gain-call count to remain
+zero. The corrected assertion compares calls immediately before/after speaker
+commands while output is closed; production reset retains XP's Mixer-before-
+DSP ordering. The retest passes all three focused cases on x64 (0.41 s) and
+x86 (0.49 s), with the hidden job exiting zero. No end-to-end audio result
+or product qualification is inferred from these handlers. This step adds
+154 lines in nt_sb.c and two declarations, and removes the fixture's duplicate
+device globals and ResetAll implementation. The product initialization,
+executor service and pause/resume sample preservation remain S6 work.
+
+#### S6 actual port registration checkpoint
+
+Port attachment follow-up selects XP's previously deferred unconditional
+SNDBLST_ADAPTER 36 declaration (ios.h line 642), without enabling the null
+driver or importing NTVDM's spare VDD slots. SbInitialize/SbTerminate bind
+and release the six selected DSP/Mixer addresses in the original I/O table.
+Local io_connect_port is void, unlike XP's fallible NTVDM trap operation;
+preflight checks that same table before changing any binding. No second
+registry or generic recovery API is added. Repeated attachment preserves
+device state, and teardown quiesces DSP work before disconnecting.
+
+The existing port-handler test now uses real inb/outb and checks occupied-port
+rejection, all six read/write owners, duplicate attach preserving Mixer,
+unbinding and reattachment. All three focused cases pass on x64 (0.44 s) and
+x86 (0.31 s). This is 38 added production lines in nt_sb.c plus the one
+restored ios.h declaration. The three device bodies now move into the
+production device archive; the smoke links those same objects instead of
+compiling a private device copy. That follow-up passes all three focused
+cases on x64 (0.50 s) and x86 (0.47 s); the hidden job exits zero.
+Machine-lifecycle invocation is not yet implemented. Its cold-reset order
+must terminate the old binding before the original I/O tables and quick-event
+queues are recreated, then attach afterward; a stale attached flag must not
+skip registration into newly cleared I/O tables.
+The lifecycle integration must also exercise cold reinitialization after a
+changed time constant and an incomplete reset pulse: ResetAll currently
+preserves XP's ordinary/high-speed split, so calling it is not by itself proof
+that a fresh standalone hardware lifetime has initial parser/rate state.
+
+#### S6 machine lifetime checkpoint
+
+Machine lifetime wiring now terminates sound before cold reset rebuilds queues
+and I/O tables, then installs DSP/Mixer after original reset. Initialization
+selects the full existing reset branch, and ResetDSP clears its reset-pulse
+parser as well as its read/write parser. A new lifetime cannot inherit an old
+time constant or finish an old half-written pulse. Guest high-speed reset
+still follows the original partial-reset selection.
+
+SbTerminate reports failed host closure while disconnecting ports. A later
+cleanup can release a retained PCM handle without touching disconnected ports.
+The existing machine destroy return now reports failure and preserves its
+object before releasing CPU/RAM; both production callers in driver.c honor
+that result and retain composition ownership. No public shared API changes.
+Focused lifecycle/port regressions pass on both widths. The additional
+close-failure injection proves machine destroy reports IO_ERROR without
+freeing its RAM, and successful later cleanup releases the retained output.
+A real machine cold reset also verifies reconstructed I/O bindings, restored
+time constant and an abandoned old reset pulse. Each width passes all three
+focused tests (x64 0.42 s, x86 0.31 s). The machine/driver change is +18/-4,
+net +14 across three files; selected device initialization/reset changes
+remain separately visible in the mirror manifest. Machine, lifecycle,
+checkpoint, snapshot-boundary and restart regressions pass 5/5 per width
+(x64 68.56 s, x86 64.75 s), with a zero job exit. These check existing
+machine/snapshot behavior, not yet serialization of active DSP state (S9).
+
+#### S6 executor service checkpoint
+
+The existing platform executor event now services a pending PCM prefix after
+the generic lifecycle callback, unless shutdown already requested an unwind.
+An output failure requests the same original lifecycle unwind; readiness reads
+the DSP's existing latched status through a narrow getter, not a second error
+state. The VM return also checks readiness for its restored-CPU route, which
+does not call machine_run. Normal and restored execution therefore report the
+same failure instead of returning a successful stop after audio failure.
+
+The added test submits only seven of 64 guest bytes, then services the real
+executor event and checks the complete ordered payload. Its failure half
+injects a write error while the actual CPU run is live and requires machine
+IO_ERROR with no invented accepted bytes. A cold reset clears the device
+failure through the existing owner. Dual-width verification passes all three
+focused tests (x64 0.48 s, x86 0.38 s); the background job exits zero.
+PCM pause/resume retention remains unfinished; no full S6 claim is made.
+
+#### S6 pause-boundary audit checkpoint
+
+The existing Lib inactive operation discards pending output and resets its
+progress epoch; it cannot be treated as a queue-preserving pause. The device
+already owns a frozen guest block, but its current accepted prefix is not a
+consumed prefix. Wiring the execution gate directly to inactive/active would
+therefore either lose pending samples or replay already consumed samples.
+No such direct hookup is admitted as a completed implementation. Retention
+must account for the current block at the device owner and preserve the
+original DMA/IRQ completion path, without a second PCM queue or clock.
+
+The Compat seam regression now injects both deactivate and activate failure,
+requiring the real adapter to return I/O error rather than claiming success;
+it also injects progress failure and verifies subsequent successful copied
+progress. No production/shared API change is needed for this proof. The
+test change is +18/-5, net +13 C lines. Both widths build and pass the focused
+test (x64 0.16 s, x86 0.10 s), with a zero background-job exit. This is mocked
+host error-forwarding evidence, not proof of queue-preserving pause, physical
+audio playback or active-device snapshot restoration.
+
+#### S6 paused-block retention implementation
+
+The admitted execution gate now calls the DSP owner. It records the consumed
+prefix of the existing frozen block before discarding native output, cancels
+that block's completion event, and preserves the unchanged controller address,
+count and transfer obligation. On resume it reuses DspServiceTransfer to enqueue
+the remaining prefix and arm the original completion path. There is no second
+sample buffer, device worker, clock or IRQ route. An output-local suspended
+flag makes repeated park/continue idempotent; a consumed-prefix offset rebases
+progress across the Lib clear epoch. Transfer mode is frozen at capture so
+STOP_AUTO's final block does not lose its original completion policy.
+
+The consumption checkpoint is copied Lib progress, not an atomic capture of
+the physical sound endpoint. Already heard audio cannot be undone; samples
+consumed between that observation and native cancellation may be replayed.
+This is within the documented distinction between exact emulated data/state
+continuation and host audible phase, not a claim of sample-exact host pause.
+No DMA advancement or IRQ is inferred from cancellation or resumed enqueue.
+
+The real machine gate regression covers seven-byte partial and complete
+64-byte submission, zero/partial/all observed consumption, repeated gate
+calls, a second pause after further consumption, byte-for-byte suffix order,
+unchanged DMA at park/resume, and original-deadline completion. Failed native
+deactivation latches the existing DSP error. The first dual-width focused
+pass is 3/3 each (0.54 s x64, 0.45 s x86); because final source/test refinement
+overlapped that build, a fresh serial focused plus expanded machine run is
+required. That final run now exits zero: focused 3/3 per width (x64 0.53 s,
+x86 0.41 s), then expanded machine 5/5 per width (x64 66.10 s, x86 63.76 s).
+This still does not replace complete S6 package qualification.
+
+#### S6 complete PCM delivery regression
+
+The existing machine sound smoke is extended rather than adding another
+parallel fixture. Its original PC-speaker checks remain. After releasing that
+stream, two cold-reset runs program the real DMA and DSP ports with a known
+64-byte ramp. The production DSP, Compat conversion and Lib worker remain
+linked; only the final platform leaf records delivered I16 samples. Each run
+must deliver all 64 frames at 11025 Hz with exact U8-to-I16 values, without a
+flush or subsequent producer burst. This separates complete first-delivery
+evidence from the scripted Compat outlet used by the device contract matrix.
+Verification ran serially after the pause/machine job, avoiding concurrent
+writers to either Ninja tree. Both builds and the smoke pass (x64 4.20 s,
+x86 0.92 s), with a zero job exit. No native audibility result is inferred.
+
+#### S6 qualification coverage ledger
+
+The frozen universe is the admitted DSP/PCM/Mixer protocol, its original
+DMA/PIC owners, host output translation, execution/lifetime integration,
+the shared pause-hook change, and every currently registered root test on
+both widths. MIDI/FM attachment and active sound-state serialization remain
+explicit S8/S9 obligations, not implicit S6 completions.
+
+| Surface | Focused proof and current disposition |
+| --- | --- |
+| DSP reset/version/parser/short probes/high speed | Real device command and I/O-table tests pass both widths. |
+| DMA copy/readback/direction/wrap, Single/Auto/EOI/IRQ | Original controller/PIC tests and completion matrix pass both widths. |
+| Mixer/rate/speaker gain/output ownership | Mixer matrix and device host-failure fixture pass both widths. |
+| PCM conversion/partial submission/first and repeated delivery | Compat seam and real DSP-to-Lib-worker smoke pass both widths; only native output is injected. |
+| Pause/resume, cold reset, teardown and output errors | Device-gate matrix and expanded machine tests pass both widths. |
+| Generic executor contract | Emulator deterministic pause/continuation regression and public corpus/manifest/inward test gates pass; no outward audio dependency. |
+| XP subset identity | 503-body mirror gate passes; prior ambiguous pending labels are replaced with explicit native-host exclusions or S8 MIDI/FM receivers. Included source ranges and local hashes are unchanged by that label clarification. |
+| Dual package build/publication and all registered regressions | Final R3 passes 160/160 per width: 94 shared, 61 other background and five individually isolated native desktop cases; both package EXEs refreshed. |
+
+The first qualification script mistakenly selected shared names using a slash
+instead of their actual dot prefix. Its shared group was empty and the other
+group selected all 155 background tests; this is not valid evidence of the
+required group order. The live run is preserved, not cancelled. A dependent
+job runs only if it succeeds, then repeats the shared and remaining groups in
+the required order using the exact dot prefix and --no-tests=error. Do not
+report the initial empty group as a passing shared suite.
+
+The initial x64 background run finishes 154/155: the source-boundary test
+correctly rejects nt_sb.h directly importing Lib Types. The header now consumes
+the existing Compat PCM host contract instead; no gate is weakened or direct
+mirror-to-Lib exception added. The source boundary and 503-body mirror checks
+pass after repair. Its follow-up build exposes the Mixer-only fixture's missing
+private App include root, which is corrected on that test target only. Both
+failed runs remain evidence. A fresh full run uses the correct dot-prefixed
+shared selection and rejects empty groups; dual-width qualification is still
+pending, not inferred from the earlier 154 passes.
+
+Prequalification accounting (C/H only, tracked diff plus whole new files):
+Compat five paths +192/-1 (net +191); Machine three paths +21/-5 (net +16);
+Emulator two paths +10/-4 (net +6); nine mirror paths +2077/-1 (net +2076);
+five test paths +1287/-13 (net +1274). These are changes from the S5 endpoint,
+not the mirror's local-patch distance from the selected XP source. Build,
+manifests, documentation and EXEs are counted separately at final delivery.
+
+No S6 P commit is admitted as complete until the final row, exact changed-path
+accounting and actual-change review obligations are satisfied. User INI/media/
+snapshots are not outputs of this qualification.
+
+#### S6 final qualification and public-change audit
+
+The R3 hidden qualification job terminates with exit zero. Both Release builds
+complete and refresh the existing package EXEs. Each width passes all 160
+registered tests: shared suites first (94/94), other background tests next
+(61/61), then five native desktop cases in separate CTest processes. x64
+background durations are 45.76/100.01 seconds; x86 durations are 45.62/70.37
+seconds. All ten desktop cases pass, including both ordinary/compact package
+flows and Window retirement/modal plus Console display restoration. No Computer
+Use or user media/configuration changes are involved. Earlier failed attempts
+remain recorded above; this successful run does not erase their evidence.
+
+Published SHA-256:
+
+- softpc32.exe: `67e8d7b83ede74bd4f5b3cd533f55d1791f1bf3f41f8fc212f03b989f8fdf979`
+- softpc64.exe: `fd4b6fcec5e13982465bea67eab1303ee5cb236c41415269948e498dfbb16669`
+
+The owner-required post-edit public audit rechecks the actual Emulator diff,
+all four heartbeat call sites and the executor park/continue/error paths.
+Changed production expressions use existing Lib Types constants. The sole
+executor remains the callback owner; private snapshot continuation still emits
+no extra RUNNING or PAUSED fact. There are no new includes, link dependencies,
+public symbols, stored fields, platform calls, locks, queues or threads.
+The change is +10/-4 production (net +6), +58/-5 tests (net +53), plus the two
+manifests. Emulator corpus, manifest, inward test-boundary and whitespace gates
+pass again after full qualification. The shared suites exercise existing gates
+for all four source/test pairs. This is a bounded change audit, not a claim that
+the known S7 formatting, path, naming and verifier gaps have been repaired.
+
+PCM delivery evidence is the real DSP/Compat/Lib-worker route with the final
+native leaf injected; it is not physical hearing evidence. Active DSP snapshot
+serialization and MIDI/FM attachment remain S9/S8 respectively. The complete
+executor delivery and subsequent actual-change review are still required before
+S6 closure.
+
+Final source accounting retains the prequalification C/H figures above:
+production +2300/-11 (net +2289), tests +1287/-13 (net +1274). Root CMake is
++30/-1 (net +29), the mirror checker +1/-1; manifests, source-selection records,
+task documents and two binaries are separate from those code figures.
+The staged whole-change whitespace check additionally sees the newly imported
+sndblst.h trailing blank line, identical to its XP selected subset. It is
+retained under mirror-format fidelity rather than introducing a formatting
+patch; this warning is not presented as a clean whole-change whitespace result.
+
+The nine touched mirror files compared with their manifest-pinned XP necessary
+subsets use `git diff --no-index --numstat --ignore-space-at-eol`; the selected
+texts are reconstructed from the recorded upstream ranges and their normalized
+hashes checked against the manifest before comparison. These totals include
+pre-S6 local patches in already retained files, not just this S's new changes:
+
+| Mirror path | Added | Removed | Local purpose |
+| --- | ---: | ---: | --- |
+| base/inc/dma.h | 3 | 1 | Existing controller access declaration without NTVDM guard. |
+| base/inc/ios.h | 2 | 2 | Retained adapter slot and prior local source layout. |
+| base/inc/sndblst.h | 11 | 11 | Existing scalar/time-width declarations, no native thread ABI. |
+| base/system/at_dma.c | 122 | 27 | Earlier DMA/snapshot repairs plus selected sound readback hooks. |
+| base/system/ica.c | 139 | 1 | Earlier PIC archive/IRET support plus Compat delayed-IRQ eligibility. |
+| host/inc/nt_sb.h | 66 | 63 | Device declarations and existing Compat host contract. |
+| host/src/nt_sb.c | 45 | 213 | Original I/O-table attachment replaces NTVDM registration. |
+| host/src/nt_sbdsp.c | 646 | 1428 | Executor/quick-event transfer and copied PCM replace native DMA thread/WinMM ownership. |
+| host/src/nt_sbmxr.c | 47 | 65 | Register semantics retained; stream gain replaces native device volume. |
+| Total | 1081 | 1811 | Net -730 relative to the selected XP bodies. |
+
+Excluded XP ranges are itemized separately in the S6 subset ledger; they are
+not counted as local functional patch deletion. This selected-source metric
+must not be substituted for the +2077/-1 mirror growth from the S5 endpoint.
+
+#### S6 DMA-read regression detail
+
+The two deferred XP DMA-read hooks and sound declaration include are now
+selected (at_dma.c lines 50, 191-193, 220-222). Local hooks use the existing
+address/count port-to-channel calculation, not XP's incorrect direct port
+comparison. They run only on the controller's low-byte read; the following
+high byte sees the same sampled position. Controller 1 is unchanged. This is
+the existing DMA register path calling the existing DSP position operation,
+not an alternate port handler or second controller.
+
+Production adds seven lines. A 37-line regression addition exercises actual
+inb/outb for channels 1/3, address/count, increment/decrement and a low-byte
+carry. It also checks another channel, controller 1 and inactive DSP do not
+advance the sound position. All three focused DMA/SB cases pass on each width.
+The device fixture supplies the currently uninstalled sound port globals;
+the product archive must acquire the real port owner before its full link is
+qualified. No temporary success stub is added to production to conceal that
+unfinished S6 dependency.
+
+#### S6 transfer-control integration checkpoint
+
+The selected XP start/stop (2554-2710), AutoInitEoiHook (1275-1321) and
+ExitAutoMode (2922-2962) now feed the existing executor-side transfer helpers.
+Native thread/semaphore ownership is excluded, not emulated by a second worker.
+DspServiceTransfer resumes accepted-prefix submission and arms exactly one
+completion after the whole copied block is accepted. The existing host wake
+will call this service; production executor/port attachment is still pending.
+Auto completion raises the PIC request only; the real EOI callback captures
+the next block. Negative withdrawal notices, paused/reset state, an outstanding
+block and a latched host failure cannot start another block. Ordinary reset
+removes the EOI owner before withdrawing the PIC request, cancels the completion
+and delayed IRQ, and closes output. High-speed escape clears output but retains
+the admitted format. ExitAutoMode removes continuation without clearing already
+accepted PCM or cancelling the last completion. Gain failure is checked before
+the completion callback can overwrite it with a successful progress query.
+
+Start/stop observer functions are removed from the device fixture. Its parser
+checks now inspect actual mode/active/output state with DMA masked. A composed
+DMA/PIC/host-fixture sequence covers increment/decrement, partial acceptance,
+two blocks across EOI, pause/continue, controller auto-reload, exit-auto's final
+block and stop cancellation. Both widths pass focused 3/3 (0.50/0.31 s). This is
+not native-host playback, real guest port installation or whole-S6 qualification.
+Production increment is +81/-0 C/H; test net change is +54 lines, replacing
+observer assertions rather than retaining a second test path.
+
+#### S6 output ownership and gain checkpoint
+
+The pinned output/speaker ranges (1471-1504 and 1622-1910) now have a local
+host-seam implementation. DspPrepareOutput uses the retained time constant and
+rate conversion, reuses an unchanged rate, and closes before changing format.
+The native device enumeration is excluded; Lib admits the requested rate or
+returns its actual status. The former WinMM nearby-rate probe loop is not
+copied: the selected PCM backend already owns native format conversion.
+TimeConstant becomes 0xffff only after a usable stream is acquired. Failed
+close prevents replacement; failed open leaves the requested rate available.
+The existing stalled-output flag now clears the host queue before the next
+block, matching XP's forced reset of its next-output position.
+
+SbApplyMixer computes one stream gain from existing Mixer registers and the
+speaker gate. Closed-output speaker commands are ignored as in XP. Unlike
+XP's device-wide restore logic, no native global volume is read or mutated;
+the admitted stream-local gain composes Master/Voice rather than replacing
+either register. A host gain failure latches the existing transfer failure,
+with no retry or fabricated DMA completion. The next device start/reset
+integration must use these functions; they are not yet wired to guest ports.
+
+The device contract target now links the real Mixer as well as DSP. Its new
+host fixture covers initial/default gain, muted Mixer changes, speaker-on with
+zero Voice, unchanged/changed rates, failed close/open and terminal gain
+failure. The old speaker observer is removed. The focused DMA/SB-DMA/command
+set passes 3/3 on each width (0.62/0.46 s); its command case executes the
+output matrix. This does not replace the standalone Mixer register matrix.
+This increment adds 53 production C/H lines and changes tests +85/-4, net +81;
+one CMake source line links the real Mixer into that test target. The selected
+upstream ranges remain separate from local host adaptation; mirror and
+documentation gates pass. No public shared source is changed in this increment.
+
+#### S6 guest DMA pause checkpoint
+
+Pinned DSP lines 1505-1573 supply PauseDMA/ContinueDMA. Both mutate the existing
+bDspPaused flag; neither calls native pause/reset. The Single-mode position
+query only guarded Sleep(0), so both that query and host yields are omitted
+on the sole executor. Machine pause remains a separate lifecycle operation.
+Production adds 14 lines; tests replace the two observer stubs with actual
+command-state assertions for Single/Auto, repeated pause/continue and DSP reset.
+The focused DMA/SB-DMA/SB-command set passes 3/3 on each width (0.42/0.41 s).
+The x86 Ninja log again required automatic recovery and 307 build steps;
+no cache purge or foreground timeout occurred. No EOI continuation or host
+playback qualification is claimed by these flag assertions. Test increment
+is +12/-6 (net +6); production is +14/-0. Mirror and documentation gates pass.
+
+Pinned ExitAutoMode (2922-2961) removes the EOI hook and resets the next-output
+position; it does not clear already queued samples. The pending transfer
+integration must preserve that distinction from reset/teardown. AutoInitEoiHook
+checks bDspPaused before capturing another block, not before completing the
+currently submitted block. These are source findings, not runtime proof yet.
+
+#### S6 EOI and delayed-IRQ dependency checkpoint
+
+Additional read-only dependency reference: pinned host/src/nt_eoi.c blob
+9f4e9dae836b054e3b43a179923cc0da20fb2ab1. It is not an eighth whole-file
+import. Its WOW/native monitor services, lock and timer dispatch are not an
+admitted standalone payload.
+
+The existing EOI contract explicitly defines CallCount=-1 as cancellation of
+a pending interrupt. Local SWPIC_clear_int emits it only when clearing the
+last pending request; normal EOI emits the remaining count. This corrects the
+earlier loose label of that path as reset notification. XP AutoInitEoiHook
+ignores CallCount and starts the next block unless paused. Therefore teardown
+must not leave a live auto-transfer callback behind while withdrawing an IRQ.
+Do not simply discard all negative notifications in a generic host dispatcher:
+their documented purpose is to release a waiting device. The device transition
+and callback ordering require an explicit port/PIC regression.
+
+The original host EOI table is one 16-line registry. Register rejects an occupied
+line; Remove only removes the same callback. Dispatch range-checks the line,
+but Register/Remove do not. A receiving Compat owner must validate all three
+entry points and null registration, preserve occupied/mismatched state, and
+use the existing PIC callout. Do not add a parallel registry in the sound
+device or replace existing PIC interrupt selection. Required cases: line -1/16,
+duplicate registration, wrong-owner removal, ordinary/automatic/specific EOI,
+pending withdrawal, stop/reset cancellation and callback removal before reuse.
+
+XP host_DelayHwInterrupt (229-328) queues the PIC request immediately while
+DelayIrqLine blocks delivery; its non-MONITOR branch schedules add_q_event_i
+and later calls ica_RestartInterrupts, with 0xffffffff cancelling the delayed
+entry. The current selected standalone PIC/Compat source has no DelayIrqLine,
+UndelayIrqLine or ica_RestartInterrupts implementation. Thus neither copying
+that function nor substituting an immediate ica_hw_interrupt preserves delay.
+Resolve the bounded existing-event-queue adaptation before implementing this
+host seam. Its proof must distinguish request accounting, delayed eligibility,
+cancellation and stale completion after reset; no periodic sound timer or new
+guest thread is authorized. This remains an open implementation-design member,
+not an already-working scheduling path.
+
+### S7 — shared contract and quality repair
+
+Planned, owner-authorized next after S6; not yet active or implemented.
+Baseline is the reviewed S6 endpoint, to be frozen at admission. The supplied
+audit is source/reproduction input, not proof of these repairs or a fresh
+full-suite pass. NXVM remains read-only comparison material; no receiving
+repository runtime, audit JSON or build tree becomes a dependency.
+
+Frozen scope is the following finding-to-owner/proof ledger, including the
+preceding local eight-package audit. Recheck every finding against the S6
+endpoint, record already-fixed members with evidence, and do not duplicate
+their repairs. Shared source/tests retain their existing owners and APIs.
+
+| Finding | Repair owner and minimal approach | Required focused proof |
+| --- | --- | --- |
+| Window title/status formatting reports success after truncation | src/emulator/product/monitor.c: check the existing formatter's required length against capacity, including the initial status prefix; retain one formatting path. | test/emulator/product/monitor_smoke.c: exact fit including NUL, one byte short, tiny capacity, long name, both title outputs, empty/nonempty help rows and existing invalid arguments. |
+| Entry test doubles reproduce the same incorrect success contract | test/x86-ibmpc/product/entry_smoke.c: bounded, contract-faithful doubles; do not recreate the monitor implementation. | Exercise error propagation and cleanup when title or status formatting rejects capacity, while Emulator owns real formatting tests. |
+| Executable directory retains a non-root trailing separator | src/lib/base/process.c, existing process_interface.h contract: correct extraction in its existing path. | test/lib/process_directory_smoke.c: Windows/POSIX ordinary directories, drive/POSIX/UNC roots as supported by the platform contract, exact capacity, missing separator/native failure, unchanged output on failure. |
+| App appends a separator unconditionally | src/app-softpc/product/config.c: review the consumer with corrected Base output; minimally avoid duplicate separators for preserved filesystem roots if needed. | Existing App config test: ordinary directory and root produce exactly one join separator, unchanged filename and capacity/error behavior; no user INI changes. |
+| Console guard/comment retain old owner | src/lib/console/console_interface.h: LIB_CONSOLE guard and Console Broker ownership wording; no alias. | Extend the existing naming gate and its negative fixtures to reject the retired Console guard/owner wording. |
+| Linux input retains LINKVM/linkvm spelling | src/lib/kvm-base/linux/input.h and input.c, test/lib/linux_input_contract_smoke.c: use consistent KVM_LINUX/kvm_linux names and update all references, without behavior change. | Existing Linux input contract and stale-name scan/negative naming proof; do not claim Linux runtime from a Windows compile. |
+| Public CMake project names retain NXVM branding | src/lib/CMakeLists.txt and src/emulator/CMakeLists.txt: neutral project names, preserving public target names and links. | Independent package configuration and name scan; these names were not runtime dependencies. |
+| Outer production code mixes NULL and LIB_NULL | Emulator and both shared X86 source packages: use existing Types vocabulary; no new aliases. | Whole-package scan excluding literals/comments and negative source-gate tests, aligned with the existing test Types rule. |
+| X86 source gates skip unexpected C/H layout and incompletely inspect CMake links | Both X86 verify_corpus.cmake files: reject unowned C/H paths and apply existing inward-link rules consistently. | Existing verify_negative.cmake suites: nested/unowned C/H, mixed-case CMake links and alternate global-link forms; valid inward dependencies remain accepted. |
+| Target-wide format-truncation warning downgrade | src/x86-debug/CMakeLists.txt: recheck actual diagnostics, remove an obsolete exemption or fix the precise bounded formatting site. | Strict dual-width build; do not classify a warning exemption alone as a proven runtime defect or add a broader suppression. |
+
+The owner-supplied extension reports 40 production and 17 test formatting
+sites, no further confirmed production truncation, no second shared directory
+join owner and no duplicate header guards. These counts are received evidence;
+S7 must reproduce a current local inventory and classify every hit rather than
+claiming its earlier 94/94 test result proves these boundaries. The local audit
+at 44cad548 covered 265 paths/216 C/H files and found 230 raw NULL tokens in
+eight outer production files after excluding comments/strings; refresh this
+mechanical count at admission rather than forcing it onto changed code.
+
+Preliminary scope: roughly 15-22 production C/H paths, 6-10 test C/H paths,
+plus existing CMake/gates/manifests. Behavior corrections should remain about
++20-45/-10-25 (net -5 to +35); Types/naming substitutions may add and delete
+250-350 lines each (near-zero net). Tests estimate +120-220/-10-30
+(net +90-210), gates/build +40-90/-15-35 (net +5-75). These are estimates,
+not measured diffs; publish refreshed per-file figures before implementation.
+No source-mirror diff, audio transport redesign, extra manager, retry/rollback
+framework, new product policy or edits to NXVM are admitted here.
+
+Verification: first demonstrate focused failing boundaries on the old code,
+then fix in place and rerun the same cases. Rebuild/publish x86/x64 EXEs using
+existing intermediates; run all shared suites, other unit/integration suites
+and all ten native desktop cases under the existing hidden-job governance.
+Report original failures and known native-startup debt without unconditional
+retries or claiming grouped tests passed when they did not. Refresh affected
+manifests and run documentation/whitespace checks. Preserve INI/media/snapshots.
+
+Exit: each ledger member is fixed and verified, or shown already correct with
+current evidence; no silent deferral. Report production/test/gate add-delete-net
+and public-package diffs separately. Push the complete executor P, switch roles
+and review actual Git changes against this ledger before admitting S8. Stop
+for unbounded path semantics, new public behavior outside these contracts,
+unrelated worktree changes or a proposed second implementation path. T closure
+still waits for the owner.
+
+### S8 — XP MIDI/FM device attachment
 
 Import necessary nt_sbmid.c and nt_sbfm.c subsets, using Lib MIDI and the
 explicit no-host FM policy. Keep one guest parser and fix tail/pointer bounds.
@@ -636,7 +1635,7 @@ Host MIDI may sound; FM on this host need not. No synthesis dependency.
 Unexpected native errors are diagnosed once; missing optional capability
 does not create a retry loop or a second fallback engine.
 
-### S8 — portable archive and final qualification
+### S9 — portable archive and final qualification
 
 Extend existing device capture/restore and fixed-width codec, not Lib archive
 APIs. Reconstruct host handles and progress origin, approximate MIDI state,

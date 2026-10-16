@@ -1,0 +1,281 @@
+path	xp_first	xp_last	disposition
+host/src/nt_sb.c	1	4	excluded-native-nt-headers
+host/src/nt_sb.c	5	10	include
+host/src/nt_sb.c	11	49	excluded-winmm-loader-and-native-imports
+host/src/nt_sb.c	50	50	include
+host/src/nt_sb.c	51	55	excluded-native-handles-and-s8-mpu-state
+host/src/nt_sb.c	56	57	include
+host/src/nt_sb.c	58	71	excluded-native-loader-prototypes-and-s8-mpu-state
+host/src/nt_sb.c	72	98	include
+host/src/nt_sb.c	99	109	excluded-wow-policy
+host/src/nt_sb.c	110	117	include
+host/src/nt_sb.c	118	126	excluded-winmm-loader
+host/src/nt_sb.c	127	156	include
+host/src/nt_sb.c	157	157	excluded-winmm-loader
+host/src/nt_sb.c	158	160	include
+host/src/nt_sb.c	161	191	excluded-initialization-wrapper-defaults-selected-separately
+host/src/nt_sb.c	192	192	include
+host/src/nt_sb.c	193	193	deferred-s8-mpu-port
+host/src/nt_sb.c	194	195	include
+host/src/nt_sb.c	196	365	excluded-native-loader-lifetime-and-deferred-s8-midi-fm
+host/src/nt_sb.c	366	469	include
+host/src/nt_sb.c	470	486	excluded-native-binding-rollback-and-deferred-s8-mpu-binding
+host/src/nt_sb.c	487	513	include
+host/src/nt_sb.c	514	517	deferred-s8-fm-mpu-detach
+host/src/nt_sb.c	518	551	include
+host/src/nt_sb.c	552	562	excluded-native-lazy-loader
+host/src/nt_sb.c	563	595	include
+host/src/nt_sb.c	596	599	deferred-s8-adlib-alias
+host/src/nt_sb.c	600	600	include
+host/src/nt_sb.c	601	634	deferred-s8-mpu-fm-read
+host/src/nt_sb.c	635	635	include
+host/src/nt_sb.c	636	636	excluded-blank
+host/src/nt_sb.c	637	661	include
+host/src/nt_sb.c	662	673	excluded-native-lazy-loader-and-diagnostics
+host/src/nt_sb.c	674	699	include
+host/src/nt_sb.c	700	708	deferred-s8-adlib-alias
+host/src/nt_sb.c	709	709	include
+host/src/nt_sb.c	710	800	deferred-s8-mpu-fm-write
+host/src/nt_sb.c	801	801	include
+host/src/nt_sb.c	802	802	excluded-blank
+host/src/nt_sb.c	803	825	include
+host/src/nt_sb.c	826	827	deferred-s8-fm-reset
+host/src/nt_sb.c	828	834	include
+host/src/nt_sb.c	835	988	excluded-ntvdm-blaster-reconfiguration-and-native-debug-output
+base/inc/ios.h	1	28	include
+base/inc/ios.h	29	35	profile: #ifdef NTVDM
+base/inc/ios.h	36	37	include
+base/inc/ios.h	38	300	profile: #if defined(NEC_98)
+base/inc/ios.h	301	641	include
+base/inc/ios.h	642	642	include
+base/inc/ios.h	643	643	include
+base/inc/ios.h	644	658	profile: #ifdef NTVDM    /* Spare slots for user supplied VDDs */
+base/inc/ios.h	659	667	include
+base/inc/ios.h	668	668	sound-deferred
+base/inc/ios.h	669	675	include
+base/inc/ios.h	676	676	profile: #ifdef NTVDM    /* Spare slots for user supplied VDDs */
+base/inc/ios.h	677	705	include
+base/inc/ios.h	706	706	profile: #if defined(NEC_98)
+base/inc/ios.h	707	707	include
+base/inc/ios.h	708	710	profile: #if defined(NEC_98)
+base/inc/ios.h	711	820	include
+base/inc/ios.h	821	824	profile: #ifdef NTVDM
+base/inc/ios.h	825	826	include
+base/inc/ios.h	827	827	profile: #ifdef NTVDM
+base/inc/ios.h	828	869	include
+host/src/nt_sbmxr.c	1	329	include
+base/inc/dma.h	1	202	include
+base/inc/dma.h	203	235	profile: #if defined(NEC_98)
+base/inc/dma.h	236	290	include
+base/inc/dma.h	291	293	profile: #if defined(NEC_98)
+base/inc/dma.h	294	313	include
+base/inc/dma.h	314	316	profile: #if defined(NEC_98)
+base/inc/dma.h	317	317	include
+base/inc/dma.h	318	318	profile: #if defined(NEC_98)
+base/inc/dma.h	319	353	include
+base/inc/dma.h	354	359	profile: #if defined(NEC_98)
+base/inc/dma.h	360	374	include
+base/inc/dma.h	375	375	profile: #if defined(NEC_98)
+base/inc/dma.h	376	564	include
+base/inc/dma.h	565	574	profile: #ifdef NTVDM
+base/inc/dma.h	575	575	include
+base/inc/dma.h	576	576	profile: #ifdef NTVDM
+base/system/at_dma.c	1	49	include
+base/system/at_dma.c	50	50	include
+base/system/at_dma.c	51	51	include
+base/system/at_dma.c	52	57	profile: #if defined(NEC_98)
+base/system/at_dma.c	58	138	include
+base/system/at_dma.c	139	142	profile: #if defined(NEC_98)
+base/system/at_dma.c	143	146	include
+base/system/at_dma.c	147	147	profile: #if defined(NEC_98)
+base/system/at_dma.c	148	163	include
+base/system/at_dma.c	164	164	profile: #ifndef NEC_98
+base/system/at_dma.c	165	166	include
+base/system/at_dma.c	167	167	profile: #ifndef NEC_98
+base/system/at_dma.c	168	169	include
+base/system/at_dma.c	170	170	profile: #ifndef NEC_98
+base/system/at_dma.c	171	176	include
+base/system/at_dma.c	177	177	profile: #ifndef NEC_98
+base/system/at_dma.c	178	190	include
+base/system/at_dma.c	191	193	include
+base/system/at_dma.c	194	198	profile: #if defined(NEC_98)
+base/system/at_dma.c	199	201	include
+base/system/at_dma.c	202	202	profile: #if defined(NEC_98)
+base/system/at_dma.c	203	204	include
+base/system/at_dma.c	205	205	profile: #ifndef NEC_98
+base/system/at_dma.c	206	212	include
+base/system/at_dma.c	213	213	profile: #ifndef NEC_98
+base/system/at_dma.c	214	219	include
+base/system/at_dma.c	220	222	include
+base/system/at_dma.c	223	227	profile: #if defined(NEC_98)
+base/system/at_dma.c	228	230	include
+base/system/at_dma.c	231	231	profile: #if defined(NEC_98)
+base/system/at_dma.c	232	233	include
+base/system/at_dma.c	234	234	profile: #ifndef NEC_98
+base/system/at_dma.c	235	241	include
+base/system/at_dma.c	242	242	profile: #ifndef NEC_98
+base/system/at_dma.c	243	245	include
+base/system/at_dma.c	246	246	profile: #ifndef NEC_98
+base/system/at_dma.c	247	247	include
+base/system/at_dma.c	248	248	profile: #ifndef NEC_98
+base/system/at_dma.c	249	254	include
+base/system/at_dma.c	255	255	profile: #ifndef NEC_98
+base/system/at_dma.c	256	256	include
+base/system/at_dma.c	257	257	profile: #ifndef NEC_98
+base/system/at_dma.c	258	281	include
+base/system/at_dma.c	282	284	profile: #if defined(NEC_98)
+base/system/at_dma.c	285	294	include
+base/system/at_dma.c	295	295	profile: #if defined(NEC_98)
+base/system/at_dma.c	296	308	include
+base/system/at_dma.c	309	314	profile: #if defined(NEC_98)
+base/system/at_dma.c	315	318	include
+base/system/at_dma.c	319	319	profile: #if defined(NEC_98)
+base/system/at_dma.c	320	321	include
+base/system/at_dma.c	322	322	profile: #ifndef NEC_98
+base/system/at_dma.c	323	330	include
+base/system/at_dma.c	331	331	profile: #ifndef NEC_98
+base/system/at_dma.c	332	337	include
+base/system/at_dma.c	338	343	profile: #if defined(NEC_98)
+base/system/at_dma.c	344	347	include
+base/system/at_dma.c	348	348	profile: #if defined(NEC_98)
+base/system/at_dma.c	349	350	include
+base/system/at_dma.c	351	351	profile: #ifndef NEC_98
+base/system/at_dma.c	352	359	include
+base/system/at_dma.c	360	360	profile: #ifndef NEC_98
+base/system/at_dma.c	361	363	include
+base/system/at_dma.c	364	364	profile: #ifndef NEC_98
+base/system/at_dma.c	365	365	include
+base/system/at_dma.c	366	366	profile: #ifndef NEC_98
+base/system/at_dma.c	367	371	include
+base/system/at_dma.c	372	372	profile: #ifndef NEC_98
+base/system/at_dma.c	373	373	include
+base/system/at_dma.c	374	374	profile: #ifndef NEC_98
+base/system/at_dma.c	375	380	include
+base/system/at_dma.c	381	381	profile: #ifndef NEC_98
+base/system/at_dma.c	382	382	include
+base/system/at_dma.c	383	383	profile: #ifndef NEC_98
+base/system/at_dma.c	384	397	include
+base/system/at_dma.c	398	398	profile: #ifndef NEC_98
+base/system/at_dma.c	399	399	include
+base/system/at_dma.c	400	400	profile: #ifndef NEC_98
+base/system/at_dma.c	401	407	include
+base/system/at_dma.c	408	408	profile: #ifndef NEC_98
+base/system/at_dma.c	409	409	include
+base/system/at_dma.c	410	410	profile: #ifndef NEC_98
+base/system/at_dma.c	411	415	include
+base/system/at_dma.c	416	416	profile: #ifndef NEC_98
+base/system/at_dma.c	417	417	include
+base/system/at_dma.c	418	418	profile: #ifndef NEC_98
+base/system/at_dma.c	419	429	include
+base/system/at_dma.c	430	430	profile: #ifndef NEC_98
+base/system/at_dma.c	431	431	include
+base/system/at_dma.c	432	432	profile: #ifndef NEC_98
+base/system/at_dma.c	433	437	include
+base/system/at_dma.c	438	438	profile: #ifndef NEC_98
+base/system/at_dma.c	439	439	include
+base/system/at_dma.c	440	440	profile: #ifndef NEC_98
+base/system/at_dma.c	441	454	include
+base/system/at_dma.c	455	455	profile: #ifndef NEC_98
+base/system/at_dma.c	456	457	include
+base/system/at_dma.c	458	458	profile: #ifndef NEC_98
+base/system/at_dma.c	459	470	include
+base/system/at_dma.c	471	481	profile: #if defined(NEC_98)
+base/system/at_dma.c	482	523	include
+base/system/at_dma.c	524	524	profile: #if defined(NEC_98)
+base/system/at_dma.c	525	538	include
+base/system/at_dma.c	539	539	profile: #ifndef NEC_98
+base/system/at_dma.c	540	540	include
+base/system/at_dma.c	541	541	profile: #ifndef NEC_98
+base/system/at_dma.c	542	553	include
+base/system/at_dma.c	554	568	profile: #if defined(NEC_98)
+base/system/at_dma.c	569	616	include
+base/system/at_dma.c	617	617	profile: #if defined(NEC_98)
+base/system/at_dma.c	618	848	include
+base/system/at_dma.c	849	858	profile: #ifdef NTVDM
+base/system/at_dma.c	859	862	include
+base/system/at_dma.c	863	863	profile: #ifdef NTVDM
+base/system/at_dma.c	864	1024	include
+base/system/at_dma.c	1025	1028	profile: #if defined(NEC_98)
+base/system/at_dma.c	1029	1032	include
+base/system/at_dma.c	1033	1033	profile: #if defined(NEC_98)
+base/system/at_dma.c	1034	1039	include
+base/system/at_dma.c	1040	1043	profile: #if defined(NEC_98)
+base/system/at_dma.c	1044	1045	include
+base/system/at_dma.c	1046	1046	profile: #if defined(NEC_98)
+base/system/at_dma.c	1047	1047	include
+base/inc/sndblst.h	1	123	include
+base/inc/sndblst.h	124	136	deferred-s8-mpu-commands-and-section-comment
+base/inc/sndblst.h	137	137	include
+base/inc/sndblst.h	138	170	excluded-native-buffer-tuning-and-deferred-s8-fm
+base/inc/sndblst.h	171	193	include
+base/inc/sndblst.h	194	205	deferred-s8-mpu-ports-and-modes
+host/inc/nt_sb.h	1	89	excluded-native-winmm-types-handles-and-prototypes
+host/inc/nt_sb.h	90	138	include
+host/inc/nt_sb.h	139	202	excluded-native-wave-prototypes-and-deferred-s8-fm
+host/inc/nt_sb.h	203	237	include
+host/inc/nt_sb.h	238	351	deferred-s8-midi-contract-and-excluded-native-debug
+host/src/nt_sbdsp.c	1	10	include
+host/src/nt_sbdsp.c	11	14	excluded-native-nt-headers
+host/src/nt_sbdsp.c	15	16	include
+host/src/nt_sbdsp.c	17	18	excluded-redundant-imports
+host/src/nt_sbdsp.c	19	20	include
+host/src/nt_sbdsp.c	21	23	excluded-native-vdd-imports
+host/src/nt_sbdsp.c	24	25	include
+host/src/nt_sbdsp.c	26	32	excluded-section-comment
+host/src/nt_sbdsp.c	33	34	include
+host/src/nt_sbdsp.c	35	58	excluded-native-lock-event-wave-handles
+host/src/nt_sbdsp.c	59	60	include
+host/src/nt_sbdsp.c	61	65	excluded-winmm-header-storage
+host/src/nt_sbdsp.c	66	69	include
+host/src/nt_sbdsp.c	70	84	excluded-system-volume-and-thread-comment
+host/src/nt_sbdsp.c	85	88	include
+host/src/nt_sbdsp.c	89	100	excluded-native-ring-buffer-storage
+host/src/nt_sbdsp.c	101	111	include
+host/src/nt_sbdsp.c	112	122	excluded-obsolete-ending-position-and-comments
+host/src/nt_sbdsp.c	123	123	include
+host/src/nt_sbdsp.c	124	124	excluded-blank
+host/src/nt_sbdsp.c	125	127	include
+host/src/nt_sbdsp.c	128	129	excluded-winmm-format-delay-macro
+host/src/nt_sbdsp.c	130	169	include
+host/src/nt_sbdsp.c	170	170	excluded-unreachable-sb-midi-state
+host/src/nt_sbdsp.c	171	187	include
+host/src/nt_sbdsp.c	188	522	excluded-native-prototypes-buffer-event-lifetime
+host/src/nt_sbdsp.c	523	686	include
+host/src/nt_sbdsp.c	687	692	excluded-unreachable-sb-midi-state
+host/src/nt_sbdsp.c	693	795	include
+host/src/nt_sbdsp.c	796	822	excluded-command-values-in-state-switch
+host/src/nt_sbdsp.c	823	1064	include
+host/src/nt_sbdsp.c	1065	1065	excluded-blank
+host/src/nt_sbdsp.c	1066	1147	include
+host/src/nt_sbdsp.c	1148	1148	excluded-blank
+host/src/nt_sbdsp.c	1149	1237	include
+host/src/nt_sbdsp.c	1238	1238	excluded-blank
+host/src/nt_sbdsp.c	1239	1274	include
+host/src/nt_sbdsp.c	1275	1321	include
+host/src/nt_sbdsp.c	1322	1470	include
+host/src/nt_sbdsp.c	1471	1504	include
+host/src/nt_sbdsp.c	1505	1573	include
+host/src/nt_sbdsp.c	1574	1621	excluded-winmm-device-discovery
+host/src/nt_sbdsp.c	1622	1910	include
+host/src/nt_sbdsp.c	1911	2085	include
+host/src/nt_sbdsp.c	2086	2119	excluded-winmm-position-wrapper
+host/src/nt_sbdsp.c	2120	2182	include
+host/src/nt_sbdsp.c	2183	2183	excluded-constant-true-wrapper
+host/src/nt_sbdsp.c	2184	2212	include
+host/src/nt_sbdsp.c	2213	2232	excluded-inactive-product-branch-and-host-yield
+host/src/nt_sbdsp.c	2233	2267	excluded-inactive-alternative
+host/src/nt_sbdsp.c	2268	2283	include
+host/src/nt_sbdsp.c	2284	2343	excluded-native-idle-poll-and-wave-header-submit
+host/src/nt_sbdsp.c	2344	2486	include
+host/src/nt_sbdsp.c	2487	2553	excluded-winmm-header-ownership
+host/src/nt_sbdsp.c	2554	2710	include
+host/src/nt_sbdsp.c	2711	2758	excluded-native-dsp-worker
+host/src/nt_sbdsp.c	2759	2792	include
+host/src/nt_sbdsp.c	2793	2809	excluded-inactive-alternative
+host/src/nt_sbdsp.c	2810	2828	include
+host/src/nt_sbdsp.c	2829	2872	excluded-native-worker-dispatch-format-lifetime
+host/src/nt_sbdsp.c	2873	2881	include
+host/src/nt_sbdsp.c	2882	2889	excluded-native-worker-dispatch-auto-wrapper
+host/src/nt_sbdsp.c	2890	2898	include
+host/src/nt_sbdsp.c	2899	2921	excluded-native-dsp-worker
+host/src/nt_sbdsp.c	2922	2962	include

@@ -11,6 +11,7 @@
 #include "host_def.h"
 #include "ios.h"
 #include "timer.h"
+#include "quick_ev.h"
 #include "lib/audio/pcm/stream.h"
 
 #ifdef _WIN32
@@ -40,12 +41,17 @@ static volatile LONG audio_probe_program_second_delivery;
 static volatile LONG audio_probe_program_first_frames;
 static volatile LONG audio_probe_program_second_frames;
 static volatile LONG audio_probe_program_fast_frames;
+static volatile LONG audio_probe_sb_frames;
+static lib_u32 audio_probe_rate;
 
 lib_status audio_pcm_stream_platform_create(const lib_audio_pcm_stream_options *options,
     audio_pcm_stream_platform **out_platform)
 {
     assert(options != NULL && out_platform != NULL);
-    assert(options->sample_rate == 48000u && options->channel_count == 1u);
+    assert((options->sample_rate == 48000u || options->sample_rate == 11025u) &&
+        options->channel_count == 1u);
+    assert(!audio_probe_platform.live);
+    audio_probe_rate = options->sample_rate;
     audio_probe_platform.live = LIB_TRUE;
     audio_probe_platform.submitted = 0u;
     *out_platform = &audio_probe_platform;
@@ -105,6 +111,13 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
     }
     if (non_silent != LIB_FALSE && phase == 5)
         (void)InterlockedAdd(&audio_probe_program_fast_frames, (LONG)frame_count);
+    if (phase == 6) {
+        LONG offset = InterlockedCompareExchange(&audio_probe_sb_frames, 0, 0);
+        assert(audio_probe_rate == 11025u && offset + frame_count <= 64u);
+        for (index = 0u; index != frame_count; ++index)
+            assert(samples[index] == ((lib_i32)(offset + index) * 4 - 128) * 256);
+        (void)InterlockedAdd(&audio_probe_sb_frames, (LONG)frame_count);
+    }
     *accepted = frame_count;
     platform->submitted += frame_count;
     return LIB_STATUS_OK;
@@ -148,11 +161,9 @@ lib_status audio_pcm_stream_platform_wait_progress(audio_pcm_stream_platform *pl
 lib_status audio_pcm_stream_platform_set_gain(audio_pcm_stream_platform *platform,
     const lib_u16 *gains, lib_u32 channel_count)
 {
-    (void)platform;
-    (void)gains;
-    (void)channel_count;
-    assert(0); /* Speaker output does not request native gain. */
-    return LIB_STATUS_INVALID_STATE;
+    assert(platform == &audio_probe_platform && audio_probe_rate == 11025u);
+    assert(gains != NULL && channel_count == 1u);
+    return LIB_STATUS_OK;
 }
 
 lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platform)
@@ -178,6 +189,34 @@ static void audio_probe_run_audio_com(void)
     outb(TIMER2_REG, 0x98u);
     outb(TIMER2_REG, 0x0au);
     outb(PPI_GENERAL, 0x03u);
+}
+
+static void audio_probe_sb_blocks(softpc_machine *machine)
+{
+    unsigned iteration, i;
+    /* Real ports -> DSP -> Compat -> Lib worker, without an explicit flush or
+       a later producer burst to make the first short block reach the host. */
+    for (iteration = 0; iteration != 2; ++iteration) {
+        lib_u64 deadline;
+        assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+        for (i = 0; i != 64; ++i) {
+            lib_u8 value = (lib_u8)(i * 4);
+            assert(softpc_machine_write_physical(machine, 0x21000 + i,
+                &value, 1) == SOFTPC_MACHINE_OK);
+        }
+        InterlockedExchange(&audio_probe_sb_frames, 0);
+        InterlockedExchange(&audio_probe_phase, 6);
+        outb(0x0c, 0); outb(2, 0); outb(2, 0x10);
+        outb(3, 63); outb(3, 0); outb(0x83, 2);
+        outb(0x0b, 0x49); outb(0x0a, 1);
+        outb(0x22c, 0x14); outb(0x22c, 63); outb(0x22c, 0);
+        deadline = softpc_test_clock_milliseconds() + 2000u;
+        while (InterlockedCompareExchange(&audio_probe_sb_frames, 0, 0) < 64 &&
+            softpc_test_clock_milliseconds() < deadline)
+            softpc_test_sleep_milliseconds(1u);
+        assert(InterlockedCompareExchange(&audio_probe_sb_frames, 0, 0) == 64);
+        dispatch_q_event();
+    }
 }
 
 /* This is AUDIO.COM's tone setup: program Timer 2 to 439Hz, enable the PPI
@@ -326,8 +365,11 @@ int main(void)
     assert(BeepLastFreq == 0u);
     assert(BeepLastDuration == 0u);
 
-    softpc_machine_destroy(machine);
     assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
+#ifdef _WIN32
+    audio_probe_sb_blocks(machine);
+#endif
+    assert(softpc_machine_destroy(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_test_remove_image(path));
     return 0;
 }

@@ -5,6 +5,7 @@
 #include "machine/snapshot.h"
 #include "compat/ccpu/lifecycle.h"
 #include "compat/audio.h"
+#include "compat/platform.h"
 #include "lib/types/atomic.h"
 
 #include <windows.h>
@@ -101,7 +102,8 @@ lib_status vm_create(const vm_options *options, vm_driver **out_driver)
     if (status == LIB_STATUS_OK) return status;
     if (softpc_platform_audio_shutdown() != LIB_STATUS_OK)
         return LIB_STATUS_IO_ERROR;
-    softpc_machine_destroy(machine);
+    if (softpc_machine_destroy(machine) != SOFTPC_MACHINE_OK)
+        return LIB_STATUS_IO_ERROR;
 failed:
     lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
     return status;
@@ -113,7 +115,8 @@ lib_status vm_destroy(vm_driver *driver)
     if (driver == NULL) return LIB_STATUS_OK;
     status = softpc_platform_audio_shutdown();
     if (status != LIB_STATUS_OK) return status;
-    softpc_machine_destroy(driver->machine);
+    if (softpc_machine_destroy(driver->machine) != SOFTPC_MACHINE_OK)
+        return LIB_STATUS_IO_ERROR;
     vm_driver_destroy(driver);
     lib_atomic_flag_clear_explicit(&vm_owned, LIB_MEMORY_ORDER_RELEASE);
     return LIB_STATUS_OK;
@@ -210,7 +213,8 @@ static lib_bool vm_driver_run(void *opaque)
         result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
     /* finish retains READY only when clock restart fails. Do not resume CCPU
        after that terminal capture failure. */
-    result = result && driver->capture.phase != SOFTPC_SNAPSHOT_READY;
+    result = result && driver->capture.phase != SOFTPC_SNAPSHOT_READY &&
+        softpc_platform_executor_ready();
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     softpc_debug_bind(NULL);
     return result;

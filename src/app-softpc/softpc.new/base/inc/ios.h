@@ -369,6 +369,7 @@
 #define VGA_DAC_DATA_PORT       35
 #endif
 
+#define SNDBLST_ADAPTER         36
 
 #ifdef GISP_SVGA
 #define GISP_VGA_FUDGE_ADAPTER          36

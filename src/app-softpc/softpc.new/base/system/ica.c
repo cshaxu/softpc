@@ -161,6 +161,7 @@ LOCAL char SccsID[]="@(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd.";
 #include "yoda.h"
 #include "debug.h"
 #include "compat/devices/snapshot.h"
+#include "compat/eoi.h" /* Host EOI contract without NTVDM platform declarations. */
 
 #ifdef NOVELL
 extern void host_sigio_event IPT0();
@@ -399,7 +400,8 @@ ica_scan_irr IFN1(IU32, adapter)
     IUM8 iret_hook_mask;
 
     /* if iret hooks are not being used, iretHookActive will always be 0 */
-    iret_hook_mask = (IU8)(iretHookActive >> (adapter << 3));
+    /* Retain both original IRET protection and XP host delayed delivery. */
+    iret_hook_mask = (IU8)((iretHookActive | DelayIrqLine) >> (adapter << 3));
 
     /*
      * A bit can only cause an int if it is set in the IRR

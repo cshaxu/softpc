@@ -120,7 +120,8 @@ int softpc_machine_presentation_fonts(const softpc_machine *machine,
     lib_u8 primary[256u * 32u], lib_u8 secondary[256u * 32u],
     lib_u32 *height_out, lib_u32 *attribute_select_out);
 
-void softpc_machine_destroy(softpc_machine *machine);
+/* Failure retains the machine and resources still owned by its host output. */
+softpc_machine_result softpc_machine_destroy(softpc_machine *machine);
 
 const char *softpc_machine_result_name(softpc_machine_result result);
 

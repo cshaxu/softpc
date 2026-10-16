@@ -46,6 +46,7 @@
 #include CpuH
 #include "trace.h"
 #include "dma.h"
+#include "sndblst.h"
 #include "debug.h"
 #include "compat/devices/snapshot.h"
 
@@ -174,6 +175,9 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
         case    DMA_CH1_ADDRESS:
         case    DMA_CH2_ADDRESS:
         case    DMA_CH3_ADDRESS:
+                /* XP sound query: compare the decoded channel, once per word. */
+                if (!dcp->first_last && (port-DMA_CH0_ADDRESS)/2 == SbDmaChannel)
+                        SbGetDMAPosition();
                 *value = dcp->current_address[(port-DMA_CH0_ADDRESS)/2][dcp->first_last];
                 dcp->first_last ^= 1;
                 break;
@@ -192,6 +196,9 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
         case    DMA_CH1_COUNT:
         case    DMA_CH2_COUNT:
         case    DMA_CH3_COUNT:
+                /* High-byte reads retain the same sampled DMA position. */
+                if (!dcp->first_last && (port-DMA_CH0_COUNT)/2 == SbDmaChannel)
+                        SbGetDMAPosition();
                 *value = dcp->current_count[(port-DMA_CH0_COUNT)/2][dcp->first_last];
                 dcp->first_last ^= 1;
                 break;
@@ -744,6 +751,12 @@ GLOBAL  void dma_enquire        IFN3(half_word, channel,
  * Internal functions
  * ============================================================================
  */
+
+/* T93: retain XP's controller accessor for the original DSP, without NTVDM. */
+DMA_ADAPT *dmaGetAdaptor(void)
+{
+  return &adaptor;
+}
 
 LOCAL void do_transfer  IFN6(int, type, int, decrement,
         sys_addr, dma_addr, char *, hw_buffer, unsigned long, length,
