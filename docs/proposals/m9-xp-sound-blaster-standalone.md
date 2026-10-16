@@ -1989,8 +1989,11 @@ admission. This subsequent P records that review only.
 
 ### S8 — XP MIDI/FM device attachment
 
-Planned after S7; the owner withdrew its automatic admission and reopened S7
-for the upstream audit above. No S8 production change has been made.
+The owner accepts S7 and explicitly admits S8 on 2026-10-16:
+"验收通过，准入s8". This supersedes the prior withdrawal of automatic S8
+admission during the shared import. Baseline is e1e44d0c. No S8 production
+change has yet been made; the initial checkpoint rechecks source ranges,
+dispatch and lifecycle against that accepted baseline.
 
 Import necessary nt_sbmid.c and nt_sbfm.c subsets, using Lib MIDI and the
 explicit no-host FM policy. Keep one guest parser and fix tail/pointer bounds.
@@ -2006,6 +2009,25 @@ selected XP fallback status, reset and no false host-output success.
 Host MIDI may sound; FM on this host need not. No synthesis dependency.
 Unexpected native errors are diagnosed once; missing optional capability
 does not create a retry loop or a second fallback engine.
+
+Initial receiving-path check confirms SbInitialize currently registers only
+DSP/Mixer ports; its existing I/O tables remain the sole binding authority.
+ResetAll currently resets Mixer and DSP. MixerGetMidiGain already provides
+decoded gain, but has no MIDI host receiver. Lib MIDI already exposes complete
+short/SysEx submission, event-driven capacity wait, cancellation, reset,
+optional volume and destruction; Lib FM explicitly reports unsupported native
+acquisition. These are implementation inputs, not evidence that guest MIDI/FM
+is already attached. The implementation must extend these existing paths,
+not introduce another registry, parser, synthesizer or device executor.
+
+Finite S8 coverage units: (1) retained source and exclusions; (2) MPU/FM I/O
+registration and conflicts; (3) complete/partial/running-status/realtime MIDI
+parsing; (4) bounded SysEx and tail delivery under backpressure; (5) host
+admission, terminal errors and volume; (6) pause/resume/reset/stop/destruction;
+(7) selected XP no-host FM index/status semantics; (8) receiving dual-width
+qualification and unchanged speaker/DSP behavior. Each needs a source owner
+and focused regression before S8 can close. Portable active-device archives
+remain S9, not an inferred S8 completion claim.
 
 ### S9 — portable archive and final qualification
 

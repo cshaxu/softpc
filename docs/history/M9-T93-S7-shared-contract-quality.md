@@ -1,5 +1,20 @@
 # M9 T93 S7 — Shared contract and quality repair
 
+## Owner acceptance of the reopened import
+
+On 2026-10-16 the owner states: "验收通过，准入s8". This accepts executor
+7bb98d79 and actual-change review e1e44d0c. The same-S import continuation is
+closed, and S8 is explicitly admitted in CURRENT; T93 remains open. This
+supersedes the earlier withdrawal of automatic S8 progression during review.
+
+The accepted delivery imports NXVM e86eb135's eight shared directories and
+adapts seven App files; public production is identical, with only the retained
+Monitor capacity matrix and its manifest differing. Production C/H +217/-223
+(net -6); tests +300/-69 (net +231). Both widths passed 161/161 including all
+ten native desktop tests. Both EXEs are published, and the source mirror,
+Compat, INI and guest assets were unchanged. The full accounting, hashes and
+initial stale-object failure are retained in the proposal's import ledger.
+
 ## Request and boundary
 
 The owner prioritizes the supplied shared-quality findings immediately after
