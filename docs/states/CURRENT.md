@@ -5,8 +5,8 @@
 No implementation subtask is active.
 Open task awaiting owner: T93.
 
-The owner-reopened S11 test-ownership correction is implemented and focused
-verified, pending executor push and actual-change review. Base owns validator
+The owner-reopened S11 test-ownership correction is closed after executor
+b9b654ac and separate actual-change review. Base owns validator
 assertions; Storage retains public API rejection coverage. Both architectures
 pass 5/5 targeted tests/gates. Production and EXEs are unchanged; no full run
 or EXE refresh was requested. S12 is not admitted.

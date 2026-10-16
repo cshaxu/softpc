@@ -34,6 +34,15 @@ same-S reopening is retained as a bounded correction record; after execution
 the idle state removes that active packet without changing the gate or claiming
 S12 admission. The final documentation gate must pass before commit.
 
+Executor b9b654ac is pushed. Coordinator reviewed the actual six-path commit:
+two test bodies, registration, manifest and two governance records. All former
+direct validator assertions are preserved in Base; every Storage public API
+assertion remains. Both JUnit inventories contain five passing cases and no
+skips. The final documentation and whitespace checks pass; the initial gate
+failure remains recorded, not counted as success. No src/assets diff exists.
+This bounded correction closes S11 under the owner's reopening request;
+T93 stays open and S12 remains unadmitted.
+
 ## Admission and closure
 
 Original owner request: "验收通过，准入执行S11到收口". This accepts S10
