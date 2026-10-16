@@ -7,7 +7,7 @@ Subsequent implementation objective: “按照治理规范和执行规范，单�
 实现现有softpc核心迁移到winxp源码的基线上。”
 
 CURRENT owns the active packet. The
-[proposal](../proposals/m9-xp-sp1-softpc-mirror-rebase.md) owns the detailed
+[proposal](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md) owns the detailed
 scope, finite source ledger, owner-approved two-task split and acceptance plan.
 Sound capability transfers to its Queue-linked independent proposal; it is
 neither implemented nor claimed by T92.

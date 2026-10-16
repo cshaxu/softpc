@@ -48,4 +48,4 @@ S3 is implementation-closed under delegated async authority, not marked as
 manually accepted by the owner. T92 stays open. S4 is serially admitted for
 the input/reset/IRQ/ROM/timing subset. Scope, source selection, failed attempts,
 test timings and per-path evidence remain in the
-[migration proposal](../proposals/m9-xp-sp1-softpc-mirror-rebase.md).
+[migration proposal](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md).

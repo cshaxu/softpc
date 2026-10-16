@@ -4,7 +4,7 @@
 
 On 2026-10-15 the owner requests two tasks instead of coupling baseline
 migration and new sound capability. This is the ordered follow-on candidate
-to [T92 core migration](m9-xp-sp1-softpc-mirror-rebase.md); CURRENT and Queue
+to [T92 core migration](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md); CURRENT and Queue
 own status. No T number or implementation S is allocated before admission.
 The complete former T92 S5 obligation transfers here, not to TODO or deletion.
 

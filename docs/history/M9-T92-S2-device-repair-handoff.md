@@ -1,6 +1,6 @@
 # M9 T92 S2: Device Repair Handoff
 
-The [proposal](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s2-implementation-and-qualification-2026-10-15)
+The [proposal](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md#s2-implementation-and-qualification-2026-10-15)
 retains the four original repair requirements, implementation, counts, failures,
 test evidence and coordinator actual-change review. Executor e884ff9b and
 review cc8509f1 are pushed. Each width passed 146/146 tests including five

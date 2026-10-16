@@ -1,7 +1,8 @@
 # M9 T92: XP Core Migration Completion Audit
 
-Status: S6 qualification passes; executor delivery/review is pending. This is the requirement ledger,
-not a claim that T92 is closed. Formal T closure waits for the owner.
+Status: S1-S6 implementation and verification are complete; S6 executor
+`48caa854` is pushed and its separate actual-change review passes. T92 is ready
+for owner acceptance, not formally closed. Formal T closure waits for the owner.
 
 ## Original request and scope
 
@@ -31,9 +32,9 @@ only T closure waits for owner confirmation. Sound Blaster is a separate task.
 | Snapshot and established behavior | S3-S5 and S6 each pass all registered snapshot, media, mode/dirty, input, runtime and package regressions on both widths. No schema change or new manual Windows-session claim. |
 | Local-only routine mirror gate | Root CMake gate validates current body identity and exact path coverage without external checkout; positive and negative checks pass. It does not pretend to reconstruct unavailable upstream bodies during ordinary builds. |
 | OpenNT retained only as lineage | Original audit/history retained. Current Architecture/Coding points to fixed XP; old divergence/upgrade ledgers explicitly identify their historical status. |
-| Protected assets and packages | No public-package source/test, user INI, guest medium or snapshot changes. Only approved package EXEs are refreshed; final hashes below. Executor commit/review pending. |
-| Full verification and delivery | S2 146/146 per width; S3-S5 148/148 per width; S6 150/150 per width, all including five desktop cases. S6 push/review pending. |
-| Single-agent dual-role governance | Every prior S has pushed executor delivery then separate actual-change review. S6 executor push and coordinator review pending. T closure is not delegated. |
+| Protected assets and packages | No public-package source/test, user INI, guest medium or snapshot changes. Only approved package EXEs are refreshed; final hashes below. Actual commit/protected-path review passes. |
+| Full verification and delivery | S2 146/146 per width; S3-S5 148/148 per width; S6 150/150 per width, all including five desktop cases. S6 executor is pushed and reviewed. |
+| Single-agent dual-role governance | Every S has pushed executor delivery then separate actual-change review. S6 review is recorded separately. T closure is not delegated. |
 
 ## Changed-path accounting
 
@@ -82,9 +83,10 @@ preserved in the proposal rather than erased by green final tests.
 
 ## References
 
-- [Migration proposal and detailed qualification](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+- [Migration proposal and detailed qualification](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)
 - [Current mirror identity manifest](../etc/evidence/softpc/xp-sp1-current-manifest.tsv)
 - [S2 device repair](M9-T92-S2-device-repair-handoff.md)
 - [S3 controller/BIOS subset](M9-T92-S3-controller-bios-subset.md)
 - [S4 input/timing subset](M9-T92-S4-input-timing-subset.md)
 - [S5 video subset](M9-T92-S5-video-subset.md)
+- [S6 final baseline qualification and review](M9-T92-S6-xp-baseline-qualification.md)

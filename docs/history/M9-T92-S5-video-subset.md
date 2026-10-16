@@ -16,7 +16,7 @@ The pinned XP subset excludes 12,095 lines; current-to-subset patches are
 +22,908/-23,257, including historical C-VID ABI patches, not just this delivery.
 All 71 fixed upstream bodies, disjoint ranges and subset hashes independently
 reconstruct; both existing video snapshot callbacks remain unchanged modulo
-whitespace. The linked [proposal](../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+whitespace. The linked [proposal](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)
 retains the complete range/count ledger and semantic dispositions.
 
 Both Release builds and 148/148 tests per architecture pass: 90 shared, 53

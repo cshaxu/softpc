@@ -39,7 +39,7 @@ remain in the local-patch comparison instead of being excluded wholesale.
 
 No new blocking finding remains. Initial fixture/merge mistakes, retained XP
 whitespace warnings and the limits of source versus runtime evidence remain
-explicit in the [proposal](../proposals/m9-xp-sp1-softpc-mirror-rebase.md).
+explicit in the [proposal](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md).
 S4 closes under delegated async authority, without inventing manual owner
 testing. T92 remains open; S5 is admitted for the video subset and preservation
 of accepted C-VID changes.

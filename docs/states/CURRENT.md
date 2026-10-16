@@ -2,6 +2,17 @@
 
 ## Current Work
 
+T92 S1-S6 are implementation-closed under the owner's async delegation.
+Open task awaiting owner: T92.
+No implementation subtask is active. T92 remains open awaiting owner acceptance
+and formal closure; no next T is admitted. Final S6 executor `48caa854` is
+pushed and its separate actual-change review passes. Both Release packages and
+150/150 tests per width pass, including all ten reserved desktop cases.
+See the [T-level audit](../history/M9-T92-completion-audit.md) and
+[S6 review](../history/M9-T92-S6-xp-baseline-qualification.md).
+
+The following retained progression records how this baseline was reached:
+
 T91 and S5 are owner-accepted and closed on 2026-10-15.
 T92 S1 source audit is the reviewed planning baseline. The owner's subsequent
 implementation goal admits S2's bounded original-device repair work.
@@ -36,13 +47,13 @@ including all ten reserved native desktop tests. The 71-path subset/range ledger
 pass independent pinned-object reconstruction; both package EXEs are refreshed
 and hashed. Executor commit/push and separate actual-change review
 are complete: executor 41aa0bc2 is pushed and coordinator actual-change review
-passes. S5 is implementation-closed under delegated async acceptance; S6 is
-now active for the final XP manifest/gate and T-level qualification.
+passes. S5 is implementation-closed under delegated async acceptance; S6 was
+then admitted for the final XP manifest/gate and T-level qualification.
 S6's initial 498-path manifest reconstruction and the new local-only mirror
 gate/selftest pass. All 997 XP paths reconcile without overlap or omission;
 the active-baseline/lineage documentation is reconciled. Full qualification
 passes all 150 registered tests per width, including all ten native desktop
-cases. S6 executor delivery and separate T-level review remain pending.
+cases. S6 executor delivery and separate T-level review are complete.
 This is not an invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
@@ -55,7 +66,8 @@ background + 5 desktop tests (146/146), with both EXEs refreshed; final
 focused/gate rechecks pass 7/7 each. On 2026-10-15 the owner authorizes async
 acceptance and automatic serial admission through S6, waiting only before
 T92 closure. S2 is implementation-closed on that delegated basis, not marked
-as manually tested by the owner. S3-S5 are closed; S6 is the active successor.
+as manually tested by the owner. S3-S6 are implementation-closed; T closure
+waits for the owner.
 Owner explicitly approves XP source import on 2026-10-15. The pinned source,
 original notices and local-patch ledger govern S3; no third-party license or
 redistribution grant is inferred. S2 repaired existing code without XP bodies.
@@ -64,7 +76,7 @@ Executor audit `2616deb8` is pushed; its coordinator actual-change review is
 recorded in the linked proposal. Proceeding to S2 does not claim runtime
 qualification of the source audit or close T92.
 
-## M9 T92 S6 Packet
+## M9 T92 S6 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |
@@ -73,7 +85,7 @@ qualification of the source audit or close T92.
 | Objective | Make the pinned XP necessary subset the auditable routine mirror baseline; qualify all retained paths and the complete migrated product. |
 | Non-goals | No new device, sound capability, production rewrite, public-package change, user configuration/media change, or external build dependency. |
 | Reference Baseline | Reviewed S5 executor 41aa0bc2; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and OpenNT pins in the proposal. |
-| Candidate Proposal | [S6 baseline gate](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s6--xp-baseline-gate-and-opennt-lineage-freeze). |
+| Candidate Proposal | [S6 baseline gate](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md#s6--xp-baseline-gate-and-opennt-lineage-freeze). |
 | Files And ABI Surface | All 498 retained and 499 unretained paths for accounting; existing S3-S5 range ledgers; repository-owned verification/test registration and architecture/provenance docs. No production ABI change. |
 | Applicable Rules | Task Reading Set; execution, coding, architecture and documentation governance; source-research and necessary-subset policy. |
 | Verification | Independent fixed-object reconstruction; complete manifest and negative gate tests; protected-path/diff audit; dual Release artifacts, all shared/other/desktop tests and requirement-by-requirement T audit. |
@@ -94,7 +106,7 @@ qualification of the source audit or close T92.
 | Objective | Migrate the necessary XP video subset across 31 changed candidates and preserve accepted patches across 40 unchanged-base C-VID paths. |
 | Non-goals | No Sound Blaster, new presenter or mode, public-package change, user INI/media/snapshot change, or generated production sources. |
 | Reference Baseline | S4 executor 5c5af37a; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and OpenNT pins in the proposal. |
-| Candidate Proposal | [S5 video migration](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s5--xp-first-c-vid-and-video-basis). |
+| Candidate Proposal | [S5 video migration](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md#s5--xp-first-c-vid-and-video-basis). |
 | Files And ABI Surface | 71 original-batch-S4 paths in the retained-path ledger, with 31 possible XP payload changes and 40 C-VID preservation checks; owner-local tests as justified. No public ABI expansion. |
 | Applicable Rules | Task Reading Set, execution/documentation/architecture/coding governance, source-research policy and necessary-source-subset policy. |
 | Verification | Fixed-object three-way/range accounting; local video/marker/snapshot preservation; focused mode/cursor/stride/geometry matrices; dual Release builds and packages; all shared, other background and reserved desktop tests. |
@@ -115,7 +127,7 @@ qualification of the source audit or close T92.
 | Objective | Audit and migrate the necessary XP input/reset/IRQ/ROM/timing subset in the 18 S4 candidates; preserve accepted local input, snapshot and timing behavior. Prove usefulness before retaining XP branches or deleting existing unused conditionals. |
 | Non-goals | No Sound Blaster integration, S5 video migration, public-package change, user INI/media/snapshot edit or second device path. |
 | Reference Baseline | S3 P2 3cf6906a; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and OpenNT revisions in the proposal. |
-| Candidate Proposal | [S4 migration scope](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s4--xp-first-input-reset-irq-rom-and-timing-basis). |
+| Candidate Proposal | [S4 migration scope](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md#s4--xp-first-input-reset-irq-rom-and-timing-basis). |
 | Files And ABI Surface | 18 paths listed in the S4 admission brief; owner-local tests and root registration as needed. No public ABI expansion. Audit first; quantified payload brief precedes source edits. |
 | Applicable Rules | Task Reading Set, execution/documentation/architecture/coding governance, source-research policy and minimal explicit mirror patches. |
 | Verification | Independent XP/local range ledgers; scan-set translation/type/reset and mouse/IRQ/timing/ROM tests; dual Release builds and refreshed EXEs, shared then all other background tests and reserved desktop cases. |
@@ -136,7 +148,7 @@ qualification of the source audit or close T92.
 | Objective | Correct DMA auto-init address reload, INT 13h AH=15h sector-count splitting and V7 cursor enable comparison; protect correct ROM CS from later XP narrowing. |
 | Non-goals | No bulk XP payload import, sound wiring, shared-package changes, new device path, user INI/media/snapshot edit or unrelated mirror formatting. |
 | Reference Baseline | f55428f8; retained XP/OpenNT pins and audit ledgers in the proposal. |
-| Candidate Proposal | [S2 repair brief](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s2--independent-original-device-repairs-and-rom-narrowing-regression). |
+| Candidate Proposal | [S2 repair brief](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md#s2--independent-original-device-repairs-and-rom-narrowing-regression). |
 | Files And ABI Surface | Three original files at_dma.c, diskbios.c, v7_ports.c; ROM production unchanged; App owner-local device tests and root build registration. No public ABI change. |
 | Applicable Rules | Full Task Reading Set; execution/documentation/architecture/coding governance, source-research policy, single executor and minimal mirror diff. |
 | Verification | Red/green tests through actual DMA, BIOS command, V7 port and ROM initialization paths; both Release builds and refreshed EXEs; shared suites then all other unit/integration tests; reserved native desktop tests separately. |
@@ -157,7 +169,7 @@ qualification of the source audit or close T92.
 | Objective | Establish the immutable XP/OpenNT/current three-way migration ledger and executable import batches for the selected IBM PC/AT/V7 profile. |
 | Non-goals | No source import, runtime edits, public package changes, EXE refresh, media/configuration changes or external repository writes in S1. |
 | Reference Baseline | SoftPC 087e512fc4bb02225d3d8cb519a12ef87aa489ac; XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89; OpenNT 5e4619ab61c2aa76151e03973cce340be2933e61. |
-| Candidate Proposal | [XP SP1 selected mirror upgrade](../proposals/m9-xp-sp1-softpc-mirror-rebase.md). |
+| Candidate Proposal | [XP SP1 selected mirror upgrade](../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md). |
 | Files And ABI Surface | Audit all 498 retained mirror paths and relevant XP-only candidates; enumerate Compat/port ABI consequences without modifying interfaces. |
 | Applicable Rules | Task Reading Set, execution/documentation governance, architecture/coding rules and source-research-policy; source admission precedes any later copy. |
 | Verification | Reproducible immutable-object inventory, three-way diff classification, selected-profile branch review, source/notice provenance and documentation/whitespace gates. No runtime qualification claimed. |

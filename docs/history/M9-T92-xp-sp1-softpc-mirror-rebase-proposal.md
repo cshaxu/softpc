@@ -1104,8 +1104,10 @@ the user's INI policy are unchanged. Full S6 qualification now passes all
 150 registered tests per width (the prior 148 plus two mirror checks), including
 all ten reserved desktop cases. Both Release package builds succeed using the
 existing Ninja intermediates. See the [completion audit](../history/M9-T92-completion-audit.md)
-for exact phase times and artifact hashes. S6 executor push and separate
-coordinator actual-change review remain required; T closure waits for the owner.
+for exact phase times and artifact hashes. Executor `48caa854` is pushed;
+the separate [coordinator actual-change review](../history/M9-T92-S6-xp-baseline-qualification.md)
+passes. S6 is implementation-closed under delegated async acceptance. The
+T-level requirement audit is complete; T closure still waits for the owner.
 
 ## S1 File-Scope And Diff Accounting Checkpoint
 

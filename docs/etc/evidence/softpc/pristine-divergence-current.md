@@ -3,7 +3,7 @@
 T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与修复沿革，
 不再充当当前镜像验收基准。当前基准为固定 XP SP1 的必要源码子集；见
 [当前身份清单](xp-sp1-current-manifest.tsv) 与
-[T92 子集及本地补丁记录](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md)。
+[T92 子集及本地补丁记录](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)。
 以下历史数字和语义说明不回写成新的 XP 统计。
 
 ### T92 S2 原始设备最小修复
@@ -19,7 +19,7 @@ rom.c 不改；新增生成 ROM 的完整 CS 防回归测试。
 整文件差异，不能理解为本次引入量或已完成 XP 迁移。
 计数使用同相对路径的 git diff --no-index --numstat；XP 三文件对象哈希
 已与 a2f6d7c93 固定对象核对一致。源码、测试及最终资格见
-[T92 proposal](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s2-implementation-and-qualification-2026-10-15)。
+[T92 proposal](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md#s2-implementation-and-qualification-2026-10-15)。
 
 ### T88 S2 V7 扫描解释最小修复
 

@@ -12,7 +12,7 @@ Compat 接线仍须进入子集差异账目，不能通过排除基准隐藏。�
 转入独立队首 proposal。新增 T92 S2 单独处理 DMA、硬盘容量、V7，
 并增加 ROM CS 防回归。尤其 read_dasd 的原 /256、%256 拆分也需修复，
 不能仅拒绝 XP 的 UCHAR 转换。此为补充修复要求，尚非实施或动态验证。
-当前计划见 [核心 proposal](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md)
+当前计划见 [核心 proposal](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)
 及 [声音 proposal](../../../proposals/m9-xp-sound-blaster-standalone.md)。
 
 ## T92 S1 源差异审计与迁移建议（2026-10-15）

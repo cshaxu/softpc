@@ -4,7 +4,7 @@
 
 This is the earlier research ledger, retained as lineage rather than current
 implementation instructions. Its old file names, batch order and whole-file
-assumptions are superseded by the [T92 proposal](../../../proposals/m9-xp-sp1-softpc-mirror-rebase.md).
+assumptions are superseded by the [T92 proposal](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md).
 The [current manifest](xp-sp1-current-manifest.tsv) records the pinned XP raw
 objects, necessary subsets and local bodies. The retained/unretained path
 ledgers and S3-S5 range ledgers account for selected and excluded material.
