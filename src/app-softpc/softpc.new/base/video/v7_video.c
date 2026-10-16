@@ -44,7 +44,6 @@
 #include CpuH
 #include "sas.h"
 
-
 #ifdef SEGMENTATION
 /*
  * The following #include specifies the code segment into which this

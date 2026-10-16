@@ -30,7 +30,7 @@ PURPOSE			: Keep the host screen up to date.
 -------------------------------------------------------------------------
 [1.2 DATATYPES FOR [1.1] (if not basic C types)]
 
-	STRUCTURES/TYPEDEFS/ENUMS: 
+	STRUCTURES/TYPEDEFS/ENUMS:
 
 -------------------------------------------------------------------------
 [1.3 INTERMODULE IMPORTS]
@@ -49,10 +49,10 @@ GLOBALS		  :	describe what exported data objects are
 			update_alg - pointers to update functions contained
 			here or elsewhere - eg. host specific update stuff.
 
-			text_update() - routine to do a text update, by comparing 
+			text_update() - routine to do a text update, by comparing
 			the adaptor regen area with video_copy.
 
-			cga_graph_update() - routine to do a graphics update, by comparing 
+			cga_graph_update() - routine to do a graphics update, by comparing
 			the adaptor regen area with video_copy.
 
 			text_scroll_up/down() - scroll portion of the screen in text mode.
@@ -61,7 +61,7 @@ GLOBALS		  :	describe what exported data objects are
 [3.INTERMODULE INTERFACE DECLARATIONS]
 =========================================================================
 
-[3.1 INTERMODULE IMPORTS]						*/ 
+[3.1 INTERMODULE IMPORTS]						*/
 
 #include "insignia.h"
 #include "host_def.h"
@@ -97,7 +97,7 @@ GLOBALS		  :	describe what exported data objects are
 #include "ga_mark.h"
 #include "ga_defs.h"
 
-/*[3.2 INTERMODULE EXPORTS]						*/ 
+/*[3.2 INTERMODULE EXPORTS]						*/
 
 /*
  * Terminal type.  This is initialised to a set default which is determined
@@ -107,7 +107,7 @@ GLOBALS		  :	describe what exported data objects are
 int terminal_type = TERMINAL_TYPE_DEFAULT;
 
 /*
-5.MODULE INTERNALS   :   (not visible externally, global internally)]     
+5.MODULE INTERNALS   :   (not visible externally, global internally)]
 
 [5.1 LOCAL DECLARATIONS]						*/
 
@@ -213,10 +213,6 @@ GLOBAL LONG dirty_curs_y;
 	LOCAL boolean simple_update IPT0();
 	boolean	dummy_scroll IPT6(int,dummy1,int,dummy2,int,dummy3,
 			int,dummy4,int,dummy5,int,dummy6);
-#if defined(NTVDM) && defined(MONITOR)
-	boolean mon_text_scroll_up IPT6(sys_addr, start, int, width, int, height, int, attr, int, lines, int, colour);
-	boolean mon_text_scroll_down IPT6(sys_addr, start, int, width, int, height, int, attr, int, lines, int, colour);
-#endif /* NTVDM & MONITOR */
 
 	LOCAL VOID save_gfx_update_routines IPT0();
 	LOCAL VOID inhibit_gfx_update_routines IPT0();
@@ -310,7 +306,7 @@ static	int	search_video_copy IFN4(int, start_line,
 #ifdef VGG
 
 /*
- *	Special version of search_video_copy() for the Video 7 Extended Modes 60h & 61h 
+ *	Special version of search_video_copy() for the Video 7 Extended Modes 60h & 61h
  *	and 'undocumented' VGA mode which have chars_per_line of 90 & 94 which don't seem
  *  to be multiples of 4.  Interestingly, Zany Golf ( EGA, Mode 14 ) also ends up
  *  calling this code.
@@ -506,7 +502,7 @@ static	int	ega_text_find_dirty_lines IFN5(byte *, vcopy, byte *, planes,
 	int, start_line, int, end_line, int, screen_start)
 {
 	register	int	i,j,k;
-	register	unsigned short	shorts_per_line=get_chars_per_line();
+	register	unsigned short	shorts_per_line=(unsigned short)get_chars_per_line();
 	register	int	offset,cur_y;
 	register	int	char_height=get_host_char_height();
 	register	int	opl=get_offset_per_line();
@@ -609,7 +605,7 @@ LOCAL	boolean simple_update IFN0()
 	return( FALSE );
 }
 
-LOCAL VOID simple_update_b_move IFN4(UTINY *, laddr, UTINY *, haddr, 
+LOCAL VOID simple_update_b_move IFN4(UTINY *, laddr, UTINY *, haddr,
 				UTINY *, src, UTINY, src_type)
 {
 	UNUSED(laddr);
@@ -1124,7 +1120,7 @@ void ega_text_update IFN0()
 		to = (USHORT *)&video_copy[screen_start>>1];
 		from = (USHORT *) get_screen_ptr(screen_start);
 
-		for(i=get_screen_length()>>1;i>0;i--) 
+		for(i=get_screen_length()>>1;i>0;i--)
 		{
 			*to++ = *from;	/* char and attribute bytes */
 			from += 2;		/* planes 2,3 interleaved */
@@ -1153,7 +1149,7 @@ void ega_text_update IFN0()
 
 	setVideodirty_total(0);
 
-	if (is_cursor_visible()) 
+	if (is_cursor_visible())
 	{
 		half_word attr;
 
@@ -1231,7 +1227,7 @@ void text_update IFN0()
 		     * The host y co-ords are doubled
 		     */
 
-		    /* one or more ints of data are now selected 
+		    /* one or more ints of data are now selected
 		       but refine difference to words (i.e. characters),
 		       to avoid a glitch on the screen when typing in to
  		       a dumb terminal  */
@@ -1399,7 +1395,7 @@ cga_graph_update_unchained IFN0()
 					{
 						*to++ = *from++;
 					}
- 
+
 					l = j - k - 1;
 					to += l;
 					from += l;
@@ -1410,7 +1406,7 @@ cga_graph_update_unchained IFN0()
 				to++;
 				from++;
 			}
-		} 
+		}
 	}
 
     host_end_update();
@@ -1470,8 +1466,8 @@ cga_graph_update_chain2 IFN0()
 		 * Start and end line represent the lines within the 8 K video
 		 * memory blocks, NOT the lines as they appear on screen.
 		 */
-		start_line = (getVideodirty_low() / SCAN_LINE_LENGTH);
-		end_line = (getVideodirty_high() / SCAN_LINE_LENGTH) + 1;
+		start_line = (short)(getVideodirty_low() / SCAN_LINE_LENGTH);
+		end_line = (short)((getVideodirty_high() / SCAN_LINE_LENGTH) + 1);
 
 		/* AJO 6/1/92
 		 * Can get start/end lines past end of screen since video bank
@@ -1573,7 +1569,7 @@ cga_graph_update_chain2 IFN0()
 					to++;
 					from += 2;
 				}
-			} 
+			}
 		}
 	}
 
@@ -1633,8 +1629,8 @@ cga_graph_update_chain4 IFN0()
 		 * start and end line represent the lines within the 8 K video
 		 * memory blocks, NOT the lines as they appear on screen.
 		 */
-		start_line = (getVideodirty_low() / SCAN_LINE_LENGTH);
-		end_line = (getVideodirty_high() / SCAN_LINE_LENGTH) + 1;
+		start_line = (short)(getVideodirty_low() / SCAN_LINE_LENGTH);
+		end_line = (short)((getVideodirty_high() / SCAN_LINE_LENGTH) + 1);
 	
 		/* AJO 6/1/92
 		 * Can get start/end lines past end of screen since video bank
@@ -1692,7 +1688,7 @@ cga_graph_update_chain4 IFN0()
 					to++;
 					from += 4;
 				}
-			} 
+			}
 			/* do odd  lines */
 	
 			from = (UTINY *) get_screen_ptr(((start_line * SCAN_LINE_LENGTH) + ODD_OFFSET)<<2);
@@ -1733,7 +1729,7 @@ cga_graph_update_chain4 IFN0()
 					to++;
 					from += 4;
 				}
-			} 
+			}
 		}
 	}
 
@@ -2356,8 +2352,8 @@ adjust_cursor IFN7(ULONG, dirn, ULONG, tlx, ULONG, tly, ULONG, width,
 	 * with spurious data.  JJS - 29/6/95.
 	 */
 	if (dirty_curs_offs != -1)
-		if(( dirty_curs_x >= tlx ) && ( dirty_curs_x < ( tlx + width )))
-			if(( dirty_curs_y >= tly ) && ( dirty_curs_y < ( tly + height )))
+		if(( dirty_curs_x >= (LONG)tlx ) && ( dirty_curs_x < (LONG)(( tlx + width ))))
+			if(( dirty_curs_y >= (LONG)tly ) && ( dirty_curs_y < (LONG)(( tly + height ))))
 			{
 				switch( dirn )
 				{
@@ -2394,10 +2390,8 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	if (video_adapter == MDA)
 	{	
@@ -2416,7 +2410,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 		colour = (attr & bg_col_mask) >> 4;
 	}
 /*
- * Reduce the width of the rectangle if any right hand area is completely 
+ * Reduce the width of the rectangle if any right hand area is completely
  * blank.
  *
  * Don't reduce the size of the scrolling region for a dumb terminal.
@@ -2428,14 +2422,14 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef DUMB_TERMINAL
         if (terminal_type != TERMINAL_TYPE_DUMB)
         {
-#endif /* DUMB_TERMINAL */            
+#endif /* DUMB_TERMINAL */
 
 		/* originally dummy was char [2] */
 		/* unfortunately doing (short) *dummy */
 		/* causes a bus error on M88K */
 		p = (unsigned char *) &dummy;
 		p [0] = ' ';
-		p [1] = attr;
+		p [1] = (unsigned char)attr;
 	    blank_word = dummy;
 
 	    words_per_line   = get_chars_per_line();
@@ -2462,7 +2456,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 	    width = (int)(top_right_ptr - top_left_ptr + 2) << 1;
 #ifdef DUMB_TERMINAL
 	}
-#endif /* DUMB_TERMINAL */            
+#endif /* DUMB_TERMINAL */
 
 	/* Do the host stuff */
 
@@ -2473,7 +2467,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 	htlx = tlx	* get_pix_char_width()/2;
 
 	tly = (int)(start_offset/get_bytes_per_line());
-	htly = tly * get_host_char_height(); 
+	htly = tly * get_host_char_height();
 
 	result = host_scroll_up(htlx,htly,htlx+width/4*get_pix_char_width()-1,
 				htly+height*get_host_char_height()-1, lines*get_host_char_height(),colour);
@@ -2493,7 +2487,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 		/* Can do the whole thing in one go */
 
 		memcpy(dest,src,(width>>1)*(height-lines));
-		fwd_word_fill( (' '<<8) | attr, dest+(width>>1)*(height-lines),(width>>1)*lines/2);
+		fwd_word_fill( (short)((' '<<8) | attr), dest+(width>>1)*(height-lines),(width>>1)*lines/2);
 	}
 	else
 	{
@@ -2509,7 +2503,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 
 		for(i=0;i<lines;i++)
 		{
-			fwd_word_fill( (' '<<8) | attr, dest,width>>2);
+			fwd_word_fill( (short)((' '<<8) | attr), dest,width>>2);
 			dest += bpl;
 		}
 	}
@@ -2578,10 +2572,8 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	if(video_adapter == MDA)
 	{	
@@ -2610,7 +2602,7 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 	htlx = tlx	* get_pix_char_width()/2;
 
 	tly = (int)(start_offset/get_bytes_per_line());
-	htly = tly * get_host_char_height(); 
+	htly = tly * get_host_char_height();
 
 	result = host_scroll_down(htlx,htly,htlx+width/4*get_pix_char_width()-1,
 			htly+height*get_host_char_height()-1, lines*get_host_char_height(),colour);
@@ -2628,7 +2620,7 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 		src = video_copy + start - gvi_pc_low_regen;
 		dest = src + lines * bpl;
 		memcpy(dest,src,(width>>1)*(height-lines));
-		fwd_word_fill( (' '<<8) | attr, src,(width>>1)*lines/2);
+		fwd_word_fill( (short)((' '<<8) | attr), src,(width>>1)*lines/2);
 	}
 	else
 	{
@@ -2646,7 +2638,7 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 
 		for(i=0;i<lines;i++)
 		{
-			fwd_word_fill( (' '<<8) | attr, dest,width>>2);
+			fwd_word_fill( (short)((' '<<8) | attr), dest,width>>2);
 			dest -= bpl;
 		}
 	}
@@ -2716,10 +2708,8 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 	register half_word *src,*dest;
 	boolean result;
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	UNUSED(dummy_arg);
 	
@@ -2740,7 +2730,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 		colour = (attr & bg_col_mask) >>4;
 	}
 /*
- * Reduce the width of the rectangle if any right hand area is completely 
+ * Reduce the width of the rectangle if any right hand area is completely
  * blank.
  *
  * Don't reduce the size of the scrolling region for a dumb terminal.
@@ -2752,14 +2742,14 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef DUMB_TERMINAL
         if (terminal_type != TERMINAL_TYPE_DUMB)
         {
-#endif /* DUMB_TERMINAL */            
+#endif /* DUMB_TERMINAL */
 
 		/* originally dummy was char [2] */
 		/* unfortunately doing (short) *dummy */
 		/* causes a bus error on M88K */
 		p = (unsigned char *) &dummy;
 		p [0] = ' ';
-		p [1] = attr;
+		p [1] = (unsigned char)attr;
 	    blank_word = dummy;
 
 	    words_per_line   = get_chars_per_line();
@@ -2786,12 +2776,12 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 	    width = (int)(top_right_ptr - top_left_ptr + 1) << 1;
 #ifdef DUMB_TERMINAL
 	}
-#endif /* DUMB_TERMINAL */            
+#endif /* DUMB_TERMINAL */
 
 	/* do the host stuff */
 	start_offset = start - get_screen_start()*2 - gvi_pc_low_regen;
 	tlx = (int)(start_offset%get_bytes_per_line())*get_pix_char_width()/2;
-	tly = (int)(start_offset/get_bytes_per_line())*get_host_char_height(); 
+	tly = (int)(start_offset/get_bytes_per_line())*get_host_char_height();
 	result = host_scroll_up(tlx,tly,tlx+width/2*get_pix_char_width()-1,
 				tly+height*get_host_char_height()-1, lines*get_host_char_height(),colour);
 
@@ -2815,7 +2805,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 	{
 		/* Can do the whole thing in one go */
 		memcpy(dest,src,width*(height-lines));
-		fwd_word_fill( (' '<<8) | attr, dest+width*(height-lines),width*lines/2);
+		fwd_word_fill( (short)((' '<<8) | attr), dest+width*(height-lines),width*lines/2);
 	}
 	else
 	{
@@ -2831,7 +2821,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 
 		for(i=0;i<lines;i++)
 		{
-			fwd_word_fill( (' '<<8) | attr, dest,width/2);
+			fwd_word_fill( (short)((' '<<8) | attr), dest,width/2);
 			dest += bpl;
 		}
 	}
@@ -2851,7 +2841,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 
 	for(i=0;i<lines;i++)
 	{
-		fwd_word_fill( (' '<<8) | attr, dest,width/2);
+		fwd_word_fill( (short)((' '<<8) | attr), dest,width/2);
 		dest += bpl;
 	}
 
@@ -2872,10 +2862,8 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	if(video_adapter == MDA)
 	{	
@@ -2921,7 +2909,7 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 		src = video_copy + start - gvi_pc_low_regen;
 		dest = src + lines * bpl;
 		memcpy(dest,src,width*(height-lines));
-		fwd_word_fill( (' '<<8) | attr, src,width*lines/2);
+		fwd_word_fill( (short)((' '<<8) | attr), src,width*lines/2);
 	}
 	else
 	{
@@ -2939,7 +2927,7 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 
 		for(i=0;i<lines;i++)
 		{
-			fwd_word_fill( (' '<<8) | attr, dest,width/2);
+			fwd_word_fill( (short)((' '<<8) | attr), dest,width/2);
 			dest -= bpl;
 		}
 	}
@@ -2959,7 +2947,7 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 
 	for(i=0;i<lines;i++)
 	{
-		fwd_word_fill( (' '<<8) | attr, dest,width/2);
+		fwd_word_fill( (short)((' '<<8) | attr), dest,width/2);
 		dest -= bpl;
 	}
 
@@ -2976,10 +2964,8 @@ boolean cga_graph_scroll_up IFN6(int, start, int, width, int, height,
 	half_word *src,*dest;
 	boolean result;
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	/* Do the host stuff */
 
@@ -3078,16 +3064,14 @@ boolean cga_graph_scroll_down IFN6(int, start, int, width, int, height,
 	register half_word *src,*dest;
 	boolean result;
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	/* Do the host stuff */
 
 	start_offset = start - gvi_pc_low_regen;
 	tlx = (int)(start_offset%SCAN_LINE_LENGTH)*8;
-	tly = (int)(start_offset/SCAN_LINE_LENGTH)*4; 
+	tly = (int)(start_offset/SCAN_LINE_LENGTH)*4;
 
 	result = host_scroll_down(tlx,tly,tlx+width*8-1,tly+height*4-1, lines*4,colour);
 
@@ -3184,10 +3168,8 @@ boolean vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3211,10 +3193,8 @@ boolean vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3239,10 +3219,8 @@ boolean v7vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3265,10 +3243,8 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3304,10 +3280,8 @@ boolean ega_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3332,10 +3306,8 @@ boolean ega_graph_scroll_down IFN6(int, start, int, width, int, height,
 	
 	UNUSED(dummy_arg);
 	
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
 
 	(*update_alg.calc_update)();
 
@@ -3373,7 +3345,7 @@ boolean	dummy_scroll IFN6(int,dummy1,int,dummy2,int,dummy3,int,
 	return FALSE;
 }
 
-#ifndef REAL_VGA 
+#ifndef REAL_VGA
 
 /*---------------------  End of scrolling routines --------------------------*/
 
@@ -3642,7 +3614,6 @@ GLOBAL VOID screen_refresh_required IFN0()
 
 LOCAL MARKING_TYPE curr_mark_type;
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove uneeded code */
 
 GLOBAL VOID
 set_mark_funcs IFN0()
@@ -3667,11 +3638,11 @@ set_mark_funcs IFN0()
 			break;
 
 		case	CGA_GRAPHICS_MARKING:
-			update_alg.mark_byte = (boolean(*)())cga_mark_byte;
-			update_alg.mark_word = (boolean(*)())cga_mark_word;
-			update_alg.mark_fill = (boolean(*)())cga_mark_string;
-			update_alg.mark_wfill = (boolean(*)())cga_mark_string;
-			update_alg.mark_string = (boolean(*)())cga_mark_string;
+			update_alg.mark_byte = (T_mark_byte)cga_mark_byte;
+			update_alg.mark_word = (T_mark_word)cga_mark_word;
+			update_alg.mark_fill = (T_mark_fill)cga_mark_string;
+			update_alg.mark_wfill = (T_mark_wfill)cga_mark_string;
+			update_alg.mark_string = (T_mark_string)cga_mark_string;
 
 #ifndef CPU_40_STYLE	/* EVID */
 			setVideomark_byte(FAST_FUNC_ADDR(_cga_mark_byte));
@@ -3696,11 +3667,11 @@ set_mark_funcs IFN0()
 #endif	/* VGG */
 #endif /* GORE */
 
-			update_alg.mark_byte = (boolean(*)())ega_mark_byte;
-			update_alg.mark_word = (boolean(*)())ega_mark_word;
-			update_alg.mark_fill = (boolean(*)())ega_mark_string;
-			update_alg.mark_wfill = (boolean(*)())ega_mark_wfill;
-			update_alg.mark_string = (boolean(*)())ega_mark_string;
+			update_alg.mark_byte = (T_mark_byte)ega_mark_byte;
+			update_alg.mark_word = (T_mark_word)ega_mark_word;
+			update_alg.mark_fill = (T_mark_fill)ega_mark_string;
+			update_alg.mark_wfill = (T_mark_wfill)ega_mark_wfill;
+			update_alg.mark_string = (T_mark_string)ega_mark_string;
 
 			switch( EGA_CPU.chain )
 			{
@@ -3761,7 +3732,6 @@ set_mark_funcs IFN0()
 			break;
 	}
 }
-#endif	/* !NTVDM | (NTVDM & !X86GFX) */
 
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #include "SOFTPC_GRAPHICS.seg"
@@ -3778,15 +3748,9 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 			update_alg.scroll_down = dummy_scroll;
 			break;
 		case	TEXT_SCROLL:
-#if defined(NTVDM) && defined(MONITOR)
-			update_alg.scroll_up = mon_text_scroll_up;
-			update_alg.scroll_down = mon_text_scroll_down;
-#else
 			update_alg.scroll_up = text_scroll_up;
 			update_alg.scroll_down = text_scroll_down;
-#endif	/* NTVDM & MONITOR */
 			break;
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove unneeded code */
 		case	CGA_GRAPH_SCROLL:
 			update_alg.scroll_up = cga_graph_scroll_up;
 			update_alg.scroll_down = cga_graph_scroll_down;
@@ -3807,7 +3771,6 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 			break;
 #endif /* V7VGA */
 #endif /* VGG */
-#endif /* !NTVDM | (NTVDM & !X86GFX) */
 	}
 
 	curr_mark_type = marking_type;
@@ -3824,7 +3787,7 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 	 * AJO 23/4/93
 	 * DON'T use disable_gfx_update_routines() here cos' it's a NOP
 	 * if the display is already disabled which causes bizarre problems
-	 * if a mode change is performed while disabled. 
+	 * if a mode change is performed while disabled.
 	 */
 	save_gfx_update_routines();
 	if (get_display_disabled())
@@ -3849,7 +3812,7 @@ void cursor_changed IFN2(int, x, int, y)
     offset += get_screen_start()<<1;	/* Because screen start is in WORDS */
     vga_card_place_cursor((word)offset);
 #endif
-} 
+}
 #endif
 
 void host_cga_cursor_has_moved IFN2(int, x, int, y)
@@ -3887,7 +3850,7 @@ void     herc_update_screen IFN0()
 	/*
 	 * arbitrary limit over which we just repaint the whole screen in one operation, assuming
 	 * this is more efficient than working out large minimum rectangles. This value should be
-	 * tuned at some future point. 
+	 * tuned at some future point.
 	 */
 	to = (USHORT *) &video_copy[get_screen_start()];
 	from = (USHORT *) get_screen_ptr((get_screen_start() << 1));
@@ -3911,7 +3874,7 @@ void     herc_update_screen IFN0()
 	{
 	    /*
 	     * step through row/cols looking for a dirty bit then look for the last clear dirty bit,
-	     * and draw the line of text 
+	     * and draw the line of text
 	     */
 	    register int    ints_per_line = get_bytes_per_line() >> 1;
 
@@ -3961,7 +3924,7 @@ void     herc_update_screen IFN0()
 	/*
 	 * arbitrary limit over which we just repaint the whole screen in one operation, assuming
 	 * this is more efficient than working out large minimum rectangles. This value should be
-	 * tuned at some future point. 
+	 * tuned at some future point.
 	 */
 
 	if (getVideodirty_total() > 8000)
@@ -4151,7 +4114,7 @@ GLOBAL void disable_gfx_update_routines IFN0()
 
     if (gfx_update_routines_inhibited)
 	return;
- 
+
     save_gfx_update_routines();
     inhibit_gfx_update_routines();
 }
@@ -4181,715 +4144,7 @@ GLOBAL void enable_gfx_update_routines IFN0()
 #include "SOFTPC_GRAPHICS.seg"
 #endif
 
-#ifdef NTVDM
-
-void init_text_rect();
-void add_to_rect(int screen_start,register int x, register int y, int len);
-void paint_text_rect(int screen_start);
-
-int RectDefined;
-int RectTop, RectBottom, RectLeft, RectRight;
-
-#ifdef MONITOR
-/*
- * Update the window to look like the regen buffer says it should
- * and with no help from dirty_total.
- */
-
-static int now_cur_x = -1, now_cur_y = -1;
-/*
- * Reset the static cursor variables:
- */
-GLOBAL void resetNowCur()
-{
-	now_cur_x = -1;
-	now_cur_y = -1;
-}
-
-void mon_text_update()
-{
-
-    register int i;	/* Loop counters		*/
-    register int j,k;
-    register unsigned long *from,*to;
-    register int ints_per_line = get_offset_per_line()>>2;
-    int lines_per_screen;
-    int	len,x,screen_start;
-    unsigned short *wfrom;
-    unsigned short *wto;
-    int dwords_to_compare;
-
-    /*::::::::::::::::::::::::::::::::::::::::::::::: Is the display disable */
-
-    if(get_display_disabled()) return;
-
-    /*::::::::::::::::::::::::::::::::: get screen size and location details */
-
-    screen_start=get_screen_start()<<1;
-    ALIGN_SCREEN_START(screen_start);
-
-    to = (unsigned long *)&video_copy[screen_start];
-    from = (unsigned long *) get_screen_ptr(screen_start);
-
-    /*::::::::::::::::::::::::::::::::::::::::::: Check for buffer overflows */
-
-#ifndef PROD
-    if(((int)to) & 3)		printf("Video copy not aligned on DWORD\n");
-    if(get_screen_length() & 3) printf("Screen size incorrect\n");
-#endif
-
-    /*::::::::::::::::::::::::::::::::::::::::::::::: Has the screen changed */
-
-#ifndef CPU_40_STYLE
-#if defined(NTVDM)
-    if( VGLOBS && VGLOBS->dirty_flag >= 1000000L ){
-#else
-    if( VGLOBS && VGLOBS->dirtyTotal >= 1000000L ){
-#endif
-
-#else
-    if(getVideodirty_total() >= 1000000L ){
-#endif
-
-	/*
-	** screen_refresh_required() has requested a complete screen
-	** repaint by setting the dirtyTotal.
-	**
-	** When switching between display pages video copy and display
-	** memory could be the same so our normal partial update algorithm
-	** gets confused.
-	** This scheme updates video copy and then forces a complete
-	** repaint.
-	** Another option would have been to splat video copy and then go
-	** through the partial update code below, but this is quicker.
-	** 
-	** Tim Jan 93.
-	*/
-	setVideodirty_total(0);
-
-	/*
-	** Copy the screen data to our video copy.
-	*/
-	dwords_to_compare = get_screen_length() / 4;
-	_asm
-	{
-		push esi	//Save orginal values of registers used by the
-		push edi	//complier
-		push ecx
-
-		mov edi,to	//Ptr to video copy
-		mov esi,from	//Ptr to intel video memory
-
-		mov ecx,dwords_to_compare
-		rep movsd	//Move screen data to video copy.
-
-		pop ecx
-		pop edi
-		pop esi
-	}
-
-	/*
-	** Re-paint the whole screen.
-	** Set up rectangle dimension globals here for paint_text_rect(),
-	** instead of calling add_to_rect().
-	*/
-        if (get_offset_per_line() == 0)    /* showing up in stress */
-            lines_per_screen = 25;
-        else
-	    lines_per_screen = get_screen_length()/get_offset_per_line();
-	RectTop = 0;
-	RectLeft = 0;
-	RectBottom = lines_per_screen - 1;
-	RectRight = (ints_per_line<<1) - 1;
-	RectDefined = TRUE;
-	host_start_update();
-	paint_text_rect(screen_start);
-	host_end_update();
-
-    }else{
-
-      /*
-      ** Normal partial screen update.
-      */
-
-      dwords_to_compare = get_screen_length() / 4;
-
-      _asm
-      {
-	push esi	//Save orginal values of registers used by the
-	push edi	//complier
-	push ecx
-
-	mov esi,to	//Ptr to screen copy
-	mov edi,from	//Ptr to intel video memory
-
-	mov ecx,dwords_to_compare
-	repe cmpsd	//Compare screen buffers
-
-	mov dwords_to_compare,ecx
-//	mov to,esi
-//	mov from,edi
-
-	pop ecx
-	pop edi
-	pop esi
-      }
-
-      /*::::::::::::::::::::::: Repaint parts of the screen that have changed */
-
-
-      if (get_offset_per_line() == 0)    /* showing up in stress */
-          lines_per_screen = 25;
-      else
-          lines_per_screen = get_screen_length()/get_offset_per_line();
-
-      if(dwords_to_compare)
-      {
-	   host_start_update();
-	   /* Screen changed, calculate position of first variation */
-
-	   init_text_rect();
-
-	   for(i=0;i<lines_per_screen;i++)
-	   {
-	    for(j=0;j<ints_per_line;j++)
-	    {
-		if(*to++ != *from++)
-		{
-		    to--;from--;
-		    for(k=ints_per_line-1-j;*(to+k)== *(from+k);k--){};
-		    /*
-		     * Note: For text mode there is one char for every word.
-		     * no of bytes into screen=line*bytes_per_line + ints_into_line*4
-		     * x_coord=width_of_one_char*(no_of_ints_into_line*2)
-		     * y_coord=height_of_one_char*2*line
-		     * length=no_of_ints*4+4     the plus 4 is to counteract the k--
-		     * The host y co-ords are doubled
-		     */
-
-		    /* one or more ints of data are now selected 
-		       but refine difference to words (i.e. characters),
-		       to avoid a glitch on the screen when typing in to
- 		       a dumb terminal  */
-
-		    len    = (k<<2) + 4;
-		    x	   = (j<<1);
-
-		    wfrom = (unsigned short *)from;
-		    wto   = (unsigned short *)to;
-		    if (*wfrom == *wto)
-		    {
-			x++;
-			len -= 2;
-		    }
-		    wfrom += (k<<1) + 1;
-		    wto   += (k<<1) + 1;
-		    if (*wfrom == *wto)
-		    {
-			len -= 2;
-		    }
-
-		    add_to_rect(screen_start, x, i, len/2);
-
-		    /*.............................. transfer data painted to video copy */
-
-		    for(k=j;k<ints_per_line;k++)
-			*to++ = *from++;
-
-		    break;	/* onto next line */
-		}
-	    }
-	  }
-
-	  /* End of screen, flush any outstanding text update rectangles */
-	  paint_text_rect(screen_start);
-
-	  host_end_update();
-
-     } /* End of partial screen update */
-
-    } /* End of if dirtyTotal stuff, which selects full or partial repaint */
-
-
-    /*:::::::::::::::::::::::::::::::::::::: Does the cursor need repainting */
-
-    if(is_cursor_visible())
-    {
-	half_word attr;
-
-	dirty_curs_x = get_cur_x();
-	dirty_curs_y = get_cur_y();
-
-	if(dirty_curs_x == now_cur_x && dirty_curs_y == now_cur_y)
-	{
-	    host_end_update();
-	    return;
-	}
-
-	now_cur_x = dirty_curs_x;
-	now_cur_y = dirty_curs_y;
-	dirty_curs_offs = screen_start+dirty_curs_y * get_offset_per_line() + (dirty_curs_x<<1);
-
-	if(dirty_curs_offs < 0x8001)	/* no lookup in possible gap */
-	    attr = *(get_screen_ptr(dirty_curs_offs + 1));
-	else
-	    attr = 0;	/* will be off screen anyway */
-
-	host_paint_cursor(dirty_curs_x, dirty_curs_y, attr);
-    }
-
-}
-
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-
-boolean mon_text_scroll_up IFN6(sys_addr, start, int, width, int, height, int, attr, int, lines, int, colour)
-{
-    short blank_word, *ptr, *top_left_ptr,*top_right_ptr, *bottom_right_ptr;
-    unsigned short dummy;
-    unsigned char *p;
-    int words_per_line;
-	int i,tlx,tly;
-	int bpl = 2*get_chars_per_line();
-	long start_offset;
-	register half_word *src,*dest;
-	boolean result;
-
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
-	if ( getVM() )
-	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
-	/*
-	 * The colour we fill with for colour text displays is controlled by
-	 * bits 4-6 of attr, with bit 7 turning on blinking (which we don't support)
-	 */
-	colour = ((half_word)attr>>4) & 7;
-
-/*
- * Reduce the width of the rectangle if any right hand area is completely 
- * blank.
- *
- * Don't reduce the size of the scrolling region for a dumb terminal.
- * Dumb terminal uses line feeds to scroll up, but only if the whole
- * screen is to be scrolled.  Reducing the scroll region causes
- * the whole region to be redrawn.
- */
-
-	/* originally dummy was char [2] */
-	/* unfortunately doing (short) *dummy */
-	/* causes a bus error on M88K */
-	p = (unsigned char *) &dummy;
-	p [0] = ' ';
-	p [1] = attr;
-	blank_word = dummy;
-
-	words_per_line   = get_chars_per_line();
-	top_left_ptr     = (short *) get_screen_ptr(start - gvi_pc_low_regen);
-        top_right_ptr    = top_left_ptr + (width >> 1) - 1;
-	bottom_right_ptr = top_right_ptr + words_per_line * (height - 1);
-	ptr = bottom_right_ptr;
-	if (width > 2) /* dont want to get a zero rectangle for safetys sake */
-	{
-	    while (*ptr == blank_word)
-	    {
-	        if (ptr == top_right_ptr) 	/* reached top of column? */
-	        {
-		    top_right_ptr--;	/* yes go to bottom of next */
-		    bottom_right_ptr--;
-		    if (top_right_ptr == top_left_ptr)
-			break;
-		    ptr = bottom_right_ptr;
-	        }
-	        else
-		    ptr -= words_per_line;
-	    }
-	}
-	width = (int)(top_right_ptr - top_left_ptr + 1) << 1;
-
-	/* do the host stuff */
-	start_offset = start - get_screen_start()*2 - gvi_pc_low_regen;
-	tlx = (int)(start_offset%get_bytes_per_line())*get_pix_char_width()/2;
-	tly = (int)(start_offset/get_bytes_per_line())*get_host_char_height(); 
-	result = host_scroll_up(tlx,tly,tlx+width/2*get_pix_char_width()-1,
-				tly+height*get_host_char_height()-1, lines*get_host_char_height(),colour);
-
-	if(!result)
-		return FALSE;
-
-
-	adjust_cursor( UP, tlx, tly, width >> 1, height, lines, bpl );
-
-	/* Scroll up the video_copy */
-	dest = video_copy + start-gvi_pc_low_regen;
-	src = dest + lines * bpl;
-
-	if(width == bpl)
-	{
-		/* Can do the whole thing in one go */
-		memcpy(dest,src,width*(height-lines));
-		fwd_word_fill( (' '<<8) | (half_word)attr, dest+width*(height-lines),width*lines/2);
-	}
-	else
-	{
-		/* Not scrolling whole width of screen, so do each line seperatly */
-		for(i=0;i<height-lines;i++)
-		{
-			memcpy(dest,src,width);
-			dest += bpl;
-			src += bpl;
-		}
-
-		/* Fill exposed area of video copy */
-
-		for(i=0;i<lines;i++)
-		{
-			fwd_word_fill( (' '<<8) | (half_word)attr, dest,width/2);
-			dest += bpl;
-		}
-	}
-
-	/* Update video buffer */
-
-	dest = get_screen_ptr(start - gvi_pc_low_regen);
-	src = dest + lines * bpl;
-	for(i=0;i<height-lines;i++)
-	{
-		memcpy(dest,src,width);
-		dest += bpl;
-		src += bpl;
-	}
-
-	/* Fill exposed area of buffer */
-
-	for(i=0;i<lines;i++)
-	{
-		fwd_word_fill( (' '<<8) | (half_word)attr, dest,width/2);
-		dest += bpl;
-	}
-
-	host_scroll_complete();
-
-	return TRUE;
-}
-
-boolean mon_text_scroll_down IFN6(sys_addr, start, int, width, int, height, int, attr, int, lines, int, colour)
-{
-	int i,tlx,tly;
-	int bpl = 2*get_chars_per_line();
-	long start_offset;
-	register half_word *src,*dest;
-	boolean result;
-
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
-	if ( getVM() )
-	   return FALSE;   /* Don't optimise in V86 Mode */
-#endif
-
-	/*
-	 * The colour we fill with for colour text displays is controlled by
-	 * bits 4-6 of attr, with bit 7 turning on blinking (which we don't support)
-	 */
-	colour = ((half_word)attr>>4) & 7;
-
-
-	/* do the host stuff */
-	start_offset = start - get_screen_start() * 2 - gvi_pc_low_regen;
-	tlx = (int)(start_offset%get_bytes_per_line())*get_pix_char_width()/2;
-	tly = (int)(start_offset/get_bytes_per_line())*get_host_char_height();
-	result = host_scroll_down(tlx,tly,tlx+width/2*get_pix_char_width()-1,
-			tly+height*get_host_char_height()-1, lines*get_host_char_height(),colour);
-
-	if(!result)
-		return FALSE;
-
-	adjust_cursor( DOWN, tlx, tly, width >> 1, height, lines, bpl );
-
-	/* Scroll down the video_copy */
-
-	if(width == bpl)
-	{
-		/* Can do the whole thing in one go */
-		src = video_copy + start - gvi_pc_low_regen;
-		dest = src + lines * bpl;
-		memcpy(dest,src,width*(height-lines));
-		fwd_word_fill( (' '<<8) | (half_word)attr, src,width*lines/2);
-	}
-	else
-	{
-		/* Not scrolling whole width of screen, so do each line seperatly */
-		dest = video_copy + start-gvi_pc_low_regen + (height-1) * bpl;
-		src = dest - lines * bpl;
-		for(i=0;i<height-lines;i++)
-		{
-			memcpy(dest,src,width);
-			dest -= bpl;
-			src -= bpl;
-		}
-
-		/* Fill exposed area of video copy */
-
-		for(i=0;i<lines;i++)
-		{
-			fwd_word_fill( (' '<<8) | (half_word)attr, dest,width/2);
-			dest -= bpl;
-		}
-	}
-
-	/* Update video buffer */
-
-	dest = get_screen_ptr(start - gvi_pc_low_regen) + (height-1) * bpl;
-	src = dest - lines * bpl;
-	for(i=0;i<height-lines;i++)
-	{
-		memcpy(dest,src,width);
-		dest -= bpl;
-		src -= bpl;
-	}
-
-	/* Fill exposed area of buffer */
-
-	for(i=0;i<lines;i++)
-	{
-		fwd_word_fill( (' '<<8) | (half_word)attr, dest,width/2);
-		dest -= bpl;
-	}
-
-	host_scroll_complete();
-
-	return TRUE;
-}
-#endif	/* MONITOR */
-
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-/*::::::::::::::::::::::::: Text handling routines :::::::::::::::::::::::::::*/
-/*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-
-#define MAX_LEFT_VARIATION  (2)
-#define MAX_RIGHT_VARIATION (5)
-
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-
-int ExpandCount;
-int BaseL, BaseR;
-
-/* Init text rect variables */
-
-void init_text_rect()
-{
-    RectDefined = FALSE;       /* No rectangle defined yet */
-    ExpandCount = 0;
-}
-
-/* Add coordinates to rectangle */
-
-void add_to_rect(int screen_start, register int x, register int y, int len)
-{
-    int endx = x + len - 1;
-
-    /* printf("add rect - (%d,%d) len %d\n", x, y, len); */
-
-
-    /* Is there an existing rectangle */
-    if(RectDefined)
-    {
-	/* Validate X variation and Y coord */
-
-	if(abs(BaseL - x) <= MAX_LEFT_VARIATION &&
-	   abs(BaseR - endx) <= MAX_RIGHT_VARIATION &&
-	   RectBottom+1 >= y)
-	{
-	    /* Expand rectangle */
-	    ExpandCount++;
-	    /* printf("Expanding rect\n"); */
-
-	    RectLeft = MIN(RectLeft,x);
-	    RectRight = MAX(RectRight,endx);
-	    RectBottom = y;
-	    return;
-	}
-	else
-	{
-	    paint_text_rect(screen_start);
-	}
-    }
-
-    /* New rectangle */
-
-    /* printf("Defining new rect\n"); */
-
-    RectDefined = TRUE;     /* Rectangle defined */
-
-    BaseL = x;		    /* Base Left/Right */
-    BaseR = endx;
-
-    RectTop = y;	    /* Define rectangle */
-    RectLeft = x;
-
-    RectBottom = y;
-    RectRight = endx;
-}
-
-
-/* Paint rectangle */
-
-void paint_text_rect(int screen_start)
-{
-#ifdef MONITOR
-    int offset = RectTop * get_offset_per_line() + (RectLeft<<1);
-#else
-    int offset = (RectTop * (get_offset_per_line()<<1)) + (RectLeft<<2);
-#endif
-
-    /* Is there a rectangled defined */
-    if(!RectDefined) return;
-
-    /* Paint rectangle */
-
-    /* printf("Paint rect (%d,%d) (%d,%d)  \t[%d]\n",RectLeft,RectTop,RectRight,RectBottom,ExpandCount); */
-
-    (*paint_screen)(offset + screen_start,			/* Start Offset */
-#ifdef MONITOR
-		   RectLeft, RectTop,				/* Screen X,Y */
-#else
-		   RectLeft*get_pix_char_width(),RectTop*get_host_char_height(),
-#endif
-		    (RectRight - RectLeft +1)*2,		/* Len */
-		    RectBottom - RectTop +1);			/* Height */
-
-    RectDefined = FALSE;	/* Rectangle painted */
-    ExpandCount = 0;
-}
-
-#ifndef MONITOR
-void jazz_text_update()
-{
-
-    register int i;	/* Loop counters		*/
-    register int j,k;
-    register unsigned short *from,*to;
-    register int chars_per_line = get_offset_per_line()>>1;
-    int lines_per_screen;
-    int	offset,len,x,screen_start;
-    unsigned short *wfrom;
-    unsigned short *wto;
-
-    if (getVideodirty_total() == 0 || get_display_disabled() )
-	return;
-
-    lines_per_screen = get_screen_length()/get_offset_per_line();
-
-    host_start_update();
-
-    screen_start=get_screen_start()<<2;
-    ALIGN_SCREEN_START(screen_start);
-
-    to = (unsigned short *)&video_copy[get_screen_start()<<1];
-    from = (unsigned short *) get_screen_ptr(screen_start);
-
-    if(getVideodirty_total() >1500)	/* paint the whole lot */
-    {
-	for(i=get_screen_length()>>1;i>0;i--)
-	{
-	    *to++ = *from;	/* char and attribute bytes */
-	    from += 2;		/* planes 2,3 interleaved */
-	}
-
-	(*paint_screen)(screen_start, 0, 0, get_bytes_per_line(),
-			lines_per_screen);
-    }
-    else
-    {
-	init_text_rect();
-
-	for(i=0;i<lines_per_screen;i++)
-	{
-	    for(j=0;j<chars_per_line;j++)
-	    {
-		if(*to != *from)
-		{
-		    k=chars_per_line-1-j;
-		    wfrom = from + k*2;
-		    wto   = to + k;
-
-		    for(;*wto== *wfrom;k--,wto--,wfrom-=2){};
-		    /*
-		     * Note: For text mode there is one char for every word.
-		     * no of bytes into screen=line*bytes_per_line + ints_into_line*4
-		     * x_coord=width_of_one_char*(no_of_ints_into_line*2)
-		     * y_coord=height_of_one_char*2*line
-		     * length=no_of_ints*4+4     the plus 4 is to counteract the k--
-		     * The host y co-ords are doubled
-		     */
-
-		    /* one or more ints of data are now selected 
-		       but refine difference to words (i.e. characters),
-		       to avoid a glitch on the screen when typing in to
- 		       a dumb terminal  */
-
-		    offset = (i * (get_offset_per_line()<<1)) + (j<<2);
-		    len    = (k<<2) + 4;
-		    add_to_rect(screen_start, j, i, len/4);
-
-		    for(k=j;k<chars_per_line;k++)
-		    {
-			*to++ = *from;
-			from+=2;
-		    }
-		    break;	/* onto next line */
-		}
-		else
-		{
-		    to++; from +=2;
-		}
-	    }
-	}
-	  /* End of screen, flush any outstanding text update rectangles */
-	  paint_text_rect(screen_start);
-    }
-
-	setVideodirty_total(0);
-
-	/*:::::::::::::::::::::::::::::::::::::::::::::::::: Repaint cursor */
-
-	if (is_cursor_visible()) 
-	{
-		half_word attr;
-
-		dirty_curs_x = get_cur_x();
-		dirty_curs_y = get_cur_y();
-
-		dirty_curs_offs = screen_start+dirty_curs_y * (get_offset_per_line()<<1) + (dirty_curs_x<<2);
-		attr = *(get_screen_ptr(dirty_curs_offs + 1));
-
-		host_paint_cursor( dirty_curs_x, dirty_curs_y, attr );
-	}
-
-	host_end_update();
-}
-#endif /* MONITOR */
-#endif /* NTVDM */
 #endif /* REAL_VGA */
 
-#ifdef NTVDM
-void stream_io_update(void)
-{
 
-#ifdef MONITOR
-    if (sas_w_at_no_check(stream_io_bios_busy_sysaddr)) {
-        return;
 
-    }
-#endif
-
-    if (*stream_io_dirty_count_ptr) {
-        host_start_update();
-        host_stream_io_update(stream_io_buffer, *stream_io_dirty_count_ptr);
-        host_end_update();
-        *stream_io_dirty_count_ptr = 0;
-
-    }
-
-}
-#endif

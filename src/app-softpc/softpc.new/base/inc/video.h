@@ -8,12 +8,12 @@
 #define R11_CURS_END	        11
 #define CGA_R12_START_ADDRH	12
 #define CGA_R13_START_ADDRL	13
-#define R14_CURS_ADDRH	        14 
-#define R15_CURS_ADDRL	        15 
+#define R14_CURS_ADDRH	        14
+#define R15_CURS_ADDRL	        15
 
-#define M6845_INDEX_REG         (vd_addr_6845)
-#define M6845_DATA_REG          (vd_addr_6845 + 1) 
-#define M6845_MODE_REG          (vd_addr_6845 + 4)
+#define M6845_INDEX_REG         (word)(vd_addr_6845)
+#define M6845_DATA_REG          (word)(vd_addr_6845 + 1)
+#define M6845_MODE_REG          (word)(vd_addr_6845 + 4)
 
 /*
  * The individual colour adaptor registers
@@ -57,6 +57,7 @@
 /*
  * intel memory position defines for data stored in bios variables
  */
+
 
 #define	vd_video_mode	0x449
 #define VID_COLS	0x44A	/* vd_cols_on_screen */
@@ -259,30 +260,11 @@ IMPORT VOID vga_write_dot IPT4(LONG, colour, LONG, page, LONG, pixcol, LONG, row
 
 #endif
 
-#ifdef NTVDM
-/* this is the stream io buffer size used on RISC machines.
- * On X86, the size is determined by spckbd.asm
- */
-#define STREAM_IO_BUFFER_SIZE_32    82
-IMPORT void disable_stream_io(void);
-IMPORT void host_enable_stream_io(void);
-IMPORT void host_disable_stream_io(void);
-IMPORT half_word * stream_io_buffer;
-IMPORT word * stream_io_dirty_count_ptr;
-IMPORT word stream_io_buffer_size;
-IMPORT boolean  stream_io_enabled;
-#ifdef MONITOR
-IMPORT sys_addr stream_io_bios_busy_sysaddr;
-#endif /* MONITOR */
-
-#endif /* NTVDM */
 
 /* The detached machine keeps this optional presentation path disabled, but
    the original video controller references its state independently of the
    product-specific enable/disable services above. */
-#ifndef NTVDM
 IMPORT half_word * stream_io_buffer;
 IMPORT word * stream_io_dirty_count_ptr;
 IMPORT word stream_io_buffer_size;
 IMPORT boolean stream_io_enabled;
-#endif

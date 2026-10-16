@@ -55,6 +55,7 @@ typedef	struct	{
 #endif /* VGG */
 } DIRTY_PARTS;
 
+
 typedef enum {
         EGA_HI_SP,
         EGA_HI_SP_WR,
@@ -134,6 +135,7 @@ typedef struct
 } VIDEOFUNCS;
 
 extern VIDEOFUNCS *working_video_funcs;
+
 
 #define host_init_screen()\
 	(working_video_funcs->init_screen)()
@@ -276,6 +278,3 @@ extern	void	flag_mode_change_required IPT0();
 extern  void    reset_graphics_routines IPT0();
 extern	void	reset_paint_routines IPT0();
 
-#ifdef NTVDM
-IMPORT  void    stream_io_update(void);
-#endif

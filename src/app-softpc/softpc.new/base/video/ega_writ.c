@@ -1,7 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
 
-#if !(defined(NTVDM) && defined(MONITOR))
 
 /*			INSIGNIA (SUB)MODULE SPECIFICATION
 			-----------------------------
@@ -26,8 +25,8 @@ SUBMODULE NAME		: ega_write
 SOURCE FILE NAME	: ega_write.c
 
 PURPOSE			: control the way writes to EGA memory is emulated.
-			  This module looks at the state of the EGA when it is changed 
-			  via writes to the EGA registers, and works out what to do about it. 
+			  This module looks at the state of the EGA when it is changed
+			  via writes to the EGA registers, and works out what to do about it.
 		
 		
 SccsID = @(#)ega_write.c	1.40 12/15/95 Copyright Insignia Solutions Ltd.
@@ -65,10 +64,10 @@ extern WRT_POINTERS dump_writes;
 extern WRT_POINTERS mode0_gen_handlers, mode0_copy_handlers;
 extern WRT_POINTERS mode1_handlers, mode2_handlers;
 
-/* [3.2 INTERMODULE EXPORTS]						*/ 
+/* [3.2 INTERMODULE EXPORTS]						*/
 
 /*
-5.MODULE INTERNALS   :   (not visible externally, global internally)]     
+5.MODULE INTERNALS   :   (not visible externally, global internally)]
 
 [5.1 LOCAL DECLARATIONS]						*/
 #ifdef SEGMENTATION
@@ -322,15 +321,15 @@ WRT_POINTERS simple_writes;
 WRT_POINTERS dth_md3_writes;
 #endif	/* CPU_40_STYLE - EVID */
 
-IMPORT VOID ega_copy_b_write();
-IMPORT VOID ega_mode0_chn_b_write();
-IMPORT VOID ega_mode1_chn_b_write();
-IMPORT VOID ega_mode2_chn_b_write();
+IMPORT VOID ega_copy_b_write(ULONG, ULONG);
+IMPORT VOID ega_mode0_chn_b_write(ULONG, ULONG);
+IMPORT VOID ega_mode1_chn_b_write(ULONG, ULONG);
+IMPORT VOID ega_mode2_chn_b_write(ULONG, ULONG);
 
-IMPORT VOID ega_copy_w_write();
-IMPORT VOID ega_mode0_chn_w_write();
-IMPORT VOID ega_mode1_chn_w_write();
-IMPORT VOID ega_mode2_chn_w_write();
+IMPORT VOID ega_copy_w_write(ULONG, ULONG);
+IMPORT VOID ega_mode0_chn_w_write(ULONG, ULONG);
+IMPORT VOID ega_mode1_chn_w_write(ULONG, ULONG);
+IMPORT VOID ega_mode2_chn_w_write(ULONG, ULONG);
 
 /* Handy array to extract all 4 plane values in one go. */
 
@@ -371,7 +370,6 @@ GLOBAL ULONG calc_latch_xor;
 #include "SOFTPC_GRAPHICS.seg"
 #endif
 
-#if !(defined(NTVDM) && defined(MONITOR))
 GLOBAL VOID
 Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 {
@@ -414,28 +412,12 @@ Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 
 	A_vid_writes = *handler;
 
-#if	0
-	A_vid_writes.b_write = handler->b_write;
-	A_vid_writes.w_write = handler->w_write;
-
-#ifndef	NO_STRING_OPERATIONS
-
-	A_vid_writes.b_fill = handler->b_fill;
-	A_vid_writes.w_fill = handler->w_fill;
-	A_vid_writes.b_fwd_move = handler->b_fwd_move;
-	A_vid_writes.b_bwd_move = handler->b_bwd_move;
-	A_vid_writes.w_fwd_move = handler->w_fwd_move;
-	A_vid_writes.w_bwd_move = handler->w_bwd_move;
-
-#endif	/* NO_STRING_OPERATIONS */
-#endif	/* 0 */
 
 #endif /* C_VID */
 #endif /* A3CPU */
-#endif /* GISP_CPU */ 
+#endif /* GISP_CPU */
 #endif 	/* CPU_40_STYLE - EVID */
 }
-#endif /* !(NTVDM && MONITOR) */
 
 #ifdef SEGMENTATION
 /*
@@ -724,7 +706,7 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 	mode_and_chain = (EGA_CPU.chain * 3) + EGA_CPU.write_mode;
 #endif /* VGG */
 
-	if(( EGA_CPU.saved_mode_chain != mode_and_chain ) 
+	if(( EGA_CPU.saved_mode_chain != mode_and_chain )
 		|| ( EGA_CPU.saved_state != state )
 #ifdef V7VGA
 		|| ( Last_v7_fg_bg != fg_bg_control)
@@ -852,4 +834,3 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #endif /* REAL VGA */
 #endif /* EGG */
 
-#endif	/* !(NTVDM && MONITOR) */

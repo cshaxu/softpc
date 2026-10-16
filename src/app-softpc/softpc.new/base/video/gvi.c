@@ -285,10 +285,8 @@ void gvi_init IFN1(half_word, v_adapter)
         break;
     }
 
-#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
     host_init_adaptor(video_adapter,screen_height);
     host_clear_screen();
-#endif	/* !NTVDM | (NTVDM & !X86GFX) */
 
 #ifdef EGA_DUMP
 	dump_init(host_getenv( "EGA_DUMP_FILE" ), video_adapter);

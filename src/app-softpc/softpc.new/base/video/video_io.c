@@ -43,16 +43,13 @@
 #include "debug.h"
 #include "idetect.h"
 
+
 #define check_video_func(AH)	(AH < EGA_FUNC_SIZE)
 
 void video_io()
 {
 
 
-#if defined(NTVDM) && !defined(X86GFX)
-    if (stream_io_enabled && getAH()!= 0x0E &&  getAX() != 0x13FF)
-        disable_stream_io();
-#endif
 
 
     /*

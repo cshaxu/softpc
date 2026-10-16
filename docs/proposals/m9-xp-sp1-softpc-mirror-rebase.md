@@ -915,6 +915,103 @@ excluding product presentation routes while retaining the standalone copied
 frame/surface path through the appropriate local owner. Verify CGA, EGA, VGA
 and V7 mode, cursor, port and frame behavior on both host widths.
 
+#### S5 reviewed payload brief (2026-10-15)
+
+The frozen local input is ce19e215. Three-way selection covers all 71 admitted
+paths; the 40 unchanged-base C-VID files remain byte-preservation obligations.
+The current candidate changes 27 of the other 31 files: +3,644/-6,544,
+net -2,900, including the selected XP formatting. These are pre-application
+estimates, not tested delivery counts. Focused test additions are estimated
+at 80-140 lines, reusing the existing video test and mode matrices.
+
+Selected changes include explicit byte/word port and BIOS stores, complete
+write-handler declarations, typed existing marker assignments, and matched
+palette-loop counter changes. Keep the wide counters for CX-sized and
+256-entry DAC operations. Eight merge overlaps were individually reviewed:
+retain the existing glue declaration authority, dirty physical-row layout,
+snapshot presentation-cache reset and detached DIB initialization; use XP's
+equivalent corrected V7 enable-bit expression. Both video-controller snapshot
+callback bodies remain lexically unchanged modulo whitespace in this candidate.
+This preservation check does not replace execution tests.
+
+Exclude PC-98/regional/NTVDM arms and the MONITOR/X86GFX native NT execution
+and full-screen routes. Neither latter macro is defined by the selected build
+or its headers. BIGWIN is defined and its painter implementations remain.
+The old stream-output endpoint/state and full-screen declarations lose their
+only users with those exclusions and are removed as a connected group.
+Shared nt_fulsc.h definitions remain: the file is included by selected host
+code and the video test, so its name alone does not justify deleting it.
+Record original XP line ranges for exclusions, including orphan declarations
+and comments; do not count them as new local functional repairs.
+
+Before delivery, prove DAC operations at 256 entries, selected mode/cursor/
+stride/geometry behavior and snapshot restoration, then run both Release
+builds, all shared and other background tests, and ten reserved desktop tests.
+Preserve all user configuration/media and public packages. No new rendering
+path, generated build input or runtime source selection is introduced.
+
+#### S5 applied candidate and verification checkpoint
+
+The applied production candidate matches the reviewed 27-file delta:
++3,644/-6,544, net -2,900. The existing owner-local video test adds 73 lines
+and removes none. Its actual video BIOS BOP entry verifies all 256 DAC entries
+through block write/read, DAC state save, a different palette, and restoration;
+canaries cover both guest-memory output boundaries. Both x64 and x86 focused
+runs pass. Full regression is still pending; these results do not claim a new
+manual guest test or S closure.
+
+The finite 71-path ledger is retained as [file counts](../etc/evidence/softpc/xp-sp1-s5-subset-files.tsv),
+[XP selection ranges](../etc/evidence/softpc/xp-sp1-s5-subset-ranges.tsv) and
+[pre-S5 conditional ranges](../etc/evidence/softpc/xp-sp1-s5-baseline-ranges.tsv).
+It excludes 12,095 XP lines and identifies 2,938 old conditional lines outside
+the selected profile. These counts are not the Git deletion count: XP/local
+versions differ, and selected XP formatting is also part of the migration.
+The 71 current bodies relative to their XP subsets are +22,908/-23,257;
+this includes the pre-existing 40-file C-VID ABI/marker patches, not 22,908
+new lines introduced by S5. Independent reconstruction from the fixed XP Git
+objects passes for all 71 bodies: original hashes, complete disjoint line ranges,
+selected-body hashes and the three tracked ledgers agree. Both existing video
+snapshot callback bodies remain unchanged modulo whitespace. Full regression
+and final actual-change review remain necessary before delivery.
+
+The whitespace check reports 19 mirror diagnostics: nonblank whitespace lines
+match the selected XP source exactly, and EOF blank lines remain after excluded
+tail removal. These are disclosed source-format exceptions, not a clean
+whole-tree `diff --check` claim. New test and documentation whitespace checks
+pass. Public packages and user INI/media/snapshots have no changes in this S.
+
+#### S5 executor qualification (2026-10-15)
+
+Final tracked production is 27 mirror files, +3,644/-6,544 (net -2,900);
+one existing owner-local test is +73/-0 (net +73). No public package, Compat
+API, snapshot schema, guest medium or configuration changes. The 40 C-VID
+paths remain unchanged. Final selected source matches the reviewed candidate.
+
+Both Release builds and all registered tests pass, 148/148 per architecture:
+90 shared background, 53 other background, and five reserved native desktop
+tests. x64 phase times are 56.08/97.35/13.60 seconds; x86 are
+58.12/75.31/13.39 seconds. This includes real BIOS DAC entry testing, existing
+CGA/EGA/VGA/V7/CHAIN2 mode and dirty matrices, snapshot restoration, package
+flows, native Console and Window cases. No Computer Use was used. Evidence is
+the S5 qualification-final phase logs and zero exit records, alongside the
+independent 71-path pinned-object/range verification. These are automated
+test results, not a claim of a fresh owner-operated Windows session.
+
+The published package SHA-256 values are:
+
+- x86: `f35cb644c0bead39baf7b2d29f8fa51c8ca44323c40adf2c2edae8dfc9003a38`.
+- x64: `6e57b7e29088fdda0c80b219bdf6cdf1dd3eda7e013e4a9bb065c93eae8f6423`.
+
+Similar-issue review covers the 31 XP-changed video candidates: byte port/BDA
+stores retain their destination width; signed cursor offsets retain modulo
+16-bit assignment; bit-field getters remain bounded; CX-sized and 256-entry
+palette loops retain wide counters. Existing full-width pointer ABI and selected
+dirty dispatch are preserved. Removed native NT declarations are checked with
+their excluded callers, not removed by filename. The known out-of-scope TODOs
+remain unchanged. Documentation and non-mirror whitespace checks pass; the
+19 explained mirror-format diagnostics remain disclosed above. Executor push
+and a separate coordinator review of the actual commit precede closure.
+
 ### S6 — XP baseline gate and OpenNT lineage freeze
 
 Make the XP manifest and XP-to-local destination ledger the routine mirror

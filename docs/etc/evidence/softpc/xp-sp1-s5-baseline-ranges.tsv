@@ -1,0 +1,425 @@
+path	baseline_first	baseline_last	disposition
+base/inc/egacpu.h	1	483	include
+base/inc/egagraph.h	1	219	include
+base/inc/egamode.h	1	14	include
+base/inc/egavideo.h	1	51	include
+base/inc/egavideo.h	52	61	profile: #if 0
+base/inc/egavideo.h	62	125	include
+base/inc/egavideo.h	126	141	profile: #if defined(NTVDM) && defined(MONITOR)
+base/inc/gfx_upd.h	1	278	include
+base/inc/gfx_upd.h	279	281	profile: #ifdef NTVDM
+base/inc/gvi.h	1	311	include
+base/inc/video.h	1	261	include
+base/inc/video.h	262	273	profile: #ifdef NTVDM
+base/inc/video.h	274	276	profile: #ifdef MONITOR
+base/inc/video.h	277	278	profile: #ifdef NTVDM
+base/inc/video.h	279	282	include
+base/inc/video.h	283	283	profile: #ifndef NTVDM
+base/inc/video.h	284	287	include
+base/inc/video.h	288	288	profile: #ifndef NTVDM
+base/video/cga.c	1	3	include
+base/video/cga.c	4	4	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/cga.c	5	1489	include
+base/video/cga.c	1490	1490	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/ega_mode.c	1	540	include
+base/video/ega_mode.c	541	541	profile: #ifndef NTVDM
+base/video/ega_mode.c	542	664	include
+base/video/ega_mode.c	665	665	profile: #ifndef NTVDM
+base/video/ega_mode.c	666	798	include
+base/video/ega_prts.c	1	1875	include
+base/video/ega_prts.c	1876	1876	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/video/ega_prts.c	1877	1883	include
+base/video/ega_prts.c	1884	1884	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/video/ega_prts.c	1885	2952	include
+base/video/ega_prts.c	2953	2953	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_prts.c	2954	2954	include
+base/video/ega_prts.c	2955	2955	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_prts.c	2956	3465	include
+base/video/ega_read.c	1	3	include
+base/video/ega_read.c	4	4	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_read.c	5	649	include
+base/video/ega_read.c	650	650	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_read.c	651	678	include
+base/video/ega_read.c	679	685	profile: #if 0
+base/video/ega_read.c	686	690	include
+base/video/ega_read.c	691	691	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_read.c	692	998	include
+base/video/ega_read.c	999	999	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_vide.c	1	129	include
+base/video/ega_vide.c	130	133	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	134	134	include
+base/video/ega_vide.c	135	138	profile: #ifdef NTVDM
+base/video/ega_vide.c	139	139	profile: #ifndef X86GFX
+base/video/ega_vide.c	140	140	profile: #ifdef NTVDM
+base/video/ega_vide.c	141	141	profile: #ifndef X86GFX
+base/video/ega_vide.c	142	142	profile: #ifdef NTVDM
+base/video/ega_vide.c	143	658	include
+base/video/ega_vide.c	659	659	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/ega_vide.c	660	662	include
+base/video/ega_vide.c	663	663	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/ega_vide.c	664	671	include
+base/video/ega_vide.c	672	675	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	676	703	include
+base/video/ega_vide.c	704	704	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	705	727	include
+base/video/ega_vide.c	728	730	profile: #ifdef NTVDM
+base/video/ega_vide.c	731	751	include
+base/video/ega_vide.c	752	762	profile: #ifdef NTVDM
+base/video/ega_vide.c	763	763	include
+base/video/ega_vide.c	764	764	profile: #ifdef NTVDM
+base/video/ega_vide.c	765	774	include
+base/video/ega_vide.c	775	781	profile: #ifdef NTVDM
+base/video/ega_vide.c	782	784	include
+base/video/ega_vide.c	785	797	profile: #ifdef NTVDM
+base/video/ega_vide.c	798	1143	include
+base/video/ega_vide.c	1144	1160	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1161	1168	include
+base/video/ega_vide.c	1169	1175	profile: #ifdef NTVDM
+base/video/ega_vide.c	1176	1180	include
+base/video/ega_vide.c	1181	1184	profile: #ifdef NTVDM
+base/video/ega_vide.c	1185	1187	include
+base/video/ega_vide.c	1188	1196	profile: #ifdef NTVDM
+base/video/ega_vide.c	1197	1199	include
+base/video/ega_vide.c	1200	1203	profile: #ifdef NTVDM
+base/video/ega_vide.c	1204	1296	include
+base/video/ega_vide.c	1297	1300	profile: #ifdef NTVDM
+base/video/ega_vide.c	1301	1310	include
+base/video/ega_vide.c	1311	1318	profile: #ifdef NTVDM
+base/video/ega_vide.c	1319	1323	include
+base/video/ega_vide.c	1324	1331	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/ega_vide.c	1332	1610	include
+base/video/ega_vide.c	1611	1618	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1619	1625	include
+base/video/ega_vide.c	1626	1628	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1629	1635	include
+base/video/ega_vide.c	1636	1638	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1639	1646	include
+base/video/ega_vide.c	1647	1649	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1650	1661	include
+base/video/ega_vide.c	1662	1665	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1666	1667	include
+base/video/ega_vide.c	1668	1668	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1669	1671	include
+base/video/ega_vide.c	1672	1675	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1676	1677	include
+base/video/ega_vide.c	1678	1678	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1679	1682	include
+base/video/ega_vide.c	1683	1686	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1687	1688	include
+base/video/ega_vide.c	1689	1689	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1690	1706	include
+base/video/ega_vide.c	1707	1737	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1738	1762	include
+base/video/ega_vide.c	1763	1763	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1764	1831	include
+base/video/ega_vide.c	1832	1832	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+base/video/ega_vide.c	1833	1845	include
+base/video/ega_vide.c	1846	1846	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+base/video/ega_vide.c	1847	1849	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1850	1858	include
+base/video/ega_vide.c	1859	1859	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1860	1860	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/ega_vide.c	1861	1864	include
+base/video/ega_vide.c	1865	1865	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/ega_vide.c	1866	1879	include
+base/video/ega_vide.c	1880	1883	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/ega_vide.c	1884	2210	include
+base/video/ega_vide.c	2211	2214	profile: #ifdef NTVDM
+base/video/ega_vide.c	2215	2265	include
+base/video/ega_vide.c	2266	2322	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2323	2356	include
+base/video/ega_writ.c	1	3	include
+base/video/ega_writ.c	4	4	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_writ.c	5	373	include
+base/video/ega_writ.c	374	374	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_writ.c	375	416	include
+base/video/ega_writ.c	417	431	profile: #if 0
+base/video/ega_writ.c	432	437	include
+base/video/ega_writ.c	438	438	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_writ.c	439	854	include
+base/video/ega_writ.c	855	855	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/egawrtm0.c	1	3	include
+base/video/egawrtm0.c	4	4	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/egawrtm0.c	5	1365	include
+base/video/egawrtm0.c	1366	1366	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/egwrtm12.c	1	3	include
+base/video/egwrtm12.c	4	4	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/egwrtm12.c	5	1217	include
+base/video/egwrtm12.c	1218	1218	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/gfx_updt.c	1	215	include
+base/video/gfx_updt.c	216	219	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/gfx_updt.c	220	2396	include
+base/video/gfx_updt.c	2397	2397	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2398	2399	include
+base/video/gfx_updt.c	2400	2400	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2401	2580	include
+base/video/gfx_updt.c	2581	2581	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2582	2583	include
+base/video/gfx_updt.c	2584	2584	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2585	2718	include
+base/video/gfx_updt.c	2719	2719	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2720	2721	include
+base/video/gfx_updt.c	2722	2722	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2723	2874	include
+base/video/gfx_updt.c	2875	2875	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2876	2877	include
+base/video/gfx_updt.c	2878	2878	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2879	2978	include
+base/video/gfx_updt.c	2979	2979	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2980	2981	include
+base/video/gfx_updt.c	2982	2982	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2983	3080	include
+base/video/gfx_updt.c	3081	3081	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3082	3083	include
+base/video/gfx_updt.c	3084	3084	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3085	3186	include
+base/video/gfx_updt.c	3187	3187	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3188	3189	include
+base/video/gfx_updt.c	3190	3190	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3191	3213	include
+base/video/gfx_updt.c	3214	3214	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3215	3216	include
+base/video/gfx_updt.c	3217	3217	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3218	3241	include
+base/video/gfx_updt.c	3242	3242	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3243	3244	include
+base/video/gfx_updt.c	3245	3245	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3246	3267	include
+base/video/gfx_updt.c	3268	3268	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3269	3270	include
+base/video/gfx_updt.c	3271	3271	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3272	3306	include
+base/video/gfx_updt.c	3307	3307	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3308	3309	include
+base/video/gfx_updt.c	3310	3310	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3311	3334	include
+base/video/gfx_updt.c	3335	3335	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3336	3337	include
+base/video/gfx_updt.c	3338	3338	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3339	3644	include
+base/video/gfx_updt.c	3645	3645	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove uneeded code */
+base/video/gfx_updt.c	3646	3763	include
+base/video/gfx_updt.c	3764	3764	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove uneeded code */
+base/video/gfx_updt.c	3765	3780	include
+base/video/gfx_updt.c	3781	3784	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/gfx_updt.c	3785	3786	include
+base/video/gfx_updt.c	3787	3787	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/gfx_updt.c	3788	3788	include
+base/video/gfx_updt.c	3789	3789	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove unneeded code */
+base/video/gfx_updt.c	3790	3809	include
+base/video/gfx_updt.c	3810	3810	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove unneeded code */
+base/video/gfx_updt.c	3811	4183	include
+base/video/gfx_updt.c	4184	4192	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4193	4243	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4244	4246	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4247	4247	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4248	4248	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4249	4458	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4459	4459	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	4460	4461	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4462	4462	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	4463	4583	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4584	4584	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	4585	4586	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4587	4587	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	4588	4662	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4663	4738	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4739	4741	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4742	4742	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4743	4743	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4744	4752	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4753	4755	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4756	4756	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4757	4757	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4758	4764	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4765	4765	profile: #ifndef MONITOR
+base/video/gfx_updt.c	4766	4870	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4871	4871	profile: #ifndef MONITOR
+base/video/gfx_updt.c	4872	4872	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4873	4874	include
+base/video/gfx_updt.c	4875	4878	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4879	4884	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4885	4895	profile: #ifdef NTVDM
+base/video/gvi.c	1	287	include
+base/video/gvi.c	288	288	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/gvi.c	289	290	include
+base/video/gvi.c	291	291	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/gvi.c	292	341	include
+base/video/v7_ports.c	1	771	include
+base/video/v7_video.c	1	524	include
+base/video/vga_mode.c	1	207	include
+base/video/vga_mode.c	208	241	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/vga_mode.c	242	285	include
+base/video/vga_mode.c	286	291	profile: #if defined(NTVDM) && !defined(MONITOR)   /* Only get here for NTVDM Riscs */
+base/video/vga_mode.c	292	298	include
+base/video/vga_mode.c	299	299	profile: #if defined(NTVDM) && !defined(MONITOR)   /* Only get here for NTVDM Riscs */
+base/video/vga_mode.c	300	581	include
+base/video/vga_prts.c	1	562	include
+base/video/vga_prts.c	563	568	profile: #ifdef NTVDM
+base/video/vga_prts.c	569	569	include
+base/video/vga_prts.c	570	570	profile: #ifdef NTVDM
+base/video/vga_prts.c	571	871	include
+base/video/vga_prts.c	872	874	profile: #ifdef NTVDM
+base/video/vga_prts.c	875	875	include
+base/video/vga_prts.c	876	876	profile: #ifdef NTVDM
+base/video/vga_prts.c	877	1347	include
+base/video/vga_prts.c	1348	1350	profile: #ifdef NTVDM
+base/video/vga_prts.c	1351	1351	include
+base/video/vga_prts.c	1352	1352	profile: #ifdef NTVDM
+base/video/vga_prts.c	1353	2167	include
+base/video/vga_prts.c	2168	2168	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/vga_prts.c	2169	2169	include
+base/video/vga_prts.c	2170	2170	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/vga_prts.c	2171	2344	include
+base/video/vga_prts.c	2345	2351	profile: #ifdef NTVDM
+base/video/vga_prts.c	2352	2356	include
+base/video/vga_prts.c	2357	2357	profile: #ifdef NTVDM
+base/video/vga_prts.c	2358	2366	include
+base/video/vga_prts.c	2367	2381	profile: #if defined(X86GFX)
+base/video/vga_prts.c	2382	2386	include
+base/video/vga_prts.c	2387	2399	profile: #ifdef X86GFX
+base/video/vga_prts.c	2400	2410	include
+base/video/vga_prts.c	2411	2413	profile: #ifdef NTVDM
+base/video/vga_prts.c	2414	2414	include
+base/video/vga_prts.c	2415	2415	profile: #ifdef NTVDM
+base/video/vga_prts.c	2416	3018	include
+base/video/vga_prts.c	3019	3028	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_prts.c	3029	3532	include
+base/video/vga_vide.c	1	668	include
+base/video/vga_vide.c	669	671	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_vide.c	672	700	include
+base/video/vga_vide.c	701	704	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_vide.c	705	706	include
+base/video/vga_vide.c	707	707	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_vide.c	708	1021	include
+base/video/video.c	1	100	include
+base/video/video.c	101	106	profile: #ifdef NTVDM
+base/video/video.c	107	109	profile: #ifdef MONITOR
+base/video/video.c	110	111	profile: #ifdef NTVDM
+base/video/video.c	112	1887	include
+base/video/video.c	1888	1891	profile: #ifdef NTVDM
+base/video/video.c	1892	1892	include
+base/video/video.c	1893	1893	profile: #ifdef NTVDM
+base/video/video.c	1894	1919	include
+base/video/video.c	1920	1922	profile: #ifdef NTVDM
+base/video/video.c	1923	1939	include
+base/video/video.c	1940	1950	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/video.c	1951	1951	include
+base/video/video.c	1952	1952	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/video.c	1953	2005	include
+base/video/video.c	2006	2016	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	2017	2020	include
+base/video/video.c	2021	2021	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	2022	2132	include
+base/video/video.c	2133	2143	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	2144	2147	include
+base/video/video.c	2148	2148	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	2149	2252	include
+base/video/video.c	2253	2255	profile: #ifdef NTVDM
+base/video/video.c	2256	2258	include
+base/video/video.c	2259	2314	profile: #ifdef NTVDM
+base/video/video.c	2315	2320	profile: #ifdef X86GFX
+base/video/video.c	2321	2322	profile: #ifdef NTVDM
+base/video/video.c	2323	2830	include
+base/video/video.c	2831	2833	profile: #ifdef NTVDM
+base/video/video.c	2834	2838	profile: #ifdef MONITOR
+base/video/video.c	2839	2846	profile: #ifdef NTVDM
+base/video/video.c	2847	2847	profile: #ifdef MONITOR
+base/video/video.c	2848	2856	profile: #ifdef NTVDM
+base/video/video.c	2857	2857	profile: #ifndef MONITOR
+base/video/video.c	2858	2858	profile: #ifdef NTVDM
+base/video/video.c	2859	2859	profile: #ifndef MONITOR
+base/video/video.c	2860	2861	profile: #ifdef NTVDM
+base/video/video_io.c	1	51	include
+base/video/video_io.c	52	55	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/video_io.c	56	70	include
+host/inc/nt_cga.h	1	22	include
+host/inc/nt_fulsc.h	1	136	include
+host/inc/nt_fulsc.h	137	141	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	142	155	include
+host/inc/nt_fulsc.h	156	159	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	160	172	include
+host/inc/nt_fulsc.h	173	173	excluded-NT-fullscreen-declaration
+host/inc/nt_fulsc.h	174	178	include
+host/inc/nt_fulsc.h	179	180	excluded-NT-fullscreen-declaration
+host/inc/nt_fulsc.h	181	196	include
+host/inc/nt_fulsc.h	197	245	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	246	247	include
+host/inc/nt_fulsc.h	248	253	profile: #ifdef X86GFX
+host/inc/nt_graph.h	1	76	include
+host/inc/nt_graph.h	77	79	profile: #ifdef X86GFX
+host/inc/nt_graph.h	80	391	include
+host/inc/nt_graph.h	392	413	profile: #ifdef MONITOR
+host/inc/nt_graph.h	414	443	include
+host/inc/nt_graph.h	444	448	profile: #ifdef MONITOR
+host/inc/nt_graph.h	449	460	include
+host/inc/nt_graph.h	461	461	excluded-NT-stream-state
+host/inc/nt_graph.h	462	484	include
+host/src/nt_cga.c	1	47	include
+host/src/nt_cga.c	48	51	profile: #ifdef MONITOR
+host/src/nt_cga.c	52	82	include
+host/src/nt_cga.c	83	85	profile: #ifdef MONITOR
+host/src/nt_cga.c	86	86	include
+host/src/nt_cga.c	87	87	profile: #ifdef MONITOR
+host/src/nt_cga.c	88	105	include
+host/src/nt_cga.c	106	108	profile: #ifdef X86GFX
+host/src/nt_cga.c	109	110	include
+host/src/nt_cga.c	111	117	profile: #ifdef MONITOR
+host/src/nt_cga.c	118	274	include
+host/src/nt_cga.c	275	275	profile: #ifndef MONITOR
+host/src/nt_cga.c	276	278	include
+host/src/nt_cga.c	279	279	profile: #ifndef MONITOR
+host/src/nt_cga.c	280	984	include
+host/src/nt_cga.c	985	1207	profile: #ifdef MONITOR
+host/src/nt_ega.c	1	42	include
+host/src/nt_ega.c	43	46	profile: #ifdef MONITOR
+host/src/nt_ega.c	47	1689	include
+host/src/nt_ega.c	1690	2168	profile: #ifdef MONITOR
+host/src/nt_graph.c	1	29	include
+host/src/nt_graph.c	30	32	profile: #ifdef X86GFX
+host/src/nt_graph.c	33	219	include
+host/src/nt_graph.c	220	271	profile: #ifdef MONITOR
+host/src/nt_graph.c	272	296	include
+host/src/nt_graph.c	297	309	profile: #ifdef MONITOR
+host/src/nt_graph.c	310	453	include
+host/src/nt_graph.c	454	454	excluded-NT-stream-state
+host/src/nt_graph.c	455	557	include
+host/src/nt_graph.c	558	558	profile: #ifndef MONITOR
+host/src/nt_graph.c	559	564	include
+host/src/nt_graph.c	565	565	profile: #ifndef MONITOR
+host/src/nt_graph.c	566	568	include
+host/src/nt_graph.c	569	577	profile: #ifdef X86GFX
+host/src/nt_graph.c	578	607	include
+host/src/nt_graph.c	608	610	profile: #ifdef X86GFX
+host/src/nt_graph.c	611	628	include
+host/src/nt_graph.c	629	631	profile: #ifdef MONITOR
+host/src/nt_graph.c	632	632	include
+host/src/nt_graph.c	633	633	profile: #ifdef MONITOR
+host/src/nt_graph.c	634	671	include
+host/src/nt_graph.c	672	698	profile: #ifdef MONITOR
+host/src/nt_graph.c	699	773	include
+host/src/nt_graph.c	774	774	profile: #ifndef X86GFX
+host/src/nt_graph.c	775	776	include
+host/src/nt_graph.c	777	777	profile: #ifndef X86GFX
+host/src/nt_graph.c	778	796	include
+host/src/nt_graph.c	797	804	profile: #ifdef MONITOR
+host/src/nt_graph.c	805	816	include
+host/src/nt_graph.c	817	819	profile: #ifdef X86GFX
+host/src/nt_graph.c	820	889	include
+host/src/nt_graph.c	890	892	profile: #ifdef X86GFX
+host/src/nt_graph.c	893	916	include
+host/src/nt_graph.c	917	919	profile: #ifdef X86GFX
+host/src/nt_graph.c	920	1307	include
+host/src/nt_graph.c	1308	1315	profile: #ifdef MONITOR
+host/src/nt_graph.c	1316	1364	include
+host/src/nt_graph.c	1365	1392	profile: #ifdef X86GFX
+host/src/nt_graph.c	1393	1395	include
+host/src/nt_graph.c	1396	1396	profile: #ifdef X86GFX
+host/src/nt_graph.c	1397	1499	include
+host/src/nt_graph.c	1500	1512	profile: #ifdef MONITOR
+host/src/nt_graph.c	1513	2350	include
+host/src/nt_graph.c	2351	2362	excluded-NT-stream-host-endpoint
+host/src/nt_vga.c	1	35	include
+host/src/nt_vga.c	36	39	profile: #ifdef MONITOR
+host/src/nt_vga.c	40	1662	include
+host/src/nt_vga.c	1663	2213	profile: #ifdef MONITOR

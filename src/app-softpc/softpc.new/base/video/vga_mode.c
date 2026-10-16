@@ -43,7 +43,7 @@ static char SccsID[]="@(#)vga_mode.c	1.35 06/01/95 Copyright Insignia Solutions 
 -------------------------------------------------------------------------
 [1.2 DATATYPES FOR [1.1] (if not basic C types)]
 
-	STRUCTURES/TYPEDEFS/ENUMS: 
+	STRUCTURES/TYPEDEFS/ENUMS:
 
 uses	enum DISPLAY_STATE which is declared in ega_graph.pi.
 
@@ -77,7 +77,7 @@ PURPOSE		  : 	To decide which memory organisation is being used by
 			(called DISPLAY_MODE), describing each sort of memory
 			organisation.
 
-PARAMETERS	  :	none 
+PARAMETERS	  :	none
 
 GLOBALS		  :	uses EGA_GRAPH struct, specially display_state to
 			decide which mode is being used.
@@ -116,17 +116,17 @@ GLOBALS		  :	uses EGA_GRAPH struct, specially display_state to
 
 /* [3.1.2 DECLARATIONS]                                                 */
 
-/* [3.2 INTERMODULE EXPORTS]						*/ 
+/* [3.2 INTERMODULE EXPORTS]						*/
 
 #include	"egamode.h"
 
-#ifdef GISP_SVGA 
+#ifdef GISP_SVGA
 #include HostHwVgaH
 #include "hwvga.h"
 #endif /* GISP_SVGA */
 
 /*
-5.MODULE INTERNALS   :   (not visible externally, global internally)]     
+5.MODULE INTERNALS   :   (not visible externally, global internally)]
 
 [5.1 LOCAL DECLARATIONS]						*/
 
@@ -150,7 +150,7 @@ PROCEDURE	  : 	set_up_screen_ptr()
 
 PURPOSE		  : 	Decide which plane the information must come from for displaying
 
-PARAMETERS	  :	none 
+PARAMETERS	  :	none
 
 GLOBALS		  :	uses EGA_GRAPH struct, plane_mask to decide which planes are enabled
 
@@ -205,40 +205,6 @@ DISPLAY_MODE	mode;
 	}
 	note_display_state1("VGA set_update_routine(%s)", get_mode_string(mode) );
 
-#if defined(NTVDM) && defined(MONITOR)
-	{
-	    extern void mon_text_update(void);
-
-	    switch (mode)
-	    {
-	    case EGA_TEXT_40_SP_WR:
-	    case EGA_TEXT_80_SP_WR:
-	    case CGA_TEXT_40_SP_WR:
-	    case CGA_TEXT_80_SP_WR:
-	    case EGA_TEXT_40_SP:
-	    case EGA_TEXT_80_SP:
-	    case CGA_TEXT_40_SP:
-	    case CGA_TEXT_80_SP:
-	    case EGA_TEXT_40_WR:
-	    case EGA_TEXT_80_WR:
-	    case EGA_TEXT_40:
-	    case EGA_TEXT_80:
-	    case CGA_TEXT_40_WR:
-	    case CGA_TEXT_80_WR:
-	    case CGA_TEXT_40:
-	    case CGA_TEXT_80:
-	    case TEXT_40_FUN:
-	    case TEXT_80_FUN:
-		set_gfx_update_routines(mon_text_update, SIMPLE_MARKING,
-					TEXT_SCROLL);
-		return;
-	    default:
-		break;
-	}
-
-	}
-
-#endif	/* MONITOR */
 /* NTVDM monitor: All text monitor cases dealt with. For frozen graphics */
 /* now fall through to do decode to correct paint routines per mode */
 
@@ -283,12 +249,6 @@ DISPLAY_MODE	mode;
 		case EGA_TEXT_40:
 		case EGA_TEXT_80:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
-#if defined(NTVDM) && !defined(MONITOR)   /* Only get here for NTVDM Riscs */
-			{
-	    		    extern void jazz_text_update();
-	    		    set_gfx_update_routines( jazz_text_update, SIMPLE_MARKING, TEXT_SCROLL );
-			}
-#else
 #ifdef GISP_SVGA
 			videoInfo.modeType = TEXT;
 			set_gfx_update_routines( mon_text_update, SIMPLE_MARKING, TEXT_SCROLL );
@@ -296,7 +256,6 @@ DISPLAY_MODE	mode;
 			set_gfx_update_routines( ega_text_update, SIMPLE_MARKING, TEXT_SCROLL );
 #endif /* GISP_SVGA */
 			host_update_fonts();
-#endif	/* NTVDM */
 			break;
 		case CGA_TEXT_40_WR:
 		case CGA_TEXT_80_WR:
@@ -579,3 +538,4 @@ boolean	choose_vga_display_mode()
 
 #endif /* EGG */
 #endif /* REAL_VGA */
+

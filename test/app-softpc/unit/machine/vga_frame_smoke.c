@@ -68,6 +68,9 @@ extern int softpc_device_bop_dispatch(unsigned char number,
 extern void c_setAL(unsigned char value);
 extern void c_setAH(unsigned char value);
 extern void c_setBX(unsigned short value);
+extern void c_setCX(IU16 value);
+extern void c_setDX(IU16 value);
+extern ISM32 c_setES(IU16 value);
 extern unsigned short c_getAX(void);
 extern unsigned short c_getBX(void);
 extern unsigned short c_getCX(void);
@@ -1435,6 +1438,75 @@ static void verify_snapshot_video_writes(softpc_machine *machine)
     }
 }
 
+static void verify_bios_dac_block_and_state(void)
+{
+    extern IU8 c_sas_hw_at(IU32 addr);
+    extern void c_sas_store(IU32 addr, IU8 value);
+    const IU32 input = 0x6000u, output = 0x6400u, saved = 0x6800u;
+    unsigned char expected[768];
+
+    c_setAH(0);
+    c_setAL(0x13);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    (void)c_setES(0);
+    for (unsigned i = 0; i < sizeof(expected); ++i) {
+        expected[i] = (unsigned char)((i * 17u + i / 3u + 7u) & 63u);
+        c_sas_store(input + i, expected[i]);
+    }
+    c_setAH(0x10);
+    c_setAL(0x12);
+    c_setBX(0);
+    c_setCX(256);
+    c_setDX((IU16)input);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+
+    /* Full DAC save needs a counter wider than the byte-sized entry index.
+       The BIOS state layout has a 32-byte header and three DAC metadata bytes. */
+    c_sas_store(saved - 1, 0xa5);
+    c_sas_store(saved + 35u + sizeof(expected), 0x5a);
+    c_setAH(0x1c);
+    c_setAL(1);
+    c_setCX(4);
+    c_setBX((IU16)saved);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    assert(c_sas_hw_at(saved - 1) == 0xa5);
+    assert(c_sas_hw_at(saved + 35u + sizeof(expected)) == 0x5a);
+    for (unsigned i = 0; i < sizeof(expected); ++i)
+        assert(c_sas_hw_at(saved + 35u + i) == expected[i]);
+
+    for (unsigned pass = 0; pass < 3; ++pass) {
+        if (pass == 1) {
+            for (unsigned i = 0; i < sizeof(expected); ++i)
+                c_sas_store(input + i, (IU8)(expected[i] ^ 63u));
+            c_setAH(0x10);
+            c_setAL(0x12);
+            c_setBX(0);
+            c_setCX(256);
+            c_setDX((IU16)input);
+            assert(softpc_device_bop_dispatch(0x42u, 0u));
+        } else if (pass == 2) {
+            c_setAH(0x1c);
+            c_setAL(2);
+            c_setCX(4);
+            c_setBX((IU16)saved);
+            assert(softpc_device_bop_dispatch(0x42u, 0u));
+        }
+        c_sas_store(output - 1, 0xa5);
+        c_sas_store(output + sizeof(expected), 0x5a);
+        c_setAH(0x10);
+        c_setAL(0x17);
+        c_setBX(0);
+        c_setCX(256);
+        c_setDX((IU16)output);
+        assert(softpc_device_bop_dispatch(0x42u, 0u));
+        assert(c_sas_hw_at(output - 1) == 0xa5);
+        assert(c_sas_hw_at(output + sizeof(expected)) == 0x5a);
+        for (unsigned i = 0; i < sizeof(expected); ++i)
+            assert(c_sas_hw_at(output + i) ==
+                (pass == 1 ? (expected[i] ^ 63u) : expected[i]));
+    }
+}
+
 int main(void)
 {
     const char *path = "softpc-original-dib-smoke.img";
@@ -1780,6 +1852,7 @@ int main(void)
     verify_driver_geometry(machine);
     verify_snapshot_rebuilds_graphics_surface(machine);
     verify_snapshot_video_writes(machine);
+    verify_bios_dac_block_and_state();
     verify_preserved_v7_modes();
     verify_v7_cpu_scanout(machine);
     verify_chain2_dirty_entries();

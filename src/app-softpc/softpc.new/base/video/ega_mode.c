@@ -538,7 +538,6 @@ LOCAL void ega_dummy_calc IFN0()
 static	void	set_update_routine(mode)
 DISPLAY_MODE	mode;
 {
-#ifndef NTVDM
 	static int last_height = 200;
 
 	if (last_height != get_screen_height()) {
@@ -662,7 +661,6 @@ DISPLAY_MODE	mode;
 			assert1(NO,"Bad display mode %d", (int) mode );
 			break;
 	}
-#endif /* NTVDM */
 }
 
 

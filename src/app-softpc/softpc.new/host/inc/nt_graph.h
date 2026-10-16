@@ -74,9 +74,6 @@ typedef struct
     BOOL        Focus;                    /* Window has Input Focus */
     HANDLE      FocusEvent;               /* Focus has changed event */
     HANDLE      ActiveOutputBufferHandle; /* The current Console screen buffer handle. */
-#ifdef X86GFX
-    BOOL	Registered;		  /* TRUE when are registered to the console */
-#endif
     WORD	ScreenSizeX;
     WORD	ScreenSizeY;
     HANDLE	AltOutputHandle;
@@ -389,28 +386,6 @@ extern void nt_v7vga_mono_hi_graph_huge(int offset, int screen_x, int screen_y,
                          int width, int height);
 #endif /* V7VGA */
 
-#ifdef MONITOR
-void nt_cga_med_frozen_std(int offset, int screen_x, int screen_y, int len,
-			   int height);
-void nt_cga_hi_frozen_std(int offset, int screen_x, int screen_y, int len,
-			  int height);
-void nt_ega_lo_frozen_std(int offset, int screen_x, int screen_y,
-                          int width, int height);
-void nt_ega_med_frozen_std(int offset, int screen_x, int screen_y,
-                           int width, int height);
-void nt_ega_hi_frozen_std(int offset, int screen_x, int screen_y,
-                          int width, int height);
-void nt_vga_frozen_std(int offset, int screen_x, int screen_y,
-                       int width, int height);
-void nt_vga_frozen_pack_std(int offset, int screen_x, int screen_y,
-                       int width, int height);
-void nt_vga_med_frozen_std(int offset, int screen_x, int screen_y,
-                           int width, int height);
-void nt_vga_hi_frozen_std(int offset, int screen_x, int screen_y,
-                          int width, int height);
-void nt_dummy_frozen(int offset, int screen_x, int screen_y, int len,
-		     int height);
-#endif /* MONITOR */
 
 void high_stretch3(unsigned char *buffer, int length);
 void high_stretch4(unsigned char *buffer, int length);
@@ -441,11 +416,6 @@ BOOL  CreateDisplayPalette(void);
 int get_screen_scale IFN0();
 void SetupConsoleMode(void);
 
-#ifdef MONITOR
-IMPORT void select_frozen_routines IFN0();
-half_word get_vga_DAC_rd_addr(void);
-void resetNowCur(void);
-#endif /* MONITOR */
 
 void do_new_cursor(void);
 void textResize(void);
@@ -458,7 +428,6 @@ extern word int10_seg;
 extern word int10_caller;
 extern word useHostInt10;
 extern word changing_mode_flag;
-extern BOOL host_stream_io_enabled;
 
 
 // from nt_ega.c

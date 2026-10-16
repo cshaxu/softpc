@@ -8,7 +8,7 @@
  * Author	: Henry Nash / David Rees
  *
  * Notes	: This file should be included by all external modules that
- *		  use the GVI module.  
+ *		  use the GVI module.
  */
 
 /* SccsID[]="@(#)gvi.h	1.16 06/28/93 Copyright Insignia Solutions Ltd."; */
@@ -43,8 +43,8 @@
 /*
  * Legal modes for the adapter
  */
-
-#define TEXT	        0	/* Alpha numeric mode 80 by 25, or 40 by 25  */ 
+#undef TEXT
+#define TEXT	        0	/* Alpha numeric mode 80 by 25, or 40 by 25  */
 #define GRAPHICS	1	/* All Points Addressable 640x200 or 320x200 */
 
 #define HIGH		0	/* APA 640x200,  2 colors		     */
@@ -223,7 +223,7 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #define	set_cur_x(val)			PCDisplay.cur_x = (val)
 #define	set_cur_y(val)			PCDisplay.cur_y = (val)
 #define	set_cursor_start(val)		PCDisplay.cursor_start = (val)
-#define	inc_cursor_start()		(PCDisplay.cursor_start)++ 
+#define	inc_cursor_start()		(PCDisplay.cursor_start)++
 #define	set_cursor_height(val)		PCDisplay.cursor_height = (val)
 #define	set_cursor_start1(val)		PCDisplay.cursor_start1 = (val)
 #define	set_cursor_height1(val)		PCDisplay.cursor_height1 = (val)
@@ -299,7 +299,7 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #endif /* V7VGA */
 #endif
 
-/* 
+/*
  * useful macro to get character height in host pixels
  */
 #define get_host_char_height()		(get_char_height()*get_host_pix_height()*get_pc_pix_height())

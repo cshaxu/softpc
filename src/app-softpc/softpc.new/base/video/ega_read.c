@@ -1,7 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
 
-#if !(defined(NTVDM) && defined(MONITOR))
 
 /*			INSIGNIA (SUB)MODULE SPECIFICATION
 			-----------------------------
@@ -16,7 +15,7 @@ DOCUMENT 		: name and number
 
 RELATED DOCS		: include all relevant references
 
-DESIGNER		: 
+DESIGNER		:
 
 REVISION HISTORY	:
 First version		: August 1988, J. Maiden
@@ -26,7 +25,7 @@ SUBMODULE NAME		: ega
 
 SOURCE FILE NAME	: ega_read.c
 
-PURPOSE			: emulation of EGA read operations 
+PURPOSE			: emulation of EGA read operations
 
 SccsID = @(#)ega_read.c	1.32 09/07/94 Copyright Insignia Solutions Ltd.
 		
@@ -50,7 +49,7 @@ SccsID = @(#)ega_read.c	1.32 09/07/94 Copyright Insignia Solutions Ltd.
 [1.3 INTERMODULE IMPORTS]
 	 (not o/s objects or standard libs)
 
-	PROCEDURES() : 
+	PROCEDURES() :
 
 	DATA 	     : 	give name, and source module name
 
@@ -138,10 +137,10 @@ ERROR RECOVERY	  :	none.
 
 /* [3.1.2 DECLARATIONS]                                                 */
 
-/* [3.2 INTERMODULE EXPORTS]						*/ 
+/* [3.2 INTERMODULE EXPORTS]						*/
 
 /*
-5.0 MODULE INTERNALS   :   (not visible externally, global internally)]     
+5.0 MODULE INTERNALS   :   (not visible externally, global internally)]
 
 [5.1 LOCAL DECLARATIONS]						*/
 
@@ -609,8 +608,8 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 
 	if( lsb )
 	{
-		*(dest MINUS count) = (( *(p01 + 1) ^ comp1 ) | dont_care1 )
-							& (( *(p23 + 1) ^ comp3 ) | dont_care3 );
+		*(dest MINUS count) = (UTINY)((( *(p01 + 1) ^ comp1 ) | dont_care1 )
+   							        & (( *(p23 + 1) ^ comp3 ) | dont_care3 ));
 		count--;
 		offset += 4;
 	}
@@ -619,22 +618,22 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 
 	while( tcount-- )
 	{
-		*(dest MINUS tcount) = (( *(p01 + offset) ^ comp0) | dont_care0 )
-							& (( *(p23 + offset) ^ comp2 ) | dont_care2 );
+		*(dest MINUS tcount) = (UTINY)((( *(p01 + offset) ^ comp0) | dont_care0 )
+							        & (( *(p23 + offset) ^ comp2 ) | dont_care2 ));
 
 		tcount--;
 		offset += 1;
 
-		*(dest MINUS tcount) = (( *(p01 + offset) ^ comp1) | dont_care1 )
-							& (( *(p23 + offset) ^ comp3 ) | dont_care3 );
+		*(dest MINUS tcount) = (UTINY)((( *(p01 + offset) ^ comp1) | dont_care1 )
+							        & (( *(p23 + offset) ^ comp3 ) | dont_care3 ));
 
 		offset += 3;
 	}	
 
 	if( count & 1 )
 	{
-		*(dest MINUS count) = (( *(p01 + offset) ^ comp0 ) | dont_care0 )
-							& (( *(p23 + offset) ^ comp2 ) | dont_care2 );
+		*(dest MINUS count) = (UTINY)((( *(p01 + offset) ^ comp0 ) | dont_care0 )
+							        & (( *(p23 + offset) ^ comp2 ) | dont_care2 ));
 	}
 }
 
@@ -647,7 +646,6 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 #include "SOFTPC_GRAPHICS.seg"
 #endif
 
-#if !(defined(NTVDM) && defined(MONITOR))
 GLOBAL void
 Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 {
@@ -676,19 +674,11 @@ Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 
 	A_vid_reads = *handler;
 
-#if	0
-	A_vid_reads.b_read = handler->b_read;
-	A_vid_reads.w_read = handler->w_read;
-#ifndef	NO_STRING_OPERATIONS
-	A_vid_reads.str_read = handler->str_read;
-#endif	/* NO_STRING_OPERATIONS */
-#endif	/* 0 */
 
 #endif	/* C_VID */
 #endif	/* A3CPU */
 #endif	/* CPU_40_STYLE - EVID */
 }	
-#endif /* !(NTVDM && MONITOR) */
 
 #ifdef SEGMENTATION
 /*
@@ -773,7 +763,7 @@ ega_read_routines_update IFN0()
 #endif /* A3CPU */
 #endif /* GISP_CPU */
 
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 		setVideofwd_str_read_addr(_rd_ram_dsbld_fwd_string_lge);
 		setVideofwd_str_read_addr(_rd_ram_dsbld_bwd_string_lge);
 #endif	/* NO_STRING_OPERATIONS */
@@ -799,7 +789,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 
 				read_ptrs = &pointers_mode0_nch;
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 				setVideofwd_str_read_addr(_rdm0_fwd_string_nch_lge);
 				setVideobwd_str_read_addr(_rdm0_bwd_string_nch_lge);
 #endif	/* NO_STRING_OPERATIONS */
@@ -812,7 +802,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 
 				read_ptrs = &pointers_mode0_ch2;
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 				string_read_ptr = rdm0_string_ch2;
 #endif	/* NO_STRING_OPERATIONS */
 #endif	/* CPU_40_STYLE */
@@ -827,7 +817,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 
 				read_ptrs = &pointers_mode0_ch4;
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 				setVideofwd_str_read_addr(_rdm0_fwd_string_ch4_lge);
 				setVideobwd_str_read_addr(_rdm0_bwd_string_ch4_lge);
 #endif
@@ -852,7 +842,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 
 				read_ptrs = &pointers_mode1_nch;
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 				setVideofwd_str_read_addr(_rdm1_fwd_string_nch_lge);
 				setVideobwd_str_read_addr(_rdm1_bwd_string_nch_lge);
 #endif	/* NO_STRING_OPERATIONS */
@@ -875,7 +865,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 
 				read_ptrs = &pointers_mode1_ch2;
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 				string_read_ptr = rdm1_string_ch2;
 #endif	/* NO_STRING_OPERATIONS */
 
@@ -893,7 +883,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 
 				read_ptrs = &pointers_mode1_ch4;
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 				setVideofwd_str_read_addr(_rdm1_fwd_string_ch4_lge);
 				setVideobwd_str_read_addr(_rdm1_bwd_string_ch4_lge);
 #endif	/* NO_STRING_OPERATIONS */
@@ -933,7 +923,7 @@ ega_read_init IFN0()
 	SetReadPointers(2);
 #else  /* CPU_40_STYLE */
 
-#ifndef	NO_STRING_OPERATIONS 
+#ifndef	NO_STRING_OPERATIONS
 	setVideofwd_str_read_addr(_rd_ram_dsbld_fwd_string_lge);
 	setVideobwd_str_read_addr(_rd_ram_dsbld_bwd_string_lge);
 #endif	/* NO_STRING_OPERATIONS */
@@ -996,4 +986,3 @@ ega_read_term IFN0()
 #endif /* REAL_VGA */
 #endif /* EGG */
 
-#endif	/* !(NTVDM && MONITOR) */

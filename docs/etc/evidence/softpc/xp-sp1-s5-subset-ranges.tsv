@@ -1,0 +1,2141 @@
+path	xp_first	xp_last	disposition
+base/cvidc/ev_glue.c	1	803	include
+base/cvidc/evidfunc.h	1	715	include
+base/cvidc/evidgen.h	1	176	include
+base/cvidc/j_c_lang.c	1	210	include
+base/cvidc/j_c_lang.h	1	49	include
+base/cvidc/sevid000.c	1	3148	include
+base/cvidc/sevid001.c	1	3498	include
+base/cvidc/sevid002.c	1	4145	include
+base/cvidc/sevid003.c	1	4708	include
+base/cvidc/sevid004.c	1	5179	include
+base/cvidc/sevid005.c	1	3874	include
+base/cvidc/sevid006.c	1	4828	include
+base/cvidc/sevid007.c	1	5257	include
+base/cvidc/sevid008.c	1	4334	include
+base/cvidc/sevid009.c	1	2827	include
+base/cvidc/sevid010.c	1	4989	include
+base/cvidc/sevid011.c	1	3792	include
+base/cvidc/sevid012.c	1	4120	include
+base/cvidc/sevid013.c	1	5153	include
+base/cvidc/sevid014.c	1	5345	include
+base/cvidc/sevid015.c	1	4711	include
+base/cvidc/sevid016.c	1	4530	include
+base/cvidc/sevid017.c	1	3361	include
+base/cvidc/sevid018.c	1	3581	include
+base/cvidc/sevid019.c	1	4591	include
+base/cvidc/sevid020.c	1	3728	include
+base/cvidc/sevid021.c	1	4413	include
+base/cvidc/sevid022.c	1	4286	include
+base/cvidc/sevid023.c	1	2875	include
+base/cvidc/sevid024.c	1	3181	include
+base/cvidc/sevid025.c	1	4209	include
+base/cvidc/sevid026.c	1	3936	include
+base/cvidc/sevid027.c	1	3725	include
+base/cvidc/sevid028.c	1	4360	include
+base/cvidc/sevid029.c	1	3784	include
+base/cvidc/sevid030.c	1	2695	include
+base/cvidc/sinit011.c	1	939	include
+base/cvidc/sinit012.c	1	1476	include
+base/cvidc/sinit013.c	1	2153	include
+base/cvidc/vglfunc.c	1	169	include
+base/inc/egacpu.h	1	116	include
+base/inc/egacpu.h	117	139	profile: #if defined(NEC_98)
+base/inc/egacpu.h	140	140	include
+base/inc/egacpu.h	141	141	profile: #if defined(NEC_98)
+base/inc/egacpu.h	142	142	include
+base/inc/egacpu.h	143	145	profile: #if defined(NEC_98)
+base/inc/egacpu.h	146	146	include
+base/inc/egacpu.h	147	147	profile: #if defined(NEC_98)
+base/inc/egacpu.h	148	148	include
+base/inc/egacpu.h	149	151	profile: #if defined(NEC_98)
+base/inc/egacpu.h	152	154	include
+base/inc/egacpu.h	155	155	profile: #if defined(NEC_98)
+base/inc/egacpu.h	156	157	include
+base/inc/egacpu.h	158	160	profile: #if defined(NEC_98)
+base/inc/egacpu.h	161	161	include
+base/inc/egacpu.h	162	162	profile: #if defined(NEC_98)
+base/inc/egacpu.h	163	182	include
+base/inc/egacpu.h	183	185	profile: #if defined(NEC_98)
+base/inc/egacpu.h	186	186	include
+base/inc/egacpu.h	187	187	profile: #if defined(NEC_98)
+base/inc/egacpu.h	188	188	include
+base/inc/egacpu.h	189	272	profile: #if defined(NEC_98)
+base/inc/egacpu.h	273	458	include
+base/inc/egacpu.h	459	459	profile: #if defined(NEC_98)
+base/inc/egacpu.h	460	468	include
+base/inc/egacpu.h	469	485	profile: #if defined(NEC_98)
+base/inc/egacpu.h	486	531	include
+base/inc/egacpu.h	532	532	profile: #if defined(NEC_98)
+base/inc/egacpu.h	533	611	include
+base/inc/egagraph.h	1	106	include
+base/inc/egagraph.h	107	109	profile: #if defined(NEC_98)
+base/inc/egagraph.h	110	110	include
+base/inc/egagraph.h	111	111	profile: #if defined(NEC_98)
+base/inc/egagraph.h	112	118	include
+base/inc/egagraph.h	119	121	profile: #if defined(NEC_98)
+base/inc/egagraph.h	122	122	include
+base/inc/egagraph.h	123	123	profile: #if defined(NEC_98)
+base/inc/egagraph.h	124	227	include
+base/inc/egamode.h	1	11	include
+base/inc/egamode.h	12	16	profile: #if defined(NEC_98)
+base/inc/egamode.h	17	17	include
+base/inc/egamode.h	18	18	profile: #if defined(NEC_98)
+base/inc/egamode.h	19	20	include
+base/inc/egavideo.h	1	51	include
+base/inc/egavideo.h	52	61	profile: #if 0
+base/inc/egavideo.h	62	121	include
+base/inc/egavideo.h	122	137	profile: #if defined(NTVDM) && defined(MONITOR)
+base/inc/gfx_upd.h	1	51	include
+base/inc/gfx_upd.h	52	52	profile: #ifndef NEC_98
+base/inc/gfx_upd.h	53	56	include
+base/inc/gfx_upd.h	57	57	profile: #ifndef NEC_98
+base/inc/gfx_upd.h	58	59	include
+base/inc/gfx_upd.h	60	65	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	66	67	include
+base/inc/gfx_upd.h	68	82	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	83	125	include
+base/inc/gfx_upd.h	126	128	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	129	129	include
+base/inc/gfx_upd.h	130	130	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	131	165	include
+base/inc/gfx_upd.h	166	174	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	175	265	include
+base/inc/gfx_upd.h	266	268	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	269	269	include
+base/inc/gfx_upd.h	270	270	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	271	287	include
+base/inc/gfx_upd.h	288	290	profile: #if defined(NEC_98)
+base/inc/gfx_upd.h	291	323	include
+base/inc/gfx_upd.h	324	324	excluded-NT-stream-comment
+base/inc/gfx_upd.h	325	325	profile: #ifndef NEC_98
+base/inc/gfx_upd.h	326	328	profile: #ifdef NTVDM
+base/inc/gfx_upd.h	329	329	profile: #ifndef NEC_98
+base/inc/gvi.h	1	98	include
+base/inc/gvi.h	99	101	profile: #if defined(NEC_98)
+base/inc/gvi.h	102	102	include
+base/inc/gvi.h	103	103	profile: #if defined(NEC_98)
+base/inc/gvi.h	104	135	include
+base/inc/gvi.h	136	198	profile: #if defined(NEC_98)
+base/inc/gvi.h	199	255	include
+base/inc/gvi.h	256	258	profile: #if defined(NEC_98)
+base/inc/gvi.h	259	283	include
+base/inc/gvi.h	284	309	profile: #if defined(NEC_98)
+base/inc/gvi.h	310	311	include
+base/inc/gvi.h	312	314	profile: #if defined(NEC_98)
+base/inc/gvi.h	315	315	include
+base/inc/gvi.h	316	316	profile: #if defined(NEC_98)
+base/inc/gvi.h	317	317	include
+base/inc/gvi.h	318	420	profile: #if defined(NEC_98)
+base/inc/gvi.h	421	503	include
+base/inc/gvi.h	504	504	profile: #if defined(NEC_98)
+base/inc/gvi.h	505	515	include
+base/inc/gvi.h	516	644	profile: #if defined(NEC_98)
+base/inc/video.h	1	2	include
+base/inc/video.h	3	3	profile: #ifndef NEC_98
+base/inc/video.h	4	40	include
+base/inc/video.h	41	41	profile: #ifndef NEC_98
+base/inc/video.h	42	62	include
+base/inc/video.h	63	113	profile: #if defined(NEC_98)
+base/inc/video.h	114	114	profile: #if 0 ///STREAM_IO codes are disabled now, till Beta-1
+base/inc/video.h	115	126	profile: #ifdef NTVDM
+base/inc/video.h	127	129	profile: #ifdef MONITOR
+base/inc/video.h	130	131	profile: #ifdef NTVDM
+base/inc/video.h	132	132	profile: #if 0 ///STREAM_IO codes are disabled now, till Beta-1
+base/inc/video.h	133	133	profile: #if defined(NEC_98)
+base/inc/video.h	134	262	include
+base/inc/video.h	263	269	profile: #ifdef JAPAN
+base/inc/video.h	270	270	include
+base/inc/video.h	271	271	profile: #ifdef JAPAN
+base/inc/video.h	272	343	include
+base/inc/video.h	344	355	profile: #ifdef NTVDM
+base/inc/video.h	356	358	profile: #ifdef MONITOR
+base/inc/video.h	359	360	profile: #ifdef NTVDM
+base/inc/video.h	361	383	profile: #if defined(JAPAN) || defined(KOREA)
+base/inc/video.h	384	384	profile: #if defined(NEC_98)
+base/video/cga.c	1	3	include
+base/video/cga.c	4	4	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/cga.c	5	226	include
+base/video/cga.c	227	227	profile: #ifndef NEC_98
+base/video/cga.c	228	373	include
+base/video/cga.c	374	374	profile: #ifndef NEC_98
+base/video/cga.c	375	885	include
+base/video/cga.c	886	886	profile: #ifndef NEC_98
+base/video/cga.c	887	1088	include
+base/video/cga.c	1089	1089	profile: #ifndef NEC_98
+base/video/cga.c	1090	1093	include
+base/video/cga.c	1094	1094	profile: #ifndef NEC_98
+base/video/cga.c	1095	1137	include
+base/video/cga.c	1138	1138	profile: #ifndef NEC_98
+base/video/cga.c	1139	1162	include
+base/video/cga.c	1163	1163	profile: #ifndef NEC_98
+base/video/cga.c	1164	1165	include
+base/video/cga.c	1166	1166	profile: #ifndef NEC_98
+base/video/cga.c	1167	1178	include
+base/video/cga.c	1179	1179	profile: #ifndef NEC_98
+base/video/cga.c	1180	1186	include
+base/video/cga.c	1187	1187	profile: #ifndef NEC_98
+base/video/cga.c	1188	1199	include
+base/video/cga.c	1200	1200	profile: #ifndef NEC_98
+base/video/cga.c	1201	1208	include
+base/video/cga.c	1209	1209	profile: #ifndef NEC_98
+base/video/cga.c	1210	1221	include
+base/video/cga.c	1222	1222	profile: #ifndef NEC_98
+base/video/cga.c	1223	1230	include
+base/video/cga.c	1231	1231	profile: #ifndef NEC_98
+base/video/cga.c	1232	1243	include
+base/video/cga.c	1244	1244	profile: #ifndef NEC_98
+base/video/cga.c	1245	1259	include
+base/video/cga.c	1260	1260	profile: #ifndef NEC_98
+base/video/cga.c	1261	1265	include
+base/video/cga.c	1266	1266	profile: #ifndef NEC_98
+base/video/cga.c	1267	1329	include
+base/video/cga.c	1330	1330	profile: #ifndef NEC_98
+base/video/cga.c	1331	1355	include
+base/video/cga.c	1356	1356	profile: #ifndef NEC_98
+base/video/cga.c	1357	1464	include
+base/video/cga.c	1465	1465	profile: #ifndef NEC_98
+base/video/cga.c	1466	1469	include
+base/video/cga.c	1470	1470	profile: #ifndef NEC_98
+base/video/cga.c	1471	1488	include
+base/video/cga.c	1489	1489	profile: #ifndef NEC_98
+base/video/cga.c	1490	1507	include
+base/video/cga.c	1508	1508	profile: #ifndef NEC_98
+base/video/cga.c	1509	1511	include
+base/video/cga.c	1512	1512	profile: #ifndef NEC_98
+base/video/cga.c	1513	1514	include
+base/video/cga.c	1515	1515	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/ega_mode.c	1	153	include
+base/video/ega_mode.c	154	154	profile: #ifndef NEC_98
+base/video/ega_mode.c	155	166	include
+base/video/ega_mode.c	167	167	profile: #ifndef NEC_98
+base/video/ega_mode.c	168	542	include
+base/video/ega_mode.c	543	543	profile: #ifndef NEC_98
+base/video/ega_mode.c	544	544	profile: #ifndef NTVDM
+base/video/ega_mode.c	545	667	include
+base/video/ega_mode.c	668	668	profile: #ifndef NTVDM
+base/video/ega_mode.c	669	669	profile: #ifndef NEC_98
+base/video/ega_mode.c	670	684	include
+base/video/ega_mode.c	685	685	profile: #ifndef NEC_98
+base/video/ega_mode.c	686	705	include
+base/video/ega_mode.c	706	706	profile: #ifndef NEC_98
+base/video/ega_mode.c	707	711	include
+base/video/ega_mode.c	712	712	profile: #ifndef NEC_98
+base/video/ega_mode.c	713	800	include
+base/video/ega_mode.c	801	801	profile: #ifndef NEC_98
+base/video/ega_mode.c	802	806	include
+base/video/ega_prts.c	1	1640	include
+base/video/ega_prts.c	1641	1641	profile: #ifndef NEC_98
+base/video/ega_prts.c	1642	1727	include
+base/video/ega_prts.c	1728	1728	profile: #ifndef NEC_98
+base/video/ega_prts.c	1729	1749	include
+base/video/ega_prts.c	1750	1750	profile: #ifndef NEC_98
+base/video/ega_prts.c	1751	1786	include
+base/video/ega_prts.c	1787	1787	profile: #ifndef NEC_98
+base/video/ega_prts.c	1788	1801	include
+base/video/ega_prts.c	1802	1804	profile: #if defined(NEC_98)
+base/video/ega_prts.c	1805	1805	include
+base/video/ega_prts.c	1806	1806	profile: #if defined(NEC_98)
+base/video/ega_prts.c	1807	1820	include
+base/video/ega_prts.c	1821	1821	profile: #ifndef NEC_98
+base/video/ega_prts.c	1822	1860	include
+base/video/ega_prts.c	1861	1861	profile: #ifndef NEC_98
+base/video/ega_prts.c	1862	1866	include
+base/video/ega_prts.c	1867	1867	profile: #ifndef NEC_98
+base/video/ega_prts.c	1868	1876	include
+base/video/ega_prts.c	1877	1877	profile: #ifndef NEC_98
+base/video/ega_prts.c	1878	1879	include
+base/video/ega_prts.c	1880	1898	profile: #if defined(NEC_98)
+base/video/ega_prts.c	1899	1902	include
+base/video/ega_prts.c	1903	1903	profile: #ifndef NEC_98
+base/video/ega_prts.c	1904	1909	include
+base/video/ega_prts.c	1910	1910	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/video/ega_prts.c	1911	1917	include
+base/video/ega_prts.c	1918	1918	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+base/video/ega_prts.c	1919	1921	include
+base/video/ega_prts.c	1922	1922	profile: #ifndef NEC_98
+base/video/ega_prts.c	1923	1926	include
+base/video/ega_prts.c	1927	1927	profile: #ifndef NEC_98
+base/video/ega_prts.c	1928	2083	include
+base/video/ega_prts.c	2084	2084	profile: #ifndef NEC_98
+base/video/ega_prts.c	2085	2088	include
+base/video/ega_prts.c	2089	2089	profile: #ifndef NEC_98
+base/video/ega_prts.c	2090	2157	include
+base/video/ega_prts.c	2158	2158	profile: #ifndef NEC_98
+base/video/ega_prts.c	2159	2162	include
+base/video/ega_prts.c	2163	2163	profile: #ifndef NEC_98
+base/video/ega_prts.c	2164	2170	include
+base/video/ega_prts.c	2171	2171	profile: #ifndef NEC_98
+base/video/ega_prts.c	2172	2175	include
+base/video/ega_prts.c	2176	2176	profile: #ifndef NEC_98
+base/video/ega_prts.c	2177	2191	include
+base/video/ega_prts.c	2192	2192	profile: #ifndef NEC_98
+base/video/ega_prts.c	2193	2196	include
+base/video/ega_prts.c	2197	2197	profile: #ifndef NEC_98
+base/video/ega_prts.c	2198	2221	include
+base/video/ega_prts.c	2222	2222	profile: #ifndef NEC_98
+base/video/ega_prts.c	2223	2226	include
+base/video/ega_prts.c	2227	2227	profile: #ifndef NEC_98
+base/video/ega_prts.c	2228	2245	include
+base/video/ega_prts.c	2246	2246	profile: #ifndef NEC_98
+base/video/ega_prts.c	2247	2250	include
+base/video/ega_prts.c	2251	2251	profile: #ifndef NEC_98
+base/video/ega_prts.c	2252	2277	include
+base/video/ega_prts.c	2278	2278	profile: #ifndef NEC_98
+base/video/ega_prts.c	2279	2282	include
+base/video/ega_prts.c	2283	2283	profile: #ifndef NEC_98
+base/video/ega_prts.c	2284	2304	include
+base/video/ega_prts.c	2305	2305	profile: #ifndef NEC_98
+base/video/ega_prts.c	2306	2309	include
+base/video/ega_prts.c	2310	2310	profile: #ifndef NEC_98
+base/video/ega_prts.c	2311	2611	include
+base/video/ega_prts.c	2612	2612	profile: #ifndef NEC_98
+base/video/ega_prts.c	2613	2616	include
+base/video/ega_prts.c	2617	2617	profile: #ifndef NEC_98
+base/video/ega_prts.c	2618	2659	include
+base/video/ega_prts.c	2660	2660	profile: #ifndef NEC_98
+base/video/ega_prts.c	2661	2665	include
+base/video/ega_prts.c	2666	2666	profile: #ifndef NEC_98
+base/video/ega_prts.c	2667	2675	include
+base/video/ega_prts.c	2676	2676	profile: #ifndef NEC_98
+base/video/ega_prts.c	2677	2689	include
+base/video/ega_prts.c	2690	2690	profile: #ifndef NEC_98
+base/video/ega_prts.c	2691	2706	include
+base/video/ega_prts.c	2707	2707	profile: #ifndef NEC_98
+base/video/ega_prts.c	2708	2715	include
+base/video/ega_prts.c	2716	2716	profile: #ifndef NEC_98
+base/video/ega_prts.c	2717	2731	include
+base/video/ega_prts.c	2732	2732	profile: #ifndef NEC_98
+base/video/ega_prts.c	2733	2736	include
+base/video/ega_prts.c	2737	2737	profile: #ifndef NEC_98
+base/video/ega_prts.c	2738	2754	include
+base/video/ega_prts.c	2755	2755	profile: #ifndef NEC_98
+base/video/ega_prts.c	2756	2759	include
+base/video/ega_prts.c	2760	2760	profile: #ifndef NEC_98
+base/video/ega_prts.c	2761	2773	include
+base/video/ega_prts.c	2774	2774	profile: #ifndef NEC_98
+base/video/ega_prts.c	2775	2778	include
+base/video/ega_prts.c	2779	2779	profile: #ifndef NEC_98
+base/video/ega_prts.c	2780	2803	include
+base/video/ega_prts.c	2804	2804	profile: #ifndef NEC_98
+base/video/ega_prts.c	2805	2808	include
+base/video/ega_prts.c	2809	2809	profile: #ifndef NEC_98
+base/video/ega_prts.c	2810	2817	include
+base/video/ega_prts.c	2818	2818	profile: #ifndef NEC_98
+base/video/ega_prts.c	2819	2822	include
+base/video/ega_prts.c	2823	2823	profile: #ifndef NEC_98
+base/video/ega_prts.c	2824	2869	include
+base/video/ega_prts.c	2870	2870	profile: #ifndef NEC_98
+base/video/ega_prts.c	2871	2874	include
+base/video/ega_prts.c	2875	2875	profile: #ifndef NEC_98
+base/video/ega_prts.c	2876	2933	include
+base/video/ega_prts.c	2934	2934	profile: #ifndef NEC_98
+base/video/ega_prts.c	2935	2938	include
+base/video/ega_prts.c	2939	2939	profile: #ifndef NEC_98
+base/video/ega_prts.c	2940	2952	include
+base/video/ega_prts.c	2953	2953	profile: #ifndef NEC_98
+base/video/ega_prts.c	2954	2986	include
+base/video/ega_prts.c	2987	2987	profile: #ifndef NEC_98
+base/video/ega_prts.c	2988	3024	include
+base/video/ega_prts.c	3025	3025	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_prts.c	3026	3026	include
+base/video/ega_prts.c	3027	3027	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_prts.c	3028	3030	include
+base/video/ega_prts.c	3031	3031	profile: #ifndef NEC_98
+base/video/ega_prts.c	3032	3041	include
+base/video/ega_prts.c	3042	3042	profile: #ifndef NEC_98
+base/video/ega_prts.c	3043	3085	include
+base/video/ega_prts.c	3086	3086	profile: #ifndef NEC_98
+base/video/ega_prts.c	3087	3091	include
+base/video/ega_prts.c	3092	3092	profile: #ifndef NEC_98
+base/video/ega_prts.c	3093	3135	include
+base/video/ega_prts.c	3136	3136	profile: #ifndef NEC_98
+base/video/ega_prts.c	3137	3140	include
+base/video/ega_prts.c	3141	3141	profile: #ifndef NEC_98
+base/video/ega_prts.c	3142	3147	include
+base/video/ega_prts.c	3148	3148	profile: #ifndef NEC_98
+base/video/ega_prts.c	3149	3152	include
+base/video/ega_prts.c	3153	3153	profile: #ifndef NEC_98
+base/video/ega_prts.c	3154	3266	include
+base/video/ega_prts.c	3267	3267	profile: #ifndef NEC_98
+base/video/ega_prts.c	3268	3271	include
+base/video/ega_prts.c	3272	3272	profile: #ifndef NEC_98
+base/video/ega_prts.c	3273	3317	include
+base/video/ega_prts.c	3318	3318	profile: #ifndef NEC_98
+base/video/ega_prts.c	3319	3322	include
+base/video/ega_prts.c	3323	3323	profile: #ifndef NEC_98
+base/video/ega_prts.c	3324	3329	include
+base/video/ega_prts.c	3330	3330	profile: #ifndef NEC_98
+base/video/ega_prts.c	3331	3334	include
+base/video/ega_prts.c	3335	3335	profile: #ifndef NEC_98
+base/video/ega_prts.c	3336	3348	include
+base/video/ega_prts.c	3349	3349	profile: #ifndef NEC_98
+base/video/ega_prts.c	3350	3353	include
+base/video/ega_prts.c	3354	3354	profile: #ifndef NEC_98
+base/video/ega_prts.c	3355	3483	include
+base/video/ega_prts.c	3484	3484	profile: #ifndef NEC_98
+base/video/ega_prts.c	3485	3488	include
+base/video/ega_prts.c	3489	3489	profile: #ifndef NEC_98
+base/video/ega_prts.c	3490	3509	include
+base/video/ega_prts.c	3510	3510	profile: #ifndef NEC_98
+base/video/ega_prts.c	3511	3539	include
+base/video/ega_prts.c	3540	3540	profile: #ifndef NEC_98
+base/video/ega_prts.c	3541	3552	include
+base/video/ega_prts.c	3553	3553	profile: #ifndef NEC_98
+base/video/ega_prts.c	3554	3558	include
+base/video/ega_read.c	1	3	include
+base/video/ega_read.c	4	4	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_read.c	5	428	include
+base/video/ega_read.c	429	429	profile: #ifndef NEC_98
+base/video/ega_read.c	430	441	include
+base/video/ega_read.c	442	442	profile: #ifndef NEC_98
+base/video/ega_read.c	443	451	include
+base/video/ega_read.c	452	452	profile: #ifndef NEC_98
+base/video/ega_read.c	453	474	include
+base/video/ega_read.c	475	475	profile: #ifndef NEC_98
+base/video/ega_read.c	476	483	include
+base/video/ega_read.c	484	484	profile: #ifndef NEC_98
+base/video/ega_read.c	485	516	include
+base/video/ega_read.c	517	517	profile: #ifndef NEC_98
+base/video/ega_read.c	518	524	include
+base/video/ega_read.c	525	527	profile: #if defined(NEC_98)
+base/video/ega_read.c	528	550	include
+base/video/ega_read.c	551	551	profile: #if defined(NEC_98)
+base/video/ega_read.c	552	556	include
+base/video/ega_read.c	557	559	profile: #if defined(NEC_98)
+base/video/ega_read.c	560	592	include
+base/video/ega_read.c	593	593	profile: #if defined(NEC_98)
+base/video/ega_read.c	594	598	include
+base/video/ega_read.c	599	599	profile: #ifndef NEC_98
+base/video/ega_read.c	600	656	include
+base/video/ega_read.c	657	657	profile: #ifndef NEC_98
+base/video/ega_read.c	658	668	include
+base/video/ega_read.c	669	669	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_read.c	670	672	include
+base/video/ega_read.c	673	673	profile: #ifndef NEC_98
+base/video/ega_read.c	674	698	include
+base/video/ega_read.c	699	705	profile: #if 0
+base/video/ega_read.c	706	709	include
+base/video/ega_read.c	710	710	profile: #ifndef NEC_98
+base/video/ega_read.c	711	711	include
+base/video/ega_read.c	712	712	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_read.c	713	726	include
+base/video/ega_read.c	727	727	profile: #ifndef NEC_98
+base/video/ega_read.c	728	765	include
+base/video/ega_read.c	766	766	profile: #ifndef NEC_98
+base/video/ega_read.c	767	772	include
+base/video/ega_read.c	773	773	profile: #ifndef NEC_98
+base/video/ega_read.c	774	945	include
+base/video/ega_read.c	946	946	profile: #ifndef NEC_98
+base/video/ega_read.c	947	952	include
+base/video/ega_read.c	953	953	profile: #ifndef NEC_98
+base/video/ega_read.c	954	993	include
+base/video/ega_read.c	994	994	profile: #ifndef NEC_98
+base/video/ega_read.c	995	1000	include
+base/video/ega_read.c	1001	1001	profile: #ifndef NEC_98
+base/video/ega_read.c	1002	1021	include
+base/video/ega_read.c	1022	1022	profile: #ifndef NEC_98
+base/video/ega_read.c	1023	1027	include
+base/video/ega_read.c	1028	1028	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_vide.c	1	3	profile: #if !defined(i386) && defined(JAPAN)
+base/video/ega_vide.c	4	125	include
+base/video/ega_vide.c	126	128	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/ega_vide.c	129	135	include
+base/video/ega_vide.c	136	139	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	140	140	include
+base/video/ega_vide.c	141	144	profile: #ifdef NTVDM
+base/video/ega_vide.c	145	145	profile: #ifndef X86GFX
+base/video/ega_vide.c	146	146	profile: #ifdef NTVDM
+base/video/ega_vide.c	147	147	profile: #ifndef X86GFX
+base/video/ega_vide.c	148	148	profile: #ifdef NTVDM
+base/video/ega_vide.c	149	152	include
+base/video/ega_vide.c	153	157	profile: #ifdef JAPAN
+base/video/ega_vide.c	158	163	include
+base/video/ega_vide.c	164	164	profile: #ifndef NEC_98
+base/video/ega_vide.c	165	208	include
+base/video/ega_vide.c	209	209	profile: #ifndef NEC_98
+base/video/ega_vide.c	210	427	include
+base/video/ega_vide.c	428	428	profile: #ifndef NEC_98
+base/video/ega_vide.c	429	430	include
+base/video/ega_vide.c	431	431	profile: #ifndef NEC_98
+base/video/ega_vide.c	432	460	include
+base/video/ega_vide.c	461	461	profile: #ifndef NEC_98
+base/video/ega_vide.c	462	662	include
+base/video/ega_vide.c	663	663	profile: #ifndef NEC_98
+base/video/ega_vide.c	664	675	include
+base/video/ega_vide.c	676	676	profile: #ifndef NEC_98
+base/video/ega_vide.c	677	677	profile: #if !(defined(NTVDM) && defined(X86GFX)) || defined(ARCX86)
+base/video/ega_vide.c	678	680	include
+base/video/ega_vide.c	681	681	profile: #if !(defined(NTVDM) && defined(X86GFX)) || defined(ARCX86)
+base/video/ega_vide.c	682	689	include
+base/video/ega_vide.c	690	691	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	692	712	profile: #ifdef ARCX86
+base/video/ega_vide.c	713	713	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	714	714	profile: #ifdef ARCX86
+base/video/ega_vide.c	715	716	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	717	744	include
+base/video/ega_vide.c	745	745	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	746	759	include
+base/video/ega_vide.c	760	760	profile: #ifndef NEC_98
+base/video/ega_vide.c	761	764	include
+base/video/ega_vide.c	765	765	profile: #ifndef NEC_98
+base/video/ega_vide.c	766	770	include
+base/video/ega_vide.c	771	773	profile: #ifdef NTVDM
+base/video/ega_vide.c	774	777	profile: #ifdef JAPAN
+base/video/ega_vide.c	778	794	include
+base/video/ega_vide.c	795	803	profile: #ifdef JAPAN
+base/video/ega_vide.c	804	807	include
+base/video/ega_vide.c	808	808	profile: #ifdef JAPAN
+base/video/ega_vide.c	809	819	profile: #ifdef NTVDM
+base/video/ega_vide.c	820	820	include
+base/video/ega_vide.c	821	821	profile: #ifdef NTVDM
+base/video/ega_vide.c	822	831	include
+base/video/ega_vide.c	832	838	profile: #ifdef NTVDM
+base/video/ega_vide.c	839	841	include
+base/video/ega_vide.c	842	854	profile: #ifdef NTVDM
+base/video/ega_vide.c	855	898	include
+base/video/ega_vide.c	899	899	profile: #ifndef NEC_98
+base/video/ega_vide.c	900	903	include
+base/video/ega_vide.c	904	904	profile: #ifndef NEC_98
+base/video/ega_vide.c	905	922	include
+base/video/ega_vide.c	923	923	profile: #ifndef NEC_98
+base/video/ega_vide.c	924	929	include
+base/video/ega_vide.c	930	930	profile: #ifndef NEC_98
+base/video/ega_vide.c	931	992	include
+base/video/ega_vide.c	993	993	profile: #ifndef NEC_98
+base/video/ega_vide.c	994	998	include
+base/video/ega_vide.c	999	999	profile: #ifndef NEC_98
+base/video/ega_vide.c	1000	1059	include
+base/video/ega_vide.c	1060	1060	profile: #ifndef NEC_98
+base/video/ega_vide.c	1061	1064	include
+base/video/ega_vide.c	1065	1065	profile: #ifndef NEC_98
+base/video/ega_vide.c	1066	1121	include
+base/video/ega_vide.c	1122	1142	profile: #ifdef JAPAN
+base/video/ega_vide.c	1143	1201	include
+base/video/ega_vide.c	1202	1250	profile: #ifdef JAPAN
+base/video/ega_vide.c	1251	1278	include
+base/video/ega_vide.c	1279	1295	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1296	1303	include
+base/video/ega_vide.c	1304	1310	profile: #ifdef NTVDM
+base/video/ega_vide.c	1311	1315	include
+base/video/ega_vide.c	1316	1319	profile: #ifdef NTVDM
+base/video/ega_vide.c	1320	1322	include
+base/video/ega_vide.c	1323	1331	profile: #ifdef NTVDM
+base/video/ega_vide.c	1332	1334	include
+base/video/ega_vide.c	1335	1338	profile: #ifdef NTVDM
+base/video/ega_vide.c	1339	1368	include
+base/video/ega_vide.c	1369	1397	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/ega_vide.c	1398	1460	include
+base/video/ega_vide.c	1461	1464	profile: #ifdef NTVDM
+base/video/ega_vide.c	1465	1472	include
+base/video/ega_vide.c	1473	1553	profile: #ifdef JAPAN
+base/video/ega_vide.c	1554	1555	include
+base/video/ega_vide.c	1556	1556	profile: #ifdef JAPAN
+base/video/ega_vide.c	1557	1564	profile: #ifdef NTVDM
+base/video/ega_vide.c	1565	1569	include
+base/video/ega_vide.c	1570	1580	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/ega_vide.c	1581	1588	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/ega_vide.c	1589	1591	include
+base/video/ega_vide.c	1592	1592	profile: #ifndef NEC_98
+base/video/ega_vide.c	1593	1606	include
+base/video/ega_vide.c	1607	1607	profile: #ifndef NEC_98
+base/video/ega_vide.c	1608	1636	include
+base/video/ega_vide.c	1637	1673	profile: #ifdef JAPAN
+base/video/ega_vide.c	1674	1747	include
+base/video/ega_vide.c	1748	1748	profile: #ifndef NEC_98
+base/video/ega_vide.c	1749	1755	include
+base/video/ega_vide.c	1756	1756	profile: #ifndef NEC_98
+base/video/ega_vide.c	1757	1807	include
+base/video/ega_vide.c	1808	1808	profile: #ifndef NEC_98
+base/video/ega_vide.c	1809	1812	include
+base/video/ega_vide.c	1813	1813	profile: #ifndef NEC_98
+base/video/ega_vide.c	1814	1895	include
+base/video/ega_vide.c	1896	1896	profile: #ifndef NEC_98
+base/video/ega_vide.c	1897	1900	include
+base/video/ega_vide.c	1901	1901	profile: #ifndef NEC_98
+base/video/ega_vide.c	1902	1908	include
+base/video/ega_vide.c	1909	1921	profile: #ifdef JAPAN
+base/video/ega_vide.c	1922	1925	include
+base/video/ega_vide.c	1926	1933	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1934	1940	include
+base/video/ega_vide.c	1941	1943	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1944	1950	include
+base/video/ega_vide.c	1951	1953	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1954	1961	include
+base/video/ega_vide.c	1962	1964	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1965	1976	include
+base/video/ega_vide.c	1977	1977	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1978	1986	profile: #ifdef ARCX86
+base/video/ega_vide.c	1987	1988	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1989	1989	profile: #ifdef ARCX86
+base/video/ega_vide.c	1990	1990	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1991	1992	include
+base/video/ega_vide.c	1993	1993	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1994	1996	include
+base/video/ega_vide.c	1997	1997	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	1998	2006	profile: #ifdef ARCX86
+base/video/ega_vide.c	2007	2008	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2009	2009	profile: #ifdef ARCX86
+base/video/ega_vide.c	2010	2010	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2011	2012	include
+base/video/ega_vide.c	2013	2013	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2014	2017	include
+base/video/ega_vide.c	2018	2018	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2019	2027	profile: #ifdef ARCX86
+base/video/ega_vide.c	2028	2029	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2030	2030	profile: #ifdef ARCX86
+base/video/ega_vide.c	2031	2031	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2032	2033	include
+base/video/ega_vide.c	2034	2034	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2035	2051	include
+base/video/ega_vide.c	2052	2056	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2057	2112	profile: #ifdef ARCX86
+base/video/ega_vide.c	2113	2136	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2137	2137	profile: #ifdef ARCX86
+base/video/ega_vide.c	2138	2139	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2140	2164	include
+base/video/ega_vide.c	2165	2165	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2166	2172	include
+base/video/ega_vide.c	2173	2173	profile: #ifndef NEC_98
+base/video/ega_vide.c	2174	2177	include
+base/video/ega_vide.c	2178	2178	profile: #ifndef NEC_98
+base/video/ega_vide.c	2179	2205	include
+base/video/ega_vide.c	2206	2206	profile: #ifndef NEC_98
+base/video/ega_vide.c	2207	2219	include
+base/video/ega_vide.c	2220	2220	profile: #ifndef NEC_98
+base/video/ega_vide.c	2221	2237	include
+base/video/ega_vide.c	2238	2238	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+base/video/ega_vide.c	2239	2241	profile: #ifdef ARCX86
+base/video/ega_vide.c	2242	2256	include
+base/video/ega_vide.c	2257	2257	profile: #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+base/video/ega_vide.c	2258	2260	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2261	2269	include
+base/video/ega_vide.c	2270	2270	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2271	2271	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/ega_vide.c	2272	2275	include
+base/video/ega_vide.c	2276	2276	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/ega_vide.c	2277	2284	include
+base/video/ega_vide.c	2285	2285	profile: #ifndef NEC_98
+base/video/ega_vide.c	2286	2290	include
+base/video/ega_vide.c	2291	2291	profile: #ifndef NEC_98
+base/video/ega_vide.c	2292	2292	include
+base/video/ega_vide.c	2293	2296	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/ega_vide.c	2297	2325	include
+base/video/ega_vide.c	2326	2326	profile: #ifndef NEC_98
+base/video/ega_vide.c	2327	2332	include
+base/video/ega_vide.c	2333	2333	profile: #ifndef NEC_98
+base/video/ega_vide.c	2334	2372	include
+base/video/ega_vide.c	2373	2373	profile: #ifndef NEC_98
+base/video/ega_vide.c	2374	2377	include
+base/video/ega_vide.c	2378	2378	profile: #ifndef NEC_98
+base/video/ega_vide.c	2379	2422	include
+base/video/ega_vide.c	2423	2423	profile: #ifndef NEC_98
+base/video/ega_vide.c	2424	2428	include
+base/video/ega_vide.c	2429	2429	profile: #ifndef NEC_98
+base/video/ega_vide.c	2430	2469	include
+base/video/ega_vide.c	2470	2470	profile: #ifndef NEC_98
+base/video/ega_vide.c	2471	2475	include
+base/video/ega_vide.c	2476	2476	profile: #ifndef NEC_98
+base/video/ega_vide.c	2477	2518	include
+base/video/ega_vide.c	2519	2519	profile: #ifndef NEC_98
+base/video/ega_vide.c	2520	2524	include
+base/video/ega_vide.c	2525	2525	profile: #ifndef NEC_98
+base/video/ega_vide.c	2526	2542	include
+base/video/ega_vide.c	2543	2543	profile: #ifndef NEC_98
+base/video/ega_vide.c	2544	2547	include
+base/video/ega_vide.c	2548	2548	profile: #ifndef NEC_98
+base/video/ega_vide.c	2549	2571	include
+base/video/ega_vide.c	2572	2572	profile: #ifndef NEC_98
+base/video/ega_vide.c	2573	2575	include
+base/video/ega_vide.c	2576	2576	profile: #ifndef NEC_98
+base/video/ega_vide.c	2577	2622	include
+base/video/ega_vide.c	2623	2623	profile: #ifndef NEC_98
+base/video/ega_vide.c	2624	2633	include
+base/video/ega_vide.c	2634	2636	profile: #if defined(NEC_98)
+base/video/ega_vide.c	2637	2641	include
+base/video/ega_vide.c	2642	2645	profile: #ifdef NTVDM
+base/video/ega_vide.c	2646	2696	include
+base/video/ega_vide.c	2697	2753	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/ega_vide.c	2754	2754	include
+base/video/ega_vide.c	2755	2755	profile: #if defined(NEC_98)
+base/video/ega_vide.c	2756	2772	include
+base/video/ega_vide.c	2773	2775	profile: #if defined(NEC_98)
+base/video/ega_vide.c	2776	2787	include
+base/video/ega_vide.c	2788	2788	profile: #if defined(NEC_98)
+base/video/ega_vide.c	2789	2792	include
+base/video/ega_writ.c	1	3	include
+base/video/ega_writ.c	4	4	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_writ.c	5	379	include
+base/video/ega_writ.c	380	380	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_writ.c	381	422	include
+base/video/ega_writ.c	423	437	profile: #if 0
+base/video/ega_writ.c	438	443	include
+base/video/ega_writ.c	444	444	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/ega_writ.c	445	459	include
+base/video/ega_writ.c	460	460	profile: #ifndef NEC_98
+base/video/ega_writ.c	461	513	include
+base/video/ega_writ.c	514	514	profile: #ifndef NEC_98
+base/video/ega_writ.c	515	519	include
+base/video/ega_writ.c	520	520	profile: #ifndef NEC_98
+base/video/ega_writ.c	521	532	include
+base/video/ega_writ.c	533	533	profile: #ifndef NEC_98
+base/video/ega_writ.c	534	541	include
+base/video/ega_writ.c	542	542	profile: #ifndef NEC_98
+base/video/ega_writ.c	543	861	include
+base/video/ega_writ.c	862	862	profile: #ifndef NEC_98
+base/video/ega_writ.c	863	866	include
+base/video/ega_writ.c	867	867	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/egawrtm0.c	1	3	include
+base/video/egawrtm0.c	4	4	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/egawrtm0.c	5	338	include
+base/video/egawrtm0.c	339	339	profile: #ifndef NEC_98
+base/video/egawrtm0.c	340	411	include
+base/video/egawrtm0.c	412	412	profile: #ifndef NEC_98
+base/video/egawrtm0.c	413	421	include
+base/video/egawrtm0.c	422	422	profile: #ifndef NEC_98
+base/video/egawrtm0.c	423	1370	include
+base/video/egawrtm0.c	1371	1371	profile: #ifndef NEC_98
+base/video/egawrtm0.c	1372	1373	include
+base/video/egawrtm0.c	1374	1374	profile: #if !(defined(NTVDM) && defined(MONITOR))
+base/video/egwrtm12.c	1	3	include
+base/video/egwrtm12.c	4	4	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/egwrtm12.c	5	261	include
+base/video/egwrtm12.c	262	262	profile: #ifndef NEC_98
+base/video/egwrtm12.c	263	268	include
+base/video/egwrtm12.c	269	269	profile: #ifndef NEC_98
+base/video/egwrtm12.c	270	274	include
+base/video/egwrtm12.c	275	275	profile: #ifndef NEC_98
+base/video/egwrtm12.c	276	280	include
+base/video/egwrtm12.c	281	281	profile: #ifndef NEC_98
+base/video/egwrtm12.c	282	294	include
+base/video/egwrtm12.c	295	295	profile: #ifndef NEC_98
+base/video/egwrtm12.c	296	328	include
+base/video/egwrtm12.c	329	329	profile: #ifndef NEC_98
+base/video/egwrtm12.c	330	344	include
+base/video/egwrtm12.c	345	345	profile: #ifndef NEC_98
+base/video/egwrtm12.c	346	372	include
+base/video/egwrtm12.c	373	373	profile: #ifndef NEC_98
+base/video/egwrtm12.c	374	378	include
+base/video/egwrtm12.c	379	379	profile: #ifndef NEC_98
+base/video/egwrtm12.c	380	418	include
+base/video/egwrtm12.c	419	419	profile: #ifndef NEC_98
+base/video/egwrtm12.c	420	426	include
+base/video/egwrtm12.c	427	427	profile: #ifndef NEC_98
+base/video/egwrtm12.c	428	533	include
+base/video/egwrtm12.c	534	534	profile: #ifndef NEC_98
+base/video/egwrtm12.c	535	539	include
+base/video/egwrtm12.c	540	540	profile: #ifndef NEC_98
+base/video/egwrtm12.c	541	546	include
+base/video/egwrtm12.c	547	547	profile: #ifndef NEC_98
+base/video/egwrtm12.c	548	552	include
+base/video/egwrtm12.c	553	553	profile: #ifndef NEC_98
+base/video/egwrtm12.c	554	559	include
+base/video/egwrtm12.c	560	560	profile: #ifndef NEC_98
+base/video/egwrtm12.c	561	566	include
+base/video/egwrtm12.c	567	567	profile: #ifndef NEC_98
+base/video/egwrtm12.c	568	594	include
+base/video/egwrtm12.c	595	595	profile: #ifndef NEC_98
+base/video/egwrtm12.c	596	600	include
+base/video/egwrtm12.c	601	601	profile: #ifndef NEC_98
+base/video/egwrtm12.c	602	632	include
+base/video/egwrtm12.c	633	633	profile: #ifndef NEC_98
+base/video/egwrtm12.c	634	638	include
+base/video/egwrtm12.c	639	639	profile: #ifndef NEC_98
+base/video/egwrtm12.c	640	672	include
+base/video/egwrtm12.c	673	673	profile: #ifndef NEC_98
+base/video/egwrtm12.c	674	678	include
+base/video/egwrtm12.c	679	679	profile: #ifndef NEC_98
+base/video/egwrtm12.c	680	739	include
+base/video/egwrtm12.c	740	740	profile: #ifndef NEC_98
+base/video/egwrtm12.c	741	745	include
+base/video/egwrtm12.c	746	746	profile: #ifndef NEC_98
+base/video/egwrtm12.c	747	846	include
+base/video/egwrtm12.c	847	847	profile: #ifndef NEC_98
+base/video/egwrtm12.c	848	852	include
+base/video/egwrtm12.c	853	853	profile: #ifndef NEC_98
+base/video/egwrtm12.c	854	949	include
+base/video/egwrtm12.c	950	950	profile: #ifndef NEC_98
+base/video/egwrtm12.c	951	955	include
+base/video/egwrtm12.c	956	956	profile: #ifndef NEC_98
+base/video/egwrtm12.c	957	1054	include
+base/video/egwrtm12.c	1055	1055	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1056	1062	include
+base/video/egwrtm12.c	1063	1063	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1064	1157	include
+base/video/egwrtm12.c	1158	1158	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1159	1169	include
+base/video/egwrtm12.c	1170	1170	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1171	1224	include
+base/video/egwrtm12.c	1225	1225	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1226	1231	include
+base/video/egwrtm12.c	1232	1232	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1233	1237	include
+base/video/egwrtm12.c	1238	1238	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1239	1244	include
+base/video/egwrtm12.c	1245	1245	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1246	1250	include
+base/video/egwrtm12.c	1251	1251	profile: #ifndef NEC_98
+base/video/egwrtm12.c	1252	1255	include
+base/video/egwrtm12.c	1256	1256	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/gfx_updt.c	1	123	include
+base/video/gfx_updt.c	124	126	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	127	132	include
+base/video/gfx_updt.c	133	133	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	134	135	include
+base/video/gfx_updt.c	136	145	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	146	192	include
+base/video/gfx_updt.c	193	193	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	194	198	include
+base/video/gfx_updt.c	199	205	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	206	206	include
+base/video/gfx_updt.c	207	207	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	208	217	include
+base/video/gfx_updt.c	218	220	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	221	227	include
+base/video/gfx_updt.c	228	228	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	229	242	include
+base/video/gfx_updt.c	243	246	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/gfx_updt.c	247	277	include
+base/video/gfx_updt.c	278	287	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	288	302	include
+base/video/gfx_updt.c	303	303	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	304	312	include
+base/video/gfx_updt.c	313	313	profile: #ifndef NEC_98
+base/video/gfx_updt.c	314	348	include
+base/video/gfx_updt.c	349	349	profile: #ifndef NEC_98
+base/video/gfx_updt.c	350	364	include
+base/video/gfx_updt.c	365	365	profile: #ifndef NEC_98
+base/video/gfx_updt.c	366	429	include
+base/video/gfx_updt.c	430	430	profile: #ifndef NEC_98
+base/video/gfx_updt.c	431	437	include
+base/video/gfx_updt.c	438	438	profile: #ifndef NEC_98
+base/video/gfx_updt.c	439	476	include
+base/video/gfx_updt.c	477	477	profile: #ifndef NEC_98
+base/video/gfx_updt.c	478	482	include
+base/video/gfx_updt.c	483	483	profile: #ifndef NEC_98
+base/video/gfx_updt.c	484	564	include
+base/video/gfx_updt.c	565	565	profile: #ifndef NEC_98
+base/video/gfx_updt.c	566	582	include
+base/video/gfx_updt.c	583	583	profile: #ifndef NEC_98
+base/video/gfx_updt.c	584	621	include
+base/video/gfx_updt.c	622	622	profile: #ifndef NEC_98
+base/video/gfx_updt.c	623	627	include
+base/video/gfx_updt.c	628	628	profile: #ifndef NEC_98
+base/video/gfx_updt.c	629	652	include
+base/video/gfx_updt.c	653	653	profile: #ifndef NEC_98
+base/video/gfx_updt.c	654	665	include
+base/video/gfx_updt.c	666	666	profile: #ifndef NEC_98
+base/video/gfx_updt.c	667	676	include
+base/video/gfx_updt.c	677	677	profile: #ifndef NEC_98
+base/video/gfx_updt.c	678	683	include
+base/video/gfx_updt.c	684	684	profile: #ifndef NEC_98
+base/video/gfx_updt.c	685	685	include
+base/video/gfx_updt.c	686	686	profile: #ifndef NEC_98
+base/video/gfx_updt.c	687	690	include
+base/video/gfx_updt.c	691	691	profile: #ifndef NEC_98
+base/video/gfx_updt.c	692	692	include
+base/video/gfx_updt.c	693	693	profile: #ifndef NEC_98
+base/video/gfx_updt.c	694	704	include
+base/video/gfx_updt.c	705	705	profile: #ifndef NEC_98
+base/video/gfx_updt.c	706	706	include
+base/video/gfx_updt.c	707	707	profile: #ifndef NEC_98
+base/video/gfx_updt.c	708	805	include
+base/video/gfx_updt.c	806	806	profile: #ifndef NEC_98
+base/video/gfx_updt.c	807	960	include
+base/video/gfx_updt.c	961	961	profile: #ifndef NEC_98
+base/video/gfx_updt.c	962	965	include
+base/video/gfx_updt.c	966	966	profile: #ifndef NEC_98
+base/video/gfx_updt.c	967	1056	include
+base/video/gfx_updt.c	1057	1057	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1058	1061	include
+base/video/gfx_updt.c	1062	1062	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1063	1167	include
+base/video/gfx_updt.c	1168	1168	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1169	1172	include
+base/video/gfx_updt.c	1173	1173	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1174	1239	include
+base/video/gfx_updt.c	1240	1240	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1241	1253	include
+base/video/gfx_updt.c	1254	1254	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1255	1356	include
+base/video/gfx_updt.c	1357	1357	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1358	1366	include
+base/video/gfx_updt.c	1367	1367	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1368	1492	include
+base/video/gfx_updt.c	1493	1493	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1494	1499	include
+base/video/gfx_updt.c	1500	1500	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1501	1658	include
+base/video/gfx_updt.c	1659	1659	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1660	1664	include
+base/video/gfx_updt.c	1665	1665	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1666	1820	include
+base/video/gfx_updt.c	1821	1821	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1822	1828	include
+base/video/gfx_updt.c	1829	1829	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1830	1842	include
+base/video/gfx_updt.c	1843	1843	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1844	1849	include
+base/video/gfx_updt.c	1850	1850	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1851	1863	include
+base/video/gfx_updt.c	1864	1864	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1865	1874	include
+base/video/gfx_updt.c	1875	1875	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1876	1939	include
+base/video/gfx_updt.c	1940	1940	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1941	1944	include
+base/video/gfx_updt.c	1945	1945	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1946	1993	include
+base/video/gfx_updt.c	1994	1994	profile: #ifndef NEC_98
+base/video/gfx_updt.c	1995	2000	include
+base/video/gfx_updt.c	2001	2001	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2002	2067	include
+base/video/gfx_updt.c	2068	2068	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2069	2074	include
+base/video/gfx_updt.c	2075	2075	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2076	2155	include
+base/video/gfx_updt.c	2156	2156	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2157	2160	include
+base/video/gfx_updt.c	2161	2161	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2162	2211	include
+base/video/gfx_updt.c	2212	2212	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2213	2218	include
+base/video/gfx_updt.c	2219	2219	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2220	2283	include
+base/video/gfx_updt.c	2284	2284	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2285	2289	include
+base/video/gfx_updt.c	2290	2290	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2291	2380	include
+base/video/gfx_updt.c	2381	2381	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2382	2398	include
+base/video/gfx_updt.c	2399	2399	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2400	2424	include
+base/video/gfx_updt.c	2425	2425	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2426	2431	include
+base/video/gfx_updt.c	2432	2432	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2433	2447	include
+base/video/gfx_updt.c	2448	2448	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2449	2450	include
+base/video/gfx_updt.c	2451	2451	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2452	2613	include
+base/video/gfx_updt.c	2614	2614	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2615	2621	include
+base/video/gfx_updt.c	2622	2622	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2623	2633	include
+base/video/gfx_updt.c	2634	2634	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2635	2636	include
+base/video/gfx_updt.c	2637	2637	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2638	2752	include
+base/video/gfx_updt.c	2753	2753	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2754	2762	include
+base/video/gfx_updt.c	2763	2763	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2764	2773	include
+base/video/gfx_updt.c	2774	2774	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2775	2776	include
+base/video/gfx_updt.c	2777	2777	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2778	2915	include
+base/video/gfx_updt.c	2916	2916	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2917	2922	include
+base/video/gfx_updt.c	2923	2923	profile: #ifndef NEC_98
+base/video/gfx_updt.c	2924	2931	include
+base/video/gfx_updt.c	2932	2932	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2933	2934	include
+base/video/gfx_updt.c	2935	2935	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	2936	3024	include
+base/video/gfx_updt.c	3025	3025	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3026	3031	include
+base/video/gfx_updt.c	3032	3032	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3033	3037	include
+base/video/gfx_updt.c	3038	3038	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3039	3040	include
+base/video/gfx_updt.c	3041	3041	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3042	3128	include
+base/video/gfx_updt.c	3129	3129	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3130	3135	include
+base/video/gfx_updt.c	3136	3136	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3137	3141	include
+base/video/gfx_updt.c	3142	3142	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3143	3144	include
+base/video/gfx_updt.c	3145	3145	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3146	3234	include
+base/video/gfx_updt.c	3235	3235	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3236	3245	include
+base/video/gfx_updt.c	3246	3248	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3249	3251	include
+base/video/gfx_updt.c	3252	3252	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3253	3254	include
+base/video/gfx_updt.c	3255	3255	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3256	3265	include
+base/video/gfx_updt.c	3266	3266	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3267	3276	include
+base/video/gfx_updt.c	3277	3279	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3280	3282	include
+base/video/gfx_updt.c	3283	3283	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3284	3285	include
+base/video/gfx_updt.c	3286	3286	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3287	3296	include
+base/video/gfx_updt.c	3297	3297	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3298	3308	include
+base/video/gfx_updt.c	3309	3309	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3310	3312	include
+base/video/gfx_updt.c	3313	3313	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3314	3315	include
+base/video/gfx_updt.c	3316	3316	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3317	3326	include
+base/video/gfx_updt.c	3327	3327	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3328	3336	include
+base/video/gfx_updt.c	3337	3337	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3338	3340	include
+base/video/gfx_updt.c	3341	3341	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3342	3343	include
+base/video/gfx_updt.c	3344	3344	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3345	3354	include
+base/video/gfx_updt.c	3355	3355	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3356	3377	include
+base/video/gfx_updt.c	3378	3380	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3381	3383	include
+base/video/gfx_updt.c	3384	3384	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3385	3386	include
+base/video/gfx_updt.c	3387	3387	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3388	3398	include
+base/video/gfx_updt.c	3399	3399	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3400	3409	include
+base/video/gfx_updt.c	3410	3412	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3413	3415	include
+base/video/gfx_updt.c	3416	3416	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3417	3418	include
+base/video/gfx_updt.c	3419	3419	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	3420	3431	include
+base/video/gfx_updt.c	3432	3432	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3433	3565	include
+base/video/gfx_updt.c	3566	3566	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3567	3575	include
+base/video/gfx_updt.c	3576	3576	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3577	3580	include
+base/video/gfx_updt.c	3581	3581	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3582	3591	include
+base/video/gfx_updt.c	3592	3592	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3593	3596	include
+base/video/gfx_updt.c	3597	3597	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3598	3607	include
+base/video/gfx_updt.c	3608	3608	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3609	3616	include
+base/video/gfx_updt.c	3617	3617	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3618	3632	include
+base/video/gfx_updt.c	3633	3633	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3634	3637	include
+base/video/gfx_updt.c	3638	3638	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3639	3656	include
+base/video/gfx_updt.c	3657	3657	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3658	3661	include
+base/video/gfx_updt.c	3662	3662	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3663	3681	include
+base/video/gfx_updt.c	3682	3682	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3683	3686	include
+base/video/gfx_updt.c	3687	3687	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3688	3703	include
+base/video/gfx_updt.c	3704	3704	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3705	3719	include
+base/video/gfx_updt.c	3720	3723	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3724	3734	include
+base/video/gfx_updt.c	3735	3735	profile: #if defined(NEC_98)
+base/video/gfx_updt.c	3736	3745	include
+base/video/gfx_updt.c	3746	3746	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove uneeded code */
+base/video/gfx_updt.c	3747	3759	include
+base/video/gfx_updt.c	3760	3760	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3761	3768	include
+base/video/gfx_updt.c	3769	3769	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3770	3771	include
+base/video/gfx_updt.c	3772	3772	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3773	3859	include
+base/video/gfx_updt.c	3860	3860	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3861	3862	include
+base/video/gfx_updt.c	3863	3863	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove uneeded code */
+base/video/gfx_updt.c	3864	3878	include
+base/video/gfx_updt.c	3879	3879	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3880	3880	include
+base/video/gfx_updt.c	3881	3884	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/gfx_updt.c	3885	3886	include
+base/video/gfx_updt.c	3887	3887	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/gfx_updt.c	3888	3888	include
+base/video/gfx_updt.c	3889	3889	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove unneeded code */
+base/video/gfx_updt.c	3890	3909	include
+base/video/gfx_updt.c	3910	3910	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove unneeded code */
+base/video/gfx_updt.c	3911	3911	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3912	3944	include
+base/video/gfx_updt.c	3945	3945	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3946	3946	include
+base/video/gfx_updt.c	3947	3947	profile: #ifndef NEC_98
+base/video/gfx_updt.c	3948	4286	include
+base/video/gfx_updt.c	4287	4295	profile: #ifdef NTVDM
+base/video/gfx_updt.c	4296	4311	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4312	4316	profile: #ifdef JAPAN
+base/video/gfx_updt.c	4317	4317	profile: #ifndef NEC_98
+base/video/gfx_updt.c	4318	4362	profile: #ifdef JAPAN
+base/video/gfx_updt.c	4363	4365	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4366	4366	profile: #ifdef JAPAN
+base/video/gfx_updt.c	4367	4367	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4368	4559	profile: #ifdef JAPAN
+base/video/gfx_updt.c	4560	4560	profile: #ifndef NEC_98
+base/video/gfx_updt.c	4561	4563	profile: #ifdef JAPAN
+base/video/gfx_updt.c	4564	4603	profile: #if defined(KOREA)
+base/video/gfx_updt.c	4604	4606	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4607	4607	profile: #if defined(KOREA)
+base/video/gfx_updt.c	4608	4608	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4609	4873	profile: #if defined(KOREA)
+base/video/gfx_updt.c	4874	4876	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4877	4877	profile: #ifndef NEC_98
+base/video/gfx_updt.c	4878	4888	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4889	4903	profile: #ifdef JAPAN
+base/video/gfx_updt.c	4904	4925	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4926	4928	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4929	4929	profile: #ifdef MONITOR
+base/video/gfx_updt.c	4930	4930	profile: #if defined(NTVDM)
+base/video/gfx_updt.c	4931	5122	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5123	5123	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5124	5131	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5132	5132	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5133	5142	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5143	5143	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	5144	5145	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5146	5146	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	5147	5152	profile: #ifdef JAPAN
+base/video/gfx_updt.c	5153	5262	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5263	5263	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5264	5268	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5269	5269	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5270	5275	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5276	5276	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	5277	5278	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5279	5279	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+base/video/gfx_updt.c	5280	5285	profile: #ifdef JAPAN
+base/video/gfx_updt.c	5286	5357	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5358	5358	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5359	5361	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5362	5379	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5380	5380	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5381	5382	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5383	5383	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5384	5389	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5390	5390	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5391	5400	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5401	5404	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/gfx_updt.c	5405	5406	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5407	5407	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/gfx_updt.c	5408	5438	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5439	5439	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5440	5446	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5447	5447	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5448	5448	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5449	5456	profile: #ifdef JAPAN
+base/video/gfx_updt.c	5457	5457	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5458	5458	profile: #ifdef JAPAN
+base/video/gfx_updt.c	5459	5459	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5460	5460	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5461	5461	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5462	5470	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5471	5473	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5474	5474	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5475	5475	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5476	5480	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5481	5481	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5482	5483	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5484	5484	profile: #ifndef MONITOR
+base/video/gfx_updt.c	5485	5658	profile: #ifdef JAPAN
+base/video/gfx_updt.c	5659	5839	profile: #if defined(KOREA)
+base/video/gfx_updt.c	5840	5852	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5853	5869	profile: #ifdef JAPAN
+base/video/gfx_updt.c	5870	5962	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5963	5963	profile: #ifndef MONITOR
+base/video/gfx_updt.c	5964	5964	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5965	5966	include
+base/video/gfx_updt.c	5967	5967	excluded-NT-stream-declaration
+base/video/gfx_updt.c	5968	5968	include
+base/video/gfx_updt.c	5969	5969	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5970	5973	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5974	5979	profile: #ifdef MONITOR
+base/video/gfx_updt.c	5980	5990	profile: #ifdef NTVDM
+base/video/gfx_updt.c	5991	5991	profile: #ifndef NEC_98
+base/video/gfx_updt.c	5992	5992	include
+base/video/gfx_updt.c	5993	7092	profile: #if defined(NEC_98)
+base/video/gvi.c	1	90	include
+base/video/gvi.c	91	93	profile: #if defined(NEC_98)
+base/video/gvi.c	94	94	include
+base/video/gvi.c	95	95	profile: #if defined(NEC_98)
+base/video/gvi.c	96	169	include
+base/video/gvi.c	170	180	profile: #if defined(NEC_98)
+base/video/gvi.c	181	302	include
+base/video/gvi.c	303	303	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/gvi.c	304	305	include
+base/video/gvi.c	306	306	profile: #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+base/video/gvi.c	307	356	include
+base/video/gvi.c	357	357	profile: #if defined(NEC_98)
+base/video/v7_ports.c	1	91	include
+base/video/v7_ports.c	92	92	profile: #ifndef NEC_98
+base/video/v7_ports.c	93	99	include
+base/video/v7_ports.c	100	100	profile: #ifndef NEC_98
+base/video/v7_ports.c	101	109	include
+base/video/v7_ports.c	110	110	profile: #ifndef NEC_98
+base/video/v7_ports.c	111	129	include
+base/video/v7_ports.c	130	130	profile: #ifndef NEC_98
+base/video/v7_ports.c	131	158	include
+base/video/v7_ports.c	159	159	profile: #ifndef NEC_98
+base/video/v7_ports.c	160	454	include
+base/video/v7_ports.c	455	455	profile: #ifndef NEC_98
+base/video/v7_ports.c	456	481	include
+base/video/v7_ports.c	482	482	profile: #ifndef NEC_98
+base/video/v7_ports.c	483	645	include
+base/video/v7_ports.c	646	646	profile: #ifndef NEC_98
+base/video/v7_ports.c	647	669	include
+base/video/v7_ports.c	670	670	profile: #ifndef NEC_98
+base/video/v7_ports.c	671	722	include
+base/video/v7_ports.c	723	723	profile: #ifndef NEC_98
+base/video/v7_ports.c	724	747	include
+base/video/v7_ports.c	748	748	profile: #ifndef NEC_98
+base/video/v7_ports.c	749	778	include
+base/video/v7_ports.c	779	779	profile: #ifndef NEC_98
+base/video/v7_ports.c	780	783	include
+base/video/v7_video.c	1	107	include
+base/video/v7_video.c	108	108	profile: #ifndef NEC_98
+base/video/v7_video.c	109	117	include
+base/video/v7_video.c	118	118	profile: #ifndef NEC_98
+base/video/v7_video.c	119	141	include
+base/video/v7_video.c	142	142	profile: #ifndef NEC_98
+base/video/v7_video.c	143	146	include
+base/video/v7_video.c	147	147	profile: #ifndef NEC_98
+base/video/v7_video.c	148	171	include
+base/video/v7_video.c	172	172	profile: #ifndef NEC_98
+base/video/v7_video.c	173	178	include
+base/video/v7_video.c	179	179	profile: #ifndef NEC_98
+base/video/v7_video.c	180	228	include
+base/video/v7_video.c	229	229	profile: #ifndef NEC_98
+base/video/v7_video.c	230	254	include
+base/video/v7_video.c	255	255	profile: #ifndef NEC_98
+base/video/v7_video.c	256	278	include
+base/video/v7_video.c	279	279	profile: #ifndef NEC_98
+base/video/v7_video.c	280	466	include
+base/video/v7_video.c	467	467	profile: #ifndef NEC_98
+base/video/v7_video.c	468	491	include
+base/video/v7_video.c	492	492	profile: #ifndef NEC_98
+base/video/v7_video.c	493	498	include
+base/video/v7_video.c	499	499	profile: #ifndef NEC_98
+base/video/v7_video.c	500	526	include
+base/video/v7_video.c	527	527	profile: #ifndef NEC_98
+base/video/v7_video.c	528	532	include
+base/video/v7_video.c	533	533	profile: #ifndef NEC_98
+base/video/v7_video.c	534	537	include
+base/video/vga_mode.c	1	162	include
+base/video/vga_mode.c	163	165	profile: #if defined(NEC_98)
+base/video/vga_mode.c	166	185	include
+base/video/vga_mode.c	186	186	profile: #if defined(NEC_98)
+base/video/vga_mode.c	187	211	include
+base/video/vga_mode.c	212	213	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/vga_mode.c	214	219	profile: #if defined(NEC_98)
+base/video/vga_mode.c	220	248	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/vga_mode.c	249	249	profile: #if defined(NEC_98)
+base/video/vga_mode.c	250	252	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/vga_mode.c	253	255	include
+base/video/vga_mode.c	256	256	profile: #ifndef NEC_98
+base/video/vga_mode.c	257	297	include
+base/video/vga_mode.c	298	303	profile: #if defined(NTVDM) && !defined(MONITOR)   /* Only get here for NTVDM Riscs */
+base/video/vga_mode.c	304	310	include
+base/video/vga_mode.c	311	311	profile: #if defined(NTVDM) && !defined(MONITOR)   /* Only get here for NTVDM Riscs */
+base/video/vga_mode.c	312	459	include
+base/video/vga_mode.c	460	460	profile: #ifndef NEC_98
+base/video/vga_mode.c	461	475	include
+base/video/vga_mode.c	476	476	profile: #ifndef NEC_98
+base/video/vga_mode.c	477	584	include
+base/video/vga_mode.c	585	585	profile: #ifndef NEC_98
+base/video/vga_mode.c	586	591	include
+base/video/vga_mode.c	592	744	profile: #if defined(NEC_98)
+base/video/vga_prts.c	1	521	include
+base/video/vga_prts.c	522	522	profile: #ifndef NEC_98
+base/video/vga_prts.c	523	560	include
+base/video/vga_prts.c	561	561	profile: #ifndef NEC_98
+base/video/vga_prts.c	562	563	include
+base/video/vga_prts.c	564	569	profile: #ifdef NTVDM
+base/video/vga_prts.c	570	570	include
+base/video/vga_prts.c	571	571	profile: #ifdef NTVDM
+base/video/vga_prts.c	572	572	include
+base/video/vga_prts.c	573	573	profile: #ifndef NEC_98
+base/video/vga_prts.c	574	644	include
+base/video/vga_prts.c	645	645	profile: #ifndef NEC_98
+base/video/vga_prts.c	646	659	include
+base/video/vga_prts.c	660	704	profile: #if defined(NEC_98)
+base/video/vga_prts.c	705	707	include
+base/video/vga_prts.c	708	708	profile: #ifndef NEC_98
+base/video/vga_prts.c	709	921	include
+base/video/vga_prts.c	922	924	profile: #ifdef NTVDM
+base/video/vga_prts.c	925	925	include
+base/video/vga_prts.c	926	926	profile: #ifdef NTVDM
+base/video/vga_prts.c	927	935	include
+base/video/vga_prts.c	936	936	profile: #ifndef NEC_98
+base/video/vga_prts.c	937	940	include
+base/video/vga_prts.c	941	941	profile: #ifndef NEC_98
+base/video/vga_prts.c	942	1040	include
+base/video/vga_prts.c	1041	1041	profile: #ifndef NEC_98
+base/video/vga_prts.c	1042	1055	include
+base/video/vga_prts.c	1056	1056	profile: #ifndef NEC_98
+base/video/vga_prts.c	1057	1082	include
+base/video/vga_prts.c	1083	1083	profile: #ifndef NEC_98
+base/video/vga_prts.c	1084	1088	include
+base/video/vga_prts.c	1089	1089	profile: #ifndef NEC_98
+base/video/vga_prts.c	1090	1129	include
+base/video/vga_prts.c	1130	1130	profile: #ifndef NEC_98
+base/video/vga_prts.c	1131	1135	include
+base/video/vga_prts.c	1136	1136	profile: #ifndef NEC_98
+base/video/vga_prts.c	1137	1166	include
+base/video/vga_prts.c	1167	1167	profile: #ifndef NEC_98
+base/video/vga_prts.c	1168	1171	include
+base/video/vga_prts.c	1172	1172	profile: #ifndef NEC_98
+base/video/vga_prts.c	1173	1218	include
+base/video/vga_prts.c	1219	1219	profile: #ifndef NEC_98
+base/video/vga_prts.c	1220	1223	include
+base/video/vga_prts.c	1224	1224	profile: #ifndef NEC_98
+base/video/vga_prts.c	1225	1263	include
+base/video/vga_prts.c	1264	1264	profile: #ifndef NEC_98
+base/video/vga_prts.c	1265	1268	include
+base/video/vga_prts.c	1269	1269	profile: #ifndef NEC_98
+base/video/vga_prts.c	1270	1412	include
+base/video/vga_prts.c	1413	1415	profile: #ifdef NTVDM
+base/video/vga_prts.c	1416	1416	include
+base/video/vga_prts.c	1417	1417	profile: #ifdef NTVDM
+base/video/vga_prts.c	1418	1748	include
+base/video/vga_prts.c	1749	1749	profile: #ifndef NEC_98
+base/video/vga_prts.c	1750	1753	include
+base/video/vga_prts.c	1754	1754	profile: #ifndef NEC_98
+base/video/vga_prts.c	1755	1871	include
+base/video/vga_prts.c	1872	1872	profile: #ifndef NEC_98
+base/video/vga_prts.c	1873	1877	include
+base/video/vga_prts.c	1878	1878	profile: #ifndef NEC_98
+base/video/vga_prts.c	1879	1941	include
+base/video/vga_prts.c	1942	1942	profile: #ifndef NEC_98
+base/video/vga_prts.c	1943	1951	include
+base/video/vga_prts.c	1952	1952	profile: #ifndef NEC_98
+base/video/vga_prts.c	1953	1962	include
+base/video/vga_prts.c	1963	1963	profile: #ifndef NEC_98
+base/video/vga_prts.c	1964	1974	include
+base/video/vga_prts.c	1975	1975	profile: #ifndef NEC_98
+base/video/vga_prts.c	1976	1990	include
+base/video/vga_prts.c	1991	1991	profile: #ifndef NEC_98
+base/video/vga_prts.c	1992	1996	include
+base/video/vga_prts.c	1997	1997	profile: #ifndef NEC_98
+base/video/vga_prts.c	1998	2011	include
+base/video/vga_prts.c	2012	2012	profile: #ifndef NEC_98
+base/video/vga_prts.c	2013	2016	include
+base/video/vga_prts.c	2017	2017	profile: #ifndef NEC_98
+base/video/vga_prts.c	2018	2033	include
+base/video/vga_prts.c	2034	2034	profile: #ifndef NEC_98
+base/video/vga_prts.c	2035	2038	include
+base/video/vga_prts.c	2039	2039	profile: #ifndef NEC_98
+base/video/vga_prts.c	2040	2053	include
+base/video/vga_prts.c	2054	2054	profile: #ifndef NEC_98
+base/video/vga_prts.c	2055	2058	include
+base/video/vga_prts.c	2059	2059	profile: #ifndef NEC_98
+base/video/vga_prts.c	2060	2080	include
+base/video/vga_prts.c	2081	2081	profile: #ifndef NEC_98
+base/video/vga_prts.c	2082	2085	include
+base/video/vga_prts.c	2086	2086	profile: #ifndef NEC_98
+base/video/vga_prts.c	2087	2096	include
+base/video/vga_prts.c	2097	2097	profile: #ifndef NEC_98
+base/video/vga_prts.c	2098	2101	include
+base/video/vga_prts.c	2102	2102	profile: #ifndef NEC_98
+base/video/vga_prts.c	2103	2162	include
+base/video/vga_prts.c	2163	2163	profile: #ifndef NEC_98
+base/video/vga_prts.c	2164	2167	include
+base/video/vga_prts.c	2168	2168	profile: #ifndef NEC_98
+base/video/vga_prts.c	2169	2182	include
+base/video/vga_prts.c	2183	2183	profile: #ifndef NEC_98
+base/video/vga_prts.c	2184	2218	include
+base/video/vga_prts.c	2219	2219	profile: #ifndef NEC_98
+base/video/vga_prts.c	2220	2257	include
+base/video/vga_prts.c	2258	2258	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/vga_prts.c	2259	2259	include
+base/video/vga_prts.c	2260	2260	profile: #if !(defined(NTVDM) && defined(X86GFX))
+base/video/vga_prts.c	2261	2263	include
+base/video/vga_prts.c	2264	2264	profile: #ifndef NEC_98
+base/video/vga_prts.c	2265	2270	include
+base/video/vga_prts.c	2271	2271	profile: #ifndef NEC_98
+base/video/vga_prts.c	2272	2316	include
+base/video/vga_prts.c	2317	2317	profile: #ifndef NEC_98
+base/video/vga_prts.c	2318	2322	include
+base/video/vga_prts.c	2323	2323	profile: #ifndef NEC_98
+base/video/vga_prts.c	2324	2368	include
+base/video/vga_prts.c	2369	2369	profile: #ifndef NEC_98
+base/video/vga_prts.c	2370	2377	include
+base/video/vga_prts.c	2378	2378	profile: #ifndef NEC_98
+base/video/vga_prts.c	2379	2397	include
+base/video/vga_prts.c	2398	2398	profile: #ifndef NEC_98
+base/video/vga_prts.c	2399	2410	include
+base/video/vga_prts.c	2411	2411	profile: #ifndef NEC_98
+base/video/vga_prts.c	2412	2413	include
+base/video/vga_prts.c	2414	2414	profile: #ifndef NEC_98
+base/video/vga_prts.c	2415	2443	include
+base/video/vga_prts.c	2444	2450	profile: #ifdef NTVDM
+base/video/vga_prts.c	2451	2455	include
+base/video/vga_prts.c	2456	2456	profile: #ifdef NTVDM
+base/video/vga_prts.c	2457	2459	include
+base/video/vga_prts.c	2460	2460	profile: #ifndef NEC_98
+base/video/vga_prts.c	2461	2466	include
+base/video/vga_prts.c	2467	2481	profile: #if defined(X86GFX)
+base/video/vga_prts.c	2482	2486	include
+base/video/vga_prts.c	2487	2499	profile: #ifdef X86GFX
+base/video/vga_prts.c	2500	2510	include
+base/video/vga_prts.c	2511	2513	profile: #ifdef NTVDM
+base/video/vga_prts.c	2514	2514	include
+base/video/vga_prts.c	2515	2515	profile: #ifdef NTVDM
+base/video/vga_prts.c	2516	2556	include
+base/video/vga_prts.c	2557	2557	profile: #ifndef NEC_98
+base/video/vga_prts.c	2558	2563	include
+base/video/vga_prts.c	2564	2564	profile: #ifndef NEC_98
+base/video/vga_prts.c	2565	2659	include
+base/video/vga_prts.c	2660	2660	profile: #ifndef NEC_98
+base/video/vga_prts.c	2661	2666	include
+base/video/vga_prts.c	2667	2667	profile: #ifndef NEC_98
+base/video/vga_prts.c	2668	2713	include
+base/video/vga_prts.c	2714	2714	profile: #ifndef NEC_98
+base/video/vga_prts.c	2715	2718	include
+base/video/vga_prts.c	2719	2719	profile: #ifndef NEC_98
+base/video/vga_prts.c	2720	2858	include
+base/video/vga_prts.c	2859	2859	profile: #ifndef NEC_98
+base/video/vga_prts.c	2860	2863	include
+base/video/vga_prts.c	2864	2864	profile: #ifndef NEC_98
+base/video/vga_prts.c	2865	2912	include
+base/video/vga_prts.c	2913	2913	profile: #ifndef NEC_98
+base/video/vga_prts.c	2914	2917	include
+base/video/vga_prts.c	2918	2918	profile: #ifndef NEC_98
+base/video/vga_prts.c	2919	2953	include
+base/video/vga_prts.c	2954	2954	profile: #ifndef NEC_98
+base/video/vga_prts.c	2955	2958	include
+base/video/vga_prts.c	2959	2959	profile: #ifndef NEC_98
+base/video/vga_prts.c	2960	2964	include
+base/video/vga_prts.c	2965	2965	profile: #ifndef NEC_98
+base/video/vga_prts.c	2966	2969	include
+base/video/vga_prts.c	2970	2970	profile: #ifndef NEC_98
+base/video/vga_prts.c	2971	2976	include
+base/video/vga_prts.c	2977	2977	profile: #ifndef NEC_98
+base/video/vga_prts.c	2978	2981	include
+base/video/vga_prts.c	2982	2982	profile: #ifndef NEC_98
+base/video/vga_prts.c	2983	2987	include
+base/video/vga_prts.c	2988	2988	profile: #ifndef NEC_98
+base/video/vga_prts.c	2989	2992	include
+base/video/vga_prts.c	2993	2993	profile: #ifndef NEC_98
+base/video/vga_prts.c	2994	2995	include
+base/video/vga_prts.c	2996	2996	profile: #ifndef NEC_98
+base/video/vga_prts.c	2997	3000	include
+base/video/vga_prts.c	3001	3001	profile: #ifndef NEC_98
+base/video/vga_prts.c	3002	3028	include
+base/video/vga_prts.c	3029	3029	profile: #ifndef NEC_98
+base/video/vga_prts.c	3030	3037	include
+base/video/vga_prts.c	3038	3038	profile: #ifndef NEC_98
+base/video/vga_prts.c	3039	3070	include
+base/video/vga_prts.c	3071	3071	profile: #ifndef NEC_98
+base/video/vga_prts.c	3072	3075	include
+base/video/vga_prts.c	3076	3076	profile: #ifndef NEC_98
+base/video/vga_prts.c	3077	3095	include
+base/video/vga_prts.c	3096	3096	profile: #ifndef NEC_98
+base/video/vga_prts.c	3097	3100	include
+base/video/vga_prts.c	3101	3101	profile: #ifndef NEC_98
+base/video/vga_prts.c	3102	3128	include
+base/video/vga_prts.c	3129	3129	profile: #ifndef NEC_98
+base/video/vga_prts.c	3130	3131	include
+base/video/vga_prts.c	3132	3141	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_prts.c	3142	3144	include
+base/video/vga_prts.c	3145	3145	profile: #ifndef NEC_98
+base/video/vga_prts.c	3146	3192	include
+base/video/vga_prts.c	3193	3193	profile: #ifndef NEC_98
+base/video/vga_prts.c	3194	3213	include
+base/video/vga_prts.c	3214	3214	profile: #ifndef NEC_98
+base/video/vga_prts.c	3215	3285	include
+base/video/vga_prts.c	3286	3286	profile: #ifndef NEC_98
+base/video/vga_prts.c	3287	3306	include
+base/video/vga_prts.c	3307	3307	profile: #ifndef NEC_98
+base/video/vga_prts.c	3308	3400	include
+base/video/vga_prts.c	3401	3401	profile: #ifndef NEC_98
+base/video/vga_prts.c	3402	3436	include
+base/video/vga_prts.c	3437	3437	profile: #ifndef NEC_98
+base/video/vga_prts.c	3438	3449	include
+base/video/vga_prts.c	3450	3450	profile: #ifndef NEC_98
+base/video/vga_prts.c	3451	3455	include
+base/video/vga_vide.c	1	113	include
+base/video/vga_vide.c	114	114	profile: #ifndef NEC_98
+base/video/vga_vide.c	115	118	include
+base/video/vga_vide.c	119	119	profile: #ifndef NEC_98
+base/video/vga_vide.c	120	125	include
+base/video/vga_vide.c	126	126	profile: #ifndef NEC_98
+base/video/vga_vide.c	127	130	include
+base/video/vga_vide.c	131	131	profile: #ifndef NEC_98
+base/video/vga_vide.c	132	144	include
+base/video/vga_vide.c	145	145	profile: #ifndef NEC_98
+base/video/vga_vide.c	146	190	include
+base/video/vga_vide.c	191	191	profile: #ifndef NEC_98
+base/video/vga_vide.c	192	197	include
+base/video/vga_vide.c	198	198	profile: #ifndef NEC_98
+base/video/vga_vide.c	199	252	include
+base/video/vga_vide.c	253	253	profile: #ifndef NEC_98
+base/video/vga_vide.c	254	258	include
+base/video/vga_vide.c	259	259	profile: #ifndef NEC_98
+base/video/vga_vide.c	260	278	include
+base/video/vga_vide.c	279	279	profile: #ifndef NEC_98
+base/video/vga_vide.c	280	284	include
+base/video/vga_vide.c	285	285	profile: #ifndef NEC_98
+base/video/vga_vide.c	286	333	include
+base/video/vga_vide.c	334	334	profile: #ifndef NEC_98
+base/video/vga_vide.c	335	339	include
+base/video/vga_vide.c	340	340	profile: #ifndef NEC_98
+base/video/vga_vide.c	341	390	include
+base/video/vga_vide.c	391	391	profile: #ifndef NEC_98
+base/video/vga_vide.c	392	395	include
+base/video/vga_vide.c	396	396	profile: #ifndef NEC_98
+base/video/vga_vide.c	397	426	include
+base/video/vga_vide.c	427	427	profile: #ifndef NEC_98
+base/video/vga_vide.c	428	431	include
+base/video/vga_vide.c	432	432	profile: #ifndef NEC_98
+base/video/vga_vide.c	433	443	include
+base/video/vga_vide.c	444	444	profile: #ifndef NEC_98
+base/video/vga_vide.c	445	449	include
+base/video/vga_vide.c	450	450	profile: #ifndef NEC_98
+base/video/vga_vide.c	451	595	include
+base/video/vga_vide.c	596	596	profile: #ifndef NEC_98
+base/video/vga_vide.c	597	605	include
+base/video/vga_vide.c	606	606	profile: #ifndef NEC_98
+base/video/vga_vide.c	607	654	include
+base/video/vga_vide.c	655	655	profile: #ifndef NEC_98
+base/video/vga_vide.c	656	658	include
+base/video/vga_vide.c	659	659	profile: #ifndef NEC_98
+base/video/vga_vide.c	660	678	include
+base/video/vga_vide.c	679	679	profile: #ifndef NEC_98
+base/video/vga_vide.c	680	683	include
+base/video/vga_vide.c	684	684	profile: #ifndef NEC_98
+base/video/vga_vide.c	685	695	include
+base/video/vga_vide.c	696	698	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_vide.c	699	727	include
+base/video/vga_vide.c	728	731	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_vide.c	732	733	include
+base/video/vga_vide.c	734	734	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/vga_vide.c	735	831	include
+base/video/vga_vide.c	832	832	profile: #ifndef NEC_98
+base/video/vga_vide.c	833	836	include
+base/video/vga_vide.c	837	837	profile: #ifndef NEC_98
+base/video/vga_vide.c	838	1045	include
+base/video/vga_vide.c	1046	1046	profile: #ifndef NEC_98
+base/video/vga_vide.c	1047	1049	include
+base/video/video.c	1	3	profile: #if (defined(JAPAN) || defined(KOREA)) && !defined(i386)
+base/video/video.c	4	46	include
+base/video/video.c	47	47	profile: #ifndef NEC_98
+base/video/video.c	48	55	include
+base/video/video.c	56	56	profile: #ifndef NEC_98
+base/video/video.c	57	97	include
+base/video/video.c	98	102	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	103	103	include
+base/video/video.c	104	106	profile: #if defined(NEC_98)
+base/video/video.c	107	114	include
+base/video/video.c	115	115	profile: #ifndef NEC_98
+base/video/video.c	116	121	profile: #ifdef NTVDM
+base/video/video.c	122	124	profile: #ifdef MONITOR
+base/video/video.c	125	126	profile: #ifdef NTVDM
+base/video/video.c	127	127	profile: #ifndef NEC_98
+base/video/video.c	128	140	include
+base/video/video.c	141	143	profile: #if defined(NEC_98)
+base/video/video.c	144	144	include
+base/video/video.c	145	145	profile: #if defined(NEC_98)
+base/video/video.c	146	146	include
+base/video/video.c	147	169	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	170	170	include
+base/video/video.c	171	176	profile: #ifdef JAPAN
+base/video/video.c	177	184	include
+base/video/video.c	185	263	profile: #if defined(NEC_98)
+base/video/video.c	264	316	include
+base/video/video.c	317	317	profile: #if defined(NEC_98)
+base/video/video.c	318	318	include
+base/video/video.c	319	319	profile: #ifndef NEC_98
+base/video/video.c	320	423	include
+base/video/video.c	424	424	profile: #ifndef NEC_98
+base/video/video.c	425	431	include
+base/video/video.c	432	461	profile: #ifdef JAPAN
+base/video/video.c	462	465	profile: #if defined(NEC_98)
+base/video/video.c	466	467	profile: #ifdef JAPAN
+base/video/video.c	468	468	profile: #if defined(NEC_98)
+base/video/video.c	469	507	profile: #ifdef JAPAN
+base/video/video.c	508	508	include
+base/video/video.c	509	517	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	518	520	profile: #if defined(NEC_98)
+base/video/video.c	521	525	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	526	526	profile: #if defined(NEC_98)
+base/video/video.c	527	528	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	529	529	profile: #ifndef NEC_98
+base/video/video.c	530	635	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	636	638	profile: #ifdef X86GFX
+base/video/video.c	639	652	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	653	655	profile: #ifdef X86GFX
+base/video/video.c	656	658	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	659	659	profile: #ifdef X86GFX
+base/video/video.c	660	666	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	667	667	profile: #ifndef NEC_98
+base/video/video.c	668	668	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	669	669	include
+base/video/video.c	670	670	profile: #ifndef NEC_98
+base/video/video.c	671	882	include
+base/video/video.c	883	895	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	896	896	include
+base/video/video.c	897	897	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	898	1077	include
+base/video/video.c	1078	1080	profile: #ifdef JAPAN
+base/video/video.c	1081	1093	include
+base/video/video.c	1094	1108	profile: #ifdef JAPAN
+base/video/video.c	1109	1113	include
+base/video/video.c	1114	1114	profile: #ifdef JAPAN
+base/video/video.c	1115	1122	include
+base/video/video.c	1123	1128	profile: #ifdef JAPAN
+base/video/video.c	1129	1138	include
+base/video/video.c	1139	1142	profile: #ifdef JAPAN
+base/video/video.c	1143	1143	include
+base/video/video.c	1144	1144	profile: #ifdef JAPAN
+base/video/video.c	1145	1180	include
+base/video/video.c	1181	1185	profile: #ifdef JAPAN
+base/video/video.c	1186	1194	include
+base/video/video.c	1195	1199	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1200	1202	include
+base/video/video.c	1203	1206	profile: #ifdef JAPAN
+base/video/video.c	1207	1210	include
+base/video/video.c	1211	1222	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1223	1223	include
+base/video/video.c	1224	1226	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1227	1227	include
+base/video/video.c	1228	1228	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1229	1233	include
+base/video/video.c	1234	1242	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1243	1243	include
+base/video/video.c	1244	1244	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1245	1247	include
+base/video/video.c	1248	1250	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1251	1259	include
+base/video/video.c	1260	1263	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1264	1268	include
+base/video/video.c	1269	1299	profile: #ifdef JAPAN
+base/video/video.c	1300	1301	include
+base/video/video.c	1302	1302	profile: #ifdef JAPAN
+base/video/video.c	1303	1307	include
+base/video/video.c	1308	1314	profile: #ifdef JAPAN
+base/video/video.c	1315	1318	include
+base/video/video.c	1319	1322	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1323	1328	include
+base/video/video.c	1329	1365	profile: #ifdef JAPAN
+base/video/video.c	1366	1367	include
+base/video/video.c	1368	1368	profile: #ifdef JAPAN
+base/video/video.c	1369	1370	include
+base/video/video.c	1371	1376	profile: #ifdef JAPAN
+base/video/video.c	1377	1483	include
+base/video/video.c	1484	1490	profile: #ifdef NTVDM
+base/video/video.c	1491	1603	include
+base/video/video.c	1604	1606	profile: #ifdef JAPAN
+base/video/video.c	1607	1619	include
+base/video/video.c	1620	1634	profile: #ifdef JAPAN
+base/video/video.c	1635	1639	include
+base/video/video.c	1640	1640	profile: #ifdef JAPAN
+base/video/video.c	1641	1648	include
+base/video/video.c	1649	1654	profile: #ifdef JAPAN
+base/video/video.c	1655	1664	include
+base/video/video.c	1665	1668	profile: #ifdef JAPAN
+base/video/video.c	1669	1669	include
+base/video/video.c	1670	1670	profile: #ifdef JAPAN
+base/video/video.c	1671	1704	include
+base/video/video.c	1705	1709	profile: #ifdef JAPAN
+base/video/video.c	1710	1714	include
+base/video/video.c	1715	1719	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1720	1723	include
+base/video/video.c	1724	1727	profile: #ifdef JAPAN
+base/video/video.c	1728	1728	include
+base/video/video.c	1729	1740	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1741	1742	include
+base/video/video.c	1743	1745	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1746	1746	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1747	1751	include
+base/video/video.c	1752	1760	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1761	1761	include
+base/video/video.c	1762	1762	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	1763	1766	include
+base/video/video.c	1767	1771	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1772	1780	include
+base/video/video.c	1781	1811	profile: #ifdef JAPAN
+base/video/video.c	1812	1813	include
+base/video/video.c	1814	1814	profile: #ifdef JAPAN
+base/video/video.c	1815	1817	include
+base/video/video.c	1818	1824	profile: #ifdef JAPAN
+base/video/video.c	1825	1828	include
+base/video/video.c	1829	1832	profile: #if !defined(i386) && defined(JAPAN)
+base/video/video.c	1833	1838	include
+base/video/video.c	1839	1875	profile: #ifdef JAPAN
+base/video/video.c	1876	1877	include
+base/video/video.c	1878	1878	profile: #ifdef JAPAN
+base/video/video.c	1879	1880	include
+base/video/video.c	1881	1886	profile: #ifdef JAPAN
+base/video/video.c	1887	2091	include
+base/video/video.c	2092	2097	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	2098	2216	include
+base/video/video.c	2217	2220	profile: #ifdef JAPAN
+base/video/video.c	2221	2230	include
+base/video/video.c	2231	2243	profile: #ifdef JAPAN
+base/video/video.c	2244	2245	include
+base/video/video.c	2246	2250	profile: #ifdef JAPAN
+base/video/video.c	2251	2271	include
+base/video/video.c	2272	2277	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	2278	2278	include
+base/video/video.c	2279	2280	profile: #ifdef JAPAN
+base/video/video.c	2281	2283	profile: #if 0
+base/video/video.c	2284	2295	profile: #ifdef JAPAN
+base/video/video.c	2296	2328	include
+base/video/video.c	2329	2332	profile: #ifdef JAPAN
+base/video/video.c	2333	2346	include
+base/video/video.c	2347	2359	profile: #ifdef JAPAN
+base/video/video.c	2360	2360	include
+base/video/video.c	2361	2366	profile: #ifdef JAPAN
+base/video/video.c	2367	2385	include
+base/video/video.c	2386	2391	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	2392	2392	include
+base/video/video.c	2393	2394	profile: #ifdef JAPAN
+base/video/video.c	2395	2397	profile: #if 0
+base/video/video.c	2398	2409	profile: #ifdef JAPAN
+base/video/video.c	2410	2703	include
+base/video/video.c	2704	2707	profile: #ifdef NTVDM
+base/video/video.c	2708	2708	include
+base/video/video.c	2709	2709	profile: #ifdef NTVDM
+base/video/video.c	2710	2735	include
+base/video/video.c	2736	2738	profile: #ifdef NTVDM
+base/video/video.c	2739	2741	include
+base/video/video.c	2742	2745	profile: #ifdef JAPAN
+base/video/video.c	2746	2759	include
+base/video/video.c	2760	2770	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/video.c	2771	2779	profile: #if defined(JAPAN)
+base/video/video.c	2780	2780	include
+base/video/video.c	2781	2781	profile: #if defined(JAPAN)
+base/video/video.c	2782	2782	profile: #if defined(NTVDM) && defined(MONITOR)
+base/video/video.c	2783	2786	include
+base/video/video.c	2787	2810	profile: #ifdef JAPAN
+base/video/video.c	2811	2831	include
+base/video/video.c	2832	2845	profile: #ifdef JAPAN
+base/video/video.c	2846	2856	include
+base/video/video.c	2857	2859	profile: #ifdef JAPAN
+base/video/video.c	2860	2876	include
+base/video/video.c	2877	2887	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	2888	2891	include
+base/video/video.c	2892	2892	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	2893	2904	include
+base/video/video.c	2905	2919	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	2920	2921	include
+base/video/video.c	2922	2922	profile: #if defined(JAPAN) && defined(i386)
+base/video/video.c	2923	2967	include
+base/video/video.c	2968	2981	profile: #ifdef JAPAN
+base/video/video.c	2982	3033	include
+base/video/video.c	3034	3044	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	3045	3048	include
+base/video/video.c	3049	3049	profile: #if defined(NTVDM) && defined(X86GFX)
+base/video/video.c	3050	3109	include
+base/video/video.c	3110	3122	profile: #ifdef JAPAN
+base/video/video.c	3123	3123	include
+base/video/video.c	3124	3124	profile: #ifdef JAPAN
+base/video/video.c	3125	3169	include
+base/video/video.c	3170	3172	profile: #ifdef NTVDM
+base/video/video.c	3173	3180	profile: #ifdef JAPAN
+base/video/video.c	3181	3183	include
+base/video/video.c	3184	3239	profile: #ifdef NTVDM
+base/video/video.c	3240	3245	profile: #ifdef X86GFX
+base/video/video.c	3246	3247	profile: #ifdef NTVDM
+base/video/video.c	3248	3248	include
+base/video/video.c	3249	3432	profile: #ifdef JAPAN
+base/video/video.c	3433	3939	include
+base/video/video.c	3940	3942	profile: #ifdef NTVDM
+base/video/video.c	3943	3947	profile: #ifdef MONITOR
+base/video/video.c	3948	3955	profile: #ifdef NTVDM
+base/video/video.c	3956	3956	profile: #ifdef MONITOR
+base/video/video.c	3957	3965	profile: #ifdef NTVDM
+base/video/video.c	3966	3966	profile: #ifndef MONITOR
+base/video/video.c	3967	3967	profile: #ifdef NTVDM
+base/video/video.c	3968	3968	profile: #ifndef MONITOR
+base/video/video.c	3969	3970	profile: #ifdef NTVDM
+base/video/video.c	3971	3971	include
+base/video/video.c	3972	4422	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4423	4425	profile: #if defined(JAPAN)
+base/video/video.c	4426	4426	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4427	4427	profile: #if defined(JAPAN)
+base/video/video.c	4428	4746	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4747	4747	profile: #if !defined(KOREA)
+base/video/video.c	4748	4757	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4758	4758	profile: #if !defined(KOREA)
+base/video/video.c	4759	4771	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4772	4772	profile: #if !defined(KOREA)
+base/video/video.c	4773	4795	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4796	4800	profile: #if 0
+base/video/video.c	4801	4854	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4855	4855	profile: #if !defined(KOREA)
+base/video/video.c	4856	4904	profile: #if defined(JAPAN) || defined(KOREA)
+base/video/video.c	4905	4905	include
+base/video/video.c	4906	4906	profile: #ifndef NEC_98
+base/video/video.c	4907	5269	profile: #if defined(NEC_98)
+base/video/video.c	5270	5329	profile: #if 0
+base/video/video.c	5330	5335	profile: #if defined(NEC_98)
+base/video/video.c	5336	5336	profile: #if 0
+base/video/video.c	5337	5620	profile: #if defined(NEC_98)
+base/video/video_io.c	1	18	include
+base/video/video_io.c	19	19	profile: #ifndef NEC_98
+base/video/video_io.c	20	27	include
+base/video/video_io.c	28	28	profile: #ifndef NEC_98
+base/video/video_io.c	29	47	include
+base/video/video_io.c	48	68	profile: #if defined(NEC_98)
+base/video/video_io.c	69	71	profile: #if 0
+base/video/video_io.c	72	75	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/video_io.c	76	76	profile: #if 0
+base/video/video_io.c	77	95	profile: #if defined(NEC_98)
+base/video/video_io.c	96	102	include
+base/video/video_io.c	103	106	profile: #if defined(NTVDM) && !defined(X86GFX)
+base/video/video_io.c	107	121	include
+base/video/video_io.c	122	122	profile: #if defined(NEC_98)
+host/inc/nt_cga.h	1	22	include
+host/inc/nt_cga.h	23	28	profile: #if defined(NEC_98)
+host/inc/nt_fulsc.h	1	13	include
+host/inc/nt_fulsc.h	14	16	profile: #if defined(NEC_98)
+host/inc/nt_fulsc.h	17	36	include
+host/inc/nt_fulsc.h	37	39	profile: #if defined(NEC_98)
+host/inc/nt_fulsc.h	40	40	include
+host/inc/nt_fulsc.h	41	41	profile: #if defined(NEC_98)
+host/inc/nt_fulsc.h	42	144	include
+host/inc/nt_fulsc.h	145	148	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	149	151	profile: #if defined(NEC_98)
+host/inc/nt_fulsc.h	152	152	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	153	153	profile: #if defined(NEC_98)
+host/inc/nt_fulsc.h	154	154	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	155	168	include
+host/inc/nt_fulsc.h	169	172	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	173	185	include
+host/inc/nt_fulsc.h	186	186	excluded-NT-fullscreen-declaration
+host/inc/nt_fulsc.h	187	207	include
+host/inc/nt_fulsc.h	208	256	profile: #ifdef X86GFX
+host/inc/nt_fulsc.h	257	258	include
+host/inc/nt_fulsc.h	259	264	profile: #ifdef X86GFX
+host/inc/nt_graph.h	1	76	include
+host/inc/nt_graph.h	77	79	profile: #ifdef X86GFX
+host/inc/nt_graph.h	80	110	include
+host/inc/nt_graph.h	111	114	profile: #if defined(NEC_98)
+host/inc/nt_graph.h	115	116	include
+host/inc/nt_graph.h	117	117	profile: #if defined(NEC_98)
+host/inc/nt_graph.h	118	245	include
+host/inc/nt_graph.h	246	259	profile: #if defined(NEC_98)
+host/inc/nt_graph.h	260	276	include
+host/inc/nt_graph.h	277	290	profile: #if defined(NEC_98)
+host/inc/nt_graph.h	291	423	include
+host/inc/nt_graph.h	424	470	profile: #if defined(NEC_98)
+host/inc/nt_graph.h	471	471	include
+host/inc/nt_graph.h	472	493	profile: #ifdef MONITOR
+host/inc/nt_graph.h	494	521	include
+host/inc/nt_graph.h	522	526	profile: #ifdef MONITOR
+host/inc/nt_graph.h	527	538	include
+host/inc/nt_graph.h	539	539	profile: #ifndef NEC_98
+host/inc/nt_graph.h	540	540	excluded-NT-stream-state
+host/inc/nt_graph.h	541	541	profile: #ifndef NEC_98
+host/inc/nt_graph.h	542	564	include
+host/src/nt_cga.c	1	41	include
+host/src/nt_cga.c	42	45	profile: #ifdef MONITOR
+host/src/nt_cga.c	46	46	include
+host/src/nt_cga.c	47	49	profile: #if defined(JAPAN) || defined(KOREA)
+host/src/nt_cga.c	50	50	include
+host/src/nt_cga.c	51	93	profile: #if defined(NEC_98)
+host/src/nt_cga.c	94	98	include
+host/src/nt_cga.c	99	102	profile: #if defined(NEC_98)
+host/src/nt_cga.c	103	128	include
+host/src/nt_cga.c	129	131	profile: #ifdef MONITOR
+host/src/nt_cga.c	132	132	include
+host/src/nt_cga.c	133	133	profile: #ifdef MONITOR
+host/src/nt_cga.c	134	134	include
+host/src/nt_cga.c	135	137	profile: #if (defined(JAPAN) || defined(KOREA)) && defined(i386)
+host/src/nt_cga.c	138	138	include
+host/src/nt_cga.c	139	164	profile: #if defined(NEC_98)
+host/src/nt_cga.c	165	180	include
+host/src/nt_cga.c	181	183	profile: #ifdef X86GFX
+host/src/nt_cga.c	184	185	include
+host/src/nt_cga.c	186	186	profile: #ifdef MONITOR
+host/src/nt_cga.c	187	189	profile: #if defined(NEC_98)
+host/src/nt_cga.c	190	194	profile: #ifdef MONITOR
+host/src/nt_cga.c	195	195	profile: #if defined(NEC_98)
+host/src/nt_cga.c	196	196	profile: #ifdef MONITOR
+host/src/nt_cga.c	197	197	profile: #if defined(JAPAN) || defined(KOREA)
+host/src/nt_cga.c	198	198	profile: #ifndef NEC_98
+host/src/nt_cga.c	199	210	profile: #if defined(JAPAN) || defined(KOREA)
+host/src/nt_cga.c	211	211	profile: #ifndef NEC_98
+host/src/nt_cga.c	212	212	profile: #if defined(JAPAN) || defined(KOREA)
+host/src/nt_cga.c	213	345	include
+host/src/nt_cga.c	346	346	profile: #ifndef NEC_98
+host/src/nt_cga.c	347	361	include
+host/src/nt_cga.c	362	365	profile: #if defined(JAPAN) && defined(i386)
+host/src/nt_cga.c	366	368	profile: #if defined(KOREA) && defined(i386)
+host/src/nt_cga.c	369	377	include
+host/src/nt_cga.c	378	378	profile: #ifndef MONITOR
+host/src/nt_cga.c	379	381	include
+host/src/nt_cga.c	382	382	profile: #ifndef MONITOR
+host/src/nt_cga.c	383	507	include
+host/src/nt_cga.c	508	508	profile: #ifndef NEC_98
+host/src/nt_cga.c	509	1080	include
+host/src/nt_cga.c	1081	1303	profile: #ifdef MONITOR
+host/src/nt_cga.c	1304	1360	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1361	1361	profile: #if 1
+host/src/nt_cga.c	1362	1367	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1368	1374	profile: #if 1
+host/src/nt_cga.c	1375	1497	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1498	1498	profile: #if 1
+host/src/nt_cga.c	1499	1504	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1505	1511	profile: #if 1
+host/src/nt_cga.c	1512	1642	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1643	1643	profile: #if 1
+host/src/nt_cga.c	1644	1649	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1650	1656	profile: #if 1
+host/src/nt_cga.c	1657	1790	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1791	1791	profile: #if 1
+host/src/nt_cga.c	1792	1798	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1799	1805	profile: #if 1
+host/src/nt_cga.c	1806	1932	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1933	1933	profile: #if 1
+host/src/nt_cga.c	1934	1939	profile: #if defined(NEC_98)
+host/src/nt_cga.c	1940	1946	profile: #if 1
+host/src/nt_cga.c	1947	2070	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2071	2071	profile: #if 1
+host/src/nt_cga.c	2072	2077	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2078	2084	profile: #if 1
+host/src/nt_cga.c	2085	2215	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2216	2216	profile: #if 1
+host/src/nt_cga.c	2217	2222	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2223	2229	profile: #if 1
+host/src/nt_cga.c	2230	2361	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2362	2362	profile: #if 1
+host/src/nt_cga.c	2363	2368	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2369	2375	profile: #if 1
+host/src/nt_cga.c	2376	2501	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2502	2683	profile: #ifdef JAPAN
+host/src/nt_cga.c	2684	2838	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2839	2841	profile: #ifdef MONITOR
+host/src/nt_cga.c	2842	2842	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2843	2843	profile: #ifdef MONITOR
+host/src/nt_cga.c	2844	2886	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2887	2887	profile: #ifdef JAPAN
+host/src/nt_cga.c	2888	2888	profile: #if defined(NEC_98)
+host/src/nt_cga.c	2889	2889	include
+host/src/nt_ega.c	1	42	include
+host/src/nt_ega.c	43	46	profile: #ifdef MONITOR
+host/src/nt_ega.c	47	1665	include
+host/src/nt_ega.c	1666	2144	profile: #ifdef MONITOR
+host/src/nt_graph.c	1	29	include
+host/src/nt_graph.c	30	32	profile: #ifdef X86GFX
+host/src/nt_graph.c	33	80	include
+host/src/nt_graph.c	81	92	profile: #if defined(NEC_98)
+host/src/nt_graph.c	93	93	include
+host/src/nt_graph.c	94	94	profile: #if defined(NEC_98)
+host/src/nt_graph.c	95	120	include
+host/src/nt_graph.c	121	123	profile: #if defined(NEC_98)
+host/src/nt_graph.c	124	124	include
+host/src/nt_graph.c	125	129	profile: #if defined(JAPAN) || defined(KOREA)
+host/src/nt_graph.c	130	133	include
+host/src/nt_graph.c	134	147	profile: #if defined(NEC_98)
+host/src/nt_graph.c	148	164	include
+host/src/nt_graph.c	165	178	profile: #if defined(NEC_98)
+host/src/nt_graph.c	179	195	include
+host/src/nt_graph.c	196	209	profile: #if defined(NEC_98)
+host/src/nt_graph.c	210	226	include
+host/src/nt_graph.c	227	240	profile: #if defined(NEC_98)
+host/src/nt_graph.c	241	257	include
+host/src/nt_graph.c	258	271	profile: #if defined(NEC_98)
+host/src/nt_graph.c	272	288	include
+host/src/nt_graph.c	289	302	profile: #if defined(NEC_98)
+host/src/nt_graph.c	303	317	include
+host/src/nt_graph.c	318	318	profile: #ifdef MONITOR
+host/src/nt_graph.c	319	319	profile: #ifndef NEC_98
+host/src/nt_graph.c	320	369	profile: #ifdef MONITOR
+host/src/nt_graph.c	370	370	profile: #ifndef NEC_98
+host/src/nt_graph.c	371	371	profile: #ifdef MONITOR
+host/src/nt_graph.c	372	374	include
+host/src/nt_graph.c	375	388	profile: #if defined(NEC_98)
+host/src/nt_graph.c	389	400	include
+host/src/nt_graph.c	401	414	profile: #if defined(NEC_98)
+host/src/nt_graph.c	415	424	include
+host/src/nt_graph.c	425	425	profile: #ifdef MONITOR
+host/src/nt_graph.c	426	426	profile: #ifndef NEC_98
+host/src/nt_graph.c	427	437	profile: #ifdef MONITOR
+host/src/nt_graph.c	438	438	profile: #ifndef NEC_98
+host/src/nt_graph.c	439	439	profile: #ifdef MONITOR
+host/src/nt_graph.c	440	583	include
+host/src/nt_graph.c	584	584	profile: #ifndef NEC_98
+host/src/nt_graph.c	585	585	excluded-NT-stream-state
+host/src/nt_graph.c	586	586	profile: #ifndef NEC_98
+host/src/nt_graph.c	587	670	include
+host/src/nt_graph.c	671	681	profile: #if defined(NEC_98)
+host/src/nt_graph.c	682	685	include
+host/src/nt_graph.c	686	693	profile: #if defined(NEC_98)
+host/src/nt_graph.c	694	708	include
+host/src/nt_graph.c	709	709	profile: #ifndef MONITOR
+host/src/nt_graph.c	710	715	include
+host/src/nt_graph.c	716	716	profile: #ifndef MONITOR
+host/src/nt_graph.c	717	719	include
+host/src/nt_graph.c	720	728	profile: #ifdef X86GFX
+host/src/nt_graph.c	729	752	include
+host/src/nt_graph.c	753	755	profile: #ifdef X86GFX
+host/src/nt_graph.c	756	773	include
+host/src/nt_graph.c	774	777	profile: #if defined(NEC_98)
+host/src/nt_graph.c	778	780	profile: #ifdef MONITOR
+host/src/nt_graph.c	781	781	include
+host/src/nt_graph.c	782	782	profile: #ifdef MONITOR
+host/src/nt_graph.c	783	787	include
+host/src/nt_graph.c	788	788	profile: #if defined(NEC_98)
+host/src/nt_graph.c	789	789	include
+host/src/nt_graph.c	790	792	profile: #if defined(NEC_98)
+host/src/nt_graph.c	793	793	include
+host/src/nt_graph.c	794	794	profile: #if defined(NEC_98)
+host/src/nt_graph.c	795	799	include
+host/src/nt_graph.c	800	802	profile: #if defined(NEC_98)
+host/src/nt_graph.c	803	813	include
+host/src/nt_graph.c	814	814	profile: #if defined(NEC_98)
+host/src/nt_graph.c	815	817	include
+host/src/nt_graph.c	818	820	profile: #if defined(NEC_98)
+host/src/nt_graph.c	821	822	include
+host/src/nt_graph.c	823	823	profile: #if defined(NEC_98)
+host/src/nt_graph.c	824	833	include
+host/src/nt_graph.c	834	860	profile: #ifdef MONITOR
+host/src/nt_graph.c	861	893	include
+host/src/nt_graph.c	894	894	profile: #ifndef NEC_98
+host/src/nt_graph.c	895	912	include
+host/src/nt_graph.c	913	913	profile: #ifndef NEC_98
+host/src/nt_graph.c	914	936	include
+host/src/nt_graph.c	937	937	profile: #ifndef X86GFX
+host/src/nt_graph.c	938	939	include
+host/src/nt_graph.c	940	940	profile: #ifndef X86GFX
+host/src/nt_graph.c	941	958	include
+host/src/nt_graph.c	959	959	profile: #ifdef MONITOR
+host/src/nt_graph.c	960	960	profile: #ifndef NEC_98
+host/src/nt_graph.c	961	966	profile: #ifdef MONITOR
+host/src/nt_graph.c	967	967	profile: #ifndef NEC_98
+host/src/nt_graph.c	968	968	profile: #ifdef MONITOR
+host/src/nt_graph.c	969	980	include
+host/src/nt_graph.c	981	983	profile: #ifdef X86GFX
+host/src/nt_graph.c	984	1005	include
+host/src/nt_graph.c	1006	1006	profile: #ifndef NEC_98
+host/src/nt_graph.c	1007	1013	include
+host/src/nt_graph.c	1014	1014	profile: #ifndef NEC_98
+host/src/nt_graph.c	1015	1016	include
+host/src/nt_graph.c	1017	1017	profile: #ifndef NEC_98
+host/src/nt_graph.c	1018	1022	include
+host/src/nt_graph.c	1023	1023	profile: #ifndef NEC_98
+host/src/nt_graph.c	1024	1053	include
+host/src/nt_graph.c	1054	1060	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1061	1064	include
+host/src/nt_graph.c	1065	1065	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1066	1068	profile: #ifdef X86GFX
+host/src/nt_graph.c	1069	1071	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1072	1072	include
+host/src/nt_graph.c	1073	1078	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1079	1090	include
+host/src/nt_graph.c	1091	1091	profile: #ifndef NEC_98
+host/src/nt_graph.c	1092	1093	include
+host/src/nt_graph.c	1094	1094	profile: #ifndef NEC_98
+host/src/nt_graph.c	1095	1095	include
+host/src/nt_graph.c	1096	1096	profile: #ifndef NEC_98
+host/src/nt_graph.c	1097	1104	include
+host/src/nt_graph.c	1105	1107	profile: #ifdef X86GFX
+host/src/nt_graph.c	1108	1112	include
+host/src/nt_graph.c	1113	1113	profile: #ifndef NEC_98
+host/src/nt_graph.c	1114	1282	include
+host/src/nt_graph.c	1283	1288	profile: #if defined(NEC_98)         // NEC {
+host/src/nt_graph.c	1289	1289	include
+host/src/nt_graph.c	1290	1290	profile: #if defined(NEC_98)         // NEC {
+host/src/nt_graph.c	1291	1298	include
+host/src/nt_graph.c	1299	1328	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1329	1342	include
+host/src/nt_graph.c	1343	1343	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1344	1379	include
+host/src/nt_graph.c	1380	1389	profile: #if (defined(JAPAN) || defined(KOREA)) && !defined(NEC_98)
+host/src/nt_graph.c	1390	1390	include
+host/src/nt_graph.c	1391	1391	profile: #if (defined(JAPAN) || defined(KOREA)) && !defined(NEC_98)
+host/src/nt_graph.c	1392	1453	include
+host/src/nt_graph.c	1454	1543	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1544	1630	include
+host/src/nt_graph.c	1631	1638	profile: #ifdef MONITOR
+host/src/nt_graph.c	1639	1681	include
+host/src/nt_graph.c	1682	1682	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1683	1688	include
+host/src/nt_graph.c	1689	1700	profile: #ifdef X86GFX
+host/src/nt_graph.c	1701	1701	profile: #ifndef NEC_98
+host/src/nt_graph.c	1702	1710	profile: #ifdef X86GFX
+host/src/nt_graph.c	1711	1711	profile: #ifndef NEC_98
+host/src/nt_graph.c	1712	1718	profile: #ifdef X86GFX
+host/src/nt_graph.c	1719	1721	include
+host/src/nt_graph.c	1722	1722	profile: #ifdef X86GFX
+host/src/nt_graph.c	1723	1795	include
+host/src/nt_graph.c	1796	1796	profile: #ifndef NEC_98
+host/src/nt_graph.c	1797	1799	include
+host/src/nt_graph.c	1800	1800	profile: #ifndef NEC_98
+host/src/nt_graph.c	1801	1803	include
+host/src/nt_graph.c	1804	1812	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1813	1834	include
+host/src/nt_graph.c	1835	1835	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1836	1837	include
+host/src/nt_graph.c	1838	1840	profile: #ifdef MONITOR
+host/src/nt_graph.c	1841	1841	profile: #ifndef NEC_98
+host/src/nt_graph.c	1842	1849	profile: #ifdef MONITOR
+host/src/nt_graph.c	1850	1850	profile: #ifndef NEC_98
+host/src/nt_graph.c	1851	1852	profile: #ifdef MONITOR
+host/src/nt_graph.c	1853	1922	include
+host/src/nt_graph.c	1923	1925	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1926	1937	include
+host/src/nt_graph.c	1938	1938	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1939	1970	include
+host/src/nt_graph.c	1971	1971	profile: #ifndef NEC_98
+host/src/nt_graph.c	1972	1972	include
+host/src/nt_graph.c	1973	1973	profile: #ifndef NEC_98
+host/src/nt_graph.c	1974	1982	include
+host/src/nt_graph.c	1983	1985	profile: #if defined(NEC_98)
+host/src/nt_graph.c	1986	1999	include
+host/src/nt_graph.c	2000	2037	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2038	2039	include
+host/src/nt_graph.c	2040	2077	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2078	2165	include
+host/src/nt_graph.c	2166	2166	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2167	2169	include
+host/src/nt_graph.c	2170	2229	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2230	2242	include
+host/src/nt_graph.c	2243	2243	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2244	2252	include
+host/src/nt_graph.c	2253	2255	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2256	2256	include
+host/src/nt_graph.c	2257	2257	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2258	2258	include
+host/src/nt_graph.c	2259	2264	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2265	2270	include
+host/src/nt_graph.c	2271	2271	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2272	2468	include
+host/src/nt_graph.c	2469	2481	profile: #if defined(JAPAN) || defined(KOREA)
+host/src/nt_graph.c	2482	2544	include
+host/src/nt_graph.c	2545	2547	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2548	2569	include
+host/src/nt_graph.c	2570	2572	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2573	2573	include
+host/src/nt_graph.c	2574	2574	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2575	2605	include
+host/src/nt_graph.c	2606	2608	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2609	2610	include
+host/src/nt_graph.c	2611	2611	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2612	2622	include
+host/src/nt_graph.c	2623	2631	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2632	2638	include
+host/src/nt_graph.c	2639	2639	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2640	2667	include
+host/src/nt_graph.c	2668	2670	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2671	2674	include
+host/src/nt_graph.c	2675	2677	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2678	2682	include
+host/src/nt_graph.c	2683	2694	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2695	2695	include
+host/src/nt_graph.c	2696	2704	profile: #if defined(NEC_98)
+host/src/nt_graph.c	2705	2882	include
+host/src/nt_graph.c	2883	2883	profile: #ifndef NEC_98
+host/src/nt_graph.c	2884	2895	excluded-NT-stream-host-endpoint
+host/src/nt_graph.c	2896	2896	profile: #ifndef NEC_98
+host/src/nt_graph.c	2897	2990	profile: #if defined(NEC_98)
+host/src/nt_vga.c	1	35	include
+host/src/nt_vga.c	36	39	profile: #ifdef MONITOR
+host/src/nt_vga.c	40	1637	include
+host/src/nt_vga.c	1638	2188	profile: #ifdef MONITOR

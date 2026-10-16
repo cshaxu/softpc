@@ -25,8 +25,18 @@ including all ten native desktop cases; both package EXEs are refreshed.
 Its production delta is +5,843/-8,750 (net -2,907), tests +164/-3 (net +161).
 Executor 5c5af37a is pushed and its separate coordinator actual-change review
 passes. S4 is implementation-closed under the owner's async delegation;
-S5 is now admitted for video-subset source audit and migration. This is not an
-invented owner manual-pass result. See the
+S5's reviewed video subset is now applied across 27 files, +3,644/-6,544
+(net -2,900). All 71 admitted paths match either the reviewed candidate or
+the frozen local input; 44 remain unchanged, including 40 C-VID files.
+Initial dual-width background compilation passes. A 73-line owner-local BIOS
+regression now checks all 256 DAC entries through block set/read and video-state
+save/restore, including modified-palette and buffer-boundary assertions. Its x64
+and x86 runs pass. Final dual-width regression passes 148/148 per architecture,
+including all ten reserved native desktop tests. The 71-path subset/range ledgers
+pass independent pinned-object reconstruction; both package EXEs are refreshed
+and hashed. Executor commit/push and separate actual-change review remain
+before S5 closure and S6 admission.
+This is not an invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
 new Sound Blaster capability transfers to the first unnumbered Queue candidate.
