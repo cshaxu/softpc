@@ -96,6 +96,53 @@ static void text_format(void)
     lib_test_assert(lib_text_find_substring(text, "While the machine is running:") != LIB_NULL);
 }
 
+static void window_format_boundaries(void)
+{
+    static const char *names[] = {"", "A much longer machine name for boundary testing"};
+    static const emulator_product_help_row row = {"Ctrl+Alt+P", "pause or resume"};
+    char running[128], paused[128], text[256], expected[256];
+    lib_size n, capacity, length, rows;
+
+    for (n = 0u; n < sizeof(names) / sizeof(names[0]); ++n) {
+        length = lib_text_length(names[n]) + sizeof(" (Running)");
+        for (capacity = 1u; capacity <= length; ++capacity) {
+            lib_test_assert(emulator_product_monitor_format_window_titles(names[n],
+                running, capacity, paused, sizeof(paused)) ==
+                (capacity == length ? LIB_STATUS_OK : LIB_STATUS_LIMIT_EXCEEDED));
+            lib_test_assert(running[capacity - 1u] == '\0');
+        }
+        length = lib_text_length(names[n]) + sizeof(" (Paused)");
+        for (capacity = 1u; capacity <= length; ++capacity) {
+            lib_test_assert(emulator_product_monitor_format_window_titles(names[n],
+                running, sizeof(running), paused, capacity) ==
+                (capacity == length ? LIB_STATUS_OK : LIB_STATUS_LIMIT_EXCEEDED));
+            lib_test_assert(paused[capacity - 1u] == '\0');
+        }
+        for (rows = 0u; rows != 2u; ++rows) {
+            emulator_product_help_map map = {rows ? &row : LIB_NULL, rows};
+            lib_test_assert(emulator_product_monitor_format_window_status(names[n],
+                map, expected, sizeof(expected)) == LIB_STATUS_OK);
+            length = lib_text_length(expected) + 1u;
+            for (capacity = 1u; capacity <= length; ++capacity) {
+                lib_test_assert(emulator_product_monitor_format_window_status(names[n],
+                    map, text, capacity) ==
+                    (capacity == length ? LIB_STATUS_OK : LIB_STATUS_LIMIT_EXCEEDED));
+            }
+            lib_test_assert(lib_text_compare(text, expected) == 0);
+        }
+    }
+    lib_test_assert(emulator_product_monitor_format_window_titles(LIB_NULL,
+        running, sizeof(running), paused, sizeof(paused)) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(emulator_product_monitor_format_window_titles("x",
+        running, 0u, paused, sizeof(paused)) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(emulator_product_monitor_format_window_titles("x",
+        running, sizeof(running), LIB_NULL, sizeof(paused)) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(emulator_product_monitor_format_window_status("x",
+        (emulator_product_help_map){LIB_NULL, 0u}, text, 0u) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(emulator_product_monitor_format_window_status("x",
+        (emulator_product_help_map){LIB_NULL, 1u}, text, sizeof(text)) == LIB_STATUS_INVALID_ARGUMENT);
+}
+
 static void provider_contract(void)
 {
     static const emulator_product_help_row extensions[] = {
@@ -268,6 +315,7 @@ int main(void)
 {
     command_parse();
     text_format();
+    window_format_boundaries();
     provider_contract();
     unavailable_fixed_commands();
     lifecycle_contract();

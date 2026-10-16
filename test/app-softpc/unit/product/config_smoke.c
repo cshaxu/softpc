@@ -1,9 +1,18 @@
 #include "lib/types/types_interface.h"
 #include "product/config.h"
 #include "lib/storage/file_interface.h"
+#include "lib/base/process_interface.h"
 #include <assert.h>
 
 static const char *input;
+static const char *directory = "C:\\tools";
+lib_status base_process_executable_directory(char *output, lib_size capacity)
+{
+    lib_size size = lib_text_length(directory) + 1u;
+    if (size > capacity) return LIB_STATUS_IO_ERROR;
+    lib_memory_copy(output, directory, size);
+    return LIB_STATUS_OK;
+}
 lib_status lib_storage_file_read_owned(const char *path, lib_size limit,
     void **bytes, lib_size *count)
 {
@@ -66,6 +75,15 @@ int main(void)
     path[0] = '\0';
     assert(app_resolve_image_path(path, "no-directory"));
     assert(app_get_config_path(path));
-    assert(lib_text_find_substring(path, "softpc.ini") != NULL);
+    assert(lib_text_compare(path, "C:\\tools\\softpc.ini") == 0);
+    directory = "C:\\";
+    assert(app_get_config_path(path));
+    assert(lib_text_compare(path, "C:\\softpc.ini") == 0);
+    directory = "/";
+    assert(app_get_config_path(path));
+    assert(lib_text_compare(path, "/softpc.ini") == 0);
+    directory = "\\\\server\\share\\";
+    assert(app_get_config_path(path));
+    assert(lib_text_compare(path, "\\\\server\\share\\softpc.ini") == 0);
     return 0;
 }

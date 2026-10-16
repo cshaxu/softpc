@@ -9,6 +9,13 @@ delegated sequential acceptance. Dual-width 160/160 qualification includes
 all ten native desktop cases and refreshed EXEs. The required post-edit
 Emulator audit passes for its +10/-4 production change; broader findings are
 the S7 scope. See the [S6 closure](../history/M9-T93-S6-xp-dsp-pcm-mixer.md).
+S7 implementation and full qualification are complete locally: both widths
+pass 161/161 (95 shared, 61 other, five native desktop), and final changed
+static checks pass another 8/8 per width. Both EXEs are refreshed; production
+C/H is +264/-242, net +22, with no mirror or audio change. The post-edit
+public-code audit and complete ledger are recorded in the
+[S7 delivery](../proposals/m9-xp-sound-blaster-standalone.md#s7-executor-qualification).
+Executor commit/push and separate actual-change review remain before closure.
 The following S6 checkpoints are retained implementation history, not pending
 work or a second active packet.
 The owner explicitly approves pause/resume use of the existing Emulator
@@ -58,7 +65,7 @@ Owner now orders the shared-quality repair
 immediately after S6: planned S7 precedes MIDI/FM attachment (renumbered S8)
 and final archive qualification (renumbered S9). Following reviewed S6 closure,
 S7 is now the only active packet. The [S7 brief](../proposals/m9-xp-sound-blaster-standalone.md#s7--shared-contract-and-quality-repair)
-owns the finding-to-regression ledger; no S7 repair is yet claimed implemented.
+owns the finding-to-regression ledger and local implementation checkpoints.
 S5 executor a34f858f is pushed and actual-change
 reviewed; S5 closes under delegated sequential acceptance. Its existing DMA
 copy/split repair is +28/-15 production and +107/-5 tests. Both widths pass

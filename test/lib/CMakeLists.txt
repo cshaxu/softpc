@@ -28,6 +28,7 @@ add_test(NAME lib.test-boundaries-selftest COMMAND "${CMAKE_COMMAND}"
 shared_register_test(lib lib_console console)
 shared_register_test(lib types_contract base)
 shared_register_test(lib process_directory base)
+shared_register_test(lib process_directory_contract base)
 shared_register_test(lib storage_file_writer_binary storage)
 shared_register_test(lib storage_position storage)
 shared_register_test(lib audio/pcm/stream types base)

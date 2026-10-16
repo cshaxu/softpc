@@ -1560,7 +1560,7 @@ not an already-working scheduling path.
 
 ### S7 — shared contract and quality repair
 
-Active after reviewed S6 closure; no S7 implementation is yet claimed.
+Active after reviewed S6 closure; local implementation checkpoints follow below.
 Baseline is S6 executor 065ac9ed and its published EXEs. The supplied
 audit is source/reproduction input, not proof of these repairs or a fresh
 full-suite pass. NXVM remains read-only comparison material; no receiving
@@ -1617,6 +1617,136 @@ and review actual Git changes against this ledger before admitting S8. Stop
 for unbounded path semantics, new public behavior outside these contracts,
 unrelated worktree changes or a proposed second implementation path. T closure
 still waits for the owner.
+
+#### S7 first implementation checkpoint
+
+The S6 endpoint and clean worktree were rechecked before edits. The formatting
+repair estimate is monitor.c +12/-6, its owner-local test +45-60/-0, and the
+entry fixture +15-25/-5. The new boundary regression fails on the old monitor
+at the first too-small running title (x64, normal test exit 8), proving the
+missing required-length check. The same route now checks signed formatter
+results against each destination capacity; no helper, extra buffer or API is
+added. Actual code is +12/-6; tests +48/-0 and +20/-5 respectively. Entry tests
+inject title/status errors separately and verify command disposal, leaving
+real formatting semantics with Emulator. Both widths pass the two focused
+tests (x64 0.29 seconds, x86 0.17 seconds). This is not S7 full qualification.
+
+The next bounded directory change estimates process.c +15-25/-1 and App
+config.c +4-6/-2. Existing root extraction remains the only path; no general
+path framework is proposed. A new Lib owner-local contract fixture injects
+only the native executable-path query, while the existing native process test
+is retained. It covers ordinary Windows/POSIX paths, drive/POSIX/UNC and
+extended Windows roots, native failure and unchanged output. Capacity tests
+use the existing whole-executable-path admission limit; this task does not
+introduce dynamic retry merely to accept a smaller directory-only buffer.
+
+The old directory implementation fails the injected ordinary-directory case
+(x64 CTest exit 8). The repair retains POSIX/drive roots and the server/share
+boundary for UNC (including canonical extended UNC), and removes only the
+ordinary-directory trailing separator. App avoids appending a second separator
+at preserved roots. Actual production change is process.c +13/-0 and config.c
++5/-2; tests add the 52-line Lib contract fixture and App +19/-1. Both widths
+pass all three focused directory/config tests, including the retained native
+directory query (x64 0.23 seconds, x86 0.37 seconds). No INI is written.
+
+Affected manifests are updated. An initial PowerShell-default sort violated
+their ordinal ordering; the manifest gates correctly rejected it. Ordinal
+ordering was restored without weakening the gate, and all affected Lib and
+Emulator manifests pass. This checkpoint does not close S7: naming/Types/gate
+repairs, the full same-issue inventory and full package qualification remain.
+
+#### S7 naming and Types checkpoint
+
+The next mechanical scope was estimated as six naming/build files, about
+60 equal replacement lines, plus checks and negative proof. Console now names
+its own guard and Console Broker owner. Linux input uses KVM_LINUX/kvm_linux;
+standalone CMake projects use shared_lib/shared_emulator without changing
+public targets. The existing naming check rejects each retired Console/Linux
+spelling independently; it adds no production state or alias.
+
+A token-aware scan of all Emulator and both X86 production C/H files excludes
+comments and string/character literals. It confirms 230 raw NULL occurrences
+in eight files: machine.c 87, input_queue.c 9, control.c 16, control_state.c 13,
+session.c 40, ui.c 55, debugger command.c 5 and PC keyboard.c 5. These become
+LIB_NULL in place, with no control-flow or data-layout change. Source gates
+reject reintroduction. Both X86 gates also reject unowned/nested source paths,
+mixed-case outward links and global/property link bypasses; nested CMakeLists
+receive the same checks. Their new negative cases pass locally.
+
+The target-wide Debugger format-truncation warning downgrade is removed.
+Strict shared-target builds pass on both widths without a replacement
+suppression; the Linux-input contract and two naming checks pass 3/3 on each
+width. This Linux-input test compiles selected decoder code on Windows, not a
+Linux runtime qualification. The first build script mistakenly named the
+INTERFACE aggregate as a build target and failed before compilation; the
+corrected run builds its actual entry test instead. The failed script result
+is retained, not counted as a test failure or silently retried.
+
+This is still an uncommitted S7 checkpoint. The complete formatting-site
+disposition, independent configuration check, full shared/product/desktop
+qualification, EXE refresh and actual-change review remain required.
+
+#### S7 finite same-issue audit
+
+The refreshed eight-directory universe is 266 files, including 217 C/H files:
+source Lib 116/102, Emulator 30/21, x86-debug 15/10, x86-ibmpc 14/9;
+matching tests 54/48, 22/18, 9/6 and 6/3 (all-files/C-H).
+The added directory contract fixture accounts for the increase over the
+received 265/216 baseline. Formatting inventory uses
+`rg -n 'lib_c_v?snprintf\s*\(' <eight roots> -g '*.c' -g '*.h'`;
+Types macro aliases are declarations, not invocation sites.
+
+| Formatting owner | Sites | Disposition |
+| --- | --- | --- |
+| Emulator monitor | 5 | Three variable-size public title/status calls repaired and boundary-tested; two internal message/prompt calls use fixed short messages or the fixed monitor prompt. All message callers were inspected. |
+| Emulator Session | 1 | Copies the NUL-terminated command-result prompt to an equally sized 64-byte field; no smaller destination is introduced. |
+| x86-debug command | 15 | Three variable formatting operations validate required lengths/dynamic output allocation; twelve fixed error renderings use bounded 16/32-bit hex fields or constant ERROR text into 256-byte arrays. |
+| x86-debug assembler | 8 | Six immediate renderings fit 256-byte arrays by fixed integer widths; two assembled statements separately validate total operand lengths. |
+| x86-debug disassembler | 2 | Existing macros check negative result and required length against owned array/context capacity. |
+| x86-ibmpc command | 9 | Fixed short messages/prompts and same-capacity debugger prompt copies; the Session destination relation is statically asserted. |
+| Lib storage test | 1 | Temporary filename template plus fixed suffix fits a 64-byte array; mkstemp changes characters, not template length. |
+| Emulator tests | 3 | Fixed media text, bounded fixed command vocabulary, and a printf-semantic composition capture returning the native required length. |
+| x86-debug tests | 6 | Fixed register names and integer widths fit explicitly inspected local arrays; expected memory row is shorter than 128 bytes. |
+| x86-ibmpc tests | 7 | Three entry doubles now reject truncation; four command-fixture calls format constant short text. |
+
+This accounts for all 40 production and 17 test invocation sites, rather
+than treating every unchecked fixed literal as a new failure path. The raw-NULL
+inventory is zero production tokens after the mechanical Types repair;
+remaining occurrences in comments are not C vocabulary violations. Directory
+extraction has one Base owner and one App consumer; the latter's root join is
+covered without touching user configuration.
+
+Same-class gate review also found Emulator skipped root-level C/H files.
+There are no such production files in this universe. A four-line guard and
+three-line negative case now reject that unowned layout in the existing gate;
+this refines the admitted verifier ledger without a new checker or runtime
+change. Full qualification started before that static-only addition; its final
+corpus/manifest/negative checks must be rerun against the final gate hashes.
+
+#### S7 executor qualification
+
+The complete final code passes both Release builds and 161/161 tests per
+width: 95 shared first, 61 other unit/integration next, then five separately
+invoked native desktop tests. All ten desktop cases pass. Final static-only
+edits receive a further 8/8 corpus/manifest/negative pass per width.
+Background shared/other times are x64 52.51/99.98 seconds and x86
+69.45/73.67 seconds. No Linux runtime or manual listening claim is made.
+Four independent Lib/Emulator configurations pass and cache their neutral
+project names; they do not rebuild the production objects a second time.
+
+Production C/H (14 paths) is +264/-242, net +22; tests C/H (five paths,
+including the new 52-line contract fixture) are +140/-7, net +133.
+Production build/gates are +73/-44, net +29; test build/gates +61/-4,
+net +57. Counts exclude manifests, documents and EXEs. Mirror diff is zero.
+The expanded x86 rebuild followed Ninja's existing premature-log recovery
+warning; no cache was cleared and no CCPU source was changed.
+
+Published SHA-256: x86
+`83c36c9abdbc402aafc9e04df51236b175adc1f6db49d5ba9c65499221eb3dd7`;
+x64 `2208dac4071a5f1961118106d3ff30b8a29044a809e86b661672984105d9460e`.
+User INI/media/snapshots are unchanged. Executor delivery and the separate
+actual-change review will create the S7 closure record; these results do
+not claim the pending S8/S9 device/archive work is complete.
 
 ### S8 — XP MIDI/FM device attachment
 

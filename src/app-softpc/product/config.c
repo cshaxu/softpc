@@ -54,12 +54,15 @@ int app_parse_media_mode(const char *value, lib_storage_medium_mode *out)
 int app_get_config_path(char *path)
 {
     lib_size length;
+    const char *suffix;
 
     if (base_process_executable_directory(path, SOFTPC_CONFIG_PATH_MAX) !=
         LIB_STATUS_OK) return 0;
     length = lib_text_length(path);
-    if (length + sizeof("\\softpc.ini") > SOFTPC_CONFIG_PATH_MAX) return 0;
-    lib_memory_copy(path + length, "\\softpc.ini", sizeof("\\softpc.ini"));
+    suffix = length != 0u && (path[length - 1u] == '/' || path[length - 1u] == '\\') ?
+        "softpc.ini" : "\\softpc.ini";
+    if (length + lib_text_length(suffix) + 1u > SOFTPC_CONFIG_PATH_MAX) return 0;
+    lib_memory_copy(path + length, suffix, lib_text_length(suffix) + 1u);
     return 1;
 }
 

@@ -5,6 +5,10 @@ endif()
 string(CONCAT retired_prefix "u" "i")
 string(TOUPPER "${retired_prefix}" retired_prefix_upper)
 string(CONCAT retired_class "Lib" "U" "x" "Window")
+string(CONCAT retired_linux "link" "vm")
+string(TOUPPER "${retired_linux}" retired_linux_upper)
+string(CONCAT retired_console "LIB_BASE_" "CONSOLE_INTERFACE_H")
+string(CONCAT retired_owner "policy.  Ho" "st is")
 
 if(EXISTS "${KVM_NAMING_ROOT}/src/lib")
     set(naming_roots
@@ -32,13 +36,16 @@ foreach(naming_root IN LISTS naming_roots)
         endif()
         if(naming_path MATCHES "(^|/)${retired_prefix}-" OR
            naming_path MATCHES "(^|/)${retired_prefix}_")
-            message(FATAL_ERROR "Obsolete KVM spelling in path: ${naming_path}")
+            message(FATAL_ERROR "Obsolete Lib spelling in path: ${naming_path}")
         endif()
         file(READ "${naming_file}" naming_text)
         if(naming_text MATCHES "(^|[^A-Za-z0-9_])${retired_prefix}_" OR
            naming_text MATCHES "(^|[^A-Za-z0-9_])${retired_prefix_upper}_" OR
-           naming_text MATCHES "(^|[^A-Za-z0-9_])${retired_class}([^A-Za-z0-9_]|$)")
-            message(FATAL_ERROR "Obsolete KVM spelling in: ${naming_path}")
+           naming_text MATCHES "(^|[^A-Za-z0-9_])${retired_class}([^A-Za-z0-9_]|$)" OR
+           naming_text MATCHES "kvm_${retired_linux}_|KVM_${retired_linux_upper}_" OR
+           naming_text MATCHES "${retired_console}" OR
+           naming_text MATCHES "${retired_owner}")
+            message(FATAL_ERROR "Obsolete Lib spelling in: ${naming_path}")
         endif()
     endforeach()
 endforeach()

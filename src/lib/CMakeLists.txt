@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    project(nxvm_shared_library LANGUAGES C)
+    project(shared_lib LANGUAGES C)
     include(CTest)
 endif()
 set(CMAKE_C_STANDARD 11)
