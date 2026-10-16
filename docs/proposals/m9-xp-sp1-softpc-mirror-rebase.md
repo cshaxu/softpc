@@ -865,7 +865,50 @@ recorded XP/local mirror whitespace exceptions remain; mirror diff-check is
 not misreported as clean. Executor commit/push and subsequent coordinator
 actual-change review remain required before S4 closure and S5 admission.
 
+#### S4 coordinator actual-change review and delegated closure
+
+Reviewed pushed executor 5c5af37a811eb8239beb4d32661a9ae9ec6b0a53 against
+the S4 packet and owner subset-policy amendment. The actual 27 changed paths
+are 17 mirror files, two owner-local tests, two EXEs and six evidence/governance
+files. Added/deleted/net counts match the final executor ledger. The review
+checks the actual source additions and selected local patches, rather than
+accepting the green tests as a substitute for source review.
+
+Full-width ROM CS, native configuration pointers and mouse bitmap addressing,
+accepted InPort behavior, IRQ deassertion, selected idle thresholds and the
+existing PCM endpoint remain. The reserved-key inverse change was withdrawn;
+real-key command tests and reserved-key no-output proof remain. Removed native
+NT endpoint declarations follow their removed consumers. No new device,
+presenter, public interface or snapshot schema is introduced. The complete
+fixed-object range recheck and sixteen selected snapshot-body comparisons pass.
+
+All final phase exit records are zero; both architectures pass 148/148 including
+the ten native desktop cases. Package hashes match the committed delivery and
+origin/main matches the executor commit. Protected source/test packages, INI,
+media and snapshots have no change. XP whitespace exceptions and earlier test
+fixture mistakes remain disclosed. No additional blocking finding is raised.
+S4 is implementation-closed under the owner's async delegation, not recorded
+as a new manual owner test. T92 stays open; S5 is admitted next.
+
 ### S5 — XP-first C-VID and video basis
+
+S5 begins at S4 executor 5c5af37a, following its actual-change review. The
+frozen source-audit universe is the 71 paths assigned to original batch S4 in
+xp-sp1-retained-paths.tsv: 31 XP-changed video/header/host paths and 40 local-only
+C-VID paths whose XP/OpenNT base is identical. The latter are preservation
+obligations, not permission to regenerate or rewrite accepted C-VID fixes.
+Initial production/test delta is +0/-0. Before any payload edit, inspect the
+fixed XP/OpenNT/current objects, declare per-file necessary ranges and local
+repairs, and publish added/deleted/net estimates. Unknown conditions remain
+until dependency review; neither all false guards nor whole files are imported
+mechanically. Existing proven useless arms may be removed within this scope.
+
+Preserve the T88 selected-marker, geometry and completed-paint publication
+contracts, fixed text destination stride, glyph/palette/cursor state and
+snapshot behavior. The targeted proof must map changed semantics to existing
+video matrices or justified new tests, followed by both Release packages and
+all shared/App background and reserved desktop tests. No frontend redesign,
+new mode, Sound Blaster, user asset or public package change is admitted.
 
 Migrate selected VGA/EGA/CGA/V7 source and declarations to the XP basis,
 excluding product presentation routes while retaining the standalone copied

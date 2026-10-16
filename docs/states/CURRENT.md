@@ -23,8 +23,9 @@ S3 is implementation-closed under the owner's async delegation. S4's final
 input/timing subset now passes dual Release builds and 148/148 tests per width,
 including all ten native desktop cases; both package EXEs are refreshed.
 Its production delta is +5,843/-8,750 (net -2,907), tests +164/-3 (net +161).
-Executor delivery and separate coordinator actual-change review are pending;
-S4 remains active and S5 is not yet admitted. This is not an
+Executor 5c5af37a is pushed and its separate coordinator actual-change review
+passes. S4 is implementation-closed under the owner's async delegation;
+S5 is now admitted for video-subset source audit and migration. This is not an
 invented owner manual-pass result. See the
 [T92 audit](../etc/evidence/softpc/xp-sp1-hunk-semantic-audit-zh.md).
 Owner approves the two-task plan on 2026-10-15: T92 retains core migration;
@@ -37,8 +38,8 @@ background + 5 desktop tests (146/146), with both EXEs refreshed; final
 focused/gate rechecks pass 7/7 each. On 2026-10-15 the owner authorizes async
 acceptance and automatic serial admission through S6, waiting only before
 T92 closure. S2 is implementation-closed on that delegated basis, not marked
-as manually tested by the owner. S3 is closed; S4 is active and S5-S6 remain
-serial successors.
+as manually tested by the owner. S3-S4 are closed; S5 is active and S6 remains
+the serial successor.
 Owner explicitly approves XP source import on 2026-10-15. The pinned source,
 original notices and local-patch ledger govern S3; no third-party license or
 redistribution grant is inferred. S2 repaired existing code without XP bodies.
@@ -47,7 +48,28 @@ Executor audit `2616deb8` is pushed; its coordinator actual-change review is
 recorded in the linked proposal. Proceeding to S2 does not claim runtime
 qualification of the source audit or close T92.
 
-## M9 T92 S4 Packet
+## M9 T92 S5 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner authorizes automatic serial S admission with async acceptance, waiting only before T closure, on 2026-10-15; S4 actual-change review passes. |
+| Objective | Migrate the necessary XP video subset across 31 changed candidates and preserve accepted patches across 40 unchanged-base C-VID paths. |
+| Non-goals | No Sound Blaster, new presenter or mode, public-package change, user INI/media/snapshot change, or generated production sources. |
+| Reference Baseline | S4 executor 5c5af37a; fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89 and OpenNT pins in the proposal. |
+| Candidate Proposal | [S5 video migration](../proposals/m9-xp-sp1-softpc-mirror-rebase.md#s5--xp-first-c-vid-and-video-basis). |
+| Files And ABI Surface | 71 original-batch-S4 paths in the retained-path ledger, with 31 possible XP payload changes and 40 C-VID preservation checks; owner-local tests as justified. No public ABI expansion. |
+| Applicable Rules | Task Reading Set, execution/documentation/architecture/coding governance, source-research policy and necessary-source-subset policy. |
+| Verification | Fixed-object three-way/range accounting; local video/marker/snapshot preservation; focused mode/cursor/stride/geometry matrices; dual Release builds and packages; all shared, other background and reserved desktop tests. |
+| Expected Markers | Useful XP video changes retained without foreign host routes; selected markers, stable geometry, completed paint, cursor/palette/font and snapshot contracts remain correct. |
+| Asset Needs | Reuse Ninja intermediates; ignored bounded audit evidence under build/t92/s5; hidden jobs with 30-minute build, 20-minute suite, 10-minute desktop budgets and 30 MiB log cap; executor owns cleanup. |
+| Reporting Requirements | Audit first with per-file changes and estimates; actual added/deleted/net and XP-subset patch/exclusion counts; dual artifacts, test evidence, executor push and separate actual-change review. |
+| Stop Conditions | New device/presentation path, public ABI expansion, unsupported guest semantic change, conflicting source terms or unexplained regression. |
+| Exit Criteria | Complete verified/pushed S5 and coordinator actual-change review permit S6 admission; T closure still waits for owner. |
+| Original Owner Request | 按照治理规范和执行规范，单人双角色模式，实现现有softpc核心迁移到winxp源码的基线上。采用必要源码子集；既有同类完全无用分支可删除。各 S 顺序推进，只在 T 收口前等待确认。 |
+| Similar-Issue Sweep | Video register/value narrowing, selected dirty-marker dispatch, geometry/publication and host-only declaration dependencies; disposition every hit without introducing alternate paths. |
+
+## M9 T92 S4 Retained Delivery Brief
 
 | Field | Required record |
 | --- | --- |
