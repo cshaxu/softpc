@@ -120,6 +120,108 @@ static void dma_word(io_addr port, IU16 value)
     outb(port, (half_word)(value >> 8));
 }
 
+static void verify_dma_transfers(softpc_machine *machine)
+{
+    static unsigned char original[0x20000], actual[0x20000], expected[0x20000];
+    static const IU16 starts[] = { 0x2100, 0, 1, 0xffff, 0xfffe };
+    unsigned controller, decrement, type, start, index;
+
+    for (controller = 0; controller != 2; ++controller)
+    for (decrement = 0; decrement != 2; ++decrement)
+    for (type = 0; type != 3; ++type)
+    for (start = 0; start != sizeof(starts) / sizeof(starts[0]); ++start) {
+        const unsigned unit = controller ? 2 : 1;
+        const unsigned bytes = 0x10000 * unit;
+        const half_word channel = controller ? 5 : 1;
+        unsigned char guarded[24], wanted[24];
+        sys_addr address;
+        word count;
+        IU16 offset = starts[start];
+        unsigned transfer, lane;
+
+        for (index = 0; index != bytes; ++index)
+            original[index] = (unsigned char)(index ^ (index >> 8) ^ 0x5a);
+        lib_memory_copy(expected, original, bytes);
+        lib_memory_set(guarded, 0xa5, sizeof(guarded));
+        for (index = 0; index != 4 * unit; ++index)
+            guarded[8 + index] = (unsigned char)(index + 0x31);
+        lib_memory_copy(wanted, guarded, sizeof(wanted));
+        for (transfer = 0; transfer != 4; ++transfer) {
+            for (lane = 0; lane != unit; ++lane) {
+                unsigned position = (unsigned)offset * unit + lane;
+                if (type == DMA_WRITE_TRANSFER)
+                    expected[position] = guarded[8 + transfer * unit + lane];
+                if (type == DMA_READ_TRANSFER)
+                    wanted[8 + transfer * unit + lane] = original[position];
+            }
+            offset = (IU16)(decrement ? offset - 1 : offset + 1);
+        }
+        assert(softpc_machine_write_physical(machine, 0x40000,
+            original, bytes) == SOFTPC_MACHINE_OK);
+        dma_post();
+        outb(controller ? 0xd8 : 0x0c, 0);
+        dma_word(controller ? 0xc4 : 0x02, starts[start]);
+        dma_word(controller ? 0xc6 : 0x03, 3);
+        /* Word channels ignore page bit zero; both cases address bank 4. */
+        outb(controller ? 0x8b : 0x83, controller ? 5 : 4);
+        outb(controller ? 0xd6 : 0x0b,
+            (half_word)(0x41 | (type << 2) | (decrement << 5)));
+        outb(controller ? 0xd4 : 0x0a, 1);
+        /* Zero length and a disabled controller must not touch either side. */
+        assert(dma_request(channel, (char *)guarded + 8, 0) == TRUE);
+        outb(controller ? 0xd0 : 0x08, 4);
+        assert(dma_request(channel, (char *)guarded + 8, 4) == TRUE);
+        outb(controller ? 0xd0 : 0x08, 0);
+        dma_enquire(channel, &address, &count);
+        assert(address == 0x40000 + (unsigned)starts[start] * unit);
+        assert(count == 3);
+        for (index = 0; index != sizeof(guarded); ++index)
+            assert(guarded[index] == (index >= 8 && index < 8 + 4 * unit ?
+                (unsigned char)(index - 8 + 0x31) : 0xa5));
+        /* Split the device request too: partial progress, then terminal count. */
+        assert(dma_request(channel, (char *)guarded + 8, 1) == TRUE);
+        assert(dma_request(channel, (char *)guarded + 8 + unit, 3) == FALSE);
+        for (index = 0; index != sizeof(guarded); ++index)
+            assert(guarded[index] == wanted[index]);
+        assert(softpc_machine_read_physical(machine, 0x40000,
+            actual, bytes) == SOFTPC_MACHINE_OK);
+        for (index = 0; index != bytes; ++index)
+            assert(actual[index] == expected[index]);
+        dma_enquire(channel, &address, &count);
+        assert(address == 0x40000 + (unsigned)offset * unit);
+        assert(count == 0xffff);
+        /* Reading status acknowledges TC; the automatically masked channel
+           must leave the complete guarded buffer unchanged on another call. */
+        {
+            half_word status;
+            inb(controller ? 0xd0 : 0x08, &status);
+            assert((status & 2) != 0);
+            inb(controller ? 0xd0 : 0x08, &status);
+            assert((status & 2) == 0);
+        }
+        assert(dma_request(channel, (char *)guarded + 8, 4) == TRUE);
+        for (index = 0; index != sizeof(guarded); ++index)
+            assert(guarded[index] == wanted[index]);
+        if (type == DMA_WRITE_TRANSFER) {
+            /* SAS remains the authority for ROM writes in either direction.
+               Reuse this private RAM bank as a temporary protected fixture. */
+            sas_connect_memory(0x40000, 0x40000 + bytes - 1, SAS_ROM);
+            outb(controller ? 0xd8 : 0x0c, 0);
+            dma_word(controller ? 0xc4 : 0x02, starts[start]);
+            dma_word(controller ? 0xc6 : 0x03, 3);
+            outb(controller ? 0xd4 : 0x0a, 1);
+            for (index = 8; index != 8 + 4 * unit; ++index)
+                guarded[index] ^= 0xff;
+            assert(dma_request(channel, (char *)guarded + 8, 4) == FALSE);
+            sas_connect_memory(0x40000, 0x40000 + bytes - 1, SAS_RAM);
+            assert(softpc_machine_read_physical(machine, 0x40000,
+                actual, bytes) == SOFTPC_MACHINE_OK);
+            for (index = 0; index != bytes; ++index)
+                assert(actual[index] == expected[index]);
+        }
+    }
+}
+
 static void verify_dma(softpc_machine *machine)
 {
     unsigned controller, decrement, automatic, round, index;
@@ -146,20 +248,19 @@ static void verify_dma(softpc_machine *machine)
         dma_word(address_port, initial);
         dma_word(count_port, 3);
         outb(controller ? 0x8b : 0x83, 0);
-        /* Single transfer; decrement uses the controller's VERIFY operation
-           to isolate reload from the separate legacy reverse-copy helper. */
+        /* Real reads also verify the reloaded address on the second round. */
         outb(controller ? 0xd6 : 0x0b,
-            (half_word)((decrement ? 0x41 : 0x49) |
+            (half_word)(0x49 |
                 (decrement << 5) | (automatic << 4)));
         outb(controller ? 0xd4 : 0x0a, 1);
         for (round = 0; round != 2; ++round) {
             lib_memory_set(output, 0, sizeof(output));
             assert(dma_request(channel, (char *)output, 4) == FALSE);
-            for (index = 0; index != 4 && !decrement; ++index) {
+            for (index = 0; index != 4; ++index) {
                 unsigned byte;
                 for (byte = 0; byte != unit; ++byte)
                     assert(output[index * unit + byte] ==
-                        memory[16 + index * unit + byte]);
+                        memory[16 + (decrement ? -index * unit : index * unit) + byte]);
             }
             dma_enquire(channel, &address, &count);
             if (automatic) {
@@ -177,6 +278,7 @@ static void verify_dma(softpc_machine *machine)
             }
         }
     }
+    verify_dma_transfers(machine);
 }
 
 static void verify_disk(softpc_machine *machine)

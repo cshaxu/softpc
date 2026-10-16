@@ -3,7 +3,14 @@
 ## Current Work
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
-T93 S5 is active: original DMA decrement/wrap prerequisite. S4 executor
+T93 S5 is active: original DMA decrement/wrap prerequisite. The existing
+copy/split repair is implemented (+28/-15 production; +107/-5 tests). The
+expanded real-transfer, host-canary, wrap, reload and ROM-protection test
+passes on x64/x86 after failing against the old copy path. Dual qualification
+passes 94 shared + 55 other + five individually isolated native desktop cases
+per width. Sequential CTest child DLL-initialization failures are retained in
+the proposal and TODO, not claimed fixed. Both EXEs are refreshed; executor
+push and coordinator actual-change review remain pending. S4 executor
 `46ad2e3f` is pushed and actual-change reviewed; S4 is closed under delegated
 sequential acceptance. It adds neutral host MIDI and truthful raw-FM capability. Both
 widths pass 154/154 including all ten native desktop tests; both EXEs are

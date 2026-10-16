@@ -1,5 +1,15 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Diagnose native package-test child startup under sequential
+  CTest execution. T93 S5 x64/x86 compact-console cases intermittently fail
+  before start at stage=1/error=6. A scratch diagnostic reproduces child exit
+  0xC0000142 (DLL initialization failed), AttachConsole error 5, then code-page
+  query error 6. Direct native/package probes pass; this does not identify the
+  responsible DLL or prove a CTest defect. Admission condition: test-owned
+  child-startup/Console lifetime investigation with loader evidence, without
+  retrying product startup or changing guest/device behavior to hide it.
+  Evidence: [T93 S5 checkpoint](../proposals/m9-xp-sound-blaster-standalone.md#s5--original-dma-prerequisite-repair).
+
 - TODO(Medium): Replace the host-time-dependent oracle in
   `test/app-softpc/unit/machine/machine_smoke.c:run_int1a_tick_boot_image`.
   T92 S2's first x64 full run failed `bda_tick_low != 0`; the next full run
@@ -9,16 +19,6 @@
   bounded test-only time/IRQ contract audit with a deterministic progress
   oracle, not a timer production change or unconditional retry. The exact
   failing host timestamp was not captured; no runtime regression is inferred.
-
-- TODO(High): Audit original DMA decrement-copy memory safety in
-  `src/app-softpc/softpc.new/base/system/at_dma.c`. Source inspection during
-  T92 S2 finds `bwd_dest_copy_from_M` advances guest source and decrements the
-  supplied host destination; Compat GFI supplies an ordinary buffer start.
-  This can write before that buffer for a guest-programmed decrement READ.
-  No dynamic memory-safety reproduction is claimed. Admission condition:
-  separate owner-approved DMA copy-semantics repair with guarded buffers,
-  byte/word increment/decrement and wrap coverage. T92 S2 isolates address
-  reload in decrement VERIFY mode rather than changing this separate helper.
 
 - TODO(High): Investigate the intermittent x86 runtime-smoke null BOP dispatch
   through `BIOS[0x52]`. Both unchanged T83 baseline `9fbf7369` and T84 builds

@@ -63,10 +63,11 @@ LOCAL void do_transfer  IPT6(int, type, int, decrement,
         sys_addr, dma_addr, char *, hw_buffer, unsigned long, length,
         unsigned long, size);
 
-LOCAL   void bwd_dest_copy_to_M IPT3(host_addr, s, sys_addr, d, sys_addr, l);
+LOCAL   void bwd_dest_copy_to_M IPT4(host_addr, s, sys_addr, d, sys_addr, l,
+        unsigned long, size);
 
-LOCAL   void bwd_dest_copy_from_M       IPT3(sys_addr, s, host_addr, d,
-        sys_addr, l);
+LOCAL   void bwd_dest_copy_from_M       IPT4(sys_addr, s, host_addr, d,
+        sys_addr, l, unsigned long, size);
 
 #ifdef LIM
         static int lim_active = 0;
@@ -612,10 +613,11 @@ GLOBAL  int     dma_request     IFN3(half_word, channel, char *, hw_buffer,
                 else
                 {
                         /* decrement memory case - check for address wrapping */
-                        if ((sys_addr)offset < munch)
+                        /* Offset zero is still one transferable DMA unit. */
+                        if ((sys_addr)offset + 1 < munch)
                         {
                                 /* transfer must be split */
-                                split_munch1 = (sys_addr)offset;
+                                split_munch1 = (sys_addr)offset + 1;
                                 split_munch2 = munch - split_munch1;
 
                                 /* do the first transfer */
@@ -826,7 +828,7 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
                         }
 #endif /* LIM */
 #endif /* nPM */
-                        bwd_dest_copy_to_M((half_word *)hw_buffer, dma_addr, length);
+                        bwd_dest_copy_to_M((half_word *)hw_buffer, dma_addr, length, size);
 
                 }
                 break;
@@ -837,7 +839,7 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
                         sas_PRS(dma_addr, (host_addr) hw_buffer, length);
                 else
                         /* decrement case */
-                        bwd_dest_copy_from_M(dma_addr, (half_word *)hw_buffer, length);
+                        bwd_dest_copy_from_M(dma_addr, (half_word *)hw_buffer, length, size);
                 break;
 
         case    DMA_VERIFY_TRANSFER:
@@ -854,18 +856,29 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
  * in the host but there seemed to be little point
  */
 
-LOCAL   void    bwd_dest_copy_to_M      IFN3(host_addr, s, sys_addr, d,
-        sys_addr, l)
+/* Reverse guest units, not bytes within a word; host buffers always advance. */
+LOCAL   void    bwd_dest_copy_to_M      IFN4(host_addr, s, sys_addr, d,
+        sys_addr, l, unsigned long, size)
 {
-        while (l-- > 0)
-                sas_PW8(d--, *s++);
+        while (l >= size)
+        {
+                sas_PWS(d, s, size);
+                d -= size;
+                s += size;
+                l -= size;
+        }
 }
 
-LOCAL   void    bwd_dest_copy_from_M    IFN3(sys_addr, s, host_addr, d,
-        sys_addr, l)
+LOCAL   void    bwd_dest_copy_from_M    IFN4(sys_addr, s, host_addr, d,
+        sys_addr, l, unsigned long, size)
 {
-        while (l-- > 0)
-                *d-- = sas_PR8(s++);
+        while (l >= size)
+        {
+                sas_PRS(s, d, size);
+                s -= size;
+                d += size;
+                l -= size;
+        }
 }
 
 #ifdef SEGMENTATION

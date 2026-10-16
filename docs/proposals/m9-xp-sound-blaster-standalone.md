@@ -507,6 +507,97 @@ device_contract_smoke fixture. Roughly 2-3 code paths plus mirror manifest.
 Use the complete canary/wrap matrix above. Remove the corresponding TODO only
 after actual proof. Keep unrelated debt and T92 accepted repairs intact.
 
+S5 implementation checkpoint: the existing backwards READ helper advances
+guest memory but decrements the host pointer; backwards WRITE reverses bytes
+rather than controller units. The decrement split also omits offset zero.
+The local patch changes only the existing helpers/signatures and split: one
+unit is copied through the same SAS memory authority, the host buffer advances,
+and the guest unit address retreats. Selected host_def.h defines PM; the old
+non-PM ROM-clipping branch is not a selected runtime path and is not expanded
+or rewritten. SAS continues to reject writes to protected ROM.
+
+The bounded sweep finds three current production calls, all in gfi_image.c,
+using the beginning of a forward host buffer (read, write and format IDs).
+There is no alternate DMA copy owner. The existing reload test used VERIFY
+for decrement, so it could not detect the copy bug; it now performs real READ
+in both directions. The new 60-case matrix covers two widths, two directions,
+three transfer types and five offsets (ordinary, zero, one, FFFE and FFFF).
+Each case compares a whole DMA bank and host canaries, zero-length/disabled
+requests, partial transfer/TC, final registers, TC acknowledgement and masked
+repeat. WRITE cases also map their private fixture bank as ROM and verify
+that DMA cannot modify it. The eight prior reload combinations remain.
+
+Before production edits the new test compiled and failed on transferred
+memory, establishing a red regression. An earlier test-only compile failure
+was an original-header `byte` macro collision with a fixture variable; the
+variable is now `lane`. The expanded transfer/ROM/reload test passes both
+widths; final qualification is recorded below. No guest audio playback or Sound
+Blaster integration is claimed by these DMA checks.
+
+Actual production delta is one file +28/-15 (net +13); test delta is one file
++107/-5 (net +102). No public header, shared component, guest-device state or
+snapshot layout changes. Reconstructing the pinned XP subset from the retained
+S3 include ranges reproduces SHA-256
+`cae6f92e62d993a24c7f490af3ab24eebb78dcbcea434141437878166a6628c0`.
+`git diff --no-index --numstat` against that subset changes from +81/-1 before
+S5 to +109/-16 after S5: local mirror diff grows by 43 changed lines, while
+production grows by 13 source lines. Excluded XP ranges are unchanged; no
+local repair was excluded to reduce that comparison.
+
+Qualification checkpoint: dual Release builds and all background tests pass
+(94 shared + 55 other per width). x64 timings are 43.96/95.80 seconds;
+x86 45.97/72.07 seconds. The x86 Ninja log reports premature-end recovery
+and rebuilds 597 steps; no cache purge or competing build was requested.
+The original first-tone, guest sound, media/snapshot and cross-process snapshot
+regressions are included. Public eight-directory sources/tests and owner
+INI/media/snapshots remain unchanged.
+
+Native desktop qualification exposed an intermittent fixture-boundary failure:
+the first x64 compact-console case and the following x86 compact-console case
+reported stage=1/error=6 before sending start. The unchanged x64 five-case
+confirmation then passed. Source identifies this stage as unavailable Console
+code page after attempted AttachConsole; error 6 alone does not establish why
+attachment failed or whether the child exited. A scratch-only native probe
+successfully attached six consecutive x86 children (656-703 ms, code page 437,
+child still active). A scratch copy of the package fixture with added child-exit
+diagnostics passed both normal and compact routes. Those passes do not explain
+the earlier failure; no production or tracked-test workaround was introduced.
+The initial scratch probe compiler lookup assumed FILEPATH rather than the
+actual UNINITIALIZED CMake cache key; that harness-only lookup was corrected.
+The final same-process desktop attempt failed x64 compact again. Running the
+diagnostic fixture pair under CTest reproduced child exit 3221225794
+(0xC0000142, DLL initialization failed), AttachConsole error 5 and subsequent
+GetConsoleCP error 6. This narrows the failure to native child startup, not
+guest DMA execution, but does not identify the DLL or prove CTest is its cause.
+The bounded follow-up runs every original desktop case in an independent
+CTest process; this is test isolation, not a production retry. The unresolved
+startup diagnostic is explicitly transferred to TODO rather than erased.
+
+Final qualification passes every registered test on both widths: 94 shared,
+55 other and five native desktop cases (154/154 coverage per width). Desktop
+cases pass unchanged in separate CTest processes: x64 durations
+6.67/6.26/0.33/0.81/1.26 seconds, x86 6.95/6.37/0.33/0.85/1.28 seconds.
+This is not a claim that the earlier grouped native invocations passed or
+that their startup defect is fixed. The original DMA debt is removed after
+bounded copy/wrap qualification; unrelated debts remain. Local mirror,
+documentation and whitespace gates pass. One manual mirror-gate invocation
+used a relative source root that its script did not resolve; the absolute-root
+invocation and registered full-suite gate pass.
+
+Published Release artifacts:
+
+- softpc64.exe: 3,097,633 bytes; SHA-256
+  `244A758A607FC0BE5C22D5E7A104B37523032E58CC84F6AA1908146F4C63C8AC`.
+- softpc32.exe: 3,498,351 bytes; SHA-256
+  `FEAAFEFE2BD850315374B1237C4FB5FFD341D8DAE4129DF2FBBA084DA984D8D7`.
+
+The coverage unit is the finite transfer matrix plus the prior eight reload
+combinations, three current caller sites and all 154 registered cases per
+width. Every member has a source disposition or executed assertion above;
+no hardware/channel beyond the selected two-controller model or real guest
+Sound Blaster workload is claimed. The only transferred finding is the
+pre-main native package child startup failure, not a second DMA implementation.
+
 ### S6 — XP DSP/PCM/Mixer and host integration
 
 Import necessary subsets of sndblst.h, nt_sb.h, nt_sb.c, nt_sbdsp.c and
