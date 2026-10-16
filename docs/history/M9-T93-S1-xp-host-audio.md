@@ -27,3 +27,10 @@ The continuing implementation goal admits S2's pure PCM relocation. PCM
 behavioral extensions, MIDI/FM, DMA, device attachment and snapshot remain
 separate later steps. The proposed shared pause-hook change retains its
 explicit implementation approval boundary. No full T completion is claimed.
+
+Handoff correction: 83aa592f initially named this record without S1, so the
+Continuation gate could not find a completed step. The shell sequence wrongly
+continued to commit/push despite that failed gate. Rename the record with S1;
+the documentation gate and diff check then pass. No production code ran or
+changed during this correction. Future delivery commands stop on a nonzero
+verification exit before staging or committing.
