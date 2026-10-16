@@ -1,5 +1,39 @@
 # T93 S11 — UTF-8 paths and native directory rules
 
+## Owner-reopened test ownership correction
+
+Owner request: "Storage 测试包含 Base UTF-8 校验器的纯边界断言，建议移回
+Base 自有测试 minor feedback，合理的话请你重开本S进行修复；因为i只是测试
+更改，不需要重新编译测试全部；只需要重新编译测试改动部分。"
+This explicitly reopens the same S11, without admitting S12. Baseline 58140a9a.
+The prior full delivery remains evidence for unchanged production; the new
+verification override is two affected targets on both architectures plus
+test-manifest/boundary/documentation gates. No EXE rebuild/publication.
+
+Plan: Base owns direct invalid/scalar-boundary/null/empty validator assertions;
+Storage keeps invalid-path rejection through its public APIs. No shared test
+fixture or new production dependency. Estimate test C +14/-4 (net +10), one
+CMake registration and manifest, production +0/-0. Similar-issue sweep searches
+all test/lib direct base_text_utf8_valid calls; only the misplaced Storage
+assertions move. Exit: focused proof, complete executor push and separate
+actual-change review. Hidden correction job has log/exit records, 600-second
+no-progress investigation budget, executor-owned cleanup; no desktop activity.
+
+Correction proof: both affected targets compile on x64/x86; each width passes
+5/5 (base_text, storage_utf8, test-manifest, test-boundaries, test-types-boundary).
+Test C is +14/-4, net +10; registration +1/-0, manifest updated. Production
+and both published EXE hashes are unchanged. Existing Ninja x86 log recovery
+rebuilt the selected targets' Base/Storage dependencies, not the product.
+Direct-validator-call sweep now finds only base_text_smoke.c. Storage retains
+the malformed input matrix because it tests API status/output contracts, not
+Base implementation. No cross-test fixture dependency is introduced.
+
+The first documentation gate rejected the reopened S11 active packet because
+its Continuation mode requires a fresh S12 identifier. The owner's explicit
+same-S reopening is retained as a bounded correction record; after execution
+the idle state removes that active packet without changing the gate or claiming
+S12 admission. The final documentation gate must pass before commit.
+
 ## Admission and closure
 
 Original owner request: "验收通过，准入执行S11到收口". This accepts S10

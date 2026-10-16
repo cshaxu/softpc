@@ -5,6 +5,12 @@
 No implementation subtask is active.
 Open task awaiting owner: T93.
 
+The owner-reopened S11 test-ownership correction is implemented and focused
+verified, pending executor push and actual-change review. Base owns validator
+assertions; Storage retains public API rejection coverage. Both architectures
+pass 5/5 targeted tests/gates. Production and EXEs are unchanged; no full run
+or EXE refresh was requested. S12 is not admitted.
+
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
 The owner accepts the reopened S7 delivery and admits S8: "验收通过，准入s8".
 S7 is closed; executor 7bb98d79 and review e1e44d0c are pushed. Both widths
@@ -245,19 +251,19 @@ proposal. No manual hearing or Linux runtime result is claimed.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner accepts S10 and explicitly admits S11 through closure; no automatic S12 admission. |
-| Objective | UTF-8 Base executable directory and Storage read/write paths; native separator/root rules stay in platform leaves. |
+| Objective | Owner-reopened S11 test ownership only: move direct Base UTF-8 validator assertions from Storage to Base; retain all Storage public API rejection tests. |
 | Non-goals | No App configuration migration, Console text/title/audio/capture repairs, new OS backend, user configuration/media/snapshot edits or NXVM writes. |
-| Reference Baseline | S10 executor e7d37b65 and review 45d6f860; both widths 165/165, zero skips. |
+| Reference Baseline | Accepted S11 endpoint 58140a9a; prior full qualification 166/166 per width. |
 | Candidate Proposal | [S11 UTF-8 paths](../proposals/m9-xp-sound-blaster-standalone.md#s11--utf-8-paths-and-native-directory-rules). |
 | Files And ABI Surface | Lib Types native encoding vocabulary, Base process/UTF-8 validation and Storage platform files, public path contracts, owner-local tests/manifests/docs. Storage uses the inward Base validator; no outer-layer or mirror changes. |
 | Applicable Rules | Task Reading Set, architecture/coding and source/research policy; single-agent dual-role execution; necessary-source subset, Types authority and inward dependencies. |
-| Verification | Drive/UNC/POSIX roots and backslash names, Unicode file read/write/append/medium roundtrip, malformed UTF-8, byte capacity and unchanged failure output. Cached dual builds/publication, shared then all other unit/integration tests and ten desktop cases; Types/dependency/naming/manifests. |
+| Verification | Owner override: build only base_text and storage_utf8 on x86/x64; run those tests plus Lib test-manifest, test-boundaries and test-types-boundary gates, documentation and diff checks. No full rebuild/regression, desktop test or EXE refresh. |
 | Expected Markers | Same UTF-8 interpretation for reads and writes, explicit invalid/unsupported paths, unchanged byte data and locking; one platform route, no fallback or path framework. |
 | Asset Needs | Hidden supervised build/t93/s11 jobs with log/exit files; 1800s build, 1200s suite, 600s desktop, 30 MiB logs; executor cleanup. Reuse cached trees, no Computer Use; native desktop scheduling preapproved. Disposable generated fixtures only. |
 | Reporting Requirements | Audit findings with exact ownership and evidence; implementation brief with per-component added/deleted/net estimates before edits; actual diff/test/artifact accounting and separate actual-change review. |
 | Stop Conditions | Unjustified abstraction, product-specific public API, new backend scope, behavior change without authority or failed required regression; resolve before delivery. |
-| Exit Criteria | Declared path contracts verified, focused/full proof, both EXEs, executor commit/push and separate actual-change review; owner authorizes S11 closure, T93 stays open. |
-| Original Owner Request | 验收通过，准入执行S11到收口。 |
+| Exit Criteria | Relocated assertions and retained Storage rejection coverage pass focused dual-width proof; production and EXEs unchanged; executor commit/push and separate actual-change review. Close only this owner-reopened S11 correction; T93 stays open. |
+| Original Owner Request | 验收通过，准入执行S11到收口。 Follow-up: Storage 测试包含 Base UTF-8 校验器的纯边界断言，建议移回 Base 自有测试；重开本 S，仅重新编译测试改动部分。 |
 | Similar-Issue Sweep | Base/Storage path APIs, narrow native opens, status propagation and root parsing; account for every production hit and distinguish deferred S12 text APIs. |
 
 ## M9 T93 S1 Retained Design Brief
