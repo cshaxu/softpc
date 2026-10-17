@@ -8,7 +8,8 @@ T96 S1 design is delivered and reviewed at 7d0d3dea; owner directs continuing
 the RGB upgrade while scheduling buffer simplification as final S4. S2 is active.
 See the [S1 record](../history/M9-T96-S1-rgb-frame-design.md). Existing five-buffer
 ownership remains unchanged during S2. Implementation and dual-width full
-qualification are complete; executor delivery awaits owner acceptance.
+qualification are complete. Executor fa569001 is committed/pushed and its
+actual diff reviewed; S2 awaits owner acceptance, with no S3 admission.
 
 ## M9 T96 S2 Packet
 
