@@ -2,53 +2,37 @@
 
 ## Current Work
 
-T93 S12 is verified for delivery: UTF-8 Console text/lines and Window titles.
-Executor 2fc25069 is pushed; separate coordinator actual-change review accepts
-the delivery for owner verification. S12 is not closed.
-Owner admission: "好的。准入下一个S任务执行到收口前等我验收。"
-Baseline 79eca79f. Deliver built/tested/published/pushed changes, then wait for
-owner acceptance; do not close S12 or admit S13 automatically.
+T93 S13 is active: minimal platform-neutral PCM progress and lifecycle.
+S12 is owner-accepted and closed after executor 2fc25069 and review f43ea903:
+167/167 per architecture including ten desktop cases. Its intermittent raw-input
+failure remains explicit TODO, not a claimed repair.
 
-Both EXEs are refreshed; final x64/x86 qualification is 167/167 each,
-zero skips, including all ten native desktop cases. The first desktop compact
-case failed at raw ver input; unchanged full desktop rerun passes, and its
-unproven cause is recorded in TODO. Production C/H +99/-43 (net +56), test
-C/H +141/-27 (net +114). See the [S12 delivery record](../proposals/m9-xp-sound-blaster-standalone.md#s12-implementation-and-review-record).
-
-The owner-reopened S11 test-ownership correction is closed after executor
-b9b654ac and separate actual-change review. Base owns validator
-assertions; Storage retains public API rejection coverage. Both architectures
-pass 5/5 targeted tests/gates. Production and EXEs are unchanged; no full run
-or EXE refresh was requested. S12 is now separately admitted below.
-
-## M9 T93 S12 Packet
+## M9 T93 S13 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits next S through delivery, waiting for acceptance before closure. |
-| Objective | UTF-8 cooked Console text/lines and Window titles at existing Lib native boundaries; preserve reader, output and FIFO owners. |
-| Non-goals | No raw frame, guest, audio, capture, new OS backend, INI/media/snapshot or external repository changes. |
-| Reference Baseline | Accepted S11 endpoint 79eca79f, production previously qualified 166/166 per architecture. |
-| Candidate Proposal | [S12 UTF-8 text](../proposals/m9-xp-sound-blaster-standalone.md#s12--utf-8-console-text-and-window-titles). |
-| Files And ABI Surface | Console public text/line contract and Win32 broker; Window title validation/native application; Types native aliases; bounded Base UTF-8 validator and Session chunk boundaries. No new Console/Window operation. |
-| Applicable Rules | Task Reading Set and all four governance skills; single-agent dual-role review, Types authority, inward dependencies. |
-| Verification | Focused UTF-8/BMP/supplementary, invalid encoding, byte capacities, fragmented reads, drain/rearm, output/title failures; cached x86/x64 full build, shared first then remaining unit/integration and ten native desktop cases; publish both EXEs. |
-| Expected Markers | No code-page interpretation at text/line/title boundary; invalid/oversized lines rejected once, no tail command; no second decoder/state owner. |
-| Asset Needs | Hidden build/t93/s12 jobs, logs/exit files; build 1800s, suites 1200s, desktop 600s observation budgets, 30 MiB logs; executor owns cleanup. No Computer Use. Native desktop execution preapproved. |
-| Reporting Requirements | Before/after semantics, actual production/test added/deleted/net counts, source versus test proof, limits and EXE hashes; separate actual-change review. |
-| Stop Conditions | Expanded scope, unapproved product behavior or failed required proof; resolve before delivery. Never terminate on interactive timeout. |
-| Exit Criteria | Complete implementation and dual-width qualification, publish/commit/push, actual-change review, then await owner; S13 stays unadmitted. |
-| Original Owner Request | 好的。准入下一个S任务执行到收口前等我验收。 |
-| Similar-Issue Sweep | All public text/line/title native API sites and fixture overrides; retain fixed ASCII OS names and raw BMP frame paths, identify external callers splitting UTF-8. |
+| Admission And Approval | Owner accepts S12 and admits S13 through delivery with before/after briefs and minimum total code. |
+| Objective | Neutral PCM progress and batch-independent destruction, retaining one worker/FIFO/backend. |
+| Non-goals | No new API/state/worker, recovery framework, MIDI/FM, capture, guest/mirror or INI/media/snapshot changes. |
+| Reference Baseline | Accepted S12 f43ea903; S12 closure is documentation only. |
+| Candidate Proposal | [S13 PCM](../proposals/m9-xp-sound-blaster-standalone.md#s13--pcm-progress-and-lifecycle-contract). |
+| Files And ABI Surface | Lib PCM interface/common/Win32 backend and two existing tests/manifests; inspect real Compat callers. |
+| Applicable Rules | Task Reading Set and four governance skills; single-agent dual-role, Types authority, inward dependencies. |
+| Verification | Blocked short/full destruction, flush, epochs/progress, native format limit; cached dual-width build, shared then other tests, ten native desktop cases and both EXEs. |
+| Expected Markers | Destroy cancels/releases, flush submits, clear discards; no batch-dependent lifecycle or public native padding/byte-rate contract. |
+| Asset Needs | Hidden build/t93/s13 jobs/logs/exit files; build 1800s, suite 1200s, desktop 600s observation budgets, 30 MiB logs; executor cleanup; no Computer Use. |
+| Reporting Requirements | Before/after brief, actual source/test additions/removals/net and changed-file totals, evidence/hashes and separate review. |
+| Stop Conditions | Expanded scope or failed proof; no unapproved behavior change, no interactive-timeout termination. |
+| Exit Criteria | Build/publish/test/commit/push and actual-change review; await owner acceptance, no automatic S14. |
+| Original Owner Request | 很好。验收通过，准入S13，开始前和结束后都要进行简报汇报；请你以极简方案实施，意思不是说diff一定要减少，而是完成后总代码数量要最少 |
+| Similar-Issue Sweep | PCM destroy/flush/clear/set_active consumers, public native terminology, format guards and lifecycle tests. |
 
-Owner scope refinement: "可以。就这么改，就在当前S里面改。然后当前S的本分任务，
-继续做，精简的做". Include the reviewed Linux Base one-use helper removal
-and Windows redundant allocation-bound removal (actual net -5 lines).
-Consolidate Console output cleanup without a chunking framework; preserve
-bounded Session output on malformed continuation bytes. Estimated production
-net about +58, refined from the earlier broad +100-160 budget. Existing
-Base/Storage contracts and previously accepted failures stay unchanged.
+Brief: remove destroy's sub-batch flush branch. Preserve cancellation, join,
+ownership checks and existing deactivation flush-then-clear behavior. Move
+Windows byte-rate representation limit to its existing backend guard.
+No new state/helper. Estimate production +15-25/-30-45 (net -10 to -25);
+tests net +40-80. Preserve necessary overflow and live-worker safety checks.
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
 The owner accepts the reopened S7 delivery and admits S8: "验收通过，准入s8".
