@@ -10,7 +10,8 @@ focused tests pass. Full qualification passed 193/193 distinct tests per width,
 including desktop and native audio. Both guest widths pass the four-WAV
 sequence, twelve further Chord plays, Windows exit/restart, full Canyon via
 MPU-401 and subsequent WAV. Delivery is qualified and awaits owner acceptance;
-S2 and T95 remain open. Original Ad Lib/SB-MIDI capabilities are not expanded.
+S2 delivery 66055d92 is pushed and coordinator-reviewed; S2 and T95 remain
+open pending owner acceptance. Original Ad Lib/SB-MIDI capabilities are not expanded.
 See the
 proposal's S1 delivery review and the [task record](../history/M9-T95-S1-win31-midi-wav-playback.md).
 Owner admits the former queue head on 2026-10-17 and supplies a post-driver-
