@@ -2,8 +2,10 @@
 
 ## Status
 
-Unadmitted queue candidate.  This proposal allocates no numeric `T` and does
-not alter the active T95 MIDI/WAV diagnostic packet.
+Owner delegates admission as T96 on 2026-10-17 after T95 closure. CURRENT owns
+the active S1 inventory/design packet. The implementation sequence below is
+provisional: public ABI and SoftPC producer must migrate in one qualified
+delivery, not leave a broken intermediate build.
 
 ## Problem
 

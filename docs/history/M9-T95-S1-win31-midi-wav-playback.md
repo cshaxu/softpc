@@ -13,7 +13,7 @@ playback or Windows exit. Preserve owner media and configuration.
 Owner request on 2026-10-17: "批准收口S1和准入S2".
 S1 delivery: 9df788229cb841a66ba74502ca81b20398eda0ce.
 The coordinator reviewed the actual documentation-only delivery and the
-[diagnostic evidence and repair design](../proposals/m9-win31-midi-wav-playback.md).
+[diagnostic evidence and repair design](M9-T95-win31-midi-wav-playback-proposal.md).
 Production and tracked tests changed +0/-0; no EXEs changed.
 
 - WAV: the service path can submit a pending DMA block after a pause. A bounded

@@ -2,70 +2,56 @@
 
 ## Current Work
 
-T95 S1 diagnosis/design is owner-accepted and closed on 2026-10-17.
-Owner admits S2 to repair paused DMA submission through the existing service
-path and qualify both widths. The minimal guard and regression are implemented;
-both unmodified architectures failed the new assertion, and repaired dual-width
-focused tests pass. Full qualification passed 193/193 distinct tests per width,
-including desktop and native audio. Both guest widths pass the four-WAV
-sequence, twelve further Chord plays, Windows exit/restart, full Canyon via
-MPU-401 and subsequent WAV. Delivery is qualified and awaits owner acceptance;
-S2 delivery 66055d92 is pushed and coordinator-reviewed; S2 and T95 remain
-open pending owner acceptance. Original Ad Lib/SB-MIDI capabilities are not expanded.
-See the
-proposal's S1 delivery review and the [task record](../history/M9-T95-S1-win31-midi-wav-playback.md).
-Owner admits the former queue head on 2026-10-17 and supplies a post-driver-
-restart snapshot after audible startup WAV. T94 is closed; see its
-[completion audit](../history/M9-T94-completion-audit.md).
+Owner delegates T95 S2/T closure and next queue admission on 2026-10-17.
+See the [completion audit](../history/M9-T95-completion-audit.md).
+T96 S1 is active: inventory and design the RGB graphics-frame migration.
+No T96 production edit or fresh runtime qualification is claimed.
 
-## M9 T95 S2 Packet
+## M9 T96 S1 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly approves closing S1 and admitting S2 on 2026-10-17. |
-| Objective | Prevent submission of pending DMA audio while DSP-paused; preserve existing completion/resume behavior and verify repeated WAV plus the working MPU MIDI route. |
-| Non-goals | No new audio model, SB-MIDI implementation, FM synthesis, forced IRQ or public component change; no Win95 volume/restart repair. |
-| Reference Baseline | 9df788229cb841a66ba74502ca81b20398eda0ce; accepted S1 diagnosis and unchanged T94 production binaries. |
-| Candidate Proposal | [Win3.1 playback investigation](../proposals/m9-win31-midi-wav-playback.md). |
-| Files And ABI Surface | Existing host/src/nt_sbdsp.c service guard, App machine device-contract test and mirror-accounting evidence; no ABI, additional state or shared-component change. |
-| Applicable Rules | Execution, Document, Architecture and Coding authorities; single-person executor/coordinator actual-diff review. |
-| Verification | Red/green mock backpressure test in both DMA directions; retain completion/reset/snapshot coverage. Cached x86/x64 builds, publish both EXEs, run full unit/gates and background, desktop and native-audio integrations. Replay four-WAV sequence, repeated Chord, Windows exit/restart and configured MPU route through existing guest input/capture probes without Computer Use or diagnostic pause gate. Report native availability separately. |
-| Expected Markers | Paused service accepts no more bytes or newly schedules completion; Continue resumes the same pending block. Already armed completion is retained. Repeated guest WAV completes without the observed masked-IRQ wait; musical MIDI delivery and completion use MPU. |
-| Asset Needs | Preserve owner snapshot, media and INI. Disposable overlays and evidence under ignored build/t95; hidden owned jobs with logs/exit markers. Guest observations: 1800-second run, 300-second no-progress and 128 MiB trace cap; qualification jobs use declared per-phase budgets. Executor owns cleanup. |
-| Reporting Requirements | Estimate production logic +1/-1, net zero, plus a short comment; test +15 to +30/-0. Report actual production/test added/deleted/net and mirror-relative diff separately, proof limits, published hashes and fixed commit. |
-| Stop Conditions | Broader interrupt/parser redesign, new capability or public API becomes necessary: report evidence and obtain revised scope. No product retries or relaxed test assertions to mask a failure. |
-| Exit Criteria | Focused and prescribed full qualification pass, dual EXEs published, similar-issue disposition and actual-diff review complete, committed/pushed delivery awaits owner acceptance before S2 closure. |
-| Original Owner Request | "批准收口S1和准入S2"; implement the minimal paused-service repair designed in S1, preserving owner inputs. |
-| Similar-Issue Sweep | Inspect all DspServiceTransfer/DspProcessBlock callers, pause/continue, auto-init EOI, completion and snapshot/running transitions. Track the separately evidenced unsupported SB-MIDI parser collision as debt, not as a repaired capability. |
+| Identifier Mode | New |
+| Admission And Approval | Owner delegates closure and admission of next queued T on 2026-10-17; queue head is RGB graphics frames. |
+| Objective | Freeze producer/consumer/allocation inventory and coherent single-format RGB migration plan, including x86 storage costs. |
+| Non-goals | No renderer rewrite, second pixel format, alpha, conversion cache or external repository edits; no production change in this design checkpoint. |
+| Reference Baseline | 6c3b604fa6df3c7979285df2a94428f516a30033, qualified T95 delivery. |
+| Candidate Proposal | [RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md). |
+| Files And ABI Surface | Read Lib Window, Emulator transport, SoftPC publisher and tests; S1 changes planning documentation only. |
+| Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
+| Verification | Enumerate producers, consumers, copy sizes, fixed buffers, source bit depth/stride/row order/palette ownership. Documentation gate and actual-diff review; later implementation requires both builds, publication and full qualification. |
+| Expected Markers | One 0x00RRGGBB contract, exact storage census, coherent ABI/producer migration without broken intermediate delivery. |
+| Asset Needs | Read-only source audit; preserve owner INI, media and checkpoint. No guest run or raw trace required. |
+| Reporting Requirements | Per-owner files and expected added/deleted/net code, memory costs and implementation split; S1 production/test +0/-0. |
+| Stop Conditions | Missing source colour information, unjustified x86 storage cost or second rendering path required: report before implementation. |
+| Exit Criteria | Finite inventory and migration design reviewed, documentation gate passed, committed/pushed design delivery; implementation needs its own packet. |
+| Original Owner Request | "我没空收口。你帮我收口准入下一个t任务吧". |
+| Similar-Issue Sweep | Indexed graphics assumptions, byte/pixel copy sizing and frame allocation; explicitly exclude legitimate text/private machine palettes. |
 
 ## Current Technical Baseline
 
-- T94 S2 delivery cd665a3d and review 7f64ec53 fix reset sound binding, physical
-  DMA accesses and input-channel PCM gain. Owner confirms Win3.1/Win95 effects.
-- T94 S3 delivery 3e5c61e4 and review 1451522f establish Base's sole neutral input
-  contract, preserving values/layout and behavior. See the
-  [S3 record](../history/M9-T94-S3-base-input-ownership.md).
-- Latest cached full builds and qualification: x64/x86 each 193/193 distinct
-  tests, no skips (177 units/gates, eight background integrations, five desktop
-  and three native audio integrations), rerun for the T95 S2 guard change.
+- T95 repair 66055d92 and review 6c3b604f: existing paused DMA service guard;
+  production +2/-1 net +1, tests +12/-0 net +12.
+- x86/x64 each 193/193 distinct passes, no skips: 177 unit/gates, eight
+  background, five desktop and three native audio integrations. Actual guests
+  pass repeated WAV, Windows exit/restart and MPU Canyon then WAV.
 - Published SHA-256: softpc32
   A00E025691F82AA746597E76A0E281343416EE59869DA0766AA5D8F79CEFC72A;
   softpc64 47D8281698DCC44F67A5E381D70D7A3450DACC4EDF9DC2C001C2DADC8F081FA0.
-  Both EXEs rebuilt for S2; owner INI/media/checkpoint are unchanged.
-- MIDI/WAV diagnosis and repair belong to active T95. Win95 volume-control
-  and restart remain queued; SB-MIDI parser collision is tracked in [TODO](TODO.md).
-  Existing mirror warnings and Ninja log recovery remain disclosed.
+- Owner inputs unchanged. MIDI requires documented MPU mapping; no new FM or
+  SB-MIDI capability. Parser debt remains in [TODO](TODO.md). Existing mirror
+  warnings and Ninja recovery remain disclosed. Governance closure does not
+  rebuild or rerun unchanged runtime code.
 
 ## Recent M9 Closures
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
-| T94 | S1-S3 accepted; owner authorizes T closure and three follow-ups, 2026-10-17. | [Audit](../history/M9-T94-completion-audit.md) |
+| T95 | Delegated S2/T closure, 2026-10-17. | [Audit](../history/M9-T95-completion-audit.md) |
+| T94 | S1-S3 accepted, 2026-10-17. | [Audit](../history/M9-T94-completion-audit.md) |
 | T93 | S1-S15 accepted, 2026-10-16. | [Audit](../history/M9-T93-completion-audit.md) |
-| T92 | S1-S6 accepted, 2026-10-15. | [Audit](../history/M9-T92-completion-audit.md) |
 
 ## Recent Governance
 
-T94 proposal archived. Its unadmitted S4 plan is superseded by this closure
-audit and owner-directed follow-ups, not reported as an executed S.
+T95 proposal archived. T96 starts with design: reconcile the original proposed
+Lib/SoftPC implementation split into one buildable ABI migration.

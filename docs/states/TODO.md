@@ -9,7 +9,7 @@
   SB-MIDI command/data contract and choose capability or explicit unsupported
   semantics; do not add a second audio path or silently broaden the admitted
   paused-DMA repair. See the
-  [S1 evidence](../proposals/m9-win31-midi-wav-playback.md#paused-transfer-and-midi-follow-up).
+  [S1 evidence](../history/M9-T95-win31-midi-wav-playback-proposal.md#paused-transfer-and-midi-follow-up).
 
 - TODO(High): Correct Compat memory.c's physical read/write adapters, which
   currently call linear c_sas_loads/stores. T94 S2's nonidentity-paging test

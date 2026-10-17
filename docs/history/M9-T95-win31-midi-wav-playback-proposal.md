@@ -1,6 +1,8 @@
 # Windows 3.1 MIDI Silence And Repeated WAV Hang
 
-Owner admitted T95 S1 on 2026-10-17; CURRENT is the active authority.
+Retained T95 proposal. Owner delegated S2/T closure on 2026-10-17;
+see the [completion audit](M9-T95-completion-audit.md). Earlier status statements
+below record their historical checkpoints, not current active work.
 The supplied screenshot selects port 220 and IRQ 5; these match the model.
 Inspection confirms Sound Blaster 1.5; the initial MIDI destination is Ad Lib.
 Owner supplies a checkpoint after driver installation, restart and audible
