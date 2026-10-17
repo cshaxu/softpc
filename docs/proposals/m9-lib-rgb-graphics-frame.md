@@ -3,9 +3,10 @@
 ## Status
 
 Owner delegates admission as T96 on 2026-10-17 after T95 closure. CURRENT owns
-the active S1 inventory/design packet. The implementation sequence below is
-provisional: public ABI and SoftPC producer must migrate in one qualified
-delivery, not leave a broken intermediate build.
+the active packet. S2 delivered the atomic ABI/producer migration at fa569001,
+reviewed at 94a0debd. Owner permits S3 without manual S2 acceptance; final S4
+remains the buffer-simplification task. The problem/examples below describe
+the pre-migration baseline, not a second current graphics format.
 
 ## Problem
 
@@ -441,3 +442,83 @@ with the fixed test fixtures and final XML: x64 recheck 177/177, x86 177/177,
 both architectures 8+5+3 integrations without skips. Reviewed source manifests,
 EXE hashes and untouched user inputs. S2 is verified and delivered, awaiting
 owner acceptance; S3 is not admitted and S4 remains the final buffer task.
+
+## S3 RGB corpus audit and downstream adoption
+
+Scope is the S2 delivery at full commit
+`94a0debd2b67bf4663159b455dc002bcb4eed7b0`. S3 changes documentation only, not any source/test corpus or
+runtime binary. Owner authorizes S3 without manual S2 acceptance. This section
+defines adoption instructions, not a claim that another repository is migrated.
+
+### Bounded audit ledger
+
+Universe: Window graphics schema/validator, copy helpers, opaque Base mailbox,
+Machine publication/copy, Session forwarding, UI routing, root/native renderer,
+SoftPC DIB producer and their direct tests. Each entry must have an inspected
+owner and retained proof; unrelated device/audio APIs are not a whole-tree
+quality certification. No new runtime defect was confirmed in this scope.
+
+| Obligation | Disposition and evidence |
+| --- | --- |
+| Single graphics representation | frame_interface.h has only u32 RGB; src/test searches for image.palette, the removed palette-capacity macro and old sizeof values return no matches. |
+| Copy extent and rejection | Window validates before mutation, copies offset + stride*height*sizeof(pixel); bounds precede indexing. Emulator copies through that helper before changing sequence/text resources. S2 copy/damage tests pass. |
+| Opaque handoff | Base mailbox uses caller-provided byte count/capacity and generation-bound acknowledgement; no pixel interpretation. Machine owns staging/published slots, Session forwards the current full frame, UI does not convert pixels. |
+| Direct rendering | render.c graphics arm reads u32; shared update_pixel compares/writes damage. Win32 keeps its 32-bit top-down BI_RGB surface; Linux remains explicitly unsupported. S2 2048-colour and native tests pass. |
+| Retained palette references | Window render.c and Emulator machine.c/ui.c references are text-only. Machine callback comment includes source palette change, not a transported graphics palette. Compat's indexed surface is private and intentional. |
+| SoftPC producer | driver.c resolves its validated 8-bit indexed source at the Machine boundary; rejects invalid/unsupported DIB before taking dirty. No mirror or snapshot-format change. S2 actual-source/palette/snapshot tests pass. |
+| Allocation and cost | Five existing production payloads are heap-owned; enlarged test automatic objects were removed in S2. No new buffer/route. Repeated validation and larger copies remain costs, not a speedup claim; S4 owns minimization. |
+| Corpus identity | All eight manifests checked against current files: 121/76/29/22/14/8/12/6 entries, total 288, all match. Exact Git tree identities below include package metadata. |
+| Proof limits | S2 x64/x86 193/193 is existing runtime evidence. S3 does not rerun unchanged code or claim user/RAIDEN/MyNES validation. No external checkout read or modified. |
+
+Searches use `rg` over src/test for image pixels/palette/stride, Window copy/
+size/validate helpers, indexed/8-bit/palette references, and automatic frame or
+Session declarations; inspect every production hit along the path above.
+Source derivation and S2 dynamic evidence are distinct. Documentation gate and
+unchanged source/test/EXE hashes complete this documentation-only delivery.
+
+### Atomic import checklist
+
+1. Import the chosen shared src/test pairs from the fixed revision together,
+   including deletion entries and manifests. Do not take just frame_interface.h
+   or mix an old binary consumer with the new union size.
+2. In the importing Machine producer, resolve each source pixel's final colour
+   using its own complete palette/planes/format. Publish
+   `(r << 16) | (g << 8) | b` with channels widened to lib_u32. An index of 1
+   is not a red pixel: publishing numeric 1 means RGB 000001.
+3. width/height remain bounded by 1280/768; stride is pixels, at least width
+   and at most 1280. Active storage is stride*height u32 elements. Only visible
+   pixels require a zero high byte; padding is copied but not drawn. No alpha,
+   byte-order flag, alternate format or palette service is introduced.
+4. A source palette-only change affecting displayed colour requires a new
+   complete RGB frame. Never publish only a dirty rectangle or 256-entry
+   reduction of a richer source palette. Source palette/register state and
+   snapshot serialization remain owned by the importing machine.
+5. Use existing copy/size helpers after validation; update indexed fixtures,
+   memcpy byte counts and allocations. Window frame sizeof is 3,932,176;
+   Emulator Machine frame is 3,933,204 on both qualified widths. Do not place
+   either object or a containing Session/Window on a small thread stack.
+6. Preserve no-frame semantics (OK plus invalid frame), explicit error status,
+   sequence/latest-wins handling, text fonts/palettes/maps and input contracts.
+   Do not add a second indexed compatibility route.
+7. Rebuild every ABI consumer and run the importing product's own units and
+   real frame/palette/snapshot integrations. Lib's synthetic 2048-colour proof
+   does not prove any external producer retains 2048 distinct source colours.
+
+No root test infrastructure change is required by this migration;
+test/register.cmake remains Git blob f13693901137ea3310154fabb23b3b67962afb42.
+The exact shared directory trees at the fixed revision are:
+
+| Directory | Git tree object |
+| --- | --- |
+| src/lib | e50d37168bd8fbb710611a8742da9830c9d9ac1c |
+| test/lib | a6828c1df5a2144d8c1668856d0d46cda7523e5e |
+| src/emulator | 0793dca7152d47fc02b638f387c84b393056cb06 |
+| test/emulator | d8e0027222b3b60cc3baf49bc83ee535923a913a |
+| src/x86-debug | 5e2159bd6deaeefd0f4fca547d3eaa0f13a6e9ba |
+| test/x86-debug | 00e9d5494e46854d2ab85550ff1e8d16f438efff |
+| src/x86-ibmpc | ed0394e0fe730810a8e79e7cea9b9799dbd3e6c4 |
+| test/x86-ibmpc | df890b719c80bff01c7424bf9b1f61cd674dcc86 |
+
+Reproduce with `git rev-parse <revision>:<directory>`; manifests carry per-file
+SHA-256. Git tree hashes are Git object identities, not SHA-256. External source
+trees can be compared after import; no current NXVM equality is asserted here.

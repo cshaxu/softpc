@@ -5,35 +5,45 @@
 Owner delegates T95 S2/T closure and next queue admission on 2026-10-17.
 See the [completion audit](../history/M9-T95-completion-audit.md).
 T96 S1 design is delivered and reviewed at 7d0d3dea; owner directs continuing
-the RGB upgrade while scheduling buffer simplification as final S4. S2 is active.
+the RGB upgrade while scheduling buffer simplification as final S4.
 See the [S1 record](../history/M9-T96-S1-rgb-frame-design.md). Existing five-buffer
 ownership remains unchanged during S2. Implementation and dual-width full
 qualification are complete. Executor fa569001 is committed/pushed and its
-actual diff reviewed; S2 awaits owner acceptance, with no S3 admission.
+actual diff reviewed. Owner says "没空验收 你继续做s3吧": proceed without
+claiming user runtime acceptance. S2 delivery is recorded in
+[its handoff](../history/M9-T96-S2-rgb-migration.md). S3 audit and migration
+instructions are complete, pending delivery review. S4 is not admitted.
 
-## M9 T96 S2 Packet
+## M9 T96 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner delegates next queue admission on 2026-10-17 and confirms "批准开始"; queue head is RGB graphics frames. |
-| Objective | Migrate Lib graphics ABI, direct-colour rendering and SoftPC producer atomically to RGB32; preserve text, dirty, snapshot and handoff semantics. |
-| Non-goals | No renderer rewrite, alternative format, alpha, cache, external repository change or frame-buffer cleanup (reserved for S4). |
-| Reference Baseline | 7d0d3dea, reviewed S1 design; production remains qualified T95. |
+| Admission And Approval | Owner explicitly authorizes proceeding: "没空验收 你继续做s3吧". S2 is technically verified, not user runtime accepted. |
+| Objective | Audit the delivered RGB contract and publish reproducible corpus identities plus downstream Machine migration instructions. |
+| Non-goals | No external repository edits, new renderer/format/cache or five-buffer cleanup; S4 remains last. |
+| Reference Baseline | 94a0debd, reviewed S2 delivery fa569001. |
 | Candidate Proposal | [RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Lib Window frame header/render, App machine driver, ten affected test files (including discovered Session automatic fixtures), manifests/docs and both EXEs. Breaking copied-graphics ABI; rebuild all consumers. No original mirror change. |
+| Files And ABI Surface | CURRENT, proposal and S2 handoff; audit src/test Lib, Emulator and direct frame consumers. No planned source/test/ABI change. |
 | Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
-| Verification | RGB/channel/high-byte/stride/tail/damage tests; actual DIB conversion, palette-only publication, snapshot and restart regression. Cached x64/x86 full builds and publication; public/App unit/gates, background, desktop and native audio integrations, reported separately. |
-| Expected Markers | One 0x00RRGGBB contract, exact storage census, coherent ABI/producer migration without broken intermediate delivery. |
-| Asset Needs | Preserve owner INI/media/checkpoint. Hidden owned build/test jobs in build/t96/s2 with logs/exit markers, two-hour budget and ten-minute no-progress investigation, executor cleanup. Native tests use standing authorization. |
-| Reporting Requirements | Estimate production +34 to +50/-18 to -28, net +16 to +22; tests +160 to +240/-62 to -98, net +98 to +142. Report actual paths/counts, hashes, proof limits and runtime costs separately. |
-| Stop Conditions | Missing source colour information, unjustified x86 storage cost or second rendering path required: report before implementation. |
-| Exit Criteria | Focused/full qualification passed, both EXEs published, manifests/gates and actual-diff review complete, delivery committed/pushed for owner acceptance. |
-| Original Owner Request | "把这个无份清理的任务排到本t的最后一个s任务 然后接着做现在的升级". |
-| Similar-Issue Sweep | Indexed graphics assumptions, byte/pixel copy sizing and frame allocation; explicitly exclude legitimate text/private machine palettes. |
+| Verification | Source/dataflow audit, eight tree identities and manifests, prior S2 dual-width 193/193 evidence, current documentation gate. No rebuild of unchanged runtime for documentation-only delivery. |
+| Expected Markers | No indexed graphics consumer or alternate format; exact atomic-import instructions with source/test hashes and proof limits. |
+| Asset Needs | Read existing evidence only; preserve EXEs, INI, media and untracked checkpoint. No guest or desktop session required. |
+| Reporting Requirements | Estimate production/test +0/-0 net 0; roughly 70-110 added and 15-35 removed documentation lines. Record actual scope and audit dispositions. |
+| Stop Conditions | Newly found runtime defect or required ABI change must be reported and scoped before implementation. |
+| Exit Criteria | All bounded audit obligations disposed, import contract and fixed corpus identified, documentation gate and actual-diff review passed; commit/push for owner review. |
+| Original Owner Request | "没空验收 你继续做s3吧". |
+| Similar-Issue Sweep | All graphics member/copy/render callers and fixed allocations; classify retained text/private palettes rather than delete them. |
 
 ## Current Technical Baseline
 
+- S3 audits the unchanged S2 corpus at 94a0debd: no residual indexed graphics
+  route found in the bounded path; all 288 manifest entries match. Exact eight
+  Git tree identities and atomic-import checklist are in the
+  [S3 ledger](../proposals/m9-lib-rgb-graphics-frame.md#s3-rgb-corpus-audit-and-downstream-adoption).
+  Production/test +0/-0; no new runtime tests/builds or EXE refresh for this
+  documentation-only audit. Prior 193/193 per architecture XML and EXE hashes
+  were rechecked; no downstream product acceptance is claimed.
 - T96 S2: production +27/-19 net +8; tests +147/-53 net +94. Both
   architectures pass 193/193 distinct tests, no skips: 177 unit/gates, eight
   background integrations, five desktop and three native audio integrations.
