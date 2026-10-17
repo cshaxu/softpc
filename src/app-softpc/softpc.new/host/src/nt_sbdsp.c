@@ -98,7 +98,8 @@ lib_status DspGetStatus(void)
 lib_status DspServiceTransfer(void)
 {
     if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
-    if (DspOutputSuspended || !bDspActive || DspTransferSize == 0 || DspCompletionEvent != 0)
+    /* T95: returning host capacity must not resume a guest-paused DMA block. */
+    if (DspOutputSuspended || bDspPaused || !bDspActive || DspTransferSize == 0 || DspCompletionEvent != 0)
         return LIB_STATUS_OK;
     DspTransferStatus = DspProcessBlock();
     if (DspTransferStatus == LIB_STATUS_OK && bWriteBurstStarted) {

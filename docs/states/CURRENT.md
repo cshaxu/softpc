@@ -4,8 +4,14 @@
 
 T95 S1 diagnosis/design is owner-accepted and closed on 2026-10-17.
 Owner admits S2 to repair paused DMA submission through the existing service
-path and qualify both widths. Production code and published binaries remain
-unchanged at admission; no repair qualification is claimed yet. See the
+path and qualify both widths. The minimal guard and regression are implemented;
+both unmodified architectures failed the new assertion, and repaired dual-width
+focused tests pass. Full qualification passed 193/193 distinct tests per width,
+including desktop and native audio. Both guest widths pass the four-WAV
+sequence, twelve further Chord plays, Windows exit/restart, full Canyon via
+MPU-401 and subsequent WAV. Delivery is qualified and awaits owner acceptance;
+S2 and T95 remain open. Original Ad Lib/SB-MIDI capabilities are not expanded.
+See the
 proposal's S1 delivery review and the [task record](../history/M9-T95-S1-win31-midi-wav-playback.md).
 Owner admits the former queue head on 2026-10-17 and supplies a post-driver-
 restart snapshot after audible startup WAV. T94 is closed; see its
@@ -34,20 +40,20 @@ restart snapshot after audible startup WAV. T94 is closed; see its
 
 ## Current Technical Baseline
 
-- S2 delivery cd665a3d and review 7f64ec53 fix reset sound binding, physical
+- T94 S2 delivery cd665a3d and review 7f64ec53 fix reset sound binding, physical
   DMA accesses and input-channel PCM gain. Owner confirms Win3.1/Win95 effects.
-- S3 delivery 3e5c61e4 and review 1451522f establish Base's sole neutral input
+- T94 S3 delivery 3e5c61e4 and review 1451522f establish Base's sole neutral input
   contract, preserving values/layout and behavior. See the
   [S3 record](../history/M9-T94-S3-base-input-ownership.md).
 - Latest cached full builds and qualification: x64/x86 each 193/193 distinct
   tests, no skips (177 units/gates, eight background integrations, five desktop
-  and three native audio integrations). Closure does not rerun runtime tests.
+  and three native audio integrations), rerun for the T95 S2 guard change.
 - Published SHA-256: softpc32
-  BF8CDD793C762FA275D25AFAB0ABEA5B001C239E18B88B5CB31EC0A1391777C9;
-  softpc64 2EB65B25A4F5E8EBA1CCCC9233C61D024D7A175BBACB354A3AA92F88CEC37DDE.
-  Binaries unchanged by closure; owner INI edit ships unchanged.
-- Newly reported MIDI/WAV, volume-control and restart symptoms are transferred
-  to Queue, not claimed fixed. Existing [TODO](TODO.md) debt is unchanged.
+  A00E025691F82AA746597E76A0E281343416EE59869DA0766AA5D8F79CEFC72A;
+  softpc64 47D8281698DCC44F67A5E381D70D7A3450DACC4EDF9DC2C001C2DADC8F081FA0.
+  Both EXEs rebuilt for S2; owner INI/media/checkpoint are unchanged.
+- MIDI/WAV diagnosis and repair belong to active T95. Win95 volume-control
+  and restart remain queued; SB-MIDI parser collision is tracked in [TODO](TODO.md).
   Existing mirror warnings and Ninja log recovery remain disclosed.
 
 ## Recent M9 Closures

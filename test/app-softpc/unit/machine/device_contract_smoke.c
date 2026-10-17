@@ -482,7 +482,19 @@ static void verify_sb_transfer(void)
         assert(bDspActive && DspMode == Auto && sb_pcm_count == 7);
         assert(!bWriteBurstStarted && DspServiceTransfer() == LIB_STATUS_OK);
         assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
+        /* Host capacity returning must not resume a guest-paused partial block. */
+        DspWrite(DSP_PAUSE_DMA);
         sb_pcm_budget = 4096;
+        for (i = 0; i != 3; ++i) {
+            assert(DspServiceTransfer() == LIB_STATUS_OK);
+            assert(bDspPaused && sb_pcm_count == 7 && !bWriteBurstStarted);
+            dispatch_q_event();
+            assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
+            assert(QueryDMA(&actual));
+            assert(actual.addr == 0x1000 && actual.count == 63);
+        }
+        DspWrite(DSP_CONTINUE_DMA);
+        assert(!bDspPaused && sb_pcm_count == 7);
         assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 32);
         for (i = 0; i != 32; ++i) assert(sb_pcm_bytes[i] == i);
         dispatch_q_event();
