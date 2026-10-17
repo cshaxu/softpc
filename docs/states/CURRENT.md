@@ -2,6 +2,23 @@
 
 ## Current Work
 
+Owner accepts S15 and requests the separate whole-T audit: "好的，验收通过。
+接下来，进行全T审计收口", additionally requiring all builds, unit tests,
+gates and integrations to pass. T93 closure is pending this final qualification,
+not inferred from S15 acceptance. Frozen audit universe: S1-S15, all production
+and test paths changed from 6ac9bf0b9 through 91a3fde2, every registered test
+in both Release builds, the current Queue/TODO transfers and both package EXEs.
+Every member requires delivered/reviewed evidence or an explicit retained
+capability limit/debt receiver. No next T is admitted. The owned hidden final
+job uses build/t93/closure-qualification and closure.log/closure.err, retaining
+the existing S15 budgets and no Computer Use; all registered tests must be
+accounted for exactly once per width, including native integrations.
+The fresh whole-T qualification passes 193/193 per width, including every
+registered native integration; exact name-set validation and all four archive
+width routes pass. The [completion audit](../history/M9-T93-completion-audit.md)
+records full scope/accounting, unchanged owner assets and known capability/debt
+receivers. This final evidence/artifact delivery precedes formal T closure.
+
 T93 S14 is owner-accepted and closed after correction 683f85d4 and actual-change
 review e2de3d3f. Both architectures passed 167/167, including ten native desktop
 cases. See [S14 closure](../history/M9-T93-S14-neutral-window-capture.md).
