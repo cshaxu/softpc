@@ -1,5 +1,10 @@
 # Windows 95 Sound Blaster Recognition And Playback Repair
 
+Retained historical proposal: owner accepted and closed T94 on 2026-10-17.
+The [completion audit](M9-T94-completion-audit.md) supersedes pending status
+below, records S1-S3 acceptance and transfers three new symptoms to Queue.
+Proposed S4 was never admitted; it is not represented as executed work.
+
 ## Owner request and queue boundary
 
 > 好的，请你追加到队首一个T任务proposal，修复这个，确保win95能识别和正确使用我们新加的sound blaster模拟硬件。

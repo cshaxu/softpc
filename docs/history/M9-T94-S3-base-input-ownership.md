@@ -2,7 +2,7 @@
 
 Baseline: 7f64ec53. Owner explicitly closes S2 and admits this S on 2026-10-17.
 T94 stays open. [CURRENT](../states/CURRENT.md) owns active status; the
-[proposal ledger](../proposals/m9-win95-sound-blaster-recognition.md#s3---owner-admitted-public-input-ownership-repair)
+[proposal ledger](M9-T94-win95-sound-blaster-recognition-proposal.md#s3---owner-admitted-public-input-ownership-repair)
 maps the bounded requirements to verification.
 
 ## Original owner request
@@ -186,4 +186,6 @@ digests and the clean HEAD/origin agreement. No mirror, audio implementation,
 user INI/media, root test infrastructure or X86 Debug change is present.
 The result requires source consumers to adopt the Base spelling and rebuild;
 no compatibility aliases are retained. No blocking finding remains. Owner
-acceptance is pending; S4 and whole-T closure are not admitted automatically.
+acceptance was pending at review. On 2026-10-17 owner accepted S3 and authorized
+T94 closure and three explicit queued follow-ups. See the
+[completion audit](M9-T94-completion-audit.md); unadmitted S4 was not executed.

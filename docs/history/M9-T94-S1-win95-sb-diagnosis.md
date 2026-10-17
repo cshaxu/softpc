@@ -11,7 +11,7 @@ S1 is diagnosis/design, not playback qualification. T94 remains open.
 
 Executor delivery `20298b44` records the baseline, overlay-only installation,
 bounded port traces and controlled callback experiment in the
-[task proposal](../proposals/m9-win95-sound-blaster-recognition.md).
+[task proposal](M9-T94-win95-sound-blaster-recognition-proposal.md).
 Windows 95 4.00.950 uses Microsoft mssblst.drv 4.0.950 with IRQ 5, DMA 1 and
 base 0220, matching the existing DSP 2.01 model.
 

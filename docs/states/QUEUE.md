@@ -5,12 +5,14 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-None.
+1. [Windows 3.1 MIDI silence and repeated WAV hang](../proposals/m9-win31-midi-wav-playback.md).
+2. [Windows 95 unavailable volume control](../proposals/m9-win95-volume-control.md).
+3. [Windows 95 restart stops at safe shutdown](../proposals/m9-win95-restart-safe-shutdown.md).
 
 ## Previously admitted
 
-The owner admits [Windows 95 Sound Blaster recognition and playback repair](../proposals/m9-win95-sound-blaster-recognition.md)
-as T94 on 2026-10-16. [CURRENT](CURRENT.md) owns its current subtask status.
+The owner admitted [Windows 95 Sound Blaster recognition and playback repair](../history/M9-T94-win95-sound-blaster-recognition-proposal.md)
+as T94 on 2026-10-16 and closed it on 2026-10-17. [CURRENT](CURRENT.md) owns status.
 
 The owner admitted
 [XP Sound Blaster standalone capability](../history/M9-T93-xp-sound-blaster-standalone-proposal.md)

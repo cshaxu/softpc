@@ -2,7 +2,7 @@
 
 Owner accepted and closed S2 on 2026-10-17. T94 remains open.
 Implementation cd665a3d and separate coordinator review 7f64ec53 were pushed.
-The [retained evidence](../proposals/m9-win95-sound-blaster-recognition.md#s2-implementation-checkpoint)
+The [retained evidence](M9-T94-win95-sound-blaster-recognition-proposal.md#s2-implementation-checkpoint)
 records the original request, reset binding diagnosis, four physical DMA
 adaptations, approved PCM gain repair and failed earlier experiments.
 
