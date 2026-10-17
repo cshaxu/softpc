@@ -2,14 +2,14 @@
 
 Transfer `src/lib`, `test/lib` and the shared CMake tools directly in `test/`.
 This suite needs no other source or test package.
-Transfer all five shared CMake tools directly in `test/` with any test package.
+Transfer the shared CMake tools directly in `test/` with any test package.
 This suite requires only `src/lib`, `test/lib`, those tools, a C11 compiler and system
 libraries. No product target, firmware, INI or media is required.
 
 ```text
 cmake -S test/lib -B build/lib-tests -DCMAKE_BUILD_TYPE=Release
 cmake --build build/lib-tests
-ctest --test-dir build/lib-tests --output-on-failure -LE desktop
+ctest --test-dir build/lib-tests --output-on-failure -LE "desktop|native_audio"
 ```
 
 The suite owns test registration, fixtures, failure injection and its manifest.
@@ -21,7 +21,12 @@ The shared file cleanup helper belongs to this suite's storage probes.
 The `desktop` label marks real native Window/Console tests, including tests
 that hide a window only after creating it. Run these explicitly with `-L desktop
 -j 1` when the desktop is reserved for testing. Mocked input/rendering tests
-remain in the background suite. An unfiltered CTest run includes both groups.
+remain in the background suite. Real-host tests live in integration/ and are
+not labelled unit. Native MIDI requires a usable host endpoint and carries
+native_audio; run it explicitly with -L native_audio. Unit tests may use system
+threads/files but not a logged-in desktop, keyboard layout or audio device.
+An unfiltered CTest run includes all groups; missing native capability is not
+evidence of playback, even when an availability probe reports it successfully.
 
 Coverage: Types/atomic/clock, overlapping moves and text vocabulary; logical Console event/output gates;
 Console broker, display and reader failure; Base sync lifetime and Linux waits; Storage

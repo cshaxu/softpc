@@ -24,6 +24,9 @@ add_test(NAME lib.test-boundaries COMMAND "${CMAKE_COMMAND}"
 add_test(NAME lib.test-boundaries-selftest COMMAND "${CMAKE_COMMAND}"
     "-DTEST_WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/../test_boundaries_selftest.cmake")
+add_test(NAME lib.test-registration COMMAND "${CMAKE_COMMAND}"
+    "-DTEST_WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/../registration_selftest.cmake")
 
 shared_register_test(lib lib_console console)
 shared_register_test(lib types_contract base)
@@ -35,7 +38,9 @@ shared_register_test(lib storage_utf8 storage)
 shared_register_test(lib audio/pcm/stream types base)
 shared_register_test(lib audio/midi/midi_output types audio-fm)
 shared_register_test(lib audio/midi/unsupported_output types)
-shared_register_test(lib audio/midi/native_midi_output audio-midi)
+shared_register_test(lib integration/native_midi_output audio-midi)
+set_property(TEST lib.integration/native_midi_output APPEND PROPERTY LABELS native_audio)
+set_property(TEST lib.integration/native_midi_output PROPERTY RESOURCE_LOCK native_midi)
 shared_register_test(lib kvm_component_contract kvm-base)
 shared_register_test(lib kvm_mailbox_selection kvm-base)
 shared_register_test(lib kvm_frame_copy kvm-window)
@@ -64,9 +69,9 @@ if(WIN32)
     shared_register_test(lib kvm_console_retirement_barrier kvm-base console)
     target_sources(lib-test-kvm_console_retirement_barrier PRIVATE
         "${LIB_ROOT}/kvm-console/console.c")
-    foreach(probe IN ITEMS kvm_frame_damage_mouse kvm_window_retirement
-            kvm_window_modal kvm_shutdown_failure console_broker_reader_failure
-            console_broker_display console_broker_cancel kvm_input_admission console_blocking_gate
+    foreach(probe IN ITEMS kvm_frame_damage_mouse integration/kvm_window_retirement
+            integration/kvm_window_modal kvm_shutdown_failure console_broker_reader_failure
+            integration/console_broker_display console_broker_cancel kvm_input_admission console_blocking_gate
             base_sync_ownership kvm_keyboard_lifetime lib_console_io_contract
             kvm_window_capture_contract)
         shared_register_test(lib ${probe} kvm-window console)
@@ -75,12 +80,12 @@ if(WIN32)
     target_link_libraries(lib-test-kvm_keyboard_lifetime PRIVATE kvm-console)
     target_link_libraries(lib-test-kvm_shutdown_failure PRIVATE kvm-console)
     # Real native windows/consoles can affect the user's desktop even when hidden.
-    set_property(TEST lib.kvm_window_modal lib.kvm_window_retirement
-        lib.console_broker_display APPEND PROPERTY LABELS desktop)
+    set_property(TEST lib.integration/kvm_window_modal lib.integration/kvm_window_retirement
+        lib.integration/console_broker_display APPEND PROPERTY LABELS desktop)
     # These tests create real native Console/Window state. Serialize only that
     # shared desktop resource; independent tests still run concurrently.
-    set_property(TEST lib.kvm_window_modal lib.kvm_window_retirement
-        lib.console_broker_display PROPERTY RESOURCE_LOCK native_desktop)
+    set_property(TEST lib.integration/kvm_window_modal lib.integration/kvm_window_retirement
+        lib.integration/console_broker_display PROPERTY RESOURCE_LOCK native_desktop)
 endif()
 
 add_test(NAME lib.types-layout
@@ -136,6 +141,7 @@ add_test(NAME lib.test-types-boundary-selftest COMMAND "${CMAKE_COMMAND}"
 set_tests_properties(
     lib.test-boundaries
     lib.test-boundaries-selftest
+    lib.test-registration
     lib.types-layout
     lib.manifest
     lib.linux-build-contract

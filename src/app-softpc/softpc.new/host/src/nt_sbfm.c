@@ -12,11 +12,31 @@
 #include "host_def.h"
 #include "sndblst.h"
 #include "nt_sb.h"
+#include "compat/devices/snapshot.h"
 
 /* T93: one no-host device state; native output capability belongs to Compat.
  * No native port batches, timer thread or synthetic audio backend is retained. */
 static IU8 AdlibRegister = 0x00;
 static IU8 Status = 0x06;
+
+/* T93: expose the existing owner to the portable device archive. */
+void softpc_device_snapshot_capture_sb_fm(softpc_device_sb_fm_state *state)
+{
+    state->selected = AdlibRegister;
+    state->status = Status;
+}
+
+int softpc_device_snapshot_restore_sb_fm(const softpc_device_sb_fm_state *state)
+{
+    IU8 flags = state->status & 0xe0;
+    if ((state->status & 0x1f) != 0 && (state->status & 0x1f) != 6)
+        return FALSE;
+    if (flags != 0 && flags != 0xa0 && flags != 0xc0 && flags != 0xe0)
+        return FALSE;
+    AdlibRegister = state->selected;
+    Status = state->status;
+    return TRUE;
+}
 
 void
 ResetFM(

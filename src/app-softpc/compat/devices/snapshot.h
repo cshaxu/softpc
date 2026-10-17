@@ -63,7 +63,9 @@ enum {
     SOFTPC_DEVICE_QUEUE_SERIAL_SEND,
     SOFTPC_DEVICE_QUEUE_PRINTER_OUT,
     SOFTPC_DEVICE_QUEUE_PRINTER_OUT_ACK,
-    SOFTPC_DEVICE_QUEUE_MOUSE_TIMER
+    SOFTPC_DEVICE_QUEUE_MOUSE_TIMER,
+    SOFTPC_DEVICE_QUEUE_SB_COMPLETION,
+    SOFTPC_DEVICE_QUEUE_DELAYED_IRQ
 };
 
 /*
@@ -489,5 +491,62 @@ typedef struct softpc_device_pit_state {
 
 int softpc_device_snapshot_capture_pit(softpc_device_pit_state *state);
 int softpc_device_snapshot_restore_pit(const softpc_device_pit_state *state);
+
+/* T93: selected XP sound-device values, not native audio resources. */
+typedef struct softpc_device_sb_mixer_state {
+    uint8_t selected, master, fm, cd, voice;
+} softpc_device_sb_mixer_state;
+
+typedef struct softpc_device_sb_fm_state {
+    uint8_t selected, status;
+} softpc_device_sb_fm_state;
+
+typedef struct softpc_device_sb_midi_state {
+    uint8_t buffer[4096];
+    uint32_t next_data, bytes_left, last_length;
+    uint8_t running_status, realtime, discard_sysex;
+    uint8_t notes[16][128][3], sustain[16], sostenuto[16];
+} softpc_device_sb_midi_state;
+
+typedef struct softpc_device_sb_dsp_state {
+    uint8_t buffer[65536];
+    uint32_t TimeConstant, SBBlockSize, blockSize;
+    uint32_t DspTransferSize, DspTransferConsumed, DspCompletionEvent, DspOutputRate;
+    uint32_t PreviousWaveOutPos, DspNumberDmaQueries, DspVirtualInc;
+    uint16_t StartingDmaAddr, StartingDmaCount, dma_addr, dma_count, dma_page;
+    uint8_t dma_status, dma_mode, dma_mask;
+    uint8_t IdentByte, ReservedRegister, TableMungeData, TableMungeFirstByte;
+    uint8_t ResetState, DSPWriteState, DSPReadState, DspMode, DspTransferMode;
+    uint8_t bDspActive, bDspPaused, SbAnswerDMAPosition, bExitDMAThread;
+    uint8_t bDspReset, bExitAuto, bHighSpeedMode, DspSpeakerEnabled, DspEoiRegistered;
+} softpc_device_sb_dsp_state;
+
+typedef struct softpc_device_eoi_state {
+    uint32_t mask, handles[16];
+} softpc_device_eoi_state;
+
+typedef struct softpc_device_sb_state {
+    uint8_t attached, mpu_present, mpu_mode, mpu_input;
+    softpc_device_sb_mixer_state mixer;
+    softpc_device_sb_fm_state fm;
+    softpc_device_sb_midi_state midi;
+    softpc_device_sb_dsp_state dsp;
+} softpc_device_sb_state;
+
+int softpc_device_snapshot_capture_sb(softpc_device_sb_state *state);
+int softpc_device_snapshot_prepare_sb(const softpc_device_sb_state *state);
+int softpc_device_snapshot_restore_sb(const softpc_device_sb_state *state);
+
+int softpc_device_snapshot_capture_sb_dsp(softpc_device_sb_dsp_state *state);
+int softpc_device_snapshot_restore_sb_dsp(const softpc_device_sb_dsp_state *state);
+void softpc_device_snapshot_capture_eoi(softpc_device_eoi_state *state);
+int softpc_device_snapshot_restore_eoi(const softpc_device_eoi_state *state);
+
+void softpc_device_snapshot_capture_sb_mixer(softpc_device_sb_mixer_state *state);
+int softpc_device_snapshot_restore_sb_mixer(const softpc_device_sb_mixer_state *state);
+void softpc_device_snapshot_capture_sb_fm(softpc_device_sb_fm_state *state);
+int softpc_device_snapshot_restore_sb_fm(const softpc_device_sb_fm_state *state);
+void softpc_device_snapshot_capture_sb_midi(softpc_device_sb_midi_state *state);
+int softpc_device_snapshot_restore_sb_midi(const softpc_device_sb_midi_state *state);
 
 #endif

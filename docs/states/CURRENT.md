@@ -6,8 +6,21 @@ T93 S14 is owner-accepted and closed after correction 683f85d4 and actual-change
 review e2de3d3f. Both architectures passed 167/167, including ten native desktop
 cases. See [S14 closure](../history/M9-T93-S14-neutral-window-capture.md).
 Owner admits S15, portable Sound Blaster archive and final qualification.
-S15 is at source inventory/design checkpoint, not implemented or verified.
-The accepted dual EXEs remain unchanged. T93 stays open for owner acceptance.
+S15 implementation extends the existing portable device archive and owner hooks.
+Both widths pass the seven focused SB checks and all four cross-process/
+cross-width archive routes. The x86 event-handle argument-width defect is fixed.
+Earlier native-host qualification attempts failed and are retained in the
+proposal; they were not accepted. The final qualification now passes 169/169
+per architecture: 97 shared and 64 other isolated tests, plus five desktop and
+three native audio integrations. All four cross-width archive routes pass.
+Both EXEs are refreshed; owner INI/media/snapshots remain unchanged.
+Owner extended S15 to test isolation: real native audio/desktop tests belong
+to integration; unit tests must not require an interactive session or audio
+endpoint. Non-audio machine tests receive test-owned audio mocks. Shared test
+registration/classification may change; public production remains unchanged.
+The executor is preparing the complete delivery and separate actual-change
+review; no S/T closure is claimed until that review and owner acceptance.
+T93 stays open.
 
 ## M9 T93 S15 Packet
 
@@ -19,7 +32,7 @@ The accepted dual EXEs remain unchanged. T93 stays open for owner acceptance.
 | Non-goals | No Lib archive API, software synthesizer, new backend, exact host MIDI envelopes, old-format compatibility, user INI/media/snapshot edits or unrelated TODO repair. |
 | Reference Baseline | Accepted S14 e2de3d3f. |
 | Candidate Proposal | [S15 archive](../proposals/m9-xp-sound-blaster-standalone.md#s15--portable-archive-and-final-qualification). |
-| Files And ABI Surface | Existing Compat device snapshot/archive, SB device owners and private declarations, owner-local tests/build and mirror ledgers. Public eight directories unchanged. |
+| Files And ABI Surface | Existing Compat device snapshot/archive, SB device owners and private declarations, owner-local tests/build and mirror ledgers; owner-approved shared test classification and App test audio isolation. Public production unchanged. |
 | Applicable Rules | Task Reading Set, execution/architecture/coding/documentation skills, selected XP subset and single device-state owner. |
 | Verification | Device/codec continuation, malformed input, active DMA/pending IRQ, partial MIDI, pause/save/load/reset, cross-width archives; cached dual builds, shared then other tests, ten native desktop cases, dual EXEs. |
 | Expected Markers | Fixed-width guest state only; no host handles/pointers serialized; restored output uses existing owners and no stale host progress. |
@@ -29,6 +42,13 @@ The accepted dual EXEs remain unchanged. T93 stays open for owner acceptance.
 | Exit Criteria | Portable archive proof, build/publish/full test/commit/push/review; wait owner acceptance before S/T closure. |
 | Original Owner Request | 批准 验收通过 准入下一个s |
 | Similar-Issue Sweep | All retained SB globals/function-static state, quick events, EOI/delayed IRQ hooks, copied PCM blocks/progress, MIDI parser/notes and host lifetime; every field classified. |
+
+Owner scope addition: "真实需要保留的音频测试，和desktop测试，确实放进integration；
+unit的话，不得依赖环境。测试各非音频组件和设备的单元测试，不得依赖音频，
+要使用mock。照此办理，作为本S的一部分收口。"
+Isolation estimate: production +0/-0, test fixtures/registration/checks
++180-280/-20-50, plus structural moves and manifests. Native qualification
+remains separate and mandatory; absent host capability is not a passing test.
 
 Start brief: extend the existing device state/codec and owner-local capture/
 restore hooks, not a second archive. Host resources are reconstructed, guest

@@ -16,6 +16,7 @@
 /* T93: use the existing core scalar ABI, not WinMM host types. */
 #include "sndblst.h"
 #include "nt_sb.h"
+#include "compat/devices/snapshot.h"
 
 void MixerSetMasterVolume(IU8 level);
 void MixerSetVoiceVolume(IU8 level);
@@ -43,6 +44,28 @@ enum {
     MixerCDVolume,
     MixerVoiceVolume
 } MixerState = MixerReset; // state of current command/data being set
+
+/* T93: restore registers first; the output owner applies gains after rebuilding. */
+void softpc_device_snapshot_capture_sb_mixer(softpc_device_sb_mixer_state *state)
+{
+    state->selected = MixerState;
+    state->master = MixerSettings.MasterVolume;
+    state->fm = MixerSettings.FMVolume;
+    state->cd = MixerSettings.CDVolume;
+    state->voice = MixerSettings.VoiceVolume;
+}
+
+int softpc_device_snapshot_restore_sb_mixer(const softpc_device_sb_mixer_state *state)
+{
+    if (state->selected < MixerReset || state->selected > MixerVoiceVolume)
+        return FALSE;
+    MixerState = state->selected;
+    MixerSettings.MasterVolume = state->master;
+    MixerSettings.FMVolume = state->fm;
+    MixerSettings.CDVolume = state->cd;
+    MixerSettings.VoiceVolume = state->voice;
+    return TRUE;
+}
 
 void
 MixerDataRead(

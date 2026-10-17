@@ -37,6 +37,8 @@ struct softpc_device_archive {
     softpc_device_serial_host_state serial_host;
     softpc_device_parallel_controller_state parallel_controller;
     softpc_device_parallel_host_state parallel_host;
+    softpc_device_sb_state sb;
+    softpc_device_eoi_state eoi;
     int valid;
 };
 
@@ -56,6 +58,10 @@ extern int softpc_device_snapshot_encode_parallel_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_parallel_callback();
 extern int softpc_device_snapshot_encode_mouse_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_mouse_callback();
+extern int softpc_device_snapshot_encode_sb_callback();
+extern Q_CALLBACK_FN softpc_device_snapshot_decode_sb_callback();
+extern int softpc_device_snapshot_encode_eoi_callback();
+extern Q_CALLBACK_FN softpc_device_snapshot_decode_eoi_callback();
 
 LOCAL int
 encode_callback(callback, callback_id)
@@ -69,7 +75,9 @@ unsigned long *callback_id;
         softpc_device_snapshot_encode_keyboard_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_serial_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_parallel_callback(callback, callback_id) ||
-        softpc_device_snapshot_encode_mouse_callback(callback, callback_id);
+        softpc_device_snapshot_encode_mouse_callback(callback, callback_id) ||
+        softpc_device_snapshot_encode_sb_callback(callback, callback_id) ||
+        softpc_device_snapshot_encode_eoi_callback(callback, callback_id);
 }
 
 softpc_device_archive *
@@ -98,7 +106,11 @@ unsigned long callback_id;
     if (callback != NULL) return callback;
     callback = softpc_device_snapshot_decode_parallel_callback(callback_id);
     if (callback != NULL) return callback;
-    return softpc_device_snapshot_decode_mouse_callback(callback_id);
+    callback = softpc_device_snapshot_decode_mouse_callback(callback_id);
+    if (callback != NULL) return callback;
+    callback = softpc_device_snapshot_decode_sb_callback(callback_id);
+    if (callback != NULL) return callback;
+    return softpc_device_snapshot_decode_eoi_callback(callback_id);
 }
 
 LOCAL int
@@ -172,7 +184,41 @@ softpc_device_archive *archive;
         return FALSE;
     if (!softpc_device_snapshot_capture_hdd(&archive->hdd))
         return FALSE;
+    if (!softpc_device_snapshot_capture_sb(&archive->sb)) return FALSE;
+    softpc_device_snapshot_capture_eoi(&archive->eoi);
     archive->valid = TRUE;
+    return TRUE;
+}
+
+/* Only the SB completion owner may remove its restored native-progress event.
+ * Delayed IRQ parameters become array indices when dispatched. Validate both
+ * directions of these handle/callback relationships before mutating devices. */
+static int device_sound_events_valid(const softpc_device_archive *archive)
+{
+    unsigned long i;
+    lib_u32 irq_mask = 0, completion = 0;
+    for (i = 0; i < archive->events.quick_entries + archive->events.tick_entries; ++i) {
+        const Q_EVENT_SNAPSHOT_ENTRY *entry = i < archive->events.quick_entries ?
+            &archive->quick_entries[i] : &archive->tick_entries[i - archive->events.quick_entries];
+        if (entry->callback_id == SOFTPC_DEVICE_QUEUE_SB_COMPLETION) {
+            if (i >= archive->events.quick_entries || completion || entry->param ||
+                !entry->handle || entry->handle != archive->sb.dsp.DspCompletionEvent)
+                return FALSE;
+            completion = 1;
+        } else if (entry->callback_id == SOFTPC_DEVICE_QUEUE_DELAYED_IRQ) {
+            lib_u32 bit;
+            if (i >= archive->events.quick_entries || entry->param < 0 || entry->param >= 16)
+                return FALSE;
+            bit = 1u << entry->param;
+            if ((irq_mask & bit) || !entry->handle ||
+                entry->handle != archive->eoi.handles[entry->param]) return FALSE;
+            irq_mask |= bit;
+        }
+    }
+    if (completion != (archive->sb.dsp.DspCompletionEvent != 0) ||
+        irq_mask != archive->eoi.mask) return FALSE;
+    for (i = 0; i < 16; ++i)
+        if (((irq_mask >> i) & 1u) != (archive->eoi.handles[i] != 0)) return FALSE;
     return TRUE;
 }
 
@@ -180,7 +226,8 @@ int
 softpc_device_archive_restore(archive)
 softpc_device_archive *archive;
 {
-    if (archive == NULL || !archive->valid ||
+    if (archive == NULL || !archive->valid || !device_sound_events_valid(archive) ||
+        !softpc_device_snapshot_prepare_sb(&archive->sb) ||
         !softpc_device_snapshot_restore_pic(&archive->pic) ||
         !softpc_device_snapshot_restore_dma(&archive->dma) ||
         !softpc_device_snapshot_restore_pit(&archive->pit) ||
@@ -199,6 +246,8 @@ softpc_device_archive *archive;
             archive->quick_capacity, archive->tick_entries,
             archive->tick_capacity, decode_callback))
         return FALSE;
+    if (!softpc_device_snapshot_restore_eoi(&archive->eoi) ||
+        !softpc_device_snapshot_restore_sb(&archive->sb)) return FALSE;
     if (!softpc_device_snapshot_rebuild_video_presentation()) return FALSE;
     if (!softpc_device_snapshot_restore_serial_controller(
             &archive->serial_controller) ||
@@ -738,6 +787,85 @@ device_read_queue(softpc_device_archive *archive, softpc_snapshot_bytes_read rea
     return LIB_STATUS_OK;
 }
 
+
+static const softpc_device_wire_field sb_mixer_fields[] = {
+    DEVICE_U8(softpc_device_sb_mixer_state, selected),
+    DEVICE_U8(softpc_device_sb_mixer_state, master),
+    DEVICE_U8(softpc_device_sb_mixer_state, fm),
+    DEVICE_U8(softpc_device_sb_mixer_state, cd),
+    DEVICE_U8(softpc_device_sb_mixer_state, voice),
+};
+
+static const softpc_device_wire_field sb_fm_fields[] = {
+    DEVICE_U8(softpc_device_sb_fm_state, selected),
+    DEVICE_U8(softpc_device_sb_fm_state, status),
+};
+
+static const softpc_device_wire_field sb_midi_fields[] = {
+    DEVICE_U8(softpc_device_sb_midi_state, buffer),
+    DEVICE_U8(softpc_device_sb_midi_state, running_status),
+    DEVICE_U8(softpc_device_sb_midi_state, realtime),
+    DEVICE_U8(softpc_device_sb_midi_state, discard_sysex),
+    DEVICE_U8(softpc_device_sb_midi_state, notes),
+    DEVICE_U8(softpc_device_sb_midi_state, sustain),
+    DEVICE_U8(softpc_device_sb_midi_state, sostenuto),
+    DEVICE_U32(softpc_device_sb_midi_state, next_data),
+    DEVICE_U32(softpc_device_sb_midi_state, bytes_left),
+    DEVICE_U32(softpc_device_sb_midi_state, last_length),
+};
+
+static const softpc_device_wire_field sb_dsp_fields[] = {
+    DEVICE_U8(softpc_device_sb_dsp_state, buffer),
+    DEVICE_U8(softpc_device_sb_dsp_state, dma_status),
+    DEVICE_U8(softpc_device_sb_dsp_state, dma_mode),
+    DEVICE_U8(softpc_device_sb_dsp_state, dma_mask),
+    DEVICE_U8(softpc_device_sb_dsp_state, IdentByte),
+    DEVICE_U8(softpc_device_sb_dsp_state, ReservedRegister),
+    DEVICE_U8(softpc_device_sb_dsp_state, TableMungeData),
+    DEVICE_U8(softpc_device_sb_dsp_state, TableMungeFirstByte),
+    DEVICE_U8(softpc_device_sb_dsp_state, ResetState),
+    DEVICE_U8(softpc_device_sb_dsp_state, DSPWriteState),
+    DEVICE_U8(softpc_device_sb_dsp_state, DSPReadState),
+    DEVICE_U8(softpc_device_sb_dsp_state, DspMode),
+    DEVICE_U8(softpc_device_sb_dsp_state, DspTransferMode),
+    DEVICE_U8(softpc_device_sb_dsp_state, bDspActive),
+    DEVICE_U8(softpc_device_sb_dsp_state, bDspPaused),
+    DEVICE_U8(softpc_device_sb_dsp_state, SbAnswerDMAPosition),
+    DEVICE_U8(softpc_device_sb_dsp_state, bExitDMAThread),
+    DEVICE_U8(softpc_device_sb_dsp_state, bDspReset),
+    DEVICE_U8(softpc_device_sb_dsp_state, bExitAuto),
+    DEVICE_U8(softpc_device_sb_dsp_state, bHighSpeedMode),
+    DEVICE_U8(softpc_device_sb_dsp_state, DspSpeakerEnabled),
+    DEVICE_U8(softpc_device_sb_dsp_state, DspEoiRegistered),
+    DEVICE_U16(softpc_device_sb_dsp_state, StartingDmaAddr),
+    DEVICE_U16(softpc_device_sb_dsp_state, StartingDmaCount),
+    DEVICE_U16(softpc_device_sb_dsp_state, dma_addr),
+    DEVICE_U16(softpc_device_sb_dsp_state, dma_count),
+    DEVICE_U16(softpc_device_sb_dsp_state, dma_page),
+    DEVICE_U32(softpc_device_sb_dsp_state, TimeConstant),
+    DEVICE_U32(softpc_device_sb_dsp_state, SBBlockSize),
+    DEVICE_U32(softpc_device_sb_dsp_state, blockSize),
+    DEVICE_U32(softpc_device_sb_dsp_state, DspTransferSize),
+    DEVICE_U32(softpc_device_sb_dsp_state, DspTransferConsumed),
+    DEVICE_U32(softpc_device_sb_dsp_state, DspCompletionEvent),
+    DEVICE_U32(softpc_device_sb_dsp_state, DspOutputRate),
+    DEVICE_U32(softpc_device_sb_dsp_state, PreviousWaveOutPos),
+    DEVICE_U32(softpc_device_sb_dsp_state, DspNumberDmaQueries),
+    DEVICE_U32(softpc_device_sb_dsp_state, DspVirtualInc),
+};
+
+static const softpc_device_wire_field sb_fields[] = {
+    DEVICE_U8(softpc_device_sb_state, attached),
+    DEVICE_U8(softpc_device_sb_state, mpu_present),
+    DEVICE_U8(softpc_device_sb_state, mpu_mode),
+    DEVICE_U8(softpc_device_sb_state, mpu_input),
+};
+
+static const softpc_device_wire_field eoi_fields[] = {
+    DEVICE_U32(softpc_device_eoi_state, mask),
+    DEVICE_U32(softpc_device_eoi_state, handles),
+};
+
 static lib_status
 device_write_all(const softpc_device_archive *archive,
     softpc_snapshot_bytes_write write, void *context)
@@ -758,6 +886,12 @@ device_write_all(const softpc_device_archive *archive,
     WRITE_MAP(&archive->parallel_controller, parallel_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_PARALLEL_PORT_COUNT; ++index) WRITE_MAP(&archive->parallel_host.port[index], parallel_host_port_fields);
     WRITE_MAP(&archive->floppy_host, floppy_host_fields);
+    WRITE_MAP(&archive->sb, sb_fields);
+    WRITE_MAP(&archive->sb.mixer, sb_mixer_fields);
+    WRITE_MAP(&archive->sb.fm, sb_fm_fields);
+    WRITE_MAP(&archive->sb.midi, sb_midi_fields);
+    WRITE_MAP(&archive->sb.dsp, sb_dsp_fields);
+    WRITE_MAP(&archive->eoi, eoi_fields);
 #undef WRITE_MAP
     return LIB_STATUS_OK;
 }
@@ -782,6 +916,12 @@ device_read_all(softpc_device_archive *archive, softpc_snapshot_bytes_read read,
     READ_MAP(&archive->parallel_controller, parallel_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_PARALLEL_PORT_COUNT; ++index) READ_MAP(&archive->parallel_host.port[index], parallel_host_port_fields);
     READ_MAP(&archive->floppy_host, floppy_host_fields);
+    READ_MAP(&archive->sb, sb_fields);
+    READ_MAP(&archive->sb.mixer, sb_mixer_fields);
+    READ_MAP(&archive->sb.fm, sb_fm_fields);
+    READ_MAP(&archive->sb.midi, sb_midi_fields);
+    READ_MAP(&archive->sb.dsp, sb_dsp_fields);
+    READ_MAP(&archive->eoi, eoi_fields);
 #undef READ_MAP
     return LIB_STATUS_OK;
 }

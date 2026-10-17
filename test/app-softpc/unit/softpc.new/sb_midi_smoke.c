@@ -3,6 +3,7 @@
 #include "host_def.h"
 #include "nt_sb.h"
 #include "compat/sb_midi.h"
+#include "compat/devices/snapshot.h"
 
 static lib_u8 messages[64][LIB_AUDIO_MIDI_SYSEX_MAX_BYTES];
 static lib_u32 lengths[64], sent, attempts, resets, fail_attempt;
@@ -41,6 +42,7 @@ static void expect(lib_u32 index, const lib_u8 *bytes, lib_u32 count)
 
 int main(void)
 {
+    softpc_device_sb_midi_state saved, invalid;
     static const lib_u8 channel_lengths[] = {3, 3, 3, 3, 2, 2, 3};
     static const lib_u8 realtime[] = {0xf8, 0xfa, 0xfb, 0xfc, 0xfe, 0xff};
     static const lib_u8 note[] = {0x90, 60, 127};
@@ -137,6 +139,9 @@ int main(void)
     sent = 0; resets = 0;
     lib_test_assert(MidiSetRunning(FALSE) == LIB_STATUS_OK && resets == 1);
     lib_test_assert(MidiSetRunning(FALSE) == LIB_STATUS_OK && resets == 1);
+    softpc_device_snapshot_capture_sb_midi(&saved);
+    ResetMidiParser();
+    lib_test_assert(softpc_device_snapshot_restore_sb_midi(&saved));
     lib_test_assert(SendMidiRequest() == LIB_STATUS_OK && sent == 0);
     lib_test_assert(BufferMidi(0x90) == LIB_STATUS_INVALID_STATE && sent == 0);
     lib_test_assert(MidiSetRunning(TRUE) == LIB_STATUS_OK && resets == 2);
@@ -166,6 +171,9 @@ int main(void)
     feed_byte(0xb0); feed_byte(64); feed_byte(127);
     feed_byte(123); feed_byte(0); /* All Notes Off still respects sustain. */
     lib_test_assert(MidiSetRunning(FALSE) == LIB_STATUS_OK);
+    softpc_device_snapshot_capture_sb_midi(&saved);
+    ResetMidiParser();
+    lib_test_assert(softpc_device_snapshot_restore_sb_midi(&saved));
     sent = 0;
     lib_test_assert(MidiSetRunning(TRUE) == LIB_STATUS_OK && sent == 35);
     {
@@ -183,5 +191,48 @@ int main(void)
     fail_attempt = 0; sent = 0;
     lib_test_assert(MidiSetRunning(TRUE) == LIB_STATUS_OK && sent == 33 && resets == 2);
     { const lib_u8 expected[] = {0x90,60,100}; expect(2, expected, 3); }
+    /* Every channel status and every unfinished prefix survive a new lifetime. */
+    for (lib_u32 status = 0x80; status < 0xf0; ++status) {
+        lib_u32 count = channel_lengths[(status - 0x80) / 16];
+        lib_u8 expected[] = {(lib_u8)status, 60, 100};
+        for (lib_u32 prefix = 1; prefix < count; ++prefix) {
+            reset();
+            for (lib_u32 i = 0; i < prefix; ++i) feed_byte(expected[i]);
+            softpc_device_snapshot_capture_sb_midi(&saved);
+            ResetMidiParser();
+            lib_test_assert(softpc_device_snapshot_restore_sb_midi(&saved));
+            lib_test_assert(SendMidiRequest() == LIB_STATUS_OK && sent == 0);
+            lib_test_assert(BufferMidi(1) == LIB_STATUS_INVALID_STATE);
+            lib_test_assert(MidiSetRunning(TRUE) == LIB_STATUS_OK);
+            sent = 0;
+            for (lib_u32 i = prefix; i < count; ++i) feed_byte(expected[i]);
+            expect(0, expected, count);
+        }
+    }
+    reset(); feed_byte(0xf0); feed_byte(1); feed_byte(2);
+    softpc_device_snapshot_capture_sb_midi(&saved);
+    ResetMidiParser();
+    lib_test_assert(softpc_device_snapshot_restore_sb_midi(&saved));
+    lib_test_assert(MidiSetRunning(TRUE) == LIB_STATUS_OK);
+    sent = 0;
+    feed_byte(0xf7); expect(0, sysex, sizeof(sysex));
+    /* Invalid archives cannot leave an unsafe prefix or mutate the parser. */
+    for (lib_u32 kind = 0; kind < 10; ++kind) {
+        invalid = saved;
+        switch (kind) {
+        case 0: invalid.next_data = sizeof(invalid.buffer) + 1; break;
+        case 1: invalid.next_data = sizeof(invalid.buffer); break;
+        case 2: invalid.bytes_left = 1; break;
+        case 3: invalid.buffer[1] = 0x80; break;
+        case 4: invalid.running_status = 0xf1; break;
+        case 5: invalid.last_length = 3; break;
+        case 6: invalid.realtime = 0xfd; break;
+        case 7: invalid.discard_sysex = 1; break;
+        case 8: invalid.notes[15][127][0] = 128; break;
+        case 9: invalid.sustain[0] = 2; break;
+        }
+        lib_test_assert(!softpc_device_snapshot_restore_sb_midi(&invalid));
+    }
+    feed_byte(60); lib_test_assert(sent == 1); /* Rejected state did not restore F0. */
     return 0;
 }

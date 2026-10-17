@@ -5,6 +5,7 @@
 #include "sndblst.h"
 #include "nt_sb.h"
 #include "compat/ccpu/lifecycle.h"
+#include "compat/devices/snapshot.h"
 /* T93: XP default binding; native WinMM/NTVDM loading is not a device path. */
 static IU16 BasePort = 0x220;
 extern IBOOL bHighSpeedMode;
@@ -16,6 +17,45 @@ static IU16 MpuBasePort;
 static IU16 MpuMode = MPU_INTELLIGENT_MODE;
 static IU8 MpuInData = 0xFF;
 static lib_status MidiStatus;
+
+/* T93: the existing binding and device owners also own snapshot admission. */
+int softpc_device_snapshot_capture_sb(softpc_device_sb_state *state)
+{
+    if (SbGetStatus() != LIB_STATUS_OK) return FALSE;
+    state->attached = bSBAttached;
+    state->mpu_present = MpuBasePort != 0;
+    state->mpu_mode = MpuMode;
+    state->mpu_input = MpuInData;
+    softpc_device_snapshot_capture_sb_mixer(&state->mixer);
+    softpc_device_snapshot_capture_sb_fm(&state->fm);
+    softpc_device_snapshot_capture_sb_midi(&state->midi);
+    return softpc_device_snapshot_capture_sb_dsp(&state->dsp);
+}
+
+int softpc_device_snapshot_prepare_sb(const softpc_device_sb_state *state)
+{
+    if (state->attached != bSBAttached || state->mpu_present > 1 ||
+        state->mpu_present != (MpuBasePort != 0) ||
+        (state->mpu_mode != MPU_INTELLIGENT_MODE && state->mpu_mode != MPU_UART_MODE))
+        return FALSE;
+    /* Clear the old interrupt and host output before the archive restores PIC. */
+    StopDspTransfer(TRUE);
+    if (DspGetStatus() != LIB_STATUS_OK) return FALSE;
+    MidiStatus = softpc_sb_midi_reset();
+    return MidiStatus == LIB_STATUS_OK;
+}
+
+int softpc_device_snapshot_restore_sb(const softpc_device_sb_state *state)
+{
+    if (!softpc_device_snapshot_restore_sb_mixer(&state->mixer) ||
+        !softpc_device_snapshot_restore_sb_fm(&state->fm) ||
+        !softpc_device_snapshot_restore_sb_midi(&state->midi) ||
+        !softpc_device_snapshot_restore_sb_dsp(&state->dsp)) return FALSE;
+    MpuMode = state->mpu_mode;
+    MpuInData = state->mpu_input;
+    SbApplyMixer();
+    return SbGetStatus() == LIB_STATUS_OK;
+}
 
 /* T93: rejected/oversized guest input is not a host transport failure.
  * Cancellation retains the parser's message until the same executor resumes. */

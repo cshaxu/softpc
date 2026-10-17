@@ -49,7 +49,7 @@ static lib_bool normalize_and_match(void *context, const kvm_input_event *event)
         event, capture_hotkey, capture, LIB_TRUE);
 }
 
-static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
+static void assert_registered_raw_chord(lib_u32 trigger, lib_u16 scan, const char *identifier)
 {
     kvm_hotkey_registry registry;
     shared_hotkey_capture capture = { 0 };
@@ -68,13 +68,13 @@ static void assert_registered_raw_chord(lib_u32 trigger, const char *identifier)
             0x38u, LIB_WIN32_KEY_ALT, 0u, 0u, control_alt, 1, 1u }));
     lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
         &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
-            (lib_u16)lib_win32_map_virtual_key((lib_win32_uint)trigger, LIB_WIN32_MAPVK_VK_TO_VSC), (lib_u16)trigger, 0u, 0u, control_alt, 1, 1u }));
+            scan, (lib_u16)trigger, 0u, 0u, control_alt, 1, 1u }));
     lib_test_assert(capture.count == 1u && capture.events[0].type == KVM_EVENT_HOTKEY);
     lib_test_assert(lib_text_compare((const char *)capture.events[0].data.hotkey.identifier, identifier) == 0);
     /* Every make and break in the matched raw chord is private to KVM. */
     lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
         &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
-            (lib_u16)lib_win32_map_virtual_key((lib_win32_uint)trigger, LIB_WIN32_MAPVK_VK_TO_VSC), (lib_u16)trigger, 0u, 0u, control_alt, 0, 1u }));
+            scan, (lib_u16)trigger, 0u, 0u, control_alt, 0, 1u }));
     lib_test_assert(kvm_keyboard_submit_record(&(base_keyboard_decoder){ 0 }, LIB_NULL,
         &capture, normalize_and_match, &(base_keyboard_record){ BASE_KEYBOARD_TRANSITION,
             0x38u, LIB_WIN32_KEY_ALT, 0u, 0u, KVM_HOTKEY_MODIFIER_CONTROL, 0, 1u }));
@@ -208,9 +208,9 @@ int main(void)
     /* Raw Console input provides its own per-record modifier state.  These
        registrations must not depend on process-global lib_win32_get_key_state(), which
        RDP does not reliably update for lib_win32_input_record delivery. */
-    assert_registered_raw_chord('P', "pause-toggle");
-    assert_registered_raw_chord('D', "send-ctrl-alt-del");
-    assert_registered_raw_chord('F', "send-alt-enter");
+    assert_registered_raw_chord('P', 0x19, "pause-toggle");
+    assert_registered_raw_chord('D', 0x20, "send-ctrl-alt-del");
+    assert_registered_raw_chord('F', 0x21, "send-alt-enter");
 
     /* Window supplies a mask at its own native boundary; the common
        normalizer preserves that value rather than replacing it globally. */

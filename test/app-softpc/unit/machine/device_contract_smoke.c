@@ -2,6 +2,8 @@
 #include "compat/sb_pcm.h"
 #include "compat/sb_midi.h"
 #include "compat/platform.h"
+#include "compat/devices/archive.h"
+#include "compat/devices/snapshot.h"
 #include "machine/machine.h"
 #include "../../fixture_cleanup.h"
 #include "insignia.h"
@@ -1391,6 +1393,182 @@ static void verify_rom(softpc_machine *machine)
     assert(observed[0] == 0 && observed[1] == 0xc0);
 }
 
+static lib_status sb_archive_write(void *context, const lib_u8 *bytes, lib_size size)
+{
+    return fwrite(bytes, 1, size, context) == size ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
+
+static lib_status sb_archive_read(void *context, lib_u8 *bytes, lib_size size)
+{
+    return fread(bytes, 1, size, context) == size ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
+}
+
+static void verify_sb_parser_archive(void)
+{
+    static const struct { IU8 bytes[3]; unsigned length, prime_munge; } commands[] = {
+        { { DSP_CARD_IDENTIFY, 0x5a }, 2, 0 },
+        { { DSP_LOAD_RES_REG, 0x96 }, 2, 0 },
+        { { DSP_SET_SAMPLE_RATE, 0xd3 }, 2, 0 },
+        { { DSP_SET_BLOCK_SIZE, 0x34, 0x12 }, 3, 0 },
+        { { DSP_WRITE, 3, 0 }, 3, 0 },
+        { { DSP_READ, 0, 0 }, 3, 0 },
+        { { DSP_TABLE_MUNGE, 0x17 }, 2, 0 },
+        { { DSP_TABLE_MUNGE, 0x32 }, 2, 1 }
+    };
+    unsigned command, prefix, i;
+    for (command = 0; command < sizeof(commands) / sizeof(commands[0]); ++command)
+    for (prefix = 1; prefix < commands[command].length; ++prefix) {
+        softpc_device_archive *saved = softpc_device_archive_create(), *decoded = NULL;
+        softpc_device_sb_dsp_state initial, expected, actual;
+        SB_DMA_INFO expected_dma, actual_dma;
+        FILE *file = tmpfile();
+        assert(saved && file);
+        ResetAll();
+        StopDspTransfer(TRUE);
+        assert(softpc_device_snapshot_capture_sb_dsp(&initial));
+        initial.TableMungeFirstByte = 1;
+        assert(softpc_device_snapshot_restore_sb_dsp(&initial));
+        outb(0x0c, 0); dma_word(2, 0x1000); dma_word(3, 63);
+        outb(0x83, 2); outb(0x0b, 0x49); outb(0x0a, 1);
+        if (commands[command].prime_munge) {
+            DspWrite(DSP_TABLE_MUNGE); DspWrite(0x17);
+        }
+        for (i = 0; i < prefix; ++i) DspWrite(commands[command].bytes[i]);
+        assert(softpc_device_archive_capture(saved));
+        assert(softpc_device_archive_write(saved, sb_archive_write, file) == LIB_STATUS_OK);
+        assert(fseek(file, 0, SEEK_SET) == 0);
+        assert(softpc_device_archive_read(&decoded, sb_archive_read, file) == LIB_STATUS_OK);
+        for (i = prefix; i < commands[command].length; ++i) DspWrite(commands[command].bytes[i]);
+        assert(softpc_device_snapshot_capture_sb_dsp(&expected) && QueryDMA(&expected_dma));
+        ResetAll();
+        DspWrite(DSP_SET_BLOCK_SIZE); DspWrite(0xff); DspWrite(0xff);
+        assert(softpc_device_archive_restore(decoded));
+        for (i = prefix; i < commands[command].length; ++i) DspWrite(commands[command].bytes[i]);
+        assert(softpc_device_snapshot_capture_sb_dsp(&actual) && QueryDMA(&actual_dma));
+        assert(actual.DSPWriteState == expected.DSPWriteState && actual.DSPReadState == expected.DSPReadState);
+        assert(actual.SBBlockSize == expected.SBBlockSize && actual.blockSize == expected.blockSize);
+        assert(actual.IdentByte == expected.IdentByte && actual.ReservedRegister == expected.ReservedRegister);
+        assert(actual.TimeConstant == expected.TimeConstant);
+        assert(actual.TableMungeFirstByte == expected.TableMungeFirstByte && actual.TableMungeData == expected.TableMungeData);
+        assert(actual_dma.addr == expected_dma.addr && actual_dma.count == expected_dma.count);
+        softpc_device_archive_dispose(decoded);
+        softpc_device_archive_dispose(saved);
+        assert(fclose(file) == 0);
+    }
+    ResetAll();
+}
+
+static void verify_sb_archive(softpc_machine *machine, const char *write_path,
+    const char *read_path)
+{
+    unsigned automatic, prefix, i;
+    for (automatic = 0; automatic < 2; ++automatic)
+    for (prefix = 0; prefix < 3; ++prefix) {
+        if ((write_path || read_path) && (automatic != 0 || prefix != 1)) continue;
+        softpc_device_archive *saved = softpc_device_archive_create(), *decoded = NULL;
+        softpc_device_sb_state sound;
+        SB_DMA_INFO dma;
+        IU8 value, sample;
+        FILE *file = write_path ? fopen(write_path, "w+b") :
+            read_path ? fopen(read_path, "rb") : tmpfile();
+        assert(saved && file);
+        assert(softpc_platform_set_clock_running(0));
+        ResetAll();
+        ica0_post(); ica1_post(); ica_outb(0x21, 0xdf);
+        outb(0x0c, 0); dma_word(2, 0x1000); dma_word(3, 63);
+        outb(0x83, 2); outb(0x0b, (IU8)(0x49 | automatic * 0x10));
+        outb(0x0a, 1);
+        for (i = 0; i < 64; ++i) {
+            sample = (IU8)(i + 17);
+            assert(softpc_machine_write_physical(machine, 0x21000 + i, &sample, 1) == SOFTPC_MACHINE_OK);
+        }
+        sb_pcm_budget = prefix == 0 ? 7 : 64;
+        SBBlockSize = 63;
+        assert(StartDspTransfer(automatic ? Auto : Single));
+        sb_pcm_consumed = prefix == 2 ? 64 : 3;
+        outb(0x224, MIXER_VOICE_VOLUME); outb(0x225, 0xa6);
+        outb(0x388, 4); outb(0x389, 1);
+        outb(0x331, MPU_PASSTHROUGH_MODE); /* Retain unread ACK and partial note. */
+        outb(0x330, 0x90); outb(0x330, 60);
+        DspWrite(DSP_GET_VERSION); DspReadData(&value); assert(value == 2);
+        GenerateInterrupt(5); /* Delayed IRQ and completion are independent. */
+        assert(softpc_device_archive_capture(saved));
+        if (!read_path) {
+            assert(softpc_device_archive_write(saved, sb_archive_write, file) == LIB_STATUS_OK);
+            assert(fflush(file) == 0 && fseek(file, 0, SEEK_SET) == 0);
+        }
+        assert(softpc_device_archive_read(&decoded, sb_archive_read, file) == LIB_STATUS_OK);
+        if (!read_path) {
+            softpc_device_archive *invalid = NULL;
+            softpc_device_eoi_state pending;
+            lib_u8 mask[4];
+            softpc_device_snapshot_capture_eoi(&pending);
+            /* Last record is the fixed EOI mask followed by sixteen u32 handles.
+             * A mask without its callback must fail before old output is cleared. */
+            assert(fseek(file, -68, SEEK_END) == 0);
+            for (i = 0; i < 4; ++i) mask[i] = (lib_u8)((pending.mask ^ 1u) >> (i * 8));
+            assert(fwrite(mask, 1, 4, file) == 4 && fflush(file) == 0);
+            assert(fseek(file, 0, SEEK_SET) == 0);
+            assert(softpc_device_archive_read(&invalid, sb_archive_read, file) == LIB_STATUS_OK);
+            assert(!softpc_device_archive_restore(invalid));
+            assert(DelayIrqLine == pending.mask && sb_output_active);
+            softpc_device_archive_dispose(invalid);
+            assert(fseek(file, -68, SEEK_END) == 0);
+            for (i = 0; i < 4; ++i) mask[i] = (lib_u8)(pending.mask >> (i * 8));
+            assert(fwrite(mask, 1, 4, file) == 4 && fflush(file) == 0);
+        }
+        ResetAll();
+        sb_pcm_budget = 65536;
+        assert(softpc_device_archive_restore(decoded));
+        assert(softpc_device_snapshot_capture_sb(&sound));
+        assert(sound.dsp.DspTransferConsumed == (prefix == 2 ? 64u : 3u));
+        {
+            softpc_device_sb_dsp_state invalid = sound.dsp;
+            invalid.DspTransferSize = 65537;
+            assert(!softpc_device_snapshot_restore_sb_dsp(&invalid));
+            invalid = sound.dsp; invalid.DspTransferConsumed = 65;
+            assert(!softpc_device_snapshot_restore_sb_dsp(&invalid));
+            invalid = sound.dsp; invalid.DSPWriteState = 0;
+            assert(!softpc_device_snapshot_restore_sb_dsp(&invalid));
+            invalid = sound.dsp; invalid.DspOutputRate = 0;
+            assert(!softpc_device_snapshot_restore_sb_dsp(&invalid));
+        }
+        assert(!sb_output_active && sb_pcm_count == 0);
+        DspReadData(&value); assert(value == 1);
+        inb(0x225, &value); assert(value == 0xa6);
+        inb(0x388, &value); assert(value == 0xc6);
+        inb(0x330, &value); assert(value == 0xfe);
+        assert(DelayIrqLine & (1u << SbInterrupt));
+        SbSetRunning(TRUE);
+        assert(SbGetStatus() == LIB_STATUS_OK);
+        assert(sb_pcm_count == (prefix == 2 ? 0u : 61u));
+        for (i = 0; i < sb_pcm_count; ++i) assert(sb_pcm_bytes[i] == i + 20);
+        outb(0x330, 100);
+        assert(sb_midi_length == 3 && sb_midi_message[0] == 0x90 &&
+            sb_midi_message[1] == 60 && sb_midi_message[2] == 100);
+        for (i = 0; i < 100 && bWriteBurstStarted; ++i) dispatch_q_event();
+        assert(!bWriteBurstStarted && QueryDMA(&dma));
+        assert(dma.addr == (automatic ? 0x1000 : 0x1040));
+        assert(dma.count == (automatic ? 63 : 0xffff));
+        if (automatic) {
+            lib_u32 previous = sb_pcm_count;
+            IU32 hook = 0;
+            for (i = 0; i < 100 && (DelayIrqLine & (1u << SbInterrupt)); ++i) dispatch_q_event();
+            assert(!(DelayIrqLine & (1u << SbInterrupt)));
+            assert(ica_scan_irr(ICA_MASTER) & 0x80);
+            assert(ica_intack(&hook) == 0x0d);
+            ica_outb(0x20, 0x65);
+            assert(bWriteBurstStarted && sb_pcm_count == previous + 64);
+            for (i = 0; i < 64; ++i) assert(sb_pcm_bytes[previous + i] == i + 17);
+        }
+        softpc_device_archive_dispose(decoded);
+        softpc_device_archive_dispose(saved);
+        assert(fclose(file) == 0);
+    }
+    ResetAll();
+    if (!write_path && !read_path) verify_sb_parser_archive();
+}
+
 int main(int argc, char **argv)
 {
     const char *path = "device-contract.img";
@@ -1398,7 +1576,7 @@ int main(int argc, char **argv)
     softpc_machine *machine = NULL;
     unsigned char boot[512] = { 0xeb, 0xfe };
     FILE *file;
-    assert(argc == 2);
+    assert(argc == 2 || argc == 3);
     boot[510] = 0x55;
     boot[511] = 0xaa;
     file = fopen(path, "wb");
@@ -1421,6 +1599,12 @@ int main(int argc, char **argv)
         verify_delayed_irq();
     else if (lib_text_compare(argv[1], "sb-dma") == 0)
         verify_sb_dma();
+    else if (lib_text_compare(argv[1], "sb-archive") == 0)
+        verify_sb_archive(machine, NULL, NULL);
+    else if (lib_text_compare(argv[1], "sb-save") == 0 && argc == 3)
+        verify_sb_archive(machine, argv[2], NULL);
+    else if (lib_text_compare(argv[1], "sb-load") == 0 && argc == 3)
+        verify_sb_archive(machine, NULL, argv[2]);
     else if (lib_text_compare(argv[1], "sb-commands") == 0)
     {
         verify_sb_commands(machine);

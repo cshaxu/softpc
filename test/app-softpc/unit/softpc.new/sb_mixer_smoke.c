@@ -3,6 +3,7 @@
 #include "insignia.h"
 #include "sndblst.h"
 #include "nt_sb.h"
+#include "compat/devices/snapshot.h"
 
 static lib_u32 applied;
 static IU16 voice_gain, midi_gain;
@@ -35,6 +36,7 @@ int main(void)
     };
     static const lib_u32 voice_levels[4] = { 0u, 16383u, 32767u, 49151u };
     lib_u32 master, voice, fm, before;
+    softpc_device_sb_mixer_state saved, restored, invalid;
 
     ResetMixer();
     lib_test_assert(applied == 3u);
@@ -82,5 +84,27 @@ int main(void)
     write_register(MIXER_RESET, 0xffu);
     lib_test_assert(read_register(MIXER_FM_VOLUME) == 8u);
     lib_test_assert(read_register(MIXER_CD_VOLUME) == 0u);
+    /* Save with a selected register and preserve every reserved volume bit. */
+    write_register(MIXER_MASTER_VOLUME, 0xf3);
+    write_register(MIXER_FM_VOLUME, 0xe7);
+    write_register(MIXER_VOICE_VOLUME, 0xbd);
+    write_register(MIXER_CD_VOLUME, 0xa5);
+    softpc_device_snapshot_capture_sb_mixer(&saved);
+    ResetMixer();
+    before = applied;
+    lib_test_assert(softpc_device_snapshot_restore_sb_mixer(&saved));
+    lib_test_assert(applied == before); /* Host recreation owns gain application. */
+    softpc_device_snapshot_capture_sb_mixer(&restored);
+    lib_test_assert(restored.selected == saved.selected && restored.master == 0xf3 &&
+        restored.fm == 0xe7 && restored.voice == 0xbd && restored.cd == 0xa5);
+    MixerDataWrite(0x12); /* Must still select CD, without another address write. */
+    lib_test_assert(read_register(MIXER_CD_VOLUME) == 0x12);
+    for (master = 0; master < 256; ++master) {
+        if (master >= 1 && master <= 5) continue;
+        invalid = saved;
+        invalid.selected = (IU8)master;
+        lib_test_assert(!softpc_device_snapshot_restore_sb_mixer(&invalid));
+        lib_test_assert(read_register(MIXER_CD_VOLUME) == 0x12);
+    }
     return 0;
 }

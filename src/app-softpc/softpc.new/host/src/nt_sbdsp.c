@@ -20,6 +20,7 @@
 #include "ica.h"
 #include "compat/eoi.h"
 #include "quick_ev.h"
+#include "compat/devices/snapshot.h"
 
 IU32           TimeConstant = 0xA6;    // one byte format
 
@@ -57,6 +58,10 @@ static IU32 DspOutputRate;
 static IBOOL DspSpeakerEnabled = TRUE;
 static IBOOL DspEoiRegistered;
 static IBOOL DspOutputSuspended;
+/* T93: parser-owned partial commands must survive a portable capture. */
+static IU32 blockSize;
+static IU8 TableMungeData;
+static IBOOL TableMungeFirstByte = TRUE;
 static void DspCompleteBlock(long unused);
 static void AutoInitEoiHook(int irq, int count);
 
@@ -429,6 +434,156 @@ enum {
 }
 DSPReadState = NothingToRead; // state of current command/data being read
 
+/* T93: archive only device values. Native counters are reduced to the consumed
+ * prefix of the frozen block; restoration starts a new paused host output. */
+int softpc_device_snapshot_capture_sb_dsp(softpc_device_sb_dsp_state *state)
+{
+    lib_audio_pcm_progress progress;
+    lib_u64 origin, played;
+    IU32 queued = DspTransferQueued - DspTransferConsumed;
+    if (DspTransferStatus != LIB_STATUS_OK) return FALSE;
+    state->TimeConstant = TimeConstant;
+    state->SBBlockSize = SBBlockSize;
+    state->blockSize = blockSize;
+    state->DspTransferSize = DspTransferSize;
+    state->DspTransferConsumed = DspTransferConsumed;
+    state->DspCompletionEvent = DspCompletionEvent;
+    state->DspOutputRate = DspOutputRate;
+    state->PreviousWaveOutPos = PreviousWaveOutPos;
+    state->DspNumberDmaQueries = DspNumberDmaQueries;
+    state->DspVirtualInc = DspVirtualInc;
+    state->StartingDmaAddr = StartingDmaAddr;
+    state->StartingDmaCount = StartingDmaCount;
+    state->IdentByte = IdentByte;
+    state->ReservedRegister = ReservedRegister;
+    state->TableMungeData = TableMungeData;
+    state->TableMungeFirstByte = TableMungeFirstByte;
+    state->ResetState = ResetState;
+    state->DSPWriteState = DSPWriteState;
+    state->DSPReadState = DSPReadState;
+    state->DspMode = DspMode;
+    state->DspTransferMode = DspTransferMode;
+    state->bDspActive = bDspActive;
+    state->bDspPaused = bDspPaused;
+    state->SbAnswerDMAPosition = SbAnswerDMAPosition;
+    state->bExitDMAThread = bExitDMAThread;
+    state->bDspReset = bDspReset;
+    state->bExitAuto = bExitAuto;
+    state->bHighSpeedMode = bHighSpeedMode;
+    state->DspSpeakerEnabled = DspSpeakerEnabled;
+    state->DspEoiRegistered = DspEoiRegistered;
+    state->dma_addr = DmaInfo.addr;
+    state->dma_count = DmaInfo.count;
+    state->dma_page = DmaInfo.page;
+    state->dma_status = DmaInfo.status;
+    state->dma_mode = DmaInfo.mode;
+    state->dma_mask = DmaInfo.mask;
+    memcpy(state->buffer, DspBuffer, sizeof(DspBuffer));
+    if (queued) {
+        if (softpc_sb_pcm_progress(&progress) != LIB_STATUS_OK ||
+            progress.accepted_frames < queued ||
+            (DspCompletionEvent && progress.epoch != DspHostEpoch)) return FALSE;
+        origin = progress.accepted_frames - queued;
+        played = progress.consumed_frames > origin ? progress.consumed_frames - origin : 0;
+        state->DspTransferConsumed += played < queued ? (IU32)played : queued;
+    }
+    return TRUE;
+}
+
+int softpc_device_snapshot_restore_sb_dsp(const softpc_device_sb_dsp_state *state)
+{
+    if ((state->TimeConstant > 255 && state->TimeConstant != 0xffff) ||
+        state->SBBlockSize >= sizeof(DspBuffer) || state->blockSize > 0xffff ||
+        state->DspTransferSize > sizeof(DspBuffer) ||
+        state->DspTransferConsumed > state->DspTransferSize ||
+        state->DspCompletionEvent > 0xfffe ||
+        (state->DspOutputRate && (state->DspOutputRate < 3921 || state->DspOutputRate > 44100)) ||
+        (state->DspTransferSize && !state->DspOutputRate) ||
+        state->ResetState < ResetNotStarted || state->ResetState > Reset1Written ||
+        state->DSPWriteState < WriteCommand || state->DSPWriteState > BlockSizeSecondByteRead ||
+        state->DSPReadState < NothingToRead || state->DSPReadState > ReadResReg ||
+        state->DspMode > None || state->DspTransferMode > None ||
+        state->TableMungeFirstByte > 1 || state->bDspActive > 1 ||
+        state->bDspPaused > 1 || state->SbAnswerDMAPosition > 1 ||
+        state->bExitDMAThread > 1 || state->bDspReset > 1 ||
+        state->bExitAuto > 1 || state->bHighSpeedMode > 1 ||
+        state->DspSpeakerEnabled > 1 || state->DspEoiRegistered > 1 ||
+        (state->DspEoiRegistered && state->DspMode != Auto)) return FALSE;
+    /* The archive prepares old output before restoring PIC and event queues.
+     * Retire only this saved host-progress event from the restored queue. */
+    if (state->DspCompletionEvent)
+        delete_q_event((q_ev_handle)state->DspCompletionEvent);
+    TimeConstant = state->TimeConstant;
+    SBBlockSize = state->SBBlockSize;
+    blockSize = state->blockSize;
+    DspTransferSize = state->DspTransferSize;
+    DspTransferConsumed = state->DspTransferConsumed;
+    PreviousWaveOutPos = state->PreviousWaveOutPos;
+    DspNumberDmaQueries = state->DspNumberDmaQueries;
+    DspVirtualInc = state->DspVirtualInc;
+    StartingDmaAddr = state->StartingDmaAddr;
+    StartingDmaCount = state->StartingDmaCount;
+    IdentByte = state->IdentByte;
+    ReservedRegister = state->ReservedRegister;
+    TableMungeData = state->TableMungeData;
+    TableMungeFirstByte = state->TableMungeFirstByte;
+    ResetState = state->ResetState;
+    DSPWriteState = state->DSPWriteState;
+    DSPReadState = state->DSPReadState;
+    DspMode = state->DspMode;
+    DspTransferMode = state->DspTransferMode;
+    bDspActive = state->bDspActive;
+    bDspPaused = state->bDspPaused;
+    SbAnswerDMAPosition = state->SbAnswerDMAPosition;
+    bExitDMAThread = state->bExitDMAThread;
+    bDspReset = state->bDspReset;
+    bExitAuto = state->bExitAuto;
+    bHighSpeedMode = state->bHighSpeedMode;
+    DspSpeakerEnabled = state->DspSpeakerEnabled;
+    DmaInfo.addr = state->dma_addr;
+    DmaInfo.count = state->dma_count;
+    DmaInfo.page = state->dma_page;
+    DmaInfo.status = state->dma_status;
+    DmaInfo.mode = state->dma_mode;
+    DmaInfo.mask = state->dma_mask;
+    memcpy(DspBuffer, state->buffer, sizeof(DspBuffer));
+    if (!SbInitializeDMA()) return FALSE;
+    DspTransferQueued = DspTransferConsumed;
+    DspCompletionEvent = 0;
+    DspCompletionRate = DspCompletionChecks = 0;
+    DspHostOrigin = DspHostEpoch = 0;
+    bWriteBurstStarted = DspResetOutput = FALSE;
+    DspOutputRate = state->DspOutputRate;
+    DspOutputSuspended = DspOutputRate != 0;
+    DspTransferStatus = LIB_STATUS_OK;
+    if (DspOutputRate) {
+        DspTransferStatus = softpc_sb_pcm_open(DspOutputRate,
+            DspSpeakerEnabled ? MixerGetVoiceGain() : 0);
+        if (DspTransferStatus == LIB_STATUS_OK)
+            DspTransferStatus = softpc_sb_pcm_set_active(LIB_FALSE);
+        if (DspTransferStatus != LIB_STATUS_OK) return FALSE;
+    }
+    DspEoiRegistered = FALSE;
+    if (state->DspEoiRegistered) {
+        if (!RegisterEOIHook(SbInterrupt, AutoInitEoiHook)) return FALSE;
+        DspEoiRegistered = TRUE;
+    }
+    return TRUE;
+}
+
+int softpc_device_snapshot_encode_sb_callback(Q_CALLBACK_FN callback,
+    unsigned long *callback_id)
+{
+    if (callback != DspCompleteBlock) return FALSE;
+    *callback_id = SOFTPC_DEVICE_QUEUE_SB_COMPLETION;
+    return TRUE;
+}
+
+Q_CALLBACK_FN softpc_device_snapshot_decode_sb_callback(unsigned long callback_id)
+{
+    return callback_id == SOFTPC_DEVICE_QUEUE_SB_COMPLETION ? DspCompleteBlock : NULL;
+}
+
 void
 GenerateInterrupt(
     IU32 delay
@@ -716,8 +871,6 @@ Return Value:
 --*/
 
 {
-    static IU32 blockSize;
-
     switch (DSPWriteState) {
     case WriteCommand:
         WriteCommandByte(data);
@@ -992,8 +1145,6 @@ Return Value:
 --*/
 
 {
-    static IU8 TableMungeData;
-    static IBOOL TableMungeFirstByte = TRUE; // munging first or second byte
     IU8 comp, dataCopy;
     SB_DMA_INFO dMAInfo;
     IU32 dMAPhysicalAddress;

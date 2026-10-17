@@ -412,10 +412,12 @@ target_include_directories(softpc-sound-smoke PRIVATE
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/sound_smoke" COMMAND softpc-sound-smoke)
-add_executable(softpc-audio-lifecycle-smoke test/app-softpc/unit/compat/audio_lifecycle_smoke.c)
+add_executable(softpc-audio-lifecycle-smoke test/app-softpc/integration/audio_lifecycle_smoke.c)
 target_link_libraries(softpc-audio-lifecycle-smoke PRIVATE softpc-vm)
-target_include_directories(softpc-audio-lifecycle-smoke PRIVATE src src/app-softpc/compat)
-add_test(NAME "app-softpc/unit/compat/audio_lifecycle_smoke" COMMAND softpc-audio-lifecycle-smoke)
+target_include_directories(softpc-audio-lifecycle-smoke PRIVATE src src/app-softpc)
+add_test(NAME "app-softpc/integration/audio_lifecycle_smoke" COMMAND softpc-audio-lifecycle-smoke)
+set_tests_properties("app-softpc/integration/audio_lifecycle_smoke" PROPERTIES
+    LABELS "integration;native_audio")
 add_executable(softpc-serial-smoke test/app-softpc/unit/machine/serial_smoke.c)
 target_link_libraries(softpc-serial-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-serial-smoke PRIVATE
@@ -482,6 +484,8 @@ add_test(NAME "app-softpc/unit/machine/device_contract_sb_dma"
     COMMAND softpc-device-contract-smoke sb-dma)
 add_test(NAME "app-softpc/unit/machine/device_contract_sb_commands"
     COMMAND softpc-device-contract-smoke sb-commands)
+add_test(NAME "app-softpc/unit/machine/device_contract_sb_archive"
+    COMMAND softpc-device-contract-smoke sb-archive)
 add_executable(softpc-quick-time-smoke test/app-softpc/unit/machine/quick_time_smoke.c)
 target_link_libraries(softpc-quick-time-smoke PRIVATE softpc-vm)
 target_include_directories(softpc-quick-time-smoke PRIVATE
@@ -712,7 +716,7 @@ target_include_directories(softpc-sb-midi-native-smoke PRIVATE src src/app-softp
 target_link_libraries(softpc-sb-midi-native-smoke PRIVATE base audio-midi)
 add_test(NAME "app-softpc/integration/sb_midi_native_smoke" COMMAND softpc-sb-midi-native-smoke)
 set_tests_properties("app-softpc/integration/sb_midi_native_smoke" PROPERTIES
-    LABELS "integration" TIMEOUT 60 SKIP_RETURN_CODE 77 RESOURCE_LOCK native_midi)
+    LABELS "integration;native_audio" TIMEOUT 60 SKIP_RETURN_CODE 77 RESOURCE_LOCK native_midi)
 list(APPEND SOFTPC_TEST_TARGETS softpc-sb-midi-native-smoke)
 foreach(probe IN ITEMS platform audio)
     set(probe_target softpc-${probe}-failure-smoke)
@@ -754,6 +758,32 @@ set_tests_properties("app-softpc/integration/runtime_cursor_smoke" PROPERTIES LA
 list(APPEND SOFTPC_TEST_TARGETS softpc-runtime-cursor-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-provider-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-x87-layout-smoke)
+# Non-audio tests retain real machine/Compat code but never acquire host audio.
+# Audio tests keep their purpose-built sinks; only their unrelated MIDI
+# dependency is replaced. No mock is linked into the launcher or native test.
+foreach(kind IN ITEMS pcm midi)
+    add_library(softpc-test-${kind} OBJECT test/app-softpc/fixture_${kind}.c)
+    target_link_libraries(softpc-test-${kind} PRIVATE types)
+    if(MSVC)
+        target_compile_options(softpc-test-${kind} PRIVATE /UNDEBUG)
+    else()
+        target_compile_options(softpc-test-${kind} PRIVATE -UNDEBUG)
+    endif()
+endforeach()
+foreach(target IN ITEMS softpc-machine-smoke softpc-dual-media-smoke
+        softpc-partition-image-smoke softpc-pit-smoke softpc-irq-smoke
+        softpc-fdc-smoke softpc-printer-smoke softpc-parallel-failure-smoke
+        softpc-serial-smoke softpc-mouse-smoke softpc-keycode-smoke
+        softpc-vga-frame-smoke softpc-text-console-compat-smoke softpc-bop-smoke
+        softpc-quick-time-smoke softpc-lifecycle-smoke softpc-checkpoint-smoke
+        softpc-platform-failure-smoke softpc-snapshot-transaction-smoke
+        softpc-runtime-smoke softpc-runtime-restart-boot-smoke
+        softpc-runtime-input-continuation-smoke softpc-command-provider-smoke
+        softpc-presentation-shutdown-smoke softpc-runtime-cursor-smoke)
+    target_sources(${target} PRIVATE $<TARGET_OBJECTS:softpc-test-pcm>
+        $<TARGET_OBJECTS:softpc-test-midi>)
+endforeach()
+target_sources(softpc-sound-smoke PRIVATE $<TARGET_OBJECTS:softpc-test-midi>)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.

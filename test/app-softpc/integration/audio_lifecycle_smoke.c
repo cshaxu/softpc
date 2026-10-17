@@ -1,4 +1,4 @@
-#include "audio.h"
+#include "compat/audio.h"
 
 #include <assert.h>
 

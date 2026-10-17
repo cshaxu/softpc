@@ -15,8 +15,11 @@ owner path (`lib`, `emulator`, `x86-debug`, `x86-ibmpc`,
 `app-softpc`, or `checks`) and retain
 any nested test directory. For App tests the registered owner path is also the
 single source of truth for its `unit` or `integration` label. Labels identify
-the test owner and execution class; they are not a guarantee of isolated
-execution.
+the test owner and execution class. Unit tests must not acquire host audio
+devices or depend on an interactive desktop/session. Real-host checks belong
+to integration and carry `native_audio` or `desktop`. App non-audio tests use
+App-owned PCM/MIDI memory sinks at existing Lib APIs; audio contract tests
+retain their own scripted sinks and failure injection.
 Self-contained tests create disposable media in their build working directory.
 Only `runtime_restart_boot_smoke` reads the fixed installed image;
 `package_smoke` exercises the matching packaged EXE and owner configuration.
@@ -31,8 +34,10 @@ processes using the existing snapshot transaction test.
 
 Configure with `cmake --preset mingw-gcc-x64-release` (or x86), then build with
 `cmake --build --preset tests-x64` (or x86). `ctest --preset test-x64` and
-`test-x86` exclude the five desktop cases per width and are safe for background
-work. `test-desktop-x64` / `test-desktop-x86` require reserved desktop access;
+`test-x86` exclude `desktop|native_audio` and are safe for background work.
+Run native audio integrations explicitly with `ctest --test-dir <build> -L
+native_audio --output-on-failure`; missing capability is not playback proof.
+`test-desktop-x64` / `test-desktop-x86` require reserved desktop access;
 never use an unfiltered invocation while the owner is using the desktop.
 List exact cases with `ctest --preset test-x64 -N` or the desktop preset.
 

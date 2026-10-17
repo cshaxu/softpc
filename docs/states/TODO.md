@@ -1,5 +1,14 @@
 # Long-Term Review Ledger
 
+- TODO(Low): Diagnose repeated Ninja log recovery in the local x86 build tree.
+  T93 S15 incremental invocations report "premature end of file; recovering"
+  and rebuild hundreds of objects, including after test-only changes. Builds
+  are not concurrent within this task. The damaged file and external cause
+  have not been established; no compiler-cache hit-rate claim is made.
+  Owner: repository build tooling. Admission condition: preserve the affected
+  build metadata and compare command/dependency logs before any clean rebuild;
+  do not mix a build-system redesign into device snapshot work.
+
 - TODO(Medium): Diagnose intermittent package compact-Console raw input loss.
   T93 S12's first desktop x64 compact case reached DOS but timed out at
   stage=14/error=0 waiting for Version after injected ver; the captured screen

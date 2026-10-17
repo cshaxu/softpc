@@ -3357,6 +3357,247 @@ addresses, guest-memory pointers or host epochs. Reuse the current fixed-width
 codec and callback identity map; no second serializer or Lib archive framework.
 Exact field layout and restore ordering remain to be proved before coding.
 
+#### S15 field and ordering audit
+
+The frozen census is the five retained `nt_sb*.c` owners plus Compat EOI,
+the existing device archive, and their snapshot callers. Public eight
+directories are excluded from modification. Apply execution, architecture,
+coding and documentation governance to this owner-local extension.
+
+| Owner | Persisted obligations | Reconstructed or excluded | Proof receiver |
+| --- | --- | --- | --- |
+| DSP parser | Reset/read/write state, identify/reserved values, time constant, block size, partially received block-size word, table-munge byte and phase | DMA adaptor/controller pointers and physical channel derive from the existing binding | DSP command continuation across every partial command |
+| DSP transfer | Frozen block, consumed prefix, starting DMA address/count, copied DMA observation, mode, active/paused/reset/exit/high-speed flags, virtual DMA query counters | Host handle, epoch/origin, accepted native prefix and completion polling counters are not portable; restore must rebase using the existing paused-output path | Active single/auto DMA, backpressure, pause, EOI continuation and failure injection |
+| EOI | Delayed-IRQ eligibility mask and event handles | EOI function pointer derives from auto-init mode; callback identity uses existing queue codec | Pending delayed IRQ, cancellation and handle/callback consistency |
+| Mixer | Selected register and all four volume bytes, including reserved bits | Host gains recomputed from restored Mixer and speaker state | Register selection/readback and subsequent gain operation |
+| MPU | Admitted port presence, mode and unread response byte | Host MIDI handle/fault is not a guest register; unavailable required capability must fail explicitly | Optional admission, unread ACK and UART continuation |
+| MIDI | Partial buffer/count, remaining bytes, last-command length, running status, realtime tail, discarded-SysEx flag, notes and sustain/sostenuto state | Native headers, host playback envelopes and execution-running flag excluded; loaded output remains paused | Partial short/SysEx/realtime messages, bounds rejection, held-note replay |
+| FM | Selected index and status byte | No OPL synthesizer or host FM state exists in the selected XP fallback | Index continuation and exact status across restore |
+
+Source findings, not dynamic qualification: snapshot checkpoint currently stops
+the platform clock but does not park SB output. Therefore capture must not
+blindly copy an accepted-prefix counter as a consumed-prefix counter. Also,
+`StopDspTransfer` cancels events and clears PIC state: it must run before PIC/
+queue restoration, never after restoring those obligations. A restored PCM
+completion cannot reuse a prior host epoch. Queue identities and saved handles
+must be checked together before installing callback-bearing state.
+
+MIDI approximation here means the already tracked logical notes and pedals,
+not precise host envelopes or a newly introduced synthesizer. Program/bank,
+pitch-bend and other controllers are not currently remembered by the parser;
+the implementation review must explicitly settle their restoration before
+claiming approximate musical continuation. This audit is not such a claim.
+
+Completion predicate: every census row has owner-local capture, validation,
+restore and focused evidence; the existing byte codec passes both cross-width
+directions; full receiving qualification and actual-change review pass. Small
+owner-hook checkpoints alone do not satisfy this predicate or permit S closure.
+
+#### S15 implementation checkpoint (not a delivery)
+
+The owner-local implementation now extends the existing device maps and callback
+identities. Capture reads host progress without altering the live transfer;
+the copied consumed prefix is relative to the frozen device block. Restore
+clears old output before PIC/queue restore, removes the saved host-progress
+deadline, and opens inactive output with a new epoch. Resume uses the same
+existing service/arm path. Delayed IRQ work remains in the existing queue.
+No timer, second serializer or public-component change is added.
+
+MIDI scope is the existing parser and logical note/pedal model. Previously
+untracked program/bank/pitch/controller state is not newly promised by this
+archive; host SysEx side effects and envelopes are likewise not reconstructed.
+This is a documented approximation, not full musical-state equivalence.
+
+First owner-local Mixer/FM/MIDI runs pass 3/3 per width. The complete archive
+fixture covers a partially accepted block, a pending completion, a fully
+consumed block with pending guest completion, single/auto DMA, delayed IRQ,
+unread MPU ACK and partial MIDI. x64 passed; x86 exposed a new call-site ABI
+mistake: the 32-bit saved handle was passed through a legacy non-prototype
+declaration expecting a 64-bit q_ev_handle. A temporary probe recorded a stale
+second completion with zero block size. The explicit q_ev_handle conversion
+passes the seven focused checks on both widths; the temporary production trace
+has been removed.
+The same-issue search for snapshot-state arguments to delete_q_event and
+delete_tic_event found only this new call site.
+
+The receiving x64 build passed. Its initial focused set passed 14/16; native
+MIDI admission and machine startup for snapshot_transaction failed. A direct
+host probe independently reports one MIDI device, zero Wave devices and
+WinMM result 1 (Undefined external error). This is not evidence of a passing
+product snapshot test, nor permission to skip it. Full qualification, final
+dual publication, malformed-wire/cross-width proof and actual-change review
+remain required. No implementation P is committed at this checkpoint.
+
+The subsequent complete run built and refreshed both EXEs and ran all 168
+registered cases per width, including all ten native desktop cases. Each width
+passed 96/97 shared, 42/66 other and 3/5 desktop tests (141/168 overall).
+The direct native MIDI check still fails; the receiving failures include reset,
+startup and both package routes. Source tracing confirms native MIDI admission
+errors propagate through SbInitialize to machine reset. Do not infer that every
+failed integration assertion is independently root-caused merely from that
+shared symptom. No tests were skipped or relabelled to qualify the run.
+Raw results are retained in the packet's ignored S15 qualification evidence.
+
+The complete byte archive passes all four separate-process writer/reader width
+combinations. The fixture also rejects a corrupted EOI mask/callback relation
+before clearing current output. Additional coverage exercises every partial DSP
+data-command boundary (including both TableMunger phases), compares continuation
+with uninterrupted execution, and acknowledges the restored auto-init interrupt
+through the actual PIC to start the next PCM block. Both widths pass this
+expanded fixture. Two initial test assumptions were corrected: this fixture intentionally
+has two IRQ requests, not one, and a direct owner restore requires old output to
+be closed first. No production workaround was added for those test mistakes.
+
+The host probe remains one MIDI device, zero Wave devices, result 1 and null
+output handle. An audio-capable host session is needed to retry qualification;
+do not change public audio behavior, hide IO_ERROR as UNSUPPORTED, or weaken
+tests. The owner has been asked to restore that environment, not manually test
+the unqualified binaries. User INI SHA-256 remains
+38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D.
+
+Current uncommitted accounting against S15 admission, from git diff --numstat:
+eight production C/H paths +562/-8 (net +554), four test C paths +274/-1
+(net +273), root test registration +2/-0. The five preserved SB owner files
+account for +324/-4 (net +320); these are visible local additions against the
+unchanged selected XP subset, not excluded from its comparison. The mirror
+gate passes all 505 local bodies. No public eight-directory changes exist.
+Both local EXEs were refreshed before the final test-only coverage extension;
+production code has not changed since that dual build. Work remains uncommitted
+pending a successful required receiving qualification and actual-change review.
+
+#### S15 owner-approved test isolation
+
+Owner extends this S: real audio and desktop checks belong to integration;
+unit tests must not depend on an interactive session or audio endpoint, and
+non-audio device tests must mock audio. This supersedes the earlier no-public-
+test-change boundary, not the unchanged public-production boundary.
+
+The finite receiving set is every registered test in the two package builds.
+Real Lib MIDI and three Lib desktop cases move under test/lib/integration;
+App's real speaker lifecycle check moves under App integration. Together with
+the existing App MIDI and two package desktop cases, eight tests per width
+remain explicitly native integrations. None is removed or replaced by a mock.
+Shared registration rejects unit/native labels and ambiguous execution classes;
+six negative/positive configure fixtures test this gate.
+
+Twenty-five non-audio App machine/runtime executables link App-owned PCM and
+MIDI memory sinks at existing public APIs. Each sink is compiled once per
+architecture. The sound-delivery test retains its real PCM worker and existing
+scripted native endpoint, replacing only unrelated MIDI. Specialized audio
+failure/continuation tests keep their own fault/progress fixtures. No sink is
+linked into the product or native integrations. Win32 keyboard unit input now
+uses explicit protocol scan codes rather than querying the host keyboard map.
+These changes do not create a production audio fallback or silence host errors.
+
+The first isolated x64 run passes 160/161; the Types gate correctly rejects
+direct allocation in the new test sinks. Replacing it with existing Lib Types
+allocation fixes that violation. This failed attempt is not final qualification.
+The final isolated and native suites are reported separately; passing mocked
+tests cannot certify native playback or an unavailable desktop.
+
+Frozen CTest inventory now contains 169 entries per width: 140 unit, 13
+repository checks and 16 integration (eight native, eight non-native). The
+native subset is five desktop plus three audio. Binary import inspection of
+all 25 mocked executables on both widths finds no midiOutOpen, waveOutOpen or
+CoCreateInstance imports; the product retains its real audio imports. Native
+SDK calls in PCM/MIDI contract tests are explicitly replaced by their scripted
+fixtures; Console logical-object tests use bound memory callbacks, not native
+console attachment. Kernel threads/events and disposable filesystem fixtures
+remain allowed; absence of an interactive/audio endpoint is the isolated
+boundary, not a claim that tests use no operating-system services at all.
+
+Final isolated suites pass 97 shared plus 64 other (161/161) on each width,
+with zero skips. x64 was rebuilt and rerun after the final structural changes;
+x86's preceding completed run already used that final configuration. Native
+qualification then passes all eight integrations per width, including all ten
+desktop cases. Thus final qualification is 169/169 per width, zero skipped,
+failed or disabled cases. All four separate-process archive width routes pass
+again. No host-service mutation or native-failure suppression was introduced.
+This native run had a usable endpoint; it does not claim that disconnected
+sessions always provide one. Mocked receiving tests now do not require one.
+
+Evidence: build/t93/s15/isolation-final (x86 shared/other) and
+isolation-qualification (final x64 shared/other, both native sets and archive
+routes), each completed with result.exit=0. The first isolated Types failure
+and earlier native-host failures remain historical failures, not overwritten
+acceptance results. Final metadata/documentation gates are rerun after this
+report; no executable code changes follow qualification.
+
+Complete S15 accounting versus admission 41693590, using rename-aware Git
+numstat, excluding artifacts/manifests/documents from source totals:
+
+| Scope | Added | Deleted | Net |
+| --- | ---: | ---: | ---: |
+| Compat production C/H (3 paths) | 238 | 4 | +234 |
+| Preserved SB owner C (5 paths) | 324 | 4 | +320 |
+| Test C/H, including moves and new sinks | 391 | 8 | +383 |
+| CMake/presets/registration self-test | 97 | 21 | +76 |
+
+The isolation addition alone has zero production change, C tests +111/-7
+(net +104), and configuration/self-test +95/-21 (net +74). Five tests move
+without deleting their original coverage. Native audio/desktop is not replaced
+by an always-successful sink. Shared production remains byte-identical to the
+admitted baseline; shared test/lib and root test tooling intentionally change.
+Mirror accounting remains +324/-4 relative to the unchanged selected XP subset.
+All 505 selected local bodies pass the mirror gate. No user medium/snapshot or
+INI was edited; the original INI hash remains unchanged.
+
+Published SHA-256:
+
+- softpc32.exe: `61CD580A6458645999FCC7841A0274FA2AADA77F579634A1C9F3D3FC83BAAF38`
+- softpc64.exe: `402020D223D0335C98AE10E79D536E3320B3553FD138DE32749AC9AFFEBB9988`
+
+These tests prove serialized device continuation and the isolated/native
+boundaries exercised, not acoustic equivalence or full MIDI instrument state.
+The approved approximation and old-format incompatibility remain explicit.
+The executor delivery awaits its separate actual-change review and owner
+acceptance; T93 does not close automatically.
+
+#### S15 owner-requested qualification retry
+
+Owner: "再来". The independent native probe initially reports one Wave device
+and MIDI open/close success. Without changing production code or weakening any
+test, x64 passes 97/97 shared and 66/66 other tests; x86 shared passes 97/97.
+During that same run the host loses its Wave device again. A fresh direct probe
+reports zero Wave devices, MIDI result 1 and no handle. x86 receiving tests then
+pass only 42/66, and native desktop passes 3/5 per width. All ten desktop cases
+ran; the four failed cases are the product package routes. Overall x64 is
+166/168, x86 142/168. Both refreshed EXEs remain unqualified. All four separate-
+process archive width routes pass again. Evidence is retained separately from
+the previous failed run in the packet's ignored qualification-retry directory.
+
+The final test review adds six lines to exercise note/sostenuto and sustain
+continuation through actual capture/reset/restore, not only pause/resume.
+This changes no production code. Final test accounting becomes +280/-1, net
++279; production remains +562/-8, net +554. The focused dual-width rebuild/run
+passes after that test-only extension. The owner was asked to keep an
+audio-capable session available during qualification; no host-service mutation,
+silent capability fallback or test skip is authorized or implemented.
+Ninja repeatedly recovered a local log and rebuilt objects; that independent
+build-efficiency observation is recorded in TODO rather than repaired here.
+No complete S15 P is committed or pushed while required qualification fails.
+
+The next owner-requested continuation repeats the complete unchanged suite in
+separate qualification-retry-2 evidence. The preflight probe opens/closes MIDI
+successfully and reports one Wave device. During x64 receiving tests, independent
+probes in both normal and background execution contexts instead report zero
+Wave devices and MIDI error 1. This establishes a native-host failure at that
+time, not its cause or proof that every receiving failure has the same cause.
+Both builds finish; x64 passes 97/97 shared, 52/66 other and 3/5 desktop
+(152/168). x86 passes 96/97 shared, 42/66 other and 3/5 desktop (141/168).
+All ten native desktop cases run, with both package cases failing per width;
+all four separate-process archive routes pass. No test is skipped or weakened.
+The job finishes normally with all.exit=1. Public directories and owner INI
+remain unchanged. This attempt changes no production or test source; no complete
+implementation commit, push, or qualified delivery is claimed. A stable usable
+native audio endpoint remains necessary for the required receiving qualification.
+
+The initial production estimate needs correction: fixed-width field maps,
+owner copies and bounded MIDI/queue validation currently total approximately
+560 added lines rather than at most 450. These are the existing codec's field
+descriptors and necessary state boundaries, not new frameworks. Final line
+accounting and simplification review remain pending.
+
 Extend existing device capture/restore and fixed-width codec, not Lib archive
 APIs. Reconstruct host handles and progress origin, approximate MIDI state,
 and preserve exact emulated DMA/DSP/FM continuation. Validate all input sizes.

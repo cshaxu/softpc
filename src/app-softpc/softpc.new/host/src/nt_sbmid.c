@@ -3,6 +3,7 @@
 #include "sndblst.h"
 #include "nt_sb.h"
 #include "compat/sb_midi.h"
+#include "compat/devices/snapshot.h"
 
 /* T93: complete copied messages replace native CMDHDR/MIDIHDR ring framing.
  * Guest parsing remains here; Compat owns only the host output. No pointer
@@ -21,6 +22,91 @@ typedef struct { IU8 velocity, held, sostenuto; } MIDI_NOTE;
 static MIDI_NOTE MidiNotes[16][128];
 static IU8 MidiSustain[16], MidiSostenuto[16];
 static IBOOL MidiRunning = TRUE;
+
+/* T93: copied parser/voice state; native output is rebuilt by the SB owner. */
+void softpc_device_snapshot_capture_sb_midi(softpc_device_sb_midi_state *state)
+{
+    IU32 channel, key;
+    _Static_assert(sizeof(state->buffer) == sizeof(MidiBuffer), "MIDI archive capacity");
+    memcpy(state->buffer, MidiBuffer, sizeof(MidiBuffer));
+    state->next_data = NextData;
+    state->bytes_left = BytesLeft;
+    state->last_length = LastCommandLength;
+    state->running_status = RunningStatus;
+    state->realtime = RealtimePending;
+    state->discard_sysex = DiscardSysEx;
+    memcpy(state->sustain, MidiSustain, sizeof(MidiSustain));
+    memcpy(state->sostenuto, MidiSostenuto, sizeof(MidiSostenuto));
+    for (channel = 0; channel < 16; ++channel)
+        for (key = 0; key < 128; ++key) {
+            state->notes[channel][key][0] = MidiNotes[channel][key].velocity;
+            state->notes[channel][key][1] = MidiNotes[channel][key].held;
+            state->notes[channel][key][2] = MidiNotes[channel][key].sostenuto;
+        }
+}
+
+int softpc_device_snapshot_restore_sb_midi(const softpc_device_sb_midi_state *state)
+{
+    IU32 channel, key, i, length = 0;
+    IU8 command = state->buffer[0], running = state->running_status;
+    if (state->next_data > sizeof(MidiBuffer) || state->bytes_left > 2 ||
+        state->discard_sysex > 1 ||
+        (running && (running < 0x80 || running > 0xf0)) ||
+        (state->realtime && (state->realtime < 0xf8 ||
+            state->realtime == 0xf9 || state->realtime == 0xfd))) return FALSE;
+    if (running >= 0x80 && running < 0xf0)
+        length = (running >= 0xc0 && running < 0xe0) ? 2 : 3;
+    if (state->last_length != length) return FALSE;
+    if (running == 0xf0 || (state->next_data && command == 0xf0)) {
+        if (!state->next_data || command != 0xf0 || state->bytes_left ||
+            (running == 0xf0 && state->next_data >= sizeof(MidiBuffer)) ||
+            (running != 0xf0 && (running || state->next_data < 2 ||
+                state->buffer[state->next_data - 1] != 0xf7)) ||
+            (state->discard_sysex && (running != 0xf0 ||
+                state->next_data != sizeof(MidiBuffer) - 1))) return FALSE;
+        for (i = 1; i < state->next_data; ++i)
+            if (state->buffer[i] >= 0x80 &&
+                !(running == 0 && i == state->next_data - 1)) return FALSE;
+    } else {
+        if (state->discard_sysex) return FALSE;
+        if (state->next_data) {
+            if (command < 0x80 || command >= 0xf7 ||
+                command == 0xf4 || command == 0xf5) return FALSE;
+            length = command == 0xf6 ? 1 :
+                ((command >= 0xc0 && command < 0xe0) ||
+                command == 0xf1 || command == 0xf3) ? 2 : 3;
+            if (state->next_data + state->bytes_left != length ||
+                (command < 0xf0 ? running != command : running != 0)) return FALSE;
+            for (i = 1; i < state->next_data; ++i)
+                if (state->buffer[i] >= 0x80) return FALSE;
+        } else if (state->bytes_left) return FALSE;
+    }
+    for (channel = 0; channel < 16; ++channel) {
+        if (state->sustain[channel] > 1 || state->sostenuto[channel] > 1)
+            return FALSE;
+        for (key = 0; key < 128; ++key)
+            if (state->notes[channel][key][0] > 127 ||
+                state->notes[channel][key][1] > 1 ||
+                state->notes[channel][key][2] > 1) return FALSE;
+    }
+    memcpy(MidiBuffer, state->buffer, sizeof(MidiBuffer));
+    NextData = state->next_data;
+    BytesLeft = state->bytes_left;
+    LastCommandLength = state->last_length;
+    RunningStatus = running;
+    RealtimePending = state->realtime;
+    DiscardSysEx = state->discard_sysex;
+    memcpy(MidiSustain, state->sustain, sizeof(MidiSustain));
+    memcpy(MidiSostenuto, state->sostenuto, sizeof(MidiSostenuto));
+    for (channel = 0; channel < 16; ++channel)
+        for (key = 0; key < 128; ++key) {
+            MidiNotes[channel][key].velocity = state->notes[channel][key][0];
+            MidiNotes[channel][key].held = state->notes[channel][key][1];
+            MidiNotes[channel][key].sostenuto = state->notes[channel][key][2];
+        }
+    MidiRunning = FALSE;
+    return TRUE;
+}
 
 static void PruneMidiNotes(IU32 channel)
 {
