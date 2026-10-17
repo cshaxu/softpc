@@ -12,7 +12,8 @@ qualification are complete. Executor fa569001 is committed/pushed and its
 actual diff reviewed. Owner says "没空验收 你继续做s3吧": proceed without
 claiming user runtime acceptance. S2 delivery is recorded in
 [its handoff](../history/M9-T96-S2-rgb-migration.md). S3 audit and migration
-instructions are complete, pending delivery review. S4 is not admitted.
+instructions are complete; executor cba71230 is pushed and actual-diff reviewed.
+S3 awaits owner review; S4 is not admitted.
 
 ## M9 T96 S3 Packet
 
