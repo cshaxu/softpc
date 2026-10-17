@@ -429,7 +429,7 @@ static void check(base_sync_wait_result result, lib_u32 requested_action)
     reject_destroy = LIB_TRUE;
     lib_test_assert(emulator_machine_shutdown(active) == LIB_STATUS_IO_ERROR);
     lib_test_assert(emulator_machine_destroy(active) == LIB_STATUS_IO_ERROR);
-    lib_test_assert(active->worker == (base_sync_task *)1 && active->frame_buffers[0]);
+    lib_test_assert(active->worker == (base_sync_task *)1 && active->frames);
     lib_test_assert(base_sync_event_signal(active->command_event) == LIB_STATUS_OK);
     reject_destroy = LIB_FALSE;
     lib_test_assert(emulator_machine_shutdown(active) == LIB_STATUS_OK && !active->worker);
@@ -504,17 +504,14 @@ static void check_publication(void)
     candidate.window.text.base.cells[0].glyph_index = 'Y';
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
     lib_test_assert(emulator_machine_published_frame_sequence(active) == LIB_UINT32_MAX);
-    /* Restart invalidates ownership, not inactive payload storage. Both slots
-     * may still contain earlier frames, even when the generation is zero. */
-    for (lib_u32 slot = 0u; slot < 2u; ++slot) {
-        active->frame_buffers[slot]->window.valid = LIB_TRUE;
-        active->frame_buffers[slot]->window.image.pixels[100] = 0xa5u;
-    }
+    /* Restart invalidates publication, never the immutable input held by a
+     * consumer. The old generation must not become visible to new observers. */
+    const emulator_machine_frame *held = kvm_frame_exchange_take(active->frames);
+    lib_test_assert(held != LIB_NULL && held->sequence == LIB_UINT32_MAX);
     emulator_machine_begin_cold_run(active, LIB_FALSE);
-    for (lib_u32 slot = 0u; slot < 2u; ++slot) {
-        lib_test_assert(!active->frame_buffers[slot]->window.valid);
-        lib_test_assert(active->frame_buffers[slot]->window.image.pixels[100] == 0xa5u);
-    }
+    lib_test_assert(held->window.valid && held->sequence == LIB_UINT32_MAX);
+    kvm_frame_exchange_finish(active->frames, LIB_FALSE);
+    lib_test_assert(kvm_frame_exchange_take(active->frames) == LIB_NULL);
     lib_test_assert(!emulator_machine_copy_published_frame(active, &captured, 0u));
     lib_test_assert(!emulator_machine_copy_published_frame(active, &captured,
         emulator_machine_run_generation(active)));
@@ -528,6 +525,23 @@ static void check_publication(void)
     lib_test_assert(emulator_machine_copy_published_frame(active, &captured,
         emulator_machine_run_generation(active)));
     lib_test_assert(captured.sequence == 1u); /* Restart retains the counter; wrap skips zero. */
+    kvm_console_text_frame console = { 0 };
+    lib_u32 sequence = 0u;
+    lib_bool graphics = LIB_TRUE;
+    lib_test_assert(emulator_machine_read_presentation(active,
+        emulator_machine_run_generation(active), &sequence, &graphics, &console));
+    lib_test_assert(sequence == 1u && !graphics &&
+        console.base.cells[3999].glyph_index == 'Z');
+    lib_test_assert(!emulator_machine_read_presentation(active, 0u,
+        &sequence, &graphics, &console));
+    lib_test_assert(sequence == 1u && console.base.cells[3999].glyph_index == 'Z');
+    /* Invalid construction cannot retire a valid publication or advance serial. */
+    candidate.window.text.base.text_columns = 81u;
+    lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_UNSUPPORTED);
+    lib_test_assert(emulator_machine_read_presentation(active,
+        emulator_machine_run_generation(active), &sequence, &graphics, &console));
+    lib_test_assert(sequence == 1u && console.base.text_columns == 80u);
+    candidate.window.text.base.text_columns = 80u;
     lib_test_assert(emulator_machine_published_frame_sequence(active) == 1u);
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK); /* Unchanged text. */
     lib_test_assert(emulator_machine_published_frame_sequence(active) == 1u);

@@ -39,14 +39,12 @@ static void leaf_drain(kvm_component *component, lib_u32 kind)
 int main(void)
 {
     kvm_component component = {0};
-    lib_u8 frame = 0;
     leaf_probe probe = {0};
     lib_u32 index;
     kvm_component_options options = {.input_sink = leaf_input, .failure_sink = leaf_failure};
     kvm_component_control title = {0};
     options.failure_context = &probe;
-    lib_test_assert(kvm_component_initialize(&component, &options, leaf_stop, leaf_dispose,
-        &frame, sizeof(frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_component_initialize(&component, &options, leaf_stop, leaf_dispose) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_mailboxes_select_notify(&component.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     /* Base transports an opaque ordinary kind without interpreting it. */

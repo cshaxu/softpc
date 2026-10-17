@@ -9,13 +9,13 @@ Unit tests and fixtures live in `test/lib`, not in the production corpus.
 Copied predicate fields use byte-sized `lib_bool` (`lib_u8`) and
 `LIB_TRUE`/`LIB_FALSE`; numeric
 indices, wire bytes, native results and atomic storage keep their own types.
-Copied frames/events are in-process values, not a serialized or stable binary
+Frames/events are in-process values, not a serialized or stable binary
 ABI. Importers must rebuild all receivers together when their layouts change.
 Configure `cmake -S test/lib -B build/lib-tests`, build that directory, then
 run CTest there. The source-only CMake entry retains its manifest target;
 the external suite owns all test registration and needs no product resources.
 
-`src/lib` contains product-neutral, copied-value platform capabilities. It has
+`src/lib` contains product-neutral platform capabilities. It has
 no application state pointer, runtime queue, monitor command, lifecycle
 policy, or native SDK type in a public API. `MANIFEST.sha256` lists every source file and
 its exact corpus revision; `verify_manifest.cmake` rejects an unlisted, stale,
@@ -34,7 +34,7 @@ accessible only from that component's corresponding platform implementation,
 not from a sibling component or a forwarding root header. The sole exception
 is `types/{win32,linux}`: these shared external declarations may be included
 by matching platform implementations. Application-facing
-copied-value APIs are distinct from the leaf-support contracts:
+value and ownership APIs are distinct from the leaf-support contracts:
 `kvm-base/worker_interface.h`, `mailbox_interface.h`,
 `kvm-base/input_interface.h` serves only the KVM leaves;
 `base/input_adapter_interface.h` serves native Lib input producers;

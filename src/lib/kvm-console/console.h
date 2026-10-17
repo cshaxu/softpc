@@ -7,7 +7,6 @@
 
 struct kvm_console {
     kvm_component base;
-    kvm_console_text_frame pending_frame;
     lib_console *logical_console;
     void *worker_state;
     lib_i32 previous_mouse_x, previous_mouse_y;

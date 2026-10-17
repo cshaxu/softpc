@@ -2,6 +2,7 @@
 #define KVM_WINDOW_FRAME_INTERFACE_H
 
 #include "lib/kvm-base/frame_interface.h"
+#include "lib/kvm-base/frame_exchange_interface.h"
 
 #define KVM_WINDOW_GRAPHICS_MAX_WIDTH 1280u
 #define KVM_WINDOW_GRAPHICS_MAX_HEIGHT 768u
@@ -74,6 +75,16 @@ static inline lib_bool kvm_window_frame_copy(kvm_window_frame *destination,
     if (destination != source)
         lib_memory_copy(destination, source, kvm_window_frame_size_bytes(source));
     return LIB_TRUE;
+}
+
+/* Producer commit: validate before replacing the last complete publication. */
+static inline lib_status kvm_window_frame_commit(kvm_frame_exchange *frames)
+{
+    lib_status status;
+    if (frames == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    status = kvm_window_frame_validate(kvm_frame_exchange_writer(frames));
+    if (status == LIB_STATUS_OK) kvm_frame_exchange_publish(frames);
+    return status;
 }
 
 #endif

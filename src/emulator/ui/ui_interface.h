@@ -3,6 +3,7 @@
 
 #include "lib/console/console_interface.h"
 #include "lib/kvm-base/event_interface.h"
+#include "lib/kvm-base/frame_exchange_interface.h"
 #include "lib/kvm-window/frame_interface.h"
 #include "lib/kvm-console/frame_interface.h"
 #include "lib/kvm-base/hotkey_interface.h"
@@ -74,8 +75,11 @@ void emulator_ui_set_run_generation(emulator_ui *ui, lib_u32 run_generation);
 lib_status emulator_ui_apply_action(emulator_ui *ui, emulator_ui_action action,
     emulator_ui_state state);
 lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state state);
-lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *frame,
-    const kvm_console_character_map *characters, lib_u32 sequence,
+/* Control-thread writer; fill completely before publish. No retention across
+ * a successful publication. Window borrows frames until UI destroys it. */
+kvm_console_text_frame *emulator_ui_frame_target(emulator_ui *ui);
+lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *frames,
+    lib_bool graphics, lib_u32 sequence,
     lib_bool window_actual, lib_bool vm_console_current,
     lib_bool console_status_surface);
 lib_status emulator_ui_release_window_mouse(emulator_ui *ui);

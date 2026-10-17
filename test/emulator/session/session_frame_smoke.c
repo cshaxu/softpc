@@ -7,22 +7,32 @@ static lib_u32 delivered_sequence;
 static lib_bool delivered_graphics, delivered_status;
 static lib_u32 fake_run(const emulator_machine *machine)
 { (void)machine; return current_run; }
-static lib_bool fake_copy(emulator_machine *machine, emulator_machine_frame *frame, lib_u32 run)
+static lib_bool fake_read(emulator_machine *machine, lib_u32 run,
+    lib_u32 *sequence, lib_bool *graphics, kvm_console_text_frame *target)
 {
     (void)machine;
     ++copies;
     if (!published.window.valid || run != published_run) return LIB_FALSE;
-    *frame = published;
+    *sequence = published.sequence;
+    *graphics = published.window.graphics;
+    if (!*graphics && target != LIB_NULL) {
+        target->base = published.window.text.base;
+        target->characters = published.characters;
+    }
     return LIB_TRUE;
 }
+static kvm_frame_exchange *fake_exchange(emulator_machine *machine)
+{ (void)machine; return (kvm_frame_exchange *)&published; }
 
 /* Run the production completion consumer with publication independently ahead
  * of its queued notification. No timing guess or second reducer is involved. */
 #define emulator_machine_run_generation fake_run
-#define emulator_machine_copy_published_frame fake_copy
+#define emulator_machine_read_presentation fake_read
+#define emulator_machine_frame_exchange fake_exchange
 #include "emulator/session/session.c"
 #undef emulator_machine_run_generation
-#undef emulator_machine_copy_published_frame
+#undef emulator_machine_read_presentation
+#undef emulator_machine_frame_exchange
 
 void emulator_ui_set_run_generation(emulator_ui *ui, lib_u32 run)
 { (void)ui; lib_test_assert(run == current_run); }
@@ -38,11 +48,16 @@ lib_status emulator_ui_cancel_monitor_line(emulator_ui *ui, lib_bool *out_comple
 { (void)ui; *out_completed = LIB_FALSE; return LIB_STATUS_OK; }
 lib_status emulator_ui_release_window_mouse(emulator_ui *ui)
 { (void)ui; return LIB_STATUS_OK; }
-lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *frame,
-    const kvm_console_character_map *characters, lib_u32 sequence,
+kvm_console_text_frame *emulator_ui_frame_target(emulator_ui *ui)
+{ static kvm_console_text_frame target; (void)ui; return &target; }
+lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *frames,
+    lib_bool graphics, lib_u32 sequence,
     lib_bool window, lib_bool console, lib_bool status)
 {
     (void)ui;
+    lib_test_assert(frames == (kvm_frame_exchange *)&published);
+    const kvm_window_frame *frame = &published.window;
+    lib_test_assert(graphics == frame->graphics);
     /* An old Window can remain actual until its queued destruction completion;
      * graphics, however, must never publish before Window creation completes. */
     lib_test_assert(console && (!frame->graphics || window));
@@ -53,7 +68,6 @@ lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *fr
     }
     ++deliveries;
     delivered_sequence = sequence;
-    (void)characters;
     delivered_graphics = frame->graphics != 0u;
     delivered_status = status;
     return LIB_STATUS_OK;
@@ -109,8 +123,6 @@ int main(void)
     emulator_session_state_note_vm_console(&session.state, 1);
     emulator_session_state_note_current_console(&session.state, 1);
     lib_test_assert(emulator_session_state_note_frame(&session.state, 1u, 0));
-    session.frame.window.valid = LIB_TRUE;
-    session.frame.sequence = 1u;
 
     published.window.valid = LIB_TRUE;
     published.sequence = 3u;
@@ -138,16 +150,16 @@ int main(void)
     event.kind = EMULATOR_SESSION_EVENT_FRAME_COMPLETED;
     event.value.frame.sequence = 3u;
     lib_test_assert(emulator_session_process_completed(&session, &event));
-    lib_test_assert(copies == 1u); /* Duplicate notification does not copy again. */
+    lib_test_assert(delivered_sequence == 3u); /* Reobserving never regresses content. */
     event.value.frame.sequence = 4u;
     published.window.valid = LIB_FALSE;
     lib_test_assert(emulator_session_process_completed(&session, &event));
-    lib_test_assert(session.frame.window.valid && session.frame.sequence == 3u &&
+    lib_test_assert(session.state.observed_frame_sequence == 3u &&
         session.state.graphics_actual);
     published.window.valid = LIB_TRUE;
     published_run = 8u; /* Reset advanced between notification and snapshot. */
     lib_test_assert(emulator_session_process_completed(&session, &event));
-    lib_test_assert(session.frame.sequence == 3u && session.state.observed_frame_sequence == 3u);
+    lib_test_assert(session.state.observed_frame_sequence == 3u);
     current_run = 8u;
     { lib_u32 prior = copies;
       lib_test_assert(emulator_session_process_completed(&session, &event));
@@ -180,29 +192,29 @@ int main(void)
         lib_test_assert(emulator_session_state_note_frame(&state, 0x80000000u, 0));
     }
     session.state.observed_frame_sequence = LIB_UINT32_MAX - 1u;
-    session.frame.sequence = LIB_UINT32_MAX - 1u;
     published.sequence = 1u;
     event.kind = EMULATOR_SESSION_EVENT_FRAME_COMPLETED;
     event.value.frame.sequence = LIB_UINT32_MAX;
     lib_u32 before = copies;
     lib_test_assert(emulator_session_process_completed(&session, &event));
-    lib_test_assert(copies == before + 1u && session.frame.sequence == 1u);
+    lib_test_assert(copies == before + 1u && session.state.observed_frame_sequence == 1u);
     lib_test_assert(session.state.observed_frame_sequence == 1u && delivered_sequence == 1u);
     const lib_u32 stale[] = { LIB_UINT32_MAX - 1u, LIB_UINT32_MAX, 0u, 1u };
     for (lib_u32 i = 0u; i < sizeof(stale) / sizeof(stale[0]); ++i) {
         event.value.frame.sequence = stale[i];
         lib_test_assert(emulator_session_process_completed(&session, &event));
-        lib_test_assert(copies == before + 1u && session.frame.sequence == 1u);
+        lib_test_assert(copies == before + 2u + i && session.state.observed_frame_sequence == 1u);
     }
+    before = copies;
     current_run = published_run = 8u;
     published.sequence = 2u;
     event.value.frame.sequence = 2u;
     lib_test_assert(emulator_session_process_completed(&session, &event));
-    lib_test_assert(copies == before + 1u); /* Old run cannot cross the wrap boundary. */
+    lib_test_assert(copies == before); /* Old run cannot cross the wrap boundary. */
     emulator_session_state_note_runtime(&session.state, EMULATOR_SESSION_MACHINE_STOPPED);
     emulator_session_state_note_runtime(&session.state, EMULATOR_SESSION_MACHINE_RUNNING);
     event.run_generation = current_run;
     lib_test_assert(emulator_session_process_completed(&session, &event));
-    lib_test_assert(copies == before + 2u && session.state.observed_frame_sequence == 2u);
+    lib_test_assert(copies == before + 1u && session.state.observed_frame_sequence == 2u);
     return 0;
 }

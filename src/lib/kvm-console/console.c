@@ -79,8 +79,7 @@ lib_status kvm_console_create(kvm_console **out_console,
     console = lib_allocate_zero(1u, sizeof(*console));
     if (console == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     status = kvm_component_initialize(&console->base, options,
-        kvm_console_component_stop, kvm_console_component_dispose,
-        &console->pending_frame, sizeof(console->pending_frame));
+        kvm_console_component_stop, kvm_console_component_dispose);
     if (status == LIB_STATUS_OK)
         status = kvm_component_mailboxes_select_notify(&console->base.mailboxes,
             LIB_NULL, LIB_NULL);
@@ -96,13 +95,10 @@ lib_status kvm_console_create(kvm_console **out_console,
     return LIB_STATUS_OK;
 }
 
-lib_status kvm_console_publish_frame(kvm_console *console, const kvm_console_text_frame *frame)
+lib_status kvm_console_publish_frame(kvm_console *console, kvm_frame_exchange *frames)
 {
-    lib_status status;
-    if (console == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    status = kvm_console_text_frame_validate(frame);
-    if (status != LIB_STATUS_OK) return status;
-    return kvm_component_publish_frame(&console->base, frame, sizeof(*frame));
+    if (console == LIB_NULL || frames == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    return kvm_component_publish_frame(&console->base, frames);
 }
 
 lib_status kvm_console_destroy(kvm_console *console)

@@ -639,3 +639,75 @@ snapshots and copied values, while rules/EXECUTION.md allows rules edits only
 under an admitted Td. Owner approval establishes the new technical direction,
 and the owner subsequently approves M9 Td S21 to reconcile the rule text.
 Production migration has not begun; the governance change is not runtime proof.
+
+### S5 implemented ownership and verification ledger
+
+Implementation baseline is 4fcaa573 (the admitted Td prerequisite). One public
+KVM Base exchange owns three or four allocated slots and a short pointer lock.
+It knows neither frame contents nor Emulator. A producer writes exclusively
+outside the lock, validates before committing, and always receives reusable
+storage. There is no per-frame allocation, reference counter or second queue.
+
+Machine owns the four-slot exchange. Its aggregate begins with the Window leaf
+frame (compile-time offset assertion); publication serial and Console maps are
+opaque to Window. UI binds that same exchange, rather than copying its payload
+into another mailbox. Window retains processing/displayed pointers until finish
+or quiesced destruction. UI owns the three-slot Console exchange, converts text
+directly into its writer and releases processing after logical Console output.
+The existing RGB surface, renderer, cursor overlay and native output remain.
+Lock order is Machine publication metadata -> exchange for observation/commit,
+and leaf admission -> exchange for take/finish. Controls retain their independent
+FIFO lock. There is no reverse exchange -> Machine/leaf acquisition. Construction,
+validation and native rendering run outside those pointer-exchange locks; bounded
+text conversion/diagnostic observation is serialized but does not wait for rendering.
+
+Session no longer retains historical payload through asynchronous creation.
+It observes the latest publication on each reconciliation, including completion
+events. Run, route and serial come from one locked observation; invalid/no-frame
+observations cannot publish uninitialized content. This is the explicitly
+approved latest-wins retention change, not a claim of identical internal timing.
+Diagnostic copied snapshots remain separate, bounded observers. Machine is
+destroyed only after UI/Window; failed UI destruction retains their dependencies.
+
+| Obligation | Implementation and focused proof |
+| --- | --- |
+| Bounded producer progress | frame_exchange unit: both slot counts, 10,000 overwritten publications with two reusable writer addresses; real second producer thread publishes 100,000 times while held processing/displayed data remain unchanged. |
+| Allocation and retirement | Same unit injects every object/frame allocation failure, proves zero live allocations, unsuperseded failure retry, newer-pending preservation, detach/recreation and invalidation while held. |
+| Admission and notification | Existing mailbox/control/input tests preserve STOP, terminal failure and independent control locks; leaf fixture helpers only prepare writer data before real typed commit/notification. |
+| Rendering and invalid values | Window damage/copy tests preserve RGB padding, rejected writes without notification, text geometry, mode changes and dirty/cursor checks. Native capture contract still invokes production message/consumer code with host calls mocked. |
+| Machine and Session | machine_wait proves no-frame/text suppression, serial wrap, immutable held old run, coherent Console conversion and invalid-publication preservation; session_frame proves delayed notices, route reconciliation and recreation. |
+| UI and lifecycle | composition retains publication-cache failure, creation, binding, destruction-failure and callback lifetime coverage. Retirement, snapshot and real restart integrations remain required. |
+| Dependencies | Public frame_exchange is explicitly admitted by Emulator's header gate; private worker/mailbox support remains forbidden with negative tests. No new outward edge, platform code or Types definition. |
+
+Code accounting includes C/H, CMake and verification scripts, excluding README,
+manifests, other documentation and EXEs. Relative to 4fcaa573: Lib production
+17 files +263/-111 (net +152), Emulator production seven +122/-85 (net +37).
+Tests: Lib 18 files +428/-210 (net +218), Emulator five +119/-57 (net +62),
+App one +6/-3 (net +3). Total production +385/-196 (net +189); tests +553/-270
+(net +283). No X86, original mirror, Compat, driver, INI or media changes.
+
+Same-format large storage is four Machine aggregates rather than three Machine
+and two Window payloads: 15,732,816 versus 19,663,964 bytes, saving 3,931,148
+bytes before small Console slots and exchange bookkeeping. This is layout
+accounting, not a throughput benchmark. The three large transport copies are
+removed; text-to-Console format conversion and explicit diagnostic copies remain.
+
+Evidence lives under build/t96/s5. Hidden owned jobs use completion markers and
+retained stdout/stderr/XML; a five-minute no-progress interval triggers inspection,
+not automatic termination. Executor owns cleanup. Initial compile failures were
+unmigrated test interfaces; the first focused failure was a UI test union reused
+across mode changes without reinitialization. Both were corrected without dropping
+assertions. An intermediate full run also identified the stale public-header
+allowlist and manifests while final changes were being reconciled. Those failed
+attempts remain evidence, not qualification. CURRENT will identify the final
+complete dual-width results and delivery; no user acceptance is inferred here.
+
+
+Final qualification: x86 and x64 each pass 194/194 with no skips: 178 unit/gates,
+eight background integrations, five desktop and three native audio integrations.
+CURRENT identifies the exact final XML sets. The first final-x64 native run
+failed three audio opens and two package cases while the user was disconnected;
+all eight passed unchanged after reconnect (native-reconnected-x64 exit 0).
+Failed attempts remain evidence. No audio workaround, assertion weakening or
+skipped qualification was introduced. Both EXEs are rebuilt and deployed.
+Owner acceptance remains pending.

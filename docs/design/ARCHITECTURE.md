@@ -72,7 +72,7 @@ sequence, driver, frame/input conversion and debugger request preflight.
 Its implementation calls Compat and the original machine while its
 public interface exposes only copied options and Emulator/Lib contracts.
 Compat never calls app or Emulator. `emulator/machine` owns the
-single generic executor, request/input queues, run generation and copied-frame
+single generic executor, request/input queues, run generation and bounded-frame
 publication; its injected VM driver calls the SoftPC machine boundary.
 
 The GFI host adapter distinguishes the physical drive from its inserted image.
@@ -190,14 +190,12 @@ only those snapshots.
 
 ### Approved frame-transport migration
 
-T96 S5 replaces the copied-frame implementation described below with bounded
-ownership circulation: Window has producing/pending/processing/displayed roles;
+T96 S5 uses bounded ownership circulation: Window has producing/pending/processing/displayed roles;
 Console has producing/pending/processing roles. Session/UI route without an
 additional historical payload owner. Unconsumed replacement and completed
 retirement return storage for reuse; controls/input remain copied values.
-Existing native surface remains separate. The updated architecture rule permits
-this migration, but it is not a claim that the runtime has already changed.
-S5 must update the implementation descriptions below with its verified delivery.
+Existing native surface remains separate. The source change is under qualification;
+runtime delivery and acceptance are recorded in CURRENT, not inferred here.
 
 ### Current implementation
 
@@ -322,8 +320,9 @@ its title/freeze/release encoding and worker validation. Console has no ordinary
 control commands and rejects unknown records. Native leaf APIs remain typed;
 there is no application-facing raw control mailbox.
 
-Shared frame mailboxes copy opaque values into fixed leaf-owned storage.
-Base replaces opaque latest bytes, with no frame update callback. Window derives
+Machine owns a four-slot opaque exchange shared with Window through UI; Session
+holds no payload. UI owns a three-slot Console exchange. Base moves pointers,
+with no frame update callback or per-publication allocation/copy. Window derives
 damage on consumption by comparing resolved colours with its existing RGB
 surface; it updates changed pixels and invalidates their enclosing rectangle.
 Machine publishers resolve graphics into numeric 0x00RRGGBB words before crossing
@@ -339,12 +338,14 @@ from explicit independent values. Logical Console also carries separate colour
 indices; only its native broker packs them for the host API. This changes no
 mailbox, readiness, graphics or lifecycle policy.
 Emulator machine publishes complete snapshots on driver display change (including
-palette/geometry), preserving no-frame readiness and text comparison. Upstream
-latest-wins is independent of leaf transport: an older notice may select the
-latest complete frame without losing damage. VM alone supplies SoftPC character
+palette/geometry), preserving no-frame readiness and text comparison. Machine
+and Window use the same pending authority: an older notice may select the latest
+complete frame without losing damage. VM alone supplies SoftPC character
 meaning; original producer dirty does not cross the KVM frame ABI.
-Capture does not consume; a successful-output
-acknowledgement clears only that still-current publication. The broker reports logical
+Take pins processing while releasing the pending slot. Successful output retires
+the previous displayed input and promotes processing (Window), or releases
+processing (Console). Failure requeues only an unsuperseded input; it never
+replaces newer pending content. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means
 no output, and NOT_CURRENT retains pending content without a retry loop.
@@ -403,7 +404,7 @@ failure independently of wake success. Worker quiescence precedes retirement,
 not fault notification. STOP/fault closes both frame and control admission
 atomically without bypassing FIFO control consumption up to STOP. Frame and
 control have independent locks; only terminal admission takes both, frame first.
-Ordinary control does not wait for frame copying.
+Ordinary control does not wait for rendering or frame observation.
 
 Logical Console metadata/event/output gates, KVM frame/control and broker
 output/transaction locks use Base blocking mutexes. Each consumer owns its lock

@@ -40,14 +40,15 @@ static lib_bool take_event(emulator_session_queue *queue, emulator_session_event
     return emulator_session_queue_take(queue, event, timeout_ms);
 }
 static lib_u32 run(const emulator_machine *m) { (void)m; return 1; }
-static lib_bool copy_frame(emulator_machine *m, emulator_machine_frame *f, lib_u32 g)
-{ (void)m; (void)f; (void)g; return LIB_FALSE; }
+static lib_bool read_frame(emulator_machine *m, lib_u32 g, lib_u32 *s,
+    lib_bool *graphics, kvm_console_text_frame *f)
+{ (void)m; (void)f; (void)g; (void)s; (void)graphics; return LIB_FALSE; }
 static lib_u32 lifecycle_calls[EMULATOR_SESSION_REQUEST_RESET + 1u];
 static emulator_session_request opened_request;
 static lib_bool machine_request(emulator_machine *m, emulator_session_request request)
 { (void)m; ++commands; ++lifecycle_calls[request]; return LIB_TRUE; }
 #define emulator_machine_run_generation run
-#define emulator_machine_copy_published_frame copy_frame
+#define emulator_machine_read_presentation read_frame
 #define emulator_machine_start(machine) machine_request(machine, EMULATOR_SESSION_REQUEST_START)
 #define emulator_machine_resume(machine) machine_request(machine, EMULATOR_SESSION_REQUEST_RESUME)
 #define emulator_machine_pause(machine) machine_request(machine, EMULATOR_SESSION_REQUEST_PAUSE)
@@ -99,10 +100,12 @@ lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state s)
 { (void)ui; (void)s; return LIB_STATUS_OK; }
 lib_status emulator_ui_release_window_mouse(emulator_ui *ui)
 { (void)ui; return LIB_STATUS_OK; }
-lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *f,
-    const kvm_console_character_map *characters, lib_u32 sequence,
+kvm_console_text_frame *emulator_ui_frame_target(emulator_ui *ui)
+{ (void)ui; return LIB_NULL; }
+lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *f,
+    lib_bool graphics, lib_u32 sequence,
     lib_bool w, lib_bool c, lib_bool status)
-{ (void)characters; (void)sequence; (void)ui; (void)f; (void)w; (void)c; (void)status; return LIB_STATUS_OK; }
+{ (void)graphics; (void)sequence; (void)ui; (void)f; (void)w; (void)c; (void)status; return LIB_STATUS_OK; }
 static void opened(void *p, emulator_session_command_result *out)
 {
     (void)p;

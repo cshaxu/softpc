@@ -124,8 +124,16 @@ lib_status emulator_machine_write_state(emulator_machine *machine,
 emulator_machine_state emulator_machine_state_get(const emulator_machine *machine);
 lib_bool emulator_machine_enqueue_input(emulator_machine *machine,
     const kvm_input_event *event);
-/* Copy one complete frame only from the requested run. On rejection the
- * destination is unchanged; content, sequence and route are one snapshot. */
+/* Borrow the sole Window exchange. Only the executor writes it; one Window
+ * consumes it. Destroy the consumer before destroying Machine. */
+kvm_frame_exchange *emulator_machine_frame_exchange(emulator_machine *machine);
+/* Observe one coherent publication. Optional Console destination is the
+ * caller's writable slot, not a retained transport copy. */
+lib_bool emulator_machine_read_presentation(emulator_machine *machine,
+    lib_u32 run_generation, lib_u32 *sequence, lib_bool *graphics,
+    kvm_console_text_frame *console);
+/* Explicit diagnostic copy, not presentation transport. Rejection leaves the
+ * destination unchanged; content, sequence and route are one snapshot. */
 lib_bool emulator_machine_copy_published_frame(emulator_machine *machine,
     emulator_machine_frame *destination, lib_u32 run_generation);
 lib_u32 emulator_machine_published_frame_sequence(const emulator_machine *machine);

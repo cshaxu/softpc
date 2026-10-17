@@ -3,15 +3,19 @@
 
 #include "lib/kvm-window/frame_interface.h"
 #include "lib/kvm-console/frame_interface.h"
+#include "lib/kvm-base/frame_exchange_interface.h"
 
 /* One upstream publication: the Window representation plus text-only Console
  * resources. Graphics do not copy or interpret characters. Sequence belongs to
  * this publication, independently of each leaf mailbox's acknowledgement. */
 typedef struct emulator_machine_frame {
-    lib_u32 sequence;
     kvm_window_frame window;
+    lib_u32 sequence;
     kvm_console_character_map characters;
 } emulator_machine_frame;
+
+_Static_assert(lib_offsetof(emulator_machine_frame, window) == 0u,
+    "Window consumes the leaf-owned representation at the start of each slot");
 
 static inline lib_bool emulator_machine_frame_copy(emulator_machine_frame *destination,
     const emulator_machine_frame *source)

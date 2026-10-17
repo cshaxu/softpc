@@ -57,6 +57,7 @@ set_property(TEST lib.integration/native_midi_output APPEND PROPERTY LABELS nati
 set_property(TEST lib.integration/native_midi_output PROPERTY RESOURCE_LOCK native_midi)
 shared_register_test(lib kvm-base/kvm_component_contract kvm-base)
 shared_register_test(lib kvm-base/kvm_mailbox_selection kvm-base)
+shared_register_test(lib kvm-base/frame_exchange kvm-base)
 shared_register_test(lib kvm-base/text_cursor kvm-base)
 shared_register_test(lib kvm-base/control_capacity kvm-base)
 shared_register_test(lib kvm-window/kvm_frame_copy kvm-window)

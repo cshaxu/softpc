@@ -11,9 +11,12 @@ makes product decisions.
 `kvm_window_frame` contains either common text fields with two bitmap-font banks,
 or Window-owned complete RGB graphics (`lib_u32` numeric `0x00RRGGBB`, no alpha).
 Graphics stride counts pixels; visible high bytes must be zero and invalid
-colour/geometry is rejected before replacing the mailbox. Row padding is copied
-but never drawn. Source palettes are resolved by the publisher. It contains no
-Console character map. Copies include only the active text or graphics extent.
+colour/geometry is rejected by frame_commit before replacing pending output.
+Row padding is never drawn. Source palettes are resolved by the publisher.
+The leaf frame contains no Console character map. The producer supplies a
+four-slot exchange, writes its current writer, commits, then notifies Window.
+Window borrows the same exchange until destruction; it never copies that payload.
+The explicit diagnostic copy helper copies only the active frame extent.
 Window compares resolved colours with its existing RGB surface on consumption,
 updates changed pixels and invalidates their enclosing rectangle. Skipped frames
 need no damage history. Both text and graphics decode colours directly into the
@@ -22,7 +25,9 @@ and recreated surfaces require full invalidation; same-size mode transitions
 compare actual pixels. Cursor position/shape/visibility changes invalidate the
 old/new overlay rectangles separately. Text retains its own colour palette.
 Native invalidation accumulates until paint; exposure redraws the surface.
-Successful acknowledgement is generation-bound. No extra previous-frame cache.
+Successful finish retains the displayed input for cursor/paint metadata until
+its replacement succeeds. Failure leaves that input retained. There is no
+separate previous-frame cache; the existing RGB surface remains Window-owned.
 
 Win32 mailbox notifications use SendNotifyMessage to the owned Window, not an
 Event-to-message bridge. Notifications coalesce; requests stay in the private

@@ -15,6 +15,7 @@ struct emulator_ui {
     console_broker *broker;
     kvm_window *window;
     kvm_console *console;
+    kvm_frame_exchange *console_frames;
     emulator_ui_options options;
     lib_atomic_u32 run_generation;
     lib_atomic_i32 window_live;
@@ -165,7 +166,9 @@ lib_status emulator_ui_create(emulator_ui **out_ui, const emulator_ui_options *o
     ui->console_input.ui = ui;
     ui->console_input.vm_console = LIB_TRUE;
     ui->options = *options;
-    status = lib_console_create(&ui->monitor);
+    status = kvm_frame_exchange_create(&ui->console_frames,
+        sizeof(kvm_console_text_frame), LIB_FALSE);
+    if (status == LIB_STATUS_OK) status = lib_console_create(&ui->monitor);
     if (status == LIB_STATUS_OK)
         status = lib_console_set_event_sink(ui->monitor, emulator_ui_monitor_receive, ui);
     if (status == LIB_STATUS_OK)
@@ -176,6 +179,7 @@ lib_status emulator_ui_create(emulator_ui **out_ui, const emulator_ui_options *o
             (void)lib_console_set_event_sink(ui->monitor, LIB_NULL, LIB_NULL);
             lib_console_release(ui->monitor);
         }
+        kvm_frame_exchange_destroy(ui->console_frames);
         lib_release(ui);
         return status;
     }
@@ -209,6 +213,7 @@ lib_status emulator_ui_destroy(emulator_ui *ui)
         (void)lib_console_set_event_sink(ui->monitor, LIB_NULL, LIB_NULL);
         lib_console_release(ui->monitor);
     }
+    kvm_frame_exchange_destroy(ui->console_frames);
     lib_release(ui);
     return LIB_STATUS_OK;
 }
@@ -304,35 +309,38 @@ static void emulator_ui_status_frame(kvm_console_text_frame *frame,
     }
 }
 
-lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *frame,
-    const kvm_console_character_map *characters, lib_u32 sequence,
+kvm_console_text_frame *emulator_ui_frame_target(emulator_ui *ui)
+{ return ui == LIB_NULL ? LIB_NULL : kvm_frame_exchange_writer(ui->console_frames); }
+
+lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *frames,
+    lib_bool graphics, lib_u32 sequence,
     lib_bool window_actual, lib_bool vm_console_current,
     lib_bool console_status_surface)
 {
-    kvm_console_text_frame console_frame;
+    kvm_console_text_frame *console_frame;
     lib_status status;
     lib_bool show_status;
-    if (ui == LIB_NULL || frame == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    show_status = frame->graphics != 0u && console_status_surface;
+    if (ui == LIB_NULL || frames == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    console_frame = emulator_ui_frame_target(ui);
+    show_status = graphics && console_status_surface;
     if (vm_console_current && ui->console != LIB_NULL &&
         (show_status != ui->console_status_delivered ||
          (!show_status && ui->console_delivered_frame_sequence != sequence))) {
         if (show_status) {
-            emulator_ui_status_frame(&console_frame, ui->options.graphics_console_status_text);
+            emulator_ui_status_frame(console_frame, ui->options.graphics_console_status_text);
         } else {
-            if (frame->graphics != 0u) return LIB_STATUS_UNSUPPORTED;
-            if (characters == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-            console_frame.base = frame->text.base;
-            console_frame.characters = *characters;
+            if (graphics) return LIB_STATUS_UNSUPPORTED;
         }
-        status = kvm_console_publish_frame(ui->console, &console_frame);
+        status = kvm_console_frame_commit(ui->console_frames);
+        if (status != LIB_STATUS_OK) return status;
+        status = kvm_console_publish_frame(ui->console, ui->console_frames);
         if (status != LIB_STATUS_OK) return status;
         ui->console_delivered_frame_sequence = sequence;
         ui->console_status_delivered = show_status;
     }
     if (window_actual && ui->window != LIB_NULL &&
         ui->window_delivered_frame_sequence != sequence) {
-        status = kvm_window_publish_frame(ui->window, frame);
+        status = kvm_window_publish_frame(ui->window, frames);
         if (status != LIB_STATUS_OK) return status;
         ui->window_delivered_frame_sequence = sequence;
     }

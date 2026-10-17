@@ -3,8 +3,11 @@
 `kvm-console` depends on `types`, `base`, `console`, and `kvm-base` only. It owns one raw Console lifecycle,
 creates its logical Console object, and publishes copied text frames through
 that object. It never opens, registers, or renders native Console I/O.
-Publication takes a `kvm_console_text_frame`: common text fields plus two copied
-256-entry BMP character maps. It has no graphics or bitmap-font storage.
+A producer writes a `kvm_console_text_frame` into a three-slot exchange:
+common text fields plus two 256-entry BMP character maps. It commits validated
+text, then notifies Console with the same borrowed exchange. The worker owns
+the taken pointer until output completes, then releases it for reuse.
+It has no graphics or bitmap-font storage.
 The caller supplies character meaning; this component has no built-in encoding.
 Each cell's explicit glyph bank selects its character map independently of colour.
 Foreground/background indices pass unchanged to the logical Console boundary.
@@ -12,7 +15,8 @@ DISABLED hides the native cursor. HOST and SOURCE both enable the native cursor:
 Console owns its blinking, and source phase is deliberately ignored. This is a
 presentation limitation, not a claim of precise source-phase reproduction.
 Malformed text returns INVALID_ARGUMENT before changing pending output or
-notifying the worker. Valid text after STOP returns INVALID_STATE.
+notifying the worker. Notification after STOP returns INVALID_STATE; the producer's exchange remains
+independent and must outlive Console destruction.
 The public component contract is cross-platform. This corpus currently has a
 supported Win32 implementation only; the Linux leaf is an intentional
 `LIB_STATUS_UNSUPPORTED` placeholder, not a claimed Linux presenter.

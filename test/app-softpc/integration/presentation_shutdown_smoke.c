@@ -93,11 +93,14 @@ lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state state)
     return LIB_STATUS_OK;
 }
 
-lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *frame,
-    const kvm_console_character_map *characters, lib_u32 sequence,
+kvm_console_text_frame *emulator_ui_frame_target(emulator_ui *ui)
+{ (void)ui; assert(0); return LIB_NULL; }
+
+lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *frame,
+    lib_bool graphics, lib_u32 sequence,
     lib_bool window, lib_bool console, lib_bool status)
 {
-    (void)ui; (void)frame; (void)characters; (void)sequence;
+    (void)ui; (void)frame; (void)graphics; (void)sequence;
     (void)window; (void)console; (void)status;
     assert(0);
     return LIB_STATUS_IO_ERROR;

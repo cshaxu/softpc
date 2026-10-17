@@ -136,7 +136,7 @@ unsupported; no register, memory, port, plan or watch operation is a placeholder
 
 ## Window And Input
 
-The optional Win32 window displays copied text or graphical frames published
+The optional Win32 window displays immutable text or graphical frames published
 by the runtime. It sends normalized keyboard and mouse records to the runtime
 queue. It never decodes guest VRAM, locks a SoftPC device, waits for the
 executor, or executes a guest instruction on the KVM worker thread.
@@ -163,13 +163,13 @@ state as its sole input source.
 It retains the desired default bounds when they fit. If either dimension would
 exceed the work area, it proportionally scales both dimensions down and centers
 the resulting Window in that work area. The same work-area limit applies when
-the first copied frame requests its natural client size. This is host-window
-geometry only: it does not alter copied frame dimensions or guest rendering.
-The Window client area always remains at the current copied-frame aspect ratio:
+the first complete frame requests its natural client size. This is host-window
+geometry only: it does not alter published frame dimensions or guest rendering.
+The Window client area always remains at the current published-frame aspect ratio:
 manual resize, system resize, and maximize use the largest fitting
 ratio-preserving bounds. The copied image fills that client area with uniform
 scaling and has no black bars. Title-bar double-click restores the natural
-copied-frame client size (or its largest work-area fit); maximize selects the
+published-frame client size (or its largest work-area fit); maximize selects the
 largest ratio-preserving Window in that work area rather than the native
 full-work-area rectangle.
 

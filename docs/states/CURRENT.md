@@ -16,7 +16,12 @@ instructions are complete; executor cba71230 is pushed and actual-diff reviewed.
 Owner acknowledges S3 and admits S4: "哦这样啊 那准入s4 你告诉我如何干净的".
 Owner approves S4 closure and explicitly keeps T96 open.
 Owner now admits S5: "非常好，我希望就按照现有架构+这个方案来做！请你开工".
-S5 is active: replace frame copies with bounded pointer ownership circulation.
+S5 implementation replaces frame copies with bounded pointer ownership circulation.
+Final qualification is complete: x86 and x64 each pass 194/194, no skips.
+The x64 native set passed unchanged after the owner reconnected the desktop.
+Earlier disconnected-session failures remain recorded below. S5 is ready for
+executor delivery and committed-diff coordinator review; owner acceptance and
+S/T closure are not claimed.
 S4 remains closed; see the
 [S4 closure](../history/M9-T96-S4-frame-lifetime-audit.md). S3's
 [documentation delivery](../history/M9-T96-S3-rgb-corpus-audit.md) is complete
@@ -31,7 +36,7 @@ acceptance remains unclaimed.
 | Admission And Approval | Owner approves existing architecture plus four-slot Window and three-slot Console pointer circulation, retaining native surface. |
 | Objective | Remove whole-frame transport copies and steady-state allocation churn without making Machine wait for rendering or cancel frame generation. |
 | Non-goals | No mirror/Compat, guest timing, media, INI, surface replacement, generic resource framework or second transport path. |
-| Reference Baseline | 9cf0ab43; existing S2 runtime and dual-width qualification. |
+| Reference Baseline | 4fcaa573 after approved Td S21; existing S2 runtime and dual-width qualification. |
 | Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
 | Files And ABI Surface | Lib KVM frame/mailbox/leaf APIs and tests, Emulator Machine/Session/UI and tests, App driver and affected integration callers; manifests and architecture documentation. |
 | Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no further rules edits in S5. |
@@ -46,6 +51,29 @@ acceptance remains unclaimed.
 
 ## Current Technical Baseline
 
+- S5 implementation accounting: production +385/-196, net +189; tests/build
+  checks +553/-270, net +283. Full path ledger is in the active proposal.
+  One four-slot Window exchange and three-slot Console exchange replace copied
+  transport; native surface, original mirror, Compat and App production remain.
+- Final x86 evidence: build/t96/s5/full1/unit-x86.xml (178/178),
+  integration-x86.xml (8/8), native-x86-0..7.xml (8/8), no skips.
+- Final x64 evidence: build/t96/s5/final-x64/unit.xml (178/178),
+  integration.xml (8/8), and native-reconnected-x64/native-0..7.xml (8/8).
+  Reconnected native qualification.exit is 0; session query reports Active.
+- Earlier full1 exit 1 retains intermediate stale gate/manifest failures;
+  final-x64 exit 1 retains three native audio and two package failures while
+  the user session was disconnected. The unchanged connected rerun passes
+  all eight; no production workaround, assertion weakening, skips or timeout
+  termination was used. This supports an environmental dependency, not proof
+  of every earlier failure's internal cause.
+- Current deployed EXEs: softpc32 SHA-256
+  1905A15F29C309B416922E99FD4A0C928EC1CCB70E8D0DE0FD30CA5F043F44CA;
+  softpc64 461EAF8CAFA353106BFDDF5EBE592C51871C8F3C213A0E67DD4101F289787AD6.
+  Both rebuilt artifacts have completed final qualification.
+  User INI/media and untracked assets/binary/snapshot.debug remain untouched.
+
+### Prior T96 qualified checkpoints
+
 - S3 audits the unchanged S2 corpus at 94a0debd: no residual indexed graphics
   route found in the bounded path; all 288 manifest entries match. Exact eight
   Git tree identities and atomic-import checklist are in the
@@ -59,7 +87,7 @@ acceptance remains unclaimed.
   Evidence: build/t96/s2/retry1 (focused, x86 units, all integrations) and
   build/t96/s2/recheck (final x64 177/177 and documentation gate). Earlier
   failed test-fixture attempts remain recorded, not counted as passes.
-- Current EXE SHA-256: softpc32
+- S2 archived EXE SHA-256: softpc32
   D6E24F0FD1E414A2C8AD4C6A36C0BBAF4911E196FE3BD5C43376E631F6699DFB;
   softpc64 BDADAE74E8FA0B766F6392837FD02A44C9B8168895468211EA37A78B53CFCE95.
   Existing original-mirror compiler warnings, three unchanged VGA-test pointer
