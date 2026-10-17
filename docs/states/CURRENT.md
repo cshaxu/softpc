@@ -82,8 +82,9 @@ source-owner layouts. Four flat fixtures preserve their original bytes and
 diagnostics. Production +0/-0; test C/H +276/-65, net +211. Both product builds
 are verified, with x64 cached and x86 rebuilt after existing Ninja-log recovery.
 Sound passes 20 consecutive executions per width, followed by 12 final manifest/
-boundary gates per width. Executor push and actual-change review remain the
-delivery steps; S15 remains open for owner acceptance.
+boundary gates per width. Executor ac98a7b6 is committed and pushed; separate
+actual-change review passes against efc232e4 and the owner requests. See the
+proposal's flat-fixture review. S15 remains open for owner acceptance.
 
 ## M9 T93 S15 Packet
 

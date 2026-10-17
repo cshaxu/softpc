@@ -3529,6 +3529,33 @@ the final README/manifest change passes all 12 manifest/ownership/type gates
 per architecture. Evidence: platform-final log, final-gates XML and final.exit
 zero. No retries inside the test or relaxed assertions conceal a failed run.
 
+#### S15 flat-fixture actual-change review
+
+Coordinator role reviewed actual executor ac98a7b6 against efc232e4, the owner's
+fixture/platform request and the existing S15 unit-isolation scope. The 32
+changed paths are tests/configuration/manifest/documentation and the rebuilt
+x86 artifact; the entire production tree and protected INI/media/snapshot diff
+are empty. Four fixture moves retain exact blobs; disposable corpus layouts
+still trigger the intended four diagnostics. No negative test was weakened
+to accept an unrelated failure.
+
+The one-line registration change removes global basename uniqueness without
+adding a second registration path. All three explicit target_sources receivers
+match the new names. Platform tests remain within their own source owners and
+use only inward dependencies. Equal filenames do not conceal capability
+differences: the coverage ledger names unsupported Linux leaves explicitly.
+New adapter probes execute the real selected leaf with controlled native calls;
+no native desktop/audio dependency was added to unit tests.
+
+Review also checked the sound fix: a fixed sample prefix replaces batch-size
+equality, preserves amplitude/polarity checks, and uses atomic completion before
+the main thread reads results. The worker stops writing those fields once the
+prefix is complete. No production pacing or fallback was introduced. Evidence
+reconciles 193/193 per width, 20 repeated sound runs per width, 12 final gates
+per width and the protected hashes. Linux-native runtime acceptance is not
+claimed; inherited build warnings remain disclosed. Review passes for delivery,
+not S/T closure. S15 waits for the owner's acceptance.
+
 #### S15 test-layout actual-change review
 
 Coordinator role reviewed executor 77cd7263 against 0dfc02cf and the retained
