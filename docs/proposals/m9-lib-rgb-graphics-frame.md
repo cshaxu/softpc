@@ -530,3 +530,54 @@ between S2 runtime qualification and unperformed user/downstream acceptance.
 No source repair or buffer restructuring was smuggled into the audit. The
 documentation governance gate passes. Delivery awaits owner review; S4 remains
 last and is not automatically admitted by completion of this audit.
+
+## S4 admitted lifetime audit: design before code
+
+Owner now admits S4 and asks how to simplify cleanly. Baseline 3758a33e.
+This is a source/test-contract audit, not a new runtime experiment or final
+proof that five buffers are the mathematical minimum. Production/test delta
+is +0/-0; implementation has not begun. The S1 suggestion to start with Session
+was a candidate, not proof that its frame was only a redundant forwarding copy.
+
+Frozen universe is the five frame payloads, plus native surface/private DIB
+as exclusions. Each needs a lifetime/contract disposition before deletion:
+
+| Buffer | Existing responsibility and deletion cost |
+| --- | --- |
+| Machine staging | Driver builds a candidate while prior publication remains intact. No-frame/error and text-change comparison use the old publication. Writing in place changes the driver contract or requires backup/preflight logic. |
+| Machine published | Latest complete frame for independent readers under frame_lock, including paused reads. Deleting it removes the publication owner, not just a memcpy. |
+| Session retained | One coherent sequence/route/content snapshot survives asynchronous Window/Console setup and rejected later copies. Deleting it requires changing retention or borrowing/pinning another owner's frame. |
+| Window pending mailbox | Latest complete submission survives producer return while the Window worker is busy. A caller pointer cannot replace owned copied storage. |
+| Window worker frame | Stable captured content while publisher may replace the mailbox; retained text metadata drives cursor/exposure behavior. Deleting it requires rendering while holding the mailbox lock or a new transfer/borrow contract; keeping only metadata does not eliminate the need for stable pixels during rendering. |
+
+Concrete Session counterexample: session_frame_smoke.c consumes notice A but
+captures latest graphics frame B, requests Window creation, and publishes B
+only after its completion event. Its subsequent invalid-publication and
+run-generation-mismatch assertions retain B. session.c:drive also runs on
+component/broker/runtime/input events, not just new-frame events. A later
+fresh fetch can return a different route or no frame; simply replacing the
+retained member with a pointer or a new fetch is not behavior preservation.
+
+Machine publish currently holds frame_lock during candidate construction;
+the second slot is needed here for transactional preservation/comparison, not
+a claim that readers concurrently inspect an unlocked slot. Base capture copies
+while locked, then Window performs native surface work after unlock. Session
+owns no native surface; UI synchronously copies into the selected leaf mailbox.
+Native surface and private Compat DIB are different representations/owners and
+are not counted as removable copies of the public frame.
+
+Rejected shortcuts: allocating a same-sized temporary merely relocates the
+buffer; swapping existing buffers can reduce copying but not their count;
+publishing a borrowed pointer without a lifetime protocol races reuse;
+pinning/reference counting or lock-spanning UI callbacks adds contracts rather
+than deleting redundant logic. Do not implement them just to meet a count.
+
+Recommendation at this design checkpoint: retain current runtime pending owner
+discussion. No direct, behavior-preserving deletion has been established.
+Removing Session would save 3,933,204 bytes (about 3.75 MiB), but requires an
+explicitly approved different handoff/retention design, not a few-line cleanup.
+This is not a claim that broader redesign cannot use fewer buffers. No code
+diff estimate for an unselected redesign is presented as a committed plan.
+Owner subsequently approves closing S4 with retention and explicitly keeps T96
+open. This disposition does not authorize whole-T closure or another subtask.
+Any future reduction must first establish its changed contract and tests.

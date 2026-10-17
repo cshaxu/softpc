@@ -13,28 +13,32 @@ actual diff reviewed. Owner says "没空验收 你继续做s3吧": proceed witho
 claiming user runtime acceptance. S2 delivery is recorded in
 [its handoff](../history/M9-T96-S2-rgb-migration.md). S3 audit and migration
 instructions are complete; executor cba71230 is pushed and actual-diff reviewed.
-S3 awaits owner review; S4 is not admitted.
+Owner acknowledges S3 and admits S4: "哦这样啊 那准入s4 你告诉我如何干净的".
+S4 is active in audit/design, with no production implementation yet. S3's
+[documentation delivery](../history/M9-T96-S3-rgb-corpus-audit.md) is complete
+at cba71230/3758a33e; S2 manual runtime
+acceptance remains unclaimed.
 
-## M9 T96 S3 Packet
+## M9 T96 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly authorizes proceeding: "没空验收 你继续做s3吧". S2 is technically verified, not user runtime accepted. |
-| Objective | Audit the delivered RGB contract and publish reproducible corpus identities plus downstream Machine migration instructions. |
-| Non-goals | No external repository edits, new renderer/format/cache or five-buffer cleanup; S4 remains last. |
-| Reference Baseline | 94a0debd, reviewed S2 delivery fa569001. |
+| Admission And Approval | Owner admits S4 and requests the clean design before implementation. |
+| Objective | Audit all five frame lifetimes, identify reductions possible without changing established behavior, and present the minimal plan and tradeoffs. Final buffer task before T closure. |
+| Non-goals | No forced buffer-count reduction, ownership framework, borrowed-pointer escape, second rendering path, lock across native painting, or unapproved runtime-semantic change. |
+| Reference Baseline | 3758a33e; source/runtime remains S2 fa569001. |
 | Candidate Proposal | [RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | CURRENT, proposal and S2 handoff; audit src/test Lib, Emulator and direct frame consumers. No planned source/test/ABI change. |
+| Files And ABI Surface | Design-stage documents only. Inspect Machine publication, Session routing/retention, Base mailbox and Window worker/surface; no API change chosen. |
 | Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
-| Verification | Source/dataflow audit, eight tree identities and manifests, prior S2 dual-width 193/193 evidence, current documentation gate. No rebuild of unchanged runtime for documentation-only delivery. |
-| Expected Markers | No indexed graphics consumer or alternate format; exact atomic-import instructions with source/test hashes and proof limits. |
-| Asset Needs | Read existing evidence only; preserve EXEs, INI, media and untracked checkpoint. No guest or desktop session required. |
-| Reporting Requirements | Estimate production/test +0/-0 net 0; roughly 70-110 added and 15-35 removed documentation lines. Record actual scope and audit dispositions. |
-| Stop Conditions | Newly found runtime defect or required ABI change must be reported and scoped before implementation. |
-| Exit Criteria | All bounded audit obligations disposed, import contract and fixed corpus identified, documentation gate and actual-diff review passed; commit/push for owner review. |
-| Original Owner Request | "没空验收 你继续做s3吧". |
-| Similar-Issue Sweep | All graphics member/copy/render callers and fixed allocations; classify retained text/private palettes rather than delete them. |
+| Verification | Map each buffer to writer/reader, concurrent lifetime and retained-failure/route behavior. Inspect actual tests; distinguish source reasoning from existing S2 execution. Any implementation requires refreshed brief, dual-width build/publication and full regression before delivery. |
+| Expected Markers | Explicit delete/retain decisions and no unproved promise that five is either irreducible or safely reducible. |
+| Asset Needs | Read-only source/test investigation; preserve EXEs, INI, media and untracked checkpoint. No desktop action. |
+| Reporting Requirements | Design stage production/test +0/-0. Quantify potential saved bytes, API/behavior cost and changed-file scope before selecting code. |
+| Stop Conditions | Removing a buffer requires changed retention/failure semantics or new lifetime/locking model: present tradeoff, do not silently implement. |
+| Exit Criteria | Owner-approved minimal disposition, any implemented change fully qualified and reviewed, then separate whole-T completion audit; not closed by this preliminary design. |
+| Original Owner Request | "哦这样啊 那准入s4 你告诉我如何干净的". |
+| Similar-Issue Sweep | Five payloads plus native surface/private DIB distinguished; check temporary allocation or pointer-sharing proposals do not merely relocate the same buffer. |
 
 ## Current Technical Baseline
 
