@@ -2,43 +2,36 @@
 
 ## Current Work
 
-T93 S13 is verified: minimal platform-neutral PCM progress and lifecycle.
-Cached x64/x86 build and publication completed; each width passed 167/167,
-including all ten native desktop cases, zero skips. Production C/H +19/-30
-(net -11); tests +36/-20 (net +16). No API/state/helper was added.
-See the [S13 delivery](../proposals/m9-xp-sound-blaster-standalone.md#s13-implementation-and-qualification).
-Executor 9960b37f is pushed and its separate coordinator actual-change review
-passes. Await owner acceptance; do not close S13 or admit S14 automatically.
-S12 is owner-accepted and closed after executor 2fc25069 and review f43ea903:
-167/167 per architecture including ten desktop cases. Its intermittent raw-input
-failure remains explicit TODO, not a claimed repair.
+T93 S14 is active: neutral Window capture and shared-contract completion audit.
+Owner accepts S13; executor 9960b37f and coordinator e85a0015 are pushed.
+S13 closed with 167/167 per width including ten desktop cases, production
+net -11 lines and no new API/state/helper. See its history and proposal ledger.
 
-## M9 T93 S13 Packet
+## M9 T93 S14 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S12 and admits S13 through delivery with before/after briefs and minimum total code. |
-| Objective | Neutral PCM progress and batch-independent destruction, retaining one worker/FIFO/backend. |
-| Non-goals | No new API/state/worker, recovery framework, MIDI/FM, capture, guest/mirror or INI/media/snapshot changes. |
-| Reference Baseline | Accepted S12 f43ea903; S12 closure is documentation only. |
-| Candidate Proposal | [S13 PCM](../proposals/m9-xp-sound-blaster-standalone.md#s13--pcm-progress-and-lifecycle-contract). |
-| Files And ABI Surface | Lib PCM interface/common/Win32 backend and two existing tests/manifests; inspect real Compat callers. |
-| Applicable Rules | Task Reading Set and four governance skills; single-agent dual-role, Types authority, inward dependencies. |
-| Verification | Blocked short/full destruction, flush, epochs/progress, native format limit; cached dual-width build, shared then other tests, ten native desktop cases and both EXEs. |
-| Expected Markers | Destroy cancels/releases, flush submits, clear discards; no batch-dependent lifecycle or public native padding/byte-rate contract. |
-| Asset Needs | Hidden build/t93/s13 jobs/logs/exit files; build 1800s, suite 1200s, desktop 600s observation budgets, 30 MiB logs; executor cleanup; no Computer Use. |
-| Reporting Requirements | Before/after brief, actual source/test additions/removals/net and changed-file totals, evidence/hashes and separate review. |
-| Stop Conditions | Expanded scope or failed proof; no unapproved behavior change, no interactive-timeout termination. |
-| Exit Criteria | Build/publish/test/commit/push and actual-change review; await owner acceptance, no automatic S14. |
-| Original Owner Request | 很好。验收通过，准入S13，开始前和结束后都要进行简报汇报；请你以极简方案实施，意思不是说diff一定要减少，而是完成后总代码数量要最少 |
-| Similar-Issue Sweep | PCM destroy/flush/clear/set_active consumers, public native terminology, format guards and lifecycle tests. |
+| Admission And Approval | Owner accepts S13 and admits next S with before/after briefs, minimal final code and single-agent dual-role governance. |
+| Objective | Encapsulate exclusive capture coordination in Lib; complete the seven-area neutral-contract audit. |
+| Non-goals | No manager/framework, new public API, mouse motion redesign, backend expansion, guest/mirror or INI/media/snapshot changes. |
+| Reference Baseline | Accepted S13 e85a0015. |
+| Candidate Proposal | [S14 capture](../proposals/m9-xp-sound-blaster-standalone.md#s14--capture-boundary-and-shared-contract-completion-audit). |
+| Files And ABI Surface | Window public contract/private Win32 mouse, Types native lock vocabulary, existing capture fixture, Lib README/manifests; readonly Emulator/X86 review. |
+| Applicable Rules | Task Reading Set and execution/architecture/coding/documentation governance skills; inward dependencies and Types authority. |
+| Verification | Competing acquisitions, foreign ownership, native errors and release; cached dual-width build, shared then all other tests, ten native desktop cases, both EXEs. |
+| Expected Markers | One query/update authority; conflicts do not steal registration or disturb capture; no native caller obligation in ordinary public contract. |
+| Asset Needs | Hidden build/t93/s14 jobs/logs/exit; build 1800s, suite 1200s, desktop 600s observation budgets, 30 MiB evidence; executor owns cleanup; no Computer Use. |
+| Reporting Requirements | Source/test additions/deletions/net and affected file totals, seven-area ledger, proof limits, artifacts, executor P then separate actual-change review. |
+| Stop Conditions | Scope expansion, unproved behavior or failed verification; do not kill long jobs on interactive timeout. |
+| Exit Criteria | Build/publish/test/commit/push and coordinator actual-change review; await owner acceptance, no automatic S15. |
+| Original Owner Request | 车通过整入下一个S任务，还是老规矩，进入前给我简报和预估，完成后给我同样级别的汇报，要求极简主义，第一性原理，禁止添油加醋，按智理规范来，单人双角色模式执行。 |
+| Similar-Issue Sweep | All native mouse registration callers, capture/release/failure, shared public native vocabulary and seven S9 audit areas. |
 
-Brief: remove destroy's sub-batch flush branch. Preserve cancellation, join,
-ownership checks and existing deactivation flush-then-clear behavior. Move
-Windows byte-rate representation limit to its existing backend guard.
-No new state/helper. Estimate production +15-25/-30-45 (net -10 to -25);
-tests net +40-80. Preserve necessary overflow and live-worker safety checks.
+Brief: serialize native registration query/update only, reserve before focus/
+capture side effects, retain existing cleanup and motion algorithms. Never hold
+the registration lock across focus/capture APIs that can invoke window messages.
+Estimate production +20-35/-10-20 (net +10-20), tests net +40-80.
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
 The owner accepts the reopened S7 delivery and admits S8: "验收通过，准入s8".
