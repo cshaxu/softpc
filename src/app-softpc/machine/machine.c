@@ -31,7 +31,6 @@ extern void q_event_init(void);
 extern void tic_event_init(void);
 extern void host_lpt_close_all(void);
 extern void host_com_close_all(void);
-extern int SbInitialize(void);
 extern int SbTerminate(void);
 extern FILE *trace_file;
 
@@ -201,10 +200,6 @@ softpc_machine_result softpc_machine_reset(softpc_machine *machine)
     soft_reset = 0;
     softpc_platform_set_boot_clock(1);
     reset();
-    if (!SbInitialize()) {
-        softpc_platform_set_boot_clock(0);
-        return SOFTPC_MACHINE_IO_ERROR;
-    }
     /* The original reset recreates the keyboard controller, but an IRQ1 that
        was already asserted by the completed standalone run is an interrupt
        line, not controller state.  Drop that line at the cold-run boundary;

@@ -1,5 +1,8 @@
 #include "compat/audio.h"
 
+#ifdef NDEBUG
+#error Audio lifecycle verification requires live assertions
+#endif
 #include <assert.h>
 
 int main(void)

@@ -2,6 +2,7 @@
 #include "compat/sb_pcm.h"
 #include "compat/sb_midi.h"
 #include "compat/platform.h"
+#include "compat/ccpu/abi.h"
 #include "compat/devices/archive.h"
 #include "compat/devices/snapshot.h"
 #include "machine/machine.h"
@@ -26,6 +27,8 @@
 #include <stdio.h>
 
 extern void disk_io(void);
+extern void reset(void);
+extern int soft_reset;
 extern void c_setAX(IU16 value);
 extern void c_setCX(IU16 value);
 extern void c_setDX(IU16 value);
@@ -39,6 +42,8 @@ extern ISM32 c_setDS(IU16 value);
 extern void c_setSP(IU16 value);
 extern void search_for_roms(void);
 extern IU8 *c_GetPhyAdd(IU32 address);
+extern void c_sas_PRS(IU32 address, IU8 *bytes, IU32 length);
+extern void c_sas_PWS(IU32 address, IU8 *bytes, IU32 length);
 extern ISM32 c_setES(IU16 value);
 extern void c_setSI(IU16 value);
 extern ISM32 c_getZF(void);
@@ -334,7 +339,7 @@ lib_status softpc_sb_pcm_write(const lib_u8 *samples, lib_u32 count, lib_u32 *ac
     return LIB_STATUS_OK;
 }
 
-static void verify_sb_block(softpc_machine *machine)
+static void verify_sb_block(void)
 {
     static const unsigned lengths[] = { 32, 700, 65536 };
     unsigned direction, length, i;
@@ -350,8 +355,7 @@ static void verify_sb_block(softpc_machine *machine)
         for (i = 0; i < lengths[length]; ++i) {
             IU16 address = (IU16)(direction ? start - i : start + i);
             unsigned char sample = (unsigned char)(i * 7 + 3);
-            assert(softpc_machine_write_physical(machine, 0x20000u + address,
-                &sample, 1) == SOFTPC_MACHINE_OK);
+            c_sas_PWS(0x20000u + address, &sample, 1);
         }
         SBBlockSize = lengths[length] - 1;
         DspNumberDmaQueries = 0;
@@ -361,8 +365,7 @@ static void verify_sb_block(softpc_machine *machine)
         for (i = 0; i < lengths[length]; ++i) {
             IU16 address = (IU16)(direction ? start - i : start + i);
             unsigned char zero = 0;
-            assert(softpc_machine_write_physical(machine, 0x20000u + address,
-                &zero, 1) == SOFTPC_MACHINE_OK);
+            c_sas_PWS(0x20000u + address, &zero, 1);
         }
         sb_pcm_count = 0; sb_pcm_budget = 7;
         assert(DspProcessBlock() == LIB_STATUS_OK && sb_pcm_count == 7 && !bWriteBurstStarted);
@@ -457,7 +460,7 @@ static void verify_sb_interrupt(unsigned delayed)
     assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
 }
 
-static void verify_sb_transfer(softpc_machine *machine)
+static void verify_sb_transfer(void)
 {
     unsigned direction, i;
     unsigned char value;
@@ -471,9 +474,7 @@ static void verify_sb_transfer(softpc_machine *machine)
         outb(0x0a, 1);
         for (i = 0; i != 64; ++i) {
             value = (unsigned char)i;
-            assert(softpc_machine_write_physical(machine,
-                0x20000 + (direction ? 0x1000 - i : 0x1000 + i), &value, 1)
-                == SOFTPC_MACHINE_OK);
+            c_sas_PWS(0x20000 + (direction ? 0x1000 - i : 0x1000 + i), &value, 1);
         }
         sb_pcm_budget = 7; sb_pcm_consumed = 0;
         DspWrite(DSP_SET_BLOCK_SIZE); DspWrite(31); DspWrite(0);
@@ -764,10 +765,27 @@ static void verify_sb_executor(softpc_machine *machine)
             assert(DspGetStatus() == LIB_STATUS_IO_ERROR && sb_pcm_count == 7);
             sb_pcm_status = LIB_STATUS_OK;
         } else {
+            softpc_device_sb_dsp_state sound;
+            half_word reply;
             softpc_platform_executor_event();
             assert(sb_pcm_count == 64 && bWriteBurstStarted);
             assert(DspGetStatus() == LIB_STATUS_OK);
             for (i = 0; i != 64; ++i) assert(sb_pcm_bytes[i] == i);
+            assert(softpc_device_snapshot_capture_sb_dsp(&sound));
+            assert(sound.DspCompletionEvent != 0);
+            /* Guest BIOS restart must retire the old completion before its
+               quick-event queue is rebuilt, then attach the same DSP anew. */
+            soft_reset = 1;
+            reset();
+            assert(softpc_platform_executor_ready());
+            assert(softpc_device_snapshot_capture_sb_dsp(&sound));
+            assert(sound.DspCompletionEvent == 0 && sound.DspTransferSize == 0);
+            assert(!bDspActive && !bWriteBurstStarted);
+            outb(0x226, 1); outb(0x226, 0);
+            inb(0x22a, &reply); assert(reply == 0xaa);
+            outb(0x22c, DSP_GET_VERSION);
+            inb(0x22a, &reply); assert(reply == 2);
+            inb(0x22a, &reply); assert(reply == 1);
         }
     }
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
@@ -830,7 +848,7 @@ static void verify_sb_machine_pause(softpc_machine *machine)
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 }
 
-static void verify_sb_commands(softpc_machine *machine)
+static void verify_sb_commands(void)
 {
     static const struct { unsigned address, incremented, decremented; } edges[] = {
         { 0x1000, 0x1003, 0x0ffd },
@@ -931,7 +949,7 @@ static void verify_sb_commands(softpc_machine *machine)
     assert(QueryDMA(&info) && info.addr == 0x1000 && info.count == 2);
     verify_sb_interrupt(1);
     DspWrite(DSP_READ); DspWrite(1); DspWrite(0);
-    assert(softpc_machine_read_physical(machine, 0x1000, &observed, 1) == SOFTPC_MACHINE_OK);
+    c_sas_PRS(0x1000, &observed, 1);
     assert(observed == 0x80);
     verify_sb_interrupt(1);
     for (decrement = 0; decrement != 2; ++decrement) {
@@ -939,9 +957,10 @@ static void verify_sb_commands(softpc_machine *machine)
         outb(0x0b, (half_word)(0x49 | decrement * 0x20));
         DspWrite(DSP_TABLE_MUNGE); DspWrite(0);
         DspWrite(DSP_TABLE_MUNGE); DspWrite(0);
-        assert(softpc_machine_read_physical(machine, 0x1000, &observed, 1) == SOFTPC_MACHINE_OK && observed == 0x20);
-        assert(softpc_machine_read_physical(machine, decrement ? 0xfff : 0x1001,
-            &observed, 1) == SOFTPC_MACHINE_OK && observed == 0xc5);
+        c_sas_PRS(0x1000, &observed, 1);
+        assert(observed == 0x20);
+        c_sas_PRS(decrement ? 0xfff : 0x1001, &observed, 1);
+        assert(observed == 0xc5);
         assert(QueryDMA(&info) && info.addr == (decrement ? 0xffe : 0x1002) && info.count == 0);
     }
 }
@@ -1569,6 +1588,44 @@ static void verify_sb_archive(softpc_machine *machine, const char *write_path,
     if (!write_path && !read_path) verify_sb_parser_archive();
 }
 
+static void verify_sb_paged_dma(softpc_machine *machine)
+{
+    lib_u32 directory[1024] = {0}, pages[1024];
+    unsigned char shadow[4096], observed;
+    unsigned i;
+    unsigned long cr0, cr3;
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    cr0 = c_getCR0(); cr3 = c_getCR3();
+    sas_disable_20_bit_wrapping();
+    /* Low linear addresses deliberately refer to different physical RAM.
+       DMA must ignore this mapping for both playback and DSP probe writes. */
+    directory[0] = 0x301007;
+    for (i = 0; i < 1024; ++i)
+        pages[i] = (i < 256 ? 0x100000u : 0u) + i * 4096u + 7u;
+    assert(softpc_machine_write_physical(machine, 0x300000, directory,
+        sizeof(directory)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x301000, pages,
+        sizeof(pages)) == SOFTPC_MACHINE_OK);
+    lib_memory_set(shadow, 0x5a, sizeof(shadow));
+    for (i = 0; i < 0x30000; i += sizeof(shadow))
+        assert(softpc_machine_write_physical(machine, 0x100000 + i, shadow,
+            sizeof(shadow)) == SOFTPC_MACHINE_OK);
+    c_setCR3(0x300000);
+    c_setCR0(cr0 | 0x80000001ul);
+    sas_load(0x1000, &observed);
+    assert(observed == 0x5a); /* Confirm the test's nonidentity mapping is live. */
+    verify_sb_commands(); /* ADC and both table-munge writes. */
+    verify_sb_block(); /* Both directions, 64K wrap and full bank. */
+    verify_sb_transfer(); /* Partial submissions and auto-init/IRQ. */
+    for (i = 0; i < 0x30000; i += sizeof(shadow)) {
+        unsigned j;
+        c_sas_PRS(0x100000 + i, shadow, sizeof(shadow));
+        for (j = 0; j < sizeof(shadow); ++j) assert(shadow[j] == 0x5a);
+    }
+    c_setCR0(cr0); c_setCR3(cr3);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+}
+
 int main(int argc, char **argv)
 {
     const char *path = "device-contract.img";
@@ -1607,15 +1664,16 @@ int main(int argc, char **argv)
         verify_sb_archive(machine, NULL, argv[2]);
     else if (lib_text_compare(argv[1], "sb-commands") == 0)
     {
-        verify_sb_commands(machine);
-        verify_sb_block(machine);
+        verify_sb_commands();
+        verify_sb_block();
         verify_sb_completion();
         verify_sb_output();
-        verify_sb_transfer(machine);
+        verify_sb_transfer();
         verify_sb_transfer_failures();
         verify_sb_ports(machine);
         verify_sb_executor(machine);
         verify_sb_machine_pause(machine);
+        verify_sb_paged_dma(machine);
     }
     else {
         assert(lib_text_compare(argv[1], "disk") == 0);

@@ -1,5 +1,8 @@
 #include "lib/types/types_interface.h"
 
+#ifdef NDEBUG
+#error Parallel failure verification requires live assertions
+#endif
 #include <assert.h>
 #include <stdio.h>
 
@@ -51,8 +54,12 @@ int main(void)
 
     write_limit = HIGH_WATER;
     assert(host_print_byte(0, 0xa5u));
-    assert(write_count == 2u && lpt->bytes_in_buffer == 1);
-    assert(lpt->buffer[0] == 0xa5u);
+    assert(write_count == 1u && lpt->bytes_in_buffer == 21);
+    for (index = 0; index < 20; ++index)
+        assert(lpt->buffer[index] == (byte)(HIGH_WATER - 20 + index));
+    assert(lpt->buffer[20] == 0xa5u);
+    assert(host_print_doc(0));
+    assert(write_count == 2u && lpt->bytes_in_buffer == 0);
 
     lpt->bytes_in_buffer = 1;
     write_limit = 1u;

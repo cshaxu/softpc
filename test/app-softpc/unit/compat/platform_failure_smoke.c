@@ -9,6 +9,20 @@ static int fail_event, fail_timer, fail_wait, fake_timer, fail_delete;
 static int signal_on_wait;
 static unsigned wait_calls, timer_calls;
 static unsigned delete_calls;
+static int fail_sound_init, fail_sound_term;
+static unsigned sound_init_calls, sound_term_calls;
+extern int SbInitialize(void);
+extern int SbTerminate(void);
+static int initialize_sound(void)
+{
+    ++sound_init_calls;
+    return fail_sound_init ? 0 : SbInitialize();
+}
+static int terminate_sound(void)
+{
+    ++sound_term_calls;
+    return fail_sound_term ? 0 : SbTerminate();
+}
 static WAITORTIMERCALLBACK saved_tick;
 static HANDLE WINAPI create_event(LPSECURITY_ATTRIBUTES a, BOOL manual,
     BOOL signaled, LPCSTR name)
@@ -58,11 +72,30 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #define CreateTimerQueueTimer create_timer
 #define DeleteTimerQueueTimer delete_timer
 #define WaitForSingleObject wait_event
+#define SbInitialize initialize_sound
+#define SbTerminate terminate_sound
 #include "compat/platform.c"
+#undef SbTerminate
+#undef SbInitialize
 #undef WaitForSingleObject
 #undef CreateTimerQueueTimer
 #undef DeleteTimerQueueTimer
 #undef CreateEventA
+
+extern void reset(void);
+static void assert_sound_ports(void)
+{
+    half_word value;
+    outb(0x226u, 1u);
+    outb(0x226u, 0u);
+    inb(0x22au, &value);
+    assert(value == 0xaau);
+    outb(0x22cu, 0xe1u);
+    inb(0x22au, &value);
+    assert(value == 2u);
+    inb(0x22au, &value);
+    assert(value == 1u);
+}
 
 int main(void)
 {
@@ -71,6 +104,7 @@ int main(void)
     const unsigned char halt[] = {0xfa, 0xf4, 0xeb, 0xfd}; /* cli; hlt; loop */
     softpc_machine_options options = {0};
     softpc_machine *machine = NULL;
+    unsigned restart;
     FILE *file = fopen(path, "wb");
     assert(file != NULL);
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
@@ -92,6 +126,16 @@ int main(void)
     fail_timer = 0;
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_platform_executor_ready());
+    assert_sound_ports();
+    for (restart = 0; restart < 2u; ++restart) {
+        unsigned inits = sound_init_calls, terms = sound_term_calls;
+        soft_reset = 1;
+        reset(); /* Original BIOS guest-restart route, not Machine cold reset. */
+        assert(sound_term_calls == terms + 1u);
+        assert(sound_init_calls == inits + 1u);
+        assert(softpc_platform_executor_ready());
+        assert_sound_ports();
+    }
     assert(SetEvent(softpc_executor_event));
     softpc_platform_wait_for_executor_event();
     assert(wait_calls == 1u && softpc_platform_executor_ready());
@@ -168,6 +212,41 @@ int main(void)
     softpc_machine_destroy(machine);
     assert(softpc_executor_event == NULL && softpc_clock_timer == NULL);
     assert(!softpc_executor_wait_failed);
+
+    /* Callback failures are terminal for this host binding, and must not be
+       erased by timer teardown or the following initialization callback. */
+    fail_wait = 0;
+    machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    fail_sound_init = 1;
+    {
+        unsigned calls = sound_init_calls;
+        assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_IO_ERROR);
+        assert(sound_init_calls == calls + 1u);
+        assert(!softpc_platform_executor_ready());
+        /* Outside a CPU frame, readiness is the observable failure contract. */
+    }
+    fail_sound_init = 0;
+    assert(softpc_machine_destroy(machine) == SOFTPC_MACHINE_OK);
+    machine = NULL;
+    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    {
+        unsigned calls = sound_init_calls;
+        unsigned terms = sound_term_calls;
+        fail_sound_term = 1;
+        softpc_ccpu_lifecycle_enter();
+        NIDDB_System_Reboot();
+        assert(sound_term_calls == terms + 1u);
+        assert(softpc_ccpu_lifecycle_exit_requested());
+        softpc_ccpu_lifecycle_leave();
+        host_timer_shutdown();
+        host_reset();
+        assert(sound_init_calls == calls); /* No restart after failed teardown. */
+        assert(!softpc_platform_executor_ready());
+        fail_sound_term = 0;
+    }
+    assert(softpc_machine_destroy(machine) == SOFTPC_MACHINE_OK);
     assert(softpc_test_remove_image(path));
     return 0;
 }

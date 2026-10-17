@@ -176,6 +176,269 @@ Publish both EXEs; commit/push complete deliveries, then wait for owner acceptan
 
 ## Finite acceptance ledger
 
+### S2 implementation checkpoint
+
+The initial production patch changes only Compat platform.c and Machine
+machine.c: +21/-8, net +13. Original sndblst.h already declares initialization
+and termination, so the callback owner consumes it without a mirror edit.
+The sound-reset failure latch is host-lifetime state, cleared when binding a
+new machine. Failed warm teardown prevents reinitialization and requests the
+existing CPU exit; executor readiness preserves the failure after callbacks.
+Machine's cold teardown and final destruction remain their distinct boundaries.
+
+The owner-local platform failure test now reads reset AA and version 02/01
+after cold initialization and two original BIOS warm resets, and injects sound
+initialization/termination failure. The revised focused4 test passes on both
+widths; x86's existing Ninja log-recovery warning caused broader rebuilds.
+This is not full qualification.
+Earlier diagnostic test attempts are retained: one used a C99 loop declaration
+in this legacy-C target, and exit-request assertions incorrectly queried outside
+an active CPU frame. Both test defects are corrected, not hidden with retries.
+Machine's existing device-contract test additionally starts a real DMA block,
+confirms a pending completion event, enters original warm BIOS reset and checks
+cleared transfer/event state plus new DSP reset/version replies. Tracked test
+delta is +98/-0 across the two existing owners, with no new target or fixture.
+Full qualification is running. Its first shared selector incorrectly required
+a slash where registered shared names use a dot; that group selected no tests
+and is not a pass. The complementary group consequently runs all 185 background
+cases. Preserve this run and supplement the corrected grouping after completion.
+x64 full-target build refreshed its package EXE; dual-width publication and
+complete test/native qualification are not yet established. Delivery remains
+outstanding.
+
+The first complete S2 run finishes both widths: 185/185 background tests pass
+per width, including the new pending-event restart. Each width runs all eight
+native cases: audio lifecycle, Window retirement/modal and Console display
+pass; native MIDI, SB native MIDI and both package cases fail. Thus each width
+has 189/193 actual tests passing, not full acceptance. Package reports stage 3;
+its cause is not proven solely by the MIDI failures. No failing native case is
+reclassified as passed or skipped. The existing shared MIDI code is unchanged.
+Correctly grouped tests are being supplemented without another compilation.
+Both full-target builds finish and refresh package EXEs; x86 again reports
+Ninja log recovery and unchanged mirror warnings, so no zero-warning or
+ideal-cache-reuse claim is made.
+
+Current candidate binary SHA-256 values are
+32-bit `1E560D700E52F03D620DA8502F9149001C50B227EC9AC0DCB6C9F019819FCB20`
+and 64-bit `5D1519C16860E7BF034F5612366F041B52064AB284CFA2245E032D15ABA20747`.
+The Win95 probe is linked from the repaired objects with observation-only PCM
+wrappers, no reset overrides. It still uses test host receivers and cannot
+establish native playback. It waits for qualification jobs before guest replay.
+
+### Qualification correction: assertions compiled out
+
+The corrected grouping reports 121 shared and 64 other cases passing per width;
+their name sets plus eight native cases exactly match all 193 registrations.
+However, inspecting the contradictory native PCM observation exposed invalid
+test evidence: audio_lifecycle_smoke has -DNDEBUG without -UNDEBUG and puts all
+operations inside assert. Its success is vacuous. Scanning every generated test
+compile rule with assert.h finds one additional omission, parallel_failure_smoke.
+Both are absent from the existing SOFTPC_TEST_TARGETS list. No other matching
+assert-based test compile rule is missing assertion activation in that scan.
+
+Restore both targets to the existing list (+2 build lines), with a three-line
+NDEBUG rejection in each affected source. This is a required qualification
+repair, not an audio production workaround. The previous 189/193 receiving
+count is not a valid acceptance claim; requalify after fixing these omissions.
+The repaired-object Win95 replay produces repeated non-neutral PCM, but explicit
+WAV opening/playback is not yet established. Preserve its observation checkpoint;
+do not confuse driver test patterns with application playback. A separate real
+PCM probe fails speaker startup and vm_create with I/O error, consistent with
+the newly exposed lack of native proof. MIDI is mocked only in that diagnostic;
+shipping code remains unchanged.
+
+With assertions enabled, the parallel test exposes an incorrect oracle, not
+a new parallel implementation defect. A short write retains twenty bytes;
+the next byte appends below the flush threshold, leaving twenty-one bytes.
+The corrected test verifies every retained byte and the appended byte, then
+explicitly flushes through host_print_doc. Parallel production stays unchanged.
+The corrected full run has 121/121 shared checks and 11/11 focused reset checks
+per width; other checks are 63/64 pending this oracle recheck. Native cases are
+3/8 per width: audio lifecycle now genuinely fails, as do both MIDI and both
+package cases. Window retirement, modal and Console display pass.
+
+An independent native SDK probe, without Lib or SoftPC, confirms successful
+COM/enumerator creation but default render endpoint lookup returns 0x80070490;
+MIDI reports one device but mapper open returns 1. These are current host
+capability failures, not evidence of successful native playback. Package stage
+3 and the real-PCM VM probe fail at startup; no silent audio fallback is added.
+
+The corrected parallel test subsequently passes on x64 and x86; all 185
+background cases per width now have actual passing evidence (the full run plus
+this focused correction). Native failures remain outstanding.
+
+The second repaired-object guest run again reaches the desktop and produces
+PCM through the diagnostic receiver. Wave-file playback remains unproven.
+Its final captured publication shows desktop icons without application windows;
+this does not prove either an application crash or a display fault. A disposable
+observation checkpoint is saved and the probe shuts down normally. Reused frame
+filenames can display stale image previews; subsequent evidence must use unique
+capture names and verify file hashes before drawing conclusions from previews.
+After assertion qualification, the x86 candidate hash is
+`2F4C4B6EF586392BCF9DC0897C6BB03D15191F0F7D3054BCEC2158AC15152F05`;
+the x64 candidate hash above is unchanged. Neither is a qualified delivery yet.
+
+### Additional physical-address defect: owner-approved correction
+
+A second probe restores the observation checkpoint and confirms the recorder
+is responsive. Its File/Open menu opens the installed Tada WAV successfully;
+the displayed duration is 1.24 seconds. Read-only FAT inspection independently
+finds 22050 Hz, mono, 8-bit PCM with 27459 data bytes. Ctrl+O was not a proven
+shortcut for this recorder, so earlier commands did not prove file opening.
+
+Actual playback then exposes a deterministic data mismatch. At DMA page FF,
+address 8000, count 0ABF, mode 59, block size 1376, the submitted samples start
+00 01 02 ... 1F. Reading the same physical range through c_sas_PRS returns
+80 repeated. At address 8560, submitted bytes start 60 61 62 ... 7F while
+physical bytes start 81 7C 7A 85 94 99 A2 9E. This is not an audible-output
+claim: the observation uses the existing diagnostic host receiver.
+
+Source chain: nt_sbdsp.c DmaDataToDsp passes dma_system_address to sas_load;
+under this CPU, sas_load reaches c_sas_hw_at -> bios_read_byte, which translates
+through guest page tables when paging is enabled. DMA addresses are physical.
+The existing at_dma.c transfer owner correctly uses sas_PRS. The four sound
+hits are one read at DmaDataToDsp and three sas_store calls using
+GetDMATransferAddress (ADC silence/identification writes). All require physical
+memory semantics; no new DMA implementation or address translation is needed.
+
+Proposed next repair uses the existing physical read/write interfaces in these
+four places, retaining the byte-wise wrap/decrement loop and guest commands.
+Tests must enable paging with deliberately different linear/physical mappings,
+then verify submitted playback bytes and the three write destinations. Current
+real-mode tests cannot establish this contract. This affects the selected XP
+mirror and its ledger. After reviewing the four adaptations and mirror delta,
+the owner approves this correction within S2, retaining the original shared
+device logic rather than reimplementing it. The repaired reboot
+binding remains valid and is not reverted. A disposable pre-play checkpoint
+now preserves the open WAV at position zero for deterministic follow-up.
+
+Incremental estimate: production +5/-4 (net +1), plus one explanatory source
+comment; tests reuse existing command/transfer assertions under nonidentity
+paging, approximately +45-65 lines. No shared component changes. The four
+linear accesses originate in T93 S6 065ac9ed, not XP's native pointer accesses.
+Normalized unified-diff accounting against the fixed necessary subset gives
+777/1389 added/deleted before, 778/1389 for the four substitutions before
+comments. This is whole-file cumulative divergence, not this repair's patch.
+
+The implemented four-site change is +6/-4, net +2 including that comment.
+Its existing XP subset selection and raw/subset hashes remain unchanged;
+only the local body identity changes. The address increment/decrement loop,
+16-bit wrap, guest DSP command handlers, transfer lifetime and IRQ paths are
+retained. No public component, native backend or snapshot schema is changed.
+
+Focused x64/x86 SB commands pass with a live nonidentity page mapping. The
+existing ADC and two identification writes, playback capture, both address
+directions, 64-KiB wrap/full bank, auto-init, partial submission and IRQ checks
+are reused rather than copied. A separate shadow range must remain untouched.
+Fixture preparation initially exposed missing A20/user-page setup; the test
+explicitly establishes both before checking that its mapping is live. Its
+non-CPU_40_STYLE sas.h aliases physical names to linear functions, so the test
+calls the original c_sas_PRS/PWS symbols explicitly, as other CPU probes do.
+
+The same test exposed Compat memory.c's named physical adapters using linear
+c_sas_loads/stores. This is recorded as a separate High TODO, not silently
+repaired in the four-site mirror authorization. The sound tests use the actual
+physical SAS functions for their oracle. Similar-issue scan of nt_sb*.c finds
+exactly the four corrected memory accesses; scanning Compat/Machine for the
+linear block calls finds those two adapters (debug_memory already documents
+and avoids a second translation).
+
+Controlled Win95 checkpoint replay opens the same installed Tada WAV and
+finishes at its 1.24-second end position. The receiver records 66 successful
+submissions, 30272 accepted bytes and 28243 non-neutral bytes. The first eleven
+submission observations compare each entire 1376-byte captured block against
+physical DMA RAM with zero mismatches. This replaces the prior ramp-byte
+failure; it does not assert bit-exact equality of the whole submitted stream
+to the WAV file, nor audible output. The guest probe shuts down/destroys all
+three owners successfully; source media and original checkpoint are untouched.
+An independent native probe still reports no default render endpoint
+(80070490) and MIDI mapper open failure (1); native qualification is pending.
+
+The refreshed full-target builds pass on x64/x86 (cache retained; x86 again
+reports the known Ninja log recovery and unchanged mirror compiler warnings).
+Both widths pass 121/121 shared and 64/64 other background cases; 11/11 focused
+cases also pass. Each width actually runs all eight native cases, with three
+Window/Console passes and five failures: audio lifecycle, native MIDI, SB MIDI,
+and both packages. x64 normal/x86 compact packages fail at stage 3; x64 compact/
+x86 normal fail at stage 1/error 6, the existing independent startup debt.
+Do not attribute the latter conclusively to missing audio. No test is skipped
+or reclassified as passing. Thus the repair is implemented and deterministically
+verified, but S2 is not qualified for a complete P or closure.
+
+Single-session coordinator review checks the actual diff: only four existing
+DSP memory adaptations change; original device state, command parser and DMA
+sequencing remain. No shared src/test package changes or original media writes.
+Entire pending S2 production: +27/-12, net +15 across three files; tests:
++166/-19, net +147 across four files; root build list +2/-0. The mirror-only
+repair contributes +6/-4 (net +2), with normalized subset diff now +779/-1389,
+total 2168 versus 2166 previously. Documentation and binaries are separate.
+The controlled guest and qualification jobs have terminated; current evidence
+retains the first failed fixture attempts, final paging pass, all native failures
+and byte observations. Required native evidence remains a blocker, not a claim
+that all Win95 playback requirements have been met.
+
+Fresh host-only revalidation after the repair still returns 80070490 for the
+default render endpoint and 1 for MIDI mapper acquisition. Session query shows
+the executor's user session 1 is disconnected. Audiosrv and AudioEndpointBuilder
+are both running, and enumerated physical audio devices report healthy status.
+Thus restarting audio services or changing the product backend is not supported
+by this evidence. Native acceptance needs an available output in the executing
+session; no host configuration, service or session was changed by this check.
+
+### S2 native gain defect and approved extension
+
+After reconnecting, native PCM lifecycle and MIDI integrations pass on both
+widths. Native Win95 checkpoint loading nevertheless fails in gain setup:
+22050 Hz mono stream creation succeeds, but set_gain returns IO_ERROR. An
+independent SDK probe confirms native conversion exposes two volume channels;
+SetAllVolumes with the one input channel returns E_INVALIDARG (80070057).
+The old unit stub assumed native volume channels equal input channels and
+therefore missed this contract mismatch. This is distinct from the earlier
+disconnected-session missing-endpoint failures.
+
+Owner approves the public Lib repair in S2. The existing native-buffer copy
+now applies input-channel gains before native conversion. Remove the native
+volume service acquisition, release and calls rather than adding a mapping or
+fallback path. No stream API, queue, worker, timing or guest state is added.
+Gain applies on subsequent submission, not retroactively to already submitted
+frames; this timing boundary is now explicit. Default unity is bit-preserving.
+Signed 32-bit multiplication is sufficient: -32768 * 65535 remains representable.
+
+Unit regressions verify mono/stereo, independent mute/unity channels, half gain
+on signed extrema and small values, default unchanged samples, clear retaining
+gain, invalid counts and native submission failures. No OS volume service is
+acquired. Existing initialization failure coverage shrinks by the removed
+service call only. Public production +13/-24 (net -11), test +32/-22 (net +10),
+excluding manifests.
+
+Final S2 qualification: full-target cached x64/x86 builds pass and publish
+both EXEs. Each width passes all 193 distinct cases: 121 shared, 64 other
+background cases and eight real audio/desktop integrations; no failures or
+skips. The focused eleven-case subset also passes. Both normal and compact
+package cases pass in the restored session. Prior failures remain evidence,
+not erased retries; the known loader debt is not declared repaired.
+
+Native Win95 checkpoint loading now opens 22050 Hz mono PCM and applies gain
+16383 successfully. Two plays of the installed Tada WAV reach 1.24 seconds.
+The first play records native consumption advancing to at least 27643 frames
+and 30272 accepted bytes. Eleven entire 1376-byte DMA block observations match
+physical RAM. The second opens successfully and submits non-neutral PCM again;
+the diagnostic's cross-stream progress-print threshold suppresses second-play
+consumption totals, so those are not claimed. Both end-position captures and
+input actions come from the actual guest, without desktop automation. This is
+native output progress, not an assertion that a human listened to the sound.
+Post-play snapshot save succeeds, resume is accepted and all shutdown/destroy
+owners return success. The probe exits zero and releases its resources.
+
+Actual-change review: all production delta is +40/-36 (net +4) across six
+files; tests +198/-41 (net +157) across five files; root build list +2/-0.
+Manifests, documentation and binaries are counted separately. Gain has one
+worker-owned input-sample path, no endpoint-volume object, native retry or
+guest-specific branch. Original DMA/IRQ loops remain intact. The mirror delta
+remains the four approved physical accesses (+6/-4). Public non-audio owners
+are unchanged. Final delivery still requires the executor commit/push and
+separate coordinator actual-commit review; whole-T acceptance is not implied.
+
 - Driver loading: selected driver/resources recorded; no Code 24 after restart.
 - DSP initialization: reset/version and observed initialization exchange pass.
 - DMA/IRQ: the guest driver completes transfers and acknowledges interrupts.

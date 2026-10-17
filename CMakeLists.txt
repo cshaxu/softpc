@@ -621,7 +621,9 @@ set(SOFTPC_TEST_TARGETS
     softpc-irq-smoke
     softpc-fdc-smoke
     softpc-printer-smoke
+    softpc-parallel-failure-smoke
     softpc-sound-smoke
+    softpc-audio-lifecycle-smoke
     softpc-serial-smoke
     softpc-mouse-smoke
     softpc-keycode-smoke

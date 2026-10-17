@@ -346,7 +346,8 @@ IBOOL DmaDataToDsp(DSP_MODE mode)
     bWriteBurstStarted = FALSE;
     address = StartingDmaAddr;
     for (i = 0; i < DspTransferSize; ++i) {
-        sas_load(dma_system_address(SbDmaChannel, DmaInfo.page, address), &DspBuffer[i]);
+        /* T94: DMA addresses are physical, independent of guest paging. */
+        sas_PRS(dma_system_address(SbDmaChannel, DmaInfo.page, address), &DspBuffer[i], 1);
         address = (IU16)(address + ((DmaInfo.mode & 0x20) ? -1 : 1));
     }
 
@@ -960,7 +961,8 @@ Return Value:
             IU32 dMAPhysicalAddress;
 
             if ((dMAPhysicalAddress=GetDMATransferAddress()) != -1L) {
-                sas_store(dMAPhysicalAddress, 0x80);
+                IU8 silence = 0x80;
+                sas_PWS(dMAPhysicalAddress, &silence, 1);
             }
             GenerateInterrupt(2);
         }
@@ -1166,7 +1168,7 @@ Return Value:
         if ((dMAPhysicalAddress=GetDMATransferAddress()) == -1L) {
             return;
         }
-        sas_store(dMAPhysicalAddress, data);
+        sas_PWS(dMAPhysicalAddress, &data, 1);
 
         // Update virtual DMA status
         QueryDMA(&dMAInfo);
@@ -1184,7 +1186,7 @@ Return Value:
         if ((dMAPhysicalAddress=GetDMATransferAddress()) == -1L) {
             return;
         }
-        sas_store(dMAPhysicalAddress, data);
+        sas_PWS(dMAPhysicalAddress, &data, 1);
 
         // Update virtual DMA status
         QueryDMA(&dMAInfo);

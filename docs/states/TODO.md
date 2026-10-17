@@ -1,5 +1,14 @@
 # Long-Term Review Ledger
 
+- TODO(High): Correct Compat memory.c's physical read/write adapters, which
+  currently call linear c_sas_loads/stores. T94 S2's nonidentity-paging test
+  exposed the incorrect read oracle; direct c_sas_PRS confirms the DMA write
+  reached physical RAM while the named physical API inspected another page.
+  Sound DMA now uses original physical SAS directly. Owner: App-SoftPC Compat
+  memory boundary. Admission condition: separately scope the two adapters and
+  all callers, preserve SAS_VIDEO dispatch and test paging plus video mapping;
+  do not enlarge the approved four-site DSP repair silently.
+
 - TODO(Low): Diagnose repeated Ninja log recovery in the local x86 build tree.
   T93 S15 incremental invocations report "premature end of file; recovering"
   and rebuild hundreds of objects, including after test-only changes. Builds

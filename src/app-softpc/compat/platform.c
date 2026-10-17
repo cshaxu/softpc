@@ -36,6 +36,7 @@
 #include "hdd_media.h"
 #include "audio.h"
 #include "nt_sb.h"
+#include "sndblst.h"
 #include "c_main.h"
 #include "lib/base/clock_interface.h"
 #include "lib/base/sync_interface.h"
@@ -48,6 +49,7 @@
 
 IU32 softpc_ccpu_instruction_budget = 0;
 IBOOL softpc_ccpu_instruction_budget_active = FALSE;
+static IBOOL softpc_sound_reset_failed;
 
 /* CCPU's original quick-event implementation uses one decoded instruction
    as one microsecond of guest progress.  On a modern host the interpreter can
@@ -219,7 +221,8 @@ int softpc_platform_executor_ready(void)
 {
 #ifdef _WIN32
     return softpc_executor_event != NULL && softpc_clock_timer != NULL &&
-        !softpc_executor_wait_failed && SbGetStatus() == LIB_STATUS_OK;
+        !softpc_executor_wait_failed && !softpc_sound_reset_failed &&
+        SbGetStatus() == LIB_STATUS_OK;
 #else
     return 0;
 #endif
@@ -755,7 +758,14 @@ CHAR *host_get_version(void) { return ""; }
 CHAR *host_get_unpublished_version(void) { return ""; }
 CHAR *host_get_years(void) { return ""; }
 CHAR *host_get_copyright(void) { return ""; }
-void NIDDB_System_Reboot(void) {}
+void NIDDB_System_Reboot(void)
+{
+    /* Original BIOS calls this before recreating quick-event queues. */
+    if (!SbTerminate()) {
+        softpc_sound_reset_failed = TRUE;
+        softpc_ccpu_lifecycle_request_exit();
+    }
+}
 void host_timer_shutdown(void)
 {
 #ifdef _WIN32
@@ -771,7 +781,14 @@ void host_timer_shutdown(void)
     softpc_executor_wait_failed = 0;
 #endif
 }
-void host_reset(void) {}
+void host_reset(void)
+{
+    /* Both cold and guest resets reach here after rebuilding the I/O table. */
+    if (!softpc_sound_reset_failed && !SbInitialize()) {
+        softpc_sound_reset_failed = TRUE;
+        softpc_ccpu_lifecycle_request_exit();
+    }
+}
 /* The detached executor has no product logger.  Keep its optional diagnostic
  * stream valid so CCPU fault reports remain usable during standalone testing. */
 FILE *trace_file = NULL;
@@ -795,6 +812,7 @@ void softpc_platform_bind_reset_host_functions(void)
 {
     extern KEYBDFUNCS softpc_keyboard_host_functions;
 
+    softpc_sound_reset_failed = FALSE;
     working_video_funcs = &nt_video_funcs;
     working_keybd_funcs = &softpc_keyboard_host_functions;
     working_error_funcs = &softpc_error_functions;
