@@ -3453,6 +3453,82 @@ Win95 Sound Blaster queue proposal is preserved verbatim with this delivery,
 without admitting or implementing it. S15 awaits owner acceptance after the
 separate actual-change review; T93 remains open.
 
+#### S15 flat fixtures and platform coverage continuation
+
+Owner request: "lib/fixtures实际上只有4个代码文件，但是搞一堆目录。请你扁平化。
+另外，各组件/子组件的 win32, linux目录里面的测试文件（甚至内容）并不对称，
+请你也要修复". Baseline efc232e4; this remains S15, not a new admission.
+
+Frozen universe: the four shared test packages, four Lib negative source inputs,
+and all Lib source-owner Win32/Linux leaves. Unit of coverage is an owner
+capability, not equal line counts or simulated support. Dispositions are shared
+root contract, matching platform boundary test, or documented absent backend.
+The receiver ledger is test/lib/README.md's Platform coverage section. The
+other three source/test packages have no platform implementation directories;
+they retain neutral contracts. Completion requires each owner to have a stated
+receiver, no unjustified platform-directory mismatch, valid negative diagnostics
+and passing dual-width qualification.
+
+Four tracked fixtures become flat files without body changes. CMake COPYONLY
+constructs only their intentional invalid source-owner paths in the build tree.
+Existing tests continue matching the exact forbidden-edge/relative-include/
+control-owner/retired-name diagnostic. This is test fixture preparation, not
+production source transformation. No verifier or production corpus changes.
+
+Matching platform tests now use keyboard_decode, sync, file, stream, output,
+and console leaf names. Shared registration derives target/workdir identity
+from the complete relative test path, not basename. Its two explicit Lib
+target_sources and one Emulator target_sources receiver are updated; every
+other registration consumes the returned target list. Same-named platform
+tests coexist in the actual build and CTest runs without special-case aliases.
+
+Five missing probes cover Linux clock failure/output preservation, Linux PCM
+public rejection and output counters, Linux Console/Window public rejection
+with repeated acquisition/cleanup, and Win32 Storage mode/encoding/acquisition
+failure cleanup. Linux keyboard now covers every defined terminal key, repeat,
+make/break, modifiers and unavailable physical mapping. Linux broker covers
+output, activation, cancellation and null destruction, not only create.
+Windows-only native facilities do not acquire fictitious Linux tests. Shared
+queue/render/input contracts stay at the owner root. No real audio/desktop is
+needed by the new units; native integration remains separate.
+
+Planning estimate: production +0/-0; tests/config +220-320/-40-80, net +180-240
+plus structural moves. First compile caught missing Types includes in two new
+fixtures; these were corrected before qualification. Failed attempts are not
+passing evidence. Owner INI/media/snapshots remain protected.
+
+Full regression found a pre-existing App sound-unit batching assumption:
+two first dequeues were required to have equal frame counts, although the
+copied PCM FIFO permits partial/variable dequeue batches. S15 already admits
+non-audio-unit isolation from native audio. The test now accumulates a fixed
+512-sample prefix for each run, checks every sample's expected amplitude and
+both polarities, then publishes completion atomically. It does not change the
+guest program, producer, public PCM contract or scheduler; no retries hide the
+failure. The earlier failing run remains excluded from acceptance evidence.
+
+Final full qualification passes x64 and x86, 193/193 each: Lib 76, Emulator 23,
+X86 Debug 12, X86 IBM PC 10, other background 64, native desktop five and native
+audio three. Evidence: ignored platform-qualification shared/other/native XML
+and platform-3 log, exit zero. These are controlled adapter tests on Windows,
+not proof of a native Linux desktop/audio implementation. The four negative
+fixture blobs are byte-identical to their previous nested paths. All 96 shared
+C/H files excluding those deliberate negative inputs retain source owners.
+
+Accounting against efc232e4, git diff --numstat with rename detection:
+production +0/-0; test C/H +276/-65, net +211. Test package totals including
+CMake/README/manifests: Lib +334/-69 (net +265), Emulator +2/-2 (net zero),
+both X86 test packages unchanged, shared registration +1/-1 (net zero),
+App sound unit +23/-32 (net -9). Structural moves do not count as rewritten
+bodies. No new production API, state, backend or implementation path exists.
+The x86 product was rebuilt because of existing Ninja log recovery; the x64
+artifact is the verified cached build. Existing mirror warnings and Ninja
+recovery remain separately recorded debt, not hidden zero-warning claims.
+Owner INI/snapshot hashes and guest media remain unchanged.
+The corrected sound unit also passes 20 consecutive runs per architecture;
+the final README/manifest change passes all 12 manifest/ownership/type gates
+per architecture. Evidence: platform-final log, final-gates XML and final.exit
+zero. No retries inside the test or relaxed assertions conceal a failed run.
+
 #### S15 test-layout actual-change review
 
 Coordinator role reviewed executor 77cd7263 against 0dfc02cf and the retained

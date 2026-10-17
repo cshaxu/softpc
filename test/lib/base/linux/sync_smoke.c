@@ -1,5 +1,5 @@
 #include "lib/types/test.h"
-#include "linux_wait_fakes.h"
+#include "sync_fakes.h"
 static lib_u32 allocations, releases;
 static void *allocate(lib_size count, lib_size size)
 { ++allocations; return lib_allocate_zero(count, size); }

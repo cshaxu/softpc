@@ -2,7 +2,7 @@ include_guard(GLOBAL)
 
 # Registration only: each corpus still selects its own tests and dependencies.
 function(shared_register_test corpus source)
-    get_filename_component(name "${source}" NAME)
+    string(REPLACE "/" "-" name "${source}")
     set(target "${corpus}-test-${name}")
     set(label "${corpus}")
     add_executable(${target} ${source}_smoke.c)

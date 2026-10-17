@@ -61,6 +61,30 @@ Executor 77cd7263 is committed and pushed. Separate actual-change review of
 that commit, the original layout/ownership requests and final evidence passes;
 see the proposal's layout review. S15 remains open awaiting owner acceptance.
 
+Owner further extends S15: flatten the four Lib negative fixture files and
+audit/fix Win32/Linux test naming and contract coverage asymmetry. Keep negative
+source-owner layouts in disposable build fixtures, not nested tracked folders.
+Use complete relative test paths for target identity so equal leaf names are
+legal. Cover missing Linux clock failures and unsupported PCM/KVM acquisition,
+expand existing Linux input/broker assertions, and record capability-specific
+differences instead of inventing backend support. Production +0/-0; estimated
+tests/config +220-320/-40-80, net +180-240, plus relocations. Qualification remains
+cached dual-width builds, shared then other and native tests, executor delivery
+and separate actual-change review before owner acceptance.
+Full regression exposed the existing App sound unit's assumption that two
+worker dequeue batches have equal size. Within S15's admitted unit-isolation
+scope, compare the same 512-sample prefix across batches instead; preserve
+amplitude/polarity assertions and atomic completion. No production audio change.
+This continuation passes full dual-width qualification, 193/193 each:
+121 shared, 64 other background, five desktop and three native audio cases.
+All 96 shared C/H test files excluding intentional negative fixtures retain
+source-owner layouts. Four flat fixtures preserve their original bytes and
+diagnostics. Production +0/-0; test C/H +276/-65, net +211. Both product builds
+are verified, with x64 cached and x86 rebuilt after existing Ninja-log recovery.
+Sound passes 20 consecutive executions per width, followed by 12 final manifest/
+boundary gates per width. Executor push and actual-change review remain the
+delivery steps; S15 remains open for owner acceptance.
+
 ## M9 T93 S15 Packet
 
 | Field | Required record |

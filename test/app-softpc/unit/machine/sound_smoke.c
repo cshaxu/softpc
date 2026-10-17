@@ -28,10 +28,8 @@ extern ULONG BeepLastDuration;
 struct audio_pcm_stream_platform { lib_bool live; lib_u64 submitted; };
 static struct audio_pcm_stream_platform audio_probe_platform;
 static volatile LONG audio_probe_phase;
-static volatile LONG audio_probe_first_delivery;
-static volatile LONG audio_probe_second_delivery;
-static lib_u32 audio_probe_first_frame_count;
-static lib_u32 audio_probe_second_frame_count;
+static volatile LONG audio_probe_first_frame_count;
+static volatile LONG audio_probe_second_frame_count;
 static lib_bool audio_probe_first_positive;
 static lib_bool audio_probe_first_negative;
 static lib_bool audio_probe_second_positive;
@@ -79,27 +77,19 @@ lib_status audio_pcm_stream_platform_enqueue(audio_pcm_stream_platform *platform
     for (index = 0u; index < frame_count; ++index)
         if (samples[index] != 0) non_silent = LIB_TRUE;
     phase = InterlockedCompareExchange(&audio_probe_phase, 0, 0);
-    if (non_silent != LIB_FALSE && phase == 1) {
-        if (InterlockedCompareExchange(&audio_probe_first_delivery, 0, 0) == 0) {
-            audio_probe_first_frame_count = frame_count;
-            for (index = 0u; index < frame_count; ++index) {
-                assert(samples[index] == 12000 || samples[index] == -12000);
-                if (samples[index] > 0) audio_probe_first_positive = LIB_TRUE;
-                if (samples[index] < 0) audio_probe_first_negative = LIB_TRUE;
-            }
+    if (non_silent != LIB_FALSE && (phase == 1 || phase == 2)) {
+        volatile LONG *frames = phase == 1 ? &audio_probe_first_frame_count : &audio_probe_second_frame_count;
+        lib_bool *positive = phase == 1 ? &audio_probe_first_positive : &audio_probe_second_positive;
+        lib_bool *negative = phase == 1 ? &audio_probe_first_negative : &audio_probe_second_negative;
+        LONG remaining = 512 - InterlockedCompareExchange(frames, 0, 0);
+        lib_u32 count = frame_count < (lib_u32)remaining ? frame_count : (lib_u32)remaining;
+        /* Compare a fixed sample prefix, independent of worker dequeue batches. */
+        for (index = 0u; index < count; ++index) {
+            assert(samples[index] == 12000 || samples[index] == -12000);
+            if (samples[index] > 0) *positive = LIB_TRUE;
+            if (samples[index] < 0) *negative = LIB_TRUE;
         }
-        (void)InterlockedIncrement(&audio_probe_first_delivery);
-    }
-    if (non_silent != LIB_FALSE && phase == 2) {
-        if (InterlockedCompareExchange(&audio_probe_second_delivery, 0, 0) == 0) {
-            audio_probe_second_frame_count = frame_count;
-            for (index = 0u; index < frame_count; ++index) {
-                assert(samples[index] == 12000 || samples[index] == -12000);
-                if (samples[index] > 0) audio_probe_second_positive = LIB_TRUE;
-                if (samples[index] < 0) audio_probe_second_negative = LIB_TRUE;
-            }
-        }
-        (void)InterlockedIncrement(&audio_probe_second_delivery);
+        if (count != 0u) (void)InterlockedAdd(frames, (LONG)count);
     }
     if (non_silent != LIB_FALSE && phase == 3) {
         /* Compare the same three complete blocks, not extra output delivered
@@ -178,13 +168,13 @@ lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platfor
     return LIB_STATUS_OK;
 }
 
-static void audio_probe_wait_for_blocks(volatile LONG *delivered)
+static void audio_probe_wait_for_count(volatile LONG *delivered, LONG required)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + 2000u;
-    while (InterlockedCompareExchange(delivered, 0, 0) < 3 &&
+    while (InterlockedCompareExchange(delivered, 0, 0) < required &&
         softpc_test_clock_milliseconds() < deadline)
         softpc_test_sleep_milliseconds(1u);
-    assert(InterlockedCompareExchange(delivered, 0, 0) >= 3);
+    assert(InterlockedCompareExchange(delivered, 0, 0) >= required);
 }
 
 static void audio_probe_run_audio_com(void)
@@ -287,12 +277,12 @@ int main(void)
        to the presentation boundary. */
     InterlockedExchange(&audio_probe_phase, 3);
     audio_probe_execute_audio_com(machine, LIB_TRUE);
-    audio_probe_wait_for_blocks(&audio_probe_program_first_delivery);
+    audio_probe_wait_for_count(&audio_probe_program_first_delivery, 3);
     assert(InterlockedCompareExchange(&audio_probe_program_first_delivery, 0, 0) != 0);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     InterlockedExchange(&audio_probe_phase, 4);
     audio_probe_execute_audio_com(machine, LIB_TRUE);
-    audio_probe_wait_for_blocks(&audio_probe_program_second_delivery);
+    audio_probe_wait_for_count(&audio_probe_program_second_delivery, 3);
     assert(InterlockedCompareExchange(&audio_probe_program_second_delivery, 0, 0) != 0);
     assert(InterlockedCompareExchange(&audio_probe_program_first_frames, 0, 0) * 4 >=
         InterlockedCompareExchange(&audio_probe_program_second_frames, 0, 0) * 3);
@@ -315,7 +305,7 @@ int main(void)
 #ifdef _WIN32
     InterlockedExchange(&audio_probe_phase, 1);
     audio_probe_run_audio_com();
-    audio_probe_wait_for_blocks(&audio_probe_first_delivery);
+    audio_probe_wait_for_count(&audio_probe_first_frame_count, 512);
 #else
     outb(TIMER_MODE_REG, 0xb6u);
     outb(TIMER2_REG, 0x98u);
@@ -351,13 +341,14 @@ int main(void)
        sink directly. */
     InterlockedExchange(&audio_probe_phase, 2);
     audio_probe_run_audio_com();
-    audio_probe_wait_for_blocks(&audio_probe_second_delivery);
+    audio_probe_wait_for_count(&audio_probe_second_frame_count, 512);
     outb(PPI_GENERAL, 0x00u);
     assert(PpiState == FALSE);
     assert(T2State == FALSE);
     assert(BeepLastFreq == 0u);
     assert(BeepLastDuration == 0u);
-    assert(audio_probe_first_frame_count == audio_probe_second_frame_count);
+    assert(InterlockedCompareExchange(&audio_probe_first_frame_count, 0, 0) == 512);
+    assert(InterlockedCompareExchange(&audio_probe_second_frame_count, 0, 0) == 512);
     assert(audio_probe_first_positive != LIB_FALSE && audio_probe_first_negative != LIB_FALSE);
     assert(audio_probe_second_positive != LIB_FALSE && audio_probe_second_negative != LIB_FALSE);
 #endif

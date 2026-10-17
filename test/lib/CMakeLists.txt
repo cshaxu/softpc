@@ -18,6 +18,14 @@ endif()
 set(SHARED_LIB_TEST_TARGETS)
 include("${CMAKE_CURRENT_LIST_DIR}/../register.cmake")
 
+# Flat tracked inputs; only the disposable negative corpus needs owner paths.
+foreach(fixture IN ITEMS "dag/console-broker/forbidden_include.c"
+        "relative/console-broker/forbidden_relative_include.c"
+        "control/kvm-base/control.h" "naming/old_identifier.c")
+    get_filename_component(name "${fixture}" NAME)
+    configure_file("fixtures/${name}" "fixtures/${fixture}" COPYONLY)
+endforeach()
+
 add_test(NAME lib.test-boundaries COMMAND "${CMAKE_COMMAND}"
     "-DTEST_ROOT=${CMAKE_CURRENT_SOURCE_DIR}" "-DTEST_LAYER=lib"
     "-DTEST_SOURCE_ROOT=${LIB_ROOT}"
@@ -43,7 +51,7 @@ shared_register_test(lib storage/storage_failure_output storage)
 shared_register_test(lib audio/pcm/stream types base)
 shared_register_test(lib audio/midi/midi_output types)
 shared_register_test(lib audio/fm/fm_output audio-fm)
-shared_register_test(lib audio/midi/linux/unsupported_output types)
+shared_register_test(lib audio/midi/linux/output types)
 shared_register_test(lib integration/native_midi_output audio-midi)
 set_property(TEST lib.integration/native_midi_output APPEND PROPERTY LABELS native_audio)
 set_property(TEST lib.integration/native_midi_output PROPERTY RESOURCE_LOCK native_midi)
@@ -57,22 +65,27 @@ shared_register_test(lib kvm-window/window_failure_output kvm-window)
 shared_register_test(lib kvm-console/text_frame_contract kvm-console)
 shared_register_test(lib kvm-console/console_failure_output kvm-console)
 shared_register_test(lib console-broker/broker_failure_output console-broker)
-shared_register_test(lib console-broker/linux/unsupported_backend types)
+shared_register_test(lib console-broker/linux/console types)
 shared_register_test(lib kvm-base/hotkey_policy kvm-base)
 shared_register_test(lib kvm-base/input_delivery kvm-base)
 shared_register_test(lib kvm-window/geometry kvm-window)
-shared_register_test(lib base/linux/linux_wait_contract types)
-shared_register_test(lib storage/linux/linux_storage_contract types base)
+shared_register_test(lib base/linux/sync types)
+shared_register_test(lib storage/linux/file types base)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    shared_register_test(lib storage/linux/linux_storage_lock storage)
+    shared_register_test(lib storage/linux/file_lock storage)
 endif()
-shared_register_test(lib base/linux/linux_input_contract types)
-target_sources(lib-test-linux_input_contract PRIVATE
+shared_register_test(lib base/linux/keyboard_decode types)
+target_sources(lib-test-base-linux-keyboard_decode PRIVATE
     "${LIB_ROOT}/base/linux/input.c" "${LIB_ROOT}/base/input.c")
+shared_register_test(lib base/linux/clock_failure types)
+shared_register_test(lib audio/pcm/linux/stream types base)
+shared_register_test(lib kvm-console/linux/component kvm-base console)
+shared_register_test(lib kvm-window/linux/component kvm-base)
 
 if(WIN32)
-    shared_register_test(lib audio/pcm/win32/win32_platform types base)
-    shared_register_test(lib audio/midi/win32/win32_midi_output types)
+    shared_register_test(lib storage/win32/file types base)
+    shared_register_test(lib audio/pcm/win32/stream types base)
+    shared_register_test(lib audio/midi/win32/output types)
     shared_register_test(lib console/lib_console_event_gate console)
     shared_register_test(lib kvm-base/kvm_frame_lock kvm-base)
     shared_register_test(lib console-broker/console_broker console)
@@ -82,7 +95,7 @@ if(WIN32)
     shared_register_test(lib base/win32/keyboard_decode base)
     shared_register_test(lib kvm-window/kvm_leaf_control_capacity kvm-window)
     shared_register_test(lib kvm-console/win32/kvm_console_retirement_barrier kvm-base console)
-    target_sources(lib-test-kvm_console_retirement_barrier PRIVATE
+    target_sources(lib-test-kvm-console-win32-kvm_console_retirement_barrier PRIVATE
         "${LIB_ROOT}/kvm-console/console.c")
     foreach(probe IN ITEMS kvm-window/kvm_frame_damage_mouse integration/kvm_window_retirement
             integration/kvm_window_modal kvm-window/win32/kvm_input_admission
@@ -91,11 +104,11 @@ if(WIN32)
     endforeach()
     foreach(probe IN ITEMS console-broker/win32/console_broker_reader_failure
             integration/console_broker_display console-broker/win32/console_broker_cancel
-            console-broker/win32/broker_blocking_gate console-broker/win32/lib_console_io_contract)
+            console-broker/win32/broker_blocking_gate console-broker/win32/console)
         shared_register_test(lib ${probe} console)
     endforeach()
     shared_register_test(lib console/console_blocking_gate console)
-    shared_register_test(lib base/win32/base_sync_ownership base)
+    shared_register_test(lib base/win32/sync base)
     shared_register_test(lib kvm-base/kvm_keyboard_lifetime kvm-base)
     shared_register_test(lib kvm-console/win32/console_keyboard_lifetime kvm-console)
     shared_register_test(lib kvm-console/win32/kvm_shutdown_failure kvm-console)
@@ -125,13 +138,13 @@ add_test(NAME lib.manifest
             -P "${LIB_ROOT}/verify_component_dependencies.cmake")
     add_test(NAME lib.component-dag-forbidden-include
         COMMAND "${CMAKE_COMMAND}"
-            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/lib-component-dag
+            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_BINARY_DIR}/fixtures/dag
             -DLIBRARY_VERIFIER:FILEPATH=${LIB_ROOT}/verify_component_dependencies.cmake
             "-DLIBRARY_EXPECTED_ERROR:STRING=Forbidden component edge: console-broker -> kvm-window"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/component_dag_forbidden_include_smoke.cmake")
     add_test(NAME lib.component-dag-relative-include
         COMMAND "${CMAKE_COMMAND}"
-            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/lib-component-relative-include
+            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_BINARY_DIR}/fixtures/relative
             -DLIBRARY_VERIFIER:FILEPATH=${LIB_ROOT}/verify_component_dependencies.cmake
             "-DLIBRARY_EXPECTED_ERROR:STRING=canonical lib/"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/component_dag_forbidden_include_smoke.cmake")
@@ -140,13 +153,13 @@ add_test(NAME lib.manifest
             -P "${LIB_ROOT}/verify_kvm_naming.cmake")
     add_test(NAME lib.component-control-ownership
         COMMAND "${CMAKE_COMMAND}"
-            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/lib-control-ownership
+            -DLIBRARY_ROOT:PATH=${CMAKE_CURRENT_BINARY_DIR}/fixtures/control
             -DLIBRARY_VERIFIER:FILEPATH=${LIB_ROOT}/verify_component_dependencies.cmake
             "-DLIBRARY_EXPECTED_ERROR:STRING=Window controls belong to kvm-window"
             -P "${CMAKE_CURRENT_SOURCE_DIR}/component_dag_forbidden_include_smoke.cmake")
     add_test(NAME lib.kvm-naming-forbidden
         COMMAND "${CMAKE_COMMAND}"
-            -DKVM_NAMING_ROOT:PATH=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/kvm-naming
+            -DKVM_NAMING_ROOT:PATH=${CMAKE_CURRENT_BINARY_DIR}/fixtures/naming
             -DKVM_NAMING_VERIFIER:FILEPATH=${LIB_ROOT}/verify_kvm_naming.cmake
             -P "${CMAKE_CURRENT_SOURCE_DIR}/kvm_naming_forbidden_smoke.cmake")
 add_test(NAME lib.types-layout-selftest COMMAND "${CMAKE_COMMAND}"

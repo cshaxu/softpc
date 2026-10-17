@@ -60,7 +60,7 @@ list(APPEND SHARED_EMULATOR_TEST_TARGETS emulator-product-composition-smoke)
 shared_register_test(emulator product/monitor emulator-product)
 if(WIN32)
     shared_register_test(emulator machine/machine emulator-machine)
-    target_sources(emulator-test-machine PRIVATE machine/machine_fixture.c)
+    target_sources(emulator-test-machine-machine PRIVATE machine/machine_fixture.c)
 endif()
 
 foreach(check IN ITEMS manifest corpus)

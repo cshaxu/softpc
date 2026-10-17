@@ -1,6 +1,6 @@
 #include "lib/types/test.h"
-#ifndef TEST_LINUX_WAIT_FAKES_H
-#define TEST_LINUX_WAIT_FAKES_H
+#ifndef TEST_LIB_BASE_LINUX_SYNC_FAKES_H
+#define TEST_LIB_BASE_LINUX_SYNC_FAKES_H
 
 /* Deterministic POSIX boundary substitute. The production Linux algorithm
  * runs unchanged; no OS scheduling or elapsed sleep decides the assertions. */
