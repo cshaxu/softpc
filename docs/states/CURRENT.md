@@ -15,12 +15,35 @@ claiming user runtime acceptance. S2 delivery is recorded in
 instructions are complete; executor cba71230 is pushed and actual-diff reviewed.
 Owner acknowledges S3 and admits S4: "哦这样啊 那准入s4 你告诉我如何干净的".
 Owner approves S4 closure and explicitly keeps T96 open.
-No implementation subtask is active. Open task awaiting owner: T96.
-No next S is admitted. See the
+Owner now admits S5: "非常好，我希望就按照现有架构+这个方案来做！请你开工".
+S5 is interrupted for owner-approved M9 Td S21; it resumes after governance delivery.
+Open task awaiting owner: T96.
+S4 remains closed; see the
 [S4 closure](../history/M9-T96-S4-frame-lifetime-audit.md). S3's
 [documentation delivery](../history/M9-T96-S3-rgb-corpus-audit.md) is complete
 at cba71230/3758a33e; S2 manual runtime
 acceptance remains unclaimed.
+
+## M9 Td S21 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Governance |
+| Admission And Approval | Owner approves inserting this narrow Td before resuming T96 S5. |
+| Objective | Permit bounded immutable frame ownership transfer without weakening guest-state isolation. |
+| Non-goals | No runtime implementation, API change, build, asset refresh or unrelated rules edits. |
+| Reference Baseline | 9cf0ab43 plus the admitted, uncommitted S5 design packet. |
+| Candidate Proposal | [Pointer circulation](../proposals/m9-lib-rgb-graphics-frame.md). |
+| Files And ABI Surface | Architecture rule, architecture migration note, current status and history; governance gate only if needed to represent an interrupted open T. |
+| Applicable Rules | Execution, Document and Architecture; single-person dual-role review. |
+| Verification | Actual diff and wording audit, documentation gate/self-tests, preserved dependency and single-executor restrictions. |
+| Expected Markers | Dedicated immutable frames are distinct from guest/live renderer state; ownership return, bounds and no render-wait or steady-state heap churn. |
+| Asset Needs | None; preserve all source/test binaries, INI and user checkpoint. |
+| Reporting Requirements | Documentation-only; report exact rule delta and any governance-check adjustment. |
+| Stop Conditions | No wider pointer exception or unrelated lifecycle change. |
+| Exit Criteria | Narrow policy reviewed, validated and pushed, then resume already admitted S5; T96 stays open. |
+| Original Owner Request | "批准" to the proposed narrow Td permitting bounded frame-pointer circulation. |
+| Similar-Issue Sweep | Copied-frame language in rules and architecture identified as current implementation versus target; ordinary copied input/command contracts retained. |
 
 ## Current Technical Baseline
 

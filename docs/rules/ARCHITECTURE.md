@@ -10,9 +10,18 @@ The concrete SoftPC ownership map is [System Architecture](../design/ARCHITECTUR
   timer delivery, media I/O, input collection, renderer surfaces, audio, and
   process/window integration.
 - The runtime has exactly one executor that may mutate SoftPC state. Frontends
-  communicate through bounded commands/input and consume copied frame snapshots.
-- Public cross-module interfaces use opaque handles and copied values; they do
-  not expose raw CPU, RAM, controller, renderer, or executor state.
+  communicate through bounded copied commands/input and consume complete frames.
+- Complete presentation frames may cross threads by explicit ownership transfer
+  of pointers to bounded, reusable storage. Only the producer writes its owned
+  frame; pending, processing and displayed frames are immutable until returned.
+  Replacement, failure, retirement and shutdown must return ownership exactly
+  once before reuse or final release. Frame exchange must not wait for rendering
+  or require steady-state per-frame allocation/free; brief transfer synchronization
+  is permitted. Frame formats belong to their consuming Lib components, never
+  to an outer machine implementation; transport does not interpret their content.
+- Other public cross-module interfaces retain opaque handles and copied values.
+  Dedicated presentation storage is not a pointer into live CPU, RAM, controller,
+  private renderer or executor state; none of those internals may escape.
 - Component-owned code, tests, CMake/configuration and component documentation
   obey the inward dependency order `lib < emulator < x86 < app-softpc`. A
   component may name only itself and tiers to its left. Repository-root

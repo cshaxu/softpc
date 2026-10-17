@@ -188,6 +188,19 @@ only those snapshots.
 
 ## Shared Console And KVM Composition
 
+### Approved frame-transport migration
+
+T96 S5 replaces the copied-frame implementation described below with bounded
+ownership circulation: Window has producing/pending/processing/displayed roles;
+Console has producing/pending/processing roles. Session/UI route without an
+additional historical payload owner. Unconsumed replacement and completed
+retirement return storage for reuse; controls/input remain copied values.
+Existing native surface remains separate. The updated architecture rule permits
+this migration, but it is not a claim that the runtime has already changed.
+S5 must update the implementation descriptions below with its verified delivery.
+
+### Current implementation
+
 Emulator is platform-independent source: it has no platform subdirectories,
 native API/types or OS-selected implementation branches. It owns its queues
 and state machines through public Lib Base mutex/event/task/wait contracts and

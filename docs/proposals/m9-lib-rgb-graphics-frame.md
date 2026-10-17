@@ -581,3 +581,61 @@ diff estimate for an unselected redesign is presented as a committed plan.
 Owner subsequently approves closing S4 with retention and explicitly keeps T96
 open. This disposition does not authorize whole-T closure or another subtask.
 Any future reduction must first establish its changed contract and tests.
+
+## S5 owner-approved pointer circulation
+
+Owner approves implementation after the S4 discussion: preserve existing layer
+ownership, circulate pointers rather than whole-frame values, retain native
+surface. Window has four roles (producing, latest pending, processing,
+displayed); Console has three (producing, latest pending, processing).
+Pending replacement returns the unconsumed buffer; completed Window display
+retires the old displayed buffer; completed Console output returns its input.
+Returned buffers remain reusable instead of being allocated/freed every frame.
+Machine must not wait for consumer completion or cancel generation to acquire
+storage. Brief pointer-exchange synchronization is distinct from such waiting.
+
+Frozen convergence universe and required proof:
+
+| Boundary | Required disposition/proof |
+| --- | --- |
+| Producer | Build only into exclusively owned storage; failed/no-frame construction preserves last valid delivery; no consumed dirty without storage. |
+| Machine publication | Replace duplicate published payload with one delivery authority; public diagnostic readers and observer lifetimes explicitly accounted for. |
+| Session/UI | Routing and run generation remain coherent without pinning extra history; asynchronous creation and simultaneous text consumers do not double-transfer a pointer. |
+| Mailbox | Atomic replace/take, latest-wins, exact-once return; controls remain independent and no content interpretation in Base. |
+| Window | Stable processing input, retirement after successful display transition, existing surface/damage and cursor behavior retained. |
+| Console | Processing input retained until conversion/output returns; NOT_CURRENT and failed output cannot leak or prematurely reuse storage. |
+| Lifecycle | Pause/final frame, reset/load generations, recreation, startup failure, close during publish and teardown release every allocation exactly once. |
+| Dependency | Leaf formats remain leaf-owned; no Lib references to Machine implementation; no duplicate runtime transport or per-frame heap churn. |
+
+Implementation is not yet claimed. Inventory existing callbacks and lifecycle
+tests before choosing signatures. The previous copied-frame architecture rules
+must be reconciled explicitly, not silently bypassed. No original source or
+user assets are part of this migration. Full x86/x64 qualification and actual
+executor/coordinator diff review remain required before a complete P delivery.
+
+### S5 admission checks
+
+Abstract exhaustive role exploration (not a production/threaded test) starts
+with producer slot 0, all other slots free, and empty pending/processing/
+displayed roles. Transitions are: successful producer publish exchanges with
+pending or takes a free slot; consumer take moves pending to processing;
+consumer finish returns old displayed and promotes processing for Window, or
+returns processing directly for Console; failed/no-frame production leaves
+roles unchanged. Every transition checks that each allocated slot has exactly
+one role and that publish can acquire its next writable slot without waiting.
+Canonical free-slot ordering yields 93 states/266 transitions for four-slot
+Window and 21 states/60 transitions for three-slot Console, all satisfying
+those invariants. This proves only the simplified role model, not mode changes,
+native output, simultaneous consumers or real synchronization.
+
+Concrete integration inventory confirms that Machine currently owns two frame
+buffers, Session a retained frame, and UI independently publishes Console and
+Window representations. The existing observer/copy-reader API also exposes the
+last publication. Those readers and asynchronous creation must not silently
+introduce another retained history into the bounded model.
+
+Governance prerequisite: rules/ARCHITECTURE.md currently mandates copied frame
+snapshots and copied values, while rules/EXECUTION.md allows rules edits only
+under an admitted Td. Owner approval establishes the new technical direction,
+and the owner subsequently approves M9 Td S21 to reconcile the rule text.
+Production migration has not begun; the governance change is not runtime proof.
