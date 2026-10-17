@@ -3259,6 +3259,26 @@ confirms the single native registry authority, lock-free message dispatch,
 existing cleanup/motion paths and Types ownership. Separate actual-commit review
 follows executor push; S14 waits for owner acceptance and S15 remains unadmitted.
 
+#### S14 coordinator actual-change review
+
+After executor fe6d9fe3 was pushed, the same agent switched to coordinator and
+reviewed its actual source/header/test/README/manifest diff, original S14
+request, seven-area ledger, full-run XML and every isolated failure result.
+The registration-call sweep still finds one implementation owner (mouse.c),
+with only Types vocabulary elsewhere. No lock spans focus/capture dispatch;
+the deterministic competing-task and synchronous reentry tests exercise the
+same production helper. Public signatures and mouse-motion conversion stay
+unchanged; native integration limits remain documented rather than hidden.
+
+All eleven changed paths belong to the admitted packet. Production and test
+counts match the executor accounting; package hashes match the published files.
+No audio implementation, App/mirror, media, snapshot or INI change is present.
+The review accepts the owner's direction to stop host-session investigation
+after unchanged isolated cases pass, without recasting aggregate failures as
+success or claiming their root causes fixed. Existing TODOs remain unchanged.
+Documentation governance and whitespace checks pass. No blocking finding in
+the bounded S14 change; owner acceptance remains required before S14 closure.
+
 ### S15 — portable archive and final qualification
 
 Extend existing device capture/restore and fixed-width codec, not Lib archive
