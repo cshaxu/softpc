@@ -19,9 +19,10 @@ Owner now admits S5: "非常好，我希望就按照现有架构+这个方案来
 S5 implementation replaces frame copies with bounded pointer ownership circulation.
 Final qualification is complete: x86 and x64 each pass 194/194, no skips.
 The x64 native set passed unchanged after the owner reconnected the desktop.
-Earlier disconnected-session failures remain recorded below. S5 is ready for
-executor delivery and committed-diff coordinator review; owner acceptance and
-S/T closure are not claimed.
+Earlier disconnected-session failures remain recorded below. Executor P1 ccecf953 is committed and pushed. Coordinator review of that actual
+commit confirms bounded ownership, no large payload transport copies, no mirror
+or Compat changes, and the final XML/artifact ledger. S5 awaits owner acceptance;
+S/T closure is not claimed.
 S4 remains closed; see the
 [S4 closure](../history/M9-T96-S4-frame-lifetime-audit.md). S3's
 [documentation delivery](../history/M9-T96-S3-rgb-corpus-audit.md) is complete
