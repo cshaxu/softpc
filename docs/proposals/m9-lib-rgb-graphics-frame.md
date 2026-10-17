@@ -815,3 +815,21 @@ passes. Existing mirror compiler warnings and x86 Ninja recovery remain; no new
 changed-path compiler warning was observed. All native tests ran in the active
 host session. These are automated test results, not owner guest acceptance or
 measured speedup. No Computer Use or interactive timeout termination occurred.
+
+### S6 coordinator actual-commit review
+
+Reviewed executor 21b64548 after push: all production/test diff, current design
+and contract descriptions, manifests and packaged EXE hashes. The immutable
+publication precondition is already part of the Window public contract; removing
+private rescans does not remove producer validation or native failure checks.
+Session notification cleanup preserves the run filter, FIFO and Machine observer
+signature. The new test advances both sides with test-only event checkpoints;
+it supplements rather than replaces the producer-with-stalled-consumer proof.
+No new runtime state, allocation route or ownership path was introduced.
+
+Recomputed 253 manifest entries across changed source/test corpora; all match.
+Compared final XML testcase names with both CTest enumerations: 194/194 each,
+no skips/failures, plus the final x64 ten-repeat proof. Actual C/H accounting
+matches the ledger. Original mirror and owner INI/media/checkpoint are untouched.
+No blocking finding remains in this bounded review. Runtime owner acceptance
+and T96 closure remain pending; no exhaustive race/performance claim is made.

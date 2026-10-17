@@ -58,8 +58,11 @@ S6 admitted. Expected production +10..25/-25..50 (net -10..-30), tests
 Emulator Session notifications and callers; manifests and current design docs.
 Hidden owned qualification under build/t96/s6; full dual-width tests and EXEs.
 S6 implementation, executor self-review and full qualification are complete.
-Executor commit/push and coordinator actual-commit review follow. Owner
-acceptance and S/T closure are not claimed.
+Executor P1 21b64548 is committed and pushed. Coordinator reviewed that actual
+commit, checked all 253 affected-corpus manifest entries, dual-width 194-name
+coverage against CTest enumeration, final turnover repeat and deployed hashes.
+No blocking finding remains in the four-item audit scope. S6 awaits owner
+acceptance; S/T closure is not claimed.
 
 ## Current Technical Baseline
 
