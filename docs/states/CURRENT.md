@@ -3,6 +3,8 @@
 ## Current Work
 
 T93 S12 is verified for delivery: UTF-8 Console text/lines and Window titles.
+Executor 2fc25069 is pushed; separate coordinator actual-change review accepts
+the delivery for owner verification. S12 is not closed.
 Owner admission: "好的。准入下一个S任务执行到收口前等我验收。"
 Baseline 79eca79f. Deliver built/tested/published/pushed changes, then wait for
 owner acceptance; do not close S12 or admit S13 automatically.

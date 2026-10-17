@@ -2971,6 +2971,25 @@ reported separately, not counted as production/test C/H. Both X86 packages
 and the original mirror have zero diff. The approved Base path simplification
 is included in the Lib production total, not an additional reduction.
 
+#### S12 coordinator actual-change review
+
+Executor 2fc25069 is pushed. After switching roles, the coordinator read the
+committed file list and actual production diffs, checked the original request
+against the frozen ledger, and inspected focused/final JUnit results and both
+published hashes. The delivery stays within the approved two Base cleanups
+and S12 text boundaries. Platform APIs/types stay in Lib platform code;
+Window's Base dependency is explicit in build, verifier, negative fixture and
+documentation. No second output/reader/decoder owner, generic conversion
+framework or retry state was added. Production/test counts match the committed
+diff; both X86 packages, App, mirror and user-owned assets other than EXEs are
+unchanged. Documentation and whitespace checks pass.
+
+The first fixture compile error, premature-history gate failure and desktop
+stage=14 failure remain disclosed. The last has an explicit TODO rather than
+a false repair claim. Final test coverage passes all 167 cases per width with
+zero skips. Review approves delivery for owner acceptance, not S12 closure;
+T93 remains open and S13 is not admitted.
+
 ### S13 — PCM progress and lifecycle contract
 
 Keep PCM/WASAPI ownership and existing counters. Define accepted/submitted/
