@@ -33,8 +33,7 @@ lib_status base_process_platform_executable_directory(char *output, lib_size cap
     lib_i32 bytes;
     lib_status status;
 
-    if (output == LIB_NULL || capacity > LIB_INT32_MAX ||
-        capacity > LIB_SIZE_MAX / sizeof(*path)) return LIB_STATUS_INVALID_ARGUMENT;
+    if (output == LIB_NULL || capacity > LIB_INT32_MAX) return LIB_STATUS_INVALID_ARGUMENT;
     path = lib_allocate(capacity * sizeof(*path));
     if (path == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     length = lib_win32_get_module_file_name_w(LIB_NULL, path, (lib_win32_dword)capacity);

@@ -102,8 +102,16 @@ static lib_win32_long_ptr LIB_WIN32_WINAPI get_context(lib_win32_hwnd w, lib_i32
 { (void)w; return index==LIB_WIN32_GWLP_USERDATA ? (lib_win32_long_ptr)context : 0; }
 static lib_win32_bool LIB_WIN32_WINAPI resize(lib_win32_hwnd w, lib_win32_hwnd after, lib_i32 x,lib_i32 y,lib_i32 cx,lib_i32 cy,lib_win32_uint f)
 { (void)w;(void)after;(void)x;(void)y;(void)cx;(void)cy;(void)f;return resize_ok; }
-static lib_win32_bool LIB_WIN32_WINAPI title(lib_win32_hwnd w,lib_win32_lpcstr text)
-{ (void)w;(void)text; if(reenter_title) title_notification(); return title_ok; }
+static lib_win32_wchar title_text[KVM_WINDOW_TITLE_CAPACITY];
+static lib_u32 title_calls;
+static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_lpcwstr text)
+{
+    (void)w; ++title_calls;
+    lib_size i=0u;
+    do { title_text[i]=text[i]; } while(text[i++]!=0u && i<KVM_WINDOW_TITLE_CAPACITY);
+    if(reenter_title) title_notification();
+    return title_ok;
+}
 #undef lib_win32_get_capture
 #undef lib_win32_set_capture
 #undef lib_win32_release_capture
@@ -116,7 +124,7 @@ static lib_win32_bool LIB_WIN32_WINAPI title(lib_win32_hwnd w,lib_win32_lpcstr t
 #undef lib_win32_set_cursor
 #undef lib_win32_get_window_long_ptr_a
 #undef lib_win32_set_window_pos
-#undef lib_win32_set_window_text_a
+#undef lib_win32_set_window_text_w
 #define lib_win32_get_capture get_capture
 #define lib_win32_set_capture set_capture
 #define lib_win32_release_capture release_capture
@@ -131,7 +139,7 @@ static lib_win32_bool LIB_WIN32_WINAPI title(lib_win32_hwnd w,lib_win32_lpcstr t
 #define lib_win32_set_cursor cursor
 #define lib_win32_get_window_long_ptr_a get_context
 #define lib_win32_set_window_pos resize
-#define lib_win32_set_window_text_a title
+#define lib_win32_set_window_text_w capture_title
 #undef lib_win32_get_tick_count
 #define lib_win32_get_tick_count clock_tick
 #undef lib_win32_set_timer
@@ -355,6 +363,10 @@ static void check_surface_damage(void)
 }
 int main(void)
 {
+    lib_test_assert(kvm_window_apply_title((lib_win32_hwnd)1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5"));
+    lib_test_assert(title_calls==1u && title_text[0]==0x6d4bu && title_text[1]==0xd83cu &&
+        title_text[2]==0xdfb5u && title_text[3]==0u);
+    lib_test_assert(!kvm_window_apply_title((lib_win32_hwnd)1,"\xc0\xaf") && title_calls==1u);
     check_invalid_controls();
     static kvm_win32_window_context surface;
     lib_test_assert(!win32_window_ensure_surface((lib_win32_hwnd)1,&surface,8,8));

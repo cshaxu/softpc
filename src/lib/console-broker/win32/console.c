@@ -10,6 +10,7 @@
 #include "lib/base/input_adapter_interface.h"
 
 #include "lib/types/win32/console.h"
+#include "lib/types/win32/text.h"
 
 struct console_broker_backend {
     lib_win32_handle input;
@@ -229,14 +230,16 @@ static lib_win32_dword LIB_WIN32_WINAPI console_broker_reader(void *context)
 {
     console_broker_backend *backend = (console_broker_backend *)context;
     if (backend->mode == CONSOLE_BROKER_COOKED_LINES) {
-        char text[LIB_CONSOLE_LINE_CAPACITY];
+        lib_win32_wchar text[LIB_CONSOLE_LINE_CAPACITY];
+        lib_win32_wchar line[LIB_CONSOLE_LINE_CAPACITY];
+        lib_u32 used = 0u;
         lib_console_event event = { 0 };
         lib_bool overflow = LIB_FALSE, complete = LIB_FALSE;
         /* ReadConsole may return a buffer fragment rather than a whole line.
          * Keep bounded storage, but drain an oversized line through its LF. */
         while (!complete) {
             lib_win32_dword read = 0u, i;
-            if (!lib_win32_read_console_a(backend->input, text,
+            if (!lib_win32_read_console_w(backend->input, text,
                     LIB_CONSOLE_LINE_CAPACITY - 1u, &read, LIB_NULL) || read == 0u) {
                 if (lib_win32_wait_for_single_object(backend->stop_event, 0u) !=
                         LIB_WIN32_WAIT_OBJECT_0)
@@ -250,10 +253,20 @@ static lib_win32_dword LIB_WIN32_WINAPI console_broker_reader(void *context)
             for (i = 0u; i < read; ++i) {
                 if (text[i] == '\n') { complete = LIB_TRUE; break; }
                 if (text[i] == '\r') continue;
-                if (event.value.line.length == LIB_CONSOLE_LINE_CAPACITY - 1u)
+                if (used == LIB_CONSOLE_LINE_CAPACITY - 1u || text[i] == 0u)
                     overflow = LIB_TRUE;
-                else event.value.line.text[event.value.line.length++] = text[i];
+                else line[used++] = text[i];
             }
+        }
+        /* Decode the completed native line once: fragments may divide a
+         * surrogate pair. UTF-8 capacity counts bytes, not native units. */
+        if (!overflow && used != 0u) {
+            lib_i32 bytes = lib_win32_wide_char_to_multi_byte(LIB_WIN32_CP_UTF8,
+                LIB_WIN32_WC_ERR_INVALID_CHARS, line, (lib_i32)used,
+                event.value.line.text, LIB_CONSOLE_LINE_CAPACITY - 1u,
+                LIB_NULL, LIB_NULL);
+            if (bytes == 0) overflow = LIB_TRUE;
+            else event.value.line.length = (lib_u32)bytes;
         }
         lib_win32_interlocked_exchange(&backend->cooked_line_pending, 0);
         event.kind = overflow ? LIB_CONSOLE_EVENT_REJECTED_LINE : LIB_CONSOLE_EVENT_COOKED_LINE;
@@ -543,7 +556,7 @@ static lib_status console_broker_retire_reader(console_broker_backend *backend)
     if (completed == LIB_WIN32_WAIT_TIMEOUT && backend->mode == CONSOLE_BROKER_COOKED_LINES) {
         lib_win32_input_record wake = { 0 };
         lib_win32_dword written = 0u;
-        /* Some terminal hosts do not interrupt a line-buffered ReadConsoleA
+        /* Some terminal hosts do not interrupt a line-buffered ReadConsoleW
            even after both documented cancellation requests.  Supply the
            terminating record ourselves while the old reader is still the
            sole owner.  It observes stop_event and discards this synthetic
@@ -633,23 +646,36 @@ lib_status console_broker_backend_write_bound(console_broker_backend *backend,
     lib_size length)
 {
     lib_win32_dword written = 0u;
+    lib_i32 count;
+    lib_win32_wchar *wide;
+    lib_status status;
     if (backend == LIB_NULL || (text == LIB_NULL && length != 0u) ||
-        length > (lib_size)LIB_UINT32_MAX) return LIB_STATUS_INVALID_ARGUMENT;
-    console_broker_backend_lock_output(backend);
-    if (backend->console != expected_console ||
-        backend->generation != expected_generation) {
-        console_broker_backend_unlock_output(backend);
-        return LIB_STATUS_OK;
+        length > (lib_size)LIB_INT32_MAX) return LIB_STATUS_INVALID_ARGUMENT;
+    if (length == 0u) return LIB_STATUS_OK;
+    count = lib_win32_multi_byte_to_wide_char(LIB_WIN32_CP_UTF8,
+        LIB_WIN32_MB_ERR_INVALID_CHARS, text, (lib_i32)length, LIB_NULL, 0);
+    if (count == 0) return LIB_STATUS_INVALID_ARGUMENT;
+    if ((lib_size)count > LIB_SIZE_MAX / sizeof(*wide)) return LIB_STATUS_LIMIT_EXCEEDED;
+    wide = lib_allocate((lib_size)count * sizeof(*wide));
+    if (wide == LIB_NULL) return LIB_STATUS_NO_MEMORY;
+    if (lib_win32_multi_byte_to_wide_char(LIB_WIN32_CP_UTF8,
+            LIB_WIN32_MB_ERR_INVALID_CHARS, text, (lib_i32)length, wide, count) != count) {
+        lib_release(wide);
+        return LIB_STATUS_INVALID_ARGUMENT;
     }
-    {
+    console_broker_backend_lock_output(backend);
+    status = LIB_STATUS_OK;
+    if (backend->console == expected_console &&
+        backend->generation == expected_generation) {
         /* A stream write invalidates copied cells, but does not discard the
          * former frame extent that a following frame must clear. */
-        if (length != 0u) backend->previous_columns = backend->previous_rows = 0u;
-        lib_status status = lib_win32_write_console_a(backend->output, text, (lib_win32_dword)length,
-            &written, LIB_NULL) && written == (lib_win32_dword)length ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
-        console_broker_backend_unlock_output(backend);
-        return status;
+        backend->previous_columns = backend->previous_rows = 0u;
+        status = lib_win32_write_console_w(backend->output, wide, (lib_win32_dword)count,
+            &written, LIB_NULL) && written == (lib_win32_dword)count ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
     }
+    console_broker_backend_unlock_output(backend);
+    lib_release(wide);
+    return status;
 }
 
 lib_status console_broker_backend_write_text_frame_bound(console_broker_backend *backend,

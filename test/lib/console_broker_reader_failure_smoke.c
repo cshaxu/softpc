@@ -22,9 +22,9 @@ static lib_win32_dword LIB_WIN32_WINAPI failed_wait(lib_win32_dword count, const
   return record_index < record_count ? LIB_WIN32_WAIT_OBJECT_0 + 1 : LIB_WIN32_WAIT_FAILED; }
 #undef lib_win32_read_console_input_w
 #define lib_win32_read_console_input_w read_wide
-#undef lib_win32_read_console_a
+#undef lib_win32_read_console_w
 #undef lib_win32_wait_for_multiple_objects
-#define lib_win32_read_console_a failed_read
+#define lib_win32_read_console_w failed_read
 #define lib_win32_wait_for_multiple_objects failed_wait
 #include "lib/console-broker/win32/console.c"
 

@@ -88,6 +88,14 @@ int main(void)
     lib_test_assert(lib_console_set_output_binding(console, &binding) == LIB_STATUS_OK);
     binding.context = &next; /* Console owns a copy, not this descriptor. */
     lib_test_assert(lib_console_write_text(console, "hello", 5u) == LIB_STATUS_OK);
+    lib_test_assert(lib_console_write_text(console, "\xf0\x9f\x8e\xb5", 4u) == LIB_STATUS_OK);
+    lib_test_assert(probe.output_length == 4u &&
+        lib_memory_compare(probe.output,"\xf0\x9f\x8e\xb5",4u) == 0);
+    lib_test_assert(lib_console_write_text(console, "\xf0\x9f\x8e\xb5", 3u) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(lib_console_write_text(console, "\xed\xa0\x80", 3u) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(lib_console_write_text(console, LIB_NULL, 0u) == LIB_STATUS_OK);
+    lib_test_assert(probe.output_length == 4u);
+    lib_test_assert(lib_console_write_text(console, "hello", 5u) == LIB_STATUS_OK);
     lib_test_assert(lib_console_write_text_frame(console, &frame) == LIB_STATUS_OK);
     lib_test_assert(probe.frames == 1u && next.frames == 0u);
     frame.columns = 81u;

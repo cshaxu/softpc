@@ -44,6 +44,8 @@ typedef struct lib_console_raw_mouse {
 } lib_console_raw_mouse;
 
 typedef struct lib_console_line {
+    /* UTF-8 bytes excluding NUL and CR/LF, at most CAPACITY-1. Invalid or
+     * oversized native lines are drained and delivered as REJECTED_LINE. */
     lib_u32 length;
     char text[LIB_CONSOLE_LINE_CAPACITY];
 } lib_console_line;
@@ -88,6 +90,9 @@ lib_console *lib_console_retain(lib_console *console);
 void lib_console_release(lib_console *console);
 lib_status lib_console_set_event_sink(lib_console *console,
     lib_console_event_sink sink, void *context);
+/* Each write is a complete UTF-8 sequence, length in bytes; malformed input
+ * returns INVALID_ARGUMENT before output. Native I/O failure may have emitted
+ * a prefix; no rollback/replay is performed. Empty writes emit nothing. */
 lib_status lib_console_write_text(lib_console *console,
     const char *text, lib_size length);
 lib_status lib_console_write_text_frame(lib_console *console,

@@ -15,7 +15,7 @@ set(library_dependencies_audio-pcm types base)
 set(library_dependencies_audio-midi types)
 set(library_dependencies_audio-fm types)
 set(library_dependencies_kvm-base types base)
-set(library_dependencies_kvm-window types kvm-base)
+set(library_dependencies_kvm-window types base kvm-base)
 set(library_dependencies_kvm-console types base console kvm-base)
 
 function(library_source_owner path out_owner out_local)

@@ -58,6 +58,27 @@ int main(void)
         &window.pending_frame, sizeof(window.pending_frame)) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
+    {
+        kvm_component_control taken;
+        char oversized[KVM_WINDOW_TITLE_CAPACITY+1u];
+        lib_memory_set(oversized,'x',sizeof(oversized));
+        oversized[sizeof(oversized)-1u]='\0';
+        lib_test_assert(kvm_window_set_title(&window,oversized)==LIB_STATUS_INVALID_ARGUMENT);
+        lib_test_assert(kvm_window_set_title(&window,"\xed\xa0\x80")==LIB_STATUS_INVALID_ARGUMENT);
+        lib_test_assert(!kvm_component_mailboxes_take_control(&window.base.mailboxes,&taken));
+        lib_test_assert(kvm_window_set_title(&window,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5")==LIB_STATUS_OK);
+        lib_test_assert(kvm_component_mailboxes_take_control(&window.base.mailboxes,&taken));
+        lib_test_assert(lib_text_compare((char *)taken.payload,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5")==0);
+        oversized[KVM_WINDOW_TITLE_CAPACITY-1u]='\0';
+        lib_test_assert(kvm_window_set_title(&window,oversized)==LIB_STATUS_OK);
+        lib_test_assert(kvm_component_mailboxes_take_control(&window.base.mailboxes,&taken));
+        kvm_window_options invalid_options={0};
+        invalid_options.component=options;
+        invalid_options.initial_title="\xc0\xaf";
+        kvm_window *invalid_window=&window;
+        lib_test_assert(kvm_window_create(&invalid_window,&invalid_options)==LIB_STATUS_INVALID_ARGUMENT);
+        lib_test_assert(invalid_window==LIB_NULL && window_probe.failures==0u);
+    }
     for (index = 0u; index < KVM_COMPONENT_CONTROL_CAPACITY; ++index)
         lib_test_assert(kvm_window_set_title(&window, "x") == LIB_STATUS_OK);
     lib_test_assert(kvm_window_set_title(&window, "x") == LIB_STATUS_LIMIT_EXCEEDED);

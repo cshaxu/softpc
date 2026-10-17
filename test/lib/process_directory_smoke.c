@@ -18,18 +18,17 @@ static lib_linux_ssize_t process_readlink(const char *name, char *output, lib_si
     return (lib_linux_ssize_t)length;
 }
 #define lib_linux_readlink process_readlink
-#define base_process_directory process_linux_trim
 #define base_process_platform_executable_directory process_linux_directory
 #include "lib/base/linux/process.c"
 #define base_process_executable_directory process_linux_public
 #include "lib/base/process.c"
 #undef base_process_executable_directory
 #undef base_process_platform_executable_directory
-#undef base_process_directory
 
 #ifdef _WIN32
 #include "lib/types/win32/process.h"
 #include "lib/types/win32/text.h"
+_Static_assert(sizeof(lib_win32_wchar)==2u, "Windows path allocation uses two-byte units");
 static lib_bool malformed_native;
 static lib_win32_dword process_module_path(lib_win32_hinstance instance,
     lib_win32_wchar *output, lib_win32_dword capacity)

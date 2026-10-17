@@ -1,4 +1,5 @@
 #include "lib/types/test.h"
+#include "lib/base/text_interface.h"
 #include "emulator/session/session_interface.h"
 #include "emulator/session/control.h"
 
@@ -69,6 +70,7 @@ lib_status emulator_ui_cancel_monitor_line(emulator_ui *ui, lib_bool *out_comple
 lib_status emulator_ui_write_monitor(emulator_ui *ui, const char *text)
 {
     (void)ui;
+    if (!base_text_utf8_valid(text)) return LIB_STATUS_INVALID_ARGUMENT;
     if (collect) {
         if (++writes == fail_write) return LIB_STATUS_IO_ERROR;
         lib_test_assert(output_used + lib_text_length(text) < sizeof(output));
@@ -269,6 +271,24 @@ static void public_session_contract(void)
 int main(void)
 {
     emulator_session_request toggle_request;
+    {
+        emulator_session session = {0};
+        char text[1100];
+        collect=LIB_TRUE;
+        for (lib_size offset=1017u;offset<=1024u;++offset) {
+            lib_memory_set(text,'x',offset);
+            lib_text_copy(text+offset,"\xf0\x9f\x8e\xb5\n");
+            output_used=0u;
+            lib_test_assert(emulator_session_write_text(&session,text));
+            lib_test_assert(output_used==offset+6u);
+            lib_test_assert(lib_memory_compare(output,text,offset+4u)==0);
+            lib_test_assert(lib_text_compare(output+offset+4u,"\r\n")==0);
+        }
+        lib_memory_set(text,0x80,sizeof(text)-1u); text[sizeof(text)-1u]='\0';
+        output_used=0u;
+        lib_test_assert(!emulator_session_write_text(&session,text) && output_used==0u);
+        collect=LIB_FALSE; output_used=0u; writes=0u;
+    }
 
     lib_test_assert(emulator_session_request_pause_toggle(
         EMULATOR_SESSION_MACHINE_RUNNING, &toggle_request) &&

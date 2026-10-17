@@ -13,7 +13,7 @@ static lib_win32_bool LIB_WIN32_WINAPI read_line(lib_win32_handle h, lib_win32_l
     lib_test_assert(capacity >= 9);
     lib_win32_set_event(entered);
     lib_test_assert(lib_win32_wait_for_single_object(finish_read, 5000) == LIB_WIN32_WAIT_OBJECT_0);
-    lib_memory_copy(bytes, "partial\r\n", 9); *count = 9;
+    lib_memory_copy(bytes, L"partial\r\n", 9u * sizeof(lib_win32_wchar)); *count = 9;
     return LIB_WIN32_TRUE;
 }
 static lib_win32_bool LIB_WIN32_WINAPI cancel_read(lib_win32_handle h, lib_win32_lpoverlapped p)
@@ -28,8 +28,8 @@ static lib_win32_bool LIB_WIN32_WINAPI flush(lib_win32_handle h)
     return fail_flush ? LIB_WIN32_FALSE : LIB_WIN32_TRUE;
 }
 static lib_win32_bool LIB_WIN32_WINAPI set_mode(lib_win32_handle h, lib_win32_dword m) { (void)h; (void)m; return LIB_WIN32_TRUE; }
-#undef lib_win32_read_console_a
-#define lib_win32_read_console_a read_line
+#undef lib_win32_read_console_w
+#define lib_win32_read_console_w read_line
 #undef lib_win32_cancel_io_ex
 #define lib_win32_cancel_io_ex cancel_read
 #undef lib_win32_cancel_synchronous_io

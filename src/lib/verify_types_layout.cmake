@@ -116,7 +116,7 @@ foreach(path IN LISTS library_sources)
             message(FATAL_ERROR "Native keyboard decoding belongs to Base: ${path}")
         endif()
         if(path MATCHES "^(console-broker|kvm-window)/win32/" AND
-           body MATCHES "lib_win32_(read_console_input_a|write_console_output_a|register_class_a|create_window_ex_a|dispatch_message_a|peek_message_a)[ \t\r\n]*\\(")
+           body MATCHES "lib_win32_(read_console_a|write_console_a|set_window_text_a|read_console_input_a|write_console_output_a|register_class_a|create_window_ex_a|dispatch_message_a|peek_message_a)[ \t\r\n]*\\(")
             message(FATAL_ERROR "ANSI input bypasses Unicode record contract: ${path}")
         endif()
         if((path MATCHES "^base/win32/" AND body MATCHES "lib_win32_get_module_file_name_a[ \t\r\n]*\\(") OR

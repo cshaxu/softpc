@@ -2,14 +2,51 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T93.
+T93 S12 is verified for delivery: UTF-8 Console text/lines and Window titles.
+Owner admission: "好的。准入下一个S任务执行到收口前等我验收。"
+Baseline 79eca79f. Deliver built/tested/published/pushed changes, then wait for
+owner acceptance; do not close S12 or admit S13 automatically.
+
+Both EXEs are refreshed; final x64/x86 qualification is 167/167 each,
+zero skips, including all ten native desktop cases. The first desktop compact
+case failed at raw ver input; unchanged full desktop rerun passes, and its
+unproven cause is recorded in TODO. Production C/H +99/-43 (net +56), test
+C/H +141/-27 (net +114). See the [S12 delivery record](../proposals/m9-xp-sound-blaster-standalone.md#s12-implementation-and-review-record).
 
 The owner-reopened S11 test-ownership correction is closed after executor
 b9b654ac and separate actual-change review. Base owns validator
 assertions; Storage retains public API rejection coverage. Both architectures
 pass 5/5 targeted tests/gates. Production and EXEs are unchanged; no full run
-or EXE refresh was requested. S12 is not admitted.
+or EXE refresh was requested. S12 is now separately admitted below.
+
+## M9 T93 S12 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits next S through delivery, waiting for acceptance before closure. |
+| Objective | UTF-8 cooked Console text/lines and Window titles at existing Lib native boundaries; preserve reader, output and FIFO owners. |
+| Non-goals | No raw frame, guest, audio, capture, new OS backend, INI/media/snapshot or external repository changes. |
+| Reference Baseline | Accepted S11 endpoint 79eca79f, production previously qualified 166/166 per architecture. |
+| Candidate Proposal | [S12 UTF-8 text](../proposals/m9-xp-sound-blaster-standalone.md#s12--utf-8-console-text-and-window-titles). |
+| Files And ABI Surface | Console public text/line contract and Win32 broker; Window title validation/native application; Types native aliases; bounded Base UTF-8 validator and Session chunk boundaries. No new Console/Window operation. |
+| Applicable Rules | Task Reading Set and all four governance skills; single-agent dual-role review, Types authority, inward dependencies. |
+| Verification | Focused UTF-8/BMP/supplementary, invalid encoding, byte capacities, fragmented reads, drain/rearm, output/title failures; cached x86/x64 full build, shared first then remaining unit/integration and ten native desktop cases; publish both EXEs. |
+| Expected Markers | No code-page interpretation at text/line/title boundary; invalid/oversized lines rejected once, no tail command; no second decoder/state owner. |
+| Asset Needs | Hidden build/t93/s12 jobs, logs/exit files; build 1800s, suites 1200s, desktop 600s observation budgets, 30 MiB logs; executor owns cleanup. No Computer Use. Native desktop execution preapproved. |
+| Reporting Requirements | Before/after semantics, actual production/test added/deleted/net counts, source versus test proof, limits and EXE hashes; separate actual-change review. |
+| Stop Conditions | Expanded scope, unapproved product behavior or failed required proof; resolve before delivery. Never terminate on interactive timeout. |
+| Exit Criteria | Complete implementation and dual-width qualification, publish/commit/push, actual-change review, then await owner; S13 stays unadmitted. |
+| Original Owner Request | 好的。准入下一个S任务执行到收口前等我验收。 |
+| Similar-Issue Sweep | All public text/line/title native API sites and fixture overrides; retain fixed ASCII OS names and raw BMP frame paths, identify external callers splitting UTF-8. |
+
+Owner scope refinement: "可以。就这么改，就在当前S里面改。然后当前S的本分任务，
+继续做，精简的做". Include the reviewed Linux Base one-use helper removal
+and Windows redundant allocation-bound removal (actual net -5 lines).
+Consolidate Console output cleanup without a chunking framework; preserve
+bounded Session output on malformed continuation bytes. Estimated production
+net about +58, refined from the earlier broad +100-160 budget. Existing
+Base/Storage contracts and previously accepted failures stay unchanged.
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
 The owner accepts the reopened S7 delivery and admits S8: "验收通过，准入s8".
@@ -29,12 +66,12 @@ The owner now approves splitting the neutrality work into multiple S tasks.
 The owner accepts S10 and admits S11 through closure: "验收通过，准入执行S11到收口".
 S10 and S11 are closed. S11 executor 33a9c9f7 is pushed and its separate
 coordinator actual-change review passes under the owner's through-closure
-authorization. T93 remains open with no active implementation subtask; S12
-requires a new owner admission. See the [S11 closure](../history/M9-T93-S11-utf8-paths.md). Final
+authorization. T93 remains open; the subsequent S12 admission is recorded above.
+See the [S11 closure](../history/M9-T93-S11-utf8-paths.md). Final
 x64/x86 each pass 166/166 with zero skips, including all ten native desktop
 cases; both EXEs are refreshed. S11 changes only Lib source/test contracts
 and governance: production C/H +199/-45 (net +154), tests +160/-39 (net +121).
-User INI, media, snapshots and original mirror remain unchanged. S12 and later
+User INI, media, snapshots and original mirror remain unchanged. S13 and later
 remain unadmitted. The accepted S10 executor
 e7d37b65 is committed and pushed; the separate coordinator actual-change
 review and subsequent owner acceptance close S10. Its final x64/x86 qualification passes 165/165 each, zero skips,
@@ -53,7 +90,7 @@ do not admit the next S automatically. S9 audit/design and dual-width
 qualification are pushed in executor 896aa2fd and actual-change reviewed;
 S9 is owner-accepted. Each width passed 165/165
 with zero skips, including five native
-desktop cases. S12-S15 remain planned and must not auto-start.
+desktop cases. S13-S15 remain planned and must not auto-start.
 No S9 archive production changes occurred before this owner-directed reorder.
 The following S8 checkpoints are retained evidence, not active work:
 XP MIDI/FM device attachment through existing

@@ -43,7 +43,7 @@ transition. `reset` is one runtime command: the VM owns every internal
 cold-reset stage and reports one reset-completed fact with its final paused
 state. The next prompt appears only after that public completion.
 
-Cooked commands are complete lines, limited to 1023 bytes excluding CR/LF.
+Cooked commands are complete UTF-8 lines, limited to 1023 bytes excluding CR/LF.
 An overlong line is drained through its terminator and reported once as
 `Command is too long.` before rearming the prompt; no tail becomes a command.
 Every nonempty monitor command result, including a rejected command, a local

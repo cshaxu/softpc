@@ -10,5 +10,12 @@ int main(void)
     }
     lib_test_assert(base_text_utf8_valid("\x7f\xc2\x80\xdf\xbf\xe0\xa0\x80\xed\x9f\xbf\xee\x80\x80\xef\xbf\xbf\xf0\x90\x80\x80\xf4\x8f\xbf\xbf"));
     lib_test_assert(base_text_utf8_valid("") && !base_text_utf8_valid(LIB_NULL));
+    const char span[] = { (char)0xf0, (char)0x90, (char)0x80, (char)0x80 };
+    for (lib_size n=1u;n<sizeof(span);++n)
+        lib_test_assert(!base_text_utf8_valid_bytes(span,n));
+    lib_test_assert(base_text_utf8_valid_bytes(span,sizeof(span)));
+    lib_test_assert(base_text_utf8_valid_bytes(LIB_NULL,0u));
+    lib_test_assert(!base_text_utf8_valid_bytes(LIB_NULL,1u));
+    lib_test_assert(base_text_utf8_valid_bytes("\0x",2u));
     return 0;
 }

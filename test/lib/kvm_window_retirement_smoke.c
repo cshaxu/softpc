@@ -16,8 +16,8 @@ static lib_u32 notification_attempts;
 static lib_bool reject_join;
 static lib_win32_bool LIB_WIN32_WINAPI startup_signal(lib_win32_handle h)
 { return scenario==19 ? LIB_WIN32_FALSE : lib_win32_set_event(h); }
-static lib_win32_bool LIB_WIN32_WINAPI set_title(lib_win32_hwnd w, lib_win32_lpcstr title)
-{ return scenario==22 ? LIB_WIN32_FALSE : lib_win32_set_window_text_a(w,title); }
+static lib_win32_bool LIB_WIN32_WINAPI set_title(lib_win32_hwnd w, lib_win32_lpcwstr title)
+{ return scenario==22 ? LIB_WIN32_FALSE : lib_win32_set_window_text_w(w,title); }
 static lib_status select_notify(kvm_component_mailboxes *mailboxes,
     kvm_mailbox_notify_fn notify_fn, void *context)
 {
@@ -119,8 +119,8 @@ static lib_win32_dword LIB_WIN32_WINAPI controlled_wait(lib_win32_dword count, c
 #define lib_win32_wait_for_single_object join_wait
 #undef lib_win32_set_event
 #define lib_win32_set_event startup_signal
-#undef lib_win32_set_window_text_a
-#define lib_win32_set_window_text_a set_title
+#undef lib_win32_set_window_text_w
+#define lib_win32_set_window_text_w set_title
 #define kvm_component_mailboxes_select_notify select_notify
 static void checked_fail(kvm_component *component, lib_status status)
 {

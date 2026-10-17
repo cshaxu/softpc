@@ -56,7 +56,7 @@ else()
     target_sources(kvm-window PRIVATE kvm-window/linux/component.c)
 endif()
 library_root(kvm-window)
-target_link_libraries(kvm-window PUBLIC types kvm-base)
+target_link_libraries(kvm-window PUBLIC types base kvm-base)
 
 add_library(kvm-console STATIC kvm-console/console.c)
 if(WIN32)

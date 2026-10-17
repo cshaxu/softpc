@@ -11,6 +11,15 @@
 #include "lib/kvm-window/win32/mouse.h"
 
 #include "lib/types/win32/window.h"
+#include "lib/types/win32/text.h"
+
+static lib_bool kvm_window_apply_title(lib_win32_hwnd window, const char *title)
+{
+    lib_win32_wchar wide[KVM_WINDOW_TITLE_CAPACITY];
+    return lib_win32_multi_byte_to_wide_char(LIB_WIN32_CP_UTF8,
+        LIB_WIN32_MB_ERR_INVALID_CHARS, title, -1, wide,
+        KVM_WINDOW_TITLE_CAPACITY) != 0 && lib_win32_set_window_text_w(window, wide);
+}
 
 #define WIN32_WINDOW_MAILBOX_READY (LIB_WIN32_WM_APP + 1u)
 #define WIN32_WINDOW_MOUSE_READY (LIB_WIN32_WM_APP + 2u)
@@ -555,7 +564,7 @@ static lib_bool win32_window_consume_mailboxes(lib_win32_hwnd window,
             return LIB_FALSE;
         }
         if (control.kind == KVM_WINDOW_CONTROL_SET_TITLE) {
-            if (!lib_win32_set_window_text_a(window, (char *)control.payload)) {
+            if (!kvm_window_apply_title(window, (char *)control.payload)) {
                 kvm_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
                 return LIB_FALSE;
             }
@@ -862,7 +871,7 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
         return 0u; /* Creator also observes worker exit. */
     }
     state->startup_status = LIB_STATUS_IO_ERROR;
-    if (!lib_win32_set_window_text_a(window, component->initial_title)) goto startup_failed;
+    if (!kvm_window_apply_title(window, component->initial_title)) goto startup_failed;
     context->transparent_cursor = win32_window_create_transparent_cursor();
     if (context->transparent_cursor == LIB_NULL) goto startup_failed;
     if (!context->frozen && !lib_win32_set_timer(window,

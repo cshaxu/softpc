@@ -229,7 +229,7 @@ The library's only direct component edges are:
 
 ```text
 types    -> base + console + console-broker + storage + audio/pcm + audio/midi + audio/fm + kvm-base + kvm-window + kvm-console
-base     -> console + console-broker + storage + audio/pcm + kvm-base + kvm-console
+base     -> console + console-broker + storage + audio/pcm + kvm-base + kvm-window + kvm-console
 console  -> console-broker + kvm-console
 kvm-base  -> kvm-window + kvm-console
 ```

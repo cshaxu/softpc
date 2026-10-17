@@ -1,5 +1,16 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Diagnose intermittent package compact-Console raw input loss.
+  T93 S12's first desktop x64 compact case reached DOS but timed out at
+  stage=14/error=0 waiting for Version after injected ver; the captured screen
+  contained only C:\>. Normal package passed immediately before it. A complete
+  unchanged ten-case desktop rerun passed both widths. This differs from the
+  stage=1 child-startup debt below and does not prove the cause or a repair.
+  Owner: App-SoftPC package-test/input handoff. Admission condition: bounded
+  native input/activation instrumentation around first raw command and hide/
+  focus transition; do not add retry or relax assertions. See
+  [S12 verification](../proposals/m9-xp-sound-blaster-standalone.md#s12-implementation-and-review-record).
+
 - TODO(Medium): Diagnose intermittent checkpoint_smoke timeout under aggregate
   parallel execution. T93 S8 third x64 qualification classified it as Timeout
   with no output; its configured budget is 15 seconds. Ten isolated repeats,

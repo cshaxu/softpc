@@ -2828,17 +2828,148 @@ only and does not replace the tested executables.
 
 ### S12 — UTF-8 Console text and Window titles
 
+Owner admits S12 from 79eca79f through pushed delivery, waiting before closure.
+After the read-only simplification review, the owner adds two bounded Base
+cleanups: inline the one-use POSIX directory trim using readlink's length and
+remove Windows' redundant allocation bound under INT32_MAX/two-byte WCHAR.
+No new path abstraction. The frozen implementation ledger is Console write,
+cooked complete-line read, initial/queued Window title, Session chunk boundary,
+Base span validation and these two path cleanups. Existing raw BMP frames,
+native named handles, file content, audio and capture remain unchanged.
+
+The output implementation retains one temporary conversion allocation rather
+than adding a chunk decoder. Bindings share one cleanup exit. Cooked input
+collects one bounded native line before conversion: a native fragment can split
+a surrogate pair, but overlong/malformed lines are drained and rejected once.
+UTF-8 byte capacity remains 1023 excluding NUL/CR/LF. Window reuses Base's
+validator before enqueue; its explicit inward Base edge replaces no owner.
+Session's existing LF normalization only flushes between complete scalars and
+retains an absolute buffer bound even for invalid continuation sequences.
+No new thread, persistent decoder, recovery or fallback path exists.
+Estimate after review: production net approximately +58, test net +120-180;
+actual accounting at delivery. Proof uses real native conversion with injected
+I/O plus owner-local API checks, then complete cached dual-width qualification.
+
 Own text/line/title encoding, reusing S11's necessary conversion primitives
 without a second converter. Replace locale-dependent public interpretation at
 the existing Windows boundaries; do not mechanically replace internal ASCII
 device names or convert arbitrary byte payloads. Define byte capacities and
 partial-operation/error semantics before implementation.
-Files: Console broker text/line paths, Window title paths, private Types and
-tests; roughly 5-8 production paths. Production +160-260/-60-100,
-paired net +100-160; tests +140-220/-20-40, net approximately +120-180.
+Original broad estimate (superseded by the bounded review above): Console
+broker, Window, Types and tests; production net +100-160. The implemented
+scope additionally makes the existing Session chunker obey the new contract,
+without adding a converter or a second output route.
 Proof: ASCII, non-ASCII and supplementary scalars, malformed input, conversion
 capacity boundaries, line completion and output errors. Shared callers must
 not select ANSI versus Console code pages. No App edits.
+
+### S12 implementation and review record
+
+#### Request and boundary
+
+Owner: "好的。准入下一个S任务执行到收口前等我验收。"
+Refinement: "可以。就这么改，就在当前S里面改。然后当前S的本分任务，继续做，精简的做".
+Baseline: 79eca79f. S12 delivers for acceptance; it does not admit S13.
+
+The approved simplification audit adds only two S11 path cleanups: inline
+Linux's one-use directory trim using the readlink length, and remove Windows'
+redundant allocation bound under INT32_MAX and two-byte WCHAR. Together these
+production changes are +8/-13, net -5. Platform-specific path interpretation
+remains in its platform implementation; the public output transaction stays.
+
+#### Implementation and finite convergence ledger
+
+| Frozen unit | Single owner and proof |
+| --- | --- |
+| Console text write | Logical Console validates the exact UTF-8 span; broker converts once into temporary native storage and writes through the existing locked binding. API rejection, empty write, native units, stale binding and partial failure are tested. |
+| Cooked line read | Existing reader collects a bounded native line and converts after LF; no incremental decoder or new reader. Fragmented surrogate pairs, ASCII/UTF-8 byte limits, malformed UTF-16, empty input, drain and cancellation are tested. |
+| Initial/queued title | Window validates before admission, both native paths use one title conversion helper. Invalid input cannot enqueue; UTF-16 content and existing startup/queued failure paths are tested. |
+| Session text chunks | Existing LF normalization flushes only between UTF-8 scalars; malformed continuation runs retain a hard buffer bound. Boundary offsets 1017-1024 and invalid runs are tested. |
+| Base UTF-8 span | One validator supports bounded spans; the NUL interface delegates. Exact nonterminated spans, truncated scalars, empty/null and embedded NUL cases belong to Base tests. |
+| Base path simplification | Existing path tests cover both platform rules; a two-byte native-unit assertion documents the removed redundant bound. |
+
+Public byte capacities are unchanged: cooked input has 1023 bytes excluding
+NUL/CR/LF; titles have 128 bytes including NUL. Public text is now explicitly
+UTF-8 instead of implicit host code pages. Old non-UTF-8 callers are rejected,
+not silently reinterpreted. Native partial output returns I/O error without
+rollback or replay. Native conversion remains exclusively in Lib; Session
+does not learn an OS API. No new worker, persistent state or fallback exists.
+Unsupported Linux presenters remain unsupported; no new platform is claimed.
+
+#### Similar-issue sweep and review
+
+Search scope: all four public source packages, using rg for ReadConsoleA,
+WriteConsoleA, SetWindowTextA and their Types aliases, plus public write/title
+consumers. All three affected native production sites now use wide APIs.
+The remaining matches are rejection patterns in the permanent Types gate;
+negative fixtures cover the added aliases. Existing raw input/frames already
+use wide records and remain unchanged. Fixed ASCII native handle names are
+not public text and remain unchanged. The existing cancellation wake injects
+only an ASCII Enter record, so its native A alias is not a text-conversion
+path; unused Types vocabulary is not a second implementation. File paths were qualified in S11;
+binary contents, audio, capture and guest character maps are not converted.
+The existing Session chunker was the affected outer text consumer; its split
+boundary is repaired in place rather than adding another output path.
+
+Self-review checks Lib Types ownership, explicit Window-to-Base dependency,
+Emulator's inward-only calls, and owner-local tests. No App/Core, original
+mirror, INI, disk or snapshot edits are included.
+
+#### Verification
+
+Focused x64 and x86 builds and nine targeted tests per architecture pass.
+The first focused compile exposed a test-macro collision: the existing stub
+named title shadowed the new helper parameter through macro substitution.
+Renaming that fixture to capture_title fixes the fixture only; the failed
+attempt remains recorded alongside the successful focused run.
+
+Final cached builds and complete qualification pass on both architectures:
+97 shared background + 65 other unit/integration/gates + five native desktop
+cases = 167/167 per width, zero skips. Evidence is the second aggregate run's
+shared/other JUnit files and the final desktop run's ten JUnit files under
+the owned ignored S12 evidence directory. No Computer Use was used.
+No generated trace or external asset is a committed test dependency.
+
+The first desktop sequence passed the normal x64 package case, then its
+compact case failed at stage=14/error=0: DOS was visible but injected ver had
+not produced Version. It was not the known stage=1 startup failure. All ten
+desktop cases subsequently passed unchanged, without retries inside tests,
+deadline changes or assertion changes. Root cause is unproven and explicitly
+transferred to TODO; final success does not claim that intermittent issue fixed.
+
+Both EXEs are republished. SHA-256:
+
+- softpc32.exe: 3B68C6805B16A8D3080E7EF6AE4CC5063523D6DDBC99D0E81B2602A9DA32CAA6
+- softpc64.exe: 0A618EC9A98C073EFBEF0144B3281B1738B74A43719725BD0188ABE41E1CF02D
+
+The package INI has no diff; guest media and snapshots are untouched. x86 Ninja
+reported recovery of its existing log and rebuilt required targets through the
+existing cache; no clean/purge or compiler setting change was performed.
+
+The first aggregate x64 run passed 97/97 shared and 64/65 remaining tests.
+Only documentation governance failed: creating an S12 history file before
+acceptance made the identifier scanner treat S12 as historical and require S13.
+The pending delivery record now stays here; no gate was relaxed. The original
+failed run is retained, and the full dual-width qualification is restarted.
+
+#### Changed-path accounting
+
+Measured against 79eca79f with git diff --numstat, selecting tracked C/H files
+under src/ and test/ separately:
+
+| Owner | Files | Added | Removed | Net |
+| --- | ---: | ---: | ---: | ---: |
+| Lib production | 12 | 95 | 42 | +53 |
+| Emulator production | 1 | 4 | 1 | +3 |
+| Lib tests | 9 | 121 | 27 | +94 |
+| Emulator tests | 1 | 20 | 0 | +20 |
+
+Production totals +99/-43, net +56; test C/H totals +141/-27, net +114.
+Three Lib CMake source/gate edits are +3/-3; the Lib gate selftest is +2/-2.
+Manifests, README/design/governance and the two executable artifacts are
+reported separately, not counted as production/test C/H. Both X86 packages
+and the original mirror have zero diff. The approved Base path simplification
+is included in the Lib production total, not an additional reduction.
 
 ### S13 — PCM progress and lifecycle contract
 

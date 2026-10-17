@@ -4,7 +4,7 @@
 #include "lib/types/win32/sync.h"
 #include "lib/console/binding_interface.h"
 
-static const char *input;
+static const lib_win32_wchar *input;
 static lib_u32 chunk = 7, reads, cancel_at;
 static lib_win32_handle stop;
 static lib_win32_bool LIB_WIN32_WINAPI read_chunk(lib_win32_handle h, lib_win32_lpvoid bytes, lib_win32_dword capacity, lib_win32_lpdword count, lib_win32_lpvoid p)
@@ -12,7 +12,7 @@ static lib_win32_bool LIB_WIN32_WINAPI read_chunk(lib_win32_handle h, lib_win32_
     lib_u32 n = 0;
     (void)h; (void)p;
     while (input[n] && n < capacity && n < chunk) {
-        ((char *)bytes)[n] = input[n];
+        ((lib_win32_wchar *)bytes)[n] = input[n];
         if (input[n++] == '\n') break;
     }
     input += n; *count = n;
@@ -23,8 +23,15 @@ static lib_u32 palette_attempts, palette_sets, writes;
 static lib_i32 partial_write;
 static lib_i32 text_result=1;
 static lib_win32_dword text_written=1;
+static lib_win32_wchar captured_text[32];
+static lib_u32 text_calls, text_units;
 static lib_win32_bool LIB_WIN32_WINAPI text_write(lib_win32_handle h,lib_win32_lpcvoid text,lib_win32_dword n,lib_win32_lpdword written,lib_win32_lpvoid r)
-{ (void)h;(void)text;(void)r;*written=n==0 ? 0 : text_written;return text_result; }
+{
+    (void)h;(void)r; ++text_calls; text_units=n;
+    lib_test_assert(n<=32u);
+    lib_memory_copy(captured_text,text,n*sizeof(*captured_text));
+    *written=n==0 ? 0 : text_written;return text_result;
+}
 static lib_i32 palette_query_ok, palette_set_ok, cursor_ok = 1;
 static lib_win32_wchar first_cell;
 static lib_win32_word first_attribute;
@@ -106,10 +113,10 @@ static lib_win32_handle LIB_WIN32_WINAPI start_reader(lib_win32_lpsecurity_attri
 #define lib_win32_set_console_mode set_mode
 #undef lib_win32_flush_console_input_buffer
 #define lib_win32_flush_console_input_buffer flush_input
-#undef lib_win32_read_console_a
-#define lib_win32_read_console_a read_chunk
-#undef lib_win32_write_console_a
-#define lib_win32_write_console_a text_write
+#undef lib_win32_read_console_w
+#define lib_win32_read_console_w read_chunk
+#undef lib_win32_write_console_w
+#define lib_win32_write_console_w text_write
 #undef lib_win32_get_console_screen_buffer_info
 #define lib_win32_get_console_screen_buffer_info screen_info
 #undef lib_win32_set_console_screen_buffer_size
@@ -150,14 +157,14 @@ static void cooked_restore(void)
     lib_test_assert(b.reader && b.cooked_line_pending && readers_started==1 &&
         cursor_positions==0u && native_cursor.X==17 && native_cursor.Y==23);
     /* Cancellation preserves an unfinished request until join. */
-    stop=b.stop_event; input="discarded\r\n"; reads=0; cancel_at=1;
+    stop=b.stop_event; input=L"discarded\r\n"; reads=0; cancel_at=1;
     console_broker_reader(&b); cancel_at=0;
     lib_test_assert(b.cooked_line_pending);
     lib_test_assert(console_broker_backend_deactivate(&b,&pending)==0 && pending);
     lib_test_assert(!b.reader && !b.cooked_line_pending);
     lib_test_assert(console_broker_backend_activate(&b,c,CONSOLE_BROKER_COOKED_LINES,1,pending)==0);
     lib_test_assert(b.reader && b.cooked_line_pending && readers_started==2);
-    input="complete\r\n";
+    input=L"complete\r\n";
     console_broker_reader(&b);
     lib_test_assert(!b.cooked_line_pending);
     lib_test_assert(console_broker_backend_deactivate(&b,&pending)==0 && !pending);
@@ -169,7 +176,7 @@ static void cooked_restore(void)
 int main(void)
 {
     console_broker_backend b={0};
-    char line[2200];
+    lib_win32_wchar line[2200];
     lib_console_text_frame f={0};
     lib_test_assert(lib_console_create(&b.console)==LIB_STATUS_OK);
     lib_test_assert(lib_console_set_event_sink(b.console,receive,LIB_NULL)==LIB_STATUS_OK);
@@ -177,7 +184,8 @@ int main(void)
     b.generation=1; b.mode=CONSOLE_BROKER_COOKED_LINES;
     stop=b.stop_event=lib_win32_create_event_a(LIB_NULL,LIB_WIN32_TRUE,LIB_WIN32_FALSE,LIB_NULL); lib_test_assert(stop);
     for (lib_u32 n=1022;n<=1024;++n) {
-        lib_memory_set(line,'x',n); lib_text_copy(line+n,"\r\nhelp\r\n"); input=line;
+        for (lib_u32 i=0;i<n;++i) line[i]='x';
+        lib_memory_copy(line+n,L"\r\nhelp\r\n",sizeof(L"\r\nhelp\r\n")); input=line;
         for (chunk=1;chunk<=1023;chunk+=1022) {
             input=line; delivered=0;
             console_broker_reader(&b);
@@ -189,7 +197,35 @@ int main(void)
             lib_test_assert(lib_text_compare(received.value.line.text,"help")==0);
         }
     }
-    lib_memory_set(line,'x',2048);lib_text_copy(line+2048,"\r\n");input=line;
+    /* Native fragments may split a surrogate pair; capacity counts UTF-8 bytes. */
+    for (chunk=1u;chunk<=4u;++chunk) {
+        input=L"\u6d4b\U0001f3b5\r\n"; delivered=0;
+        console_broker_reader(&b);
+        lib_test_assert(delivered==1 && received.kind==LIB_CONSOLE_EVENT_COOKED_LINE);
+        lib_test_assert(received.value.line.length==7u &&
+            lib_text_compare(received.value.line.text,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5")==0);
+    }
+    for (lib_u32 n=341u;n<=342u;++n) {
+        for (lib_u32 i=0;i<n;++i) line[i]=0x6d4bu;
+        lib_memory_copy(line+n,L"\r\nhelp\r\n",sizeof(L"\r\nhelp\r\n"));
+        input=line; delivered=0; chunk=7u;
+        console_broker_reader(&b);
+        lib_test_assert(received.kind==(n==341u ? LIB_CONSOLE_EVENT_COOKED_LINE : LIB_CONSOLE_EVENT_REJECTED_LINE));
+        lib_test_assert(received.value.line.length==(n==341u ? 1023u : 0u));
+        console_broker_reader(&b);
+        lib_test_assert(delivered==2 && lib_text_compare(received.value.line.text,"help")==0);
+    }
+    const lib_win32_wchar invalid[][5] = {
+        {0xd800u,'\r','\n',0u}, {0xdc00u,'\r','\n',0u}, {0xd800u,'x','\r','\n',0u}};
+    for (lib_size i=0u;i<3u;++i) {
+        input=invalid[i]; delivered=0; chunk=1u;
+        console_broker_reader(&b);
+        lib_test_assert(delivered==1 && received.kind==LIB_CONSOLE_EVENT_REJECTED_LINE && !received.value.line.length);
+    }
+    input=L"\r\n"; console_broker_reader(&b);
+    lib_test_assert(received.kind==LIB_CONSOLE_EVENT_COOKED_LINE && !received.value.line.length);
+    for (lib_u32 i=0;i<2048u;++i) line[i]='x';
+    lib_memory_copy(line+2048,L"\r\n",sizeof(L"\r\n"));input=line;
     reads=0;cancel_at=2;chunk=7;delivered=0;
     console_broker_reader(&b);lib_test_assert(delivered==0);lib_win32_reset_event(stop);cancel_at=0;
     lib_test_assert(base_sync_mutex_create(&b.output_lock)==LIB_STATUS_OK);
@@ -347,6 +383,17 @@ int main(void)
         lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==0);
         lib_test_assert(writes==++previous_writes && b.previous_columns==80);
     }
+    text_result=1; text_written=3; text_calls=0;
+    lib_test_assert(console_broker_backend_write_bound(&b,b.console,1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5",7)==LIB_STATUS_OK);
+    lib_test_assert(text_calls==1 && text_units==3 && captured_text[0]==0x6d4b &&
+        captured_text[1]==0xd83c && captured_text[2]==0xdfb5);
+    lib_test_assert(console_broker_backend_write_bound(&b,b.console,1,"\xf0\x9f",2)==LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(console_broker_backend_write_bound(&b,b.console,1,LIB_NULL,0)==LIB_STATUS_OK);
+    lib_test_assert(console_broker_backend_write_bound(&b,b.console,2,"x",1)==LIB_STATUS_OK);
+    lib_test_assert(text_calls==1);
+    text_written=2;
+    lib_test_assert(console_broker_backend_write_bound(&b,b.console,1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5",7)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     /* Failed B can partly overwrite A: retrying A must not hit the old cache. */
     for (lib_i32 failure=1;failure<=5;++failure) {
         partial_write=failure; f.text[0]='B';
