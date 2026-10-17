@@ -18,9 +18,10 @@ Owner extended S15 to test isolation: real native audio/desktop tests belong
 to integration; unit tests must not require an interactive session or audio
 endpoint. Non-audio machine tests receive test-owned audio mocks. Shared test
 registration/classification may change; public production remains unchanged.
-The executor is preparing the complete delivery and separate actual-change
-review; no S/T closure is claimed until that review and owner acceptance.
-T93 stays open.
+Executor 66058ab4 is committed and pushed. The separate actual-change review
+passes against the original archive request and owner-added test-isolation
+scope; see the proposal's S15 review. S15 is delivered pending owner acceptance,
+not formally closed. T93 stays open; no subsequent S is admitted.
 
 ## M9 T93 S15 Packet
 
