@@ -22,11 +22,12 @@ pixel-index format.
 
 ## Objective
 
-Make Lib graphics frames one canonical, copied, 24-bit RGB-value contract:
+Make Lib graphics frames one canonical, copied RGB contract: 24-bit colour
+meaning stored in a 32-bit XRGB word, never a packed three-byte pixel.
 
 ```c
-/* Numeric colour meaning; high byte is reserved and must be zero. */
-typedef lib_u32 lib_rgb24; /* 0x00RRGGBB */
+/* XRGB32 storage; numeric colour meaning is 0x00RRGGBB. */
+typedef lib_u32 lib_rgb24; /* high byte is reserved and must be zero */
 
 typedef struct kvm_window_graphics_frame {
     lib_u32 width;
@@ -37,6 +38,10 @@ typedef struct kvm_window_graphics_frame {
 ```
 
 Lib Window validates, copies, damages, and presents only resolved RGB values.
+This exactly matches the current Win32 Window's 32-bpp `BI_RGB` DIB: on the
+supported little-endian host, the `0x00RRGGBB` word occupies its BGRX bytes
+without a per-pixel conversion.  The cross-platform Lib contract remains the
+numeric RGB value, not that host-memory byte order.
 Each product's Machine boundary converts its private source representation to
 that format before publishing.  SoftPC resolves its original renderer's DIB
 at the existing driver publication boundary; PC and MyNES do the equivalent
