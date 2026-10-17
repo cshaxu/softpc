@@ -5,7 +5,7 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-1. [Windows 3.1 MIDI silence and repeated WAV hang](../proposals/m9-win31-midi-wav-playback.md).
+1. [Lib RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md).
 2. [Windows 95 unavailable volume control](../proposals/m9-win95-volume-control.md).
 3. [Windows 95 restart stops at safe shutdown](../proposals/m9-win95-restart-safe-shutdown.md).
 
