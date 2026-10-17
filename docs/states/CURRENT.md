@@ -7,7 +7,8 @@ Only this Window's native capture is released before unbinding; cleanup errors
 are propagated. Correction production +3/-0, tests +26/-1 (net +25).
 Both cached builds and complete suites pass 167/167 per architecture, zero skips,
 including all ten native desktop cases; both EXEs refreshed, INI unchanged.
-Executor push and actual-change review remain due; await owner acceptance, no S15.
+Executor 683f85d4 is pushed and separately actual-change reviewed; await owner
+acceptance, no S15.
 See the [correction](../proposals/m9-xp-sound-blaster-standalone.md#s14-partial-capture-correction).
 Prior evidence follows.
 

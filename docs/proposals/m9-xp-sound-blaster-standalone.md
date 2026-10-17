@@ -3325,6 +3325,18 @@ Final SHA-256:
 - softpc64.exe: 7176466BA4086D79C451869D773C9BFFF93805BE860D3456B8DA0ADD2FDBEF75
 - unchanged INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
 
+Correction coordinator review: after pushing 683f85d4, switched roles and read
+the actual eight-path commit, original P2 report/owner approval, before-fix
+assertion failure and all fourteen qualification XML reports. The three-line
+repair preserves cleanup order and attempts unbinding even after failed native
+release; the ownership guard leaves a replacement capture untouched. The test
+uses the existing native fixture and checks status, release count, registration
+and untouched clipping. Its release-failure injection proves error forwarding,
+not every possible native failure side effect. No new public boundary or second
+input path. Counts/hashes and both-width 167/167 evidence agree. Documentation
+and whitespace gates pass; no blocking finding in this correction. S14 still
+awaits owner acceptance; neither S14 nor T93 is closed by this review.
+
 ### S15 — portable archive and final qualification
 
 Extend existing device capture/restore and fixed-width codec, not Lib archive
