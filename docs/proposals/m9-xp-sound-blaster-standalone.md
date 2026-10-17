@@ -3339,6 +3339,128 @@ awaits owner acceptance; neither S14 nor T93 is closed by this review.
 
 ### S15 — portable archive and final qualification
 
+#### Owner-local shared test layout extension
+
+Owner requests preserved: "test里的公共4组件的test，目录文件结构和src的公共4组件
+的src，不匹配！我需要你修复。" "跨组件的单元测试，那就放在最外层组件的
+单元测试即可，不可以放到integration去。" "最内层只依赖和测试最内层组件；
+中间和外层只依赖本层和内层组件，然后测试的话只测试本层组件。"
+
+The frozen universe is all C/H fixtures and registered cases in test/lib,
+test/emulator, test/x86-debug and test/x86-ibmpc at 0dfc02cf, plus their
+registration, manifests and ownership checks. Unit of review: one assertion
+group and its production owner. Permitted dispositions are unchanged owner,
+structural move, split to independent owners, or real-host integration retained.
+Completion requires every group to have a receiver, no unregistered smoke,
+no unit-to-outward source dependency and dual-width qualification. Production,
+mirror, INI, media and snapshot changes are outside this extension.
+
+| Mixed original test | Assertion receivers |
+| --- | --- |
+| types_contract | Types scalars/atomics; Base clock |
+| Emulator sync | Session queue concurrency; Machine input capacity; Types atomic operations; Base invalid mutex arguments |
+| lib_failure_output_contract | Storage, Base task, Broker, KVM Console and KVM Window failed-create outputs |
+| linux_wait_contract | Base synchronization; Broker Linux unsupported backend |
+| midi_output | MIDI message validation; FM unsupported acquisition |
+| win32_presentation | KVM Base hotkey matching (hotkey_policy); Window text-frame validation |
+| win32_vocabulary_ownership | Base native clock/layout failure; Window modifier state; KVM Base neutral synthesis (input_delivery) |
+| win32_keyboard / linux_input_contract | Base native physical/text decoding; KVM Base neutral delivery and registered chord matching |
+| kvm_frame_copy | Window frame/copy publication; KVM Base cursor/cell contract; KVM Console character-frame validation; Console boolean fields |
+| kvm_leaf_control_capacity | Window title/freeze admission; KVM Base opaque control capacity |
+| console_blocking_gate | Console bindings/metadata contention; Broker output/transaction contention |
+| kvm_keyboard_lifetime | KVM Base ledger/synthesis; separate Window and Console message-adapter behavior |
+
+Keyboard adapters now assert expected key/scalar payloads and ordering rather
+than comparing peers that might share an error. Test-owned native keyboard
+queries and synthesis mapping remove dependence on the host keyboard layout.
+No shared fixture or production path is introduced to couple the two leaves.
+Existing UI composition assertions were not registered; the unchanged test
+body is moved to ui/ and restored to the executable suite. The Session reducer
+test loses its misleading integration suffix without changing its assertions.
+
+Other Lib/Emulator tests and their private fixtures are moved with git mv to
+matching source-owner directories. X86 test bodies already have matching
+ownership and stay unchanged. Real native tests remain in integration/;
+no cross-component unit was reclassified. Source-owner directories and inward
+same-package includes are checked by the shared test boundary gate, reusing
+production dependency authorities. Eleven new positive/negative probes exercise
+layout, legal inward use, outward/sibling rejection and integration exemption.
+Package-wide scripts and negative fixtures retain package ownership.
+
+Owner's follow-up: "请你审计类似情况，确保src和test的各个公共组件的目录文件代码结构严格对齐";
+approved implementation: "请你按照规范执行，完成后编译测试提交推送等我验收".
+The finite inventory covers all C/H in the four suites (90 before this final
+pass), their registrations, includes and source owner directories. No production
+file changes. Native layout/UTF-16 assertions move to Base, while KVM delivery
+uses neutral values. The former Window bounds test becomes geometry; the MIDI
+unsupported-backend test moves to linux/. Foreign Base private platform bodies
+are no longer used as leaf fixtures: lock tests intercept the public acquisition
+boundary; shutdown injects the existing mailbox wake contract, without inspecting
+Base handles; keyboard synthesis receives a deterministic neutral layout.
+Pure native SDK test resources (guard pages, threads, file-name oracles) remain
+legal unit fixtures, not reasons to create a nonexistent source platform owner
+or relabel a unit as integration. Base's own two-platform directory matrix stays
+at Base because it exercises that common public contract on both backends.
+Emulator and both X86 suites have corresponding owner directories and no foreign
+test package dependencies. The gate additionally rejects a nonexistent nested
+source directory and another owner's private platform fixture. Three new
+positive/negative probes cover those conditions. Assertion ownership still
+requires actual-change review; static includes cannot prove assertion meaning.
+
+An initial final-pass run rejected all four manifests because the regeneration
+script used the wrong header/hash spelling. The generator was corrected to the
+existing manifest contract; the failed run is retained, not accepted evidence.
+
+Final qualification for the layout extension, relative to 0dfc02cf:
+
+| Evidence | x64 | x86 |
+| --- | --- | --- |
+| Cached package/test build | pass | pass (existing Ninja-log recovery) |
+| Shared non-native suites | 116/116 | 116/116 |
+| Other unit/integration/checks | 64/64 | 64/64 |
+| Native desktop | 5/5 | 5/5 |
+| Native audio | 3/3 | 3/3 |
+| Registered total | 188/188 | 188/188 |
+
+Final comment-only corrections received another dual-width affected-target
+build and 8/8 focused checks each (leaf tests, manifests, boundaries and docs).
+The full-run exit is zero; evidence is retained under the packet's declared
+ignored evidence directory as layout-delivery logs and qualification XML.
+No failing run is substituted for a passing final result. Public changed-path
+compilation remains under Werror; inherited mirror warnings and Ninja recovery
+are not represented as zero-warning whole-repository builds.
+
+`git diff --numstat 0dfc02cf` with rename detection gives production +0/-0;
+test C/H +1276/-1032, net +244. Package totals including CMake, README and
+manifests: test/lib +1374/-1086 (net +288), test/emulator +69/-60 (net +9),
+test/x86-debug +2/-1 and test/x86-ibmpc +2/-1 (net +1 each). Shared root test
+gates add 77 lines. Splitting independent ownership adds test entry/fixture
+setup, not runtime abstractions. Final coverage universe is 91 C/H files;
+all have an explicit owner, with real-host cases retained in integration.
+Console now consumes complete neutral scalars; the seven malformed/repeated
+UTF-16 cases are also asserted directly in Base. Window physical cases supply
+PC scans, leaving scan-less native recovery to Base's deterministic probe.
+
+Published artifact SHA-256:
+
+- softpc32.exe: C5E3B709152B534F7B353D5E98B0606E8FFBACBD7D1A98DAC0AAAB0632F2F09C
+- softpc64.exe: 56BEA1E29C4EB06C48050D444E640631AFF7865203A2653F89AE13495D9E5CCF
+
+The x64 product artifact is unchanged and verified against the current cached
+production build; x86 was rebuilt. Owner INI and snapshot hashes remain
+unchanged, and no guest media was edited. The pre-existing owner-approved
+Win95 Sound Blaster queue proposal is preserved verbatim with this delivery,
+without admitting or implementing it. S15 awaits owner acceptance after the
+separate actual-change review; T93 remains open.
+
+Implementation review found and fixed split-fixture missing declarations before
+qualification. An intermediate x86 build encountered the reducer's old filename
+while the final rename was being applied; that run is not acceptance evidence.
+The final source set is frozen before repeating qualification. Existing x86
+Ninja log recovery still triggers unnecessary rebuilds and inherited mirror
+warnings; it is already recorded separately and is not repaired by this task.
+
+
 Owner accepts S14 and admits this step: "批准 验收通过 准入下一个s".
 Baseline e2de3d3f. This first checkpoint is source inventory/design, not a
 production change or passing snapshot qualification. The existing archive owns

@@ -102,6 +102,16 @@ test/app-softpc/integration, and x86 static gates are in tools/checks. Test exec
 The reusable test/lib, test/emulator, test/x86-debug and test/x86-ibmpc
 packages are not destinations for App-owned fixtures.
 
+Shared unit directories mirror their source subcomponent owners. A unit may
+consume its owner's inward production dependencies, but its assertions test
+that owner's responsibility, not independent contracts belonging to those
+dependencies. Unrelated assertion groups belong in their own owners' tests.
+Cross-component calls alone do not make an integration test. Only cases that
+require real host devices, desktop interaction or real external media belong
+in the package's integration/ directory. Disposable files and controlled
+threads are legitimate unit-test resources. Package-wide CMake, manifests,
+verifier scripts and negative fixtures remain at package scope.
+
 Root CMake assigns all `src/app-softpc/machine/*.c` to `softpc-vm`; other targets link it
 instead of copying its implementation list. The original machine OBJECT
 groups remain intact. The build-ownership gate checks actual target source

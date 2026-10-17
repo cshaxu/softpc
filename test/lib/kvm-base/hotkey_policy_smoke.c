@@ -1,6 +1,4 @@
 #include "lib/types/test.h"
-#include "lib/types/win32/test.h"
-#include "lib/kvm-window/frame_interface.h"
 #include "lib/kvm-base/hotkey_interface.h"
 
 
@@ -19,19 +17,10 @@ static lib_bool kvm_capture_event(void *opaque, const kvm_input_event *event)
 
 int main(void)
 {
-    kvm_window_frame *frame = lib_allocate_zero(1u, sizeof(*frame));
     kvm_hotkey_registry registry;
     kvm_hotkey_matcher matcher;
     kvm_capture capture = { 0 };
     kvm_input_event event = { 0 };
-
-    lib_test_assert(frame != LIB_NULL);
-    frame->valid = LIB_TRUE;
-    frame->graphics = 0u;
-    frame->text.base.text_columns = 80u;
-    frame->text.base.text_rows = 25u;
-    frame->text.base.cells[0].glyph_index = 'X';
-    lib_test_assert(kvm_window_frame_validate(frame) == LIB_STATUS_OK);
 
     kvm_hotkey_registry_initialize(&registry);
     lib_test_assert(kvm_hotkey_registry_register(&registry, 'P',
@@ -185,6 +174,5 @@ int main(void)
     }
     lib_test_assert(matcher.held_count == 0 && capture.count == 64);
     kvm_hotkey_matcher_discard(&matcher);
-    lib_release(frame);
     return 0;
 }

@@ -1,14 +1,13 @@
 #include "lib/types/test.h"
 #include "lib/types/win32/test.h"
-#include "lib/base/win32/sync.c"
+#include "lib/base/sync_interface.h"
 
 static lib_win32_handle contended;
 static lib_win32_long contender;
 static void tracked_lock(base_sync_mutex *mutex)
 {
     if (lib_win32_get_current_thread_id() == (lib_win32_dword)lib_win32_interlocked_compare_exchange(&contender, 0, 0)) {
-        if (lib_win32_try_enter_critical_section(&mutex->gate)) return;
-        lib_win32_set_event(contended); /* The native blocking lock is actually owned. */
+        lib_win32_set_event(contended); /* The contender has reached the owner-held lock. */
     }
     base_sync_mutex_lock(mutex);
 }

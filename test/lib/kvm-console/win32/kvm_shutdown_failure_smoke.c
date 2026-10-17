@@ -6,12 +6,12 @@
 
 static lib_win32_handle asleep;
 static lib_u32 attempts, retired, failures, joins;
-static lib_win32_bool LIB_WIN32_WINAPI reject_signal(lib_win32_handle h) { (void)h; ++attempts; return LIB_WIN32_FALSE; }
+static lib_status reject_signal(base_sync_event *event) { (void)event; ++attempts; return LIB_STATUS_IO_ERROR; }
 static lib_win32_bool (LIB_WIN32_WINAPI *signal_asleep)(lib_win32_handle) = lib_win32_set_event;
 static lib_win32_dword (LIB_WIN32_WINAPI *wait_for_signal)(lib_win32_handle,lib_win32_dword) = lib_win32_wait_for_single_object;
-#undef lib_win32_set_event
-#define lib_win32_set_event reject_signal
-#include "lib/base/win32/sync.c"
+#define base_sync_event_signal reject_signal
+#include "lib/kvm-base/mailbox.c"
+#undef base_sync_event_signal
 static base_sync_wait_result observed_wait(base_sync_event *w, lib_u32 timeout)
 { signal_asleep(asleep); return base_sync_event_wait(w, timeout); }
 static lib_win32_dword LIB_WIN32_WINAPI bounded_join(lib_win32_handle h,lib_win32_dword timeout)
@@ -34,7 +34,7 @@ static void failure(void *p,lib_u64 id,lib_status s)
 int main(void)
 {
     lib_test_assert(kvm_console_destroy(LIB_NULL)==LIB_STATUS_OK);
-    lib_test_assert(base_sync_event_signal(LIB_NULL)==LIB_STATUS_INVALID_ARGUMENT);
+
     for(lib_u32 mode=0;mode<4;++mode) {
         kvm_console_options o={0}; kvm_console *c=LIB_NULL;
         asleep=lib_win32_create_event_a(LIB_NULL,LIB_WIN32_TRUE,LIB_WIN32_FALSE,LIB_NULL);
@@ -63,7 +63,7 @@ int main(void)
         lib_test_assert(joins==1 && c->worker_state==state && !retired && failures==1);
         lib_test_assert(wait_for_signal(worker->worker,0)==LIB_WIN32_WAIT_TIMEOUT);
         /* Test-only rescue after proving no premature retirement/free. */
-        lib_test_assert(signal_asleep(c->base.mailboxes.wake->handle));
+        lib_test_assert(base_sync_event_signal(c->base.mailboxes.wake)==LIB_STATUS_OK);
         lib_test_assert(wait_for_signal(worker->worker,3000)==LIB_WIN32_WAIT_OBJECT_0);
         lib_test_assert(retired==1 && failures==1);
         lib_test_assert(kvm_console_destroy(c)==LIB_STATUS_OK && joins==2);

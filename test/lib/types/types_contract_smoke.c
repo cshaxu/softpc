@@ -8,7 +8,6 @@ _Static_assert(_Generic((lib_bool)0, lib_u8: 1, default: 0),
 _Static_assert(LIB_FALSE == 0 && LIB_TRUE == 1, "canonical boolean values");
 _Static_assert(sizeof(lib_uptr) == sizeof(void *),
     "lib_uptr must preserve every object-pointer bit");
-#include "lib/base/clock_interface.h"
 
 #define CHECK(expression) do { if (!(expression)) return __LINE__; } while (0)
 
@@ -21,7 +20,6 @@ int main(void)
     lib_atomic_uptr token;
     lib_u64 expected;
     lib_uptr expected_token;
-    lib_u64 before, after, frequency, next_frequency, milliseconds;
     char bytes[4];
     char *copy = lib_allocate_zero(4u, 1u);
 
@@ -92,11 +90,10 @@ int main(void)
     CHECK(lib_atomic_uptr_load_explicit(&token, LIB_MEMORY_ORDER_ACQUIRE) ==
         LIB_UPTR_MAX);
 
-    CHECK(base_clock_monotonic_counter(LIB_NULL, &frequency) == LIB_STATUS_INVALID_ARGUMENT);
-    CHECK(base_clock_monotonic_counter(&before, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT);
-    CHECK(base_clock_monotonic_counter(&before, &frequency) == LIB_STATUS_OK);
-    CHECK(base_clock_monotonic_counter(&after, &next_frequency) == LIB_STATUS_OK);
-    CHECK(frequency > 0u && frequency == next_frequency && after >= before);
-    CHECK(base_clock_milliseconds(&milliseconds) == LIB_STATUS_OK);
+    lib_atomic_i32 atom;
+    lib_atomic_i32_initialize(&atom, 0);
+    lib_test_assert(lib_atomic_i32_fetch_add_explicit(&atom, 3, LIB_MEMORY_ORDER_SEQ_CST) == 0);
+    lib_test_assert(lib_atomic_i32_exchange_explicit(&atom, 7, LIB_MEMORY_ORDER_SEQ_CST) == 3);
+    lib_test_assert(lib_atomic_i32_load_explicit(&atom, LIB_MEMORY_ORDER_SEQ_CST) == 7);
     return 0;
 }

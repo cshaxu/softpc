@@ -10,7 +10,7 @@ S15 implementation extends the existing portable device archive and owner hooks.
 Both widths pass the seven focused SB checks and all four cross-process/
 cross-width archive routes. The x86 event-handle argument-width defect is fixed.
 Earlier native-host qualification attempts failed and are retained in the
-proposal; they were not accepted. The final qualification now passes 169/169
+proposal; they were not accepted. The archive qualification passed 169/169
 per architecture: 97 shared and 64 other isolated tests, plus five desktop and
 three native audio integrations. All four cross-width archive routes pass.
 Both EXEs are refreshed; owner INI/media/snapshots remain unchanged.
@@ -22,6 +22,43 @@ Executor 66058ab4 is committed and pushed. The separate actual-change review
 passes against the original archive request and owner-added test-isolation
 scope; see the proposal's S15 review. S15 is delivered pending owner acceptance,
 not formally closed. T93 stays open; no subsequent S is admitted.
+
+Owner extends the current S15 test cleanup: align the four shared test package
+subdirectories with their source owners; integration tests use each package's
+integration directory where applicable. This is a structural test-only change,
+with zero production changes. Preserve test bodies and native labels, update
+registration, references and manifests, and verify both widths before delivery.
+An existing unregistered Emulator UI composition test will regain registration.
+Estimate approximately 50 moved paths and 40-80 added gate/configuration lines;
+no new public API or runtime implementation. Owner request: "test里的公共4组件
+的test，目录文件结构和src的公共4组件的src，不匹配！我需要你修复。
+integration测试除外，你建立 test/lib/integration, test/emulator/integration,
+之类的，if it is applicable."
+
+Owner clarification: "最内层只依赖和测试最内层组件；中间和外层只依赖本层和
+内层组件，然后测试的话只测试本层组件。" Cross-component calls do not make
+a unit an integration: assign it to the tested outer owner, with legal inward
+production dependencies. Only real host/device/desktop/media requirements
+justify integration. Split unrelated inner-owner assertions rather than moving
+mixed tests to integration. Existing assertions remain covered by their owners.
+
+Owner further requests auditing all analogous platform/name/private-fixture
+misplacements and approves completion through build/test/commit/push, then
+acceptance. Base owns native keyboard decoding/layout assertions; KVM units
+own neutral delivery/synthesis/hotkeys. Remove foreign private backend fixture
+imports, stale platform names and unmatched platform directories; preserve
+each assertion's owner coverage. Production remains unchanged. Incremental
+estimate: 12-18 test/configuration paths, about +150-250/-250-350 lines before
+final qualification. No new public interface or test framework.
+
+The test-layout extension is implemented and dual-width qualification passes
+188/188 each: 116 shared, 64 other background, five desktop and three native
+audio integrations. All 91 shared C/H files (excluding deliberate negative
+fixtures) have source-owner directories. Public production is unchanged;
+INI/media/snapshots are preserved. The x64 EXE remains the verified cached
+production artifact; x86 was rebuilt after existing Ninja-log recovery.
+The executor delivery is ready for commit and separate actual-change review;
+S15 remains open awaiting owner acceptance.
 
 ## M9 T93 S15 Packet
 

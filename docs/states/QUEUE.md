@@ -3,7 +3,13 @@
 This is the ordered, unnumbered candidate queue. It neither activates work nor
 allocates a numeric task identifier.
 
-No unadmitted candidates remain. The owner admits
+## Ordered candidates
+
+1. [Windows 95 Sound Blaster recognition and playback repair](../proposals/m9-win95-sound-blaster-recognition.md)
+
+## Previously admitted
+
+The owner admits
 [XP Sound Blaster standalone capability](../proposals/m9-xp-sound-blaster-standalone.md)
 as T93 on 2026-10-15; CURRENT owns its active subtask, not this queue.
 

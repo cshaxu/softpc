@@ -18,6 +18,12 @@ by CMake; Linux fakes test algorithms, not native Linux runtime availability.
 Assertions remain enabled in Release. Scratch files stay in the build directory.
 The shared file cleanup helper belongs to this suite's storage probes.
 
+Unit directories follow src/lib ownership: types, base, console,
+console-broker, storage, audio/{pcm,midi,fm}, kvm-base, kvm-console and
+kvm-window. Tests use only their owner and its inward production dependencies;
+assertions about independent inner contracts stay with the inner owner.
+Using several components does not turn a unit into an integration test.
+
 The `desktop` label marks real native Window/Console tests, including tests
 that hide a window only after creating it. Run these explicitly with `-L desktop
 -j 1` when the desktop is reserved for testing. Mocked input/rendering tests

@@ -2,6 +2,9 @@
 #include "lib/console/console_interface.h"
 #include "lib/console/binding_interface.h"
 
+_Static_assert(_Generic(((lib_console_text_frame *)0)->cursor_visible, lib_bool: 1, default: 0), "cursor visibility boolean");
+_Static_assert(_Generic(((lib_console_text_frame *)0)->cursor_phase, lib_bool: 1, default: 0), "cursor phase boolean");
+
 
 typedef struct console_probe {
     lib_console_event event;

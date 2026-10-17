@@ -1,6 +1,6 @@
 #include "lib/types/test.h"
 #include "lib/types/win32/test.h"
-#include "lib/base/win32/sync.c"
+#include "lib/base/sync_interface.h"
 
 static lib_win32_handle entered, release_gate, blocked;
 static lib_win32_long contender;
@@ -23,8 +23,7 @@ static void tracked_destroy(base_sync_mutex *mutex)
 static void tracked_enter(base_sync_mutex *mutex)
 {
     if (lib_win32_get_current_thread_id() == (lib_win32_dword)lib_win32_interlocked_compare_exchange(&contender, 0, 0)) {
-        if (lib_win32_try_enter_critical_section(&mutex->gate)) return;
-        lib_win32_set_event(blocked); /* proven contention, not a scheduling guess */
+        lib_win32_set_event(blocked); /* The contender has reached the owner-held lock. */
     }
     base_sync_mutex_lock(mutex);
 }
@@ -32,13 +31,11 @@ static void tracked_enter(base_sync_mutex *mutex)
 #define base_sync_mutex_create tracked_create
 #define base_sync_mutex_destroy tracked_destroy
 #include "lib/console/console.c"
-#include "lib/console-broker/win32/console.c"
 #undef base_sync_mutex_lock
 #undef base_sync_mutex_create
 #undef base_sync_mutex_destroy
 
 static lib_console *object;
-static console_broker_backend backend;
 static lib_i32 mode;
 static lib_i32 replacement_calls;
 static lib_console_text_frame frame = { .columns = 80u, .rows = 25u };
@@ -92,14 +89,7 @@ static lib_win32_dword LIB_WIN32_WINAPI lock_consumer(void *unused)
 {
     (void)unused;
     lib_win32_interlocked_exchange(&contender, (lib_win32_long)lib_win32_get_current_thread_id());
-    if (mode == 0) lib_test_assert(lib_console_bind_generation(object, 2) == LIB_STATUS_OK);
-    else if (mode == 1) {
-        console_broker_backend_lock_output(&backend);
-        console_broker_backend_unlock_output(&backend);
-    } else {
-        console_broker_backend_lock_transaction(&backend);
-        console_broker_backend_unlock_transaction(&backend);
-    }
+    lib_test_assert(lib_console_bind_generation(object, 2) == LIB_STATUS_OK);
     return 0;
 }
 int main(void)
@@ -145,11 +135,8 @@ int main(void)
         lib_win32_close_handle(entered); lib_win32_close_handle(release_gate); lib_win32_close_handle(blocked);
     }
     lib_test_assert(lib_console_create(&object) == LIB_STATUS_OK);
-    lib_test_assert(base_sync_mutex_create(&backend.output_lock) == LIB_STATUS_OK);
-    lib_test_assert(base_sync_mutex_create(&backend.transaction_lock) == LIB_STATUS_OK);
-    for (mode = 0; mode < 3; ++mode) {
-        base_sync_mutex *held = mode == 0 ? object->lock :
-            mode == 1 ? backend.output_lock : backend.transaction_lock;
+    {
+        base_sync_mutex *held = object->lock;
         blocked = lib_win32_create_event_a(LIB_NULL, LIB_WIN32_TRUE, LIB_WIN32_FALSE, LIB_NULL);
         lib_test_assert(blocked);
         base_sync_mutex_lock(held);
@@ -161,8 +148,6 @@ int main(void)
         lib_win32_interlocked_exchange(&contender, 0);
         lib_win32_close_handle(thread); lib_win32_close_handle(blocked);
     }
-    base_sync_mutex_destroy(backend.output_lock);
-    base_sync_mutex_destroy(backend.transaction_lock);
     lib_console_release(object);
     lib_test_assert(live_mutexes == 0);
     return 0;

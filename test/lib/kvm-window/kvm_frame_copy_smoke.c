@@ -1,8 +1,6 @@
 #include "lib/types/test.h"
 #include "lib/kvm-base/mailbox_interface.h"
 #include "lib/kvm-window/frame_interface.h"
-#include "lib/kvm-console/frame_interface.h"
-#include "lib/console/console_interface.h"
 #include "lib/kvm-base/event_interface.h"
 
 #if defined(KVM_WINDOW_FONT_DEFAULT_HEIGHT) || defined(KVM_WINDOW_FONT_MAX_HEIGHT) || defined(LIB_CONSOLE_LINE_MAX)
@@ -16,50 +14,13 @@ ASSERT_BOOLEAN(kvm_window_frame, valid);
 ASSERT_BOOLEAN(kvm_window_frame, graphics);
 _Static_assert(KVM_CURSOR_DISABLED == 0 && KVM_CURSOR_HOST == 1 &&
     KVM_CURSOR_SOURCE == 2, "cursor mode values");
-ASSERT_BOOLEAN(kvm_text_frame, cursor_phase);
-ASSERT_BOOLEAN(lib_console_text_frame, cursor_visible);
-ASSERT_BOOLEAN(lib_console_text_frame, cursor_phase);
-ASSERT_BOOLEAN(kvm_input_event, data.key.pressed);
-ASSERT_BOOLEAN(kvm_input_event, data.mouse.relative);
 #undef ASSERT_BOOLEAN
 
 static kvm_window_frame source, destination, storage;
 static kvm_component_mailboxes mailbox;
 
-_Static_assert(sizeof(kvm_text_cell) == 4u, "cell size");
-_Static_assert(lib_offsetof(kvm_text_cell, glyph_index) == 0u, "glyph offset");
-_Static_assert(lib_offsetof(kvm_text_cell, glyph_bank) == 1u, "bank offset");
-_Static_assert(lib_offsetof(kvm_text_cell, foreground) == 2u, "foreground offset");
-_Static_assert(lib_offsetof(kvm_text_cell, background) == 3u, "background offset");
-
 static void check_validation(void)
 {
-    kvm_console_text_frame text = {0};
-    lib_u32 height, top, bottom;
-    text.base = (kvm_text_frame){.text_columns = 80u, .text_rows = 25u,
-        .cursor_mode = KVM_CURSOR_SOURCE, .cursor_top = 14u, .cursor_bottom = 31u};
-    lib_test_assert(kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    lib_test_assert(height == 16u && top == 14u && bottom == 16u);
-    text.base.cursor_phase = LIB_FALSE;
-    lib_test_assert(kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    text.base.font_height = 32u;
-    lib_test_assert(kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    lib_test_assert(height == 32u && top == 14u && bottom == 32u);
-    text.base.font_height = 14u;
-    lib_test_assert(!kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    text.base.cursor_bottom = 0u;
-    lib_test_assert(kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    lib_test_assert(top == 0u && bottom == 14u);
-    text.base.font_height = 512u;
-    lib_test_assert(kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    lib_test_assert(top == 0u && bottom == 512u);
-    text.base.cursor_row = 25;
-    lib_test_assert(!kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    text.base.cursor_row = 0;
-    text.base.cursor_mode = KVM_CURSOR_DISABLED;
-    lib_test_assert(!kvm_text_cursor_shape(&text.base, &height, &top, &bottom));
-    text = (kvm_console_text_frame){0};
-    lib_test_assert(KVM_TEXT_FONT_DEFAULT_HEIGHT == 16u);
     source = (kvm_window_frame){0};
     lib_test_assert(kvm_window_frame_validate(LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT);
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_INVALID_ARGUMENT);
@@ -87,8 +48,6 @@ static void check_validation(void)
     }
     source.text.base.font_height = KVM_WINDOW_FONT_HEIGHT + 1u;
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
-    text.base = source.text.base; /* Console does not own bitmap bounds. */
-    lib_test_assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_OK);
     source.text.base.font_height = 0u;
     for (lib_u32 field = 0; field < 3; ++field) {
         lib_u8 *value = field == 0 ? &source.text.base.cells[3999].foreground :
@@ -104,18 +63,6 @@ static void check_validation(void)
     }
     source.text.base.text_rows++;
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
-    text.base.text_columns++;
-    lib_test_assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_UNSUPPORTED);
-    text.base.text_columns = 0u;
-    lib_test_assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
-    text.base.text_columns = 1u;
-    text.characters.primary[255] = 0xd800u;
-    lib_test_assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
-    text.characters.primary[255] = 0xd7ffu;
-    text.characters.secondary[0] = 0xdfffu;
-    lib_test_assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
-    text.characters.secondary[0] = 0xe000u;
-    lib_test_assert(kvm_console_text_frame_validate(&text) == LIB_STATUS_OK);
     source.graphics = LIB_TRUE;
     source.image.width = source.image.height = source.image.stride = 1u;
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
@@ -145,9 +92,7 @@ static void check_copy(void)
 int main(void)
 {
     lib_u32 generation, old;
-    lib_test_assert(sizeof(kvm_text_frame) == 16092);
     lib_test_assert(sizeof(kvm_window_text_frame) == 32476);
-    lib_test_assert(sizeof(kvm_console_text_frame) == 17116);
     lib_test_assert(sizeof(kvm_window_frame) == 984080);
     check_validation();
     lib_memory_set(&source, 0x3c, sizeof(source));
