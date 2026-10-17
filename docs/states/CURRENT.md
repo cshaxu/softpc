@@ -2,7 +2,8 @@
 
 ## Current Work
 
-T94 S3 is active: Base input ownership cleanup. The owner accepted and closed
+T94 S3 is delivered and coordinator-reviewed at 3e5c61e4, awaiting owner
+acceptance: Base input ownership cleanup. The owner accepted and closed
 S2 on 2026-10-17. S1
 diagnosis/design is complete after delivery 20298b44 and separate review.
 S2 implemented reset binding, physical DMA access and input-channel PCM gain
@@ -43,8 +44,8 @@ records, not as competing active packets in this status file.
   PCM gain operates on input channels. Native Win95 WAV progress and
   post-play snapshot save/resume were instrumented successfully, not claimed
   from human listening. Details remain in the S2 history and proposal.
-- S3 is implemented and verified, awaiting executor delivery and independent
-  coordinator review before owner acceptance. Base owns the single neutral
+- S3 is implemented, verified and pushed as 3e5c61e4; separate actual-commit
+  coordinator review passes. Owner acceptance is pending. Base owns the single neutral
   input header, native decoder and layout query; KVM retains hotkey/held-key,
   synthesis and event delivery. Six hotkey aliases and unused KVM user32
   linkage are removed. Numeric values and record layout are unchanged.
