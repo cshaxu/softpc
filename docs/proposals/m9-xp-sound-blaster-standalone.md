@@ -3279,6 +3279,52 @@ success or claiming their root causes fixed. Existing TODOs remain unchanged.
 Documentation governance and whitespace checks pass. No blocking finding in
 the bounded S14 change; owner acceptance remains required before S14 closure.
 
+#### S14 partial-capture correction
+
+Owner supplies downstream P2 audit of 4aacc52e, then explicitly approves repair:
+"批准修复". This continues the unaccepted S14; it does not admit S15. The prior
+actual-change review missed capture-success followed by focus-loss and is not
+evidence that this failure path was correct. Source review confirms that only
+Raw Input was unbound, leaving native capture held while captured remained false.
+
+Minimal plan: before unbinding on activation rejection, release native capture
+only if still owned by this Window. Always attempt registration cleanup even
+when release fails; propagate cleanup failure rather than normal INVALID_STATE.
+No clipping was acquired yet, so do not invoke full clipping cleanup or create
+a false captured state. No new API/helper/state/retry or message-spanning lock.
+Estimate: production net +4-6 and tests +25-40, manifests and EXEs separate.
+
+The existing fixture now injects successful capture followed by focus loss,
+capture replacement, release failure and registration-removal failure. Existing
+focus/capture denial tests remain. Before the repair, the new regression fails
+at its required release-count assertion on x64. Production repair is +3/-0;
+tests +26/-1, net +25. Both cleanup calls remain on the same rejection path.
+
+Similar-issue sweep covers every mouse_bind, SetCapture and ReleaseCapture call
+in the Window owner and its component failure forwarding. Normal release
+already checks native ownership and preserves errors; bounds failure already
+uses normal release and returns IO_ERROR. The incomplete activation-rejection
+branch is the sole newly identified hit. Component maps INVALID_STATE to normal
+refusal and all other errors to its existing failure sink; that behavior stays.
+The new controlled regression proves the local failure sequence, not an actual
+RDP reproduction.
+
+Corrected receiving qualification: cached Release builds pass both widths;
+each architecture passes 97/97 shared, 65/65 other and 5/5 native desktop tests,
+167/167 total, zero skips. This complete run passes without isolated retries.
+The new capture regression passes both widths. Both EXEs are refreshed; INI
+hash is unchanged. Native test harnesses ran without Computer Use.
+Manifest, inward-boundary, Types, naming and documentation gates pass.
+Executor self-review confirms that ReleaseCapture runs before unbinding and
+outside the registry lock, including failure; another native capture owner is
+untouched. No new API or persistent state. Correction stays within Lib source/
+test plus manifests/governance and two package EXEs.
+
+Final SHA-256:
+- softpc32.exe: 5D137C99B97114285E3D5176B94518F18805B7CAD8D9E0631BA4C7112DE30D45
+- softpc64.exe: 7176466BA4086D79C451869D773C9BFFF93805BE860D3456B8DA0ADD2FDBEF75
+- unchanged INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
 ### S15 — portable archive and final qualification
 
 Extend existing device capture/restore and fixed-width codec, not Lib archive

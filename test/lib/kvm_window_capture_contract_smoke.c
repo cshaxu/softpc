@@ -74,6 +74,7 @@ static lib_win32_bool LIB_WIN32_WINAPI get_clip(lib_win32_rect *r) { *r=clipped;
 static lib_u32 releases, clips, events, input_resets;
 static lib_bool reject_input;
 static lib_i32 release_ok=1, focus_ok=1, capture_ok=1;
+static lib_bool lose_focus_on_capture, replace_capture;
 static lib_u32 focus_requests, foreground_requests;
 static lib_i32 clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
 static lib_win32_dword ticks;
@@ -107,7 +108,14 @@ static void check_callback_contention(void);
 static lib_i32 reenter_title;
 static void title_notification(void);
 static lib_win32_hwnd LIB_WIN32_WINAPI get_capture(void) { return owner; }
-static lib_win32_hwnd LIB_WIN32_WINAPI set_capture(lib_win32_hwnd w) { lib_win32_hwnd old=owner; if(capture_ok)owner=w; return old; }
+static lib_win32_hwnd LIB_WIN32_WINAPI set_capture(lib_win32_hwnd w)
+{
+    lib_win32_hwnd old=owner;
+    if(capture_ok)owner=w;
+    if(lose_focus_on_capture)focused=LIB_NULL;
+    if(replace_capture)owner=(lib_win32_hwnd)2;
+    return old;
+}
 static lib_win32_bool LIB_WIN32_WINAPI release_capture(void)
 { ++releases; owner=LIB_NULL; check_callback_contention(); notify_loss(); return release_ok; }
 static lib_win32_hwnd LIB_WIN32_WINAPI set_focus(lib_win32_hwnd w) { ++focus_requests; check_callback_contention(); if(focus_ok)focused=w; return w; }
@@ -736,6 +744,23 @@ int main(void)
         lib_test_assert(!c.mouse.captured && raw_binding.usUsage == 0u && clips == before_clips);
     }
     focus_ok = capture_ok = 1;
+    /* Capture succeeded, but activation was lost before the final check. */
+    lose_focus_on_capture = LIB_TRUE;
+    for (lib_u32 i = 0u; i < 4u; ++i) {
+        lib_u32 before_releases = releases, before_clips = clips;
+        replace_capture = i == 1u;
+        release_ok = i != 2u;
+        raw_remove_ok = i != 3u;
+        lib_test_assert(kvm_win32_mouse_capture(&c.mouse, (lib_win32_hwnd)1) ==
+            (i < 2u ? LIB_STATUS_INVALID_STATE : LIB_STATUS_IO_ERROR));
+        lib_test_assert(!c.mouse.captured && clips == before_clips);
+        lib_test_assert(releases == before_releases + (replace_capture ? 0u : 1u));
+        lib_test_assert(owner == (replace_capture ? (lib_win32_hwnd)2 : LIB_NULL));
+        lib_test_assert(raw_binding.usUsage == (raw_remove_ok ? 0u : 2u));
+        raw_binding = (lib_win32_raw_input_device){0};
+    }
+    lose_focus_on_capture = replace_capture = LIB_FALSE;
+    release_ok = raw_remove_ok = 1;
     contend_on_callback = LIB_TRUE;
     lib_test_assert(kvm_win32_mouse_capture(&c.mouse, (lib_win32_hwnd)1) == LIB_STATUS_OK);
     lib_test_assert(kvm_win32_mouse_release(&c.mouse) == LIB_STATUS_OK);

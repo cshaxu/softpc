@@ -2,7 +2,16 @@
 
 ## Current Work
 
-T93 S14 is implemented and receiving verification has finished after host audio
+T93 S14 partial-capture cleanup correction is implemented and verified.
+Only this Window's native capture is released before unbinding; cleanup errors
+are propagated. Correction production +3/-0, tests +26/-1 (net +25).
+Both cached builds and complete suites pass 167/167 per architecture, zero skips,
+including all ten native desktop cases; both EXEs refreshed, INI unchanged.
+Executor push and actual-change review remain due; await owner acceptance, no S15.
+See the [correction](../proposals/m9-xp-sound-blaster-standalone.md#s14-partial-capture-correction).
+Prior evidence follows.
+
+T93 S14 prior receiving verification finished after host audio
 recovery. Both cached builds and all ten native desktop cases pass. Full rerun:
 x64 158/167, x86 166/167; all ten failed cases then pass unchanged in isolation,
 so every test has passing evidence, not a single all-green aggregate run.

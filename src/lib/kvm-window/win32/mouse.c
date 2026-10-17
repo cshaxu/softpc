@@ -111,7 +111,10 @@ lib_status kvm_win32_mouse_capture(kvm_win32_mouse *mouse,
     lib_win32_set_focus(window);
     if (lib_win32_get_focus() == window) lib_win32_set_capture(window);
     if (lib_win32_get_focus() != window || lib_win32_get_capture() != window) {
+        lib_bool released = lib_win32_get_capture() != window ||
+            lib_win32_release_capture();
         status = mouse_bind(window, LIB_FALSE);
+        if (!released) return LIB_STATUS_IO_ERROR;
         return status == LIB_STATUS_OK ? LIB_STATUS_INVALID_STATE : status;
     }
     mouse->window = window;
