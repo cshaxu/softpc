@@ -104,7 +104,7 @@ lib_bool kvm_window_cursor_rect(const kvm_window_frame *frame, const kvm_window_
 {
     lib_i32 width, height, cell_top, cell_bottom;
     lib_u32 top, bottom, font_height;
-    if (kvm_window_frame_validate(frame) != LIB_STATUS_OK || !display || !cursor || frame->graphics ||
+    if (frame == LIB_NULL || !frame->valid || !display || !cursor || frame->graphics ||
         !kvm_text_cursor_shape(&frame->text.base, &font_height, &top, &bottom))
         return LIB_FALSE;
     width = display->right - display->left;

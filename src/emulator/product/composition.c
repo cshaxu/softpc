@@ -39,11 +39,12 @@ static void emulator_product_machine_frame_published(void *context, lib_u32 sequ
     lib_bool graphics, lib_u32 run_generation)
 {
     emulator_product *product = context;
+    (void)sequence;
+    (void)graphics;
 
     if (product == LIB_NULL || product->session == LIB_NULL)
         return;
-    (void)emulator_session_enqueue_frame_completed(product->session,
-        sequence, graphics, run_generation);
+    (void)emulator_session_enqueue_frame_completed(product->session, run_generation);
 }
 
 lib_status emulator_product_create(const emulator_product_machine *machine,

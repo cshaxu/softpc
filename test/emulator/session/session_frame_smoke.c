@@ -133,8 +133,6 @@ int main(void)
     published.window.image.pixels[15] = 0xabcdef; /* B changed the opposite corner. */
     event.kind = EMULATOR_SESSION_EVENT_FRAME_COMPLETED;
     event.run_generation = 7u;
-    event.value.frame.sequence = 2u;
-    event.value.frame.graphics = 0; /* An earlier text frame. */
     lib_test_assert(emulator_session_process_completed(&session, &event));
     lib_test_assert(copies == 1u && session.state.observed_frame_sequence == 3u);
     lib_test_assert(session.state.graphics_actual);
@@ -148,10 +146,8 @@ int main(void)
         delivered_graphics && delivered_status);
 
     event.kind = EMULATOR_SESSION_EVENT_FRAME_COMPLETED;
-    event.value.frame.sequence = 3u;
     lib_test_assert(emulator_session_process_completed(&session, &event));
     lib_test_assert(delivered_sequence == 3u); /* Reobserving never regresses content. */
-    event.value.frame.sequence = 4u;
     published.window.valid = LIB_FALSE;
     lib_test_assert(emulator_session_process_completed(&session, &event));
     lib_test_assert(session.state.observed_frame_sequence == 3u &&
@@ -194,21 +190,18 @@ int main(void)
     session.state.observed_frame_sequence = LIB_UINT32_MAX - 1u;
     published.sequence = 1u;
     event.kind = EMULATOR_SESSION_EVENT_FRAME_COMPLETED;
-    event.value.frame.sequence = LIB_UINT32_MAX;
     lib_u32 before = copies;
     lib_test_assert(emulator_session_process_completed(&session, &event));
     lib_test_assert(copies == before + 1u && session.state.observed_frame_sequence == 1u);
     lib_test_assert(session.state.observed_frame_sequence == 1u && delivered_sequence == 1u);
-    const lib_u32 stale[] = { LIB_UINT32_MAX - 1u, LIB_UINT32_MAX, 0u, 1u };
-    for (lib_u32 i = 0u; i < sizeof(stale) / sizeof(stale[0]); ++i) {
-        event.value.frame.sequence = stale[i];
+    /* Repeated wake hints always inspect the same latest publication. */
+    for (lib_u32 i = 0u; i < 4u; ++i) {
         lib_test_assert(emulator_session_process_completed(&session, &event));
         lib_test_assert(copies == before + 2u + i && session.state.observed_frame_sequence == 1u);
     }
     before = copies;
     current_run = published_run = 8u;
     published.sequence = 2u;
-    event.value.frame.sequence = 2u;
     lib_test_assert(emulator_session_process_completed(&session, &event));
     lib_test_assert(copies == before); /* Old run cannot cross the wrap boundary. */
     emulator_session_state_note_runtime(&session.state, EMULATOR_SESSION_MACHINE_STOPPED);

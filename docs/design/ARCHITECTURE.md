@@ -120,7 +120,7 @@ import App, VM, Compat or MVDM.
 
 `lib/` is the canonical checked-in shared-library corpus, not a runtime or
 build dependency on NXVM or NTVDM64. NXVM adopts this corpus exactly. It
-consumes and produces copied host values only. It owns
+consumes and produces copied controls/input and bounded immutable frame references. It owns
 the generic mailbox mechanics, independent console/window message loops,
 host-input normalization, registered-chord matching, mouse capture, clock,
 synchronization,
@@ -307,10 +307,10 @@ Console maintain separate ledgers. Matching accepts each record's modifier
 snapshot even when a modifier make was not observed in that instance; no
 additional source-local modifier-participation restriction is imposed.
 
-Every `kvm-window` and `kvm-console` instance owns private control/frame/input
-mailboxes and its own native worker(s). Their emulator mailbox mechanics live in
-`kvm-base`; the mailbox instances remain per-component implementation details,
-never public handles or shared KVM infrastructure. SoftPC invokes the specific
+Every `kvm-window` and `kvm-console` instance owns a private control mailbox
+and its own native worker(s), and borrows a producer-owned frame exchange.
+Their transport mechanics live in `kvm-base`; control mailbox instances remain
+private, while the opaque frame exchange carries immutable held references. SoftPC invokes the specific
 component API it has chosen; components communicate back only through the
 copied input-queue entry supplied at creation.
 
@@ -348,7 +348,8 @@ processing (Console). Failure requeues only an unsuperseded input; it never
 replaces newer pending content. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means
-no output, and NOT_CURRENT retains pending content without a retry loop.
+no output. Unbound Console output succeeds without native drawing and releases
+that frame; UI republishes the current frame when presenting Console again.
 Before native activation, the existing broker binding helper synchronously sends
 INPUT_RESET through the logical Console after old-reader quiescence. kvm-console
 clears its held keys, incomplete text and mouse baseline, retaining registrations
@@ -415,8 +416,8 @@ owned-byte reads use a stack file. Close consumes the stream, not its container.
 
 Pure Window geometry, cursor rectangles, frame pixel conversion and relative
 motion scaling belong to kvm-window root helpers. Native files marshal SDK
-values and own actual drawing/messages/capture. Worker context and frame share
-one allocation; native cleanup runs on the worker, storage release after join.
+values and own actual drawing/messages/capture. Worker context borrows processing/displayed frames from the producer exchange;
+native cleanup runs on the worker, context storage release follows join.
 Base event is one opaque platform allocation, not a pointer-only outer wrapper.
 KVM destruction performs one bounded 5000 ms join. An unjoinable live worker is
 an application-terminal infrastructure failure; Lib never terminates the

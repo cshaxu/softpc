@@ -42,7 +42,9 @@ only signals the existing worker's wake; it neither renders nor reenters the bro
 A failed activation notification enters the same terminal failure path as a
 failed frame/control notification. Checked destroy uses the shared bounded-join
 contract; failure retains the component and its callback dependencies.
-The worker draws a pending mailbox frame, or does nothing if empty. NOT_CURRENT
-does not acknowledge a frame: the next publication or activation wakes it again.
-STOP retains priority over frame consumption. No separate activation renderer,
-polling retry or application republish requirement exists.
+The worker draws a pending exchange frame, or does nothing if empty. An unbound
+logical Console accepts output without native drawing; successful consumption
+releases that frame. Activation only wakes still-pending work. The producer must
+republish the current frame when presenting that Console again.
+STOP retains priority over frame consumption. There is no separate activation
+renderer or polling retry.

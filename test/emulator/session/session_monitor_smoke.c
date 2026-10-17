@@ -232,15 +232,15 @@ static void public_session_contract(void)
     lib_test_assert(emulator_session_queue_take(&session->queue, &taken, 0u));
     lib_test_assert(taken.kind == EMULATOR_SESSION_EVENT_CONSOLE_FAILED);
     lib_test_assert(!emulator_session_enqueue_runtime_completed(LIB_NULL, EMULATOR_SESSION_MACHINE_PAUSED, 1u));
-    lib_test_assert(!emulator_session_enqueue_frame_completed(LIB_NULL, 1u, LIB_TRUE, 1u));
+    lib_test_assert(!emulator_session_enqueue_frame_completed(LIB_NULL, 1u));
     lib_test_assert(emulator_session_enqueue_runtime_completed(session, EMULATOR_SESSION_MACHINE_PAUSED, 10u));
     lib_test_assert(emulator_session_queue_take(&session->queue, &taken, 0u));
     lib_test_assert(taken.kind == EMULATOR_SESSION_EVENT_RUNTIME_COMPLETED &&
         taken.run_generation == 10u && taken.value.runtime_state == EMULATOR_SESSION_MACHINE_PAUSED);
-    lib_test_assert(emulator_session_enqueue_frame_completed(session, 5u, LIB_TRUE, 11u));
+    lib_test_assert(emulator_session_enqueue_frame_completed(session, 11u));
     lib_test_assert(emulator_session_queue_take(&session->queue, &taken, 0u));
     lib_test_assert(taken.kind == EMULATOR_SESSION_EVENT_FRAME_COMPLETED &&
-        taken.run_generation == 11u && taken.value.frame.sequence == 5u && taken.value.frame.graphics);
+        taken.run_generation == 11u);
 
     active = session;
     exit_on_request = LIB_TRUE;

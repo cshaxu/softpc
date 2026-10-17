@@ -2,7 +2,7 @@
 
 lib_bool kvm_window_frame_size(const kvm_window_frame *frame, lib_u32 *width, lib_u32 *height)
 {
-    if (kvm_window_frame_validate(frame) != LIB_STATUS_OK || !width || !height) return LIB_FALSE;
+    if (frame == LIB_NULL || !frame->valid || !width || !height) return LIB_FALSE;
     *width = frame->graphics ? frame->image.width : frame->text.base.text_columns * 8u;
     *height = frame->graphics ? frame->image.height : frame->text.base.text_rows *
         (frame->text.base.font_height != 0u ? frame->text.base.font_height : KVM_TEXT_FONT_DEFAULT_HEIGHT);

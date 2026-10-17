@@ -162,8 +162,8 @@ synchronously through the logical Console. Consumers clear local input history
 before the next reader starts; this is distinct from successful ACTIVATED and
 permanent KVM source retirement. Rollback uses the same reset-before-reader path.
 Normal replacement cancellation is not failure. A KVM Console reports genuine
-input/output errors through its failure sink and retires; NOT_CURRENT output
-is an expected inactive-object write. Neither path makes application decisions.
+input/output errors through its failure sink and retires; inactive-object output
+succeeds without native drawing. Neither path makes application decisions.
 Broker replacement holds its transaction lock through old output-sink cleanup;
 the backend output lock is released first so in-flight writes can complete.
 

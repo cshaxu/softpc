@@ -77,11 +77,11 @@ or MVDM, and no other X86 file may include VM. VM's public header exposes only
 copied options, opaque identity and existing Emulator/Lib contracts. Compat
 does not depend on app, VM or Emulator. Historical same-name replacement headers
 remain isolated; no generic compat wrapper layer is retained. `emulator/machine` owns the one generic
-executor, lifecycle/input queues, run generation and copied-frame publication.
+executor, lifecycle/input queues, run generation and bounded immutable-frame publication.
 `emulator/session` owns the control FIFO,
 completed-fact reduction, prompt scheduling and dispatch to injected machine/
 UI adapters. `emulator/ui` owns monitor/KVM composition and Console handoff.
-`lib` owns copied-value platform mechanics:
+`lib` owns platform mechanics, copied controls/input and bounded frame exchanges:
 mailbox, host input normalization, action registration, console/window loops,
 routing, geometry, capture, clock, synchronization, and storage. It never
 owns a project runtime, machine, renderer, product input queue, guest-input

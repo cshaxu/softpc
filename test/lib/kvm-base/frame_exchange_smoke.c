@@ -146,6 +146,79 @@ static void concurrent_exchange(lib_bool retained)
     kvm_frame_exchange_destroy(test.exchange);
 }
 
+/* Both sides progress: publication races take/finish, with a checkpoint every
+ * 32 frames to guarantee consumer turnover even on a single-core scheduler.
+ * These test barriers do not replace the stalled-consumer test above. */
+static void produce_turnover(void *context, const base_sync_task *task)
+{
+    concurrent_test *test = context;
+    (void)task;
+    for (lib_u32 serial = 1u; serial <= 32000u; ++serial) {
+        publish(test->exchange, serial);
+        lib_test_assert(base_sync_event_signal(test->produced) == LIB_STATUS_OK);
+        if (serial % 32u == 0u)
+            lib_test_assert(base_sync_event_wait(test->held, 5000u) == BASE_SYNC_WAIT_SIGNALED);
+    }
+}
+
+static void concurrent_turnover(lib_bool retained)
+{
+    concurrent_test test = { 0 };
+    base_sync_task *producer;
+    const test_frame *displayed = LIB_NULL;
+    lib_u32 last = 0u, displayed_serial = 0u, checkpoint = 0u, consumed = 0u;
+    lib_bool previous_failed = LIB_FALSE;
+    lib_test_assert(kvm_frame_exchange_create(&test.exchange,
+        sizeof(test_frame), retained) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.held) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.produced) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_task_create(produce_turnover, &test, &producer) == LIB_STATUS_OK);
+    while (last < 32000u) {
+        const test_frame *processing = kvm_frame_exchange_take(test.exchange);
+        if (processing == LIB_NULL) {
+            lib_test_assert(base_sync_event_wait(test.produced, 5000u) == BASE_SYNC_WAIT_SIGNALED);
+            continue;
+        }
+        lib_u32 serial = processing->serial;
+        ++consumed;
+        lib_bool success = previous_failed || serial == 32000u || consumed % 17u != 0u;
+        lib_test_assert(serial > last || (previous_failed && serial == last));
+        check(processing, serial);
+        if (displayed != LIB_NULL) {
+            lib_test_assert(displayed != processing);
+            check(displayed, displayed_serial);
+        }
+        /* Latest inspection holds only the exchange lock, never the rendering
+         * interval. A held processing/displayed pointer remains immutable. */
+        const test_frame *latest = kvm_frame_exchange_lock_latest(test.exchange);
+        lib_test_assert(latest != LIB_NULL && latest->serial >= serial);
+        check(latest, latest->serial);
+        kvm_frame_exchange_unlock(test.exchange);
+        check(processing, serial);
+        if (displayed != LIB_NULL) check(displayed, displayed_serial);
+        kvm_frame_exchange_finish(test.exchange, success);
+        if (retained && success) {
+            displayed = processing;
+            displayed_serial = serial;
+        }
+        last = serial;
+        previous_failed = !success;
+        if (serial % 32u == 0u && serial != checkpoint) {
+            checkpoint = serial;
+            lib_test_assert(base_sync_event_signal(test.held) == LIB_STATUS_OK);
+        }
+    }
+    lib_test_assert(consumed >= 1000u);
+    lib_test_assert(base_sync_task_destroy(producer) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_take(test.exchange) == LIB_NULL);
+    kvm_frame_exchange_detach(test.exchange);
+    check(kvm_frame_exchange_take(test.exchange), 32000u);
+    kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
+    base_sync_event_destroy(test.held);
+    base_sync_event_destroy(test.produced);
+    kvm_frame_exchange_destroy(test.exchange);
+}
+
 int main(void)
 {
     kvm_frame_exchange *exchange = (kvm_frame_exchange *)1;
@@ -165,6 +238,8 @@ int main(void)
     exercise(LIB_TRUE);
     concurrent_exchange(LIB_FALSE);
     concurrent_exchange(LIB_TRUE);
+    concurrent_turnover(LIB_FALSE);
+    concurrent_turnover(LIB_TRUE);
     lib_test_assert(live_allocations == 0u);
     return 0;
 }

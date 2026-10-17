@@ -12,8 +12,8 @@ The adapter-only `binding_interface.h` installs one copied output binding:
 text callback, text-frame callback and a shared borrowed context. Replacing it
 with NULL clears both. The output gate covers either callback and replacement;
 after replacement returns, no previous output uses the old context. A valid
-object always accepts replacement; an absent callback makes its write return
-NOT_CURRENT. Input generation and its separate event gate are unchanged.
+object always accepts replacement; an absent callback accepts output without
+native drawing. Input generation and its separate event gate are unchanged.
 
 Text-frame cells contain copied BMP Unicode values, not encoded byte indices.
 Separate foreground/background arrays contain palette indices 0..15, not native

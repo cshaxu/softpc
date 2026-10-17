@@ -312,7 +312,7 @@ static lib_bool win32_window_paint(lib_win32_hwnd window, kvm_win32_window_conte
     kvm_window_rect display;
 
     if (context == LIB_NULL || context->surface_dc == LIB_NULL ||
-        kvm_window_frame_validate(context->frame) != LIB_STATUS_OK ||
+        context->frame == LIB_NULL || !context->frame->valid ||
         !win32_window_display_rect(context, context->surface_width,
             context->surface_height, &display)) return LIB_TRUE;
     if (!lib_win32_stretch_blt(dc, display.left, display.top, display.right - display.left,
@@ -344,7 +344,7 @@ static void win32_window_advance_cursor_blink(lib_win32_hwnd window,
     /* KillTimer does not remove an already queued tick. The frozen/due guards
      * also prevent an old tick from advancing a newly unfrozen phase early. */
     if (!win32_window_accepting_input(context) || context->frozen ||
-        kvm_window_frame_validate(context->frame) != LIB_STATUS_OK || context->frame->graphics ||
+        context->frame == LIB_NULL || !context->frame->valid || context->frame->graphics ||
         context->frame->text.base.cursor_mode != KVM_CURSOR_HOST ||
         (lib_win32_long)(now - context->cursor_blink_due) < 0)
         return;

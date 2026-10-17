@@ -29,28 +29,61 @@ S4 remains closed; see the
 at cba71230/3758a33e; S2 manual runtime
 acceptance remains unclaimed.
 
-## M9 T96 S5 Packet
+S6 is now active by owner admission; [S5 delivery](../history/M9-T96-S5-frame-exchange-delivery.md)
+remains an unaccepted checkpoint, not a second active task.
+
+## M9 T96 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves existing architecture plus four-slot Window and three-slot Console pointer circulation, retaining native surface. |
-| Objective | Remove whole-frame transport copies and steady-state allocation churn without making Machine wait for rendering or cancel frame generation. |
+| Admission And Approval | Owner: 准入新S完成本次审计问题的修复。 S5 delivery remains recorded without claiming runtime acceptance. |
+| Objective | Close S5 audit: concurrent consumer turnover regression; remove unused Session frame payload; validate immutable frames once at publication; reconcile stale ownership documentation. |
 | Non-goals | No mirror/Compat, guest timing, media, INI, surface replacement, generic resource framework or second transport path. |
-| Reference Baseline | 4fcaa573 after approved Td S21; existing S2 runtime and dual-width qualification. |
+| Reference Baseline | d76355ed (S5 delivered); keep exchange roles, FIFO notifications and Machine observer contract unchanged. |
 | Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Lib KVM frame/mailbox/leaf APIs and tests, Emulator Machine/Session/UI and tests, App driver and affected integration callers; manifests and architecture documentation. |
-| Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no further rules edits in S5. |
-| Verification | Deterministic overwrite/take/retire races, slow-consumer progress, failure/no-frame, pause/reset/load, component recreation and teardown; dual-width focused then complete unit/gate/integration runs and both EXEs. Hidden owned jobs under build/t96/s5, no Computer Use or interactive timeout termination. |
+| Files And ABI Surface | Lib private Window helpers and exchange tests; Emulator Session wake-hint signature and direct callers; manifests and ownership documentation. Machine observer ABI, App/Core and exchange algorithm unchanged. |
+| Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no rules edits in S6. |
+| Verification | Deterministic overwrite/take/retire races, slow-consumer progress, failure/no-frame, pause/reset/load, component recreation and teardown; dual-width focused then complete unit/gate/integration runs and both EXEs. Hidden owned jobs under build/t96/s6, no Computer Use or interactive timeout termination. |
 | Expected Markers | Window roles produce/pending/processing/displayed, Console produce/pending/processing; bounded allocations, no pixel memcpy between transport stages, no outward Lib dependency. |
 | Asset Needs | Preserve user configuration, media and untracked checkpoint; refresh only package EXEs after successful build. |
-| Reporting Requirements | Preliminary production +300..550/-250..450, net -150..+300; tests +250..450 before removals. Refine from actual call inventory; report exact production/test accounting and evidence, not promised speedup. |
+| Reporting Requirements | Production +10..25/-25..50, net -10..-30; tests +100..160/-20..50. Report actual accounting and evidence, not a promised speedup. |
 | Stop Conditions | More slots, consumer-dependent producer wait, extra pinned historical frame, or changed failure/snapshot semantics requires explicit revised design, not hidden fallback. |
 | Exit Criteria | Single transport ownership path, bounded complete lifecycle proof, full qualification, artifacts, actual diff review, commit/push and owner acceptance. |
-| Original Owner Request | "非常好，我希望就按照现有架构+这个方案来做！请你开工"; Window 1->2->3->4->1 / 1->2->1; Console 1->2->3->1 / 1->2->1; keep surface. |
+| Original Owner Request | 准入新S完成本次审计问题的修复。 |
 | Similar-Issue Sweep | All frame producers/copy readers, event routes, native consumers, observer callbacks and reset/destroy paths; small Console conversion and explicit diagnostic copies distinguished from forbidden transport copies. |
 
+S6 admitted. Expected production +10..25/-25..50 (net -10..-30), tests
++100..160/-20..50. Scope: Lib private Window helpers and exchange tests;
+Emulator Session notifications and callers; manifests and current design docs.
+Hidden owned qualification under build/t96/s6; full dual-width tests and EXEs.
+S6 implementation, executor self-review and full qualification are complete.
+Executor commit/push and coordinator actual-commit review follow. Owner
+acceptance and S/T closure are not claimed.
+
 ## Current Technical Baseline
+
+- S6 production C/H +19/-17, net +2; tests C/H +88/-20, net +68.
+  Lib production +10/-7, Emulator +9/-10; Lib tests +75/-0,
+  Emulator tests +13/-20. Manifests/docs/artifacts are excluded.
+  Full changed-path and four-finding convergence ledger is in the proposal.
+- x86 and x64 each pass 194/194 distinct tests, no skips: 178 unit/gates,
+  eight background integrations, five desktop and three native audio.
+  Evidence: build/t96/s6/full1/{unit,integration}-x86.xml and -x64.xml,
+  native-{x86,x64}-0..7.xml; qualification.exit is 0. Focused sets are 15/15.
+  Final x64 turnover-test counter cleanup was rebuilt and passed ten repeats
+  in build/t96/s6/recheck-x64/turnover.xml (qualification.exit 0), superseding
+  that test's earlier x64 binary. x86 full qualification used the final test.
+- Both package EXEs are rebuilt and deployed. SHA-256 softpc32:
+  37FECBCEDB6C8B0897DF4EF882E84974FF61872FF0A44A8E55550DF1245C2B40;
+  softpc64: 70FC59C1498712AC84CCB6EEF2EF058FF3F291FA976704132C7B58881D6194B7.
+- Existing original-mirror macro-redefinition warnings and x86 Ninja log
+  recovery remain disclosed; no new warning in changed production files was
+  observed. No zero-warning or measured performance claim is made.
+- No App/Core/mirror, INI, media, snapshot or exchange-algorithm changes.
+  Untracked assets/binary/snapshot.debug remains owner-owned and excluded.
+
+### S5 delivered checkpoint
 
 - S5 implementation accounting: production +385/-196, net +189; tests/build
   checks +553/-270, net +283. Full path ledger is in the active proposal.
@@ -67,7 +100,7 @@ acceptance remains unclaimed.
   all eight; no production workaround, assertion weakening, skips or timeout
   termination was used. This supports an environmental dependency, not proof
   of every earlier failure's internal cause.
-- Current deployed EXEs: softpc32 SHA-256
+- S5 deployed EXEs: softpc32 SHA-256
   1905A15F29C309B416922E99FD4A0C928EC1CCB70E8D0DE0FD30CA5F043F44CA;
   softpc64 461EAF8CAFA353106BFDDF5EBE592C51871C8F3C213A0E67DD4101F289787AD6.
   Both rebuilt artifacts have completed final qualification.

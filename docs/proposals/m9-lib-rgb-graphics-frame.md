@@ -723,3 +723,95 @@ no mirror, Compat, App production, user configuration or media changes occur.
 Final dual-width XML and deployed hashes were checked. No blocking finding
 remains within this review; this is not a claim of exhaustive race freedom or
 measured performance. Owner runtime acceptance is pending.
+
+
+## T96 S6: independent audit corrections
+
+Owner admitted the audit repair after S5 delivery. Keep the four/three-slot
+ownership model, native surface and FIFO notification policy unchanged.
+
+- Exercise concurrent producer and consumer turnover, failure retry, immutable
+  held pointers and final latest delivery; retain stalled-consumer coverage.
+- Session frame notifications carry only run generation. Sequence/graphics stay
+  in the actual publication and in the Machine observer contract.
+- Private Window rendering consumes validated immutable input; full validation
+  stays at publication/copy boundaries, not repeated repaint or cursor ticks.
+- Reconcile design and Console documentation with pointer ownership and actual
+  unbound-output success semantics; do not invent NOT_CURRENT retention.
+
+Scope: Lib/Emulator production, owner-local tests, manifests and documentation.
+No App/Core/mirror/Compat, assets configuration or guest media edits. Estimates
+and current execution status are in CURRENT. Full dual-width qualification is
+required before executor delivery and coordinator committed-diff review.
+
+### S6 finite convergence and similar-issue ledger
+
+Frozen universe: the four S5 audit findings above, their direct callers and
+owner-local tests. Completion requires all four dispositions below plus full
+x86/x64 qualification and actual committed-diff review, not a general claim
+of race freedom or benchmark improvement.
+
+1. Exchange coverage: retain stalled-consumer tests and add concurrent turnover
+   for both slot counts. Check held contents, monotonic observations (failed
+   retries may repeat), final latest delivery and detach/reuse. Existing failure
+   cases exercise supersession and invalidation; allocator accounting remains.
+2. Notification ownership: search all src/test for enqueue_frame_completed,
+   queue_push_frame_completed and value.frame. Remove the unused Session fields
+   and arguments, update every direct caller/test. Keep Machine observer fields
+   and actual frame sequence. FIFO growth/order and stale-run rejection remain.
+3. Validation ownership: search all Window/Emulator frame_validate calls and
+   private size/cursor/render callers. Machine publish and typed commit/copy
+   remain complete validation boundaries. Window consumes immutable pinned
+   frames under its existing public precondition. Native failure checks, target
+   surface dimensions, null/valid checks and cursor visibility remain. Existing
+   malformed-publication, damage, cursor and native-message tests cover these
+   boundaries. No validation flag, cache or alternative renderer is introduced.
+4. Documentation: search NOT_CURRENT and copied-frame claims in Lib and current
+   design. Correct Console README/binding comments, broker comment, KVM README
+   and architecture descriptions against current output code. No Console output
+   behavior is changed. Historical delivery records remain historical.
+
+The notification FIFO is deliberately retained: coalescing would change ordering
+and introduce another policy outside this narrowly admitted repair. Exchange
+production code, Machine observer ABI, App/Core and original mirror are unchanged.
+
+### S6 changed-path accounting
+
+Counted from d76355ed with git diff --numstat, C/H production and test paths
+only (exclude Markdown, manifests and EXEs). Production +19/-17, net +2;
+tests +88/-20, net +68. No mirror delta. Compared with the estimate, replacements
+mostly remained one line, and explicit private-helper contract comments account
+for the small positive production net; no new runtime state was added.
+
+- Lib production +10/-7: kvm-window/{geometry.c,geometry.h,render.c,render.h,
+  win32/component.c}; console/binding_interface.h and console-broker/console.c
+  are comment-only corrections.
+- Emulator production +9/-10: product/composition.c;
+  session/{control.c,control.h,session.c,session_interface.h}.
+- Lib tests +75/-0: kvm-base/frame_exchange_smoke.c.
+- Emulator tests +13/-20: product/composition_smoke.c;
+  session/{session_frame_smoke.c,session_monitor_smoke.c,
+  session_queue_failure_smoke.c,sync_smoke.c}.
+
+The only public call-signature change removes unused sequence/graphics arguments
+from emulator_session_enqueue_frame_completed. All repository callers are
+migrated atomically. Producers still validate every complete frame, and all
+Window repaint/cursor operations use the same pinned immutable publication.
+
+### S6 executor verification
+
+Both architectures pass 194/194 distinct tests without skips (178 unit/gates,
+8 background integration, 5 desktop, 3 native audio). Hidden job
+build/t96/s6/full1 exits 0; focused sets pass 15/15 each. After the initial x64
+build, the new test's consumed counter was separated from the short-circuit
+success expression so the minimum-progress assertion counts every take. Final
+x64 test was rebuilt and passed ten consecutive runs under recheck-x64 (exit 0);
+x86 full qualification already used the final version. No production change
+followed either artifact build. CURRENT records exact XML locations and hashes.
+
+A preliminary documentation check rejected S6 admission until S5's delivered,
+not-owner-accepted checkpoint was recorded in history. The unchanged gate now
+passes. Existing mirror compiler warnings and x86 Ninja recovery remain; no new
+changed-path compiler warning was observed. All native tests ran in the active
+host session. These are automated test results, not owner guest acceptance or
+measured speedup. No Computer Use or interactive timeout termination occurred.

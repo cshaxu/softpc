@@ -385,10 +385,10 @@ lib_bool emulator_session_enqueue_runtime_completed(emulator_session *session,
 }
 
 lib_bool emulator_session_enqueue_frame_completed(emulator_session *session,
-    lib_u32 sequence, lib_bool graphics, lib_u32 run_generation)
+    lib_u32 run_generation)
 {
     return session != LIB_NULL && emulator_session_queue_push_frame_completed(&session->queue,
-        sequence, graphics, run_generation);
+        run_generation);
 }
 
 lib_bool emulator_session_run(emulator_session *session)
