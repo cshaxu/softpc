@@ -291,8 +291,17 @@ int main(void)
         options.sample_rate = 0;
         lib_test_assert(audio_pcm_stream_platform_create(&options, &platform) == LIB_STATUS_INVALID_ARGUMENT);
         options.sample_rate = LIB_UINT32_MAX;
-        lib_test_assert(audio_pcm_stream_platform_create(&options, &platform) == LIB_STATUS_INVALID_ARGUMENT);
+        lib_test_assert(audio_pcm_stream_platform_create(&options, &platform) == LIB_STATUS_UNSUPPORTED);
         lib_test_assert(calls == 0 && platform == LIB_NULL);
+        for (options.channel_count = 1u; options.channel_count <= 2u; ++options.channel_count) {
+            options.sample_rate = LIB_UINT32_MAX / (options.channel_count * sizeof(lib_i16));
+            lib_test_assert(audio_pcm_stream_platform_create(&options, &platform) == LIB_STATUS_OK);
+            lib_test_assert(audio_pcm_stream_platform_destroy(&platform) == LIB_STATUS_OK);
+            ++options.sample_rate;
+            lib_test_assert(audio_pcm_stream_platform_create(&options, &platform) == LIB_STATUS_UNSUPPORTED);
+            lib_test_assert(platform == LIB_NULL);
+        }
+        options.channel_count = 1u;
         options.sample_rate = 48000;
         format_status = LIB_WIN32_AUDIO_UNSUPPORTED_FORMAT;
         lib_test_assert(audio_pcm_stream_platform_create(&options, &platform) == LIB_STATUS_OK);

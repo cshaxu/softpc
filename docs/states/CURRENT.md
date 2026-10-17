@@ -2,7 +2,13 @@
 
 ## Current Work
 
-T93 S13 is active: minimal platform-neutral PCM progress and lifecycle.
+T93 S13 is verified: minimal platform-neutral PCM progress and lifecycle.
+Cached x64/x86 build and publication completed; each width passed 167/167,
+including all ten native desktop cases, zero skips. Production C/H +19/-30
+(net -11); tests +36/-20 (net +16). No API/state/helper was added.
+See the [S13 delivery](../proposals/m9-xp-sound-blaster-standalone.md#s13-implementation-and-qualification).
+Executor delivery and coordinator review precede owner acceptance; do not
+close S13 or admit S14 automatically.
 S12 is owner-accepted and closed after executor 2fc25069 and review f43ea903:
 167/167 per architecture including ten desktop cases. Its intermittent raw-input
 failure remains explicit TODO, not a claimed repair.
@@ -57,7 +63,7 @@ See the [S11 closure](../history/M9-T93-S11-utf8-paths.md). Final
 x64/x86 each pass 166/166 with zero skips, including all ten native desktop
 cases; both EXEs are refreshed. S11 changes only Lib source/test contracts
 and governance: production C/H +199/-45 (net +154), tests +160/-39 (net +121).
-User INI, media, snapshots and original mirror remain unchanged. S13 and later
+User INI, media, snapshots and original mirror remain unchanged. S14 and later
 remain unadmitted. The accepted S10 executor
 e7d37b65 is committed and pushed; the separate coordinator actual-change
 review and subsequent owner acceptance close S10. Its final x64/x86 qualification passes 165/165 each, zero skips,
@@ -76,7 +82,7 @@ do not admit the next S automatically. S9 audit/design and dual-width
 qualification are pushed in executor 896aa2fd and actual-change reviewed;
 S9 is owner-accepted. Each width passed 165/165
 with zero skips, including five native
-desktop cases. S13-S15 remain planned and must not auto-start.
+desktop cases. S14-S15 remain planned and must not auto-start.
 No S9 archive production changes occurred before this owner-directed reorder.
 The following S8 checkpoints are retained evidence, not active work:
 XP MIDI/FM device attachment through existing

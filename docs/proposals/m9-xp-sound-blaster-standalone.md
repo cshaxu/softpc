@@ -2992,21 +2992,112 @@ T93 remains open and S13 is not admitted.
 
 ### S13 — PCM progress and lifecycle contract
 
+Owner admission: "很好。验收通过，准入S13，开始前和结束后都要进行简报汇报；
+请你以极简方案实施，意思不是说diff一定要减少，而是完成后总代码数量要最少".
+Baseline f43ea903, with documentation-only S12 closure 0d63e3bb.
+The admitted implementation removes the destroy tail-only flush branch,
+retains explicit flush and clear, and preserves set_active(false)'s established
+flush-then-clear behavior. It moves only the Windows byte-rate guard out of
+the common options predicate; channel/storage arithmetic remains bounded.
+No new API, state, helper, worker, retry or recovery path is introduced.
+Estimate: three production C/H files +15-25/-30-45 (net -10 to -25), two
+existing tests net +40-80. Counts and changed-file total sizes follow delivery.
+
+Finite ledger: (1) public progress/flush/clear/destroy contract; (2) destroy at
+short, batch and full-FIFO boundaries while native output is held; (3) common
+versus Win32 format ownership; (4) progress/epoch/overflow/error regressions;
+(5) actual consumer compatibility. Each needs focused proof plus both-width
+full qualification; unsupported Linux/MIDI/FM are preserved, not reimplemented.
+The consumer sweep finds speaker gate-off/finite completion already flushes,
+speaker shutdown intentionally stops/cancels, and SB close clears then destroys.
+No App change is required; existing actual-machine audio regressions verify
+first delivery and cold/warm lifecycle, without claiming audible observation.
+
 Keep PCM/WASAPI ownership and existing counters. Define accepted/submitted/
 consumed without requiring padding knowledge; move backend-only format limits
 to the backend while retaining arithmetic validation. Resolve destroy's
 sub-batch-only flush special case with one explicit lifetime rule.
-Proposed rule is explicit flush for submission, clear for discard, destroy for
-stop/release; it changes short-tail destruction behavior and must be confirmed
-in the admission brief. Flush is NOT proof of audible playback or a drain.
+The admitted rule is explicit flush for submission, clear for discard, destroy
+for stop/release; the start brief identifies the changed short-tail destruction
+behavior. Flush is NOT proof of audible playback or a drain.
 No new drain API or recovery machine. Existing SB close clears first; speaker
 shutdown calls destroy directly, so compatibility must be tested, not assumed.
-Files: PCM interface/common/Win32 implementation and fixtures, roughly 3-4
-production paths. Production +15-35/-25-45, paired net about -10;
-tests +80-140/-20-40, net approximately +60-100.
+Files: PCM interface/common/Win32 implementation and two existing fixtures;
+the admission estimate above supersedes the initial broad audit estimate.
 Proof: short/whole batches, blocked backend, cancellation, epochs/counter
 monotonicity and failures. MIDI already documents device-wide volume and
 optional support; FM unsupported remains valid. No gratuitous MIDI/FM change.
+
+#### S13 implementation and qualification
+
+The retained owner is the existing PCM worker, bounded FIFO and backend.
+Destroy no longer inspects queue length or conditionally flushes; cancellation,
+join and ownership retention on cleanup failure stay intact. No new callable
+API, state, helper, retry, second worker or platform selection route was added.
+Public progress counts input frames, not native padding. Windows alone rejects
+rates whose native byte rate cannot be represented; fake-backend tests prove
+the common layer forwards the full nonzero sample-rate domain.
+
+Actual C/H accounting against f43ea903 (`git diff --numstat`):
+
+| Path | Added | Removed | Net | File lines before -> after |
+| --- | ---: | ---: | ---: | --- |
+| src/lib/audio/pcm/stream.c | 1 | 14 | -13 | 537 -> 524 |
+| src/lib/audio/pcm/stream_interface.h | 15 | 14 | +1 | 82 -> 83 |
+| src/lib/audio/pcm/win32/stream.c | 3 | 2 | +1 | 335 -> 336 |
+| test/lib/audio/pcm/stream_smoke.c | 26 | 19 | +7 | 591 -> 598 |
+| test/lib/audio/pcm/win32_platform_smoke.c | 10 | 1 | +9 | 325 -> 334 |
+
+Production totals +19/-30, net -11 (954 -> 943 lines in affected files).
+Tests +36/-20, net +16 (916 -> 932). Combined +55/-50, net +5;
+documentation, manifests and EXEs are counted separately. Mirror diff is zero.
+This is smaller than the start estimate because the existing blocked-output
+fixture became a five-size loop rather than acquiring another fixture.
+
+Similar-issue sweep: searched PCM source/test public padding, byte-rate,
+sub-batch and destroy/flush/clear/set_active uses; inspected speaker and SB PCM
+call sites. Short/batch/full-FIFO cancellation uses the same path. Speaker
+finite/gate-off completion already flushes; shutdown intentionally cancels;
+startup failure destroys an empty stream; SB close clears before destruction.
+set_active(false) retains flush-then-clear. Linux remains explicitly unsupported;
+MIDI/FM and Emulator/X86 interfaces remain unchanged. No new out-of-scope
+production finding was confirmed by this bounded sweep.
+
+Focused tests pass on both widths. They cover blocked destruction at 1, 512,
+1024, 1025 and 4096 frames, cancellation failure retaining ownership and a
+successful subsequent cleanup; explicit flush while consumed remains zero;
+existing epochs, overflow, partial submission, control and notification errors;
+and mono/stereo native byte-rate boundaries. These are deterministic fixture
+proofs, not claims of listening to physical sound. The first focused runner
+had a PowerShell quoting error before any build/test started; its preserved
+failure is tooling evidence, not a product failure or a passing test.
+
+Full cached qualification exit 0: x64 and x86 each 97 shared + 65 other +
+5 desktop = 167/167, zero failures or skips. Shared suites ran first, then
+all remaining unit/integration cases; ten native desktop cases ran serially
+under the owner's standing authorization, without Computer Use. No assertion,
+timeout or product retry was relaxed. Ninja recovered its log and revisited
+targets with the existing compiler cache; no cache purge was performed.
+Evidence is the S13 focused/full runner logs and 14 full-suite JUnit reports.
+The documentation gate and `git diff --check` also pass.
+
+All five finite-ledger items are verified: (1) interface and source review;
+(2) deterministic five-size destruction/cancel-failure matrix; (3) fake-backend
+full-range forwarding and native boundary fixture; (4) retained counter,
+epoch, overflow and error cases plus flush-not-consumed proof; (5) consumer
+source audit and actual-machine first-tone/first-delivery/audio-lifecycle,
+SB PCM, snapshot and package regressions. No physical-audibility, Linux audio
+backend or external-consumer qualification is claimed.
+
+Published SHA-256:
+- softpc32.exe: 77A8FAC203C887753383EC7A7B49B50C1C3DEFE1E12EF8FDF8DB3E2E77D72A99
+- softpc64.exe: 288EA3C8C81FBA11AAD63A48B338FCD255D3CFD70C266AE1FB79D8031FB80E99
+- unchanged user INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
+Both EXEs are 512 bytes smaller than the accepted S12 artifacts. No guest
+media, snapshot, original mirror or external repository changed. Executor
+delivery is ready for a separate actual-change review and owner acceptance;
+S13 is not closed and S14 is not admitted.
 
 ### S14 — capture boundary and shared-contract completion audit
 
