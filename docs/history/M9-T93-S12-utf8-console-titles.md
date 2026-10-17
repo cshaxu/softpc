@@ -2,7 +2,7 @@
 
 Owner accepted S12 and admitted S13 on 2026-10-16. S12 is closed.
 Executor 2fc25069 and actual-change review f43ea903 are pushed.
-The [delivery ledger](../proposals/m9-xp-sound-blaster-standalone.md#s12-implementation-and-review-record)
+The [delivery ledger](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s12-implementation-and-review-record)
 preserves the requests, implementation, sweep, failures and artifact hashes.
 Production +99/-43 (net +56), test C/H +141/-27 (net +114); both architectures
 pass 167/167 with zero skips including all ten native desktop cases.

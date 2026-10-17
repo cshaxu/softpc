@@ -22,7 +22,7 @@ S6 and requires the same public coding audit after every Emulator change.
 Executor b1934914 is pushed and separately actual-change reviewed. S7 closes
 under the owner's delegated sequential acceptance. T93 remains open.
 
-The [proposal ledger](../proposals/m9-xp-sound-blaster-standalone.md#s7--shared-contract-and-quality-repair)
+The [proposal ledger](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s7--shared-contract-and-quality-repair)
 preserves all ten findings, prechange estimates, old-code failures, the finite
 266-file/217-C-H audit and all 40 production/17 test formatting dispositions.
 This work does not change the source mirror, audio transport, guest protocol,

@@ -1,5 +1,10 @@
 # XP Sound Blaster Standalone Capability
 
+Archived after owner acceptance and T93 closure on 2026-10-16. Historical
+checkpoint statuses below describe their own execution times, not current
+open work. See the [completion audit](M9-T93-completion-audit.md) and
+[S15 acceptance](M9-T93-S15-portable-sound-archive.md) for final evidence.
+
 ## Owner request and admission boundary
 
 The owner accepts T92 and admits T93/S1 on 2026-10-15. This task receives the

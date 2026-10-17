@@ -80,7 +80,7 @@ this is not a Linux-host product qualification claim.
 
 Production C/H: 16 Lib paths, +199/-45, net +154. Test C/H: three Lib paths,
 +160/-39, net +121. Source build/gates: +8/-3; test build/gates: +20/-2.
-The [finite ledger and delivery](../proposals/m9-xp-sound-blaster-standalone.md#s11-executor-qualification)
+The [finite ledger and delivery](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s11-executor-qualification)
 record full accounting, hashes, compatible behavior, preliminary/final evidence
 and separate actual-change review. Ninja's existing x86 log-recovery warning
 caused extra rebuilding; it is not claimed repaired.

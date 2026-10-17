@@ -11,6 +11,6 @@ No mirror, user configuration, media or snapshot changed.
 
 Both architectures pass 165/165 with zero skips, including five native desktop
 tests each. Both package executables were refreshed. Production C/H +542/-534,
-net +8; tests +268/-181, net +87. The [delivery ledger](../proposals/m9-xp-sound-blaster-standalone.md#s10-executor-qualification)
+net +8; tests +268/-181, net +87. The [delivery ledger](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s10-executor-qualification)
 records component counts, original requests, test boundaries, hashes and
 actual-change review. No unsupported Linux presenter or manual result was claimed.

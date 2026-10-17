@@ -156,7 +156,7 @@ captured below as a separate planned S2. This update admits planning only,
 not production changes, source import, or automatic S1 acceptance.
 
 T92 owns existing-core XP baseline migration and its necessary corrections.
-The [XP Sound Blaster candidate](m9-xp-sound-blaster-standalone.md) owns new
+The [XP Sound Blaster candidate](../history/M9-T93-xp-sound-blaster-standalone-proposal.md) owns new
 DSP/FM/MIDI capability and is first in Queue, without allocating a T number.
 T92 may close without sound only after accounting for this explicit owner-
 approved transfer; it must not claim sound support. The earlier S1 audit's

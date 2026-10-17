@@ -13,7 +13,7 @@ helpers now copy controller units through SAS and advance host buffers; the
 decrement split includes address zero. No new state, header, shared component
 or snapshot format is introduced. XP selected-subset diff changes from
 +81/-1 to +109/-16; the unchanged subset hash and reconstruction method are in
-the [proposal ledger](../proposals/m9-xp-sound-blaster-standalone.md#s5--original-dma-prerequisite-repair).
+the [proposal ledger](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s5--original-dma-prerequisite-repair).
 
 The new regression fails against the old code and passes the repair on both
 widths. Its 60 transfer cases and eight existing reload combinations cover

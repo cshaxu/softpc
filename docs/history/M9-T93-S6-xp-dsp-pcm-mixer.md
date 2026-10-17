@@ -22,7 +22,7 @@ paths +21/-5; Emulator two paths +10/-4. Tests: five C files +1287/-13, net
 documents and EXEs are separate. Against the pinned XP necessary subsets,
 the nine mirror files total +1081/-1811, net -730, including earlier local
 patches; that is not the S6 incremental footprint. Per-file figures and
-excluded-range dispositions are in the [proposal](../proposals/m9-xp-sound-blaster-standalone.md#s6-final-qualification-and-public-change-audit).
+excluded-range dispositions are in the [proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s6-final-qualification-and-public-change-audit).
 
 ## Verification and limits
 

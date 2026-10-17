@@ -6,7 +6,7 @@ The owner's active goal is to build reusable Lib audio source/test capabilities,
 then attach the selected XP NTVDM sound devices to standalone SoftPC. Sequential
 S execution is delegated; T closure still waits for owner acceptance. S4 owns
 host MIDI and truthful raw-FM capability, not guest synthesis or XP device code.
-The [proposal ledger](../proposals/m9-xp-sound-blaster-standalone.md#s4-implementation-and-qualification-ledger)
+The [proposal ledger](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s4-implementation-and-qualification-ledger)
 preserves the frozen coverage universe, API decisions, estimates, source
 references, exact qualification and package hashes.
 

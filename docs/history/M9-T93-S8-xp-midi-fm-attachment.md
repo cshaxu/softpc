@@ -25,7 +25,7 @@ The fourth complete qualification passes 165/165 per width, with zero skips:
 95 shared, 65 other background tests and five native desktop cases. Both EXEs
 are refreshed. Each of the two affected real stop integrations also passes
 twenty repetitions per width. The finite eight-unit proof ledger is in the
-[proposal](../proposals/m9-xp-sound-blaster-standalone.md#s8-complete-fourth-qualification).
+[proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s8-complete-fourth-qualification).
 
 Earlier failures are retained: unequal first/second sound-count windows were
 corrected in the test; faulted MIDI cleanup and paused idle service were repaired

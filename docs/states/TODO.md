@@ -18,7 +18,7 @@
   Owner: App-SoftPC package-test/input handoff. Admission condition: bounded
   native input/activation instrumentation around first raw command and hide/
   focus transition; do not add retry or relax assertions. See
-  [S12 verification](../proposals/m9-xp-sound-blaster-standalone.md#s12-implementation-and-review-record).
+  [S12 verification](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s12-implementation-and-review-record).
 
 - TODO(Medium): Diagnose intermittent checkpoint_smoke timeout under aggregate
   parallel execution. T93 S8 third x64 qualification classified it as Timeout
@@ -28,7 +28,7 @@
   Owner: App-SoftPC test lifecycle. Admission condition: bounded phase/native
   wait instrumentation of the actual checkpoint test under parallel load;
   preserve the timeout evidence and do not add product retries or simply
-  enlarge the deadline. See the [S8 evidence](../proposals/m9-xp-sound-blaster-standalone.md#s8-repeated-stop-proof-and-third-qualification).
+  enlarge the deadline. See the [S8 evidence](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s8-repeated-stop-proof-and-third-qualification).
 
 - TODO(Medium): Diagnose native package-test child startup under sequential
   CTest execution. T93 S5 x64/x86 compact-console cases intermittently fail
@@ -38,7 +38,7 @@
   responsible DLL or prove a CTest defect. Admission condition: test-owned
   child-startup/Console lifetime investigation with loader evidence, without
   retrying product startup or changing guest/device behavior to hide it.
-  Evidence: [T93 S5 checkpoint](../proposals/m9-xp-sound-blaster-standalone.md#s5--original-dma-prerequisite-repair).
+  Evidence: [T93 S5 checkpoint](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s5--original-dma-prerequisite-repair).
 
 - TODO(Medium): Replace the host-time-dependent oracle in
   `test/app-softpc/unit/machine/machine_smoke.c:run_int1a_tick_boot_image`.

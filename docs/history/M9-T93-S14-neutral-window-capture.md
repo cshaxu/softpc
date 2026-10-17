@@ -4,7 +4,7 @@ Owner accepts S14 and admits S15: "批准 验收通过 准入下一个s".
 Executor fe6d9fe3, review 4aacc52e, corrective executor 683f85d4 and corrective
 review e2de3d3f are pushed. Original requests, seven-area ledger, full failure/
 retry evidence and corrected qualification remain in the
-[S14 proposal record](../proposals/m9-xp-sound-blaster-standalone.md#s14--capture-boundary-and-shared-contract-completion-audit).
+[S14 proposal record](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s14--capture-boundary-and-shared-contract-completion-audit).
 
 Lib serializes native mouse registration query/update without holding the lock
 across message-dispatching capture/focus calls. Native registration stays the

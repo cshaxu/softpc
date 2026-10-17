@@ -3,7 +3,7 @@
 Owner accepted S9 and admitted S10 after executor 896aa2fd and actual-change
 review 449c0646. The read-only design audit splits repairs into S10 input,
 S11 paths, S12 text, S13 PCM and S14 capture/boundary review; archive work is S15.
-The [proposal](../proposals/m9-xp-sound-blaster-standalone.md#s9--shared-component-platform-neutrality)
+The [proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s9--shared-component-platform-neutrality)
 retains the finite request-area dispositions, estimates and compatibility risks.
 
 Production/test code +0/-0, net zero; no mirror, INI, media or snapshot changes.

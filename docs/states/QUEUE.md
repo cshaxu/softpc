@@ -10,8 +10,9 @@ allocates a numeric task identifier.
 ## Previously admitted
 
 The owner admits
-[XP Sound Blaster standalone capability](../proposals/m9-xp-sound-blaster-standalone.md)
-as T93 on 2026-10-15; CURRENT owns its active subtask, not this queue.
+[XP Sound Blaster standalone capability](../history/M9-T93-xp-sound-blaster-standalone-proposal.md)
+as T93 on 2026-10-15. T93 is now closed after owner acceptance and full-task
+audit; [CURRENT](CURRENT.md) owns status. This does not admit the candidate above.
 
 The XP SP1 SoftPC mirror baseline upgrade was owner-admitted as T92 on
 2026-10-15 and is now owner-accepted and closed. [CURRENT](CURRENT.md) owns status.

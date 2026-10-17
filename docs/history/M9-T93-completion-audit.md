@@ -4,8 +4,9 @@
 
 Owner accepts S15 and requests whole-task closure: "好的，验收通过。接下来，
 进行全T审计收口" and "全量编译和测试（单元测试，门禁，集成测试）都要通过噢！"
-Fresh full qualification passes. Formal closure follows the separate
-actual-change review of this final evidence/artifact delivery.
+Fresh full qualification and the separate actual-change review of pushed
+delivery 161305b2 pass. S15 and T93 are closed on 2026-10-16 under the owner's
+acceptance and closure request. No next task is admitted.
 
 Original scope: reusable Lib PCM/MIDI/FM host contracts and the necessary XP
 Sound Blaster subset, with one existing device/executor path. The owner explicitly
@@ -40,7 +41,7 @@ actual-change review and pushed closure records. No subsequent T is admitted.
 | S12 | UTF-8 Console/title boundary and owner-approved local simplification. | [S12](M9-T93-S12-utf8-console-titles.md), 2fc25069/f43ea903; 167/167 each. |
 | S13 | PCM consumed/submitted semantics and batch-independent destroy/flush contract. | [S13](M9-T93-S13-pcm-lifecycle.md), 9960b37f/e85a0015; 167/167 each. |
 | S14 | Neutral capture ownership; corrected partial-acquisition cleanup. | [S14](M9-T93-S14-neutral-window-capture.md), 683f85d4/e2de3d3f; 167/167 each. |
-| S15 | Portable sound state and cross-width restoration, isolated units, actual native integration and source-owner-aligned shared tests. | [Detailed S15 ledger](../proposals/m9-xp-sound-blaster-standalone.md#s15--portable-archive-and-final-qualification), 66058ab4 through ac98a7b6, reviewed by 91a3fde2; owner accepted. |
+| S15 | Portable sound state and cross-width restoration, isolated units, actual native integration and source-owner-aligned shared tests. | [Detailed S15 ledger](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s15--portable-archive-and-final-qualification), 66058ab4 through ac98a7b6, reviewed by 91a3fde2; owner accepted. |
 
 Earlier failed attempts remain in the retained proposal. A later green run
 does not retrospectively turn those attempts into passing evidence. Original
@@ -168,6 +169,23 @@ is byte-identical. Build log recovery and warnings from unchanged preserved
 mirror files remain disclosed; this is not a zero-warning claim. The warning
 path sweep finds no T93-changed C/H owner among those compiler warning sites.
 No warning suppression or mirrored-source cleanup is added for closure.
+
+## Separate final actual-change review
+
+Coordinator inspects pushed 161305b2: only the audit, status checkpoint and
+rebuilt x86 artifact change. Production and test source still equal reviewed
+91a3fde2. Both artifact hashes match the final receiving builds; all final XML
+names match CTest registration, both exit records are zero, and four archive
+routes pass. Original request/S1-S15 mapping, owner-supplied asset changes,
+necessary-subset ledger, known limits and all independent receivers are
+rechecked before closure. No gate/assertion is relaxed to obtain this result.
+
+The closure commit archives the proposal with Git provenance and fixes its
+direct links, creates the S15 acceptance record and replaces accumulated stale
+CURRENT narratives with one compact current baseline. History retains the
+failed attempts and prior decisions. Current documentation and whitespace
+checks pass before commit. This is the governance follow-up to the already
+pushed complete P9, not a partially verified implementation delivery.
 
 ## Explicit limits and independent receivers
 

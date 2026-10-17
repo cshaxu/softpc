@@ -2,7 +2,7 @@
 
 S3 is implementation-closed under the owner's sequential async delegation;
 T93 remains open. Executor `b31b6e17` is pushed. This is not an owner manual
-hearing acceptance. The [proposal](../proposals/m9-xp-sound-blaster-standalone.md#s3-executor-qualification)
+hearing acceptance. The [proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s3-executor-qualification)
 retains the complete path/line ledger, qualification matrix and artifact hashes.
 
 ## Request and delivery

@@ -9,7 +9,7 @@ The owner prioritizes XP behavior/source fidelity, selects host MIDI with
 approximate restoration, and accepts XP-compatible FM silence when no native
 raw-FM capability exists. No software synthesizer or instrument bank is admitted.
 
-The [proposal](../proposals/m9-xp-sound-blaster-standalone.md) holds the full
+The [proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md) holds the full
 source/API census, ownership, estimates and serial S2-S8 plan.
 [CURRENT](../states/CURRENT.md) is the only active packet.
 

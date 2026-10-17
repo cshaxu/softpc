@@ -5,9 +5,9 @@
 > 好的，请你追加到队首一个T任务proposal，修复这个，确保win95能识别和正确使用我们新加的sound blaster模拟硬件。
 
 This is the first unnumbered candidate in [Queue](../states/QUEUE.md).
-It neither allocates a T number nor interrupts the active T93 packet.
+It does not allocate a T number. T93 is closed; this candidate remains unadmitted.
 [CURRENT](../states/CURRENT.md) remains the sole implementation authority.
-The [XP sound capability proposal](m9-xp-sound-blaster-standalone.md) records
+The [XP sound capability proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md) records
 the imported device and host capability baseline, not Win95 driver acceptance.
 
 ## Observed failure and evidence limits
