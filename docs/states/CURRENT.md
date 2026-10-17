@@ -57,8 +57,9 @@ audio integrations. All 91 shared C/H files (excluding deliberate negative
 fixtures) have source-owner directories. Public production is unchanged;
 INI/media/snapshots are preserved. The x64 EXE remains the verified cached
 production artifact; x86 was rebuilt after existing Ninja-log recovery.
-The executor delivery is ready for commit and separate actual-change review;
-S15 remains open awaiting owner acceptance.
+Executor 77cd7263 is committed and pushed. Separate actual-change review of
+that commit, the original layout/ownership requests and final evidence passes;
+see the proposal's layout review. S15 remains open awaiting owner acceptance.
 
 ## M9 T93 S15 Packet
 

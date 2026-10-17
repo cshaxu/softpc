@@ -3453,6 +3453,32 @@ Win95 Sound Blaster queue proposal is preserved verbatim with this delivery,
 without admitting or implementing it. S15 awaits owner acceptance after the
 separate actual-change review; T93 remains open.
 
+#### S15 test-layout actual-change review
+
+Coordinator role reviewed executor 77cd7263 against 0dfc02cf and the retained
+owner requests, rather than relying on its test summary. The 96 changed paths
+include structural test moves/splits, registrations/manifests, owner-requested
+queue documentation and one rebuilt product artifact. Source production,
+user INI, snapshot and guest-media diffs are empty. The four owner layouts,
+native-name removals, inner assertion receivers, inward links and absence of
+foreign test fixtures match the requested model. Existing real-host labels
+remain integration-only; no cross-component unit was moved there.
+
+The old combined keyboard test is replaced by independent expected-value
+checks, not peer equality. Base owns native/UTF-16 mapping; Console receives
+neutral complete inputs; Window covers its native message boundary with explicit
+physical scans. Lifetime/reset/sink-failure assertions remain in the appropriate
+leaf, with the shared matcher ledger tested by KVM Base. Static boundary checks
+and their new negative probes pass, and the unchanged UI composition body is
+now registered. Production dependency rules are reused rather than duplicated.
+
+Review reconciled the full-run XML (188/188 each width), subsequent comment-only
+focused checks (8/8 each), both artifact hashes and clean protected-file diff.
+Earlier failed manifests/build attempts remain explicitly rejected evidence.
+The known Ninja recovery/mirror warnings remain disclosed debt, not a false
+zero-warning claim. Review passes for delivery; it does not replace the owner's
+S15 acceptance and does not close T93 or admit another S.
+
 Implementation review found and fixed split-fixture missing declarations before
 qualification. An intermediate x86 build encountered the reducer's old filename
 while the final rename was being applied; that run is not acceptance evidence.
