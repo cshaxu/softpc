@@ -7,8 +7,8 @@ Cached x64/x86 build and publication completed; each width passed 167/167,
 including all ten native desktop cases, zero skips. Production C/H +19/-30
 (net -11); tests +36/-20 (net +16). No API/state/helper was added.
 See the [S13 delivery](../proposals/m9-xp-sound-blaster-standalone.md#s13-implementation-and-qualification).
-Executor delivery and coordinator review precede owner acceptance; do not
-close S13 or admit S14 automatically.
+Executor 9960b37f is pushed and its separate coordinator actual-change review
+passes. Await owner acceptance; do not close S13 or admit S14 automatically.
 S12 is owner-accepted and closed after executor 2fc25069 and review f43ea903:
 167/167 per architecture including ten desktop cases. Its intermittent raw-input
 failure remains explicit TODO, not a claimed repair.
