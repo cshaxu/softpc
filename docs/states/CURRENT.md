@@ -4,15 +4,18 @@
 
 Owner delegates T95 S2/T closure and next queue admission on 2026-10-17.
 See the [completion audit](../history/M9-T95-completion-audit.md).
-T96 S1 is active: inventory and design the RGB graphics-frame migration.
-No T96 production edit or fresh runtime qualification is claimed.
+T96 S1 inventory/design is implemented and undergoing delivery review. The
+proposal records three expected production files, nine test files, five existing
+heap frame buffers (+14740480 bytes total), and atomic ABI/producer migration.
+Dual-width layout/allocation probes pass; no production edit, new EXE or full
+runtime qualification is claimed. S2 is not admitted automatically.
 
 ## M9 T96 S1 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner delegates closure and admission of next queued T on 2026-10-17; queue head is RGB graphics frames. |
+| Admission And Approval | Owner delegates next queue admission on 2026-10-17 and confirms "批准开始"; queue head is RGB graphics frames. |
 | Objective | Freeze producer/consumer/allocation inventory and coherent single-format RGB migration plan, including x86 storage costs. |
 | Non-goals | No renderer rewrite, second pixel format, alpha, conversion cache or external repository edits; no production change in this design checkpoint. |
 | Reference Baseline | 6c3b604fa6df3c7979285df2a94428f516a30033, qualified T95 delivery. |
@@ -21,7 +24,7 @@ No T96 production edit or fresh runtime qualification is claimed.
 | Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
 | Verification | Enumerate producers, consumers, copy sizes, fixed buffers, source bit depth/stride/row order/palette ownership. Documentation gate and actual-diff review; later implementation requires both builds, publication and full qualification. |
 | Expected Markers | One 0x00RRGGBB contract, exact storage census, coherent ABI/producer migration without broken intermediate delivery. |
-| Asset Needs | Read-only source audit; preserve owner INI, media and checkpoint. No guest run or raw trace required. |
+| Asset Needs | Preserve owner inputs. Disposable layout/allocation probe in ignored build/t96/s1; hidden owned job, log/exit marker, 120-second budget and 1 MiB output cap, executor cleanup. No guest/desktop/audio use. |
 | Reporting Requirements | Per-owner files and expected added/deleted/net code, memory costs and implementation split; S1 production/test +0/-0. |
 | Stop Conditions | Missing source colour information, unjustified x86 storage cost or second rendering path required: report before implementation. |
 | Exit Criteria | Finite inventory and migration design reviewed, documentation gate passed, committed/pushed design delivery; implementation needs its own packet. |

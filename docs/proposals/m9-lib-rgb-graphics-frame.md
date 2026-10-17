@@ -28,14 +28,12 @@ Make Lib graphics frames one canonical, copied RGB contract: 24-bit colour
 meaning stored in a 32-bit XRGB word, never a packed three-byte pixel.
 
 ```c
-/* XRGB32 storage; numeric colour meaning is 0x00RRGGBB. */
-typedef lib_u32 lib_rgb24; /* high byte is reserved and must be zero */
-
 typedef struct kvm_window_graphics_frame {
     lib_u32 width;
     lib_u32 height;
     lib_u32 stride; /* pixels, not bytes */
-    lib_rgb24 pixels[KVM_WINDOW_GRAPHICS_MAX_PIXELS];
+    /* Numeric 0x00RRGGBB, not an OS byte-order or alpha contract. */
+    lib_u32 pixels[KVM_WINDOW_GRAPHICS_MAX_PIXELS];
 } kvm_window_graphics_frame;
 ```
 
@@ -87,13 +85,13 @@ colour = frame->image.palette[source[column]];
 After migration it reads the canonical colour directly:
 
 ```c
-const lib_rgb24 *source = frame->image.pixels + row * frame->image.stride;
+const lib_u32 *source = frame->image.pixels + row * frame->image.stride;
 colour = source[column];
 ```
 
 `stride` remains a pixel count.  Frame validation retains geometry and
 overflow checks; copy size becomes the header offset plus
-`stride * height * sizeof(lib_rgb24)`.  Mailbox latest-wins semantics,
+`stride * height * sizeof(frame->image.pixels[0])`. Mailbox latest-wins semantics,
 sequence handling, and damage derivation remain unchanged.  At the current
 1280 x 768 bound, the active graphics storage grows from 983,040 bytes to
 3,932,160 bytes, plus the removed 1,024-byte palette.  Admission must measure
@@ -109,35 +107,36 @@ mechanics; the only removed palette route is Machine-to-Lib and onward.
 
 ## Sequential Plan
 
-### S1 — Freeze contract and migrate Lib transport
+### S1 — Inventory and freeze the coherent migration design
 
 Inventory every producer, consumer, fixed frame buffer, copy-size expression,
-and test of `kvm_window_graphics_frame`.  Replace the indexed graphics member
-with `lib_u32` RGB pixels and delete the graphics palette member.  Update
-validation, frame copy sizing, renderer damage comparison and native Window
-presentation to consume direct RGB values.  Prove that the high byte is zero
-on every producer and that row padding never becomes visible pixels.
+and test of `kvm_window_graphics_frame`. Measure both-width layouts and bounded
+allocation feasibility. Freeze validation, source conversion and test ownership.
+This is a documentation/design delivery, not a production migration or runtime
+qualification. The original split of Lib ABI and SoftPC producer is superseded:
+they must ship together, with no compatibility format or broken intermediate.
 
-Focused tests include a same-frame set of more than 256 distinct RGB values,
-colour changes at both ends of a strided row, copy-size/tail-canary checks,
-and damage derived from direct RGB equality.  Existing text-frame and Console
-palette tests remain unchanged and pass as regression proof.
+### S2 — Atomic Lib ABI and SoftPC publication migration
 
-### S2 — SoftPC Machine publication conversion
+Replace the indexed graphics member with `lib_u32` RGB pixels, delete the
+graphics palette member, update byte sizing and direct-colour rendering, and
+migrate every affected producer/test in the same qualified delivery. Emulator
+copies already delegate to the owning Lib helper; no new transport is needed.
+Retain native 32-bpp surface, common pixel damage helper and latest-wins rules.
 
 At `app-softpc/machine/driver.c`, replace indexed-DIB plus palette export with
 per-pixel RGB publication.  Audit the source DIB's bit depth, row order,
 stride and palette/DAC availability; do not assume the old 8-bit path covers
 all sources.  Keep the original draw/update transaction and dirty ownership.
 
-Focused proof publishes a frame with at least 257 distinct resolved colours
-when the available source can supply it, checks RGB channel order and stride,
-and retains the existing VGA/text/damage/snapshot cases.  If the original
-surface cannot supply the stated RAIDEN II result, record the first loss point
-and create a separate Machine/renderer proposal instead of adding a Lib
-workaround.
+Focused Lib proof publishes at least 257 (preferably 2048) distinct RGB values
+in one synthetic frame, checks high-byte rejection, channels, row padding,
+copy extent/tail canaries and damage. SoftPC tests validate its actual 8-bit
+source conversion, palette-only updates and existing VGA/text/snapshot paths;
+they must not manufacture a 257-colour source claim. Move oversized automatic
+test frames off the stack without changing test ownership or product storage.
 
-### S3 — Downstream adoption and closure audit
+### S3 — Downstream adoption and RGB contract audit
 
 Publish the exact Lib header/API migration notes and corpus hash for PC and
 MyNES.  Their future import converts private graphics formats only at their
@@ -145,7 +144,21 @@ Machine boundaries.  The SoftPC delivery audits that no production Lib or
 Emulator graphics code retains indexed palette lookup or an alternate pixel
 format; text-only palette paths are explicitly excluded from this search.
 
-Each admitted S builds x64 and x86 Release packages, runs changed focused
+### S4 — Final frame-buffer simplification and task closure
+
+Owner request: "把这个无份清理的任务排到本t的最后一个s任务 然后接着做现在的升级".
+Audit the five existing frame buffers after RGB qualification, then remove
+copies/lifetimes that can be eliminated through the existing path. Start with
+Session's retained copy and prove route-switch/no-frame behavior. A current
+responsibility is not proof that every buffer is minimal. Retained buffers need
+explicit concurrency/lifetime evidence; reductions must preserve failure,
+latest-wins and rendering semantics. No frame pool, reference-count framework,
+second publication path or lock held across painting merely to reduce count.
+Estimate and qualify the actual minimal change within S4. Whole-T closure audit
+follows this final S, not S3. S2 deliberately retains the five-buffer model;
+its measured cost is accepted for this stage, not declared irreducible.
+
+Each code-changing S builds x64 and x86 Release packages, runs changed focused
 tests and prescribed background/desktop suites, records changed-path line
 counts and a similar-issue sweep, commits and pushes its complete delivery.
 The later task-level audit verifies the single RGB graphics route and reports
@@ -161,8 +174,7 @@ the fixed-frame storage cost and downstream adoption contract.
 | SoftPC adapter | `src/app-softpc/machine/driver.c`, narrowly related presentation declarations | Resolve original presentation into RGB only at this boundary. |
 | Tests | `test/lib/kvm-window/*`, `test/emulator/*`, `test/app-softpc/unit/machine/vga_frame_smoke.c` and direct consumers | Replace index assertions with RGB results and add >256-colour/stride/copy/damage proof. |
 
-The ledger is initial discovery, not an authorization to change every listed
-path.  S1 freezes the actual finite universe before implementation.
+The actual S1 ledger below supersedes these preliminary path estimates.
 
 ## Risks And Admission Conditions
 
@@ -180,3 +192,190 @@ path.  S1 freezes the actual finite universe before implementation.
 - No implementation begins while T95 is active.  Owner admission supplies the
   next numeric T, active packet, baseline, exact downstream scope and
   verification budget.
+
+## S1 audited design and finite coverage ledger
+
+Owner confirms "批准开始" after the T96 S1 admission. Audit baseline is
+f6385a76719c41ea60124ab871d5ea333221b8a9 (production unchanged from 6c3b604f).
+Frozen universe: tracked src/test/tools consumers of `kvm_window_frame`,
+`kvm_window_graphics_frame`, `emulator_machine_frame`, graphics pixels/palette,
+the palette constant and hardcoded frame sizes. Commands: `rg -n` for those
+symbols and direct member accesses, then inspect each producer, transport,
+allocation and native surface owner. Units of coverage are paths/responsibilities;
+dispositions are change, retain with reason, or explicit external non-goal.
+Completion means every category below has a disposition and test receiver.
+
+### Production path and minimum changes
+
+1. `src/lib/kvm-window/frame_interface.h`: delete graphics palette/constant;
+   change pixels to existing `lib_u32`; multiply active extent by element size.
+   No new `lib_rgb24` alias or Types domain declaration. Geometry validation
+   remains first; reject a visible pixel with high byte nonzero as
+   INVALID_ARGUMENT before any copy/publication. Padding is uninterpreted and
+   copied, never rendered; inspect only width pixels per row for colour validity.
+2. `src/lib/kvm-window/render.c`: read the RGB word directly and call the same
+   existing compare/write/damage helper. Do not add a row buffer, cache or
+   full-frame redraw path. Text decoding and cursor invalidation stay intact.
+3. `src/app-softpc/machine/driver.c`: validate the actual published DIB before
+   consuming dirty; require the existing top-down 8-bit BI_RGB form with one
+   plane, matching positive width/negative height and the owned 256-entry
+   palette. Existing bounded dimensions make aligned byte stride arithmetic
+   safe. Resolve each source index through RGBQUAD into the final destination
+   word, directly, with destination stride=width. No intermediate RGB palette
+   cache, extra conversion surface or format switch. Set valid only afterward.
+   Missing completed damage remains OK/no-frame; malformed/unsupported source
+   is an explicit error, not an absent frame. Use existing test-visible DIB
+   metadata for negative fixtures, restoring it afterward.
+
+The three files are the expected production C/H delta. Geometry helpers,
+`window.c`, `window.h`, `window_interface.h`, `render.h` and Win32 `component.c`
+already use typed fields/sizeof or opaque active-byte copy. Retain them. Win32
+creates a top-down 32-bpp BI_RGB surface; numeric 0x00RRGGBB fits the existing
+supported little-endian BGRX storage. Linux remains explicitly unsupported.
+Neither platform needs a second conversion/renderer or changed cursor policy.
+
+Emulator `machine/{frame_interface.h,machine_interface.h,machine.c}`,
+`session/session.c`, `ui/{ui.c,ui_interface.h}` retain their existing typed
+copy/allocation/dispatch behavior. Machine uses two heap buffers; Session embeds
+one in its heap allocation; UI forwards the reference and makes only a small
+Console text frame. Base mailbox knows byte length only; no format knowledge
+or new transport is added. X86 packages have no graphics interpretation to move.
+
+SoftPC `machine/{machine.c,machine.h}` simply expose the Compat surface;
+`compat/dib_surface.c/.h` owns the indexed presentation. Its initializer and
+bind always expose 8-bit top-down BI_RGB with 256 RGBQUAD slots. Original 1-bit
+painters are expanded there; 8-bit painters share the composed pointer surface.
+Palette changes already mark full damage; outer update/body readiness remains.
+These paths and all original softpc.new files are retained, not rewritten.
+This source can express at most 256 colours simultaneously: it does not prove
+RAIDEN II's reported 2048-colour source. That downstream machine is outside
+this audit; Lib's independent synthetic test proves the transport capacity.
+
+### Allocation and bandwidth census
+
+A disposable strict C11 probe compiled and ran on x86 and x64, defining the
+proposed layout alongside current headers (not replacing production headers).
+Both executions returned zero and reported identical sizes:
+
+| Payload | Current bytes | Proposed bytes | Increase |
+| --- | --- | --- | --- |
+| Window frame | 984080 | 3932176 | 2948096 |
+| Machine frame including sequence/map | 985108 | 3933204 | 2948096 |
+| Five production frame payloads | 4923484 | 19663964 | 14740480 |
+
+The five are Machine staging/publication (two), Session capture (one), Window
+mailbox (one), Window worker context (one). Each is heap-backed; metadata outside
+these payloads is excluded and unchanged. The probe allocated/touched all five
+proposed payloads concurrently on both widths. This is allocation feasibility,
+not a gameplay/performance benchmark or a guarantee under memory exhaustion.
+Native RGB surface (up to 3932160 bytes) and private Compat DIBs already exist
+and do not grow. Even a text-only machine retains the larger union buffers;
+text active-copy size stays 32480 bytes. No stack-size linker change is needed.
+
+Graphics pixel offset becomes 16 rather than 1040. Active copy is
+`16 + 4 * stride * height`; at 640x480 it is 1228816 vs 308240 bytes. There
+are three frame memcpy handoffs (Machine->Session->mailbox->worker), not an
+additional producer memcpy after conversion. At a hypothetical 60 complete
+640x480 publications/second these payload copies alone total about 211 MiB/s
+instead of 53 MiB/s, excluding read/write doubling, rendering and validation.
+This is arithmetic, not a measured frequency or speed claim. Existing validation
+is reached at several copy/render boundaries; added high-byte checking costs
+visible-pixel scans. Do not claim a performance gain or add a trusted bypass.
+S2 must observe publication/consumption cost with existing qualification, retain
+no-dirty suppression, and report any material regression before closing.
+
+Probe evidence is retained under ignored build/t96/s1 (layout source, hidden-job
+logs and zero exit). The first unprivileged launch produced no completion marker
+and is inconclusive; the hidden retry completed both architectures without
+warnings. Budget 120 seconds, output below 1 MiB, executor owns cleanup. No
+native Window, guest or audio device was opened by this probe.
+
+### Test ownership and complete affected-path disposition
+
+Expected test edits, nine existing files; no new test framework:
+
+- Lib `kvm-window/kvm_frame_copy_smoke.c`: new sizeof, element-sized extent,
+  byte-tail canaries, high-byte invalid publication/copy, strided padding,
+  geometry boundaries and text/graphics transitions. Replace frame compound
+  resets with direct memset/field initialization if they create large temporaries.
+- Lib `kvm-window/kvm_frame_damage_mouse_smoke.c`: direct RGB damage, 2048
+  distinct synthetic colours, unchanged-colour and padding-no-damage, skipped
+  publication, text/cursor regressions. Its automatic text/tall frames must be
+  static test-local storage or owned heap, with explicit reset between cases.
+  Machine palette identity assertions no longer belong in this Lib test.
+- Lib `kvm-window/win32/kvm_window_capture_contract_smoke.c`: update actual
+  message-to-render fixtures to direct colour and preserve invalidation/cursor
+  behavior. Native calls stay mocked in this unit.
+- Emulator `machine/machine_wait_smoke.c`: new sizeof, RGB-valued skipped-frame
+  payload and retained invalidation/tail preservation. No independent Lib colour
+  validation tests here; audit compound resets for stack temporaries.
+- Emulator `machine/machine_smoke.c`: move its automatic Machine frame off
+  stack, retain publication and active-copy assertions.
+- Emulator `session/session_frame_smoke.c`: RGB forwarding/latest publication,
+  no graphics character-map copy and no palette field.
+- App `unit/machine/vga_frame_smoke.c`: compare published RGB to actual DIB
+  indices/palette across original modes; palette-only mutation must alter visible
+  RGB, unused entries must not change pixels. Add channel/odd-row-padding/source
+  rejection cases through the existing publisher, no test-only production API.
+- App `integration/snapshot_transaction_smoke.c`: expected colours are resolved
+  RGB, not BIOS palette indices (current 0Ch/0Ah inputs); establish expected DAC
+  colours independently of publisher conversion. Move its two automatic frames
+  off stack; saved guest device state/format stays unchanged.
+- App `integration/runtime_restart_boot_smoke.c`: move both automatic frames
+  in prompt observation/failure reporting off stack; preserve original assertions.
+
+Other direct frame users retain semantics and need only regression/rebuild:
+Lib `kvm-window/{text_frame_smoke.c,win32/kvm_input_admission_smoke.c}` and
+`integration/kvm_window_retirement_smoke.c`; Emulator `ui/composition_smoke.c`,
+`session/session_monitor_smoke.c`, `product/composition_smoke.c`,
+`machine/machine_fixture.c`; X86-debug `product/machine_smoke.c`; App integration
+`{presentation_shutdown_smoke.c,runtime_cursor_smoke.c,runtime_smoke.c,
+command_provider_smoke.c}`. They use pointers, heap/static storage, text or
+callbacks without indexed graphics assertions. Window embedded fixture users
+`kvm_leaf_control_capacity_smoke.c` and `win32/window_keyboard_lifetime_smoke.c`
+also use static storage. Existing Base mailbox tests remain opaque, Console
+palette tests remain text-only. Root tools contain no direct graphics member
+interpretation in the frozen search; ignored past diagnostic probes are not
+release/build dependencies and are not silently declared compatible.
+
+### Estimated implementation diff and proof plan
+
+Estimates are paired small/large endpoints, not measured implementation totals:
+
+| Owner / files | Added | Deleted | Net |
+| --- | --- | --- | --- |
+| Lib frame header | 12-18 | 4-6 | +8 to +12 |
+| Lib renderer | 2-4 | 2-4 | 0 |
+| SoftPC driver | 20-28 | 12-18 | +8 to +10 |
+| Production total, 3 files | 34-50 | 18-28 | +16 to +22 |
+| Lib tests, 3 files | 90-130 | 30-45 | +60 to +85 |
+| Emulator tests, 3 files | 15-25 | 12-18 | +3 to +7 |
+| App tests, 3 files | 55-85 | 20-35 | +35 to +50 |
+| Test total, 9 files | 160-240 | 62-98 | +98 to +142 |
+
+Documentation/manifests/binaries are separate: update Lib Window README, current
+architecture and affected src/test manifests (Lib, test Lib, test Emulator);
+App tests belong to root gates, not shared manifests. No expected Emulator
+production edit, no Types alias, no mirror delta and no snapshot format change.
+Exact counts and all changed paths must be reported from S2's actual diff.
+
+S1 validation is source inspection, dual-width layout/allocation probe and
+documentation gate only. S2 qualification is dual-width cached full builds,
+two published EXEs, all public and App units/gates, background integrations,
+five desktop and three native-audio cases per current architecture registration.
+Report discovery of changed registration counts and native availability honestly.
+Focused tests above must pass before full runs. Existing snapshot/restart/video
+mode matrix protects no-frame readiness, pointer/body update ordering and text.
+S3 is corpus/adoption audit, not a second conversion implementation; S4 owns
+buffer simplification and the subsequent whole-T audit.
+Downstream imports rebuild all ABI consumers together and convert their own
+private images at their Machine boundary; never transmit old palette indices.
+
+### S1 executor review
+
+Compared the design with the original owner-approved queue objective and active
+read-only packet. Removed the unnecessary colour typedef from the proposal,
+kept Types unchanged, corrected the split that would break intermediate builds,
+and separated >256-colour Lib proof from SoftPC's 256-colour source limit.
+Production/test tracked delta is +0/-0. No EXE, INI, media or checkpoint change.
+The code estimates above belong to proposed S2, not this design delivery.
