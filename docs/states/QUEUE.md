@@ -11,6 +11,9 @@ allocates a numeric task identifier.
 
 ## Previously admitted
 
+Owner admits [Windows 3.1 MIDI silence and repeated WAV hang](../proposals/m9-win31-midi-wav-playback.md)
+as T95 S1 diagnosis on 2026-10-17. CURRENT owns its active packet.
+
 The owner admitted [Windows 95 Sound Blaster recognition and playback repair](../history/M9-T94-win95-sound-blaster-recognition-proposal.md)
 as T94 on 2026-10-16 and closed it on 2026-10-17. [CURRENT](CURRENT.md) owns status.
 
