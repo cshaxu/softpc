@@ -10,7 +10,7 @@ None.
 ## Previously admitted
 
 The owner admits [Windows 95 Sound Blaster recognition and playback repair](../proposals/m9-win95-sound-blaster-recognition.md)
-as T94 on 2026-10-16. [CURRENT](CURRENT.md) owns its active S1 investigation.
+as T94 on 2026-10-16. [CURRENT](CURRENT.md) owns its current subtask status.
 
 The owner admitted
 [XP Sound Blaster standalone capability](../history/M9-T93-xp-sound-blaster-standalone-proposal.md)
