@@ -14,31 +14,13 @@ claiming user runtime acceptance. S2 delivery is recorded in
 [its handoff](../history/M9-T96-S2-rgb-migration.md). S3 audit and migration
 instructions are complete; executor cba71230 is pushed and actual-diff reviewed.
 Owner acknowledges S3 and admits S4: "哦这样啊 那准入s4 你告诉我如何干净的".
-S4 is active in audit/design, with no production implementation yet. S3's
+Owner approves S4 closure and explicitly keeps T96 open.
+No implementation subtask is active. Open task awaiting owner: T96.
+No next S is admitted. See the
+[S4 closure](../history/M9-T96-S4-frame-lifetime-audit.md). S3's
 [documentation delivery](../history/M9-T96-S3-rgb-corpus-audit.md) is complete
 at cba71230/3758a33e; S2 manual runtime
 acceptance remains unclaimed.
-
-## M9 T96 S4 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S4 and requests the clean design before implementation. |
-| Objective | Audit all five frame lifetimes, identify reductions possible without changing established behavior, and present the minimal plan and tradeoffs. Final buffer task before T closure. |
-| Non-goals | No forced buffer-count reduction, ownership framework, borrowed-pointer escape, second rendering path, lock across native painting, or unapproved runtime-semantic change. |
-| Reference Baseline | 3758a33e; source/runtime remains S2 fa569001. |
-| Candidate Proposal | [RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Design-stage documents only. Inspect Machine publication, Session routing/retention, Base mailbox and Window worker/surface; no API change chosen. |
-| Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
-| Verification | Map each buffer to writer/reader, concurrent lifetime and retained-failure/route behavior. Inspect actual tests; distinguish source reasoning from existing S2 execution. Any implementation requires refreshed brief, dual-width build/publication and full regression before delivery. |
-| Expected Markers | Explicit delete/retain decisions and no unproved promise that five is either irreducible or safely reducible. |
-| Asset Needs | Read-only source/test investigation; preserve EXEs, INI, media and untracked checkpoint. No desktop action. |
-| Reporting Requirements | Design stage production/test +0/-0. Quantify potential saved bytes, API/behavior cost and changed-file scope before selecting code. |
-| Stop Conditions | Removing a buffer requires changed retention/failure semantics or new lifetime/locking model: present tradeoff, do not silently implement. |
-| Exit Criteria | Owner-approved minimal disposition, any implemented change fully qualified and reviewed, then separate whole-T completion audit; not closed by this preliminary design. |
-| Original Owner Request | "哦这样啊 那准入s4 你告诉我如何干净的". |
-| Similar-Issue Sweep | Five payloads plus native surface/private DIB distinguished; check temporary allocation or pointer-sharing proposals do not merely relocate the same buffer. |
 
 ## Current Technical Baseline
 
@@ -61,7 +43,7 @@ acceptance remains unclaimed.
   Existing original-mirror compiler warnings, three unchanged VGA-test pointer
   casts and x86 Ninja log recovery remain disclosed; no zero-warning claim.
 - Owner INI/media and untracked assets/binary/snapshot.debug are untouched.
-  S3 is downstream adoption audit; final S4 owns five-buffer simplification.
+  S4 closes with the owner-approved retain disposition; runtime is unchanged.
 
 ### Previous qualified baseline
 
