@@ -2,54 +2,41 @@
 
 ## Current Work
 
-T93 S14 partial-capture cleanup correction is implemented and verified.
-Only this Window's native capture is released before unbinding; cleanup errors
-are propagated. Correction production +3/-0, tests +26/-1 (net +25).
-Both cached builds and complete suites pass 167/167 per architecture, zero skips,
-including all ten native desktop cases; both EXEs refreshed, INI unchanged.
-Executor 683f85d4 is pushed and separately actual-change reviewed; await owner
-acceptance, no S15.
-See the [correction](../proposals/m9-xp-sound-blaster-standalone.md#s14-partial-capture-correction).
-Prior evidence follows.
+T93 S14 is owner-accepted and closed after correction 683f85d4 and actual-change
+review e2de3d3f. Both architectures passed 167/167, including ten native desktop
+cases. See [S14 closure](../history/M9-T93-S14-neutral-window-capture.md).
+Owner admits S15, portable Sound Blaster archive and final qualification.
+S15 is at source inventory/design checkpoint, not implemented or verified.
+The accepted dual EXEs remain unchanged. T93 stays open for owner acceptance.
 
-T93 S14 prior receiving verification finished after host audio
-recovery. Both cached builds and all ten native desktop cases pass. Full rerun:
-x64 158/167, x86 166/167; all ten failed cases then pass unchanged in isolation,
-so every test has passing evidence, not a single all-green aggregate run.
-Owner confirms RDP/audio-session switching and directs no further host diagnosis.
-No host settings or test expectations changed. Production +40/-21 (net +19),
-tests +93/-4 (net +89). Executor fe6d9fe3 is pushed and separate actual-change
-review passes; S14 now awaits owner acceptance. S15 is not admitted. See the
-[retry/review record](../proposals/m9-xp-sound-blaster-standalone.md#s14-host-recovery-and-retry-verification).
-Owner accepts S13; executor 9960b37f, coordinator e85a0015 and closure 833ac174 are pushed.
-S13 closed with 167/167 per width including ten desktop cases, production
-net -11 lines and no new API/state/helper. See its history and proposal ledger.
-
-## M9 T93 S14 Packet
+## M9 T93 S15 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S13 and admits next S with before/after briefs, minimal final code and single-agent dual-role governance. |
-| Objective | Encapsulate exclusive capture coordination in Lib; complete the seven-area neutral-contract audit. |
-| Non-goals | No manager/framework, new public API, mouse motion redesign, backend expansion, guest/mirror or INI/media/snapshot changes. |
-| Reference Baseline | Accepted S13 e85a0015. |
-| Candidate Proposal | [S14 capture](../proposals/m9-xp-sound-blaster-standalone.md#s14--capture-boundary-and-shared-contract-completion-audit). |
-| Files And ABI Surface | Window public contract/private Win32 mouse, Types native lock vocabulary, existing capture fixture, Lib README/manifests; readonly Emulator/X86 review. |
-| Applicable Rules | Task Reading Set and execution/architecture/coding/documentation governance skills; inward dependencies and Types authority. |
-| Verification | Competing acquisitions, foreign ownership, native errors and release; cached dual-width build, shared then all other tests, ten native desktop cases, both EXEs. |
-| Expected Markers | One query/update authority; conflicts do not steal registration or disturb capture; no native caller obligation in ordinary public contract. |
-| Asset Needs | Hidden build/t93/s14 jobs/logs/exit; build 1800s, suite 1200s, desktop 600s observation budgets, 30 MiB evidence; executor owns cleanup; no Computer Use. |
-| Reporting Requirements | Source/test additions/deletions/net and affected file totals, seven-area ledger, proof limits, artifacts, executor P then separate actual-change review. |
-| Stop Conditions | Scope expansion, unproved behavior or failed verification; do not kill long jobs on interactive timeout. |
-| Exit Criteria | Build/publish/test/commit/push and coordinator actual-change review; await owner acceptance, no automatic S15. |
-| Original Owner Request | 车通过整入下一个S任务，还是老规矩，进入前给我简报和预估，完成后给我同样级别的汇报，要求极简主义，第一性原理，禁止添油加醋，按智理规范来，单人双角色模式执行。 |
-| Similar-Issue Sweep | All native mouse registration callers, capture/release/failure, shared public native vocabulary and seven S9 audit areas. |
+| Admission And Approval | Owner: 批准 验收通过 准入下一个s. S14 closes; S15 alone is admitted. |
+| Objective | Include retained DSP/Mixer/MIDI/FM machine state in the existing portable device archive, reconstruct host output and qualify continuation. |
+| Non-goals | No Lib archive API, software synthesizer, new backend, exact host MIDI envelopes, old-format compatibility, user INI/media/snapshot edits or unrelated TODO repair. |
+| Reference Baseline | Accepted S14 e2de3d3f. |
+| Candidate Proposal | [S15 archive](../proposals/m9-xp-sound-blaster-standalone.md#s15--portable-archive-and-final-qualification). |
+| Files And ABI Surface | Existing Compat device snapshot/archive, SB device owners and private declarations, owner-local tests/build and mirror ledgers. Public eight directories unchanged. |
+| Applicable Rules | Task Reading Set, execution/architecture/coding/documentation skills, selected XP subset and single device-state owner. |
+| Verification | Device/codec continuation, malformed input, active DMA/pending IRQ, partial MIDI, pause/save/load/reset, cross-width archives; cached dual builds, shared then other tests, ten native desktop cases, dual EXEs. |
+| Expected Markers | Fixed-width guest state only; no host handles/pointers serialized; restored output uses existing owners and no stale host progress. |
+| Asset Needs | Ignored build/t93/s15 evidence; hidden jobs with logs/exit, build 1800s, suite 1200s, desktop 600s observation budgets, 30 MiB logs; disposable test media only, executor cleanup owner, no Computer Use. |
+| Reporting Requirements | Before/after brief, production/test added/deleted/net, local mirror diff, field ledger, source versus test versus guest evidence, executor push then separate actual-change review. |
+| Stop Conditions | Unresolved state semantics, necessary scope expansion or failed qualification; no interactive-timeout kill or silent fallback. |
+| Exit Criteria | Portable archive proof, build/publish/full test/commit/push/review; wait owner acceptance before S/T closure. |
+| Original Owner Request | 批准 验收通过 准入下一个s |
+| Similar-Issue Sweep | All retained SB globals/function-static state, quick events, EOI/delayed IRQ hooks, copied PCM blocks/progress, MIDI parser/notes and host lifetime; every field classified. |
 
-Brief: serialize native registration query/update only, reserve before focus/
-capture side effects, retain existing cleanup and motion algorithms. Never hold
-the registration lock across focus/capture APIs that can invoke window messages.
-Estimate production +20-35/-10-20 (net +10-20), tests net +40-80.
+Start brief: extend the existing device state/codec and owner-local capture/
+restore hooks, not a second archive. Host resources are reconstructed, guest
+DMA/DSP/FM continuation preserved, MIDI restoration approximate as approved.
+Planning estimate production +250-450/-10-30 (net +220-440), tests +300-500/-0;
+roughly 6-10 production paths plus tests and manifest evidence. Refine after
+the exhaustive field inventory before implementation; do not force the estimate
+by omitting active transfers or partially parsed commands.
 
 The owner accepts and closes T92 on 2026-10-15 and admits queue head as T93.
 The owner accepts the reopened S7 delivery and admits S8: "验收通过，准入s8".

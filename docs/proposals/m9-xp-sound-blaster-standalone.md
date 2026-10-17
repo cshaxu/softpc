@@ -3339,6 +3339,24 @@ awaits owner acceptance; neither S14 nor T93 is closed by this review.
 
 ### S15 — portable archive and final qualification
 
+Owner accepts S14 and admits this step: "批准 验收通过 准入下一个s".
+Baseline e2de3d3f. This first checkpoint is source inventory/design, not a
+production change or passing snapshot qualification. The existing archive owns
+DMA/PIC/quick-event capture and table-driven fixed-width encoding, but has no
+SB state member or SB callback mapping. SB device owners retain static transfer,
+parser and FM state; copying only exposed registers would be incomplete.
+
+Inventory units before implementation: DSP command parser (including function-
+static multi-byte command state), frozen PCM block/accepted-consumed offsets,
+completion quick event and EOI/delayed IRQ continuation, Mixer registers and
+gain, MPU binding/mode/input, MIDI partial message/running status/notes/pedals,
+FM index/status, and host resources. Each must be classified as serialized guest
+state, derived/reconstructed state or intentionally excluded host state, with
+validation and a test receiver. Do not serialize native handles, callback
+addresses, guest-memory pointers or host epochs. Reuse the current fixed-width
+codec and callback identity map; no second serializer or Lib archive framework.
+Exact field layout and restore ordering remain to be proved before coding.
+
 Extend existing device capture/restore and fixed-width codec, not Lib archive
 APIs. Reconstruct host handles and progress origin, approximate MIDI state,
 and preserve exact emulated DMA/DSP/FM continuation. Validate all input sizes.
