@@ -35,3 +35,16 @@ mirror warnings/Ninja recovery are disclosed, not erased by test success.
 Documentation gate, actual diff/link review and final clean remote checks
 qualify this governance change. Retained proposal and S histories preserve
 earlier failures. No new implementation task is admitted by queue insertion.
+
+## Coordinator actual-commit review
+
+Reviewed pushed closure 56387026 against the owner's ordering and acceptance:
+three separate proposals, no new task admission, honest symptom/evidence split,
+archived links and unchanged TODO. Only the owner's one-line INI mode change
+ships outside documentation; no source, test, binary or media changes. The
+documentation gate and whitespace check pass. Worktree was clean and HEAD
+matched origin/main after delivery. This review records no additional repair.
+
+Owner subsequently explicitly authorizes restoring the package hard_disk_mode
+from direct to overlay as a configuration exception. The follow-up commit
+contains that exact one-line edit and this review; all other settings stay intact.
