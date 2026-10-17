@@ -5,7 +5,8 @@
 T94 S2 is active under the owner's continuing implementation goal. S1
 diagnosis/design is complete after delivery 20298b44 and separate review.
 S2 implements reset binding, physical DMA access and input-channel PCM gain
-repairs. Fresh dual-width qualification passes; delivery review is pending. See the
+repairs. Delivery cd665a3d is pushed and coordinator-reviewed; S2 awaits owner
+acceptance, and T94 remains open. See the
 [S1 review](../history/M9-T94-S1-win95-sb-diagnosis.md).
 
 See the [T93 audit](../history/M9-T93-completion-audit.md),
@@ -45,7 +46,8 @@ records, not as competing active packets in this status file.
   progresses, eleven whole DMA-block observations match physical RAM, and
   post-play snapshot save and resume succeed. Shutdown, runtime destruction
   and VM destruction all return success. This proves device/output progress,
-  not a human audibility judgment. S2 awaits delivery and owner acceptance.
+  not a human audibility judgment. S2 delivery cd665a3d is pushed and reviewed;
+  owner acceptance remains pending.
   Current candidate SHA-256: x86 AA3797FD2335F8730827FCAB2077C4C2BF816EC033F09DCCA823A1F865E563F2;
   x64 86330C3F2518D49F31B33C3425397C39682F47C8FC85773B0F0263A0D30BEFC4.
 - Earlier disconnected-session failures and the native gain diagnosis remain
