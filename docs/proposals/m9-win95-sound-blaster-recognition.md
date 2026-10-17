@@ -163,7 +163,35 @@ device. Sweep equivalent reset, command, DMA completion and IRQ acknowledgement
 paths as justified by the root cause. Preserve unrelated original code.
 Build both widths, refresh both package EXEs and qualify the changed path.
 
-### S3 - Real Win95 qualification and task closure audit
+### S3 - Owner-admitted public input ownership repair
+
+Owner request (2026-10-17): close the accepted S2; audit and fix public input
+ownership for downstream exact import, without reading or modifying NXVM.
+Types retains foundational types, statuses and one-to-one CRT/SDK/atomic
+wrappers, never project input definitions. Base owns neutral key/modifier/
+extended/button values and records, native decoding, layout queries and UTF-16
+pair merging. KVM retains hotkeys, held-key lifetime, synthesis and delivery.
+
+The bounded ledger is A-E below; completion requires every row's proof, dual
+build/publication, public units and necessary wiring regressions, actual-diff
+review and a pushed fixed commit. No new framework, thread, global state,
+compatibility alias, product behavior or user-media/configuration change.
+
+| Request | Implementation boundary | Proof |
+| --- | --- | --- |
+| A: move input_values.h into base/input_interface.h; retain internal native adapter; no old header/aliases; preserve values/layout | Base and every production/test caller, including App | Token-normalized declaration identity, caller sweep, both builds |
+| B: delete hotkey key/modifier synonyms; ordinary Window query must not depend on hotkeys for constants | KVM and its callers | No alias definitions; hotkey/lifetime/reset and modifier tests |
+| C: boolean neutral submission; keep native ACCEPTED/REJECTED/UNMAPPED and Window translation policy | Existing KVM submission path | Explicit result conversion; acceptance/rejection/unmapped tests |
+| D: remove unused KVM Base user32 link; retain true dependencies | Lib CMake | Source/API search and both full links |
+| E: docs, dependency/manifests, Types ownership negatives; owner-local tests | Existing public gates/tests | Legitimate wrappers pass; input-domain declarations fail |
+
+Estimate: about 40 caller files, predominantly spelling changes. Production
++500-700/-510-720 (net -10-20 including relocation), test/gate net +30-60.
+No mirror changes. Native audio remains integration: device availability is
+reported separately and is not repaired by test classification. No root test
+infrastructure change is planned. Single-session executor/coordinator review.
+
+### S4 - Real Win95 qualification and task closure audit (not admitted)
 
 Prove successful driver initialization and actual known-WAV PCM playback in
 Win95, not merely an installed device icon or AUDIO.COM beep. Verify first and
@@ -175,6 +203,10 @@ tests, including separately scheduled real audio and native desktop tests.
 Publish both EXEs; commit/push complete deliveries, then wait for owner acceptance.
 
 ## Finite acceptance ledger
+
+Owner accepts and closes S2 on 2026-10-17. Delivery cd665a3d and review
+7f64ec53 remain its fixed evidence. S3 is the newly admitted input cleanup;
+the previously planned whole-T audit is shifted to S4, not automatically admitted.
 
 ### S2 implementation checkpoint
 

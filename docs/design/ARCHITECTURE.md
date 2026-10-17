@@ -174,7 +174,7 @@ bounded copied observations use the existing result query, not a second event
 queue or instruction sink. Fault candidates are discarded before the next
 instruction; internal translation/device/debugger reads are outside this boundary.
 
-Shared KVM key events are copied `kvm_key`, physical scan, neutral injection
+Shared KVM key events are copied `base_key`, physical scan, neutral injection
 flags, generic Ctrl/Alt/Shift state, and make/break values. Platform adapters
 translate native records before the event reaches the shared contract; only
 the VM guest binding may translate that neutral value to an architecture's
@@ -209,9 +209,9 @@ adopts it exactly; no runtime or build dependency crosses repositories.
 
 `types` defines universal copied scalar/status values and header-only external
 C/compiler/platform vocabulary. Platform declaration headers contain no
-component policy; base owns synchronization/clock composition, audio/pcm owns PCM
-output, and kvm-base owns input
-interpretation. Component platform implementations are selected by the build,
+component policy; base owns synchronization/clock composition and neutral input
+definitions/native decoding, audio/pcm owns PCM output, and kvm-base owns
+hotkey policy, held-key state, synthesis and event delivery. Component platform implementations are selected by the build,
 not by a generic types dispatcher. `console` defines
 copied logical Console objects. `console-broker` owns native Console
 handles/modes, one I/O worker, and exactly one Current Console Object from
@@ -438,4 +438,4 @@ Native adapters copy repetition metadata without expanding UTF-16 units.
 Base owns complete-character decoding and malformed-prefix recovery. KVM owns
 repetition and TEXT fallback when physical mapping is unavailable. Physical
 identity is PC set-1, with zero indicating unavailable, not a native OS scan
-contract. Console raw events and KVM events share the Types-owned key vocabulary.
+contract. Console raw events and KVM events share the Base-owned key vocabulary.

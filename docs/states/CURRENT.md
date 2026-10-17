@@ -2,11 +2,11 @@
 
 ## Current Work
 
-T94 S2 is active under the owner's continuing implementation goal. S1
+T94 S3 is active: Base input ownership cleanup. The owner accepted and closed
+S2 on 2026-10-17. S1
 diagnosis/design is complete after delivery 20298b44 and separate review.
-S2 implements reset binding, physical DMA access and input-channel PCM gain
-repairs. Delivery cd665a3d is pushed and coordinator-reviewed; S2 awaits owner
-acceptance, and T94 remains open. See the
+S2 implemented reset binding, physical DMA access and input-channel PCM gain
+repairs. Delivery cd665a3d and review 7f64ec53 are pushed; T94 remains open. See the
 [S1 review](../history/M9-T94-S1-win95-sb-diagnosis.md).
 
 See the [T93 audit](../history/M9-T93-completion-audit.md),
@@ -15,76 +15,61 @@ See the [T93 audit](../history/M9-T93-completion-audit.md),
 Historical requests/checkpoints are retained there and in the individual S
 records, not as competing active packets in this status file.
 
-## M9 T94 S2 Packet
+## M9 T94 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner's active goal explicitly requests continued implementation of standalone XP-parity sound and Win95 SB playback; S1 causal design is complete. Single-session executor/coordinator review remains separate. |
-| Objective | Preserve SB registration across guest BIOS reset, correct physical DMA access, and repair the approved Lib PCM gain defect blocking native Win95 checkpoint playback. |
-| Non-goals | No guest-specific branch, SB16 model, synthetic successful detection or native-audio fallback. Owner approves the four DSP physical-memory adaptations and the proven Lib PCM input-channel gain repair with regressions; no device reimplementation. |
-| Reference Baseline | 4a675c00; S1 controlled experiment proves missing binding after io_init. |
-| Candidate Proposal | [Win95 sound repair](../proposals/m9-win95-sound-blaster-recognition.md). |
-| Files And ABI Surface | Compat platform.c, Machine machine.c, nt_sbdsp.c's four physical DMA accesses and mirror manifest, owner-local tests, publication and evidence; no public ABI change. Restore assertion enablement for audio lifecycle and parallel failure. Owner additionally approves Lib PCM Win32 gain implementation, Types vocabulary cleanup, contract documentation, regression and manifests. |
-| Applicable Rules | Execution, Document, Architecture and Coding authorities and shared governance skills. |
-| Verification | Deterministic real reset/port checks and callback-failure injection with host audio fixtures; cached hidden x86/x64 builds, background units/gates/integrations and explicit native desktop/audio runs. Report environmental failures separately, never convert to passes. |
-| Expected Markers | Reset AA and version 02/01 survive repeated guest reset; pending sound events terminate before queue reconstruction; callback failures reject execution. |
-| Asset Needs | Ignored build/t94/s2 bounded logs; owned hidden build/test job, 3600-second total and 600-second no-progress observation budget; no timeout-kill. Diagnostic guest runs retain S1's 600-second/120-second budget. Protect owner INI/media/snapshot; refresh only dual EXEs after build success. |
-| Reporting Requirements | Production estimate +20-35/-8-12, net +8-27 across two files; tests initially +100-180 lines, refine from existing owners. Report actual added/deleted/net, mirror delta, source versus test versus native evidence. |
-| Stop Conditions | Public changes beyond the approved PCM gain repair, mirror changes beyond the four DMA accesses, unexpected original-media write or out-of-scope behavior: stop affected operation and revise scope before proceeding. |
-| Exit Criteria | Minimal production repair, deterministic regressions, dual-width publication and required regression outcomes reviewed and pushed; no whole-T playback claim. |
-| Original Owner Request | Continue toward standalone XP-NTVDM-parity audio usable for Win95 Sound Blaster playback under single-person dual-role governance. |
-| Similar-Issue Sweep | Enumerate SbInitialize/SbTerminate and original reset callback sites. The original I/O table is the sole registry; preserve cold teardown, warm teardown and destroy as distinct lifecycle boundaries, not alternative initialization paths. |
+| Admission And Approval | Owner accepts S2 and explicitly admits S3 input-definition ownership repair; no NXVM checkout access. |
+| Objective | Move the sole neutral input contract to Base, remove hotkey aliases and unused native linking, and separate boolean delivery from native decode results without changing behavior. |
+| Non-goals | No input algorithm, encoding, layout, hotkey, device, firmware, audio or media change; no compatibility alias or second decoder. |
+| Reference Baseline | 7f64ec53; S2 owner accepted on 2026-10-17. |
+| Candidate Proposal | [Win95 sound repair and admitted shared-input follow-up](../proposals/m9-win95-sound-blaster-recognition.md). |
+| Files And ABI Surface | Lib Types/Base/KVM/Console headers and callers; Emulator, X86 IBM PC and App caller spelling; owner-local tests, manifests, documentation and dual EXEs. Source API rename and submit_input boolean return; values/layout unchanged. |
+| Applicable Rules | Execution, Document, Architecture and Coding authorities and their governance skills; single-person executor/coordinator actual-change review. |
+| Verification | Cached hidden x86/x64 full builds; input-focused regressions, complete shared units/gates and remaining units followed by integrations. Report real desktop/audio capability separately. Verify numeric/layout identity and complete caller scan. |
+| Expected Markers | One Base input definition and decoder; no legacy input header/aliases; KVM retains only policy, synthesis and delivery; UNMAPPED Window translation unchanged. |
+| Asset Needs | Ignored build/t94/s3 logs and exit marker; owned hidden job, 3600-second observation and 600-second no-progress budget, no interactive-timeout kill. Publish dual EXEs only; preserve configuration and media. |
+| Reporting Requirements | Estimate about 40 caller files, production +500-700/-510-720 net -10-20 including relocation; test/gate net +30-60. Report actual production/test added/deleted/net and root infrastructure changes. |
+| Stop Conditions | Unexpected numeric/layout/input behavior change, need for new decoder/state or external repository dependency: stop affected work and revise scope. |
+| Exit Criteria | Ownership and caller migration, focused/full verification, manifest/dependency/naming gates, dual publication, complete executor commit/push and separate actual-diff review; await owner acceptance. |
+| Original Owner Request | Close S2; admit a new S to implement sections A-E of the input ownership request, without reading NXVM, for exact downstream import. Preserve neutral behavior and legitimate Types CRT/SDK/atomic wrappers; no aliases or parallel paths. |
+| Similar-Issue Sweep | Search all src/test and current documentation for legacy input types/constants/header and hotkey synonyms; enumerate submit_input callers and native User32 references; negative Types ownership cases protect the moved domain. |
 
 ## Current Technical Baseline
 
-- Latest S2 gain-repair qualification supersedes the failed native attempts
-  recorded below: x64 and x86 each pass 193/193 distinct registered tests,
-  comprising 121 shared, 64 other background and eight native integrations.
-  Full-target cached builds refresh both EXEs. Win95 checkpoint load and gain
-  setup succeed; two WAV plays reach the 1.24-second end. Native PCM consumption
-  progresses, eleven whole DMA-block observations match physical RAM, and
-  post-play snapshot save and resume succeed. Shutdown, runtime destruction
-  and VM destruction all return success. This proves device/output progress,
-  not a human audibility judgment. S2 delivery cd665a3d is pushed and reviewed;
-  owner acceptance remains pending.
-  Current candidate SHA-256: x86 AA3797FD2335F8730827FCAB2077C4C2BF816EC033F09DCCA823A1F865E563F2;
-  x64 86330C3F2518D49F31B33C3425397C39682F47C8FC85773B0F0263A0D30BEFC4.
-- Earlier disconnected-session failures and the native gain diagnosis remain
-  in the proposal as historical evidence, not current qualification results.
-  The separate Compat physical-memory defect remains an explicitly scoped TODO.
-- Program task/build version remains T93. Shared source/test packages are
-  Lib, Emulator, X86 Debug and X86 IBM PC; App privately composes the existing
-  machine and Compat over the selected XP SP1 core. The 505-body mirror manifest
-  pins upstream, necessary subset and local identities independently.
-- Lib provides neutral PCM/MIDI/FM contracts. PCM uses its existing copied
-  FIFO/worker/native output; MIDI uses the native capability, not synthesis.
-  FM honestly reports unsupported host capability. XP DSP/Mixer/MIDI/FM device
-  state remains in the recovered owners, with Compat supplying host services.
-- Portable snapshots include active sound state and reconstruct host resources.
-  Four separate-process x86/x64 archive routes pass. Old snapshot formats are
-  intentionally incompatible; MIDI restoration is approximate, not full host
-  instrument/envelope restoration. No native Linux or downstream-product
-  qualification is inferred from Windows-based contract tests.
-- Latest complete receiving qualification: x64 193/193 and x86 193/193, no
-  failures, skips, disabled or missing tests. Each comprises 121 shared checks,
-  64 other background tests, five real desktop and three real audio integrations.
-  Exact name-set comparison with unfiltered CTest registration passes. Both
-  full-target cached Release builds pass; x64 reused current objects, x86 rebuilt
-  after the existing Ninja log recovery. This is not a clean-cache rebuild or
-  zero-warning claim; unchanged mirror warnings remain disclosed in the audit.
-- Accepted executables in assets/binary:
-  softpc32 SHA-256 `CA4D9B152C44E901354ADE7DB7635717B47BD11596B39E41F792BD584A60ACBE`;
-  softpc64 SHA-256 `56BEA1E29C4EB06C48050D444E640631AFF7865203A2653F89AE13495D9E5CCF`.
-  Final qualification delivery changes no production/test source. User INI,
-  media and current owner snapshot remain unchanged during closure.
-- Shared units reside under their tested source owners, use inward dependencies
-  and do not require an interactive/audio endpoint. Native audio and desktop
-  tests remain integrations and were actually run; no native failure is mocked
-  into a passing product test. Four Lib negative fixtures are flat.
-- Queue is empty after admission of Win95 Sound Blaster recognition/playback.
-  Code 24 is not declared repaired by T93. TODO retains six independent debts;
-  their causes are not claimed fixed by the successful receiving run.
+- T94 S2 is owner-accepted and closed (delivery cd665a3d, review 7f64ec53).
+  Reset callbacks restore SB binding; four DSP accesses use physical SAS;
+  PCM gain operates on input channels. Native Win95 WAV progress and
+  post-play snapshot save/resume were instrumented successfully, not claimed
+  from human listening. Details remain in the S2 history and proposal.
+- S3 is implemented and verified, awaiting executor delivery and independent
+  coordinator review before owner acceptance. Base owns the single neutral
+  input header, native decoder and layout query; KVM retains hotkey/held-key,
+  synthesis and event delivery. Six hotkey aliases and unused KVM user32
+  linkage are removed. Numeric values and record layout are unchanged.
+  Source consumers must rebuild for the renamed API and boolean submission.
+- Latest qualification: x64 and x86 each pass 193/193 distinct registered
+  tests: 177 units/gates, eight background integrations and eight native
+  integrations (five desktop, three audio). Exact executed/registered name
+  sets match, with no skipped or disabled tests. Final units include the
+  extra left/right Alt cases and corrected documentation state.
+- Earlier S3 x86 documentation-gate failure was an executor history-filename
+  error, corrected and followed by a complete 177/177 rerun. Full-target
+  cached builds pass; existing x86 Ninja log recovery causes unnecessary
+  rebuilds and unchanged mirror warnings. This is not a zero-warning claim.
+- Published assets/binary SHA-256:
+  softpc32 BF8CDD793C762FA275D25AFAB0ABEA5B001C239E18B88B5CB31EC0A1391777C9;
+  softpc64 2EB65B25A4F5E8EBA1CCCC9233C61D024D7A175BBACB354A3AA92F88CEC37DDE.
+  User INI, media, snapshots and the XP mirror are untouched by S3.
+- Reusable packages remain Lib, Emulator, X86 Debug and X86 IBM PC (eight
+  source/test trees). No root test infrastructure changed. NXVM was neither
+  read nor modified; downstream import and actual Linux/RDP runs are not
+  inferred from Windows contract tests. Audio classification/implementation
+  is unchanged; native passes establish this session's availability only.
+- Queue remains empty. Independent deferred issues remain in TODO; no
+  unrelated debt is declared fixed. The planned whole-T sound qualification
+  and closure audit shifts to S4 and is not admitted by S3.
 
 ## Recent M9 Closures
 
