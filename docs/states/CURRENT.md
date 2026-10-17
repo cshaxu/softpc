@@ -4,31 +4,30 @@
 
 Owner delegates T95 S2/T closure and next queue admission on 2026-10-17.
 See the [completion audit](../history/M9-T95-completion-audit.md).
-T96 S1 inventory/design is implemented and undergoing delivery review. The
-proposal records three expected production files, nine test files, five existing
-heap frame buffers (+14740480 bytes total), and atomic ABI/producer migration.
-Dual-width layout/allocation probes pass; no production edit, new EXE or full
-runtime qualification is claimed. S2 is not admitted automatically.
+T96 S1 design is delivered and reviewed at 7d0d3dea; owner directs continuing
+the RGB upgrade while scheduling buffer simplification as final S4. S2 is active.
+See the [S1 record](../history/M9-T96-S1-rgb-frame-design.md). Existing five-buffer
+ownership remains unchanged during S2; qualification is pending.
 
-## M9 T96 S1 Packet
+## M9 T96 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
+| Identifier Mode | Continuation |
 | Admission And Approval | Owner delegates next queue admission on 2026-10-17 and confirms "批准开始"; queue head is RGB graphics frames. |
-| Objective | Freeze producer/consumer/allocation inventory and coherent single-format RGB migration plan, including x86 storage costs. |
-| Non-goals | No renderer rewrite, second pixel format, alpha, conversion cache or external repository edits; no production change in this design checkpoint. |
-| Reference Baseline | 6c3b604fa6df3c7979285df2a94428f516a30033, qualified T95 delivery. |
+| Objective | Migrate Lib graphics ABI, direct-colour rendering and SoftPC producer atomically to RGB32; preserve text, dirty, snapshot and handoff semantics. |
+| Non-goals | No renderer rewrite, alternative format, alpha, cache, external repository change or frame-buffer cleanup (reserved for S4). |
+| Reference Baseline | 7d0d3dea, reviewed S1 design; production remains qualified T95. |
 | Candidate Proposal | [RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Read Lib Window, Emulator transport, SoftPC publisher and tests; S1 changes planning documentation only. |
+| Files And ABI Surface | Lib Window frame header/render, App machine driver, nine expected affected test files, manifests/docs and both EXEs. Breaking copied-graphics ABI; rebuild all consumers. No original mirror change. |
 | Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
-| Verification | Enumerate producers, consumers, copy sizes, fixed buffers, source bit depth/stride/row order/palette ownership. Documentation gate and actual-diff review; later implementation requires both builds, publication and full qualification. |
+| Verification | RGB/channel/high-byte/stride/tail/damage tests; actual DIB conversion, palette-only publication, snapshot and restart regression. Cached x64/x86 full builds and publication; public/App unit/gates, background, desktop and native audio integrations, reported separately. |
 | Expected Markers | One 0x00RRGGBB contract, exact storage census, coherent ABI/producer migration without broken intermediate delivery. |
-| Asset Needs | Preserve owner inputs. Disposable layout/allocation probe in ignored build/t96/s1; hidden owned job, log/exit marker, 120-second budget and 1 MiB output cap, executor cleanup. No guest/desktop/audio use. |
-| Reporting Requirements | Per-owner files and expected added/deleted/net code, memory costs and implementation split; S1 production/test +0/-0. |
+| Asset Needs | Preserve owner INI/media/checkpoint. Hidden owned build/test jobs in build/t96/s2 with logs/exit markers, two-hour budget and ten-minute no-progress investigation, executor cleanup. Native tests use standing authorization. |
+| Reporting Requirements | Estimate production +34 to +50/-18 to -28, net +16 to +22; tests +160 to +240/-62 to -98, net +98 to +142. Report actual paths/counts, hashes, proof limits and runtime costs separately. |
 | Stop Conditions | Missing source colour information, unjustified x86 storage cost or second rendering path required: report before implementation. |
-| Exit Criteria | Finite inventory and migration design reviewed, documentation gate passed, committed/pushed design delivery; implementation needs its own packet. |
-| Original Owner Request | "我没空收口。你帮我收口准入下一个t任务吧". |
+| Exit Criteria | Focused/full qualification passed, both EXEs published, manifests/gates and actual-diff review complete, delivery committed/pushed for owner acceptance. |
+| Original Owner Request | "把这个无份清理的任务排到本t的最后一个s任务 然后接着做现在的升级". |
 | Similar-Issue Sweep | Indexed graphics assumptions, byte/pixel copy sizing and frame allocation; explicitly exclude legitimate text/private machine palettes. |
 
 ## Current Technical Baseline
