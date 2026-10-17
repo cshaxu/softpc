@@ -1,5 +1,16 @@
 # Long-Term Review Ledger
 
+- TODO(High): Resolve unsupported Sound Blaster MIDI command 38h parser
+  collision. T95 S1 observes sndblst2.drv sending MIDI bytes after 38h;
+  a following 91h is interpreted as DSP high-speed PCM, leaving the guest
+  polling busy status. The supported MPU-401 route plays Canyon after the
+  Mapper configuration is committed correctly. Owner: App-SoftPC sound-device
+  command boundary. Admission condition: separately establish the original
+  SB-MIDI command/data contract and choose capability or explicit unsupported
+  semantics; do not add a second audio path or silently broaden the admitted
+  paused-DMA repair. See the
+  [S1 evidence](../proposals/m9-win31-midi-wav-playback.md#paused-transfer-and-midi-follow-up).
+
 - TODO(High): Correct Compat memory.c's physical read/write adapters, which
   currently call linear c_sas_loads/stores. T94 S2's nonidentity-paging test
   exposed the incorrect read oracle; direct c_sas_PRS confirms the DMA write

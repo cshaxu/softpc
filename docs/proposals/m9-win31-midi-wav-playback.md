@@ -165,7 +165,23 @@ and whitespace checks pass. Owner checkpoint remains untracked and unmodified.
 The finite S1 ledger is: WAV diagnosis/design evidenced, repair qualification
 pending S2; MIDI original FM limitation evidenced, existing MPU route evidenced,
 owner media unchanged; SB-MIDI parser collision evidenced, new capability scope
-not admitted. S1 awaits owner acceptance; S2 is not automatically activated.
+not admitted. Owner explicitly accepted and closed S1 on 2026-10-17 after
+delivery commit 9df788229cb841a66ba74502ca81b20398eda0ce. The closure review
+confirms that this is diagnosis/design acceptance, not production qualification.
+
+## S2 admission
+
+Original owner request: "批准收口S1和准入S2". S2 is admitted on 2026-10-17;
+CURRENT contains its sole executable packet. Implement the existing service
+guard described above, without a diagnostic wrapper or additional state.
+Qualification must cover partial-acceptance pause/continue in both DMA
+directions and preserve already armed completion behavior. The finite repair
+ledger requires: paused submission fixed and tested; existing completion/reset/
+snapshot behavior retained and tested; repeated guest WAV replay qualified;
+existing MPU route replay qualified; unsupported FM/SB-MIDI not implemented.
+Native output availability is reported separately from mock unit proof.
+The independent SB-MIDI parser collision is transferred to TODO for separately
+admitted capability work. Original inputs are not changed by admission.
 
 ## Repair exit evidence
 
