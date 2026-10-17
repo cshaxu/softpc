@@ -49,8 +49,7 @@ lib_status emulator_ui_publish_frame(emulator_ui *ui, const kvm_window_frame *fr
     if (frame->graphics) {
         /* Delayed notification A receives full B, including A's earlier pixels. */
         lib_test_assert(frame->image.width == 4 && frame->image.height == 4);
-        lib_test_assert(frame->image.pixels[0] == 1 && frame->image.pixels[15] == 2);
-        lib_test_assert(frame->image.palette[1] == 0x123456);
+        lib_test_assert(frame->image.pixels[0] == 0x123456 && frame->image.pixels[15] == 0xabcdef);
     }
     ++deliveries;
     delivered_sequence = sequence;
@@ -79,11 +78,10 @@ static void publication_value_contract(void)
     source.sequence = 6u;
     source.window.graphics = LIB_TRUE;
     source.window.image.width = source.window.image.height = source.window.image.stride = 1u;
-    source.window.image.pixels[0] = 1u;
-    source.window.image.palette[1] = 0x123456u;
+    source.window.image.pixels[0] = 0x123456u;
     lib_test_assert(emulator_machine_frame_copy(&copy, &source));
-    lib_test_assert(copy.sequence == 6u && copy.window.graphics && copy.window.image.pixels[0] == 1u &&
-        copy.window.image.palette[1] == 0x123456u && copy.characters.primary['X'] == 0x263au);
+    lib_test_assert(copy.sequence == 6u && copy.window.graphics && copy.window.image.pixels[0] == 0x123456u &&
+        copy.characters.primary['X'] == 0x263au);
     /* Invalid Window payload cannot overwrite the publication's serial/map. */
     source.sequence = 7u;
     source.window.image.width = 0u;
@@ -119,9 +117,8 @@ int main(void)
     published.window.graphics = 1u;
     published.window.image.width = published.window.image.stride = 4;
     published.window.image.height = 4;
-    published.window.image.pixels[0] = 1; /* A changed the first corner. */
-    published.window.image.pixels[15] = 2; /* B changed the opposite corner. */
-    published.window.image.palette[1] = 0x123456;
+    published.window.image.pixels[0] = 0x123456; /* A changed the first corner. */
+    published.window.image.pixels[15] = 0xabcdef; /* B changed the opposite corner. */
     event.kind = EMULATOR_SESSION_EVENT_FRAME_COMPLETED;
     event.run_generation = 7u;
     event.value.frame.sequence = 2u;

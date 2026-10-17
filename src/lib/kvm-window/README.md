@@ -9,7 +9,10 @@ copied KVM events to the application queue entry. It never includes `console-bro
 makes product decisions.
 
 `kvm_window_frame` contains either common text fields with two bitmap-font banks,
-or Window-owned complete indexed graphics and palette. It contains no
+or Window-owned complete RGB graphics (`lib_u32` numeric `0x00RRGGBB`, no alpha).
+Graphics stride counts pixels; visible high bytes must be zero and invalid
+colour/geometry is rejected before replacing the mailbox. Row padding is copied
+but never drawn. Source palettes are resolved by the publisher. It contains no
 Console character map. Copies include only the active text or graphics extent.
 Window compares resolved colours with its existing RGB surface on consumption,
 updates changed pixels and invalidates their enclosing rectangle. Skipped frames
@@ -17,7 +20,7 @@ need no damage history. Both text and graphics decode colours directly into the
 same pixel comparison helper, without an intermediate buffer. First frames
 and recreated surfaces require full invalidation; same-size mode transitions
 compare actual pixels. Cursor position/shape/visibility changes invalidate the
-old/new overlay rectangles separately. Stride and palette come from each frame.
+old/new overlay rectangles separately. Text retains its own colour palette.
 Native invalidation accumulates until paint; exposure redraws the surface.
 Successful acknowledgement is generation-bound. No extra previous-frame cache.
 

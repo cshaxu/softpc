@@ -19,8 +19,6 @@ static void damage(void)
     frame.valid = frame.graphics = 1u;
     frame.image.width = frame.image.stride = 4u;
     frame.image.height = 4u;
-    frame.image.palette[1] = 0x112233u;
-    frame.image.palette[2] = 0x445566u;
     lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     /* First all-black frame still invalidates the entire surface. */
@@ -33,7 +31,8 @@ static void damage(void)
         lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_UNSUPPORTED);
         frame.image.height = 4u; frame.image.stride = 3u;
         lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_ARGUMENT);
-        frame = (kvm_window_frame){ .valid = LIB_TRUE }; /* No graphics bytes in a text fixture. */
+        lib_memory_set(&frame, 0, sizeof(frame)); /* No graphics bytes in a text fixture. */
+        frame.valid = LIB_TRUE;
         frame.text.base.text_columns = 80u; frame.text.base.text_rows = 25u;
         frame.text.base.font_height = KVM_WINDOW_FONT_HEIGHT + 1u;
         lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_UNSUPPORTED);
@@ -44,9 +43,9 @@ static void damage(void)
     }
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
     /* A is overwritten by B before consumption; B contains both changes. */
-    frame.image.pixels[5] = 1u;
+    frame.image.pixels[5] = 0x112233u;
     lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
-    frame.image.pixels[10] = 2u;
+    frame.image.pixels[10] = 0x445566u;
     lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
     lib_test_assert(kvm_window_render_frame(&received, surface, 4, 4, &valid, &changed));
@@ -55,7 +54,7 @@ static void damage(void)
     lib_test_assert(!kvm_window_render_frame(&received, surface, 4, 4, &valid, &changed));
     /* Failed output keeps its capture; old acknowledgement cannot erase new data. */
     old = generation;
-    frame.image.pixels[0] = 2u;
+    frame.image.pixels[0] = 0x445566u;
     lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, old);
     lib_test_assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
@@ -64,16 +63,15 @@ static void damage(void)
     lib_test_assert(changed.left == 0 && changed.top == 0 && changed.right == 1 && changed.bottom == 1);
     kvm_component_mailboxes_acknowledge_frame(&window.base.mailboxes, generation);
     lib_test_assert(!kvm_component_mailboxes_capture_frame(&window.base.mailboxes, &generation, &received, sizeof(received)));
-    /* Palette-only changes affect exactly the pixels using that entry. */
-    frame.image.palette[1] = 0xffu;
+    /* Only the changed RGB pixel damages the surface. */
+    frame.image.pixels[5] = 0xffu;
     lib_test_assert(kvm_window_render_frame(&frame, surface, 4, 4, &valid, &changed));
     lib_test_assert(surface[5] == 0xffu && changed.left == 1 && changed.top == 1 &&
         changed.right == 2 && changed.bottom == 2);
-    frame.image.palette[255] = 0xffffffu;
+    frame.image.pixels[255] = 0xffffffu; /* Outside the active image. */
     lib_test_assert(!kvm_window_render_frame(&frame, surface, 4, 4, &valid, &changed));
-    /* Different indices with the same resolved colour do not damage the surface. */
-    frame.image.palette[3] = frame.image.palette[2];
-    frame.image.pixels[0] = 3;
+    /* Republishing the same colour does not damage the surface. */
+    frame.image.pixels[0] = 0x445566u;
     lib_test_assert(!kvm_window_render_frame(&frame, surface, 4, 4, &valid, &changed));
     /* Row padding is not part of the displayed pixels. */
     frame.image.width = 3;
@@ -86,6 +84,43 @@ static void damage(void)
     valid = LIB_FALSE;
     lib_test_assert(kvm_window_render_frame(&frame, surface, 3, 4, &valid, &changed));
     lib_test_assert(changed.left == 0 && changed.top == 0 && changed.right == 3 && changed.bottom == 4);
+    kvm_component_mailboxes_destroy(&window.base.mailboxes);
+}
+
+static void rgb_coverage(void)
+{
+    lib_u32 surface[2048], generation;
+    lib_bool valid = LIB_FALSE;
+    kvm_window_rect changed;
+    lib_memory_set(&frame, 0, sizeof(frame));
+    frame.valid = frame.graphics = LIB_TRUE;
+    frame.image.width = 64u; frame.image.height = 32u; frame.image.stride = 65u;
+    for (lib_u32 row = 0u; row < 32u; ++row) {
+        for (lib_u32 col = 0u; col < 64u; ++col)
+            frame.image.pixels[row * 65u + col] = 0x123400u + row * 64u + col;
+        frame.image.pixels[row * 65u + 64u] = 0xffffffffu; /* Padding is not a colour. */
+    }
+    lib_test_assert(kvm_component_mailboxes_create(&window.base.mailboxes,
+        &window.pending_frame, sizeof(window.pending_frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes, LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
+    lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_SIGNALED);
+    lib_test_assert(kvm_component_mailboxes_capture_frame(&window.base.mailboxes,
+        &generation, &received, sizeof(received)));
+    lib_test_assert(kvm_window_render_frame(&received, surface, 64, 32, &valid, &changed));
+    for (lib_u32 i = 0u; i < 2048u; ++i) lib_test_assert(surface[i] == 0x123400u + i);
+    lib_test_assert(!kvm_window_render_frame(&received, surface, 64, 32, &valid, &changed));
+    frame.image.pixels[31u * 65u + 63u] = 0xff123456u;
+    lib_test_assert(kvm_window_publish_frame(&window, &frame) == LIB_STATUS_INVALID_ARGUMENT);
+    lib_test_assert(window.base.mailboxes.frame_generation == generation);
+    lib_test_assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_TIMED_OUT);
+    lib_test_assert(!kvm_window_frame_copy(&received, &frame));
+    lib_test_assert(received.image.pixels[31u * 65u + 63u] == 0x123bffu);
+    frame.image.pixels[31u * 65u + 63u] = 0xabcdefu;
+    frame.image.pixels[31u * 65u] = 0xfedcbau;
+    lib_test_assert(kvm_window_render_frame(&frame, surface, 64, 32, &valid, &changed));
+    lib_test_assert(changed.left == 0 && changed.right == 64 && changed.top == 31 && changed.bottom == 32);
+    lib_test_assert(surface[1984] == 0xfedcbau && surface[2047] == 0xabcdefu);
     kvm_component_mailboxes_destroy(&window.base.mailboxes);
 }
 
@@ -115,7 +150,8 @@ static void motion(void)
 
 static void rendering(void)
 {
-    kvm_window_frame text = { 0 };
+    static kvm_window_frame text;
+    lib_memory_set(&text, 0, sizeof(text));
     kvm_window_rect display = { 0, 0, 640, 410 }, cursor;
     lib_u32 pixels[8 * 16];
     lib_bool valid = LIB_FALSE;
@@ -220,7 +256,8 @@ static void text_coverage(void)
     const lib_u32 sentinel = 0xdeadbeefu;
     lib_bool valid = LIB_FALSE;
     kvm_window_rect changed;
-    frame = (kvm_window_frame){ .valid = LIB_TRUE };
+    lib_memory_set(&frame, 0, sizeof(frame));
+    frame.valid = LIB_TRUE;
     frame.text.base.text_palette[1] = 0x123456u;
     frame.text.base.text_palette[2] = 0xabcdefu;
     for (lib_u32 scan = 0; scan < KVM_WINDOW_FONT_HEIGHT; ++scan) {
@@ -257,7 +294,9 @@ static void text_coverage(void)
     /* Last slot/last scanline and a 24-row bitmap retain the fixed stride. */
     {
         const lib_size last = (KVM_WINDOW_FONT_GLYPHS - 1u) * KVM_WINDOW_FONT_HEIGHT;
-        kvm_window_frame tall = {.valid = LIB_TRUE};
+        static kvm_window_frame tall;
+        lib_memory_set(&tall, 0, sizeof(tall));
+        tall.valid = LIB_TRUE;
         tall.text.base.text_columns = tall.text.base.text_rows = 1u;
         tall.text.base.font_height = KVM_WINDOW_FONT_HEIGHT;
         tall.text.base.cells[0] = (kvm_text_cell){255u, 0u, 1u, 2u};
@@ -313,4 +352,4 @@ static void text_coverage(void)
         KVM_TEXT_ROWS * KVM_TEXT_FONT_DEFAULT_HEIGHT, &valid, &changed));
     lib_test_assert(guarded[1] == sentinel);
 }
-int main(void) { damage(); motion(); rendering(); text_coverage(); return 0; }
+int main(void) { damage(); rgb_coverage(); motion(); rendering(); text_coverage(); return 0; }

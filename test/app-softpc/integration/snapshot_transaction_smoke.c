@@ -177,7 +177,7 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
     return LIB_TRUE;
 }
 
-static lib_bool snapshot_has_pixels(emulator_machine *machine, lib_u8 colour)
+static lib_bool snapshot_has_pixels(emulator_machine *machine, lib_u32 colour)
 {
     emulator_machine_frame *frame = lib_allocate_zero(1, sizeof(*frame));
     lib_bool found = LIB_FALSE;
@@ -193,7 +193,7 @@ static lib_bool snapshot_has_pixels(emulator_machine *machine, lib_u8 colour)
     return found;
 }
 
-static lib_bool snapshot_wait_for_pixels(emulator_machine *machine, lib_u8 colour)
+static lib_bool snapshot_wait_for_pixels(emulator_machine *machine, lib_u32 colour)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
     do {
@@ -223,7 +223,7 @@ static int snapshot_run_transaction(void)
 
     assert(emulator_machine_start(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
-    assert(snapshot_wait_for_pixels(machine, 0x0c));
+    assert(snapshot_wait_for_pixels(machine, 0xfc5454u)); /* BIOS DAC 3Fh/15h/15h, scaled by four. */
     assert(emulator_machine_pause(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_PAUSED));
     assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
@@ -234,7 +234,7 @@ static int snapshot_run_transaction(void)
         LIB_STATUS_OK);
     assert(stream.count != 0u);
     assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
-    assert(snapshot_has_pixels(machine, 0x0c));
+    assert(snapshot_has_pixels(machine, 0xfc5454u));
     /* The just-completed archive keeps its VM-owned checkpoint image alive
        until resume, so this second paused save must not run the guest again. */
     assert(emulator_machine_read_state(machine,
@@ -303,7 +303,7 @@ static int snapshot_run_transaction(void)
         LIB_STATUS_OK);
     assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
-        emulator_machine_frame frame = { 0 };
+        static emulator_machine_frame frame;
         assert(emulator_machine_copy_published_frame(machine, &frame,
             emulator_machine_run_generation(machine)));
         assert(frame.window.valid != 0u);
@@ -343,7 +343,7 @@ static int snapshot_run_save(const char *media_path, const char *snapshot_path,
     assert(file != NULL);
     assert(emulator_machine_start(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
-    assert(snapshot_wait_for_pixels(machine, 0x0c));
+    assert(snapshot_wait_for_pixels(machine, 0xfc5454u));
     assert(emulator_machine_pause(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_PAUSED));
     assert(snapshot_media_bytes(LIB_TRUE, LIB_FALSE));
@@ -408,12 +408,12 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
     assert(fclose(file) == 0);
     assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
-        emulator_machine_frame frame = { 0 };
+        static emulator_machine_frame frame;
         assert(emulator_machine_copy_published_frame(machine, &frame,
             emulator_machine_run_generation(machine)));
         assert(frame.window.valid != 0u);
     }
-    assert(snapshot_has_pixels(machine, 0x0c));
+    assert(snapshot_has_pixels(machine, 0xfc5454u));
     {
         softpc_device_floppy_host_state floppy;
         softpc_media_view media;
@@ -436,7 +436,7 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
         assert(emulator_machine_enqueue_input(machine, &event));
         /* The restored CPU must redraw every pixel through its actual video
            write rules, not merely retain the first reconstructed frame. */
-        assert(snapshot_wait_for_pixels(machine, 0x0a));
+        assert(snapshot_wait_for_pixels(machine, 0x54fc54u)); /* BIOS DAC 15h/3Fh/15h. */
     }
     assert(emulator_machine_stop(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_STOPPED));

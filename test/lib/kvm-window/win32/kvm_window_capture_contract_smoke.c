@@ -281,17 +281,16 @@ static void check_surface_damage(void)
     c.client_width=c.client_height=8;
     frame.valid=frame.graphics=1;
     frame.image.width=frame.image.stride=frame.image.height=8;
-    frame.image.palette[1]=0x123456;
     lib_test_assert(kvm_window_publish_frame(&window,&frame)==0);
     win32_window_consume_frame((lib_win32_hwnd)1,&c);
     lib_test_assert(c.surface_valid && invalidated.right==8 && invalidated.bottom==8);
     lib_u32 before=invalidations;
     /* Two updates before LIB_WIN32_WM_PAINT must each invalidate, not replace the first. */
-    frame.image.pixels[0]=1;
+    frame.image.pixels[0]=0x123456;
     lib_test_assert(kvm_window_publish_frame(&window,&frame)==0);
     win32_window_consume_frame((lib_win32_hwnd)1,&c);
     lib_test_assert(invalidated.left==0 && invalidated.top==0 && invalidated.right==1 && invalidated.bottom==1);
-    frame.image.pixels[63]=1;
+    frame.image.pixels[63]=0x123456;
     lib_test_assert(kvm_window_publish_frame(&window,&frame)==0);
     win32_window_consume_frame((lib_win32_hwnd)1,&c);
     lib_test_assert(invalidations==before+2 && invalidated.left==7 && invalidated.top==7);

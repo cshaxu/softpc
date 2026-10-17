@@ -708,6 +708,20 @@ static void make_boot_disk(const char *path)
     assert(fclose(file) == 0);
 }
 
+static void verify_rgb_pixels(const emulator_machine_frame *frame, const void *bits,
+    const void *info)
+{
+    const BITMAPINFO *dib = info;
+    lib_u32 stride = (frame->window.image.width + 3u) & ~3u;
+    for (lib_u32 row = 0u; row < frame->window.image.height; ++row)
+        for (lib_u32 col = 0u; col < frame->window.image.width; ++col) {
+            lib_u32 rgb = frame->window.image.pixels[row * frame->window.image.stride + col];
+            const RGBQUAD *entry = &dib->bmiColors[((const lib_u8 *)bits)[row * stride + col]];
+            assert((rgb >> 24u) == 0u && ((rgb >> 16u) & 255u) == entry->rgbRed &&
+                ((rgb >> 8u) & 255u) == entry->rgbGreen && (rgb & 255u) == entry->rgbBlue);
+        }
+}
+
 static void verify_driver_geometry(softpc_machine *machine)
 {
     static const unsigned modes[] = {
@@ -908,12 +922,12 @@ static void verify_driver_geometry(softpc_machine *machine)
                 frame->window.image.width, frame->window.image.height);
         assert(frame->window.image.width == width && frame->window.image.height == height);
         assert(frame->window.image.stride == width);
-        assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
+        verify_rgb_pixels(frame, bits, info);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
         assert(softpc_standalone_dib_damage(&rect, TRUE));
         assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         assert(frame->window.image.width == width);
-        assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
+        verify_rgb_pixels(frame, bits, info);
         /* A graphics route with no complete dirty frame must publish nothing.
            It must never substitute the text surface: restoration relies on
            this same rule while the indexed painter is being rebuilt. */
@@ -925,14 +939,54 @@ static void verify_driver_geometry(softpc_machine *machine)
             colour.peRed ^= 0xffu;
             softpc_standalone_dib_set_palette_entries(&colour, 1u);
             assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-            assert(frame->window.image.palette[0] == ((lib_u32)colour.peRed << 16u |
-                (lib_u32)colour.peGreen << 8u | colour.peBlue));
-            assert(lib_memory_compare(frame->window.image.pixels, bits, width * height) == 0);
+            verify_rgb_pixels(frame, bits, info);
             assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
             colour.peRed ^= 0xffu;
             softpc_standalone_dib_set_palette_entries(&colour, 1u);
             assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
         }
+    }
+    /* Exercise the actual publication boundary with padded 3-pixel rows. */
+    {
+        BITMAPINFO painter = {0};
+        PBITMAPINFO previous = sc.ConsoleBufInfo.lpBitMapInfo;
+        const void *bits, *info;
+        lib_u32 width, height;
+        SMALL_RECT rect = {0, 0, 2, 1};
+        painter.bmiHeader.biWidth = 3;
+        painter.bmiHeader.biHeight = -2;
+        painter.bmiHeader.biBitCount = 8;
+        assert(softpc_standalone_dib_bind(&painter));
+        assert(softpc_machine_presentation_dib(machine, &bits, &info, &width, &height));
+        BITMAPINFO *dib = (BITMAPINFO *)info;
+        BITMAPINFOHEADER saved = dib->bmiHeader;
+        RGBQUAD colours[2] = {dib->bmiColors[0], dib->bmiColors[1]};
+        dib->bmiColors[0] = (RGBQUAD){0x56, 0x34, 0x12, 0};
+        dib->bmiColors[1] = (RGBQUAD){0xef, 0xcd, 0xab, 0};
+        const lib_u8 pattern[] = {0, 1, 0, 255, 1, 0, 1, 254};
+        lib_memory_copy((void *)bits, pattern, sizeof(pattern));
+        assert(softpc_standalone_dib_damage(&rect, TRUE));
+        for (unsigned field = 0; field < 6; ++field) {
+            dib->bmiHeader = saved;
+            if (field == 0) dib->bmiHeader.biSize = 0;
+            if (field == 1) dib->bmiHeader.biHeight = 2;
+            if (field == 2) dib->bmiHeader.biPlanes = 2;
+            if (field == 3) dib->bmiHeader.biBitCount = 24;
+            if (field == 4) dib->bmiHeader.biCompression = BI_RLE8;
+            if (field == 5) dib->bmiHeader.biClrUsed = 16;
+            assert(driver.copy_frame(driver.context, frame) ==
+                (field < 3 ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED));
+            assert(!frame->window.valid);
+        }
+        dib->bmiHeader = saved;
+        /* Rejections did not consume the pending damage. */
+        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+        const lib_u32 expected[] = {0x123456, 0xabcdef, 0x123456, 0xabcdef, 0x123456, 0xabcdef};
+        assert(frame->window.image.stride == 3 && frame->window.image.height == 2);
+        assert(lib_memory_compare(frame->window.image.pixels, expected, sizeof(expected)) == 0);
+        dib->bmiColors[0] = colours[0]; dib->bmiColors[1] = colours[1];
+        assert(softpc_standalone_dib_bind(previous));
+        host_flush_screen();
     }
     vm_driver_destroy(adapter);
     lib_release(frame);

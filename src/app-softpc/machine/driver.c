@@ -278,7 +278,6 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
     lib_i32 bottom;
     const BITMAPINFO *dib;
     lib_u32 row;
-    lib_u32 palette_index;
 
     if (!softpc_machine_presentation_dib(driver->machine, &bits, &info, &width,
             &height)) return LIB_STATUS_OK;
@@ -286,20 +285,26 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
         return LIB_STATUS_INVALID_ARGUMENT;
     if (width > KVM_WINDOW_GRAPHICS_MAX_WIDTH || height > KVM_WINDOW_GRAPHICS_MAX_HEIGHT)
         return LIB_STATUS_UNSUPPORTED;
+    dib = (const BITMAPINFO *)info;
+    if (dib->bmiHeader.biSize != sizeof(BITMAPINFOHEADER) ||
+        dib->bmiHeader.biWidth != (LONG)width ||
+        dib->bmiHeader.biHeight != -(LONG)height || dib->bmiHeader.biPlanes != 1u)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    if (dib->bmiHeader.biBitCount != 8u || dib->bmiHeader.biCompression != BI_RGB ||
+        dib->bmiHeader.biClrUsed != 256u)
+        return LIB_STATUS_UNSUPPORTED;
     if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
             &right, &bottom)) return LIB_STATUS_OK;
     row_stride = (width + 3u) & ~3u;
     lib_memory_set(&frame->window, 0, lib_offsetof(kvm_window_frame, image.pixels));
-    for (row = 0u; row < height; ++row)
-        lib_memory_copy(frame->window.image.pixels + row * width,
-            (const lib_u8 *)bits + row * row_stride, width);
-    dib = (const BITMAPINFO *)info;
-    for (palette_index = 0u; palette_index < KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES;
-            ++palette_index) {
-        const RGBQUAD *colour = &dib->bmiColors[palette_index];
-        frame->window.image.palette[palette_index] =
-            ((lib_u32)colour->rgbRed << 16u) |
-            ((lib_u32)colour->rgbGreen << 8u) | (lib_u32)colour->rgbBlue;
+    for (row = 0u; row < height; ++row) {
+        const lib_u8 *source = (const lib_u8 *)bits + row * row_stride;
+        lib_u32 *destination = frame->window.image.pixels + row * width;
+        for (lib_u32 column = 0u; column < width; ++column) {
+            const RGBQUAD *colour = &dib->bmiColors[source[column]];
+            destination[column] = ((lib_u32)colour->rgbRed << 16u) |
+                ((lib_u32)colour->rgbGreen << 8u) | (lib_u32)colour->rgbBlue;
+        }
     }
     frame->window.image.width = width;
     frame->window.image.height = height;

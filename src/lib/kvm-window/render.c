@@ -38,9 +38,9 @@ lib_bool kvm_window_render_frame(const kvm_window_frame *frame, lib_u32 *pixels,
         lib_u32 *destination = pixels + row * width;
         lib_u32 column;
         if (frame->graphics) {
-            const lib_u8 *source = frame->image.pixels + row * frame->image.stride;
+            const lib_u32 *source = frame->image.pixels + row * frame->image.stride;
             for (column = 0u; column < width; ++column)
-                kvm_window_update_pixel(&destination[column], frame->image.palette[source[column]],
+                kvm_window_update_pixel(&destination[column], source[column],
                     column, row, *valid, &damage);
         } else {
             const kvm_window_text_frame *text = &frame->text;

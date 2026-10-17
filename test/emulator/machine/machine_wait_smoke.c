@@ -469,7 +469,7 @@ static void check_publication(void)
     candidate.window.valid = LIB_FALSE; /* Driver reports no subsequent display change. */
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
     lib_test_assert(emulator_machine_published_frame_sequence(active) == 3);
-    candidate = (emulator_machine_frame){0};
+    lib_memory_set(&candidate, 0, sizeof(candidate));
     candidate.window.valid = LIB_TRUE;
     candidate.window.text.base.text_columns = candidate.window.text.base.text_rows = 1;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
@@ -636,7 +636,7 @@ int main(void)
     lib_test_assert(emulator_machine_create(&output, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT && output == LIB_NULL);
     output = (emulator_machine *)&invalid_driver;
     lib_test_assert(emulator_machine_create(&output, &invalid_driver) == LIB_STATUS_INVALID_ARGUMENT && output == LIB_NULL);
-    lib_test_assert(sizeof(emulator_machine_frame) == 985108);
+    lib_test_assert(sizeof(emulator_machine_frame) == 3933204);
     /* Resource-only changes are publications, not just character changes. */
     static emulator_machine_frame before, after;
     before.window.valid = LIB_TRUE;

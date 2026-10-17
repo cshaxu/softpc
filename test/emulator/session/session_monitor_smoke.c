@@ -272,7 +272,7 @@ int main(void)
 {
     emulator_session_request toggle_request;
     {
-        emulator_session session = {0};
+        static emulator_session session;
         char text[1100];
         collect=LIB_TRUE;
         for (lib_size offset=1017u;offset<=1024u;++offset) {
@@ -301,7 +301,7 @@ int main(void)
         toggle_request == EMULATOR_SESSION_REQUEST_NONE);
     public_session_contract();
     {
-        emulator_session initial = {0};
+        static emulator_session initial;
         emulator_session_event initial_event = {
             .kind = EMULATOR_SESSION_EVENT_RUNTIME_COMPLETED,
             .value.runtime_state = EMULATOR_SESSION_MACHINE_STOPPED};

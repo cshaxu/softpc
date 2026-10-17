@@ -6,7 +6,6 @@
 #define KVM_WINDOW_GRAPHICS_MAX_WIDTH 1280u
 #define KVM_WINDOW_GRAPHICS_MAX_HEIGHT 768u
 #define KVM_WINDOW_GRAPHICS_MAX_PIXELS (KVM_WINDOW_GRAPHICS_MAX_WIDTH * KVM_WINDOW_GRAPHICS_MAX_HEIGHT)
-#define KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES 256u
 #define KVM_WINDOW_FONT_HEIGHT 32u
 #define KVM_WINDOW_FONT_GLYPHS 256u
 
@@ -20,10 +19,10 @@ typedef struct kvm_window_text_frame {
 typedef struct kvm_window_graphics_frame {
     lib_u32 width;
     lib_u32 height;
-    lib_u32 stride;
-    lib_u32 palette[KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES]; /* 0x00RRGGBB */
-    /* Complete image; damage is derived by the receiving Window. */
-    lib_u8 pixels[KVM_WINDOW_GRAPHICS_MAX_PIXELS];
+    lib_u32 stride; /* Pixels, including uninterpreted row padding. */
+    /* Complete image, numeric 0x00RRGGBB (no alpha); visible high bytes must
+     * be zero. Damage is derived by the receiving Window. */
+    lib_u32 pixels[KVM_WINDOW_GRAPHICS_MAX_PIXELS];
 } kvm_window_graphics_frame;
 
 typedef struct kvm_window_frame {
@@ -48,6 +47,10 @@ static inline lib_status kvm_window_frame_validate(const kvm_window_frame *frame
             frame->image.stride > KVM_WINDOW_GRAPHICS_MAX_WIDTH ||
             frame->image.height > KVM_WINDOW_GRAPHICS_MAX_PIXELS / frame->image.stride)
             return LIB_STATUS_UNSUPPORTED;
+        for (lib_u32 row = 0u; row < frame->image.height; ++row)
+            for (lib_u32 column = 0u; column < frame->image.width; ++column)
+                if (frame->image.pixels[(lib_size)row * frame->image.stride + column] & 0xff000000u)
+                    return LIB_STATUS_INVALID_ARGUMENT;
         return LIB_STATUS_OK;
     }
     status = kvm_text_frame_validate(&frame->text.base);
@@ -60,7 +63,7 @@ static inline lib_status kvm_window_frame_validate(const kvm_window_frame *frame
 static inline lib_size kvm_window_frame_size_bytes(const kvm_window_frame *frame)
 {
     return frame->graphics != 0u ? lib_offsetof(kvm_window_frame, image.pixels) +
-        (lib_size)frame->image.stride * frame->image.height :
+        (lib_size)frame->image.stride * frame->image.height * sizeof(frame->image.pixels[0]) :
         lib_offsetof(kvm_window_frame, text) + sizeof(frame->text);
 }
 

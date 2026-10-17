@@ -313,7 +313,9 @@ Shared frame mailboxes copy opaque values into fixed leaf-owned storage.
 Base replaces opaque latest bytes, with no frame update callback. Window derives
 damage on consumption by comparing resolved colours with its existing RGB
 surface; it updates changed pixels and invalidates their enclosing rectangle.
-Both text and graphics decode colours directly into the same comparison helper. First
+Machine publishers resolve graphics into numeric 0x00RRGGBB words before crossing
+the Window ABI; source palettes stay machine-private. Text decodes its own palette
+and graphics reads direct RGB, both using the same comparison helper. First
 frames and recreated surfaces invalidate fully; same-size mode changes compare
 actual pixels. Cursor overlays invalidate their old/new rectangles separately.
 Native invalidations accumulate until paint. No previous-frame cache is added.

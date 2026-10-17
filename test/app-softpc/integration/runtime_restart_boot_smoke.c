@@ -89,7 +89,7 @@ static int frame_has_dos_prompt(const emulator_machine_frame *frame)
 
 static void report_last_frame(emulator_machine *runtime)
 {
-    emulator_machine_frame frame;
+    static emulator_machine_frame frame;
     lib_u32 row;
 
     if (!emulator_machine_copy_published_frame(runtime, &frame,
@@ -116,7 +116,7 @@ static void report_last_frame(emulator_machine *runtime)
 
 static int wait_for_dos_prompt(emulator_machine *runtime, DWORD timeout_ms)
 {
-    emulator_machine_frame frame;
+    static emulator_machine_frame frame;
     lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
 
     do {

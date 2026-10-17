@@ -21,7 +21,7 @@ static kvm_component_mailboxes mailbox;
 
 static void check_validation(void)
 {
-    source = (kvm_window_frame){0};
+    lib_memory_set(&source, 0, sizeof(source));
     lib_test_assert(kvm_window_frame_validate(LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT);
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_INVALID_ARGUMENT);
     source.valid = LIB_TRUE;
@@ -64,6 +64,7 @@ static void check_validation(void)
     source.text.base.text_rows++;
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_UNSUPPORTED);
     source.graphics = LIB_TRUE;
+    lib_memory_set(&source.image, 0, sizeof(source.image));
     source.image.width = source.image.height = source.image.stride = 1u;
     lib_test_assert(kvm_window_frame_validate(&source) == LIB_STATUS_OK);
     source.image.stride = 0u;
@@ -93,7 +94,7 @@ int main(void)
 {
     lib_u32 generation, old;
     lib_test_assert(sizeof(kvm_window_text_frame) == 32476);
-    lib_test_assert(sizeof(kvm_window_frame) == 984080);
+    lib_test_assert(sizeof(kvm_window_frame) == 3932176);
     check_validation();
     lib_memory_set(&source, 0x3c, sizeof(source));
     source.valid = LIB_TRUE;
@@ -123,6 +124,8 @@ int main(void)
     lib_test_assert(mailbox.frame_generation == old);
     lib_test_assert(!kvm_component_mailboxes_capture_frame(&mailbox, &generation, &destination, 1u));
     source.graphics = LIB_TRUE;
+    for (lib_size i = 0u; i < KVM_WINDOW_GRAPHICS_MAX_PIXELS; ++i)
+        source.image.pixels[i] = (lib_u32)i;
     source.image.width = 3u;
     source.image.stride = 7u;
     source.image.height = 5u;
@@ -132,8 +135,9 @@ int main(void)
     kvm_component_mailboxes_acknowledge_frame(&mailbox, old);
     lib_test_assert(kvm_component_mailboxes_capture_frame(&mailbox, &generation, &destination, sizeof(destination)));
     lib_test_assert(generation != old);
-    lib_test_assert(lib_memory_compare(destination.image.pixels, source.image.pixels, 35u) == 0);
-    lib_test_assert(destination.image.pixels[35] == 0xa5);
+    lib_test_assert(lib_memory_compare(destination.image.pixels, source.image.pixels,
+        35u * sizeof(source.image.pixels[0])) == 0);
+    lib_test_assert(destination.image.pixels[35] == 0xa5a5a5a5u);
     source.image.width = source.image.stride = KVM_WINDOW_GRAPHICS_MAX_WIDTH;
     source.image.height = KVM_WINDOW_GRAPHICS_MAX_HEIGHT;
     check_copy();

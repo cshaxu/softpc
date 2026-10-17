@@ -83,7 +83,8 @@ int main(void)
     emulator_machine_driver driver = { 0 };
     emulator_machine *machine = LIB_NULL;
     kvm_input_event input = { 0 };
-    emulator_machine_frame frame = { 0 };
+    static emulator_machine_frame frame;
+    lib_memory_set(&frame, 0, sizeof(frame));
     lib_u32 generation = 0u;
     emulator_machine_debug_lease lease = { 0 };
     lib_u32 token = 0x1234u, debug_result = 0u;

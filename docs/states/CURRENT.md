@@ -7,7 +7,8 @@ See the [completion audit](../history/M9-T95-completion-audit.md).
 T96 S1 design is delivered and reviewed at 7d0d3dea; owner directs continuing
 the RGB upgrade while scheduling buffer simplification as final S4. S2 is active.
 See the [S1 record](../history/M9-T96-S1-rgb-frame-design.md). Existing five-buffer
-ownership remains unchanged during S2; qualification is pending.
+ownership remains unchanged during S2. Implementation and dual-width full
+qualification are complete; executor delivery awaits owner acceptance.
 
 ## M9 T96 S2 Packet
 
@@ -19,7 +20,7 @@ ownership remains unchanged during S2; qualification is pending.
 | Non-goals | No renderer rewrite, alternative format, alpha, cache, external repository change or frame-buffer cleanup (reserved for S4). |
 | Reference Baseline | 7d0d3dea, reviewed S1 design; production remains qualified T95. |
 | Candidate Proposal | [RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Lib Window frame header/render, App machine driver, nine expected affected test files, manifests/docs and both EXEs. Breaking copied-graphics ABI; rebuild all consumers. No original mirror change. |
+| Files And ABI Surface | Lib Window frame header/render, App machine driver, ten affected test files (including discovered Session automatic fixtures), manifests/docs and both EXEs. Breaking copied-graphics ABI; rebuild all consumers. No original mirror change. |
 | Applicable Rules | Execution and Document; Architecture and Coding before source/design audit. Single-person executor/coordinator actual-diff review. |
 | Verification | RGB/channel/high-byte/stride/tail/damage tests; actual DIB conversion, palette-only publication, snapshot and restart regression. Cached x64/x86 full builds and publication; public/App unit/gates, background, desktop and native audio integrations, reported separately. |
 | Expected Markers | One 0x00RRGGBB contract, exact storage census, coherent ABI/producer migration without broken intermediate delivery. |
@@ -31,6 +32,22 @@ ownership remains unchanged during S2; qualification is pending.
 | Similar-Issue Sweep | Indexed graphics assumptions, byte/pixel copy sizing and frame allocation; explicitly exclude legitimate text/private machine palettes. |
 
 ## Current Technical Baseline
+
+- T96 S2: production +27/-19 net +8; tests +147/-53 net +94. Both
+  architectures pass 193/193 distinct tests, no skips: 177 unit/gates, eight
+  background integrations, five desktop and three native audio integrations.
+  Evidence: build/t96/s2/retry1 (focused, x86 units, all integrations) and
+  build/t96/s2/recheck (final x64 177/177 and documentation gate). Earlier
+  failed test-fixture attempts remain recorded, not counted as passes.
+- Current EXE SHA-256: softpc32
+  D6E24F0FD1E414A2C8AD4C6A36C0BBAF4911E196FE3BD5C43376E631F6699DFB;
+  softpc64 BDADAE74E8FA0B766F6392837FD02A44C9B8168895468211EA37A78B53CFCE95.
+  Existing original-mirror compiler warnings, three unchanged VGA-test pointer
+  casts and x86 Ninja log recovery remain disclosed; no zero-warning claim.
+- Owner INI/media and untracked assets/binary/snapshot.debug are untouched.
+  S3 is downstream adoption audit; final S4 owns five-buffer simplification.
+
+### Previous qualified baseline
 
 - T95 repair 66055d92 and review 6c3b604f: existing paused DMA service guard;
   production +2/-1 net +1, tests +12/-0 net +12.

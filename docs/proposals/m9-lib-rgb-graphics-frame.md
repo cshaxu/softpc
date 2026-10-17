@@ -379,3 +379,56 @@ kept Types unchanged, corrected the split that would break intermediate builds,
 and separated >256-colour Lib proof from SoftPC's 256-colour source limit.
 Production/test tracked delta is +0/-0. No EXE, INI, media or checkpoint change.
 The code estimates above belong to proposed S2, not this design delivery.
+
+## S2 implementation and convergence ledger
+
+The ABI and producer migration is one change against c951e24c. The only
+production changes are Window frame storage/validation/copy extent, Window
+direct-colour rendering and App Machine indexed-DIB conversion. No Types,
+Emulator production, X86, Compat, preserved mirror or snapshot-format change.
+The five production frame owners remain intact for final S4.
+
+Counted with `git diff --numstat c951e24c -- src test`, excluding manifests and
+README: production three files +27/-19 (net +8); tests ten files +147/-53
+(net +94). Documentation, manifests and the two EXEs are separate.
+
+| Frozen obligation | Implementation / proof |
+| --- | --- |
+| RGB contract, channel order and >256 colours | Lib damage test publishes/renders 2048 distinct colours and exact first/last row changes. |
+| Geometry, stride, padding and copy extent | Existing capacity/text tests retained; padded RGB rows, byte-tail canary and full-capacity copy updated. |
+| Invalid publication atomicity | Visible nonzero high byte rejected without changing mailbox generation, waking renderer or overwriting destination. Padding remains uninterpreted. |
+| Machine source boundary | Actual driver tested against indexed DIB across existing mode matrix, palette-only changes and padded 3-pixel rows. Invalid DIB headers fail before consuming damage. |
+| Snapshot and restart | Existing guest tests retain state/flow assertions; expected DAC RGB values independently established as FC5454/54FC54. |
+| Allocation and unchanged ownership | Automatic test frames moved to static storage; production Machine, Session, mailbox and worker remain heap-owned. |
+| Old indexed contract removal | `rg` over src/test finds no `image.palette` or `KVM_WINDOW_GRAPHICS_PALETTE_ENTRIES`; private machine/text palettes remain. |
+| Qualification | Dual-width builds, 177 unit/gates and 16 integrations per architecture; retained XML/log evidence under build/t96/s2. Completion requires all final results passed, not the first attempt. |
+
+First attempts exposed two test-fixture defects: the new RGB mailbox case did
+not select its existing wake notification, and two automatic Session fixtures
+in session_monitor embedded the enlarged frame. The latter adds a tenth test
+path to the nine-path S1 inventory. Enable the existing notifier and move those
+test objects to static storage; do not alter production transport. Preserve
+the failed logs and requalify. No tests or assertions were disabled.
+
+Storage is still 19,663,964 bytes across five payloads versus 4,923,484 before
+(+14,740,480 bytes); this is a stage cost, not proof of minimality. RGB copies
+also move four bytes per pixel. Correctness qualification is not a throughput
+benchmark or a claim that RGB is faster. S4 owns the subsequent buffer audit.
+
+Final verification: each architecture passes 193/193 distinct tests without
+skips (177 unit/gates, eight background, five desktop, three native audio).
+Both focused sets pass 13/13. Evidence is retry1/focused-*.xml,
+retry1/unit-x86.xml, retry1/integration-*.xml, retry1/native-*.xml and
+recheck/unit-x64.xml under build/t96/s2. The retry1 job retains exit 1 for its
+earlier x64 fixture failure; the explicit final x64 rebuild/recheck exits 0.
+Do not interpret or erase that earlier failure as a clean first pass.
+Both package EXEs were rebuilt/deployed. Existing mirror warnings and three
+unchanged VGA-test pointer-cast warnings remain; x86 Ninja recovered its prior
+log and rebuilt affected targets. No external repository or user input changed.
+
+Executor review: inspected actual production/test diff, all changed frame
+callers and automatic embedded-frame declarations. Production allocations
+remain owned by their existing heap objects; tests alone move large automatic
+objects to static storage. Shared manifests, full boundary gates and
+documentation governance pass. Delivery is ready for coordinator review and
+owner acceptance; this does not close S2 or admit S3.
