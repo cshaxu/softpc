@@ -2,18 +2,36 @@
 
 ## Current Work
 
-No implementation subtask is active.
-
-T93 S15 is owner-accepted and closed. The owner requests whole-T audit and
-closure, requiring every build, unit, gate and integration to pass. The separate
-T93 completion audit passes after final delivery 161305b2 and actual-change
-review: T93 is closed. No new task is admitted.
+T94 S1 is active: investigate Windows 95 Sound Blaster recognition and playback
+using the owner-supplied snapshot. T93 remains closed; its receiving results
+do not prove Win95 driver initialization.
 
 See the [T93 audit](../history/M9-T93-completion-audit.md),
 [S15 closure](../history/M9-T93-S15-portable-sound-archive.md) and
 [retained proposal](../history/M9-T93-xp-sound-blaster-standalone-proposal.md).
 Historical requests/checkpoints are retained there and in the individual S
 records, not as competing active packets in this status file.
+
+## M9 T94 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner admits the next queued T and authorizes independent Win95 driver installation on 2026-10-16. Single-session executor/coordinator roles remain separate. |
+| Objective | Restore the supplied Win95 snapshot, install the appropriate existing SB driver on disposable overlay media, and identify the first failed hardware contract, if any. |
+| Non-goals | No speculative production fix, SB16 upgrade, software FM, new device path, public interface change or modification of original user media/configuration. |
+| Reference Baseline | c55dd73d; accepted T93 binaries and selected XP device implementation. Subsequent disconnected-session rerun passed all units but not all native integrations. |
+| Candidate Proposal | [Win95 SB proposal and admission ledger](../proposals/m9-win95-sound-blaster-recognition.md). |
+| Files And ABI Surface | Admission documents plus ignored diagnostic harnesses; inspect App machine/Compat/XP DSP, DMA and PIC paths. No production ABI change admitted in S1. |
+| Applicable Rules | Execution and Document rules; Architecture and Coding rules/design for probes; shared governance skills; UI policy for guest-independent product behavior. |
+| Verification | Check snapshot media identity/mode before loading; restore through existing machine executor; capture copied frames and inject guest keys without Computer Use. Record driver files/resources and bounded DSP/DMA/IRQ observations. Documentation gate and actual-change review for S1; dual-width complete regression and publication belong to subsequent implementation qualification. |
+| Expected Markers | Snapshot restored, guest frame captured, driver installation outcome and earliest failed exchange evidenced; absence of evidence is not success. |
+| Asset Needs | Owner-supplied Win95 snapshot/media read-only originals; disposable copies and overlays allowed. Ignored build/t94/s1 probes: 600 seconds per guest run, 120 seconds without progress, 30 MiB trace cap, one owned hidden job with log/exit paths. Executor owns shutdown and cleanup; retain bounded checkpoint. No host audio mock counts as native playback proof. |
+| Reporting Requirements | Before/after brief; production/test added/deleted/net counts; source inference distinct from deterministic and guest evidence; minimal repair scope and XP-subset diff estimate after diagnosis. |
+| Stop Conditions | Unexpected writes to original assets, unsafe snapshot attachment, unbounded trace, or necessary out-of-scope public change: stop that operation, preserve evidence, revise scope before implementation. |
+| Exit Criteria | Reproducible guest/driver outcome and evidenced causal repair plan, or explicit unresolved boundary with next probe; S1 is not Win95 playback acceptance. |
+| Original Owner Request | Owner admits the next T, supplies a Win95 snapshot with no audio driver installed, and authorizes handling installation independently; task objective remains full XP-NTVDM-parity standalone audio usable for Win95 SB playback. |
+| Similar-Issue Sweep | Follow reset/version, DSP command parsing, DMA completion, IRQ acknowledgement and native endpoint acquisition through their existing owners; classify observations without attributing unrelated defects. |
 
 ## Current Technical Baseline
 
@@ -46,7 +64,7 @@ records, not as competing active packets in this status file.
   and do not require an interactive/audio endpoint. Native audio and desktop
   tests remain integrations and were actually run; no native failure is mocked
   into a passing product test. Four Lib negative fixtures are flat.
-- Queue has one unnumbered candidate: Win95 Sound Blaster recognition/playback.
+- Queue is empty after admission of Win95 Sound Blaster recognition/playback.
   Code 24 is not declared repaired by T93. TODO retains six independent debts;
   their causes are not claimed fixed by the successful receiving run.
 
@@ -63,8 +81,5 @@ Git, rather than repeating stale active/delivery statements here.
 
 ## Recent Governance
 
-T93 closure archives its proposal, repairs all direct references, records S15
-acceptance and full-task request/S/evidence/debt accounting, and reduces this
-status file to its current authority. The final artifact/evidence P was pushed
-before the separate actual-change review. Existing Queue order and TODO items
-are unchanged; no next T number is allocated. No rule is edited by this closure.
+T94 S1 admission consumes the sole queued candidate. Existing TODO items and
+T93 closure evidence are unchanged. No rule is edited.

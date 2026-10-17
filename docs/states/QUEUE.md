@@ -5,14 +5,17 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-1. [Windows 95 Sound Blaster recognition and playback repair](../proposals/m9-win95-sound-blaster-recognition.md)
+None.
 
 ## Previously admitted
 
-The owner admits
+The owner admits [Windows 95 Sound Blaster recognition and playback repair](../proposals/m9-win95-sound-blaster-recognition.md)
+as T94 on 2026-10-16. [CURRENT](CURRENT.md) owns its active S1 investigation.
+
+The owner admitted
 [XP Sound Blaster standalone capability](../history/M9-T93-xp-sound-blaster-standalone-proposal.md)
 as T93 on 2026-10-15. T93 is now closed after owner acceptance and full-task
-audit; [CURRENT](CURRENT.md) owns status. This does not admit the candidate above.
+audit; [CURRENT](CURRENT.md) owns status.
 
 The XP SP1 SoftPC mirror baseline upgrade was owner-admitted as T92 on
 2026-10-15 and is now owner-accepted and closed. [CURRENT](CURRENT.md) owns status.
