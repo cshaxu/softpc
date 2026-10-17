@@ -2,8 +2,15 @@
 
 ## Current Work
 
-T93 S14 is active: neutral Window capture and shared-contract completion audit.
-Owner accepts S13; executor 9960b37f and coordinator e85a0015 are pushed.
+T93 S14 is implemented and receiving verification has finished after host audio
+recovery. Both cached builds and all ten native desktop cases pass. Full rerun:
+x64 158/167, x86 166/167; all ten failed cases then pass unchanged in isolation,
+so every test has passing evidence, not a single all-green aggregate run.
+Owner confirms RDP/audio-session switching and directs no further host diagnosis.
+No host settings or test expectations changed. Production +40/-21 (net +19),
+tests +93/-4 (net +89). Executor delivery/review and owner acceptance remain due;
+S15 is not admitted. See the [retry record](../proposals/m9-xp-sound-blaster-standalone.md#s14-host-recovery-and-retry-verification).
+Owner accepts S13; executor 9960b37f, coordinator e85a0015 and closure 833ac174 are pushed.
 S13 closed with 167/167 per width including ten desktop cases, production
 net -11 lines and no new API/state/helper. See its history and proposal ledger.
 

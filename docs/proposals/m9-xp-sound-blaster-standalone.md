@@ -3114,6 +3114,44 @@ required. This review does not close T93 or claim all platform tasks finished.
 
 ### S14 — capture boundary and shared-contract completion audit
 
+Owner accepts S13 and admits S14 with before/after briefs, minimum necessary
+final code and single-agent dual-role execution. Baseline e85a0015; S13 closure
+833ac174 changes governance only. The start estimate is production +20-35/-10-20
+(net +10-20), tests net +40-80, plus documentation/manifests and published EXEs.
+
+The source-proven defect is an unprotected query followed by registration:
+two Window workers can both observe no binding and subsequently replace it.
+The native registry remains the sole ownership authority. One static native
+lock serializes its query/update; no shadow owner pointer or registry is added.
+Reserve before focus/capture/clipping changes. On release, finish native cleanup
+before removing the reservation. Never hold the lock across focus/capture APIs:
+they may dispatch messages. The private helper is a real atomic boundary,
+not another input path. Types owns its four native lock declarations.
+
+Finite convergence ledger: the seven original S9 audit areas below are the
+frozen units, each requiring source disposition and its existing/new tests.
+This is a cross-component contract audit, not a claim of complete backend
+support or a line-by-line absence of all bugs in the eight packages.
+
+| Area | Current disposition and proof |
+| --- | --- |
+| Console raw input | S10: Types key/scalar/repeat/button vocabulary, explicit absolute cell coordinates; Base normalization before Console/KVM. Input, raw normalization and key/text regressions. |
+| Physical keyboard | S10: PC set-1 make identity, E0, Pause/Print Screen and unavailable-zero rules; Windows/Linux adaptation stays inside Lib. Base/KVM input fixtures. |
+| Strings | S11/S12: UTF-8 paths, titles and complete Console text/lines; Windows wide calls at native boundary, binary data unchanged. Process/storage, title and Console encoding fixtures. |
+| Path syntax | S11/S12: Windows root/separator interpretation stays in Windows, POSIX recognizes slash and rejects non-UTF-8 names. Directory root/bounds/encoding fixtures. |
+| Audio | S13: frame/epoch progress, explicit flush/discard and batch-independent destruction; native format guard remains backend-local. MIDI optional device-wide volume and unsupported FM are already honest contracts. PCM/MIDI/FM fixtures. |
+| Capture | S14: one serialized registry query/update; capture/release/reservation ordering, conflict and native failures. Existing capture fixture extended for actual task competition and synchronous message reentry. |
+| Emulator/X86 | No native API/type or OS-selection C/H matches on renewed scan; no production changes warranted. All inward dependency, public-header, Types/naming, corpus and test gates must pass receiving qualification. |
+
+Searches cover registered-raw-input calls across src (only mouse.c owns them),
+native API/OS vocabulary in Emulator/X86 C/H, and the identified A/W/text/path
+entry points. Remaining CreateFileA vocabulary is a Types declaration, not a
+public path implementation; Linux fopen consumes the validated UTF-8 byte path.
+Reviewed the public headers and corresponding native implementations, not just
+the spelling search. Third-party direct Raw Input mutation is outside the Lib
+lock; that limitation is retained in Lib's Windows integration documentation,
+not silently erased. No Linux/macOS capability expansion is claimed.
+
 Describe capture/release/conflict/failure neutrally; native third-party mixing
 restrictions belong in platform integration documentation. First prove whether
 two Lib Windows can race query/register, then add only necessary coordination
@@ -3128,6 +3166,98 @@ paths, without claiming to control third-party native calls. Finish a finite
 ledger mapping all seven owner-requested audit areas to S10-S14 fixes or justified
 unchanged contracts, including Emulator/X86 interfaces and build/test boundaries.
 No new Linux/macOS support claim. Complete receiving qualification before S15.
+
+#### S14 implementation checkpoint — qualification blocked
+
+The existing capture fixture now holds the first registration update while a
+second task enters acquisition; exactly one binding wins. Query/update hooks
+assert lock coverage. Synchronous focus/release callbacks attempt another
+capture without deadlock, side effects or stealing the reservation. Native
+activation denial releases the reservation before returning INVALID_STATE.
+Existing foreign-binding, query/register/remove failure, clipping, relative/
+absolute movement, freeze/reset and native-message cases remain in the same
+fixture. Both-width focused tests and the final shared-suite capture cases pass.
+
+Actual C/H diff against e85a0015:
+- mouse.c +32/-18, net +14; 165 -> 179 lines.
+- window_interface.h +4/-3, net +1; 46 -> 47 lines.
+- types/win32/sync.h +4/-0, net +4; 37 -> 41 lines.
+- capture fixture +93/-4, net +89; 658 -> 747 lines.
+
+Production totals +40/-21, net +19 (248 -> 267 affected-file lines).
+Tests +93/-4, net +89. The test estimate is exceeded by 9 lines because message
+reentry ordering is proved separately from task contention, without duplicating
+the native fixture. Public API/structure layout and motion algorithm are unchanged.
+No manager, shadow registry, owner pointer, retry or recovery state is added.
+One native static lock and one actual atomic helper replace split registration
+handling. README/manifests, governance and two EXEs are separate accounting.
+
+Cached dual-width builds published both EXEs. First x64 link was blocked by the
+running package EXE; its exact process was closed under standing owner authority,
+then the build resumed from cache. The next x64 shared run failed native MIDI.
+Isolated runs also failed; a disposable direct WinMM probe, bypassing Lib and
+SoftPC, returned midiOutOpen result 1 (Undefined external error), MIDI device
+count 1 and wave-output device count 0. Both audio services reported Running.
+No service, device configuration, audio production code or test expectation was
+changed. The exact cause of the missing host playback endpoint is not established.
+
+The complete receiving run continued through every test after failures:
+each width ran 97 shared (96 pass, native MIDI fails), 65 other (41 pass,
+24 failures at machine initialization/related expectations), and five native
+desktop tests (three Lib cases pass, two package-start cases fail at stage 3).
+Thus 140/167 per architecture pass, 27 fail, zero skip. Direct native failure
+is established; attributing every machine/package failure to that same cause
+requires rerun after host capability recovery. No passing qualification is
+claimed. All ten native desktop cases ran without Computer Use.
+
+Published but not qualified artifact SHA-256:
+- softpc32.exe: 05DCE704C5F1719CED657D9CA55287E549CEAC2DFA13627EB982BC9FEB6F8822
+- softpc64.exe: 1814D15A5B446545E228703DFC6190D08646A5E85341949A57076D87309E306A
+- unchanged INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
+S14 executor work remains uncommitted pending receiving qualification, not a
+completed P. Coordinator actual-commit review and owner acceptance remain due.
+The owner was asked whether the host/RDP audio session changed. Restoring host
+playback capability or authorizing host-audio investigation is the next external
+action; do not silently alter host services or weaken native tests. S15 is not
+admitted. S13 acceptance/closure is already pushed as 833ac174.
+
+#### S14 host recovery and retry verification
+
+Owner requests "Ok retry", then confirms RDP/audio-session switching and says
+"所以你别死磕了，现在能跑通就行了". This authorizes ending host investigation
+once the current paths run; it does not establish a cause for every prior failure.
+The direct native probe now reports MIDI devices=1, wave devices=1, open=0 and
+close=0. No host services/settings, production audio or test budgets changed.
+
+Both cached Release builds succeed and refresh the package EXEs. The complete
+rerun executes every case, without skips:
+- x64: shared 97/97, other 56/65, desktop 5/5; total 158/167.
+- x86: shared 96/97, other 65/65, desktop 5/5; total 166/167.
+- The nine x64 failures (machine, FDC, checkpoint, snapshot transaction/cross-
+  process, runtime, restart, command provider and platform failure) and x86
+  native MIDI all pass in the subsequent unchanged, serial isolated run (10/10).
+
+All 334 unique architecture/test pairs therefore have passing evidence. This
+is explicitly not a claim that the aggregate first rerun passed, or that the
+known checkpoint timing debt is repaired. The x86 MIDI exit 0xc0000409 was its
+failed-open assertion, not proof of memory corruption. Its isolated run passes
+in 1.00 second; the earlier x64 native case took 10.50 seconds. Historical failed
+qualification evidence is retained alongside the full retry and isolated XML.
+All ten desktop cases passed without Computer Use. No further host investigation
+is undertaken under the owner's direction; S14 capture tests passed throughout.
+
+Final package SHA-256:
+- softpc32.exe: 695FE67B4CE2F9713F83FFBEC0C11F4FAD35D35703EAE4C91090C57CD68E0B10
+- softpc64.exe: 1814D15A5B446545E228703DFC6190D08646A5E85341949A57076D87309E306A
+- unchanged INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
+The seven-area ledger above is complete at the declared cross-component-contract
+scope. Existing native capability limits and TODO debts remain explicit. No
+App, Emulator/X86, mirror, guest media or snapshot changes. Executor self-review
+confirms the single native registry authority, lock-free message dispatch,
+existing cleanup/motion paths and Types ownership. Separate actual-commit review
+follows executor push; S14 waits for owner acceptance and S15 remains unadmitted.
 
 ### S15 — portable archive and final qualification
 

@@ -255,3 +255,14 @@ The broker alone sequences deactivation, including failed initial activation.
 Backend disposal frees inactive resources without repeating mode restoration
 or reader retirement. KVM Console disposal similarly follows its worker's sink
 detachment; it does not detach a second time.
+
+### Windows native input integration
+
+Window capture reserves the process-wide raw mouse registration before focus
+or clipping changes. Lib serializes registration query/update across its Windows;
+release removes only its own binding, after native capture/clipping cleanup.
+The lock is never held across focus/capture calls that can dispatch messages.
+Third-party code using Raw Input directly must not concurrently replace/remove
+that registration during Lib capture/release. Such code does not participate in
+Lib's lock; Lib cannot synchronize arbitrary native calls. An existing foreign
+binding prevents capture, and release does not remove a foreign replacement.

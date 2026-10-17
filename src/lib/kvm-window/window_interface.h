@@ -20,9 +20,10 @@ typedef struct kvm_window_options {
     lib_bool initial_frozen;
 } kvm_window_options;
 
-/* Win32 capture requires exclusive raw mouse registration while captured.
- * An existing registration prevents capture. Applications must not concurrently
- * change that process-wide registration during capture/release.
+/* Capture is exclusive: a conflicting input owner or denied host activation
+ * leaves the Window uncaptured, without taking another owner's input binding.
+ * Lib coordinates its Window instances; ordinary callers need no native
+ * input registration. Capture/release I/O failures use the component failure sink.
  * On failure *out_window remains NULL. A live worker that cannot be joined is
  * a terminal application infrastructure fault, not a caller-owned half object. */
 lib_status kvm_window_create(kvm_window **out_window,

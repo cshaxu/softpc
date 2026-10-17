@@ -13,8 +13,23 @@ static lib_u32 raw_reads, raw_registrations, raw_removals;
 static lib_i32 raw_read_ok=1, raw_register_ok=1, raw_query_ok=1, raw_remove_ok=1;
 static lib_win32_uint raw_size=sizeof(lib_win32_raw_input);
 static lib_i32 desktop_width=65535, desktop_height=65535;
+static lib_bool registration_locked;
+static base_sync_event *registration_entered, *registration_continue, *registration_attempt;
+static void registration_lock(lib_win32_srwlock *lock)
+{
+    if (registration_attempt != LIB_NULL)
+        lib_test_assert(base_sync_event_signal(registration_attempt) == LIB_STATUS_OK);
+    lib_win32_acquire_srwlock_exclusive(lock);
+    registration_locked = LIB_TRUE;
+}
+static void registration_unlock(lib_win32_srwlock *lock)
+{
+    registration_locked = LIB_FALSE;
+    lib_win32_release_srwlock_exclusive(lock);
+}
 static lib_win32_uint LIB_WIN32_WINAPI query_raw(lib_win32_raw_input_device *d,lib_win32_uint *count,lib_win32_uint size)
 {
+    lib_test_assert(registration_locked);
     lib_test_assert(size==sizeof(*d));
     if (!raw_query_ok) return (lib_win32_uint)-1;
     lib_win32_uint needed=raw_binding.usUsage ? 1u : 0u;
@@ -25,6 +40,7 @@ static lib_win32_uint LIB_WIN32_WINAPI query_raw(lib_win32_raw_input_device *d,l
 }
 static lib_win32_bool LIB_WIN32_WINAPI register_raw(const lib_win32_raw_input_device *d,lib_win32_uint count,lib_win32_uint size)
 {
+    lib_test_assert(registration_locked);
     lib_test_assert(count==1 && size==sizeof(*d) && d->usUsagePage==1 && d->usUsage==2);
     if (d->dwFlags==LIB_WIN32_RIDEV_REMOVE) {
         lib_test_assert(!d->hwndTarget); ++raw_removals;
@@ -33,6 +49,10 @@ static lib_win32_bool LIB_WIN32_WINAPI register_raw(const lib_win32_raw_input_de
     } else {
         lib_test_assert(d->dwFlags==0 && d->hwndTarget==(lib_win32_hwnd)1); ++raw_registrations;
         if (!raw_register_ok) return LIB_WIN32_FALSE;
+        if (registration_entered != LIB_NULL) {
+            lib_test_assert(base_sync_event_signal(registration_entered) == LIB_STATUS_OK);
+            lib_test_assert(base_sync_event_wait(registration_continue, 5000u) == BASE_SYNC_WAIT_SIGNALED);
+        }
         raw_binding=*d;
     }
     return LIB_WIN32_TRUE;
@@ -53,7 +73,7 @@ static lib_i32 LIB_WIN32_WINAPI metrics(lib_i32 index)
 static lib_win32_bool LIB_WIN32_WINAPI get_clip(lib_win32_rect *r) { *r=clipped; return LIB_WIN32_TRUE; }
 static lib_u32 releases, clips, events, input_resets;
 static lib_bool reject_input;
-static lib_i32 release_ok=1;
+static lib_i32 release_ok=1, focus_ok=1, capture_ok=1;
 static lib_u32 focus_requests, foreground_requests;
 static lib_i32 clip_ok = 1, resize_ok = 1, title_ok = 1, client_ok = 1;
 static lib_win32_dword ticks;
@@ -82,13 +102,15 @@ static lib_win32_bool LIB_WIN32_WINAPI invalidate(lib_win32_hwnd w,const lib_win
 { (void)w;lib_test_assert(!erase);++invalidations;previous_invalidated=invalidated;if(r)invalidated=*r;return LIB_WIN32_TRUE; }
 static void *context;
 static void notify_loss(void);
+static lib_bool contend_on_callback;
+static void check_callback_contention(void);
 static lib_i32 reenter_title;
 static void title_notification(void);
 static lib_win32_hwnd LIB_WIN32_WINAPI get_capture(void) { return owner; }
-static lib_win32_hwnd LIB_WIN32_WINAPI set_capture(lib_win32_hwnd w) { lib_win32_hwnd old=owner; owner=w; return old; }
+static lib_win32_hwnd LIB_WIN32_WINAPI set_capture(lib_win32_hwnd w) { lib_win32_hwnd old=owner; if(capture_ok)owner=w; return old; }
 static lib_win32_bool LIB_WIN32_WINAPI release_capture(void)
-{ ++releases; owner=LIB_NULL; notify_loss(); return release_ok; }
-static lib_win32_hwnd LIB_WIN32_WINAPI set_focus(lib_win32_hwnd w) { ++focus_requests; focused=w; return w; }
+{ ++releases; owner=LIB_NULL; check_callback_contention(); notify_loss(); return release_ok; }
+static lib_win32_hwnd LIB_WIN32_WINAPI set_focus(lib_win32_hwnd w) { ++focus_requests; check_callback_contention(); if(focus_ok)focused=w; return w; }
 static lib_win32_bool LIB_WIN32_WINAPI foreground(lib_win32_hwnd w) { (void)w; ++foreground_requests; return LIB_WIN32_TRUE; }
 static lib_win32_hwnd LIB_WIN32_WINAPI get_focus(void) { return focused; }
 static lib_win32_bool LIB_WIN32_WINAPI clip(const lib_win32_rect *r)
@@ -170,11 +192,25 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #define lib_win32_get_registered_raw_input_devices query_raw
 #undef lib_win32_get_system_metrics
 #define lib_win32_get_system_metrics metrics
+#undef lib_win32_acquire_srwlock_exclusive
+#undef lib_win32_release_srwlock_exclusive
+#define lib_win32_acquire_srwlock_exclusive registration_lock
+#define lib_win32_release_srwlock_exclusive registration_unlock
 #include "lib/kvm-window/win32/mouse.c"
 #include "lib/kvm-window/win32/geometry.c"
 #include "lib/kvm-window/win32/component.c"
 
 static void notify_loss(void) { win32_window_proc((lib_win32_hwnd)1,LIB_WIN32_WM_CAPTURECHANGED,0,0); }
+static void check_callback_contention(void)
+{
+    if (contend_on_callback) {
+        kvm_win32_mouse competitor = {0};
+        lib_u32 before = clips;
+        lib_test_assert(!registration_locked);
+        lib_test_assert(kvm_win32_mouse_capture(&competitor, (lib_win32_hwnd)2) == LIB_STATUS_INVALID_STATE);
+        lib_test_assert(!competitor.captured && clips == before && raw_binding.hwndTarget == (lib_win32_hwnd)1);
+    }
+}
 static lib_status immediate_notification(void *p)
 { (void)p; win32_window_proc((lib_win32_hwnd)1,WIN32_WINDOW_MAILBOX_READY,0,0); return 0; }
 static void title_notification(void)
@@ -361,6 +397,45 @@ static void check_surface_damage(void)
     timer_ok=1;
     lib_test_assert(kvm_component_destroy(&window.base)==0);
 }
+typedef struct binding_attempt {
+    lib_win32_hwnd window;
+    lib_status result;
+} binding_attempt;
+
+static void try_binding(void *p, const base_sync_task *task)
+{
+    binding_attempt *attempt = p;
+    (void)task;
+    attempt->result = mouse_bind(attempt->window, LIB_TRUE);
+}
+
+static void check_competing_bindings(void)
+{
+    base_sync_task *first = LIB_NULL, *second = LIB_NULL;
+    binding_attempt a = {(lib_win32_hwnd)1, LIB_STATUS_IO_ERROR};
+    binding_attempt b = {(lib_win32_hwnd)2, LIB_STATUS_IO_ERROR};
+    lib_u32 registrations = raw_registrations;
+    lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &registration_entered) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &registration_continue) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_task_create(try_binding, &a, &first) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_event_wait(registration_entered, 5000u) == BASE_SYNC_WAIT_SIGNALED);
+    /* First query saw empty; keep its update pending while the second enters. */
+    lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &registration_attempt) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_task_create(try_binding, &b, &second) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_event_wait(registration_attempt, 5000u) == BASE_SYNC_WAIT_SIGNALED);
+    lib_test_assert(base_sync_event_signal(registration_continue) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_task_destroy(first) == LIB_STATUS_OK);
+    lib_test_assert(base_sync_task_destroy(second) == LIB_STATUS_OK);
+    lib_test_assert(a.result == LIB_STATUS_OK && b.result == LIB_STATUS_INVALID_STATE);
+    lib_test_assert(raw_registrations == registrations + 1u && raw_binding.hwndTarget == a.window);
+    lib_test_assert(mouse_bind(b.window, LIB_FALSE) == LIB_STATUS_OK && raw_binding.hwndTarget == a.window);
+    lib_test_assert(mouse_bind(a.window, LIB_FALSE) == LIB_STATUS_OK && raw_binding.usUsage == 0u);
+    base_sync_event_destroy(registration_entered);
+    base_sync_event_destroy(registration_continue);
+    base_sync_event_destroy(registration_attempt);
+    registration_entered = registration_continue = registration_attempt = LIB_NULL;
+}
+
 int main(void)
 {
     lib_test_assert(kvm_window_apply_title((lib_win32_hwnd)1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5"));
@@ -652,6 +727,20 @@ int main(void)
     raw_remove_ok=0;
     lib_test_assert(kvm_win32_mouse_release(&c.mouse)==LIB_STATUS_IO_ERROR && !c.mouse.captured);
     raw_remove_ok=1; raw_binding=(lib_win32_raw_input_device){0};
+    /* Failed native activation must give back the reservation, without clipping. */
+    for (lib_u32 i = 0u; i < 2u; ++i) {
+        lib_u32 before_clips = clips;
+        owner = focused = LIB_NULL;
+        focus_ok = i != 0u; capture_ok = 0;
+        lib_test_assert(kvm_win32_mouse_capture(&c.mouse, (lib_win32_hwnd)1) == LIB_STATUS_INVALID_STATE);
+        lib_test_assert(!c.mouse.captured && raw_binding.usUsage == 0u && clips == before_clips);
+    }
+    focus_ok = capture_ok = 1;
+    contend_on_callback = LIB_TRUE;
+    lib_test_assert(kvm_win32_mouse_capture(&c.mouse, (lib_win32_hwnd)1) == LIB_STATUS_OK);
+    lib_test_assert(kvm_win32_mouse_release(&c.mouse) == LIB_STATUS_OK);
+    contend_on_callback = LIB_FALSE;
+    check_competing_bindings();
     lib_test_assert(kvm_component_destroy(&window.base)==0);
     check_surface_damage();
     return 0;
