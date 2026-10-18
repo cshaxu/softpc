@@ -1686,3 +1686,24 @@ Task-owned diagnostic guests have terminated. Retain bounded investigation
 logs and the corrected disposable checkpoint for acceptance; no new media or
 diagnostic executable is committed. Executor P1 delivers only the configuration
 guidance, task evidence and rebuilt x86 package, followed by actual-commit review.
+
+### S8 coordinator actual-commit review
+
+After pushing a404740f30c90486294277a17ca987781847ff60, switched roles and
+read the actual four-path commit rather than relying on the executor summary.
+It contains three documentation files and the rebuilt x86 EXE, with no source,
+test, mirror, public contract, INI or guest-media edits. The instruction fixes
+the previously incorrect IRQ recommendation and the independent Mapper route.
+It does not promise FM, SB-MIDI or MPU input support, and explicitly distinguishes
+the bounded first-install observation from an identified hardware defect.
+
+Compared every XML testcase name with each current CTest registration list:
+191 unique names per architecture, zero missing/extra cases, failures or skips.
+Qualification exit is 0; the separate replay-launcher empty-exit limitation is
+retained, not silently converted into a passed exit code. Guest cleanup and
+post-restart frames provide the distinct guest evidence. The x86 package hash
+matches CURRENT; the unchanged x64 hash matches the prior qualified package.
+Original configuration/media and the owner's untracked snapshot remain intact.
+No remaining task-owned guest process was found. Existing Ninja/compiler
+warnings remain disclosed. No blocking change finding; S8 awaits owner acceptance,
+and neither S8 nor T96 is closed by this review.

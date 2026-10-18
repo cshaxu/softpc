@@ -9,7 +9,8 @@ Owner admits T96 S8: reproduce and repair Win3.1 MPU-401 installation,
 post-restart mouse loss and silent MIDI. Guest A/B evidence establishes an
 IRQ9 conflict with InPort and an incorrect MIDI Mapper destination. Corrected
 disposable guest playback is verified on both widths and audible on x64.
-S8 is verified, pending executor delivery/review and owner acceptance.
+S8 executor a404740f is pushed and actual-commit review is complete;
+S8 awaits owner acceptance. T96 remains open.
 
 S1-S7 are complete. Before whole-T closure, reconcile the final RGB/schema and
 four-slot ownership contracts, final fixed-frame storage accounting, downstream
