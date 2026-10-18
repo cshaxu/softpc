@@ -465,6 +465,11 @@ int softpc_machine_presentation_dib(const softpc_machine *machine,
     return 1;
 }
 
+int softpc_machine_presentation_take_text_dirty(const softpc_machine *machine)
+{
+    return machine != NULL && machine->reset && softpc_standalone_text_take_dirty();
+}
+
 int softpc_machine_presentation_text(const softpc_machine *machine,
     const void **cells_out, lib_u32 *columns_out, lib_u32 *rows_out,
     lib_u32 *stride_out, lib_u32 *cell_bytes_out)

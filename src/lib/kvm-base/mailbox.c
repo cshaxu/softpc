@@ -126,13 +126,15 @@ void kvm_component_mailboxes_redraw_frame(kvm_component_mailboxes *mailboxes)
     base_sync_mutex_unlock(mailboxes->frame_lock);
 }
 
-const void *kvm_component_mailboxes_take_frame(kvm_component_mailboxes *mailboxes)
+const void *kvm_component_mailboxes_take_frame(kvm_component_mailboxes *mailboxes,
+    const void **previous)
 {
     const void *frame;
+    if (previous != LIB_NULL) *previous = LIB_NULL;
     if (mailboxes == LIB_NULL) return LIB_NULL;
     base_sync_mutex_lock(mailboxes->frame_lock);
     frame = mailboxes->frames == LIB_NULL ? LIB_NULL :
-        kvm_frame_exchange_take(mailboxes->frames);
+        kvm_frame_exchange_take(mailboxes->frames, previous);
     base_sync_mutex_unlock(mailboxes->frame_lock);
     return frame;
 }

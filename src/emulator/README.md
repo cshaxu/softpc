@@ -12,7 +12,7 @@ Emulator has no platform directories, platform types, native calls or OS-selecte
 implementations. Base owns blocking mutex/event/task/wait; Types owns the atomic
 vocabulary. Emulator retains queue, lifecycle and frame-publication ownership.
 
-Machine owns a four-slot Window exchange and a three-slot Console exchange.
+Machine owns a four-slot exchange for each of Window and Console.
 Window publication uses the Lib reference/schema directly; there is no Machine
 frame wrapper. The driver reports no-ready-frame separately through produced,
 never by publishing an invalid payload. The executor passes writable Window
@@ -27,7 +27,8 @@ and graphics/text routing without copying payloads. It may observe a newer
 publication than the notification. UI owns immutable status text and its pure
 frame builder; composition injects that builder into the executor's existing
 Console production flow for graphics mode. UI owns no frame exchange.
-Machine compares both maps and font banks for unchanged-text suppression.
+Machine publishes every produced frame without content comparison. Readiness
+and optional dirty tracking belong to the driver; consumers optimize drawing.
 Explicit diagnostic snapshot copies remain available, with the expected run and
 unchanged destination on rejection; they are not the presentation transport. UI owns the shared action vocabulary;
 session does not maintain a second action enum or mapping.

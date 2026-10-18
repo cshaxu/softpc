@@ -5,6 +5,7 @@
 #include "insignia.h"
 #include "host_def.h"
 #include "gmi.h"
+#include "gvi.h"
 #include "gfx_upd.h"
 #include "egacpu.h"
 #include "dib_surface.h"
@@ -33,6 +34,7 @@ static unsigned long softpc_dib_painter_stride;
 static unsigned long softpc_dib_painter_bits_per_pixel;
 static SMALL_RECT softpc_dib_dirty;
 static int softpc_dib_dirty_valid;
+static int softpc_text_dirty = 1;
 static SMALL_RECT softpc_dib_pending_dirty;
 static int softpc_dib_pending_dirty_valid;
 /* Pending damage uses bit 1 for body participation in an original full
@@ -307,6 +309,10 @@ void softpc_standalone_dib_end_update(void)
 {
     if (softpc_dib_update_depth == 0u) return;
     --softpc_dib_update_depth;
+    /* Original text updates (including font/mode refreshes) commit here even
+       when their cell comparison needs no native rectangle. */
+    if (softpc_dib_update_depth == 0u && sc.ModeType != GRAPHICS)
+        softpc_text_dirty = 1;
     if (softpc_dib_update_depth != 0u || !softpc_dib_pending_dirty_valid)
         return;
     if (!softpc_standalone_dib_copy_pending()) {
@@ -390,6 +396,18 @@ int softpc_standalone_text_surface(const void **cells_out,
     return 1;
 }
 
+void softpc_standalone_text_damage(void)
+{
+    softpc_text_dirty = 1;
+}
+
+int softpc_standalone_text_take_dirty(void)
+{
+    if (softpc_dib_update_depth != 0u || !softpc_text_dirty) return 0;
+    softpc_text_dirty = 0;
+    return 1;
+}
+
 int softpc_standalone_text_surface_geometry(unsigned long *columns_out,
     unsigned long *rows_out)
 {
@@ -408,6 +426,7 @@ int softpc_standalone_text_surface_write_cell(unsigned long column,
         return 0;
     textBuffer[(row * SOFTPC_TEXT_COLUMNS + column) *
         SOFTPC_TEXT_CELL_BYTES + byte_offset] = value;
+    softpc_text_dirty = 1;
     return 1;
 }
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
@@ -415,6 +434,7 @@ void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
 {
     int index;
     if (softpc_dib_info == NULL || entries == NULL || count <= 0) return;
+    softpc_text_dirty = 1;
     if (count > (int)SOFTPC_DIB_COLOURS) count = (int)SOFTPC_DIB_COLOURS;
     for (index = 0; index < count; ++index) {
         softpc_dib_info->bmiColors[index].rgbRed = entries[index].peRed;

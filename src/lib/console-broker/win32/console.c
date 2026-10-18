@@ -38,9 +38,6 @@ struct console_broker_backend {
     console_broker_mode mode;
     lib_u32 generation;
     base_keyboard_decoder keyboard;
-    lib_u16 previous[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
-    lib_u8 previous_foreground[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
-    lib_u8 previous_background[LIB_CONSOLE_TEXT_COLUMNS * LIB_CONSOLE_TEXT_ROWS];
     lib_u32 previous_palette[16u];
     lib_u16 previous_columns;
     lib_u16 previous_rows;
@@ -501,9 +498,6 @@ lib_status console_broker_backend_activate(console_broker_backend *backend,
     backend->console = console;
     backend->mode = mode;
     backend->generation = generation;
-    lib_memory_set(backend->previous, 0xff, sizeof(backend->previous));
-    lib_memory_set(backend->previous_foreground, 0xff, sizeof(backend->previous_foreground));
-    lib_memory_set(backend->previous_background, 0xff, sizeof(backend->previous_background));
     lib_memory_set(backend->previous_palette, 0xff,
         sizeof(backend->previous_palette));
     backend->previous_columns = 0u;
@@ -714,6 +708,9 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
         lib_memory_set(&info, 0, sizeof(info));
         info.cbSize = sizeof(info);
         if (lib_win32_get_console_screen_buffer_info_ex(backend->output, &info)) {
+            /* Applying metadata may discard cells through a temporary shrink,
+             * even when the final backing dimensions are restored. */
+            backend->previous_columns = backend->previous_rows = 0u;
             for (index = 0u; index < 16u; ++index)
                 info.ColorTable[index] = console_broker_colorref_from_rgb(
                     frame->palette[index]);
@@ -744,12 +741,8 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
     else
         size.Y = (lib_win32_short)frame->rows;
     region.Bottom = size.Y - 1;
-    if (backend->previous_columns != frame->columns ||
-        backend->previous_rows != frame->rows ||
-        lib_memory_compare(frame->text, backend->previous,
-            sizeof(frame->text)) != 0 ||
-        lib_memory_compare(frame->foreground, backend->previous_foreground, sizeof(frame->foreground)) != 0 ||
-        lib_memory_compare(frame->background, backend->previous_background, sizeof(frame->background)) != 0) {
+    if (!frame->cells_unchanged || backend->previous_columns != frame->columns ||
+        backend->previous_rows != frame->rows) {
         for (row = 0u; row < (lib_u32)size.Y; ++row) {
             lib_u32 column;
             for (column = 0u; column < LIB_CONSOLE_TEXT_COLUMNS; ++column) {
@@ -773,12 +766,6 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
             console_broker_backend_unlock_output(backend);
             return LIB_STATUS_IO_ERROR;
         }
-        lib_memory_copy(backend->previous, frame->text, sizeof(frame->text));
-        lib_memory_copy(backend->previous_foreground, frame->foreground, sizeof(frame->foreground));
-        lib_memory_copy(backend->previous_background, frame->background, sizeof(frame->background));
-        backend->previous_columns = frame->columns;
-        backend->previous_rows = frame->rows;
-        backend->coverage_rows = frame->rows;
     }
     {
         lib_win32_console_cursor_info cursor;
@@ -803,6 +790,10 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
             return LIB_STATUS_IO_ERROR;
         }
     }
+    /* Reuse refers to a fully successful output, including its cursor. */
+    backend->previous_columns = frame->columns;
+    backend->previous_rows = frame->rows;
+    backend->coverage_rows = frame->rows;
     console_broker_backend_unlock_output(backend);
     return LIB_STATUS_OK;
 }

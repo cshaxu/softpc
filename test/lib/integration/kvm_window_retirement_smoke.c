@@ -183,7 +183,7 @@ static void paint_scenario(void)
 }
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage), LIB_TRUE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage)) == LIB_STATUS_OK);
     static kvm_window_frame_storage frame;
     for (scenario = 0; scenario != 24; ++scenario) {
         kvm_window_options options = { 0 };

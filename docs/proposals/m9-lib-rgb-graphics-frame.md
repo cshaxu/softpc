@@ -1267,3 +1267,100 @@ check pass. Original warnings remain disclosed. Only the owner-owned untracked
 snapshot.debug remains outside Git; it was neither staged nor changed.
 No blocking issue found in this bounded actual-commit review. S7 awaits owner
 acceptance and T96 remains open; this governance P does not close either.
+
+### S7 fixed four-slot owner revision
+
+Owner request: “四槽的整个数据结构和算法你可以放到 KVM Base 里面去，
+这样两边可以统一共享同一份代码，更干净。就按这个方案把我们刚才讨论的
+所有点全部做干净。” Baseline d24ab19c; this supersedes the three-slot design,
+not its already collected historical evidence. New qualification is required.
+
+Bounded convergence ledger (implemented; final qualification recorded below):
+- Base: one fixed four-slot implementation; remove variant/count; take pins
+  processing and exposes optional previous displayed until finish. Both leaves
+  use the same latest-wins, failure, redraw, retirement and shutdown mechanics.
+- Machine: produced is the only publication decision. Remove content comparison;
+  preserve validation, sequence, generation, notification and Session routing.
+- SoftPC: connect original host text update completion plus cursor/palette and
+  explicit refresh to driver-owned readiness. No mirror changes, duplicate
+  drawing algorithm or shared dirty semantics. Check initial/reset/load frames.
+- Console: compare actual mapped cells/colours against held displayed input;
+  native output can reuse unchanged cells only while its own surface is valid.
+  Remove broker character/foreground/background arrays; keep palette, extent
+  and tail-clearing metadata. Activation, stream output and geometry changes
+  override reuse. Metadata-induced temporary shrink must invalidate reuse.
+- Proof: Base stalled/concurrent producer and failed promotion, Machine identical
+  produced and no-production cases, Console mapping/colour/cursor/extent cases,
+  broker recovery/failure/tail cases, SoftPC text readiness and existing reset,
+  snapshot, text/graphics and package/native integration regression.
+
+Locks remain short ownership transfers; no output under an exchange lock.
+The broker output lock still serializes native geometry, palette, cells and
+cursor. No new thread, retry state machine, payload backup or transport copy.
+Estimate production +120..220/-140..240 (net -120..+80), tests +180..300/-80..180
+(net 0..+220). Owned hidden jobs/evidence: build/t96/s7/four-slot; inspect after
+five minutes without progress, never terminate on interactive timeout. Preserve
+INI, media and owner snapshot. Full dual-width qualification and actual commit
+review precede delivery/owner acceptance.
+
+### S7 four-slot implementation proof
+
+The ledger's production members are implemented in the existing owners. Base
+has one four-slot exchange and no retain/count variant; its take pins both
+inputs until finish. Machine's content comparison is deleted. SoftPC readiness
+uses the original outer host text-update completion, cursor/palette changes and
+explicit refresh; no original mirror code changes. Console compares mapped
+visible cells and colours with its held input. Palette and cursor still pass
+through the existing native output path independently. Changed Console cells
+use the existing complete rectangle write; this is not a new partial-cell
+renderer. Window retains its RGB dirty-area algorithm. Base shares ownership,
+not knowledge of either payload or renderer.
+
+The broker no longer retains character/foreground/background arrays. Native
+activation, output/geometry invalidation and palette metadata changes override
+the caller's unchanged-cell hint. Extent reuse is committed only after cursor
+output succeeds, so a partially written failed frame cannot become the next
+comparison baseline. Existing coverage metadata retains tail-clearing duties.
+Native-format conversion on the output stack remains necessary adaptation,
+not another retained transport frame.
+
+Similar-issue sweep: searched all src/test callers of frame_exchange_create,
+frame_exchange_take, mailbox_take_frame and publish_text_frame; all use the
+same fixed exchange API. Searches for retain_displayed, three-slot and
+emulator_machine_text_frame_changed in current source/tests/design find no
+remaining alternative. The Window surface comparison and diagnostic copies
+remain for their distinct rendering/inspection duties. No new root test
+infrastructure or X86 component change is required by this delivery.
+
+Focused proof covers held old/new pointer identity, stalled producer writes,
+concurrent turnover and failed promotion; Machine identical-produced versus
+not-produced; Console mapped glyphs/colours/extents and independent cursor/
+palette changes; broker palette shrink and failed-cursor repaint; SoftPC idle,
+in-progress and completed text updates. These are executable test proofs;
+no new owner manual guest acceptance or measured performance improvement is
+claimed. Initial qualification attempts exposed and corrected test assumptions
+about the old schema size, old dedup sequence and repeated cursor coordinates;
+their logs remain in the owned evidence directory.
+
+Accounting against d24ab19c, git diff --numstat on C/H only:
+- Production Lib 11 files +57/-47, net +10; Emulator two +7/-42, net -35;
+  App-SoftPC seven +41/-0, net +41. Total +105/-89, net +16.
+- Tests Lib 14 files +119/-82, net +37; Emulator two +19/-37, net -18;
+  App-SoftPC one +37/-0, net +37. Total +175/-119, net +56.
+Documentation, manifests and two EXEs are excluded. Mirror, INI, media and
+snapshot format are unchanged; owner snapshot.debug is excluded from staging.
+
+Fresh qualification: each architecture passes focused 32/32, unit/gates
+178/178 and background integration 8/8. x86 passes all eight native cases.
+x64's compact native package first fails before the frame handoff at
+stage=1/error=6; the unchanged independent package-recheck passes. The original
+qualification.exit=1 remains alongside final-check.exit=0. All 194 distinct
+registered cases per width therefore have passing evidence, with zero skips,
+but this is not an all-green first aggregate or a fix for the startup TODO.
+The final x64 incremental header refresh and 178 unit/gates also pass.
+Evidence is build/t96/s7/four-slot/{focused,unit,integration}-*.xml,
+native-*-0..7.xml, final-unit-x64.xml and package-recheck.xml. Native retained
+Console recovery passes both widths. Original mirror warnings and the existing
+x86 Ninja-log recovery warning remain disclosed. All 292 shared manifest
+entries match; documentation and whitespace checks pass. Both deployed artifact
+hashes are recorded in CURRENT. No Computer Use or manual guest test was used.

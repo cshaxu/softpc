@@ -3,14 +3,19 @@
 `kvm-console` depends on `types`, `base`, `console`, and `kvm-base` only. It owns one raw Console lifecycle,
 creates its logical Console object, and publishes copied text frames through
 that object. It never opens, registers, or renders native Console I/O.
-A producer writes a `kvm_console_text_frame` into a three-slot exchange:
+A producer writes a `kvm_console_text_frame` into a four-slot exchange:
 common text fields plus two 256-entry BMP character maps. It commits validated
 text, then notifies Console with the same borrowed exchange. The worker owns
-the taken pointer through output and idle time, replacing it at the next take.
+the taken pointer through output, retaining the previous displayed pointer
+until successful finish. The last successful input remains held while idle.
 It has no graphics or bitmap-font storage.
 The caller supplies character meaning; this component has no built-in encoding.
 Each cell's explicit glyph bank selects its character map independently of colour.
 Foreground/background indices pass unchanged to the logical Console boundary.
+The worker compares mapped visible characters and colours with the held previous
+input. It permits native cell reuse when identical, without skipping palette,
+cursor or geometry handling. Native binding, stream writes and surface changes
+invalidate reuse; the broker keeps no duplicate character/colour arrays.
 DISABLED hides the native cursor. HOST and SOURCE both enable the native cursor:
 Console owns its blinking, and source phase is deliberately ignored. This is a
 presentation limitation, not a claim of precise source-phase reproduction.

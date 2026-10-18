@@ -9,11 +9,10 @@ struct kvm_frame_exchange {
     const void *processing;
     const void *displayed;
     const void *latest;
-    lib_u32 count;
 };
 
 lib_status kvm_frame_exchange_create(kvm_frame_exchange **out_exchange,
-    lib_size frame_size, lib_bool retain_displayed)
+    lib_size frame_size)
 {
     kvm_frame_exchange *exchange;
     lib_status status;
@@ -22,9 +21,8 @@ lib_status kvm_frame_exchange_create(kvm_frame_exchange **out_exchange,
     if (frame_size == 0u) return LIB_STATUS_INVALID_ARGUMENT;
     exchange = lib_allocate_zero(1u, sizeof(*exchange));
     if (exchange == LIB_NULL) return LIB_STATUS_NO_MEMORY;
-    exchange->count = retain_displayed ? 4u : 3u;
     status = base_sync_mutex_create(&exchange->lock);
-    for (lib_u32 i = 0u; status == LIB_STATUS_OK && i < exchange->count; ++i) {
+    for (lib_u32 i = 0u; status == LIB_STATUS_OK && i < 4u; ++i) {
         exchange->slots[i] = lib_allocate_zero(1u, frame_size);
         if (exchange->slots[i] == LIB_NULL) status = LIB_STATUS_NO_MEMORY;
     }
@@ -40,7 +38,7 @@ lib_status kvm_frame_exchange_create(kvm_frame_exchange **out_exchange,
 void kvm_frame_exchange_destroy(kvm_frame_exchange *exchange)
 {
     if (exchange == LIB_NULL) return;
-    for (lib_u32 i = 0u; i < exchange->count; ++i) lib_release(exchange->slots[i]);
+    for (lib_u32 i = 0u; i < 4u; ++i) lib_release(exchange->slots[i]);
     base_sync_mutex_destroy(exchange->lock);
     lib_release(exchange);
 }
@@ -54,7 +52,7 @@ void kvm_frame_exchange_publish(kvm_frame_exchange *exchange)
     exchange->latest = exchange->pending = exchange->writer;
     /* At most pending, processing and displayed are unavailable. The remaining
      * slot is always writable, including when the consumer never advances. */
-    for (lib_u32 i = 0u; i < exchange->count; ++i) {
+    for (lib_u32 i = 0u; i < 4u; ++i) {
         void *slot = exchange->slots[i];
         if (slot != exchange->pending && slot != exchange->processing &&
             slot != exchange->displayed) {
@@ -65,17 +63,16 @@ void kvm_frame_exchange_publish(kvm_frame_exchange *exchange)
     base_sync_mutex_unlock(exchange->lock);
 }
 
-const void *kvm_frame_exchange_take(kvm_frame_exchange *exchange)
+const void *kvm_frame_exchange_take(kvm_frame_exchange *exchange, const void **previous)
 {
     const void *frame = LIB_NULL;
+    if (previous != LIB_NULL) *previous = LIB_NULL;
     base_sync_mutex_lock(exchange->lock);
     if (exchange->processing == LIB_NULL) {
         frame = exchange->processing = exchange->pending;
         exchange->pending = LIB_NULL;
-        /* Three-slot consumers replace their held input at take, rather than
-         * keeping old and new inputs throughout rendering as Window does. */
-        if (frame != LIB_NULL && exchange->count == 3u)
-            exchange->displayed = LIB_NULL;
+        if (frame != LIB_NULL && previous != LIB_NULL)
+            *previous = exchange->displayed;
     }
     base_sync_mutex_unlock(exchange->lock);
     return frame;
@@ -85,7 +82,7 @@ void kvm_frame_exchange_finish(kvm_frame_exchange *exchange, lib_bool success)
 {
     base_sync_mutex_lock(exchange->lock);
     if (exchange->processing != LIB_NULL) {
-        if (success || exchange->count == 3u)
+        if (success)
             exchange->displayed = exchange->processing;
         if (!success && exchange->latest == exchange->processing)
             exchange->pending = exchange->processing;

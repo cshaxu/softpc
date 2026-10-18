@@ -13,7 +13,8 @@ struct kvm_console {
     lib_bool previous_mouse_valid;
 };
 
-lib_status kvm_console_publish_text_frame(kvm_console *console, const kvm_console_text_frame *frame);
+lib_status kvm_console_publish_text_frame(kvm_console *console,
+    const kvm_console_text_frame *frame, const kvm_console_text_frame *previous);
 
 void kvm_console_receive_event(void *context, const lib_console_event *event);
 

@@ -35,7 +35,7 @@ static void failure(void *p,lib_u64 id,lib_status s)
 { (void)p; lib_test_assert(id && s==LIB_STATUS_IO_ERROR); ++failures; }
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame), LIB_FALSE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame)) == LIB_STATUS_OK);
     lib_test_assert(kvm_console_destroy(LIB_NULL)==LIB_STATUS_OK);
 
     for(lib_u32 mode=0;mode<4;++mode) {

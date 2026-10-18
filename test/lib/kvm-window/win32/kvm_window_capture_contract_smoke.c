@@ -445,7 +445,7 @@ static void check_competing_bindings(void)
 
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage), LIB_TRUE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage)) == LIB_STATUS_OK);
     lib_test_assert(kvm_window_apply_title((lib_win32_hwnd)1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5"));
     lib_test_assert(title_calls==1u && title_text[0]==0x6d4bu && title_text[1]==0xd83cu &&
         title_text[2]==0xdfb5u && title_text[3]==0u);
@@ -588,7 +588,7 @@ int main(void)
     win32_window_proc((lib_win32_hwnd)1,WIN32_WINDOW_MAILBOX_READY,0,0);
     lib_test_assert(window.base.stopping && !c.frozen && !foreground_requests);
     lib_test_assert(window.base.mailboxes.control_count==2);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&window.base.mailboxes) != LIB_NULL);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&window.base.mailboxes, LIB_NULL) != LIB_NULL);
     kvm_component_mailboxes_finish_frame(&window.base.mailboxes, LIB_FALSE);
     lib_test_assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_initialize(&window.base, &options, join, dispose)==LIB_STATUS_OK);

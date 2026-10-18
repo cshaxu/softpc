@@ -113,11 +113,11 @@ int main(void)
             (lib_u8)(i % 16u), (lib_u8)((i / 16u) % 16u) };
     check_copy(); /* No inactive graphics payload is copied. */
     lib_test_assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(source), LIB_TRUE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(source)) == LIB_STATUS_OK);
     lib_test_assert(kvm_window_frame_copy(kvm_frame_exchange_writer(frames), &source.frame));
     lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_mailboxes_publish_frame(&mailbox, frames) == LIB_STATUS_OK);
-    taken = kvm_component_mailboxes_take_frame(&mailbox);
+    taken = kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL);
     lib_test_assert(taken != LIB_NULL && lib_memory_compare(taken->text->base.cells,
         source.data.text.base.cells, sizeof(source.data.text.base.cells)) == 0);
     (void)kvm_window_frame_begin_graphics(&source);
@@ -130,7 +130,7 @@ int main(void)
     lib_test_assert(kvm_window_frame_copy(kvm_frame_exchange_writer(frames), &source.frame));
     lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_OK);
     kvm_component_mailboxes_finish_frame(&mailbox, LIB_TRUE);
-    taken = kvm_component_mailboxes_take_frame(&mailbox);
+    taken = kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL);
     lib_test_assert(taken != LIB_NULL && lib_memory_compare(taken->graphics->pixels,
         source.data.graphics.pixels, 35u * sizeof(source.data.graphics.pixels[0])) == 0);
     kvm_component_mailboxes_finish_frame(&mailbox, LIB_TRUE);
@@ -147,10 +147,10 @@ int main(void)
     check_copy(); /* Graphics -> text never exposes the old pixels. */
     lib_test_assert(kvm_window_frame_copy(kvm_frame_exchange_writer(frames), &source.frame));
     lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_OK);
-    taken = kvm_component_mailboxes_take_frame(&mailbox);
+    taken = kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL);
     lib_test_assert(taken != LIB_NULL && !taken->graphics);
     kvm_component_mailboxes_finish_frame(&mailbox, LIB_TRUE);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox) == LIB_NULL);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL) == LIB_NULL);
     (void)kvm_window_frame_begin_graphics(&source);
     source.data.graphics.stride = KVM_WINDOW_GRAPHICS_MAX_WIDTH + 1u;
     lib_memory_set(&destination.frame, 0xa5, sizeof(destination));
@@ -163,11 +163,11 @@ int main(void)
     writer->frame.text = LIB_NULL;
     writer->frame.graphics = LIB_NULL;
     lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_INVALID_ARGUMENT);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox) == LIB_NULL);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL) == LIB_NULL);
     writer->frame.text = &writer->data.text;
     writer->frame.graphics = &writer->data.graphics;
     lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_INVALID_ARGUMENT);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox) == LIB_NULL);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL) == LIB_NULL);
     kvm_component_mailboxes_destroy(&mailbox);
     kvm_frame_exchange_destroy(frames);
     return 0;

@@ -101,7 +101,7 @@ int main(void)
 
     /* Notification binds one exchange; consumption transfers its actual pointer. */
     kvm_frame_exchange *frames;
-    lib_test_assert(kvm_frame_exchange_create(&frames, 1u, LIB_FALSE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, 1u) == LIB_STATUS_OK);
     lib_u8 *frame = kvm_frame_exchange_writer(frames);
     *frame = 0x5au;
     kvm_frame_exchange_publish(frames);
@@ -109,7 +109,7 @@ int main(void)
     lib_test_assert(kvm_component_publish_frame(&first, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT);
     lib_test_assert(kvm_component_publish_frame(&first, frames) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_wait(first.mailboxes.wake, 0u) == BASE_SYNC_WAIT_SIGNALED);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&first.mailboxes) == frame);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&first.mailboxes, LIB_NULL) == frame);
     lib_test_assert(*frame == 0x5au);
     kvm_component_mailboxes_finish_frame(&first.mailboxes, LIB_TRUE);
 

@@ -338,6 +338,8 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     if (columns > KVM_TEXT_COLUMNS || rows > KVM_TEXT_ROWS)
         return LIB_STATUS_UNSUPPORTED;
     if (stride < columns) return LIB_STATUS_INVALID_ARGUMENT;
+    if (!softpc_machine_presentation_take_text_dirty(driver->machine))
+        return LIB_STATUS_OK;
     text = kvm_window_frame_begin_text(frame);
     lib_memory_set(text, 0, sizeof(*text));
     targets[0] = &text->base;

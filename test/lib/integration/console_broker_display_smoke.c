@@ -338,7 +338,7 @@ static void check_retained_console_restore(void)
     snapshot(&cooked_display);
     options.input_sink = restore_input; options.failure_sink = restore_failure;
     lib_test_assert(kvm_console_create(&console, &options) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame), LIB_FALSE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame)) == LIB_STATUS_OK);
     kvm_console_text_frame *frame = kvm_frame_exchange_writer(frames);
     frame->base.text_columns=80; frame->base.text_rows=25;
     frame->base.cursor_mode=KVM_CURSOR_HOST;

@@ -73,7 +73,9 @@ typedef struct emulator_machine_driver {
     void (*set_executor_callback)(void *context,
         emulator_machine_executor_callback callback, void *callback_context);
     void (*deliver_input)(void *context, const kvm_input_event *event);
-    /* Return a complete frame on display change (including palette/geometry).
+    /* produced means a complete frame is ready for publication. Machine does
+     * not compare content: dirty/readiness policy belongs solely to the driver,
+     * which may always produce when it has no update signal.
      * First ready output must be published. OK with produced == false means
      * no new ready frame. Set produced only after completing both required outputs. Publications may be skipped by latest-wins consumers;
      * no incremental damage contract crosses this boundary. Failure does not
@@ -133,7 +135,7 @@ lib_bool emulator_machine_enqueue_input(emulator_machine *machine,
 kvm_frame_exchange *emulator_machine_frame_exchange(emulator_machine *machine);
 kvm_frame_exchange *emulator_machine_console_exchange(emulator_machine *machine);
 /* Install before starting the executor. The optional graphics-mode Console
- * producer fills the same three-slot stream as the driver's text output.
+ * producer fills the same four-slot stream as the driver's text output.
  * Context must remain alive until Machine shutdown; callback performs no UI I/O. */
 void emulator_machine_set_console_status_source(emulator_machine *machine,
     void (*produce)(void *context, kvm_console_text_frame *frame), void *context);

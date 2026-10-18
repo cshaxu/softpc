@@ -209,6 +209,9 @@ BOOL softpc_compat_scroll_console_buffer(HANDLE output,
 BOOL softpc_compat_set_console_cursor_position(HANDLE output, COORD position)
 {
     UNUSED(output);
+    if (!softpc_compat_cursor_position_valid ||
+        softpc_compat_cursor_column != position.X || softpc_compat_cursor_row != position.Y)
+        softpc_standalone_text_damage();
     softpc_compat_cursor_column = position.X;
     softpc_compat_cursor_row = position.Y;
     softpc_compat_cursor_position_valid = 1;
@@ -220,6 +223,9 @@ BOOL softpc_compat_set_console_cursor_info(HANDLE output,
 {
     UNUSED(output);
     if (cursor != NULL) {
+        if (softpc_compat_cursor_size != cursor->dwSize ||
+            softpc_compat_cursor_visible != (cursor->bVisible != FALSE))
+            softpc_standalone_text_damage();
         softpc_compat_cursor_size = cursor->dwSize;
         softpc_compat_cursor_visible = cursor->bVisible != FALSE;
     }

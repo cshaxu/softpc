@@ -5,23 +5,23 @@
 
 typedef struct kvm_frame_exchange kvm_frame_exchange;
 
-/* One producer and one consumer, with three (replace held input at take) or
- * four (retain old displayed input through finish) reusable frames.
+/* One producer and one consumer, with four reusable frames:
+ * producing, pending, processing and displayed.
  * Contents belong to the caller.
  * The producer alone writes writer(), outside the exchange lock. Publication
  * transfers that storage and supplies another writer without waiting for the
  * consumer. No allocation or payload copy occurs after create.
  * Destroy requires both participants and all observers to have stopped. */
 lib_status kvm_frame_exchange_create(kvm_frame_exchange **out_exchange,
-    lib_size frame_size, lib_bool retain_displayed);
+    lib_size frame_size);
 void kvm_frame_exchange_destroy(kvm_frame_exchange *exchange);
 void *kvm_frame_exchange_writer(kvm_frame_exchange *exchange);
 void kvm_frame_exchange_publish(kvm_frame_exchange *exchange);
-/* One outstanding take. Its immutable input remains owned until finish.
- * Finish retains the current input; four slots retain the previous displayed
- * input instead on failure. Failure requeues only an unsuperseded input.
+/* One outstanding take. Both the returned input and optional previous displayed
+ * input remain immutable until finish. Successful finish replaces displayed;
+ * failure preserves it and requeues only an unsuperseded input.
  * No host drawing/output may hold the exchange lock. */
-const void *kvm_frame_exchange_take(kvm_frame_exchange *exchange);
+const void *kvm_frame_exchange_take(kvm_frame_exchange *exchange, const void **previous);
 void kvm_frame_exchange_finish(kvm_frame_exchange *exchange, lib_bool success);
 /* Requeue the consumer-held input only when no newer frame is pending.
  * Safe during output; a repeated request coalesces in the existing pending

@@ -500,11 +500,11 @@ static void check_publication(void)
     (void)kvm_window_frame_begin_text(&candidate);
     candidate.data.text.base.text_columns = candidate.data.text.base.text_rows = 1;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-    lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK); /* Unchanged text suppressed. */
-    lib_test_assert(emulator_machine_published_frame_sequence(active) == 4);
+    lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK); /* Produced, even if identical. */
+    lib_test_assert(emulator_machine_published_frame_sequence(active) == 5);
     candidate.data.text.base.cursor_column = 1;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-    lib_test_assert(emulator_machine_published_frame_sequence(active) == 5);
+    lib_test_assert(emulator_machine_published_frame_sequence(active) == 6);
     for (lib_u32 field = 0; field < 5; ++field) {
         if (field == 0) candidate.data.text.base.cells[0].foreground = 1;
         if (field == 1) candidate.data.text.base.cells[0].background = 2;
@@ -512,9 +512,9 @@ static void check_publication(void)
         if (field == 3) candidate.data.text.base.text_palette[1] = 0x123456;
         if (field == 4) candidate.data.text.base.cells[0].glyph_index = 'X';
         lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-        lib_test_assert(emulator_machine_published_frame_sequence(active) == 6 + field);
+        lib_test_assert(emulator_machine_published_frame_sequence(active) == 7 + 2 * field);
         lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-        lib_test_assert(emulator_machine_published_frame_sequence(active) == 6 + field);
+        lib_test_assert(emulator_machine_published_frame_sequence(active) == 8 + 2 * field);
     }
     candidate.data.text.base.text_columns = 80;
     candidate.data.text.base.text_rows = 50;
@@ -523,26 +523,26 @@ static void check_publication(void)
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
     lib_test_assert(emulator_machine_copy_published_frame(active, &captured,
         emulator_machine_run_generation(active)));
-    lib_test_assert(captured.frame.sequence == 12 &&
+    lib_test_assert(captured.frame.sequence == 18 &&
         captured.data.text.base.cells[3999].glyph_index == 'Z');
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-    lib_test_assert(emulator_machine_published_frame_sequence(active) == 12);
+    lib_test_assert(emulator_machine_published_frame_sequence(active) == 19);
     active->published_frame_sequence = LIB_UINT32_MAX - 1u;
     candidate.data.text.base.cells[0].glyph_index = 'Y';
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
     lib_test_assert(emulator_machine_published_frame_sequence(active) == LIB_UINT32_MAX);
     /* Restart invalidates publication, never the immutable input held by a
      * consumer. The old generation must not become visible to new observers. */
-    const kvm_window_frame *held = kvm_frame_exchange_take(active->frames);
+    const kvm_window_frame *held = kvm_frame_exchange_take(active->frames, LIB_NULL);
     lib_test_assert(held != LIB_NULL && held->sequence == LIB_UINT32_MAX);
     emulator_machine_begin_cold_run(active, LIB_FALSE);
     lib_test_assert(held->text != LIB_NULL && held->sequence == LIB_UINT32_MAX);
     kvm_frame_exchange_finish(active->frames, LIB_FALSE);
-    lib_test_assert(kvm_frame_exchange_take(active->frames) == LIB_NULL);
+    lib_test_assert(kvm_frame_exchange_take(active->frames, LIB_NULL) == LIB_NULL);
     lib_test_assert(!emulator_machine_copy_published_frame(active, &captured, 0u));
     lib_test_assert(!emulator_machine_copy_published_frame(active, &captured,
         emulator_machine_run_generation(active)));
-    lib_test_assert(captured.frame.sequence == 12u &&
+    lib_test_assert(captured.frame.sequence == 18u &&
         captured.data.text.base.cells[3999].glyph_index == 'Z');
     candidate_ready = LIB_FALSE;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
@@ -553,7 +553,7 @@ static void check_publication(void)
     lib_test_assert(emulator_machine_copy_published_frame(active, &captured,
         emulator_machine_run_generation(active)));
     lib_test_assert(captured.frame.sequence == 1u); /* Restart retains the counter; wrap skips zero. */
-    const kvm_console_text_frame *console = kvm_frame_exchange_take(active->console_frames);
+    const kvm_console_text_frame *console = kvm_frame_exchange_take(active->console_frames, LIB_NULL);
     lib_test_assert(console == produced_console);
     lib_u32 sequence = 0u;
     lib_bool graphics = LIB_TRUE;
@@ -582,27 +582,27 @@ static void check_publication(void)
     lib_test_assert(emulator_machine_published_frame_sequence(active) == 3u);
     lib_test_assert(console->characters.primary[65] == 0u);
     kvm_frame_exchange_finish(active->console_frames, LIB_TRUE);
-    console = kvm_frame_exchange_take(active->console_frames);
+    console = kvm_frame_exchange_take(active->console_frames, LIB_NULL);
     lib_test_assert(console == produced_console && console->characters.primary[65] == 0x263au &&
         console->characters.secondary[65] == 0x2665u);
     kvm_frame_exchange_finish(active->console_frames, LIB_TRUE);
-    lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK); /* Unchanged text. */
-    lib_test_assert(emulator_machine_published_frame_sequence(active) == 3u);
+    lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK); /* Produced unchanged text still advances. */
+    lib_test_assert(emulator_machine_published_frame_sequence(active) == 4u);
     candidate_map.primary[65] = 0xd800u;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_INVALID_ARGUMENT);
-    lib_test_assert(emulator_machine_published_frame_sequence(active) == 3u);
+    lib_test_assert(emulator_machine_published_frame_sequence(active) == 4u);
     candidate_map.primary[65] = 0x263au;
     lib_memory_set(&candidate, 0, sizeof(candidate));
     candidate_ready = LIB_TRUE;
     (void)kvm_window_frame_begin_graphics(&candidate);
     candidate.data.graphics.width = candidate.data.graphics.height = candidate.data.graphics.stride = 1u;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-    console = kvm_frame_exchange_take(active->console_frames);
+    console = kvm_frame_exchange_take(active->console_frames, LIB_NULL);
     lib_test_assert(console == produced_console && console->base.cells[0].glyph_index == 'S');
     kvm_frame_exchange_finish(active->console_frames, LIB_TRUE);
     candidate_ready = LIB_FALSE;
     lib_test_assert(emulator_machine_publish(active) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_take(active->console_frames) == LIB_NULL);
+    lib_test_assert(kvm_frame_exchange_take(active->console_frames, LIB_NULL) == LIB_NULL);
     lib_test_assert(emulator_machine_destroy(active) == LIB_STATUS_OK);
 }
 
@@ -709,24 +709,6 @@ int main(void)
     output = (emulator_machine *)&invalid_driver;
     lib_test_assert(emulator_machine_create(&output, &invalid_driver) == LIB_STATUS_INVALID_ARGUMENT && output == LIB_NULL);
     lib_test_assert(lib_offsetof(kvm_window_frame_storage, frame) == 0u);
-    /* Resource-only changes are publications, not just character changes. */
-    static kvm_window_frame_storage before, after;
-    (void)kvm_window_frame_begin_text(&before);
-    before.data.text.base.text_columns = 80u;
-    before.data.text.base.text_rows = 25u;
-    lib_test_assert(kvm_window_frame_copy(&after, &before.frame));
-    lib_test_assert(!emulator_machine_text_frame_changed(&before.frame, &after.frame));
-    after.data.text.base.cursor_mode = KVM_CURSOR_SOURCE;
-    lib_test_assert(emulator_machine_text_frame_changed(&before.frame, &after.frame));
-    lib_test_assert(kvm_window_frame_copy(&before, &after.frame));
-    after.data.text.base.cursor_phase = LIB_TRUE;
-    lib_test_assert(emulator_machine_text_frame_changed(&before.frame, &after.frame));
-    lib_test_assert(kvm_window_frame_copy(&before, &after.frame));
-    after.data.text.font[65u * KVM_WINDOW_FONT_HEIGHT] = 0xffu;
-    lib_test_assert(emulator_machine_text_frame_changed(&before.frame, &after.frame));
-    lib_test_assert(kvm_window_frame_copy(&before, &after.frame));
-    after.data.text.secondary_font[65u * KVM_WINDOW_FONT_HEIGHT] = 0x81u;
-    lib_test_assert(emulator_machine_text_frame_changed(&before.frame, &after.frame));
     check(BASE_SYNC_WAIT_FAULT, 0u);
     check(BASE_SYNC_WAIT_INVALID_ARGUMENT, 0u);
     check(BASE_SYNC_WAIT_TIMED_OUT, 0u);

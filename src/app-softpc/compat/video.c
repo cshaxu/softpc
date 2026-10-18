@@ -47,6 +47,8 @@ void softpc_platform_presentation_request_refresh(void)
 {
     if (softpc_platform_presentation_is_graphics())
         nt_mark_screen_refresh();
+    else
+        softpc_standalone_text_damage();
 }
 
 int softpc_platform_presentation_cursor(long *column_out, long *row_out,

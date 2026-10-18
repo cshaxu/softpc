@@ -497,7 +497,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     const kvm_window_frame *previous = context->frame;
     const kvm_window_frame *incoming;
     if (!win32_window_accepting_input(context)) return;
-    incoming = kvm_component_mailboxes_take_frame(&context->component->base.mailboxes);
+    incoming = kvm_component_mailboxes_take_frame(&context->component->base.mailboxes, LIB_NULL);
     if (incoming == LIB_NULL) return;
     context->frame = incoming;
     if (!context->frame->graphics && context->frame->text->base.cursor_mode == KVM_CURSOR_HOST &&

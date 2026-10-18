@@ -80,38 +80,13 @@ static void emulator_machine_invalidate_published_frame(emulator_machine *machin
     base_sync_mutex_unlock(machine->frame_lock);
 }
 
-static lib_bool emulator_machine_text_frame_changed(const kvm_window_frame *previous,
-    const kvm_window_frame *candidate)
-{
-    if (previous->text == LIB_NULL) return LIB_TRUE;
-    const kvm_text_frame *old_text = &previous->text->base;
-    const kvm_text_frame *new_text = &candidate->text->base;
-    return old_text->text_columns != new_text->text_columns ||
-        old_text->text_rows != new_text->text_rows ||
-        old_text->cursor_column != new_text->cursor_column ||
-        old_text->cursor_row != new_text->cursor_row ||
-        old_text->cursor_top != new_text->cursor_top ||
-        old_text->cursor_bottom != new_text->cursor_bottom ||
-        old_text->cursor_mode != new_text->cursor_mode ||
-        old_text->cursor_phase != new_text->cursor_phase ||
-        old_text->font_height != new_text->font_height ||
-        lib_memory_compare(old_text->cells, new_text->cells, sizeof(new_text->cells)) != 0 ||
-        lib_memory_compare(old_text->text_palette, new_text->text_palette,
-            sizeof(new_text->text_palette)) != 0 ||
-        lib_memory_compare(previous->text->font, candidate->text->font, sizeof(candidate->text->font)) != 0 ||
-        lib_memory_compare(previous->text->secondary_font, candidate->text->secondary_font,
-            sizeof(candidate->text->secondary_font)) != 0;
-}
-
 static lib_status emulator_machine_publish(emulator_machine *machine)
 {
     kvm_window_frame_storage *storage;
     kvm_window_frame *frame;
-    const kvm_window_frame *previous;
     kvm_console_text_frame *console;
-    const kvm_console_text_frame *previous_console;
     lib_status status;
-    lib_bool changed, produced = LIB_FALSE;
+    lib_bool produced = LIB_FALSE;
     lib_u32 generation;
     if (machine == LIB_NULL || machine->driver.copy_frame == LIB_NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
@@ -122,18 +97,6 @@ static lib_status emulator_machine_publish(emulator_machine *machine)
     if (status != LIB_STATUS_OK || !produced) return status;
     status = kvm_window_frame_validate(frame);
     if (status != LIB_STATUS_OK) return status;
-    previous = kvm_frame_exchange_lock_latest(machine->frames);
-    changed = previous == LIB_NULL || frame->graphics ||
-        emulator_machine_text_frame_changed(previous, frame);
-    kvm_frame_exchange_unlock(machine->frames);
-    if (!frame->graphics) {
-        previous_console = kvm_frame_exchange_lock_latest(machine->console_frames);
-        changed = changed || previous_console == LIB_NULL ||
-            lib_memory_compare(&previous_console->characters, &console->characters,
-                sizeof(console->characters)) != 0;
-        kvm_frame_exchange_unlock(machine->console_frames);
-    }
-    if (!changed) return LIB_STATUS_OK;
     if (frame->graphics && machine->console_status_source != LIB_NULL)
         machine->console_status_source(machine->console_status_context, console);
     if (!frame->graphics || machine->console_status_source != LIB_NULL) {
@@ -652,10 +615,10 @@ lib_status emulator_machine_create(emulator_machine **out_machine,
     if (status == LIB_STATUS_OK) status = emulator_machine_input_queue_initialize(&machine->input_queue);
     if (status == LIB_STATUS_OK)
         status = kvm_frame_exchange_create(&machine->frames,
-            sizeof(kvm_window_frame_storage), LIB_TRUE);
+            sizeof(kvm_window_frame_storage));
     if (status == LIB_STATUS_OK)
         status = kvm_frame_exchange_create(&machine->console_frames,
-            sizeof(kvm_console_text_frame), LIB_FALSE);
+            sizeof(kvm_console_text_frame));
     if (status == LIB_STATUS_OK)
         status = base_sync_task_create(emulator_machine_worker, machine, &machine->worker);
     if (status != LIB_STATUS_OK) {

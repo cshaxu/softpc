@@ -22,7 +22,7 @@ static void damage(void)
     frame.data.graphics.width = frame.data.graphics.stride = 4u;
     frame.data.graphics.height = 4u;
     lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_OK);
-    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes);
+    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes, LIB_NULL);
     lib_test_assert(received != LIB_NULL);
     /* First all-black frame still invalidates the entire surface. */
     lib_test_assert(kvm_window_render_frame(received, surface, 4, 4, &valid, &changed));
@@ -49,7 +49,7 @@ static void damage(void)
     lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_OK);
     frame.data.graphics.pixels[10] = 0x445566u;
     lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_OK);
-    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes);
+    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes, LIB_NULL);
     lib_test_assert(received != LIB_NULL);
     lib_test_assert(kvm_window_render_frame(received, surface, 4, 4, &valid, &changed));
     lib_test_assert(changed.left == 1 && changed.top == 1 && changed.right == 3 && changed.bottom == 3);
@@ -60,13 +60,13 @@ static void damage(void)
     frame.data.graphics.pixels[0] = 0x445566u;
     lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_OK);
     kvm_component_mailboxes_finish_frame(&window.base.mailboxes, LIB_TRUE);
-    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes);
+    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes, LIB_NULL);
     lib_test_assert(received != LIB_NULL);
     lib_test_assert(received != old);
     lib_test_assert(kvm_window_render_frame(received, surface, 4, 4, &valid, &changed));
     lib_test_assert(changed.left == 0 && changed.top == 0 && changed.right == 1 && changed.bottom == 1);
     kvm_component_mailboxes_finish_frame(&window.base.mailboxes, LIB_TRUE);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&window.base.mailboxes) == LIB_NULL);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&window.base.mailboxes, LIB_NULL) == LIB_NULL);
     /* Only the changed RGB pixel damages the surface. */
     frame.data.graphics.pixels[5] = 0xffu;
     lib_test_assert(kvm_window_render_frame(&frame.frame, surface, 4, 4, &valid, &changed));
@@ -108,7 +108,7 @@ static void rgb_coverage(void)
     lib_test_assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes, LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_SIGNALED);
-    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes);
+    received = kvm_component_mailboxes_take_frame(&window.base.mailboxes, LIB_NULL);
     lib_test_assert(received != LIB_NULL);
     lib_test_assert(kvm_window_render_frame(received, surface, 64, 32, &valid, &changed));
     for (lib_u32 i = 0u; i < 2048u; ++i) lib_test_assert(surface[i] == 0x123400u + i);
@@ -360,7 +360,7 @@ static void text_coverage(void)
 }
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage), LIB_TRUE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage)) == LIB_STATUS_OK);
     damage(); rgb_coverage(); motion(); rendering(); text_coverage();
     kvm_frame_exchange_destroy(frames);
     return 0;

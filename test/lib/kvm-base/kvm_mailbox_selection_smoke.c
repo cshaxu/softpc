@@ -78,7 +78,7 @@ int main(void)
     lib_test_assert(signals == 1u && notifications == 1u && creates == 2u);
     kvm_component_control control = { .kind = 1u }, taken;
     kvm_frame_exchange *frames;
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(lib_u32), LIB_FALSE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(lib_u32)) == LIB_STATUS_OK);
     lib_u32 *value = kvm_frame_exchange_writer(frames);
     *value = 0x12345678u;
     kvm_frame_exchange_publish(frames);
@@ -90,10 +90,10 @@ int main(void)
     lib_test_assert(kvm_component_mailboxes_enqueue_control(&mailbox, &control) == LIB_STATUS_INVALID_STATE);
     lib_test_assert(kvm_component_mailboxes_take_control(&mailbox, &taken) && taken.kind == 1u);
     lib_test_assert(!kvm_component_mailboxes_take_control(&mailbox, &taken));
-    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox) == value);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL) == value);
     lib_test_assert(*value == 0x12345678u); /* Closure retains accepted state. */
     kvm_component_mailboxes_finish_frame(&mailbox, LIB_TRUE);
-    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox) == LIB_NULL);
+    lib_test_assert(kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL) == LIB_NULL);
     kvm_component_mailboxes_destroy(&mailbox);
     kvm_frame_exchange_destroy(frames);
     lib_test_assert(destroys == 1u);

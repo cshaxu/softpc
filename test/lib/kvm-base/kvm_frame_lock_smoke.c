@@ -26,7 +26,7 @@ static lib_win32_dword LIB_WIN32_WINAPI compete(void *unused)
     if (operation == 0)
         lib_test_assert(kvm_component_mailboxes_publish_frame(&mailbox, frames) == LIB_STATUS_OK);
     else if (operation == 1) {
-        const lib_u32 *frame = kvm_component_mailboxes_take_frame(&mailbox);
+        const lib_u32 *frame = kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL);
         lib_test_assert(frame != LIB_NULL && *frame == 80u);
         kvm_component_mailboxes_finish_frame(&mailbox, LIB_TRUE);
     } else if (operation == 2)
@@ -44,7 +44,7 @@ int main(void)
         lib_win32_handle thread;
         kvm_component_control taken;
         const kvm_component_control title = { .kind = 42u };
-        lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(lib_u32), LIB_FALSE) == LIB_STATUS_OK);
+        lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(lib_u32)) == LIB_STATUS_OK);
         *(lib_u32 *)kvm_frame_exchange_writer(frames) = 80u;
         kvm_frame_exchange_publish(frames);
         lib_test_assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_OK);
@@ -58,7 +58,7 @@ int main(void)
         lib_test_assert(lib_win32_wait_for_single_object(thread, 0) == LIB_WIN32_WAIT_TIMEOUT);
         /* Even STOP's pending frame-lock acquisition must not hold control. */
         if (operation == 3) {
-                    const lib_u32 *frame = kvm_component_mailboxes_take_frame(&mailbox);
+                    const lib_u32 *frame = kvm_component_mailboxes_take_frame(&mailbox, LIB_NULL);
             lib_test_assert(frame != LIB_NULL && *frame == 80u);
             kvm_component_mailboxes_finish_frame(&mailbox, LIB_TRUE);
         } else {

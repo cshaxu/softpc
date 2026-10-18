@@ -98,6 +98,9 @@ int softpc_machine_presentation_dib(const softpc_machine *machine,
     const void **bits_out, const void **info_out, lib_u32 *width_out,
     lib_u32 *height_out);
 
+/* Consume completed host-text update readiness on the executor only. */
+int softpc_machine_presentation_take_text_dirty(const softpc_machine *machine);
+
 /* Borrow the original nt_cga text-presenter surface.  Cells are four bytes
  * wide in this standalone build: the character and attribute occupy the
  * first two bytes, followed by the original renderer's padding.  The caller

@@ -219,8 +219,8 @@ int main(void)
     static kvm_window_frame_storage frame;
     kvm_console_character_map characters = { 0 };
     lib_u32 sequence;
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(frame), LIB_TRUE) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_create(&console_exchange, sizeof(kvm_console_text_frame), LIB_FALSE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&console_exchange, sizeof(kvm_console_text_frame)) == LIB_STATUS_OK);
     lib_test_assert(emulator_ui_create(LIB_NULL, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT);
     ui = (emulator_ui *)&options;
     lib_test_assert(emulator_ui_create(&ui, LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT && ui == LIB_NULL);

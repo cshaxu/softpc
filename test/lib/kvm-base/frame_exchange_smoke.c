@@ -38,51 +38,53 @@ static void check(const test_frame *frame, lib_u32 serial)
         frame->complement == ~serial);
 }
 
-static void exercise(lib_bool retained)
+static void exercise(void)
 {
     kvm_frame_exchange *exchange = LIB_NULL;
     const test_frame *processing, *displayed;
     void *slots[4] = { 0 };
     lib_u32 count = 0u;
     lib_test_assert(kvm_frame_exchange_create(&exchange,
-        sizeof(test_frame), retained) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_take(exchange) == LIB_NULL);
+        sizeof(test_frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == LIB_NULL);
     lib_test_assert(kvm_frame_exchange_lock_latest(exchange) == LIB_NULL);
     kvm_frame_exchange_unlock(exchange);
     publish(exchange, 1u);
-    displayed = kvm_frame_exchange_take(exchange);
+    displayed = kvm_frame_exchange_take(exchange, LIB_NULL);
     check(displayed, 1u);
     kvm_frame_exchange_finish(exchange, LIB_TRUE);
-    if (!retained) {
+    {
         test_frame *writer = kvm_frame_exchange_writer(exchange);
         lib_test_assert(writer != displayed);
         writer->serial = 999u;
         check(displayed, 1u);
         kvm_frame_exchange_redraw(exchange);
         kvm_frame_exchange_redraw(exchange);
-        lib_test_assert(kvm_frame_exchange_take(exchange) == displayed);
+        lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == displayed);
         /* Activation racing an in-flight output retains one pending redraw. */
         kvm_frame_exchange_redraw(exchange);
         kvm_frame_exchange_finish(exchange, LIB_TRUE);
-        lib_test_assert(kvm_frame_exchange_take(exchange) == displayed);
+        lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == displayed);
         kvm_frame_exchange_finish(exchange, LIB_TRUE);
-        lib_test_assert(kvm_frame_exchange_take(exchange) == LIB_NULL);
+        lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == LIB_NULL);
     }
     publish(exchange, 2u);
-    processing = kvm_frame_exchange_take(exchange);
+    const void *previous;
+    processing = kvm_frame_exchange_take(exchange, &previous);
+    lib_test_assert(previous == displayed);
     check(processing, 2u);
-    lib_test_assert(kvm_frame_exchange_take(exchange) == LIB_NULL);
+    lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == LIB_NULL);
     /* A stalled consumer cannot prevent publication or mutate held inputs.
      * Record distinct writer addresses rather than merely checking values. */
     for (lib_u32 serial = 3u; serial < 10003u; ++serial) {
         void *writer = kvm_frame_exchange_writer(exchange);
         lib_u32 i;
-        lib_test_assert(writer != processing && (!retained || writer != displayed));
+        lib_test_assert(writer != processing && writer != displayed);
         for (i = 0u; i < count && slots[i] != writer; ++i) {}
         if (i == count) { lib_test_assert(count < 2u); slots[count++] = writer; }
         publish(exchange, serial);
         check(processing, 2u);
-        if (retained) check(displayed, 1u);
+        check(displayed, 1u);
         check(kvm_frame_exchange_lock_latest(exchange), serial);
         kvm_frame_exchange_unlock(exchange);
     }
@@ -90,14 +92,16 @@ static void exercise(lib_bool retained)
     /* Failed old output must never replace the newer pending publication. */
     kvm_frame_exchange_redraw(exchange);
     kvm_frame_exchange_finish(exchange, LIB_FALSE);
-    processing = kvm_frame_exchange_take(exchange);
+    processing = kvm_frame_exchange_take(exchange, &previous);
+    lib_test_assert(previous == displayed);
+    check(displayed, 1u);
     check(processing, 10002u);
     kvm_frame_exchange_finish(exchange, LIB_FALSE);
-    lib_test_assert(kvm_frame_exchange_take(exchange) == processing);
+    lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == processing);
     kvm_frame_exchange_finish(exchange, LIB_TRUE);
-    lib_test_assert(kvm_frame_exchange_take(exchange) == LIB_NULL);
+    lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == LIB_NULL);
     kvm_frame_exchange_detach(exchange);
-    check(kvm_frame_exchange_take(exchange), 10002u);
+    check(kvm_frame_exchange_take(exchange, LIB_NULL), 10002u);
     /* Invalidating a run cannot write into an in-flight immutable input or
      * requeue it when that consumer finishes. */
     kvm_frame_exchange_invalidate(exchange);
@@ -106,9 +110,9 @@ static void exercise(lib_bool retained)
     lib_test_assert(kvm_frame_exchange_lock_latest(exchange) == LIB_NULL);
     kvm_frame_exchange_unlock(exchange);
     kvm_frame_exchange_finish(exchange, LIB_FALSE);
-    lib_test_assert(kvm_frame_exchange_take(exchange) == LIB_NULL);
+    lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == LIB_NULL);
     publish(exchange, 10003u);
-    check(kvm_frame_exchange_take(exchange), 10003u);
+    check(kvm_frame_exchange_take(exchange, LIB_NULL), 10003u);
     kvm_frame_exchange_finish(exchange, LIB_TRUE);
     kvm_frame_exchange_detach(exchange);
     kvm_frame_exchange_destroy(exchange);
@@ -129,20 +133,20 @@ static void produce(void *context, const base_sync_task *task)
     lib_test_assert(base_sync_event_signal(test->produced) == LIB_STATUS_OK);
 }
 
-static void concurrent_exchange(lib_bool retained)
+static void concurrent_exchange(void)
 {
     concurrent_test test = { 0 };
     base_sync_task *producer;
     const test_frame *displayed, *processing;
     lib_test_assert(kvm_frame_exchange_create(&test.exchange,
-        sizeof(test_frame), retained) == LIB_STATUS_OK);
+        sizeof(test_frame)) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.held) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.produced) == LIB_STATUS_OK);
     publish(test.exchange, 1u);
-    displayed = kvm_frame_exchange_take(test.exchange);
+    displayed = kvm_frame_exchange_take(test.exchange, LIB_NULL);
     kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
     publish(test.exchange, 2u);
-    processing = kvm_frame_exchange_take(test.exchange);
+    processing = kvm_frame_exchange_take(test.exchange, LIB_NULL);
     lib_test_assert(base_sync_task_create(produce, &test, &producer) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_signal(test.held) == LIB_STATUS_OK);
     /* Actual concurrent reads, while the producer repeatedly overwrites the
@@ -150,13 +154,13 @@ static void concurrent_exchange(lib_bool retained)
     base_sync_wait_result result;
     do {
         check(processing, 2u);
-        if (retained) check(displayed, 1u);
+        check(displayed, 1u);
         result = base_sync_event_wait(test.produced, 0u);
     } while (result == BASE_SYNC_WAIT_TIMED_OUT);
     lib_test_assert(result == BASE_SYNC_WAIT_SIGNALED);
     lib_test_assert(base_sync_task_destroy(producer) == LIB_STATUS_OK);
     kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
-    check(kvm_frame_exchange_take(test.exchange), 100000u);
+    check(kvm_frame_exchange_take(test.exchange, LIB_NULL), 100000u);
     kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
     base_sync_event_destroy(test.held);
     base_sync_event_destroy(test.produced);
@@ -178,7 +182,7 @@ static void produce_turnover(void *context, const base_sync_task *task)
     }
 }
 
-static void concurrent_turnover(lib_bool retained)
+static void concurrent_turnover(void)
 {
     concurrent_test test = { 0 };
     base_sync_task *producer;
@@ -186,12 +190,12 @@ static void concurrent_turnover(lib_bool retained)
     lib_u32 last = 0u, displayed_serial = 0u, checkpoint = 0u, consumed = 0u;
     lib_bool previous_failed = LIB_FALSE;
     lib_test_assert(kvm_frame_exchange_create(&test.exchange,
-        sizeof(test_frame), retained) == LIB_STATUS_OK);
+        sizeof(test_frame)) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.held) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.produced) == LIB_STATUS_OK);
     lib_test_assert(base_sync_task_create(produce_turnover, &test, &producer) == LIB_STATUS_OK);
     while (last < 32000u) {
-        const test_frame *processing = kvm_frame_exchange_take(test.exchange);
+        const test_frame *processing = kvm_frame_exchange_take(test.exchange, LIB_NULL);
         if (processing == LIB_NULL) {
             lib_test_assert(base_sync_event_wait(test.produced, 5000u) == BASE_SYNC_WAIT_SIGNALED);
             continue;
@@ -214,7 +218,7 @@ static void concurrent_turnover(lib_bool retained)
         check(processing, serial);
         if (displayed != LIB_NULL) check(displayed, displayed_serial);
         kvm_frame_exchange_finish(test.exchange, success);
-        if (retained && success) {
+        if (success) {
             displayed = processing;
             displayed_serial = serial;
         }
@@ -227,9 +231,9 @@ static void concurrent_turnover(lib_bool retained)
     }
     lib_test_assert(consumed >= 1000u);
     lib_test_assert(base_sync_task_destroy(producer) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_take(test.exchange) == LIB_NULL);
+    lib_test_assert(kvm_frame_exchange_take(test.exchange, LIB_NULL) == LIB_NULL);
     kvm_frame_exchange_detach(test.exchange);
-    check(kvm_frame_exchange_take(test.exchange), 32000u);
+    check(kvm_frame_exchange_take(test.exchange, LIB_NULL), 32000u);
     kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
     base_sync_event_destroy(test.held);
     base_sync_event_destroy(test.produced);
@@ -239,24 +243,21 @@ static void concurrent_turnover(lib_bool retained)
 int main(void)
 {
     kvm_frame_exchange *exchange = (kvm_frame_exchange *)1;
-    lib_test_assert(kvm_frame_exchange_create(LIB_NULL, 1u, LIB_FALSE) ==
+    lib_test_assert(kvm_frame_exchange_create(LIB_NULL, 1u) ==
         LIB_STATUS_INVALID_ARGUMENT);
-    lib_test_assert(kvm_frame_exchange_create(&exchange, 0u, LIB_FALSE) ==
+    lib_test_assert(kvm_frame_exchange_create(&exchange, 0u) ==
         LIB_STATUS_INVALID_ARGUMENT && exchange == LIB_NULL);
     kvm_frame_exchange_destroy(LIB_NULL);
     for (fail_at = 1u; fail_at <= 5u; ++fail_at) {
         allocation = 0u;
-        lib_test_assert(kvm_frame_exchange_create(&exchange, sizeof(test_frame), LIB_TRUE) ==
+        lib_test_assert(kvm_frame_exchange_create(&exchange, sizeof(test_frame)) ==
             LIB_STATUS_NO_MEMORY);
         lib_test_assert(exchange == LIB_NULL && live_allocations == 0u);
     }
     fail_at = 0u;
-    exercise(LIB_FALSE);
-    exercise(LIB_TRUE);
-    concurrent_exchange(LIB_FALSE);
-    concurrent_exchange(LIB_TRUE);
-    concurrent_turnover(LIB_FALSE);
-    concurrent_turnover(LIB_TRUE);
+    exercise();
+    concurrent_exchange();
+    concurrent_turnover();
     lib_test_assert(live_allocations == 0u);
     return 0;
 }

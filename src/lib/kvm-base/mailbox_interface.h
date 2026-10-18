@@ -59,7 +59,8 @@ lib_status kvm_component_mailboxes_enqueue_control(
     kvm_component_mailboxes *mailboxes, const kvm_component_control *control);
 lib_bool kvm_component_mailboxes_take_control(kvm_component_mailboxes *mailboxes,
     kvm_component_control *out_control);
-const void *kvm_component_mailboxes_take_frame(kvm_component_mailboxes *mailboxes);
+const void *kvm_component_mailboxes_take_frame(kvm_component_mailboxes *mailboxes,
+    const void **previous);
 void kvm_component_mailboxes_redraw_frame(kvm_component_mailboxes *mailboxes);
 void kvm_component_mailboxes_finish_frame(kvm_component_mailboxes *mailboxes,
     lib_bool success);

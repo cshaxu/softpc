@@ -190,9 +190,9 @@ only those snapshots.
 
 ### Approved frame-transport migration
 
-T96 S5 uses bounded ownership circulation: Window has producing/pending/processing/displayed roles;
-Console has producing/pending/current roles; current is held during output and
-idle time until replaced at take. Session/UI route without an
+T96 uses bounded ownership circulation: both leaves use Base's fixed four
+producing/pending/processing/displayed roles. Displayed remains immutable until
+processing succeeds. Session/UI route without an
 additional historical payload owner. Unconsumed replacement and completed
 retirement return storage for reuse; controls/input remain copied values.
 Existing native surface remains separate. The source change is under qualification;
@@ -321,7 +321,7 @@ its title/freeze/release encoding and worker validation. Console has no ordinary
 control commands and rejects unknown records. Native leaf APIs remain typed;
 there is no application-facing raw control mailbox.
 
-Machine owns a four-slot Window exchange and a three-slot Console exchange.
+Machine owns a four-slot Window exchange and a four-slot Console exchange.
 Window slots contain a Lib-defined reference (sequence and exactly one text/
 graphics pointer) and reusable payload backing. Console slots contain text and
 character maps, without bitmap fonts. No Machine frame wrapper exists.
@@ -345,14 +345,17 @@ glyph bank, foreground and background palette indices. VM alone decodes device c
 from explicit independent values. Logical Console also carries separate colour
 indices; only its native broker packs them for the host API. This changes no
 mailbox, readiness, graphics or lifecycle policy.
-Emulator machine publishes complete snapshots on driver display change (including
-palette/geometry), preserving no-frame readiness and text comparison. Machine
+Emulator machine publishes every complete driver-produced frame, preserving
+no-frame readiness but performing no content comparison. Dirty/readiness belongs
+to the driver; a driver without dirty tracking may always produce. Machine
 and Window use the same pending authority: an older notice may select the latest
 complete frame without losing damage. VM alone supplies SoftPC character
 meaning; original producer dirty does not cross the KVM frame ABI.
-Take pins processing while releasing the pending slot. Window retires its old
-displayed input on successful finish. Console retires its held input at the next
-take and retains the replacement through output and idle time. Failure requeues only an unsuperseded input; it never
+Take pins processing while releasing the pending slot. Both leaves retain old
+displayed input until successful finish, then retain its replacement through
+idle time. Console compares mapped cells against that old input; the broker
+keeps only geometry/palette/tail metadata, not duplicate cell arrays. Native
+recovery overrides cell reuse. Failure requeues only an unsuperseded input; it never
 replaces newer pending content. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means

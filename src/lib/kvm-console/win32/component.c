@@ -18,6 +18,7 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_console_worker(void *opaque)
         LIB_MEMORY_ORDER_ACQUIRE) == 0) {
         kvm_component_control control;
         const kvm_console_text_frame *frame;
+        const void *previous;
         base_sync_wait_result wake = base_sync_event_wait(
             console->base.mailboxes.wake, LIB_UINT32_MAX);
         if (wake != BASE_SYNC_WAIT_SIGNALED) {
@@ -35,9 +36,9 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_console_worker(void *opaque)
             kvm_component_fail(&console->base, LIB_STATUS_INVALID_ARGUMENT);
             goto retired;
         }
-        frame = kvm_component_mailboxes_take_frame(&console->base.mailboxes);
+        frame = kvm_component_mailboxes_take_frame(&console->base.mailboxes, &previous);
         if (frame != LIB_NULL) {
-            lib_status status = kvm_console_publish_text_frame(console, frame);
+            lib_status status = kvm_console_publish_text_frame(console, frame, previous);
             kvm_component_mailboxes_finish_frame(&console->base.mailboxes,
                 status == LIB_STATUS_OK);
             if (status != LIB_STATUS_OK) {
