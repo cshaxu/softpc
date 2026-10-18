@@ -5,9 +5,11 @@
 T96 remains open. Owner accepted and closed S7 after the public-test governance
 delivery and actual-commit review. See the
 [S7 closure](../history/M9-T96-S7-frame-and-test-governance-closure.md).
-No implementation subtask is active.
-Open task awaiting owner: T96.
-No next S is admitted.
+Owner admits T96 S8: reproduce and repair Win3.1 MPU-401 installation,
+post-restart mouse loss and silent MIDI. Guest A/B evidence establishes an
+IRQ9 conflict with InPort and an incorrect MIDI Mapper destination. Corrected
+disposable guest playback is verified on both widths and audible on x64.
+S8 is verified, pending executor delivery/review and owner acceptance.
 
 S1-S7 are complete. Before whole-T closure, reconcile the final RGB/schema and
 four-slot ownership contracts, final fixed-frame storage accounting, downstream
@@ -16,7 +18,49 @@ The Win3.1 prompt-roundtrip readiness investigation remains explicitly deferred
 in [TODO](TODO.md); passing later runs do not establish its repair.
 User-owned untracked assets/binary/snapshot.debug remains untouched and excluded.
 
+## M9 T96 S8 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly admits a new S to reproduce and repair MIDI after Roland MPU-401 installation; T96 remains open. |
+| Objective | Establish the installation error, mouse regression and silent MIDI causes against the previously working Canyon route; minimally repair the responsible path and prove mouse/MIDI/WAV coexistence. |
+| Non-goals | No FM synthesizer, second audio route, unrelated frame redesign, user-media rewrite or automatic T closure. |
+| Reference Baseline | 5e76dd49; T95 recorded successful MPU Canyon followed by WAV, but did not prove this new installation sequence or mouse coexistence. |
+| Candidate Proposal | [T96 ledger](../proposals/m9-lib-rgb-graphics-frame.md); [prior MIDI evidence](../history/M9-T95-win31-midi-wav-playback-proposal.md). |
+| Files And ABI Surface | Investigate App-SoftPC original MPU/InPort/PIC paths, Compat MIDI and machine integration tests; select minimal production changes only after evidence. No public ABI change planned. |
+| Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator actual-diff review. |
+| Verification | Disposable guest replay from available checkpoints, installation/restart and MIDI Mapper inspection, IRQ/vector/mouse and complete MIDI-message probes; deterministic owner-local regression plus cached x86/x64 builds, full unit/gates and applicable full integration including native audio/desktop. No Computer Use. |
+| Expected Markers | One existing device/output path; music messages rather than only reset messages; mouse and keyboard survive restart and playback; subsequent WAV completes. |
+| Asset Needs | Preserve owner INI, media and snapshot.debug. Use task-owned disposable copies/overlays and bounded probes under ignored build/t96/s8; refresh only dual EXEs upon verified code repair. |
+| Reporting Requirements | Distinguish source deductions, guest reproduction and host output proof. Initial production estimate deferred until cause is located; report proposed and actual added/deleted/net lines before and after repair, including mirror diff if touched. |
+| Stop Conditions | Public ABI redesign, new device capability or unrelated mirror change requires scope revision. Do not substitute arbitrary IRQ changes or skipped native tests for diagnosis. |
+| Exit Criteria | Reproduced cause chain, minimal repair or evidenced configuration correction, similar-class sweep, dual-width proof/artifacts, actual-diff review, commit/push and owner acceptance. |
+| Original Owner Request | 安装了Roland MPU-401 MIDI以后，出现一个错误提示但是仍然允许我继续选择 330h + IRQ 2/9，我都点了，重启系统，发现鼠标无法使用但是键盘正常；然后打开mplayer播放midi，没有听到任何声音。准入一个新的S任务来复现和修复这个MIDI问题；BTW之前你在S1里面调研的时候我确实听到过播放的canyon MIDI音乐 |
+| Similar-Issue Sweep | MPU/InPort IRQ ownership, PIC vector/mask/EOI and reset/load, guest Mapper route, host acquisition/message status; each hit receives an explicit disposition, not a second implementation. |
+
 ## Current Technical Baseline
+
+### S8 MIDI configuration qualification
+
+- Correct configuration is MPU330/IRQ7, SB220/IRQ5 and all sixteen Mapper
+  ports routed to Roland MPU-401; [Product UI](../design/UI.md#windows-31-midi-playback)
+  owns the instructions. IRQ9 conflicts with the existing InPort mouse.
+- Both widths complete Canyon, subsequent Chord, mouse movement and Windows
+  exit/re-entry using disposable overlay snapshots. Owner confirms audible
+  Canyon on x64. First-install warning is observed before resource selection;
+  no recurring warning after correct configuration, but no driver-internal
+  branch disassembly or new MPU hardware-fix claim.
+- Cached dual builds and all 191 distinct tests per architecture pass, no
+  failures/skips: 175 unit/gates, eight background integrations, five desktop
+  and three native audio. Evidence: build/t96/s8/qualification; exit=0.
+- Production/test/mirror diff +0/-0. Source and public manifests unchanged.
+  x86 Ninja log recovery rebuilt/published the EXE; unchanged x64 stays current.
+  Existing warnings remain disclosed. SHA-256: softpc32
+  6A65D5127C6EBF567DCB7FD32F506541BF028FD42B69F9113CB09B363DF52C9A;
+  softpc64 E1B95ED71ACB371098C854FEF6FD4E3573B71BE98169243958F13DD2900A53C1.
+- User INI, media and snapshot.debug remain untouched. Probe guests have exited;
+  corrected overlay checkpoint is retained under the task evidence directory.
 
 ### S7 public-test governance
 
@@ -217,4 +261,4 @@ User-owned untracked assets/binary/snapshot.debug remains untouched and excluded
   T96 S5 resumes; no runtime or artifact change is claimed by this Td.
 
 T95 proposal is archived. T96 remains open for whole-task closure audit;
-S7 is owner-accepted and no further S is admitted.
+S7 is owner-accepted and S8 is active.

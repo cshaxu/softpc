@@ -298,6 +298,29 @@ virtual-key code or native control-state word. A platform adapter translates
 native input before emitting the event; SoftPC's private keyboard binding
 performs any conversion required by its original machine key mapper.
 
+## Windows 3.1 MIDI Playback
+
+Use the bundled Roland MPU-401 driver for the existing host-MIDI output path.
+Configure its port as 330h and its interrupt as IRQ7. Do not select IRQ2/9:
+SoftPC's InPort mouse owns IRQ9, and the MPU driver's IRQ9 configuration can
+mask mouse interrupts after Windows restarts. Leave Sound Blaster at its
+separate 220h/IRQ5 configuration. These are guest resource settings, not a
+host MIDI-device or Windows audio-endpoint selection.
+
+Installing the driver does not redirect MIDI Mapper. In Control Panel's MIDI
+Mapper, choose/edit the playback setup and set all sixteen channel ports to
+Roland MPU-401, retaining the channel numbers and enabled mappings. A setup
+named General MIDI is not sufficient if its ports still name Sound Blaster.
+Confirm saving the edited setup, then use the outer Mapper Close button to
+commit the selection; Escape can discard that outer transaction. Restart
+Windows and select Media Player's MIDI Sequencer to open the MIDI file.
+
+This route is MIDI playback through the host's available MIDI output. It does
+not add FM synthesis, Sound Blaster MIDI parsing or MPU MIDI-input interrupt
+support. An initial unconfigured-driver dialog was observed during installation;
+a recurring error after selecting and saving the resource settings requires
+investigation rather than being treated as a successful installation.
+
 ## Responsiveness
 
 The frontend remains responsive while the guest runs. Frame presentation is

@@ -3,7 +3,8 @@
 ## Status
 
 T96 was admitted on 2026-10-17 after T95 closure. Owner has accepted and closed
-S7; S1-S7 are complete. T96 remains open with no active S. See the
+S7; S1-S7 are complete. Owner subsequently admits S8 for the reported Win3.1
+MIDI installation/mouse regression; CURRENT owns its active packet. See the
 [S7 closure](../history/M9-T96-S7-frame-and-test-governance-closure.md).
 Before T closure, reconcile final ABI/adoption instructions, fixed-frame storage
 accounting and qualification evidence against the complete request. Earlier
@@ -1582,3 +1583,106 @@ job/log/exit path; future potentially long gate probes must do the same.
 No blocking finding within the admitted cleanup ledger. Source, root test
 infrastructure, user INI and media are unchanged; snapshot.debug remains
 untracked and untouched. This review prepares owner acceptance, not S/T closure.
+
+## S8 Win3.1 MPU installation and input coexistence investigation
+
+Owner admits the installation-error, post-restart mouse-loss and silent-MIDI
+chain after S7 acceptance. CURRENT owns the task contract. No production fix
+or new device capability is presumed from the report.
+
+The finite investigation ledger comprises installation/configuration error,
+IRQ ownership and mouse delivery after restart, active Mapper routing,
+completed musical MIDI output, subsequent WAV, and dual-width regression.
+Each requires direct evidence or an explicitly approved unresolved disposition;
+prior Canyon success alone does not prove mouse coexistence.
+
+Initial isolated guest replay reproduces the MPU configuration/hardware error
+before first port/IRQ selection. The original snapshot lacks the MPU driver
+and selects Ad Lib. This is not yet proof of a hardware initialization defect.
+The existing InPort controller uses slave PIC line1, IRQ9. Guest installation
+at port330 and IRQ2/9 records int=9. A single-variable IRQ7 trial after Windows
+restart restores mouse movement; changing back to IRQ9 and restarting again
+leaves the arrow stationary after accepted relative input. In that unpaused
+trial the slave PIC has IRR=02, ISR=00, IMR=9e and line1 count=1: the mouse
+interrupt is pending but masked. The earlier advice to select IRQ2/9 did not
+account for the existing mouse resource.
+
+An earlier observation followed snapshot save and was paused; it is excluded
+from mouse-failure proof. The later IRQ9 repetition explicitly runs without
+save/pause between restart and input. Remaining work: identify the driver's
+masking operation, verify a nonconflicting configuration, and complete actual
+Mapper/music/WAV coexistence proof before choosing the smallest repair.
+No production or user-media change has been made; no completed-fix claim.
+
+The corrected disposable x64 guest uses MPU port330/IRQ7, leaving InPort IRQ9
+and Sound Blaster IRQ5 separate. General MIDI's original destinations were
+Sound Blaster, not MPU; all sixteen channel destinations were explicitly changed
+to Roland MPU-401 and committed with the outer Mapper Close button. Offline
+inspection of the saved overlay confirms int=7 and all sixteen destinations.
+No synthesis, forced PIC unmasking or device-routing fallback was introduced.
+
+The guest plays Canyon through Media Player; the native-output probe records
+musical Note On/Off calls with success, and the owner independently confirms
+hearing music. Canyon subsequently reaches stopped naturally. Chord opens and
+returns to stopped after playback; the mouse moves, Windows exits to DOS and
+starts again, with a live mouse after restart. These x64 guest observations do
+not yet substitute for the pending x86 replay or prove the exact origin of the
+first-install configuration dialog. The x64 probe exits cleanly with successful
+shutdown/destroy. An isolated x86 replay from the corrected saved checkpoint is
+running, including Canyon, Chord, mouse and Windows exit/re-entry.
+
+The subsequent x86 replay also reaches Canyon's natural stopped state, opens
+and completes Chord, moves the mouse and exits/re-enters Windows. Frames33/35
+and54/56 distinguish the moving pointer before/after WAV; frame73 shows the
+post-restart desktop. Guest shutdown, Machine destroy and VM destroy return
+success. The PowerShell replay launcher wrote an empty exit file rather than
+a numeric code; this is not counted as exit=0. Guest-stage logs and inspected
+frames provide the replay evidence; the separate full CTest job has its own
+explicit exit and XML records.
+
+The first-install warning is reproduced before port/IRQ selection, when the
+configuration dialog has no selected resources. It does not recur in the
+correctly configured x64/x86 restarts. Its exact driver-internal branch has not
+been disassembled; no claim that an MPU hardware-emulation bug was repaired
+is made. The supported configuration and its limitations now have one current
+authority in [Product UI](../design/UI.md#windows-31-midi-playback), superseding
+the earlier historical IRQ2/9 recommendation. The resource conflict is proved
+by the IRQ9/IRQ7 guest A/B and pending masked mouse IRQ, not just by choosing
+another number. The guest VMM PIC-mask trace does not identify a particular
+MPU driver instruction, so that stronger claim is not made either.
+
+### S8 qualification and executor accounting
+
+The six investigation members now have bounded dispositions: installation
+warning reproduced only before configuration (internal branch unverified);
+mouse conflict demonstrated by IRQ A/B and PIC state; Mapper persisted by
+offline inspection after restart; music proved by real guest playback, native
+Note On/Off output and owner listening; subsequent Chord and mouse/keyboard
+remain responsive; both architectures complete the guest sequence and full
+registered regression. This is an evidenced configuration correction, not a
+production repair or a claim that unsupported FM/SB-MIDI now works.
+
+Similar-class review retains the original InPort IRQ9 source in base/inc/ica.h
+and its timer delivery, the separately configured SB IRQ5 path, and the existing
+MPU330 UART/native-output path in host/src/nt_sb.c. MIDI Mapper routes to Ad Lib
+or Sound Blaster do not select that MPU endpoint; unsupported capabilities stay
+in their existing TODO rather than being silently rerouted. Snapshot reload
+and Windows restart retain the corrected settings. No forced PIC unmasking,
+extra audio backend, second event path or new global IRQ policy is introduced.
+
+Full qualification under build/t96/s8/qualification exits 0. The ten XML reports
+per width cover all 191 distinct registered tests, with zero failures/skips:
+175 unit/gates, eight background integrations and eight serial native tests
+(five desktop, three audio). Native execution follows guest-probe termination.
+Documentation and whitespace gates pass. Production C/H +0/-0, tests +0/-0,
+mirror baseline diff change zero. Shared source/test trees and manifests remain
+unchanged. Both cached builds complete; x86's existing Ninja recovery triggers
+rebuild/republication, while the unchanged x64 package remains current. This
+does not establish repair of the already-recorded build-log debt or remove
+existing compiler warnings. EXE hashes are recorded in CURRENT.
+
+User inputs remain untouched and the untracked owner checkpoint is excluded.
+Task-owned diagnostic guests have terminated. Retain bounded investigation
+logs and the corrected disposable checkpoint for acceptance; no new media or
+diagnostic executable is committed. Executor P1 delivers only the configuration
+guidance, task evidence and rebuilt x86 package, followed by actual-commit review.
