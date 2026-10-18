@@ -10,6 +10,10 @@ four new P2 findings, existing debt and bounded performance candidates. Cached
 x64/x86 App unit/root gates each pass 56/56; an isolated real HDD adapter probe
 confirms swallowed close failure and 4-GiB extent overflow. All 131 local mirror
 subset hashes were independently reconstructed. No implementation fix admitted.
+Owner-requested COM/LPT follow-up withdraws the public writer migration:
+flush alone misses partial-write accounting. A bounded private UTF-8 opener
+candidate preserves existing FILE operations and passed an isolated probe;
+it remains a proposed repair, not deployed code.
 User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 
 ## M9 T98 S1 Packet

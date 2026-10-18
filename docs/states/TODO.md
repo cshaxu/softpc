@@ -25,9 +25,10 @@
 - TODO(Medium): Align optional COM/LPT output paths with config/media UTF-8
   semantics; current narrow fopen uses the Windows CRT code page. Owner:
   App-SoftPC host file exits. Admission condition: preserve lazy open and
-  flush visibility; Storage writer currently lacks public flush, so decide
-  that narrow capability before migrating, without importing private file.h
-  or duplicating path conversion. See
+  flush visibility and partial-write tail accounting. T98 follow-up withdraws
+  the writer migration: adding flush alone cannot preserve partial progress.
+  Assess one Compat-private UTF-8 append opener while retaining existing FILE
+  operations; no public API expansion is required for that candidate. See
   [F4](../proposals/m9-nonpublic-quality-performance-audit.md#f4---p2-comlpt-file-paths-have-inconsistent-encoding).
 
 - TODO(High): Resolve unsupported Sound Blaster MIDI command 38h parser

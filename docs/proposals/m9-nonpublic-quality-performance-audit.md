@@ -137,16 +137,22 @@ paths can fail or identify a different name; ASCII paths remain unaffected.
 This is a source-established encoding mismatch, not a claim that every host
 configuration fails. Current endpoint tests use ASCII paths.
 
-Remedy direction: use Storage's UTF-8 APPEND writer at these two host exits,
-retaining lazy open, serial per-byte visibility and parallel buffering. There
-is one concrete interface gap: writer_write does not flush, and only Storage's
-private file.h exposes flush. Therefore merely replacing fopen/fwrite would
-change current visibility. Do not include that private header or duplicate its
-UTF-8 conversion. A separately approved public writer-flush operation could
-reuse the existing flush implementation, with no new state/backend. Estimate:
-two App production files +15-30/-15-30, approximately net zero, plus public
-header/implementation +6-10/-0 if admitted; focused endpoint/flush tests
-+25-45/-5-10. Public changes remain outside S1 and require explicit admission.
+The initially suggested Storage-writer migration is withdrawn after the
+owner-requested follow-up below: flush is not its only missing contract.
+LPT also needs the exact partial-write count. Adding just writer_flush would
+not preserve its already-tested unwritten-tail behavior.
+
+Recommended narrow candidate: retain the existing FILE write/flush/close
+paths and change only UTF-8 path opening through one Compat-private append
+helper shared by COM/LPT. The existing Windows-only host can convert the
+bounded 1024-byte path to UTF-16 and use _wfopen in binary append mode.
+This deliberately retains a small native path conversion at the private host
+boundary rather than expanding the public writer ABI or replacing its I/O
+semantics. It does not claim all file opening is unified with Storage.
+Estimated production: platform.c/platform.h plus two call sites, +10-16/-2,
+net +8-14; focused existing endpoint tests +20-35/-0. Public and mirror delta
+zero. The helper has been validated only in an isolated candidate probe;
+production implementation and product regressions are not yet admitted.
 
 ### Performance candidates - evidence of work, not measured speedup
 
@@ -227,9 +233,9 @@ snapshot.debug remain untouched. Documentation gate and actual-diff review
 qualify this report; they do not qualify hypothetical fixes.
 
 Suggested follow-up ordering, subject to admission: fix real media adapter
-failure and size boundaries; fix bounded-run contracts; address endpoint paths
-after deciding the small public flush capability; then profile the three
-runtime candidates before implementing performance changes. Unchanged mirror
+failure and size boundaries; fix bounded-run contracts; fix endpoint path
+opening without migrating the write contract; then profile the three runtime
+candidates before implementing performance changes. Unchanged mirror
 algorithms stay outside those suggested repairs.
 
 ## Actual-commit review
@@ -242,3 +248,51 @@ injected, provenance and performance evidence are distinguished; F4 explicitly
 retains the public-flush decision instead of promising an invalid direct swap.
 Documentation governance and whitespace checks pass. S1 awaits owner review;
 T98 remains open and no repair subtask is automatically admitted.
+
+## Owner-requested COM/LPT flush follow-up
+
+Owner asks why other file handling does not need a new flush API, then requests
+research before proceeding. No new S or production change is admitted.
+
+Source/history establishes these distinct boundaries:
+
+- Fixed XP nt_com.c submits the normal host byte through WriteFile, waiting
+  for pending completion there; it does not use CRT fflush or FlushFileBuffers.
+  Its existing native batching route is not the standalone file endpoint.
+- The optional standalone synchronous append endpoints were introduced in
+  d82389aa7 (M7 T4 S1). That commit introduced serial fputc plus fflush, not
+  an XP hardware requirement. Original XP LPT has its own buffer and submits
+  a batch through WriteFile; current Compat keeps its 1020-byte threshold.
+- Current serial output flushes per byte; current parallel output flushes at
+  a completed batch/doc boundary and on close/reset. Neither operation is a
+  physical power-loss durability guarantee. No new host timer/worker is needed.
+- Snapshot save and Debugger W finish by closing the writer and checking close
+  status. DIRECT medium writes already flush internally. Ordinary writer_write
+  deliberately leaves buffering intact, which avoids flushing every tiny
+  snapshot field. Making every public write flush is not a suitable shortcut.
+- Serial/printer machine tests read after machine destruction. They prove final
+  contents, not live visibility. Parallel failure tests separately assert exact
+  partial-tail retention and flush failure without replay of accepted bytes.
+- Storage writer reports exact-write status, not transferred byte count. A
+  failed partial write cannot tell the LPT adapter which tail to retain. This
+  was omitted from the initial writer-plus-flush migration estimate.
+
+A task-local x64 probe links the unchanged real Storage archive. A one-byte
+writer_write leaves native observed size zero; after writer_close it is one.
+CRT append leaves size one until fflush, then size two. Observation uses an
+explicitly read/write-sharing native handle. The first attempt used Storage
+reader, whose sharing mode conflicts with an existing writer; that failure is
+not evidence of flush behavior or a new Storage defect.
+
+The same assertions-enabled probe validates the Compat-only candidate with a
+non-ASCII UTF-8 filename, two binary appends containing NUL/FF/LF/1A, explicit
+fflush and malformed UTF-8 rejection. The candidate is not production code.
+Evidence: build/t98/s1/flush-design.log; flush.exit=0. No Computer Use, user
+media/config edits, public edits or EXE rebuilds occurred.
+
+Conclusion: do not assume per-byte flush is a hardware necessity, but do not
+silently remove existing synchronous submission while repairing path encoding.
+Its frequency may be profiled separately if optional file output is a measured
+bottleneck. For this bounded fix, a public Storage migration would broaden
+scope beyond the actual encoding defect, so the narrow private-open candidate
+supersedes the earlier public-flush proposal and its estimates.
