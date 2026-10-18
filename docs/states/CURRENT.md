@@ -8,7 +8,12 @@ S1-S8, final frame contracts, fixed storage, adoption and qualification.
 Owner admits T97 S1 and subsequently merges the remaining queue candidate:
 investigate Windows 95 unavailable volume controls and restart stopping at the
 safe-shutdown screen. Preserve separate evidence/conclusions for both symptoms.
-No production repair, shared cause or new hardware capability is presumed.
+S1 investigation now reproduces both symptoms and their independent guest
+policies: the installed driver excludes SB2.01 mixer/volume capabilities;
+its hardware-change dialog requests shutdown, while explicit Restart works.
+The [S1 evidence reconciliation](../proposals/m9-win95-volume-and-restart.md#s1-nine-item-evidence-reconciliation)
+records limits and verification. No production repair or new model is justified.
+Await owner review; T97 and S1 are not owner-closed.
 User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 
 ## M9 T97 S1 Packet
@@ -26,7 +31,7 @@ User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 | Verification | Disposable overlay/snapshot replay, bounded capability/reset/BIOS probes and source-to-request trace. Compare normal restart, installation restart and shutdown; verify audio rebinding. No Computer Use. Design-only delivery runs documentation/whitespace checks; later repairs require focused and full dual-width qualification. |
 | Expected Markers | Working PCM with disabled controls; exact capability predicate; restart intent versus actual reset/BIOS progress; independent causal evidence for both issues. Host gain is not guest mixer support, and a shutdown screen alone is not a reset diagnosis. |
 | Asset Needs | Preserve all owner INI/media/snapshots. Evidence under ignored build/t97/s1; bounded logs/captures and explicit job log/exit before launching diagnostics. No EXE refresh for admission alone. |
-| Reporting Requirements | Separate causal evidence and source/runtime distinction for each symptom; minimal per-file proposals, added/deleted/net estimates, mirror impact, compatibility limits and follow-up S plan. |
+| Reporting Requirements | S1 report supplies separate binary/source/runtime evidence, reproduction limits and zero production/test/mirror delta; full mixer capability needs separate approval, not a version spoof. |
 | Stop Conditions | New hardware identity/capability, mirror behavior expansion or public API redesign needs approval. No forced controls or reboot bypass; actual repair follows the investigated design. |
 | Exit Criteria | Finite nine-item combined ledger resolved with evidence/limits for both issues, actionable designs, actual-diff review and committed/pushed report for owner direction. |
 | Original Owner Request | 启动开机有声音，但是任务栏无法显示声音图标，为啥; 我看到的是现在可以安全地关闭计算机了，一直停在那里; 本项和队列剩余一项合并调查吧. |
