@@ -2,67 +2,19 @@
 
 ## Current Work
 
-T96 remains open. Owner accepted S6; see [closure](../history/M9-T96-S6-audit-closure.md).
-S7 is active by explicit owner admission: direct Console production, native
-rebind-without-rewrite regression and equivalent transport-copy audit. Owner
-additionally approves pointer-discriminated Window frames, removal of valid/
-graphics booleans and removal of the Machine frame envelope; sequence belongs
-to the Window frame. Session remains the sole routing coordinator.
-The [S7 ledger](../proposals/m9-lib-rgb-graphics-frame.md#t96-s7-direct-console-production) owns its
-bounded convergence ledger. Executor 8841e5fd is committed and pushed;
-coordinator has reviewed its actual diff, final evidence and artifacts.
-Owner reopens S7 for the native narrow-Console retention investigation at
-baseline aa8f75c3. Trace the original test/broker chain before assigning cause;
-no unrelated build, artifact or guest-media changes. The follow-up ledger below
-owns bounded evidence and review. User snapshot.debug is
-preserved and excluded.
+T96 remains open. Owner accepted and closed S7 after the public-test governance
+delivery and actual-commit review. See the
+[S7 closure](../history/M9-T96-S7-frame-and-test-governance-closure.md).
+No implementation subtask is active.
+Open task awaiting owner: T96.
+No next S is admitted.
 
-Owner-approved retained three-slot Console recovery is implemented and verified.
-Executor 881a3df9 is committed and pushed; coordinator reviewed the actual
-commit, ownership transitions, native assertions and qualification evidence.
-Owner continues S7 with a fixed four-slot exchange shared by both consumers.
-Machine publishes every driver-produced frame without content deduplication;
-SoftPC owns text-update readiness. Console compares held old/new frames and
-removes the broker's duplicate cell cache. Recovery must override content reuse.
-Implementation and qualification are complete. Executor 917a2277 is pushed;
-coordinator reviewed its actual diff and evidence. Owner reopens the current S7
-at 104bab46 for active-extent Console conversion and real font-register dirty
-regression. This bounded follow-up is implemented and verified. Executor
-c2f5becb is pushed; coordinator reviewed the actual commit and evidence.
-Owner continues S7 at 56f65ece for the bounded public-test governance audit:
-remove proven duplicate assertions/targets, restore owner-local text validation,
-prove exchange mutex failure and zero steady allocations, and tighten negative
-verifier oracles without reducing dependency-edge coverage. Production behavior
-and APIs remain unchanged. Implementation and full qualification are complete;
-executor d62567e5 is pushed and the coordinator has reviewed its actual diff,
-qualification XML and package hashes. S7 awaits owner acceptance; T96 remains open.
-Raw activation requeues the held input through the existing output path; no
-extra frame, backup, Machine publication or second renderer is introduced.
-Cooked native history/cursor restoration remains strict. The earlier capacity-
-only candidate failed compact package acceptance and was superseded, not shipped.
-Its evidence and activation-clipping diagnosis remain in the proposal.
-
-## M9 T96 S7 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner continues S7: 四槽的整个数据结构和算法你可以放到 KVM Base 里面去，这样两边可以统一共享同一份代码，更干净。就按这个方案把我们刚才讨论的所有点全部做干净。 Earlier schema and recovery deliveries remain checkpoints, not closure. |
-| Objective | Complete the approved public-test governance ledger within S7; retain unique failure, platform and integration proof while removing demonstrated duplication. |
-| Non-goals | No mirror edits, guest timing, media, INI, native surface replacement, generic resource framework or second transport/render path. |
-| Reference Baseline | Public-test cleanup 56f65ece; earlier follow-up aa8f75c3 and original b25f9969 (S6 accepted); preserve all production behavior. |
-| Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | test/lib, test/emulator, test/x86-ibmpc, their manifests and task records; audit test/x86-debug with no demonstrated deletion. No production API, four-slot algorithm, mirror, INI or media change. |
-| Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no rules edits in S6. |
-| Verification | Direct producer/consumer pointer identity, both slot lifetimes, text/graphics/status transitions, failed/no-frame publication, native raw rebind before rewriting, reset/load/recreation; dual-width focused and full unit/gate/integration tests and EXEs. Hidden owned jobs under build/t96/s7; five-minute no-progress inspection, no automatic termination; executor owns cleanup. |
-| Expected Markers | Both consumers use produce/pending/processing/displayed; Base never interprets content. No render-dependent producer wait, steady allocation, transport copy, broker cell cache or Machine dedup. |
-| Asset Needs | Preserve user configuration, media and untracked checkpoint; refresh only package EXEs after successful build. |
-| Reporting Requirements | Against 56f65ece: production 0; estimated test C/H +30..70/-150..230, net reduction 80..200; verifier CMake estimated +20..50/-10..30. Report actual counts, retained assertion owners, full cached dual-width qualification and EXE hashes. |
-| Stop Conditions | More than four slots, consumer-dependent producer wait, extra historical copy, mirror changes or changed snapshot semantics requires explicit revised design. |
-| Exit Criteria | Single transport ownership path, bounded complete lifecycle proof, full qualification, artifacts, actual diff review, commit/push and owner acceptance. |
-| Original Owner Request | 按照你的规划，在S7内把所有测试治理干净。 Earlier schema/recovery requests remain in the linked proposal. |
-| Similar-Issue Sweep | All driver producers, Session/UI payload writes, mailbox/leaf handoffs, status pages, observers and diagnostic readers. Remove presentation staging copies; retain only source decoding, native rendering and explicit diagnostic copies with distinct evidence. |
-
+S1-S7 are complete. Before whole-T closure, reconcile the final RGB/schema and
+four-slot ownership contracts, final fixed-frame storage accounting, downstream
+adoption instructions and qualification evidence against the original request.
+The Win3.1 prompt-roundtrip readiness investigation remains explicitly deferred
+in [TODO](TODO.md); passing later runs do not establish its repair.
+User-owned untracked assets/binary/snapshot.debug remains untouched and excluded.
 
 ## Current Technical Baseline
 
@@ -87,7 +39,7 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
   x86 rebuilt after Ninja recovery; unchanged x64 production target remains
   up to date and its hash is unchanged. User snapshot.debug stays untouched
   and excluded. Coordinator review found no blocking issue in the admitted
-  ledger. S7 awaits owner acceptance.
+  ledger. Owner has now accepted and closed S7.
 
 ### S7 active-extent and font readiness follow-up
 
@@ -187,7 +139,7 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
   log recovery remain disclosed; no zero-warning or speedup claim.
 - No mirror/Compat, Base exchange algorithm, INI, media or snapshot-format
   changes. Owner-owned untracked assets/binary/snapshot.debug is excluded.
-  T96 remains open and S7 awaits owner acceptance after delivery/review.
+  This earlier checkpoint is superseded by the accepted S7 qualification above.
 
 ### S5 delivered checkpoint
 
@@ -264,5 +216,5 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
   reviewed; [record](../history/M9-Td-S21-frame-ownership-transfer.md).
   T96 S5 resumes; no runtime or artifact change is claimed by this Td.
 
-T95 proposal archived. T96 starts with design: reconcile the original proposed
-Lib/SoftPC implementation split into one buildable ABI migration.
+T95 proposal is archived. T96 remains open for whole-task closure audit;
+S7 is owner-accepted and no further S is admitted.

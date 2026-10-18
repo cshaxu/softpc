@@ -2,11 +2,14 @@
 
 ## Status
 
-Owner delegates admission as T96 on 2026-10-17 after T95 closure. CURRENT owns
-the active packet. S2 delivered the atomic ABI/producer migration at fa569001,
-reviewed at 94a0debd. Owner permits S3 without manual S2 acceptance; final S4
-remains the buffer-simplification task. The problem/examples below describe
-the pre-migration baseline, not a second current graphics format.
+T96 was admitted on 2026-10-17 after T95 closure. Owner has accepted and closed
+S7; S1-S7 are complete. T96 remains open with no active S. See the
+[S7 closure](../history/M9-T96-S7-frame-and-test-governance-closure.md).
+Before T closure, reconcile final ABI/adoption instructions, fixed-frame storage
+accounting and qualification evidence against the complete request. Earlier
+sections record historical designs; S7's shared four-slot exchange supersedes
+the earlier Console three-slot design. CURRENT owns current technical status.
+The problem/examples below describe the pre-migration baseline.
 
 ## Problem
 
