@@ -179,15 +179,15 @@ static lib_bool snapshot_media_bytes(lib_bool write, lib_bool later)
 
 static lib_bool snapshot_has_pixels(emulator_machine *machine, lib_u32 colour)
 {
-    emulator_machine_frame *frame = lib_allocate_zero(1, sizeof(*frame));
+    kvm_window_frame_storage *frame = lib_allocate_zero(1, sizeof(*frame));
     lib_bool found = LIB_FALSE;
     if (frame == NULL) return LIB_FALSE;
     if (emulator_machine_copy_published_frame(machine, frame,
-            emulator_machine_run_generation(machine)) && frame->window.graphics) {
+            emulator_machine_run_generation(machine)) && frame->frame.graphics) {
         lib_size i;
         found = LIB_TRUE;
-        for (i = 0; i < frame->window.image.height * frame->window.image.stride; ++i)
-            if (frame->window.image.pixels[i] != colour) { found = LIB_FALSE; break; }
+        for (i = 0; i < frame->data.graphics.height * frame->data.graphics.stride; ++i)
+            if (frame->data.graphics.pixels[i] != colour) { found = LIB_FALSE; break; }
     }
     lib_release(frame);
     return found;
@@ -303,10 +303,10 @@ static int snapshot_run_transaction(void)
         LIB_STATUS_OK);
     assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
-        static emulator_machine_frame frame;
+        static kvm_window_frame_storage frame;
         assert(emulator_machine_copy_published_frame(machine, &frame,
             emulator_machine_run_generation(machine)));
-        assert(frame.window.valid != 0u);
+        assert(frame.frame.text != LIB_NULL || frame.frame.graphics != LIB_NULL);
     }
     assert(emulator_machine_resume(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_RUNNING));
@@ -408,10 +408,10 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
     assert(fclose(file) == 0);
     assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_PAUSED);
     {
-        static emulator_machine_frame frame;
+        static kvm_window_frame_storage frame;
         assert(emulator_machine_copy_published_frame(machine, &frame,
             emulator_machine_run_generation(machine)));
-        assert(frame.window.valid != 0u);
+        assert(frame.frame.text != LIB_NULL || frame.frame.graphics != LIB_NULL);
     }
     assert(snapshot_has_pixels(machine, 0xfc5454u));
     {

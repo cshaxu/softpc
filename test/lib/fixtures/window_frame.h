@@ -10,7 +10,9 @@ static lib_status test_window_frame(kvm_window *window, kvm_frame_exchange *fram
 {
     lib_status status;
     if (window == LIB_NULL || value == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    lib_memory_copy(kvm_frame_exchange_writer(frames), value, sizeof(*value));
+    status = kvm_window_frame_validate(value);
+    if (status != LIB_STATUS_OK) return status;
+    (void)kvm_window_frame_copy(kvm_frame_exchange_writer(frames), value);
     status = kvm_window_frame_commit(frames);
     return status == LIB_STATUS_OK ? kvm_window_publish_frame(window, frames) : status;
 }

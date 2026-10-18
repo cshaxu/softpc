@@ -163,6 +163,8 @@ lib_status emulator_product_compose_ui(emulator_product *product,
         product->ui = LIB_NULL;
         return status;
     }
+    emulator_machine_set_console_status_source(product->emulator_machine,
+        emulator_ui_produce_console_status, ui);
     return LIB_STATUS_OK;
 }
 

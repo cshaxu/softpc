@@ -30,7 +30,9 @@ typedef struct kvm_window_options {
 lib_status kvm_window_create(kvm_window **out_window,
     const kvm_window_options *options);
 /* Notify after committing a validated Window frame. Use a four-slot exchange
- * whose slots begin with kvm_window_frame. The exchange is fixed for this Window lifetime and outlives successful destroy.
+ * of kvm_window_frame_storage slots. Its payload pointers remain slot-owned and
+ * immutable until retirement. The exchange is fixed for this Window lifetime
+ * and outlives successful destroy.
  * Notification never copies a frame or creates another pending owner. */
 lib_status kvm_window_publish_frame(kvm_window *window, kvm_frame_exchange *frames);
 /* Same checked destruction contract as kvm_component_destroy. */

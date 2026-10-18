@@ -320,8 +320,15 @@ its title/freeze/release encoding and worker validation. Console has no ordinary
 control commands and rejects unknown records. Native leaf APIs remain typed;
 there is no application-facing raw control mailbox.
 
-Machine owns a four-slot opaque exchange shared with Window through UI; Session
-holds no payload. UI owns a three-slot Console exchange. Base moves pointers,
+Machine owns a four-slot Window exchange and a three-slot Console exchange.
+Window slots contain a Lib-defined reference (sequence and exactly one text/
+graphics pointer) and reusable payload backing. Console slots contain text and
+character maps, without bitmap fonts. No Machine frame wrapper exists.
+Its sole executor passes both writable leaf storage areas directly to the driver;
+Session/UI hold no payload and forward exchange references. Product composition
+injects UI's pure status-page builder for graphics-mode Console production into
+the same executor path. Stop Machine before destroying that immutable context.
+Base moves pointers,
 with no frame update callback or per-publication allocation/copy. Window derives
 damage on consumption by comparing resolved colours with its existing RGB
 surface; it updates changed pixels and invalidates their enclosing rectangle.

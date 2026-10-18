@@ -12,16 +12,21 @@ Emulator has no platform directories, platform types, native calls or OS-selecte
 implementations. Base owns blocking mutex/event/task/wait; Types owns the atomic
 vocabulary. Emulator retains queue, lifecycle and frame-publication ownership.
 
-Machine owns one four-slot exchange, containing a leading typed Window frame,
-publication sequence and text-only Console maps. The executor writes a reusable
-slot directly; Window borrows that same exchange through UI. Session retains
+Machine owns a four-slot Window exchange and a three-slot Console exchange.
+Window publication uses the Lib reference/schema directly; there is no Machine
+frame wrapper. The driver reports no-ready-frame separately through produced,
+never by publishing an invalid payload. The executor passes writable Window
+storage and Console text directly to the driver; each
+consumer borrows its exchange through UI. Character maps belong only to the
+Console frame. Session retains
 metadata, never another frame. Machine can keep replacing pending output while
 Window processes and retains older slots. UI/Window must be destroyed before
-Machine and its exchange.
+Machine and its exchanges.
 Session treats events as hints: one bounded observation checks run, sequence
-and graphics/text routing and converts text directly into UI's three-slot Console
-writer when needed. It may observe a newer publication than the notification.
-UI owns the small Console exchange and fixed status text, not a graphics copy.
+and graphics/text routing without copying payloads. It may observe a newer
+publication than the notification. UI owns immutable status text and its pure
+frame builder; composition injects that builder into the executor's existing
+Console production flow for graphics mode. UI owns no frame exchange.
 Machine compares both maps and font banks for unchanged-text suppression.
 Explicit diagnostic snapshot copies remain available, with the expected run and
 unchanged destination on rejection; they are not the presentation transport. UI owns the shared action vocabulary;

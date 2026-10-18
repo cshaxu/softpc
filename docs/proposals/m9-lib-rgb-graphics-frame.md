@@ -833,3 +833,147 @@ no skips/failures, plus the final x64 ten-repeat proof. Actual C/H accounting
 matches the ledger. Original mirror and owner INI/media/checkpoint are untouched.
 No blocking finding remains in this bounded review. Runtime owner acceptance
 and T96 closure remain pending; no exhaustive race/performance claim is made.
+
+## T96 S7 direct Console production
+
+Owner accepts S6 and requests: "那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。"
+
+Baseline b25f9969. S7 corrects the S5 implementation's retained Console
+transport copy; prior claims that this was necessary conversion are withdrawn.
+T71 S4 introduced the mixed Machine envelope at 17c9da90; S5 changed its
+Window layout for pointer consumption but left the Console extraction in place.
+
+Frozen convergence universe:
+
+1. Machine owns Window four-slot and Console three-slot exchanges. Its sole
+   executor passes the actual writable leaf frames to the driver. Session/UI
+   forward borrowed exchanges and metadata, never copy guest text.
+2. Driver fills both consumers from one source sampling path. Preserve native
+   graphics/text decoding, validation, no-frame and ERROR behavior. Maps belong
+   only to Console; the owner correction below removes the Window envelope.
+3. Existing UI status-page construction remains one pure implementation;
+   Product composition injects it into the executor's Console production path.
+   No extra exchange/output route. Immutable context lives until executor shutdown.
+4. Prove native raw/cooked/raw retention by reading before any second write.
+5. Scan every producer, Session/UI payload write, mailbox/leaf handoff, observer
+   and diagnostic reader. Source decoding, native rendering and explicit
+   diagnostic copies remain distinct from transport copies.
+6. Build/deploy both EXEs, focused then complete unit/gate/integration tests;
+   executor commit/push, coordinator actual diff review, owner acceptance.
+
+No original mirror, Compat, guest configuration or media changes. No new slot
+algorithm, rendering path, per-frame allocation or consumer-dependent wait.
+Expected production +120..200/-130..220, test net +100..200. Final accounting
+uses git diff --numstat from the baseline, excluding documents/manifests/EXEs.
+Evidence is under build/t96/s7 with hidden owned jobs, five-minute no-progress
+inspection rather than automatic termination. Earlier build failures remain
+recorded: stale migrated test signatures and a missing UI mock symbol. Native
+Window, audio and Console tests remain separate from background unit runs.
+
+### S7 owner-approved schema correction
+
+Owner: "好的，按照这个方案整改。" The approved feedback removes valid and
+graphics booleans, uses exactly one non-null text/graphics pointer in the Window
+frame, and moves sequence into that frame instead of a Machine envelope.
+The producer writes bounded slot-owned backing storage, never guest memory or
+a transient stack buffer. Selection does not allocate per frame. Console keeps
+its independent text/maps representation and three slots. Machine owns both
+exchanges; Driver fills them only, Session/UI forward references as before.
+No-frame readiness must remain an explicit producer outcome, not an invalid
+published frame. Diagnostic copies must copy payload and rebind destination
+pointers; transport remains pointer-only. Tests cover both-null/both-present
+rejection, mode changes, destination ownership, held-slot immutability and
+sequence preservation. Expected additional C/H migration: about 30 files,
++250..400/-300..500; exact accounting follows final verification.
+
+The pre-correction full1 run had native Console retention failures in both
+widths and an x64 compact-package interruption. Its failure evidence is retained and is not qualification of this
+revised ABI. Final verification must rebuild and exercise the revised sources.
+
+The first added retention assertion was placed in the extent stress loop that
+intentionally shrinks the native viewport. It read 30 columns after restoring
+an 80-column raw buffer (saved=80x30, actual=30x30). This does not qualify full
+content retention under host resizing. The admitted no-rewrite regression is
+now placed in the existing raw/cooked/raw preservation loop before its next
+write, checking all saved visible cells and geometry, not merely a marker.
+The separate deliberate-resize loop retains its original frame-repair proof.
+The host-resize retention finding is separately recorded, not declared fixed.
+
+### S7 changed-path accounting and executor audit
+
+Counting C/H only with git diff --numstat b25f9969 -- src test (documentation,
+manifests and EXEs excluded): production +237/-298, net -61; tests +749/-671,
+net +78. The 13 production paths comprise App Machine driver +51/-36,
+Emulator seven paths +102/-109 (including deletion of the old frame header),
+and Lib Window five paths +84/-53. Test paths: App seven +170/-139, Emulator
+seven +240/-213, Lib eight +334/-317, X86 Debug one +5/-2.
+Most test churn repairs direct field access and fixture ownership for the new
+pointer ABI, not additional test routes. Combined C/H net is +17.
+
+The frozen production sweep uses rg for the exact retired frame type and
+emulator_ui_frame_target, plus kvm_window_frame_copy/lib_memory_copy/memcpy
+through Machine, Session, UI and both KVM leaves. Retired types/target have no
+callers. The similarly named Machine exchange accessor and notification sink
+are retained, distinct APIs, not the deleted schema.
+
+| Member | Disposition / proof |
+| --- | --- |
+| App Machine producer | Samples source once and directly fills both text destinations; only Console receives code-point maps. VGA mode/attribute matrix verifies identical common cells and no-frame behavior. Graphics RGB decoding stays single-path. |
+| Machine publisher | Owns both exchanges; validates before commit, assigns sequence once, preserves no-frame/error/reset semantics. machine_wait proves producer/taken Console pointer identity, held-slot immutability, map-only changes, invalid-map rejection and status production. |
+| Session/UI | Metadata and exchange references only. Removed writable UI frame target and Console copy/commit. Session/UI tests verify dispatch; no guest payload assignment remains. |
+| Product composition | Binds the existing pure UI status builder before running. Existing shutdown precedes UI destruction, preserving callback context lifetime; composition mock verifies binding. |
+| Window schema/consumer | Exactly one payload pointer, slot-owned union backing, existing four-slot algorithm. Copy test proves pointer rebinding and inactive-tail preservation; damage/cursor tests retain rendering behavior. |
+| Console consumer | Same three-slot ownership. Remaining palette copy belongs to conversion into native Console output, not transport of a second KVM frame. |
+| Diagnostics | Machine copy_published_frame is the only production caller of the explicit Window deep-copy helper; it holds the publication/exchange locks. App observers are synchronous and do not retain the borrowed pointer. |
+| Other copies | Machine media/debug requests and Session command text are copied controls, deliberately outside frame ownership transfer. |
+| Native retention test | Normal raw/cooked/raw verifies saved content before rewriting. Deliberate viewport narrowing has a separately recorded finding; no claim that this S fixes that unrelated geometry path. |
+
+No Base exchange algorithm, mirror, Compat, INI, media or snapshot-format
+change. No new allocation per frame, producer wait on rendering, historical
+payload copy, or driver-to-presenter bypass. Public ABI consumers must rebuild
+together; this is not a compatible header-only update.
+
+The final1 run passes both 178-test unit/gate suites, all native tests and
+x64 background integration. Its x86 runtime_restart_boot_smoke fails the first
+prompt_roundtrip while still graphics (sequence 36). Source review finds no
+retained shallow frame copy or changed keyboard sequence in this migration;
+the fixture uses a fixed 15-second startup observation, which does not prove
+Program Manager readiness. This remains a hypothesis, not the cause.
+Unchanged independent repetitions and a complete x86 integration rerun are
+recorded separately under recheck; final1's exit 1 is preserved. A bounded
+follow-up investigation is in TODO, not hidden by changing assertions.
+
+Follow-up: the first three unchanged independent x86 repetitions pass, but the
+complete background integration rerun fails again (graphics sequence 62).
+PROCESSORS=8 already reserves all eight CTest slots for this test; therefore
+concurrent CTest CPU load is not established as the cause. Added test-only
+failure-stage reporting and a PPM dump of the already copied graphics frame
+to the test-owned working directory. No input, timeout, success condition,
+production code or artifact changed. The instrumented x86 probe run passes
+8/8 background integrations; absence of failure in that run produces no image.
+This is improved observability, not a claimed repair of the intermittent case.
+
+### S7 final verification
+
+Both architectures have final passing evidence for all 194 registered names
+without skips: final1 unit-*.xml (178 each), final-check integration-*.xml
+(8 each), final1 native-*-0..7.xml (5 desktop and 3 audio each).
+Compared those XML names to CTest's complete JSON enumeration: no missing or
+duplicate qualification member. Focused sets are 13/13; final-check exit is 0.
+The later test-only diagnostics are compiled for both architectures and exercised
+by final-check. Production EXE hashes are in CURRENT and unchanged after them.
+
+All 292 entries across the eight shared manifests match. Documentation governance
+and git diff --check pass. Existing mirror macro warnings, VGA fixture pointer
+casts and x86 Ninja recovery are retained; changed shared code builds under its
+strict warnings. No Computer Use, timed termination, automatic retry in product/
+tests, user INI/media mutation or snapshot-format modification occurred.
+The intermittent test and deliberate viewport findings above remain disclosed;
+final passing coverage is not a claim that either root cause has been repaired.
+
+Executor reviewed the actual changes and all public frame consumers. Source
+sampling/decoding and native rendering remain necessary transformations; only
+explicit diagnostic reads retain deep copying. Tests that formerly asserted
+Machine-envelope copying now assert Lib copy ownership and Machine Console
+pointer identity at their proper owners. S7 is ready for delivery and actual
+coordinator commit review; no S/T closure is claimed.

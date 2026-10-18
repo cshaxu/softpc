@@ -265,8 +265,9 @@ static void vm_driver_deliver_input(void *opaque,
 }
 
 static lib_status vm_driver_copy_graphics(vm_driver *driver,
-    emulator_machine_frame *frame)
+    kvm_window_frame_storage *frame, lib_bool *produced)
 {
+    kvm_window_graphics_frame *image;
     const void *bits;
     const void *info;
     lib_u32 width;
@@ -296,27 +297,27 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
     if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
             &right, &bottom)) return LIB_STATUS_OK;
     row_stride = (width + 3u) & ~3u;
-    lib_memory_set(&frame->window, 0, lib_offsetof(kvm_window_frame, image.pixels));
+    image = kvm_window_frame_begin_graphics(frame);
     for (row = 0u; row < height; ++row) {
         const lib_u8 *source = (const lib_u8 *)bits + row * row_stride;
-        lib_u32 *destination = frame->window.image.pixels + row * width;
+        lib_u32 *destination = image->pixels + row * width;
         for (lib_u32 column = 0u; column < width; ++column) {
             const RGBQUAD *colour = &dib->bmiColors[source[column]];
             destination[column] = ((lib_u32)colour->rgbRed << 16u) |
                 ((lib_u32)colour->rgbGreen << 8u) | (lib_u32)colour->rgbBlue;
         }
     }
-    frame->window.image.width = width;
-    frame->window.image.height = height;
-    frame->window.image.stride = width;
-    frame->window.graphics = 1u;
-    frame->window.valid = 1u;
+    image->width = width;
+    image->height = height;
+    image->stride = width;
+    *produced = LIB_TRUE;
     return LIB_STATUS_OK;
 }
 
 static lib_status vm_driver_copy_text(vm_driver *driver,
-    emulator_machine_frame *frame)
+    kvm_window_frame_storage *frame, kvm_console_text_frame *console, lib_bool *produced)
 {
+    kvm_window_text_frame *text;
     const void *surface;
     lib_u32 columns;
     lib_u32 rows;
@@ -328,6 +329,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     lib_u32 cursor_size = 0u;
     lib_u32 text_row;
     lib_u32 attribute_select;
+    kvm_text_frame *targets[2];
 
     if (!softpc_machine_presentation_text(driver->machine, &surface, &columns,
             &rows, &stride, &cell_bytes)) return LIB_STATUS_OK;
@@ -336,14 +338,19 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     if (columns > KVM_TEXT_COLUMNS || rows > KVM_TEXT_ROWS)
         return LIB_STATUS_UNSUPPORTED;
     if (stride < columns) return LIB_STATUS_INVALID_ARGUMENT;
-    lib_memory_set(&frame->window, 0, lib_offsetof(kvm_window_frame, text) +
-        sizeof(frame->window.text));
-    for (lib_size index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
-        frame->window.text.base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
-    if (!softpc_machine_presentation_fonts(driver->machine, frame->window.text.font,
-        frame->window.text.secondary_font, &frame->window.text.base.font_height,
+    text = kvm_window_frame_begin_text(frame);
+    lib_memory_set(text, 0, sizeof(*text));
+    targets[0] = &text->base;
+    targets[1] = &console->base;
+    lib_memory_set(console, 0, sizeof(*console));
+    for (lib_size target = 0u; target < 2u; ++target)
+        for (lib_size index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
+            targets[target]->cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
+    if (!softpc_machine_presentation_fonts(driver->machine, text->font,
+        text->secondary_font, &text->base.font_height,
         &attribute_select))
         return LIB_STATUS_IO_ERROR;
+    console->base.font_height = text->base.font_height;
     cells = (const lib_u8 *)surface;
     for (text_row = 0u; text_row < rows; ++text_row) {
         lib_u32 text_column;
@@ -351,9 +358,11 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
             lib_size source = ((lib_size)text_row * stride + text_column) * cell_bytes;
             lib_size destination = (lib_size)text_row * KVM_TEXT_COLUMNS + text_column;
             lib_u8 attribute = cell_bytes >= 2u ? cells[source + 1u] : 7u;
-            frame->window.text.base.cells[destination] = (kvm_text_cell){
+            kvm_text_cell cell = {
                 cells[source], attribute_select && (attribute & 0x08u) ? 1u : 0u,
                 attribute & 0x0fu, (attribute >> 4u) & 0x0fu };
+            for (lib_size target = 0u; target < 2u; ++target)
+                targets[target]->cells[destination] = cell;
         }
     }
     {
@@ -365,43 +374,49 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
                 &height) && info != NULL) {
             const BITMAPINFO *dib = (const BITMAPINFO *)info;
             lib_u32 index;
-            for (index = 0u; index < 16u; ++index)
-                frame->window.text.base.text_palette[index] = ((lib_u32)dib->bmiColors[index].rgbRed << 16u) |
-                    ((lib_u32)dib->bmiColors[index].rgbGreen << 8u) |
-                    (lib_u32)dib->bmiColors[index].rgbBlue;
+            for (index = 0u; index < 16u; ++index) {
+                lib_u32 colour = ((lib_u32)dib->bmiColors[index].rgbRed << 16u) |
+                    ((lib_u32)dib->bmiColors[index].rgbGreen << 8u) | (lib_u32)dib->bmiColors[index].rgbBlue;
+                for (lib_size target = 0u; target < 2u; ++target)
+                    targets[target]->text_palette[index] = colour;
+            }
         }
     }
     (void)softpc_machine_presentation_cursor(driver->machine, &column, &row,
         &cursor_size);
-    frame->window.text.base.cursor_column = column;
-    frame->window.text.base.cursor_row = row;
-    frame->window.text.base.text_columns = (lib_u16)columns;
-    frame->window.text.base.text_rows = (lib_u16)rows;
-    frame->window.valid = 1u;
+    for (lib_size target = 0u; target < 2u; ++target) {
+        targets[target]->cursor_column = column;
+        targets[target]->cursor_row = row;
+        targets[target]->text_columns = (lib_u16)columns;
+        targets[target]->text_rows = (lib_u16)rows;
+        vm_driver_cursor_shape(targets[target], cursor_size);
+        targets[target]->cursor_mode = column >= 0 && row >= 0 ? KVM_CURSOR_HOST : KVM_CURSOR_DISABLED;
+        targets[target]->cursor_phase = 1u;
+    }
     {
-        lib_status status = kvm_window_frame_validate(&frame->window);
+        lib_status status = kvm_window_frame_validate(&frame->frame);
         if (status != LIB_STATUS_OK) return status;
     }
-    vm_driver_cursor_shape(&frame->window.text.base, cursor_size);
-    frame->window.text.base.cursor_mode = column >= 0 && row >= 0 ? KVM_CURSOR_HOST : KVM_CURSOR_DISABLED;
-    frame->window.text.base.cursor_phase = 1u;
-    lib_memory_copy(frame->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
-    lib_memory_copy(frame->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    lib_memory_copy(console->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    lib_memory_copy(console->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    *produced = LIB_TRUE;
     return LIB_STATUS_OK;
 }
 
-static lib_status vm_driver_copy_frame(void *opaque, emulator_machine_frame *frame)
+static lib_status vm_driver_copy_frame(void *opaque, kvm_window_frame_storage *frame,
+    kvm_console_text_frame *console, lib_bool *produced)
 {
     vm_driver *driver = (vm_driver *)opaque;
-    if (driver == NULL || frame == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    frame->window.valid = 0u;
+    if (driver == NULL || frame == NULL || console == NULL || produced == NULL)
+        return LIB_STATUS_INVALID_ARGUMENT;
+    *produced = LIB_FALSE;
     /* A graphics route has one valid representation: a complete graphics
        frame.  In particular, restoration must wait for the rebuilt painter
        rather than publishing an 80x25 text fallback as a false graphics
        result; that fallback would create a wrongly sized black Window. */
     if (softpc_machine_presentation_is_graphics(driver->machine))
-        return vm_driver_copy_graphics(driver, frame);
-    return vm_driver_copy_text(driver, frame);
+        return vm_driver_copy_graphics(driver, frame, produced);
+    return vm_driver_copy_text(driver, frame, console, produced);
 }
 
 static lib_bool vm_driver_set_removable_media(void *opaque,

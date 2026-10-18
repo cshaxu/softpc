@@ -29,7 +29,7 @@ static lib_win32_long_ptr LIB_WIN32_WINAPI test_get_window_context(
 
 static kvm_window window;
 static kvm_win32_window_context context;
-static kvm_window_frame frame;
+static kvm_window_frame_storage frame;
 static kvm_input_event delivered[32];
 static lib_u32 count, resets, retirements, attempts, reject_at, failures;
 static lib_bool reject_reset;
@@ -67,7 +67,7 @@ static void initialize(void)
     test_window_context = &context;
     count = resets = retirements = attempts = reject_at = failures = 0;
     reject_reset = LIB_FALSE;
-    frame.valid = LIB_TRUE; frame.text.base.text_columns = 80; frame.text.base.text_rows = 25;
+    (void)kvm_window_frame_begin_text(&frame); frame.data.text.base.text_columns = 80; frame.data.text.base.text_rows = 25;
 }
 static lib_bool key(base_key key, lib_u16 scan, lib_bool down, lib_u8 modifiers)
 {
@@ -207,7 +207,7 @@ static lib_win32_dword LIB_WIN32_WINAPI publish(void *unused)
 {
     (void)unused;
     lib_test_assert(lib_win32_wait_for_single_object(start_race, 5000) == LIB_WIN32_WAIT_OBJECT_0);
-    publish_status = test_window_frame(&window, frames, &frame);
+    publish_status = test_window_frame(&window, frames, &frame.frame);
     return 0;
 }
 static lib_win32_dword LIB_WIN32_WINAPI enqueue_title(void *unused)
@@ -218,7 +218,7 @@ static lib_win32_dword LIB_WIN32_WINAPI enqueue_title(void *unused)
 }
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame), LIB_TRUE) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage), LIB_TRUE) == LIB_STATUS_OK);
     kvm_input_event event = { .type = KVM_EVENT_WINDOW_CLOSE };
     kvm_component_control taken;
     frozen_prefix_replay();
@@ -261,17 +261,17 @@ int main(void)
     lib_test_assert(window.base.hotkey_matcher.held_count == 0);
     lib_test_assert(!key('B', 0x30, 1, 0));
     lib_test_assert(attempts == 2 && count == 1);
-    lib_test_assert(test_window_frame(&window, frames, &frame) == LIB_STATUS_INVALID_STATE);
+    lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_INVALID_STATE);
     kvm_component_retire(&window.base, LIB_STATUS_OK);
     lib_test_assert(failures == 1 && count == 1 && retirements == 1u);
     lib_test_assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);
 
     initialize();
     lib_test_assert(kvm_window_set_title(&window, "first") == LIB_STATUS_OK);
-    lib_test_assert(test_window_frame(&window, frames, &frame) == LIB_STATUS_OK);
+    lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_request_stop(&window.base) == LIB_STATUS_OK);
     lib_test_assert(kvm_component_request_stop(&window.base) == LIB_STATUS_OK);
-    lib_test_assert(test_window_frame(&window, frames, &frame) == LIB_STATUS_INVALID_STATE);
+    lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_INVALID_STATE);
     /* Call mailbox API so ordinary rejected control does not add a failure report. */
     kvm_component_control title = { .kind = KVM_WINDOW_CONTROL_SET_TITLE };
     lib_test_assert(kvm_component_mailboxes_enqueue_control(&window.base.mailboxes, &title) == LIB_STATUS_INVALID_STATE);
@@ -305,7 +305,7 @@ int main(void)
         lib_test_assert(lib_win32_wait_for_single_object(thread, 5000) == LIB_WIN32_WAIT_OBJECT_0);
         lib_test_assert(publish_status == LIB_STATUS_OK || publish_status == LIB_STATUS_INVALID_STATE);
         lib_test_assert(window.base.mailboxes.frames == stopped_frames);
-        lib_test_assert(test_window_frame(&window, frames, &frame) == LIB_STATUS_INVALID_STATE);
+        lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_INVALID_STATE);
         lib_test_assert(kvm_component_destroy(&window.base) == LIB_STATUS_OK);
         lib_win32_close_handle(thread); lib_win32_close_handle(start_race);
     }

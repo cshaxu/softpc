@@ -196,10 +196,7 @@ static lib_bool emulator_session_drive(emulator_session *session)
     emulator_ui_set_run_generation(session->ui,
         emulator_machine_run_generation(session->machine));
     available = emulator_machine_read_presentation(session->machine,
-        emulator_machine_run_generation(session->machine), &sequence, &graphics,
-        session->state.vm_console_actual &&
-            session->state.current_console_actual == EMULATOR_SESSION_CONSOLE_VM ?
-                emulator_ui_frame_target(session->ui) : LIB_NULL);
+        emulator_machine_run_generation(session->machine), &sequence, &graphics);
     if (available)
         (void)emulator_session_state_note_frame(&session->state, sequence, graphics);
     action = emulator_session_state_take_action(&session->state);
@@ -213,7 +210,8 @@ static lib_bool emulator_session_drive(emulator_session *session)
         session->state.display == EMULATOR_SESSION_DISPLAY_CONSOLE &&
         !session->state.console_control && graphics;
     return emulator_ui_publish_frame(session->ui,
-        emulator_machine_frame_exchange(session->machine), graphics, sequence,
+        emulator_machine_frame_exchange(session->machine),
+        emulator_machine_console_exchange(session->machine), graphics, sequence,
         session->state.window_actual,
         session->state.vm_console_actual &&
             session->state.current_console_actual == EMULATOR_SESSION_CONSOLE_VM,

@@ -2,89 +2,67 @@
 
 ## Current Work
 
-Owner delegates T95 S2/T closure and next queue admission on 2026-10-17.
-See the [completion audit](../history/M9-T95-completion-audit.md).
-T96 S1 design is delivered and reviewed at 7d0d3dea; owner directs continuing
-the RGB upgrade while scheduling buffer simplification as final S4.
-See the [S1 record](../history/M9-T96-S1-rgb-frame-design.md). Existing five-buffer
-ownership remains unchanged during S2. Implementation and dual-width full
-qualification are complete. Executor fa569001 is committed/pushed and its
-actual diff reviewed. Owner says "没空验收 你继续做s3吧": proceed without
-claiming user runtime acceptance. S2 delivery is recorded in
-[its handoff](../history/M9-T96-S2-rgb-migration.md). S3 audit and migration
-instructions are complete; executor cba71230 is pushed and actual-diff reviewed.
-Owner acknowledges S3 and admits S4: "哦这样啊 那准入s4 你告诉我如何干净的".
-Owner approves S4 closure and explicitly keeps T96 open.
-Owner now admits S5: "非常好，我希望就按照现有架构+这个方案来做！请你开工".
-S5 implementation replaces frame copies with bounded pointer ownership circulation.
-Final qualification is complete: x86 and x64 each pass 194/194, no skips.
-The x64 native set passed unchanged after the owner reconnected the desktop.
-Earlier disconnected-session failures remain recorded below. Executor P1 ccecf953 is committed and pushed. Coordinator review of that actual
-commit confirms bounded ownership, no large payload transport copies, no mirror
-or Compat changes, and the final XML/artifact ledger. S5 awaits owner acceptance;
-S/T closure is not claimed.
-S4 remains closed; see the
-[S4 closure](../history/M9-T96-S4-frame-lifetime-audit.md). S3's
-[documentation delivery](../history/M9-T96-S3-rgb-corpus-audit.md) is complete
-at cba71230/3758a33e; S2 manual runtime
-acceptance remains unclaimed.
+T96 remains open. Owner accepted S6; see [closure](../history/M9-T96-S6-audit-closure.md).
+S7 is active by explicit owner admission: direct Console production, native
+rebind-without-rewrite regression and equivalent transport-copy audit. Owner
+additionally approves pointer-discriminated Window frames, removal of valid/
+graphics booleans and removal of the Machine frame envelope; sequence belongs
+to the Window frame. Session remains the sole routing coordinator.
+The [S7 ledger](../proposals/m9-lib-rgb-graphics-frame.md#t96-s7-direct-console-production) owns its
+bounded convergence ledger. S7 is implemented and verified, ready for executor
+commit/push and coordinator actual-commit review; owner acceptance remains
+pending. User snapshot.debug is preserved and excluded.
 
-S6 is now active by owner admission; [S5 delivery](../history/M9-T96-S5-frame-exchange-delivery.md)
-remains an unaccepted checkpoint, not a second active task.
-
-## M9 T96 S6 Packet
+## M9 T96 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 准入新S完成本次审计问题的修复。 S5 delivery remains recorded without claiming runtime acceptance. |
-| Objective | Close S5 audit: concurrent consumer turnover regression; remove unused Session frame payload; validate immutable frames once at publication; reconcile stale ownership documentation. |
+| Admission And Approval | Owner accepts S6 and admits S7: 那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。 |
+| Objective | Produce Console frames directly into Machine-owned three-slot storage; remove Session/UI guest-text copying; add native rebind-without-rewrite proof and audit equivalent transport copies. |
 | Non-goals | No mirror/Compat, guest timing, media, INI, surface replacement, generic resource framework or second transport path. |
-| Reference Baseline | d76355ed (S5 delivered); keep exchange roles, FIFO notifications and Machine observer contract unchanged. |
+| Reference Baseline | b25f9969 (S6 accepted); preserve exchange roles, FIFO notices, diagnostic reads and native rendering behavior. |
 | Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Lib private Window helpers and exchange tests; Emulator Session wake-hint signature and direct callers; manifests and ownership documentation. Machine observer ABI, App/Core and exchange algorithm unchanged. |
+| Files And ABI Surface | Lib Window frame schema and consumers; Emulator Machine driver/publication, Session/UI routing and Product assembly; App machine driver; direct caller tests, Lib native Console regression, manifests and current design. Remove Machine frame envelope; mutually exclusive text/graphics pointers and sequence belong to Window. No mirror or Compat changes. |
 | Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no rules edits in S6. |
-| Verification | Deterministic overwrite/take/retire races, slow-consumer progress, failure/no-frame, pause/reset/load, component recreation and teardown; dual-width focused then complete unit/gate/integration runs and both EXEs. Hidden owned jobs under build/t96/s6, no Computer Use or interactive timeout termination. |
+| Verification | Direct producer/consumer pointer identity, both slot lifetimes, text/graphics/status transitions, failed/no-frame publication, native raw rebind before rewriting, reset/load/recreation; dual-width focused and full unit/gate/integration tests and EXEs. Hidden owned jobs under build/t96/s7; five-minute no-progress inspection, no automatic termination; executor owns cleanup. |
 | Expected Markers | Window roles produce/pending/processing/displayed, Console produce/pending/processing; bounded allocations, no pixel memcpy between transport stages, no outward Lib dependency. |
 | Asset Needs | Preserve user configuration, media and untracked checkpoint; refresh only package EXEs after successful build. |
-| Reporting Requirements | Production +10..25/-25..50, net -10..-30; tests +100..160/-20..50. Report actual accounting and evidence, not a promised speedup. |
+| Reporting Requirements | Production +120..200/-130..220, net -100..+70; test net +100..200; report actual component accounting and evidence, not a promised speedup. |
 | Stop Conditions | More slots, consumer-dependent producer wait, extra pinned historical frame, or changed failure/snapshot semantics requires explicit revised design, not hidden fallback. |
 | Exit Criteria | Single transport ownership path, bounded complete lifecycle proof, full qualification, artifacts, actual diff review, commit/push and owner acceptance. |
-| Original Owner Request | 准入新S完成本次审计问题的修复。 |
-| Similar-Issue Sweep | All frame producers/copy readers, event routes, native consumers, observer callbacks and reset/destroy paths; small Console conversion and explicit diagnostic copies distinguished from forbidden transport copies. |
+| Original Owner Request | 那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。 |
+| Similar-Issue Sweep | All driver producers, Session/UI payload writes, mailbox/leaf handoffs, status pages, observers and diagnostic readers. Remove presentation staging copies; retain only source decoding, native rendering and explicit diagnostic copies with distinct evidence. |
 
-S6 admitted. Expected production +10..25/-25..50 (net -10..-30), tests
-+100..160/-20..50. Scope: Lib private Window helpers and exchange tests;
-Emulator Session notifications and callers; manifests and current design docs.
-Hidden owned qualification under build/t96/s6; full dual-width tests and EXEs.
-S6 implementation, executor self-review and full qualification are complete.
-Executor P1 21b64548 is committed and pushed. Coordinator reviewed that actual
-commit, checked all 253 affected-corpus manifest entries, dual-width 194-name
-coverage against CTest enumeration, final turnover repeat and deployed hashes.
-No blocking finding remains in the four-item audit scope. S6 awaits owner
-acceptance; S/T closure is not claimed.
 
 ## Current Technical Baseline
 
-- S6 production C/H +19/-17, net +2; tests C/H +88/-20, net +68.
-  Lib production +10/-7, Emulator +9/-10; Lib tests +75/-0,
-  Emulator tests +13/-20. Manifests/docs/artifacts are excluded.
-  Full changed-path and four-finding convergence ledger is in the proposal.
-- x86 and x64 each pass 194/194 distinct tests, no skips: 178 unit/gates,
-  eight background integrations, five desktop and three native audio.
-  Evidence: build/t96/s6/full1/{unit,integration}-x86.xml and -x64.xml,
-  native-{x86,x64}-0..7.xml; qualification.exit is 0. Focused sets are 15/15.
-  Final x64 turnover-test counter cleanup was rebuilt and passed ten repeats
-  in build/t96/s6/recheck-x64/turnover.xml (qualification.exit 0), superseding
-  that test's earlier x64 binary. x86 full qualification used the final test.
-- Both package EXEs are rebuilt and deployed. SHA-256 softpc32:
-  37FECBCEDB6C8B0897DF4EF882E84974FF61872FF0A44A8E55550DF1245C2B40;
-  softpc64: 70FC59C1498712AC84CCB6EEF2EF058FF3F291FA976704132C7B58881D6194B7.
-- Existing original-mirror macro-redefinition warnings and x86 Ninja log
-  recovery remain disclosed; no new warning in changed production files was
-  observed. No zero-warning or measured performance claim is made.
-- No App/Core/mirror, INI, media, snapshot or exchange-algorithm changes.
-  Untracked assets/binary/snapshot.debug remains owner-owned and excluded.
+- S7 production C/H +237/-298, net -61; tests C/H +749/-671, net +78.
+  Component/path accounting and bounded copy audit are in the proposal.
+  The Machine envelope is deleted; Window's sequence and mutually exclusive
+  payload pointers use slot-owned backing. Machine owns both exchanges and
+  Session/UI route references; Console maps never enter Window graphics.
+- Final evidence covers all 194 distinct registered tests per architecture,
+  zero skips/failures: 178 unit/gates in build/t96/s7/final1/unit-*.xml;
+  eight background integrations in final-check/integration-*.xml;
+  five desktop and three native audio in final1/native-*-0..7.xml.
+  Both 13-test focused sets pass. Final-check qualification.exit is 0.
+- Earlier final1 and recheck exits remain 1: intermittent x86 Win3.1
+  prompt-roundtrip failures were followed by three unchanged independent
+  passes, then one aggregate failure. Added failure-stage/frame diagnostics;
+  subsequent probe and final-check integrations pass. This is not a proven
+  repair of that intermittent case; TODO records the investigation boundary.
+  Native deliberate-viewport narrowing also has a separately recorded finding.
+- Both EXEs were rebuilt/deployed from the current production code. SHA-256:
+  softpc32 1744CB9D976FD714A2FB425B85AFD54FA8232017AFF32B8EC8B5686BFAB7B9DE;
+  softpc64 69622273FFE889C7F9C035DBE42CCED900FDF5F670075E537849A21253291D17.
+  Later failure diagnostics change only the integration test executable.
+- All 292 shared manifest entries match. Documentation gate and diff whitespace
+  check pass. Existing mirror warnings, unchanged VGA test casts and x86 Ninja
+  log recovery remain disclosed; no zero-warning or speedup claim.
+- No mirror/Compat, Base exchange algorithm, INI, media or snapshot-format
+  changes. Owner-owned untracked assets/binary/snapshot.debug is excluded.
+  T96 remains open and S7 awaits owner acceptance after delivery/review.
 
 ### S5 delivered checkpoint
 

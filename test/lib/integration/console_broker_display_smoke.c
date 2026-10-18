@@ -341,6 +341,9 @@ int main(void)
     frame.palette[1] = 0x123456;
     for (lib_i32 round = 0; round < 3; ++round) {
         lib_test_assert(console_broker_replace(broker, cooked, raw, CONSOLE_BROKER_RAW_EVENTS) == 0);
+        /* Prove saved raw contents before rewriting them. The separate extent
+         * tests intentionally resize host geometry and test frame repair. */
+        if (round != 0) expect_display(&raw_display);
         lib_test_assert(lib_console_write_text_frame(raw, &frame) == 0);
         snapshot(&raw_display);
         lib_test_assert(raw_display.cells[0].Char.UnicodeChar == '#');

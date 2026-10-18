@@ -1,4 +1,5 @@
 #include "lib/types/types_interface.h"
+#include "lib/types/test.h"
 #include "lib/types/file.h"
 #include "emulator/product/composition_interface.h"
 
@@ -39,6 +40,15 @@ typedef struct composition_fixture {
 } composition_fixture;
 
 static composition_fixture fixture;
+void emulator_ui_produce_console_status(void *context, kvm_console_text_frame *frame)
+{ (void)context; (void)frame; }
+
+void emulator_machine_set_console_status_source(emulator_machine *machine,
+    void (*produce)(void *, kvm_console_text_frame *), void *context)
+{
+    lib_test_assert(machine == &fixture.emulator_machine);
+    lib_test_assert(produce == emulator_ui_produce_console_status && context == &fixture.ui);
+}
 static char opening[256];
 
 int emulator_product_composition_smoke_printf(const char *format, ...)

@@ -300,9 +300,9 @@ static lib_bool win32_window_cursor_rect(lib_win32_hwnd window,
 static lib_bool win32_window_cursor_visible(const kvm_win32_window_context *context)
 {
     if (context->frame == LIB_NULL) return LIB_FALSE;
-    const kvm_text_frame *text = &context->frame->text.base;
-    return !context->frame->graphics &&
-        (text->cursor_mode == KVM_CURSOR_SOURCE ? text->cursor_phase :
+    if (context->frame->text == LIB_NULL) return LIB_FALSE;
+    const kvm_text_frame *text = &context->frame->text->base;
+    return (text->cursor_mode == KVM_CURSOR_SOURCE ? text->cursor_phase :
             text->cursor_mode == KVM_CURSOR_HOST && context->cursor_blink_visible);
 }
 
@@ -312,7 +312,7 @@ static lib_bool win32_window_paint(lib_win32_hwnd window, kvm_win32_window_conte
     kvm_window_rect display;
 
     if (context == LIB_NULL || context->surface_dc == LIB_NULL ||
-        context->frame == LIB_NULL || !context->frame->valid ||
+        context->frame == LIB_NULL || (context->frame->text == LIB_NULL && context->frame->graphics == LIB_NULL) ||
         !win32_window_display_rect(context, context->surface_width,
             context->surface_height, &display)) return LIB_TRUE;
     if (!lib_win32_stretch_blt(dc, display.left, display.top, display.right - display.left,
@@ -344,8 +344,8 @@ static void win32_window_advance_cursor_blink(lib_win32_hwnd window,
     /* KillTimer does not remove an already queued tick. The frozen/due guards
      * also prevent an old tick from advancing a newly unfrozen phase early. */
     if (!win32_window_accepting_input(context) || context->frozen ||
-        context->frame == LIB_NULL || !context->frame->valid || context->frame->graphics ||
-        context->frame->text.base.cursor_mode != KVM_CURSOR_HOST ||
+        context->frame == LIB_NULL || (context->frame->text == LIB_NULL && context->frame->graphics == LIB_NULL) || context->frame->graphics ||
+        context->frame->text->base.cursor_mode != KVM_CURSOR_HOST ||
         (lib_win32_long)(now - context->cursor_blink_due) < 0)
         return;
     periods = (now - context->cursor_blink_due) / WIN32_WINDOW_CURSOR_BLINK_INTERVAL_MS + 1u;
@@ -489,7 +489,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     lib_u32 height;
     lib_win32_rect old_cursor = {0}, new_cursor = {0};
     const kvm_cursor_mode old_mode = context->frame == LIB_NULL || context->frame->graphics ?
-        KVM_CURSOR_DISABLED : context->frame->text.base.cursor_mode;
+        KVM_CURSOR_DISABLED : context->frame->text->base.cursor_mode;
     lib_bool old_visible = win32_window_cursor_visible(context) &&
         win32_window_cursor_rect(window, context, &old_cursor);
     lib_bool new_visible;
@@ -500,7 +500,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     incoming = kvm_component_mailboxes_take_frame(&context->component->base.mailboxes);
     if (incoming == LIB_NULL) return;
     context->frame = incoming;
-    if (!context->frame->graphics && context->frame->text.base.cursor_mode == KVM_CURSOR_HOST &&
+    if (!context->frame->graphics && context->frame->text->base.cursor_mode == KVM_CURSOR_HOST &&
         old_mode != KVM_CURSOR_HOST) {
         context->cursor_blink_visible = LIB_TRUE;
         context->cursor_blink_due = lib_win32_get_tick_count() +

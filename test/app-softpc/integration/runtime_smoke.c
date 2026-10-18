@@ -55,7 +55,7 @@ int main(void)
     softpc_machine *machine = NULL;
     softpc_machine_fixture fixture = { 0 };
     emulator_machine *runtime;
-    emulator_machine_frame *frame;
+    kvm_window_frame_storage *frame;
     lib_u32 first_run;
     runtime_completion_probe completion_probe = { 0 };
 
@@ -81,7 +81,7 @@ int main(void)
     first_run = emulator_machine_run_generation(runtime);
     assert(first_run != 0u);
     softpc_test_sleep_milliseconds(150u);
-    frame = (emulator_machine_frame *)lib_allocate_zero(1u, sizeof(*frame));
+    frame = (kvm_window_frame_storage *)lib_allocate_zero(1u, sizeof(*frame));
     assert(frame != NULL);
     {
         lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
@@ -93,11 +93,11 @@ int main(void)
                defined snapshot miss into a timing-dependent test failure. */
             if (emulator_machine_copy_published_frame(runtime, frame,
                     emulator_machine_run_generation(runtime)) &&
-                frame->window.graphics == 0u && frame->window.text.base.cursor_column >= 0 &&
-                frame->window.text.base.cursor_column < KVM_TEXT_COLUMNS &&
-                frame->window.text.base.cursor_row >= 0 &&
-                frame->window.text.base.cursor_row < KVM_TEXT_ROWS &&
-                frame->window.text.base.cursor_mode == KVM_CURSOR_HOST && frame->window.text.base.cursor_phase != 0u) {
+                frame->frame.graphics == LIB_NULL && frame->data.text.base.cursor_column >= 0 &&
+                frame->data.text.base.cursor_column < KVM_TEXT_COLUMNS &&
+                frame->data.text.base.cursor_row >= 0 &&
+                frame->data.text.base.cursor_row < KVM_TEXT_ROWS &&
+                frame->data.text.base.cursor_mode == KVM_CURSOR_HOST && frame->data.text.base.cursor_phase != 0u) {
                 cursor_seen = 1;
                 break;
             }
@@ -107,15 +107,15 @@ int main(void)
            frame.  Both outer frontends consume this value without reading a
            controller register or a guest-memory pointer. */
         assert(cursor_seen);
-        assert(frame->window.text.base.font_height > 0u && frame->window.text.base.font_height <= 16u);
-        assert(frame->window.text.base.cursor_bottom == frame->window.text.base.font_height - 1u);
-        assert(frame->window.text.base.cursor_top <= frame->window.text.base.cursor_bottom);
+        assert(frame->data.text.base.font_height > 0u && frame->data.text.base.font_height <= 16u);
+        assert(frame->data.text.base.cursor_bottom == frame->data.text.base.font_height - 1u);
+        assert(frame->data.text.base.cursor_top <= frame->data.text.base.cursor_bottom);
     }
-    assert(emulator_machine_published_frame_sequence(runtime) == frame->sequence);
+    assert(emulator_machine_published_frame_sequence(runtime) == frame->frame.sequence);
     assert(emulator_machine_published_frame_run_generation(runtime) == first_run);
-    assert(frame->sequence != 0u);
+    assert(frame->frame.sequence != 0u);
     {
-        lib_u32 stable_sequence = frame->sequence;
+        lib_u32 stable_sequence = frame->frame.sequence;
         LONG stable_state_facts;
         /* An unchanged text screen is not an executor heartbeat.  Repeated
            publication would flood the app control FIFO and starve Console
@@ -123,7 +123,7 @@ int main(void)
         softpc_test_sleep_milliseconds(150u);
         assert(emulator_machine_copy_published_frame(runtime, frame,
             emulator_machine_run_generation(runtime)));
-        assert(frame->sequence == stable_sequence);
+        assert(frame->frame.sequence == stable_sequence);
         /* Executor paint callbacks are frame facts only. They must not create
            additional lifecycle completions while the machine stays running. */
         stable_state_facts = InterlockedCompareExchange(

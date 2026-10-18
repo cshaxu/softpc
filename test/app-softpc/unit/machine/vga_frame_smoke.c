@@ -708,14 +708,14 @@ static void make_boot_disk(const char *path)
     assert(fclose(file) == 0);
 }
 
-static void verify_rgb_pixels(const emulator_machine_frame *frame, const void *bits,
+static void verify_rgb_pixels(const kvm_window_frame *frame, const void *bits,
     const void *info)
 {
     const BITMAPINFO *dib = info;
-    lib_u32 stride = (frame->window.image.width + 3u) & ~3u;
-    for (lib_u32 row = 0u; row < frame->window.image.height; ++row)
-        for (lib_u32 col = 0u; col < frame->window.image.width; ++col) {
-            lib_u32 rgb = frame->window.image.pixels[row * frame->window.image.stride + col];
+    lib_u32 stride = (frame->graphics->width + 3u) & ~3u;
+    for (lib_u32 row = 0u; row < frame->graphics->height; ++row)
+        for (lib_u32 col = 0u; col < frame->graphics->width; ++col) {
+            lib_u32 rgb = frame->graphics->pixels[row * frame->graphics->stride + col];
             const RGBQUAD *entry = &dib->bmiColors[((const lib_u8 *)bits)[row * stride + col]];
             assert((rgb >> 24u) == 0u && ((rgb >> 16u) & 255u) == entry->rgbRed &&
                 ((rgb >> 8u) & 255u) == entry->rgbGreen && (rgb & 255u) == entry->rgbBlue);
@@ -734,7 +734,9 @@ static void verify_driver_geometry(softpc_machine *machine)
     };
     vm_driver *adapter = NULL;
     emulator_machine_driver driver;
-    emulator_machine_frame *frame = lib_allocate(sizeof(*frame));
+    kvm_window_frame_storage *frame = lib_allocate(sizeof(*frame));
+    kvm_console_text_frame console = {0};
+    lib_bool produced;
     unsigned index, pass;
     assert(frame != NULL);
     assert(vm_driver_create(&adapter, machine) == LIB_STATUS_OK);
@@ -755,13 +757,13 @@ static void verify_driver_geometry(softpc_machine *machine)
         assert(Currently_emulated_video_mode == modes[index]);
         if (modes[index] == 3) {
             lib_memory_set(frame, 0xa5, sizeof(*frame));
-            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-            assert(frame->window.valid && !frame->window.graphics);
-            assert(frame->window.text.base.text_columns == 80u &&
-                frame->window.text.base.text_rows == 25u);
-            for (lib_size byte = kvm_window_frame_size_bytes(&frame->window);
-                    byte < sizeof(frame->window); ++byte)
-                assert(((const lib_u8 *)&frame->window)[byte] == 0xa5);
+            assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+            assert(produced && !frame->frame.graphics);
+            assert(frame->data.text.base.text_columns == 80u &&
+                frame->data.text.base.text_rows == 25u);
+            for (lib_size byte = lib_offsetof(kvm_window_frame_storage, data) + sizeof(frame->data.text);
+                    byte < sizeof(*frame); ++byte)
+                assert(((const lib_u8 *)&frame->frame)[byte] == 0xa5);
             {
                 unsigned saved_columns = get_chars_per_line();
                 unsigned saved_height = get_char_height();
@@ -774,15 +776,15 @@ static void verify_driver_geometry(softpc_machine *machine)
                 set_char_height(1u);
                 /* Registers can describe the next graphics mode while the
                    selected text painter still owns the completed 80x25. */
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-                assert(frame->window.text.base.text_columns == 80u &&
-                    frame->window.text.base.text_rows == 25u);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                assert(frame->data.text.base.text_columns == 80u &&
+                    frame->data.text.base.text_rows == 25u);
                 set_chars_per_line(0u);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
                 set_chars_per_line(saved_columns);
                 set_char_height(saved_height);
                 now_width = 81;
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_UNSUPPORTED);
                 now_width = saved_width;
                 {
                     const unsigned text_rows[] = {22, 25, 43, 50, 25, 50};
@@ -796,55 +798,55 @@ static void verify_driver_geometry(softpc_machine *machine)
                             ((rows - 1u) * stride + 79u) * cell_bytes;
                         unsigned char saved = *last;
                         *last = 'Z';
-                        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-                        assert(frame->window.text.base.text_rows == rows &&
-                            frame->window.text.base.cells[(rows - 1u) * 80u + 79u].glyph_index == 'Z');
+                        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                        assert(frame->data.text.base.text_rows == rows &&
+                            frame->data.text.base.cells[(rows - 1u) * 80u + 79u].glyph_index == 'Z');
                         *last = saved;
                     }
                 }
                 now_height = 51;
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_UNSUPPORTED);
                 now_height = 0;
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
                 now_height = saved_rows;
                 c_sas_store(0x485u, 32u);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-                assert(frame->window.text.base.font_height == saved_height);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                assert(frame->data.text.base.font_height == saved_height);
                 {
                     const unsigned heights[] = {17u, 24u, 32u};
                     for (unsigned h = 0; h < sizeof(heights)/sizeof(heights[0]); ++h) {
                         set_char_height(heights[h]);
-                        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-                        assert(frame->window.text.base.font_height == heights[h]);
+                        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                        assert(frame->data.text.base.font_height == heights[h]);
                     }
                 }
                 set_char_height(33u);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_UNSUPPORTED);
-                assert(frame->window.text.base.font_height == 33u);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_UNSUPPORTED);
+                assert(frame->data.text.base.font_height == 33u);
                 set_char_height(0u);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-                assert(frame->window.text.base.font_height == 0u);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                assert(frame->data.text.base.font_height == 0u);
                 set_char_height(saved_height);
                 c_sas_store(0x485u, saved_font_height);
                 /* Intermediate geometry is not a completed unsupported mode. */
                 now_height = 50;
                 set_display_disabled(1);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
                 set_display_disabled(0);
                 set_mode_change_required(TRUE);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
                 set_mode_change_required(FALSE);
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-                assert(frame->window.text.base.text_rows == 50u);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                assert(frame->data.text.base.text_rows == 50u);
                 now_height = saved_rows;
                 {
                     byte *saved_planes = EGA_planes;
                     EGA_planes = NULL;
-                    assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_IO_ERROR);
-                    assert(!frame->window.valid);
+                    assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_IO_ERROR);
+                    assert(!produced);
                     EGA_planes = saved_planes;
                 }
-                assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
             }
             {
                 const void *surface;
@@ -859,25 +861,28 @@ static void verify_driver_geometry(softpc_machine *machine)
                     set_attrib_font_select(enabled);
                     for (unsigned attribute = 0; attribute < 256; ++attribute) {
                         cells[1] = (unsigned char)attribute;
-                        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK);
-                        assert(frame->window.valid && !frame->window.graphics);
-                        assert(frame->window.text.base.cells[0].foreground == (attribute & 15u));
-                        assert(frame->window.text.base.cells[0].background == (attribute >> 4));
-                        assert(frame->window.text.base.cells[0].glyph_bank ==
+                        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK);
+                        assert(produced && !frame->frame.graphics);
+                        assert(kvm_console_text_frame_validate(&console) == LIB_STATUS_OK);
+                        assert(lib_memory_compare(&console.base, &frame->data.text.base,
+                            sizeof(console.base)) == 0);
+                        assert(frame->data.text.base.cells[0].foreground == (attribute & 15u));
+                        assert(frame->data.text.base.cells[0].background == (attribute >> 4));
+                        assert(frame->data.text.base.cells[0].glyph_bank ==
                             (unsigned)(enabled && (attribute & 8u)));
                     }
                 }
                 cells[1] = saved_attribute;
                 set_attrib_font_select(saved_select);
             }
-            const lib_u16 *map = frame->characters.primary;
+            const lib_u16 *map = console.characters.primary;
             assert(map[0]==' ' && map['A']=='A');
             assert(map[1]==0x263a && map[0x7f]==0x2302);
             assert(map[0xb3]==0x2502 && map[0xc4]==0x2500);
             assert(map[0xda]==0x250c && map[0xdb]==0x2588);
             assert(map[0x82]==0xe9 && map[0xff]==0xa0);
-            assert(lib_memory_compare(map, frame->characters.secondary,
-                sizeof(frame->characters.primary)) == 0);
+            assert(lib_memory_compare(map, console.characters.secondary,
+                sizeof(console.characters.primary)) == 0);
             continue;
         }
         assert(softpc_machine_presentation_dib(machine, &bits, &info,
@@ -905,45 +910,45 @@ static void verify_driver_geometry(softpc_machine *machine)
                 &right, &bottom)) { }
         host_mark_screen_refresh();
         host_flush_screen();
-        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-        assert(frame->window.valid && frame->window.graphics);
-        assert(frame->window.image.width == width && frame->window.image.height == height);
+        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+        assert(produced && frame->frame.graphics);
+        assert(frame->data.graphics.width == width && frame->data.graphics.height == height);
         /* A legitimate full-height half repaint must not resize the frame.
          * Both halves are tested across original mode transitions. */
         rect.Left = 0; rect.Top = 0;
         rect.Right = (SHORT)((pass ? width / 2u : width) - 1u);
         rect.Bottom = (SHORT)(height - 1u);
         assert(softpc_standalone_dib_damage(&rect, TRUE));
-        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-        assert(frame->window.valid && frame->window.graphics);
-        if (frame->window.image.width != width || frame->window.image.height != height)
+        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+        assert(produced && frame->frame.graphics);
+        if (frame->data.graphics.width != width || frame->data.graphics.height != height)
             fprintf(stderr, "mode %02x pass %u: DIB %ux%u, frame %ux%u\n",
                 modes[index], pass, width, height,
-                frame->window.image.width, frame->window.image.height);
-        assert(frame->window.image.width == width && frame->window.image.height == height);
-        assert(frame->window.image.stride == width);
-        verify_rgb_pixels(frame, bits, info);
+                frame->data.graphics.width, frame->data.graphics.height);
+        assert(frame->data.graphics.width == width && frame->data.graphics.height == height);
+        assert(frame->data.graphics.stride == width);
+        verify_rgb_pixels(&frame->frame, bits, info);
         rect.Left = (SHORT)(width / 2u); rect.Right = (SHORT)(width - 1u);
         assert(softpc_standalone_dib_damage(&rect, TRUE));
-        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-        assert(frame->window.image.width == width);
-        verify_rgb_pixels(frame, bits, info);
+        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+        assert(frame->data.graphics.width == width);
+        verify_rgb_pixels(&frame->frame, bits, info);
         /* A graphics route with no complete dirty frame must publish nothing.
            It must never substitute the text surface: restoration relies on
            this same rule while the indexed painter is being rebuilt. */
-        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
         {
             const BITMAPINFO *dib = (const BITMAPINFO *)info;
             PALETTEENTRY colour = { dib->bmiColors[0].rgbRed,
                 dib->bmiColors[0].rgbGreen, dib->bmiColors[0].rgbBlue, 0 };
             colour.peRed ^= 0xffu;
             softpc_standalone_dib_set_palette_entries(&colour, 1u);
-            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
-            verify_rgb_pixels(frame, bits, info);
-            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && !frame->window.valid);
+            assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+            verify_rgb_pixels(&frame->frame, bits, info);
+            assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
             colour.peRed ^= 0xffu;
             softpc_standalone_dib_set_palette_entries(&colour, 1u);
-            assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+            assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
         }
     }
     /* Exercise the actual publication boundary with padded 3-pixel rows. */
@@ -974,16 +979,16 @@ static void verify_driver_geometry(softpc_machine *machine)
             if (field == 3) dib->bmiHeader.biBitCount = 24;
             if (field == 4) dib->bmiHeader.biCompression = BI_RLE8;
             if (field == 5) dib->bmiHeader.biClrUsed = 16;
-            assert(driver.copy_frame(driver.context, frame) ==
+            assert(driver.copy_frame(driver.context, frame, &console, &produced) ==
                 (field < 3 ? LIB_STATUS_INVALID_ARGUMENT : LIB_STATUS_UNSUPPORTED));
-            assert(!frame->window.valid);
+            assert(!produced);
         }
         dib->bmiHeader = saved;
         /* Rejections did not consume the pending damage. */
-        assert(driver.copy_frame(driver.context, frame) == LIB_STATUS_OK && frame->window.valid);
+        assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
         const lib_u32 expected[] = {0x123456, 0xabcdef, 0x123456, 0xabcdef, 0x123456, 0xabcdef};
-        assert(frame->window.image.stride == 3 && frame->window.image.height == 2);
-        assert(lib_memory_compare(frame->window.image.pixels, expected, sizeof(expected)) == 0);
+        assert(frame->data.graphics.stride == 3 && frame->data.graphics.height == 2);
+        assert(lib_memory_compare(frame->data.graphics.pixels, expected, sizeof(expected)) == 0);
         dib->bmiColors[0] = colours[0]; dib->bmiColors[1] = colours[1];
         assert(softpc_standalone_dib_bind(previous));
         host_flush_screen();

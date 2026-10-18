@@ -75,11 +75,12 @@ void emulator_ui_set_run_generation(emulator_ui *ui, lib_u32 run_generation);
 lib_status emulator_ui_apply_action(emulator_ui *ui, emulator_ui_action action,
     emulator_ui_state state);
 lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state state);
-/* Control-thread writer; fill completely before publish. No retention across
- * a successful publication. Window borrows frames until UI destroys it. */
-kvm_console_text_frame *emulator_ui_frame_target(emulator_ui *ui);
+/* Pure producer callback: reads immutable UI options, fills an executor-owned
+ * slot, performs no host I/O. Stop the producer before destroying UI. */
+void emulator_ui_produce_console_status(void *context, kvm_console_text_frame *frame);
+/* Borrow both producer exchanges until their consumers have been destroyed. */
 lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *frames,
-    lib_bool graphics, lib_u32 sequence,
+    kvm_frame_exchange *console_frames, lib_bool graphics, lib_u32 sequence,
     lib_bool window_actual, lib_bool vm_console_current,
     lib_bool console_status_surface);
 lib_status emulator_ui_release_window_mouse(emulator_ui *ui);
