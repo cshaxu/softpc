@@ -17,8 +17,10 @@ no unrelated build, artifact or guest-media changes. The follow-up ledger below
 owns bounded evidence and review. User snapshot.debug is
 preserved and excluded.
 
-Owner-approved retained three-slot Console recovery is implemented and verified;
-executor delivery and actual-commit review follow before owner acceptance.
+Owner-approved retained three-slot Console recovery is implemented and verified.
+Executor 881a3df9 is committed and pushed; coordinator reviewed the actual
+commit, ownership transitions, native assertions and qualification evidence.
+S7 now awaits owner acceptance; T96 remains open.
 Raw activation requeues the held input through the existing output path; no
 extra frame, backup, Machine publication or second renderer is introduced.
 Cooked native history/cursor restoration remains strict. The earlier capacity-

@@ -1244,3 +1244,26 @@ proof; unrelated startup/prompt-roundtrip debts remain. Executor actual-diff
 review finds no extra slot, transport copy, lock-held output or second path.
 Commit/push and coordinator actual-commit review precede owner acceptance; S7
 and T96 are not closed by these test results.
+
+### S7 retained recovery coordinator review
+
+Executor commit 881a3df90639bd534c238424d6276f9704e0f4e5 is pushed to main.
+Coordinator switched roles and read its actual production/test/documentation
+diff, rather than accepting only the executor summary. The review maps the
+owner's retained-three-slot request to take/finish ownership, activation's sole
+requeue caller, native normal-output reconstruction and the one-publication
+integration test. Producer storage remains distinct from held/processing input;
+newer pending frames and invalidated generations cannot be replaced by redraw.
+No native surface, extra frame allocation, Machine/Session path or product
+configuration was added. Cooked uses its existing native screen and strict
+restoration; raw restoration is explicitly reconstruction, not false native
+retention. Test-owned readback occurs after worker output, not a producer rewrite.
+
+Reviewed XML gives passing evidence for all 194 tests per architecture, with
+the preserved x64 package startup failure followed by its unchanged independent
+pass. This is not an all-green first aggregate run or repair of startup debt.
+Both artifact hashes match CURRENT. Manifests, documentation gate and whitespace
+check pass. Original warnings remain disclosed. Only the owner-owned untracked
+snapshot.debug remains outside Git; it was neither staged nor changed.
+No blocking issue found in this bounded actual-commit review. S7 awaits owner
+acceptance and T96 remains open; this governance P does not close either.
