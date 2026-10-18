@@ -27,8 +27,9 @@ removes the broker's duplicate cell cache. Recovery must override content reuse.
 Implementation and qualification are complete. Executor 917a2277 is pushed;
 coordinator reviewed its actual diff and evidence. Owner reopens the current S7
 at 104bab46 for active-extent Console conversion and real font-register dirty
-regression. This bounded follow-up is implemented and verified, awaiting
-executor delivery and actual-commit review; T96 remains open.
+regression. This bounded follow-up is implemented and verified. Executor
+c2f5becb is pushed; coordinator reviewed the actual commit and evidence.
+S7 awaits owner acceptance; T96 remains open.
 Raw activation requeues the held input through the existing output path; no
 extra frame, backup, Machine publication or second renderer is introduced.
 Cooked native history/cursor restoration remains strict. The earlier capacity-
