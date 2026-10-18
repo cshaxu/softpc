@@ -369,3 +369,22 @@ F1/F2 are removed from deferred TODO; S3/F3 and S4/F4 remain unimplemented.
 No real native close error or 2-GiB guest installation was reproduced; those
 boundaries have injected adapter proof. Existing real-guest snapshot/restart
 and package paths pass the integration regression. S2 waits for owner acceptance.
+
+### S2 actual-commit coordinator review
+
+Executor P1 7afc9981 was committed and pushed before this role switch. The
+coordinator read its actual CMake, both production diffs, all three test files
+and four documentation diffs; the two binary changes were reconciled with the
+full link logs and recorded hashes. The twelve-path scope contains no public,
+mirror, INI or guest-media change. Accounting independently agrees with
+production +30/-16, tests +195/-0 and root CMake +3/-2. Closed leases are not
+retained/retried, transfer multiplication follows the capacity guard, and valid
+replacement ownership/metadata survive a reported retirement error.
+
+The original request, active packet and six S2 ledger members are satisfied
+within their stated proof limits. The coordinator reran the independent XML
+set comparison: x64/x86 each 193 unique passing registered cases, no skips or
+failures. Documentation/whitespace checks pass. Existing mirror warnings and
+Ninja recovery remain disclosed, not fixed. Main matches the pushed executor
+commit; only owner-owned untracked snapshot.debug remains and is excluded.
+This review accepts executor delivery, not owner acceptance or T98 closure.

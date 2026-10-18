@@ -8,7 +8,8 @@ propagate real media retirement errors and enforce HDD address bounds.
 The [proposal](../proposals/m9-nonpublic-quality-performance-audit.md) records
 S2-S4 ordering. S2 implementation and qualification are complete: both cached
 builds/releases and all 193 registered tests per width pass, zero failures/skips.
-Executor delivery and actual-commit review are being finalized for owner acceptance.
+Executor P1 7afc9981 is pushed; coordinator reviewed its actual twelve changed
+paths, exact test coverage and package hashes. S2 awaits owner acceptance.
 Each implementation S delivers builds/tests and a pushed actual-diff review,
 then waits for owner acceptance before the next S. No public writer expansion
 is admitted; S4 retains FILE operations and changes only UTF-8 opening.
