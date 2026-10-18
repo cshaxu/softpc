@@ -23,13 +23,6 @@ static void check_validation(void)
     lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_INVALID_ARGUMENT);
     source.data.text.base.text_columns = source.data.text.base.text_rows = 1u;
     lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_OK);
-    for (lib_i32 mode = -1; mode <= 3; ++mode) {
-        source.data.text.base.cursor_mode = (kvm_cursor_mode)mode;
-        lib_test_assert(kvm_window_frame_validate(&source.frame) ==
-            (mode >= KVM_CURSOR_DISABLED && mode <= KVM_CURSOR_SOURCE ?
-                LIB_STATUS_OK : LIB_STATUS_INVALID_ARGUMENT));
-    }
-    source.data.text.base.cursor_mode = KVM_CURSOR_DISABLED;
     source.data.text.base.font_height = KVM_TEXT_FONT_DEFAULT_HEIGHT;
     source.data.text.base.text_columns = KVM_TEXT_COLUMNS;
     source.data.text.base.text_rows = KVM_TEXT_ROWS;
@@ -44,20 +37,6 @@ static void check_validation(void)
     source.data.text.base.font_height = KVM_WINDOW_FONT_HEIGHT + 1u;
     lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_UNSUPPORTED);
     source.data.text.base.font_height = 0u;
-    for (lib_u32 field = 0; field < 3; ++field) {
-        lib_u8 *value = field == 0 ? &source.data.text.base.cells[3999].foreground :
-            field == 1 ? &source.data.text.base.cells[3999].background : &source.data.text.base.cells[3999].glyph_bank;
-        *value = field == 2 ? 1 : 15;
-        lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_OK);
-        ++*value;
-        lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_INVALID_ARGUMENT);
-        source.data.text.base.text_rows = 1;
-        lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_OK); /* Invisible tail. */
-        source.data.text.base.text_rows = KVM_TEXT_ROWS;
-        *value = 0;
-    }
-    source.data.text.base.text_rows++;
-    lib_test_assert(kvm_window_frame_validate(&source.frame) == LIB_STATUS_UNSUPPORTED);
     (void)kvm_window_frame_begin_graphics(&source);
     lib_memory_set(&source.data.graphics, 0, sizeof(source.data.graphics));
     source.data.graphics.width = source.data.graphics.height = source.data.graphics.stride = 1u;

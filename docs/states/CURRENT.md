@@ -29,7 +29,12 @@ coordinator reviewed its actual diff and evidence. Owner reopens the current S7
 at 104bab46 for active-extent Console conversion and real font-register dirty
 regression. This bounded follow-up is implemented and verified. Executor
 c2f5becb is pushed; coordinator reviewed the actual commit and evidence.
-S7 awaits owner acceptance; T96 remains open.
+Owner continues S7 at 56f65ece for the bounded public-test governance audit:
+remove proven duplicate assertions/targets, restore owner-local text validation,
+prove exchange mutex failure and zero steady allocations, and tighten negative
+verifier oracles without reducing dependency-edge coverage. Production behavior
+and APIs remain unchanged. Implementation and full qualification are complete;
+executor P9 awaits actual-commit coordinator P10 review. T96 remains open.
 Raw activation requeues the held input through the existing output path; no
 extra frame, backup, Machine publication or second renderer is introduced.
 Cooked native history/cursor restoration remains strict. The earlier capacity-
@@ -42,23 +47,45 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner continues S7: 四槽的整个数据结构和算法你可以放到 KVM Base 里面去，这样两边可以统一共享同一份代码，更干净。就按这个方案把我们刚才讨论的所有点全部做干净。 Earlier schema and recovery deliveries remain checkpoints, not closure. |
-| Objective | Preserve the delivered four-slot design; convert only active Console cells and prove real font-register writes reach produced without a manually supplied host-update completion. |
+| Objective | Complete the approved public-test governance ledger within S7; retain unique failure, platform and integration proof while removing demonstrated duplication. |
 | Non-goals | No mirror edits, guest timing, media, INI, native surface replacement, generic resource framework or second transport/render path. |
-| Reference Baseline | Follow-up aa8f75c3; original b25f9969 (S6 accepted); preserve exchange roles, FIFO notices, diagnostic reads and native rendering behavior. |
+| Reference Baseline | Public-test cleanup 56f65ece; earlier follow-up aa8f75c3 and original b25f9969 (S6 accepted); preserve all production behavior. |
 | Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Baseline 104bab46: lib/kvm-console/console.c, its existing retirement/character test, App machine vga_frame test, affected manifests and task records. No API, four-slot algorithm, mirror, INI or media change. |
+| Files And ABI Surface | test/lib, test/emulator, test/x86-ibmpc, their manifests and task records; audit test/x86-debug with no demonstrated deletion. No production API, four-slot algorithm, mirror, INI or media change. |
 | Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no rules edits in S6. |
 | Verification | Direct producer/consumer pointer identity, both slot lifetimes, text/graphics/status transitions, failed/no-frame publication, native raw rebind before rewriting, reset/load/recreation; dual-width focused and full unit/gate/integration tests and EXEs. Hidden owned jobs under build/t96/s7; five-minute no-progress inspection, no automatic termination; executor owns cleanup. |
 | Expected Markers | Both consumers use produce/pending/processing/displayed; Base never interprets content. No render-dependent producer wait, steady allocation, transport copy, broker cell cache or Machine dedup. |
 | Asset Needs | Preserve user configuration, media and untracked checkpoint; refresh only package EXEs after successful build. |
-| Reporting Requirements | Follow-up estimate production +20/-20, approximately net zero; tests net +60..100. Report actual C/H counts against 104bab46, full dual-width proof and EXE hashes separately from earlier qualification. |
+| Reporting Requirements | Against 56f65ece: production 0; estimated test C/H +30..70/-150..230, net reduction 80..200; verifier CMake estimated +20..50/-10..30. Report actual counts, retained assertion owners, full cached dual-width qualification and EXE hashes. |
 | Stop Conditions | More than four slots, consumer-dependent producer wait, extra historical copy, mirror changes or changed snapshot semantics requires explicit revised design. |
 | Exit Criteria | Single transport ownership path, bounded complete lifecycle proof, full qualification, artifacts, actual diff review, commit/push and owner acceptance. |
-| Original Owner Request | 那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。 |
+| Original Owner Request | 按照你的规划，在S7内把所有测试治理干净。 Earlier schema/recovery requests remain in the linked proposal. |
 | Similar-Issue Sweep | All driver producers, Session/UI payload writes, mailbox/leaf handoffs, status pages, observers and diagnostic readers. Remove presentation staging copies; retain only source decoding, native rendering and explicit diagnostic copies with distinct evidence. |
 
 
 ## Current Technical Baseline
+
+### S7 public-test governance
+
+- Against 56f65ece: no production changes. Test C/H +86/-189, net -103:
+  Lib +75/-115, Emulator +1/-50, X86 IBM PC +10/-24; X86 Debug unchanged.
+  Test CMake +46/-40, net +6. Three duplicate targets removed with assertion
+  receivers recorded in the proposal; new Base validation/failure/allocation
+  assertions and diagnostic-specific negative fixtures retain meaningful proof.
+- Cached dual builds complete. Each architecture passes focused 25/25 and
+  all 191 distinct registered tests: 175 unit/gates, eight background
+  integration, five desktop and three native audio; zero failures/skips.
+  Evidence: build/t96/s7/test-governance/qualification.log and XML files;
+  qualification.exit=0. No qualification retry or test-budget change.
+- All 289 public manifest entries, documentation and whitespace checks pass.
+  No shared source or root test infrastructure changed. Existing mirror/ABI
+  warnings and x86 Ninja log recovery remain, not a zero-warning claim.
+- Package hashes: softpc32
+  D16647A87671559B1D114AD282E904529615DB25267D91640D72039758D5297B;
+  softpc64 E1B95ED71ACB371098C854FEF6FD4E3573B71BE98169243958F13DD2900A53C1.
+  x86 rebuilt after Ninja recovery; unchanged x64 production target remains
+  up to date and its hash is unchanged. User snapshot.debug stays untouched
+  and excluded. S7 awaits owner acceptance after coordinator review.
 
 ### S7 active-extent and font readiness follow-up
 

@@ -1476,3 +1476,77 @@ with CURRENT. No unrelated tracked modifications, mirror/config/media edits
 or root test infrastructure changes were included. Owner snapshot.debug
 remains untracked and untouched. No blocking finding within this two-member
 ledger; this review prepares acceptance, and does not close S7 or T96.
+
+### S7 public-test governance follow-up
+
+Owner admits the audit cleanup inside S7 at 56f65ece; no new S or production
+behavior change. Apply Architecture, Coding, Execution and Documentation
+governance; executor P9 followed by actual-commit coordinator review P10.
+Estimate: production zero; test C/H +30..70/-150..230 (net -80..200);
+verifier CMake +20..50/-10..30. Counts are estimates, not a deletion target.
+
+Frozen universe is the four shared source/test pairs, with all registrations
+inventoried. Coverage units are distinct contract assertions, not file counts.
+The finite implementation ledger is:
+- Delete Base control_capacity; component_contract retains FIFO overflow,
+  payload preservation, reserved STOP and drain assertions.
+- Delete Window text_frame; frame_copy retains valid creation plus discriminant,
+  font, graphics and copy proof.
+- Consolidate Monitor capacities, duplicate presentation-plan case and reducer
+  normal-transition overlap; retain independent expected strings, lifecycle,
+  ordering, barriers and reset proof.
+- Remove IBM PC entry's mock-formatting algorithm/long-name case; retain injected
+  formatter failures and argument forwarding. Real formatting stays in Emulator.
+- Move shared dimensions/attributes validation from Window to Base, including
+  fixed-stride inactive columns; leaf-specific validation remains local.
+- Add exchange mutex-create failure and zero steady-allocation assertions;
+  retain both concurrent scenarios.
+- Require intended diagnostics for Types negative fixtures. Preserve all ordered
+  include/link dependency edges while avoiding unrelated Types rescans.
+- Merge task invalid-output checks into both platform sync tests before deleting
+  the tiny target; keep Base's complete UTF-8 decoder matrix and representative
+  invalid path checks at every Storage entry.
+
+Unique constructor-null, audio failure/cancellation, unsupported capability,
+native Console recovery, Window encoding and xasm boundary tests remain.
+No claim of instrumented branch coverage or a global proof of defect absence.
+Run cached dual builds, focused proof, full unit/gates and integration/native
+qualification; publish both EXEs. Preserve user snapshot.debug and all media.
+
+Implementation accounting against 56f65ece (before qualification):
+- Production C/H: +0/-0. No mirror or shared runtime behavior changes.
+- Lib tests C/H: +75/-115, net -40; Emulator +1/-50, net -49;
+  X86 IBM PC +10/-24, net -14; X86 Debug unchanged.
+- Total test C/H: +86/-189, net -103. Added direct Base validation cases and
+  sentinel/failure checks exceed the estimated additions; retained contracts
+  take priority over the line estimate. Three redundant test targets are gone.
+- Test CMake: +46/-40, net +6. Dependency fixtures call the existing exact-edge
+  verifier rather than the full Types scan; all 121 include and 121 link cases
+  remain. Negative failures must match their intended diagnostic family.
+  No source verifier or root test infrastructure changes.
+- Same-class scan: Emulator and both X86 negative suites already check their
+  diagnostic; retain them. Keep Emulator's private-Lib-include gate because
+  it rejects private headers, not merely a forbidden dependency direction.
+  Constructor-null tests retain distinct owner output-reset proof, not a shared
+  cross-owner harness. Tests requiring host devices remain integration tests.
+
+The preliminary standalone gate run caught a test-oracle mismatch:
+pthread_cond_timedwait is rejected by the declared-external-vocabulary rule,
+not the unwrapped-family rule. Match both intended vocabulary families for
+that fixture list. This was not a production failure. Qualification evidence
+is owned under build/t96/s7/test-governance; do not substitute earlier S7 runs.
+
+Qualification completes with exit 0: each architecture passes focused 25/25,
+unit/gates 175/175, background integration 8/8, desktop 5/5 and native audio
+3/3. Thus all 191 distinct tests pass per width with zero skips and no
+qualification rerun. All 289 public manifest entries and documentation/
+whitespace gates match. x64's unchanged production target is up to date;
+x86 rebuilds/relinks after the already recorded Ninja-log recovery. Package
+hashes are recorded in CURRENT. Existing mirror/ABI and Ninja warnings remain.
+
+The finite eight-member ledger above is implemented and verified. The retained
+constructor, native, audio and xasm cases have distinct contracts; no arbitrary
+coverage percentage or proof that all future bugs are excluded is claimed.
+No root test infrastructure, source contract, INI, media or snapshot change.
+Executor P9 is ready for commit/push and subsequent actual-commit review P10;
+S7 and T96 remain open for owner acceptance.

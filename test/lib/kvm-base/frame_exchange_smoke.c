@@ -3,6 +3,13 @@
 #include "lib/base/sync_interface.h"
 
 static lib_u32 allocation, fail_at, live_allocations;
+static lib_bool fail_mutex;
+static lib_status create_mutex(base_sync_mutex **out_mutex)
+{
+    if (!fail_mutex) return base_sync_mutex_create(out_mutex);
+    *out_mutex = LIB_NULL;
+    return LIB_STATUS_IO_ERROR;
+}
 static void *allocate_frame(lib_size count, lib_size size)
 {
     if (++allocation == fail_at) return LIB_NULL;
@@ -17,7 +24,9 @@ static void release_frame(void *memory)
 }
 #define lib_allocate_zero allocate_frame
 #define lib_release release_frame
+#define base_sync_mutex_create create_mutex
 #include "lib/kvm-base/frame_exchange.c"
+#undef base_sync_mutex_create
 #undef lib_allocate_zero
 #undef lib_release
 
@@ -46,6 +55,7 @@ static void exercise(void)
     lib_u32 count = 0u;
     lib_test_assert(kvm_frame_exchange_create(&exchange,
         sizeof(test_frame)) == LIB_STATUS_OK);
+    lib_u32 initial_allocations = allocation;
     lib_test_assert(kvm_frame_exchange_take(exchange, LIB_NULL) == LIB_NULL);
     lib_test_assert(kvm_frame_exchange_lock_latest(exchange) == LIB_NULL);
     kvm_frame_exchange_unlock(exchange);
@@ -115,6 +125,7 @@ static void exercise(void)
     check(kvm_frame_exchange_take(exchange, LIB_NULL), 10003u);
     kvm_frame_exchange_finish(exchange, LIB_TRUE);
     kvm_frame_exchange_detach(exchange);
+    lib_test_assert(allocation == initial_allocations);
     kvm_frame_exchange_destroy(exchange);
 }
 
@@ -140,6 +151,7 @@ static void concurrent_exchange(void)
     const test_frame *displayed, *processing;
     lib_test_assert(kvm_frame_exchange_create(&test.exchange,
         sizeof(test_frame)) == LIB_STATUS_OK);
+    lib_u32 initial_allocations = allocation;
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.held) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.produced) == LIB_STATUS_OK);
     publish(test.exchange, 1u);
@@ -164,6 +176,7 @@ static void concurrent_exchange(void)
     kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
     base_sync_event_destroy(test.held);
     base_sync_event_destroy(test.produced);
+    lib_test_assert(allocation == initial_allocations);
     kvm_frame_exchange_destroy(test.exchange);
 }
 
@@ -191,6 +204,7 @@ static void concurrent_turnover(void)
     lib_bool previous_failed = LIB_FALSE;
     lib_test_assert(kvm_frame_exchange_create(&test.exchange,
         sizeof(test_frame)) == LIB_STATUS_OK);
+    lib_u32 initial_allocations = allocation;
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.held) == LIB_STATUS_OK);
     lib_test_assert(base_sync_event_create(BASE_SYNC_EVENT_AUTO_RESET, &test.produced) == LIB_STATUS_OK);
     lib_test_assert(base_sync_task_create(produce_turnover, &test, &producer) == LIB_STATUS_OK);
@@ -237,6 +251,7 @@ static void concurrent_turnover(void)
     kvm_frame_exchange_finish(test.exchange, LIB_TRUE);
     base_sync_event_destroy(test.held);
     base_sync_event_destroy(test.produced);
+    lib_test_assert(allocation == initial_allocations);
     kvm_frame_exchange_destroy(test.exchange);
 }
 
@@ -255,6 +270,12 @@ int main(void)
         lib_test_assert(exchange == LIB_NULL && live_allocations == 0u);
     }
     fail_at = 0u;
+    fail_mutex = LIB_TRUE;
+    exchange = (kvm_frame_exchange *)1;
+    lib_test_assert(kvm_frame_exchange_create(&exchange, sizeof(test_frame)) ==
+        LIB_STATUS_IO_ERROR);
+    lib_test_assert(exchange == LIB_NULL && live_allocations == 0u);
+    fail_mutex = LIB_FALSE;
     exercise();
     concurrent_exchange();
     concurrent_turnover();
