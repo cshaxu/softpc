@@ -9,6 +9,9 @@ No queued candidates.
 
 ## Previously admitted
 
+T98 [non-public quality/performance work](../proposals/m9-nonpublic-quality-performance-audit.md)
+remains open after owner acceptance of S2; CURRENT owns the waiting state.
+
 Owner accepts and closes [Windows 95 volume control and restart](../history/M9-T97-completion-audit.md)
 as T97 on 2026-10-18. Both candidates were investigated together in S1.
 

@@ -2,39 +2,16 @@
 
 ## Current Work
 
-Owner approves the established T98 repairs on 2026-10-18, accepting the
-[S1 audit](../history/M9-T98-S1-nonpublic-quality-audit.md) and admitting S2:
-propagate real media retirement errors and enforce HDD address bounds.
-The [proposal](../proposals/m9-nonpublic-quality-performance-audit.md) records
-S2-S4 ordering. S2 implementation and qualification are complete: both cached
-builds/releases and all 193 registered tests per width pass, zero failures/skips.
-Executor P1 7afc9981 is pushed; coordinator reviewed its actual twelve changed
-paths, exact test coverage and package hashes. S2 awaits owner acceptance.
-Each implementation S delivers builds/tests and a pushed actual-diff review,
-then waits for owner acceptance before the next S. No public writer expansion
-is admitted; S4 retains FILE operations and changes only UTF-8 opening.
-User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
+No implementation subtask is active.
+Open task awaiting owner: T98.
 
-## M9 T98 S2 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner: 批准执行当前既定修复任务. Accept S1 findings; implement established repairs in S2-S4 order, correctness before performance. |
-| Objective | Return consumed-medium close failures through existing FDD/HDD attach/restore results, retain correct ownership/metadata, reject unaddressable HDD sizes and check transfer arithmetic. |
-| Non-goals | No public or mirror edits, retry/rollback state, new backend, performance redesign, guest/media/configuration edits or status API expansion for void teardown. |
-| Reference Baseline | main 3b368d26; accepted runtime 5ea4e55e; pinned XP subset manifest unchanged. |
-| Candidate Proposal | [Non-public quality/performance audit](../proposals/m9-nonpublic-quality-performance-audit.md). |
-| Files And ABI Surface | compat/hdd_media.c, gfi_image.c; owner-local adapter unit and root test registration; state/proposal/history. Existing signatures unchanged. |
-| Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator actual-change review; no Computer Use. |
-| Verification | Real adapters with injected consumed close failures, rejected replacement ownership and mocked large media; x86/x64 cached full builds, all unit/gates, background integrations and serial native desktop/audio integrations; exact CTest/XML coverage. |
-| Expected Markers | Cleanup completes once on error; valid replacement metadata commits even when retirement reports failure; unsupported sizes do not attach/replace; transfer bounds cannot wrap. |
-| Asset Needs | Preserve INI/media/snapshot.debug. Refresh only assets/binary dual EXEs. Owned hidden qualification under build/t98/s2: 30-minute budget, 5-minute no-progress observation, 50 MiB logs; executor owns cleanup. No Computer Use. |
-| Reporting Requirements | Production/test added, deleted and net lines, unchanged public/mirror delta, exact proof boundaries and dual EXE links. Initial estimate production +20-42/-11-22, tests +75-130. |
-| Stop Conditions | Public/mirror changes, new storage semantics or ABI expansion require owner direction. Host-dependent failure is not a unit pass or an automatic retry. |
-| Exit Criteria | F1/F2 ledger satisfied; focused and full qualification passed, dual EXEs published, complete P pushed and actual-change coordinator review delivered; wait for owner acceptance. |
-| Original Owner Request | 批准执行当前既定修复任务; earlier: 先把已知缺口修复 再处理性能问题. |
-| Similar-Issue Sweep | Every medium-destroy and size/offset conversion in the real FDD/HDD adapters, callers and snapshot replacement joins; status-bearing failures fixed, void/cleanup-only calls explicitly disposed. |
+Owner accepts and closes [S2](../history/M9-T98-S2-media-boundaries.md) on
+2026-10-18: 验收通过 收口s任务 保持t开放. Executor 7afc9981 and coordinator
+review db935fb7 are pushed; both architectures passed all 193 registered tests.
+T98 remains open. S3/S4 in the
+[proposal](../proposals/m9-nonpublic-quality-performance-audit.md) are not active;
+no automatic next admission. User-owned untracked assets/binary/snapshot.debug
+remains untouched/excluded.
 
 ## Current Technical Baseline
 

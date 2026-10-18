@@ -4,7 +4,7 @@
 
 Owner admits T98 on 2026-10-18:
 "准入一个新的t任务 帮我检验非公共组件的代码质量和性能问题（不包括镜像代码，但包括镜像diff）".
-Baseline: 4c8e185b. CURRENT owns the active S1 packet.
+Audit baseline: 4c8e185b. CURRENT owns current task status.
 
 S1 audits src/app-softpc/product, machine and compat; test/app-softpc;
 repository-root build/test assembly and tools; reviewed local changes against
@@ -41,7 +41,8 @@ status; rediscovering them does not establish a new regression.
 - S1 admitted: inventory, source audit, relevant checks, findings and minimal
   remedy estimates, actual-diff review and pushed report for owner review.
 - Owner approved established repairs on 2026-10-18: 批准执行当前既定修复任务.
-- S2: F1/F2 real media adapter failure and capacity bounds; active packet in CURRENT.
+- S2: F1/F2 real media adapter failure and capacity bounds; owner accepted and
+  closed on 2026-10-18. See [closure](../history/M9-T98-S2-media-boundaries.md).
 - S3: finite instruction budget rejection, no hot-loop counter widening.
 - S4: Compat-private UTF-8 append opening, retaining FILE write/flush/close.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
@@ -388,3 +389,7 @@ failures. Documentation/whitespace checks pass. Existing mirror warnings and
 Ninja recovery remain disclosed, not fixed. Main matches the pushed executor
 commit; only owner-owned untracked snapshot.debug remains and is excluded.
 This review accepts executor delivery, not owner acceptance or T98 closure.
+
+Owner subsequently accepts and closes S2: 验收通过 收口s任务 保持t开放.
+The [S2 history](../history/M9-T98-S2-media-boundaries.md) records closure;
+T98 remains open without an active S. S3/S4 are not automatically started.
