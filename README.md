@@ -106,16 +106,24 @@ remain serial and explicit.
 When `ccache` is already available on `PATH`, the opt-in
 `ninja-ccache-gcc-x64-release` and `ninja-ccache-gcc-x86-release` configure
 presets use it as the C compiler launcher. Their matching build and test
-presets start with `ninja-ccache-`. The cache is developer-local rather than a
-repository artifact; its Windows default is `%LOCALAPPDATA%\\ccache`, or set
-`CCACHE_DIR` to choose another local directory. The regular Ninja and
+presets start with `ninja-ccache-`. The generated compiler launcher fixes
+storage to `build/.ccache/` (5 GB limit), including its temporary files, even
+when building directly without a preset. Plain and ccache Ninja presets reuse
+the same `build/.ninja/gcc-x64-release/` or `gcc-x86-release/` tree. The regular Ninja and
 Makefiles routes do not require or use ccache.
+For cache statistics, also set `CCACHE_DIR` to this repository's
+`build/.ccache`; bare `ccache --show-stats` may describe another user-wide cache.
 
 ## Build and package details
 
 All generated build state belongs under the repository's single `build/`
-directory.  This includes CMake/Ninja metadata, generated sources, test
-executables, diagnostics, and temporary test media. The user-facing package is
+directory. Only `.ccache/` and `.ninja/` persist; Makefiles trees, task probes,
+scripts, logs and temporary media are disposable. After stopping owned jobs,
+preview `powershell -File tools/Clean-Build.ps1`, then pass exact child names
+with `-Entry <name> -Apply -Quiescent`. Run `-Check` before task closure.
+Never move/reuse an old CMake tree at a different path: configure a fresh one.
+See [execution rules](docs/rules/EXECUTION.md#changed-path-accounting-and-build-hygiene).
+The user-facing package is
 only `assets/binary/`; reusable boot media is in `assets/media/`. The
 selected original ROMs are embedded from
 `src/app-softpc/softpc.new/roms/`; `assets/roms/` does not exist. Do not

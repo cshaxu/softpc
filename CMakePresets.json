@@ -32,33 +32,34 @@
       "name": "ninja-gcc-x64-release",
       "displayName": "Ninja GCC x64 release",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/ninja-gcc-x64-release",
+      "binaryDir": "${sourceDir}/build/.ninja/gcc-x64-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
         "CMAKE_EXE_LINKER_FLAGS": "-static -static-libgcc",
         "CMAKE_C_COMPILER": "gcc",
-        "SOFTPC_ARTIFACT_ARCHITECTURE": "x64"
+        "SOFTPC_ARTIFACT_ARCHITECTURE": "x64",
+        "CMAKE_C_COMPILER_LAUNCHER": ""
       }
     },
     {
       "name": "ninja-gcc-x86-release",
       "displayName": "Ninja GCC x86 release",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/ninja-gcc-x86-release",
+      "binaryDir": "${sourceDir}/build/.ninja/gcc-x86-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_FLAGS_RELEASE": "-O3 -DNDEBUG",
         "CMAKE_EXE_LINKER_FLAGS": "-static -static-libgcc",
         "CMAKE_C_COMPILER": "i686-w64-mingw32-gcc",
-        "SOFTPC_ARTIFACT_ARCHITECTURE": "x86"
+        "SOFTPC_ARTIFACT_ARCHITECTURE": "x86",
+        "CMAKE_C_COMPILER_LAUNCHER": ""
       }
     },
     {
       "name": "ninja-ccache-gcc-x64-release",
       "displayName": "Ninja GCC x64 release with optional ccache",
       "inherits": "ninja-gcc-x64-release",
-      "binaryDir": "${sourceDir}/build/ninja-ccache-gcc-x64-release",
       "cacheVariables": {
         "CMAKE_C_COMPILER_LAUNCHER": "ccache"
       }
@@ -67,7 +68,6 @@
       "name": "ninja-ccache-gcc-x86-release",
       "displayName": "Ninja GCC x86 release with optional ccache",
       "inherits": "ninja-gcc-x86-release",
-      "binaryDir": "${sourceDir}/build/ninja-ccache-gcc-x86-release",
       "cacheVariables": {
         "CMAKE_C_COMPILER_LAUNCHER": "ccache"
       }

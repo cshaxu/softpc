@@ -107,14 +107,38 @@ duplicate paths in scope or records each retained path's distinct reason and
 receiver. Non-positive net code is a design preference, not permission to
 delete correct necessary behavior.
 
-`build/` is disposable evidence space. After a completed or failed owned
-build, test, smoke, or diagnostic run, remove no-longer-needed owned children
-of `build/` only after resolving their path below `build/`, excluding
-`build/output/`, and stopping processes that hold them. Never clean user
-configuration, guest media, or a path not owned by the active packet. A raw
-trace/recording requires a packet-declared ignored path, size/time/no-progress
-budget, process cleanup owner, and retained checkpoint; it is never committed
-as a fixture or product input.
+`build/` has exactly two reusable roots: `.ccache/` (bounded compiler cache)
+and `.ninja/` (the two canonical architecture build trees). Everything else
+is disposable, including Makefiles builds, task scripts, probes, test media,
+captures and raw logs. Do not hide task evidence or recordings in either cache.
+Persistent trees reuse stable names, never M/T/S/P-specific copies.
+Repeated repository qualification uses the Ninja presets, choosing their
+ccache variants consistently when ccache is available. Do not clear/recreate
+the persistent trees between P/S tasks or alternate launchers unnecessarily;
+that discards incremental work. Makefiles is a disposable diagnostic/fallback
+route, not another long-lived build cache.
+
+Each packet names its disposable build children, owner and time/size/no-progress
+budget. At the end of a run, P delivery, S or T, stop/join owned jobs and remove
+work no longer needed by that still-active packet. Promote concise results,
+failure disposition and relevant hashes into tracked task records first;
+historical raw build paths are not a retention promise. Failed experiments
+must not become permanently retained directories. Reusable probes belong in
+tools/test source rather than an indefinitely retained build script.
+
+Use `tools/Clean-Build.ps1` to preview, then apply exact disposable child names
+with explicit `-Apply -Quiescent` confirmation. The caller must verify there
+are no jobs using those targets; confirmation is not automatic process detection.
+Never delete build itself, the two caches, reparse targets, user configuration,
+guest media or another live task's files. If legacy build/output/softpc.ini
+exists, stop for owner relocation rather than treating it as disposable data.
+Do not purge/migrate a user-wide ccache that may belong to other repositories.
+
+Before governance/task closure run `tools/Clean-Build.ps1 -Check`; no non-cache
+build child may remain. During an interrupted numeric T, only the currently
+active packet's explicitly named scratch may remain until its work ends. The
+root build-cache gate validates presets; its selftests cover unsafe cleanup.
+Raw traces are never committed as fixtures or product inputs.
 
 ### Long-running execution
 

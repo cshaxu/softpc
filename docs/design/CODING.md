@@ -122,10 +122,17 @@ including relative paths. Tests may use
 private implementation contracts for focused proof; production consumers may
 not bypass the VM public boundary.
 
-The complete `build/` tree is ignored. It holds CMake build trees, generated
-sources, test binaries, compiler intermediates, logs, captures, diagnostic
-scripts, and disposable test media. Additional host-width configurations use
-children of it (for example `build/x86/`). The only user-facing package is
+The complete `build/` tree is ignored. Only `build/.ccache/` and
+`build/.ninja/` persist across completed work. Ninja uses exactly
+`.ninja/gcc-x64-release/` and `.ninja/gcc-x86-release/`, including OBJ/archive,
+CMake metadata and Ninja dependency/log state. Optional ccache uses the same
+architecture trees; generated launch commands fix its data and temporary
+directories beneath `.ccache/`, bounded to 5 GB. No user-wide cache is a build
+dependency. Makefiles builds and all other children are task-owned disposable
+work, not alternative retained caches. No M/T/S/P trees or raw evidence may be
+hidden under the two reusable roots. Cleanup and closure checks follow
+[Execution Rules](../rules/EXECUTION.md#changed-path-accounting-and-build-hygiene).
+The only user-facing package is
 `assets/binary/`: `softpc32.exe`, `softpc64.exe`, and their adjacent fixed
 `softpc.ini`. That INI may use absolute paths or paths relative to
 `assets/binary/`; the supplied default uses `../media/`. Reusable guest media

@@ -10,8 +10,10 @@ and any deferred work. Use the task identifier and commit conventions in the
 execution rules. A local executable is developer evidence, not a release.
 
 The complete `build/` tree is ignored and reserved for native configurations,
-generated sources, tests, logs, captures, and disposable media. Use `build/`
-and subdirectories such as `build/x86/` for additional toolchains. The only
+generated sources, tests, logs, captures, and disposable media. Only
+`build/.ccache/` and `build/.ninja/` are reusable caches; all other children
+are removed when their owning work ends, following the execution rules.
+The only
 user-facing deliverables are `assets/binary/softpc32.exe`,
 `assets/binary/softpc64.exe`, and their adjacent `softpc.ini`. Reusable guest
 media belongs in `assets/media/`. The fixed original ROMs remain embedded from

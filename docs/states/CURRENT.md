@@ -2,8 +2,14 @@
 
 ## Current Work
 
-No implementation subtask is active.
+M9 Td S22 is active: [build-cache governance](../proposals/m9-build-cache-governance.md).
 Open task awaiting owner: T98.
+
+Td S22 executor verification is complete: canonical dual-width test builds,
+180/180 unit/gates per architecture, latest five affected gates per architecture
+and direct-build cache confinement/hits passed. Thirty obsolete build children
+are removed. Only its declared review scratch remains beside the two caches;
+actual pushed-change review and final scratch removal precede delivery.
 
 Owner accepts and closes [S2](../history/M9-T98-S2-media-boundaries.md) on
 2026-10-18: 验收通过 收口s任务 保持t开放. Executor 7afc9981 and coordinator
@@ -13,11 +19,33 @@ T98 remains open. S3/S4 in the
 no automatic next admission. User-owned untracked assets/binary/snapshot.debug
 remains untouched/excluded.
 
+## M9 Td S22 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Governance |
+| Admission And Approval | Owner: 准入一个td任务执行治理; persist only build/.ccache and build/.ninja, clean completed task scratch, update rules/gates/scripts. |
+| Objective | Pin compiler-cache storage and Ninja build trees to their two repository-local roots; enforce safe task cleanup and remove obsolete build leftovers after preserving concise evidence. |
+| Non-goals | No runtime, public corpus, mirror, INI/media/snapshot changes, global cache purge or new build framework. T98 stays open; no numeric T/S admission. |
+| Reference Baseline | main 733a7f6e; accepted T98 S2 runtime and both package hashes below. |
+| Candidate Proposal | [Build-cache governance](../proposals/m9-build-cache-governance.md). |
+| Files And ABI Surface | Root presets/CMake, tools, README/CONTRIBUTING, Execution and source-layout documentation, Current/history. No production ABI. |
+| Applicable Rules | Execution, Document, Architecture and Coding governance skills; single-person executor/coordinator review; no Computer Use. |
+| Verification | Preset/cache confinement gate and negative/safety tests; fresh x64/x86 configure/build and background unit/gates in canonical trees, ccache miss/hit probe, no-op incremental build; final build-root residue check. |
+| Expected Markers | Exactly two reusable cache roots; non-cache entries have finite task ownership and disappear on completion; no stale absolute-path CMake tree is relocated/reused. |
+| Asset Needs | Disposable build/td-s22 for jobs/logs with 30-minute/5-minute no-progress/50-MiB budget; stop owned jobs and summarize evidence before removal. Keep user files; no global ccache deletion. |
+| Reporting Requirements | Paths, actual script/config/test diff, cleanup inventory, cache proof and verification limits; preserve runtime hashes for governance-only work. |
+| Stop Conditions | User data, live unrelated jobs, symlink/reparse traversal or cache outside repo must block unsafe cleanup; do not kill jobs or erase unrelated global caches. |
+| Exit Criteria | Policy/scripts/gates implemented and tested, obsolete generated directories removed safely, only the two caches remain, evidence summarized and pushed actual-change review delivered. |
+| Original Owner Request | build/.ccache, build/.ninja可以跨提交保存，以便节省时间。但是这两个之外的build里的内容属于用后即抛; 准入一个td任务执行治理. |
+| Similar-Issue Sweep | All tracked build entry points, current docs, live build roots, compiler launcher routing and temporary-probe/log references; historical paths stay historical with explicit retirement notes. |
+
 ## Current Technical Baseline
 
 - T98 S2 fixes Compat media close reporting and address bounds only. Production
   +30/-16 (net +14); tests +195/-0; root test registration +3/-2. Public and
-  mirror code unchanged. Qualification: build/t98/s2/qualification, exit 0;
+  mirror code unchanged. Historical qualification: build/t98/s2/qualification,
+  exit 0; raw logs retired by Td S22 after preserving the checkpoint;
   x64/x86 each 177 unit/gates, eight background integrations, five desktop and
   three native audio, exact XML/registration match. Existing Ninja recovery
   and original compiler warnings remain; no warning-removal claim is made.
