@@ -34,7 +34,8 @@ remove proven duplicate assertions/targets, restore owner-local text validation,
 prove exchange mutex failure and zero steady allocations, and tighten negative
 verifier oracles without reducing dependency-edge coverage. Production behavior
 and APIs remain unchanged. Implementation and full qualification are complete;
-executor P9 awaits actual-commit coordinator P10 review. T96 remains open.
+executor d62567e5 is pushed and the coordinator has reviewed its actual diff,
+qualification XML and package hashes. S7 awaits owner acceptance; T96 remains open.
 Raw activation requeues the held input through the existing output path; no
 extra frame, backup, Machine publication or second renderer is introduced.
 Cooked native history/cursor restoration remains strict. The earlier capacity-
@@ -85,7 +86,8 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
   softpc64 E1B95ED71ACB371098C854FEF6FD4E3573B71BE98169243958F13DD2900A53C1.
   x86 rebuilt after Ninja recovery; unchanged x64 production target remains
   up to date and its hash is unchanged. User snapshot.debug stays untouched
-  and excluded. S7 awaits owner acceptance after coordinator review.
+  and excluded. Coordinator review found no blocking issue in the admitted
+  ledger. S7 awaits owner acceptance.
 
 ### S7 active-extent and font readiness follow-up
 

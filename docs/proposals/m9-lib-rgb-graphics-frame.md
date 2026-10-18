@@ -1550,3 +1550,32 @@ coverage percentage or proof that all future bugs are excluded is claimed.
 No root test infrastructure, source contract, INI, media or snapshot change.
 Executor P9 is ready for commit/push and subsequent actual-commit review P10;
 S7 and T96 remain open for owner acceptance.
+
+### S7 public-test governance coordinator review
+
+After executor d62567e5 was pushed, switched from executor to coordinator and
+read its actual changed paths/diffs, including deleted tests and their retained
+receivers. No source path changed. Confirmed generic FIFO assertions survive
+in component_contract, nullable-output contracts survive in both platform sync
+tests, and text validation now has a direct Base owner. Window still tests its
+own fonts, discriminator and graphics. Reducer lifecycle and format exact-string
+oracles remain; entry failure injection no longer reimplements formatting.
+
+The exchange allocation counter is read after producer join in concurrent
+tests; no added cross-thread counter reads or production instrumentation.
+Mutex failure propagates with null output and zero retained allocations.
+Dependency self-tests still enumerate all 242 ordered include/link cases
+through the existing verifier, and match diagnostic families instead of any
+nonzero process exit. No second verification framework or timeout relaxation.
+
+Reviewed 191/191 distinct passing tests per width, focused 25/25, zero skips,
+exit=0, all 289 manifest hashes and both package hashes. The unchanged x64 EXE
+was correctly reused by cached build, not claimed freshly compiled. x86's
+Ninja recovery/rebuild and existing warnings remain disclosed. The preliminary
+standalone gate was launched directly rather than as an owned hidden job;
+it was not terminated. All subsequent qualification used the owned hidden
+job/log/exit path; future potentially long gate probes must do the same.
+
+No blocking finding within the admitted cleanup ledger. Source, root test
+infrastructure, user INI and media are unchanged; snapshot.debug remains
+untracked and untouched. This review prepares owner acceptance, not S/T closure.
