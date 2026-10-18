@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 Td S22 is reopened and active:
+M9 Td S22 is verified, awaiting owner acceptance:
 [build-cache governance](../proposals/m9-build-cache-governance.md).
 Open task awaiting owner: T98.
 
@@ -11,8 +11,10 @@ d6523386/review 5fa2995c passed 180 unit/gates per width but duplicated cache
 policy in configure, preset parsing and documentation checks. The correction
 removes those duplicates; both widths passed 178/178 unit/gates and direct
 cache-hit/confinement probes. Final cleanup regression took 1.16/1.09 seconds.
-Executor delivery and actual pushed-change review precede owner acceptance.
-No EXE/runtime change; T98 stays open.
+Executor 7758a9c4 is pushed and its actual diff/XML/cache logs reviewed with no
+blocker. Task scratch and six obsolete fixtures are removed; the sole cleanup
+check passes and build contains only .ccache/.ninja. Build/check code is
++16/-120, net -104 relative to reopening. No EXE/runtime change; T98 stays open.
 
 Owner accepts and closes [S2](../history/M9-T98-S2-media-boundaries.md) on
 2026-10-18: 验收通过 收口s任务 保持t开放. Executor 7afc9981 and coordinator

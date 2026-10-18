@@ -86,6 +86,14 @@ Native desktop/audio/package integrations were not rerun; EXE hashes match
 accepted S2. No production, test corpus, INI, media or snapshot change.
 
 Six obsolete generated fixtures from deleted checks were removed after tests
-finished. Only owned build/td-s22 scratch remains until pushed-change review;
-remove it and run the sole residue gate before final delivery. P4 records that
-actual review; owner acceptance and numeric T/S advancement are not assumed.
+finished. Coordinator reviewed actual pushed executor 7758a9c4 against all four
+ledger members and independently matched both 178-case XML reports to current
+registration, inspected final safety timings/cache logs and both exit-zero
+markers. No blocker; src/test/assets have zero diff. P3 accounting is
++126/-251 over nine paths, including compacted documents; build/check code
+alone is +16/-120. No safety scenario was dropped.
+
+After confirming owned jobs ended, removed exact build/td-s22 scratch and ran
+Clean-Build.ps1 -Check successfully: only .ccache/.ninja remain. Raw logs are
+retired; the results above are retained. User snapshot.debug remains untouched.
+Owner acceptance and numeric T/S advancement are not assumed.
