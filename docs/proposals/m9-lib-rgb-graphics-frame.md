@@ -1364,3 +1364,29 @@ Console recovery passes both widths. Original mirror warnings and the existing
 x86 Ninja-log recovery warning remain disclosed. All 292 shared manifest
 entries match; documentation and whitespace checks pass. Both deployed artifact
 hashes are recorded in CURRENT. No Computer Use or manual guest test was used.
+
+### S7 four-slot coordinator review
+
+Executor 917a2277cc86c9b679cd59647b2cdd616547060e is committed and pushed.
+After switching roles, coordinator reviewed the actual committed changes,
+including the Base exchange API/algorithm, Machine publication removal,
+SoftPC host-update readiness, Console old/new mapping and broker invalidation,
+not merely the executor's summary. The committed callers and tests consistently
+use four slots; no compatibility variant or second transport remains.
+
+The review confirms that pending replacement cannot mutate held processing or
+displayed input, and failed finish does not promote a failed frame. Native
+recovery can override dedup even with identical input. Cursor failure after a
+cell write leaves reuse invalid. Comparison semantics remain with the owning
+consumer; Base stays opaque. Console's complete native conversion and Window's
+surface are format adapters, not additional retained input copies. Machine
+does not compare content or require a shared dirty protocol.
+
+XML evidence covers all 194 cases per width and the 32-case focused sets. The
+x64 compact startup failure followed by unchanged success remains explicitly
+disclosed, with its existing TODO open; the review does not certify that old
+failure as fixed. Artifact hashes, 292 manifest entries, documentation gate
+and whitespace checks agree. No mirror/configuration/media changes or new
+root test infrastructure are present. Only user-owned snapshot.debug remains
+untracked. No blocking finding in this bounded review; S7 and T96 remain open
+pending owner acceptance rather than being closed by this governance commit.

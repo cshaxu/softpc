@@ -24,8 +24,9 @@ Owner continues S7 with a fixed four-slot exchange shared by both consumers.
 Machine publishes every driver-produced frame without content deduplication;
 SoftPC owns text-update readiness. Console compares held old/new frames and
 removes the broker's duplicate cell cache. Recovery must override content reuse.
-Implementation and qualification are complete; executor delivery and coordinator
-review precede owner acceptance. T96 remains open.
+Implementation and qualification are complete. Executor 917a2277 is pushed;
+coordinator reviewed its actual diff and evidence. S7 awaits owner acceptance;
+T96 remains open.
 Raw activation requeues the held input through the existing output path; no
 extra frame, backup, Machine publication or second renderer is introduced.
 Cooked native history/cursor restoration remains strict. The earlier capacity-
