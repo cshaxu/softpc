@@ -78,15 +78,6 @@
   CS:EIP and reset context before choosing a repair; do not mask it with a
   no-op handler. Evidence: [T84 investigation](../history/M9-T84-S1-kvm-text-80x50.md).
 
-- TODO(Medium): Investigate native raw-screen content retention during deliberate
-  narrow viewport roundtrips. T96 S7's expanded test reads only 30 columns after
-  a saved 80x30 raw surface is restored; the resulting buffer is 30x30. Existing
-  extent tests prove repair after the next complete frame, not retention before
-  that write. Owner: Lib Console broker Win32 geometry. Admission condition:
-  trace the native size/viewport operations and distinguish host resize from
-  broker state loss before changing restoration or adding any redraw mechanism.
-  See the [S7 ledger](../proposals/m9-lib-rgb-graphics-frame.md#t96-s7-direct-console-production).
-
 - TODO(Medium): Diagnose intermittent Win3.1 prompt-roundtrip integration
   readiness. T96 S7 final1 x86 remained in a graphics frame (sequence 36)
   while runtime_restart_boot_smoke expected the first DOS prompt transition;

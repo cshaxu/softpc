@@ -191,7 +191,8 @@ only those snapshots.
 ### Approved frame-transport migration
 
 T96 S5 uses bounded ownership circulation: Window has producing/pending/processing/displayed roles;
-Console has producing/pending/processing roles. Session/UI route without an
+Console has producing/pending/current roles; current is held during output and
+idle time until replaced at take. Session/UI route without an
 additional historical payload owner. Unconsumed replacement and completed
 retirement return storage for reuse; controls/input remain copied values.
 Existing native surface remains separate. The source change is under qualification;
@@ -349,14 +350,15 @@ palette/geometry), preserving no-frame readiness and text comparison. Machine
 and Window use the same pending authority: an older notice may select the latest
 complete frame without losing damage. VM alone supplies SoftPC character
 meaning; original producer dirty does not cross the KVM frame ABI.
-Take pins processing while releasing the pending slot. Successful output retires
-the previous displayed input and promotes processing (Window), or releases
-processing (Console). Failure requeues only an unsuperseded input; it never
+Take pins processing while releasing the pending slot. Window retires its old
+displayed input on successful finish. Console retires its held input at the next
+take and retains the replacement through output and idle time. Failure requeues only an unsuperseded input; it never
 replaces newer pending content. The broker reports logical
 Console activation through its neutral event sink after binding succeeds;
 kvm-console only wakes its existing worker to draw pending content. Empty means
-no output. Unbound Console output succeeds without native drawing and releases
-that frame; UI republishes the current frame when presenting Console again.
+no output. Unbound Console output succeeds without native drawing and retains
+that input. Activation requeues held input if no newer frame is pending, through
+the existing worker/output path, without another producer publication.
 Before native activation, the existing broker binding helper synchronously sends
 INPUT_RESET through the logical Console after old-reader quiescence. kvm-console
 clears its held keys, incomplete text and mouse baseline, retaining registrations

@@ -285,19 +285,19 @@ static void check_activation_frame(void)
     }
     write_result=LIB_STATUS_OK;
     lib_test_assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
-    lib_test_assert(frame_writes==1 && kvm_component_mailboxes_take_frame(&c->base.mailboxes) == LIB_NULL);
+    lib_test_assert(frame_writes==2 && last_frame_text=='X' && kvm_component_mailboxes_take_frame(&c->base.mailboxes) == LIB_NULL);
     lib_test_assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
-    lib_test_assert(frame_writes==1);
+    lib_test_assert(frame_writes==3 && last_frame_text=='X');
     publishing_console=c; next_frame.base.cells[0].glyph_index='A';
     lib_test_assert(test_console_frame(c, frames,&next_frame)==0);
     idle_frame(); idle_frame();
-    lib_test_assert(frame_writes==3 && last_frame_text=='B' && kvm_component_mailboxes_take_frame(&c->base.mailboxes) == LIB_NULL);
+    lib_test_assert(frame_writes==5 && last_frame_text=='B' && kvm_component_mailboxes_take_frame(&c->base.mailboxes) == LIB_NULL);
     next_frame.base.cells[0].glyph_index='A'; stop_after_publication=1;
     lib_test_assert(test_console_frame(c, frames,&next_frame)==0);
     lib_test_assert(lib_win32_wait_for_single_object(probe.retired,5000)==LIB_WIN32_WAIT_OBJECT_0);
     lib_test_assert(test_console_frame(c, frames,&next_frame)==LIB_STATUS_INVALID_STATE);
     lib_test_assert(kvm_console_destroy(c) == LIB_STATUS_OK);
-    lib_test_assert(probe.event_count==1 && probe.failures==0 && frame_writes==4);
+    lib_test_assert(probe.event_count==1 && probe.failures==0 && frame_writes==6);
     lib_win32_close_handle(probe.retired); lib_win32_close_handle(frame_idle); frame_idle=LIB_NULL;
 }
 

@@ -11,8 +11,19 @@ to the Window frame. Session remains the sole routing coordinator.
 The [S7 ledger](../proposals/m9-lib-rgb-graphics-frame.md#t96-s7-direct-console-production) owns its
 bounded convergence ledger. Executor 8841e5fd is committed and pushed;
 coordinator has reviewed its actual diff, final evidence and artifacts.
-S7 is delivered for owner acceptance, not closed. User snapshot.debug is
+Owner reopens S7 for the native narrow-Console retention investigation at
+baseline aa8f75c3. Trace the original test/broker chain before assigning cause;
+no unrelated build, artifact or guest-media changes. The follow-up ledger below
+owns bounded evidence and review. User snapshot.debug is
 preserved and excluded.
+
+Owner-approved retained three-slot Console recovery is implemented and verified;
+executor delivery and actual-commit review follow before owner acceptance.
+Raw activation requeues the held input through the existing output path; no
+extra frame, backup, Machine publication or second renderer is introduced.
+Cooked native history/cursor restoration remains strict. The earlier capacity-
+only candidate failed compact package acceptance and was superseded, not shipped.
+Its evidence and activation-clipping diagnosis remain in the proposal.
 
 ## M9 T96 S7 Packet
 
@@ -20,16 +31,16 @@ preserved and excluded.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner accepts S6 and admits S7: 那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。 |
-| Objective | Produce Console frames directly into Machine-owned three-slot storage; remove Session/UI guest-text copying; add native rebind-without-rewrite proof and audit equivalent transport copies. |
+| Objective | Follow-up: retain Console's third input until replacement, requeue it through existing pending ownership on activation, and restore raw capacity/content/cursor through ordinary output without another producer publication. Preserve cooked native state and distinguish native retention from retained-frame restoration. Original direct Console production/schema scope remains. |
 | Non-goals | No mirror/Compat, guest timing, media, INI, surface replacement, generic resource framework or second transport path. |
-| Reference Baseline | b25f9969 (S6 accepted); preserve exchange roles, FIFO notices, diagnostic reads and native rendering behavior. |
+| Reference Baseline | Follow-up aa8f75c3; original b25f9969 (S6 accepted); preserve exchange roles, FIFO notices, diagnostic reads and native rendering behavior. |
 | Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Lib Window frame schema and consumers; Emulator Machine driver/publication, Session/UI routing and Product assembly; App machine driver; direct caller tests, Lib native Console regression, manifests and current design. Remove Machine frame envelope; mutually exclusive text/graphics pointers and sequence belong to Window. No mirror or Compat changes. |
+| Files And ABI Surface | Follow-up Lib KVM Base exchange/mailbox redraw support, Console activation, broker raw restore, corresponding unit/native tests, manifests/docs. Three slots unchanged; Window four-slot behavior unchanged. No Machine/Session, mirror, Compat, INI or media change. |
 | Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no rules edits in S6. |
 | Verification | Direct producer/consumer pointer identity, both slot lifetimes, text/graphics/status transitions, failed/no-frame publication, native raw rebind before rewriting, reset/load/recreation; dual-width focused and full unit/gate/integration tests and EXEs. Hidden owned jobs under build/t96/s7; five-minute no-progress inspection, no automatic termination; executor owns cleanup. |
-| Expected Markers | Window roles produce/pending/processing/displayed, Console produce/pending/processing; bounded allocations, no pixel memcpy between transport stages, no outward Lib dependency. |
+| Expected Markers | Window roles produce/pending/processing/displayed, Console produce/pending/current (held during output and idle); bounded allocations, no pixel memcpy between transport stages, no outward Lib dependency. |
 | Asset Needs | Preserve user configuration, media and untracked checkpoint; refresh only package EXEs after successful build. |
-| Reporting Requirements | Production +120..200/-130..220, net -100..+70; test net +100..200; report actual component accounting and evidence, not a promised speedup. |
+| Reporting Requirements | Revised follow-up estimate production +40..70/-15..30, net +10..55; tests net +100..180. Report actual counts against aa8f75c3 and distinguish earlier unsuccessful candidate evidence. |
 | Stop Conditions | More slots, consumer-dependent producer wait, extra pinned historical frame, or changed failure/snapshot semantics requires explicit revised design, not hidden fallback. |
 | Exit Criteria | Single transport ownership path, bounded complete lifecycle proof, full qualification, artifacts, actual diff review, commit/push and owner acceptance. |
 | Original Owner Request | 那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。 |
@@ -37,6 +48,31 @@ preserved and excluded.
 
 
 ## Current Technical Baseline
+
+### S7 retained-Console follow-up
+
+- Against aa8f75c3, production C/H +49/-10, net +39; tests C/H +154/-10,
+  net +144, plus test CMake +1/-0. Only Lib production/tests change; no
+  Machine/Session, mirror, Compat, INI, media or snapshot-format changes.
+- Both architectures rebuilt and published. Each has passing evidence for all
+  194 distinct registered tests: 178 unit/gates, eight background integration,
+  five desktop and three native audio; focused 25/25 also pass each width.
+  Evidence: build/t96/s7/console-retained/{unit,integration,focused}-*.xml and
+  native-*-0..7.xml. No skipped tests. qualification.exit remains 1 because
+  x64 compact package first failed at child-startup stage=1/error=6; unchanged
+  independent package-recheck.xml passes (exit 0). This does not fix or close
+  the existing startup TODO. All x86 cases and other x64 cases passed first run.
+- Native retained-frame proof publishes once, then performs repeated narrow
+  raw/cooked/raw activation; cells, attributes, cursor and cooked saved state
+  pass without another producer commit. Ordinary native no-rewrite retention
+  and deliberate-resize repair remain separately checked.
+- Deployed SHA-256: softpc32
+  C3BA854432D6575FF122A3EB6BD77CA12DB4B179BE0E63145D26F6699A9431C2;
+  softpc64 2C6AFAD676F04CE64EB7DDA88CAA00EA5A637C04227FE06E6A8F7C0A0A21533B.
+  Existing mirror warnings and x86 Ninja-log recovery remain disclosed.
+  User-owned untracked snapshot.debug is preserved and excluded.
+
+### Original S7 delivered checkpoint
 
 - S7 production C/H +237/-298, net -61; tests C/H +749/-671, net +78.
   Component/path accounting and bounded copy audit are in the proposal.

@@ -72,6 +72,10 @@ const void *kvm_frame_exchange_take(kvm_frame_exchange *exchange)
     if (exchange->processing == LIB_NULL) {
         frame = exchange->processing = exchange->pending;
         exchange->pending = LIB_NULL;
+        /* Three-slot consumers replace their held input at take, rather than
+         * keeping old and new inputs throughout rendering as Window does. */
+        if (frame != LIB_NULL && exchange->count == 3u)
+            exchange->displayed = LIB_NULL;
     }
     base_sync_mutex_unlock(exchange->lock);
     return frame;
@@ -81,12 +85,21 @@ void kvm_frame_exchange_finish(kvm_frame_exchange *exchange, lib_bool success)
 {
     base_sync_mutex_lock(exchange->lock);
     if (exchange->processing != LIB_NULL) {
-        if (success && exchange->count == 4u)
+        if (success || exchange->count == 3u)
             exchange->displayed = exchange->processing;
-        else if (!success && exchange->latest == exchange->processing)
+        if (!success && exchange->latest == exchange->processing)
             exchange->pending = exchange->processing;
         exchange->processing = LIB_NULL;
     }
+    base_sync_mutex_unlock(exchange->lock);
+}
+
+void kvm_frame_exchange_redraw(kvm_frame_exchange *exchange)
+{
+    base_sync_mutex_lock(exchange->lock);
+    if (exchange->pending == LIB_NULL && exchange->latest != LIB_NULL)
+        exchange->pending = exchange->processing != LIB_NULL ?
+            exchange->processing : exchange->displayed;
     base_sync_mutex_unlock(exchange->lock);
 }
 

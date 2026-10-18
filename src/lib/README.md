@@ -266,3 +266,10 @@ Third-party code using Raw Input directly must not concurrently replace/remove
 that registration during Lib capture/release. Such code does not participate in
 Lib's lock; Lib cannot synchronize arbitrary native calls. An existing foreign
 binding prevents capture, and release does not remove a foreign replacement.
+
+Win32 cooked handoff verifies saved capacity after the final viewport operation.
+Raw handoff restores native metadata, then KVM Console's activation requeues its
+retained input through ordinary output. That path establishes required capacity
+after palette/viewport operations and writes cells and cursor. No native screen
+backup or additional frame storage is used. Traditional Console can retain a
+narrow viewport over a wider buffer; pseudoconsole activation may clip it.

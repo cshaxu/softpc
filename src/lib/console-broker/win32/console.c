@@ -126,6 +126,13 @@ static lib_status console_broker_apply_display(lib_win32_handle output,
             current.dwSize, current.dwMaximumWindowSize) ||
         !lib_win32_set_console_window_info(output, LIB_WIN32_TRUE, &viewport))
         return LIB_STATUS_IO_ERROR;
+    /* Some hosts couple viewport and buffer size. A screen handoff must not
+     * report restoration after that final operation silently changed capacity.
+     * Palette-only writes instead establish their text extent below. */
+    if (restore_cursor &&
+        (!lib_win32_get_console_screen_buffer_info(output, &current) ||
+         current.dwSize.X != source->dwSize.X || current.dwSize.Y != source->dwSize.Y))
+        return LIB_STATUS_IO_ERROR;
     return LIB_STATUS_OK;
 }
 
@@ -350,9 +357,11 @@ static lib_status console_broker_select_output(console_broker_backend *backend,
     backend->output = output;
     backend->output_ready = LIB_FALSE;
     if (next->cbSize != 0u) {
-        lib_status status = console_broker_apply_display(output, next, LIB_TRUE);
-        /* Selecting a saved screen has no palette-only fallback: every part
-         * of its stored display state is required before it becomes active. */
+        /* Cooked owns native history and cursor. Raw restores metadata here;
+         * its retained complete frame establishes capacity, cells and cursor
+         * after all potentially destructive native geometry operations. */
+        lib_status status = console_broker_apply_display(output, next,
+            output == backend->cooked_output);
         if (status != LIB_STATUS_OK)
             return status == LIB_STATUS_UNSUPPORTED ? LIB_STATUS_IO_ERROR : status;
     }

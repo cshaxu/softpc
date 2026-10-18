@@ -6,7 +6,7 @@ that object. It never opens, registers, or renders native Console I/O.
 A producer writes a `kvm_console_text_frame` into a three-slot exchange:
 common text fields plus two 256-entry BMP character maps. It commits validated
 text, then notifies Console with the same borrowed exchange. The worker owns
-the taken pointer until output completes, then releases it for reuse.
+the taken pointer through output and idle time, replacing it at the next take.
 It has no graphics or bitmap-font storage.
 The caller supplies character meaning; this component has no built-in encoding.
 Each cell's explicit glyph bank selects its character map independently of colour.
@@ -38,13 +38,14 @@ these are not measured host-font pixels or guest-device coordinates. The
 product adapter owns conversion to its guest input protocol.
 
 Successful broker binding delivers a neutral Console activation event. The callback
-only signals the existing worker's wake; it neither renders nor reenters the broker.
+requeues held input only when no newer frame is pending, then signals the existing
+worker's wake; it neither renders nor reenters the broker.
 A failed activation notification enters the same terminal failure path as a
 failed frame/control notification. Checked destroy uses the shared bounded-join
 contract; failure retains the component and its callback dependencies.
 The worker draws a pending exchange frame, or does nothing if empty. An unbound
 logical Console accepts output without native drawing; successful consumption
-releases that frame. Activation only wakes still-pending work. The producer must
-republish the current frame when presenting that Console again.
+retains that frame. Activation redraws through the same output path even when
+the producer has not published another frame. Invalidation prevents stale redraw.
 STOP retains priority over frame consumption. There is no separate activation
 renderer or polling retry.

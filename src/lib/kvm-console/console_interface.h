@@ -16,6 +16,8 @@ lib_status kvm_console_create(kvm_console **out_console,
     const kvm_console_options *options);
 /* Notify after committing a validated Console frame. Use a three-slot exchange
  * whose slots hold kvm_console_text_frame. Graphics have no representation.
+ * The consumer retains its input until the next take; activation can redraw
+ * it without a new publication. No separate historical frame is retained.
  * The exchange is fixed until successful destroy and outlives this consumer.
  * Notifications after STOP return INVALID_STATE. */
 lib_status kvm_console_publish_frame(kvm_console *console, kvm_frame_exchange *frames);

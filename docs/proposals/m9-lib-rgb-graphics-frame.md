@@ -997,3 +997,250 @@ they do not establish the cause of the intermittent x86 integration failure.
 The viewport-narrowing finding is likewise not presented as repaired.
 No blocking schema/transport finding in this bounded review; S7 remains
 awaiting owner acceptance and T96 stays open.
+
+### S7 native narrow-Console follow-up admission
+
+Owner admits investigation and repair within still-open S7, baseline aa8f75c3.
+The old retained-extent log proves clipping, not the first failing operation:
+its temporary assertion source was replaced. Earlier attribution to deliberate
+viewport resizing is unproven. A separate hidden probe preserved the wider
+buffer, but is not the original integration test.
+
+Scope: existing Win32 Console broker and its native display integration test.
+Trace native operations in that test's real path, including handles, saved and
+actual geometry/cursor and column-79 content, before choosing production or
+test correction. Preserve normal no-rewrite retention; deliberate resize/frame
+repair is a separate requirement. No extra renderer, backup, replay or retry.
+Temporary tracing lives locally in the test and evidence under
+build/t96/s7/console-narrow; finite six-case/three-round runs, no unbounded loop.
+Remove instrumentation after diagnosis. Expected final production 0..20 added/
+0..20 removed; tests 30..80 added/0..20 removed, provisional until evidence.
+Run affected dual-width unit/native tests; production changes additionally
+require dual EXE publication and prescribed qualification. Hidden owned jobs
+do not share active build trees; inspect five minutes without progress, never
+kill by interaction timeout. No Computer Use or owner INI/media/snapshot edits.
+Executor P3 and actual-commit coordinator P4 precede owner acceptance.
+
+### S7 narrow-Console diagnosis and minimal correction
+
+The original extent loop, instrumenting its actual native API wrappers, reproduces
+80x30 -> 30x30. In round 1 the first change is SetConsoleActiveScreenBuffer(raw):
+immediately before it the saved raw handle is 80x30 with column 79 readable;
+immediately after it is 30x30. Metadata restores 80 columns (temporarily 29 rows),
+the existing buffer restore returns 80x30, then the final SetConsoleWindowInfo
+again reports 30x30 despite returning success. This precedes the test viewport
+setter. Palette application uses the same path; frame output subsequently
+establishes its required extent before writing cells.
+
+The default host is PseudoConsoleWindow. The same test chain inside an owned
+classic ConsoleWindowClass keeps the wide buffer. Microsoft host source has an
+explicit backing resize in SetConsoleWindowInfoImpl's VtIo branch:
+https://github.com/microsoft/terminal/blob/main/src/host/getset.cpp
+This explains a platform branch, not identity with the installed host binary.
+
+After the final viewport call, handoff restoration now queries capacity and
+returns IO_ERROR if it differs from the saved buffer. No additional resize,
+backup, replay or renderer is added. Palette-only output is distinct: its
+existing ensure-text-surface precedes the complete cell write. Unsupported
+distinct geometry now fails explicitly instead of reporting clipped success.
+
+Tests retain normal no-rewrite comparison and extend the extent loop with
+patterned cells, attributes and a visible cursor. Successful restoration is
+read before ensure/viewport/write. Limited native handoff must return IO_ERROR,
+retain cooked binding, expose a capacity mismatch and restore cooked display;
+it is not counted as successful wide-buffer preservation. Deliberate resize
+and complete-frame repair remain distinct. The mock injects successful viewport
+mutation of capacity and proves failure without another resize. The hide helper
+now precedes API substitution; previously main's hide call received null.
+
+Evidence under build/t96/s7/console-narrow: baseline-native.log retains wrapper
+traces; native.log records the corrected default host; classic.log records the
+original chain in ConsoleWindowClass; final-classic.log records final assertions
+(Classic complete, no limited-host branch). Scratch classic-test.c changes only
+startup to retain the explicitly owned classic host instead of allocating the
+default host. It does not replace broker logic. Tracked tracing is removed.
+
+History: final viewport operation predates T96 (1f7383f4c); pre-viewport capacity
+check is from eaf05bff2. S7 previously changed no broker production. This is an
+existing false-success gap, not the frame-pointer migration. These commits prove
+code lineage, not the first historical user-visible occurrence. The old TODO's
+unproven attribution to deliberate viewport resizing is superseded here.
+
+The clipping log did not prove content loss. Column 79 became readable again
+during intermediate expansion; one cell does not prove complete preservation.
+No all-terminal-version or ConPTY wide-buffer retention guarantee is claimed.
+
+Similar-issue sweep: rg for set_console_window_info,
+set_console_screen_buffer_size and apply_display across src/lib finds one
+viewport setter, in apply_display; buffer setters are its saved-state restore
+and ensure_text_surface. The latter already queries and checks the required
+extent after its resize. apply_display has only two callers: select_output
+requires saved display restoration, while palette output subsequently ensures
+capacity and writes the complete cell rectangle. Types occurrences are SDK
+aliases, not a second implementation. No Machine/Session redraw is added.
+
+Follow-up accounting (C/H only against aa8f75c3): production +7/-0, net +7 in
+one Lib broker file; tests +60/-6, net +54 in native display and mocked Win32
+Console tests. Manifests, documentation and EXEs are excluded from C/H counts.
+
+### S7 candidate qualification blocker
+
+The seven-line postcheck above is a candidate, NOT an accepted repair. Full
+qualification under console-narrow/final exits 1: both 178-test unit/gate suites
+and both focused 10-test sets pass; native compact-package fails stage 12 in
+both widths (pause/stop/start remains in the cooked screen instead of completing
+the expected raw handoff). The old product acceptance therefore cannot be
+declared preserved merely because the limited native test now fails truthfully.
+x64 background integrations pass 8/8; x86 command_provider additionally fails
+its expected-IP assertion (0xc0000409). That separate cause is not established.
+Other native cases pass. No acceptance assertion or test deadline was weakened.
+
+The bounded reexpand-test scratch keeps the original broker path and writes a
+patterned 80x30 frame. After the rejected narrow handoff it only restores raw
+capacity and reads, without redrawing: reexpand.log records 2310 mismatched
+character/attribute cells out of 2400. This proves expansion alone does not
+restore the original layout; it does not establish whether bytes were deleted
+or reflowed elsewhere internally. No such expansion is added to production.
+Classic final assertions pass both widths (classic.exit and classic-x86.exit 0;
+final-classic-x64.log and final-classic-x86.log contain Classic complete).
+
+Decision boundary: accepting explicit unsupported narrow ConPTY handoff changes
+the existing compact product contract. Otherwise retaining that contract needs
+a different approved host strategy; no backup/replay/extra Machine publication
+is authorized. Do not silently bless compact-package failure or claim this
+candidate meets the requested complete repair. Candidate remains uncommitted;
+published EXEs are restored to the pre-follow-up S7 commit. No P3/P4 yet.
+
+### S7 continued activation isolation
+
+Owner requests continued investigation, not acceptance of the unsupported-host
+candidate. All additional probes are hidden, test-owned runs under the same
+console-narrow evidence directory; no published EXE or production source is
+changed by these experiments. The actual native test/broker chain is retained.
+Experimental ordering edits are scratch copies, not an alternative renderer.
+
+activation-cells.log isolates SetConsoleActiveScreenBuffer before the broker's
+metadata, cursor and viewport restoration. Raw 80x30 becomes 30x30. Before any
+re-expansion, all 750 surviving sampled coordinates still match their prior
+characters/attributes. Immediately expanding to the saved size, without any
+write or metadata operation, leaves 1940/2000 sampled coordinates mismatched.
+Thus activation clips the addressable extent; expanding it cannot be treated
+as preserving the old layout. This does not identify hidden host storage or
+prove every inaccessible character was deleted. Height-only cases 80x25 to
+80x12/13 similarly retain surviving coordinates but fail full-frame recovery.
+activation.exit and activation-cells.exit are 0 (diagnostic completion, not
+product qualification).
+
+Bounded ordering experiments:
+- preactivate: setting the inactive target's extended geometry before activation
+  does not prevent 80x30 becoming 30x30; the same 1940/2000 mismatch remains.
+- active-enlarge: enlarging the outgoing active screen first prevents that
+  activation shrink, but the subsequent saved viewport restoration still fails;
+  rollback then changes geometry again. It also touches cooked geometry, so this
+  is not adopted as a repair. Diagnostic assertion exit is 3.
+- rectangle: compensate extended-metadata rectangle endpoints and avoid a
+  redundant final viewport setter in a scratch copy. A later no-rewrite cell
+  assertion fails even though the capacity postcheck passes (exit 3). Geometry
+  equality alone is not a sufficient restoration-success oracle.
+
+The remaining design boundary is native content retention across distinct
+buffer/viewport extents in the tested ConPTY host, not frame transport or a
+missing full-frame publication. No claim that all possible native strategies
+are exhausted is made. The seven-line candidate is still unqualified, and no
+test is weakened to admit it. Classic-host results remain separately scoped.
+
+### S7 owner-approved retained Console recovery
+
+Owner approves: 行了你赶紧干活 确保符合我的要求. Console keeps its third input
+through idle time; taking a newer frame retires the old input atomically. Window
+still retains old/new separately with four slots. Activation requeues held input
+through the existing pending role, preferring newer pending work; no additional
+queue, frame, producer publication, backup or rendering path is introduced.
+Generation invalidation suppresses stale redraw. Output never holds exchange
+locks. Cooked remains native-owned; raw metadata selection is followed by normal
+frame output establishing capacity and writing contents/cursor.
+
+Bounded verification: exchange ownership under stalled/concurrent production,
+coalesced and in-flight redraw, newer-frame priority, invalidation, activation
+without another publication, STOP/failure and destruction. Native proof separates
+ordinary no-rewrite retention from narrow raw reconstruction using KVM-held input,
+and compares cooked contents/geometry/cursor. Required qualification remains
+dual-width focused/full unit/gate/integration including native cases, artifacts,
+actual diff review, commit/push then owner acceptance. Earlier unsuccessful
+candidate logs remain historical, not proof of this revised implementation.
+
+### S7 retained recovery implementation and executor review
+
+The frozen follow-up universe is the seven changed production C/H paths,
+four test C files, their test linkage, manifests and affected documentation.
+Every production member remains on the existing ownership/output path:
+
+- Exchange: three-slot take retires the prior current input; finish retains
+  the replacement even if output was unbound or failed. Four-slot failure still
+  preserves the previously displayed input. Redraw puts processing/current
+  into the existing pending role only if no newer input is pending and the
+  publication generation is valid. No additional state or allocation exists.
+- Mailbox: frame lock protects exchange binding and terminal admission, then
+  takes the existing exchange lock. Producer releases that lock before notify;
+  no reverse lock ordering or rendering under either lock is introduced.
+- Console activation: requeue then wake the same worker. STOP priority and the
+  existing notification/output failure path remain unchanged.
+- Native broker: cooked restoration verifies capacity after the final viewport
+  operation. Raw restores metadata, then ordinary frame output ensures capacity
+  after palette/geometry changes and writes complete cells and cursor. This is
+  reconstruction from the held input, not a claim of native content preservation.
+
+The original failure's first observed operation was native raw activation,
+before the test's own resize; final viewport restoration can clip again. Raw
+native storage therefore cannot be the sole retained content owner in that
+host. The owner-approved current Console slot supplies the missing lifetime.
+No new backing screen snapshot, renderer, retry loop or Machine publication is
+added. This supersedes the unqualified capacity-only candidate above.
+
+Proof dispositions:
+- Exchange tests prove held storage is not writable, repeated/in-flight redraw
+  coalesces, newer pending input wins and invalidation suppresses stale output;
+  existing stalled/concurrent producer and lifetime stress remain passing.
+- Console unit exercises activation without publication, superseding output,
+  failed output and STOP. Broker mock proves a successful native viewport call
+  that silently changes cooked capacity returns IO_ERROR, not false success.
+- Native integration publishes one patterned 80x25 KVM frame into a three-slot
+  exchange, then switches with a 30x30 cooked surface three times. It checks
+  all cells/attributes and cursor after worker output and cooked saved state
+  after return. No new commit/producer notification occurs after the first.
+  Ordinary no-rewrite retention is still checked before test resizing; deliberate
+  viewport changes followed by ordinary output remain a separate case.
+- Similar-issue rg sweep covers frame_exchange_redraw/finish/detach/invalidate,
+  mailboxes_redraw_frame, set_console_window_info, set_console_screen_buffer_size
+  and apply_display in Lib/Emulator. The only new production redraw caller is
+  Console activation. Window retains its four-slot path; Machine's existing
+  invalidations suppress stale generations. Broker's only geometry paths are
+  saved metadata restoration and existing ensure_text_surface; no new outer
+  dependency or secondary renderer was found in this bounded sweep.
+
+Qualification evidence: build/t96/s7/console-retained. Both x64/x86 builds and
+25 focused tests pass. Each architecture has 178/178 unit/gates, 8/8 background
+integrations and passing evidence for five desktop plus three native audio tests.
+x86 all pass first run. x64 compact package first fails stage=1/error=6 before
+the tested handoff, then unchanged independent package-recheck passes. Its first
+failure and qualification.exit=1 are retained; package-recheck.exit=0 does not establish
+a repair of the existing startup TODO. No skips, shortened deadlines, relaxed
+assertions, Computer Use or owner manual reproduction were used. No universal
+ConPTY version guarantee or new real-guest manual acceptance is claimed.
+
+Accounting against aa8f75c3 (git diff --numstat, C/H only):
+- Production: broker +12/-3; exchange implementation +15/-2 and interface
+  +10/-5; mailbox implementation +8/-0 and interface +1/-0; Console event
+  +1/-0 and interface +2/-0. Total +49/-10, net +39.
+- Tests: broker mock +16/-2; native display +117/-4; exchange +17/-0;
+  Console retirement +4/-4. Total +154/-10, net +144. Test linkage +1/-0
+  separately. Documentation, manifests and EXEs are excluded from code counts.
+
+Dual EXEs are rebuilt and deployed; their hashes are recorded in CURRENT.
+Existing original-mirror warnings and Ninja metadata recovery remain disclosed.
+User configuration/media and untracked snapshot.debug are untouched. The narrow
+restoration debt is removed from TODO because its admitted repair now has scoped
+proof; unrelated startup/prompt-roundtrip debts remain. Executor actual-diff
+review finds no extra slot, transport copy, lock-held output or second path.
+Commit/push and coordinator actual-commit review precede owner acceptance; S7
+and T96 are not closed by these test results.

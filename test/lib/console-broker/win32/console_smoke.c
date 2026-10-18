@@ -41,7 +41,7 @@ static lib_win32_coord buffer_size={80,30};
 static lib_win32_small_rect viewport={0,0,79,29};
 static lib_win32_coord native_cursor;
 static lib_win32_coord viewport_limit;
-static lib_bool limit_viewport, fail_viewport_set;
+static lib_bool limit_viewport, fail_viewport_set, viewport_resizes_buffer;
 static lib_bool reject_resize, ignore_resize;
 static lib_u32 resize_attempts;
 static lib_win32_small_rect palette_metadata_window;
@@ -77,7 +77,14 @@ static lib_win32_bool LIB_WIN32_WINAPI palette_set(lib_win32_handle h, lib_win32
 }
 static lib_win32_bool LIB_WIN32_WINAPI viewport_set(lib_win32_handle h, lib_win32_bool absolute,
     const lib_win32_small_rect *next)
-{ (void)h; (void)absolute; if(fail_viewport_set) return LIB_WIN32_FALSE; viewport=*next; return LIB_WIN32_TRUE; }
+{
+    (void)h; (void)absolute;
+    if(fail_viewport_set) return LIB_WIN32_FALSE;
+    viewport=*next;
+    if (viewport_resizes_buffer)
+        buffer_size=(lib_win32_coord){next->Right-next->Left+1,next->Bottom-next->Top+1};
+    return LIB_WIN32_TRUE;
+}
 static lib_win32_bool LIB_WIN32_WINAPI write_cells(lib_win32_handle h, const lib_win32_char_info *p, lib_win32_coord a, lib_win32_coord b, lib_win32_small_rect *r)
 {
     (void)h; (void)a; (void)b; ++writes; first_cell=p[0].Char.UnicodeChar;
@@ -308,6 +315,13 @@ int main(void)
         lib_test_assert(buffer_size.X==120 && buffer_size.Y==60);
         lib_test_assert(viewport.Right==19 && viewport.Bottom==9);
         fail_viewport_set = LIB_FALSE;
+        /* A successful viewport API may still resize the buffer. Reject a
+         * truncated handoff; do not resize again and claim content survived. */
+        viewport_resizes_buffer = LIB_TRUE;
+        resize_attempts = 0u;
+        lib_test_assert(console_broker_apply_display(b.output,&saved,LIB_TRUE)==LIB_STATUS_IO_ERROR);
+        lib_test_assert(buffer_size.X==120 && buffer_size.Y==30 && resize_attempts==0u);
+        viewport_resizes_buffer = LIB_FALSE;
         limit_viewport = LIB_FALSE;
         buffer_size = (lib_win32_coord){80,30};
         viewport = (lib_win32_small_rect){0,0,79,29};

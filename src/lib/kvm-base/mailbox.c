@@ -118,6 +118,14 @@ lib_bool kvm_component_mailboxes_take_control(kvm_component_mailboxes *mailboxes
     return LIB_TRUE;
 }
 
+void kvm_component_mailboxes_redraw_frame(kvm_component_mailboxes *mailboxes)
+{
+    base_sync_mutex_lock(mailboxes->frame_lock);
+    if (!mailboxes->closed && mailboxes->frames != LIB_NULL)
+        kvm_frame_exchange_redraw(mailboxes->frames);
+    base_sync_mutex_unlock(mailboxes->frame_lock);
+}
+
 const void *kvm_component_mailboxes_take_frame(kvm_component_mailboxes *mailboxes)
 {
     const void *frame;

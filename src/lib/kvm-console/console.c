@@ -26,6 +26,7 @@ void kvm_console_receive_event(void *context,
         if (!kvm_component_reset_input(&console->base)) return;
         console->previous_mouse_valid = LIB_FALSE;
     } else if (event->kind == LIB_CONSOLE_EVENT_ACTIVATED) {
+        kvm_component_mailboxes_redraw_frame(&console->base.mailboxes);
         lib_status status = kvm_component_mailboxes_notify(&console->base.mailboxes);
         if (status != LIB_STATUS_OK) kvm_component_fail(&console->base, status);
     } else if (event->kind == LIB_CONSOLE_EVENT_IO_FAILURE) {

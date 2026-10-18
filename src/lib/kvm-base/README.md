@@ -12,7 +12,7 @@ visible cells are validated before publication. No packed device attribute is
 interpreted here. Producers initialize the complete fixed-capacity value.
 Fonts, character maps and graphics belong to the receiving leaf, not this base.
 The public frame exchange circulates opaque storage through three slots
-(produce/pending/processing) or four (also retain displayed input). The producer
+(produce/pending/current) or four (separate processing/displayed inputs). The producer
 writes outside its lock, then commits a validated complete frame. A superseded
 pending pointer becomes reusable; take pins processing until finish. No steady
 allocation, payload copy, content callback or damage interpretation occurs.
@@ -75,8 +75,11 @@ Linux terminal text uses TEXT rather
 than inventing physical keys. No KVM leaf decodes native key values itself.
 Window message decoding and key-state queries belong only to kvm-window.
 Base owns the default Event implementation; no KVM platform wake duplicate remains.
-Take removes pending ownership. Successful finish promotes processing to displayed
-(four slots) or releases it (three slots). Failed output requeues only an
+Take removes pending ownership. Three slots retire the previous held input at
+take; four slots retire it at successful finish. Finish retains the current
+input for three slots, or the last successfully displayed input for four.
+An explicit redraw requeues held input only when no newer input is pending.
+Failed output requeues only an
 unsuperseded input, without replacing a newer pending frame or signalling retry.
 The leaf mailbox binds that same exchange; it does not own another pending slot.
 

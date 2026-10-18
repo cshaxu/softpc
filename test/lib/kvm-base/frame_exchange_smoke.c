@@ -53,6 +53,21 @@ static void exercise(lib_bool retained)
     displayed = kvm_frame_exchange_take(exchange);
     check(displayed, 1u);
     kvm_frame_exchange_finish(exchange, LIB_TRUE);
+    if (!retained) {
+        test_frame *writer = kvm_frame_exchange_writer(exchange);
+        lib_test_assert(writer != displayed);
+        writer->serial = 999u;
+        check(displayed, 1u);
+        kvm_frame_exchange_redraw(exchange);
+        kvm_frame_exchange_redraw(exchange);
+        lib_test_assert(kvm_frame_exchange_take(exchange) == displayed);
+        /* Activation racing an in-flight output retains one pending redraw. */
+        kvm_frame_exchange_redraw(exchange);
+        kvm_frame_exchange_finish(exchange, LIB_TRUE);
+        lib_test_assert(kvm_frame_exchange_take(exchange) == displayed);
+        kvm_frame_exchange_finish(exchange, LIB_TRUE);
+        lib_test_assert(kvm_frame_exchange_take(exchange) == LIB_NULL);
+    }
     publish(exchange, 2u);
     processing = kvm_frame_exchange_take(exchange);
     check(processing, 2u);
@@ -73,6 +88,7 @@ static void exercise(lib_bool retained)
     }
     lib_test_assert(count == 2u);
     /* Failed old output must never replace the newer pending publication. */
+    kvm_frame_exchange_redraw(exchange);
     kvm_frame_exchange_finish(exchange, LIB_FALSE);
     processing = kvm_frame_exchange_take(exchange);
     check(processing, 10002u);
@@ -85,6 +101,7 @@ static void exercise(lib_bool retained)
     /* Invalidating a run cannot write into an in-flight immutable input or
      * requeue it when that consumer finishes. */
     kvm_frame_exchange_invalidate(exchange);
+    kvm_frame_exchange_redraw(exchange);
     check(processing, 10002u);
     lib_test_assert(kvm_frame_exchange_lock_latest(exchange) == LIB_NULL);
     kvm_frame_exchange_unlock(exchange);
