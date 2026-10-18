@@ -5,12 +5,13 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-1. [Windows 95 restart stops at safe shutdown](../proposals/m9-win95-restart-safe-shutdown.md).
+No queued candidates. Both Win95 issues are admitted in T97 S1.
 
 ## Previously admitted
 
-Owner admits [Windows 95 unavailable volume control](../proposals/m9-win95-volume-control.md)
-as T97 S1 on 2026-10-17. CURRENT owns its active packet.
+Owner admits [Windows 95 volume control and restart](../proposals/m9-win95-volume-and-restart.md)
+as T97 S1 on 2026-10-17, then explicitly merges the remaining restart candidate
+into the same investigation. CURRENT owns its active packet.
 
 Owner accepts and closes [T96](../history/M9-T96-completion-audit.md) on
 2026-10-17, including S8 MIDI configuration verification.

@@ -5,8 +5,10 @@
 Owner accepted T96 S8 and explicitly closed T96 after confirming Win3.1 MIDI
 works. The [T96 completion audit](../history/M9-T96-completion-audit.md) reconciles
 S1-S8, final frame contracts, fixed storage, adoption and qualification.
-Owner admits the next queue head as T97 S1: investigate Windows 95 unavailable
-volume controls. No production repair or new hardware capability is presumed.
+Owner admits T97 S1 and subsequently merges the remaining queue candidate:
+investigate Windows 95 unavailable volume controls and restart stopping at the
+safe-shutdown screen. Preserve separate evidence/conclusions for both symptoms.
+No production repair, shared cause or new hardware capability is presumed.
 User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 
 ## M9 T97 S1 Packet
@@ -14,21 +16,21 @@ User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | New |
-| Admission And Approval | Owner: "works! 好了收口本S和本T，准入下一个T任务"; next Queue head is Win95 volume control. |
-| Objective | Reproduce disabled Win95 volume slider/taskbar checkbox despite working startup PCM; identify driver, model, mixer and guest-software cause; propose the smallest correct remedy. |
-| Non-goals | No restart/shutdown repair, SB16 identity spoof, new mixer model, forced UI flag, unrelated Lib redesign or automatic user-media modification. |
+| Admission And Approval | Owner admits next T after T96, then explicitly directs: "本项和队列剩余一项合并调查吧"; volume and safe-shutdown restart are both in S1. |
+| Objective | Reproduce disabled Win95 volume controls despite working PCM and installation-requested restart stopping at safe shutdown; determine each first divergence and smallest correct remedy without presuming a common cause. |
+| Non-goals | No production repair in this investigation stage, SB16 spoof, new mixer model, forced UI flag, screen-triggered reboot, unrelated Lib redesign or user-media modification. |
 | Reference Baseline | T96 accepted runtime 5ea4e55e; final closure audit and unchanged qualified packages. |
-| Candidate Proposal | [Win95 volume control and S1 ledger](../proposals/m9-win95-volume-control.md). |
-| Files And ABI Surface | Read-only investigation of App-SoftPC driver/Compat/original DSP and mixer, installed guest drivers and volume-control software. No public ABI change admitted in S1. |
+| Candidate Proposal | [Win95 volume and restart S1 ledger](../proposals/m9-win95-volume-and-restart.md). |
+| Files And ABI Surface | Read-only investigation of App-SoftPC driver/Compat/original DSP/mixer, keyboard-controller/CPU reset and BIOS, installed guest drivers, volume software and restart intent. No public ABI change admitted in S1. |
 | Applicable Rules | Execution and Document for admission; Architecture/Coding before code work. Single-person executor/coordinator actual-diff review. |
-| Verification | Disposable overlay/snapshot guest replay, bounded port/capability probes and source-to-request trace. No Computer Use. Reconcile each finding with actual driver/configuration; design-only delivery runs documentation/whitespace checks. Any later production repair requires focused and full dual-width qualification. |
-| Expected Markers | Working PCM and disabled controls observed together; exact advertised capability and first divergence; no claim that host gain equals guest mixer support. |
+| Verification | Disposable overlay/snapshot replay, bounded capability/reset/BIOS probes and source-to-request trace. Compare normal restart, installation restart and shutdown; verify audio rebinding. No Computer Use. Design-only delivery runs documentation/whitespace checks; later repairs require focused and full dual-width qualification. |
+| Expected Markers | Working PCM with disabled controls; exact capability predicate; restart intent versus actual reset/BIOS progress; independent causal evidence for both issues. Host gain is not guest mixer support, and a shutdown screen alone is not a reset diagnosis. |
 | Asset Needs | Preserve all owner INI/media/snapshots. Evidence under ignored build/t97/s1; bounded logs/captures and explicit job log/exit before launching diagnostics. No EXE refresh for admission alone. |
-| Reporting Requirements | S1 returns causal evidence, source/runtime distinction, minimal per-file proposal, added/deleted/net estimate, compatibility limits and follow-up S plan. |
-| Stop Conditions | New hardware identity/capability, mirror behavior expansion or public API redesign needs owner approval; do not silently force the controls enabled. |
-| Exit Criteria | Finite six-item S1 investigation ledger resolved with evidence/limits, actionable design, actual-diff review and committed/pushed report for owner direction. |
-| Original Owner Request | 启动开机有声音，但是任务栏无法显示声音图标，为啥; owner subsequently requests admission of the next queue task. |
-| Similar-Issue Sweep | Check PCM volume capability, mixer lines/controls, MIDI versus PCM ownership, guest volume-control installation and both slider/tray predicates; classify rather than add product special cases. |
+| Reporting Requirements | Separate causal evidence and source/runtime distinction for each symptom; minimal per-file proposals, added/deleted/net estimates, mirror impact, compatibility limits and follow-up S plan. |
+| Stop Conditions | New hardware identity/capability, mirror behavior expansion or public API redesign needs approval. No forced controls or reboot bypass; actual repair follows the investigated design. |
+| Exit Criteria | Finite nine-item combined ledger resolved with evidence/limits for both issues, actionable designs, actual-diff review and committed/pushed report for owner direction. |
+| Original Owner Request | 启动开机有声音，但是任务栏无法显示声音图标，为啥; 我看到的是现在可以安全地关闭计算机了，一直停在那里; 本项和队列剩余一项合并调查吧. |
+| Similar-Issue Sweep | PCM volume/mixer exposure, MIDI versus PCM and guest control software; normal versus install restart, warm/reset paths, normal shutdown and post-reset audio acquisition. Classify rather than add product special cases. |
 
 ## Current Technical Baseline
 
