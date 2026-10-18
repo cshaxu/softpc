@@ -209,3 +209,15 @@ reads DSP version, 2b44h/2b84h forwards it, 2877h stores it; DRV 1e98h copies
 that value into instance+6. MXDMESSAGE at 50fah checks it at 51cdh;
 WODMESSAGE volume checks are at 81ech and 8228h. These inspected installed
 binaries are evidence, not new project source or redistributed assets.
+
+### Actual-commit review
+
+Coordinator role reviewed pushed executor commit 2ea2441f against the packet
+and the nine dispositions, checked the captured confirmation/restart/shutdown
+frames, callback/PCM logs and normal diagnostic exits. The actual change is
+two documentation files, +136/-3 (net +133); production/tests/mirror remain
++0/-0. Documentation governance and whitespace checks pass. Package hashes
+still match the accepted baseline; no diagnostic guest process remains.
+The original-click and first-install limitations remain explicit, not silently
+promoted to universal restart proof. S1 is delivered for owner review, not
+owner-closed; no subsequent hardware-capability task is automatically admitted.
