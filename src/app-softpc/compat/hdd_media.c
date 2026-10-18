@@ -19,6 +19,13 @@ typedef struct softpc_disk_media
 static softpc_disk_media softpc_hdd_media[2];
 #define SOFTPC_DISK_SECTOR_BYTES 512u
 
+static int softpc_hdd_size_supported(lib_size bytes)
+{
+    /* Original controller/host byte offsets are signed 32-bit values. The
+       final sector of a 2-GiB image still starts at a representable offset. */
+    return bytes >= SOFTPC_DISK_SECTOR_BYTES && bytes <= (lib_size)INT_MAX + 1u;
+}
+
 const CHAR *softpc_hdd_media_config_path(unsigned int index)
 {
     if (index >= 2u)
@@ -42,7 +49,7 @@ static int softpc_hdd_attach_media(softpc_disk_media *media, const char *path,
     if (lib_storage_medium_open(path, mode, &media->medium) !=
         LIB_STATUS_OK) return 0;
     bytes = lib_storage_medium_byte_count(media->medium);
-    if (bytes < SOFTPC_DISK_SECTOR_BYTES) goto attach_failed;
+    if (!softpc_hdd_size_supported(bytes)) goto attach_failed;
     media->total_sectors = (IU32)(bytes / SOFTPC_DISK_SECTOR_BYTES);
     lib_memory_copy(media->path, path, lib_text_length(path) + 1u);
     return 1;
@@ -54,12 +61,15 @@ attach_failed:
 int softpc_platform_hdd_attach(const char *hard_disk_path, lib_storage_medium_mode mode)
 {
     unsigned int index;
+    int closed = 1;
     for (index = 0u; index < 2u; ++index)
     {
-        lib_storage_medium_destroy(&softpc_hdd_media[index].medium);
+        if (lib_storage_medium_destroy(&softpc_hdd_media[index].medium) !=
+            LIB_STATUS_OK) closed = 0;
         softpc_hdd_media[index].total_sectors = 0u;
         softpc_hdd_media[index].path[0] = '\0';
     }
+    if (!closed) return 0;
     /* Fixed disks belong solely to the original fixed-disk controller.
        Removable media is attached separately through original FLA/GFI/FDC. */
     if (!softpc_hdd_attach_media(&softpc_hdd_media[0], hard_disk_path, mode))
@@ -106,12 +116,15 @@ static softpc_disk_media *softpc_hdd_transfer(int driveid, int offset,
     int sectors, lib_size *bytes)
 {
     softpc_disk_media *media;
+    lib_size extent;
     if (driveid < 0 || driveid >= 2 || offset < 0 || sectors < 0)
         return NULL;
     media = &softpc_hdd_media[driveid];
-    *bytes = (lib_size)sectors * SOFTPC_DISK_SECTOR_BYTES;
-    if (media->medium == NULL || (IU32)offset > media->total_sectors * SOFTPC_DISK_SECTOR_BYTES || *bytes > (lib_size)(media->total_sectors * SOFTPC_DISK_SECTOR_BYTES - (IU32)offset))
+    extent = (lib_size)media->total_sectors * SOFTPC_DISK_SECTOR_BYTES;
+    if (media->medium == NULL || (lib_size)offset > extent ||
+        (lib_size)sectors > (extent - (lib_size)offset) / SOFTPC_DISK_SECTOR_BYTES)
         return NULL;
+    *bytes = (lib_size)sectors * SOFTPC_DISK_SECTOR_BYTES;
     return media;
 }
 
@@ -171,22 +184,22 @@ lib_status softpc_hdd_media_restore(unsigned slot, const char *path,
     media = &softpc_hdd_media[slot];
     if (path == NULL) {
         if (*replacement != NULL) return LIB_STATUS_INVALID_ARGUMENT;
-        (void)lib_storage_medium_destroy(&media->medium);
+        status = lib_storage_medium_destroy(&media->medium);
         *media = (softpc_disk_media){0};
-        return LIB_STATUS_OK;
+        return status;
     }
     if (*replacement != NULL) {
-        if (lib_storage_medium_byte_count(*replacement) < SOFTPC_DISK_SECTOR_BYTES)
+        if (!softpc_hdd_size_supported(lib_storage_medium_byte_count(*replacement)))
             return LIB_STATUS_INVALID_ARGUMENT;
         status = lib_storage_medium_replace(&media->medium, *replacement, &retired);
         if (status != LIB_STATUS_OK) return status;
         *replacement = NULL;
-        (void)lib_storage_medium_destroy(&retired);
+        status = lib_storage_medium_destroy(&retired);
         media->mode = mode;
         media->total_sectors = (IU32)(lib_storage_medium_byte_count(media->medium) /
             SOFTPC_DISK_SECTOR_BYTES);
         lib_memory_copy(media->path, path, lib_text_length(path) + 1u);
-        return LIB_STATUS_OK;
+        return status;
     }
     if (media->medium == NULL || media->mode != mode || lib_text_compare(media->path, path) != 0)
         return LIB_STATUS_INVALID_ARGUMENT;

@@ -345,8 +345,7 @@ int softpc_platform_floppy_attach(const char *path, lib_storage_medium_mode mode
     retired = *drive;
     *drive = candidate;
     softpc_gfi_install(0);
-    (void)lib_storage_medium_destroy(&retired.medium);
-    return 1;
+    return lib_storage_medium_destroy(&retired.medium) == LIB_STATUS_OK;
 }
 
 void softpc_platform_floppy_detach(void)
@@ -398,7 +397,7 @@ lib_status softpc_floppy_media_restore(unsigned slot, const char *path,
 {
     softpc_gfi_image_drive *drive;
     lib_storage_medium *retired = NULL;
-    lib_status status;
+    lib_status status = LIB_STATUS_OK;
     if (slot >= MAX_DISKETTES || replacement == NULL || cylinder > 255u ||
         mode > LIB_STORAGE_MEDIUM_OVERLAY ||
         (path != NULL && lib_text_length(path) >= sizeof(softpc_gfi_drives[slot].path)))
@@ -412,14 +411,16 @@ lib_status softpc_floppy_media_restore(unsigned slot, const char *path,
     drive = &softpc_gfi_drives[slot];
     if (path == NULL) {
         if (*replacement != NULL) return LIB_STATUS_INVALID_ARGUMENT;
-        (void)softpc_platform_floppy_attach(NULL, mode);
-        return LIB_STATUS_OK;
+        return softpc_platform_floppy_attach(NULL, mode) ? LIB_STATUS_OK :
+            LIB_STATUS_IO_ERROR;
     }
     if (*replacement != NULL) {
+        if (lib_storage_medium_byte_count(*replacement) > LONG_MAX)
+            return LIB_STATUS_INVALID_ARGUMENT;
         status = lib_storage_medium_replace(&drive->medium, *replacement, &retired);
         if (status != LIB_STATUS_OK) return status;
         *replacement = NULL;
-        (void)lib_storage_medium_destroy(&retired);
+        status = lib_storage_medium_destroy(&retired);
         drive->mode = mode;
         lib_memory_copy(drive->path, path, lib_text_length(path) + 1u);
         if (drive->medium == NULL || !softpc_gfi_geometry(
@@ -431,5 +432,5 @@ lib_status softpc_floppy_media_restore(unsigned slot, const char *path,
         return LIB_STATUS_INVALID_ARGUMENT;
     }
     drive->cylinder = cylinder;
-    return LIB_STATUS_OK;
+    return status;
 }

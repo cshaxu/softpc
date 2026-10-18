@@ -720,8 +720,9 @@ add_test(NAME "app-softpc/integration/sb_midi_native_smoke" COMMAND softpc-sb-mi
 set_tests_properties("app-softpc/integration/sb_midi_native_smoke" PROPERTIES
     LABELS "integration;native_audio" TIMEOUT 60 SKIP_RETURN_CODE 77 RESOURCE_LOCK native_midi)
 list(APPEND SOFTPC_TEST_TARGETS softpc-sb-midi-native-smoke)
-foreach(probe IN ITEMS platform audio)
-    set(probe_target softpc-${probe}-failure-smoke)
+foreach(probe IN ITEMS platform audio hdd_media gfi_image)
+    string(REPLACE "_" "-" probe_name "${probe}")
+    set(probe_target softpc-${probe_name}-failure-smoke)
     add_executable(${probe_target} test/app-softpc/unit/compat/${probe}_failure_smoke.c)
     target_link_libraries(${probe_target} PRIVATE softpc-vm)
     target_include_directories(${probe_target} PRIVATE src src/app-softpc

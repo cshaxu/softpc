@@ -1,20 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(Medium): Propagate consumed-medium close failures through the real
-  App-SoftPC FDD/HDD attach and snapshot-restore adapters. An isolated T98 S1
-  production-code probe confirms HDD detach returns OK after injected IO_ERROR;
-  the archive unit substitutes adapters and misses this path. Owner: Compat
-  media adapters. Admission condition: complete existing metadata cleanup and
-  return the error once, without retrying the consumed lease; cover both real
-  adapters. See [F1](../proposals/m9-nonpublic-quality-performance-audit.md#f1---p2-media-retirement-can-falsely-report-success).
-
-- TODO(Medium): Validate HDD attachment/restoration size against the existing
-  signed host-offset ABI and prevent 32-bit extent multiplication overflow.
-  T98 S1's mocked 4-GiB medium attaches but cannot transfer its first sector.
-  Owner: Compat HDD. Admission condition: prove the addressable bound, reject
-  unsupported sizes and use checked transfer arithmetic; no geometry spoof or
-  second backend. See [F2](../proposals/m9-nonpublic-quality-performance-audit.md#f2---p2-accepted-hdd-size-exceeds-its-address-representation).
-
 - TODO(Medium): Reject finite machine instruction budgets beyond the existing
   32-bit counter. 2^32 currently narrows to zero and bypasses budget completion;
   normal continuous UINT64_MAX execution is separately handled. Owner:

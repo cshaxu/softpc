@@ -40,7 +40,12 @@ status; rediscovering them does not establish a new regression.
 
 - S1 admitted: inventory, source audit, relevant checks, findings and minimal
   remedy estimates, actual-diff review and pushed report for owner review.
-- Follow-up implementation subtasks: unallocated until findings and admission.
+- Owner approved established repairs on 2026-10-18: 批准执行当前既定修复任务.
+- S2: F1/F2 real media adapter failure and capacity bounds; active packet in CURRENT.
+- S3: finite instruction budget rejection, no hot-loop counter widening.
+- S4: Compat-private UTF-8 append opening, retaining FILE write/flush/close.
+- Each S builds/releases/tests/commits/pushes and waits for acceptance before
+  the next admission. Performance profiling follows correctness by separate admission.
 
 ## Findings and verification
 
@@ -296,3 +301,71 @@ Its frequency may be profiled separately if optional file output is a measured
 bottleneck. For this bounded fix, a public Storage migration would broaden
 scope beyond the actual encoding defect, so the narrow private-open candidate
 supersedes the earlier public-flush proposal and its estimates.
+
+## S2 implementation and finite qualification ledger
+
+Owner approval: 批准执行当前既定修复任务. Baseline 3b368d26.
+The bounded universe is F1/F2 in the two real media adapters and their existing
+callers. Completion requires every member below, full registered dual-width
+qualification, released EXEs and actual-commit review. S3/S4 are not part of
+this S's completion claim.
+
+- HDD attach: consume/clear both old leases, report any retirement error before
+  opening a new path. Failure cleanup already returns failure and keeps it.
+- HDD restore: absent slots return the close status after clearing metadata;
+  replacement transfers once, commits its metadata and returns retired-close
+  status without pretending the old lease can be retried.
+- FDD attach/restore: preserve physical drive identity, commit the real current
+  medium metadata and return retired-close failure; absent restore propagates
+  attach's failure. No retry, rollback or new storage path exists.
+- Capacity: original fdisk.c::dosearchid returns signed long byte offsets, and
+  host_fdisk_rd/wt accept signed int. Both Windows widths use 32 bits for these.
+  A 2-GiB image's last sector starts at 0x7ffffe00; larger images are rejected
+  on attach and replacement restore. Existing whole-cylinder geometry remains
+  unchanged; this does not add an LBA or large-disk mode. Transfer validation
+  compares sector count against remaining extent before multiplication.
+- Similar FDD narrowing: attach already rejects byte lengths above LONG_MAX;
+  restore now applies the same bound before consuming its replacement.
+- Remaining destroy calls: both void hardware-teardown callbacks keep their
+  original no-result ABI; rejected-candidate/error cleanup already reports the
+  primary failure. Snapshot archive callers check each restore status and stop;
+  their mutation phase is explicitly non-rollback. Machine attach/set-media
+  callers already propagate false. Its stored startup options are not the
+  authoritative mounted-medium view after hardware initialization; capture uses
+  the real adapter view and cold reset retains live attachments.
+
+Permanent owner-local tests include the actual hdd_media.c and gfi_image.c in
+separate test translation units, sharing only a 39-line scripted-medium fixture.
+It creates real 512-byte Lib leases but scripts reported size and close result.
+The HDD unit checks both-slot cleanup, consumed replacement ownership, failed
+retirement metadata, repeated detach, 2-GiB attach/restore/last-sector access,
+oversized/short rejection, negative offsets/counts and x86 multiplication bounds.
+The FDD unit checks attach and restore retirement, retained physical identity,
+repeated detach and oversized replacement ownership. Native close failure and
+a real multi-gigabyte guest disk are not reproduced by these injected tests.
+
+Production estimate resolves to +30/-16, net +14 across two paths; tests are
+195 added lines across three files, plus root CMake +3/-2. Test scaffolding
+exceeds the original +75-130 estimate because both actual legacy adapters need
+separate translation units (host_def.h is not multiply-includable) and scripted
+size/close behavior. No production helper/state was added for testing. Initial
+combined-TU test compilation failed on that original header; separate-owner
+translation units fix the test setup, without changing mirror headers.
+
+Both adapter units pass on x64/x86. Final cached full builds refresh both
+assets/binary EXEs. Qualification under build/t98/s2/qualification exits zero:
+each architecture passes all 193 registered tests, with zero failures/skips:
+177 unit/gates, eight background integration, five native desktop and three
+native audio. audit-results.ps1 independently compares registration against
+the unique XML case names; both exact sets match. No Computer Use was used.
+The x86 build re-emits existing Ninja-log recovery and original macro/switch
+warnings; S2 changes none of those original bodies. The recovery causes extra
+recompilation, not an authored source change or a measured performance gain.
+
+Accounting method: git diff --numstat against 3b368d26, with production limited
+to the two Compat paths, tests to the three new owner-local files, and root
+CMake accounted separately. No public tree, mirror, owner INI or media change.
+F1/F2 are removed from deferred TODO; S3/F3 and S4/F4 remain unimplemented.
+No real native close error or 2-GiB guest installation was reproduced; those
+boundaries have injected adapter proof. Existing real-guest snapshot/restart
+and package paths pass the integration regression. S2 waits for owner acceptance.

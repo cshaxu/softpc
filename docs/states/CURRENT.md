@@ -2,43 +2,51 @@
 
 ## Current Work
 
-Owner admits T98 S1 on 2026-10-18 to audit non-public code quality and
-performance, excluding unchanged mirror bodies but including local mirror diffs.
-The [audit proposal](../proposals/m9-nonpublic-quality-performance-audit.md)
-owns its finite scope and findings. S1 audit is delivered for owner review:
-four new P2 findings, existing debt and bounded performance candidates. Cached
-x64/x86 App unit/root gates each pass 56/56; an isolated real HDD adapter probe
-confirms swallowed close failure and 4-GiB extent overflow. All 131 local mirror
-subset hashes were independently reconstructed. No implementation fix admitted.
-Owner-requested COM/LPT follow-up withdraws the public writer migration:
-flush alone misses partial-write accounting. A bounded private UTF-8 opener
-candidate preserves existing FILE operations and passed an isolated probe;
-it remains a proposed repair, not deployed code.
+Owner approves the established T98 repairs on 2026-10-18, accepting the
+[S1 audit](../history/M9-T98-S1-nonpublic-quality-audit.md) and admitting S2:
+propagate real media retirement errors and enforce HDD address bounds.
+The [proposal](../proposals/m9-nonpublic-quality-performance-audit.md) records
+S2-S4 ordering. S2 implementation and qualification are complete: both cached
+builds/releases and all 193 registered tests per width pass, zero failures/skips.
+Executor delivery and actual-commit review are being finalized for owner acceptance.
+Each implementation S delivers builds/tests and a pushed actual-diff review,
+then waits for owner acceptance before the next S. No public writer expansion
+is admitted; S4 retains FILE operations and changes only UTF-8 opening.
 User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 
-## M9 T98 S1 Packet
+## M9 T98 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner: 准入一个新的t任务 帮我检验非公共组件的代码质量和性能问题（不包括镜像代码，但包括镜像diff）. |
-| Objective | Audit App-SoftPC Product, Machine, Compat, their tests and root build/tooling; inspect local mirror patches rather than unchanged XP implementation. Identify concrete quality defects, avoidable work and measurement gaps with minimal remedies. |
-| Non-goals | No public-package audit or edits, wholesale original-core audit, speculative speedup claims, implementation fixes, guest/media/configuration edits or new hardware capabilities. |
-| Reference Baseline | main 4c8e185b; accepted runtime 5ea4e55e and unchanged dual packages; pinned XP subset manifest. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 批准执行当前既定修复任务. Accept S1 findings; implement established repairs in S2-S4 order, correctness before performance. |
+| Objective | Return consumed-medium close failures through existing FDD/HDD attach/restore results, retain correct ownership/metadata, reject unaddressable HDD sizes and check transfer arithmetic. |
+| Non-goals | No public or mirror edits, retry/rollback state, new backend, performance redesign, guest/media/configuration edits or status API expansion for void teardown. |
+| Reference Baseline | main 3b368d26; accepted runtime 5ea4e55e; pinned XP subset manifest unchanged. |
 | Candidate Proposal | [Non-public quality/performance audit](../proposals/m9-nonpublic-quality-performance-audit.md). |
-| Files And ABI Surface | Read-only src/app-softpc excluding untouched mirror bodies; local mirror diff and ABI joins, test/app-softpc, root CMake/tools and mirror ledgers. Only audit/state documentation may change. |
+| Files And ABI Surface | compat/hdd_media.c, gfi_image.c; owner-local adapter unit and root test registration; state/proposal/history. Existing signatures unchanged. |
 | Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator actual-change review; no Computer Use. |
-| Verification | Frozen path inventory, six call-chain reviews, caller/test searches and existing deterministic checks where useful. Any long diagnostic uses hidden owned jobs with logs/exits and bounded budgets. No full rebuild/release for documentation-only audit. |
-| Expected Markers | Findings cite precise production path, trigger, impact, test gap and minimal correction; distinguish existing TODO, new issue, measured cost and source-inferred cost. |
-| Asset Needs | Preserve owner INI/media/snapshots and packages. Optional bounded evidence under build/t98/s1, up to 20 MiB and 15 minutes per diagnostic; executor owns cleanup. |
-| Reporting Requirements | Findings by severity and responsibility, changed-file/line estimates for candidate fixes, scope coverage and verification limits; production/test/mirror audit delta +0/-0. |
-| Stop Conditions | Report before production fixes, public contract changes, mirror expansion or externally dependent performance experiments. Do not treat tests passing as absence of defects. |
-| Exit Criteria | Six finite audit areas reconciled with evidence or explicit limitations, independent actual-diff review, documentation checks, committed/pushed report awaiting owner direction. |
-| Original Owner Request | 准入一个新的t任务 帮我检验非公共组件的代码质量和性能问题（不包括镜像代码，但包括镜像diff）. |
-| Similar-Issue Sweep | Failure propagation, ownership, duplicated paths, hot-loop allocations/copies/synchronization, snapshot/media boundaries and test/build isolation across all admitted owners. |
+| Verification | Real adapters with injected consumed close failures, rejected replacement ownership and mocked large media; x86/x64 cached full builds, all unit/gates, background integrations and serial native desktop/audio integrations; exact CTest/XML coverage. |
+| Expected Markers | Cleanup completes once on error; valid replacement metadata commits even when retirement reports failure; unsupported sizes do not attach/replace; transfer bounds cannot wrap. |
+| Asset Needs | Preserve INI/media/snapshot.debug. Refresh only assets/binary dual EXEs. Owned hidden qualification under build/t98/s2: 30-minute budget, 5-minute no-progress observation, 50 MiB logs; executor owns cleanup. No Computer Use. |
+| Reporting Requirements | Production/test added, deleted and net lines, unchanged public/mirror delta, exact proof boundaries and dual EXE links. Initial estimate production +20-42/-11-22, tests +75-130. |
+| Stop Conditions | Public/mirror changes, new storage semantics or ABI expansion require owner direction. Host-dependent failure is not a unit pass or an automatic retry. |
+| Exit Criteria | F1/F2 ledger satisfied; focused and full qualification passed, dual EXEs published, complete P pushed and actual-change coordinator review delivered; wait for owner acceptance. |
+| Original Owner Request | 批准执行当前既定修复任务; earlier: 先把已知缺口修复 再处理性能问题. |
+| Similar-Issue Sweep | Every medium-destroy and size/offset conversion in the real FDD/HDD adapters, callers and snapshot replacement joins; status-bearing failures fixed, void/cleanup-only calls explicitly disposed. |
 
 ## Current Technical Baseline
 
+- T98 S2 fixes Compat media close reporting and address bounds only. Production
+  +30/-16 (net +14); tests +195/-0; root test registration +3/-2. Public and
+  mirror code unchanged. Qualification: build/t98/s2/qualification, exit 0;
+  x64/x86 each 177 unit/gates, eight background integrations, five desktop and
+  three native audio, exact XML/registration match. Existing Ninja recovery
+  and original compiler warnings remain; no warning-removal claim is made.
+- Current packages are rebuilt S2: softpc32 SHA-256
+  4E67DBD9AAEBE99BB874BA77E0BFA7DBE7819DE5927D920BE4998769089231AC;
+  softpc64 SHA-256
+  5C692E0DE7ADFDF9D1AEF2446D90C7C4B733FD3ECA589B94CBA33D2E89D216A8.
 - T97 is investigation/documentation only; production, tests and source mirror
   have no changes. Installed Win95 driver rejects mixer/volume capabilities for
   DSP 2.01. The observed hardware-change confirmation explicitly requests
@@ -49,7 +57,7 @@ User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
   eight background integrations, five desktop and three native audio.
   Evidence: build/t96/s8/qualification, qualification.exit=0; exact CTest/XML
   registration equality was checked. Existing compiler/Ninja warnings remain.
-- Packages remain the accepted T96 runtime, without a T97 rebuild:
+- Previously accepted T96 package reference, without a T97 rebuild:
   softpc32 SHA-256 6A65D5127C6EBF567DCB7FD32F506541BF028FD42B69F9113CB09B363DF52C9A;
   softpc64 SHA-256 E1B95ED71ACB371098C854FEF6FD4E3573B71BE98169243958F13DD2900A53C1.
 - Current transport: RGB graphics, separate leaf text contracts, Machine-owned
