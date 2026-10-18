@@ -9,9 +9,10 @@ additionally approves pointer-discriminated Window frames, removal of valid/
 graphics booleans and removal of the Machine frame envelope; sequence belongs
 to the Window frame. Session remains the sole routing coordinator.
 The [S7 ledger](../proposals/m9-lib-rgb-graphics-frame.md#t96-s7-direct-console-production) owns its
-bounded convergence ledger. S7 is implemented and verified, ready for executor
-commit/push and coordinator actual-commit review; owner acceptance remains
-pending. User snapshot.debug is preserved and excluded.
+bounded convergence ledger. Executor 8841e5fd is committed and pushed;
+coordinator has reviewed its actual diff, final evidence and artifacts.
+S7 is delivered for owner acceptance, not closed. User snapshot.debug is
+preserved and excluded.
 
 ## M9 T96 S7 Packet
 

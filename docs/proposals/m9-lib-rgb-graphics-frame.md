@@ -977,3 +977,23 @@ explicit diagnostic reads retain deep copying. Tests that formerly asserted
 Machine-envelope copying now assert Lib copy ownership and Machine Console
 pointer identity at their proper owners. S7 is ready for delivery and actual
 coordinator commit review; no S/T closure is claimed.
+
+### S7 coordinator actual-commit review
+
+Reviewed pushed executor 8841e5fd07ad9b212f97f4f577554811aedd7396 against
+the owner-approved schema and original S7 requests. Inspected committed
+Machine/Driver production, Session/UI/Product wiring, Lib consumer/schema and
+test changes, not only the executor's report. Confirmed both exchanges remain
+owned by Machine, payload pointers target reusable owned storage, and the pure
+status callback is installed only after UI binding and outlived by shutdown.
+No live guest pointer, per-frame allocation, second renderer or transport copy
+is introduced. The removed Machine wrapper has no source/test consumer left.
+
+Recomputed C/H accounting and checked all eight manifests (292 entries),
+both EXE hashes, full registered-name coverage (194 each), final-check exit 0
+and retained failing runs. All task changes are in P1; the only unstaged path
+is the owner's excluded snapshot.debug. Diagnostics add observability only;
+they do not establish the cause of the intermittent x86 integration failure.
+The viewport-narrowing finding is likewise not presented as repaired.
+No blocking schema/transport finding in this bounded review; S7 remains
+awaiting owner acceptance and T96 stays open.
