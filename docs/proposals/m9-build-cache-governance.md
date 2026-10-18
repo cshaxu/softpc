@@ -1,116 +1,91 @@
 # Repository-local build caches and disposable task work
 
-Owner requests that ccache live in build/.ccache, Ninja trees in build/.ninja,
-and everything else below build be disposable when its owning work completes.
-Owner admits M9 Td S22: 准入一个td任务执行治理. T98 remains open.
+## Owner request and active scope
 
-Finite ledger: (1) persistent directory/preset layout; (2) ccache command routing
-including direct build invocations; (3) explicit safe cleanup and residue gate;
-(4) current instructions and closure obligations; (5) real dual-width cache/build
-proof; (6) retirement of old generated trees/probes/logs. Each needs implementation,
-focused proof and a recorded disposition before delivery. No runtime change.
+Owner admits M9 Td S22: 准入一个td任务执行治理. Persist only build/.ccache
+and build/.ninja; dispose of completed task scripts, probes and logs elsewhere
+under build. T98 stays open. No runtime/public-corpus/mirror, media, INI or EXE
+change, global cache purge or new build framework.
 
-Plan: reuse one canonical Ninja tree per architecture, whether ccache is enabled
-or not. Never move an old CMake tree because its generated files retain absolute
-paths. Retain optional ccache rather than silently requiring a new user dependency;
-when selected, the generated launcher fixes its repository cache/temporary roots
-and bounded size. Makefiles remain an explicitly disposable fallback.
+Owner reopens this same unaccepted S: 请你重开本S，把编译规范、脚本、门禁治理干净！
+Reopen baseline 5fa2995c; original baseline 733a7f6e. CURRENT is the active
+packet; Execution owns cleanup policy and Coding owns the output layout.
 
-The cleanup tool lists by default, requires exact build-child names and explicit
-apply/quiescence confirmation to delete, rejects persistent roots and reparse
-points, and checks closure residue. No cache manager, background janitor or
-global cache purge is added. Global ccache can contain other projects and is not
-safe to relocate wholesale; only this repository's future writes are confined.
+## Retained design and finite correction ledger
 
-Preserve compact verification summaries in task history before discarding raw
-logs. Existing historical evidence paths are historical references, not retention
-requirements. Never reclassify task recordings as a cache to evade cleanup.
+1. Real configure owns Ninja containment under build/.ninja and generated
+   ccache commands own build/.ccache, its tmp child and a 5-GiB bound.
+   Keep the shipped x86/x64 preset trees shared with their ccache variants.
+   Do not force custom configurations to use only two exact GCC names.
+2. Delete the second preset parser, synthetic negative fixtures and their
+   registrations. Verify actual configure and generated build behavior instead.
+3. Clean-Build.ps1 alone owns exact-name deletion and the closure residue gate.
+   Keep traversal/cache-root, reparse, Git and user-config protection, dry-run
+   and explicit quiescence confirmation. Documentation gates check documents,
+   not another implementation of filesystem cleanup policy.
+4. Retain cleanup regression scenarios but invoke the actual script in-process,
+   not thirteen child shells. Verify all x86/x64 unit/gates and remove owned
+   scratch after summarizing evidence and pushed-change review.
 
-Expected scope: roughly 10-14 root configuration/tool/document paths; zero C
-production/test or mirror diff; scripts/gates/regressions about +200-300 lines.
-CURRENT owns execution and budgets; final accounting uses git diff --numstat.
+No cache manager, retry state machine, new helper layer or background janitor.
+Global ccache may contain other products; only future SoftPC writes are pinned.
+Never move old CMake trees with absolute paths. Completed raw evidence paths are
+historical references, not retention requirements or hidden persistent caches.
 
-## Legacy retirement admission and retained checkpoint
+Estimate at reopening: 8-10 paths; build/check code net -40 to -70 lines.
+Final accounting must use actual Git numstat, not this estimate.
 
-The owner authorizes disposal of completed work outside the two persistent
-roots. Freeze the legacy build children before cleanup; tools preflight exact
-paths and reject links/Git/user configuration. A cleanup job may run alongside
-validation only on these disjoint old children: it cannot delete .ninja,
-.ccache or the active td-s22 scratch. Matching live-process references block
-deletion; no foreign process is killed. Both jobs use separate bounded logs.
+## Prior delivery and legacy retirement checkpoint
 
-Retain this checkpoint before deleting old raw evidence: T98 S2 delivery
-7afc9981, review db935fb7, owner closure 733a7f6e; both architectures passed
-193/193 with no failures/skips, exact XML/registration match. Its production
-+30/-16 and test +195/-0 accounting and proof limits are in the S2 history.
-S1 reconstructed all 131 patched XP-subset hashes; deterministic checks and
-mirror manifests remain reproducible from tracked source. No measured runtime
-performance improvement was claimed. The old x86 .ninja_log is version 7,
-212184 bytes after S2; repeated recovery warnings were observed, not diagnosed.
-That metadata is disposable, not a new retained cache exception.
+Executor d6523386 and actual-change review 5fa2995c were pushed. First delivery
+changed 13 paths, +446/-27 in total; configuration/tools/checks +236/-6.
+Both architectures passed 180/180 unit/gates, latest five gates and direct
+cache confinement/hit proofs. Fresh test builds each completed 684 edges;
+second builds had no work. Test wall times were 113.24/91.82 seconds.
+The cold cache's 28 hits/976 calls were not a warm-cache speedup measurement.
+Neither EXE nor native desktop/audio/package integrations was refreshed.
+Existing compiler warnings and old Ninja recovery debt were not repaired.
 
-Legacy generated classes include old mingw/ninja build variants, lib CI/MSVC
-proof trees, closed t93-t98 scratch and root diagnostic text. Summaries are
-retained in tracked history/proposals; these old raw paths cease to be available
-after retirement. Their deletion is not a runtime repair or a cache-hit claim.
+Thirty obsolete direct build children and prior Td scratch were deleted.
+The generic cleaner correctly refused one embedded Git checkout; its local
+SoftPC origin, clean ancestor 5fbe692 and lack of reparse points were verified
+before explicit one-off disposal. Generic Git protection was not weakened.
+Removed generated work is reproducible; raw logs are not recoverable from Git.
 
-## Executor delivery, 2026-10-18
+Before retirement, retained T98 S2 delivery 7afc9981, review db935fb7 and owner
+closure 733a7f6e: both widths 193/193, zero failures/skips, exact XML/registration
+match; production +30/-16, tests +195/-0, registration +3/-2. Accepted package
+hashes stay in CURRENT. S1 reconstructed all 131 patched XP-subset hashes;
+tracked manifests and source preserve reproducibility. The old x86 Ninja log
+was version 7, 212184 bytes; recovery warnings were observed, not diagnosed.
 
-All six ledger members are implemented and verified:
+## Reopen verification and delivery
 
-1. Presets share the canonical build/.ninja/gcc-x64-release and gcc-x86-release
-   trees; noncanonical Ninja configure paths fail rather than creating variants.
-2. Generated ccache commands pin build/.ccache, its tmp child and a 5-GiB limit.
-   A fresh miss/hit probe succeeded. Direct builds of both architectures also
-   hit that cache while hostile caller cache/temp paths remained absent.
-3. Exact-name cleanup rejects cache roots, traversal, reparse points, Git data
-   and protected output configuration. Safety regressions passed; the idle
-   documentation gate rejects disposable residue.
-4. Execution, source layout and contributor/quick-start instructions now use
-   the same paths and require evidence summarization followed by cleanup.
-5. Fresh dual-width test builds each completed 684 edges; second builds reported
-   no work. x64 and x86 each passed all 180 registered unit/gate tests, with
-   exact registration/XML equality and no failures or skips. Test wall times
-   were 113.24 and 91.82 seconds. After final safety changes, both architectures
-   passed all five affected gates and the clock smoke again. These are not
-   whole-product timings or a measured warm-cache speedup: the initial local
-   cache had 28 hits/976 cacheable calls, mostly cold misses.
-6. Thirty obsolete direct build children were retired, including legacy build
-   variants, t93-t98 scratch and diagnostics. One deletion initially stopped
-   correctly on an embedded Git repository. Its local SoftPC origin, clean
-   checkout at ancestor 5fbe692 and absence of reparse points were verified
-   before explicit disposal of that old T50 checkout proof. The generic tool
-   still refuses Git data. No global cache or user data was removed.
+All four correction members are implemented. Relative to 5fa2995c, build and
+check code is +16/-120, net -104; C/H production/tests and public corpora have
+zero diff. No second policy interpreter remains. The cleanup safety script
+keeps all thirteen scenarios; expected rejection returns locally and unexpected
+failure preserves the actual exception, without another status flag.
 
-The final owned scratch build/td-s22 was removed after pushed-change review;
-the residue check passes with only .ccache and .ninja remaining.
-Raw logs are disposable; this summary preserves their outcomes. Generated files
-deleted here are reproducible, but raw logs are not recoverable from Git.
+Both widths configured successfully in shipped trees and all test targets
+built without work on first and second incremental calls. A deliberately
+removed clock object then rebuilt through the actual launcher: direct cache
+hit per width; hostile caller cache/temp directories were not created.
+The real configure rejected an outside tree; the actual helper accepted a
+nested path and rejected both .ninja itself and its same-prefix sibling.
+Initial task-local probe invocation/path checks were corrected before the
+successful run; they were not product defects or hidden passing results.
 
-Scope: root build/configuration/tooling and governance only. C/H production,
-C/H tests, public component trees and the preserved mirror have zero diff.
-Native desktop/audio/package integrations were not rerun; neither EXE was
-rebuilt or published for this governance-only change. Both package hashes
-remain the accepted T98 S2 hashes recorded in CURRENT. Existing compiler
-warnings and the historical Ninja recovery debt are not claimed fixed.
+x64/x86 each passed all 178 unit/gates, exact XML/registration equality,
+zero failures/errors/skips; wall times 82.52/80.95 seconds. Count fell by two
+because the duplicate preset checker and its selftest were deleted, not because
+product tests were removed. Final cleanup regression reruns passed in
+1.15738/1.08503 seconds versus about 30 seconds with child shells. Different
+load prevents treating whole-suite timing differences as controlled speedups.
+Native desktop/audio/package integrations were not rerun; EXE hashes match
+accepted S2. No production, test corpus, INI, media or snapshot change.
 
-## Coordinator actual-change review
-
-Reviewed pushed executor d6523386 against baseline 733a7f6e and the owner request,
-not just its summary. All 13 changed paths belong to root build governance;
-git diff confirms src, test and assets have no changes. Independently counted
-180 XML cases per architecture with zero failure/error/skipped nodes; checked
-job exit codes, both no-work builds, actual direct cache-hit logs and the safe
-cleanup outcome. No extra runtime owner, background cleanup service, global
-cache mutation or new public dependency was introduced. Review found no blocker.
-
-Reproducible executor accounting: git diff 733a7f6e d6523386 --numstat gives
-+421/-27, net +394 across all 13 paths. Of this, root build configuration,
-tools and check regressions are +236/-6, net +230; remaining changes are docs.
-C/H production and C/H tests are +0/-0. The larger text total includes the
-admission, retained retirement evidence and this review, not extra runtime code.
-
-Final process check found no owned background script running. Cleanup removed
-the exact validated task directory, then Clean-Build.ps1 -Check passed.
-User snapshot.debug remains untouched and untracked; no other worktree changes
-are excluded. Td S22 awaits owner acceptance; T98 is not closed or advanced.
+Six obsolete generated fixtures from deleted checks were removed after tests
+finished. Only owned build/td-s22 scratch remains until pushed-change review;
+remove it and run the sole residue gate before final delivery. P4 records that
+actual review; owner acceptance and numeric T/S advancement are not assumed.

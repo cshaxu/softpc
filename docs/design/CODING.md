@@ -123,11 +123,13 @@ private implementation contracts for focused proof; production consumers may
 not bypass the VM public boundary.
 
 The complete `build/` tree is ignored. Only `build/.ccache/` and
-`build/.ninja/` persist across completed work. Ninja uses exactly
+`build/.ninja/` persist across completed work. Shipped Ninja presets use
 `.ninja/gcc-x64-release/` and `.ninja/gcc-x86-release/`, including OBJ/archive,
 CMake metadata and Ninja dependency/log state. Optional ccache uses the same
 architecture trees; generated launch commands fix its data and temporary
-directories beneath `.ccache/`, bounded to 5 GB. No user-wide cache is a build
+directories beneath `.ccache/`, bounded to 5 GB. Configure requires Ninja trees
+below `.ninja/` but does not prescribe custom compiler/configuration names.
+No user-wide cache is a build
 dependency. Makefiles builds and all other children are task-owned disposable
 work, not alternative retained caches. No M/T/S/P trees or raw evidence may be
 hidden under the two reusable roots. Cleanup and closure checks follow

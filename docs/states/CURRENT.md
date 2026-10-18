@@ -2,18 +2,17 @@
 
 ## Current Work
 
-M9 Td S22 is verified, awaiting owner acceptance:
+M9 Td S22 is reopened and active:
 [build-cache governance](../proposals/m9-build-cache-governance.md).
 Open task awaiting owner: T98.
 
-Td S22 executor d6523386 is pushed and its actual changed paths reviewed:
-canonical dual-width test builds,
-180/180 unit/gates per architecture, latest five affected gates per architecture
-and direct-build cache confinement/hits passed. Thirty obsolete build children
-are removed. The coordinator independently checked the pushed diff, both
-180-case XML reports and confinement/cleanup logs. Its review scratch is now
-removed; build contains only .ccache and .ninja, and the residue check passes.
-No EXE/runtime change. T98 stays open; owner acceptance of this Td is pending.
+Owner requests simplification of build rules, scripts and gates. Prior delivery
+d6523386/review 5fa2995c passed 180 unit/gates per width but duplicated cache
+policy in configure, preset parsing and documentation checks. The correction
+removes those duplicates; both widths passed 178/178 unit/gates and direct
+cache-hit/confinement probes. Final cleanup regression took 1.16/1.09 seconds.
+Executor delivery and actual pushed-change review precede owner acceptance.
+No EXE/runtime change; T98 stays open.
 
 Owner accepts and closes [S2](../history/M9-T98-S2-media-boundaries.md) on
 2026-10-18: 验收通过 收口s任务 保持t开放. Executor 7afc9981 and coordinator
@@ -28,20 +27,20 @@ remains untouched/excluded.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Governance |
-| Admission And Approval | Owner: 准入一个td任务执行治理; persist only build/.ccache and build/.ninja, clean completed task scratch, update rules/gates/scripts. |
+| Admission And Approval | Owner reopens S22: 请你重开本S，把编译规范、脚本、门禁治理干净！ Preserve the original two-cache-root request. |
 | Objective | Pin compiler-cache storage and Ninja build trees to their two repository-local roots; enforce safe task cleanup and remove obsolete build leftovers after preserving concise evidence. |
 | Non-goals | No runtime, public corpus, mirror, INI/media/snapshot changes, global cache purge or new build framework. T98 stays open; no numeric T/S admission. |
-| Reference Baseline | main 733a7f6e; accepted T98 S2 runtime and both package hashes below. |
+| Reference Baseline | Reopen baseline main 5fa2995c; original 733a7f6e; accepted T98 S2 runtime and both package hashes below. |
 | Candidate Proposal | [Build-cache governance](../proposals/m9-build-cache-governance.md). |
 | Files And ABI Surface | Root presets/CMake, tools, README/CONTRIBUTING, Execution and source-layout documentation, Current/history. No production ABI. |
 | Applicable Rules | Execution, Document, Architecture and Coding governance skills; single-person executor/coordinator review; no Computer Use. |
-| Verification | Preset/cache confinement gate and negative/safety tests; fresh x64/x86 configure/build and background unit/gates in canonical trees, ccache miss/hit probe, no-op incremental build; final build-root residue check. |
+| Verification | Real Ninja configure accepts shipped trees and rejects outside roots; actual helper accepts nested paths; actual launcher confinement; in-process cleanup safety regression; x64/x86 cached test build and complete unit/gates; final cleanup check. No runtime/EXE or native integration changes. |
 | Expected Markers | Exactly two reusable cache roots; non-cache entries have finite task ownership and disappear on completion; no stale absolute-path CMake tree is relocated/reused. |
 | Asset Needs | Disposable build/td-s22 for jobs/logs with 30-minute/5-minute no-progress/50-MiB budget; stop owned jobs and summarize evidence before removal. Keep user files; no global ccache deletion. |
 | Reporting Requirements | Paths, actual script/config/test diff, cleanup inventory, cache proof and verification limits; preserve runtime hashes for governance-only work. |
 | Stop Conditions | User data, live unrelated jobs, symlink/reparse traversal or cache outside repo must block unsafe cleanup; do not kill jobs or erase unrelated global caches. |
 | Exit Criteria | Policy/scripts/gates implemented and tested, obsolete generated directories removed safely, only the two caches remain, evidence summarized and pushed actual-change review delivered. |
-| Original Owner Request | build/.ccache, build/.ninja可以跨提交保存，以便节省时间。但是这两个之外的build里的内容属于用后即抛; 准入一个td任务执行治理. |
+| Original Owner Request | build/.ccache, build/.ninja可以跨提交保存，以便节省时间。但是这两个之外的build里的内容属于用后即抛; 请你重开本S，把编译规范、脚本、门禁治理干净！ |
 | Similar-Issue Sweep | All tracked build entry points, current docs, live build roots, compiler launcher routing and temporary-probe/log references; historical paths stay historical with explicit retirement notes. |
 
 ## Current Technical Baseline

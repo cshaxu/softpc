@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.23)
 include(tools/build_cache.cmake)
 project(softpcvm LANGUAGES C RC)
-softpc_verify_ninja_tree()
 
 # The CCPU is a full instruction interpreter. A single-config generator
 # otherwise leaves CMAKE_BUILD_TYPE empty and silently emits an unoptimised
@@ -575,13 +574,6 @@ set_tests_properties("app-softpc/unit/softpc.new/x87_layout_smoke" PROPERTIES LA
 add_test(NAME "checks/standalone_source_boundary"
     COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
         "${CMAKE_SOURCE_DIR}/tools/checks/standalone_source_boundary.cmake")
-add_test(NAME "checks/build_cache"
-    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}" -P
-        "${CMAKE_SOURCE_DIR}/tools/checks/build_cache.cmake")
-add_test(NAME "checks/build_cache/selftest"
-    COMMAND "${CMAKE_COMMAND}" "-DSOFTPC_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
-        "-DSELF_TEST_ROOT=${CMAKE_BINARY_DIR}/build-cache-selftest" -P
-        "${CMAKE_SOURCE_DIR}/tools/checks/build_cache.cmake")
 if(WIN32)
     add_test(NAME "checks/build_cleanup/selftest"
         COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File

@@ -108,7 +108,7 @@ receiver. Non-positive net code is a design preference, not permission to
 delete correct necessary behavior.
 
 `build/` has exactly two reusable roots: `.ccache/` (bounded compiler cache)
-and `.ninja/` (the two canonical architecture build trees). Everything else
+and `.ninja/` (reusable Ninja build trees). Everything else
 is disposable, including Makefiles builds, task scripts, probes, test media,
 captures and raw logs. Do not hide task evidence or recordings in either cache.
 Persistent trees reuse stable names, never M/T/S/P-specific copies.
@@ -137,7 +137,10 @@ Do not purge/migrate a user-wide ccache that may belong to other repositories.
 Before governance/task closure run `tools/Clean-Build.ps1 -Check`; no non-cache
 build child may remain. During an interrupted numeric T, only the currently
 active packet's explicitly named scratch may remain until its work ends. The
-root build-cache gate validates presets; its selftests cover unsafe cleanup.
+configure step enforces Ninja containment and compiler-cache routing. Cleanup
+and its residue check have one owner, `Clean-Build.ps1`; do not duplicate that
+policy in preset parsers or documentation validators. Its selftest exercises
+the real script in-process, including unsafe deletion rejection.
 Raw traces are never committed as fixtures or product inputs.
 
 ### Long-running execution
