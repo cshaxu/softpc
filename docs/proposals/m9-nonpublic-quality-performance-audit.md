@@ -231,3 +231,14 @@ failure and size boundaries; fix bounded-run contracts; address endpoint paths
 after deciding the small public flush capability; then profile the three
 runtime candidates before implementing performance changes. Unchanged mirror
 algorithms stay outside those suggested repairs.
+
+## Actual-commit review
+
+Coordinator role reviewed executor commit 849709b5 against the owner request,
+packet, real adapter probe, both 56-test XML reports and 131 reconstructed
+subset identities. Its three changed paths are documentation only, +292/-5;
+production/tests/mirror remain +0/-0. Package hashes match T96. Source-only,
+injected, provenance and performance evidence are distinguished; F4 explicitly
+retains the public-flush decision instead of promising an invalid direct swap.
+Documentation governance and whitespace checks pass. S1 awaits owner review;
+T98 remains open and no repair subtask is automatically admitted.
