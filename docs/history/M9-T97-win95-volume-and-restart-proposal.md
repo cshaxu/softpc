@@ -3,7 +3,9 @@
 ## Status
 
 Owner admits T97 S1 on 2026-10-17 after T96 acceptance: "works! 好了收口本S和本T，准入下一个T任务".
-CURRENT owns its active packet; this proposal retains the investigation plan.
+Owner accepts S1 and closes T97 on 2026-10-18. This retained proposal preserves
+the investigation plan and findings; the [completion audit](M9-T97-completion-audit.md)
+records closure and its limits.
 Baseline is 5ea4e55e. S1 findings below distinguish observed guest policy from
 an emulator defect; no production repair has been made.
 Owner subsequently directs: "本项和队列剩余一项合并调查吧". The queued
@@ -219,5 +221,6 @@ two documentation files, +136/-3 (net +133); production/tests/mirror remain
 +0/-0. Documentation governance and whitespace checks pass. Package hashes
 still match the accepted baseline; no diagnostic guest process remains.
 The original-click and first-install limitations remain explicit, not silently
-promoted to universal restart proof. S1 is delivered for owner review, not
-owner-closed; no subsequent hardware-capability task is automatically admitted.
+promoted to universal restart proof. S1 was delivered for owner review at that
+commit. Owner subsequently accepted and closed S1/T97; no subsequent
+hardware-capability task is automatically admitted.

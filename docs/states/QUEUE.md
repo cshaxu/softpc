@@ -5,13 +5,12 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-No queued candidates. Both Win95 issues are admitted in T97 S1.
+No queued candidates.
 
 ## Previously admitted
 
-Owner admits [Windows 95 volume control and restart](../proposals/m9-win95-volume-and-restart.md)
-as T97 S1 on 2026-10-17, then explicitly merges the remaining restart candidate
-into the same investigation. CURRENT owns its active packet.
+Owner accepts and closes [Windows 95 volume control and restart](../history/M9-T97-completion-audit.md)
+as T97 on 2026-10-18. Both candidates were investigated together in S1.
 
 Owner accepts and closes [T96](../history/M9-T96-completion-audit.md) on
 2026-10-17, including S8 MIDI configuration verification.
