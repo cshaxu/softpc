@@ -82,8 +82,8 @@ All six ledger members are implemented and verified:
    before explicit disposal of that old T50 checkout proof. The generic tool
    still refuses Git data. No global cache or user data was removed.
 
-The final owned scratch is build/td-s22, retained only through pushed-change
-review; it must be removed and the residue check pass before final delivery.
+The final owned scratch build/td-s22 was removed after pushed-change review;
+the residue check passes with only .ccache and .ninja remaining.
 Raw logs are disposable; this summary preserves their outcomes. Generated files
 deleted here are reproducible, but raw logs are not recoverable from Git.
 
@@ -93,3 +93,24 @@ Native desktop/audio/package integrations were not rerun; neither EXE was
 rebuilt or published for this governance-only change. Both package hashes
 remain the accepted T98 S2 hashes recorded in CURRENT. Existing compiler
 warnings and the historical Ninja recovery debt are not claimed fixed.
+
+## Coordinator actual-change review
+
+Reviewed pushed executor d6523386 against baseline 733a7f6e and the owner request,
+not just its summary. All 13 changed paths belong to root build governance;
+git diff confirms src, test and assets have no changes. Independently counted
+180 XML cases per architecture with zero failure/error/skipped nodes; checked
+job exit codes, both no-work builds, actual direct cache-hit logs and the safe
+cleanup outcome. No extra runtime owner, background cleanup service, global
+cache mutation or new public dependency was introduced. Review found no blocker.
+
+Reproducible executor accounting: git diff 733a7f6e d6523386 --numstat gives
++421/-27, net +394 across all 13 paths. Of this, root build configuration,
+tools and check regressions are +236/-6, net +230; remaining changes are docs.
+C/H production and C/H tests are +0/-0. The larger text total includes the
+admission, retained retirement evidence and this review, not extra runtime code.
+
+Final process check found no owned background script running. Cleanup removed
+the exact validated task directory, then Clean-Build.ps1 -Check passed.
+User snapshot.debug remains untouched and untracked; no other worktree changes
+are excluded. Td S22 awaits owner acceptance; T98 is not closed or advanced.

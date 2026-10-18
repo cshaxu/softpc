@@ -2,14 +2,18 @@
 
 ## Current Work
 
-M9 Td S22 is active: [build-cache governance](../proposals/m9-build-cache-governance.md).
+M9 Td S22 is verified, awaiting owner acceptance:
+[build-cache governance](../proposals/m9-build-cache-governance.md).
 Open task awaiting owner: T98.
 
-Td S22 executor verification is complete: canonical dual-width test builds,
+Td S22 executor d6523386 is pushed and its actual changed paths reviewed:
+canonical dual-width test builds,
 180/180 unit/gates per architecture, latest five affected gates per architecture
 and direct-build cache confinement/hits passed. Thirty obsolete build children
-are removed. Only its declared review scratch remains beside the two caches;
-actual pushed-change review and final scratch removal precede delivery.
+are removed. The coordinator independently checked the pushed diff, both
+180-case XML reports and confinement/cleanup logs. Its review scratch is now
+removed; build contains only .ccache and .ninja, and the residue check passes.
+No EXE/runtime change. T98 stays open; owner acceptance of this Td is pending.
 
 Owner accepts and closes [S2](../history/M9-T98-S2-media-boundaries.md) on
 2026-10-18: 验收通过 收口s任务 保持t开放. Executor 7afc9981 and coordinator
