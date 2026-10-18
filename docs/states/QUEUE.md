@@ -5,13 +5,15 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-1. [Windows 95 unavailable volume control](../proposals/m9-win95-volume-control.md).
-2. [Windows 95 restart stops at safe shutdown](../proposals/m9-win95-restart-safe-shutdown.md).
+1. [Windows 95 restart stops at safe shutdown](../proposals/m9-win95-restart-safe-shutdown.md).
 
 ## Previously admitted
 
-Owner delegates admission of [Lib RGB graphics-frame contract](../proposals/m9-lib-rgb-graphics-frame.md)
-as T96 S1 on 2026-10-17. CURRENT owns its active packet.
+Owner admits [Windows 95 unavailable volume control](../proposals/m9-win95-volume-control.md)
+as T97 S1 on 2026-10-17. CURRENT owns its active packet.
+
+Owner accepts and closes [T96](../history/M9-T96-completion-audit.md) on
+2026-10-17, including S8 MIDI configuration verification.
 
 Owner delegates closure of [Windows 3.1 MIDI silence and repeated WAV hang](../history/M9-T95-win31-midi-wav-playback-proposal.md)
 as T95 on 2026-10-17; see its completion audit.

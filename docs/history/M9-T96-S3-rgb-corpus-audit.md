@@ -7,7 +7,7 @@ admits S4 for buffer-lifetime audit and design. T96 remains open.
 The bounded source scan found no residual indexed graphics interface; all 288
 shared manifest entries matched. Fixed import tree identities and the atomic
 adoption checklist are recorded in the
-[proposal](../proposals/m9-lib-rgb-graphics-frame.md#s3-rgb-corpus-audit-and-downstream-adoption).
+[proposal](M9-T96-lib-rgb-graphics-frame-proposal.md#s3-rgb-corpus-audit-and-downstream-adoption).
 
 Production and tests: +0/-0. No new compilation, runtime tests or EXE refresh
 was needed for this documentation-only delivery. The prior S2 evidence and

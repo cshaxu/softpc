@@ -21,7 +21,7 @@ This closure changes documentation only, not production, tests, EXEs or media.
   adds exchange failure/allocation proof and precise negative-test diagnostics.
 
 The detailed bounded ledgers and historical evidence remain in the
-[proposal](../proposals/m9-lib-rgb-graphics-frame.md).
+[proposal](M9-T96-lib-rgb-graphics-frame-proposal.md).
 
 ## Final delivery and review
 

@@ -14,7 +14,7 @@ Both architectures passed 194/194 with no skips: 178 unit/gates, eight backgroun
 integration, five desktop and three native audio. Evidence and the disconnected
 session failures preceding the successful unchanged rerun are retained in the
 [current baseline](../states/CURRENT.md). The
-[proposal](../proposals/m9-lib-rgb-graphics-frame.md) records ownership and paths.
+[proposal](M9-T96-lib-rgb-graphics-frame-proposal.md) records ownership and paths.
 
 S6 addresses concurrent turnover coverage, redundant private revalidation,
 unused notification payload and stale ownership documentation. S5 runtime

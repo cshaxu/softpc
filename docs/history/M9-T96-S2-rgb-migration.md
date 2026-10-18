@@ -9,7 +9,7 @@ Production: three files +27/-19, net +8. Tests: ten files +147/-53, net +94.
 Both architectures pass 193/193 distinct cases, no skips: 177 unit/gates,
 eight background integrations, five desktop and three native audio cases.
 The detailed ledger and first-failure dispositions remain in the
-[proposal](../proposals/m9-lib-rgb-graphics-frame.md#s2-implementation-and-convergence-ledger).
+[proposal](M9-T96-lib-rgb-graphics-frame-proposal.md#s2-implementation-and-convergence-ledger).
 EXE identities and the current baseline are in [CURRENT](../states/CURRENT.md).
 
 One RGB format and existing renderer/transport remain. No original mirror,

@@ -13,7 +13,7 @@ All five members have a retain disposition with distinct lifetime obligations:
 Machine candidate and publication, Session retained route/content, Window
 pending mailbox and captured worker frame. Native surface and private indexed
 DIB are explicitly excluded from that count. The
-[audit ledger](../proposals/m9-lib-rgb-graphics-frame.md#s4-admitted-lifetime-audit-design-before-code)
+[audit ledger](M9-T96-lib-rgb-graphics-frame-proposal.md#s4-admitted-lifetime-audit-design-before-code)
 records source/test evidence and rejected shortcuts. It does not prove that
 five is an absolute minimum, or claim a new runtime experiment.
 

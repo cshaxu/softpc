@@ -2,14 +2,12 @@
 
 ## Status
 
-T96 was admitted on 2026-10-17 after T95 closure. Owner has accepted and closed
-S7; S1-S7 are complete. Owner subsequently admits S8 for the reported Win3.1
-MIDI installation/mouse regression; CURRENT owns its active packet. See the
-[S7 closure](../history/M9-T96-S7-frame-and-test-governance-closure.md).
-Before T closure, reconcile final ABI/adoption instructions, fixed-frame storage
-accounting and qualification evidence against the complete request. Earlier
-sections record historical designs; S7's shared four-slot exchange supersedes
-the earlier Console three-slot design. CURRENT owns current technical status.
+T96 was admitted and closed on 2026-10-17. Owner accepts S1-S8 and the
+whole-task closure; see the [completion audit](M9-T96-completion-audit.md)
+for final ABI/adoption instructions, storage accounting and qualification.
+Earlier sections record historical designs and intermediate states; S7's
+shared four-slot exchange supersedes the earlier Console three-slot design.
+CURRENT owns the next active task, not the historical status passages below.
 The problem/examples below describe the pre-migration baseline.
 
 ## Problem
