@@ -2,12 +2,36 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner accepts and closes T97 S1 and T97
-on 2026-10-18: "好的 既然如此 批准收口本T".
-The [T97 completion audit](../history/M9-T97-completion-audit.md) reconciles
-both Win95 investigations, evidence limits, unchanged runtime and owner decision.
-No mixer-capability upgrade or subsequent task is admitted.
+Owner admits T98 S1 on 2026-10-18 to audit non-public code quality and
+performance, excluding unchanged mirror bodies but including local mirror diffs.
+The [audit proposal](../proposals/m9-nonpublic-quality-performance-audit.md)
+owns its finite scope and findings. S1 audit is delivered for owner review:
+four new P2 findings, existing debt and bounded performance candidates. Cached
+x64/x86 App unit/root gates each pass 56/56; an isolated real HDD adapter probe
+confirms swallowed close failure and 4-GiB extent overflow. All 131 local mirror
+subset hashes were independently reconstructed. No implementation fix admitted.
 User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
+
+## M9 T98 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner: 准入一个新的t任务 帮我检验非公共组件的代码质量和性能问题（不包括镜像代码，但包括镜像diff）. |
+| Objective | Audit App-SoftPC Product, Machine, Compat, their tests and root build/tooling; inspect local mirror patches rather than unchanged XP implementation. Identify concrete quality defects, avoidable work and measurement gaps with minimal remedies. |
+| Non-goals | No public-package audit or edits, wholesale original-core audit, speculative speedup claims, implementation fixes, guest/media/configuration edits or new hardware capabilities. |
+| Reference Baseline | main 4c8e185b; accepted runtime 5ea4e55e and unchanged dual packages; pinned XP subset manifest. |
+| Candidate Proposal | [Non-public quality/performance audit](../proposals/m9-nonpublic-quality-performance-audit.md). |
+| Files And ABI Surface | Read-only src/app-softpc excluding untouched mirror bodies; local mirror diff and ABI joins, test/app-softpc, root CMake/tools and mirror ledgers. Only audit/state documentation may change. |
+| Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator actual-change review; no Computer Use. |
+| Verification | Frozen path inventory, six call-chain reviews, caller/test searches and existing deterministic checks where useful. Any long diagnostic uses hidden owned jobs with logs/exits and bounded budgets. No full rebuild/release for documentation-only audit. |
+| Expected Markers | Findings cite precise production path, trigger, impact, test gap and minimal correction; distinguish existing TODO, new issue, measured cost and source-inferred cost. |
+| Asset Needs | Preserve owner INI/media/snapshots and packages. Optional bounded evidence under build/t98/s1, up to 20 MiB and 15 minutes per diagnostic; executor owns cleanup. |
+| Reporting Requirements | Findings by severity and responsibility, changed-file/line estimates for candidate fixes, scope coverage and verification limits; production/test/mirror audit delta +0/-0. |
+| Stop Conditions | Report before production fixes, public contract changes, mirror expansion or externally dependent performance experiments. Do not treat tests passing as absence of defects. |
+| Exit Criteria | Six finite audit areas reconciled with evidence or explicit limitations, independent actual-diff review, documentation checks, committed/pushed report awaiting owner direction. |
+| Original Owner Request | 准入一个新的t任务 帮我检验非公共组件的代码质量和性能问题（不包括镜像代码，但包括镜像diff）. |
+| Similar-Issue Sweep | Failure propagation, ownership, duplicated paths, hot-loop allocations/copies/synchronization, snapshot/media boundaries and test/build isolation across all admitted owners. |
 
 ## Current Technical Baseline
 

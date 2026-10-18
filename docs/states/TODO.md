@@ -1,5 +1,35 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Propagate consumed-medium close failures through the real
+  App-SoftPC FDD/HDD attach and snapshot-restore adapters. An isolated T98 S1
+  production-code probe confirms HDD detach returns OK after injected IO_ERROR;
+  the archive unit substitutes adapters and misses this path. Owner: Compat
+  media adapters. Admission condition: complete existing metadata cleanup and
+  return the error once, without retrying the consumed lease; cover both real
+  adapters. See [F1](../proposals/m9-nonpublic-quality-performance-audit.md#f1---p2-media-retirement-can-falsely-report-success).
+
+- TODO(Medium): Validate HDD attachment/restoration size against the existing
+  signed host-offset ABI and prevent 32-bit extent multiplication overflow.
+  T98 S1's mocked 4-GiB medium attaches but cannot transfer its first sector.
+  Owner: Compat HDD. Admission condition: prove the addressable bound, reject
+  unsupported sizes and use checked transfer arithmetic; no geometry spoof or
+  second backend. See [F2](../proposals/m9-nonpublic-quality-performance-audit.md#f2---p2-accepted-hdd-size-exceeds-its-address-representation).
+
+- TODO(Medium): Reject finite machine instruction budgets beyond the existing
+  32-bit counter. 2^32 currently narrows to zero and bypasses budget completion;
+  normal continuous UINT64_MAX execution is separately handled. Owner:
+  App-SoftPC Machine. Admission condition: boundary check and targeted test,
+  preserving the sentinel without widening the hot-loop counter. See
+  [F3](../proposals/m9-nonpublic-quality-performance-audit.md#f3---p2-a-finite-instruction-budget-can-become-unbounded).
+
+- TODO(Medium): Align optional COM/LPT output paths with config/media UTF-8
+  semantics; current narrow fopen uses the Windows CRT code page. Owner:
+  App-SoftPC host file exits. Admission condition: preserve lazy open and
+  flush visibility; Storage writer currently lacks public flush, so decide
+  that narrow capability before migrating, without importing private file.h
+  or duplicating path conversion. See
+  [F4](../proposals/m9-nonpublic-quality-performance-audit.md#f4---p2-comlpt-file-paths-have-inconsistent-encoding).
+
 - TODO(High): Resolve unsupported Sound Blaster MIDI command 38h parser
   collision. T95 S1 observes sndblst2.drv sending MIDI bytes after 38h;
   a following 91h is interpreted as DSP high-speed PCM, leaving the guest
