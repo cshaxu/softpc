@@ -472,6 +472,34 @@ static void check_character_banks(void)
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &previous) == LIB_STATUS_OK);
     lib_test_assert(captured.cells_unchanged && captured.cursor_column == 3 &&
         captured.palette[2] == frame.base.text_palette[2]);
+    /* Active extents retain fixed stride. Inactive cells are not converted
+     * and cannot make an otherwise identical frame different. */
+    const lib_u16 extents[][2] = { {1, 1}, {2, 2}, {80, 25}, {80, 50} };
+    for (lib_size extent = 0; extent < sizeof(extents) / sizeof(extents[0]); ++extent) {
+        frame = previous;
+        frame.base.text_columns = extents[extent][0];
+        frame.base.text_rows = extents[extent][1];
+        for (lib_size row = 0; row < KVM_TEXT_ROWS; ++row)
+            for (lib_size column = 0; column < KVM_TEXT_COLUMNS; ++column)
+                frame.base.cells[row * KVM_TEXT_COLUMNS + column] = (kvm_text_cell){67, 1, 5, 6};
+        kvm_console_text_frame same = frame;
+        for (lib_size row = 0; row < KVM_TEXT_ROWS; ++row)
+            for (lib_size column = 0; column < KVM_TEXT_COLUMNS; ++column)
+                if (row >= frame.base.text_rows || column >= frame.base.text_columns)
+                    same.base.cells[row * KVM_TEXT_COLUMNS + column] = (kvm_text_cell){66, 0, 1, 2};
+        lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &same) == LIB_STATUS_OK);
+        lib_test_assert(captured.cells_unchanged);
+        for (lib_size row = 0; row < KVM_TEXT_ROWS; ++row) {
+            for (lib_size column = 0; column < KVM_TEXT_COLUMNS; ++column) {
+                lib_size cell = row * KVM_TEXT_COLUMNS + column;
+                lib_bool active = row < frame.base.text_rows && column < frame.base.text_columns;
+                lib_test_assert(captured.text[cell] == (active ? 0x2588 : 0));
+                lib_test_assert(captured.foreground[cell] == (active ? 5 : 0));
+                lib_test_assert(captured.background[cell] == (active ? 6 : 0));
+            }
+        }
+    }
+    frame = previous;
     /* KVM scanlines are normalized before the independent Console boundary. */
     const struct { lib_u32 height, top, bottom; lib_bool visible; lib_u32 out_top, out_bottom; } cases[] = {
         {0,14,15,LIB_TRUE,14,15}, {16,20,21,LIB_FALSE,20,15}, {16,14,31,LIB_TRUE,14,15},

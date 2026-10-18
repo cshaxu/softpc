@@ -117,7 +117,6 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
 {
     lib_console_text_frame text_frame = { 0 };
     const kvm_text_frame *text;
-    lib_size index;
     lib_u32 top, bottom;
 
     if (console == LIB_NULL || frame == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
@@ -127,21 +126,22 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
     text_frame.cells_unchanged = previous != LIB_NULL &&
         previous->base.text_columns == text->text_columns &&
         previous->base.text_rows == text->text_rows;
-    for (index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index) {
-        const kvm_text_cell *cell = &text->cells[index];
-        const lib_u16 *map = cell->glyph_bank != 0u ?
-            frame->characters.secondary : frame->characters.primary;
-        text_frame.text[index] = map[cell->glyph_index];
-        text_frame.foreground[index] = cell->foreground;
-        text_frame.background[index] = cell->background;
-        if (text_frame.cells_unchanged &&
-            index / KVM_TEXT_COLUMNS < text->text_rows &&
-            index % KVM_TEXT_COLUMNS < text->text_columns) {
-            const kvm_text_cell *old = &previous->base.cells[index];
-            const lib_u16 *old_map = old->glyph_bank != 0u ?
-                previous->characters.secondary : previous->characters.primary;
-            text_frame.cells_unchanged = old_map[old->glyph_index] == text_frame.text[index] &&
-                old->foreground == cell->foreground && old->background == cell->background;
+    for (lib_size row = 0u; row < text->text_rows; ++row) {
+        for (lib_size column = 0u; column < text->text_columns; ++column) {
+            lib_size index = row * KVM_TEXT_COLUMNS + column;
+            const kvm_text_cell *cell = &text->cells[index];
+            const lib_u16 *map = cell->glyph_bank != 0u ?
+                frame->characters.secondary : frame->characters.primary;
+            text_frame.text[index] = map[cell->glyph_index];
+            text_frame.foreground[index] = cell->foreground;
+            text_frame.background[index] = cell->background;
+            if (text_frame.cells_unchanged) {
+                const kvm_text_cell *old = &previous->base.cells[index];
+                const lib_u16 *old_map = old->glyph_bank != 0u ?
+                    previous->characters.secondary : previous->characters.primary;
+                text_frame.cells_unchanged = old_map[old->glyph_index] == text_frame.text[index] &&
+                    old->foreground == cell->foreground && old->background == cell->background;
+            }
         }
     }
     lib_memory_copy(text_frame.palette, text->text_palette, sizeof(text_frame.palette));

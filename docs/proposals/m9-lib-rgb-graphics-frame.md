@@ -1390,3 +1390,70 @@ and whitespace checks agree. No mirror/configuration/media changes or new
 root test infrastructure are present. Only user-owned snapshot.debug remains
 untracked. No blocking finding in this bounded review; S7 and T96 remain open
 pending owner acceptance rather than being closed by this governance commit.
+
+### S7 audit follow-up admission
+
+Original request: “批准修复，重开当前的S任务修复完成以后达到收口标准等我验收。”
+Baseline 104bab46. Keep the existing S7 open; do not allocate another S or close T96.
+The finite follow-up ledger has two members:
+- Console conversion: iterate active rows/columns with fixed 80-cell stride,
+  retaining existing mapping, old/new comparison, native tail clearing and
+  recovery. Add narrow/short frame and inactive-cell regression in its existing
+  owner-local character test. No new helper, cache, schema or renderer.
+- Text readiness proof: use real sequencer I/O to switch font selection without
+  changing character cells; let the existing original update route complete,
+  then assert produced and changed bitmap font. Restore the register/resources.
+  Do not manually supply host_start/end_update as the test's dirty trigger.
+
+Both require focused proof plus full cached dual-width build, publication and
+unit/gate/integration/native qualification. Estimate production +20/-20, tests
+net +60..100; actual counts use git diff --numstat on C/H against 104bab46.
+Hidden owned logs/scripts live under build/t96/s7/extent-font, with five-minute
+no-progress inspection and no interactive-timeout termination. Preserve INI,
+media and untracked owner snapshot. Executor P7 and actual-commit coordinator
+P8 precede delivery; owner acceptance remains required for closure.
+
+### S7 audit follow-up implementation
+
+The two-member ledger is implemented without expanding its boundary:
+- Console now maps and compares only active rows/columns, retaining stride 80.
+  Its existing zero-initialized native output and broker tail clearing remain.
+  Regression covers 1x1, 2x2, 80x25 and 80x50, with differing inactive input
+  cells and exact active output checks. No exchange or native broker change.
+- App VGA regression seeds distinct font banks, writes sequencer register 3
+  through ports 3C4/3C5, and advances the original timer/update path. Both
+  bank transitions produce changed fonts with unchanged cells; a second copy
+  without a new update reports not produced. Saved font bytes and selection
+  are restored. The new trigger does not call host_start/end_update.
+
+The first test attempt advanced only two ticks and correctly failed produced.
+Source inspection of nt_graph.c's existing mode-selection countdown and flush
+countdown established that the test must allow both phases: four ticks. The
+test was corrected, not the production updater or its readiness assertion.
+Initial evidence remains in extent-font/qualification.log; the corrected run
+is qualification2.log. This is a test scheduling correction, not evidence of
+a customer-visible font defect or a new video repair.
+
+Similar-issue sweep: rg for KVM_TEXT_COLUMNS * KVM_TEXT_ROWS over KVM Console,
+Window, Emulator and App machine finds only the existing UI status-page and
+App producer capacity initialization loops. Those initialize producer-owned
+storage rather than converting inactive cells to native output; retain them.
+Window already renders active dimensions. Console frame commit validates the
+dimensions before publication; the private consumer uses that existing path.
+
+Against 104bab46, production C/H is +16/-16, net zero (one Lib file). Test C/H
+is +57/-0, net +57: Lib +28, App-SoftPC +29. Manifests, documents and binaries
+are separate. No Emulator, mirror, API, INI, media or snapshot changes.
+
+### S7 audit follow-up qualification
+
+Corrected qualification2.log completes with qualification.exit=0. Each width
+passes focused 18/18 and all 194 distinct registered tests: unit/gates 178,
+background integration eight, desktop five, native audio three, no skips.
+Both EXEs are rebuilt and published; hashes are recorded in CURRENT. No
+manual customer reproduction or measured performance improvement is claimed.
+All 292 shared manifest entries match; documentation and whitespace checks
+pass. Existing mirror/test pointer-width warnings and x86 Ninja-log recovery
+remain disclosed, not repaired by this bounded delivery. Owner snapshot.debug
+is preserved and excluded. Executor P7 is ready for actual-commit review P8;
+S7 and T96 remain open until owner acceptance.

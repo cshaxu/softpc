@@ -25,8 +25,10 @@ Machine publishes every driver-produced frame without content deduplication;
 SoftPC owns text-update readiness. Console compares held old/new frames and
 removes the broker's duplicate cell cache. Recovery must override content reuse.
 Implementation and qualification are complete. Executor 917a2277 is pushed;
-coordinator reviewed its actual diff and evidence. S7 awaits owner acceptance;
-T96 remains open.
+coordinator reviewed its actual diff and evidence. Owner reopens the current S7
+at 104bab46 for active-extent Console conversion and real font-register dirty
+regression. This bounded follow-up is implemented and verified, awaiting
+executor delivery and actual-commit review; T96 remains open.
 Raw activation requeues the held input through the existing output path; no
 extra frame, backup, Machine publication or second renderer is introduced.
 Cooked native history/cursor restoration remains strict. The earlier capacity-
@@ -39,16 +41,16 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner continues S7: 四槽的整个数据结构和算法你可以放到 KVM Base 里面去，这样两边可以统一共享同一份代码，更干净。就按这个方案把我们刚才讨论的所有点全部做干净。 Earlier schema and recovery deliveries remain checkpoints, not closure. |
-| Objective | Unify both consumers on Base's four reusable producing/pending/processing/displayed roles. Machine publishes all produced frames; driver alone decides readiness/dirty. Connect SoftPC text updates, compare Console held inputs at consumption, remove broker cell copies, preserve native recovery and cooked state. |
+| Objective | Preserve the delivered four-slot design; convert only active Console cells and prove real font-register writes reach produced without a manually supplied host-update completion. |
 | Non-goals | No mirror edits, guest timing, media, INI, native surface replacement, generic resource framework or second transport/render path. |
 | Reference Baseline | Follow-up aa8f75c3; original b25f9969 (S6 accepted); preserve exchange roles, FIFO notices, diagnostic reads and native rendering behavior. |
 | Candidate Proposal | [RGB contract and S5 circulation ledger](../proposals/m9-lib-rgb-graphics-frame.md). |
-| Files And ABI Surface | Base fixed four-slot exchange and held previous-input access; Console comparison and broker cache removal; Emulator Machine produced-only publication; SoftPC driver/Compat text readiness; corresponding tests, manifests and docs. No mirror, INI or media change. Baseline d24ab19c. |
+| Files And ABI Surface | Baseline 104bab46: lib/kvm-console/console.c, its existing retirement/character test, App machine vga_frame test, affected manifests and task records. No API, four-slot algorithm, mirror, INI or media change. |
 | Applicable Rules | Execution, Document, Architecture and Coding; single-person executor/coordinator review. M9 Td S21 reconciles the frame ownership rule; no rules edits in S6. |
 | Verification | Direct producer/consumer pointer identity, both slot lifetimes, text/graphics/status transitions, failed/no-frame publication, native raw rebind before rewriting, reset/load/recreation; dual-width focused and full unit/gate/integration tests and EXEs. Hidden owned jobs under build/t96/s7; five-minute no-progress inspection, no automatic termination; executor owns cleanup. |
 | Expected Markers | Both consumers use produce/pending/processing/displayed; Base never interprets content. No render-dependent producer wait, steady allocation, transport copy, broker cell cache or Machine dedup. |
 | Asset Needs | Preserve user configuration, media and untracked checkpoint; refresh only package EXEs after successful build. |
-| Reporting Requirements | Four-slot revision estimate production +120..220/-140..240, net -120..+80; tests +180..300/-80..180, net 0..+220. Report actual counts against d24ab19c; earlier qualification does not prove this revision. |
+| Reporting Requirements | Follow-up estimate production +20/-20, approximately net zero; tests net +60..100. Report actual C/H counts against 104bab46, full dual-width proof and EXE hashes separately from earlier qualification. |
 | Stop Conditions | More than four slots, consumer-dependent producer wait, extra historical copy, mirror changes or changed snapshot semantics requires explicit revised design. |
 | Exit Criteria | Single transport ownership path, bounded complete lifecycle proof, full qualification, artifacts, actual diff review, commit/push and owner acceptance. |
 | Original Owner Request | 那你准入一个新的S修复吧。另外一个测试的问题也一起修复。同类问题审计扫描一起修复。然后给我提交推送等我验收。 |
@@ -56,6 +58,27 @@ Its evidence and activation-clipping diagnosis remain in the proposal.
 
 
 ## Current Technical Baseline
+
+### S7 active-extent and font readiness follow-up
+
+- Against 104bab46, production C/H +16/-16, net zero in Lib Console; tests
+  +57/-0, net +57 (Lib +28, App-SoftPC +29). No API, exchange algorithm,
+  mirror, INI, media or snapshot change. Conversion visits active cells only;
+  real sequencer writes prove font-only updates reach Driver produced.
+- Cached x64/x86 builds publish both EXEs. Per architecture: focused 18/18,
+  unit/gates 178/178, background integration 8/8, native desktop 5/5 and
+  native audio 3/3 pass. All 194 distinct registered tests pass without skips
+  in the corrected qualification; qualification.exit=0. Logs and XML live
+  under build/t96/s7/extent-font. Initial focused test scheduling failure
+  (two ticks instead of the full mode-selection plus flush cycle) is retained
+  separately; no production workaround or relaxed assertion was added.
+- All 292 shared manifest entries match. Documentation and whitespace gates
+  pass. Existing mirror/test ABI warnings and x86 Ninja log recovery remain;
+  this is not a zero-warning or measured-performance claim.
+- Published SHA-256: softpc32
+  42EF30B5984A1E5B0B12C845E2F3F7F59BCDA54A4A56E925124B54032BAC5AC3;
+  softpc64 E1B95ED71ACB371098C854FEF6FD4E3573B71BE98169243958F13DD2900A53C1.
+  User-owned untracked snapshot.debug remains untouched and excluded.
 
 ### S7 fixed four-slot revision
 

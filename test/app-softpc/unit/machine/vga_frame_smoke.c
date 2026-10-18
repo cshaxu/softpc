@@ -756,6 +756,35 @@ static void verify_driver_geometry(softpc_machine *machine)
         host_timer_event();
         assert(Currently_emulated_video_mode == modes[index]);
         if (modes[index] == 3) {
+            /* Real sequencer writes must publish font-only changes through
+               the original updater, without a test-supplied host transaction. */
+            {
+                const unsigned glyph = 'A' * FONT_MAX_HEIGHT;
+                unsigned char *bank0 = EGA_planes + FONT_BASE_ADDR + glyph * 4u;
+                unsigned char *bank1 = bank0 + (0x4000u << 2);
+                unsigned char saved0 = *bank0, saved1 = *bank1;
+                unsigned char saved_select = sequencer.character_map_select.as.abyte;
+                kvm_text_cell saved_cells[KVM_TEXT_COLUMNS * KVM_TEXT_ROWS];
+                *bank0 = 0x55u; *bank1 = 0xaau;
+                outb(0x3c4, 3); outb(0x3c5, 0);
+                /* Two mode-selection ticks followed by two flush ticks. */
+                for (unsigned tick = 0; tick < 4; ++tick) host_timer_event();
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                assert(frame->data.text.font[glyph] == 0x55u);
+                lib_memory_copy(saved_cells, frame->data.text.base.cells, sizeof(saved_cells));
+                for (unsigned selection = 0; selection < 2; ++selection) {
+                    assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
+                    outb(0x3c4, 3); outb(0x3c5, selection == 0 ? 5 : 0);
+                    for (unsigned tick = 0; tick < 4; ++tick) host_timer_event();
+                    assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                    assert(frame->data.text.font[glyph] == (selection == 0 ? 0xaau : 0x55u));
+                    assert(frame->data.text.secondary_font[glyph] == frame->data.text.font[glyph]);
+                    assert(lib_memory_compare(saved_cells, frame->data.text.base.cells, sizeof(saved_cells)) == 0);
+                }
+                *bank0 = saved0; *bank1 = saved1;
+                outb(0x3c4, 3); outb(0x3c5, saved_select);
+                for (unsigned tick = 0; tick < 4; ++tick) host_timer_event();
+            }
             lib_memory_set(frame, 0xa5, sizeof(*frame));
             host_start_update(); host_end_update();
             assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
