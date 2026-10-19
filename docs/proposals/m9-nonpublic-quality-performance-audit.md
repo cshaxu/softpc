@@ -43,8 +43,9 @@ status; rediscovering them does not establish a new regression.
 - Owner approved established repairs on 2026-10-18: 批准执行当前既定修复任务.
 - S2: F1/F2 real media adapter failure and capacity bounds; owner accepted and
   closed on 2026-10-18. See [closure](../history/M9-T98-S2-media-boundaries.md).
-- S3: finite instruction budget rejection, no hot-loop counter widening.
-- S4: Compat-private UTF-8 append opening, retaining FILE write/flush/close.
+- Owner inserts S3 on 2026-10-19: exact shared import, dual EXE and full tests.
+- S4 (formerly S3): finite instruction budget rejection, no counter widening.
+- S5 (formerly S4): Compat-private UTF-8 append opening, retaining FILE I/O.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 
@@ -392,4 +393,103 @@ This review accepts executor delivery, not owner acceptance or T98 closure.
 
 Owner subsequently accepts and closes S2: 验收通过 收口s任务 保持t开放.
 The [S2 history](../history/M9-T98-S2-media-boundaries.md) records closure;
-T98 remains open without an active S. S3/S4 are not automatically started.
+T98 remained open without an active S; later admissions are recorded below.
+
+## S3 - Owner-directed exact shared import
+
+Owner: 准入一个s任务完成原样导入并构建双exe并跑全量测试.
+Baseline f805483f. This explicit scope addition does not rewrite S1's private
+audit boundary; it inserts one import S ahead of the two remaining repairs.
+Td S22 remains awaiting owner acceptance with no active governance work.
+
+Frozen source: NXVM b2f8b93112897529c0437f37e26c2a70e4b87cb9 worktree;
+shared changes are committed as 9b41a82ca, with no uncommitted shared edits.
+The eight trees are src/test pairs for lib, emulator, x86-debug and x86-ibmpc.
+Audit found 292 identical files, five modified and one added, no deletions.
+Only optional Types sin/cos/atan/sqrt aliases, docs/test/linkage and manifests
+change. Estimate +34/-3, net +31: C/H production +12, test C +10, CMake +3,
+documentation +5 and manifests +4/-3. No new state or runtime implementation.
+
+Finite ledger and completion predicate:
+1. Capture source manifest identities and import exact bytes/path sets across
+   eight trees. No root helper or NXVM outer machine/product code is imported.
+2. Check manifest/LF, Types authority, dependency/naming/test ownership and
+   optional math link. The existing inward test helpers remain sufficient.
+3. Reuse stable .ninja/.ccache trees, build every target including both package
+   EXEs, preserve INI/media/snapshot and record final binary hashes.
+4. Per architecture execute all registered unit/gates, background integrations,
+   five desktop and three native audio integrations. Partition exact names and
+   reconcile executed XML with registration; no failures/skips may be called pass.
+5. Executor commits/pushes, then coordinator reviews the actual change and
+   evidence. Retain concise results before deleting owned build/t98-s3 scratch;
+   final residue gate passes and owner acceptance remains pending.
+
+Every member requires verified disposition; failure requires diagnosis rather
+than relaxed contracts or automatic retries. No Computer Use. Existing native
+desktop authorization applies; foreground interference and device availability
+are recorded independently of unit results. No known TODO is silently repaired.
+
+### S3 source identity
+
+Initial import comparison verifies all 298 files and exact path equality.
+The following SHA-256 values identify the eight MANIFEST.sha256 files; their
+listed members are checked by the existing registered manifest gates.
+
+| Tree | Manifest SHA-256 |
+| --- | --- |
+| src/lib | F93120DCE8E2D5C22E656EAED4440044C8DC0025B279185C50F6189C2ECD077B |
+| test/lib | 2BBDDF388A33A35CCD8191DA7727E54DE7150BD7AEDA591FB307FB9FF80C1047 |
+| src/emulator | 02DF54BC3B8C0CDC8B1C3EE4D3FAE64072AA2B25B5E22847583DDEE5F9EB81A5 |
+| test/emulator | 8DB4D1E679E2C66E0FD126F1CA73BEAD933413BCB3FF1BE711118911844D39A8 |
+| src/x86-debug | A4CD0C19EE53EFF1A00382A76321D49FC5B7B1772540973DE41F5A6EDFE7B6C3 |
+| test/x86-debug | F6296ABB5A81D3EAD78DA2591E8CE55D2007E45C27DCBA122C1A6C08469CC751 |
+| src/x86-ibmpc | E1E272D833B594A3380924F24D7B5D16B73117881A9B26D2404CB0F773D5A8F5 |
+| test/x86-ibmpc | D225CAF1E669E6A26AB095D821B1794D3D38CB93AEE22DBD0D5B1C9A013B2CE7 |
+
+No importer helper is added: root test registration/manifest tools already
+match; four other NXVM root boundary/selftest scripts are deliberately left
+out because this import does not require their extra outer-layer support.
+
+### S3 implementation and full qualification
+
+All five ledger members are implemented, with actual pushed-change review
+and final scratch cleanup still preceding owner delivery. The final comparison
+against NXVM HEAD 930075de1f406f9eddee258fd65714aa19343b36 again finds all
+298 files identical; NXVM advanced only outside the frozen shared trees.
+
+Actual shared accounting matches +34/-3 (net +31) across six paths, separated
+as estimated above. The six other trees, original mirror, App source and root
+test helpers have zero diff. No alternate math path or additional state exists.
+The optional aliases retain ISO C contracts and only the Types test consumes
+them. Existing Types/dependency/naming/manifest/LF and test-owner gates pass.
+
+Cached configure and full build complete for both widths; each builds ten
+edges including the changed Types test, previously uncached package objects
+and final EXE/package-test links. The second full build reports no work.
+CCPU/device intermediates are reused, not rebuilt unnecessarily. Both package
+EXEs are published directly in assets/binary; hashes are recorded in CURRENT.
+No new compiler warning/error was emitted in these incremental build logs;
+this does not claim historical mirror warning debt is repaired.
+
+Per architecture all 194 registrations execute exactly once in disjoint
+phases: 119 shared unit/gates, 59 remaining unit/gates, eight background
+integrations, five serial desktop and three serial native audio. All pass,
+zero failures/errors/skips. The controller independently compares the union
+of ten XML reports with current registrations; full coverage is exact.
+Desktop includes both normal and compact package paths. Native PCM/MIDI
+passed in the active Console session with audio services running; capability
+success here is not a claim about disconnected sessions or arbitrary devices.
+
+The first task-local runner completed x64 194/194, then stopped because its
+post-test Get-FileHash cmdlet was unavailable in background Windows PowerShell.
+The reporting dependency was removed and only the unexecuted x86 was resumed;
+its runner exits zero. No x64 test was retried to hide a failure. Independent
+controller verification of both complete XML sets and package hashes exits zero.
+Raw first-run diagnostic is retained until review, then retired with scratch.
+
+Protected user files keep their admission hashes: package INI
+38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D;
+untracked snapshot.debug
+AEBD86C4AD8A2B7A41B60B985EE18E11B3BE46C635B5659C8FC3CC75AB9EA310.
+No user media changed. Await owner acceptance after commit/push and actual
+coordinator review; S4/S5 and T98 closure are not admitted.

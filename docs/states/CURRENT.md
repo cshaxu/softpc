@@ -2,51 +2,50 @@
 
 ## Current Work
 
-M9 Td S22 is verified, awaiting owner acceptance:
-[build-cache governance](../proposals/m9-build-cache-governance.md).
-Open task awaiting owner: T98.
+M9 T98 S3 is verified, preparing pushed-change review: exact shared import and full
+qualification. See the [proposal](../proposals/m9-nonpublic-quality-performance-audit.md).
+The former S3/S4 repairs move to S4/S5 and are not admitted. Td S22 remains
+verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md)
+delivery f805483f is preserved, not implicitly owner-closed.
+User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 
-Owner requests simplification of build rules, scripts and gates. Prior delivery
-d6523386/review 5fa2995c passed 180 unit/gates per width but duplicated cache
-policy in configure, preset parsing and documentation checks. The correction
-removes those duplicates; both widths passed 178/178 unit/gates and direct
-cache-hit/confinement probes. Final cleanup regression took 1.16/1.09 seconds.
-Executor 7758a9c4 is pushed and its actual diff/XML/cache logs reviewed with no
-blocker. Task scratch and six obsolete fixtures are removed; the sole cleanup
-check passes and build contains only .ccache/.ninja. Build/check code is
-+16/-120, net -104 relative to reopening. No EXE/runtime change; T98 stays open.
+Both packages are freshly linked in the persistent cached trees. Each width
+passed 194/194 registered tests: 119 shared unit/gates, 59 other unit/gates,
+eight background integrations, five desktop and three native audio. All 298
+shared files match NXVM; no root helper import. Review scratch is owned until
+actual-change review, then removed before final owner handoff.
 
-Owner accepts and closes [S2](../history/M9-T98-S2-media-boundaries.md) on
-2026-10-18: 验收通过 收口s任务 保持t开放. Executor 7afc9981 and coordinator
-review db935fb7 are pushed; both architectures passed all 193 registered tests.
-T98 remains open. S3/S4 in the
-[proposal](../proposals/m9-nonpublic-quality-performance-audit.md) are not active;
-no automatic next admission. User-owned untracked assets/binary/snapshot.debug
-remains untouched/excluded.
-
-## M9 Td S22 Packet
+## M9 T98 S3 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Governance |
-| Admission And Approval | Owner reopens S22: 请你重开本S，把编译规范、脚本、门禁治理干净！ Preserve the original two-cache-root request. |
-| Objective | Pin compiler-cache storage and Ninja build trees to their two repository-local roots; enforce safe task cleanup and remove obsolete build leftovers after preserving concise evidence. |
-| Non-goals | No runtime, public corpus, mirror, INI/media/snapshot changes, global cache purge or new build framework. T98 stays open; no numeric T/S admission. |
-| Reference Baseline | Reopen baseline main 5fa2995c; original 733a7f6e; accepted T98 S2 runtime and both package hashes below. |
-| Candidate Proposal | [Build-cache governance](../proposals/m9-build-cache-governance.md). |
-| Files And ABI Surface | Root presets/CMake, tools, README/CONTRIBUTING, Execution and source-layout documentation, Current/history. No production ABI. |
-| Applicable Rules | Execution, Document, Architecture and Coding governance skills; single-person executor/coordinator review; no Computer Use. |
-| Verification | Real Ninja configure accepts shipped trees and rejects outside roots; actual helper accepts nested paths; actual launcher confinement; in-process cleanup safety regression; x64/x86 cached test build and complete unit/gates; final cleanup check. No runtime/EXE or native integration changes. |
-| Expected Markers | Exactly two reusable cache roots; non-cache entries have finite task ownership and disappear on completion; no stale absolute-path CMake tree is relocated/reused. |
-| Asset Needs | Disposable build/td-s22 for jobs/logs with 30-minute/5-minute no-progress/50-MiB budget; stop owned jobs and summarize evidence before removal. Keep user files; no global ccache deletion. |
-| Reporting Requirements | Paths, actual script/config/test diff, cleanup inventory, cache proof and verification limits; preserve runtime hashes for governance-only work. |
-| Stop Conditions | User data, live unrelated jobs, symlink/reparse traversal or cache outside repo must block unsafe cleanup; do not kill jobs or erase unrelated global caches. |
-| Exit Criteria | Policy/scripts/gates implemented and tested, obsolete generated directories removed safely, only the two caches remain, evidence summarized and pushed actual-change review delivered. |
-| Original Owner Request | build/.ccache, build/.ninja可以跨提交保存，以便节省时间。但是这两个之外的build里的内容属于用后即抛; 请你重开本S，把编译规范、脚本、门禁治理干净！ |
-| Similar-Issue Sweep | All tracked build entry points, current docs, live build roots, compiler launcher routing and temporary-probe/log references; historical paths stay historical with explicit retirement notes. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 准入一个s任务完成原样导入并构建双exe并跑全量测试. Explicitly adds shared import ahead of the remaining private repairs. |
+| Objective | Import the audited NXVM eight shared trees exactly; build/release both SoftPC packages and pass every registered test in both architectures. |
+| Non-goals | No root NXVM test-helper import, runtime feature change, original mirror edit, new framework, cache reset or owner INI/media/snapshot mutation. No S4/S5 admission or T98 closure. |
+| Reference Baseline | SoftPC f805483f; NXVM worktree at b2f8b93112897529c0437f37e26c2a70e4b87cb9, shared math delivery 9b41a82ca, no shared-tree uncommitted changes. |
+| Candidate Proposal | [T98 owner-directed S3 import](../proposals/m9-nonpublic-quality-performance-audit.md#s3---owner-directed-exact-shared-import). |
+| Files And ABI Surface | Exactly src/test lib, emulator, x86-debug and x86-ibmpc; expected six changed Lib paths. Optional CRT header only, no existing ABI change. Task records plus assets/binary double EXE. |
+| Applicable Rules | Execution, Document, Architecture, Coding and their governance skills; single-person executor/coordinator review; no Computer Use. |
+| Verification | Byte/hash identity of all eight trees, manifest/LF and Types/dependency/naming/test gates; cached x64/x86 builds and dual package publication; unit/gates then background integration, serial desktop and native audio; exact XML/registration coverage. |
+| Expected Markers | Only four optional ISO C math aliases added; no importer build/runtime dependency on NXVM; all registered cases execute, with failures/skips reported honestly. |
+| Asset Needs | Owned build/t98-s3, 45-minute overall/10-minute no-progress/80-MiB logs budget. Existing .ninja/.ccache retained. Native desktop/audio tests are preauthorized; no guest edits. |
+| Reporting Requirements | Actual source/test/config/doc and package diff, fixed source pin/eight manifest hashes, exact per-phase counts, native capability limits, binary hashes, review and commit evidence. |
+| Stop Conditions | Source drift, unrelated overlapping changes, active product handles blocking replacement or native environment failures must be investigated, not hidden by retries, skips, code weakening or killing unrelated jobs. |
+| Exit Criteria | Exact import, both freshly linked packages, all registered tests passing, actual pushed-change review and final scratch cleanup; then wait for owner acceptance. |
+| Original Owner Request | 准入一个s任务完成原样导入并构建双exe并跑全量测试. |
+| Similar-Issue Sweep | All eight path sets and bytes; unchanged six trees; Lib Types aliases/optional math linkage; root helper differences reviewed but deliberately not imported; protected package/media hashes. |
 
 ## Current Technical Baseline
 
+- T98 S3 optional Types math import: public source +12/-0, test C +10/-0,
+  CMake +3/-0, docs +5/-0 and manifests +4/-3; total +34/-3 (net +31).
+  No existing ABI or product/mirror implementation changes. All 194 tests
+  pass per architecture with exact XML/registration equality and zero skips.
+- S3 packages: softpc32 SHA-256
+  704D873D121307CDAB765454C4CAF388C6AD221208B5FE12722D016C566C3873;
+  softpc64 SHA-256
+  78A32B672B1A2D49BF742C99EA6B2647FC364717B7BE4414CB73CFF54D0E4838.
 - T98 S2 fixes Compat media close reporting and address bounds only. Production
   +30/-16 (net +14); tests +195/-0; root test registration +3/-2. Public and
   mirror code unchanged. Historical qualification: build/t98/s2/qualification,
@@ -54,7 +53,7 @@ remains untouched/excluded.
   x64/x86 each 177 unit/gates, eight background integrations, five desktop and
   three native audio, exact XML/registration match. Existing Ninja recovery
   and original compiler warnings remain; no warning-removal claim is made.
-- Current packages are rebuilt S2: softpc32 SHA-256
+- Historical accepted S2 packages: softpc32 SHA-256
   4E67DBD9AAEBE99BB874BA77E0BFA7DBE7819DE5927D920BE4998769089231AC;
   softpc64 SHA-256
   5C692E0DE7ADFDF9D1AEF2446D90C7C4B733FD3ECA589B94CBA33D2E89D216A8.
