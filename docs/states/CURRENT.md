@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T98 S3 is verified, preparing pushed-change review: exact shared import and full
+M9 T98 S3 is verified, awaiting owner acceptance: exact shared import and full
 qualification. See the [proposal](../proposals/m9-nonpublic-quality-performance-audit.md).
 The former S3/S4 repairs move to S4/S5 and are not admitted. Td S22 remains
 verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md)
@@ -12,8 +12,9 @@ User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
 Both packages are freshly linked in the persistent cached trees. Each width
 passed 194/194 registered tests: 119 shared unit/gates, 59 other unit/gates,
 eight background integrations, five desktop and three native audio. All 298
-shared files match NXVM; no root helper import. Review scratch is owned until
-actual-change review, then removed before final owner handoff.
+shared files match NXVM; no root helper import. Executor d08ac104 is pushed;
+actual-change review found no blocker. Scratch has been removed and the cleanup
+gate passes with only .ninja/.ccache remaining. No next S is admitted.
 
 ## M9 T98 S3 Packet
 
