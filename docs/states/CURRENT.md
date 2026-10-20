@@ -2,40 +2,16 @@
 
 ## Current Work
 
-M9 T98 S3 is verified, awaiting owner acceptance: exact shared import and full
-qualification. See the [proposal](../proposals/m9-nonpublic-quality-performance-audit.md).
-The former S3/S4 repairs move to S4/S5 and are not admitted. Td S22 remains
-verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md)
-delivery f805483f is preserved, not implicitly owner-closed.
-User-owned untracked assets/binary/snapshot.debug remains untouched/excluded.
+No implementation subtask is active. Open task awaiting owner: T98.
 
-Both packages are freshly linked in the persistent cached trees. Each width
-passed 194/194 registered tests: 119 shared unit/gates, 59 other unit/gates,
-eight background integrations, five desktop and three native audio. All 298
-shared files match NXVM; no root helper import. Executor d08ac104 is pushed;
-actual-change review found no blocker. Scratch has been removed and the cleanup
-gate passes with only .ninja/.ccache remaining. No next S is admitted.
-
-## M9 T98 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner: 准入一个s任务完成原样导入并构建双exe并跑全量测试. Explicitly adds shared import ahead of the remaining private repairs. |
-| Objective | Import the audited NXVM eight shared trees exactly; build/release both SoftPC packages and pass every registered test in both architectures. |
-| Non-goals | No root NXVM test-helper import, runtime feature change, original mirror edit, new framework, cache reset or owner INI/media/snapshot mutation. No S4/S5 admission or T98 closure. |
-| Reference Baseline | SoftPC f805483f; NXVM worktree at b2f8b93112897529c0437f37e26c2a70e4b87cb9, shared math delivery 9b41a82ca, no shared-tree uncommitted changes. |
-| Candidate Proposal | [T98 owner-directed S3 import](../proposals/m9-nonpublic-quality-performance-audit.md#s3---owner-directed-exact-shared-import). |
-| Files And ABI Surface | Exactly src/test lib, emulator, x86-debug and x86-ibmpc; expected six changed Lib paths. Optional CRT header only, no existing ABI change. Task records plus assets/binary double EXE. |
-| Applicable Rules | Execution, Document, Architecture, Coding and their governance skills; single-person executor/coordinator review; no Computer Use. |
-| Verification | Byte/hash identity of all eight trees, manifest/LF and Types/dependency/naming/test gates; cached x64/x86 builds and dual package publication; unit/gates then background integration, serial desktop and native audio; exact XML/registration coverage. |
-| Expected Markers | Only four optional ISO C math aliases added; no importer build/runtime dependency on NXVM; all registered cases execute, with failures/skips reported honestly. |
-| Asset Needs | Owned build/t98-s3, 45-minute overall/10-minute no-progress/80-MiB logs budget. Existing .ninja/.ccache retained. Native desktop/audio tests are preauthorized; no guest edits. |
-| Reporting Requirements | Actual source/test/config/doc and package diff, fixed source pin/eight manifest hashes, exact per-phase counts, native capability limits, binary hashes, review and commit evidence. |
-| Stop Conditions | Source drift, unrelated overlapping changes, active product handles blocking replacement or native environment failures must be investigated, not hidden by retries, skips, code weakening or killing unrelated jobs. |
-| Exit Criteria | Exact import, both freshly linked packages, all registered tests passing, actual pushed-change review and final scratch cleanup; then wait for owner acceptance. |
-| Original Owner Request | 准入一个s任务完成原样导入并构建双exe并跑全量测试. |
-| Similar-Issue Sweep | All eight path sets and bytes; unchanged six trees; Lib Types aliases/optional math linkage; root helper differences reviewed but deliberately not imported; protected package/media hashes. |
+Owner accepted and closed T98 S3 on 2026-10-19. Its exact NXVM shared import,
+dual package refresh and 194/194 qualification per architecture are recorded
+in [S3 history](../history/M9-T98-S3-shared-import.md). T98 remains open: the
+former S3/S4 repairs are now S4/S5 and require separate owner admission.
+Td S22 remains verified awaiting owner acceptance; its
+[cache governance](../proposals/m9-build-cache-governance.md) delivery
+f805483f is preserved, not implicitly owner-closed. User-owned untracked
+assets/binary/snapshot.debug remains untouched/excluded.
 
 ## Current Technical Baseline
 

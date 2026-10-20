@@ -515,3 +515,7 @@ Clean-Build.ps1 -Check passes and only the two persistent roots remain. Raw
 logs/XML are retired under Td S22 policy; their concise evidence remains here.
 User snapshot.debug stays untracked/untouched. S3 waits for owner acceptance;
 T98 and Td S22 owner status remain unchanged, and S4/S5 do not auto-start.
+
+Owner accepted and closed S3 on 2026-10-19: 验收通过 批准收口s任务.
+Its durable closure record is [M9 T98 S3 shared import](../history/M9-T98-S3-shared-import.md).
+T98 remains open; S4/S5 still require separate owner admission.
