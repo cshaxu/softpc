@@ -48,9 +48,15 @@ status; rediscovering them does not establish a new regression.
   staged Emulator Product assembly and replace the over-wide frame-exchange
   locked-pointer observation with a scoped callback observation. Machine
   metadata remains locally cached and no observer can retain the exchange
-  pointer.
-- S5 (formerly S3): finite instruction budget rejection, no counter widening.
-- S6 (formerly S4): Compat-private UTF-8 append opening, retaining FILE I/O.
+  pointer. Owner accepted and closed it on 2026-10-21; see
+  [S4 closure](../history/M9-T98-S4-public-api-consolidation.md).
+- S5: audit the KVM native-worker destruction wait and replace the 5000ms
+  destroy deadline only if the complete stop/wake/join/ownership chain proves
+  synchronous destruction is safe. This supersedes the formerly planned
+  finite-budget candidate, which becomes S6.
+- S6 (formerly S5/S3): finite instruction budget rejection, no counter
+  widening.
+- S7 (formerly S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 

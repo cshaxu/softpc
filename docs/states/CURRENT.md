@@ -2,28 +2,28 @@
 
 ## Current Work
 
-## M9 T98 S4 Packet
+## M9 T98 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests a small API consolidation across the public eight-component corpus: remove unused FM, internalize staged Emulator Product composition, and remove the over-wide frame-exchange locked-pointer API without changing product behavior. |
-| Objective | Remove no-consumer capability and public API that exists only for tests or exposes unnecessary ownership details, while retaining one correct production path. |
-| Non-goals | Do not reduce Linux/POSIX support; alter x86 DEBUG/xasm32; alter four-slot exchange/latest-wins/continuous production; alter Console switching, Storage, PCM/MIDI, App, mirror, user INI/media/snapshot; add compatibility aliases, test-only production APIs, a second path, a runtime switch, or a framework. |
-| Reference Baseline | `9ebb9887`; eight shared trees exactly match the latest NXVM import at S3. User-owned untracked `assets/binary/snapshot.debug` is excluded. |
-| Candidate Proposal | [T98 audit](../proposals/m9-nonpublic-quality-performance-audit.md), amended by this owner admission. |
-| Files And ABI Surface | Expected: `src/test/lib`, `src/test/emulator`, their CMake/README/manifests, and current-state/proposal records. Public removal is allowed only for FM and obsolete staged/locked-pointer APIs after whole-tree caller proof. A scoped callback observation replaces `lock_latest/unlock`; Session serves its real metadata need from its Machine cache, and no caller receives a retained exchange pointer. |
+| Admission And Approval | Owner admits a KVM native-worker destruction-wait audit and authorizes implementation only after full caller and ownership proof establishes the smallest safe contract. |
+| Objective | Determine whether the 5000ms KVM destroy deadline is a sound resource-lifetime contract; if not, replace it with one correct stop/wake/worker-exit/join/dispose path without importing product or NT service policy. |
+| Non-goals | Do not mechanically substitute INFINITE; alter Console-close or service timing; introduce polling, retries, background collection, a second lifecycle manager or product exit policy; change frame exchange, PCM/MIDI, Storage, snapshots, App or mirror behavior. |
+| Reference Baseline | `34cc3af8`; S4 is owner-accepted and closed in [history](../history/M9-T98-S4-public-api-consolidation.md). User-owned untracked `assets/binary/snapshot.debug` remains excluded. |
+| Candidate Proposal | [T98 audit](../proposals/m9-nonpublic-quality-performance-audit.md), S5. |
+| Files And ABI Surface | Expected audit surface: `src/lib/kvm-base/component*`, `worker_interface.h`, Window/Console native worker start/join implementations and owner-local tests; any implementation change must be limited to the proven lifetime boundary and its tests/docs/manifests. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Before edits, scan all tracked source/test/CMake/docs callers. Build x64/x86 affected targets; run complete public-component unit/gate suites and focused frame/product tests; build and publish both EXEs; run required package/integration regression proportionate to the frame/product ABI change. Reconcile manifests, dependency/naming/LF gates and actual diff. |
-| Expected Markers | No `audio/fm` source/test/CMake/manifest/README/architecture references; no staged composition functions in the public header; no public `lock_latest/unlock`; no public consumer obtains a frame pointer while an exchange lock is held. |
-| Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` when the final package link changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report actual callers and disposition before deletion; production/test/build-doc added/removed/net lines; retained needed production behavior; test proof versus source proof; fixed commit and any non-eight-tree support change required for NXVM import. |
-| Stop Conditions | Stop an individual deletion if a real production caller or contractual consumer is found and no smaller single-path replacement preserves behavior. Do not replace it with a compatibility alias. |
-| Exit Criteria | FM is either removed after no-caller proof or explicitly retained with proof; composition has only `emulator_product_run` public; frame observation no longer exposes manually held exchange locks and all affected tests use the narrowed observation contract; builds/tests/manifests/gates pass, packages are refreshed, actual diff reviewed, one complete P is pushed, worktree is clean except the protected snapshot. |
-| Original Owner Request | “对公共八组件进行一次‘小而彻底’的 API 收紧；目标是删除无消费者能力与仅为测试暴露的生产接口”，with the three explicitly supplied S1/S2/S3 scopes and verification requirements. |
-| Similar-Issue Sweep | Search the entire repository for FM contracts, staged composition APIs, frame-exchange lock exposure, other test-only public APIs in the affected headers, and all pointer-under-lock consumers. Each hit receives an in-scope removal/replacement/retention disposition. |
+| Verification | Enumerate normal destroy, failed startup rollback, source-retired callback, repeat destroy and concurrent publish/input paths. Prove a worker blocked beyond five seconds may later exit without premature free. Before any code change, identify self-join/lock-order constraints. Build x64/x86 and run focused lifetime tests plus proportional public regression. |
+| Expected Markers | Every successful destroy joins before disposal; no timeout return leaves an inaccessible worker; no caller joins itself or waits while retaining a worker-required lock; test deadlines are test-only, not a product deadline. |
+| Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
+| Reporting Requirements | Report complete stop chain, all actual callers, 5000ms timeout disposition, source proof versus dynamic proof, smallest proposed diff and actual accounting. Name any retention constraint with its concrete observable need. |
+| Stop Conditions | Stop implementation if a caller needs an asynchronous ownership handoff not already represented by the current lifecycle; report it rather than creating another manager. |
+| Exit Criteria | A source-proven disposition exists for every normal/failure destroy call; if changed, destroy means worker/callback quiescence before release, tests cover delayed exit and no self-join/deadlock, and build/test/manifest/gate/package evidence is complete. |
+| Original Owner Request | Audit shared Lib window-thread destroy waiting, compare the existing 5000ms contract with NTVDM64's actual-exit behavior, and implement only a proven single-path repair. |
+| Similar-Issue Sweep | Search all KVM leaf starts/joins, Component destruction, UI/Product owners and tests for finite destroy joins, startup rollback, stop wake, source retirement and callback reentry. |
 
-T98 S3 remains closed in [S3 history](../history/M9-T98-S3-shared-import.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
+T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
 
