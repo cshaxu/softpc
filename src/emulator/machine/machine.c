@@ -14,6 +14,7 @@ struct emulator_machine {
     base_sync_mutex *request_lock;
     lib_u32 published_frame_sequence;
     lib_u32 published_frame_run_generation;
+    lib_bool published_frame_graphics;
     base_sync_event *command_event;
     base_sync_event *resume_event;
     base_sync_event *input_event;
@@ -77,6 +78,7 @@ static void emulator_machine_invalidate_published_frame(emulator_machine *machin
     kvm_frame_exchange_invalidate(machine->frames);
     kvm_frame_exchange_invalidate(machine->console_frames);
     machine->published_frame_run_generation = 0u;
+    machine->published_frame_graphics = LIB_FALSE;
     base_sync_mutex_unlock(machine->frame_lock);
 }
 
@@ -114,6 +116,7 @@ static lib_status emulator_machine_publish(emulator_machine *machine)
     machine->published_frame_sequence = frame->sequence;
     generation = emulator_machine_run_generation(machine);
     machine->published_frame_run_generation = generation;
+    machine->published_frame_graphics = frame->graphics != LIB_NULL;
     base_sync_mutex_unlock(machine->frame_lock);
     if (machine->driver.frame_published != LIB_NULL)
         machine->driver.frame_published(machine->driver.context, frame);
@@ -784,18 +787,28 @@ lib_bool emulator_machine_enqueue_input(emulator_machine *machine,
     return LIB_TRUE;
 }
 
+typedef struct emulator_machine_frame_copy {
+    kvm_window_frame_storage *destination;
+    lib_bool copied;
+} emulator_machine_frame_copy;
+
+static void emulator_machine_copy_latest_frame(void *opaque, const void *frame)
+{
+    emulator_machine_frame_copy *copy = opaque;
+    copy->copied = kvm_window_frame_copy(copy->destination, frame);
+}
+
 lib_bool emulator_machine_copy_published_frame(emulator_machine *machine,
     kvm_window_frame_storage *destination, lib_u32 run_generation)
 {
-    lib_bool copied;
+    emulator_machine_frame_copy copy = { destination, LIB_FALSE };
     if (machine == LIB_NULL || destination == LIB_NULL) return LIB_FALSE;
     base_sync_mutex_lock(machine->frame_lock);
-    const kvm_window_frame *frame = kvm_frame_exchange_lock_latest(machine->frames);
-    copied = frame != LIB_NULL && machine->published_frame_run_generation == run_generation;
-    if (copied) copied = kvm_window_frame_copy(destination, frame);
-    kvm_frame_exchange_unlock(machine->frames);
+    if (machine->published_frame_run_generation == run_generation)
+        (void)kvm_frame_exchange_observe_latest(machine->frames,
+            emulator_machine_copy_latest_frame, &copy);
     base_sync_mutex_unlock(machine->frame_lock);
-    return copied;
+    return copy.copied;
 }
 
 kvm_frame_exchange *emulator_machine_frame_exchange(emulator_machine *machine)
@@ -816,18 +829,14 @@ lib_bool emulator_machine_read_presentation(emulator_machine *machine,
     lib_u32 run_generation, lib_u32 *sequence, lib_bool *graphics)
 {
     lib_bool available;
-    const kvm_window_frame *frame;
     if (machine == LIB_NULL || sequence == LIB_NULL || graphics == LIB_NULL)
         return LIB_FALSE;
     base_sync_mutex_lock(machine->frame_lock);
-    frame = kvm_frame_exchange_lock_latest(machine->frames);
-    available = frame != LIB_NULL &&
-        machine->published_frame_run_generation == run_generation;
+    available = machine->published_frame_run_generation == run_generation;
     if (available) {
-        *sequence = frame->sequence;
-        *graphics = frame->graphics != LIB_NULL;
+        *sequence = machine->published_frame_sequence;
+        *graphics = machine->published_frame_graphics;
     }
-    kvm_frame_exchange_unlock(machine->frames);
     base_sync_mutex_unlock(machine->frame_lock);
     return available;
 }

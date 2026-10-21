@@ -40,8 +40,7 @@ shared_register_test(emulator session/physical_key_identity emulator-session)
 shared_register_test(emulator session/session_frame emulator-session)
 shared_register_test(emulator session/session_monitor emulator-session)
 shared_register_test(emulator ui/composition emulator-ui)
-add_executable(emulator-product-composition-smoke product/composition_smoke.c
-    "${EMULATOR_ROOT}/product/composition.c")
+add_executable(emulator-product-composition-smoke product/composition_smoke.c)
 target_link_libraries(emulator-product-composition-smoke PRIVATE types)
 target_compile_definitions(emulator-product-composition-smoke PRIVATE
     printf=emulator_product_composition_smoke_printf)

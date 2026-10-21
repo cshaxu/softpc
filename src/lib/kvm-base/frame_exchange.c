@@ -108,14 +108,17 @@ void kvm_frame_exchange_detach(kvm_frame_exchange *exchange)
     base_sync_mutex_unlock(exchange->lock);
 }
 
-const void *kvm_frame_exchange_lock_latest(kvm_frame_exchange *exchange)
+lib_bool kvm_frame_exchange_observe_latest(kvm_frame_exchange *exchange,
+    kvm_frame_exchange_latest_observer observer, void *context)
 {
+    const void *latest;
+    if (exchange == LIB_NULL || observer == LIB_NULL) return LIB_FALSE;
     base_sync_mutex_lock(exchange->lock);
-    return exchange->latest;
+    latest = exchange->latest;
+    if (latest != LIB_NULL) observer(context, latest);
+    base_sync_mutex_unlock(exchange->lock);
+    return latest != LIB_NULL;
 }
-
-void kvm_frame_exchange_unlock(kvm_frame_exchange *exchange)
-{ base_sync_mutex_unlock(exchange->lock); }
 
 void kvm_frame_exchange_invalidate(kvm_frame_exchange *exchange)
 {

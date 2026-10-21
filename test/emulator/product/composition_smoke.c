@@ -220,6 +220,11 @@ lib_status emulator_ui_destroy(emulator_ui *ui)
     return LIB_STATUS_OK;
 }
 
+/* Staged assembly is implementation-private. Include this component's source
+ * in its owner-local fixture to retain teardown-order coverage without making
+ * the individual stages public API. */
+#include "emulator/product/composition.c"
+
 static lib_i32 composition_machine_failure_recovers(composition_failure failure)
 {
     emulator_product *app = LIB_NULL;

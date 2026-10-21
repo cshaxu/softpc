@@ -2,19 +2,45 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T98.
+## M9 T98 S4 Packet
 
-Owner accepted and closed T98 S3 on 2026-10-19. Its exact NXVM shared import,
-dual package refresh and 194/194 qualification per architecture are recorded
-in [S3 history](../history/M9-T98-S3-shared-import.md). T98 remains open: the
-former S3/S4 repairs are now S4/S5 and require separate owner admission.
-Td S22 remains verified awaiting owner acceptance; its
-[cache governance](../proposals/m9-build-cache-governance.md) delivery
-f805483f is preserved, not implicitly owner-closed. User-owned untracked
-assets/binary/snapshot.debug remains untouched/excluded.
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests a small API consolidation across the public eight-component corpus: remove unused FM, internalize staged Emulator Product composition, and remove the over-wide frame-exchange locked-pointer API without changing product behavior. |
+| Objective | Remove no-consumer capability and public API that exists only for tests or exposes unnecessary ownership details, while retaining one correct production path. |
+| Non-goals | Do not reduce Linux/POSIX support; alter x86 DEBUG/xasm32; alter four-slot exchange/latest-wins/continuous production; alter Console switching, Storage, PCM/MIDI, App, mirror, user INI/media/snapshot; add compatibility aliases, test-only production APIs, a second path, a runtime switch, or a framework. |
+| Reference Baseline | `9ebb9887`; eight shared trees exactly match the latest NXVM import at S3. User-owned untracked `assets/binary/snapshot.debug` is excluded. |
+| Candidate Proposal | [T98 audit](../proposals/m9-nonpublic-quality-performance-audit.md), amended by this owner admission. |
+| Files And ABI Surface | Expected: `src/test/lib`, `src/test/emulator`, their CMake/README/manifests, and current-state/proposal records. Public removal is allowed only for FM and obsolete staged/locked-pointer APIs after whole-tree caller proof. A scoped callback observation replaces `lock_latest/unlock`; Session serves its real metadata need from its Machine cache, and no caller receives a retained exchange pointer. |
+| Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
+| Verification | Before edits, scan all tracked source/test/CMake/docs callers. Build x64/x86 affected targets; run complete public-component unit/gate suites and focused frame/product tests; build and publish both EXEs; run required package/integration regression proportionate to the frame/product ABI change. Reconcile manifests, dependency/naming/LF gates and actual diff. |
+| Expected Markers | No `audio/fm` source/test/CMake/manifest/README/architecture references; no staged composition functions in the public header; no public `lock_latest/unlock`; no public consumer obtains a frame pointer while an exchange lock is held. |
+| Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` when the final package link changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
+| Reporting Requirements | Report actual callers and disposition before deletion; production/test/build-doc added/removed/net lines; retained needed production behavior; test proof versus source proof; fixed commit and any non-eight-tree support change required for NXVM import. |
+| Stop Conditions | Stop an individual deletion if a real production caller or contractual consumer is found and no smaller single-path replacement preserves behavior. Do not replace it with a compatibility alias. |
+| Exit Criteria | FM is either removed after no-caller proof or explicitly retained with proof; composition has only `emulator_product_run` public; frame observation no longer exposes manually held exchange locks and all affected tests use the narrowed observation contract; builds/tests/manifests/gates pass, packages are refreshed, actual diff reviewed, one complete P is pushed, worktree is clean except the protected snapshot. |
+| Original Owner Request | “对公共八组件进行一次‘小而彻底’的 API 收紧；目标是删除无消费者能力与仅为测试暴露的生产接口”，with the three explicitly supplied S1/S2/S3 scopes and verification requirements. |
+| Similar-Issue Sweep | Search the entire repository for FM contracts, staged composition APIs, frame-exchange lock exposure, other test-only public APIs in the affected headers, and all pointer-under-lock consumers. Each hit receives an in-scope removal/replacement/retention disposition. |
+
+T98 S3 remains closed in [S3 history](../history/M9-T98-S3-shared-import.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
 
+- T98 S4 is awaiting owner acceptance: FM's no-consumer placeholder leaf is
+  removed; the staged Product assembly functions are implementation-private;
+  and frame exchange no longer exports manually acquired locks. Machine caches
+  publication metadata for Session, while bounded observers cannot retain the
+  exchange pointer. Production +55/-81 (net -26), tests +94/-91 (net +3), and
+  docs/build +45/-17 (net +28), excluding rebuilt packages. Both architectures
+  built successfully. Each non-desktop/non-native-audio suite passed 184/185
+  normally; the sole `checks/build_cleanup/selftest` requires a Junction and
+  passed separately under its required elevated host permission, yielding all
+  185 qualified tests per architecture. Build residue check passed.
+- Pending S4 packages: softpc32 SHA-256
+  EDE3E5A8F89A5064E1B93D347BCCF76CDFC58FC2E936B6880358C54019022174;
+  softpc64 SHA-256
+  2AF3E37332AD9DC982A6AAD6D41B1E488868DD9F4716296DAC63D2A65FEC80CE.
 - T98 S3 optional Types math import: public source +12/-0, test C +10/-0,
   CMake +3/-0, docs +5/-0 and manifests +4/-3; total +34/-3 (net +31).
   No existing ABI or product/mirror implementation changes. All 194 tests

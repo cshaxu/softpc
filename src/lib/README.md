@@ -59,7 +59,7 @@ An arrow means the component on the right may use the generic contract of the
 component on the left:
 
 ```text
-types -> base + console + console-broker + storage + audio/pcm + audio/midi + audio/fm + kvm-base + kvm-window + kvm-console
+types -> base + console + console-broker + storage + audio/pcm + audio/midi + kvm-base + kvm-window + kvm-console
 base -> console + console-broker + storage + audio/pcm + kvm-base + kvm-window + kvm-console
 console -> console-broker + kvm-console
 kvm-base -> kvm-window + kvm-console
@@ -111,8 +111,6 @@ lifecycle controller, or public unified presenter API.
   submission. Ordinary short messages preserve long-message ordering; realtime
   messages may interleave. Reset stops notes and terminates interrupted SysEx.
   Optional device volume can affect other clients. Linux reports unsupported.
-- `audio/fm` (target `audio-fm`) exposes raw FM capability acquisition only.
-  Current platforms return UNSUPPORTED/null, not a substitute synthesizer.
 - `kvm-base` provides copied frame/input values, source-local registered-hotkey
   matching, source identities, and private mailbox mechanics.
 - `kvm-window` owns one Window lifecycle; `kvm-console` owns one raw-Console

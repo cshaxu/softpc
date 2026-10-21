@@ -87,11 +87,19 @@ lib_status kvm_window_unfreeze(kvm_window *window)
 { lib_test_assert(window == &window_fake); ++unfreezes; return LIB_STATUS_OK; }
 lib_status kvm_window_release_mouse(kvm_window *window)
 { lib_test_assert(window == &window_fake); return control_status; }
+
+static void validate_window_frame(void *opaque, const void *value)
+{
+    const kvm_window_frame *frame = value;
+    lib_bool *valid = opaque;
+    *valid = frame->text != LIB_NULL || frame->graphics != LIB_NULL;
+}
+
 lib_status kvm_window_publish_frame(kvm_window *window, kvm_frame_exchange *exchange)
 {
-    const kvm_window_frame *frame = kvm_frame_exchange_lock_latest(exchange);
-    lib_test_assert(window == &window_fake && (frame->text != LIB_NULL || frame->graphics != LIB_NULL));
-    kvm_frame_exchange_unlock(exchange);
+    lib_bool valid = LIB_FALSE;
+    lib_test_assert(window == &window_fake &&
+        kvm_frame_exchange_observe_latest(exchange, validate_window_frame, &valid) && valid);
     ++window_frames;
     return publish_status;
 }
@@ -108,13 +116,20 @@ lib_status kvm_console_destroy(kvm_console *console)
   lib_console_release(console->object); return LIB_STATUS_OK; }
 lib_console *kvm_console_get_console(const kvm_console *console)
 { return console->object; }
+
+static void copy_console_frame(void *opaque, const void *value)
+{
+    kvm_console_text_frame *destination = opaque;
+    const kvm_console_text_frame *frame = value;
+    lib_test_assert(kvm_console_text_frame_validate(frame) == LIB_STATUS_OK);
+    *destination = *frame;
+}
+
 lib_status kvm_console_publish_frame(kvm_console *console, kvm_frame_exchange *exchange)
 {
     lib_test_assert(console == &console_fake);
-    const kvm_console_text_frame *frame = kvm_frame_exchange_lock_latest(exchange);
-    lib_test_assert(kvm_console_text_frame_validate(frame) == LIB_STATUS_OK);
-    last_console = *frame;
-    kvm_frame_exchange_unlock(exchange);
+    lib_test_assert(kvm_frame_exchange_observe_latest(exchange, copy_console_frame,
+        &last_console));
     ++console_frames;
     return publish_status;
 }

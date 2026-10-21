@@ -44,8 +44,13 @@ status; rediscovering them does not establish a new regression.
 - S2: F1/F2 real media adapter failure and capacity bounds; owner accepted and
   closed on 2026-10-18. See [closure](../history/M9-T98-S2-media-boundaries.md).
 - Owner inserts S3 on 2026-10-19: exact shared import, dual EXE and full tests.
-- S4 (formerly S3): finite instruction budget rejection, no counter widening.
-- S5 (formerly S4): Compat-private UTF-8 append opening, retaining FILE I/O.
+- S4: owner-admitted public API consolidation: remove unused FM, internalize
+  staged Emulator Product assembly and replace the over-wide frame-exchange
+  locked-pointer observation with a scoped callback observation. Machine
+  metadata remains locally cached and no observer can retain the exchange
+  pointer.
+- S5 (formerly S3): finite instruction budget rejection, no counter widening.
+- S6 (formerly S4): Compat-private UTF-8 append opening, retaining FILE I/O.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 

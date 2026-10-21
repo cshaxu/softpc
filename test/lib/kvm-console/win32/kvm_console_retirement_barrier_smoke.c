@@ -11,6 +11,14 @@ static kvm_frame_exchange *frames;
 
 static lib_win32_long fail_wake;
 static lib_win32_handle frame_idle;
+
+static void observe_text_columns(void *opaque, const void *value)
+{
+    const kvm_console_text_frame *frame = value;
+    lib_u32 *columns = opaque;
+    *columns = frame->base.text_columns;
+}
+
 static base_sync_wait_result retirement_wait(base_sync_event *wake, lib_u32 timeout)
 {
     if (frame_idle) lib_test_assert(lib_win32_release_semaphore(frame_idle, 1, LIB_NULL));
@@ -342,9 +350,11 @@ static void check_input_reset(void)
         reset_events[1].data.mouse.buttons==0u &&
         reset_events[2].type==KVM_EVENT_INPUT_RESET &&
         !c->base.hotkey_matcher.held_count && c->base.hotkey_matcher.registry.count==1);
-    const kvm_console_text_frame *latest = kvm_frame_exchange_lock_latest(frames);
-    lib_test_assert(latest != LIB_NULL && latest->base.text_columns==80);
-    kvm_frame_exchange_unlock(frames);
+    {
+        lib_u32 columns = 0u;
+        lib_test_assert(kvm_frame_exchange_observe_latest(frames,
+            observe_text_columns, &columns) && columns == 80u);
+    }
     e.kind=LIB_CONSOLE_EVENT_RAW_KEY;
     e.value.raw_key=(base_key_input){ .scalar=0xde00, .pressed=LIB_TRUE };
     lib_test_assert(lib_console_deliver_event(logical,&e)==0 && reset_event_count==3);

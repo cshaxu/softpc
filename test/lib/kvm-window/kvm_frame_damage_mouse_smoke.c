@@ -10,6 +10,9 @@ static kvm_window window;
 static kvm_window_frame_storage frame;
 static const kvm_window_frame *received;
 
+static void observe_expected_frame(void *opaque, const void *value)
+{ *(lib_bool *)opaque = value == received; }
+
 static void damage(void)
 {
     const kvm_window_frame *old;
@@ -115,8 +118,11 @@ static void rgb_coverage(void)
     lib_test_assert(!kvm_window_render_frame(received, surface, 64, 32, &valid, &changed));
     frame.data.graphics.pixels[31u * 65u + 63u] = 0xff123456u;
     lib_test_assert(test_window_frame(&window, frames, &frame.frame) == LIB_STATUS_INVALID_ARGUMENT);
-    lib_test_assert(kvm_frame_exchange_lock_latest(frames) == received);
-    kvm_frame_exchange_unlock(frames);
+    {
+        lib_bool matched = LIB_FALSE;
+        lib_test_assert(kvm_frame_exchange_observe_latest(frames,
+            observe_expected_frame, &matched) && matched);
+    }
     lib_test_assert(base_sync_event_wait(window.base.mailboxes.wake, 0u) == BASE_SYNC_WAIT_TIMED_OUT);
     static kvm_window_frame_storage rejected_copy;
     lib_test_assert(!kvm_window_frame_copy(&rejected_copy, &frame.frame));
