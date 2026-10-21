@@ -1,8 +1,8 @@
 #include "lib/kvm-window/window.h"
 #include "lib/base/text_interface.h"
 
-static lib_status kvm_window_component_stop(kvm_component *base, lib_u32 timeout_ms)
-{ return kvm_window_worker_join((kvm_window *)base, timeout_ms); }
+static lib_status kvm_window_component_stop(kvm_component *base)
+{ return kvm_window_worker_join((kvm_window *)base); }
 
 static void kvm_window_component_dispose(kvm_component *base)
 {

@@ -58,8 +58,9 @@ a fixed 32-byte glyph-slot stride. Zero height uses the Base-owned
 unrelated default-height cursor cell.
 Native Window destruction removes its timer; stale queued ticks cannot bypass
 frozen/due checks.
-Checked destroy uses the shared 5000 ms join contract; a failed join retains the
-component and all callback dependencies, never freeing a live worker.
+Checked destroy requests terminal stop, wakes the native message wait, then
+joins the actual worker exit. A failed native stop or join retains the component
+and all callback dependencies, never freeing a live worker.
 `freeze()` submits one control; the Window worker prevents capture, releases any
 capture, and holds the cursor at its current drawn state; `unfreeze()` resumes
 the blink but waits for a later client-area click before it captures. A real

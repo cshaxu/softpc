@@ -241,8 +241,8 @@ static lib_bool input(void *p,const kvm_input_event *e)
 }
 static void failure(void *p,lib_u64 id,lib_status status)
 { (void)p;(void)id;(void)status; }
-static lib_status join(kvm_component *p, lib_u32 timeout_ms)
-{ (void)p; (void)timeout_ms; return LIB_STATUS_OK; }
+static lib_status join(kvm_component *p)
+{ (void)p; return LIB_STATUS_OK; }
 static void dispose(kvm_component *p) { kvm_component_mailboxes_destroy(&p->mailboxes); }
 static lib_u32 control_failures;
 static void invalid_control_failure(void *p, lib_u64 id, lib_status status)

@@ -53,7 +53,9 @@ status; rediscovering them does not establish a new regression.
 - S5: audit the KVM native-worker destruction wait and replace the 5000ms
   destroy deadline only if the complete stop/wake/join/ownership chain proves
   synchronous destruction is safe. This supersedes the formerly planned
-  finite-budget candidate, which becomes S6.
+  finite-budget candidate, which becomes S6. Implementation is delivered for
+  owner acceptance: normal destruction now has a terminal wake and waits for
+  actual exit; no owner-visible timeout remains.
 - S6 (formerly S5/S3): finite instruction budget rejection, no counter
   widening.
 - S7 (formerly S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.

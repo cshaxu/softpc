@@ -49,8 +49,8 @@ static lib_bool sink(void *opaque, const kvm_input_event *event)
 }
 static void failure(void *opaque, lib_u64 identity, lib_status status)
 { (void)opaque; lib_test_assert(identity && status == LIB_STATUS_IO_ERROR); ++failures; }
-static lib_status join(kvm_component *component, lib_u32 timeout_ms)
-{ (void)component; (void)timeout_ms; return LIB_STATUS_OK; }
+static lib_status join(kvm_component *component)
+{ (void)component; return LIB_STATUS_OK; }
 static void dispose(kvm_component *component)
 { kvm_component_mailboxes_destroy(&component->mailboxes); }
 static void initialize(void)

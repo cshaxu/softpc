@@ -99,9 +99,10 @@ delivered make always retains its break and never becomes consumed later.
 The ledger is released at retirement; destroy also handles workerless cleanup.
 An unmatched break is consumed without delivery or pending-key replay: a new or
 reset input source must not forward a release whose make it never accepted.
-Destroy performs one bounded join. An unjoinable live worker is an importing
-application terminal infrastructure failure; the library does not terminate or
-add a fallback wake channel. A selected wake failure after a request has been
+Destroy requests terminal stop, uses a leaf-owned terminal wake, and joins
+actual worker exit before it releases callback dependencies. A native stop or
+join failure retains the live component; the library neither frees it nor adds
+a recovery manager. A selected ordinary wake failure after a request has been
 accepted reports through the failure sink; it does not roll back or replay it.
 
 Window submits copied native records through kvm_keyboard_submit_record, which

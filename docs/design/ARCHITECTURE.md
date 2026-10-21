@@ -429,10 +429,12 @@ motion scaling belong to kvm-window root helpers. Native files marshal SDK
 values and own actual drawing/messages/capture. Worker context borrows processing/displayed frames from the producer exchange;
 native cleanup runs on the worker, context storage release follows join.
 Base event is one opaque platform allocation, not a pointer-only outer wrapper.
-KVM destruction performs one bounded 5000 ms join. An unjoinable live worker is
-an application-terminal infrastructure failure; Lib never terminates the
-process or exposes a half-object recovery protocol. A KVM notification failure
-after copied work has been accepted reports once through the existing failure
+KVM destruction requests terminal stop, uses a dedicated terminal wake distinct
+from ordinary mailbox notification, waits for the worker to exit, then releases
+its context and callback dependencies. A native stop or join primitive failure
+retains the object; Lib neither frees a live worker nor exposes a half-object
+recovery protocol. A KVM notification failure after copied work has been
+accepted reports once through the existing failure
 sink; it is not a second request rejection and is never replayed. Window blinking uses
 one native timer message path, including native modal loops, not outer-loop
 timeout scheduling.

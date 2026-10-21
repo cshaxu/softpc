@@ -7,27 +7,44 @@ static kvm_frame_exchange *frames;
 #include "lib/types/win32/sync.h"
 
 static lib_win32_handle asleep;
+static base_sync_event *rejected_wake;
+static lib_bool reject_attach;
 static lib_u32 attempts, retired, failures, joins;
-static lib_status reject_signal(base_sync_event *event) { (void)event; ++attempts; return LIB_STATUS_IO_ERROR; }
+static lib_status (*real_signal)(base_sync_event *) = base_sync_event_signal;
+static lib_status (*real_set_event_sink)(lib_console *, lib_console_event_sink, void *) =
+    lib_console_set_event_sink;
+static lib_status reject_signal(base_sync_event *event)
+{ if(event==rejected_wake) { ++attempts; return LIB_STATUS_IO_ERROR; } return real_signal(event); }
+static lib_status reject_event_sink(lib_console *console,
+    lib_console_event_sink sink, void *context)
+{
+    if (reject_attach && sink != LIB_NULL) return LIB_STATUS_IO_ERROR;
+    return real_set_event_sink(console, sink, context);
+}
 static lib_win32_bool (LIB_WIN32_WINAPI *signal_asleep)(lib_win32_handle) = lib_win32_set_event;
 static lib_win32_dword (LIB_WIN32_WINAPI *wait_for_signal)(lib_win32_handle,lib_win32_dword) = lib_win32_wait_for_single_object;
 #define base_sync_event_signal reject_signal
 #include "lib/kvm-base/mailbox.c"
 #undef base_sync_event_signal
-static base_sync_wait_result observed_wait(base_sync_event *w, lib_u32 timeout)
-{ signal_asleep(asleep); return base_sync_event_wait(w, timeout); }
+static base_sync_wait_result observed_wait_any(base_sync_event *const *events,
+    lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index)
+{
+    signal_asleep(asleep);
+    return base_sync_wait_any(events, count, task, timeout, index);
+}
 static lib_win32_dword LIB_WIN32_WINAPI bounded_join(lib_win32_handle h,lib_win32_dword timeout)
 {
-    lib_test_assert(timeout==KVM_COMPONENT_DESTROY_TIMEOUT_MS);
+    lib_test_assert(timeout==LIB_WIN32_INFINITE);
     ++joins;
-    /* Model deadline expiry without sleeping five seconds per failure case. */
-    return wait_for_signal(h,0);
+    return wait_for_signal(h,timeout);
 }
 #undef lib_win32_wait_for_single_object
 #define lib_win32_wait_for_single_object bounded_join
-#define base_sync_event_wait observed_wait
+#define base_sync_wait_any observed_wait_any
+#define lib_console_set_event_sink reject_event_sink
 #include "lib/kvm-console/win32/component.c"
-#undef base_sync_event_wait
+#undef base_sync_wait_any
+#undef lib_console_set_event_sink
 
 static lib_bool input(void *p,const kvm_input_event *e)
 { (void)p; lib_test_assert(e->type==KVM_EVENT_SOURCE_RETIRED); ++retired; return LIB_TRUE; }
@@ -44,9 +61,8 @@ int main(void)
         attempts=retired=failures=joins=0;
         o.input_sink=input; o.failure_sink=failure;
         lib_test_assert(kvm_console_create(&c,&o)==LIB_STATUS_OK);
+        rejected_wake=c->base.mailboxes.wake;
         lib_test_assert(wait_for_signal(asleep,3000)==LIB_WIN32_WAIT_OBJECT_0);
-        void *state=c->worker_state;
-        kvm_console_win32_state *worker=state;
         if(mode==0) lib_test_assert(kvm_component_request_stop(&c->base)==LIB_STATUS_OK);
         if(mode==1) {
             kvm_component_control title={.kind=42u};
@@ -62,14 +78,24 @@ int main(void)
             lib_test_assert(lib_console_deliver_event(c->logical_console,&activated)==LIB_STATUS_OK);
         }
         lib_test_assert(attempts==2 && c->base.stopping && !retired);
-        lib_test_assert(kvm_console_destroy(c)==LIB_STATUS_IO_ERROR);
-        lib_test_assert(joins==1 && c->worker_state==state && !retired && failures==1);
-        lib_test_assert(wait_for_signal(worker->worker,0)==LIB_WIN32_WAIT_TIMEOUT);
-        /* Test-only rescue after proving no premature retirement/free. */
-        lib_test_assert(base_sync_event_signal(c->base.mailboxes.wake)==LIB_STATUS_OK);
-        lib_test_assert(wait_for_signal(worker->worker,3000)==LIB_WIN32_WAIT_OBJECT_0);
-        lib_test_assert(retired==1 && failures==1);
-        lib_test_assert(kvm_console_destroy(c)==LIB_STATUS_OK && joins==2);
+        /* The dedicated terminal wake is independent of failed ordinary
+         * notification, so destroy waits for real retirement and frees once. */
+        lib_test_assert(kvm_console_destroy(c)==LIB_STATUS_OK);
+        lib_test_assert(joins==1 && retired==1 && failures==1);
+        rejected_wake=LIB_NULL;
+        lib_win32_close_handle(asleep);
+    }
+    {
+        kvm_console_options o = { .input_sink = input, .failure_sink = failure };
+        kvm_console *c = LIB_NULL;
+        asleep = lib_win32_create_event_a(LIB_NULL, LIB_WIN32_TRUE, LIB_WIN32_FALSE, LIB_NULL);
+        lib_test_assert(asleep != LIB_NULL);
+        rejected_wake = LIB_NULL;
+        reject_attach = LIB_TRUE;
+        attempts = retired = failures = joins = 0u;
+        lib_test_assert(kvm_console_create(&c, &o) == LIB_STATUS_INVALID_STATE && c == LIB_NULL);
+        lib_test_assert(joins == 1u && retired == 1u && failures == 0u);
+        reject_attach = LIB_FALSE;
         lib_win32_close_handle(asleep);
     }
     kvm_frame_exchange_destroy(frames);

@@ -19,17 +19,22 @@ static void observe_text_columns(void *opaque, const void *value)
     *columns = frame->base.text_columns;
 }
 
-static base_sync_wait_result retirement_wait(base_sync_event *wake, lib_u32 timeout)
+static base_sync_wait_result (*real_wait_any)(base_sync_event *const *events,
+    lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index) =
+    base_sync_wait_any;
+
+static base_sync_wait_result retirement_wait_any(base_sync_event *const *events,
+    lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index)
 {
     if (frame_idle) lib_test_assert(lib_win32_release_semaphore(frame_idle, 1, LIB_NULL));
-    base_sync_wait_result result = base_sync_event_wait(wake, timeout);
+    base_sync_wait_result result = real_wait_any(events, count, task, timeout, index);
     return lib_win32_interlocked_compare_exchange(&fail_wake, 0, 0) ?
         BASE_SYNC_WAIT_FAULT : result;
 }
 /* Compile the production worker; only its wait result is controllable. */
-#define base_sync_event_wait retirement_wait
+#define base_sync_wait_any retirement_wait_any
 #include "lib/kvm-console/win32/component.c"
-#undef base_sync_event_wait
+#undef base_sync_wait_any
 
 typedef struct retirement_probe {
     lib_win32_handle input_entered;

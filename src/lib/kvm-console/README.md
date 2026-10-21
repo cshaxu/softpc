@@ -46,8 +46,9 @@ Successful broker binding delivers a neutral Console activation event. The callb
 requeues held input only when no newer frame is pending, then signals the existing
 worker's wake; it neither renders nor reenters the broker.
 A failed activation notification enters the same terminal failure path as a
-failed frame/control notification. Checked destroy uses the shared bounded-join
-contract; failure retains the component and its callback dependencies.
+failed frame/control notification. Checked destroy uses the shared terminal
+wake and joins actual exit; native stop/join failure retains the component and
+its callback dependencies.
 The worker draws a pending exchange frame, or does nothing if empty. An unbound
 logical Console accepts output without native drawing; successful consumption
 retains that frame. Activation redraws through the same output path even when

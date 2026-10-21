@@ -63,8 +63,8 @@ static void kvm_console_component_dispose(kvm_component *base)
     lib_release(console);
 }
 
-static lib_status kvm_console_component_stop(kvm_component *base, lib_u32 timeout_ms)
-{ return kvm_console_worker_join((kvm_console *)base, timeout_ms); }
+static lib_status kvm_console_component_stop(kvm_component *base)
+{ return kvm_console_worker_join((kvm_console *)base); }
 
 lib_status kvm_console_create(kvm_console **out_console,
     const kvm_console_options *options)

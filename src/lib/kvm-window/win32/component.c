@@ -831,6 +831,7 @@ static lib_status win32_window_destroy(kvm_win32_window_context *context, lib_wi
 typedef struct kvm_window_win32_state {
     lib_win32_handle worker;
     lib_win32_handle ready;
+    lib_win32_handle stop;
     lib_status startup_status;
     kvm_win32_window_context context;
 } kvm_window_win32_state;
@@ -862,6 +863,7 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
     klass.lpszClassName = L"LibKvmWindow";
     if (lib_win32_register_class_w(&klass) == 0 && lib_win32_get_last_error() != LIB_WIN32_ERROR_CLASS_ALREADY_EXISTS) {
         state->startup_status = LIB_STATUS_INVALID_STATE;
+        (void)lib_win32_set_event(state->ready);
         return 0u; /* Creator also observes worker exit. */
     }
     win32_window_initial_bounds(&initial_left, &initial_top, &initial_width,
@@ -873,6 +875,7 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
         LIB_NULL, LIB_NULL, klass.hInstance, context);
     if (window == LIB_NULL) {
         state->startup_status = LIB_STATUS_INVALID_STATE;
+        (void)lib_win32_set_event(state->ready);
         return 0u; /* Creator also observes worker exit. */
     }
     state->startup_status = LIB_STATUS_IO_ERROR;
@@ -898,8 +901,9 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
     }
     while (lib_win32_is_window(window) && win32_window_accepting_input(context)) {
         lib_win32_dword wait = lib_win32_msg_wait_for_multiple_objects(
-            0u, LIB_NULL, LIB_WIN32_FALSE,
+            1u, &state->stop, LIB_WIN32_FALSE,
             LIB_WIN32_INFINITE, LIB_WIN32_QS_ALLINPUT);
+        if (wait == LIB_WIN32_WAIT_OBJECT_0) break;
         if (wait == LIB_WIN32_WAIT_FAILED) {
             kvm_component_fail(&component->base, LIB_STATUS_IO_ERROR);
         }
@@ -921,6 +925,7 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
 
 startup_failed:
     (void)win32_window_destroy(context, window);
+    (void)lib_win32_set_event(state->ready);
     return 0u; /* Creator observes worker exit and the original startup status. */
 }
 
@@ -943,40 +948,50 @@ lib_status kvm_window_worker_start(kvm_window *component)
     if (state->ready == LIB_NULL) {
         lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
+    state->stop = lib_win32_create_event_a(LIB_NULL, LIB_WIN32_TRUE, LIB_WIN32_FALSE, LIB_NULL);
+    if (state->stop == LIB_NULL) {
+        lib_win32_close_handle(state->ready);
+        lib_release(state); return LIB_STATUS_NO_MEMORY;
+    }
     component->worker_state = state;
     state->worker = lib_win32_create_thread(LIB_NULL, 0u, kvm_window_worker, component, 0u, LIB_NULL);
     if (state->worker == LIB_NULL) {
         component->worker_state = LIB_NULL;
         lib_win32_close_handle(state->ready);
+        lib_win32_close_handle(state->stop);
         lib_release(state); return LIB_STATUS_NO_MEMORY;
     }
     completion[0] = state->ready;
     completion[1] = state->worker;
     wait = lib_win32_wait_for_multiple_objects(2u, completion, LIB_WIN32_FALSE, LIB_WIN32_INFINITE);
     if (wait != LIB_WIN32_WAIT_OBJECT_0 || state->startup_status != LIB_STATUS_OK) {
-        startup_status = wait == LIB_WIN32_WAIT_OBJECT_0 + 1u ?
-            state->startup_status : LIB_STATUS_IO_ERROR;
+        startup_status = state->startup_status;
+        if (wait != LIB_WIN32_WAIT_OBJECT_0 &&
+            wait != LIB_WIN32_WAIT_OBJECT_0 + 1u)
+            startup_status = LIB_STATUS_IO_ERROR;
         if (startup_status == LIB_STATUS_OK) startup_status = LIB_STATUS_IO_ERROR;
         /* An unsuccessful wait is not permission to free a live worker. */
-        if (kvm_window_worker_join(component, KVM_COMPONENT_DESTROY_TIMEOUT_MS) != LIB_STATUS_OK)
+        if (kvm_window_worker_join(component) != LIB_STATUS_OK)
             return startup_status;
         return startup_status;
     }
     return LIB_STATUS_OK;
 }
 
-lib_status kvm_window_worker_join(kvm_window *component, lib_u32 timeout_ms)
+lib_status kvm_window_worker_join(kvm_window *component)
 {
     kvm_window_win32_state *state;
     if (component == LIB_NULL || (state = (kvm_window_win32_state *)
             component->worker_state) == LIB_NULL) return LIB_STATUS_OK;
-    /* STOP is already in the control FIFO.  The worker consumes it, closes
-     * its Window, and thereby establishes completion before this join. */
-    if (lib_win32_wait_for_single_object(state->worker, timeout_ms) != LIB_WIN32_WAIT_OBJECT_0)
+    /* STOP closes normal admission. This terminal wake exits the native
+     * message wait even if the ordinary mailbox notification failed. */
+    if (!lib_win32_set_event(state->stop)) return LIB_STATUS_IO_ERROR;
+    if (lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE) != LIB_WIN32_WAIT_OBJECT_0)
         return LIB_STATUS_IO_ERROR;
     (void)lib_win32_close_handle(state->worker);
     state->worker = LIB_NULL;
     (void)lib_win32_close_handle(state->ready);
+    (void)lib_win32_close_handle(state->stop);
     component->worker_state = LIB_NULL;
     lib_release(state);
     return LIB_STATUS_OK;

@@ -19,6 +19,6 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
 void kvm_console_receive_event(void *context, const lib_console_event *event);
 
 lib_status kvm_console_worker_start(kvm_console *console);
-lib_status kvm_console_worker_join(kvm_console *console, lib_u32 timeout_ms);
+lib_status kvm_console_worker_join(kvm_console *console);
 
 #endif

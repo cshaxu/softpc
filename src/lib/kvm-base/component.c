@@ -158,7 +158,7 @@ lib_status kvm_component_destroy(kvm_component *component)
         kvm_component_report_failure(component, LIB_STATUS_INVALID_STATE);
         return status;
     }
-    status = component->join_worker(component, KVM_COMPONENT_DESTROY_TIMEOUT_MS);
+    status = component->join_worker(component);
     if (status != LIB_STATUS_OK) return status;
     kvm_hotkey_matcher_discard(&component->hotkey_matcher);
     component->dispose(component);

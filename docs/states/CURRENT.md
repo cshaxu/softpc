@@ -49,6 +49,13 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   704D873D121307CDAB765454C4CAF388C6AD221208B5FE12722D016C566C3873;
   softpc64 SHA-256
   78A32B672B1A2D49BF742C99EA6B2647FC364717B7BE4414CB73CFF54D0E4838.
+- T98 S5 implementation awaits owner acceptance: Console and Window now use
+  terminal wake plus actual worker join before disposal; the former 5000ms
+  public destroy deadline is removed. Focused x64/x86 lifetime regressions,
+  including a synchronized worker hold beyond five seconds, pass. Complete
+  non-desktop suites pass except the privilege-required Junction selftest,
+  which passes separately elevated. Package smoke is blocked by current-host
+  MIDI initialization (`cannot compose machine`) before monitor startup.
 - T98 S2 fixes Compat media close reporting and address bounds only. Production
   +30/-16 (net +14); tests +195/-0; root test registration +3/-2. Public and
   mirror code unchanged. Historical qualification: build/t98/s2/qualification,
