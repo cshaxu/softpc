@@ -53,16 +53,121 @@ status; rediscovering them does not establish a new regression.
 - S5: audit the KVM native-worker destruction wait and replace the 5000ms
   destroy deadline only if the complete stop/wake/join/ownership chain proves
   synchronous destruction is safe. This supersedes the formerly planned
-  finite-budget candidate, which becomes S6. Implementation is delivered for
-  owner acceptance: normal destruction now has a terminal wake and waits for
-  actual exit; no owner-visible timeout remains.
-- S6 (formerly S5/S3): finite instruction budget rejection, no counter
+  finite-budget candidate. Owner accepted S5 on 2026-10-21; see
+  [closure and verification limits](../history/M9-T98-S5-worker-destruction.md).
+- S6: owner-inserted text underline and split cursor; audit/design first.
+- S7 (formerly S6/S5/S3): finite instruction budget rejection, no counter
   widening.
-- S7 (formerly S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.
+- S8 (formerly S7/S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 
 ## Findings and verification
+
+### S6 - Text decoration and cursor design
+
+Audit baseline is `8132d0db`, 2026-10-21. This section records proposed design,
+not implemented capability or guest verification. The current packet owns
+admission. No production, tests, package, media or snapshot changes accompany
+this design. Linked remote governance skills could not be fetched (DNS/cache
+failure); repository-local authorities were used.
+
+Finite audit ledger: original shape/underline state; original update/host
+boundary; Compat presentation; Driver leaf construction; neutral schema;
+Window pixels/overlay; Console representation; frame lifetime. Source traces
+below establish the loss points. Exact device-mode qualification and dynamic
+proof remain required before implementation can be accepted.
+
+1. Original CGA `cga.c` cursor computation and EGA/VGA `do_new_cursor()`
+   already set `PCDisplay.cursor_start/height` and `cursor_start1/height1`,
+   plus visibility. End-before-start interpretation belongs there. Their
+   formulas are not to be reconstructed from registers by Lib or Driver.
+   `base_cursor_shape_changed()` uses the existing video dirty count.
+2. `nt_graph.c:make_cursor_change()` reduces the first height to a native
+   Console percentage. Compat's font query returns false, selecting the
+   original 20-percent fallback. Compat then stores that percentage and Driver
+   `vm_driver_cursor_shape()` synthesizes a bottom-aligned range. Neither
+   original top nor the second span survives. Read the already computed
+   original shape in Compat before this lossy conversion; remove the Driver
+   percentage conversion from frame production. Keep native compatibility
+   callbacks required by the original host, not a second rendering authority.
+3. `EGA_GRAPH.underline_start` and `UL_ATTR_MASK/UL_ATTR` already define the
+   scanline and X000X001 attribute predicate. The retained NT text host has no
+   consumer of those underline constants. Compat must select the applicable
+   original display family, using existing original state/constants; never
+   apply bit 0 unconditionally to CGA or every text mode. Original colour and
+   glyph-bank extraction remain unchanged. Before coding, register tests must
+   pin the selected EGA/VGA and CGA cases, including disabled/out-of-height
+   underline; comments saying mono-only are not themselves runtime proof.
+4. EGA underline-location writes already call `screen_refresh_required()`;
+   VGA CRTC 0x14 currently updates the position without that call. Proposed
+   narrow mirror repair: request the existing refresh when that position
+   changes. Do not create metadata polling or another dirty cache. Original
+   updates reach `softpc_standalone_dib_end_update()`, which marks text dirty
+   even if its character comparison drew nothing. Driver already gates on
+   that dirty flag. Prove this with a position-only register write.
+
+Proposed shared contract (one replacement, not legacy plus new shape APIs):
+
+- One `lib_u8 underline` per text cell, zero meaning disabled; one frame-level
+  scanline. The scanline is zero-based; a position outside effective font
+  height produces no underline. No magic value is necessary because cell
+  enable and bounds already express absence. No bitfield/packing framework.
+- One cursor with two fixed `{start, height}` spans, both in glyph scanlines.
+  Zero height is empty; clip to effective font height; the union is the visible
+  shape. Normalize overlaps before native inversion so overlap is not inverted
+  twice. Shared position, mode and phase remain unchanged. No segment count,
+  second visibility flag or second clock is needed.
+- Replace old top/bottom fields and migrate every in-tree initializer and
+  helper. Existing single-span results, including deliberate full-cell
+  fallback users, are translated explicitly. This is a source/ABI layout
+  update requiring downstream rebuild/adaptation, not binary compatibility.
+  Zero-initialized new underline stays off; migrated single cursors stay single.
+- Base owns scanline normalization only. Window owns pixel rectangles and
+  native drawing. Underline ORs foreground pixels into the existing glyph
+  decoder before the existing pixel comparison; fonts/VRAM are untouched.
+  Cursor retains its existing overlay and blink path, drawing the two resolved
+  spans and invalidating old/new shapes. Full-cell cursor invalidation is an
+  acceptable small bounded region; it is not permission to draw the gap.
+- Machine/Session/UI still route the same immutable four-slot payloads. No
+  extra frame, retained pointer, queue, timer, thread or per-frame allocation.
+  Emulator status-page initializers need mechanical schema adaptation only;
+  X86 packages must not acquire display interpretation.
+
+Console decision for owner review: retain the documented existing single-span
+native percentage/host-blink approximation. The native interface cannot exactly
+represent arbitrary underline scanlines or two disjoint cursor spans. Proposed
+behavior for the new unrepresentable active effects is `UNSUPPORTED` before
+native output, not a filled cursor gap, silently ignored decoration, new VT
+renderer or automatic presenter switch. This means a Console route requesting
+such effects will fail explicitly. If that product behavior is undesirable,
+an explicitly approved approximate Console contract is needed before coding;
+the exact Window implementation does not require a Console workaround.
+
+Estimated production scope: shared `kvm-base/frame_interface.h`, Window
+render/geometry declarations and native overlay caller, Console mapper; App
+Compat presentation declarations/implementation, Machine presentation forwarding
+and Driver; status-page shape initializers. Approximately 12--18 C/H files,
++150--230/-70--120, net +80--110. This is a planning range, not measured diff.
+Mirror candidate is one VGA refresh site, approximately +3--6/-0, separate
+from that estimate and requiring source-policy exception/ledger update. No
+device cursor formula rewrite is proposed. If the live-chain tests expose a
+different original semantic defect, report it rather than expanding this task.
+
+Tests: extend existing Base shape, Window render/geometry/worker, Console map
+and App presentation/device fixtures. Estimate +180--280/-30--60, net
++150--220; use table-driven cases instead of separate near-duplicate fixtures.
+Cover attribute-only and position-only changes, font heights/colours/banks,
+empty/single/split/overlap/clipped shapes, old second-span erasure, SOURCE/HOST,
+freeze/redraw and existing exchange retirement. Original I/O-to-frame tests
+must use actual register dispatch and producer, not only hand-built frames.
+Reuse lifetime/concurrency suites; no test-only production entrypoints.
+
+Only source inspection has run for S6. No dynamic/pixel/guest proof yet.
+Implementation waits for design review, especially Console behavior. Final
+delivery must count actual production/test/mirror lines, update manifests and
+source ledger, run cached dual builds and affected public/App regressions,
+publish both EXEs, review actual diff, commit/push, then await acceptance.
 
 S1 report delivered on 2026-10-18. No production or test modification has been
 made. Findings below are against 4c8e185b; none is claimed to explain an owner's

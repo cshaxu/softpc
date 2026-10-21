@@ -2,32 +2,32 @@
 
 ## Current Work
 
-## M9 T98 S5 Packet
+## M9 T98 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a KVM native-worker destruction-wait audit and authorizes implementation only after full caller and ownership proof establishes the smallest safe contract. |
-| Objective | Determine whether the 5000ms KVM destroy deadline is a sound resource-lifetime contract; if not, replace it with one correct stop/wake/worker-exit/join/dispose path without importing product or NT service policy. |
-| Non-goals | Do not mechanically substitute INFINITE; alter Console-close or service timing; introduce polling, retries, background collection, a second lifecycle manager or product exit policy; change frame exchange, PCM/MIDI, Storage, snapshots, App or mirror behavior. |
-| Reference Baseline | `34cc3af8`; S4 is owner-accepted and closed in [history](../history/M9-T98-S4-public-api-consolidation.md). User-owned untracked `assets/binary/snapshot.debug` remains excluded. |
-| Candidate Proposal | [T98 audit](../proposals/m9-nonpublic-quality-performance-audit.md), S5. |
-| Files And ABI Surface | Expected audit surface: `src/lib/kvm-base/component*`, `worker_interface.h`, Window/Console native worker start/join implementations and owner-local tests; any implementation change must be limited to the proven lifetime boundary and its tests/docs/manifests. |
+| Admission And Approval | Owner accepts S5 and admits text underline and split-cursor work. First deliver audit and minimal unified design; no production implementation in this turn. |
+| Objective | Preserve original text decoration and cursor shape through Compat/Driver into neutral Lib frame data and the existing render path. |
+| Non-goals | No dimension increase, guest changes, new renderer/clock/polling, exchange algorithm change, destroy-timeout work or writes to other repositories. |
+| Reference Baseline | `8132d0db`; [S5 closure](../history/M9-T98-S5-worker-destruction.md). User-owned untracked snapshot.debug remains excluded. |
+| Candidate Proposal | [T98 audit](../proposals/m9-nonpublic-quality-performance-audit.md#s6---text-decoration-and-cursor-design). |
+| Files And ABI Surface | Lib shared text schema, Window render/geometry/overlay, Console mapping; App Compat presentation and Machine Driver; corresponding owner-local tests. Existing original video shape and refresh logic is audited, not reimplemented. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Enumerate normal destroy, failed startup rollback, source-retired callback, repeat destroy and concurrent publish/input paths. Prove a worker blocked beyond five seconds may later exit without premature free. Before any code change, identify self-join/lock-order constraints. Build x64/x86 and run focused lifetime tests plus proportional public regression. |
-| Expected Markers | Every successful destroy joins before disposal; no timeout return leaves an inaccessible worker; no caller joins itself or waits while retaining a worker-required lock; test deadlines are test-only, not a product deadline. |
+| Verification | Audit original source through rendering first. Implementation later requires state/pixel tests for underline, two clipped cursor spans, phase, old-shape clearing, redraw/freeze and frame retirement; actual original register-to-frame tests; cached dual builds, affected shared and App regression, manifests/gates and applicable desktop tests. |
+| Expected Markers | Original device state is the only hardware authority; one frame/render path and phase owner; no percent roundtrip for Window; unsupported Console effects are not reported as exact output. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report complete stop chain, all actual callers, 5000ms timeout disposition, source proof versus dynamic proof, smallest proposed diff and actual accounting. Name any retention constraint with its concrete observable need. |
-| Stop Conditions | Stop implementation if a caller needs an asynchronous ownership handoff not already represented by the current lifecycle; report it rather than creating another manager. |
-| Exit Criteria | A source-proven disposition exists for every normal/failure destroy call; if changed, destroy means worker/callback quiescence before release, tests cover delayed exit and no self-join/deadlock, and build/test/manifest/gate/package evidence is complete. |
-| Original Owner Request | Audit shared Lib window-thread destroy waiting, compare the existing 5000ms contract with NTVDM64's actual-exit behavior, and implement only a proven single-path repair. |
-| Similar-Issue Sweep | Search all KVM leaf starts/joins, Component destruction, UI/Product owners and tests for finite destroy joins, startup rollback, stop wake, source retirement and callback reentry. |
+| Reporting Requirements | Report original state sources, loss points, neutral schema, Console limits, source versus test proof, expected and actual production/test/mirror diff. No scratch allocated for this read-only design. Later scratch requires a named budget before launch. |
+| Stop Conditions | Seek design approval for Console behavior and any required original-mirror patch before implementation; do not replace unresolved hardware semantics with heuristics. |
+| Exit Criteria | Reviewed design followed by verified single-path implementation, dual packages, proportional tests, actual-diff review and pushed delivery, then owner acceptance. Current phase is design only. |
+| Original Owner Request | Add optional text underline and two-segment cursor to shared Lib and connect original SoftPC producer state; first audit and propose the simplest unified design without quality violations or polling. |
+| Similar-Issue Sweep | All cursor percentage conversions, text schema initializers, underline state changes, frame validation/comparison and old/new cursor invalidation paths. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
 
-- T98 S4 is awaiting owner acceptance: FM's no-consumer placeholder leaf is
+- T98 S4 is owner-accepted and closed: FM's no-consumer placeholder leaf is
   removed; the staged Product assembly functions are implementation-private;
   and frame exchange no longer exports manually acquired locks. Machine caches
   publication metadata for Session, while bounded observers cannot retain the
@@ -49,13 +49,14 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   704D873D121307CDAB765454C4CAF388C6AD221208B5FE12722D016C566C3873;
   softpc64 SHA-256
   78A32B672B1A2D49BF742C99EA6B2647FC364717B7BE4414CB73CFF54D0E4838.
-- T98 S5 implementation awaits owner acceptance: Console and Window now use
+- T98 S5 is owner-accepted and closed: Console and Window now use
   terminal wake plus actual worker join before disposal; the former 5000ms
   public destroy deadline is removed. Focused x64/x86 lifetime regressions,
   including a synchronized worker hold beyond five seconds, pass. Complete
   non-desktop suites pass except the privilege-required Junction selftest,
-  which passes separately elevated. Package smoke is blocked by current-host
-  MIDI initialization (`cannot compose machine`) before monitor startup.
+  which passes separately elevated. Package smoke fails with `cannot compose
+  machine` before monitor startup; the particular initialization cause is not
+  independently established by that message.
 - T98 S2 fixes Compat media close reporting and address bounds only. Production
   +30/-16 (net +14); tests +195/-0; root test registration +3/-2. Public and
   mirror code unchanged. Historical qualification: build/t98/s2/qualification,
