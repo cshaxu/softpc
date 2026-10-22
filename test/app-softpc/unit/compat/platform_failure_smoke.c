@@ -83,6 +83,27 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #undef CreateEventA
 
 extern void reset(void);
+static void verify_instruction_budget(void)
+{
+    const lib_u64 values[] = {1u, 2u, UINT32_MAX,
+        (lib_u64)UINT32_MAX + 1u, (lib_u64)UINT32_MAX + 2u, UINT64_MAX};
+    lib_size i;
+    for (i = 0; i < sizeof(values) / sizeof(values[0]); ++i) {
+        softpc_ccpu_instruction_budget = values[i];
+        softpc_ccpu_instruction_budget_active = TRUE;
+        assert(softpc_platform_consume_instruction_budget() == (values[i] == 1u));
+        assert(softpc_ccpu_instruction_budget == values[i] - 1u);
+    }
+    softpc_ccpu_instruction_budget = 2u;
+    assert(!softpc_platform_consume_instruction_budget());
+    assert(softpc_platform_consume_instruction_budget());
+    assert(!softpc_platform_consume_instruction_budget());
+    assert(softpc_ccpu_instruction_budget == 0u); /* No wrap after exhaustion. */
+    softpc_ccpu_instruction_budget_active = FALSE;
+    assert(!softpc_platform_consume_instruction_budget());
+    assert(softpc_ccpu_instruction_budget == 0u);
+}
+
 static void assert_sound_ports(void)
 {
     half_word value;
@@ -106,6 +127,7 @@ int main(void)
     softpc_machine *machine = NULL;
     unsigned restart;
     FILE *file = fopen(path, "wb");
+    verify_instruction_budget();
     assert(file != NULL);
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
@@ -205,7 +227,7 @@ int main(void)
     assert(c_setCS(0u) == 0);
     c_setEIP(0x500u);
     fail_wait = 1; wait_calls = 0u;
-    assert(softpc_machine_run(machine, UINT64_MAX) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_machine_run(machine, 0u) == SOFTPC_MACHINE_IO_ERROR);
     assert(wait_calls == 1u && !softpc_platform_executor_ready());
     assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_IO_ERROR);
     assert(wait_calls == 1u); /* Reject execution before entering the CPU again. */

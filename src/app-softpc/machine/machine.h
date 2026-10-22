@@ -34,6 +34,8 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     softpc_machine **machine_out);
 softpc_machine_result softpc_machine_reset(softpc_machine *machine);
 lib_u32 softpc_machine_memory_bytes(const softpc_machine *machine);
+/* Zero runs continuously until a lifecycle exit; every nonzero 64-bit value
+ * is a finite instruction budget. The contract is identical on x86 and x64. */
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     lib_u64 instruction_budget);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,

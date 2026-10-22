@@ -30,6 +30,10 @@
   was corrected to 30 seconds, without a retry or product timeout change.
   This does not explain the separate initialization exits or prove that all
   attach/prompt failures are timing-budget failures.
+  T98 S9 repeats stage 1/error 6 in compact package on each architecture while
+  RDP is Active; ordinary package and all other cases pass. Each unchanged
+  isolated compact rerun passes. No fixture/product change or causal repair
+  is claimed; retain both first failures and supplemental qualification facts.
 
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,
@@ -41,20 +45,14 @@
   before a separately approved minimal mirror fix. S6 hidden-shape coverage uses
   the existing start-outside-font branch, not an assertion that bit 5 works.
 
-- TODO(Medium): Reject finite machine instruction budgets beyond the existing
-  32-bit counter. 2^32 currently narrows to zero and bypasses budget completion;
-  normal continuous UINT64_MAX execution is separately handled. Owner:
-  App-SoftPC Machine. Admission condition: boundary check and targeted test,
-  preserving the sentinel without widening the hot-loop counter. See
-  [F3](../proposals/m9-nonpublic-quality-performance-audit.md#f3---p2-a-finite-instruction-budget-can-become-unbounded).
-
 - TODO(Medium): Align optional COM/LPT output paths with config/media UTF-8
   semantics; current narrow fopen uses the Windows CRT code page. Owner:
   App-SoftPC host file exits. Admission condition: preserve lazy open and
   flush visibility and partial-write tail accounting. T98 follow-up withdraws
   the writer migration: adding flush alone cannot preserve partial progress.
-  Assess one Compat-private UTF-8 append opener while retaining existing FILE
-  operations; no public API expansion is required for that candidate. See
+  Owner supersedes the private opener in planned T98 S10: audit all file entry
+  points and unify UTF-8 paths through Lib, retaining existing I/O semantics.
+  Any minimal API extension requires evidence from that caller audit. See
   [F4](../proposals/m9-nonpublic-quality-performance-audit.md#f4---p2-comlpt-file-paths-have-inconsistent-encoding).
 
 - TODO(High): Resolve unsupported Sound Blaster MIDI command 38h parser

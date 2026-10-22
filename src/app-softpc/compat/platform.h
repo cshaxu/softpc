@@ -5,6 +5,10 @@
 #include "lib/storage/medium_interface.h"
 struct kvm_text_frame;
 
+/* Executor-owned run budget: zero at entry means continuous execution. */
+extern lib_u64 softpc_ccpu_instruction_budget;
+extern int softpc_ccpu_instruction_budget_active;
+
 /* Host support used by the machine bootstrap and VM adapter. Implementations
  * include this contract too; it does not own CPU/device state. */
 int softpc_platform_write_physical(unsigned long address,

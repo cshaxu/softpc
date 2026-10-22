@@ -2,30 +2,44 @@
 
 ## Current Work
 
-## M9 T98 S8 Packet
+## M9 T98 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S7 and admits the next S through verified delivery, then waits for acceptance. S9 is not automatically admitted. |
-| Objective | Actual-size, type-specific, lazy reusable KVM frame storage; retain four-slot ownership and integrate all existing producers/consumers. |
-| Non-goals | No guest mode/firmware change, resource framework, polling, second transport path, external import or unrelated debt repair. |
-| Reference Baseline | `7bab2e62`; [accepted S7](../history/M9-T98-S7-window-sizing.md). Preserve user INI/media and untracked snapshot.debug. |
-| Candidate Proposal | [T98 dynamic storage](../proposals/m9-nonpublic-quality-performance-audit.md#s8---dynamic-frame-storage). |
-| Files And ABI Surface | Lib Base/Console/KVM frame schemas, allocation and native rendering; Emulator Machine/UI, SoftPC Driver/Compat host text output, diagnostic copies and corresponding tests/manifests. Narrow original host output stride changes only, with mirror accounting. |
+| Admission And Approval | Owner explicitly admits S9 with a 64-bit budget, zero continuous and all nonzero values finite; build, publish, test, commit and push, then wait for acceptance. S10 design is revised but implementation is not admitted. |
+| Objective | Eliminate finite-budget truncation in the existing Machine/Compat execution path, identical on x86 and x64. |
+| Non-goals | No public component, mirror, guest, scheduler, snapshot format or file-I/O implementation changes. |
+| Reference Baseline | `34e53055`; S8 verified delivery f2677d01 and actual-change review 34e53055. Preserve user INI/media and untracked snapshot.debug. |
+| Candidate Proposal | [T98 64-bit budget](../proposals/m9-nonpublic-quality-performance-audit.md#s9---64-bit-execution-budget). |
+| Files And ABI Surface | Private Machine run contract, Compat budget declarations/storage, Driver and test callers; existing owner-local regressions. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Allocation/free accounting, dynamic text/graphics sizes and transitions, overflow/stride/OOM, held reader safety, producer routing and diagnostic deep copies; cached dual builds and complete registered background/desktop/native-audio regression. |
-| Expected Markers | No fixed public text capacity or max graphics union; unused slots have no payload; equal specifications reuse storage; old readers remain immutable and obsolete free payloads retire. |
+| Verification | 64-bit boundary decrement, finite completion and zero-budget lifecycle stop; real CCPU entry preserves high bits; cached dual builds, complete background/desktop/native-audio regression. |
+| Expected Markers | One lib_u64 budget declaration/storage, no narrowing or old sentinel callers; existing active flag separates infinite mode from finite exhaustion. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report ownership/API changes, actual allocation evidence, production/test/mirror diff and verification limitations. Executor owns disposable build/t98-s8; hidden jobs use log/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
-| Stop Conditions | No new arbitrary shared maximum, shallow owning copy, overwrite of held input, guest mode workaround, second lifecycle or build-time mirror transformation. |
-| Exit Criteria | Verified single-path implementation, dual packages, proportional tests, actual-diff quality review and pushed delivery, then owner acceptance. |
-| Original Owner Request | Preserve leaf frame formats and four slots, remove fixed maximum backing, allocate by actual specification only on use, safely retire old storage and correctly integrate production and tests. |
-| Similar-Issue Sweep | Fixed dimensions/stride, sizeof frame copies, shallow copies, retained pointers, native capacity/overflow, allocation failure and destruction across all real callers. |
+| Reporting Requirements | Report production/test added, removed and net lines, execution semantics and proof limits. Executor owns disposable build/t98-s9; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Stop Conditions | No second counter, execution path, polling, compatibility sentinel or mirror/public ABI changes. |
+| Exit Criteria | Verified single-path implementation, dual packages, required tests, pushed executor and actual-diff review, then owner acceptance. |
+| Original Owner Request | S9 uses a 64-bit integer throughout: zero means infinite and every nonzero value finite. S10 will unify UTF-8 path contracts through Lib after a full entry-point audit. Admit and execute S9 now. |
+| Similar-Issue Sweep | All budget declarations, assignments, decrement and lifecycle consumers, run callers, saved-state and documentation references. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- T98 S9 implementation is verified, pending pushed actual-change review and
+  owner acceptance. Budget storage and interface are lib_u64 on both widths:
+  zero is continuous, every nonzero value finite. Existing active state and
+  original safe-point counting remain; no public component or mirror change.
+  Production +14/-20 (net -6); tests +62/-4 (net +58). Cached dual builds and
+  focused tests pass. Each full regression has 191/192 first-pass successes;
+  the sole compact package attach failure passes in an unchanged isolated run,
+  yielding passing evidence for all 192 registrations with no skips. This is
+  not an all-green aggregate or a repair of the existing package intermittency.
+  Original header warnings remain. User INI/media/snapshot.debug are unchanged.
+  softpc32 SHA-256 D10C1108705F623CBA05BE1C9EA130585C76FC30067854AC63F2346D1988F76B;
+  softpc64 SHA-256 00FCAD94A0EB8D3CB8FB9A6E3C1F3279025B71F68963F9722D876BA07D5BAF25.
+  S10's unified UTF-8 file-entry audit is planned, not implementation-admitted.
 
 - T98 S8 implementation and cached dual builds are verified. Final x64 and x86
   each pass all 192 registrations: 184 background, five desktop and three
@@ -37,7 +51,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   Emulator src/test public trees change; App integration and one narrow mirror
   host-stride repair (+12/-8) complete the path. Executor f2677d01 is pushed;
   coordinator actual-change review is complete with no delivery blocker.
-  S8 is verified awaiting owner acceptance; S9 admission has not occurred.
+  Owner authorizes advancement to S9; [S8 closure](../history/M9-T98-S8-dynamic-frame-storage.md)
+  records this transition without claiming an additional owner-run test.
   softpc32 SHA-256 E9E574CE63573AB1C8346470528BA70908552D663FC174654813A6B9A3E42BAD;
   softpc64 SHA-256 5012E3AD96F289752AF6681C64A4B4C048F23F25DAF613F68024A4BAC35A88C2.
   User INI/media and pre-existing untracked snapshot.debug are preserved.
@@ -48,7 +63,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   x86 final 192/192 passes; x64 final 190/192 plus two unchanged isolated passes
   provides passing coverage for all 192 registrations. Intermittent failures
   remain disclosed and deferred, not repaired by this sizing change.
-  S9 and S10 remain planned, not admitted.
+  S9 is now admitted; S10 remains planned.
   softpc32 SHA-256 BEAE1647F8F177123045F99AACE6A6195212A5F89F611C47F57EA18C9A346C5B;
   softpc64 SHA-256 9314E59A4B8143F230E0A2D1833C388BD8A214F72DF0513114149B97DCED9CEB.
 

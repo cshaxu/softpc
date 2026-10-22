@@ -22,8 +22,6 @@ extern void softpc_ccpu_install_video_vector(void);
 extern void reset(void);
 extern void (*ica_clear_int_func)(unsigned long adapter, unsigned long line);
 extern int soft_reset;
-extern unsigned long softpc_ccpu_instruction_budget;
-extern int softpc_ccpu_instruction_budget_active;
 extern void mouse_send(int delta_x, int delta_y, int left, int right);
 extern void time_strobe(void);
 extern void host_timer_shutdown(void);
@@ -335,23 +333,13 @@ softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
 softpc_machine_result softpc_machine_run(softpc_machine *machine,
     lib_u64 instruction_budget)
 {
-    if (machine == NULL || !machine->reset || instruction_budget == 0u)
+    if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     if (!softpc_platform_executor_ready()) return SOFTPC_MACHINE_IO_ERROR;
-    /* CCPU's restored inter-instruction counter is 32-bit.  UINT64_MAX is
-       the public API's continuous-execution sentinel: do not truncate it to
-       0xffffffff and accidentally turn a VM run into a roughly-20-second
-       slice.  Finite callers (smokes and the public slicing API) retain the
-       original generated safe-point budget. */
-    if (instruction_budget == UINT64_MAX) {
-        softpc_ccpu_instruction_budget = 0u;
-        softpc_ccpu_instruction_budget_active = 0;
-    } else {
-        softpc_ccpu_instruction_budget = (unsigned long)instruction_budget;
-        /* The original timer subsystem starts the standalone host timer during
-           reset.  Do not manufacture a second timer tick at every KVM slice. */
-        softpc_ccpu_instruction_budget_active = 1;
-    }
+    /* Zero selects continuous execution; a finite budget reaching zero must
+       remain distinct from that entry choice. Both widths keep all 64 bits. */
+    softpc_ccpu_instruction_budget = instruction_budget;
+    softpc_ccpu_instruction_budget_active = instruction_budget != 0u;
     c_cpu_simulate();
     softpc_ccpu_instruction_budget_active = 0;
     softpc_ccpu_lifecycle_clear_exit();

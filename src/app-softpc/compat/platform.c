@@ -47,7 +47,7 @@
  * notification.  There is no product-session or service-dispatch layer here.
  */
 
-IU32 softpc_ccpu_instruction_budget = 0;
+lib_u64 softpc_ccpu_instruction_budget = 0;
 IBOOL softpc_ccpu_instruction_budget_active = FALSE;
 static IBOOL softpc_sound_reset_failed;
 
@@ -152,7 +152,7 @@ IBOOL softpc_platform_consume_executor_wake(void)
 
 /* A bounded public machine run is measured only at the generated CCPU
  * inter-instruction safe point.  The continuous VM executor supplies the
- * maximum native budget and is stopped through its separate lifecycle port. */
+ * zero budget and is stopped through its separate lifecycle port. */
 IBOOL softpc_platform_consume_instruction_budget(void)
 {
     if (!softpc_ccpu_instruction_budget_active ||

@@ -199,7 +199,7 @@ static lib_bool vm_driver_run(void *opaque)
         driver->restore_pending = LIB_FALSE;
         if (result) vm_driver_executor_event(driver);
     } else
-        result = softpc_machine_run(driver->machine, UINT64_MAX) == SOFTPC_MACHINE_OK;
+        result = softpc_machine_run(driver->machine, 0u) == SOFTPC_MACHINE_OK;
     /* finish retains READY only when clock restart fails. Do not resume CCPU
        after that terminal capture failure. */
     result = result && driver->capture.phase != SOFTPC_SNAPSHOT_READY &&

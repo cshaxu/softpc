@@ -58,9 +58,10 @@ status; rediscovering them does not establish a new regression.
 - S6: owner-inserted text underline and split cursor; audit/design first.
 - S7: Window sizing policy; owner revises the still-design-only packet.
 - S8: dynamic frame storage and producer integration, moved after S7.
-- S9 (formerly planned S8): finite instruction budget rejection, no counter
-  widening.
-- S10 (formerly planned S9): Compat-private UTF-8 append opening, retaining FILE I/O.
+- S9 (formerly planned S8): owner revises to a fully 64-bit instruction budget;
+  zero means continuous, every nonzero value finite.
+- S10 (formerly planned S9): owner revises to a full file-entry UTF-8 contract
+  audit and minimal Lib-owned path conversion, preserving each I/O contract.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 
@@ -74,9 +75,104 @@ and preliminary audit, no implementation P. Owner revises that active packet
 to sizing and carries its storage audit forward to S8; no completed S is reused.
 
 1. S7: Window sizing policy (owner accepted and closed).
-2. S8: dynamic frame storage (current admission).
-3. S9: finite instruction-budget bounds (not yet admitted).
-4. S10: private COM/LPT UTF-8 append opening (not yet admitted).
+2. S8: dynamic frame storage (verified and pushed).
+3. S9: 64-bit instruction budget (current admission).
+4. S10: uniform UTF-8 file paths (design approved, implementation not admitted).
+
+### S9 - 64-bit execution budget
+
+Owner explicitly admits S9 after revising the F3 remedy: retain the lib_u64
+value parameter, make the private counter equally wide, use zero for continuous
+execution and all nonzero values including UINT64_MAX as finite. Existing
+budget-active state distinguishes finite exhaustion from unlimited entry.
+No nullable pointer, legacy sentinel, widened guest counter or alternate path.
+Baseline 34e53055; S8's verified evidence remains above its own acceptance boundary.
+
+Finite ledger: (1) Machine entry and every run caller, (2) Compat storage and
+decrement/idle consumers, (3) unchanged original CCPU safe-point call, (4) snapshot
+and debug lifetime interaction, (5) owner-local boundary and full dual regression.
+Each requires source disposition and matching tests before verified delivery.
+Scan all instruction_budget/softpc_machine_run references, not just the cast.
+Estimate production +10..18/-18..25, tests +45..75/-4; public and mirror zero.
+Test real entry with high values using existing bounded lifecycle observation;
+test the real consume helper across 2^32 and finite zero without billions of
+iterations. No test-only production API. Verify unchanged continuous stop and
+small finite completion, dual cached builds and all registered test partitions.
+
+S9 implementation and source review: one lib_u64 definition in Compat, one
+shared private declaration in platform.h (removing Machine's mismatched extern),
+and the existing active flag. Machine assigns the entire value and derives
+active from nonzero; Driver and four existing continuous test calls now use zero.
+The original CCPU calls the same boolean consume helper and requires no source
+change. Full-tree symbol/run-call scan finds no other production counter or
+sentinel caller; snapshot archives contain no host execution-budget state.
+All remaining small finite callers retain their values. Public eight trees,
+mirror and root build/test registration are unchanged.
+
+Actual C/H accounting: production five files +14/-20 (net -6), tests two files
++62/-4 (net +58). No new state, public API, polling or execution branch. Finite
+counting retains the original NEXT_INST safe-point convention, including entry
+before the first fetch; this task does not redefine retired-instruction counts.
+
+Focused x64/x86 each pass checkpoint_smoke and platform_failure_smoke. Actual
+CCPU entry observations verify 0, UINT32_MAX, 2^32, 2^32+1 and UINT64_MAX preserve
+mode/high bits and remain stoppable through the existing lifecycle observer.
+The real Compat consumer verifies low-word borrow, maximal finite decrement,
+2->1->0 completion and no wrap on a subsequent call. Small finite real runs
+return normally; existing continuous nested checkpoint/HLT tests use zero.
+No billions-of-instructions runtime claim is made. x86 object disassembly
+shows two-word add/adc for finite decrement and an early inactive return before
+those loads/operations. No performance speedup or zero-overhead claim is made.
+
+First build stopped on a C99 loop declaration added to the existing C90 Compat
+fixture; moving its declaration to block scope fixes it without changing build
+settings. Both cached builds and focused runs then pass. Recompiled original
+headers emit existing endif-label and macro-redefinition warnings; these are
+not suppressed or claimed repaired. Full regression is in progress; disconnected
+RDP is recorded before native tests, and the owner has been asked to reconnect.
+Remote linked governance skills were unavailable due to DNS resolution; local
+authority documents were read, not replaced by an assumed remote skill result.
+
+S9 executor qualification, 2026-10-21: both cached full builds succeed and
+publish the EXEs. Focused owner tests pass 2/2 per width. Full background runs
+pass 184/184 (x64 114.92s, x86 107.19s), including public units/manifests,
+repository gates and real guest restart integration. Native audio passes 3/3
+per width (41.54s/41.44s). Native desktop first runs pass 4/5 each: compact
+package fails at stage 1/error 6 before Console attachment, while ordinary
+package and three Lib desktop tests pass. RDP was Active. After completing
+all initial native runs, the unchanged compact tests pass individually in
+12.08s/12.59s, with separate logs/XML and no fixture/product modifications.
+This provides passing coverage, not a first-pass all-green result or an
+explanation/repair of the pre-existing initialization debt retained in TODO.
+
+Independent XML/CTest comparison finds exactly 192 unique passing registered
+names per architecture, zero skips and one retained failed attempt each.
+S9's finite ledger is complete: all production declarations/callers and state
+boundaries are reviewed, targeted real-entry/decrement and lifecycle tests
+pass, and complete registered regression has passing execution evidence.
+No real customer crash is attributed to the former narrowing bug. No complete
+UINT64_MAX-duration run or new performance benchmark is claimed.
+
+Published softpc32 SHA-256:
+D10C1108705F623CBA05BE1C9EA130585C76FC30067854AC63F2346D1988F76B.
+Published softpc64 SHA-256:
+00FCAD94A0EB8D3CB8FB9A6E3C1F3279025B71F68963F9722D876BA07D5BAF25.
+Admission INI/snapshot hashes are unchanged; media is untouched. No shared
+manifest needs updating because all eight public trees remain byte-unchanged.
+Task scratch is removed after this evidence promotion; only caches persist.
+Executor commit/push precedes actual-change coordinator review and owner
+acceptance. S10 is not automatically admitted.
+
+### S10 - Uniform UTF-8 file paths
+
+Owner supersedes the private-opener candidate: audit config, snapshot, media,
+DEBUG input/output, COM/LPT and all other file entries. UTF-8 is the path
+contract, not a transformation of binary file contents. Keep already conforming
+paths; native path conversion belongs to existing Lib capability, not duplicated
+App helpers. Preserve append, lazy open, partial-write accounting and flush
+semantics. Determine the minimal existing API extension only after caller audit;
+do not force a new framework or change every I/O operation to solve path encoding.
+Implementation and revised measured file/diff scope await separate S10 admission.
 
 ### S7 - Window sizing policy
 
@@ -203,7 +299,7 @@ acceptance or T98 closure. S8 remains unstarted.
 
 Owner admitted after accepting S6 on 2026-10-21, then moved implementation
 after S7. S7 is now accepted; S8 implementation baseline is 7bab2e62.
-S9 finite-budget and S10 UTF-8 append work remain unstarted. This retained
+S9 budget implementation is admitted separately; S10 remains unstarted. This retained
 audit/design is for resumption, not evidence of implementation.
 
 Initial source audit confirms four independent fixed-capacity assumptions:
@@ -708,7 +804,8 @@ never stops through its instruction budget. UINT64_MAX is separately handled
 as continuous execution; normal App execution uses that sentinel and is not
 shown broken by this finding. Existing tests exercise small finite budgets.
 
-Minimal remedy: reject finite budgets beyond the existing 32-bit counter before
+Original S1 remedy (superseded by the owner-approved S9 64-bit contract):
+reject finite budgets beyond the existing 32-bit counter before
 entering execution; document the limit and preserve the continuous sentinel.
 No 64-bit per-instruction counter or new scheduling path is needed. Estimate:
 machine.c/machine.h +3-6/-0; existing machine test +10-20/-0. Source proof only;
@@ -729,7 +826,8 @@ owner-requested follow-up below: flush is not its only missing contract.
 LPT also needs the exact partial-write count. Adding just writer_flush would
 not preserve its already-tested unwritten-tail behavior.
 
-Recommended narrow candidate: retain the existing FILE write/flush/close
+Original narrow candidate (superseded by the owner-approved S10 audit):
+retain the existing FILE write/flush/close
 paths and change only UTF-8 path opening through one Compat-private append
 helper shared by COM/LPT. The existing Windows-only host can convert the
 bounded 1024-byte path to UTF-16 and use _wfopen in binary append mode.
