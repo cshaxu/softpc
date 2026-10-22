@@ -85,6 +85,7 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 7. S13: Direction-aware manual resizing and native snap fitting (closed after owner manual verification and integration qualification).
 8. S14: [KVM lifetime failure cleanup](../history/M9-T98-S14-kvm-lifetime-failure.md),
    closed after owner-authorized self-verification, delivery and actual-diff review.
+9. S15: [Pause/input handoff](m9-pause-input-handoff.md), owner-admitted.
 
 ### S13 - Manual edges and native snap regions
 

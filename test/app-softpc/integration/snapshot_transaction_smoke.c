@@ -431,9 +431,9 @@ static int snapshot_run_load(const char *startup_media_path, const char *snapsho
         event.data.key.key = BASE_KEY_ENTER;
         event.data.key.scan_code = 0x1c;
         event.data.key.pressed = 1;
-        assert(emulator_machine_enqueue_input(machine, &event));
+        assert(emulator_machine_enqueue_input(machine, &event) == LIB_STATUS_OK);
         event.data.key.pressed = 0;
-        assert(emulator_machine_enqueue_input(machine, &event));
+        assert(emulator_machine_enqueue_input(machine, &event) == LIB_STATUS_OK);
         /* The restored CPU must redraw every pixel through its actual video
            write rules, not merely retain the first reconstructed frame. */
         assert(snapshot_wait_for_pixels(machine, 0x54fc54u)); /* BIOS DAC 15h/3Fh/15h. */

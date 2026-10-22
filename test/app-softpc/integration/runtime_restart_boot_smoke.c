@@ -180,9 +180,9 @@ static int enter_windows(emulator_machine *runtime)
         event.data.key.key = keys[index];
         event.data.key.scan_code = scans[index];
         event.data.key.pressed = 1u;
-        if (!emulator_machine_enqueue_input(runtime, &event)) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
+        if (emulator_machine_enqueue_input(runtime, &event) != LIB_STATUS_OK) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
         event.data.key.pressed = 0u;
-        if (!emulator_machine_enqueue_input(runtime, &event)) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
+        if (emulator_machine_enqueue_input(runtime, &event) != LIB_STATUS_OK) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
     }
     /* Observe through startup, not merely its first splash frame. The fixed
        installed image remains overlay-only and the normal executor owns time. */
@@ -208,7 +208,7 @@ static int send_key(emulator_machine *runtime, lib_u32 key, lib_u32 scan, int do
     event.data.key.key = key;
     event.data.key.scan_code = scan;
     event.data.key.pressed = down != 0;
-    return emulator_machine_enqueue_input(runtime, &event);
+    return emulator_machine_enqueue_input(runtime, &event) == LIB_STATUS_OK;
 }
 
 static int tap_key(emulator_machine *runtime, lib_u32 key, lib_u32 scan)

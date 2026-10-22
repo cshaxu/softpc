@@ -1,5 +1,15 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Audit key release across paused Session input. Existing
+  session/control.c forgets host held keys on release/source retirement while
+  PAUSED without delivering them to the driver. T98 S15 freezes Machine FIFO
+  but does not turn the host ledger into a guest-delivery ledger or resolve
+  device-held keys. Source ordering is confirmed; a complete user-visible stuck
+  key reproduction is not claimed. Owner: Session/driver input ownership.
+  Admission condition: reproduce make-before-pause and release-during-pause,
+  then define neutral reconciliation without product callbacks, treating
+  host-pending FIFO and already-delivered device input as different states.
+
 - TODO(Medium): Diagnose the intermittent command-provider event wait failure.
   T98 S7's second x64 aggregate run failed the 10000ms event assertion after
   debug resume/pause observations; the first aggregate and unchanged isolated
@@ -39,6 +49,9 @@
   T98 S13 x64 compact package repeats stage 1/error 6 while RDP is Active;
   its unchanged isolated repeat passes. x86 passes all desktop cases first run.
   S13 does not claim to repair this existing package-initialization debt.
+  T98 S15 x64 repeats compact stage 1/error 6 after reconnection while Active;
+  the unchanged isolated case passes. All other desktop/audio cases pass.
+  This supplemental qualification does not establish a repair or root cause.
 
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,

@@ -89,6 +89,14 @@ source files remain component-local. Importing products decide whether to inject
 an adapter or expose a command. Emulator never depends on an outer component.
 The machine debug contract is synchronous to the control-thread caller and
 serviced by the existing paused executor.
+Machine FIFO admission and push share one mutex. At a user pause/debug stop,
+the executor closes admission and freezes pending input, then publishes PAUSED.
+Genuine resume delivers pending input in order at the normal safe-point cadence.
+Pending host input is not part of driver snapshots; a cold run or successful
+state replacement clears the previous run's queue. Parked state-read continuation keeps guest
+input closed; genuine running/resume opens it. Enqueue returns OK for acceptance,
+INVALID_STATE for normal closed admission and LIMIT_EXCEEDED for overflow.
+Neither rejected events nor accepted prefixes are replayed by Session.
 Machine copies opaque pointer-free request/response bytes with explicit lengths,
 bounded by 128/1536 bytes in its single request slot. It does not interpret CPU
 operations. Protocol vocabulary belongs to the requesting frontend and its

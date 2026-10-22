@@ -291,6 +291,14 @@ one completed public fact. VM `run_generation` is SoftPC-only. Component
 readiness is returned by each component's own creation/start contract; shared
 KVM carries no global configuration generation.
 
+Machine's input queue mutex orders admission against the executor's pause
+cutoff. Pause/debug stop freeze ordinary input delivery without draining or
+discarding pending events. Genuine resume preserves FIFO order at the normal
+one-event-per-safe-callback cadence. Internal paused state-read continuation
+does not reopen input. Driver snapshots contain machine/device state, not
+pending host FIFO events; cold start/reset and successful state replacement
+clear the previous run's queue. State refusal is distinct from queue overflow.
+
 SoftPC passes copied `{chord, identifier}` registrations to each KVM component.
 The components may generically recognize and suppress a registered chord, but
 only enqueue `KVM_HOTKEY(identifier)`; they never execute a x86 callback or

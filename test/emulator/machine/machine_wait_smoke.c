@@ -133,9 +133,13 @@ static base_sync_wait_result paused_wait(base_sync_event *const *events,
         }
         return idle_wait(events[0], timeout);
     }
-    lib_test_assert(count == 3u && events[0] == active->resume_event);
+    lib_test_assert(count == 2u && events[0] == active->resume_event);
+    lib_test_assert(emulator_machine_enqueue_input(active,
+        &(kvm_input_event) { .type = KVM_EVENT_KEY }) == LIB_STATUS_INVALID_STATE);
     lib_test_assert(timeout == LIB_UINT32_MAX);
     lib_test_assert(!heartbeat);
+    if (action == 6u || action == 8u)
+        lib_test_assert(emulator_machine_input_queue_pending(&active->input_queue));
     ++paused_waits;
     if (action == 6u) {
         lib_test_assert(paused_waits <= 2u);
@@ -220,12 +224,24 @@ static lib_bool run(void *context)
     (void)context;
     lib_test_assert(heartbeat && executor != LIB_NULL);
     if (frame_status != LIB_STATUS_OK) register_pending();
-    if (action != 7u) lib_test_assert(emulator_machine_pause(active));
+    if (action == 6u || action == 8u)
+        lib_test_assert(emulator_machine_enqueue_input(active,
+            &(kvm_input_event) { .type = KVM_EVENT_KEY }) == LIB_STATUS_OK);
+    if (action == 8u) {
+        /* The driver captured before this callback; servicing completion must
+         * freeze input before it can mutate the just-captured device state. */
+        lib_atomic_i32_store_explicit(&active->state_read_requested, 1, LIB_MEMORY_ORDER_SEQ_CST);
+        lib_atomic_i32_store_explicit(&active->state_read_armed, 1, LIB_MEMORY_ORDER_SEQ_CST);
+        lib_atomic_i32_store_explicit(&active->state_read_ready, 1, LIB_MEMORY_ORDER_SEQ_CST);
+        active->state_status = LIB_STATUS_OK;
+    } else if (action != 7u) lib_test_assert(emulator_machine_pause(active));
     executor(executor_context);
     if (action == 1u || action == 2u || action == 5u)
         lib_test_assert(!heartbeat); /* Stop from parking never re-enables it. */
     if (action == 6u) {
         lib_test_assert(heartbeat && active->state_read_continuing);
+        lib_test_assert(emulator_machine_enqueue_input(active,
+            &(kvm_input_event) { .type = KVM_EVENT_KEY }) == LIB_STATUS_INVALID_STATE);
         lib_test_assert(facts == 2u); /* Private continuation emits no RUNNING. */
         executor(executor_context);
         lib_test_assert(!heartbeat && facts == 2u); /* No duplicate PAUSED. */
@@ -239,7 +255,7 @@ static lib_bool run(void *context)
     return LIB_TRUE; /* Unwinding the driver itself succeeds, even after fault. */
 }
 static void input(void *context, const kvm_input_event *event)
-{ (void)context; (void)event; }
+{ (void)context; (void)event; lib_test_assert(!"paused/capture input must remain queued"); }
 static lib_status frame(void *context, kvm_window_frame_storage *value, kvm_console_text_frame *console, lib_bool *produced)
 { (void)context; (void)console; (void)value; *produced = LIB_FALSE; return frame_status; }
 static void state(void *context, emulator_machine_state value, lib_u32 generation)
@@ -410,7 +426,8 @@ static void check(base_sync_wait_result result, lib_u32 requested_action)
         lib_test_assert(!lib_atomic_i32_load_explicit(&active->debug_requested, LIB_MEMORY_ORDER_SEQ_CST));
         lib_test_assert(!lib_atomic_i32_load_explicit(&active->media_requested, LIB_MEMORY_ORDER_SEQ_CST));
     } else {
-        lib_test_assert(active->state_status == (action == 6u ? LIB_STATUS_OK : LIB_STATUS_UNSUPPORTED));
+        lib_test_assert(active->state_status == ((action == 6u || action == 8u)
+            ? LIB_STATUS_OK : LIB_STATUS_UNSUPPORTED));
         lib_test_assert(active->debug_status == LIB_STATUS_UNSUPPORTED && active->media_succeeded);
     }
     /* A dead worker rejects all registrations, even with an allowed state. */
@@ -725,6 +742,7 @@ int main(void)
     check(BASE_SYNC_WAIT_SIGNALED, 5u); /* Debug-close/shutdown loses command wake. */
     check(BASE_SYNC_WAIT_SIGNALED, 6u); /* Paused capture continues to a safe point. */
     check(BASE_SYNC_WAIT_SIGNALED, 7u); /* Driver debug stop, then resume. */
+    check(BASE_SYNC_WAIT_SIGNALED, 8u); /* Capture completion precedes input. */
     frame_status = LIB_STATUS_UNSUPPORTED;
     check(BASE_SYNC_WAIT_SIGNALED, 0u);
     frame_status = LIB_STATUS_INVALID_ARGUMENT;

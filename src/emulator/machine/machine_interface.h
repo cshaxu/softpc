@@ -128,7 +128,11 @@ lib_status emulator_machine_read_state(emulator_machine *machine,
 lib_status emulator_machine_write_state(emulator_machine *machine,
     const emulator_machine_state_reader *reader);
 emulator_machine_state emulator_machine_state_get(const emulator_machine *machine);
-lib_bool emulator_machine_enqueue_input(emulator_machine *machine,
+/* OK transfers ownership of the copied event: never resend. INVALID_STATE is
+ * normal closed admission; LIMIT_EXCEEDED is a real full-queue failure.
+ * PAUSED freezes pending input. Genuine resume delivers it in FIFO order;
+ * pending host input is not part of the driver's saved machine state. */
+lib_status emulator_machine_enqueue_input(emulator_machine *machine,
     const kvm_input_event *event);
 /* Borrow the sole Window exchange. Only the executor writes it; one Window
  * consumes it. Destroy the consumer before destroying Machine. */

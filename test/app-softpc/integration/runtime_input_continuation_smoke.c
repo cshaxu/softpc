@@ -43,7 +43,7 @@ static int runtime_input_enqueue_key(emulator_machine *runtime, lib_u16 scan,
     event.data.key.scan_code = scan;
     event.data.key.key = key;
     event.data.key.pressed = pressed;
-    return emulator_machine_enqueue_input(runtime, &event);
+    return emulator_machine_enqueue_input(runtime, &event) == LIB_STATUS_OK;
 }
 
 int main(void)
