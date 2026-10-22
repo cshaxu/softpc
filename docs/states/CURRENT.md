@@ -31,6 +31,10 @@ the same startup exit but not post-boot input loss. Loader instrumentation
 suppresses reproduction; the failing DLL/initializer is not identified.
 No production or permanent test change is justified yet. The report explicitly
 separates proved phase/cause, source limitations and remaining unknowns.
+Coordinator reviewed pushed research commit 240dd036: only task documents
+changed, no production/test/EXE/config/media edits or false root-cause claims.
+Documentation/whitespace checks pass; owned probes exited and scratch is retired.
+This is a research checkpoint, not S4 completion or permission to implement.
 The following S3/S2 records are historical evidence.
 T99 S1 research is now owner-closed; its report and actual-commit review are
 retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.
