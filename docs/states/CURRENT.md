@@ -8,17 +8,17 @@
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner authorizes the two definite cleanups in a new S; S1 research closes and S2 is admitted. S3 pause-input research and S4 intermittency investigation remain planned, not admitted. |
-| Objective | Merge identical Broker terminal cleanup branches and remove the redundant auto-reset event reset from the command-provider fixture. |
-| Non-goals | No pause semantics, new state/API/retry, package intermittency fix, downstream edits or guest changes. |
+| Objective | Preserve both delivered cleanups; owner now authorizes investigation and minimal repair of the five fresh full-regression failures, followed by complete dual-width qualification. |
+| Non-goals | No pause semantics, new recovery state/API/retry, downstream edits, guest/configuration changes, skipped native tests or fake device success. |
 | Reference Baseline | bf18a2f7; clean worktree at admission. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Lib console-broker implementation and owner-local test/manifest; App command-provider integration test; task records and rebuilt EXEs. No ABI change. |
+| Files And ABI Surface | Delivered Lib console-broker cleanup and App command-provider test; owner-authorized package/native failure investigation now includes App package fixture diagnostics. No ABI change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
 | Verification | Owner now requests a fresh complete x64/x86 run: all registered background, desktop and native-audio cases, exact registration/XML coverage and failures disclosed. Prior bounded evidence remains historical. |
 | Expected Markers | One fail-closed cleanup, unchanged first-error/lock/resource order; auto-reset wait consumes exactly one signal. |
 | Asset Needs | Refresh assets/binary dual EXEs only; preserve INI/media. No Computer Use. |
 | Reporting Requirements | Actual production/test counts and failure dispositions. Scratch build/t99-s2: 60-minute job, investigate after 10-minute no progress, 300MB; retire after delivery. |
-| Stop Conditions | Do not expand to pause/input semantics or diagnose/fix package intermittency in this S; no new recovery model. |
+| Stop Conditions | Do not expand to pause/input semantics or a new recovery model. Native device/session unavailability must be proved and reported, not masked. |
 | Exit Criteria | Both cleanups verified, actual-diff review, manifests/governance checks, dual published EXEs, committed/pushed delivery and clean workspace awaiting acceptance. |
 | Original Owner Request | Complete the first two definite cleanups now; separately schedule pause-key simplification and intermittent-failure research. |
 | Similar-Issue Sweep | All wait_for consumers and auto-reset event creation in command_provider_smoke; adjacent Broker failure blocks and existing reset/retirement/activation fault coverage. |
@@ -31,8 +31,22 @@ registrations per width: each passes 187, fails five, skips zero. Background
 184/184 and Lib desktop 3/3 pass; two package and three native-audio cases per
 width fail. Session changed from Active at launch to Disc when inspected.
 All test names match registration; no prior passes substitute for these failures.
-Connected-session supplementary verification is pending; full passing
-qualification is not claimed. No source or EXE changed during this rerun.
+Owner now requests repair and full passing verification. The package fixture
+now stops waiting when its child exits and captures exit status and final
+Console content. Both widths build without warnings; the disconnected failure
+now reports exit 1 / cannot compose machine in under one second, rather than
+a misleading 30-second missing-prompt timeout. A direct native probe independently
+reports no default PCM endpoint (0x80070490) and WinMM MIDI open error 1.
+No production audio behavior is changed. After another interrupted full run,
+the owner's final connected retry passes all eight native cases per width:
+three audio and five desktop/package. Combined with the latest background
+184/184 per width, exact registration/XML equality proves passing coverage
+for all 192 per width, zero failures/skips in the final evidence set.
+This is supplemented qualification, not an all-green initial aggregate or a
+repair claim for historical loader/input intermittency. The follow-up changes
+only the App package fixture (+11/-3) and task records. No production source,
+EXE, public manifest, INI or media changes. S2 awaits acceptance after delivery
+and actual-commit review; S3/S4 remain unadmitted.
 The following records the earlier bounded delivery, not this fresh run:
 S2 implementation and cached dual builds are complete, no compiler warnings.
 Background regression passes 184/184 per width; focused final evidence is 4/4

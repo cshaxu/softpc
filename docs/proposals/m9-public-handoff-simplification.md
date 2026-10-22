@@ -514,3 +514,73 @@ Moving them does not establish a fix or a public-component root cause.
   child-startup/Console lifetime investigation with loader evidence, without
   retrying product startup or changing guest/device behavior to hide it.
   Evidence: [T93 S5 checkpoint](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s5--original-dma-prerequisite-repair).
+
+### S2 owner-authorized failure investigation, after fresh full regression
+
+The owner requests repair and full passing verification. This expands S2 to
+investigate the five failing native registrations; it does not admit pause
+semantics work or claim the historical intermittent failures repaired.
+
+An independent system-API probe, in the disconnected owner session, reports
+`midiOutOpen(MIDI_MAPPER)=1` (Undefined external error), with one enumerated
+device, and `GetDefaultAudioEndpoint=0x80070490` after successful COM setup.
+Enumeration is not usable-device proof. No Lib status is changed to conceal
+these failures and no native integration is skipped.
+
+The package fixture had a real diagnostic defect: after its child exited it
+continued waiting for a prompt, reporting stage 3/error 0 with no screen.
+The existing attach/prompt waits now also observe process exit; failure captures
+the final buffer before detachment and reports the child exit code. This adds
+no retry and leaves successful-path assertions and budgets intact. Both widths
+compile without warnings. In the same disconnected environment all four package
+executions now terminate in approximately 0.7-0.8 seconds, reporting child exit
+1 and `softpcvm: cannot compose machine`, instead of waiting 30 seconds.
+This proves accurate failure classification, not successful product startup.
+Source inspection places native PCM acquisition in driver creation before
+monitor composition, consistent with the absent endpoint; it does not identify
+the separate historical 0xC0000142 loader failure.
+
+Follow-up test C diff is +11/-3 (net +8), no production or EXE change.
+At this checkpoint real-host verification was blocked on an active session;
+it was not delivered as a completed P. Subsequent evidence is recorded below.
+
+On the owner's subsequent reconnection, direct native acquisition succeeds:
+MIDI open returns 0 and default PCM endpoint lookup returns S_OK. The new
+complete run uses the existing cached dual builds (both report no work).
+Both widths again execute exactly 192/192 registered names with no skips:
+184/184 background, 3/5 desktop and 0/3 native audio. Background durations
+are 117.49 seconds x64 and 112.26 seconds x86. The session is recorded Active
+at launch but is Disc when the x64 native failures are inspected and remains
+Disc at completion. Both package tests per width report exit 1 and cannot
+compose machine. This is not full passing qualification; reconnection with
+the session held active is required for the eight native cases per width.
+Their next invocation is ordered before any further background suite.
+
+### S2 P4 connected verification and review
+
+The owner reconnects and requests retry. Both native groups pass serially on
+both widths, unchanged code and budgets: x64 audio 3/3 in 41.21 seconds and
+desktop/package 5/5 in 31.20 seconds; x86 audio 3/3 in 41.25 seconds and
+desktop/package 5/5 in 31.36 seconds. No skip or individual-test retry occurs
+inside this connected invocation. The preceding disconnected failures remain
+above; this is supplemented qualification, not a repaired loader-race claim.
+
+The frozen universe is the 192 CTest registrations per width. Final evidence
+combines the latest full-run background XML (184 cases) with connected desktop
+(five) and audio (three). Exact sorted name equality with registration proves
+192 unique cases per width, zero missing/extra names, failures or skipped cases.
+Both cached full builds report no work; the changed fixture's preceding dual
+builds compiled and linked without warnings. Published EXE hashes remain:
+
+- x86: F657EC43BADB3BE205C837A0605376F2F0E29EC0F863298712AE9D0C786A63E4
+- x64: B5E940DC7F101AF8D484C2E6FE272114C8A39AA58EBE13355944FD722BC5E362
+
+Actual-change self-review: only the fixture's existing attach and monitor wait
+paths observe child exit, and failure captures output before detachment. There
+is no new retry, thread, API or production path. Successful prompt assertions
+are unchanged. Similar-issue sweep covers all waits in this fixture: subsequent
+guest/debug operation waits retain bounded budgets and now share final child
+exit/screen diagnostics; they are not startup waits and are not broadened here.
+The historical 0xC0000142 failure remains unproved and belongs to planned S4.
+No shared tree/manifest, guest, configuration or media changes in this P.
+Task scratch is retired only after owned jobs exit and evidence promotion.

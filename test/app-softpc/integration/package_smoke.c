@@ -284,7 +284,7 @@ static int package_wait_for_dos_prompt(HANDLE output, DWORD timeout_ms)
 
 /* Text can remain in scrollback after raw-to-cooked selection. Verify the
  * active line's native cursor instead of accepting an old monitor prompt. */
-static int package_wait_monitor_prompt(HANDLE output, DWORD timeout_ms)
+static int package_wait_monitor_prompt(HANDLE output, HANDLE process, DWORD timeout_ms)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + timeout_ms;
     do {
@@ -293,6 +293,7 @@ static int package_wait_monitor_prompt(HANDLE output, DWORD timeout_ms)
         char prompt[2];
         DWORD read;
 
+        if (WaitForSingleObject(process, 0u) == WAIT_OBJECT_0) return 0;
         if (GetConsoleScreenBufferInfo(output, &info) &&
             info.dwCursorPosition.X == 2) {
             position = info.dwCursorPosition;
@@ -455,6 +456,8 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     deadline = softpc_test_clock_milliseconds() + 5000u;
     do {
         if (AttachConsole(process->dwProcessId)) break;
+        if (WaitForSingleObject(process->hProcess, 0u) == WAIT_OBJECT_0)
+            break;
         softpc_test_sleep_milliseconds(20u);
     } while (softpc_test_clock_milliseconds() < deadline);
     if (GetConsoleCP() == 0u) { stage = 1; goto done; }
@@ -495,7 +498,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
      * run took over ten seconds before this same child became ready. Give
      * startup its own fixture budget, retaining the exact prompt assertion
      * and the shorter budgets for subsequent machine/UI operations. */
-    if (!package_wait_monitor_prompt(output, 30000u)) { stage = 3; goto done; }
+    if (!package_wait_monitor_prompt(output, process->hProcess, 30000u)) { stage = 3; goto done; }
     /* Exercise the shipping CLI provider, not only the debug library link.
        Entering before start must leave the machine stopped and permit help. */
     if (!package_compact_console && (!package_send_text(input, "debug\r") ||
@@ -524,7 +527,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
     /* The product attaches the monitor Console only after PAUSED completion;
        the visible proof is its rearmed cooked prompt, not text written while
        the former VM Console was still Current. */
-    if (!package_wait_monitor_prompt(output, 5000u)) {
+    if (!package_wait_monitor_prompt(output, process->hProcess, 5000u)) {
         stage = 7; goto done;
     }
     /* Debugger column-layout assertions belong to the normal-size route. */
@@ -551,6 +554,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
 done:
     if (!success && out_stage != NULL) *out_stage = stage;
     if (!success && out_error != NULL) *out_error = GetLastError();
+    if (!success) (void)package_buffer_contains(output, "");
     if (input != INVALID_HANDLE_VALUE) CloseHandle(input);
     if (output != INVALID_HANDLE_VALUE) CloseHandle(output);
     (void)FreeConsole();
@@ -583,8 +587,12 @@ int main(int argc, char **argv)
         return 1;
     }
     if (!verify_package_monitor_restart(&process, &stage, &error)) {
+        DWORD child_exit = STILL_ACTIVE;
+        (void)GetExitCodeProcess(process.hProcess, &child_exit);
         fprintf(stderr, "softpc-package-smoke: configured monitor pause-stop-start route failed (stage=%d error=%lu)\n",
             stage, (unsigned long)error);
+        fprintf(stderr, "softpc-package-smoke: child exit=0x%08lx (0x00000103 means still running)\n",
+            (unsigned long)child_exit);
         package_report_last_screen();
         TerminateProcess(process.hProcess, 1u);
         (void)WaitForSingleObject(process.hProcess, 5000u);
