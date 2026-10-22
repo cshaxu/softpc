@@ -89,9 +89,10 @@ extern void vga_ac_outb(io_addr port, half_word value);
 
 extern EVID_WRT_POINTERS c_ev_write_ptr;
 extern EVID_WRT_POINTERS chain2_evid[];
-extern IUH r1, r2, r3;
+/* C-VID exports native-width rule words; this CPU fixture's IUH is guest-width. */
+extern IHPE r1, r2, r3;
 extern IHP Gdp;
-extern void setMarkPointers(IUH markset);
+extern void setMarkPointers(IHPE markset);
 static IU32 writer_offset, writer_value;
 
 static void verify_pointer_update_pixels(void)
@@ -1314,7 +1315,7 @@ static void verify_chain2_dirty_entries(void)
         setVideodirty_total(0);
         setVideodirty_low(INT_MAX);
         setVideodirty_high(-1);
-        r1 = (IUH)Gdp; r2 = offset; r3 = 0xa5;
+        r1 = (IHPE)Gdp; r2 = offset; r3 = 0xa5;
         c_ev_write_ptr.b_write(offset, 0xa5);
         assert(getVideodirty_total() != 0);
         if (marking == 2) {
@@ -1336,8 +1337,8 @@ static void verify_chain2_dirty_entries(void)
         unsigned offset = offsets[entry];
         lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
         setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
-        r1 = (IUH)Gdp; r2 = offset; r3 = 0xa5;
-        ((IUH (*)())getVideomark_word())(0, 0, 0, 0);
+        r1 = (IHPE)Gdp; r2 = offset; r3 = 0xa5;
+        ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_word())(0, 0, 0, 0);
         assert(video_copy[offset >> 3] != 0);
         assert(video_copy[(offset + 1) >> 3] != 0);
         assert(getVideodirty_low() == (offset >> 3));
@@ -1349,14 +1350,14 @@ static void verify_chain2_dirty_entries(void)
         setVideov7_bank_vid_copy_off(bank);
         lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
         setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
-        r1 = (IUH)Gdp; r2 = 0x100; r3 = 16;
-        ((IUH (*)())getVideomark_string())(0, 0, 0, 0);
+        r1 = (IHPE)Gdp; r2 = 0x100; r3 = 16;
+        ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
         assert(video_copy[bank + 0x20] != 0 && video_copy[bank + 0x21] != 0);
         assert(getVideodirty_low() == bank + 0x20);
         assert(getVideodirty_high() >= bank + 0x21);
         assert(r2 == 0x100 && r3 == 16);
         setVideodirty_total(0); r2 = 0x100; r3 = 0;
-        ((IUH (*)())getVideomark_string())(0, 0, 0, 0);
+        ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
         assert(getVideodirty_total() == 0);
     }
     setVideov7_bank_vid_copy_off(0);

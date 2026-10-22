@@ -444,6 +444,8 @@ add_executable(softpc-vga-frame-smoke
     test/app-softpc/unit/machine/vga_frame_smoke.c
     test/app-softpc/unit/machine/chain2_rule_smoke.c)
 target_link_libraries(softpc-vga-frame-smoke PRIVATE softpc-vm)
+target_compile_options(softpc-vga-frame-smoke PRIVATE
+    -Werror=pointer-to-int-cast -Werror=int-to-pointer-cast)
 target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/app-softpc/compat
     src/app-softpc/softpc.new/host/inc

@@ -8,11 +8,11 @@
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner closes accepted S9 and explicitly admits S10: implement, build, publish, test, commit and push, then wait for acceptance. |
-| Objective | Uniform UTF-8 file paths through Lib Storage, including COM/LPT, configuration, media, snapshot and DEBUG. |
+| Objective | Uniform UTF-8 file paths through Lib Storage; owner additionally admits same-class non-mirror pointer-width warning/ABI cleanup in S10. |
 | Non-goals | No mirror, guest, scheduler, snapshot format, media or user configuration changes; no alternate path converter. |
 | Reference Baseline | `d987f10f`; S9 executor dbff43df and actual-change review are accepted. Preserve user INI/media and untracked snapshot.debug. |
 | Candidate Proposal | [T98 UTF-8 paths](../proposals/m9-nonpublic-quality-performance-audit.md#s10---uniform-utf-8-file-paths). |
-| Files And ABI Surface | Lib Storage writer partial progress/flush; Compat COM/LPT consumers; affected owner-local tests, manifests and documentation. |
+| Files And ABI Surface | Lib Storage writer partial progress/flush; Compat COM/LPT consumers; affected tests. Follow-up audits all non-mirror compilation units and corrects VGA fixture C-VID declarations without changing the actual ABI. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
 | Verification | UTF-8 native-name and binary output, append/lazy-open/flush visibility, partial-write and flush-failure accounting; cached dual builds and full background/desktop/native-audio regression. |
 | Expected Markers | One existing Storage platform opener; no locale fopen at owned product file exits; retained partial-progress semantics. |
@@ -30,7 +30,16 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 - Owner closes S9 and admits S10; [S9 closure](../history/M9-T98-S9-execution-budget.md).
   S10 audit finds COM/LPT still using locale fopen; other owned file entries
   already use Storage. Executor 0151689d is pushed; actual-diff coordinator
-  review is complete. S10 awaits owner acceptance; T98 stays open. Production +55/-23
+  review is complete. Owner-admitted warning/ABI follow-up is implemented and
+  verified, pending its delivery review and owner acceptance. T98 stays open.
+  Follow-up changes no production code: test +9/-8 and build +2/-0. All 242
+  non-mirror C objects per architecture were rebuilt with cache; no non-mirror
+  warnings remain. Mirror header warnings are retained by owner instruction.
+  Both architectures pass all 192 registrations without test retries this run.
+  Current softpc32 SHA-256:
+  78FE670609EDAB63B5B6532920C54544D217941C02004CF7F4EABFEDD828F888;
+  softpc64: 0A52927A7B91AEE1295928C62E505100BBC97A55A13D55FE40F1C97A1F0F314A.
+  Original delivery production +55/-23
   (net +32), tests +136/-29 (net +107); mirror unchanged. Cached dual builds,
   focused 12/12 each and all 192 registrations per architecture have passing
   evidence. x86 compact package first failed stage 1/error 6; the unchanged

@@ -306,6 +306,63 @@ or its documentation-only review successor. Wait for owner acceptance without
 closing S10 or admitting another S. Scratch retires after this review push;
 the tracked evidence above is the durable receipt.
 
+S10 owner-admitted warning follow-up (baseline 97e492b5):
+
+- Scope: inspect all non-mirror source/test compilation units on both Windows
+  widths, with all eight public trees included. Original mirror diagnostics
+  are explicitly exempt; no warning suppression or mirror change is allowed.
+- Root cause: vga_frame_smoke declared native C-VID r1/r2/r3 with its CPU-side
+  32-bit IUH. j_c_lang.c and ev_glue.c compile with CVIDC_RULE_WORD on x64;
+  their actual registers and selected-marker calls are pointer-width. Correct
+  this fixture's declarations, GDP casts and marker-call signatures to IHPE.
+  Do not change the CPU fixture's entire IUH model. Expected test +9/-8, plus
+  two build lines making pointer/integer-size cast warnings errors locally.
+- Similar-issue sweep: all non-mirror IUH/IHPE casts, rule-register externs,
+  j_c_lang includes and pointer-width candidates. chain2_rule_smoke already
+  defines CVIDC_RULE_WORD before insignia.h and uses the original j_c_lang
+  declarations; its pointer casts are correct. Compat platform.c's IUH cast
+  converts elapsed microseconds, not a pointer. Other IU32 hits are numeric
+  disk/IRQ/guest-address calculations, not host-pointer transport.
+- Verification invalidates only generated non-mirror object files beneath
+  the existing Ninja trees, retaining mirror objects and ccache. Rebuild and
+  background regression run hidden with the existing packet budgets. Each
+  compiler diagnostic is classified by its originating source path; included
+  mirror-header warnings are not relabelled as owned source warnings.
+
+Follow-up executor receipt:
+
+- Actual diff against 97e492b5: production +0/-0, test +9/-8 (net +1),
+  root build +2/-0; no shared-tree or mirror changes. The two compiler checks
+  reject pointer/integer-width cast regressions on the existing VGA target.
+  Correct native declarations also avoid partial register writes on x64; no
+  new adapter, alternate marker, state or rendering path is introduced.
+- Rebuilt all 242 non-mirror C objects on each architecture using retained
+  ccache, including the 144 public source/test objects. Public objects retain
+  strict C11 Wall/Wextra/Wpedantic/Werror flags. Non-mirror compiler warning
+  count is zero; remaining diagnostics originate only in original host_cpu.h
+  and cpu4gen.h, explicitly excluded from repair. No warning was suppressed.
+- x64/x86 each pass 184 background, five desktop and three native-audio
+  registrations (192/192), no skipped/failed cases or test retries. XML names
+  exactly match registered names. VGA covers selected markers, dirty banks and
+  the native-width CHAIN2 continuation fixture on both widths. This is Windows
+  runtime proof, not a Linux-host build claim.
+- Two early x64 links failed because the package EXE was running; the owner
+  authorized closing exact project processes. Both failures are retained in
+  the temporary evidence until promotion; incremental resumes reused completed
+  objects. No test failure or product workaround was involved.
+- Both package EXEs were relinked from the verified objects. softpc32 SHA-256
+  78FE670609EDAB63B5B6532920C54544D217941C02004CF7F4EABFEDD828F888;
+  softpc64 SHA-256
+  0A52927A7B91AEE1295928C62E505100BBC97A55A13D55FE40F1C97A1F0F314A.
+  This test-only follow-up changes no product semantics; rebuilt package
+  identity is not evidence of a new production fix. INI/media/snapshot.debug
+  remain unchanged. The resolved VGA warning TODO is removed.
+- Actual-diff self-review confirms the C-VID definitions in j_c_lang.c,
+  ev_glue.c and the generated marker entrypoints use native words, while the
+  CPU fixture still needs its original guest-width IUH elsewhere. No global
+  typedef switch is applied. Scratch retires after P delivery/review; S10
+  remains awaiting owner acceptance.
+
 ### S7 - Window sizing policy
 
 Preserve initial work-area fitting and maximize-to-work-area. Allow manual

@@ -1,13 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(Low): Audit three pointer-to-IUH casts in the VGA frame test's selected
-  marker fixture (vga_frame_smoke.c). T98 S10's x64 rebuild reports
-  pointer-to-integer-width warnings at the pre-existing r1 = (IUH)Gdp sites;
-  the same statements exist in d987f10f. Owner: App machine VGA test/CCPU ABI
-  fixture. Admission condition: verify the correct GDP register representation
-  on both widths before changing the fixture; do not suppress the diagnostic
-  or alter mirror code as part of the unrelated UTF-8 path repair.
-
 - TODO(Medium): Diagnose the intermittent command-provider event wait failure.
   T98 S7's second x64 aggregate run failed the 10000ms event assertion after
   debug resume/pause observations; the first aggregate and unchanged isolated
