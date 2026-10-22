@@ -7,25 +7,36 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S6 and admits dynamic frame storage on 2026-10-21; audit and concise design precede integrated implementation. |
-| Objective | Remove fixed maximum text/graphics backing; allocate actual leaf payloads lazily within the existing four-slot ownership exchange and integrate all producers/consumers. |
-| Non-goals | No guest modification, new renderer, polling, recycler thread, timeout recovery, resource framework or writes to other repositories; retain decorations, font banks and latest-wins. |
-| Reference Baseline | `1b95cfd7`; [accepted S6](../history/M9-T98-S6-text-decoration.md). User-owned untracked snapshot.debug remains excluded. |
-| Candidate Proposal | [T98 dynamic storage](../proposals/m9-nonpublic-quality-performance-audit.md#s7---dynamic-frame-storage). |
-| Files And ABI Surface | Lib Base exchange/text schema, KVM leaves, logical Console/broker; Emulator Machine/UI producer contracts; SoftPC Driver/Compat and audited original host text-stride boundary; owner-local tests. |
+| Admission And Approval | Owner revises the design-only S7 packet to Window sizing first; dynamic storage audit/implementation moves to planned S8. No implementation P or completed S identity is reused. |
+| Objective | Preserve initial/maximized work-area fitting; permit manual resize and double-click natural-size restoration beyond screen bounds. |
+| Non-goals | No frame schema/allocation/exchange, guest mode, Console/App/mirror changes, polling or second sizing path. |
+| Reference Baseline | `6500790b`; [accepted S6](../history/M9-T98-S6-text-decoration.md). Preserve user INI edits and untracked snapshot.debug. |
+| Candidate Proposal | [T98 Window sizing](../proposals/m9-nonpublic-quality-performance-audit.md#s7---window-sizing-policy). |
+| Files And ABI Surface | Existing kvm-window geometry/Win32 sizing and message handling, owner-local tests, manifests and UI documentation; no planned frame ABI change. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Allocation/free byte records, lazy first use, same-spec reuse, all four roles, size/type changes during reads, failure without publication, dynamic dimensions/stride/overflow, decorations and actual producer path; cached dual builds, shared units/gates, App integration and serial desktop tests. |
-| Expected Markers | Four metadata slots, no eager four-payload allocation; leaf-owned formats, immutable borrowed frames, single transfer path, no maximum-graphics allocation for text, no stale pointer or silent truncation. |
+| Verification | Small-work-area geometry/message-path assertions: initial fit, maximize, oversized manual drag and natural-size double-click; cached dual builds, affected regressions/gates and serial desktop tests. |
+| Expected Markers | Work-area bounds limit default placement and maximize, not manual/natural sizing; aspect ratio and native numeric safety remain. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report interface/ownership migration, allocations/reuse/reclamation, callers, native limits and actual production/test/mirror diff. Executor owns disposable build/t98-s7; hidden jobs use log/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
-| Stop Conditions | Do not publish incomplete allocations, overwrite readers or invent hardware layouts. Explain any necessary mirror stride repair before changing it; do not rewrite device semantics. |
+| Reporting Requirements | Report audited sizing paths, estimate and actual production/test diff. Executor owns disposable build/t98-s7; hidden jobs use log/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Stop Conditions | Do not globally remove sizing guards or change guest frame dimensions for desktop geometry; no storage migration in this S. |
 | Exit Criteria | Verified single-path implementation, dual packages, proportional tests, actual-diff quality review and pushed delivery, then owner acceptance. |
-| Original Owner Request | Preserve leaf boundaries and four-slot flow, remove fixed maximum capacities, allocate by actual type/size/use, safely retire obsolete payloads, integrate production and prove nine stated allocation/lifetime scenarios. |
-| Similar-Issue Sweep | Fixed row strides, embedded maximum arrays, sizeof-as-payload, shallow copies, cached payload pointers, unchecked dimensions/allocations and destruction with readers. |
+| Original Owner Request | Split Window sizing and dynamic storage into separate S tasks; sizing first, storage second; order them in this T proposal, not the T candidate queue. |
+| Similar-Issue Sweep | Initial bounds, first-frame sizing, maximum tracking, maximize, manual sizing and title-bar double-click; classify every work-area clamp by its actual operation. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- T98 S7 implementation and dual packages are verified, awaiting pushed-change
+  review and owner acceptance. See the proposal's S7 verification record.
+  Production +16/-7 (net +9); tests +55/-3 (net +52). Only src/lib and test/lib
+  of the public eight trees change; App and mirror production are unchanged.
+  x86 final 192/192 passes; x64 final 190/192 plus two unchanged isolated passes
+  provides passing coverage for all 192 registrations. Intermittent failures
+  remain disclosed and deferred, not repaired by this sizing change.
+  S8 remains planned and is not automatically admitted.
+  softpc32 SHA-256 BEAE1647F8F177123045F99AACE6A6195212A5F89F611C47F57EA18C9A346C5B;
+  softpc64 SHA-256 9314E59A4B8143F230E0A2D1833C388BD8A214F72DF0513114149B97DCED9CEB.
 
 - T98 S6 is owner-accepted and closed; see its linked closure record.
   Executor delivery is `8e66d797`; actual-change coordinator review is recorded

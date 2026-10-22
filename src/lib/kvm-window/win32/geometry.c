@@ -76,7 +76,7 @@ lib_status kvm_win32_maximize_client(lib_win32_hwnd window, lib_u32 source_width
 }
 
 lib_status kvm_win32_resize_client(lib_win32_hwnd window, lib_u32 width,
-    lib_u32 height)
+    lib_u32 height, lib_bool fit_work_area)
 {
     lib_win32_rect outer;
     lib_win32_monitorinfo monitor_info;
@@ -89,7 +89,8 @@ lib_status kvm_win32_resize_client(lib_win32_hwnd window, lib_u32 width,
     style = (lib_win32_dword)lib_win32_get_window_long_ptr_a(window, LIB_WIN32_GWL_STYLE);
     extended_style = (lib_win32_dword)lib_win32_get_window_long_ptr_a(window, LIB_WIN32_GWL_EXSTYLE);
     if (!lib_win32_adjust_window_rect_ex(&outer, style, LIB_WIN32_FALSE, extended_style)) return LIB_STATUS_IO_ERROR;
-    monitor = lib_win32_monitor_from_window(window, LIB_WIN32_MONITOR_DEFAULTTONEAREST);
+    monitor = fit_work_area ? lib_win32_monitor_from_window(window,
+        LIB_WIN32_MONITOR_DEFAULTTONEAREST) : LIB_NULL;
     lib_win32_zero_memory(&monitor_info, sizeof(monitor_info));
     monitor_info.cbSize = sizeof(monitor_info);
     if (monitor != LIB_NULL && lib_win32_get_monitor_info_a(monitor, &monitor_info)) {

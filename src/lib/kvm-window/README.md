@@ -1,5 +1,11 @@
 # kvm-window
 
+Win32 initial placement and automatic content-size changes fit the monitor work
+area. Maximize also fits that area while preserving content aspect ratio.
+Manual resizing has no desktop-size cap; title-bar double-click restores natural
+content dimensions even beyond the work area. Native coordinate/resource limits
+still apply. These operations change presentation size, never frame dimensions.
+
 Text cells select primary/secondary bitmaps through explicit glyph-bank values;
 foreground/background palette indices are independent, with no device bit layout.
 Enabled underline adds foreground pixels on the frame's scanline, before the

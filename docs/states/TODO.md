@@ -1,5 +1,14 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Diagnose the intermittent command-provider event wait failure.
+  T98 S7's second x64 aggregate run failed the 10000ms event assertion after
+  debug resume/pause observations; the first aggregate and unchanged isolated
+  follow-up pass. This fixture does not create a Window; RDP is not an
+  established explanation. Owner: App command-provider integration fixture/
+  executor event boundary. Admission condition: identify the exact awaited
+  event and producer/consumer ordering under aggregate execution; do not relax
+  assertions or increase product timeouts. S7 does not claim this repaired.
+
 - TODO(Medium): Diagnose package integration Console attach/prompt intermittency.
   T98 S6 observed stage 1/error 6 and stage 3/error 0, including after RDP
   reconnect. Unchanged final tests later pass on both architectures; this is
@@ -7,7 +16,11 @@
   Owner: App package fixture/Console integration boundary. Admission condition:
   capture child exit, active buffer identity and cursor at the first failure
   against the unchanged baseline; do not weaken prompt assertions or add retries
-  as a production fix. Temporary diagnostic code was removed.
+  as a production fix. Temporary diagnostic code was removed. T98 S7 also
+  observed a live blank initial buffer and, in a separate attempt, child exit 1
+  with cannot compose machine. Some attempts failed even after RDP was Active;
+  later unchanged package tests pass. These are distinct observations, not
+  proof that all stage-3 failures share one cause.
 
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,

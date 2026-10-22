@@ -63,6 +63,11 @@ int main(void)
         o.initial_title = "modal-before";
         lib_test_assert(kvm_window_create(&w, &o) == LIB_STATUS_OK);
         lib_win32_enum_windows(find_window, 0); lib_test_assert(target);
+        lib_win32_minmaxinfo limits = {0};
+        lib_test_assert(lib_win32_send_message_timeout_w(target, LIB_WIN32_WM_GETMINMAXINFO,
+            0, (lib_win32_lparam)&limits, LIB_WIN32_SMTO_ABORT_IF_HUNG, 3000, &result));
+        lib_test_assert(limits.ptMaxTrackSize.x == LIB_INT32_MAX &&
+            limits.ptMaxTrackSize.y == LIB_INT32_MAX);
         original = (lib_win32_wndproc)lib_win32_set_window_long_ptr_w(target, LIB_WIN32_GWLP_WNDPROC, (lib_win32_long_ptr)observe);
         lib_c_printf("modal case %u\n", i); lib_c_fflush(lib_c_stdout);
         lib_test_assert(lib_win32_post_message_w(target, LIB_WIN32_WM_SYSCOMMAND, commands[i], i == 2 ? ' ' : 0));

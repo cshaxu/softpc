@@ -271,12 +271,13 @@ static void win32_window_enforce_aspect(lib_win32_hwnd window,
 }
 
 static void win32_window_resize_client(lib_win32_hwnd window,
-    kvm_win32_window_context *context, lib_u32 width, lib_u32 height)
+    kvm_win32_window_context *context, lib_u32 width, lib_u32 height,
+    lib_bool fit_work_area)
 {
     if (window == LIB_NULL || context == LIB_NULL || width == 0u || height == 0u ||
         (context->client_surface_width == width &&
          context->client_surface_height == height)) return;
-    lib_status status = kvm_win32_resize_client(window, width, height);
+    lib_status status = kvm_win32_resize_client(window, width, height, fit_work_area);
     if (status != LIB_STATUS_OK) {
         kvm_component_fail(&context->component->base, status);
         return;
@@ -520,7 +521,7 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
         kvm_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
         goto failed;
     }
-    win32_window_resize_client(window, context, width, height);
+    win32_window_resize_client(window, context, width, height, LIB_TRUE);
     if (!win32_window_accepting_input(context)) goto failed;
     {
         kvm_window_rect changed;
@@ -640,6 +641,11 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     context = win32_window_context(window);
     if (context == LIB_NULL) return lib_win32_def_window_proc_w(window, message, wparam, lparam);
     switch (message) {
+    case LIB_WIN32_WM_GETMINMAXINFO:
+        /* Manual sizing is not limited by the virtual desktop. */
+        ((lib_win32_minmaxinfo *)lparam)->ptMaxTrackSize.x = LIB_INT32_MAX;
+        ((lib_win32_minmaxinfo *)lparam)->ptMaxTrackSize.y = LIB_INT32_MAX;
+        return 0;
     case LIB_WIN32_WM_TIMER:
         if (wparam == WIN32_WINDOW_CURSOR_TIMER) {
             win32_window_advance_cursor_blink(window, context);
@@ -697,7 +703,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
             context->client_surface_height = 0u;
             if (context->surface_width != 0u)
                 win32_window_resize_client(window, context, context->surface_width,
-                    context->surface_height);
+                    context->surface_height, LIB_FALSE);
             return 0;
         }
         break;

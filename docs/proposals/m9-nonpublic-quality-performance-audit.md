@@ -56,19 +56,132 @@ status; rediscovering them does not establish a new regression.
   finite-budget candidate. Owner accepted S5 on 2026-10-21; see
   [closure and verification limits](../history/M9-T98-S5-worker-destruction.md).
 - S6: owner-inserted text underline and split cursor; audit/design first.
-- S7: owner-inserted dynamic frame storage and producer integration.
-- S8 (formerly S7/S6/S5/S3): finite instruction budget rejection, no counter
+- S7: Window sizing policy; owner revises the still-design-only packet.
+- S8: dynamic frame storage and producer integration, moved after S7.
+- S9 (formerly planned S8): finite instruction budget rejection, no counter
   widening.
-- S9 (formerly S8/S7/S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.
+- S10 (formerly planned S9): Compat-private UTF-8 append opening, retaining FILE I/O.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 
 ## Findings and verification
 
-### S7 - Dynamic frame storage
+### Ordered remaining S work
+
+Owner separates the two changes and prioritizes Window sizing. This is T98's
+internal S queue, not the repository T candidate queue. S7 had only admission
+and preliminary audit, no implementation P. Owner revises that active packet
+to sizing and carries its storage audit forward to S8; no completed S is reused.
+
+1. S7: Window sizing policy (current admission).
+2. S8: dynamic frame storage after S7 acceptance.
+3. S9: finite instruction-budget bounds (not yet admitted).
+4. S10: private COM/LPT UTF-8 append opening (not yet admitted).
+
+### S7 - Window sizing policy
+
+Preserve initial work-area fitting and maximize-to-work-area. Allow manual
+resize and title-bar double-click natural-size restoration beyond the current
+monitor/RDP work area. Keep the existing content aspect ratio and checked native
+coordinate boundaries; natural size means content-frame pixels, not desktop size.
+
+Scope: existing kvm-window geometry and Win32 sizing/message paths, their
+owner-local tests, README/UI contract and manifests. No payload/schema, guest
+mode, frame exchange, Console, App or mirror changes. Audit initial placement,
+first-frame fitting, maximum tracking, maximize and double-click independently;
+do not globally remove startup/maximize guards or add a second sizing path.
+
+Verification: oversized content initially fits a small work area; maximize
+fits with aspect preserved; manual sizing exceeds work area; double-click
+restores oversized natural dimensions; ordinary small frames retain behavior.
+Use geometry and actual message-path assertions, dual cached builds/packages,
+affected regression/gates and serial desktop tests; no Computer Use.
+Implementation estimate: production +20/-8 (net +12), focused tests about
++60/-3; manifests/UI/task records are counted separately. Two causes: natural
+restore used the automatic work-area fit, and unhandled WM_GETMINMAXINFO retained
+the native virtual-desktop tracking limit. Retain existing aspect and maximize
+helpers; pass the fit policy through the same private resize helper and override
+only maximum tracking dimensions. No public API/state is added. Microsoft
+documents the default at
+https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-minmaxinfo.
+Finite coverage ledger: initial/automatic fit, manual tracking and aspect,
+natural restore (oversized and small), maximize, failure propagation, and dual
+runtime regression. Existing initial geometry tests retain their owner; actual
+message-path assertions cover the changed policies. Each member requires passing
+evidence or an explicit unresolved disposition; only verified delivery can await
+acceptance. Each S is delivered separately and waits for acceptance.
+
+### S7 implementation and verification
+
+The existing resize helper takes one private fit_work_area value: automatic
+frame sizing passes true, title-bar natural restore passes false. No second
+geometry algorithm or persistent policy state is added. WM_GETMINMAXINFO only
+replaces the desktop-derived maximum tracking extent with the signed native
+extent limit; minimum tracking and maximized geometry remain unchanged.
+This does not promise windows beyond native coordinate/resource capabilities.
+
+Actual tracked C/H accounting against 6500790b: production +16/-7 (net +9)
+across four files; tests +55/-3 (net +52) across two files. Public eight-tree
+changes are confined to src/lib and test/lib. Types adds only one-to-one
+MINMAXINFO/message wrappers. No public API/frame ABI, App, Emulator, mirror,
+input, allocation or exchange changes. The owner's INI display change is
+preserved verbatim and included under package policy; snapshot.debug is
+neither modified nor staged.
+
+Sweep: searched rcWork, fit_client_size, fit_outer_rect, GETMINMAX, MAXTRACK,
+resize_client and constrain_sizing throughout kvm-window. Initial placement,
+automatic frame sizing and maximize retain fitting; manual aspect and WM_SIZE
+enforcement contain no desktop clamp; natural restore bypasses only that fit.
+These are all production hits. No obsolete sizing path remains.
+
+The ledger is covered by existing pure initial/aspect tests, actual WndProc
+assertions with a deterministic 600x500 work area, existing resize failure
+propagation, and native modal-message verification. Tests prove initial
+1280x960 content fits 600x477 outer bounds, manual 1616x1239 is retained,
+double-click restores 1296x999 including decorations, maximize shrinks it back
+to 600x477, and a small natural frame remains 336x279. Native modal tests verify
+the installed procedure's tracking response. Physical user drag/RDP acceptance
+is still the owner's step, not claimed from screenshots.
+
+Cached x64/x86 full builds succeeded and published both EXEs. The first build
+caught a new fixture function/local-variable naming collision, fixed before
+verification. Existing mirror/test-header compiler warnings remain outside
+this repair. Final builds only rebuilt the restored package fixture; shared
+production/test code passes its strict warning policy.
+
+Final universe: 192 registrations per architecture (184 background, five
+desktop, three native audio). x86 passed all 192 in that run. x64 passed
+183/184 background, 4/5 desktop and 3/3 audio; the unchanged isolated
+command_provider_smoke and normal package_smoke subsequently passed. Independent
+XML/name comparison confirms all 192 unique names have passing evidence per
+architecture, with no missing/skipped cases. This is coverage with supplements,
+not a claim that the x64 aggregate run was all green.
+
+Earlier runs also observed the known runtime_restart_boot prompt roundtrip
+failure, package stages 1/error 6 and 3/error 0, and a disconnected session.
+The runtime test passed independently and in both final full suites. A temporary
+failure-only package probe saw a live blank Console in one run and a terminated
+child printing cannot compose machine in a later run. RDP was subsequently
+confirmed Active; some package failures still occurred before final success.
+Neither RDP nor this Window repair is asserted as their root cause. Temporary
+App probe changes were removed before final qualification. Package debt remains
+open; the command-provider wait has a deferred receiver. No assertion, timeout,
+retry loop or product behavior was changed to manufacture success.
+
+Final package SHA-256:
+- softpc32: BEAE1647F8F177123045F99AACE6A6195212A5F89F611C47F57EA18C9A346C5B
+- softpc64: 9314E59A4B8143F230E0A2D1833C388BD8A214F72DF0513114149B97DCED9CEB
+
+Raw evidence and runners in build/t98-s7 are disposable after promotion of
+this record and actual-change review. Commit/push and coordinator review
+precede owner delivery; S8 is not started.
+
+### S8 - Dynamic frame storage
 
 Owner admitted after accepting S6 on 2026-10-21. Baseline 1b95cfd7.
-S8 finite-budget and S9 UTF-8 append work remain unstarted.
+Owner subsequently moved implementation after S7 Window sizing is accepted.
+S9 finite-budget and S10 UTF-8 append work remain unstarted. This retained
+audit/design is for resumption, not evidence of implementation.
 
 Initial source audit confirms four independent fixed-capacity assumptions:
 
@@ -130,7 +243,7 @@ also covers Driver -> Machine -> Session/UI -> both leaves, plus the status
 producer and explicit diagnostic deep copies. No snapshot format change is
 currently planned. Cached dual builds, shared units/gates, private regression
 and serial desktop qualification follow implementation; prior S6 passes are
-not S7 evidence.
+not S8 evidence.
 
 ### S6 - Text decoration and cursor design
 

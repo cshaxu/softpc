@@ -172,7 +172,9 @@ The Window client area always remains at the current published-frame aspect rati
 manual resize, system resize, and maximize use the largest fitting
 ratio-preserving bounds. The copied image fills that client area with uniform
 scaling and has no black bars. Title-bar double-click restores the natural
-published-frame client size (or its largest work-area fit); maximize selects the
+published-frame client size even beyond the work area. Manual resizing is not
+limited to desktop dimensions; native coordinate/resource limits still apply.
+Maximize selects the
 largest ratio-preserving Window in that work area rather than the native
 full-work-area rectangle.
 

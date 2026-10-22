@@ -149,8 +149,18 @@ static lib_win32_bool LIB_WIN32_WINAPI to_screen(lib_win32_hwnd w, lib_win32_poi
 static lib_win32_hcursor LIB_WIN32_WINAPI cursor(lib_win32_hcursor c) { return c; }
 static lib_win32_long_ptr LIB_WIN32_WINAPI get_context(lib_win32_hwnd w, lib_i32 index)
 { (void)w; return index==LIB_WIN32_GWLP_USERDATA ? (lib_win32_long_ptr)context : 0; }
+static lib_win32_rect sized;
 static lib_win32_bool LIB_WIN32_WINAPI resize(lib_win32_hwnd w, lib_win32_hwnd after, lib_i32 x,lib_i32 y,lib_i32 cx,lib_i32 cy,lib_win32_uint f)
-{ (void)w;(void)after;(void)x;(void)y;(void)cx;(void)cy;(void)f;return resize_ok; }
+{ (void)w;(void)after;(void)x;(void)y;(void)f;sized=(lib_win32_rect){0,0,cx,cy};return resize_ok; }
+static lib_win32_bool LIB_WIN32_WINAPI get_outer(lib_win32_hwnd w, lib_win32_rect *r)
+{ (void)w; *r=(lib_win32_rect){0,0,client.right+16,client.bottom+39}; return LIB_WIN32_TRUE; }
+static lib_win32_bool LIB_WIN32_WINAPI adjust_outer(lib_win32_rect *r, lib_win32_dword s,
+    lib_win32_bool menu, lib_win32_dword ex)
+{ (void)s;(void)menu;(void)ex;r->right+=16;r->bottom+=39;return LIB_WIN32_TRUE; }
+static lib_win32_hmonitor LIB_WIN32_WINAPI monitor_for_window(lib_win32_hwnd w, lib_win32_dword flags)
+{ (void)w;(void)flags;return (lib_win32_hmonitor)1; }
+static lib_win32_bool LIB_WIN32_WINAPI get_monitor(lib_win32_hmonitor m, lib_win32_monitorinfo *info)
+{ (void)m;info->rcWork=(lib_win32_rect){0,0,600,500};return LIB_WIN32_TRUE; }
 static lib_win32_wchar title_text[KVM_WINDOW_TITLE_CAPACITY];
 static lib_u32 title_calls;
 static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_lpcwstr text)
@@ -188,6 +198,14 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #define lib_win32_set_cursor cursor
 #define lib_win32_get_window_long_ptr_a get_context
 #define lib_win32_set_window_pos resize
+#undef lib_win32_get_window_rect
+#define lib_win32_get_window_rect get_outer
+#undef lib_win32_adjust_window_rect_ex
+#define lib_win32_adjust_window_rect_ex adjust_outer
+#undef lib_win32_monitor_from_window
+#define lib_win32_monitor_from_window monitor_for_window
+#undef lib_win32_get_monitor_info_a
+#define lib_win32_get_monitor_info_a get_monitor
 #define lib_win32_set_window_text_w capture_title
 #undef lib_win32_get_tick_count
 #define lib_win32_get_tick_count clock_tick
@@ -232,6 +250,34 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #include "lib/kvm-window/win32/component.c"
 
 static void notify_loss(void) { win32_window_proc((lib_win32_hwnd)1,LIB_WIN32_WM_CAPTURECHANGED,0,0); }
+static void check_sizing_policy(void)
+{
+    kvm_win32_window_context c = {0};
+    lib_win32_hwnd w = (lib_win32_hwnd)1;
+    lib_win32_minmaxinfo limits = {0};
+    lib_win32_rect outer = {0,0,1616,1239};
+    context = &c;
+    c.surface_width=1280; c.surface_height=960;
+    win32_window_resize_client(w,&c,1280,960,LIB_TRUE);
+    lib_test_assert(sized.right==600 && sized.bottom==477);
+    limits.ptMinTrackSize=(lib_win32_point){100,100};
+    limits.ptMaxTrackSize=(lib_win32_point){600,500};
+    limits.ptMaxSize=(lib_win32_point){600,500};
+    win32_window_proc(w,LIB_WIN32_WM_GETMINMAXINFO,0,(lib_win32_lparam)&limits);
+    lib_test_assert(limits.ptMaxTrackSize.x==LIB_INT32_MAX &&
+        limits.ptMaxTrackSize.y==LIB_INT32_MAX);
+    lib_test_assert(limits.ptMinTrackSize.x==100 && limits.ptMaxSize.x==600);
+    win32_window_proc(w,LIB_WIN32_WM_SIZING,LIB_WIN32_WMSZ_BOTTOMRIGHT,(lib_win32_lparam)&outer);
+    lib_test_assert(outer.right==1616 && outer.bottom==1239);
+    win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
+    lib_test_assert(sized.right==1296 && sized.bottom==999);
+    win32_window_proc(w,LIB_WIN32_WM_SYSCOMMAND,LIB_WIN32_SC_MAXIMIZE,0);
+    lib_test_assert(sized.right==600 && sized.bottom==477);
+    c.surface_width=320; c.surface_height=240;
+    win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
+    lib_test_assert(sized.right==336 && sized.bottom==279);
+    context=LIB_NULL;
+}
 static void check_split_paint(void)
 {
     static kvm_window_frame_storage frame;
@@ -498,6 +544,7 @@ static void check_competing_bindings(void)
 
 int main(void)
 {
+    check_sizing_policy();
     lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage)) == LIB_STATUS_OK);
     lib_test_assert(kvm_window_apply_title((lib_win32_hwnd)1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5"));
     lib_test_assert(title_calls==1u && title_text[0]==0x6d4bu && title_text[1]==0xd83cu &&
@@ -543,14 +590,14 @@ int main(void)
     lib_u32 previous=clips;
     win32_window_proc((lib_win32_hwnd)1,LIB_WIN32_WM_MOVE,0,0); lib_test_assert(clips==previous);
     resize_ok=0;
-    win32_window_resize_client((lib_win32_hwnd)1,&c,640,480);
+    win32_window_resize_client((lib_win32_hwnd)1,&c,640,480,LIB_TRUE);
     lib_test_assert(c.client_surface_width==0 && window.base.stopping);
     lib_test_assert(kvm_component_destroy(&window.base)==LIB_STATUS_OK);
     lib_test_assert(kvm_component_initialize(&window.base, &options, join, dispose)==LIB_STATUS_OK);
     lib_test_assert(kvm_component_mailboxes_select_notify(&window.base.mailboxes,
         LIB_NULL, LIB_NULL) == LIB_STATUS_OK);
     resize_ok=1;
-    win32_window_resize_client((lib_win32_hwnd)1,&c,640,480);
+    win32_window_resize_client((lib_win32_hwnd)1,&c,640,480,LIB_TRUE);
     lib_test_assert(c.client_surface_width==640 && c.client_surface_height==480);
     focus_requests=foreground_requests=0;
     lib_test_assert(kvm_window_unfreeze(&window)==LIB_STATUS_OK);
