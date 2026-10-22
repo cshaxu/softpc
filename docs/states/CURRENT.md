@@ -27,8 +27,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 ## Current Technical Baseline
 
-- T98 S7 implementation and dual packages are verified, awaiting pushed-change
-  review and owner acceptance. See the proposal's S7 verification record.
+- T98 S7 executor ed9bb7b8 is pushed and actual-change review is complete;
+  awaiting owner acceptance. See the proposal's S7 verification/review record.
   Production +16/-7 (net +9); tests +55/-3 (net +52). Only src/lib and test/lib
   of the public eight trees change; App and mirror production are unchanged.
   x86 final 192/192 passes; x64 final 190/192 plus two unchanged isolated passes
