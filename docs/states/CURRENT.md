@@ -2,28 +2,41 @@
 
 ## Current Work
 
-## M9 T99 S1 Packet
+## M9 T99 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner closes T98 and immediately transfers its unimplemented S16 research to new T99 S1. |
-| Objective | Establish one responsible owner and completion fact per handoff; identify removable duplicate state/logic, or justify no change. |
-| Non-goals | No production repair, new queue/ledger/epoch/recovery framework, speculative performance work, downstream edits or guest changes. |
-| Reference Baseline | 8165664a; S15 accepted, tracked and untracked worktree clean before admission. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner authorizes the two definite cleanups in a new S; S1 research closes and S2 is admitted. S3 pause-input research and S4 intermittency investigation remain planned, not admitted. |
+| Objective | Merge identical Broker terminal cleanup branches and remove the redundant auto-reset event reset from the command-provider fixture. |
+| Non-goals | No pause semantics, new state/API/retry, package intermittency fix, downstream edits or guest changes. |
+| Reference Baseline | bf18a2f7; clean worktree at admission. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Review public src/test Lib, Emulator, X86 Debug and X86 IBMPC; read actual App callers/fixtures for attribution. Documentation only at admission; no ABI change authorized. |
+| Files And ABI Surface | Lib console-broker implementation and owner-local test/manifest; App command-provider integration test; task records and rebuilt EXEs. No ABI change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Five-observation ledger, source/caller traces, existing tests and bounded discriminating probes as necessary; distinguish source proof, dynamic proof and unverified hypotheses. |
-| Expected Markers | One input ownership explanation, one completion owner, one Console handoff path; no presumption that an integration failure is a public defect. |
-| Asset Needs | None; preserve INI/media and published EXEs. No Computer Use. |
-| Reporting Requirements | Per candidate: observed impact, ownership, redundant states/branches, minimal option/no-change option, projected production/test counts and evidence limits. Optional scratch build/t99-s1: 45-minute jobs, investigate after 10-minute no progress, 200MB, retire on delivery. |
-| Stop Conditions | Seek approval before production/test repairs, changed pause/input semantics, new state or a broader product investigation. |
-| Exit Criteria | All five observations attributed or explicitly unresolved with receiver; concrete simplification proposals and actual-diff review, governance checks, complete research delivery committed/pushed for owner review. |
-| Original Owner Request | Bundle the public-component issues, describe observed phenomena, then research where code and mental models can genuinely be simplified and unified. |
-| Similar-Issue Sweep | Duplicate input ledgers, request/completion guesses, Console activation/restoration intervention and overlapping startup failure records within the named paths. |
+| Verification | Cached x64/x86 builds; focused broker and command-provider cases, complete background regression and affected desktop Console/package group. Unrelated native audio excluded; failures remain disclosed. |
+| Expected Markers | One fail-closed cleanup, unchanged first-error/lock/resource order; auto-reset wait consumes exactly one signal. |
+| Asset Needs | Refresh assets/binary dual EXEs only; preserve INI/media. No Computer Use. |
+| Reporting Requirements | Actual production/test counts and failure dispositions. Scratch build/t99-s2: 60-minute job, investigate after 10-minute no progress, 300MB; retire after delivery. |
+| Stop Conditions | Do not expand to pause/input semantics or diagnose/fix package intermittency in this S; no new recovery model. |
+| Exit Criteria | Both cleanups verified, actual-diff review, manifests/governance checks, dual published EXEs, committed/pushed delivery and clean workspace awaiting acceptance. |
+| Original Owner Request | Complete the first two definite cleanups now; separately schedule pause-key simplification and intermittent-failure research. |
+| Similar-Issue Sweep | All wait_for consumers and auto-reset event creation in command_provider_smoke; adjacent Broker failure blocks and existing reset/retirement/activation fault coverage. |
 
-T99 S1 research is delivered for owner review, not implementation approval.
+T99 S1 research is now owner-closed; its report and actual-commit review are
+retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.
+S2 is active; S3/S4 are the internal T99 plan only.
+S2 implementation and cached dual builds are complete, no compiler warnings.
+Background regression passes 184/184 per width; focused final evidence is 4/4
+per width, retaining the initial x86 command wait failure. Native Lib cases pass
+3/3 per width. Connected package x86 passes 2/2; x64 ordinary passes, compact
+first fails stage 1/error 6 then passes unchanged in isolation. Earlier Disc
+stage 3 failures remain disclosed. Passing evidence covers all 189 applicable
+registrations per width, excluding three unrelated native-audio cases. This
+is supplemented qualification, not an all-green first run or an intermittency
+repair. EXEs are refreshed; INI/media remain unchanged. All jobs have exited;
+scratch is retired for delivery. S2 awaits owner acceptance after commit/review.
+The following records the completed S1 research:
 The proposal records all five dispositions and a bounded source/caller review.
 Existing cached x64/x86 focused tests pass 7/7 each; no full-suite, desktop,
 guest stuck-key reproduction or intermittent-failure repair is claimed.
@@ -33,8 +46,8 @@ not a new shared recovery model. Pause-release semantics require a decision.
 Executor research 29c260b5 is pushed. Coordinator actual-commit review confirms
 only the proposal and CURRENT changed, all five observations remain accounted
 for, and no unproved repair/full-regression claim was introduced. Documentation,
-diff-whitespace and build-residue checks pass. S1 awaits owner acceptance;
-T99 remains open. No implementation is automatically admitted.
+diff-whitespace and build-residue checks passed. Only S2 is admitted above;
+T99 remains open.
 The owner transfers the five related observations out of TODO into T99 S1;
 the proposal retains their evidence and is their sole investigation record.
 QUEUE has no matching candidate; its product-performance task remains separate.

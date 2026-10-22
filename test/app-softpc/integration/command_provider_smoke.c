@@ -55,7 +55,6 @@ static void note_state(void *opaque, emulator_machine_state state, lib_u32 gener
 static void wait_for(HANDLE event)
 {
     assert(WaitForSingleObject(event, 10000u) == WAIT_OBJECT_0);
-    ResetEvent(event);
 }
 
 static void submit(emulator_session_command_provider *provider,

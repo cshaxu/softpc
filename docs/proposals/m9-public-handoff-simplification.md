@@ -12,13 +12,106 @@ Emulator, X86 Debug and X86 IBMPC. Actual App callers and fixtures are evidence
 for attribution, not permission to repair App or the preserved core.
 Do not read or modify downstream repositories.
 
-This S first researches and reports. No production/API or permanent test repair
-is authorized. Temporary probes may exercise existing paths without a second
-implementation, guest modifications or Computer Use. Implementation options
-require owner approval after the report. No new EXE/build claim accompanies
-this documentation admission.
+S1 was research-only: no production/API or permanent test repair was authorized
+by its original admission. The subsequent owner-approved S2 scope is below.
+Temporary probes may exercise existing paths without a second implementation,
+guest modifications or Computer Use. Further implementation options require
+owner approval; S3 and S4 do not inherit S2's repair admission.
 
-## Frozen observation ledger
+## Owner-approved sequence after S1
+
+On 2026-10-22 the owner directs completion of the two definite cleanups first,
+with pause-input semantics and intermittent failures investigated separately.
+S1 research (29c260b5, reviewed in bf18a2f7) is closed by that advancement.
+
+- S2: admitted minimal cleanup. Merge Broker deactivate/reset failure cleanup;
+  delete the extra ResetEvent after auto-reset wait in the App fixture. Preserve
+  first error, cleanup order, rollback, all timeouts and input semantics. Add
+  reset-delivery failure coverage by reusing the existing retirement scenario.
+  Estimate production net -15 lines; test net +5 to +20. Build cached x86/x64,
+  publish dual EXEs, run focused plus complete background regression and the
+  affected desktop group. Unrelated native audio is not required. Commit/push
+  and actual-diff review precede owner acceptance. No repair of the historical
+  intermittent failures is claimed merely by removing redundant code.
+- S3: planned, not admitted. Determine one correct minimal pause-key contract
+  across source ledger, FIFO admission and driver delivery. Give concrete
+  ordering and make/break/source-retirement examples, reject extra ledgers and
+  product callbacks, and obtain approval before changing semantics.
+- S4: planned, not admitted. Investigate observations 2 through 5 using exact
+  missing completion and child/input boundary evidence. Distinguish startup
+  death, live blank output and post-start input loss. Do not add retries or
+  shared recovery machinery before identifying the first failing operation.
+
+S3/S4 remain here, not duplicated in the T queue or TODO. S2 does not delete
+the unrelated redundant Session predicate, which belongs to the later review.
+
+## S2 implementation and verification record
+
+Baseline bf18a2f7. Production cleanup changes only
+`src/lib/console-broker/console.c`: +4/-18, net -14. A successful deactivate is
+followed by reset; failure of either enters the single existing broken-binding
+cleanup. The original error is retained, reset is not attempted after failed
+retirement, and lock release/output unbinding/reference-release order is
+unchanged. Activation rollback remains necessary and untouched.
+
+Tests: `test/lib/console-broker/console_broker_smoke.c` +27/-14 and
+`test/app-softpc/integration/command_provider_smoke.c` +0/-1: total +27/-15,
+net +12. The existing retirement-failure assertions run for both retirement
+and old-input reset failure. Added assertions prove the fault was consumed,
+next activation was not attempted, and a second replacement is refused.
+No test-only production entry or extra test framework is introduced.
+
+Similar-issue review: all `wait_for` callers in command_provider_smoke use its
+three completion handles or program_completed; all four are auto-reset events.
+No remaining ResetEvent call exists in that fixture. Broker's prepare,
+allocation, activation/rollback and notification failures are distinct phases,
+not duplicate copies of the retired-binding cleanup; they remain unchanged.
+No adjacent Session change is included. Public changes are limited to src/lib
+and test/lib with their manifests; other six public trees are unchanged.
+
+Qualification is complete for the S2 scope, with the supplements below.
+Cached builds completed on both widths (28 incremental steps each), without
+compiler warnings in either build log. x64 focused 4/4 and background 184/184
+pass. The initial x86 focused run is 3/4: command_provider_smoke reaches debug
+resume (completion 2) then fails its unchanged 10000ms wait assertion with
+0xc0000409, while all three Broker tests pass. This is the historical symptom,
+not proof of an identical root cause or a repair; S4 retains investigation
+ownership. No code or timeout was changed for the supplemental run.
+The x86 full background run passes 184/184, followed by focused 4/4. Both
+background XML sets exactly match registered names, with zero failures/skips.
+Background elapsed: x64 125.76s, x86 123.23s. Both desktop groups were attempted
+while the owner session was Disc: three Lib cases pass on each width, but both
+App package routes on each width fail stage 3/error 0 waiting for the initial
+prompt. This records correlation with session state, not causal proof. Desktop
+elapsed: x64 69.81s, x86 69.18s; group exit 8. These failures are not waived and
+do not constitute complete qualification. All launched jobs have exited.
+
+After owner reconnection, session query confirmed Active. Connected package
+results: x86 2/2 (24.62s); x64 ordinary passes, compact fails stage 1/error 6
+(17.32s group). An unchanged isolated x64 compact run passes in 12.41s. No
+code, fixture budget or product behavior changed between these attempts. The
+earlier command wait and package failures remain S4 evidence, not repaired by
+this cleanup. Passing JUnit names combined with the original three successful
+Lib desktop cases and background results exactly cover 189 registered cases
+per width excluding native_audio, without skipped cases in the passing set.
+This is supplemented qualification, not an all-green first run. Three unrelated
+native-audio cases per width were not rerun under this bounded S2 packet.
+
+Published build hashes:
+
+- softpc32: F657EC43BADB3BE205C837A0605376F2F0E29EC0F863298712AE9D0C786A63E4.
+- softpc64: B5E940DC7F101AF8D484C2E6FE272114C8A39AA58EBE13355944FD722BC5E362.
+
+INI/media, other six public trees and mirror are unchanged. Source/test diff
+review preserves a single fail-closed path without new state or interface;
+combined production and test C net is -2. Manifest, documentation and whitespace
+checks pass. All owned jobs exited; concise evidence is retained here and task
+scratch is retired before delivery. No ABI, platform dependency, lock order,
+queue, retry, timeout, guest behavior or native rendering path is added.
+Executor delivery is followed by actual-commit coordinator review; S2 awaits
+owner acceptance and neither S3 nor S4 is automatically admitted.
+
+## Observation ledger retained
 
 These five observations originate in TODO, not five established public bugs.
 Owner explicitly transfers all five entries out of TODO into this S. Their

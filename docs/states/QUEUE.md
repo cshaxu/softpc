@@ -15,7 +15,7 @@ Td S22 [build-cache governance](../proposals/m9-build-cache-governance.md)
 is delivered and awaiting owner acceptance. No implementation subtask is active.
 
 T99 [public handoff simplification](../proposals/m9-public-handoff-simplification.md)
-is immediately admitted as S1, not a duplicate queued candidate. T98 is
+is admitted, not a duplicate queued candidate; CURRENT owns its active S. T98 is
 owner-closed; see its [completion audit](../history/M9-T98-completion-audit.md).
 
 Owner accepts and closes [Windows 95 volume control and restart](../history/M9-T97-completion-audit.md)
