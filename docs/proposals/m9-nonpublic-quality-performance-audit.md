@@ -56,13 +56,81 @@ status; rediscovering them does not establish a new regression.
   finite-budget candidate. Owner accepted S5 on 2026-10-21; see
   [closure and verification limits](../history/M9-T98-S5-worker-destruction.md).
 - S6: owner-inserted text underline and split cursor; audit/design first.
-- S7 (formerly S6/S5/S3): finite instruction budget rejection, no counter
+- S7: owner-inserted dynamic frame storage and producer integration.
+- S8 (formerly S7/S6/S5/S3): finite instruction budget rejection, no counter
   widening.
-- S8 (formerly S7/S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.
+- S9 (formerly S8/S7/S6/S4): Compat-private UTF-8 append opening, retaining FILE I/O.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Performance profiling follows correctness by separate admission.
 
 ## Findings and verification
+
+### S7 - Dynamic frame storage
+
+Owner admitted after accepting S6 on 2026-10-21. Baseline 1b95cfd7.
+S8 finite-budget and S9 UTF-8 append work remain unstarted.
+
+Initial source audit confirms four independent fixed-capacity assumptions:
+
+1. Base exchange allocates four frame_size blocks during create.
+2. Window storage embeds a union dominated by 1280x768 RGB words, so text
+   slots reserve about 3.75 MiB apiece without using the graphics payload.
+3. Shared text and lower logical Console independently embed 80x50 cells;
+   render, conversion, validation and broker writes all assume stride 80.
+4. SoftPC's original nt_text writes a target stride of 80. Compat advertises
+   80x50 despite a larger private allocation. Removing Driver bounds alone
+   would not make wider producer frames correct. This requires a narrow audit
+   of original host output, not another VRAM reader or a new shared maximum.
+
+Preliminary design:
+
+- Keep Base text metadata/cells, Console text plus copied character banks,
+  Window text plus owned font banks, and separate Window RGB graphics.
+- Make row stride and capacity explicit; validate the last addressed element
+  and checked byte size before allocation or traversal. Frame dimensions remain
+  content dimensions. Native SHORT/DIB constraints are backend checks, never
+  arbitrary shared text capacity constants.
+- Keep four stable slot identities and existing roles. Metadata may exist at
+  create, but payloads start null. Leaf-owned allocation/destruction handles
+  their own layouts; Base stays ignorant of Console/fonts/graphics content.
+  Allocation is confined to the producer-owned slot; same-spec reuse allocates
+  nothing. Specification replacement retires incompatible free storage and
+  marks held storage for disposal only after its last exchange role releases it.
+  No collection thread, polling, per-frame allocation or reference-counted
+  resource framework is proposed. The exact minimal leaf/exchange preparation
+  interface must be checked against all callers before implementation.
+- Preserve last displayed content until successful replacement. Allocation
+  failure produces no new publication and leaves held frames intact. Session
+  continues routing exchanges without copying or retaining payload pointers.
+- Lower Console conversion and native CHAR_INFO scratch become actual-size,
+  reusable buffers. Coverage tracks both width and height so shrink clears old
+  tails without imposing a maximum rectangle or writing unrelated scrollback.
+- Preserve the private 80x25 status-page design as an actual producer choice,
+  not a shared maximum. Its preparation callback must return allocation errors.
+- Audit original host text-buffer writes and geometry establishment before
+  adjusting Compat stride. Any necessary mirror diff must be separately
+  explained and recorded; no guest/firmware or video-mode programming changes.
+
+Initial inventory search hits 39 source/test files for fixed constants,
+frame_storage and exchange create/writer. This is a lower bound, not final
+coverage: copied values, fixture storage, resource ownership and backend
+temporary buffers require follow-up. Expected total including documentation,
+manifests and new regressions is roughly 45-65 files. Preliminary production
+estimate +700..1100/-450..750 (net +250..350), tests +450..800/-250..500
+(net +200..300). These are budgeting ranges, not an approved reason to add
+abstractions; refine after selecting the smallest preparation contract.
+
+Finite verification ledger: creation allocates no payload; first/additional
+slot allocation; identical-spec reuse; dynamic sizes 80x25/80x50/132x43/100x60;
+text/graphics growth/shrink/type transitions; decoration/font/map preservation;
+slow reader across transition; allocation/overflow/stride failures; final
+stop/destroy frees every allocation. Record exact allocation bytes and free
+events using owner-local fixtures, never a production test API. Integration
+also covers Driver -> Machine -> Session/UI -> both leaves, plus the status
+producer and explicit diagnostic deep copies. No snapshot format change is
+currently planned. Cached dual builds, shared units/gates, private regression
+and serial desktop qualification follow implementation; prior S6 passes are
+not S7 evidence.
 
 ### S6 - Text decoration and cursor design
 

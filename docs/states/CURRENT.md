@@ -2,32 +2,32 @@
 
 ## Current Work
 
-## M9 T98 S6 Packet
+## M9 T98 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves implementation on 2026-10-21: exact Window output and documented native Console approximation, never terminal failure merely for an unrepresentable decoration. |
-| Objective | Preserve original text decoration and cursor shape through Compat/Driver into neutral Lib frame data and the existing render path. |
-| Non-goals | No dimension increase, guest changes, new renderer/clock/polling, exchange algorithm change, destroy-timeout work or writes to other repositories. |
-| Reference Baseline | `8132d0db`; [S5 closure](../history/M9-T98-S5-worker-destruction.md). User-owned untracked snapshot.debug remains excluded. |
-| Candidate Proposal | [T98 audit](../proposals/m9-nonpublic-quality-performance-audit.md#s6---text-decoration-and-cursor-design). |
-| Files And ABI Surface | Lib shared text schema, Window render/geometry/overlay, Console mapping; App Compat presentation and Machine Driver; corresponding owner-local tests. Existing original video shape and refresh logic is audited, not reimplemented. |
+| Admission And Approval | Owner accepts S6 and admits dynamic frame storage on 2026-10-21; audit and concise design precede integrated implementation. |
+| Objective | Remove fixed maximum text/graphics backing; allocate actual leaf payloads lazily within the existing four-slot ownership exchange and integrate all producers/consumers. |
+| Non-goals | No guest modification, new renderer, polling, recycler thread, timeout recovery, resource framework or writes to other repositories; retain decorations, font banks and latest-wins. |
+| Reference Baseline | `1b95cfd7`; [accepted S6](../history/M9-T98-S6-text-decoration.md). User-owned untracked snapshot.debug remains excluded. |
+| Candidate Proposal | [T98 dynamic storage](../proposals/m9-nonpublic-quality-performance-audit.md#s7---dynamic-frame-storage). |
+| Files And ABI Surface | Lib Base exchange/text schema, KVM leaves, logical Console/broker; Emulator Machine/UI producer contracts; SoftPC Driver/Compat and audited original host text-stride boundary; owner-local tests. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Audit original source through rendering first. Implementation later requires state/pixel tests for underline, two clipped cursor spans, phase, old-shape clearing, redraw/freeze and frame retirement; actual original register-to-frame tests; cached dual builds, affected shared and App regression, manifests/gates and applicable desktop tests. |
-| Expected Markers | Original device state is the only hardware authority; one frame/render path and phase owner; no percent roundtrip for Window; unsupported Console effects are not reported as exact output. |
+| Verification | Allocation/free byte records, lazy first use, same-spec reuse, all four roles, size/type changes during reads, failure without publication, dynamic dimensions/stride/overflow, decorations and actual producer path; cached dual builds, shared units/gates, App integration and serial desktop tests. |
+| Expected Markers | Four metadata slots, no eager four-payload allocation; leaf-owned formats, immutable borrowed frames, single transfer path, no maximum-graphics allocation for text, no stale pointer or silent truncation. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report original state sources, loss points, neutral schema, Console limits, source versus test proof, actual production/test/mirror diff. Executor owns disposable build/t98-s6; background build/test jobs have log/exit files, 45-minute budget, 10-minute no-progress investigation threshold and 200MB scratch budget; retire scratch after recording evidence. |
-| Stop Conditions | Do not replace unresolved hardware semantics with heuristics or expand mirror changes beyond the reviewed refresh site. |
+| Reporting Requirements | Report interface/ownership migration, allocations/reuse/reclamation, callers, native limits and actual production/test/mirror diff. Executor owns disposable build/t98-s7; hidden jobs use log/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Stop Conditions | Do not publish incomplete allocations, overwrite readers or invent hardware layouts. Explain any necessary mirror stride repair before changing it; do not rewrite device semantics. |
 | Exit Criteria | Verified single-path implementation, dual packages, proportional tests, actual-diff quality review and pushed delivery, then owner acceptance. |
-| Original Owner Request | Add optional text underline and two-segment cursor to shared Lib and connect original SoftPC producer state; first audit and propose the simplest unified design without quality violations or polling. |
-| Similar-Issue Sweep | All cursor percentage conversions, text schema initializers, underline state changes, frame validation/comparison and old/new cursor invalidation paths. |
+| Original Owner Request | Preserve leaf boundaries and four-slot flow, remove fixed maximum capacities, allocate by actual type/size/use, safely retire obsolete payloads, integrate production and prove nine stated allocation/lifetime scenarios. |
+| Similar-Issue Sweep | Fixed row strides, embedded maximum arrays, sizeof-as-payload, shallow copies, cached payload pointers, unchecked dimensions/allocations and destruction with readers. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
 
-- T98 S6 implementation is verified awaiting owner acceptance, not closed.
+- T98 S6 is owner-accepted and closed; see its linked closure record.
   Executor delivery is `8e66d797`; actual-change coordinator review is recorded
   in the S6 proposal. Task scratch is retired; build residue check passes.
   Exact Window underline/two-span cursor and documented native Console

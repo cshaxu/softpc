@@ -13,7 +13,7 @@ Td S22 [build-cache governance](../proposals/m9-build-cache-governance.md)
 is delivered and awaiting owner acceptance. No implementation subtask is active.
 
 T98 [non-public quality/performance work](../proposals/m9-nonpublic-quality-performance-audit.md)
-remains open. S5 is owner-accepted; S6 text decoration design is active in CURRENT.
+remains open. S6 is owner-accepted; S7 dynamic frame storage is active in CURRENT.
 
 Owner accepts and closes [Windows 95 volume control and restart](../history/M9-T97-completion-audit.md)
 as T97 on 2026-10-18. Both candidates were investigated together in S1.
