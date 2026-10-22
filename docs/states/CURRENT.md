@@ -27,8 +27,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 ## Current Technical Baseline
 
-- T98 S9 implementation is verified, pending pushed actual-change review and
-  owner acceptance. Budget storage and interface are lib_u64 on both widths:
+- T98 S9 executor dbff43df is pushed and actual-change review is complete;
+  verified delivery awaits owner acceptance. Budget storage and interface are lib_u64 on both widths:
   zero is continuous, every nonzero value finite. Existing active state and
   original safe-point counting remain; no public component or mirror change.
   Production +14/-20 (net -6); tests +62/-4 (net +58). Cached dual builds and
