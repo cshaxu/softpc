@@ -8,6 +8,7 @@ static kvm_frame_exchange *frames;
 
 static lib_win32_hwnd owner, focused;
 static lib_win32_rect client = {0,0,640,480}, clipped;
+static lib_bool clip_to_desktop, sizing_messages, clip_query_fails;
 static lib_win32_point origin = {100,200};
 static lib_win32_raw_input raw_record;
 static lib_win32_raw_input_device raw_binding;
@@ -72,7 +73,7 @@ static lib_i32 LIB_WIN32_WINAPI metrics(lib_i32 index)
         index==LIB_WIN32_SM_CXVIRTUALSCREEN || index==LIB_WIN32_SM_CYVIRTUALSCREEN);
     return index==LIB_WIN32_SM_CXSCREEN || index==LIB_WIN32_SM_CXVIRTUALSCREEN ? desktop_width : desktop_height;
 }
-static lib_win32_bool LIB_WIN32_WINAPI get_clip(lib_win32_rect *r) { *r=clipped; return LIB_WIN32_TRUE; }
+static lib_win32_bool LIB_WIN32_WINAPI get_clip(lib_win32_rect *r) { if(clip_query_fails) return LIB_WIN32_FALSE; *r=clipped; return LIB_WIN32_TRUE; }
 static lib_u32 releases, clips, events, input_resets;
 static lib_bool reject_input;
 static lib_i32 release_ok=1, focus_ok=1, capture_ok=1;
@@ -141,7 +142,19 @@ static lib_win32_hwnd LIB_WIN32_WINAPI set_focus(lib_win32_hwnd w) { ++focus_req
 static lib_win32_bool LIB_WIN32_WINAPI foreground(lib_win32_hwnd w) { (void)w; ++foreground_requests; return LIB_WIN32_TRUE; }
 static lib_win32_hwnd LIB_WIN32_WINAPI get_focus(void) { return focused; }
 static lib_win32_bool LIB_WIN32_WINAPI clip(const lib_win32_rect *r)
-{ ++clips; if (r) clipped=*r; return r ? clip_ok : LIB_WIN32_TRUE; }
+{
+    ++clips;
+    if (r) {
+        clipped=*r;
+        if (clip_to_desktop) {
+            if (clipped.left < 0) clipped.left=0;
+            if (clipped.top < 0) clipped.top=0;
+            if (clipped.right > 600) clipped.right=600;
+            if (clipped.bottom > 500) clipped.bottom=500;
+        }
+    }
+    return r ? clip_ok : LIB_WIN32_TRUE;
+}
 static lib_win32_bool LIB_WIN32_WINAPI get_client(lib_win32_hwnd w, lib_win32_rect *r)
 { (void)w; if (!client_ok) return LIB_WIN32_FALSE; *r=client; return LIB_WIN32_TRUE; }
 static lib_win32_bool LIB_WIN32_WINAPI to_screen(lib_win32_hwnd w, lib_win32_point *p)
@@ -150,8 +163,17 @@ static lib_win32_hcursor LIB_WIN32_WINAPI cursor(lib_win32_hcursor c) { return c
 static lib_win32_long_ptr LIB_WIN32_WINAPI get_context(lib_win32_hwnd w, lib_i32 index)
 { (void)w; return index==LIB_WIN32_GWLP_USERDATA ? (lib_win32_long_ptr)context : 0; }
 static lib_win32_rect sized;
+static void size_notification(void);
 static lib_win32_bool LIB_WIN32_WINAPI resize(lib_win32_hwnd w, lib_win32_hwnd after, lib_i32 x,lib_i32 y,lib_i32 cx,lib_i32 cy,lib_win32_uint f)
-{ (void)w;(void)after;(void)x;(void)y;(void)f;sized=(lib_win32_rect){0,0,cx,cy};return resize_ok; }
+{
+    (void)w;(void)after;(void)x;(void)y;(void)f;
+    sized=(lib_win32_rect){0,0,cx,cy};
+    if (resize_ok && sizing_messages) {
+        client=(lib_win32_rect){0,0,cx-16,cy-39};
+        size_notification();
+    }
+    return resize_ok;
+}
 static lib_win32_bool LIB_WIN32_WINAPI get_outer(lib_win32_hwnd w, lib_win32_rect *r)
 { (void)w; *r=(lib_win32_rect){0,0,client.right+16,client.bottom+39}; return LIB_WIN32_TRUE; }
 static lib_win32_bool LIB_WIN32_WINAPI adjust_outer(lib_win32_rect *r, lib_win32_dword s,
@@ -250,13 +272,16 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #include "lib/kvm-window/win32/component.c"
 
 static void notify_loss(void) { win32_window_proc((lib_win32_hwnd)1,LIB_WIN32_WM_CAPTURECHANGED,0,0); }
+static void size_notification(void) { win32_window_proc((lib_win32_hwnd)1,LIB_WIN32_WM_SIZE,0,0); }
 static void check_sizing_policy(void)
 {
+    lib_win32_rect saved_client=client;
     kvm_win32_window_context c = {0};
     lib_win32_hwnd w = (lib_win32_hwnd)1;
     lib_win32_minmaxinfo limits = {0};
     lib_win32_rect outer = {0,0,1616,1239};
     context = &c;
+    sizing_messages=LIB_TRUE;
     c.surface_width=1280; c.surface_height=960;
     win32_window_resize_client(w,&c,1280,960,LIB_TRUE);
     lib_test_assert(sized.right==600 && sized.bottom==477);
@@ -271,12 +296,37 @@ static void check_sizing_policy(void)
     lib_test_assert(outer.right==1616 && outer.bottom==1239);
     win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
     lib_test_assert(sized.right==1296 && sized.bottom==999);
+    /* Frame changes preserve natural scale, including a different aspect. */
+    c.surface_width=640; c.surface_height=400;
+    win32_window_resize_client(w,&c,640,400,LIB_TRUE);
+    lib_test_assert(client.right==640 && client.bottom==400);
+    c.surface_width=1280; c.surface_height=960;
+    win32_window_resize_client(w,&c,1280,960,LIB_TRUE);
+    lib_test_assert(client.right==1280 && client.bottom==960);
     win32_window_proc(w,LIB_WIN32_WM_SYSCOMMAND,LIB_WIN32_SC_MAXIMIZE,0);
     lib_test_assert(sized.right==600 && sized.bottom==477);
+    lib_u32 scale_pixels=c.scale_pixels, scale_source=c.scale_source;
+    for (lib_u32 i=0;i<10u;++i) {
+        c.surface_width=640; c.surface_height=400;
+        win32_window_resize_client(w,&c,640,400,LIB_TRUE);
+        lib_test_assert(client.right==292 && client.bottom==183);
+        c.surface_width=1280; c.surface_height=960;
+        win32_window_resize_client(w,&c,1280,960,LIB_TRUE);
+        lib_test_assert(client.right==584 && client.bottom==438);
+        lib_test_assert(c.scale_pixels==scale_pixels && c.scale_source==scale_source);
+    }
+    /* A user resize, not a frame transition, chooses the next scale. */
+    client=(lib_win32_rect){0,0,1600,1200};
+    size_notification();
+    c.surface_width=640; c.surface_height=400;
+    win32_window_resize_client(w,&c,640,400,LIB_TRUE);
+    lib_test_assert(client.right==800 && client.bottom==500);
     c.surface_width=320; c.surface_height=240;
     win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
     lib_test_assert(sized.right==336 && sized.bottom==279);
     context=LIB_NULL;
+    sizing_messages=LIB_FALSE;
+    client=saved_client;
 }
 static void check_split_paint(void)
 {
@@ -856,6 +906,23 @@ int main(void)
     }
     lose_focus_on_capture = replace_capture = LIB_FALSE;
     release_ok = raw_remove_ok = 1;
+    /* Native clipping truncates a client larger than a small RDP desktop. */
+    clip_to_desktop=LIB_TRUE;
+    client=(lib_win32_rect){0,0,1280,960}; origin=(lib_win32_point){100,100};
+    lib_test_assert(kvm_win32_mouse_capture(&c.mouse,(lib_win32_hwnd)1)==LIB_STATUS_OK);
+    lib_test_assert(c.mouse.bounds.right==600 && c.mouse.bounds.bottom==500);
+    raw_record=(lib_win32_raw_input){0};
+    raw_record.header.dwType=LIB_WIN32_RIM_TYPEMOUSE;
+    raw_record.data.mouse.lLastX=2;
+    lib_i32 clipped_dx, clipped_dy;
+    lib_test_assert(kvm_win32_mouse_move(&c.mouse,1,1280,960,1280,960,&clipped_dx,&clipped_dy));
+    lib_test_assert(clipped_dx==2 && clipped_dy==0 && c.mouse.captured);
+    lib_test_assert(kvm_win32_mouse_release(&c.mouse)==LIB_STATUS_OK);
+    clip_to_desktop=LIB_FALSE;
+    clip_query_fails=LIB_TRUE;
+    lib_test_assert(kvm_win32_mouse_capture(&c.mouse,(lib_win32_hwnd)1)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(!c.mouse.captured && owner==LIB_NULL && raw_binding.usUsage==0u);
+    clip_query_fails=LIB_FALSE;
     contend_on_callback = LIB_TRUE;
     lib_test_assert(kvm_win32_mouse_capture(&c.mouse, (lib_win32_hwnd)1) == LIB_STATUS_OK);
     lib_test_assert(kvm_win32_mouse_release(&c.mouse) == LIB_STATUS_OK);

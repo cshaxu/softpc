@@ -2,37 +2,51 @@
 
 ## Current Work
 
-## M9 T98 S10 Packet
+## M9 T98 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes accepted S9 and explicitly admits S10: implement, build, publish, test, commit and push, then wait for acceptance. |
-| Objective | Uniform UTF-8 file paths through Lib Storage; owner additionally admits same-class non-mirror pointer-width warning/ABI cleanup in S10. |
-| Non-goals | No mirror, guest, scheduler, snapshot format, media or user configuration changes; no alternate path converter. |
-| Reference Baseline | `d987f10f`; S9 executor dbff43df and actual-change review are accepted. Preserve user INI/media and untracked snapshot.debug. |
-| Candidate Proposal | [T98 UTF-8 paths](../proposals/m9-nonpublic-quality-performance-audit.md#s10---uniform-utf-8-file-paths). |
-| Files And ABI Surface | Lib Storage writer partial progress/flush; Compat COM/LPT consumers; affected tests. Follow-up audits all non-mirror compilation units and corrects VGA fixture C-VID declarations without changing the actual ABI. |
+| Admission And Approval | Owner accepts/closes S10 and admits S11 to repair oversized Window capture and preserve display scale across frame changes, investigating reported exits. |
+| Objective | Preserve startup work-area fitting; subsequent frame type/size changes retain user scale; oversized visible Window capture works without escape or false failure. |
+| Non-goals | No mirror, guest, scheduler, snapshot format, media or user configuration changes; no alternate mouse or rendering path. |
+| Reference Baseline | `296d4165`; S10 is owner-accepted. Preserve INI/media and untracked snapshot.debug. |
+| Candidate Proposal | [Window scale/capture](../proposals/m9-nonpublic-quality-performance-audit.md#s11---window-scale-and-oversized-capture). |
+| Files And ABI Surface | Lib KVM Window existing geometry, frame transition and native mouse paths; owner-local tests/manifests/docs. No new public API is planned. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | UTF-8 native-name and binary output, append/lazy-open/flush visibility, partial-write and flush-failure accounting; cached dual builds and full background/desktop/native-audio regression. |
-| Expected Markers | One existing Storage platform opener; no locale fopen at owned product file exits; retained partial-progress semantics. |
+| Verification | Oversized capture with actual host clipping, user resize/natural restore/maximize and text/graphics transitions; cursor transition safety; cached dual builds and required regression. |
+| Expected Markers | Initial fit only; stable chosen scale across frames; native clipping bounds reflect actual ownership; no extra mouse/render path. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report production/test added, removed and net lines, path semantics and proof limits. Executor owns disposable build/t98-s10; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
-| Stop Conditions | No duplicate conversion, CRT handle exposure, replay of accepted bytes, mirror changes or silent truncation. |
+| Reporting Requirements | Separate source proof, controlled reproduction and unverified user exits. Executor owns build/t98-s11; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Stop Conditions | No polling, retry manager, duplicate scale/capture authority, mirror change or masking unexpected native failures. |
 | Exit Criteria | Verified single-path implementation, dual packages, required tests, pushed executor and actual-diff review, then owner acceptance. |
-| Original Owner Request | Close S9, admit S10 and complete compilation, publication, tests, commit and push before owner acceptance. All file paths use UTF-8, including COM/LPT/config/snapshot/DEBUG, without special cases. |
-| Similar-Issue Sweep | All owned file open/read/write entries, platform wrappers, original diagnostic-only mirror hits and real callers; classify unchanged compliant paths. |
+| Original Owner Request | Close S10; fix capture escaping after oversized natural-size restore, unwanted shrink on text/graphics changes and possible spontaneous exits. Scale must not change without user action. |
+| Similar-Issue Sweep | All automatic/manual sizing entries, capture/refresh/release ownership, frame-type cursor comparisons and terminal failure paths. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- S10 is owner-accepted and closed; [closure](../history/M9-T98-S10-utf8-paths.md).
+  S11 implements stable Window scale and actual clipped capture bounds in the
+  existing Win32 paths. Production +40/-3 (net +37), tests +123/-3 (net +120).
+  No public ABI, App, mirror or frame-exchange change. Focused controlled and
+  native tests pass on both architectures. Cached dual builds and all 192
+  registered tests per architecture have passing evidence with zero skips.
+  x64 passes first run; x86 compact package first failed stage 1/error 6,
+  then the unchanged desktop group passes 5/5. No repair of that existing
+  intermittency is claimed. Executor delivery is ready for actual-diff review.
+  softpc32 SHA-256 D1AE94255C19A53217F0E0580308EC79D4C42B4642DB2822225106B9996610FC;
+  softpc64: 1696924D7125B779F9C0EB0E1524F658D46715E07637B257BC56810FE357F0A5.
+  The reported occasional exit has not been reproduced or attributed; its
+  precise remaining investigation is recorded in TODO, not claimed fixed.
 
 - Owner closes S9 and admits S10; [S9 closure](../history/M9-T98-S9-execution-budget.md).
   S10 audit finds COM/LPT still using locale fopen; other owned file entries
   already use Storage. Executor 0151689d is pushed; actual-diff coordinator
   review is complete. Owner-admitted warning/ABI follow-up is implemented and
   verified: bf01eead is pushed and its actual-diff coordinator review passes.
-  S10 waits for owner acceptance; T98 stays open.
+  S10 is now owner-closed; T98 stays open with S11 active.
   Follow-up changes no production code: test +9/-8 and build +2/-0. All 242
   non-mirror C objects per architecture were rebuilt with cache; no non-mirror
   warnings remain. Mirror header warnings are retained by owner instruction.

@@ -1,5 +1,15 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Identify the owner's intermittent exit after oversized Window
+  restore/capture and text/graphics switching. T98 S11 fixes the independently
+  demonstrated scale reset and false clip-ownership loss. Controlled transitions
+  and the real native oversized capture/switch/destroy sequence pass on both
+  architectures; they do not establish the reported exit's cause. Owner: Lib
+  Window native failure boundary and App terminal reporting. Admission condition:
+  capture the first component status/child exit at the failing transition;
+  distinguish deliberate terminal native failure from a process exception and
+  do not suppress either to claim stability.
+
 - TODO(Medium): Diagnose the intermittent command-provider event wait failure.
   T98 S7's second x64 aggregate run failed the 10000ms event assertion after
   debug resume/pause observations; the first aggregate and unchanged isolated

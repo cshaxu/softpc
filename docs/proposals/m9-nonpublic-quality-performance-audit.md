@@ -77,7 +77,83 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 1. S7: Window sizing policy (owner accepted and closed).
 2. S8: dynamic frame storage (owner accepted and closed).
 3. S9: 64-bit instruction budget (owner accepted and closed).
-4. S10: uniform UTF-8 file paths (current admission).
+4. S10: uniform UTF-8 file paths (owner accepted and closed).
+5. S11: Window scale and oversized capture (current admission).
+
+### S11 - Window scale and oversized capture
+
+Owner closes S10 and admits S11. Baseline 296d4165. Preserve startup work-area
+fit and explicit maximize/natural restore behavior; frame dimensions/type alone
+must not reset the selected scale. Investigate oversized capture escaping and
+reported exits without presuming one cause. No mirror/App/config/media changes
+or second mouse/render path. Scope is existing Window component, geometry,
+native mouse ownership, related tests and manifest/documentation.
+
+Finite ledger: initial fit; manual/maximize/natural-size scale selection;
+text/graphics dimension transitions; native clip acquisition/refresh/release;
+cursor old/new-frame comparison; fault/exit propagation. Each needs source
+disposition and focused proof. Controlled native stubs and existing desktop
+fixtures replace Computer Use. Require dual cached builds, regression and
+actual-diff review before owner acceptance. Raw probes remain task-owned.
+
+Source findings and minimal implementation:
+
+- `win32_window_resize_client` previously refitted every changed source size.
+  Initial automatic resize alone now fits the work area. Two private integers
+  retain the selected client/source width ratio; automatic transitions use
+  64-bit rounded arithmetic without recapturing the rounded intermediate ratio.
+  Existing aspect-correction suppression also covers programmatic resizing.
+  Manual sizing/maximize update this ratio; double-click resets natural size.
+- `kvm_win32_mouse_refresh_bounds` previously saved the requested clip rectangle,
+  while motion/release compared it with the host's actual rectangle. An
+  oversized client can be clipped by the desktop. Save the successful native
+  query instead; query failure unclips and follows existing failure cleanup.
+  No second motion path, retry, public API, ownership or frame-exchange change.
+- Similar-issue sweep: `rg` over resize_client, WM_SIZE, WM_SIZING,
+  WM_NCLBUTTONDBLCLK, SC_MAXIMIZE, clip_cursor and same_bounds in Window's
+  Win32 implementation. Initial layout remains fitting; explicit maximize
+  remains fitting; natural/manual sizing remains unconstrained by desktop;
+  refresh is shared by acquisition/move/size; release checks actual ownership.
+  Consume-frame cursor comparison short-circuits graphics/text access correctly;
+  no independently confirmed cursor dereference defect. Terminal native failure
+  reporting remains intact, not suppressed to hide exits.
+
+The changed-path estimate was roughly 40 net production lines and 120 test
+lines, with no public ABI, App, mirror, INI or media change. Actual C accounting
+against 296d4165: production +40/-3 (net +37), tests +123/-3 (net +120).
+The only public trees changed are src/lib and test/lib.
+
+Focused proof uses the existing native-contract fixture: initial fitting,
+natural oversized restore, manual 1.25 scale, maximize scale, ten rounded
+back-and-forth transitions, actual clipped capture followed by a raw movement,
+and failed clip-query cleanup. The existing native modal integration additionally
+creates a frame larger than the current screen, restores its exact natural
+size, acquires native capture, switches real text/graphics frames six times and
+destroys normally. Both architectures passed the native and controlled tests.
+This proves those exercised paths, not the cause of the owner's unrecorded
+intermittent exit. No original introduction commit for that exit is established.
+
+Executor qualification: cached Ninja dual builds succeeded, affected builds
+have no compiler warnings. x64 background 184/184, desktop 5/5, native audio
+3/3 pass first run. x86 background 184/184 and native audio 3/3 pass; first
+desktop run is 4/5 (compact package stage=1/error=6 before Window operations).
+The unchanged desktop repeat passes 5/5. This is passing coverage for all 192
+registrations per architecture, not an all-green first x86 aggregate. Exact
+CTest registration/XML name equality and zero skips are verified. Existing
+package-startup debt remains; no causal repair is claimed. Focused tests and
+full runs use task scratch build/t98-s11; logs are disposable after promotion.
+Documentation governance and git diff --check pass; source/test manifests,
+Types, dependency, naming and boundary gates pass within the full suite.
+
+Published SHA-256:
+
+- softpc32: D1AE94255C19A53217F0E0580308EC79D4C42B4642DB2822225106B9996610FC
+- softpc64: 1696924D7125B779F9C0EB0E1524F658D46715E07637B257BC56810FE357F0A5
+
+INI remains 403B1E1B8B728FB83F2BBF18FF08CBF5696F20A87F580D75CAAD482905FFD8AA;
+untracked owner snapshot.debug remains
+AEBD86C4AD8A2B7A41B60B985EE18E11B3BE46C635B5659C8FC3CC75AB9EA310.
+Neither is included as an implementation change. No guest media changes.
 
 ### S9 - 64-bit execution budget
 

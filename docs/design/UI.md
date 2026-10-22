@@ -178,6 +178,11 @@ limited to desktop dimensions; native coordinate/resource limits still apply.
 Maximize selects the
 largest ratio-preserving Window in that work area rather than the native
 full-work-area rectangle.
+After the first frame, frame type or dimensions alone never refit the Window
+to the desktop. The last user-selected scale (manual resize, maximize or
+natural-size restore) applies to subsequent frames, without cumulative
+rounding drift. Capture uses the host's actual clipped rectangle when the
+client extends beyond the desktop.
 
 ## KVM Component And Console Product Policy
 

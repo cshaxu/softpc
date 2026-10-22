@@ -137,6 +137,11 @@ Storage close retains its documented consumed-stream behavior.
 Every `kvm-window` and `kvm-console` instance owns a separate, private pair of
 mailboxes. Callers never share or address a mailbox directly.
 
+Win32 Window fits its first frame to the work area. Later frame size/type
+changes retain the user-selected scale; natural-size restore and manual sizing
+may exceed the desktop, while maximize fits it. Captured motion uses the
+actual host clipping bounds, not an assumed full client rectangle.
+
 - The frame mailbox holds one copied frame. Publishing replaces that value:
   frames are **latest-wins** opaque payloads in leaf-owned fixed storage.
   Window derives changed regions by comparing complete frames with its RGB

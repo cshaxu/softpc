@@ -50,6 +50,8 @@ typedef struct kvm_win32_window_context {
     lib_u32 client_surface_height;
     lib_i32 client_width;
     lib_i32 client_height;
+    lib_u32 scale_pixels;
+    lib_u32 scale_source;
     lib_bool correcting_aspect;
     lib_bool frozen;
     lib_bool cursor_blink_visible;
@@ -272,18 +274,44 @@ static void win32_window_enforce_aspect(lib_win32_hwnd window,
 
 static void win32_window_resize_client(lib_win32_hwnd window,
     kvm_win32_window_context *context, lib_u32 width, lib_u32 height,
-    lib_bool fit_work_area)
+    lib_bool automatic)
 {
     if (window == LIB_NULL || context == LIB_NULL || width == 0u || height == 0u ||
         (context->client_surface_width == width &&
          context->client_surface_height == height)) return;
-    lib_status status = kvm_win32_resize_client(window, width, height, fit_work_area);
+    lib_u64 target_width = width, target_height = height;
+    lib_bool initial = context->scale_source == 0u;
+    if (automatic && !initial) {
+        target_width = ((lib_u64)width * context->scale_pixels + context->scale_source / 2u) /
+            context->scale_source;
+        target_height = ((lib_u64)height * context->scale_pixels + context->scale_source / 2u) /
+            context->scale_source;
+    }
+    if (target_width == 0u) target_width = 1u;
+    if (target_height == 0u) target_height = 1u;
+    if (target_width > LIB_INT32_MAX || target_height > LIB_INT32_MAX) {
+        kvm_component_fail(&context->component->base, LIB_STATUS_UNSUPPORTED);
+        return;
+    }
+    /* Programmatic size changes must not replace the user's scale with a
+       rounded intermediate ratio or enforce the previous frame's aspect. */
+    context->correcting_aspect = LIB_TRUE;
+    lib_status status = kvm_win32_resize_client(window, (lib_u32)target_width,
+        (lib_u32)target_height, automatic && initial);
+    context->correcting_aspect = LIB_FALSE;
     if (status != LIB_STATUS_OK) {
         kvm_component_fail(&context->component->base, status);
         return;
     }
     context->client_surface_width = width;
     context->client_surface_height = height;
+    if (initial || !automatic) {
+        win32_window_capture_client_size(window, context);
+        if (context->client_width > 0 && context->client_height > 0) {
+            context->scale_pixels = (lib_u32)context->client_width;
+            context->scale_source = width;
+        }
+    }
 }
 
 static lib_bool win32_window_cursor_rect(lib_win32_hwnd window,
@@ -686,6 +714,11 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     case LIB_WIN32_WM_SIZE:
         win32_window_capture_client_size(window, context);
         win32_window_enforce_aspect(window, context);
+        if (!context->correcting_aspect && context->client_width > 0 &&
+            context->client_height > 0 && context->surface_width != 0u) {
+            context->scale_pixels = (lib_u32)context->client_width;
+            context->scale_source = context->surface_width;
+        }
         if (!kvm_win32_mouse_refresh_bounds(&context->mouse))
             win32_window_release_mouse(context);
         (void)win32_window_invalidate(window, context, LIB_NULL);
