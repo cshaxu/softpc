@@ -155,6 +155,20 @@ modified. First-run fixture and disconnected failures are disclosed above.
 Disposable diagnostic/build/test evidence is retired after these facts are
 promoted; .ninja and .ccache remain. Actual committed-diff review follows push.
 
+Coordinator actual-change review: inspected pushed fc2fa687, all three changed
+production C files, both owner-local tests, manifests, UI contract, closure and
+packet changes. C accounting independently matches +18/-21 and +41/-2. The
+width-only arithmetic remains in the existing pure geometry path; native
+messages retain one adapter and terminal failure boundary. Unknown directions
+reach DefWindowProc, while known edges preserve anchoring. No public API,
+polling, new scale state, test-only production hook or mirror change is present.
+Published EXE hashes match the qualified versions. Final test-name reconciliation
+covered 192 unique registrations per architecture; both manifests and the
+documentation/whitespace checks pass again. Scratch is removed after runner
+quiescence; build residue check passes. User snapshot.debug remains untracked
+and unchanged, not implementation residue. Review accepts delivery; S12 waits
+for owner validation and T98 remains open.
+
 ### S11 - Window scale and oversized capture
 
 Owner closes S10 and admits S11. Baseline 296d4165. Preserve startup work-area

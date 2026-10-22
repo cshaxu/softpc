@@ -37,7 +37,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   Production +18/-21 (net -3), tests +41/-2 (net +39). Initial new fixture errors
   and disconnected native failures are retained in the proposal, not hidden.
   INI/media/snapshot.debug are preserved. Executor commit/review precede owner
-  acceptance; S12 stays open. Published softpc32 SHA-256:
+  acceptance; S12 stays open. Executor fc2fa687 is pushed and its actual-diff
+  review passes; task scratch is retired. Published softpc32 SHA-256:
   9F113DFE380E62F12705BE69A2102A49205B02AEFD9A53956D623660DF527B02;
   softpc64: 71E95D1D90A2828604C1529012488759790076468D8A239422471ADF27E37253.
 
