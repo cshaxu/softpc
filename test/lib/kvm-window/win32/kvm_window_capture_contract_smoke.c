@@ -164,6 +164,10 @@ static lib_win32_long_ptr LIB_WIN32_WINAPI get_context(lib_win32_hwnd w, lib_i32
 { (void)w; return index==LIB_WIN32_GWLP_USERDATA ? (lib_win32_long_ptr)context : 0; }
 static lib_win32_rect sized;
 static void size_notification(void);
+static lib_u32 default_messages;
+static lib_win32_lresult LIB_WIN32_WINAPI default_message(lib_win32_hwnd w,
+    lib_win32_uint message, lib_win32_wparam wp, lib_win32_lparam lp)
+{ (void)w; (void)message; (void)wp; (void)lp; ++default_messages; return 0; }
 static lib_win32_bool LIB_WIN32_WINAPI resize(lib_win32_hwnd w, lib_win32_hwnd after, lib_i32 x,lib_i32 y,lib_i32 cx,lib_i32 cy,lib_win32_uint f)
 {
     (void)w;(void)after;(void)x;(void)y;(void)f;
@@ -220,6 +224,8 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #define lib_win32_set_cursor cursor
 #define lib_win32_get_window_long_ptr_a get_context
 #define lib_win32_set_window_pos resize
+#undef lib_win32_def_window_proc_w
+#define lib_win32_def_window_proc_w default_message
 #undef lib_win32_get_window_rect
 #define lib_win32_get_window_rect get_outer
 #undef lib_win32_adjust_window_rect_ex
@@ -324,6 +330,39 @@ static void check_sizing_policy(void)
     c.surface_width=320; c.surface_height=240;
     win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
     lib_test_assert(sized.right==336 && sized.bottom==279);
+    /* Reproduce snap -> drag restore: native direction 9 is not an edge. */
+    c.surface_width=640; c.surface_height=400;
+    win32_window_resize_client(w,&c,640,400,LIB_FALSE);
+    client=(lib_win32_rect){0,0,320,536};
+    size_notification();
+    lib_test_assert(client.right==320 && client.bottom==200 && c.scale_pixels==320);
+    outer=(lib_win32_rect){-8,-8,648,431};
+    lib_win32_rect preserved=outer;
+    lib_u32 defaults=default_messages;
+    win32_window_proc(w,LIB_WIN32_WM_SIZING,9,(lib_win32_lparam)&outer);
+    lib_test_assert(default_messages==defaults+1u &&
+        outer.left==preserved.left && outer.top==preserved.top &&
+        outer.right==preserved.right && outer.bottom==preserved.bottom);
+    client=(lib_win32_rect){0,0,640,100};
+    size_notification();
+    lib_test_assert(client.right==640 && client.bottom==400 && c.scale_pixels==640);
+    /* Width wins even when the resulting height extends beyond the desktop. */
+    client=(lib_win32_rect){0,0,1280,100};
+    size_notification();
+    lib_test_assert(client.right==1280 && client.bottom==800 && c.scale_pixels==1280);
+    c.surface_width=320; c.surface_height=240;
+    win32_window_resize_client(w,&c,320,240,LIB_TRUE);
+    lib_test_assert(client.right==640 && client.bottom==480);
+    scale_pixels=c.scale_pixels; scale_source=c.scale_source;
+    client=(lib_win32_rect){0,0,0,0};
+    size_notification();
+    lib_test_assert(c.scale_pixels==scale_pixels && c.scale_source==scale_source);
+    /* Actual native failure and unrepresentable dimensions remain failures. */
+    client=(lib_win32_rect){0,0,640,100};
+    resize_ok=LIB_FALSE;
+    lib_test_assert(kvm_win32_enforce_client_aspect(w,640,400)==LIB_STATUS_IO_ERROR);
+    resize_ok=LIB_TRUE;
+    lib_test_assert(kvm_win32_enforce_client_aspect(w,1,LIB_UINT32_MAX)==LIB_STATUS_IO_ERROR);
     context=LIB_NULL;
     sizing_messages=LIB_FALSE;
     client=saved_client;
@@ -758,8 +797,7 @@ int main(void)
         kvm_window_rect r={10,20,826,749};
         kvm_window_constrain_sizing(&r,(kvm_window_edge)edge,16,29,640,480);
         lib_i32 w=r.right-r.left-16,h=r.bottom-r.top-29;
-        lib_test_assert((edge==KVM_WINDOW_EDGE_LEFT || edge==KVM_WINDOW_EDGE_RIGHT) ?
-            (w==800 && h==600) : (w==934 && h==700));
+        lib_test_assert(w==800 && h==600);
         lib_i32 fitted_w,fitted_h;
         lib_test_assert(kvm_window_fit_aspect_size(w,h,640,480,&fitted_w,&fitted_h));
         lib_test_assert(fitted_w==w && fitted_h==h);

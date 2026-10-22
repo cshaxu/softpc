@@ -2,30 +2,44 @@
 
 ## Current Work
 
-## M9 T98 S11 Packet
+## M9 T98 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts/closes S10 and admits S11 to repair oversized Window capture and preserve display scale across frame changes, investigating reported exits. |
-| Objective | Preserve startup work-area fitting; subsequent frame type/size changes retain user scale; oversized visible Window capture works without escape or false failure. |
+| Admission And Approval | Owner closes S11 and admits S12 to fix snap/drag-off exit and use actual client width for system sizing. |
+| Objective | Unknown sizing directions defer to native handling; system resize derives height and scale from actual client width. Initial fit and explicit maximize still fit both work-area dimensions. |
 | Non-goals | No mirror, guest, scheduler, snapshot format, media or user configuration changes; no alternate mouse or rendering path. |
-| Reference Baseline | `296d4165`; S10 is owner-accepted. Preserve INI/media and untracked snapshot.debug. |
+| Reference Baseline | `64706f69`; S11 is owner-closed with its reproduced exit transferred here. Preserve INI/media and untracked snapshot.debug. |
 | Candidate Proposal | [Window scale/capture](../proposals/m9-nonpublic-quality-performance-audit.md#s11---window-scale-and-oversized-capture). |
 | Files And ABI Surface | Lib KVM Window existing geometry, frame transition and native mouse paths; owner-local tests/manifests/docs. No new public API is planned. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Oversized capture with actual host clipping, user resize/natural restore/maximize and text/graphics transitions; cursor transition safety; cached dual builds and required regression. |
+| Verification | Actual WM_SIZING/9 path, snap/restore widths, reentrant size correction, zero size and overflow/native failures; cached dual builds and all registered tests. |
 | Expected Markers | Initial fit only; stable chosen scale across frames; native clipping bounds reflect actual ownership; no extra mouse/render path. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Separate source proof, controlled reproduction and unverified user exits. Executor owns build/t98-s11; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Reporting Requirements | Separate owner trace, controlled regression and new manual acceptance. S12 owns build/t98-s12 and transferred build/t98-s11 diagnostic evidence; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
 | Stop Conditions | No polling, retry manager, duplicate scale/capture authority, mirror change or masking unexpected native failures. |
 | Exit Criteria | Verified single-path implementation, dual packages, required tests, pushed executor and actual-diff review, then owner acceptance. |
-| Original Owner Request | Close S10; fix capture escaping after oversized natural-size restore, unwanted shrink on text/graphics changes and possible spontaneous exits. Scale must not change without user action. |
+| Original Owner Request | Close S11, admit new S; implement width-driven snap/restore, build/release/test/commit/push, audit actual quality and wait for acceptance. |
 | Similar-Issue Sweep | All automatic/manual sizing entries, capture/refresh/release ownership, frame-type cursor comparisons and terminal failure paths. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- S11 is owner-closed; [closure](../history/M9-T98-S11-window-scale-capture.md).
+  Owner diagnostic proves non-edge WM_SIZING/9 is incorrectly promoted to
+  terminal failure. S12 handles that native handoff and width-driven sizing.
+  Temporary instrumentation is removed before qualification; no extra ratio,
+  lifecycle, polling or rendering path is introduced. Final x64/x86 each pass
+  all 192 registrations (184 background, five desktop, three native audio),
+  exact XML/registration equality and zero skips. Both cached builds are clean.
+  Production +18/-21 (net -3), tests +41/-2 (net +39). Initial new fixture errors
+  and disconnected native failures are retained in the proposal, not hidden.
+  INI/media/snapshot.debug are preserved. Executor commit/review precede owner
+  acceptance; S12 stays open. Published softpc32 SHA-256:
+  9F113DFE380E62F12705BE69A2102A49205B02AEFD9A53956D623660DF527B02;
+  softpc64: 71E95D1D90A2828604C1529012488759790076468D8A239422471ADF27E37253.
 
 - S10 is owner-accepted and closed; [closure](../history/M9-T98-S10-utf8-paths.md).
   S11 implements stable Window scale and actual clipped capture bounds in the
@@ -36,7 +50,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   x64 passes first run; x86 compact package first failed stage 1/error 6,
   then the unchanged desktop group passes 5/5. No repair of that existing
   intermittency is claimed. Executor 1aab6116 is pushed; coordinator actual-diff
-  review is complete. S11 waits for owner acceptance; T98 remains open.
+  review is complete. S11 is owner-closed; T98 remains open with S12 active.
   softpc32 SHA-256 D1AE94255C19A53217F0E0580308EC79D4C42B4642DB2822225106B9996610FC;
   softpc64: 1696924D7125B779F9C0EB0E1524F658D46715E07637B257BC56810FE357F0A5.
   The reported occasional exit has not been reproduced or attributed; its

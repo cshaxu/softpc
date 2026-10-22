@@ -754,10 +754,13 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         }
         break;
     case LIB_WIN32_WM_SIZING:
-        if (kvm_win32_constrain_sizing(window, wparam, (lib_win32_rect *)lparam,
-                context->surface_width, context->surface_height) != LIB_STATUS_OK)
-            kvm_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
-        return LIB_WIN32_TRUE;
+        {
+            lib_status status = kvm_win32_constrain_sizing(window, wparam,
+                (lib_win32_rect *)lparam, context->surface_width, context->surface_height);
+            if (status == LIB_STATUS_UNSUPPORTED) break;
+            if (status != LIB_STATUS_OK) kvm_component_fail(&context->component->base, status);
+            return LIB_WIN32_TRUE;
+        }
     case LIB_WIN32_WM_KEYDOWN:
     case LIB_WIN32_WM_SYSKEYDOWN:
         if (win32_window_accepting_input(context) &&

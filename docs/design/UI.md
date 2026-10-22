@@ -170,8 +170,9 @@ the resulting Window in that work area. The same work-area limit applies when
 the first complete frame requests its natural client size. This is host-window
 geometry only: it does not alter published frame dimensions or guest rendering.
 The Window client area always remains at the current published-frame aspect ratio:
-manual resize, system resize, and maximize use the largest fitting
-ratio-preserving bounds. The copied image fills that client area with uniform
+manual edge resizing preserves aspect; system resize/snap/restore keeps the
+actual client width and recalculates height and scale. Initial fitting and
+maximize still consider both work-area dimensions. The copied image fills that client area with uniform
 scaling and has no black bars. Title-bar double-click restores the natural
 published-frame client size even beyond the work area. Manual resizing is not
 limited to desktop dimensions; native coordinate/resource limits still apply.

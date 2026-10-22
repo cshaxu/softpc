@@ -78,7 +78,82 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 2. S8: dynamic frame storage (owner accepted and closed).
 3. S9: 64-bit instruction budget (owner accepted and closed).
 4. S10: uniform UTF-8 file paths (owner accepted and closed).
-5. S11: Window scale and oversized capture (current admission).
+5. S11: Window scale and oversized capture (owner closed; follow-up exit transferred).
+6. S12: Width-driven system sizing and non-edge snap restoration (current admission).
+
+### S12 - Width-driven snap and restoration
+
+Owner admits on 2026-10-22 against 64706f69 and closes S11; see
+[S11 closure](../history/M9-T98-S11-window-scale-capture.md).
+The owner-run diagnostic records WM_SIZING/9 followed immediately by component
+failure at the sizing handler. Existing geometry rejects unknown directions;
+this predates S11. No arithmetic failure or exception is observed in this trace.
+
+Minimal design: unknown direction returns internal UNSUPPORTED and WndProc
+defers to native processing. Known directions keep the existing constraint.
+WM_SIZE keeps the actual width, uses the existing pure aspect helper to derive
+height within native integer capacity, then records the existing rational scale.
+Initial fit and explicit maximize remain bounded in both axes. No saved snap
+ratio, new state, polling or alternative rendering/input path is added.
+Owner clarification also makes every manual sizing edge width-led: vertical-only
+dragging cannot choose a different ratio through height. Existing edge anchoring
+is retained. Double-click explicitly selects 1:1; maximize remains work-area fit.
+
+Finite ledger: unknown direction unchanged/native handoff; width-led system
+resize/restore; initial/maximize/manual behavior; zero/overflow/native errors;
+frame transitions retain ratio; remove diagnostics; dual cached builds and all
+registered tests; actual committed-diff review and owner acceptance.
+Estimate production net +10-20 lines, tests +40-70; only Lib Window src/test,
+manifests and current UI/governance docs, plus refreshed EXEs. No mirror/App,
+config/media/snapshot or public ABI changes. Scratch is S12-owned including
+transferred diagnostic evidence; delete after promotion, preserving caches.
+
+Implementation accounting against 64706f69: production C +18/-21 (net -3),
+test C +41/-2 (net +39). Manual direction-specific height-led branches are
+deleted; native width fitting reuses the existing pure geometry helper and
+rejects a result that cannot retain width within native integer capacity.
+The private UNSUPPORTED result means native message handoff, not component fault.
+Actual native failures continue through the existing terminal path.
+
+Similar-issue sweep covers all WM_SIZING, WM_SIZE, constrain_sizing,
+enforce_client_aspect, SC_MAXIMIZE and natural-restore sites in Window. The
+single eight-direction adapter contained the confirmed unknown-value rejection.
+Initial/maximize fit still considers both work-area axes; all manual directions
+now retain width. Existing reentrant suppression and rational frame scale remain
+the sole state. Temporary diagnostic includes, compiler definition and exception
+handler are removed. No App, mirror, input, timer or exchange algorithm changes.
+
+Cached dual builds pass without warnings. First new test build found an invalid
+test helper name; explicit rectangle assertions replace it. First full runs
+each pass 183/184 background cases; the new fixture omitted normal source-size
+registration and failed its transition assertion. Fixing the fixture to use
+the real resize entry (not weakening the assertion) passes all 11 focused cases
+on each architecture. Final full background qualification is in progress.
+Each first desktop run passes the three Lib native tests but both package
+prompt tests fail. All three native-audio tests per width fail opening devices.
+Session query reports Disc. These failures are not waived or claimed repaired;
+connected-session qualification is required before the implementation P.
+
+Final qualification: both cached builds succeed without compiler warnings;
+each architecture passes 184/184 background tests, 5/5 desktop tests and 3/3
+native-audio integrations after session reconnection. Exact XML-name comparison
+matches all 192 CTest registrations per architecture with no skips, failures or
+errors. The unchanged production/native tests pass after reconnection; this does
+not repair unrelated package startup debt or promise disconnected audio devices.
+The owner-specific drag gesture still awaits acceptance; its observed message
+is covered through the actual WndProc/geometry path, not another implementation.
+
+Published softpc32 SHA-256:
+9F113DFE380E62F12705BE69A2102A49205B02AEFD9A53956D623660DF527B02;
+softpc64: 71E95D1D90A2828604C1529012488759790076468D8A239422471ADF27E37253.
+INI and owner snapshot retain the S11 protected hashes. Self-review verifies
+the three changed production C files use existing state/geometry/native paths,
+unknown native messages do not become fatal I/O failures, true failed operations
+remain terminal, and bounds checking rejects impossible dimensions. Only src/lib
+and test/lib of the public eight trees change; no external repository is read or
+modified. First-run fixture and disconnected failures are disclosed above.
+Disposable diagnostic/build/test evidence is retired after these facts are
+promoted; .ninja and .ccache remain. Actual committed-diff review follows push.
 
 ### S11 - Window scale and oversized capture
 

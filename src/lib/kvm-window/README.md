@@ -1,7 +1,10 @@
 # kvm-window
 
-Win32 initial placement and automatic content-size changes fit the monitor work
-area. Maximize also fits that area while preserving content aspect ratio.
+Win32 initial placement and the first content size fit the monitor work area.
+Maximize also fits that area while preserving content aspect ratio.
+System snap/restore keeps the actual client width and derives height from the
+content aspect. Unknown sizing directions defer to native handling, not failure.
+Subsequent frame changes preserve the current scale; no separate snap scale is kept.
 Manual resizing has no desktop-size cap; title-bar double-click restores natural
 content dimensions even beyond the work area. Native coordinate/resource limits
 still apply. These operations change presentation size, never frame dimensions.
