@@ -28,6 +28,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 ## Current Technical Baseline
 
 - T98 S6 implementation is verified awaiting owner acceptance, not closed.
+  Executor delivery is `8e66d797`; actual-change coordinator review is recorded
+  in the S6 proposal. Task scratch is retired; build residue check passes.
   Exact Window underline/two-span cursor and documented native Console
   approximations use original video state through the existing frame path.
   Production +153/-114 (net +39), tests +261/-116 (net +145); the only mirror

@@ -251,6 +251,30 @@ empty) and initialize the optional underline enable to zero. No downstream
 repository was modified or claimed synchronized. Await owner acceptance after
 executor push and coordinator actual-change review.
 
+### S6 coordinator actual-change review
+
+Reviewed pushed executor 8e66d797 against the admitted scope and actual 47-path
+diff. The shared schema has one hardware-neutral shape definition; consumers
+normalize once per conversion and retain the existing phase/exchange owners.
+Compat consumes original calculated state, not registers reinterpreted in Lib.
+The only mirror addition is the reviewed four-line refresh hook. Removed
+percentage forwarding and duplicate test linkage have no remaining callers.
+Native Console limitations and downstream source migration are explicit.
+
+Before retiring logs, independently counted 189 distinct passing final-code
+test names per architecture across final/supplement reports. This is aggregate
+passing evidence, not a clean single-run or a stability claim; package attach/
+prompt intermittency remains an explicit TODO. No product change was made to
+hide it. Original cursor-off handling is also explicitly deferred. The review
+does not waive either issue or claim all hardware combinations tested.
+
+Published binary hashes and protected INI/snapshot hashes match the executor
+record. All owned runners exited; exact disposable S6 scratch was removed via
+the cleanup owner and residue check passes. Only the two reusable caches remain.
+Git retains only the owner's untracked snapshot.debug outside committed work.
+Implementation is delivered for owner acceptance; S6/T98 remain open and no
+next task is admitted by this review.
+
 S1 report delivered on 2026-10-18. No production or test modification has been
 made. Findings below are against 4c8e185b; none is claimed to explain an owner's
 specific historical symptom without a matching guest reproduction.
