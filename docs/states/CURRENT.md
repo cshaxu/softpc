@@ -30,6 +30,11 @@ guest stuck-key reproduction or intermittent-failure repair is claimed.
 Production, permanent tests, configuration and EXEs are unchanged. Recommended
 next work is small owner-local cleanup and discriminating fixture evidence,
 not a new shared recovery model. Pause-release semantics require a decision.
+Executor research 29c260b5 is pushed. Coordinator actual-commit review confirms
+only the proposal and CURRENT changed, all five observations remain accounted
+for, and no unproved repair/full-regression claim was introduced. Documentation,
+diff-whitespace and build-residue checks pass. S1 awaits owner acceptance;
+T99 remains open. No implementation is automatically admitted.
 The owner transfers the five related observations out of TODO into T99 S1;
 the proposal retains their evidence and is their sole investigation record.
 QUEUE has no matching candidate; its product-performance task remains separate.
