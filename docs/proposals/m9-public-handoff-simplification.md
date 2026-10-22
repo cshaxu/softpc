@@ -584,3 +584,12 @@ exit/screen diagnostics; they are not startup waits and are not broadened here.
 The historical 0xC0000142 failure remains unproved and belongs to planned S4.
 No shared tree/manifest, guest, configuration or media changes in this P.
 Task scratch is retired only after owned jobs exit and evidence promotion.
+
+Coordinator review of pushed executor commit e6090b97 confirms the three actual
+changed paths match the admitted follow-up, test assertions are not weakened,
+production/EXEs remain unchanged and no new public dependency or recovery path
+exists. Both success and early-exit behavior have direct execution evidence.
+The complete name ledger and disconnected-history qualifications above agree
+with the inspected XML results. Documentation, whitespace and build-residue
+checks pass; scratch has been removed after all owned jobs exited. S2 remains
+verified awaiting owner acceptance, with T99 open and S3/S4 not admitted.

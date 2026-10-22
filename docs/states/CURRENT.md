@@ -47,6 +47,10 @@ repair claim for historical loader/input intermittency. The follow-up changes
 only the App package fixture (+11/-3) and task records. No production source,
 EXE, public manifest, INI or media changes. S2 awaits acceptance after delivery
 and actual-commit review; S3/S4 remain unadmitted.
+Executor P4 e6090b97 is pushed. Coordinator actual-commit review confirms the
+fixture-only change, preserved assertions/ownership, complete 192-case evidence
+per width and explicit disconnected-failure history. Documentation and residue
+checks pass; task scratch is retired. S2 is verified awaiting owner acceptance.
 The following records the earlier bounded delivery, not this fresh run:
 S2 implementation and cached dual builds are complete, no compiler warnings.
 Background regression passes 184/184 per width; focused final evidence is 4/4
