@@ -35,7 +35,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   registered tests per architecture have passing evidence with zero skips.
   x64 passes first run; x86 compact package first failed stage 1/error 6,
   then the unchanged desktop group passes 5/5. No repair of that existing
-  intermittency is claimed. Executor delivery is ready for actual-diff review.
+  intermittency is claimed. Executor 1aab6116 is pushed; coordinator actual-diff
+  review is complete. S11 waits for owner acceptance; T98 remains open.
   softpc32 SHA-256 D1AE94255C19A53217F0E0580308EC79D4C42B4642DB2822225106B9996610FC;
   softpc64: 1696924D7125B779F9C0EB0E1524F658D46715E07637B257BC56810FE357F0A5.
   The reported occasional exit has not been reproduced or attributed; its

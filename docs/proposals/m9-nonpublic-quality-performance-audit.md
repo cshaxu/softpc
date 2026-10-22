@@ -155,6 +155,20 @@ untracked owner snapshot.debug remains
 AEBD86C4AD8A2B7A41B60B985EE18E11B3BE46C635B5659C8FC3CC75AB9EA310.
 Neither is included as an implementation change. No guest media changes.
 
+Coordinator review of pushed executor 1aab6116: inspected the actual committed
+production, controlled-test, native-test, manifest and package diff against
+296d4165 and the owner's request. The rational scale is Window-owned private
+state; existing source-size cache still serves only change detection. Existing
+aspect guard prevents reentrant resizing from recapturing automatic rounding.
+Clip query failure releases native reservation through the existing cleanup.
+No public API, second renderer/input path, new thread, polling, or lower-layer
+dependency is introduced. Tests retain the exchange until Window destruction.
+Actual C totals match the executor accounting; full XML names match registrations.
+The x86 first failure and unproven owner exit remain explicitly disclosed.
+S11 is ready for owner validation of the two verified repairs, not a claim that
+the intermittent exit is solved; T98 is not closed. Raw evidence is promoted
+here; scratch cleanup follows the final push, with reusable caches preserved.
+
 ### S9 - 64-bit execution budget
 
 Owner explicitly admits S9 after revising the F3 remedy: retain the lib_u64
