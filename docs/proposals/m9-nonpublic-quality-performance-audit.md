@@ -80,7 +80,7 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 4. S10: uniform UTF-8 file paths (owner accepted and closed).
 5. S11: Window scale and oversized capture (owner closed; follow-up exit transferred).
 6. S12: Width-driven system sizing and non-edge snap restoration (owner validates exit repair; manual policy superseded by S13).
-7. S13: Direction-aware manual resizing and native snap fitting (current admission).
+7. S13: Direction-aware manual resizing and native snap fitting (closed after owner manual verification and integration qualification).
 
 ### S13 - Manual edges and native snap regions
 
@@ -173,6 +173,14 @@ App, user INI and snapshot.debug are unchanged.
 The executor self-review found no further blocker within the admitted boundary.
 Task logs/probes are retired after promoting these results; persistent Ninja
 and ccache trees are retained. The untracked owner snapshot is not task residue.
+
+Coordinator reviewed pushed executor 1e07dcce's actual production/test/doc and
+binary changes against the nine-case request. Scope, private state ownership,
+error propagation, reentrant correction and test classification are consistent;
+no further in-scope blocker was found. The owner reports manual verification
+and requests closure assessment after integrations; S13 closes with the above
+explicit automation/platform limits. T98 stays open. See
+[closure](../history/M9-T98-S13-directional-sizing.md).
 
 ### S12 - Width-driven snap and restoration
 
