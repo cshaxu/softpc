@@ -113,6 +113,36 @@ owner acceptance and neither S3 nor S4 is automatically admitted.
 
 ## Observation ledger retained
 
+### S2 owner-requested fresh full regression
+
+On 2026-10-22 the owner expands verification to every registered test, including
+native audio. Baseline 27946581; no source, binary, INI or timeout changes.
+The frozen universe is all 192 registrations per architecture, partitioned into
+184 background, five desktop and three native-audio cases. All six groups ran
+to completion; XML names exactly match registration, with no missing, duplicate
+or skipped cases. No older result substitutes for this run.
+
+- x64: background 184/184, desktop 3/5, audio 0/3; total 187/192.
+- x86: background 184/184, desktop 3/5, audio 0/3; total 187/192.
+
+Both widths fail the same five names: app-softpc/integration/package_smoke,
+app-softpc/integration/package_smoke/compact_console,
+app-softpc/integration/audio_lifecycle_smoke,
+app-softpc/integration/sb_midi_native_smoke and
+lib.integration/native_midi_output. x64 package failures are stage 1/error 6;
+x86 package failures are stage 3/error 0. Audio failures are the existing
+assertions for PCM startup or native MIDI output opening, not skipped capability
+checks. Command-provider passes in both fresh background groups.
+
+Session was Active at job launch and Disc at the subsequent audio-failure
+inspection. This is recorded environmental evidence, not proof that every
+failure has that single cause. Full execution is complete but full passing
+qualification is not. Owner has been asked to reconnect for the five failing
+cases on each width. No disconnected retry, deadline change or production
+repair was made. Prior supplementary passes remain historical evidence only.
+The owned job exited with result 1; results are promoted here before scratch
+retirement. S2 remains awaiting complete qualification and owner acceptance.
+
 These five observations originate in TODO, not five established public bugs.
 Owner explicitly transfers all five entries out of TODO into this S. Their
 unresolved status and historical evidence are retained below, not marked fixed.

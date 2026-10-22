@@ -14,7 +14,7 @@
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
 | Files And ABI Surface | Lib console-broker implementation and owner-local test/manifest; App command-provider integration test; task records and rebuilt EXEs. No ABI change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Cached x64/x86 builds; focused broker and command-provider cases, complete background regression and affected desktop Console/package group. Unrelated native audio excluded; failures remain disclosed. |
+| Verification | Owner now requests a fresh complete x64/x86 run: all registered background, desktop and native-audio cases, exact registration/XML coverage and failures disclosed. Prior bounded evidence remains historical. |
 | Expected Markers | One fail-closed cleanup, unchanged first-error/lock/resource order; auto-reset wait consumes exactly one signal. |
 | Asset Needs | Refresh assets/binary dual EXEs only; preserve INI/media. No Computer Use. |
 | Reporting Requirements | Actual production/test counts and failure dispositions. Scratch build/t99-s2: 60-minute job, investigate after 10-minute no progress, 300MB; retire after delivery. |
@@ -26,6 +26,14 @@
 T99 S1 research is now owner-closed; its report and actual-commit review are
 retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.
 S2 is active; S3/S4 are the internal T99 plan only.
+Owner-requested fresh full regression at 27946581 has now executed all 192
+registrations per width: each passes 187, fails five, skips zero. Background
+184/184 and Lib desktop 3/3 pass; two package and three native-audio cases per
+width fail. Session changed from Active at launch to Disc when inspected.
+All test names match registration; no prior passes substitute for these failures.
+Connected-session supplementary verification is pending; full passing
+qualification is not claimed. No source or EXE changed during this rerun.
+The following records the earlier bounded delivery, not this fresh run:
 S2 implementation and cached dual builds are complete, no compiler warnings.
 Background regression passes 184/184 per width; focused final evidence is 4/4
 per width, retaining the initial x86 command wait failure. Native Lib cases pass
