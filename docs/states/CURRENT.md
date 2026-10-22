@@ -7,24 +7,32 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts and closes S3, admits S4 research; latest direction retains shared-package repair planning here and transfers other research to planned S5. |
-| Objective | Establish the minimal shared Console reader-retirement correction; preserve other failure evidence in proposal S5, distinguishing proved causes from unresolved leads. |
+| Admission And Approval | Owner approves implementing the researched minimal Console repair within S4, with dual build/publication, regression, commit/push and self-review before acceptance. |
+| Objective | Remove native read cancellation and drain the existing cooked line through LF before retirement; preserve other failure evidence in planned S5. |
 | Non-goals | No Machine/FIFO/KVM changes, release replay, new ledger/state/API, downstream edits, guest or configuration changes. |
-| Reference Baseline | 8072abdc; clean worktree at admission. |
+| Reference Baseline | 2e85ed53; clean worktree at repair approval; original research admission 8072abdc. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Task records and shared Console retirement call-site audit; temporary diagnostics only so far. Plan native Lib repair without new public API; private CPU/debug/startup work transfers to S5. |
+| Files And ABI Surface | Lib native Console reader, existing cancellation tests, manifests, task records and dual EXEs. No public API change; private CPU/debug/startup work stays in S5. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Bounded x86/x64 repeats of actual affected fixtures; capture exact failed wait/child exit/phase. No unchanged pass claimed as root-cause proof. |
+| Verification | Dual cached builds; focused Console tests; full registered background, audio and desktop/package groups with exact name/skip/failure accounting. Preserve first failures and classify against S5 evidence. |
 | Expected Markers | Separate failure classes; identify first failing operation where evidence permits. |
-| Asset Needs | Preserve EXEs, INI and media. No Computer Use or downstream changes. |
+| Asset Needs | Publish assets/binary/softpc32.exe and softpc64.exe; preserve INI, snapshots and media. No Computer Use or downstream changes. |
 | Reporting Requirements | Source inference versus dynamic evidence, minimal recommendations. Scratch build/t99-s4: 60-minute job, 10-minute no-progress investigation, 300MB; retire before delivery. |
 | Stop Conditions | No broader input redesign or historical intermittency repair; disclose host/device failures rather than skip or fake success. |
-| Exit Criteria | Bounded evidence and honest root-cause report reviewed, records committed/pushed; no unsupported repair claim. |
+| Exit Criteria | Implemented minimal repair, required build/test evidence and actual diff review committed/pushed; wait for owner acceptance, do not admit S5. |
 | Original Owner Request | Close accepted S3 and admit S4 investigation with root-cause report. |
 | Similar-Issue Sweep | All waits in command-provider/package fixture; startup, runtime and input boundaries kept distinct. |
 
 S3 is owner-closed at 8072abdc; see [closure](../history/M9-T99-S3-pause-contract.md).
-S4 is active research, not ready for closure.
+S4's approved minimal repair is implemented and verified, awaiting owner
+acceptance, not closed. Dual cached builds publish both EXEs without compiler
+warnings. Exact registered-name verification proves 192/192 per architecture:
+184 background, three audio and five desktop/package, zero failures/skips.
+Corrected focused Console groups also pass 7/7 per width. Production C is
++6/-13 (net -7); test C +31/-11 (net +20); no public API/state change.
+The proposal records self-review, evidence and the initial zero-test selection
+mistake. S5 remains unadmitted. The following is earlier research evidence,
+not the status of the now-implemented repair.
 The owner's latest split is recorded in the proposal's S4/S5 section: shared
 Console cancellation/input-loss repair planning remains S4; private HLT/TF/BOP,
 pre-main native startup and App fixture investigations transfer to planned S5.
@@ -44,7 +52,8 @@ This is bounded counterfactual evidence, not a production repair, fresh full
 regression or proof that unrelated native startup failure is fixed. All owned
 jobs have exited; the proposal owns detailed evidence and the minimal repair
 plan. S4 remains open for that plan; S5 retains its explicit unresolved items.
-Task scratch is retired; documentation, whitespace and build-residue checks pass.
+Research scratch was retired; implementation scratch is retired after evidence
+promotion and confirmation that all owned verification jobs have exited.
 The following S3/S2 records are historical evidence.
 T99 S1 research is now owner-closed; its report and actual-commit review are
 retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.

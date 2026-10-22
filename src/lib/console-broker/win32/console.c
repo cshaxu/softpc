@@ -258,9 +258,6 @@ static lib_win32_dword LIB_WIN32_WINAPI console_broker_reader(void *context)
                 console_broker_reader_failed(backend);
                 return 0u;
             }
-            if (lib_win32_wait_for_single_object(backend->stop_event, 0u) == LIB_WIN32_WAIT_OBJECT_0) {
-                return 0u;
-            }
             for (i = 0u; i < read; ++i) {
                 if (text[i] == '\n') { complete = LIB_TRUE; break; }
                 if (text[i] == '\r') continue;
@@ -269,6 +266,9 @@ static lib_win32_dword LIB_WIN32_WINAPI console_broker_reader(void *context)
                 else line[used++] = text[i];
             }
         }
+        /* Retire only after draining the native line, including its tail. */
+        if (lib_win32_wait_for_single_object(backend->stop_event, 0u) == LIB_WIN32_WAIT_OBJECT_0)
+            return 0u;
         /* Decode the completed native line once: fragments may divide a
          * surrogate pair. UTF-8 capacity counts bytes, not native units. */
         if (!overflow && used != 0u) {
@@ -566,20 +566,13 @@ static lib_status console_broker_retire_reader(console_broker_backend *backend)
     if (backend->reader == LIB_NULL) return LIB_STATUS_OK;
     if (backend->stop_event == LIB_NULL ||
         !lib_win32_set_event(backend->stop_event)) return LIB_STATUS_IO_ERROR;
-    /* A reader owns the process Console until it has exited.  Cancellation is
-       deliberately best effort because Console implementations differ; the
-       completion observation below is the actual ownership proof. */
-    (void)lib_win32_cancel_io_ex(backend->input, LIB_NULL);
-    (void)lib_win32_cancel_synchronous_io(backend->reader);
+    /* The old reader owns input until its exit has been observed. */
     completed = lib_win32_wait_for_single_object(backend->reader, 0u);
     if (completed == LIB_WIN32_WAIT_TIMEOUT && backend->mode == CONSOLE_BROKER_COOKED_LINES) {
         lib_win32_input_record wake = { 0 };
         lib_win32_dword written = 0u;
-        /* Some terminal hosts do not interrupt a line-buffered ReadConsoleW
-           even after both documented cancellation requests.  Supply the
-           terminating record ourselves while the old reader is still the
-           sole owner.  It observes stop_event and discards this synthetic
-           line; the new binding cannot observe it. */
+        /* Complete the pending native line. The reader drains it before
+           observing stop; the caller flushes any unused wake after join. */
         wake.EventType = LIB_WIN32_KEY_EVENT;
         wake.Event.KeyEvent.bKeyDown = LIB_WIN32_TRUE;
         wake.Event.KeyEvent.wRepeatCount = 1u;

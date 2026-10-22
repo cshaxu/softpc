@@ -55,6 +55,16 @@ neither it nor S4 is a separate T-queue candidate.
 
 ### S4: shared Console reader retirement
 
+Owner now approves the two-site minimal production repair, without S5 scope.
+Implementation baseline is 2e85ed53. Frozen qualification universe: both cached
+Ninja trees' current CTest registrations (expected 192 per architecture), each
+classified as background, native audio or desktop/package. Record actual names
+before execution and require exact coverage, no skips and no failures for a
+full-pass claim. Existing S5 failures retain their own disposition rather than
+being concealed by test retries or scope expansion. Production estimate is
++5..10/-10..20 lines; existing tests +20..50/-5..15; manifests and records are
+counted separately. Scratch owner is S4, build/t99-s4, with the packet budgets.
+
 The confirmed shared-package candidate is the Win32 Lib Console broker's
 cooked-reader retirement before raw input. The actual product failure loses
 input before the broker's raw delivery; independent native experiments reproduce
@@ -122,6 +132,80 @@ integration owner. Test estimate is about +20 to +50 / -5 to -15 lines; actual
 accounting is required before delivery. Wake failure, delayed reader entry,
 completion races and raw handoff require targeted proof. No existing timeout
 or fatal policy changes are proposed.
+
+#### S4 approved implementation and verification ledger
+
+The actual production patch is +6/-13 (net -7), confined to the native broker:
+remove both cancellation calls, move the existing stop observation past LF,
+and update two adjacent comments. No API, state, timeout, allocation or thread
+is added. Existing transaction serialization, stop wake, join, completion
+observation and post-join input flush retain their owners and order. Raw-reader
+stop remains its existing event wait; read errors remain on its existing path.
+
+The existing worker cancellation unit is +31/-11 (net +20). Its wake mock now
+uses the actual terminating-record route rather than cancellation mocks. It
+checks an over-capacity two-fragment line is fully drained without delivery,
+a completed command survives retirement, repeated cancellation is harmless,
+and failed wake reports IO_ERROR while the worker/context remain owned. The
+fixture explicitly releases its blocked read and joins before freeing context;
+this introduces no production retry. Existing deactivate-flush failure coverage
+is preserved. All shared values are read after event/join synchronization.
+
+Final test placement is narrower than the research estimate: retain native
+long-line evidence above and make its deterministic regression permanent in the
+existing worker unit. The display integration deliberately replaces reader
+threads with signaled events; adding a second reader mode there would conflate
+its geometry fixture with input ownership. Existing actual package integration
+supplies native handoff regression; no duplicate integration runner is added.
+
+Similar-issue sweep: search `cancel_io_ex|cancel_synchronous_io|read_console_w`
+under src/lib and test/lib/console-broker. The broker is the only production
+read/cancellation owner; removed calls have no remaining production consumer.
+Types retains its legitimate one-to-one SDK declarations. Reader-failure and
+fragment/UTF-8 tests use the same source inclusion and remain in qualification.
+Normal read, raw stop, replacement/rollback and destroy use the same retirement
+helper; no other path or public package needs alteration. S5 is not implemented.
+
+The first task runner's focused regex used a slash where registered names use
+a dot, selecting zero tests. That invocation is not passing evidence; full
+qualification still includes every registered test, and the corrected focused
+invocation uses `--no-tests=error`. No production or test budget is enlarged.
+
+Final implementation qualification on 2026-10-22: both cached ccache/Ninja
+builds exit zero, 33 incremental steps each, with no compiler warning/error.
+Both published EXEs are rebuilt from this source; no user INI/media is touched.
+The corrected focused groups pass 7/7 per architecture (0.33s x64, 0.37s x86).
+The full run passes on its first execution, without retries:
+
+- x64: background 184/184 in 122.03s; audio 3/3 in 2.54s;
+  desktop/package 5/5 in 14.27s.
+- x86: background 184/184 in 114.89s; audio 3/3 in 2.86s;
+  desktop/package 5/5 in 13.78s.
+
+Each width's combined JUnit names exactly equal its 192-name frozen registry,
+with 192 unique cases, no missing/extra names, failures or skipped cases.
+Audio claims remain those of each test: default MIDI open/release alone is
+not audible-playback proof. Normal and compact package paths pass on both
+published products. Session was Active at launch. Historical S5 intermittency
+is not declared repaired by this successful run.
+
+Published SHA-256:
+
+- softpc32.exe: CFD828584B0CB8F9BBB54593E5482FA7C599487B52CAEC9D58DBBCCE4C13619E
+- softpc64.exe: E66A8962E3362CF2A0399B93DE4BE30E79DC4301B0061774A9C8D00E73172B35
+
+Executor self-review checks the actual production/test diff against the two
+approved corrections: no second path, polling, new timeout/state/API, changed
+dependency or product policy. The existing bounded native line buffer and
+join-before-release contract are unchanged. Test cleanup waits for the reader;
+failed wake does not masquerade as completion. Both manifests and all corpus,
+Types, naming, dependency and documentation gates pass in the full run.
+Counted C paths are precisely the two files above; relative to 2e85ed53,
+`git diff --numstat -- src test` reports production +6/-13, test +31/-11,
+and manifest hashes separately +2/-2. Original mirror diff is zero. Only Lib's
+src/test pair changes among the public eight trees; other shared owners are
+unchanged. Both binaries and task documentation are separate from C counts.
+All jobs must exit before task scratch retirement; S4 waits for acceptance.
 
 Follow-up controlled tests now pass on both widths using the existing cancellation
 fixture with the candidate reader and wake-driven completion. They preserve
