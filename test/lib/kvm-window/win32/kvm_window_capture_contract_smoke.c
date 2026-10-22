@@ -163,6 +163,25 @@ static lib_win32_hcursor LIB_WIN32_WINAPI cursor(lib_win32_hcursor c) { return c
 static lib_win32_long_ptr LIB_WIN32_WINAPI get_context(lib_win32_hwnd w, lib_i32 index)
 { (void)w; return index==LIB_WIN32_GWLP_USERDATA ? (lib_win32_long_ptr)context : 0; }
 static lib_win32_rect sized;
+static lib_bool native_zoomed, native_arranged, arranged_available=LIB_TRUE;
+static lib_bool native_minimized;
+static lib_win32_bool LIB_WIN32_WINAPI is_zoomed(lib_win32_hwnd w)
+{ (void)w; return native_zoomed; }
+static lib_win32_bool LIB_WIN32_WINAPI is_iconic(lib_win32_hwnd w)
+{ (void)w; return native_minimized; }
+static lib_win32_bool LIB_WIN32_WINAPI is_arranged(lib_win32_hwnd w)
+{ (void)w; return native_arranged; }
+static lib_win32_farproc LIB_WIN32_WINAPI get_proc(lib_win32_hinstance module,
+    lib_win32_lpcstr name)
+{
+    union { lib_win32_farproc address; lib_win32_is_window_arranged_proc call; } value;
+    (void)module;
+    lib_test_assert(lib_text_compare(name,"IsWindowArranged")==0);
+    value.call = arranged_available ? is_arranged : LIB_NULL;
+    return value.address;
+}
+static lib_win32_bool LIB_WIN32_WINAPI show_window(lib_win32_hwnd w,lib_i32 command)
+{ (void)w; lib_test_assert(command==LIB_WIN32_SW_RESTORE); native_zoomed=native_arranged=LIB_FALSE; return LIB_WIN32_TRUE; }
 static void size_notification(void);
 static lib_u32 default_messages;
 static lib_win32_lresult LIB_WIN32_WINAPI default_message(lib_win32_hwnd w,
@@ -226,6 +245,14 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #define lib_win32_set_window_pos resize
 #undef lib_win32_def_window_proc_w
 #define lib_win32_def_window_proc_w default_message
+#undef lib_win32_is_zoomed
+#define lib_win32_is_zoomed is_zoomed
+#undef lib_win32_is_iconic
+#define lib_win32_is_iconic is_iconic
+#undef lib_win32_get_proc_address
+#define lib_win32_get_proc_address get_proc
+#undef lib_win32_show_window
+#define lib_win32_show_window show_window
 #undef lib_win32_get_window_rect
 #define lib_win32_get_window_rect get_outer
 #undef lib_win32_adjust_window_rect_ex
@@ -360,9 +387,51 @@ static void check_sizing_policy(void)
     /* Actual native failure and unrepresentable dimensions remain failures. */
     client=(lib_win32_rect){0,0,640,100};
     resize_ok=LIB_FALSE;
-    lib_test_assert(kvm_win32_enforce_client_aspect(w,640,400)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(kvm_win32_enforce_client_aspect(w,640,400,KVM_WIN32_SIZE_WIDTH)==LIB_STATUS_IO_ERROR);
     resize_ok=LIB_TRUE;
-    lib_test_assert(kvm_win32_enforce_client_aspect(w,1,LIB_UINT32_MAX)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(kvm_win32_enforce_client_aspect(w,1,LIB_UINT32_MAX,KVM_WIN32_SIZE_WIDTH)==LIB_STATUS_IO_ERROR);
+    /* Native assigned regions fit both axes, including a flat top rectangle.
+       Top restoration keeps width; either side keeps height, without desktop
+       limits. Use deliberately different aspects to distinguish the axes. */
+    c.surface_width=640; c.surface_height=400;
+    for (lib_u32 side=0;side<2u;++side) {
+        native_zoomed=side==0u;
+        native_arranged=side!=0u;
+        client=(lib_win32_rect){0,0,side==0u ? 1200 : 240,side==0u ? 200 : 600};
+        size_notification();
+        lib_test_assert(client.right==(side==0u ? 320 : 240));
+        lib_test_assert(client.bottom==(side==0u ? 200 : 150));
+        lib_test_assert(c.snap==(side==0u ? KVM_WIN32_SNAP_TOP : KVM_WIN32_SNAP_SIDE));
+        /* Frame-driven native reentry does not consume the saved snap axis. */
+        c.surface_width=320; c.surface_height=240;
+        c.client_surface_width=0;
+        win32_window_resize_client(w,&c,320,240,LIB_TRUE);
+        lib_test_assert(c.snap==(side==0u ? KVM_WIN32_SNAP_TOP : KVM_WIN32_SNAP_SIDE));
+        native_zoomed=native_arranged=LIB_FALSE;
+        client=(lib_win32_rect){0,0,1280,900};
+        size_notification();
+        lib_test_assert(client.right==(side==0u ? 1280 : 1200));
+        lib_test_assert(client.bottom==(side==0u ? 960 : 900));
+        lib_test_assert(c.snap==KVM_WIN32_SNAP_NONE);
+        c.surface_width=640; c.surface_height=400;
+    }
+    /* Minimize must not consume a pending side restore; explicit natural and
+       maximize commands do clear it, without becoming a top-snap state. */
+    c.snap=KVM_WIN32_SNAP_SIDE; native_minimized=LIB_TRUE;
+    client=(lib_win32_rect){0,0,0,0}; size_notification();
+    lib_test_assert(c.snap==KVM_WIN32_SNAP_SIDE);
+    native_minimized=LIB_FALSE; native_zoomed=LIB_TRUE;
+    win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
+    lib_test_assert(c.snap==KVM_WIN32_SNAP_NONE && client.right==640 && client.bottom==400);
+    native_zoomed=LIB_TRUE; c.snap=KVM_WIN32_SNAP_TOP;
+    win32_window_proc(w,LIB_WIN32_WM_SYSCOMMAND,LIB_WIN32_SC_MAXIMIZE,0);
+    lib_test_assert(c.snap==KVM_WIN32_SNAP_NONE && client.right==584 && client.bottom==365);
+    native_arranged=LIB_TRUE; c.snap=KVM_WIN32_SNAP_SIDE;
+    win32_window_proc(w,LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION,0);
+    lib_test_assert(!native_arranged && c.snap==KVM_WIN32_SNAP_NONE && client.right==640 && client.bottom==400);
+    arranged_available=LIB_FALSE; native_arranged=LIB_TRUE;
+    lib_test_assert(kvm_win32_snap_state(w)==KVM_WIN32_SNAP_NONE);
+    arranged_available=LIB_TRUE; native_arranged=LIB_FALSE;
     context=LIB_NULL;
     sizing_messages=LIB_FALSE;
     client=saved_client;
@@ -797,7 +866,8 @@ int main(void)
         kvm_window_rect r={10,20,826,749};
         kvm_window_constrain_sizing(&r,(kvm_window_edge)edge,16,29,640,480);
         lib_i32 w=r.right-r.left-16,h=r.bottom-r.top-29;
-        lib_test_assert(w==800 && h==600);
+        lib_test_assert((edge==KVM_WINDOW_EDGE_LEFT || edge==KVM_WINDOW_EDGE_RIGHT) ?
+            (w==800 && h==600) : (w==934 && h==700));
         lib_i32 fitted_w,fitted_h;
         lib_test_assert(kvm_window_fit_aspect_size(w,h,640,480,&fitted_w,&fitted_h));
         lib_test_assert(fitted_w==w && fitted_h==h);

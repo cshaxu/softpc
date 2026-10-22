@@ -2,10 +2,15 @@
 
 Win32 initial placement and the first content size fit the monitor work area.
 Maximize also fits that area while preserving content aspect ratio.
-System snap/restore keeps the actual client width and derives height from the
-content aspect. Unknown sizing directions defer to native handling, not failure.
+Native snap fits the system-assigned client region in both dimensions. Dragging
+off top snap uses restored width; dragging off a side uses restored height,
+without a desktop cap. Only the last snap kind is retained, not another scale
+or saved rectangle. IsWindowArranged supplies side-state on Windows 10 1903+;
+older hosts retain width-led native restoration without side identification.
+Unknown sizing directions defer to native handling, not failure.
 Subsequent frame changes preserve the current scale; no separate snap scale is kept.
-Manual resizing has no desktop-size cap; title-bar double-click restores natural
+Manual horizontal edges use width, vertical edges use height, and corners use
+the dominant proposed scale. Resizing has no desktop-size cap; title-bar double-click restores natural
 content dimensions even beyond the work area. Native coordinate/resource limits
 still apply. These operations change presentation size, never frame dimensions.
 

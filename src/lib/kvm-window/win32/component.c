@@ -53,6 +53,7 @@ typedef struct kvm_win32_window_context {
     lib_u32 scale_pixels;
     lib_u32 scale_source;
     lib_bool correcting_aspect;
+    kvm_win32_snap snap;
     lib_bool frozen;
     lib_bool cursor_blink_visible;
     lib_win32_dword cursor_blink_due;
@@ -265,9 +266,16 @@ static void win32_window_enforce_aspect(lib_win32_hwnd window,
     lib_status status;
     if (context == LIB_NULL || context->correcting_aspect != LIB_FALSE ||
         context->surface_width == 0u || context->surface_height == 0u) return;
+    if (lib_win32_is_iconic(window)) return;
+    kvm_win32_snap snap = kvm_win32_snap_state(window);
+    kvm_win32_size_basis basis = snap != KVM_WIN32_SNAP_NONE ? KVM_WIN32_SIZE_FIT :
+        context->snap == KVM_WIN32_SNAP_SIDE ? KVM_WIN32_SIZE_HEIGHT : KVM_WIN32_SIZE_WIDTH;
+    /* Observe native state before our synchronous correction. Nested size
+       messages must neither consume restoration nor replace the chosen axis. */
+    context->snap = snap;
     context->correcting_aspect = LIB_TRUE;
     status = kvm_win32_enforce_client_aspect(window, context->surface_width,
-        context->surface_height);
+        context->surface_height, basis);
     context->correcting_aspect = LIB_FALSE;
     if (status != LIB_STATUS_OK) kvm_component_fail(&context->component->base, status);
 }
@@ -734,7 +742,11 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         return 1;
     case LIB_WIN32_WM_NCLBUTTONDBLCLK:
         if (wparam == LIB_WIN32_HTCAPTION) {
-            if (lib_win32_is_zoomed(window)) lib_win32_show_window(window, LIB_WIN32_SW_RESTORE);
+            context->snap = KVM_WIN32_SNAP_NONE;
+            context->correcting_aspect = LIB_TRUE;
+            if (kvm_win32_snap_state(window) != KVM_WIN32_SNAP_NONE)
+                lib_win32_show_window(window, LIB_WIN32_SW_RESTORE);
+            context->correcting_aspect = LIB_FALSE;
             context->client_surface_width = 0u;
             context->client_surface_height = 0u;
             if (context->surface_width != 0u)
@@ -746,8 +758,18 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
     case LIB_WIN32_WM_SYSCOMMAND:
         if ((wparam & 0xfff0u) == LIB_WIN32_SC_MAXIMIZE) {
             if (context->surface_width != 0u && context->surface_height != 0u) {
+                context->snap = KVM_WIN32_SNAP_NONE;
+                context->correcting_aspect = LIB_TRUE;
+                if (kvm_win32_snap_state(window) != KVM_WIN32_SNAP_NONE)
+                    lib_win32_show_window(window, LIB_WIN32_SW_RESTORE);
                 lib_status status = kvm_win32_maximize_client(window, context->surface_width,
                     context->surface_height);
+                context->correcting_aspect = LIB_FALSE;
+                win32_window_capture_client_size(window, context);
+                if (status == LIB_STATUS_OK && context->client_width > 0) {
+                    context->scale_pixels = (lib_u32)context->client_width;
+                    context->scale_source = context->surface_width;
+                }
                 if (status != LIB_STATUS_OK) kvm_component_fail(&context->component->base, status);
             }
             return 0;

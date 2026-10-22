@@ -2,30 +2,45 @@
 
 ## Current Work
 
-## M9 T98 S12 Packet
+## M9 T98 S13 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S11 and admits S12 to fix snap/drag-off exit and use actual client width for system sizing. |
-| Objective | Unknown sizing directions defer to native handling; system resize derives height and scale from actual client width. Initial fit and explicit maximize still fit both work-area dimensions. |
+| Admission And Approval | Owner accepts S12 exit repair and admits S13 to restore eight-direction resizing and fit all native snap regions. |
+| Objective | Direction-aware manual resizing; maximize and snap fit both axes; native restored top width/side height selects scale; natural restore remains 1:1 and frame transitions retain scale. |
 | Non-goals | No mirror, guest, scheduler, snapshot format, media or user configuration changes; no alternate mouse or rendering path. |
-| Reference Baseline | `64706f69`; S11 is owner-closed with its reproduced exit transferred here. Preserve INI/media and untracked snapshot.debug. |
+| Reference Baseline | `c1d6e645`; preserve the accepted unknown-direction exit repair, INI/media and untracked snapshot.debug. |
 | Candidate Proposal | [Window scale/capture](../proposals/m9-nonpublic-quality-performance-audit.md#s11---window-scale-and-oversized-capture). |
 | Files And ABI Surface | Lib KVM Window existing geometry, frame transition and native mouse paths; owner-local tests/manifests/docs. No new public API is planned. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | Actual WM_SIZING/9 path, snap/restore widths, reentrant size correction, zero size and overflow/native failures; cached dual builds and all registered tests. |
+| Verification | Eight manual edges, native snap/state/restore evidence, narrow and flat work areas, reentrant correction, frame scale and real errors; cached dual builds and all registered tests. |
 | Expected Markers | Initial fit only; stable chosen scale across frames; native clipping bounds reflect actual ownership; no extra mouse/render path. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Separate owner trace, controlled regression and new manual acceptance. S12 owns build/t98-s12 and transferred build/t98-s11 diagnostic evidence; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Reporting Requirements | Separate native evidence, controlled regression and owner acceptance. S13 owns build/t98-s13; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
 | Stop Conditions | No polling, retry manager, duplicate scale/capture authority, mirror change or masking unexpected native failures. |
 | Exit Criteria | Verified single-path implementation, dual packages, required tests, pushed executor and actual-diff review, then owner acceptance. |
-| Original Owner Request | Close S11, admit new S; implement width-driven snap/restore, build/release/test/commit/push, audit actual quality and wait for acceptance. |
+| Original Owner Request | Implement clarified manual/maximize/three-edge snap/restore rules without confusing content aspect and display scale; build/test/release/commit/push, audit and wait for acceptance. |
 | Similar-Issue Sweep | All automatic/manual sizing entries, capture/refresh/release ownership, frame-type cursor comparisons and terminal failure paths. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- S13 implementation is local, not yet a qualified/pushed delivery. Private
+  snap classification selects fit/width/height in the existing native size
+  correction; manual eight-edge behavior is restored. Production C/H +76/-10
+  (net +66), test C +108/-4 (net +104). Both EXEs have been rebuilt with cache.
+  x86 and final x64 background each pass 184/184, exact registration/XML name
+  equality and zero failure/error/skip nodes. Documentation and diff checks pass.
+  RDP Active integration rerun executes all 15 per architecture: x86 first-run
+  15/15; x64 14/15 plus unchanged isolated compact package pass. The initial
+  stage 1/error 6 failure remains existing TODO, not claimed repaired.
+  The owner reports manual verification. Actual shell side-snap ordering is
+  not independently automated: SendInput still returns zero/error 5 while
+  Active. The probe verifies native maximize/restore ordering only; controlled
+  and native geometry tests remain distinct evidence. Executor delivery and
+  actual-diff review are next; user INI/snapshot are unchanged.
 
 - S11 is owner-closed; [closure](../history/M9-T98-S11-window-scale-capture.md).
   Owner diagnostic proves non-edge WM_SIZING/9 is incorrectly promoted to
@@ -37,7 +52,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   Production +18/-21 (net -3), tests +41/-2 (net +39). Initial new fixture errors
   and disconnected native failures are retained in the proposal, not hidden.
   INI/media/snapshot.debug are preserved. Executor commit/review precede owner
-  acceptance; S12 stays open. Executor fc2fa687 is pushed and its actual-diff
+  acceptance; S12 is now owner-closed in [history](../history/M9-T98-S12-native-sizing-handoff.md).
+  S13 owns the revised nine-case sizing policy. Executor fc2fa687 is pushed and its actual-diff
   review passes; task scratch is retired. Published softpc32 SHA-256:
   9F113DFE380E62F12705BE69A2102A49205B02AEFD9A53956D623660DF527B02;
   softpc64: 71E95D1D90A2828604C1529012488759790076468D8A239422471ADF27E37253.

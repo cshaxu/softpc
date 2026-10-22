@@ -90,6 +90,41 @@ static void check_frame_scale(void)
     }
     lib_test_assert(kvm_window_release_mouse(window)==LIB_STATUS_OK);
     send_checked(LIB_WIN32_WM_APP+1u,0);
+    /* Exercise all eight native edge notifications through the real Window,
+       then let SetWindowPos deliver the resulting WM_SIZE synchronously. */
+    lib_test_assert(kvm_window_frame_prepare_graphics(&frame,640u,400u,640u)==LIB_STATUS_OK);
+    lib_test_assert(test_window_frame(window,frames,&frame.frame)==LIB_STATUS_OK);
+    send_checked(LIB_WIN32_WM_APP+1u,0);
+    for (lib_win32_wparam edge=LIB_WIN32_WMSZ_LEFT;edge<=LIB_WIN32_WMSZ_BOTTOMRIGHT;++edge) {
+        lib_win32_rect outer;
+        lib_win32_dword_ptr result;
+        lib_test_assert(lib_win32_get_window_rect(target,&outer));
+        lib_test_assert(lib_win32_get_client_rect(target,&client));
+        lib_i32 dw=outer.right-outer.left-client.right;
+        lib_i32 dh=outer.bottom-outer.top-client.bottom;
+        outer=(lib_win32_rect){40,40,40+800+dw,40+600+dh};
+        lib_test_assert(lib_win32_send_message_timeout_w(target,LIB_WIN32_WM_SIZING,edge,
+            (lib_win32_lparam)&outer,LIB_WIN32_SMTO_ABORT_IF_HUNG,3000,&result) && result);
+        lib_test_assert(lib_win32_set_window_pos(target,LIB_NULL,outer.left,outer.top,
+            outer.right-outer.left,outer.bottom-outer.top,
+            LIB_WIN32_SWP_NOZORDER|LIB_WIN32_SWP_NOACTIVATE));
+        lib_test_assert(lib_win32_get_client_rect(target,&client));
+        lib_bool horizontal=edge==LIB_WIN32_WMSZ_LEFT || edge==LIB_WIN32_WMSZ_RIGHT;
+        lib_test_assert(client.right==(horizontal ? 800 : 960) &&
+            client.bottom==(horizontal ? 500 : 600));
+    }
+    send_checked(LIB_WIN32_WM_SYSCOMMAND,LIB_WIN32_SC_MAXIMIZE);
+    {
+        lib_win32_monitorinfo info={.cbSize=sizeof(info)};
+        lib_win32_rect outer;
+        lib_test_assert(lib_win32_get_monitor_info_a(lib_win32_monitor_from_window(target,
+            LIB_WIN32_MONITOR_DEFAULTTONEAREST),&info));
+        lib_test_assert(lib_win32_get_window_rect(target,&outer));
+        lib_test_assert(outer.left>=info.rcWork.left && outer.top>=info.rcWork.top &&
+            outer.right<=info.rcWork.right && outer.bottom<=info.rcWork.bottom);
+    }
+    send_checked(LIB_WIN32_WM_NCLBUTTONDBLCLK,LIB_WIN32_HTCAPTION);
+    lib_test_assert(lib_win32_get_client_rect(target,&client) && client.right==640 && client.bottom==400);
     kvm_window_frame_release(&frame);
     /* The Window borrows the exchange until destroy. */
     lib_test_assert(kvm_window_destroy(window)==LIB_STATUS_OK);

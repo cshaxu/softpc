@@ -15,8 +15,23 @@ static lib_bool kvm_win32_window_decoration(lib_win32_hwnd window, lib_i32 *widt
     return *width >= 0 && *height >= 0;
 }
 
+kvm_win32_snap kvm_win32_snap_state(lib_win32_hwnd window)
+{
+    /* The explicit maximize command is handled separately. Native maximization
+       here is the shell's top snap; arranged (non-maximized) is a side snap. */
+    union {
+        lib_win32_farproc address;
+        lib_win32_is_window_arranged_proc call;
+    } arranged;
+    if (lib_win32_is_zoomed(window)) return KVM_WIN32_SNAP_TOP;
+    arranged.address = lib_win32_get_proc_address(
+        lib_win32_get_module_handle_a("user32.dll"), "IsWindowArranged");
+    return arranged.address != LIB_NULL && arranged.call(window) ?
+        KVM_WIN32_SNAP_SIDE : KVM_WIN32_SNAP_NONE;
+}
+
 lib_status kvm_win32_enforce_client_aspect(lib_win32_hwnd window, lib_u32 source_width,
-    lib_u32 source_height)
+    lib_u32 source_height, kvm_win32_size_basis basis)
 {
     lib_win32_rect client;
     lib_i32 decoration_width;
@@ -28,13 +43,19 @@ lib_status kvm_win32_enforce_client_aspect(lib_win32_hwnd window, lib_u32 source
     if (client.right <= client.left || client.bottom <= client.top) return LIB_STATUS_OK;
     if (source_width == 0u || source_height == 0u || !kvm_win32_window_decoration(window,
             &decoration_width, &decoration_height)) return LIB_STATUS_IO_ERROR;
-    /* System snap/restore supplies the width; height follows the frame aspect. */
+    /* Fit a native assigned region, or keep the restored axis without a
+       desktop cap. Native coordinate capacity is still a hard bound. */
     if (client.right - client.left > LIB_INT32_MAX - decoration_width ||
-        !kvm_window_fit_aspect_size(client.right - client.left,
-            LIB_INT32_MAX - decoration_height, source_width, source_height,
-            &target_width, &target_height) || target_width != client.right - client.left)
+        client.bottom - client.top > LIB_INT32_MAX - decoration_height ||
+        !kvm_window_fit_aspect_size(
+            basis == KVM_WIN32_SIZE_HEIGHT ? LIB_INT32_MAX - decoration_width : client.right - client.left,
+            basis == KVM_WIN32_SIZE_WIDTH ? LIB_INT32_MAX - decoration_height : client.bottom - client.top,
+            source_width, source_height, &target_width, &target_height) ||
+        (basis == KVM_WIN32_SIZE_WIDTH && target_width != client.right - client.left) ||
+        (basis == KVM_WIN32_SIZE_HEIGHT && target_height != client.bottom - client.top))
         return LIB_STATUS_IO_ERROR;
-    if (target_height == client.bottom - client.top) return LIB_STATUS_OK;
+    if (target_width == client.right - client.left &&
+        target_height == client.bottom - client.top) return LIB_STATUS_OK;
     return lib_win32_set_window_pos(window, LIB_NULL, 0, 0, target_width + decoration_width,
         target_height + decoration_height,
         LIB_WIN32_SWP_NOMOVE | LIB_WIN32_SWP_NOZORDER | LIB_WIN32_SWP_NOACTIVATE) ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;

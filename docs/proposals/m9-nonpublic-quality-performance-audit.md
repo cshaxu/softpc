@@ -79,7 +79,100 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 3. S9: 64-bit instruction budget (owner accepted and closed).
 4. S10: uniform UTF-8 file paths (owner accepted and closed).
 5. S11: Window scale and oversized capture (owner closed; follow-up exit transferred).
-6. S12: Width-driven system sizing and non-edge snap restoration (current admission).
+6. S12: Width-driven system sizing and non-edge snap restoration (owner validates exit repair; manual policy superseded by S13).
+7. S13: Direction-aware manual resizing and native snap fitting (current admission).
+
+### S13 - Manual edges and native snap regions
+
+Owner admits against c1d6e645 on 2026-10-22. Preserve the accepted non-edge
+message handoff. Restore left/right width-led, top/bottom height-led and original
+corner constraints; maximize and all snap regions fit both dimensions. Requested
+drag-off semantics use restored width after top snap and restored height after
+side snap. Natural restore is 1:1; frame transitions preserve scale.
+
+The independent native probe can create, query and resize its own window, but
+SendInput is denied and cannot trigger an actual shell snap. This is not a
+successful snap/restore experiment. Microsoft documents IsWindowArranged as
+distinct from IsZoomed and SW_SHOWNORMAL, with minimum Windows 10 version 1903;
+it reports arrangement, not the snapping edge. Native maximize/restore is
+separately observed to expose IsZoomed before WM_SIZE and preserve it across
+synchronous SetWindowPos correction. The reconnected Active-session probe also
+receives SendInput zero/error 5; disconnection is not established as its cause.
+Shell side-snap ordering has no independent automated gesture proof. Sources: Microsoft Learn IsWindowArranged,
+GetWindowPlacement and WM_SIZING reference pages, consulted 2026-10-22.
+
+Owner confirms the nine cases: first fit; explicit maximize; natural double
+click; eight manual directions; top snap; side snap; width-led top restoration;
+height-led side restoration; stable scale across source-frame changes. Maximize
+is an explicit command, not a stored snap kind. Native state is observed before
+synchronous correction; nested correction cannot consume the saved restore axis.
+Only none/top/side classification is stored, not a second rectangle or scale.
+
+Finite verification ledger is these nine cases plus unknown-edge handoff,
+minimize, native errors, coordinate capacity, reentrancy, old-host capability,
+dual builds and all registered tests. Controlled tests must discriminate axes
+with different restored/current-frame aspects. Native shell-state ordering
+remains a separate proof obligation, not inferred from those controlled tests.
+Windows 10 1903 introduces IsWindowArranged; on older hosts the dynamic lookup
+retains prior ordinary resize behavior but cannot identify side restoration.
+No host minimum is silently raised. Estimate production net +60--90 lines,
+tests approximately +100; Lib Window and one-to-one Types SDK declarations only.
+The owner subsequently reports manual verification and requests all integration
+tests before deciding closure; this is owner evidence, not an automated gesture trace.
+
+Implementation checkpoint: production C/H +76/-10 (net +66), test C
++108/-4 (net +104), counted with git diff --numstat against c1d6e645.
+All production hits are the existing pure sizing helper, native geometry,
+Window procedure and one-to-one Types declarations. No public Window ABI,
+App/mirror/input/render path changes. The private snap kind is the only new
+instance state; the existing rational scale and reentrant correction guard
+remain authoritative. Review also makes explicit maximize/natural commands
+restore native arranged state before setting their chosen size.
+
+First build could not replace a running package EXE; the exact repository
+process was closed under standing owner authorization, then the build passed.
+First x64 background run passed 180/184; three manifest checks rejected the
+executor's lowercase hash generation, and the documentation check required
+the accepted S12 closure record. Both mistakes were corrected without changing
+gates. A subsequent x64 run passed 184/184; x86 passed 184/184. The final x64
+review rerun also passes 184/184 in 112.11 seconds (x86 108.42 seconds).
+Final XML names exactly match the 184 background registrations on each width,
+with zero failures/errors/skips. Both owned jobs have exited. Original mirror
+header warnings remain on x86; no non-mirror warning was found in build logs.
+Native qualification is recorded below; controlled state and programmatic
+maximize evidence are not relabelled as an actual Shell side-snap trace.
+
+Final integration run, 2026-10-22 with RDP Active: each architecture executes
+all 15 integration registrations (seven background, five desktop, three native
+audio). x86 passes 15/15 first run. x64 passes 14/15: compact Console package
+fails stage 1/error 6, then passes unchanged in an isolated 12.10-second run.
+The first aggregate exit remains 1, not a claimed all-green initial run.
+This existing package debt remains in TODO; no causal repair is asserted.
+JUnit passing-case names, including that isolated supplement, exactly match
+all 192 CTest registrations on each architecture; all 15 integration names
+also match the integration label inventory. No registration is skipped.
+The native Window modal test passes all eight edge notifications through the
+real procedure/SetWindowPos/WM_SIZE chain, maximize work-area bounds and natural
+restore. Both cached final builds report no work required. Published hashes:
+
+- softpc32: E858D10FB8D328870802295FBDA75EFFC345C79E458A044D5C7461B0A1C6E762
+- softpc64: 73429E55067820087ECF1BBA0D8194010A52F4B8502A6DC0013EB9BAEC206006
+
+Ledger disposition: initial/natural/frame-scale cases retain existing focused
+and native regression; eight manual edges add real native geometry proof;
+top/side fit and restored-axis selection have controlled state/reentrancy proof;
+native maximize ordering is directly observed. Owner reports manual verification,
+but no per-gesture trace is claimed. Unknown-edge, minimize, native failure,
+overflow and absent arranged API have controlled regression. Shell side ordering
+on other hosts remains an explicit validation limit, not a new code path.
+Similar-issue sweep searches WM_SIZING, WM_SIZE, SC_MAXIMIZE, HTCAPTION,
+scale_pixels and correcting_aspect in the Window owner: all size changes use
+the existing geometry helpers and single scale owner; no polling, duplicate
+saved rectangle, render/input path or public API is added. Original mirror,
+App, user INI and snapshot.debug are unchanged.
+The executor self-review found no further blocker within the admitted boundary.
+Task logs/probes are retired after promoting these results; persistent Ninja
+and ccache trees are retained. The untracked owner snapshot is not task residue.
 
 ### S12 - Width-driven snap and restoration
 

@@ -30,7 +30,6 @@ static void check_stable_fit(void)
         kvm_window_rect rect = {10,20,1027,810};
         lib_i32 w,h;
         kvm_window_constrain_sizing(&rect,(kvm_window_edge)edge,16,39,640,480);
-        lib_test_assert(rect.right-rect.left==1017 && rect.bottom-rect.top==790);
         lib_test_assert(kvm_window_fit_aspect_size(rect.right-rect.left-16,
             rect.bottom-rect.top-39,640,480,&w,&h));
         lib_test_assert(w == rect.right-rect.left-16 && h == rect.bottom-rect.top-39);

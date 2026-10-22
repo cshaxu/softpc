@@ -1,10 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(Medium): Verify owner's snap/drag-off exit repair. The S11 diagnostic
-  proves WM_SIZING/9 reaches terminal IO_ERROR; S12 now owns the admitted repair
-  and regressions. Owner: Lib Window. Closure condition: qualified fix and owner
-  acceptance of the same native gesture; do not claim unrelated exits solved.
-
 - TODO(Medium): Diagnose the intermittent command-provider event wait failure.
   T98 S7's second x64 aggregate run failed the 10000ms event assertion after
   debug resume/pause observations; the first aggregate and unchanged isolated
@@ -41,6 +36,9 @@
   is claimed; retain both first failures and supplemental qualification facts.
   T98 S10 final x86 compact package again failed stage 1/error 6; an unchanged
   complete desktop-group repeat passed 5/5. No causal repair is claimed.
+  T98 S13 x64 compact package repeats stage 1/error 6 while RDP is Active;
+  its unchanged isolated repeat passes. x86 passes all desktop cases first run.
+  S13 does not claim to repair this existing package-initialization debt.
 
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,

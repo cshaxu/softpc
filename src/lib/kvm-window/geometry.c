@@ -153,7 +153,16 @@ void kvm_window_constrain_sizing(kvm_window_rect *outer, kvm_window_edge edge,
     client_width = target_width - frame_width;
     client_height = target_height - frame_height;
     if (client_width <= 0 || client_height <= 0) return;
-    client_height = kvm_window_scale_extent(client_width, source_height, source_width);
+    if (edge == KVM_WINDOW_EDGE_LEFT || edge == KVM_WINDOW_EDGE_RIGHT) {
+        client_height = kvm_window_scale_extent(client_width, source_height, source_width);
+    } else if (edge == KVM_WINDOW_EDGE_TOP || edge == KVM_WINDOW_EDGE_BOTTOM) {
+        client_width = kvm_window_scale_extent(client_height, source_width, source_height);
+    } else if ((lib_u64)client_width * source_height >=
+        (lib_u64)client_height * source_width) {
+        client_height = kvm_window_scale_extent(client_width, source_height, source_width);
+    } else {
+        client_width = kvm_window_scale_extent(client_height, source_width, source_height);
+    }
     target_width = client_width + frame_width;
     target_height = client_height + frame_height;
     if (edge == KVM_WINDOW_EDGE_LEFT || edge == KVM_WINDOW_EDGE_TOPLEFT || edge == KVM_WINDOW_EDGE_BOTTOMLEFT)
