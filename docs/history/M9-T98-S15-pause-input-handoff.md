@@ -2,7 +2,7 @@
 
 Owner accepts and closes S15 on 2026-10-22. Executor edb91df1 and coordinator
 actual-commit review 453edcfa are pushed. T98 remains open; no next S is admitted.
-The [retained investigation](../proposals/m9-pause-input-handoff.md) records
+The [retained investigation](M9-T98-S15-pause-input-handoff-proposal.md) records
 the rejected burst-drain experiment and owner-approved freeze contract.
 
 ## Accepted result
