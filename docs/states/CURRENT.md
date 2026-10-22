@@ -7,6 +7,10 @@ for integration qualification before closure; S13 is now closed after that
 qualification and actual-diff review. T98 remains open; no next S is admitted.
 See [S13 closure](../history/M9-T98-S13-directional-sizing.md).
 Open task awaiting owner: T98.
+Owner keeps T98 open for further public-component governance. Its four
+performance candidates are transferred to a separate unnumbered
+[queued proposal](../proposals/m9-runtime-performance-investigation.md);
+no new T or S is admitted by that transfer.
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
@@ -202,7 +206,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   Mapper channels to MPU. [Product UI](../design/UI.md#windows-31-midi-playback)
   owns instructions. No FM or SB-MIDI capability was added.
 - Existing [TODO](TODO.md) items remain open. No unrelated debt is repaired or
-  removed by this investigation closure; the [Queue](QUEUE.md) is empty.
+  removed by this investigation closure; current candidates are in [Queue](QUEUE.md).
 
 ## Recent M9 Closures
 

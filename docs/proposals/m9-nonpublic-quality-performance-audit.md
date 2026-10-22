@@ -63,7 +63,9 @@ status; rediscovering them does not establish a new regression.
 - S10 (formerly planned S9): owner revises to a full file-entry UTF-8 contract
   audit and minimal Lib-owned path conversion, preserving each I/O contract.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
-  the next admission. Performance profiling follows correctness by separate admission.
+  the next admission. Owner transfers performance profiling to a separate
+  [queued task](m9-runtime-performance-investigation.md) on 2026-10-22;
+  T98 remains open for further public-component governance.
 
 ## Findings and verification
 
@@ -1319,38 +1321,12 @@ production implementation and product regressions are not yet admitted.
 
 ### Performance candidates - evidence of work, not measured speedup
 
-1. `compat/cvidc/gdp_state.c:107` linearly searches slot records on each access.
-   The mirror contains 22603 textual rule-slot call sites. Mapped VGA members
-   also search for their aggregate carrier. This is local ABI adaptation cost,
-   not an inherent XP device algorithm. Call-site count is not a dynamic call
-   count. Measure slot count, hit position and time in a controlled VGA workload
-   before choosing an owner-local lookup improvement. Do not replace the C-VID
-   implementation or introduce a second fast rendering path.
-2. `machine/machine.c:286` requests an original full refresh after each mouse
-   delivery. `machine/driver.c:304` resolves every pixel of a produced graphics
-   frame, even if source damage is small; Window damage comparison happens
-   later. A 1024x768 frame writes 3 MiB of RGB payload; at 20 produced frames/s
-   that alone would be 60 MiB/s, excluding reads. This is arithmetic, not a
-   measured bandwidth bottleneck. Removing the refresh without proving the V7
-   software-pointer path would reintroduce missing cursor updates. First measure
-   refresh, conversion and paint separately. Complete immutable frames remain
-   required; no partial-frame ABI or history cache is proposed.
-3. `compat/platform.c:115,174` uses locked compare/exchange for pending/pacing
-   reads; local c_main.c hooks call into this seam at instruction/quick-loop
-   boundaries. Debug and snapshot observers also have inactive fast returns.
-   These calls warrant instruction-throughput profiling, not unconditional
-   deletion. Control/stop/HLT wake and snapshot semantics must survive any change.
-4. `compat/media_snapshot.c:verify_base/capture_slot` hashes complete base media;
-   overlay capture reads both base and effective data in 4-KiB blocks. Load
-   validates before mutation and again after reopening the saved path. This is
-   substantial save/load I/O, not idle CPU. SHA validation and re-open validation
-   are distinct obligations. No unsafe hash cache or removed validation is
-   recommended merely to reduce reads.
-
-Performance changes have no defensible implementation line estimate until a
-bounded profile selects the actual bottleneck. A follow-up profiling S can
-change zero production lines and use task-local probes. Avoid a speculative
-buffer/cache/index framework based solely on these source counts.
+Owner transfers all four candidates together on 2026-10-22 into the independent
+[runtime performance proposal](m9-runtime-performance-investigation.md), now
+queued for a future T. That proposal owns their source leads, measurement plan,
+constraints and disposition ledger. No optimization or measurement is claimed
+by this transfer. These are no longer pending S tasks within T98; T98 remains
+open for the owner's further public-component governance requests.
 
 ### Existing debt and reviewed non-findings
 

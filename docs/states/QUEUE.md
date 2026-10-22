@@ -5,7 +5,9 @@ allocates a numeric task identifier.
 
 ## Ordered candidates
 
-No queued candidates.
+1. [Runtime performance investigation](../proposals/m9-runtime-performance-investigation.md):
+   one future T covering C-VID slot lookup, mouse/frame conversion, execution
+   hot-path checks and snapshot I/O. Audit/measure first; not yet admitted or numbered.
 
 ## Previously admitted
 
