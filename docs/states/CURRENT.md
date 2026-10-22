@@ -31,7 +31,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   S10 audit finds COM/LPT still using locale fopen; other owned file entries
   already use Storage. Executor 0151689d is pushed; actual-diff coordinator
   review is complete. Owner-admitted warning/ABI follow-up is implemented and
-  verified, pending its delivery review and owner acceptance. T98 stays open.
+  verified: bf01eead is pushed and its actual-diff coordinator review passes.
+  S10 waits for owner acceptance; T98 stays open.
   Follow-up changes no production code: test +9/-8 and build +2/-0. All 242
   non-mirror C objects per architecture were rebuilt with cache; no non-mirror
   warnings remain. Mirror header warnings are retained by owner instruction.
