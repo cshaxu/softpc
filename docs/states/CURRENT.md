@@ -33,7 +33,12 @@ three audio and five desktop/package), exact XML coverage, zero skips/failures.
 Native tests ran after the owner's RDP reconnection. Dual EXEs are published;
 production C is +1/-3 and test C +5/-0. No new pause state or reconciliation
 path exists. The proposal owns the full evidence and similar-issue review.
-S4 remains unadmitted. The following is historical S2 evidence.
+Executor c4a624ee is pushed. Coordinator actual-commit review confirms the
+two-predicate scope, unchanged FIFO/ledger ownership, matching regression
+assertions and complete verification record. Manifest, documentation,
+whitespace and residue checks pass; task scratch is removed after jobs exit.
+S3 awaits owner acceptance; T99 stays open and S4 remains unadmitted.
+The following is historical S2 evidence.
 Owner-requested fresh full regression at 27946581 has now executed all 192
 registrations per width: each passes 187, fails five, skips zero. Background
 184/184 and Lib desktop 3/3 pass; two package and three native-audio cases per
