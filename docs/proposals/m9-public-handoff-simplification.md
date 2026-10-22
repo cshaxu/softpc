@@ -46,8 +46,153 @@ S1 research (29c260b5, reviewed in bf18a2f7) is closed by that advancement.
   death, live blank output and post-start input loss. Do not add retries or
   shared recovery machinery before identifying the first failing operation.
 
-S3/S4 remain here, not duplicated in the T queue or TODO. S3 is owner-closed;
-S4 owns the remaining research. S2 is closed by the prior advancement.
+S3 is owner-closed; S2 is closed by the prior advancement. The owner's latest
+scope split retains public-package repair planning in S4 and transfers the
+other investigation to the next S5 described below. S5 is planned, not active;
+neither it nor S4 is a separate T-queue candidate.
+
+## Owner-directed S4/S5 split
+
+### S4: shared Console reader retirement
+
+The confirmed shared-package candidate is the Win32 Lib Console broker's
+cooked-reader retirement before raw input. The actual product failure loses
+input before the broker's raw delivery; independent native experiments reproduce
+the loss with either cancellation API. The terminating-record/join control
+retains all input in 10,000 cycles. The detailed counts below remain evidence,
+not a qualified production fix.
+
+Plan the minimal repair at the existing native reader owner: reuse the existing
+terminating-record wake and join, removing cancellation only if the actual
+reader lifecycle proves it sufficient. Do not add a reader, retry, timeout,
+input replay, Machine/Session admission state or application-specific branch.
+Before implementation, verify empty and partially edited cooked lines, completed
+lines racing retirement, raw-reader retirement, wake failure, shutdown and
+rollback. Preserve real error reporting and join before releasing reader context.
+Keep ordinary text/echo and line-completion behavior unchanged; a wake record
+must not become a user command or leak into the next raw reader.
+
+Retirement and the reader are both private to
+`src/lib/console-broker/win32/console.c`; Base owns neither operation. The two
+cancellation wrappers have no other production consumers in Lib. Root broker
+serialization excludes new request/activation until retirement ends. Raw reading
+already waits on stop and input together; cooked reading needs the existing
+terminating-record wake. No Base or public API change is currently indicated.
+Companions are existing Lib broker contract/integration tests and manifest.
+Qualification must include both architectures, controlled cancellation/retirement
+regressions and the actual raw package handoff. Unit proof and native desktop
+proof are separate. Other public packages remain unchanged unless a concrete
+call-site dependency is established. No production repair is implemented yet.
+
+#### Real-reader counterfactual and long-line discovery
+
+A task-private probe includes the actual native broker implementation and real
+Console I/O, using cached Lib dependencies. It cycles empty cancellation,
+partial-line cancellation, over-capacity cancellation and a completed `ok` line.
+Only the candidate's two native cancellation calls are removed initially;
+wake, reader, join, pending state and flush remain the real implementation.
+After the oversized line, the next delivered command is 33 old `x` characters,
+not `ok`. The original unchanged native broker also fails the same scenario,
+delivering an old long-line tail. This is not merely a mock-specific failure.
+
+Source explains the separate defect: ReadConsoleW can return a fragment of an
+already completed native line. The reader checks stop and returns immediately
+after that fragment, before reaching LF; FlushConsoleInputBuffer does not
+discard the native line's unread fragment. Thus thread exit plus input-record
+flush does not prove that the cooked line has been fully retired. This is the
+same ownership boundary as the input-loss candidate, not another input path.
+
+The second private candidate moves the existing stop check after the existing
+through-LF read loop, before UTF-8 conversion/event delivery, and removes the
+two cancellation calls. It neither enlarges line storage nor delivers an
+abandoned line. The x64 and x86 real-reader tests each complete all 400 cycles:
+100 completed lines per width, no abandoned-line event, no I/O failure, no
+pending input record, ordinary join and cleanup. Both jobs exit zero. This is
+local controlled proof, not shipping or complete
+package qualification. An initial probe compile incorrectly compared a void
+release result; it was corrected before runtime evidence was collected.
+The x86 launch initially misread the CMake cache compiler property's type;
+correcting that task-only script enabled the recorded x86 build/run.
+
+The minimal production candidate is one file: remove two calls, relocate
+the stop check, and correct nearby cancellation comments (roughly +5 to +10 /
+-10 to -20 lines, net reduction). Reuse current unit scenarios with wake-driven
+completion and add native long-line retirement coverage to the existing
+integration owner. Test estimate is about +20 to +50 / -5 to -15 lines; actual
+accounting is required before delivery. Wake failure, delayed reader entry,
+completion races and raw handoff require targeted proof. No existing timeout
+or fatal policy changes are proposed.
+
+Follow-up controlled tests now pass on both widths using the existing cancellation
+fixture with the candidate reader and wake-driven completion. They preserve
+already committed lines, discard cancelled fragments and verify a failed wake
+returns IO_ERROR while the reader/context remain alive. Fixture-controlled
+completion then permits safe join; this is not a new production retry protocol.
+The builds use Wall/Wextra/Wpedantic/Werror without diagnostics.
+
+A private x64 product links only the candidate broker object ahead of the
+existing archive; all other cached production objects remain unchanged. The
+actual package fixture, pointed only at its private raw-Console/overlay
+configuration, passes 40/40 complete compact runs, including initial `ver`,
+pause, stop and restart. All attempts are counted; none is retried or waived.
+This supplements, but does not turn into, full dual-product qualification or
+proof that S5's pre-main initialization failure is fixed. The shipping x64
+hash remains AFA8D42BC1C3C0B21DCBD30527C4D6DCC054E40914946F74E575700416A88D94.
+Temporary tracked command-provider diagnostics were removed and both cached
+test executables rebuilt successfully. Production and test tracked code are
+unchanged. All task-owned jobs exited before evidence retirement.
+
+### S5: private CPU/debug and native startup investigation
+
+This is the next planned S, carrying current evidence forward rather than
+restarting the investigation. It must separate these cases:
+
+1. **HLT instruction-plan timeout (App/CCPU/debug fixture).** The failed executor
+   remains at RESUME_HALT after the fixture changes PC and clears IF. No trace
+   instruction retires, so PAUSED cannot complete. Establish a deterministic
+   valid fixture entry state and preserve the documented architectural HLT
+   contract; do not infer that public Machine event delivery is broken.
+2. **TF quick-path invariant (local CCPU debug hook).** The debug-begin jump
+   bypasses the original quick_mode clearing invariant. The private
+   recomputation experiment passes 60 runs and observes the stale TF case.
+   Audit the smallest original-path correction and mirror accounting before
+   proposing implementation; no public X86 Debug API change is established.
+3. **x86 null BOP dispatch (private machine/boot execution).** Timing probes now
+   capture actual AVs, not merely a timeout: one executes BDA bytes at
+   0000:046f and dispatches BOP 0f; another reaches physical f1c00's BOP 52
+   with CS=e7f4. Both reach an empty BIOS slot. In the latter run the first
+   reset-completed register read already shows CS:IP=0000:5ce1, before the
+   synchronous debug mutation sequence and first resume. This moves the next
+   investigation to reset/bootstrap's first invalid transition. It does not
+   prove that small fixture media, reset itself or a shared data race caused
+   it. The last-instruction ring proves the eventual dispatch, not the first
+   corrupt transition. Do not install a no-op BIOS handler. Cross-reference the
+   historical BIOS[52] TODO without claiming its entire history explained.
+4. **Pre-main native Console startup.** Matching KernelBase symbols locate
+   0xc0074005 at ConsoleCreateConnectionObject's NtCreateFile after successful
+   server launch; loader rollback surfaces 0xc0000142. Owned-server observation
+   sees Windows Terminal OpenConsoleProxy loaded. All 40 starts under server
+   debugging succeed, so that instrument perturbs reproduction. A separate
+   SW_HIDE-start counterfactual has 20/20 successful native initializations,
+   but only 16/20 complete fixture successes; the four later failures were not
+   attributed and cannot be counted as repaired. Terminal delegation is a
+   lead, not a proved server-side root cause. Compare normal-start reversal
+   and obtain the first server rejection before suggesting a host/test change.
+   This occurs before shared Lib or App main, so it is not assigned to S4's
+   broker repair. Do not hide the shipping window or add startup retries.
+5. **App fixture oracles and environment attribution.** Preserve the demonstrated
+   viewport-versus-buffer linear-read limitation and the already tracked legal
+   zero timer-byte assertion. Keep disconnected PCM/MIDI composition failure
+   separate from native loader failure. Repair only proven test-owned defects;
+   an online rerun is not a repair of unavailable host devices.
+
+S5 must report source inference, controlled counterfactual and real failure
+captures separately, retain existing assertions until their contract is proved
+wrong, and request approval for permanent private/mirror repairs. Do not expand
+into unrelated TODO items or downstream repositories. No guest, shipped EXE,
+INI or media changes are part of this transfer. The completed diagnostic jobs
+are stopped; retained scratch belongs to active S4 until concise evidence is
+promoted and unused files are retired. Raw logs are not permanent evidence.
 
 ## S4 bounded investigation report
 
@@ -125,6 +270,221 @@ on the uninstrumented failing startup and name the exact command wait under
 aggregate load. There is no justified minimal production fix yet. Preserve
 separate dispositions for live delayed prompts, exit 1, exit 0xc0000142 and
 post-boot input; only the exit-1 native-endpoint chain is explained here.
+
+### S4 continued failure-site evidence
+
+These are additional active-research observations, not a completed repair or
+full root-cause closure. Temporary fixture diagnostics and task-local probe
+objects remain outside any downstream import baseline.
+
+- The real command-provider first execution plan timed out again. A debugger
+  attached only after its ten-second wait failed. Its executor stack is in
+  `ccpu`, `c_main.c:4065`, the `RESUME_HALT` checkpoint loop. The live debug
+  state is TRACE, target_count=3, executed=0, stop_pending=false,
+  result_ready=false, in_instruction=false; quick_mode=0 and interrupt_map=1.
+  The test's preceding requests set CS:EIP=0:500 and EFLAGS=2. Thus the CPU
+  retained its pre-pause HLT continuation while debug changed the next PC and
+  cleared IF. The HLT loop does not reach the ordinary debug begin/retirement
+  hooks; neither its enabled-INTR nor RESET exit condition is satisfied.
+  This explains this reproduced PAUSED timeout, not every historical wait.
+  It is not an event-wait deadlock or an undersized ten-second budget.
+- Separately, x64 trace with guest TF set sometimes returns IP=702 rather
+  than taking INT1 to 700. The local debug-begin hook jumps to NEXT_INST
+  without clearing quick_mode; the original resampling code only sets it
+  true when eligible, relying on earlier callers to clear it. A task-local
+  counterfactual clears it before recomputation: 60 iterations pass and one
+  records stale quick_mode with TF set at IP=701. This is evidence for a port
+  hook violating the original quick-path invariant, not proof that it also
+  repairs the distinct HLT continuation problem. No mirror change is made.
+- Parallel x86 command-provider also raised an access violation before the
+  execution-plan section. Fifty runs under a debugger pass. Its root remains
+  unproved; debugger-altered timing is not an exoneration.
+- The unchanged x64 package fixture reproduced stage 1 with a still-live
+  child, not just an exited child. Post-failure attachment shows the sole
+  ordinary thread in ntdll's loader initialization failure path, invoking
+  ZwRaiseHardError with STATUS_APP_INIT_FAILURE (0xc0000145) and parameter
+  STATUS_DLL_INIT_FAILED (0xc0000142). Only ntdll is in the loaded module list.
+  Matching Microsoft ntdll symbols identify LdrpInitializationFailure,
+  LdrpInitialize, LdrpInitializeInternal and LdrInitializeThunk. This proves
+  that this live/no-Console sample is a native initialization failure before
+  SoftPC main, not application monitor delay. Which earlier native operation
+  returned the error still requires evidence. Merely extending attachment
+  timeout is not a demonstrated correction.
+
+Further native evidence narrows this last case: the failed child's existing
+LdrpSnapsUnicodeString log explicitly reports KernelBase.dll's process-attach
+initializer returning failure, then Kernel32 load failure, then process
+initialization failure. Read-only observation catches BasepInitializationStage
+at 600. Matching KernelBase symbols/disassembly place stage 600 immediately
+before ConsoleInitialize; its false return exits the DLL initializer without
+advancing to stage 700. Thus this sample's native Console initialization is
+the failed operation, not native PCM or SoftPC main. VirtualQueryEx confirms
+only EXE/ntdll remain mapped after loader rollback; an empty later DLL list
+does not mean KernelBase was never mapped. The trigger of ConsoleInitialize's
+failure remains under investigation. A task-local A/B keeps the same EXE and
+fixture but moves the parent's FreeConsole before versus after CreateProcess;
+results must be inspected, not presumed. KernelBase symbols match RSDS
+79B505276F140450EB83DF0440BF06C6 age 1.
+
+The FreeConsole-order comparison is now complete: the original order fails
+one of ten starts, while releasing before CreateProcess fails three of ten.
+Moving that call alone is therefore not a demonstrated fix. A separate
+15-start diagnostic retains the parent's Console and does not AttachConsole
+until the child advances beyond native Console initialization. Two starts
+still fail at initialization stage 600 with the same KernelBase initializer
+failure. This rules out early parent detach/attach as a necessary trigger in
+these samples. Its later stage-3 prompt report observes the retained parent
+Console, not a running child; the native loader evidence is the useful result.
+The failed primary thread's final LastError is 6, but that stale value alone
+does not identify the originating native API. A minimal Console child that
+immediately returns, with no SoftPC code or attachment, passes 60/60 starts;
+this does not reproduce the package lifecycle or exonerate its native path.
+Raw compact-input experiments now use a private overlay configuration so the
+real raw route is exercised without changing the user's Window configuration.
+Those results remain pending; no passing Window route is counted as raw input
+coverage.
+
+The unchanged raw compact fixture now reproduces the historical post-boot
+failure: attempt 47 reports stage 14, a live child, and a fresh DOS prompt
+with no characters from `ver`. Of these 47 attempts, 39 pass the complete
+route, seven fail native startup, and one fails post-boot input. This is a
+separate reproduced failure, not a window-mode result or a guessed input
+cause. A subsequent task-local fixture attaches the debugger only after
+failure to capture the actual blocked threads. The private package executable
+hash matches the shipping executable; only its private configuration selects
+raw Console with overlay media.
+
+An additional minimal native-only experiment reproduces parent detach,
+child Console attachment, hiding and forced child termination, but passes
+60/60 cycles. Along with the immediate-exit child experiment, this shows that
+these simplified lifecycles have not reproduced the package initialization
+failure; it does not prove that native initialization is sound under the full
+package lifecycle. Separately, 500 consecutive real provider resume/debug-pause
+cycles complete without access violation; the following instruction-plan wait
+times out again. The access violation still lacks a captured faulting stack.
+
+The 60-start raw post-failure-stack experiment completes with 40 successful
+routes and 20 native-initialization failures, but no new stage-14 input failure.
+This does not supersede the reproduced stage-14 sample above. Input-chain
+diagnostics now instrument task-local copies of the broker, KVM Console,
+Session and App keyboard adapter. Their private link reuses existing objects,
+does not replace shipping executables, and writes only to task scratch. A
+lower-perturbation variant records fixed-size in-memory observations and reads
+them only after failure, avoiding per-event file I/O. It also records original
+keyboard-controller disable, scanning and buffer facts; no controller behavior
+or production input routing is changed. Results remain pending.
+
+The file-observation input-chain experiment reproduces stage 14 on attempt
+80. PID 16656's raw reader observes only Enter release, not the three letters
+or Enter press. The adapter decodes that release correctly; the unmatched
+release is not delivered as a guest make. No App keyboard delivery occurs.
+The native reader subsequently waits for input, Session waits for its queue,
+and the guest executor waits normally in BIOS keyboard idetect. Thus this
+sample loses the command before Broker native key delivery, not in Machine
+FIFO, Session admission or the guest keyboard adapter. The native cause
+(flushing, another reader or host input handling) remains to be distinguished.
+
+A native-only controlled experiment now reproduces the exact missing-input
+shape without SoftPC, Session or Machine. It starts a cooked ReadConsoleW,
+cancels through the two existing native cancellation calls, joins the reader,
+flushes input, switches to raw mode and successfully writes all eight records
+for `ver` plus Enter. On cycle 470, only Enter release remains. A fresh repeat
+reproduces on cycle 388. In both failures ReadConsoleW returned TRUE with zero
+characters and ERROR_OPERATION_ABORTED; the reader thread had exited before
+new input was written. Thus joining the application reader does not prove the
+native cancelled cooked-read state can no longer consume future input.
+
+The counterfactual removes only the two cancellation calls, retaining the
+existing terminating-key wake, join, flush and raw transition. All 10,000 cycles
+retain all eight key records. This is dynamic causal evidence for cancellation
+in this native probe, corroborating the real product's pre-Broker loss. It is
+not qualification of a permanent broker repair or every terminal implementation.
+The native observation is consistent with Microsoft's public Terminal issue
+[17791](https://github.com/microsoft/terminal/issues/17791), which reports a
+successful cancelled ReadConsole and discarded first subsequent input. The
+independent local experiment, not that issue alone, supplies the evidence here.
+Per-call isolation remains useful before choosing the smallest correction.
+That isolation now also reproduces with CancelIoEx alone (cycle 220) and
+CancelSynchronousIo alone (cycle 203), each leaving only Enter release.
+Replacing one cancellation API with the other is therefore not a supported
+correction. The existing terminating-record/join route is the useful minimal
+candidate; its product-level output/editing behavior still needs qualification.
+
+A one-shot debugger observes ConsoleInitialize's ConsoleAllocate return in
+40 private package children. Every observed status is success; each child is
+then terminated before product execution. This deliberately limited experiment
+does not reproduce the native initialization failure or the full package
+lifecycle, and cannot close that root-cause item. All these diagnostic children
+and the cancellation isolation/control jobs have exited.
+
+The x86 fixture's exact prefix through its first resume and second pause now
+runs in 1,000 fresh processes. All pass; later attempts overlap an eight-way
+Machine/unit stress group. The prefix retains its original register/memory,
+port, command-open/close and pause calls, then uses ordinary owner teardown;
+only subsequent execution-plan/snapshot sections are omitted. This separates
+the historical access violation from the known later HLT/TF assertions, but
+does not prove the violation repaired. Source review confirms debug cancellation
+is queued atomically and applied on the executor, not a direct frontend write
+to the driver's debug state. No unsupported shared-state-race claim follows.
+The supporting stress group remains active until its bounded repeats finish.
+Read-only System log inspection finds the native 0xc0000142 popup records but
+no Win32k or Resource-Exhaustion event in the preceding twelve hours. This is
+not proof that resource pressure is impossible or the initialization root cause.
+
+The startup debugger now retains the actual complete package fixture lifecycle
+instead of terminating immediately after successful native initialization.
+Its second start observes ConsoleAllocate returning 0xc0074005; subsequent
+starts reproduce the same return. The child never reaches main in those
+failures. This provides the first live originating status beneath the loader's
+generic 0xc0000142. A serialized follow-up observes the individual allocation,
+server-launch, connection and standard-I/O returns in the same native chain;
+its results must be checked before attributing that status to a particular call.
+The one-shot breakpoints affect only private diagnostic child memory and are
+removed before each observed instruction executes; no DLL on disk is changed.
+
+The complete-lifecycle experiment finishes 40 starts: 22 native allocation
+successes and 18 failures with 0xc0074005. The serialized deeper observation
+then captures one success and one failure. In the failing child, both initial
+NtCreateFile operations and ConsoleLaunchServerProcess return success;
+ConsoleCreateConnectionObject returns 0xc0074005, propagated unchanged through
+ConsoleAllocate. Matching local disassembly shows the connection routine
+obtains its failure from its NtCreateFile request; allocation failure would
+instead return 0xc000009a. Standard-I/O creation is never reached in that
+sample. This establishes the failing client/server connection operation before
+main, not why the native server rejects it. No product retry or timeout change
+is justified by this evidence. Both native diagnostic jobs have now exited.
+
+The supporting x86 eight-way repeated Machine/unit group completes in 609.15
+seconds: 30 of 31 registrations pass; machine_smoke fails its existing
+run_int1a_tick_boot_image assertion bda_tick_low != 0 (exit 0xc0000409).
+This is the already-recorded host-time oracle debt in TODO, not a new access
+violation: the fixture repeatedly executes INT 1Ah, whose original time_of_day
+overwrites TIMER_LOW from get_host_timestamp. A zero low byte is legal.
+The failed timestamp was not captured, so no timer-delivery regression is
+inferred and that test-only repair remains outside this S.
+
+The HLT finding also requires a contract distinction: Product UI explicitly
+preserves HLT until an interrupt. The fixture resumes firmware before pausing
+and installing its instruction-plan program, so a retained HLT continuation is
+a possible entry state. Editing PC and clearing IF does not itself provide an
+architectural interrupt. The timeout is explained; automatically clearing HLT
+in production is not yet an approved or demonstrated correct repair. A repair
+must distinguish deterministic fixture setup from any separately intended
+debugger override of halted CPU state.
+
+The x86 first-chance exception-observed prefix adds 200 successful fresh runs.
+No access violation is observed; neither a captured crash nor a repair is
+claimed. The debug cancellation call-chain review remains negative evidence,
+not a substitute for the missing fault site.
+This 80-attempt group has 61 complete passes, 18 startup failures and this
+one input failure. Its private executable is instrumented; it is not a claim
+about unmodified production timing. Shipping hashes remain unchanged.
+
+The loader symbol file is the public Microsoft ntdll.pdb matching RSDS
+C031D45B0DA18A6E74D06ED6AB2DD9E1 age 1. Symbol lookup corrects GDB's nearest
+export names; no OS registry, system binary, downstream source, user INI or
+guest media is changed. The documented status meanings are in Microsoft's
+[NTSTATUS reference](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55).
 
 ## S3 implementation and verification record
 

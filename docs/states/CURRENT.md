@@ -7,12 +7,12 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts and closes S3, admits S4 root-cause research. |
-| Objective | Distinguish command completion timeout, package startup/prompt failure and compact input loss; report proved causes and unresolved evidence separately. |
+| Admission And Approval | Owner accepts and closes S3, admits S4 research; latest direction retains shared-package repair planning here and transfers other research to planned S5. |
+| Objective | Establish the minimal shared Console reader-retirement correction; preserve other failure evidence in proposal S5, distinguishing proved causes from unresolved leads. |
 | Non-goals | No Machine/FIFO/KVM changes, release replay, new ledger/state/API, downstream edits, guest or configuration changes. |
 | Reference Baseline | 8072abdc; clean worktree at admission. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Task records; read actual command-provider/package fixtures and production callers. Temporary diagnostics only; no permanent production/API repair. |
+| Files And ABI Surface | Task records and shared Console retirement call-site audit; temporary diagnostics only so far. Plan native Lib repair without new public API; private CPU/debug/startup work transfers to S5. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
 | Verification | Bounded x86/x64 repeats of actual affected fixtures; capture exact failed wait/child exit/phase. No unchanged pass claimed as root-cause proof. |
 | Expected Markers | Separate failure classes; identify first failing operation where evidence permits. |
@@ -24,17 +24,27 @@
 | Similar-Issue Sweep | All waits in command-provider/package fixture; startup, runtime and input boundaries kept distinct. |
 
 S3 is owner-closed at 8072abdc; see [closure](../history/M9-T99-S3-pause-contract.md).
-S4 is active research, not ready for closure. Its proposal records bounded
-experiments: command-provider 40/40 per width; x64 package reproduces online
-0xc0000142, x86 package 24/24 passes. Isolated raw Console starts reproduce
-the same startup exit but not post-boot input loss. Loader instrumentation
-suppresses reproduction; the failing DLL/initializer is not identified.
-No production or permanent test change is justified yet. The report explicitly
-separates proved phase/cause, source limitations and remaining unknowns.
-Coordinator reviewed pushed research commit 240dd036: only task documents
-changed, no production/test/EXE/config/media edits or false root-cause claims.
-Documentation/whitespace checks pass; owned probes exited and scratch is retired.
-This is a research checkpoint, not S4 completion or permission to implement.
+S4 is active research, not ready for closure.
+The owner's latest split is recorded in the proposal's S4/S5 section: shared
+Console cancellation/input-loss repair planning remains S4; private HLT/TF/BOP,
+pre-main native startup and App fixture investigations transfer to planned S5.
+S5 is not admitted. New x86 captures prove null BOP dispatch after invalid
+guest execution; the first invalid reset/boot transition remains unresolved.
+Native hidden-start initialization passed 20/20 but its complete fixture only
+16/20: no full repair claim follows. No production or shipping artifact changed.
+Temporary command-provider diagnostics are removed; its normal cached test
+executables rebuild successfully for both architectures.
+The shared-reader audit also reproduces old long-line tail delivery after
+retirement. A private same-path candidate removes native cancellation and
+moves the stop check after the existing through-LF read loop; real native
+broker probes pass 400 cycles per architecture. Controlled wake-failure and
+completed-line tests also pass both widths. A private x64 product containing
+only the candidate broker change passes 40/40 actual raw compact-package runs.
+This is bounded counterfactual evidence, not a production repair, fresh full
+regression or proof that unrelated native startup failure is fixed. All owned
+jobs have exited; the proposal owns detailed evidence and the minimal repair
+plan. S4 remains open for that plan; S5 retains its explicit unresolved items.
+Task scratch is retired; documentation, whitespace and build-residue checks pass.
 The following S3/S2 records are historical evidence.
 T99 S1 research is now owner-closed; its report and actual-commit review are
 retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.
