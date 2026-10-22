@@ -2,26 +2,31 @@
 
 ## Current Work
 
-## M9 T99 S4 Packet
+## M9 T99 S5 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves implementing the researched minimal Console repair within S4, with dual build/publication, regression, commit/push and self-review before acceptance. |
-| Objective | Remove native read cancellation and drain the existing cooked line through LF before retirement; preserve other failure evidence in planned S5. |
-| Non-goals | No Machine/FIFO/KVM changes, release replay, new ledger/state/API, downstream edits, guest or configuration changes. |
-| Reference Baseline | 2e85ed53; clean worktree at repair approval; original research admission 8072abdc. |
+| Admission And Approval | Owner accepts S4 and admits S5 research. Permanent repairs require a subsequent evidence-backed approval. |
+| Objective | Investigate the five private CPU/debug, native startup and fixture cases transferred from S4; produce distinct root-cause conclusions and minimal repair proposals. |
+| Non-goals | No production repair, public API/input redesign, guest/media changes, downstream access, startup retry or timeout relaxation. Cursor appearance is not added to this S. |
+| Reference Baseline | c5d6cf64; owner INI change display=console is preserved, not an investigation edit. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Lib native Console reader, existing cancellation tests, manifests, task records and dual EXEs. No public API change; private CPU/debug/startup work stays in S5. |
+| Files And ABI Surface | Task documentation; read-only App/Compat/CCPU and actual test-path audit, with task-private diagnostic builds if needed. No permanent ABI change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Dual cached builds; focused Console tests; full registered background, audio and desktop/package groups with exact name/skip/failure accounting. Preserve first failures and classify against S5 evidence. |
-| Expected Markers | Separate failure classes; identify first failing operation where evidence permits. |
-| Asset Needs | Publish assets/binary/softpc32.exe and softpc64.exe; preserve INI, snapshots and media. No Computer Use or downstream changes. |
-| Reporting Requirements | Source inference versus dynamic evidence, minimal recommendations. Scratch build/t99-s4: 60-minute job, 10-minute no-progress investigation, 300MB; retire before delivery. |
-| Stop Conditions | No broader input redesign or historical intermittency repair; disclose host/device failures rather than skip or fake success. |
-| Exit Criteria | Implemented minimal repair, required build/test evidence and actual diff review committed/pushed; wait for owner acceptance, do not admit S5. |
-| Original Owner Request | Close accepted S3 and admit S4 investigation with root-cause report. |
-| Similar-Issue Sweep | All waits in command-provider/package fixture; startup, runtime and input boundaries kept distinct. |
+| Verification | Bounded actual-path x86/x64 research; distinguish prior captures from new evidence. Documentary admission uses governance/diff checks, not a redundant full build; any later repair defines its own full regression before implementation. |
+| Expected Markers | First bad transition, owning code, reproducibility limits, minimal candidate and falsifying checks for each of five ledger entries. |
+| Asset Needs | Preserve published EXEs, INI, snapshots and media. No Computer Use or downstream changes. |
+| Reporting Requirements | Source proof, dynamic proof and unknowns separately. S5 owns build/t99-s5: 60-minute job, 10-minute no-progress investigation, 300MB; retire unused scratch before delivery. |
+| Stop Conditions | No unapproved production/mirror repair or broader TODO cleanup; do not conceal host/device failures or infer root cause from an unchanged rerun. |
+| Exit Criteria | Five-case research ledger has explicit evidence/disposition and actionable proposals or precise remaining unknowns; records reviewed and committed/pushed before seeking repair approval. |
+| Original Owner Request | Accept S4, then admit S5 research. |
+| Similar-Issue Sweep | CPU resume/quick-mode entry edges, fixture register mutations and all package startup/wait phases; keep independent causes distinct. |
+
+S4 is owner-accepted and closed; see [closure](../history/M9-T99-S4-console-retirement.md).
+S5 is active research. T99 remains open. No S5 production repair is authorized.
+
+### Historical S4 verification and research
 
 Executor 52d8fcc3 is pushed. Coordinator review of the actual eight changed
 paths confirms the approved two-site repair, synchronized fixture ownership,

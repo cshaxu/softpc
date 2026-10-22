@@ -236,8 +236,12 @@ unchanged. All task-owned jobs exited before evidence retirement.
 
 ### S5: private CPU/debug and native startup investigation
 
-This is the next planned S, carrying current evidence forward rather than
-restarting the investigation. It must separate these cases:
+Owner accepts S4 and admits S5 research at c5d6cf64. This carries current
+evidence forward rather than restarting the investigation. The five entries
+below are the finite research ledger: each needs source ownership, evidence
+class, first-bad-transition findings, candidate scope and explicit unknowns.
+Prior passing experiments are not new runs. No permanent fix is authorized.
+It must separate these cases:
 
 1. **HLT instruction-plan timeout (App/CCPU/debug fixture).** The failed executor
    remains at RESUME_HALT after the fixture changes PC and clears IF. No trace
@@ -283,8 +287,34 @@ captures separately, retain existing assertions until their contract is proved
 wrong, and request approval for permanent private/mirror repairs. Do not expand
 into unrelated TODO items or downstream repositories. No guest, shipped EXE,
 INI or media changes are part of this transfer. The completed diagnostic jobs
-are stopped; retained scratch belongs to active S4 until concise evidence is
-promoted and unused files are retired. Raw logs are not permanent evidence.
+are stopped and S4 scratch has been retired. Any S5 diagnostics belong to
+build/t99-s5 under CURRENT's bounded execution policy; publish concise evidence
+and remove disposable files, rather than retaining raw logs permanently.
+
+#### S5 admission source recheck
+
+At admission, current source still matches the earlier captures. In
+`c_main.c`, a retained halted entry goes directly to RESUME_HALT; ordinary
+PC/register edits do not change that entry. The actual command-provider test
+resumes the booted machine, requests pause, then execution_plans clears IF and
+sets CS:EIP to 0:500. These operations do not establish that the CPU was parked
+at a fetch boundary. First research target: establish a deterministic fixture
+entry without changing architectural HLT or creating a second resume path.
+This is source confirmation, not a newly reproduced timeout.
+
+The debug-begin hook's return jumps to NEXT_INST. Its implementation explicitly
+permits paused register/code edits before returning. At RESUME_FETCH the CPU
+resamples TF, but the eligibility block only assigns quick_mode=TRUE, never
+FALSE. Thus the existing local hook can bypass the original clearing invariant.
+Compare clearing at that newly introduced return edge against broader changes
+to original recomputation; prefer the narrower hook-local correction if all
+entry paths and the controlled TF test prove it sufficient. No patch is made.
+
+Next evidence targets are a controlled HLT/fetch fixture comparison, a TF
+return-edge counterfactual on both widths, the first invalid bootstrap register
+transition for the BOP case, and native startup before application entry.
+No new dynamic test, all-case root-cause claim or S5 EXE publication is reported
+at admission. Current production and tests remain identical to accepted S4.
 
 ## S4 bounded investigation report
 
