@@ -36,6 +36,11 @@ registrations per width, excluding three unrelated native-audio cases. This
 is supplemented qualification, not an all-green first run or an intermittency
 repair. EXEs are refreshed; INI/media remain unchanged. All jobs have exited;
 scratch is retired for delivery. S2 awaits owner acceptance after commit/review.
+Executor delivery a3fa9062 is pushed. Coordinator reviewed the actual committed
+code, test, manifest, package and documentation diff: both approved cleanups
+are complete, first-error/ownership order is retained, and no pause semantics
+or recovery path changed. Checks pass and the workspace is clean. S2 awaits
+owner acceptance; S3/S4 remain unadmitted.
 The following records the completed S1 research:
 The proposal records all five dispositions and a bounded source/caller review.
 Existing cached x64/x86 focused tests pass 7/7 each; no full-suite, desktop,
@@ -67,6 +72,14 @@ that performance candidate remains unnumbered and unadmitted.
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- T99 S2 delivery a3fa9062: Broker fail-closed cleanup is consolidated and the
+  App completion fixture no longer resets an already auto-reset event. Cached
+  x86/x64 builds refresh both EXEs. Applicable 189 tests per width have passing
+  evidence with disclosed supplements; three unrelated native-audio tests per
+  width were not rerun. Production C +4/-18, tests +27/-15; combined net -2.
+  Manifests and dependency boundaries remain valid. S2 is not a repair of the
+  historical command/package intermittency; see the proposal for all failures.
 
 - Final T98 accepted runtime: edb91df1, reviewed in 453edcfa, closure through
   8165664a. S15 provides passing evidence for all 192 tests per architecture,
