@@ -243,3 +243,17 @@ manifests. There is no root test-infrastructure change. All external Machine
 enqueue callers must compare lib_status explicitly: OK is accepted,
 INVALID_STATE is normal refusal, other errors are failures. No old bool alias
 is retained. Lib and X86 Debug trees are unchanged.
+
+## Coordinator actual-commit review
+
+Executor edb91df128b6d046da557590fc5ade29ec05cf6e is pushed to main.
+After switching roles, review of its actual production and test diff confirms
+the approved freeze contract, one mutex admission boundary, the existing
+single-event delivery cadence, explicit resume wake and capture-first ordering.
+The obsolete paused input event and delivery branch are removed, not retained
+as a second route. Queue/real-worker/capture tests exercise the respective
+boundaries; caller adaptations distinguish normal refusal from genuine failure.
+The public return-type change and paused Session key-release debt are disclosed.
+No unapproved Lib/mirror/product implementation or user asset change is present.
+Documentation governance, diff whitespace and build-residue checks pass.
+This accepts executor delivery, not owner acceptance or T closure.

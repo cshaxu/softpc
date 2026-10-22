@@ -35,7 +35,10 @@ and audio 3/3. Exact registration equality proves passing evidence for all 192
 tests per width, without skips, not an all-green first run. Earlier disconnected
 failures and Active compact stage 1/error 6 remain disclosed in the proposal.
 Source C/H +63/-26; tests +200/-20. Delivery/review precede owner acceptance;
-S15 and T98 remain open.
+S15 and T98 remain open. Executor edb91df1 is pushed; coordinator review of
+the actual committed production/test diff passes. S15 is verified awaiting
+owner acceptance. Task scratch is retired; only the preserved user-owned
+untracked snapshot.debug remains outside the clean tracked worktree.
 
 S14 is closed under the owner's authorization to complete self-verification
 and close after reconnection; see [closure](../history/M9-T98-S14-kvm-lifetime-failure.md).
