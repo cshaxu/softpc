@@ -83,6 +83,8 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 5. S11: Window scale and oversized capture (owner closed; follow-up exit transferred).
 6. S12: Width-driven system sizing and non-edge snap restoration (owner validates exit repair; manual policy superseded by S13).
 7. S13: Direction-aware manual resizing and native snap fitting (closed after owner manual verification and integration qualification).
+8. S14: [KVM lifetime failure audit/design](m9-kvm-lifetime-failure.md), owner-admitted;
+   assess scope and minimal remedy before production changes.
 
 ### S13 - Manual edges and native snap regions
 

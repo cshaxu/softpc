@@ -2,11 +2,28 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner reports manual acceptance and asks
-for integration qualification before closure; S13 is now closed after that
-qualification and actual-diff review. T98 remains open; no next S is admitted.
-See [S13 closure](../history/M9-T98-S13-directional-sizing.md).
-Open task awaiting owner: T98.
+## M9 T98 S14 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits a new S to assess the proposed minimal KVM lifetime-failure repair and whether its scope is justified. |
+| Objective | Audit actual create rollback, stop/join, cleanup and callers; deliver a bounded recommendation and cost estimate before production implementation. |
+| Non-goals | No production edit in this audit delivery; no frame redesign, new recovery protocol, fatal callback, polling, App/mirror/media change or downstream repository modification. |
+| Reference Baseline | 9514c823; preserve user snapshot.debug and configuration. |
+| Candidate Proposal | [KVM lifetime failure audit](../proposals/m9-kvm-lifetime-failure.md). |
+| Files And ABI Surface | Read Lib Window/Console/Base/Types, Emulator UI consumers and owner-local tests; only proposal/current state change in this delivery. |
+| Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [Documentation](../rules/DOCUMENT.md). |
+| Verification | Source/caller/test inventory; ordinary versus unsafe-return boundary; documentation and diff checks. No dynamic fault reproduction claimed. |
+| Expected Markers | Two-result creation; no inaccessible live worker after ordinary failure; no new ownership state; classify post-join resource errors separately. |
+| Asset Needs | None for audit; do not rebuild or replace EXEs. |
+| Reporting Requirements | Confirmed source defects, minimum changes, estimates and compatibility effects; explicit proof limits. No task scratch needed. |
+| Stop Conditions | Report before broadening fatal policy, lifecycle APIs, frame algorithm or platform architecture. |
+| Exit Criteria | Reviewed audit and bounded design delivered for owner decision; implementation/qualification and S closure remain pending. |
+| Original Owner Request | Assess whether the proposed minimal lifecycle-failure repair is reasonable and worthwhile, avoiding a large redesign for small failures. |
+| Similar-Issue Sweep | Both KVM leaves, generic destroy, native cleanup, all production destroy callers, Linux unsupported leaves and frame/lifetime tests. |
+
+S13 remains [closed](../history/M9-T98-S13-directional-sizing.md). T98 remains open.
 Owner keeps T98 open for further public-component governance. Its four
 performance candidates are transferred to a separate unnumbered
 [queued proposal](../proposals/m9-runtime-performance-investigation.md);
