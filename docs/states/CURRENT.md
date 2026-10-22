@@ -23,6 +23,13 @@
 | Original Owner Request | Close accepted S3 and admit S4 investigation with root-cause report. |
 | Similar-Issue Sweep | All waits in command-provider/package fixture; startup, runtime and input boundaries kept distinct. |
 
+Executor 52d8fcc3 is pushed. Coordinator review of the actual eight changed
+paths confirms the approved two-site repair, synchronized fixture ownership,
+matching manifest/artifact hashes and complete qualification. No new state,
+API, polling or mirror change is present. Task scratch is removed; documentation,
+whitespace and build-residue checks pass. S4 awaits owner acceptance; T99 stays
+open and S5 is not admitted.
+
 S3 is owner-closed at 8072abdc; see [closure](../history/M9-T99-S3-pause-contract.md).
 S4's approved minimal repair is implemented and verified, awaiting owner
 acceptance, not closed. Dual cached builds publish both EXEs without compiler
