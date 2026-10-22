@@ -124,7 +124,195 @@ actual-diff self-review and coordinator review under the single-person mode,
 documentation checks and one complete research delivery before acceptance.
 This is not a planning-only implementation P or an automatic repair admission.
 
-## Transferred historical evidence
+## S1 research delivery (2026-10-22)
+
+Reviewed repository baseline: 4bc1ff35; runtime remains edb91df1. This is a
+bounded review of the three named handoffs, not a whole-library correctness
+certificate. No production or permanent test change accompanies this report.
+
+### 1. Input: different records, not interchangeable copies
+
+`src/lib/kvm-base/hotkey.c` owns source-local pending/consumed/delivered-to-sink
+keys for chord recognition. `component.c` discards that matcher on input reset
+or retirement and emits the corresponding event. It does not synthesize every
+guest break. `src/emulator/session/control.c` owns source-key records used to
+synthesize those releases while running. Machine's `input_queue.c` owns
+accepted events, with admission and push ordered by the same mutex. Only the
+Machine executor delivers them to the driver. None of these records is a
+guest device's held-key state.
+
+The concrete sequence is:
+
+1. KVM worker posts copied events to Session; Session's control thread alone
+   updates its source ledger.
+2. Session dispatches to `deliver_machine_input()` in `session.c`. That adapter
+   treats both acceptance and INVALID_STATE refusal as successfully handled;
+   other failures remain failures.
+3. Machine queue mutex orders push against the pause cutoff. S15 freezes
+   existing FIFO contents, closes admission, and publishes PAUSED from the
+   executor. It does not drain the queue. Genuine resume reopens admission;
+   state-read continuation does not.
+4. A release/reset seen while Session believes the machine PAUSED removes its
+   record without calling the Machine sink. On resume there is no retained
+   Session release to send for that record.
+
+Observation 1 is therefore a confirmed accounting/semantic gap, not a newly
+reproduced guest fault. Existing `physical_key_identity_smoke.c` explicitly
+asserts that paused reset forgets the record without another break; the focused
+run passes that assertion. `control_reconciler_smoke.c` also tests suppression
+of paused guest input. The problematic state is therefore currently deliberate
+test behavior, not an uncovered accidental branch alone.
+
+Do not delete either ledger: removing KVM's loses chord/prefix behavior;
+removing Session's loses source-wide cleanup after matcher discard. Moving
+`remember_pressed` after a boolean sink call is insufficient: handled refusal
+still returns true, and successful enqueue is not driver delivery. Session's
+queued completion facts can also lag the actual Machine admission boundary.
+
+Recommendation: retain the accepted frozen-FIFO contract in this research
+delivery. Before repair, explicitly choose the semantics for a release that
+occurs during pause: retain an ordered release obligation until genuine resume,
+or permit a defined paused release operation. Both change present behavior;
+neither is authorized merely by calling it cleanup. Do not introduce a second
+ledger, special product callback or restore-time release burst. A minimal repair
+estimate cannot honestly be fixed until that choice and source-retirement
+ordering are established. Current recommended production/test diff: zero.
+Receiver remains T99 input-semantics investigation, not a duplicate TODO.
+
+One independent redundant predicate exists in `accept_kvm_event()`: PAUSED tests
+SOURCE_RETIRED again after the early unconditional acceptance. Removing that
+single line is safe simplification, but does not repair observation 1 and is
+not sufficient reason to reopen the input architecture.
+
+### 2. Command completion: preserve one fact, remove redundant fixture reset
+
+`src/x86-ibmpc/product/command.c` translates debug lifecycle requests to Session
+requests and delegates completed-runtime reporting to the Emulator monitor.
+It does not independently complete a pause. Machine `machine.c` publishes
+PAUSED from its executor after closing input and stopping heartbeat; genuine
+resume publishes RUNNING. Internal state-read continuation suppresses a false
+user pause/resume pair. Session reduces copied completed facts; its desired
+state is a request, not a second completed-state authority.
+
+The affected App integration fixture directly drives Machine and feeds provider
+runtime notifications; it does not exercise the complete Session run loop.
+`command_provider_smoke.c:wait_for()` waits for an auto-reset event and then
+calls `ResetEvent()` again. All its completion handles, including
+`program_completed`, are created with manual-reset FALSE. The second reset is
+unnecessary and could erase a signal arriving between successful wait and reset.
+This proves a removable operation, not that such an interleaving caused the
+historical debug timeout. Its exact missing event remains unidentified.
+
+Recommendation: App-owned fixture cleanup, production +0/-0, test +0/-1.
+No new completion ID, acknowledgment, retry or public event model. Verify all
+wait callers and rerun the fixture on both widths. If the original failure
+recurs, record the particular wait and preceding executor completion before
+changing shared code. Observation 2 remains unresolved; receiver is the App
+command-provider fixture/executor boundary. This run passes unchanged on both
+widths and does not reproduce the historical aggregate failure.
+
+### 3. Console: one owner already exists; one duplicate cleanup is removable
+
+`console_broker_replace()` is the native handoff transaction owner. It prepares
+the next binding, takes the output gate, retires/joins the old reader, resets
+old source input, invalidates the old binding, activates the next binding, then
+commits current identity/generation. Old output bindings are removed after the
+output gate is released so in-flight writers can settle. Failed activation
+restores the old object through the same activation helper; failed restoration
+marks the broker broken rather than claiming a usable binding.
+
+The transaction lock serializes replace; the output lock prevents concurrent
+native output during the switch; generations reject stale writers. These are
+different obligations. `emulator/ui/ui.c` calls replace and emits a completed
+handoff only on success. Session's broker completion and Lib's activation
+notification have different consumers: control/prompt sequencing versus render
+activation. Neither is evidence for a second native restoration path.
+
+In `src/lib/console-broker/console.c`, adjacent deactivate-failure and
+reset-bound-failure branches duplicate the same broken-state/output-binding
+cleanup. The minimal alternative is:
+
+```c
+status = console_broker_backend_deactivate(...);
+if (status == LIB_STATUS_OK)
+    status = console_broker_reset_bound(...);
+if (status != LIB_STATUS_OK) {
+    /* one existing broken-state cleanup block */
+}
+```
+
+Projected production +2/-15 (approximately net -13, final comment placement
+affects count); no new helper, state or API. Existing broker fault tests are
+the starting point; budget test +0 to +15/-0 only if reset-failure assertions
+need an explicit counterpart. This is cleanup, not a claimed fix for package
+attach/input failure. Keep the old-binding restoration path: it is necessary
+to preserve the replace failure contract, not a second renderer.
+
+Native deactivate and activate both flush input at different boundaries:
+retired-reader cancellation residue versus records arriving before new-reader
+activation. Do not remove either merely because the same API occurs twice.
+
+### 4. Package observations 3, 4 and 5: improve attribution, not Lib recovery
+
+`test/app-softpc/integration/package_smoke.c` retries AttachConsole within its
+fixture deadline without checking child exit in that loop. Stage 1 is assigned
+by the subsequent code-page query, so its error alone cannot identify the
+original startup fault. A historical 0xC0000142 is distinct from a live blank
+buffer and from an explicit machine-composition failure. Observations 3 and 5
+share an evidence boundary, not a proved common root cause.
+
+The compact route sees DOS, hides its Console again, injects `ver`, and waits
+for Version. Stage 14 combines injection failure and successful injection with
+missing output into one result. A visible prompt alone does not identify which
+input boundary later discarded a record. Hide/focus, activation flush, KVM
+decode, Session admission and guest delivery need discriminating evidence;
+none is proved responsible here. Observation 4 stays separate from startup.
+
+Recommended receiver for all three is the App package fixture/native handoff
+investigation. No shared production change is justified yet. Minimal next
+probe: record child liveness/exit and first attach error, distinguish injection
+return from output timeout, and timestamp existing activation/read/admission
+boundaries only if needed. Estimated temporary fixture diagnostics +15 to +30
+lines, production zero; remove temporary traces after evidence promotion.
+No retry of startup, extra Session redraw, larger product timeout or recovery
+manager. Do not combine these observations into one purported Console bug.
+
+The visible-screen helper also uses a linear read count based on viewport area;
+that is not a rectangular viewport read when backing stride exceeds viewport
+width. Review its intended oracle before changing it; stage 14 uses the separate
+buffer-text helper, so this is not evidence of its cause. This candidate remains
+within the package-fixture receiver and is not an admitted test rewrite.
+
+### Verification, scope and decision
+
+Existing cached binaries, without rebuilding or changing source, were exercised
+with CTest on both x64 and x86. Selection:
+`physical_key|control_reconciler|command_provider|session_monitor|console_broker`,
+excluding `desktop|native_audio`. Each width passes 7/7, zero failed tests:
+
+- app-softpc/integration/command_provider_smoke;
+- lib.console-broker/console_broker;
+- lib.console-broker/win32/console_broker_reader_failure;
+- lib.console-broker/win32/console_broker_cancel;
+- emulator.session/control_reconciler;
+- emulator.session/physical_key_identity;
+- emulator.session/session_monitor.
+
+Times: x64 1.02s, x86 1.19s; job exit 0. The first hidden launch left no results;
+it is not counted as a test run. The subsequent logged launch completed. No
+desktop/package/audio test, aggregate-stress reproduction, guest stuck-key
+experiment or fresh compilation was performed. Source traces and cached-test
+evidence are reported separately. Scratch is retired after this record.
+
+All five observations have an owner and an honest disposition above; none is
+declared repaired. The research recommends fewer duplicated statements, not
+fewer necessary safety boundaries. Suggested next implementation is the tiny
+Broker cleanup and auto-reset fixture cleanup, separately approved; input
+semantics and package diagnosis remain research. No production/test code was
+changed here (both +0/-0), no ABI or published artifact changed, and no downstream
+repository was read. The task awaits owner review, not automatic repair admission.
+
+## Historical evidence retained below
 
 The following five former TODO entries are retained as source observations,
 including their original admission conditions, now questions owned by T99 S1.

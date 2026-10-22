@@ -23,8 +23,13 @@
 | Original Owner Request | Bundle the public-component issues, describe observed phenomena, then research where code and mental models can genuinely be simplified and unified. |
 | Similar-Issue Sweep | Duplicate input ledgers, request/completion guesses, Console activation/restoration intervention and overlapping startup failure records within the named paths. |
 
-T99 S1 is admitted for research, not implementation. Admission documentation is
-prepared; no new reproduction or complete source review is claimed yet.
+T99 S1 research is delivered for owner review, not implementation approval.
+The proposal records all five dispositions and a bounded source/caller review.
+Existing cached x64/x86 focused tests pass 7/7 each; no full-suite, desktop,
+guest stuck-key reproduction or intermittent-failure repair is claimed.
+Production, permanent tests, configuration and EXEs are unchanged. Recommended
+next work is small owner-local cleanup and discriminating fixture evidence,
+not a new shared recovery model. Pause-release semantics require a decision.
 The owner transfers the five related observations out of TODO into T99 S1;
 the proposal retains their evidence and is their sole investigation record.
 QUEUE has no matching candidate; its product-performance task remains separate.
