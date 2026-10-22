@@ -2,26 +2,11 @@
 
 ## Current Work
 
-## M9 T98 S14 Packet
+No implementation subtask is active.
+Open task awaiting owner: T98.
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the audited minimal repair and requests build/release/tests/commit/push plus shared-component quality review; on reconnection authorizes closure after successful self-verification. |
-| Objective | Implement safe-return or process-terminal KVM lifetime semantics, independent cleanup and consumed-object callers with focused regressions. |
-| Non-goals | No frame redesign, recovery protocol, fatal callback, polling, App/mirror/media change or downstream repository modification. |
-| Reference Baseline | 06a86ad7 audit delivery; preserve user snapshot.debug and configuration. |
-| Candidate Proposal | [KVM lifetime failure audit](../proposals/m9-kvm-lifetime-failure.md). |
-| Files And ABI Surface | Lib Types/KVM lifecycle and native cleanup; Emulator UI callers; owner-local tests and contracts. Destroy consumes valid objects on normal return. |
-| Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [Documentation](../rules/DOCUMENT.md). |
-| Verification | Isolated fatal children, rollback/cleanup faults, concurrent dynamic payloads, caller ownership; dual cached builds, full background and native integration suites plus corpus gates. |
-| Expected Markers | Two-result creation; no inaccessible live worker after ordinary failure; no new ownership state; classify post-join resource errors separately. |
-| Asset Needs | Refresh dual assets/binary EXEs only; preserve INI, media and user snapshot.debug. |
-| Reporting Requirements | Actual production/test counts and public-component quality review. S14 owns build/t98-s14: hidden jobs, 45-minute budget, 10-minute no-progress investigation, 200MB scratch; retire after evidence promotion. |
-| Stop Conditions | Report before broadening fatal policy, lifecycle APIs, frame algorithm or platform architecture. |
-| Exit Criteria | Safe single-path implementation, dual builds/releases and required tests, pushed executor and actual-diff review; owner authorizes closure once these pass. |
-| Original Owner Request | Assess whether the proposed minimal lifecycle-failure repair is reasonable and worthwhile, avoiding a large redesign for small failures. |
-| Similar-Issue Sweep | Both KVM leaves, generic destroy, native cleanup, all production destroy callers, Linux unsupported leaves and frame/lifetime tests. |
+S14 is closed under the owner's authorization to complete self-verification
+and close after reconnection; see [closure](../history/M9-T98-S14-kvm-lifetime-failure.md).
 
 S13 remains [closed](../history/M9-T98-S13-directional-sizing.md). T98 remains open.
 Owner keeps T98 open for further public-component governance. Its four
@@ -33,8 +18,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 ## Current Technical Baseline
 
-- S14 implementation, qualification and executor source-quality review pass;
-  executor delivery and coordinator review precede authorized closure. Production C/H
+- S14 executor 0d9f1803 is pushed and coordinator actual-commit review passes;
+  S14 is closed, T98 stays open. Production C/H
   +64/-66 (net -2); test C/H +225/-49 (net +176); test CMake +26/-2.
   Cached x64/x86 builds and final focused tests pass. Final production has
   184/184 background passes on each width. The final test-only held-payload

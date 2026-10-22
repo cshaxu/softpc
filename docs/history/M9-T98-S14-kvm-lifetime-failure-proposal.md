@@ -1,4 +1,4 @@
-# KVM Lifetime Failure Audit
+# KVM Lifetime Failure Audit (Retained T98 S14 Proposal)
 
 ## Scope and status
 
@@ -7,6 +7,8 @@ owner's proposed repair. Audit P1 is 06a86ad7. The owner subsequently approved
 implementation and dual qualification. On reconnection the owner authorizes
 closure after successful self-verification and delivery.
 T98 stays open; the queued performance work is unrelated.
+S14 is now closed; [closure and actual-commit review](../history/M9-T98-S14-kvm-lifetime-failure.md)
+record executor 0d9f1803 and the completed qualification.
 
 The owner explicitly permits process termination when an internal lifetime
 failure cannot safely return. Ordinary parameter/allocation/resource/I/O errors
@@ -287,5 +289,6 @@ gates, not an exhaustive new audit of unchanged implementations.
 Counts remain production C/H +64/-66 (net -2), test C/H +225/-49 (net +176),
 test CMake +26/-2 (net +24). All task-owned jobs have exited. Concise evidence
 is promoted here before retiring disposable scratch; reusable caches remain.
-Executor commit/push and coordinator review follow as separate P deliveries.
-T98 remains open; no next S is admitted.
+Executor 0d9f1803 is committed/pushed. Coordinator actual-commit review and
+authorized closure are recorded separately in the linked history. T98 remains
+open; no next S is admitted.
