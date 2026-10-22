@@ -41,13 +41,90 @@ S1 research (29c260b5, reviewed in bf18a2f7) is closed by that advancement.
   Estimate production C +1/-3, test C about +5; no API/state/thread changes.
   Run cached dual builds, publish EXEs and all 192 tests per width; commit,
   push, review actual changes and wait for owner acceptance.
-- S4: planned, not admitted. Investigate observations 2 through 5 using exact
+- S4: owner-admitted after S3 acceptance. Investigate observations 2 through 5 using exact
   missing completion and child/input boundary evidence. Distinguish startup
   death, live blank output and post-start input loss. Do not add retries or
   shared recovery machinery before identifying the first failing operation.
 
-S3/S4 remain here, not duplicated in the T queue or TODO. S3 owns the two
-Session predicates; S4 remains unadmitted. S2 is closed by this advancement.
+S3/S4 remain here, not duplicated in the T queue or TODO. S3 is owner-closed;
+S4 owns the remaining research. S2 is closed by the prior advancement.
+
+## S4 bounded investigation report
+
+Baseline 8072abdc; owner closes S3 and admits root-cause research. This report
+does not complete the root-cause objective: S4 remains active. No production,
+permanent test, public manifest, package EXE or user configuration is changed.
+Temporary probes and raw logs are retired after promoting these results.
+
+The finite investigation ledger keeps four distinct cases:
+
+1. Command-provider wait: 40 unchanged isolated repetitions per width all pass.
+   The existing single wait_for assertion is shared by running, paused, stopped
+   and program-marker waits. Historical completion=2 does not identify which
+   next wait failed. The fixture directly feeds runtime notifications and does
+   not exercise the complete Session event loop. Its program marker is observed
+   through the executor copy_frame callback. No causal proof of a lost wake,
+   delayed callback, driver hang or fixed error is available. Receiver remains
+   this fixture/executor boundary; next discriminating evidence is the call-site
+   identity and producer signal sequence under aggregate load, not a longer
+   deadline or a second completion mechanism.
+2. Pre-prompt composition failure: previous disconnected experiments established
+   unavailable native PCM/MIDI endpoints. Source chain is main -> compose_machine
+   -> vm_create -> softpc_platform_audio_start -> PCM stream acquisition; failure
+   is returned before monitor assembly. This explains those recorded exit-1
+   cannot-compose-machine executions, not every blank screen or loader exit.
+   No audio fallback or startup policy change is authorized by this research.
+3. Loader/init exit: online x64 ordinary package passes twice then fails on its
+   third attempt; compact passes once then fails on its second. Both failures
+   report stage=1/error=6 and child exit 0xc0000142. x86 ordinary and compact
+   each pass all 12 bounded repetitions. Stage 1 is the failed GetConsoleCP
+   check after attachment attempts; it is not evidence that Broker restoration
+   failed. A separate scratch copy using the unchanged fixture and shipping
+   x64 EXE, Console mode and overlay media, passes odd attempts and fails all
+   six even attempts out of 12 with the same loader exit. This also excludes
+   CTest as a necessary trigger. No failure reached raw-input stage 14.
+4. Post-boot raw input: current user INI selects Window. Both registered package
+   names therefore take the Window branch; the compact name alone does not
+   prove raw Console input coverage. The scratch Console configuration exercised
+   the real raw route, including ver, in its six successful starts. There is no
+   reproduced post-boot loss in this run and no evidence tying it to the loader
+   failure. Startup failures remain failures, not waived raw-input passes.
+
+Additional discriminating startup experiments:
+
+- A process-local Win32 debug-event collector enabled loader diagnostics only
+  in its debugged processes (no IFEO/registry change). Six direct original
+  package-fixture executions and 12 original CTest executions all pass under
+  that instrumentation. Thus the failing initializer is still unidentified;
+  debugger timing is not an adequate negative proof. DLL export/probing warnings
+  also occur in successful runs and are not assigned as the root cause.
+- An independent native program creates a child Console, attaches, waits for
+  a named event proving child main was entered, detaches and terminates its own
+  child. Twenty repetitions pass. Adding the same six native DLL imports as
+  SoftPC passes another 20; adding immediate Console hiding passes another 20.
+  This does not reproduce the full product startup and cannot exonerate all
+  attachment timing, but disproves an unconditional failure of those operations.
+- No matching Application-log failure record identified a DLL. No source-level
+  TLS/DllMain implementation was found in the repository. The loader status
+  narrows the phase; it does not establish a particular module or OS defect.
+
+Source audit also confirms package_screen_contains reads viewport area as a
+linear buffer count, although native linear reads wrap at backing-buffer width.
+For differing widths this is not a rectangular viewport oracle. This is a
+real fixture limitation, but stage 14 uses package_buffer_contains instead;
+it does not explain the recorded raw ver failure. Keep any repair test-owned.
+
+The raw fixture's first scratch link omitted existing Base clock/sleep symbols
+and failed; linking the existing cached Base archive fixed the probe build.
+No source was rewritten to obtain a pass. All reported runtime counts above
+are from the linked probe. This run is research, not a fresh full qualification.
+
+Recommendation: do not alter shared lifecycle, pause or Console recovery paths
+on this evidence. The next bounded step should capture the specific initializer
+on the uninstrumented failing startup and name the exact command wait under
+aggregate load. There is no justified minimal production fix yet. Preserve
+separate dispositions for live delayed prompts, exit 1, exit 0xc0000142 and
+post-boot input; only the exit-1 native-endpoint chain is explained here.
 
 ## S3 implementation and verification record
 

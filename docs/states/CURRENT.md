@@ -2,27 +2,36 @@
 
 ## Current Work
 
-## M9 T99 S3 Packet
+## M9 T99 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the minimal pause-contract cleanup and advancement from verified S2; S2 closes, S3 is admitted. S4 remains planned only. |
-| Objective | Document no cross-pause host-key resynchronization; remove duplicate retirement admission and no-op paused mouse admission. |
+| Admission And Approval | Owner accepts and closes S3, admits S4 root-cause research. |
+| Objective | Distinguish command completion timeout, package startup/prompt failure and compact input loss; report proved causes and unresolved evidence separately. |
 | Non-goals | No Machine/FIFO/KVM changes, release replay, new ledger/state/API, downstream edits, guest or configuration changes. |
-| Reference Baseline | 22cdeb7f; clean worktree at admission. |
+| Reference Baseline | 8072abdc; clean worktree at admission. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Emulator session/control.c, existing control test, README and manifests; architecture/task records and rebuilt EXEs. No ABI change. |
+| Files And ABI Surface | Task records; read actual command-provider/package fixtures and production callers. Temporary diagnostics only; no permanent production/API repair. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Cached x86/x64 builds; existing Session admission/retirement tests and full 192 registered cases per width, including desktop/audio, exact XML name coverage. |
-| Expected Markers | Pause preserves the existing FIFO; no resume synchronization; ordinary mouse input rejected while paused; source cleanup/hotkeys/keyboard ledger unchanged. |
-| Asset Needs | Refresh assets/binary dual EXEs only; preserve INI/media. No Computer Use. |
-| Reporting Requirements | Actual production/test counts and retained responsibilities. Scratch build/t99-s3: 60-minute job, 10-minute no-progress investigation, 300MB; retire before delivery. |
+| Verification | Bounded x86/x64 repeats of actual affected fixtures; capture exact failed wait/child exit/phase. No unchanged pass claimed as root-cause proof. |
+| Expected Markers | Separate failure classes; identify first failing operation where evidence permits. |
+| Asset Needs | Preserve EXEs, INI and media. No Computer Use or downstream changes. |
+| Reporting Requirements | Source inference versus dynamic evidence, minimal recommendations. Scratch build/t99-s4: 60-minute job, 10-minute no-progress investigation, 300MB; retire before delivery. |
 | Stop Conditions | No broader input redesign or historical intermittency repair; disclose host/device failures rather than skip or fake success. |
-| Exit Criteria | Minimal diff reviewed, manifests/gates and full verification complete, dual EXEs published, committed/pushed and clean workspace awaiting acceptance. |
-| Original Owner Request | Keep current pause behavior, simplify only two redundant conditions; build, publish, test, commit, push and wait for acceptance. |
-| Similar-Issue Sweep | Session admission and dispatch for every KVM event type; retain necessary pressed ledger/reset/retirement and running delivery. |
+| Exit Criteria | Bounded evidence and honest root-cause report reviewed, records committed/pushed; no unsupported repair claim. |
+| Original Owner Request | Close accepted S3 and admit S4 investigation with root-cause report. |
+| Similar-Issue Sweep | All waits in command-provider/package fixture; startup, runtime and input boundaries kept distinct. |
 
+S3 is owner-closed at 8072abdc; see [closure](../history/M9-T99-S3-pause-contract.md).
+S4 is active research, not ready for closure. Its proposal records bounded
+experiments: command-provider 40/40 per width; x64 package reproduces online
+0xc0000142, x86 package 24/24 passes. Isolated raw Console starts reproduce
+the same startup exit but not post-boot input loss. Loader instrumentation
+suppresses reproduction; the failing DLL/initializer is not identified.
+No production or permanent test change is justified yet. The report explicitly
+separates proved phase/cause, source limitations and remaining unknowns.
+The following S3/S2 records are historical evidence.
 T99 S1 research is now owner-closed; its report and actual-commit review are
 retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.
 S2 is closed by owner-approved advancement; see [closure](../history/M9-T99-S2-handoff-cleanup.md).
