@@ -290,7 +290,7 @@ void emulator_ui_produce_console_status(void *context, kvm_console_text_frame *f
     frame->base.cursor_row = -1;
     frame->base.text_palette[7] = 0xc0c0c0u;
     for (index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
-        frame->base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
+        frame->base.cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u, 0u };
     for (index = 0u; index < 256u; ++index) {
         lib_u16 character = index >= 32u && index < 127u ? (lib_u16)index : ' ';
         frame->characters.primary[index] = character;

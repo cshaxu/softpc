@@ -232,18 +232,6 @@ BOOL softpc_compat_set_console_cursor_info(HANDLE output,
     return TRUE;
 }
 
-int softpc_compat_presentation_cursor(long *column_out, long *row_out,
-    unsigned long *size_out)
-{
-    if (column_out == NULL || row_out == NULL || size_out == NULL ||
-        !softpc_compat_cursor_position_valid || !softpc_compat_cursor_visible)
-        return 0;
-    *column_out = softpc_compat_cursor_column;
-    *row_out = softpc_compat_cursor_row;
-    *size_out = softpc_compat_cursor_size;
-    return 1;
-}
-
 BOOL softpc_compat_get_current_console_font(HANDLE output, BOOL maximum,
     PCONSOLE_FONT_INFO font)
 {

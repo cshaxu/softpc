@@ -49,6 +49,7 @@ lib_bool kvm_window_render_frame(const kvm_window_frame *frame, lib_u32 *pixels,
                 const kvm_text_cell *cell = &cells[column];
                 const lib_u8 *font = cell->glyph_bank ? text->secondary_font : text->font;
                 lib_u8 bits = font[(lib_size)cell->glyph_index * KVM_WINDOW_FONT_HEIGHT + row % cell_height];
+                if (cell->underline && row % cell_height == text->base.underline_row) bits = 0xffu;
                 lib_u32 bit;
                 for (bit = 0u; bit < 8u; ++bit) {
                     lib_u32 x = column * 8u + bit;

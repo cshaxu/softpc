@@ -15,6 +15,7 @@
 #include "config.h"
 #include "vgaports.h"
 #include "compat/dib_surface.h"
+#include "compat/platform.h"
 #include "compat/conapi.h"
 #include "compat/devices/snapshot.h"
 #include "nt_graph.h"
@@ -391,9 +392,7 @@ static void verify_fullscreen_cursor_metadata(void)
     int saved_screen_state = sc.ScreenState;
     CONSOLE_CURSOR_INFO hidden;
     COORD position;
-    long column;
-    long row;
-    unsigned long size;
+    kvm_text_frame text = {0};
 
     position.X = 7;
     position.Y = 8;
@@ -402,9 +401,7 @@ static void verify_fullscreen_cursor_metadata(void)
     hidden.bVisible = FALSE;
     assert(softpc_compat_set_console_cursor_info(NULL, &hidden));
 
-    /* First drive the original size cache to its hidden state.  Then a
-       visible guest cursor in fullscreen must still update the detached
-       presenter's only cursor metadata. */
+    /* Legacy host percentage caches are not the presentation authority. */
     sc.ScreenState = WINDOWED;
     set_cursor_visible(FALSE);
     make_cursor_change();
@@ -412,8 +409,9 @@ static void verify_fullscreen_cursor_metadata(void)
     set_cursor_height(1);
     sc.ScreenState = FULLSCREEN;
     make_cursor_change();
-    assert(softpc_compat_presentation_cursor(&column, &row, &size));
-    assert(column == 7 && row == 8 && size != 0u);
+    softpc_platform_presentation_text_style(&text);
+    assert(text.cursor_column == get_cur_x() && text.cursor_row == get_cur_y());
+    assert(text.cursor_mode == KVM_CURSOR_HOST && text.cursor[0].height == 1u);
 
     PCDisplay = saved_display;
     sc.ScreenState = saved_screen_state;
@@ -722,6 +720,41 @@ static void verify_rgb_pixels(const kvm_window_frame *frame, const void *bits,
         }
 }
 
+static void verify_text_style(emulator_machine_driver *driver,
+    kvm_window_frame_storage *frame, kvm_console_text_frame *console)
+{
+    lib_bool produced;
+    const unsigned starts[] = {14u, 12u, 4u, 31u};
+    const unsigned ends[] = {15u, 2u, 7u, 15u};
+    for (unsigned i = 0; i < 4u; ++i) {
+        outb(0x3d4, 0x0a); outb(0x3d5, (half_word)starts[i]);
+        outb(0x3d4, 0x0b); outb(0x3d5, (half_word)ends[i]);
+        host_timer_event(); host_timer_event();
+        assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK && produced);
+        const kvm_text_frame *text = &frame->data.text.base;
+        assert(text->cursor_mode == (i == 3u ? KVM_CURSOR_DISABLED : KVM_CURSOR_HOST));
+        if (i != 3u) {
+            assert(text->cursor[0].start == starts[i]);
+            assert(text->cursor[0].height == (i == 1u ? text->font_height - 12u : ends[i] - starts[i]));
+            assert(text->cursor[1].height == (i == 1u ? 2u : 0u));
+        }
+        assert(lib_memory_compare(&console->base, text, sizeof(*text)) == 0);
+    }
+    /* A location-only register write must produce without touching characters,
+       fonts or synthesizing host_start/end_update in this test. */
+    for (unsigned position = 0u; position <= 17u; ++position) {
+        assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK && !produced);
+        outb(0x3d4, 0x14); outb(0x3d5, (half_word)position);
+        host_timer_event(); host_timer_event();
+        assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK && produced);
+        assert(frame->data.text.base.underline_row == position);
+    }
+    outb(0x3d4, 0x0a); outb(0x3d5, 14);
+    outb(0x3d4, 0x0b); outb(0x3d5, 15);
+    outb(0x3d4, 0x14); outb(0x3d5, 31);
+    host_timer_event(); host_timer_event();
+}
+
 static void verify_driver_geometry(softpc_machine *machine)
 {
     static const unsigned modes[] = {
@@ -756,6 +789,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         host_timer_event();
         assert(Currently_emulated_video_mode == modes[index]);
         if (modes[index] == 3) {
+            verify_text_style(&driver, frame, &console);
             /* Real sequencer writes must publish font-only changes through
                the original updater, without a test-supplied host transaction. */
             {
@@ -798,17 +832,20 @@ static void verify_driver_geometry(softpc_machine *machine)
             assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
             assert(console.base.cells[0].glyph_index == 'X');
             assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
-            COORD cursor = {0, 0};
-            CONSOLE_CURSOR_INFO visible_cursor = {20u, TRUE};
-            assert(softpc_compat_set_console_cursor_position(NULL, cursor));
-            assert(softpc_compat_set_console_cursor_info(NULL, &visible_cursor));
-            assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK);
-            cursor.X = 3; cursor.Y = 4;
-            assert(softpc_compat_set_console_cursor_position(NULL, cursor));
+            outb(0x3d4, 0x0e); outb(0x3d5, 1);
+            outb(0x3d4, 0x0f); outb(0x3d5, 67); /* row 4, column 3 */
+            host_timer_event(); host_timer_event();
             assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
             assert(console.base.cursor_column == 3 && console.base.cursor_row == 4);
-            assert(softpc_compat_set_console_cursor_position(NULL, cursor));
             assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && !produced);
+            for (unsigned attribute = 0; attribute < 256u; ++attribute) {
+                softpc_standalone_dib_begin_update();
+                assert(softpc_standalone_text_surface_write_cell(0, 0, 1, (unsigned char)attribute));
+                softpc_standalone_dib_end_update();
+                assert(driver.copy_frame(driver.context, frame, &console, &produced) == LIB_STATUS_OK && produced);
+                assert(console.base.cells[0].underline == ((attribute & 0x77u) == 1u));
+                assert(frame->data.text.base.cells[0].underline == console.base.cells[0].underline);
+            }
             assert(frame->data.text.base.text_columns == 80u &&
                 frame->data.text.base.text_rows == 25u);
             for (lib_size byte = lib_offsetof(kvm_window_frame_storage, data) + sizeof(frame->data.text);

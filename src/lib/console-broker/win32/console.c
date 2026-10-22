@@ -440,6 +440,12 @@ static lib_status console_broker_prepare_output(console_broker_backend *backend,
         if (output == LIB_WIN32_INVALID_HANDLE_VALUE) return LIB_STATUS_IO_ERROR;
         backend->raw_output = output;
     }
+    if (mode == CONSOLE_BROKER_RAW_EVENTS) {
+        lib_win32_dword flags;
+        if (!lib_win32_get_console_mode(backend->raw_output, &flags) ||
+            !lib_win32_set_console_mode(backend->raw_output, flags | LIB_WIN32_ENABLE_LVB_GRID_WORLDWIDE))
+            return LIB_STATUS_IO_ERROR;
+    }
     return LIB_STATUS_OK;
 }
 
@@ -751,7 +757,8 @@ lib_status console_broker_backend_write_text_frame_bound(console_broker_backend 
                     column < frame->columns ? frame->text[offset] : ' ';
                 cells[offset].Attributes = (lib_win32_word)(row < frame->rows &&
                     column < frame->columns ? frame->foreground[offset] |
-                        (frame->background[offset] << 4u) : 0);
+                        (frame->background[offset] << 4u) |
+                        (frame->underline[offset] ? LIB_WIN32_COMMON_LVB_UNDERSCORE : 0u) : 0);
             }
         }
         /* A failed or clipped write may already have changed some cells. The

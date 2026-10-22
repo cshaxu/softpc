@@ -89,6 +89,23 @@ static lib_win32_bool LIB_WIN32_WINAPI stop_timer(lib_win32_hwnd w,lib_win32_uin
 static lib_i32 selection_ok;
 static lib_u32 selections, deleted_bitmaps, deleted_dcs;
 static lib_u32 surface_bits[64];
+static lib_u8 painted[128];
+static lib_win32_bool LIB_WIN32_WINAPI paint_body(lib_win32_hdc dc, lib_i32 x, lib_i32 y,
+    lib_i32 w, lib_i32 h, lib_win32_hdc source, lib_i32 sx, lib_i32 sy,
+    lib_i32 sw, lib_i32 sh, lib_win32_dword operation)
+{
+    (void)dc; (void)source; (void)sx; (void)sy; (void)sw; (void)sh; (void)operation;
+    lib_test_assert(x == 0 && y == 0 && w == 8 && h == 16);
+    lib_memory_set(painted, 0, sizeof(painted));
+    return LIB_WIN32_TRUE;
+}
+static lib_win32_bool LIB_WIN32_WINAPI paint_cursor(lib_win32_hdc dc, const lib_win32_rect *r)
+{
+    (void)dc;
+    for (lib_i32 y = r->top; y < r->bottom; ++y)
+        for (lib_i32 x = r->left; x < r->right; ++x) painted[y * 8 + x] ^= 1u;
+    return LIB_WIN32_TRUE;
+}
 static lib_win32_hdc LIB_WIN32_WINAPI surface_dc(lib_win32_hwnd w) { (void)w; return (lib_win32_hdc)1; }
 static lib_win32_hdc LIB_WIN32_WINAPI compatible_dc(lib_win32_hdc d) { (void)d; return (lib_win32_hdc)2; }
 static lib_win32_hbitmap LIB_WIN32_WINAPI bitmap(lib_win32_hdc d,const lib_win32_bitmapinfo *i,lib_win32_uint u,void **p,lib_win32_handle s,lib_win32_dword o)
@@ -202,6 +219,10 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #define lib_win32_get_registered_raw_input_devices query_raw
 #undef lib_win32_get_system_metrics
 #define lib_win32_get_system_metrics metrics
+#undef lib_win32_stretch_blt
+#define lib_win32_stretch_blt paint_body
+#undef lib_win32_invert_rect
+#define lib_win32_invert_rect paint_cursor
 #undef lib_win32_acquire_srwlock_exclusive
 #undef lib_win32_release_srwlock_exclusive
 #define lib_win32_acquire_srwlock_exclusive registration_lock
@@ -211,6 +232,25 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #include "lib/kvm-window/win32/component.c"
 
 static void notify_loss(void) { win32_window_proc((lib_win32_hwnd)1,LIB_WIN32_WM_CAPTURECHANGED,0,0); }
+static void check_split_paint(void)
+{
+    static kvm_window_frame_storage frame;
+    kvm_window_text_frame *text = kvm_window_frame_begin_text(&frame);
+    text->base.text_columns = text->base.text_rows = 1u;
+    text->base.cursor_mode = KVM_CURSOR_SOURCE;
+    text->base.cursor_phase = LIB_TRUE;
+    text->base.cursor[0] = (kvm_text_cursor_span){0u, 2u};
+    text->base.cursor[1] = (kvm_text_cursor_span){12u, 4u};
+    kvm_win32_window_context c = {.frame = &frame.frame, .surface_dc = (lib_win32_hdc)1,
+        .surface_width = 8u, .surface_height = 16u, .client_width = 8, .client_height = 16};
+    for (lib_u32 step = 0; step < 3u; ++step) {
+        if (step == 1u) text->base.cursor[1].height = 0u;
+        if (step == 2u) text->base.cursor_phase = LIB_FALSE;
+        lib_test_assert(win32_window_paint(&c, (lib_win32_hdc)1));
+        for (lib_u32 pixel = 0; pixel < 128u; ++pixel)
+            lib_test_assert(painted[pixel] == (step < 2u && (pixel < 16u || (step == 0u && pixel >= 96u))));
+    }
+}
 static void check_callback_contention(void)
 {
     if (contend_on_callback) {
@@ -318,7 +358,7 @@ static void check_surface_damage(void)
     frame.data.text.base.text_columns=1; frame.data.text.base.text_rows=2;
     frame.data.text.base.font_height=4;
     frame.data.text.base.cursor_mode=KVM_CURSOR_HOST;
-    frame.data.text.base.cursor_top=frame.data.text.base.cursor_bottom=3;
+    frame.data.text.base.cursor[0]=(kvm_text_cursor_span){3u,1u};
     c.cursor_blink_visible=1;
     before=invalidations;
     lib_test_assert(test_window_frame(&window, frames,&frame.frame)==0);
@@ -395,6 +435,19 @@ static void check_surface_damage(void)
     lib_test_assert(test_window_frame(&window, frames,&frame.frame)==0);
     win32_window_consume_frame((lib_win32_hwnd)1,&c);
     lib_test_assert(invalidations==before+6 && invalidated.right==8 && invalidated.bottom==8);
+    /* A changed gap must redraw even when the outer cursor bounds are equal. */
+    frame.data.text.base.cursor_mode=KVM_CURSOR_SOURCE;
+    frame.data.text.base.cursor_phase=LIB_TRUE;
+    frame.data.text.base.cursor[0]=(kvm_text_cursor_span){0u,1u};
+    frame.data.text.base.cursor[1]=(kvm_text_cursor_span){3u,1u};
+    lib_test_assert(test_window_frame(&window, frames,&frame.frame)==LIB_STATUS_OK);
+    win32_window_consume_frame((lib_win32_hwnd)1,&c);
+    before=invalidations;
+    frame.data.text.base.cursor[0].height=2u;
+    lib_test_assert(test_window_frame(&window, frames,&frame.frame)==LIB_STATUS_OK);
+    win32_window_consume_frame((lib_win32_hwnd)1,&c);
+    lib_test_assert(invalidations==before+2 && previous_invalidated.top==invalidated.top &&
+        previous_invalidated.bottom==invalidated.bottom);
     /* A failed HOST timer transition follows the existing terminal path. */
     frame.data.text.base.cursor_mode=KVM_CURSOR_HOST;
     timer_ok=0;
@@ -764,6 +817,7 @@ int main(void)
     check_competing_bindings();
     lib_test_assert(kvm_component_destroy(&window.base)==0);
     check_surface_damage();
+    check_split_paint();
     kvm_frame_exchange_destroy(frames);
     return 0;
 }

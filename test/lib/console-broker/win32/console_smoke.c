@@ -105,7 +105,12 @@ static lib_u32 cursor_positions;
 static lib_win32_bool LIB_WIN32_WINAPI cursor_position(lib_win32_handle h, lib_win32_coord p)
 { (void)h; ++cursor_positions; if (cursor_ok) native_cursor=p; return cursor_ok; }
 static lib_u32 readers_started, mode_sets;
-static lib_win32_bool LIB_WIN32_WINAPI set_mode(lib_win32_handle h, lib_win32_dword mode) { (void)h; (void)mode; ++mode_sets; return LIB_WIN32_TRUE; }
+static lib_bool mode_query_ok=LIB_TRUE, underline_mode_ok=LIB_TRUE;
+static lib_win32_dword output_flags;
+static lib_win32_bool LIB_WIN32_WINAPI get_mode(lib_win32_handle h, lib_win32_lpdword mode)
+{ (void)h; *mode=0u; return mode_query_ok; }
+static lib_win32_bool LIB_WIN32_WINAPI set_mode(lib_win32_handle h, lib_win32_dword mode)
+{ (void)h; ++mode_sets; output_flags=mode; return !(mode & LIB_WIN32_ENABLE_LVB_GRID_WORLDWIDE) || underline_mode_ok; }
 static lib_win32_bool LIB_WIN32_WINAPI flush_input(lib_win32_handle h) { (void)h; return LIB_WIN32_TRUE; }
 static lib_win32_handle LIB_WIN32_WINAPI start_reader(lib_win32_lpsecurity_attributes a, lib_win32_size_t size,
     lib_win32_thread_start_routine entry, lib_win32_lpvoid arg, lib_win32_dword flags, lib_win32_lpdword id)
@@ -118,6 +123,8 @@ static lib_win32_handle LIB_WIN32_WINAPI start_reader(lib_win32_lpsecurity_attri
 #define lib_win32_create_thread start_reader
 #undef lib_win32_set_console_mode
 #define lib_win32_set_console_mode set_mode
+#undef lib_win32_get_console_mode
+#define lib_win32_get_console_mode get_mode
 #undef lib_win32_flush_console_input_buffer
 #define lib_win32_flush_console_input_buffer flush_input
 #undef lib_win32_read_console_w
@@ -185,6 +192,16 @@ int main(void)
     console_broker_backend b={0};
     lib_win32_wchar line[2200];
     lib_console_text_frame f={0};
+    /* A retained raw handle never turns a failed mode setup into success. */
+    b.raw_output=(lib_win32_handle)1;
+    mode_query_ok=LIB_FALSE;
+    lib_test_assert(console_broker_prepare_output(&b,CONSOLE_BROKER_RAW_EVENTS)==LIB_STATUS_IO_ERROR);
+    mode_query_ok=LIB_TRUE; underline_mode_ok=LIB_FALSE;
+    lib_test_assert(console_broker_prepare_output(&b,CONSOLE_BROKER_RAW_EVENTS)==LIB_STATUS_IO_ERROR);
+    underline_mode_ok=LIB_TRUE;
+    lib_test_assert(console_broker_prepare_output(&b,CONSOLE_BROKER_RAW_EVENTS)==LIB_STATUS_OK);
+    lib_test_assert(output_flags & LIB_WIN32_ENABLE_LVB_GRID_WORLDWIDE);
+    b.raw_output=LIB_NULL;
     lib_test_assert(lib_console_create(&b.console)==LIB_STATUS_OK);
     lib_test_assert(lib_console_set_event_sink(b.console,receive,LIB_NULL)==LIB_STATUS_OK);
     lib_test_assert(lib_console_bind_generation(b.console,1)==LIB_STATUS_OK);
@@ -435,6 +452,10 @@ int main(void)
         f.foreground[0]=attribute & 15u; f.background[0]=attribute >> 4;
         lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
         lib_test_assert(first_attribute==attribute);
+        f.underline[0]=1u;
+        lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+        lib_test_assert(first_attribute==(attribute | LIB_WIN32_COMMON_LVB_UNDERSCORE));
+        f.underline[0]=0u;
         lib_u32 completed=writes;
         f.cells_unchanged=LIB_TRUE;
         lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);

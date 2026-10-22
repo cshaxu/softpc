@@ -3,7 +3,7 @@
 int main(void)
 {
     kvm_console_text_frame text = {0};
-    lib_test_assert(sizeof(kvm_console_text_frame) == 17116);
+    lib_test_assert(sizeof(kvm_console_text_frame) == sizeof(text.base) + sizeof(text.characters));
     /* Character presentation has no bitmap font-storage bound. */
     text.base = (kvm_text_frame){.text_columns = 80, .text_rows = 50,
         .font_height = 33, .cursor_mode = KVM_CURSOR_HOST,

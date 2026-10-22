@@ -7,7 +7,7 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S5 and admits text underline and split-cursor work. First deliver audit and minimal unified design; no production implementation in this turn. |
+| Admission And Approval | Owner approves implementation on 2026-10-21: exact Window output and documented native Console approximation, never terminal failure merely for an unrepresentable decoration. |
 | Objective | Preserve original text decoration and cursor shape through Compat/Driver into neutral Lib frame data and the existing render path. |
 | Non-goals | No dimension increase, guest changes, new renderer/clock/polling, exchange algorithm change, destroy-timeout work or writes to other repositories. |
 | Reference Baseline | `8132d0db`; [S5 closure](../history/M9-T98-S5-worker-destruction.md). User-owned untracked snapshot.debug remains excluded. |
@@ -17,15 +17,31 @@
 | Verification | Audit original source through rendering first. Implementation later requires state/pixel tests for underline, two clipped cursor spans, phase, old-shape clearing, redraw/freeze and frame retirement; actual original register-to-frame tests; cached dual builds, affected shared and App regression, manifests/gates and applicable desktop tests. |
 | Expected Markers | Original device state is the only hardware authority; one frame/render path and phase owner; no percent roundtrip for Window; unsupported Console effects are not reported as exact output. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report original state sources, loss points, neutral schema, Console limits, source versus test proof, expected and actual production/test/mirror diff. No scratch allocated for this read-only design. Later scratch requires a named budget before launch. |
-| Stop Conditions | Seek design approval for Console behavior and any required original-mirror patch before implementation; do not replace unresolved hardware semantics with heuristics. |
-| Exit Criteria | Reviewed design followed by verified single-path implementation, dual packages, proportional tests, actual-diff review and pushed delivery, then owner acceptance. Current phase is design only. |
+| Reporting Requirements | Report original state sources, loss points, neutral schema, Console limits, source versus test proof, actual production/test/mirror diff. Executor owns disposable build/t98-s6; background build/test jobs have log/exit files, 45-minute budget, 10-minute no-progress investigation threshold and 200MB scratch budget; retire scratch after recording evidence. |
+| Stop Conditions | Do not replace unresolved hardware semantics with heuristics or expand mirror changes beyond the reviewed refresh site. |
+| Exit Criteria | Verified single-path implementation, dual packages, proportional tests, actual-diff quality review and pushed delivery, then owner acceptance. |
 | Original Owner Request | Add optional text underline and two-segment cursor to shared Lib and connect original SoftPC producer state; first audit and propose the simplest unified design without quality violations or polling. |
 | Similar-Issue Sweep | All cursor percentage conversions, text schema initializers, underline state changes, frame validation/comparison and old/new cursor invalidation paths. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- T98 S6 implementation is verified awaiting owner acceptance, not closed.
+  Exact Window underline/two-span cursor and documented native Console
+  approximations use original video state through the existing frame path.
+  Production +153/-114 (net +39), tests +261/-116 (net +145); the only mirror
+  change is vga_prts.c +4/-0 for underline-location refresh. Cached x86/x64
+  builds and applicable 184 background plus five desktop registrations have
+  passing evidence per architecture, including targeted supplements. Package
+  attach/prompt failures also occurred; their intermittent cause remains open,
+  not proved fixed by later passes. See the S6 proposal evidence and TODO.
+  Three unrelated native-audio integrations were not rerun.
+- S6 published softpc32 SHA-256
+  EA6786D56FC58D8BD873BAFC5E93C7D51F11BD9D12AF583585488373FD53C824;
+  softpc64 SHA-256
+  7D137F481626F4904AD33F634328E006D2C9E6662D4BACBD8AA34FF6EFBA6568.
+  User INI/media and untracked snapshot.debug remain untouched.
 
 - T98 S4 is owner-accepted and closed: FM's no-consumer placeholder leaf is
   removed; the staged Product assembly functions are implementation-private;

@@ -169,7 +169,7 @@ static void rendering(void)
     kvm_window_rect changed;
     (void)kvm_window_frame_begin_text(&text); text.data.text.base.text_columns = 80; text.data.text.base.text_rows = 25;
     text.data.text.base.cursor_mode = KVM_CURSOR_HOST; text.data.text.base.cursor_column = 0; text.data.text.base.cursor_row = 24;
-    text.data.text.base.font_height = 16; text.data.text.base.cursor_top = 14; text.data.text.base.cursor_bottom = 15;
+    text.data.text.base.font_height = 16; text.data.text.base.cursor[0] = (kvm_text_cursor_span){ 14, 2u };
     lib_test_assert(kvm_window_cursor_rect(&text.frame, &display, &cursor));
     lib_test_assert(cursor.bottom == 410 && cursor.top == 407);
     text.data.text.base.font_height = 0;
@@ -187,19 +187,19 @@ static void rendering(void)
     text.data.text.base.cursor_row = 0;
     display = (kvm_window_rect){10,20,18,36};
     for (lib_u32 top=0;top<16;++top) {
-        text.data.text.base.cursor_top=(lib_u8)top; text.data.text.base.cursor_bottom=(lib_u8)top;
+        text.data.text.base.cursor[0] = (kvm_text_cursor_span){ (lib_u8)top, 1u };
         lib_test_assert(kvm_window_cursor_rect(&text.frame,&display,&cursor));
         lib_test_assert(cursor.top==20+(lib_i32)top && cursor.bottom==21+(lib_i32)top);
     }
-    text.data.text.base.cursor_top=4; text.data.text.base.cursor_bottom=7;
+    text.data.text.base.cursor[0] = (kvm_text_cursor_span){ 4, 4u };
     display.bottom=52;
     lib_test_assert(kvm_window_cursor_rect(&text.frame,&display,&cursor));
     lib_test_assert(cursor.top==28 && cursor.bottom==36);
-    text.data.text.base.cursor_top=15; text.data.text.base.cursor_bottom=255;
+    text.data.text.base.cursor[0] = (kvm_text_cursor_span){ 15, 241u };
     lib_test_assert(kvm_window_cursor_rect(&text.frame,&display,&cursor) && cursor.bottom==52);
-    text.data.text.base.cursor_top=16;
+    text.data.text.base.cursor[0].start=16;
     lib_test_assert(!kvm_window_cursor_rect(&text.frame,&display,&cursor));
-    text.data.text.base.cursor_top=9; text.data.text.base.cursor_bottom=8;
+    text.data.text.base.cursor[0] = (kvm_text_cursor_span){ 0u, LIB_UINT32_MAX };
     lib_test_assert(kvm_window_cursor_rect(&text.frame,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
     text.data.text.base.font_height=0;
     lib_test_assert(kvm_window_cursor_rect(&text.frame,&display,&cursor) && cursor.top==20 && cursor.bottom==52);
@@ -237,6 +237,31 @@ static void rendering(void)
     text.data.text.base.cells[0].glyph_bank = 1u;
     kvm_window_render_frame(&text.frame, pixels, 8, 16, &valid, &changed);
     lib_test_assert(pixels[2] == 0x010101u);
+    /* Decoration changes alone damage old and new scanlines; glyph data stays intact. */
+    text.data.text.base.cells[0].underline = 1u;
+    text.data.text.base.underline_row = 12u;
+    lib_test_assert(kvm_window_render_frame(&text.frame, pixels, 8, 16, &valid, &changed));
+    for (lib_u32 x = 0; x < 8u; ++x) lib_test_assert(pixels[12u * 8u + x] == 0x010101u);
+    text.data.text.base.underline_row = 13u;
+    lib_test_assert(kvm_window_render_frame(&text.frame, pixels, 8, 16, &valid, &changed));
+    lib_test_assert(changed.top == 12 && changed.bottom == 14);
+    text.data.text.base.underline_row = 16u;
+    lib_test_assert(kvm_window_render_frame(&text.frame, pixels, 8, 16, &valid, &changed));
+    lib_test_assert(changed.top == 13 && changed.bottom == 14);
+    text.data.text.base.cells[0].underline = 0u;
+    lib_test_assert(!kvm_window_render_frame(&text.frame, pixels, 8, 16, &valid, &changed));
+    {
+        kvm_window_rect spans[2];
+        text.data.text.base.cursor[0] = (kvm_text_cursor_span){12u, 4u};
+        text.data.text.base.cursor[1] = (kvm_text_cursor_span){0u, 2u};
+        display = (kvm_window_rect){0, 0, 8, 16};
+        lib_test_assert(kvm_window_cursor_rects(&text.frame, &display, spans) == 2u);
+        lib_test_assert(spans[0].top == 0 && spans[0].bottom == 2 &&
+            spans[1].top == 12 && spans[1].bottom == 16);
+        display.bottom = 1;
+        lib_test_assert(kvm_window_cursor_rects(&text.frame, &display, spans) == 1u);
+        lib_test_assert(spans[0].top == 0 && spans[0].bottom == 1);
+    }
     /* A short visible row still has an 80-cell storage stride. */
     lib_u32 grid[16u * 32u];
     text.data.text.base.text_columns = text.data.text.base.text_rows = 2;
@@ -246,7 +271,7 @@ static void rendering(void)
         for (lib_u32 column = 0; column < 2; ++column) {
             lib_u8 fg = (lib_u8)(1u + row * 4u + column * 2u);
             text.data.text.base.cells[row * KVM_TEXT_COLUMNS + column] =
-                (kvm_text_cell){ column ? 5u : 3u, (lib_u8)column, fg, (lib_u8)(fg + 1u) };
+                (kvm_text_cell){ column ? 5u : 3u, (lib_u8)column, fg, (lib_u8)(fg + 1u), 0u };
         }
     }
     valid = LIB_FALSE;
@@ -277,7 +302,7 @@ static void text_coverage(void)
     }
     for (lib_u32 i = 0; i < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++i)
         frame.data.text.base.cells[i] = (kvm_text_cell){ (lib_u8)(i % 2u),
-            (lib_u8)((i / 2u) % 2u), 1u, 2u };
+            (lib_u8)((i / 2u) % 2u), 1u, 2u, (lib_u8)(i % 3u == 0u) };
     for (lib_size grid = 0; grid < sizeof(rows)/sizeof(rows[0]); ++grid) {
         frame.data.text.base.text_columns = columns[grid];
         frame.data.text.base.text_rows = rows[grid];
@@ -287,6 +312,7 @@ static void text_coverage(void)
             lib_u32 height = rows[grid] * cell_height;
             lib_size count = (lib_size)width * height;
             frame.data.text.base.font_height = font_height;
+            frame.data.text.base.underline_row = cell_height - 1u;
             for (lib_size i = 0; i < count + 2u; ++i) guarded[i] = sentinel;
             valid = LIB_FALSE;
             lib_test_assert(kvm_window_render_frame(&frame.frame, guarded + 1, width, height, &valid, &changed));
@@ -298,6 +324,7 @@ static void text_coverage(void)
                 lib_size cell_index = (i / width / cell_height) * KVM_TEXT_COLUMNS + (i % width) / 8u;
                 const kvm_text_cell *cell = &frame.data.text.base.cells[cell_index];
                 lib_i32 foreground = cell->glyph_index && ((i % 2u) != cell->glyph_bank);
+                foreground |= cell->underline && (i / width) % cell_height == cell_height - 1u;
                 lib_test_assert(guarded[i + 1u] == (foreground ? 0x123456u : 0xabcdefu));
             }
         }
@@ -310,7 +337,7 @@ static void text_coverage(void)
         (void)kvm_window_frame_begin_text(&tall);
         tall.data.text.base.text_columns = tall.data.text.base.text_rows = 1u;
         tall.data.text.base.font_height = KVM_WINDOW_FONT_HEIGHT;
-        tall.data.text.base.cells[0] = (kvm_text_cell){255u, 0u, 1u, 2u};
+        tall.data.text.base.cells[0] = (kvm_text_cell){255u, 0u, 1u, 2u, 0u };
         tall.data.text.base.text_palette[1] = 0x123456u;
         tall.data.text.base.text_palette[2] = 0xabcdefu;
         tall.data.text.font[last + 31u] = 0x80u;
@@ -341,14 +368,13 @@ static void text_coverage(void)
     lib_test_assert(kvm_window_render_frame(&frame.frame, guarded + 1, 640, 400, &valid, &changed));
     frame.data.text.base.text_rows = 50;
     frame.data.text.base.font_height = 8;
-    frame.data.text.base.cells[3999] = (kvm_text_cell){0, 0, 1, 1};
+    frame.data.text.base.cells[3999] = (kvm_text_cell){0, 0, 1, 1, 0u };
     lib_test_assert(kvm_window_render_frame(&frame.frame, guarded + 1, 640, 400, &valid, &changed));
     lib_test_assert(changed.bottom == 400 && guarded[640u * 400u] == 0x123456u);
     frame.data.text.base.cursor_mode = KVM_CURSOR_HOST;
     frame.data.text.base.cursor_column = 79;
     frame.data.text.base.cursor_row = 49;
-    frame.data.text.base.cursor_top = 6;
-    frame.data.text.base.cursor_bottom = 7;
+    frame.data.text.base.cursor[0] = (kvm_text_cursor_span){ 6, 2u };
     {
         kvm_window_rect display = {0, 0, 640, 400}, cursor;
         lib_test_assert(kvm_window_cursor_rect(&frame.frame, &display, &cursor));

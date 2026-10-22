@@ -248,6 +248,7 @@ static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
     for (lib_u32 i=0; i<80u*25u; ++i) {
         frame.text[i]=(lib_u32)('A'+i%26u);
         frame.foreground[i]=14u; frame.background[i]=1u;
+        frame.underline[i]=(lib_u8)(i % 3u == 0u);
     }
     for (lib_i32 round = 0; round < 3; ++round) {
         lib_status status = console_broker_replace(broker, cooked, raw, CONSOLE_BROKER_RAW_EVENTS);
@@ -260,7 +261,8 @@ static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
             lib_test_assert(region.Right==79 && region.Bottom==24);
             for (lib_u32 i=0; i<80u*25u; ++i) {
                 lib_test_assert(cells[i].Char.UnicodeChar==frame.text[i]);
-                lib_test_assert(cells[i].Attributes==0x1eu);
+                lib_test_assert(cells[i].Attributes==(0x1eu |
+                    (frame.underline[i] ? LIB_WIN32_COMMON_LVB_UNDERSCORE : 0u)));
             }
             lib_test_assert(lib_win32_get_console_screen_buffer_info(broker->backend->output, &actual));
             lib_test_assert(actual.dwCursorPosition.X==7 && actual.dwCursorPosition.Y==8);
@@ -293,7 +295,8 @@ static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
         lib_test_assert(region.Left == 0 && region.Top == 0 && region.Right == 79 && region.Bottom == 24);
         for (lib_u32 i = 0; i < 80 * 25; ++i) {
             lib_test_assert(cells[i].Char.UnicodeChar == frame.text[i]);
-            lib_test_assert(cells[i].Attributes == 0x1eu);
+            lib_test_assert(cells[i].Attributes == (0x1eu |
+                (frame.underline[i] ? LIB_WIN32_COMMON_LVB_UNDERSCORE : 0u)));
         }
         lib_test_assert(console_broker_replace(broker, raw, cooked, CONSOLE_BROKER_COOKED_LINES) == 0);
         expect_display(&cooked_display);
@@ -343,7 +346,7 @@ static void check_retained_console_restore(void)
     frame->base.text_columns=80; frame->base.text_rows=25;
     frame->base.cursor_mode=KVM_CURSOR_HOST;
     frame->base.cursor_column=7; frame->base.cursor_row=8;
-    frame->base.cursor_top=14; frame->base.cursor_bottom=15;
+    frame->base.cursor[0] = (kvm_text_cursor_span){ 14, 2u };
     for (lib_u32 i=0;i<256u;++i) frame->characters.primary[i]=(lib_u16)i;
     for (lib_u32 i=0;i<2000u;++i) {
         frame->base.cells[i].glyph_index=(lib_u8)('A'+i%26u);

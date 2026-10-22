@@ -134,15 +134,12 @@ Proposed shared contract (one replacement, not legacy plus new shape APIs):
   Emulator status-page initializers need mechanical schema adaptation only;
   X86 packages must not acquire display interpretation.
 
-Console decision for owner review: retain the documented existing single-span
-native percentage/host-blink approximation. The native interface cannot exactly
-represent arbitrary underline scanlines or two disjoint cursor spans. Proposed
-behavior for the new unrepresentable active effects is `UNSUPPORTED` before
-native output, not a filled cursor gap, silently ignored decoration, new VT
-renderer or automatic presenter switch. This means a Console route requesting
-such effects will fail explicitly. If that product behavior is undesirable,
-an explicitly approved approximate Console contract is needed before coding;
-the exact Window implementation does not require a Console workaround.
+Owner-approved Console contract: retain native percentage/host-blink output.
+An active in-font underline maps to native character underline (host-selected
+position). A split cursor maps the topmost normalized span to native percentage;
+it does not combine the gap into a full-height block. These are documented
+approximations, not UNSUPPORTED, a product failure, or a second VT renderer.
+Real native I/O failures still use the existing error path. Window remains exact.
 
 Estimated production scope: shared `kvm-base/frame_interface.h`, Window
 render/geometry declarations and native overlay caller, Console mapper; App
@@ -163,11 +160,96 @@ freeze/redraw and existing exchange retirement. Original I/O-to-frame tests
 must use actual register dispatch and producer, not only hand-built frames.
 Reuse lifetime/concurrency suites; no test-only production entrypoints.
 
-Only source inspection has run for S6. No dynamic/pixel/guest proof yet.
-Implementation waits for design review, especially Console behavior. Final
+Implementation is owner-approved; qualification is in progress. Final
 delivery must count actual production/test/mirror lines, update manifests and
 source ledger, run cached dual builds and affected public/App regressions,
 publish both EXEs, review actual diff, commit/push, then await acceptance.
+
+### S6 implementation and convergence ledger
+
+Frozen scope: Base text schema, Window glyph/overlay rendering, Console native
+mapping, SoftPC Compat/Driver production and one VGA refresh hook. Four-slot
+transport, dimensions, snapshots, guest media and audio remain unchanged.
+
+- Schema: five-byte cells add a 0/1 underline enable; one frame-level scanline;
+  two fixed start/height spans replace top/bottom. Empty spans hide, bounds clip,
+  adjacent/overlapping spans merge. This is a source/ABI change: downstream
+  producers must migrate cursor initializers and rebuild; no binary shim remains.
+- Original authority: PCDisplay's calculated cursor position, visibility and
+  two spans, EGA_GRAPH underline position and original UL_ATTR constants.
+  Compat maps these; Driver fills both leaf payloads. Removed the old cached
+  percentage getter, Machine forwarding and percentage-to-scanline helper.
+- Window: underline enters the existing foreground pixel decoder and colour
+  comparison. The existing overlay paints the union of normalized spans; old
+  and new bounds are invalidated when position, visibility, font or shape changes.
+  Even equal outer bounds with a different gap redraw. Same-shape frames retain
+  the prior no-op optimization. No new frame, clock, queue, thread or allocation.
+- Console: native character underline and topmost-span percentage are explicit
+  approximations; the raw screen buffer enables the native underline mode.
+  Setup/write errors remain I/O errors. Retained handles do not bypass a failed
+  mode setup. Cooked screen state and output mode are not changed by this setup.
+- Proof owners: Base normalization/validation; Window pixel/shape and native
+  overlay mocks (including erasing a second segment); Console conversion and
+  native error injection; actual raw/cooked display restoration; App actual
+  register/timer-to-Driver publication and all 256 attribute combinations.
+  Existing exchange, phase, freeze, retirement and lifecycle suites remain.
+- Test cleanup: remove the obsolete percentage-helper-only runtime cursor
+  executable and its duplicate App linkage. Real App cursor coverage lives in
+  the existing VGA frame test. Runtime smoke observes BIOS quiescence before
+  checking idle publication; a valid original cursor exists before BIOS finishes.
+- Similar-issue sweep: all former cursor getters/top-bottom fields, cell
+  initializers, hard-coded frame sizes, frame comparison and damage consumers.
+  Only lower Console's intentional native single-cursor conversion retains
+  top/bottom. The independent original VGA cursor-off defect is in TODO, not
+  hidden by this task or claimed fixed.
+- Mirror: `vga_prts.c` +4/-0, request the existing refresh on underline-location
+  change; no device formula rewrite. See the current divergence ledger.
+
+Qualification universe: 184 non-desktop/non-native-audio tests and five desktop
+tests per architecture. Three unrelated native-audio integrations per architecture
+are outside this display change; no claim is made that host audio is available.
+Completion requires focused results, applicable regressions, exact diff review,
+published package hashes and honest disposition of host-dependent failures.
+
+### S6 executor verification, 2026-10-21
+
+Cached dual builds publish both EXEs. Final tracked C/H accounting against
+b044613f: production +153/-114, net +39 (19 paths); tests +261/-116, net +145
+(13 paths). Shared production is +121/-50; private adapters +28/-64; mirror
++4/-0. Counts exclude manifests, documentation, CMake and binary artifacts.
+No second renderer, phase clock, frame allocation or ownership path is added.
+
+Focused six-test suites pass on both architectures. Final background x64 is
+184/184; x86 is 183/184 with the sole stale test manifest caused by the last
+mock regression edit. After refreshing that manifest and rebuilding the
+changed test, the four-test supplement passes on both widths: broker console,
+test manifest, documentation governance and XP mirror gate. This also proves
+native mode query/set failures and success using a retained raw handle.
+
+Final desktop x86 is 5/5. Final desktop x64 is 4/5 plus the unchanged compact
+package test passing separately (1/1); all five have final-code passing evidence.
+Earlier runs failed package attachment or initial prompt checks, including
+after reconnect. No causal fix is claimed: the unresolved intermittent test
+is recorded in TODO. Diagnostic-only edits were removed and the final test
+was rebuilt. Passing retries do not prove stability. All three Lib desktop
+tests consistently pass, including raw/cooked underline/content restoration.
+Three unchanged native-audio integrations are outside this display scope.
+
+Self-review checked actual schema/producer/consumer diffs, cursor shape lifetime,
+old/new overlay invalidation (including changed gap with equal bounds), overflow
+clipping, underline-only refresh, retained output handle failure and all former
+percentage API consumers. No compatibility alias remains; lower Console's
+native cursor percentage is an intentional approximation, not another hardware
+authority. The original VGA disable-bit defect is separately recorded, not
+silently repaired. Window pixel and original-port frame assertions are dynamic
+proof; arbitrary real guest/adapter combinations are not claimed exhaustive.
+
+Published hashes are in CURRENT. INI/media/snapshot are unchanged. Downstream
+imports must take changed Lib source/test trees and the Emulator initializer,
+rebuild, and migrate cursor producers to two start/height spans (zero height
+empty) and initialize the optional underline enable to zero. No downstream
+repository was modified or claimed synchronized. Await owner acceptance after
+executor push and coordinator actual-change review.
 
 S1 report delivered on 2026-10-18. No production or test modification has been
 made. Findings below are against 4c8e185b; none is claimed to explain an owner's

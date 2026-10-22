@@ -306,7 +306,7 @@ static lib_bool win32_window_cursor_visible(const kvm_win32_window_context *cont
             text->cursor_mode == KVM_CURSOR_HOST && context->cursor_blink_visible);
 }
 
-static lib_bool win32_window_paint(lib_win32_hwnd window, kvm_win32_window_context *context,
+static lib_bool win32_window_paint(kvm_win32_window_context *context,
     lib_win32_hdc dc)
 {
     kvm_window_rect display;
@@ -319,9 +319,13 @@ static lib_bool win32_window_paint(lib_win32_hwnd window, kvm_win32_window_conte
         display.bottom - display.top, context->surface_dc, 0, 0,
         (lib_i32)context->surface_width, (lib_i32)context->surface_height, LIB_WIN32_SRCCOPY)) return LIB_FALSE;
     if (win32_window_cursor_visible(context)) {
-        lib_win32_rect cursor;
-        if (win32_window_cursor_rect(window, context, &cursor))
-            return lib_win32_invert_rect(dc, &cursor) != 0;
+        kvm_window_rect spans[2];
+        lib_u32 count = kvm_window_cursor_rects(context->frame, &display, spans);
+        for (lib_u32 i = 0u; i < count; ++i) {
+            lib_win32_rect cursor;
+            kvm_win32_rect_store(&cursor, &spans[i]);
+            if (!lib_win32_invert_rect(dc, &cursor)) return LIB_FALSE;
+        }
     }
     return LIB_TRUE;
 }
@@ -534,9 +538,12 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
     }
     new_visible = win32_window_cursor_visible(context) &&
         win32_window_cursor_rect(window, context, &new_cursor);
-    if (old_visible != new_visible ||
-        (old_visible && (old_cursor.left != new_cursor.left || old_cursor.top != new_cursor.top ||
-            old_cursor.right != new_cursor.right || old_cursor.bottom != new_cursor.bottom))) {
+    /* Equal outer bounds can still contain different split spans. */
+    if (old_visible != new_visible || (old_visible &&
+        (lib_memory_compare(&old_cursor, &new_cursor, sizeof(old_cursor)) != 0 ||
+         previous->text->base.font_height != incoming->text->base.font_height ||
+         lib_memory_compare(previous->text->base.cursor, incoming->text->base.cursor,
+             sizeof(previous->text->base.cursor)) != 0))) {
         if (old_visible && !win32_window_invalidate(window, context, &old_cursor)) goto failed;
         if (new_visible && !win32_window_invalidate(window, context, &new_cursor)) goto failed;
     }
@@ -661,7 +668,7 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
         {
             lib_win32_paintstruct paint;
             lib_win32_hdc dc = lib_win32_begin_paint(window, &paint);
-            lib_i32 painted = dc != LIB_NULL && win32_window_paint(window, context, dc);
+            lib_i32 painted = dc != LIB_NULL && win32_window_paint(context, dc);
             /* End the paint transaction even if drawing failed. */
             if (dc != LIB_NULL && !lib_win32_end_paint(window, &paint)) painted = 0;
             if (!painted) kvm_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);

@@ -1597,6 +1597,10 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 				case 0x14:
 					note_entrance0("underline loc");
 					crt_controller.underline_location.as.abyte = value;
+					/* SoftPC presentation: underline-only writes use the
+					 * same refresh contract as the original EGA path. */
+					if (get_underline_start() != crt_controller.underline_location.as_bfld.underline_location)
+						screen_refresh_required();
 					set_underline_start(crt_controller.underline_location.as_bfld.underline_location);
 					if (crt_controller.underline_location.as_bfld.doubleword_mode) {
 					    assert0(crt_controller.underline_location.as_bfld.count_by_4 == 1,"count by 4 not set in doubleword mode");

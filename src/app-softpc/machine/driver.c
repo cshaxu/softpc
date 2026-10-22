@@ -122,17 +122,6 @@ lib_status vm_destroy(vm_driver *driver)
     return LIB_STATUS_OK;
 }
 
-void vm_driver_cursor_shape(kvm_text_frame *frame, lib_u32 percent)
-{
-    lib_u32 height = frame->font_height;
-    lib_u32 lines;
-    if (height == 0u) height = KVM_TEXT_FONT_DEFAULT_HEIGHT;
-    if (percent == 0u || percent > 100u) percent = 100u;
-    lines = (height * percent + 99u) / 100u;
-    frame->cursor_top = (lib_u8)(height - lines);
-    frame->cursor_bottom = (lib_u8)(height - 1u);
-}
-
 static lib_bool vm_driver_reset(void *opaque)
 {
     vm_driver *driver = (vm_driver *)opaque;
@@ -324,9 +313,6 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     lib_u32 stride;
     lib_u32 cell_bytes;
     const lib_u8 *cells;
-    lib_i32 column = -1;
-    lib_i32 row = -1;
-    lib_u32 cursor_size = 0u;
     lib_u32 text_row;
     lib_u32 attribute_select;
     kvm_text_frame *targets[2];
@@ -347,7 +333,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     lib_memory_set(console, 0, sizeof(*console));
     for (lib_size target = 0u; target < 2u; ++target)
         for (lib_size index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
-            targets[target]->cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u };
+            targets[target]->cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u, 0u };
     if (!softpc_machine_presentation_fonts(driver->machine, text->font,
         text->secondary_font, &text->base.font_height,
         &attribute_select))
@@ -362,7 +348,8 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
             lib_u8 attribute = cell_bytes >= 2u ? cells[source + 1u] : 7u;
             kvm_text_cell cell = {
                 cells[source], attribute_select && (attribute & 0x08u) ? 1u : 0u,
-                attribute & 0x0fu, (attribute >> 4u) & 0x0fu };
+                attribute & 0x0fu, (attribute >> 4u) & 0x0fu,
+                softpc_platform_text_underline(attribute) };
             for (lib_size target = 0u; target < 2u; ++target)
                 targets[target]->cells[destination] = cell;
         }
@@ -384,16 +371,10 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
             }
         }
     }
-    (void)softpc_machine_presentation_cursor(driver->machine, &column, &row,
-        &cursor_size);
     for (lib_size target = 0u; target < 2u; ++target) {
-        targets[target]->cursor_column = column;
-        targets[target]->cursor_row = row;
+        softpc_platform_presentation_text_style(targets[target]);
         targets[target]->text_columns = (lib_u16)columns;
         targets[target]->text_rows = (lib_u16)rows;
-        vm_driver_cursor_shape(targets[target], cursor_size);
-        targets[target]->cursor_mode = column >= 0 && row >= 0 ? KVM_CURSOR_HOST : KVM_CURSOR_DISABLED;
-        targets[target]->cursor_phase = 1u;
     }
     {
         lib_status status = kvm_window_frame_validate(&frame->frame);

@@ -1,5 +1,24 @@
 # Long-Term Review Ledger
 
+- TODO(Medium): Diagnose package integration Console attach/prompt intermittency.
+  T98 S6 observed stage 1/error 6 and stage 3/error 0, including after RDP
+  reconnect. Unchanged final tests later pass on both architectures; this is
+  passing execution evidence, not a repair or proof of environmental cause.
+  Owner: App package fixture/Console integration boundary. Admission condition:
+  capture child exit, active buffer identity and cursor at the first failure
+  against the unchanged baseline; do not weaken prompt assertions or add retries
+  as a production fix. Temporary diagnostic code was removed.
+
+- TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
+  port test observed start=0x20/end=15 producing PCDisplay visible=true,
+  start=0/height=15: case 0x0a consults old cursor_off, conditionally updates
+  the register by start bits only, then do_new_cursor overwrites visibility.
+  This precedes both the old host percentage path and the new frame adapter;
+  it is not repaired by neutral shape transport. Owner: original video core.
+  Admission condition: verify VGA/EGA hardware disable semantics and all writes
+  before a separately approved minimal mirror fix. S6 hidden-shape coverage uses
+  the existing start-outside-font branch, not an assertion that bit 5 works.
+
 - TODO(Medium): Reject finite machine instruction budgets beyond the existing
   32-bit counter. 2^32 currently narrows to zero and bypasses budget completion;
   normal continuous UINT64_MAX execution is separately handled. Owner:

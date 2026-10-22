@@ -2,6 +2,10 @@
 
 Text cells select primary/secondary bitmaps through explicit glyph-bank values;
 foreground/background palette indices are independent, with no device bit layout.
+Enabled underline adds foreground pixels on the frame's scanline, before the
+existing surface comparison. It does not mutate fonts. One cursor may have two
+disjoint spans sharing position and phase. Painting inverts their union only;
+damage may include the gap to erase the preceding shape safely.
 
 `kvm-window` depends on `types`, `base` and `kvm-base`. It uses Base's UTF-8
 validator before copying titles into its existing control FIFO. Window owns one lifecycle and sends

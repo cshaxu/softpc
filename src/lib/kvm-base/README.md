@@ -6,11 +6,16 @@ mechanics to `kvm-window` and `kvm-console`.
 
 `kvm_text_frame` contains the common text fields with a fixed 80-cell row stride.
 One `kvm_text_cell` array carries glyph index, glyph bank (0 primary, 1 secondary)
-and foreground/background palette indices (0..15) together in each four-byte cell.
+and foreground/background palette indices (0..15), plus an underline enable,
+together in each five-byte cell.
 Cells have no padding; whole-array copying/comparison is valid. Colours and bank are independent;
 visible cells are validated before publication. No packed device attribute is
 interpreted here. Producers initialize the complete fixed-capacity value.
 Fonts, character maps and graphics belong to the receiving leaf, not this base.
+Underline scanline is shared by the frame; outside the effective font height it
+is invisible. The cursor is one position and phase with two start/height spans.
+Zero height is empty. Normalization clips, sorts and merges adjacent/overlapping
+spans; it never interprets device registers. Leaves own rendering approximation.
 The public frame exchange circulates opaque storage through four slots
 (produce/pending/processing/displayed) for both consumers. The producer
 writes outside its lock, then commits a validated complete frame. A superseded

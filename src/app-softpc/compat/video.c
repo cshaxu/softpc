@@ -1,4 +1,5 @@
 #include "lib/types/types_interface.h"
+#include "lib/kvm-base/frame_interface.h"
 #include "insignia.h"
 #include "host_def.h"
 #include "platform.h"
@@ -51,10 +52,27 @@ void softpc_platform_presentation_request_refresh(void)
         softpc_standalone_text_damage();
 }
 
-int softpc_platform_presentation_cursor(long *column_out, long *row_out,
-                                        unsigned long *size_out)
+void softpc_platform_presentation_text_style(kvm_text_frame *frame)
 {
-    return softpc_compat_presentation_cursor(column_out, row_out, size_out);
+    /* Consume the original calculated shape, before NT's percentage conversion.
+       Device registers and split/hide semantics remain owned by the core. */
+    frame->cursor_column = get_cur_x();
+    frame->cursor_row = get_cur_y();
+    frame->cursor_mode = is_cursor_visible() ? KVM_CURSOR_HOST : KVM_CURSOR_DISABLED;
+    frame->cursor_phase = LIB_TRUE;
+    frame->cursor[0] = (kvm_text_cursor_span){
+        (lib_u32)get_cursor_start(),
+        get_cursor_height() > 0 ? (lib_u32)get_cursor_height() : 0u };
+    frame->cursor[1] = (kvm_text_cursor_span){
+        (lib_u32)get_cursor_start1(),
+        get_cursor_height1() > 0 ? (lib_u32)get_cursor_height1() : 0u };
+    frame->underline_row = (lib_u32)get_underline_start();
+}
+
+lib_u8 softpc_platform_text_underline(lib_u8 attribute)
+{
+    return (video_adapter == EGA || video_adapter == VGA) &&
+        (attribute & UL_ATTR_MASK) == UL_ATTR;
 }
 
 int softpc_platform_presentation_text_extent(unsigned long *columns_out,

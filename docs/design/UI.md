@@ -149,9 +149,12 @@ For text frames, cursor position, shape, and enabled state are copied frame
 data. The native VM Console/Terminal owns its own blink behavior. `kvm-window`
 draws the corresponding guest cursor and owns a 250 ms Window-local blink
 cadence while unfrozen; no SoftPC runtime or guest timer phase is invented.
-The runtime converts compatibility cursor-size percentages into bottom-aligned
-scanline bounds using the copied font height. The library draws those bounds
-literally; it must not force every caller's cursor shape to the cell bottom.
+Compat copies the original video's calculated start/height pairs directly,
+without a cursor-percentage roundtrip. Window paints the clipped union of two
+spans and the original attribute-enabled underline scanline. Console maps the
+topmost span to native cursor size and uses host-positioned character underline;
+these are documented approximations, not exact VGA scanline output. Unsupported
+decoration precision does not stop the machine; real native I/O errors do fail.
 
 The console and window are equivalent input producers. RDP is supported by
 the same normalized key path; no frontend may depend on raw local-only key

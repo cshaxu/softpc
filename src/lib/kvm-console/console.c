@@ -117,10 +117,13 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
 {
     lib_console_text_frame text_frame = { 0 };
     const kvm_text_frame *text;
-    lib_u32 top, bottom;
+    lib_u32 top = 0u, bottom = 0u;
+    kvm_text_cursor_span spans[2];
+    lib_u32 height;
 
     if (console == LIB_NULL || frame == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     text = &frame->base;
+    height = text->font_height ? text->font_height : KVM_TEXT_FONT_DEFAULT_HEIGHT;
     text_frame.columns = text->text_columns;
     text_frame.rows = text->text_rows;
     text_frame.cells_unchanged = previous != LIB_NULL &&
@@ -135,12 +138,16 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
             text_frame.text[index] = map[cell->glyph_index];
             text_frame.foreground[index] = cell->foreground;
             text_frame.background[index] = cell->background;
+            text_frame.underline[index] = cell->underline && text->underline_row < height;
             if (text_frame.cells_unchanged) {
                 const kvm_text_cell *old = &previous->base.cells[index];
                 const lib_u16 *old_map = old->glyph_bank != 0u ?
                     previous->characters.secondary : previous->characters.primary;
                 text_frame.cells_unchanged = old_map[old->glyph_index] == text_frame.text[index] &&
-                    old->foreground == cell->foreground && old->background == cell->background;
+                    old->foreground == cell->foreground && old->background == cell->background &&
+                    (old->underline && previous->base.underline_row <
+                        (previous->base.font_height ? previous->base.font_height : KVM_TEXT_FONT_DEFAULT_HEIGHT)) ==
+                        text_frame.underline[index];
             }
         }
     }
@@ -149,11 +156,17 @@ lib_status kvm_console_publish_text_frame(kvm_console *console,
     text_frame.cursor_row = text->cursor_row;
     /* Native Console owns blinking; source phase cannot be reproduced exactly. */
     text_frame.cursor_visible = kvm_text_cursor_shape(text,
-        &text_frame.font_height, &top, &bottom);
+        &text_frame.font_height, spans) != 0u;
+    /* Native Console approximates the first (topmost) resolved span by height;
+     * it cannot represent the gap or scanline origin of a split cursor. */
+    if (text_frame.cursor_visible) {
+        top = spans[0].start;
+        bottom = top + spans[0].height;
+    }
     text_frame.cursor_phase = LIB_TRUE;
     /* The native contract represents a full cell by an inverted range, even
      * for logical fonts taller than its byte-sized cursor coordinates. */
     text_frame.cursor_top = bottom == text_frame.font_height && top == 0u ? 1u : (lib_u8)top;
-    text_frame.cursor_bottom = bottom == text_frame.font_height && top == 0u ? 0u : (lib_u8)(bottom - 1u);
+    text_frame.cursor_bottom = bottom == 0u || (bottom == text_frame.font_height && top == 0u) ? 0u : (lib_u8)(bottom - 1u);
     return lib_console_write_text_frame(console->logical_console, &text_frame);
 }

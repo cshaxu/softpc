@@ -12,6 +12,9 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_C_STANDARD 17)
+# The presentation adapter consumes the shared C11 text contract; the preserved
+# device sources keep their existing C90 compilation policy.
+set_source_files_properties(src/app-softpc/compat/video.c PROPERTIES COMPILE_OPTIONS "-std=gnu11")
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
@@ -757,15 +760,6 @@ add_test(NAME "app-softpc/integration/presentation_shutdown_smoke"
     COMMAND softpc-presentation-shutdown-smoke)
 set_tests_properties("app-softpc/integration/presentation_shutdown_smoke" PROPERTIES LABELS "integration" TIMEOUT 10)
 list(APPEND SOFTPC_TEST_TARGETS softpc-presentation-shutdown-smoke)
-add_executable(softpc-runtime-cursor-smoke test/app-softpc/integration/runtime_cursor_smoke.c)
-target_include_directories(softpc-runtime-cursor-smoke PRIVATE src src/app-softpc/compat src/app-softpc/product)
-get_target_property(cursor_test_sources softpcvm SOURCES)
-list(REMOVE_ITEM cursor_test_sources src/app-softpc/product/main.c src/app-softpc/product/firmware.rc)
-target_sources(softpc-runtime-cursor-smoke PRIVATE ${cursor_test_sources})
-target_link_libraries(softpc-runtime-cursor-smoke PRIVATE ${shutdown_test_links})
-add_test(NAME "app-softpc/integration/runtime_cursor_smoke" COMMAND softpc-runtime-cursor-smoke)
-set_tests_properties("app-softpc/integration/runtime_cursor_smoke" PROPERTIES LABELS "integration")
-list(APPEND SOFTPC_TEST_TARGETS softpc-runtime-cursor-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-command-provider-smoke)
 list(APPEND SOFTPC_TEST_TARGETS softpc-x87-layout-smoke)
 # Non-audio tests retain real machine/Compat code but never acquire host audio.
@@ -789,7 +783,7 @@ foreach(target IN ITEMS softpc-machine-smoke softpc-dual-media-smoke
         softpc-platform-failure-smoke softpc-snapshot-transaction-smoke
         softpc-runtime-smoke softpc-runtime-restart-boot-smoke
         softpc-runtime-input-continuation-smoke softpc-command-provider-smoke
-        softpc-presentation-shutdown-smoke softpc-runtime-cursor-smoke)
+        softpc-presentation-shutdown-smoke)
     target_sources(${target} PRIVATE $<TARGET_OBJECTS:softpc-test-pcm>
         $<TARGET_OBJECTS:softpc-test-midi>)
 endforeach()

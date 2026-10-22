@@ -1102,3 +1102,15 @@ DIVERGENCE(T88-CHAIN2-DIRTY)，不增加 standalone 行为分支或公共接口�
 [S6 记录](../../../history/M9-T88-win31-file-manager-vga-width-transition.md#s6-per-site-qualified-result-and-minimal-proposed-diff)
 承接。不扩展修复其他生成规则家族，也不宣称所有 legacy compound
 入口的算法或生产可达性已经完整认证。
+
+## T98 S6 text decoration refresh
+
+`base/video/vga_prts.c` adds four lines at CRTC 0x14: a changed underline
+scanline requests the existing `screen_refresh_required()` before storing the
+derived value. The original EGA path already requests this refresh. No register
+formula, drawing path, condition ordering or source-subset selection changes.
+This is +4/-0 relative to S6 admission and four additional local lines against
+the selected XP subset. App VGA frame regression drives the actual port and
+timer path; changing only the underline position must produce a new frame.
+The current manifest records the changed local hash, preserving XP baseline
+hashes and subset ranges. The separate cursor-off finding is deferred in TODO.

@@ -74,7 +74,8 @@ static void check_copy(void)
 int main(void)
 {
     const kvm_window_frame *taken;
-    lib_test_assert(sizeof(kvm_window_text_frame) == 32476);
+    lib_test_assert(sizeof(kvm_window_text_frame) == sizeof(kvm_text_frame) +
+        2u * KVM_WINDOW_FONT_GLYPHS * KVM_WINDOW_FONT_HEIGHT);
     lib_test_assert(lib_offsetof(kvm_window_frame_storage, frame) == 0u);
     check_validation();
     (void)kvm_window_frame_begin_text(&source);
@@ -89,7 +90,7 @@ int main(void)
     source.data.text.base.cursor_phase = LIB_TRUE;
     for (lib_size i = 0; i < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++i)
         source.data.text.base.cells[i] = (kvm_text_cell){ (lib_u8)i, (lib_u8)(i % 2u),
-            (lib_u8)(i % 16u), (lib_u8)((i / 16u) % 16u) };
+            (lib_u8)(i % 16u), (lib_u8)((i / 16u) % 16u), 0u };
     check_copy(); /* No inactive graphics payload is copied. */
     lib_test_assert(kvm_component_mailboxes_create(&mailbox) == LIB_STATUS_OK);
     lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(source)) == LIB_STATUS_OK);
@@ -122,7 +123,7 @@ int main(void)
     source.data.text.base.cursor_mode = KVM_CURSOR_DISABLED;
     source.data.text.base.cursor_phase = LIB_FALSE;
     for (lib_size i = 0; i < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++i)
-        source.data.text.base.cells[i] = (kvm_text_cell){ (lib_u8)i, 1u, 15u, 2u };
+        source.data.text.base.cells[i] = (kvm_text_cell){ (lib_u8)i, 1u, 15u, 2u, 0u };
     check_copy(); /* Graphics -> text never exposes the old pixels. */
     lib_test_assert(kvm_window_frame_copy(kvm_frame_exchange_writer(frames), &source.frame));
     lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_OK);

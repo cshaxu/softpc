@@ -103,20 +103,35 @@ int main(void)
             }
             softpc_test_sleep_milliseconds(10u);
         } while (softpc_test_clock_milliseconds() < deadline);
-        /* Original nt_graph's Console cursor endpoint must reach the copied
+        /* Original video's calculated cursor shape must reach the copied
            frame.  Both outer frontends consume this value without reading a
            controller register or a guest-memory pointer. */
         assert(cursor_seen);
         assert(frame->data.text.base.font_height > 0u && frame->data.text.base.font_height <= 16u);
-        assert(frame->data.text.base.cursor_bottom == frame->data.text.base.font_height - 1u);
-        assert(frame->data.text.base.cursor_top <= frame->data.text.base.cursor_bottom);
+        kvm_text_cursor_span spans[2];
+        lib_u32 font_height;
+        assert(kvm_text_cursor_shape(&frame->data.text.base, &font_height, spans) != 0u);
     }
     assert(emulator_machine_published_frame_sequence(runtime) == frame->frame.sequence);
     assert(emulator_machine_published_frame_run_generation(runtime) == first_run);
     assert(frame->frame.sequence != 0u);
     {
-        lib_u32 stable_sequence = frame->frame.sequence;
+        lib_u32 stable_sequence;
+        lib_u64 deadline = softpc_test_clock_milliseconds() + 5000u;
+        lib_bool settled = LIB_FALSE;
         LONG stable_state_facts;
+        /* A valid original cursor is available before BIOS finishes painting.
+           Observe quiescence before asserting that the idle guest stays idle. */
+        do {
+            stable_sequence = emulator_machine_published_frame_sequence(runtime);
+            softpc_test_sleep_milliseconds(150u);
+            if (emulator_machine_copy_published_frame(runtime, frame,
+                    emulator_machine_run_generation(runtime)) && frame->frame.sequence == stable_sequence) {
+                settled = LIB_TRUE;
+                break;
+            }
+        } while (softpc_test_clock_milliseconds() < deadline);
+        assert(settled);
         /* An unchanged text screen is not an executor heartbeat.  Repeated
            publication would flood the app control FIFO and starve Console
            raw input behind redundant frame completions. */

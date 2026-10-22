@@ -3,6 +3,7 @@
 #define SOFTPC_PLATFORM_H
 
 #include "lib/storage/medium_interface.h"
+struct kvm_text_frame;
 
 /* Host support used by the machine bootstrap and VM adapter. Implementations
  * include this contract too; it does not own CPU/device state. */
@@ -39,8 +40,8 @@ char *softpc_platform_floppy_config_value(void);
 int softpc_platform_presentation_is_graphics(void);
 int softpc_platform_presentation_state(lib_u32 *, lib_u32 *);
 int softpc_platform_presentation_text_extent(unsigned long *, unsigned long *);
-int softpc_platform_presentation_cursor(long *, long *,
-    unsigned long *);
+void softpc_platform_presentation_text_style(struct kvm_text_frame *);
+lib_u8 softpc_platform_text_underline(lib_u8 attribute);
 int softpc_platform_presentation_fonts(lib_u8 *, lib_u8 *,
     unsigned long *, unsigned long *);
 

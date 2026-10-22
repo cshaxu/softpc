@@ -490,21 +490,6 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
     return 1;
 }
 
-int softpc_machine_presentation_cursor(const softpc_machine *machine,
-    lib_i32 *column_out, lib_i32 *row_out, lib_u32 *size_out)
-{
-    long column;
-    long row;
-    unsigned long size;
-    if (machine == NULL || !machine->reset || column_out == NULL ||
-        row_out == NULL || size_out == NULL ||
-        !softpc_platform_presentation_cursor(&column, &row, &size)) return 0;
-    *column_out = (lib_i32)column;
-    *row_out = (lib_i32)row;
-    *size_out = (lib_u32)size;
-    return 1;
-}
-
 int softpc_machine_presentation_fonts(const softpc_machine *machine,
     lib_u8 primary[256u * 32u], lib_u8 secondary[256u * 32u],
     lib_u32 *height_out, lib_u32 *attribute_select_out)

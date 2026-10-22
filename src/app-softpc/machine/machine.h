@@ -109,12 +109,6 @@ int softpc_machine_presentation_text(const softpc_machine *machine,
     const void **cells_out, lib_u32 *columns_out, lib_u32 *rows_out,
     lib_u32 *stride_out, lib_u32 *cell_bytes_out);
 
-/* Read the most recent text-cursor position emitted by the original video
- * controller. The standalone host records this callback; frontends own the
- * actual cursor drawing. */
-int softpc_machine_presentation_cursor(const softpc_machine *machine,
-    lib_i32 *column_out, lib_i32 *row_out, lib_u32 *size_out);
-
 /* The original VGA attribute controller may select a second character map
    through attribute bit 3.  Presentation consumers need both loaded maps;
    they must not substitute a host font for either one. Each glyph occupies
