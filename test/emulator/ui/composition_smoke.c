@@ -112,8 +112,8 @@ lib_status kvm_console_create(kvm_console **out, const kvm_console_options *opti
 }
 lib_status kvm_console_destroy(kvm_console *console)
 { lib_test_assert(console == &console_fake); ++console_destroys;
-  if (destroy_failure == 3u) return LIB_STATUS_IO_ERROR;
-  lib_console_release(console->object); return LIB_STATUS_OK; }
+  lib_console_release(console->object);
+  return destroy_failure == 3u ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK; }
 lib_console *kvm_console_get_console(const kvm_console *console)
 { return console->object; }
 
@@ -199,20 +199,20 @@ static void check_destroy(const emulator_ui_options *options, lib_u32 failure, l
     released_ui = broker_destroys = window_destroys = console_destroys = 0u;
     destroy_failure = failure;
     lib_test_assert(emulator_ui_destroy(ui) == LIB_STATUS_IO_ERROR);
-    lib_test_assert(released_ui == 0u && ui->monitor != LIB_NULL && ui->console != LIB_NULL);
+    lib_test_assert(released_ui == 0u && ui->monitor != LIB_NULL);
+    lib_test_assert((ui->console != LIB_NULL) == (failure != 3u));
     lib_test_assert(broker_destroys == 1u && window_destroys == (failure >= 2u) &&
         console_destroys == (failure == 3u));
     lib_test_assert((ui->broker != LIB_NULL) == (failure == 1u));
-    lib_test_assert((ui->window != LIB_NULL) == (failure != 3u));
+    lib_test_assert((ui->window != LIB_NULL) == (failure == 1u));
     /* A retained source can still safely call its retained UI/event context. */
-    input_worker(&console_fake.options, LIB_NULL);
+    if (ui->console) input_worker(&console_fake.options, LIB_NULL);
     if (ui->window) input_worker(&window_fake.options.component, LIB_NULL);
     /* End the scripted failure for fixture cleanup, not a product retry policy. */
     destroy_failure = 0u;
     lib_test_assert(emulator_ui_destroy(ui) == LIB_STATUS_OK && released_ui == 1u);
     lib_test_assert(broker_destroys == (failure == 1u ? 2u : 1u));
-    lib_test_assert(window_destroys == (failure == 2u ? 2u : 1u));
-    lib_test_assert(console_destroys == (failure == 3u ? 2u : 1u));
+    lib_test_assert(window_destroys == 1u && console_destroys == 1u);
     tracked_ui = LIB_NULL;
 }
 
@@ -315,8 +315,10 @@ int main(void)
     lib_test_assert(emulator_ui_set_state(ui, EMULATOR_UI_STATE_PAUSED) == LIB_STATUS_OK);
     lib_test_assert(emulator_ui_set_state(ui, EMULATOR_UI_STATE_RUNNING) == LIB_STATUS_OK);
     lib_test_assert(freezes == 1u && unfreezes == 1u);
+    destroy_failure = 2u;
     lib_test_assert(emulator_ui_apply_action(ui, EMULATOR_UI_ACTION_DESTROY_WINDOW,
-        EMULATOR_UI_STATE_PAUSED) == LIB_STATUS_OK);
+        EMULATOR_UI_STATE_PAUSED) == LIB_STATUS_IO_ERROR && ui->window == LIB_NULL);
+    destroy_failure = 0u;
     lib_test_assert(emulator_ui_apply_action(ui, EMULATOR_UI_ACTION_CREATE_WINDOW,
         EMULATOR_UI_STATE_PAUSED) == LIB_STATUS_OK);
     lib_test_assert(window_fake.options.initial_frozen && unfreezes == 1u);
@@ -396,8 +398,10 @@ int main(void)
     /* A fresh Console has no old status; even the same sequence is delivered. */
     lib_test_assert(emulator_ui_apply_action(ui, EMULATOR_UI_ACTION_BIND_MONITOR,
         EMULATOR_UI_STATE_RUNNING) == LIB_STATUS_OK);
+    destroy_failure = 3u;
     lib_test_assert(emulator_ui_apply_action(ui, EMULATOR_UI_ACTION_DESTROY_VM_CONSOLE,
-        EMULATOR_UI_STATE_RUNNING) == LIB_STATUS_OK);
+        EMULATOR_UI_STATE_RUNNING) == LIB_STATUS_IO_ERROR && ui->console == LIB_NULL);
+    destroy_failure = 0u;
     lib_test_assert(emulator_ui_apply_action(ui, EMULATOR_UI_ACTION_CREATE_VM_CONSOLE,
         EMULATOR_UI_STATE_RUNNING) == LIB_STATUS_OK);
     lib_test_assert(emulator_ui_apply_action(ui, EMULATOR_UI_ACTION_BIND_VM_CONSOLE,

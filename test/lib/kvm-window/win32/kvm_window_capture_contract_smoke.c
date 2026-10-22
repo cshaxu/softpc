@@ -5,6 +5,53 @@ static kvm_frame_exchange *frames;
 #include "lib/kvm-window/window.h"
 #include "lib/types/win32/window.h"
 #include "lib/types/win32/sync.h"
+#include "../../fixtures/lifetime.h"
+
+static lib_u32 closed_handles;
+static lib_win32_dword LIB_WIN32_WINAPI idle_worker(void *opaque);
+static lib_win32_handle LIB_WIN32_WINAPI create_idle_thread(lib_win32_security_attributes *security,
+    lib_size stack, lib_win32_thread_start_routine entry, void *opaque, lib_win32_dword flags,
+    lib_win32_dword *identity)
+{
+    (void)entry;
+    return lib_win32_create_thread(security, stack, idle_worker, opaque, flags, identity);
+}
+static lib_win32_dword LIB_WIN32_WINAPI startup_wait(lib_win32_dword count,
+    const lib_win32_handle *handles, lib_win32_bool all, lib_win32_dword timeout)
+{
+    (void)count; (void)handles; (void)all; (void)timeout;
+    return lifetime_fault >= 3u ? LIB_WIN32_WAIT_OBJECT_0 : LIB_WIN32_WAIT_FAILED;
+}
+static lib_win32_bool LIB_WIN32_WINAPI terminal_signal(lib_win32_handle event)
+{
+    if (lifetime_fault == 1u || lifetime_fault == 3u) return LIB_WIN32_FALSE;
+    return lib_win32_set_event(event);
+}
+static lib_win32_dword LIB_WIN32_WINAPI terminal_wait(lib_win32_handle worker, lib_win32_dword timeout)
+{
+    if (lifetime_fault == 2u || lifetime_fault == 4u) return LIB_WIN32_WAIT_FAILED;
+    return lib_win32_wait_for_single_object(worker, timeout);
+}
+static void wait_idle_stop(lib_win32_handle stop)
+{
+    lib_test_assert(lib_win32_wait_for_single_object(stop, LIB_WIN32_INFINITE) == LIB_WIN32_WAIT_OBJECT_0);
+}
+static lib_win32_bool LIB_WIN32_WINAPI close_worker_handle(lib_win32_handle handle)
+{
+    ++closed_handles;
+    lib_test_assert(lib_win32_close_handle(handle));
+    return lifetime_fault == 5u ? LIB_WIN32_FALSE : LIB_WIN32_TRUE;
+}
+#undef lib_win32_create_thread
+#define lib_win32_create_thread create_idle_thread
+#undef lib_win32_wait_for_multiple_objects
+#define lib_win32_wait_for_multiple_objects startup_wait
+#undef lib_win32_set_event
+#define lib_win32_set_event terminal_signal
+#undef lib_win32_wait_for_single_object
+#define lib_win32_wait_for_single_object terminal_wait
+#undef lib_win32_close_handle
+#define lib_win32_close_handle close_worker_handle
 
 static lib_win32_hwnd owner, focused;
 static lib_win32_rect client = {0,0,640,480}, clipped;
@@ -88,6 +135,7 @@ static lib_win32_uint_ptr LIB_WIN32_WINAPI start_timer(lib_win32_hwnd w,lib_win3
 static lib_win32_bool LIB_WIN32_WINAPI stop_timer(lib_win32_hwnd w,lib_win32_uint_ptr id)
 { (void)w; lib_test_assert(id==1); ++timer_stops; return timer_ok; }
 static lib_i32 selection_ok;
+static lib_u32 cleanup_fault, deleted_cursors;
 static lib_u32 selections, deleted_bitmaps, deleted_dcs;
 static lib_u32 surface_bits[64];
 static lib_u8 painted[128];
@@ -114,8 +162,9 @@ static lib_win32_hbitmap LIB_WIN32_WINAPI bitmap(lib_win32_hdc d,const lib_win32
 static lib_i32 LIB_WIN32_WINAPI release_dc(lib_win32_hwnd w,lib_win32_hdc d) { (void)w;(void)d;return 1; }
 static lib_win32_hgdiobj LIB_WIN32_WINAPI select_bitmap(lib_win32_hdc d,lib_win32_hgdiobj o)
 { (void)d;lib_test_assert(o==(lib_win32_hgdiobj)3 || o==(lib_win32_hgdiobj)4);++selections;return selection_ok ? (lib_win32_hgdiobj)4 : LIB_NULL; }
-static lib_win32_bool LIB_WIN32_WINAPI delete_bitmap(lib_win32_hgdiobj o) { lib_test_assert(o==(lib_win32_hgdiobj)3);++deleted_bitmaps;return LIB_WIN32_TRUE; }
-static lib_win32_bool LIB_WIN32_WINAPI delete_dc(lib_win32_hdc d) { lib_test_assert(d==(lib_win32_hdc)2);++deleted_dcs;return LIB_WIN32_TRUE; }
+static lib_win32_bool LIB_WIN32_WINAPI delete_bitmap(lib_win32_hgdiobj o) { lib_test_assert(o==(lib_win32_hgdiobj)3);++deleted_bitmaps;return cleanup_fault!=2u; }
+static lib_win32_bool LIB_WIN32_WINAPI delete_dc(lib_win32_hdc d) { lib_test_assert(d==(lib_win32_hdc)2);++deleted_dcs;return cleanup_fault!=1u; }
+static lib_win32_bool LIB_WIN32_WINAPI delete_cursor(lib_win32_hcursor c) { lib_test_assert(c==(lib_win32_hcursor)5);++deleted_cursors;return cleanup_fault!=3u; }
 static lib_win32_dword LIB_WIN32_WINAPI clock_tick(void) { return ticks; }
 static lib_u32 invalidations;
 static lib_win32_rect invalidated, previous_invalidated;
@@ -284,6 +333,8 @@ static lib_win32_bool LIB_WIN32_WINAPI capture_title(lib_win32_hwnd w,lib_win32_
 #define lib_win32_select_object select_bitmap
 #define lib_win32_delete_object delete_bitmap
 #define lib_win32_delete_dc delete_dc
+#undef lib_win32_destroy_cursor
+#define lib_win32_destroy_cursor delete_cursor
 #undef lib_win32_register_raw_input_devices
 #undef lib_win32_get_raw_input_data
 #define lib_win32_register_raw_input_devices register_raw
@@ -699,8 +750,32 @@ static void check_competing_bindings(void)
     registration_entered = registration_continue = registration_attempt = LIB_NULL;
 }
 
-int main(void)
+static lib_win32_dword LIB_WIN32_WINAPI idle_worker(void *opaque)
 {
+    kvm_window *window = opaque;
+    kvm_window_win32_state *state = window->worker_state;
+    wait_idle_stop(state->stop);
+    return 0;
+}
+
+int main(int argc, char **argv)
+{
+    kvm_window_options lifetime_options = { .initial_title = "",
+        .component = { .input_sink = input, .failure_sink = failure } };
+    kvm_window *instance = LIB_NULL;
+    if (argc == 2) {
+        lifetime_fault = (lib_u32)(argv[1][0] - '0');
+        lib_test_assert(lib_test_at_exit(unexpected_cleanup) == 0);
+        (void)kvm_window_create(&instance, &lifetime_options);
+        (void)kvm_window_destroy(instance);
+        return 90;
+    }
+    lib_test_assert(kvm_window_create(&instance, &lifetime_options) == LIB_STATUS_IO_ERROR);
+    lib_test_assert(instance == LIB_NULL && closed_handles == 3u);
+    lifetime_fault = 5u;
+    lib_test_assert(kvm_window_create(&instance, &lifetime_options) == LIB_STATUS_OK);
+    lib_test_assert(kvm_window_destroy(instance) == LIB_STATUS_IO_ERROR && closed_handles == 6u);
+    lifetime_fault = 0u;
     check_sizing_policy();
     lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage), kvm_window_frame_retire) == LIB_STATUS_OK);
     lib_test_assert(kvm_window_apply_title((lib_win32_hwnd)1,"\xe6\xb5\x8b\xf0\x9f\x8e\xb5"));
@@ -716,7 +791,20 @@ int main(void)
     lib_test_assert(win32_window_ensure_surface((lib_win32_hwnd)1,&surface,8,8));
     lib_test_assert(surface.surface_width==8 && selections==2);
     win32_window_destroy_surface(&surface);
-    lib_test_assert(selections==3 && deleted_bitmaps==2 && deleted_dcs==2);
+    lib_test_assert(selections==2 && deleted_bitmaps==2 && deleted_dcs==2);
+    for (cleanup_fault = 1u; cleanup_fault <= 3u; ++cleanup_fault) {
+        kvm_win32_window_context failed = { .surface_dc = (lib_win32_hdc)2,
+            .surface_bitmap = (lib_win32_hbitmap)3, .surface_previous_bitmap = (lib_win32_hgdiobj)4,
+            .transparent_cursor = (lib_win32_hcursor)5 };
+        lib_u32 bitmaps = deleted_bitmaps, dcs = deleted_dcs;
+        lib_test_assert(win32_window_destroy(&failed, LIB_NULL) == LIB_STATUS_IO_ERROR);
+        lib_test_assert(deleted_dcs == dcs+1u && deleted_cursors == cleanup_fault);
+        lib_test_assert(deleted_bitmaps == bitmaps+(cleanup_fault!=1u));
+        lib_test_assert((failed.surface_dc != LIB_NULL) == (cleanup_fault==1u));
+        lib_test_assert((failed.surface_bitmap != LIB_NULL) == (cleanup_fault!=3u));
+        lib_test_assert((failed.transparent_cursor != LIB_NULL) == (cleanup_fault==3u));
+    }
+    cleanup_fault = 0u;
     static kvm_window window;
     static kvm_win32_window_context c;
     kvm_component_options options={.input_sink=input,.failure_sink=failure};

@@ -195,15 +195,15 @@ lib_status emulator_ui_destroy(emulator_ui *ui)
     }
     if (ui->window != LIB_NULL) {
         status = kvm_window_destroy(ui->window);
-        if (status != LIB_STATUS_OK) return status;
         ui->window = LIB_NULL;
         lib_atomic_i32_store_explicit(
             &ui->window_live, 0, LIB_MEMORY_ORDER_SEQ_CST);
+        if (status != LIB_STATUS_OK) return status;
     }
     if (ui->console != LIB_NULL) {
         status = kvm_console_destroy(ui->console);
-        if (status != LIB_STATUS_OK) return status;
         ui->console = LIB_NULL;
+        if (status != LIB_STATUS_OK) return status;
     }
     if (ui->monitor != LIB_NULL) {
         (void)lib_console_set_event_sink(ui->monitor, LIB_NULL, LIB_NULL);
@@ -247,18 +247,18 @@ lib_status emulator_ui_apply_action(emulator_ui *ui, emulator_ui_action action,
     case EMULATOR_UI_ACTION_DESTROY_VM_CONSOLE:
         if (ui->console == LIB_NULL) return LIB_STATUS_INVALID_STATE;
         status = kvm_console_destroy(ui->console);
-        if (status != LIB_STATUS_OK) return status;
         ui->console = LIB_NULL;
         ui->console_delivered_frame_sequence = 0u;
+        if (status != LIB_STATUS_OK) return status;
         return emulator_ui_emit_component(ui, EMULATOR_UI_COMPONENT_VM_CONSOLE, LIB_FALSE);
     case EMULATOR_UI_ACTION_DESTROY_WINDOW:
         if (ui->window == LIB_NULL) return LIB_STATUS_INVALID_STATE;
         status = kvm_window_destroy(ui->window);
-        if (status != LIB_STATUS_OK) return status;
         lib_atomic_i32_store_explicit(&ui->window_live, 0,
             LIB_MEMORY_ORDER_SEQ_CST);
         ui->window = LIB_NULL;
         ui->window_delivered_frame_sequence = 0u;
+        if (status != LIB_STATUS_OK) return status;
         return emulator_ui_emit_component(ui, EMULATOR_UI_COMPONENT_WINDOW, LIB_FALSE);
     }
     return LIB_STATUS_INVALID_ARGUMENT;

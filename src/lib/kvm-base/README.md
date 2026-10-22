@@ -105,9 +105,9 @@ The ledger is released at retirement; destroy also handles workerless cleanup.
 An unmatched break is consumed without delivery or pending-key replay: a new or
 reset input source must not forward a release whose make it never accepted.
 Destroy requests terminal stop, uses a leaf-owned terminal wake, and joins
-actual worker exit before it releases callback dependencies. A native stop or
-join failure retains the live component; the library neither frees it nor adds
-a recovery manager. A selected ordinary wake failure after a request has been
+actual worker exit before it releases callback dependencies. Unconfirmed exit
+terminates the process without application callbacks. Every normal destroy
+return consumes the object, reporting any cleanup error. An ordinary wake failure after a request has been
 accepted reports through the failure sink; it does not roll back or replay it.
 
 Window submits copied native records through kvm_keyboard_submit_record, which

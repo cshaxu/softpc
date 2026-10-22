@@ -94,26 +94,26 @@ lib_status kvm_console_worker_start(kvm_console *console)
     status = lib_console_set_event_sink(console->logical_console,
         kvm_console_receive_event, console);
     if (status == LIB_STATUS_OK) return LIB_STATUS_OK;
-    status = kvm_console_worker_join(console) == LIB_STATUS_OK ?
-        LIB_STATUS_INVALID_STATE : LIB_STATUS_IO_ERROR;
+    (void)kvm_console_worker_join(console);
     return status;
 }
 
 lib_status kvm_console_worker_join(kvm_console *console)
 {
     kvm_console_win32_state *state;
+    lib_status status;
 
     if (console == LIB_NULL || (state = (kvm_console_win32_state *)
             console->worker_state) == LIB_NULL) return LIB_STATUS_OK;
     /* STOP closes normal admission. This separate terminal wake guarantees the
      * worker can observe it even when ordinary mailbox notification failed. */
-    if (base_sync_event_signal(state->stop) != LIB_STATUS_OK)
-        return LIB_STATUS_IO_ERROR;
-    if (lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE) != LIB_WIN32_WAIT_OBJECT_0)
-        return LIB_STATUS_IO_ERROR;
-    if (!lib_win32_close_handle(state->worker)) return LIB_STATUS_IO_ERROR;
+    status = base_sync_event_signal(state->stop);
+    if (lib_win32_wait_for_single_object(state->worker,
+            status == LIB_STATUS_OK ? LIB_WIN32_INFINITE : 0u) != LIB_WIN32_WAIT_OBJECT_0)
+        lib_process_exit_immediate(LIB_STATUS_INTERNAL_ERROR);
+    if (!lib_win32_close_handle(state->worker)) status = LIB_STATUS_IO_ERROR;
     console->worker_state = LIB_NULL;
     base_sync_event_destroy(state->stop);
     lib_release(state);
-    return LIB_STATUS_OK;
+    return status;
 }

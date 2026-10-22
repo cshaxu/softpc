@@ -167,26 +167,25 @@ static void win32_window_initial_bounds(lib_i32 *left, lib_i32 *top, lib_i32 *wi
 
 static lib_status win32_window_destroy_surface(kvm_win32_window_context *context)
 {
+    lib_status status = LIB_STATUS_OK;
     if (context == LIB_NULL) return LIB_STATUS_OK;
-    if (context->surface_dc != LIB_NULL && context->surface_previous_bitmap != LIB_NULL) {
-        if (!lib_win32_select_object(context->surface_dc, context->surface_previous_bitmap))
-            return LIB_STATUS_IO_ERROR;
-        context->surface_previous_bitmap = LIB_NULL;
+    /* Deleting the owned DC releases its selection, not the owned bitmap.
+       If that fails, never delete a bitmap still selected into the live DC. */
+    if (context->surface_dc != LIB_NULL) {
+        if (lib_win32_delete_dc(context->surface_dc)) {
+            context->surface_dc = LIB_NULL;
+            context->surface_previous_bitmap = LIB_NULL;
+        } else status = LIB_STATUS_IO_ERROR;
     }
-    if (context->surface_bitmap != LIB_NULL) {
-        if (!lib_win32_delete_object(context->surface_bitmap)) return LIB_STATUS_IO_ERROR;
-        context->surface_bitmap = LIB_NULL;
+    if (context->surface_bitmap != LIB_NULL && context->surface_previous_bitmap == LIB_NULL) {
+        if (lib_win32_delete_object(context->surface_bitmap)) context->surface_bitmap = LIB_NULL;
+        else status = LIB_STATUS_IO_ERROR;
     }
-    if (context->surface_dc != LIB_NULL && !lib_win32_delete_dc(context->surface_dc))
-        return LIB_STATUS_IO_ERROR;
-    context->surface_dc = LIB_NULL;
-    context->surface_bitmap = LIB_NULL;
-    context->surface_previous_bitmap = LIB_NULL;
     context->surface_pixels = LIB_NULL;
     context->surface_width = 0u;
     context->surface_height = 0u;
     context->surface_valid = LIB_FALSE;
-    return LIB_STATUS_OK;
+    return status;
 }
 
 static lib_bool win32_window_ensure_surface(lib_win32_hwnd window,
@@ -892,14 +891,15 @@ static lib_win32_lresult LIB_WIN32_CALLBACK win32_window_proc(lib_win32_hwnd win
 
 static lib_status win32_window_destroy(kvm_win32_window_context *context, lib_win32_hwnd window)
 {
-    lib_status status;
+    lib_status status = LIB_STATUS_OK;
     if (window != LIB_NULL && lib_win32_is_window(window) && !lib_win32_destroy_window(window))
-        return LIB_STATUS_IO_ERROR;
-    status = win32_window_destroy_surface(context);
-    if (status != LIB_STATUS_OK) return status;
-    if (context != LIB_NULL && context->transparent_cursor != LIB_NULL)
-        if (!lib_win32_destroy_cursor(context->transparent_cursor)) return LIB_STATUS_IO_ERROR;
-    return LIB_STATUS_OK;
+        status = LIB_STATUS_IO_ERROR;
+    if (win32_window_destroy_surface(context) != LIB_STATUS_OK) status = LIB_STATUS_IO_ERROR;
+    if (context != LIB_NULL && context->transparent_cursor != LIB_NULL) {
+        if (lib_win32_destroy_cursor(context->transparent_cursor)) context->transparent_cursor = LIB_NULL;
+        else status = LIB_STATUS_IO_ERROR;
+    }
+    return status;
 }
 
 typedef struct kvm_window_win32_state {
@@ -992,10 +992,9 @@ static lib_win32_dword LIB_WIN32_WINAPI kvm_window_worker(void *opaque)
     }
     if (!lib_win32_is_window(window)) kvm_component_fail(&component->base, LIB_STATUS_IO_ERROR);
     win32_window_release_mouse(context);
-    if (win32_window_destroy(context, window) != LIB_STATUS_OK)
-        kvm_component_fail(&component->base, LIB_STATUS_IO_ERROR);
-    kvm_component_retire(&component->base, LIB_STATUS_OK);
-    return 0u;
+    lib_status cleanup = win32_window_destroy(context, window);
+    kvm_component_retire(&component->base, cleanup);
+    return (lib_win32_dword)cleanup;
 
 startup_failed:
     (void)win32_window_destroy(context, window);
@@ -1045,8 +1044,7 @@ lib_status kvm_window_worker_start(kvm_window *component)
             startup_status = LIB_STATUS_IO_ERROR;
         if (startup_status == LIB_STATUS_OK) startup_status = LIB_STATUS_IO_ERROR;
         /* An unsuccessful wait is not permission to free a live worker. */
-        if (kvm_window_worker_join(component) != LIB_STATUS_OK)
-            return startup_status;
+        (void)kvm_window_worker_join(component);
         return startup_status;
     }
     return LIB_STATUS_OK;
@@ -1055,18 +1053,19 @@ lib_status kvm_window_worker_start(kvm_window *component)
 lib_status kvm_window_worker_join(kvm_window *component)
 {
     kvm_window_win32_state *state;
+    lib_win32_dword result = LIB_STATUS_OK;
     if (component == LIB_NULL || (state = (kvm_window_win32_state *)
             component->worker_state) == LIB_NULL) return LIB_STATUS_OK;
     /* STOP closes normal admission. This terminal wake exits the native
      * message wait even if the ordinary mailbox notification failed. */
-    if (!lib_win32_set_event(state->stop)) return LIB_STATUS_IO_ERROR;
-    if (lib_win32_wait_for_single_object(state->worker, LIB_WIN32_INFINITE) != LIB_WIN32_WAIT_OBJECT_0)
-        return LIB_STATUS_IO_ERROR;
-    (void)lib_win32_close_handle(state->worker);
-    state->worker = LIB_NULL;
-    (void)lib_win32_close_handle(state->ready);
-    (void)lib_win32_close_handle(state->stop);
+    lib_win32_dword timeout = lib_win32_set_event(state->stop) ? LIB_WIN32_INFINITE : 0u;
+    if (lib_win32_wait_for_single_object(state->worker, timeout) != LIB_WIN32_WAIT_OBJECT_0)
+        lib_process_exit_immediate(LIB_STATUS_INTERNAL_ERROR);
+    if (!lib_win32_get_exit_code_thread(state->worker, &result) || timeout == 0u) result = LIB_STATUS_IO_ERROR;
+    if (!lib_win32_close_handle(state->worker)) result = LIB_STATUS_IO_ERROR;
+    if (!lib_win32_close_handle(state->ready)) result = LIB_STATUS_IO_ERROR;
+    if (!lib_win32_close_handle(state->stop)) result = LIB_STATUS_IO_ERROR;
     component->worker_state = LIB_NULL;
     lib_release(state);
-    return LIB_STATUS_OK;
+    return (lib_status)result;
 }

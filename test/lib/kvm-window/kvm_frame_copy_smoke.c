@@ -1,7 +1,9 @@
 #include "lib/types/test.h"
 #include "lib/kvm-base/frame_exchange_interface.h"
+#include "lib/base/sync_interface.h"
 
 static lib_size allocations, releases, last_bytes, live;
+static const void *held_payload[2];
 static lib_bool fail_allocation;
 static void *allocate_payload(lib_size count, lib_size bytes)
 {
@@ -14,7 +16,10 @@ static void *allocate_payload(lib_size count, lib_size bytes)
 }
 static void release_payload(void *pointer)
 {
-    if (pointer != LIB_NULL) { ++releases; --live; }
+    if (pointer != LIB_NULL) {
+        lib_test_assert(pointer != held_payload[0] && pointer != held_payload[1]);
+        ++releases; --live;
+    }
     lib_release(pointer);
 }
 /* Observe real leaf allocations, not a test-only production API. Exchange
@@ -83,6 +88,23 @@ static void check_copy(void)
     kvm_window_frame_release(&copy);
 }
 
+static void replace_frames(void *opaque, const base_sync_task *task)
+{
+    kvm_frame_exchange *frames = opaque;
+    (void)task;
+    for (lib_u32 i = 0; i < 20; ++i) {
+        kvm_window_frame_storage *writer = kvm_frame_exchange_writer(frames);
+        if (i % 2u == 0u) {
+            lib_test_assert(kvm_window_frame_prepare_text(writer, 80+i,25,100) == LIB_STATUS_OK);
+        } else {
+            lib_test_assert(kvm_window_frame_prepare_graphics(writer, 31+i,17,64) == LIB_STATUS_OK);
+            writer->data.graphics->pixels[0] = i;
+        }
+        lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_OK);
+        lib_test_assert(live <= 4u);
+    }
+}
+
 static void check_exchange(void)
 {
     kvm_frame_exchange *frames = LIB_NULL;
@@ -103,20 +125,34 @@ static void check_exchange(void)
     const void *previous;
     const kvm_window_frame *processing = kvm_frame_exchange_take(frames, &previous);
     lib_test_assert(previous == old && processing != old);
-    for (lib_u32 i = 0; i < 20; ++i) {
-        writer = kvm_frame_exchange_writer(frames);
-        lib_test_assert(kvm_window_frame_prepare_graphics(writer, 31,17,32) == LIB_STATUS_OK);
-        writer->data.graphics->pixels[0] = i;
-        lib_test_assert(kvm_window_frame_commit(frames) == LIB_STATUS_OK);
-    }
-    lib_test_assert(allocations == before + 4);
+    base_sync_task *producer;
+    held_payload[0] = old->text; held_payload[1] = processing->text;
+    lib_test_assert(base_sync_task_create(replace_frames, frames, &producer) == LIB_STATUS_OK);
+    /* The consumer owns both old payloads throughout concurrent replacement.
+     * Only the producer mutates allocation counters until join establishes
+     * quiescence; no sleep or unsynchronized counter observation is needed. */
     lib_test_assert(old->text->base.cells[0].glyph_index == 'A' && processing->text);
+    lib_test_assert(base_sync_task_destroy(producer) == LIB_STATUS_OK);
+    lib_test_assert(old->text->base.cells[0].glyph_index == 'A' && processing->text);
+    held_payload[0] = held_payload[1] = LIB_NULL;
     kvm_frame_exchange_finish(frames, LIB_TRUE);
-    lib_test_assert(live == 3);
+    lib_test_assert(live == 2); /* Old text freed; mismatched writer is empty. */
     const kvm_window_frame *latest = kvm_frame_exchange_take(frames, &previous);
     lib_test_assert(latest->graphics->pixels[0] == 19 && previous == processing);
     kvm_frame_exchange_finish(frames, LIB_TRUE);
-    lib_test_assert(live == 2);
+    lib_test_assert(live == 1); /* Only the newest graphics payload remains. */
+    kvm_frame_exchange_redraw(frames);
+    lib_test_assert(kvm_frame_exchange_take(frames, LIB_NULL) == latest);
+    held_payload[0] = latest->graphics;
+    lib_test_assert(base_sync_task_create(replace_frames, frames, &producer) == LIB_STATUS_OK);
+    lib_test_assert(latest->graphics->pixels[0] == 19);
+    lib_test_assert(base_sync_task_destroy(producer) == LIB_STATUS_OK);
+    lib_test_assert(latest->graphics->pixels[0] == 19);
+    held_payload[0] = LIB_NULL;
+    kvm_frame_exchange_finish(frames, LIB_TRUE);
+    latest = kvm_frame_exchange_take(frames, LIB_NULL);
+    lib_test_assert(latest != LIB_NULL && latest->graphics->pixels[0] == 19);
+    kvm_frame_exchange_finish(frames, LIB_TRUE);
     fail_allocation = LIB_TRUE;
     writer = kvm_frame_exchange_writer(frames);
     lib_test_assert(kvm_window_frame_prepare_text(writer,132,43,132) == LIB_STATUS_NO_MEMORY);

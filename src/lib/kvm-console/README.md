@@ -54,8 +54,9 @@ requeues held input only when no newer frame is pending, then signals the existi
 worker's wake; it neither renders nor reenters the broker.
 A failed activation notification enters the same terminal failure path as a
 failed frame/control notification. Checked destroy uses the shared terminal
-wake and joins actual exit; native stop/join failure retains the component and
-its callback dependencies.
+wake and joins actual exit. Unconfirmed exit terminates the process without
+application callbacks. Every normal destroy return consumes the component;
+post-join cleanup errors are reported without retaining a recovery object.
 The worker draws a pending exchange frame, or does nothing if empty. An unbound
 logical Console accepts output without native drawing; successful consumption
 retains that frame. Activation redraws through the same output path even when

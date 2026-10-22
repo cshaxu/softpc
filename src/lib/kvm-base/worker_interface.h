@@ -6,6 +6,7 @@
 
 #include "lib/types/atomic.h"
 
+/* Every return guarantees worker/callback quiescence, including cleanup errors. */
 typedef lib_status (*kvm_component_join_fn)(kvm_component *component);
 typedef void (*kvm_component_dispose_fn)(kvm_component *component);
 

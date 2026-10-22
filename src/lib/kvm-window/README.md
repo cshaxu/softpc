@@ -77,8 +77,8 @@ unrelated default-height cursor cell.
 Native Window destruction removes its timer; stale queued ticks cannot bypass
 frozen/due checks.
 Checked destroy requests terminal stop, wakes the native message wait, then
-joins the actual worker exit. A failed native stop or join retains the component
-and all callback dependencies, never freeing a live worker.
+joins the actual worker exit. If exit cannot be confirmed, the process terminates
+without application callbacks; no live worker is freed or returned as a half object.
 `freeze()` submits one control; the Window worker prevents capture, releases any
 capture, and holds the cursor at its current drawn state; `unfreeze()` resumes
 the blink but waits for a later client-area click before it captures. A real
@@ -109,7 +109,9 @@ input failure releases capture; reentry requires another click.
 All post-start worker exits stop input, release capture, close the
 Window and retire the source once quiescent, before releasing storage. First
 failure is reported on the detecting thread, not delayed until this cleanup.
-Failed native disposal retains ownership and returns failure from join/destroy.
+Destroy consumes the object on every normal return, including native cleanup
+failure. Independent cleanup continues; a bitmap still selected into a DC is
+not deleted. Such post-join resource errors do not trigger process termination.
 Paint acquisition, pixel transfer, cursor inversion and redraw-request failures
 use that same terminal path, without retry loops. A successful BeginPaint is
 always paired with EndPaint even if drawing fails. Empty/minimized content

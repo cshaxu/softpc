@@ -437,9 +437,10 @@ native cleanup runs on the worker, context storage release follows join.
 Base event is one opaque platform allocation, not a pointer-only outer wrapper.
 KVM destruction requests terminal stop, uses a dedicated terminal wake distinct
 from ordinary mailbox notification, waits for the worker to exit, then releases
-its context and callback dependencies. A native stop or join primitive failure
-retains the object; Lib neither frees a live worker nor exposes a half-object
-recovery protocol. A KVM notification failure after copied work has been
+its context and callback dependencies. A KVM native stop/join failure that leaves
+worker exit unconfirmed terminates the process without application callbacks.
+Every normal KVM destroy return consumes the object; post-join cleanup errors
+are reported while independent resources are still released. A KVM notification failure after copied work has been
 accepted reports once through the existing failure
 sink; it is not a second request rejection and is never replayed. Window blinking uses
 one native timer message path, including native modal loops, not outer-loop
@@ -454,8 +455,8 @@ Synchronous request rejection returns `lib_status`, with normal wait outcomes
 separated into output values. Ordinary synchronization and local cleanup stay
 inside their owning component. A failed public create leaves its output null;
 failed file close consumes the stream and cannot be retried. Expected local
-outcomes remain local; only terminal live-worker/native-reader ownership
-failures use the application's status boundary. Accepted KVM requests report
+outcomes remain local; Base task/native-reader ownership failures still use
+the application's status boundary. Accepted KVM requests report
 asynchronous failure through the existing control-queue sink. No alternate
 event path exists.
 

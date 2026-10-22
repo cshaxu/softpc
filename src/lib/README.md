@@ -129,9 +129,10 @@ request, it is accepted: a later wake failure reports once through the existing
 component failure sink and is never replayed.
 
 A successful public create returns one complete object; a failed create leaves
-its output null. KVM and native Console destruction join their live worker once.
-An unjoinable worker is handled at the importing application's terminal
-infrastructure boundary rather than exposed as a half-object recovery protocol.
+its output null. KVM destruction consumes the object on every normal return,
+including post-join cleanup errors. If KVM cannot establish worker exit, it
+terminates the process without application cleanup callbacks. Native Console
+broker and Base task ownership contracts are unchanged.
 Storage close retains its documented consumed-stream behavior.
 
 Every `kvm-window` and `kvm-console` instance owns a separate, private pair of

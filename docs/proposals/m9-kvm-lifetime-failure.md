@@ -3,9 +3,10 @@
 ## Scope and status
 
 T98 S14 is admitted on 2026-10-22 against 9514c823 for audit/design of the
-owner's proposed repair. This delivery changes documentation only. Production
-implementation awaits the owner's assessment of this recommendation. T98 stays
-open; the queued performance work is unrelated.
+owner's proposed repair. Audit P1 is 06a86ad7. The owner subsequently approved
+implementation and dual qualification. On reconnection the owner authorizes
+closure after successful self-verification and delivery.
+T98 stays open; the queued performance work is unrelated.
 
 The owner explicitly permits process termination when an internal lifetime
 failure cannot safely return. Ordinary parameter/allocation/resource/I/O errors
@@ -137,3 +138,154 @@ After implementation: dual cached builds, affected/complete public unit tests,
 Emulator UI caller regressions and required native/product integrations; publish
 dual EXEs, actual-diff review, commit/push and owner acceptance. This audit has
 not run those tests and does not claim a repaired or qualified implementation.
+
+## Implementation and bounded quality review
+
+The implemented path is stop -> terminal wake -> actual worker exit -> join ->
+independent resource cleanup -> object disposal. An unconfirmed native stop/join
+calls the Types one-to-one `_Exit` wrapper. It never returns a hidden live worker,
+calls application cleanup, or creates a recovery owner. A failed terminal wake
+uses the same wait once with zero duration to observe an already-exited worker;
+confirmed exit permits ordinary error/cleanup, not process termination. This is
+not a polling loop, deadline or retry. Ordinary cleanup errors
+after join consume the object and return IO_ERROR. Emulator UI clears all four
+consumed pointers before examining status; its own broker/UI contract is unchanged.
+
+Window deletes its owned memory DC before its bitmap: successful DC deletion
+removes the selection, but does not delete the bitmap. Failed DC deletion prevents
+deletion of a still-selected bitmap, without skipping independent cursor cleanup.
+The existing worker exit code carries cleanup status to join; no state field or
+new lifecycle path is introduced. Console preserves the original sink-attachment
+error after successful rollback, rather than replacing it with INVALID_STATE.
+
+The frozen review universe is the seven source-ledger items above plus their
+real callers and tests. Dispositions/proof:
+
+- Both failed-create paths: ordinary NULL/error and isolated stop/wait failure
+  children in the existing Window capture and Console shutdown fixtures.
+- Both normal destroy paths: isolated stop/wait faults and ordinary post-join
+  handle-close errors; exact fatal exit 6, a reached-boundary marker, absence of
+  atexit output and rejection of ordinary returns distinguish termination from
+  an unrelated crash. The test controller remains a separate CMake process.
+- Independent GDI cleanup: DC/bitmap/cursor faults verify subsequent releases,
+  cleared successful handles and preservation of a still-selected bitmap.
+- Four Emulator UI consumers: composition and action failure tests prove a
+  consumed Window/Console is not destroyed twice. Retained broker behavior stays.
+- Existing retirement tests still own STOP/input/callback concurrency and a
+  synchronized wait beyond the former five-second deadline.
+- Dynamic frame proof extends the existing leaf fixture, with a real producer
+  replacing sizes and text/graphics while a consumer holds old text, then old
+  graphics. Only that producer mutates allocation counters until join; at most
+  four payloads coexist and final allocation/free counts must balance.
+- Linux unsupported leaves, frame exchange, Base task and broker production
+  paths remain unchanged. No downstream repository is read or modified.
+
+Searches cover all production kvm_window/console/component_destroy calls,
+worker_start/join and stale retained-KVM contract text. The only outer consumers
+are the four Emulator UI sites. Ordinary notification faults retain their existing
+asynchronous sink; no fatal callback, polling, retry, alias API or second frame
+path was added. Shared-corpus type/dependency/naming/manifest tests will provide
+whole-package static evidence, not a claim of a new line-by-line audit of every
+unchanged public implementation.
+
+Limits remain explicit: callers must serialize destroy, stop external publishers
+before object disposal, and never synchronously destroy from a worker/callback.
+Post-join native resource failure can leak that failed OS resource; it reports
+failure without a residual-object manager. Base event destruction is still void,
+so its private handle-close failure is not newly observable from KVM; that generic
+Base contract was deliberately not expanded. No actual host stop/join corruption
+is claimed reproduced: these paths are controlled injected faults.
+
+Initial focused x64 run caught an obsolete test count: switching specifications
+reclaims the spare writer immediately, leaving two then one payload rather than
+the old fixed-spec three then two. The test's exact counts were corrected from
+the existing retire contract; exchange production code was not changed. Final
+focused x86/x64 runs each pass all four selected fixtures. Full qualification
+and delivery evidence follows below when completed.
+
+The first native retirement runs exposed its obsolete retained-object/retry
+assertion after injected join failure. That block and its join override are
+removed: the new unit children cover this fatal boundary without a real desktop.
+All 24 native scenarios and the >5-second synchronized retirement remain.
+The existing native startup-signal failure also proves safe rollback when the
+worker has already exited; Console has the equivalent controlled test. Native
+cursor-delete failure now expects IO_ERROR on the consumed-object return.
+Both native retirement fixtures passed after this contract update. An initial
+x64 compact package run and a subsequent x86 compact run separately failed at
+stage 1/error 6, matching the retained TODO; neither is attributed to this repair
+or silently replaced by the following qualification record.
+
+## Earlier qualification checkpoint
+
+- Cached builds pass on x64 and x86; changed public components have no compiler
+  warnings. Original mirror-header warnings from the wider rebuild are retained.
+- Final production background runs each pass 184/184. A final test-only change
+  adds direct release-hook rejection of the two held payload pointers, so early
+  freeing cannot pass merely because old memory still contains expected bytes.
+  Its focused four-fixture runs pass on both widths. All 177 unit/gate cases per
+  width subsequently pass with the host session Disc, including new manifests.
+- The updated real native retirement test passes on both widths, including the
+  synchronized >5-second case. The final native batch coincided with the session
+  becoming Disc: PCM/MIDI open assertions fail and package startup routes fail.
+  This is a qualification blocker, not a reason to change product audio or to
+  claim final integration success using earlier Active-session passes.
+- User reconnection has been requested. No owned build/test job remains running;
+  only this packet's small scratch directory is retained for native rerun and
+  final evidence promotion. No executor P2 commit or push has been made yet.
+- Count basis is `git diff --numstat 06a86ad7` for tracked src/test C/H plus the
+  new 18-line test fixture header. Production: +64/-66, net -2. Tests: +225/-49,
+  net +176. Test registration/controller CMake: +26/-2, net +24. Manifests,
+  documentation and EXEs are separate, not disguised as production reductions.
+  Necessary fatal/cleanup/concurrent-allocation proof explains test growth;
+  no established lifecycle coverage was deleted to force a negative total.
+- Changed shared trees: src/lib, test/lib, src/emulator, test/emulator. Both
+  X86 source/test pairs, root test infrastructure, App and mirror are unchanged.
+  Downstream consumers must adopt the consumed-on-normal-return destroy contract;
+  no downstream synchronization is claimed and no uncommitted import baseline
+  is offered.
+- Published softpc32 SHA-256:
+  A583D165349382242CAB44F132DA98573CE1A431249D785436437304AFC5F891.
+  Published softpc64 SHA-256:
+  BECB19DBD2A64C72727BB7E9F142E77C2B57832C23176C30EDF187795B9F48B1.
+  INI and pre-existing user snapshot.debug hashes match the admission baseline.
+
+This checkpoint preceded the successful rerun below; it is retained to disclose
+the failures, not as the final task status.
+
+## Final executor qualification, 2026-10-22
+
+The owner reconnects and authorizes self-verification followed by S closure.
+RDP is confirmed Active. Hidden serial native execution returns zero:
+
+- x64: desktop 5/5, native audio 3/3.
+- x86: desktop 5/5, native audio 3/3.
+- Both ordinary and compact package cases pass in this complete rerun; no
+  isolated replacement, skip, assertion relaxation or product retry is used.
+- Together with final-production background 184/184 on each architecture,
+  XML testcase names exactly equal all 192 registrations per architecture;
+  there are no duplicate names, failures, errors or skipped cases in that set.
+- The final test-only held-pointer assertion supplement also has the later
+  177/177 unit/gate run on each width, in addition to its focused four fixtures.
+  These executions are supplementary, not extra registrations.
+- Both published EXE hashes and protected INI/snapshot hashes still match the
+  checkpoint above. No additional production rebuild is necessary for this
+  session-only rerun. Changed public code is warning-free; original mirror
+  header warnings remain outside scope as required.
+
+Earlier Active compact attach failures and disconnected audio/package failures
+are not erased by this result. The existing package TODO remains open. Injected
+faults prove terminal/cleanup contracts, not real host corruption; the native
+tests separately prove real creation, retirement, modal and Console behavior.
+
+Executor review finds no additional in-scope blocker: one terminal join path
+per native leaf, ordinary failure remains ordinary, all four outer destroy
+consumers clear consumed pointers, no new production state/polling/recovery,
+and no frame algorithm change. Public Types/dependency/naming/manifests and
+all public unit tests pass. This is a changed-path review plus whole-package
+gates, not an exhaustive new audit of unchanged implementations.
+
+Counts remain production C/H +64/-66 (net -2), test C/H +225/-49 (net +176),
+test CMake +26/-2 (net +24). All task-owned jobs have exited. Concise evidence
+is promoted here before retiring disposable scratch; reusable caches remain.
+Executor commit/push and coordinator review follow as separate P deliveries.
+T98 remains open; no next S is admitted.

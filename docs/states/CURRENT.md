@@ -7,19 +7,19 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S to assess the proposed minimal KVM lifetime-failure repair and whether its scope is justified. |
-| Objective | Audit actual create rollback, stop/join, cleanup and callers; deliver a bounded recommendation and cost estimate before production implementation. |
-| Non-goals | No production edit in this audit delivery; no frame redesign, new recovery protocol, fatal callback, polling, App/mirror/media change or downstream repository modification. |
-| Reference Baseline | 9514c823; preserve user snapshot.debug and configuration. |
+| Admission And Approval | Owner approves the audited minimal repair and requests build/release/tests/commit/push plus shared-component quality review; on reconnection authorizes closure after successful self-verification. |
+| Objective | Implement safe-return or process-terminal KVM lifetime semantics, independent cleanup and consumed-object callers with focused regressions. |
+| Non-goals | No frame redesign, recovery protocol, fatal callback, polling, App/mirror/media change or downstream repository modification. |
+| Reference Baseline | 06a86ad7 audit delivery; preserve user snapshot.debug and configuration. |
 | Candidate Proposal | [KVM lifetime failure audit](../proposals/m9-kvm-lifetime-failure.md). |
-| Files And ABI Surface | Read Lib Window/Console/Base/Types, Emulator UI consumers and owner-local tests; only proposal/current state change in this delivery. |
+| Files And ABI Surface | Lib Types/KVM lifecycle and native cleanup; Emulator UI callers; owner-local tests and contracts. Destroy consumes valid objects on normal return. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [Documentation](../rules/DOCUMENT.md). |
-| Verification | Source/caller/test inventory; ordinary versus unsafe-return boundary; documentation and diff checks. No dynamic fault reproduction claimed. |
+| Verification | Isolated fatal children, rollback/cleanup faults, concurrent dynamic payloads, caller ownership; dual cached builds, full background and native integration suites plus corpus gates. |
 | Expected Markers | Two-result creation; no inaccessible live worker after ordinary failure; no new ownership state; classify post-join resource errors separately. |
-| Asset Needs | None for audit; do not rebuild or replace EXEs. |
-| Reporting Requirements | Confirmed source defects, minimum changes, estimates and compatibility effects; explicit proof limits. No task scratch needed. |
+| Asset Needs | Refresh dual assets/binary EXEs only; preserve INI, media and user snapshot.debug. |
+| Reporting Requirements | Actual production/test counts and public-component quality review. S14 owns build/t98-s14: hidden jobs, 45-minute budget, 10-minute no-progress investigation, 200MB scratch; retire after evidence promotion. |
 | Stop Conditions | Report before broadening fatal policy, lifecycle APIs, frame algorithm or platform architecture. |
-| Exit Criteria | Reviewed audit and bounded design delivered for owner decision; implementation/qualification and S closure remain pending. |
+| Exit Criteria | Safe single-path implementation, dual builds/releases and required tests, pushed executor and actual-diff review; owner authorizes closure once these pass. |
 | Original Owner Request | Assess whether the proposed minimal lifecycle-failure repair is reasonable and worthwhile, avoiding a large redesign for small failures. |
 | Similar-Issue Sweep | Both KVM leaves, generic destroy, native cleanup, all production destroy callers, Linux unsupported leaves and frame/lifetime tests. |
 
@@ -32,6 +32,21 @@ no new T or S is admitted by that transfer.
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- S14 implementation, qualification and executor source-quality review pass;
+  executor delivery and coordinator review precede authorized closure. Production C/H
+  +64/-66 (net -2); test C/H +225/-49 (net +176); test CMake +26/-2.
+  Cached x64/x86 builds and final focused tests pass. Final production has
+  184/184 background passes on each width. The final test-only held-payload
+  assertion supplement passes, followed by all 177 unit/gate registrations
+  per width passing while RDP is Disc. After owner reconnection, both widths
+  pass five desktop and three native-audio cases, including >5-second worker
+  retirement and both package routes. Exact registration/XML equality proves
+  192/192 per width with zero failures/errors/skips in the final evidence set.
+  Earlier disconnected failures and Active compact stage 1/error 6 remain
+  disclosed in the proposal; no causal repair of existing TODO is claimed.
+  All owned jobs have exited; scratch is retired after evidence promotion.
+  User INI/media/snapshot.debug are unchanged; no App/mirror/X86 changes.
 
 - S13 executor 1e07dcce is pushed and actual-diff review is complete. Private
   snap classification selects fit/width/height in the existing native size

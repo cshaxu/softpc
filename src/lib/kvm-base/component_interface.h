@@ -30,8 +30,9 @@ typedef struct kvm_component_options {
 lib_status kvm_component_request_stop(kvm_component *component);
 /* Synchronous destruction: request terminal stop, wait for the worker and its
  * callbacks to exit, then free storage. The owner serializes destroy and never
- * calls it from a component callback or worker. Failure retains the object and
- * all callback context; success consumes it. NULL returns OK. */
+ * calls it from a component callback or worker. Every normal return consumes
+ * the object; errors report cleanup failures after quiescence. If worker exit
+ * cannot be established, the process terminates without callbacks. NULL is OK. */
 lib_status kvm_component_destroy(kvm_component *component);
 
 #endif

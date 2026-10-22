@@ -89,8 +89,7 @@ lib_status kvm_console_create(kvm_console **out_console,
         status = lib_console_create(&console->logical_console);
     if (status == LIB_STATUS_OK) status = kvm_console_worker_start(console);
     if (status != LIB_STATUS_OK) {
-        if (console->worker_state == LIB_NULL)
-            kvm_console_component_dispose(&console->base);
+        kvm_console_component_dispose(&console->base);
         return status;
     }
     *out_console = console;
