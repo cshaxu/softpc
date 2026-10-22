@@ -33,17 +33,63 @@ S1 research (29c260b5, reviewed in bf18a2f7) is closed by that advancement.
   affected desktop group. Unrelated native audio is not required. Commit/push
   and actual-diff review precede owner acceptance. No repair of the historical
   intermittent failures is claimed merely by removing redundant code.
-- S3: planned, not admitted. Determine one correct minimal pause-key contract
-  across source ledger, FIFO admission and driver delivery. Give concrete
-  ordering and make/break/source-retirement examples, reject extra ledgers and
-  product callbacks, and obtain approval before changing semantics.
+- S3: owner admits minimal cleanup after accepting that pause need not preserve
+  ordinary host transitions or resynchronize keys on resume. Keep Machine FIFO,
+  KVM filtering and Session key ledger unchanged. Remove only duplicate
+  SOURCE_RETIRED admission and no-op paused zero-button mouse admission.
+  Update the existing Session test, contract documentation and manifests.
+  Estimate production C +1/-3, test C about +5; no API/state/thread changes.
+  Run cached dual builds, publish EXEs and all 192 tests per width; commit,
+  push, review actual changes and wait for owner acceptance.
 - S4: planned, not admitted. Investigate observations 2 through 5 using exact
   missing completion and child/input boundary evidence. Distinguish startup
   death, live blank output and post-start input loss. Do not add retries or
   shared recovery machinery before identifying the first failing operation.
 
-S3/S4 remain here, not duplicated in the T queue or TODO. S2 does not delete
-the unrelated redundant Session predicate, which belongs to the later review.
+S3/S4 remain here, not duplicated in the T queue or TODO. S3 owns the two
+Session predicates; S4 remains unadmitted. S2 is closed by this advancement.
+
+## S3 implementation and verification record
+
+Baseline 22cdeb7f. Production C changes only session/control.c: +1/-3,
+net -2. The existing control_reconciler test adds five lines, net +5.
+No ABI, state, thread, queue, driver callback or resume synchronization is added.
+Only src/emulator and test/emulator change among the public eight trees;
+their manifests and the architecture/contract documentation are synchronized.
+The other six trees, Machine implementation, App, mirror, INI and media remain
+unchanged. Dual published EXEs are rebuilt from this implementation.
+
+Similar-issue sweep inspected accept_kvm_event and dispatch_input for every
+KVM event type, plus Session callers and existing Machine/physical-key tests.
+SOURCE_RETIRED and INPUT_RESET already enter before state/generation filtering;
+their ledger cleanup remains necessary. Paused key-up also clears the local
+ledger without guest delivery. Paused mouse has no ledger or dispatch action;
+its redundant admission is removed. Hotkeys and close retain control semantics.
+Machine admission/FIFO and KVM filtering remain their existing single owners.
+No additional gate or abstraction is warranted for these two predicates.
+
+Cached x64/x86 builds each complete 23 incremental steps, no warning/error
+matches in their logs. Focused Machine/Session tests pass 14/14 per width.
+Full background runs pass 184/184 each (113.70s x64, 114.62s x86).
+Native tests were held while the owner session was disconnected, then executed
+after reconnection: audio 3/3 and desktop/package 5/5 on each width, no skips
+or failures. No native test was attempted during the disconnected interval.
+Frozen qualification universe: all 192 registered CTest names per width.
+Exact registration/XML name equality across background/audio/desktop proves
+192 unique passing cases per width, zero missing/extra/failed/skipped cases.
+This proves this build's regression result, not repair of historical S4
+intermittency or acceptance by other products. No downstream repo was read.
+
+Published SHA-256:
+
+- x86: EB924BBA391EB0F88E989EBC9A7F7CDCC4331B8D1D124296474BF2678DD0937E
+- x64: AFA8D42BC1C3C0B21DCBD30527C4D6DCC054E40914946F74E575700416A88D94
+
+Self-review confirms the two removed predicates had no paused guest-delivery
+effect. The new assertions retain retirement acceptance and distinguish paused
+mouse rejection from running admission. Necessary ownership and error handling
+are unchanged. S3 waits for owner acceptance after delivery and committed-diff
+review; S4 is not admitted.
 
 ## S2 implementation and verification record
 

@@ -2,30 +2,38 @@
 
 ## Current Work
 
-## M9 T99 S2 Packet
+## M9 T99 S3 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner authorizes the two definite cleanups in a new S; S1 research closes and S2 is admitted. S3 pause-input research and S4 intermittency investigation remain planned, not admitted. |
-| Objective | Preserve both delivered cleanups; owner now authorizes investigation and minimal repair of the five fresh full-regression failures, followed by complete dual-width qualification. |
-| Non-goals | No pause semantics, new recovery state/API/retry, downstream edits, guest/configuration changes, skipped native tests or fake device success. |
-| Reference Baseline | bf18a2f7; clean worktree at admission. |
+| Admission And Approval | Owner approves the minimal pause-contract cleanup and advancement from verified S2; S2 closes, S3 is admitted. S4 remains planned only. |
+| Objective | Document no cross-pause host-key resynchronization; remove duplicate retirement admission and no-op paused mouse admission. |
+| Non-goals | No Machine/FIFO/KVM changes, release replay, new ledger/state/API, downstream edits, guest or configuration changes. |
+| Reference Baseline | 22cdeb7f; clean worktree at admission. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Delivered Lib console-broker cleanup and App command-provider test; owner-authorized package/native failure investigation now includes App package fixture diagnostics. No ABI change. |
+| Files And ABI Surface | Emulator session/control.c, existing control test, README and manifests; architecture/task records and rebuilt EXEs. No ABI change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Owner now requests a fresh complete x64/x86 run: all registered background, desktop and native-audio cases, exact registration/XML coverage and failures disclosed. Prior bounded evidence remains historical. |
-| Expected Markers | One fail-closed cleanup, unchanged first-error/lock/resource order; auto-reset wait consumes exactly one signal. |
+| Verification | Cached x86/x64 builds; existing Session admission/retirement tests and full 192 registered cases per width, including desktop/audio, exact XML name coverage. |
+| Expected Markers | Pause preserves the existing FIFO; no resume synchronization; ordinary mouse input rejected while paused; source cleanup/hotkeys/keyboard ledger unchanged. |
 | Asset Needs | Refresh assets/binary dual EXEs only; preserve INI/media. No Computer Use. |
-| Reporting Requirements | Actual production/test counts and failure dispositions. Scratch build/t99-s2: 60-minute job, investigate after 10-minute no progress, 300MB; retire after delivery. |
-| Stop Conditions | Do not expand to pause/input semantics or a new recovery model. Native device/session unavailability must be proved and reported, not masked. |
-| Exit Criteria | Both cleanups verified, actual-diff review, manifests/governance checks, dual published EXEs, committed/pushed delivery and clean workspace awaiting acceptance. |
-| Original Owner Request | Complete the first two definite cleanups now; separately schedule pause-key simplification and intermittent-failure research. |
-| Similar-Issue Sweep | All wait_for consumers and auto-reset event creation in command_provider_smoke; adjacent Broker failure blocks and existing reset/retirement/activation fault coverage. |
+| Reporting Requirements | Actual production/test counts and retained responsibilities. Scratch build/t99-s3: 60-minute job, 10-minute no-progress investigation, 300MB; retire before delivery. |
+| Stop Conditions | No broader input redesign or historical intermittency repair; disclose host/device failures rather than skip or fake success. |
+| Exit Criteria | Minimal diff reviewed, manifests/gates and full verification complete, dual EXEs published, committed/pushed and clean workspace awaiting acceptance. |
+| Original Owner Request | Keep current pause behavior, simplify only two redundant conditions; build, publish, test, commit, push and wait for acceptance. |
+| Similar-Issue Sweep | Session admission and dispatch for every KVM event type; retain necessary pressed ledger/reset/retirement and running delivery. |
 
 T99 S1 research is now owner-closed; its report and actual-commit review are
 retained in the [closure](../history/M9-T99-S1-handoff-research.md) and proposal.
-S2 is active; S3/S4 are the internal T99 plan only.
+S2 is closed by owner-approved advancement; see [closure](../history/M9-T99-S2-handoff-cleanup.md).
+S3 is implemented and verified, awaiting owner acceptance after delivery and
+committed-diff review. Cached dual builds and focused 14/14 tests per width pass;
+full qualification passes all 192 registrations per width (184 background,
+three audio and five desktop/package), exact XML coverage, zero skips/failures.
+Native tests ran after the owner's RDP reconnection. Dual EXEs are published;
+production C is +1/-3 and test C +5/-0. No new pause state or reconciliation
+path exists. The proposal owns the full evidence and similar-issue review.
+S4 remains unadmitted. The following is historical S2 evidence.
 Owner-requested fresh full regression at 27946581 has now executed all 192
 registrations per width: each passes 187, fails five, skips zero. Background
 184/184 and Lib desktop 3/3 pass; two package and three native-audio cases per
