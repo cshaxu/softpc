@@ -29,8 +29,8 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 - Owner closes S9 and admits S10; [S9 closure](../history/M9-T98-S9-execution-budget.md).
   S10 audit finds COM/LPT still using locale fopen; other owned file entries
-  already use Storage. Implementation and verification are complete; executor
-  delivery and actual-diff review precede owner acceptance. Production +55/-23
+  already use Storage. Executor 0151689d is pushed; actual-diff coordinator
+  review is complete. S10 awaits owner acceptance; T98 stays open. Production +55/-23
   (net +32), tests +136/-29 (net +107); mirror unchanged. Cached dual builds,
   focused 12/12 each and all 192 registrations per architecture have passing
   evidence. x86 compact package first failed stage 1/error 6; the unchanged
