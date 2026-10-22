@@ -1,5 +1,13 @@
 # Long-Term Review Ledger
 
+- TODO(Low): Audit three pointer-to-IUH casts in the VGA frame test's selected
+  marker fixture (vga_frame_smoke.c). T98 S10's x64 rebuild reports
+  pointer-to-integer-width warnings at the pre-existing r1 = (IUH)Gdp sites;
+  the same statements exist in d987f10f. Owner: App machine VGA test/CCPU ABI
+  fixture. Admission condition: verify the correct GDP register representation
+  on both widths before changing the fixture; do not suppress the diagnostic
+  or alter mirror code as part of the unrelated UTF-8 path repair.
+
 - TODO(Medium): Diagnose the intermittent command-provider event wait failure.
   T98 S7's second x64 aggregate run failed the 10000ms event assertion after
   debug resume/pause observations; the first aggregate and unchanged isolated
@@ -34,6 +42,8 @@
   RDP is Active; ordinary package and all other cases pass. Each unchanged
   isolated compact rerun passes. No fixture/product change or causal repair
   is claimed; retain both first failures and supplemental qualification facts.
+  T98 S10 final x86 compact package again failed stage 1/error 6; an unchanged
+  complete desktop-group repeat passed 5/5. No causal repair is claimed.
 
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,
@@ -44,16 +54,6 @@
   Admission condition: verify VGA/EGA hardware disable semantics and all writes
   before a separately approved minimal mirror fix. S6 hidden-shape coverage uses
   the existing start-outside-font branch, not an assertion that bit 5 works.
-
-- TODO(Medium): Align optional COM/LPT output paths with config/media UTF-8
-  semantics; current narrow fopen uses the Windows CRT code page. Owner:
-  App-SoftPC host file exits. Admission condition: preserve lazy open and
-  flush visibility and partial-write tail accounting. T98 follow-up withdraws
-  the writer migration: adding flush alone cannot preserve partial progress.
-  Owner supersedes the private opener in planned T98 S10: audit all file entry
-  points and unify UTF-8 paths through Lib, retaining existing I/O semantics.
-  Any minimal API extension requires evidence from that caller audit. See
-  [F4](../proposals/m9-nonpublic-quality-performance-audit.md#f4---p2-comlpt-file-paths-have-inconsistent-encoding).
 
 - TODO(High): Resolve unsupported Sound Blaster MIDI command 38h parser
   collision. T95 S1 observes sndblst2.drv sending MIDI bytes after 38h;

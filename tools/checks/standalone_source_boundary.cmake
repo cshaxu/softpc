@@ -11,6 +11,18 @@ foreach(preset_index RANGE 0 1)
     endif()
 endforeach()
 
+# All owned file exits use Storage's UTF-8 boundary, not a locale opener.
+file(GLOB_RECURSE owned_file_sources
+    "${SOFTPC_SOURCE_DIR}/src/app-softpc/product/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/app-softpc/machine/*.[ch]"
+    "${SOFTPC_SOURCE_DIR}/src/app-softpc/compat/*.[ch]")
+foreach(source IN LISTS owned_file_sources)
+    file(READ "${source}" body)
+    if(body MATCHES "(^|[^A-Za-z0-9_])(fopen|freopen|_wfopen|CreateFileA|CreateFileW|lib_c_fopen|lib_win32_wfopen|lib_win32_create_file_[aw])[ \t\r\n]*\\(")
+        message(FATAL_ERROR "Owned file entry bypasses Storage UTF-8 contract: ${source}")
+    endif()
+endforeach()
+
 # New host code has one concrete ownership taxonomy.  No compatibility or
 # convenience aggregate may appear beside these seven owners.
 set(allowed_host_taxonomies bios ccpu cmos cvidc devices keymouse system)

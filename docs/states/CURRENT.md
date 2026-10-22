@@ -2,33 +2,44 @@
 
 ## Current Work
 
-## M9 T98 S9 Packet
+## M9 T98 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly admits S9 with a 64-bit budget, zero continuous and all nonzero values finite; build, publish, test, commit and push, then wait for acceptance. S10 design is revised but implementation is not admitted. |
-| Objective | Eliminate finite-budget truncation in the existing Machine/Compat execution path, identical on x86 and x64. |
-| Non-goals | No public component, mirror, guest, scheduler, snapshot format or file-I/O implementation changes. |
-| Reference Baseline | `34e53055`; S8 verified delivery f2677d01 and actual-change review 34e53055. Preserve user INI/media and untracked snapshot.debug. |
-| Candidate Proposal | [T98 64-bit budget](../proposals/m9-nonpublic-quality-performance-audit.md#s9---64-bit-execution-budget). |
-| Files And ABI Surface | Private Machine run contract, Compat budget declarations/storage, Driver and test callers; existing owner-local regressions. |
+| Admission And Approval | Owner closes accepted S9 and explicitly admits S10: implement, build, publish, test, commit and push, then wait for acceptance. |
+| Objective | Uniform UTF-8 file paths through Lib Storage, including COM/LPT, configuration, media, snapshot and DEBUG. |
+| Non-goals | No mirror, guest, scheduler, snapshot format, media or user configuration changes; no alternate path converter. |
+| Reference Baseline | `d987f10f`; S9 executor dbff43df and actual-change review are accepted. Preserve user INI/media and untracked snapshot.debug. |
+| Candidate Proposal | [T98 UTF-8 paths](../proposals/m9-nonpublic-quality-performance-audit.md#s10---uniform-utf-8-file-paths). |
+| Files And ABI Surface | Lib Storage writer partial progress/flush; Compat COM/LPT consumers; affected owner-local tests, manifests and documentation. |
 | Applicable Rules | [Execution](../rules/EXECUTION.md), [Architecture](../rules/ARCHITECTURE.md), [Coding](../rules/CODING.md), [System Architecture](../design/ARCHITECTURE.md), [Source Layout](../design/CODING.md). |
-| Verification | 64-bit boundary decrement, finite completion and zero-budget lifecycle stop; real CCPU entry preserves high bits; cached dual builds, complete background/desktop/native-audio regression. |
-| Expected Markers | One lib_u64 budget declaration/storage, no narrowing or old sentinel callers; existing active flag separates infinite mode from finite exhaustion. |
+| Verification | UTF-8 native-name and binary output, append/lazy-open/flush visibility, partial-write and flush-failure accounting; cached dual builds and full background/desktop/native-audio regression. |
+| Expected Markers | One existing Storage platform opener; no locale fopen at owned product file exits; retained partial-progress semantics. |
 | Asset Needs | Refresh only `assets/binary/softpc32.exe` and `softpc64.exe` if final production linkage changes. Preserve `assets/binary/softpc.ini`, media, and `snapshot.debug`. |
-| Reporting Requirements | Report production/test added, removed and net lines, execution semantics and proof limits. Executor owns disposable build/t98-s9; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
-| Stop Conditions | No second counter, execution path, polling, compatibility sentinel or mirror/public ABI changes. |
+| Reporting Requirements | Report production/test added, removed and net lines, path semantics and proof limits. Executor owns disposable build/t98-s10; hidden jobs have logs/exit files, 45-minute budget, 10-minute no-progress investigation and 200MB scratch budget; retire after evidence promotion. |
+| Stop Conditions | No duplicate conversion, CRT handle exposure, replay of accepted bytes, mirror changes or silent truncation. |
 | Exit Criteria | Verified single-path implementation, dual packages, required tests, pushed executor and actual-diff review, then owner acceptance. |
-| Original Owner Request | S9 uses a 64-bit integer throughout: zero means infinite and every nonzero value finite. S10 will unify UTF-8 path contracts through Lib after a full entry-point audit. Admit and execute S9 now. |
-| Similar-Issue Sweep | All budget declarations, assignments, decrement and lifecycle consumers, run callers, saved-state and documentation references. |
+| Original Owner Request | Close S9, admit S10 and complete compilation, publication, tests, commit and push before owner acceptance. All file paths use UTF-8, including COM/LPT/config/snapshot/DEBUG, without special cases. |
+| Similar-Issue Sweep | All owned file open/read/write entries, platform wrappers, original diagnostic-only mirror hits and real callers; classify unchanged compliant paths. |
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
 
+- Owner closes S9 and admits S10; [S9 closure](../history/M9-T98-S9-execution-budget.md).
+  S10 audit finds COM/LPT still using locale fopen; other owned file entries
+  already use Storage. Implementation and verification are complete; executor
+  delivery and actual-diff review precede owner acceptance. Production +55/-23
+  (net +32), tests +136/-29 (net +107); mirror unchanged. Cached dual builds,
+  focused 12/12 each and all 192 registrations per architecture have passing
+  evidence. x86 compact package first failed stage 1/error 6; the unchanged
+  full desktop repeat passes 5/5. This is not a repair of that known debt.
+  Native audio passes 3/3 each after reconnection. See the proposal for exact
+  qualification, package hashes and pre-existing warning disclosure.
+
 - T98 S9 executor dbff43df is pushed and actual-change review is complete;
-  verified delivery awaits owner acceptance. Budget storage and interface are lib_u64 on both widths:
+  owner has accepted and closed S9. Budget storage and interface are lib_u64 on both widths:
   zero is continuous, every nonzero value finite. Existing active state and
   original safe-point counting remain; no public component or mirror change.
   Production +14/-20 (net -6); tests +62/-4 (net +58). Cached dual builds and
@@ -39,7 +50,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   Original header warnings remain. User INI/media/snapshot.debug are unchanged.
   softpc32 SHA-256 D10C1108705F623CBA05BE1C9EA130585C76FC30067854AC63F2346D1988F76B;
   softpc64 SHA-256 00FCAD94A0EB8D3CB8FB9A6E3C1F3279025B71F68963F9722D876BA07D5BAF25.
-  S10's unified UTF-8 file-entry audit is planned, not implementation-admitted.
+  S10's unified UTF-8 file-entry work is now admitted above.
 
 - T98 S8 implementation and cached dual builds are verified. Final x64 and x86
   each pass all 192 registrations: 184 background, five desktop and three
@@ -63,7 +74,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   x86 final 192/192 passes; x64 final 190/192 plus two unchanged isolated passes
   provides passing coverage for all 192 registrations. Intermittent failures
   remain disclosed and deferred, not repaired by this sizing change.
-  S9 is now admitted; S10 remains planned.
+  S9 is now closed; S10 is active.
   softpc32 SHA-256 BEAE1647F8F177123045F99AACE6A6195212A5F89F611C47F57EA18C9A346C5B;
   softpc64 SHA-256 9314E59A4B8143F230E0A2D1833C388BD8A214F72DF0513114149B97DCED9CEB.
 

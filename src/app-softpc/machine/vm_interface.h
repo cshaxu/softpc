@@ -5,6 +5,7 @@
 #include "lib/storage/medium_interface.h"
 
 typedef struct vm_driver vm_driver;
+/* All configured file paths are UTF-8; contents remain binary. */
 typedef struct vm_options {
     const char *floppy_path;
     const char *hard_disk_path;

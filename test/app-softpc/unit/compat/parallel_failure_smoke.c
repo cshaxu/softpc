@@ -1,4 +1,5 @@
 #include "lib/types/types_interface.h"
+#include "lib/storage/file_interface.h"
 
 #ifdef NDEBUG
 #error Parallel failure verification requires live assertions
@@ -9,27 +10,31 @@
 static lib_size write_limit;
 static int flush_result;
 static unsigned write_count;
+static unsigned flush_count;
+static lib_bool write_error;
 
-static lib_size fake_fwrite(const void *bytes, lib_size size, lib_size count,
-    FILE *output)
+static lib_status fake_write(lib_storage_file_writer *output,
+    const void *bytes, lib_size count, lib_size *written)
 {
     (void)bytes;
-    assert(size == 1u && output == (FILE *)1);
+    assert(output == (lib_storage_file_writer *)1);
     ++write_count;
-    return write_limit < count ? write_limit : count;
+    *written = write_limit < count ? write_limit : count;
+    return *written == count && !write_error ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-static int fake_fflush(FILE *output)
+static lib_status fake_flush(lib_storage_file_writer *output)
 {
-    assert(output == (FILE *)1);
-    return flush_result;
+    assert(output == (lib_storage_file_writer *)1);
+    ++flush_count;
+    return flush_result == 0 ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR;
 }
 
-#define fwrite fake_fwrite
-#define fflush fake_fflush
+#define lib_storage_file_writer_write_some fake_write
+#define lib_storage_file_writer_flush fake_flush
 #include "compat/parallel.c"
-#undef fflush
-#undef fwrite
+#undef lib_storage_file_writer_flush
+#undef lib_storage_file_writer_write_some
 
 int main(void)
 {
@@ -40,7 +45,7 @@ int main(void)
     assert(lpt->buffer != NULL);
     for (index = 0; index < HIGH_WATER; ++index)
         lpt->buffer[index] = (byte)index;
-    lpt->output = (FILE *)1;
+    lpt->output = (lib_storage_file_writer *)1;
     lpt->active = TRUE;
     lpt->bytes_in_buffer = HIGH_WATER;
     lpt->flush_threshold = HIGH_WATER;
@@ -66,6 +71,14 @@ int main(void)
     flush_result = EOF;
     assert(!host_print_doc(0));
     assert(lpt->bytes_in_buffer == 0);
+    /* An accepted prefix remains accepted even if the stream reports error.
+       Full acceptance must still reach the existing flush, never be replayed. */
+    lpt->bytes_in_buffer = 1;
+    flush_result = 0;
+    flush_count = 0;
+    write_error = LIB_TRUE;
+    assert(!host_print_doc(0));
+    assert(lpt->bytes_in_buffer == 0 && flush_count == 1u);
     lpt->output = NULL;
     lpt->active = FALSE;
     lib_release(lpt->buffer);

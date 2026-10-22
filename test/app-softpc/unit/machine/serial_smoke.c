@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <wchar.h>
 
 #include "insignia.h"
 #include "host_def.h"
@@ -33,7 +34,8 @@ static void make_boot_disk(const char *path)
 int main(void)
 {
     const char *path = "softpc-serial-smoke.img";
-    const char *output_path = "softpc-serial-output.bin";
+    const char *output_path = "softpc-serial-\xe6\xb5\x8b-\xf0\x9f\x8e\xb5.bin";
+    const wchar_t *native_path = L"softpc-serial-\u6d4b-\U0001f3b5.bin";
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     half_word status = 0u;
@@ -43,10 +45,18 @@ int main(void)
     int modem = 0;
 
     make_boot_disk(path);
-    assert(remove(output_path) == 0 || errno == ENOENT);
+    assert(_wremove(native_path) == 0 || errno == ENOENT);
     options.serial_output_path = output_path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    /* No endpoint is created before transmission. Seed an existing file to
+       prove append without truncation through a non-code-page native name. */
+    assert(_wfopen(native_path, L"rb") == NULL);
+    {
+        FILE *file = _wfopen(native_path, L"wb");
+        assert(file != NULL && fputc('P', file) == 'P');
+        assert(fclose(file) == 0);
+    }
 
     /* The original UART remains the controller.  Exercise the recovered
        host edge independently: fixed-profile COM1 is connected, has no
@@ -60,6 +70,11 @@ int main(void)
     host_com_read(0, &received, &error_mask);
     assert(error_mask == HOST_COM_NO_DATA);
     host_com_write(0, 'S');
+    {
+        FILE *file = _wfopen(native_path, L"rb");
+        assert(file != NULL && fgetc(file) == 'P' && fgetc(file) == 'S');
+        assert(fclose(file) == 0); /* Visible before device close. */
+    }
     host_com_ioctl(0, HOST_COM_FLUSH, 0);
 
     inb(RS232_COM1_PORT_START + SOFTPC_RS232_LSR, &status);
@@ -77,17 +92,18 @@ int main(void)
 
     softpc_machine_destroy(machine);
     {
-        unsigned char output[3];
-        FILE *file = fopen(output_path, "rb");
+        unsigned char output[4];
+        FILE *file = _wfopen(native_path, L"rb");
         assert(file != NULL);
         assert(fread(output, 1u, sizeof(output), file) == sizeof(output));
-        assert(output[0] == 'S');
-        assert(output[1] == 'A');
-        assert(output[2] == 'R');
+        assert(output[0] == 'P');
+        assert(output[1] == 'S');
+        assert(output[2] == 'A');
+        assert(output[3] == 'R');
         assert(fgetc(file) == EOF);
         assert(fclose(file) == 0);
     }
-    assert(remove(output_path) == 0);
+    assert(_wremove(native_path) == 0);
     assert(softpc_test_remove_image(path));
     return 0;
 }

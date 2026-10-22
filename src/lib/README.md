@@ -97,6 +97,9 @@ lifecycle controller, or public unified presenter API.
   File paths and Base executable directories use UTF-8, not a host code page.
   Windows converts paths at its native boundary; POSIX names with non-UTF-8
   bytes are outside the contract. File contents remain arbitrary bytes.
+  Writer progress reports the accepted prefix even on failure; flush makes
+  buffered output visible without claiming durable-media persistence. Neither
+  flush failure nor close failure makes accepted bytes safe to replay.
   Base directory capacity counts UTF-8 bytes including NUL and must fit the
   full executable path; failure leaves caller output unchanged. Root/separator
   interpretation belongs to each native implementation, not the shared root.

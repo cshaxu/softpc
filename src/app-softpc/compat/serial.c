@@ -17,7 +17,7 @@
 #include "host_com.h"
 #include "compat/devices/snapshot.h"
 
-#include <stdio.h>
+#include "lib/storage/file_interface.h"
 
 #define SOFTPC_COM_PORTS 4
 #define SOFTPC_COM_QUEUE_SIZE 256
@@ -40,13 +40,13 @@ typedef struct {
     int xon_enabled;
     int modem;
     half_word last_msr;
-    FILE *output;
+    lib_storage_file_writer *output;
     char output_path[SOFTPC_COM_OUTPUT_PATH_MAX];
 } HOST_COM;
 
 static HOST_COM host_com[SOFTPC_COM_PORTS];
 
-/* The configured FILE endpoint is outside machine state.  The remaining
+/* The configured file endpoint is outside machine state.  The remaining
  * standalone carrier is finite virtual state and can be copied semantically. */
 int softpc_device_snapshot_capture_serial_host(
     softpc_device_serial_host_state *state)
@@ -152,8 +152,9 @@ int adapter;
     HOST_COM *port = host_com_port(adapter);
     if (port == 0) return FALSE;
     if (port->output_path[0] != '\0' && port->output == 0) {
-        port->output = fopen(port->output_path, "ab");
-        if (port->output == 0) return FALSE;
+        if (lib_storage_file_writer_open(port->output_path,
+                LIB_STORAGE_FILE_WRITER_APPEND, &port->output) != LIB_STATUS_OK)
+            return FALSE;
     }
     port->opened = TRUE;
     return TRUE;
@@ -188,7 +189,7 @@ int adapter;
     if (port == 0) return;
     port->opened = FALSE;
     if (port->output != 0) {
-        fclose(port->output);
+        (void)lib_storage_file_writer_close(port->output);
         port->output = 0;
     }
     port->rx_head = 0;
@@ -240,8 +241,8 @@ char value;
     if ((!port->opened || (port->output_path[0] != '\0' &&
         port->output == 0)) && !host_com_open(adapter)) return;
     if (port->output != 0) {
-        if (fputc((unsigned char)value, port->output) == EOF ||
-            fflush(port->output) != 0) return;
+        if (lib_storage_file_writer_write(port->output, &value, 1u) != LIB_STATUS_OK ||
+            lib_storage_file_writer_flush(port->output) != LIB_STATUS_OK) return;
     }
     /* nt_com.c's WriteFile exit is a successful virtual sink here.  Keep a
        bounded accounting value so FLUSH and close retain original meaning. */

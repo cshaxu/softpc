@@ -12,7 +12,7 @@
 #include "host_def.h"
 #include "platform.h"
 
-#include <stdio.h>
+#include "lib/storage/file_interface.h"
 
 #include "xt.h"
 #include "host_lpt.h"
@@ -33,7 +33,7 @@ typedef struct {
     boolean direct_access;
     boolean no_device_attached;
     byte *buffer;
-    FILE *output;
+    lib_storage_file_writer *output;
     char output_path[SOFTPC_LPT_OUTPUT_PATH_MAX];
 } HOST_LPT;
 
@@ -146,11 +146,12 @@ static boolean flush_buffer(int adapter)
 {
     HOST_LPT *lpt = &host_lpt[adapter];
     lib_size written;
+    lib_status status;
 
     if (!lpt->active) return FALSE;
     if (lpt->output != 0 && lpt->bytes_in_buffer != 0) {
-        written = fwrite(lpt->buffer, 1u, (lib_size)lpt->bytes_in_buffer,
-            lpt->output);
+        status = lib_storage_file_writer_write_some(lpt->output, lpt->buffer,
+            (lib_size)lpt->bytes_in_buffer, &written);
         if (written != 0u && written < (lib_size)lpt->bytes_in_buffer) {
             lib_memory_move(lpt->buffer, lpt->buffer + written,
                 (lib_size)lpt->bytes_in_buffer - written);
@@ -158,10 +159,11 @@ static boolean flush_buffer(int adapter)
             return FALSE;
         }
         if (written != (lib_size)lpt->bytes_in_buffer) return FALSE;
-        /* fwrite accepted the whole buffer.  A later flush failure has no
+        /* Storage accepted the whole buffer. A later flush failure has no
            replay-safe prefix, so do not send those bytes twice. */
         lpt->bytes_in_buffer = 0;
-        return fflush(lpt->output) == 0;
+        return lib_storage_file_writer_flush(lpt->output) == LIB_STATUS_OK &&
+            status == LIB_STATUS_OK;
     }
     lpt->bytes_in_buffer = 0;
     return TRUE;
@@ -177,8 +179,8 @@ static SHORT host_lpt_open(int adapter, boolean direct_access)
     lpt->buffer = (byte *)lib_allocate(KBUFFER_SIZE);
     if (lpt->buffer == NULL) return FALSE;
     if (lpt->output_path[0] != '\0') {
-        lpt->output = fopen(lpt->output_path, "ab");
-        if (lpt->output == NULL) {
+        if (lib_storage_file_writer_open(lpt->output_path,
+                LIB_STORAGE_FILE_WRITER_APPEND, &lpt->output) != LIB_STATUS_OK) {
             lib_release(lpt->buffer);
             lpt->buffer = NULL;
             return FALSE;
@@ -203,7 +205,7 @@ void host_lpt_close(int adapter)
     if (!lpt->active) return;
     (void)flush_buffer(adapter);
     if (lpt->output != NULL) {
-        fclose(lpt->output);
+        (void)lib_storage_file_writer_close(lpt->output);
         lpt->output = NULL;
     }
     lib_release(lpt->buffer);

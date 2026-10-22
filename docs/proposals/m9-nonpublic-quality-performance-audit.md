@@ -75,9 +75,9 @@ and preliminary audit, no implementation P. Owner revises that active packet
 to sizing and carries its storage audit forward to S8; no completed S is reused.
 
 1. S7: Window sizing policy (owner accepted and closed).
-2. S8: dynamic frame storage (verified and pushed).
-3. S9: 64-bit instruction budget (current admission).
-4. S10: uniform UTF-8 file paths (design approved, implementation not admitted).
+2. S8: dynamic frame storage (owner accepted and closed).
+3. S9: 64-bit instruction budget (owner accepted and closed).
+4. S10: uniform UTF-8 file paths (current admission).
 
 ### S9 - 64-bit execution budget
 
@@ -186,7 +186,109 @@ paths; native path conversion belongs to existing Lib capability, not duplicated
 App helpers. Preserve append, lazy open, partial-write accounting and flush
 semantics. Determine the minimal existing API extension only after caller audit;
 do not force a new framework or change every I/O operation to solve path encoding.
-Implementation and revised measured file/diff scope await separate S10 admission.
+Owner admits S10 on 2026-10-21 after accepting S9. Baseline d987f10f.
+The finite audit universe is all owned production file-entry points: config,
+media/overlay, snapshot read/write, DEBUG read/write, COM and LPT. Each must
+either use existing Storage UTF-8 opening or be migrated to that same path;
+native platform endpoints and inactive mirror diagnostics are separately
+classified, not silently claimed converted. Completion requires dual-width
+focused proof and complete registered regression, publication and actual-diff
+review. User INI/media and snapshot.debug are protected.
+
+Initial source audit: config uses read_owned; media uses medium_open; snapshots
+use reader/writer; DEBUG uses medium/writer. Only COM/LPT use locale fopen.
+Storage already converts UTF-8 once in its Windows backend and validates it in
+POSIX. The minimal extension is writer_write_some (accepted prefix, including
+error) and writer_flush (visibility, not durable-media sync), sharing the
+existing file write/flush implementation. No native stream escapes Storage.
+COM retains per-byte flush; LPT retains unsent tails and never replays an
+accepted buffer after flush failure. Expected production net +25 to +45,
+tests +60 to +100; no mirror change or new component.
+
+S10 source audit and executor self-review:
+
+- `product/config.c` opens through Storage read_owned and copies path values
+  unchanged; relative-path assembly preserves UTF-8 bytes. Its unit now checks
+  non-ASCII config directory and floppy/serial/printer values. This is parser
+  and assembly proof, not a new native config-file integration case.
+- `compat/gfi_image.c`, `hdd_media.c`, `media_snapshot.c` and
+  `machine/machine.c` already open media through Storage medium. Storage's
+  existing UTF-8 native-name regression covers direct/overlay reads; the full
+  product media/snapshot tests retain their existing coverage.
+- `product/extensions.c` already uses writer/reader for save/load. The updated
+  extension fixture writes and loads a Unicode snapshot filename through the
+  real Storage implementation, with a controlled machine-state callback.
+- `x86-debug/product/command.c` already uses medium/writer. Its original CLI
+  fixture now executes N/W/L with a Unicode filename, verifies native filename
+  and bytes, and loads them back into the controlled machine memory.
+- COM/LPT alone needed migration. Their real controller/host tests verify lazy
+  creation, native Unicode names, append, and visibility before close. The LPT
+  failure fixture retains partial tails and clears accepted bytes before flush.
+- `Storage/file.c` retains one fwrite operation shared by exact and progress
+  calls, plus its existing fflush. No retry, additional stream, native handle
+  exposure or conversion is introduced. Existing callers retain exact-write
+  semantics. A complete accepted write with a sticky stream error now reports
+  failure at LPT instead of treating count alone as success; no bytes replay.
+- Full-source open-call sweep (`fopen`, `freopen`, `_wfopen`, `CreateFile`,
+  `open`, `remove`, `rename`, Storage open/read-owned and Types aliases) leaves
+  only the native Storage implementation and fixed `CONIN$`/`CONOUT$` device
+  acquisition outside the callers above. Console device names are not paths
+  supplied by users. Mirror com.c diagnostic fopen is under !PROD; ega_trcr.c
+  is under EGA_DUMP; HOST_OPEN is a definition without a caller. The shipped
+  core defines PROD without EGA_DUMP. These are not active file-entry gaps and
+  no mirror diff is added. The owned-source gate now rejects locale/native
+  file opening outside Storage; Lib's existing Unicode gate is unchanged.
+
+Initial test corrections: printer regression needed its existing host_lpt
+declaration header. The writer visibility test initially attempted a Storage
+readonly lease while a writer was alive; that lease intentionally excludes
+write access on Windows. A sharing CRT reader now proves visibility without
+changing the production lease. Both corrected focused suites pass 12/12.
+These were test setup failures, not hidden production fallbacks.
+
+S10 final executor qualification (2026-10-21):
+
+- Self-review caught the full-acceptance/error case: LPT must still attempt
+  flush before returning the write error. The expression now evaluates flush
+  first; the failure fixture proves one flush and no replay. Both cached
+  architectures were rebuilt and requalified after this final correction.
+- Production C/H: five paths, +55/-23, net +32. Test C: seven paths,
+  +136/-29, net +107. Counts use git diff --numstat from d987f10f,
+  excluding manifests, docs and EXEs. The owned-source gate is +12/-0.
+  Test growth exceeds the initial estimate because native filename/visibility
+  checks and the full-acceptance/error regression are included. Public trees
+  changed: src/lib, test/lib, test/x86-debug only; no mirror or root test
+  infrastructure change. Existing exact writer APIs keep their signatures.
+- Cached x64/x86 builds pass; focused tests pass 12/12 each. Final background
+  groups pass 184/184 each, native audio 3/3 each, x64 desktop 5/5. Final x86
+  desktop initially passes 4/5 (compact stage 1/error 6); its unchanged full
+  desktop repeat passes 5/5. Selected XML case names equal all 192 registered
+  tests per architecture, with no duplicates, missing cases or skips. This is
+  complete passing coverage, not a first-pass all-green claim or a fix of the
+  separately recorded package intermittency.
+- Before reconnection, initial x64 native audio failed 0/3 and both package
+  cases failed stage 3/error 0. Later native groups pass after the owner
+  reconnects. Session status is evidence, not proof of every failure's cause.
+  No product timeout, retry or test assertion was relaxed.
+- The header-triggered x64 rebuild reports three existing pointer-to-IUH
+  warnings in vga_frame_smoke.c, also present in d987f10f; they are recorded
+  in TODO rather than suppressed. Final incremental build adds no warning;
+  this is not a claim of a warning-free full baseline rebuild.
+- Documentation/whitespace/manifests and registered boundary gates pass. A
+  disposable owned-source fixture containing fopen is correctly rejected.
+  No Linux-host full runtime or new manual guest validation was performed;
+  Windows native-path/controller fixtures and existing package integration
+  provide dynamic evidence, while unchanged caller classification is source
+  proof. No NXVM checkout was read or modified for this delivery.
+- Published softpc32 SHA-256:
+  4EA0D109785423CD4FFDCB41CC0B3E4B3D535E14E39E4DC803330D1B2892FBA4.
+  Published softpc64 SHA-256:
+  142277753824A94B332917DBD70F9FB152DFBB98DAB3C3B6710D0E4992CA466C.
+  User INI, media and pre-existing untracked snapshot.debug are unchanged.
+- Raw evidence was collected in the packet-owned build/t98-s10; concise
+  results are promoted here before scratch retirement after push/review.
+  Reusable Ninja/ccache roots remain intact. Executor delivery is ready for
+  actual-change coordinator review; S10 and T98 are not owner-closed.
 
 ### S7 - Window sizing policy
 

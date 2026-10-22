@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "lib/types/win32/file.h"
 #include "product/extensions.c"
 
 static int capture;
@@ -22,8 +23,11 @@ lib_status emulator_machine_read_state(emulator_machine *machine,
 lib_status emulator_machine_write_state(emulator_machine *machine,
     const emulator_machine_state_reader *reader)
 {
-    (void)machine; (void)reader;
-    return LIB_STATUS_UNSUPPORTED;
+    lib_u8 bytes[9];
+    (void)machine;
+    assert(reader->read(reader->context, bytes, sizeof(bytes)) == LIB_STATUS_OK);
+    assert(lib_memory_compare(bytes, "new state", sizeof(bytes)) == 0);
+    return LIB_STATUS_OK;
 }
 
 lib_bool emulator_machine_set_removable_media(emulator_machine *machine,
@@ -48,7 +52,7 @@ static void contents(const char *path, const char *expected)
 
 int main(void)
 {
-    const char *path = "extensions-snapshot.spcs";
+    const char *path = "snapshot-\xe6\xb5\x8b-\xf0\x9f\x8e\xb5.spcs";
     const char *commands[] = {
         "floppy insert READONLY Disk Image.img",
         "floppy insert direct Disk Image.img",
@@ -79,7 +83,11 @@ int main(void)
         assert(lib_text_find_substring(result.text, capture == 3 ?
             "Machine saved and paused." : "Cannot save machine state.") != LIB_NULL);
     }
-    assert(lib_c_remove(path) == 0);
+    assert(extensions.submit_snapshot(LIB_NULL, machine,
+        EMULATOR_PRODUCT_MONITOR_COMMAND_LOAD, EMULATOR_SESSION_MACHINE_INIT,
+        path, &result));
+    assert(lib_text_find_substring(result.text, "Machine loaded and paused.") != LIB_NULL);
+    assert(lib_win32_wremove(L"snapshot-\u6d4b-\U0001f3b5.spcs") == 0);
     /* A real open failure is reported by the first write, not as a saved image. */
     assert(extensions.submit_snapshot(LIB_NULL, machine,
         EMULATOR_PRODUCT_MONITOR_COMMAND_SAVE, EMULATOR_SESSION_MACHINE_PAUSED,

@@ -4,10 +4,12 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <wchar.h>
 
 #include "insignia.h"
 #include "host_def.h"
 #include "ios.h"
+#include "host_lpt.h"
 #include "compat/devices/snapshot.h"
 
 static void check_parallel_snapshot_rejection(void)
@@ -40,17 +42,24 @@ static void make_boot_disk(const char *path)
 int main(void)
 {
     const char *path = "softpc-printer-smoke.img";
-    const char *output_path = "softpc-printer-output.bin";
+    const char *output_path = "softpc-printer-\xe6\xb5\x8b-\xf0\x9f\x8e\xb5.bin";
+    const wchar_t *native_path = L"softpc-printer-\u6d4b-\U0001f3b5.bin";
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     half_word status = 0u;
 
     check_parallel_snapshot_rejection();
     make_boot_disk(path);
-    assert(remove(output_path) == 0 || errno == ENOENT);
+    assert(_wremove(native_path) == 0 || errno == ENOENT);
     options.printer_output_path = output_path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    assert(_wfopen(native_path, L"rb") == NULL);
+    {
+        FILE *file = _wfopen(native_path, L"wb");
+        assert(file != NULL && fputc('P', file) == 'P');
+        assert(fclose(file) == 0);
+    }
     outb(LPT1_PORT_START, 0x41u);
     outb(LPT1_PORT_START + 2u, 0x0du);
     inb(LPT1_PORT_START + 1u, &status);
@@ -58,15 +67,17 @@ int main(void)
     assert((status & 0x80u) == 0u);
     inb(LPT1_PORT_START + 1u, &status);
     assert((status & 0x80u) != 0u);
-    softpc_machine_destroy(machine);
+    assert(host_print_doc(0));
     {
-        FILE *file = fopen(output_path, "rb");
+        FILE *file = _wfopen(native_path, L"rb");
         assert(file != NULL);
+        assert(fgetc(file) == 'P');
         assert(fgetc(file) == 0x41);
         assert(fgetc(file) == EOF);
         assert(fclose(file) == 0);
     }
-    assert(remove(output_path) == 0);
+    softpc_machine_destroy(machine);
+    assert(_wremove(native_path) == 0);
     assert(softpc_test_remove_image(path));
     return 0;
 }

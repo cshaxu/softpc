@@ -85,5 +85,16 @@ int main(void)
     directory = "\\\\server\\share\\";
     assert(app_get_config_path(path));
     assert(lib_text_compare(path, "\\\\server\\share\\softpc.ini") == 0);
+    directory = "C:/\xe6\xb5\x8b";
+    assert(app_get_config_path(path));
+    assert(lib_text_compare(path, "C:/\xe6\xb5\x8b\\softpc.ini") == 0);
+    input = "floppy=\xe6\xb5\x8b.img\nserial_output=\xf0\x9f\x8e\xb5.bin\n"
+        "printer_output=\xe6\xb5\x8b.bin\n";
+    assert(app_load_startup_config(path, &config));
+    assert(lib_text_compare(config.floppy_path, "\xe6\xb5\x8b.img") == 0);
+    assert(lib_text_compare(config.serial_output_path, "\xf0\x9f\x8e\xb5.bin") == 0);
+    assert(lib_text_compare(config.printer_output_path, "\xe6\xb5\x8b.bin") == 0);
+    assert(app_resolve_image_path(config.floppy_path, path));
+    assert(lib_text_compare(config.floppy_path, "C:/\xe6\xb5\x8b\\\xe6\xb5\x8b.img") == 0);
     return 0;
 }
