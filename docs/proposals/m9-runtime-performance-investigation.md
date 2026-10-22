@@ -5,8 +5,9 @@
 Owner requests on 2026-10-22 that the four performance candidates from T98
 be grouped into one separate future implementation task and placed in Queue.
 This proposal is unnumbered and not admitted; allocate its T identifier only
-on admission. T98 remains open for separately requested public-component
-governance. Moving these candidates is not a performance fix or a T98 closure.
+on admission. T98 was subsequently owner-closed, and the separate handoff
+research was admitted as T99 S1. This performance candidate is unaffected;
+transferring it did not implement any optimization.
 
 ## Scope and evidence boundary
 

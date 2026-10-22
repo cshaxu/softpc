@@ -1,58 +1,5 @@
 # Long-Term Review Ledger
 
-- TODO(Medium): Audit key release across paused Session input. Existing
-  session/control.c forgets host held keys on release/source retirement while
-  PAUSED without delivering them to the driver. T98 S15 freezes Machine FIFO
-  but does not turn the host ledger into a guest-delivery ledger or resolve
-  device-held keys. Source ordering is confirmed; a complete user-visible stuck
-  key reproduction is not claimed. Owner: Session/driver input ownership.
-  Admission condition: reproduce make-before-pause and release-during-pause,
-  then define neutral reconciliation without product callbacks, treating
-  host-pending FIFO and already-delivered device input as different states.
-
-- TODO(Medium): Diagnose the intermittent command-provider event wait failure.
-  T98 S7's second x64 aggregate run failed the 10000ms event assertion after
-  debug resume/pause observations; the first aggregate and unchanged isolated
-  follow-up pass. This fixture does not create a Window; RDP is not an
-  established explanation. Owner: App command-provider integration fixture/
-  executor event boundary. Admission condition: identify the exact awaited
-  event and producer/consumer ordering under aggregate execution; do not relax
-  assertions or increase product timeouts. S7 does not claim this repaired.
-
-- TODO(Medium): Diagnose package integration Console attach/prompt intermittency.
-  T98 S6 observed stage 1/error 6 and stage 3/error 0, including after RDP
-  reconnect. Unchanged final tests later pass on both architectures; this is
-  passing execution evidence, not a repair or proof of environmental cause.
-  Owner: App package fixture/Console integration boundary. Admission condition:
-  capture child exit, active buffer identity and cursor at the first failure
-  against the unchanged baseline; do not weaken prompt assertions or add retries
-  as a production fix. Temporary diagnostic code was removed. T98 S7 also
-  observed a live blank initial buffer and, in a separate attempt, child exit 1
-  with cannot compose machine. Some attempts failed even after RDP was Active;
-  later unchanged package tests pass. These are distinct observations, not
-  proof that all stage-3 failures share one cause.
-  T98 S8 also observed these failures while Active: a live child with blank
-  31x30 buffer/cursor 0,0, and a separate pre-attach exit 0xC0000142. Ordinary
-  package subsequently passed on both architectures while compact failed.
-  The temporary diagnostic was removed; no causal repair is claimed.
-  A subsequent S8 probe proved one live child reached the unchanged prompt
-  another 5157 ms after the five-second check. The startup-only test budget
-  was corrected to 30 seconds, without a retry or product timeout change.
-  This does not explain the separate initialization exits or prove that all
-  attach/prompt failures are timing-budget failures.
-  T98 S9 repeats stage 1/error 6 in compact package on each architecture while
-  RDP is Active; ordinary package and all other cases pass. Each unchanged
-  isolated compact rerun passes. No fixture/product change or causal repair
-  is claimed; retain both first failures and supplemental qualification facts.
-  T98 S10 final x86 compact package again failed stage 1/error 6; an unchanged
-  complete desktop-group repeat passed 5/5. No causal repair is claimed.
-  T98 S13 x64 compact package repeats stage 1/error 6 while RDP is Active;
-  its unchanged isolated repeat passes. x86 passes all desktop cases first run.
-  S13 does not claim to repair this existing package-initialization debt.
-  T98 S15 x64 repeats compact stage 1/error 6 after reconnection while Active;
-  the unchanged isolated case passes. All other desktop/audio cases pass.
-  This supplemental qualification does not establish a repair or root cause.
-
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,
   start=0/height=15: case 0x0a consults old cursor_off, conditionally updates
@@ -92,17 +39,6 @@
   build metadata and compare command/dependency logs before any clean rebuild;
   do not mix a build-system redesign into device snapshot work.
 
-- TODO(Medium): Diagnose intermittent package compact-Console raw input loss.
-  T93 S12's first desktop x64 compact case reached DOS but timed out at
-  stage=14/error=0 waiting for Version after injected ver; the captured screen
-  contained only C:\>. Normal package passed immediately before it. A complete
-  unchanged ten-case desktop rerun passed both widths. This differs from the
-  stage=1 child-startup debt below and does not prove the cause or a repair.
-  Owner: App-SoftPC package-test/input handoff. Admission condition: bounded
-  native input/activation instrumentation around first raw command and hide/
-  focus transition; do not add retry or relax assertions. See
-  [S12 verification](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s12-implementation-and-review-record).
-
 - TODO(Medium): Diagnose intermittent checkpoint_smoke timeout under aggregate
   parallel execution. T93 S8 third x64 qualification classified it as Timeout
   with no output; its configured budget is 15 seconds. Ten isolated repeats,
@@ -112,16 +48,6 @@
   wait instrumentation of the actual checkpoint test under parallel load;
   preserve the timeout evidence and do not add product retries or simply
   enlarge the deadline. See the [S8 evidence](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s8-repeated-stop-proof-and-third-qualification).
-
-- TODO(Medium): Diagnose native package-test child startup under sequential
-  CTest execution. T93 S5 x64/x86 compact-console cases intermittently fail
-  before start at stage=1/error=6. A scratch diagnostic reproduces child exit
-  0xC0000142 (DLL initialization failed), AttachConsole error 5, then code-page
-  query error 6. Direct native/package probes pass; this does not identify the
-  responsible DLL or prove a CTest defect. Admission condition: test-owned
-  child-startup/Console lifetime investigation with loader evidence, without
-  retrying product startup or changing guest/device behavior to hide it.
-  Evidence: [T93 S5 checkpoint](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s5--original-dma-prerequisite-repair).
 
 - TODO(Medium): Replace the host-time-dependent oracle in
   `test/app-softpc/unit/machine/machine_smoke.c:run_int1a_tick_boot_image`.

@@ -4,7 +4,7 @@ Owner admission: 准入一个s任务完成原样导入并构建双exe并跑全�
 Owner acceptance on 2026-10-19: 验收通过 批准收口s任务.
 
 Baseline SoftPC f805483f. Executor delivery d08ac104 and coordinator review
-2d5a67f6 are pushed. The [S3 ledger](../proposals/m9-nonpublic-quality-performance-audit.md#s3---owner-directed-exact-shared-import)
+2d5a67f6 are pushed. The [S3 ledger](M9-T98-nonpublic-quality-performance-proposal.md#s3---owner-directed-exact-shared-import)
 contains the frozen source identity, all five proof members and their limits.
 
 All 298 files in the eight shared trees now byte-match NXVM revision

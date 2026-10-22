@@ -64,7 +64,7 @@ status; rediscovering them does not establish a new regression.
   audit and minimal Lib-owned path conversion, preserving each I/O contract.
 - Each S builds/releases/tests/commits/pushes and waits for acceptance before
   the next admission. Owner transfers performance profiling to a separate
-  [queued task](m9-runtime-performance-investigation.md) on 2026-10-22;
+  [queued task](../proposals/m9-runtime-performance-investigation.md) on 2026-10-22;
   T98 remains open for further public-component governance.
 
 ## Findings and verification
@@ -86,6 +86,9 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
 8. S14: [KVM lifetime failure cleanup](../history/M9-T98-S14-kvm-lifetime-failure.md),
    closed after owner-authorized self-verification, delivery and actual-diff review.
 9. S15: [Pause/input handoff](../history/M9-T98-S15-pause-input-handoff.md), owner-accepted and closed.
+10. S16: unimplemented research transferred by owner to
+    [T99 S1](../proposals/m9-public-handoff-simplification.md) at T98 closure;
+    not reported as completed research.
 
 ### S13 - Manual edges and native snap regions
 
@@ -1325,7 +1328,7 @@ production implementation and product regressions are not yet admitted.
 ### Performance candidates - evidence of work, not measured speedup
 
 Owner transfers all four candidates together on 2026-10-22 into the independent
-[runtime performance proposal](m9-runtime-performance-investigation.md), now
+[runtime performance proposal](../proposals/m9-runtime-performance-investigation.md), now
 queued for a future T. That proposal owns their source leads, measurement plan,
 constraints and disposition ledger. No optimization or measurement is claimed
 by this transfer. These are no longer pending S tasks within T98; T98 remains

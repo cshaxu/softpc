@@ -2,7 +2,7 @@
 
 Owner request: 准入一个新的t任务 帮我检验非公共组件的代码质量和性能问题（不包括镜像代码，但包括镜像diff）.
 
-S1 delivered the [bounded audit and flush follow-up](../proposals/m9-nonpublic-quality-performance-audit.md)
+S1 delivered the [bounded audit and flush follow-up](M9-T98-nonpublic-quality-performance-proposal.md)
 in 849709b5, actual-change review 392b54f4 and follow-up 3b368d26.
 The six-area ledger covers 139 non-public paths and the 131 local XP-subset
 patches. Both cached App/root selections passed 56/56. Real-adapter injected

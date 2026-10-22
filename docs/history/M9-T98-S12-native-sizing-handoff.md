@@ -17,5 +17,5 @@ published and the task scratch retired. INI/media/snapshot were preserved.
 The width-led manual resizing policy was implemented as then requested;
 owner now requests vertical-led top/bottom resizing and direction-aware snap
 restoration in S13. That follow-up does not retract acceptance of the exit fix.
-See the [proposal](../proposals/m9-nonpublic-quality-performance-audit.md#s12---width-driven-snap-and-restoration)
+See the [proposal](M9-T98-nonpublic-quality-performance-proposal.md#s12---width-driven-snap-and-restoration)
 for the original scope and qualification.

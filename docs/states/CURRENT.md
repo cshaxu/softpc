@@ -2,26 +2,54 @@
 
 ## Current Work
 
-Open task awaiting owner: T98.
+## M9 T99 S1 Packet
 
-No implementation subtask is active. Owner accepts and closes S15 on
-2026-10-22; see [closure](../history/M9-T98-S15-pause-input-handoff.md).
-Executor edb91df1 and actual-commit review 453edcfa are pushed. T98 remains
-open; no next S is admitted. User-owned snapshot.debug remains preserved
-and untracked, not silently deleted, ignored or included in the delivery.
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner closes T98 and immediately transfers its unimplemented S16 research to new T99 S1. |
+| Objective | Establish one responsible owner and completion fact per handoff; identify removable duplicate state/logic, or justify no change. |
+| Non-goals | No production repair, new queue/ledger/epoch/recovery framework, speculative performance work, downstream edits or guest changes. |
+| Reference Baseline | 8165664a; S15 accepted, tracked and untracked worktree clean before admission. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Review public src/test Lib, Emulator, X86 Debug and X86 IBMPC; read actual App callers/fixtures for attribution. Documentation only at admission; no ABI change authorized. |
+| Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
+| Verification | Five-observation ledger, source/caller traces, existing tests and bounded discriminating probes as necessary; distinguish source proof, dynamic proof and unverified hypotheses. |
+| Expected Markers | One input ownership explanation, one completion owner, one Console handoff path; no presumption that an integration failure is a public defect. |
+| Asset Needs | None; preserve INI/media and published EXEs. No Computer Use. |
+| Reporting Requirements | Per candidate: observed impact, ownership, redundant states/branches, minimal option/no-change option, projected production/test counts and evidence limits. Optional scratch build/t99-s1: 45-minute jobs, investigate after 10-minute no progress, 200MB, retire on delivery. |
+| Stop Conditions | Seek approval before production/test repairs, changed pause/input semantics, new state or a broader product investigation. |
+| Exit Criteria | All five observations attributed or explicitly unresolved with receiver; concrete simplification proposals and actual-diff review, governance checks, complete research delivery committed/pushed for owner review. |
+| Original Owner Request | Bundle the public-component issues, describe observed phenomena, then research where code and mental models can genuinely be simplified and unified. |
+| Similar-Issue Sweep | Duplicate input ledgers, request/completion guesses, Console activation/restoration intervention and overlapping startup failure records within the named paths. |
+
+T99 S1 is admitted for research, not implementation. Admission documentation is
+prepared; no new reproduction or complete source review is claimed yet.
+The owner transfers the five related observations out of TODO into T99 S1;
+the proposal retains their evidence and is their sole investigation record.
+QUEUE has no matching candidate; its product-performance task remains separate.
+S15 is owner-closed; see [closure](../history/M9-T98-S15-pause-input-handoff.md).
+The owner subsequently authorized deletion of untracked snapshot.debug;
+it was removed without changing tracked media or configuration. T98 is now closed;
+see the [completion audit](../history/M9-T98-completion-audit.md).
 
 S14 is closed under the owner's authorization to complete self-verification
 and close after reconnection; see [closure](../history/M9-T98-S14-kvm-lifetime-failure.md).
 
-S13 remains [closed](../history/M9-T98-S13-directional-sizing.md). T98 remains open.
-Owner keeps T98 open for further public-component governance. Its four
+S13 remains [closed](../history/M9-T98-S13-directional-sizing.md). T98's four
 performance candidates are transferred to a separate unnumbered
 [queued proposal](../proposals/m9-runtime-performance-investigation.md);
-no new T or S is admitted by that transfer.
+that performance candidate remains unnumbered and unadmitted.
 
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- Final T98 accepted runtime: edb91df1, reviewed in 453edcfa, closure through
+  8165664a. S15 provides passing evidence for all 192 tests per architecture,
+  with the disclosed unchanged x64 compact-package supplement. T99 S1 has
+  made no production changes; published EXEs remain T98. The entries below
+  retain historical per-S qualification, not current active-task status.
 
 - S14 executor 0d9f1803 is pushed and coordinator actual-commit review passes;
   S14 is closed, T98 stays open. Production C/H
@@ -234,6 +262,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 | Task | Closure | Evidence |
 | --- | --- | --- |
+| T98 | Owner closes T98 on 2026-10-22; unimplemented S16 transfers to T99 S1. | [Audit](../history/M9-T98-completion-audit.md) |
 | T97 | Owner accepted S1 and T97, 2026-10-18. | [Audit](../history/M9-T97-completion-audit.md) |
 | T96 | Owner accepted S8 and T96, 2026-10-17. | [Audit](../history/M9-T96-completion-audit.md) |
 | T95 | Delegated closure, 2026-10-17. | [Audit](../history/M9-T95-completion-audit.md) |

@@ -14,8 +14,9 @@ allocates a numeric task identifier.
 Td S22 [build-cache governance](../proposals/m9-build-cache-governance.md)
 is delivered and awaiting owner acceptance. No implementation subtask is active.
 
-T98 [non-public quality/performance work](../proposals/m9-nonpublic-quality-performance-audit.md)
-remains open; CURRENT owns its active S and the proposal owns its internal S queue.
+T99 [public handoff simplification](../proposals/m9-public-handoff-simplification.md)
+is immediately admitted as S1, not a duplicate queued candidate. T98 is
+owner-closed; see its [completion audit](../history/M9-T98-completion-audit.md).
 
 Owner accepts and closes [Windows 95 volume control and restart](../history/M9-T97-completion-audit.md)
 as T97 on 2026-10-18. Both candidates were investigated together in S1.

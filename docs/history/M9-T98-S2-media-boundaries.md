@@ -4,7 +4,7 @@ Owner admission: 批准执行当前既定修复任务; correctness before perfor
 Owner acceptance on 2026-10-18: 验收通过 收口s任务 保持t开放.
 
 Baseline 3b368d26. Executor delivery 7afc9981; actual-change coordinator review
-db935fb7. Both are pushed. The [S2 ledger](../proposals/m9-nonpublic-quality-performance-audit.md#s2-implementation-and-finite-qualification-ledger)
+db935fb7. Both are pushed. The [S2 ledger](M9-T98-nonpublic-quality-performance-proposal.md#s2-implementation-and-finite-qualification-ledger)
 records the finite scope, every media-close/size-path disposition and proof limits.
 
 F1/F2 are complete: real FDD/HDD adapters propagate consumed-lease retirement

@@ -39,5 +39,5 @@ Published SHA-256:
 
 Task scratch is retired after evidence promotion; Ninja/ccache are retained.
 User INI, media and the pre-existing untracked snapshot.debug are preserved.
-See the [proposal](../proposals/m9-nonpublic-quality-performance-audit.md#s13---manual-edges-and-native-snap-regions)
+See the [proposal](M9-T98-nonpublic-quality-performance-proposal.md#s13---manual-edges-and-native-snap-regions)
 for the finite ledger and first-run failure disposition.
