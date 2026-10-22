@@ -2,43 +2,13 @@
 
 ## Current Work
 
-## M9 T98 S15 Packet
+Open task awaiting owner: T98.
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the revised freeze-on-pause contract and implementation, replacing the rejected drain requirement. |
-| Objective | Atomic admission, frozen pending FIFO during pause, ordered normal-cadence delivery on genuine resume, distinct state refusal and real failure. |
-| Non-goals | No product-specific callbacks, epoch framework, Lib/mirror changes, downstream edits or guest/media changes. |
-| Reference Baseline | af55acf7; preserve user INI/media and untracked snapshot.debug. |
-| Candidate Proposal | [Pause input handoff](../proposals/m9-pause-input-handoff.md). |
-| Files And ABI Surface | Emulator Machine queue/executor/input status; Session adapter; X86 IBMPC keyboard caller status adaptation; owner-local and App caller tests, manifests and contracts. |
-| Applicable Rules | Execution, Architecture, Coding and Documentation rules; current design authorities. |
-| Verification | Controlled queue/cutoff ordering and real executor tests; pause/debug/continuation/stop/reset/error; dual cached builds, public/background tests and relevant product integration. |
-| Expected Markers | One queue lock owns cutoff and push; no driver under queue lock; no input delivery after PAUSED until genuine resume. |
-| Asset Needs | Publish dual EXEs after verification; preserve configuration and guest assets. |
-| Reporting Requirements | Before/after contract and counts; own build/t98-s15, hidden jobs, 45-minute budget, 10-minute no-progress investigation, 200MB scratch; retire on delivery. |
-| Stop Conditions | Report necessary expansion to other public components or Session phase-generation tracking before implementation. |
-| Exit Criteria | Actual diff review, dual build/test evidence, manifests/gates, complete executor commit/push and coordinator review; wait for owner acceptance. |
-| Original Owner Request | Repair atomic input/pause handoff, drain accepted input before PAUSED and distinguish normal rejection without product-specific control cleanup. |
-| Similar-Issue Sweep | All Machine enqueue callers, state transitions, paused continuation, debug, stop/reset and Session source-reset/retirement paths. |
-
-S15 implements the owner-approved frozen FIFO contract. The rejected burst drain
-and its probe remain documented, not shipped. Ordinary pause/debug freeze delivery;
-genuine resume retains order and cadence. Driver snapshots exclude host-pending
-input. No mirror or Lib changes are admitted.
-
-Implementation/self-review and qualification complete: cached dual builds and
-184/184 background tests per width pass. x86 desktop 5/5 and audio 3/3 pass;
-x64 after reconnection has desktop 4/5 plus an unchanged isolated compact pass,
-and audio 3/3. Exact registration equality proves passing evidence for all 192
-tests per width, without skips, not an all-green first run. Earlier disconnected
-failures and Active compact stage 1/error 6 remain disclosed in the proposal.
-Source C/H +63/-26; tests +200/-20. Delivery/review precede owner acceptance;
-S15 and T98 remain open. Executor edb91df1 is pushed; coordinator review of
-the actual committed production/test diff passes. S15 is verified awaiting
-owner acceptance. Task scratch is retired; only the preserved user-owned
-untracked snapshot.debug remains outside the clean tracked worktree.
+No implementation subtask is active. Owner accepts and closes S15 on
+2026-10-22; see [closure](../history/M9-T98-S15-pause-input-handoff.md).
+Executor edb91df1 and actual-commit review 453edcfa are pushed. T98 remains
+open; no next S is admitted. User-owned snapshot.debug remains preserved
+and untracked, not silently deleted, ignored or included in the delivery.
 
 S14 is closed under the owner's authorization to complete self-verification
 and close after reconnection; see [closure](../history/M9-T98-S14-kvm-lifetime-failure.md).
