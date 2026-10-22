@@ -22,6 +22,11 @@ Console frame. Session retains
 metadata, never another frame. Machine can keep replacing pending output while
 Window processes and retains older slots. UI/Window must be destroyed before
 Machine and its exchanges.
+Exchange creation allocates slot metadata only. Drivers prepare actual-size
+leaf payloads on their unheld writer; equal specifications reuse storage.
+Leaf retirement frees incompatible unheld storage without interpreting content
+in Machine. The injected status-page builder also returns preparation errors.
+Diagnostic copies own independent payloads and require explicit release.
 Session treats events as hints: one bounded observation checks run, sequence
 and graphics/text routing without copying payloads. It may observe a newer
 publication than the notification. UI owns immutable status text and its pure

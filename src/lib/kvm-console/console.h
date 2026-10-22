@@ -9,6 +9,8 @@ struct kvm_console {
     kvm_component base;
     lib_console *logical_console;
     void *worker_state;
+    void *mapped_cells; /* Worker-owned native-independent output conversion. */
+    lib_size mapped_count;
     lib_i32 previous_mouse_x, previous_mouse_y;
     lib_bool previous_mouse_valid;
 };

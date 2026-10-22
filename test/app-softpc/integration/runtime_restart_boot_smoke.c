@@ -74,7 +74,7 @@ static int frame_has_dos_prompt(const kvm_window_frame *frame)
     if (frame == NULL || frame->text == LIB_NULL || frame->graphics != LIB_NULL)
         return 0;
     for (row = 0u; row < frame->text->base.text_rows; ++row) {
-        const kvm_text_cell *line = &frame->text->base.cells[row * KVM_TEXT_COLUMNS];
+        const kvm_text_cell *line = &frame->text->base.cells[row * 80u];
         lib_u32 column;
 
         for (column = 0u; column + 3u < frame->text->base.text_columns; ++column) {
@@ -96,7 +96,7 @@ static void report_last_frame(emulator_machine *runtime)
             emulator_machine_run_generation(runtime))) return;
     fprintf(stderr, "last frame: graphics=%u text=%ux%u sequence=%lu\n",
         (unsigned int)(frame.frame.graphics != LIB_NULL),
-        (unsigned int)frame.data.text.base.text_columns, (unsigned int)frame.data.text.base.text_rows,
+        (unsigned int)frame.data.text->base.text_columns, (unsigned int)frame.data.text->base.text_rows,
         (unsigned long)frame.frame.sequence);
     if (frame.frame.graphics != LIB_NULL) {
         const kvm_window_graphics_frame *image = frame.frame.graphics;
@@ -115,17 +115,17 @@ static void report_last_frame(emulator_machine *runtime)
         }
         return;
     }
-    for (row = 0u; row < frame.data.text.base.text_rows; ++row) {
-        char line[KVM_TEXT_COLUMNS + 1u];
+    for (row = 0u; row < frame.data.text->base.text_rows; ++row) {
+        char line[80u + 1u];
         lib_u32 column;
         int nonblank = 0;
 
-        for (column = 0u; column < frame.data.text.base.text_columns; ++column) {
-            lib_u8 c = frame.data.text.base.cells[row * KVM_TEXT_COLUMNS + column].glyph_index;
+        for (column = 0u; column < frame.data.text->base.text_columns; ++column) {
+            lib_u8 c = frame.data.text->base.cells[row * 80u + column].glyph_index;
             line[column] = c >= 0x20u && c < 0x7fu ? (char)c : ' ';
             if (line[column] != ' ') nonblank = 1;
         }
-        line[frame.data.text.base.text_columns] = '\0';
+        line[frame.data.text->base.text_columns] = '\0';
         if (nonblank) fprintf(stderr, "%s\n", line);
     }
 }
@@ -180,9 +180,9 @@ static int enter_windows(emulator_machine *runtime)
         event.data.key.key = keys[index];
         event.data.key.scan_code = scans[index];
         event.data.key.pressed = 1u;
-        if (!emulator_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
+        if (!emulator_machine_enqueue_input(runtime, &event)) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
         event.data.key.pressed = 0u;
-        if (!emulator_machine_enqueue_input(runtime, &event)) { lib_release(frame); return 0; }
+        if (!emulator_machine_enqueue_input(runtime, &event)) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
     }
     /* Observe through startup, not merely its first splash frame. The fixed
        installed image remains overlay-only and the normal executor owns time. */
@@ -197,7 +197,7 @@ static int enter_windows(emulator_machine *runtime)
             graphics = frame->frame.graphics->width == 640u && frame->frame.graphics->height == 480u;
         softpc_test_sleep_milliseconds(10u);
     } while (softpc_test_clock_milliseconds() < deadline);
-    lib_release(frame);
+    kvm_window_frame_release(frame); lib_release(frame);
     return running && graphics;
 }
 
@@ -235,7 +235,7 @@ static int wait_for_mode(emulator_machine *runtime, int graphics, lib_u32 after)
         }
         softpc_test_sleep_milliseconds(10u);
     } while (softpc_test_clock_milliseconds() < deadline);
-    lib_release(frame);
+    kvm_window_frame_release(frame); lib_release(frame);
     return matched;
 }
 
@@ -299,7 +299,7 @@ done:
         fprintf(stderr, "prompt roundtrip windowed=%d stage=%u\n", windowed, stage);
         report_last_frame(runtime);
     }
-    lib_release(frame);
+    kvm_window_frame_release(frame); lib_release(frame);
     return succeeded;
 }
 

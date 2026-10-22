@@ -105,9 +105,9 @@ int softpc_machine_presentation_take_text_dirty(const softpc_machine *machine);
  * wide in this standalone build: the character and attribute occupy the
  * first two bytes, followed by the original renderer's padding.  The caller
  * must not mutate the surface or retain it after machine destruction. */
-int softpc_machine_presentation_text(const softpc_machine *machine,
+lib_status softpc_machine_presentation_text(const softpc_machine *machine,
     const void **cells_out, lib_u32 *columns_out, lib_u32 *rows_out,
-    lib_u32 *stride_out, lib_u32 *cell_bytes_out);
+    lib_u32 *stride_out, lib_u32 *cell_bytes_out, lib_bool *available);
 
 /* The original VGA attribute controller may select a second character map
    through attribute bit 3.  Presentation consumers need both loaded maps;

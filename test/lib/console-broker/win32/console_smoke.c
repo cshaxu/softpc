@@ -191,7 +191,11 @@ int main(void)
 {
     console_broker_backend b={0};
     lib_win32_wchar line[2200];
-    lib_console_text_frame f={0};
+    lib_u16 text[80u * 50u] = {0};
+    lib_u8 foreground[80u * 50u] = {0}, background[80u * 50u] = {0},
+        underline[80u * 50u] = {0};
+    lib_console_text_frame f={.stride=80u, .capacity=80u*50u, .text=text,
+        .foreground=foreground, .background=background, .underline=underline};
     /* A retained raw handle never turns a failed mode setup into success. */
     b.raw_output=(lib_win32_handle)1;
     mode_query_ok=LIB_FALSE;
@@ -468,7 +472,7 @@ int main(void)
         const lib_u16 write_rows[] = {25u,25u,43u,50u,50u,50u};
         for (lib_size i=0;i<sizeof(rows)/sizeof(rows[0]);++i) {
             f.rows=rows[i];
-            lib_memory_set(f.text,0,sizeof(f.text));
+            lib_memory_set(f.text,0,sizeof(text));
             f.text[(lib_size)f.rows*80u-1u]='Z';
             lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
             lib_test_assert(captured_cells[(lib_size)f.rows*80u-1u].Char.UnicodeChar=='Z');
@@ -481,9 +485,9 @@ int main(void)
     /* A partial 50-to-25 clear invalidates the cached cells, but retrying
      * must still cover the former tail rather than leaving old characters. */
     f.cells_unchanged=LIB_FALSE;
-    f.rows=50; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*50u-1u]='T';
+    f.rows=50; lib_memory_set(f.text,0,sizeof(text)); f.text[80u*50u-1u]='T';
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
-    f.rows=25; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*25u-1u]='S';
+    f.rows=25; lib_memory_set(f.text,0,sizeof(text)); f.text[80u*25u-1u]='S';
     partial_write=2;
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
     lib_test_assert(!b.previous_columns && !b.previous_rows && b.coverage_rows==50);
@@ -496,22 +500,22 @@ int main(void)
             lib_test_assert(captured_cells[row*80u+col].Char.UnicodeChar==' ');
     /* An external backing-store shrink can happen even when 25 rows still
      * fit. Clamp the retained tail before choosing the native write extent. */
-    f.rows=50; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*50u-1u]='X';
+    f.rows=50; lib_memory_set(f.text,0,sizeof(text)); f.text[80u*50u-1u]='X';
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     buffer_size=(lib_win32_coord){80,30};
-    f.rows=25; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*25u-1u]='Y';
+    f.rows=25; lib_memory_set(f.text,0,sizeof(text)); f.text[80u*25u-1u]='Y';
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     lib_test_assert(b.previous_columns==80 && b.previous_rows==25 && b.coverage_rows==25);
     lib_test_assert(captured_region.Bottom==29);
     buffer_size=(lib_win32_coord){120,60};
     /* A direct stream write invalidates copied cells but cannot discard the
      * tail that the following shorter frame must clear. */
-    f.rows=50; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*50u-1u]='V';
+    f.rows=50; lib_memory_set(f.text,0,sizeof(text)); f.text[80u*50u-1u]='V';
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     text_result=1; text_written=1;
     lib_test_assert(console_broker_backend_write_bound(&b,b.console,1,"x",1)==LIB_STATUS_OK);
     lib_test_assert(!b.previous_columns && !b.previous_rows && b.coverage_rows==50);
-    f.rows=25; lib_memory_set(f.text,0,sizeof(f.text)); f.text[80u*25u-1u]='W';
+    f.rows=25; lib_memory_set(f.text,0,sizeof(text)); f.text[80u*25u-1u]='W';
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     lib_test_assert(captured_region.Bottom==49 && b.coverage_rows==25);
     for (lib_u32 row=25u;row<50u;++row)
@@ -537,6 +541,29 @@ int main(void)
     lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
     lib_test_assert(buffer_size.X==80 && buffer_size.Y==50);
     lib_test_assert(viewport.Left==7 && viewport.Top==3 && viewport.Right==46 && viewport.Bottom==15);
+    /* Width changes use the same retained-extent contract as height changes.
+     * Row padding is not visible, and a failed clear keeps the old width. */
+    f.rows=25;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    f.columns=100; f.stride=104; f.text[24u*104u+99u]='Z';
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(captured_region.Right==99 && captured_cells[2499].Char.UnicodeChar=='Z');
+    f.columns=40; partial_write=2;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_IO_ERROR);
+    lib_test_assert(b.coverage_columns==100);
+    partial_write=0;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(captured_region.Right==99 && b.coverage_columns==40);
+    for (lib_u32 row=0;row<25;++row)
+        for (lib_u32 col=40;col<100;++col)
+            lib_test_assert(captured_cells[row*100u+col].Char.UnicodeChar==' ');
+    f.columns=100;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    buffer_size.X=60; f.columns=40;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_OK);
+    lib_test_assert(captured_region.Right==59);
+    f.columns=32768;
+    lib_test_assert(console_broker_backend_write_text_frame_bound(&b,b.console,1,&f)==LIB_STATUS_UNSUPPORTED);
     base_sync_mutex_destroy(b.transaction_lock);base_sync_mutex_destroy(b.output_lock);lib_win32_close_handle(stop);lib_console_release(b.console);
     cooked_restore();
     /* Disposal must not restore native mode a second time. */
@@ -548,5 +575,6 @@ int main(void)
     lib_u32 restored=mode_sets;
     console_broker_backend_destroy(disposed);
     lib_test_assert(mode_sets==restored);
+    lib_release(b.cells);
     return 0;
 }

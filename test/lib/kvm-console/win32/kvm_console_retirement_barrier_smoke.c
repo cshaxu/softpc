@@ -205,7 +205,7 @@ static void check_io_failure(lib_i32 reader, lib_status output_status)
         write_result = output_status;
         const lib_console_output_binding output = { LIB_NULL, failing_frame, LIB_NULL };
         lib_test_assert(lib_console_set_output_binding(logical, &output) == LIB_STATUS_OK);
-        frame.base.text_columns = 80u; frame.base.text_rows = 25u;
+        lib_test_assert(kvm_console_frame_prepare(&frame, 80u, 25u, 80u) == LIB_STATUS_OK);
         lib_test_assert(test_console_frame(console, frames, &frame) == LIB_STATUS_OK);
         lib_test_assert(lib_win32_wait_for_single_object(write_called, 5000u) == LIB_WIN32_WAIT_OBJECT_0);
     }
@@ -215,6 +215,7 @@ static void check_io_failure(lib_i32 reader, lib_status output_status)
     lib_test_assert(probe.event_count == 1 && probe.events[0].type == KVM_EVENT_SOURCE_RETIRED);
     lib_test_assert(probe.failures == (reader || output_status == LIB_STATUS_IO_ERROR));
     lib_win32_close_handle(probe.retired); lib_win32_close_handle(write_called);
+    kvm_console_frame_release(&frame);
 }
 
 static lib_u32 frame_writes;
@@ -262,10 +263,10 @@ static void check_activation_frame(void)
     activated.kind=LIB_CONSOLE_EVENT_ACTIVATED; activated.binding_generation=1;
     lib_test_assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
     lib_test_assert(frame_writes==0); /* Empty activation never invents output. */
-    next_frame.base.text_columns=80; next_frame.base.text_rows=25;
+    lib_test_assert(kvm_console_frame_prepare(&next_frame, 80u, 25u, 80u) == LIB_STATUS_OK);
     for (lib_u32 i=0;i<256;++i) {
-        next_frame.characters.primary[i]=(lib_u16)i;
-        next_frame.characters.secondary[i]=(lib_u16)i;
+        next_frame.characters->primary[i]=(lib_u16)i;
+        next_frame.characters->secondary[i]=(lib_u16)i;
     }
     next_frame.base.cells[0].glyph_index='X'; write_result=LIB_STATUS_OK;
     lib_test_assert(test_console_frame(c, frames,&next_frame)==0); idle_frame();
@@ -275,13 +276,14 @@ static void check_activation_frame(void)
         lib_test_assert(test_console_frame(LIB_NULL, frames,&next_frame)==LIB_STATUS_INVALID_ARGUMENT);
         lib_test_assert(test_console_frame(c, frames,LIB_NULL)==LIB_STATUS_INVALID_ARGUMENT);
         lib_test_assert(test_console_frame(c, frames,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        lib_test_assert(kvm_console_frame_prepare(&rejected, 80u, 25u, 80u) == LIB_STATUS_OK);
         rejected.base.text_columns=81; rejected.base.text_rows=25;
-        lib_test_assert(test_console_frame(c, frames,&rejected)==LIB_STATUS_UNSUPPORTED);
-        rejected.base.text_columns=80; rejected.base.text_rows=51;
-        lib_test_assert(test_console_frame(c, frames,&rejected)==LIB_STATUS_UNSUPPORTED);
-        rejected.base.text_rows=25; rejected.characters.secondary[255]=0xd800;
         lib_test_assert(test_console_frame(c, frames,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
-        rejected.characters.secondary[255]=0;
+        rejected.base.text_columns=80; rejected.base.text_rows=51;
+        lib_test_assert(test_console_frame(c, frames,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        rejected.base.text_rows=25; rejected.characters->secondary[255]=0xd800;
+        lib_test_assert(test_console_frame(c, frames,&rejected)==LIB_STATUS_INVALID_ARGUMENT);
+        rejected.characters->secondary[255]=0;
         for (lib_u32 field=0;field<3;++field) {
             lib_u8 *value=field==0 ? &rejected.base.cells[1999].foreground :
                 field==1 ? &rejected.base.cells[1999].background : &rejected.base.cells[1999].glyph_bank;
@@ -295,6 +297,7 @@ static void check_activation_frame(void)
         /* The worker is parked after its previous write; no rejected request
          * may signal the existing auto-reset wake event. */
         lib_test_assert(base_sync_event_wait(c->base.mailboxes.wake,0)==BASE_SYNC_WAIT_TIMED_OUT);
+        kvm_console_frame_release(&rejected);
     }
     write_result=LIB_STATUS_OK;
     lib_test_assert(lib_console_deliver_event(logical,&activated)==0); idle_frame();
@@ -312,6 +315,7 @@ static void check_activation_frame(void)
     lib_test_assert(kvm_console_destroy(c) == LIB_STATUS_OK);
     lib_test_assert(probe.event_count==1 && probe.failures==0 && frame_writes==6);
     lib_win32_close_handle(probe.retired); lib_win32_close_handle(frame_idle); frame_idle=LIB_NULL;
+    kvm_console_frame_release(&next_frame);
 }
 
 static kvm_input_event reset_events[16];
@@ -330,7 +334,8 @@ static void check_input_reset(void)
     kvm_console *c;
     kvm_console_options options = { .input_sink=reset_input, .failure_sink=reset_failure };
     lib_console_event e = { .kind=LIB_CONSOLE_EVENT_RAW_KEY, .binding_generation=1 };
-    static kvm_console_text_frame frame = { .base = { .text_columns=80, .text_rows=25 } };
+    static kvm_console_text_frame frame;
+    lib_test_assert(kvm_console_frame_prepare(&frame, 80u, 25u, 80u) == LIB_STATUS_OK);
     lib_test_assert(kvm_hotkey_registry_register(&options.hotkeys,'P',3,"CAP")==0);
     lib_test_assert(kvm_console_create(&c,&options)==0);
     lib_console *logical=kvm_console_get_console(c);
@@ -384,6 +389,7 @@ static void check_input_reset(void)
     lib_test_assert(reset_events[6].type==KVM_EVENT_HOTKEY); /* Accepted snapshot policy survives. */
     lib_test_assert(kvm_console_destroy(c) == LIB_STATUS_OK);
     lib_test_assert(reset_event_count==8 && reset_events[7].type==KVM_EVENT_SOURCE_RETIRED);
+    kvm_console_frame_release(&frame);
 }
 
 static void invalid_control_failure(void *opaque, lib_u64 identity, lib_status status)
@@ -414,28 +420,44 @@ static void check_invalid_control(void)
 static lib_status capture_characters(void *opaque, const lib_console_text_frame *frame)
 {
     lib_console_text_frame *captured = opaque;
+    lib_u16 *text = captured->text;
+    lib_u8 *foreground = captured->foreground, *background = captured->background,
+        *underline = captured->underline;
     *captured = *frame;
+    captured->text = text;
+    captured->foreground = foreground;
+    captured->background = background;
+    captured->underline = underline;
+    lib_memory_copy(text, frame->text, frame->capacity * sizeof(*text));
+    lib_memory_copy(foreground, frame->foreground, frame->capacity);
+    lib_memory_copy(background, frame->background, frame->capacity);
+    lib_memory_copy(underline, frame->underline, frame->capacity);
     return LIB_STATUS_OK;
 }
 
 static void check_character_banks(void)
 {
     kvm_console console = { 0 };
-    kvm_console_text_frame frame = { .base = { .text_columns=2, .text_rows=1 } };
-    lib_console_text_frame captured = { 0 };
+    kvm_console_text_frame frame = {0}, previous = {0}, decorated = {0}, same = {0};
+    lib_u16 text[4000];
+    lib_u8 foreground[4000], background[4000], underline[4000];
+    lib_console_text_frame captured = {.text=text, .foreground=foreground,
+        .background=background, .underline=underline};
+    lib_test_assert(kvm_console_frame_prepare(&frame, 80u, 50u, 80u) == LIB_STATUS_OK);
+    frame.base.text_columns=2u; frame.base.text_rows=1u;
     lib_console_output_binding binding = { LIB_NULL, capture_characters, &captured };
     lib_test_assert(lib_console_create(&console.logical_console) == LIB_STATUS_OK);
     lib_test_assert(lib_console_set_output_binding(console.logical_console, &binding) == LIB_STATUS_OK);
     frame.base.cells[0].glyph_index = frame.base.cells[1].glyph_index = 65;
     frame.base.cells[1].foreground = 8;
-    frame.characters.primary[65] = 0x263a;
-    frame.characters.secondary[65] = 0x2665;
+    frame.characters->primary[65] = 0x263a;
+    frame.characters->secondary[65] = 0x2665;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, LIB_NULL) == LIB_STATUS_OK);
     lib_test_assert(captured.text[0] == 0x263a && captured.text[1] == 0x263a);
     frame.base.cells[1].glyph_bank = 1;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, LIB_NULL) == LIB_STATUS_OK);
     lib_test_assert(captured.text[0] == 0x263a && captured.text[1] == 0x2665);
-    frame.characters.secondary[65] = 0x03a9;
+    frame.characters->secondary[65] = 0x03a9;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, LIB_NULL) == LIB_STATUS_OK);
     lib_test_assert(captured.text[1] == 0x03a9);
     for (lib_u32 enabled=0;enabled<2;++enabled) {
@@ -453,13 +475,14 @@ static void check_character_banks(void)
     lib_test_assert(kvm_console_publish_text_frame(&console,&frame, LIB_NULL)==LIB_STATUS_OK);
     lib_test_assert(captured.text[1]==0x03a9 && captured.foreground[1]==1);
     frame.base.text_rows = 2;
-    frame.base.cells[KVM_TEXT_COLUMNS] = (kvm_text_cell){ 66, 0, 3, 4, 0u };
-    frame.base.cells[KVM_TEXT_COLUMNS + 1u] = (kvm_text_cell){ 67, 1, 5, 6, 0u };
-    frame.characters.primary[66] = 0x2500;
-    frame.characters.secondary[67] = 0x2588;
+    frame.base.cells[80u] = (kvm_text_cell){ 66, 0, 3, 4, 0u };
+    frame.base.cells[80u + 1u] = (kvm_text_cell){ 67, 1, 5, 6, 0u };
+    frame.characters->primary[66] = 0x2500;
+    frame.characters->secondary[67] = 0x2588;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, LIB_NULL) == LIB_STATUS_OK);
-    lib_test_assert(captured.text[80] == 0x2500 && captured.foreground[80] == 3 && captured.background[80] == 4);
-    lib_test_assert(captured.text[81] == 0x2588 && captured.foreground[81] == 5 && captured.background[81] == 6);
+    lib_test_assert(captured.stride == 2u && captured.capacity == 4u);
+    lib_test_assert(captured.text[2] == 0x2500 && captured.foreground[2] == 3 && captured.background[2] == 4);
+    lib_test_assert(captured.text[3] == 0x2588 && captured.foreground[3] == 5 && captured.background[3] == 6);
     frame.base.text_columns = 80;
     frame.base.text_rows = 50;
     frame.base.cells[3999] = (kvm_text_cell){67, 1, 5, 6, 0u };
@@ -467,14 +490,14 @@ static void check_character_banks(void)
     lib_test_assert(captured.rows == 50 && captured.text[3999] == 0x2588 &&
         captured.foreground[3999] == 5 && captured.background[3999] == 6);
     lib_test_assert(!captured.cells_unchanged);
-    kvm_console_text_frame previous = frame;
+    lib_test_assert(test_console_frame_copy(&previous, &frame) == LIB_STATUS_OK);
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &previous) == LIB_STATUS_OK);
     lib_test_assert(captured.cells_unchanged);
     for (lib_u32 field = 0u; field < 7u; ++field) {
-        frame = previous;
+        lib_test_assert(test_console_frame_copy(&frame, &previous) == LIB_STATUS_OK);
         if (field == 0u) frame.base.cells[3999].foreground ^= 1u;
         if (field == 1u) frame.base.cells[3999].background ^= 1u;
-        if (field == 2u) frame.characters.secondary[67] = 'X';
+        if (field == 2u) frame.characters->secondary[67] = 'X';
         if (field == 3u) frame.base.cells[3999].glyph_bank = 0u;
         if (field == 4u) frame.base.text_rows = 25u;
         if (field == 5u) frame.base.text_columns = 40u;
@@ -482,19 +505,19 @@ static void check_character_banks(void)
         lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &previous) == LIB_STATUS_OK);
         lib_test_assert(!captured.cells_unchanged);
     }
-    frame = previous;
+    lib_test_assert(test_console_frame_copy(&frame, &previous) == LIB_STATUS_OK);
     frame.base.cells[0].underline = 1u;
     frame.base.underline_row = 1u;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &previous) == LIB_STATUS_OK);
     lib_test_assert(!captured.cells_unchanged && captured.underline[0]);
-    kvm_console_text_frame decorated = frame;
+    lib_test_assert(test_console_frame_copy(&decorated, &frame) == LIB_STATUS_OK);
     frame.base.underline_row = 2u;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &decorated) == LIB_STATUS_OK);
     lib_test_assert(captured.cells_unchanged && captured.underline[0]);
     frame.base.underline_row = 16u;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &decorated) == LIB_STATUS_OK);
     lib_test_assert(!captured.cells_unchanged && !captured.underline[0]);
-    frame = previous;
+    lib_test_assert(test_console_frame_copy(&frame, &previous) == LIB_STATUS_OK);
     frame.base.cursor_column = 3;
     frame.base.text_palette[2] ^= 0x123456u;
     lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &previous) == LIB_STATUS_OK);
@@ -504,30 +527,34 @@ static void check_character_banks(void)
      * and cannot make an otherwise identical frame different. */
     const lib_u16 extents[][2] = { {1, 1}, {2, 2}, {80, 25}, {80, 50} };
     for (lib_size extent = 0; extent < sizeof(extents) / sizeof(extents[0]); ++extent) {
-        frame = previous;
+        lib_test_assert(test_console_frame_copy(&frame, &previous) == LIB_STATUS_OK);
         frame.base.text_columns = extents[extent][0];
         frame.base.text_rows = extents[extent][1];
-        for (lib_size row = 0; row < KVM_TEXT_ROWS; ++row)
-            for (lib_size column = 0; column < KVM_TEXT_COLUMNS; ++column)
-                frame.base.cells[row * KVM_TEXT_COLUMNS + column] = (kvm_text_cell){67, 1, 5, 6, 0u };
-        kvm_console_text_frame same = frame;
-        for (lib_size row = 0; row < KVM_TEXT_ROWS; ++row)
-            for (lib_size column = 0; column < KVM_TEXT_COLUMNS; ++column)
+        for (lib_size row = 0; row < 50u; ++row)
+            for (lib_size column = 0; column < 80u; ++column)
+                frame.base.cells[row * 80u + column] = (kvm_text_cell){67, 1, 5, 6, 0u };
+        /* Copy the backing extent before reducing the logical viewport. */
+        lib_u32 rows = frame.base.text_rows;
+        frame.base.text_rows = 50u;
+        lib_test_assert(test_console_frame_copy(&same, &frame) == LIB_STATUS_OK);
+        same.base.text_rows = frame.base.text_rows = rows;
+        for (lib_size row = 0; row < 50u; ++row)
+            for (lib_size column = 0; column < 80u; ++column)
                 if (row >= frame.base.text_rows || column >= frame.base.text_columns)
-                    same.base.cells[row * KVM_TEXT_COLUMNS + column] = (kvm_text_cell){66, 0, 1, 2, 0u };
+                    same.base.cells[row * 80u + column] = (kvm_text_cell){66, 0, 1, 2, 0u };
         lib_test_assert(kvm_console_publish_text_frame(&console, &frame, &same) == LIB_STATUS_OK);
         lib_test_assert(captured.cells_unchanged);
-        for (lib_size row = 0; row < KVM_TEXT_ROWS; ++row) {
-            for (lib_size column = 0; column < KVM_TEXT_COLUMNS; ++column) {
-                lib_size cell = row * KVM_TEXT_COLUMNS + column;
-                lib_bool active = row < frame.base.text_rows && column < frame.base.text_columns;
-                lib_test_assert(captured.text[cell] == (active ? 0x2588 : 0));
-                lib_test_assert(captured.foreground[cell] == (active ? 5 : 0));
-                lib_test_assert(captured.background[cell] == (active ? 6 : 0));
+        lib_test_assert(captured.capacity == (lib_size)frame.base.text_rows * frame.base.text_columns);
+        for (lib_size row = 0; row < frame.base.text_rows; ++row) {
+            for (lib_size column = 0; column < frame.base.text_columns; ++column) {
+                lib_size cell = row * captured.stride + column;
+                lib_test_assert(captured.text[cell] == 0x2588);
+                lib_test_assert(captured.foreground[cell] == 5);
+                lib_test_assert(captured.background[cell] == 6);
             }
         }
     }
-    frame = previous;
+    lib_test_assert(test_console_frame_copy(&frame, &previous) == LIB_STATUS_OK);
     /* KVM scanlines are normalized before the independent Console boundary. */
     const struct { lib_u32 height, top, bottom; lib_bool visible; lib_u32 out_top, out_bottom; } cases[] = {
         {0,14,15,LIB_TRUE,14,15}, {16,20,21,LIB_FALSE,0,0}, {16,14,31,LIB_TRUE,14,15},
@@ -561,11 +588,16 @@ static void check_character_banks(void)
         }
     }
     lib_console_release(console.logical_console);
+    lib_release(console.mapped_cells);
+    kvm_console_frame_release(&frame);
+    kvm_console_frame_release(&previous);
+    kvm_console_frame_release(&decorated);
+    kvm_console_frame_release(&same);
 }
 
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame), kvm_console_frame_retire) == LIB_STATUS_OK);
     check_retirement(0);
     check_retirement(1);
     check_io_failure(1, LIB_STATUS_OK);

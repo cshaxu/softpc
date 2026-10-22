@@ -223,7 +223,11 @@ static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
 {
     console_broker *broker = LIB_NULL;
     lib_console *cooked, *raw;
-    lib_console_text_frame frame = {0};
+    lib_u16 text[80u * 25u] = {0};
+    lib_u8 foreground[80u * 25u] = {0}, background[80u * 25u] = {0},
+        underline[80u * 25u] = {0};
+    lib_console_text_frame frame = {.stride=80u, .capacity=80u*25u,
+        .text=text, .foreground=foreground, .background=background, .underline=underline};
     lib_win32_console_screen_buffer_info before, actual;
     display_snapshot cooked_display;
     lib_win32_coord extent = {columns, rows}, origin = {0, 0}, cells_size = {80, 25};
@@ -271,16 +275,16 @@ static void check_frame_extent(lib_i16 columns, lib_i16 rows, lib_i32 scrolled)
         set_supported_viewport(broker->backend->output, &viewport);
         if (round == 0 && !scrolled && rows == 13) {
             fail_resize = 1;
-            lib_test_assert(!console_broker_ensure_text_surface(broker->backend, 25u));
+            lib_test_assert(!console_broker_ensure_text_surface(broker->backend, 80u, 25u));
             lib_test_assert(fail_resize == 0);
             ignore_resize = 1;
-            lib_test_assert(!console_broker_ensure_text_surface(broker->backend, 25u));
+            lib_test_assert(!console_broker_ensure_text_surface(broker->backend, 80u, 25u));
             lib_test_assert(ignore_resize == 0);
         }
         {
             lib_win32_console_screen_buffer_info raw_before;
             lib_test_assert(lib_win32_get_console_screen_buffer_info(broker->backend->output, &raw_before));
-            lib_test_assert(console_broker_ensure_text_surface(broker->backend, 25u));
+            lib_test_assert(console_broker_ensure_text_surface(broker->backend, 80u, 25u));
             lib_test_assert(lib_win32_get_console_screen_buffer_info(broker->backend->output, &actual));
             lib_test_assert(lib_memory_compare(&actual.srWindow, &raw_before.srWindow,
                 sizeof(actual.srWindow)) == 0);
@@ -341,13 +345,13 @@ static void check_retained_console_restore(void)
     snapshot(&cooked_display);
     options.input_sink = restore_input; options.failure_sink = restore_failure;
     lib_test_assert(kvm_console_create(&console, &options) == LIB_STATUS_OK);
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame), kvm_console_frame_retire) == LIB_STATUS_OK);
     kvm_console_text_frame *frame = kvm_frame_exchange_writer(frames);
-    frame->base.text_columns=80; frame->base.text_rows=25;
+    lib_test_assert(kvm_console_frame_prepare(frame, 80u, 25u, 80u) == LIB_STATUS_OK);
     frame->base.cursor_mode=KVM_CURSOR_HOST;
     frame->base.cursor_column=7; frame->base.cursor_row=8;
     frame->base.cursor[0] = (kvm_text_cursor_span){ 14, 2u };
-    for (lib_u32 i=0;i<256u;++i) frame->characters.primary[i]=(lib_u16)i;
+    for (lib_u32 i=0;i<256u;++i) frame->characters->primary[i]=(lib_u16)i;
     for (lib_u32 i=0;i<2000u;++i) {
         frame->base.cells[i].glyph_index=(lib_u8)('A'+i%26u);
         frame->base.cells[i].foreground=14; frame->base.cells[i].background=1;
@@ -389,7 +393,11 @@ int main(void)
 {
     console_broker *broker;
     lib_console *cooked, *raw, *other;
-    lib_console_text_frame frame = {0};
+    lib_u16 text[80u * 50u] = {0};
+    lib_u8 foreground[80u * 50u] = {0}, background[80u * 50u] = {0},
+        underline[80u * 50u] = {0};
+    lib_console_text_frame frame = {.stride=80u, .capacity=80u*50u,
+        .text=text, .foreground=foreground, .background=background, .underline=underline};
     display_snapshot before, after, raw_display;
     lib_win32_dword written;
     lib_win32_coord origin = {0, 0};

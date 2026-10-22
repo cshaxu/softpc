@@ -130,6 +130,8 @@ BOOL softpc_compat_set_console_buffer_size(HANDLE output, COORD size)
 {
     UNUSED(output);
     if (size.X <= 0 || size.Y <= 0) return FALSE;
+    if (!softpc_standalone_text_prepare((unsigned long)size.X, (unsigned long)size.Y))
+        return FALSE;
     softpc_compat_console_size = size;
     if (softpc_compat_console_window.Right >= size.X)
         softpc_compat_console_window.Right = (SHORT)(size.X - 1);
@@ -171,9 +173,8 @@ static BOOL softpc_compat_fill_console_cell(HANDLE output, unsigned char value,
         unsigned long column = cell % columns;
         unsigned long row = cell / columns;
 
-        /* The original Console buffer can temporarily be wider/taller than
-           the 80x50 shared surface.  Only its visible intersection has a
-           presentation slot. */
+        /* A temporary original Console extent can differ from the selected
+           painter. Only their visible intersection belongs to this surface. */
         if (!softpc_standalone_text_surface_write_cell(column, row,
                 attribute ? 1u : 0u, value) &&
             (column < surface_columns && row < surface_rows))

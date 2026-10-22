@@ -6,16 +6,21 @@
 typedef struct kvm_frame_exchange kvm_frame_exchange;
 typedef void (*kvm_frame_exchange_latest_observer)(void *context,
     const void *frame);
+/* Leaf-owned payload retirement. Called only for an unheld slot. Release its
+ * payload if its specification differs from latest; null latest releases all.
+ * Must not reenter the exchange or perform host output. */
+typedef void (*kvm_frame_exchange_retire)(void *slot, const void *latest);
 
 /* One producer and one consumer, with four reusable frames:
  * producing, pending, processing and displayed.
  * Contents belong to the caller.
  * The producer alone writes writer(), outside the exchange lock. Publication
  * transfers that storage and supplies another writer without waiting for the
- * consumer. No allocation or payload copy occurs after create.
+ * consumer. Create allocates only caller-sized slot metadata. Payloads are
+ * prepared by their leaf on the writer, never copied by the exchange.
  * Destroy requires both participants and all observers to have stopped. */
 lib_status kvm_frame_exchange_create(kvm_frame_exchange **out_exchange,
-    lib_size frame_size);
+    lib_size frame_size, kvm_frame_exchange_retire retire);
 void kvm_frame_exchange_destroy(kvm_frame_exchange *exchange);
 void *kvm_frame_exchange_writer(kvm_frame_exchange *exchange);
 void kvm_frame_exchange_publish(kvm_frame_exchange *exchange);

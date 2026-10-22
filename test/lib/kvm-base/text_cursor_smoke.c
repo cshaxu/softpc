@@ -14,11 +14,15 @@ _Static_assert(lib_offsetof(kvm_text_cell, background) == 3u, "background offset
 static void check_validation(void)
 {
     kvm_text_frame text = {0};
+    kvm_text_cell cells[80u * 50u] = {0};
     lib_test_assert(kvm_text_frame_validate(LIB_NULL) == LIB_STATUS_INVALID_ARGUMENT);
     lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
     text.text_columns = 1u;
     lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
     text.text_rows = 1u;
+    text.cells = cells;
+    text.stride = 80u;
+    text.capacity = 80u * 50u;
     lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_OK);
     for (lib_i32 mode = -1; mode <= 3; ++mode) {
         text.cursor_mode = (kvm_cursor_mode)mode;
@@ -29,8 +33,8 @@ static void check_validation(void)
     text.cursor_mode = KVM_CURSOR_HOST;
     text.cursor_column = -1;
     text.cursor_row = 500;
-    text.text_columns = KVM_TEXT_COLUMNS;
-    text.text_rows = KVM_TEXT_ROWS;
+    text.text_columns = 80u;
+    text.text_rows = 50u;
     for (lib_u32 field = 0; field < 4; ++field) {
         lib_u8 *value = field == 0 ? &text.cells[3999].foreground :
             field == 1 ? &text.cells[3999].background :
@@ -41,19 +45,19 @@ static void check_validation(void)
         lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
         text.text_rows = 1u;
         lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_OK);
-        text.text_rows = KVM_TEXT_ROWS;
+        text.text_rows = 50u;
         *value = 0u;
     }
     ++text.text_rows;
-    lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_UNSUPPORTED);
+    lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
     text.text_rows = 1u;
     ++text.text_columns;
-    lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_UNSUPPORTED);
+    lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
     text.text_columns = 1u;
     text.text_rows = 2u;
     text.cells[1].glyph_bank = 2u; /* Inactive column, not the next row. */
     lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_OK);
-    text.cells[KVM_TEXT_COLUMNS].glyph_bank = 2u;
+    text.cells[80u].glyph_bank = 2u;
     lib_test_assert(kvm_text_frame_validate(&text) == LIB_STATUS_INVALID_ARGUMENT);
 }
 

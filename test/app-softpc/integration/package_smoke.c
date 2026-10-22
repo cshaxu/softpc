@@ -491,7 +491,11 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
         if (!SetConsoleWindowInfo(output, TRUE, &viewport) ||
             !SetConsoleScreenBufferSize(output, extent)) { stage = 19; goto done; }
     }
-    if (!package_wait_monitor_prompt(output, 5000u)) { stage = 3; goto done; }
+    /* First launch includes native audio/host initialization; an online RDP
+     * run took over ten seconds before this same child became ready. Give
+     * startup its own fixture budget, retaining the exact prompt assertion
+     * and the shorter budgets for subsequent machine/UI operations. */
+    if (!package_wait_monitor_prompt(output, 30000u)) { stage = 3; goto done; }
     /* Exercise the shipping CLI provider, not only the debug library link.
        Entering before start must leave the machine stopped and permit help. */
     if (!package_compact_console && (!package_send_text(input, "debug\r") ||

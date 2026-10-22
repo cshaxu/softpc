@@ -236,12 +236,19 @@ only a successful write of the entire requested rectangle commits the cache.
 Clipped native success is incomplete output and returns IO_ERROR.
 Surface size is established after palette application, which can change native
 buffer geometry; output does not rely on a precondition invalidated by metadata.
-Text frames hold at most 80x50 cells with a fixed 80-cell row stride; active
-dimensions, not capacity, determine the image. Raw output grows only backing
-storage to at least 80 columns and the frame's active rows; it preserves the
-host viewport, font fit and scroll position. Lower rows left by a taller frame
-are cleared within the 50-row capacity. A failed or silently ineffective backing
-resize returns IO_ERROR, not success.
+Text frames carry producer-selected columns, rows, cell stride and capacity;
+there is no fixed public grid limit. Zero dimensions, insufficient stride or
+capacity, and arithmetic overflow are rejected. Leaf prepare operations allocate
+only the active text/map/font or graphics payload on first use, then reuse equal
+specifications. Four exchange slots start with metadata only. Unheld incompatible
+payloads retire on publication or reader release; held inputs remain immutable.
+Prepare failure never changes a held frame. Producers must not shallow-copy
+owning storage and must release standalone diagnostic copies explicitly.
+Raw output grows only native backing storage to the frame's actual extent,
+preserving the host viewport, font fit and scroll position. Old right/bottom
+tails are cleared when a frame shrinks. Win32's signed 16-bit native cell extent
+is a backend limit (UNSUPPORTED), not a shared frame limit. A failed or silently
+ineffective backing resize returns IO_ERROR, not success.
 
 Window bitmap fonts use two copied banks of 256 fixed 32-byte glyph slots.
 The active glyph height is 1--32; zero uses the KVM Base-owned

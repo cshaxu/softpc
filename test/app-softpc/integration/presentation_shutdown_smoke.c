@@ -94,8 +94,8 @@ lib_status emulator_ui_set_state(emulator_ui *ui, emulator_ui_state state)
 }
 
 
-void emulator_ui_produce_console_status(void *context, kvm_console_text_frame *frame)
-{ (void)context; (void)frame; assert(0); }
+lib_status emulator_ui_produce_console_status(void *context, kvm_console_text_frame *frame)
+{ (void)context; (void)frame; assert(0); return LIB_STATUS_IO_ERROR; }
 
 lib_status emulator_ui_publish_frame(emulator_ui *ui, kvm_frame_exchange *frame,
     kvm_frame_exchange *console_frames, lib_bool graphics, lib_u32 sequence,

@@ -323,6 +323,12 @@ Machine owns a four-slot Window exchange and a four-slot Console exchange.
 Window slots contain a Lib-defined reference (sequence and exactly one text/
 graphics pointer) and reusable payload backing. Console slots contain text and
 character maps, without bitmap fonts. No Machine frame wrapper exists.
+Only slot metadata exists at exchange creation. Each leaf prepares its payload
+at the producer's actual dimensions and stride; text storage never reserves
+graphics pixels. Equal specifications reuse allocations. The exchange invokes
+the leaf retirement callback only on unheld slots; incompatible old payloads
+are freed when their reader releases them. No collector, polling or second
+ownership mechanism is used. Allocation errors do not publish a partial frame.
 Its sole executor passes both writable leaf storage areas directly to the driver;
 Session/UI hold no payload and forward exchange references. Product composition
 injects UI's pure status-page builder for graphics-mode Console production into
@@ -338,8 +344,8 @@ frames and recreated surfaces invalidate fully; same-size mode changes compare
 actual pixels. Cursor overlays invalidate their old/new rectangles separately.
 Native invalidations accumulate until paint. No previous-frame cache is added.
 Console stores emulator text fields and caller-supplied character maps only.
-Shared text uses one array of four-byte cells, each holding a glyph index,
-glyph bank, foreground and background palette indices. VM alone decodes device colour/bank bits; KVM leaves select resources
+Shared text uses one array of five-byte cells, each holding a glyph index,
+glyph bank, foreground/background palette indices and underline enable. VM alone decodes device colour/bank bits; KVM leaves select resources
 from explicit independent values. Logical Console also carries separate colour
 indices; only its native broker packs them for the host API. This changes no
 mailbox, readiness, graphics or lifecycle policy.

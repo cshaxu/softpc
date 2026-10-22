@@ -52,7 +52,7 @@ static void failure(void *p,lib_u64 id,lib_status s)
 { (void)p; lib_test_assert(id && s==LIB_STATUS_IO_ERROR); ++failures; }
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_console_text_frame), kvm_console_frame_retire) == LIB_STATUS_OK);
     lib_test_assert(kvm_console_destroy(LIB_NULL)==LIB_STATUS_OK);
 
     for(lib_u32 mode=0;mode<4;++mode) {
@@ -69,8 +69,10 @@ int main(void)
             lib_test_assert(kvm_component_enqueue_control(&c->base,&title)==LIB_STATUS_OK);
         }
         if(mode==2) {
-            static kvm_console_text_frame frame={.base = { .text_columns=80, .text_rows=25 }};
+            kvm_console_text_frame frame={0};
+            lib_test_assert(kvm_console_frame_prepare(&frame, 80u, 25u, 80u) == LIB_STATUS_OK);
             lib_test_assert(test_console_frame(c, frames,&frame)==LIB_STATUS_OK);
+            kvm_console_frame_release(&frame);
         }
         if(mode==3) {
             lib_console_event activated={.kind=LIB_CONSOLE_EVENT_ACTIVATED,.binding_generation=1};

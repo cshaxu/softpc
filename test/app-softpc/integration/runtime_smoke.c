@@ -93,11 +93,11 @@ int main(void)
                defined snapshot miss into a timing-dependent test failure. */
             if (emulator_machine_copy_published_frame(runtime, frame,
                     emulator_machine_run_generation(runtime)) &&
-                frame->frame.graphics == LIB_NULL && frame->data.text.base.cursor_column >= 0 &&
-                frame->data.text.base.cursor_column < KVM_TEXT_COLUMNS &&
-                frame->data.text.base.cursor_row >= 0 &&
-                frame->data.text.base.cursor_row < KVM_TEXT_ROWS &&
-                frame->data.text.base.cursor_mode == KVM_CURSOR_HOST && frame->data.text.base.cursor_phase != 0u) {
+                frame->frame.graphics == LIB_NULL && frame->data.text->base.cursor_column >= 0 &&
+                frame->data.text->base.cursor_column < 80u &&
+                frame->data.text->base.cursor_row >= 0 &&
+                frame->data.text->base.cursor_row < 50u &&
+                frame->data.text->base.cursor_mode == KVM_CURSOR_HOST && frame->data.text->base.cursor_phase != 0u) {
                 cursor_seen = 1;
                 break;
             }
@@ -107,10 +107,10 @@ int main(void)
            frame.  Both outer frontends consume this value without reading a
            controller register or a guest-memory pointer. */
         assert(cursor_seen);
-        assert(frame->data.text.base.font_height > 0u && frame->data.text.base.font_height <= 16u);
+        assert(frame->data.text->base.font_height > 0u && frame->data.text->base.font_height <= 16u);
         kvm_text_cursor_span spans[2];
         lib_u32 font_height;
-        assert(kvm_text_cursor_shape(&frame->data.text.base, &font_height, spans) != 0u);
+        assert(kvm_text_cursor_shape(&frame->data.text->base, &font_height, spans) != 0u);
     }
     assert(emulator_machine_published_frame_sequence(runtime) == frame->frame.sequence);
     assert(emulator_machine_published_frame_run_generation(runtime) == first_run);
@@ -174,7 +174,7 @@ int main(void)
     assert(emulator_machine_stop(runtime));
     assert(runtime_wait(runtime, EMULATOR_MACHINE_STOPPED));
     assert(emulator_machine_set_removable_media(runtime, NULL, LIB_STORAGE_MEDIUM_OVERLAY));
-    lib_release(frame);
+    kvm_window_frame_release(frame); lib_release(frame);
     softpc_machine_fixture_destroy(&fixture);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));

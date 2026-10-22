@@ -470,24 +470,32 @@ int softpc_machine_presentation_take_text_dirty(const softpc_machine *machine)
     return machine != NULL && machine->reset && softpc_standalone_text_take_dirty();
 }
 
-int softpc_machine_presentation_text(const softpc_machine *machine,
+lib_status softpc_machine_presentation_text(const softpc_machine *machine,
     const void **cells_out, lib_u32 *columns_out, lib_u32 *rows_out,
-    lib_u32 *stride_out, lib_u32 *cell_bytes_out)
+    lib_u32 *stride_out, lib_u32 *cell_bytes_out, lib_bool *available)
 {
     unsigned long columns;
     unsigned long rows;
     unsigned long stride;
     unsigned long cell_bytes;
-    if (machine == NULL || !machine->reset || cells_out == NULL ||
+    unsigned long visible_columns, visible_rows;
+    if (available == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    *available = LIB_FALSE;
+    if (machine == NULL || cells_out == NULL ||
         columns_out == NULL || rows_out == NULL || stride_out == NULL ||
-        cell_bytes_out == NULL || !softpc_standalone_text_surface(cells_out,
-            &columns, &rows, &stride, &cell_bytes) ||
-        !softpc_platform_presentation_text_extent(&columns, &rows)) return 0;
+        cell_bytes_out == NULL) return LIB_STATUS_INVALID_ARGUMENT;
+    if (!machine->reset || !softpc_platform_presentation_text_extent(
+            &visible_columns, &visible_rows)) return LIB_STATUS_OK;
+    if (!softpc_standalone_text_surface(cells_out,
+            &columns, &rows, &stride, &cell_bytes)) return LIB_STATUS_NO_MEMORY;
+    /* A newly selected geometry is not a frame until its painter wrote it. */
+    if (columns != visible_columns || rows != visible_rows) return LIB_STATUS_OK;
     *columns_out = (lib_u32)columns;
     *rows_out = (lib_u32)rows;
     *stride_out = (lib_u32)stride;
     *cell_bytes_out = (lib_u32)cell_bytes;
-    return 1;
+    *available = LIB_TRUE;
+    return LIB_STATUS_OK;
 }
 
 int softpc_machine_presentation_fonts(const softpc_machine *machine,
@@ -521,6 +529,7 @@ softpc_machine_result softpc_machine_destroy(softpc_machine *machine)
             c_cpu_terminate();
         softpc_gdp_destroy_global();
         sas_term();
+        softpc_standalone_text_release();
     }
     if (machine != NULL && softpc_sb_midi_dispose() != LIB_STATUS_OK)
         return SOFTPC_MACHINE_IO_ERROR;

@@ -101,7 +101,7 @@ int main(void)
 
     /* Notification binds one exchange; consumption transfers its actual pointer. */
     kvm_frame_exchange *frames;
-    lib_test_assert(kvm_frame_exchange_create(&frames, 1u) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, 1u, LIB_NULL) == LIB_STATUS_OK);
     lib_u8 *frame = kvm_frame_exchange_writer(frames);
     *frame = 0x5au;
     kvm_frame_exchange_publish(frames);

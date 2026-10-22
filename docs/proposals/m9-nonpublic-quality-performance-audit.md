@@ -73,8 +73,8 @@ internal S queue, not the repository T candidate queue. S7 had only admission
 and preliminary audit, no implementation P. Owner revises that active packet
 to sizing and carries its storage audit forward to S8; no completed S is reused.
 
-1. S7: Window sizing policy (current admission).
-2. S8: dynamic frame storage after S7 acceptance.
+1. S7: Window sizing policy (owner accepted and closed).
+2. S8: dynamic frame storage (current admission).
 3. S9: finite instruction-budget bounds (not yet admitted).
 4. S10: private COM/LPT UTF-8 append opening (not yet admitted).
 
@@ -201,8 +201,8 @@ acceptance or T98 closure. S8 remains unstarted.
 
 ### S8 - Dynamic frame storage
 
-Owner admitted after accepting S6 on 2026-10-21. Baseline 1b95cfd7.
-Owner subsequently moved implementation after S7 Window sizing is accepted.
+Owner admitted after accepting S6 on 2026-10-21, then moved implementation
+after S7. S7 is now accepted; S8 implementation baseline is 7bab2e62.
 S9 finite-budget and S10 UTF-8 append work remain unstarted. This retained
 audit/design is for resumption, not evidence of implementation.
 
@@ -267,6 +267,141 @@ producer and explicit diagnostic deep copies. No snapshot format change is
 currently planned. Cached dual builds, shared units/gates, private regression
 and serial desktop qualification follow implementation; prior S6 passes are
 not S8 evidence.
+
+S8 implementation selection: the existing exchange receives one leaf-owned
+retirement callback, with no new roles, generation state or recycler. Leaf
+prepare functions allocate one contiguous block for their payload and own its
+release; metadata remains small. Console native conversion scratch follows
+actual extents and clears both old width and height tails. Diagnostic copies
+are explicitly deep and released by callers; Session transport stays reference-only.
+
+Mirror exception: host/src/nt_cga.c changes only the existing host target stride
+and its allocation preflight (+12/-8 against S8 entry). The original copy loops,
+source stride and device rendering remain in place. Compat supplies an actual-size
+text destination, also used by its existing Console resize/fill adapter. No guest,
+firmware, device register or second VRAM reader change is introduced. The pinned
+XP subset identity is unchanged; only the reviewed local body hash advances.
+
+In-progress proof: x64 shared/outer unit run reached 161/163, with remaining
+old fixed-storage fixture assumptions in two App tests. After those fixtures
+were corrected, the focused VGA/text-Console pair passed 2/2. These runs are
+development evidence, not final dual-architecture qualification. Allocation
+counting, byte requests and retirement assertions reside in the existing
+Window copy and Console frame-contract tests, not production-only test APIs.
+
+S8 implemented contract and review:
+
+- Base retains the same four roles and short transfer lock. Its only new hook
+  retires an unheld leaf payload against the latest specification, or releases
+  it at destruction. The callback cannot reenter or perform host output.
+- Window prepare allocates `sizeof(text payload) + stride*rows*5` for text,
+  including its existing two font banks, or `sizeof(graphics payload) +
+  stride*height*4` for RGB. Console prepare allocates its 1024-byte character
+  banks plus `stride*rows*5`. Slot metadata is separate and small.
+- Allocation-count fixtures prove zero payload allocations at creation, one
+  on first preparation, four only when all roles need them, no additional
+  allocation over twenty same-spec pending replacements, and balanced frees
+  after one hundred specification changes and final destruction. A held text
+  reader remains unchanged while newer graphics publications replace pending
+  input. Injected OOM rejects commit and leaves the displayed publication valid.
+- Dynamic text cases include 80x25, 80x50, 132x43, 100x60 and 193x77 with row
+  padding. Pixel tests retain font/underline/cursor coverage; native Console
+  tests additionally check right-tail clearing, partial failure/retry and an
+  externally reduced backing width. Native SHORT limits explicitly reject
+  unsupported output, without restricting the shared frame format.
+- Machine status production now returns allocation status. Driver prepares
+  both leaf formats directly from the existing host surface. Session still
+  routes references only. Diagnostic copies deep-copy and their callers release
+  owned payloads. No snapshot format or guest state changes.
+- Similar-issue scans cover retired fixed-limit/begin names, frame-size memcpy,
+  owning-header memset, row offsets, diagnostic destruction and all create
+  consumers. Remaining constant dimensions are actual fixture/status choices
+  or the unchanged private graphics DIB capability, not shared limits. There
+  is no new memory manager, timer, state generation or alternate rendering path.
+- Self-review removed oversized former-maximum graphics allocations from small
+  UI/machine/Window fixtures. Base owns mechanics only; leaf callbacks own
+  layout. Types, dependency, naming, Linux build and owner-local test gates are
+  included in final qualification, not inferred from successful compilation.
+
+Compatibility: this is a source ABI change. Downstream producers replace begin
+with checked prepare calls, register the leaf retire callback on exchange create,
+fill actual stride/capacity-backed storage and release standalone copies. Lower
+Console callers provide borrowed arrays valid for the synchronous write. There
+are no compatibility aliases or shallow-copy fallbacks. The changed public trees
+are src/lib, test/lib, src/emulator and test/emulator; both X86 src/test pairs and
+root test infrastructure are unchanged. No downstream repository was modified.
+
+Initial validation was incomplete while the native session was unavailable. The
+first final x64 background partition passed 184/184; its three Lib desktop
+tests passed, but both package tests failed at Console attach/prompt and all
+three native audio tests failed opening output. At inspection the neko session
+was Disc. These are failed attempts, not passes or proof of a frame regression;
+an online repeat is required. Development compile errors and stale/lowercase
+manifest failures were corrected before that final background partition.
+
+After owner reconnection, session 1 was confirmed Active. Latest cached builds
+and background suites pass 184/184 on both architectures; each architecture's
+three Lib desktop and three native-audio tests pass. The unchanged ordinary
+package test passes on both architectures, but sequential compact package
+still fails stage 3/error 0. Temporary diagnostics observed one live child with
+a blank 31x30 buffer, cursor 0,0, and another child exiting 0xC0000142 before
+attachment. These are distinct observations, not a proved common root cause
+or proof of a dynamic-frame regression. Diagnostic source has been removed.
+Qualification was incomplete at this checkpoint; the final record below
+supersedes its status, without discarding these failed attempts.
+
+Package qualification follow-up: a diagnostic run deliberately retained the
+same child after the five-second initial-prompt failure. It reached the exact
+existing prompt predicate another 5157 ms later, without restart or injected
+input. A separate live-child stack showed the normal Session queue wait and
+Console reader. This establishes an insufficient startup fixture budget for
+that case, not a deadlock or a dynamic-frame failure. Only the initial prompt
+wait is now 30000 ms; attachment, subsequent UI/guest waits, assertions and the
+90-second outer CTest budget are unchanged. There is no retry or product
+timeout change. Temporary test/Driver probes were removed before final builds.
+The separate compose failure and 0xC0000142 startup exit remain disclosed in
+TODO; this timing correction does not claim to repair them.
+
+Executor actual-diff review against 7bab2e62: production C/H is 24 files,
++431/-190 (net +241); test C/H is 33 files, +767/-564 (net +203). Counts use
+`git diff --numstat` filtered to src/test C/H, excluding manifests, prose and
+EXEs. Production splits into Lib +321/-112, Emulator +25/-18 and App +85/-60;
+tests split into Lib +551/-389, Emulator +97/-89 and App +119/-86. The App
+production count includes the separately recorded mirror +12/-8.
+
+Similar-issue sweep searched every src/test caller for former fixed text and
+graphics maxima, begin helpers, frame-storage assignments, memcpy/sizeof
+ownership assumptions, native geometry narrowing, and callback error handling.
+No old shared maxima or begin-helper callers remain. Session remains reference
+transport; diagnostic copy is the sole explicit deep-copy helper and its callers
+release their own storage. Native conversion/surface buffers remain distinct
+format boundaries, not duplicate publication caches. No second lifecycle,
+polling worker, compatibility alias or renderer was introduced. The existing
+private DIB graphics capacity, 32-scanline font banks and native Console signed
+16-bit geometry remain explicit capability limits; this does not claim new
+guest device modes or exact Console cursor/underline rendering. Source reasoning
+and allocation/pixel/producer assertions are separate from owner guest testing.
+
+Final executor qualification, 2026-10-21: both cached Ninja builds succeed with
+no warnings/errors in the final build logs. Each architecture passes all 192
+registered tests: 184 background (`-LE desktop|native_audio`, eight-way), five
+serial desktop and three serial native-audio integrations. XML names equal
+the frozen CTest registration set exactly, with zero failures and skips. x64
+partition durations are 113.63/31.37/41.53 seconds; x86 are
+118.34/31.39/41.37 seconds. Both package variants now pass in the full desktop
+partitions, without retries. These final results do not erase the earlier
+compile/fixture/manifest failures or the separate startup observations above.
+
+Published softpc32 SHA-256:
+E9E574CE63573AB1C8346470528BA70908552D663FC174654813A6B9A3E42BAD.
+Published softpc64 SHA-256:
+5012E3AD96F289752AF6681C64A4B4C048F23F25DAF613F68024A4BAC35A88C2.
+Owner INI and media are unchanged; pre-existing untracked snapshot.debug is
+preserved and excluded from delivery. Temporary diagnostics were removed;
+concise results are promoted here before disposable task work is retired.
+The public changed-tree list above is the downstream import surface; no root
+test infrastructure changed. A fixed pushed executor commit is recorded by
+the subsequent actual-change review, not an uncommitted import baseline.
 
 ### S6 - Text decoration and cursor design
 

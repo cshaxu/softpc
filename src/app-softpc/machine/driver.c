@@ -268,13 +268,12 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
     lib_i32 bottom;
     const BITMAPINFO *dib;
     lib_u32 row;
+    lib_status status;
 
     if (!softpc_machine_presentation_dib(driver->machine, &bits, &info, &width,
             &height)) return LIB_STATUS_OK;
     if (bits == NULL || info == NULL || width == 0u || height == 0u)
         return LIB_STATUS_INVALID_ARGUMENT;
-    if (width > KVM_WINDOW_GRAPHICS_MAX_WIDTH || height > KVM_WINDOW_GRAPHICS_MAX_HEIGHT)
-        return LIB_STATUS_UNSUPPORTED;
     dib = (const BITMAPINFO *)info;
     if (dib->bmiHeader.biSize != sizeof(BITMAPINFOHEADER) ||
         dib->bmiHeader.biWidth != (LONG)width ||
@@ -286,7 +285,9 @@ static lib_status vm_driver_copy_graphics(vm_driver *driver,
     if (!softpc_machine_presentation_take_dirty(driver->machine, &left, &top,
             &right, &bottom)) return LIB_STATUS_OK;
     row_stride = (width + 3u) & ~3u;
-    image = kvm_window_frame_begin_graphics(frame);
+    status = kvm_window_frame_prepare_graphics(frame, width, height, width);
+    if (status != LIB_STATUS_OK) return status;
+    image = frame->data.graphics;
     for (row = 0u; row < height; ++row) {
         const lib_u8 *source = (const lib_u8 *)bits + row * row_stride;
         lib_u32 *destination = image->pixels + row * width;
@@ -316,24 +317,26 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     lib_u32 text_row;
     lib_u32 attribute_select;
     kvm_text_frame *targets[2];
+    lib_status status;
 
-    if (!softpc_machine_presentation_text(driver->machine, &surface, &columns,
-            &rows, &stride, &cell_bytes)) return LIB_STATUS_OK;
+    lib_bool available;
+    status = softpc_machine_presentation_text(driver->machine, &surface, &columns,
+        &rows, &stride, &cell_bytes, &available);
+    if (status != LIB_STATUS_OK || !available) return status;
     if (surface == NULL || cell_bytes == 0u || columns == 0u || rows == 0u)
         return LIB_STATUS_INVALID_ARGUMENT;
-    if (columns > KVM_TEXT_COLUMNS || rows > KVM_TEXT_ROWS)
-        return LIB_STATUS_UNSUPPORTED;
     if (stride < columns) return LIB_STATUS_INVALID_ARGUMENT;
     if (!softpc_machine_presentation_take_text_dirty(driver->machine))
         return LIB_STATUS_OK;
-    text = kvm_window_frame_begin_text(frame);
-    lib_memory_set(text, 0, sizeof(*text));
+    status = kvm_window_frame_prepare_text(frame, columns, rows, columns);
+    if (status == LIB_STATUS_OK)
+        status = kvm_console_frame_prepare(console, columns, rows, columns);
+    if (status != LIB_STATUS_OK) return status;
+    text = frame->data.text;
     targets[0] = &text->base;
     targets[1] = &console->base;
-    lib_memory_set(console, 0, sizeof(*console));
     for (lib_size target = 0u; target < 2u; ++target)
-        for (lib_size index = 0u; index < KVM_TEXT_COLUMNS * KVM_TEXT_ROWS; ++index)
-            targets[target]->cells[index] = (kvm_text_cell){ ' ', 0u, 7u, 0u, 0u };
+        lib_memory_set(targets[target]->text_palette, 0, sizeof(targets[target]->text_palette));
     if (!softpc_machine_presentation_fonts(driver->machine, text->font,
         text->secondary_font, &text->base.font_height,
         &attribute_select))
@@ -344,7 +347,7 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
         lib_u32 text_column;
         for (text_column = 0u; text_column < columns; ++text_column) {
             lib_size source = ((lib_size)text_row * stride + text_column) * cell_bytes;
-            lib_size destination = (lib_size)text_row * KVM_TEXT_COLUMNS + text_column;
+            lib_size destination = (lib_size)text_row * columns + text_column;
             lib_u8 attribute = cell_bytes >= 2u ? cells[source + 1u] : 7u;
             kvm_text_cell cell = {
                 cells[source], attribute_select && (attribute & 0x08u) ? 1u : 0u,
@@ -373,15 +376,13 @@ static lib_status vm_driver_copy_text(vm_driver *driver,
     }
     for (lib_size target = 0u; target < 2u; ++target) {
         softpc_platform_presentation_text_style(targets[target]);
-        targets[target]->text_columns = (lib_u16)columns;
-        targets[target]->text_rows = (lib_u16)rows;
     }
     {
         lib_status status = kvm_window_frame_validate(&frame->frame);
         if (status != LIB_STATUS_OK) return status;
     }
-    lib_memory_copy(console->characters.primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
-    lib_memory_copy(console->characters.secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    lib_memory_copy(console->characters->primary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
+    lib_memory_copy(console->characters->secondary, vm_driver_pc_glyphs, sizeof(vm_driver_pc_glyphs));
     *produced = LIB_TRUE;
     return LIB_STATUS_OK;
 }

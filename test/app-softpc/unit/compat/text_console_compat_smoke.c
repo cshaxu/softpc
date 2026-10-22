@@ -184,7 +184,7 @@ int main(void)
     verify_dib_update_transaction();
     assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride,
         &cell_bytes));
-    assert(surface != NULL && columns == 80u && rows == 50u &&
+    assert(surface != NULL && columns == 80u && rows == 25u &&
         stride == 80u && cell_bytes >= 2u);
     cells = (const unsigned char *)surface;
 
@@ -215,6 +215,9 @@ int main(void)
     final_cell.X = 132;
     final_cell.Y = 25;
     assert(softpc_compat_set_console_buffer_size(NULL, final_cell));
+    assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride, &cell_bytes));
+    assert(columns == 132u && rows == 25u && stride == 132u);
+    cells = surface;
     assert(softpc_compat_get_console_buffer_info(NULL, &info));
     assert(info.dwSize.X == 132 && info.dwSize.Y == 25);
     assert(info.dwMaximumWindowSize.X == 132 && info.dwMaximumWindowSize.Y == 25);
@@ -238,12 +241,15 @@ int main(void)
     assert(softpc_compat_fill_console_character(NULL, ' ', 132u * 25u,
         origin, &written));
     assert(written == 132u * 25u);
-    for (index = 0u; index < 80u * 25u; ++index)
+    for (index = 0u; index < 132u * 25u; ++index)
         assert(cells[index * cell_bytes] == ' ');
 
     final_cell.X = 80;
     final_cell.Y = 50;
     assert(softpc_compat_set_console_buffer_size(NULL, final_cell));
+    assert(softpc_standalone_text_surface(&surface, &columns, &rows, &stride, &cell_bytes));
+    assert(columns == 80u && rows == 50u && stride == 80u);
+    cells = surface;
 
     final_cell.X = 78;
     final_cell.Y = 49;
@@ -266,7 +272,7 @@ int main(void)
     assert(!softpc_compat_fill_console_character(NULL, 'Z', 1u, invalid,
         &written));
     assert(written == 0u);
-    assert(character_at(cells, 0u, 0u, stride, cell_bytes) == ' ');
+    assert(character_at(cells, 0u, 0u, stride, cell_bytes) == 0u);
 
     softpc_machine_destroy(machine);
     assert(remove(path) == 0);

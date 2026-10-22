@@ -186,10 +186,10 @@ static lib_bool snapshot_has_pixels(emulator_machine *machine, lib_u32 colour)
             emulator_machine_run_generation(machine)) && frame->frame.graphics) {
         lib_size i;
         found = LIB_TRUE;
-        for (i = 0; i < frame->data.graphics.height * frame->data.graphics.stride; ++i)
-            if (frame->data.graphics.pixels[i] != colour) { found = LIB_FALSE; break; }
+        for (i = 0; i < frame->data.graphics->height * frame->data.graphics->stride; ++i)
+            if (frame->data.graphics->pixels[i] != colour) { found = LIB_FALSE; break; }
     }
-    lib_release(frame);
+    kvm_window_frame_release(frame); lib_release(frame);
     return found;
 }
 

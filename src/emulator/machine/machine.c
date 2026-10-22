@@ -8,7 +8,7 @@ struct emulator_machine {
     emulator_machine_input_queue input_queue;
     kvm_frame_exchange *frames;
     kvm_frame_exchange *console_frames;
-    void (*console_status_source)(void *context, kvm_console_text_frame *frame);
+    lib_status (*console_status_source)(void *context, kvm_console_text_frame *frame);
     void *console_status_context;
     base_sync_mutex *frame_lock;
     base_sync_mutex *request_lock;
@@ -99,8 +99,10 @@ static lib_status emulator_machine_publish(emulator_machine *machine)
     if (status != LIB_STATUS_OK || !produced) return status;
     status = kvm_window_frame_validate(frame);
     if (status != LIB_STATUS_OK) return status;
-    if (frame->graphics && machine->console_status_source != LIB_NULL)
-        machine->console_status_source(machine->console_status_context, console);
+    if (frame->graphics && machine->console_status_source != LIB_NULL) {
+        status = machine->console_status_source(machine->console_status_context, console);
+        if (status != LIB_STATUS_OK) return status;
+    }
     if (!frame->graphics || machine->console_status_source != LIB_NULL) {
         status = kvm_console_text_frame_validate(console);
         if (status != LIB_STATUS_OK) return status;
@@ -618,10 +620,10 @@ lib_status emulator_machine_create(emulator_machine **out_machine,
     if (status == LIB_STATUS_OK) status = emulator_machine_input_queue_initialize(&machine->input_queue);
     if (status == LIB_STATUS_OK)
         status = kvm_frame_exchange_create(&machine->frames,
-            sizeof(kvm_window_frame_storage));
+            sizeof(kvm_window_frame_storage), kvm_window_frame_retire);
     if (status == LIB_STATUS_OK)
         status = kvm_frame_exchange_create(&machine->console_frames,
-            sizeof(kvm_console_text_frame));
+            sizeof(kvm_console_text_frame), kvm_console_frame_retire);
     if (status == LIB_STATUS_OK)
         status = base_sync_task_create(emulator_machine_worker, machine, &machine->worker);
     if (status != LIB_STATUS_OK) {
@@ -818,7 +820,7 @@ kvm_frame_exchange *emulator_machine_console_exchange(emulator_machine *machine)
 { return machine == LIB_NULL ? LIB_NULL : machine->console_frames; }
 
 void emulator_machine_set_console_status_source(emulator_machine *machine,
-    void (*produce)(void *context, kvm_console_text_frame *frame), void *context)
+    lib_status (*produce)(void *context, kvm_console_text_frame *frame), void *context)
 {
     if (machine == LIB_NULL) return;
     machine->console_status_source = produce;

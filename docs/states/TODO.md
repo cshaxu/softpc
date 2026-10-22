@@ -21,6 +21,15 @@
   with cannot compose machine. Some attempts failed even after RDP was Active;
   later unchanged package tests pass. These are distinct observations, not
   proof that all stage-3 failures share one cause.
+  T98 S8 also observed these failures while Active: a live child with blank
+  31x30 buffer/cursor 0,0, and a separate pre-attach exit 0xC0000142. Ordinary
+  package subsequently passed on both architectures while compact failed.
+  The temporary diagnostic was removed; no causal repair is claimed.
+  A subsequent S8 probe proved one live child reached the unchanged prompt
+  another 5157 ms after the five-second check. The startup-only test budget
+  was corrected to 30 seconds, without a retry or product timeout change.
+  This does not explain the separate initialization exits or prove that all
+  attach/prompt failures are timing-budget failures.
 
 - TODO(Medium): Audit original VGA cursor-off bit handling. T98 S6's actual
   port test observed start=0x20/end=15 producing PCDisplay visible=true,

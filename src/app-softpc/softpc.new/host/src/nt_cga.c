@@ -44,6 +44,7 @@
 #include "nt_cga.h"
 #include "nt_cgalt.h"
 #include "nt_det.h"
+#include "dib_surface.h"
 
 
 
@@ -267,6 +268,12 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
     if (pScreenText == NULL || len <= 0 || height <= 0)
         return;
 
+    /* Host sharing storage follows the selected painter, not a fixed 80-column
+       Console allocation. Keep the original copying and source-stride path. */
+    if (ScreenX < 0 || ScreenY < 0 || now_width <= 0 || now_height <= 0 ||
+        !softpc_standalone_text_prepare(now_width, now_height))
+        return;
+
     /*:: Clip requested re-paint region to currently selected console buffer */
 
     //Clip width
@@ -307,8 +314,8 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 		org_height,clen);
     }
 
-    /* Bulk copying requires matching source and fixed shared-buffer strides. */
-    if (get_chars_per_line() == 80 && get_offset_per_line()/2 == 80)
+    /* Bulk copying requires matching source and shared-buffer strides. */
+    if (get_chars_per_line() == now_width && get_offset_per_line()/2 == now_width)
     {
 	//
 	// Slam Dunk Screen text buffer into shared buffer
@@ -321,10 +328,7 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
     }
     else
     {
-	// the sharing buffer width never changes((80 chars, decided at the
-	// moment we make the RegisterConsoleVDM call to the console).
-	// We have to do some transformation when our screen width is not
-	// 80.
+	// The sharing buffer uses the selected painter width.
 
 	// note that the sharing buffer has different format on x86 and RISC
 	// platforms. On x86, a cell is defined as:
@@ -347,13 +351,13 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 
 	/*::::::::::::::::::::::::::::::::::::::::::::: Construct output buffer */
 	//Start location of repaint region
-	to = &textBuffer[(ScreenY*80 + ScreenX) * TEXT_INCVAL];
+	to = &textBuffer[(ScreenY*now_width + ScreenX) * TEXT_INCVAL];
 
 	for(lines = height; lines; lines--)
 	{
 	    RtlCopyMemory(to, pScreenText, clen * TEXT_INCVAL);	// copy this line
 	    pScreenText += (get_offset_per_line()/2) * TEXT_INCVAL;	// update src ptr
-	    to += 80 * TEXT_INCVAL;				// update dst ptr
+	    to += now_width * TEXT_INCVAL;			// update dst ptr
 	}
     }
 

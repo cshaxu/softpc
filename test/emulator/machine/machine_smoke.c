@@ -96,7 +96,7 @@ int main(void)
     lib_test_assert(emulator_machine_create(&machine, &driver) == LIB_STATUS_OK);
     lib_test_assert(emulator_machine_published_frame_run_generation(LIB_NULL) == 0u);
     lib_test_assert(emulator_machine_published_frame_run_generation(machine) == 0u);
-    (void)kvm_window_frame_begin_text(&frame);
+    lib_test_assert(kvm_window_frame_prepare_text(&frame, 80u, 50u, 80u) == LIB_STATUS_OK);
     frame.frame.sequence = 77u;
     lib_test_assert(!emulator_machine_copy_published_frame(machine, &frame,
         emulator_machine_run_generation(machine)));
@@ -109,13 +109,10 @@ int main(void)
     lib_test_assert(lib_win32_interlocked_compare_exchange(&fake.resets, 0, 0) == 1);
     generation = emulator_machine_run_generation(machine);
     lib_test_assert(emulator_machine_published_frame_run_generation(machine) == generation);
-    lib_memory_set(&frame, 0xa5, sizeof(frame));
+    kvm_window_frame_release(&frame);
     lib_test_assert(emulator_machine_copy_published_frame(machine, &frame, generation));
     lib_test_assert(frame.frame.text != LIB_NULL && generation == emulator_machine_run_generation(machine));
     lib_test_assert(!frame.frame.graphics);
-    for (lib_size i = lib_offsetof(kvm_window_frame_storage, data) + sizeof(frame.data.text);
-            i < sizeof(frame); ++i)
-        lib_test_assert(((const lib_u8 *)&frame.frame)[i] == 0xa5);
     {
         lib_u32 sequence = frame.frame.sequence;
         lib_test_assert(!emulator_machine_copy_published_frame(machine, &frame, generation + 1u));
@@ -181,7 +178,7 @@ int main(void)
         lib_test_assert(emulator_machine_copy_published_frame(machine, &frame,
             emulator_machine_run_generation(machine)));
         lib_test_assert(frame.frame.text != LIB_NULL && !frame.frame.graphics &&
-            frame.frame.sequence > sequence && frame.data.text.base.text_rows == KVM_TEXT_ROWS);
+            frame.frame.sequence > sequence && frame.data.text->base.text_rows == 50u);
     }
     lib_test_assert(emulator_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     lib_test_assert(emulator_machine_debug_execute_with_lease(machine, &lease,
@@ -264,5 +261,6 @@ int main(void)
         lib_test_assert(emulator_machine_destroy(machine) == LIB_STATUS_OK);
     }
     machine_fake_dispose(&fake);
+    kvm_window_frame_release(&frame);
     return 0;
 }

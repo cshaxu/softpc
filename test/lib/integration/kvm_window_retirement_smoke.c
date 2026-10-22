@@ -248,7 +248,7 @@ static void check_delayed_destroy(void)
 
 int main(void)
 {
-    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage)) == LIB_STATUS_OK);
+    lib_test_assert(kvm_frame_exchange_create(&frames, sizeof(kvm_window_frame_storage), kvm_window_frame_retire) == LIB_STATUS_OK);
     static kvm_window_frame_storage frame;
     for (scenario = 0; scenario != 24; ++scenario) {
         kvm_window_options options = { 0 };
@@ -277,8 +277,8 @@ int main(void)
         }
         lib_test_assert(kvm_window_create(&window, &options) == LIB_STATUS_OK);
         lib_test_assert(lib_win32_wait_for_single_object(waiting, LIB_WIN32_INFINITE) == LIB_WIN32_WAIT_OBJECT_0);
-        (void)kvm_window_frame_begin_text(&frame); frame.data.text.base.text_columns = 80u; frame.data.text.base.text_rows = 25u;
-        frame.data.text.base.cursor_mode=KVM_CURSOR_HOST; frame.data.text.base.font_height=16; frame.data.text.base.cursor[0] = (kvm_text_cursor_span){ 14, 2u };
+        lib_test_assert(kvm_window_frame_prepare_text(&frame, 80u, 50u, 80u) == LIB_STATUS_OK); frame.data.text->base.text_columns = 80u; frame.data.text->base.text_rows = 25u;
+        frame.data.text->base.cursor_mode=KVM_CURSOR_HOST; frame.data.text->base.font_height=16; frame.data.text->base.cursor[0] = (kvm_text_cursor_span){ 14, 2u };
         lib_test_assert(test_window_frame(window, frames, &frame.frame) == LIB_STATUS_OK);
         if(scenario==18) {
             void *retained=window->worker_state;
@@ -312,5 +312,6 @@ int main(void)
     }
     check_delayed_destroy();
     kvm_frame_exchange_destroy(frames);
+    kvm_window_frame_release(&frame);
     return 0;
 }

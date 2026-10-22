@@ -16,12 +16,12 @@ void kvm_window_map_dirty_rect(const kvm_window_rect *source, const kvm_window_r
         source_width == 0u || source_height == 0u) return;
     width = display->right - display->left;
     height = display->bottom - display->top;
-    target->left = display->left + source->left * width / (lib_i32)source_width;
-    target->top = display->top + source->top * height / (lib_i32)source_height;
-    target->right = display->left + (source->right * width +
-        (lib_i32)source_width - 1) / (lib_i32)source_width;
-    target->bottom = display->top + (source->bottom * height +
-        (lib_i32)source_height - 1) / (lib_i32)source_height;
+    target->left = display->left + (lib_i32)((lib_i64)source->left * width / source_width);
+    target->top = display->top + (lib_i32)((lib_i64)source->top * height / source_height);
+    target->right = display->left + (lib_i32)(((lib_i64)source->right * width +
+        source_width - 1u) / source_width);
+    target->bottom = display->top + (lib_i32)(((lib_i64)source->bottom * height +
+        source_height - 1u) / source_height);
     if (target->right <= target->left) target->right = target->left + 1;
     if (target->bottom <= target->top) target->bottom = target->top + 1;
 }
@@ -113,12 +113,12 @@ lib_u32 kvm_window_cursor_rects(const kvm_window_frame *frame, const kvm_window_
     height = display->bottom - display->top;
     if (width <= 0 || height <= 0) return 0u;
     cell_top = (lib_i32)((lib_i64)frame->text->base.cursor_row*height/frame->text->base.text_rows);
-    cell_bottom = (lib_i32)((lib_i64)(frame->text->base.cursor_row+1)*height/frame->text->base.text_rows);
+    cell_bottom = (lib_i32)(((lib_i64)frame->text->base.cursor_row+1)*height/frame->text->base.text_rows);
     for (lib_u32 i = 0u; i < count; ++i) {
         kvm_window_rect *cursor = &cursors[written];
         lib_u32 top = spans[i].start, bottom = top + spans[i].height;
         cursor->left = display->left+(lib_i32)((lib_i64)frame->text->base.cursor_column*width/frame->text->base.text_columns);
-        cursor->right = display->left+(lib_i32)((lib_i64)(frame->text->base.cursor_column+1)*width/frame->text->base.text_columns);
+        cursor->right = display->left+(lib_i32)(((lib_i64)frame->text->base.cursor_column+1)*width/frame->text->base.text_columns);
         cursor->top = display->top+cell_top+(lib_i32)(
             (lib_i64)(cell_bottom-cell_top)*top/font_height);
         cursor->bottom = display->top+cell_top+(lib_i32)(

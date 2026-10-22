@@ -516,8 +516,11 @@ static void win32_window_consume_frame(lib_win32_hwnd window,
             goto failed;
         }
     }
-    if (!kvm_window_frame_size(context->frame, &width, &height) ||
-        !win32_window_ensure_surface(window, context, width, height)) {
+    if (!kvm_window_frame_size(context->frame, &width, &height)) {
+        kvm_component_fail(&context->component->base, LIB_STATUS_UNSUPPORTED);
+        goto failed;
+    }
+    if (!win32_window_ensure_surface(window, context, width, height)) {
         kvm_component_fail(&context->component->base, LIB_STATUS_IO_ERROR);
         goto failed;
     }

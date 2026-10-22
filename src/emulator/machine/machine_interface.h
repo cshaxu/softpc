@@ -138,12 +138,14 @@ kvm_frame_exchange *emulator_machine_console_exchange(emulator_machine *machine)
  * producer fills the same four-slot stream as the driver's text output.
  * Context must remain alive until Machine shutdown; callback performs no UI I/O. */
 void emulator_machine_set_console_status_source(emulator_machine *machine,
-    void (*produce)(void *context, kvm_console_text_frame *frame), void *context);
+    lib_status (*produce)(void *context, kvm_console_text_frame *frame), void *context);
 /* Observe metadata only; both leaf exchanges retain their own payloads. */
 lib_bool emulator_machine_read_presentation(emulator_machine *machine,
     lib_u32 run_generation, lib_u32 *sequence, lib_bool *graphics);
-/* Explicit diagnostic copy, not presentation transport. Rejection leaves the
- * destination unchanged; content, sequence and route are one snapshot. */
+/* Explicit diagnostic copy into zero-initialized, caller-owned storage, not
+ * presentation transport. Missing/stale publication leaves it unchanged;
+ * allocation failure may empty it. Release it with kvm_window_frame_release.
+ * Content, sequence and route are one snapshot. */
 lib_bool emulator_machine_copy_published_frame(emulator_machine *machine,
     kvm_window_frame_storage *destination, lib_u32 run_generation);
 lib_u32 emulator_machine_published_frame_sequence(const emulator_machine *machine);

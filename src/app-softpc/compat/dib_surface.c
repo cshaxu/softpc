@@ -14,16 +14,7 @@
 #define SOFTPC_DIB_MAX_WIDTH 1280u
 #define SOFTPC_DIB_MAX_HEIGHT 768u
 #define SOFTPC_DIB_COLOURS 256u
-#define SOFTPC_TEXT_COLUMNS 80u
-#define SOFTPC_TEXT_ROWS 50u
 #define SOFTPC_TEXT_CELL_BYTES 4u
-/* nt_text's original 80-column fast path indexes the shared text surface
-   with the controller's physical character stride, rather than its visible
-   width.  Setup temporarily programs 132-column / tall text geometries while
-   probing video hardware, so the standalone backing store must accommodate
-   that original contract even though the console presenter exposes 80x50. */
-#define SOFTPC_TEXT_STORAGE_COLUMNS 160u
-#define SOFTPC_TEXT_STORAGE_ROWS 200u
 
 static BITMAPINFO *softpc_dib_info;
 static unsigned char *softpc_dib_bits;
@@ -171,6 +162,25 @@ void softpc_standalone_dib_invalidate_all(void)
    sharing buffer becomes standalone-owned storage; the frontend consumes it
    through the DIB/text presenter instead of a console server. */
 PBYTE textBuffer;
+static unsigned long softpc_text_columns, softpc_text_rows;
+
+void softpc_standalone_text_release(void)
+{
+    lib_release(textBuffer);
+    textBuffer = NULL;
+    softpc_text_columns = softpc_text_rows = 0u;
+}
+
+int softpc_standalone_text_prepare(unsigned long columns, unsigned long rows)
+{
+    if (columns == 0u || rows == 0u ||
+        (lib_size)columns > LIB_SIZE_MAX / rows / SOFTPC_TEXT_CELL_BYTES) return 0;
+    if (textBuffer && columns == softpc_text_columns && rows == softpc_text_rows) return 1;
+    softpc_standalone_text_release();
+    softpc_text_columns = columns; softpc_text_rows = rows;
+    textBuffer = lib_allocate_zero((lib_size)columns * rows, SOFTPC_TEXT_CELL_BYTES);
+    return textBuffer != NULL;
+}
 
 int softpc_standalone_dib_init(void)
 {
@@ -178,8 +188,8 @@ int softpc_standalone_dib_init(void)
     lib_size bitmap_bytes;
 
     if (softpc_dib_bits != NULL) {
-        if (softpc_dib_info == NULL || softpc_dib_painter_bits == NULL ||
-            textBuffer == NULL) return 0;
+        if (softpc_dib_info == NULL || softpc_dib_painter_bits == NULL) return 0;
+        if (textBuffer == NULL && !softpc_standalone_text_prepare(80u, 25u)) return 0;
         if (softpc_dib_width == 0u || softpc_dib_height == 0u)
             softpc_standalone_dib_set_default_geometry();
         return 1;
@@ -213,10 +223,7 @@ int softpc_standalone_dib_init(void)
     sc.ConsoleBufInfo.hMutex = NULL;
     sc.PC_W_Width = SOFTPC_DIB_MAX_WIDTH;
     sc.PC_W_Height = SOFTPC_DIB_MAX_HEIGHT;
-    if (textBuffer == NULL)
-        textBuffer = (PBYTE)lib_allocate_zero(SOFTPC_TEXT_STORAGE_COLUMNS *
-            SOFTPC_TEXT_STORAGE_ROWS, SOFTPC_TEXT_CELL_BYTES);
-    if (textBuffer == NULL) return 0;
+    if (!softpc_standalone_text_prepare(80u, 25u)) return 0;
     DIBData = (char *)softpc_dib_bits;
     MonoDIB = softpc_dib_info;
     CGADIB = softpc_dib_info;
@@ -389,9 +396,9 @@ int softpc_standalone_text_surface(const void **cells_out,
         stride_out == NULL || cell_bytes_out == NULL || textBuffer == NULL)
         return 0;
     *cells_out = textBuffer;
-    *columns_out = SOFTPC_TEXT_COLUMNS;
-    *rows_out = SOFTPC_TEXT_ROWS;
-    *stride_out = SOFTPC_TEXT_COLUMNS;
+    *columns_out = softpc_text_columns;
+    *rows_out = softpc_text_rows;
+    *stride_out = softpc_text_columns;
     *cell_bytes_out = SOFTPC_TEXT_CELL_BYTES;
     return 1;
 }
@@ -413,18 +420,18 @@ int softpc_standalone_text_surface_geometry(unsigned long *columns_out,
 {
     if (columns_out == NULL || rows_out == NULL || textBuffer == NULL)
         return 0;
-    *columns_out = SOFTPC_TEXT_COLUMNS;
-    *rows_out = SOFTPC_TEXT_ROWS;
+    *columns_out = softpc_text_columns;
+    *rows_out = softpc_text_rows;
     return 1;
 }
 
 int softpc_standalone_text_surface_write_cell(unsigned long column,
     unsigned long row, unsigned long byte_offset, unsigned char value)
 {
-    if (textBuffer == NULL || column >= SOFTPC_TEXT_COLUMNS ||
-        row >= SOFTPC_TEXT_ROWS || byte_offset >= SOFTPC_TEXT_CELL_BYTES)
+    if (textBuffer == NULL || column >= softpc_text_columns ||
+        row >= softpc_text_rows || byte_offset >= SOFTPC_TEXT_CELL_BYTES)
         return 0;
-    textBuffer[(row * SOFTPC_TEXT_COLUMNS + column) *
+    textBuffer[((lib_size)row * softpc_text_columns + column) *
         SOFTPC_TEXT_CELL_BYTES + byte_offset] = value;
     softpc_text_dirty = 1;
     return 1;

@@ -13,6 +13,9 @@ typedef struct _CONSOLE_GRAPHICS_BUFFER_INFO {
 } CONSOLE_GRAPHICS_BUFFER_INFO, *PCONSOLE_GRAPHICS_BUFFER_INFO;
 
 int softpc_standalone_dib_init(void);
+/* Original text painter's destination, sized before its existing copies. */
+int softpc_standalone_text_prepare(unsigned long columns, unsigned long rows);
+void softpc_standalone_text_release(void);
 int softpc_standalone_dib_surface(const void **bits_out, const void **info_out,
     unsigned long *width_out, unsigned long *height_out);
 /* Bind the DIB allocated by original nt_graph::CreateSpcDIB to standalone
