@@ -35,8 +35,9 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
   initialization exits remain disclosed in TODO, not claimed repaired.
   Production +431/-190 (net +241); tests +767/-564 (net +203). Only Lib and
   Emulator src/test public trees change; App integration and one narrow mirror
-  host-stride repair (+12/-8) complete the path. Executor push/review pending;
-  owner acceptance and S9 admission have not occurred.
+  host-stride repair (+12/-8) complete the path. Executor f2677d01 is pushed;
+  coordinator actual-change review is complete with no delivery blocker.
+  S8 is verified awaiting owner acceptance; S9 admission has not occurred.
   softpc32 SHA-256 E9E574CE63573AB1C8346470528BA70908552D663FC174654813A6B9A3E42BAD;
   softpc64 SHA-256 5012E3AD96F289752AF6681C64A4B4C048F23F25DAF613F68024A4BAC35A88C2.
   User INI/media and pre-existing untracked snapshot.debug are preserved.

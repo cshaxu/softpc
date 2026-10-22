@@ -400,8 +400,25 @@ Owner INI and media are unchanged; pre-existing untracked snapshot.debug is
 preserved and excluded from delivery. Temporary diagnostics were removed;
 concise results are promoted here before disposable task work is retired.
 The public changed-tree list above is the downstream import surface; no root
-test infrastructure changed. A fixed pushed executor commit is recorded by
-the subsequent actual-change review, not an uncommitted import baseline.
+test infrastructure changed.
+
+S8 actual-change coordinator review: reviewed pushed executor
+f2677d01767d6b46c57a265cb3982cb3bb1a092a against the admitted ownership,
+allocation and producer/consumer requirements. The actual exchange retirement,
+leaf allocations, Console native extent handling, Emulator publication, App
+stride integration and test-fixture changes preserve a single transport path.
+Held readers remain immutable; allocation failure cannot publish partial data.
+The four X86 public trees, root test infrastructure, user INI and media have no
+changes. The sole mirror change is the documented host text stride/preflight.
+Actual production/test accounting and published hashes match the qualification
+above; Git whitespace checks pass. No new delivery blocker was found.
+
+The fixed executor commit is the downstream import baseline, not a claim that
+any downstream repository has imported it. Historical startup exits remain
+explicitly deferred in TODO; the measured first-prompt fixture budget correction
+does not claim to repair them. Task scratch is retired after evidence promotion,
+retaining only reusable caches and the owner's untracked snapshot. S8 is ready
+for owner acceptance; neither S9 nor T98 closure is automatically admitted.
 
 ### S6 - Text decoration and cursor design
 
