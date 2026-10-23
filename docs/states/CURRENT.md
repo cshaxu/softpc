@@ -7,16 +7,16 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs public-eight-tree quality audit; confirmed issues repurpose S5 for public quality repair planning and transfer former S5 intact to planned S6. This delivery is audit and scope revision, not implementation. |
+| Admission And Approval | Owner approves the minimal unified S5 repair: Broker retirement/cleanup, PCM creation rollback and UI/Product ownership adaptation; build, publish, fully test, commit/push and await acceptance. Former private research remains planned S6. |
 | Objective | Resolve the confirmed Console broker retirement/cleanup ownership gap with a minimal single-path plan; review public package quality without speculative redesign. |
-| Non-goals | No production edits in this audit delivery, private CPU repair, input/frame redesign, guest/media changes, downstream access, startup retry or timeout relaxation. |
+| Non-goals | No private CPU repair, input/frame redesign, guest/media changes, downstream access, startup retry, timeout relaxation or new lifecycle framework. |
 | Reference Baseline | cf60e14f; accepted S4 and owner INI are unchanged. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Eight public src/test trees reviewed; confirmed repair candidate is Lib Console broker and existing owner-local tests. Documentation only changes now; no ABI change. |
+| Files And ABI Surface | Six production C files in Lib Broker/PCM and Emulator UI/Product, existing owner-local tests and contracts/manifests. Broker/UI destroy consume on ordinary return; no signature or layout change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Source audit and documentary governance/diff checks now. Before repair, extend actual owner-local failure fixtures; implementation requires cached dual builds, focused/public tests and affected native/package regression. Prior S4 results are not fresh audit tests. |
+| Verification | Cached dual builds and published EXEs; focused failure regressions followed by every registered test per width, partitioned into background, native_audio and desktop groups. Record inventory and exact counts; no skips or concealed retries. Prior S4 evidence is not current proof. |
 | Expected Markers | Distinguish confirmed reader exit from reader I/O status and subsequent cleanup errors; prove no inaccessible ownership remains on safely recoverable create failure. |
-| Asset Needs | Preserve published EXEs, INI, snapshots and media. No Computer Use or downstream changes. |
+| Asset Needs | Publish both EXEs; preserve owner INI, snapshots and media. No Computer Use or downstream changes. |
 | Reporting Requirements | Source proof, dynamic proof and unknowns separately. S5 owns build/t99-s5: 60-minute job, 10-minute no-progress investigation, 300MB; retire unused scratch before delivery. |
 | Stop Conditions | Do not equate an I/O error with an unjoined worker, hide errors, add retry/owner state machines or expand into private S6 research. |
 | Exit Criteria | Source findings and bounded coverage recorded, then minimally repaired and verified after implementation brief; actual diff reviewed and owner acceptance obtained. This audit does not close S5. |
@@ -24,9 +24,15 @@
 | Similar-Issue Sweep | Broker create/replace/cancel/destroy, reader exit and backend cleanup; compare existing KVM/PCM lifecycle ownership without assuming their failure contracts are identical. |
 
 S4 is owner-accepted and closed; see [closure](../history/M9-T99-S4-console-retirement.md).
-S5 is active public quality audit/repair planning. Former S5's five private
+S5 is implemented and verified, awaiting owner acceptance. Former S5's five private
 research cases transfer intact to planned S6; S6 is not active. T99 remains open.
-No production or test code changed in this audit delivery.
+Against 164a5f70, production C/H is +72/-78 (net -6), test C +88/-49
+(net +39), test CMake/fixture +20/-5. Cached dual builds publish both EXEs;
+focused tests pass 12/12 each and full qualification passes 192/192 each
+(184 background, three native audio, five desktop/package), exact registered
+name equality, zero failures/skips. No non-mirror compiler warnings. Contracts,
+failure evidence and self-review are recorded in the proposal. INI/media,
+App/mirror and X86 trees are unchanged. No S6 work is admitted.
 
 ### Historical S4 verification and research
 

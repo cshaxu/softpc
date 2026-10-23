@@ -4,6 +4,84 @@
 
 ### Current S5 quality audit and S6 transfer
 
+#### Approved S5 implementation qualification
+
+Owner approves the unified minimal repair after the audit delivery 164a5f70.
+Frozen production scope: Broker root/native owner, PCM root/native creation
+cleanup, Emulator UI and Product (six C files), with directly affected contracts,
+existing owner-local fixtures and manifests. No Base, Types, X86, App or mirror
+implementation change is admitted. Broker/UI destroy consume on ordinary return;
+Machine/private owner failures and public PCM destroy retain their existing
+contracts. No new lifecycle state, callback, recovery thread or retry is added.
+
+Finite verification ledger: inventory both cached CTest trees after configure;
+every registered name belongs to background, native_audio or desktop. Require
+the complete union per architecture with no skipped/failing cases, plus focused
+Broker/PCM/UI/Product tests. Expected universe is 192 names per width. Native
+audio availability and desktop/package readiness are separately reported.
+Retain initial failures and their dispositions rather than calling an unchanged
+rerun a repair. All jobs use S5 scratch and CURRENT's finite budgets.
+
+Source review checks: completed-reader I/O failure still closes its handle;
+post-join cleanup continues and reports first error; failed creation releases
+the process claim; unconfirmed exit terminates without atexit; UI consumption
+propagates through both normal and failed-assembly Product paths. Protected
+Machine/driver ownership barriers remain. Existing tests are extended rather
+than new production test entry points or a second cleanup implementation.
+
+Initial configure failed because the new child-process wrapper attempted to
+register two existing CTest names twice. The registration now uses the existing
+lifetime-script registration loop with each test registered once; no test name
+is added or removed. This configure failure is not a product failure or pass.
+
+#### S5 executor verification and self-review
+
+Final cached x64/x86 builds publish both EXEs. Focused regressions pass 12/12
+per width. Full qualification passes 192/192 per width: 184 background, three
+native-audio and five desktop/package tests. Sorted actual passing names equal
+the frozen registration inventory exactly (192 unique names each); no failure,
+skip or individual-test retry occurs in this final run. Native tests run in an
+Active desktop session. Initial builds report only preserved mirror-header
+warnings; no public-package or other non-mirror compiler warning is present.
+
+Against 164a5f70, `git diff --numstat` counts six production C files +58/-69
+(net -11); including five contract headers, production C/H +72/-78 (net -6).
+Seven test C files total +88/-49 (net +39); existing test CMake/fixture script
+changes add +20/-5 (net +15). Documentation, manifests and two binary artifacts
+are counted separately. Only Lib and Emulator source/test public trees change;
+X86, App, original mirror, user INI and media remain unchanged. Root test
+infrastructure does not change.
+
+The retained path is stop, confirm worker exit, then independent cleanup.
+An exited reader's I/O status does not prevent handle disposal. Post-join
+flush/close/mode errors remain observable without retaining inaccessible
+objects. Raw and cooked handles are closed by ownership, not the mutable output
+alias. Broker/UI ordinary destroy returns consume their objects; Product clears
+those pointers and continues independent cleanup. Machine shutdown/unbind and
+private owner failures retain their existing dependency safety barriers; those
+later errors take precedence over an earlier UI cleanup error. Public PCM
+destroy ownership is unchanged; only creation rollback and the detached native
+wrapper are repaired. Linux unsupported paths create no worker/object and stay
+unchanged. No timeout, public signature, state, thread, retry or callback added.
+
+Similar-issue sweep uses `rg` for all Broker/UI destroy callers and inspects
+Broker create/replace/cancel/destroy, PCM root/native cleanup and Product normal
+and failed assembly. All actual consumers are adapted. Existing Window/Console
+worker ownership and Machine dependency barriers have distinct contracts and
+are retained, not mechanically rewritten. Source review found no new in-scope
+blocker. Tests exercise real worker retirement plus injected native failures;
+isolated child tests verify non-returning fatal exit without atexit cleanup.
+These are controlled fault proofs, not claims of naturally occurring OS handle
+failure, Linux runtime qualification, or repair of private S6 intermittency.
+
+Published SHA-256:
+- softpc32.exe: F74CBF62E248D46D8F28004A67D904CBE0C78CBC3C79407A1C2FA75418A7C811
+- softpc64.exe: BE3F330A1B9953FED8BD5FC623BDFE29608122D5139AA2740E2888A255FDF541
+
+Owned qualification jobs have exited. Concise evidence is promoted here before
+scratch retirement. S5 is verified pending committed-diff review and owner
+acceptance; S6 remains planned and T99 remains open.
+
 The owner's latest direction supersedes the historical S4/S5 split below:
 S5 now owns confirmed public-package quality issues; the former five-case
 private research packet transfers intact to planned S6. No private evidence

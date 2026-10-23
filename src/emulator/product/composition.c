@@ -67,14 +67,13 @@ static lib_status emulator_product_create(const emulator_product_machine *machin
 static lib_status emulator_product_destroy(emulator_product *product)
 {
     lib_status shutdown_status;
+    lib_status ui_status;
 
     if (product == LIB_NULL) return LIB_STATUS_OK;
     shutdown_status = emulator_machine_shutdown(product->emulator_machine);
     if (shutdown_status != LIB_STATUS_OK)
         return shutdown_status;
-    shutdown_status = emulator_ui_destroy(product->ui);
-    if (shutdown_status != LIB_STATUS_OK)
-        return shutdown_status;
+    ui_status = emulator_ui_destroy(product->ui);
     product->ui = LIB_NULL;
     emulator_session_destroy(product->session);
     product->session = LIB_NULL;
@@ -89,7 +88,7 @@ static lib_status emulator_product_destroy(emulator_product *product)
     if (shutdown_status != LIB_STATUS_OK)
         return shutdown_status;
     lib_release(product);
-    return LIB_STATUS_OK;
+    return ui_status;
 }
 
 static lib_status emulator_product_compose_machine(emulator_product *product)
@@ -157,10 +156,9 @@ static lib_status emulator_product_compose_ui(emulator_product *product,
     status = emulator_session_bind_ui(product->session, ui);
     if (status != LIB_STATUS_OK) {
         lib_status cleanup_status = emulator_ui_destroy(ui);
-
+        product->ui = LIB_NULL;
         if (cleanup_status != LIB_STATUS_OK)
             return cleanup_status;
-        product->ui = LIB_NULL;
         return status;
     }
     emulator_machine_set_console_status_source(product->emulator_machine,

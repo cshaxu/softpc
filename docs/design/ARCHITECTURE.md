@@ -467,8 +467,10 @@ Synchronous request rejection returns `lib_status`, with normal wait outcomes
 separated into output values. Ordinary synchronization and local cleanup stay
 inside their owning component. A failed public create leaves its output null;
 failed file close consumes the stream and cannot be retried. Expected local
-outcomes remain local; Base task/native-reader ownership failures still use
-the application's status boundary. Accepted KVM requests report
+outcomes remain local; Base task ownership failures still return status to their
+owner. Broker native-reader exit failures cannot return unsafe ownership.
+Broker/UI destroy consume on normal return while preserving cleanup errors;
+PCM failed creation cannot strand an inaccessible worker. Accepted KVM requests report
 asynchronous failure through the existing control-queue sink. No alternate
 event path exists.
 

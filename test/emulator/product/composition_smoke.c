@@ -215,9 +215,8 @@ lib_status emulator_ui_destroy(emulator_ui *ui)
 {
     if (ui == LIB_NULL) return LIB_STATUS_OK;
     ++fixture.ui_destroy_count;
-    if (fixture.ui_destroy_status != LIB_STATUS_OK) return fixture.ui_destroy_status;
     ui->live = LIB_FALSE;
-    return LIB_STATUS_OK;
+    return fixture.ui_destroy_status;
 }
 
 /* Staged assembly is implementation-private. Include this component's source
@@ -389,7 +388,7 @@ static lib_i32 composition_machine_cleanup_failure_recovers(void)
         fixture.emulator_machine_destroy_count == 2u && fixture.machine_destroy_count == 1u;
 }
 
-static lib_i32 composition_ui_destroy_failure_recovers(lib_bool binding_failed)
+static lib_i32 composition_ui_destroy_failure_consumes(lib_bool binding_failed)
 {
     emulator_product *app = LIB_NULL;
     emulator_session_options session_options = {0};
@@ -403,17 +402,10 @@ static lib_i32 composition_ui_destroy_failure_recovers(lib_bool binding_failed)
     fixture.ui_destroy_status = binding_failed ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
     if (emulator_product_compose_ui(app, &ui_options) !=
             (binding_failed ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK) ||
-        !fixture.ui.live) return 0;
+        fixture.ui.live == binding_failed) return 0;
     fixture.ui_destroy_status = LIB_STATUS_IO_ERROR;
-    if (emulator_product_destroy(app) != LIB_STATUS_IO_ERROR ||
-        !fixture.ui.live ||
-        !fixture.session.live || !fixture.emulator_machine.live ||
-        !fixture.machine.live || fixture.session_destroy_count != 0u ||
-        fixture.emulator_machine_destroy_count != 0u ||
-        fixture.machine_destroy_count != 0u) return 0;
-    fixture.ui_destroy_status = LIB_STATUS_OK;
-    return emulator_product_destroy(app) == LIB_STATUS_OK && composition_fixture_clean() &&
-        fixture.ui_destroy_count == (binding_failed ? 3u : 2u) &&
+    return emulator_product_destroy(app) == (binding_failed ? LIB_STATUS_OK : LIB_STATUS_IO_ERROR) &&
+        composition_fixture_clean() && fixture.ui_destroy_count == 1u &&
         fixture.session_destroy_count == 1u &&
         fixture.emulator_machine_destroy_count == 1u && fixture.machine_destroy_count == 1u;
 }
@@ -471,8 +463,8 @@ lib_i32 main(void)
         !composition_destroy_failure_recovers() ||
         !composition_initial_state_reports_enqueue_result() ||
         !composition_machine_cleanup_failure_recovers() ||
-        !composition_ui_destroy_failure_recovers(LIB_FALSE) ||
-        !composition_ui_destroy_failure_recovers(LIB_TRUE) ||
+        !composition_ui_destroy_failure_consumes(LIB_FALSE) ||
+        !composition_ui_destroy_failure_consumes(LIB_TRUE) ||
         !composition_run_formats_app_opening()) return 1;
     lib_c_printf("APP-COMPOSITION-ATOMICITY:OK\n");
     return 0;
