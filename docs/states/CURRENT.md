@@ -2,50 +2,38 @@
 
 ## Current Work
 
-Owner expands T99 to absorb all eight TODO entries after a current-source
-audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
-checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
-memory, S10 VGA cursor-disable, S11 SB-MIDI parsing and S12 Ninja integrity.
-The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S8 closes by owner-authorized advancement after verified delivery
-and review. S9 is implemented and verified for exact NXVM public-eight-tree import; the three
-previously planned tasks move in order to S10-S12. The owner accepts current passing native startup
-qualification without retaining the historical observation as deferred work.
-The separate performance Queue candidate remains.
+Owner accepts and closes S9 at reviewed delivery 46d821d4 and admits S10,
+original VGA cursor-disable research/design. T99 stays open. S11 SB-MIDI and
+S12 Ninja integrity remain planned, in that order. The proposal retains the
+eight transferred TODO items and their proof/dispositions; TODO is empty by
+transfer, not a blanket repair claim. The performance Queue candidate remains.
 
-## M9 T99 S9 Packet
+## M9 T99 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits exact NXVM eight-tree import and explicitly selects S9; former planned S9-S11 move in order to S10-S12. |
-| Objective | Import the reviewed immutable public source/test corpus exactly and qualify the complete standalone product. |
-| Non-goals | No root helper import, App/mirror edits, S10-S12 implementation, media/snapshot/INI changes or downstream edits. |
-| Reference Baseline | SoftPC 304cea4f; NXVM shared commit 04674703a9b0c977e94e7334450a022de3e6514c, unchanged in HEAD 197076521acf9e593a6c0340ae59fb5d617806f8. |
+| Admission And Approval | Owner: 收口s9 准入s10. S9 is accepted after executor a69fc1e0 and coordinator actual-diff review 46d821d4. S10 starts with current-source research/design under the existing approved sequence. |
+| Objective | Determine the original VGA cursor-disable defect, authoritative hardware semantics and minimum single-path repair with executable regression design. |
+| Non-goals | No production/test implementation before the researched diff is presented for approval; no public-eight-tree, frame transport, cursor styling, SB-MIDI, Ninja, guest, media, snapshot or INI change. |
+| Reference Baseline | SoftPC 46d821d4 and its S9 published dual EXEs; original necessary XP subset and existing mirror/local ledger remain authoritative. T98 S6 port evidence is historical, not a fresh reproduction. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | src/test pairs for lib, emulator, x86-debug and x86-ibmpc: 296 paths, six Emulator differences, no public API/ABI change; task records and refreshed dual EXEs. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy; executor then coordinator actual-diff review. |
-| Verification | Exact pinned paths/hashes, cached dual full builds, focused Emulator proof and complete background, desktop/package and audio tests; exact registered/executed names, manifests, dependency/Types/naming, documentation, mirror, whitespace and residue gates. |
-| Expected Markers | All 296 paths match pinned NXVM; Machine wake failures retain ERROR and Session enqueue preserves actual failure status without committing rejected work. |
-| Asset Needs | Preserve user INI and guest assets; refresh only dual EXEs. No Computer Use. |
-| Reporting Requirements | Actual diff, quality review, tests and limits, commits and EXE links. S9 owns build/t99-s9: 30-minute jobs, five-minute no-progress and 300MB budgets; retire scratch after evidence promotion and job exit. |
-| Stop Conditions | Report unreviewed upstream changes, scope/ABI drift or unexplained failures; no weakened tests, silent retries or unrelated imports. |
-| Exit Criteria | Exact equality, complete qualification/publication, executor commit/push, coordinator actual-diff review/push and clean worktree/scratch; await owner acceptance. |
-| Original Owner Request | 准入一个新的S任务，原样导入nxvm的公共八组件，老规矩，编译发布测试提交推送+代码质量审计后等我验收。 Correction: 现在你就是准入S9来做导入！S任务编号不得打乱。 |
-| Similar-Issue Sweep | Review changed Machine lifecycle signal/state transitions, Session enqueue/fault ordering, all callers and failure tests; preserve unique cancellation/queue ownership with no polling or second path. |
+| Files And ABI Surface | Initially task records only. Research traces original base/video/vga_prts.c 0x0A, do_new_cursor and other original cursor writers, Compat/Driver consumers and owner-local tests. No public API change planned. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, source/research policy and current design; original source remains sole hardware authority. |
+| Verification | Establish a finite VGA/EGA/V7 writer/consumer and behavior ledger; verify hardware references and actual register path. Design x86/x64 proof for disable-only toggles, enable/disable, start/end, shape/font and mode changes. Any long probe runs hidden with logged exit status; distinguish source, test and guest evidence. |
+| Expected Markers | A disable bit cannot be lost or overridden by subsequent original shape recomputation; valid shapes and card-specific semantics remain intact through the existing path. |
+| Asset Needs | Preserve existing dual EXEs, INI, media and snapshots during research. No Computer Use or downstream writes. |
+| Reporting Requirements | Current facts, exact root cause or remaining unknowns, minimum code example, production/test/mirror diff estimates and verification plan before implementation. S10 owns build/t99-s10 only if probes are needed: 30-minute jobs, five-minute no-progress, 300MB cap; promote findings and retire scratch. |
+| Stop Conditions | Report if hardware semantics are ambiguous, the fix requires a second cursor authority/public change or mirror scope exceeds approved research. Do not patch around an unproved root cause. |
+| Exit Criteria | Research yields a reviewed executable minimal proposal and honest evidence boundaries; implementation requires owner approval, then dual build/publication, proportionate full regression, mirror accounting, actual-diff review and push before owner acceptance. |
+| Original Owner Request | 收口s9 准入s10. Existing S10 plan: audit original VGA cursor-disable semantics, then propose a minimal original-path repair and port-level tests without changing shared text-frame transport. |
+| Similar-Issue Sweep | All original cursor visibility/shape writers, CRTC 0x0A/0x0B paths and protection/mode/font recomputation, plus Compat/Driver conversion; record each owner and disposition rather than add frontend compensation. |
 
-S9 matches all 296 pinned upstream files exactly, with six Emulator paths
-changed. Production +58/-20, tests +52/-2; no public ABI, App/mirror, root helper
-or user asset change. Cached dual builds refresh both EXEs without compilation
-warnings. Each width passes all 193 registrations (185 background, five desktop,
-three audio), exact name inventory, zero failures/skips/retries. Focused tests
-also pass. The proposal records hashes, scope, quality audit and proof limits.
-Documentation, mirror, whitespace and residue gates pass; owned jobs exited
-and task scratch is retired. Executor a69fc1e0 is pushed. Coordinator review
-of the actual twelve-path commit confirms exact import, unchanged public
-contracts/ownership and matching committed/published EXEs. No delivery blocker
-is found; S9 now awaits owner acceptance only;
-T99 stays open and S10-S12 are not admitted.
+S9 is accepted and closed; see its [closure](../history/M9-T99-S9-public-import.md).
+Its verified baseline remains: all 296 public paths equal the pinned NXVM
+commit; both cached builds refresh the EXEs and each architecture passes all
+193 tests. S10 admission changes documents only and does not rerun or supersede
+that qualification.
 
 ### S8 reviewed delivery (closed by owner-authorized advancement)
 

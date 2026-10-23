@@ -2,6 +2,32 @@
 
 ## Admission and scope
 
+### S10 admission: original cursor-disable research and design
+
+Owner request: 收口s9 准入s10. S9 is accepted and closed at reviewed delivery
+46d821d4; the [closure](../history/M9-T99-S9-public-import.md) retains its
+complete qualification. S10 is the next consecutive task. S11 SB-MIDI and
+S12 Ninja integrity remain planned; no task is skipped or reordered.
+
+Research first: trace CRTC 0x0A writes, original do_new_cursor and all other
+visibility/shape writers through Compat and Driver to the existing text frame.
+Recheck VGA, EGA and V7 semantics against authoritative hardware references.
+The current 0x0A code reads the pre-write cursor_off, updates the byte only
+when start scanline bits differ, then calls a shape routine that may set
+visibility true. These are source observations, not fresh dynamic proof or a
+complete root-cause finding. T98 S6's disabled-register observation remains
+historical evidence and does not establish the cause of perceived thin cursors.
+
+Deliver a finite writer/consumer and behavior ledger, exact minimum repair,
+line-count estimate (including original mirror delta), and owner-local tests
+for disable-only changes, enable/disable, shape/start/end, font and mode changes.
+Preserve original card-specific behavior and the existing single cursor owner.
+No public compensation, alternate renderer, polling or API change is planned.
+Implementation approval follows that researched proposal; this admission alone
+changes no production/test code or EXE and claims no new test execution.
+Only build/t99-s10 may hold disposable probes, with the CURRENT packet's
+budgets and mandatory evidence promotion/cleanup. INI and guest assets stay fixed.
+
 ### S9 admission: exact public-eight-tree import
 
 Owner admits the import as S9 and requires continuous numbering. The earlier
