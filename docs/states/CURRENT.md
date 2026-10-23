@@ -5,8 +5,9 @@
 T99 S14 implements the owner-approved minimum: 批准修复 按老规矩.
 Cached dual builds publish both EXEs and both full inventories pass 193/193.
 The single original VGA owner is repaired, not compensated in Lib; EGA/CGA
-and public eight trees are unchanged. Complete delivery and actual-commit
-review precede owner acceptance. S14/T99 stay open; no next S is admitted.
+and public eight trees are unchanged. Executor delivery 77326df5 is pushed
+and actual-commit reviewed. S14 now waits for owner acceptance; S14/T99 stay
+open and no next S is admitted.
 
 ## M9 T99 S14 Packet
 
@@ -20,7 +21,7 @@ review precede owner acceptance. S14/T99 stay open; no next S is admitted.
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
 | Files And ABI Surface | vga_prts.c do_new_cursor, existing App-local vga_frame_smoke, XP local manifest/repair ledger, task records and dual EXEs. No public API or snapshot schema changes. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy; original controller owns hardware semantics. |
-| Verification | Permanent actual-port/Driver cursor checks at 8/14/16/32 rows, snapshot register replay and existing disable/protection/underline coverage; cached Ninja/ccache dual builds and published package. Run every registered test on each architecture in disjoint background, desktop and native_audio groups; match executed/registered inventories with no skips. Audit mirror, dependencies, warnings outside the preserved source, whitespace and residue. |
+| Verification | Permanent actual-port/Driver cursor checks at font heights 8/14/16/32 scanlines, snapshot register replay and existing disable/protection/underline coverage; cached Ninja/ccache dual builds and published package. Run every registered test on each architecture in disjoint background, desktop and native_audio groups; match executed/registered inventories with no skips. Audit mirror, dependencies, warnings outside the preserved source, whitespace and residue. |
 | Expected Markers | Distinguish row numbering, inclusive versus exclusive end, true VGA hide versus EGA split, cell clipping and frontend scaling. Do not infer the entire historical thin-cursor symptom from one source formula. |
 | Asset Needs | Publish assets/binary softpc32.exe and softpc64.exe only. Preserve user INI, media and snapshot-midi; tests use disposable media and mock audio except explicit native integration; no Computer Use. |
 | Reporting Requirements | Record actual production/test/mirror line counts, source and dynamic evidence separately, single-owner quality review, hashes and full exact test inventories. S14 owns build/t99-s14: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence and retire scratch. |
