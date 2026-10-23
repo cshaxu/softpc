@@ -6,6 +6,16 @@
 
 #### S5 P6 final private-surface cleanup
 
+Owner-requested complete shared-unit rerun at 40c2860e: both architectures
+pass exactly 118/118 registered unit tests (Lib 73, Emulator 23, X86 Debug 12,
+X86 IBMPC 10), including their static gates. Sorted executed names match each
+architecture's independently queried CTest unit inventory; zero failures,
+disabled/skipped tests or retries. x64 takes 70.09 seconds; x86 57.90 seconds.
+Existing P6 binaries are reused, without rebuilding or changing production,
+tests, EXEs or configuration. Native desktop/audio and App tests are outside
+this requested unit universe. Hidden owned job 38432 exits zero; evidence is
+promoted here before retiring its task scratch.
+
 Owner approves the two residual audit items at eac62924. Move the Product
 opaque typedef to composition.c (no public function uses it); remove the
 static source-ID allocator's null-argument check. Its only production caller
