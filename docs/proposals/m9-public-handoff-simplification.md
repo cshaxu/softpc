@@ -2,6 +2,36 @@
 
 ## Admission and scope
 
+### S14 admission: original cursor-shape semantics
+
+Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;
+2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口.
+Move the sole remaining TODO here by admission, not by declaring a repair.
+Separately record accepted Td S22 closure; no runtime/source change follows
+from that governance disposition. S14 starts research/design at 889b309a;
+the performance Queue and T99 closure are outside scope.
+
+Finite research ledger: (1) authoritative VGA/V7 versus EGA row numbering,
+end inclusion, wrap and out-of-cell behavior; (2) original register/shape
+writers, adapter selection and host/Driver/frame/render consumers; (3) existing
+oracle/history and possible perceived-thickness regression; (4) fresh private
+x86/x64 actual-port/producer observations at font heights 8/14/16/32, including
+zero/equal/reversed/overscan/disabled shapes; (5) minimum original-path diff,
+mirror accounting and permanent test plan. Each needs proof or an explicit
+limit. Private counterfactuals are not shipping fixes. No second cursor owner,
+fallback, percentage reconstruction or public two-span capability removal.
+
+The transferred lead is retained in [S10 research](#s10-research-two-site-cursor-disable-repair):
+the original VGA path uses End-Start and splits End<Start, and the current
+fixture expects those values. Recheck against the selected adapter's primary
+manual before changing either implementation or oracle. This is an audit
+lead, not proof of the reported cursor-thickness symptom.
+
+Initial tracked production/test delta +0/-0. Preserve the S10 disable fix,
+genuine EGA semantics and existing Lib frame schema. A functional mirror
+repair requires the researched diff and owner decision first. Task-owned
+scratch is bounded in CURRENT and retired after evidence promotion.
+
 ### S13 admission: exact eight-tree test-ownership import
 
 Owner first requests a read-only audit of latest NXVM including uncommitted

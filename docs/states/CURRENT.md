@@ -2,12 +2,36 @@
 
 ## Current Work
 
-S13 is closed under the owner's explicit delegated closure after exact import,
-complete qualification and coordinator actual-commit review.
-No implementation subtask is active. T99 remains open for its separate completion audit; no next
-S or queued T is admitted. The VGA TODO and performance Queue remain unchanged.
+Owner admits T99 S14: 原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;
+把这个从TODO里面清理掉; Td S22 这个直接收口. S14 researches original
+hardware semantics and producer output before proposing any source repair.
+The VGA debt transfers out of TODO, not as a claim of repair. Td S22 is
+owner-closed; the performance Queue and open T99 are unchanged.
 
-Open task awaiting owner: T99.
+## M9 T99 S14 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. |
+| Objective | Establish exact VGA/V7 cursor start/end/zero/wrap/clipping semantics, trace original state to both text frames, and give an evidence-based minimal repair/test proposal; close accepted cache governance. |
+| Non-goals | No shipping source/test repair before the researched diff is presented; no public-eight-tree, renderer, guest/media/INI/snapshot change, generic EGA rewrite, performance work or T99 closure. |
+| Reference Baseline | Reviewed S13 889b309a, current S11 EXEs and S10 cursor-disable repair. S10's adjacent shape observation is a research lead, not new proof. Td S22 accepted delivery/review 7758a9c4/f805483f. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Initially task records and Td proposal archival only. Read vga_prts.c, ega_prts.c, cga.c, original BIOS shape/host conversion, Compat text style, Driver and existing VGA fixture. No public API planned. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy; original controller owns hardware semantics. |
+| Verification | Primary manuals with explicit adapter distinctions; original port/readback and actual producer frame observations on x86/x64 through private fixture-based probes; baseline versus any private counterfactual stays separate. Inspect current test oracles and history, then minimum production/test/mirror estimates. Governance/mirror/whitespace/residue gates. |
+| Expected Markers | Distinguish row numbering, inclusive versus exclusive end, true VGA hide versus EGA split, cell clipping and frontend scaling. Do not infer the entire historical thin-cursor symptom from one source formula. |
+| Asset Needs | Preserve EXEs, user INI, media and snapshot-midi; use disposable test media and mocked audio; no Computer Use or new external asset. |
+| Reporting Requirements | Record the finite semantic/caller ledger, actual source/dynamic proof, implementation estimate and remaining limits. S14 owns build/t99-s14: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence and retire scratch. |
+| Stop Conditions | Report conflicting hardware semantics, missing evidence, unavoidable source-policy expansion or a required new state/path; do not silently apply generic VGA rules to EGA or claim a private candidate shipped. |
+| Exit Criteria | Complete bounded research/design, minimum actionable diff and proof plan, actual-change review, committed/pushed task updates and Td closure, retired scratch; wait for owner repair decision. |
+| Original Owner Request | 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. |
+| Similar-Issue Sweep | All original cursor-shape writers/callers and consumers, zero/equal/reversed/out-of-cell shapes, font-height/adapter distinctions, both text leaves and existing test assertions. |
+
+S14 is researching, not implementing a repair. TODO is empty after transfer;
+Td S22 closure is recorded in history without rerunning or claiming new runtime
+qualification. The proposal owns research results and the minimum design.
 
 ## Technical Baseline
 
@@ -324,7 +348,7 @@ performance candidates are transferred to a separate unnumbered
 [queued proposal](../proposals/m9-runtime-performance-investigation.md);
 that performance candidate remains unnumbered and unadmitted.
 
-T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
+T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Owner now explicitly closes Td S22; its [closure](../history/M9-Td-S22-build-cache-governance.md) preserves delivery/review 7758a9c4/f805483f and verification limits.
 
 ## Current Technical Baseline
 

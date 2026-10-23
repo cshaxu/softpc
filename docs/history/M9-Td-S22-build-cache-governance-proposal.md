@@ -97,3 +97,9 @@ After confirming owned jobs ended, removed exact build/td-s22 scratch and ran
 Clean-Build.ps1 -Check successfully: only .ccache/.ninja remain. Raw logs are
 retired; the results above are retained. User snapshot.debug remains untouched.
 Owner acceptance and numeric T/S advancement are not assumed.
+
+## Owner closure
+
+Owner now explicitly requests: Td S22 这个直接收口. The
+[closure](M9-Td-S22-build-cache-governance.md) records acceptance of the reviewed
+delivery; no fresh build/runtime result or implicit T99 closure is added.
