@@ -28,6 +28,138 @@ changes no production/test code or EXE and claims no new test execution.
 Only build/t99-s10 may hold disposable probes, with the CURRENT packet's
 budgets and mandatory evidence promotion/cleanup. INI and guest assets stay fixed.
 
+#### S10 research: two-site cursor-disable repair
+
+Research baseline: 74461df9. Owner request: 老规矩 调研审计 设计.
+This delivery changes task records only. The candidate below is a private
+counterfactual, not an implemented product repair or refreshed release.
+
+**Hardware evidence.** IBM VGA/XGA Technical Reference, preliminary May 1992,
+VGA Function 2-65 defines CRTC 0A bit 5 as Cursor Off. Video Seven's V7 VGA
+Technical Reference, June 1988, 3-41 defines the same read/write disable bit
+and EREB[4] write protection. IBM EGA Technical Reference, August 1984, page
+33 instead marks the upper Cursor Start bits unused. Therefore the VGA fix
+belongs in vga_prts.c, not in a common Lib renderer or copied into EGA.
+Primary references consulted through their indexed manual text:
+
+- [IBM VGA/XGA manual](https://bitsavers.org/pdf/ibm/pc/cards/IBM_VGA_XGA_Technical_Reference_Manual_May92.pdf)
+- [Video Seven manual](https://www.bitsavers.org/components/video7/700-0242_V7_VGA_Technical_Reference_Manual_Jun88.pdf)
+- [IBM EGA manual](https://www.minuszerodegrees.net/oa/OA%20-%20IBM%20Enhanced%20Graphics%20Adapter.pdf)
+
+**Frozen ownership/call ledger.** Full source search for set_cursor_visible,
+PC_cursor_visible, cursor_start.as.abyte, do_new_cursor and their consumers
+finds the following distinct responsibilities, not interchangeable paths:
+
+- gvi.h owns the original PCDisplay visibility field and access macros.
+- vga_prts.c has nine visibility writes: seven in shape recomputation and two
+  premature 0A-handler writes. Its five recomputation callers are CRTC 09
+  (font height), 0A/0B (shape), 0E/0F (location). These form the repair universe.
+- ega_prts.c has eight visibility writes in its own shape routine; EGA is a
+  separate original adapter. cga.c has four for its mode/shape rules. Neither
+  path receives the VGA bit-5 repair. gvi_init selects the original adapter;
+  current config_inquire returns VGA (5), confirmed by both actual probes.
+- v7_ports.c EREB preserves the existing crtc_9_b_protect gate around writes.
+  The proposed assignment remains inside that gate; it cannot bypass protection.
+- gfx_updt.c base_cursor_shape_changed calls cursor_changed, increasing the
+  original video-dirty counter. No extra Machine/Session wake or dedup is needed.
+- host/src/nt_graph.c make_cursor_change consumes original visibility for the
+  native cursor and converts shape to a percentage. It does not own VGA policy.
+- compat/video.c presentation_text_style copies PCDisplay visibility/spans;
+  machine/driver.c calls it for both Window and Console texts after original
+  dirty production. Session and Lib consume those frames, not device registers.
+- Snapshot preserves original state through the existing archive; no field,
+  layout, extra cursor authority or snapshot-format change is proposed.
+
+**Root cause.** The 0A handler examines the old off bit, stores the new byte
+only if the low five start bits differ, then always recomputes shape. Thus
+0E->2E loses the disable-only write entirely. Changing start as well (2D)
+stores the bit but the shape routine sets visibility true again. End/location/
+font changes use that same routine and can override a disabled cursor too.
+Clearing only the off bit can likewise leave the stale register byte behind.
+The defective code is present in history 0e91ada1 and the XP-import delivery
+41aa0bc2. Since that import, vga_prts.c changes only by T98 S6's four underline
+refresh lines. This is a retained original-path defect, not S4 Console changes,
+the shared-library import or the newer two-span frame contract.
+
+**Dynamic proof.** Hidden research job 13216 exits normally with research.exit=0.
+The probe reuses the existing VGA fixture and exact cached compile/link commands,
+but emits only private objects/executables. It uses original outb/inb, original
+mode-3 BIOS dispatch and timer updates, then real Driver copy_frame. PCM/MIDI
+use the existing test mocks; no native desktop/audio or Computer Use is needed.
+Nine checkpoints observe register readback, PCDisplay visibility, produced and
+both leaf cursor modes: enabled; disable-only; disable+shape; end while disabled;
+location while disabled; enable-only; off+outside font; enabled+outside font;
+valid shape restored. For both x64/x86 the baseline violates six of nine
+contracts; the two-site candidate passes all nine (18/18 combined). Every
+checkpoint produces a frame through original dirty handling, with both leaves
+reporting the same mode. This is actual producer-chain proof, not a screenshot
+or a guest-application reproduction.
+
+The unchanged registered vga_frame_smoke also passes on both architectures
+(3.96s/7.54s), proving its current green result misses this defect. Its existing
+four shape samples never set bit 5. Full repository, desktop, native audio,
+font-change/protection stress and new snapshot cases were not run in this
+research, and are not represented as newly qualified. Two initial probe builds
+failed due to an omitted I/O prototype, then the legacy ios.h declaration mode;
+using the fixture's explicit native declaration style resolves the probe setup.
+Those are research fixture mistakes, not production build failures. The final
+four private baseline/candidate executions all return normally.
+
+**Recommended minimum.** Remove the premature visibility selection and the
+low-five-bit-only assignment guard. Store the actual register byte and call
+the one existing shape routine. Add off-bit handling to that routine's existing
+hidden branch, so every recomputation honors the same register authority:
+
+```c
+/* Inside the existing unprotected CRTC 0A branch. */
+crt_controller.cursor_start.as.abyte = value;
+do_new_cursor();
+
+/* In do_new_cursor, extend the existing hidden condition. */
+if (crt_controller.cursor_start.as_bfld.cursor_off ||
+    crt_controller.cursor_start.as_bfld.cursor_start >= (unsigned)get_char_height() ) {
+    /* Existing hidden handling, host notification and dirty tail unchanged. */
+}
+```
+
+Both changes are necessary: saving alone still lets shape re-enable the cursor;
+checking alone cannot see a discarded disable-only write. No new helper, state,
+lock, thread, timeout, polling, format or fallback is needed. Re-enabling uses
+the existing shape branches; invalid start rows remain hidden as before.
+The two local reason comments are the only added bookkeeping.
+
+**Estimated implementation scope.** One production file, vga_prts.c: measured
+private diff +5/-12, net -7, including two reason comments. This adds 17 changed
+lines to mirror accounting, not zero mirror diff and not a claim about the
+file's total historical patch. Existing underline/snapshot/ABI edits stay intact.
+Extend existing test/app-softpc/unit/machine/vga_frame_smoke.c in place,
+approximately +55..85/-0..5; no new target or framework. Update one XP manifest
+hash row and the existing local-change ledger. Shared eight trees, Compat,
+Driver, root CMake, firmware, user media/INI and snapshots need no production edit.
+
+Permanent proof should use explicit expected register/mode values, not merely
+mirror the implementation formula. Reuse the current fixture for enable/disable
+with unchanged start; disable+shape; end/location/font recomputation while off;
+font heights 8/14/16/32; out-of-cell start; V7-protected ignored write; re-enable
+and original mode transition. Observe produced plus both leaf frames without
+test-supplied dirty or host transaction. Retain existing shape/underline and
+snapshot regression. After approval: cached dual build/publication, focused
+tests and full registered x64/x86 regression including native integrations,
+exact inventory, mirror/manifest and quality review, then push and await acceptance.
+
+**Adjacent differences, not silently repaired.** The manuals also specify VGA
+End-Start+1 and no wrap for End<Start; this retained VGA routine instead uses
+End-Start and supports a split. Current tests explicitly encode those legacy
+results. These require their own reviewed hardware-semantics/test-oracle change,
+not changing Lib's valid ability to represent two spans. They are recorded in
+TODO, not mixed into the disable-only candidate. This research does not prove
+the historical perceived-thin-cursor report's full cause.
+
+Actual tracked production/test changes in this research are +0/-0. Published
+dual EXE and INI hashes remain S9's. Scratch peaks below 13 MB of the 300 MB
+budget. Findings are promoted here; all owned jobs exit before scratch cleanup.
+The task remains open for owner approval of this minimal implementation.
+
 ### S9 admission: exact public-eight-tree import
 
 Owner admits the import as S9 and requires continuous numbering. The earlier

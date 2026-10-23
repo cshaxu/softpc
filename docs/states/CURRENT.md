@@ -35,6 +35,17 @@ commit; both cached builds refresh the EXEs and each architecture passes all
 193 tests. S10 admission changes documents only and does not rerun or supersede
 that qualification.
 
+S10 research confirms two original-path defects through real CRTC writes and
+Driver frame production: disable-only writes can be discarded, and shape
+recomputation can re-enable a saved disabled cursor. Private x64/x86 probes
+each show six baseline violations in nine checkpoints and 9/9 passes with the
+two-site candidate. Existing VGA unit passes unchanged on both widths, exposing
+its bit-5 coverage gap. Proposed production diff is +5/-12 in vga_prts.c only;
+shared eight trees need no change. The proposal owns the complete evidence,
+hardware references, test design and adjacent shape-semantic findings. No tracked
+source/test or EXE is modified; full qualification is not rerun. S10 remains
+research/design, awaiting owner implementation approval.
+
 ### S8 reviewed delivery (closed by owner-authorized advancement)
 
 S8 replaces two Compat linear calls with original physical SAS and corrects
