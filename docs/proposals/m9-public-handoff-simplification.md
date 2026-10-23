@@ -98,7 +98,7 @@ and accepts an unused-tail prompt; the new predicate does the opposite. Four
 real captured-frame classes per width reject uninitialized UI, distinguish
 Program Manager from Run, and reject a changed expected pixel or insufficient
 extent. These are predicate proofs, not new full guest runs or host screenshots.
-No captured image or generated probe becomes a tracked fixture or build input.
+No captured image or generated probe becomes a tracked fixture or product build input.
 
 An earlier complete test round passes exactly 192/192 per width, with zero
 failures/skips. Its wrapper then fails because Get-FileHash is unavailable in
@@ -127,6 +127,20 @@ Raw evidence is promoted here before all owned jobs and temporary probes,
 captures and logs are retired. The delivery is committed/pushed before the
 coordinator reviews its actual Git diff; owner acceptance closes S7, not this
 executor result. No next S is admitted.
+
+Coordinator review of pushed executor 13e32442 checks its actual six changed
+paths and four complete code diffs, not just this report. Code accounting is
++151/-114 in App tests only. The full-tuple completion marker, original
+PIC/BIOS callback and restored vector, exact 640x480 guard, typed/strided frame
+inspection and single native viewport reader agree with the approved scope.
+No full-buffer guest assertion, product path or lifecycle boundary is removed.
+Final 192-name ledgers and dual-width predicate proofs agree with the promoted
+evidence; limits of historical causation and inactive native origins remain
+explicit. Both EXEs equal their unchanged committed Git objects and SHA-256
+identities. User INI/media and all public trees have no diff. Documentation,
+all 505 mirror bodies, whitespace and build-residue checks pass; all owned jobs
+have exited and scratch is retired. S7 is verified awaiting owner acceptance;
+T99 stays open and S8 is not admitted.
 
 Similar-issue sweep searches App tests for fixed row*80 / 81-byte diagnostic
 rows, bda_tick_low, INT 1Ah image references and the removed startup wait. The

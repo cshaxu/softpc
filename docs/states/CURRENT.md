@@ -7,8 +7,8 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S6 is owner-closed and S7 is implemented and verified, pending
-actual-commit review and owner acceptance; S8-S11 remain planned. The owner accepts current passing native startup
+not by repair. S6 is owner-closed and S7 is delivered, verified and reviewed,
+awaiting owner acceptance; S8-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
@@ -35,7 +35,7 @@ The separate performance Queue candidate remains.
 
 S6 is closed by owner-authorized advancement; see its
 [closure](../history/M9-T99-S6-debug-fixtures.md). S7 is active and verified,
-awaiting delivery review and acceptance. Its four-case record is in the proposal. The following S6 delivery
+awaiting owner acceptance. Its four-case record is in the proposal. The following S6 delivery
 record is historical evidence, not current S7 qualification.
 
 S7 implements the approved bounded proposal: retain checkpoint's budget under
@@ -47,7 +47,11 @@ exact inventory equality and zero failures/skips. Both full cached builds have
 no compiler warnings. Public eight trees, production/mirror, root CMake, media
 and INI are unchanged; shipping EXE identities remain S6's. The proposal owns
 counterfactuals, failed test-draft dispositions and verification limits. S7
-awaits actual-commit review and owner acceptance; T99 remains open.
+is pushed as executor 13e32442. Coordinator review of its actual six paths
+confirms the four-file test scope, retained mode/IRQ assertions, exact counters
+and absence of production/public/asset changes. Documentation, mirror,
+whitespace and build-residue checks pass; scratch is retired and the worktree
+is clean. S7 awaits owner acceptance; T99 remains open and no next S is admitted.
 
 S6's final four-case ledger and research are in the proposal. The existing local
 debug hook clears quick_mode before refetch; fixtures own a non-HLT program and
