@@ -153,6 +153,15 @@ package qualification, mirror/accounting/manifest and documentation gates,
 actual-diff review, commit/push and owner acceptance. Counts above are an
 implementation estimate, not an already implemented or tested full repair.
 
+Coordinator review of pushed research c28eb8c1 checks its actual two-file diff:
+only evidence/design and active status changed; no implementation or assets.
+The proposal distinguishes the reproduced adapter defect, the still-failing
+original boundary and the untested boundary patch. Final dual probe exit is
+zero; concise evidence is promoted and all owned processes have exited.
+Disposable probes/media/logs are removed through the approved cleanup tool;
+documentation, whitespace and build-residue checks pass. S8 remains open for
+the owner's decision on the minimal mirror scope, not accepted as repaired.
+
 ### S7 admission: deterministic App test contracts
 
 The owner closes S6 without a second acceptance round and admits S7 at
