@@ -7,7 +7,7 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S6 is verified awaiting committed-diff review and owner acceptance;
+not by repair. S6 is delivered and reviewed, awaiting owner acceptance;
 S7-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
@@ -43,8 +43,11 @@ executions pass. Temporary probes are removed and their test targets rebuilt.
 Native tracing is retired, scratch is cleaned, and validation limits are
 preserved in the research history. The owner's latest decision removes the
 native observation from active/deferred work without asserting a Windows fix.
-S6 awaits executor delivery, committed-diff review and owner acceptance;
-T99 stays open. No next S is admitted.
+Executor 8566eb42 is pushed. Coordinator review of its actual eight changed
+paths confirms the three-file code scope, retained assertions and single CPU
+path, normalized mirror hash and matching committed/published EXEs. Final
+documentation, mirror, whitespace and residue checks pass; the workspace is
+clean. S6 awaits owner acceptance; T99 stays open. No next S is admitted.
 
 S5 is closed by owner-authorized advancement to S6; see its
 [closure](../history/M9-T99-S5-public-quality.md). The following S5 records
@@ -222,6 +225,14 @@ that performance candidate remains unnumbered and unadmitted.
 T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.md) and [S4 history](../history/M9-T98-S4-public-api-consolidation.md). Td S22 remains verified awaiting owner acceptance; its [cache governance](../proposals/m9-build-cache-governance.md) delivery f805483f is preserved, not implicitly owner-closed.
 
 ## Current Technical Baseline
+
+- T99 S6 runtime delivery is 8566eb42. The local debug-refetch correction and
+  test-owned boot/HLT preparation are verified by cached dual build/publication,
+  complete 192/192 qualification per architecture and 24 additional desktop
+  package passes. Production +4/-0, tests +20/-0. The owner removes the historical
+  native-start observation from deferred work; its research stays in the
+  proposal without a Windows-repair claim. Both artifact identities are
+  recorded there and match the committed binaries. S6 awaits owner acceptance.
 
 - T99 S2 delivery a3fa9062: Broker fail-closed cleanup is consolidated and the
   App completion fixture no longer resets an already auto-reset event. Cached

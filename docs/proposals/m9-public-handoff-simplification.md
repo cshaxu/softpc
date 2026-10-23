@@ -9,7 +9,7 @@ work after the passing current-environment qualification: "干嘛保留？你都
 Accordingly, its research stays below as history, without an active TODO, Queue
 candidate or delivery blocker. This is an explicit acceptance disposition,
 not a claim that a Windows initializer was repaired or that RDP causation was
-proved. S6 is verified pending committed-diff review and owner acceptance;
+proved. S6 is delivered and reviewed, awaiting owner acceptance;
 T99 stays open and S7-S11 remain planned.
 
 The frozen four-case ledger is complete under that owner decision:
@@ -50,6 +50,16 @@ Final checks pass: documentation governance, all 505 XP mirror bodies,
 diff whitespace and build residue. One manual relative-root mirror invocation
 cannot resolve its manifest; the exact registered absolute-root invocation
 passes. No source change is made to obtain that result.
+
+Executor P2 8566eb42 is pushed to main. The coordinator then reviews that
+actual eight-path commit rather than relying on the executor summary: its
+three code diffs match the admitted repairs, original assertions and HLT/BOP
+ownership remain intact, and only c_main.c's local normalized mirror hash
+changes. Git object identities of both published EXEs equal their committed
+objects; the SHA-256 identities above are unchanged. Both CTest inventories
+still contain 192 registrations. No public tree, user INI/media, temporary
+probe or raw trace is in the commit. Final gates and residue checks pass;
+the workspace is clean. S6 awaits owner acceptance, with no next S admitted.
 
 ### S6 preceding research and repair record
 
