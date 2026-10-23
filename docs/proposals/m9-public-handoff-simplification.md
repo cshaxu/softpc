@@ -63,6 +63,15 @@ Published SHA-256 for this follow-up:
 After job exit, retire task scratch and preserve only reusable caches. The
 follow-up awaits committed-diff review and owner acceptance; S6 is not admitted.
 
+Coordinator review of pushed 29cf8a95 confirms all 22 changed paths match the
+five-item admission. Public run validation and actual allocation/lifetime
+errors remain checked; deleted assertions concern only impossible private
+order. Machine callback-affinity, input ordering and join barriers remain
+observable through neutral primitives. Allocator exhaustion coverage remains
+owner-local. No old forwarding-header or Machine Win32 references remain.
+Actual diff, manifests, artifact hashes and complete test-name evidence agree.
+Documentation, whitespace and build-residue checks pass; S5 awaits acceptance.
+
 #### Approved S5 implementation qualification
 
 Owner approves the unified minimal repair after the audit delivery 164a5f70.

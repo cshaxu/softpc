@@ -31,6 +31,10 @@ focused tests pass 14/14 each and full runs pass 192/192 each, exact registered
 name equality and no failures/skips/retries. No non-mirror compiler warnings.
 The proposal records neutral fixture synchronization, preserved coverage and
 platform verification limits. S6 remains planned, not active.
+Executor 29cf8a95 is pushed. Coordinator actual-commit review confirms the
+22-path scope, unchanged public run validation/ownership barriers and retained
+concurrency assertions. Documentation, whitespace and residue checks pass;
+scratch is retired and S5 awaits owner acceptance.
 The following qualification records the preceding P2/P3, not this follow-up.
 Former S5's five private
 research cases transfer intact to planned S6; S6 is not active. T99 remains open.
