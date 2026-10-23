@@ -2,33 +2,45 @@
 
 ## Current Work
 
-Owner accepts and closes S9 at reviewed delivery 46d821d4 and admits S10,
-original VGA cursor-disable repair. Owner approves the reviewed two-site design
-at 65afb9be: 批准实施 老规矩执行. T99 stays open. S11 SB-MIDI and
-S12 Ninja integrity remain planned, in that order. The proposal retains the
+Owner accepts and closes S10 at reviewed delivery 2866cbd5 and admits S11,
+Sound Blaster MIDI command/parser research and design. T99 stays open;
+S12 Ninja integrity remains planned. The proposal retains the
 eight transferred TODO items and their proof/dispositions. The adjacent VGA
 end-row/wrap finding remains in TODO; the performance Queue candidate remains.
 
-## M9 T99 S10 Packet
+## M9 T99 S11 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S9 and admits S10, then approves the researched two-site mirror repair at 65afb9be: 批准实施 老规矩执行. This includes local reason markers, mirror accounting, permanent regression, dual publication/full tests and actual-diff review. |
-| Objective | Repair original VGA disable-only register storage and unified shape visibility using the reviewed single-path design. |
-| Non-goals | No public-eight-tree, Compat/Driver or root build change; no end-row/wrap semantic rewrite, cursor styling, SB-MIDI, Ninja, guest, media, snapshot-format or INI edit. |
-| Reference Baseline | Reviewed research 65afb9be; S9 published dual EXEs and original necessary XP subset/local ledger. Private research is counterfactual evidence, not fresh permanent qualification. |
+| Admission And Approval | Owner accepts S10 and admits the next S: 好，收口本S，转入下一个S任务。老规矩. Research the established S11 boundary first; present supported/unsupported semantics and minimum source diff before implementation. |
+| Objective | Establish the exact SB DSP command/data collision, authoritative command lengths, existing MIDI ownership and minimum safe disposition with executable regression design. |
+| Non-goals | No production/test implementation before the researched diff is presented; no public-eight-tree, full SB-MIDI/UART input, FM synthesis, second MIDI parser/output path, Ninja, guest/media/INI or snapshot-format change. |
+| Reference Baseline | Reviewed S10 2866cbd5 and its dual EXEs; fixed necessary XP source subset and local ledger. T95 SB 38h/91h trace is historical evidence, not a fresh reproduction. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Original base/video/vga_prts.c two sites, existing App vga_frame_smoke.c, XP manifest/local patch ledger, task records and rebuilt dual EXEs. No public API or snapshot-layout change. |
+| Files And ABI Surface | Initially task records only. Trace sndblst.h, host/src/nt_sbdsp.c command/state/reset/archive and nt_sb.c port/MIDI boundary, existing App SB/PCM tests. No public API change planned. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, source/research policy and current design; original source remains sole hardware authority. |
-| Verification | Execute the reviewed finite port/frame matrix on x86/x64: disable-only, re-enable, end/location/font recomputation, out-of-cell start, write protection and mode reset. Cached full builds/publication, all registered background/desktop/audio tests and exact name inventory; mirror, Types/dependency/manifests, documentation and whitespace gates. All long jobs hidden/logged; separate test proof from guest acceptance. |
-| Expected Markers | A disable bit cannot be lost or overridden by subsequent original shape recomputation; valid shapes and card-specific semantics remain intact through the existing path. |
-| Asset Needs | Publish dual EXEs only; preserve INI, media and user snapshots. Test-created disposable media only. No Computer Use or downstream writes. |
-| Reporting Requirements | Report actual production/test/mirror diff, focused/full test evidence and limits, dual EXE hashes, similar-issue dispositions and quality review. S10 owns build/t99-s10: 30-minute jobs, five-minute no-progress, 300MB cap; promote findings and retire scratch. |
-| Stop Conditions | Report if the repair requires extra production paths, public changes or a rewrite of adjacent shape semantics; do not weaken tests or conceal host-device failures. |
-| Exit Criteria | Reviewed minimal implementation, focused and complete dual qualification/publication, exact mirror accounting, executor commit/push, coordinator actual-diff review/push, retired scratch and clean worktree; await owner acceptance. |
-| Original Owner Request | 收口s9 准入s10; 老规矩 调研审计 设计; after mirror-diff explanation: 批准实施 老规矩执行. Implement the reviewed minimal repair, dual build/publication/full tests, commit/push and quality audit, then wait for acceptance. |
-| Similar-Issue Sweep | All original cursor visibility/shape writers, CRTC 0x0A/0x0B paths and protection/mode/font recomputation, plus Compat/Driver conversion; record each owner and disposition rather than add frontend compensation. |
+| Verification | Freeze command/write-state/port/reset/archive callers; verify primary hardware command semantics and actual DSP ports on x86/x64 with mocked host audio. Observe 38h/data including 91h, parser return, busy/IRQ/PCM state and subsequent valid commands. Any private candidate remains counterfactual. Research runs hidden/logged; implementation later requires dual build/publication and full regression. |
+| Expected Markers | MIDI data cannot be misclassified as a standalone PCM command; a supported or unsupported boundary is honest, original single-owner and does not alter valid PCM behavior. |
+| Asset Needs | Preserve dual EXEs, INI, guest media and snapshots during research. No Computer Use or downstream repository reads/writes. |
+| Reporting Requirements | Give exact root cause, finite command disposition, minimum example, production/test/mirror diff estimate, snapshot impact and proof limits. S11 owns build/t99-s11: 30-minute jobs, five-minute no-progress, 300MB cap; promote results then retire scratch. |
+| Stop Conditions | Report unclear hardware semantics, required new MIDI state authority, unsupported snapshot migration or public-scope expansion; no silent fake-success or full capability addition. |
+| Exit Criteria | Reviewed executable minimum proposal with dual-width focused evidence and accurate limits; implementation needs approval, then qualification/publication, mirror accounting, actual-diff review and push before owner acceptance. |
+| Original Owner Request | 好，收口本S，转入下一个S任务。老规矩. S11 researches Sound Blaster MIDI command/data framing before selecting the minimum repair, with ordinary implementation governance unchanged. |
+| Similar-Issue Sweep | Every defined SB MIDI opcode, DSP pending-data state and command dispatch, WRITE_STATUS busy owner, reset/archive restoration and existing MPU parser/output route; classify each rather than add a competing parser. |
+
+S11 source and actual-port research confirms the framing defect and its UART
+siblings. On each width the baseline misclassifies checked state/IRQ for 15
+of 256 payload values after 38h, enters busy for 90h/91h and collides after
+all four 34h..37h entries. The private bounded-unsupported candidate has zero
+checked effects/busy/IRQ in the same sweep, preserves reset and pending archive
+states, and passes four UART byte sweeps. The unchanged registered SB command
+test passes but contains the incorrect MIDI oracle. The proposal owns the
+finite ledger, primary hardware reference, private evidence and minimum design.
+Recommended production scope is two mirror files +24/-2 (net +22), preserving
+unsupported SB-MIDI while fixing command/data framing; the supported MPU path
+does not change. This capability decision awaits owner approval. No tracked
+production/test or published EXE is changed; no fresh full-suite claim is made.
 
 S9 is accepted and closed; see its [closure](../history/M9-T99-S9-public-import.md).
 Its verified baseline remains: all 296 public paths equal the pinned NXVM
@@ -60,8 +72,9 @@ legacy-only warnings and quality review. Executor ad9d5fcf is pushed; coordinato
 actual-commit review confirms the nine-path scope, unchanged original shape/
 protection/dirty route, permanent register/frame regression and correct mirror
 identity/accounting. Published EXE blobs equal the committed artifacts; scratch
-is retired and residue checks pass. S10 awaits owner acceptance, with no S11
-admission and T99 still open.
+is retired and residue checks pass. Owner now accepts and closes S10; see its
+[closure](../history/M9-T99-S10-vga-cursor-disable.md). S11 research is active;
+the S10 results above remain historical qualification, not new S11 proof.
 
 ### S8 reviewed delivery (closed by owner-authorized advancement)
 

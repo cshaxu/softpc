@@ -2,6 +2,178 @@
 
 ## Admission and scope
 
+### S11 admission: Sound Blaster MIDI command boundary
+
+Owner accepts S10 at 2866cbd5: 好，收口本S，转入下一个S任务。老规矩.
+S10's [closure](../history/M9-T99-S10-vga-cursor-disable.md) retains its reviewed
+delivery; T99 stays open and S12 remains planned. S11 starts source research
+and executable design, not an unapproved expansion to SB-MIDI support.
+
+Freeze all defined MIDI command bytes, the one DSP write-state dispatch,
+port busy/read status, reset, snapshots and existing MPU byte/message output.
+Confirm command lengths from primary hardware documentation; reproduce the
+38h/data collision through original ports with mocked audio. Compare the
+smallest correct supported or explicit unsupported disposition, including
+subsequent PCM, IRQ/busy and reset/archive behavior. Do not reuse another
+device's mutable parser without proving its ownership semantics.
+
+Research edits task records only. Temporary probes live solely in build/t99-s11
+under the CURRENT budgets and never become build dependencies or release
+inputs. Present code examples, exact scope, mirror/test estimates and proof
+limits before any production implementation. Shared eight trees, published
+EXEs, INI, media and snapshots remain unchanged in this phase.
+
+#### S11 research: bound unsupported MIDI at the DSP parser
+
+Research baseline is reviewed S10 2866cbd5. This delivery edits documents
+only; private candidates below are counterfactuals, not shipping repairs.
+
+**Primary hardware contract.** Creative's Sound Blaster Series Hardware
+Programming Guide (copyright 1993-1996), sections 5-1 through 5-3 and 6-12
+through 6-14, distinguishes one-byte normal output from persistent UART mode.
+38h precedes each individual MIDI data byte. Commands 34h/35h/36h/37h enter
+UART mode, where DSP writes are MIDI data until the separate DSP reset.
+Write-buffer status expresses readiness, not a per-command semantic ACK/NACK.
+The [primary manual](https://pdos.csail.mit.edu/6.828/2018/readings/hardware/SoundBlaster.pdf)
+is consulted as a hardware reference, not copied as code or a repository asset.
+
+**Finite ownership and opcode ledger.** Searches for MIDI_READ/MIDI_WRITE,
+DspWrite, WriteCommandByte, DSPWriteState, bHighSpeedMode, BufferMidi and
+snapshot fields freeze these distinct responsibilities:
+
+- nt_sb.c VsbByteOut is the only production caller of DspWrite, via the
+  original 022Ch I/O binding. DspWrite calls WriteCommandByte only in its
+  WriteCommand state. No frontend, Compat or Lib command parser is involved.
+- nt_sbdsp.c owns eleven existing write states, pending command arguments,
+  PCM starts and reset. WriteCommandByte has no MIDI cases. Unknown 38h thus
+  leaves WriteCommand active, and data 91h is dispatched as DSP_WRITE_HS.
+- nt_sb.c rejects further DSP writes and reports FFh busy while
+  bHighSpeedMode is set. The busy behavior is correct for actual high-speed
+  PCM; changing it would hide, not repair, the wrong command dispatch.
+- 38h needs exactly one following data byte. Add an unsupported-byte state
+  to the existing parser and return to WriteCommand after consuming it.
+- 34h/35h/37h are already declared; documented 36h lacks its corresponding
+  constant. All four have the same unhandled-entry problem: ignored entry
+  lets subsequent bytes become PCM commands. An unsupported UART sink in the
+  same write state consumes data until the existing separate DSP reset.
+- 30h/31h input has no outgoing payload byte. No host MIDI input exists, so
+  keep the unsupported empty-input/no-generated-IRQ boundary, not fabricate
+  input support. 32h/33h are unused legacy constants with no handler and no
+  entry in this manual's command table; do not invent their protocol here.
+- ResetAll -> ResetDSP already returns DSPWriteState to WriteCommand. Keep
+  this single reset owner; no second cleanup path or compensating PCM reset.
+- The archive already serializes DSPWriteState as one uint8 field. Append
+  values 12/13 after the existing 1..11 and extend its existing validator;
+  do not add fields or change archive layout. Existing valid old states keep
+  their identities. An older executable would reject a snapshot captured in
+  a new pending state; do not promise reverse-reader compatibility.
+- nt_sb.c owns MPU-401 mode/status and calls the sole nt_sbmid.c BufferMidi
+  parser. That parser owns running status, notes and pending host messages;
+  Compat owns native delivery only. Feeding an unsupported DSP path into it
+  would add capability and require explicit shared-stream/error ownership,
+  not merely repair framing. Leave the working MPU route unchanged.
+- Existing device_contract_sb_commands explicitly asserts that every byte
+  30h..38h leaves the parser free for E1h. This is an incorrect framing oracle
+  for 38h and the UART entries, not missing production code in the shared Lib.
+
+**Fresh dynamic evidence.** Hidden owned research jobs 41300, 17316 and 40508
+exit normally with research.exit=0. The first isolates 38h; the second includes
+all UART entries and actual PIC requests; the final pass adds an explicit
+pending-normal-byte reset assertion. They reuse the existing
+device-contract fixture's PCM/MIDI mocks, cached native compile/link commands,
+original outb/inb dispatch and real machine initialization. Private objects
+and EXEs do not replace cached objects, archives or published products.
+
+For each of x64/x86, after 38h the baseline remains in WriteCommand for all
+256 possible next-byte values. Fifteen values alter the checked DSP state or
+PIC request; 90h/91h produce busy status, E1h starts version output, and F2h
+raises IRQ5. Specifically 38h->91h sets bHighSpeedMode=1 and busy=FFh. Each
+34h..37h entry followed by 91h likewise enters high-speed PCM (four collisions).
+These are current actual-port observations, not only the historical T95 trace.
+
+The private bounded-unsupported candidate has zero checked data effects,
+busy results or spurious IRQs in the same 256-value test per architecture.
+It consumes each 38h payload then answers a genuine subsequent E1h normally.
+For each UART entry it consumes all 256 byte values without PCM dispatch or
+MIDI submission, ignores an in-band E1h, and accepts version commands after
+the separate reset. Direct existing archive capture/restore preserves both
+pending states; reset also cancels pending input. No native audio, guest
+media/configuration change or Computer Use is involved.
+
+The unchanged registered device_contract_sb_commands passes x64 (0.19s) and
+x86 (0.21s) in the final pass, exposing its incorrect existing oracle. The candidate is not run
+as a replacement for that unchanged fixture: its incompatible old MIDI
+assertions must be corrected in the permanent test. Private 36h compilation
+supplies only its documented missing constant; implementation would put that
+constant beside its existing peers, not add a build switch. An initial probe
+without PIC observation found fourteen DSP-state effects; the strengthened
+probe also detects F2h's separate delayed IRQ, giving fifteen. No earlier
+limited observation is represented as full IRQ proof.
+
+**Recommended minimum and capability decision.** Preserve the original
+explicitly unsupported SB-MIDI capability, but correctly consume its protocol
+framing. This prevents accidental PCM/IRQ behavior; it does **not** play
+SB-MIDI music. Do not set permanent busy, terminate the machine or invent an
+error byte: this port has no semantic command-failure return. Ready means
+input space, not confirmation that an attached MIDI instrument sounded.
+Document this limitation and keep MPU-401 as the supported MIDI output.
+This is a device capability boundary, not a Lib native-output success claim.
+
+The candidate adds two enumerators to the existing write-state authority,
+not another state variable, queue, worker, MIDI decoder or recovery machine:
+
+```c
+/* Existing command dispatch. */
+case MIDI_WRITE_POLL:
+    DSPWriteState = UnsupportedMidiByte;
+    break;
+case MIDI_READ_POLL_WRITE_POLL_UART:
+case MIDI_READ_INTERRUPT_WRITE_POLL_UART:
+case MIDI_READ_TIMESTAMP_POLL_WRITE_POLL_UART:
+case MIDI_READ_TIMESTAMP_INTERRUPT_WRITE_POLL_UART:
+    DSPWriteState = UnsupportedMidiUart;
+    break;
+
+/* Existing data dispatch. */
+case UnsupportedMidiByte:
+    DSPWriteState = WriteCommand;
+    break;
+case UnsupportedMidiUart:
+    break; /* Existing separate DSP reset exits this mode. */
+```
+
+Measured private behavioral diff, excluding private EOF whitespace: nt_sbdsp.c
++23/-2. Add the missing 36h constant in base/inc/sndblst.h (+1/-0): proposed
+production total **+24/-2, net +22**, two mirror files only. Incremental mirror
+changed lines increase by 26, not decrease; full necessary-XP-subset accounting
+and manifest hashes are required during approved implementation. No new public
+header, Compat function, configuration, native dependency or build framework.
+Fixing 38h alone would be smaller but knowingly retain four same-cause UART
+collisions, so is not the recommended complete boundary repair.
+
+Extend only existing device_contract_smoke.c, estimated +65..95/-4..8:
+replace the wrong MIDI oracle, cover all 256 normal payload values, all four
+UART entries, required reset, version/PCM continuity, unchanged legitimate
+high-speed busy behavior, actual PIC non-delivery and pending-state snapshot
+acceptance/rejection. Existing fixture owns real ports and native mocks, so
+no new target or test-only production interface is needed. Root registration,
+public eight trees, nt_sb/nt_sbmid, Compat and media stay unchanged. Task/design
+and existing mirror provenance documents change separately from code counts.
+
+After owner approval: apply the bounded original-source change with a local
+reason marker, update the one existing test and two mirror identity rows,
+run focused dual-width proof, cached dual full builds/publication, exact full
+test inventories including native integration and quality gates; record actual
+diff and conduct actual-commit review before owner acceptance. The research
+does not qualify the shipping repair, run the full suite, replay a Windows
+application or demonstrate audible SB-MIDI. S11 remains design-ready awaiting
+the owner's capability/diff decision; S12 is not admitted. All owned jobs are
+joined/exited, concise evidence is promoted here and the task's disposable
+scratch (under 15 MB of its 300 MB budget) is retired before delivery. The
+three-document delivery has zero tracked production/test/artifact changes;
+documentation, 505-body mirror, whitespace and residue gates pass. No native
+integration or full repository test is claimed by this research.
+
 ### S10 admission: original cursor-disable research, design and repair
 
 Owner request: 收口s9 准入s10. S9 is accepted and closed at reviewed delivery
