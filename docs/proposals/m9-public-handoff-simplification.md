@@ -2,6 +2,30 @@
 
 ## Admission and scope
 
+### S7 admission: deterministic App test contracts
+
+The owner closes S6 without a second acceptance round and admits S7 at
+819ff0cc. T99 stays open; S8-S11 remain planned. This is admission, not a
+claim of completed S7 diagnosis or verification.
+
+The frozen research universe has four members:
+
+1. Checkpoint aggregate timeout: measure existing phases and waits under
+   parallel load before proposing any budget change.
+2. INT 1Ah oracle: replace the invalid nonzero low-byte assumption with
+   independently meaningful guest/timer evidence; zero is legal.
+3. Win3.1 prompt roundtrip: identify an observable readiness condition before
+   menu interaction, preserving actual frame and mode-transition assertions.
+4. Package viewport oracle: distinguish visible rectangular rows from linear
+   backing-buffer reads; preserve separate full-buffer checks.
+
+Each member needs a current-source finding, smallest design and diff estimate,
+focused proof and final disposition. Test fixtures and their necessary
+registration are the planned boundary. A production finding requires scope
+revision rather than an unannounced repair. Host audio/session unavailability
+is reported separately; the owner-disposed native startup observation is not
+reopened. No S7 code or fresh test result is recorded by this admission.
+
 ### S6 delivery and owner disposition
 
 The owner rejects carrying the historical native-start observation as deferred
@@ -9,8 +33,8 @@ work after the passing current-environment qualification: "干嘛保留？你都
 Accordingly, its research stays below as history, without an active TODO, Queue
 candidate or delivery blocker. This is an explicit acceptance disposition,
 not a claim that a Windows initializer was repaired or that RDP causation was
-proved. S6 is delivered and reviewed, awaiting owner acceptance;
-T99 stays open and S7-S11 remain planned.
+proved. S6 is delivered, reviewed and now owner-closed by advancement to S7;
+T99 stays open and S8-S11 remain planned.
 
 The frozen four-case ledger is complete under that owner decision:
 
@@ -59,7 +83,8 @@ changes. Git object identities of both published EXEs equal their committed
 objects; the SHA-256 identities above are unchanged. Both CTest inventories
 still contain 192 registrations. No public tree, user INI/media, temporary
 probe or raw trace is in the commit. Final gates and residue checks pass;
-the workspace is clean. S6 awaits owner acceptance, with no next S admitted.
+the workspace is clean. The owner subsequently closes S6 and admits S7;
+see the closure record and current packet for the authoritative transition.
 
 ### S6 preceding research and repair record
 

@@ -7,31 +7,36 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S6 is delivered and reviewed, awaiting owner acceptance;
-S7-S11 remain planned. The owner accepts current passing native startup
+not by repair. S6 is owner-closed and S7 is admitted for deterministic App
+test-contract research and repair; S8-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
-## M9 T99 S6 Packet
+## M9 T99 S7 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests research and correct repair followed by verification and acceptance. Owner subsequently rejects retaining the historical native-start observation after passing qualification; preserve its research as history without a deferred task or blocker. |
-| Objective | Complete minimal HLT/debug, TF quick-mode and boot-fixture repairs; record the native-start investigation and owner-accepted passing-environment disposition. |
-| Non-goals | No public-component changes, S7-S11 implementation, guest/media/INI edits, blind retries, no-op BOP handlers or enlarged timeouts. |
-| Reference Baseline | 898e4054; current published dual EXEs and prior evidence remain distinct from fresh research. |
+| Admission And Approval | Owner directs closure of S6 without another acceptance round and immediate admission of S7. |
+| Objective | Diagnose and minimally repair checkpoint timing, INT 1Ah timer assertions, Win3.1 readiness and package viewport-reading test contracts. |
+| Non-goals | No S8-S11 implementation, public-component or mirror changes, guest/media/INI edits, blind retries, speculative product fixes or undiagnosed timeout increases. |
+| Reference Baseline | 819ff0cc; S6 published dual EXEs and regression evidence are retained, not claimed as fresh S7 verification. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | App Machine/Compat/CCPU hooks and command-provider/package fixtures; minimal existing-hook correction and mirror accounting. No public-component or production ABI change. |
+| Files And ABI Surface | test/app-softpc unit machine checkpoint and timer fixtures, integration runtime-restart and package fixtures, and their actual test registration if diagnosis requires it. No planned production or public ABI change. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy. |
-| Verification | Cached dual builds/publication; focused repetitions and checkpoint/mirror checks; fresh full 192/192 per width and 24 additional desktop package passes. Distinguish diagnostics from full qualification and do not claim repair of a historical native failure. |
-| Expected Markers | Distinguish halted continuation, stale quick eligibility, first invalid boot transition and native initialization before main. |
-| Asset Needs | Preserve INI, snapshots and guest media; publish both EXEs after verified production changes. No Computer Use. |
-| Reporting Requirements | Four-case finite ledger with proven facts, unknowns, proposed diff and acceptance; S6 owns build/t99-s6, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote results and retire scratch. |
-| Stop Conditions | Do not replace original device semantics, infer root cause from a later crash, suppress failed experiments or install speculative production fixes. |
-| Exit Criteria | Three local corrections are verified; the native case has the owner's accepted current-environment disposition without deferred work. Dual builds/publication, applicable full regression, actual-diff review and commit/push precede owner acceptance. |
-| Original Owner Request | Admit S6 audit, research and repair-scheme design; repair and wait for acceptance. Latest disposition: 干嘛保留？你都测试通过了，保留个毛线？ |
-| Similar-Issue Sweep | Enumerate debug refetch edges, halt resume and reset entry, native CreateProcess/attach initialization and existing fixture setup. |
+| Verification | Cached x86/x64 builds of changed fixtures, focused actual-path counterfactuals and parallel phase measurements, complete background regression and affected native/package integration. Test-only changes preserve published EXE identities; production changes require owner-approved scope revision and dual publication. |
+| Expected Markers | Phase durations identify a checkpoint budget cause; legal zero timer values pass a meaningful oracle; actual Program Manager readiness precedes interaction; visible-screen reads follow viewport rows rather than backing-buffer stride. |
+| Asset Needs | Preserve INI, snapshots and guest media; disposable fixtures only. No Computer Use. Native device unavailability remains an environment result, not a product repair. |
+| Reporting Requirements | Four-case finite ledger, initial minimal design/diff estimate, measured versus source-inferred facts, actual source/test line counts and verification limits. S7 owns build/t99-s7, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote evidence and retire scratch. |
+| Stop Conditions | Stop for scope revision if a production fix is required; do not weaken assertions, infer a cause from repetition alone, add retries or retain the owner-disposed native-start observation as new debt. |
+| Exit Criteria | Each of the four cases has a diagnosed repair with focused proof or an explicit owner disposition; required dual regression, actual-diff review, commit/push and clean scratch precede delivery for acceptance. |
+| Original Owner Request | S6没有生成代码改动不需要我验收，直接准入S7。 S6 actually includes the recorded +4 production and +20 test lines; advancement closes it without a second acceptance request. |
+| Similar-Issue Sweep | Audit App test waits/readiness, byte-level timer oracles and visible-versus-backing Console reads; record every in-scope hit and preserve existing frame/IRQ assertions. |
+
+S6 is closed by owner-authorized advancement; see its
+[closure](../history/M9-T99-S6-debug-fixtures.md). S7 is active, not yet implemented
+or verified. Its four-case plan is in the proposal. The following S6 delivery
+record is historical evidence, not current S7 qualification.
 
 S6's final four-case ledger and research are in the proposal. The existing local
 debug hook clears quick_mode before refetch; fixtures own a non-HLT program and
@@ -47,7 +52,7 @@ Executor 8566eb42 is pushed. Coordinator review of its actual eight changed
 paths confirms the three-file code scope, retained assertions and single CPU
 path, normalized mirror hash and matching committed/published EXEs. Final
 documentation, mirror, whitespace and residue checks pass; the workspace is
-clean. S6 awaits owner acceptance; T99 stays open. No next S is admitted.
+clean. The owner now closes S6 and admits S7; T99 stays open.
 
 S5 is closed by owner-authorized advancement to S6; see its
 [closure](../history/M9-T99-S5-public-quality.md). The following S5 records
