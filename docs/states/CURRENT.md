@@ -2,49 +2,25 @@
 
 ## Current Work
 
-Owner accepts and closes S11 at reviewed delivery 722ffaca and admits S12,
-Ninja incremental-build integrity research and design. T99 stays open.
-The proposal retains the
-eight transferred TODO items and their proof/dispositions. The adjacent VGA
-end-row/wrap finding remains in TODO; the performance Queue candidate remains.
+Owner accepts and closes S12 at reviewed research 0108e47e: 批准收口，请你把外部
+重命名变化一起提交推送。 No implementation subtask is active. T99 remains open
+for its separate completion audit; no next S or queued T is admitted.
+The adjacent VGA end-row/wrap TODO and performance Queue candidate remain.
 
-## M9 T99 S12 Packet
+Open task awaiting owner: T99.
 
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S11 and admits the next planned task: 准入S12，老规矩. Research, audit and design first; present causal evidence and a minimal remedy before production/tooling changes. |
-| Objective | Explain historical premature metadata recovery and excessive rebuilds, verify current no-op/incremental behavior, and propose the smallest evidence-based correction or bounded limitation. |
-| Non-goals | No cache purge, alternative cache manager, speculative tool replacement, public-eight-tree/App/mirror behavior change, guest/media/INI/snapshot change or unrelated performance rewrite. |
-| Reference Baseline | Reviewed S11 722ffaca and its qualified EXEs; existing persistent x64/x86 Ninja/ccache trees; T93 historical recovery records are leads, not fresh reproduction. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Initially task records only. Read CMakePresets.json, root CMake/tools build/cache/cleanup policies, actual Ninja log/dependency metadata, generated commands and historical invocation records. No public ABI change. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation and current source/build design; preserve stable trees and single ownership. |
-| Verification | Capture untouched metadata/version/configuration identity first; hidden serialized cached x64/x86 builds, no-op repeats and configure/build cycles; inspect explain/dependency/command hashes and metadata before/after. Distinguish fresh observation, historical evidence and controlled private counterfactuals. Any later code repair needs focused dual proof and applicable full qualification/publication. |
-| Expected Markers | A no-op build executes no compile/link commands; genuine input changes have explained rebuilds. Metadata recovery is not declared fixed solely because current builds succeed. |
-| Asset Needs | Preserve existing EXEs unless an actual build changes them; protect INI/media/snapshots. No Computer Use or external comparison repository dependency. |
-| Reporting Requirements | Give causal conclusions, exact reproduction limits, proposed files/diff and proof plan. S12 owns build/t99-s12: 30-minute jobs, five-minute no-progress and 300MB cap; promote evidence then retire scratch. |
-| Stop Conditions | Report inability to reproduce or prove a historical cause honestly; do not force cache corruption, broad tool upgrades, concurrent writers, cache deletion or runtime edits into the shipping path. |
-| Exit Criteria | Reviewed source/tooling audit, dual-width measured incremental proof and minimal actionable proposal or explicitly bounded unresolved evidence; approved implementation, if any, follows ordinary verification, publication, commit/push and actual-change review before owner acceptance. |
-| Original Owner Request | 准入S12，老规矩. The remaining planned task is Ninja incremental-build integrity research; follow research/design before repair. |
-| Similar-Issue Sweep | Both architecture trees, .ninja_log versus .ninja_deps, launcher/command identity, root configure/publish/cleanup writers, concurrent build processes and historical premature-end records. |
+## Technical Baseline
 
-S12 research finds structurally valid current dependencies and correct measured
-incremental behavior: six no-op/configure builds per width; one mtime-only test
-input causes exactly its object/link, its test passes, restored full builds
-are again no-op. Historical recovery maps to .ninja_deps, not the text build-log
-version, but its damaged bytes/writer timeline were not retained. Recommend
-zero code/build-script diff rather than speculative recovery machinery; the
-proposal owns the finite ledger, exact proof and unresolved historical limits.
-No repair or fresh full runtime regression is claimed. Await owner disposition;
-T99 stays open. External snapshot.midi modification is preserved, not staged.
-Research 5d44c2cf is pushed; coordinator actual-commit review confirms its
-three-document-only scope, bounded current proof and unresolved historical
-cause. Scratch is retired and gates pass. S12 awaits owner disposition;
-neither a historical tooling repair nor T99 closure is claimed.
+S12 is closed under the owner's bounded no-code disposition; see its
+[closure](../history/M9-T99-S12-ninja-integrity.md). Current incremental behavior
+is measured correct, not proof of a historical corruption repair. Research
+5d44c2cf and actual review 0108e47e retain the six-member ledger and limitations.
+The owner additionally approves the external snapshot.midi -> snapshot-midi
+rename; both names have the same Git blob, with no payload change. EXEs,
+INI, production, tests and build scripts remain unchanged. Scratch is retired.
 S11 is owner-accepted and closed; see its
-[closure](../history/M9-T99-S11-sb-midi-framing.md). Its following delivery
-record is historical S11 evidence, not S12 qualification.
+[closure](../history/M9-T99-S11-sb-midi-framing.md). The following records retain
+historical qualification, not a new full regression for S12 closure.
 
 S11 source and actual-port research confirms the framing defect and its UART
 siblings. On each width the baseline misclassifies checked state/IRQ for 15

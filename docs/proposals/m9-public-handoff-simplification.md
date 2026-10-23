@@ -140,6 +140,12 @@ Documentation/mirror/whitespace/residue checks pass; owned jobs are gone and
 scratch removed. Unrelated snapshot changes remain outside staging. No research
 delivery blocker; S12 still requires owner disposition and T99 is open.
 
+**Owner closure.** Owner approves: 批准收口，请你把外部重命名变化一起提交推送。
+S12 closes at reviewed research 0108e47e under the no-code disposition; the
+[closure](../history/M9-T99-S12-ninja-integrity.md) records its verification
+limits and the explicitly approved byte-identical snapshot rename. No historical
+corruption repair, new full regression or T99 closure is implied.
+
 ### S11 admission: Sound Blaster MIDI command boundary
 
 Owner accepts S10 at 2866cbd5: 好，收口本S，转入下一个S任务。老规矩.
