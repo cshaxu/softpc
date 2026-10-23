@@ -295,6 +295,14 @@ No delivery blocker or new second path/ownership/cleanup defect is found.
 Documentation/whitespace/residue checks pass. S14 remains verified awaiting
 owner acceptance, not closed; T99 and the performance candidate are unchanged.
 
+**Owner acceptance and closure.** Owner now approves: 批准收口S14.然后列出所有的S任务、T任务、TODO.
+S14 closes after delivered implementation 77326df5 and actual-commit review
+755d0445; the [closure record](../history/M9-T99-S14-vga-cursor-shape.md)
+maps acceptance to the existing full qualification. This governance-only
+closure does not rebuild or rerun tests. S1 through S14 are closed; T99 stays
+open for its separate completion audit. No next S/T is admitted, TODO is empty,
+and the one unnumbered runtime-performance Queue candidate is unchanged.
+
 ### S13 admission: exact eight-tree test-ownership import
 
 Owner first requests a read-only audit of latest NXVM including uncommitted

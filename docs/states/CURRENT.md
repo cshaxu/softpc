@@ -2,52 +2,17 @@
 
 ## Current Work
 
-T99 S14 implements the owner-approved minimum: 批准修复 按老规矩.
-Cached dual builds publish both EXEs and both full inventories pass 193/193.
-The single original VGA owner is repaired, not compensated in Lib; EGA/CGA
-and public eight trees are unchanged. Executor delivery 77326df5 is pushed
-and actual-commit reviewed. S14 now waits for owner acceptance; S14/T99 stay
-open and no next S is admitted.
-
-## M9 T99 S14 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner admits the cursor audit and TODO transfer, closes Td S22, starts research, then approves its reviewed minimum at ff97104b: 批准修复 按老规矩. |
-| Objective | Implement inclusive VGA end and reversed-range hiding at the original shape owner, retain V7 overflow/disable/protection and transport, correct permanent tests and fully qualify/publish both architectures. |
-| Non-goals | No public-eight-tree, renderer, guest/media/INI/snapshot-format change, generic EGA/CGA rewrite, performance work or T99 closure. |
-| Reference Baseline | Reviewed research f074452f/ff97104b; current S11 EXEs and S10 cursor-disable repair. Fixed XP necessary subset identities and selection ranges remain unchanged. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | vga_prts.c do_new_cursor, existing App-local vga_frame_smoke, XP local manifest/repair ledger, task records and dual EXEs. No public API or snapshot schema changes. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy; original controller owns hardware semantics. |
-| Verification | Permanent actual-port/Driver cursor checks at font heights 8/14/16/32 scanlines, snapshot register replay and existing disable/protection/underline coverage; cached Ninja/ccache dual builds and published package. Run every registered test on each architecture in disjoint background, desktop and native_audio groups; match executed/registered inventories with no skips. Audit mirror, dependencies, warnings outside the preserved source, whitespace and residue. |
-| Expected Markers | Distinguish row numbering, inclusive versus exclusive end, true VGA hide versus EGA split, cell clipping and frontend scaling. Do not infer the entire historical thin-cursor symptom from one source formula. |
-| Asset Needs | Publish assets/binary softpc32.exe and softpc64.exe only. Preserve user INI, media and snapshot-midi; tests use disposable media and mock audio except explicit native integration; no Computer Use. |
-| Reporting Requirements | Record actual production/test/mirror line counts, source and dynamic evidence separately, single-owner quality review, hashes and full exact test inventories. S14 owns build/t99-s14: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence and retire scratch. |
-| Stop Conditions | Report conflicting hardware semantics, missing evidence, unavoidable source-policy expansion or a required new state/path; do not silently apply generic VGA rules to EGA or claim a private candidate shipped. |
-| Exit Criteria | Approved minimal repair, focused and full dual-width proof, dual EXEs published, actual-change review, committed/pushed complete delivery and retired scratch; wait for owner acceptance, do not close S14/T99. |
-| Original Owner Request | 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. 开始执行s14 规矩你懂. 批准修复 按老规矩. |
-| Similar-Issue Sweep | All original cursor-shape writers/callers and consumers, zero/equal/reversed/out-of-cell shapes, font-height/adapter distinctions, both text leaves and existing test assertions. |
-
-S14 research f074452f/review ff97104b supplies the five-member ledger and
-actual-port baseline/candidate proof. Approved implementation is +6/-33 in
-vga_prts.c and +49/-19 in its existing App fixture. Both widths pass all 193
-registrations (118 shared background, 67 other background, five desktop and
-three native audio), with exact registered/executed names and zero failures/
-skips. Both EXEs are refreshed, only changed objects compile, and warnings
-outside preserved mirror headers are zero. Public eight trees, user INI,
-guest media and snapshots are unchanged. The
-[proposal](../proposals/m9-public-handoff-simplification.md#s14-approved-implementation)
-owns hashes, the corrected task-runner selector, precise proof limits,
-historical mirror growth (+39 lines) and self-review. TODO remains empty;
-Td S22 is closed. Implementation is not owner-accepted S/T closure.
-Final documentation/mirror/whitespace checks pass and both builds report no
-work. Owned scratch is retired; build-residue check passes.
+Owner accepts and closes T99 S14: 批准收口S14.然后列出所有的S任务、T任务、TODO.
+No implementation subtask is active.
+Open task awaiting owner: T99.
+S1 through S14 are closed. T99 itself remains open pending its separately
+admitted completion audit; no S15 or next T is admitted. TODO is empty and
+Queue retains one unnumbered runtime-performance candidate. See the
+[S14 closure](../history/M9-T99-S14-vga-cursor-shape.md).
 
 ## Technical Baseline
 
-Latest published binaries are S14's verified build, pending owner acceptance;
+Latest published binaries are S14's verified, owner-accepted build;
 their hashes and full 193-case-per-width qualification are in the
 [implementation record](../proposals/m9-public-handoff-simplification.md#s14-approved-implementation).
 The following S13 and earlier paragraphs retain their delivery-time evidence.
