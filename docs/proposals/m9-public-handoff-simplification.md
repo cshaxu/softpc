@@ -2,6 +2,133 @@
 
 ## Admission and scope
 
+### S12 admission: Ninja incremental-build integrity
+
+Owner accepts S11 and requests: 准入S12，老规矩. S11 closes at 722ffaca;
+its [closure](../history/M9-T99-S11-sb-midi-framing.md) retains the full delivery.
+T99 remains open. Research/design first; do not erase caches or equate recent
+successful builds with repair of the historical metadata defect.
+
+Finite research ledger: (1) historical exact symptom and retained evidence;
+(2) executable/tool versions and resolved preset/cache commands; (3) untouched
+x64/x86 metadata identity and validity; (4) all repository build/cleanup writers
+and observable concurrent processes; (5) serialized repeated no-op builds;
+(6) unchanged configure/build cycles and causal dirty explanations. Each member
+must end in source proof, measured proof or an explicit missing-evidence limit.
+Private scratch experiments may refine causality but never become a second
+production route or a replacement for observing the real trees.
+
+Initial scope: task documents and disposable probes only; estimated production,
+test and build-script diff +0/-0 pending evidence. No public API/runtime/guest
+change. Capture metadata before running Ninja, since normal recovery can rewrite
+the evidence. Use the stable existing ccache presets, one owned hidden job,
+serialized per tree. Report exact compile/link/no-op counts and unchanged EXE
+identity. A genuine tooling fix requires its causal design and diff first.
+No new cache manager, retry loop, background service or speculative recovery.
+
+#### S12 research and minimum disposition
+
+Baseline 722ffaca, hidden serialized jobs 14732 (09:04:13..09:04:29) and 30068
+(09:06:01..09:06:04), both exit 0. Before any Ninja load, copy both real trees'
+dependency/build logs, cache, graph and rules into owned scratch. Tools resolve
+to Ninja 1.13.2 and CMake 4.3.3 from the existing x64 WinLibs installation;
+ccache is 4.13.6 from the existing x86 installation. Both cached make-program
+paths resolve to the same Ninja executable. Different compiler architectures
+retain their established toolchains; no tool upgrade or launcher change occurs.
+
+1. **Historical symptom: confirmed, historical producer unknown.** T93's retained
+   proposal records repeated recovery followed by hundreds of rebuild edges,
+   including 584 at its input-ownership continuation and 613 during an earlier
+   build. It does not retain the original corrupted metadata, byte offset,
+   failing-record type, executable identity or contemporaneous writer timeline.
+   Those missing inputs cannot be recovered from the now-successful cache.
+   Prior generic wording about a premature Ninja log did not identify the file.
+   [Ninja v1.13.2 DepsLog::Load](https://github.com/ninja-build/ninja/blob/v1.13.2/src/deps_log.cc)
+   owns the exact premature-end recovery warning: it reads binary .ninja_deps,
+   detects invalid/truncated records or path-ID conflicts and truncates for
+   recovery. This message alone does not distinguish interrupted writes,
+   concurrent writers or other corruption. Its separate
+   [build log](https://github.com/ninja-build/ninja/blob/v1.13.2/src/build_log.cc)
+   has version-change diagnostics. A v7 .ninja_log header cannot prove a healthy
+   dependency database. Missing recovered dependencies can explain subsequent
+   recompilation, but the exact old dirty-edge explanation is no longer present.
+
+2. **Current configuration: source and measured proof.** CMakePresets.json uses
+   stable separate x64/x86 trees and eight-way jobs. tools/build_cache.cmake
+   embeds one ccache launcher/environment; the unchanged configure does not
+   accumulate launcher prefixes or RC flags. Generated rules and complete
+   `ninja -t commands` output have identical before/after hashes per width:
+   x64 8E59B895FDAC638544523E766FD9CAA949C109C98166FEC6FFBCF998FF538CFE;
+   x86 B6DF95C4ED71A2B3CBA13096B993E828B27770D7435C175EA4CEA8B12045DAA4.
+   Cache, build.ninja and rules.ninja identities also remain equal.
+
+3. **Untouched metadata: structural proof, not historical reconstruction.**
+   Inspect the saved bytes without loading/repairing them through Ninja. Check
+   signature/version, record lengths, complete EOF, path-ID checksums and
+   dependency/output ID bounds. x64 dependency v4: 1,232,540 bytes, 1,693 path
+   records and 1,359 dependency records; x86: 608,000 bytes, 1,579 paths and
+   869 dependency records. Both reach exact EOF without invalid records.
+   Build logs are v7 with 761/768 well-formed entries. Untouched dependency
+   SHA-256: x64 48EED4B030ADD14B2CA5FA7AA5ADC23AFE6296FC053F9514B18C6899C2898565;
+   x86 5BDA00FCDFA141F5D396CB578F14B6CCCFE6FC233808228B3EF3178877363AED.
+
+4. **Writers/ownership: bounded source and process audit.** Search repository
+   source/configuration for .ninja_log, .ninja_deps, recompact, make-program,
+   launcher and build/cache/cleanup references. No tracked project code directly
+   edits the Ninja metadata or creates a recovery path. Root CMake emits the
+   graph and targets the two distinct package filenames; configure owns graph
+   generation, Ninja owns build/dependency records. Clean-Build.ps1 refuses
+   both persistent roots; its selftest uses its own disposable child. No other
+   process targets either SoftPC tree at the observed preflight. A build process
+   for another repository is left alone; it is not a competing writer to these
+   trees. This snapshot cannot prove no historical concurrency or later writer.
+
+5. **No-op/configure proof on both real trees.** Three repeated full cached
+   builds, two unchanged configure/build cycles, then a final build all report
+   no work: six no-op builds per architecture, zero compile/link commands and
+   no recovery warning. Build calls take 0.41..0.54s; configure takes 2.19..2.41s.
+   The first three no-ops preserve both metadata hashes exactly. Configure
+   changes the text log's representation but not the binary dependency hash:
+   latest-entry maps retain exactly 718 output keys; only the 26 existing
+   configure-output records change, not any object/archive/executable entry.
+   Duplicate historical entries collapse; no output key is lost. This is not
+   evidence of dependency loss or an unwanted C rebuild. No copied or cleared
+   cache substitutes for testing the original trees.
+
+6. **Real incremental proof.** Temporarily update only config_smoke.c's mtime,
+   not content; restore its original mtime in finally. Full-graph `-n -d explain`
+   identifies exactly that older test object and its link. Each actual cached
+   full build executes exactly two edges: one test object and one test EXE;
+   takes x64 0.78s/x86 0.75s. The corresponding config test passes 1/1 each.
+   After restoration, both full builds again report no work (0.34s/0.32s).
+   Explain text appears on stderr and receives PowerShell's NativeCommandError
+   formatting in captured logs; native exit codes are zero, not compiler/test
+   failures. No shipping EXE is relinked. Test source content is unchanged.
+
+**Recommendation: zero production/test/build-script diff.** Current incremental
+behavior is correct, and no specific project defect is proved. Do not add a
+lock wrapper, recovery manager, purge, automatic retry or speculative version
+pin merely to dispose of historical warnings. If recovery recurs, preserve
+.ninja_deps and .ninja_log before the next Ninja invocation, record process and
+tool identity and run the existing explain path; this is an investigation
+procedure, not a new service or permanent API. A future patch must follow the
+actual failing record/writer, not the warning's generic wording. An isolated
+manufactured truncation would reproduce Ninja's known warning but cannot
+identify the historical writer, so it is not used as a causal substitute.
+
+All six ledger members are disposed above; the missing historical damaged bytes
+and writer sequence remain explicit limits. S12 research is delivered, not a
+claim that the historical defect is fixed or owner-deferred. Owner decision is
+needed to accept this bounded disposition versus require further investigation;
+T99 is not closed. No new full unit/desktop/audio qualification is claimed:
+this turn changes only documentation and runs two relevant unit tests plus
+measured full build graphs. S11's 193/193 per architecture remains historical
+runtime qualification. Shipping EXE hashes remain S11's, INI/media untouched.
+An externally modified snapshot.midi appears during research; preserve it and
+exclude it from this task's staging. Scratch (about 35MB) is retired after
+promoting this report; both persistent caches remain. No reusable production
+probe, external source copy or dependency is introduced.
+
 ### S11 admission: Sound Blaster MIDI command boundary
 
 Owner accepts S10 at 2866cbd5: 好，收口本S，转入下一个S任务。老规矩.

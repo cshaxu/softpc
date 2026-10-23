@@ -2,34 +2,45 @@
 
 ## Current Work
 
-Owner accepts and closes S10 at reviewed delivery 2866cbd5 and admits S11,
-Sound Blaster MIDI command/parser repair. Owner approves the reviewed minimal
-bounded-unsupported design at b38ff693, including the displayed production diff.
-T99 stays open;
-S12 Ninja integrity remains planned. The proposal retains the
+Owner accepts and closes S11 at reviewed delivery 722ffaca and admits S12,
+Ninja incremental-build integrity research and design. T99 stays open.
+The proposal retains the
 eight transferred TODO items and their proof/dispositions. The adjacent VGA
 end-row/wrap finding remains in TODO; the performance Queue candidate remains.
 
-## M9 T99 S11 Packet
+## M9 T99 S12 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts the researched and displayed minimum diff: 批准，就按这个最小方案在S11内实施。完成后编译双EXE、发布、跑全量测试、提交推送，再自行审计代码质量，汇报实际diff，等我验收。 |
-| Objective | Correct unsupported SB-MIDI command/data framing in the existing DSP parser without implementing a second MIDI path or changing valid PCM behavior. |
-| Non-goals | No public-eight-tree, full SB-MIDI/UART input or audible output, FM synthesis, second parser/output path, Ninja, guest/media/INI or snapshot-format change. |
-| Reference Baseline | Reviewed S11 research b38ff693 and S10 dual EXEs; fixed necessary XP source subset/local ledger. Private candidate results do not replace permanent final-source qualification. |
+| Admission And Approval | Owner accepts S11 and admits the next planned task: 准入S12，老规矩. Research, audit and design first; present causal evidence and a minimal remedy before production/tooling changes. |
+| Objective | Explain historical premature metadata recovery and excessive rebuilds, verify current no-op/incremental behavior, and propose the smallest evidence-based correction or bounded limitation. |
+| Non-goals | No cache purge, alternative cache manager, speculative tool replacement, public-eight-tree/App/mirror behavior change, guest/media/INI/snapshot change or unrelated performance rewrite. |
+| Reference Baseline | Reviewed S11 722ffaca and its qualified EXEs; existing persistent x64/x86 Ninja/ccache trees; T93 historical recovery records are leads, not fresh reproduction. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Two mirror files: sndblst.h and nt_sbdsp.c; existing device_contract_smoke.c; XP manifest/local patch ledger, task records, rebuilt dual EXEs. Append two values to the existing DSP state field; no public API or snapshot-layout change. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation, source/research policy and current design; original source remains sole hardware authority. |
-| Verification | Permanent actual-port x86/x64 tests for all 256 data bytes after 38h, four UART entries, reset, pending-state capture/restore/rejection, no PCM/IRQ/MIDI side effects and valid following commands. Keep existing PCM/high-speed/MPU/archive regressions. Cached full builds/publication; exact full registered background, desktop and audio inventories; mirror/manifests/Types/dependency/naming/documentation/whitespace/residue gates. |
-| Expected Markers | MIDI data cannot be misclassified as a standalone PCM command; a supported or unsupported boundary is honest, original single-owner and does not alter valid PCM behavior. |
-| Asset Needs | Publish dual EXEs only; preserve INI, guest media and snapshots. Tests may own disposable media. No Computer Use or downstream repository reads/writes. |
-| Reporting Requirements | Report actual production/test/mirror counts, final qualification, hashes, capability/snapshot limits and quality review. S11 owns build/t99-s11: 30-minute jobs, five-minute no-progress, 300MB cap; promote results then retire scratch. |
-| Stop Conditions | Report unclear hardware semantics, required new MIDI state authority, unsupported snapshot migration or public-scope expansion; no silent fake-success or full capability addition. |
-| Exit Criteria | Approved minimal repair with permanent focused/full dual proof, published EXEs, honest mirror accounting, executor commit/push and coordinator actual-commit review/push; clean worktree and retired scratch, then wait for owner acceptance. |
-| Original Owner Request | 好，收口本S，转入下一个S任务。老规矩; after reviewing the diff: 批准，就按这个最小方案在S11内实施。完成后编译双EXE、发布、跑全量测试、提交推送，再自行审计代码质量，汇报实际diff，等我验收。 |
-| Similar-Issue Sweep | Every defined SB MIDI opcode, DSP pending-data state and command dispatch, WRITE_STATUS busy owner, reset/archive restoration and existing MPU parser/output route; classify each rather than add a competing parser. |
+| Files And ABI Surface | Initially task records only. Read CMakePresets.json, root CMake/tools build/cache/cleanup policies, actual Ninja log/dependency metadata, generated commands and historical invocation records. No public ABI change. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation and current source/build design; preserve stable trees and single ownership. |
+| Verification | Capture untouched metadata/version/configuration identity first; hidden serialized cached x64/x86 builds, no-op repeats and configure/build cycles; inspect explain/dependency/command hashes and metadata before/after. Distinguish fresh observation, historical evidence and controlled private counterfactuals. Any later code repair needs focused dual proof and applicable full qualification/publication. |
+| Expected Markers | A no-op build executes no compile/link commands; genuine input changes have explained rebuilds. Metadata recovery is not declared fixed solely because current builds succeed. |
+| Asset Needs | Preserve existing EXEs unless an actual build changes them; protect INI/media/snapshots. No Computer Use or external comparison repository dependency. |
+| Reporting Requirements | Give causal conclusions, exact reproduction limits, proposed files/diff and proof plan. S12 owns build/t99-s12: 30-minute jobs, five-minute no-progress and 300MB cap; promote evidence then retire scratch. |
+| Stop Conditions | Report inability to reproduce or prove a historical cause honestly; do not force cache corruption, broad tool upgrades, concurrent writers, cache deletion or runtime edits into the shipping path. |
+| Exit Criteria | Reviewed source/tooling audit, dual-width measured incremental proof and minimal actionable proposal or explicitly bounded unresolved evidence; approved implementation, if any, follows ordinary verification, publication, commit/push and actual-change review before owner acceptance. |
+| Original Owner Request | 准入S12，老规矩. The remaining planned task is Ninja incremental-build integrity research; follow research/design before repair. |
+| Similar-Issue Sweep | Both architecture trees, .ninja_log versus .ninja_deps, launcher/command identity, root configure/publish/cleanup writers, concurrent build processes and historical premature-end records. |
+
+S12 research finds structurally valid current dependencies and correct measured
+incremental behavior: six no-op/configure builds per width; one mtime-only test
+input causes exactly its object/link, its test passes, restored full builds
+are again no-op. Historical recovery maps to .ninja_deps, not the text build-log
+version, but its damaged bytes/writer timeline were not retained. Recommend
+zero code/build-script diff rather than speculative recovery machinery; the
+proposal owns the finite ledger, exact proof and unresolved historical limits.
+No repair or fresh full runtime regression is claimed. Await owner disposition;
+T99 stays open. External snapshot.midi modification is preserved, not staged.
+S11 is owner-accepted and closed; see its
+[closure](../history/M9-T99-S11-sb-midi-framing.md). Its following delivery
+record is historical S11 evidence, not S12 qualification.
 
 S11 source and actual-port research confirms the framing defect and its UART
 siblings. On each width the baseline misclassifies checked state/IRQ for 15
