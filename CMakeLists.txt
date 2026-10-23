@@ -474,6 +474,8 @@ target_include_directories(softpc-device-contract-smoke PRIVATE
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/device_contract_dma"
     COMMAND softpc-device-contract-smoke dma)
+add_test(NAME "app-softpc/unit/machine/device_contract_memory"
+    COMMAND softpc-device-contract-smoke memory)
 add_test(NAME "app-softpc/unit/machine/device_contract_disk"
     COMMAND softpc-device-contract-smoke disk)
 add_test(NAME "app-softpc/unit/machine/device_contract_rom"

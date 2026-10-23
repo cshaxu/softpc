@@ -44,6 +44,8 @@ extern void search_for_roms(void);
 extern IU8 *c_GetPhyAdd(IU32 address);
 extern void c_sas_PRS(IU32 address, IU8 *bytes, IU32 length);
 extern void c_sas_PWS(IU32 address, IU8 *bytes, IU32 length);
+extern IU16 phy_r16(IU32 address);
+extern IU32 phy_r32(IU32 address);
 extern ISM32 c_setES(IU16 value);
 extern void c_setSI(IU16 value);
 extern ISM32 c_getZF(void);
@@ -1600,6 +1602,112 @@ static void verify_sb_archive(softpc_machine *machine, const char *write_path,
     if (!write_path && !read_path) verify_sb_parser_archive();
 }
 
+static void verify_physical_memory(softpc_machine *machine)
+{
+    lib_u32 directory[1024] = {0}, pages[1024];
+    const unsigned char initial[] = {0x11, 0x22, 0x33, 0x44};
+    const unsigned char shadow[] = {0xaa, 0xbb, 0xcc, 0xdd};
+    const unsigned char changed[] = {0x51, 0x62, 0x73, 0x84};
+    const unsigned char tail[] = {0x10, 0x21, 0x32, 0x43, 0x54, 0x65, 0x76, 0x87};
+    unsigned char observed[8], rom, value;
+    const lib_u32 size = softpc_machine_memory_bytes(machine);
+    const unsigned long cr0 = c_getCR0(), cr3 = c_getCR3();
+    const int wrap = sas_twenty_bit_wrapping_enabled();
+    const unsigned char memory_type = sas_memory_type(0x80000);
+    unsigned i;
+    sas_disable_20_bit_wrapping();
+    directory[0] = 0x301007;
+    for (i = 0; i < 1024; ++i)
+        pages[i] = (i < 256 ? 0x100000u : 0u) + i * 4096u + 7u;
+    assert(softpc_machine_write_physical(machine, 0x300000, directory,
+        sizeof(directory)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x301000, pages,
+        sizeof(pages)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x4ffe, initial, 4) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x104ffe, shadow, 4) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x1b8000, shadow, 4) == SOFTPC_MACHINE_OK);
+    c_setCR3(0x300000);
+    c_setCR0(cr0 | 0x80000001ul);
+    sas_load(0x4ffe, &value);
+    assert(value == shadow[0]); /* The nonidentity mapping is actually active. */
+    assert(softpc_machine_read_physical(machine, 0x4ffe, observed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(observed, initial, 4) == 0);
+    assert(softpc_machine_write_physical(machine, 0x4ffe, changed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(c_GetPhyAdd(0x4ffe), changed, 4) == 0);
+    assert(lib_memory_compare(c_GetPhyAdd(0x104ffe), shadow, 4) == 0);
+    assert(sas_memory_type(0xb8000) == SAS_VIDEO);
+    assert(softpc_machine_write_physical(machine, 0xb8000, initial, 4) == SOFTPC_MACHINE_OK);
+    c_sas_PRS(0xb8000, observed, 4);
+    assert(lib_memory_compare(observed, initial, 4) == 0);
+    assert(softpc_machine_read_physical(machine, 0xb8000, observed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(observed, initial, 4) == 0);
+    assert(lib_memory_compare(c_GetPhyAdd(0x1b8000), shadow, 4) == 0);
+    c_setCR0(cr0);
+    c_setCR3(cr3);
+
+    /* Independent host-byte checks prevent a broken SAS reader validating itself. */
+    assert(softpc_machine_write_physical(machine, 0, initial, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(c_GetPhyAdd(0), initial, 4) == 0);
+    assert(softpc_machine_read_physical(machine, 0, observed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(observed, initial, 4) == 0);
+    assert(softpc_machine_write_physical(machine, size - sizeof(tail), tail,
+        sizeof(tail)) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(c_GetPhyAdd(size - sizeof(tail)), tail, sizeof(tail)) == 0);
+    assert(softpc_machine_read_physical(machine, size - sizeof(tail), observed,
+        sizeof(observed)) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(observed, tail, sizeof(tail)) == 0);
+    for (i = 0; i < sizeof(tail); ++i) {
+        assert(softpc_machine_read_physical(machine, size - sizeof(tail) + i,
+            &value, 1) == SOFTPC_MACHINE_OK);
+        assert(value == tail[i]);
+    }
+    assert(phy_r16(size - 2) == 0x8776);
+    assert(phy_r32(size - 4) == 0x87766554ul);
+
+    value = 0x5a;
+    lib_memory_set(observed, 0x5a, sizeof(observed));
+    assert(softpc_machine_read_physical(NULL, 0, &value, 1) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_read_physical(machine, 0, NULL, 1) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_read_physical(machine, 0, &value, 0) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_read_physical(machine, size, &value, 1) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_read_physical(machine, size - 1, observed, 2) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_read_physical(machine, 0xffffffffu, observed, 2) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(value == 0x5a);
+    for (i = 0; i < sizeof(observed); ++i) assert(observed[i] == 0x5a);
+    assert(softpc_machine_write_physical(NULL, 0, &value, 1) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_write_physical(machine, 0, NULL, 1) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_write_physical(machine, 0, &value, 0) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_write_physical(machine, size, &value, 1) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_write_physical(machine, size - 1, initial, 2) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(softpc_machine_write_physical(machine, 0xffffffffu, initial, 2) == SOFTPC_MACHINE_INVALID_ARGUMENT);
+    assert(lib_memory_compare(c_GetPhyAdd(0), initial, 4) == 0);
+    assert(lib_memory_compare(c_GetPhyAdd(size - sizeof(tail)), tail, sizeof(tail)) == 0);
+
+    assert(sas_memory_type(0xf0000) == SAS_ROM);
+    c_sas_PRS(0xf0000, &rom, 1);
+    value = rom ^ 0xff;
+    assert(softpc_machine_write_physical(machine, 0xf0000, &value, 1) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0xf0000, &value, 1) == SOFTPC_MACHINE_OK);
+    assert(value == rom);
+    assert(softpc_machine_write_physical(machine, 0x80000, initial, 4) == SOFTPC_MACHINE_OK);
+    sas_connect_memory(0x80000, 0x80fff, SAS_INACCESSIBLE);
+    assert(softpc_machine_write_physical(machine, 0x80000, changed, 4) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x80000, &value, 1) == SOFTPC_MACHINE_OK);
+    assert(value == 0xff && lib_memory_compare(c_GetPhyAdd(0x80000), initial, 4) == 0);
+    sas_connect_memory(0x80000, 0x80fff, memory_type);
+
+    assert(softpc_machine_write_physical(machine, 0x100000, shadow, 4) == SOFTPC_MACHINE_OK);
+    sas_enable_20_bit_wrapping();
+    assert(softpc_machine_read_physical(machine, 0x100000, observed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(observed, initial, 4) == 0);
+    assert(softpc_machine_write_physical(machine, 0x100000, changed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(c_GetPhyAdd(0), changed, 4) == 0);
+    sas_disable_20_bit_wrapping();
+    assert(softpc_machine_read_physical(machine, 0x100000, observed, 4) == SOFTPC_MACHINE_OK);
+    assert(lib_memory_compare(observed, shadow, 4) == 0);
+    if (wrap) sas_enable_20_bit_wrapping();
+}
+
 static void verify_sb_paged_dma(softpc_machine *machine)
 {
     lib_u32 directory[1024] = {0}, pages[1024];
@@ -1654,7 +1762,9 @@ int main(int argc, char **argv)
     assert(fclose(file) == 0);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    if (lib_text_compare(argv[1], "dma") == 0)
+    if (lib_text_compare(argv[1], "memory") == 0)
+        verify_physical_memory(machine);
+    else if (lib_text_compare(argv[1], "dma") == 0)
         verify_dma(machine);
     else if (lib_text_compare(argv[1], "rom") == 0)
         verify_rom(machine);

@@ -7,8 +7,8 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S7 is owner-accepted and closed; S8 is admitted for current-source
-audit and design, with the initial task brief first. S9-S11 remain planned. The owner accepts current passing native startup
+not by repair. S7 is owner-accepted and closed; S8 is implemented and verified,
+awaiting delivery review and owner acceptance. S9-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
@@ -17,35 +17,34 @@ The separate performance Queue candidate remains.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts and closes S7 and admits the next planned S: 批准收口，准入下一个S任务，先给任务简报。 Begin with the S8 brief and current-source audit/design; do not start implementation in the admission delivery. |
+| Admission And Approval | After the brief and research at bdcdd28b, the owner approves implementation: 批准实施，规矩你懂。 This explicitly includes the proposed original phyR boundary condition, its marker/accounting, two Compat call replacements and Machine contract comment. |
 | Objective | Establish and minimally repair the actual physical-memory adapter contract using the original physical SAS path, including mapped video and boundaries. |
 | Non-goals | No S9-S11 implementation, public-component changes, guest/media/INI edits, direct-RAM second implementation or speculative mirror changes. |
-| Reference Baseline | 7fac795d reviewed S7 delivery; S6 published dual EXEs remain current because S7 changes tests only. Historical T94 DMA evidence is a research lead, not fresh S8 proof. |
+| Reference Baseline | bdcdd28b reviewed S8 research and f251686b research source baseline. S6 published dual EXEs are refreshed by S8 production delivery. Historical T94 DMA evidence remains distinct from fresh S8 proof. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | App Compat memory adapters and their machine wrapper callers; owner-local App memory tests and necessary registration. No planned public eight-tree ABI or mirror change. Confirm actual files and all callers before implementation. |
+| Files And ABI Surface | compat/memory.c, machine/machine.h comment, original base/ccpu386/ccpusas4.c phyR condition with local marker, existing Machine device-contract test and root registration; XP manifest/local ledger and task records. Public eight-tree ABI and all other mirror code remain unchanged. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy. |
 | Verification | First audit all physical adapter callers and the original SAS contract. Planned focused proof covers nonidentity paging reads/writes, SAS_VIDEO routing and range boundaries on x86/x64. Implementation requires cached dual builds/publication, complete background regression and applicable integration; record fresh versus inherited evidence separately. |
 | Expected Markers | Physical addresses remain physical under paging; reads/writes retain original SAS device mapping and fail honestly at invalid boundaries. One original memory route, no direct-RAM bypass. |
 | Asset Needs | Preserve INI, snapshots and guest media; disposable fixtures only. No Computer Use. Native device unavailability remains an environment result, not a product repair. |
 | Reporting Requirements | Brief first; then current-source findings, finite caller/contract ledger, minimal design and measured diff estimate before implementation. Separate source inference, tests and guest proof. S8 owns build/t99-s8, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote evidence and retire scratch. |
-| Stop Conditions | Report if original physical SAS cannot preserve device mapping or requires public/mirror scope expansion. Do not silently replace device access with RAM copies or treat the historical DMA observation as proof of every caller's failure. |
+| Stop Conditions | Report if original physical SAS cannot preserve mapping or needs changes beyond the approved phyR condition/marker. Do not add a direct-RAM production bypass or infer live product failures from test-only adapter callers. |
 | Exit Criteria | Audited single-path repair with focused dual proof, required regression/publication, actual-diff review, commit/push and clean scratch; wait for owner acceptance. |
-| Original Owner Request | 批准收口，准入下一个S任务，先给任务简报。 Next planned item is S8 physical memory adapter correctness in the admitted T99 expansion. |
+| Original Owner Request | Admit S8, investigate through an executable proposal, then 批准实施，规矩你懂。 Implement the reviewed minimal solution, dual-build/publish/test/review/commit/push and wait for acceptance. |
 | Similar-Issue Sweep | Enumerate named physical memory read/write adapters and all actual callers; distinguish linear, physical and device-mapped SAS operations and document each disposition. |
 
-S8 research confirms the two Compat calls use linear rather than physical SAS.
-Current and scratch-only candidate probes on both widths establish the paged
-wrong-page defect and the two-call repair, including SAS_VIDEO. All direct
-Machine wrapper consumers are tests, not shipping runtime paths. An additional
-existing phyR boundary defect rejects the final two legal RAM bytes; the
-candidate still reproduces it. The proposal records a one-condition original
-repair, required mirror accounting and precise scope/diff estimates. Owner
-approval of that mirror scope is required before implementation. No tracked
-code or assets are modified; this delivery is research, not S8 qualification.
+S8 replaces two Compat linear calls with original physical SAS and corrects
+the approved phyR range condition, with one marker and updated XP accounting.
+Production +7/-6, test C +111/-1, root registration +2/-0; all eight shared
+trees are unchanged. Final-source x64/x86 each pass 193/193 (185 background,
+five desktop, three native audio), exact registration/execution equality and
+zero failures/skips. Both EXEs are refreshed; user INI and guest assets are
+unchanged. Original-header warnings are retained; no non-mirror warning is
+reported. The proposal owns complete evidence, hashes and validation limits.
 
 S6 is closed by owner-authorized advancement; see its
 [closure](../history/M9-T99-S6-debug-fixtures.md). S7 is accepted and closed; see its
-[closure](../history/M9-T99-S7-app-test-contracts.md). S8 is active for audit/design.
+[closure](../history/M9-T99-S7-app-test-contracts.md). S8 is verified, awaiting acceptance.
 The following S7 and S6 delivery
 record is historical evidence, not current S7 qualification.
 
@@ -257,13 +256,12 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 ## Current Technical Baseline
 
-- T99 S6 runtime delivery is 8566eb42. The local debug-refetch correction and
-  test-owned boot/HLT preparation are verified by cached dual build/publication,
-  complete 192/192 qualification per architecture and 24 additional desktop
-  package passes. Production +4/-0, tests +20/-0. The owner removes the historical
-  native-start observation from deferred work; its research stays in the
-  proposal without a Windows-repair claim. Both artifact identities are
-  recorded there and match the committed binaries. S6 awaits owner acceptance.
+- T99 S8 is the current verified runtime: physical adapter routing and the
+  original range-check correction pass cached dual build/publication and
+  193/193 final-source tests per architecture. Public eight trees retain their
+  prior identities. The proposal records new EXE identities and unchanged INI.
+  S8 awaits owner acceptance. S6's debug-refetch correction is preserved;
+  its owner-closed evidence is in [history](../history/M9-T99-S6-debug-fixtures.md).
 
 - T99 S2 delivery a3fa9062: Broker fail-closed cleanup is consolidated and the
   App completion fixture no longer resets an already auto-reset event. Cached

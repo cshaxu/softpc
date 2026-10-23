@@ -581,7 +581,8 @@ phyR IFN4(PHY_ADDR, addr, IUM8, typeSize, VID_READ_FP, vidFP, char *, name)
 
 	addr &= SasWrapMask;
 
-	if ((addr + typeSize + 1) >= Length_of_M_area) {
+	/* T99 S8: accept complete in-range accesses without overflowing the end. */
+	if (addr >= Length_of_M_area || typeSize > Length_of_M_area - addr) {
 		SAVED IBOOL first = TRUE;
 		SAVED IU32 junk_value = 0xfefefefe;
 		if (first)

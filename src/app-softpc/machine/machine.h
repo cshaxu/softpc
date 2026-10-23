@@ -40,9 +40,9 @@ softpc_machine_result softpc_machine_run(softpc_machine *machine,
     lib_u64 instruction_budget);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
     lib_u32 address, void *buffer, lib_u32 bytes);
-/* Copy bytes into guest physical RAM through the machine boundary.  This is
- * intended for firmware/media integration and test fixtures, not a host RAM
- * alias; ROM and out-of-range writes are rejected by the machine. */
+/* Copy through the original physical bus mapping, including A20 and video.
+ * ROM writes are accepted but ignored by SAS; out-of-range requests fail.
+ * This is a serialized machine operation, not a live host RAM alias. */
 softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
     lib_u32 address, const void *buffer, lib_u32 bytes);
 softpc_machine_result softpc_machine_instruction_pointer(

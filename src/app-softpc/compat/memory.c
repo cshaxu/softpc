@@ -37,7 +37,7 @@ int softpc_platform_write_physical(IU32 address, const IU8 *bytes, IU32 length)
     /* A physical bus write must take the same original SAS route as reads.
        Direct host-RAM copying bypasses SAS_VIDEO, so it fails to update
        C-VID's EGA planes and its original dirty-marking algorithm. */
-    c_sas_stores(address, (IU8 *)bytes, length);
+    c_sas_PWS(address, (IU8 *)bytes, length);
     return 1;
 }
 
@@ -49,6 +49,6 @@ int softpc_platform_read_physical(IU32 address, IU8 *bytes, IU32 length)
     /* A physical bus read must honour SAS_VIDEO and other original mapping
        types. Reading host_sas memory directly bypasses C-VID's EGA planes,
        making B8000h appear empty even after a guest has written text. */
-    c_sas_loads(address, bytes, length);
+    c_sas_PRS(address, bytes, length);
     return 1;
 }

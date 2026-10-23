@@ -26,6 +26,11 @@ Research baseline is f251686b. The owner requests investigation through an
 executable proposal, not production implementation. No tracked production,
 test, mirror, public-component or asset file changes in this delivery.
 
+Subsequent owner approval at bdcdd28b admits implementation of this complete
+minimal proposal, including the phyR mirror condition, its local marker and
+accounting. The research statements below retain their original proof limits;
+fresh implementation qualification is recorded separately after execution.
+
 #### Frozen ledger and current-source findings
 
 The universe is the two Compat physical adapters, their two Machine wrappers,
@@ -161,6 +166,99 @@ zero; concise evidence is promoted and all owned processes have exited.
 Disposable probes/media/logs are removed through the approved cleanup tool;
 documentation, whitespace and build-residue checks pass. S8 remains open for
 the owner's decision on the minimal mirror scope, not accepted as repaired.
+
+### S8 approved implementation and qualification
+
+Implementation baseline is bdcdd28b. The owner explicitly approves the
+three-statement proposal, including the original phyR correction. No new
+implementation path, API, allocation, state, lock, worker or polling is added.
+
+Actual production C/H changes are memory.c +2/-2, machine.h +3/-3 and
+ccpusas4.c +2/-1: +7/-6, net +1. The first switches linear to original physical
+SAS; the header describes actual bus/ROM behavior; the mirror changes only its
+range condition and adds the local reason marker. Existing snapshot bodies,
+A20 masking, device dispatch and out-of-range handling remain untouched.
+
+Test C changes are +111/-1, net +110, in the existing device-contract fixture.
+One new memory case reuses its creation/reset, firmware, audio mocks and
+cleanup. Two original physical-width declarations are test-local, not new
+production exports. Root CMake adds two lines for that case; no new executable
+or shared test infrastructure. The finite proof ledger is:
+
+1. Active nonidentity paging: a real linear read proves the mapping, while
+   physical reads/writes cross a page boundary and preserve shadow RAM.
+2. SAS_VIDEO: original mapped reads observe wrapper writes; wrapper reads
+   preserve the video value and leave paged shadow RAM unchanged.
+3. Allocation ends: first and final bytes, an eight-byte span ending exactly
+   at the end, and original physical word/dword reads use independent expected
+   values. Test-only host-byte observations verify the writes, avoiding a
+   broken reader validating its own output.
+4. Refusal: null machine/buffer, zero length, one-past-end, partial overrun and
+   address overflow return INVALID_ARGUMENT, preserving destination and RAM.
+   Rejected two-byte operations still receive adequately sized test buffers.
+5. ROM and inaccessible pages: original ignored-write and inaccessible-read
+   behavior remain observable; the temporary memory type is restored.
+6. A20: enabled wrapping accesses low memory; disabled wrapping accesses the
+   independent high-memory value. Original CR0, CR3 and wrap state are restored.
+
+All six groups pass in the focused x86/x64 run. The first complete run passes
+193/193 per architecture (185 background, five desktop, three native audio).
+Self-review then replaces undersized buffers in rejected-request test cases
+with existing arrays and adds unchanged-array assertions. A final-source full
+run follows; preliminary results are not substituted for that qualification.
+
+The mirror increment relative to this S is +2/-1. A comparison-only read of
+the XP file matches pinned normalized SHA256
+1673d63843341ed4861a1cada87e9c62bcc8d020587e68638fb97a663fceaab5.
+Against that whole-file subset the current normalized diff is +62/-1: the
+other 60 additions predate S8. The manifest retains XP raw/subset identity,
+updates local hash to
+5be2dbef6e0ec480e59a796588932d1b64d8a5a4920fdc222d4ecde386e681c6
+and records REVIEWED_LOCAL_PATCH. The current semantic ledger identifies the
+condition and marker. No external source is a build/test input.
+
+The similar-issue sweep retains the research ledger: the only two named
+Compat physical operations now call physical SAS; their Machine wrappers and
+13 test consumers keep one interface. Debug's explicit one-time linear
+translation and DMA's existing physical SAS route remain distinct and
+unchanged. This is not an exhaustive repair of every original SAS primitive.
+All eight shared trees are byte-unchanged against the implementation baseline;
+no importing project needs a shared-component synchronization for S8.
+
+Final-source qualification passes 193/193 per architecture: 185 background
+(164 unit, 14 checks, seven integration), five desktop and three native-audio
+tests. Combined JUnit names equal each architecture's 193 registered CTest
+names exactly, without duplicates, failures, disabled cases or skips. The
+final focused memory cases also pass. Background time is 118.88s x64 and
+121.19s x86; native desktop is 24.27s/23.67s and audio 3.05s/3.20s. The final
+Win3.1 installed-image roundtrip is 54.93s/53.73s; checkpoint is 1.26s/1.37s.
+Desktop session is active; no Computer Use or manual guest test is used.
+
+Ninja/ccache trees and original objects are reused, not cleared. The initial
+production build publishes both EXEs; after the test-only safety correction,
+only the changed fixture is recompiled and the complete build reports no work.
+Across actual compiled paths, 712 repeated warning diagnostics belong to
+unchanged original-mirror headers; no warning belongs to shared, App or test
+source outside the mirror. This is not a zero-warning mirror-build claim.
+
+Published SHA256 identities are:
+
+- softpc32.exe: AF0E4D7DFD87C67F1A7E0EF5B10502F7A6EDF96FCF67C36A02F1937113B4CF8B
+- softpc64.exe: 95104A23CB440B3A1D366705A36DFBC604C072C419A0891F12222AE5B3261CF6
+- unchanged user INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
+Both complete runs produce the same EXE identities. The final job exits zero;
+mirror verification accounts for all 505 bodies and documentation/whitespace
+checks pass. The six focused groups use the default 16-MiB fixture and selected
+RAM/ROM/VIDEO/inaccessible/A20 cases, not an exhaustive hardware-address-space
+proof. Registered DOS package and installed Win3.1 flows pass; no extra Win95
+manual acceptance is claimed. S8 waits for owner acceptance after delivery;
+S9-S11 remain unadmitted.
+
+All owned qualification processes exit before cleanup. Concise results and
+identities above replace the disposable scripts/logs; build/t99-s8 is retired
+with the existing cleanup tool. Reusable caches are retained and the residue
+check passes. No guest medium, snapshot or user configuration is changed.
 
 ### S7 admission: deterministic App test contracts
 

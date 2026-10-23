@@ -1,5 +1,15 @@
 # XP SP1 SoftPC 逐文件语义审计
 
+## T99 S8 已批准的物理读取边界修正
+
+`base/ccpu386/ccpusas4.c` 的原始 phyR 在 A20 掩码后，将
+`addr + typeSize + 1 >= Length_of_M_area` 改为先检查起点，再比较剩余容量。
+只替换一个条件并加原因标记（+2/-1）；保留原始 RAM/ROM/VIDEO 分派、
+越界返回值和全部快照代码。合法的末尾字节、字及双字访问不再被误拒绝，
+也不通过 Compat 绕过原有物理路径。固定 XP 身份与 whole 子集不变，
+只更新本地哈希和 reviewed patch 处置。验证及当前交付状态见
+[T99 S8](../../../proposals/m9-public-handoff-simplification.md#s8-research-physical-sas-callers-and-minimal-repair)。
+
 迁移政策纠偏（2026-10-15）：当前采用 **XP 必要源码子集**，不是保留路径
 的整文件导入。文末 T40 历史材料中的“全部采用文件”“保留未编译分支”
 不再是执行要求。逐区块排除无用的外部机型、地域宿主及产品路由；既有
