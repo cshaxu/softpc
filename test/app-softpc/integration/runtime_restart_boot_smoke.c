@@ -21,6 +21,47 @@ typedef struct runtime_frame_probe {
     } \
 } while (0)
 
+/* These regions belong to the fixed image, not Windows in general. Include
+   the active Program Manager title AND its initialized Main group's title. */
+typedef struct runtime_caption {
+    lib_u32 x, y, width, height, hash;
+} runtime_caption;
+static const runtime_caption program_manager = {252u, 56u, 116u, 52u, 0xdc71b0dfu};
+static const runtime_caption run_dialog = {280u, 108u, 32u, 10u, 0xfd3f1585u};
+
+static int frame_has_caption(const kvm_window_frame *frame, const runtime_caption *caption)
+{
+    const kvm_window_graphics_frame *image = frame->graphics;
+    lib_u32 hash = 2166136261u;
+    if (!image || image->width != 640u || image->height != 480u ||
+        caption->x > image->width || caption->width > image->width - caption->x ||
+        caption->y > image->height || caption->height > image->height - caption->y) return 0;
+    for (lib_u32 y = caption->y; y < caption->y + caption->height; ++y)
+        for (lib_u32 x = caption->x; x < caption->x + caption->width; ++x)
+            hash = (hash ^ image->pixels[(lib_size)y * image->stride + x]) * 16777619u;
+    return hash == caption->hash;
+}
+
+static int wait_for_caption(emulator_machine *runtime, const runtime_caption *caption)
+{
+    kvm_window_frame_storage frame = {0};
+    lib_u64 deadline = softpc_test_clock_milliseconds() + 15000u;
+    int matched = 0;
+    do {
+        if (emulator_machine_state_get(runtime) != EMULATOR_MACHINE_RUNNING) break;
+        if (emulator_machine_copy_published_frame(runtime, &frame,
+                emulator_machine_run_generation(runtime)) && frame_has_caption(&frame.frame, caption)) {
+            matched = 1;
+            break;
+        }
+        softpc_test_sleep_milliseconds(10u);
+    } while (softpc_test_clock_milliseconds() < deadline);
+    if (!matched) fprintf(stderr, "caption not ready: %u,%u %ux%u hash=%08x\n",
+        caption->x, caption->y, caption->width, caption->height, caption->hash);
+    kvm_window_frame_release(&frame);
+    return matched;
+}
+
 static int wait_for_state(emulator_machine *runtime, emulator_machine_state state)
 {
     lib_u64 deadline = softpc_test_clock_milliseconds() + 10000u;
@@ -74,7 +115,7 @@ static int frame_has_dos_prompt(const kvm_window_frame *frame)
     if (frame == NULL || frame->text == LIB_NULL || frame->graphics != LIB_NULL)
         return 0;
     for (row = 0u; row < frame->text->base.text_rows; ++row) {
-        const kvm_text_cell *line = &frame->text->base.cells[row * 80u];
+        const kvm_text_cell *line = &frame->text->base.cells[(lib_size)row * frame->text->base.stride];
         lib_u32 column;
 
         for (column = 0u; column + 3u < frame->text->base.text_columns; ++column) {
@@ -94,18 +135,16 @@ static void report_last_frame(emulator_machine *runtime)
 
     if (!emulator_machine_copy_published_frame(runtime, &frame,
             emulator_machine_run_generation(runtime))) return;
-    fprintf(stderr, "last frame: graphics=%u text=%ux%u sequence=%lu\n",
-        (unsigned int)(frame.frame.graphics != LIB_NULL),
-        (unsigned int)frame.data.text->base.text_columns, (unsigned int)frame.data.text->base.text_rows,
-        (unsigned long)frame.frame.sequence);
     if (frame.frame.graphics != LIB_NULL) {
         const kvm_window_graphics_frame *image = frame.frame.graphics;
+        fprintf(stderr, "last frame: graphics=%ux%u sequence=%lu\n",
+            image->width, image->height, (unsigned long)frame.frame.sequence);
         FILE *file = fopen("restart-failure.ppm", "wb");
         if (file != NULL) {
             fprintf(file, "P6\n%u %u\n255\n", image->width, image->height);
             for (lib_u32 y = 0; y < image->height; ++y)
                 for (lib_u32 x = 0; x < image->width; ++x) {
-                    lib_u32 pixel = image->pixels[y * image->stride + x];
+                    lib_u32 pixel = image->pixels[(lib_size)y * image->stride + x];
                     const unsigned char rgb[] = {
                         (unsigned char)(pixel >> 16), (unsigned char)(pixel >> 8),
                         (unsigned char)pixel };
@@ -115,18 +154,15 @@ static void report_last_frame(emulator_machine *runtime)
         }
         return;
     }
-    for (row = 0u; row < frame.data.text->base.text_rows; ++row) {
-        char line[80u + 1u];
-        lib_u32 column;
-        int nonblank = 0;
-
-        for (column = 0u; column < frame.data.text->base.text_columns; ++column) {
-            lib_u8 c = frame.data.text->base.cells[row * 80u + column].glyph_index;
-            line[column] = c >= 0x20u && c < 0x7fu ? (char)c : ' ';
-            if (line[column] != ' ') nonblank = 1;
+    const kvm_text_frame *text = &frame.frame.text->base;
+    fprintf(stderr, "last frame: text=%ux%u sequence=%lu\n",
+        text->text_columns, text->text_rows, (unsigned long)frame.frame.sequence);
+    for (row = 0u; row < text->text_rows; ++row) {
+        for (lib_u32 column = 0u; column < text->text_columns; ++column) {
+            lib_u8 c = text->cells[(lib_size)row * text->stride + column].glyph_index;
+            fputc(c >= 0x20u && c < 0x7fu ? c : ' ', stderr);
         }
-        line[frame.data.text->base.text_columns] = '\0';
-        if (nonblank) fprintf(stderr, "%s\n", line);
+        fputc('\n', stderr);
     }
 }
 
@@ -170,35 +206,17 @@ static int enter_windows(emulator_machine *runtime)
 {
     const lib_u32 keys[] = { 'W', 'I', 'N', BASE_KEY_ENTER };
     const lib_u32 scans[] = { 0x11u, 0x17u, 0x31u, 0x1cu };
-    kvm_window_frame_storage *frame = lib_allocate_zero(1u, sizeof(*frame));
-    lib_u64 deadline;
-    int graphics = 0, running = 1;
-    if (frame == NULL) return 0;
     for (unsigned index = 0; index < 4u; ++index) {
         kvm_input_event event = { 0 };
         event.type = KVM_EVENT_KEY;
         event.data.key.key = keys[index];
         event.data.key.scan_code = scans[index];
         event.data.key.pressed = 1u;
-        if (emulator_machine_enqueue_input(runtime, &event) != LIB_STATUS_OK) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
+        if (emulator_machine_enqueue_input(runtime, &event) != LIB_STATUS_OK) return 0;
         event.data.key.pressed = 0u;
-        if (emulator_machine_enqueue_input(runtime, &event) != LIB_STATUS_OK) { kvm_window_frame_release(frame); lib_release(frame); return 0; }
+        if (emulator_machine_enqueue_input(runtime, &event) != LIB_STATUS_OK) return 0;
     }
-    /* Observe through startup, not merely its first splash frame. The fixed
-       installed image remains overlay-only and the normal executor owns time. */
-    deadline = softpc_test_clock_milliseconds() + 15000u;
-    do {
-        if (emulator_machine_state_get(runtime) != EMULATOR_MACHINE_RUNNING) {
-            running = 0;
-            break;
-        }
-        if (emulator_machine_copy_published_frame(runtime, frame,
-                emulator_machine_run_generation(runtime)) && frame->frame.graphics)
-            graphics = frame->frame.graphics->width == 640u && frame->frame.graphics->height == 480u;
-        softpc_test_sleep_milliseconds(10u);
-    } while (softpc_test_clock_milliseconds() < deadline);
-    kvm_window_frame_release(frame); lib_release(frame);
-    return running && graphics;
+    return wait_for_caption(runtime, &program_manager);
 }
 
 static int send_key(emulator_machine *runtime, lib_u32 key, lib_u32 scan, int down)
@@ -261,12 +279,13 @@ static int prompt_roundtrip(emulator_machine *runtime, int windowed)
     int succeeded = 0;
     unsigned stage = 0u;
     if (frame == NULL) return 0;
+    if (!wait_for_caption(runtime, &program_manager)) goto done;
     /* Program Manager File/Run, through the ordinary machine input queue. */
     if (!send_key(runtime, BASE_KEY_ALT, 0x38, 1) ||
         !tap_key(runtime, 'F', 0x21) ||
         !send_key(runtime, BASE_KEY_ALT, 0x38, 0) ||
         !tap_key(runtime, 'R', 0x13)) goto done;
-    softpc_test_sleep_milliseconds(300u);
+    if (!wait_for_caption(runtime, &run_dialog)) goto done;
     if (!emulator_machine_copy_published_frame(runtime, frame,
             emulator_machine_run_generation(runtime)) ||
         !type_command(runtime, windowed ? "DOSPMPTW.PIF" : "DOSPRMPT.PIF")) goto done;
@@ -293,6 +312,7 @@ static int prompt_roundtrip(emulator_machine *runtime, int windowed)
     softpc_test_sleep_milliseconds(2000u);
     stage = 8u;
     if (!wait_for_mode(runtime, 1, frame->frame.sequence)) goto done;
+    if (!wait_for_caption(runtime, &program_manager)) goto done;
     succeeded = 1;
 done:
     if (!succeeded) {
@@ -314,6 +334,21 @@ int main(void)
     unsigned int cycle;
     runtime_frame_probe frame_probe = { 0 };
 
+    {
+        /* Keep the old row-80 address in bounds as a false-positive control. */
+        kvm_text_cell cells[96] = {0};
+        kvm_window_text_frame text = {.base = {.text_columns = 4u, .text_rows = 2u,
+            .stride = 6u, .capacity = 96u, .cells = cells}};
+        kvm_window_frame frame = {.text = &text};
+        for (unsigned i = 0; i < 4u; ++i) cells[6u + i].glyph_index = "C:\\>"[i];
+        REQUIRE(frame_has_dos_prompt(&frame));
+        REQUIRE(!frame_has_caption(&frame, &program_manager));
+        for (unsigned i = 0; i < 4u; ++i) {
+            cells[6u + i].glyph_index = 0u;
+            cells[80u + i].glyph_index = "C:\\>"[i];
+        }
+        REQUIRE(!frame_has_dos_prompt(&frame));
+    }
     options.hard_disk_path = SOFTPC_TEST_RESTART_BOOT_IMAGE;
     options.memory_bytes = 16u * 1024u * 1024u;
     options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;

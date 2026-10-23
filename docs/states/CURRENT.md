@@ -7,8 +7,8 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S6 is owner-closed and S7 is admitted for deterministic App
-test-contract research and repair; S8-S11 remain planned. The owner accepts current passing native startup
+not by repair. S6 is owner-closed and S7 is implemented and verified, pending
+actual-commit review and owner acceptance; S8-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
@@ -17,35 +17,37 @@ The separate performance Queue candidate remains.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs closure of S6 without another acceptance round and immediate admission of S7. |
+| Admission And Approval | Owner directs closure of S6 and admission of S7, then approves the measured minimal proposal at 7d58115c: retain checkpoint unchanged, consolidate timer oracles, observe fixed-image readiness and correct viewport reads. Implement, verify, commit/push and wait for acceptance. |
 | Objective | Diagnose and minimally repair checkpoint timing, INT 1Ah timer assertions, Win3.1 readiness and package viewport-reading test contracts. |
 | Non-goals | No S8-S11 implementation, public-component or mirror changes, guest/media/INI edits, blind retries, speculative product fixes or undiagnosed timeout increases. |
-| Reference Baseline | 819ff0cc; S6 published dual EXEs and regression evidence are retained, not claimed as fresh S7 verification. |
+| Reference Baseline | 7d58115c approved research; S6 published dual EXEs are retained because S7 changes tests only. Prior regression remains distinct from fresh S7 qualification. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
 | Files And ABI Surface | test/app-softpc unit machine checkpoint and timer fixtures, integration runtime-restart and package fixtures, and their actual test registration if diagnosis requires it. No planned production or public ABI change. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy. |
 | Verification | Cached x86/x64 builds of changed fixtures, focused actual-path counterfactuals and parallel phase measurements, complete background regression and affected native/package integration. Test-only changes preserve published EXE identities; production changes require owner-approved scope revision and dual publication. |
-| Expected Markers | Phase durations identify a checkpoint budget cause; legal zero timer values pass a meaningful oracle; actual Program Manager readiness precedes interaction; visible-screen reads follow viewport rows rather than backing-buffer stride. |
+| Expected Markers | Retain checkpoint budget under the approved no-change disposition without claiming the historical timeout repaired; legal zero timer values pass a meaningful oracle; actual Program Manager readiness precedes interaction; visible-screen reads follow viewport rows rather than backing-buffer stride. |
 | Asset Needs | Preserve INI, snapshots and guest media; disposable fixtures only. No Computer Use. Native device unavailability remains an environment result, not a product repair. |
 | Reporting Requirements | Four-case finite ledger, initial minimal design/diff estimate, measured versus source-inferred facts, actual source/test line counts and verification limits. S7 owns build/t99-s7, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote evidence and retire scratch. |
 | Stop Conditions | Stop for scope revision if a production fix is required; do not weaken assertions, infer a cause from repetition alone, add retries or retain the owner-disposed native-start observation as new debt. |
 | Exit Criteria | Each of the four cases has a diagnosed repair with focused proof or an explicit owner disposition; required dual regression, actual-diff review, commit/push and clean scratch precede delivery for acceptance. |
-| Original Owner Request | S6没有生成代码改动不需要我验收，直接准入S7。 S6 actually includes the recorded +4 production and +20 test lines; advancement closes it without a second acceptance request. |
+| Original Owner Request | S6没有生成代码改动不需要我验收，直接准入S7。 Subsequent request: actual research, executable report and diff estimate; latest approval: 批准治理，规矩你懂。 Implement the approved test-only proposal and wait for acceptance after build/test/review/commit/push. |
 | Similar-Issue Sweep | Audit App test waits/readiness, byte-level timer oracles and visible-versus-backing Console reads; record every in-scope hit and preserve existing frame/IRQ assertions. |
 
 S6 is closed by owner-authorized advancement; see its
-[closure](../history/M9-T99-S6-debug-fixtures.md). S7 is active, not yet implemented
-or verified. Its four-case plan is in the proposal. The following S6 delivery
+[closure](../history/M9-T99-S6-debug-fixtures.md). S7 is active and verified,
+awaiting delivery review and acceptance. Its four-case record is in the proposal. The following S6 delivery
 record is historical evidence, not current S7 qualification.
 
-S7 research now has a bounded implementation proposal: retain the checkpoint
-budget (its historical failure is not claimed repaired), consolidate timer
-oracles, use fixed-image UI readiness, and correct viewport row reads. Current
-dual 29-case parallel groups pass; native viewport counterexample is proved;
-two x64 installed-image runs pass. Temporary probes are removed and both test
-targets rebuilt on both widths. These are research results, not completed
-S7 implementation or fresh full qualification. See the proposal for measured
-timings, evidence limits and the approximately +121/-104 test-only estimate.
+S7 implements the approved bounded proposal: retain checkpoint's budget under
+the owner's no-change disposition, consolidate timer oracles, observe initialized
+Program Manager/Run readiness and read actual viewport rows. Actual test C is
++151/-114 (net +37), four App files only. Fresh final-source R3 qualification
+passes 192/192 per width (184 background, five desktop, three native audio),
+exact inventory equality and zero failures/skips. Both full cached builds have
+no compiler warnings. Public eight trees, production/mirror, root CMake, media
+and INI are unchanged; shipping EXE identities remain S6's. The proposal owns
+counterfactuals, failed test-draft dispositions and verification limits. S7
+awaits actual-commit review and owner acceptance; T99 remains open.
 
 S6's final four-case ledger and research are in the proposal. The existing local
 debug hook clears quick_mode before refetch; fixtures own a non-HLT program and

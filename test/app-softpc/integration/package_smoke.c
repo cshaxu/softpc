@@ -164,40 +164,63 @@ static int package_send_pause_hotkey(HANDLE input)
             LEFT_CTRL_PRESSED | LEFT_ALT_PRESSED, 0);
 }
 
-static int package_screen_contains(HANDLE output, const char *needle)
+static int package_read_viewport(HANDLE output)
 {
     CONSOLE_SCREEN_BUFFER_INFO info;
-    char text[4096];
-    DWORD read = 0u;
     COORD origin;
-    DWORD count;
+    DWORD width;
 
+    package_last_screen_length = 0u;
+    if (!GetConsoleScreenBufferInfo(output, &info)) return 0;
+    width = (DWORD)(info.srWindow.Right - info.srWindow.Left + 1);
+    if (width * (DWORD)(info.srWindow.Bottom - info.srWindow.Top + 1) >=
+            sizeof(package_last_screen)) return 0;
+    origin.X = info.srWindow.Left;
+    for (origin.Y = info.srWindow.Top; origin.Y <= info.srWindow.Bottom; ++origin.Y) {
+        DWORD read = 0u;
+        if (!ReadConsoleOutputCharacterA(output,
+                package_last_screen + package_last_screen_length,
+                width, origin, &read) || read != width) return 0;
+        package_last_screen_length += read;
+    }
+    package_last_screen[package_last_screen_length] = '\0';
+    package_last_screen_width = width;
+    return 1;
+}
+
+static int package_screen_contains(HANDLE output, const char *needle)
+{
+    int succeeded;
     if (output == INVALID_HANDLE_VALUE || needle == NULL) return 0;
-    /* CONOUT$ resolves the currently displayed buffer at open time. A saved
-       handle still observes cooked history while the raw surface is active. */
+    /* Reopen the active buffer, not a saved cooked-history handle. */
     output = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0u, NULL);
     if (output == INVALID_HANDLE_VALUE) return 0;
-    if (!GetConsoleScreenBufferInfo(output, &info)) {
-        CloseHandle(output);
-        return 0;
-    }
-    origin.X = info.srWindow.Left;
-    origin.Y = info.srWindow.Top;
-    count = (DWORD)(info.srWindow.Right - info.srWindow.Left + 1) *
-        (DWORD)(info.srWindow.Bottom - info.srWindow.Top + 1);
-    if (count >= sizeof(text)) count = sizeof(text) - 1u;
-    if (!ReadConsoleOutputCharacterA(output, text, count, origin, &read)) {
-        CloseHandle(output);
-        return 0;
-    }
+    succeeded = package_read_viewport(output);
     CloseHandle(output);
-    text[read] = '\0';
-    lib_memory_copy(package_last_screen, text, read + 1u);
-    package_last_screen_width =
-        (DWORD)(info.srWindow.Right - info.srWindow.Left + 1);
-    package_last_screen_length = read;
-    return lib_text_find_substring(text, needle) != NULL;
+    return succeeded && lib_text_find_substring(package_last_screen, needle) != NULL;
+}
+
+static int package_check_viewport(void)
+{
+    HANDLE output = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+    SMALL_RECT viewport = {0, 0, 29, 9};
+    COORD extent = {80, 30}, outside = {40, 0}, visible = {0, 8};
+    DWORD written;
+    int succeeded;
+    if (output == INVALID_HANDLE_VALUE) return 0;
+    /* Never activate this buffer or change the child's actual screen. */
+    succeeded = SetConsoleWindowInfo(output, TRUE, &viewport) &&
+        SetConsoleScreenBufferSize(output, extent) &&
+        WriteConsoleOutputCharacterA(output, "OUTSIDE", 7u, outside, &written) &&
+        written == 7u &&
+        WriteConsoleOutputCharacterA(output, "VISIBLE", 7u, visible, &written) &&
+        written == 7u && package_read_viewport(output) &&
+        lib_text_find_substring(package_last_screen, "OUTSIDE") == NULL &&
+        lib_text_find_substring(package_last_screen, "VISIBLE") != NULL;
+    if (!CloseHandle(output)) succeeded = 0;
+    return succeeded;
 }
 
 /* Raw KVM frames may be larger than a deliberately compact native viewport.
@@ -499,6 +522,7 @@ static int verify_package_monitor_restart(PROCESS_INFORMATION *process,
      * startup its own fixture budget, retaining the exact prompt assertion
      * and the shorter budgets for subsequent machine/UI operations. */
     if (!package_wait_monitor_prompt(output, process->hProcess, 30000u)) { stage = 3; goto done; }
+    if (!package_check_viewport()) { stage = 22; goto done; }
     /* Exercise the shipping CLI provider, not only the debug library link.
        Entering before start must leave the machine stopped and permit help. */
     if (!package_compact_console && (!package_send_text(input, "debug\r") ||

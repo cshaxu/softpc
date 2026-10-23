@@ -234,7 +234,10 @@ int main(void)
     const char *path = "softpc-machine-irq-smoke.img";
     unsigned char sector[512] = { 0 };
     unsigned char marker = 0;
-    unsigned char ticks[4] = { 0, 0, 0, 0 };
+    unsigned char prior_user_timer[4];
+    const unsigned char user_timer_vector[] = {0x00u, 0x09u, 0x00u, 0x00u};
+    /* CS is zero even when the original BIOS invokes INT 1Ch with another DS. */
+    const unsigned char user_timer[] = {0x2eu, 0xfeu, 0x06u, 0x01u, 0x05u, 0xcfu};
     half_word reset_command = 0xfeu;
     lib_u16 cs = 0u;
     lib_u32 eip = 0u;
@@ -249,8 +252,8 @@ int main(void)
         0xb8u, 0x84u, 0x9fu, 0x8eu, 0xd0u, 0xbcu, 0xe3u, 0x00u,
         0xb0u, 0x34u, 0xe6u, 0x43u, 0xb0u, 0x01u, 0xe6u, 0x40u,
         0xb0u, 0x00u, 0xe6u, 0x40u,
-        /* The queued IRQ0 must be delivered after STI and return through the
-           fixed handler before the following store runs. */
+        /* Enable interrupts and mark boot completion. The high byte at 0501h
+           starts the following IRQ proof at zero, independently of host time. */
         0xfbu, 0xb8u, 0x5au, 0x00u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
     };
     softpc_machine_options options = { path, NULL };
@@ -272,9 +275,20 @@ int main(void)
     assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x5au);
-    assert(softpc_machine_read_physical(machine, 0x46cu, ticks,
-        sizeof(ticks)) == SOFTPC_MACHINE_OK);
-    assert(ticks[0] != 0u || ticks[1] != 0u || ticks[2] != 0u || ticks[3] != 0u);
+    /* Preserve the real BIOS IRQ0 handler. Its INT 1Ch callback proves actual
+       delivery, whereas a nonzero BDA timestamp does not prove any interrupt. */
+    assert(softpc_machine_read_physical(machine, 0x70u, prior_user_timer,
+        sizeof(prior_user_timer)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x900u, user_timer,
+        sizeof(user_timer)) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_write_physical(machine, 0x70u, user_timer_vector,
+        sizeof(user_timer_vector)) == SOFTPC_MACHINE_OK);
+    ica_hw_interrupt(ICA_MASTER, 0u, 1);
+    assert(softpc_machine_run(machine, 256u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_read_physical(machine, 0x501u, &marker, 1u) == SOFTPC_MACHINE_OK);
+    assert(marker != 0u);
+    assert(softpc_machine_write_physical(machine, 0x70u, prior_user_timer,
+        sizeof(prior_user_timer)) == SOFTPC_MACHINE_OK);
     verify_rejected_interrupt(machine);
     verify_scan_input();
     verify_keyboard_sets();

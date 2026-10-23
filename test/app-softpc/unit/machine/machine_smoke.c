@@ -360,32 +360,13 @@ static void write_int1a_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* Set BDA ticks to 00001234h; AH=00h; INT 1Ah; store DX:CX at 0500h. */
+    /* Keep IRQ updates out of this INT 1Ah result/BDA comparison. Store the
+       complete tuple and a completion marker; a legitimate zero is valid. */
     unsigned char program[] = {
-        0xc7u, 0x06u, 0x6cu, 0x04u, 0x34u, 0x12u,
+        0xfau, 0xc7u, 0x06u, 0x6cu, 0x04u, 0x34u, 0x12u,
         0xc7u, 0x06u, 0x6eu, 0x04u, 0x00u, 0x00u, 0xb4u, 0x00u,
         0xcdu, 0x1au, 0x89u, 0x16u, 0x00u, 0x05u, 0x89u, 0x0eu,
-        0x02u, 0x05u, 0xebu, 0xfeu
-    };
-    lib_memory_copy(sector, program, sizeof(program));
-    sector[510] = 0x55u; sector[511] = 0xaau;
-    file = fopen(path, "wb");
-    assert(file != NULL);
-    assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
-    assert(fclose(file) == 0);
-}
-
-static void write_int1a_tick_boot_image(const char *path)
-{
-    unsigned char sector[512] = { 0 };
-    FILE *file;
-    /* Program PIT at a high, but finite rate, then repeatedly read its BDA tick
-       through INT 1Ah into 0500h. */
-    unsigned char program[] = {
-        0xfau, 0x31u, 0xc0u, 0x8eu, 0xd8u, 0xb0u, 0x34u, 0xe6u,
-        0x43u, 0xb0u, 0x00u, 0xe6u, 0x40u, 0xb0u, 0x10u, 0xe6u,
-        0x40u, 0xfbu, 0xb4u, 0x00u, 0xcdu, 0x1au, 0x89u, 0x16u,
-        0x00u, 0x05u, 0xebu, 0xf6u
+        0x02u, 0x05u, 0xc6u, 0x06u, 0x04u, 0x05u, 0x55u, 0xebu, 0xfeu
     };
     lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
@@ -1016,11 +997,15 @@ static void run_int1a_boot_image(const char *path)
     softpc_machine_smoke_note(__func__);
     unsigned char ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
     unsigned char bda_ticks[4] = { 0xffu, 0xffu, 0xffu, 0xffu };
+    unsigned char complete = 0u;
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     boot_machine(machine);
+    assert(softpc_machine_read_physical(machine, 0x504u, &complete,
+        sizeof(complete)) == SOFTPC_MACHINE_OK);
+    assert(complete == 0x55u);
     assert(softpc_machine_read_physical(machine, 0x500u, ticks,
         sizeof(ticks)) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x46cu, bda_ticks,
@@ -1028,23 +1013,6 @@ static void run_int1a_boot_image(const char *path)
     /* The original time_of_day BOP derives the response from the host clock
        and refreshes the BDA; it does not return the test's earlier 1234h. */
     assert(lib_memory_compare(ticks, bda_ticks, sizeof(ticks)) == 0);
-    softpc_machine_destroy(machine);
-}
-
-static void run_int1a_tick_boot_image(const char *path)
-{
-    softpc_machine_smoke_note(__func__);
-    unsigned char bda_tick_low = 0u;
-    softpc_machine_options options = { path, NULL };
-    softpc_machine *machine = NULL;
-    assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    boot_machine(machine);
-    assert(softpc_machine_run(machine, 1000u) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_run(machine, 100u) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_read_physical(machine, 0x46cu, &bda_tick_low,
-        1u) == SOFTPC_MACHINE_OK);
-    assert(bda_tick_low != 0u);
     softpc_machine_destroy(machine);
 }
 
@@ -1172,7 +1140,6 @@ int main(void)
     const char *int12 = "softpc-machine-int12-smoke.img";
     const char *int11 = "softpc-machine-int11-smoke.img";
     const char *int1a = "softpc-machine-int1a-smoke.img";
-    const char *int1a_tick = "softpc-machine-int1a-tick-smoke.img";
     const char *hdd_pio = "softpc-machine-hdd-pio-smoke.img";
     const char *hdd_pio_write = "softpc-machine-hdd-pio-write-smoke.img";
     const char *hdd_int13 = "softpc-machine-hdd-int13-smoke.img";
@@ -1208,7 +1175,6 @@ int main(void)
     write_int12_boot_image(int12);
     write_int11_boot_image(int11);
     write_int1a_boot_image(int1a);
-    write_int1a_tick_boot_image(int1a_tick);
     write_hdd_pio_boot_image(hdd_pio);
     write_hdd_pio_write_boot_image(hdd_pio_write);
     assert(softpc_machine_create(&dual_media, &dual_machine) == SOFTPC_MACHINE_OK);
@@ -1251,7 +1217,6 @@ int main(void)
     run_bda_configuration_image(floppy, 1, 0xc821u);
     run_bda_configuration_image(hdd, 0, 0xc821u);
     run_int1a_boot_image(int1a);
-    run_int1a_tick_boot_image(int1a_tick);
     run_hdd_pio_boot_image(hdd_pio);
     run_hdd_pio_write_boot_image(hdd_pio_write);
     assert(softpc_test_remove_image(floppy));
@@ -1274,7 +1239,6 @@ int main(void)
     assert(softpc_test_remove_image(int12));
     assert(softpc_test_remove_image(int11));
     assert(softpc_test_remove_image(int1a));
-    assert(softpc_test_remove_image(int1a_tick));
     assert(softpc_test_remove_image(hdd_pio));
     assert(softpc_test_remove_image(hdd_pio_write));
     return 0;

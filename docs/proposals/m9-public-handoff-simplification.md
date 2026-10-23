@@ -26,7 +26,118 @@ revision rather than an unannounced repair. Host audio/session unavailability
 is reported separately; the owner-disposed native startup observation is not
 reopened. No S7 code or fresh test result is recorded by this admission.
 
-### S7 research and minimal implementation proposal
+### S7 approved implementation and qualification
+
+The owner approves governance of the measured proposal: "批准治理，规矩你懂".
+The implementation baseline is 7d58115c. The frozen four-case universe stays
+unchanged; checkpoint receives the approved no-change disposition, not an
+invented repair of its historical timeout. S8-S11 remain unadmitted.
+
+Actual changes are confined to four existing App test C files:
+
+- machine_smoke: +8/-44 (net -36). Remove the redundant INT 1Ah polling image,
+  run and cleanup. Keep one real boot/INT 1Ah path with IRQ delivery disabled
+  around full CX:DX/BDA comparison and an explicit 55h completion marker.
+  The oracle accepts zero; no new mock clock or specific zero-time guest run
+  is claimed. Dedicated PIT coverage remains.
+- irq_smoke: +20/-6 (net +14). Observe the original BIOS IRQ0 handler's actual
+  INT 1Ch callback through the original PIC request. The synthetic callback
+  increments the known-zero high byte of the boot-completion word, uses CS
+  override rather than assuming BIOS DS, and returns with IRET. Restore the
+  old vector afterwards. Neither original IRQ0 handling nor the real executor
+  clock is replaced.
+- runtime_restart_boot_smoke: +74/-39 (net +35). One private RGB-region
+  predicate and bounded waiter replace graphics-only startup and assumed Run
+  dialog delay. The Program Manager region includes its initialized Main
+  group; both Program Manager and Run require the original 640x480 extent.
+  All mode/sequence assertions remain. Correct padded text-row indexing and
+  type-aware diagnostics; stream text rows rather than writing an 81-byte
+  array. Deterministic positive/negative row-padding controls share the actual
+  prompt predicate, and a text frame cannot satisfy graphical readiness.
+- package_smoke: +49/-25 (net +24). One native viewport-row reader writes the
+  existing diagnostic buffer directly, removing the duplicate local text
+  copy. Reopen the active output for each query; preserve the separate full
+  guest-buffer reader. Add a real inactive 80x30 buffer / 30x10 viewport
+  regression with OUTSIDE at (40,0) and VISIBLE at (0,8); never activate that
+  buffer. Oversized diagnostic input fails rather than returning a clipped
+  viewport as complete; native row reads must return their requested width.
+
+Total test C is +151/-114, net +37, measured by git diff --numstat against the
+baseline over those four paths. The increase over the +17 estimate is chiefly
+the actual IRQ observation and padded-row regression rather than a new runtime
+layer. Production C/H, public eight trees, mirror, root CMake and test inventory
+have no change. No public API, worker, recovery state, polling service or retry
+is introduced. The test's existing bounded sampling moves into one UI waiter;
+it is not a new production polling path. Shipping EXEs need no refresh.
+
+Implementation experiments refine the proposal without broadening the scope:
+
+1. Merely clearing BDA then running a finite slice leaves zero: that slice
+   need not contain a timer tick. A stopped-host-clock experiment also correctly
+   fails Machine's existing executor-ready contract. Both failed test drafts
+   are discarded. The final test instead observes real IRQ dispatch, with
+   the normal clock intact; it does not report either draft as a product bug.
+2. Program Manager's title alone can precede Main initialization. Captured
+   frames distinguish a blank Program Manager (region hash 05edad9f) from the
+   initialized Program/Main region (dc71b0df). Run's active caption region is
+   fd3f1585 in both fullscreen and windowed rounds. Include the initialized
+   region, not an extra sleep or Windows-specific production callback.
+3. The extra nonzero-origin inactive-buffer experiment is not a valid fixture
+   on this host. After buffer resize the queried origin is (0,0); reapplying
+   its viewport can yield an actual 30x10 buffer despite the earlier 80x30
+   size. The resulting stage-22 failures are test setup failures. Keep the
+   admitted zero-origin counterexample, not a Lib workaround or a second
+   drawing path. Nonzero native-origin behavior is not dynamically certified
+   by the final inactive-buffer fixture; the reader uses actual queried origin.
+
+Focused evidence includes actual Machine/IRQ/checkpoint passes on both widths,
+and the live installed-image fullscreen/windowed prompt roundtrips. Independent
+scratch probes compile the exact final caption/prompt predicates on both widths
+and compare the original row-80 predicate: it misses a real padded-row prompt
+and accepts an unused-tail prompt; the new predicate does the opposite. Four
+real captured-frame classes per width reject uninitialized UI, distinguish
+Program Manager from Run, and reject a changed expected pixel or insufficient
+extent. These are predicate proofs, not new full guest runs or host screenshots.
+No captured image or generated probe becomes a tracked fixture or build input.
+
+An earlier complete test round passes exactly 192/192 per width, with zero
+failures/skips. Its wrapper then fails because Get-FileHash is unavailable in
+that hidden Windows PowerShell environment; this is not a failed test or a
+successful job exit. The wrapper now uses .NET SHA-256. Final self-review also
+restores the explicit 640x480 guard. Fresh final-source qualification R3 now
+completes with job exit zero: x64 and x86 each pass 184 background, five desktop
+and three native audio tests, exactly 192/192 registered names, zero failures
+or skips. This is a new complete run, not relabelled R2 evidence. Background
+durations are 151.60 / 159.27 seconds, desktop 23.79 / 23.78 seconds and native
+audio approximately three seconds per width. Final checkpoint is 1.32 / 1.33
+seconds and the installed-image roundtrip 53.85 / 51.55 seconds. All shared
+manifests, ownership/naming gates and mirror checks participate. Both cached
+full builds have no compiler warnings; unchanged Core objects are reused.
+
+Published EXEs and owner INI retain their SHA-256 identities:
+
+- softpc32.exe: 0EA1A248BC280F9CA04B52005EE2594C5D9568AFCF07311DD81262B37E08F6BF
+- softpc64.exe: 337EBE62DA50318FE53C82B4275C0F73CDBA2389EDFEE8BE29261208ECBF6077
+- softpc.ini: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
+Executor self-review confirms four test owners, unchanged production/public
+ABIs and frame ownership, retained original IRQ0 and mode assertions, one
+viewport reader and no retry/compensation path. Modified C files remain LF.
+Raw evidence is promoted here before all owned jobs and temporary probes,
+captures and logs are retired. The delivery is committed/pushed before the
+coordinator reviews its actual Git diff; owner acceptance closes S7, not this
+executor result. No next S is admitted.
+
+Similar-issue sweep searches App tests for fixed row*80 / 81-byte diagnostic
+rows, bda_tick_low, INT 1Ah image references and the removed startup wait. The
+incorrect forms are removed from the owning paths. The intentional row-80
+negative control is retained. Existing mode-stability dwells and distinct
+whole-buffer guest assertions retain their purpose; no generic wait framework
+or speculative timeout widening is added. Current checkpoint timing and audio
+isolation do not establish the historical timeout cause. Likewise these UI
+oracle repairs do not establish the cause of the old sequence-36 report.
+
+### S7 preceding research and minimal implementation proposal
 
 Research baseline is 7d89b010. No permanent source/test change is implemented
 by this report. Temporary probes were added only to the two existing App
