@@ -160,6 +160,15 @@ dual EXE and INI hashes remain S9's. Scratch peaks below 13 MB of the 300 MB
 budget. Findings are promoted here; all owned jobs exit before scratch cleanup.
 The task remains open for owner approval of this minimal implementation.
 
+Coordinator review of pushed research 2b20b2ae checks its actual three-path
+diff against the original request and the complete finite ledger. Hardware
+references, private candidate scope, nine-point results per width, unchanged
+VGA-unit passes, failed probe setup, pending permanent coverage and adjacent
+TODO are explicitly distinguished. Source/test/EXE changes remain zero; no
+implementation approval or full-regression result is invented. Documentation,
+505-body mirror, whitespace and residue checks pass. Both research jobs have
+exited and scratch is retired. S10 remains open for implementation approval.
+
 ### S9 admission: exact public-eight-tree import
 
 Owner admits the import as S9 and requires continuous numbering. The earlier

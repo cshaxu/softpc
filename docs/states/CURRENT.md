@@ -45,6 +45,9 @@ shared eight trees need no change. The proposal owns the complete evidence,
 hardware references, test design and adjacent shape-semantic findings. No tracked
 source/test or EXE is modified; full qualification is not rerun. S10 remains
 research/design, awaiting owner implementation approval.
+Research 2b20b2ae is pushed; coordinator actual-diff review confirms the
+three-document-only scope and honest proof/coverage boundaries. Task scratch
+is retired and documentation, mirror, whitespace and residue gates pass.
 
 ### S8 reviewed delivery (closed by owner-authorized advancement)
 
