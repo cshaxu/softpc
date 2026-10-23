@@ -862,6 +862,70 @@ static void verify_sb_machine_pause(softpc_machine *machine)
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 }
 
+static void sb_reset_ports(void)
+{
+    IU8 value;
+    outb(0x226, 1); outb(0x226, 0);
+    inb(0x22a, &value); assert(value == 0xaa);
+}
+
+static void verify_sb_midi_framing(void)
+{
+    static const IU8 commands[] = {0x38, 0x34, 0x35, 0x36, 0x37};
+    softpc_device_sb_dsp_state pending, actual, invalid;
+    SB_DMA_INFO before, after;
+    unsigned command, data;
+    IU8 value;
+    outb(0x0a, 5); /* No test payload may start an actual PCM transfer. */
+    for (command = 0; command < sizeof(commands); ++command) {
+        sb_reset_ports();
+        assert(host_DelayHwInterrupt(5, 0, 0xfffffffful));
+        ica0_post(); ica_outb(0x21, 0xdf);
+        assert(QueryDMA(&before));
+        lib_u32 midi = sb_midi_writes, pcm = sb_open_calls;
+        outb(0x22c, commands[command]);
+        assert(softpc_device_snapshot_capture_sb_dsp(&pending));
+        assert(pending.DSPWriteState == (command ? 13 : 12));
+        invalid = pending; invalid.DSPWriteState = 14;
+        assert(!softpc_device_snapshot_restore_sb_dsp(&invalid));
+        assert(softpc_device_snapshot_capture_sb_dsp(&actual));
+        assert(actual.DSPWriteState == pending.DSPWriteState);
+        /* Reset abandons either pending form; a valid command works again. */
+        sb_reset_ports();
+        outb(0x22c, DSP_GET_VERSION);
+        assert(sb_read() == 2 && sb_read() == 1 && sb_status() == 0x7f);
+        sb_reset_ports();
+        assert(softpc_device_snapshot_restore_sb_dsp(&pending));
+        for (data = 0; data < 256; ++data) {
+            if (!command && data) outb(0x22c, 0x38);
+            outb(0x22c, (IU8)data);
+            inb(0x22c, &value); assert(value == 0x7f);
+            assert(softpc_device_snapshot_capture_sb_dsp(&actual));
+            assert(actual.DSPWriteState == (command ? 13 : 1));
+            assert(actual.DSPReadState == pending.DSPReadState && !actual.bHighSpeedMode);
+            assert(actual.DspMode == pending.DspMode && actual.bDspActive == pending.bDspActive);
+            assert(actual.TimeConstant == pending.TimeConstant && actual.SBBlockSize == pending.SBBlockSize);
+            assert(actual.blockSize == pending.blockSize && actual.IdentByte == pending.IdentByte);
+            assert(actual.ReservedRegister == pending.ReservedRegister &&
+                actual.DspSpeakerEnabled == pending.DspSpeakerEnabled);
+            assert(actual.bDspPaused == pending.bDspPaused && actual.bExitAuto == pending.bExitAuto);
+            assert(actual.DspTransferSize == pending.DspTransferSize &&
+                actual.DspCompletionEvent == pending.DspCompletionEvent);
+            assert(sb_midi_writes == midi && sb_open_calls == pcm);
+            ica_outb(0x20, 0x0a); ica_inb(0x20, &value);
+            assert(!(value & 0x20) && !(DelayIrqLine & (1ul << 5)));
+            if (!command) {
+                outb(0x22c, DSP_GET_VERSION);
+                assert(sb_read() == 2 && sb_read() == 1 && sb_status() == 0x7f);
+            }
+        }
+        assert(QueryDMA(&after) && after.addr == before.addr && after.count == before.count);
+        sb_reset_ports();
+        outb(0x22c, DSP_GET_VERSION);
+        assert(sb_read() == 2 && sb_read() == 1 && sb_status() == 0x7f);
+    }
+}
+
 static void verify_sb_commands(void)
 {
     static const struct { unsigned address, incremented, decremented; } edges[] = {
@@ -890,12 +954,13 @@ static void verify_sb_commands(void)
     DspWrite(DSP_GET_VERSION);
     assert(sb_status() == 0xff && sb_read() == 2 && sb_status() == 0xff);
     assert(sb_read() == 1 && sb_status() == 0x7f && sb_read() == 0xff);
-    for (i = 0x30; i <= 0x38; ++i) {
+    for (i = 0x30; i <= 0x33; ++i) {
         DspWrite((IU8)i);
         assert(sb_status() == 0x7f);
-        DspWrite(DSP_GET_VERSION); /* Unsupported SB-MIDI never captures data. */
+        DspWrite(DSP_GET_VERSION); /* Unsupported input has no outgoing payload. */
         assert(sb_read() == 2 && sb_read() == 1 && sb_status() == 0x7f);
     }
+    verify_sb_midi_framing();
     for (i = 0; i != 256; ++i) {
         DspWrite(DSP_CARD_IDENTIFY); DspWrite((IU8)i);
         assert(sb_status() == 0xff && sb_read() == (IU8)~i && sb_status() == 0x7f);

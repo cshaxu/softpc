@@ -1136,3 +1136,32 @@ excluded to hide local repairs. Only the local manifest hash changes.
 The existing App VGA test owns real register/readback, font/protection/mode
 and Driver frame proof; full qualification and limitations are recorded in
 the [S10 proposal](../../../proposals/m9-public-handoff-simplification.md#s10-research-two-site-cursor-disable-repair).
+
+## T99 S11 unsupported SB-MIDI framing
+
+Owner approves the displayed two-file minimum repair. `base/inc/sndblst.h`
+adds the documented 36h constant beside its peers. `host/src/nt_sbdsp.c`
+appends two values to the existing write-state enum and extends the existing
+archive validator: 38h consumes one byte, UART 34h..37h consumes data until the
+existing DSP reset. The local T99 S11 marker names this framing boundary.
+Existing values 1..11, PCM/high-speed behavior, reset owner, archive layout,
+MPU-401 parser and native output remain unchanged. SB-MIDI is still unsupported
+for audible playback; readiness is not a command/playback acknowledgement.
+
+Relative to b38ff693: production +24/-2, net +22; no additional path or state
+variable. Only local hashes change in the current XP manifest. Reconstruct
+the fixed XP necessary subsets using existing T93 S8 and S6 selection ranges,
+verify raw/subset/before/after hashes, then compare LF-normalized bodies with
+Git default diff:
+
+- sndblst.h: +18/-15 before, +19/-15 after.
+- nt_sbdsp.c: +835/-1462 before, +839/-1445 after.
+- Combined: +853/-1477 -> +858/-1460; changed-line total 2330 -> 2318 (-12).
+
+The admitted change itself contains 26 changed lines. A full historical diff
+is not additive: matching/context can realign. With Git --diff-algorithm=minimal,
+the same combined bodies count +772/-1396 -> +793/-1395 (2168 -> 2188, +20).
+Neither number proves fewer semantic local patches; the earlier estimate of
+an unconditional +26 in the historical diff was too strong. No selection range
+is changed or excluded to improve these counts. The [S11 record](../../../proposals/m9-public-handoff-simplification.md#s11-approved-implementation)
+owns permanent port/IRQ/archive proof, full qualification and limitations.

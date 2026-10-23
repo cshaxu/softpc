@@ -1,5 +1,18 @@
 # XP SP1 SoftPC 逐文件语义审计
 
+## T99 S11 已批准的 SB-MIDI 解析边界修正
+
+`base/inc/sndblst.h` 补齐 36h 常量；`host/src/nt_sbdsp.c` 在既有 DSP
+写状态中追加单字节消费、UART 消费两个值，使用同一 reset 和快照字段。
+不支持的 MIDI 数据不能再触发 PCM/IRQ；不新增 MIDI 输出能力或第二套解析器。
+生产 +24/-2，净 +22；原始 XP 身份和必要子集范围不变，仅更新两行本地哈希。
+完整子集 diff 按 Git 默认算法从 +853/-1477 变为 +858/-1460，增删合计减少
+12 行；按 --minimal 则增加 20 行。历史 diff 对齐不具可加性，不能将本次
+自身 26 行改动误报成必然增加 26 行历史差异，也不能据默认统计宣称减少
+本地功能修正。精确逐文件账目见当前本地修正台账；验证与能力限制由
+[S11 record](../../../proposals/m9-public-handoff-simplification.md#s11-approved-implementation)
+承接。
+
 ## T99 S10 原始 VGA 光标禁用位修正
 
 `base/video/vga_prts.c` 两处修复：受原 V7 保护的 CRTC 0A 写入完整寄存器字节，

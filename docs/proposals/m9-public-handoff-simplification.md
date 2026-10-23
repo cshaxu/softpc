@@ -184,6 +184,80 @@ downstream synchronization is present. Mirror, documentation, whitespace and
 residue gates pass; scratch is retired. No blocking research finding remains;
 owner approval is still required for the proposed mirror/capability change.
 
+#### S11 approved implementation
+
+Owner approves the displayed minimum at b38ff693: 批准，就按这个最小方案在S11内实施。
+完成后编译双EXE、发布、跑全量测试、提交推送，再自行审计代码质量，汇报实际diff，等我验收。
+The exact two-file production diff is implemented: +24/-2, net +22. One existing
+App fixture changes +67/-2, net +65; no root registration or public-eight-tree
+change. The existing architecture description now states the unsupported DSP
+framing boundary and supported MPU route. Original reason/semantic ledgers
+and the two current-manifest local hashes are updated; source selection,
+upstream/subset hashes and snapshot layout remain unchanged.
+
+Permanent tests retain 30h..33h's empty-input behavior but replace the wrong
+38h/UART oracle. Five actual-port command cases each consume all 256 payload
+values, checking parser state, ready/read status, PCM fields/native-open count,
+MIDI submission count, DMA address/count and actual PIC IRQ/delay state. The
+single-byte mode accepts a following version query; the UART modes absorb it
+as data and resume command handling only after the separate reset. Values
+12/13 round-trip through existing DSP capture/restore; value 14 is rejected
+without consuming the pending state. Existing valid PCM/high-speed/MPU and
+full archive tests remain, with no copied test-only production entry.
+
+The first focused build fails in new test code: the local variable named
+byte expands through a legacy header macro, shadowing IU8. Rename it data;
+do not alter headers or production logic to work around the fixture mistake.
+The failure is retained until evidence promotion. Final focused actual-source
+tests pass x64 2/2 (commands 0.20s, archive 0.05s) and x86 2/2 (0.26s, 0.11s).
+Final cached dual qualification/publication completes successfully. Hidden owned
+job 31944 runs 08:50:35..08:55:42, exit 0. x64 build takes 5.63s, background
+116.65s, desktop 22.82s and audio 2.99s; x86 build 4.77s, background 112.92s,
+desktop 22.99s and audio 2.74s. Both widths execute 193/193 registrations:
+185 background (164 unit, 14 checks, seven integrations), five desktop/package
+and three native-audio integrations. Inventory JSON and the three JUnit sets
+have exact name equality, no duplicate, failure, error, skipped or disabled
+case. These are fresh final-source results, not the research candidate's proof.
+No tests need an unchanged retry in full qualification. Legacy mirror-header
+warnings remain; no warning originates outside softpc.new. The corrected initial
+test-draft compile failure above is not hidden by this final green result.
+
+Mirror (505 bodies), documentation and whitespace gates pass. Public eight trees,
+root CMake/registration, Compat/Driver, INI, media and snapshots are unchanged.
+Both package EXEs are rebuilt/published from the persistent ccache/Ninja trees;
+no cache clearing or duplicate architecture tree is used. SHA-256:
+
+- softpc32.exe: C093BA279A7462D532FD3B186B7EEF2E6ABCD1C8A708A74F777BC0FEABAEB7B7.
+- softpc64.exe: 394939CE667FEF60D7BC0B8541EB842419BCEEE54461EEC458A5BC8C4B59E58B.
+- Unchanged INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D.
+
+Executor self-review examines the actual three code-file diff and complete
+changed-path list. It confirms one existing DSP state owner, unchanged reset,
+no added output decoder, worker, queue, polling, fallback or product special
+case. The two appended states are necessary protocol positions, not a second
+device-state model. The permanent fixture uses actual ports, existing snapshot,
+DMA and PIC observations; it adds no test-only production API. Ordinary PCM,
+high-speed busy/reset and supported MPU behavior retain their existing paths.
+SB-MIDI remains inaudible/unsupported; neither write readiness nor no side
+effects proves MIDI playback. No fresh interactive Windows guest playback is
+claimed. New pending-state snapshots are readable by this executable; older
+readers may reject states 12/13, despite unchanged archive layout. There is no
+claim to implement UART MIDI input, timing or full hardware support.
+Source and actual-port proof are distinct from native-host integration passes.
+Task scratch is retired after promotion of this evidence; the reusable caches
+remain. S11 awaits owner acceptance; S12 is not admitted.
+
+Complete mirror accounting checks pinned XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89,
+both raw source hashes, S8/S6 subset-range hashes and before/current local
+hashes. On LF-normalized bodies Git default reports sndblst.h +18/-15 ->
++19/-15 and nt_sbdsp.c +835/-1462 -> +839/-1445, combined 2330 -> 2318 (-12).
+Git --minimal instead reports combined +772/-1396 -> +793/-1395, 2168 -> 2188
+(+20). This corrects the design's additive historical-diff estimate: the S's
+own +24/-2 is 26 changed lines, but matching against a much larger historical
+patch can realign. Neither matching statistic changes provenance, authorizes
+source exclusion or implies removal of semantic local fixes. No external
+source is copied into the repair or made a build/test dependency.
+
 ### S10 admission: original cursor-disable research, design and repair
 
 Owner request: 收口s9 准入s10. S9 is accepted and closed at reviewed delivery

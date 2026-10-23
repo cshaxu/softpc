@@ -270,6 +270,12 @@ does not own guest byte parsing, synthesis or instrument banks. MIDI volume
 is an optional host-device capability, unlike stream-local PCM gain.
 Neither audio leaf depends on the other audio leaves.
 
+SoftPC's supported guest MIDI output is the original MPU-401 route. Its
+unsupported SB-MIDI DSP route consumes the byte following 38h, or UART data
+after 34h..37h until the existing DSP reset, without interpreting it as PCM
+commands or submitting native MIDI. These are states in the existing DSP
+parser, not a second MIDI decoder. DSP write readiness is not a playback ACK.
+
 All cross-component contracts are declared at the owning component root.
 Each component's `win32/` and `linux/` files are exclusively its own platform
 implementation; neither sibling components nor root forwarding headers may

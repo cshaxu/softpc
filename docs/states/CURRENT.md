@@ -3,7 +3,9 @@
 ## Current Work
 
 Owner accepts and closes S10 at reviewed delivery 2866cbd5 and admits S11,
-Sound Blaster MIDI command/parser research and design. T99 stays open;
+Sound Blaster MIDI command/parser repair. Owner approves the reviewed minimal
+bounded-unsupported design at b38ff693, including the displayed production diff.
+T99 stays open;
 S12 Ninja integrity remains planned. The proposal retains the
 eight transferred TODO items and their proof/dispositions. The adjacent VGA
 end-row/wrap finding remains in TODO; the performance Queue candidate remains.
@@ -13,20 +15,20 @@ end-row/wrap finding remains in TODO; the performance Queue candidate remains.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S10 and admits the next S: 好，收口本S，转入下一个S任务。老规矩. Research the established S11 boundary first; present supported/unsupported semantics and minimum source diff before implementation. |
-| Objective | Establish the exact SB DSP command/data collision, authoritative command lengths, existing MIDI ownership and minimum safe disposition with executable regression design. |
-| Non-goals | No production/test implementation before the researched diff is presented; no public-eight-tree, full SB-MIDI/UART input, FM synthesis, second MIDI parser/output path, Ninja, guest/media/INI or snapshot-format change. |
-| Reference Baseline | Reviewed S10 2866cbd5 and its dual EXEs; fixed necessary XP source subset and local ledger. T95 SB 38h/91h trace is historical evidence, not a fresh reproduction. |
+| Admission And Approval | Owner accepts the researched and displayed minimum diff: 批准，就按这个最小方案在S11内实施。完成后编译双EXE、发布、跑全量测试、提交推送，再自行审计代码质量，汇报实际diff，等我验收。 |
+| Objective | Correct unsupported SB-MIDI command/data framing in the existing DSP parser without implementing a second MIDI path or changing valid PCM behavior. |
+| Non-goals | No public-eight-tree, full SB-MIDI/UART input or audible output, FM synthesis, second parser/output path, Ninja, guest/media/INI or snapshot-format change. |
+| Reference Baseline | Reviewed S11 research b38ff693 and S10 dual EXEs; fixed necessary XP source subset/local ledger. Private candidate results do not replace permanent final-source qualification. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Initially task records only. Trace sndblst.h, host/src/nt_sbdsp.c command/state/reset/archive and nt_sb.c port/MIDI boundary, existing App SB/PCM tests. No public API change planned. |
+| Files And ABI Surface | Two mirror files: sndblst.h and nt_sbdsp.c; existing device_contract_smoke.c; XP manifest/local patch ledger, task records, rebuilt dual EXEs. Append two values to the existing DSP state field; no public API or snapshot-layout change. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, source/research policy and current design; original source remains sole hardware authority. |
-| Verification | Freeze command/write-state/port/reset/archive callers; verify primary hardware command semantics and actual DSP ports on x86/x64 with mocked host audio. Observe 38h/data including 91h, parser return, busy/IRQ/PCM state and subsequent valid commands. Any private candidate remains counterfactual. Research runs hidden/logged; implementation later requires dual build/publication and full regression. |
+| Verification | Permanent actual-port x86/x64 tests for all 256 data bytes after 38h, four UART entries, reset, pending-state capture/restore/rejection, no PCM/IRQ/MIDI side effects and valid following commands. Keep existing PCM/high-speed/MPU/archive regressions. Cached full builds/publication; exact full registered background, desktop and audio inventories; mirror/manifests/Types/dependency/naming/documentation/whitespace/residue gates. |
 | Expected Markers | MIDI data cannot be misclassified as a standalone PCM command; a supported or unsupported boundary is honest, original single-owner and does not alter valid PCM behavior. |
-| Asset Needs | Preserve dual EXEs, INI, guest media and snapshots during research. No Computer Use or downstream repository reads/writes. |
-| Reporting Requirements | Give exact root cause, finite command disposition, minimum example, production/test/mirror diff estimate, snapshot impact and proof limits. S11 owns build/t99-s11: 30-minute jobs, five-minute no-progress, 300MB cap; promote results then retire scratch. |
+| Asset Needs | Publish dual EXEs only; preserve INI, guest media and snapshots. Tests may own disposable media. No Computer Use or downstream repository reads/writes. |
+| Reporting Requirements | Report actual production/test/mirror counts, final qualification, hashes, capability/snapshot limits and quality review. S11 owns build/t99-s11: 30-minute jobs, five-minute no-progress, 300MB cap; promote results then retire scratch. |
 | Stop Conditions | Report unclear hardware semantics, required new MIDI state authority, unsupported snapshot migration or public-scope expansion; no silent fake-success or full capability addition. |
-| Exit Criteria | Reviewed executable minimum proposal with dual-width focused evidence and accurate limits; implementation needs approval, then qualification/publication, mirror accounting, actual-diff review and push before owner acceptance. |
-| Original Owner Request | 好，收口本S，转入下一个S任务。老规矩. S11 researches Sound Blaster MIDI command/data framing before selecting the minimum repair, with ordinary implementation governance unchanged. |
+| Exit Criteria | Approved minimal repair with permanent focused/full dual proof, published EXEs, honest mirror accounting, executor commit/push and coordinator actual-commit review/push; clean worktree and retired scratch, then wait for owner acceptance. |
+| Original Owner Request | 好，收口本S，转入下一个S任务。老规矩; after reviewing the diff: 批准，就按这个最小方案在S11内实施。完成后编译双EXE、发布、跑全量测试、提交推送，再自行审计代码质量，汇报实际diff，等我验收。 |
 | Similar-Issue Sweep | Every defined SB MIDI opcode, DSP pending-data state and command dispatch, WRITE_STATUS busy owner, reset/archive restoration and existing MPU parser/output route; classify each rather than add a competing parser. |
 
 S11 source and actual-port research confirms the framing defect and its UART
@@ -39,13 +41,21 @@ test passes but contains the incorrect MIDI oracle. The proposal owns the
 finite ledger, primary hardware reference, private evidence and minimum design.
 Recommended production scope is two mirror files +24/-2 (net +22), preserving
 unsupported SB-MIDI while fixing command/data framing; the supported MPU path
-does not change. This capability decision awaits owner approval. No tracked
-production/test or published EXE is changed; no fresh full-suite claim is made.
+does not change. Those research results preceded implementation approval and
+made no shipping repair or full-suite claim.
 Research df70efc0 is pushed. Coordinator actual-diff review confirms its
 three-document-only scope, honest capability/verification limits and preserved
 S10 artifacts. Scratch is retired; mirror, documentation, whitespace and
-residue checks pass. S11 awaits the minimum-design decision, not acceptance
-of an implemented repair; S12 is not admitted.
+residue checks passed for that research. Owner now approves the displayed
+minimum; production +24/-2 and test +67/-2 are implemented. Focused actual-source
+tests pass 2/2 per width. Final cached builds publish both EXEs; each width
+passes all 193 registrations (185 background, five desktop, three native audio),
+exact executed-name equality and zero failures/skips. No non-mirror compiler
+warning remains. Mirror, documentation and whitespace gates pass. Public eight
+trees, root build/registration and user INI/media/snapshots are unchanged. The
+proposal owns corrected historical mirror accounting, hashes, initial test-draft
+compile failure, quality review and proof limits. S11 awaits owner acceptance;
+S12 is not admitted. Scratch is retired after evidence promotion.
 
 S9 is accepted and closed; see its [closure](../history/M9-T99-S9-public-import.md).
 Its verified baseline remains: all 296 public paths equal the pinned NXVM

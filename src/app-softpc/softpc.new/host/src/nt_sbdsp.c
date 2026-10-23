@@ -418,7 +418,9 @@ enum {
     BlockSizeFirstByteWrite,
     BlockSizeSecondByteWrite,
     BlockSizeFirstByteRead,
-    BlockSizeSecondByteRead
+    BlockSizeSecondByteRead,
+    UnsupportedMidiByte,
+    UnsupportedMidiUart
 }
 DSPWriteState = WriteCommand; // state of current command/data being written
 
@@ -502,7 +504,7 @@ int softpc_device_snapshot_restore_sb_dsp(const softpc_device_sb_dsp_state *stat
         (state->DspOutputRate && (state->DspOutputRate < 3921 || state->DspOutputRate > 44100)) ||
         (state->DspTransferSize && !state->DspOutputRate) ||
         state->ResetState < ResetNotStarted || state->ResetState > Reset1Written ||
-        state->DSPWriteState < WriteCommand || state->DSPWriteState > BlockSizeSecondByteRead ||
+        state->DSPWriteState < WriteCommand || state->DSPWriteState > UnsupportedMidiUart ||
         state->DSPReadState < NothingToRead || state->DSPReadState > ReadResReg ||
         state->DspMode > None || state->DspTransferMode > None ||
         state->TableMungeFirstByte > 1 || state->bDspActive > 1 ||
@@ -878,6 +880,13 @@ Return Value:
         WriteCommandByte(data);
         break;
 
+    case UnsupportedMidiByte:
+        DSPWriteState = WriteCommand;
+        break;
+
+    case UnsupportedMidiUart:
+        break;
+
     case CardIdent:
         IdentByte = data;
         DSPReadState = ReadIdent;
@@ -999,6 +1008,18 @@ Return Value:
 
 {
     switch (command) {
+    /* T99 S11: consume unsupported MIDI framing, never PCM commands. */
+    case MIDI_WRITE_POLL:
+        DSPWriteState = UnsupportedMidiByte;
+        break;
+
+    case MIDI_READ_POLL_WRITE_POLL_UART:
+    case MIDI_READ_INTERRUPT_WRITE_POLL_UART:
+    case MIDI_READ_TIMESTAMP_POLL_WRITE_POLL_UART:
+    case MIDI_READ_TIMESTAMP_INTERRUPT_WRITE_POLL_UART:
+        DSPWriteState = UnsupportedMidiUart;
+        break;
+
     case DSP_GET_VERSION:
         DSPReadState = FirstVersionByte;
         break;
