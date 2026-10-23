@@ -2,12 +2,41 @@
 
 ## Current Work
 
-Owner accepts and closes S12 at reviewed research 0108e47e: 批准收口，请你把外部
-重命名变化一起提交推送。 No implementation subtask is active. T99 remains open
-for its separate completion audit; no next S or queued T is admitted.
-The adjacent VGA end-row/wrap TODO and performance Queue candidate remain.
+Owner admits S13: 好，准入新S导入nxvm最新公共八组件，老规矩，可直接完成S13收口后等我。
+S13 is exact public-eight-tree import, superseding the not-yet-recorded suggestion
+to use S13 for the T-level audit. T99 remains open; the adjacent VGA TODO and
+performance Queue candidate are not admitted. Owner authorizes S13 closure
+after required qualification and actual-change review, then stop.
 
-Open task awaiting owner: T99.
+## M9 T99 S13 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves the read-only audit of NXVM including uncommitted changes and requests: 好，准入新S导入nxvm最新公共八组件，老规矩，可直接完成S13收口后等我。 |
+| Objective | Import the frozen latest eight-tree content exactly, verify test ownership and full product qualification, then close S13 under delegated approval. |
+| Non-goals | No downstream repository write, production/API/App/mirror modification, root-helper import, new capture fallback or runtime behavior change; no T99 closure or next-task admission. |
+| Reference Baseline | SoftPC 06430c21; fixed NXVM ad5c532a8d627a51748ea7d209a8d2d9fd558eed, verified equal to the initially approved working payload and all eight frozen tree digests. No uncommitted upstream baseline is used for delivery. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | src/test pairs for lib, emulator, x86-debug and x86-ibmpc: 296 files, only modal integration test and its manifest differ. No public ABI or production change. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, source/research policy and current source/test ownership design; preserve notices and admitted shared-corpus provenance. |
+| Verification | Exact byte/path/mode equality for the frozen 296-file universe; cached x64/x86 full build checks; all registered unit/check/integration tests with exact JSON/JUnit name equality, serial desktop/audio groups; focused modal/capture regressions, manifests, Types/dependency/naming and documentation/mirror/whitespace/residue checks. |
+| Expected Markers | Remove only unrelated native capture from modal/geometry integration; keep its sizing/modal/teardown assertions and dedicated controlled capture tests. Honest distinction between removed native coverage and retained unit coverage. |
+| Asset Needs | Preserve EXEs when production inputs are unchanged and graph is current; protect user INI/media/snapshot-midi. No Computer Use. Native desktop/audio testing is permanently authorized. |
+| Reporting Requirements | Report immutable composite source identity, actual production/test/build diff, full results/failures, artifact identity and actual-change quality review. S13 owns build/t99-s13: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence before cleanup. |
+| Stop Conditions | Report source drift outside frozen scope, new license/notice uncertainty, unexpected production/artifact mutation or genuine test failure; do not silently weaken assertions or broaden import. |
+| Exit Criteria | Exact import and full qualification, complete pushed executor P, coordinator actual-commit review and delegated S13 closure pushed; clean worktree and retired scratch, then wait for owner. |
+| Original Owner Request | 好，准入新S导入nxvm最新公共八组件，老规矩，可直接完成S13收口后等我。 |
+| Similar-Issue Sweep | Whole eight-tree byte inventory, all modal/native capture callsites and dedicated capture regressions, root helper compatibility and full registered test universe. Root differences without a required caller change stay outside import. |
+
+S13 is implemented and verified: all 296 files match fixed NXVM ad5c532a,
+production unchanged, test C -7 lines and one manifest hash updated. Each
+cached architecture build compiles/links only the changed test; no warnings,
+package EXE change or user asset edit. Each width passes 193/193 (185 background,
+five desktop, three audio), exact registration/execution equality and no skips
+or retries. Mirror/documentation/whitespace gates pass. The proposal owns full
+evidence, artifact hashes, coverage limits and quality review. Executor push,
+actual-commit coordinator review and delegated closure follow before stopping.
 
 ## Technical Baseline
 

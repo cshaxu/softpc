@@ -2,6 +2,126 @@
 
 ## Admission and scope
 
+### S13 admission: exact eight-tree test-ownership import
+
+Owner first requests a read-only audit of latest NXVM including uncommitted
+changes, then authorizes: 好，准入新S导入nxvm最新公共八组件，老规矩，可直接完成S13收口后等我。
+This makes S13 the import, not the suggested but unrecorded T-completion audit.
+S12 is closed at 06430c21; T99 stays open. Delegated S13 closure requires full
+qualification, pushed executor delivery and actual-commit coordinator review.
+
+**Provenance and frozen universe.** Source is the existing admitted shared
+NXVM corpus at HEAD 9436f08fe6ece2dd9a3afc6729e3ee648b0e71fc, plus its two
+audited uncommitted test files explicitly included in the owner's request.
+Do not misrepresent this as an upstream committed revision. Freeze the exact
+payload by hashes before import; the SoftPC executor commit will provide the
+committed downstream baseline. Existing shared-source notices/provenance stay
+unchanged, with no third-party addition, new license or redistribution claim.
+All 296 original Git entries have mode 100644; no file is added or deleted.
+During qualification NXVM commits the exact reviewed payload as
+ad5c532a8d627a51748ea7d209a8d2d9fd558eed. Its eight trees have no working diff,
+and the frozen hashes below remain identical. This fixed upstream commit is
+the final import revision; the initial uncommitted observation is provenance,
+not the delivered baseline. Upstream task documents are not imported.
+
+Per-tree SHA-256 covers sorted case-sensitive relative paths, a tab, uppercase
+file SHA-256, LF per record, UTF-8 without BOM. Counts and content identities:
+
+- src/lib: 123, 6E816EA3C583A3CC83E4F041772CCA5238C9DDD5F32BD73C4FB8671DDEFB011C.
+- test/lib: 78, E6E07FEA499AD2C5FEF9EC158258F91D93C91923934BEEEC693454324182DEE4.
+- src/emulator: 28, 651573320EB1F23EA4E78BA5F30F7285E67AD9E496FE0D6D097432236DD6FC40.
+- test/emulator: 23, 28D77D98508F444C8ED496FED36CF8AA119AE0947CB60859B6F7FA70D23894E1.
+- src/x86-debug: 15, 9D5D4F2E894A22B10833ABDBDD61AED19D27055DF37D70AD35F3918C9E1C4A60.
+- test/x86-debug: 9, B49F5BFBBF1FA4E84F4A0F2403DA6550367B9B595960714A5E8C779097E415E2.
+- src/x86-ibmpc: 13, FE65B9699FB9B7CD97EB793E7057A13D2E15093F5097DE296628A4E1B2DB5B02.
+- test/x86-ibmpc: 7, 72BFA4C356B44AB481DC79FE1EDD375A15A24BE851ADAB5369631BBAA0D32B88.
+
+Only test/lib/integration/kvm_window_modal_smoke.c and its manifest differ
+from SoftPC. The test SHA-256 is
+380D944A4A1A175590E1010669D3072418EDA2F63B47F535BEE2ED52FBFDC667.
+Its manifest SHA-256 is
+07A167C4BEEE0B917FB77E60E7A4B7C5EA131FE722EDF2827EBB575B22EF3977.
+Expected production +0/-0, test C +0/-7, manifest +1/-1; root helper/build
+changes +0/-0. All other bytes remain identical. No format/identifier rewrite.
+
+**Reviewed behavior.** Delete the synthetic LBUTTONDOWN, native capture query,
+release and associated test-only observer branch from the modal/scale fixture.
+Upstream reports RDP ClipCursor access denial; that report is context, not a
+new SoftPC reproduction. Frame-scale/type switches, eight sizing edges, fit/
+restore, modal-loop entry, control/title delivery and terminal teardown stay.
+Dedicated capture-contract units retain successful/failed capture, rollback,
+off-screen clipping and move/resize paths. Controlled units are not equivalent
+to real desktop capture: this intentionally removes that incidental native
+coverage, without pretending to fix or silently bypass capture in production.
+No new path, state, polling, skip or product exception is introduced.
+
+**Finite verification ledger.** (1) all 296 paths/bytes/modes match the frozen
+payload; (2) both full cached builds and relevant focused tests; (3) all current
+193 registrations per width, partitioned into 185 background, five desktop and
+three native audio, with exact name equality and failure/skip accounting;
+(4) source/test boundaries, manifests and governance gates; (5) unchanged
+production-input/artifact and INI/media identities; (6) actual executor diff
+review, push, scratch retirement and delegated closure. A source/test discovery
+or inventory change must be explained, never silently excluded. No downstream
+repository is modified or used by the build/tests after import.
+
+#### S13 executor qualification and quality review
+
+All 296 local files match the fixed upstream ad5c532a Git blobs and 100644
+modes, independently checked against all eight path/content digests above.
+Actual delta from 06430c21: production +0/-0, test C +0/-7 (net -7), manifest
++1/-1. Only test/lib changes; the other seven trees stay byte-identical.
+No root infrastructure, CMake registration, public ABI, App or mirror changes.
+The original audit found root helpers outside the eight trees with unrelated
+differences; the imported test introduces no helper calls, existing helpers
+remain compatible, and their ownership/manifest/boundary tests pass unchanged.
+No root-helper import or downstream runtime/build dependency is required.
+
+Hidden owned qualification job 40836 completes 09:22:20..09:27:27, exit 0.
+Cached full builds take x64 5.24s and x86 4.01s: each compiles exactly one
+changed modal-test C object and links its test executable. No production
+object/library or package EXE rebuilds. Both follow-up builds report no work.
+No compiler warning or error appears. Final-source full tests pass on each
+width: 193/193, comprising 185 background (164 unit, 14 checks and seven
+integrations), five desktop/package and three native-audio integrations.
+Recorded group wall times: x64 120.69/22.92/2.75s; x86 122.70/23.20/2.86s.
+Inventory JSON and all three JUnit sets have exactly equal unique names,
+zero disabled registrations and no failure/error/skip/missing/duplicate case.
+No initial failure or unchanged retry occurs in this qualification.
+
+The changed modal integration passes x64 0.505s/x86 0.503s; the dedicated
+capture contract passes 0.451s/0.517s within the complete suites. They remain
+distinct proof: real native modal/geometry flow versus controlled capture
+semantics and rollback. No new real-desktop capture success or reproduction
+of upstream's RDP access denial is claimed. The session is Console Active;
+no Computer Use, timeout increase or skip is used. All public/nonpublic unit,
+Types/dependency/naming/manifest gates and existing product integrations are
+represented in the frozen registration universe. Mirror (505 bodies),
+documentation and whitespace gates pass.
+
+Package EXE SHA-256 remains softpc32
+C093BA279A7462D532FD3B186B7EEF2E6ABCD1C8A708A74F777BC0FEABAEB7B7,
+softpc64 394939CE667FEF60D7BC0B8541EB842419BCEEE54461EEC458A5BC8C4B59E58B.
+Both are up-to-date in their full production graphs and exercised by matching
+package integrations; no artificial recompilation or publication occurs for a
+test-only import. INI SHA-256 remains
+38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D;
+snapshot-midi remains
+0ABD8902275A52CA72504EACD7B277AD801BA234E6BFFC41152383FD67D8B8F4.
+No assets/media path changes.
+
+Executor self-review reads the actual test/manifest and task-record diff:
+only the approved incidental capture segment disappears. Modal/geometry,
+frame-type/scale and teardown assertions remain; no registration is removed.
+The dedicated unit retains capture failure/ownership coverage without using a
+real host policy. Search of all test/lib/integration finds no remaining native
+capture exercise; no test-only production API, alias, new platform dependency,
+polling, retry, exception branch or second path is added. This is a bounded
+changed-path quality review, not a fresh line-by-line audit of every unchanged
+public source. All six verification-ledger members have proof above; final
+commit/review/closure is recorded after executor push. Scratch is retired only
+after evidence promotion and owned job exit; reusable caches stay intact.
+
 ### S12 admission: Ninja incremental-build integrity
 
 Owner accepts S11 and requests: 准入S12，老规矩. S11 closes at 722ffaca;
