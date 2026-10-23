@@ -20,6 +20,139 @@ No code is changed by admission. Current-source findings, the exact file set
 and a justified minimal diff estimate precede implementation. Public eight
 components, mirror, media and user configuration have no planned change.
 
+### S8 research: physical SAS, callers and minimal repair
+
+Research baseline is f251686b. The owner requests investigation through an
+executable proposal, not production implementation. No tracked production,
+test, mirror, public-component or asset file changes in this delivery.
+
+#### Frozen ledger and current-source findings
+
+The universe is the two Compat physical adapters, their two Machine wrappers,
+all direct callers, original SAS routing and end-of-memory validation. Search
+uses `rg -n` for `softpc_platform_(read|write)_physical`,
+`softpc_machine_(read|write)_physical`, `c_sas_(loads|stores)` and physical
+SAS entries over src/test, then reads each implementation and caller group.
+
+1. `compat/memory.c` calls c_sas_stores/c_sas_loads. Original
+   `base/ccpu386/ccpusas4.c` explicitly defines these as linear operations;
+   bios_read_byte/bios_write_byte translate through guest page tables when PG
+   is set. Allocation bounds are checked against the physical memory size
+   before that wrong translation. This is a confirmed adapter contract bug.
+2. The only production-source callers of the Compat pair are the two wrappers
+   in `machine/machine.c`. All direct uses of those wrappers are in 13 App
+   test C files: unit machine machine, bop, checkpoint, device_contract,
+   dual_media, irq, fdc, mouse, partition_image and sound; unit Compat
+   platform_failure; integration command_provider and runtime_input_continuation.
+   No shipping Product, driver or snapshot routine calls the pair. Do not
+   attribute live playback or snapshot failures to these adapters.
+3. Original c_sas_PWS/c_sas_PRS are the explicit physical block counterparts.
+   They call phy_w8/phy_r8, retain SasWrapMask/A20 and route SAS_VIDEO through
+   existing C-VID dispatch. They do not walk guest page tables. Reusing these
+   entries repairs the adapter without new declarations or memory logic.
+4. DMA already uses original sas_PWS/sas_PRS. Debug memory deliberately
+   preflights a linear request, translates once and accesses phy_w8/phy_r8;
+   its rejection/transactional semantics are distinct. Snapshot captures SAS
+   storage through its original archive path. Retain these separate owners;
+   none should be converted to another adapter or rewritten to share a helper.
+5. Original phyR has `addr + typeSize + 1 >= Length_of_M_area` as its range
+   rejection. Byte reads reject the last two valid bytes; word reads reject
+   valid near-end ranges too. The addition also needlessly risks overflow.
+   This is an independent existing mirror defect, not caused by changing the
+   Compat calls. Both the current and candidate physical adapter inherit it.
+6. `machine/machine.h` promises ROM writes are rejected. Actual in-range
+   calls return SOFTPC_MACHINE_OK while phy_w8 ignores SAS_ROM writes. The
+   existing bounds reject out-of-allocation requests; they do not reject ROM.
+   Preserve the original bus behavior and correct the misleading comment,
+   rather than adding type scans or changing accepted status into a new error.
+
+#### Dynamic evidence and its limits
+
+An isolated probe compiles against each existing architecture's real object
+and library set. It includes the owner-local device fixture for its existing
+audio mocks; all generated code, a disposable 512-byte boot medium and logs
+are task scratch. Nothing is linked into a shipping EXE or cached target.
+
+Set physical 00005000=31h and 00105000=72h, then enable a nonidentity page
+mapping from the former linear address to the latter physical address.
+Both x64 and x86 show the same results:
+
+- Current adapter read returns 72h instead of 31h.
+- Current adapter write of 94h leaves physical 00005000=31h and changes the
+  wrong physical page 00105000 to 94h.
+- Original physical SAS reads/writes the intended address with PG still on.
+- B8000 is actually SAS_VIDEO. An original physical write/read returns 31h;
+  the current paged adapter instead reads 00h from its shadow RAM mapping.
+- With wrapping disabled, at the 16-MiB allocation end, byte reads at size-3,
+  size-2 and size-1 return 31h, FEh and FEh after physical writes of 31h.
+- An in-range ROM write returns OK and leaves its previous byte unchanged.
+  One-past-end and overflowing wrapper requests return INVALID_ARGUMENT.
+
+A separate scratch-only candidate substitutes precisely the two Compat
+calls with c_sas_PWS/c_sas_PRS. Both architectures then read 31h, write 94h to
+the correct physical page, leave shadow RAM at 72h and read video as 31h.
+The final dual probe job exits zero. The same tail-byte FEh results remain,
+proving why the two-call repair alone is insufficient for complete boundary
+acceptance. The original phyR range correction is source-derived and has NOT
+yet been compiled or dynamically validated.
+
+Discarded harness drafts include missing boot-media setup, using test-target
+instead of Compat compile flags, and duplicate unguarded original headers.
+Those failures are not product findings. Candidate compilation reports legacy
+original-header endif/redefinition warnings; no warning-free full-build claim
+is made. No actual guest boot, desktop acceptance, new full suite or mirror
+patch validation is claimed by these isolated probes.
+
+#### Recommended single-path implementation, pending scope approval
+
+The two adapter replacements are:
+
+```diff
+-    c_sas_stores(address, (IU8 *)bytes, length);
++    c_sas_PWS(address, (IU8 *)bytes, length);
+-    c_sas_loads(address, bytes, length);
++    c_sas_PRS(address, bytes, length);
+```
+
+For complete boundary correctness, additionally repair the original owner:
+
+```diff
+-    if ((addr + typeSize + 1) >= Length_of_M_area) {
++    if (addr >= Length_of_M_area || typeSize > Length_of_M_area - addr) {
+```
+
+Short-circuiting validates addr before subtraction; the comparison accepts
+exactly the remaining byte capacity. Keep original A20 masking, type/device
+dispatch and out-of-range value handling. Add the required local reason marker
+and update the XP manifest and local patch ledger. This adds mirror diff and
+therefore REQUIRES owner approval: the admission's initial no-mirror expectation
+must be revised, not silently bypassed with a Compat tail workaround.
+
+Production estimate: memory.c +2/-2; original ccpusas4.c +2/-1 including its
+reason marker; Machine header comment approximately +3/-3. Total approximately
++7/-6, net +1. Only three executable statements change; no API/layout changes,
+new state, locks, workers, polling or direct-RAM path. Shared eight trees stay
+unchanged. Mirror delta is one replaced condition plus one reason marker,
+not a source import or formatting sweep.
+
+Extend the existing Machine device-contract executable with one physical-memory
+case, reusing its creation/reset/mock/cleanup path; register it in root CMake.
+Estimated test addition is 100-150 C lines and two registration lines, not a
+new test framework. Proof obligations: nonidentity read/write including a page
+boundary and unchanged shadow RAM; SAS_VIDEO reads/writes preserving mapped
+storage; A20 on/off; null/zero/outside/overflow refusal with unchanged outputs;
+first/last RAM bytes and a valid span ending exactly at memory end; ROM ignore
+behavior and inaccessible-read semantics. Use known sentinels and independent
+test-only RAM observations for the tail, not the repaired reader as its own
+oracle. Restore CPU/page/wrap state and destroy through existing ownership.
+Retain existing text boot, paged DMA, checkpoint/TLB and debug regressions.
+
+After approved implementation: cached dual build/publication, focused memory
+and affected caller tests, complete background tests and applicable native/
+package qualification, mirror/accounting/manifest and documentation gates,
+actual-diff review, commit/push and owner acceptance. Counts above are an
+implementation estimate, not an already implemented or tested full repair.
+
 ### S7 admission: deterministic App test contracts
 
 The owner closes S6 without a second acceptance round and admits S7 at

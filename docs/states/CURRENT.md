@@ -33,6 +33,16 @@ The separate performance Queue candidate remains.
 | Original Owner Request | 批准收口，准入下一个S任务，先给任务简报。 Next planned item is S8 physical memory adapter correctness in the admitted T99 expansion. |
 | Similar-Issue Sweep | Enumerate named physical memory read/write adapters and all actual callers; distinguish linear, physical and device-mapped SAS operations and document each disposition. |
 
+S8 research confirms the two Compat calls use linear rather than physical SAS.
+Current and scratch-only candidate probes on both widths establish the paged
+wrong-page defect and the two-call repair, including SAS_VIDEO. All direct
+Machine wrapper consumers are tests, not shipping runtime paths. An additional
+existing phyR boundary defect rejects the final two legal RAM bytes; the
+candidate still reproduces it. The proposal records a one-condition original
+repair, required mirror accounting and precise scope/diff estimates. Owner
+approval of that mirror scope is required before implementation. No tracked
+code or assets are modified; this delivery is research, not S8 qualification.
+
 S6 is closed by owner-authorized advancement; see its
 [closure](../history/M9-T99-S6-debug-fixtures.md). S7 is accepted and closed; see its
 [closure](../history/M9-T99-S7-app-test-contracts.md). S8 is active for audit/design.
