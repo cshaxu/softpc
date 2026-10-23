@@ -52,11 +52,7 @@ static lib_status emulator_product_create(const emulator_product_machine *machin
 {
     emulator_product *product;
 
-    if (out_product == LIB_NULL) return LIB_STATUS_INVALID_ARGUMENT;
     *out_product = LIB_NULL;
-    if (machine == LIB_NULL || machine->machine == LIB_NULL ||
-        machine->bind == LIB_NULL || machine->destroy == LIB_NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
     product = lib_allocate_zero(1u, sizeof(*product));
     if (product == LIB_NULL) return LIB_STATUS_NO_MEMORY;
     product->machine = *machine;
@@ -98,8 +94,6 @@ static lib_status emulator_product_compose_machine(emulator_product *product)
     emulator_machine *emulator_machine = LIB_NULL;
     lib_status status;
 
-    if (product == LIB_NULL || product->emulator_machine != LIB_NULL)
-        return LIB_STATUS_INVALID_STATE;
     machine = product->machine.machine;
     driver = product->machine.driver;
     status = emulator_machine_create(&emulator_machine, &driver);
@@ -126,9 +120,6 @@ static lib_status emulator_product_compose_control(emulator_product *product,
     emulator_session *session = LIB_NULL;
     lib_status status;
 
-    if (product == LIB_NULL || options == LIB_NULL ||
-        product->emulator_machine == LIB_NULL ||
-        product->session != LIB_NULL) return LIB_STATUS_INVALID_STATE;
     resolved = *options;
     resolved.machine = product->emulator_machine;
     status = emulator_session_create(&session, &resolved);
@@ -147,9 +138,6 @@ static lib_status emulator_product_compose_ui(emulator_product *product,
     emulator_ui *ui = LIB_NULL;
     lib_status status;
 
-    if (product == LIB_NULL || options == LIB_NULL || product->session == LIB_NULL ||
-        product->ui != LIB_NULL)
-        return LIB_STATUS_INVALID_STATE;
     status = emulator_ui_create(&ui, options);
     if (status != LIB_STATUS_OK) return status;
     product->ui = ui;
@@ -170,8 +158,6 @@ static lib_status emulator_product_publish_initial_state(emulator_product *produ
 {
     emulator_machine_state state;
 
-    if (product == LIB_NULL || product->emulator_machine == LIB_NULL ||
-        product->session == LIB_NULL) return LIB_STATUS_INVALID_STATE;
     state = emulator_machine_state_get(product->emulator_machine);
     if (state != EMULATOR_MACHINE_STOPPED) return LIB_STATUS_INVALID_STATE;
     return emulator_session_enqueue_runtime_completed(product->session,

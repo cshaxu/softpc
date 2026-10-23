@@ -4,6 +4,65 @@
 
 ### Current S5 quality audit and S6 transfer
 
+#### S5 approved follow-up at 6a9bf601
+
+Owner admits all five audit findings as a single bounded follow-up: remove
+duplicate preconditions from implementation-private composition stages while
+retaining real failure/ownership checks; delete unused composition.h; make
+the component-local source identity allocator static; use char text buffers
+and consistent booleans/direct returns; replace Machine fixture's Win32
+synchronization with existing Base events/tasks and Types atomics. Keep thread
+affinity and shutdown completion assertions, without a new production API.
+Estimate: production net -25..-40 lines, test changes primarily mechanical
+replacement across three Machine fixture files, with no new test framework.
+The frozen verification universe remains all 192 Windows registrations per
+width plus focused changed-owner tests; removing WIN32-only registration makes
+the neutral Machine test available on Linux but does not claim Linux execution.
+No App/mirror/media changes. Scratch and budgets remain those of CURRENT.
+
+Follow-up implementation and qualification: all five items are complete.
+Private composition stages no longer validate impossible caller order or repeat
+the public run preconditions. Allocation, downstream failure and ownership
+barriers remain. Remove only the two corresponding invalid-order assertions;
+creation failure, destroy ordering, retained-owner failure and ordinary run
+coverage remain. The source identity allocator is static; its existing boundary
+test includes the owner implementation rather than exporting a test entry.
+The unused forwarding header is deleted. UTF-8 buffers use char directly, and
+presentation booleans/direct-return style are consistent at the audited sites.
+
+Machine fixture events/tasks now use Base; counters use Types atomics. C11
+thread-local fixture identity preserves executor-affinity assertions. An explicit
+completion event plus task join replaces the native helper-thread wait, retaining
+the blocked-final-callback proof without sleeps. The existing Machine test is
+registered on every platform, not just Windows. No new production interface,
+platform test framework, polling, retry or lifecycle state was introduced.
+
+Against 6a9bf601, production C/H +19/-43 (net -24), test C/H +149/-155
+(net -6), test CMake +2/-4 (net -2). Five public trees change: src/lib,
+test/lib, src/emulator, test/emulator and src/x86-ibmpc. Other public trees,
+App, mirror, INI and media are unchanged. Manifests are synchronized. No root
+test-infrastructure changes are needed for downstream adoption.
+
+Cached x64/x86 builds refresh both EXEs. Focused tests pass 14/14 each.
+Full runs pass 192/192 each (184 background, three native audio and five
+desktop/package), with exact registration/passing-name equality, zero skips,
+failures or retries. Desktop session was Active. No non-mirror warnings occur;
+preserved mirror warnings are not changed. This proves Windows dual-width
+qualification, not an executed Linux or MSVC runtime qualification.
+
+Self-review scans all allocator/header callers, composition stages and test
+assertions, UTF-8 buffer uses, and Machine native-symbol references. No stale
+header or native Machine fixture reference remains; exported lifetime contracts
+from the preceding P remain intact. No in-scope delivery blocker was found.
+The larger textual test diff is primitive substitution, not extra behavior.
+
+Published SHA-256 for this follow-up:
+- softpc32.exe: 0BE8C7308FB3BD94C4A9CD261FCC2B4483837DC13294764F26F59C58D8D20CEA
+- softpc64.exe: EAC612787CFA5C5AE5DB16AD8E16854F8A97BD9A409236337D9B7381ABEB047E
+
+After job exit, retire task scratch and preserve only reusable caches. The
+follow-up awaits committed-diff review and owner acceptance; S6 is not admitted.
+
 #### Approved S5 implementation qualification
 
 Owner approves the unified minimal repair after the audit delivery 164a5f70.

@@ -7,12 +7,12 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the minimal unified S5 repair: Broker retirement/cleanup, PCM creation rollback and UI/Product ownership adaptation; build, publish, fully test, commit/push and await acceptance. Former private research remains planned S6. |
+| Admission And Approval | Owner reopens S5 for all five follow-up audit items: private composition checks, unused forwarding header, private identity allocator, text/style cleanup, and neutral Machine test synchronization. Append P delivery, build/publish/full-test/commit/push, then await acceptance. Prior lifecycle repairs remain intact. |
 | Objective | Resolve the confirmed Console broker retirement/cleanup ownership gap with a minimal single-path plan; review public package quality without speculative redesign. |
 | Non-goals | No private CPU repair, input/frame redesign, guest/media changes, downstream access, startup retry, timeout relaxation or new lifecycle framework. |
 | Reference Baseline | cf60e14f; accepted S4 and owner INI are unchanged. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Six production C files in Lib Broker/PCM and Emulator UI/Product, existing owner-local tests and contracts/manifests. Broker/UI destroy consume on ordinary return; no signature or layout change. |
+| Files And ABI Surface | Lib KVM Base allocator, Emulator Product composition and Session booleans, X86 IBMPC text buffers; their tests/manifests plus Machine fixture and registration. No product behavior or public object layout changes; remove internal-only allocator export and unused header. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
 | Verification | Cached dual builds and published EXEs; focused failure regressions followed by every registered test per width, partitioned into background, native_audio and desktop groups. Record inventory and exact counts; no skips or concealed retries. Prior S4 evidence is not current proof. |
 | Expected Markers | Distinguish confirmed reader exit from reader I/O status and subsequent cleanup errors; prove no inaccessible ownership remains on safely recoverable create failure. |
@@ -24,7 +24,15 @@
 | Similar-Issue Sweep | Broker create/replace/cancel/destroy, reader exit and backend cleanup; compare existing KVM/PCM lifecycle ownership without assuming their failure contracts are identical. |
 
 S4 is owner-accepted and closed; see [closure](../history/M9-T99-S4-console-retirement.md).
-S5 is implemented and verified, awaiting owner acceptance. Former S5's five private
+S5 follow-up is implemented and verified against 6a9bf601, awaiting acceptance.
+All five audit items are complete. Production C/H +19/-43 (net -24), test C/H
++149/-155 (net -6), test CMake +2/-4. Cached dual builds publish both EXEs;
+focused tests pass 14/14 each and full runs pass 192/192 each, exact registered
+name equality and no failures/skips/retries. No non-mirror compiler warnings.
+The proposal records neutral fixture synchronization, preserved coverage and
+platform verification limits. S6 remains planned, not active.
+The following qualification records the preceding P2/P3, not this follow-up.
+Former S5's five private
 research cases transfer intact to planned S6; S6 is not active. T99 remains open.
 Against 164a5f70, production C/H is +72/-78 (net -6), test C +88/-49
 (net +39), test CMake/fixture +20/-5. Cached dual builds publish both EXEs;

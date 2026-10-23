@@ -2,7 +2,8 @@
 
 static lib_atomic_u64 kvm_component_next_source_identity = 1u;
 
-lib_status kvm_component_allocate_source_identity(lib_atomic_u64 *next,
+/* Component-local allocator: identities never wrap into a second epoch. */
+static lib_status kvm_component_allocate_source_identity(lib_atomic_u64 *next,
     lib_u64 *out_identity)
 {
     lib_u64 identity;
