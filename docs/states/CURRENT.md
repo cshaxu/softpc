@@ -38,6 +38,10 @@ zero code/build-script diff rather than speculative recovery machinery; the
 proposal owns the finite ledger, exact proof and unresolved historical limits.
 No repair or fresh full runtime regression is claimed. Await owner disposition;
 T99 stays open. External snapshot.midi modification is preserved, not staged.
+Research 5d44c2cf is pushed; coordinator actual-commit review confirms its
+three-document-only scope, bounded current proof and unresolved historical
+cause. Scratch is retired and gates pass. S12 awaits owner disposition;
+neither a historical tooling repair nor T99 closure is claimed.
 S11 is owner-accepted and closed; see its
 [closure](../history/M9-T99-S11-sb-midi-framing.md). Its following delivery
 record is historical S11 evidence, not S12 qualification.

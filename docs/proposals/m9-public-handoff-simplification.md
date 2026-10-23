@@ -129,6 +129,17 @@ exclude it from this task's staging. Scratch (about 35MB) is retired after
 promoting this report; both persistent caches remain. No reusable production
 probe, external source copy or dependency is introduced.
 
+**Coordinator actual-change review.** Executor 5d44c2cf is pushed. After role
+switch, inspect its complete three-document diff against admission and S11
+acceptance: no source, test, tooling, manifest or artifact is committed. The
+six-member research ledger separates measured current behavior from unprovable
+historical causality and does not equate zero reproduction with repair. S11
+closure cites its actual accepted delivery. The source links support the
+metadata distinction, not an allegation against a particular old writer.
+Documentation/mirror/whitespace/residue checks pass; owned jobs are gone and
+scratch removed. Unrelated snapshot changes remain outside staging. No research
+delivery blocker; S12 still requires owner disposition and T99 is open.
+
 ### S11 admission: Sound Blaster MIDI command boundary
 
 Owner accepts S10 at 2866cbd5: 好，收口本S，转入下一个S任务。老规矩.
