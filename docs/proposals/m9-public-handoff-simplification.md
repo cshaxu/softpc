@@ -2,6 +2,98 @@
 
 ## Admission and scope
 
+### S9 admission: exact public-eight-tree import
+
+Owner admits the import as S9 and requires continuous numbering. The earlier
+unadmitted VGA, SB-MIDI and Ninja candidates move in order to S10, S11 and S12.
+Historical reports retain their then-current identifiers. S8 closes by authorized
+advancement from reviewed delivery 304cea4f; T99 remains open.
+
+Original request: 准入一个新的S任务，原样导入nxvm的公共八组件，老规矩，
+编译发布测试提交推送+代码质量审计后等我验收。
+
+Import identity: cshaxu/nxvm shared commit
+04674703a9b0c977e94e7334450a022de3e6514c. Latest observed HEAD
+197076521acf9e593a6c0340ae59fb5d617806f8 has identical eight trees.
+Source/destination are the same src/test paths for lib, emulator, x86-debug and
+x86-ibmpc. Existing notices are preserved; this owner-approved same-project
+shared-corpus update adds no separately licensed dependency or redistribution
+claim. NXVM stays read-only, never a build/runtime dependency.
+
+Frozen ledger: 296 files, identical path sets, no additions/deletions. Source/test
+counts are Lib 123/78, Emulator 28/23, X86-debug 15/9 and X86-IBMPC 13/7.
+Six differences: Machine implementation, Session control, source manifest,
+Machine wait test, Session queue-failure test and test manifest. Pre-import
+measured production +58/-20 (net +38), test C +52/-2 (net +50), four manifest
+hash rows changed. No root helper import.
+
+The reviewed changes check lifecycle wakes through existing Machine failure/
+cancellation, prevent ERROR being overwritten by RUNNING/PAUSED and commit
+Session queued work only after successful notification under its existing mutex.
+Private enqueue uses existing lib_status to distinguish allocation and I/O errors.
+No public API, new state/worker/queue, polling, retry or product-specific path;
+existing pause/FIFO policy remains.
+
+Acceptance requires pinned equality for every member, cached dual full builds,
+complete registered background/desktop/audio tests and exact execution inventory.
+Review actual diff, inward dependencies, Types, naming, manifests and ownership;
+commit/push executor delivery, then coordinator actual-change review. Preserve
+INI/media/snapshots and publish both EXEs. S9 owns disposable build/t99-s9:
+30-minute run, five-minute no-progress and 300MB limits. Promote evidence and
+retire scratch after all jobs exit; await owner acceptance.
+
+#### S9 executor delivery and quality review
+
+Final import is byte-identical for all 296 frozen paths; no path is added or
+deleted and all use LF. Six changed paths match the audited upstream commit.
+Actual production C is +58/-20 (net +38), test C +52/-2 (net +50), and source/
+test manifests together +4/-4. Lib and both X86 pairs are unchanged. App,
+original mirror, root build/test helpers, guest media and user INI are unchanged.
+
+Quality review follows the actual six-file diff and affected callers. Machine
+keeps one executor/cancellation path; failed lifecycle wakes no longer report
+acceptance, and guarded state commits cannot overwrite an observed ERROR.
+Session's existing queue mutex covers notification and commit: a woken reader
+must acquire that mutex before observing the appended event. Failed notification
+does not append; existing fault slots retain the actual lib_status. No public
+header/ABI, fallback, extra queue/thread/state machine, retry or polling is added.
+Lib Types remains the sole base vocabulary and inward dependency ownership is
+unchanged. Tests remain in their respective Machine and Session owners, using
+their existing fixtures rather than test-only production APIs.
+
+Similar-issue sweep: all command/resume signals in Machine and all private
+Session enqueue callers were inspected. Ordinary lifecycle sites now check
+results; request registration already returns its status and cancels a rejected
+flag; completion already uses fail_sync. Shutdown's best-effort ordinary wakes
+remain distinct from its independent task-cancel/join authority. Session fault-
+slot notification remains the existing terminal reporting mechanism, not a new
+accepted-work path. No additional in-scope defect was confirmed. This is source
+reasoning plus controlled failure injection, not exhaustive OS failure proof.
+
+Fresh cached qualification: hidden job 42348 exits normally, qualification.exit=0,
+elapsed 5m02.50s. Both architectures configure/build successfully with zero
+compiler warnings/errors in this incremental run. Four C objects per width are
+rebuilt (two production, two tests); other objects/archives are reused for links.
+Both focused tests pass per width. Full x64/x86 each pass 193/193, exact registered
+name equality, zero duplicate/failure/skip and no retry: 185 background (164
+unit, 14 checks, seven integration), five desktop/package and three native audio.
+Background durations are 116.95s/112.41s, desktop 22.81s/22.36s, audio 2.76s/2.52s.
+This includes all four shared packages, App integrations and both real package
+paths. The host Console session is Active; no Computer Use is used. All manifests,
+Types/dependency/naming gates, documentation, 505-body XP mirror and whitespace
+checks pass. No claim is made that unchanged original-source warnings are fixed
+or that every hardware/host interleaving has been exercised.
+
+Published SHA-256:
+
+- softpc32: 783F37579C11647B8761C5648C3BDF1AF584DA1BF5B98CC91E575B20C16B4EFE
+- softpc64: F97A5F9E0140BC1C48F27E32EA6789D1592EBD0DA506473170A682709E782745
+- preserved INI: 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D
+
+Evidence is promoted here before retiring build/t99-s9 after confirmed job exit.
+Executor delivery and coordinator actual-commit review precede final handoff;
+S9 waits for owner acceptance, T99 remains open and S10-S12 are not admitted.
+
 ### S8 admission: physical memory adapter correctness
 
 The owner accepts and closes S7 at reviewed delivery 7fac795d and admits
@@ -913,7 +1005,7 @@ Audited dispositions and implementation sequence:
   Test nonidentity paging for both directions plus mapped video and boundaries.
   Retain T94 S2's observation that c_sas_PRS sees the actual DMA write while
   the old named-physical oracle reads another page. Owner: Compat memory.
-- **S9, original VGA cursor-disable semantics.** vga_prts.c case 0x0a still
+- **S10, original VGA cursor-disable semantics.** vga_prts.c case 0x0a still
   reads the old cursor_off, updates the register only when start bits differ,
   then calls do_new_cursor whose shape branches set visibility true. T98 S6's
   port observation (start=0x20/end=15 remaining visible) therefore has no
@@ -922,7 +1014,7 @@ Audited dispositions and implementation sequence:
   only changes, enable/disable, start/end and mode transitions through ports.
   Do not change public text-frame transport or assume this explains perceived
   cursor thickness. Mirror accounting and focused dual-width proof required.
-- **S10, Sound Blaster MIDI parser boundary.** sndblst.h still defines 38h,
+- **S11, Sound Blaster MIDI parser boundary.** sndblst.h still defines 38h,
   but nt_sbdsp.c has no MIDI_WRITE_POLL handler and still treats 91h as
   DSP_WRITE_HS. The original header explicitly excludes SB-MIDI support.
   MPU-401 playback success therefore does not fix the observed SB command/data
@@ -931,7 +1023,7 @@ Audited dispositions and implementation sequence:
   path or silent expansion to full SB MIDI. Test 38h followed by MIDI data
   including 91h, subsequent valid PCM commands and busy/IRQ behavior.
   Evidence: [T95 S1](../history/M9-T95-win31-midi-wav-playback-proposal.md#paused-transfer-and-midi-follow-up).
-- **S11, Ninja incremental build integrity.** The current reusable x86 log
+- **S12, Ninja incremental build integrity.** The current reusable x86 log
   has a v7 header and recent builds succeed, but no captured damaged metadata
   or causal repair explains T93 S15's repeated premature-end recovery and
   large rebuilds. Cache relocation is not proof of repair. Preserve affected
@@ -941,8 +1033,8 @@ Audited dispositions and implementation sequence:
   either repair a proved tooling cause or report a bounded unresolved host
   limitation for explicit owner disposition; do not declare fixed from absence.
 
-These S tasks own all eight original entries: cursor->S9, SB-MIDI->S10,
-physical memory->S8, Ninja->S11, checkpoint/timer/readiness->S7, BOP->S6.
+These S tasks own all eight original entries: cursor->S10, SB-MIDI->S11,
+physical memory->S8, Ninja->S12, checkpoint/timer/readiness->S7, BOP->S6.
 No original evidence is discarded. Source inspection commands include searches
 for cursor_off/do_new_cursor, MIDI_WRITE_POLL/DSP_WRITE_HS, physical adapter
 callers, bda_tick_low, checkpoint registration and the 15000-ms graphics wait,

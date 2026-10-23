@@ -5,33 +5,46 @@
 Owner expands T99 to absorb all eight TODO entries after a current-source
 audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
-memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
+memory, S10 VGA cursor-disable, S11 SB-MIDI parsing and S12 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S7 is owner-accepted and closed; S8 is implemented, verified and
-reviewed, awaiting owner acceptance. S9-S11 remain planned. The owner accepts current passing native startup
+not by repair. S8 closes by owner-authorized advancement after verified delivery
+and review. S9 is implemented and verified for exact NXVM public-eight-tree import; the three
+previously planned tasks move in order to S10-S12. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
-## M9 T99 S8 Packet
+## M9 T99 S9 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | After the brief and research at bdcdd28b, the owner approves implementation: 批准实施，规矩你懂。 This explicitly includes the proposed original phyR boundary condition, its marker/accounting, two Compat call replacements and Machine contract comment. |
-| Objective | Establish and minimally repair the actual physical-memory adapter contract using the original physical SAS path, including mapped video and boundaries. |
-| Non-goals | No S9-S11 implementation, public-component changes, guest/media/INI edits, direct-RAM second implementation or speculative mirror changes. |
-| Reference Baseline | bdcdd28b reviewed S8 research and f251686b research source baseline. S6 published dual EXEs are refreshed by S8 production delivery. Historical T94 DMA evidence remains distinct from fresh S8 proof. |
+| Admission And Approval | Owner admits exact NXVM eight-tree import and explicitly selects S9; former planned S9-S11 move in order to S10-S12. |
+| Objective | Import the reviewed immutable public source/test corpus exactly and qualify the complete standalone product. |
+| Non-goals | No root helper import, App/mirror edits, S10-S12 implementation, media/snapshot/INI changes or downstream edits. |
+| Reference Baseline | SoftPC 304cea4f; NXVM shared commit 04674703a9b0c977e94e7334450a022de3e6514c, unchanged in HEAD 197076521acf9e593a6c0340ae59fb5d617806f8. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | compat/memory.c, machine/machine.h comment, original base/ccpu386/ccpusas4.c phyR condition with local marker, existing Machine device-contract test and root registration; XP manifest/local ledger and task records. Public eight-tree ABI and all other mirror code remain unchanged. |
-| Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy. |
-| Verification | First audit all physical adapter callers and the original SAS contract. Planned focused proof covers nonidentity paging reads/writes, SAS_VIDEO routing and range boundaries on x86/x64. Implementation requires cached dual builds/publication, complete background regression and applicable integration; record fresh versus inherited evidence separately. |
-| Expected Markers | Physical addresses remain physical under paging; reads/writes retain original SAS device mapping and fail honestly at invalid boundaries. One original memory route, no direct-RAM bypass. |
-| Asset Needs | Preserve INI, snapshots and guest media; disposable fixtures only. No Computer Use. Native device unavailability remains an environment result, not a product repair. |
-| Reporting Requirements | Brief first; then current-source findings, finite caller/contract ledger, minimal design and measured diff estimate before implementation. Separate source inference, tests and guest proof. S8 owns build/t99-s8, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote evidence and retire scratch. |
-| Stop Conditions | Report if original physical SAS cannot preserve mapping or needs changes beyond the approved phyR condition/marker. Do not add a direct-RAM production bypass or infer live product failures from test-only adapter callers. |
-| Exit Criteria | Audited single-path repair with focused dual proof, required regression/publication, actual-diff review, commit/push and clean scratch; wait for owner acceptance. |
-| Original Owner Request | Admit S8, investigate through an executable proposal, then 批准实施，规矩你懂。 Implement the reviewed minimal solution, dual-build/publish/test/review/commit/push and wait for acceptance. |
-| Similar-Issue Sweep | Enumerate named physical memory read/write adapters and all actual callers; distinguish linear, physical and device-mapped SAS operations and document each disposition. |
+| Files And ABI Surface | src/test pairs for lib, emulator, x86-debug and x86-ibmpc: 296 paths, six Emulator differences, no public API/ABI change; task records and refreshed dual EXEs. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy; executor then coordinator actual-diff review. |
+| Verification | Exact pinned paths/hashes, cached dual full builds, focused Emulator proof and complete background, desktop/package and audio tests; exact registered/executed names, manifests, dependency/Types/naming, documentation, mirror, whitespace and residue gates. |
+| Expected Markers | All 296 paths match pinned NXVM; Machine wake failures retain ERROR and Session enqueue preserves actual failure status without committing rejected work. |
+| Asset Needs | Preserve user INI and guest assets; refresh only dual EXEs. No Computer Use. |
+| Reporting Requirements | Actual diff, quality review, tests and limits, commits and EXE links. S9 owns build/t99-s9: 30-minute jobs, five-minute no-progress and 300MB budgets; retire scratch after evidence promotion and job exit. |
+| Stop Conditions | Report unreviewed upstream changes, scope/ABI drift or unexplained failures; no weakened tests, silent retries or unrelated imports. |
+| Exit Criteria | Exact equality, complete qualification/publication, executor commit/push, coordinator actual-diff review/push and clean worktree/scratch; await owner acceptance. |
+| Original Owner Request | 准入一个新的S任务，原样导入nxvm的公共八组件，老规矩，编译发布测试提交推送+代码质量审计后等我验收。 Correction: 现在你就是准入S9来做导入！S任务编号不得打乱。 |
+| Similar-Issue Sweep | Review changed Machine lifecycle signal/state transitions, Session enqueue/fault ordering, all callers and failure tests; preserve unique cancellation/queue ownership with no polling or second path. |
+
+S9 matches all 296 pinned upstream files exactly, with six Emulator paths
+changed. Production +58/-20, tests +52/-2; no public ABI, App/mirror, root helper
+or user asset change. Cached dual builds refresh both EXEs without compilation
+warnings. Each width passes all 193 registrations (185 background, five desktop,
+three audio), exact name inventory, zero failures/skips/retries. Focused tests
+also pass. The proposal records hashes, scope, quality audit and proof limits.
+Documentation, mirror, whitespace and residue gates pass; owned jobs exited
+and task scratch is retired. S9 awaits executor delivery and actual-commit review, then owner acceptance;
+T99 stays open and S10-S12 are not admitted.
+
+### S8 reviewed delivery (closed by owner-authorized advancement)
 
 S8 replaces two Compat linear calls with original physical SAS and corrects
 the approved phyR range condition, with one marker and updated XP accounting.
@@ -49,7 +62,8 @@ residue gates pass. Scratch is retired and the worktree is clean.
 
 S6 is closed by owner-authorized advancement; see its
 [closure](../history/M9-T99-S6-debug-fixtures.md). S7 is accepted and closed; see its
-[closure](../history/M9-T99-S7-app-test-contracts.md). S8 is verified, awaiting acceptance.
+[closure](../history/M9-T99-S7-app-test-contracts.md). S8 closes by advancement;
+see its [record](../history/M9-T99-S8-physical-memory.md).
 The following S7 and S6 delivery
 record is historical evidence, not current S7 qualification.
 
