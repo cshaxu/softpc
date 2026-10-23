@@ -94,6 +94,21 @@ Evidence is promoted here before retiring build/t99-s9 after confirmed job exit.
 Executor delivery and coordinator actual-commit review precede final handoff;
 S9 waits for owner acceptance, T99 remains open and S10-S12 are not admitted.
 
+Coordinator actual-change review: executor a69fc1e0 is pushed. Its twelve paths
+are six exact imported paths, two rebuilt EXEs and four task records. The actual
+code/test/manifest hunks, full qualification evidence, corrected S numbering,
+original owner request and preserved App/root/media scope have been checked.
+Committed EXE/INI blobs equal published files. No new outward dependency,
+Types alias, extra runtime path, weakened assertion or blocking quality defect
+is found in this change. Build residue, documentation, mirror and whitespace
+checks pass; task jobs have exited and scratch is retired. This review is not
+an exhaustive concurrency proof or a downstream synchronization claim. S9 is
+verified/reviewed awaiting owner acceptance; no next S is automatically admitted.
+One final manual mirror-check invocation supplied a relative root and resolved
+the manifest incorrectly; the corrected absolute-root invocation passes all
+505 bodies, as did the original full qualification. No source/test fix or retry
+was involved.
+
 ### S8 admission: physical memory adapter correctness
 
 The owner accepts and closes S7 at reviewed delivery 7fac795d and admits
