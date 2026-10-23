@@ -7,24 +7,26 @@
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner accepts S4 and admits S5 research. Permanent repairs require a subsequent evidence-backed approval. |
-| Objective | Investigate the five private CPU/debug, native startup and fixture cases transferred from S4; produce distinct root-cause conclusions and minimal repair proposals. |
-| Non-goals | No production repair, public API/input redesign, guest/media changes, downstream access, startup retry or timeout relaxation. Cursor appearance is not added to this S. |
-| Reference Baseline | c5d6cf64; owner INI change display=console is preserved, not an investigation edit. |
+| Admission And Approval | Owner directs public-eight-tree quality audit; confirmed issues repurpose S5 for public quality repair planning and transfer former S5 intact to planned S6. This delivery is audit and scope revision, not implementation. |
+| Objective | Resolve the confirmed Console broker retirement/cleanup ownership gap with a minimal single-path plan; review public package quality without speculative redesign. |
+| Non-goals | No production edits in this audit delivery, private CPU repair, input/frame redesign, guest/media changes, downstream access, startup retry or timeout relaxation. |
+| Reference Baseline | cf60e14f; accepted S4 and owner INI are unchanged. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Task documentation; read-only App/Compat/CCPU and actual test-path audit, with task-private diagnostic builds if needed. No permanent ABI change. |
+| Files And ABI Surface | Eight public src/test trees reviewed; confirmed repair candidate is Lib Console broker and existing owner-local tests. Documentation only changes now; no ABI change. |
 | Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Bounded actual-path x86/x64 research; distinguish prior captures from new evidence. Documentary admission uses governance/diff checks, not a redundant full build; any later repair defines its own full regression before implementation. |
-| Expected Markers | First bad transition, owning code, reproducibility limits, minimal candidate and falsifying checks for each of five ledger entries. |
+| Verification | Source audit and documentary governance/diff checks now. Before repair, extend actual owner-local failure fixtures; implementation requires cached dual builds, focused/public tests and affected native/package regression. Prior S4 results are not fresh audit tests. |
+| Expected Markers | Distinguish confirmed reader exit from reader I/O status and subsequent cleanup errors; prove no inaccessible ownership remains on safely recoverable create failure. |
 | Asset Needs | Preserve published EXEs, INI, snapshots and media. No Computer Use or downstream changes. |
 | Reporting Requirements | Source proof, dynamic proof and unknowns separately. S5 owns build/t99-s5: 60-minute job, 10-minute no-progress investigation, 300MB; retire unused scratch before delivery. |
-| Stop Conditions | No unapproved production/mirror repair or broader TODO cleanup; do not conceal host/device failures or infer root cause from an unchanged rerun. |
-| Exit Criteria | Five-case research ledger has explicit evidence/disposition and actionable proposals or precise remaining unknowns; records reviewed and committed/pushed before seeking repair approval. |
-| Original Owner Request | Accept S4, then admit S5 research. |
-| Similar-Issue Sweep | CPU resume/quick-mode entry edges, fixture register mutations and all package startup/wait phases; keep independent causes distinct. |
+| Stop Conditions | Do not equate an I/O error with an unjoined worker, hide errors, add retry/owner state machines or expand into private S6 research. |
+| Exit Criteria | Source findings and bounded coverage recorded, then minimally repaired and verified after implementation brief; actual diff reviewed and owner acceptance obtained. This audit does not close S5. |
+| Original Owner Request | Audit quality first; if issues exist, transfer current S5 to S6 and use S5 for public-eight-tree quality repairs. |
+| Similar-Issue Sweep | Broker create/replace/cancel/destroy, reader exit and backend cleanup; compare existing KVM/PCM lifecycle ownership without assuming their failure contracts are identical. |
 
 S4 is owner-accepted and closed; see [closure](../history/M9-T99-S4-console-retirement.md).
-S5 is active research. T99 remains open. No S5 production repair is authorized.
+S5 is active public quality audit/repair planning. Former S5's five private
+research cases transfer intact to planned S6; S6 is not active. T99 remains open.
+No production or test code changed in this audit delivery.
 
 ### Historical S4 verification and research
 

@@ -2,6 +2,63 @@
 
 ## Admission and scope
 
+### Current S5 quality audit and S6 transfer
+
+The owner's latest direction supersedes the historical S4/S5 split below:
+S5 now owns confirmed public-package quality issues; the former five-case
+private research packet transfers intact to planned S6. No private evidence
+is discarded and S6 is not simultaneously active.
+
+Audit baseline is cf60e14f. This is source inspection, not a new dynamic
+qualification. The bounded coverage ledger is:
+
+- Lib source/test: inspect Types/Base boundaries, UTF-8 directory ownership,
+  storage I/O, Console broker lifecycle and associated failure fixtures,
+  PCM/MIDI ownership, dynamic frame storage/exchange and Window rendering.
+  Confirmed finding is the broker cleanup issue below. Other inspected paths
+  did not establish a new repair requirement.
+- Emulator source/test: inspect Machine input admission/FIFO, Session output,
+  UI destruction and Product composition; scan direct platform/outer-package
+  references. No confirmed new defect; do not reopen accepted pause semantics.
+- X86 Debug and X86 IBMPC source/test: inspect package dependencies, command
+  adaptation and registration, scan outer-package/platform references. No new
+  confirmed violation. This is not exhaustive xasm32 instruction verification.
+- Whole-tree structural searches are candidate filters, not proof that every
+  branch or edge case was exercised. No fresh unit/native tests were run;
+  accepted S4's 192/192 per width remains historical evidence only.
+
+**Confirmed P2: Console reader failure and cleanup ownership are conflated.**
+In the native broker, retire_reader observes WAIT_OBJECT_0 but returns
+reader_status before closing/clearing the reader handle. Thus a completed
+reader with an I/O error repeatedly prevents deactivate/destroy from reaching
+cleanup. Separately, deactivate can fail after successful retirement (flush,
+stop-handle close or mode restoration). Root broker create treats every such
+rollback error as an unquiesced reader and returns without releasing the
+broker, binding or process claim. The output stays null, so the caller has no
+object to destroy. This is a source-proven ownership defect; no claim is made
+that it caused the owner's cursor or input symptoms.
+
+Existing reader-failure tests prove notification, not cleanup after a completed
+failed reader. Root broker smoke covers activation failure with successful
+retirement, not activation failure plus post-retirement cleanup failure.
+
+Minimal repair direction: retain one stop/join/cleanup sequence; use actual
+exit evidence, not the worker's I/O result, to decide whether cleanup is safe.
+Preserve the first error while completing independent safe cleanup. A genuinely
+unconfirmed live worker remains a separate safety case; do not silently free it
+or introduce a half-object/retry protocol. Establish its exact existing policy
+before changing it. Do not alter retirement timeouts as part of this fix.
+Reuse existing root broker and Win32 failure fixtures, including recreate after
+a safely cleaned failed creation. No new public API or persistent state is
+currently justified. Planning estimate: two production files +15..35/-20..45;
+existing tests +30..60/-5..20, plus contract/manifest edits if required. This is
+an estimate, not an implemented or verified diff.
+
+No production, test, EXE, INI or media changes accompany this audit. Before
+implementation, confirm the ordinary-error cleanup contract against all broker
+callers and test the concrete failure chains. The audit does not justify a
+general lifecycle framework or rewriting other public components.
+
 Owner initially admitted T98 S16 against 8165664a, then on 2026-10-22 closed
 T98 and immediately transferred this unimplemented research to new T99 S1.
 CURRENT owns status. No S16 research completion is claimed; scope and evidence
@@ -234,9 +291,10 @@ Temporary tracked command-provider diagnostics were removed and both cached
 test executables rebuilt successfully. Production and test tracked code are
 unchanged. All task-owned jobs exited before evidence retirement.
 
-### S5: private CPU/debug and native startup investigation
+### S6: private CPU/debug and native startup investigation (transferred from S5)
 
-Owner accepts S4 and admits S5 research at c5d6cf64. This carries current
+Originally admitted as S5 at c5d6cf64, now transferred intact to planned S6.
+This carries current
 evidence forward rather than restarting the investigation. The five entries
 below are the finite research ledger: each needs source ownership, evidence
 class, first-bad-transition findings, candidate scope and explicit unknowns.
@@ -282,16 +340,16 @@ It must separate these cases:
    separate from native loader failure. Repair only proven test-owned defects;
    an online rerun is not a repair of unavailable host devices.
 
-S5 must report source inference, controlled counterfactual and real failure
+S6 must report source inference, controlled counterfactual and real failure
 captures separately, retain existing assertions until their contract is proved
 wrong, and request approval for permanent private/mirror repairs. Do not expand
 into unrelated TODO items or downstream repositories. No guest, shipped EXE,
 INI or media changes are part of this transfer. The completed diagnostic jobs
-are stopped and S4 scratch has been retired. Any S5 diagnostics belong to
-build/t99-s5 under CURRENT's bounded execution policy; publish concise evidence
+are stopped and S4 scratch has been retired. Future S6 diagnostics need an
+admitted CURRENT packet and bounded scratch policy; publish concise evidence
 and remove disposable files, rather than retaining raw logs permanently.
 
-#### S5 admission source recheck
+#### Historical S5 admission source recheck (retained for S6)
 
 At admission, current source still matches the earlier captures. In
 `c_main.c`, a retained halted entry goes directly to RESUME_HALT; ordinary
