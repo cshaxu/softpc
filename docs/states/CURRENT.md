@@ -34,6 +34,10 @@ P6 is implemented and verified: source +2/-5, test +3/-3; both EXEs rebuilt
 and published, 22/22 focused tests per width pass without build warnings.
 The IBMPC entry stub now owns its dummy type; no public alias is restored.
 No full-suite rerun is claimed. S5 remains awaiting acceptance.
+Executor P6 8ae39951 is pushed. Coordinator reviewed the actual eleven-path
+commit: only the two admitted cleanups and the necessary entry-fixture naming
+adaptation are present; assertions and lifecycle barriers are unchanged.
+Manifests, artifact hashes and focused evidence agree; scratch is retired.
 
 S4 is owner-accepted and closed; see [closure](../history/M9-T99-S4-console-retirement.md).
 S5 follow-up is implemented and verified against 6a9bf601, awaiting acceptance.
