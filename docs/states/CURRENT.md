@@ -38,6 +38,15 @@ S6 is closed by owner-authorized advancement; see its
 or verified. Its four-case plan is in the proposal. The following S6 delivery
 record is historical evidence, not current S7 qualification.
 
+S7 research now has a bounded implementation proposal: retain the checkpoint
+budget (its historical failure is not claimed repaired), consolidate timer
+oracles, use fixed-image UI readiness, and correct viewport row reads. Current
+dual 29-case parallel groups pass; native viewport counterexample is proved;
+two x64 installed-image runs pass. Temporary probes are removed and both test
+targets rebuilt on both widths. These are research results, not completed
+S7 implementation or fresh full qualification. See the proposal for measured
+timings, evidence limits and the approximately +121/-104 test-only estimate.
+
 S6's final four-case ledger and research are in the proposal. The existing local
 debug hook clears quick_mode before refetch; fixtures own a non-HLT program and
 restore ejected boot media before reset/restart. Production +4/-0, tests +20/-0.

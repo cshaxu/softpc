@@ -26,6 +26,141 @@ revision rather than an unannounced repair. Host audio/session unavailability
 is reported separately; the owner-disposed native startup observation is not
 reopened. No S7 code or fresh test result is recorded by this admission.
 
+### S7 research and minimal implementation proposal
+
+Research baseline is 7d89b010. No permanent source/test change is implemented
+by this report. Temporary probes were added only to the two existing App
+fixtures, removed afterwards, and both original targets rebuilt on both widths.
+No public tree, source mirror, shipping EXE, configuration or medium is changed.
+
+#### 1. Checkpoint budget: retain, do not speculate
+
+Current checkpoint links the App PCM/MIDI memory sinks. The historical T93 S8
+timeout predates the T93 S15 isolation commit 66058ab4. Source and binary-path
+inspection therefore exclude native audio acquisition from the current test,
+but do not prove which native call or other cause delayed the old execution.
+
+Actual phase markers in the existing executable record, in milliseconds:
+
+| Width / schedule | Main-body total | Create/reset/first capture | Deliberate deadline | Archive round trip |
+| --- | ---: | ---: | ---: | ---: |
+| x64 isolated | 1200 | 16 | 1008 | 97 |
+| x64 eight-way App group | 1229 | 22 | 1008 | 110 |
+| x86 isolated | 1239 | 21 | 1011 | 113 |
+| x86 eight-way App group | 1226 | 22 | 1016 | 105 |
+
+These are measured phase differences, not complete process/CTest durations.
+For example the first x64 CTest duration is 2.89 seconds, including work before
+the first main marker. All 29 tests in each parallel group pass. The intended
+one-second deadline is verified by snapshot.c's existing counter comparison;
+there is no five-second product wait in this case.
+
+Recommendation: retain the existing 15-second budget and code. Do not split
+the fixture, add an audio workaround or claim the historical timeout repaired.
+This is a proposed no-change disposition for owner review, supported by current
+path isolation and measured headroom, not merely a passing repeat.
+
+#### 2. Timer oracle: one INT 1Ah case and a deterministic IRQ owner
+
+time_day.c's AH=00 path obtains a host timestamp, writes DX/CX and refreshes
+both BDA words. A zero low byte is legal; programming PIT faster does not make
+the timestamp's low byte nonzero. The current second INT 1Ah fixture tests
+that invalid implication, whereas the first already checks the returned full
+tuple against the BDA. A cold zero-filled tuple could also make equality alone
+look successful before guest completion.
+
+Minimal proposal: consolidate the two INT 1Ah boot cases into one. Its
+disposable boot program disables IRQ delivery around the read, stores full
+CX:DX and writes a completion marker before its terminal loop. Assert the
+marker and full BDA/result equality, accepting zero without a clock mock.
+Remove the redundant looping image, run and cleanup. Preserve PIT programming
+in run_timer_boot_image and actual IRQ delivery in irq_smoke.c. Strengthen the
+latter by explicitly clearing all four BDA tick bytes in its existing synthetic
+boot program before programming PIT/enabling interrupts: its existing nonzero
+assertion then measures IRQ progress from a known zero, not host time-of-day.
+No installed guest or fixed media is changed. This is a proposed fixture
+consolidation, not already verified new test coverage.
+
+#### 3. Win3.1 readiness: observe the fixed guest UI, not a generic OS hook
+
+The actual installed-image test passes twice on x64, in 62.28 and 62.50 seconds.
+The second run's existing startup loop observes first 640x480 graphics at
+597 ms / sequence 13, and the Program Manager caption at 4991 ms / sequence 22.
+A copied guest-frame capture independently shows the Program Manager desktop.
+This demonstrates distinct observable stages, not reproduction of the old
+roundtrip failure or proof that this failure was caused by early input.
+
+Minimal proposal: use the existing bounded startup loop to recognize a small
+expected active-caption pixel region in this fixed image. Compare complete
+RGB pixels, not just black text, so an inactive background caption is not a
+readiness match. A private test-local region fingerprint avoids an OCR engine,
+Win16 memory introspection, guest changes and new production callbacks. This
+oracle deliberately belongs to the existing fixed-image App integration;
+its expected region must be reviewed if that fixture's UI layout changes.
+After one File/Run key sequence, wait for the actual Run dialog region before
+typing instead of assuming 300 ms is enough. Reuse the same small predicate
+and existing bounded waits, without resending keys. Preserve mode-transition
+assertions and verify the same Program Manager readiness on return.
+
+The current probe distinguishes early graphics from caption appearance only.
+The proposed active-caption/Run-dialog predicates still need dual-width
+negative and actual-path verification; a screenshot alone is not that proof.
+
+The same file has two additional oracle issues in scope: DOS text scanning
+uses row*80 instead of frame stride, and failure reporting interprets the
+payload as text before branching on its type and uses an 81-byte row for
+dynamic columns. Use the actual tagged payload and stride; stream diagnostic
+row characters without another fixed-size buffer or allocation layer.
+
+#### 4. Visible Console rectangle: one reader, direct counterexample
+
+The current package_screen_contains opens the active native screen buffer but
+reads width*height characters linearly. Win32 advances those reads by backing
+buffer width, not viewport width. A native probe compiles that exact existing
+helper, redirects only its open/close to a test-owned buffer, and leaves the
+actual geometry and ReadConsoleOutputCharacterA calls native.
+
+For buffer 80x30, viewport 30x10, HIDDEN at (40,0) and VISIBLE at (0,8), the old
+helper returns hidden=1 / visible=0. Reading each visible row returns hidden=0 /
+visible=1; probe exit is zero. Initial probe harness attempts lost diagnostics
+or read GetLastError after another call; those harness defects were corrected
+and are not evidence of a Console product fault.
+
+Minimal proposal: keep active-buffer acquisition, use one private row reader
+for the viewport and existing diagnostics, and retain the distinct full-buffer
+guest-frame query. Add the counterexample using an inactive test-owned buffer
+inside the existing package fixture; do not activate it or alter the product's
+screen. Its assertions call the same row reader, not a copied implementation.
+No Console broker or Emulator repair is indicated.
+
+#### Estimated implementation and verification
+
+The following are design estimates, not measured implementation counts:
+
+- machine_smoke.c: approximately +12/-54, consolidating INT 1Ah cases.
+- irq_smoke.c: approximately +4/-0, deterministic initial BDA ticks.
+- runtime_restart_boot_smoke.c: approximately +50/-30, readiness and correct
+  dynamic-frame inspection, including negative predicate checks.
+- package_smoke.c: approximately +55/-20, rectangular reader and native oracle.
+- Total test C: approximately +121/-104, net +17, with about 20 percent sizing
+  uncertainty. Production/shared/mirror C/H: +0/-0. No new target or timeout
+  change is planned. Documentation is counted separately.
+
+Proposed order: timer/IRQ oracle, Console reader, then Win3.1 readiness. Verify
+each through the existing owning test; run x86/x64 affected tests and complete
+background suites, then native package cases in an available desktop session.
+Test-only work leaves shipping EXE identities unchanged. No S7 implementation
+or full-regression completion is claimed by these research runs.
+
+The similar-issue scan of App tests finds the low-byte timer assertion only
+in machine_smoke, and fixed row*80 / 81-byte diagnostic rows only in the
+runtime-restart fixture. Full-buffer queries have distinct guest-frame purpose
+and remain. The historical startup/device observation is not reopened.
+All research workers have completed; original fixture sources are restored,
+both widths rebuild without warnings and the restored checkpoint passes on
+both widths (3.15 / 1.36 seconds CTest duration). S7 remains active for owner
+review of this implementation proposal; scratch is retired after promotion.
+
 ### S6 delivery and owner disposition
 
 The owner rejects carrying the historical native-start observation as deferred
