@@ -1114,3 +1114,25 @@ the selected XP subset. App VGA frame regression drives the actual port and
 timer path; changing only the underline position must produce a new frame.
 The current manifest records the changed local hash, preserving XP baseline
 hashes and subset ranges. The separate cursor-off finding is deferred in TODO.
+
+## T99 S10 VGA cursor-disable authority
+
+Owner approves two local repair sites in `base/video/vga_prts.c`: always store
+the unprotected CRTC 0A register byte, including disable-only writes, and honor
+its off bit in the existing `do_new_cursor()` hidden branch. Remove the old
+premature visibility selection and low-five-bit assignment guard. Both sites
+have T99 S10 reason markers. Existing V7 protection, shape branches, dirty
+notification, archive and host conversion remain unchanged; no alternate path
+or state owner is added. The earlier cursor-off deferral above is now handled
+here; the distinct end-row/wrap issue remains in TODO.
+
+Relative to reviewed research 65afb9be, production is +5/-12, net -7. Against
+the fixed XP necessary subset, this file changes from +221/-0 to +226/-12:
+changed-line total 221 to 238 (+17), not a reduction in mirror difference.
+The audit checks fixed raw XP identity, reconstructs the existing S5 XP
+selection ranges and verifies subset hash 084da18a959a825d66ef900d60b212a9bcffffd3cea23da0607cbf561946b120
+before Git default diff with CR line endings ignored. No source range is
+excluded to hide local repairs. Only the local manifest hash changes.
+The existing App VGA test owns real register/readback, font/protection/mode
+and Driver frame proof; full qualification and limitations are recorded in
+the [S10 proposal](../../../proposals/m9-public-handoff-simplification.md#s10-research-two-site-cursor-disable-repair).

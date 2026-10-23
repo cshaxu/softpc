@@ -3,37 +3,37 @@
 ## Current Work
 
 Owner accepts and closes S9 at reviewed delivery 46d821d4 and admits S10,
-original VGA cursor-disable research/design. T99 stays open. S11 SB-MIDI and
+original VGA cursor-disable repair. Owner approves the reviewed two-site design
+at 65afb9be: 批准实施 老规矩执行. T99 stays open. S11 SB-MIDI and
 S12 Ninja integrity remain planned, in that order. The proposal retains the
-eight transferred TODO items and their proof/dispositions; TODO is empty by
-transfer, not a blanket repair claim. The performance Queue candidate remains.
+eight transferred TODO items and their proof/dispositions. The adjacent VGA
+end-row/wrap finding remains in TODO; the performance Queue candidate remains.
 
 ## M9 T99 S10 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 收口s9 准入s10. S9 is accepted after executor a69fc1e0 and coordinator actual-diff review 46d821d4. S10 starts with current-source research/design under the existing approved sequence. |
-| Objective | Determine the original VGA cursor-disable defect, authoritative hardware semantics and minimum single-path repair with executable regression design. |
-| Non-goals | No production/test implementation before the researched diff is presented for approval; no public-eight-tree, frame transport, cursor styling, SB-MIDI, Ninja, guest, media, snapshot or INI change. |
-| Reference Baseline | SoftPC 46d821d4 and its S9 published dual EXEs; original necessary XP subset and existing mirror/local ledger remain authoritative. T98 S6 port evidence is historical, not a fresh reproduction. |
+| Admission And Approval | Owner closes S9 and admits S10, then approves the researched two-site mirror repair at 65afb9be: 批准实施 老规矩执行. This includes local reason markers, mirror accounting, permanent regression, dual publication/full tests and actual-diff review. |
+| Objective | Repair original VGA disable-only register storage and unified shape visibility using the reviewed single-path design. |
+| Non-goals | No public-eight-tree, Compat/Driver or root build change; no end-row/wrap semantic rewrite, cursor styling, SB-MIDI, Ninja, guest, media, snapshot-format or INI edit. |
+| Reference Baseline | Reviewed research 65afb9be; S9 published dual EXEs and original necessary XP subset/local ledger. Private research is counterfactual evidence, not fresh permanent qualification. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Initially task records only. Research traces original base/video/vga_prts.c 0x0A, do_new_cursor and other original cursor writers, Compat/Driver consumers and owner-local tests. No public API change planned. |
+| Files And ABI Surface | Original base/video/vga_prts.c two sites, existing App vga_frame_smoke.c, XP manifest/local patch ledger, task records and rebuilt dual EXEs. No public API or snapshot-layout change. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, source/research policy and current design; original source remains sole hardware authority. |
-| Verification | Establish a finite VGA/EGA/V7 writer/consumer and behavior ledger; verify hardware references and actual register path. Design x86/x64 proof for disable-only toggles, enable/disable, start/end, shape/font and mode changes. Any long probe runs hidden with logged exit status; distinguish source, test and guest evidence. |
+| Verification | Execute the reviewed finite port/frame matrix on x86/x64: disable-only, re-enable, end/location/font recomputation, out-of-cell start, write protection and mode reset. Cached full builds/publication, all registered background/desktop/audio tests and exact name inventory; mirror, Types/dependency/manifests, documentation and whitespace gates. All long jobs hidden/logged; separate test proof from guest acceptance. |
 | Expected Markers | A disable bit cannot be lost or overridden by subsequent original shape recomputation; valid shapes and card-specific semantics remain intact through the existing path. |
-| Asset Needs | Preserve existing dual EXEs, INI, media and snapshots during research. No Computer Use or downstream writes. |
-| Reporting Requirements | Current facts, exact root cause or remaining unknowns, minimum code example, production/test/mirror diff estimates and verification plan before implementation. S10 owns build/t99-s10 only if probes are needed: 30-minute jobs, five-minute no-progress, 300MB cap; promote findings and retire scratch. |
-| Stop Conditions | Report if hardware semantics are ambiguous, the fix requires a second cursor authority/public change or mirror scope exceeds approved research. Do not patch around an unproved root cause. |
-| Exit Criteria | Research yields a reviewed executable minimal proposal and honest evidence boundaries; implementation requires owner approval, then dual build/publication, proportionate full regression, mirror accounting, actual-diff review and push before owner acceptance. |
-| Original Owner Request | 收口s9 准入s10. Existing S10 plan: audit original VGA cursor-disable semantics, then propose a minimal original-path repair and port-level tests without changing shared text-frame transport. |
+| Asset Needs | Publish dual EXEs only; preserve INI, media and user snapshots. Test-created disposable media only. No Computer Use or downstream writes. |
+| Reporting Requirements | Report actual production/test/mirror diff, focused/full test evidence and limits, dual EXE hashes, similar-issue dispositions and quality review. S10 owns build/t99-s10: 30-minute jobs, five-minute no-progress, 300MB cap; promote findings and retire scratch. |
+| Stop Conditions | Report if the repair requires extra production paths, public changes or a rewrite of adjacent shape semantics; do not weaken tests or conceal host-device failures. |
+| Exit Criteria | Reviewed minimal implementation, focused and complete dual qualification/publication, exact mirror accounting, executor commit/push, coordinator actual-diff review/push, retired scratch and clean worktree; await owner acceptance. |
+| Original Owner Request | 收口s9 准入s10; 老规矩 调研审计 设计; after mirror-diff explanation: 批准实施 老规矩执行. Implement the reviewed minimal repair, dual build/publication/full tests, commit/push and quality audit, then wait for acceptance. |
 | Similar-Issue Sweep | All original cursor visibility/shape writers, CRTC 0x0A/0x0B paths and protection/mode/font recomputation, plus Compat/Driver conversion; record each owner and disposition rather than add frontend compensation. |
 
 S9 is accepted and closed; see its [closure](../history/M9-T99-S9-public-import.md).
 Its verified baseline remains: all 296 public paths equal the pinned NXVM
 commit; both cached builds refresh the EXEs and each architecture passes all
-193 tests. S10 admission changes documents only and does not rerun or supersede
-that qualification.
+193 tests. That historical S9 qualification is not S10 implementation proof.
 
 S10 research confirms two original-path defects through real CRTC writes and
 Driver frame production: disable-only writes can be discarded, and shape
@@ -42,12 +42,23 @@ each show six baseline violations in nine checkpoints and 9/9 passes with the
 two-site candidate. Existing VGA unit passes unchanged on both widths, exposing
 its bit-5 coverage gap. Proposed production diff is +5/-12 in vga_prts.c only;
 shared eight trees need no change. The proposal owns the complete evidence,
-hardware references, test design and adjacent shape-semantic findings. No tracked
-source/test or EXE is modified; full qualification is not rerun. S10 remains
-research/design, awaiting owner implementation approval.
+hardware references, test design and adjacent shape-semantic findings. That
+research changed no tracked source/test or EXE and ran no full qualification.
 Research 2b20b2ae is pushed; coordinator actual-diff review confirms the
 three-document-only scope and honest proof/coverage boundaries. Task scratch
-is retired and documentation, mirror, whitespace and residue gates pass.
+was retired and documentation, mirror, whitespace and residue gates passed.
+
+Owner now approves implementation. The two-site production repair is +5/-12;
+the existing VGA fixture adds 70 lines for real register/readback, font heights,
+V7 protection, mode reset and both Driver text leaves. Focused tests pass on
+x64/x86. Final cached full builds refresh both EXEs; each width passes 193/193
+(185 background, five desktop, three native audio), exact name equality and
+zero failed/skipped/disabled cases. Mirror, documentation and whitespace gates
+pass. Public eight trees, Compat/Driver and user INI/media/snapshots are unchanged.
+The proposal records test-draft correction, complete mirror accounting, hashes,
+legacy-only warnings and quality review. Executor delivery and coordinator
+actual-commit review remain before handoff; S10 awaits owner acceptance, with
+no S11 admission.
 
 ### S8 reviewed delivery (closed by owner-authorized advancement)
 

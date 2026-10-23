@@ -45,6 +45,7 @@ typedef struct {
 /* Direct original-renderer probes use the existing detached DIB, not a UI. */
 extern unsigned char *EGA_planes;
 extern void outb(io_addr port, half_word value);
+extern void inb(io_addr port, half_word *value);
 extern void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
@@ -729,10 +730,79 @@ static void verify_rgb_pixels(const kvm_window_frame *frame, const void *bits,
         }
 }
 
+static void verify_cursor_output(emulator_machine_driver *driver,
+    kvm_window_frame_storage *frame, kvm_console_text_frame *console,
+    half_word start, lib_bool visible, lib_bool require_frame)
+{
+    half_word value = 0;
+    lib_bool produced;
+    outb(0x3d4, 0x0a); inb(0x3d5, &value);
+    assert(value == start && is_cursor_visible() == visible);
+    host_timer_event(); host_timer_event();
+    assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK);
+    assert(!require_frame || produced);
+    assert(frame->data.text->base.cursor_mode == (visible ? KVM_CURSOR_HOST : KVM_CURSOR_DISABLED));
+    assert(console->base.cursor_mode == frame->data.text->base.cursor_mode);
+}
+
+static void verify_cursor_disable(emulator_machine_driver *driver,
+    kvm_window_frame_storage *frame, kvm_console_text_frame *console)
+{
+    const unsigned heights[] = {8u, 14u, 16u, 32u};
+    const struct { half_word index, value, start; lib_bool visible, require_frame; } cases[] = {
+        {0x0a, 2, 2, LIB_TRUE, LIB_TRUE}, {0x0a, 0x22, 0x22, LIB_FALSE, LIB_TRUE},
+        {0x0a, 0x23, 0x23, LIB_FALSE, LIB_FALSE}, {0x0b, 6, 0x23, LIB_FALSE, LIB_FALSE},
+        {0x0f, 1, 0x23, LIB_FALSE, LIB_FALSE}, {0x0a, 3, 3, LIB_TRUE, LIB_TRUE},
+        {0x0a, 0x23, 0x23, LIB_FALSE, LIB_TRUE}, {0x0a, 3, 3, LIB_TRUE, LIB_TRUE}
+    };
+    const half_word saved_height = crt_controller.maximum_scan_line.as.abyte;
+    const half_word saved_protection = extensions_controller.emulation_control.as.abyte;
+    for (unsigned h = 0; h < sizeof(heights) / sizeof(heights[0]); ++h) {
+        /* Changing only the font height must not re-enable a disabled cursor. */
+        outb(0x3d4, 0x0a); outb(0x3d5, 0x22);
+        outb(0x3d4, 9); outb(0x3d5, (saved_height & 0xe0u) | (heights[h] - 1u));
+        for (unsigned tick = 0; tick < 4u; ++tick) host_timer_event();
+        verify_cursor_output(driver, frame, console, 0x22, LIB_FALSE, LIB_TRUE);
+        assert(frame->data.text->base.font_height == heights[h]);
+        outb(0x3d4, 0x0b); outb(0x3d5, 7);
+        outb(0x3d4, 0x0f); outb(0x3d5, 0);
+        for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+            outb(0x3d4, cases[i].index); outb(0x3d5, cases[i].value);
+            verify_cursor_output(driver, frame, console, cases[i].start, cases[i].visible, cases[i].require_frame);
+        }
+        /* V7 EREB[4] protects both shape registers; the fix cannot bypass it. */
+        outb(0x3c4, 6); outb(0x3c5, 0xea);
+        outb(0x3c4, 0xeb); outb(0x3c5, saved_protection | 0x10u);
+        outb(0x3d4, 0x0a); outb(0x3d5, 0x22);
+        outb(0x3d4, 0x0b); outb(0x3d5, 5);
+        assert(crt_controller.cursor_start.as.abyte == 3u);
+        assert(crt_controller.cursor_end.as_bfld.cursor_end == 6u);
+        assert(is_cursor_visible());
+        lib_bool produced;
+        assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK && !produced);
+        outb(0x3c4, 0xeb); outb(0x3c5, saved_protection);
+    }
+    outb(0x3d4, 9); outb(0x3d5, saved_height);
+    for (unsigned tick = 0; tick < 4u; ++tick) host_timer_event();
+    outb(0x3d4, 0x0a); outb(0x3d5, 0x3f);
+    verify_cursor_output(driver, frame, console, 0x3f, LIB_FALSE, LIB_TRUE);
+    outb(0x3d4, 0x0a); outb(0x3d5, 0x1f);
+    verify_cursor_output(driver, frame, console, 0x1f, LIB_FALSE, LIB_FALSE);
+    /* Original mode programming, not a frontend override, restores visibility. */
+    outb(0x3d4, 0x0a); outb(0x3d5, 0x22);
+    c_setAH(0); c_setAL(3);
+    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    for (unsigned tick = 0; tick < 4u; ++tick) host_timer_event();
+    assert(!crt_controller.cursor_start.as_bfld.cursor_off);
+    verify_cursor_output(driver, frame, console,
+        crt_controller.cursor_start.as.abyte, LIB_TRUE, LIB_TRUE);
+}
+
 static void verify_text_style(emulator_machine_driver *driver,
     kvm_window_frame_storage *frame, kvm_console_text_frame *console)
 {
     lib_bool produced;
+    verify_cursor_disable(driver, frame, console);
     const unsigned starts[] = {14u, 12u, 4u, 31u};
     const unsigned ends[] = {15u, 2u, 7u, 15u};
     for (unsigned i = 0; i < 4u; ++i) {

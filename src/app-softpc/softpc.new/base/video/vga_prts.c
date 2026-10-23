@@ -569,7 +569,9 @@ LOCAL VOID	do_new_cursor IFN0()
 
 	note_entrance0("do_new_cursor()");
 
-	if (crt_controller.cursor_start.as_bfld.cursor_start >= (unsigned)get_char_height() ) {
+	/* T99 S10: disable remains authoritative during shape recomputation. */
+	if (crt_controller.cursor_start.as_bfld.cursor_off ||
+		crt_controller.cursor_start.as_bfld.cursor_start >= (unsigned)get_char_height() ) {
 		note_entrance0("No cursor");
 		set_cursor_visible(FALSE);
 		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start | 0x20,
@@ -1403,17 +1405,8 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 					if (crtc_9_b_protect == FALSE)
 					{
 #endif /* V7VGA */
-						new.value = value;
-						if (crt_controller.cursor_start.as_bfld.cursor_off)
-							set_cursor_visible(FALSE);
-						else
-							set_cursor_visible(TRUE);
-
-						if (crt_controller.cursor_start.as_bfld.cursor_start !=
-							((CURSOR_START*)&new)->as_bfld.cursor_start)
-						{
-							crt_controller.cursor_start.as.abyte = value;
-						}
+						/* T99 S10: retain disable-only register writes. */
+						crt_controller.cursor_start.as.abyte = value;
 
 						do_new_cursor();
 #ifdef V7VGA

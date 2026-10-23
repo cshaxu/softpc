@@ -1,5 +1,16 @@
 # XP SP1 SoftPC 逐文件语义审计
 
+## T99 S10 原始 VGA 光标禁用位修正
+
+`base/video/vga_prts.c` 两处修复：受原 V7 保护的 CRTC 0A 写入完整寄存器字节，
+统一形状计算的既有隐藏条件同时检查 cursor_off。删除原有提前选择可见性和
+仅按低五位变化保存字节的分支；不改变 EGA/CGA、形状算法或快照布局。
+生产 +5/-12、净 -7；相对已固定 XP 必要子集的完整文件差异为 +226/-12，
+修前为 +221/-0，增删合计增加 17 行。原始与子集哈希、S5 XP 选择范围不变，
+只更新本地哈希；来源和验证边界由
+[S10 proposal](../../../proposals/m9-public-handoff-simplification.md#s10-research-two-site-cursor-disable-repair)
+及当前本地修正台账承接。End-Start 和 end<start 相邻语义另留 TODO。
+
 ## T99 S8 已批准的物理读取边界修正
 
 `base/ccpu386/ccpusas4.c` 的原始 phyR 在 A20 掩码后，将

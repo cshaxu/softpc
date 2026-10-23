@@ -2,7 +2,7 @@
 
 ## Admission and scope
 
-### S10 admission: original cursor-disable research and design
+### S10 admission: original cursor-disable research, design and repair
 
 Owner request: 收口s9 准入s10. S9 is accepted and closed at reviewed delivery
 46d821d4; the [closure](../history/M9-T99-S9-public-import.md) retains its
@@ -168,6 +168,98 @@ TODO are explicitly distinguished. Source/test/EXE changes remain zero; no
 implementation approval or full-regression result is invented. Documentation,
 505-body mirror, whitespace and residue checks pass. Both research jobs have
 exited and scratch is retired. S10 remains open for implementation approval.
+
+#### S10 approved implementation
+
+Owner approves at reviewed research 65afb9be: 批准实施 老规矩执行.
+The exact two-site candidate is now implemented, including its reason markers.
+Production is +5/-12 (net -7) in vga_prts.c; the existing VGA fixture adds 70
+lines, with no new target or public/test-only API. No Compat/Driver, public
+eight-tree, root assembly, snapshot layout, user INI or guest asset changes.
+The existing XP manifest changes only the local body hash; raw XP and selected
+subset identities/ranges are unchanged.
+
+Full-file mirror accounting independently reconstructs the existing S5 **XP
+subset ranges**, checks pinned raw SHA-256 57a3318256a0b9392329fd4afada8b9926b32345c4262f08c3f3324b65d291f2
+and subset SHA-256 084da18a959a825d66ef900d60b212a9bcffffd3cea23da0607cbf561946b120,
+then compares LF-normalized text with Git default diff (CR ignored). Against
+that necessary subset the file is +221/-0 before and +226/-12 after: changed
+lines 221->238, an increase of 17. The first accounting draft mistakenly used
+the separate pre-S5 **baseline** ranges, was rejected by subset hash mismatch,
+and supplied no accepted count; corrected XP ranges reproduce the fixed hash.
+No source extraction is introduced into the build.
+
+Permanent proof uses actual outb/inb and BIOS mode programming, original timer
+updates, and real Driver copy_frame, with existing audio mocks. Four font
+heights (8/14/16/32) each cover unchanged-start disable/re-enable, hidden shape,
+end and location recomputation, repeated transitions and protected ignored
+0A/0B writes. Out-of-cell starts remain hidden, and original mode-3 reset
+restores visibility. Both Window and Console modes are checked. The existing
+shape/underline and snapshot cases remain unchanged.
+
+The first x64 test draft incorrectly required a new output frame for every
+register write, even a hidden-to-hidden shape change. Local temporary
+diagnostics establish successful register/state updates but produced=false at
+font height 14: original host presentation may suppress a visually unchanged
+hidden shape. The final fixture requires real production for every visibility
+transition and font/mode change; hidden-only changes still check readback,
+original visibility and both output modes, without requiring redundant output.
+Protected writes must produce no frame. Temporary diagnostics are removed;
+production is not expanded to satisfy the mistaken expectation. The focused
+final-source VGA test passes x64 (5.37s) and x86 (7.62s). Full qualification is
+separately completed below, not inferred from these focused results or earlier
+private probes.
+
+**Final-source qualification.** Hidden owned job 35532 finishes normally with
+qualification.exit=0. Both cached full builds pass and publish the changed
+EXEs, reusing the already rebuilt original video object. Registration is
+unchanged at 193 cases per architecture. For each width, sorted registered
+names exactly equal the union of the three JUnit execution inventories, with
+no duplicate, failed, disabled or skipped case:
+
+- x64: 185/185 background (120.86s), 5/5 desktop (23.12s), 3/3 native audio
+  (2.99s); VGA regression also passes under full scheduling (3.96s).
+- x86: 185/185 background (198.34s), 5/5 desktop (23.47s), 3/3 native audio
+  (2.96s); VGA regression also passes under full scheduling (7.81s).
+- Each inventory covers 164 unit, 14 checks and 15 integration cases, including
+  seven background, five real desktop and three real audio cases. Existing
+  snapshot transaction/checkpoint, restart, input and package paths pass.
+- x86 types-layout-selftest takes 146.25s within its existing 180s budget;
+  no timeout is changed or long job killed. Concurrent repository test work
+  is observed but neither interrupted nor modified.
+- Final full-build logs have zero warnings. The final focused x86 fixture
+  build has 89 diagnostics, all in preserved mirror headers (legacy endif
+  labels/macro redefinitions); zero warning locations are outside the mirror.
+  Original-header cleanup is not admitted. No public source recompilation
+  policy or warning suppression is changed.
+- Documentation, current 505-body XP manifest, dependency/Types/naming/test
+  manifest gates and whitespace checks pass. User INI hash remains
+  38d9eecd0a002fa6bf924d5f87bda154c71d89a2790674965739179c2d56623d.
+
+Published EXE SHA-256:
+
+- x64: 9e11fdf3463dfca727b52583a624d335c990f96e19006b429b3ab0cb913a84ba.
+- x86: c1725fe575740eb6d435d2a1b1c3b1c741282ef0a08f671f46672dbf6d832650.
+
+**Executor quality review.** Actual source diff has exactly the two reviewed
+sites, preserving the original protection and shared shape/dirty tail. The
+repair removes competing premature visibility handling rather than adding a
+state machine, helper, second renderer or frontend register interpretation.
+The existing App-owned test consumes its inward real device/Driver contracts;
+expected visibility/register values are independent of the production branch.
+Hidden-to-hidden output may be elided, but visible transitions cannot. No
+permanent diagnostic, synthetic dirty injection, fixed sleep or test-only
+production interface is added. Public eight directories, root infrastructure,
+Compat/Driver, INI, guest media and snapshots have no diff against 65afb9be.
+The finite writer/consumer ledger above remains the similar-issue sweep;
+distinct VGA end-row/wrap semantics remain explicitly deferred in TODO.
+Source proof and real producer-chain test proof do not claim a fresh manual
+guest application or downstream acceptance. Test C is +70/-0, production
++5/-12 (net -7); only two EXEs and five evidence/governance documents accompany
+those two code files. Task scratch peaks below 2 MB; concise evidence is promoted
+here, all owned jobs exit and scratch is retired with the residue check passing.
+S10 remains awaiting owner
+acceptance, not closed or followed automatically by S11.
 
 ### S9 admission: exact public-eight-tree import
 
