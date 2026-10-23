@@ -7,29 +7,41 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S5 remains verified awaiting acceptance; S6-S11 are planned,
-not concurrently active. The separate performance Queue candidate remains.
+not by repair. Owner advances from completed S5 to S6 research; S7-S11 remain
+planned. The separate performance Queue candidate remains.
 
-## M9 T99 S5 Packet
+## M9 T99 S6 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner reopens S5 for all five follow-up audit items: private composition checks, unused forwarding header, private identity allocator, text/style cleanup, and neutral Machine test synchronization. Append P delivery, build/publish/full-test/commit/push, then await acceptance. Prior lifecycle repairs remain intact. |
-| Objective | Resolve the confirmed Console broker retirement/cleanup ownership gap with a minimal single-path plan; review public package quality without speculative redesign. |
-| Non-goals | No private CPU repair, input/frame redesign, guest/media changes, downstream access, startup retry, timeout relaxation or new lifecycle framework. |
-| Reference Baseline | cf60e14f; accepted S4 and owner INI are unchanged. |
+| Admission And Approval | Owner advances from completed S5 to S6 audit, research and repair design; no permanent production repair is admitted by this design request. |
+| Objective | Establish causal ownership and minimal repair plans for HLT/debug, TF quick mode, x86 null BOP and pre-main Console startup. |
+| Non-goals | No public-component changes, S7-S11 implementation, guest/media/INI edits, blind retries, no-op BOP handlers or enlarged timeouts. |
+| Reference Baseline | 898e4054; current published dual EXEs and prior evidence remain distinct from fresh research. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Lib KVM Base allocator, Emulator Product composition and Session booleans, X86 IBMPC text buffers; their tests/manifests plus Machine fixture and registration. No product behavior or public object layout changes; remove internal-only allocator export and unused header. |
-| Applicable Rules | Execution, Architecture, Coding and Documentation rules and current design authorities. |
-| Verification | Cached dual builds and published EXEs; focused failure regressions followed by every registered test per width, partitioned into background, native_audio and desktop groups. Record inventory and exact counts; no skips or concealed retries. Prior S4 evidence is not current proof. |
-| Expected Markers | Distinguish confirmed reader exit from reader I/O status and subsequent cleanup errors; prove no inaccessible ownership remains on safely recoverable create failure. |
-| Asset Needs | Publish both EXEs; preserve owner INI, snapshots and media. No Computer Use or downstream changes. |
-| Reporting Requirements | Source proof, dynamic proof and unknowns separately. S5 owns build/t99-s5: 60-minute job, 10-minute no-progress investigation, 300MB; retire unused scratch before delivery. |
-| Stop Conditions | Do not equate an I/O error with an unjoined worker, hide errors, add retry/owner state machines or expand into private S6 research. |
-| Exit Criteria | Source findings and bounded coverage recorded, then minimally repaired and verified after implementation brief; actual diff reviewed and owner acceptance obtained. This audit does not close S5. |
-| Original Owner Request | Audit quality first; if issues exist, transfer current S5 to S6 and use S5 for public-eight-tree quality repairs. |
-| Similar-Issue Sweep | Broker create/replace/cancel/destroy, reader exit and backend cleanup; compare existing KVM/PCM lifecycle ownership without assuming their failure contracts are identical. |
+| Files And ABI Surface | Read App Machine/Compat/CCPU hooks and command-provider/package fixtures; diagnostics only in owned scratch. No production ABI change. |
+| Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy. |
+| Verification | Bounded dual-width existing command-provider repetitions; source control-flow and reset/caller inspection. Native startup probes only when useful and session permits. No full-suite or repair claim from research runs. |
+| Expected Markers | Distinguish halted continuation, stale quick eligibility, first invalid boot transition and native initialization before main. |
+| Asset Needs | Preserve shipping EXEs, INI, snapshots and guest media; no Computer Use. |
+| Reporting Requirements | Four-case finite ledger with proven facts, unknowns, proposed diff and acceptance; S6 owns build/t99-s6, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote results and retire scratch. |
+| Stop Conditions | Do not replace original device semantics, infer root cause from a later crash, suppress failed experiments or install speculative production fixes. |
+| Exit Criteria | Deliver reviewed causal/design report; unresolved cases state the next discriminating probe. Permanent repair requires owner approval and cannot be claimed complete by this report. |
+| Original Owner Request | Admit S6 audit, research and repair-scheme design. |
+| Similar-Issue Sweep | Enumerate debug refetch edges, halt resume and reset entry, native CreateProcess/attach initialization and existing fixture setup. |
+
+S6 source review identifies deterministic non-HLT fixture setup and a local
+debug-hook quick-mode clear as minimal candidates. Neither is implemented.
+First-corrupt-reset/BOP and native Console server rejection remain unresolved;
+the proposal names their next discriminating probes. Unchanged dual binaries
+pass 5 command-provider and 3 ordinary package repetitions per width (16/16),
+not proof of repair or full qualification. No production/test/EXE change;
+scratch is retired. S6 remains active for research/design, not closed.
+
+S5 is closed by owner-authorized advancement to S6; see its
+[closure](../history/M9-T99-S5-public-quality.md). The following S5 records
+are historical qualification, not active status.
 
 Owner additionally admits S5 P6 at eac62924: move the unused public Product
 opaque typedef into its implementation and remove the now-private source-ID

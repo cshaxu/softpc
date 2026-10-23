@@ -2,6 +2,96 @@
 
 ## Admission and scope
 
+### Active S6 research and minimal repair design
+
+Owner admits S6 audit/research/design at 898e4054 and advances from S5.
+This report separates four cases; it does not claim a completed four-root-cause
+investigation or authorize permanent production patches. Existing case 5's
+fixture-oracle work remains assigned to S7. No public component change is
+proposed for any of these four cases.
+
+**HLT continuation and execution-plan fixture.** Current c_main.c enters
+RESUME_HALT for a restored halted continuation and stays there until its
+original RESET or enabled-INTR condition is met. The same loop handles an
+ordinary live HLT. Debug writes in machine/debug.c change registers only;
+they do not unwind the CCPU's live instruction phase. command_provider_smoke
+resumes arbitrary post-reset/BIOS execution, pauses it, then execution_plans
+sets EFLAGS=2 and CS:EIP=0:500. That is not proof of a fetch-boundary pause.
+Historical capture of RESUME_HALT with executed=0 explains that timeout.
+Do not make EIP writes secretly cancel HLT or fake a guest interrupt.
+Minimal fixture design: before its first deliberate resume, use the existing
+paused debug access to install/select a test-owned non-HLT loop with a marker;
+observe that loop before the pause used by execution_plans. Keep a separate
+existing-path HLT/interrupt test so deterministic fixture setup does not erase
+halt coverage. This is test setup, not a new guest/production execution path.
+Estimated permanent delta: one App integration fixture, +15..30/-0..10;
+production/mirror zero. Counterfactual still needed before choosing exact code.
+
+**TF quick-path invariant.** DO_INST's local softpc_host_debug_begin() return
+goes directly to NEXT_INST. Unlike normal retirement at c_main.c:4439, this
+edge does not clear quick_mode. The hook parks the executor and permits flag
+edits. RESUME_FETCH resamples TF but only sets quick_mode TRUE when eligible;
+it never assigns FALSE in the ineligible branch. Therefore TF can be sampled
+as one while stale quick_mode remains true, and subsequent retirement skips
+the ordinary trap path. Historical controlled recomputation evidence is
+consistent, but this turn did not execute a new patched counterfactual.
+Preferred minimum candidate at the already-local hook:
+
+```c
+if (softpc_host_debug_begin())
+   {
+   quick_mode = FALSE;
+   goto NEXT_INST;
+   }
+```
+
+This reuses the original slow/refetch path and leaves global quick eligibility
+and original device logic unchanged. Estimated production +4/-1 including a
+short reason marker; existing App debug tests +10..25 lines to make the
+quick-to-paused-TF transition deterministic. No public API change. Compare
+TF=0/1, interrupt shadow, ordinary resume and stepping on both widths; count
+this as a local-hook mirror correction, not an upstream XP bug. Do not broaden
+the repair to every NEXT_INST edge without evidence.
+
+**Null BOP dispatch.** Current c_cpu_reset initializes F000:FFF0, then the
+App cold-reset path calls original reset/device POST before reporting done.
+That larger sequence is not equivalent to the CPU reset setter alone. Original
+reset.c has explicit CS:IP restore branches gated by soft_reset, while the App
+cold path sets soft_reset=0. Thus blindly clearing CMOS or forcing F000:FFF0
+again after POST is not justified by the old bad-register capture. The first
+bad reset-completed sample predates synchronous_access, so that fixture's later
+register edits cannot explain that sample. No first corrupting writer is yet
+identified. Next probe must record CPU registers/phase at CPU reset return,
+original reset entry/return, host_reset and POST boundaries, then the first
+executor fetch; preserve the earliest mismatch and its call stack. Only then
+choose an owner-local correction. Estimated production diff: undetermined,
+not a fabricated one-line fix. No null BIOS handler, retry or new CPU state.
+
+**Pre-main Console startup.** package_smoke still launches the shipping child
+with CREATE_NEW_CONSOLE; it subsequently attaches and hides only the Console.
+Historical matched-symbol evidence places the rejection in KernelBase native
+Console connection (0xc0074005), followed by loader rollback (0xc0000142),
+before App/Lib code. It proves the failure phase, not the server rejection's
+cause. Moving FreeConsole, SW_HIDE or debugging the server has not supplied a
+complete causal repair. Next probe should preserve the ordinary launch mode,
+compare successful/failed native connection returns with child/server lifetime,
+and capture the first rejecting server operation without global registry or
+terminal configuration changes. No shared Lib repair is justified. A fixture
+change is acceptable only if its own lifetime/ordering violation is proven;
+otherwise report the native environment limit rather than hiding/retrying it.
+Production diff remains undetermined; shipped window behavior must not change.
+
+Fresh bounded verification on unchanged published binaries: x64 and x86 each
+pass five command-provider executions and three ordinary package executions,
+16/16 total, zero failed or skipped testcases. Session is Active at launch.
+This is repeated diagnostic sampling, not a retry-to-green qualification;
+no compact-package, patched TF, controlled HLT or first-BOP-write experiment
+ran in this turn. No historical intermittent case is declared repaired.
+Hidden job 31636 exits; source, test, EXE, INI and media are unchanged.
+Scratch build/t99-s6 is retired after promoting evidence. S6 remains open for
+the two required counterfactuals and two unresolved first-failure captures;
+the owner receives this bounded design, not a claim of completed repair.
+
 ### TODO audit and owner-admitted T99 expansion
 
 On 2026-10-22 the owner requests an audit of every TODO: remove confirmed
