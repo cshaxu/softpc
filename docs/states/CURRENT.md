@@ -7,35 +7,36 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S6 is owner-closed and S7 is delivered, verified and reviewed,
-awaiting owner acceptance; S8-S11 remain planned. The owner accepts current passing native startup
+not by repair. S7 is owner-accepted and closed; S8 is admitted for current-source
+audit and design, with the initial task brief first. S9-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
-## M9 T99 S7 Packet
+## M9 T99 S8 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner directs closure of S6 and admission of S7, then approves the measured minimal proposal at 7d58115c: retain checkpoint unchanged, consolidate timer oracles, observe fixed-image readiness and correct viewport reads. Implement, verify, commit/push and wait for acceptance. |
-| Objective | Diagnose and minimally repair checkpoint timing, INT 1Ah timer assertions, Win3.1 readiness and package viewport-reading test contracts. |
-| Non-goals | No S8-S11 implementation, public-component or mirror changes, guest/media/INI edits, blind retries, speculative product fixes or undiagnosed timeout increases. |
-| Reference Baseline | 7d58115c approved research; S6 published dual EXEs are retained because S7 changes tests only. Prior regression remains distinct from fresh S7 qualification. |
+| Admission And Approval | Owner accepts and closes S7 and admits the next planned S: 批准收口，准入下一个S任务，先给任务简报。 Begin with the S8 brief and current-source audit/design; do not start implementation in the admission delivery. |
+| Objective | Establish and minimally repair the actual physical-memory adapter contract using the original physical SAS path, including mapped video and boundaries. |
+| Non-goals | No S9-S11 implementation, public-component changes, guest/media/INI edits, direct-RAM second implementation or speculative mirror changes. |
+| Reference Baseline | 7fac795d reviewed S7 delivery; S6 published dual EXEs remain current because S7 changes tests only. Historical T94 DMA evidence is a research lead, not fresh S8 proof. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | test/app-softpc unit machine checkpoint and timer fixtures, integration runtime-restart and package fixtures, and their actual test registration if diagnosis requires it. No planned production or public ABI change. |
+| Files And ABI Surface | App Compat memory adapters and their machine wrapper callers; owner-local App memory tests and necessary registration. No planned public eight-tree ABI or mirror change. Confirm actual files and all callers before implementation. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy. |
-| Verification | Cached x86/x64 builds of changed fixtures, focused actual-path counterfactuals and parallel phase measurements, complete background regression and affected native/package integration. Test-only changes preserve published EXE identities; production changes require owner-approved scope revision and dual publication. |
-| Expected Markers | Retain checkpoint budget under the approved no-change disposition without claiming the historical timeout repaired; legal zero timer values pass a meaningful oracle; actual Program Manager readiness precedes interaction; visible-screen reads follow viewport rows rather than backing-buffer stride. |
+| Verification | First audit all physical adapter callers and the original SAS contract. Planned focused proof covers nonidentity paging reads/writes, SAS_VIDEO routing and range boundaries on x86/x64. Implementation requires cached dual builds/publication, complete background regression and applicable integration; record fresh versus inherited evidence separately. |
+| Expected Markers | Physical addresses remain physical under paging; reads/writes retain original SAS device mapping and fail honestly at invalid boundaries. One original memory route, no direct-RAM bypass. |
 | Asset Needs | Preserve INI, snapshots and guest media; disposable fixtures only. No Computer Use. Native device unavailability remains an environment result, not a product repair. |
-| Reporting Requirements | Four-case finite ledger, initial minimal design/diff estimate, measured versus source-inferred facts, actual source/test line counts and verification limits. S7 owns build/t99-s7, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote evidence and retire scratch. |
-| Stop Conditions | Stop for scope revision if a production fix is required; do not weaken assertions, infer a cause from repetition alone, add retries or retain the owner-disposed native-start observation as new debt. |
-| Exit Criteria | Each of the four cases has a diagnosed repair with focused proof or an explicit owner disposition; required dual regression, actual-diff review, commit/push and clean scratch precede delivery for acceptance. |
-| Original Owner Request | S6没有生成代码改动不需要我验收，直接准入S7。 Subsequent request: actual research, executable report and diff estimate; latest approval: 批准治理，规矩你懂。 Implement the approved test-only proposal and wait for acceptance after build/test/review/commit/push. |
-| Similar-Issue Sweep | Audit App test waits/readiness, byte-level timer oracles and visible-versus-backing Console reads; record every in-scope hit and preserve existing frame/IRQ assertions. |
+| Reporting Requirements | Brief first; then current-source findings, finite caller/contract ledger, minimal design and measured diff estimate before implementation. Separate source inference, tests and guest proof. S8 owns build/t99-s8, 30-minute jobs, 5-minute no-progress review and 300MB cap; promote evidence and retire scratch. |
+| Stop Conditions | Report if original physical SAS cannot preserve device mapping or requires public/mirror scope expansion. Do not silently replace device access with RAM copies or treat the historical DMA observation as proof of every caller's failure. |
+| Exit Criteria | Audited single-path repair with focused dual proof, required regression/publication, actual-diff review, commit/push and clean scratch; wait for owner acceptance. |
+| Original Owner Request | 批准收口，准入下一个S任务，先给任务简报。 Next planned item is S8 physical memory adapter correctness in the admitted T99 expansion. |
+| Similar-Issue Sweep | Enumerate named physical memory read/write adapters and all actual callers; distinguish linear, physical and device-mapped SAS operations and document each disposition. |
 
 S6 is closed by owner-authorized advancement; see its
-[closure](../history/M9-T99-S6-debug-fixtures.md). S7 is active and verified,
-awaiting owner acceptance. Its four-case record is in the proposal. The following S6 delivery
+[closure](../history/M9-T99-S6-debug-fixtures.md). S7 is accepted and closed; see its
+[closure](../history/M9-T99-S7-app-test-contracts.md). S8 is active for audit/design.
+The following S7 and S6 delivery
 record is historical evidence, not current S7 qualification.
 
 S7 implements the approved bounded proposal: retain checkpoint's budget under
@@ -51,7 +52,7 @@ is pushed as executor 13e32442. Coordinator review of its actual six paths
 confirms the four-file test scope, retained mode/IRQ assertions, exact counters
 and absence of production/public/asset changes. Documentation, mirror,
 whitespace and build-residue checks pass; scratch is retired and the worktree
-is clean. S7 awaits owner acceptance; T99 remains open and no next S is admitted.
+is clean. The owner accepts S7 and admits S8; T99 remains open.
 
 S6's final four-case ledger and research are in the proposal. The existing local
 debug hook clears quick_mode before refetch; fixtures own a non-HLT program and

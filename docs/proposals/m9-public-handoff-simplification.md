@@ -2,6 +2,24 @@
 
 ## Admission and scope
 
+### S8 admission: physical memory adapter correctness
+
+The owner accepts and closes S7 at reviewed delivery 7fac795d and admits
+planned S8, requesting its task brief first. T99 remains open; S9-S11 remain
+planned. S7 closure is recorded in
+[history](../history/M9-T99-S7-app-test-contracts.md).
+
+S8 first rechecks named physical read/write adapters, every actual caller and
+the original physical SAS contract. The intended repair stays in App Compat,
+using the original physical route with SAS_VIDEO behavior rather than adding
+a direct-RAM implementation. Nonidentity paging in both directions, mapped
+video and boundaries define the initial proof universe. Historical T94 DMA
+observations motivate this audit but are not fresh S8 dynamic evidence.
+
+No code is changed by admission. Current-source findings, the exact file set
+and a justified minimal diff estimate precede implementation. Public eight
+components, mirror, media and user configuration have no planned change.
+
 ### S7 admission: deterministic App test contracts
 
 The owner closes S6 without a second acceptance round and admits S7 at
