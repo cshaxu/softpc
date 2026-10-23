@@ -2,8 +2,218 @@
 
 ## Admission and scope
 
-### Active S6 research and minimal repair design
+### S6 delivery and owner disposition
 
+The owner rejects carrying the historical native-start observation as deferred
+work after the passing current-environment qualification: "干嘛保留？你都测试通过了，保留个毛线？"
+Accordingly, its research stays below as history, without an active TODO, Queue
+candidate or delivery blocker. This is an explicit acceptance disposition,
+not a claim that a Windows initializer was repaired or that RDP causation was
+proved. S6 is verified pending committed-diff review and owner acceptance;
+T99 stays open and S7-S11 remain planned.
+
+The frozen four-case ledger is complete under that owner decision:
+
+| Case | Final disposition and evidence |
+| --- | --- |
+| HLT/debug timeout | Correct the fixture to enter its own EB FE loop before resume/pause. Preserve the original HLT/interrupt contract; checkpoint regression passes on both widths. |
+| TF quick eligibility | Clear quick_mode on the existing local debug-hook refetch edge. Source invariant and historical stale-TF observation support the correction; focused repetitions and complete regression pass. Do not claim a new deterministic failing-before TF reproduction. |
+| Invalid boot/null BOP | Restore the fixture media ejected by earlier assertions before reset/restart. Paired actual-path probes change 7C00 from zeros to EB FE; original CPU reset returns F000:FFF0. No BIOS/BOP workaround is introduced. |
+| Native Console initialization | Historical rejection is before main. Current full qualification and 24 additional desktop package executions pass. Owner accepts this disposition without retaining a deferred task; no native-failure repair is claimed. |
+
+Production changes only c_main.c's existing port hook: +4/-0, net +4 relative
+to the S6 implementation baseline (898e4054 and 7d3b711d have identical code).
+Test changes only command_provider_smoke.c (+17/-0) and runtime_smoke.c
+(+3/-0): +20/-0, net +20. The same four added source lines increase the local
+patch against the XP necessary subset; upstream and subset hashes are unchanged.
+Its manifest changes only c_main.c's normalized local hash. The public eight
+trees, package fixture, user INI, media and snapshots have no diff. No new API,
+state owner, execution path, retry, timeout, thread or polling is introduced.
+
+Verification is the earlier fresh cached dual build/publication and exact
+192/192 passing registrations per architecture (184 background, three audio,
+five desktop/package), supplemented by 120 uninstrumented focused executions
+and the separately recorded native diagnostics. The final temporary PID probe
+is removed; both package fixtures rebuild and their four registered executions
+pass. The additional desktop package total is 24 (4 initial capture, 16 bounded
+compact samples, 4 restored-fixture cases), all passing. It is not another full
+suite rerun or a repair claim for an unreproduced native failure.
+
+Self-review checks the actual three code-path diffs, retained assertions,
+single ownership, normalized mirror accounting and the artifact hashes below.
+Both ETW sessions are confirmed absent; all owned jobs exit before scratch
+retirement. Only build/.ccache and build/.ninja remain. Final documentation,
+mirror, whitespace and residue checks precede commit/push and coordinator
+review of the actual committed changes. User acceptance, not this record,
+will close S6.
+Final checks pass: documentation governance, all 505 XP mirror bodies,
+diff whitespace and build residue. One manual relative-root mirror invocation
+cannot resolve its manifest; the exact registered absolute-root invocation
+passes. No source change is made to obtain that result.
+
+### S6 preceding research and repair record
+
+The following records research states before the final disposition above.
+
+Implementation progress after the owner's repair authorization: the integration
+fixture now installs EB FE at 0000:0520 before its deliberate resume and checks
+that paused CS:EIP remains there. This adds 11 test lines, removing none. With
+that setup alone and the original quick-mode code, 20 command-provider runs per
+architecture pass (40/40). This is not a failing-before/passing-after TF proof.
+The local debug-hook return now clears quick_mode before the existing NEXT_INST
+edge, adding four production lines and no second execution path. Another 20
+command-provider runs per architecture pass (40/40). Both jobs complete; these
+are bounded diagnostic runs, not full qualification. Mirror accounting updates
+only c_main.c's local normalized hash; upstream/subset identities are unchanged.
+The rebuilt checkpoint test passes on both widths, preserving its existing HLT
+and interrupt-shadow assertions. XP mirror and its negative selftest also pass
+on both widths (six focused test executions). No EXE publication or completed
+repair P is claimed.
+
+Further actual-path probes distinguish CPU reset, device POST and the first
+executor callback. CPU reset and POST both return F000:FFF0. RESET_COMPLETED is
+not this return: Emulator installs its executor callback and runs the driver
+before publishing that fact at the pause rendezvous. The earlier inference of
+already-corrupt reset output was therefore premature. The original nested POST
+simulation is real, but its register save/restore is not implicated by these runs.
+
+The outer fetch sequence reaches F000:FFF0 -> F000:E05B (reset BOP) -> E05E
+(INT 19h) -> the original bootstrap -> 0000:7C00. At 7C00 the original fixture
+reads 00 00 00 00, not its intended EB FE. command_provider_smoke previously
+executed a real floppy eject while testing ERROR command admission, then reset
+without reinserting its only boot medium. The fixture's supplied monitor state
+is ERROR but the actual Machine is stopped, so that eject succeeds. The original
+bootstrap reports failed boot but still transfers control to 7C00; executing
+uninitialized guest memory can reach arbitrary BOP bytes. No BIOS no-op handler
+or CPU reset workaround is appropriate for this test preparation error.
+
+Keep the eject test, assert its actual completion, and reinsert the fixture image
+before reset (+6 lines). With the same temporary probes this changes 7C00 to
+EB FE and the first callback to the intended loop; both widths pass 20 runs
+(40/40). An initial added assertion omitted the existing CRLF output suffix and
+failed before boot; correcting that assertion is not counted as a product fix.
+The earlier 40 no-media probe runs also pass as tests despite observing wrong
+boot bytes, demonstrating why pass counts alone missed this precondition.
+
+A same-class scan of all App tests finds only runtime_smoke's two direct ejects
+and command_provider_smoke's provider eject. runtime_smoke ejects before its
+restart/reset sequence too, matching the owner of the historical T84 null-BOP
+report. It now reinserts its fixture at the stopped boundary (+3 lines); its
+final eject remains valid teardown coverage. This does not prove every possible
+guest null BOP has the same cause or reproduce the historical AV instruction.
+All temporary production probes are removed. Uninstrumented command-provider,
+runtime and checkpoint each pass 20 repetitions on each width (120 executions).
+The subsequent complete cached dual build publishes both EXEs. Each width passes
+184 background, three native-audio and five desktop/package tests, 192/192,
+without failed/skipped registrations; build logs contain no compiler warnings.
+This is fresh full regression, not proof of the still-unexplained native failure.
+Published SHA-256: softpc32.exe
+0ea1a248bc280f9ca04b52005ee2594c5d9568afcf07311dd81262b37e08f6bf;
+softpc64.exe 337ebe62da50318fe53c82b4275c0f73cdba2389edfee8be29261208ecbf6077.
+Actual production C/H delta is +4/-0 in one local CCPU hook; tests +20/-0 in
+two App fixtures. Public components, original BIOS/BOP, INI and media are
+unchanged. Actual-diff review finds no additional execution path or polling.
+
+Native-start follow-up uses an independent small Win32 child (no SoftPC linkage)
+with an event set from main. Forty alternating launches compare immediate
+AttachConsole/hide against attachment only after that event. Both groups reach
+main and attach (20/20 each); this provides no evidence for a fixture timing
+change. The first diagnostic launch was incomplete because PowerShell treated
+its stderr record as a terminating script error; switching diagnostic output to
+stdout fixed the harness, not a native initialization failure. A separate
+sandbox-launched group stops after seven recorded successes when its owner
+environment disposes the job, without an observed child failure status; it is
+inconclusive, not another 40-run pass. Four real package cases in full regression
+also pass. Neither these results nor absence of a matching host crash establishes
+the historical Console connection refusal's cause. No startup retry, window
+hiding policy, timeout increase or system setting change is justified. S6 remains
+active with that fourth case unresolved; full qualification does not close it.
+
+The next native-source review finds a useful experimental distinction in
+Microsoft Terminal's [handoff selection](https://github.com/microsoft/terminal/blob/main/src/server/IoDispatchers.cpp):
+STARTF_USESHOWWINDOW with SW_HIDE suppresses delegation, while an ordinary
+visible initial Console can delegate. Its handoff failure handler can continue
+with the original server. Therefore the earlier hidden-start result neither
+proves a SoftPC fix nor identifies a failing handoff operation. The current
+source's [VT startup](https://github.com/microsoft/terminal/blob/main/src/host/VtIo.cpp)
+also has a connection-abort path when its pipes close during startup, but no
+local failing stack identifies that path. These mutable upstream references
+explain candidate boundaries; they are not a matched-source diagnosis of the
+installed binary. No external code is imported.
+
+Read-only host inspection identifies Terminal 1.24.12741.0 and an OpenConsole
+COM server. The default command token has Low integrity; the unsandboxed user
+token has Medium integrity, not administrative elevation. A serial same-source,
+same-EXE package comparison runs both registered variants on each architecture
+under both tokens: Low 4/4 and Medium 4/4, zero failed/skipped cases. The current
+unchanged user configuration selects Console, and the fixture reaches its raw
+DOS/input/restart assertions. Thus this comparison covers raw presentation;
+neither restricted integrity nor early attachment alone is proved causal.
+
+An attempted bounded native ETW capture cannot start: the initial repeated -p
+syntax is rejected; the corrected provider-file form is denied by Windows
+permissions before any package tests run. No trace or startup evidence is
+claimed from those attempts, and no session remains active. The installed
+event channels expose no corresponding Console host diagnostic channel. This
+is a diagnostic limitation, not evidence that the historical server failure
+has disappeared. Case 4 remains open; no retry, hidden-start shipping policy,
+timeout change or privilege-dependent product behavior is added.
+
+The owner permits UAC and an administrator ETW session starts successfully.
+Only error-level Console/Terminal providers are enabled, with a 64 MB circular
+cap. The separate ordinary-user test job runs both existing package variants
+on both widths: 4/4 pass, no native startup failure. Named events delimit those
+executions. This distinguishes diagnostic elevation from elevating the product.
+The administrator's finally block attempts stop and delete, but logman returns
+an unrecognized-provider GUID error and the ETL continues growing after that
+job exits. The planned four-minute lifetime is therefore exceeded; the size
+cap remains. A cleanup UAC is cancelled before process creation; a normal-user
+fallback returns access denied (5). After renewed owner confirmation, native
+ControlTrace reports query=0, stop=0, then query=4201 (session absent). Cleanup
+succeeds and exports 1,329 records. No persistent data-collector configuration
+exists. The failed logman cleanup and excess duration are disclosed, not
+represented as a correctly bounded initial capture.
+
+Initial error payload inspection finds E_FAIL at SystemConfigurationProvider
+line 212 in both inbox conhost and OpenConsole, pipe-not-connected at the inbox
+ConDrvDeviceComm line 147, and invalid-parameter at OpenConsole screenInfo line
+1410. These occur during a trace containing passing package executions and
+other Console activity; an error code alone is not a causal failed-start record.
+The historical first connection refusal has not been captured in this trace.
+Raw traces remain disposable research data, not checked-in evidence or inputs.
+
+A second diagnostic corrects session retirement to that proven native stop/
+query sequence. It samples only the historical compact Console path, alternating
+architectures with an eight-run limit per width and stopping at the first
+failed test. A temporary package-fixture PID record correlates each child;
+no production code changes. All 16 executions pass. Native stop=0 and subsequent
+query=4201 confirm normal session retirement, and the exported trace has 455
+records. Its error-site inventory repeats configuration/icon E_FAIL, process
+handle/pipe closure and screen-parameter diagnostics seen alongside successful
+starts. No historical 0xc0074005 connection refusal is captured. Both fixture
+executables are then rebuilt without the temporary PID probe, and the ordinary
+and compact package registrations pass again on each width (4/4). These bounded
+diagnostics supplement, not replace, the earlier complete 192/192 qualification.
+
+Read-only retained System events identify 89 SoftPC 0xc0000142 popups, from
+14:03:19 through 15:41:38 on 2026-10-22 (Pacific). Session events show remote
+reconnection at 13:27:47 and transfer to the local Console at 15:45:51, with
+no intervening recorded connection transition. No retained popup follows that
+transfer. This is an environmental association, not proof that RDP causes the
+failure. HKCU Console enumeration finds no SoftPC-specific application key;
+it does not exclude every possible external configuration source. The owner
+confirms current testing is on the desktop and will not be asked to switch
+merely to obtain a failing result. Available desktop runs establish their own
+passes, not a repair of the historical remote-session initializer.
+
+The administrator permission/cleanup blocker is removed. The remaining case
+has an evidenced native failure phase and healthy-current-environment evidence,
+but still lacks the first server rejection cause and a justified repair. S6's
+four-case exit criterion remains unmet; accepting an external limitation or
+deferring this case requires an explicit owner decision. The three local fixes
+are preserved, and no partial implementation delivery or completed S is claimed.
+
+The following records the initial research/design before implementation.
 Owner admits S6 audit/research/design at 898e4054 and advances from S5.
 This report separates four cases; it does not claim a completed four-root-cause
 investigation or authorize permanent production patches. Existing case 5's

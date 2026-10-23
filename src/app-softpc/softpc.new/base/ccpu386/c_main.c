@@ -863,7 +863,11 @@ IFN1(
 DO_INST:
    /* A paused debugger may change CS:EIP, code or address translation. */
    if (softpc_host_debug_begin())
+      {
+      /* T99: debug edits must re-enter with slow-path trap eligibility. */
+      quick_mode = FALSE;
       goto NEXT_INST;
+      }
 
    /* INSIGNIA debugging */
 #ifdef	PIG

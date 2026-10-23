@@ -847,6 +847,12 @@ int main(void)
         submit(&provider, EMULATOR_SESSION_MACHINE_ERROR, "floppy eject", &result);
         assert(lib_text_find_substring(result.text, "Machine has failed;") == NULL &&
             result.arm_prompt);
+        assert(lib_text_compare(result.text, "Floppy ejected.\r\n") == 0);
+        /* This command really changes media even though the supplied monitor
+           state is ERROR. Restore the boot fixture before exercising reset. */
+        submit(&provider, EMULATOR_SESSION_MACHINE_INIT,
+            "floppy insert overlay debug-commands-smoke.img", &result);
+        assert(lib_text_compare(result.text, "Floppy inserted.\r\n") == 0);
     }
     /* Exercise the actual composed provider, not a second hotkey dispatcher. */
     assert(provider.context == &commands.monitor &&
@@ -913,6 +919,15 @@ int main(void)
     /* With A20 wrapping enabled this is the last ROM byte, not an invalid
      * host pointer. The original SAS bus, not host RAM bounds, decides. */
     assert(lib_text_find_substring(debug_text(&result), "failed") == NULL);
+    /* Pause/resume policy does not imply an instruction-fetch boundary. Keep
+       this debug fixture in its own non-HLT loop, rather than arbitrary BIOS
+       code which may halt before execution_plans clears IF. */
+    (void)access(machine, &lease, (x86_debug_request){
+        .operation = X86_DEBUG_WRITE_LINEAR, .address = 0x520u, .bytes = 2u,
+        .data = { 0xeb, 0xfe } });
+    setreg(machine, &lease, X86_DEBUG_CS, 0u);
+    setreg(machine, &lease, X86_DEBUG_EIP, 0x520u);
+    setreg(machine, &lease, X86_DEBUG_EFLAGS, 2u);
     assert(provider.handle_hotkey(provider.context, EMULATOR_SESSION_MACHINE_PAUSED,
         "pause-toggle", &result));
     assert(commands.debug_active && result.request == EMULATOR_SESSION_REQUEST_RESUME);
@@ -938,6 +953,8 @@ int main(void)
     assert(lib_text_find_substring(debug_text(&result), "AX=") != NULL);
     assert(emulator_machine_debug_acquire(machine, &lease) == LIB_STATUS_OK);
     /* mov word [0600],1234; mov word [0602],5678; jmp $ */
+    assert(reg(machine, &lease, X86_DEBUG_CS) == 0u);
+    assert(reg(machine, &lease, X86_DEBUG_EIP) == 0x520u);
     execution_plans(machine, &lease, &events);
     command_matrix(machine, &lease, &provider);
     trace_cli(machine, &lease, &events, &provider);

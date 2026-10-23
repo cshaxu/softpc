@@ -159,6 +159,9 @@ int main(void)
     assert(runtime_wait(runtime, EMULATOR_MACHINE_RUNNING));
     assert(emulator_machine_stop(runtime));
     assert(runtime_wait(runtime, EMULATOR_MACHINE_STOPPED));
+    /* The preceding media test ejected the only boot device. Restore this
+       fixture's program before testing a new cold run, not an empty BIOS boot. */
+    assert(emulator_machine_set_removable_media(runtime, path, LIB_STORAGE_MEDIUM_OVERLAY));
     /* A monitor `start` after `stop` is a new cold run, not merely an
        accepted request.  Waiting for RUNNING catches a restart that reaches
        BIOS setup but never re-enters the executor. */
