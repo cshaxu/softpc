@@ -122,6 +122,20 @@ public source. All six verification-ledger members have proof above; final
 commit/review/closure is recorded after executor push. Scratch is retired only
 after evidence promotion and owned job exit; reusable caches stay intact.
 
+**Coordinator actual-commit review and delegated closure.** Executor 350dcd95
+is pushed. After role switch, review reads all four actual changed paths
+against the request and packet. Independent committed-tree comparison matches
+all 296 paths, blob identities and modes to fixed NXVM ad5c532a; no production,
+root infrastructure or asset is changed. The seven deleted lines are precisely
+the approved incidental capture segment; modal/sizing/teardown assertions and
+all registrations remain. The full passing inventory and unchanged artifact
+identities agree with recorded proof. No new API, platform/Types dependency,
+polling, recovery route or quality blocker is found in the changed surface.
+Owned jobs exit, scratch is removed and residue/documentation/mirror/whitespace
+checks pass. Close S13 under the owner's explicit delegation, not a claimed
+manual owner test. T99 stays open and work stops; its separate completion audit
+and the existing TODO/Queue are not silently admitted.
+
 ### S12 admission: Ninja incremental-build integrity
 
 Owner accepts S11 and requests: 准入S12，老规矩. S11 closes at 722ffaca;
