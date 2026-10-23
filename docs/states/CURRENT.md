@@ -7,8 +7,8 @@ audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
 checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
 memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
 The proposal owns evidence and acceptance per item. TODO is empty by transfer,
-not by repair. S7 is owner-accepted and closed; S8 is implemented and verified,
-awaiting delivery review and owner acceptance. S9-S11 remain planned. The owner accepts current passing native startup
+not by repair. S7 is owner-accepted and closed; S8 is implemented, verified and
+reviewed, awaiting owner acceptance. S9-S11 remain planned. The owner accepts current passing native startup
 qualification without retaining the historical observation as deferred work.
 The separate performance Queue candidate remains.
 
@@ -41,6 +41,11 @@ five desktop, three native audio), exact registration/execution equality and
 zero failures/skips. Both EXEs are refreshed; user INI and guest assets are
 unchanged. Original-header warnings are retained; no non-mirror warning is
 reported. The proposal owns complete evidence, hashes and validation limits.
+Executor 349057b1 is pushed. Coordinator actual-diff review confirms the
+three-statement production scope, six regression groups, original SAS/device
+ownership and unchanged shared/configuration/media paths. Published and
+committed EXEs match; documentation, 505-body mirror, whitespace and build
+residue gates pass. Scratch is retired and the worktree is clean.
 
 S6 is closed by owner-authorized advancement; see its
 [closure](../history/M9-T99-S6-debug-fixtures.md). S7 is accepted and closed; see its
@@ -256,7 +261,7 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 
 ## Current Technical Baseline
 
-- T99 S8 is the current verified runtime: physical adapter routing and the
+- T99 S8 delivery 349057b1 is the current verified runtime: physical adapter routing and the
   original range-check correction pass cached dual build/publication and
   193/193 final-source tests per architecture. Public eight trees retain their
   prior identities. The proposal records new EXE identities and unchanged INI.

@@ -260,6 +260,18 @@ identities above replace the disposable scripts/logs; build/t99-s8 is retired
 with the existing cleanup tool. Reusable caches are retained and the residue
 check passes. No guest medium, snapshot or user configuration is changed.
 
+Coordinator actual-change review of executor 349057b1 covers all eleven
+committed paths, including source/test bodies, registration, XP identities,
+task records and binary identities. It confirms +7/-6 production, +111/-1
+test C, +2/-0 registration, the sole +2/-1 mirror hunk, valid failed-request
+buffers and restored temporary CPU/mapping state. No duplicate production
+route, public ABI, test-only production entry or dependency edge is introduced.
+The shared trees and protected assets have zero diff against bdcdd28b; both
+committed EXE blobs match publication. Final-source evidence distinguishes
+the two complete runs, original-header warnings and untested hardware cases.
+Gates and scratch retirement are verified after delivery. S8 is reviewed and
+awaits owner acceptance; T99 stays open and no next S is admitted.
+
 ### S7 admission: deterministic App test contracts
 
 The owner closes S6 without a second acceptance round and admits S7 at
