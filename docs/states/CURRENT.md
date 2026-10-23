@@ -56,9 +56,12 @@ x64/x86. Final cached full builds refresh both EXEs; each width passes 193/193
 zero failed/skipped/disabled cases. Mirror, documentation and whitespace gates
 pass. Public eight trees, Compat/Driver and user INI/media/snapshots are unchanged.
 The proposal records test-draft correction, complete mirror accounting, hashes,
-legacy-only warnings and quality review. Executor delivery and coordinator
-actual-commit review remain before handoff; S10 awaits owner acceptance, with
-no S11 admission.
+legacy-only warnings and quality review. Executor ad9d5fcf is pushed; coordinator
+actual-commit review confirms the nine-path scope, unchanged original shape/
+protection/dirty route, permanent register/frame regression and correct mirror
+identity/accounting. Published EXE blobs equal the committed artifacts; scratch
+is retired and residue checks pass. S10 awaits owner acceptance, with no S11
+admission and T99 still open.
 
 ### S8 reviewed delivery (closed by owner-authorized advancement)
 

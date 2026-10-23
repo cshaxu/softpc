@@ -258,8 +258,22 @@ guest application or downstream acceptance. Test C is +70/-0, production
 +5/-12 (net -7); only two EXEs and five evidence/governance documents accompany
 those two code files. Task scratch peaks below 2 MB; concise evidence is promoted
 here, all owned jobs exit and scratch is retired with the residue check passing.
-S10 remains awaiting owner
-acceptance, not closed or followed automatically by S11.
+S10 remains awaiting owner acceptance, not closed or followed automatically by S11.
+
+**Coordinator actual-diff review.** After executor ad9d5fcf is committed and
+pushed, switch roles and read its actual complete nine-path Git diff, not just
+the executor summary. The two original-source sites match the approved design;
+the App fixture retains existing shape tests and adds real state/leaf checks,
+without changing public interfaces or production behavior to satisfy the
+corrected test draft. The manifest changes only local identity; the fixed raw
+and subset hashes/ranges remain intact, with full-file +226/-12 and incremental
++5/-12 correctly distinguished. Five document changes record approval, finite
+coverage, failed drafts, unchanged scope and remaining TODO rather than claiming
+those adjacent semantics fixed. Both committed EXE blobs equal the published
+files and the recorded SHA-256 values. No unrelated tracked change, extra build
+tree or leftover task job/scratch remains. Final mirror, documentation,
+whitespace and build-residue gates pass. No blocking quality finding remains
+in this admitted diff. This review is not owner acceptance; S10/T99 remain open.
 
 ### S9 admission: exact public-eight-tree import
 
