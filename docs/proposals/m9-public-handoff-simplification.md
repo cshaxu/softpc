@@ -32,6 +32,158 @@ genuine EGA semantics and existing Lib frame schema. A functional mirror
 repair requires the researched diff and owner decision first. Task-owned
 scratch is bounded in CURRENT and retired after evidence promotion.
 
+#### S14 research: original VGA cursor shape
+
+Owner starts the admitted audit: 开始执行s14 规矩你懂. Baseline is
+0ab81c52. This is research/design, not approval to ship a cursor-policy change.
+The five-member ledger above converges to the following evidence and limits.
+
+**1. Hardware contract.** Video Seven V7 VGA Technical Reference, 30 June
+1988, pages 3-41/3-42, numbers rows from zero, includes the ending row in VGA,
+hides reversed ranges in VGA, and distinguishes EGA's exclusive end and wrap.
+Equal start/end produces one line. It also specifies a full cell for an end
+greater than cell height; that V7 rule must not be replaced by generic clipping.
+IBM VGA/XGA Technical Reference, May 1992, VGA Function 2-66 independently
+confirms that a reversed range hides. These are controller rules, not Window
+scale policy. Primary manuals consulted through their indexed text:
+
+- [V7 VGA manual](https://dosdays.co.uk/media/video_seven/v7_vga_techref.pdf), CRA/CRB.
+- [IBM VGA/XGA manual](https://bitsavers.org/pdf/ibm/pc/cards/IBM_VGA_XGA_Technical_Reference_Manual_May92.pdf), CRTC 0B.
+- [IBM EGA manual](https://www.minuszerodegrees.net/oa/OA%20-%20IBM%20Enhanced%20Graphics%20Adapter.pdf), page 33, distinct original adapter.
+
+The exact physical boundary End==cell-height is not independently hardware-
+measured. The minimum keeps the original greater-than-height full-block rule;
+the existing Lib clips a span at the cell boundary. The proposal does not
+assert every overscan combination on every VGA-compatible chipset is identical.
+
+**2. One state and presentation path.** A search for original video
+set_cursor_start/height/visible (including the second span) finds three owners:
+cga.c, ega_prts.c and vga_prts.c. gvi_init selects the adapter; host_def.h
+defines EGG/VGG, and actual probes report VGA (5). vga_init installs its CRTC
+handlers. Thus ega_prts.c's conditional VGA-labelled branch is not the active
+shape handler for this fixed model, even though it is compiled. No EGA/CGA
+algorithm is to be changed using VGA rules. V7's separate graphics pointer is
+not this CRTC text cursor and is outside the repair.
+
+vga_prts.c do_new_cursor has five normal caller sites: font height (09),
+shape (0A/0B) and location (0E/0F). S10's disable authority and original V7
+write-protection remain. The existing base_cursor_shape_changed tail marks
+original video dirty. Original BIOS vd_set_cursor_mode writes the same ports;
+it does not own a second shape formula. Existing snapshot replay also writes
+the CRTC through vga_crtc_outb, so a repair at this owner applies on replay
+without a snapshot-layout change. Fresh snapshot qualification is still required
+after implementation, not claimed by this source trace.
+
+Compat presentation_text_style copies calculated original visibility and two
+spans; Driver copy_text uses it for both leaves. Machine/Session transport
+does not recompute shape. Lib Base clips/merges explicit spans; Window geometry
+scales their rectangles. Console deliberately approximates a native cursor,
+not arbitrary scanline origin or a split gap. No shared interface, renderer,
+percentage fallback, new state, thread, polling or alternate path is needed.
+
+**3. Why it can look thinner.** The shape defect is present in retained
+0e91ada1 and XP migration 41aa0bc2: ordinary ranges use End-Start, End==0 is
+special-cased to the bottom of the cell, and reversed ranges split. It is not
+introduced by T99 S4's Console reader-retirement change (52d8fcc3).
+T98 S6 8e66d797 replaced the old NT-percentage reconstruction with direct
+original scanline transmission, correctly preserving original positioning.
+Before that change, nt_graph.c make_cursor_change called GetCurrentConsoleFont;
+Compat returned FALSE, causing the original 20% approximation. The old Driver
+rounded that percentage up: a 16-line cell became four cursor lines. The
+current exact route exposes one line where the controller should calculate
+two. Restoring the four-line approximation would conceal, not repair, that
+original defect. This explains the available source/history example; no capture
+of the owner's earlier DOS register state exists, so the entire subjective
+report is not claimed as a reproduced historical guest session.
+
+**4. Actual-port and producer proof.** Hidden owned jobs reuse the existing
+VGA fixture, mock PCM/MIDI, cached compile/link commands and private objects.
+They create disposable test media, use original BIOS mode 3, write/read actual
+CRTC ports, advance original timer work and call real Driver copy_frame.
+Heights 8/14/16/32 use complete character rows (400/392/400/384 scanlines),
+not a deliberately partial last row. Each width executes all 32x32 start/end
+pairs, with disable clear/set: 8192 observations, all producing frames in the
+final sweep. Window and Console modes/spans agree, and 1:1 Window cursor
+rectangles reproduce the frame's resolved row mask.
+
+The independent oracle covers in-cell ends, explicit disable and outside-cell
+starts: 7492 cases per width. Baseline failures by font height are 57/183/241/993,
+total 1474; the private candidate has zero. Concrete H=16 observations:
+14..15 is one line before, two after; 4..7 is three before, four after;
+12..2 is two visible spans before, hidden after; 0..0 is full cell before,
+one line after; 6..6 is one line in both. The initial BIOS-mode shape is
+13..14, one line before and two after. These are frame/geometry assertions,
+not real desktop pixel captures or a DOS application recording.
+
+The other 700 overscan cases per width are observed rather than included in
+that hardware-correctness count. Their resolved output/visibility aggregate
+is identical before/after and across architectures (FNV64 1c311dc4e39109e8,
+ordered height/start/end/mask/mode scalar values). Samples End==H remain
+cell-clipped; End>H retains the full block. Existing disable/protection/font/
+mode checks also pass on both private variants. The unchanged registered
+app-softpc/unit/machine/vga_frame_smoke passes baseline on both widths;
+its explicit exclusive-end/split oracle is the coverage defect, not new proof
+that those shapes are correct.
+
+Research setup failures are retained here, not treated as product failures:
+an initial probe wrongly required production after every synthetic geometry;
+complete-row CRTC geometry removes those suppressed frames. Reusing the
+existing disable helper after ending at a 32-line font violates its 16-line
+initial precondition; running it before the matrix restores that precondition.
+The first candidate left End-1 underflow after deleting the zero special case;
+four zero-range checks caught it, and the final direct End>height comparison
+removes the underflow while preserving the prior nonzero threshold. Final
+research/candidate exit markers are zero. Private candidate compilation has
+existing mirror-header endif/macro warnings, not a warning-free full build.
+
+**5. Minimum repair and accounting.** Only vga_prts.c do_new_cursor needs a
+production change: extend its existing hidden condition with End<Start;
+delete the zero-end, split and redundant equal-end branches; compare End>height
+directly; use End-Start+1 in the ordinary branch and align its debug assertion.
+Keep the existing notifications, off-screen row hide and dirty tail unchanged.
+The essential algorithm (not a second implementation to retain) is:
+
+```c
+if (cursor_off || End < Start || Start >= H)
+    /* existing hidden path */;
+else if (End > H)
+    /* existing V7 full-block path */;
+else
+    /* existing normal path, height = End - Start + 1 */;
+```
+
+The exact reviewed private source diff is +6/-33, net -27, with local reason
+markers and no unrelated formatting/condition reordering. Production repair
+would add a necessary mirror patch, not reduce mirror difference. Reconstructing
+the fixed XP S5 necessary subset verifies raw hash 57a3318256a0b9392329fd4afada8b9926b32345c4262f08c3f3324b65d291f2
+and subset hash 084da18a959a825d66ef900d60b212a9bcffffd3cea23da0607cbf561946b120.
+Git default line diff is +226/-12 now versus +232/-45 for the candidate:
+238->277 changed lines, +39. No source ranges are excluded to hide this patch.
+One rejected accounting attempt used pre-S5 baseline ranges; only the XP
+selection ranges reproducing the registered hash supply these accepted counts.
+
+Proposed permanent tests replace the existing four shape samples in the
+App-local VGA fixture with a compact actual-port table/matrix, not another
+test executable or test-only production API. Preserve underline and S10 tests;
+check metadata/produced and both text leaves, normal/zero/equal/reversed/outside
+ends, disable, font change and snapshot replay. Estimated test diff +45..65/
+-20..30 (net +15..45); final implementation accounting must be measured.
+Mirror manifest and existing repair evidence need only their local hash/reason
+updated. Public eight trees, App/Compat interfaces and guest data stay unchanged.
+After owner approval, use cached dual builds, publish both EXEs, focused VGA/
+snapshot/geometry checks and full prescribed regression including native tests.
+
+Actual tracked production/test delta for this research is zero; only task
+records change. No new EXE, full-suite, native desktop, audio or real guest
+qualification is claimed. S14 waits for the owner's repair decision, not
+acceptance of an already shipped fix. T99 remains open.
+Final registered-test wall times are x64 3.76s and x86 7.35s (one test each),
+not complete-suite timings. The research scratch held about 12 MiB at retirement and
+was retired after both owned jobs exited and results were promoted here.
+Documentation, the unchanged 505-file mirror, whitespace and build-residue
+checks pass; production/test/assets Git diff is empty. EXE and INI SHA-256
+remain identical to the accepted S11 hashes in CURRENT.
+
 ### S13 admission: exact eight-tree test-ownership import
 
 Owner first requests a read-only audit of latest NXVM including uncommitted

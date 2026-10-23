@@ -2,18 +2,18 @@
 
 ## Current Work
 
-Owner admits T99 S14: 原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;
-把这个从TODO里面清理掉; Td S22 这个直接收口. S14 researches original
-hardware semantics and producer output before proposing any source repair.
-The VGA debt transfers out of TODO, not as a claim of repair. Td S22 is
-owner-closed; the performance Queue and open T99 are unchanged.
+T99 S14 research is ready for the owner's source-repair decision after the
+request 开始执行s14 规矩你懂. The minimum remains an original VGA shape repair,
+not a Lib thickness compensation. No shipping repair is implemented. The VGA
+debt has transferred out of TODO; Td S22 is owner-closed. T99 stays open and
+the performance Queue is unchanged.
 
 ## M9 T99 S14 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. |
+| Admission And Approval | Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. Then starts research: 开始执行s14 规矩你懂. |
 | Objective | Establish exact VGA/V7 cursor start/end/zero/wrap/clipping semantics, trace original state to both text frames, and give an evidence-based minimal repair/test proposal; close accepted cache governance. |
 | Non-goals | No shipping source/test repair before the researched diff is presented; no public-eight-tree, renderer, guest/media/INI/snapshot change, generic EGA rewrite, performance work or T99 closure. |
 | Reference Baseline | Reviewed S13 889b309a, current S11 EXEs and S10 cursor-disable repair. S10's adjacent shape observation is a research lead, not new proof. Td S22 accepted delivery/review 7758a9c4/f805483f. |
@@ -26,12 +26,21 @@ owner-closed; the performance Queue and open T99 are unchanged.
 | Reporting Requirements | Record the finite semantic/caller ledger, actual source/dynamic proof, implementation estimate and remaining limits. S14 owns build/t99-s14: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence and retire scratch. |
 | Stop Conditions | Report conflicting hardware semantics, missing evidence, unavoidable source-policy expansion or a required new state/path; do not silently apply generic VGA rules to EGA or claim a private candidate shipped. |
 | Exit Criteria | Complete bounded research/design, minimum actionable diff and proof plan, actual-change review, committed/pushed task updates and Td closure, retired scratch; wait for owner repair decision. |
-| Original Owner Request | 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. |
+| Original Owner Request | 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. 开始执行s14 规矩你懂. |
 | Similar-Issue Sweep | All original cursor-shape writers/callers and consumers, zero/equal/reversed/out-of-cell shapes, font-height/adapter distinctions, both text leaves and existing test assertions. |
 
-S14 is researching, not implementing a repair. TODO is empty after transfer;
-Td S22 closure is recorded in history without rerunning or claiming new runtime
-qualification. The proposal owns research results and the minimum design.
+S14 research checks the five-member ledger and primary VGA/V7 semantics.
+Both widths observe 8192 actual-port/Driver outputs; the 7492-case independent
+oracle has 1474 baseline mismatches and zero in the private candidate. All
+700 separately observed overscan outputs are unchanged, and existing disable/
+protection checks pass. The registered baseline VGA test also passes, exposing
+its incorrect shape oracle. The candidate is +6/-33 in one mirror file;
+public eight trees, assets and tracked production/tests have zero diff.
+The [proposal](../proposals/m9-public-handoff-simplification.md#s14-research-original-vga-cursor-shape)
+owns history, precise limits, mirror growth and permanent-test estimates.
+This is not full regression, desktop verification or a shipped repair. TODO
+is empty after transfer; Td S22 closure remains recorded in history. Owned
+research scratch is retired; documentation/mirror/whitespace/residue gates pass.
 
 ## Technical Baseline
 
