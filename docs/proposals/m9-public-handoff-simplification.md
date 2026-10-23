@@ -258,6 +258,23 @@ patch can realign. Neither matching statistic changes provenance, authorizes
 source exclusion or implies removal of semantic local fixes. No external
 source is copied into the repair or made a build/test dependency.
 
+**Coordinator actual-commit review.** Executor 478c680f is pushed. After role
+switch, review reads all eleven committed paths against the owner's minimum
+and the active packet, not just the executor report. Production +24/-2 and
+test +67/-2 match the displayed plan; executor documentation/manifest is
++149/-17, with two rebuilt binary artifacts separately counted. Only the
+two local mirror hashes change; original/subset identities and selection are
+retained. The new parser states reuse the existing reset and archive field;
+no Compat/Driver/public path changes or MIDI-output claim are present.
+Permanent port, PIC, DMA, reset and archive assertions replace the old wrong
+oracle without exposing test-only interfaces. The full final-source qualification
+and initial fixture failure are explicitly distinguished. Published EXEs match
+committed blob identities 95dbbe54b210197036b09a6af6bed687f99624cd (x86) and
+b9c82d945a92f3310d75e0adf852dc49521c1aee (x64). All owned jobs have exited;
+scratch is removed, only the two reusable caches remain, and residue,
+documentation, mirror and whitespace checks pass. No delivery blocker found.
+S11 is verified, awaiting owner acceptance; T99 remains open and S12 unadmitted.
+
 ### S10 admission: original cursor-disable research, design and repair
 
 Owner request: 收口s9 准入s10. S9 is accepted and closed at reviewed delivery

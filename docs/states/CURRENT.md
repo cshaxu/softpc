@@ -56,6 +56,11 @@ trees, root build/registration and user INI/media/snapshots are unchanged. The
 proposal owns corrected historical mirror accounting, hashes, initial test-draft
 compile failure, quality review and proof limits. S11 awaits owner acceptance;
 S12 is not admitted. Scratch is retired after evidence promotion.
+Executor 478c680f is pushed. Coordinator review of the actual eleven committed
+paths confirms the approved parser-only scope, permanent port/IRQ/archive
+regression, unchanged public trees and original reset/MPU ownership. Published
+EXE blobs equal the committed artifacts; residue checks pass. No delivery
+blocker is found. S11 remains verified awaiting owner acceptance, not closed.
 
 S9 is accepted and closed; see its [closure](../history/M9-T99-S9-public-import.md).
 Its verified baseline remains: all 296 public paths equal the pinned NXVM
