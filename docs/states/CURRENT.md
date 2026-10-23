@@ -23,6 +23,18 @@
 | Original Owner Request | Audit quality first; if issues exist, transfer current S5 to S6 and use S5 for public-eight-tree quality repairs. |
 | Similar-Issue Sweep | Broker create/replace/cancel/destroy, reader exit and backend cleanup; compare existing KVM/PCM lifecycle ownership without assuming their failure contracts are identical. |
 
+Owner additionally admits S5 P6 at eac62924: move the unused public Product
+opaque typedef into its implementation and remove the now-private source-ID
+allocator's impossible null-argument check. No lifecycle or runtime contract
+change. Verification for this narrow P is cached dual build/publication,
+related component/composition tests and shared boundary/manifest checks;
+prior full-suite evidence is retained, not rerun or claimed fresh. Scratch
+build/t99-s5 remains owned by S5 with the packet's existing budgets.
+P6 is implemented and verified: source +2/-5, test +3/-3; both EXEs rebuilt
+and published, 22/22 focused tests per width pass without build warnings.
+The IBMPC entry stub now owns its dummy type; no public alias is restored.
+No full-suite rerun is claimed. S5 remains awaiting acceptance.
+
 S4 is owner-accepted and closed; see [closure](../history/M9-T99-S4-console-retirement.md).
 S5 follow-up is implemented and verified against 6a9bf601, awaiting acceptance.
 All five audit items are complete. Production C/H +19/-43 (net -24), test C/H

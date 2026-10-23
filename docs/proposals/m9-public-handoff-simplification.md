@@ -4,6 +4,40 @@
 
 ### Current S5 quality audit and S6 transfer
 
+#### S5 P6 final private-surface cleanup
+
+Owner approves the two residual audit items at eac62924. Move the Product
+opaque typedef to composition.c (no public function uses it); remove the
+static source-ID allocator's null-argument check. Its only production caller
+passes the static counter and a local output; owner-local exhaustion tests
+also pass real addresses. Preserve exhaustion, public initialization validation,
+composition ordering and ownership checks. No test deletion or new abstraction.
+Estimated source delta is a few removed lines; two source manifests change.
+Frozen proof scope: dual cached builds/publication, component/composition and
+shared boundary/manifest regressions. Unrelated native/audio/package tests
+are not repeated for this declaration/private-precondition cleanup.
+
+P6 delivery: production C/H +2/-5 (net -3); test C +3/-3 (net zero).
+The complete caller scan also identifies the IBMPC entry stub borrowing the
+old typedef; rename its local dummy to fixture_product, without changing any
+assertion. Three source files and one test file change, with three corresponding
+manifests. No App, mirror, INI, media or root test-infrastructure change.
+Both cached full builds succeed and publish both EXEs without compiler warnings.
+Each architecture passes 21 selected component/composition/manifest/boundary/
+corpus tests, plus the separately selected IBMPC entry test: 22/22, no failures
+or skips. These are focused P6 results, not a new full-suite qualification.
+The initial sandboxed hidden launches exited without executing the script;
+the authorized hidden job 22928 completes with exit zero, and scratch is retired
+after confirming it exited. No test or build was terminated by a time budget.
+Caller/actual-diff review confirms the sole allocator production caller supplies
+valid addresses, and no production consumer names the private Product type.
+Public validation, identity exhaustion and cleanup coverage remain intact.
+Documentation governance and whitespace checks pass.
+Published SHA-256: softpc32.exe
+8D99A7F11BFB204C6A0178F81A46677D5D82C8C5F5A08DDFAC414AA5D8BB5546;
+softpc64.exe
+19B3FCB294D93F8DC9908083872E39E9E6DB7CAC0616A1503439468C22A89235.
+
 #### S5 approved follow-up at 6a9bf601
 
 Owner admits all five audit findings as a single bounded follow-up: remove

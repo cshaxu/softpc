@@ -2,12 +2,12 @@
 #include "lib/types/file.h"
 #include "emulator/product/composition_interface.h"
 
-struct emulator_product {
+typedef struct emulator_product {
     emulator_product_machine machine;
     emulator_machine *emulator_machine;
     emulator_session *session;
     emulator_ui *ui;
-};
+} emulator_product;
 
 static emulator_session_machine_state emulator_product_machine_state(
     const emulator_product *product, emulator_machine_state state)
