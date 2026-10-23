@@ -12,7 +12,7 @@ allocates a numeric task identifier.
 ## Previously admitted
 
 Td S22 [build-cache governance](../proposals/m9-build-cache-governance.md)
-is delivered and awaiting owner acceptance. No implementation subtask is active.
+is delivered and awaiting owner acceptance; CURRENT owns active implementation.
 
 T99 [public handoff simplification](../proposals/m9-public-handoff-simplification.md)
 is admitted, not a duplicate queued candidate; CURRENT owns its active S. T98 is

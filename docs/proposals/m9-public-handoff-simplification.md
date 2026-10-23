@@ -2,6 +2,96 @@
 
 ## Admission and scope
 
+### TODO audit and owner-admitted T99 expansion
+
+On 2026-10-22 the owner requests an audit of every TODO: remove confirmed
+resolved items and move all unresolved work into this T as S tasks. Frozen
+universe: the eight TODO entries at 9ee4af66. Source/caller/history inspection
+confirms four unchanged defect paths and four unresolved intermittent reports;
+none has sufficient repair evidence to be classified resolved. This is a
+read-only source/status audit, not a fresh hardware or failure reproduction.
+All eight leave TODO by transfer, not by an assertion of successful repair.
+The separate runtime-performance Queue candidate is unchanged. S5 remains
+verified awaiting acceptance; only one S may become active at a time.
+
+Audited dispositions and implementation sequence:
+
+- **S6, private CPU/debug and native startup (existing plan).** Merge the high
+  priority historical BIOS[0x52] null-dispatch TODO into existing case 3 below,
+  without a duplicate task. Current first-invalid-reset and BOP evidence is
+  stronger than the old report, but no permanent repair or first corrupting
+  transition is proved. Preserve HLT, TF and pre-main startup cases 1-4.
+  Existing case 5's test-oracle work is assigned to S7, not implemented twice.
+  Receiver: App/CCPU/debug and native startup fixture, not public Lib.
+  Original evidence: [T84](../history/M9-T84-S1-kvm-text-80x50.md).
+- **S7, deterministic App test contracts.** Consolidate three TODOs: checkpoint
+  aggregate timeout, INT 1Ah zero-byte oracle, and Win3.1 prompt-roundtrip
+  readiness. CMake still gives checkpoint_smoke 15 seconds, with no diagnosed
+  repair; its prior isolated passes do not close the parallel failure.
+  machine_smoke.c still asserts bda_tick_low != 0 in run_int1a_tick_boot_image,
+  although zero is legal. runtime_restart_boot_smoke.c still observes graphics
+  for 15000 ms before menu interaction, without Program Manager readiness.
+  Instrument actual phase/waits under parallel load; replace the proven invalid
+  timer oracle with deterministic guest/IRQ evidence; establish observable
+  readiness before changing the menu sequence. Preserve frame assertions,
+  budgets and failure evidence; no blind retries. Cover existing S6 case 5's
+  viewport/buffer read distinction and host-device attribution in this same
+  fixture audit, without treating disconnected devices as product failures.
+  Historical evidence: [T93 S8](../history/M9-T93-xp-sound-blaster-standalone-proposal.md#s8-repeated-stop-proof-and-third-qualification),
+  T92 S2 timer failure and T96 S7 graphics sequence 36. Pass/fail repetition
+  alone cannot establish a cause or justify closure of the intermittent cases.
+- **S8, physical memory adapter correctness.** memory.c still routes named
+  physical write/read through c_sas_stores/c_sas_loads. machine.c's public
+  physical wrappers call these adapters; the direct physical Sound DMA fix
+  did not repair them. Audit all callers and use the original physical SAS
+  route, preserving SAS_VIDEO mapping, not a direct-RAM second implementation.
+  Test nonidentity paging for both directions plus mapped video and boundaries.
+  Retain T94 S2's observation that c_sas_PRS sees the actual DMA write while
+  the old named-physical oracle reads another page. Owner: Compat memory.
+- **S9, original VGA cursor-disable semantics.** vga_prts.c case 0x0a still
+  reads the old cursor_off, updates the register only when start bits differ,
+  then calls do_new_cursor whose shape branches set visibility true. T98 S6's
+  port observation (start=0x20/end=15 remaining visible) therefore has no
+  identified repair. Verify authoritative VGA/EGA and V7 write semantics,
+  then propose a minimal single original-path mirror correction; test off-bit
+  only changes, enable/disable, start/end and mode transitions through ports.
+  Do not change public text-frame transport or assume this explains perceived
+  cursor thickness. Mirror accounting and focused dual-width proof required.
+- **S10, Sound Blaster MIDI parser boundary.** sndblst.h still defines 38h,
+  but nt_sbdsp.c has no MIDI_WRITE_POLL handler and still treats 91h as
+  DSP_WRITE_HS. The original header explicitly excludes SB-MIDI support.
+  MPU-401 playback success therefore does not fix the observed SB command/data
+  collision. Establish original command lengths/state and a correct supported
+  or explicit unsupported disposition before implementing; no second audio
+  path or silent expansion to full SB MIDI. Test 38h followed by MIDI data
+  including 91h, subsequent valid PCM commands and busy/IRQ behavior.
+  Evidence: [T95 S1](../history/M9-T95-win31-midi-wav-playback-proposal.md#paused-transfer-and-midi-follow-up).
+- **S11, Ninja incremental build integrity.** The current reusable x86 log
+  has a v7 header and recent builds succeed, but no captured damaged metadata
+  or causal repair explains T93 S15's repeated premature-end recovery and
+  large rebuilds. Cache relocation is not proof of repair. Preserve affected
+  metadata if recurrence occurs, compare command/dependency hashes and no-op
+  rebuilds under the normal serialized build flow. Do not clear caches first
+  or create another cache manager. Establish normal incremental behavior and
+  either repair a proved tooling cause or report a bounded unresolved host
+  limitation for explicit owner disposition; do not declare fixed from absence.
+
+These S tasks own all eight original entries: cursor->S9, SB-MIDI->S10,
+physical memory->S8, Ninja->S11, checkpoint/timer/readiness->S7, BOP->S6.
+No original evidence is discarded. Source inspection commands include searches
+for cursor_off/do_new_cursor, MIDI_WRITE_POLL/DSP_WRITE_HS, physical adapter
+callers, bda_tick_low, checkpoint registration and the 15000-ms graphics wait,
+plus relevant path history and the existing S6 failure ledger.
+
+Each S starts with current-source confirmation and a minimal diff estimate,
+then owns its narrow implementation, focused dual-width proof, proportionate
+regression/publication and actual-commit review. Mirror changes require the
+existing source-policy accounting; no standalone branches or fake-success
+fallbacks. Unreproduced failures must have an explicit remaining-evidence
+disposition rather than an invented fix. T99 cannot close until all S and
+these eight transferred entries have owner-accepted dispositions. This plan
+does not launch S6-S11 concurrently or silently close S5.
+
 ### Current S5 quality audit and S6 transfer
 
 #### S5 P6 final private-surface cleanup
@@ -533,7 +623,7 @@ It must separate these cases:
    and obtain the first server rejection before suggesting a host/test change.
    This occurs before shared Lib or App main, so it is not assigned to S4's
    broker repair. Do not hide the shipping window or add startup retries.
-5. **App fixture oracles and environment attribution.** Preserve the demonstrated
+5. **App fixture oracles and environment attribution (transferred to S7).** Preserve the demonstrated
    viewport-versus-buffer linear-read limitation and the already tracked legal
    zero timer-byte assertion. Keep disconnected PCM/MIDI composition failure
    separate from native loader failure. Repair only proven test-owned defects;
@@ -542,7 +632,9 @@ It must separate these cases:
 S6 must report source inference, controlled counterfactual and real failure
 captures separately, retain existing assertions until their contract is proved
 wrong, and request approval for permanent private/mirror repairs. Do not expand
-into unrelated TODO items or downstream repositories. No guest, shipped EXE,
+into work outside the owner-expanded S6-S11 allocation or downstream repositories.
+The following asset restriction describes this research transfer, not later
+owner-admitted implementation and publication: no guest, shipped EXE,
 INI or media changes are part of this transfer. The completed diagnostic jobs
 are stopped and S4 scratch has been retired. Future S6 diagnostics need an
 admitted CURRENT packet and bounded scratch policy; publish concise evidence

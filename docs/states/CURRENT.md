@@ -2,6 +2,14 @@
 
 ## Current Work
 
+Owner expands T99 to absorb all eight TODO entries after a current-source
+audit at 9ee4af66. None is proved resolved: BOP joins planned S6; S7 owns
+checkpoint/timer/readiness tests and former S6 test-oracle case 5; S8 physical
+memory, S9 VGA cursor-disable, S10 SB-MIDI parsing and S11 Ninja integrity.
+The proposal owns evidence and acceptance per item. TODO is empty by transfer,
+not by repair. S5 remains verified awaiting acceptance; S6-S11 are planned,
+not concurrently active. The separate performance Queue candidate remains.
+
 ## M9 T99 S5 Packet
 
 | Field | Required record |
