@@ -101,8 +101,8 @@ pending states; reset also cancels pending input. No native audio, guest
 media/configuration change or Computer Use is involved.
 
 The unchanged registered device_contract_sb_commands passes x64 (0.19s) and
-x86 (0.21s) in the final pass, exposing its incorrect existing oracle. The candidate is not run
-as a replacement for that unchanged fixture: its incompatible old MIDI
+x86 (0.21s) in the final pass, exposing its incorrect existing oracle. The
+candidate is not run as a replacement for that unchanged fixture: its incompatible old MIDI
 assertions must be corrected in the permanent test. Private 36h compilation
 supplies only its documented missing constant; implementation would put that
 constant beside its existing peers, not add a build switch. An initial probe
@@ -173,6 +173,16 @@ scratch (under 15 MB of its 300 MB budget) is retired before delivery. The
 three-document delivery has zero tracked production/test/artifact changes;
 documentation, 505-body mirror, whitespace and residue gates pass. No native
 integration or full repository test is claimed by this research.
+
+Coordinator reviews the actual pushed df70efc0 three-document diff, its owner
+request and source/port evidence. S10 is closed by explicit acceptance, not
+by research results. S11's finite opcode ledger, private baseline/candidate
+proof, corrected IRQ observation, missing 36h constant, archive constraints
+and unsupported capability decision remain distinct from implementation.
+No source/test/asset edit, new public contract, native-output success claim or
+downstream synchronization is present. Mirror, documentation, whitespace and
+residue gates pass; scratch is retired. No blocking research finding remains;
+owner approval is still required for the proposed mirror/capability change.
 
 ### S10 admission: original cursor-disable research, design and repair
 

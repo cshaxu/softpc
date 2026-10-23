@@ -41,6 +41,11 @@ Recommended production scope is two mirror files +24/-2 (net +22), preserving
 unsupported SB-MIDI while fixing command/data framing; the supported MPU path
 does not change. This capability decision awaits owner approval. No tracked
 production/test or published EXE is changed; no fresh full-suite claim is made.
+Research df70efc0 is pushed. Coordinator actual-diff review confirms its
+three-document-only scope, honest capability/verification limits and preserved
+S10 artifacts. Scratch is retired; mirror, documentation, whitespace and
+residue checks pass. S11 awaits the minimum-design decision, not acceptance
+of an implemented repair; S12 is not admitted.
 
 S9 is accepted and closed; see its [closure](../history/M9-T99-S9-public-import.md).
 Its verified baseline remains: all 296 public paths equal the pinned NXVM
