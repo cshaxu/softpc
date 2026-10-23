@@ -2,49 +2,54 @@
 
 ## Current Work
 
-T99 S14 research is ready for the owner's source-repair decision after the
-request 开始执行s14 规矩你懂. The minimum remains an original VGA shape repair,
-not a Lib thickness compensation. No shipping repair is implemented. The VGA
-debt has transferred out of TODO; Td S22 is owner-closed. T99 stays open and
-the performance Queue is unchanged.
+T99 S14 implements the owner-approved minimum: 批准修复 按老规矩.
+Cached dual builds publish both EXEs and both full inventories pass 193/193.
+The single original VGA owner is repaired, not compensated in Lib; EGA/CGA
+and public eight trees are unchanged. Complete delivery and actual-commit
+review precede owner acceptance. S14/T99 stay open; no next S is admitted.
 
 ## M9 T99 S14 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. Then starts research: 开始执行s14 规矩你懂. |
-| Objective | Establish exact VGA/V7 cursor start/end/zero/wrap/clipping semantics, trace original state to both text frames, and give an evidence-based minimal repair/test proposal; close accepted cache governance. |
-| Non-goals | No shipping source/test repair before the researched diff is presented; no public-eight-tree, renderer, guest/media/INI/snapshot change, generic EGA rewrite, performance work or T99 closure. |
-| Reference Baseline | Reviewed S13 889b309a, current S11 EXEs and S10 cursor-disable repair. S10's adjacent shape observation is a research lead, not new proof. Td S22 accepted delivery/review 7758a9c4/f805483f. |
+| Admission And Approval | Owner admits the cursor audit and TODO transfer, closes Td S22, starts research, then approves its reviewed minimum at ff97104b: 批准修复 按老规矩. |
+| Objective | Implement inclusive VGA end and reversed-range hiding at the original shape owner, retain V7 overflow/disable/protection and transport, correct permanent tests and fully qualify/publish both architectures. |
+| Non-goals | No public-eight-tree, renderer, guest/media/INI/snapshot-format change, generic EGA/CGA rewrite, performance work or T99 closure. |
+| Reference Baseline | Reviewed research f074452f/ff97104b; current S11 EXEs and S10 cursor-disable repair. Fixed XP necessary subset identities and selection ranges remain unchanged. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Initially task records and Td proposal archival only. Read vga_prts.c, ega_prts.c, cga.c, original BIOS shape/host conversion, Compat text style, Driver and existing VGA fixture. No public API planned. |
+| Files And ABI Surface | vga_prts.c do_new_cursor, existing App-local vga_frame_smoke, XP local manifest/repair ledger, task records and dual EXEs. No public API or snapshot schema changes. |
 | Applicable Rules | Execution, Architecture, Coding, Documentation, current design and source/research policy; original controller owns hardware semantics. |
-| Verification | Primary manuals with explicit adapter distinctions; original port/readback and actual producer frame observations on x86/x64 through private fixture-based probes; baseline versus any private counterfactual stays separate. Inspect current test oracles and history, then minimum production/test/mirror estimates. Governance/mirror/whitespace/residue gates. |
+| Verification | Permanent actual-port/Driver cursor checks at 8/14/16/32 rows, snapshot register replay and existing disable/protection/underline coverage; cached Ninja/ccache dual builds and published package. Run every registered test on each architecture in disjoint background, desktop and native_audio groups; match executed/registered inventories with no skips. Audit mirror, dependencies, warnings outside the preserved source, whitespace and residue. |
 | Expected Markers | Distinguish row numbering, inclusive versus exclusive end, true VGA hide versus EGA split, cell clipping and frontend scaling. Do not infer the entire historical thin-cursor symptom from one source formula. |
-| Asset Needs | Preserve EXEs, user INI, media and snapshot-midi; use disposable test media and mocked audio; no Computer Use or new external asset. |
-| Reporting Requirements | Record the finite semantic/caller ledger, actual source/dynamic proof, implementation estimate and remaining limits. S14 owns build/t99-s14: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence and retire scratch. |
+| Asset Needs | Publish assets/binary softpc32.exe and softpc64.exe only. Preserve user INI, media and snapshot-midi; tests use disposable media and mock audio except explicit native integration; no Computer Use. |
+| Reporting Requirements | Record actual production/test/mirror line counts, source and dynamic evidence separately, single-owner quality review, hashes and full exact test inventories. S14 owns build/t99-s14: 30-minute jobs, five-minute no-progress, 300MB cap; promote evidence and retire scratch. |
 | Stop Conditions | Report conflicting hardware semantics, missing evidence, unavoidable source-policy expansion or a required new state/path; do not silently apply generic VGA rules to EGA or claim a private candidate shipped. |
-| Exit Criteria | Complete bounded research/design, minimum actionable diff and proof plan, actual-change review, committed/pushed task updates and Td closure, retired scratch; wait for owner repair decision. |
-| Original Owner Request | 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. 开始执行s14 规矩你懂. |
+| Exit Criteria | Approved minimal repair, focused and full dual-width proof, dual EXEs published, actual-change review, committed/pushed complete delivery and retired scratch; wait for owner acceptance, do not close S14/T99. |
+| Original Owner Request | 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细; 2. 把这个从TODO里面清理掉; 3. Td S22 这个直接收口. 开始执行s14 规矩你懂. 批准修复 按老规矩. |
 | Similar-Issue Sweep | All original cursor-shape writers/callers and consumers, zero/equal/reversed/out-of-cell shapes, font-height/adapter distinctions, both text leaves and existing test assertions. |
 
-S14 research checks the five-member ledger and primary VGA/V7 semantics.
-Both widths observe 8192 actual-port/Driver outputs; the 7492-case independent
-oracle has 1474 baseline mismatches and zero in the private candidate. All
-700 separately observed overscan outputs are unchanged, and existing disable/
-protection checks pass. The registered baseline VGA test also passes, exposing
-its incorrect shape oracle. The candidate is +6/-33 in one mirror file;
-public eight trees, assets and tracked production/tests have zero diff.
-The [proposal](../proposals/m9-public-handoff-simplification.md#s14-research-original-vga-cursor-shape)
-owns history, precise limits, mirror growth and permanent-test estimates.
-This is not full regression, desktop verification or a shipped repair. TODO
-is empty after transfer; Td S22 closure remains recorded in history. Owned
-research scratch is retired; documentation/mirror/whitespace/residue gates pass.
-Executor f074452f is pushed and actual-commit reviewed; the two-document
-delivery makes no production/full-regression claim. No next S is admitted.
+S14 research f074452f/review ff97104b supplies the five-member ledger and
+actual-port baseline/candidate proof. Approved implementation is +6/-33 in
+vga_prts.c and +49/-19 in its existing App fixture. Both widths pass all 193
+registrations (118 shared background, 67 other background, five desktop and
+three native audio), with exact registered/executed names and zero failures/
+skips. Both EXEs are refreshed, only changed objects compile, and warnings
+outside preserved mirror headers are zero. Public eight trees, user INI,
+guest media and snapshots are unchanged. The
+[proposal](../proposals/m9-public-handoff-simplification.md#s14-approved-implementation)
+owns hashes, the corrected task-runner selector, precise proof limits,
+historical mirror growth (+39 lines) and self-review. TODO remains empty;
+Td S22 is closed. Implementation is not owner-accepted S/T closure.
+Final documentation/mirror/whitespace checks pass and both builds report no
+work. Owned scratch is retired; build-residue check passes.
 
 ## Technical Baseline
+
+Latest published binaries are S14's verified build, pending owner acceptance;
+their hashes and full 193-case-per-width qualification are in the
+[implementation record](../proposals/m9-public-handoff-simplification.md#s14-approved-implementation).
+The following S13 and earlier paragraphs retain their delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,
 blobs and modes match exactly. Production is unchanged; test C -7 lines and

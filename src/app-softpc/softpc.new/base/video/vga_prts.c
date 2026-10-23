@@ -571,43 +571,15 @@ LOCAL VOID	do_new_cursor IFN0()
 
 	/* T99 S10: disable remains authoritative during shape recomputation. */
 	if (crt_controller.cursor_start.as_bfld.cursor_off ||
+		/* T99 S14: VGA hides reversed ranges; only EGA wraps. */
+		crt_controller.cursor_end.as_bfld.cursor_end < crt_controller.cursor_start.as_bfld.cursor_start ||
 		crt_controller.cursor_start.as_bfld.cursor_start >= (unsigned)get_char_height() ) {
 		note_entrance0("No cursor");
 		set_cursor_visible(FALSE);
 		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start | 0x20,
 					crt_controller.cursor_end.as_bfld.cursor_end);
 	}
-	else if (crt_controller.cursor_end.as_bfld.cursor_end == 0) {
-		note_entrance0("cursor from start to bum");
-		set_cursor_start1(0);
-		set_cursor_height1(0);
-		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
-		set_cursor_height(get_char_height() - get_cursor_start());
-		set_cursor_visible(TRUE);
-		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start,
-					crt_controller.cursor_end.as_bfld.cursor_end);
-	}
-	else if (crt_controller.cursor_end.as_bfld.cursor_end < crt_controller.cursor_start.as_bfld.cursor_start) {
-		note_entrance0("2 cursors");
-		set_cursor_start1(0);
-		set_cursor_height1(crt_controller.cursor_end.as_bfld.cursor_end);
-		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
-		set_cursor_height(get_char_height() - get_cursor_start());
-		set_cursor_visible(TRUE);
-		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start,
-					crt_controller.cursor_end.as_bfld.cursor_end);
-	}
-	else if (crt_controller.cursor_end.as_bfld.cursor_end == crt_controller.cursor_start.as_bfld.cursor_start) {
-		note_entrance0("One line cursor");
-		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
-		set_cursor_height(1);
-		set_cursor_start1(0);
-		set_cursor_height1(0);
-		set_cursor_visible(TRUE);
-		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start,
-					crt_controller.cursor_end.as_bfld.cursor_end);
-	}
-	else if (crt_controller.cursor_end.as_bfld.cursor_end - 1 >= (unsigned)get_char_height()) {
+	else if (crt_controller.cursor_end.as_bfld.cursor_end > (unsigned)get_char_height()) {
 		note_entrance0("block cursor");
 		set_cursor_start(0);
 		set_cursor_height(get_char_height());
@@ -618,13 +590,14 @@ LOCAL VOID	do_new_cursor IFN0()
 					crt_controller.cursor_end.as_bfld.cursor_end);
 	}
 	else {
-		assert2(((crt_controller.cursor_end.as_bfld.cursor_end - 1) >= crt_controller.cursor_start.as_bfld.cursor_start),
+		assert2((crt_controller.cursor_end.as_bfld.cursor_end >= crt_controller.cursor_start.as_bfld.cursor_start),
 				"cursor values do not match default set Start %d, End %d",
 				crt_controller.cursor_end.as_bfld.cursor_end,
 				crt_controller.cursor_start.as_bfld.cursor_start);
 		note_entrance0("normal cursor");
 		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
-		set_cursor_height(crt_controller.cursor_end.as_bfld.cursor_end - crt_controller.cursor_start.as_bfld.cursor_start);
+		/* T99 S14: VGA includes the ending scanline, including 0..0. */
+		set_cursor_height(crt_controller.cursor_end.as_bfld.cursor_end - crt_controller.cursor_start.as_bfld.cursor_start + 1);
 		set_cursor_start1(0);
 		set_cursor_height1(0);
 		set_cursor_visible(TRUE);

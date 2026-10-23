@@ -803,27 +803,57 @@ static void verify_text_style(emulator_machine_driver *driver,
 {
     lib_bool produced;
     verify_cursor_disable(driver, frame, console);
-    const unsigned starts[] = {14u, 12u, 4u, 31u};
-    const unsigned ends[] = {15u, 2u, 7u, 15u};
-    for (unsigned i = 0; i < 4u; ++i) {
-        outb(0x3d4, 0x0a); outb(0x3d5, (half_word)starts[i]);
-        outb(0x3d4, 0x0b); outb(0x3d5, (half_word)ends[i]);
-        host_timer_event(); host_timer_event();
-        assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK && produced);
-        const kvm_text_frame *text = &frame->data.text->base;
-        assert(text->cursor_mode == (i == 3u ? KVM_CURSOR_DISABLED : KVM_CURSOR_HOST));
-        if (i != 3u) {
-            assert(text->cursor[0].start == starts[i]);
-            assert(text->cursor[0].height == (i == 1u ? text->font_height - 12u : ends[i] - starts[i]));
-            assert(text->cursor[1].height == (i == 1u ? 2u : 0u));
+    const unsigned heights[] = {8u, 14u, 16u, 32u};
+    const half_word saved_height = crt_controller.maximum_scan_line.as.abyte;
+    const half_word saved_end = (half_word)crt_controller.vertical_display_enable_end;
+    for (unsigned h = 0; h < sizeof(heights) / sizeof(heights[0]); ++h) {
+        const unsigned height = heights[h];
+        /* V7 manual CRA/CRB: inclusive VGA end; reversed ranges hide. The
+           final two cases preserve the existing overscan boundary policy. */
+        const struct { unsigned start, end, top, lines; } shapes[] = {
+            {0, 0, 0, 1}, {0, 1, 0, 2}, {2, 2, 2, 1}, {4, 7, 4, 4},
+            {7, 2, 0, 0}, {2, 0, 0, 0}, {height - 2, height - 1, height - 2, 2},
+            {31, 31, 31, height == 32u ? 1u : 0u},
+            {2, height < 32u ? height : 31u, 2, height < 32u ? height - 1u : 30u},
+            {2, 31, height < 32u ? 0u : 2u, height < 32u ? height : 30u}
+        };
+        /* Keep complete character rows while changing the actual font. */
+        outb(0x3d4, 0x12); outb(0x3d5, (half_word)(400u / height * height - 1u));
+        outb(0x3d4, 9); outb(0x3d5, (saved_height & 0xe0u) | (height - 1u));
+        for (unsigned tick = 0; tick < 4u; ++tick) host_timer_event();
+        for (unsigned disabled = 0; disabled < 2u; ++disabled)
+        for (unsigned i = 0; i < sizeof(shapes) / sizeof(shapes[0]); ++i) {
+            const half_word start = (half_word)(shapes[i].start | (disabled ? 0x20u : 0u));
+            outb(0x3d4, 0x0a); outb(0x3d5, start);
+            outb(0x3d4, 0x0b); outb(0x3d5, (half_word)shapes[i].end);
+            if (i == 0u || i == 4u || i == 6u) {
+                softpc_device_video_controller_state saved;
+                assert(softpc_device_snapshot_capture_video_controller(&saved));
+                outb(0x3d4, 0x0a); outb(0x3d5, disabled ? 0u : 0x20u);
+                assert(softpc_device_snapshot_restore_video_controller(&saved));
+                assert(softpc_device_snapshot_rebuild_video_presentation());
+            }
+            verify_cursor_output(driver, frame, console, start,
+                !disabled && shapes[i].lines != 0u, LIB_TRUE);
+            const kvm_text_frame *text = &frame->data.text->base;
+            assert(text->font_height == height);
+            if (!disabled && shapes[i].lines != 0u) {
+                assert(text->cursor[0].start == shapes[i].top);
+                assert(text->cursor[0].height == shapes[i].lines);
+                assert(text->cursor[1].height == 0u);
+            }
+            kvm_text_frame metadata = *text;
+            assert(console->base.cells != text->cells);
+            assert(lib_memory_compare(console->base.cells, text->cells,
+                text->capacity * sizeof(*text->cells)) == 0);
+            metadata.cells = console->base.cells;
+            assert(lib_memory_compare(&console->base, &metadata, sizeof(metadata)) == 0);
         }
-        kvm_text_frame metadata = *text;
-        assert(console->base.cells != text->cells);
-        assert(lib_memory_compare(console->base.cells, text->cells,
-            text->capacity * sizeof(*text->cells)) == 0);
-        metadata.cells = console->base.cells;
-        assert(lib_memory_compare(&console->base, &metadata, sizeof(metadata)) == 0);
     }
+    outb(0x3d4, 0x12); outb(0x3d5, saved_end);
+    outb(0x3d4, 9); outb(0x3d5, saved_height);
+    for (unsigned tick = 0; tick < 4u; ++tick) host_timer_event();
+    assert(driver->copy_frame(driver->context, frame, console, &produced) == LIB_STATUS_OK && produced);
     /* A location-only register write must produce without touching characters,
        fonts or synthesizing host_start/end_update in this test. */
     for (unsigned position = 0u; position <= 17u; ++position) {

@@ -1165,3 +1165,17 @@ Neither number proves fewer semantic local patches; the earlier estimate of
 an unconditional +26 in the historical diff was too strong. No selection range
 is changed or excluded to improve these counts. The [S11 record](../../../proposals/m9-public-handoff-simplification.md#s11-approved-implementation)
 owns permanent port/IRQ/archive proof, full qualification and limitations.
+
+## T99 S14 original VGA cursor shape
+
+Owner approves the researched single-owner fix in vga_prts.c do_new_cursor.
+VGA includes its ending scanline and hides reversed ranges; the prior EGA-like
+zero/end/split branches are removed. S10 disable and V7 protection, original
+host notifications, dirty tail, off-screen hiding and snapshot register replay
+remain. The direct End>height test preserves the nonzero V7 full-block rule
+without End-1 underflow. EGA/CGA and Lib's two-span schema are unchanged.
+Source diff +6/-33, net -27; necessary-subset mirror diff +226/-12 becomes
++232/-45 (238 to 277 changed lines, +39). Fixed XP raw/subset identities and
+selection ranges are unchanged; only the local manifest hash changes.
+The [S14 proposal](../../../proposals/m9-public-handoff-simplification.md#s14-approved-implementation)
+owns hardware evidence, actual-port research and implementation qualification.

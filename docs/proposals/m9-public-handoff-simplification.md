@@ -192,6 +192,98 @@ retains one VGA shape owner and original dirty/protection/snapshot routes;
 permanent-oracle correction and post-repair full qualification remain required.
 No research-delivery blocker is found; S14 awaits the owner's repair decision.
 
+#### S14 approved implementation
+
+Owner approves at reviewed research ff97104b: 批准修复 按老规矩.
+Apply the exact +6/-33 original-path minimum above, with no public-eight-tree
+or EGA/CGA change. Replace the old four-sample oracle in the existing App VGA
+fixture with explicit inclusive/zero/equal/reversed/outside/overscan shapes at
+8/14/16/32 rows, each enabled/disabled. Reuse existing port/frame assertions,
+add original snapshot capture/replay for zero, reversed and ordinary ranges,
+and retain underline, disable/protection and existing graphics/snapshot tests.
+No new test target, helper framework or production test API is admitted.
+Then cached dual builds/publish and all registered background, desktop and
+native-audio tests, exact inventory matching, changed-path/mirror accounting,
+warning audit and actual-commit review. Preserve INI/media/snapshot-midi;
+task scratch and budgets stay in CURRENT. Wait for owner acceptance afterward.
+
+**Implemented minimum and permanent proof.** Against ff97104b, production is
+exactly +6/-33 (net -27), in do_new_cursor only. Three old special branches
+disappear; the existing hidden/full-block/ordinary paths, notifications and
+dirty tail remain. No renderer compensation, added owner/state/API or fallback.
+The source Git blob aa04e3e68e18bcf94b71c173f59b153e3b78cda0 matches the reviewed
+private candidate. Current normalized source SHA-256 is
+961eccd23cf76b531efc9dc92a3bc9dc38db4773fce366bf18e6b9333edfde6f.
+EGA/CGA, Compat, Machine/Session and all eight public trees have zero diff.
+
+The existing VGA fixture is +49/-19 (net +30), with no new target/helper.
+Ten explicit expected shapes at four font heights and both disable values
+run in each of its two existing mode-3 passes: 160 shape observations and
+48 selected controller-archive replays. They check actual register readback,
+original visibility, real Driver-produced metadata and both text leaves,
+including no VGA second span. Complete-row geometry is restored afterward.
+Zero/equal/inclusive end, reversed/zero-ended hide, last row/outside start and
+retained overscan policy have direct cases. Existing underline, disable/V7
+protection, colour/graphics and snapshot tests remain. Focused VGA passes on
+x64/x86 in 5.96/7.77 seconds. This is actual executable proof, not screenshot
+or manual guest-application qualification.
+
+The freshly reconstructed pinned XP subset again matches both registered
+raw/subset hashes. Default Git mirror diff is +232/-45 (277 changed lines),
+versus +226/-12 (238) before: +39 historical changed lines, despite net source
+reduction. Only the local body hash changes; no extraction range, source
+baseline or external dependency is changed. Mirror worktree CRLF and fixture
+LF follow existing .gitattributes, with no whole-file normalization.
+
+**Build, publish and complete inventory.** Both cached Ninja/ccache Release
+builds succeed and publish their EXEs directly in assets/binary. Each runs
+34 edges, compiling only vga_prts.c and the changed VGA fixture, then archiving/
+linking existing objects; CCPU and unchanged public components are not rebuilt.
+Configuration has no warning; build warnings are 178 existing mirror-header
+lines combined, zero outside the preserved mirror. No unrelated warning repair
+is claimed. The first task-local shared-test selector used slash instead of
+the registered dot prefix and selected zero cases; --no-tests=error correctly
+stopped it. The selector was corrected from actual CTest JSON before proceeding;
+this is not a passed test or a hidden case retry.
+
+Every registered case subsequently passes once in the disjoint full groups:
+x64/x86 each 118 shared background +67 other background +5 desktop +3 native
+audio =193/193. JUnit test names exactly equal each architecture's JSON
+registration, with zero failures/skips/non-run cases or duplicate execution.
+The separate focused VGA run is not included in those totals. Group wall times
+are x64 63.88/86.31/22.75/2.93 seconds and x86 66.20/63.86/23.37/2.63 seconds;
+individual JUnit records preserve all group results during
+qualification. Both package modes, Console/Window desktop, native MIDI/PCM,
+snapshot transaction/cross-process, boot/restart and every source/dependency/
+manifest gate pass. Native tests run in the active desktop session without
+Computer Use. No exhaustive manual DOS/Windows application acceptance is claimed.
+
+Published SHA-256:
+
+- softpc32.exe: 74641B4AF7E7B07E0B33D958038E5882F7001DD8467FAB63CB10E2222F56E570.
+- softpc64.exe: B5A1FBAA7A85CF814DE57F669827A3D4126375108871A47A726EA4C46F25A52E.
+- User INI remains 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D.
+
+**Executor quality review.** Repeated rg searches for original video
+set_cursor_start/height/visible and cursor-end/start arithmetic still find
+only cga.c, ega_prts.c and the repaired vga_prts.c. Distinct CGA/EGA algorithms
+are retained, including EGA's compiled but unselected VGA-labelled branch;
+they are not blanket-certified for other adapters. BIOS, five recomputation
+callers and snapshot replay all reach the one selected VGA owner. Lib remains
+a neutral explicit-span consumer. Necessary errors, disable/protection and
+existing cleanup remain; no polling, allocation, thread, recovery mechanism,
+compatibility alias or test-only production entry is added. Code totals are
++55/-52, net +3, excluding records/manifests/artifacts. All runtime changes are
+inside the approved single-file original-hardware repair; tests stay App-local.
+The End==cell-height physical-hardware limit stated in research remains a limit,
+not an invented new chipset guarantee. Wait for owner acceptance; do not close
+S14 or T99 solely on these test results.
+Final documentation and 505-body mirror checks pass, whitespace is clean, and
+both persistent build trees report no work on a second actual build. EXE/INI
+hashes remain as listed. All owned jobs have exited; promoted results above
+replace the disposable scripts/logs/subset copy, and exact build/t99-s14 was
+removed. Clean-Build.ps1 -Check passes with only the two reusable cache roots.
+
 ### S13 admission: exact eight-tree test-ownership import
 
 Owner first requests a read-only audit of latest NXVM including uncommitted
