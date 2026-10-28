@@ -797,7 +797,7 @@ void nt_graphics_tick(void)
 
 void nt_start_update(void)
 {
-   softpc_standalone_dib_begin_update();
+   softpc_standalone_dib_begin_host_update();
    IDLE_video();
 }
 
@@ -807,7 +807,7 @@ void nt_start_update(void)
 
 void nt_end_update(void)
 {
-    softpc_standalone_dib_end_update();
+    softpc_standalone_dib_end_host_update();
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/

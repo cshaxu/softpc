@@ -2,13 +2,35 @@
 
 ## Current Work
 
-Owner accepts and closes T99 S14: 批准收口S14.然后列出所有的S任务、T任务、TODO.
-No implementation subtask is active.
-Open task awaiting owner: T99.
-S1 through S14 are closed. T99 itself remains open pending its separately
-admitted completion audit; no S15 or next T is admitted. TODO is empty and
-Queue retains one unnumbered runtime-performance candidate. See the
-[S14 closure](../history/M9-T99-S14-vga-cursor-shape.md).
+Owner accepts S14 and admits T99 S15 to repair V7 pointer trails. T99 remains
+open; Queue retains the unnumbered runtime-performance candidate.
+
+S15 final implementation and dual-width qualification are recorded in the
+[proposal](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
+Both architectures pass all 193 registered cases with exact inventory match;
+the earlier x64 package stage-5 failure and proof limits remain documented.
+Both EXEs are refreshed; await actual-diff review, push and owner acceptance.
+
+## M9 T99 S15 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner approves the V7 pointer repair, minimal regression, dual builds, release, tests and push. |
+| Objective | Preserve current body pixels when the original V7 hardware pointer is cleared, redrawn or moved across display updates. |
+| Non-goals | No public component, guest configuration, media or snapshot format changes; no separate renderer or polling. |
+| Reference Baseline | S14 accepted at 844c7e17. Read-only comparison found stale saved background can overwrite the newly painted body. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Existing Compat DIB transaction and pointer callbacks, existing VGA fixture, task records and dual EXEs; preserve original video owner. |
+| Applicable Rules | Execution, architecture, coding, documentation and source policies. |
+| Verification | Focused actual-path pixel and transaction tests; dual cached builds and complete registered background, desktop and native-audio regression. |
+| Expected Markers | Clear before body painting; redraw after body and before publication, retaining nested transactions and mode changes. |
+| Asset Needs | Publish both assets/binary EXEs; preserve user INI, guest media and snapshots. No Computer Use. |
+| Reporting Requirements | Record actual source/test counts, mirror diff, tests, artifacts and review. Scratch build/t99-s15; 30-minute job budget, five-minute no-progress, 300 MB cap. |
+| Stop Conditions | Report if correct repair requires a second path, unapproved external mutation, or unsafe lifecycle change. |
+| Exit Criteria | Correct minimal repair, focused and full dual-width qualification, two published EXEs, actual diff review, commit and push; wait for owner acceptance. |
+| Original Owner Request | 好，请你准入一个新的S完成此项修复，并补上最小必要测试覆盖此情况，老规矩完成后编译发布测试提交推送等我验收. |
+| Similar-Issue Sweep | Examine body refresh, partial and split paths, nested updates, pointer register changes, palette, 1-bit conversion, resize and teardown. |
 
 ## Technical Baseline
 

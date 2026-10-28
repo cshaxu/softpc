@@ -184,15 +184,57 @@ static void verify_pointer_update_pixels(void)
     outb(0x3c4, 0xa5); outb(0x3c5, 0x80);
     assert(pixels[0] == 0xff);
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    /* A full body repaint must not be replaced by the old pointer background. */
+    host_start_update();
+    lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0x42, stride * height);
+    {
+        SMALL_RECT body = { 0, 0, 63, 47 };
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+    }
+    (*paint_v7ptr)(pattern, (word)0, (word)0);
+    host_end_update();
+    assert(pixels[0] == 0xff);
+    outb(0x3c4, 0xa5); outb(0x3c5, 0);
+    assert(pixels[0] == 0x42);
+    outb(0x3c5, 0x80);
+    assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     outb(0x3c5, 0x80);
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     outb(0x3c5, 0x81);
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     outb(0x3c5, 1);
-    assert(pixels[0] == 0x62);
+    assert(pixels[0] == 0x42);
     assert(softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
     outb(0x3c5, 0);
     assert(!softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom));
+    /* Packed monochrome body conversion must precede the final pointer. */
+    painter.bmiHeader.biBitCount = 1;
+    assert(softpc_standalone_dib_bind(&painter));
+    host_mark_screen_refresh();
+    host_start_update();
+    lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0, 8u * height);
+    {
+        SMALL_RECT body = { 0, 0, 63, 47 };
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+    }
+    host_end_update();
+    outb(0x3c4, 0xa5); outb(0x3c5, 0x80);
+    (*clear_v7ptr)((word)0, (word)0);
+    (void)softpc_standalone_dib_take_dirty(&left, &top, &right, &bottom);
+    host_start_update();
+    host_end_update();
+    assert(pixels[0] == 0xff);
+    host_start_update();
+    lib_memory_set(sc.ConsoleBufInfo.lpBitMap, 0xff, 8u * height);
+    {
+        SMALL_RECT body = { 0, 0, 63, 47 };
+        assert(InvalidateConsoleDIBits(sc.ScreenBufHandle, &body));
+    }
+    (*paint_v7ptr)(pattern, (word)0, (word)0);
+    host_end_update();
+    assert(pixels[0] == 0xff);
+    outb(0x3c4, 0xa5); outb(0x3c5, 0);
+    assert(pixels[0] == 1);
     lib_memory_copy(EGA_planes + pattern, saved_pattern, sizeof(saved_pattern));
 }
 

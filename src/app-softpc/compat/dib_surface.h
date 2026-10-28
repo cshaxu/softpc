@@ -27,6 +27,8 @@ int softpc_standalone_dib_bind(PBITMAPINFO painter_info);
  * damage update remains private until the matching outer end. */
 void softpc_standalone_dib_begin_update(void);
 void softpc_standalone_dib_end_update(void);
+void softpc_standalone_dib_begin_host_update(void);
+void softpc_standalone_dib_end_host_update(void);
 BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect, BOOL body);
 unsigned long softpc_standalone_dib_generation(void);
 /* Pointer composition may follow body painting inside the outer update. */

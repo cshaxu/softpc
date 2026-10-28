@@ -109,6 +109,11 @@ Compat 在 outer end 才把累计 damage 交给 VM copied-frame 路径。此窄�
 P2/P3 的来源分类逻辑，x86/x64 transaction 与 V7 frame smoke 覆盖 bind、嵌套、palette、
 pointer 及连续未消费 damage；不新增原始机器行为分支。
 
+T99 S15 将此既有事务桥的两个 Compat 调用替换为 host-update 入口；
+硬件寄存器与原始画面主体仍由原代码处理，Compat 在外层事务内先移除
+V7 指针、完成主体与必要的单色转换、再重画指针并提交。该桥只改变
+host 调用目标，不增加原始设备行为分支。验证以 S15 任务记录为准。
+
 ### T69 V7 helper removal; retained painter geometry
 
 S2 temporarily centralized three original V7 BIOS-mode conversions in

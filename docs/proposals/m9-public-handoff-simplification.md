@@ -2,6 +2,55 @@
 
 ## Admission and scope
 
+### S15 admission: V7 pointer/body handoff
+
+Owner requests: 好，请你准入一个新的S完成此项修复，并补上最小必要测试覆盖此情况，老规矩完成后编译发布测试提交推送等我验收.
+The retained V7 compositor saves a background and restores it when redrawing;
+an original full body repaint can therefore be overwritten by the old saved
+background. An existing App VGA fixture now exercises actual callbacks and
+pixel values for a changed body followed by pointer disable. Baseline x64
+fails the new `pixels[0] == 0x42` assertion. This confirms the sequence, not a
+reproduction of every observed guest trail. No production repair is yet made.
+Investigate nested transactions and packed mono conversion before choosing the
+single transaction implementation. Both widths and the full requested tests
+remain outstanding; do not treat the intentional baseline failure as delivery.
+
+**Implementation and qualification.** The existing original host transaction
+bridge now calls Compat host-update entry points. The outer host transaction
+removes the V7 overlay before body painting; at its end it finishes any packed
+monochrome conversion, restores the original controller-selected pointer and
+commits the existing accumulated damage. Nested updates retain the existing
+depth. The ordinary standalone damage transaction remains its existing path.
+No new frame owner, thread, timeout, polling or public component is added.
+The retained callbacks still own the 32x32 saved background and pattern logic.
+
+Against 844c7e17, production is +33/-3 (Compat C +29/-1, internal header +2,
+mirror host bridge +2/-2); test C +43/-1. Only the two existing mirror bridge
+calls change, with current local body hash a568b07b2859a96a2c001ef12960b13156903b9da88af5eaf9ee96be1c4d8d4c;
+XP raw/subset identities and source selection are unchanged. The existing VGA
+fixture verifies changed background after clearing and packed monochrome
+conversion, including an otherwise empty host update. The first 8-bit baseline
+failed the expected new-background assertion; an intermediate implementation
+passed that case but failed monochrome and then empty-monochrome assertions.
+The final focused x64 fixture passes. Existing move, clipping, palette, nested
+update and resize tests remain; these do not prove every real guest trail.
+
+Cached final x64/x86 builds refresh both EXEs. Each passes 193/193 registered
+tests: 185 background, five native desktop, three native audio; JUnit names
+match the registered inventory with no failures or skips. The earlier x64
+desktop package attempt failed stage 5 while waiting for the DOS prompt and
+the child remained alive; its compact and three Lib desktop tests passed. Its
+cause was not established, and this final passing run is not claimed as a repair
+of that intermittent result. Initial expected fixture failures and this failed
+package run are not concealed. Warnings in preserved mirror headers remain;
+no non-mirror warnings were observed. INI/media/snapshot are unchanged.
+
+Published SHA-256: softpc32 C411721341B38CCCF184C27A12201AFA97BEF931FD7E15D96D8772303985B13C;
+softpc64 FEADEBB940AC53A139012B8F488AE7BB16EAD620A8C7672C7BAE19ED7F3CD81D.
+The private pixel tests prove the addressed source sequence and final suite
+proves the registered scenarios; neither establishes that all guest cursor
+trails have been independently reproduced or eliminated. Await owner testing.
+
 ### S14 admission: original cursor-shape semantics
 
 Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;

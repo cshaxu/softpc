@@ -301,6 +301,29 @@ void softpc_standalone_dib_begin_update(void)
     ++softpc_dib_update_depth;
 }
 
+extern void draw_v7ptr(void);
+static void softpc_standalone_dib_finish_update(int copied);
+
+void softpc_standalone_dib_begin_host_update(void)
+{
+    softpc_standalone_dib_begin_update();
+    if (softpc_dib_update_depth == 1u) (*clear_v7ptr)(0, 0);
+}
+
+void softpc_standalone_dib_end_host_update(void)
+{
+    int copied = 0;
+    if (softpc_dib_update_depth == 1u) {
+        if (softpc_dib_painter_bits_per_pixel == 1u) {
+            (*clear_v7ptr)(0, 0);
+            copied = !softpc_dib_pending_dirty_valid ||
+                softpc_standalone_dib_copy_pending();
+        }
+        draw_v7ptr();
+    }
+    softpc_standalone_dib_finish_update(copied);
+}
+
 unsigned long softpc_standalone_dib_generation(void)
 {
     return softpc_dib_generation;
@@ -314,6 +337,11 @@ int softpc_standalone_dib_body_ready(void)
 
 void softpc_standalone_dib_end_update(void)
 {
+    softpc_standalone_dib_finish_update(0);
+}
+
+static void softpc_standalone_dib_finish_update(int copied)
+{
     if (softpc_dib_update_depth == 0u) return;
     --softpc_dib_update_depth;
     /* Original text updates (including font/mode refreshes) commit here even
@@ -322,7 +350,7 @@ void softpc_standalone_dib_end_update(void)
         softpc_text_dirty = 1;
     if (softpc_dib_update_depth != 0u || !softpc_dib_pending_dirty_valid)
         return;
-    if (!softpc_standalone_dib_copy_pending()) {
+    if (!copied && !softpc_standalone_dib_copy_pending()) {
         softpc_dib_pending_dirty_valid = 0;
         return;
     }
