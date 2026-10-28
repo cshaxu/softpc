@@ -99,6 +99,18 @@ CE9FB9E203E5C5FCF4AD6DCE98708418119804B47496B0ABFC157DBE870BFC3B;
 softpc64 8B0816A7D97C950E328A001B0EECB561D29D32D59D5F9C5874E057A0B197B1C5.
 INI SHA-256 remains 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D.
 
+**Follow-up actual-commit review.** Executor 099e2104 is reviewed against
+the owner-approved minimal unified scope. The body flag is carried only in
+the already-existing pending-damage value and is reset with that value;
+all callers continue through the same commit and existing body conversion.
+The fixture retains its indexed assertions and adds monochrome palette and
+full-invalidation pixel checks. Both committed EXE blobs match the published
+files. No public component or mirror path changes, extra rendering path,
+pointer owner or cleanup mechanism is introduced. Disconnected package
+failures and the scope of the subsequent passing connected groups remain
+explicitly recorded. Documentation, whitespace and residue checks pass.
+S15 awaits owner acceptance; T99 remains open.
+
 ### S14 admission: original cursor-shape semantics
 
 Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;

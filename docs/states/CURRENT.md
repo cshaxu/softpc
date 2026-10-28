@@ -13,8 +13,8 @@ Both EXEs were refreshed and manually accepted. Owner then approves a further
 minimal repair for the audited monochrome palette-update pointer defect.
 Follow-up builds refresh both EXEs; each architecture passes all 193 tests
 using its background run and connected-session desktop/native runs. The earlier
-disconnected package failures are retained in the proposal. S15 remains active
-for actual-commit review and owner acceptance; T99 stays open.
+disconnected package failures are retained in the proposal. Executor 099e2104
+is pushed and actual-commit reviewed; S15 awaits owner acceptance. T99 stays open.
 
 ## M9 T99 S15 Packet
 
