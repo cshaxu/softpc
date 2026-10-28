@@ -2,42 +2,16 @@
 
 ## Current Work
 
-Owner accepts S16 audit and admits T99 S17: import NXVM public eight trees at
-`346094bf2b166a547b0a38abe1c98b8956e77fd6`. T99 remains open. The import and dual builds are verified with passing evidence
-for 193 unique tests per width; compact Console required isolated supplements
-after recorded first-run failures. Actual physical snapping remains unverified;
-see the [S17 record](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review). Executor 7a262fb1 is pushed and actual-diff coordinator review is complete; S17 awaits owner acceptance.
-
-## M9 T99 S17 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner authorizes exact import, dual build, publication, full tests and quality review. |
-| Objective | Import the audited NXVM public eight trees exactly at the pinned revision. |
-| Non-goals | No NXVM modifications, unrelated App or mirror changes, or user configuration/media changes. |
-| Reference Baseline | SoftPC ccd846a55; NXVM 346094bf2b166a547b0a38abe1c98b8956e77fd6. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Four shared src/test pairs and manifests; existing private Window behavior changes, no public ABI change. |
-| Applicable Rules | Execution, architecture, coding, documentation and source policies. |
-| Verification | Compare all eight trees against pinned commit; cached x86/x64 full builds, focused and complete registered tests including desktop and audio; documentation and residue gates. |
-| Expected Markers | Eight trees byte-identical; full test inventory reported; snap restore fixture and desktop limits disclosed. |
-| Asset Needs | Publish two EXEs only; preserve INI, guest media and snapshots. |
-| Reporting Requirements | Actual diff counts, builds, tests, hashes, code review and physical snap verification limits. |
-| Stop Conditions | Preserve unrelated changes; no claims of unexecuted tests; no Computer Use. |
-| Exit Criteria | Executor delivery pushed and actual-diff review; await owner acceptance. |
-| Original Owner Request | 好 批准一个s任务导入 老规矩 |
-| Similar-Issue Sweep | Review changed Window scale transitions, fixture ownership, timeouts and related tested paths. |
-
-Scratch: `build/t99-s17` is disposable, owned by this task, with two-hour
-execution and 30-minute no-progress observation budgets; retire after jobs exit.
+Owner accepts and closes T99 S17; see its [closure](../history/M9-T99-S17-public-import.md).
+No implementation subtask is active. Open task awaiting owner: T99.
+The runtime-performance candidate remains in Queue.
 
 ## Technical Baseline
 
-Latest published binaries are S15's palette follow-up build; their hashes and
-full 193-case-per-width qualification are in the
-[implementation record](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
-The following S13 and earlier paragraphs retain their delivery-time evidence.
+Latest published binaries are S17's shared Window import build; hashes and
+193-case-per-width supplemented qualification are in its
+[implementation record](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review).
+The following S15 and earlier paragraphs retain their delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,
 blobs and modes match exactly. Production is unchanged; test C -7 lines and
