@@ -6,7 +6,7 @@ Owner accepts S16 audit and admits T99 S17: import NXVM public eight trees at
 `346094bf2b166a547b0a38abe1c98b8956e77fd6`. T99 remains open. The import and dual builds are verified with passing evidence
 for 193 unique tests per width; compact Console required isolated supplements
 after recorded first-run failures. Actual physical snapping remains unverified;
-see the [S17 record](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review).
+see the [S17 record](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review). Executor 7a262fb1 is pushed and actual-diff coordinator review is complete; S17 awaits owner acceptance.
 
 ## M9 T99 S17 Packet
 
