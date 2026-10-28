@@ -2,6 +2,48 @@
 
 ## Admission and scope
 
+### S16: NXVM public eight-tree import audit
+
+Owner request: 好，收口S15准入一个S16，审计一下NXVM当前我们可导入的公共八组件的代码改动和代码质量情况，给我一个汇报。
+Read-only inventory covers all eight corresponding src/test trees, with each
+path classified as equal, changed, only SoftPC or only NXVM. SoftPC baseline is
+2faad954; NXVM HEAD observed 06ce2710d3a67c4cacdcb3f6e0402b14459c021f.
+The observed NXVM worktree has four modified public paths: Window component,
+Window fixture and their two manifests. Recheck before any later import.
+
+There are 296 files on each side and identical paths. Eight differ: src/lib
+component.c and manifest; test/lib CMakeLists.txt, types_layout_selftest.cmake,
+Window capture fixture and manifest; test/emulator CMakeLists.txt and manifest.
+The other five trees, plus src/emulator, match byte-for-byte. The shared root
+test/register.cmake also matches. Component and Window fixture hashes match the
+modified NXVM manifests. No external build or test was run for this audit.
+
+NXVM's active S85 is still qualifying an uncommitted Window change: prevent
+the system minimum size from becoming persistent scale, retain snap-region
+ratio during frame changes, and record user sizing at EXITSIZEMOVE. Its CURRENT
+reports the latest draft passes focused dual-width tests; prior full suites
+predate it. Existing fixture checks snap geometry immediately after restore but
+does not assert the next frame's scale after a restore delivered only by
+WM_SIZE. Since WM_SIZE no longer records scale, that scenario can retain an
+older scale; whether actual Windows emits WM_SIZING/EXITSIZEMOVE for the user's
+snap restoration requires native message-path proof. The real desktop fixture
+also injects sizing without an enter/exit sequence and does not test this
+restore-then-frame behavior. This is a concrete coverage gap and conditional
+regression risk, not a claimed real-desktop reproduction. Obtain evidence
+before declaring the current draft safe to import.
+
+Committed NXVM test changes extend exact fixture budgets (two Lib selftests
+30 -> 300 seconds; Emulator verifier 60 -> 300) and replace a long list of
+fixture-file removals with recursive cleanup of its owned types-layout-fixture.
+Normal registration supplies TEST_WORK_DIR from the package binary directory;
+verify fixture ownership/path safety and isolated negative/positive behavior
+for downstream contexts. Timeouts are test budgets, not production waits, but
+the 300-second value should be judged against measured failures rather than
+assumed necessary. No added platform dependency or public API change appears
+in the bounded diff. Recommendation: wait for upstream final qualification
+and check snap restore/frame sequence and cleanup safety before exact import;
+do not silently merge only a subset. User decides import as a separate step.
+
 ### S15 admission: V7 pointer/body handoff
 
 Owner requests: 好，请你准入一个新的S完成此项修复，并补上最小必要测试覆盖此情况，老规矩完成后编译发布测试提交推送等我验收.

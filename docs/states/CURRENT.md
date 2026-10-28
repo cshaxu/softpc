@@ -2,40 +2,36 @@
 
 ## Current Work
 
-Owner accepts S14 and admits T99 S15 to repair V7 pointer trails. T99 remains
-open; Queue retains the unnumbered runtime-performance candidate.
+Owner accepts and closes T99 S15; see its [closure](../history/M9-T99-S15-v7-pointer.md).
+Owner admits S16 to audit NXVM's current public eight trees. T99 remains open;
+the unnumbered performance candidate remains in Queue.
 
-S15 final implementation and dual-width qualification are recorded in the
-[proposal](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
-Both architectures pass all 193 registered cases with exact inventory match;
-the earlier x64 package stage-5 failure and proof limits remain documented.
-Both EXEs were refreshed and manually accepted. Owner then approves a further
-minimal repair for the audited monochrome palette-update pointer defect.
-Follow-up builds refresh both EXEs; each architecture passes all 193 tests
-using its background run and connected-session desktop/native runs. The earlier
-disconnected package failures are retained in the proposal. Executor 099e2104
-is pushed and actual-commit reviewed; S15 awaits owner acceptance. T99 stays open.
+S16's read-only eight-tree comparison found eight differing files among 296;
+upstream Window changes remain uncommitted and NXVM S85 is active. The
+[audit](../proposals/m9-public-handoff-simplification.md#s16-nxvm-public-eight-tree-import-audit)
+records the frozen observation, snap-restoration test gap, test infrastructure
+changes, evidence limits and recommendation to wait before exact import.
 
-## M9 T99 S15 Packet
+## M9 T99 S16 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the V7 pointer repair, minimal regression, dual builds, release, tests and push; then approves a minimal unified monochrome palette-update follow-up. |
-| Objective | Preserve current body pixels when the original V7 hardware pointer is cleared, redrawn or moved across display updates. |
-| Non-goals | No public component, guest configuration, media or snapshot format changes; no separate renderer or polling. |
-| Reference Baseline | S14 accepted at 844c7e17. Read-only comparison found stale saved background can overwrite the newly painted body. |
+| Admission And Approval | Owner closes S15 and admits S16: audit current NXVM public eight components and report. |
+| Objective | Compare and assess all importable shared source and test trees, including uncommitted NXVM content. |
+| Non-goals | No import, public code change, external repository modification, asset rebuild or T99 closure. |
+| Reference Baseline | SoftPC 2faad954; record the observed NXVM commit and working-tree hashes. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Existing Compat DIB transaction and pointer callbacks, existing VGA fixture, task records and dual EXEs; preserve original video owner. |
+| Files And ABI Surface | Four shared src/test pairs; task records only may change. |
 | Applicable Rules | Execution, architecture, coding, documentation and source policies. |
-| Verification | Focused actual-path pixel and transaction tests; dual cached builds and complete registered background, desktop and native-audio regression. |
-| Expected Markers | Clear before body painting; redraw after body and before publication, retaining nested transactions and mode changes. |
-| Asset Needs | Publish both assets/binary EXEs; preserve user INI, guest media and snapshots. No Computer Use. |
-| Reporting Requirements | Record actual source/test counts, mirror diff, tests, artifacts and review. Scratch build/t99-s15; 30-minute job budget, five-minute no-progress, 300 MB cap. |
-| Stop Conditions | Report if correct repair requires a second path, unapproved external mutation, or unsafe lifecycle change. |
-| Exit Criteria | Correct minimal repair, focused and full dual-width qualification, two published EXEs, actual diff review, commit and push; wait for owner acceptance. |
-| Original Owner Request | 好，请你准入一个新的S完成此项修复，并补上最小必要测试覆盖此情况，老规矩完成后编译发布测试提交推送等我验收. |
-| Similar-Issue Sweep | Examine body refresh, partial and split paths, nested updates, pointer register changes, palette, 1-bit conversion, resize and teardown. |
+| Verification | Inventory paths and byte hashes, review each changed production and test file, dependencies and manifests; distinguish static findings from executed tests. |
+| Expected Markers | Separate shared-corpus differences from NXVM private files and identify exact import risks and consumer adaptation. |
+| Asset Needs | None; preserve INI, guest media and both EXEs. |
+| Reporting Requirements | Report source and test diff by component, quality findings, test evidence, frozen upstream state and import recommendation. |
+| Stop Conditions | Do not import or modify NXVM; report moving upstream baseline or unverified behavior. |
+| Exit Criteria | Complete bounded audit and report; await owner decision on import. |
+| Original Owner Request | 好，收口S15准入一个S16，审计一下NXVM当前我们可导入的公共八组件的代码改动和代码质量情况，给我一个汇报。 |
+| Similar-Issue Sweep | Check changed contracts, related platform backends, existing failure paths and owner-local tests. |
 
 ## Technical Baseline
 
