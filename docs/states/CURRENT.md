@@ -9,7 +9,8 @@ S15 final implementation and dual-width qualification are recorded in the
 [proposal](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
 Both architectures pass all 193 registered cases with exact inventory match;
 the earlier x64 package stage-5 failure and proof limits remain documented.
-Both EXEs are refreshed; await actual-diff review, push and owner acceptance.
+Both EXEs are refreshed. Executor 81a7a096 is pushed and actual-commit reviewed;
+scratch is retired. S15 awaits owner acceptance; T99 remains open.
 
 ## M9 T99 S15 Packet
 

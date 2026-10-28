@@ -51,6 +51,17 @@ The private pixel tests prove the addressed source sequence and final suite
 proves the registered scenarios; neither establishes that all guest cursor
 trails have been independently reproduced or eliminated. Await owner testing.
 
+**Coordinator actual-commit review.** Reviewed executor 81a7a096 against the
+owner request, the existing host transaction, all original V7 pointer call
+sites, the 8-bit and packed-mono producer paths, fixture assertions, mirror
+manifest and the final registered test inventory. The existing update-depth
+boundary owns ordering; no extra frame owner, thread, polling or public-package
+change was introduced. Published EXE Git blobs match the committed assets.
+The first desktop package failure remains disclosed; no root cause is claimed.
+The dynamic tests prove the covered pixel sequences, not every guest behavior.
+Documentation, whitespace and residue gates pass; scratch is retired. No
+delivery blocker found. S15 remains open for owner acceptance; T99 stays open.
+
 ### S14 admission: original cursor-shape semantics
 
 Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;
