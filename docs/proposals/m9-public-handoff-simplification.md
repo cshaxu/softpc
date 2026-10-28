@@ -62,6 +62,43 @@ The dynamic tests prove the covered pixel sequences, not every guest behavior.
 Documentation, whitespace and residue gates pass; scratch is retired. No
 delivery blocker found. S15 remains open for owner acceptance; T99 stays open.
 
+**Owner-approved palette follow-up in progress.** The owner manually accepted
+the earlier cursor-trail repair, then requested a minimal unified repair for
+the audited packed-monochrome palette-update gap. An assertion in the existing
+VGA fixture fails on the prior source: after a palette update, the visible
+pointer pixel was overwritten. A first candidate wrapping all invalidation in
+the host transaction instead failed the existing indexed pointer/palette check
+and was discarded. The current candidate tags body damage in the existing
+pending-damage bit field and converts packed pixels only when body data changed.
+Palette and invalidation retain the same transaction and commit; no pointer
+owner or renderer is added. Focused x64 and both complete background groups
+pass; full dual-width qualification is not yet complete. An initial x64 desktop
+run while the Windows session reported disconnected failed both package cases
+at stage 3 with child exit 1 and `cannot compose machine`; this correlation
+does not prove the cause. Three Lib desktop cases passed. Await connected-session
+rerun; do not describe the failed attempt as a pass.
+
+**Follow-up qualification.** Relative to dd10399b, production is +4/-1 in
+the existing Compat DIB owner, test C +4/-0. `body` damage sets one bit in the
+existing pending-damage value; the existing packed conversion skips copying
+when only presentation damage is pending. Both palette and explicit full
+invalidation now preserve the visible pointer in the existing VGA fixture.
+The 8-bit callback/palette assertion remains intact; no extra callback,
+renderer, persistent frame or device policy is added. No public eight-tree,
+mirror, INI, media or snapshot change is made. No automatic recovery or test
+override is introduced.
+
+Both cached dual builds refreshed the EXEs. Each architecture's 185 background
+registrations passed; after session reconnection, each architecture's five
+desktop and three native-audio tests passed. Registered/executed names match
+exactly (193 each), with zero failures/skips in those combined groups. The
+previous disconnected-session package failures remain a separate failed run,
+not proof of their cause or of an independent product repair. No non-mirror
+warnings were observed. Published SHA-256: softpc32
+CE9FB9E203E5C5FCF4AD6DCE98708418119804B47496B0ABFC157DBE870BFC3B;
+softpc64 8B0816A7D97C950E328A001B0EECB561D29D32D59D5F9C5874E057A0B197B1C5.
+INI SHA-256 remains 38D9EECD0A002FA6BF924D5F87BDA154C71D89A2790674965739179C2D56623D.
+
 ### S14 admission: original cursor-shape semantics
 
 Owner requests: 1. 准入新S：原始 VGA 光标结束扫描线及回绕语义审计，可能涉及光标粗细;

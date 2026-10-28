@@ -9,15 +9,19 @@ S15 final implementation and dual-width qualification are recorded in the
 [proposal](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
 Both architectures pass all 193 registered cases with exact inventory match;
 the earlier x64 package stage-5 failure and proof limits remain documented.
-Both EXEs are refreshed. Executor 81a7a096 is pushed and actual-commit reviewed;
-scratch is retired. S15 awaits owner acceptance; T99 remains open.
+Both EXEs were refreshed and manually accepted. Owner then approves a further
+minimal repair for the audited monochrome palette-update pointer defect.
+Follow-up builds refresh both EXEs; each architecture passes all 193 tests
+using its background run and connected-session desktop/native runs. The earlier
+disconnected package failures are retained in the proposal. S15 remains active
+for actual-commit review and owner acceptance; T99 stays open.
 
 ## M9 T99 S15 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves the V7 pointer repair, minimal regression, dual builds, release, tests and push. |
+| Admission And Approval | Owner approves the V7 pointer repair, minimal regression, dual builds, release, tests and push; then approves a minimal unified monochrome palette-update follow-up. |
 | Objective | Preserve current body pixels when the original V7 hardware pointer is cleared, redrawn or moved across display updates. |
 | Non-goals | No public component, guest configuration, media or snapshot format changes; no separate renderer or polling. |
 | Reference Baseline | S14 accepted at 844c7e17. Read-only comparison found stale saved background can overwrite the newly painted body. |
@@ -35,9 +39,9 @@ scratch is retired. S15 awaits owner acceptance; T99 remains open.
 
 ## Technical Baseline
 
-Latest published binaries are S14's verified, owner-accepted build;
-their hashes and full 193-case-per-width qualification are in the
-[implementation record](../proposals/m9-public-handoff-simplification.md#s14-approved-implementation).
+Latest published binaries are S15's palette follow-up build; their hashes and
+full 193-case-per-width qualification are in the
+[implementation record](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
 The following S13 and earlier paragraphs retain their delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,

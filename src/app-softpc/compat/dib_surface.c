@@ -31,6 +31,7 @@ static int softpc_dib_pending_dirty_valid;
 /* Pending damage uses bit 1 for body participation in an original full
    refresh. Pointer/palette damage never establishes a new surface. */
 #define SOFTPC_DIB_BODY_REFRESH 2
+#define SOFTPC_DIB_BODY_DIRTY 4
 static int softpc_dib_ready;
 static unsigned long softpc_dib_update_depth;
 static unsigned long softpc_dib_generation;
@@ -107,7 +108,8 @@ static BOOL softpc_standalone_dib_copy_pending(void)
         return FALSE;
     /* Indexed painters and the V7 pointer already share the output surface.
        Copying a second background over it would erase the composed pointer. */
-    if (softpc_dib_painter_bits_per_pixel == 8u) return TRUE;
+    if (softpc_dib_painter_bits_per_pixel == 8u ||
+        !(softpc_dib_pending_dirty_valid & SOFTPC_DIB_BODY_DIRTY)) return TRUE;
     left = softpc_dib_pending_dirty.Left;
     top = softpc_dib_pending_dirty.Top;
     right = softpc_dib_pending_dirty.Right;
@@ -389,6 +391,7 @@ BOOL softpc_standalone_dib_damage(const SMALL_RECT *rect, BOOL body)
     if (own_update) softpc_standalone_dib_begin_update();
     (void)softpc_standalone_dib_merge(&softpc_dib_pending_dirty,
         &softpc_dib_pending_dirty_valid, rect);
+    if (body) softpc_dib_pending_dirty_valid |= SOFTPC_DIB_BODY_DIRTY;
     /* screen_refresh_required's 1000000 sentinel selects a whole-screen
        repaint; a successful incremental body patch is not that proof. */
     if (body && !softpc_dib_ready && softpc_dib_generation != 0u &&

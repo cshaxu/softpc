@@ -233,6 +233,10 @@ static void verify_pointer_update_pixels(void)
     (*paint_v7ptr)(pattern, (word)0, (word)0);
     host_end_update();
     assert(pixels[0] == 0xff);
+    softpc_standalone_dib_set_palette_entries(&palette, 1);
+    assert(pixels[0] == 0xff);
+    softpc_standalone_dib_invalidate_all();
+    assert(pixels[0] == 0xff);
     outb(0x3c4, 0xa5); outb(0x3c5, 0);
     assert(pixels[0] == 1);
     lib_memory_copy(EGA_planes + pattern, saved_pattern, sizeof(saved_pattern));
