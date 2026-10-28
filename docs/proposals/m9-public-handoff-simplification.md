@@ -3802,3 +3802,46 @@ The complete name ledger and disconnected-history qualifications above agree
 with the inspected XML results. Documentation, whitespace and build-residue
 checks pass; scratch has been removed after all owned jobs exited. S2 remains
 verified awaiting owner acceptance, with T99 open and S3/S4 not admitted.
+
+
+### S17 admission: exact NXVM shared import
+
+Frozen universe: 296 paths across four public src/test pairs at NXVM
+`346094bf2b166a547b0a38abe1c98b8956e77fd6`. The eight changed paths are
+the Lib Window implementation and manifest, four Lib test paths, and Emulator
+test CMake and manifest. Exact bytes and file set must match the pinned commit.
+S16 identified no import blocker; controlled snap restore is tested upstream,
+while actual physical snap/drag order remains unverified. Receiver qualification
+requires x86/x64 builds, all registered tests, packages and actual-diff review.
+
+
+### S17 import qualification and self-review
+
+All 296 paths across the eight shared trees are byte-identical to pinned NXVM
+346094bf2. Production C +33/-6 (net +27); test C/CMake +60/-28 (net +32),
+excluding manifest and documentation. The Window change retains the existing
+scale/snap path and adds one sizing marker; no public API, outward dependency,
+retry or second renderer is introduced. The fixture lock and its cleanup own
+only the Types test fixture; changed test budgets are targeted. Review covers
+the initial minimum, manual sizing, snapped frame and restore transitions;
+physical Windows snap/drag message ordering is not independently tested.
+
+Cached x64/x86 builds succeeded and refreshed both EXEs, with no compiler
+warnings reported. Each architecture has passing evidence for all 193 distinct
+registered tests: 185 background, five desktop and three native-audio. The
+complete desktop groups initially failed compact Console at stage 1/error 6
+with child exit 0xc0000142 on each width; x64 repeated this on a second full
+desktop invocation. The unchanged isolated test subsequently passed on both
+widths. This is supplemental evidence, not an uninterrupted full green run
+or a claim that the pre-existing startup failure was fixed.
+
+Two initial sandboxed Ninja attempts stalled in Windows I/O completion with no
+visible compile subprocess; they were terminated as failed execution attempts,
+not test results. A normal authorized execution environment completed the builds
+and tests. Both EXEs were published:
+
+- softpc32: FF467362EA83C0A960A13CE5E1CC7304BDC177B5A2788B3886CE3FBBD692E134
+- softpc64: 24F3B9AE9D7E0EECE0092C7554E9D11874F7D439D604F91E1335E13FF70DA3D0
+
+User INI, media and snapshots are unchanged. Native physical snapping remains
+an owner acceptance item; no Computer Use was performed.

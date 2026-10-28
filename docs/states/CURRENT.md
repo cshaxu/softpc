@@ -2,36 +2,35 @@
 
 ## Current Work
 
-Owner accepts and closes T99 S15; see its [closure](../history/M9-T99-S15-v7-pointer.md).
-Owner admits S16 to audit NXVM's current public eight trees. T99 remains open;
-the unnumbered performance candidate remains in Queue.
+Owner accepts S16 audit and admits T99 S17: import NXVM public eight trees at
+`346094bf2b166a547b0a38abe1c98b8956e77fd6`. T99 remains open. The import and dual builds are verified with passing evidence
+for 193 unique tests per width; compact Console required isolated supplements
+after recorded first-run failures. Actual physical snapping remains unverified;
+see the [S17 record](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review).
 
-S16's read-only eight-tree comparison found eight differing files among 296;
-upstream Window changes remain uncommitted and NXVM S85 is active. The
-[audit](../proposals/m9-public-handoff-simplification.md#s16-nxvm-public-eight-tree-import-audit)
-records the frozen observation, snap-restoration test gap, test infrastructure
-changes, evidence limits and recommendation to wait before exact import.
-
-## M9 T99 S16 Packet
+## M9 T99 S17 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S15 and admits S16: audit current NXVM public eight components and report. |
-| Objective | Compare and assess all importable shared source and test trees, including uncommitted NXVM content. |
-| Non-goals | No import, public code change, external repository modification, asset rebuild or T99 closure. |
-| Reference Baseline | SoftPC 2faad954; record the observed NXVM commit and working-tree hashes. |
+| Admission And Approval | Owner authorizes exact import, dual build, publication, full tests and quality review. |
+| Objective | Import the audited NXVM public eight trees exactly at the pinned revision. |
+| Non-goals | No NXVM modifications, unrelated App or mirror changes, or user configuration/media changes. |
+| Reference Baseline | SoftPC ccd846a55; NXVM 346094bf2b166a547b0a38abe1c98b8956e77fd6. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Four shared src/test pairs; task records only may change. |
+| Files And ABI Surface | Four shared src/test pairs and manifests; existing private Window behavior changes, no public ABI change. |
 | Applicable Rules | Execution, architecture, coding, documentation and source policies. |
-| Verification | Inventory paths and byte hashes, review each changed production and test file, dependencies and manifests; distinguish static findings from executed tests. |
-| Expected Markers | Separate shared-corpus differences from NXVM private files and identify exact import risks and consumer adaptation. |
-| Asset Needs | None; preserve INI, guest media and both EXEs. |
-| Reporting Requirements | Report source and test diff by component, quality findings, test evidence, frozen upstream state and import recommendation. |
-| Stop Conditions | Do not import or modify NXVM; report moving upstream baseline or unverified behavior. |
-| Exit Criteria | Complete bounded audit and report; await owner decision on import. |
-| Original Owner Request | 好，收口S15准入一个S16，审计一下NXVM当前我们可导入的公共八组件的代码改动和代码质量情况，给我一个汇报。 |
-| Similar-Issue Sweep | Check changed contracts, related platform backends, existing failure paths and owner-local tests. |
+| Verification | Compare all eight trees against pinned commit; cached x86/x64 full builds, focused and complete registered tests including desktop and audio; documentation and residue gates. |
+| Expected Markers | Eight trees byte-identical; full test inventory reported; snap restore fixture and desktop limits disclosed. |
+| Asset Needs | Publish two EXEs only; preserve INI, guest media and snapshots. |
+| Reporting Requirements | Actual diff counts, builds, tests, hashes, code review and physical snap verification limits. |
+| Stop Conditions | Preserve unrelated changes; no claims of unexecuted tests; no Computer Use. |
+| Exit Criteria | Executor delivery pushed and actual-diff review; await owner acceptance. |
+| Original Owner Request | 好 批准一个s任务导入 老规矩 |
+| Similar-Issue Sweep | Review changed Window scale transitions, fixture ownership, timeouts and related tested paths. |
+
+Scratch: `build/t99-s17` is disposable, owned by this task, with two-hour
+execution and 30-minute no-progress observation budgets; retire after jobs exit.
 
 ## Technical Baseline
 
