@@ -2,46 +2,38 @@
 
 ## Current Work
 
-Owner admits T99 S18 to remove confirmed unused whole mirror files. T99 stays
-open; no partial in-file branch pruning or Compat rewrite is admitted. Dual
-builds and all 193 tests per architecture pass first run; the two new EXEs
-are byte-identical to S17 after zeroing PE timestamp/checksum only. Raw EXEs
-are not byte-identical. Executor 664be095 is pushed and the actual commit is
-reviewed. Owner extends S18 to remove the three unobserved locally patched
-headers. Both cached builds report no work, EXEs are byte-identical to P1,
-and all 193 tests per architecture pass first run; follow-up executor bcbf0bb8 is pushed and actual-change review is complete;
-S18 awaits owner acceptance. See the [S18 record](../proposals/m9-public-handoff-simplification.md#s18-whole-file-mirror-selection).
+Owner accepts and closes S18 and admits S19: audit and simplify the Compat
+compile boundary for the selected fixed mirror configuration. T99 remains open.
 
-## M9 T99 S18 Packet
+## M9 T99 S19 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner authorizes whole-file removal and extends S18 to the three unobserved locally patched headers; dual builds and validation required. |
-| Objective | Remove proven unused mirror files in the supported fixed machine configurations. |
-| Non-goals | Do not prune in-file branches, alter guest behavior, public components, user INI, media or snapshots. |
-| Reference Baseline | SoftPC 36d0d869; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89; prior 676-context branch observation. |
+| Admission And Approval | Owner closes S18 and admits S19 to audit and simplify Compat compile boundary. |
+| Objective | Preserve the selected mirror ABI while removing proven unnecessary Compat compile complexity and const macro pollution. |
+| Non-goals | No general framework, second device path, mirror branch pruning, guest behavior change, or unrelated public component work. |
+| Reference Baseline | SoftPC 8383891d; XP selected machine profile and S18 accepted result. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Selected unused mirror C and headers, including three locally patched NTVDM-only headers, source lists and verification/selection ledgers; no public ABI changes. |
-| Applicable Rules | Execution, architecture, coding, documentation and source policy. |
-| Verification | Prove selected source/header contexts; cached x86/x64 builds, binary before/after comparison, mirror and boundary gates, related and full regression. |
-| Expected Markers | Record each excluded original hash, current source profile and binary differences without assuming linker determinism. |
+| Files And ABI Surface | Compat and necessary build/tests only; no public API change intended. |
+| Applicable Rules | Execution, architecture, coding, documentation and mirror source policy. |
+| Verification | Actual x86/x64 preprocessor and declaration consistency, affected regressions, cached full dual builds, complete unit/gate/integration tests and byte/hash reporting. |
+| Expected Markers | Separate necessary mirror ABI selection from direct Compat flags and accidental const pollution; demonstrate simplified single path. |
 | Asset Needs | Publish both EXEs; preserve user INI, media and snapshots. |
-| Reporting Requirements | Enumerate removed files, selection reason, local patch retention, code changes, proof and both binary hashes. |
-| Stop Conditions | Preserve all unrelated local fixes and changes; owner expressly authorizes removing the three identified local-patch headers; no Computer Use. |
-| Exit Criteria | Verified dual builds and tests, actual diff review, pushed delivery, await owner acceptance. |
-| Original Owner Request | 把确定无用的文件先整文件从项目里移除；带补丁的未使用头文件一起删了吧 |
-| Similar-Issue Sweep | Review all 10 empty-object C files and 20 unobserved headers against actual product/test contexts and local patch identities. |
+| Reporting Requirements | Per-macro disposition, actual production/test diff, test evidence, hashes, failure limits, and independent actual-commit review. |
+| Stop Conditions | Do not alter mirror or add compatibility abstractions; preserve unrelated changes; no Computer Use. |
+| Exit Criteria | Implement reviewed minimal changes, test, publish, commit and push, then await owner acceptance. |
+| Original Owner Request | 准入s19；收口s18 |
+| Similar-Issue Sweep | Audit all Compat translation units and included self-owned declarations for original const pollution and machine-configuration conditionals. |
 
-Scratch `build/t99-s18` belongs to this task; two-hour total and 30-minute
+Scratch `build/t99-s19` belongs to this task; two-hour total and 30-minute
 no-progress observation budgets. Stop owned jobs and retire scratch after evidence.
 
 ## Technical Baseline
 
-Latest published binaries are S17's shared Window import build; hashes and
-193-case-per-width supplemented qualification are in its
-[implementation record](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review).
-The following S15 and earlier paragraphs retain their delivery-time evidence.
+Latest published binaries are S18's mirror cleanup build; hashes and 193-case
+qualification are in its [closure](../history/M9-T99-S18-unused-mirror-files.md).
+The following S17 and earlier paragraphs retain delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,
 blobs and modes match exactly. Production is unchanged; test C -7 lines and

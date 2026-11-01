@@ -3977,3 +3977,15 @@ subset and removed local hashes remain recorded, all public trees and EXEs
 are unchanged, and mirror, documentation, whitespace and residue gates pass.
 Both architectures have first-run passing evidence for every registration.
 S18 awaits owner acceptance; T99 stays open.
+
+
+### S19: fixed mirror compile boundary in Compat
+
+Owner closes S18 and admits a focused audit and minimal cleanup. The finite
+universe is every compiled `src/app-softpc/compat` translation unit and its
+actual x86/x64 selected mirror and own-header include paths. Classify every
+original `const` macro crossing into own declarations, and the PIG/WDCTRL_BOP
+conditions, as required, corrected, or proven harmless with evidence.
+Preserve the selected CCPU/C-VID and native ABI; no mirror files, generic
+macro framework, parallel device implementation, or public trees change.
+Use in-memory preprocessing first and document exact scope before editing.
