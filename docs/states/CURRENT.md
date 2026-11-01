@@ -2,40 +2,35 @@
 
 ## Current Work
 
-Owner accepts and closes S18 and admits S19: audit and simplify the Compat
-compile boundary for the selected fixed mirror configuration. T99 remains open.
+Owner accepts and closes S19 and admits S20 for read-only audit of conditional
+compilation within retained mirror files. T99 remains open.
 
-## M9 T99 S19 Packet
+## M9 T99 S20 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S18 and admits S19 to audit and simplify Compat compile boundary. |
-| Objective | Preserve the selected mirror ABI while removing proven unnecessary Compat compile complexity and const macro pollution. |
-| Non-goals | No general framework, second device path, mirror branch pruning, guest behavior change, or unrelated public component work. |
-| Reference Baseline | SoftPC 8383891d; XP selected machine profile and S18 accepted result. |
+| Admission And Approval | Owner closes S19 and admits S20 audit. |
+| Objective | Audit retained mirror conditional branches against actual x86/x64 profiles and design minimal, reviewable selection cleanup. |
+| Non-goals | No source pruning, build changes, new feature import, or runtime behavior change in this research task. |
+| Reference Baseline | S19 delivery 23f65b5c, selected XP SP1 mirror and existing manifest. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Compat and necessary build/tests only; no public API change intended. |
-| Applicable Rules | Execution, architecture, coding, documentation and mirror source policy. |
-| Verification | Actual x86/x64 preprocessor and declaration consistency, affected regressions, cached full dual builds, complete unit/gate/integration tests and byte/hash reporting. |
-| Expected Markers | Separate necessary mirror ABI selection from direct Compat flags and accidental const pollution; demonstrate simplified single path. |
-| Asset Needs | Publish both EXEs; preserve user INI, media and snapshots. |
-| Reporting Requirements | Per-macro disposition, actual production/test diff, test evidence, hashes, failure limits, and independent actual-commit review. |
-| Stop Conditions | Do not alter mirror or add compatibility abstractions; preserve unrelated changes; no Computer Use. |
-| Exit Criteria | Implement reviewed minimal changes, test, publish, commit and push, then await owner acceptance. |
-| Original Owner Request | 准入s19；收口s18 |
-| Similar-Issue Sweep | Audit all Compat translation units and included self-owned declarations for original const pollution and machine-configuration conditionals. |
+| Files And ABI Surface | Read-only retained mirror, actual build/test contexts, Compat and mirror provenance; task documentation only. |
+| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
+| Verification | Account for a finite file and branch universe; distinguish selected, unselected, unobserved and undetermined; validate actual x86/x64 compiler contexts and dependencies. |
+| Expected Markers | Document possible whole-branch deletions, preserved placeholders, real local patches and potential original-code reuse with evidence. |
+| Asset Needs | No package, user configuration, media, snapshots or source changes. |
+| Reporting Requirements | Explain evidence limits, classify candidates with reasons and estimate mirror diff; propose independently reviewable batches. |
+| Stop Conditions | Do not modify mirror, assume unobserved means safely removable, or use external material as a build dependency. |
+| Exit Criteria | Provide reproducible audit, precise remaining unknowns and actionable proposed next steps; commit and push documentation. |
+| Original Owner Request | 收口s19 准入s20审计 |
+| Similar-Issue Sweep | Include source and header branch chains, compile profiles, shared declarations, and existing local fixes. |
 
-Scratch `build/t99-s19` belongs to this task; two-hour total and 30-minute
-no-progress observation budgets. Stop owned jobs and retire scratch after evidence.
+Disposable research scratch: `build/t99-s20`, owned by S20; two-hour total and
+30-minute no-progress observation budgets. Retire after evidence promotion.
 
-S19 is implemented and awaits owner acceptance. Compat production +27/-35,
-test C +24/-3, root build +4/-0; no public or mirror source changes. Cached
-dual builds refreshed the EXEs. Each architecture has passing evidence for
-all 194 registrations: 186 background, five desktop and three native audio.
-Desktop and native audio were repeated after session reconnection; initial
-disconnected failures are retained in the proposal. Actual-diff review finds no new runtime path, public or mirror modification.
-Task scratch is retired after verification. T99 remains open.
+S19 is owner-accepted and closed; see [closure](../history/M9-T99-S19-compat-boundary.md).
+Its delivery is 23f65b5c. T99 remains open.
 
 ## Technical Baseline
 

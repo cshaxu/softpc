@@ -4024,3 +4024,33 @@ fixed-profile blocks use existing behavior directly. No new runtime path,
 state, polling, public interface, or mirror patch is introduced. The native
 test evidence is a supplemented run rather than a first-pass all-green run;
 user media, INI and snapshots are unchanged.
+
+
+### S20: retained mirror conditional-branch audit (in progress)
+
+Frozen starting universe: the 475 bodies in the current XP manifest at
+S19 delivery `23f65b5c`: 229 C, 241 headers, three ROM, one RAM and one
+extensionless source-list file. The first textual inventory finds conditional
+directive spellings in 109 C files and 85 headers, with 2,887 `#endif` lines.
+This is a discovery inventory, not an actual preprocessing or semantic
+classification: comments, include guards, nesting, multiple build contexts
+and macro redefinitions must be resolved before any removal decision. Binary
+ROM/RAM and the source list are not C preprocessor branch candidates.
+
+The actual x64 CMOS compile command explicitly selects CCPU, CPU_40_STYLE,
+CPU_486, C_VID, PROD, SPC386, V7VGA and WDCTRL_BOP. This alone does not prove
+the value at every later conditional or in every x86, test or include context.
+CMOS combines NTVDM/macintosh alternatives with existing non-NTVDM config
+handling, so it must be analyzed as complete nested chains, not deleted by
+macro search. V7VGA and WDCTRL_BOP include selected device paths and must not
+be treated as unused merely because they are conditional. S18's removed
+NT-only monregs header is still named from a retained inactive CPU_30_STYLE /
+MONITOR branch; its branch is a candidate for detailed audit, not proof that
+the entire containing condition is removable.
+
+Remaining before a deletion proposal: enumerate each branch and its nested
+condition, actual production and test inclusion contexts for both widths,
+source-level redefinitions, shared declarations and selected local patches;
+then map each proposed exclusion against the existing XP subset ledger and
+provide per-file estimates. No branch deletion, compatibility replacement or
+complete-domain claim follows from this initial inventory.
