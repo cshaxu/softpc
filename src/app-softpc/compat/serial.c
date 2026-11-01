@@ -9,7 +9,7 @@
  * has no implicit host serial device: receive queues start empty and output
  * goes to a virtual sink.
  */
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "platform.h"
 

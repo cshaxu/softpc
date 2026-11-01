@@ -4,15 +4,9 @@
 
 #include <limits.h>
 
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "quick_ev.h"
-
-/* Legacy CCPU headers erase const for their K&R declarations.  The new
-   archive boundary is ordinary ANSI C and keeps its read-only contract. */
-#ifdef const
-#undef const
-#endif
 
 struct softpc_device_archive {
     Q_EVENT_SNAPSHOT_STATE events;

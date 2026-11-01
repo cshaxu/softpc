@@ -29,6 +29,14 @@ compile boundary for the selected fixed mirror configuration. T99 remains open.
 Scratch `build/t99-s19` belongs to this task; two-hour total and 30-minute
 no-progress observation budgets. Stop owned jobs and retire scratch after evidence.
 
+S19 is implemented and awaits owner acceptance. Compat production +27/-35,
+test C +24/-3, root build +4/-0; no public or mirror source changes. Cached
+dual builds refreshed the EXEs. Each architecture has passing evidence for
+all 194 registrations: 186 background, five desktop and three native audio.
+Desktop and native audio were repeated after session reconnection; initial
+disconnected failures are retained in the proposal. Actual-diff review finds no new runtime path, public or mirror modification.
+Task scratch is retired after verification. T99 remains open.
+
 ## Technical Baseline
 
 Latest published binaries are S18's mirror cleanup build; hashes and 193-case

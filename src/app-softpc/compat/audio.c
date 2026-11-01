@@ -1,4 +1,4 @@
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "audio.h"
 #include "timer.h"

@@ -1,6 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "lib/kvm-base/frame_interface.h"
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "platform.h"
 #include "devices/snapshot.h"

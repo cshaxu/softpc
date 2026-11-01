@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "gmi.h"
 #include "gvi.h"

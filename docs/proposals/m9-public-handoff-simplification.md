@@ -3989,3 +3989,38 @@ conditions, as required, corrected, or proven harmless with evidence.
 Preserve the selected CCPU/C-VID and native ABI; no mirror files, generic
 macro framework, parallel device implementation, or public trees change.
 Use in-memory preprocessing first and document exact scope before editing.
+
+
+S19 final-source implementation and qualification:
+
+- The fixed profile does not select PIG and does select WDCTRL_BOP. Removing
+  the Compat wrappers leaves both x86 and x64 preprocessed outputs unchanged
+  for those blocks. Other selected mirror configuration remains owned by the
+  existing build; no original mirror branch is pruned.
+- `compat/mirror_types.h` includes the original type declarations and ends the
+  legacy `const` macro at the Compat boundary. All 25 compiled Compat
+  translation units per architecture were checked with their real compiler
+  preprocessing commands: zero retain the macro at translation-unit end.
+  `compat/cmos/port.h` intentionally keeps the original include because it is
+  also consumed from mirror code. The new compile test checks representative
+  const-qualified declarations. Three audio fixtures use the same boundary.
+- Against S19 admission: Compat production +27/-35 (net -8); App test C
+  +24/-3 (net +21); root build +4/-0. No public component or original mirror
+  source changed. These are line counts, not a claim that ABI qualifications
+  provide exhaustive runtime proof.
+- Cached dual builds completed and produced the assets binaries below. Each
+  architecture has passing evidence for all 194 unique registered tests:
+  186 background tests, five desktop and three native-audio. The initial
+  native groups ran while the executing Windows session was disconnected and
+  had failures; after reconnection, both native groups were rerun unchanged
+  and passed. This does not establish that disconnection caused every failure.
+  The first fixture draft also failed the Types gate and was corrected before
+  final builds. No non-mirror build warning was observed in final builds.
+- softpc32 SHA-256: 52B2C6B55134EFC82265D0858759DC9D88BB3673932FBA6066000738848414DE
+- softpc64 SHA-256: A389FCC072843520E96896EAF5F29D2F8098DF1CE0BFDD065D341461A7DBF4C7
+
+Self-review: one owner-local header replaces scattered const cleanup; the
+fixed-profile blocks use existing behavior directly. No new runtime path,
+state, polling, public interface, or mirror patch is introduced. The native
+test evidence is a supplemented run rather than a first-pass all-green run;
+user media, INI and snapshots are unchanged.

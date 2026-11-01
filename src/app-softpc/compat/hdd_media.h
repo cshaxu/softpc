@@ -1,7 +1,7 @@
 #ifndef SOFTPC_HDD_MEDIA_H
 #define SOFTPC_HDD_MEDIA_H
 
-#include "insignia.h"
+#include "mirror_types.h"
 
 /* Private host-media configuration bridge.  Original CMOS/config callbacks
    ask the platform for the attached fixed-media path; the image backend owns

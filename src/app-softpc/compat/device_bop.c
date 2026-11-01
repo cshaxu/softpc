@@ -1,4 +1,4 @@
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "platform.h"
 #include "bios.h"
@@ -57,17 +57,13 @@ void softpc_device_bop_register_machine_services IFN0()
     extern void bootstrap1 IPT0();
     extern void bootstrap2 IPT0();
     extern void bootstrap3 IPT0();
-#ifdef WDCTRL_BOP
     /* Original diskbios.c 32-bit controller path.  Windows probes this at
        ROM BOP 04h; it is a machine disk I/O acceleration, not a DOS, DPMI,
        XMS, VDD, or NTVDM service. */
-#endif
 
     BIOS[BIOS_RESET] = reset;
     BIOS[BIOS_DUMMY_INT] = dummy_int;
-#ifdef WDCTRL_BOP
     BIOS[0x04] = wdctrl_bop;
-#endif
     BIOS[0x06] = illegal_op_int;
     BIOS[BIOS_UNEXP_INT] = unexpected_int;
     BIOS[BIOS_KB_INT] = keyboard_int;

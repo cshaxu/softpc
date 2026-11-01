@@ -8,7 +8,7 @@
  * virtual printer sink.  No product monitor, DOS-open state or system handle
  * leaks across this boundary.
  */
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "platform.h"
 

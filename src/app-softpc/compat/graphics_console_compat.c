@@ -1,7 +1,7 @@
 #include "lib/types/types_interface.h"
 #include <windows.h>
 
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "conapi.h"
 #include "nt_graph.h"

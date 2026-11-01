@@ -1,4 +1,4 @@
-#include "insignia.h"
+#include "mirror_types.h"
 #include "lib/base/sync_interface.h"
 #include "lib/audio/pcm/stream_interface.h"
 

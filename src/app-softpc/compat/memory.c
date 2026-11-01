@@ -1,5 +1,5 @@
 #include "lib/types/types_interface.h"
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 #include "host_gen.h"
 #include "platform.h"

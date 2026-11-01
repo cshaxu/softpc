@@ -1,12 +1,10 @@
-#include "insignia.h"
+#include "mirror_types.h"
 #include "host_def.h"
 
 #include "../cvidc/evidgen.h"
 #include "cpu4.h"
 #include "c_main.h"
 #include "c_bsic.h"
-
-#ifndef PIG
 
 extern struct VideoVector C_Video;
 
@@ -38,5 +36,3 @@ void retrieve_descr_fields IFN4(half_word *, ar, sys_addr *, base,
     *base = descriptor.base;
     *limit = descriptor.limit;
 }
-
-#endif /* !PIG */

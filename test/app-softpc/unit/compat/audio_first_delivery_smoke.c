@@ -1,4 +1,4 @@
-#include "insignia.h"
+#include "mirror_types.h"
 #include "lib/audio/pcm/stream.h"
 
 #include <assert.h>
