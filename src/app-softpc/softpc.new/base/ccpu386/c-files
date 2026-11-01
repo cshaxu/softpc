@@ -9,14 +9,12 @@ arpl.c
 bound.c
 bsf.c
 bsr.c
-bswap.c
 bt.c
 btc.c
 btr.c
 bts.c
 call.c
 cbw.c
-ccpupig.c
 ccpusas4.c
 cdq.c
 clc.c
@@ -25,14 +23,12 @@ cli.c
 clts.c
 cmc.c
 cmp.c
-cmpxchg.c
 cwd.c
 cwde.c
 c_addr.c
 c_bsic.c
 c_debug.c
 c_div64.c
-c_getset.c
 c_intr.c
 c_main.c
 c_mul64.c
@@ -59,8 +55,6 @@ in.c
 inc.c
 into.c
 intx.c
-invd.c
-invlpg.c
 iret.c
 jcxz.c
 jmp.c
@@ -121,8 +115,6 @@ test.c
 verr.c
 verw.c
 wait.c
-wbinvd.c
-xadd.c
 xchg.c
 xlat.c
 xor.c

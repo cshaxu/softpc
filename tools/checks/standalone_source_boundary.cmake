@@ -442,7 +442,6 @@ set(required_original_controller_sources
     "src/app-softpc/softpc.new/base/video/ega_read.c"
     "src/app-softpc/softpc.new/base/video/ega_writ.c"
     "src/app-softpc/softpc.new/base/video/ega_dmmy.c"
-    "src/app-softpc/softpc.new/base/video/ega_trcr.c"
     "src/app-softpc/softpc.new/base/video/egawrtm0.c"
     "src/app-softpc/softpc.new/base/video/egwrtm12.c"
     "src/app-softpc/softpc.new/base/video/cga.c"

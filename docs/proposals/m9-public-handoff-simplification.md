@@ -3853,3 +3853,80 @@ no App, mirror, configuration or media is changed. Documentation, diff and
 residue gates pass. The recorded supplemental compact-Console results are not
 a single uninterrupted all-green run. S17 awaits owner acceptance; T99 stays
 open.
+
+
+### S18: whole-file mirror selection
+
+The frozen 30-file candidate universe consists of 10 C translation units with
+zero text/data/bss under both cached product builds and 20 headers not observed
+in 676 x86/x64 product/App-test preprocessing contexts. Remove only original
+XP-identical bodies: 10 C and 17 headers. Retain monregs.h, nt_pif.h and
+nt_reset.h because they contain reviewed local patches pending separate audit.
+Keep all selected in-file conditional paths; no runtime or ABI change is
+intended. Preserve source hash and reason for each removed file in this record.
+The original c-files list is narrowed as a selected XP subset; no build-time
+transformation or second execution route is introduced. Verify by cached dual
+build, exact binary comparison, mirror/source gates and all registered tests.
+
+
+S18 exclusion ledger: `empty-object` means zero text/data/bss under both
+product widths; `unreached-header` means no inclusion observed in 676 tested
+product/App-test preprocessing contexts. Raw and subset hashes are retained:
+
+| XP selected path | Reason | XP SHA-256 |
+| --- | --- | --- |
+| `base/ccpu386/bswap.c` | empty-object | `16b8260d51041fc1a350018397ca4098de279eb94043727eae9160724d4bddd7` |
+| `base/ccpu386/c_getset.c` | empty-object | `bc3b2655b2eaeebfc9fa343d1f4f7153d3ba31d5019a0246ec8c684478635dcd` |
+| `base/ccpu386/ccpupig.c` | empty-object | `f9fe472f9979f510a56cdfeebb150870fa78b51bfff4189668745cc7f3fc3780` |
+| `base/ccpu386/cmpxchg.c` | empty-object | `31864ed50ec06922d3220501f713b9137c241d18ce9cf9c7d39b4f2d59257731` |
+| `base/ccpu386/evidgen.h` | unreached-header | `05737651808fa634f26fa4dd5c3c11b14b066acb7d8c01dd88ce79c0e2ed29b6` |
+| `base/ccpu386/invd.c` | empty-object | `ca64ec64cfd906bc4d229c6b9bb00f9b8a0cc865535f9c775ea7cc737bef054f` |
+| `base/ccpu386/invlpg.c` | empty-object | `909b84cf9466a4f36756ff98b1949bec64e7a632443cf9ead6dabc94ef1bde97` |
+| `base/ccpu386/univer_c.h` | unreached-header | `be241ef045b48ab5744e5ff2c71e129e655e2acc4d0178e292afd7bc346a83fa` |
+| `base/ccpu386/wbinvd.c` | empty-object | `a0e32377cb179eb3be70a5ff1c9c9a7194daff135e1617173cc46a18870b965a` |
+| `base/ccpu386/xadd.c` | empty-object | `87b973e680365c518f41e0096b219f06850cbfe0edde6866b91cf80f7f21d6c4` |
+| `base/cvidc/accessfn.c` | empty-object | `1e3e5e520c3f20df5f5039d0711a66f6acad04510c48af04a8a7a9cf4cf19ed1` |
+| `base/cvidc/cpu4gen.h` | unreached-header | `79825604d1efce8ce1c2068a13c476fe929413bb43f68c17fe42127cf896a6c3` |
+| `base/cvidc/cpu_c.h` | unreached-header | `b8053aab0869cae44ec197df7937876f03858d7a50da834cc8d3199d7dc91a31` |
+| `base/cvidc/cpuint_c.h` | unreached-header | `6d5a28e8e3922b63814ebeaeafce0c0176c69cb1d7ec2f900fe16d0eab9e195b` |
+| `base/inc/dasm.h` | unreached-header | `25701d961e72cb47ef84cbfc6efb702de83b7198b837edad8d227ae5ccd5aa68` |
+| `base/inc/decode.h` | unreached-header | `c4502f6c9d2439c0764abd0d80eee077888d9902a689e5f7dc854be30826d3d5` |
+| `base/inc/egatrace.h` | unreached-header | `c1c63a5cfdb8b7497a5c5cb7d25b4fab8d3d125dd4e8f6a6de6e9457e3975d47` |
+| `base/inc/gisp_sas.h` | unreached-header | `51225563e31793b166df3d38f47eda3955bef665a53a318d01c8ffdf842d175a` |
+| `base/inc/gore.h` | unreached-header | `a12a6e13ba5b6a1b3253ad53514d241501e64445bebe7c9d35e0b633c0b1e48f` |
+| `base/inc/herc.h` | unreached-header | `0930eee3ae09b767a823727da81e232591627c329cb340cbd8044c45fe5aedd5` |
+| `base/inc/hg_cpu.h` | unreached-header | `1236eb8a3c4afcaa1f8b3a898fae4e9b82d8c2cbd166041d5cde6e2e55ec0bf2` |
+| `base/inc/hwvga.h` | unreached-header | `6b05bcb5cbe9ce8a344a9ac39dbc50c3b302d28481a063e4579b299edb39865b` |
+| `base/inc/mouse16b.h` | unreached-header | `32fd663da37039e112d52edde8f0834131c9478af71296f2aed95a367d28ca07` |
+| `base/inc/novell.h` | unreached-header | `027b12b8898d930fd2ecaf72489da03383108a21b1623ee0a13e6ffc949d557c` |
+| `base/video/ega_trcr.c` | empty-object | `cec51198bb43de3a7ed960cf7ae08f5039eb49240fb622b870181f4afce13c38` |
+| `host/inc/nt_eoi.h` | unreached-header | `672cb99d548ab30416ed753598a64c223daff951d1e331846e04e949bd004175` |
+| `host/inc/nt_extra.h` | unreached-header | `8660e7b1ae9b31dd4f85b717a7e40194fdbf159a4c5533a03653488940796daf` |
+
+
+S18 implementation and qualification: 27 XP-identical whole files were
+removed: ten zero-object C files and 17 headers unobserved in the 676 frozen
+product/App-test preprocessing contexts. The eight corresponding CCPU entries
+were removed from `base/ccpu386/c-files` as a selected XP subset: its original
+raw XP hash remains in the current manifest, while the selected and local hashes
+match. The two remaining empty C files were removed from the root source list.
+The three unobserved headers with reviewed local patches are retained pending
+a separate audit. No original code branches were edited; Compat and shared
+components are unchanged. The mirror count is 478. Mirror/source/documentation
+gates pass. Tracked mirror diff +0/-7168 lines including eight c-files entries;
+build and verification scripts +1/-4.
+
+Both cached x86/x64 builds completed without reported warnings and published
+both EXEs. x86 and x64 each passed all 193 unique registered tests on first run:
+185 background, five desktop and three native-audio, no skips or retries.
+XML inventory exactly matches registrations. Byte comparison against S17:
+lengths unchanged; each file differs in six bytes exclusively in PE timestamp
+and checksum fields, and zeroing those two fields makes the files identical.
+Raw binaries are not byte-identical. No artifact was modified to conceal that.
+
+- softpc32 SHA-256: 702560228E2B84D953B1FD9D15DAB11510DB30F92A6DC8670D616711B7078CB3
+- softpc64 SHA-256: 8F5D8AFE9E1C293D00947EE8D2AEFCC55910E594CD6EA81D89D3843D991BBF9E
+
+The inactive includes in retained historic branches are not expanded by these
+selected profiles; in-file pruning and future profile support are outside S18.
+User INI/media/snapshots are preserved.

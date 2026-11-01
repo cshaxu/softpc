@@ -2,9 +2,35 @@
 
 ## Current Work
 
-Owner accepts and closes T99 S17; see its [closure](../history/M9-T99-S17-public-import.md).
-No implementation subtask is active. Open task awaiting owner: T99.
-The runtime-performance candidate remains in Queue.
+Owner admits T99 S18 to remove confirmed unused whole mirror files. T99 stays
+open; no partial in-file branch pruning or Compat rewrite is admitted. Dual
+builds and all 193 tests per architecture pass first run; the two new EXEs
+are byte-identical to S17 after zeroing PE timestamp/checksum only. Raw EXEs
+are not byte-identical. See the [S18 record](../proposals/m9-public-handoff-simplification.md#s18-whole-file-mirror-selection).
+
+## M9 T99 S18 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner authorizes whole-file removal, dual builds and publication, and acceptance if binaries remain unchanged. |
+| Objective | Remove proven unused mirror files in the supported fixed machine configurations. |
+| Non-goals | Do not prune in-file branches, alter guest behavior, public components, user INI, media or snapshots. |
+| Reference Baseline | SoftPC 36d0d869; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89; prior 676-context branch observation. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Selected unused mirror C and headers, source lists and verification/selection ledgers; no public ABI changes. |
+| Applicable Rules | Execution, architecture, coding, documentation and source policy. |
+| Verification | Prove selected source/header contexts; cached x86/x64 builds, binary before/after comparison, mirror and boundary gates, related and full regression. |
+| Expected Markers | Record each excluded original hash, current source profile and binary differences without assuming linker determinism. |
+| Asset Needs | Publish both EXEs; preserve user INI, media and snapshots. |
+| Reporting Requirements | Enumerate removed files, selection reason, local patch retention, code changes, proof and both binary hashes. |
+| Stop Conditions | Preserve local fixes and unrelated changes; no Computer Use; disclose any binary difference and failures. |
+| Exit Criteria | Verified dual builds and tests, actual diff review, pushed delivery, await owner acceptance. |
+| Original Owner Request | 把确定无用的文件先整文件从项目里移除 完了告诉我 编译发布 如果没有binary diff 可以停下来等我验收 |
+| Similar-Issue Sweep | Review all 10 empty-object C files and 20 unobserved headers against actual product/test contexts and local patch identities. |
+
+Scratch `build/t99-s18` belongs to this task; two-hour total and 30-minute
+no-progress observation budgets. Stop owned jobs and retire scratch after evidence.
 
 ## Technical Baseline
 

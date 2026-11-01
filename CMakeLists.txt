@@ -141,7 +141,6 @@ add_library(softpc-ccpu-core OBJECT
     src/app-softpc/softpc.new/base/cvidc/ev_glue.c
     src/app-softpc/softpc.new/base/cvidc/evidfunc.c
     src/app-softpc/softpc.new/base/cvidc/j_c_lang.c
-    src/app-softpc/softpc.new/base/cvidc/accessfn.c
     src/app-softpc/softpc.new/base/cvidc/vglfunc.c
     src/app-softpc/softpc.new/base/cvidc/sascdef.c)
 add_library(softpc-machine-compat OBJECT
@@ -215,7 +214,6 @@ add_library(softpc-machine-devices OBJECT
     src/app-softpc/softpc.new/base/video/ega_read.c
     src/app-softpc/softpc.new/base/video/ega_writ.c
     src/app-softpc/softpc.new/base/video/ega_dmmy.c
-    src/app-softpc/softpc.new/base/video/ega_trcr.c
     src/app-softpc/softpc.new/base/video/egawrtm0.c
     src/app-softpc/softpc.new/base/video/egwrtm12.c
     src/app-softpc/softpc.new/base/video/cga.c
