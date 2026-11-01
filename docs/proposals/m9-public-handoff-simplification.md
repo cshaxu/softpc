@@ -3938,3 +3938,35 @@ mirror, documentation, whitespace and build-residue gates. Rechecking the
 committed EXE blobs after zeroing PE timestamp/checksum confirms identical
 remaining bytes; raw files differ. The documented first-run test inventory and
 qualification are retained. S18 awaits owner acceptance; T99 remains open.
+
+
+### S18 owner extension: three unobserved patched headers
+
+Owner explicitly authorizes removal of `host/inc/monregs.h`, `nt_pif.h`,
+and `nt_reset.h`. Each was unobserved across 676 frozen product/App-test
+preprocessing contexts; only monregs.h has a textual include, within the
+unselected CPU_30_STYLE and MONITOR path. The S3 patches are NTVDM-only
+product declarations, not selected machine behavior. The following exclusion
+records retain XP raw, selected subset and former local hashes; earlier S18
+statements that these files were retained are historical, superseded here.
+
+| Path | XP raw | XP subset | Former local |
+| --- | --- | --- | --- |
+| `host/inc/monregs.h` | `c5d1d8e08a269c2dbb09dd32fe11dfb4dd6386fa4dec5299385c9f0d2e377ac1` | `01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b` | `21ca0069d71627bae01020712269ba835c4e28d6b2ebb3b5503fe144a9ae77e1` |
+| `host/inc/nt_pif.h` | `965e72f463590478f391bcd9119bd1aadb1b310d38cd191a138ecd41f7fb7e61` | `01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b` | `0e970eb7fb050158cc2038f348e5d4de1d1ffd0d40f6babb7f15c64230eb9133` |
+| `host/inc/nt_reset.h` | `951a97fbbda076a1a0e63a39ee090efe59ab739e7fbb8ee3461cd73e45343170` | `01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b` | `6491fb94edc53544e53bdffdac61d1887574308b447bf3e3153254c47001b43f` |
+
+The three headers above are removed; the manifest now records 475 retained
+bodies. Their 289 former local lines belong to unselected NTVDM-only host
+interfaces and are not reproduced elsewhere. The original, subset, and local
+hashes are retained in the preceding exclusion ledger. The inactive monregs.h
+include remains in the historical CPU_30_STYLE/MONITOR branch; that branch is
+outside the selected machine and will be handled only in a later branch task.
+
+Cached x64/x86 builds each reported no work; published EXEs are byte-for-byte
+unchanged from 664be095. Both architectures passed all 193 registered tests
+on the first run, with exact XML/registration equality, no skips and no
+failures: 185 background, five desktop and three native-audio. Mirror and
+documentation gates pass; no public component, user INI, media or snapshots
+changed. This follow-up removes three whole files and does not alter retained
+production code.
