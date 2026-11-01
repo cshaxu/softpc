@@ -4258,3 +4258,47 @@ Both package EXEs were rebuilt: their lengths match S19 and each differs in
 six raw bytes, only in PE timestamp/checksum; the remaining bytes are equal.
 - softpc32 SHA-256 f87f88c7bb730f404c03ac1216cf6ee6f27a7a93ffee8b7da4b08c0acc507160
 - softpc64 SHA-256 813b6a33b1b7a24d3326fcada9930a1568ac61092ce09e8527fd650e0adb7c35
+
+
+#### S20 macro-state inventory at 31ee31e1
+
+Owner requests classification of all mirror conditional identifiers while
+deferring coupled-condition edits. The inventory covers 470 retained C/H
+mirror bodies and 664 distinct x86/x64 App, Compat and App-test C compilation
+commands, 332 per width; other public-component-only translation units are not
+in this universe. Conditional locations are physical source lines at 31ee31e1.
+
+A disposable instrumented copy inserts independent `defined(NAME)` probes
+before reachable `#if`, `#ifdef`, and `#ifndef` conditions. The original
+commands and include order are reproduced with mirror/App/test paths redirected
+to the temporary copy and supporting headers copied. The copies are used only
+for preprocessing, not as build inputs. All 664 contexts exit successfully.
+Known CPU_30, PIG and mixed NTVDM/TLS states were independently spot checked.
+Two `#elif` conditions (`ppi.c:234` SOFTPC_STANDALONE and `ica.c:1932` ASPI)
+are explicitly marked unprobed; a probe before `#elif` would change conditional
+semantics. The preprocessor controls probe reachability, so conditions nested
+inside inactive parents remain unknown rather than being reported false.
+
+[Macro inventory](../etc/evidence/softpc/m9-t99-s20-macro-inventory.tsv) has
+241 identifiers: 176 undefined only where observed, 27 defined only where
+observed, 24 both defined and undefined across observations, and 14 with no
+reachable observation. Seventy-five identifiers have at least one occurrence
+not reached on a width or one unprobed `#elif`; category names apply only to
+observed positions. [Per-location evidence](../etc/evidence/softpc/m9-t99-s20-macro-locations.tsv)
+records 3,070 probed identifier occurrences and two unprobed `#elif` uses,
+with direct-expression symbol count and enclosing depth. Include guards,
+compiler/native helper names and domain selectors are all retained; nesting
+includes ordinary include guards. Defined is not necessarily enabled: `#if X`
+may evaluate false when X is defined as zero. The values were not measured.
+
+Only `NDEBUG` appears in all 664 command lines as `-D`, but 130 commands also
+contain `-UNDEBUG`, illustrating why command flags alone are not the actual
+state. CPU_30_STYLE is undefined at all reached occurrences on both widths;
+one nested occurrence is unreached. SEGMENTATION is undefined at all 93 of
+its occurrences on both widths. CCPU, CPU_40_STYLE, PROD, V7VGA and
+WDCTRL_BOP have both defined and undefined observations across product/test
+contexts; do not treat the product target's flags as uniform across tests.
+The two inventories do not decide deletability or compile support: outer
+conditions, `#elif`, macro values, include guards, selected local patches,
+original conditions and test dependencies remain relevant. No source, EXE,
+media or configuration was changed by this macro investigation.

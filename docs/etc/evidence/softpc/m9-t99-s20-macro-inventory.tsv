@@ -1,0 +1,242 @@
+macro	observed_class	defined_widths	undefined_widths	condition_occurrences	direct_ifdef_ifndef	unreached_occurrences	unprobed_elif_occurrences	explicit_D_commands	explicit_U_commands	example_locations	unreached_x86	unreached_x64	coupled_expression_occurrences	nested_occurrences
+A2CPU	undefined_only_observed		x64,x86	31	22	6	0	0	0	base/bios/reset.c:115, base/bios/reset.c:406, base/bios/reset.c:1011	6	6	9	20
+A3CPU	undefined_only_observed		x64,x86	20	17	13	0	0	0	base/bios/reset.c:410, base/inc/cpu_vid.h:140, base/video/cga.c:171	13	13	3	18
+ADAPTOR_ROM_END	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:82	0	0	0	0
+ADAPTOR_ROM_START	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:78	0	0	0	0
+ANSI	undefined_only_observed		x64,x86	57	57	11	0	0	0	base/ccpu386/bound.c:37, base/ccpu386/call.c:42, base/ccpu386/jmp.c:45	11	11	0	18
+ASPI	undefined_only_observed		x64,x86	2	1	0	1	0	0	base/inc/ica.h:71, base/system/ica.c:1463	0	0	0	1
+AVERAGED	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/quick_ev.c:1563	0	0	0	1
+A_VID	undefined_only_observed		x64,x86	12	5	4	0	0	0	base/bios/reset.c:430, base/inc/cga.h:100, base/video/cga.c:1134	4	4	7	7
+BACK_M	undefined_only_observed		x64,x86	32	32	3	0	0	0	base/bios/reset.c:442, base/ccpu386/c_main.c:661, base/ccpu386/c_main.c:4795	3	3	0	30
+BASE_SAS	undefined_only_observed		x64,x86	3	1	0	0	0	0	base/inc/host_sas.h:20, base/inc/host_sas.h:68, base/inc/sas.h:129	0	0	2	1
+BIGEND	undefined_only_observed		x64,x86	35	35	3	0	0	0	base/ccpu386/fpu.c:462, base/cvidc/j_c_lang.h:49, base/disks/fdisk.c:1539	3	3	0	23
+BIGWIN	mixed	x64,x86	x64,x86	32	32	1	0	0	0	host/inc/nt_graph.h:106, host/inc/nt_graph.h:187, host/inc/nt_graph.h:400	1	1	0	2
+BIOS1ROM_FILENAME	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:47	0	0	0	0
+BIOS2ROM_FILENAME	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:51	0	0	0	0
+BIT_ORDER1	undefined_only_observed		x64,x86	21	21	1	0	0	0	base/comms/rs232_io.c:80, base/disks/fla.c:182, base/inc/cga.h:27	1	1	0	12
+BIT_ORDER2	defined_only_observed	x64,x86		19	19	1	0	0	0	base/comms/rs232_io.c:69, base/disks/fla.c:197, base/inc/cga.h:46	1	1	0	13
+BOOL	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/insignia.h:114	0	0	0	1
+BSD4_2	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/support/time_day.c:137, base/support/time_day.c:314, base/support/time_day.c:367	0	0	0	0
+BUILDING_CPU_TOOL	undefined_only_observed		x64,x86	1	0	0	0	0	0	host/inc/error.h:256	0	0	0	1
+CCPU	mixed	x64,x86	x64,x86	292	290	3	0	530	0	base/bios/reset.c:402, base/ccpu386/ccpusas4.c:23, base/ccpu386/cpu4gen.h:188	3	3	2	231
+CDROM	undefined_only_observed		x64,x86	3	1	0	0	0	0	base/bios/reset.c:983, base/inc/bios.h:203, base/inc/gendrvr.h:21	0	0	2	0
+CGAMONO	undefined_only_observed		x64,x86	5	5	0	0	0	0	base/bios/reset.c:341, base/video/gvi.c:183, base/video/gvi.c:218	0	0	0	0
+CHEAT	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/sas.h:116	0	0	0	1
+CHECK_ACCESS	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/ccpusas4.c:306	0	0	0	1
+COLLECT_MMIO_STATS	unobserved			4	0	4	0	0	0	base/ccpu386/c_main.c:4600, base/ccpu386/c_main.c:4607, base/ccpu386/ccpupig.h:124	4	4	0	4
+COM3_ADAPTOR	defined_only_observed	x64,x86		1	1	0	0	0	0	base/comms/com.c:2302	0	0	0	0
+COM4_ADAPTOR	defined_only_observed	x64,x86		1	1	0	0	0	0	base/comms/com.c:2305	0	0	0	0
+CPU_30_STYLE	undefined_only_observed		x64,x86	14	11	1	0	0	0	base/bios/reset.c:394, base/bios/reset.c:619, base/bios/reset.c:683	1	1	3	11
+CPU_40_STYLE	mixed	x64,x86	x64,x86	105	76	7	0	530	0	base/bios/reset.c:394, base/bios/reset.c:398, base/inc/cpu_vid.h:88	7	7	24	58
+CPU_486	defined_only_observed	x64,x86		1	1	0	0	530	0	base/ccpu386/c_main.c:174	0	0	0	0
+CPU_PRIVATE	mixed	x64,x86	x64,x86	4	4	0	0	0	0	base/ccpu386/cpu4gen.h:13, base/ccpu386/cpu4gen.h:18, base/ccpu386/cpu4gen.h:23	0	0	0	3
+CVIDC_RULE_WORD	mixed	x64,x86	x64,x86	1	1	0	0	37	0	host/inc/insignia.h:82	0	0	0	1
+C_VID	defined_only_observed	x64,x86		40	29	20	0	530	0	base/bios/reset.c:434, base/cvidc/ev_glue.c:57, base/inc/cga.h:100	20	20	11	29
+Cpu_set_vid_wrt_ptrs	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/cpu_vid.h:134	0	0	0	0
+DELAYED_INTS	undefined_only_observed		x64,x86	9	8	0	0	0	0	base/comms/com.c:536, base/comms/com.c:686, base/comms/com.c:1011	0	0	1	5
+DELTA	defined_only_observed	x64,x86		4	2	1	0	0	0	base/bios/reset.c:115, base/bios/reset.c:1011, base/inc/trace.h:128	1	1	2	2
+DEMO_COPY	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/keymouse/keyba.c:1374	0	0	0	1
+DOCUMENTATION	undefined_only_observed		x64,x86	5	5	0	0	0	0	base/comms/com.c:1468, base/system/timer.c:1138, base/system/timer.c:1153	0	0	0	0
+DONT_CLEAR_LDTR_ON_INVALID	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/ccpu386/c_bsic.c:303, base/ccpu386/lldt.c:51	0	0	0	0
+DONT_CLEAR_LDT_BL_ON_INVALID	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/lldt.c:56	0	0	0	0
+DOS_APP_LIC	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/inc/bios.h:387, base/inc/error.h:299	0	0	0	1
+DOUBLE_CPU	undefined_only_observed		x64,x86	4	4	0	0	0	0	base/ccpu386/c_main.h:140, base/ccpu386/c_main.h:218, base/ccpu386/lgdt.c:47	0	0	0	0
+DPMI	undefined_only_observed		x64,x86	4	4	1	0	0	0	base/bios/reset.c:106, base/bios/reset.c:450, base/bios/reset.c:703	1	1	0	2
+DUMB_TERMINAL	undefined_only_observed		x64,x86	7	7	0	0	0	0	base/video/gfx_updt.c:2422, base/video/gfx_updt.c:2457, base/video/gfx_updt.c:2742	0	0	0	4
+EGAROM_FILENAME	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:59	0	0	0	0
+EGATEST	undefined_only_observed		x64,x86	12	11	3	0	0	0	base/ccpu386/ccpusas4.c:202, base/ccpu386/ccpusas4.c:465, base/ccpu386/ccpusas4.c:1295	3	3	1	10
+EGA_DUMP	undefined_only_observed		x64,x86	14	9	1	0	0	0	base/support/ios.c:435, base/support/ios.c:476, base/support/ios.c:513	1	1	5	5
+EGA_PARMS_ATTR_SIZE	mixed	x64,x86	x64,x86	1	1	0	0	0	0	base/inc/mouse_io.h:843	0	0	0	0
+EGA_PARMS_CRTC_SIZE	mixed	x64,x86	x64,x86	1	1	0	0	0	0	base/inc/mouse_io.h:839	0	0	0	0
+EGA_PARMS_GRAPH_SIZE	mixed	x64,x86	x64,x86	1	1	0	0	0	0	base/inc/mouse_io.h:847	0	0	0	0
+EGA_PARMS_SEQ_SIZE	mixed	x64,x86	x64,x86	1	1	0	0	0	0	base/inc/mouse_io.h:835	0	0	0	0
+EGA_STAT	undefined_only_observed		x64,x86	5	0	1	0	0	0	base/video/ega_read.c:158, base/video/ega_read.c:936, base/video/ega_writ.c:60	1	1	5	5
+EGG	defined_only_observed	x64,x86		109	99	8	0	0	0	base/bios/reset.c:349, base/ccpu386/ccpusas4.c:612, base/inc/bios.h:255	8	8	10	37
+EOI_HOOKS	defined_only_observed	x64,x86		2	2	0	0	174	0	base/system/ica.c:361, base/system/ica.c:1273	0	0	0	0
+ERROR	defined_only_observed	x64,x86		2	2	0	0	0	0	base/comms/printer.c:138, base/disks/diskbios.c:745	0	0	0	1
+EXPANSION_ROM_END	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:92	0	0	0	0
+EXPANSION_ROM_START	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:88	0	0	0	0
+FALSE	defined_only_observed	x64,x86		2	2	0	0	0	0	base/inc/base_def.h:50, host/inc/insignia.h:96	0	0	0	1
+FAST_FUNC_ADDR	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/ios.h:568	0	0	0	0
+FAST_TLB	defined_only_observed	x64,x86		11	11	2	0	0	0	base/ccpu386/c_tlb.c:70, base/ccpu386/c_tlb.c:151, base/ccpu386/c_tlb.c:188	2	2	0	2
+FIFO_ON	undefined_only_observed		x64,x86	1	0	0	0	0	0	base/inc/host_com.h:190	0	0	1	1
+FIX_BT_BUG	defined_only_observed	x64,x86		4	4	0	0	0	0	base/ccpu386/c_main.c:1483, base/ccpu386/c_main.c:1555, base/ccpu386/c_main.c:1653	0	0	0	0
+FLOPPIES_KEEP_TRYING	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/disks/floppy.c:2855, base/disks/floppy.c:2896	0	0	0	1
+FLOPPY_B	undefined_only_observed		x64,x86	3	3	1	0	0	0	base/bios/reset.c:325, base/disks/gfi.c:340, base/system/cmos.c:361	1	1	0	1
+FULLSCREEN	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/nt_graph.h:88	0	0	0	0
+GEN_DRVR	undefined_only_observed		x64,x86	4	2	0	0	0	0	base/bios/reset.c:983, base/inc/bios.h:189, base/inc/gendrvr.h:21	0	0	2	0
+GISP_CPU	undefined_only_observed		x64,x86	38	23	13	0	0	0	base/bios/reset.c:414, base/comms/com.c:52, base/comms/com.c:673	13	13	15	19
+GISP_SVGA	undefined_only_observed		x64,x86	66	61	5	0	0	0	base/bios/reset.c:82, base/bios/reset.c:110, base/bios/reset.c:201	5	5	5	42
+GORE	undefined_only_observed		x64,x86	20	20	0	0	0	0	base/video/ega_mode.c:107, base/video/ega_mode.c:614, base/video/ega_mode.c:654	0	0	0	17
+GORE_PIG	unobserved			7	7	7	0	0	0	base/video/gfx_updt.c:3354, base/video/gfx_updt.c:3361, base/video/gfx_updt.c:3371	7	7	0	7
+HERC	undefined_only_observed		x64,x86	30	29	0	0	0	0	base/bios/reset.c:358, base/inc/gfx_upd.h:265, base/inc/gvi.h:64	0	0	0	8
+HERC_REGEN_BUFF	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/sas.h:283, base/inc/sas.h:291	1	1	0	2
+HFX	undefined_only_observed		x64,x86	4	4	0	0	0	0	base/bios/reset.c:741, base/bios/reset.c:1077, base/inc/bios.h:383	0	0	0	0
+HOOKED_IRETS	mixed	x64,x86	x64,x86	9	8	0	0	0	0	base/inc/ica.h:115, base/system/ica.c:226, base/system/ica.c:288	0	0	1	0
+HOST_BIAS	mixed	x64,x86	x64,x86	3	0	0	0	0	0	base/ccpu386/fpu.c:1760, base/ccpu386/fpu.c:1886, host/inc/cfpu_def.h:15	0	0	0	0
+HOST_CPU_MOUSE_INT	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/ica.h:32	0	0	0	0
+HOST_HELP	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/error.h:314	0	0	0	1
+HOST_MOUSE	undefined_only_observed		x64,x86	1	0	0	0	0	0	base/inc/mouse_io.h:756	0	0	1	0
+HOST_SAS	undefined_only_observed		x64,x86	3	1	0	0	0	0	base/inc/host_sas.h:20, base/inc/host_sas.h:70, base/inc/sas.h:129	0	0	2	2
+HOST_SCREEN_UPDATES	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/video/gfx_updt.c:229	0	0	0	1
+HOST_VGA_GLOBALS	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/egacpu.h:125, base/inc/egacpu.h:162	1	1	0	1
+HUNTER	undefined_only_observed		x64,x86	24	24	0	0	0	0	base/bios/reset.c:1020, base/inc/cga.h:22, base/inc/cga.h:71	0	0	0	4
+HostProcessClipData	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/bios/reset.c:770	0	0	0	0
+IO_MAX_NUMBER_ADAPTORS	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/ios.h:385	0	0	0	1
+IP32	undefined_only_observed		x64,x86	1	0	0	0	0	0	base/comms/rs232_io.c:49	0	0	1	0
+IPC	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/bios/reset.c:805	0	0	0	0
+IRET_HOOKS	undefined_only_observed		x64,x86	22	11	2	0	0	0	base/bios/reset.c:454, base/comms/com.c:103, base/comms/com.c:115	2	2	10	3
+JOKER	undefined_only_observed		x64,x86	19	17	2	0	0	0	base/disks/fdisk.c:1374, base/disks/fdisk.c:1517, base/disks/floppy.c:2390	2	2	2	6
+KBD_CONT_DELAY	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/keymouse/keyba.c:101	0	0	0	0
+KIPPER	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/keymouse/mouse.c:483	0	0	0	0
+LICENSING	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/bios/reset.c:86, base/bios/reset.c:943	0	0	0	0
+LIM	mixed	x64,x86	x64,x86	11	11	2	0	0	0	base/bios/reset.c:515, base/bios/reset.c:1025, base/ccpu386/ccpusas4.c:866	2	2	0	4
+LITTLEND	defined_only_observed	x64,x86		30	30	3	0	2	0	base/ccpu386/c_main.c:210, base/cvidc/j_c_lang.h:42, base/disks/fdisk.c:1546	3	3	0	13
+MAC68K	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/inc/ios.h:537, base/support/ios.c:64, base/support/ios.c:911	0	0	0	0
+MAXPATHLEN	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/xt.h:64	0	0	0	1
+MONITOR	undefined_only_observed		x64,x86	24	7	2	0	0	0	base/inc/emm.h:135, base/keymouse/keyba.c:2069, base/keymouse/mouse_io.c:1283	2	2	17	7
+MOUSE_16_BIT	undefined_only_observed		x64,x86	18	18	0	0	0	0	base/inc/mouse_io.h:982, base/inc/mouse_io.h:1114, base/keymouse/mouse_io.c:110	0	0	0	0
+MOUSE_COPYRIGHT_SEGMENT	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/sas.h:513, base/inc/sas.h:768	1	1	0	2
+MOUSE_INT1_SEGMENT	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/sas.h:504, base/inc/sas.h:759	1	1	0	2
+MOUSE_INT2_SEGMENT	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/sas.h:507, base/inc/sas.h:762	1	1	0	2
+MOUSE_VERSION_SEGMENT	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/sas.h:510, base/inc/sas.h:765	1	1	0	2
+MOUSE_VIDEO_IO_SEGMENT	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/inc/sas.h:488, base/inc/sas.h:743	1	1	0	2
+MSWDVR	undefined_only_observed		x64,x86	5	5	1	0	0	0	base/bios/reset.c:438, base/bios/reset.c:771, base/inc/bios.h:314	1	1	0	3
+MSWDVR_DEBUG	unobserved			1	1	1	0	0	0	base/inc/yoda.h:59	1	1	0	1
+M_IS_POINTER	unobserved			1	1	1	0	0	0	base/inc/sas.h:117	1	1	0	1
+NEC_98	undefined_only_observed		x64,x86	26	26	0	0	0	0	base/system/timestrb.c:89, base/video/ega_mode.c:154, base/video/ega_mode.c:543	0	0	0	26
+NOVELL	undefined_only_observed		x64,x86	6	5	0	0	0	0	base/bios/reset.c:75, base/bios/reset.c:764, base/inc/bios.h:294	0	0	1	1
+NOVELL_CFM	unobserved			1	1	1	0	0	0	base/inc/bios.h:306	1	1	0	1
+NOVELL_IPX	undefined_only_observed		x64,x86	2	1	0	0	0	0	base/inc/bios.h:322, base/inc/ica.h:63	0	0	1	0
+NOVELL_TCPIP	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/bios.h:328	0	0	0	0
+NO_STRING_OPERATIONS	undefined_only_observed		x64,x86	42	42	33	0	0	0	base/inc/cpu_vid.h:32, base/inc/cpu_vid.h:95, base/inc/cpu_vid.h:102	33	33	0	40
+NPX	undefined_only_observed		x64,x86	4	4	0	0	0	0	base/bios/reset.c:102, base/bios/reset.c:302, base/bios/reset.c:646	0	0	0	1
+NTVDM	undefined_only_observed		x64,x86	105	35	4	0	0	0	base/bios/cmos_bis.c:55, base/bios/reset.c:527, base/bios/reset.c:824	4	4	70	17
+NT_INCLUDED	undefined_only_observed		x64,x86	6	2	0	0	0	0	host/inc/insignia.h:25, host/inc/insignia.h:37, host/inc/insignia.h:43	0	0	4	6
+NULL	defined_only_observed	x64,x86		3	3	0	0	0	0	base/ccpu386/fpu.c:160, base/inc/xt.h:41, host/inc/insignia.h:110	0	0	0	2
+NULL_STRING	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/xt.h:45	0	0	0	1
+NUM_PARALLEL_PORTS	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/host_def.h:116	0	0	0	0
+NUM_SERIAL_PORTS	mixed	x64,x86	x64,x86	4	1	0	0	0	0	base/inc/ios.h:357, base/inc/rs232.h:268, base/inc/rs232.h:299	0	0	0	3
+PATHSEP_CHAR	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/inc/suplib.h:26, base/inc/suplib.h:36	0	0	0	2
+PC_CONFIG	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/comms/printer.c:428, base/comms/printer.c:477, base/inc/host.h:22	0	0	0	2
+PIG	undefined_only_observed		x64,x86	98	95	5	0	0	0	base/bios/reset.c:156, base/bios/reset.c:426, base/bios/reset.c:865	5	5	2	7
+PIG_DONT_CHECK_OTHER_WORD_ON_STACK	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/ccpu386/c_stack.c:341, base/ccpu386/c_stack.c:381	1	1	0	1
+PM	defined_only_observed	x64,x86		12	12	0	0	0	0	base/bios/reset.c:522, base/bios/tape_io.c:70, base/bios/tape_io.c:114	0	0	0	2
+PRINTER	defined_only_observed	x64,x86		10	10	0	0	0	0	base/bios/reset.c:68, base/bios/reset.c:816, base/bios/reset.c:1003	0	0	0	1
+PROD	mixed	x64,x86	x64,x86	564	549	289	0	530	0	base/bios/reset.c:387, base/bios/reset.c:974, base/bios/tape_io.c:81	289	289	13	370
+PS_FLUSHING	undefined_only_observed		x64,x86	12	12	0	0	0	0	base/comms/com.c:353, base/comms/com.c:999, base/comms/com.c:1021	0	0	0	7
+PTY	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/bios.h:185	0	0	0	0
+QEVENT_TESTER	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/quick_ev.c:1748	0	0	0	0
+REAL_ICA	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/ica.h:173	0	0	0	0
+REAL_KBD	undefined_only_observed		x64,x86	15	15	0	0	0	0	base/inc/keyba.h:25, base/keymouse/keyba.c:141, base/keymouse/keyba.c:236	0	0	0	3
+REAL_ROM	undefined_only_observed		x64,x86	8	8	0	0	0	0	base/disks/fdisk.c:1714, base/disks/fdisk.c:1721, base/disks/fdisk.c:1742	0	0	0	0
+REAL_TIMER	undefined_only_observed		x64,x86	2	1	0	0	0	0	base/system/timestrb.c:77, base/system/timestrb.c:87	0	0	1	1
+REAL_VGA	undefined_only_observed		x64,x86	65	65	0	0	0	0	base/inc/host.h:49, base/inc/mouse_io.h:987, base/inc/mouse_io.h:1119	0	0	0	26
+SAS_PREFIX	unobserved			1	1	1	0	0	0	base/inc/host_sas.h:22	1	1	0	1
+SCCSID	undefined_only_observed		x64,x86	22	22	0	0	0	0	base/bios/bootstra.c:45, base/bios/mem_size.c:16, base/bios/slave_bs.c:33	0	0	0	1
+SECURE	undefined_only_observed		x64,x86	10	10	1	0	0	0	base/bios/bootstra.c:3, base/bios/bootstra.c:74, base/bios/bootstra.c:98	1	1	0	4
+SEGMENTATION	undefined_only_observed		x64,x86	93	93	0	0	0	0	base/bios/bootstra.c:49, base/bios/cmos_bis.c:38, base/bios/equipmnt.c:23	0	0	0	35
+SETUID_ROOT	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/host.h:58	0	0	0	0
+SET_UNDEFINED_DIV_FLAG	defined_only_observed	x64,x86		6	6	0	0	0	0	base/ccpu386/div.c:81, base/ccpu386/div.c:119, base/ccpu386/div.c:159	0	0	0	0
+SET_UNDEFINED_FLAG	defined_only_observed	x64,x86		11	11	0	0	0	0	base/ccpu386/aaa.c:52, base/ccpu386/aad.c:55, base/ccpu386/aam.c:59	0	0	0	0
+SET_UNDEFINED_MUL_FLAG	defined_only_observed	x64,x86		8	8	0	0	0	0	base/ccpu386/imul.c:70, base/ccpu386/imul.c:112, base/ccpu386/imul.c:154	0	0	0	0
+SET_UNDEFINED_SHxD_FLAG	defined_only_observed	x64,x86		2	2	0	0	0	0	base/ccpu386/shld.c:110, base/ccpu386/shrd.c:112	0	0	0	0
+SFELLOW	undefined_only_observed		x64,x86	35	19	4	0	0	0	base/ccpu386/c_main.c:227, base/ccpu386/c_main.c:240, base/ccpu386/c_main.c:245	4	4	8	7
+SHORT_TRACE	undefined_only_observed		x64,x86	18	17	1	0	0	0	base/comms/com.c:349, base/comms/com.c:715, base/comms/com.c:743	1	1	1	2
+SLAVEPC	undefined_only_observed		x64,x86	5	5	0	0	0	0	base/disks/gfi.c:294, base/disks/gfi.c:306, base/disks/gfi.c:320	0	0	0	0
+SMEG	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/system/idetect.c:212, base/system/idetect.c:222	0	0	0	0
+SOFTPC_CCPU_TLS_SIMSTACK	defined_only_observed	x64,x86		7	0	1	0	324	0	base/ccpu386/c_main.c:33, base/ccpu386/c_main.c:832, base/ccpu386/c_main.c:4838	1	1	7	1
+SOFTPC_STANDALONE	mixed	x64,x86	x64,x86	16	8	0	1	616	0	base/bios/reset.c:527, base/bios/reset.c:748, base/bios/reset.c:824	0	0	8	1
+SOFTWINDOWS	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/xt.h:49	0	0	0	1
+SOFTWIN_API	undefined_only_observed		x64,x86	4	2	0	0	0	0	base/bios/reset.c:1015, base/inc/bios.h:343, base/inc/bios.h:348	0	0	1	1
+SPC386	mixed	x64,x86	x64,x86	20	16	1	0	526	0	base/bios/reset.c:418, base/inc/bios.h:393, base/inc/ios.h:447	1	1	4	2
+SPC486	undefined_only_observed		x64,x86	32	31	3	0	0	0	base/bios/reset.c:418, base/bios/reset.c:422, base/bios/tape_io.c:270	3	3	1	3
+STINGER	undefined_only_observed		x64,x86	2	2	1	0	0	0	base/comms/printer.c:90, base/inc/sas.h:687	1	1	0	2
+STREAM_IO	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/nt_graph.h:91	0	0	0	0
+STRINGIFY	defined_only_observed	x64,x86		1	1	0	0	0	0	host/inc/insignia.h:101	0	0	0	1
+SUN4	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/fpu.c:262	0	0	0	0
+SUN_VA	undefined_only_observed		x64,x86	2	1	1	0	0	0	base/bios/reset.c:1026, base/inc/sas.h:216	1	1	1	2
+SUSPEND	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/inc/bios.h:199, base/inc/host.h:46	0	0	0	0
+SVID3_TCGET	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/rs232.h:333	0	0	0	1
+SWINAPI	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/bios.h:337	0	0	0	0
+SWIN_HAW	undefined_only_observed		x64,x86	3	2	0	0	0	0	base/inc/bios.h:352, base/inc/ica.h:67, base/system/ica.c:1459	0	0	0	1
+SWIN_HFX	undefined_only_observed		x64,x86	1	0	0	0	0	0	base/inc/bios.h:343	0	0	1	0
+SWIN_MOUSE_OPTS	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/timer.h:90	0	0	0	0
+SWIN_SNDBLST_NULL	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/bios/reset.c:881, base/inc/ios.h:305, base/inc/ios.h:381	0	0	0	1
+SWITCHNPX	undefined_only_observed		x64,x86	4	3	2	0	0	0	base/bios/reset.c:309, base/bios/reset.c:316, base/ccpu386/c_main.c:4976	2	2	0	3
+SYNCH_BOTH_WAYS	defined_only_observed	x64,x86		3	3	2	0	0	0	base/ccpu386/c_main.c:1417, base/ccpu386/c_main.c:2459, base/ccpu386/c_main.c:3797	2	2	0	2
+SYNCH_TIMERS	undefined_only_observed		x64,x86	15	15	1	0	0	0	base/bios/reset.c:462, base/ccpu386/c_intr.c:503, base/ccpu386/c_main.c:534	1	1	0	8
+SYSTEMV	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/comms/printer.c:89, base/comms/printer_.c:45	0	0	0	2
+TAKE_PROT_MODE_LIMIT_FAILURE	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/c_xfer.c:156	0	0	0	1
+TAKE_PROT_MODE_LIMIT_FAULT	mixed	x64,x86	x64,x86	3	3	0	0	0	0	base/ccpu386/call.c:267, base/ccpu386/call.c:330, base/ccpu386/jmp.c:161	0	0	0	3
+TAKE_REAL_MODE_LIMIT_FAULT	undefined_only_observed		x64,x86	11	11	0	0	0	0	base/ccpu386/c_addr.c:629, base/ccpu386/c_intr.c:230, base/ccpu386/c_xfer.c:143	0	0	0	0
+TEST_HARNESS	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/system/cmos.c:120, base/system/cmos.c:901, base/system/cmos.c:1178	0	0	0	0
+TK43	undefined_only_observed		x64,x86	1	0	0	0	0	0	base/comms/rs232_io.c:49	0	0	1	0
+TRUE	defined_only_observed	x64,x86		2	2	0	0	0	0	base/inc/base_def.h:46, base/inc/xt.h:31	0	0	0	1
+UNIVERSAL	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gmi.h:42	0	0	0	0
+UNUSED	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/base_def.h:22	0	0	0	0
+USE_CURSOR_END_TABLES	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/video/ega_vide.c:238, base/video/ega_vide.c:1281, base/video/ega_vide.c:1293	0	0	0	3
+USE_OLD_MASK_CODE	undefined_only_observed		x64,x86	4	4	0	0	0	0	base/video/ega_prts.c:2987, base/video/ega_prts.c:3035, base/video/vga_prts.c:2160	0	0	0	4
+V4CLIENT	unobserved			1	1	1	0	0	0	base/inc/bios.h:309	1	1	0	1
+V7VGA	mixed	x64,x86	x64,x86	136	136	8	0	530	0	base/inc/egacpu.h:155, base/inc/egagraph.h:92, base/inc/egagraph.h:160	8	8	0	106
+V7VGAROM_FILENAME	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:67	0	0	0	0
+VARIABLE_TICK_COMMS	unobserved			1	1	1	0	0	0	base/comms/com.c:1795	1	1	0	1
+VGAROM_FILENAME	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/system/rom.c:63	0	0	0	0
+VGG	defined_only_observed	x64,x86		105	104	6	0	0	0	base/bios/reset.c:351, base/inc/cpu_vid.h:71, base/inc/cpu_vid.h:79	6	6	1	72
+VIRTUALISATION	defined_only_observed	x64,x86		10	10	0	0	0	0	base/support/ios.c:431, base/support/ios.c:440, base/support/ios.c:472	0	0	0	2
+WDCTRL_BOP	mixed	x64,x86	x64,x86	3	2	1	0	526	0	base/disks/diskbios.c:530, base/disks/diskbios.c:1228, base/inc/bios.h:393	1	1	1	1
+WINDOWED	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/nt_graph.h:85	0	0	0	0
+WINSOCK	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/bios.h:333	0	0	0	0
+WINWORLD	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/host_def.h:85	0	0	0	1
+WIN_VTD	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/bios.h:251	0	0	0	0
+X86GFX	undefined_only_observed		x64,x86	8	5	1	0	0	0	base/inc/emm.h:297, base/inc/mouse_io.h:817, base/keymouse/mouse_io.c:2353	1	1	3	2
+XTSFD	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/support/time_day.c:88, base/support/time_day.c:346	0	0	0	0
+YES	mixed	x64,x86	x64,x86	1	1	0	0	0	0	base/inc/debug.h:14	0	0	0	0
+YODA	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/nt_event.h:18	0	0	0	0
+_CONFIG_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/config.h:1	0	0	0	0
+_CPU4GEN_H_	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/cpu4gen.h:6	0	0	0	0
+_CpuInt_c_h	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/cpuint_c.h:1	0	0	0	0
+_Evid_c_h	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/ccpu386/evid_c.h:1, base/cvidc/evid_c.h:1	0	0	0	0
+_Fpu_c_h	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/ccpu386/fpu_c.h:1, base/cvidc/fpu_c.h:1, host/inc/cfpu_def.h:236	0	0	0	0
+_HOST_COM_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/host_com.h:1	0	0	0	0
+_HOST_CONFIG_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/host_cfg.h:9	0	0	0	0
+_HOST_CPU_H	unobserved			1	1	1	0	0	0	host/inc/host_cpu.h:19	1	1	0	1
+_HOST_ERROR_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/host_rrr.h:1	0	0	0	0
+_HOST_INC_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	host/inc/host_inc.h:16	0	0	0	0
+_HOST_LPT_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/host_lpt.h:3	0	0	0	1
+_INSIGNIA_H	mixed	x64,x86	x64,x86	1	1	0	0	0	0	host/inc/insignia.h:1	0	0	0	0
+_INS_ERROR_H	mixed	x64,x86	x64,x86	3	3	0	0	0	0	base/inc/config.h:30, base/inc/error.h:5, host/inc/error.h:1	0	0	0	2
+_Pigger_c_h	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/ccpu386/pigger_c.h:1, base/cvidc/pigger_c.h:1	0	0	0	0
+_RS232_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/rs232.h:1	0	0	0	0
+_SUPLIB_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/suplib.h:19	0	0	0	0
+_TRACE_H	mixed	x64,x86	x64,x86	1	1	0	0	0	0	base/inc/trace.h:1	0	0	0	0
+_Univer_c_h	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/cvidc/univer_c.h:1	0	0	0	0
+_WINDOWS_	defined_only_observed	x64,x86		5	0	1	0	0	0	host/inc/insignia.h:37, host/inc/insignia.h:43, host/inc/insignia.h:50	1	1	4	5
+_XT_H	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/xt.h:1	0	0	0	0
+_gdpvar_h	undefined_only_observed		x64,x86	2	2	0	0	0	0	base/ccpu386/gdpvar.h:1, base/cvidc/gdpvar.h:1	0	0	0	0
+access	unobserved			1	1	1	0	0	0	host/inc/host_hfx.h:183	1	1	0	1
+bop	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/bios.h:181	0	0	0	0
+cursor_changed	undefined_only_observed		x64,x86	3	3	0	0	0	0	base/inc/vgaports.h:1999, base/video/ega_prts.c:369, base/video/gfx_updt.c:3800	0	0	0	2
+file_id	unobserved			1	1	1	0	0	0	base/inc/debug.h:35	1	1	0	1
+host_block_timer	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/timer.h:67	0	0	0	0
+host_calc_q_ev_inst_for_time	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/quick_ev.h:79	0	0	0	1
+host_color_select_changed	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gfx_upd.h:194	0	0	0	0
+host_cursor_size_changed	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gfx_upd.h:206	0	0	0	0
+host_expand_environment_vars	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/config.h:393	0	0	0	1
+host_get_count_ms	undefined_only_observed		x64,x86	2	0	1	0	0	0	base/video/vga_prts.c:2298, base/video/vga_prts.c:2333	1	1	2	2
+host_get_time_ms	undefined_only_observed		x64,x86	1	0	0	0	0	0	base/video/vga_prts.c:2298	0	0	1	1
+host_log1p	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/fpu.c:235	0	0	0	0
+host_log2	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/ccpu386/fpu.c:231	0	0	0	0
+host_memset	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/host.h:38	0	0	0	0
+host_mode_select_changed	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gfx_upd.h:188	0	0	0	0
+host_release_timer	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/timer.h:71	0	0	0	0
+host_rflop_drive_type	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gfi.h:592	0	0	0	0
+host_screen_address_changed	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gfx_upd.h:200	0	0	0	0
+host_scroll_complete	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/gfx_upd.h:212	0	0	0	0
+host_timer_event	unobserved			1	1	1	0	0	0	base/ccpu386/c_main.c:592	1	1	0	1
+host_update_logical_page	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/emm.h:309	0	0	0	1
+hunter_fopen	unobserved			2	2	2	0	0	0	base/inc/hunter.h:157, base/inc/hunter.h:165	2	2	0	2
+i386	mixed	x86	x64,x86	1	1	0	0	0	0	host/inc/host_def.h:234	0	0	0	0
+lint	undefined_only_observed		x64,x86	1	1	0	0	0	0	base/inc/base_def.h:23	0	0	0	1
+macintosh	undefined_only_observed		x64,x86	37	18	1	0	0	0	base/comms/rs232_io.c:49, base/disks/diskbios.c:370, base/disks/fdisk.c:1846	1	1	19	10
+newline	unobserved			2	2	2	0	0	0	base/inc/debug.h:31, base/inc/hunter.h:496	2	2	0	2

@@ -41,6 +41,11 @@ per width pass; the rejected condition and line marker are verified. Both EXEs
 match S19 outside PE timestamp/checksum. This is not the conversion of all
 mirror subsets or a full regression; the proposal owns remaining scope.
 
+S20 macro inventory at 31ee31e1 records 241 mirror conditional identifiers
+and 3,072 identifier occurrences across 664 x86/x64 App-related compile
+commands; two `#elif` uses are unprobed. The proposal records the observational
+limits and linked tables. Coupled conditions remain unmodified.
+
 ## Technical Baseline
 
 Latest published binaries are S18's mirror cleanup build; hashes and 193-case
