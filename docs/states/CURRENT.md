@@ -9,8 +9,8 @@ are byte-identical to S17 after zeroing PE timestamp/checksum only. Raw EXEs
 are not byte-identical. Executor 664be095 is pushed and the actual commit is
 reviewed. Owner extends S18 to remove the three unobserved locally patched
 headers. Both cached builds report no work, EXEs are byte-identical to P1,
-and all 193 tests per architecture pass first run; follow-up delivery and
-actual-change review are pending. See the [S18 record](../proposals/m9-public-handoff-simplification.md#s18-whole-file-mirror-selection).
+and all 193 tests per architecture pass first run; follow-up executor bcbf0bb8 is pushed and actual-change review is complete;
+S18 awaits owner acceptance. See the [S18 record](../proposals/m9-public-handoff-simplification.md#s18-whole-file-mirror-selection).
 
 ## M9 T99 S18 Packet
 
