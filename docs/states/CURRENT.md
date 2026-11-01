@@ -6,7 +6,8 @@ Owner admits T99 S18 to remove confirmed unused whole mirror files. T99 stays
 open; no partial in-file branch pruning or Compat rewrite is admitted. Dual
 builds and all 193 tests per architecture pass first run; the two new EXEs
 are byte-identical to S17 after zeroing PE timestamp/checksum only. Raw EXEs
-are not byte-identical. See the [S18 record](../proposals/m9-public-handoff-simplification.md#s18-whole-file-mirror-selection).
+are not byte-identical. Executor 664be095 is pushed and the actual commit is
+reviewed; S18 awaits owner acceptance. See the [S18 record](../proposals/m9-public-handoff-simplification.md#s18-whole-file-mirror-selection).
 
 ## M9 T99 S18 Packet
 

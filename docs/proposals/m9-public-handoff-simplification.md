@@ -3930,3 +3930,11 @@ Raw binaries are not byte-identical. No artifact was modified to conceal that.
 The inactive includes in retained historic branches are not expanded by these
 selected profiles; in-file pruning and future profile support are outside S18.
 User INI/media/snapshots are preserved.
+
+Coordinator review of pushed `664be095`: the actual commit removes the 27
+recorded files and eight source-list entries, preserves the three local-patch
+headers, leaves all public trees and user inputs unchanged, and passes the
+mirror, documentation, whitespace and build-residue gates. Rechecking the
+committed EXE blobs after zeroing PE timestamp/checksum confirms identical
+remaining bytes; raw files differ. The documented first-run test inventory and
+qualification are retained. S18 awaits owner acceptance; T99 remains open.
