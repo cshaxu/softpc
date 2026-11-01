@@ -52,6 +52,7 @@ AMENDMENTS	:
 #include "ios.h"
 #include "rtc_bios.h"
 
+#ifndef NTVDM
 /*
 =========================================================================
 
@@ -121,6 +122,7 @@ void set_tod()
 	
 	return;
 }
+#endif
 
 
 /*

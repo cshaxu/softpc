@@ -4054,3 +4054,207 @@ source-level redefinitions, shared declarations and selected local patches;
 then map each proposed exclusion against the existing XP subset ledger and
 provide per-file estimates. No branch deletion, compatibility replacement or
 complete-domain claim follows from this initial inventory.
+
+
+#### S20 actual-command discovery evidence
+
+At `23f65b5c`, the cached Ninja release trees provide 332 distinct C
+compile commands per width: 233 mirror-source contexts, 47 own App/Compat
+contexts and 52 App-test contexts. All 664 commands were preprocessed with
+their original compiler, definitions and includes; zero reported failure.
+The two derived inventories are [file inventory](../etc/evidence/softpc/m9-t99-s20-file-inventory.tsv)
+and [conditional-arm observations](../etc/evidence/softpc/m9-t99-s20-branch-observations.tsv).
+The former covers all 475 manifest bodies; the latter records 3,983 textual
+conditional arms across 194 C/H files. Source paths are case-folded for
+matching Windows preprocessor line markers, retaining manifest spelling.
+
+The discovery marker reports a nonempty output line in an arm, not a semantic
+branch decision: generated comments may count, nested arms overlap, compiler
+line mappings do not reveal all macro state and an include-only arm can emit
+no parent-file output line even when selected. Hence `no` does not mean dead,
+`yes` does not prove runtime relevance, and no line total or auto-removal
+list can be derived by adding these overlapping ranges. Actual observation:
+1,490 arms have nonempty lines observed for both widths, one only for x86,
+and 2,492 have none observed for either width. One known include-only false
+negative is `c_main.c:33-34`, while its TLS code at 832-833 is observed.
+The first exploratory scan doubled Windows CRLF line numbers and was rejected;
+the replacement uses binary line reading and was checked against the known
+CPU_30, V7VGA and TLS examples. A first probe also stalled on output pipes and
+was retired; neither attempt is evidence of a product failure.
+
+Concrete examples and preliminary disposition:
+
+- `host/inc/host_cpu.h:17-111`: CPU_30_STYLE body has no observed lines; no
+  scanned compile command defines CPU_30_STYLE and a source scan found no
+  direct definition in App source/tests. Its MONITOR-only deleted monregs.h
+  include is nested inside. Candidate for an isolated, reviewed subset change:
+  preserve outer `#ifdef/#else`, replace the 94 body lines with one fixed
+  exclusion comment (estimated source +1/-94). The file's non-CCPU/local ABI
+  work remains outside that body. This is an estimate, not implementation or
+  proof for every possible alternative build.
+- `base/ccpu386/c_main.c:832-835`: retain the selected TLS simulation-stack
+  arm; it is enabled by `SOFTPC_CCPU_TLS_SIMSTACK` despite the other NTVDM
+  alternative. It contains a previously recorded local ABI correction.
+- `base/video/vga_prts.c:398-435`: V7VGA declarations are observed on both
+  widths and the file has reviewed local cursor/video patches. Retain the
+  selected behavior; do not infer the fate of unselected arms by file label.
+- `host/inc/host_def.h:234-237`: the `i386` declaration is observed only on
+  x86, with an alternate x64 arm. Both supported compile contexts matter;
+  selected text alone is not proof that the symbol has a live consumer.
+- `base/comms/com.c`: a candidate SEGMENTATION arm and several IRET_HOOKS
+  arms have no direct output lines; the same file contains the active UART
+  and snapshot integration, and the chosen non-IRET path is observed. Audit
+  its whole nested chains and snapshot callbacks before a deletion estimate.
+
+The 2,492 discovery candidates include 919 arms in files with reviewed local
+patches and 889 in files with preserved local patches. These are arm counts,
+not unique files or removable changes. Semantic classification, complete
+consumer review, potential original-code reuse and per-file XP subset diff
+estimates remain open; S20 is not complete and no mirror or EXE was changed.
+
+The largest no-direct-output clusters are `cpu4gen.h` (652 arms),
+`sas4gen.h` (166), `c_main.c` (87), `ega_read.c` (84), `gfx_updt.c`
+(68), `com.c` (64), `reset.c` (62), `ica.c` (62), and `video.c` (54).
+They mix nested, generated and diagnostic paths; these counts cannot be
+summed into a diff or interpreted as approved deletion. In `com.c:670-699`,
+IRET_HOOKS changes interrupt/receive scheduling, while the observed alternative
+uses the existing host input-ready callback and quick event; this is an
+alternative device behavior, not a demonstrated replacement for Compat.
+The selected UART/snapshot path and its tests must remain intact.
+
+
+#### S20 branch markers and first bounded cleanup candidate
+
+To distinguish include-only and empty arms from non-selection, 470 C/H
+mirror bodies were instrumented **only in a disposable copy** with a unique
+preprocessor pragma after each of 3,983 conditional arms. All 664 frozen
+x86/x64 App/product/test commands were preprocessed against that copy; it was
+never a product build input. Known PIG, CPU_30, V7VGA, and mixed TLS examples
+were checked. Case-normalized file markers cover all 470 bodies. Initial
+64 contexts failed because the copy lacked relative shared headers; after
+copying those headers, the 66 retry commands covering those contexts succeeded.
+A projection-tool draft also failed on differing historical TSV column names
+and was corrected. These are research fixture failures, not product failures.
+
+The branch observation ledger now includes marker evidence: 1,515 arms
+selected in at least one context on both widths, one observed only on x86,
+and 2,467 not selected by those contexts. An arm may be selected in one
+context and not another even for the same width; `selected` is a union, not
+a promise that every context selected it. The temporary path and pragma probes
+are bounded evidence, not proof of equivalent behavior under other builds or
+permission to delete a branch. Macro continuations, nested parents, generated
+ABI, selected device paths and local repairs remain subject to manual review.
+
+A first independently reviewable candidate is `#ifdef SEGMENTATION`: all 93
+matching arms were unselected in the scanned contexts. Of those, 90 arms in
+53 files contain only original `.seg` includes and comments; they do not
+overlap and their 475 body lines match the pinned XP raw sources. All candidate
+body matches are included in the existing necessary-XP subset ranges; repeated
+identical bodies were checked at all matching original positions. The three
+other arms contain nested directives and are explicitly excluded. The `.seg`
+blocks describe historical Mac compiler code-segment selection, not a machine
+implementation that could replace standalone Compat. The existing source
+contains an `#undef SEGMENTATION`, but no source/test definition or selected
+compiler `-DSEGMENTATION` was found; this scope does not prove future profiles.
+
+Estimated implementation diff if the owner admits this candidate: keep all
+existing outer conditions, replace each 90-body block by one fixed comment,
+source +90/-475, net -385 lines across 53 files. This is not implemented and
+excludes manifest, range records, tests and documentation. Because the 475
+lines are present in the old XP necessary subset, the new subset must record
+their deliberate exclusions separately; the 90 local comment lines remain
+visible in the local-versus-new-subset comparison. Compute actual per-file
+raw, subset and local diffs after implementation rather than assuming Git
+alignment in files containing duplicate blocks. The 53 files include 56 candidate
+arms in REVIEWED_LOCAL_PATCH files and one in a PRESERVED_LOCAL_PATCH file;
+raw-XP exact body matches are not a blanket license to touch adjacent patches.
+
+S20 remains open: the other 2,377 unselected arms (including three nested
+SEGMENTATION cases), cross-component alternatives and original-code reuse
+have not all received semantic or patch-by-patch review. No broad deletion
+estimate or full-domain semantic completion is claimed.
+
+
+#### S20 PIG comparison
+
+The actual-context marker audit identifies 84 plain `#ifdef PIG` arms in
+18 files, with 977 body lines before any deduplication. They are mutually
+non-overlapping and unselected in this fixed x86/x64 evidence set. Against
+pinned XP raw bodies, 82 match some original contiguous body; two in
+`base/ccpu386/c_main.c` do not: line 2911 includes the local
+`softpc_host_debug_retired()` hook, and line 5055 contains the local
+`SOFTPC_CCPU_TLS_SIMSTACK` condition. These are inside unselected outer PIG
+branches, but their prior purpose, provenance and comparison accounting must
+be recorded before deletion. Other duplicate bodies have multiple original
+locations, so raw-body identity alone is not a per-location patch proof.
+The remaining PIG family includes `#ifndef`, compound and nested forms and
+is not equivalent to these 84 cases. No PIG cleanup is approved by this audit
+and no generalized reuse or runtime effect is claimed.
+
+#### S20 ROI guard against mechanical churn
+
+There are 22 unselected plain SCCSID arms, each with one body line in a
+different file. Replacing each with the requested one-line placeholder would
+produce approximately +22/-22 source lines before provenance changes; it
+does not materially reduce source length and would touch 22 files. Do not
+recommend this as a separate cleanup just because the condition is inactive.
+Similarly, counts for generated PROD arms must not be interpreted as a
+worthwhile batch without considering nesting, ABI, placeholder overhead and
+the exact current XP subset. This is a prioritization decision, not a claim
+that every such arm is permanently necessary.
+
+
+#### S20 owner direction: preserve conditions and reject excluded arms
+
+The owner now specifies the binding [coding rule](../rules/CODING.md#selected-mirror-conditional-branches):
+retain or restore original conditional structure in retained mirror subsets;
+replace each deliberately excluded body with `#error` alone, including any
+existing comment-only placeholders. Earlier S20 discussion of one-line
+comment placeholders is superseded. This is not permission to classify an
+unobserved arm as excluded or to alter selected behavior; classify original
+context and existing local patches first. Whole-file exclusions remain a
+distinct decision. Audit the 85 recorded subset-baseline files as well as
+other retained files, and distinguish actual local source from range projection.
+Current S20 evidence and 90-arm sizing are research, not an implementation
+or proof that all former removed conditions have already been restored.
+
+The owner also requires necessary `#line` directives for preserved diagnostic
+locations. Audit the original and local line-control directives and verify
+file/line mapping on each applicable boundary. `#line` is retained line control,
+not an explanatory comment or a replacement for the required `#error`.
+
+
+#### S20 owner-requested first implementation and build validation
+
+The owner directs an initial application of the rule and build verification.
+This is a bounded first application, not conversion of all 85 prior XP
+subset files or all 2,467 unselected arms. Against S19, six mirror files
+change +64/-6: five previously selected-subset-identical files restore only
+their original pinned XP conditional directives (`cmos_bis.c`, `timestrb.c`,
+`ega_mode.c`, `egawrtm0.c`, `egwrtm12.c`); their normalized local contents
+now exactly match the respective XP raw objects. Their prior subset projection
+is retained as the independently recorded old baseline; their actual restored
+directives are visible in the local-versus-subset manifest identity rather
+than hidden as a new baseline. No non-directive original body was added.
+
+In `com.c` the original SEGMENTATION directives remain, the excluded Mac
+segment body is replaced with `#error`, and `#line 27` preserves the existing
+source location following the branch, also matching the pinned XP position.
+Other candidate SEGMENTATION blocks, prior excluded-body placeholders and
+restoration of previously removed condition structures remain unconverted.
+The prior audit ledger describes the frozen pre-pilot source, not the new line
+numbers. No Compat or public production source changed.
+
+Final x86 and x64 cached all-target builds succeeded. Each architecture passed
+five focused cases: serial, CMOS, VGA-frame, XP mirror and mirror selftest.
+The actual `com.c` preprocess command with `-DSEGMENTATION` failed with the
+expected diagnostic on both widths, while normal preprocessing succeeded and
+emitted the line-27 marker. Final build logs include 406 original-mirror warning lines, and zero warning
+lines outside the mirror; no full regression or guest visual verification is
+claimed. Task-owned scratch was retired after evidence promotion. First mirror-check
+invocation used an incorrectly formed relative source parameter and failed
+to find the manifest; rerunning with the explicit absolute source path passed.
+Both package EXEs were rebuilt: their lengths match S19 and each differs in
+six raw bytes, only in PE timestamp/checksum; the remaining bytes are equal.
+- softpc32 SHA-256 f87f88c7bb730f404c03ac1216cf6ee6f27a7a93ffee8b7da4b08c0acc507160
+- softpc64 SHA-256 813b6a33b1b7a24d3326fcada9930a1568ac61092ce09e8527fd650e0adb7c35

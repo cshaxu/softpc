@@ -17,13 +17,9 @@ static char SccsID[]="@(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd."
 #endif
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_COMMS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 27
 
 /*
  *    O/S include files.

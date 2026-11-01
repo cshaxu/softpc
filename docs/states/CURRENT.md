@@ -13,19 +13,19 @@ control. T99 remains open.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner closes S19 and admits S20 audit. |
-| Objective | Audit retained mirror conditional branches against actual x86/x64 profiles and design reviewable cleanup under the owner-directed conditional-structure and `#error` rule. |
-| Non-goals | No source pruning, build changes, new feature import, or runtime behavior change in this research task. |
+| Objective | Audit retained mirror conditional branches and perform the owner-directed first implementation and x86/x64 build validation of restored structure and excluded-body `#error`. |
+| Non-goals | No unverified bulk pruning, new feature import, guest behavior change, or modifications outside the admitted mirror and provenance scope. |
 | Reference Baseline | S19 delivery 23f65b5c, selected XP SP1 mirror and existing manifest. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Read-only retained mirror, actual build/test contexts, Compat and mirror provenance; task documentation only. |
+| Files And ABI Surface | Audited retained mirror conditional structure, XP subset/provenance records and relevant build verification; no public API change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
-| Verification | Account for a finite file and branch universe; distinguish selected, unselected, unobserved and undetermined; validate actual x86/x64 compiler contexts and dependencies. |
+| Verification | Account for the finite branch universe; validate selected and deliberately rejected branches, diagnostic line mappings, actual x86/x64 builds, mirror gate and published binary comparison. |
 | Expected Markers | Document original condition restoration, excluded-body `#error`, real local patches and potential original-code reuse with evidence. |
-| Asset Needs | No package, user configuration, media, snapshots or source changes. |
+| Asset Needs | Preserve user INI, media and snapshots; build both architectures and publish EXEs if produced by the approved validation. |
 | Reporting Requirements | Explain evidence limits, classify candidates with reasons and estimate mirror diff; propose independently reviewable batches. |
-| Stop Conditions | Do not modify mirror, assume unobserved means safely removable, or use external material as a build dependency. |
-| Exit Criteria | Provide reproducible audit, precise remaining unknowns and actionable proposed next steps; commit and push documentation. |
-| Original Owner Request | 收口s19 准入s20审计；保留或恢复镜像条件结构，被排除分支仅用 #error，保留必要 #line，写入代码规范 |
+| Stop Conditions | Do not alter unverified mirror paths, assume unobserved means safely removable, or use external material as a build dependency. |
+| Exit Criteria | Implement and validate the owner-directed first application, record actual scope and remaining unconverted branches, and provide reproducible audit evidence. |
+| Original Owner Request | 收口s19 准入s20审计；保留或恢复镜像条件结构，被排除分支仅用 #error，保留必要 #line，写入代码规范；执行一次并验证编译结果 |
 | Similar-Issue Sweep | Include source and header branch chains, compile profiles, shared declarations, and existing local fixes. |
 
 Disposable research scratch: `build/t99-s20`, owned by S20; two-hour total and
@@ -33,6 +33,13 @@ Disposable research scratch: `build/t99-s20`, owned by S20; two-hour total and
 
 S19 is owner-accepted and closed; see [closure](../history/M9-T99-S19-compat-boundary.md).
 Its delivery is 23f65b5c. T99 remains open.
+
+S20 first application: six mirror files +64/-6 restore five original
+conditional structures and replace one excluded segment body with `#error`
+and preserved `#line`. Both cached architecture builds and five focused tests
+per width pass; the rejected condition and line marker are verified. Both EXEs
+match S19 outside PE timestamp/checksum. This is not the conversion of all
+mirror subsets or a full regression; the proposal owns remaining scope.
 
 ## Technical Baseline
 

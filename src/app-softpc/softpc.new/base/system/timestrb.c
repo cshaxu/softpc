@@ -83,15 +83,19 @@ void time_strobe()
 #endif    
 
 
+#ifndef NTVDM
 #ifndef	REAL_TIMER
 	/* Update the real time clock */
+#ifndef NEC_98
         rtc_tick();
+#endif   //NEC_98
 #endif	/* REAL_TIMER */
 
         dispatch_tic_event();
 
 #if defined(CPU_40_STYLE)
 	ica_check_stale_iret_hook();
+#endif
 #endif
 
         /*

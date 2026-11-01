@@ -151,6 +151,7 @@ GLOBALS		  :	uses EGA_GRAPH struct, plane_mask to decide which planes are enable
 LOCAL VOID
 set_up_screen_ptr()
 {
+#ifndef NEC_98
 	if( get_memory_chained() )
 	{
 		if( plane01_enabled() )
@@ -163,6 +164,7 @@ set_up_screen_ptr()
 	}
 	else
 		set_screen_ptr(EGA_planes);
+#endif   //NEC_98
 }
 
 /* -----------------------------------------------------------------------
@@ -538,6 +540,8 @@ LOCAL void ega_dummy_calc IFN0()
 static	void	set_update_routine(mode)
 DISPLAY_MODE	mode;
 {
+#ifndef NEC_98
+#ifndef NTVDM
 	static int last_height = 200;
 
 	if (last_height != get_screen_height()) {
@@ -661,6 +665,8 @@ DISPLAY_MODE	mode;
 			assert1(NO,"Bad display mode %d", (int) mode );
 			break;
 	}
+#endif /* NTVDM */
+#endif   //NEC_98
 }
 
 
@@ -676,6 +682,7 @@ DISPLAY_MODE	mode;
 
 void	ega_mode_init()
 {
+#ifndef NEC_98
 	/*
 	** This bit moved here from ega_video_init(), since it's all about 
 	** the emulation of the video hardware, not the video BIOS.
@@ -696,11 +703,13 @@ void	ega_mode_init()
 	** forced which then gets too confused and dies.
 	*/
 	set_update_routine(DUMMY_FUN);
+#endif   //NEC_98
 }
 
 
 boolean	choose_ega_display_mode()
 {
+#ifndef NEC_98
 	DISPLAY_MODE	mode;
 	int	old_offset;
 
@@ -789,6 +798,7 @@ boolean	choose_ega_display_mode()
 	 */
 
 	screen_refresh_required();
+#endif   //NEC_98
 	return TRUE;
 }
 

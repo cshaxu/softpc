@@ -1,6 +1,7 @@
 #include "insignia.h"
 #include "host_def.h"
 
+#if !(defined(NTVDM) && defined(MONITOR))
 
 /*			INSIGNIA (SUB)MODULE SPECIFICATION
 			-----------------------------
@@ -335,6 +336,7 @@ byte rotate IFN2(byte, value, int, nobits)
 	return double_num.as_bytes.lo_byte;
 }
 
+#ifndef NEC_98
 VOID
 ega_copy_b_write IFN2(ULONG, value, ULONG, offset )
 {
@@ -407,6 +409,7 @@ ega_copy_b_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 		inc ^= 2;
 	}
 }
+#endif  //NEC_98
 
 #ifdef  BIGEND
 #define first_half(wd)      (((wd) & 0xff00) >> 8)
@@ -416,6 +419,7 @@ ega_copy_b_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 #define sec_half(wd)        (((wd) & 0xff00) >> 8)
 #endif
 
+#ifndef NEC_98
 VOID
 ega_copy_w_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 {
@@ -1364,5 +1368,7 @@ ega_mode0_chn_w_write IFN2(ULONG, value, ULONG, offset )
    ega_mode0_chn_b_write( value >> 8, offset + 1 );
 }
 
+#endif  //NEC_98
 #endif
 
+#endif	/* !(NTVDM && MONITOR) */
