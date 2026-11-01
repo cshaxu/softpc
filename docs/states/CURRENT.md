@@ -2,8 +2,10 @@
 
 ## Current Work
 
-Owner accepts and closes S19 and admits S20 for read-only audit of conditional
-compilation within retained mirror files. T99 remains open.
+Owner accepts and closes S19, admits S20 for mirror conditional-branch audit,
+and directs the coding rule to preserve original condition structure and use
+`#error` for excluded branch bodies, retaining necessary diagnostic `#line`
+control. T99 remains open.
 
 ## M9 T99 S20 Packet
 
@@ -11,19 +13,19 @@ compilation within retained mirror files. T99 remains open.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner closes S19 and admits S20 audit. |
-| Objective | Audit retained mirror conditional branches against actual x86/x64 profiles and design minimal, reviewable selection cleanup. |
+| Objective | Audit retained mirror conditional branches against actual x86/x64 profiles and design reviewable cleanup under the owner-directed conditional-structure and `#error` rule. |
 | Non-goals | No source pruning, build changes, new feature import, or runtime behavior change in this research task. |
 | Reference Baseline | S19 delivery 23f65b5c, selected XP SP1 mirror and existing manifest. |
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
 | Files And ABI Surface | Read-only retained mirror, actual build/test contexts, Compat and mirror provenance; task documentation only. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Account for a finite file and branch universe; distinguish selected, unselected, unobserved and undetermined; validate actual x86/x64 compiler contexts and dependencies. |
-| Expected Markers | Document possible whole-branch deletions, preserved placeholders, real local patches and potential original-code reuse with evidence. |
+| Expected Markers | Document original condition restoration, excluded-body `#error`, real local patches and potential original-code reuse with evidence. |
 | Asset Needs | No package, user configuration, media, snapshots or source changes. |
 | Reporting Requirements | Explain evidence limits, classify candidates with reasons and estimate mirror diff; propose independently reviewable batches. |
 | Stop Conditions | Do not modify mirror, assume unobserved means safely removable, or use external material as a build dependency. |
 | Exit Criteria | Provide reproducible audit, precise remaining unknowns and actionable proposed next steps; commit and push documentation. |
-| Original Owner Request | 收口s19 准入s20审计 |
+| Original Owner Request | 收口s19 准入s20审计；保留或恢复镜像条件结构，被排除分支仅用 #error，保留必要 #line，写入代码规范 |
 | Similar-Issue Sweep | Include source and header branch chains, compile profiles, shared declarations, and existing local fixes. |
 
 Disposable research scratch: `build/t99-s20`, owned by S20; two-hour total and
