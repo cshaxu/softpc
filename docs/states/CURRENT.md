@@ -2,11 +2,154 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T99.
-Owner closes T99 S20 after first-depth mirror reconciliation. Each subsequent
-conditional depth is a separate S. The owner authorizes automatic admission of
-the next depth after the preceding S completes its delivery and closure;
-depth 2 is awaiting that transition. See the [S20 closure](../history/M9-T99-S20-mirror-depth1.md) and the [proposal](../proposals/m9-public-handoff-simplification.md).
+Owner closes T99 S20 and authorizes each later conditional depth as a separate
+S, automatically admitted after the preceding depth is built, published,
+tested, committed, pushed and closed. S21 is active for depth 2; T99 remains
+open. The [S20 closure](../history/M9-T99-S20-mirror-depth1.md) records depth 1.
+
+## M9 T99 S21 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner closes S20 and authorizes automatic admission of the next depth. |
+| Objective | Reconcile the second-depth mirror conditional frames using the established breadth-first policy. |
+| Non-goals | Do not process third-depth bodies, add guest behavior, alter public APIs, or modify user media and configuration. |
+| Reference Baseline | S20 closure 36be4a7a, pinned XP SP1 subset, OpenNT comparison, and S20 depth-2 evidence. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
+| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
+| Verification | Probe supported x86/x64 contexts, validate line controls and mirror gates, dual builds and published EXEs, full tests, independent actual-diff review, commit and push. |
+| Expected Markers | Preserve original second-depth conditional frames; use one #error in each conclusively excluded arm and correct #line for retained code. |
+| Asset Needs | Build and publish both EXEs; preserve INI, guest media and snapshots. |
+| Reporting Requirements | Report depth-2 totals and dispositions, source and test diff, validation, and provisional depth-3 queue. |
+| Stop Conditions | Do not treat unreachable observations as proof of exclusion, alter unverified paths, or process deeper branches. |
+| Exit Criteria | Complete second-depth exclusion delivery, then audit retained arms and enqueue their direct third-depth children; complete required validation and delivery. |
+| Original Owner Request | 每一层都是独立 S；每层先交付排除分支，再审计保留分支和排队下一层；每 S 编译、发布、测试、提交、推送后收口并自动准入下一层。 |
+| Similar-Issue Sweep | Compare XP and OpenNT second-depth frames across source and headers; account for existing local fixes and complete OR expressions. |
+
+S20 recorded 1,381 present second-depth arms, 11 known absent XP groups and
+140 unverified direct-child candidates. These categories can overlap and are
+not a final count. Disposable scratch `build/t99-s21` belongs to S21, with a
+two-hour total and 30-minute no-progress observation budget; promote durable
+evidence and remove scratch before closure.
+
+The first pending depth-2 batch restores six original NTVDM child frames
+under selected non-NEC parents. Each excluded body is one `#error`; the
+original child line is restored and existing post-parent line controls remain.
+The changes are not yet delivered: actual x86/x64 context probes, complete
+exclusion-batch scan, dual builds, publication and full tests remain required.
+See `m9-t99-s21-depth2-restored-exclusions.tsv`; S20 evidence remains frozen.
+Both architectures passed an intermediate build after the first six
+restorations. The second-depth scan then identified three literal `#if 0`
+arms, replaced with `#error` and verified retained-code line numbers. Four
+additional OR-condition arms were probed at their actual source positions:
+both x86/x64 contexts reached each location and selected the false path.
+These four arms are now excluded with original line controls. All later changes
+passed an intermediate dual-architecture build and the mirror/documentation
+gates. Full regression and the remaining exclusion scan are still pending.
+At the intermediate checkpoint, the S20 queue mapped all 1,381 prior
+arms: 703 contained `#error` and 678 needed condition proof. Later original
+frame restoration can change nesting, so that queue must be regenerated
+before retained-arm qualification.
+Of the earlier 131 source/header arms without an exact historical observation,
+128 source arms were probed in 40 successful actual x86/x64 preprocessing
+contexts. Their parents and arms were reached in both architectures, so these
+are not exclusion candidates. Three header arms remain unprobed. A prior
+syntax-only probe was invalid because inserted pragmas disturbed C syntax;
+only the successful preprocessing probe is evidence. See
+`m9-t99-s21-depth2-source-probes.tsv`. The three header arms were then
+checked in 68 actual dependency contexts: printer and RS232 selected in all
+contexts; ICA `!CPU_40_STYLE` selected in four x86 and four x64 test
+contexts, so none may be excluded. See `m9-t99-s21-depth2-header-probes.tsv`.
+This does not yet enqueue depth 3.
+Two additional previously unselected `else` arms were probed with their
+complete parent expressions at both actual x86/x64 source contexts. Both
+parents selected their first arm; the two else bodies are now single `#error`
+and selected local standalone logic remains intact. The batch now contains
+15 excluded-arm changes; these last edits still require build and validation.
+Two further original NTVDM header frames in `sas.h` and `host_inc.h` have
+been restored around their existing selected paths; they also await complete
+context validation. The PPI NTVDM candidate is not an exclusion: its existing
+OR with standalone selects `HostPpiState` for standalone audio. See
+`m9-t99-s21-depth2-candidate-review.tsv`. Ten more missing NTVDM frames
+were restored only where original direct-group boundaries and both adjacent
+anchors mapped uniquely; their following retained XP line controls were
+checked. The 27-item working batch needs fresh dual builds and full
+exclusion-batch qualification. No overlapping or uncertain candidate was
+automatically restored. One additional NTVDM direct group surrounding a
+large original `gfx_updt.c` body was restored as one `#error`; its inner
+conditions remain absent. Four adjacent NTVDM/JAPAN groups in `video.c` were
+restored in original order, preserving the two retained statements and their
+XP line numbers. Twelve further unselected NEC_98/JAPAN groups were
+restored only where original group and adjacent anchors were unambiguous.
+Twelve further original NEC_98/JAPAN groups with uniquely matching selected
+bodies have their excluded arm restored while keeping selected text intact.
+The working batch contains 56 exclusion items. Both architectures built and
+passed the documentation and XP mirror gates after these edits; full
+exclusion-batch regression remains pending. Of the 140 provisional XP child
+candidates, 86 are represented by working-batch restorations and three
+have separate existing/local dispositions. The other 51 remain to be
+classified and may include selected/local frames.
+Three additional groups were subsequently matched against unique complete
+non-NTVDM/NEC selected bodies and restored with those bodies unchanged;
+Four further direct compound expressions were verified false at their actual
+x86/x64 source positions and restored as excluded frames. The working batch
+includes three `NTVDM && FIFO_ON` header conditions that proved
+false in six real x86/x64 dependency contexts and were restored. One
+video NTVDM candidate already existed; its preceding diagnostic line was
+corrected and the adjacent original JAPAN/KOREA exclusion restored. The
+current work needs a fresh dual build; other compound candidates remain
+under review.
+Two adjacent JAPAN/KOREA-and-i386 groups were subsequently restored in
+original order after both complete expressions proved false in both real
+architecture contexts. Two known missing `DESCENT` and `ARCX86` frames
+were also restored after both expressions proved false in actual x86/x64
+contexts. Of the 11 previously known missing XP groups, eight exclusion
+groups are restored; the remaining three are selected outer wrappers for
+after the exclusion delivery. Seven additional NTVDM groups were restored
+using uniquely matched surrounding selected code. The original timer NTVDM
+conditional was also restored around its existing selected path without
+changing the zero-delay fix; the reset NTVDM candidate is its already
+selected local OR extension. The working batch now has 79 items and remains
+unqualified pending the full exclusion scan. Five additional regional
+sibling groups were restored only after their selected content and five
+preceding original source lines matched uniquely; the working exclusion
+batch now has 86 items after restoring two NEC_98 timer switch-case
+groups at uniquely identified cases; their selected calculations remain
+unchanged. Four more original NT-only groups were restored at anchored
+positions. Four further compound-expression sibling groups were restored
+after actual-context probes, retaining their selected code; existing nested
+conditions inside the serial selected arm now correctly belong to depth 3.
+Four region/graphics groups were subsequently restored after context checks,
+with selected output preserved. Three further false native/graphics guards
+were restored after actual dual-architecture source probes; the keyboard
+IRQ clear remains in its existing unconditional selected path. The working
+batch has 107 items after four NEC_98 sibling groups were restored without
+rewriting selected code or pre-existing deeper conditions; final exclusion
+scan, build and regression remain. An earlier structural scan found 772 existing
+second-depth direct-error arms and
+zero bodies containing anything besides a single `#error`; this structural
+result is not evidence that every original frame has been restored.
+A later scan of the current tree finds 806 such arms and no non-single-error
+bodies. The working exclusion batch now contains 114 original groups; x64
+and x86 intermediate builds and the XP mirror and documentation gates pass.
+The full test run is in progress. The S20 provisional queue has seven entries
+whose depth changes under restored parent frames; they require reclassification,
+not blind retention as depth-2 work.
+The exclusion delivery now restores 116 original groups; 99 overlap the
+140 original XP child candidates, four candidates are separately reviewed,
+and 37 await retained-branch review. The remaining 17 restored groups came
+from the independent scan. A fresh structural scan finds 807 direct #error
+arms with no non-single-error bodies. The latest final-source dual build and
+tests passed: each architecture 186 background tests and eight serial native
+integration tests, with no failures. The initial sandbox run failed its
+junction-creation selftest with access denied; the unsandboxed complete rerun
+passed it. These results qualify only the exclusion batch, not closure of S21.
+Final-source context observations were refreshed: 40 source preprocessing
+contexts and 68 header dependency contexts all succeeded; 128 source arms
+and three header arms were observed selected in both architectures. After
+the last parent restorations nine earlier queue entries moved to depth 3.
 
 ## Technical Baseline
 

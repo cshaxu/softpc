@@ -9,6 +9,13 @@
 extern	boolean	(*choose_display_mode)();
 extern	boolean	choose_ega_display_mode();
 #ifdef VGG
+#line 12
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 17
 extern	boolean	choose_vga_display_mode();
+#endif
+#line 19
 #endif
 

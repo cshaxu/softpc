@@ -1521,8 +1521,9 @@ GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 #line 1554
 
 #if 0
-		dt1(DHW | PORTIO, 0, "inw on sector buffer returns %x(hex)\n", *value)
+#error "Unsupported SoftPC mirror configuration: constant false"
 #else
+#line 1557
 		dt1(DHW | PORTIO, INW_TRACE_HNDL, "inw on sector buffer", *value)
 #endif
 			break;

@@ -1,0 +1,5 @@
+path	xp_line	current_line	status	reason	source_sha256
+base/keymouse/ppi.c	170	169	retained-local-condition-extension	NTVDM predicate is retained in NTVDM-or-standalone; HostPpiState is used by standalone audio, so branch is selected and not an exclusion	b145249ddb7351efcd68c34eafac5e12f5c3c5403f1b9f8e2b47e3b2a63796b8
+base/video/video.c	3940	2838	matched-existing-excluded-frame	NTVDM frame already present; preceding line control corrected to XP 3940	c6bd732ad8f2950c665481b9562f5b733b88780a4dd870109804bea9fa8358cb
+base/bios/reset.c	1027	737	retained-local-condition-extension	original NTVDM predicate remains inside existing NTVDM-or-standalone condition; selected equipment logic retained	47ad578c2d021aed45d46b8d186f5f968c8c8c9f0bf8f1268200193ebb5c95f4
+base/keymouse/mouse.c	393	0	absent-inside-approved-local-removed-code	XP debug conditional was inside the loadsainterrupts block removed by the accepted local InPort implementation; do not reintroduce the removed enclosing runtime logic	7e013a3b879397241d821607782df572eb585c2c6a80fe749b1a6180466b7cdb

@@ -126,6 +126,11 @@ DESCRIPTION       :     describe what (not how) function does
 #endif          /* GISP_SVGA */
 #line 123
 
+#line 126
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: defined(JAPAN) || defined(KOREA)"
+#endif
+#line 130
 /* [3.1.2 DECLARATIONS]                                                 */
 
 GLOBAL IU8 Video_mode;  /* Shadow copy of BIOS video mode */
@@ -134,6 +139,15 @@ GLOBAL IU8 Currently_emulated_video_mode = 0;   /* Holds last video mode
 
 
 
+#line 136
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
+#endif
+#line 141
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 150
 #ifdef CPU_40_STYLE
 GLOBAL IBOOL forceVideoRmSemantics = FALSE;
 #endif

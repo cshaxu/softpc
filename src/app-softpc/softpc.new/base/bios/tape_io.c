@@ -134,6 +134,11 @@ half_word target_AR;
                 inb(CMOS_DATA, &cmos_u_m_s_hi);
                 setAH(cmos_u_m_s_hi);
                 setAL(cmos_u_m_s_lo);
+#line 150
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: defined(JAPAN) && defined(i386)"
+#endif
+#line 156
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* PM */

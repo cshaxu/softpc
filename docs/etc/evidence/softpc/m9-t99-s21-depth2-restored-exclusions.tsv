@@ -1,0 +1,117 @@
+path	xp_child_line	condition	source_sha256	status
+base/support/time_day.c	989	ifdef NTVDM	cb62ab2f604b9b58ebf3964b7cb5300b00bed51c3a31b1f73c83707a7608dda5	restored-pending-context-probe-and-delivery
+base/video/gfx_updt.c	5970	ifdef NTVDM	e37ac8342cb404da77e24191fdb5eb769a8bfd0df640eb2d7ed327053f972d5c	restored-pending-context-probe-and-delivery
+base/inc/gfx_upd.h	326	ifdef NTVDM	6e66f32045a53b126a516c645ab90ca8ab9da5f763a1d007027978ab14c23f2c	restored-pending-context-probe-and-delivery
+base/video/video.c	116	ifdef NTVDM	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	restored-pending-context-probe-and-delivery
+base/keymouse/mouse_io.c	1230	ifdef NTVDM	e2b0bafeebf0844bf2922e33c3a71afa6cbb799489649f54c06eae48e0666bf6	restored-pending-context-probe-and-delivery
+base/system/ica.c	2063	ifdef NTVDM	9d46345c040931d9b891d8487eeb212b9d0e98bf3e3e15dfc90bb5eca4ac002b	restored-pending-context-probe-and-delivery
+base/ccpu386/c_main.h	167	if 0	63d447dac17995a83b4a42b62aec25704972c54b0e6297bc7ba9f057e3cbfa19	constant-false-pending-delivery
+base/ccpu386/ntstubs.c	85	if 0	eab2b059881b5b7b383e8a5445edda8cf7d7955de52fc04fc0ffc0193ca4dac3	constant-false-pending-delivery
+base/disks/fdisk.c	1554	if 0	ddf2f97f524b3fc28ce906df8d3225d52a012006daebd3e583628391c61e5df7	constant-false-pending-delivery
+base/comms/com.c	1590	if delayed interrupts or NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	false-in-four-current-context-probes-pending-delivery
+base/comms/com.c	2665	if non-PROD or IRET_HOOKS	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	false-in-four-current-context-probes-pending-delivery
+base/video/video.c	2372	if NTVDM monitor or GISP_SVGA	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	false-in-four-current-context-probes-pending-delivery
+base/video/video.c	2929	if NTVDM monitor or GISP_SVGA	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	false-in-four-current-context-probes-pending-delivery
+base/bios/reset.c	1037	else of NTVDM or standalone	a4a8233e0c44647c7c2da51a9e171bc2bdbdcf437c471ebaa84c7e12545881d2	false-in-four-current-context-probes-pending-delivery
+base/video/gfx_updt.c	129	else of PROD or not EGG	e37ac8342cb404da77e24191fdb5eb769a8bfd0df640eb2d7ed327053f972d5c	false-in-four-current-context-probes-pending-delivery
+base/inc/sas.h	95	ifdef NTVDM	670152b3e0d19ebd2f6d6d051483d8b5f725b500ad37681b996ac48dabdc353e	restored-pending-context-probe-and-delivery
+host/inc/host_inc.h	27	ifdef NTVDM	f96bd169ba500f403a47c34204b496b3f06eeb97fd51eb6fb8e32e180b123ad3	restored-pending-context-probe-and-delivery
+base/comms/com.c	1155	ifdef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/comms/com.c	1313	ifdef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/comms/com.c	1536	ifdef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/comms/com.c	1548	ifdef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/comms/com.c	1930	ifdef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/comms/com.c	3550	ifdef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/disks/diskbios.c	441	ifdef NTVDM	9d1cfdabebc4071e67e43e0b3878f711b90b99375e829d22b5fe12c81b816867	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/inc/rs232.h	645	ifdef NTVDM	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/keymouse/keyba.c	1606	ifdef NTVDM	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/ega_vide.c	141	ifdef NTVDM	39020febded5b22370223c62bee63f6d3cdfab1f59ff73aa1018abf722296a54	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/gfx_updt.c	4287	ifdef NTVDM	e37ac8342cb404da77e24191fdb5eb769a8bfd0df640eb2d7ed327053f972d5c	original-outer-frame-restored-pending-context-probe-and-delivery
+base/video/video.c	3170	ifdef NTVDM	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	original-direct-frame-anchored-pending-context-probe-and-delivery
+base/video/video.c	3173	ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	original-direct-frame-anchored-pending-context-probe-and-delivery
+base/video/video.c	3184	ifdef NTVDM	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	original-direct-frame-anchored-pending-context-probe-and-delivery
+base/video/video.c	3249	ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	original-direct-frame-anchored-pending-context-probe-and-delivery
+base/system/timer.c	1804	#if defined(NEC_98)	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/system/timer.c	2585	#if defined(NEC_98)	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	unique-surrounding-anchors-pending-context-probe-and-delivery
+host/src/nt_graph.c	1069	#if defined(NEC_98)	f83920cc2409cf2e331b75e6de376cd3dc0ad831344b36b3e4ebcd6b381ceae1	unique-surrounding-anchors-pending-context-probe-and-delivery
+host/src/nt_graph.c	1073	#if defined(NEC_98)	f83920cc2409cf2e331b75e6de376cd3dc0ad831344b36b3e4ebcd6b381ceae1	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	1078	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	1123	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	1604	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	1649	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	1724	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	2347	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	2361	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/video/video.c	2393	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-surrounding-anchors-pending-context-probe-and-delivery
+base/comms/printer.c	479	#if defined(NEC_98)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/comms/printer.c	717	#if defined(NEC_98)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/comms/printer.c	791	#if defined(NEC_98)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/inc/egamode.h	12	#if defined(NEC_98)	f96d3ecffce3a825686e5514752cf1ccbc3365413b4c1a059638cf0007bccdb3	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/keymouse/keyba.c	352	#if defined(NEC_98)	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/keymouse/keyba.c	606	#ifdef JAPAN	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/system/timer.c	2509	#if defined(NEC_98)	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/system/timer.c	2591	#if defined(NEC_98)	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	unique-selected-content-preserved-pending-context-probe-and-delivery
+host/inc/host_def.h	101	#if defined(NEC_98)	9634c587822aaee686eaa4f16da87339210a86656024a1ba283bbb7b791fd86d	unique-selected-content-preserved-pending-context-probe-and-delivery
+host/inc/host_def.h	109	#if defined(NEC_98)	9634c587822aaee686eaa4f16da87339210a86656024a1ba283bbb7b791fd86d	unique-selected-content-preserved-pending-context-probe-and-delivery
+host/inc/nt_graph.h	111	#if defined(NEC_98)	11380d958f81bab19bfd05c8d7bef2df2e025bf05ba8ed03f746f583626f30a5	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/video/video.c	3110	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/comms/printer.c	391	#if defined(NEC_98)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/disks/floppy_i.c	581	#ifdef NTVDM	cce10648a09cb613e63d25de04c18691302eeabae5b21e2dceb4ac4deb0ff2d2	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/keymouse/keyba.c	1545	#ifdef NTVDM	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	unique-selected-content-preserved-pending-context-probe-and-delivery
+base/bios/tape_io.c	150	#if defined(JAPAN) && defined(i386)	3a56edffe3655bdfcb1c290379b09fee99d025f1d4165b827657ee50eb947cf0	false-in-eight-actual-context-probes-pending-delivery
+base/keymouse/keyba.c	2772	#if defined(KOREA)	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	false-in-eight-actual-context-probes-pending-delivery
+base/video/ega_vide.c	126	#if defined(JAPAN) || defined(KOREA)	39020febded5b22370223c62bee63f6d3cdfab1f59ff73aa1018abf722296a54	false-in-eight-actual-context-probes-pending-delivery
+base/video/video.c	2386	#if defined(JAPAN) && defined(i386)	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	false-in-eight-actual-context-probes-pending-delivery
+base/inc/rs232.h	541	if NTVDM and FIFO_ON	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	false-in-six-actual-context-probes-pending-delivery
+base/inc/rs232.h	561	if NTVDM and FIFO_ON	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	false-in-six-actual-context-probes-pending-delivery
+base/inc/rs232.h	614	if NTVDM and FIFO_ON	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	false-in-six-actual-context-probes-pending-delivery
+base/video/video.c	3972	if JAPAN or KOREA	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	original-end-of-parent-frame-pending-context-probe-and-delivery
+host/src/nt_cga.c	362	if JAPAN and i386	da4b7bf77600ed8b46fb2708a33fcf69347076ab4ebdf16de55ba4359614ee2a	false-in-two-actual-context-probes-pending-delivery
+host/src/nt_cga.c	366	if KOREA and i386	da4b7bf77600ed8b46fb2708a33fcf69347076ab4ebdf16de55ba4359614ee2a	false-in-two-actual-context-probes-pending-delivery
+host/src/nt_sbdsp.c	2218	if DESCENT	02875fb88f98c1eab699c8eb0282b4328516cd6161c199bfa640d14b23f7c6c5	false-in-four-actual-context-probes-pending-delivery
+base/system/rom.c	785	ifdef ARCX86	0fd86abd893a354f1a39aa53d25de1766484a8408f31464a1290271a8dfc155b	false-in-four-actual-context-probes-pending-delivery
+base/disks/floppy.c	4274	ifdef NTVDM	ca7a48747be50025897a64e2e22a878367fd741a88e4374669c254823c41f50c	unique-selected-context-and-no-supported-NTVDM-pending-delivery
+base/disks/floppy.c	4734	ifdef NTVDM	ca7a48747be50025897a64e2e22a878367fd741a88e4374669c254823c41f50c	unique-selected-context-and-no-supported-NTVDM-pending-delivery
+base/inc/rs232.h	579	ifdef NTVDM	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	unique-selected-context-and-no-supported-NTVDM-pending-delivery
+base/inc/rs232.h	588	ifdef NTVDM	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	unique-selected-context-and-no-supported-NTVDM-pending-delivery
+base/keymouse/keyba.c	1600	ifdef NTVDM	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	unique-selected-context-and-no-supported-NTVDM-pending-delivery
+base/disks/floppy.c	4330	ifdef NTVDM	ca7a48747be50025897a64e2e22a878367fd741a88e4374669c254823c41f50c	selected-body-and-12-line-context-verified-pending-delivery
+base/disks/floppy.c	4488	ifdef NTVDM	ca7a48747be50025897a64e2e22a878367fd741a88e4374669c254823c41f50c	selected-body-and-12-line-context-verified-pending-delivery
+base/system/timer.c	2294	ifdef NTVDM	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	selected-local-timer-fix-preserved-pending-delivery
+base/comms/printer.c	366	#if defined(NEC_98)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	selected-content-and-five-line-context-verified-pending-delivery
+base/comms/printer.c	778	#if defined(NEC_98)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	selected-content-and-five-line-context-verified-pending-delivery
+base/keymouse/keyba.c	1345	#if defined(NEC_98)	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	selected-content-and-five-line-context-verified-pending-delivery
+base/video/video.c	1139	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	selected-content-and-five-line-context-verified-pending-delivery
+base/video/video.c	1665	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	selected-content-and-five-line-context-verified-pending-delivery
+base/system/timer.c	1822	if NEC_98	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	exact-case-context-and-selected-body-preserved-pending-delivery
+base/system/timer.c	1834	if NEC_98	25156246963155c455e47512a5382dcb575b0bcf1b164eca3dd1dde480b02ab0	exact-case-context-and-selected-body-preserved-pending-delivery
+base/comms/printer.c	212	if defined(NTVDM)	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	anchored-native-only-group-pending-delivery
+base/inc/config.h	273	if defined(NTVDM)	c809f0b5f42688d08b16b241a81b27385fd8e8a623f2a877e2c406feef3866b4	anchored-native-only-group-pending-delivery
+base/comms/printer_.c	205	if NTVDM and MONITOR	f408d6515731e5626dc06c6f5e4091d3ed879dd05a14afc03ceb2c3b30d2e4fb	anchored-native-only-group-pending-delivery
+base/comms/printer_.c	228	if defined(NTVDM)	f408d6515731e5626dc06c6f5e4091d3ed879dd05a14afc03ceb2c3b30d2e4fb	anchored-native-only-group-pending-delivery
+base/video/video.c	1234	if JAPAN and i386	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	actual-context-false-selected-body-preserved-pending-delivery
+base/video/video.c	1752	if JAPAN and i386	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	actual-context-false-selected-body-preserved-pending-delivery
+base/video/video.c	2760	if NTVDM and MONITOR	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	actual-context-false-selected-body-preserved-pending-delivery
+base/comms/com.c	1715	if NTVDM and FIFO_ON	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	actual-context-false-selected-body-preserved-pending-delivery
+base/video/video.c	883	if JAPAN or KOREA	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	anchored-false-condition-selected-content-preserved-pending-delivery
+host/src/nt_graph.c	1054	if NEC_98	f83920cc2409cf2e331b75e6de376cd3dc0ad831344b36b3e4ebcd6b381ceae1	anchored-false-condition-selected-content-preserved-pending-delivery
+host/src/nt_graph.c	1066	ifdef X86GFX	f83920cc2409cf2e331b75e6de376cd3dc0ad831344b36b3e4ebcd6b381ceae1	anchored-false-condition-selected-content-preserved-pending-delivery
+base/inc/video.h	361	if JAPAN or KOREA	c4df1be9b50e4f75fcb84a5ef4c7be7231e9163e7c10a4cf05d7b7e2277562a9	anchored-false-condition-selected-content-preserved-pending-delivery
+base/inc/rs232.h	280	if NTVDM and FIFO_ON	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	selected-existing-bit-order-branches-preserved-pending-delivery
+base/video/video.c	2905	if JAPAN and i386	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	selected-body-preserved-prior-video-macro-context-false-pending-delivery
+base/keymouse/keyba.c	3175	ifdef JOKER	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	actual-context-false-local-selected-fix-preserved-pending-delivery
+base/video/ega_vide.c	136	if NTVDM and X86GFX	39020febded5b22370223c62bee63f6d3cdfab1f59ff73aa1018abf722296a54	actual-context-false-local-selected-fix-preserved-pending-delivery
+base/video/video_io.c	103	if NTVDM and not X86GFX	661f69f197dfbbfe8c4308f98177e1ba0f6adc9ef265c3622f19d2e34b7c4f38	actual-context-false-local-selected-fix-preserved-pending-delivery
+base/comms/printer.c	560	if NEC_98	869453fd0d70216cd007be6e2009ebaf59bb7b0b2df98437124d5b92503c26cb	selected-code-and-existing-inner-frames-preserved-pending-delivery
+base/inc/rs232.h	454	if NEC_98	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	selected-code-and-existing-inner-frames-preserved-pending-delivery
+base/inc/rs232.h	601	if NEC_98	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	selected-code-and-existing-inner-frames-preserved-pending-delivery
+base/video/gfx_updt.c	3720	if NEC_98	e37ac8342cb404da77e24191fdb5eb769a8bfd0df640eb2d7ed327053f972d5c	selected-code-and-existing-inner-frames-preserved-pending-delivery
+base/video/video.c	1248	if not i386 and JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	actual-dual-context-false-anchored-pending-delivery
+base/video/video.c	1715	if not i386 and JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	actual-dual-context-false-anchored-pending-delivery
+base/inc/video.h	263	#ifdef JAPAN	c4df1be9b50e4f75fcb84a5ef4c7be7231e9163e7c10a4cf05d7b7e2277562a9	selected-code-preserved-pending-delivery
+base/keymouse/keyba.c	2487	#if defined(NEC_98)	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	selected-code-preserved-pending-delivery
+base/keymouse/keyba.c	3167	#if defined(NEC_98)	9f57713a891b1f3721c5aa9a8153dc8b8862ff4e4c048f9559114de2dab9b688	selected-code-preserved-pending-delivery
+base/video/video.c	1094	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	selected-code-preserved-pending-delivery
+base/video/video.c	1620	#ifdef JAPAN	ac53ef768d33cd6c9d383df95df0c7a033bd9e7b0bd63643e8c6d87738833702	selected-code-preserved-pending-delivery
+base/comms/com.c	3815	ifndef NTVDM	ed61965a6194ea522130c54f0d169fba1e736a28dab8676bd6477d2a54fea67e	selected-code-and-inner-frames-preserved-pending-delivery
+base/inc/rs232.h	22	ifndef NEC_98	5835a9b9c7131acba4d292328b6039ef4d05d7f4d2263b977174f8b2c1c94dc2	selected-code-and-inner-frames-preserved-pending-delivery

@@ -895,12 +895,32 @@ void nt_graphics_tick(void)
             if(++flush_count == TICKS_PER_FLUSH)
             {
 
+#line 1054
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // !NEC_98
+#line 1061
                 if(update_vlt || get_palette_change_required())
                     set_the_vlt();
 
                 if (ConsoleInitialised == TRUE && ConsoleNoUpdates == FALSE)
+#endif // !NEC_98
+#line 1066
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 1069
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif
+#line 1072
                         (void)(*update_alg.calc_update)();
 
+#line 1073
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif
+#line 1080
                 ega_tick_delay = EGA_TICK_DELAY;
 
                 /* batch cursor changes as some naffola apps (Word) change

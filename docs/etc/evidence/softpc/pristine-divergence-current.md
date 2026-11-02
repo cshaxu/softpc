@@ -6,6 +6,14 @@ T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与�
 [T92 子集及本地补丁记录](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)。
 以下历史数字和语义说明不回写成新的 XP 统计。
 
+### T99 S21 条件框架恢复
+
+`host/inc/host_inc.h` 原 XP 子集直接保留非 NTVDM 的系统头，S21 恢复
+其二层 NTVDM 条件框架：未支持的 NTVDM 主体以 `#error` 排除，非 NTVDM
+头文件及 `#line` 保留。`base/inc/egamode.h` 同样恢复原 NEC_98
+条件框架，排除 NEC_98 主体并保留已选声明。两项均是条件结构
+差异，不新增产品行为。
+
 ### T92 S2 原始设备最小修复
 
 相对 f55428f8，at_dma.c +4/-4、diskbios.c +2/-2、v7_ports.c +1/-1，

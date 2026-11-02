@@ -593,6 +593,10 @@ LOCAL sys_addr  cur_loc = DOS_SCRATCH_PAD;
 GLOBAL void display_string IFN1(char *, string_ptr)
 {
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+#line 785
+#ifdef ARCX86
+#error "Unsupported SoftPC mirror configuration: ARCX86"
+#endif
 #line 789
 	/*
 	 * Put the message "*string_ptr" in the ROM

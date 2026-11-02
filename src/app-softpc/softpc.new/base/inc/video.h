@@ -198,7 +198,14 @@ IMPORT MODE_ENTRY vd_ext_graph_table[];
  * Mode macros to distinguish between alphanumeric & graphics video modes
  */
 
+#line 263
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else // !JAPAN
+#line 270
 #define	alpha_num_mode()	(sas_hw_at_no_check(vd_video_mode) < 4 || sas_hw_at_no_check(vd_video_mode) == 7)
+#endif // !JAPAN
+#line 272
 #define	global_alpha_num_mode()	((Video_mode < 4) || (Video_mode == 7))
 #ifdef EGG
 #ifdef V7VGA
@@ -277,6 +284,11 @@ IMPORT VOID vga_write_dot IPT4(LONG, colour, LONG, page, LONG, pixcol, LONG, row
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
+#line 361
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: JAPAN or KOREA"
+#endif // JAPAN
+#line 384
 #endif // NEC98
 #line 264
 /* The detached machine keeps this optional presentation path disabled, but

@@ -702,6 +702,11 @@ Return Value:
             offset = SBBlockSize - 0x8;
         }
 
+#line 2218
+#if DESCENT
+#error "Unsupported SoftPC mirror configuration: DESCENT"
+#endif
+#line 2232
 #endif
 #line 2233
 #if 0

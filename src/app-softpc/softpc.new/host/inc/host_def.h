@@ -115,11 +115,25 @@ extern void host_simulate(void);
 *	system parameter defines				*
 \***************************************************************/
 #ifndef NUM_PARALLEL_PORTS
+#line 101
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 104
 #define NUM_PARALLEL_PORTS	3
+#endif
+#line 106
 #endif /* NUM_PARALLEL_PORTS */
 
 #ifndef NUM_SERIAL_PORTS
+#line 109
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 112
 #define NUM_SERIAL_PORTS	4
+#endif
+#line 114
 #endif /* NUM_SERIAL_PORTS */
 
 /***************************************************************\

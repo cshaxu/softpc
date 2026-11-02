@@ -24,7 +24,13 @@
 #include <stdarg.h>
 #include <assert.h>
 
-
+#line 27
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else   /* !NTVDM */
+#line 73
 #include <sys/param.h>
+#endif   /* !NTVDM */
+#line 75
 
 #endif  /* _HOST_INC_H */

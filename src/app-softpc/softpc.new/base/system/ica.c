@@ -1839,6 +1839,10 @@ ica_check_stale_iret_hook IFN0()
 #define INIT0_ICW4      (IU8)0x01
 
 
+#line 2063
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
 #line 2068
 /* POST leaves some int lines masked out (including comms and lpt lines) */
 /* The setting of the bits is spread out throughout the real POST code
@@ -1847,6 +1851,7 @@ ica_check_stale_iret_hook IFN0()
  * DOS (eg OS/2 or coherent etc.)
  */
 #define INIT0_OCW1      (IU8)0xb8
+#endif /* NTVDM */
 #endif   //NEC_98
 #line 2077
 

@@ -271,6 +271,11 @@ WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 
 
 
+#line 273
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 282
 /* Host-specific entries in the message catalogue start at
  * the following number plus 1 - note that the value must
  * fit into an IU8, so 255 is an upper limit

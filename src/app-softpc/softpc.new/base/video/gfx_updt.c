@@ -125,8 +125,7 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 #if	defined(PROD) || (!defined(EGG))
 #define	init_dirty_recs()		dirty_next = 0
 #else
-#define	init_dirty_recs()		{ dirty_next = 0 ; if (io_verbose & EGA_DISPLAY_VERBOSE) \
-						trace("--- start collecting update records ---\n",0); }
+#error "Unsupported SoftPC mirror configuration: non-PROD EGG diagnostics"
 #endif
 #endif  //NEC_98
 #line 134
@@ -3655,7 +3654,11 @@ GLOBAL VOID screen_refresh_required IFN0()
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
-#line 3595
+#line 3720
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 3723
 
 #ifndef CPU_40_STYLE
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
@@ -3663,6 +3666,8 @@ GLOBAL VOID screen_refresh_required IFN0()
 #line 3605
 	setVideodirty_total(1000000L);
 #endif	/* CPU_40_STYLE */
+#endif // NEC_98
+#line 3736
 }
 
 #ifdef EGG
@@ -3980,14 +3985,21 @@ GLOBAL void enable_gfx_update_routines IFN0()
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 4146
+#line 4286
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 5965
 #endif /* REAL_VGA */
 
 
 
 #ifndef NEC_98
-/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#line 5970
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
 #endif // !NEC_98
 #line 5993
 #if defined(NEC_98)

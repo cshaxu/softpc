@@ -109,8 +109,15 @@ typedef struct
 
 #ifdef BIGWIN
 
+#line 111
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 115
 #define SCALE(value) ((host_screen_scale * (value)) >> 1)
 #define UNSCALE(value) (((value) << 1) / host_screen_scale)
+#endif
+#line 118
 #define MAX_SCALE(value) ((value) << 1)
 
 #else   /* BIGWIN */

@@ -85,11 +85,9 @@ void _asm_simulate()
 }
 
 #if 0
-void cpu_simulate()
-{
-    c_cpu_simulate();
-}
+#error "Unsupported SoftPC mirror configuration: constant false"
 #endif
+#line 100
 
 
 

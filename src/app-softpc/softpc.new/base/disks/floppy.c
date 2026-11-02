@@ -2512,8 +2512,15 @@ LOCAL void motor_on IFN1(int, drive)
 
 		setAH(INT15_DEVICE_BUSY);
 		setAL(INT15_DEVICE_FLOPPY_MOTOR);
+#line 4274
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 4278
 		setCS(RCPU_INT15_SEGMENT);
 		setIP(RCPU_INT15_OFFSET);
+#endif
+#line 4281
 
 		host_simulate();
 
@@ -2563,8 +2570,15 @@ LOCAL void motor_on IFN1(int, drive)
 		setAH(INT15_WAIT);
 		setCX(0);
 		setDX(1);
+#line 4330
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 4334
 		setCS(RCPU_INT15_SEGMENT);
 		setIP(RCPU_INT15_OFFSET);
+#endif
+#line 4337
 
 		host_simulate();
 
@@ -2718,8 +2732,15 @@ LOCAL void hd_wait IFN1(int, drive)
 	setCX(0);
 	setDX(1);
 
+#line 4488
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 4492
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
+#endif
+#line 4495
 
 	host_simulate();
 
@@ -2961,8 +2982,15 @@ LOCAL wait_int IFN0()
 	setAH(INT15_DEVICE_BUSY);
 	setAL(INT15_DEVICE_FLOPPY);
 
+#line 4734
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 4738
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
+#endif
+#line 4741
 
 	host_simulate();
 

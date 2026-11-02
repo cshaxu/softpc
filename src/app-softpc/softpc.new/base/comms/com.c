@@ -770,6 +770,11 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 				if (adapter_was_critical)
 				{
 
+#line 1155
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1181
 #ifndef NTVDM
 #line 670
 #ifdef IRET_HOOKS
@@ -855,6 +860,11 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	case RS232_LCR:
 
 
+#line 1313
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1325
 		*value = asp->line_control_reg.all;
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
@@ -956,6 +966,11 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #endif
 #line 966
 
+#line 1536
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1539
 }
 
 
@@ -967,6 +982,11 @@ void com_outb IFN2(io_addr, port, half_word, value)
 
 
 
+#line 1548
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1553
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -993,9 +1013,11 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #endif	/* PS_FLUSHING */
 #line 1014
 				host_com_write(adapter, asp->tx_buffer);
+#line 1590
 #if defined (DELAYED_INTS) || defined (NTVDM)
-				set_xmit_char_status(asp);
+#error "Unsupported SoftPC mirror configuration: DELAYED_INTS or NTVDM"
 #else
+#line 1593
 					if(tx_pacing_enabled)
 						add_q_event_t(do_wait_on_send,
 					            TX_delay[asp->com_baud_ind], adapter);
@@ -1085,6 +1107,11 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #line 1120
 		break;
 		
+#line 1715
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#else
+#line 1744
 	case RS232_IIR:
 		/*
 		 * Essentially a READ ONLY register
@@ -1099,6 +1126,8 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #line 1145
 		break;
 
+#endif /* NTVDM && FIFO_ON */
+#line 1770
 	case RS232_LCR:
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -1201,6 +1230,11 @@ void com_outb IFN2(io_addr, port, half_word, value)
 	}
 
 
+#line 1930
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1933
 }
 #endif // NEC_98
 #line 1290
@@ -1545,28 +1579,7 @@ static word valid_latches[] =
 #else // NEC_98
 #line 2665
 #if !defined(PROD) || defined(IRET_HOOKS)
-static IUM32 bauds[] =
-{
-	115200, /* 115200 baud */
-	57600, /* 57600 baud */
-	38400, /* 38400 baud */
-	19200, /* 19200 baud */
-	9600, /* 9600 baud */
-	7200, /* 7200 baud */
-	4800, /* 4800 baud */
-	3600, /* 3600 baud */
-	2400, /* 2400 baud */
-	2000, /* 2000 baud */
-	1800, /* 1800 baud */
-	1200, /* 1200 baud */
-	600, /* 600 baud */
-	300, /* 300 baud */
-	150, /* 150 baud */
-	134, /* 134 baud */
-	110, /* 110 baud */
-	75, /* 75 baud */
-	50  /* 50 baud */
-};
+#error "Unsupported SoftPC mirror configuration: non-PROD or IRET_HOOKS"
 #endif /* !PROD or IRET_HOOKS*/
 #endif // NEC_98
 #line 2690
@@ -2150,6 +2163,11 @@ static void com_reset IFN1(int, adapter)
 
 
 	
+#line 3550
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 3556
 	asp->int_id_reg.all = 0;
 	asp->int_id_reg.bits.no_int_pending = 1;
 	
@@ -2293,8 +2311,15 @@ GLOBAL VOID com_init IFN1(int, adapter)
 	/* reset adapter state */
 	com_reset(adapter);
 
+#line 3815
+#ifndef NTVDM
+#line 3816
 	/* Should we enable TX pacing ? */
 	tx_pacing_enabled = host_getenv("TX_PACING_ENABLED") ? TRUE : FALSE;
+#else /* not NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 3822
 
 	return;
 }

@@ -313,6 +313,9 @@ extern  void    reset_graphics_routines IPT0();
 extern	void	reset_paint_routines IPT0();
 
 #ifndef NEC_98
-/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#line 326
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
 #endif // !NEC_98
 #line 330

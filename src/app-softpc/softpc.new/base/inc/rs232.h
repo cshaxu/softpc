@@ -19,6 +19,9 @@
  * ============================================================================
  */
 
+#line 22
+#ifndef NEC_98
+#line 23
 /* register type definitions follow: */
 
 typedef half_word BUFFER_REG;
@@ -36,6 +39,10 @@ typedef union {
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
 #line 44
+#else //NEC_98
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif //NEC_98
+#line 254
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -52,8 +59,13 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 69
+#line 278
 
+
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#else /* NTVDM */
+#line 304
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -68,7 +80,8 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 91
+#endif /* NTVDM */
+#line 326
 
 
 #ifdef BIT_ORDER2
@@ -146,7 +159,11 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 210
+#line 454
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // !NEC_98
+#line 513
 
 
 /* register select code definitions follow: */
@@ -159,6 +176,8 @@ typedef union {
 #define RS232_LSR	5
 #define RS232_MSR	6
 #define RS232_SCRATCH	7
+#endif // !NEC_98
+#line 529
 
 #define RS232_COM1_TIMEOUT (BIOS_VAR_START + 0x7c)
 #define RS232_COM2_TIMEOUT (BIOS_VAR_START + 0x7d)
@@ -172,6 +191,11 @@ typedef union {
 #define NO_GO_LINE  2  /* We can't emulate requested line setup */
 
 
+#line 541
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#endif
+#line 555
 #define OFF 0
 #define ON 1
 #define LEAVE_ALONE 2
@@ -179,6 +203,11 @@ typedef union {
 	((external_state == internal_state) ? LEAVE_ALONE : external_state)
 
 
+#line 561
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#endif
+#line 565
 #define RLS_INT 3     /* receiver line status interrupt ID */
 #define RDA_INT 2     /* data available interrupt ID */
 #define THRE_INT 1    /* tx holding register empty interrupt ID */
@@ -193,24 +222,49 @@ typedef union {
 #define STOP2 1       /* line control setting for one and a half or two
                          stop bits */
 
+#line 579
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 584
 #define PARITY_ON 1   /* line control setting for parity enabled */
 #define PARITY_OFF 0  /* line control setting for parity disabled */
+#endif
+#line 592
 
+#line 588
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 593
 #define PARITY_ODD 0  /* line control setting for odd parity */
 #define PARITY_EVEN 1 /* line control setting for even parity */
+#endif
+#line 596
 
 #define PARITY_STICK 1  /* line control setting for stick(y) parity */
 
 #define PARITY_FIXED 2  /* Internal state setting for fixed parity */
 
+#line 601
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // !NEC_98
+#line 606
 #define COM1 0
 #define COM2 1
 #if (NUM_SERIAL_PORTS > 2)
 #define COM3 2
 #define COM4 3
 #endif
+#endif // !NEC_98
 
 
+#line 614
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#endif
+#line 621
 /*
  * ============================================================================
  * External declarations and macros
@@ -237,6 +291,11 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #line 297
 
 
+#line 645
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 649
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98

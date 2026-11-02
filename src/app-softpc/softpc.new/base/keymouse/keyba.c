@@ -280,7 +280,14 @@ static half_word set_3_key_state [127];
 #line 248
 #endif	/* REAL_KBD */
 
+#line 352
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 359
 static int key_down_count [127];
+#endif
+#line 361
 
 #else	/* macintosh */
 #error "Unsupported SoftPC mirror configuration: macintosh"
@@ -463,7 +470,14 @@ static half_word trans_8042 [256] =
   0x55,0x56,0x77,0x78,0x79,0x7a,0x0e,0x7b,0x7c,0x4f,0x7d,0x4b,0x47,0x7e,0x7f,0x6f,    		/* 60-6f */
   0x52,0x53,0x50,0x4c,0x4d,0x48,0x01,0x45,0x57,0x4e,0x51,0x4a,0x37,0x49,0x46,0x54,		/* 70-7f */
   0x80,0x81,0x82,0x41,0x54,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,		/* 80-8f */
+#line 606
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else
+#line 609
   0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,		/* 90-9f */
+#endif
+#line 611
   0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,		/* a0-af */
   0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,		/* b0-bf */
   0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,		/* c0-cf */
@@ -832,7 +846,14 @@ switch (key_set)
 	case 1:
 		make_sizes=set_1_make_sizes;
 		break_sizes=set_1_break_sizes;
+#line 1345
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 1348
 		for (key=0;key<127;key++)
+#endif
+#line 1350
 			{
 			switch (keytypes[key])
 				{
@@ -971,10 +992,17 @@ if (scanning_discontinued)
 		always_trace0("host_key_down held event buffer overflow");
 		}
 	}
+#line 1545
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1559
 else
 	{
 	do_host_key_down(key);
 	}
+#endif
+#line 1564
 }
 
 GLOBAL VOID host_key_up IFN1(int,key)
@@ -995,8 +1023,19 @@ if (scanning_discontinued)
 		always_trace0("host_key_up held event buffer overflow");
 		}
 	}
+#line 1600
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1603
 else
 	{
+#endif
+#line 1606
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1609
 	do_host_key_up(key);
 	}
 }
@@ -1750,7 +1789,14 @@ if (free_6805_buff_size < BUFF_6805_VMAX)
 LOCAL VOID do_int IFN1(long,scancode)
 {
 	output_contents = (char)scancode;
+#line 2487
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 2490
 	kbd_status |= 1;			/* Character now available! */
+#endif   //NEC_98
+#line 2492
 	if (int_enabled)
 	{
 		sure_note_trace0(AT_KBD_VERBOSE,"keyboard interrupting");
@@ -1955,6 +2001,11 @@ if (!waiting_for_next_8042_code)
 			break;
 		case 0xad:
 			/* Disable keyboard interface */
+#line 2772
+#if defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: defined(KOREA)"
+#endif
+#line 2777
 			cmd_byte_8042 |= 0x10;
 			keyboard_interface_disabled=TRUE;
 			break;
@@ -2378,8 +2429,20 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 
 		output_full = FALSE;
 
+#line 3167
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 3170
 		kbd_status &= 0xfe;		/* Mask out "char avail" bit */
+#endif   //NEC_98
+#line 3172
 
+#line 3175
+#ifdef JOKER
+#error "Unsupported SoftPC mirror configuration: JOKER"
+#endif /* JOKER */
+#line 3174
 		/* The output buffer is now empty, so deassert its IRQ1 request.
 		 * Normal interrupt delivery may already have acknowledged it; this
 		 * also covers a guest which temporarily masks IRQ1 and polls the PIC. */

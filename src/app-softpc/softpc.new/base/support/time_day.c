@@ -770,6 +770,9 @@ void time_of_day_init()
 
 
 #ifndef NEC_98
-/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#line 989
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
 #endif // !NEC_98
 #line 1013

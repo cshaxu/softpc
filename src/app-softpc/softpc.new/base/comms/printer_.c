@@ -181,5 +181,13 @@ void printer_io()
 #endif
 }
 
-
+#line 205
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#endif
+#line 228
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 246
 #endif // !NEC_98

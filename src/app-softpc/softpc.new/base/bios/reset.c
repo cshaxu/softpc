@@ -747,14 +747,9 @@ void reset()
                 equip_flag.bits.max_diskette++;
 	}
 #else
-
-        /* 20/10/93 PaulC - set the diskette_present bit regardless of */
-        /* whether or not any floppies are configured. Not having the  */
-        /* bit set confuses DOS and Windows. See BCN 2262.             */
-
-        equip_flag.bits.diskette_present = TRUE;
-
+#error "Unsupported SoftPC mirror configuration: non-NTVDM outside standalone"
 #endif /* NTVDM */
+#line 1046
 
         sas_storew(EQUIP_FLAG, equip_flag.all);
 

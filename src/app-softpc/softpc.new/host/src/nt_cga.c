@@ -233,6 +233,15 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
     SMALL_RECT WriteRegion;
     PBYTE   to;
     PBYTE   pScreenText = get_screen_ptr(ScreenOffset);
+#line 362
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#endif // JAPAN && i386
+#line 366
+#if defined(KOREA) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: KOREA and i386"
+#endif // KOREA && i386
+#line 369
 
     /*:::::::::::::::::::::::::::::::::::::::::::: Output trace information */
 

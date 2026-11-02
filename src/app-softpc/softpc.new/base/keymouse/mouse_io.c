@@ -1457,6 +1457,10 @@ void mouse_io_interrupt()
          */
         word local_AX, local_BX, local_CX, local_DX;
 #ifndef NEC_98
+#line 1230
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
 #endif // !NEC_98
 #line 1235
 

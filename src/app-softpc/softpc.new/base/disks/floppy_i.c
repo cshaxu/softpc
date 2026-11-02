@@ -138,7 +138,14 @@ void diskette_io()
 #ifndef NEC_98
 #line 580
 	if (op != FL_DISK_RESET && op != FL_DISK_STATUS && op != FL_DISK_PARMS)
+#line 581
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 584
 		if (drive >= MAX_FLOPPY)
+#endif
+#line 586
 			op = FL_FNC_ERR;
 #endif // !NEC_98
 #line 333

@@ -92,8 +92,13 @@ extern void sas_term IPT0();
 
 #include	<sas4gen.h>
 
-extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
+#line 95
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
 
+extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
+#line 103
 
 /*
  * TEMPORARY FOR NT!!!!!

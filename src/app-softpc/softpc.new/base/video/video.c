@@ -113,7 +113,10 @@
 #line 114
 
 #ifndef NEC_98
-/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#line 116
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
 #endif // !NEC_98
 #line 128
 
@@ -561,7 +564,14 @@ GLOBAL void vd_set_cursor_position IFN0()
     vd_addr_6845 = sas_w_at_no_check(VID_INDEX);
     vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
 
+#line 883
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: JAPAN or KOREA"
+#else
+#line 896
     sas_storew_no_check(VID_CURPOS+(getBH()*2), getDX());
+#endif // !JAPAN && !KOREA
+#line 898
 
     if (sas_hw_at_no_check(vd_current_page) == getBH()) {           /* display if this page */
 
@@ -744,6 +754,11 @@ GLOBAL void vd_scroll_up IFN0()
     int t_row,b_row,l_col,r_col,lines,attr;
     int rowsdiff,colsdiff;
 
+#line 1078
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 1082
     /* Load internal variables with the values stored in BIOS
      * data area.
      */
@@ -756,11 +771,18 @@ GLOBAL void vd_scroll_up IFN0()
     lines = getAL();
     attr = getBH();
 
+#line 1094
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else // !JAPAN
+#line 1109
     if(b_row > VD_ROWS_ON_SCREEN)
 		b_row = VD_ROWS_ON_SCREEN; /* trim to screen size */
 
     if(t_row > VD_ROWS_ON_SCREEN)
 		t_row = VD_ROWS_ON_SCREEN; /* trim to screen size */
+#endif // !JAPAN
+#line 1115
 
     if (r_col < l_col)		/* some dipstick has got their left & right mixed up */
     {
@@ -769,6 +791,11 @@ GLOBAL void vd_scroll_up IFN0()
 	r_col = colsdiff;
     }
 
+#line 1123
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 1129
     if ( r_col >= vd_cols_on_screen )
     	r_col = vd_cols_on_screen-1;
 
@@ -779,7 +806,14 @@ GLOBAL void vd_scroll_up IFN0()
     {
 	lines = rowsdiff;
     }
+#line 1139
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else
+#line 1143
     if(r_col == vd_cols_on_screen-1)
+#endif
+#line 1145
     {
 #ifdef EGG
 	if(ega_mode())
@@ -861,10 +895,22 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 
 	if( source >= get_screen_base() )
 	{
+#line 1234
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#else
+#line 1243
 	    screen_updated = (*update_alg.scroll_up)(source,2*colsdiff,rowsdiff,attr,lines,0);
+#endif
+#line 1245
 	}
 
     dest = source;
+#line 1248
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: not i386 and JAPAN"
+#endif
+#line 1251
 /*
  * We dont need to move data which would be scrolled off the
  * window. So point source at the first line which needs to
@@ -1150,6 +1196,11 @@ GLOBAL void vd_scroll_down IFN0()
     int t_row,b_row,l_col,r_col,lines,attr;
     int rowsdiff,colsdiff;
 
+#line 1604
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 1608
     /* Load internal variables with the values stored in BIOS
      * data area.
      */
@@ -1162,11 +1213,18 @@ GLOBAL void vd_scroll_down IFN0()
     lines = getAL();
     attr = getBH();
 
+#line 1620
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else // !JAPAN
+#line 1635
     if(b_row > VD_ROWS_ON_SCREEN)
 		b_row = VD_ROWS_ON_SCREEN; /* trim to screen size */
 
     if(t_row > VD_ROWS_ON_SCREEN)
 		t_row = VD_ROWS_ON_SCREEN; /* trim to screen size */
+#endif // !JAPAN
+#line 1641
 
     if (r_col < l_col)		/* some dipstick has got their left & right mixed up */
     {
@@ -1175,6 +1233,11 @@ GLOBAL void vd_scroll_down IFN0()
 	r_col = colsdiff;
     }
 
+#line 1649
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 1655
     if ( r_col >= vd_cols_on_screen )
     	r_col = vd_cols_on_screen-1;
 
@@ -1185,7 +1248,14 @@ GLOBAL void vd_scroll_down IFN0()
     {
 	lines = rowsdiff;
     }
+#line 1665
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else
+#line 1669
     if(r_col == vd_cols_on_screen-1)
+#endif
+#line 1671
 #ifdef EGG
 	if(ega_mode())
     		ega_sensible_graph_scroll_down(t_row,l_col,rowsdiff,colsdiff,lines,attr);
@@ -1229,11 +1299,21 @@ GLOBAL void vd_scroll_down IFN0()
 LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr)
 {
     register sys_addr	source, dest;
+#line 1715
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: not i386 and JAPAN"
+#endif
+#line 1720
     register int	col_incr;
     register int	i;
     boolean		screen_updated;
     int			vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
 
+#line 1724
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 1729
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: JAPAN and i386"
 #else // !JAPAN || !i386
@@ -1250,7 +1330,14 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 
 	if( source >= get_screen_base() )
 	{
+#line 1752
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#else
+#line 1761
 	    screen_updated = (*update_alg.scroll_down)(source,2*colsdiff,rowsdiff,attr,lines,0);
+#endif
+#line 1763
 	}
 
     dest = source + (rowsdiff-1)*col_incr;
@@ -1732,15 +1819,27 @@ GLOBAL void vd_write_char IFN0()
 
 	if (alpha_num_mode())
 	{
+#line 2347
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 2360
 		cpos = vd_cursor_offset(getBH());
 
+#line 2361
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 2368
 		/* store in memory, skipping attribute bytes */
 
 		for(i = 0; i < getCX(); i++)
 		{
+#line 2372
 #if ( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )
-                        *((unsigned char *)( video_pc_low_regen + cpos)) =  getAL();
+#error "Unsupported SoftPC mirror configuration: NTVDM monitor or GISP_SVGA"
 #else
+#line 2375
 #ifdef	EGG
 			if ( ( (video_adapter != CGA) && (EGA_CPU.chain != CHAIN2) )
 #ifdef CPU_40_STYLE
@@ -1752,7 +1851,17 @@ GLOBAL void vd_write_char IFN0()
 #endif	/* EGG */
 				(*bios_ch2_byte_wrt_fn)( getAL(), cpos );
 #endif	/* NTVDM & MONITOR */
+#line 2386
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: defined(JAPAN) && defined(i386)"
+#endif
+#line 2392
 			cpos += 2;
+#line 2393
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 2410
 		}
 	}
 
@@ -2099,7 +2208,14 @@ GLOBAL void vd_write_teletype IFN0()
 
     vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
 
+#line 2760
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#else
+#line 2780
     re_entrant = (sas_w_at_no_check(0x42) < 0xa000);
+#endif
+#line 2783
 
     vd_cursor_col = sas_hw_at_no_check(current_cursor_col);
     vd_cursor_row = sas_hw_at_no_check(current_cursor_row);
@@ -2187,17 +2303,26 @@ GLOBAL void vd_write_teletype IFN0()
             }
             else
 	    {
+#line 2905
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#else // !JAPAN || !i386
+#line 2920
 	         ch_addr = sas_w_at_no_check(VID_ADDR) +
                               vd_page_offset(vd_cursor_col,vd_cursor_row);
+#endif // !JAPAN && !i386
+#line 2923
 
 		/*
 		 *	Call the C code to do the biz rather than brothel
 		 *	around in SAS.
 		 */
 
+#line 2929
 #if ( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )
-                *((unsigned char *)( video_pc_low_regen + ch_addr)) = ch;
+#error "Unsupported SoftPC mirror configuration: NTVDM monitor or GISP_SVGA"
 #else
+#line 2932
 #ifdef	EGG
 			if ( ( (video_adapter != CGA) && (EGA_CPU.chain != CHAIN2) )
 #ifdef CPU_40_STYLE
@@ -2347,7 +2472,14 @@ GLOBAL void vd_write_teletype IFN0()
 		sas_load( video_pc_low_regen + sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,vd_cursor_row) + 1, &attrib);
 #endif /* A2CPU */
 
+#line 3110
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else
+#line 3123
 		sensible_text_scroll_up(0,0, VD_ROWS_ON_SCREEN+1,vd_cols_on_screen,1,attrib);
+#endif
+#line 3125
 
 	}
 #ifdef EGG
@@ -2393,8 +2525,26 @@ GLOBAL void vd_write_string IFN0()
 	sys_addr ptr;
 	boolean ctl;
 
-	op = getAL();
+#line 3170
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 3173
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 3181
 
+	op = getAL();
+#line 3184
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 3249
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 3432
 
 	ptr =  effective_addr(getES(),getBP()) ;
 	col = getDL();
@@ -2749,10 +2899,11 @@ GLOBAL void video_init IFN0()
     (video_func[SET_MODE])();
 }
 
+#line 3821
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 2715
+#line 3936
 
 
 
@@ -2760,6 +2911,12 @@ GLOBAL void video_init IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 3971
+
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: JAPAN or KOREA"
+#endif // JAPAN
+#line 4905
 
 #else
 #error "Unsupported SoftPC mirror configuration: NEC_98"

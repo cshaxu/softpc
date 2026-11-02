@@ -1753,6 +1753,11 @@ LOCAL unsigned long clocksSinceCounterActivated IFN1(struct host_timeval *, now)
     register unsigned long usec_val, nclocks;
     register unsigned int secs;
 
+#line 1804
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif
+#line 1808
     first = &pcu->activationTime;
     (*pcu->getTime)(now);
 
@@ -1765,12 +1770,25 @@ LOCAL unsigned long clocksSinceCounterActivated IFN1(struct host_timeval *, now)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1607
+#line 1822
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1829
              nclocks  = (usec_val * TIMER_CLOCK_DENOM) / TIMER_CLOCK_NUMER;
+#endif // NEC_98
+#line 1831
              break;
 
     case 1:  usec_val = 1000000L + now->tv_usec - first->tv_usec;
+#line 1834
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1841
              nclocks  = (usec_val * TIMER_CLOCK_DENOM) / TIMER_CLOCK_NUMER;
+#endif // NEC_98
+#line 1843
              break;
 
     default:
@@ -2039,6 +2057,10 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
 #ifdef DELAYED_INTS
 #error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #else /* !DELAYED_INTS */
+#line 2294
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else /* !NTVDM */
 #line 2310
 
 
@@ -2075,6 +2097,8 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
 				}
 			}
 
+#endif /* !NTVDM */
+#line 2341
 #endif /* !DELAYED_INTS */
                 }
     }
@@ -2108,7 +2132,14 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
          * host_timer_2_frig_factor is now redundant. 28/4/93 niall.
          */
 
+#line 2509
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 2512
         if (pcu == &timers[2]) {
+#endif
+#line 2514
                 /*
                  * PMINFO uses ~counter, so one tick becomes 0.
                  * 2 ticks is just as good. Avoid guessing (frig_factor!).
@@ -2184,9 +2215,21 @@ LOCAL void setLastWrap IFN2(unsigned int, nclocks, struct host_timeval *, now)
         struct host_timeval *stamp;
         unsigned long usecs;
 
+#line 2585
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif
+#line 2589
         stamp  = &pcu->activationTime;
         *stamp = *now;
+#line 2591
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 2598
         usecs  = ((unsigned long)nclocks * TIMER_CLOCK_NUMER) / TIMER_CLOCK_DENOM;
+#endif
+#line 2600
 
         if (stamp->tv_usec < usecs)
         {
