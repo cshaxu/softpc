@@ -1209,6 +1209,12 @@ candidates separately from the 1,381 present queued arms and 11 known absent
 children. Candidate matching is provisional, not a claim that every candidate
 is absent; unmatched parent mappings still require review. No depth-2 body
 was processed. See `m9-t99-s20-bfs-depth2-xp-child-candidates.tsv`.
+Three unmapped parent records were checked against direct original and current
+condition boundaries: ICA 1549 and mouse 3018/1126 have their direct children
+already queued. The mouse 3018 selected body has a first-depth `#line 3018`
+whose next source line corresponds to XP 3019; this correction is pending
+concentrated delivery, not yet applied. See
+`m9-t99-s20-bfs-depth1-unmapped-parent-review.tsv`.
 This audit is documentation/evidence only; cross-version root mappings and
 first-depth completeness remain under review.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
