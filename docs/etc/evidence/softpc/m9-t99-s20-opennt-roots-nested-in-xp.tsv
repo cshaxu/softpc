@@ -1,0 +1,316 @@
+path	opennt_line	xp_line	xp_depth	xp_expression	xp_root_line	xp_root_directive	xp_root_expression	current_root_line	current_child_line	mapping	child_status	current_sha256
+base/bios/reset.c	522	685	2	PM	684	ifndef	NEC_98	400	402	exact-root-anchor	present-depth2-queue	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461
+base/bios/reset.c	823	1018	2	PRINTER	1010	else		719	728	exact-root-anchor	present-depth2-queue	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461
+base/bios/reset.c	832	1027	2	NTVDM	1010	else		719		exact-root-anchor	candidate-depth2	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461
+base/bios/reset.c	859	1054	2	GISP_SVGA	1010	else		719	766	exact-root-anchor	present-depth2-queue	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461
+base/comms/com.c	90	138	2	defined(NTVDM) && defined(FIFO_ON)	125	else		94	107	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	114	162	2	IRET_HOOKS	125	else		94	127	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	120	168	2	NTVDM	125	else		94	131	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	127	175	2	NTVDM	125	else		94	138	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	271	357	2	NTVDM	347	else		409	420	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	298	384	2	NTVDM	347	else		409	449	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	406	551	2	defined(NTVDM) && defined(FIFO_ON)	454	else		463	561	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	441	622	2	defined(NTVDM) && defined(FIFO_ON)	611	else		587	599	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	446	627	2	DELAYED_INTS	611	else		587	605	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	465	646	2	defined(NTVDM) && defined(FIFO_ON)	611	else		587	624	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	538	742	2	NTVDM	741	else		693		manual-parent-boundary	known-absent-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	558	1102	2	NTVDM	1094	else		711	720	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	571	1115	2	NTVDM	1094	else		711	734	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	611	1155	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	637	1181	2	NTVDM	1094	else		711	773	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	677	1221	2	IRET_HOOKS	1094	else		711	803	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	688	1232	2	SHORT_TRACE	1094	else		711	810	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	697	1241	2	PROD	1094	else		711	814	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	716	1260	2	SHORT_TRACE	1094	else		711	825	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	724	1268	2	PROD	1094	else		711	829	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	747	1291	2	SHORT_TRACE	1094	else		711	845	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	755	1299	2	PROD	1094	else		711	849	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	769	1313	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	782	1326	2	SHORT_TRACE	1094	else		711	859	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	790	1334	2	PROD	1094	else		711	863	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	805	1349	2	SHORT_TRACE	1094	else		711	871	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	813	1357	2	PROD	1094	else		711	875	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	835	1379	2	defined(NTVDM) && defined(FIFO_ON)	1094	else		711	890	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	839	1383	2	SHORT_TRACE	1094	else		711	895	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	852	1396	2	PROD	1094	else		711	899	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	883	1427	2	NTVDM	1094	else		711	907	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	948	1492	2	SHORT_TRACE	1094	else		711	935	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	956	1500	2	PROD	1094	else		711	939	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	978	1522	2	PROD	1094	else		711	954	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	992	1536	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1004	1548	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1009	1553	2	PROD	1094	else		711	970	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1034	1578	2	PS_FLUSHING	1094	else		711	991	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1046	1590	2	defined (DELAYED_INTS) || defined (NTVDM)	1094	else		711	996	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1056	1600	2	PS_FLUSHING	1094	else		711	1006	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1071	1615	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1075	1619	2	SHORT_TRACE	1094	else		711	1024	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1084	1628	2	PROD	1094	else		711	1028	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1101	1645	2	NTVDM	1094	else		711	1037	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1131	1675	2	NTVDM	1094	else		711	1068	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1146	1690	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1150	1694	2	SHORT_TRACE	1094	else		711	1078	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1158	1702	2	PROD	1094	else		711	1082	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1171	1715	2	defined(NTVDM) && defined(FIFO_ON)	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1227	1771	2	NTVDM	1094	else		711	1103	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1252	1796	2	SHORT_TRACE	1094	else		711	1114	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1260	1804	2	PROD	1094	else		711	1118	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1274	1818	2	SHORT_TRACE	1094	else		711	1125	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1297	1841	2	PROD	1094	else		711	1144	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1314	1858	2	SHORT_TRACE	1094	else		711	1154	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1322	1866	2	PROD	1094	else		711	1158	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1339	1883	2	SHORT_TRACE	1094	else		711	1168	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1347	1891	2	PROD	1094	else		711	1172	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1386	1930	2	NTVDM	1094	else		711		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1515	2117	2	NTVDM	2115	else		1223	1225	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1637	2239	2	DOCUMENTATION	2115	else		1223	1287	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1926	2665	2	!defined(PROD) || defined(IRET_HOOKS)	2664	else		1545	1547	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2002	2798	2	NTVDM	2772	else		1615	1643	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2070	2996	2	NTVDM	2966	ifndef	NEC_98	1678	1709	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2080	3006	2	NTVDM	2966	ifndef	NEC_98	1678	1721	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2089	3015	2	NTVDM	2966	ifndef	NEC_98	1678	1732	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2100	3026	2	NTVDM	2966	ifndef	NEC_98	1678	1745	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2110	3036	2	NTVDM	2966	ifndef	NEC_98	1678	1757	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2119	3045	2	NTVDM	2966	ifndef	NEC_98	1678	1768	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2130	3056	2	NTVDM	2966	ifndef	NEC_98	1678	1781	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2498	3550	2	NTVDM	3525	else		2125		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2543	3595	2	defined(NTVDM) && defined(FIFO_ON)	3525	else		2125	2192	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2572	3624	2	IRET_HOOKS	3525	else		2125	2216	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2621	3781	2	NTVDM	3776	else		2261	2267	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2629	3789	2	NTVDM	3776	else		2261	2275	exact-root-anchor	present-depth2-queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	2656	3815	2	NTVDM	3776	else		2261		exact-root-anchor	candidate-depth2	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/printer.c	786	1012	2	NTVDM	1011	ifndef	NEC_98	772	773	exact-root-anchor	present-depth2-queue	71aaa07982075fcc00fab277b66824b9949180e966cc90d38f8e91d2b58ece50
+base/comms/printer_.c	23	25	2	SCCSID	2	else		3	28	exact-root-anchor	present-depth2-queue	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/printer_.c	27	29	2	SEGMENTATION	2	else		3	33	exact-root-anchor	present-depth2-queue	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/printer_.c	40	42	2	PRINTER	2	else		3	42	exact-root-anchor	present-depth2-queue	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/printer_.c	86	88	2	defined(NTVDM) && defined(MONITOR)	2	else		3	83	exact-root-anchor	present-depth2-queue	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/printer_.c	103	105	2	PRINTER	2	else		3	101	exact-root-anchor	present-depth2-queue	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/printer_.c	200	205	2	defined(NTVDM) && defined(MONITOR)	2	else		3		exact-root-anchor	candidate-depth2	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/printer_.c	225	228	2	defined(NTVDM)	2	else		3		exact-root-anchor	candidate-depth2	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
+base/comms/rs232_io.c	69	74	2	BIT_ORDER2	73	ifndef	NEC_98	74	76	exact-root-anchor	present-depth2-queue	4655f5b7e8fbe538b3145f924db10c969457140e72207f8db4dd2e57178a0850
+base/comms/rs232_io.c	80	85	2	BIT_ORDER1	73	ifndef	NEC_98	74	87	exact-root-anchor	present-depth2-queue	4655f5b7e8fbe538b3145f924db10c969457140e72207f8db4dd2e57178a0850
+base/disks/diskbios.c	217	386	2	!(defined(NTVDM) && defined(MONITOR))	382	else		228	233	exact-root-anchor	present-depth2-queue	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/diskbios.c	228	397	2	!(defined(NTVDM) && defined(MONITOR))	382	else		228	246	exact-root-anchor	present-depth2-queue	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/diskbios.c	272	441	2	NTVDM	382	else		228		exact-root-anchor	candidate-depth2	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/diskbios.c	711	1075	2	PROD	1063	else		529	542	exact-root-anchor	present-depth2-queue	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/fdisk.c	1582	1583	2	PROD	1574	ifndef	NEC_98	1543	1553	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1713	1716	2	REAL_ROM	1679	ifndef	NEC_98	1652	1690	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1720	1723	2	REAL_ROM	1679	ifndef	NEC_98	1652	1698	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1741	1744	2	REAL_ROM	1679	ifndef	NEC_98	1652	1720	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1748	1751	2	REAL_ROM	1679	ifndef	NEC_98	1652	1728	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1776	1781	2	REAL_ROM	1762	ifndef	NEC_98	1741	1761	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1783	1788	2	REAL_ROM	1762	ifndef	NEC_98	1741	1769	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1796	1801	2	REAL_ROM	1762	ifndef	NEC_98	1741	1783	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1803	1808	2	REAL_ROM	1762	ifndef	NEC_98	1741	1791	exact-root-anchor	present-depth2-queue	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fla.c	436	437	2	PROD	294	ifndef	NEC_98	381	525	exact-root-anchor	present-depth2-queue	27c4cd723ab1351bd13dbf79f522b14149f257b779feae75cd25970ddae87504
+base/disks/fla.c	712	715	2	PROD	461	ifndef	NEC_98	547	802	exact-root-anchor	present-depth2-queue	27c4cd723ab1351bd13dbf79f522b14149f257b779feae75cd25970ddae87504
+base/disks/floppy.c	1622	3383	2	NTVDM	3372	ifndef	NEC_98	1663	1675	exact-root-anchor	present-depth2-queue	6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	2014	3785	2	NTVDM	3733	ifndef	NEC_98	1997		exact-root-anchor	candidate-depth2	6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy_i.c	334	581	2	NTVDM	579	ifndef	NEC_98	138		exact-root-anchor	candidate-depth2	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/disks/floppy_i.c	433	697	2	NTVDM	695	else		251		exact-root-anchor	candidate-depth2	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/disks/floppy_i.c	475	763	2	NTVDM	727	else		263	300	exact-root-anchor	present-depth2-queue	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/inc/egacpu.h	121	152	2	HOST_VGA_GLOBALS	151	else		113	115	exact-root-anchor	present-depth2-queue	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/inc/egacpu.h	149	273	2	CPU_40_STYLE	272	else		168	170	exact-root-anchor	present-depth2-queue	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/inc/egacpu.h	344	486	2	CPU_40_STYLE	485	else		288	290	exact-root-anchor	present-depth2-queue	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/inc/gfx_upd.h	52	53	2	VGG	52	ifndef	NEC_98	52	54	exact-root-anchor	present-depth2-queue	2bfa647ff4d85c45f4bb50b4655d28d770b9511802960eeea7f1ca799725040f
+base/inc/gfx_upd.h	279	326	2	NTVDM	325	ifndef	NEC_98	315		exact-root-anchor	known-absent-depth2	2bfa647ff4d85c45f4bb50b4655d28d770b9511802960eeea7f1ca799725040f
+base/inc/gvi.h	278	481	2	VGG	420	else		219	281	exact-root-anchor	present-depth2-queue	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
+base/inc/gvi.h	289	492	2	VGG	420	else		219	293	exact-root-anchor	present-depth2-queue	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
+base/inc/ios.h	46	309	2	HERC	300	else		37	47	exact-root-anchor	present-depth2-queue	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
+base/inc/ios.h	83	346	2	VGG	300	else		37	84	exact-root-anchor	present-depth2-queue	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
+base/inc/ios.h	312	575	2	SWIN_SNDBLST_NULL	300	else		37	313	exact-root-anchor	present-depth2-queue	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
+base/inc/ios.h	326	589	2	SFELLOW	300	else		37	325	exact-root-anchor	present-depth2-queue	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
+base/inc/video.h	72	146	2	EGG	133	else		68	81	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	125	199	2	VGG	133	else		68	135	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	129	203	2	VGG	133	else		68	139	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	136	210	2	VGG	133	else		68	146	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	144	218	2	EGG	133	else		68	155	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	174	248	2	V7VGA	133	else		68	185	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	179	253	2	V7VGA	133	else		68	190	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	191	273	2	EGG	133	else		68	203	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	203	285	2	VGG	133	else		68	215	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	237	319	2	V7VGA	133	else		68	250	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	249	331	2	VGG	133	else		68	263	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/inc/video.h	262	344	2	NTVDM	133	else		68	277	exact-root-anchor	present-depth2-queue	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
+base/keymouse/keyba.c	2413	2688	2	JOKER	2644	else		1836	1881	exact-root-anchor	present-depth2-queue	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74
+base/keymouse/keyba.c	2457	2732	2	PM	2644	else		1836	1917	exact-root-anchor	present-depth2-queue	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74
+base/keymouse/keyba.c	2529	2809	2	JOKER	2644	else		1836	1991	exact-root-anchor	present-depth2-queue	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74
+base/keymouse/mouse.c	121	159	2	PROD	138	else		195	217	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	145	183	2	PROD	138	else		195	239	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	156	282	2	PROD	281	else		251	253	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	188	314	2	PROD	281	else		251	277	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	222	348	2	PROD	281	else		251	309	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	235	361	2	PROD	281	else		251	320	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	267	393	2	PROD	281	else		251		exact-root-anchor	candidate-depth2	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	282	408	2	PROD	281	else		251	333	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	289	415	2	PROD	281	else		251	339	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	299	425	2	PROD	281	else		251	349	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse.c	316	442	2	PROD	281	else		251	377	exact-root-anchor	present-depth2-queue	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+base/keymouse/mouse_io.c	1203	1230	2	NTVDM	1229	ifndef	NEC_98	1459		manual-parent-boundary	known-absent-depth2	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1217	1246	2	EGG	1245	ifndef	NEC_98	1472	1474	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1763	1821	2	V7VGA	1788	ifndef	NEC_98	1917	1928	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1774	1838	2	V7VGA	1788	ifndef	NEC_98	1917	1944	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1786	1850	2	V7VGA	1788	ifndef	NEC_98	1917	1957	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1793	1860	2	EGG	1788	ifndef	NEC_98	1917	1968	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1805	1872	2	defined(NTVDM) && defined(MONITOR)	1788	ifndef	NEC_98	1917	1980	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1813	1880	2	defined(NTVDM) && defined(MONITOR)	1788	ifndef	NEC_98	1917	1989	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1859	1926	2	defined(NTVDM) && defined(MONITOR)	1788	ifndef	NEC_98	1917	2033	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1877	1944	2	EGG	1788	ifndef	NEC_98	1917	2043	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	2178	2245	2	!defined(NTVDM) || !defined(MONITOR)	1788	ifndef	NEC_98	1917		exact-root-anchor	candidate-depth2	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	2199	2266	2	X86GFX	1788	ifndef	NEC_98	1917	2355	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	2232	2299	2	GISP_SVGA	1788	ifndef	NEC_98	1917	2391	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3790	3868	2	EGG	3818	ifndef	NEC_98	3776	3827	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3793	3871	2	defined(NTVDM) && defined(MONITOR)	3818	ifndef	NEC_98	3776	3830	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3804	3882	2	PROD	3818	ifndef	NEC_98	3776	3839	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	4015	4095	2	PROD	4077	ifndef	NEC_98	4036	4055	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	4375	4465	2	MOUSE_16_BIT	4434	ifndef	NEC_98	4404	4436	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	5199	5323	2	V7VGA	5312	ifndef	NEC_98	5281	5293	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	5250	5376	2	NTVDM	5375	ifndef	NEC_98	5348	5350	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	5351	5479	2	NTVDM	5478	ifndef	NEC_98	5456	5457	exact-root-anchor	present-depth2-queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/ppi.c	87	88	2	PROD	87	ifndef	NEC_98	90	92	exact-root-anchor	present-depth2-queue	b145249ddb7351efcd68c34eafac5e12f5c3c5403f1b9f8e2b47e3b2a63796b8
+base/keymouse/ppi.c	136	139	2	NTVDM	114	ifndef	NEC_98	119	145	exact-root-anchor	present-depth2-queue	b145249ddb7351efcd68c34eafac5e12f5c3c5403f1b9f8e2b47e3b2a63796b8
+base/keymouse/ppi.c	167	170	2	NTVDM	114	ifndef	NEC_98	119		exact-root-anchor	candidate-depth2	b145249ddb7351efcd68c34eafac5e12f5c3c5403f1b9f8e2b47e3b2a63796b8
+base/support/time_day.c	89	98	2	XTSFD	96	else		92	94	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	94	103	2	NTVDM	96	else		92	100	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	108	117	2	ANSI	96	else		92	112	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	145	301	2	BSD4_2	286	else		139	154	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	152	308	2	NTVDM	286	else		139	162	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	218	374	2	NTVDM	286	else		139		exact-root-anchor	candidate-depth2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	228	384	2	NTVDM	286	else		139		exact-root-anchor	candidate-depth2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	243	399	2	NTVDM	286	else		139		exact-root-anchor	candidate-depth2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	285	441	2	NTVDM	286	else		139		exact-root-anchor	candidate-depth2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	300	456	2	NTVDM	286	else		139		exact-root-anchor	candidate-depth2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	345	501	2	BSD4_2	286	else		139	301	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	377	533	2	XTSFD	286	else		139	334	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	398	554	2	BSD4_2	286	else		139	344	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	409	586	2	NTVDM	582	ifndef	NEC_98	358	363	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	770	951	2	NTVDM	950	ifndef	NEC_98	730	732	exact-root-anchor	present-depth2-queue	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/support/time_day.c	806	989	2	NTVDM	988	ifndef	NEC_98	772		exact-root-anchor	known-absent-depth2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/system/ica.c	2007	2063	2	NTVDM	2059	else		1836		exact-root-anchor	known-absent-depth2	d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	2081	2149	2	NTVDM	2144	else		1920	1926	exact-root-anchor	present-depth2-queue	d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/rom.c	48	61	2	BIOS1ROM_FILENAME	59	else		50	52	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	52	65	2	BIOS2ROM_FILENAME	59	else		50	56	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	60	73	2	EGAROM_FILENAME	59	else		50	65	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	64	77	2	VGAROM_FILENAME	59	else		50	69	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	68	81	2	V7VGAROM_FILENAME	59	else		50	73	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	222	252	2	REAL_VGA	251	ifndef	NEC_98	229	231	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	282	342	2	!defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )	340	else		293		manual-parent-boundary	known-absent-depth2	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/rom.c	349	454	2	!(defined(NTVDM) && defined(MONITOR))	452	else		346	349	exact-root-anchor	present-depth2-queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/timer.c	2679	2855	2	SYNCH_TIMERS	2854	else		2420	2422	exact-root-anchor	present-depth2-queue	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db
+base/system/timer.c	2696	2872	2	NTVDM	2854	else		2420		exact-root-anchor	candidate-depth2	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db
+base/video/gfx_updt.c	124	127	2	defined(PROD) || (!defined(EGG))	126	else		123	125	exact-root-anchor	present-depth2-queue	d9588aeddd405063d242529b4aea2c012c935106e8ac55b99f23d697d24c927b
+base/video/gfx_updt.c	132	146	2	VGG	145	else		137	139	exact-root-anchor	present-depth2-queue	d9588aeddd405063d242529b4aea2c012c935106e8ac55b99f23d697d24c927b
+base/video/gfx_updt.c	195	221	2	PROD	220	else		194	196	exact-root-anchor	present-depth2-queue	d9588aeddd405063d242529b4aea2c012c935106e8ac55b99f23d697d24c927b
+base/video/gfx_updt.c	4825	5970	2	NTVDM	5969	ifndef	NEC_98	3989		exact-root-anchor	known-absent-depth2	d9588aeddd405063d242529b4aea2c012c935106e8ac55b99f23d697d24c927b
+base/video/gvi.c	177	192	2	DUMB_TERMINAL	180	else		167	180	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	183	198	2	CGAMONO	180	else		167	185	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	188	203	2	EGG	180	else		167	191	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	193	208	2	VGG	180	else		167	196	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	198	213	2	HERC	180	else		167	201	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	204	219	2	PROD	180	else		167	206	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	218	233	2	CGAMONO	180	else		167	220	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	224	239	2	HERC	180	else		167	227	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	230	245	2	EGG	180	else		167	231	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	236	251	2	VGG	180	else		167	237	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	247	262	2	GORE	180	else		167	248	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	258	273	2	DUMB_TERMINAL	180	else		167	255	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	264	279	2	CGAMONO	180	else		167	260	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	269	284	2	HERC	180	else		167	266	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	274	289	2	EGG	180	else		167	270	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	279	294	2	VGG	180	else		167	275	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	288	303	2	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	180	else		167		exact-root-anchor	candidate-depth2	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	293	308	2	EGA_DUMP	180	else		167	287	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	302	317	2	DUMB_TERMINAL	180	else		167	297	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	308	323	2	CGAMONO	180	else		167	302	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	313	328	2	HERC	180	else		167	308	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	318	333	2	EGG	180	else		167	312	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	323	338	2	VGG	180	else		167	317	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	331	346	2	PROD	180	else		167	325	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/gvi.c	338	353	2	GORE	180	else		167	332	exact-root-anchor	present-depth2-queue	3f99e0f01ebceabfd6ae1c491c22cddc60f1091ebec4433279b4b726eca9ab79
+base/video/video.c	44	48	2	SEGMENTATION	47	ifndef	NEC_98	48	50	exact-root-anchor	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	101	116	2	NTVDM	115	ifndef	NEC_98	115		manual-parent-boundary	known-absent-depth2	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	142	271	2	HERC	263	else		161	170	exact-root-anchor	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	166	295	2	HERC	263	else		161	193	exact-root-anchor	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	181	310	2	VGG	263	else		161	208	exact-root-anchor	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	231	362	2	VGG	319	ifndef	NEC_98	219	263	exact-root-anchor	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	238	369	2	V7VGA	319	ifndef	NEC_98	219	270	exact-root-anchor	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	304	675	2	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	670	ifndef	NEC_98	348	354	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	314	685	2	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	670	ifndef	NEC_98	348	365	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	345	716	2	PROD	670	ifndef	NEC_98	348	397	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	370	741	2	REAL_VGA	670	ifndef	NEC_98	348	423	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	396	767	2	EGG	670	ifndef	NEC_98	348	448	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	424	795	2	REAL_VGA	670	ifndef	NEC_98	348	476	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	582	967	2	PROD	670	ifndef	NEC_98	348	634	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	599	984	2	V7VGA	670	ifndef	NEC_98	348	652	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	618	1003	2	V7VGA	670	ifndef	NEC_98	348	671	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	731	1146	2	EGG	670	ifndef	NEC_98	348	784	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	746	1161	2	EGG	670	ifndef	NEC_98	348	799	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	756	1171	2	EGA_DUMP	670	ifndef	NEC_98	348	809	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	804	1266	2	REAL_VGA	670	ifndef	NEC_98	348	883	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	820	1326	2	REAL_VGA	670	ifndef	NEC_98	348	909	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	876	1426	2	REAL_VGA	670	ifndef	NEC_98	348	970	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	884	1434	2	REAL_VGA	670	ifndef	NEC_98	348	979	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	897	1447	2	REAL_VGA	670	ifndef	NEC_98	348	993	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	946	1502	2	PROD	670	ifndef	NEC_98	348	1045	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	965	1521	2	REAL_VGA	670	ifndef	NEC_98	348	1065	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	977	1533	2	REAL_VGA	670	ifndef	NEC_98	348	1078	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	985	1541	2	REAL_VGA	670	ifndef	NEC_98	348	1087	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1003	1559	2	REAL_VGA	670	ifndef	NEC_98	348	1106	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1014	1570	2	REAL_VGA	670	ifndef	NEC_98	348	1118	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1085	1671	2	EGG	670	ifndef	NEC_98	348	1189	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1099	1685	2	EGG	670	ifndef	NEC_98	348	1203	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1109	1695	2	EGA_DUMP	670	ifndef	NEC_98	348	1213	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1147	1778	2	REAL_VGA	670	ifndef	NEC_98	348	1268	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1161	1836	2	REAL_VGA	670	ifndef	NEC_98	348	1292	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1214	1933	2	REAL_VGA	670	ifndef	NEC_98	348	1350	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1229	1948	2	REAL_VGA	670	ifndef	NEC_98	348	1365	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1270	1989	2	PROD	670	ifndef	NEC_98	348	1406	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1287	2006	2	REAL_VGA	670	ifndef	NEC_98	348	1424	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1298	2017	2	REAL_VGA	670	ifndef	NEC_98	348	1436	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1306	2025	2	REAL_VGA	670	ifndef	NEC_98	348	1445	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1320	2039	2	REAL_VGA	670	ifndef	NEC_98	348	1460	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1331	2050	2	REAL_VGA	670	ifndef	NEC_98	348	1472	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1374	2099	2	A2CPU	670	ifndef	NEC_98	348	1519	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1383	2108	2	EGG	670	ifndef	NEC_98	348	1527	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1431	2156	2	EGG	670	ifndef	NEC_98	348	1575	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1506	2253	2	REAL_VGA	670	ifndef	NEC_98	348	1663	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1529	2299	2	EGG	670	ifndef	NEC_98	348	1687	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1579	2372	2	( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )	670	ifndef	NEC_98	348	1741	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1604	2420	2	EGG	670	ifndef	NEC_98	348	1766	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1663	2479	2	EGG	670	ifndef	NEC_98	348	1825	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1701	2517	2	EGG	670	ifndef	NEC_98	348	1863	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1719	2535	2	EGG	670	ifndef	NEC_98	348	1881	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1739	2555	2	EGG	670	ifndef	NEC_98	348	1901	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1769	2585	2	EGG	670	ifndef	NEC_98	348	1931	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1787	2603	2	EGG	670	ifndef	NEC_98	348	1949	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1803	2619	2	EGG	670	ifndef	NEC_98	348	1965	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1837	2653	2	EGG	670	ifndef	NEC_98	348	1999	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1881	2697	2	CPU_40_STYLE	670	ifndef	NEC_98	348	2043	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1915	2731	2	ANSI	670	ifndef	NEC_98	348	2071	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1920	2736	2	NTVDM	670	ifndef	NEC_98	348	2077	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	1940	2760	2	defined(NTVDM) && defined(MONITOR)	670	ifndef	NEC_98	348		manual-parent-boundary	candidate-depth2	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2006	2877	2	defined(NTVDM) && defined(X86GFX)	670	ifndef	NEC_98	348	2168	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2042	2929	2	( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )	670	ifndef	NEC_98	348	2198	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2058	2945	2	EGG	670	ifndef	NEC_98	348	2214	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2104	3005	2	REAL_VGA	670	ifndef	NEC_98	348	2264	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2201	3102	2	A2CPU	670	ifndef	NEC_98	348	2343	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2212	3127	2	EGG	670	ifndef	NEC_98	348	2353	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2224	3139	2	EGA_DUMP	670	ifndef	NEC_98	348	2365	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2253	3170	2	NTVDM	670	ifndef	NEC_98	348		manual-parent-boundary	candidate-depth2	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2259	3184	2	NTVDM	670	ifndef	NEC_98	348		manual-parent-boundary	candidate-depth2	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2485	3594	2	PROD	670	ifndef	NEC_98	348	2560	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2493	3602	2	EGG	670	ifndef	NEC_98	348	2569	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2607	3716	2	REAL_VGA	670	ifndef	NEC_98	348	2683	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2635	3744	2	SEGMENTATION	670	ifndef	NEC_98	348	2688	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2649	3758	2	HERC	670	ifndef	NEC_98	348	2698	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2668	3777	2	HERC	670	ifndef	NEC_98	348	2718	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2682	3791	2	EGG	670	ifndef	NEC_98	348	2722	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2712	3821	2	HERC	670	ifndef	NEC_98	348	2752	manual-parent-boundary	present-depth2-queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	2831	3940	2	NTVDM	670	ifndef	NEC_98	348		manual-parent-boundary	candidate-depth2	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video_io.c	19	20	2	SEGMENTATION	19	ifndef	NEC_98	19	21	exact-root-anchor	present-depth2-queue	6ce43207e47e958eada9160d24fdd8822b671b6ca92f6c267da1030a4b77981a
+base/video/video_io.c	52	103	2	defined(NTVDM) && !defined(X86GFX)	95	else		49		exact-root-anchor	candidate-depth2	6ce43207e47e958eada9160d24fdd8822b671b6ca92f6c267da1030a4b77981a
+host/src/nt_cga.c	269	378	2	MONITOR	346	ifndef	NEC_98	219		exact-root-anchor	candidate-depth2	0ed3b5efea350f940568c2a51c2bad79d6e73fe41f47a2f211dfa2779ccbd3ce
+host/src/nt_graph.c	616	778	2	MONITOR	777	else		630	631	exact-root-anchor	present-depth2-queue	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	902	1105	2	X86GFX	1096	ifndef	NEC_98	918	928	exact-root-anchor	present-depth2-queue	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	1276	1620	2	V7VGA	1543	else		1257	1335	exact-root-anchor	present-depth2-queue	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	1287	1631	2	MONITOR	1543	else		1257	1346	exact-root-anchor	present-depth2-queue	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11

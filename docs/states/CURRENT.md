@@ -1220,6 +1220,12 @@ boundary classifications in that review. Excluded parents do not enqueue
 children; missing original direct children remain separately queued. The large
 video parent has 27 provisional child candidates, not confirmed absences.
 This resolves these mapping records only, not the full first-depth audit.
+The 315 OpenNT root directives that map exactly to nested XP directives
+all have selected current first-depth parents: 238 exact mappings and 77
+boundary-verified mappings. Their direct children are accounted for as 274
+present in the depth-2 queue, eight known absent, and 33 provisional
+candidates. These categories do not verify any child body. Evidence:
+`m9-t99-s20-opennt-roots-nested-in-xp.tsv`.
 This audit is documentation/evidence only; cross-version root mappings and
 first-depth completeness remain under review.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
