@@ -41,6 +41,11 @@ followed by a successful isolated retry and full `-j2` dual-architecture
 qualification, 194 tests per architecture with no skips. Exclusion delivery
 is ready; retained-frame review and the ninth-depth queue follow it.
 
+Exclusion delivery `1adedb19` is pushed. The one selected eighth-depth frame
+corresponds to XP and needs no restoration. Its ninth-depth direct-child
+queues contain two matching arms each. No production source changed after
+the fully qualified exclusion delivery; final documentation and closure remain.
+
 ## Technical Baseline
 
 Latest published binaries are S26's seventh-depth verified build; hashes and

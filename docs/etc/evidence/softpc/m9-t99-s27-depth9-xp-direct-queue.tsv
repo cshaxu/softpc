@@ -1,0 +1,3 @@
+path	current_parent_line	xp_parent_line	xp_child_line	directive	expression	status
+base/video/ega_writ.c	216	491	492	ifdef	A3CPU	pending-depth9-xp-direct-child
+base/video/ega_writ.c	216	491	499	else		pending-depth9-xp-direct-child
