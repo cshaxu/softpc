@@ -2,65 +2,17 @@
 
 ## Current Work
 
-Owner authorizes automatic admission of each next depth after the preceding S
-is built, published, tested, committed, pushed and closed. S22 is closed at
-`83caa3f9`; [its record](../history/M9-T99-S22-mirror-depth3.md) and
-[final evidence](../etc/evidence/softpc/m9-t99-s22-depth3-final.md) identify
-the first two depth-4 queues. S23 is active for depth 4; T99 remains open.
-
-## M9 T99 S23 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Automatic per-depth admission authorized by owner after S22 closure and push. |
-| Objective | Audit and reconcile fourth-depth retained mirror conditional arms under the established breadth-first policy. |
-| Non-goals | Do not process fifth-depth bodies, introduce new guest behavior, alter public APIs or modify user media and configuration. |
-| Reference Baseline | S22 closure 83caa3f9, pinned XP SP1 subset, OpenNT comparison and S22 depth-4 evidence. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
-| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
-| Verification | Verify actual x86/x64 conditions and original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |
-| Expected Markers | Preserve original fourth-depth frames; conclusively excluded bodies become one #error and required #line; do not retain inner frames inside excluded bodies. |
-| Asset Needs | Build and publish both EXEs; preserve INI, guest media and snapshots. |
-| Reporting Requirements | Report current depth, actual totals and dispositions, production/test diff, verification and depth-5 queue. |
-| Stop Conditions | Do not equate unobserved code with excluded code; preserve approved local fixes in selected arms; do not process deeper bodies. |
-| Exit Criteria | Deliver excluded fourth-depth phase with build, publish, tests, commit and push; then audit every retained fourth-depth arm, enqueue direct fifth-depth children and complete final verification, delivery and closure. |
-| Original Owner Request | 每一层单独作为 S；本层排除分支先集中交付，再审计本层保留分支并排队下一层；每 S 编译、测试、发布、提交、推送、收口后自动准入下一层。 |
-| Similar-Issue Sweep | Account for current-code and pinned-XP direct-child queues, their overlap, local-condition extensions and the one local frame without a one-to-one XP guard. |
-
-The S22 queues contain 309 current fourth-depth arms and 326 XP direct-child
-arms; these counts overlap and are not final dispositions. One local frame has
-no one-to-one XP guard and requires scope review. Begin with current depth and
-parent qualification, then compare original frames. Disposable scratch is
-`build/t99-s23`, owned by S23, with a four-hour total and 30-minute no-progress
-observation budget. Promote concise evidence and retire scratch before closure.
-
-Initial depth-4 queue has 309 current arms: 119 single-error and 190
-requiring qualification. Of 326 XP direct-child records, 293 aligned exactly
-and 33 require review. The working exclusion batch has restored nine original
-conditional groups with false supported-context arms, including a two-arm
-JAPAN/KOREA chain; selected siblings remain unchanged. Dual builds and gates
-passed. A 160-context preprocessing probe selected 195 of 196 non-error arms
-on both widths; the remaining marker was inside a multiline comment, and a
-corrected two-context probe verified its parent and selected arm on both.
-Current fourth-depth accounting is 324 arms: 128 single-error and 196 selected.
-Both architecture builds, mirror/documentation gates and full tests passed:
-each width completed 186 non-native and eight serial native integration tests.
-Exclusion delivery `df6c079d` was pushed after full qualification. In the
-retained phase, 13 original selected frames were restored and three other
-records were confirmed as existing frames. Current fourth depth has 327 arms:
-123 direct single-error, 191 previously observed selected and 13 restored
-selected. Five formerly direct selected arms moved to depth 5. Fifth-depth
-queues contain 94 current arms and 97 XP direct-child candidates; the counts
-overlap. One selected local frame has no one-to-one XP guard and remains in
-the parent map. Final dual builds and all 194 tests per architecture passed.
-Actual-diff review, delivery and S23 closure remain.
+No implementation subtask is active. Open task awaiting owner: T99.
+The owner has already authorized automatic admission of S24, so no further
+owner response is required. S23 is closed after fourth-depth delivery and full
+qualification; see its [closure](../history/M9-T99-S23-mirror-depth4.md).
+S24 must audit fifth-depth candidates without processing their children; both
+queues are linked from the S23 final report.
 
 ## Technical Baseline
 
-Latest published binaries are S22's third-depth mirror build; hashes and dual-
-architecture qualification are in its [closure](../history/M9-T99-S22-mirror-depth3.md).
+Latest published binaries are S23's fourth-depth mirror build; hashes and dual-
+architecture qualification are in its [closure](../history/M9-T99-S23-mirror-depth4.md).
 The following S17 and earlier paragraphs retain delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,
