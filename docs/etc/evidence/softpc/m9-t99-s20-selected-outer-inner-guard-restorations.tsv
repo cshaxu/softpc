@@ -1,0 +1,5 @@
+path	xp_if_line	xp_endif_line	baseline_next_line	macro	excluded_body_sha256
+base/comms/printer.c	1011	1025	667	NEC_98	""
+base/comms/printer.c	1012	1024	667	NTVDM	3497ea65f93ef12b91f3a857b4319001bd93a95b914351ce0d0e8816c93e8170
+base/keymouse/keyba.c	1374	1382	973	NEC_98	""
+base/keymouse/keyba.c	1375	1381	973	JAPAN	49ba13afb028ac543eaad711c587cd5641830fd043b36138e1cdd216833b5974

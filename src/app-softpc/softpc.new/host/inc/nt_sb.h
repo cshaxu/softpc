@@ -102,3 +102,11 @@ lib_status DspCloseOutput(void);
 lib_status DspArmCompletion(IU32 rate);
 void DspCancelTransfer(void);
 void StopDspTransfer(IBOOL reset);
+
+#line 311
+#if DBG
+#error "Unsupported SoftPC mirror configuration: NTVDM sound debugging"
+#else
+/* T93: unused native debug macros are omitted from the selected subset. */
+#endif // DBG
+#line 330

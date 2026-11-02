@@ -56,39 +56,16 @@
 #ifdef VGG
 #define MAX_NUM_FONTS	8	/* VGA support 8 fonts */
 #else
-#define MAX_NUM_FONTS	4	/* EGA support 4 fonts */
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif  /* VGG */
+#line 61
 #endif  /* EGG */
 
 
 #ifdef HERC
-
-/* Hercules Page 0  */
-
-#define P0_EVEN_START1      0x0000  /* Start of the even bank         */
-#define P0_EVEN_END1        0x1E95  /* End of the even bank           */
-#define P0_ODD_START1       0x2000  /* Start of the odd bank          */
-#define P0_ODD_END1         0x3E95  /* End of the odd bank            */
-#define P0_EVEN_START2      0x4000  /* Start of the even bank         */
-#define P0_EVEN_END2        0x5E95  /* End of the even bank           */
-#define P0_ODD_START2       0x6000  /* Start of the odd bank          */
-#define P0_ODD_END2         0x7E95  /* End of the odd bank            */
-
-/* Hercules Page 1   */
-
-#define P1_EVEN_START1      0x8000  /* Start of the even bank         */
-#define P1_EVEN_END1        0x9E95  /* End of the even bank           */
-#define P1_ODD_START1       0xA000  /* Start of the odd bank          */
-#define P1_ODD_END1         0xBE95  /* End of the odd bank            */
-#define P1_EVEN_START2      0xC000  /* Start of the even bank         */
-#define P1_EVEN_END2        0xDE95  /* End of the even bank           */
-#define P1_ODD_START2       0xE000  /* Start of the odd bank          */
-#define P1_ODD_END2         0xFE95  /* End of the odd bank            */
-
-#define HERC_CURS_HEIGHT   2	 /* Default  Hercules MDA cursor height     */
-#define HERC_CURS_START    13 	 /* Default  Hercules MDA cursor starting scan line   */
-
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif	/* HERC */
+#line 92
 
 /*
  * ============================================================================
@@ -96,7 +73,13 @@
  * ============================================================================
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 102
 extern	void	gvi_init IPT1(half_word, v_adapter);
+#endif // !NEC_98
+#line 104
 extern	void	gvi_term IPT0();
 extern	void	recalc_screen_params IPT0();
 
@@ -129,15 +112,18 @@ extern half_word video_adapter;
  * this type of setting.
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 199
 typedef union {
         word    as_word;
         struct
         {
 #ifdef  BIT_ORDER1
-                unsigned        unused          : 7,
-                                top_bit         : 1,
-                                low_byte        : 8;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #else
+#line 141
                 unsigned        low_byte        : 8,
                                 top_bit         : 1,
                                 unused          : 7;
@@ -156,11 +142,9 @@ typedef union {
         struct
         {
 #ifdef  BIT_ORDER1
-                unsigned        unused          : 6,
-                                top_bit         : 1,
-				med_bit		: 1,
-                                low_byte        : 8;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #else
+#line 164
                 unsigned        low_byte        : 8,
 				med_bit		: 1,
                                 top_bit         : 1,
@@ -182,10 +166,15 @@ typedef	struct {
 #ifdef VGG
 	_10_BITS screen_height;		/* Height in pc scanlines of screen	    */
 #else
-	_9_BITS	screen_height;		/* Height in pc scanlines of screen	    */
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
+#line 254
 	half_word *screen_ptr;		/* pointer to start of regen buffer	    */
 	int screen_length;		/* Number of bytes in one screenfull        */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 259
 	int display_disabled;		/* 0 if it's OK to do screen output.        */
 					/* it is used to implement the VIDEO_ENABLE */
 					/* bit in the mode select register          */
@@ -211,10 +200,24 @@ typedef	struct {
 	int host_pix_height; 		/* Height of PC pixel in host pixels	    */
 	int offset_per_line;		/* mirrors bytes_per_line for mda and cga, but can vary for ega */
 	int screen_limit;		/* number of bytes in video_copy */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 310
 } DISPLAY_GLOBS;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 315
 extern	DISPLAY_GLOBS	PCDisplay;
+#endif // !NEC_98
+#line 317
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 218
 #define	set_mode_change_required(val)	PCDisplay.mode_change_required = (val)
 #define	set_word_addressing(val)	PCDisplay.word_addressing = (val)
 #define	set_offset_per_line(val)	PCDisplay.offset_per_line = (val)
@@ -279,8 +282,9 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #define get_screen_height()             ((video_adapter == VGA) ? ((PCDisplay.screen_height.as_word+1)<<EGA_GRAPH.multiply_vert_by_two) : \
 							((PCDisplay.screen_height.as_word+1)*get_pc_pix_height()))
 #else
-#define get_screen_height()             ((PCDisplay.screen_height.as_word+1)*get_pc_pix_height())
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
+#line 284
 #define get_screen_height_lo()          (PCDisplay.screen_height.as_bfld.low_byte)
 #define get_screen_height_hi()          (PCDisplay.screen_height.as_bfld.top_bit)
 #define	get_screen_end()		(get_screen_start() + get_screen_length() + gvi_pc_low_regen)
@@ -298,6 +302,8 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #define get_seq_chain_mode()	(PCDisplay.seq_chain_mode)
 #endif /* V7VGA */
 #endif
+#endif // !NEC_98
+#line 301
 
 /*
  * useful macro to get character height in host pixels
@@ -309,3 +315,7 @@ extern	DISPLAY_GLOBS	PCDisplay;
  */
 
 #define gvi_pc_check_regen(addr) (addr >= gvi_pc_low_regen && addr <= gvi_pc_high_regen)
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 645

@@ -26,12 +26,14 @@
 #ifndef PATHSEP_CHAR
 
 #ifdef macintosh
-#define	PATHSEP_CHAR 	':'
+#error "Unsupported SoftPC mirror configuration: macintosh"
 #endif
+#line 31
 
 #ifdef NTVDM
-#define PATHSEP_CHAR	'\\'
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 35
 
 #ifndef PATHSEP_CHAR
 #define PATHSEP_CHAR	'/'	/* default UNIX separator */

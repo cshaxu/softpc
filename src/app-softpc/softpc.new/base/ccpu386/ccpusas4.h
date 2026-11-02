@@ -27,8 +27,9 @@ extern PHY_ADDR SasWrapMask;
 
 #if !defined(PIG)
 #ifdef BACK_M
-#define IncCpuPtrLS8(ptr) (ptr)--
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else	/* BACK_M */
+#line 32
 #define IncCpuPtrLS8(ptr) (ptr)++
 #endif	/* BACK_M */
 #endif	/* PIG */

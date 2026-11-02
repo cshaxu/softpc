@@ -1,0 +1,4 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/video/ega_vide.c	1065	1592	947	1220	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_vide.c	1901	2173	1485	1592	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_vide.c	2634	2755	2017	2074	ac30714d36b8e9c9247e95d4a5228fad787fa516f412c34d276ffefb0e51ad17

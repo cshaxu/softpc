@@ -1,0 +1,5 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line
+base/comms/printer.c	264	302	303	316
+base/comms/printer.c	269	297	303	311
+base/comms/printer.c	323	364	333	345
+base/comms/printer.c	335	363	333	345

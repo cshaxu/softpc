@@ -20,3 +20,7 @@
 #define CGA_CHAR_HEIGHT		16
 #define CGA_WIN_WIDTH		(80 * CGA_CHAR_WIDTH)
 #define CGA_WIN_HEIGHT		(25 * CGA_CHAR_HEIGHT)
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 29

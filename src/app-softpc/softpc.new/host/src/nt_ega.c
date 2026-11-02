@@ -40,6 +40,10 @@
 #include "nt_ega.h"
 #include "nt_egalt.h"
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 47
 
 /* Statics */
 
@@ -185,15 +189,9 @@ void nt_init_ega_lo_graph()
                         byte7 = ( i & 0x80 ) >> 7;
 
 #ifdef BIGEND
-                        or_of_bytes01 = ( byte1 << 24 ) | ( byte1 << 16 ) |
-                                                ( byte0 << 8 ) | byte0;
-                        or_of_bytes23 = ( byte3 << 24 ) | ( byte3 << 16 ) |
-                                                ( byte2 << 8 ) | byte2;
-                        or_of_bytes45 = ( byte5 << 24 ) | ( byte5 << 16 ) |
-                                                ( byte4 << 8 ) | byte4;
-                        or_of_bytes67 = ( byte7 << 24 ) | ( byte7 << 16 ) |
-                                                ( byte6 << 8 ) | byte6;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
+#line 197
 
 #ifdef LITTLEND
                         or_of_bytes01 = ( byte0 << 24 ) | ( byte0 << 16 ) |
@@ -228,21 +226,9 @@ void nt_init_ega_lo_graph()
 
 #ifdef BIGWIN
 #ifdef BIGEND
-
-                        or_of_bytes01 = ( byte1 << 24 ) | ( byte0 << 16 ) |
-                                                ( byte0 << 8 ) | byte0;
-                        or_of_bytes23 = ( byte2 << 24 ) | ( byte2 << 16 ) |
-                                                ( byte1 << 8 ) | byte1;
-                        or_of_bytes45 = ( byte3 << 24 ) | ( byte3 << 16 ) |
-                                                ( byte3 << 8 ) | byte2;
-                        or_of_bytes67 = ( byte5 << 24 ) | ( byte4 << 16 ) |
-                                                ( byte4 << 8 ) | byte4;
-                        or_of_bytes89 = ( byte6 << 24 ) | ( byte6 << 16 ) |
-                                                ( byte5 << 8 ) | byte5;
-                        or_of_bytesab = ( byte7 << 24 ) | ( byte7 << 16 ) |
-                                                ( byte7 << 8 ) | byte6;
-
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
+#line 246
 
 #ifdef LITTLEND
 
@@ -410,11 +396,9 @@ void nt_init_ega_med_and_hi_graph_luts()
         byte7 = (i & 0x80) >> 7;
 
 #ifdef BIGEND
-
-        or_of_bytes1 = (byte3 << 24) | (byte2 << 16) | (byte1 << 8) | byte0;
-        or_of_bytes2 = (byte7 << 24) | (byte6 << 16) | (byte5 << 8) | byte4;
-
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
+#line 418
 
 #ifdef LITTLEND
 
@@ -435,12 +419,9 @@ void nt_init_ega_med_and_hi_graph_luts()
 
 #ifdef BIGWIN
 #ifdef BIGEND
-
-        or_of_bytes1 = (byte2 << 24) | (byte1 << 16) | (byte0 << 8) | byte0;
-        or_of_bytes2 = (byte4 << 24) | (byte4 << 16) | (byte3 << 8) | byte2;
-        or_of_bytes3 = (byte7 << 24) | (byte6 << 16) | (byte6 << 8) | byte5;
-
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /*BIGEND */
+#line 444
 
 #ifdef LITTLEND
 
@@ -464,13 +445,9 @@ void nt_init_ega_med_and_hi_graph_luts()
         lut3_big_ptr[3*i+2] = or_of_bytes1 << 3;
 
 #ifdef BIGEND
-
-        or_of_bytes1 = (byte1 << 24) | (byte1 << 16) | (byte0 << 8) | byte0;
-        or_of_bytes2 = (byte3 << 24) | (byte3 << 16) | (byte2 << 8) | byte2;
-        or_of_bytes3 = (byte5 << 24) | (byte5 << 16) | (byte4 << 8) | byte4;
-        or_of_bytes4 = (byte7 << 24) | (byte7 << 16) | (byte6 << 8) | byte6;
-
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
+#line 474
 
 #ifdef LITTLEND
 
@@ -1682,4 +1659,9 @@ sub_note_trace5(EGA_HOST_VERBOSE,
     "nt_ega_mono_hi_graph_huge off=%d x=%d y=%d width=%d h=%d - NOT SUPPORTED\n",
     offset, screen_x, screen_y, width, height);
 }
+
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 2145
 

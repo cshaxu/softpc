@@ -33,14 +33,9 @@ typedef union {
 } DIVISOR_LATCH;
 #endif
 #ifdef BIGEND
-typedef union {
-   word all;
-   struct {
-      WORD_BIT_FIELD MSByte:8;
-      WORD_BIT_FIELD LSByte:8;
-   } byte;
-} DIVISOR_LATCH;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 44
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -55,17 +50,9 @@ typedef union {
       } INT_ENABLE_REG;
 #endif
 #ifdef BIT_ORDER1
-typedef union {
- 	half_word all;
-	struct {
-		 HALF_WORD_BIT_FIELD pad:4;
-		 HALF_WORD_BIT_FIELD modem_status:1;
-		 HALF_WORD_BIT_FIELD rx_line:1;
-		 HALF_WORD_BIT_FIELD tx_holding:1;
-		 HALF_WORD_BIT_FIELD data_available:1;
-	       } bits;
-      } INT_ENABLE_REG;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 69
 
 
 #ifdef BIT_ORDER2
@@ -79,15 +66,9 @@ typedef union {
       } INT_ID_REG;
 #endif
 #ifdef BIT_ORDER1
-typedef union {
- 	half_word all;
-	struct {
-		 HALF_WORD_BIT_FIELD pad:5;
-		 HALF_WORD_BIT_FIELD interrupt_ID:2;
-		 HALF_WORD_BIT_FIELD no_int_pending:1;
-	       } bits;
-      } INT_ID_REG;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 91
 
 
 #ifdef BIT_ORDER2
@@ -105,19 +86,9 @@ typedef union {
       } LINE_CONTROL_REG;
 #endif
 #ifdef BIT_ORDER1
-typedef union {
- 	half_word all;
-	struct {
-		 HALF_WORD_BIT_FIELD DLAB:1;
-		 HALF_WORD_BIT_FIELD set_break:1;
-		 HALF_WORD_BIT_FIELD stick_parity:1;
-		 HALF_WORD_BIT_FIELD even_parity:1;
-		 HALF_WORD_BIT_FIELD parity_enabled:1;
-		 HALF_WORD_BIT_FIELD no_of_stop_bits:1;
-		 HALF_WORD_BIT_FIELD word_length:2;
-	       } bits;
-      } LINE_CONTROL_REG;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 121
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -133,18 +104,9 @@ typedef union {
       } MODEM_CONTROL_REG;
 #endif
 #ifdef BIT_ORDER1
-typedef union {
- 	half_word all;
-	struct {
-		 HALF_WORD_BIT_FIELD pad:3;
-		 HALF_WORD_BIT_FIELD loop:1;
-		 HALF_WORD_BIT_FIELD OUT2:1;
-		 HALF_WORD_BIT_FIELD OUT1:1;
-		 HALF_WORD_BIT_FIELD RTS:1;
-		 HALF_WORD_BIT_FIELD DTR:1;
-	       } bits;
-      } MODEM_CONTROL_REG;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 148
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -162,20 +124,9 @@ typedef union {
       } LINE_STATUS_REG;
 #endif
 #ifdef BIT_ORDER1
-typedef union {
- 	half_word all;
-	struct {
-		 HALF_WORD_BIT_FIELD pad:1;
-		 HALF_WORD_BIT_FIELD tx_shift_empty:1;
-		 HALF_WORD_BIT_FIELD tx_holding_empty:1;
-		 HALF_WORD_BIT_FIELD break_interrupt:1;
-		 HALF_WORD_BIT_FIELD framing_error:1;
-		 HALF_WORD_BIT_FIELD parity_error:1;
-		 HALF_WORD_BIT_FIELD overrun_error:1;
-		 HALF_WORD_BIT_FIELD data_ready:1;
-	       } bits;
-      } LINE_STATUS_REG;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 179
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -193,20 +144,9 @@ typedef union {
       } MODEM_STATUS_REG;
 #endif
 #ifdef BIT_ORDER1
-typedef union {
- 	half_word all;
-	struct {
-		 HALF_WORD_BIT_FIELD RLSD:1;
-		 HALF_WORD_BIT_FIELD RI:1;
-		 HALF_WORD_BIT_FIELD DSR:1;
-		 HALF_WORD_BIT_FIELD CTS:1;
-		 HALF_WORD_BIT_FIELD delta_RLSD:1;
-		 HALF_WORD_BIT_FIELD TERI:1;
-		 HALF_WORD_BIT_FIELD delta_DSR:1;
-		 HALF_WORD_BIT_FIELD delta_CTS:1;
-	       } bits;
-      } MODEM_STATUS_REG;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 210
 
 
 /* register select code definitions follow: */
@@ -292,10 +232,15 @@ extern void com_save_rxbytes IPT2(int,n, CHAR *,buf);
 extern void com_save_txbyte IPT1(CHAR,value);
 
 #ifdef PS_FLUSHING
-extern void com_psflush_change IPT2(IU8,hostID, IBOOL,apply);
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 297
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 299
 #if (NUM_SERIAL_PORTS > 2)
 #define	adapter_for_port(port) \
 	(((port & 0x300) == 0x300) ? \
@@ -304,8 +249,9 @@ extern void com_psflush_change IPT2(IU8,hostID, IBOOL,apply);
 		(((port & 0xf8) == 0xf8) ? COM2 : COM4))
 
 #ifdef SHORT_TRACE
-#define	id_for_adapter(adapter)	 	(adapter + '1')
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 309
 
 #else
 
@@ -316,25 +262,22 @@ extern void com_psflush_change IPT2(IU8,hostID, IBOOL,apply);
 #define	id_for_adapter(adapter)	(adapter == COM1 ? 'P' : 'S')
 #endif
 #endif /* more than 2 serial ports */
+#endif // !NEC_98
+#line 319
 
 #ifdef IRET_HOOKS
-/*
- * A macro we need for IRET hooks, the number of bits in a an async
- * character on a comms line, which is about 8 (for the character)
- * plus two stop bits.
- */
-#define BITS_PER_ASYNC_CHAR 10
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
+#line 328
 
 /* BCN 2730 define generic macros which can be SVID3 or old style
  * in either case the structure used should be a termios
  */
 
 #ifdef SVID3_TCGET
-#define	TCGET TCGETS
-#define	TCSET TCSETS
-#define	TCSETF TCSETSF
+#error "Unsupported SoftPC mirror configuration: SVID3_TCGET"
 #else
+#line 338
 #define	TCGET TCGETA
 #define	TCSET TCSETA
 #define	TCSETF TCSETAF

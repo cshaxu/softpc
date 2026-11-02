@@ -35,10 +35,9 @@ LIDT CPU Functions.
 GLOBAL VOID
 LIDT16
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* src(limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 42
    (op1)
    IU32 op1[2];
 #endif
@@ -50,10 +49,9 @@ LIDT16
 GLOBAL VOID
 LIDT32
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* src(limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 57
    (op1)
    IU32 op1[2];
 #endif

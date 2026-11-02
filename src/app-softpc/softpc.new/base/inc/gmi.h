@@ -29,14 +29,9 @@ typedef struct
 	VOID	(*w_move)IPT4(IU32, eaOff, IHPE, fromOff, IU32, count,
 		 IBOOL, srcInRAM);
 #else
-	VOID	(*b_write)();
-	VOID	(*w_write)();
-	VOID	(*b_fill)();
-	VOID	(*w_fill)();
-	VOID	(*b_move)IPT4(UTINY *, laddr, UTINY *, haddr, UTINY *, src,
-		 UTINY, src_type);
-	VOID	(*w_move)();
+#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && defined(C_VID))"
 #endif
+#line 26
 } MEM_HANDLERS;
 
 #ifndef UNIVERSAL	/* These are in host_cpu.h during a UNIVERSAL build. */
@@ -60,12 +55,9 @@ IMPORT	boolean	gmi_disconnect_mem IPT3(sys_addr, laddr,
 	sys_addr, haddr, mem_type, type);
 IMPORT	void	gmi_define_mem IPT2(mem_type, type, MEM_HANDLERS *, handlers);
 #else	/* CCPU */
-IMPORT	boolean	gmi_connect_mem	IPT3(host_addr, laddr, host_addr, haddr,
-	mem_type, type);
-IMPORT 	boolean	gmi_disconnect_mem IPT3(host_addr, laddr, host_addr, haddr,
-	mem_type, type);
-IMPORT	void	gmi_define_mem IPT2(mem_type, type, MEM_HANDLERS *, handlers);
+#error "Unsupported SoftPC mirror configuration: !CCPU"
 #endif	/* CCPU */
+#line 69
 
 #endif /* UNIVERSAL */
 
@@ -77,16 +69,9 @@ IMPORT	void	gmi_define_mem IPT2(mem_type, type, MEM_HANDLERS *, handlers);
 #define BACKWARDS 1
 
 #ifdef EGATEST
-#define gmi_redefine_mem(type,handlers) \
-b_write_ptrs[(int)type] = handlers.b_write; \
-w_write_ptrs[(int)type] = handlers.w_write; \
-b_fill_ptrs[(int)type] = handlers.b_fill; \
-w_fill_ptrs[(int)type] = handlers.w_fill; \
-b_fwd_move_ptrs[(int)type] = handlers.b_move_fwd; \
-b_bwd_move_ptrs[(int)type] = handlers.b_move_bwd; \
-w_fwd_move_ptrs[(int)type] = handlers.w_move_fwd; \
-w_bwd_move_ptrs[(int)type] = handlers.w_move_bwd; 
+#error "Unsupported SoftPC mirror configuration: EGATEST"
 #else
+#line 90
 #define gmi_redefine_mem(type,handlers) \
 b_write_ptrs[(int)type] = handlers.b_write; \
 w_write_ptrs[(int)type] = handlers.w_write; \

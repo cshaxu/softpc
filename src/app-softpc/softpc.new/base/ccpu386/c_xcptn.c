@@ -159,11 +159,9 @@ LOCAL VOID check_for_shutdown IFN1(IU16, xcode)
       c_cpu_reset();
 
 #ifdef	PIG
-      save_last_xcptn_details("Exception:- Shutdown @%2d\n", xcode, 0, 0, 0, 0);
-      ccpu_synch_count++;
-      pig_cpu_action = CHECK_ALL;
-      c_cpu_unsimulate();
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 167
 
       /* then carry on */
       c_cpu_continue();   /* DOES NOT RETURN */
@@ -187,13 +185,9 @@ IFN3(
    SET_EIP(CCPU_save_EIP);
 
 #ifdef NTVDM
-   {
-   extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-   if(GET_PE() && host_exint_hook((IS32) nmbr, NULL_ERROR_CODE))
-	c_cpu_continue();	/* DOES NOT RETURN */
-   }
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 197
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -203,8 +197,9 @@ IFN3(
    EXT = source;
    check_exception_env();
 #ifdef	PIG
-   save_last_xcptn_details("Exception:- #%s-%d @%2d \n", (IUH)faultstr(nmbr), nmbr, xcode, 0, 0);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 208
    if (show_exceptions){
 	fprintf(trace_file, "(%04x:%08x)Exception:- %d.\n",
 		       GET_CS_SELECTOR(), GET_EIP(), nmbr);
@@ -246,14 +241,9 @@ IFN3(
    SET_EIP(CCPU_save_EIP);
 
 #ifdef NTVDM
-    {
-	extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	if(GET_PE() && host_exint_hook((IS32) nmbr, (IS32)error_code))
-        doing_contributory = FALSE;
-	    c_cpu_continue();	    /* DOES NOT RETURN */
-    }
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 257
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -263,8 +253,9 @@ IFN3(
    EXT = INTERNAL;
    check_exception_env();
 #ifdef	PIG
-   save_last_xcptn_details("Exception:- #%s-%d(%04x) @%2d\n", (IUH)faultstr(nmbr), nmbr, error_code, xcode, 0);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 268
    if (show_exceptions){
 	fprintf(trace_file, "(%04x:%08x)Exception:- %d(%04x).\n",
 		       GET_CS_SELECTOR(), GET_EIP(), nmbr, error_code);
@@ -306,14 +297,9 @@ IFN3(
    SET_EIP(CCPU_save_EIP);
 
 #ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) nmbr, (IS32)error_code))
-          doing_contributory = FALSE;
-	      c_cpu_continue();	/* DOES NOT RETURN */
-      }
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 317
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -323,8 +309,9 @@ IFN3(
    EXT = INTERNAL;
    check_exception_env();
 #ifdef	PIG
-   save_last_xcptn_details("Exception:- %s-%d(%04x) @%2d\n", (IUH)faultstr(nmbr), nmbr, error_code, xcode, 0);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 328
    if (show_exceptions){
 	if ( GET_IDT_LIMIT() != 0 ){
            fprintf(trace_file, "(%04x:%08x)Exception:- %d(%04x).\n",
@@ -367,14 +354,9 @@ IFN1(
    SET_EIP(CCPU_save_EIP);
 
 #ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) DF_INT_NR, (IS32)NULL_ERROR_CODE))
-            doing_double_fault = FALSE;
-		    c_cpu_continue(); /* DOES NOT RETURN */
-      }
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 378
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -384,8 +366,9 @@ IFN1(
    EXT = INTERNAL;
    check_exception_env();
 #ifdef	PIG
-   save_last_xcptn_details("Exception:- #DF-8 @%2d\n", xcode, 0, 0, 0, 0);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 389
    if (show_exceptions){
         if ( GET_IDT_LIMIT() != 0 ){
            fprintf(trace_file, "(%04x:%08x)Exception:- %d.\n",
@@ -431,15 +414,9 @@ GLOBAL VOID Int0 IFN0 ()
    SET_EIP(CCPU_save_EIP);
 
 #ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) I0_INT_NR, (IS32)NULL_ERROR_CODE))
-          doing_fault = FALSE;
-          doing_contributory = FALSE;
-	      c_cpu_continue(); /* DOES NOT RETURN */
-      }
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 443
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -450,8 +427,9 @@ GLOBAL VOID Int0 IFN0 ()
 
    check_exception_env();
 #ifdef	PIG
-   save_last_xcptn_details("Exception:- #DIV-0\n", 0, 0, 0, 0, 0);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 455
    if (show_exceptions){
         fprintf(trace_file, "(%04x:%08x)Exception:- %d.\n",
 		       GET_CS_SELECTOR(), GET_EIP(), I0_INT_NR);
@@ -577,15 +555,9 @@ IFN2(
    SET_EIP(CCPU_save_EIP);
 
 #ifdef NTVDM
-      {
-	  extern BOOL host_exint_hook IPT2(IS32, exp_no, IS32, error_code);
-
-	  if(GET_PE() && host_exint_hook((IS32) PF_INT_NR, (IS32)page_error))
-          doing_fault = FALSE;
-          doing_page_fault = FALSE;
-	      c_cpu_continue(); /* DOES NOT RETURN */
-      }
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 589
 
    /* Set default mode up */
    SET_OPERAND_SIZE(GET_SR_AR_X(CS_REG));
@@ -594,8 +566,9 @@ IFN2(
 
    check_exception_env();
 #ifdef	PIG
-   save_last_xcptn_details("Exception:- #PF-14(%04x) CR2=%08x @%2d\n", page_error, GET_CR(CR_PFLA), xcode, 0, 0);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 599
    if (show_exceptions){
 	fprintf(trace_file, "(%04x:%08x)Exception:- %d(%04x) CR2=%08x.\n",
            GET_CS_SELECTOR(), GET_EIP(), PF_INT_NR, page_error, GET_CR(CR_PFLA));

@@ -161,17 +161,9 @@ IMPORT VOID fill_both_bytes IPT3( IU16, data, IU16 *, dest, ULONG, len );
 
 /* [5.1.1 #DEFINES]							*/
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#ifdef PROD
-#include "SOFTPC_EGA.seg"
-#else
-#include "SOFTPC_EGA_WRITE.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#endif
+#line 174
 
 /* [5.1.2 TYPEDEF, STRUCTURE, ENUM DECLARATIONS]			*/
 
@@ -179,9 +171,9 @@ typedef	union {
 	unsigned short	as_word;
 	struct {
 #ifdef	BIGEND
-		unsigned char	hi_byte;
-		unsigned char	lo_byte;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
+#line 184
 		unsigned char	lo_byte;
 		unsigned char	hi_byte;
 #endif
@@ -209,60 +201,9 @@ typedef	union {
 [7.1 INTERMODULE DATA DEFINITIONS]				*/
 
 #ifdef A_VID
-IMPORT VOID	_ch2_copy_byte_write();
-IMPORT VOID	_ch2_copy_word_write();
-IMPORT VOID	_ch2_copy_byte_fill_glue();
-IMPORT VOID	_ch2_copy_word_fill_glue();
-IMPORT VOID	_ch2_copy_byte_move_glue();
-IMPORT VOID	_ch2_copy_word_move_glue();
-IMPORT VOID	_ch2_copy_byte_move_glue_fwd();
-IMPORT VOID	_ch2_copy_word_move_glue_fwd();
-IMPORT VOID	_ch2_copy_byte_move_glue_bwd();
-IMPORT VOID	_ch2_copy_word_move_glue_bwd();
-
-IMPORT VOID	_ch2_mode0_chn_byte_write_glue();
-IMPORT VOID	_ch2_mode0_chn_word_write_glue();
-IMPORT VOID	_ch2_mode0_chn_byte_fill_glue();
-IMPORT VOID	_ch2_mode0_chn_word_fill_glue();
-IMPORT VOID	_ch2_mode0_chn_byte_move_glue();
-IMPORT VOID	_ch2_mode0_chn_word_move_glue();
-
-WRT_POINTERS mode0_copy_handlers =
-{
-	_ch2_copy_byte_write,
-	_ch2_copy_word_write
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_ch2_copy_byte_fill_glue,
-	_ch2_copy_word_fill_glue,
-	_ch2_copy_byte_move_glue_fwd,
-	_ch2_copy_byte_move_glue_bwd,
-	_ch2_copy_word_move_glue_fwd,
-	_ch2_copy_word_move_glue_bwd
-
-#endif	/* NO_STRING_OPERATIONS */
-
-};
-
-WRT_POINTERS mode0_gen_handlers =
-{
-	_ch2_mode0_chn_byte_write_glue,
-	_ch2_mode0_chn_word_write_glue
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_ch2_mode0_chn_byte_fill_glue,
-	_ch2_mode0_chn_word_fill_glue,
-	_ch2_mode0_chn_byte_move_glue,
-	_ch2_mode0_chn_byte_move_glue,
-	_ch2_mode0_chn_word_move_glue,
-	_ch2_mode0_chn_word_move_glue
-
-#endif	/* NO_STRING_OPERATIONS */
-
-};
+#error "Unsupported SoftPC mirror configuration: A_VID"
 #else
+#line 265
 VOID  ega_copy_b_write(ULONG, ULONG);
 VOID  ega_copy_w_write(ULONG, ULONG);
 VOID  ega_copy_b_fill(ULONG, ULONG, ULONG);
@@ -412,9 +353,9 @@ ega_copy_b_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 #endif  //NEC_98
 
 #ifdef  BIGEND
-#define first_half(wd)      (((wd) & 0xff00) >> 8)
-#define sec_half(wd)        ((wd) & 0xff)
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
+#line 415
 #define first_half(wd)      ((wd) & 0xff)
 #define sec_half(wd)        (((wd) & 0xff00) >> 8)
 #endif
@@ -429,8 +370,9 @@ ega_copy_w_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 	note_entrance0("ega_copy_w_fill");
 
 #ifdef BIGEND
-	value = ((value >> 8) & 0xff) | ((value << 8) & 0xff00);
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 430
 
     count >>= 1;
 
@@ -525,8 +467,9 @@ ega_copy_move IFN6(UTINY *, dst, UTINY *, eas, ULONG, count, ULONG, src_flag,
 		{
 			dst += w;
 #ifdef BACK_M
-			eas -= w;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 526
 			eas += w;
 #endif
 		}
@@ -536,8 +479,9 @@ ega_copy_move IFN6(UTINY *, dst, UTINY *, eas, ULONG, count, ULONG, src_flag,
 		if(forward)
 		{
 #ifdef BACK_M
-			easinc = -1;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 537
 			easinc = 1;
 #endif
 			dstinc = lsbdst ? 3 : 1;
@@ -545,8 +489,9 @@ ega_copy_move IFN6(UTINY *, dst, UTINY *, eas, ULONG, count, ULONG, src_flag,
 		else
 		{
 #ifdef BACK_M
-			easinc = 1;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 546
 			easinc = -1;
 #endif
 			dstinc = lsbdst ? -1 : -3;
@@ -1102,8 +1047,9 @@ ega_mode0_chn_move_ram_src IFN5(UTINY *, eas, LONG, count, UTINY *, ead,
 	if(( offset & 1 ) != ( plane & 1 ))
 	{
 #ifdef BACK_M
-		src_offset--;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 1103
 		src_offset++;
 #endif
 		offset++;
@@ -1111,8 +1057,9 @@ ega_mode0_chn_move_ram_src IFN5(UTINY *, eas, LONG, count, UTINY *, ead,
 	}
 
 #ifdef BACK_M
-	srcinc = -2;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 1112
 	srcinc = 2;
 #endif
 
@@ -1175,8 +1122,9 @@ ega_mode0_chn_move_vid_src IFN7(UTINY *, eas, LONG, count, UTINY *, ead,
 	{
 		eas++;
 #ifdef BACK_M
-		scratch--;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 1176
 		scratch++;
 #endif
 		offset++;
@@ -1186,8 +1134,9 @@ ega_mode0_chn_move_vid_src IFN7(UTINY *, eas, LONG, count, UTINY *, ead,
 	src_offset = (ULONG) eas;
 
 #ifdef BACK_M
-	srcinc = -2;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 1187
 	srcinc = 2;
 #endif
 	inc = 4;
@@ -1265,8 +1214,9 @@ ega_mode0_chn_move IFN6(UTINY, w, UTINY *, ead, UTINY *, eas, ULONG, count,
 		 */
 
 #ifdef BACK_M
-		scratch = getVideoscratch() + 0x10000 - 1;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 1266
 		scratch = getVideoscratch();
 #endif
 
@@ -1295,8 +1245,9 @@ ega_mode0_chn_move IFN6(UTINY, w, UTINY *, ead, UTINY *, eas, ULONG, count,
 		if( !forwards )
 		{
 #ifdef BACK_M
-			eas += count - 1 - w;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 1296
 			eas += - count + 1 + w;
 #endif
 			ead += - count + 1 + w;

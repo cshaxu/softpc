@@ -1,0 +1,7 @@
+path	baseline_if_line	baseline_next_line	directive	condition	excluded_body_sha256	copyright_retained_outside
+base/ccpu386/c_main.c	4976	4980	if	SWITCHNPX	c8e4e3e60d2b65b3ce8036fd02d3045d1ba41f5fb9357684bf815328f25f7af2	False
+base/inc/bios.h	348	351	if	SOFTWIN_API	3c441e5e932421b0d12e073b2f63884ce48fbee42396866135d582ace94c2af4	False
+base/inc/gfx_upd.h	265	268	if	HERC	0cfcd23519c11112eb09a816f73152afbde05529973e5cc06528819cfa579678	False
+base/inc/ica.h	67	70	if	SWIN_HAW	16bdd41d3885876ca74d00b8b5f62563827cdea84ffe72c32e94b110fb62e95d	False
+base/inc/ica.h	71	74	if	ASPI	91df3c816bf37e86c13c1f8894520cccc94cefa1ba94044427ac46df147596da	False
+base/system/ica.c	2093	2200	if	PROD	06289c0687a02a70674b9aeaca6e777c700d717866aab6c7ee38e619b505367a	False

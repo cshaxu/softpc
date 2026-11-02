@@ -29,13 +29,9 @@
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_SUPPORT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 39
 
 
 /*
@@ -54,9 +50,9 @@
 #include "host_qev.h"
 
 #ifdef HUNTER
-#include <stdio.h>
-#include "hunter.h"
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 60
 
 #include "host_gfx.h"
 
@@ -79,8 +75,9 @@ void time_strobe()
 #endif
 
 #ifdef HUNTER
-        do_hunter();
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif    
+#line 84
 
 
 #ifndef NTVDM
@@ -116,7 +113,8 @@ void time_strobe()
             }
         }
 #ifdef	EGA_DUMP
-	dump_tick();
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 117
 }
 

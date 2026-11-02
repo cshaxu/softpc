@@ -1,0 +1,6 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/comms/com.c	3069	3157	1883	1942	NEC_98	else	24ef1c9ed5da456099d490c7e84daa5d54eeaa56b1eb3d1cf21c1dc44f9a8e3e
+base/comms/com.c	3463	3641	2203	2305	NEC_98	else	4cb08d827d555a6f17bb2cc76ed5153a4c7760358fb96594305569f5b0fc1099
+base/video/ega_vide.c	2378	2423	1773	1817	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/gvi.c	170	357	166	340	NEC_98	else	d9c241055b385171273106c94fae72bde039a66356b9515ed496eda46836fa9e
+host/src/nt_sound.c	424	454	327	346	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

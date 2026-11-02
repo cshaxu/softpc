@@ -29,6 +29,10 @@
 #include "trace.h"
 #include "video.h"
 #include "debug.h"
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 45
 
 
 #include "ica.h"
@@ -39,6 +43,8 @@
 extern void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration);
 IMPORT ULONG GetPerfCounter(VOID);
 
+#ifndef NEC_98
+#line 52
 ULONG FreqT2    = 0;
 BOOL  PpiState  = FALSE;
 BOOL  T2State   = FALSE;
@@ -46,6 +52,8 @@ ULONG LastPpi   = 0;
 ULONG FreqPpi   = 0;
 ULONG ET2TicCount=0;
 ULONG PpiCounting  = 0;
+#endif // !NEC_98
+#line 62
 
 ULONG BeepLastFreq = 0;
 ULONG BeepLastDuration = 0;
@@ -106,6 +114,10 @@ VOID InitSound( BOOL bInit)
 
 
 
+#ifndef PROD
+#error "Unsupported SoftPC mirror configuration: not PROD"
+#endif
+#line 171
 /*
  * LazyBeep -
  * Calls Beep Device Driver asynchronously
@@ -153,6 +165,8 @@ VOID LazyBeep(ULONG Freq, ULONG Duration)
  */
 void PlaySound(BOOL bPulsedPpi)
 {
+#ifndef NEC_98
+#line 246
   if (PpiState && T2State && FreqT2) {
       LazyBeep(FreqT2, INFINITE);
       }
@@ -165,6 +179,8 @@ void PlaySound(BOOL bPulsedPpi)
   else {
       LazyBeep(0,0);
       }
+#endif // !NEC_98
+#line 168
 }
 
 
@@ -180,6 +196,8 @@ void host_timer2_waveform(int delay,
                           int lohi,
                           int repeat)
 {
+#ifndef NEC_98
+#line 183
     ULONG ul;
 
     if (loclocks == INFINITE || hiclocks == INFINITE) {
@@ -202,6 +220,8 @@ void host_timer2_waveform(int delay,
         }
 
     PlaySound(FALSE);
+#endif // !NEC_98
+#line 205
 }
 
 
@@ -211,6 +231,8 @@ void host_timer2_waveform(int delay,
  */
 void HostPpiState(BYTE PortValue)
 {
+#ifndef NEC_98
+#line 308
    BOOL   bPpi;
 
    host_ica_lock();
@@ -228,6 +250,8 @@ void HostPpiState(BYTE PortValue)
        }
 
     host_ica_unlock();
+#endif // !NEC_98
+#line 231
 }
 
 
@@ -235,6 +259,8 @@ void HostPpiState(BYTE PortValue)
 
 void PulsePpi(void)
 {
+#ifndef NEC_98
+#line 334
     static ULONG PpiTicStart=0;
     static ULONG PpiCycles  =0;
     ULONG  ul,Elapsed;
@@ -311,6 +337,8 @@ void PulsePpi(void)
     LastPpi = ul;
     PpiCycles = 0;
 
+#endif // !NEC_98
+#line 314
 }
 
 
@@ -324,6 +352,8 @@ Called by:      The SoftPC timer.
 
 void PlayContinuousTone(void)
 {
+#ifndef NEC_98
+#line 425
    ULONG Elapsed;
 
    host_ica_lock();
@@ -343,4 +373,11 @@ void PlayContinuousTone(void)
 
 
     host_ica_unlock();
+#endif // !NEC_98
+#line 346
 }
+
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 514

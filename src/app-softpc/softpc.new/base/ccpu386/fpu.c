@@ -158,8 +158,9 @@ GLOBAL void setNpxStackRegs IPT1(FPSTACKENTRY *, loadPtr);
 
 /* DEFINED values */
 #ifndef NULL
-#define NULL ((VOID *)0)
+#error "Unsupported SoftPC mirror configuration: !NULL"
 #endif
+#line 163
 #define TAG_NEGATIVE_MASK 1
 #define TAG_ZERO_MASK 2
 #define TAG_INFINITY_MASK 4
@@ -260,8 +261,9 @@ GLOBAL BOOL NpxException;
 */
 
 #ifdef SUN4
-LOCAL IU8 *FPout; /* HostGet*Exception() macros need this for Sparc ports. */
+#error "Unsupported SoftPC mirror configuration: SUN4"
 #endif /* SUN4 */
+#line 263
 
 LOCAL IU32 NpxControl;
 LOCAL IU32 NpxStatus;
@@ -460,31 +462,9 @@ INTEL_COMP_NC
 };
 
 #ifdef BIGEND
-/* Note enforcement of word ordering as high word/low word */
-LOCAL FPU_I64 BCDLowNibble[] = {
-{0x002386f2, 0x6fc10000},
-{0x00005af3, 0x107a4000},
-{0x000000e8, 0xd4a51000},
-{0x00000002, 0x540be400},
-{0x00000000, 0x05f5e100},
-{0x00000000, 0x000f4240},
-{0x00000000, 0x00002710},
-{0x00000000, 0x00000064},
-{0x00000000, 0x00000001}
-};
-
-LOCAL FPU_I64 BCDHighNibble[] = {
-{0x01634578, 0x5d8a0000},
-{0x00038d7e, 0xa4c68000},
-{0x00000918, 0x4e72a000},
-{0x00000017, 0x4876e800},
-{0x00000000, 0x3b9aca00},
-{0x00000000, 0x00989680},
-{0x00000000, 0x000186a0},
-{0x00000000, 0x000003e8},
-{0x00000000, 0x0000000a}
-};
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #else	/* !BIGEND */
+#line 488
 LOCAL FPU_I64 BCDLowNibble[] = {
 {0x6fc10000, 0x002386f2},
 {0x107a4000, 0x00005af3},
@@ -1307,8 +1287,9 @@ GLOBAL VOID InitNpx IFN1(IBOOL, disabled)
 #ifndef SFELLOW
 		check_malloc(FPUStackBase, 8, FPSTACKENTRY);
 #else
-		FPUStackBase = (FPSTACKENTRY *)SFMalloc(8*sizeof(FPSTACKENTRY), FALSE);
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 1307
 		first = FALSE;
 	}
 
@@ -1758,20 +1739,9 @@ IU16 exp_value;
 		   nothing except set the thing to zero.
 		*/
 #if (HOST_BIAS >= 16383)
-		if ((mantissa_hi | mantissa_lo) == 0)  {
-			/* It's zero */
-			 memPtr->tagvalue |= TAG_ZERO_MASK;
-		} else {
-			/* It's a denormal */
-			/* First, check it isn't a pseudodenorm */
-			if ((mantissa_hi & 0x80000000) != 0) {
-				memPtr->tagvalue |= TAG_UNSUPPORTED_MASK;
-			} else {
-				memPtr->tagvalue |= TAG_DENORMAL_MASK;
-				CVTR80FPH(memPtr, FPUpload);
-			}
-		}
+#error "Unsupported SoftPC mirror configuration: HOST_BIAS >= 16383"
 #else
+#line 1770
 		/* It's zero either way */
 		if ((mantissa_hi | mantissa_lo) != 0)  {
 			/* It's a denormal */
@@ -1884,10 +1854,9 @@ LOCAL VOID CalcTagword IFN1(FPSTACKENTRY *, FPPtr)
 			/* It's a zero */
 			tagword |= TAG_ZERO_MASK;
 #if (HOST_BIAS >= 16383)
-		} else {
-			/* It's a denorm */
-			tagword |= TAG_DENORMAL_MASK;
+#error "Unsupported SoftPC mirror configuration: HOST_BIAS >= 16383"
 #endif
+#line 1886
 		}
 	} else {
 		if (((FPHOST *)&(FPPtr->fpvalue))->hiword.exp == HOST_MAX_EXP) {

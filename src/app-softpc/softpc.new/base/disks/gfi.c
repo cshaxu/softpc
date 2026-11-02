@@ -26,18 +26,16 @@
  *                <Unix file> #endif".
  */
 
+/* @(#)gfi.c	1.16 08/03/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)gfi.c	1.16 08/03/93 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 32
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_FLOPPY.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 41
 
 
 /*
@@ -153,9 +151,9 @@ IFN2(FDC_CMD_BLOCK *,command_block,FDC_RESULT_BLOCK *,result_block)
     int ret_stat = SUCCESS;
 
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-	gfi_test_command(command_block, result_block);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 159
 
     if (get_type_cmd(command_block) == FDC_SPECIFY)
     {
@@ -185,9 +183,9 @@ IFN2(FDC_CMD_BLOCK *,command_block,FDC_RESULT_BLOCK *,result_block)
 GLOBAL SHORT gfi_drive_on IFN1(UTINY,drive)
 {
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-	gfi_test_drive_on(drive);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 191
 
     /*
      * Route to the correct module.
@@ -199,9 +197,9 @@ GLOBAL SHORT gfi_drive_on IFN1(UTINY,drive)
 GLOBAL SHORT gfi_drive_off IFN1(UTINY,drive)
 {
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-	gfi_test_drive_off(drive);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 205
 
     /*
      * Route to the correct module.
@@ -218,9 +216,9 @@ GLOBAL SHORT gfi_reset IFN2(FDC_RESULT_BLOCK *,result_block, UTINY, drive)
      */
 
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-	gfi_test_reset(result_block);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 224
 
     /*
      * Reset the appropriate drive.
@@ -246,9 +244,9 @@ GLOBAL SHORT gfi_reset IFN2(FDC_RESULT_BLOCK *,result_block, UTINY, drive)
 GLOBAL SHORT gfi_high IFN2(UTINY,drive,half_word,datarate)
 {
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-        gfi_test_high(drive);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 252
 
     /*
      * Route to the correct module.
@@ -261,9 +259,9 @@ GLOBAL SHORT gfi_high IFN2(UTINY,drive,half_word,datarate)
 GLOBAL SHORT gfi_drive_type IFN1(UTINY,drive)
 {
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-        gfi_test_drive_type(drive);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 267
 
     /*
      * Route to the correct module.
@@ -275,9 +273,9 @@ GLOBAL SHORT gfi_drive_type IFN1(UTINY,drive)
 GLOBAL SHORT gfi_change IFN1(UTINY,drive)
 {
 #ifndef PROD
-    if (io_verbose & GFI_VERBOSE)
-        gfi_test_change(drive);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 281
 
     /*
      * Route to the correct module.
@@ -292,10 +290,9 @@ IFN4(UTINY, hostID, ConfigValues *,vals, NameTable *,table, CHAR *,err)
 {
 	UNUSED(table);
 #ifdef SLAVEPC
-	if (hostID == C_SLAVEPC_DEVICE)
-		return host_slave_port_validate(host_expand_environment_vars(
-			vals->string), err);
+#error "Unsupported SoftPC mirror configuration: SLAVEPC"
 #endif /* SLAVEPC */
+#line 299
 
 	return host_gfi_rdiskette_valid(hostID, vals, err);
 }
@@ -304,12 +301,9 @@ GLOBAL VOID
 gfi_floppy_change IFN2(UTINY, hostID, BOOL, apply)
 {
 #ifdef SLAVEPC
-	if (hostID == C_SLAVEPC_DEVICE)
-	{
-		gfi_slave_change(hostID, apply);
-		return;
-	}
+#error "Unsupported SoftPC mirror configuration: SLAVEPC"
 #endif /* SLAVEPC */
+#line 313
 
 	host_gfi_rdiskette_change(hostID, apply);
 }
@@ -318,9 +312,9 @@ GLOBAL SHORT
 gfi_floppy_active IFN3(UTINY, hostID, BOOL, active, CHAR *,err)
 {
 #ifdef SLAVEPC
-	if (hostID == C_SLAVEPC_DEVICE)
-		return gfi_slave_active(hostID, active, err);
+#error "Unsupported SoftPC mirror configuration: SLAVEPC"
 #endif /* SLAVEPC */
+#line 324
 
 	return host_gfi_rdiskette_active(hostID, active, err);
 }
@@ -329,39 +323,17 @@ GLOBAL VOID
 gfi_attach_adapter IFN2(UTINY, adapter, BOOL, attach)
 {
 #ifdef SLAVEPC
-	if (host_runtime_inquire(C_FLOPPY_SERVER) == GFI_SLAVE_SERVER)
-	{
-		if (adapter == 1)
-			return;	/* No B adapter for slave PC */
-
-		/* First cleaup the other possible adapters */
-		if (config_get_active(C_FLOPPY_A_DEVICE))
-			config_activate(C_FLOPPY_A_DEVICE, FALSE);
-#ifdef FLOPPY_B
-		if (config_get_active(C_FLOPPY_B_DEVICE))
-			config_activate(C_FLOPPY_B_DEVICE, FALSE);
-#endif /* FLOPPY_B */
-
-		/* Activate the SLAVEPC device handler */
-		config_activate(C_SLAVEPC_DEVICE, attach);
-		return;
-	}
-	/* Must be a GFI_REAL_DISKETTE_SERVER */
-	if (config_get_active(C_SLAVEPC_DEVICE))
-		config_activate(C_SLAVEPC_DEVICE, FALSE);
+#error "Unsupported SoftPC mirror configuration: SLAVEPC"
 #endif /* SLAVEPC */
+#line 353
 
 	config_activate((UTINY)(C_FLOPPY_A_DEVICE + adapter), attach);
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * function will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 365
 
 /*
  * Initialize the GFI module.  Fill the function table with the GFI

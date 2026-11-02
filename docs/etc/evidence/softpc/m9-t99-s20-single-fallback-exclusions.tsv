@@ -1,0 +1,8 @@
+path	baseline_if_line	baseline_next_line	directive	condition	excluded_body_sha256	copyright_retained_outside
+base/ccpu386/fpu.c	160	163	ifndef	NULL	531f45277f2fe9fb76d71d99e8ffe7d2e6c6e2fc92cac9c5d7180c40acc72628	False
+base/inc/base_def.h	46	49	ifndef	TRUE	aff87e84a0ce312a48845c189277001a0662587045db84b876ea3637de850aa0	False
+base/inc/base_def.h	50	53	ifndef	FALSE	f215b8bda3010371d417cd1df58814c176d97b0803625ec72c9153ef71ada6e1	False
+base/inc/xt.h	41	44	ifndef	NULL	7dea57c637e686b9167200ddf2968e1cb78fb9f45c3a2bc1cd0c88ec77c1ebf4	False
+host/inc/insignia.h	96	100	ifndef	FALSE	782bbf4c0ed5f4f05c8ac496729ffad9194e128f9d6c35ad30c5f8a596140a6b	False
+host/inc/insignia.h	101	104	ifndef	STRINGIFY	f3a1b2f8fd208fe905f708dd941dd97a964a63bca34397f0386c7866dfb89790	False
+host/inc/insignia.h	110	113	ifndef	NULL	dd29544ef119f898434dc51d856a3424759e7ba1298bd49630c2319914b550b7	False

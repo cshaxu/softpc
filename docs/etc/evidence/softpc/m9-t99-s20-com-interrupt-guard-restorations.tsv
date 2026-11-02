@@ -1,0 +1,4 @@
+path	guard	baseline_selected_line	proof
+base/comms/com.c	NEC_98 outer	528	XP anchors
+base/comms/com.c	NTVDM && FIFO_ON 1	538	x86/x64 actual compile probes
+base/comms/com.c	NTVDM && FIFO_ON 2	559	x86/x64 actual compile probes

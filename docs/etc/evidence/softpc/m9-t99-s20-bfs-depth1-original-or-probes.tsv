@@ -1,0 +1,18 @@
+path	xp_line	condition	x86	x64	source_sha256	disposition
+base/video/cga.c	4	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	ccce0267e18836251d0f10fb833396524e4e71e00fdf6ba3f82f3190167075f6	restored-selected-first-depth-framework
+base/system/rom.c	602	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	restored-selected-first-depth-framework
+base/system/rom.c	622	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	restored-selected-first-depth-framework
+base/system/rom.c	630	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	restored-selected-first-depth-framework
+base/system/rom.c	784	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)	selected	selected	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	restored-selected-first-depth-framework
+base/keymouse/mouse_io.c	1126	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	restored-selected-first-depth-framework
+base/keymouse/mouse_io.c	2885	!defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))	selected	selected	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	restored-selected-first-depth-framework
+base/video/video.c	1	(defined(JAPAN) || defined(KOREA)) && !defined(i386)	unselected	unselected	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	restored-excluded-first-depth-framework
+base/video/video.c	98	defined(JAPAN) || defined(KOREA)	unselected	unselected	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	restored-excluded-first-depth-framework
+base/video/video.c	147	defined(JAPAN) || defined(KOREA)	unselected	unselected	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	restored-excluded-first-depth-framework
+base/video/video.c	509	defined(JAPAN) || defined(KOREA)	unselected	unselected	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	restored-excluded-first-depth-framework
+host/src/nt_cga.c	47	defined(JAPAN) || defined(KOREA)	unselected	unselected	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	restored-excluded-first-depth-framework
+host/src/nt_cga.c	135	(defined(JAPAN) || defined(KOREA)) && defined(i386)	unselected	unselected	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	restored-excluded-first-depth-framework
+host/src/nt_cga.c	197	defined(JAPAN) || defined(KOREA)	unselected	unselected	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	restored-excluded-first-depth-framework
+host/src/nt_graph.c	125	defined(JAPAN) || defined(KOREA)	unselected	unselected	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	restored-excluded-first-depth-framework
+host/src/nt_graph.c	1380	(defined(JAPAN) || defined(KOREA)) && !defined(NEC_98)	unselected	unselected	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	restored-excluded-first-depth-framework
+host/src/nt_graph.c	2469	defined(JAPAN) || defined(KOREA)	unselected	unselected	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	restored-excluded-first-depth-framework

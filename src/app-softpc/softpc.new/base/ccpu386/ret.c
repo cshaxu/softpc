@@ -84,12 +84,9 @@ IFN1(
       /* Real Mode or V86 Mode */
 
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
-
-      /* do ip limit check */
-      if ( new_ip > GET_CS_LIMIT() )
-	 GP((IU16)0, FAULT_RETF_RM_CS_LIMIT);
-
+#error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else	/* TAKE_REAL_MODE_LIMIT_FAULT */
+#line 93
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it

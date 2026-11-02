@@ -1,0 +1,176 @@
+path	xp_if_line	xp_endif_line	condition	proof
+base/disks/diskbios.c	934	939	ifndef NEC_98	x86+x64 undefined
+base/keymouse/keybd_io.c	672	686	ifndef NTVDM	x86+x64 undefined
+base/system/cmos.c	387	393	ifndef NTVDM	x86+x64 undefined
+base/system/timer.c	1864	1867	ifndef NTVDM	x86+x64 undefined
+base/comms/com.c	62	64	ifndef NEC_98	x86+x64 undefined
+base/keymouse/keyba.c	3278	3292	ifndef NTVDM	x86+x64 undefined
+base/keymouse/keyba.c	3362	3365	ifndef NTVDM	x86+x64 undefined
+base/system/idetect.c	510	521	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	2714	2720	if NEC_98	x86+x64 undefined
+base/video/video.c	141	145	if NEC_98	x86+x64 undefined
+base/system/at_dma.c	282	295	if NEC_98	x86+x64 undefined
+base/bios/reset.c	964	973	ifndef NTVDM	x86+x64 undefined
+base/video/video_io.c	48	122	if NEC_98	x86+x64 undefined
+base/system/at_dma.c	1040	1046	if NEC_98	x86+x64 undefined
+base/system/ica.c	2103	2107	if NEC_98	x86+x64 undefined
+base/system/ica.c	2190	2194	if NEC_98	x86+x64 undefined
+base/keymouse/mouse_io.c	3064	3074	ifndef NTVDM	x86+x64 undefined
+base/keymouse/mouse_io.c	3075	3077	NTVDM and X86GFX	x86+x64 NTVDM undefined
+host/src/nt_graph.c	790	794	if NEC_98	x86+x64 undefined
+host/src/nt_graph.c	1283	1290	if NEC_98	x86+x64 undefined
+host/src/nt_graph.c	2253	2257	if NEC_98	x86+x64 undefined
+base/inc/gvi.h	312	316	if NEC_98	56 x86+x64 contexts undefined
+base/inc/ios.h	821	827	ifdef NTVDM	110 x86+x64 contexts undefined
+base/comms/com.c	2996	3000	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	3006	3010	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	3015	3019	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	3026	3030	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	3036	3040	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	3045	3049	ifdef NTVDM	x86+x64 undefined
+base/video/gfx_updt.c	124	133	if NEC_98	x86+x64 undefined
+base/bios/reset.c	945	962	if NEC_98	x86+x64 undefined
+base/keymouse/keyba.c	3356	3360	if NEC_98	x86+x64 undefined
+base/bios/tape_io.c	389	395	NTVDM and MONITOR	x86+x64 NTVDM undefined
+host/src/nt_cga.c	42	45	ifdef MONITOR	x86+x64 undefined
+host/src/nt_cga.c	51	93	if NEC_98	x86+x64 undefined
+host/src/nt_cga.c	129	133	ifdef MONITOR	x86+x64 undefined
+host/src/nt_cga.c	186	196	ifdef MONITOR	x86+x64 undefined
+host/src/nt_cga.c	1081	1303	ifdef MONITOR	x86+x64 undefined
+host/src/nt_cga.c	1304	2888	if NEC_98	x86+x64 undefined
+host/src/nt_ega.c	1666	2144	ifdef MONITOR	x86+x64 undefined
+host/src/nt_vga.c	1638	2188	ifdef MONITOR	x86+x64 undefined
+host/src/nt_graph.c	834	860	ifdef MONITOR	x86+x64 undefined
+host/src/nt_graph.c	1838	1852	ifdef MONITOR	x86+x64 undefined
+host/inc/nt_graph.h	472	493	ifdef MONITOR	22 x86+x64 contexts undefined
+base/bios/tape_io.c	140	142	if 0	constant false
+base/inc/egavideo.h	52	61	if 0	constant false
+base/system/ica.c	582	584	if 0	constant false
+host/src/nt_sbfm.c	67	101	if 0	constant false
+host/src/nt_sbfm.c	153	157	if 0	constant false
+host/src/nt_sbfm.c	164	168	if 0	constant false
+base/system/at_dma.c	849	863	ifdef NTVDM	x86+x64 undefined; retained T93 accessor outside
+base/inc/dma.h	565	576	ifdef NTVDM	14 x86+x64 contexts undefined; retained T93 declaration outside
+base/disks/floppy_i.c	68	70	if NEC_98	x86+x64 undefined
+base/disks/floppy_i.c	72	75	ifdef NTVDM	x86+x64 undefined
+base/disks/floppy_i.c	77	162	if NEC_98	x86+x64 undefined
+base/inc/floppy.h	578	587	ifdef NTVDM	6 x86+x64 contexts undefined
+base/system/cmos.c	395	404	ifdef NTVDM	x86+x64 undefined
+base/comms/com.c	2520	2541	NTVDM condition	x86+x64 NTVDM undefined
+base/keymouse/keyba.c	3104	3119	NTVDM condition	x86+x64 NTVDM undefined
+base/keymouse/keyba.c	3242	3247	NTVDM condition	x86+x64 NTVDM undefined
+base/system/timer.c	1064	1066	NTVDM condition	x86+x64 NTVDM undefined
+base/system/timer.c	1083	1088	NTVDM condition	x86+x64 NTVDM undefined
+base/inc/sas.h	404	407	NTVDM and not X86GFX	114 x86+x64 contexts NTVDM undefined
+base/inc/dma.h	203	235	if NEC_98	14 x86+x64 contexts undefined
+base/inc/dma.h	291	293	if NEC_98	14 x86+x64 contexts undefined
+base/support/ios.c	1054	1070	ifdef NTVDM	x86+x64 undefined
+host/inc/nt_fulsc.h	259	264	ifdef X86GFX	4 x86+x64 contexts undefined
+base/system/cmos.c	967	971	ifndef NTVDM	x86+x64 undefined; child deferred
+base/system/cmos.c	973	978	ifndef NTVDM	x86+x64 undefined; child deferred
+host/inc/nt_cga.h	23	28	if NEC_98	4 x86+x64 contexts undefined
+host/inc/nt_graph.h	246	259	if NEC_98	22 x86+x64 contexts undefined
+host/inc/nt_graph.h	277	290	if NEC_98	22 x86+x64 contexts undefined
+host/inc/nt_graph.h	424	470	if NEC_98	22 x86+x64 contexts undefined
+base/inc/ios.h	708	710	if NEC_98	110 x86+x64 contexts undefined
+host/src/nt_sound.c	35	44	if NEC_98	x86+x64 undefined
+host/src/nt_sound.c	457	513	if NEC_98	x86+x64 undefined
+host/src/nt_keycd.c	714	718	if NEC_98	x86+x64 undefined
+host/src/nt_keycd.c	740	786	if NEC_98	x86+x64 undefined
+host/src/nt_keycd.c	806	815	if NEC_98	x86+x64 undefined
+base/video/vga_mode.c	592	744	if NEC_98	x86+x64 undefined
+base/video/video.c	104	106	if NEC_98	x86+x64 undefined
+base/inc/sas.h	1098	1245	if defined(NEC_98)	x86+x64 114 contexts undefined
+base/inc/bios.h	416	600	if defined(NEC_98)	x86+x64 70 contexts undefined
+base/inc/dma.h	314	318	if defined(NEC_98)	x86+x64 14 contexts undefined
+base/inc/dma.h	354	375	if defined(NEC_98)	x86+x64 14 contexts undefined
+base/inc/gvi.h	136	198	if defined(NEC_98)	x86+x64 56 contexts undefined
+base/inc/gvi.h	516	644	if defined(NEC_98)	x86+x64 56 contexts undefined
+base/comms/printer.c	1064	1101	if defined(NEC_98)	x86+x64 source-point undefined
+base/disks/floppy.c	5090	5878	if defined(NEC_98)	x86+x64 source-point undefined
+base/video/gfx_updt.c	5993	7092	if defined(NEC_98)	x86+x64 source-point undefined
+base/bios/reset.c	1336	1760	if defined(NEC_98)	x86+x64 source-point undefined
+base/keymouse/keyba.c	3602	3619	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/inc/egavideo.h	122	137	if defined(NTVDM) && defined(MONITOR)	x86+x64 18 contexts NTVDM undefined
+base/disks/floppy_i.c	787	1179	if defined(NEC_98)	x86+x64 source-point undefined
+base/disks/floppy_i.c	612	617	if defined(NEC_98)	x86+x64 source-point undefined
+base/bios/reset.c	975	978	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/bios/reset.c	1079	1081	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/bios/reset.c	1083	1085	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+base/keymouse/mouse.c	503	513	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/keymouse/mouse.c	515	527	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/at_dma.c	194	202	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/at_dma.c	223	231	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/at_dma.c	52	57	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/at_dma.c	471	524	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/at_dma.c	170	177	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+base/system/rom.c	46	85	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/disks/diskbios.c	854	857	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/disks/diskbios.c	865	891	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/disks/diskbios.c	893	895	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+base/disks/diskbios.c	2092	2140	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/timer.c	751	756	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/timer.c	1869	1871	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/comms/com.c	66	70	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/comms/com.c	731	753	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/comms/com.c	2838	2964	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/comms/com.c	2722	2760	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/system/ica.c	2054	2076	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/bios/reset.c	1283	1285	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/bios/reset.c	1287	1289	ifndef NTVDM	x86+x64 source-point NTVDM undefined
+host/src/nt_graph.c	121	123	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+host/src/nt_graph.c	2883	2896	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+host/src/nt_graph.c	2897	2990	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+host/src/nt_graph.c	2606	2611	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+host/src/nt_graph.c	2683	2694	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+host/src/nt_graph.c	2696	2704	if defined(NEC_98)	x86+x64 source-point NEC_98 undefined
+base/support/time_day.c	988	1012	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+base/video/gfx_updt.c	5969	5991	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+base/inc/gfx_upd.h	325	329	ifndef NEC_98	x86+x64 58 contexts NEC_98 undefined
+base/video/video.c	115	127	ifndef NEC_98	x86+x64 source-point NEC_98 undefined
+base/support/ios.c	181	195	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/disks/floppy.c	258	260	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/keybd_io.c	268	273	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/keybd_io.c	274	277	if defined(JAPAN) && defined(NTVDM) && !defined(NEC_98)	x86+x64 source-point NTVDM undefined
+base/keymouse/keybd_io.c	279	302	if defined(NTVDM) && defined(MONITOR)	x86+x64 source-point NTVDM undefined
+base/keymouse/keybd_io.c	876	882	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/keybd_io.c	1999	2280	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/keyba.c	105	174	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/keyba.c	231	233	if defined(KOREA)	x86+x64 source-point KOREA undefined
+base/keymouse/keyba.c	3058	3077	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/mouse_io.c	990	993	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/mouse_io.c	994	996	ifdef JAPAN	x86+x64 source-point JAPAN undefined
+base/keymouse/mouse_io.c	1173	1175	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/mouse_io.c	1177	1179	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/mouse_io.c	1206	1208	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/keymouse/mouse_io.c	1210	1212	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/system/timer.c	81	89	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/system/timer.c	745	749	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/system/timer.c	773	799	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+base/system/ica.c	148	152	if !defined(NTVDM)	x86+x64 source-point NTVDM undefined
+base/system/ica.c	483	494	if defined (NTVDM)	x86+x64 source-point NTVDM undefined
+base/system/illegalp.c	64	66	if defined(NTVDM) && defined(MONITOR)	x86+x64 source-point NTVDM undefined
+base/comms/com.c	2264	2311	ifdef NTVDM	x86+x64 source-point NTVDM undefined
+host/src/nt_sbdsp.c	2183	2232	if 1	constant true
+host/src/nt_sbdsp.c	2233	2267	if 0	constant false
+base/system/timer.c	490	497	if !defined(NTVDM)	x86+x64 source-point NTVDM undefined
+base/system/timer.c	499	503	if defined(NTVDM)	x86+x64 source-point NTVDM undefined
+base/system/timer.c	2905	2945	if !defined (NTVDM)	x86+x64 source-point NTVDM undefined
+base/comms/com.c	656	676	if defined(NTVDM) && defined(FIFO_ON)	x86+x64 source-point NTVDM undefined
+host/src/nt_sound.c	158	160	ifndef PROD	x86+x64 actual nt_sound compile commands define PROD; original NT Beep device function replaced by standalone audio endpoint
+host/src/nt_keycd.c	729	738	ifdef JAPAN	x86+x64 source point JAPAN undefined; original second JAPAN guard retained; XP following line 804 restored
+host/inc/nt_uis.h	91	93	ifdef DBCS	no DBCS definition found in current source or compile flags; contexts pending probe
+host/inc/nt_uis.h	114	116	ifdef DBCS	no DBCS definition found in current source or compile flags; contexts pending probe
+base/system/rom.c	423	512	if defined(NEC_98)	moved misplaced endif back to original read_rom boundary; x86+x64 NEC_98 undefined
+base/system/ica.c	1814	1860	if defined(NTVDM)	x86+x64 NTVDM undefined; exclude whole original IRET hook block
+base/bios/tape_io.c	1	6	if defined(JAPAN) && defined(i386)	x86+x64 JAPAN undefined; exclude native header block
+base/bios/tape_io.c	455	552	if defined(JAPAN) && defined(i386)	x86+x64 JAPAN undefined; exclude Japan extended memory block
+base/video/video.c	171	176	ifdef JAPAN	x86+x64 JAPAN undefined; exclude country-specific state
+base/video/video.c	432	507	ifdef JAPAN / elif defined(KOREA)	x86+x64 JAPAN and KOREA undefined; exclude both sibling bodies
+base/video/ega_vide.c	1	3	if !defined(i386) && defined(JAPAN)	x86+x64 JAPAN undefined; exclude Japan-specific native windows header
+base/keymouse/mouse_io.c	1780	1782	if NTVDM && MONITOR	x86+x64 NTVDM undefined; exclude native mode-change declaration
+base/keymouse/mouse_io.c	3728	3732	if NTVDM && MONITOR	x86+x64 NTVDM undefined; exclude native conditional-off call
+host/src/nt_cga.c	139	164	if defined(NEC_98)	x86+x64 NEC_98 undefined; exclude NEC-98 text initializers
+base/inc/ios.h	29	35	ifdef NTVDM	x86+x64 NTVDM undefined; native extioentry declaration excluded; subsequent NEC else line mapped to XP 301
+base/keymouse/mouse_io.c	3120	3146	if defined(NTVDM)	x86+x64 NTVDM undefined; omit host-specific mouse position path
+host/src/nt_sbdsp.c	2793	2809	if 0	constant false; native waveout reader thread already replaced by existing audio endpoint

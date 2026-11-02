@@ -184,9 +184,15 @@
 #define	RS_1000	(3 << 6)
 #define	RS_MASK	(RS_300 | RS_250)
 
+#ifdef	NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 187
 #define	next_rate(rate)	(rate == RS_500 ? RS_250: \
 			(rate == RS_250 ? RS_300: \
 			(rate == RS_300 ? RS_1000: RS_500)))
+#endif
+#line 190
 
 /*
  *	Unused high density floppy variables
@@ -422,7 +428,13 @@
  *	Number of floppy drives that can really be supported
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 425
 #define MAX_FLOPPY	0x02
+#endif // !NEC_98
+#line 426
 
 /*
  *	Special value of sectors transferred count
@@ -465,10 +477,9 @@
  */
 
 #ifdef ANSI
-extern void diskette_io(void);
-extern void diskette_int(void);
-extern void diskette_post(void);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 483
 extern void diskette_io();
 extern void diskette_int();
 extern void diskette_post();
@@ -479,20 +490,9 @@ extern void diskette_post();
  */
 
 #ifdef ANSI
-extern void fl_disk_reset(int);
-extern void fl_disk_status(int);
-extern void fl_disk_read(int);
-extern void fl_disk_write(int);
-extern void fl_disk_verify(int);
-extern void fl_disk_format(int);
-extern void fl_fnc_err(int);
-extern void fl_disk_parms(int);
-extern void fl_disk_type(int);
-extern void fl_disk_change(int);
-extern void fl_format_set(int);
-extern void fl_set_media(int);
-extern void fl_diskette_setup(void);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 507
 extern void fl_disk_reset();
 extern void fl_disk_status();
 extern void fl_disk_read();
@@ -514,10 +514,9 @@ extern void fl_diskette_setup();
  */
 
 #ifdef ANSI
-extern void drive_detect(int);
-extern void translate_old(int);
-extern void GetFormatParams(int *, int *, int *, int *);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 532
 extern void drive_detect();
 extern void translate_old();
 extern void GetFormatParams();
@@ -528,12 +527,9 @@ extern void GetFormatParams();
  * External functions in the host.
  */
 #ifdef ANSI
-extern void host_floppy_init(int, int);
-extern void host_floppy_term(int, int);
-extern void host_attach_floppies (void);
-extern void host_detach_floppies (void);
-extern void host_flip_real_floppy_ind (void);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 548
 extern void host_floppy_init();
 extern void host_floppy_term();
 extern void host_attach_floppies ();
@@ -564,3 +560,7 @@ extern void host_flip_real_floppy_ind ();
 
 extern void ((*(fl_fnc_tab[]))());
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 588

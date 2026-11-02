@@ -80,10 +80,9 @@ OUT32 IFN2(
 {
 #ifndef PIG
 #ifdef SFELLOW
-	(*Ios_outd_function[Ios_out_adapter_table[op1 & 
-			(PC_IO_MEM_SIZE-1)]])
-				(op1, op2);
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 87
 	OUT16(op1, op2 & 0xffff);
 	OUT16(op1 + 2, op2 >> 16);
 #endif

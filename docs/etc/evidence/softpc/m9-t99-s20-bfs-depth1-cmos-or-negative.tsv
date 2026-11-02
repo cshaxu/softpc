@@ -1,0 +1,3 @@
+arch	exit	expected_target_errors	observed_target_errors	total_errors
+x86	1	11	11	12
+x64	1	11	11	12

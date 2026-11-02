@@ -197,30 +197,9 @@ IPT3(
    );
 
 #ifdef	PIG
-IMPORT VOID cannot_vir_write_byte
-               
-IPT3(
-	IU32, lin_addr,
-	IU32, phy_addr,
-	IU8, valid_mask
-   );
-
-IMPORT VOID cannot_vir_write_dword
-               
-IPT3(
-	IU32, lin_addr,
-	IU32, phy_addr,
-	IU32, valid_mask
-   );
-
-IMPORT VOID cannot_vir_write_word
-               
-IPT3(
-	IU32, lin_addr,
-	IU32, phy_addr,
-	IU16, valid_mask
-   );
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 224
 
 extern void vir_write_bytes IPT4(LIN_ADDR, lin_addr,PHY_ADDR, phy_addr, IU8 *, data, IU32, num_bytes);
 extern void vir_read_bytes IPT4(IU8 *, destbuff, LIN_ADDR, lin_addr, PHY_ADDR, phy_addr, IU32, num_bytes);

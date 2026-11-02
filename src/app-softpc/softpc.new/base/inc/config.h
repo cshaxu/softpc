@@ -81,10 +81,9 @@ WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 
 #define C_FILE_DEFAULT		0
 #ifdef macintosh
-#define C_PRINTER_DEFAULT	1
-#define C_PLOTTER_DEFAULT	2
-#define C_DATACOMM_DEFAULT	4
+#error "Unsupported SoftPC mirror configuration: macintosh"
 #else	/* macintosh */
+#line 88
 #define C_DEVICE_DEFAULT	1
 #endif	/* macintosh */
 #define C_PIPE_DEFAULT		3
@@ -397,8 +396,9 @@ extern CHAR *host_expand_environment_vars IPT1(const char *, string);
 extern CHAR ptr_to_empty[];
 
 #ifdef SWITCHNPX
-extern IS32 Npx_enabled;
+#error "Unsupported SoftPC mirror configuration: SWITCHNPX"
 #endif /* SWITCHNPX */
+#line 402
 
 /* Dumb Terminal UIF Flag */
 extern IBOOL Config_has_been_edited;

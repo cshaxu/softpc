@@ -1,3 +1,7 @@
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1
 #include "insignia.h"
 #include "host_def.h"
 
@@ -15,18 +19,16 @@
 *	NB: This file does not comply with all of Insignias standards.
 */
 
+/* @(#)diskbios.c	1.36 04/12/95 Copyright Insignia Solutions Inc. */
 #ifdef SCCSID
-static char	SccsID[] = "@(#)diskbios.c	1.36 04/12/95 Copyright Insignia Solutions Inc.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 27
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "AT_STUFF.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 36
 
 /* includes */
 #include <stdio.h>
@@ -45,6 +47,10 @@ static char	SccsID[] = "@(#)diskbios.c	1.36 04/12/95 Copyright Insignia Solution
 #include "dsktrace.h"
 #include "idetect.h"
 #include "debug.h"
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 57
 
 /* disk status BIOS variable location */
 #define DISK_STATUS1 0x474
@@ -67,6 +73,10 @@ static char	SccsID[] = "@(#)diskbios.c	1.36 04/12/95 Copyright Insignia Solution
 #define ERROR_CLEAR 0x00
 #define ERROR_READ_ONLY_MEDIA 0x03 /* this is really only for floppies but it has the desired effect on DOS */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 137
 /* command parameters structure */
 /* use ints to allow the compiler to chose the fastest type */
 typedef struct _com
@@ -106,11 +116,9 @@ LOCAL int maxsectors, maxoffset;
 LOCAL int tfstatus;
 
 #ifndef PROD
-/*
-* disk trace control variable; global only for use by Yoda.
-*/
-GLOBAL IU32 disktraceinfo;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 114
 
 /*
 * non-zero if drive 1 does not exist
@@ -152,6 +160,10 @@ LOCAL void enable_disk_interrupts IPT0();
 
 LOCAL void hd_reset IPT2(int, drive, int, diag);
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 155
 /********************************************************/
 /* POST & DEBUG defines*/
 
@@ -211,11 +223,19 @@ DESCRIPTION	  : 	reads the CMOS to see if any disks.
 
 void disk_post IFN0()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 214
 	UTINY diag;
 	UTINY disks;
 	UTINY ndisks;
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 217
 	USHORT diskette_offset;
 	USHORT diskette_seg;
+#endif /* !(NTVDM && MONITOR) */
+#line 219
 	int i;
 
 	/*
@@ -223,6 +243,8 @@ void disk_post IFN0()
 	 */
 	 diag = rcmos (CMOS_DIAG);
 
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 226
 	/* We don't want this section if running on NTVDM MONITOR */
 
 	 drive1notwiredup = ~0;
@@ -264,6 +286,8 @@ void disk_post IFN0()
 	 */
 	 wcmos (CMOS_DIAG, diag & ~HF_FAIL);
 
+#endif  /* !(NTVDM && MONITOR) */
+#line 267
 
 
 	/*
@@ -306,6 +330,8 @@ void disk_post IFN0()
 		sas_store (HF_NUM, 0);
 		wcmos (CMOS_DIAG, (UTINY)(diag | HF_FAIL));
 	}
+#endif // !NEC_98
+#line 309
 }
 
 
@@ -348,212 +374,25 @@ LOCAL void hd_reset IFN2(int, drive, int, diag)
 }
 
 #ifndef PROD
-/*
-FUNCTION	:	relevant()
-PURPOSE		:	filter out unwanted tracing as requested by the
-			disk trace flag.
-INPUT PARAMS	:
-	i		encoded flag indicating type of tracing information
-			asking to be output
-*/
-LOCAL BOOL relevant IFN1(IU32, i)
-{
-	if ((i & disktraceinfo) == i)
-		return ~0;
-	else
-		return 0;
-}
-
-LOCAL BOOL storing_trace = FALSE;
-LOCAL int stored_trace_hndl, stored_trace_count = 0;
-
-#ifdef macintosh
-GLOBAL	int	*stored_trace_data;
-#else
-LOCAL int stored_trace_data[1024];
-#endif
-LOCAL int stored_tr_dptr = 0;
-LOCAL int stored_infoid;
-LOCAL char stored_tr_string[80];
-
-void unload_stored_trace IFN1(int, hndl)
-{
-	int i,linecount;
-
-	if (stored_infoid & DBIOS)
-		fprintf (trace_file, "DBIOS:");
-
-	if (stored_infoid & DHW)
-		fprintf (trace_file, "DHW  :");
-
-	switch (hndl)
-	{
-	case INW_TRACE_HNDL:
-	case OUTW_TRACE_HNDL:
-		if (stored_trace_count == 1)
-		{
-			fprintf (trace_file, "%s : 0x%04x\n",stored_tr_string,stored_trace_data[0]);
-		}
-		else
-		{
-			fprintf (trace_file, "%d lots of %s : \n",
-				stored_trace_count,stored_tr_string);
-			linecount = 8;
-			for (i=0;i<stored_trace_count;i++)
-			{
-				if (linecount >= 8)
-				{
-					fprintf(trace_file, "\n");
-					if (stored_infoid & DBIOS)
-						fprintf (trace_file, "DBIOS:");
-				
-					if (stored_infoid & DHW)
-						fprintf (trace_file, "DHW  :");
-					linecount = 0;
-				}
-				fprintf(trace_file, "0x%04x ",stored_trace_data[i]);
-				linecount++;
-			}
-			fprintf(trace_file, "\n");
-		}
-		break;
-	default:
-		/* unknown handle */
-		break;
-	}
-	stored_tr_dptr = 0;
-	stored_trace_count = 0;
-}
-
-void add_to_stored_trace IFN1(int, data)
-{
-	stored_trace_data[stored_tr_dptr++]=data;
-}
-
-#ifdef ANSI
-void disktrace (int infoid, int nargs, int hndl, char *fmt, unsigned long a1,
-		unsigned long a2, unsigned long a3, unsigned long a4,
-		unsigned long a5)
-#else
-void disktrace (infoid, nargs, hndl, fmt, a1, a2, a3, a4, a5)
-int infoid;
-int nargs;
-int hndl;
-char *fmt;
-unsigned long a1;
-unsigned long a2;
-unsigned long a3;
-unsigned long a4;
-unsigned long a5;
-#endif	/* ANSI */
-{
-
-
-	if (relevant (infoid))
-	{
-		switch(hndl)
-		{
-		case INW_TRACE_HNDL:
-		case OUTW_TRACE_HNDL:
-			if (storing_trace && (stored_trace_hndl != hndl))
-				unload_stored_trace(stored_trace_hndl);
-			if (!storing_trace)
-			{	
-				storing_trace = TRUE;
-				stored_trace_hndl = hndl;
-				strcpy(stored_tr_string, fmt);
-				stored_infoid = infoid;
-			}
-			add_to_stored_trace(a1);
-			stored_trace_count++;
-			return;
-		default:
-		case 0:
-			if (storing_trace)
-				unload_stored_trace(stored_trace_hndl);
-			storing_trace = FALSE;
-			break;
-		}			
-				
-		if (infoid & DBIOS)
-			fprintf (trace_file, "DBIOS:");
-
-		if (infoid & DHW)
-			fprintf (trace_file, "DHW  :");
-
-		switch (nargs)
-		{
-			case 0:
-				fprintf (trace_file, fmt);
-				break;
-			case 1:
-				fprintf (trace_file, fmt, a1);
-				break;
-			case 2:
-				fprintf (trace_file, fmt, a1, a2);
-				break;
-			case 3:
-				fprintf (trace_file, fmt, a1, a2, a3);
-				break;
-			case 4:
-				fprintf (trace_file, fmt, a1, a2, a3, a4);
-				break;
-			case 5:
-				fprintf (trace_file, fmt, a1, a2, a3, a4, a5);
-				break;
-		}
-	}
-}
-
-
-void setdisktrace IFN0()
-{
-	char l[30];
-	int value;
-
-/* make the compiler happy */
-	value = 0;
-
-	printf ("select disk trace mask\n");
-	printf ("\tcmnd info\t%x\n",CMDINFO);
-	printf ("\texec info\t%x\n",XINFO);
-	printf ("\texec status\t%x\n",XSTAT);
-	printf ("\tphys.att\t%x\n",PAD);
-	printf ("\tio-att\t\t%x\n",IOAD);
-	printf ("\tportio\t\t%x\n",PORTIO);
-	printf ("\tints\t\t%x\n",INTRUPT);
-	printf ("\thw xinfo\t%x\n",HWXINFO);
-	printf ("\tdata dump\t%x\n",DDATA);
-	printf ("\tPhys IO\t\t%x\n",PHYSIO);
-	printf ("\thardware\t\t%x\n",DHW);
-	printf ("\tbios\t\t%x\n",DBIOS);
-#ifdef WDCTRL_BOP
-	printf ("\twdctrl\t\t%x\n",WDCTRL);
-#endif /* WDCTRL_BOP
-	printf (" .. ? ");
-	 gets (l);
-	 sscanf (l, "%x", &value);
-
-	/*
-	 * automatically select BIOS entry,exit tracing if BIOS
-	 * tracing selected
-	 */
-	if (value & DBIOS)
-		 value |= CALL;
-	 disktraceinfo = value;
-}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif				/* nPROD */
+#line 546
 
 
 /********************************************************/
 /* BIOS mainline and functions */
 
 #ifdef ANSI
-LOCAL void (*disk_func[]) (void) =
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 739
 LOCAL void (*disk_func[]) () =
 #endif
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 767
 	disk_reset,		/* 0x00 */
 	return_status,		/* 0x01 */
 	disk_read,		/* 0x02 */
@@ -577,74 +416,67 @@ LOCAL void (*disk_func[]) () =
 	diagnostics,		/* 0x14 */
 	read_dasd,		/* 0x15 */
 	/* 0x16 - 0x19 are all floppy commands */
+#endif // !NEC_98
+#line 580
 };
 
 #ifndef PROD
-static char *BIOSnames[] =
-{
-        "reset disk (AH=0)",
-        "read last status (AH=1)",
-        "read sectors (AH=2)",
-        "write sectors (AH=3)",
-        "verify sectors (AH=4)",
-        "format track (AH=5)",
-        "unused (AH=6)",
-        "unused (AH=7)",
-        "return current drive parameters (AH=8)",
-        "set drive geometry for controller (AH=9)",
-        "read long (AH=0xa)",
-        "write long (AH=0xb)",
-        "seek (AH=0xc)",
-        "alternate disk reset (AH=0xd)",
-        "unused (AH=0xe)",
-        "unused (AH=0xf)",
-        "test drive ready (AH=0x10)",
-        "recalibrate (AH=0x11)",
-        "unused (AH=0x12)",
-        "unused (AH=0x13)",
-        "diagnostics (AH=0x14)",
-        "read dasd type (AH=0x15)"
-};
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* nPROD */
+#line 849
 
 /* Fixed disk BIOS mainline */
 void disk_io IFN0()
 {
 	register int BIOS_command;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 858
 #ifndef PROD
-	int ax,bx,cx,dx,es;
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 617
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 892
+#ifndef NEC_98
+#line 894
 	IDLE_disk();
+#endif // !NEC_98
+#line 896
 
 
 	/* what function to perform ? */
 	/* what command ?? */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 903
 	BIOS_command = getAH ();
+#endif // !NEC_98
+#line 624
 
 #ifndef PROD
-
-        ax = getAX();
-        bx = getBX();
-        cx = getCX();
-        dx = getDX();
-        es = getES();
-
-        dt5(DBIOS, 0, "<ax %x bx %x cx %x dx %x es %x\n", ax,bx,cx,dx,es)
-
-        if (BIOS_command > 0x15)
-                dt1(DBIOS|CALL, 0, "bad BIOS call (AH=%x)\n", BIOS_command)
-        else
-                dt1(DBIOS|CALL, 0, "BIOS call = %s\n",
-				(unsigned long)BIOSnames[BIOS_command])
-
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 642
 
+#ifndef NEC_98
+#line 935
 	/* clear up the status before we kick off */
 	/* but only if this is NOT a read status command */
 	if (BIOS_command != 0x01)
 		wstatus (STATUS_CLEAR);
+#endif // !NEC_98
+#line 940
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 648
 	/* setup our command structure from the remaining registers */
 	com.drive = getDL () & 0x7f;
 	com.sectors = getAL ();
@@ -654,7 +486,11 @@ void disk_io IFN0()
 	com.start_sector = getCL () & 0x3f;
 	com.xfersegment = getES () + ((getBX ()) >> 4);
 	com.xferoffset = getBX () & 0x0f;
+#endif // !NEC_98
+#line 657
 
+#ifndef NEC_98
+#line 1005
 	/* DMA boundary check */
 	if (BIOS_command == 0x0a || BIOS_command == 0x0b)
 	{
@@ -666,7 +502,13 @@ void disk_io IFN0()
 		maxsectors = 128;
 		maxoffset = 0;
 	}
+#endif // !NEC_98
+#line 669
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 670
 	/* call our function if sensible ie the drive requested exists */
 	/* and the BIOS command is in a sensible range */
 	if (check_drive (com.drive)
@@ -679,7 +521,13 @@ void disk_io IFN0()
 	{
 		badcmd ();
 	}
+#endif // !NEC_98
+#line 682
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 683
 	/* setup the applications return */
 	if (BIOS_command != 0x15)
 		setAH (rstatus ());
@@ -692,24 +540,29 @@ void disk_io IFN0()
 		 * of a device.
 		 */
 #ifndef PROD
-		if (BIOS_command != 8) {
-			assert0 (NO,"FAST DISK COMMAND FAILED \n");
-			assert1 (NO,"STATUS %x   ", rstatus ());
-			assert1 (NO,"BIOS_command %x \n", BIOS_command);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 701
 		setCF (1);	/* cmd fails */
 	}
 	else
 		setCF (0);	/* cmd ok */
         dt2(DBIOS|CALL, 0, "CF=%c, status=%x(hex)\n",
 		getCF()?'T':'F',(unsigned)rstatus())
+#endif // !NEC_98
+#line 707
 }
 
 /*0x?? badcommand catch all */
 LOCAL void badcmd IFN0()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 712
 	wstatus (STATUS_BAD_COMMAND);
+#endif // !NEC_98
+#line 713
 }
 
 /*0x00 reset the hard disk system */
@@ -755,6 +608,10 @@ LOCAL void return_status IFN0()
 /*0x02 disk read sector(s) */
 LOCAL void disk_read IFN0()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 758
 	long offset;
 	host_addr inbuf;
 	sys_addr pdata;
@@ -793,11 +650,17 @@ LOCAL void disk_read IFN0()
 	}
 	wstatus (STATUS_CLEAR);
 	setAL ((unsigned char) com.sectors);
+#endif // !NEC_98
+#line 796
 }
 
 /*0x03 disk write sector(s) */
 LOCAL void disk_write IFN0()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 801
 	long offset;
 	host_addr outbuf;
 	sys_addr pdata;
@@ -841,8 +704,14 @@ LOCAL void disk_write IFN0()
 	}
 	wstatus (STATUS_CLEAR);
 	setAL ((unsigned char) com.sectors);
+#endif // !NEC_98
+#line 844
 }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1478
 /*0x04 disk verify sector */
 LOCAL void disk_verify IFN0()
 {
@@ -1262,28 +1131,9 @@ GLOBAL void wdctrl_bop IFN0()
 	command = getDH();
 
 #ifndef PROD
-	/* #ifndef PROD so the tests don't occur in PROD version */
-	{
-		IUM32	cs = getCS();
-		IUM32	eip = getEIP();
-		
-		if (command == BDC_READ)
-		{
-			dt2(WDCTRL, 0, "WDCTRL READ: called from %04x:%08x\n",
-	                                cs, eip);
-	        }
-	        else if (command == BDC_WRITE)
-		{
-			dt2(WDCTRL, 0, "WDCTRL WRITE: called from %04x:%08x\n",
-					cs, eip);
-		}
-		else
-		{
-			dt3(WDCTRL, 0, "WDCTRL command %d: called from %04x:%08x\n",
-					command, cs, eip);
-		}
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1287
 
 	/* clear up the status before we kick off */
 	wstatus (STATUS_CLEAR);
@@ -1403,27 +1253,9 @@ GLOBAL void wdctrl_bop IFN0()
 		setAL ((unsigned char) com.sectors);
 	}
 #ifndef PROD
-/* These are for debugging scatter gather - I never had one and don't know
- * if the intel side is correct...
- */
-else if (command == 4)
-{
-	/* Just to let me know we've got a scatter/gather loop */
-	dt0(WDCTRL, 0, "wdctrl_bop: scatter gather detected ********\n");
-	force_yoda();
-	return;
-}
-else if (command == 5)
-{
-	/* Just to let me know we've got a scatter/gather loop */
-	dt0(WDCTRL, 0, "wdctrl_bop: scatter gather processing ********\n");
-	force_yoda();
-	return;
-}
-/*
- * end of debugging commands
- */
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
+#line 1427
 	else
 	{
 		badcmd ();
@@ -1440,10 +1272,9 @@ else if (command == 5)
 		 * of a device.
 		 */
 #ifndef PROD
-		assert0 (NO,"FAST DISK COMMAND FAILED \n");
-		assert1 (NO,"STATUS %x   ", rstatus ());
-		assert1 (NO,"command %x \n", command);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 1447
 		setCF (1);	/* cmd fails */
 	}
 	else
@@ -1457,3 +1288,7 @@ else if (command == 5)
 #endif	/* WDCTRL_BOP */
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2141

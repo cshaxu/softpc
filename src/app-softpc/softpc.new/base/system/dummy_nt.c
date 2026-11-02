@@ -13,18 +13,16 @@
  * Notes         :
  */
 
+/* @(#)dummy_int.c	1.4 08/10/92 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)dummy_int.c	1.4 08/10/92 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 19
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 28
 
 void dummy_int()
 {

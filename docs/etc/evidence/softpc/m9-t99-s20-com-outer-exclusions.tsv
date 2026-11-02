@@ -1,0 +1,9 @@
+path	baseline_if_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/comms/com.c	56	59	ifdef	GISP_CPU	c56a3d9a9a6899655643ad9133754c2cc347002accc36095d7e140171833504a
+base/comms/com.c	119	127	ifdef	IRET_HOOKS	8fbb57b4859e51b3b1f51a7de99a51a548a8e0f88df08eb2511d738fe0ef06b8
+base/comms/com.c	357	361	ifdef	PS_FLUSHING	bd00c1551d5227d7c843f2cb8e027a0c0a6a6669f242d56c19ee63dbfa5e005a
+base/comms/com.c	1292	1408	ifdef	IRET_HOOKS	d7f4773602bdf3800903f7a8d625cc11ce61888ae475ea3b05e9b14f4d4fef29
+base/comms/com.c	2156	2177	ifdef	SHORT_TRACE	af2d8e28b3015d482da4dad0710ecb8cb5742d2928085d66a9d62896be499d83
+base/comms/com.c	2306	2309	ifndef	COM3_ADAPTOR	624dba5f43041a142f763b28a6b52acd48e3663cb99d45b690cf713d55a4ca94
+base/comms/com.c	2309	2312	ifndef	COM4_ADAPTOR	3948c5b6d26d7273a289f4b849965f8d0bb1fda763cff06383c324503ba53f9b
+base/comms/com.c	2383	2419	ifdef	PS_FLUSHING	d4c247cff7b6b2577475f1f15a88276a6d23cfd00add82efbcbe0b636e79dfe4

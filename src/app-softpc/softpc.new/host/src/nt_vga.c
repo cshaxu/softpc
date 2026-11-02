@@ -33,6 +33,10 @@
 
 #include "nt_graph.h"
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 40
 
 IMPORT int DisplayErrorTerm(int, DWORD, char *, int);
 
@@ -236,8 +240,9 @@ void nt_vga_graph_big(int offset, int screen_x, int screen_y,
             *(dest_ptr + (2 * shorts_per_scanline) + 1) =
                 *(dest_ptr + shorts_per_scanline + 1) =
 #ifdef BIGEND
-                *(dest_ptr + 1) = (unsigned short) ((temp1 << 8) | temp2);
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
+#line 241
 #ifdef LITTLEND
                 *(dest_ptr + 1) = (unsigned short) ((temp2 << 8) | temp1);
 #endif /* LITTLEND */
@@ -1655,4 +1660,9 @@ sub_note_trace5(EGA_HOST_VERBOSE,
     offset, screen_x, screen_y, width, height);
 }
 #endif /* V7VGA */
+
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 2189
 

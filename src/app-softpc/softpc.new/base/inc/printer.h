@@ -28,19 +28,23 @@
  * ============================================================================
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 31
 #ifdef ANSI
-extern	void printer_init(int);
-extern	void printer_post(int);
-extern	void printer_status_changed(int);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 36
 extern	void printer_init();
 extern	void printer_post();
 extern	void printer_status_changed();
 #endif
 
 #ifdef PS_FLUSHING
-extern void printer_psflush_change IPT2(IU8,hostID, IBOOL,apply);
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 44
 
 /*
  * The following 6 defines refer to the address in the BIOS data area
@@ -55,6 +59,11 @@ extern void printer_psflush_change IPT2(IU8,hostID, IBOOL,apply);
 #define LPT1_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x78)
 #define LPT2_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x79)
 #define LPT3_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x7a)
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#endif // !NEC_98
+#line 58
 
 
 #endif

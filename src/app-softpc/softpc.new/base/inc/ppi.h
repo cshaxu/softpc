@@ -27,10 +27,9 @@
  */
 
 #ifdef ANSI
-extern void ppi_init(void);
-extern void ppi_inb(io_addr,half_word *);
-extern void ppi_outb(io_addr,half_word);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 34
 extern void ppi_init();
 extern void ppi_inb();
 extern void ppi_outb();

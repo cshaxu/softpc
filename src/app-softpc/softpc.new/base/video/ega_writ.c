@@ -1,6 +1,8 @@
 #include "insignia.h"
 #include "host_def.h"
 
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 5
 
 /*			INSIGNIA (SUB)MODULE SPECIFICATION
 			-----------------------------
@@ -71,13 +73,9 @@ extern WRT_POINTERS mode1_handlers, mode2_handlers;
 
 [5.1 LOCAL DECLARATIONS]						*/
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_EGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 81
 
 #ifndef REAL_VGA
 
@@ -87,217 +85,9 @@ GLOBAL UTINY Last_v7_fg_bg;			/* used by {ev}ga_mask_register_changed() */
 #endif
 
 #ifndef CPU_40_STYLE	/* EVID without introducing EVID define */
-
-WRT_POINTERS *mode_chain_handler_table[] =
-{
-	&mode_table.nch.mode_0[0],
-	&mode_table.nch.mode_1[0],
-	&mode_table.nch.mode_2[0],
-#ifdef VGG
-	&mode_table.nch.mode_3[0],
-#endif
-
-	&mode_table.nch.mode_0[0],		/* This should be chain 2 eventually */
-	&mode_table.nch.mode_1[0],		/* This should be chain 2 eventually */
-	&mode_table.nch.mode_2[0],		/* This should be chain 2 eventually */
-#ifdef VGG
-	&mode_table.nch.mode_3[0],		/* This should be chain 2 eventually */
-#endif
-
-#ifdef VGG
-	&mode_table.ch4.mode_0[0],
-	&mode_table.ch4.mode_1[0],
-	&mode_table.ch4.mode_2[0],
-	&mode_table.ch4.mode_3[0],
-#endif /* VGG */
-};
-	
-#ifndef EGATEST
-IMPORT VOID glue_b_write IPT2(UTINY *, addr, ULONG, val);
-IMPORT VOID glue_w_write IPT2(UTINY *, addr, ULONG, val);
-IMPORT VOID glue_b_fill IPT3(UTINY *, laddr, UTINY *, haddr, ULONG, val);
-IMPORT VOID glue_w_fill IPT3(UTINY *, laddr, UTINY *, haddr, ULONG, val);
-IMPORT VOID glue_b_move IPT4(UTINY *, laddr, UTINY *, haddr, UTINY *, src, UTINY, src_type);
-IMPORT VOID glue_w_move IPT3(UTINY *, laddr, UTINY *, haddr, UTINY *, src);
-
-#ifndef GISP_CPU
-#ifdef A3CPU
-#ifdef C_VID
-IMPORT VOID _glue_b_write IPT2(UTINY *, addr, ULONG, val);
-IMPORT VOID _glue_w_write IPT2(UTINY *, addr, ULONG, val);
-IMPORT VOID _glue_b_fill IPT3(UTINY *, laddr, UTINY *, haddr, ULONG, val);
-IMPORT VOID _glue_w_fill IPT3(UTINY *, laddr, UTINY *, haddr, ULONG, val);
-IMPORT VOID _glue_b_fwd_move IPT0();
-IMPORT VOID _glue_b_bwd_move IPT0();
-IMPORT VOID _glue_w_fwd_move IPT0();
-IMPORT VOID _glue_w_bwd_move IPT0();
-
-GLOBAL WRT_POINTERS Glue_writes =
-{
-	_glue_b_write,
-	_glue_w_write
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_glue_b_fill,
-	_glue_w_fill,
-	_glue_b_fwd_move,
-	_glue_b_bwd_move,
-	_glue_w_fwd_move,
-	_glue_w_bwd_move
-
-#endif	/* NO_STRING_OPERATIONS */
-
-};
-
-GLOBAL WRT_POINTERS C_vid_writes;
-#endif /* C_VID */
-#else
-
-#ifdef A_VID
-IMPORT VOID _glue_b_write();
-IMPORT VOID _glue_w_write();
-IMPORT VOID _glue_b_fill();
-IMPORT VOID _glue_w_fill();
-IMPORT VOID _glue_b_move();
-IMPORT VOID _glue_w_move();
-
-GLOBAL MEM_HANDLERS Glue_writes =
-{
-	_glue_b_write,
-	_glue_w_write,
-	_glue_b_fill,
-	_glue_w_fill,
-	_glue_b_move,
-	_glue_w_move,
-};
-
-GLOBAL WRT_POINTERS A_vid_writes;
-
-#else
-
-GLOBAL MEM_HANDLERS Glue_writes =
-{
-	glue_b_write,
-	glue_w_write,
-	glue_b_fill,
-	glue_w_fill,
-	glue_b_move,
-	glue_w_move,
-};
-
-GLOBAL WRT_POINTERS C_vid_writes;
-#endif /* C_VID */
-#endif /* A3CPU */
-#endif /* GISP_CPU */
-#endif /* EGATEST */
-
-IMPORT VOID _simple_b_write();
-IMPORT VOID _simple_w_write();
-IMPORT VOID _simple_b_fill();
-IMPORT VOID _simple_w_fill();
-IMPORT VOID _simple_bf_move();
-IMPORT VOID _simple_wf_move();
-IMPORT VOID _simple_bb_move();
-IMPORT VOID _simple_wb_move();
-
-WRT_POINTERS simple_writes =
-{
-	_simple_b_write,
-	_simple_w_write
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_simple_b_fill,
-	_simple_w_fill,
-	_simple_bf_move,
-	_simple_bb_move,
-	_simple_wf_move,
-	_simple_wb_move
-
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-IMPORT VOID _dt0_bw_nch();
-IMPORT VOID _dt0_ww_nch();
-IMPORT VOID _dt0_bf_nch();
-IMPORT VOID _dt0_wf_nch();
-IMPORT VOID _vid_md0_bfm_0_8();
-IMPORT VOID _vid_md0_bbm_0_8();
-IMPORT VOID _vid_md0_wfm_0_8();
-IMPORT VOID _vid_md0_wbm_0_8();
-
-IMPORT VOID _dt2_bw_nch();
-IMPORT VOID _dt2_ww_nch();
-IMPORT VOID _dt2_bf_nch();
-IMPORT VOID _dt2_wf_nch();
-IMPORT VOID _vid_md2_bfm_0_8();
-IMPORT VOID _vid_md2_bbm_0_8();
-IMPORT VOID _vid_md2_wfm_0_8();
-IMPORT VOID _vid_md2_wbm_0_8();
-
-IMPORT VOID _dt3_bw_nch();
-IMPORT VOID _dt3_ww_nch();
-IMPORT VOID _dt3_bf_nch();
-IMPORT VOID _dt3_wf_nch();
-IMPORT VOID _vid_md3_bfm_0_8();
-IMPORT VOID _vid_md3_bbm_0_8();
-IMPORT VOID _vid_md3_wfm_0_8();
-IMPORT VOID _vid_md3_wbm_0_8();
-
-WRT_POINTERS dth_md0_writes =
-{
-	_dt0_bw_nch,
-	_dt0_ww_nch
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_dt0_bf_nch,
-	_dt0_wf_nch,
-	_vid_md0_bfm_0_8,
-	_vid_md0_bbm_0_8,
-	_vid_md0_wfm_0_8,
-	_vid_md0_wbm_0_8
-
-#endif	/* NO_STRING_OPERATIONS */
-
-};
-
-WRT_POINTERS dth_md2_writes =
-{
-	_dt2_bw_nch,
-	_dt2_ww_nch
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_dt2_bf_nch,
-	_dt2_wf_nch,
-	_vid_md2_bfm_0_8,
-	_vid_md2_bbm_0_8,
-	_vid_md2_wfm_0_8,
-	_vid_md2_wbm_0_8
-#endif	/* NO_STRING_OPERATIONS */
-
-};
-
-WRT_POINTERS dth_md3_writes =
-{
-	_dt3_bw_nch,
-	_dt3_ww_nch
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_dt3_bf_nch,
-	_dt3_wf_nch,
-	_vid_md3_bfm_0_8,
-	_vid_md3_bbm_0_8,
-	_vid_md3_wfm_0_8,
-	_vid_md3_wbm_0_8
-
-#endif	/* NO_STRING_OPERATIONS */
-
-};
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
+#line 301
 WRT_POINTERS *mode_chain_handler_table[] = { 0 };
 #ifdef C_VID
 
@@ -312,9 +102,9 @@ MEM_HANDLERS Glue_writes =
 	move_word_fwd_ev_glue,
 };
 #else	/* C_VID */
-/* no glue required */
-MEM_HANDLERS Glue_writes = { 0, 0, 0, 0, 0, 0 };
+#error "Unsupported SoftPC mirror configuration: !C_VID"
 #endif	/* CVID */
+#line 318
 WRT_POINTERS dth_md0_writes;
 WRT_POINTERS dth_md2_writes;
 WRT_POINTERS simple_writes;
@@ -342,11 +132,9 @@ ULONG sr_lookup[16] =
 	0xffff0000,0xffff00ff,0xffffff00,0xffffffff
 #endif
 #ifdef BIGEND
-	0x00000000,0xff000000,0x00ff0000,0xffff0000,
-	0x0000ff00,0xff00ff00,0x00ffff00,0xffffff00,
-	0x000000ff,0xff0000ff,0x00ff00ff,0xffff00ff,
-	0x0000ffff,0xff00ffff,0x00ffffff,0xffffffff
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 350
 };
 
 GLOBAL VOID
@@ -362,77 +150,32 @@ GLOBAL ULONG calc_data_xor;
 GLOBAL ULONG calc_latch_xor;
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_GRAPHICS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 372
 
 GLOBAL VOID
 Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 {
 
 #ifndef CPU_40_STYLE	/* EVID */
-#ifndef GISP_CPU
-#ifdef A3CPU
-#ifdef C_VID
-
-	C_vid_writes.b_write = handler->b_write;
-	C_vid_writes.w_write = handler->w_write;
-	C_vid_writes.b_fill = handler->b_fill;
-	C_vid_writes.w_fill = handler->w_fill;
-	C_vid_writes.b_fwd_move = handler->b_fwd_move;
-	C_vid_writes.b_bwd_move = handler->b_bwd_move;
-	C_vid_writes.w_fwd_move = handler->w_fwd_move;
-	C_vid_writes.w_bwd_move = handler->w_bwd_move;
-
-#else
-	UNUSED(handler);
-#endif /* C_VID */
-#else
-#ifdef C_VID
-
-	C_vid_writes.b_write = handler->b_write;
-	C_vid_writes.w_write = handler->w_write;
-
-#ifndef	NO_STRING_OPERATIONS
-
-	C_vid_writes.b_fill = handler->b_fill;
-	C_vid_writes.w_fill = handler->w_fill;
-	C_vid_writes.b_fwd_move = handler->b_fwd_move;
-	C_vid_writes.b_bwd_move = handler->b_bwd_move;
-	C_vid_writes.w_fwd_move = handler->w_fwd_move;
-	C_vid_writes.w_bwd_move = handler->w_bwd_move;
-
-#endif	/* NO_STRING_OPERATIONS */
-
-#else
-
-	A_vid_writes = *handler;
-
-
-#endif /* C_VID */
-#endif /* A3CPU */
-#endif /* GISP_CPU */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif 	/* CPU_40_STYLE - EVID */
+#line 420
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_EGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 430
 
 /*  Initialize the write module */
 
 VOID
 ega_write_init IFN0()
 {
+#ifndef NEC_98
+#line 436
 	WRT_POINTERS *handler;
 
 	note_entrance0("ega_write_init");
@@ -452,26 +195,22 @@ ega_write_init IFN0()
 #endif
 
 #ifdef	JOKER
-
-	Glue_set_vid_wrt_ptrs(handler);
-
+#error "Unsupported SoftPC mirror configuration: JOKER"
 #else	/* not JOKER */
+#line 459
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
 	dump_writes = handler;
 #else
 #ifdef EGATEST
-	gmi_define_mem(VIDEO,(*handler));
+#error "Unsupported SoftPC mirror configuration: EGATEST"
 #else
+#line 466
 #ifndef GISP_CPU
 #ifdef A3CPU
-#ifdef C_VID
-	Cpu_set_vid_wrt_ptrs( &Glue_writes );	
-	Glue_set_vid_wrt_ptrs( handler );
+#error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
-	Cpu_set_vid_wrt_ptrs( handler );	
-#endif /* C_VID */
-#else
+#line 475
 	gmi_define_mem(VIDEO,&Glue_writes);
 	Glue_set_vid_wrt_ptrs( handler );
 #endif /* A3CPU */
@@ -486,11 +225,15 @@ ega_write_init IFN0()
 	ega_write_routines_update(SET_RESET);
 	ega_write_routines_update(ENABLE_SET_RESET);
 	ega_write_routines_update(FUNCTION);
+#endif  //NEC_98
+#line 489
 }
 
 VOID
 ega_write_term IFN0()
 {
+#ifndef NEC_98
+#line 494
 	/*
 	 * ensure that if you are an EGA and then change to a VGA (or vice
 	 * versa) the write mode will be changed by the new adaptor. Otherwise
@@ -503,6 +246,8 @@ ega_write_term IFN0()
 	setVideowrmode(EGA_CPU.write_mode);
 
 	ega_write_routines_update(WRITE_MODE);
+#endif  //NEC_98
+#line 506
 }
 
 
@@ -511,12 +256,15 @@ ega_write_term IFN0()
 VOID
 ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 {
+#ifndef NEC_98
+#line 514
 	ULONG state;
 	ULONG mode_and_chain;
 	WRT_POINTERS *handler;
 #ifndef PROD
-	LOCAL WRT_POINTERS *last_handler;
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 520
 
 	note_entrance1("ega_write_routines_update(%d)",reason);
 
@@ -703,8 +451,9 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #ifdef VGG
 	mode_and_chain = (EGA_CPU.chain << 2) + EGA_CPU.write_mode;
 #else
-	mode_and_chain = (EGA_CPU.chain * 3) + EGA_CPU.write_mode;
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
+#line 708
 
 	if(( EGA_CPU.saved_mode_chain != mode_and_chain )
 		|| ( EGA_CPU.saved_state != state )
@@ -793,34 +542,14 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #ifdef CPU_40_STYLE
 		SetWritePointers();
 #else  /* CPU_40_STYLE */
-
-#if defined(EGA_DUMP) || defined(EGA_STAT)
-		dump_writes = handler;
-#else
-		/* Tell the glue code about the new write routines */
-
-#ifdef EGATEST
-		gmi_redefine_mem(VIDEO,(*handler));
-#else
-#ifndef GISP_CPU
-#ifdef A3CPU
-#ifdef C_VID
-		Glue_set_vid_wrt_ptrs( handler );
-#else
-		Cpu_set_vid_wrt_ptrs( handler );	
-#endif /* C_VID */
-#else
-		Glue_set_vid_wrt_ptrs( handler );
-#endif /* A3CPU */
-#endif /* GISP_CPU */
-#endif /* EGATEST */
-#endif
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 820
 
 #ifndef PROD
-		last_handler = handler;
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 824
 
 		set_mark_funcs();
 
@@ -830,7 +559,11 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 		Last_v7_fg_bg = fg_bg_control;
 #endif
 	}
+#endif  //NEC_98
+#line 833
 }
 #endif /* REAL VGA */
 #endif /* EGG */
 
+#endif	/* !(NTVDM && MONITOR) */
+#line 837

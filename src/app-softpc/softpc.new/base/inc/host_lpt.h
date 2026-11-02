@@ -2,6 +2,10 @@
 
 #ifndef _HOST_LPT_H
 #define _HOST_LPT_H
+#if defined(NEC_98)         // NEC {
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else
+#line 5
 /*[
 	Name:		host_lpt.h
 	Derived From:	Base 2.0
@@ -131,14 +135,22 @@ IMPORT	BOOL		host_print_byte IPT2(int,adapter, byte, value);
 IMPORT	BOOL		host_print_doc IPT1(int,adapter);
 IMPORT	void		host_reset_print IPT1(int,adapter);
 IMPORT	void		host_print_auto_feed IPT2(int,adapter, BOOL,auto_feed);
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 134
 
 
 #ifdef PS_FLUSHING
-IMPORT void host_lpt_enable_autoflush IPT1(IS32, adapter);
-IMPORT void host_lpt_disable_autoflush IPT1(IS32, adapter);
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 140
 
 
+#if defined (NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#endif
+#line 142
 #define	HOST_LPT_BUSY	(1 << 0)
 #define	HOST_LPT_PEND	(1 << 1)
 #define	HOST_LPT_SELECT	(1 << 2)
@@ -154,6 +166,8 @@ IMPORT void host_lpt_disable_autoflush IPT1(IS32, adapter);
 
 #define	number_for_adapter(adapter)	(adapter + 1)
 
+#endif	// NEC_98                                          // NEC }
+#line 157
 
 #endif /* _HOST_LPT_H */
 

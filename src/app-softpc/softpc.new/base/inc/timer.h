@@ -75,8 +75,9 @@ extern void host_release_timer IPT0();
 extern void host_timer2_waveform IPT5(unsigned int, a, unsigned long, b,
 	unsigned long, c, int, d, int, e);
 #ifdef NTVDM
-void HostPpiState(half_word);
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
+#line 80
 extern void host_enable_timer2_sound IPT0();
 extern void host_disable_timer2_sound IPT0();
 #endif
@@ -88,9 +89,9 @@ extern IU32 host_speed IPT1( IU32, ControlMachineNumber );
 
 extern void host_timer_init IPT0();
 #ifdef SWIN_MOUSE_OPTS
-extern void host_timer_setup IPT1(BOOL, fast_timer);
-extern void generic_timer_setup IPT1(BOOL, fast_timer);
+#error "Unsupported SoftPC mirror configuration: SWIN_MOUSE_OPTS"
 #else
+#line 94
 extern void host_timer_setup IPT0();
 extern void generic_timer_setup IPT0();
 #endif /* SWIN_MOUSE_OPTS */
@@ -99,8 +100,9 @@ extern void host_timer_event IPT0();
 extern void generic_timer_event IPT0();
 
 #ifdef HUNTER
-extern word timer_batch_count;
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif /* HUNTER */
+#line 104
 
 extern int timer_int_enabled;
 extern boolean timer_video_enabled;
@@ -120,5 +122,6 @@ extern void (*timer_gate_func) IPT2(io_addr, port, half_word, value);
 extern void (*timer_tick_func) IPT0();
 
 #ifdef NTVDM
-extern ULONG EoiIntsPending;
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 125

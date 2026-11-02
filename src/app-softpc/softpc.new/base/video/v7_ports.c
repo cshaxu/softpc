@@ -40,13 +40,9 @@
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_VGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 50
 
 
 IMPORT	byte	crtc_0_7_protect;
@@ -89,6 +85,8 @@ io_addr         port;
 half_word       value;
 
 {
+#ifndef NEC_98
+#line 92
 	NON_PROD(if(io_verbose & EGA_PORTS_VERBOSE)fprintf(trace_file,"seq(6,%#x)\n",value);)
 	note_entrance2("vga_seq_extn_control(%x,%x)", port, value);
 
@@ -96,6 +94,8 @@ half_word       value;
 		sequencer.extensions_control.as_bfld.extension_enable = 1;
 	else if (value == 0xae)
 		sequencer.extensions_control.as_bfld.extension_enable = 0;
+#endif  //NEC_98
+#line 99
 }
 
 GLOBAL VOID
@@ -105,6 +105,8 @@ UTINY *rd_bank;
 UTINY *wrt_bank;
 
 {
+#ifndef NEC_98
+#line 108
 	if( get_seq_chain4_mode() && get_chain4_mode() ) {
 		set_v7_bank_for_seq_chain4( rd_bank, wrt_bank );
 	}
@@ -124,6 +126,8 @@ UTINY *wrt_bank;
 		*rd_bank=(extensions_controller.ram_bank_select.as_bfld.cpu_read_bank_select&1);
 		*wrt_bank=(extensions_controller.ram_bank_select.as_bfld.cpu_write_bank_select&1);
 	}
+#endif  //NEC_98
+#line 127
 }
 
 /*(
@@ -152,6 +156,8 @@ io_addr         port;
 half_word       value;
 
 {
+#ifndef NEC_98
+#line 155
 	half_word	old_value;
 
 	note_entrance2("vga_extn_outb(%x,%x)", port, value);
@@ -447,6 +453,8 @@ half_word       value;
 			        sequencer.address.as.abyte);)
 			break;
 	}
+#endif  //NEC_98
+#line 450
 }
 
 /*(
@@ -473,6 +481,8 @@ vga_extn_inb(port, value)
 io_addr         port;
 half_word       *value;
 {
+#ifndef NEC_98
+#line 476
 	note_entrance1("vga_extn_inb(%x)", port);
 
 	switch (sequencer.address.as.abyte) {
@@ -636,6 +646,8 @@ half_word       *value;
 
 	}
 	note_entrance1("returning %x",*value);
+#endif //NEC_98
+#line 639
 }
 
 /*(
@@ -659,6 +671,8 @@ Output:
 GLOBAL VOID
 draw_v7ptr()
 {
+#ifndef NEC_98
+#line 662
 	sys_addr pattern;
 
 	if (extensions_controller.cursor_attrs.as_bfld.pointer_enable)
@@ -711,6 +725,8 @@ draw_v7ptr()
 
 		(*paint_v7ptr)(pattern, curr_v7ptr_x, curr_v7ptr_y);
 	}
+#endif  //NEC_98
+#line 714
 }
 
 GLOBAL	VOID	remove_v7ptr IFN0()
@@ -735,6 +751,8 @@ GLOBAL	BOOL	v7ptr_between_lines IFN2(int, start_line, int, end_line)
  */
 GLOBAL void set_v7_fg_latch_byte IFN2(IU8, index, IU8, value)
 {
+#ifndef NEC_98
+#line 738
 	IU32 v7latch;
 
 	/* get current value */
@@ -765,6 +783,8 @@ GLOBAL void set_v7_fg_latch_byte IFN2(IU8, index, IU8, value)
 
 	/* update v7 latches */
 	setVideov7_fg_latches(v7latch);
+#endif  //NEC_98
+#line 768
 }
 #endif	/* CPU_40_STYLE */
 

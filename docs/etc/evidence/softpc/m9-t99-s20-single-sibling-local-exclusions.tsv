@@ -1,0 +1,5 @@
+path	baseline_if_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/bios/reset.c	201	213	ifdef	GISP_SVGA	b6ce70f53413fb6ac2e98c15fdc41b5cf35b6377c959deb4af0eeb480588ba60
+base/inc/bios.h	356	362	ifdef	ANSI	9e064868f7cc95a9069306eb0f1ac11ee64e22ffbc93dc8bb678081ab2903c00
+base/inc/sas.h	108	111	ifdef	GISP_CPU	a62f0c73ff1beb8569887eb9aeb523a17a6d4728f486a80b4d025bb5d857d8e0
+base/system/rom.c	316	329	ifdef	GISP_SVGA	00adec47225f4882adbc1688ebf2d18821b7ee9640cc53e9abf126ca9d2e581c

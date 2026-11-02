@@ -47,10 +47,7 @@ IMPORT void CrulesRuntimeError IPT1(char *, message);
 #define	REGLONG		0
 #endif
 #ifdef BIGEND
-#define UOFF_15_8(a)	((IU8 *)(a) + sizeof(IUH)-2)
-#define SOFF_15_8(a)	((IS8 *)(a) + sizeof(IUH)-2)
-#define	REGBYTE		(sizeof(IUH) -1)
-#define	REGWORD		(sizeof(IUH)/2 -1)
-#define	REGLONG		(sizeof(IUH)/4 -1)
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 56
 #define __J_C_LANG	/* mark as already included */

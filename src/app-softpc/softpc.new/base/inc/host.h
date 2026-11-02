@@ -20,8 +20,9 @@
  */
 
 #ifdef PC_CONFIG
-extern void pc_config();	
+#error "Unsupported SoftPC mirror configuration: PC_CONFIG"
 #endif
+#line 25
 
 IMPORT	VOID	host_flip_real_floppy_ind IPT2(int, drive, BOOL, active);
 
@@ -44,8 +45,9 @@ extern boolean         host_validate_pathname();
 extern boolean         host_check_rd_wt_access();
 extern boolean         host_check_read_access();
 #ifdef SUSPEND
-extern void	       suspend_softpc();
+#error "Unsupported SoftPC mirror configuration: SUSPEND"
 #endif
+#line 49
 #ifndef REAL_VGA
 /* DIVERGENCE MVDM-HOST-DIV-090: bind the exact original host_def.h provider
  * carrier; `ULONG *` only happened to match `unsigned int *` on NT4. */
@@ -56,11 +58,7 @@ IMPORT VOID fill_alternate_bytes IPT3( IS8 *, start, IS8 *, end, IS8, value);
 IMPORT VOID fill_both_bytes IPT3( IU16, data, IU16 *, dest, ULONG, len );
 
 #ifdef	SETUID_ROOT
-
-/* real/effective user ID stuff */
-IMPORT void host_init_uid IPT0 ();
-IMPORT void host_set_root IPT0 ();
-IMPORT void host_revert_uid IPT0 ();
-
+#error "Unsupported SoftPC mirror configuration: SETUID_ROOT"
 #endif	/* SETUID_ROOT */
+#line 66
 

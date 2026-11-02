@@ -1,0 +1,5 @@
+path	selected_anchor	baseline_selected_line	baseline_after_line
+base/inc/egacpu.h	} VGA_GLOBALS;	117	118
+base/inc/egacpu.h	extern struct EGA_CPU_GLOBALS	123	124
+base/inc/egacpu.h	} EGA_CPU;	159	160
+base/inc/egacpu.h	globals member	125	136

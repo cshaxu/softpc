@@ -85,6 +85,10 @@ extern HANDLE GHModule;	  /* Holds currently run processes module handle */
 /* Startup and Error reporting related strings */
 #define ED_WOWPROMPT    333     // special prompt for wow
 #define ED_WOWTITLE     334     // title message for win16 subsystem
+#ifdef DBCS
+#error "Unsupported SoftPC mirror configuration: DBCS"
+#endif // DBCS
+#line 94
 
 #define ED_BADSYSFILE   336
 #define ED_INITMEMERR   337
@@ -103,6 +107,10 @@ extern HANDLE GHModule;	  /* Holds currently run processes module handle */
 #define IDS_BURRRR         502      /* Frozen graphics window '-FROZEN' */
 
 #define EXIT_NO_CLOSE      503      /* Console window title - Inactive */
+#ifdef DBCS	    /* this should go to US build also */
+#error "Unsupported SoftPC mirror configuration: DBCS"
+#endif // DBCS
+#line 120
 
 
 /* entries from 1000+ are reserved for host errors. See host\inc\host_rrr.h */

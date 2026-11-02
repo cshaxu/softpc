@@ -284,9 +284,9 @@ IFN5(
 	 flags = flags & ~BIT14_MASK;   /* clear NT */
       spr_write_dword(next_addr, (IU32)flags);
 #ifdef PIG
-      /* Note the possibility of unknown flags "pushed" */
-      record_flags_addr(next_addr);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 290
       next_addr += 4;
 
       spr_write_dword(next_addr, GET_EAX());
@@ -336,9 +336,9 @@ IFN5(
 	 flags = flags & ~BIT14_MASK;   /* clear NT */
       spr_write_word(next_addr, (IU16)flags);
 #ifdef PIG
-      /* Note the possibility of unknown flags "pushed" */
-      record_flags_addr(next_addr);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 342
       next_addr += 2;
 
       spr_write_word(next_addr, GET_AX());
@@ -560,12 +560,9 @@ IFN5(
    /* code ok, load hidden cache */
    load_CS_cache(new_cs, cs_descr, &cs_entry);
 #if 0
-   /* retain operand size from gate until first instruction fetch */
-   if ( GET_CS_AR_X() == USE16 )
-      SET_OPERAND_SIZE(USE16);
-   else   /* USE32 */
-      SET_OPERAND_SIZE(USE32);
+#error "Unsupported SoftPC mirror configuration: disabled branch"
 #endif
+#line 569
 
    /* check new SS and load if ok */
    if ( GET_VM() == 1 )

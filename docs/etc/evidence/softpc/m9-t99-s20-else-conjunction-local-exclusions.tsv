@@ -1,0 +1,2 @@
+path	parent_if_line	baseline_else_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/system/ica.c	2001	2015	2023	if	defined(CPU_40_STYLE) && !defined(NTVDM)	471245401c046ede84144c1caed5cdeb2da40331c72f0c0e90f2aa23e748509b

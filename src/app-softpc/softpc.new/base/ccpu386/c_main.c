@@ -23,8 +23,9 @@ Actual worker routines are spun off elsewhere.
 #include  <sas.h>	/* need memory(M)     */
 #include  <ccpusas4.h>	/* the cpu internal sas bits */
 #ifdef	PIG
-#include  <Cpu_c.h>	/* Intel pointer manipulation macros */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 28
 #include CpuH
 /* #include "event.h" */	/* Event Manager         */
 #include  <bios.h>	/* need access to bop */
@@ -214,20 +215,17 @@ typedef union
 #define X_OFF 0
 
 #else /* BIGEND */
-
-#define L_OFF 3
-#define H_OFF 2
-#define X_OFF 2
-
+#error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif /* LITTLEND */
+#line 223
 
 /* CPU hardware interrupt definitions */
 #define CPU_HW_INT_MASK         (1 << 0)
 
 #ifdef SFELLOW
-	/* for raising NPX interrupt */
-#define IRQ5_SLAVE_PIC	5
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 231
 
 /* CPU hardware interrupt definitions */
 #define CPU_HW_INT_MASK         (1 << 0)
@@ -238,13 +236,15 @@ typedef union
 #define CPU_RESET_EXCEPTION_MASK        (1 << 14)
 #define CPU_SIGALRM_EXCEPTION_MASK      (1 << 15)
 #ifdef SFELLOW
-#define CPU_HW_NPX_INT_MASK         	(1 << 16)
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 224
 
 LOCAL IU16 cpu_hw_interrupt_number;
 #if defined(SFELLOW)
-extern IU32	cpu_interrupt_map ;
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 229
 LOCAL IUM32	cpu_interrupt_map = 0;
 #endif	/* SFELLOW */
 
@@ -305,28 +305,9 @@ LOCAL BOOL quick_mode = FALSE;	/* true if no special processing (trap
 
 
 #ifdef	PIG
-
-/* We must delay the actual synch (i.e. the c_cpu_unsimulate)
- * until after processing any trap/breakpoint stuff.
- */
-#define	PIG_SYNCH(action)			\
-	SYNCH_TICK();				\
-	if (ccpu_pig_enabled)			\
-	{					\
-		pig_cpu_action = (action);	\
-		quick_mode = FALSE;		\
-		pig_synch_required = TRUE;	\
-		CANCEL_HOST_IP();		\
-	}
-	
-
-LOCAL IBOOL pig_synch_required = FALSE; /* This indicates that the current
-					 * instruction needs a pig synch,
-					 * and after trap/breakpoint
-					 * processing we must return to
-					 * the pigger.
-					 */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 330
 
 #define	PIG_SYNCH(action)			\
 	SYNCH_TICK();				\
@@ -353,11 +334,9 @@ LOCAL jmp_buf next_inst[FRAMES];
  * our buffer.
  */
 #ifdef	PIG
-LOCAL int prefix_length = 0;
-#define	CHECK_PREFIX_LENGTH()				\
-	if (++prefix_length >= MAX_INTEL_PREFIX)	\
-		Int6();
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else	/* !PIG */
+#line 361
 #define	CHECK_PREFIX_LENGTH()
 #endif	/* PIG */
 
@@ -532,29 +511,9 @@ IMPORT VOID dispatch_q_event();
 
 #ifndef SFELLOW
 #ifdef SYNCH_TIMERS
-
-#define SYNCH_TICK()					\
-	{						\
-		PigSynchCount += 1;			\
-		if (cpu_heartbeat != 0)			\
-		{					\
-			if ((--cpu_heartbeat) == 0)	\
-			{				\
-				dispatch_q_event();	\
-				quick_mode = FALSE;	\
-			}				\
-		}					\
-	}
-
-#define QUICK_EVENT_TICK()	/* Nothing */
-
-GLOBAL void SynchTick IFN0()
-{
-	quick_mode = FALSE;
-	SYNCH_TICK();
-}
-
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else	/* !SYNCH_TIMERS */
+#line 558
 
 #define SYNCH_TICK()	/* Nothing */
 
@@ -571,38 +530,14 @@ GLOBAL void SynchTick IFN0()
 
 #endif /* SYNCH_TIMERS */
 #else	/* SFELLOW */
-
-extern IBOOL qEventsToDo;
-extern IBOOL checkForQEvent IPT0();
-
-#define SYNCH_TICK()
-
-#define QUICK_EVENT_TICK() 				\
-	{						\
-		if (qEventsToDo)			\
-		{					\
-			if (checkForQEvent())		\
-			{				\
-				dispatch_q_event();	\
-				quick_mode = FALSE;	\
-			}				\
-		}					\
-	}
-
-#ifdef host_timer_event
-#undef host_timer_event
-#endif
-
-#define host_timer_event()
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 598
 
 #ifdef SFELLOW
-extern int ica_intack IPT0();
-extern int VectorBase8259Slave IPT0();
-#if !defined(PROD)
-IMPORT IBOOL sf_debug_char_waiting();
-#endif	/* !PROD */
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 545
 
 
 /* debugging stuff */
@@ -652,20 +587,14 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
 /* setup host format IP from Intel format IP */
 /*    and set up end of page marker          */
 #ifdef PIG
-#define SETUP_HOST_IP(x)							\
-   ip_phy_addr = usr_chk_byte(GET_CS_BASE() + GET_EIP(), PG_R) & SasWrapMask;	\
-   x = Sas.SasPtrToPhysAddrByte(ip_phy_addr);					\
-   pg_end = AddCpuPtrLS8(CeilingIntelPageLS8(x), 1);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else /* !PIG */
+#line 598
 GLOBAL UTINY *CCPU_M;
 #ifdef BACK_M
-#define SETUP_HOST_IP(x)							\
-   ip_phy_addr = usr_chk_byte(GET_CS_BASE() + GET_EIP(), PG_R) &		\
-		    SasWrapMask;						\
-   x = &CCPU_M[-ip_phy_addr];							\
-   ip_phy_addr = (ip_phy_addr & ~0xfff) + 0x1000;				\
-   pg_end = &CCPU_M[-ip_phy_addr];
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 669
 #define SETUP_HOST_IP(x)							\
    ip_phy_addr = usr_chk_byte(GET_CS_BASE() + GET_EIP(), PG_R) &		\
 		    SasWrapMask;						\
@@ -690,13 +619,9 @@ GLOBAL ULONG m_la2[3];		/* Memory Operand(2) Linear Addr. */
 GLOBAL ULONG m_pa2[3];		/* Memory Operand(2) Physical Addr. */
 
 #if defined(PIG) && defined(SFELLOW)
-/*
- * memory-mapped I/O information. Counts number of memory-mapped inputs and
- * outputs since the last pig synch.
- */
-GLOBAL	struct pig_mmio_info	pig_mmio_info;
-
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* PIG && SFELLOW */
+#line 638
 
 extern void InitNpx IPT1(IBOOL, disable);
 
@@ -822,27 +747,22 @@ IFN1(
    took_relative_jump = FALSE;
    took_absolute_toc = FALSE;
 #ifdef PIG
-   pig_synch_required = FALSE;
-#if defined(SFELLOW)
-   pig_mmio_info.flags &= ~(MM_INPUT_OCCURRED | MM_OUTPUT_OCCURRED);
-#endif	/* SFELLOW */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 767
 
    /* somewhere for exceptions to return to */
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
    setjmp(*ccpu386ThrdExptnPtr());
 #else
-   setjmp(next_inst[simulate_level-1]);
+#error "Unsupported SoftPC mirror configuration: no CCPU TLS simulation stack"
 #endif
+#line 774
 
 #ifdef SYNCH_TIMERS
-   /* If we have taken a fault the EDL Cpu will have checked on
-    * the resulting transfer of control.
-    */
-   if (took_absolute_toc || took_relative_jump)
-	   goto CHECK_INTERRUPT;
-   quick_mode = TRUE;
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else /* SYNCH_TIMERS */
+#line 783
    /* go slow until we are sure we can go fast */
    quick_mode = FALSE;
 #endif /* SYNCH_TIMERS */
@@ -871,8 +791,9 @@ DO_INST:
 
    /* INSIGNIA debugging */
 #ifdef	PIG
-   /* We do not want to do check_I() in both CPUs */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else	/* PIG */
+#line 796
    if ( do_condition_checks )
       {
       check_I();
@@ -881,9 +802,9 @@ DO_INST:
 #endif	/* !PIG */
 
 #ifdef	PIG
-   save_last_inst_details(NULL);
-   prefix_length = 0;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 887
 
    QUICK_EVENT_TICK();
 
@@ -1175,14 +1096,9 @@ TYPE0F01_2:
 	 case 7:   /* T2 INVLPG Mm */
 
 #ifdef SPC486
-	    note_486_instruction("INVLPG");
-
-	    if ( GET_CPL() != 0 )
-	       GP((IU16)0, FAULT_CCPU_INVLPG_ACCESS);
-	    D_Mm(0);
-	    F_Mm(0);
-	    INVLPG(ops[0].sng);
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1186
 	    Int6();
 #endif /* SPC486 */
 
@@ -1300,12 +1216,9 @@ TYPE0F02:
       case  0x08:   /* T0 INVD */
 
 #ifdef SPC486
-	 note_486_instruction("INVD");
-
-	 if ( GET_CPL() != 0 )
-	    GP((IU16)0, FAULT_CCPU_INVD_ACCESS);
-	 INVD();
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1309
 	 Int6();
 #endif /* SPC486 */
 
@@ -1314,12 +1227,9 @@ TYPE0F02:
       case  0x09:   /* T0 WBINVD */
 
 #ifdef SPC486
-	 note_486_instruction("WBINVD");
-
-	 if ( GET_CPL() != 0 )
-	    GP((IU16)0, FAULT_CCPU_WBIND_ACCESS);
-	 WBINVD();
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1323
 	 Int6();
 #endif /* SPC486 */
 
@@ -1327,10 +1237,9 @@ TYPE0F02:
 
       case  0x0f:
 #ifdef PIG
-	 SET_EIP(CCPU_save_EIP);
-	 CANCEL_HOST_IP();
-	 PIG_SYNCH(CHECK_NO_EXEC);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 1334
 	 Int6();
 #endif /* PIG */
 	 break;
@@ -1481,8 +1390,9 @@ TYPE0F90:
       case  0xa3:   /* T6 BT Ev Gv */
 	 inst32328 = BT;
 #ifndef FIX_BT_BUG
-	goto TYPE39;
+#error "Unsupported SoftPC mirror configuration: !FIX_BT_BUG"
 #endif
+#line 1486
 	 modRM = GET_INST_BYTE(p);
 	 if ( GET_OPERAND_SIZE() == USE16 )
 	    {
@@ -1553,8 +1463,9 @@ TYPE0FA5:
       case  0xab:   /* T5 BTS Ev Gv */
 	 instp32328 = BTS;
 #ifndef FIX_BT_BUG
-	goto TYPE01;
+#error "Unsupported SoftPC mirror configuration: !FIX_BT_BUG"
 #endif
+#line 1558
 TYPE0FAB:
 	 modRM = GET_INST_BYTE(p);
 	 if ( GET_OPERAND_SIZE() == USE16 )
@@ -1604,16 +1515,9 @@ TYPE0FAB:
       case  0xb0:   /* T5 CMPXCHG Eb Gb */
 
 #ifdef SPC486
-	 note_486_instruction("CMPXCHG Eb Gb");
-
-	 modRM = GET_INST_BYTE(p);
-	 D_Eb(0, RW0, PG_W);
-	 D_Gb(1);
-	 F_Eb(0);
-	 F_Gb(1);
-	 CMPXCHG8(&ops[0].sng, ops[1].sng);
-	 P_Eb(0);
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1617
 	 Int6();
 #endif /* SPC486 */
 
@@ -1622,28 +1526,9 @@ TYPE0FAB:
       case  0xb1:   /* T5 CMPXCHG Ev Gv */
 
 #ifdef SPC486
-	 note_486_instruction("CMPXCHG Ev Gv");
-
-	 modRM = GET_INST_BYTE(p);
-	 if ( GET_OPERAND_SIZE() == USE16 )
-	    {
-	    D_Ew(0, RW0, PG_W);
-	    D_Gw(1);
-	    F_Ew(0);
-	    F_Gw(1);
-	    CMPXCHG16(&ops[0].sng, ops[1].sng);
-	    P_Ew(0);
-	    }
-	 else   /* USE32 */
-	    {
-	    D_Ed(0, RW0, PG_W);
-	    D_Gd(1);
-	    F_Ed(0);
-	    F_Gd(1);
-	    CMPXCHG32(&ops[0].sng, ops[1].sng);
-	    P_Ed(0);
-	    }
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1647
 	 Int6();
 #endif /* SPC486 */
 
@@ -1651,8 +1536,9 @@ TYPE0FAB:
 
       case  0xb2:   /* T4 LSS Gv Mp */   instp32p32 = LSS;   goto TYPEC4;
 #ifndef FIX_BT_BUG
-      case  0xb3:   /* T5 BTR Ev Gv */   instp32328 = BTR;   goto TYPE01;
+#error "Unsupported SoftPC mirror configuration: !FIX_BT_BUG"
 #else
+#line 1576
       case  0xb3:   /* T5 BTR Ev Gv */   instp32328 = BTR;   goto TYPE0FAB;
 #endif
       case  0xb4:   /* T4 LFS Gv Mp */   instp32p32 = LFS;   goto TYPEC4;
@@ -1721,8 +1607,9 @@ TYPE0FAB:
       case  0xbb:   /* T5 BTC Ev Gv */
 	 instp32328 = BTC;
 #ifndef FIX_BT_BUG
-	 goto TYPE01;
+#error "Unsupported SoftPC mirror configuration: !FIX_BT_BUG"
 #else
+#line 1646
 	 goto TYPE0FAB;
 #endif
       case  0xbc:   /* T5 BSF Gv Ev */
@@ -1783,17 +1670,9 @@ TYPE0FAB:
       case  0xc0:   /* T8 XADD Eb Gb */
 
 #ifdef SPC486
-	 note_486_instruction("XADD Eb Gb");
-
-	 modRM = GET_INST_BYTE(p);
-	 D_Eb(0, RW0, PG_W);
-	 D_Gb(1);
-	 F_Eb(0);
-	 F_Gb(1);
-	 XADD(&ops[0].sng, &ops[1].sng, 8);
-	 P_Eb(0);
-	 P_Gb(1);
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1797
 	 Int6();
 #endif /* SPC486 */
 
@@ -1802,30 +1681,9 @@ TYPE0FAB:
       case  0xc1:   /* T8 XADD Ev Gv */
 
 #ifdef SPC486
-	 note_486_instruction("XADD Ev Gv");
-
-	 modRM = GET_INST_BYTE(p);
-	 if ( GET_OPERAND_SIZE() == USE16 )
-	    {
-	    D_Ew(0, RW0, PG_W);
-	    D_Gw(1);
-	    F_Ew(0);
-	    F_Gw(1);
-	    XADD(&ops[0].sng, &ops[1].sng, 16);
-	    P_Ew(0);
-	    P_Gw(1);
-	    }
-	 else   /* USE32 */
-	    {
-	    D_Ed(0, RW0, PG_W);
-	    D_Gd(1);
-	    F_Ed(0);
-	    F_Gd(1);
-	    XADD(&ops[0].sng, &ops[1].sng, 32);
-	    P_Ed(0);
-	    P_Gd(1);
-	    }
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1829
 	 Int6();
 #endif /* SPC486 */
 
@@ -1841,23 +1699,9 @@ TYPE0FAB:
       case  0xcf:
 
 #ifdef SPC486
-	 note_486_instruction("BSWAP Hv");
-
-	 if ( GET_OPERAND_SIZE() == USE16 )
-	    {
-	    D_Hd(0);		/* BSWAP 16 bit reads 32 bit & writes 16 */
-	    F_Hd(0);		/* so getting EAX -> EAX' -> AX */
-	    BSWAP(&ops[0].sng);
-	    P_Hw(0);
-	    }
-	 else   /* USE32 */
-	    {
-	    D_Hd(0);
-	    F_Hd(0);
-	    BSWAP(&ops[0].sng);
-	    P_Hd(0);
-	    }
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 1861
 	 Int6();
 #endif /* SPC486 */
 
@@ -2277,8 +2121,9 @@ TYPE40:
 	  */
 	 }
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 2282
       PIG_SYNCH(CHECK_SOME_MEM);
       quick_mode = FALSE;
       break;
@@ -2318,8 +2163,9 @@ TYPE40:
 	    }
 	 }
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 2323
       PIG_SYNCH(CHECK_SOME_MEM);
       quick_mode = FALSE;
       break;
@@ -2341,8 +2187,9 @@ TYPE40:
 	 /* KNOWN BUG #1. */
 	 }
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 2346
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -2382,8 +2229,9 @@ TYPE40:
 	    }
 	 }
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 2387
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -2395,75 +2243,16 @@ TYPE70:
       D_Jb(0);
       UPDATE_INTEL_IP_USE_OP_SIZE(p);
 #ifdef PIG
-      if ((opcode != 0xeb) && (ops[0].sng == 3))
-      {
-	/* Convert the EDL cpu super-instructions
-	 *
-	 *	Jcc	.+03
-	 *	JMPN	dst
-	 *
-	 * into
-	 *
-	 *	Jcc'	dest
-	 */
-	 int offset_in_page = DiffCpuPtrsLS8(FloorIntelPageLS8(p), p);
-
-	 if ((GET_CS_AR_X() == 0)
-	     && (offset_in_page != 0)
-	     && (offset_in_page <= 0xFFD)
-	     && (*p == 0xe9)) 
-	 {
-		 p_start = p;
-		 (void)GET_INST_BYTE(p);
-		 switch (opcode)
-		 {
-		 case 0x70:   /* T2 JO   Jb */   inst32 = JNO;    goto TYPE0F80;
-		 case 0x71:   /* T2 JNO  Jb */   inst32 = JO;     goto TYPE0F80;
-		 case 0x72:   /* T2 JB   Jb */   inst32 = JNB;    goto TYPE0F80;
-		 case 0x73:   /* T2 JNB  Jb */   inst32 = JB;     goto TYPE0F80;
-		 case 0x74:   /* T2 JZ   Jb */   inst32 = JNZ;    goto TYPE0F80;
-		 case 0x75:   /* T2 JNZ  Jb */   inst32 = JZ;     goto TYPE0F80;
-		 case 0x76:   /* T2 JBE  Jb */   inst32 = JNBE;   goto TYPE0F80;
-		 case 0x77:   /* T2 JNBE Jb */   inst32 = JBE;    goto TYPE0F80;
-		 case 0x78:   /* T2 JS   Jb */   inst32 = JNS;    goto TYPE0F80;
-		 case 0x79:   /* T2 JNS  Jb */   inst32 = JS;     goto TYPE0F80;
-		 case 0x7a:   /* T2 JP   Jb */   inst32 = JNP;    goto TYPE0F80;
-		 case 0x7b:   /* T2 JNP  Jb */   inst32 = JP;     goto TYPE0F80;
-		 case 0x7c:   /* T2 JL   Jb */   inst32 = JNL;    goto TYPE0F80;
-		 case 0x7d:   /* T2 JNL  Jb */   inst32 = JL;     goto TYPE0F80;
-		 case 0x7e:   /* T2 JLE  Jb */   inst32 = JNLE;   goto TYPE0F80;
-		 case 0x7f:   /* T2 JNLE Jb */   inst32 = JLE;    goto TYPE0F80;
-		 default:
-			 break;
-		 }
-	 }
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 2442
       (*inst32)(ops[0].sng);
       CANCEL_HOST_IP();
 
 #ifdef PIG
-      if (single_instruction_delay && !took_relative_jump)
-      {
-	 if (single_instruction_delay_enable)
-	 {
-	    save_last_xcptn_details("STI/POPF blindspot\n", 0, 0, 0, 0, 0);
-	    PIG_SYNCH(CHECK_NO_EXEC);
-         }
-	 else
-	 {
-	    save_last_xcptn_details("STI/POPF problem\n", 0, 0, 0, 0, 0);
-	 }
-	 break;
-      }
-#ifdef SYNCH_BOTH_WAYS
-      took_relative_jump = TRUE;
-#endif	/* SYNCH_BOTH_WAYS */
-      if (took_relative_jump)
-      {
-	 PIG_SYNCH(CHECK_ALL);
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 2467
       break;
 
    case 0x71:   /* T2 JNO  Jb */   inst32 = JNO;    goto TYPE70;
@@ -2909,21 +2698,9 @@ TYPE9A:
 	 POPFD();
 	 }
 #ifdef PIG
-      if (getIF()==1 && oldIF==0)
-      {
-          /* locally update IP - interrupts are supressed after POPF */
-          UPDATE_INTEL_IP(p);
-
-	  /* We need to pig sync one instr *after* an POPF that enabled
-	   * interrupts, because the A4CPU might need to take a H/W interrupt
-	   */
-
-	  single_instruction_delay = TRUE;
-	  PIG_SYNCH(CHECK_ALL);
-          softpc_host_debug_retired();
-          goto NEXT_INST;
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 2927
 
       quick_mode = FALSE;
       break;
@@ -3394,29 +3171,18 @@ TYPEC4:
 	  }
           immed |= ops[0].sng;
 #ifdef	PIG
-          if (immed == 0xfe)
-	     SET_EIP(CCPU_save_EIP);
-	  else
-	     UPDATE_INTEL_IP(p);
-	  CANCEL_HOST_IP();
-	  PIG_SYNCH(CHECK_NO_EXEC);	/* Everything checkable up to this point */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else	/* PIG */
+#line 3404
 	  UPDATE_INTEL_IP(p);
           if ((immed & 0xff) == 0xfe)
           {
 		  switch(immed)
 		  {
 #if defined(SFELLOW)
-		  case 0x03fe:
-			    SfdelayUSecs();
-			    break;
-		  case 0x05fe:
-			    SfsasTouchBop();
-			    break;
-		  case 0x06fe:
-			    SfscatterGatherSasTouch();
-			    break;
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif /* SFELLOW */
+#line 3420
 		  case 0xfe:
 			  c_cpu_unsimulate();
 			  /* Never returns (?) */
@@ -3579,16 +3345,9 @@ TYPEC4:
       PIG_SYNCH(CHECK_ALL);
       /* Dont do interrupt checks etc after an IRET */
 #ifdef PIG
-      /* If the destination is going to page fault, or need
-       * accessing, then the EDL CPU will do so before issuing
-       * the pig synch. We use the dasm386 decode to prefetch
-       * a single instruction which mimics the EDL Cpu's behaviour
-       * when close to a page boundary.
-       */
-      prefetch_1_instruction();	/* Will PF if destination not present */
-      ccpu_synch_count++;
-      c_cpu_unsimulate();
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 3592
 
       softpc_host_debug_retired();
       goto NEXT_INST;
@@ -3753,11 +3512,9 @@ TYPED4:
 	}
 
 #ifdef	PIG
-	/* Must get npx registers from test CPU
-	 * This is lazily done for efficiency.
-	 */
-	c_checkCpuNpxRegisters();
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 3761
 
 	modRM = GET_INST_BYTE(p);
 	ZFRSRVD(((opcode-0xd8)*0x100) + modRM);
@@ -3781,27 +3538,9 @@ TYPEE0:
       CANCEL_HOST_IP();
 
 #ifdef PIG
-      if (single_instruction_delay && !took_relative_jump)
-      {
-	 if (single_instruction_delay_enable)
-	 {
-	    save_last_xcptn_details("STI/POPF blindspot\n", 0, 0, 0, 0, 0);
-	    PIG_SYNCH(CHECK_NO_EXEC);
-         }
-	 else
-	 {
-	    save_last_xcptn_details("STI/POPF problem\n", 0, 0, 0, 0, 0);
-	 }
-	 break;
-      }
-#ifdef SYNCH_BOTH_WAYS
-      took_relative_jump = TRUE;
-#endif	/* SYNCH_BOTH_WAYS */
-      if (took_relative_jump)
-      {
-	 PIG_SYNCH(CHECK_ALL);
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 3805
       break;
 
    case 0xe1:   /* T2 LOOPE  Jb */
@@ -3828,8 +3567,9 @@ TYPEE0:
       IN8(&ops[0].sng, ops[1].sng);
       P_Fal(0);
 #ifdef PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3833
       PIG_SYNCH(CHECK_NO_AL);
       quick_mode = FALSE;
       break;
@@ -3845,8 +3585,9 @@ TYPEE0:
 	 IN16(&ops[0].sng, ops[1].sng);
 	 P_Fax(0);
 #ifdef PIG
-	 UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3850
          PIG_SYNCH(CHECK_NO_AX);
 	 }
       else   /* USE32 */
@@ -3857,8 +3598,9 @@ TYPEE0:
 	 IN32(&ops[0].sng, ops[1].sng);
 	 P_Feax(0);
 #ifdef PIG
-	 UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3862
 	 PIG_SYNCH(CHECK_NO_EAX);
 	 }
       quick_mode = FALSE;
@@ -3873,17 +3615,9 @@ TYPEE0:
       F_Fal(1);
       OUT8(ops[0].sng, ops[1].sng);
 #ifdef PIG
-      UPDATE_INTEL_IP(p);
-      if (ops[0].sng == 0x60)
-         {
-	      /* This may be a change of A20 wrap status */
-	      PIG_SYNCH(CHECK_NO_A20);
-         }
-      else
-         {
-         PIG_SYNCH(CHECK_ALL);
-         }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 3887
       SYNCH_TICK();
 #endif
       break;
@@ -3908,8 +3642,9 @@ TYPEE0:
 	 OUT32(ops[0].sng, ops[1].sng);
 	 }
 #ifdef PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3913
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -3956,8 +3691,9 @@ TYPEE8:
       IN8(&ops[0].sng, ops[1].sng);
       P_Fal(0);
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3961
       PIG_SYNCH(CHECK_NO_AL);
       quick_mode = FALSE;
       break;
@@ -3973,8 +3709,9 @@ TYPEE8:
 	 IN16(&ops[0].sng, ops[1].sng);
 	 P_Fax(0);
 #ifdef PIG
-	 UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3978
          PIG_SYNCH(CHECK_NO_AX);
 	 }
       else   /* USE32 */
@@ -3985,8 +3722,9 @@ TYPEE8:
 	 IN32(&ops[0].sng, ops[1].sng);
 	 P_Feax(0);
 #ifdef PIG
-	 UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 3990
          PIG_SYNCH(CHECK_NO_EAX);
 	 }
       quick_mode = FALSE;
@@ -4001,8 +3739,9 @@ TYPEE8:
       F_Fal(1);
       OUT8(ops[0].sng, ops[1].sng);
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 4006
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -4027,8 +3766,9 @@ TYPEE8:
 	 OUT32(ops[0].sng, ops[1].sng);
 	 }
 #ifdef	PIG
-      UPDATE_INTEL_IP(p);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 4032
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -4090,12 +3830,9 @@ RESUME_HALT:
 
 
 #ifndef	PROD
-	 if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
-	    {
-	    cpu_interrupt_map &= ~CPU_SAD_EXCEPTION_MASK;
-	    force_yoda();
-	    }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
+#line 4099
 
          /* HLT is still an original CCPU instruction-safe
             rendezvous.  Consume host mailbox records here
@@ -4297,12 +4034,9 @@ TYPEF7_6:
       UPDATE_INTEL_IP(p);
 
 #ifdef PIG
-      /* We need to pig sync one instr *after* an STI that enabled
-       * interrupts, because the A4CPU might need to take a H/W interrupt
-       */
-      single_instruction_delay = TRUE;
-      PIG_SYNCH(CHECK_ALL);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 4306
       softpc_host_debug_retired();
       goto NEXT_INST;
 
@@ -4438,14 +4172,16 @@ TYPEFF_3:
       goto DO_INST;
 
 #ifdef SYNCH_TIMERS
- CHECK_INTERRUPT:
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
+#line 4443
    quick_mode = FALSE;
 
    /* Action RESET first. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 #ifdef SYNCH_TIMERS
-   if (took_absolute_toc || took_relative_jump)
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
+#line 4338
    if (cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK)
       {
       cpu_interrupt_map &= ~CPU_RESET_EXCEPTION_MASK;
@@ -4462,8 +4198,9 @@ TYPEFF_3:
    /* Action Insignia (ie non Intel) Processing. <<<<<<<<<<<<<<< */
 
 #ifdef SYNCH_TIMERS
-   if (took_absolute_toc || took_relative_jump)
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
+#line 4467
    if (cpu_interrupt_map & CPU_SIGALRM_EXCEPTION_MASK)
       {
       cpu_interrupt_map &= ~CPU_SIGALRM_EXCEPTION_MASK;
@@ -4520,8 +4257,9 @@ TYPEFF_3:
       }
 
 #ifdef SYNCH_TIMERS
-   if (took_absolute_toc || took_relative_jump)
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
+#line 4525
 #ifndef SFELLOW
    if (GET_IF() && (cpu_interrupt_map & CPU_HW_INT_MASK))
       {
@@ -4549,72 +4287,14 @@ TYPEFF_3:
 	 }
       }
 #else	/* SFELLOW */
-   if (GET_IF() && (cpu_interrupt_map & (CPU_HW_INT_MASK | CPU_HW_NPX_INT_MASK)))
-      {
-	/* service any pending real H/W interrupt first */
-      	if (cpu_interrupt_map & CPU_HW_INT_MASK)
-      	{
-		 cpu_hw_interrupt_number = ica_intack();
-		 cpu_interrupt_map &= ~CPU_HW_INT_MASK;
-		 EXT = EXTERNAL;
-		 do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
-		 CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
-	}
-	else
-      	if (cpu_interrupt_map & CPU_HW_NPX_INT_MASK)
-      	{
-		 cpu_hw_interrupt_number = IRQ5_SLAVE_PIC + VectorBase8259Slave();
-		 cpu_interrupt_map &= ~CPU_HW_NPX_INT_MASK;
-		 EXT = EXTERNAL;
-		 do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
-		 CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
-	}
-      }
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 4574
 
 #ifdef PIG
-   if ( pig_synch_required )
-      {
-      if (IgnoringThisSynchPoint(GET_CS_SELECTOR(), GET_EIP()))
-      {
-      	pig_synch_required = FALSE;
-      }
-      else
-      {
-      /* If the destination is going to page fault, or need
-       * accessing, then the EDL CPU will do so before issuing
-       * the pig synch. We use the dasm386 decode to prefetch
-       * a single instruction which mimics the EDL Cpu's behaviour
-       * when close to a page boundary.
-       */
-      prefetch_1_instruction();	/* Will PF if destination not present */
-#if defined(SFELLOW)
-      /*
-       * Check for occurrence of memory-mapped input.
-       * This initial crude implementation just leaves the entire synch
-       * section unchecked.
-       */
-      if ( pig_mmio_info.flags & MM_INPUT_OCCURRED )
-      {
-         pig_cpu_action = CHECK_NONE;	/* cos' its effects are unknown */
-#if COLLECT_MMIO_STATS
-         if ( ++pig_mmio_info.mm_input_section_count == 0 )
-            pig_mmio_info.flags |= MM_INPUT_SECTION_COUNT_WRAPPED;
-#endif	/* COLLECT_MMIO_STATS */
-      }
-      if ( pig_mmio_info.flags & MM_OUTPUT_OCCURRED )
-      {
-#if COLLECT_MMIO_STATS
-         if ( ++pig_mmio_info.mm_output_section_count == 0 )
-            pig_mmio_info.flags |= MM_OUTPUT_SECTION_COUNT_WRAPPED;
-#endif	/* COLLECT_MMIO_STATS */
-      }
-#endif	/* SFELLOW */
-      ccpu_synch_count++;
-      c_cpu_unsimulate();
-      }
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 4618
 
 NEXT_INST:
 
@@ -4644,11 +4324,9 @@ RESUME_FETCH:
    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
 
 #if defined(SFELLOW) && !defined(PROD)
-	if (sf_debug_char_waiting())
-	{
-	   force_yoda();
-	}
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* SFELLOW && !PROD */
+#line 4652
 
    /* Reset default mode */
    SET_OPERAND_SIZE(GET_CS_AR_X());
@@ -4679,8 +4357,9 @@ RESUME_FETCH:
 	start_trap == 0 &&
 	nr_inst_break == 0
 #ifdef PIG
-	&& !pig_synch_required
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 4684
 	)
       {
 	quick_mode = TRUE;
@@ -4790,11 +4469,13 @@ LOCAL VOID
       p_start = *q;
 
 #ifdef	PIG
-      return *IncCpuPtrLS8(*q);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else /* PIG */
+#line 4795
 #ifdef BACK_M
-      return *(*q)--;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 4798
       return *(*q)++;
 #endif /* BACK_M */
 #endif /* PIG */
@@ -4809,31 +4490,9 @@ LOCAL VOID
       SAVED IBOOL first = TRUE;
 
 #ifdef	PIG
-      SAVED char default_flags[] = "faults accessed";
-
-      if (first)
-      {
-	char *s = getenv("FLAGS_IGNORE_DEFAULT");
-	if (s)
-	  set_flags_ignore(s);
-	else
-	  set_flags_ignore(default_flags);
-	single_instruction_delay_enable = FALSE;
-	s = getenv("SINGLE_INSTRUCTION_BLIND_SPOT");
-	if (s)
-	{
-	    if (strcmp(s, "TRUE") == 0)
-	       single_instruction_delay_enable = TRUE;
-	    else if (strcmp(s, "FALSE") == 0)
-	       single_instruction_delay_enable = FALSE;
-	    else
-	       printf("*** Ignoring getenv(\"SINGLE_INSTRUCTION_BLIND_SPOT\") value\n");
-	    printf("STI/POPF %s cause a blind spot after next conditional\n",
-		   single_instruction_delay_enable ? "will": "will not");
-        }
-	first = FALSE;
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 4837
 
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386InitThreadStuff();
@@ -4900,8 +4559,9 @@ LOCAL VOID
       /* All FLAGS are cleared */
       /* NB. VM MUST BE CLEARED BEFORE SEGMENT REGISTERS ARE LOADED. */
 #ifdef SPC486
-      SET_AC(0);
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif /* SPC486 */
+#line 4741
       SET_RF(0); SET_VM(0); SET_NT(0); SET_IOPL(0);
       SET_PF(0); SET_CF(0); SET_AF(0); SET_ZF(0); SET_SF(0); SET_OF(0);
       SET_TF(0); SET_IF(0); SET_DF(0);
@@ -4935,9 +4595,9 @@ LOCAL VOID
 
       SET_CR(CR_STAT, 0);
 #ifdef SPC486
-      SET_CD(1);
-      SET_NW(1);
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif /* SPC486 */
+#line 4777
 
       SET_DR(DR_DAR0, 0);   /* Really Undefined */
       SET_DR(DR_DAR1, 0);   /* Really Undefined */
@@ -4962,8 +4622,9 @@ LOCAL VOID
       SET_EAX(0);
       SET_ECX(0);   /* Really Undefined */
 #ifdef SPC486
-      SET_EDX(0x0000E401);	/* Give component ID : revision ID */
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else
+#line 4803
       SET_EDX(0x00000303);	/* Give component ID : revision ID */
 #endif
       SET_EBX(0);   /* Really Undefined */
@@ -4974,9 +4635,9 @@ LOCAL VOID
 
 
 #if defined(SWITCHNPX)
-      if (!config_inquire(C_SWITCHNPX, NULL))
-	      disableNpx = TRUE;
+#error "Unsupported SoftPC mirror configuration: SWITCHNPX"
 #endif	/* SWITCHNPX */
+#line 4816
 
       if ( disableNpx )
 	 SET_ET(0);
@@ -5003,8 +4664,9 @@ LOCAL VOID
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       if ( setjmp(*ccpu386SimulatePtr()) == 0)
 #else
-      if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
+#error "Unsupported SoftPC mirror configuration: no CCPU TLS simulation stack"
 #endif
+#line 4843
 	 {
 	 in_C = 0;
 	 ccpu(FALSE);
@@ -5021,8 +4683,9 @@ LOCAL VOID
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386GotoThrdExptnPt();
 #else
-      longjmp(next_inst[simulate_level-1], 1);
+#error "Unsupported SoftPC mirror configuration: no CCPU TLS simulation stack"
 #endif
+#line 4860
       }
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -5036,55 +4699,15 @@ LOCAL VOID
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386Unsimulate();
 #else
-      if (simulate_level == 0)
-         {
-	 fprintf(stderr, "host_unsimulate() - already at base of stack!\n");
-#ifndef	PROD
-	 force_yoda();
-#endif	/* PROD */	 
-	 }
-      else
-	 {
-	 /* Return to previous context */
-	 in_C = 1;
-	 longjmp(longjmp_env_stack[--simulate_level], 1);
-	 }
+#error "Unsupported SoftPC mirror configuration: no CCPU TLS simulation stack"
 #endif
+#line 4887
       }
 
 #ifdef	PIG
-   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-   /* To push an interrupt frame in response to an external interrupt.   */
-   /* Called from CPU under test, just before it processes the interrupt */
-   /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-   GLOBAL VOID
-   c_pig_interrupt
-   IFN1(
-	   IU8, vector
-       )
-
-      {
-      if (simulate_level >= FRAMES)
-	 fprintf(stderr, "Stack overflow in c_do_interrupt()!\n");
-
-      /* Save current context and invoke a new CPU level */
-#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
-      if ( setjmp(*ccpu386SimulatePtr()) == 0)
-#else
-      if ( setjmp(longjmp_env_stack[simulate_level++]) == 0 )
-#endif
-	 {
-	 in_C = 0;
-	 EXT = EXTERNAL;
-
-         /* Reset default mode */
-         SET_OPERAND_SIZE(GET_CS_AR_X());
-         SET_ADDRESS_SIZE(GET_CS_AR_X());
-
-	 do_intrupt((IU16)vector, FALSE, FALSE, (IU16)0);
-	 }
-      }
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 5088
 
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

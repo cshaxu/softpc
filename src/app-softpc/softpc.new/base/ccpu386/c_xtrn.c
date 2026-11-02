@@ -20,8 +20,9 @@ Interface routines used by BIOS code.
 #include <xt.h>
 
 #if 0
-#include <sas.h>
+#error "Unsupported SoftPC mirror configuration: disabled branch"
 #endif
+#line 25
 
 #include <c_main.h>
 #include <c_addr.h>

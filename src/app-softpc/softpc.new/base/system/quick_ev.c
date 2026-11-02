@@ -56,18 +56,16 @@
  *	(yes, you guessed it, it was written by wtgc) of events.
  */
  
+/* @(#)quick_ev.c	1.43 07/04/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-LOCAL char SccsID[]="@(#)quick_ev.c	1.43 07/04/95 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 62
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_QUICKEV.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 71
 
 /*
 ** Normal UNIX includes
@@ -89,8 +87,9 @@ LOCAL char SccsID[]="@(#)quick_ev.c	1.43 07/04/95 Copyright Insignia Solutions L
 #include "timer.h"
 
 #ifdef SFELLOW
-#include "malloc.h"
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 94
 /* for host_malloc & host_free */
 #include "host_hfx.h" 
 #endif	/* SFELLOW */
@@ -102,8 +101,9 @@ LOCAL char SccsID[]="@(#)quick_ev.c	1.43 07/04/95 Copyright Insignia Solutions L
 #endif
 
 #ifdef NTVDM
-#include "ica.h"
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 107
 
 
 #define HASH_SIZE	16
@@ -167,12 +167,9 @@ LOCAL q_ev_handle next_free_handle = 1;
 	Separate list for events on timer ticks
 */
 #if defined(SFELLOW)
-/*
- * a single, shared free list (both tic and quick events
- * use the same structs)
- */
-#define	tic_free_list_head	q_free_list_head
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 176
 LOCAL t_q_event *tic_free_list_head = NULL;
 #endif	/* SFELLOW */
 LOCAL t_q_event *tic_list_head = NULL;
@@ -189,8 +186,9 @@ LOCAL void q_weighted_ratio IPT2(IU32 *, mant, IU32 *, divis);
 void quick_tick_recalibrate IPT0();
 
 #else
-#define	init_q_ratio()
+#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && !defined(SFELLOW))"
 #endif	/* CPU_40_STYLE && !SFELLOW */
+#line 194
 
 LOCAL ULONG calc_q_ev_time_for_inst IPT1(ULONG, inst);
 
@@ -205,25 +203,9 @@ GLOBAL IBOOL DisableQuickTickRecal = FALSE;
 
 
 #if defined NTVDM && !defined MONITOR
-/*  NTVDM
- *
- *  The Timer hardware emulation for NT is multithreaded
- *  So we use the ica critsect to synchronize access to the following
- *  quick event functions:
- *
- *   q_event_init()
- *   add_q_event_i()
- *   add_q_event_t()
- *   delete_q_event()
- *   dispatch_q_event()
- *
- *  tic events are not affected
- *  On x86 platforms (MONITOR) the quick event mechanism
- *  is to call the func directly so synchronization is not needed.
- *
- */
-
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 227
 
 
 /*
@@ -231,10 +213,9 @@ GLOBAL IBOOL DisableQuickTickRecal = FALSE;
  */
 
 #ifdef ANSI
-LOCAL void  q_event_init_structs(t_q_event **head, t_q_event **tail,
-				 t_q_event **free_ptr, t_q_event *table[],
-				 q_ev_handle *free_handle)
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 238
 LOCAL void  q_event_init_structs(head, tail, free_ptr, table, free_handle)
 t_q_event **head;
 t_q_event **tail;
@@ -250,11 +231,9 @@ q_ev_handle *free_handle;
 		ptr = *head;
 		*head = (*head)->next;
 #ifdef SFELLOW
-		ptr->next_free = *free_ptr;
-		*free_ptr = ptr;
-	}
-	*head = *tail = NULL;
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else	/* SFELLOW */
+#line 258
 		host_free(ptr);
 	}
 	while (*free_ptr != NULL) {
@@ -275,18 +254,9 @@ LOCAL t_q_event* makeSomeFreeEvents IPT0()
 {
 	t_q_event *nptr;
 #ifdef SFELLOW
-	IUH	count;
-
-	nptr = SFMalloc(4096,TRUE);
-	for (count=0; count< (4096/sizeof(t_q_event)); count++)
-	{
-		nptr->next_free = q_free_list_head;
-		q_free_list_head = nptr;
-		nptr++;
-	}
-	nptr = q_free_list_head;
-	q_free_list_head = nptr->next_free;
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 290
 	nptr = (t_q_event *)host_malloc(sizeof(t_q_event));
 #endif
 	return nptr;
@@ -296,8 +266,9 @@ VOID q_event_init IFN0()
 {
 	
 #if defined NTVDM && !defined MONITOR
-     host_ica_lock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 301
 
 
 	host_q_ev_set_count(0);
@@ -308,8 +279,9 @@ VOID q_event_init IFN0()
 	init_q_ratio();
 
 #if defined NTVDM && !defined MONITOR
-     host_ica_unlock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 313
 }
 
 LOCAL VOID
@@ -369,16 +341,18 @@ add_event IFN10(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 	{
 		/* we have no free list elements, so we must create one */
 #if defined(SFELLOW)
-		if ((nptr = (t_q_event *)makeSomeFreeEvents()) ==
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 374
 		if ((nptr = (t_q_event *)host_malloc(sizeof(t_q_event))) ==
 #endif	/* SFELLOW */
 			(t_q_event *)0 )
 		{
 			always_trace0("ARRGHH! malloc failed in add_q_event");
 #if defined(SFELLOW)
-			return 0;
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #else
+#line 382
 			return 0xffff;
 #endif	/* SFELLOW */
 		}
@@ -534,13 +508,14 @@ LOCAL q_ev_handle gen_add_q_event IFN4(Q_CALLBACK_FN, func,
 	unsigned long	event_time;
 
 #if (defined(NTVDM) && defined(MONITOR)) || defined(GISP_CPU)	/* No quick events - just call func */
-    (*func)(param);
-    return(1);
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif	/* NTVDM & MONITOR */
+#line 540
 
 #if defined NTVDM && !defined MONITOR
-        host_ica_lock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 544
 
 	jumps_remaining_to_count_down = (unsigned long)host_q_ev_get_count();
 
@@ -552,8 +527,9 @@ LOCAL q_ev_handle gen_add_q_event IFN4(Q_CALLBACK_FN, func,
 	time_remaining_to_next_trigger =
 		host_calc_q_ev_time_for_inst( jumps_remaining_to_count_down );
 #else
-	time_remaining_to_next_trigger = jumps_remaining_to_count_down;
+#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE))"
 #endif
+#line 557
 
 	if( event_type == EVENT_TIME )
 	{
@@ -604,9 +580,9 @@ LOCAL q_ev_handle gen_add_q_event IFN4(Q_CALLBACK_FN, func,
 			"setting CPU counter to %d", jumps_till_trigger );
 
 #else	/* CPU_40_STYLE */
-
-		host_q_ev_set_count(q_list_head->time_from_last);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 610
 	}
 	sure_sub_note_trace1(Q_EVENT_VERBOSE,"q_event returning handle %d",handle);
 
@@ -617,8 +593,9 @@ LOCAL q_ev_handle gen_add_q_event IFN4(Q_CALLBACK_FN, func,
         host_note_queue_added(event_value);
 
 #if defined NTVDM && !defined MONITOR
-        host_ica_unlock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 622
 
 	return(	(q_ev_handle)handle );
 }
@@ -651,8 +628,9 @@ GLOBAL q_ev_handle add_q_event_t IFN3(Q_CALLBACK_FN, func, unsigned long, time,
 #ifdef CPU_40_STYLE
 	return (gen_add_q_event(func, time, param, EVENT_TIME));
 #else
-	return (gen_add_q_event(func, host_calc_q_ev_inst_for_time(time),param, EVENT_TIME));
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
+#line 656
 }
 
 /*
@@ -722,12 +700,9 @@ dispatch_event IFN6(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 					(*set_count)( jumps );
 
 #else
-					sure_sub_note_trace1(Q_EVENT_VERBOSE,
-						"set new inst delay %d",
-						(*head)->time_from_last );
-
-					(*set_count)((*head)->time_from_last);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
+#line 731
 					break;
 
 				case EVENT_TICK:
@@ -741,10 +716,9 @@ dispatch_event IFN6(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 
 				default:
 #ifndef PROD
-					always_trace1( "Invalid quick event type %d",
-								(*head)->event_type );
-					assert( FALSE );
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 748
 					break;
 			}
 			
@@ -830,16 +804,18 @@ VOID	dispatch_tic_event IFN0()
 VOID	dispatch_q_event IFN0()
 {
 #if defined NTVDM && !defined MONITOR
-        host_ica_lock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 835
 
 	dispatch_event( &q_list_head, &q_list_tail, &q_free_list_head,
 			q_ev_hash_table, host_q_ev_set_count,
 			host_q_ev_get_count );
 
 #if defined NTVDM && !defined MONITOR
-        host_ica_unlock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 843
 }
 
 /*
@@ -925,8 +901,9 @@ delete_event IFN7(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 #if defined(CPU_40_STYLE)
 					scale_func = host_calc_q_ev_inst_for_time;
 #else
-					scale_func = unit_scaler;
+#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE))"
 #endif
+#line 930
 					unscale_func = host_calc_q_ev_time_for_inst;
 					break;
 
@@ -940,10 +917,9 @@ delete_event IFN7(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 
 				default:
 #ifndef PROD
-					always_trace1( "Invalid quick event type %d",
-								(*head)->event_type );
-					assert( FALSE );
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 947
 					break;
 			}
 
@@ -960,13 +936,9 @@ delete_event IFN7(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 			 */
 
 #ifndef PROD
-			if( cur_counter < 0 )
-			{
-				always_trace1( "cur_counter is negative (%d)",
-								cur_counter );
-				FmDebug(0);
-			}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 970
 #endif
 
 			time_to_next_trigger = (*scale_func)(cur_counter);
@@ -1006,16 +978,18 @@ delete_event IFN7(t_q_event **, head, t_q_event **, tail, t_q_event **, free,
 VOID delete_q_event IFN1(q_ev_handle, handle )
 {
 #if defined NTVDM && !defined MONITOR
-        host_ica_lock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 1011
 
 	delete_event( &q_list_head, &q_list_tail, &q_free_list_head,
 		q_ev_hash_table, handle, host_q_ev_set_count,
 		host_q_ev_get_count );
 
 #if defined NTVDM && !defined MONITOR
-        host_ica_unlock();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 1019
 }
 
 VOID delete_tic_event IFN1(q_ev_handle,  handle )
@@ -1378,8 +1352,9 @@ IU32
 calc_q_inst_for_time IFN1(IU32, time)
 {
 #ifdef SYNCH_TIMERS
-	return (time * SYNCS_PER_USEC);
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
+#line 1383
 	IU32 inst, jumps;
 
 	/* be crude before initialisation */
@@ -1407,8 +1382,9 @@ IU32
 calc_q_time_for_inst IFN1(IU32, inst)
 {
 #ifdef SYNCH_TIMERS
-	return (inst / SYNCS_PER_USEC);
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
+#line 1412
 	IU32 time, jumps;
 
 	/* be crude before initialisation */
@@ -1561,12 +1537,9 @@ quick_tick_recalibrate IFN0()
 	ijc_calib += realrate;
 
 #ifdef AVERAGED	/* not for the moment */
-	/* add new value to buffer */
-	add_new_q_ratio(idealrate, realrate);
-
-	/* ... and get average of accumulated ratios */
-	q_weighted_ratio(&ideal_q_rate, &real_q_rate);
+#error "Unsupported SoftPC mirror configuration: AVERAGED"
 #else
+#line 1570
 	ideal_q_rate = idealrate;
 	real_q_rate = realrate;
 #endif
@@ -1746,47 +1719,6 @@ add_q_ev_int_action IFN5(unsigned long, time, Q_CALLBACK_FN, func, IU32, adapter
 #endif /* CPU_40_STYLE && !SFELLOW */
 
 #ifdef QEVENT_TESTER
-
-/*
- * The routine qevent_tester() below can be called from a BOP, which
- * in turn can be called from a .BAT file using bop.com in a loop.
- * This doesn't test the quick event system exhaustively but puts it
- * under a bit more pressure.
- */
-
-LOCAL q_ev_handle handles[256];
-LOCAL IU8 deleter = 1;
-
-LOCAL void
-tester_func IFN1
-(
-	IU32,	param
-)
-{
-	SAVED IU8 do_delete = 0;
-
-	handles[param] = 0;
-
-	if( handles[deleter] && (( do_delete++ & 0x1 ) == 0 ))
-	{
-		delete_q_event( handles[deleter] );
-	}
-
-	deleter += 7;
-}
-
-GLOBAL void
-qevent_tester IFN0()
-{
-	SAVED IU8 indx = 0;
-
-	handles[indx++] = add_q_event_i((Q_CALLBACK_FN) tester_func, 100, indx );
-	handles[indx++] = add_q_event_t((Q_CALLBACK_FN) tester_func, 300, indx );
-	handles[indx++] = add_q_event_i((Q_CALLBACK_FN) tester_func, 1000, indx );
-	handles[indx++] = add_q_event_t((Q_CALLBACK_FN) tester_func, 3000, indx );
-	handles[indx++] = add_q_event_i((Q_CALLBACK_FN) tester_func, 10000, indx );
-	handles[indx++] = add_q_event_t((Q_CALLBACK_FN) tester_func, 30000, indx );
-	handles[indx++] = add_q_event_i((Q_CALLBACK_FN) tester_func, 100000, indx );
-	handles[indx++] = add_q_event_t((Q_CALLBACK_FN) tester_func, 300000, indx );
-}
+#error "Unsupported SoftPC mirror configuration: QEVENT_TESTER"
 #endif /* QEVENT_TESTER */
+#line 1793

@@ -1,0 +1,4 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/video/ega_vide.c	690	745	658	686	940302ebc2c4684631c4a609e73bcb73bfd856524699b5519ca0cb1d511e7889
+base/video/ega_vide.c	2258	2270	1668	1676	346ccc1eaadef8a4c6cadb397f6482a75f1242326dea57cadaa2c438c1762283
+base/video/ega_vide.c	2271	2276	1677	1681	""

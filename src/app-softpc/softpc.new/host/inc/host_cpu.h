@@ -15,101 +15,9 @@
 /* SccsID[]="@(#)host_cpu.h     1.22 4/15/91 Copyright Insignia Solutions Ltd."; */
 
 #ifdef CPU_30_STYLE
-
-#ifndef _HOST_CPU_H
-#define _HOST_CPU_H
-
-
-#ifdef MONITOR
-#include <monregs.h>
-
-#define	 getSTATUS() 	(getCF()        |	\
-			getOF()   << 11 |	\
-			getZF()   << 6  |	\
-			getSF()   << 7  |	\
-			getAF()   << 4  |	\
-			getPF()   << 2  |	\
-			getTF()   << 8  |	\
-			getIF()   << 9  |	\
-			getDF()   << 10 |	\
-			getIOPL() << 12 |	\
-			getNT()   << 14)
-
-#endif
-
-/*
- * Union representing different ways of accessing a register
- *
- * Should probably not be here, but is for historical reasons.
- *
- * If it goes, then host_cpu.h should have reached nirvana (i.e. be totally empty)!
- */
-
-#ifdef BIGEND
-
-typedef union
-    {
-        word    X;
-    struct
-        {                               /* as two bytes */
-        half_word high;
-        half_word low;
-        word pad;
-        } byte;
-    struct
-        {                               /* as 4 nibbles */
-        word n3:4;
-        word n2:4;
-        word n1:4;
-        word n0:4;
-        word pad;
-        } nibble;
-    struct
-        {                               /* as 16 bits   */
-        word b15:1;
-        word b14:1;
-        word b13:1;
-        word b12:1;
-        word b11:1;
-        word b10:1;
-        word b9:1;
-        word b8:1;
-        word b7:1;
-        word b6:1;
-        word b5:1;
-        word b4:1;
-        word b3:1;
-        word b2:1;
-        word b1:1;
-        word b0:1;
-        word pad;
-        } bit;
-    } reg;
-
-#endif /* BIGEND */
-
-
-#ifdef LITTLEND
-
-typedef union
-    {
-        word    X;
-    struct
-        {                               /* as two bytes */
-        half_word low;
-        half_word high;
-        } byte;
-    } reg;
-
-#endif /* LITTLEND */
-
-
-
-
-
-
-#endif
+#error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else /* CPU_30_STYLE */
+#line 113
 
 /*
  * ============================================================================
@@ -130,9 +38,9 @@ typedef union
         half_word low;
         half_word high;
 #else
-        half_word high;
-        half_word low;
+#error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
+#line 136
         word pad;
         } byte;
     struct
@@ -166,21 +74,9 @@ typedef union
     } reg;
 
 #ifdef A2CPU
-
-/*
- * The Fast CPU status register structure ....
- */
-
-typedef struct
-{
-    word pad:5;
-    word DF:1;
-    word IF:1;
-    word TF:1;
-    word pad1:8;
-} sreg;
-
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 184
 
 /*
  * ============================================================================
@@ -191,11 +87,9 @@ extern word m_s_w;
 
 #ifndef EGATEST
 #ifdef A2CPU
-extern  int     compile_everything;
-extern  short   host_event;
-extern char *CPU_00[];          /* CPU main jump table            */
-extern char *int_table[];       /* CPU interrupt jump table       */
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 199
 
 
 /*  common READ functions  */
@@ -251,13 +145,9 @@ extern char *int_table[];       /* CPU interrupt jump table       */
 #endif CCPU
 
 #ifdef A2CPU
-/*  Assembler CPU specific READ functions */
-#define getOPA()                ((*getOPA_func) ())
-#define getOPB()                ((*getOPB_func) ())
-#define getOPR()                ((*getOPR_func) ())
-#define getSSD()                ((*getSSD_func) ())
-#define getDSD()                ((*getDSD_func) ())
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 261
 
 /*  common WRITE functions  */
 #define  setAX(val)     ((*setAX_func) (val))
@@ -311,12 +201,9 @@ extern char *int_table[];       /* CPU interrupt jump table       */
 #endif CCPU
 
 #ifdef A2CPU
-/*  Assembler CPU specific WRITE functions */
-#define setOPLEN                ((*setOPLEN_func) (val))
-#define setOPA()                ((*setOPA_func) (val))
-#define setOPB()                ((*setOPB_func) (val))
-#define setOPR()                ((*setOPR_func) (val))
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 320
 #endif EGATEST
 
 
@@ -378,13 +265,9 @@ extern word             (*getIOPL_func) ();
 #endif CCPU
 
 #ifdef A2CPU
-/*  Assembler CPU specific READ functions */
-extern double_word      (*getOPA_func) ();
-extern double_word      (*getOPB_func) ();
-extern double_word      (*getOPR_func) ();
-extern sys_addr (*getSSD_func) ();
-extern sys_addr (*getDSD_func) ();
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 388
 
 
 
@@ -406,39 +289,9 @@ extern VOID (*setDF_func)(IBOOL); extern VOID (*setIF_func)(IBOOL); extern VOID 
 extern VOID (*setPF_func)(IBOOL); extern VOID (*setAF_func)(IBOOL); extern VOID (*setSF_func)(IBOOL);
 extern VOID (*setZF_func)(IBOOL); extern VOID (*setOF_func)(IBOOL); extern VOID (*setCF_func)(IBOOL);
 #else
-extern void             (*setAX_func) ();
-extern void             (*setAH_func) ();
-extern void             (*setAL_func) ();
-extern void             (*setBX_func) ();
-extern void             (*setBH_func) ();
-extern void             (*setBL_func) ();
-extern void             (*setCX_func) ();
-extern void             (*setCH_func) ();
-extern void             (*setCL_func) ();
-extern void             (*setDX_func) ();
-extern void             (*setDH_func) ();
-extern void             (*setDL_func) ();
-extern void             (*setSP_func) ();
-extern void             (*setBP_func) ();
-extern void             (*setSI_func) ();
-extern void             (*setDI_func) ();
-extern void             (*setIP_func) ();
-extern void             (*setCS_func) ();
-extern void             (*setDS_func) ();
-extern void             (*setES_func) ();
-extern void             (*setSS_func) ();
-extern void             (*setMSW_func) ();
-extern void             (*setDF_func) ();
-extern void             (*setIF_func) ();
-extern void             (*setTF_func) ();
-extern void             (*setPF_func) ();
-extern void             (*setAF_func) ();
-extern void             (*setSF_func) ();
-extern void             (*setZF_func) ();
-extern void             (*setOF_func) ();
-extern void             (*setCF_func) ();
-
+#error "Unsupported SoftPC mirror configuration: !CCPU"
 #endif
+#line 442
 #ifdef CCPU
 /* CCPU-specific WRITE functions */
 extern void             (*setCPL_func) ();
@@ -458,12 +311,9 @@ extern void             (*setIOPL_func) ();
 #endif CCPU
 
 #ifdef A2CPU
-/*  Assembler CPU specific WRITE functions */
-extern void             (*setOPLEN_func) ();
-extern void             (*setOPA_func) ();
-extern void             (*setOPB_func) ();
-extern void             (*setOPR_func) ();
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 467
 
 
 /*  HOST_SIMULATE function  */
@@ -477,53 +327,8 @@ extern void             (*host_simulate_func) ();
  *
  */
 #ifdef A2CPU
-extern sreg INTEL_STATUS;
-extern void     (*R_ROUTE)();
-extern int      R_INTR;
-extern reg R_AX;                /* Accumulator          */
-extern reg R_BX;                /* Base                 */
-extern reg R_CX;                /* Count                */
-extern reg R_DX;                /* Data                 */
-extern reg R_SP;                /* Stack Pointer        */
-extern reg R_BP;                /* Base pointer         */
-extern reg R_SI;                /* Source Index         */
-extern reg R_DI;                /* Destination Index    */
-
-extern double_word R_OPA;
-extern double_word R_OPB;
-extern double_word R_OPR;
-extern int      R_MISC_FLAGS;
-
-extern sys_addr R_IP;           /* Instruction Pointer  */
-
-extern sys_addr R_ACT_CS;               /* Code Segment */
-extern sys_addr R_ACT_DS;               /* Data Segment */
-extern sys_addr R_ACT_SS;               /* Stack Segment */
-extern sys_addr R_ACT_ES;               /* Extra Segment */
-
-extern sys_addr R_DEF_SS;               /* Default SS register  */
-extern sys_addr R_DEF_DS;               /* Default DS register  */
-
-extern void do_setSF();
-extern void do_setOF();
-extern void do_setPF();
-extern void do_setZF();
-extern void do_setCF();
-
-#define BYTE_OPERATION  0x80000000
-#define WORD_OPERATION  0
-#define IS_BYTE_OP      (R_MISC_FLAGS < 0)
-#define REALLY_ZERO     (R_MISC_FLAGS & 1)
-
-/*
-        NB. retl does jmp %o7+8
-*/
-#define setROUTE(val)   R_ROUTE = (void *)((int)(val) - 8)
-#define setINTR(val)    R_INTR = ( val )
-#define setbitINTR(val) R_INTR |= ( val )
-#define clrbitINTR(val) R_INTR &= ~( val )
-#define getROUTE()      (R_ROUTE)
-#define getINTR()       (R_INTR)
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
+#line 528
 
 #endif /* CPU_30_STYLE */

@@ -129,25 +129,27 @@
  *
  */
 
+/* @(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-LOCAL char SccsID[]="@(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 135
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_ICA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 144
 
 /* these ports have iret hooks enabled automatically - others will have to
  * define hooked_irets as parts of their configuration
  */
+#if !defined(NTVDM)
+#line 149
 #if defined(CPU_40_STYLE) || defined(GISP_CPU)
 #define HOOKED_IRETS    /* switch on IRET hooks */
 #endif
+#endif
+#line 153
 
 /*
  * SoftPC include files
@@ -164,8 +166,9 @@ LOCAL char SccsID[]="@(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd.";
 #include "compat/eoi.h" /* Host EOI contract without NTVDM platform declarations. */
 
 #ifdef NOVELL
-extern void host_sigio_event IPT0();
+#error "Unsupported SoftPC mirror configuration: NOVELL"
 #endif /* NOVELL */
+#line 169
 
 /*
  * ============================================================================
@@ -173,6 +176,8 @@ extern void host_sigio_event IPT0();
  * ============================================================================
  */
 
+#if !defined(NTVDM)
+#line 176
 /*
  *  Table of function pointers to access PIC routines
  */
@@ -181,14 +186,17 @@ void (*ica_outb_func) IPT2(io_addr, port, IU8, value);
 void (*ica_hw_interrupt_func) IPT3(IU32, adapter, IU32, line_no,
 	IS32, call_count);
 void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
+#endif
+#line 184
 
 #if defined (CPU_40_STYLE) || defined (NTVDM)
 #define ICA_INTACK_REJECT       -1
 #endif
 
 #ifndef PROD
-char icamsgbuf[132];	/* Text buffer for debug messages */
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 192
 
 /*
  * ============================================================================
@@ -196,6 +204,10 @@ char icamsgbuf[132];	/* Text buffer for debug messages */
  * ============================================================================
  */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else   /* !NTVDM */
+#line 277
 
 /* regular SoftPC definitions for ica */
 ADAPTER_STATE adapter_state[2];
@@ -204,8 +216,9 @@ ADAPTER_STATE adapter_state[2];
 #ifdef PROD
 #define host_valid_iret_hook()	(TRUE)
 #else		/* allow disabling of iret hooks whilst debugging */
-#define host_valid_iret_hook()	(iretHooksEnabled)
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 209
 #define host_bop_style_iret_hooks()	(FALSE)
 #define host_iret_bop_table_addr(line)	(0)
 
@@ -222,6 +235,8 @@ LOCAL IUM8      ica_lock;
 #define	ica_lock_inc()	ica_lock++
 #define ica_lock_dec()  ica_lock--
 
+#endif  /* NTVDM */
+#line 304
 
 #ifdef HOOKED_IRETS		/* iret hook related variables */
 LOCAL IBOOL  iretHooksEnabled = FALSE;
@@ -289,6 +304,8 @@ IS32 ica_accept IPT1(IU32, adapter);
 extern IU32 ica_iret_hook_needed IPT1(IU32, line);
 #endif
 
+#if !defined (NTVDM)
+#line 292
 void
 SWPIC_init_funcptrs IFN0()
 {
@@ -300,6 +317,8 @@ SWPIC_init_funcptrs IFN0()
 	ica_hw_interrupt_func		= SWPIC_hw_interrupt;
 	ica_clear_int_func		= SWPIC_clear_int;
 }
+#endif
+#line 303
 
 /*
  *	Please note that ica_eoi is called by SUN_VA code and thus needs to
@@ -348,12 +367,9 @@ ica_eoi IFN3(IU32, adapter, IS32 *, line, IBOOL, rotate)
     }
 
 #ifndef PROD
-    if (io_verbose & ICA_VERBOSE)
-    {
-	sprintf(icamsgbuf, "**** CPU END-OF-INT %c (%d) ****", (adapter == ICA_MASTER? 'M': 'S'), *line);
-	trace(icamsgbuf, DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 438
 
     if (rotate && (*line >= 0))
 	asp->ica_hipri = (USHORT)((*line + 1) & 0x07);
@@ -399,9 +415,15 @@ ica_scan_irr IFN1(IU32, adapter)
     IUM8 bit, irr_and_not_imr, active_isr;
     IUM8 iret_hook_mask;
 
+#if defined (NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else  /* !NTVDM */
+#line 492
     /* if iret hooks are not being used, iretHookActive will always be 0 */
     /* Retain both original IRET protection and XP host delayed delivery. */
     iret_hook_mask = (IU8)((iretHookActive | DelayIrqLine) >> (adapter << 3));
+#endif
+#line 495
 
     /*
      * A bit can only cause an int if it is set in the IRR
@@ -489,6 +511,10 @@ IS32 ica_accept IFN1(IU32, adapter)
 	 * on line 7, but this is not neccessary and can cause problems
 	 * for some programs (eg DOOM with a mouse)
 	 */
+#if 0
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#endif
+#line 585
 
 	/* Skip spurious ints. These are any that are caused by clearing an
 	 * int when the cpu has already registered that there is an int to
@@ -537,12 +563,9 @@ IS32 ica_accept IFN1(IU32, adapter)
     }
 
 #ifndef PROD
-    if (io_verbose & ICA_VERBOSE)
-    {
-        sprintf(icamsgbuf, "**** CPU INTACK %c (%d) ****", (adapter == ICA_MASTER? 'M': 'S'), line1 + asp->ica_base);
-        trace(icamsgbuf, DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 639
 
     return((IS32)line1);
 }
@@ -564,12 +587,9 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
     if (asp->ica_cpu_int)
     {
 #ifndef PROD
-	if ((io_verbose & ICA_VERBOSE) && ((IU32)(asp->ica_int_line) != line))
-	{
-	    sprintf(icamsgbuf,"******* INT LINE ALREADY HIGH %c line=%d ****", (adapter == ICA_MASTER? 'M': 'S'), asp->ica_int_line);
-	    trace(icamsgbuf, DUMP_NONE);	
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 573
         asp->ica_int_line = line;
 
 	return;
@@ -585,38 +605,38 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
     if (asp->ica_master)		/* If ICA is Master */
     {
 #ifndef PROD
-        if (io_verbose & ICA_VERBOSE)
-        {
-            sprintf(icamsgbuf, "**** CPU INTERRUPT (%x) ****", line);
-            trace(icamsgbuf, DUMP_NONE);
-        }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 594
 
         /*
          *  Set the 'hardware interrupt' bit in cpu_interrupt_map
          */
 
 #ifndef CPU_40_STYLE	/* No globals in the 4.0 I/F! */
-	cpu_int_delay = 0;
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
+#line 602
 
         host_set_hw_int();
 
 #ifdef A2CPU
-        host_cpu_interrupt();
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif
+#line 608
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 609
 
     }
     else
     {				/* If ICA is Slave */
 #ifndef PROD
-        if (io_verbose & ICA_VERBOSE)
-        {
-            sprintf(icamsgbuf, "**** SLAVE ICA INTERRUPT (%x) ****", line);
-            trace(icamsgbuf, DUMP_NONE);
-        }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 620
         /*
          * Signal the Master ICA.
          * NB. A kludge is used here. We know that we have
@@ -646,8 +666,9 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
 void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 {
 #ifndef PROD
-    char *reg_name;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */
+#line 748
     IU32 adapter       = adapter_for_port(port);
     ADAPTER_STATE *asp = &adapter_state[adapter];
 
@@ -656,13 +677,9 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
      */
 
 #ifndef PROD
-    if (io_verbose & ICA_VERBOSE)
-        if ((port != ICA_PORT_0) && (port != ICA_PORT_1))
-	{
-	    sprintf(icamsgbuf, "ica_inb: bad port (%x)", port);
-	    trace(icamsgbuf, DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 666
 
     /*
      * If we are in the middle of a Poll command, then respond to it
@@ -686,12 +703,9 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 	host_ica_unlock();			/* free lock if supported */
 
 #ifndef PROD
-        if (io_verbose & ICA_VERBOSE)
-	{
-	    sprintf(icamsgbuf, "ica_inb: responding to Poll with %x", *value);
-	    trace(icamsgbuf, DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 695
     }
 
     /*
@@ -707,31 +721,31 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 	    {
 		*value = asp->ica_isr;
 #ifndef PROD
-		reg_name = "ISR";
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */		
+#line 712
 	    }
 	    else
 	    {
 		*value = asp->ica_irr;
 #ifndef PROD
-		reg_name = "IRR";
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */		
+#line 719
 	    }
 	else
 	{
 	    *value = asp->ica_imr;
 #ifndef PROD
-	    reg_name = "IMR";
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */	
+#line 726
 	}
 
 #ifndef PROD
-	if (io_verbose & ICA_VERBOSE)
-	{
-	    sprintf(icamsgbuf, "ica_inb: delivered %s value %x", reg_name, *value);
-	    trace(icamsgbuf, DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 735
     }
 }
 
@@ -773,15 +787,18 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
      * First check the validity of the port
      */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 876
     if ((port & 0xfffe) != ICA_PORT_0)
+#endif   //NEC_98
+#line 777
     {
 #ifndef PROD
-	if (io_verbose & ICA_VERBOSE)
-	{
-	    sprintf(icamsgbuf, "ica_outb: bad port (%x)", port);
-	    trace(icamsgbuf, DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 785
 	return;
     }
 
@@ -789,7 +806,13 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
      * If we get an ICW1 then we are into initialisation
      */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 896
     if (((port & 1) == 0) && (value & 0x10))            /****  ICW1  ****/
+#endif   //NEC_98
+#line 793
     {
         asp->ica_irr  = 0;	/* Clear all pending interrupts		*/
         asp->ica_isr  = 0;	/* Clear all in-progress interrupts	*/
@@ -809,9 +832,9 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 	sequence[adapter] = 2;		/* Prepare for the rest of the sequence	*/
 
 #ifndef PROD
-        if (io_verbose & ICA_VERBOSE)
-	    trace("ica_outb: ICW1 detected, initialisation begins", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 815
         return;
     }
 
@@ -831,16 +854,19 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
     switch(sequence[adapter])
     {
     case  0:			/* We are expecting an OCW	*/
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 942
         if (port & 1)           /* Odd address -> OCW1          */
+#endif   //NEC_98
+#line 835
 	{
 	    asp->ica_imr = value & 0xff;
 #ifndef PROD
-            if (io_verbose & ICA_VERBOSE)
-	    {
-	        sprintf(icamsgbuf, "ica_outb: new %c IMR: %x", (adapter == ICA_MASTER? 'M': 'S'), value);
-	        trace(icamsgbuf, DUMP_NONE);
-	    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 844
 	    if (asp->ica_cpu_int)
 	    {
 		/* We might have masked out a pending interrupt */
@@ -868,17 +894,17 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 	    case 0:		/* Clear rotate in auto EOI	*/
 		asp->ica_mode &= ~ICA_RAEOI;
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    trace("ica_outb: Clear Rotate in Auto EOI",DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 874
 		break;
 
 	    case 1:		/* Non-specific EOI		*/
 		line = -1;	/* -1 -> highest priority	*/
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    trace("ica_outb: Non-specific EOI", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 882
 		ica_eoi(adapter, &line, FALSE);
 		break;
 
@@ -888,52 +914,43 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 	    case 3:		/* Specific EOI command		*/
 		line  = value & 0x07;
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		{
-		    sprintf(icamsgbuf, "ica_outb: Specific EOI, line %d", line);
-		    trace(icamsgbuf, DUMP_NONE);
-		}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 897
 		ica_eoi(adapter, &line, FALSE);
 		break;
 
 	    case 4:		/* Set rotate in auto EOI mode	*/
 		asp->ica_mode |= ICA_RAEOI;
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    trace("ica_outb: Set Rotate in Auto EOI",DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 906
 		break;
 
 	    case 5:		/* Rotate on non-specific EOI	*/
 		line = -1;	/* -1 -> non specific		*/
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    trace("ica_outb: Rotate on Non-specific EOI",DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 914
 		ica_eoi(adapter, &line, TRUE);
 		break;
 
 	    case 6:		/* Set priority			*/
 		asp->ica_hipri = (value + 1) & 0x07;
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		{
-		    sprintf(icamsgbuf, "ica_outb: Set Priority, line %d", value & 0x07);
-		    trace(icamsgbuf, DUMP_NONE);
-		}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 926
 		break;
 
 	    case 7:		/* Rotate on specific EOI	*/
 		line  = value & 0x07;
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		{
-		    sprintf(icamsgbuf, "ica_outb: Rotate on specific EOI, line %d", line);
-		    trace(icamsgbuf, DUMP_NONE);
-		}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 937
 		ica_eoi(adapter, &line, TRUE);
 		break;
 	    }
@@ -945,57 +962,53 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 	    {
 		asp->ica_mode = (asp->ica_mode & ~ICA_SMM) | (((IU16)value << 4) & ICA_SMM);
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    if (asp->ica_mode & ICA_SMM)
-			trace("ica_outb: Special Mask Mode set", DUMP_NONE);
-		    else
-			trace("ica_outb: Special Mask Mode unset", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 954
 	    }
 
 	    if (value & ICA_POLL_CMD)	/* We are being polled	*/
 	    {
 		asp->ica_mode |= ICA_POLL;
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    trace("ica_outb: Poll detected!", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 963
 	    }
 	    else
 	    if (value & ICA_RR_CMD)	/* Select IRR or ISR	*/
 	    {
 		asp->ica_mode = (asp->ica_mode & ~ICA_RIS) | (((IU16)value << 11) & ICA_RIS);
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		    if (asp->ica_mode & ICA_RIS)
-			trace("ica_outb: ISR selected", DUMP_NONE);
-		    else
-			trace("ica_outb: IRR selected", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 975
 	    }
 	}
 	break;
 
 /**/
     case  2:			/* We are expecting a ICW2		*/
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 981
         if (!(port & 1))        /* Should be odd address, so check      */
+#endif   //NEC_98
+#line 982
 	{
 #ifndef PROD
-	    sprintf(icamsgbuf, "ica_outb: bad port (%x) while awaiting ICW2",
-			 (unsigned)port);
-	    trace(icamsgbuf, DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 988
 	}
 	else
 	{
 	    asp->ica_base = value & ICA_BASE_MASK;
 #ifndef PROD
-	    if (io_verbose & ICA_VERBOSE)
-	    {
-		sprintf(icamsgbuf, "ica_outb: vector base set to %x", asp->ica_base);
-		trace(icamsgbuf, DUMP_NONE);
-	    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1112
 	    if (!(asp->ica_mode & ICA_SINGL))
 		sequence[adapter] = 3;
 	    else
@@ -1008,24 +1021,26 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 
 /**/
     case  3:			/* We are expecting a ICW3		*/
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 1011
         if (!(port & 1))        /* Should be odd address, so check      */
+#endif   //NEC_98
+#line 1012
 	{
 #ifndef PROD
-	    sprintf(icamsgbuf, "ica_outb: bad port (%x) while awaiting ICW3",
-			 (unsigned)port);
-	    trace(icamsgbuf, DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1018
 	}
 	else
 	{
 	    asp->ica_ssr = value & 0xff;
 #ifndef PROD
-	    if (io_verbose & ICA_VERBOSE)
-	    {
-		sprintf(icamsgbuf, "ica_outb: slave register set to %x", asp->ica_ssr);
-		trace(icamsgbuf, DUMP_NONE);
-	    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1029
 	    if (asp->ica_mode & ICA_IC4)
 		sequence[adapter] = 4;
 	    else
@@ -1035,50 +1050,43 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 
 /**/
     case  4:			/* We are expecting a ICW4		*/
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 1038
         if (!(port & 1))        /* Should be odd address, so check      */
+#endif   //NEC_98
+#line 1039
 	{
 #ifndef PROD
-	    sprintf(icamsgbuf, "ica_outb: bad port (%x) while awaiting ICW4",
-			 (unsigned)port);
-	    trace(icamsgbuf, DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1045
 	}
 	else
 	{
 	    asp->ica_mode = (asp->ica_mode & ~ICA_ICW4_MASK)
 		           | (((IU16)value << 4) &  ICA_ICW4_MASK);
 #ifndef PROD
-	    if (io_verbose & ICA_VERBOSE)
-	    {
-		sprintf(icamsgbuf, "ica_outb: IC4 value %x", value);
-		trace(icamsgbuf, DUMP_NONE);
-	    }
-	    /*
-	     * Check the mode bits for sensible values
-	     */
-	    if (!(asp->ica_mode & ICA_MPM))
-		trace("ica_outb: attempt to set up 8080 mode!", DUMP_NONE);
-
-	    if ((asp->ica_mode & ICA_BUF) && !(asp->ica_mode & ICA_MS)
-				     && !(asp->ica_mode & ICA_SINGL))
-		trace("ica_outb: attempt to set up slave mode!", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1066
 	}
 	sequence[adapter] = 0;
 	break;
 
     case -1:		/* Power on but so far uninitialised	*/
 #ifndef PROD
-	sprintf(icamsgbuf, "ica_outb: bad port/value (%x/%x) while awaiting ICW1",
-		     (unsigned)port, value);
-	trace(icamsgbuf, DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1076
 	break;
 
     default:		/* This cannot happen			*/;
 #ifndef PROD
-	trace("ica_outb: impossible error, programmer brain-dead", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1082
     }
 
     ica_lock_set(0);
@@ -1102,30 +1110,9 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
 #endif	/* CPU_40_STYLE */
 
 #ifndef PROD
-    SAVED char *linename[2][8] =
-    {
-        {
-            "IRQ  0 TIMER",
-            "IRQ  1 KEYBOARD",
-            "IRQ  2 SLAVE_ICA",
-            "IRQ  3 COM2",
-            "IRQ  4 COM1",
-            "IRQ  5 PARALLEL2",
-            "IRQ  6 DISKETTE",
-            "IRQ  7 PARALLEL1"
-        },
-        {
-            "IRQ  8 REALTIME CLOCK",
-            "IRQ  9 MOUSE",
-            "IRQ 10 SOFTNODE",
-            "IRQ 11 SOUND DRIVER",
-            "IRQ 12 ASPI",
-            "IRQ 13 COPROCESSOR",
-            "IRQ 14 FIXED DISK",
-            "IRQ 15 reserved"
-        }
-    };
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1129
 
     /*
      * vddsvc.h defines the NTVDM exported call to this function as:
@@ -1140,13 +1127,9 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
     host_ica_lock();
 
 #ifndef PROD
-    if (io_verbose & ICA_VERBOSE_LOCK)
-    {
-	if(adapter>1 || line_no>7)
-		printf("**** H/W INTERRUPT (%sx%d) [%d:%d] ****\n",
-		       linename[adapter][line_no], call_count,adapter,line_no);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1150
 
     /*
      * If there is a request already outstanding on this line, then leave
@@ -1163,13 +1146,9 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
     asp->ica_count[line_no] += call_count;	/* Add the further requests */
 
 #ifndef PROD
-    if (io_verbose & ICA_VERBOSE)
-    {
-	sprintf(icamsgbuf, "**** H/W INTERRUPT (%sx%d) ****",
-			 linename[adapter][line_no], call_count);
-	trace(icamsgbuf, DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1173
 
     /*
      * Check the lock flag. If it is set, then this routine is being called
@@ -1185,21 +1164,22 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
      * leaves both primitive & real lock styles intact.
      */
 
+#ifndef NTVDM
+#line 1336
     if (!host_ica_real_locks())
     {
 	if (ica_lock_inc())
 	{
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE_LOCK)
-		{
-			sprintf(icamsgbuf, "*");
-			trace(icamsgbuf, DUMP_NONE);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1199
 		ica_lock_dec();
 		return;
 	}
     }
+#endif
+#line 1352
 
 #if defined (CPU_40_STYLE) && !defined(NTVDM)
     depth = asp->isr_depth[line_no];
@@ -1281,12 +1261,9 @@ void SWPIC_clear_int IFN2(IU32, adapter, IU32, line_no)
     }
 
 #ifndef PROD
-    if (io_verbose & ICA_VERBOSE)
-    {
-	sprintf(icamsgbuf, "**** ICA_CLEAR_INT, line %d ****", line_no);
-	trace(icamsgbuf, DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1290
 
     host_ica_unlock();
 }
@@ -1309,9 +1286,9 @@ void ica_hw_interrupt_cancel IFN2(IU32, adapter, IU32, line_no)
 GLOBAL IS32
 ica_intack IFN1(IU32 *, hook_address)
 #else
-GLOBAL IS32
-ica_intack IFN0()
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif	/* HOOKED_IRETS */
+#line 1453
 {
     /*
      * This routine is called by the CPU when it wishes to acknowledge
@@ -1396,6 +1373,10 @@ ica_intack IFN0()
     }
 
 
+#if defined (NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1399
 #ifdef HOOKED_IRETS
     /* check whether IRET Hook required for interrupt on this line.
      * If IRET trapping mechanism is via bops on stack then this may
@@ -1418,6 +1399,8 @@ ica_intack IFN0()
 #endif	/* CPU_40_STYLE */
     }
 #endif  /* HOOKED_IRETS */
+#endif  /* !NTVDM */
+#line 1573
 
     host_ica_unlock();		/* real lock if supported */
 
@@ -1425,6 +1408,8 @@ ica_intack IFN0()
 }
 
 
+#ifndef NTVDM
+#line 1428
 #ifdef CPU_40_STYLE
 
 /*(
@@ -1453,16 +1438,19 @@ typedef struct {
 GLOBAL ICA_ASYNC_HANDLER async_handlers[] = {
 
 #ifdef NOVELL
-	{ ICA_SLAVE, 	NETWORK_INT,	host_sigio_event },
+#error "Unsupported SoftPC mirror configuration: NOVELL"
 #endif /* NOVELL */
+#line 1458
 
 #ifdef SWIN_HAW
-	{ ICA_SLAVE,	SWIN_HAW_INT,	0 },
+#error "Unsupported SoftPC mirror configuration: SWIN_HAW"
 #endif /* SWIN_HAW */
+#line 1462
 
 #ifdef ASPI
-	{ ICA_SLAVE,	ASPI_INT,	0 },
+#error "Unsupported SoftPC mirror configuration: ASPI"
 #endif /* ASPI */
+#line 1466
 
 	{ 0, ICA_IMPOSSIBLE_LINE, 0}
 };
@@ -1488,11 +1476,9 @@ GLOBAL void ica_async_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call
 	ICA_ASYNC_HANDLER *iahp;
 	
 #ifndef PROD
-	if (call_count != 1) {
-		always_trace3("ica_async_interrupt(%s, %d, %d): call_count must be 1",
-			adapter? "MASTER":"SLAVE", line_no, call_count);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
+#line 1496
 
 	for (iahp = async_handlers; iahp->line_no != ICA_IMPOSSIBLE_LINE; iahp++) {
 		if (iahp->adapter == adapter && iahp->line_no == line_no) {
@@ -1583,12 +1569,9 @@ action_interrupt IFN4(IU32, adapter, IU32, line, ICA_CALLBACK, func, IU32, parm)
 	if (asp->callback_fn[line] != NO_ICA_CALLBACK)
 	{
 #ifndef PROD
-		if (io_verbose & ICA_VERBOSE)
-		{
-			sprintf(icamsgbuf, "action_interrupt called before line %d cleared", line);
-			trace(icamsgbuf, DUMP_NONE);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
+#line 1592
 		host_ica_unlock();	/* real unlock if available */
 		return(FALSE);
 	}
@@ -1654,11 +1637,17 @@ cancel_action_interrupt IFN2(IU32, adapter, IU32, line)
 }
 #endif  /* CPU_40_STYLE */
 
+#endif  /* !NTVDM */
+#line 1809
 
 
 
 
 
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif   /* NTVDM */
+#line 1863
 #ifdef HOOKED_IRETS
 #ifndef  GISP_CPU           /* GISP has own version of this routine */
 
@@ -1667,14 +1656,9 @@ GLOBAL IU32 ica_iret_hook_needed IFN1(IU32, line)
 	IU16 ireq_mask = 1 << line;
 
 #ifndef PROD
-	if (line < 0 || line > 15)
-	{
-		/* Line is out of range */
-		sprintf(icamsgbuf, "**** ICA IRET HOOK IMPOSSIBLE line %d ****", line);
-		trace(icamsgbuf, DUMP_NONE);
-		return 0;
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1678
 
 	/* does this line require iret hooks */
 	if (!(iretHookMask & ireq_mask))
@@ -1698,13 +1682,9 @@ ica_iret_hook_control IFN3(IU32, adapter, IU32, line, IBOOL, enable)
 	/* The CCPU interrupt path receives but does not consume IRET hooks.
 	 * Keep hook bookkeeping disabled for that executor, as in ica.old. */
 #ifndef CCPU
-	int mask = 1 << (line + (adapter << 3));
-
-	if (enable)
-		iretHookMask |= mask;
-	else
-		iretHookMask &= ~mask;
+#error "Unsupported SoftPC mirror configuration: !CCPU"
 #else
+#line 1708
 	UNUSED(adapter);
 	UNUSED(line);
 	UNUSED(enable);
@@ -1721,12 +1701,9 @@ ica_iret_hook_called IFN1(IU32, abs_line)
 	IU8 i;
 
 #ifndef PROD
-	if (io_verbose & ICA_VERBOSE)
-	{
-		sprintf(icamsgbuf, "**** ICA IRET HOOK, line %d ****", line);
-		trace(icamsgbuf, DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1730
 
 #ifdef CPU_40_STYLE
 	asp = &adapter_state[adapter];
@@ -1741,9 +1718,9 @@ ica_iret_hook_called IFN1(IU32, abs_line)
 	if (asp->isr_depth[line] < MAX_ISR_DEPTH)
 		iretHookActive &= ~(1 << abs_line);
 #else
-	UNUSED(asp);	/* anti warning */
-	iretHookActive &= ~(1 << abs_line);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 1747
 
 
 	if ((i = ica_scan_irr(adapter)) & 0x80)
@@ -1848,20 +1825,21 @@ ica_check_stale_iret_hook IFN0()
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 1858
 
 #define INIT0_ICW1	(IU8)0x11	
 #define INIT0_ICW2	(IU8)0x08	
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else     //NEC_98
+#line 2060
 #define INIT0_ICW3	(IU8)0x04	
 #define INIT0_ICW4      (IU8)0x01
 
 
+#line 2068
 /* POST leaves some int lines masked out (including comms and lpt lines) */
 /* The setting of the bits is spread out throughout the real POST code
  * but is collected into one place here. I think that this will not cause
@@ -1869,6 +1847,8 @@ ica_check_stale_iret_hook IFN0()
  * DOS (eg OS/2 or coherent etc.)
  */
 #define INIT0_OCW1      (IU8)0xb8
+#endif   //NEC_98
+#line 2077
 
 void ica0_post IFN0()
 {
@@ -1887,15 +1867,29 @@ void ica0_init IFN0()
      * Set up the IO chip select logic for adapter 0. (Master).
      */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2099
     io_define_inb(ICA0_ADAPTOR, ica_inb_func);
     io_define_outb(ICA0_ADAPTOR, ica_outb_func);
+#endif
+#line 1892
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 2106
     for(i = ICA0_PORT_START; i <= ICA0_PORT_END; i++)
+#endif   //NEC_98
+#line 2108
         io_connect_port(i, ICA0_ADAPTOR, IO_READ_WRITE);
 
     adapter_state[ICA_MASTER].ica_master = TRUE;
 
 
+#ifndef NTVDM
+#line 1899
 
 #ifdef CPU_40_STYLE
     for (i = 0; i < 8; i++)
@@ -1914,26 +1908,31 @@ void ica0_init IFN0()
     iretHooksEnabled = TRUE;
 #endif
 
+#endif  /* !NTVDM */
+#line 1917
 
 }
 
 
 #define INIT1_ICW1	(IU8)0x11	
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else     //NEC_98
+#line 1922
 #define INIT1_ICW2	(IU8)0x70	
 #define INIT1_ICW3	(IU8)0x02	
 #define INIT1_ICW4      (IU8)0x01
 
 #ifdef NTVDM
-#define INIT1_OCW1      (IU8)0x0
-
-
-/* POST leaves some int lines masked out (reserved lines and RTC) */
-/* see the comment on POST setting mask bits for master ica */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #elif ASPI
-#define INIT1_OCW1	(IU8)0x8d
+#error "Unsupported SoftPC mirror configuration: ASPI"
 #else /* ASPI */	
+#line 1935
 #define INIT1_OCW1	(IU8)0x9d	
 #endif /* ASPI */
+#endif   //NEC_98
+#line 2161
 
 
 
@@ -1955,10 +1954,22 @@ void ica1_init IFN0()
      * Set up the IO chip select logic for adapter 1. (Slave).
      */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2186
     io_define_inb(ICA1_ADAPTOR, ica_inb_func);
     io_define_outb(ICA1_ADAPTOR, ica_outb_func);
+#endif
+#line 1960
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 2193
     for(i = ICA1_PORT_START; i <= ICA1_PORT_END; i++)
+#endif   //NEC_98
+#line 2195
         io_connect_port(i, ICA1_ADAPTOR, IO_READ_WRITE);
 
     adapter_state[ICA_SLAVE].ica_master = FALSE;
@@ -2013,13 +2024,9 @@ softpc_device_pic_state *state;
 				target->isr_time_decay[line][depth] =
 					source->isr_time_decay[line][depth];
 #else
-			target->callback_parameter[line] = 0u;
-			target->isr_depth[line] = 0;
-			for (depth = 0; depth <= SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
-				target->isr_progress[line][depth] = 0;
-			for (depth = 0; depth < SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
-				target->isr_time_decay[line][depth] = 0;
+#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && !defined(NTVDM))"
 #endif
+#line 2023
 		}
 	}
 #ifdef HOOKED_IRETS
@@ -2027,10 +2034,9 @@ softpc_device_pic_state *state;
 	state->iret_hook_mask = iretHookMask;
 	state->iret_hook_active = iretHookActive;
 #else
-	state->iret_hooks_enabled = 0u;
-	state->iret_hook_mask = 0u;
-	state->iret_hook_active = 0u;
+#error "Unsupported SoftPC mirror configuration: !HOOKED_IRETS"
 #endif
+#line 2034
 	return TRUE;
 }
 
@@ -2091,110 +2097,7 @@ const softpc_device_pic_state *state;
 
 
 #if !defined(PROD)
-/*
- * The following functions are used for DEBUG purposes only.
- */
-LOCAL void
-ica_print_int IFN2(char *, str, IS32, val)
-{
-    printf("%-20s 0x%02X\n", str, val);
-}
-
-LOCAL void
-ica_print_str IFN2(char *, str, char *, val)
-{
-    printf("%-20s %s\n", str, val);
-}
-
-GLOBAL void
-ica_dump IFN1(IU32, adapter)
-{
-    ADAPTER_STATE *asp = &adapter_state[adapter];
-    char buff[80];
-    int i;
-
-    if (adapter == ICA_MASTER)
-        printf("MASTER 8259A State:\n\n");
-    else
-        printf("SLAVE  8259A State:\n\n");
-
-    ica_print_str("ica_master", (asp->ica_master ? "Master" : "Slave"));
-    ica_print_int("ica_irr", asp->ica_irr);
-    ica_print_int("ica_isr", asp->ica_isr);
-    ica_print_int("ica_imr", asp->ica_imr);
-    ica_print_int("ica_ssr", asp->ica_ssr);
-    ica_print_int("ica_base", asp->ica_base);
-    ica_print_int("ica_hipri", asp->ica_hipri);
-    ica_print_int("ica_mode", asp->ica_mode);
-    printf("%-20s %8d%8d%8d%8d%8d%8d%8d%8d\n", "ica_count",
-		asp->ica_count[0], asp->ica_count[1], asp->ica_count[2], asp->ica_count[3],
-		asp->ica_count[4], asp->ica_count[5], asp->ica_count[6], asp->ica_count[7]);
-    ica_print_int("ica_int_line", asp->ica_int_line);
-    ica_print_str("ica_cpu_int", (asp->ica_cpu_int ? "TRUE" : "FALSE"));
-
-#if defined(CPU_40_STYLE) && !defined(NTVDM)
-    printf("%-20s %8d%8d%8d%8d%8d%8d%8d%8d\n", "callback_parm",
-                asp->callback_parm[0], asp->callback_parm[1], asp->callback_parm[2], asp->callback_parm[3],
-                asp->callback_parm[4], asp->callback_parm[5], asp->callback_parm[6], asp->callback_parm[7]);
-    printf("%-20s %8p%8p%8p%8p%8p%8p%8p%8p\n", "callback_fn",
-                asp->callback_fn[0], asp->callback_fn[1], asp->callback_fn[2], asp->callback_fn[3],
-                asp->callback_fn[4], asp->callback_fn[5], asp->callback_fn[6], asp->callback_fn[7]);
-    printf("%-20s %8d%8d%8d%8d%8d%8d%8d%8d\n", "isr_depth",
-                asp->isr_depth[0], asp->isr_depth[1], asp->isr_depth[2], asp->isr_depth[3],
-                asp->isr_depth[4], asp->isr_depth[5], asp->isr_depth[6], asp->isr_depth[7]);
-    for (i=0; i<(MAX_ISR_DEPTH + 1); i++)
-    {
-	    int j;
-	    int progress[8];
-	    IBOOL some_progress = FALSE;
-	
-	    for (j = 0; j < 8; j++)
-	    {
-		    if (asp->isr_depth[j] >= i)
-		    {
-			    some_progress = TRUE;
-			    progress[j] = asp->isr_progress[j][i];
-		    }
-		    else
-		    {
-			    progress[j] = 0;
-		    }
-	    }
-	    sprintf (buff, "isr_progress[%d]", i);
-	    printf("%-20s %8d%8d%8d%8d%8d%8d%8d%8d\n", buff,
-		   progress[0], progress[1], progress[2], progress[3],
-		   progress[4], progress[5], progress[6], progress[7]);
-	    if (!some_progress)
-		    break;
-    }
-    for (i=0; i<MAX_ISR_DEPTH; i++)
-    {
-	    int j;
-	    int decay[8];
-	    IBOOL some_decay = FALSE;
-	
-	    for (j = 0; j < 8; j++)
-	    {
-		    if (asp->isr_depth[j] >= i)
-		    {
-			    decay[j] = asp->isr_time_decay[j][i];
-			    some_decay = TRUE;
-		    }
-		    else
-		    {
-			    decay[j] = 0;
-		    }
-	    }
-	    sprintf (buff, "isr_time_decay[%d]", i);
-	    printf("%-20s %8d%8d%8d%8d%8d%8d%8d%8d\n", buff,
-		   decay[0], decay[1], decay[2], decay[3],
-		   decay[4], decay[5], decay[6], decay[7]);
-	    if (!some_decay)
-		    break;
-    }
-#endif /* CPU_40_STYLE && !NTVDM */
-
-    printf("\n\n");
-}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 2200
 

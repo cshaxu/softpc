@@ -1,0 +1,19 @@
+path	xp_if_line	xp_endif_line	condition	xp_body	classification
+host/src/nt_graph.c	584	586	ifndef NEC_98	host_stream_io_enabled definition	owner-approved-excluded-NT-stream-state-selected-condition-framework-restored
+host/src/nt_graph.c	937	940	ifndef X86GFX	NT fullscreen clear guard	selected-condition-framework-restored-standalone-frontend-does-not-use-NT-fullscreen
+base/inc/dma.h	155	171	ifdef BIT_ORDER2	DMA_COMMAND definition	false-positive-original-frame-and-selected-body-already-present
+base/inc/dma.h	261	270	ifdef BIT_ORDER2	DMA_STATUS definition	false-positive-original-frame-and-selected-body-already-present
+base/ccpu386/c_reg.c	1555	1615	ifdef SPC486	SPC486 register setters	false-positive-original-frame-already-excluded-at-aligned-location
+base/inc/dma.h	407	425	ifdef LITTLEND	DMA_ADDRESS definition	false-positive-original-frame-and-selected-body-already-present-14-contexts
+host/inc/nt_graph.h	539	541	ifndef NEC_98	host_stream_io_enabled declaration	owner-approved-excluded-NT-stream-state-selected-condition-framework-restored
+host/src/nt_graph.c	2883	2896	ifndef NEC_98	host_stream_io_update NT Console stream output	selected-condition-framework-restored-standalone-presentation-excludes-native-NT-console-stream
+host/src/nt_graph.c	2606	2611	else !NEC_98	NT fullscreen resize return guard	selected-condition-framework-restored-standalone-presentation-excludes-NT-fullscreen
+base/keymouse/ppi.c	69	71	ifndef NTVDM	SPKRDATA_was_low declaration	selected-outer-framework-present; existing-standalone-port-uses-full-HostPpiState-after-gate; local-inner-guard-await-depth-2-review
+base/ccpu386/c_main.c	33		ifdef NTVDM	thread exception/simulation stack branch	original-condition-modified-by-existing-CCPU-TLS-port; combined-OR-deferred-not-resolved
+base/ccpu386/c_main.c	769		ifdef NTVDM	thread exception/simulation stack branch	original-condition-modified-by-existing-CCPU-TLS-port; combined-OR-deferred-not-resolved
+base/ccpu386/c_main.c	4684		ifdef NTVDM	thread exception/simulation stack branch	original-condition-modified-by-existing-CCPU-TLS-port; combined-OR-deferred-not-resolved
+base/ccpu386/c_main.c	4838		ifdef NTVDM	thread exception/simulation stack branch	original-condition-modified-by-existing-CCPU-TLS-port; combined-OR-deferred-not-resolved
+base/ccpu386/c_main.c	4855		ifdef NTVDM	thread exception/simulation stack branch	original-condition-modified-by-existing-CCPU-TLS-port; combined-OR-deferred-not-resolved
+base/ccpu386/c_main.c	4870		ifdef NTVDM	thread exception/simulation stack branch	original-condition-modified-by-existing-CCPU-TLS-port; combined-OR-deferred-not-resolved
+base/keymouse/mouse_io.c	1229	1235	ifndef NEC_98	NTVDM-only stream disable call	selected-outer-restored-native-NTVDM-stream-content-omitted-child-queued-depth2
+host/inc/nt_sb.h	311	329	if DBG else	selected no-op native debug macros	selected-original-content-omitted-T93-no-callers-conditional-frame-restored

@@ -19,9 +19,11 @@ static char SccsID[]="@(#)gendrvr.h	1.4 09/24/92 Copyright Insignia Solutions Lt
 */
 
 #if defined (GEN_DRVR) || defined (CDROM)
-extern void init_gen_drivers();
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif /* GEN_DRVR || CDROM */
+#line 24
 
 #ifdef GEN_DRVR
-extern void gen_driver_io();
+#error "Unsupported SoftPC mirror configuration: GEN_DRVR"
 #endif /* GEN_DRVR */
+#line 28

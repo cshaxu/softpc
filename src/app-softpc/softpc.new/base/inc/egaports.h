@@ -20,9 +20,9 @@
 	(extensions_controller.ram_bank_select.as_bfld.counter_bank_enable? \
 			EGA_PLANE_SIZE:0x10000)
 #else
-#define	EGA_PLANE_SIZE	0x10000
-#define EGA_PLANE_DISP_SIZE EGA_PLANE_SIZE
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
+#line 26
 
 	extern void ega_init IPT0();
 	extern void ega_term IPT0();
@@ -30,10 +30,9 @@
 	extern int ega_get_pel_panning IPT1(int,line);
 	extern void ega_gc_outb_index IPT2(io_addr,ia,half_word,hw);
 #ifdef	HUNTER
-	extern int ega_get_line_compare IPT0();
-	extern int ega_get_max_scan_lines IPT0();
-	extern void ega_set_line_compare IPT1(int,i);
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 37
 	IMPORT VOID update_banking IPT0();
 	IMPORT VOID set_banking IPT2(IU8, rd_bank, IU8, wrt_bank);
 
@@ -75,11 +74,6 @@
 
 #define Cpu_define_outb( port, func )
 #else
-/* Declare as Import to remove warnings */
-#ifdef ANSI
-IMPORT VOID Cpu_define_outb(IU16 adapterID, VOID (*asmFunc) IPT2(io_addr, port, half_word, value));
-#else
-IMPORT VOID Cpu_define_outb IPT2(IU16, adapterID, VOID (*)(), asmFunc);
-#endif /* ANSI */
- 
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif /* C_VID || A2CPU */
+#line 84

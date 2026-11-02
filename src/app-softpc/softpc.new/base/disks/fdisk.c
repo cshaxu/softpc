@@ -215,13 +215,9 @@ IMPORT	int	soft_reset;
 /* [3.1.1 #INCLUDES]                                                    */
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_HDA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 225
 
 #include <stdio.h>
 #include TypesH
@@ -364,22 +360,9 @@ typedef struct _drvinfo
 /* [5.1.3 PROCEDURE() DECLARATIONS]					 */
 
 #ifdef ANSI
-static void     restore(int);
-static void     seek(int);
-static void     rsector(int);
-static void     wsector(int);
-static void     format(int);
-static void     rverify(int);
-static void     diagnose(int);
-static void     setparams(int);
-static void     bad(int);
-static void     irq(int);
-static void     rmac(unsigned short *, int);
-static long     dosearchid(void);
-static void     doseek(void);
-static int      disktobuffer(long);
-static int      buffertodisk(long);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 382
 static void     restore();
 static void     seek();
 static void     rsector();
@@ -1499,8 +1482,9 @@ GLOBAL VOID fdisk_inb IFN2(io_addr, port, UTINY *,value)
 		 		 * sector buffer must be accessed only in 16 bit quantities
 		 		 */
 #ifndef PROD
-				printf("(fdisk_inb()) inb on sector buffer ignored!\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1504
 				break;
 			default:
 				dt1(DHW | PORTIO, 0, "inb on port %x(hex)\n", port)
@@ -1515,30 +1499,14 @@ GLOBAL VOID fdisk_inb IFN2(io_addr, port, UTINY *,value)
 GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 {
 #ifdef	JOKER
-	/* This is the only way JOKER talks to disks, since
-	** Ade's fast disk bios is currently infeasible.
-	** Hence, speed is of interest here!
-	*/
-	if (port == TFBASE)
-	{
-		/* For speed, JOKER doesn't bother with calling rmac(IOREAD). */
-
-		*value = HostWordToIntelWord(sectbuffer[sectindx]);
-
-		if (!++sectindx)	/* sectindx is a byte value -- wraparound? */
-		{
-			if (activecmd)
-			{
-				(*activecmd) (BRDY);
-			}
-		}
-	}
-
+#error "Unsupported SoftPC mirror configuration: JOKER"
 #else	/* JOKER */
+#line 1538
 
 #ifdef BIGEND
-	unsigned short  temp;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 1542
 		switch (port)
 	{
 	case TFBASE:
@@ -1548,9 +1516,9 @@ GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 #endif
 
 #ifdef BIGEND
-		rmac(&temp, IOREAD);
-		*value = ((temp << 8) & 0xff00) | (temp >> 8);
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 1554
 
 #if 0
 		dt1(DHW | PORTIO, 0, "inw on sector buffer returns %x(hex)\n", *value)
@@ -1572,6 +1540,8 @@ GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 
 GLOBAL VOID fdisk_outb IFN2(io_addr, port, UTINY, value)
 {
+#ifndef NEC_98
+#line 1575
 	dt0(DHW, 0, "(\n")
 		switch (port)
 	{
@@ -1581,8 +1551,9 @@ GLOBAL VOID fdisk_outb IFN2(io_addr, port, UTINY, value)
 		 * byte access to sector buffer is not a good idea
 		 */
 #ifndef PROD
-		printf("(disk_outb()) outb to sector buffer ignored\n!");
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1586
 		break;
 	case TFPCMP:
 		dt2(DHW | PORTIO, 0, "outb to port %x(hex),val %x(hex)\n",
@@ -1635,20 +1606,23 @@ GLOBAL VOID fdisk_outb IFN2(io_addr, port, UTINY, value)
 		dt0(DHW | PORTIO, 0, "\n")
 	}
 	dt0(DHW, 0, ")\n")
+#endif // !NEC_98
+#line 1638
 }
 
 GLOBAL VOID fdisk_outw IFN2(io_addr, port, USHORT, value)
 {
 #ifdef BIGEND
-	unsigned short  temp;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 1645
 		switch (port)
 	{
 	case TFBASE:
 #if 0
-		dt1(DHW | PORTIO, 0, "outw to sector buffer, val %x(hex)\n",
-		    (unsigned) value)
+#error "Unsupported SoftPC mirror configuration: disabled branch"
 #else
+#line 1653
 		dt1(DHW | PORTIO, OUTW_TRACE_HNDL, "outw to sector buffer",
 		    (unsigned) value)
 #endif
@@ -1658,9 +1632,9 @@ GLOBAL VOID fdisk_outw IFN2(io_addr, port, USHORT, value)
 #endif
 
 #ifdef BIGEND
-		temp = ((value << 8) & 0xff00) | (value >> 8);
-		rmac(&temp, IOWRITE);
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 1664
 
 			break;
 	default:
@@ -1675,6 +1649,8 @@ GLOBAL VOID fdisk_outw IFN2(io_addr, port, USHORT, value)
 
 GLOBAL VOID fdisk_ioattach IFN0()
 {
+#ifndef NEC_98
+#line 1680
 	unsigned short  ncyls;
 	unsigned char   nheads;
 	unsigned char   nsects;
@@ -1712,15 +1688,17 @@ GLOBAL VOID fdisk_ioattach IFN0()
 		nheads = (unsigned char)(drives[0].maxhead + 1);
 		nsects = (unsigned char)(drives[0].maxsect + 1);
 #ifdef REAL_ROM
-		host_write_enable((DPB0 & (~0xfff)), (DPB0 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1717
 		patch_rom(DPB0, (unsigned char) (ncyls & 0xff));
 		patch_rom(DPB0+1, (unsigned char) (ncyls >> 8));
 		patch_rom(DPB0+2, nheads);
 		patch_rom(DPB0+0xe, nsects);
 #ifdef REAL_ROM
-		host_write_protect((DPB0 & (~0xfff)), (DPB0 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1724
 		dt1(DHW | IOAD, 0, "drive 0 wiredup, total cyls %d\n",
 		    (unsigned) ncyls)
 	}
@@ -1740,22 +1718,28 @@ GLOBAL VOID fdisk_ioattach IFN0()
 		nheads = (unsigned char)(drives[1].maxhead + 1);
 		nsects = (unsigned char)(drives[1].maxsect + 1);
 #ifdef REAL_ROM
-		host_write_enable((DPB1 & (~0xfff)), (DPB1 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1745
 		patch_rom(DPB1, (unsigned char)(ncyls & 0xff));
 		patch_rom(DPB1 + 1, (unsigned char)((ncyls >> 8)));
 		patch_rom(DPB1+2, nheads);
 		patch_rom(DPB1+0xe, nsects);
 #ifdef REAL_ROM
-		host_write_protect((DPB1 & (~0xfff)), (DPB1 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1752
 		dt1(DHW | IOAD, 0, "drive 1 wiredup, total cyls %d\n",
 		    (unsigned) ncyls)
 	}
+#endif // !NEC_98
+#line 1755
 }
 
 GLOBAL VOID fdisk_iodetach IFN0()
 {
+#ifndef NEC_98
+#line 1759
 	io_addr         p;
 
 	/*
@@ -1775,15 +1759,17 @@ GLOBAL VOID fdisk_iodetach IFN0()
 		 */
 		drives[0].wiredup = 0;
 #ifdef REAL_ROM
-		host_write_enable((DPB0 & (~0xfff)), (DPB0 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1780
 		patch_rom(DPB0, 0);
 		patch_rom(DPB0 + 1, 0);
 		patch_rom(DPB0 + 2, 0);
 		patch_rom(DPB0 + 0xe, 0);
 #ifdef REAL_ROM
-		host_write_protect((DPB0 & (~0xfff)), (DPB0 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1787
 		dt0(DHW | IOAD, 0, "drive 0 unplugged\n")
 	}
 	if (drives[1].physattached)
@@ -1795,17 +1781,21 @@ GLOBAL VOID fdisk_iodetach IFN0()
 		 */
 		drives[1].wiredup = 0;
 #ifdef REAL_ROM
-		host_write_enable((DPB1 & (~0xfff)), (DPB1 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1800
 		patch_rom(DPB1, 0);
 		patch_rom(DPB1 + 1, 0);
 		patch_rom(DPB1 + 2, 0);
 		patch_rom(DPB1 + 0xe, 0);
 #ifdef REAL_ROM
-		host_write_protect((DPB1 & (~0xfff)), (DPB1 & (~0xfff)) + 0x1000);
+#error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
+#line 1807
 		dt0(DHW | IOAD, 0, "drive 1 unplugged\n")
 	}
+#endif // !NEC_98
+#line 1809
 }
 
 GLOBAL VOID fdisk_physattach IFN1(int,driveno)
@@ -1844,21 +1834,9 @@ GLOBAL VOID fdisk_physattach IFN1(int,driveno)
 }
 
 #ifdef macintosh
-
-GLOBAL VOID fdisk_physdetach IFN1(int,driveno)
-{
-	if (drives[driveno].physattached)
-	{
-		host_fdisk_close(driveno);
-
-		drives[driveno].physattached = 0;
-
-		fast_disk_bios_detach (driveno);
-
-		dt0(DHW|PAD, 0, "drive %d closed\n")
-	}
-}
+#error "Unsupported SoftPC mirror configuration: legacy Mac"
 #endif /* macintosh */
+#line 1867
 
 GLOBAL VOID fdisk_reset IFN0()
 {

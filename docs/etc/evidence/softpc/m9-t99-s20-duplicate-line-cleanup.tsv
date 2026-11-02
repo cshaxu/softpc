@@ -1,0 +1,13 @@
+path	before_physical_line	retained_logical_line
+base/keymouse/mouse.c	243	240
+base/keymouse/mouse_io.c	1854	1929
+base/support/time_day.c	193	185
+base/support/time_day.c	349	370
+base/system/timer.c	458	416
+base/video/ega_prts.c	1334	1852
+base/video/ega_read.c	679	912
+base/video/ega_read.c	716	958
+base/video/ega_vide.c	1846	1817
+base/video/gfx_updt.c	263	262
+base/video/vga_vide.c	185	186
+base/video/vga_vide.c	777	799

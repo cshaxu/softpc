@@ -1,0 +1,2 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/inc/rs232.h	649	679	299	319	32971804b0383e260fe2e43b3e1f01574a1b02fa69e8c43d88964d5a0b4978da

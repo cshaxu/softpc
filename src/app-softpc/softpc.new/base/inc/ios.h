@@ -28,6 +28,14 @@
 
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 38
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 301
 /*
  * The IO address range for the Monochrome Display Adapter.
  */
@@ -37,9 +45,9 @@
 
 
 #ifdef HERC
-#define HERC_PORT_START         0x3B0
-#define HERC_PORT_END           0x3BF
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 43
 
 /*
  * Memory bounds for the colour graphics adaptor
@@ -303,11 +311,9 @@
 /* SoundBlaster I/O Ports */
 
 #ifdef SWIN_SNDBLST_NULL
-#define SNDBLST1_PORT_START             0x0220
-#define SNDBLST1_PORT_END               0x022F
-#define SNDBLST2_PORT_START             0x0240
-#define SNDBLST2_PORT_END               0x026F
+#error "Unsupported SoftPC mirror configuration: SWIN_SNDBLST_NULL"
 #endif
+#line 311
 
 /*
  * PCI configuration ports.
@@ -352,8 +358,9 @@
 #define AT_KEYB_ADAPTOR         26
 #define CMOS_ADAPTOR            27
 #ifdef HERC
-#define HERC_ADAPTOR            28
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 357
 #if (NUM_SERIAL_PORTS > 2)
 #define COM3_ADAPTOR            29
 #define COM4_ADAPTOR            30
@@ -372,15 +379,16 @@
 #define SNDBLST_ADAPTER         36
 
 #ifdef GISP_SVGA
-#define GISP_VGA_FUDGE_ADAPTER          36
-#define IO_MAX_NUMBER_ADAPTORS          37
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else           /* GISP_SVGA */
+#line 378
 
 /* Adapter for SoundBlaster Null Driver */
 
 #ifdef SWIN_SNDBLST_NULL
-#define SNDBLST_ADAPTER         36
+#error "Unsupported SoftPC mirror configuration: SWIN_SNDBLST_NULL"
 #endif
+#line 384
 
 #ifndef IO_MAX_NUMBER_ADAPTORS
 #define IO_MAX_NUMBER_ADAPTORS  37      /* make this equal to the highest used plus one please! */
@@ -388,35 +396,16 @@
 
 #endif          /* GISP_SVGA */
 #else   /* SFELLOW */
-
-/*
- * StringFellow doesn't need most of the emulated hardware, as
- * it has the real thing.
- */
-
-#define EMPTY_ADAPTOR                                   0
-#define HW_ADAPTOR_DW                                   1
-#define HW_ADAPTOR_W                                    2
-#define HW_ADAPTOR_B                                    3
-#define KEY64_ADAPTOR                                   4
-#define KEY60_ADAPTOR                                   5
-#define DMA_ADAPTOR                                     6
-#define PPI_ADAPTOR                                     7
-#define CMOS_ADAPTOR                                    8
-#define MFG_ADAPTOR                                     9
-#define PCI_CONFIG_ADDRESS_ADAPTOR                      10
-#define PCI_CONFIG_PORT_ADAPTOR                         11
-#define PCI_CONFIG_DATA_ADAPTOR0                        12
-#define PCI_CONFIG_DATA_ADAPTOR13                       13
-#define PCI_CONFIG_DATA_ADAPTOR2                        14
-#define PIC_SLAVE_ADAPTOR                               15
-#define PIC_MASTER_ADAPTOR                              16
-#define SF_EGA_GC_ADAP_INDEX                            17
-#define SF_EGA_GC_ADAP_DATA                             18
-#define IO_MAX_NUMBER_ADAPTORS  19      /* make this equal to the highest used plus one please! */
-
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif /*SFELLOW */
+#line 419
+#endif // !NEC_98
+#line 419
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // !NEC_98
+#line 711
 
 /*
  * The Bit masks for specifying Read/Write access when connecting ports
@@ -452,92 +441,62 @@ IMPORT void     outd IPT2(io_addr, io_address, IU32, value);
 IMPORT void     io_define_inb
 (
 #ifdef  ANSI
-        half_word adapter,
-        void (*func) IPT2(io_addr, io_address, half_word *, value)
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
+#line 458
 );
 
 #ifdef SFELLOW
-IMPORT void     io_define_inw
-(
-#ifdef  ANSI
-        half_word adapter,
-        void (*func) IPT2(io_addr, io_address, word *, value)
-#endif  /* ANSI */
-);
-
-IMPORT void     io_define_ind
-(
-#ifdef  ANSI
-        half_word adapter,
-        void (*func) IPT2(io_addr, io_address, IU32 *, value)
-#endif  /* ANSI */
-);
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif  /* SFELLOW */
+#line 768
 
 IMPORT void     io_define_in_routines
 (
 #ifdef  ANSI
-        half_word adapter,
-        void (*inb_func) IPT2(io_addr, io_address, half_word *, value),
-        void (*inw_func) IPT2(io_addr, io_address, word *, value),
-        void (*insb_func) IPT3(io_addr, io_address, half_word *, valarray,
-                word, count),
-        void (*insw_func) IPT3(io_addr, io_address, word *, valarray,
-                word, count)
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
+#line 489
 );
 
 IMPORT void     io_define_outb
 (
 #ifdef  ANSI
-        half_word adapter,
-        void (*func) IPT2(io_addr, io_address, half_word, value)
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
+#line 497
 );
 
 #ifdef SFELLOW
-IMPORT void     io_define_outw
-(
-#ifdef  ANSI
-        half_word adapter,
-        void (*func) IPT2(io_addr, io_address, word, value)
-#endif  /* ANSI */
-);
-
-extern void     io_define_outd
-(
-#ifdef  ANSI
-        half_word adapter,
-        void (*func) IPT2(io_addr, io_address, IU32, value)
-#endif  /* ANSI */
-);
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif  /* SFELLOW */
+#line 807
 
 IMPORT void     io_define_out_routines
 (
 #ifdef  ANSI
-        half_word adapter,
-        void (*outb_func) IPT2(io_addr, io_address, half_word, value),
-        void (*outw_func) IPT2(io_addr, io_address, word, value),
-        void (*outsb_func) IPT3(io_addr, io_address, half_word *, valarray,
-                word, count),
-        void (*outsw_func) IPT3(io_addr, io_address, word *, valarray,
-                word, count)
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
+#line 528
 );
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 825
 IMPORT void     io_connect_port IPT3(io_addr, io_address, half_word, adapter,
         half_word, mode);
+#endif  /* NTVDM */
+#line 828
 
 IMPORT void     io_disconnect_port IPT2(io_addr, io_address, half_word, adapter);
 IMPORT void     io_init IPT0();
 
 /* Externs and macros for io_redefine_inb/outb */
 #ifdef MAC68K
-IMPORT char     *Ios_in_adapter_table;
-IMPORT char     *Ios_out_adapter_table;
+#error "Unsupported SoftPC mirror configuration: MAC68K"
 #else
+#line 837
 IMPORT char     Ios_in_adapter_table[];
 IMPORT char     Ios_out_adapter_table[];
 #endif

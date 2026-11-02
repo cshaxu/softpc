@@ -1,0 +1,8 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/disks/floppy.c	3383	3483	1566	1624	NTVDM	then	7b414655db0c0e09a5cdae20861daf0a60c7431b0fd789cf5dd0831620dd5771
+base/keymouse/keyba.c	3506	3528	2719	2728	NEC_98	else	9d6e268a063571392e5d0579c263bfbcb98420e840f81c36d6fbfcd94546b78b
+base/keymouse/keyba.c	3463	3475	2688	2693	NEC_98	else	1766b4b4b708b5b7196ec2e36d8d3bae8db42ef6e78416d54adcf3c45b97854b
+base/keymouse/keyba.c	3486	3492	2703	2706	NEC_98	else	0def9a4f0e9f4d7c07a88e7cd76ac444030b2c67e3bc41a6238d09371cbbe4aa
+base/keymouse/keyba.c	492	498	340	342	JAPAN	else	a8f774a11e2eb0fd57227e2c5bd1a8cb32b6c8e4fd03926282494e8a73178022
+host/src/nt_keycd.c	434	466	151	166	JAPAN	else	56ef25733e13fef204f89de9f5bad69cf16d02bad9340bfcb126922499fa7857
+host/src/nt_keycd.c	406	413	129	131	JAPAN	else	4e418d9cb021a9b2b9fdd5398e44aa4b72e1a7a071a4cd8d009f73529065c7f5

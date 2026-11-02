@@ -1,0 +1,5 @@
+path	parent_if_line	baseline_else_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/system/quick_ev.c	185	191	194	if	defined(CPU_40_STYLE) && !defined(SFELLOW)	6374d1f81f13eee788f78dbfdaf717ca87cd545a662a91429cfd93093e4eda7b
+base/system/quick_ev.c	547	554	557	if	defined(CPU_40_STYLE)	419d622c6d6e289520c84d58fb6a02b092dfaf26ba061fdffa0f2eb7ae555004
+base/system/quick_ev.c	925	927	930	if	defined(CPU_40_STYLE)	e4dfaa397387a1bd58e39a1c5fed0a71a861b60ac97a6d9a18ff5705fcf4b971
+host/inc/error.h	256	260	273	if	!defined(BUILDING_CPU_TOOL)	f904455733d815dc2a92f76b91ecbcd2517593d8fc22e24ed2296bef409a2169

@@ -46,6 +46,19 @@
 #include "nt_det.h"
 #include "dib_surface.h"
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 46
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif
+#line 50
+
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 92
 
 
 
@@ -53,21 +66,19 @@
 
 
 extern char *image_buffer;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 103
 
 /* Statics */
 
 static unsigned int cga_med_graph_hi_nyb[256];
 static unsigned int cga_med_graph_lo_nyb[256];
 #ifdef BIGWIN
-static unsigned int cga_med_graph_hi_lut_big[256];
-static unsigned int cga_med_graph_mid_lut_big[256];
-static unsigned int cga_med_graph_lo_lut_big[256];
-
-static unsigned int cga_med_graph_lut4_huge[256];
-static unsigned int cga_med_graph_lut3_huge[256];
-static unsigned int cga_med_graph_lut2_huge[256];
-static unsigned int cga_med_graph_lut1_huge[256];
+#error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif
+#line 71
 
 /*
  *  cga_graph_inc_val depends on whether data is interleaved ( EGA/VGA )
@@ -79,12 +90,26 @@ static unsigned int cga_med_graph_lut1_huge[256];
 // for x86 we have 2 bytes per character (char and attr)
 // for risc we have 4 bytes per character because of vga interleaving
 //
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#else
+#line 132
 #define TEXT_INCVAL 4
+#endif
+#line 134
+#if (defined(JAPAN) || defined(KOREA)) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // (JAPAN || KOREA) && i386
+#line 138
 
 
 
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 168
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*:::::::::::::::::::::: Initialise CGA text output ::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -98,7 +123,20 @@ void nt_init_text()
 
     sub_note_trace0(HERC_HOST_VERBOSE, "nt_init_text");
 
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif	//X86GFX
+#line 184
     closeGraphicsBuffer(); /* Tim Oct 92 */
+
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif  //MONITOR
+#line 197
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // JAPAN || KOREA
+#line 213
 
 }
 
@@ -141,41 +179,9 @@ void nt_init_cga_colour_med_graph()
                         byte4 = ( i & 0xC0 ) >> 6;
 
 #ifdef BIGEND
-                        cga_med_graph_hi_nyb[i]
-                                = ( byte4 << 24 ) | ( byte4 << 16)
-                                        | ( byte3 << 8 ) | byte3;
-                        cga_med_graph_lo_nyb[i]
-                                = ( byte2 << 24 ) | ( byte2 << 16)
-                                        | ( byte1 << 8 ) | byte1;
-
-#ifdef BIGWIN
-                        cga_med_graph_hi_lut_big[i]
-                                = ( byte4 << 24 ) | ( byte4 << 16)
-                                        | ( byte4 << 8 ) | byte3;
-                        cga_med_graph_mid_lut_big[i]
-                                = ( byte3 << 24) | ( byte3 << 16 )
-                                        | ( byte2 << 8 ) | byte2;
-                        cga_med_graph_lo_lut_big[i]
-                                = ( byte2 << 24 ) | ( byte1 << 16)
-                                        | ( byte1 << 8 ) | byte1;
-
-                        cga_med_graph_lut4_huge[i]
-                                = ( byte4 << 24 ) | ( byte4 << 16)
-                                        | ( byte4 << 8 ) | byte4;
-
-                        cga_med_graph_lut3_huge[i]
-                                = ( byte3 << 24 ) | ( byte3 << 16)
-                                        | ( byte3 << 8 ) | byte3;
-
-                        cga_med_graph_lut2_huge[i]
-                                = ( byte2 << 24 ) | ( byte2 << 16)
-                                        | ( byte2 << 8 ) | byte2;
-
-                        cga_med_graph_lut1_huge[i]
-                                = ( byte1 << 24 ) | ( byte1 << 16)
-                                        | ( byte1 << 8 ) | byte1;
-#endif /* BIGWIN */
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
+#line 289
 
 #ifdef LITTLEND
                         cga_med_graph_hi_nyb[i]
@@ -186,32 +192,9 @@ void nt_init_cga_colour_med_graph()
                                         | ( byte2 << 8 ) | byte2;
 
 #ifdef BIGWIN
-                        cga_med_graph_hi_lut_big[i]
-                                = ( byte3 << 24 ) | ( byte4 << 16)
-                                        | ( byte4 << 8 ) | byte4;
-                        cga_med_graph_mid_lut_big[i]
-                                = ( byte2 << 24) | ( byte2 << 16 )
-                                        | ( byte3 << 8 ) | byte3;
-                        cga_med_graph_lo_lut_big[i]
-                                = ( byte1 << 24 ) | ( byte1 << 16)
-                                        | ( byte1 << 8 ) | byte2;
-
-                        cga_med_graph_lut4_huge[i]
-                                = ( byte4 << 24 ) | ( byte4 << 16)
-                                        | ( byte4 << 8 ) | byte4;
-
-                        cga_med_graph_lut3_huge[i]
-                                = ( byte3 << 24 ) | ( byte3 << 16)
-                                        | ( byte3 << 8 ) | byte3;
-
-                        cga_med_graph_lut2_huge[i]
-                                = ( byte2 << 24 ) | ( byte2 << 16)
-                                        | ( byte2 << 8 ) | byte2;
-
-                        cga_med_graph_lut1_huge[i]
-                                = ( byte1 << 24 ) | ( byte1 << 16)
-                                        | ( byte1 << 8 ) | byte1;
+#error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
+#line 215
 #endif /* LITTLEND */
 
                 }
@@ -233,6 +216,8 @@ void nt_init_cga_colour_hi_graph()
         sc.BitsPerPixel = MONO_BITS_PER_PIXEL;
 }
 
+#ifndef NEC_98
+#line 236
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*:::::::::::::::::::::::::: Output CGA text :::::::::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -396,6 +381,8 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
     }
 
 }   /* end of nt_text() */
+#endif // !NEC_98
+#line 399
 
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -540,94 +527,9 @@ void nt_cga_colour_med_graph_big(int offset, int screen_x, int screen_y,
                                  int len, int height)
 {
 #ifdef BIGWIN
-    UTINY       *intelmem_ptr;
-    ULONG       *graph_ptr;
-    LONG         local_len,
-                 bytes_per_scanline,
-                 longs_per_scanline;
-    ULONG	 inc;
-    SMALL_RECT   rect;
-
-    sub_note_trace5(CGA_HOST_VERBOSE,
-              "nt_cga_colour_med_graph_big off=%d x=%d y=%d len=%d height=%d\n",
-                    offset, screen_x, screen_y, len, height);
-
-    /*
-    ** Tim Jan 93, rapid mode changes cause mismatch between update and
-    ** paint rountines. Ignore paint request when invalid parameter
-    ** causes crash.
-    */
-    if( screen_y > 400 ){
-	assert1( NO, "VDM: med gfx big rejected y=%d\n", screen_y );
-	return;
-    }
-
-    /*
-    ** Tim September 92, bounce call if handle to screen buffer is null.
-    ** This can happen when VDM session is about to suspend, buffer has
-    ** been closed, but still get a paint request.
-    */
-    if( sc.ScreenBufHandle == (HANDLE)NULL ){
-	assert0( NO, "VDM: rejected paint request due to NULL handle" );
-	return;
-    }
-
-    /* Clip to window */
-    height = 1;
-    if (len > 80)
-	len = 80;
-
-    bytes_per_scanline = BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
-    longs_per_scanline = LONGS_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
-    inc = offset & 1 ? 3 : 1;
-    intelmem_ptr = get_screen_ptr(offset);
-    graph_ptr = (ULONG *) ((UTINY *) sc.ConsoleBufInfo.lpBitMap +
-                           SCALE(screen_y * bytes_per_scanline + screen_x));
-    local_len = len;
-
-    /* Grab the mutex. */
-    GrabMutex(sc.ConsoleBufInfo.hMutex);
-
-    do
-    {
-        *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr =
-            cga_med_graph_hi_lut_big[*intelmem_ptr];
-        graph_ptr++;
-
-        *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr =
-            cga_med_graph_mid_lut_big[*intelmem_ptr];
-        graph_ptr++;
-
-        *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr =
-            cga_med_graph_lo_lut_big[*intelmem_ptr];
-        graph_ptr++;
-
-        intelmem_ptr += inc;
-        inc ^= 2;
-    }
-    while( --local_len );
-
-    /* Release the mutex. */
-    RelMutex(sc.ConsoleBufInfo.hMutex);
-
-    /* Display the new image. */
-    rect.Left = SCALE(screen_x);
-    rect.Top = SCALE(screen_y);
-    rect.Right = rect.Left + SCALE(len << 3) - 1;
-    rect.Bottom = rect.Top + SCALE(height << 1) - 1;
-
-    if( sc.ScreenBufHandle )
-	if (!InvalidateConsoleDIBits(sc.ScreenBufHandle, &rect))
-		assert1( NO, "VDM: InvalidateConsoleDIBits() error:%#x",
-			 GetLastError() );
-        //DisplayErrorTerm(EHS_FUNC_FAILED,GetLastError(),__FILE__,__LINE__);
+#error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
+#line 631
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -638,100 +540,9 @@ void nt_cga_colour_med_graph_huge(int offset, int screen_x, int screen_y,
                                   int len, int height)
 {
 #ifdef BIGWIN
-    UTINY       *intelmem_ptr;
-    ULONG       *graph_ptr;
-    LONG         local_len,
-                 bytes_per_scanline,
-                 longs_per_scanline;
-    ULONG	 inc;
-    SMALL_RECT   rect;
-
-    sub_note_trace5(CGA_HOST_VERBOSE,
-             "nt_cga_colour_med_graph_huge off=%d x=%d y=%d len=%d height=%d\n",
-                    offset, screen_x, screen_y, len, height );
-
-    /*
-    ** Tim Jan 93, rapid mode changes cause mismatch between update and
-    ** paint rountines. Ignore paint request when invalid parameter
-    ** causes crash.
-    */
-    if( screen_y > 400 ){
-	assert1( NO, "VDM: med gfx huge rejected y=%d\n", screen_y );
-	return;
-    }
-
-    /*
-    ** Tim September 92, bounce call if handle to screen buffer is null.
-    ** This can happen when VDM session is about to suspend, buffer has
-    ** been closed, but still get a paint request.
-    */
-    if( sc.ScreenBufHandle == (HANDLE)NULL ){
-	assert0( NO, "VDM: rejected paint request due to NULL handle" );
-	return;
-    }
-
-    /* Clip to window */
-    height = 1;
-    if (len > 80)
-	len = 80;
-
-    bytes_per_scanline = BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
-    longs_per_scanline = LONGS_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
-    inc = offset & 1 ? 3 : 1;
-    intelmem_ptr = get_screen_ptr(offset);
-    graph_ptr = (ULONG *) ((UTINY *) sc.ConsoleBufInfo.lpBitMap +
-                           SCALE(screen_y * bytes_per_scanline + screen_x));
-    local_len = len;
-
-    /* Grab the mutex. */
-    GrabMutex(sc.ConsoleBufInfo.hMutex);
-
-    do
-    {
-        *(graph_ptr + 3 * longs_per_scanline) =
-            *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr = cga_med_graph_lut4_huge[*intelmem_ptr];
-        graph_ptr++;
-
-        *(graph_ptr + 3 * longs_per_scanline) =
-            *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr = cga_med_graph_lut3_huge[*intelmem_ptr];
-        graph_ptr++;
-
-        *(graph_ptr + 3 * longs_per_scanline) =
-            *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr = cga_med_graph_lut2_huge[*intelmem_ptr];
-        graph_ptr++;
-
-        *(graph_ptr + 3 * longs_per_scanline) =
-            *(graph_ptr + 2 * longs_per_scanline) =
-            *(graph_ptr + longs_per_scanline) =
-            *graph_ptr = cga_med_graph_lut1_huge[*intelmem_ptr];
-        graph_ptr++;
-
-        intelmem_ptr += inc;
-        inc ^= 2;
-    }
-    while(--local_len);
-
-    /* Release the mutex. */
-    RelMutex(sc.ConsoleBufInfo.hMutex);
-
-    /* Display the new image. */
-    rect.Left = SCALE(screen_x);
-    rect.Top = SCALE(screen_y);
-    rect.Right = rect.Left + SCALE(len << 3) - 1;
-    rect.Bottom = rect.Top + SCALE(height << 1) - 1;
-
-    if( sc.ScreenBufHandle )
-	if (!InvalidateConsoleDIBits(sc.ScreenBufHandle, &rect))
-		assert1( NO, "VDM: InvalidateConsoleDIBits() error:%#x",
-			 GetLastError() );
-        //DisplayErrorTerm(EHS_FUNC_FAILED,GetLastError(),__FILE__,__LINE__);
+#error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
+#line 735
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -819,82 +630,9 @@ void nt_cga_colour_hi_graph_big(int offset, int screen_x, int screen_y,
                                 int len, int height)
 {
 #ifdef BIGWIN
-    register char   *intelmem,
-                    *bufptr;
-    register int    i;
-    char            *buffer;
-    int             bytes_per_scanline;
-    SMALL_RECT      rect;
-
-    sub_note_trace5(CGA_HOST_VERBOSE,
-              "nt_cga_colour_hi_graph_big off=%d x=%d y=%d len=%d height=%d\n",
-                    offset, screen_x, screen_y, len, height );
-    /*
-    ** Tim September 92, bounce call if handle to screen buffer is null.
-    ** This can happen when VDM session is about to suspend, buffer has
-    ** been closed, but still get a paint request.
-    */
-    if( sc.ScreenBufHandle == (HANDLE)NULL ){
-	assert0( NO, "VDM: rejected paint request due to NULL handle" );
-	return;
-    }
-
-    /* Clip to window */
-    height = 1;
-    if (len > 80)
-	len = 80;
-
-    /*
-     * In this mode each byte becomes 12 bits (1.5 screen size) so if screen_x
-     * is on an odd byte boundary the resulting bitmap starts on a half-byte
-     * boundary. To avoid this set screen_x to the previous even byte.
-     */
-    if (screen_x & 8)
-    {
-        screen_x -= 8;
-        offset -= CGA_GRAPH_INCVAL;
-        len++;
-    }
-
-    /* `len' must be even for `high_stretch3' to work. */
-    if (len & 1)
-        len++;
-
-    bytes_per_scanline = BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
-    bufptr = buffer = (char *) sc.ConsoleBufInfo.lpBitMap +
-                      SCALE(screen_y * bytes_per_scanline + (screen_x >> 3));
-    intelmem = (char *) get_screen_ptr(offset);
-
-    /* Grab the mutex. */
-    GrabMutex(sc.ConsoleBufInfo.hMutex);
-
-    for(i = len; i > 0; i--)
-    {
-        *bufptr = *intelmem;
-        intelmem += CGA_GRAPH_INCVAL;
-        bufptr++;
-    }
-
-    high_stretch3((unsigned char *) buffer, len);
-
-    memcpy(buffer + bytes_per_scanline, buffer, SCALE(len));
-    memcpy(buffer + 2 * bytes_per_scanline, buffer, SCALE(len));
-
-    /* Release the mutex. */
-    RelMutex(sc.ConsoleBufInfo.hMutex);
-
-    /* Display the new image. */
-    rect.Left = SCALE(screen_x);
-    rect.Top = SCALE(screen_y);
-    rect.Right = rect.Left + SCALE(len << 3) - 1;
-    rect.Bottom = rect.Top + SCALE(height << 1) - 1;
-
-    if( sc.ScreenBufHandle )
-	if (!InvalidateConsoleDIBits(sc.ScreenBufHandle, &rect))
-		assert1( NO, "VDM: InvalidateConsoleDIBits() error:%#x",
-			 GetLastError() );
-        //DisplayErrorTerm(EHS_FUNC_FAILED,GetLastError(),__FILE__,__LINE__);
+#error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
+#line 898
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -905,67 +643,18 @@ void nt_cga_colour_hi_graph_huge(int offset, int screen_x, int screen_y,
                                  int len, int height )
 {
 #ifdef BIGWIN
-    register char   *intelmem,
-                    *bufptr;
-    char            *buffer;
-    register int    i;
-    int             bytes_per_scanline;
-    SMALL_RECT      rect;
-
-    sub_note_trace5(CGA_HOST_VERBOSE,
-              "nt_cga_colour_hi_graph_huge off=%d x=%d y=%d len=%d height=%d\n",
-                    offset, screen_x, screen_y, len, height );
-    /*
-    ** Tim September 92, bounce call if handle to screen buffer is null.
-    ** This can happen when VDM session is about to suspend, buffer has
-    ** been closed, but still get a paint request.
-    */
-    if( sc.ScreenBufHandle == (HANDLE)NULL ){
-	assert0( NO, "VDM: rejected paint request due to NULL handle" );
-	return;
-    }
-
-    /* Clip to window */
-    height = 1;
-    if (len > 80)
-	len = 80;
-
-    bytes_per_scanline = BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);
-    intelmem = (char *) get_screen_ptr(offset);
-    bufptr = buffer = (char *) sc.ConsoleBufInfo.lpBitMap +
-                      SCALE(screen_y * bytes_per_scanline + (screen_x >> 3));
-
-    /* Grab the mutex. */
-    GrabMutex(sc.ConsoleBufInfo.hMutex);
-
-    for( i = len; i > 0; i-- )
-    {
-        *bufptr = *intelmem;
-        intelmem += CGA_GRAPH_INCVAL;
-        bufptr++;
-    }
-
-    high_stretch4((unsigned char *) buffer, len);
-
-    memcpy(buffer + bytes_per_scanline, buffer, SCALE(len));
-    memcpy(buffer + 2 * bytes_per_scanline, buffer, SCALE(len));
-    memcpy(buffer + 3 * bytes_per_scanline, buffer, SCALE(len));
-
-    /* Release the mutex. */
-    RelMutex(sc.ConsoleBufInfo.hMutex);
-
-    /* Display the new image. */
-    rect.Left = SCALE(screen_x);
-    rect.Top = SCALE(screen_y);
-    rect.Right = rect.Left + SCALE(len << 3) - 1;
-    rect.Bottom = rect.Top + SCALE(height << 1) - 1;
-
-    if( sc.ScreenBufHandle )
-	if (!InvalidateConsoleDIBits(sc.ScreenBufHandle, &rect))
-		assert1( NO, "VDM: InvalidateConsoleDIBits() error:%#x",
-			 GetLastError() );
-        //DisplayErrorTerm(EHS_FUNC_FAILED,GetLastError(),__FILE__,__LINE__);
+#error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
+#line 969
 }
+
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 1304
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2889
 
 

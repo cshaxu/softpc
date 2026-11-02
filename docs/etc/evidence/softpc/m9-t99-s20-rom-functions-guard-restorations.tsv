@@ -1,0 +1,3 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/system/rom.c	320	418	287	337	6e19c3ca1b4abb637bd30e44c62c5b268287187820cbb9128ef362afd6903fd9
+base/system/rom.c	423	512	341	428	ae40469393ee7e3408e124666f58bd75e3db0b3dae0edd140c665300c30187e1

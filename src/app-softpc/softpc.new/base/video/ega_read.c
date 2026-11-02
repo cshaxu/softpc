@@ -1,6 +1,8 @@
 #include "insignia.h"
 #include "host_def.h"
 
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 5
 
 /*			INSIGNIA (SUB)MODULE SPECIFICATION
 			-----------------------------
@@ -147,20 +149,17 @@ ERROR RECOVERY	  :	none.
 /* [5.1.1 #DEFINES]							*/
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_EGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 157
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
 #define	change_read_pointers(ptr)	dump_change_read_pointers(&ptr)
 #else
 #ifdef EGATEST
-#define	change_read_pointers(ptr)	read_pointers = ptr
+#error "Unsupported SoftPC mirror configuration: EGATEST"
 #else
+#line 164
 #define	change_read_pointers(ptr)	read_glue_ptrs = ptr
 #endif /* EGATEST */
 #endif
@@ -191,190 +190,9 @@ GLOBAL READ_POINTERS read_pointers;
 
 
 #ifndef CPU_40_STYLE	/* i.e. EVID without introducing an EVID define */
-#ifndef EGATEST
-#ifndef A3CPU
-#ifndef JOKER
-READ_POINTERS Glue_reads =
-{
-	glue_b_read,
-	glue_w_read
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	glue_str_read
-#endif	/* NO_STRING_OPERATIONS */
-};
-#endif /* JOKER */
-#endif /* A3CPU */
-#endif /* EGATEST */
-
-READ_POINTERS	simple_reads =
-{
-	_simple_b_read,
-	_simple_w_read
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_simple_str_read
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-READ_POINTERS	pointers_RAM_off =
-{
-	_rd_ram_dsbld_byte,
-	_rd_ram_dsbld_word
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_rd_ram_dsbld_string
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-READ_POINTERS	pointers_mode0_nch =
-{
-	_rdm0_byte_nch,
-	_rdm0_word_nch
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_rdm0_string_nch
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-#ifdef VGG
-READ_POINTERS	pointers_mode0_ch4 =
-{
-	_rdm0_byte_ch4,
-	_rdm0_word_ch4
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_rdm0_string_ch4
-#endif	/* NO_STRING_OPERATIONS */
-};
-#endif
-
-READ_POINTERS	pointers_mode1_nch =
-{
-	_rdm1_byte_nch,
-	_rdm1_word_nch
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_rdm1_string_nch
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-#ifdef VGG
-READ_POINTERS	pointers_mode1_ch4 =
-{
-	_rdm1_byte_ch4,
-	_rdm1_word_ch4
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_rdm1_string_ch4
-#endif	/* NO_STRING_OPERATIONS */
-};
-#endif
-
-#ifdef A_VID
-extern IU32 _ch2_md0_byte_read_glue();
-extern IU32 _ch2_md0_word_read_glue();
-extern void _ch2_md0_str_read_glue();
-
-extern IU32 _ch2_md1_byte_read_glue();
-extern IU32 _ch2_md1_word_read_glue();
-extern void _ch2_md1_str_read_glue();
-
-READ_POINTERS	pointers_mode0_ch2 =
-{
-	_ch2_md0_byte_read_glue,
-	_ch2_md0_word_read_glue
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_ch2_md0_str_read_glue
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-READ_POINTERS	pointers_mode1_ch2 =
-{
-	_ch2_md1_byte_read_glue,
-	_ch2_md1_word_read_glue
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_ch2_md1_str_read_glue
-#endif	/* NO_STRING_OPERATIONS */
-};
-#else			/* AVID */
-
-extern void rdm0_string_ch2 IPT3(UTINY *, dest, ULONG, offset, ULONG, count );
-extern void rdm1_string_ch2 IPT3(UTINY *, dest, ULONG, offset, ULONG, count );
-extern IU32 rdm0_byte_ch2 IPT1(ULONG, offset );
-extern IU32 rdm1_byte_ch2 IPT1(ULONG, offset );
-extern IU32 rdm0_word_ch2 IPT1(ULONG, offset );
-extern IU32 rdm1_word_ch2 IPT1(ULONG, offset );
-
-READ_POINTERS	pointers_mode0_ch2 =
-{
-	rdm0_byte_ch2,
-	rdm0_word_ch2
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	rdm0_string_ch2
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-READ_POINTERS	pointers_mode1_ch2 =
-{
-	rdm1_byte_ch2,
-	rdm1_word_ch2
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	rdm1_string_ch2
-#endif	/* NO_STRING_OPERATIONS */
-};
-
-#endif /* A_VID */
-
-
-#ifdef A3CPU
-#ifdef C_VID
-GLOBAL READ_POINTERS C_vid_reads;
-#endif /* C_VID */
-#else
-#ifdef C_VID
-GLOBAL READ_POINTERS C_vid_reads;
-#else
-GLOBAL READ_POINTERS A_vid_reads;
-#endif /* A_VID */
-#endif /* A3CPU */
-
-#ifndef GISP_CPU
-#if (defined(A_VID) && defined(A2CPU) && !defined(A3CPU)) || (defined(A3CPU) && defined(C_VID))
-extern IU32 _glue_b_read();
-extern IU32 _glue_w_read();
-extern void _glue_str_read();
-
-READ_POINTERS Glue_reads =
-{
-	_glue_b_read,
-	_glue_w_read
-
-#ifndef	NO_STRING_OPERATIONS
-	,
-	_glue_str_read
-#endif	/* NO_STRING_OPERATIONS */
-
-};
-#endif
-#endif /* GISP_CPU */
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - evid */
+#line 378
 
 #ifdef C_VID
 /* C_Evid glue */
@@ -385,8 +203,9 @@ READ_POINTERS Glue_reads =
 	read_str_fwd_ev_glue
 };
 #else
-READ_POINTERS Glue_reads = { 0, 0, 0 };
+#error "Unsupported SoftPC mirror configuration: !C_VID"
 #endif /* C_VID */
+#line 390
 READ_POINTERS	simple_reads;
 READ_POINTERS	pointers_mode0_nch;
 READ_POINTERS	pointers_mode1_nch;
@@ -443,6 +262,8 @@ GLOBAL IU32
 rdm0_word_ch2 IFN1(ULONG, offset )
 {
 	IU32 temp;
+#ifndef NEC_98
+#line 446
 	IU32 lsb;
 
 	setVideolatches(*(IU32 *)( EGA_planes +
@@ -465,6 +286,8 @@ rdm0_word_ch2 IFN1(ULONG, offset )
 #ifdef C_VID
 	EasVal = temp;
 #endif
+#endif  //NEC_98
+#line 468
 	return( temp );
 }
 
@@ -473,6 +296,8 @@ rdm0_word_ch2 IFN1(ULONG, offset )
 GLOBAL void
 rdm0_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )
 {
+#ifndef NEC_98
+#line 476
 	ULONG lsb;
 	ULONG inc;
 	UTINY *planes;
@@ -498,13 +323,16 @@ rdm0_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )
     while( count-- )
     {
 #ifdef BACK_M
-        *dest-- = *(planes + offset);
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 503
         *dest++ = *(planes + offset);
 #endif
 		offset += inc;
 		inc ^= 0x2;
     }
+#endif  //NEC_98
+#line 508
 }
 
 /* Used to correct writes to M when in mode 1 */
@@ -512,6 +340,10 @@ rdm0_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )
 GLOBAL IU32
 rdm1_byte_ch2 IFN1(ULONG, offset )
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 515
 	IU32 temp, lsb;
 
 	lsb = offset & 0x1;
@@ -535,11 +367,17 @@ rdm1_byte_ch2 IFN1(ULONG, offset )
 	EasVal = temp;
 #endif
 	return( temp );
+#endif  //NEC_98
+#line 538
 }
 
 GLOBAL IU32
 rdm1_word_ch2 IFN1(ULONG, offset )		/* used to correct writes to M when in mode 1 */
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 543
 	IU32 temp1, temp2, lsb;
 
 	setVideolatches(*(IU32 *)( EGA_planes + ((( offset + 1 ) >> 1 ) << 2 )));
@@ -573,18 +411,22 @@ rdm1_word_ch2 IFN1(ULONG, offset )		/* used to correct writes to M when in mode 
 	EasVal = temp1;
 #endif
 	return( temp1 );
+#endif  //NEC_98
+#line 576
 }
 
 GLOBAL void
 rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to correct writes to M when in mode 1 */
 {
+#ifndef NEC_98
+#line 581
 	UTINY *p01, *p23;
 	ULONG tcount, lsb;
 
 #ifdef BACK_M
-#define	PLUS -
-#define	MINUS +
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 588
 #define	PLUS +
 #define	MINUS -
 #endif
@@ -635,64 +477,35 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 		*(dest MINUS count) = (UTINY)((( *(p01 + offset) ^ comp0 ) | dont_care0 )
 							        & (( *(p23 + offset) ^ comp2 ) | dont_care2 ));
 	}
+#endif  //NEC_98
+#line 638
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_GRAPHICS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 648
 
 GLOBAL void
 Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 {
 #ifndef CPU_40_STYLE	/* EVID */
-#ifdef A3CPU
-#ifdef C_VID
-
-	C_vid_reads.b_read = handler->b_read;
-	C_vid_reads.w_read = handler->w_read;
-	C_vid_reads.str_read = handler->str_read;
-
-#else
-	UNUSED(handler);
-#endif
-#else					/* A3CPU */
-#ifdef C_VID
-
-	C_vid_reads.b_read = handler->b_read;
-	C_vid_reads.w_read = handler->w_read;
-
-#ifndef	NO_STRING_OPERATIONS
-	C_vid_reads.str_read = handler->str_read;
-#endif	/* NO_STRING_OPERATIONS */
-
-#else
-
-	A_vid_reads = *handler;
-
-
-#endif	/* C_VID */
-#endif	/* A3CPU */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE - EVID */
+#line 681
 }	
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_EGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 691
 
 GLOBAL void
 update_shift_count IFN0()
 
 {
+#ifndef NEC_98
+#line 696
 	switch( EGA_CPU.chain )
 	{
 		case UNCHAINED:
@@ -702,8 +515,9 @@ update_shift_count IFN0()
  			 */
 
 #ifdef BIGEND
- 			setVideoread_shift_count(( 3 - getVideoread_mapped_plane() ) << 3);
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
+#line 707
  			setVideoread_shift_count(getVideoread_mapped_plane() << 3);
 #endif /* BIGEND */
 
@@ -731,12 +545,16 @@ update_shift_count IFN0()
 			break;
 #endif	/* VGG */
 	}
+#endif  //NEC_98
+#line 734
 }
 
 void
 ega_read_routines_update IFN0()
 
 {
+#ifndef NEC_98
+#line 740
 	LOCAL BOOL ram_off = TRUE;	/* optimised to avoid updates if ram disabled */
 	LOCAL READ_POINTERS *read_ptrs;
 
@@ -750,25 +568,9 @@ ega_read_routines_update IFN0()
 #ifdef CPU_40_STYLE
 		SetReadPointers(2);
 #else  /* CPU_40_STYLE */
-
-#ifndef GISP_CPU	
-#ifdef A3CPU
-#ifdef C_VID
-		Glue_set_vid_rd_ptrs( &pointers_RAM_off );
-#else
-		Cpu_set_vid_rd_ptrs( &pointers_RAM_off );
-#endif /* C_VID */
-#else
-		Glue_set_vid_rd_ptrs( &pointers_RAM_off );
-#endif /* A3CPU */
-#endif /* GISP_CPU */
-
-#ifndef	NO_STRING_OPERATIONS
-		setVideofwd_str_read_addr(_rd_ram_dsbld_fwd_string_lge);
-		setVideofwd_str_read_addr(_rd_ram_dsbld_bwd_string_lge);
-#endif	/* NO_STRING_OPERATIONS */
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif  /* CPU_40_STYLE */
+#line 772
 
 		ram_off = TRUE;	/* prevent recalcs until ram enabled again */
 
@@ -787,25 +589,18 @@ ega_read_routines_update IFN0()
 #ifdef CPU_40_STYLE
 				SetReadPointers(0);
 #else  /* CPU_40_STYLE */
-
-				read_ptrs = &pointers_mode0_nch;
-#ifndef	NO_STRING_OPERATIONS
-				setVideofwd_str_read_addr(_rdm0_fwd_string_nch_lge);
-				setVideobwd_str_read_addr(_rdm0_bwd_string_nch_lge);
-#endif	/* NO_STRING_OPERATIONS */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 797
 				break;
 				
 			case CHAIN2:
 #ifdef CPU_40_STYLE
 				SetReadPointers(0);
 #else  /* CPU_40_STYLE */
-
-				read_ptrs = &pointers_mode0_ch2;
-#ifndef	NO_STRING_OPERATIONS
-				string_read_ptr = rdm0_string_ch2;
-#endif	/* NO_STRING_OPERATIONS */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 809
 				EGA_CPU.read_mapped_plane_ch2 = EGA_planes +
 							(getVideoread_mapped_plane() & 2)*EGA_PLANE_SIZE;
 				break;
@@ -815,14 +610,9 @@ ega_read_routines_update IFN0()
 #ifdef CPU_40_STYLE
 				SetReadPointers(0);
 #else  /* CPU_40_STYLE */
-
-				read_ptrs = &pointers_mode0_ch4;
-#ifndef	NO_STRING_OPERATIONS
-				setVideofwd_str_read_addr(_rdm0_fwd_string_ch4_lge);
-				setVideobwd_str_read_addr(_rdm0_bwd_string_ch4_lge);
-#endif
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 826
 				break;
 #endif	/* VGG */
 		}
@@ -840,13 +630,9 @@ ega_read_routines_update IFN0()
 #ifdef CPU_40_STYLE
 				SetReadPointers(1);
 #else  /* CPU_40_STYLE */
-
-				read_ptrs = &pointers_mode1_nch;
-#ifndef	NO_STRING_OPERATIONS
-				setVideofwd_str_read_addr(_rdm1_fwd_string_nch_lge);
-				setVideobwd_str_read_addr(_rdm1_bwd_string_nch_lge);
-#endif	/* NO_STRING_OPERATIONS */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 850
 				break;
 
 			case CHAIN2:
@@ -863,13 +649,9 @@ ega_read_routines_update IFN0()
 #ifdef CPU_40_STYLE
 				SetReadPointers(1);
 #else  /* CPU_40_STYLE */
-
-				read_ptrs = &pointers_mode1_ch2;
-#ifndef	NO_STRING_OPERATIONS
-				string_read_ptr = rdm1_string_ch2;
-#endif	/* NO_STRING_OPERATIONS */
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 873
 
 				break;
 
@@ -881,13 +663,9 @@ ega_read_routines_update IFN0()
 #ifdef CPU_40_STYLE
 				SetReadPointers(1);
 #else  /* CPU_40_STYLE */
-
-				read_ptrs = &pointers_mode1_ch4;
-#ifndef	NO_STRING_OPERATIONS
-				setVideofwd_str_read_addr(_rdm1_fwd_string_ch4_lge);
-				setVideobwd_str_read_addr(_rdm1_bwd_string_ch4_lge);
-#endif	/* NO_STRING_OPERATIONS */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 891
 				break;
 #endif	/* VGG */
 		}
@@ -897,24 +675,18 @@ ega_read_routines_update IFN0()
 	update_banking();
 
 #ifndef CPU_40_STYLE
-#ifndef GISP_CPU
-#ifdef A3CPU
-#ifdef C_VID
-	Glue_set_vid_rd_ptrs( read_ptrs );
-#else
-	Cpu_set_vid_rd_ptrs( read_ptrs );
-#endif /* C_VID */
-#else
-	Glue_set_vid_rd_ptrs( read_ptrs );
-#endif /* A3CPU */
-#endif /* GISP_CPU */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#endif  //NEC_98
+#line 912
 }
 
 void
 ega_read_init IFN0()
 
 {
+#ifndef NEC_98
+#line 918
 	read_state.mode = 0;
 	read_state.colour_compare = 0x0f;		/* looking for bright white */
 	read_state.colour_dont_care = 0xf;		/* all planes significant */
@@ -922,12 +694,9 @@ ega_read_init IFN0()
 #ifdef CPU_40_STYLE
 	SetReadPointers(2);
 #else  /* CPU_40_STYLE */
-
-#ifndef	NO_STRING_OPERATIONS
-	setVideofwd_str_read_addr(_rd_ram_dsbld_fwd_string_lge);
-	setVideobwd_str_read_addr(_rd_ram_dsbld_bwd_string_lge);
-#endif	/* NO_STRING_OPERATIONS */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 931
 
 	setVideoread_mapped_plane(0);
 
@@ -942,19 +711,10 @@ ega_read_init IFN0()
 #endif /* EGATEST */
 
 #ifndef CPU_40_STYLE
-#ifndef GISP_CPU
-#ifdef A3CPU
-#ifdef C_VID
-	Cpu_set_vid_rd_ptrs( &Glue_reads );
-	Glue_set_vid_rd_ptrs( &pointers_mode0_nch );
-#else
-	Cpu_set_vid_rd_ptrs( &pointers_mode0_nch );
-#endif	/* C_VID */
-#else	/* A3CPU */
-	Glue_set_vid_rd_ptrs( &pointers_mode0_nch );
-#endif	/* A3CPU */
-#endif /* GISP_CPU */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#endif  //NEC_98
+#line 958
 }
 
 void
@@ -968,21 +728,13 @@ ega_read_term IFN0()
 #ifdef CPU_40_STYLE
 		SetReadPointers(3);
 #else  /* CPU_40_STYLE */
-
-#ifndef GISP_CPU
-#ifdef A3CPU
-#ifdef C_VID
-	Glue_set_vid_rd_ptrs( &simple_reads );
-#else
-	Cpu_set_vid_rd_ptrs( &simple_reads );
-#endif /* C_VID */
-#else
-	Glue_set_vid_rd_ptrs( &simple_reads );
-#endif /* A3CPU */
-#endif /* GISP_CPU */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 984
 }
 
 #endif /* REAL_VGA */
 #endif /* EGG */
 
+#endif	/* !(NTVDM && MONITOR) */
+#line 989

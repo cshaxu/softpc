@@ -69,8 +69,9 @@
 #define PTY_VERBOSE		0x2000000L /* Print Pesudo-terminal messages */
 #define GEN_DRVR_VERBOSE	0x4000000L /* Generic driver messages */
 #ifdef HERC
-#define HERC_VERBOSE		0x8000000L /* Hercules graphics board */
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 74
 #define IPC_VERBOSE		0x10000000L /* Interproc communication debug */
 #define LIM_VERBOSE		0x20000000L /* LIM messages */
 #define HFX_VERBOSE		0x40000000L /* severity of HFX messages */
@@ -122,15 +123,9 @@
  */
 
 #ifdef ANSI
-extern void trace(char *, int);
-extern void trace_init(void);
-
-#ifdef DELTA
-extern void file_back_trace(char *);
-extern void print_back_trace(void);
-#endif /* DELTA */
-
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 134
 extern void trace();
 extern void trace_init();
 

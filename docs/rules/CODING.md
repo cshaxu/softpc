@@ -27,13 +27,45 @@ When a branch body is deliberately excluded from the retained subset, replace
 its excluded body with a single `#error` directive that identifies the
 unsupported mirror configuration. Do not use an explanatory comment as the
 replacement; existing comment-only exclusion placeholders must be converted
-to `#error`. Preserve the original nested condition structure where applicable.
+to `#error`. Process conditions from the outside inward: when an entire
+branch body is excluded, its single `#error` replaces that entire body,
+including any nested conditional directives. Preserve the excluded branch's
+own condition and its surrounding and sibling conditional structure; do not
+recreate inner conditions whose enclosing body has already been excluded.
 Retain or restore original `#line` directives needed for correct diagnostics
 and source locations; where exclusion shifts retained code, use correctly
 verified line-control directives at the applicable boundary. `#line` is line
 control, not a substitute for `#error` or an explanatory placeholder.
+
+Apply this rule recursively, branch by branch, using the actual supported
+compile configurations. If an outer branch is selected in any supported
+configuration, retain its selected code and restore the original nested
+conditional framework in the retained subset; audit each inner branch in turn. If an inner branch is selected, continue the
+same inspection inside it. At the first branch proven excluded from every
+supported configuration, stop descending: replace that entire branch body
+with exactly one `#error`, removing all nested directives and code inside it.
+A selected sibling such as `#else` remains a separate branch; its original
+nested conditions must still be retained and audited. Do not replace an
+outer selected body merely because one of its inner branches is excluded.
+Keep any necessary `#line` at the appropriate boundary for retained code,
+without leaving extra content or nested structure in the excluded body.
 This rule concerns excluded branch bodies, not ordinary original comments,
 include guards, runtime diagnostics, or whole files excluded from the project.
+
+If the condition is selected in a supported build but particular original
+content is intentionally outside the needed source subset, retain the original
+condition, omit or comment out that content, and record a specific mirror
+exception explaining why. A brief in-source explanation may identify the
+omission. Do not insert `#error` on that selected path: exclusion of content
+from the subset is not evidence that its enclosing condition is false.
+
+A branch proven unreachable in every supported production and test
+configuration because a single condition is false or because at least one
+required conjunct is false must be excluded the same way, even when its body
+contains previously registered local patches. Remove those excluded patches
+and their individual patch registrations; keep registrations for any selected
+patches still present. Do not treat an unknown condition or one false operand
+of an OR expression as proof that the complete branch is unreachable.
 
 Classify each exclusion against the pinned original, all supported production
 and test configurations and the local patch ledger before changing it. Keep

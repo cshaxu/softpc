@@ -1,0 +1,3 @@
+path	baseline_if_line	baseline_next_line	expression	proved_false_operands	excluded_line_count	excluded_body_sha256
+base/inc/emm.h	297	308	defined(X86GFX) && defined(NTVDM)	X86GFX,NTVDM	9	6b15b5e58cf94e2b74d60eb41d6bc27ee682fb67075c74691137c1d965f85944
+base/system/rom.c	105	109	defined(macintosh) && defined(A2CPU)	macintosh,A2CPU	2	b4be99b65fe849634b71ec4dce4d75d8b2f8d2489a5591bf8d1b94e6aa868781

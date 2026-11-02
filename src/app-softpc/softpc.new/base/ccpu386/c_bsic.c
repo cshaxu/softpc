@@ -134,8 +134,9 @@ c_getEFLAGS IFN0()
    flags = flags | GET_VM() << 17 | GET_RF() << 16;
 
 #ifdef SPC486
-   flags = flags | GET_AC() << 18;
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif /* SPC486 */
+#line 139
 
    return flags;
    }
@@ -303,8 +304,9 @@ IFN2(
 #ifndef DONT_CLEAR_LDTR_ON_INVALID
       if ( GET_LDT_SELECTOR() <= 3 || offset + 7 > GET_LDT_LIMIT() )
 #else
-      if ( GET_LDT_SELECTOR() == 0 || offset + 7 > GET_LDT_LIMIT() )
+#error "Unsupported SoftPC mirror configuration: DONT_CLEAR_LDTR_ON_INVALID"
 #endif /* DONT_CLEAR_LDTR_ON_INVALID */
+#line 308
 	 return TRUE;
       *descr_addr = GET_LDT_BASE() + offset;
       }
@@ -332,8 +334,9 @@ IFN1(
       SET_VM((flags & BIT17_MASK) != 0);
 
 #ifdef SPC486
-   SET_AC((flags & BIT18_MASK) != 0);
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif /* SPC486 */
+#line 337
    }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

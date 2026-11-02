@@ -702,9 +702,9 @@ operand)
    vir_write_byte(m_la[ARG], m_pa[ARG], (IU8)ops[ARG].sng);
 
 #ifdef	PIG
-#define PIG_P_Yb(ARG)						\
-   cannot_vir_write_byte(m_la[ARG], m_pa[ARG], 0x00);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 708
 #define PIG_P_Yb(ARG)						\
    vir_write_byte(m_la[ARG], m_pa[ARG], (IU8)ops[ARG].sng);
 #endif	/* PIG */
@@ -750,9 +750,9 @@ operand)
    vir_write_word(m_la[ARG], m_pa[ARG], (IU16)ops[ARG].sng);
 
 #ifdef	PIG
-#define PIG_P_Yw(ARG)						\
-   cannot_vir_write_word(m_la[ARG], m_pa[ARG], 0x0000);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 756
 #define PIG_P_Yw(ARG)						\
    vir_write_word(m_la[ARG], m_pa[ARG], (IU16)ops[ARG].sng);
 #endif	/* PIG */
@@ -1052,9 +1052,9 @@ operand)
    vir_write_dword(m_la[ARG], m_pa[ARG], (IU32)ops[ARG].sng);
 
 #ifdef	PIG
-#define PIG_P_Yd(ARG)						\
-   cannot_vir_write_dword(m_la[ARG], m_pa[ARG], 0x00000000);
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 1058
 #define PIG_P_Yd(ARG)						\
    vir_write_dword(m_la[ARG], m_pa[ARG], (IU32)ops[ARG].sng);
 #endif	/* PIG */

@@ -1,9 +1,9 @@
 #include "insignia.h"
 #include "host_def.h"
 #ifdef SECURE
-#include "xt.h"
-#include "config.h"
+#error "Unsupported SoftPC mirror configuration: SECURE"
 #endif
+#line 7
 /*
  * VPC-XT Revision 1.0
  *
@@ -42,18 +42,16 @@
  *
  */
 
+/* @(#)bootstrap.c	1.9 09/19/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)bootstrap.c	1.9 09/19/94 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 48
 
 #ifdef SEGMENTATION
-/*
- * The following #include define specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 57
 
 
 
@@ -72,16 +70,9 @@ static char SccsID[]="@(#)bootstrap.c	1.9 09/19/94 Copyright Insignia Solutions 
 #include CpuH
 
 #ifdef SECURE
-LOCAL IBOOL boot_has_finished = FALSE;
-GLOBAL void end_secure_boot IFN0()
-{
-	boot_has_finished = TRUE;
-}
-GLOBAL IBOOL has_boot_finished IFN0()
-{
-	return boot_has_finished;
-}
+#error "Unsupported SoftPC mirror configuration: SECURE"
 #endif
+#line 85
 
 /*
  * ============================================================================
@@ -96,8 +87,9 @@ void bootstrap()
      */
 
 #ifdef SECURE
-    boot_has_finished = FALSE;
+#error "Unsupported SoftPC mirror configuration: SECURE"
 #endif
+#line 101
     setAX(0);			/* reset floppy */
     setDX(0x80);		/* drive 0 */
 }
@@ -111,16 +103,9 @@ void bootstrap1()
     setAH(2);			/* read */
     setAL(1);			/* 1 block */
 #ifdef SECURE
-    if ((IBOOL) config_inquire(C_SECURE, NULL))
-    {
-	setDH(0);		/* Head 0 */
-	setDL(0x80);		/* on Hard Disk */
-    }
-    else
-    {
-        setDX(0);		/* head 0 on drive 0 (floppy)*/
-    }
+#error "Unsupported SoftPC mirror configuration: SECURE"
 #else
+#line 124
     setDX(0);			/* head 0 on drive 0 (floppy)*/
 #endif
     setCX(1);			/* track 0, sector 1 */

@@ -1,0 +1,2 @@
+path	xp_if_line	xp_endif_line	baseline_next_line	macro	excluded_body_sha256
+base/system/cmos.c	1209	1212	1100	NTVDM	742a243148d156ea1782634f5923822593489a379b1405a5122f9724ffa62f30

@@ -183,12 +183,14 @@ extern void (*BIOS[]) IPT0();
 #endif /* bop */
 
 #ifdef PTY
-extern void com_bop_pty IPT0();
+#error "Unsupported SoftPC mirror configuration: PTY"
 #endif
+#line 188
 
 #ifdef GEN_DRVR
-extern void gen_driver_io IPT0();
+#error "Unsupported SoftPC mirror configuration: GEN_DRVR"
 #endif
+#line 192
 
 #ifdef LIM
 extern void emm_init IPT0();
@@ -197,14 +199,14 @@ extern void return_from_call IPT0();
 #endif
 
 #ifdef SUSPEND
-extern void send_script IPT0();
+#error "Unsupported SoftPC mirror configuration: SUSPEND"
 #endif
+#line 202
 
 #ifdef CDROM
-extern void cdrom_ord_fns IPT0();
-extern void cdrom_ext_fns IPT0();
-extern void bcdrom_io IPT0();
+#error "Unsupported SoftPC mirror configuration: CDROM"
 #endif /* CDROM */
+#line 208
 
 extern void worm_init IPT0();
 extern void worm_io IPT0();
@@ -213,14 +215,9 @@ extern void cmd_install IPT0();
 extern void cmd_load IPT0();
 
 #ifdef DPMI
-extern void DPMI_2F IPT0();
-extern void DPMI_31 IPT0();
-extern void DPMI_general IPT0();
-extern void DPMI_int IPT0();
-extern void DPMI_r0_int IPT0();
-extern void DPMI_exc IPT0();
-extern void DPMI_4B IPT0();
+#error "Unsupported SoftPC mirror configuration: DPMI"
 #endif
+#line 224
 
 extern void reset IPT0();
 extern void illegal_bop IPT0();
@@ -249,8 +246,9 @@ extern void unexpected_int IPT0();
 extern void Get_build_id IPT0();
 
 #ifdef WIN_VTD
-extern void VtdTickSync IPT0();
+#error "Unsupported SoftPC mirror configuration: WIN_VTD"
 #endif /* WIN_VTD */
+#line 254
 
 #ifdef EGG
 extern void ega_video_io IPT0();
@@ -292,73 +290,54 @@ extern void bootstrap2 IPT0();
 extern void bootstrap3 IPT0();
 
 #ifdef NOVELL
-extern void DriverInitialize IPT0();
-extern void DriverReadPacket IPT0();
-extern void DriverSendPacket IPT0();
-extern void DriverMulticastChange IPT0();
-extern void DriverCloseSocket IPT0();
-extern void DriverReset IPT0();
-extern void DriverShutdown IPT0();
-extern void DriverAddProtocol IPT0();
-extern void DriverChangePromiscuous IPT0() ;
-extern void DriverOpenSocket IPT0() ;
-extern void DriverCloseSocket IPT0() ;
-#ifdef NOVELL_CFM
-extern void DriverCheckForMore IPT0() ;
+#error "Unsupported SoftPC mirror configuration: NOVELL"
 #endif
-#ifdef V4CLIENT
-extern void DriverChangeIntStatus IPT0() ;
-#endif	/* V4CLIENT */
-#endif
+#line 313
 
 #ifdef	MSWDVR
-extern void ms_windows IPT0();
-extern void msw_mouse IPT0();
-extern void msw_copy IPT0();
-extern void msw_copyInit IPT0();
-extern void msw_keybd IPT0();
+#error "Unsupported SoftPC mirror configuration: MSWDVR"
 #endif
+#line 321
 
 #ifdef	NOVELL_IPX
-extern void IPXResInit  IPT0();
-extern void IPXResEntry  IPT0();
-extern void IPXResInterrupt  IPT0();
+#error "Unsupported SoftPC mirror configuration: NOVELL_IPX"
 #endif
+#line 327
 
 #ifdef	NOVELL_TCPIP
-extern void TCPResInit  IPT0();
-extern void TCPResEntry  IPT0();
+#error "Unsupported SoftPC mirror configuration: NOVELL_TCPIP"
 #endif
+#line 332
 
 #ifdef WINSOCK
-extern void ISWSEntry IPT0();
+#error "Unsupported SoftPC mirror configuration: WINSOCK"
 #endif /* WINSOCK */
+#line 336
 
 #ifdef SWINAPI
-extern void User_call IPT0();
-extern void Gdi_call IPT0();
-extern void Swinapi_bop IPT0();
+#error "Unsupported SoftPC mirror configuration: SWINAPI"
 #endif /* SWINAPI */
+#line 342
 
 #if	defined(SOFTWIN_API) || defined(SWIN_HFX)
-extern void SoftWindowsInit IPT0();
-extern void SoftWindowsTerm IPT0();
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif	/* SOFTWIN_API or SWIN_HFX */
+#line 347
 
 #if	defined(SOFTWIN_API)
-extern void SoftWindowsApi IPT0();
+#error "Unsupported SoftPC mirror configuration: SOFTWIN_API"
 #endif	/* SOFTWIN_API */
+#line 351
 
 #ifdef SWIN_HAW
-extern void msw_sound IPT0();
+#error "Unsupported SoftPC mirror configuration: SWIN_HAW"
 #endif	/* SWIN_HAW */
+#line 355
 
 #ifdef ANSI
-extern void host_reset(void);
-extern void reboot(void);
-extern void display_string(char *);
-extern void clear_string(void);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 364
 extern void host_reset IPT0();
 extern void reboot IPT0();
 extern void display_string IPT0();
@@ -366,27 +345,34 @@ extern void clear_string IPT0();
 #endif /* ANSI */
 
 #ifdef ANSI
-extern void smeg_collect_data(void);
-extern void smeg_freeze_data(void);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 376
 extern void smeg_collect_data IPT0();
 extern void smeg_freeze_data IPT0();
 #endif /* ANSI */
 
 extern void softpc_version IPT0();
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif	/* NTVDM */
+#line 397
 
 #ifdef GISP_CPU
-extern void hg_bop_handler IPT0();
+#error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif	/* GISP_CPU */
+#line 401
 
 #ifdef HFX
-extern void test_for_us IPT0();
+#error "Unsupported SoftPC mirror configuration: HFX"
 #endif /* HFX */
+#line 405
 
 #ifdef DOS_APP_LIC
-extern void DOS_AppLicense IPT0();
+#error "Unsupported SoftPC mirror configuration: DOS_APP_LIC"
 #endif
+#line 409
 
 IMPORT int soft_reset;
 
@@ -394,3 +380,7 @@ IMPORT int soft_reset;
 extern void wdctrl_bop IPT0();
 #endif	/* SPC386 && WDCTRL_BOP */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 601

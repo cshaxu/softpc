@@ -19,6 +19,10 @@
  */
 
 /* Mouse port number definitions. */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 22
 #define MOUSE_PORT_0		0x023c
 #define MOUSE_PORT_1		0x023d
 #define MOUSE_PORT_2		0x023e
@@ -26,6 +30,8 @@
 
 #define MOUSE_PORT_START	0x023c
 #define MOUSE_PORT_END		0x023f
+#endif // !NEC_98
+#line 46
 
 /* Internal mouse status word bits. */
 #define LEFT_BUTTON_DOWN	0x04

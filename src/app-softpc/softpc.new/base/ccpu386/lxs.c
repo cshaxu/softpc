@@ -39,11 +39,9 @@ LDS, LES, LGS, LGS and LSS (ie LxS) CPU Functions.
 GLOBAL VOID
 LDS
 #ifdef ANSI
-   (
-   IU32 *pop1,	/* Pntr to dst(offset) operand */
-   IU32 op2[2]	/* src(offset:selector pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 47
    (pop1, op2)
    IU32 *pop1;
    IU32 op2[2];
@@ -62,11 +60,9 @@ LDS
 GLOBAL VOID
 LES
 #ifdef ANSI
-   (
-   IU32 *pop1,	/* Pntr to dst(offset) operand */
-   IU32 op2[2]	/* src(offset:selector pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 70
    (pop1, op2)
    IU32 *pop1;
    IU32 op2[2];
@@ -85,11 +81,9 @@ LES
 GLOBAL VOID
 LFS
 #ifdef ANSI
-   (
-   IU32 *pop1,	/* Pntr to dst(offset) operand */
-   IU32 op2[2]	/* src(offset:selector pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 93
    (pop1, op2)
    IU32 *pop1;
    IU32 op2[2];
@@ -108,11 +102,9 @@ LFS
 GLOBAL VOID
 LGS
 #ifdef ANSI
-   (
-   IU32 *pop1,	/* Pntr to dst(offset) operand */
-   IU32 op2[2]	/* src(offset:selector pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 116
    (pop1, op2)
    IU32 *pop1;
    IU32 op2[2];
@@ -131,11 +123,9 @@ LGS
 GLOBAL VOID
 LSS
 #ifdef ANSI
-   (
-   IU32 *pop1,	/* Pntr to dst(offset) operand */
-   IU32 op2[2]	/* src(offset:selector pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 139
    (pop1, op2)
    IU32 *pop1;
    IU32 op2[2];

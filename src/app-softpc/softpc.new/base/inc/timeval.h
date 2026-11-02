@@ -64,6 +64,6 @@ extern struct host_tm *host_localtime IPT1(time_t *, clock);
 extern void host_gettimeofday IPT2(struct host_timeval *, time,
 				   struct host_timezone *, zone);
 #else
-extern void host_GetSysTime(struct host_timeval *);
-#define host_gettimeofday(timeval, timezn) host_GetSysTime((timeval))
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 70

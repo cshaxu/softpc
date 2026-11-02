@@ -1,0 +1,4 @@
+path	directive	baseline_first_line	baseline_after_line
+base/bios/reset.c	if	809	864
+base/video/video.c	if	126	179
+base/video/video.c	ifndef	180	284

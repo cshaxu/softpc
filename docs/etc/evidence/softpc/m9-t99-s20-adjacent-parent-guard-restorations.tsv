@@ -1,0 +1,3 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/comms/printer.c	624	644	476	492	NEC_98	else	6bf52aa4e7c817723d612f08209925390df53bee81c563f72a758fcd83860002
+base/comms/printer.c	572	623	467	476	NEC_98	else	7ff47d1b1e06fb91d87234d2f872afe19d4a3bdf4822e5f54aa41a5563eb6690

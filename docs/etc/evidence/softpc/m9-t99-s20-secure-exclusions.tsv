@@ -1,0 +1,7 @@
+path	baseline_if_line	baseline_next_line	condition	excluded_body_sha256
+base/bios/bootstra.c	3	7	SECURE	a0f1851bbba7d1901972aad9767c3563e2cc546f7aabdc90f90596c630dc427f
+base/bios/bootstra.c	74	85	SECURE	7abe1fc4312029da23d8b0f250224d1702468976116fe9464a1c7370a6a6de90
+base/bios/bootstra.c	98	101	SECURE	838ca7f4ee116e987ae6ce7eaab067fa11e58927aac2b38d3f41bed303d25778
+base/bios/bootstra.c	113	124	SECURE	1b4363da71a343d3b42853bd5102f34320ff8ea25023bde3f033376595b9a16f
+base/keymouse/keyba.c	599	682	SECURE	85eb1907b2dd32bdf6118b3fb1fce3f7bfabd56e853f114bb3b2d4057a10f258
+base/keymouse/keyba.c	694	800	SECURE	5c185c29a522175abe5058293b49fdd58bf82c3648bcac3087834fcbb612e812

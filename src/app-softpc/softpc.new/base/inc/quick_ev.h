@@ -80,8 +80,9 @@ extern q_ev_handle add_q_ev_int_action IPT5(unsigned long, time, Q_CALLBACK_FN, 
 extern ULONG host_calc_q_ev_inst_for_time IPT1( ULONG, time );
 #endif /* host_calc_q_ev_inst_for_time */
 #ifdef NTVDM
-extern ULONG host_calc_q_ev_time_for_inst IPT1(ULONG, inst);
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 85
 
 extern void host_q_ev_set_count IPT1( ULONG, count );
 extern ULONG host_q_ev_get_count IPT0();

@@ -352,8 +352,9 @@ ERROR RECOVERY	  :	none.
 #include	"egaports.h"
 
 #ifdef GORE
-#include  "gore.h"
+#error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
+#line 357
 
 #include  "ga_mark.h"
 #include  "ga_defs.h"
@@ -389,13 +390,9 @@ LOCAL void	ega_ipstat1_inb IPT2(io_addr, port, half_word *, value);
 
 /* [5.1.1 #DEFINES]							*/
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_EGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 399
 
 GLOBAL VOID ega_gc_outw IPT2(io_addr, port, word, outval);
 
@@ -407,318 +404,9 @@ GLOBAL VOID ega_gc_outw IPT2(io_addr, port, word, outval);
 
 /* [5.1.2 TYPEDEF, STRUCTURE, ENUM DECLARATIONS]			*/
 #ifdef BIT_ORDER1
-typedef	union
-{
-	struct {
-		unsigned abyte : 8;
-    	} as;
-    	struct {
-	    unsigned hardware_reset		: 1,	/* NO		*/
-	    	     word_or_byte_mode		: 1,	/* YES 		*/
-	    	     address_wrap		: 1,	/* NO 		*/
-	    	     output_control		: 1,	/* YES - screen goes black		*/
-	    	     count_by_two		: 1,	/* NO		*/
-	    	     horizontal_retrace_select	: 1,	/* NO		*/
-	    	     select_row_scan_counter	: 1,	/* NO		*/
-		     compatibility_mode_support	: 1;	/* YES - CGA graphics banks		*/
-	} as_bfld;
-} MODE_CONTROL;
-
-typedef	union
-{
-	struct {
-		unsigned abyte : 8;
-	} as;
-    	struct {
-	    unsigned not_used				: 3,
-	    	     line_compare_bit_8			: 1,	/* YES	*/
-	    	     start_vertical_blank_bit_8		: 1,	/* NO	*/
-	    	     vertical_retrace_start_bit_8	: 1,	/* NO	*/
-	    	     vertical_display_enab_end_bit_8	: 1,	/* YES	*/
-		     vertical_total_bit_8		: 1;	/* NO	*/
-	} as_bfld;
-} CRTC_OVERFLOW;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 3,
-		     maximum_scan_line			: 5;	/* YES					*/
-	} as_bfld;
-} MAX_SCAN_LINE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 3,
-		     cursor_start			: 5;	/* YES					*/
-	} as_bfld;
-} CURSOR_START;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 1,
-		     cursor_skew_control		: 2,	/* NO					*/
-		     cursor_end				: 5;	/* YES					*/
-	} as_bfld;
-} CURSOR_END;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used			: 6,
-	    	     synchronous_reset		: 1,		/* Ditto (could implement as enable_ram)*/
-		     asynchronous_reset		: 1;		/* NO - damages video and font RAM	*/
-	} as_bfld;
-} SEQ_RESET;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used			: 4,
-	    	     dot_clock			: 1,		/* YES - distinguishes 40 or 80 chars	*/
-	    	     shift_load			: 1,		/* NO					*/
-	    	     bandwidth			: 1,		/* NO					*/
-		     eight_or_nine_dot_clocks	: 1;		/* NO - only for mono display		*/
-	} as_bfld;
-} CLOCKING_MODE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used			: 4,
-		     all_planes			: 4;		/* YES					*/
-	} as_bfld;
-} MAP_MASK;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used			: 4,
-	    	     character_map_select_b	: 2,		/* YES					*/
-		     character_map_select_a	: 2;		/* YES					*/
-    	} as_bfld;
-	struct {
-	    unsigned not_used			: 4,
-	    	     map_selects		: 4;		/* YES					*/
-    	} character;
-} CHAR_MAP_SELECT;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned
-	    	     not_used			: 5,		/* If above 2 not both 1, bank 0 set 2	*/
-	    	     not_odd_or_even		: 1,		/* YES (check consistency)		*/
-	    	     extended_memory		: 1,		/* NO - assume full 256K on board	*/
-		     alpha_mode			: 1;		/* YES (check consistency)		*/
-	} as_bfld;
-} MEMORY_MODE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 4,
-		     set_or_reset			: 4;	/* YES - write mode 0 only		*/
-	} as_bfld;
-} SET_OR_RESET;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 4,
-		     enable_set_or_reset		: 4;	/* YES - write mode 0 only		*/
-	} as_bfld;
-} ENABLE_SET_OR_RESET;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 4,
-		     color_compare			: 4;	/* YES - read mode 1 only		*/
-	} as_bfld;
-} COLOR_COMPARE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 3,
-	    	     function_select			: 2,	/* YES - write mode 0 only		*/
-		     rotate_count			: 3;	/* YES - write mode 0 only		*/
-	} as_bfld;
-} DATA_ROTATE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 5,
-		 map_select				: 3;	/* YES  				*/
-	} as_bfld;
-} READ_MAP_SELECT;
-
-typedef	union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 2,
-	    	     shift_register_mode		: 1,	/* YES - CGA colour graphics		*/
-	    	     odd_or_even			: 1,	/* YES (check for consistency)		*/
-	    	     read_mode				: 1,	/* YES					*/
-	    	     test_condition			: 1,	/* NO					*/
-		     write_mode				: 2;	/* YES					*/
-	} as_bfld;
-} MODE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 4,
-	    	     memory_map				: 2,	/* YES - location of EGA in M		*/
-	    	     odd_or_even			: 1,	/* YES (check consistency)		*/
-		     graphics_mode			: 1;	/* YES					*/
-	} as_bfld;
-} MISC_REG;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 4,
-		     color_dont_care			: 4;	/* YES - read mode 1 only		*/
-	} as_bfld;
-} COLOR_DONT_CARE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned
-	    	     not_used				: 4,
-	    	     background_intensity_or_blink	: 1,	/* NO - never blink			*/
-	    	     enable_line_graphics_char_codes	: 1,	/* NO mono display only			*/
-	    	     display_type			: 1,	/* NO - always colour display		*/
-		     graphics_mode			: 1;	/* YES - with Sequencer Mode reg	*/
-	} as_bfld;
-} AC_MODE_CONTROL;
-
-typedef union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	unsigned vertical_retrace_polarity	: 1,		/* YES - switch between 200/350 lines	*/
-    		 horizontal_retrace_polarity	: 1,		/* NO - probably destroys display!	*/
-    		 page_bit_odd_even		: 1,		/* NO - selects 32k page in odd/even?	*/
-    		 disable_internal_video_drivers	: 1,		/* NO - like switching PC off		*/
-    		 clock_select			: 2,		/* YES - only for switch address	*/
-    		 enable_ram			: 1,		/* YES - writes to display mem ignored	*/
-		 io_address_select		: 1;		/* NO - only used for mono screens	*/
-	} as_bfld;
-} MISC_OUTPUT_REG;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	unsigned not_used			: 4,
-    		 reserved			: 2,		/* YES - ignore				*/
-		 feature_control		: 2;		/* NO - device not supported		*/
-	} as_bfld;
-} FEAT_CONT_REG;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	unsigned crt_interrupt			: 1,		/* YES - sequence if not timing		*/
-    		 reserved			: 2,		/* YES - all bits 1			*/
-    		 switch_sense			: 1,		/* YES - switch selected by clock sel.	*/
-		 not_used			: 4;		/* YES - all bits 1			*/
-	} as_bfld;
-} INPUT_STAT_REG0;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-    	struct {
-	    unsigned not_used				: 2,
-		     video_status_mux			: 2,	/* NO					*/
-		     color_plane_enable			: 4;	/* YES  NB. affects attrs in text mode	*/
-	} as_bfld;
-} COLOR_PLANE_ENABLE;
-
-typedef	union
-{
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	unsigned not_used			: 1,		/* YES - set to 1			*/
-    		 diagnostic_0			: 1,		/* NO - set to 0			*/
-    		 diagnostic_1			: 1,		/* NO - set to 0			*/
-    		 vertical_retrace		: 1,		/* YES - sequence only			*/
-    		 light_pen_switch		: 1,		/* YES - set to 0			*/
-    		 light_pen_strobe		: 1,		/* YES - set to 1			*/
-		 display_enable			: 1;		/* YES - sequence only			*/
-	} as_bfld;
-} INPUT_STAT_REG1;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 722
 #ifdef BIT_ORDER2
 typedef	union
 {
@@ -1058,226 +746,9 @@ static	INPUT_STAT_REG1	input_status_register_one;
 
 /* The Sequencer Registers */
 #ifdef BIT_ORDER1
-static struct
-{
-    union
-    {
-	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	    unsigned not_used			: 5,
-		     index			: 3;
-    	} as_bfld;
-    } address;
-
-    SEQ_RESET		reset;
-    CLOCKING_MODE	clocking_mode;
-    MAP_MASK		map_mask;
-    CHAR_MAP_SELECT	character_map_select;
-    MEMORY_MODE		memory_mode;
-} sequencer;
-
-
-/* The CRT Controller Registers */
-
-static struct
-{
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	    unsigned not_used				: 3,
-		     index				: 5;
-    	} as_bfld;
-    } address;
-
-    byte horizontal_total;					/* NO - screen trash if wrong value	*/
-    byte horizontal_display_end;				/* YES - defines line length!!		*/
-    byte start_horizontal_blanking;				/* NO					*/
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 1,
-	    	     display_enable_skew_control	: 2,	/* NO					*/
-		     end_blanking			: 5;	/* NO					*/
-	} as_bfld;
-    } end_horizontal_blanking;
-
-    byte start_horizontal_retrace;				/* NO					*/
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 1,
-	    	     horizontal_retrace_delay		: 2,	/* NO					*/
-		     end_horizontal_retrace		: 5;	/* NO					*/
-	} as_bfld;
-    } end_horizontal_retrace;
-
-    byte vertical_total;					/* NO					*/
-    CRTC_OVERFLOW	crtc_overflow;
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 3,
-		     preset_row_scan			: 5;	/* NO					*/
-	} as_bfld;
-    } preset_row_scan;
-
-    MAX_SCAN_LINE	maximum_scan_line;
-    CURSOR_START	cursor_start;
-    CURSOR_END		cursor_end;
-    byte start_address_high;					/* YES					*/
-    byte start_address_low;					/* YES					*/
-    byte cursor_location_high;					/* YES					*/
-    byte cursor_location_low;					/* YES					*/
-    byte vertical_retrace_start;				/* NO					*/
-    byte light_pen_high;					/* NO					*/
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned
-	    	     not_used				: 2,
-	    	     enable_vertical_interrupt		: 1,	/* YES - ditto				*/
-	    	     clear_vertical_interrupt		: 1,	/* YES - needs investigation		*/
-		     vertical_retrace_end		: 4;	/* NO					*/
-	} as_bfld;
-    } vertical_retrace_end;
-
-    byte light_pen_low;						/* NO					*/
-    byte vertical_display_enable_end;				/* YES - defines screen height		*/
-    byte offset;						/* YES (maybe!)	???????			*/
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 3,
-		     underline_location			: 5;	/* NO (mono display only)		*/
-	} as_bfld;
-    } underline_location;
-
-    byte start_vertical_blanking;				/* NO					*/
-    byte end_vertical_blanking;					/* NO					*/
-    MODE_CONTROL	mode_control;
-    byte line_compare;						/* YES					*/
-
-} crt_controller;
-
-
-/* The Graphics Controller Registers */
-
-static struct
-{
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	    unsigned not_used				: 4,
-		     index				: 4;
-    	} as_bfld;
-    } address;
-
-    SET_OR_RESET	set_or_reset;
-    ENABLE_SET_OR_RESET	enable_set_or_reset;
-    COLOR_COMPARE	color_compare;
-    DATA_ROTATE		data_rotate;
-    READ_MAP_SELECT	read_map_select;
-    MODE		mode;
-    MISC_REG		miscellaneous;
-    COLOR_DONT_CARE	color_dont_care;
-    byte bit_mask_register;					/* YES - write modes 0 & 2		*/
-    byte graphics_1_position;					/* NO					*/
-    byte graphics_2_position;					/* NO					*/
-} graphics_controller;
-
-
-/* The Attribute Controller Registers */
-
-static struct
-{
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-    	    unsigned not_used				: 3,
-		     index				: 5;
-    	} as_bfld;
-    } address;
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned
-		     not_used				: 2,	/* YES					*/
-		     secondary_red			: 1,	/* YES					*/
-		     secondary_green			: 1,	/* YES					*/
-		     secondary_blue			: 1,	/* YES					*/
-		     red				: 1,	/* YES					*/
-		     green				: 1,	/* YES					*/
-		     blue				: 1;	/* YES					*/
-	} as_bfld;
-    } palette[EGA_PALETTE_SIZE];
-
-    AC_MODE_CONTROL	mode_control;
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 2,
-		     secondary_red_border		: 1,	/* YES					*/
-		     secondary_green_border		: 1,	/* YES					*/
-		     secondary_blue_border		: 1,	/* YES					*/
-		     red_border				: 1,	/* YES					*/
-		     green_border			: 1,	/* YES					*/
-		     blue_border			: 1;	/* YES - real thing isn't good at this	*/
-	} as_bfld;
-    } overscan_color;
-
-    COLOR_PLANE_ENABLE	color_plane_enable;
-
-    union
-    {
-    	struct {
-		unsigned abyte : 8;
-	} as;
-	struct {
-	    unsigned not_used				: 4,
-		     horizontal_pel_panning		: 4;	/* NO					*/
-	} as_bfld;
-    } horizontal_pel_panning;
-} attribute_controller;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 1281
 
 #ifdef BIT_ORDER2
 static struct
@@ -1638,6 +1109,8 @@ RETURN PARAMS   :	None
 
 LOCAL void	do_new_cursor IFN0()
 {
+#ifndef NEC_98
+#line 1641
 
 	note_entrance0("do_new_cursor()");
 
@@ -1724,6 +1197,8 @@ LOCAL void	do_new_cursor IFN0()
 	}
 
 	base_cursor_shape_changed();
+#endif   //NEC_98
+#line 1727
 }
 
 /*
@@ -1745,6 +1220,8 @@ RETURN PARAMS   :	None
 
 LOCAL void	do_chain_majority_decision IFN0()
 {
+#ifndef NEC_98
+#line 1748
 	static	int	current_votes=0;
 	int		new_votes;
 
@@ -1781,6 +1258,8 @@ LOCAL void	do_chain_majority_decision IFN0()
 		}
 
 	current_votes = new_votes;
+#endif   //NEC_98
+#line 1784
 }
 
 
@@ -1810,10 +1289,13 @@ GLOBAL UTINY *ega_gc_outb_index_addr;
 GLOBAL void
 set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 {
+#ifndef NEC_98
+#line 1813
 	ULONG roffs, woffs;
 #ifdef PIG
-	IMPORT ULONG pig_vid_bank;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 1817
 
 #ifdef V7VGA
 	if( get_seq_chain4_mode() && get_chain4_mode() )
@@ -1827,15 +1309,14 @@ set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 		woffs = (ULONG)wrt_bank << 18;
 	}
 #else
-		UNUSED(rd_bank);
-		UNUSED(wrt_bank);
-		roffs = 0;
-		woffs = 0;
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
+#line 1835
 
 #ifdef PIG
-	pig_vid_bank = woffs;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 1839
 	setVideorplane(EGA_planes + roffs);
 	setVideowplane(EGA_planes + woffs);
 
@@ -1847,28 +1328,37 @@ set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 		setVideov7_bank_vid_copy_off(woffs >> 4);
 
 #ifdef GORE
-	gd.max_vis_addr = get_screen_length() - 1 + woffs;
+#error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
+#endif   //NEC_98
+#line 1852
 }
 
 GLOBAL void
 update_banking IFN0()
 {
+#ifndef NEC_98
+#line 1857
 	UTINY rd_bank, wrt_bank;
 
 #ifdef V7VGA
 	v7_get_banks( &rd_bank, &wrt_bank );
 #else
-	rd_bank = wrt_bank = 0;
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
+#line 1864
 
 	set_banking( rd_bank, wrt_bank );
+#endif  //NEC_98
+#line 1866
 }
 
 
 VOID
 init_vga_globals IFN0()
 {
+#ifndef NEC_98
+#line 1872
 	setVideov7_bank_vid_copy_off(0);
 	setVideosr_lookup(sr_lookup);
 	setVideovideo_copy(&video_copy[0]);
@@ -1876,19 +1366,22 @@ init_vga_globals IFN0()
 	setVideoscreen_ptr(EGA_planes);
 	setVideorotate(0);
 #ifndef CPU_40_STYLE	/* EVID */
-	setVideomark_byte(_simple_mark_sml);
-	setVideomark_word(_simple_mark_sml);
-	setVideomark_string(_simple_mark_lge);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else
+#line 1883
 	SetMarkPointers(0);
 #endif	/* CPU_40_STYLE - EVID */
 
 
 	update_banking();
+#endif  //NEC_98
+#line 1888
 }
 
 void	ega_init IFN0()
 {
+#ifndef NEC_98
+#line 1892
 	note_entrance0("ega_init");
 	/*
 	 * Define sequencer's ports
@@ -1918,8 +1411,9 @@ void	ega_init IFN0()
 	io_define_out_routines(EGA_GC_ADAP_INDEX, ega_gc_outb_index, ega_gc_outw, NULL, NULL);
 
 #ifndef CPU_40_STYLE	/* TEMPORARY */
-	Cpu_define_outb(EGA_GC_ADAP_INDEX,_ega_gc_outb_index);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
+#line 1923
 
 	io_define_outb(EGA_GC_ADAP_DATA,ega_gc_set_reset);
 	Cpu_define_outb(EGA_GC_ADAP_DATA,NULL);
@@ -2045,10 +1539,14 @@ void	ega_init IFN0()
 	/* prevent copyright message mysteriously disappearing */
 	timer_video_enabled = TRUE;
 
+#endif  //NEC_98
+#line 2048
 }
 
 void	ega_term IFN0()
 {
+#ifndef NEC_98
+#line 2052
 
 int	index;
 
@@ -2117,10 +1615,14 @@ int	index;
 	/* Disable CPU read processing */
 	ega_read_term();
 	ega_write_term();
+#endif  //NEC_98
+#line 2120
 }
 
 LOCAL void	ega_seq_outb_index IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2124
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2128,6 +1630,8 @@ LOCAL void	ega_seq_outb_index IFN2(io_addr, port, half_word, value)
 	assert1(value<5,"Bad seq index %d",value);
 	NON_PROD(sequencer.address.as.abyte = value);
 	io_redefine_outb(EGA_SEQ_ADAP_DATA,ega_seq_regs[value & 7]);
+#endif  //NEC_98
+#line 2131
 }
 
 /* Snapshot port ABI: this receiver owns reset even when VGA ports are used. */
@@ -2138,6 +1642,8 @@ GLOBAL half_word ega_snapshot_seq_reset IFN0()
 
 void	ega_seq_reset IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2141
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2153,10 +1659,14 @@ void	ega_seq_reset IFN2(io_addr, port, half_word, value)
 		 set_bit_display_disabled(SYNC_RESET);
 	else
 		 clear_bit_display_disabled(SYNC_RESET);
+#endif  //NEC_98
+#line 2156
 }
 
 void	ega_seq_clock IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2160
 register unsigned dot_clock;
 
 #ifdef PROD
@@ -2181,10 +1691,14 @@ register unsigned dot_clock;
 		}
 		flag_mode_change_required();
 	}
+#endif  //NEC_98
+#line 2184
 }
 
 void	ega_seq_map_mask IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2188
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2203,10 +1717,14 @@ void	ega_seq_map_mask IFN2(io_addr, port, half_word, value)
 	setVideowrstate((IU8)EGA_CPU.ega_state.mode_0.lookup);
 
 	ega_write_routines_update(PLANES_ENABLED);
+#endif  //NEC_98
+#line 2206
 }
 
 void	ega_seq_char_map IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2210
 register unsigned map_selects;
 
 #ifdef PROD
@@ -2233,10 +1751,14 @@ register unsigned map_selects;
 		host_select_fonts(get_prim_font_index(), get_sec_font_index());
 		flag_mode_change_required();
 	}
+#endif  //NEC_98
+#line 2236
 }
 
 void	ega_seq_mem_mode IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2240
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2258,10 +1780,14 @@ void	ega_seq_mem_mode IFN2(io_addr, port, half_word, value)
 	do_chain_majority_decision();
 
 	assert1(sequencer.memory_mode.as_bfld.extended_memory == 1,"Someone is trying to set extended memory to 0 (reg=%x)",value);
+#endif  //NEC_98
+#line 2261
 }
 
 LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2265
 	SHORT offset;
 	struct {	/* avoid alignment problems with casts */
 		unsigned value : 8;
@@ -2327,9 +1853,9 @@ LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
 						set_screen_height_med_recal(
 							((CRTC_OVERFLOW*)&new)->as_bfld.vertical_display_enab_end_bit_8 );
 #else
-						set_screen_height_hi_recal(
-							((CRTC_OVERFLOW*)&new)->as_bfld.vertical_display_enab_end_bit_8 );
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
+#line 2333
 						flag_mode_change_required();
 					}
 					if (crt_controller.crtc_overflow.as_bfld.line_compare_bit_8 !=
@@ -2563,10 +2089,14 @@ LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
 			assert1(NO,"Bad port passed %x", port );
 			break;
 	}
+#endif  //NEC_98
+#line 2566
 }
 
 LOCAL void	ega_crtc_inb IFN2(io_addr, port, half_word *, value)
 {
+#ifndef NEC_98
+#line 2570
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2609,11 +2139,15 @@ LOCAL void	ega_crtc_inb IFN2(io_addr, port, half_word *, value)
 			*value = IO_EMPTY_PORT_BYTE_VALUE;
 			break;
 	}
+#endif  //NEC_98
+#line 2612
 }
 
 
 void	ega_gc_outb_index IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2617
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2623,6 +2157,8 @@ void	ega_gc_outb_index IFN2(io_addr, port, half_word, value)
 
 	io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_regs[value & 15]);
 	Cpu_define_outb(EGA_GC_ADAP_DATA,ega_gc_regs_cpu[value & 15]);
+#endif  //NEC_98
+#line 2626
 }
 
 
@@ -2636,6 +2172,8 @@ void	ega_gc_outb_index IFN2(io_addr, port, half_word, value)
 )*/
 GLOBAL VOID ega_gc_outw IFN2(io_addr, port, word, outval)
 {
+#ifndef NEC_98
+#line 2639
 	reg     temp;
 	INT		value;
 
@@ -2652,6 +2190,8 @@ GLOBAL VOID ega_gc_outw IFN2(io_addr, port, word, outval)
 	Cpu_define_outb(EGA_GC_ADAP_DATA,ega_gc_regs_cpu[value]);
 
 	(*(ega_gc_regs[value]))((IU16)(port+1), temp.byte.high);
+#endif  //NEC_98
+#line 2655
 }
 
 
@@ -2660,6 +2200,8 @@ GLOBAL VOID ega_gc_outw IFN2(io_addr, port, word, outval)
 
 void	ega_gc_set_reset IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2663
 register unsigned set_reset;
 
 #ifdef PROD
@@ -2675,10 +2217,14 @@ register unsigned set_reset;
 		EGA_CPU.set_reset = graphics_controller.set_or_reset.as_bfld.set_or_reset;
 		ega_write_routines_update(SET_RESET);
 	}
+#endif  //NEC_98
+#line 2678
 }
 
 void	ega_gc_enable_set IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2682
 register unsigned en_set_reset;
 
 #ifdef PROD
@@ -2696,10 +2242,14 @@ register unsigned en_set_reset;
 		setVideowrstate((IU8)EGA_CPU.ega_state.mode_0.lookup);
 		ega_write_routines_update(ENABLE_SET_RESET);
 	}
+#endif  //NEC_98
+#line 2699
 }
 
 void	ega_gc_compare IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2703
 register unsigned colour_compare;
 
 #ifdef PROD
@@ -2713,10 +2263,14 @@ register unsigned colour_compare;
 		read_state.colour_compare = (unsigned char)graphics_controller.color_compare.as_bfld.color_compare;
 		if (read_state.mode == 1) ega_read_routines_update();
 	}
+#endif  //NEC_98
+#line 2716
 }
 
 void	ega_gc_rotate IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2720
 	struct {
 		unsigned value : 8;
 	} new;
@@ -2741,10 +2295,14 @@ void	ega_gc_rotate IFN2(io_addr, port, half_word, value)
 	}
 	EGA_CPU.fun_or_protection = (value != 0) || write_state.bp;
 	graphics_controller.data_rotate.as.abyte = value;
+#endif  //NEC_98
+#line 2744
 }
 
 void	ega_gc_read_map IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2748
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2753,10 +2311,14 @@ void	ega_gc_read_map IFN2(io_addr, port, half_word, value)
 	setVideoread_mapped_plane(value & 3);
 
 	update_shift_count();
+#endif  //NEC_98
+#line 2756
 }
 
 void	ega_gc_mode IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2760
 MODE new_mode;
 
 #ifdef PROD
@@ -2803,10 +2365,14 @@ MODE new_mode;
 	do_chain_majority_decision();
 
 	assert0(graphics_controller.mode.as_bfld.test_condition == 0,"Test conditon set");
+#endif  //NEC_98
+#line 2806
 }
 
 void	ega_gc_misc IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2810
 register unsigned memory_map;
 
 #ifdef PROD
@@ -2865,10 +2431,14 @@ register unsigned memory_map;
 	 */
 
 	do_chain_majority_decision();
+#endif  //NEC_98
+#line 2868
 }
 
 void	ega_gc_dont_care IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2872
 register unsigned colour_dont_care;
 
 #ifdef PROD
@@ -2882,6 +2452,8 @@ register unsigned colour_dont_care;
 		read_state.colour_dont_care = (unsigned char)graphics_controller.color_dont_care.as_bfld.color_dont_care;
 		if (read_state.mode == 1) ega_read_routines_update();
 	}
+#endif  //NEC_98
+#line 2885
 }
 
 /*
@@ -2915,6 +2487,8 @@ IMPORT void Glue_set_vid_wrt_ptrs (WRT_POINTERS * handler );
 
 GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 {
+#ifndef NEC_98
+#line 2918
 	ULONG				state;
 	SAVED IU8			masks[] = {0x1f, 0x01, 0x0f, 0x0f};
 	IMPORT WRT_POINTERS	*mode_chain_handler_table[];
@@ -2946,16 +2520,15 @@ GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 	state = EGA_CPU.ega_state.mode_0.lookup & masks[EGA_CPU.write_mode];
 
 #ifdef A3CPU
-#ifdef C_VID
-	Glue_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);
+#error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
-	Cpu_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);	
-#endif /* C_VID */
-#else
+#line 2955
 	Glue_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);
 #endif /* A3CPU */
 
 	EGA_CPU.saved_state = state;
+#endif  //NEC_98
+#line 2959
 }
 
 
@@ -2966,6 +2539,8 @@ GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 
 LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 2969
 	register unsigned int mask;
 
 #ifdef PROD
@@ -2987,33 +2562,34 @@ LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 #ifndef	USE_OLD_MASK_CODE
 		ega_mask_register_changed(/*bit protection :=*/0);
 #else
-		write_state.bp = 0;
-		setVideowrstate(EGA_CPU.ega_state.mode_0.lookup);
-		EGA_CPU.fun_or_protection = (graphics_controller.data_rotate.as.abyte != 0);
-		ega_write_routines_update(BIT_PROT);
+#error "Unsupported SoftPC mirror configuration: USE_OLD_MASK_CODE"
 #endif	/* USE_OLD_MASK_CODE */
+#line 2995
 
 		/* Alter the function table used by ega_gc_index */
 		ega_gc_regs[8] = ega_gc_mask_ff;
 
 #ifndef CPU_40_STYLE	/* TEMPORARY */
-#ifndef A2CPU
-		/* Alter the function table used by assembler ega_gc_index */
-		ega_gc_regs_cpu[8] = _ega_gc_outb_mask_ff;
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#endif
+#line 3005
 
 		io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_mask_ff);
 
 #ifndef CPU_40_STYLE	/* TEMPORARY */
-		Cpu_define_outb(EGA_GC_ADAP_DATA,_ega_gc_outb_mask_ff);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
+#line 3011
 	}
+#endif  //NEC_98
+#line 3012
 }
 
 /* This version isn't called so often */
 void	ega_gc_mask_ff IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 3017
 	register unsigned int mask;
 
 #ifdef PROD
@@ -3035,42 +2611,47 @@ void	ega_gc_mask_ff IFN2(io_addr, port, half_word, value)
 #ifndef	USE_OLD_MASK_CODE
 		ega_mask_register_changed(/*bit protection :=*/1);
 #else
-		write_state.bp = 1;
-		setVideowrstate(EGA_CPU.ega_state.mode_0.lookup);
-		EGA_CPU.fun_or_protection = TRUE;
-		ega_write_routines_update(BIT_PROT);
+#error "Unsupported SoftPC mirror configuration: USE_OLD_MASK_CODE"
 #endif	/* USE_OLD_MASK_CODE*/
+#line 3043
 
 		/* Alter the function table used by ega_gc_index */
 		ega_gc_regs[8] = ega_gc_mask;
 
 #ifndef CPU_40_STYLE	/* TEMPORARY */
-#ifndef A2CPU
-		/* Alter the function table used by assembler ega_gc_index */
-		ega_gc_regs_cpu[8] = _ega_gc_outb_mask;
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#endif
+#line 3053
 
 		io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_mask);
 
 #ifndef CPU_40_STYLE	/* TEMPORARY */
-		Cpu_define_outb(EGA_GC_ADAP_DATA,_ega_gc_outb_mask);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
+#line 3059
 	}
+#endif  //NEC_98
+#line 3060
 }
 
 LOCAL void	ega_index_invalid IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 3064
 #ifdef PROD
 	UNUSED(port);
 	UNUSED(value);
 #endif
 	note_entrance2("ega_index_invalid(%x,%x)", port, value);
 	assert1(NO,"Invalid index %d",graphics_controller.address.as_bfld.index);
+#endif  //NEC_98
+#line 3070
 }
 
 LOCAL void	ega_ac_outb IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 3074
 	struct {
 		unsigned value : 8;
 	} new;
@@ -3184,10 +2765,14 @@ LOCAL void	ega_ac_outb IFN2(io_addr, port, half_word, value)
 			break;
 		}
 	}
+#endif  //NEC_98
+#line 3187
 }
 
 LOCAL void	ega_misc_outb IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 3191
 MISC_OUTPUT_REG new;
 
 #ifdef PROD
@@ -3233,20 +2818,28 @@ MISC_OUTPUT_REG new;
 	 * register value used by ipsr0 to find out the index into the switches
 	 * so that correct switch setting can be returned.
 	 */
+#endif  //NEC_98
+#line 3236
 }
 
 LOCAL void	ega_feat_outb IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 3240
 #ifdef PROD
 	UNUSED(port);
 	UNUSED(value);
 #endif
 	note_entrance2("ega_feat_outb(%x,%x)", port, value);
 	NON_PROD(feature_control_register.as.abyte = value);
+#endif  //NEC_98
+#line 3246
 }
 
 LOCAL void	ega_ipstat0_inb IFN2(io_addr, port, half_word *, value)
 {
+#ifndef NEC_98
+#line 3250
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -3260,10 +2853,14 @@ LOCAL void	ega_ipstat0_inb IFN2(io_addr, port, half_word *, value)
 	get_ega_switch_setting();
 	*value = (half_word)input_status_register_zero.as.abyte;
 	note_entrance1("returning %x",*value);
+#endif  //NEC_98
+#line 3263
 }
 
 LOCAL void	ega_ipstat1_inb IFN2(io_addr, port, half_word *, value)
 {
+#ifndef NEC_98
+#line 3267
 
 	/*
 	 * The whole of this routine has been nicked from the cga without modification
@@ -3393,10 +2990,14 @@ LOCAL void	ega_ipstat1_inb IFN2(io_addr, port, half_word *, value)
 	break;
     }
     note_entrance1("returning %x",*value);
+#endif  //NEC_98
+#line 3396
 }
 
 LOCAL	void	vote_ega_mode IFN0()
 {
+#ifndef NEC_98
+#line 3400
 	static	int	old_votes = 3;
 	int	votes;
 
@@ -3417,49 +3018,13 @@ LOCAL	void	vote_ega_mode IFN0()
 		flag_mode_change_required();
 	}
 	old_votes = votes;
+#endif  //NEC_98
+#line 3420
 }
 
 #ifdef HUNTER
-
-/* Get line compare value */
-
-int ega_get_line_compare IFN0()
-
-    {
-    int		return_value;
-
-    return_value = crt_controller.line_compare;
-    if (crt_controller.crtc_overflow.as_bfld.line_compare_bit_8 != 0)
-	return_value += 0x100;
-    return (return_value);
-    }			/* ega_get_line_compare */
-
-/* Get maximum scan lines value */
-
-int ega_get_max_scan_lines IFN0()
-
-    {
-    return (crt_controller.maximum_scan_line.as_bfld.maximum_scan_line);
-    }			/* ega_get_max_scan_lines */
-
-/* Set line compare value */
-
-void ega_set_line_compare IFN1(int, lcomp_val)
-    {
-    CRTC_OVERFLOW	new_overflow;
-
-    new_overflow.as.abyte = crt_controller.crtc_overflow.as.abyte;
-    if (lcomp_val >= 0x100)
-	new_overflow.as_bfld.line_compare_bit_8 = 1;
-    else
-	new_overflow.as_bfld.line_compare_bit_8 = 0;
-
-    outb(EGA_CRTC_INDEX, 7);
-    outb(EGA_CRTC_DATA, new_overflow.as.abyte);
-    outb(EGA_CRTC_INDEX, 24);
-    outb(EGA_CRTC_DATA, lcomp_val & 0xff);
-    }
-
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif /* HUNTER */
+#line 3464
 #endif /* EGG */
 #endif /* REAL_VGA */

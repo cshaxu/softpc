@@ -45,13 +45,9 @@
 #include "sas.h"
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "VIDEO_BIOS_VGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 55
 
 
 IMPORT	struct	sequencer sequencer;
@@ -105,6 +101,8 @@ Output:
 GLOBAL VOID
 v7vga_func_6f()
 {
+#ifndef NEC_98
+#line 108
 	byte al;
 
 	note_entrance0("v7vga_func_6f");
@@ -114,6 +112,8 @@ v7vga_func_6f()
 	else
 		setAH(2);
 		/* setCF(1) ?? */
+#endif  //NEC_98
+#line 117
 }
 
 /*(
@@ -165,12 +165,16 @@ Output:
 GLOBAL VOID
 v7vga_get_info()
 {
+#ifndef NEC_98
+#line 168
 	note_entrance0("v7vga_get_info");
 
 	/* Reserved */
 	setAL(0x10); /* This is what our V7VGA puts there */
 	/* Status register information */
 	setAH(0x04); /* Bit 5 = 0 -> colour. Bit 4 = 0 -> hi-res. Bit 0 = 0 -> display enabled. */
+#endif  //NEC_98
+#line 174
 }
 
 /*(
@@ -220,6 +224,8 @@ Output:
 GLOBAL VOID
 v7vga_get_mode_and_screen_res()
 {
+#ifndef NEC_98
+#line 223
 	half_word video_mode;
 
 	note_entrance0("v7vga_get_mode_and_screen_res");
@@ -245,6 +251,8 @@ v7vga_get_mode_and_screen_res()
 		else
 			setCX(get_screen_height()/get_pc_pix_height());
 	}
+#endif  //NEC_98
+#line 248
 }
 
 /*(
@@ -268,6 +276,8 @@ Output:
 GLOBAL VOID
 v7vga_extended_set_mode()
 {
+#ifndef NEC_98
+#line 271
 	UTINY pag;
 	sys_addr save_addr,font_addr;
 	half_word temp_word;
@@ -276,8 +286,9 @@ v7vga_extended_set_mode()
 	ULONG font_offset;
 	word clr_char;
 #ifndef PROD
-	trace("setting video mode", DUMP_REG);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 281
 	set_host_pix_height(1);
 	set_banking( 0, 0 );
 
@@ -443,9 +454,9 @@ v7vga_extended_set_mode()
 		else
 			clr_char = vd_mode_table[video_mode].clear_char;
 #ifdef REAL_VGA
-   		sas_fillsw_16(video_pc_low_regen, clr_char,
-				 	(video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 449
     	sas_fillsw(video_pc_low_regen, clr_char,
 				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
 #endif
@@ -453,8 +464,11 @@ v7vga_extended_set_mode()
     inb(EGA_IPSTAT1_REG,&temp_word);
     outb(EGA_AC_INDEX_DATA, EGA_PALETTE_ENABLE);	/* re-enable video */
 #ifndef PROD
-    trace("end of video set mode", DUMP_NONE);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 458
+#endif  //NEC_98
+#line 458
 }
 
 /*(
@@ -479,12 +493,16 @@ Output:
 GLOBAL VOID
 v7vga_select_autoswitch_mode()
 {
+#ifndef NEC_98
+#line 482
 	note_entrance0("v7vga_select_autoswitch_mode");
 
 /***
 	I reckon we shouldn't support this
 ***/
 	setAH(0x2);
+#endif  //NEC_98
+#line 488
 }
 
 /*(

@@ -1,0 +1,2 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/system/cmos.c	1136	1229	1068	1115	22c5f9eaa1a7e989e01b463add654ac45826a763647a2cc2b087ca452c191d79

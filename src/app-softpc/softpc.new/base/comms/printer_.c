@@ -1,3 +1,7 @@
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1
 
 #include "insignia.h"
 #include "host_def.h"
@@ -20,18 +24,16 @@
  *	(r3.3)	: Implement the real code, inside compile switch.
  */
 
+/* @(#)printer_io.c	1.11 08/25/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)printer_io.c	1.11 08/25/93 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 26
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 35
 
 
 /*
@@ -43,8 +45,9 @@ static char SccsID[]="@(#)printer_io.c	1.11 08/25/93 Copyright Insignia Solution
 #include TypesH
 
 #ifdef SYSTEMV
-#include <sys/termio.h>
+#error "Unsupported SoftPC mirror configuration: SYSTEMV"
 #endif
+#line 48
 
 /*
  * SoftPC include files
@@ -77,6 +80,10 @@ static sys_addr timeout_address[] = {
 
 #endif /* PRINTER */
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 80
 /*
  * The printer bios consists of three functions:
  *
@@ -99,6 +106,10 @@ void printer_io()
     unsigned long time_count;
     int adapter;
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 102
 
     setIF(1);
     adapter = getDX() % NUM_PARALLEL_PORTS;
@@ -171,3 +182,4 @@ void printer_io()
 }
 
 
+#endif // !NEC_98

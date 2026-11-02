@@ -1,0 +1,10 @@
+path	s19_line	current_line	macro	review
+base/ccpu386/c_main.c	5042	4709	PROD	OR parent; probe did not reach; do not infer PROD
+base/inc/egaports.h	79	78	ANSI	OR parent; probe did not reach; do not infer ANSI
+base/inc/rs232.h	315	257	SHORT_TRACE	numeric parent NUM_SERIAL_PORTS > 2; probe did not reach
+base/keymouse/keybd_io.c	460	448	GISP_CPU	OR parent; probe did not reach; do not infer GISP_CPU
+base/system/cmos.c	1034	1043	PROD	OR parent; probe did not reach; do not infer PROD
+base/system/timer.c	1712	1840	PROD	nested mixed parent; probe did not reach; verify outermost first
+base/video/ega_vide.c	488	446	GISP_SVGA	nested EGG/V7VGA; observed undefined makes ifndef true; do not exclude
+base/video/vga_prts.c	2320	2313	PROD	nested OR parent; probe did not reach; do not infer PROD
+base/video/vga_prts.c	2327	2320	V7VGA	nested OR parent; probe did not reach; do not infer V7VGA

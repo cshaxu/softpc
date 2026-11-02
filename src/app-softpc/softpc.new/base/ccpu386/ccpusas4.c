@@ -23,13 +23,9 @@
 #ifdef	CCPU
 
 #ifdef SEGMENTATION
-
-/*
- * The following #include specifies the code segment into which this module
- * will by placed by the MPW C compiler on the Mac II running MultiFinder.
- */
-#include <SOFTPC_SUPPORT.seg>
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 33
 
 
 #include <stdio.h>
@@ -139,8 +135,9 @@ LOCAL void bios_write_double IPT2(LIN_ADDR, linAddr, IU32, value);
 GLOBAL IU8 *Start_of_M_area = NULL;
 GLOBAL PHY_ADDR  Length_of_M_area = 0;
 #ifdef BACK_M
-GLOBAL IU8 *end_of_M = NULL;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #endif
+#line 144
 
 void	    (*temp_func) ();
 
@@ -306,41 +303,14 @@ GLOBAL IBOOL c_SasRegisterVirtualSelectors IFN2(IU16, sel1, IU16, sel2)
 #ifndef CHECK_ACCESS
 #define checkAccess(addr)
 #else
-GLOBAL PHY_ADDR lowCheckAccess = 0;
-GLOBAL PHY_ADDR highCheckAccess = 0;
-#define checkAccess(addr) \
-	if ((addr < highCheckAccess) && (addr >= lowCheckAccess)) { \
-		always_trace1("Write access break point - addres 0x%.8x", \
-				 addr); \
-	}
+#error "Unsupported SoftPC mirror configuration: CHECK_ACCESS"
 #endif /* !CHECK_ACCESS else */
+#line 317
 
 #ifndef PROD
-/*
- * This function is useful for calling from a debugger!
- */
-
-GLOBAL void
-DumpMemType()
-{
-	SAS_MEM_TYPE currentType;
-	PHY_ADDR numEntries;	/* number of entries in the table */
-	PHY_ADDR currEntry;
-
-	currentType = SAS_DANGEROUS;  /* memory_type should never have this */
-	numEntries = c_sas_memory_size() >> 12;
-
-	for (currEntry = 0; currEntry < numEntries; currEntry++) {
-		if (memory_type[currEntry] != currentType) {
-			fprintf(stderr,"0x%.8x	%s\n", currEntry << 12,
-				SAS_TYPE_TO_STRING(memory_type[currEntry]));
-			currentType = memory_type[currEntry];
-		}
-	}
-	fprintf(stderr,"0x%.8x End of Memory\n", c_sas_memory_size());
-
-}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* ndef PROD */
+#line 344
 
 
 /*********** INIT & ADMIN FUNCS  ***********/
@@ -442,8 +412,9 @@ sas_init IFN1(PHY_ADDR, size)
 		IMPORT IU8 *CCPU_M;
 
 #ifdef BACK_M
-		CCPU_M = Start_of_M_area + size - 1;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 447
 		CCPU_M = Start_of_M_area;
 #endif				/* BACK_M */
 	}
@@ -457,8 +428,9 @@ sas_init IFN1(PHY_ADDR, size)
 
 	Length_of_M_area = size;
 #ifdef BACK_M
-	end_of_M = Start_of_M_area + Length_of_M_area -1;
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #endif
+#line 462
 
 	/* init the ROM (load the bios roms etc) */
 
@@ -1338,11 +1310,9 @@ c_GetLinAdd IFN1(PHY_ADDR, linAddr)
 		return(c_GetPhyAdd(phyAddr));
 	else {
 #ifndef	PROD
-		if (!AlreadyInYoda) {
-			always_trace1("get_byte_addr for linear address 0x%x which is unmapped", linAddr);
-			force_yoda();
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1346
 		return(c_GetPhyAdd(0));	/* as good as anything! */
 	}
 }
@@ -1372,9 +1342,9 @@ c_GetPhyAdd IFN1(PHY_ADDR, addr)
 	IU8 *retVal;
 
 #ifdef BACK_M
-	retVal = (IU8 *)((IHPE)end_of_M - (IHPE)addr);
-	return(retVal);
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else 
+#line 1378
 	return((IU8 *)((IHPE)Start_of_M_area + (IHPE)addr));
 #endif
 }
@@ -1490,9 +1460,9 @@ biosDoInst IFN5(IU16, vCS, LIN_ADDR, vEIP, IU32, vEAX, IU16, vDS, IU32, vEDX)
 #ifdef	PROD
 		host_error(EG_OWNUP, ERR_QUIT, "biosDoInst: Virtualisation sequencing failure");
 #else
-		always_trace0("biosDoInst: Virtualisation sequencing failure");
-		force_yoda();
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1496
 	}
 
 	result = getEAX();
@@ -2002,8 +1972,9 @@ LOCAL	void	c_sas_not_used	IFN0()
 {
 	always_trace0("c_sas_not_used called");
 #ifndef	PROD
-	force_yoda();
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 2007
 }
 
 

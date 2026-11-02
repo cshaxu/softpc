@@ -20,18 +20,16 @@
  *                <Unix file> #endif".
  */
 
+/* @(#)gfi_empty.c	1.13 08/03/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)gfi_empty.c	1.13 08/03/93 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 26
 
 #ifdef SEGMENTATION
-/*
- * The following #define specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_FLOPPY.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 35
 
 
 /*
@@ -150,44 +148,44 @@ gfi_empty_command
       {
    case FDC_READ_DATA:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf (trace_file, "\tGFI-empty: Read Data Command \n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 156
       break;
 
    case FDC_WRITE_DATA:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf (trace_file,"\tGFI-empty: Write Data Command\n");	
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 163
       break;
 
    case FDC_READ_TRACK:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf(trace_file,"\tGFI-empty: Read Track Command \n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 170
       break;
 
    case FDC_SPECIFY:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf(trace_file, "\tGFI-empty: Specify command\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 177
       break;
 
    case FDC_READ_ID:
 #ifndef PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf(trace_file, "\tGFI-empty: read id command\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 184
       break;
 
    case FDC_RECALIBRATE:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf (trace_file, "\tGFI-empty: Recalibrate command\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 191
       /* Controller tries 77 pulses to get drive to head 0,
 	 but fails, so we set Equipment Check */
       D = get_c5_drive(command_block);
@@ -200,31 +198,29 @@ gfi_empty_command
 
    case FDC_SENSE_DRIVE_STATUS:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf (trace_file, "\tGFI-empty: Sense Drive Status command\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 206
       break;
 
    case FDC_SEEK:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf(trace_file, "\tGFI-empty: Seek command\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 213
       break;
 
    case FDC_FORMAT_TRACK:
 #ifndef	PROD
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf(trace_file, "\tGFI-empty: Format Track command\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 220
       break;
 
 #ifndef	PROD
-   default:
-      if (io_verbose & GFI_VERBOSE)
-	 fprintf(trace_file, "GFI-empty: Unimplemented command, type %x\n",
-	                      get_type_cmd (command_block));
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 228
       }
 
    return ((SHORT)ret_stat);

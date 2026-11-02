@@ -29,9 +29,9 @@ typedef enum {EIGHT_BIT, SIXTEEN_BIT, THIRTY_TWO_BIT} SIZE_SPECIFIER;
 
 
 #ifndef TRUE
-#define FALSE  	0
-#define TRUE   	!FALSE
+#error "Unsupported SoftPC mirror configuration: !TRUE"
 #endif /* ! TRUE */
+#line 35
 
 #undef SUCCESS
 #undef FAILURE
@@ -39,16 +39,18 @@ typedef enum {EIGHT_BIT, SIXTEEN_BIT, THIRTY_TWO_BIT} SIZE_SPECIFIER;
 #define FAILURE	~SUCCESS
 
 #ifndef	NULL
-#define	NULL	0
+#error "Unsupported SoftPC mirror configuration: !NULL"
 #endif
+#line 44
 
 #ifndef NULL_STRING
 #define NULL_STRING	""
 #endif
 
 #ifdef SOFTWINDOWS
-#define SPC_PRODUCT_NAME "SoftWindows"
+#error "Unsupported SoftPC mirror configuration: SOFTWINDOWS"
 #else
+#line 52
 #define SPC_PRODUCT_NAME "SoftPC"
 #endif
 
@@ -71,36 +73,15 @@ typedef enum {EIGHT_BIT, SIXTEEN_BIT, THIRTY_TWO_BIT} SIZE_SPECIFIER;
  */
 
 #ifdef CPU_30_STYLE
-/* ========================================================== */
-
-/*
-   Our model for the data extracted from a decriptor entry.
- */
-typedef struct
-   {
-   double_word base;		/* 32-bit base address */
-   double_word limit;		/* 32-bit offset limit */
-   word  AR;			/* 16-bit attributes/access rights */
-   } DESCR;
-
-extern LIN_ADDR effective_addr IPT2( IU16, seg,  IU32, off);
-extern void read_descriptor IPT2( LIN_ADDR, addr, DESCR*, descr);
-extern boolean selector_outside_table IPT2( IU16, selector, IU32*, descr_addr);
-
-
-/* ========================================================== */
+#error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else /* CPU_30_STYLE */
+#line 93
 /* ========================================================== */
 
 #ifdef A2CPU
-
-/*
- * Effective address macro
- */
-
-#define effective_addr(seg, offset) (((double_word) seg * 0x10) + offset)
-
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif /* A2CPU */
+#line 104
 
 #ifdef CCPU
 extern sys_addr effective_addr IPT2( word, seg, word, ofs);
@@ -145,11 +126,9 @@ extern half_word pf_table[]; /* shouldn't this be in host_cpu.h ? */
  */
  
 #ifdef ANSI
-extern void applInit(int, char *[]);
-extern void applClose(void);
-extern void terminate(void);
-extern void host_terminate(void);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 153
 extern void applInit();
 extern void applClose();
 extern void terminate();

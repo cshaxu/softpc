@@ -1,3 +1,7 @@
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1
 #include "insignia.h"
 #include "host_def.h"
 
@@ -103,15 +107,15 @@ extern void host_simulate();
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_FLOPPY.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 113
 
 #include <stdio.h>
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif //NEC_98
+#line 115
 #include TypesH
 
 #include "xt.h"
@@ -132,11 +136,19 @@ extern void host_simulate();
 #include "cmosbios.h"
 #include "rtc_bios.h"
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 135
 
 /*
  *	Definition of the diskette operation function jump table
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 140
 void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 {
 	fl_disk_reset,
@@ -165,6 +177,13 @@ void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 	fl_format_set,
 	fl_set_media,
 };
+#endif // !NEC_98
+#line 168
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif    /* NTVDM */
+#line 261
 
 
 /*
@@ -205,6 +224,10 @@ LOCAL void waitf IPT1(long, time);
 LOCAL recal IPT1(int, drive);
 LOCAL chk_stat_2 IPT0();
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 208
 /*
  *	This macro defines the normal behaviour of the FDC after a reset.
  *	Sending a series of sense interrupt status commands following a
@@ -250,6 +273,8 @@ LOCAL BOOL high_density IFN1(int, drive)
 
 void fl_disk_reset IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 253
 	/*
 	 *	Reset the FDC and all drives. "drive" is not significant
 	 *
@@ -340,6 +365,8 @@ void fl_disk_reset IFN1(int, drive)
 	 */
 
 	setup_end(IGNORE_SECTORS_TRANSFERRED);
+#endif // !NEC_98
+#line 343
 }
 
 void fl_disk_status IFN1(int, drive)
@@ -362,6 +389,10 @@ void fl_disk_status IFN1(int, drive)
 
 void fl_disk_read IFN1(int, drive)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 365
 	/*
 	 *	Read sectors from the diskette in "drive"
 	 *
@@ -398,10 +429,16 @@ void fl_disk_read IFN1(int, drive)
         put_c0_MFM(fdc_cmd_block, 1);
         put_c0_MT(fdc_cmd_block, 1);
 	rd_wr_vf(drive, fdc_cmd_block, BIOS_DMA_READ);
+#endif // !NEC_98
+#line 401
 }
 
 void fl_disk_write IFN1(int, drive)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 405
 	/*
 	 *	Write sectors to the diskette in "drive"
 	 *
@@ -438,10 +475,16 @@ void fl_disk_write IFN1(int, drive)
 	put_c1_MFM(fdc_cmd_block, 1);
 	put_c1_MT(fdc_cmd_block, 1);
 	rd_wr_vf(drive, fdc_cmd_block, BIOS_DMA_WRITE);
+#endif // !NEC_98
+#line 441
 }
 
 void fl_disk_verify IFN1(int, drive)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 445
 	/*
 	 *	Verify sectors in the diskette in "drive"
 	 *
@@ -478,6 +521,8 @@ void fl_disk_verify IFN1(int, drive)
 	put_c0_MFM(fdc_cmd_block, 1);
 	put_c0_MT(fdc_cmd_block, 1);
 	rd_wr_vf(drive, fdc_cmd_block, BIOS_DMA_VERIFY);
+#endif // !NEC_98
+#line 481
 }
 
 /*
@@ -496,6 +541,10 @@ void GetFormatParams IFN4(int *, c, int *, h, int *, s, int *, n)
 
 void fl_disk_format IFN1(int, drive)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 499
 	/*
 	 *	Format the diskette in "drive"
 	 *
@@ -603,6 +652,8 @@ void fl_disk_format IFN1(int, drive)
 	translate_old(drive);
 	setup_end(IGNORE_SECTORS_TRANSFERRED);
 
+#endif // !NEC_98
+#line 606
 }
 
 void fl_fnc_err IFN1(int, drive)
@@ -620,9 +671,15 @@ void fl_fnc_err IFN1(int, drive)
 	 */
 	UNUSED(drive);
 	
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // NEC_98
+#line 2381
 	setAH(FS_BAD_COMMAND);
 	sas_store(FLOPPY_STATUS, FS_BAD_COMMAND);
 	setCF(1);
+#endif // !NEC_98
+#line 626
 }
 
 void fl_disk_parms IFN1(int, drive)
@@ -666,8 +723,14 @@ void fl_disk_parms IFN1(int, drive)
 	 *	Set up drive dependent parameters
 	 */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 669
 	if (    (equip_flag.bits.diskette_present == 1)
 	     && (drive < MAX_FLOPPY))
+#endif /* NTVDM */
+#line 671
 	{
 
 		if (! high_density(drive))
@@ -855,13 +918,9 @@ void fl_disk_type IFN1(int, drive)
 	setCF(0);
 
 #ifndef PROD
-switch( getAH() ){
-case DRIVE_IQ_UNKNOWN: note_trace0( GFI_VERBOSE, "unknown drive\n" ); break;
-case DRIVE_IQ_CHANGE_LINE: note_trace0( GFI_VERBOSE, "change line\n" ); break;
-case DRIVE_IQ_NO_CHANGE_LINE: note_trace0( GFI_VERBOSE, "no change line\n" ); break;
-default: note_trace0( GFI_VERBOSE, "bad AH return value\n" ); break;
-}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 865
 
 }
 
@@ -1043,8 +1102,14 @@ void fl_set_media IFN1(int, drive)
 	half_word dt_drive_type;
 	half_word lastrate;
 	word md_segment, md_offset;
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2814
 	sys_addr dt_start = DR_TYPE_ADDR;
 	sys_addr dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
+#endif
+#line 2817
 	sys_addr md_table;
 
 	translate_new(drive);
@@ -1184,10 +1249,16 @@ LOCAL dr_type_check IFN3(half_word, drive_type, word *, seg_ptr, word *, off_ptr
 	half_word dt_drive_type;
 	sys_addr dt_start, dt_end;
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2962
 	*seg_ptr = DISKETTE_IO_1_SEGMENT;
 
 	dt_start = DR_TYPE_ADDR;
 	dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
+#endif  /* NTVDM */
+#line 1191
 
 	while (dt_start < dt_end)
 	{
@@ -1240,7 +1311,13 @@ LOCAL void translate_new IFN1(int, drive)
 
 	sas_load(DRIVE_CAPABILITY, &hf_cntrl);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3022
 	if (high_density(drive) && (drive < MAX_FLOPPY))
+#endif /* NTVDM */
+#line 1244
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
 		if (disk_state == 0)
@@ -1276,7 +1353,13 @@ void translate_old IFN1(int, drive)
 	sas_load(DRIVE_CAPABILITY, &hf_cntrl);
 	sas_load(FDD_STATUS+drive, &disk_state);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3062
 	if (high_density(drive) && (drive < MAX_FLOPPY) && (disk_state != 0))
+#endif  /* NTVDM */
+#line 1280
 
 	{
 		/*
@@ -1438,8 +1521,14 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 				 *	Try to find parameter table entry with
 				 *	right drive type and current data rate
 				 */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1441
 				dt_start = DR_TYPE_ADDR;
 				dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
+#endif /* NTVDM */
+#line 1443
 				while (dt_start < dt_end)
 				{
 					/*
@@ -1470,11 +1559,17 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 					/*
 					 *	Assume media matches drive
 					 */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1473
 					md_segment = DISKETTE_IO_1_SEGMENT;
 					if ((disk_state & DC_80_TRACK) == 0)
 						md_offset = MD_TBL1_OFFSET;
 					else
 						md_offset = MD_TBL3_OFFSET;
+#endif  /* NTVDM */
+#line 1478
 						
 				}
 			}
@@ -1483,11 +1578,17 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 				/*
 				 *	Assume media matches drive
 				 */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1486
 				md_segment = DISKETTE_IO_1_SEGMENT;
 				if ((disk_state & DC_80_TRACK) == 0)
 					md_offset = MD_TBL1_OFFSET;
 				else
 					md_offset = MD_TBL3_OFFSET;
+#endif	/* NTVDM */
+#line 1491
 			}
 		}
 		else
@@ -1495,11 +1596,17 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 			/*
 			 *	Assume media matches drive
 			 */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1498
 			md_segment = DISKETTE_IO_1_SEGMENT;
 			if ((disk_state & DC_80_TRACK) == 0)
 				md_offset = MD_TBL1_OFFSET;
 			else
 				md_offset = MD_TBL3_OFFSET;
+#endif /* NTVDM */
+#line 1503
 		}
 
 		/*
@@ -1553,6 +1660,8 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 
 LOCAL void setup_state IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 3373
 	half_word	drive_type;	/* Floppy unit type specified by CMOS */
 
 	/*
@@ -1563,6 +1672,8 @@ LOCAL void setup_state IFN1(int, drive)
 	if (high_density(drive))
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
+#ifndef NTVDM
+#line 1566
 		if ((disk_state & FS_MEDIA_DET) == 0)
 		{
 
@@ -1621,6 +1732,10 @@ if( cmos_type( drive, &drive_type ) != FAILURE ){
 
                         }
 
+#else /* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1624
 
 			/*
 			 *	Set up disk state with current data
@@ -1641,10 +1756,14 @@ if( cmos_type( drive, &drive_type ) != FAILURE ){
 			sas_store(RATE_STATUS, lastrate);
 		}
 	}
+#endif // !NEC_98
+#line 1644
 }
 
 LOCAL void fmt_init IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 1648
 	/*
 	 *	If the media type has not already been set up, establish
 	 *	the default media type for the drive type
@@ -1691,10 +1810,14 @@ LOCAL void fmt_init IFN1(int, drive)
 			sas_store(FDD_STATUS+drive, disk_state);
 		}
 	}
+#endif // !NEC_98
+#line 1694
 }
 
 LOCAL med_change IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 1698
 	/*
 	 *	Checks for media change, resets media change,
 	 *	checks media change again
@@ -1742,10 +1865,14 @@ LOCAL med_change IFN1(int, drive)
 			sas_store(FLOPPY_STATUS, FS_TIME_OUT);
 	}
 	return(FAILURE);
+#endif // !NEC_98
+#line 1745
 }
 
 LOCAL void send_rate IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 1749
 	/*
 	 *	Update the data rate for "drive"
 	 */
@@ -1771,6 +1898,8 @@ LOCAL void send_rate IFN1(int, drive)
 
 		outb(DISKETTE_DCR_REG, (IU8)(disk_state >> 6));
 	}
+#endif // !NEC_98
+#line 1774
 }
 
 LOCAL chk_lastrate IFN1(int, drive)
@@ -1795,6 +1924,8 @@ LOCAL chk_lastrate IFN1(int, drive)
 
 LOCAL dma_setup IFN1(half_word, dma_mode)
 {
+#ifndef NEC_98
+#line 1798
 	/*
 	 *	This routine sets up the DMA for read/write/verify
 	 *	operations
@@ -1857,10 +1988,14 @@ LOCAL dma_setup IFN1(half_word, dma_mode)
 	}
 
 	return(SUCCESS);
+#endif // !NEC_98
+#line 1860
 }
 
 LOCAL fmtdma_set IFN0()
 {
+#ifndef NEC_98
+#line 1864
 	/*
 	 *	This routine sets up the DMA for format operations
 	 */
@@ -1921,6 +2056,8 @@ LOCAL fmtdma_set IFN0()
 	}
 
 	return(SUCCESS);
+#endif // !NEC_98
+#line 1924
 }
 
 LOCAL void nec_init IFN2(int, drive, FDC_CMD_BLOCK *, fcbp)
@@ -2341,32 +2478,9 @@ LOCAL half_word get_parm IFN1(int, index)
 	sas_load(effective_addr(segment, offset+index), &value);
 
 #ifndef PROD
-        {
-                char *parm_name = "Unknown???";
-
-#define DT_PARM_NAME(x,y)       case x: parm_name = y; break;
-
-                switch (index) {
-                DT_PARM_NAME(DT_SPECIFY1,"SPECIFY1");
-                DT_PARM_NAME(DT_SPECIFY2,"SPECIFY2");
-                DT_PARM_NAME(DT_MOTOR_WAIT,"MOTOR_WAIT");
-                DT_PARM_NAME(DT_N_FORMAT,"N_FORMAT");
-                DT_PARM_NAME(DT_LAST_SECTOR,"LAST_SECTOR");
-                DT_PARM_NAME(DT_GAP_LENGTH,"GAP_LENGTH");
-                DT_PARM_NAME(DT_DTL,"DTL");
-                DT_PARM_NAME(DT_FORMAT_GAP_LENGTH,"FORMAT_GAP_LENGTH");
-                DT_PARM_NAME(DT_FORMAT_FILL_BYTE,"FORMAT_FILL_BYTE");
-                DT_PARM_NAME(DT_HEAD_SETTLE,"HEAD_SETTLE");
-                DT_PARM_NAME(DT_MOTOR_START,"MOTOR_START");
-                DT_PARM_NAME(DT_MAXIMUM_TRACK,"MAXIMUM_TRACK");
-                DT_PARM_NAME(DT_DATA_TRANS_RATE,"DATA_TRANS_RATE");
-                }
-
-        note_trace5(FLOPBIOS_VERBOSE,
-		"diskette_io:get_parm(%04x:%04x+%02x) %s=%02x)",
-                 segment, offset, index, parm_name, value);
-        }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* PROD */
+#line 4243
 
 	return(value);
 }
@@ -2477,6 +2591,8 @@ LOCAL void motor_on IFN1(int, drive)
 
 LOCAL turn_on IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 2480
 	/*
 	 *	Turn motor on and return wait state
 	 */
@@ -2538,6 +2654,8 @@ LOCAL turn_on IFN1(int, drive)
 	 */
 	setIF(1);
 	return(FAILURE);
+#endif // !NEC_98
+#line 2541
 }
 
 LOCAL void hd_wait IFN1(int, drive)
@@ -2627,6 +2745,8 @@ LOCAL void hd_wait IFN1(int, drive)
 
 LOCAL void nec_output IFN1(half_word, byte_value)
 {
+#ifndef NEC_98
+#line 2630
 	/*
 	 *	This routine sends a byte to the FDC after testing for
 	 *	correct direction and controller ready. If the FDC does
@@ -2659,6 +2779,8 @@ LOCAL void nec_output IFN1(half_word, byte_value)
 	 *	Do fixed wait for FDC update cycle time
 	 */
 	waitf(FDC_SETTLE);
+#endif // !NEC_98
+#line 2662
 }
 
 LOCAL seek IFN2(int, drive, int, track)
@@ -2853,13 +2975,20 @@ LOCAL wait_int IFN0()
 	 *	registers that would otherwise be corrupted
 	 */
 #ifdef FLOPPIES_KEEP_TRYING
-   try_again:
+#error "Unsupported SoftPC mirror configuration: FLOPPIES_KEEP_TRYING"
 #endif
+#line 2858
 	savedCS = getCS();
 	savedIP = getIP();
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2861
 	setCS(RCPU_WAIT_INT_SEGMENT);
 	setIP(RCPU_WAIT_INT_OFFSET);
+#endif /* NTVDM */
+#line 2863
 
 	host_simulate();
 
@@ -2868,22 +2997,9 @@ LOCAL wait_int IFN0()
 
 
 #else	/* JOKER */
-
-
-	/* Since we can't have a recursive CPU call, we'd be
-	** well stuffed but for the fact that the default diskette
-	** interrupt on SoftPC is actually a BOP which calls the "C"
-	** function diskette_int() in "floppy_io.c". So most, if not
-	** all, of the action takes place on the host side anyway.
-	**
-	** FieldFloppyInterrupts() simply checks if an interrupt
-	** was generated, and does what the diskette_int() does,
-	** but without the recursive CPU call.
-	*/
-
-	FieldFloppyInterrupts();
-
+#error "Unsupported SoftPC mirror configuration: JOKER"
 #endif	/* JOKER */
+#line 2887
 
 
 	/*
@@ -2894,21 +3010,9 @@ LOCAL wait_int IFN0()
 	{
 
 #ifdef FLOPPIES_KEEP_TRYING
-		extern IBOOL fdc_interrupt_pending;
-
-		/* If the CPU is very slow, or interrupt emulation
-		 * has changed for the worst, then the low-priority
-		 * floppy interrupt may not get through in the execution
-	 	 * of the instructions allotted. This code looks at a
-		 * global variable maintained by fla.c, which says whether
-		 * or not the ICA has an un-processed diskette interrupt
-		 * pending.
-		 */
-		if (fdc_interrupt_pending) {
-			always_trace0("fdc_interrupt_pending, so try again");
-			goto try_again;
-		}
+#error "Unsupported SoftPC mirror configuration: FLOPPIES_KEEP_TRYING"
 #endif /* FLOPPIES_KEEP_TRYING */
+#line 2912
 
 		sas_load(FLOPPY_STATUS, &diskette_status);
 		diskette_status |= FS_TIME_OUT;
@@ -2925,6 +3029,8 @@ LOCAL wait_int IFN0()
 
 LOCAL results IFN0()
 {
+#ifndef NEC_98
+#line 2928
 
 	/*
 	 *	This routine will read anything that the FDC controller
@@ -2996,10 +3102,14 @@ LOCAL results IFN0()
 	}
 
 	return(SUCCESS);
+#endif // !NEC_98
+#line 2999
 }
 
 LOCAL read_dskchng IFN1(int, drive)
 {
+#ifndef NEC_98
+#line 3003
 	/*
 	 *	Reads the state of the disk change line for "drive"
 	 */
@@ -3016,6 +3126,8 @@ LOCAL read_dskchng IFN1(int, drive)
 	 */
 	inb(DISKETTE_DIR_REG, &diskette_dir_reg);
 	return(((diskette_dir_reg & DIR_DISKETTE_CHANGE) != 0) ? FAILURE : SUCCESS);
+#endif // !NEC_98
+#line 3019
 }
 
 void drive_detect IFN1(int, drive)
@@ -3110,13 +3222,9 @@ LOCAL void waitf IFN1(long, time)
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 5026
 
 void fl_diskette_setup IFN0()
 {
@@ -3181,3 +3289,7 @@ void fl_diskette_setup IFN0()
 	 */
 	setup_end(IGNORE_SECTORS_TRANSFERRED);
 }
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 5879

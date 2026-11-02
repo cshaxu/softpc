@@ -1,0 +1,5 @@
+path	xp_if_line	xp_endif_line	baseline_next_line	macro	excluded_body_sha256
+base/comms/com.c	1102	1104	627	NTVDM	abd3ce96c35de7d915e6629e9505356a0fda08f634ea69316886f3c296450495
+base/comms/com.c	1645	1647	1068	NTVDM	12675a08830cda229c39fad618d1814f960bafb6ab1b71a6d0edf4c9bb17e086
+base/comms/com.c	1675	1685	1095	NTVDM	3713a554ffd865b9d80cd74296754307ac7dad690a7ac706e158ad3e6d348c1a
+base/comms/com.c	1771	1788	1148	NTVDM	0832672ecc6d722cecee752d3c6f0d09e702136557fe048f54b8eb0f5418a912

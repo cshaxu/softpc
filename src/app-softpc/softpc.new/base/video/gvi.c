@@ -39,13 +39,9 @@
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 49
 
 
 /*
@@ -67,8 +63,9 @@
 #include "gmi.h"
 #include "cga.h"
 #ifdef HERC
-#include "herc.h"
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 72
 #include "debug.h"
 #include "gfx_upd.h"
 #ifdef EGG
@@ -88,7 +85,13 @@ extern int soft_reset;  /* Defined in reset.c                       */
  * These should be integrated with the new EGA stuff
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 94
 DISPLAY_GLOBS	PCDisplay;
+#endif  //NEC_98
+#line 96
 int text_blk_size;	/* In TEXT mode the size of a dirty block   */
 
 /*
@@ -155,14 +158,14 @@ void	recalc_screen_params IFN0()
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 165
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 181
 void gvi_init IFN1(half_word, v_adapter)
 {
     int screen_height;
@@ -175,14 +178,14 @@ void gvi_init IFN1(half_word, v_adapter)
     if (soft_reset)
         switch (video_adapter) {
 #ifdef DUMB_TERMINAL
-        case MDA:
-            mda_term();
-            break;
+#error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
+#line 182
         case CGA:
 #ifdef CGAMONO 
-	case CGA_MONO: 
+#error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif 
+#line 186
             cga_term();
             break;
 #ifdef EGG
@@ -196,15 +199,14 @@ void gvi_init IFN1(half_word, v_adapter)
 	    break;
 #endif
 #ifdef HERC
-	case HERCULES:
-	    herc_term();
-	    break;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 203
         default:
 #ifndef PROD
-            fprintf(trace_file, "gvi_term: invalid video adaptor: %d\n",
-                    video_adapter);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 208
 	    break;
         }
 
@@ -216,17 +218,16 @@ void gvi_init IFN1(half_word, v_adapter)
     case MDA:
     case CGA:
 #ifdef CGAMONO  
-    case CGA_MONO:  
+#error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
+#line 221
 	screen_height = CGA_HEIGHT;
         video_adapter = v_adapter;
         break;
 #ifdef HERC
-    case HERCULES:
-	screen_height = HERC_HEIGHT;
-	video_adapter = v_adapter;
-	break;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 230
 #ifdef EGG
     case EGA:
 	screen_height = EGA_HEIGHT;
@@ -245,32 +246,27 @@ void gvi_init IFN1(half_word, v_adapter)
     }
 
 #ifdef GORE
-	/*
-	 *	GORE variables must be set up before doing any other
-	 *	graphics.
-	 */
-
-    init_gore_update();
+#error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
+#line 255
 
 /* Setting all these variables should be done in the appropriate xxx_init() */
     switch (video_adapter) {
 #ifdef DUMB_TERMINAL
-    case MDA:
-        mda_init();
-        break;
+#error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
+#line 263
     case CGA:
 #ifdef CGAMONO  
-    case CGA_MONO:  
+#error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
+#line 267
         cga_init();
         break;
 #ifdef HERC
-    case HERCULES:
-	herc_init();
-	break;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 274
 #ifdef EGG
     case EGA:
 	ega_init();
@@ -289,8 +285,9 @@ void gvi_init IFN1(half_word, v_adapter)
     host_clear_screen();
 
 #ifdef EGA_DUMP
-	dump_init(host_getenv( "EGA_DUMP_FILE" ), video_adapter);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 294
 }
 
 
@@ -298,21 +295,20 @@ void gvi_term IFN0()
 {
     switch (video_adapter) {
 #ifdef DUMB_TERMINAL
-    case MDA:
-        mda_term();
-        break;
+#error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
+#line 305
     case CGA:
 #ifdef CGAMONO  
-    case CGA_MONO:  
+#error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
+#line 309
         cga_term();
         break;
 #ifdef HERC
-    case HERCULES:
-	herc_term();
-	break;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 316
 #ifdef EGG
     case EGA:
 	ega_term();
@@ -327,13 +323,16 @@ void gvi_term IFN0()
 	break;
     default:
 #ifndef PROD
-        fprintf(trace_file, "gvi_term: invalid video adaptor: %d\n",
-                video_adapter);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 333
 	break;
     }
 
 #ifdef GORE
-    term_gore_update();
+#error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
+#line 339
 }
+#endif  //NEC_98
+#line 340

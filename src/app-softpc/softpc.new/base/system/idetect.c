@@ -162,6 +162,10 @@ ERROR RECOVERY    :     bad values ignored.
 #include "xt.h"
 #include "timer.h"
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif  /* NTVDM */
+#line 173
 
 /* [3.2 INTERMODULE EXPORTS]                                            */
 #include "idetect.h"
@@ -177,8 +181,14 @@ ERROR RECOVERY    :     bad values ignored.
 
 
 /* [5.1.3 PROCEDURE() DECLARATIONS]                                     */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 192
         LOCAL void idle_kybd_poll();
         LOCAL void idle_tick();
+#endif
+#line 195
 
 
 /* -------------------------------------------------------------------
@@ -186,6 +196,8 @@ ERROR RECOVERY    :     bad values ignored.
 
    [5.2.1 INTERNAL DATA DEFINITIONS                                     */
 
+#ifndef NTVDM
+#line 203
 int idle_no_video;
 int idle_no_comlpt;
 int idle_no_disk;
@@ -197,6 +209,10 @@ static int minConsecutiveTicks = 12;
 static int minFailedPolls = 10;
 
 
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif  /* NTVDM */
+#line 254
 
 /* [5.2.2 INTERNAL PROCEDURE DEFINITIONS]                               */
 
@@ -209,40 +225,33 @@ PURPOSE         :       called from keyboard BIOS as result of
 */
 
 
+#ifndef NTVDM
+#line 212
 #ifdef SMEG
-#include "smeg_head.h"
-
-GLOBAL LONG dummy_long_1, dummy_long_2;
-GLOBAL BOOL system_has_idled = FALSE;
+#error "Unsupported SoftPC mirror configuration: SMEG"
 #endif
+#line 218
 
 
 LOCAL void my_host_release_timeslice()
 {
 #ifdef SMEG
-    /*
-     * Set marker and waste time (SIGPROF screws up
-     * host_release_timeslice)
-     */
-
-    LONG i;
-
-    smeg_set(SMEG_IN_IDLE);
-
-    system_has_idled = TRUE;
-
-    for (i = 0; i < 100000; i++)
-		dummy_long_1 += dummy_long_2;
-
-    smeg_clear(SMEG_IN_IDLE);
+#error "Unsupported SoftPC mirror configuration: SMEG"
 #else
+#line 239
     host_release_timeslice();
 #endif
 
     /* re-count polls in next tick */
     nCharPollsPerTick = 0;
 }
+#endif  /* NTVDM */
+#line 245
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 336
 LOCAL void idle_kybd_poll()
 {
 	/* go idle if enough consecutive PC timer interrupts
@@ -257,6 +266,8 @@ LOCAL void idle_kybd_poll()
 	/* another unsuccessful poll ! */
 	nCharPollsPerTick++;
 }
+#endif
+#line 260
 
 /*
 ======================================================================
@@ -270,6 +281,10 @@ PURPOSE         :       check polling activity and graphics activity
 ======================================================================
 */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else  /* NTVDM */
+#line 412
 LOCAL void idle_tick()
 {
 	if (idle_no_video && idle_no_disk && idle_no_comlpt)
@@ -294,6 +309,8 @@ LOCAL void idle_tick()
 
 	nCharPollsPerTick = 0;
 }
+#endif
+#line 297
 
 /*
 7.INTERMODULE INTERFACE IMPLEMENTATION :
@@ -308,23 +325,39 @@ LOCAL void idle_tick()
 void idetect (event)
 int event;
 {
+#ifndef NTVDM
+#line 452
 	if (!ienabled)
             return;
+#endif
+#line 455
 
 	switch (event)
 	{
 	/* application waiting for input - go idle */
 	case IDLE_WAITIO:
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 318
 		my_host_release_timeslice();
+#endif
+#line 470
 		/* fall thru to idle init */
 
 	/* initialise flags and counter */
 	case IDLE_INIT:
 		nCharPollsPerTick = 0;
 		i_counter = 0;
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 325
 		idle_no_video = 1;
 		idle_no_disk = 1;
 		idle_no_comlpt = 1;
+#endif
+#line 328
 		break;
 
 	/* application polling for keyboard input */
@@ -352,5 +385,11 @@ int minpoll, minperiod;
 void idle_ctl (flag)
 int flag;
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 520
 	ienabled = flag;
+#endif  /* NTVDM */
+#line 522
 }

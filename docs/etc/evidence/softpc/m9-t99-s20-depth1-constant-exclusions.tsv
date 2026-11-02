@@ -1,0 +1,4 @@
+path	xp_if_line	xp_next_directive_line	condition	excluded_body_sha256
+base/ccpu386/c_tsksw.c	562	568	0	a3c94c6077119f56012c29222b2f0509009246ad168deceb12cdff49481d5d39
+base/ccpu386/c_xtrn.c	22	24	0	a67d7e918e2c6492344b6a66177b1a53b26a705617c307e4f886449803ccb7dc
+base/disks/fdisk.c	1649	1652	0	00787fe4828e0373546dc169dc36bd2965cd700c6cbd51a27b3394f066d343c6

@@ -1,0 +1,3 @@
+path	xp_if_line	s19_if_line	condition	excluded_nested_condition
+base/keymouse/ppi.c	69	70	#ifndef NTVDM	#ifndef SOFTPC_STANDALONE
+base/keymouse/ppi.c	139	137	#ifndef NTVDM	#ifndef SOFTPC_STANDALONE

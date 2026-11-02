@@ -674,6 +674,8 @@ Return Value:
             }
             return;
         }
+#if 1
+#line 2184
         if (DspMode == Single) {
             PreviousWaveOutPos++;
         }
@@ -700,6 +702,12 @@ Return Value:
             offset = SBBlockSize - 0x8;
         }
 
+#endif
+#line 2233
+#if 0
+#error "Unsupported SoftPC mirror configuration: constant false"
+#endif
+#line 2268
         //
         // Now update the dma controller with our emulation/real position
         //
@@ -1491,3 +1499,8 @@ void ContinueDMA(void)
 {
     bDspPaused = FALSE;
 }
+
+#if 0
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#endif
+#line 2810

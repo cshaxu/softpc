@@ -1,0 +1,5 @@
+path	baseline_if_line	baseline_next_line	excluded_line_count	excluded_body_sha256
+base/disks/fdisk.c	1846	1862	14	4de1f3ec28c37403c4ad14188a6031481fd247c5fd77eb5f3c1bcff93b5e032e
+base/keymouse/keyba.c	84	87	1	1769c85543611fb07e68157ff2229d72d74e56e98ff3f2604e4d213397308fca
+base/keymouse/keyba.c	883	888	3	0ec6c8143423b0027e524216450e2a70b5501d0ca53b21e3b87ee68b90193322
+base/support/ios.c	911	917	4	51225e3c23e3dc0a4f6eb9c39eecfa6ec11c20f11a0200eaa4e173e8d9a032c1

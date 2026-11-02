@@ -40,10 +40,9 @@ CALL CPU Functions.
 GLOBAL VOID
 CALLF
 #ifdef ANSI
-   (
-   IU32 op1[2]       /* offset:segment pointer */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 47
    (op1)
    IU32 op1[2];
 #endif
@@ -86,12 +85,9 @@ CALLF
       validate_stack_space(USE_SP, (ISM32)NR_ITEMS_2);
 
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
-
-      /* do ip limit checking */
-      if ( new_ip > GET_CS_LIMIT() )
-	 GP((IU16)0, FAULT_CALLF_RM_CS_LIMIT);
-
+#error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else	/* TAKE_REAL_MODE_LIMIT_FAULT */
+#line 95
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it
@@ -252,11 +248,9 @@ IFN1(
 
    /* do ip limit check */
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
-
-   if ( offset > GET_CS_LIMIT() )
-      GP((IU16)0, FAULT_CALLN_RM_CS_LIMIT);
-
+#error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else /* TAKE_REAL_MODE_LIMIT_FAULT */
+#line 260
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it
@@ -265,14 +259,9 @@ IFN1(
        */
 
 #ifdef TAKE_PROT_MODE_LIMIT_FAULT
-
-   if ( GET_PE() == 1 && GET_VM() == 0 )
-      {
-      if ( offset > GET_CS_LIMIT() )
-	 GP((IU16)0, FAULT_CALLN_PM_CS_LIMIT);
-      }
-
+#error "Unsupported SoftPC mirror configuration: TAKE_PROT_MODE_LIMIT_FAULT"
 #endif /* TAKE_PROT_MODE_LIMIT_FAULT */
+#line 276
 
       /* The Soft486 EDL CPU does not take Protected Mode limit failues
        * for the instructions with relative offsets, Jxx, LOOPxx, JCXZ,
@@ -315,11 +304,9 @@ IFN1(
 
    /* do ip limit check */
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
-
-   if ( new_dest > GET_CS_LIMIT() )
-      GP((IU16)0, FAULT_CALLR_RM_CS_LIMIT);
-
+#error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else /* TAKE_REAL_MODE_LIMIT_FAULT */
+#line 323
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it
@@ -328,14 +315,9 @@ IFN1(
        */
 
 #ifdef TAKE_PROT_MODE_LIMIT_FAULT
-
-   if ( GET_PE() == 1 && GET_VM() == 0 )
-      {
-      if ( new_dest > GET_CS_LIMIT() )
-	 GP((IU16)0, FAULT_CALLR_PM_CS_LIMIT);
-      }
-
+#error "Unsupported SoftPC mirror configuration: TAKE_PROT_MODE_LIMIT_FAULT"
 #endif /* TAKE_PROT_MODE_LIMIT_FAULT */
+#line 339
 
       /* The Soft486 EDL CPU does not take Protected Mode limit failues
        * for the instructions with relative offsets, Jxx, LOOPxx, JCXZ,

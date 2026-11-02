@@ -30,8 +30,9 @@ Reserved Floating Point CPU Functions.
 #include <fault.h>
 #include "snapshot.h"
 #ifdef SFELLOW
-#include <CpuInt_c.h>
+#error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
+#line 31
 
 typedef union
 {
@@ -4864,19 +4865,9 @@ void TakeNpxExceptionInt()
 	NpxFIP = NpxExceptionEIP;
 
 #ifdef	SPC486
-	if (GET_NE() == 0)
-	{
-#ifndef SFELLOW
-		ica_hw_interrupt (ICA_SLAVE, CPU_AT_NPX_INT, 1);
-#else	/* SFELLOW */
-		c_cpu_interrupt(CPU_NPX_INT, 0);
-#endif	/* SFELLOW */
-	}
-	else
-	{
-		Int16();
-	}
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #else	/* SPC486 */
+#line 4880
 	ica_hw_interrupt (ICA_SLAVE, CPU_AT_NPX_INT, 1);
 #endif	/* SPC486 */
 

@@ -96,13 +96,9 @@ typedef struct
 	void (*str_read) IPT3(IU8 *, dest, IU32, eaOff, IU32, count);
 #endif	/* NO_STRING_OPERATIONS */
 #else
-	IU32 (*b_read) IPT1(ULONG, offset);
-	IU32 (*w_read) IPT1(ULONG, offset);
-
-#ifndef	NO_STRING_OPERATIONS
-	void (*str_read) IPT3(IU8 *, dest, ULONG, offset, ULONG, count);
-#endif	/* NO_STRING_OPERATIONS */
+#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && defined(C_VID))"
 #endif
+#line 93
 
 } READ_POINTERS; 
 
@@ -137,20 +133,9 @@ extern void Cpu_set_vid_rd_ptrs IPT1( READ_POINTERS *, ptrs );
 #endif /* Cpu_set_vid_wrt_ptrs */
 
 #ifndef CPU_40_STYLE
-#ifdef A3CPU
-
-#ifdef C_VID
-extern WRT_POINTERS Glue_writes;
-#endif /* C_VID */
-
-#else /* A3CPU */
-
-#ifdef C_VID
-extern MEM_HANDLERS Glue_writes;
-#endif /* C_VID */
-
-#endif /* A3CPU */
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif /* CPU_40_STYLE */
+#line 127
 
 extern WRT_POINTERS simple_writes;
 extern WRT_POINTERS dth_md0_writes, dth_md1_writes, dth_md2_writes, dth_md3_writes;

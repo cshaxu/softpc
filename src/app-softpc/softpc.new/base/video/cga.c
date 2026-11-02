@@ -1,6 +1,8 @@
 #include "insignia.h"
 #include "host_def.h"
 
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+#line 5
 
 /*
  * SoftPC Revision 3.0
@@ -50,13 +52,9 @@
  */
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_CGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 60
 
 /*
  *    O/S include files.
@@ -93,8 +91,9 @@
 #include "ckmalloc.h"
 
 #ifdef REAL_VGA
-#include "avm361.h"
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 98
 #include "host_gfx.h"
 #endif
 
@@ -118,9 +117,9 @@ static int current_mode = -1;   /* Value of Mode Select at last call    */
  */
 
 #ifdef HUNTER
-half_word MC6845[MC6845_REGS];  /* The current values of the MC6845 registers */
-half_word mode_reg;             /* The value of the mode control register */
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 125
 
 static half_word index_reg = 00 ;       /* Index register        */
 
@@ -169,8 +168,9 @@ static void update_cursor_shape IPT0();
 
 
 #ifdef A3CPU
-IMPORT WRT_POINTERS Glue_writes;
+#error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
+#line 175
 IMPORT MEM_HANDLERS Glue_writes;
 #endif /* A3CPU */
 IMPORT WRT_POINTERS simple_writes;
@@ -179,29 +179,9 @@ IMPORT READ_POINTERS read_glue_ptrs;
 IMPORT READ_POINTERS simple_reads;
 
 #ifdef  A2CPU
-LOCAL ULONG dummy_read IFN1(ULONG, offset)
-{
-	UNUSED(offset);
-	return 0;
-}
-
-LOCAL void dummy_str_read IFN3(UTINY *, dest, ULONG, offset, ULONG, count)
-{
-	UNUSED(dest);
-	UNUSED(offset);
-	UNUSED(count);
-}
-
-LOCAL READ_POINTERS     dummy_reads =
-{
-	dummy_read,
-	dummy_read
-#ifndef NO_STRING_OPERATIONS
-	,
-	dummy_str_read
-#endif  /* NO_STRING_OPERATIONS */
-};
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif  /* A2CPU */
+#line 205
 
 /*
  *==========================================================================
@@ -223,6 +203,8 @@ reg regen_start;                /* Regen start address                   */
 void cga_inb    IFN2(io_addr, address, half_word *, value)
 {
 
+#ifndef NEC_98
+#line 228
 static int cga_state = 0;       /* current cga status state */
 static long state_count = 1;    /* position in that state */
 static int sub_state = 0;       /* sub state for cga state 2 */
@@ -369,6 +351,8 @@ else
 	 */
 
 	*value = 0x00;
+#endif   //NEC_98
+#line 372
 }
 
 
@@ -424,8 +408,9 @@ switch (address) {
     case 0x3D5:
     case 0x3D7:
 #ifdef HUNTER
-	MC6845[index_reg] = value;
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 429
 
 /*
  * This is the data register, the function to be performed depends on the
@@ -622,8 +607,9 @@ switch (address) {
 		{
 		    Ra_cursor_start = value;
 #ifdef REAL_VGA
-		    CRTC_REG(0xa, value);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
+#line 627
 		    update_cursor_shape();
 		}
 		break;
@@ -633,8 +619,9 @@ switch (address) {
 		{
 		    Rb_cursor_end = (value & CURSOR_USED_BITS);
 #ifdef REAL_VGA
-		    CRTC_REG(0xb, value);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
+#line 638
 		    update_cursor_shape();
 		}
 		break;
@@ -655,8 +642,9 @@ switch (address) {
 			screen_refresh_required();
 		}
 #ifdef REAL_VGA
-		CRTC_REG(0xc, value);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
+#line 660
 		break;
 
 	    case 0x0D:
@@ -672,8 +660,9 @@ switch (address) {
 			screen_refresh_required();
 		}
 #ifdef REAL_VGA
-		CRTC_REG(0xd, value);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
+#line 677
 		break;
 
 	    /*
@@ -738,8 +727,9 @@ switch (address) {
 	 */
 
 #ifdef HUNTER
-	mode_reg = value;
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 746
 	timer_video_enabled = (boolean) (value & VIDEO_ENABLE);
 
 	if (value != current_mode) {
@@ -880,6 +870,8 @@ switch (address) {
 
 static void set_cga_palette     IFN2(int, screen_mode, int, res)
 {
+#ifndef NEC_98
+#line 883
     /*
      * palette for color text - 16 colors for FG and BG
      * These tables are also used to set some graphic mode palette entries
@@ -1082,10 +1074,14 @@ static void set_cga_palette     IFN2(int, screen_mode, int, res)
 
 	host_set_palette(cga_graph_high,2);
     }
+#endif   //NEC_98
+#line 1085
 }
 
 static void update_cursor_shape IFN0()
 {
+#ifndef NEC_98
+#line 1089
 	/*
 	 *      This function actions a change to the cursor shape
 	 *      when either the cursor start or cursor end registers
@@ -1129,220 +1125,33 @@ static void update_cursor_shape IFN0()
 
 	host_cursor_size_changed(Ra_cursor_start, Rb_cursor_end);
 
+#endif   //NEC_98
+#line 1132
 }
 
 #if !defined(EGG) && !defined(A3CPU) && !defined(A2CPU) && !defined(C_VID) && !defined(A_VID)
-
-/*
-	The following functions are MEM_HANDLER functions for the CGA-only
-	build with no C_VID (no a common build). They are unused for most
-	variants of SoftPC.
-*/
-
-#define INTEL_SRC       0
-#define HOST_SRC        1
-
-/*
-======================== cga_only_simple_handler =========================
-PURPOSE:        This function provides a stub for the unused MEM_HANDLER
-		functions. This function probably shouldn't be called hence
-		the trace statement.
-INPUT:          None.
-OUTPUT:         None.
-==========================================================================
-*/
-LOCAL void cga_only_simple_handler IFN0()
-{
-	always_trace0("cga_only_simple_handler called");
-	setVideodirty_total(getVideodirty_total() + 1);
-}
-
-/*
-=========================== cga_only_b_write =============================
-PURPOSE:        Byte write function. Puts the value at the given address
-		and increments dirty_flag.
-INPUT:          Address (in terms of M) and value to put there.
-OUTPUT:         None.
-==========================================================================
-*/
-LOCAL void cga_only_b_write IFN2(UTINY *, addr, ULONG, val)
-{
-	host_addr       ptr;
-	ULONG           offs;
-	
-	offs = (ULONG) (addr - gvi_pc_low_regen);
-	ptr = get_screen_ptr(offs);
-	*ptr = val & 0xff;
-	setVideodirty_total(getVideodirty_total() + 1);
-}
-
-/*
-=========================== cga_only_w_write =============================
-PURPOSE:        Word write function. Puts the value at the given address
-		and increments dirty_flag.
-INPUT:          Address (in terms of M) and value to put there.
-OUTPUT:         None.
-==========================================================================
-*/
-LOCAL void cga_only_w_write IFN2(UTINY *, addr, ULONG, val)
-{
-	host_addr       ptr;
-	ULONG           offs;
-	
-	offs = (ULONG) (addr - gvi_pc_low_regen);
-	ptr = get_screen_ptr(offs);
-	*ptr++ = val & 0xff;
-	*ptr = (val >> 8) & 0xff;
-	setVideodirty_total(getVideodirty_total() + 2);
-}
-
-/*
-=========================== cga_only_b_fill ==============================
-PURPOSE:        Byte fill function. Fills the given address range with the
-		value and increments dirty_flag.
-INPUT:          Address range (in terms of M) and value to put there.
-OUTPUT:         None.
-==========================================================================
-*/
-LOCAL void cga_only_b_fill IFN3(UTINY *, laddr, UTINY *, haddr, ULONG, val )
-{
-	host_addr       ptr;
-	IS32            len;
-	ULONG           offs;
-		
-	offs = (ULONG) (laddr - gvi_pc_low_regen);
-	ptr = get_screen_ptr(offs);
-	for (len = (haddr - laddr); len > 0; len--)
-		*ptr++ = val;
-}
-
-/*
-=========================== cga_only_w_fill ==============================
-PURPOSE:        Word fill function. Fills the given address range with the
-		value and increments dirty_flag.
-INPUT:          Address range (in terms of M) and value to put there.
-OUTPUT:         None.
-==========================================================================
-*/
-LOCAL void cga_only_w_fill IFN3(UTINY *, laddr, UTINY *, haddr, ULONG, val )
-{
-	host_addr       ptr;
-	IS32            len;
-	IU8             lo;
-	IU8             hi;
-	ULONG           offs;
-	
-	lo = val & 0xff;
-	hi = (val >> 8) & 0xff;
-	offs = (ULONG) (laddr - gvi_pc_low_regen);
-	ptr = get_screen_ptr(offs);
-	for (len = (haddr - laddr) >> 1; len > 0; len--)
-	{
-		*ptr++ = lo;
-		*ptr++ = hi;
-	}
-}
-
-LOCAL void cga_only_b_move IFN4(UTINY *, laddr, UTINY *, haddr, UTINY *, src,
-	UTINY, src_type)
-{
-	host_addr       src_ptr;
-	host_addr       dst_ptr;
-	IS32            len;
-	ULONG           offs;
-	BOOL            move_bwds = getDF();
-	
-	offs = (ULONG) (laddr - gvi_pc_low_regen);
-	dst_ptr = get_screen_ptr(offs);
-	len = haddr - laddr;
-	if ((src_type == HOST_SRC) || (src < (UTINY *)gvi_pc_low_regen) ||
-		((UTINY *)gvi_pc_high_regen < src))
-	{
-		/* Ram source */
-		if (src_type == INTEL_SRC)
-			src_ptr = get_byte_addr(src);
-		else
-			src_ptr = src;
-		
-		/* Ram to video move - video is always forwards, ram
-		** depends on BACK_M.
-		*/
-		if (move_bwds)
-		{
-			dst_ptr += len;
-#ifdef  BACK_M
-			src_ptr -= len;
-			for ( ; len > 0; len--)
-				*(--dst_ptr) = *(++src_ptr);
-#else
-			src_ptr += len;
-			for ( ; len > 0; len--)
-				*(--dst_ptr) = *(--src_ptr);
-#endif  /* BACK_M */
-		}
-		else
-		{
-#ifdef  BACK_M
-			for ( ; len > 0; len--)
-				*dst_ptr++ = *src_ptr--;
-#else
-			memcpy(dst_ptr, src_ptr, len);
-#endif  /* BACK_M */
-		}
-	}
-	else
-	{
-		/* Video source */
-		offs = (ULONG) (src - gvi_pc_low_regen);
-		src_ptr = get_screen_ptr(offs);
-		
-		/* Video to video move - both sets of memory are always
-		** forwards.
-		*/
-		if (move_bwds)
-		{
-			dst_ptr += len;
-			src_ptr += len;
-			for ( ; len > 0; len--)
-				*(--dst_ptr) = *(--src_ptr);
-		}
-		else
-			memcpy(dst_ptr, src_ptr, len);
-	}
-}
-
-LOCAL MEM_HANDLERS cga_only_handlers =
-{
-	cga_only_b_write,
-	cga_only_w_write,
-	cga_only_b_fill,
-	cga_only_w_fill,
-	cga_only_b_move,
-	cga_only_simple_handler         /* word move - not used? */
-};
-
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* not EGG or A3CPU or A2CPU or C_VID or A_VID */
+#line 1325
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 1353
 
 void cga_init()
 {
+#ifndef NEC_98
+#line 1357
 IMPORT void Glue_set_vid_rd_ptrs IPT1(READ_POINTERS *, handler );
 IMPORT void Glue_set_vid_wrt_ptrs IPT1(WRT_POINTERS *, handler );
 
 io_addr i;
 
 #ifdef HUNTER
-for (i = 0; i < MC6845_REGS; i++)
-    MC6845[i] = 0;
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 1346
 
 
 /*
@@ -1371,32 +1180,23 @@ for(i = CGA_PORT_START; i <= CGA_PORT_END; i++)
 /* GISP CPU physically cannot perform read and/or write checks */
 
 #ifdef  JOKER
-
-	/* gmi_define_mem(SAS_VIDEO, &Glue_writes); */
-	Glue_set_vid_wrt_ptrs(&simple_writes);
-	Glue_set_vid_rd_ptrs(&simple_reads);
-
+#error "Unsupported SoftPC mirror configuration: JOKER"
 #else   /* not JOKER */
+#line 1380
 
 
 #ifdef A3CPU
-#ifdef C_VID
-	Cpu_set_vid_wrt_ptrs( &Glue_writes );
-	Cpu_set_vid_rd_ptrs( &Glue_reads );
-	Glue_set_vid_wrt_ptrs( &simple_writes );
-	Glue_set_vid_rd_ptrs( &simple_reads );
-#else
-	Cpu_set_vid_wrt_ptrs( &simple_writes );
-	Cpu_set_vid_rd_ptrs( &simple_reads );
-#endif  /* C_VID */
+#error "Unsupported SoftPC mirror configuration: A3CPU"
 #else   /* not A3CPU */
+#line 1393
 #ifdef A2CPU
-	gmi_define_mem(SAS_VIDEO, &vid_handlers);
-	read_pointers = dummy_reads;
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
+#line 1397
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
-	gmi_define_mem(SAS_VIDEO, &cga_only_handlers);
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
+#line 1400
 	gmi_define_mem(SAS_VIDEO, &Glue_writes);
 	read_pointers = Glue_reads;
 	Glue_set_vid_wrt_ptrs( &simple_writes );
@@ -1442,10 +1242,14 @@ for(i = CGA_PORT_START; i <= CGA_PORT_END; i++)
 
 	bios_ch2_byte_wrt_fn = simple_bios_byte_wrt;
 	bios_ch2_word_wrt_fn = simple_bios_word_wrt;
+#endif   //NEC_98
+#line 1445
 }
 
 void cga_term   IFN0()
 {
+#ifndef NEC_98
+#line 1449
     io_addr i;
 
     /*
@@ -1464,26 +1268,13 @@ void cga_term   IFN0()
 	host_free(cga_screen_buf);
 	cga_screen_buf = 0;
     }
+#endif   //NEC_98
+#line 1467
 }
 
 
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
-
-GLOBAL CGA_ONLY_GLOBS *VGLOBS = NULL;
-LOCAL CGA_ONLY_GLOBS CgaOnlyGlobs;
-/*(
-============================ setup_vga_globals =============================
-PURPOSE:        This function is provided for CGA-only builds to set up a
-		dummy VGLOBS structure which avoids the need to ifdef all
-		references to VGLOBS->dirty_flag and VGLOBS->screen_ptr.
-INPUT:          None.
-OUTPUT:         None.
-============================================================================
-)*/
-GLOBAL void setup_vga_globals IFN0()
-{
-#ifndef CPU_40_STYLE    /* Evid interface */
-	VGLOBS = &CgaOnlyGlobs;
-#endif
-}
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* not EGG or C_VID or A_VID */
+#line 1490
+#endif  /* !NTVDM | (NTVDM & !X86GFX) */

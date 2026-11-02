@@ -84,13 +84,9 @@ IPT1(
    );
 
 #ifdef PIG
-IMPORT VOID spush_flags
-       
-IPT1(
-	IU32, data
-
-   );
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 94
 
 IMPORT VOID spush16
        
@@ -100,13 +96,9 @@ IPT1(
    );
 
 #ifdef PIG
-IMPORT VOID spush16_flags
-       
-IPT1(
-	IU32, data
-
-   );
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 110
 
 
 IMPORT IU32 tpop

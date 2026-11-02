@@ -1,0 +1,13 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/comms/com.c	3159	3241	1943	1996	NEC_98	else	f6e9d0cf1c20a25486e872c74b1cd89c7a6142bcb6d20defe278178768f47948
+base/comms/printer.c	819	872	602	619	NEC_98	else	b2808b51301c4b324f409933f9edab4fdfd8f6aa74aac70e51f5d9ce7185431b
+base/keymouse/mouse.c	113	189	190	240	NEC_98	else	7215bf188bcfc1b6e94cd61209dbc5dc64fd123818ed6b3818dfa7d2abba55fc
+base/keymouse/mouse_io.c	1754	1765	1921	1929	NTVDM	else	2817e9c11d9ff85470668ea186e75746d0006a52b508c38bab26cd9c4d3ebaad
+base/system/timer.c	417	482	383	416	NTVDM	else	bfafce0560081cf38f32b9bedecfbd7c340fe1728c6b9f8cd515f7ead0a5f0b3
+base/video/ega_prts.c	1821	1861	1813	1852	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_read.c	773	946	740	912	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_read.c	953	994	918	958	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/gfx_updt.c	278	303	247	262	NEC_98	else	d2f139b9d0467a38c362632f7f63549b81d564f444cdd2244610752258ec5fbe
+base/video/vga_prts.c	2271	2317	2140	2185	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/vga_prts.c	2323	2369	2190	2235	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/vga_vide.c	145	191	141	186	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

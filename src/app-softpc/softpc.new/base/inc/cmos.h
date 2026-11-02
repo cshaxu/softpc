@@ -333,17 +333,9 @@ IMPORT VOID cmos_inb IPT2(io_addr, port, half_word *, value);
 IMPORT VOID cmos_outb IPT2(io_addr, port, half_word, value);
 
 #if defined(NTVDM) || defined(macintosh)
-/*
- *	void cmos_pickup()
- *	{
- *		This is an extremely badly named function that picks up
- *		the data stored in the cmos.ram resource to emulate not
- *		losing data between invocations of SoftPC/AT. This is
- *		called from main() at application startup.
- *	}
- */
-IMPORT VOID cmos_pickup IPT0();
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif	/* defined(NTVDM) || defined(macintosh) */
+#line 347
 
 /*	void cmos_update()
  *	{

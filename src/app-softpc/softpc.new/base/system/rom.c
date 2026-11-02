@@ -39,11 +39,16 @@
 #ifdef CCPU
 #include "ccpusas4.h"
 #else	/* ! CCPU */
-#include "Cpu_c.h"
+#error "Unsupported SoftPC mirror configuration: !CCPU"
 #endif	/* ! CCPU */
+#line 44
 #endif	/* CPU_40_STYLE */
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 61
 #ifndef BIOS1ROM_FILENAME
 #define	BIOS1ROM_FILENAME	"bios1.rom"
 #endif /* BIOS1ROM_FILENAME */
@@ -52,8 +57,9 @@
 #ifdef	CPU_40_STYLE
 #define	BIOS2ROM_FILENAME	"bios4.rom"
 #else	/* CPU_40_STYLE */
-#define	BIOS2ROM_FILENAME	"bios2.rom"
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 57
 #endif /* BIOS2ROM_FILENAME */
 
 #ifndef EGAROM_FILENAME
@@ -67,13 +73,14 @@
 #ifndef V7VGAROM_FILENAME
 #define	V7VGAROM_FILENAME	"v7vga.rom"
 #endif /* V7VGAROM_FILENAME */
+#endif   //NEC_98
+#line 85
 
 
 #ifdef 	GISP_SVGA
-#define	GISP_VGAROM_FILENAME         "hwvga.rom"
-#define	GISP_BIOS1ROM_FILENAME       "hwbios1.rom"
-#define	GISP_BIOS2ROM_FILENAME       BIOS2ROM_FILENAME
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif
+#line 92
 
 #ifndef ADAPTOR_ROM_START
 #define ADAPTOR_ROM_START	0xc8000
@@ -97,15 +104,19 @@
 
 #define	ROM_SIGNATURE		0xaa55
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 119
 
 /* Current SoftPC verion number */
 #define MAJOR_VER	0x03
 #define MINOR_VER	0x00
 
 #if defined(macintosh) && defined(A2CPU)
-	/* Buffer is temporarily allocted  - no bigger than needed. */
-#define ROM_BUFFER_SIZE 1024*25
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
+#line 128
 	/* Using sas_scratch_buffer - will get 64K anyway. */
 #define ROM_BUFFER_SIZE 1024*64
 #endif
@@ -114,13 +125,18 @@ LOCAL LONG read_rom IPT2(char *, name, sys_addr, address);
 LOCAL	half_word	do_rom_checksum IPT1(sys_addr, addr);
 
 #ifdef ANSI
-extern long host_read_resource (int, char *, host_addr, int ,int);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 138
 extern long host_read_resource ();
 #endif
 
 extern void host_simulate();
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 124
 
 /*(
  *=========================== patchCheckSum ================================
@@ -163,22 +179,9 @@ patchCheckSum IFN3(PHY_ADDR, start, PHY_ADDR, length, PHY_ADDR, offset)
 	sas_connect_memory(start, start + roundedLength - 1, SAS_RAM);
 
 #ifndef PROD
-	if (roundedLength != length) {
-		always_trace3("ROM at 0x%.5lx length rounded up from 0x%.8lx to 0x%.8lx", start, length, roundedLength);
-	}
-
-	if (roundedLength > (128 * 1024)) {
-		always_trace2("ROM at 0x%.5lx has a length of 0x%.8lx which is more than 128K", start, roundedLength);
-		force_yoda();
-		return;
-	}
-
-	if ((roundedLength <= offset) || (roundedLength < 4)) {
-		always_trace1("ROM at 0x%.5lx is too short!", start);
-		force_yoda();
-		return;
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 207
 
 	signature = sas_PR16(start);
 	if (signature != 0xaa55) {
@@ -223,9 +226,12 @@ OUTPUT:		None.
 )*/
 GLOBAL void read_video_rom IFN0()
 {
+#ifndef NEC_98
+#line 226
 #ifdef REAL_VGA
-	read_rom (VGAROM_FILENAME, EGA_ROM_START);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else /* REAL_VGA */
+#line 229
 	PHY_ADDR romLength = 0;
 
 	/* DIVERGENCE MVDM-HOST-DIV-075: config scalar is pointer-sized on x86/x64. */
@@ -237,8 +243,9 @@ GLOBAL void read_video_rom IFN0()
 #ifdef V7VGA
 		romLength = read_rom (V7VGAROM_FILENAME, EGA_ROM_START);
 #else	/* V7VGA */
-		romLength = read_rom (VGAROM_FILENAME, EGA_ROM_START);
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif  /* V7VGA */
+#line 242
 		break;
 #endif	/* VGG */
 
@@ -253,14 +260,9 @@ GLOBAL void read_video_rom IFN0()
 		break;
 
 #else			/* GISP_SVGA */
-
-	/* GISP_SVGA - only have the gisp vga roms or, none for CGA boot */
-	case VGA:
-		romLength = read_rom (GISP_VGAROM_FILENAME, EGA_ROM_START);
-	default:
-		break;
-
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */	
+#line 264
 
 	}
 
@@ -280,10 +282,16 @@ GLOBAL void read_video_rom IFN0()
 		patchCheckSum(EGA_ROM_START, romLength, 5);
 	}
 #endif	/* not REAL_VGA */
+#endif   //NEC_98
+#line 283
 }
 
 GLOBAL void rom_init IFN0()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 287
 
 	 /*
      * Fill up all of ROM (Intel C0000 upwards) with bad op-codes.
@@ -293,11 +301,13 @@ GLOBAL void rom_init IFN0()
      */
 
 #ifdef GISP_SVGA
-	mapHostROMs( );
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else		/* GISP_SVGA */
+#line 298
 #if	defined(macintosh) && defined(A2CPU)
-	/* not macintosh 2.0 cpus - they have sparse M */
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
+#line 301
 	sas_fills( ROM_START, BAD_OP, PC_MEM_SIZE - ROM_START);
 #endif		/* macintosh && A2CPU */
 #endif		/* GISP_SVGA */
@@ -314,18 +324,9 @@ GLOBAL void rom_init IFN0()
 
 	/* load the rom bios */
 #ifdef GISP_SVGA
-	if ((ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL) == CGA )
-	{
-		read_rom (BIOS1ROM_FILENAME, BIOS_START);
-		read_rom (BIOS2ROM_FILENAME, BIOS2_START);
-	}
-	else
-	{
-		read_rom (GISP_BIOS1ROM_FILENAME, BIOS_START);
-		read_rom (GISP_BIOS2ROM_FILENAME, BIOS2_START);
-	}
-
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else		/* GISP_SVGA */
+#line 329
 
 	read_rom (BIOS1ROM_FILENAME, BIOS_START);
 	read_rom (BIOS2ROM_FILENAME, BIOS2_START);
@@ -334,11 +335,19 @@ GLOBAL void rom_init IFN0()
 
 
 	host_rom_init();
+#endif   //NEC_98
+#line 337
 }
 
 LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 341
 
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 342
 	host_addr tmp;
 	long size = 0;
 
@@ -346,8 +355,9 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
     /* BIOS rom first. 														*/
 	/* Mac on 2.0 cpu doesn't want to use sas scratch buffer. 				*/
 #if defined(macintosh) && defined(A2CPU)
-    tmp = (host_addr)host_malloc(ROM_BUFFER_SIZE);
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
+#line 351
 	tmp = (host_addr)sas_scratch_address(ROM_BUFFER_SIZE);
 #endif
 
@@ -364,12 +374,22 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
     }
 
 #if defined(macintosh) && defined(A2CPU)
-	host_free((char *)tmp);
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 369
 
     return( size );
+#else
+#error "Unsupported SoftPC mirror configuration: !(defined(NTVDM) && defined(MONITOR))"
+#endif	/* !(NTVDM && MONITOR) */
+#endif   //NEC_98
+#line 513
 }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 543
 
 LOCAL	half_word	do_rom_checksum IFN1(sys_addr, addr)
 {
@@ -425,10 +445,13 @@ LOCAL	VOID	do_search_for_roms IFN3(sys_addr, start_addr,
 			}
 		}
 	}
+#line 598
 }
 
 GLOBAL void search_for_roms IFN0()
 {
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+#line 603
 #ifndef GISP_SVGA
 /*
         First search for adaptor ROM modules
@@ -442,17 +465,25 @@ GLOBAL void search_for_roms IFN0()
     do_search_for_roms(EXPANSION_ROM_START,
                                 EXPANSION_ROM_END, EXPANSION_ROM_INCREMENT);
 #endif 		/* GISP_SVGA */
+#endif	/* !NTVDM | (NTVDM & !X86GFX) */
+#line 617
 }
 
 
 GLOBAL void rom_checksum IFN0()
 {
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+#line 623
 	patchCheckSum(BIOS_START, PC_MEM_SIZE - BIOS_START,
 				0xfffff - BIOS_START);
+#endif	/* !NTVDM | (NTVDM & !X86GFX) */
+#line 626
 }
 
 GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 {
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+#line 631
 	UTINY	old_val;
 
 	/*
@@ -472,20 +503,9 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 	 */
 
 #ifdef macintosh
-
-	/* The Mac config system wants to call this routine before the
-	 * CPU exists, so we'd better invent a Mac-specific IBOOL to
-	 * make the symptom non-fatal - finding and fixing the cause
-	 * is too hard.
-	 */
-	{
-		extern IBOOL SafeToCallSas;
-
-		if (!SafeToCallSas)
-			return;	
-	}
-
+#error "Unsupported SoftPC mirror configuration: macintosh"
 #endif /* macintosh */
+#line 489
 
 	/* The page might not be present (Arrggghhhh!!!!!)
 	** so we can't do anything sensible and must give
@@ -530,45 +550,12 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 #endif /* GISP_SVGA */
 
 #else	/* CPU_40_STYLE */
-
-	/*
-	 * 4.0 style CPUs don't export this variable, and if sas hasn't been
-	 * inited, then the sas_connect will drop out to yoda.
-	 */
-
-	if (Length_of_M_area == 0)
-		return;
-
-	old_val = sas_hw_at( addr );
-
-	/* Optimisation - don't upset the world if the value is unchanged.
-	 */
-	if (old_val == val)
-		return;
-
-	sas_connect_memory (addr, addr, SAS_RAM);
-	sas_store (addr,val);
-	sas_connect_memory (addr, addr, SAS_ROM);
-/*
- *	Adjust the checksum value by new - old.
- *	val is now difference between new and old value.
- *	We don't do this for GISP_SVGA because the checksums are already
- *	screwed, and attempting to write to the real host system ROM would
- *	only make things worse!
- */
-
-#ifndef GISP_SVGA
-	val -= old_val;
-	old_val = sas_hw_at( 0xFFFFFL );
-
-	old_val -= val;
-	sas_connect_memory (0xFFFFFL, 0xFFFFFL, SAS_RAM);
-	sas_store (0xFFFFFL, old_val);
-	sas_connect_memory (0xFFFFFL, 0xFFFFFL, SAS_ROM);
-#endif /* GISP_SVGA */
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
+#line 571
 
+#endif	/* !NTVDM | (NTVDM & !X86GFX) */
+#line 748
 }
 
 #ifndef GISP_SVGA
@@ -599,12 +586,14 @@ GLOBAL void copyROM IFN0()
 #ifndef GISP_SVGA
 LOCAL sys_addr  cur_loc = DOS_SCRATCH_PAD;
 #else		/* GISP_SVGA */
-/* For GISP svga builds, we initialise from gispROMInit() */
-sys_addr  cur_loc;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
+#line 781
 
 GLOBAL void display_string IFN1(char *, string_ptr)
 {
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+#line 789
 	/*
 	 * Put the message "*string_ptr" in the ROM
 	 * scratch area where the drivers know where
@@ -651,8 +640,9 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 	if (((endLinAddr ^ DOS_SCRATCH_PAD) > 0xfff) || (endLinAddr > DOS_SCRATCH_PAD_END))
 	{
 #ifndef PROD
-		fprintf(trace_file, "*** Warning ***: patch string into ROM too long; tuncating string '%s'", string_ptr);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 656
 		if ((DOS_SCRATCH_PAD_END ^ DOS_SCRATCH_PAD) > 0xfff)
 		{
 			/* The defined DOS scratch pad crosses a page
@@ -679,16 +669,10 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 	*IncCpuPtrLS8(hostPtr) = '$';
 	*IncCpuPtrLS8(hostPtr) = '\0';
 #else /* CPU_40_STYLE */
-	sas_connect_memory(DOS_SCRATCH_PAD, DOS_SCRATCH_PAD_END, SAS_RAM);
-	sas_stores(cur_loc, (host_addr)string_ptr, strlen(string_ptr));
-	cur_loc += strlen(string_ptr);
-
-	/* Terminate the string */
-	sas_store(cur_loc, '$');
-	sas_store(cur_loc + 1, '\0');
-	sas_disconnect_memory(DOS_SCRATCH_PAD, DOS_SCRATCH_PAD_END);
-	cur_loc -= strlen(string_ptr);
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif /* CPU_40_STYLE */
+#endif	/* !NTVDM | !MONITOR | ARCX86 */
+#line 871
 	cur_loc += (sys_addr)stringLength;
 }
 

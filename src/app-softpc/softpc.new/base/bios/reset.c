@@ -19,13 +19,9 @@
 ]*/
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 29
 
 
 /*
@@ -73,19 +69,22 @@
 #include "debug.h"
 #include "video.h"
 #ifdef NOVELL
-#include "novell.h"
+#error "Unsupported SoftPC mirror configuration: NOVELL"
 #endif
+#line 78
 #include "emm.h"
 #include "quick_ev.h"
 #include "keyba.h"
 #include "rom.h"
 #ifdef GISP_SVGA
-#include "gisp_sas.h"
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
+#line 85
 #include "hunter.h"
 #ifdef LICENSING
-#include "host_lic.h"
+#error "Unsupported SoftPC mirror configuration: LICENSING"
 #endif /* LICENSING */
+#line 89
 
 /* Exports */
 
@@ -95,26 +94,33 @@
 
 VIDEOFUNCS      *working_video_funcs;
 KEYBDFUNCS      *working_keybd_funcs;
+#ifndef NTVDM
+#line 99
 ERRORFUNCS      *working_error_funcs;
+#endif
+#line 101
 HOSTMOUSEFUNCS  *working_mouse_funcs;
 
 /* Imports */
 #ifdef NPX
-IMPORT void initialise_npx IPT0();
+#error "Unsupported SoftPC mirror configuration: NPX"
 #endif  /* NPX */
+#line 105
 
 #ifdef DPMI
-IMPORT void DPMI_reset IPT0();
+#error "Unsupported SoftPC mirror configuration: DPMI"
 #endif /* DPMI */
+#line 109
 
 #ifdef GISP_SVGA
-#include HostHwVgaH
-#include "hwvga.h"
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 114
 
 #if     defined(DELTA) && defined(A2CPU)
-extern  void    reset_delta_data_structures();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* DELTA && A2CPU */
+#line 118
 
 /*
  * ============================================================================
@@ -147,6 +153,10 @@ extern void cmos_clear_shutdown_byte IPT0();
 
 extern word msw;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 169
 
 IMPORT  CHAR    *host_get_version IPT0();
 IMPORT  CHAR    *host_get_unpublished_version IPT0();
@@ -154,8 +164,9 @@ IMPORT  CHAR    *host_get_years IPT0();
 IMPORT  CHAR    *host_get_copyright IPT0();
 
 #ifdef PIG
-extern long pig_gfx_adapter;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 178
 
 #define STATUS_PORT   0x64   /* keyboard status port */
 #define SYS_FLAG      0x4    /* shutdown bit of keyboard status port */
@@ -165,6 +176,10 @@ extern long pig_gfx_adapter;
 
 static void setup_ivt()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 168
         IUH count;
 
         /* make all vectors between 0 and 78 (apart from
@@ -199,17 +214,9 @@ static void setup_ivt()
         sas_storew(int_addr(0xE), DISKETTE_INT_OFFSET);
         sas_storew(int_addr(0xE) + 2, DISKETTE_INT_SEGMENT);
 #ifdef  GISP_SVGA
-        if((ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL) == CGA )
-        {
-                sas_storew(int_addr(0x10), CGA_VIDEO_IO_OFFSET);
-                sas_storew( int_addr(0x10) + 2 , VIDEO_IO_SEGMENT );
-        }
-        else
-        {
-                sas_storew(int_addr(0x10), GISP_INT_10_ADDR_OFFSET );
-                sas_storew( int_addr(0x10) + 2 , EgaROMSegment );
-        }
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else           /* GISP_SVGA */
+#line 213
         sas_storew(int_addr(0x10), VIDEO_IO_OFFSET);
         sas_storew(int_addr(0x10) + 2, VIDEO_IO_SEGMENT);
 #endif          /* GISP_SVGA */
@@ -272,6 +279,8 @@ static void setup_ivt()
         sas_storew(int_addr(0x76) + 2, D11_INT_SEGMENT);
         sas_storew(int_addr(0x77), D11_INT_OFFSET);
         sas_storew(int_addr(0x77) + 2, D11_INT_SEGMENT);
+#endif // !NEC_98
+#line 275
 }
 
 /* Low Switch Settings */
@@ -300,35 +309,16 @@ half_word *low, *high;
         half_word low_switches = 0, high_switches = 0;
 
 #ifdef  NPX
-        /*
-        ** Switchable NPX
-        */
-
-        if (host_runtime_inquire(C_NPX_ENABLED))
-        {
-#ifdef SWITCHNPX
-                Npx_enabled = 1;
-#endif
-                low_switches |= (RAM_256KB | PPI_CO_PROCESSOR_PRESENT | NO_LOOP_ON_POST);
-        }
-        else
-        {
-#ifdef SWITCHNPX
-                Npx_enabled = 0;
-#endif
-                low_switches |= (RAM_256KB | PPI_CO_PROCESSOR_NOT_PRESENT | NO_LOOP_ON_POST);
-        }
+#error "Unsupported SoftPC mirror configuration: NPX"
 #else
+#line 322
         low_switches |= (RAM_256KB | PPI_CO_PROCESSOR_NOT_PRESENT | NO_LOOP_ON_POST);
 #endif
 
 #ifdef FLOPPY_B
-        /* only indicate two floppies if a second is configured */
-        if (strlen(config_inquire(C_FLOPPY_B_DEVICE, NULL)))
-                high_switches |= (PPI_TWO_DRIVES);
-        else
-                high_switches |= (PPI_ONE_DRIVE);
+#error "Unsupported SoftPC mirror configuration: FLOPPY_B"
 #else
+#line 332
         high_switches |= (PPI_ONE_DRIVE);
 #endif
 
@@ -339,8 +329,9 @@ half_word *low, *high;
     {
     case CGA:
 #ifdef CGAMONO
-    case CGA_MONO:
+#error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
+#line 504
         high_switches |= (PPI_CGA_80_COLUMN);
         break;
     case MDA:
@@ -356,8 +347,9 @@ half_word *low, *high;
 #endif
     case HERCULES:
 #ifdef HERC
-        break;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 361
     default:
         break;
     }
@@ -385,140 +377,28 @@ GLOBAL CHAR *get_copyright IFN0()
 
 
 #ifndef PROD
-LOCAL void announce_variant IFN0()
-{
-        CHAR    buff[4*80], *p;
-
-        strcpy (buff, "Non-PROD build variant:");
-
-#if defined(CPU_30_STYLE) && !defined(CPU_40_STYLE)
-        strcat (buff, " CPU_30_STYLE");
-#endif /* CPU_30_STYLE && ! CPU_40_STYLE*/
-
-#ifdef CPU_40_STYLE
-        strcat (buff, " CPU_40_STYLE");
-#endif /* CPU_40_STYLE */
-
-#ifdef CCPU
-        strcat (buff, " CCPU");
-#endif /* CCPU */
-
-#ifdef A2CPU
-        strcat (buff, " A2CPU");
-#endif /* A2CPU */
-
-#ifdef A3CPU
-        strcat (buff, " A3CPU");
-#endif /* A3CPU */
-
-#ifdef GISP_CPU
-        strcat( buff , " GISP_CPU" );
-#endif /* GISP_CPU */
-
-#if (defined(SPC386) && !defined(SPC486))
-        strcat( buff , " SPC386" );
-#endif /* SPC386 && !SPC486 */
-
-#ifdef SPC486
-        strcat( buff , " SPC486" );
-#endif /* SPC486 */
-
-#ifdef PIG
-        strcat (buff, " PIG");
-#endif /* PIG */
-
-#ifdef A_VID
-        strcat (buff, " A_VID");
-#endif /* A_VID */
-
-#ifdef C_VID
-        strcat (buff, " C_VID");
-#endif /* C_VID */
-
-#ifdef MSWDVR
-        strcat( buff , " MSWDVR" );
-#endif /* MSWDVR */
-
-#ifdef BACK_M
-        strcat (buff, " BACK_M");
-#endif /* BACK_M */
-
-#ifdef GISP_SVGA
-        strcat( buff , " GISP_SVGA" );
-#endif /* GISP_SVGA */
-
-#ifdef DPMI
-        strcat( buff , " DPMI" );
-#endif /* DPMI */
-
-#ifdef IRET_HOOKS
-        strcat( buff , " IRET_HOOKS" );
-#endif /* IRET_HOOKS */
-
-#ifdef SECURE
-        strcat( buff , " SECURE" );
-#endif
-
-#ifdef SYNCH_TIMERS
-        strcat( buff , " SYNCH_TIMERS" );
-#endif
-
-        p = buff;
-        while (strlen(p) >= 80)
-        {
-                while( *(--p) != ' ' )
-                        ;
-                *p++ = (char)0xFF;      /* Mark last space on line */
-        }
-        p = buff;
-        while(*p != '\0')
-        {
-                if( (IU8)*p == 0xFF )           /* Marker from above */
-                {
-                        setAH( 14 );
-                        setAL( VD_CR );
-                        bop(BIOS_VIDEO_IO);
-                        setAH( 14 );
-                        setAL( VD_LF );
-                        bop(BIOS_VIDEO_IO);
-                }
-                else
-                {
-                        setAH(14);
-                        setAL(*p);
-                        bop(BIOS_VIDEO_IO);
-                }
-
-                p++;
-        }
-
-        /*
-         * Set the cursor to the next line
-         */
-
-        setAH(14);
-        setAL(0xd);
-        bop(BIOS_VIDEO_IO);
-        setAH(14);
-        setAL(0xa);
-        bop(BIOS_VIDEO_IO);
-        setAH(14);
-        setAL(0xa);
-        bop(BIOS_VIDEO_IO);
-}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* PROD */
+#line 670
 
 void reset()
 {
+#ifndef NTVDM
+#line 513
         char *cp;
         char temp_str[256];
 #ifdef LIM
-        SHORT limSize, backFill;
+#error "Unsupported SoftPC mirror configuration: LIM"
 #endif /* LIM */
+#line 518
+#endif /* NTVDM */
+#line 680
         EQUIPMENT_WORD equip_flag;
         half_word low_switches, high_switches;
         LONG gfxAdapt;
         int adapter;
+#ifndef NEC_98
+#line 522
 #ifdef PM
 	half_word status_byte;
 	half_word cmos_shutdown;
@@ -644,8 +524,9 @@ void reset()
                                 ** stored double word.
                                 */
 #ifdef  NPX
-                                npx_reset();
+#error "Unsupported SoftPC mirror configuration: NPX"
 #endif  /* NPX */
+#line 649
                                 outb(ICA0_PORT_0, (half_word)0x11);
                                 outb(ICA0_PORT_1, (half_word)0x08);
                                 outb(ICA0_PORT_1, (half_word)0x04);
@@ -701,9 +582,9 @@ void reset()
                 }
         }
 #ifdef DPMI
-        /* ensure DPMI host is not still active */
-        DPMI_reset();
+#error "Unsupported SoftPC mirror configuration: DPMI"
 #endif /* DPMI */
+#line 707
 #endif /* PM */
 
         /*
@@ -714,10 +595,14 @@ void reset()
 
         cmos_write_byte(CMOS_DISKETTE,
                 (IU8)((half_word) gfi_drive_type(0) << 4 | gfi_drive_type(1)));
+#endif // !NEC_98
+#line 717
 
         /*
          * NTVDM: if soft reset We will never get here...
          */
+#ifndef NTVDM
+#line 721
         /*
          * If this isn't the first (re)set, then allow hosts to close down
          * timer and keyboard systems. Most ports will need to disable ALRM and
@@ -739,16 +624,16 @@ void reset()
                 NIDDB_System_Reboot();
 
 #ifdef HFX
-                hfx_driver_termination();       /* ..then each driver */
-                hfx_driver_initialisation();
+#error "Unsupported SoftPC mirror configuration: HFX"
 #endif
+#line 745
 		/* These calls manage DOS mouse-driver instance storage, not INT 33
 		 * installation.  Standalone omits that software driver; physical
 		 * mouse hardware is initialised separately by mouse_init() below. */
 #ifndef SOFTPC_STANDALONE
-		mouse_driver_termination();	/* ..then each driver */
-		mouse_driver_initialisation();
+#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
 #endif
+#line 752
 
                 q_event_init();
                 tic_event_init();
@@ -756,23 +641,35 @@ void reset()
                 host_timer_shutdown();
                 host_kb_shutdown();
                 host_disable_timer2_sound();
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 759
         }
+#endif /* NTVDM */
+#line 760
 
         /*
          * Shutdown ODI network driver in case it was running
          */
 #ifdef NOVELL
-        net_term();
+#error "Unsupported SoftPC mirror configuration: NOVELL"
 #endif
+#line 936
 
         /* Shutdown SmartCopy */
 
 #ifndef HostProcessClipData
 #ifdef MSWDVR
-        msw_smcpy_term();
+#error "Unsupported SoftPC mirror configuration: MSWDVR"
 #endif
+#line 774
 #endif
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 954
     {
         /* Clear out the bottom 32K of memory. */
         sas_fills (0, '\0', 640L * 1024L);
@@ -780,8 +677,12 @@ void reset()
         /* Now set up the interrupt vector table. */
         setup_ivt();
     }
+#endif // !NEC_98
+#line 963
 
 
+#ifndef NTVDM
+#line 966
         /* Initialise the physical devices */
         SWPIC_init_funcptrs ();
 
@@ -789,7 +690,13 @@ void reset()
          * VDDs. (see host\src\nt_msscs.c).
          */
         io_init();
+#endif /* NTVDM */
+#line 974
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 979
         ica0_init();
         ica0_post();
         ica1_init();
@@ -803,9 +710,14 @@ void reset()
          * an 8087 floating point chip.
          */
 #ifdef IPC
-        init_subprocs();
+#error "Unsupported SoftPC mirror configuration: IPC"
 #endif /* IPC */
+#line 808
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1011
         cmos_init();
         cmos_post();
 
@@ -816,8 +728,9 @@ void reset()
 #ifdef PRINTER
         equip_flag.bits.printer_count = NUM_PARALLEL_PORTS;
 #else /* PRINTER */
-        equip_flag.bits.printer_count = 0;
+#error "Unsupported SoftPC mirror configuration: !PRINTER"
 #endif /* PRINTER */
+#line 821
 	equip_flag.bits.game_io_present = FALSE;
 	equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
 	equip_flag.bits.ram_size = 0;
@@ -851,37 +764,50 @@ void reset()
 	gfxAdapt = (LONG)(ULONG_PTR)config_inquire(C_GFX_ADAPTER, NULL);
 
 #ifdef GISP_SVGA
-
-        /* The gisp build needs to do all its setup and then
-        ** build the SoftPC ivt.
-        */
-        initHWVGA( );
-        setup_ivt( );
-
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
+#line 862
 
         gvi_init((half_word) gfxAdapt);
+#endif // !NEC_98
+#line 864
 
 #ifdef PIG
-        /* tell the pig what video adapter we are using */
-        pig_gfx_adapter = gfxAdapt;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 1071
 
         SWTMR_init_funcptrs ();
+#ifndef NEC_98
+#line 1074
         time_of_day_init();
+#endif // !NEC_98
+#line 1076
         timer_init();
         timer_post();
         keyboard_init();
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1082
         keyboard_post();
+#ifndef NEC_98
+#line 1084
         AT_kbd_init();
+#endif // !NEC_98
+#line 1086
         AT_kbd_post();
 
         video_init();
 
 #ifdef SWIN_SNDBLST_NULL
-        sb_init();
+#error "Unsupported SoftPC mirror configuration: SWIN_SNDBLST_NULL"
 #endif /* SWIN_SNDBLST_NULL */
+#line 884
 
+#ifndef NEC_98
+#ifndef NTVDM   /* No signon for NTVDM - transparent integration */
+#line 885
         if (soft_reset == 0)
         {
                 sprintf(temp_str,"%d KB OK", sas_w_at(MEMORY_VAR)
@@ -941,26 +867,9 @@ void reset()
         }
 
 #ifdef LICENSING
-        if (host_lic_tick)
-        host_lic_tick();
-
-        cp = host_lic_string();
-        if (*cp)
-        {
-                while(*cp != '\0')
-                {
-                        setAH(14);
-                        setAL(*cp++);
-                        bop(BIOS_VIDEO_IO);
-                }
-                setAH(14);
-                setAL(0xd);     /* carriage return feed */
-                bop(BIOS_VIDEO_IO);
-                setAH(14);
-                setAL(0xa);     /* line feed */
-                bop(BIOS_VIDEO_IO);
-        }
+#error "Unsupported SoftPC mirror configuration: LICENSING"
 #endif /* LICENSING */
+#line 964
 
         /* skip another 1 line */
         setAH(14);
@@ -972,32 +881,55 @@ void reset()
          * sort of a SoftPC they are running.
          */
 #ifndef PROD
-        announce_variant();
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 977
 
 
+#endif  /* NTVDM */
+#line 979
         /* Now search for extra ROM modules */
         search_for_roms();
+#endif // !NEC_98
+#line 1194
 
         /* Now initialise the other BIOS handlers */
 #if defined (GEN_DRVR) || defined (CDROM)
-        init_gen_drivers();
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif /* GEN_DRVR || CDROM */
+#line 1199
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1203
         for (adapter = 0; adapter < NUM_SERIAL_PORTS; adapter++)
+#endif // !NEC_98
+#line 988
         {
                 com_init(adapter);
+#ifndef NEC_98
+#line 1208
                 com_post(adapter);
+#endif // !NEC_98
+#line 991
         }
 
 #ifdef NPX
-        initialise_npx();
+#error "Unsupported SoftPC mirror configuration: NPX"
 #endif
+#line 1215
         dma_init();
         dma_post();
+#ifndef NEC_98
+#line 998
         fla_init();
         mouse_init();
         hda_init();
+#else  // NEC_98
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1001
 
 
 #ifdef PRINTER
@@ -1009,62 +941,46 @@ void reset()
 #endif /* PRINTER */
 
 #if     defined(DELTA) && defined(A2CPU)
-        reset_delta_data_structures();
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* DELTA && A2CPU */
+#line 1237
 
 #ifdef SOFTWIN_API
-        ApiReset() ;
-        ApiDisable() ;
+#error "Unsupported SoftPC mirror configuration: SOFTWIN_API"
 #endif
+#line 1242
 
 #ifdef HUNTER
-        /* Initialise the Hunter program -- the bug finder */
-        hunter_init();
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 1024
 
 #ifdef LIM
-#if !defined(SUN_VA) && !defined(NTVDM)
-/*
-        Temporary removal of LIM for SUN_VA until this issue is sorted out
-*/
-        /*
-         * Initialise the LIM
-         *
-         * 'free expanded memory' only does anything if expanded memory
-         * has previously been initialised
-         *
-         * GISP_SVGAs may need to disable LIM if there isn't room in the
-         * UMA for the page frame, so don't insist on LIM for these.
-         */
-
-#ifdef GISP_SVGA
-        if(!LimBufferInUse()) {
-#endif /*GISP_SVGA */
-        if (soft_reset)                 /* if LIM already initialised */
-                free_expanded_memory();
-
-        backFill = (SHORT) (config_inquire(C_MEM_LIMIT, NULL)? 256: 640);
-        if (limSize = (ULONG)config_inquire(C_LIM_SIZE, NULL))
-                while (init_expanded_memory(limSize, backFill) != SUCCESS)
-                {
-                        free_expanded_memory();
-                        host_error(EG_EXPANDED_MEM_FAILURE, ERR_QU_CO, NULL);
-                }
-#ifdef GISP_SVGA
-        }       /* end of additional check for no LIM buffer */
-#endif /*GISP_SVGA */
-#endif /* !SUN_VA & !NTVDM */
-
+#error "Unsupported SoftPC mirror configuration: LIM"
 #endif /* LIM */
+#line 1059
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1286
+
+#ifndef NTVDM
+#line 1288
         host_reset();
+#endif
+#line 1290
 
         /* Do diskette BIOS POST */
         diskette_post();
 
         disk_post();
 
+#ifdef  NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1068
 
         /*
          * allow routines to distinguish between the initial boot and the 'soft'
@@ -1075,8 +991,9 @@ void reset()
 
         /* Now perform any other initialisation of DOS Drivers */
 #ifdef HFX
-        hfx_init();
+#error "Unsupported SoftPC mirror configuration: HFX"
 #endif
+#line 1080
 }
 
 /*(
@@ -1100,3 +1017,7 @@ GLOBAL void reset_bios_flags IFN0()
         /* clear shut down byte */
         cmos_clear_shutdown_byte();
 }
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1761

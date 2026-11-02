@@ -30,18 +30,16 @@ AMMENDMENTS	:
 =========================================================================
 */
 
+/*  @(#)slave_bios.c	1.6 08/10/92 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]=" @(#)slave_bios.c	1.6 08/10/92 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 36
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "AT_STUFF.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 45
 
 #include "xt.h"
 #include "ios.h"

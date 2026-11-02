@@ -1,0 +1,21 @@
+path	baseline_if_line	baseline_next_line	expression	proved_false_operands	excluded_line_count	excluded_body_sha256
+base/bios/reset.c	115	118	defined(DELTA) && defined(A2CPU)	A2CPU	1	1ce7d1bdce6149ab6d7e82541742ed52547316fbccfab0928962d9bca74ab9d6
+base/bios/reset.c	1011	1014	defined(DELTA) && defined(A2CPU)	A2CPU	1	af9518fd71b5af4c5f323c0327fe1d31d3270314ed8eb76ad7ad37943b1d17a4
+base/ccpu386/c_main.c	692	700	defined(PIG) && defined(SFELLOW)	PIG,SFELLOW	6	db856ac900fbd65b7e7080eee370105eff737cd463dbb921339ecadfbee53952
+base/ccpu386/c_main.c	4646	4652	defined(SFELLOW) && !defined(PROD)	SFELLOW,!PROD	4	e5d887841bc0330e8afff033b10cbd5af3de6424788b5b733e2c1533693b8275
+base/ccpu386/c_stack.c	30	37	defined(PIG) && !defined(PROD)	PIG,!PROD	5	2c2d9ff182e5e08d476a8885f37929ed489b7e3c591e5a8e87145c813256704d
+base/inc/cga.h	100	113	!defined(EGG) && !defined(A_VID) && !defined(C_VID)	!EGG,!C_VID	11	6a1af4d55bea49ea9f16bcafd91ded573dd61669207d371f48ae2fb680204573
+base/inc/cpu4.h	115	118	!defined(CCPU) && !defined(PROD)	!CCPU,!PROD	1	1bf1adb3f04c42f1898bea718bba19151221b87bdb646d5cd5d6cf14015a397d
+base/inc/host_com.h	190	194	defined(NTVDM) && defined(FIFO_ON)	NTVDM,FIFO_ON	2	6396778c458e0692be6184eb88224554a58423884a97c23471df153283767d39
+base/inc/host_sas.h	20	67	defined(BASE_SAS) && defined(HOST_SAS)	BASE_SAS,HOST_SAS	45	5f7266817730f6d7185e02c7f278cdc1151a0df701a2c15c90ccf41dd3ad658f
+base/keymouse/keyba.c	209	215	defined(IRET_HOOKS) && defined(GISP_CPU)	IRET_HOOKS,GISP_CPU	4	7558c7943f0fb0b5b9ea5f4c9a4bcfe4cbed70cf58da74382e1e868fdfccd6ba
+base/keymouse/keyba.c	2596	2637	defined(IRET_HOOKS) && defined(GISP_CPU)	IRET_HOOKS,GISP_CPU	39	5d060b57bb7049203d695ae6074098c4187045e8d34a90c6cc9810a586028df3
+base/keymouse/keybd_io.c	180	183	defined(IRET_HOOKS) && defined(GISP_CPU)	IRET_HOOKS,GISP_CPU	1	f75756524f015e69425bae8243bc4b289f32e7fa8f6c2ce1a41020a228bd163e
+base/keymouse/keybd_io.c	658	661	defined(IRET_HOOKS)  && defined(GISP_CPU)	IRET_HOOKS,GISP_CPU	1	af08bdd6ccf027af797f646845855d5adcd5e238b42e3801e976fb4b4b487b10
+base/system/quick_ev.c	207	227	defined NTVDM && !defined MONITOR	NTVDM	18	7aa93dd6c51097cf5ad104b7e10069e0003db79c18e090fa5a7ca16b01e3204b
+base/system/quick_ev.c	298	301	defined NTVDM && !defined MONITOR	NTVDM	1	497f23ab6ca8bfad5b82c70c299500b809726e6f62c78957182009db08e399e9
+base/system/quick_ev.c	310	313	defined NTVDM && !defined MONITOR	NTVDM	1	fef4fdd9d1dd7562bd08d623591266b484333ef00a4c1eeb9f8be9d396826805
+host/inc/insignia.h	37	40	!defined(_WINDOWS_) && !defined(NT_INCLUDED)	!_WINDOWS_	1	ad3e7898fb73c0460b70c16ce5d5265d7fe56b04e75d990ee1e7e3e2d1e199c8
+host/inc/insignia.h	43	47	!defined(_WINDOWS_) && !defined(NT_INCLUDED)	!_WINDOWS_	2	c2c3daf35cd9951d43e5a90b71656c5c644e203e9cb6fc3629fcfb41c1fc003e
+host/inc/insignia.h	50	60	!defined(_WINDOWS_) && !defined(NT_INCLUDED)	!_WINDOWS_	8	388d72ec089712326524f7bd910cdf949f80adfbb3ca700a73f7f83736972fdb
+host/inc/insignia.h	105	109	!defined(_WINDOWS_) && !defined(NT_INCLUDED)	!_WINDOWS_	2	9c94d263b1555705e13de3b44f4945133f986d8f5dd70f2f1d5b056852b53dbc

@@ -1,0 +1,5 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/disks/floppy_i.c	579	587	330	333	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/disks/floppy_i.c	692	701	420	423	NEC_98	else	33b3039ac90de60bda33a8d65eed01a721144653250560b05de30fbfe434f440
+base/system/rom.c	251	315	226	283	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_vide.c	164	209	141	185	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

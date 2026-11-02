@@ -1,0 +1,5 @@
+path	baseline_if_line	baseline_next_line	directive	condition	excluded_body_sha256	copyright_retained_outside
+base/ccpu386/c_main.c	245	248	if	SFELLOW	9bf9acba3a2e488da51f76d5e53273ee95e4c62a1070c639b8448308a21d56cf	False
+base/system/quick_ev.c	169	176	if	SFELLOW	a2db57b57b43d558ea4f3421e594d0fb5aeb5d451ce3ed29770bbd915f04ed78	False
+base/system/quick_ev.c	371	374	if	SFELLOW	49a8fedee0a6ae764d133d11b0abba16643189e86125774c3ae2131afb90bb9c	False
+base/system/quick_ev.c	379	382	if	SFELLOW	f00cecc264465a2bd73b2b20803ba68450692ab07a5379952b203cd2c72653b8	False

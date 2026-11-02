@@ -43,11 +43,9 @@ INTO()
   if ( GET_OF() )
       {
 #ifdef NTVDM
-      extern BOOL host_swint_hook IPT1(IS32, int_no);
-
-      if(GET_PE() && host_swint_hook((IS32) 4))
-	  return; /* Interrupt processed by user defined handler */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 51
 
       EXT = INTERNAL;
       do_intrupt((IU16)4, TRUE, FALSE, (IU16)0);

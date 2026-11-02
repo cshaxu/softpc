@@ -14,18 +14,16 @@
  *
  */
 
+/* @(#)ppi.c	1.9 08/10/92 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)ppi.c	1.9 08/10/92 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 20
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_SUPPORT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 29
 
 
 /*
@@ -41,8 +39,9 @@ static char SccsID[]="@(#)ppi.c	1.9 08/10/92 Copyright Insignia Solutions Ltd.";
 #include "ppi.h"
 #include "timer.h"
 #ifndef PROD
-#include "trace.h"
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 46
 #include "debug.h"
 #include "compat/devices/snapshot.h"
 
@@ -67,9 +66,12 @@ static half_word ppi_register;
 #define PPI_BIT_MASK	0x3F1
 
 static boolean gate_2_was_low = TRUE;	/* state of timer 2 gate */
-#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
-static boolean SPKRDATA_was_low = TRUE;	/* speaker data for sound */
+#ifndef NTVDM
+#ifndef SOFTPC_STANDALONE
+#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
 #endif
+#endif
+#line 73
 
 /*
  * ============================================================================
@@ -85,6 +87,8 @@ static boolean SPKRDATA_was_low = TRUE;	/* speaker data for sound */
 
 void ppi_inb IFN2(io_addr, port, half_word *, value)
 {
+#ifndef NEC_98
+#line 88
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -106,10 +110,14 @@ void ppi_inb IFN2(io_addr, port, half_word *, value)
     *value = ppi_register;
 
     note_trace2(PPI_VERBOSE, "ppi_inb() - port %x, returning val %x", port, *value);
+#endif   //NEC_98
+#line 109
 }
 
 void ppi_outb IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 113
     port = port & PPI_BIT_MASK;		/* clear unused bits */
 
     if (port == PPI_GENERAL)
@@ -134,19 +142,12 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 	 * Tell sound logic whether sound is enabled or not
 	 */
 
-#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
-		if ( (value & 0x02) && SPKRDATA_was_low)
-		{
-			host_enable_timer2_sound();
-			SPKRDATA_was_low = FALSE;
-		}
-		else
-		if ( !(value & 0x02) && !SPKRDATA_was_low)
-		{
-			host_disable_timer2_sound();
-			SPKRDATA_was_low = TRUE;
-		}
+#ifndef NTVDM
+#ifndef SOFTPC_STANDALONE
+#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
 #endif
+#endif
+#line 150
 
 		/*
 		 * Now gate the ppi signal to the timer.
@@ -177,19 +178,21 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 	}
     else
 	    note_trace2(PPI_VERBOSE, "ppi_outb() - Value %x to unsupported port %x", value, port);
+#else
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 180
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 193
 
 void ppi_init IFN0()
 {
+#ifndef NEC_98
+#line 193
     io_addr i;
     io_define_inb(PPI_ADAPTOR, ppi_inb);
     io_define_outb(PPI_ADAPTOR, ppi_outb);
@@ -199,6 +202,10 @@ void ppi_init IFN0()
 
     ppi_register = 0x00;
     gate_2_was_low = TRUE;
+#else
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 202
 }
 
 GLOBAL void
@@ -210,8 +217,9 @@ softpc_device_ppi_state *state;
 	state->register_value = ppi_register;
 	state->gate_2_was_low = gate_2_was_low ? 1u : 0u;
 #if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
-	state->speaker_data_was_low = SPKRDATA_was_low ? 1u : 0u;
+#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
 #else
+#line 215
 	state->speaker_data_was_low = (ppi_register & 0x02u) == 0u ? 1u : 0u;
 #endif
 }
@@ -226,12 +234,9 @@ const softpc_device_ppi_state *state;
 	ppi_register = state->register_value;
 	gate_2_was_low = state->gate_2_was_low ? TRUE : FALSE;
 #if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
-	if (state->speaker_data_was_low)
-		host_disable_timer2_sound();
-	else
-		host_enable_timer2_sound();
-	SPKRDATA_was_low = state->speaker_data_was_low ? TRUE : FALSE;
+#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
 #elif defined(SOFTPC_STANDALONE)
+#line 235
 	HostPpiState(ppi_register);
 #endif
 	return TRUE;

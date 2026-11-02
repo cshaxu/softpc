@@ -188,9 +188,9 @@ IMPORT SHORT host_com_active IPT3(UTINY,hostID, BOOL,active, CHAR *,errString);
 IMPORT VOID host_com_close IPT1(int,adapter);
 
 #if defined(NTVDM) && defined(FIFO_ON)
-IMPORT UTINY host_com_read_char(int adapter, FIFORXDATA *buffer, UTINY count);
-IMPORT VOID host_com_fifo_char_read(int adapter);
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 194
 
 IMPORT VOID host_com_read IPT3(int,adapter,UTINY *,value, int *,error_mask);
 IMPORT VOID host_com_write IPT2(int,adapter, char,value);
@@ -198,19 +198,14 @@ IMPORT VOID host_com_write IPT2(int,adapter, char,value);
 IMPORT VOID host_com_ioctl IPT3(int,adapter, int,request, intptr_t,arg);
 
 #ifdef NTVDM
-extern	boolean host_com_check_adapter(int adapter);
-extern void host_com_lock(int adapter);
-extern void host_com_unlock(int adapter);
-extern int host_com_char_read(int adapter, int da_int);
-extern void host_com_disable_open(int adapter, int disableOpen);
-extern void host_com_da_int_change(int adapter, int da_int_state, int da_data_state);
-#define host_com_msr_callback(a,b)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 209
 
 #ifdef PS_FLUSHING
-IMPORT void host_com_enable_autoflush IPT1(IS32,adapter);
-IMPORT void host_com_disable_autoflush IPT1(IS32,adapter);
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 214
 
 #ifndef macintosh
 IMPORT void host_com_xon_change IPT2(IU8,hostID, IBOOL,apply);
@@ -231,8 +226,9 @@ IMPORT void host_com_xon_change IPT2(IU8,hostID, IBOOL,apply);
 #define	HOST_COM_PARITY		0000015
 
 #ifdef NTVDM
-#define HOST_COM_LSR		0000016
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 236
 
 #define	HOST_COM_FRAMING_ERROR	(1 << 0)
 #define	HOST_COM_OVERRUN_ERROR	(1 << 1)
@@ -240,8 +236,9 @@ IMPORT void host_com_xon_change IPT2(IU8,hostID, IBOOL,apply);
 #define	HOST_COM_PARITY_ERROR	(1 << 3)
 #define HOST_COM_NO_DATA		(1 << 4)
 #ifdef NTVDM
-#define HOST_COM_FIFO_ERROR	(1 << 7)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+#line 245
 
 #define	HOST_COM_MODEM_CTS	(1 << 0)
 #define	HOST_COM_MODEM_RI	(1 << 1)

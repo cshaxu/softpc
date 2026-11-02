@@ -16,6 +16,10 @@
 // Somehow this has to end up being loaded rather than compiled in...
 //
 #define UNDEFINED 0
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif //NEC_98
+#line 36
 
 /*@ACW=======================================================================
 
@@ -31,6 +35,10 @@ scancode values for the regular keys just to make life a little more fun!
 
 ============================================================================*/
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 34
 BYTE Scan1ToKeynum[] =
 {
     // Keynum		Scancode	US encoding
@@ -126,8 +134,14 @@ BYTE Scan1ToKeynum[] =
     122,		//  0x57	F11
     123,		//  0x58	F12
     UNDEFINED,		//  0x59	
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else // !JAPAN
+#line 129
     UNDEFINED,		//  0x5a	
     UNDEFINED,		//  0x5b	
+#endif // !JAPAN
+#line 131
     UNDEFINED,		//  0x5c	
     UNDEFINED,		//  0x5d
     UNDEFINED,		//  0x5e
@@ -148,6 +162,10 @@ BYTE Scan1ToKeynum[] =
     UNDEFINED,		//  0x6d	
     UNDEFINED,		//  0x6e	
     UNDEFINED,		//  0x6f	
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#else
+#line 151
     UNDEFINED,		//  0x70	
     UNDEFINED,		//  0x71	
     UNDEFINED,		//  0x72	
@@ -163,6 +181,8 @@ BYTE Scan1ToKeynum[] =
     94,       		//  0x7c	Extended kbd (IBM 122 key)
     14,			//  0x7d	Extended kbd (IBM 122 key)
     107,		//  0x7e	Brazilian ABNT numpad .
+#endif
+#line 166
     UNDEFINED,		//  0x7f
     UNDEFINED,		//  0x80
     UNDEFINED,		//  0x81
@@ -270,6 +290,8 @@ BYTE Scan1ToKeynumExtended[] =
     76,			//  0x53	Extended 53 Delete
 
 };
+#endif // !NEC_98
+#line 698
 
 
 
@@ -287,6 +309,10 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
     /*:::::::::::::::::::::::::::::::::::: do we need the enhanced key set ? */
     /* Correct original one-past-end guards: byte count is exclusive. */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 719
 
     // Both Pause and Numlock have ScanCode==0x45,
     // so simple table lookup by ScanCode doesn't work
@@ -297,16 +323,32 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 
     if(!(KeyEvent->dwControlKeyState & ENHANCED_KEY))
     {
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 739
 	/*............................... the regular keyset is what we need */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 787
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynum)
 		   ? 0
                    : Scan1ToKeynum[KeyEvent->wVirtualScanCode];
     }
     else
     {
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 804
         /*.................................. we do need the extended key set */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 816
 
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynumExtended)
 		   ? 0

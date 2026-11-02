@@ -1,0 +1,11 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/comms/printer.c	693	698	519	521	defined(NTVDM) && !defined(MONITOR)	else	4f1a9b43d92288650f815524f663b2c9ffa425ef56778ed16de056b4d8bd135d
+base/disks/diskbios.c	397	439	226	267	!(defined(NTVDM) && defined(MONITOR))	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/disks/diskbios.c	386	389	217	219	!(defined(NTVDM) && defined(MONITOR))	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/system/rom.c	454	511	342	371	!(defined(NTVDM) && defined(MONITOR))	then	ca05a903c1bdae3169bcde44ac53a8854a5de045eb9df2400034ef9a9e936a4c
+base/video/ega_read.c	4	1028	4	989	!(defined(NTVDM) && defined(MONITOR))	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_vide.c	2052	2165	1560	1585	defined(NTVDM) && defined(X86GFX)	else	b41dfeb47cc6a6777ac7339e1c05170a724f120d49d6f305a7bb076d8f8a368f
+base/video/ega_writ.c	4	867	4	837	!(defined(NTVDM) && defined(MONITOR))	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/gfx_updt.c	3881	3887	3751	3753	defined(NTVDM) && defined(MONITOR)	else	c3a46d83b8a214efff1f41a1b2e342c12a76cc7173e0d4a55ea0e312fd94176f
+base/video/video.c	2877	2892	1980	1984	defined(NTVDM) && defined(X86GFX)	else	fcdbdba542f8f3a90e9cf33378ee96c4fd4d1e084aa94f877ba87e4968a65f38
+base/video/video.c	3034	3049	2095	2099	defined(NTVDM) && defined(X86GFX)	else	fcdbdba542f8f3a90e9cf33378ee96c4fd4d1e084aa94f877ba87e4968a65f38

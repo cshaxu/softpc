@@ -1,0 +1,2 @@
+path	baseline_if_line	baseline_next_line	condition	excluded_body_sha256
+base/ccpu386/c_main.c	3409	3420	defined(SFELLOW)	cd83a633a3733e4109ca78867baff2dbfb198979668a49de27bf0cb99626ab5c

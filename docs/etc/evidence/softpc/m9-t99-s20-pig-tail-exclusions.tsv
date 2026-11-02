@@ -1,0 +1,4 @@
+path	baseline_if_line	baseline_next_line	condition	excluded_body_sha256
+base/bios/reset.c	156	159	PIG	ea8ff25950595cc85b2dee69aaa54a966459006eb98aec19befd9ce8e7e33c96
+base/bios/reset.c	865	869	PIG	207ad0b86bb42ba4fa1dc104865868ad134b73d0ecf8a982ae43eb71cc7709d2
+base/system/timer.c	1831	1834	PIG	5663ed6239230446706885c85f67547e08e8a3bb24ec3943a6ea5573961561e9

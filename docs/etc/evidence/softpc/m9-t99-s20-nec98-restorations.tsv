@@ -1,0 +1,6 @@
+path	xp_if_line	xp_endif_line	excluded_body_sha256
+base/disks/diskbios.c	1	6	4efbddf504fe87603d88d18adaeb6e0e729d98d40dc56beb7d1b7b247a8840d3
+base/disks/floppy.c	1	6	4efbddf504fe87603d88d18adaeb6e0e729d98d40dc56beb7d1b7b247a8840d3
+base/disks/floppy_i.c	1	6	4efbddf504fe87603d88d18adaeb6e0e729d98d40dc56beb7d1b7b247a8840d3
+base/support/time_day.c	1	6	514095abe463eeafae091dadf32e2265422464fe645c03d8cdf9d53bb49ac979
+base/comms/printer_.c	1	2	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

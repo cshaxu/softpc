@@ -16,8 +16,9 @@
 #define ES_SCALEVENT    4
 #define ES_YODA         8
 #ifdef YODA
-void CheckForYodaEvents(void);
+#error "Unsupported SoftPC mirror configuration: YODA"
 #endif
+#line 21
 #ifndef X86GFX
 void GetScaleEvent(void);
 #endif
@@ -44,8 +45,9 @@ BOOL MoreMouseEvents(void);
 VOID DelayMouseEvents(ULONG count);
 void FlushMouseEvents(void);
 #ifdef X86GFX
-IMPORT VOID SelectMouseBuffer(half_word mode, half_word lines);
+#error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif //X86GFX
+#line 49
 
 VOID KbdResume(VOID);
 ULONG  WaitKbdHdw(ULONG dwTimeOut);

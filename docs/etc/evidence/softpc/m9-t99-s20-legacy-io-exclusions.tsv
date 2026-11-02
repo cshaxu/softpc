@@ -1,0 +1,7 @@
+path	baseline_if_line	baseline_next_line	condition	excluded_body_sha256
+base/comms/printer.c	668	704	PS_FLUSHING	3f56c33bafe3f0be85b2eae8c09b78411ad21597877292cd6994aef9e1126381
+base/disks/gfi.c	294	299	SLAVEPC	7db58c9c9c9a40fb5dd5b05091d3855e7478405db6f013f9ae97806c9cd9827f
+base/disks/gfi.c	306	313	SLAVEPC	3cd4c529615d78a380752861d07b63f6f43af9ea991561daf4df8ba98c8d52c4
+base/disks/gfi.c	320	324	SLAVEPC	5626b3155e2798f3f95a61a9bf9540695fbfb02665f6598524529e8203281de3
+base/disks/gfi.c	331	353	SLAVEPC	61adde2579658e644093f1d4c414b8bd2a7f031809443770b8703a008d94fc29
+base/system/cmos.c	348	357	SLAVEPC	c0b79bb9097404d2a3e2faab9dfb5d0ebfb2c681385a1c876e6554cf6c3a13b0

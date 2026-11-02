@@ -1,0 +1,3 @@
+arch	header_contexts	header_unselected	header_identical	fm_contexts	fm_identical	negative_both_errors
+x86	16	16	16	2	2	2
+x64	16	16	16	2	2	2

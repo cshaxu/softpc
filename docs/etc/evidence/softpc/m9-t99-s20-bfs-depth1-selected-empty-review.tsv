@@ -1,0 +1,25 @@
+path	current_line	current_sha256	disposition	evidence
+base/ccpu386/c_intr.c	233	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 237.
+base/ccpu386/call.c	89	9ff24b95fc56adc581324a27af043ceb9696bac84e70cba54671f12725bd1f84	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 94.
+base/ccpu386/imul.c	70	9cc48f0ff83909e122e01fc417d909fa93964ba4b5c79b3553810d1a6162adc4	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 70.
+base/ccpu386/imul.c	112	9cc48f0ff83909e122e01fc417d909fa93964ba4b5c79b3553810d1a6162adc4	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 112.
+base/ccpu386/imul.c	154	9cc48f0ff83909e122e01fc417d909fa93964ba4b5c79b3553810d1a6162adc4	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 154.
+base/ccpu386/imul.c	195	9cc48f0ff83909e122e01fc417d909fa93964ba4b5c79b3553810d1a6162adc4	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 195.
+base/ccpu386/imul.c	236	9cc48f0ff83909e122e01fc417d909fa93964ba4b5c79b3553810d1a6162adc4	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 236.
+base/ccpu386/iret.c	106	fcc3e09c77da176c1ed54eaca0267308f7b1385eeb7727eabb58ec65baf26bc9	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 110.
+base/ccpu386/jmp.c	71	9674820a67e72fef6b1b513d235577d0da5733987aa617b90780747246f1c7a8	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 80.
+base/ccpu386/mul.c	65	5e7f349937d7302ae969bbb3fbd994cc93c23c1b4838e5243e7cd242ce384973	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 65.
+base/ccpu386/mul.c	103	5e7f349937d7302ae969bbb3fbd994cc93c23c1b4838e5243e7cd242ce384973	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 103.
+base/ccpu386/mul.c	140	5e7f349937d7302ae969bbb3fbd994cc93c23c1b4838e5243e7cd242ce384973	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 140.
+base/ccpu386/ret.c	88	3eec45453f4e7c0021ec6fdeb686cd1e5e8e8bc2e7ec96675c123884f8922ee3	original-comment-only-body-verified	Matching original condition and complete comment-only arm, XP line 92.
+base/cvidc/sas4gen.h	506	08f193c0e0592f9bb43e98965c91ea8271e66ffe63783391bec51d81d9be3897	original-selected-body-empty	Pinned XP selected branch is empty.
+base/inc/gfx_upd.h	315	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	original-child-pending-depth2	See bfs-depth2-absent-original-children.tsv.
+base/inc/yoda.h	53	cc573a311f338003d9e3ec58d71777d64f16d895eb56a4587d6bedd8bc282996	original-selected-body-empty	Pinned XP selected branch is empty.
+base/keymouse/mouse_io.c	1459	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	original-child-pending-depth2	See bfs-depth2-absent-original-children.tsv.
+base/support/time_day.c	772	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	original-child-pending-depth2	See bfs-depth2-absent-original-children.tsv.
+base/video/gfx_updt.c	3989	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	original-child-pending-depth2	See bfs-depth2-absent-original-children.tsv.
+base/video/video.c	115	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	original-child-pending-depth2	See bfs-depth2-absent-original-children.tsv.
+host/inc/nt_graph.h	455	9902bcfa3fa191fe1d2efd21b929a8233d61255978619281ee2a86716a9d3a0d	selected-content-omission-recorded	See bfs-depth1-whole-omissions.tsv.
+host/src/nt_graph.c	444	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	selected-content-omission-recorded	See bfs-depth1-whole-omissions.tsv.
+host/src/nt_graph.c	778	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	selected-content-omission-recorded	See bfs-depth1-whole-omissions.tsv.
+host/src/nt_graph.c	2451	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	selected-content-omission-recorded	See bfs-depth1-whole-omissions.tsv.

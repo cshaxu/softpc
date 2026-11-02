@@ -1,5 +1,7 @@
 /* SccsID @(#)video.h	1.24 08/19/94 Copyright Insignia Solutions Inc. */
 
+#ifndef NEC_98
+#line 3
 /*
  * M6845 video chip registers
  */
@@ -37,6 +39,8 @@
 
 /* 4 full scanlines is the (offset/size) of one text line PER bank */
 #define ONELINEOFF      320
+#endif // !NEC_98
+#line 40
 
 
 /*
@@ -59,6 +63,10 @@
  */
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 62
 #define	vd_video_mode	0x449
 #define VID_COLS	0x44A	/* vd_cols_on_screen */
 #define	VID_LEN  	0x44C	/* vd_crt_len */
@@ -73,8 +81,9 @@
 #ifdef EGG
 #define vd_rows_on_screen 0x484
 #else
-#define vd_rows_on_screen  24        /* Never changes */
+#error "Unsupported SoftPC mirror configuration: !EGG"
 #endif
+#line 78
 
 extern IU8 Video_mode;	/* Shadow copy of BIOS video mode */
 
@@ -137,8 +146,9 @@ IMPORT void vga_int_1C IPT0();
 #ifdef VGG
 #define EGA_FUNC_SIZE	0x1D
 #else
-#define EGA_FUNC_SIZE	0x14
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
+#line 142
 #define CGA_FUNC_SIZE	0x14
 
 #define SET_MODE 0
@@ -180,8 +190,9 @@ IMPORT MODE_ENTRY vd_ext_graph_table[];
 #ifdef V7VGA
 #define VD_MAX_MODE	0x69
 #else
-#define VD_MAX_MODE	(sizeof(vd_mode_table)/sizeof(MODE_ENTRY))
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
+#line 185
 
 /*
  * Mode macros to distinguish between alphanumeric & graphics video modes
@@ -196,17 +207,18 @@ IMPORT MODE_ENTRY vd_ext_graph_table[];
 	((sas_hw_at_no_check(vd_video_mode) >= 0x14) && \
 	(sas_hw_at_no_check(vd_video_mode) < 0x1a)))
 #else
-#define ega_mode()	((sas_hw_at_no_check(vd_video_mode) > 7) && \
-	(sas_hw_at_no_check(vd_video_mode) < 19))
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
+#line 202
 #endif
 
 #ifdef VGG
 #ifdef V7VGA
 #define vga_256_mode()		(sas_hw_at_no_check(vd_video_mode) == 19 || (sas_hw_at_no_check(vd_video_mode) > 0x19 && sas_hw_at_no_check(vd_video_mode) < 0x1e))
 #else
-#define vga_256_mode()		(sas_hw_at_no_check(vd_video_mode) == 19)
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
+#line 210
 #endif /* VGG */
 
 /*
@@ -238,8 +250,9 @@ IMPORT unsigned char	valid_modes[];
 #ifdef V7VGA
 #define is_v7vga_mode(nm)	((nm >= 0x40 && nm <= 0x45) || (nm >= 0x60 && nm <= 0x69))
 #else
-#define is_v7vga_mode(nm)	(FALSE)
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
+#line 243
 
 IMPORT VOID (*bios_ch2_byte_wrt_fn) IPT2(ULONG, ch_attr, ULONG, ch_addr);
 IMPORT VOID (*bios_ch2_word_wrt_fn) IPT2(ULONG, ch_attr, ULONG, ch_addr);
@@ -261,6 +274,11 @@ IMPORT VOID vga_write_dot IPT4(LONG, colour, LONG, page, LONG, pixcol, LONG, row
 #endif
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#endif // NEC98
+#line 264
 /* The detached machine keeps this optional presentation path disabled, but
    the original video controller references its state independently of the
    product-specific enable/disable services above. */

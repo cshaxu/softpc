@@ -49,6 +49,10 @@
 #define GRAPH_FONT_OFFSET 12
 
 /* Location of font definitions */
+#if 0
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#endif
+#line 62
 
 #ifdef VGG
 /* Flags controlling extra bits of VGA BIOS, not in EGA one */
@@ -85,18 +89,18 @@
 #define RS480   3
 
 #ifdef ANSI
-extern int get_scanlines(void);
-extern sys_addr find_mode_table(int,sys_addr *);
-extern sys_addr follow_ptr(sys_addr);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 102
 extern int get_scanlines();
 extern sys_addr find_mode_table();
 extern sys_addr follow_ptr();
 #endif /* ANSI */
 
 #ifdef MSWDVR
-IMPORT VOID host_mswin_disable IPT0();
+#error "Unsupported SoftPC mirror configuration: MSWDVR"
 #endif
+#line 110
 
 #ifdef V7VGA
 IMPORT VOID v7vga_extended_set_mode IPT0();
@@ -113,3 +117,7 @@ IMPORT VOID init_vga_dac IPT1( int, table );
  * its original page/column/row contract. */
 IMPORT void ega_read_dot IPT3(int, page, int, col, int, row);
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(MONITOR)"
+#endif
+#line 138

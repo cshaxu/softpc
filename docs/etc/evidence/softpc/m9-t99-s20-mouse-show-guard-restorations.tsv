@@ -1,0 +1,3 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/keymouse/mouse_io.c	3018	3037	2976	2995	""
+base/keymouse/mouse_io.c	3039	3041	2995	2995	df2125f76bfe05ec1b308f743b0a039ddfa85840555813e6ac646a38fdadf08f

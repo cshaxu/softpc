@@ -1,3 +1,7 @@
+#if (defined(JAPAN) || defined(KOREA)) && !defined(i386)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // (JAPAN || KOREA)&& !i386
+#line 4
 #include "insignia.h"
 #include "host_def.h"
 /*
@@ -41,14 +45,14 @@
  */
 
 
+#ifndef NEC_98
+#line 44
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "VIDEO_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 52
+#endif // !NEC_98
+#line 52
 
 
 /*
@@ -84,19 +88,34 @@
 #include "debug.h"
 #include "timer.h"
 #ifndef PROD
-#include "trace.h"
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 89
 #include "egavideo.h"
 #include "host_gfx.h"
 #include "cpu_vid.h"
 #include "ga_defs.h"
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // JAPAN || KOREA
+#line 103
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 107
 
 #ifdef	EGG
 #define	VD_ROWS_ON_SCREEN	sas_hw_at_no_check(vd_rows_on_screen)
 #else
-#define VD_ROWS_ON_SCREEN	vd_rows_on_screen
+#error "Unsupported SoftPC mirror configuration: !EGG"
 #endif	/* EGG */
+#line 100
+
+#ifndef NEC_98
+/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#endif // !NEC_98
+#line 128
 
 
 
@@ -112,10 +131,24 @@
  * This was done to fix "dots on screen" problem with EGA-PICS, which changes screen
  * mode behind the BIOS's back.
  */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 144
 GLOBAL sys_addr video_pc_low_regen,video_pc_high_regen;
+#endif // !NEC_98
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif
+#line 170
+#line 146
 
 
 
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif
+#line 178
 /*
  * ============================================================================
  * Local static data and defines
@@ -123,6 +156,10 @@ GLOBAL sys_addr video_pc_low_regen,video_pc_high_regen;
  */
 
 /* internal function declarations */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 264
 LOCAL sys_addr 	extend_addr IPT1(sys_addr,addr);
 LOCAL half_word fgcolmask IPT1(word, rawchar);
 LOCAL word 	expand_byte IPT1(word, lobyte);
@@ -131,10 +168,9 @@ LOCAL void 	M6845_reg_init IPT2(half_word, mode, word, base);
 LOCAL void 	vd_dummy IPT0();
 
 #ifdef HERC
-GLOBAL void herc_alt_sel IPT0();
-GLOBAL void herc_char_gen IPT0();
-GLOBAL void herc_video_init IPT0();
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
+#line 138
 
 void (*video_func[]) () = {
 				vd_set_mode,
@@ -155,9 +191,9 @@ void (*video_func[]) () = {
 				vd_get_mode,
 				vd_dummy,
 #ifdef HERC
-				herc_char_gen,
-				herc_alt_sel,
+#error "Unsupported SoftPC mirror configuration: HERC"
 #else /* !HERC */
+#line 161
 				vd_dummy,
 				vd_dummy,
 #endif /* HERC */
@@ -172,11 +208,16 @@ void (*video_func[]) () = {
 #ifdef VGG
 				vga_disp_func,
 #else /* !VGG */
-				vd_dummy,
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
+#line 177
 				vd_dummy,
 			   };
+#endif // !NEC_98
+#line 179
 
+#ifndef NEC_98
+#line 320
 unsigned char   valid_modes[] =
         {
                 ALL_MODES,              /* Mode 0. */
@@ -281,6 +322,10 @@ LOCAL void sensible_graph_scroll_up IPT6(int, t_row, int, l_col, int, rowsdiff, 
 LOCAL void sensible_graph_scroll_down IPT6(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr);
 LOCAL void kinky_scroll_up IPT7(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr, int, vd_cols_on_screen);
 LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr, int, vd_cols_on_screen);
+#else
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // !NEC_98
+#line 284
 
 /*
  * ============================================================================
@@ -290,13 +335,26 @@ LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, co
 
 
 
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#elif defined(KOREA) // JAPAN
+#error "Unsupported SoftPC mirror configuration: KOREA"
+#endif // KOREA
+#line 670
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // JAPAN || KOREA
+#line 669
+#ifndef NEC_98
+#line 671
 GLOBAL VOID
 simple_bios_byte_wrt IFN2(ULONG, ch, ULONG, ch_addr)
 {
 	*(IU8 *)(getVideoscreen_ptr() + ch_addr) = (UTINY)ch;
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
-	setVideodirty_total(getVideodirty_total() + 1);
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* not EGG or C_VID or A_VID */
+#line 300
 }
 
 GLOBAL VOID
@@ -305,8 +363,9 @@ simple_bios_word_wrt IFN2(ULONG, ch_attr, ULONG, ch_addr)
 	*(IU8 *)(getVideoscreen_ptr() + ch_addr) = (UTINY)ch_attr;
 	*(IU8 *)(getVideoscreen_ptr() + ch_addr + 1) = (UTINY)(ch_attr >> 8);
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
-	setVideodirty_total(getVideodirty_total() + 1);
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* not EGG or C_VID or A_VID */
+#line 310
 }
 
 /*
@@ -336,8 +395,9 @@ GLOBAL void vd_set_mode IFN0()
     if ((half_word)current_video_mode > VD_MAX_MODE ||
 	vd_mode_table[current_video_mode].mode_control_val == VD_BAD_MODE) {
 #ifndef PROD
-	trace(EBAD_VIDEO_MODE, DUMP_REG);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 341
         return;
     }
     if (equip_flag.bits.video_mode == VIDEO_MODE_80X25_BW) {
@@ -361,10 +421,9 @@ GLOBAL void vd_set_mode IFN0()
 	     * Clear the video area
 	     */
 #ifdef REAL_VGA
-	    sas_fillsw_16(video_pc_low_regen,
-				vd_mode_table[sas_hw_at_no_check(vd_video_mode)].clear_char,
-				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 368
 	    sas_fillsw(video_pc_low_regen,
 				vd_mode_table[sas_hw_at_no_check(vd_video_mode)].clear_char,
 				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
@@ -415,9 +474,9 @@ GLOBAL void vd_set_mode IFN0()
      * Clear the video area
      */
 #ifdef REAL_VGA
-    sas_fillsw_16(video_pc_low_regen, vd_mode_table[sas_hw_at_no_check(vd_video_mode)].clear_char,
-				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 421
     sas_fillsw(video_pc_low_regen, vd_mode_table[sas_hw_at_no_check(vd_video_mode)].clear_char,
 				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
 #endif
@@ -573,8 +632,9 @@ GLOBAL void vd_get_light_pen IFN0()
     }
     else {		        /* not supported */
 #ifndef PROD
-	trace("call to light pen - trigger | switch was on!", DUMP_REG);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 578
     }
 }
 
@@ -747,15 +807,19 @@ GLOBAL void vd_scroll_up IFN0()
 	else
     		sensible_graph_scroll_up(t_row,l_col,rowsdiff,colsdiff,lines,attr);
 #ifdef EGA_DUMP
-	dump_scroll(sas_hw_at_no_check(vd_video_mode),0,video_pc_low_regen,sas_w_at_no_check(VID_ADDR),sas_w_at_no_check(VID_COLS),
-    		t_row,l_col,rowsdiff,colsdiff,lines,attr);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 753
     /*
      * re-enable video for this mode, if on a CGA adaptor (fixes ROUND42 bug).
      */
 	if(video_adapter == CGA)
     	outb(CGA_CONTROL_REG, vd_mode_table[sas_hw_at_no_check(vd_video_mode)].mode_control_val);
     }
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 759
 }
 
 /*
@@ -765,15 +829,33 @@ GLOBAL void vd_scroll_up IFN0()
 LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr)
 {
     register sys_addr	source, dest;
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // !i386 && JAPAN
+#line 768
     register int	col_incr,i;
     boolean 		screen_updated = FALSE;
     int			vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 771
 
 
 	/* Set origin of data movement for calculating screen refresh */
 
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#else // !JAPAN || !i386
+#line 775
     source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + video_pc_low_regen;
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: !i386 and JAPAN"
+#endif // !i386 && JAPAN
+#line 776
     col_incr = sas_w_at_no_check(VID_COLS) * 2;	/* offset to next line */
+#endif // !JAPAN || !i386
+#line 777
 
 	/* Try to scroll the adaptor memory & host screen. */
 
@@ -792,11 +874,16 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
  * terminate immediately.
  */
     source += lines*col_incr;	
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // !i386 && JAPAN
+#line 795
     for(i = 0; i < rowsdiff-lines; i++)
     {
 #ifdef REAL_VGA
-		VcopyStr(&M[dest],&M[source], colsdiff*2);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 800
 		if( !screen_updated )
 			sas_move_bytes_forward (source, dest, colsdiff*2);
 #endif
@@ -804,20 +891,33 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 		/* next line */
 		source += col_incr;
 		dest += col_incr;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 807
     }
 
 /* moved all the data we were going to move - blank the cleared region */
 
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // !i386 && JAPAN
+#line 811
 
     while(lines--)
     {
 #ifdef REAL_VGA
-		sas_fillsw_16(dest, (attr << 8)|' ', colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 817
 		if( !screen_updated )
 			sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
 #endif
 		dest += col_incr;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 821
     }
 }
 
@@ -868,16 +968,18 @@ LOCAL void sensible_graph_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, 
 	for(i = 0; i < rowsdiff-lines; i++)
 	{
 #ifdef REAL_VGA
-		VcopyStr(&M[dest],&M[source], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 873
 		sas_move_bytes_forward (source,dest, colsdiff);
 #endif
 		/*
 		 * graphics mode has to cope with odd bank as well
 		 */
 #ifdef REAL_VGA
-		VcopyStr(&M[dest+ODD_OFF],&M[source+ODD_OFF], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 881
 		sas_move_bytes_forward (source+ODD_OFF,dest+ODD_OFF, colsdiff);
 #endif
 		source += SCAN_LINE_LENGTH;
@@ -889,9 +991,9 @@ LOCAL void sensible_graph_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, 
 	while( lines-- )
 	{
 #ifdef REAL_VGA
-		sas_fills_16(dest, attr, colsdiff);
-		sas_fills_16(dest+ODD_OFF, attr, colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 895
 		sas_fills(dest, (IU8)attr, colsdiff);
 		sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -925,6 +1027,10 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 	is_alpha = FALSE;
 	rowsdiff *= 4;		/* 8 scans per char - 4 per bank */
 	lines *= 4;		/* scan lines */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 928
 	if (sas_hw_at_no_check(vd_video_mode) != 6) {
 	    colsdiff *= 2;		/* 4 pixels/byte */
 	    /* set origin of data movement for calculating screen refresh */
@@ -937,8 +1043,9 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 
     default:
 #ifndef PROD
-	trace("bad video mode\n",DUMP_REG);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 942
 	;
     }
 
@@ -956,8 +1063,9 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
     if (is_alpha) {
 	    for(i = 0; i < rowsdiff-lines; i++) {
 #ifdef REAL_VGA
-	        VcopyStr(&M[dest],&M[source], colsdiff*2);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 961
 		sas_move_bytes_forward (source,dest, colsdiff*2);
 #endif
 	        /* next line */
@@ -968,16 +1076,18 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
      else {
 	    for(i = 0; i < rowsdiff-lines; i++) {
 #ifdef REAL_VGA
-	        VcopyStr(&M[dest],&M[source], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 973
 		sas_move_bytes_forward (source,dest, colsdiff);
 #endif
 	        /*
 	         * graphics mode has to cope with odd bank as well
 	         */
 #ifdef REAL_VGA
-	        VcopyStr(&M[dest+ODD_OFF],&M[source+ODD_OFF], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 981
 		sas_move_bytes_forward (source+ODD_OFF,dest+ODD_OFF, colsdiff);
 #endif
 	        source += SCAN_LINE_LENGTH;
@@ -994,8 +1104,9 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 		lines = 0; /* force termination */
 	    }
 #ifdef REAL_VGA
-	    sas_fillsw_16(dest, (attr << 8)|' ', colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 999
 	    sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
 #endif
 	    dest += col_incr;
@@ -1005,9 +1116,9 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 
 	while( lines-- ) {
 #ifdef REAL_VGA
-	    sas_fills_16(dest, attr, colsdiff);
-	    sas_fills_16(dest+ODD_OFF, attr, colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1011
 	    sas_fills(dest, (IU8)attr, colsdiff);
 	    sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -1100,15 +1211,19 @@ GLOBAL void vd_scroll_down IFN0()
 	else
     		sensible_graph_scroll_down(t_row,l_col,rowsdiff,colsdiff,lines,attr);
 #ifdef EGA_DUMP
-	dump_scroll(sas_hw_at_no_check(vd_video_mode),1,video_pc_low_regen,sas_w_at_no_check(VID_ADDR),sas_w_at_no_check(VID_COLS),
-    		t_row,l_col,rowsdiff,colsdiff,lines,attr);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 1106
     /*
      * re-enable video for this mode, if on a CGA adaptor (fixes ROUND42 bug).
      */
 	if(video_adapter == CGA)
     	outb(CGA_CONTROL_REG, vd_mode_table[sas_hw_at_no_check(vd_video_mode)].mode_control_val);
     }
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1112
 }
 
 LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr)
@@ -1119,8 +1234,17 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
     boolean		screen_updated;
     int			vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
 
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#else // !JAPAN || !i386
+#line 1122
 	source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + video_pc_low_regen;
 	col_incr = sas_w_at_no_check(VID_COLS) * 2;
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: !i386 and JAPAN"
+#endif // !i386 && JAPAN
+#endif // !386 || !JAPAN
+#line 1124
 
 	/* Try to scroll the adaptor memory & host screen. */
 
@@ -1131,6 +1255,10 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 
     dest = source + (rowsdiff-1)*col_incr;
     source = dest - lines*col_incr;
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // !i386 && JAPAN
+#line 1134
 /*
  * NB if we are just doing a clear area, the scrolling 'for' loop will terminate immediately
  */
@@ -1138,27 +1266,41 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 	for(i = 0; i < rowsdiff-lines; i++)
 	{
 #ifdef REAL_VGA
-		VcopyStr(&M[dest],&M[source], colsdiff*2);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1143
 		if( !screen_updated )
 			sas_move_bytes_forward (source, dest, colsdiff*2);
 #endif
 		source -= col_incr;
 		dest -= col_incr;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1148
 	}
 
     /* moved all the data we were going to move - blank the cleared region */
 
+#if !defined(i386) && defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // !i386 && JAPAN
+#line 1152
 
 	while(lines--)
 	{
 #ifdef REAL_VGA
-		sas_fillsw_16(dest, (attr << 8)|' ', colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1158
 		if( !screen_updated )
 			sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
 #endif
 		dest -= col_incr;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1162
 	}
 }
 
@@ -1206,9 +1348,9 @@ LOCAL void sensible_graph_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff
 		 */
 
 #ifdef REAL_VGA
-		VcopyStr(&M[dest],&M[source], colsdiff);
-		VcopyStr(&M[dest+ODD_OFF],&M[source+ODD_OFF], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1212
 		sas_move_bytes_forward (source, dest, colsdiff);
 		sas_move_bytes_forward (source+ODD_OFF, dest+ODD_OFF, colsdiff);
 #endif
@@ -1221,9 +1363,9 @@ LOCAL void sensible_graph_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff
 	while( lines-- )
 	{
 #ifdef REAL_VGA
-		sas_fills_16(dest, attr, colsdiff);
-		sas_fills_16(dest+ODD_OFF, attr, colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1227
 		sas_fills(dest, (IU8)attr, colsdiff);
 		sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -1262,8 +1404,9 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 
     default:
 #ifndef PROD
-	trace("bad video mode\n",DUMP_REG);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1267
 	;
     }
 
@@ -1279,8 +1422,9 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 	if (is_alpha) {
 	    for(i = 0; i < rowsdiff-lines; i++) {
 #ifdef REAL_VGA
-	        VcopyStr(&M[dest],&M[source], colsdiff*2);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1284
 		sas_move_bytes_forward (source, dest, colsdiff*2);
 #endif
 	        source -= col_incr;
@@ -1290,16 +1434,18 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 	else {
 	    for(i = 0; i < rowsdiff-lines; i++) {
 #ifdef REAL_VGA
-	        VcopyStr(&M[dest],&M[source], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1295
 		sas_move_bytes_forward (source, dest, colsdiff);
 #endif
 	        /*
 	         * graphics mode has to do odd & even banks
 	         */
 #ifdef REAL_VGA
-	        VcopyStr(&M[dest+ODD_OFF],&M[source+ODD_OFF], colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1303
 		sas_move_bytes_forward (source+ODD_OFF, dest+ODD_OFF, colsdiff);
 #endif
 	        source -= col_incr;
@@ -1312,8 +1458,9 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
     if (is_alpha) {		/* alpha blank */
 	while(lines--) {
 #ifdef REAL_VGA
-	    sas_fillsw_16(dest, (attr << 8)|' ', colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1317
 	    sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
 #endif
 	    dest -= col_incr;
@@ -1323,9 +1470,9 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 
 	while(lines--) {
 #ifdef REAL_VGA
-	    sas_fills_16(dest, attr, colsdiff);
-	    sas_fills_16(dest+ODD_OFF, attr, colsdiff);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1329
 	    sas_fills(dest, (IU8)attr, colsdiff);
 	    sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -1364,12 +1511,15 @@ GLOBAL void vd_read_attrib_char IFN0()
     vd_cursor_row = sas_hw_at_no_check(VID_CURPOS + getBH()*2 + 1);
 
    if (alpha_num_mode()) {		/* alpha */
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // JAPAN && i386
+#line 1367
 	cpos = video_pc_low_regen + vd_cursor_offset(getBH());
 #ifdef A2CPU
-	(*read_pointers.w_read)( (ULONG)get_byte_addr(cpos) );
-	chattr = (*get_byte_addr (cpos));
-	chattr |= (*get_byte_addr (cpos+1)) << 8;
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
+#line 1373
 	sas_loadw(cpos,&chattr);
 #endif /* A2CPU */
 	setAX(chattr);			/* hmm that was easy */
@@ -1428,8 +1578,9 @@ GLOBAL void vd_read_attrib_char IFN0()
 	else
 	    cgen = CHAR_GEN_ADDR;			/* match in char generator */
 #else
-	cgen = CHAR_GEN_ADDR;			/* match in char generator */
+#error "Unsupported SoftPC mirror configuration: !EGG"
 #endif
+#line 1433
 	if (cgen != 0)
 		for(i = 0; i < CHARS_IN_GEN; i++) {
 			sas_loads (cgen, tmp, sizeof(tmp));
@@ -1483,6 +1634,10 @@ GLOBAL void vd_write_char_attrib IFN0()
     register word i, cpos;
     word vd_cols_on_screen;
     half_word vd_cursor_col, vd_cursor_row;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1486
 
     /* Load internal variables with the values stored in BIOS
      * data area.
@@ -1493,13 +1648,22 @@ GLOBAL void vd_write_char_attrib IFN0()
 
     if (alpha_num_mode())
     {
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1496
 		cpos = vd_cursor_offset(getBH());
 
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1498
 		/* place in memory */
 
 #ifdef REAL_VGA
-		sas_fillsw_16(video_pc_low_regen + cpos, (getBL() << 8) | getAL(), getCX());
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 1503
 		for(i = 0; i < getCX(); i++)
 		{
 #if ( defined(NTVDM) && defined(MONITOR) ) || defined(GISP_SVGA)/* No Ega planes... */
@@ -1550,6 +1714,10 @@ GLOBAL void vd_write_char IFN0()
     register word i, cpos;
     word vd_cols_on_screen;
     half_word vd_cursor_col, vd_cursor_row;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1553
 
     /* Load internal variables with the values stored in BIOS
      * data area.
@@ -1878,10 +2046,9 @@ GLOBAL void vd_read_dot IFN0()
 #define OUTB(port, val) outb(port, val)
 
 #else
-
-#define OUTB( port, val )	(**get_outb_ptr( port ))( port, val )
-
+#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif /* CPU_40_STYLE */
+#line 1885
 
 GLOBAL void vd_write_teletype IFN0()
 {
@@ -1902,13 +2069,22 @@ GLOBAL void vd_write_teletype IFN0()
     register half_word	vd_cursor_row,vd_cursor_col;
     word 		vd_cols_on_screen;
 #ifdef ANSI
-     IMPORT VOID (**get_outb_ptr(io_addr))(io_addr address, half_word value);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 1907
      IMPORT VOID (**get_outb_ptr())();
 #endif
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1909
 
     unsigned short savedAX, savedBX, savedCX, savedIP, savedCS, savedDX;
     unsigned short re_entrant = FALSE;
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1912
 
     /* Load internal variables with the values stored in BIOS
      * data area.
@@ -1928,6 +2104,10 @@ GLOBAL void vd_write_teletype IFN0()
     vd_cursor_col = sas_hw_at_no_check(current_cursor_col);
     vd_cursor_row = sas_hw_at_no_check(current_cursor_row);
 
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1931
     /*
      * First check to see if it is a control character and if so action
      * it here rather than call the write char function.
@@ -1949,6 +2129,10 @@ GLOBAL void vd_write_teletype IFN0()
 	/* Row only should be checked for == (25-1), so in principle
 	 * it ignores LF off the top of the screen.
 	 */
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1952
 	if (vd_cursor_row == VD_ROWS_ON_SCREEN)
 		scroll_required = TRUE;
 	else
@@ -1960,6 +2144,10 @@ GLOBAL void vd_write_teletype IFN0()
         return;			/* after all, shouldn't cause a scroll */
 
     default:
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 1963
         /*
          * It's a real character, place it in the regen buffer.
          */
@@ -1977,10 +2165,16 @@ GLOBAL void vd_write_teletype IFN0()
                  setBH(sas_hw_at_no_check(vd_current_page));
                  setCX(1);
 
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(X86GFX)"
+#else
+#line 1980
                  setCS(VIDEO_IO_SEGMENT);
                  setIP(VIDEO_IO_RE_ENTRY);
                  host_simulate();
 
+#endif	/* NTVDM & MONITOR */
+#line 1984
 
 		/*
 		 * Note: Always make sure CS comes before IP
@@ -2040,6 +2234,10 @@ GLOBAL void vd_write_teletype IFN0()
 	    /* Row only should be checked for == (25-1) and
 	     * only if there was a line wrap.
 	     */
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 2043
 	    if (vd_cursor_row == VD_ROWS_ON_SCREEN)
 		scroll_required = TRUE;
 	    else
@@ -2064,21 +2262,9 @@ GLOBAL void vd_write_teletype IFN0()
     if(alpha_num_mode())
     {
 #ifdef REAL_VGA
-        /*
-         * tell the 6845 all about the change
-         */
-	cur_pos = (sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,
-		vd_cursor_row))>>1; /* Word address, not byte */
-        outb(vd_addr_6845, R14_CURS_ADDRH);
-        outb(vd_addr_6845+1,  cur_pos >> 8);
-        outb(vd_addr_6845, R15_CURS_ADDRL);
-        outb(vd_addr_6845+1,  cur_pos & 0xff);
-	/*
-	 * save the current cursor position in the bios
-	 */
-	sas_store_no_check(current_cursor_col, vd_cursor_col);
-	sas_store_no_check(current_cursor_row , vd_cursor_row);
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
+#line 2082
 	if(re_entrant)
         {
              savedAX = getAX();
@@ -2092,10 +2278,16 @@ GLOBAL void vd_write_teletype IFN0()
              setDH(vd_cursor_row);
              setDL(vd_cursor_col);
 
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(X86GFX)"
+#else
+#line 2095
              setCS(VIDEO_IO_SEGMENT);
              setIP(VIDEO_IO_RE_ENTRY);
              host_simulate();
 
+#endif	/* NTVDM & MONITOR */
+#line 2099
 
 		/*
 		 * Note: Always make sure CS comes before IP
@@ -2149,10 +2341,9 @@ GLOBAL void vd_write_teletype IFN0()
 	 */
 	if (alpha_num_mode()) {
 #ifdef A2CPU
-		ch_addr = video_pc_low_regen + sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,vd_cursor_row) + 1;
-		(*read_pointers.b_read)( (ULONG)get_byte_addr(ch_addr) );
-		attrib = (*get_byte_addr (ch_addr));
+#error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
+#line 2156
 		sas_load( video_pc_low_regen + sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,vd_cursor_row) + 1, &attrib);
 #endif /* A2CPU */
 
@@ -2172,10 +2363,9 @@ GLOBAL void vd_write_teletype IFN0()
 		sensible_graph_scroll_up(0,0, VD_ROWS_ON_SCREEN+1,vd_cols_on_screen,1,0);
 
 #ifdef EGA_DUMP
-	if(!alpha_num_mode())attrib=0;
-	dump_scroll(sas_hw_at_no_check(vd_video_mode),0,video_pc_low_regen,sas_w_at_no_check(VID_ADDR),sas_w_at_no_check(VID_COLS),
-		0,0,vd_rows_on_screen+1,vd_cols_on_screen,1,attrib);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 2179
 
     }
 }
@@ -2368,8 +2558,9 @@ GLOBAL void graphics_write_char IFN5(half_word, x, half_word, y, half_word, wcha
         if ( (char_addr = extend_addr(4*BIOS_EXTEND_CHAR)) == 0)
         {
 #ifndef PROD
-            trace("want extended char but no ex char gen set \n",DUMP_REG);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 2373
             return;
         }
         else
@@ -2490,41 +2681,14 @@ LOCAL void vd_dummy IFN0()
 }
 
 #ifdef REAL_VGA
-/* STF */
-GLOBAL sas_fillsw_16 IFN3(sys_addr, address, word, value, sys_addr, length)
-{
-    register word *to;
-
-    to = (word *)&M[address];
-    while(length--)
-	*to++ = value;
-}
-
-GLOBAL sas_fills_16 IFN3(sys_addr, address, half_word, value, sys_addr, length)
-{
-    register half_word *to;
-
-    to = (half_word *)&M[address];
-    while(length--)
-	*to++ = value;
-}
-/* STF */
-
-GLOBAL VcopyStr IFN3(half_word *, to, half_word *, from, int, len)
-{
-    while(len--)
-	*to++ = *from++;
-}
+#error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
+#line 2519
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 2528
 
 GLOBAL void video_init IFN0()
 {
@@ -2532,8 +2696,9 @@ GLOBAL void video_init IFN0()
     word vd_addr_6845;
     word curmod;
 #ifdef HERC
-    EQUIPMENT_WORD equip_flag;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
+#line 2537
 
 
     /*
@@ -2551,19 +2716,9 @@ GLOBAL void video_init IFN0()
 		video_pc_high_regen = MDA_REGEN_END;
 		break;
 #ifdef HERC
-	case HERCULES:
-		/* put the BW card in the equipment list */
-                equip_flag.all = sas_w_at_no_check(EQUIP_FLAG);
-                equip_flag.bits.video_mode = VIDEO_MODE_80X25_BW;
-		sas_storew_no_check(EQUIP_FLAG, equip_flag.all);
-        	mode = 0x7;
-        	vd_addr_6845  = 0x3B4;
-		video_pc_low_regen = HERC_REGEN_START;
-		video_pc_high_regen = HERC_REGEN_END;
-		herc_video_init();
-		curmod = 0xb0c;	/* cursor is scans 11-12 */
-		break;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
+#line 2567
 #ifdef EGG
     	case EGA:
     	case VGA:
@@ -2595,123 +2750,21 @@ GLOBAL void video_init IFN0()
 }
 
 #ifdef HERC
-GLOBAL void herc_video_init IFN0()
-{
-
-/* Initialize the INTs */
-	sas_storew(BIOS_EXTEND_CHAR*4, EGA_INT1F_OFF);
-	sas_storew(BIOS_EXTEND_CHAR*4+2, EGA_SEG);
-	sas_move_bytes_forward(BIOS_VIDEO_IO*4, 0x42*4, 4);  /* save old INT 10 as INT 42 */
-#ifdef GISP_SVGA
-	if((ULONG) config_inquire(C_GFX_ADAPTER, NULL) == CGA )
-		sas_storew(int_addr(0x10), CGA_VIDEO_IO_OFFSET);
-	else
-#endif      /* GISP_SVGA */
-	sas_storew(BIOS_VIDEO_IO*4, VIDEO_IO_OFFSET);
-	sas_storew(BIOS_VIDEO_IO*4+2, VIDEO_IO_SEGMENT);
-
-
-/* Now set up the EGA BIOS variables */
-	sas_storew(EGA_SAVEPTR,VGA_PARMS_OFFSET);
-	sas_storew(EGA_SAVEPTR+2,EGA_SEG);
-	sas_store(ega_info, 0x00);   /* Clear on mode change, 64K, EGA active, emulate cursor */
-	sas_store(ega_info3, 0xf9);  /* feature bits = 0xF, EGA installed, use 8*14 font */
-	set_VGA_flags(S350 | VGA_ACTIVE | VGA_MONO);
-	host_memset(EGA_planes, 0, 4*EGA_PLANE_SIZE);
-	host_mark_screen_refresh();
-	init_herc_globals();
-	load_herc_font(EGA_CGMN,256,0,0,14);	/* To initialize font */
-}
-
-
-GLOBAL void herc_char_gen IFN0()
-{
-	switch (getAL())
-	{
-		case 3:
-			break;
-		case 0:
-		case 0x10:
-			load_herc_font(effective_addr(getES(),getBP()),getCX(),getDX(),getBL(),getBH());
-			if(getAL()==0x10)
-				recalc_text(getBH());
-			break;
-		case 1:
-		case 0x11:
-			load_herc_font(EGA_CGMN,256,0,getBL(),14);
-			if(getAL()==0x11)
-				recalc_text(14);
-			break;
-
-		case 0x30:
-			setCX(sas_hw_at(ega_char_height));
-			setDL(VD_ROWS_ON_SCREEN);
-			switch (getBH())
-			{
-				case 0:
-					setBP(sas_w_at(BIOS_EXTEND_CHAR*4));
-					setES(sas_w_at(BIOS_EXTEND_CHAR*4+2));
-					break;
-				case 1:
-					setBP(sas_w_at(EGA_FONT_INT*4));
-					setES(sas_w_at(EGA_FONT_INT*4+2));
-					break;
-				case 2:
-					setBP(EGA_CGMN_OFF);
-					setES(EGA_SEG);
-					break;
-
-				default:
-					assert2(FALSE,"Illegal char_gen subfunction %#x %#x",getAL(),getBH());
-			}
-			break;
-		default:
-			assert1(FALSE,"Illegal char_gen %#x",getAL());
-	}
-}
-
-GLOBAL load_herc_font IFN5(sys_addr, table, int, count, int, char_off, int, font_no, int, nbytes)
-{
-	register int i, j;
-	register host_addr font_addr;
-	register sys_addr data_addr;
-	SAVED word font_off[] = { 0, 0x4000, 0x8000, 0xc000, 0x2000, 0x6000, 0xa000, 0xe000 };
-
-	/*
-	 * Work out where to put the font. We know where
-	 * it's going to end up in the planes so ...
-	 */
-
-	font_addr = &EGA_planes[FONT_BASE_ADDR] +
-					(font_off[font_no] << 2) + (FONT_MAX_HEIGHT*char_off << 2);
-	data_addr = table;
-
-	assert2( FALSE, "Font No. = %4d, No. of Bytes/char. def. = %4d", font_no, nbytes );
-
-	for(i=0; i<count; i++) {
-
-		for(j=0; j<nbytes; j++) {
-			*font_addr = sas_hw_at(data_addr++);
-			font_addr += 4;
-		}
-
-		font_addr += ((FONT_MAX_HEIGHT - nbytes) << 2);
-	}
-
-	host_update_fonts();
-}
-
-GLOBAL void herc_alt_sel IFN0()
-{
-        /*
-         * The code previously here caused *ALL* Hercules Display AutoDetect
-	 * programs to fail and to believe that the adaptor is an EGA Mono -vs-
-	 * Hercules. It was designed to allow International Code Pages for DOS
-	 * under Herc Mode. Removing it makes AutoDetect programs work and Herc
-	  Mono CodePages still work ok for dos versions 4.01 and 5.00
-         */
-}
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
+#line 2715
 
 
 
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+
+#else
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // !NEC_98
+#line 2718
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98

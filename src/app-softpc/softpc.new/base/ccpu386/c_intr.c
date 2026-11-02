@@ -33,8 +33,9 @@ Interrupt Support.
 #include <fault.h>
 
 #ifdef PIG
-#include <gdpvar.h>
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 38
 
 /*
    Prototype our internal functions.
@@ -228,17 +229,9 @@ IFN4(
       new_cs = phy_read_word(ivt_addr+2);
 
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
-	/*
-	 * In real mode, there is still an IP limit check.  The new IP is
-	 * compared against the last CS limit from when the program was last
-	 * in protected mode (or 64K if it never was).  For us, this is stored
-	 * in the CS limit field. (cf i486PRM page 22-4)
-	 */
-
-      if ( new_ip > GET_CS_LIMIT() )
-	 GP((IU16)0, FAULT_INTR_RM_CS_LIMIT);
-
+#error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else	/* TAKE_REAL_MODE_LIMIT_FAULT */
+#line 238
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it
@@ -255,18 +248,17 @@ IFN4(
       if ( doing_fault )
       {
 #ifdef PIG
-         if (GLOBAL_RF_OnXcptnWanted)
-	    flags |= BIT16_MASK;   /* SET RF bit */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 261
 	 flags |= BIT16_MASK;   /* SET RF bit */
 #endif
       }
 
 #ifdef PIG
-      if (vector < 31 && (((1 << vector) & NO_FLAGS_EXCEPTION_MASK) != 0))
-         spush_flags(flags);
-      else
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 270
          spush(flags);
 
       spush16((IU32)GET_CS_SELECTOR());
@@ -327,18 +319,17 @@ IFN4(
 	 if ( doing_fault )
          {
 #ifdef PIG
-            if (GLOBAL_RF_OnXcptnWanted)
-	       flags |= BIT16_MASK;   /* SET RF bit */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 333
 	    flags |= BIT16_MASK;   /* SET RF bit */
 #endif
          }
 
 #ifdef PIG
-	 if (vector < 31 && (((1 << vector) & NO_FLAGS_EXCEPTION_MASK) != 0))
-	    spush_flags(flags);
-	 else
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 342
 	    spush(flags);
 
 
@@ -402,9 +393,9 @@ IFN4(
 	 if ( doing_fault )
          {
 #ifdef PIG
-            if (GLOBAL_RF_OnXcptnWanted)
-	       flags |= BIT16_MASK;   /* SET RF bit */
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else
+#line 408
 	    flags |= BIT16_MASK;   /* SET RF bit */
 #endif
          }
@@ -458,10 +449,9 @@ IFN4(
 
 	 /* push old flags */
 #ifdef PIG
-	 if (vector < 31 && (((1 << vector) & NO_FLAGS_EXCEPTION_MASK) != 0))
-	    spush_flags(flags);
-	 else
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 465
 	    spush(flags);
 
 	 /* push return address */
@@ -489,24 +479,13 @@ IFN4(
       }
    EXT = INTERNAL;
 #ifdef	PIG
-   save_last_inst_details("do_intr");
-   pig_cpu_action = CHECK_ALL;
-   /* If the destination is going to page fault, or need
-    * accessing, then the EDL CPU will do so before issuing
-    * the pig synch. We use the dasm386 decode to prefetch
-    * a single instruction which mimics the EDL Cpu's behaviour
-    * when close to a page boundary.
-    */
-   prefetch_1_instruction();	/* Will PF if destination not present */
-   ccpu_synch_count++;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #else /* !PIG */
+#line 503
 #ifdef SYNCH_TIMERS
-   if (doing_fault)
-      {
-      extern void SynchTick IPT0();
-      SynchTick();
-      }
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
+#line 510
 #endif /* PIG */
    /* mark successful end to interrupt */
    doing_fault = FALSE;
@@ -514,6 +493,7 @@ IFN4(
    doing_page_fault = FALSE;
    doing_double_fault = FALSE;
 #ifdef PIG
-   c_cpu_unsimulate();
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
+#line 519
    }

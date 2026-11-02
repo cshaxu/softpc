@@ -1,0 +1,11 @@
+path	parent_if_line	baseline_else_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/inc/cpu_vid.h	88	98	106	if	defined(CPU_40_STYLE) && defined(C_VID)	8931ce3400b131781497d5c2e108ddc094b1d3ea0c31794e6397074616b3c11a
+base/inc/gmi.h	19	31	40	if	defined(CPU_40_STYLE) && defined(C_VID)	afe891b3ff4db55440e388c5f2562071e6f03664b091f56253dbca855c3fd16e
+base/support/ios.c	155	158	166	ifdef	PROD	1d118138a37ebd9d8722624a4caabdc943e024f36d812e6603398f238c90e116
+base/support/ios.c	182	184	192	ifdef	PROD	d57f77afe342c9d8663089b0b4a29a2c5a783938109c4face483d454bfee2e5e
+host/inc/cfpu_def.h	21	25	30	ifdef	LITTLEND	6744a02dc49f6b302a5a31274098858c705f63042fab8eb281381f4b77bffeef
+host/inc/cfpu_def.h	33	37	42	ifdef	LITTLEND	6848c48485760a208f184360a6e7abf84613e64b7a68aa5c1f3491379115a8c2
+host/inc/cfpu_def.h	45	48	52	ifdef	LITTLEND	87c0d7d1a625f977e5775f2d2af2f282a3c589bc23269749facf8eac36635167
+host/inc/cfpu_def.h	57	60	64	ifdef	LITTLEND	72c6fd2d35ceefa3302298538c6024168b252487acabc55154385693f2c6dbb7
+host/inc/cfpu_def.h	68	72	76	ifdef	LITTLEND	74e8e56ea8259d5c784d05aa5a9450a6be64f3b8d2fd8384b7af6ce782822602
+host/inc/cfpu_def.h	85	88	92	ifdef	LITTLEND	c710f299c2ce01fc21fc11009f52ba5e2b440fc05e81c111f3756ad83973783f

@@ -43,18 +43,16 @@
  *
  */
 
+/* @(#)fla.c	1.18 07/06/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)fla.c	1.18 07/06/94 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 49
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_FLOPPY.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 58
 
 
 /*
@@ -168,8 +166,9 @@ static half_word fdc_result_count;
 /* The following sector buffer is used for non_dma transfers */
 
 #ifdef macintosh
-char *fla_ndma_buffer; /* so that host_init can 'see' it to malloc() it. */
+#error "Unsupported SoftPC mirror configuration: macintosh"
 #else
+#line 171
 static char fla_ndma_buffer[8192];
 #endif
 static int fla_ndma_buffer_count;
@@ -180,19 +179,9 @@ static int fla_ndma_sector_size;
  */
 
 #ifdef BIT_ORDER1
-typedef union {
-	 	half_word all;
-		struct {
-			 HALF_WORD_BIT_FIELD motor_3_on:1;
-			 HALF_WORD_BIT_FIELD motor_2_on:1;
-			 HALF_WORD_BIT_FIELD motor_1_on:1;
-			 HALF_WORD_BIT_FIELD motor_0_on:1;
-			 HALF_WORD_BIT_FIELD interrupts_enabled:1;
-			 HALF_WORD_BIT_FIELD not_reset:1;
-			 HALF_WORD_BIT_FIELD drive_select:2;
-		       } bits;
-	      } DOR;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 194
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -389,6 +378,8 @@ void fla_ndma_req_rd IFN2(char *,buf,int,n)
 
 void fla_inb IFN2(io_addr, port, half_word *,value)
 {
+#ifndef NEC_98
+#line 295
 
 
     note_trace0_no_nl(FLA_VERBOSE, "fla_inb() ");
@@ -532,12 +523,9 @@ void fla_inb IFN2(io_addr, port, half_word *,value)
 			break;
 	}
 #ifndef PROD
-	if( *value==DUAL_CARD_ID ){
-		note_trace0( FLA_VERBOSE, "Dual Card\n" );
-	}else{
-		note_trace0( FLA_VERBOSE, "No Dual Card\n" );
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 541
     }
     else
     {
@@ -549,11 +537,15 @@ void fla_inb IFN2(io_addr, port, half_word *,value)
     fla_busy = FALSE;
 
 
+#endif // !NEC_98
+#line 552
 }
 
 
 void fla_outb IFN2(io_addr, port, half_word, value)
 {
+#ifndef NEC_98
+#line 557
     int i;
     DOR new_dor;
 
@@ -808,13 +800,15 @@ void fla_outb IFN2(io_addr, port, half_word, value)
     }
 
 #ifndef PROD
-    else
-        note_trace0(FLA_VERBOSE, "<unknown port>");
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 814
 
     fla_busy = FALSE;
 
 
+#endif // !NEC_98
+#line 818
 }
 
 
@@ -840,6 +834,10 @@ LOCAL	void fla_int_call_back IFN1(long,junk)
 	fla_hw_interrupt();
 }
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else    /* NTVDM */
+#line 843
 
 /*
  * This routine will 'automatically' execute the current FDC command.
@@ -915,6 +913,8 @@ static void fla_atomicxqt IFN0()
 		fdc_status |= FDC_DIO;
 	}
 }
+#endif    /* NTVDM */
+#line 899
 
 
 static void fdc_request_write_data_to_cpu IFN0()
@@ -1152,16 +1152,14 @@ static void fla_ndma_unbump_sectid IFN0()
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * function will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 1143
 
 void fla_init IFN0()
 {
+#ifndef NEC_98
+#line 1165
     io_addr i;
 
     note_trace0(FLA_VERBOSE, "fla_init() called");
@@ -1195,4 +1193,6 @@ void fla_init IFN0()
 
     fla_ndma = FALSE;
     fla_busy = FALSE;
+#endif // !NEC_98
+#line 1198
 }

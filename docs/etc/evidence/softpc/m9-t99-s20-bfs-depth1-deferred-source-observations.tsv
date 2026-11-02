@@ -1,0 +1,26 @@
+path	line	directive	group_condition	x86	x64	source_sha256	disposition
+base/bios/reset.c	897	if	defined (GEN_DRVR) || defined (CDROM)	not-observed	not-observed	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	converted-to-excluded-error
+base/ccpu386/c_main.c	757	else	defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)	not-observed	not-observed	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	converted-to-excluded-error
+base/ccpu386/c_main.c	4666	else	defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)	not-observed	not-observed	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	converted-to-excluded-error
+base/ccpu386/c_main.c	4685	else	defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)	not-observed	not-observed	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	converted-to-excluded-error
+base/ccpu386/c_main.c	4701	else	defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)	not-observed	not-observed	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	converted-to-excluded-error
+base/ccpu386/fpu.c	1741	if	(HOST_BIAS >= 16383)	not-observed	not-observed	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	converted-to-excluded-error
+base/ccpu386/fpu.c	1856	if	(HOST_BIAS >= 16383)	not-observed	not-observed	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	converted-to-excluded-error
+base/comms/com.c	386	if	!defined(PROD) || defined(SHORT_TRACE)	not-observed	not-observed	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	converted-to-excluded-error
+base/comms/rs232_io.c	47	if	defined(IP32) || defined(TK43) || defined(macintosh)	not-observed	not-observed	c81e2bc7ad44561cf628a302c5195505ef9e55ee9e1dff0420a5ed418b982b34	converted-to-excluded-error
+base/keymouse/keybd_io.c	448	if	defined(NTVDM) || defined(GISP_CPU)	not-observed	not-observed	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	converted-to-excluded-error
+base/system/cmos.c	66	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	79	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	526	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	548	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	592	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	759	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	764	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	907	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	1014	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	1022	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/cmos.c	1031	if	defined(NTVDM) || defined(macintosh)	not-observed	not-observed	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	converted-to-excluded-error
+base/system/ica.c	1288	else	defined(HOOKED_IRETS) || defined(NTVDM)	not-observed	not-observed	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	converted-to-excluded-error
+base/system/quick_ev.c	510	if	(defined(NTVDM) && defined(MONITOR)) || defined(GISP_CPU)	not-observed	not-observed	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	converted-to-excluded-error
+base/system/timer.c	708	if	defined(NTVDM) || defined(GISP_SVGA)	not-observed	not-observed	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	converted-to-excluded-error
+base/video/egwrtm12.c	4	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	selected	selected	d21794539be547da13d13c1ec5fdf82e77d6b0f605bc206821e4562aca76ee9b	selected-existing-complete-or-retained

@@ -105,8 +105,9 @@ GLOBALS		  :	uses EGA_GRAPH struct, specially display_state to decide which mode
 #include	"host_gfx.h"
 
 #ifdef GORE
-#include	"gore.h"
+#error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
+#line 110
 
 /* [3.1.2 DECLARATIONS]                                                 */
 
@@ -123,13 +124,9 @@ boolean	(*choose_display_mode)();
 
 /* [5.1.1 #DEFINES]							*/
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_EGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 133
 
 /* [5.1.2 TYPEDEF, STRUCTURE, ENUM DECLARATIONS]			*/
 
@@ -612,8 +609,9 @@ DISPLAY_MODE	mode;
 		case EGA_LO:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GORE
-			set_gfx_update_routines( process_object_list, EGA_GRAPHICS_MARKING, EGA_GRAPH_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GORE"
 #else
+#line 613
 			set_gfx_update_routines( ega_graph_update, EGA_GRAPHICS_MARKING, EGA_GRAPH_SCROLL );
 #endif /* GORE */
 			break;
@@ -652,8 +650,9 @@ DISPLAY_MODE	mode;
 			assert1(NO,"Funny memory organisation selected %s", get_mode_string(mode) );
 			do_display_trace("dumping EGA_GRAPH struct ...", dump_EGA_GRAPH());
 #ifdef GORE
-			set_gfx_update_routines( process_object_list, EGA_GRAPHICS_MARKING, NO_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GORE"
 #else
+#line 653
 			set_gfx_update_routines( ega_graph_update, EGA_GRAPHICS_MARKING, NO_SCROLL );
 #endif /* GORE */
 			break;

@@ -35,12 +35,9 @@ BOUND CPU functions.
 GLOBAL VOID
 BOUND
 #ifdef ANSI
-   (
-   IU32 op1,		/* lsrc(test value) operand */
-   IU32 op2[2],	/* rsrc(lower:upper pair) operand */
-   IUM8 op_sz		/* 16 or 32-bit */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 44
    (op1, op2, op_sz)
    IU32 op1;
    IU32 op2[2];

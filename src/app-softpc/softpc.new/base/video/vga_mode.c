@@ -111,8 +111,9 @@ GLOBALS		  :	uses EGA_GRAPH struct, specially display_state to
 #include	"host_gfx.h"
 
 #ifdef GORE
-#include	"gore.h"
+#error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
+#line 116
 
 /* [3.1.2 DECLARATIONS]                                                 */
 
@@ -121,9 +122,9 @@ GLOBALS		  :	uses EGA_GRAPH struct, specially display_state to
 #include	"egamode.h"
 
 #ifdef GISP_SVGA
-#include HostHwVgaH
-#include "hwvga.h"
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 127
 
 /*
 5.MODULE INTERNALS   :   (not visible externally, global internally)]
@@ -132,13 +133,9 @@ GLOBALS		  :	uses EGA_GRAPH struct, specially display_state to
 
 /* [5.1.1 #DEFINES]							*/
 #ifdef SEGMENTATION
-/*
- * The following #define specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_VGA.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 142
 
 /* [5.1.2 TYPEDEF, STRUCTURE, ENUM DECLARATIONS]			*/
 
@@ -160,6 +157,10 @@ GLOBALS		  :	uses EGA_GRAPH struct, plane_mask to decide which planes are enable
 LOCAL VOID
 set_up_screen_ptr()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 163
 	if( get_chain4_mode() )
 	{
 		if (all_planes_enabled())
@@ -180,6 +181,8 @@ set_up_screen_ptr()
 		}
 		else
 			set_screen_ptr(EGA_planes);
+#endif  //NEC_98
+#line 183
 }
 
 /* -----------------------------------------------------------------------
@@ -192,8 +195,9 @@ IMPORT	DISPLAY_MODE	choose_mode[];
 /* [5.2.2 INTERNAL PROCEDURE DEFINITIONS]				*/
 
 #ifdef GISP_SVGA
-	    extern void mon_text_update();
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 197
 
 static	void	set_update_routine(mode)
 DISPLAY_MODE	mode;
@@ -205,9 +209,15 @@ DISPLAY_MODE	mode;
 	}
 	note_display_state1("VGA set_update_routine(%s)", get_mode_string(mode) );
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif	/* MONITOR */
+#line 208
 /* NTVDM monitor: All text monitor cases dealt with. For frozen graphics */
 /* now fall through to do decode to correct paint routines per mode */
 
+#ifndef NEC_98
+#line 211
 	switch (mode) {
 		case EGA_TEXT_40_SP_WR:
 		case EGA_TEXT_80_SP_WR:
@@ -215,9 +225,9 @@ DISPLAY_MODE	mode;
 		case CGA_TEXT_80_SP_WR:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
-			set_gfx_update_routines( mon_text_update, SIMPLE_MARKING, NO_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else /* GISP_SVGA */
+#line 221
 			set_gfx_update_routines( ega_wrap_split_text_update, SIMPLE_MARKING, NO_SCROLL );
 #endif /* GISP_SVGA */
 			host_update_fonts();
@@ -228,9 +238,9 @@ DISPLAY_MODE	mode;
 		case CGA_TEXT_80_SP:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
-			set_gfx_update_routines( mon_text_update, SIMPLE_MARKING, NO_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else /* GISP_SVGA */
+#line 234
 			set_gfx_update_routines( ega_split_text_update, SIMPLE_MARKING, NO_SCROLL );
 #endif /* GISP_SVGA */
 			host_update_fonts();
@@ -239,9 +249,9 @@ DISPLAY_MODE	mode;
 		case EGA_TEXT_80_WR:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
-			set_gfx_update_routines( mon_text_update, SIMPLE_MARKING, NO_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else /* GISP_SVGA */
+#line 245
 			set_gfx_update_routines( ega_wrap_text_update, SIMPLE_MARKING, NO_SCROLL );
 #endif /* GISP_SVGA */
 			host_update_fonts();
@@ -250,9 +260,9 @@ DISPLAY_MODE	mode;
 		case EGA_TEXT_80:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
-			set_gfx_update_routines( mon_text_update, SIMPLE_MARKING, TEXT_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else /* GISP_SVGA */
+#line 256
 			set_gfx_update_routines( ega_text_update, SIMPLE_MARKING, TEXT_SCROLL );
 #endif /* GISP_SVGA */
 			host_update_fonts();
@@ -261,8 +271,9 @@ DISPLAY_MODE	mode;
 		case CGA_TEXT_80_WR:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 266
 			set_gfx_update_routines( ega_wrap_text_update, SIMPLE_MARKING, NO_SCROLL );
 			host_update_fonts();
 			break;
@@ -270,8 +281,9 @@ DISPLAY_MODE	mode;
 		case CGA_TEXT_80:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 275
 			assert1( get_screen_height() == 200, "screen height %d for text mode", get_screen_height() );
 			set_gfx_update_routines( text_update, SIMPLE_MARKING, TEXT_SCROLL );
 			host_update_fonts();
@@ -279,17 +291,17 @@ DISPLAY_MODE	mode;
 		case CGA_MED:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 2;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 285
 			set_gfx_update_routines( cga_med_graph_update, CGA_GRAPHICS_MARKING, CGA_GRAPH_SCROLL );
 			break;
 		case CGA_HI:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 4;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 293
 			set_gfx_update_routines( cga_hi_graph_update, CGA_GRAPHICS_MARKING, CGA_GRAPH_SCROLL );
 			break;
 		case EGA_HI_WR:
@@ -297,9 +309,9 @@ DISPLAY_MODE	mode;
 		case EGA_LO_WR:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 4;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 303
 			set_gfx_update_routines( ega_wrap_graph_update, EGA_GRAPHICS_MARKING, NO_SCROLL );
 			break;
 		case EGA_HI:
@@ -307,15 +319,13 @@ DISPLAY_MODE	mode;
 		case EGA_LO:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 4;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 313
 #ifdef GORE
-			if (get_256_colour_mode())
-			    set_gfx_update_routines( process_object_list, EGA_GRAPHICS_MARKING, VGA_GRAPH_SCROLL );
-			else
-			    set_gfx_update_routines( process_object_list, EGA_GRAPHICS_MARKING, EGA_GRAPH_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GORE"
 #else
+#line 319
 			if (get_256_colour_mode())
 			    set_gfx_update_routines( vga_graph_update, EGA_GRAPHICS_MARKING, VGA_GRAPH_SCROLL );
 			else
@@ -327,9 +337,9 @@ DISPLAY_MODE	mode;
 		case EGA_LO_SP_WR:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 4;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 333
 			set_gfx_update_routines( ega_wrap_split_graph_update, EGA_GRAPHICS_MARKING, NO_SCROLL );
 			break;
 
@@ -338,8 +348,9 @@ DISPLAY_MODE	mode;
 		case EGA_LO_SP:
 			assert0( !is_it_text(), "In graphics memory mode, but not in graphics mode !!" );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 343
 			if (get_256_colour_mode())
 				set_gfx_update_routines(vga_split_graph_update,
 					EGA_GRAPHICS_MARKING, NO_SCROLL);
@@ -352,8 +363,9 @@ DISPLAY_MODE	mode;
 		case TEXT_80_FUN:
 			assert1(NO,"Funny memory organisation selected %s", get_mode_string(mode) );
 #ifdef GISP_SVGA
-			videoInfo.modeType = TEXT;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 357
 			do_display_trace("dumping EGA_GRAPH struct ...", dump_EGA_GRAPH());
 			set_gfx_update_routines( text_update, SIMPLE_MARKING, NO_SCROLL );
 			host_update_fonts();
@@ -361,17 +373,18 @@ DISPLAY_MODE	mode;
 		case CGA_HI_FUN:
 			assert1(NO,"Funny memory organisation selected %s", get_mode_string(mode) );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 366
 			do_display_trace("dumping EGA_GRAPH struct ...", dump_EGA_GRAPH());
 			set_gfx_update_routines( cga_hi_graph_update, CGA_GRAPHICS_MARKING, NO_SCROLL );
 			break;
 		case CGA_MED_FUN:
 			assert1(NO,"Funny memory organisation selected %s", get_mode_string(mode) );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 4;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 375
 			do_display_trace("dumping EGA_GRAPH struct ...", dump_EGA_GRAPH());
 			set_gfx_update_routines( cga_med_graph_update, CGA_GRAPHICS_MARKING, NO_SCROLL );
 			break;
@@ -380,30 +393,35 @@ DISPLAY_MODE	mode;
 		case EGA_LO_FUN:
 			assert1(NO,"Funny memory organisation selected %s", get_mode_string(mode) );
 #ifdef GISP_SVGA
-			videoInfo.modeType = GRAPH;
-			videoInfo.numPlanes = 4;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 386
 			do_display_trace("dumping EGA_GRAPH struct ...", dump_EGA_GRAPH());
 #ifdef GORE
-			set_gfx_update_routines( process_object_list, EGA_GRAPHICS_MARKING, NO_SCROLL );
+#error "Unsupported SoftPC mirror configuration: GORE"
 #else
+#line 390
 			set_gfx_update_routines( ega_graph_update, EGA_GRAPHICS_MARKING, NO_SCROLL );
 #endif /* GORE */
 			break;
 		case DUMMY_FUN:
 			assert0(NO,"Using the dummy mode!!");
 #ifdef GISP_SVGA
-			videoInfo.modeType = UNIMP;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 398
 			set_gfx_update_routines( dummy_calc, SIMPLE_MARKING, NO_SCROLL );
 			break;
 		default:
 			assert1(NO,"Bad display mode %d", (int) mode );
 #ifdef GISP_SVGA
-			videoInfo.modeType = UNIMP;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 405
 			break;
 	}
+#endif  //NEC_98
+#line 407
 }
 
 
@@ -419,6 +437,8 @@ DISPLAY_MODE	mode;
 
 boolean	choose_vga_display_mode()
 {
+#ifndef NEC_98
+#line 422
 	DISPLAY_MODE	mode;
 
 	note_entrance0("choose vga display mode");
@@ -506,8 +526,9 @@ boolean	choose_vga_display_mode()
 		/* For the 2 & 4 colour modes 63h & 64h */
 		mode = EGA_HI;
 #else
-		mode = DUMMY_FUN;
+#error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
+#line 511
 	else
 		mode = choose_mode[get_munged_index()];
 
@@ -533,9 +554,15 @@ boolean	choose_vga_display_mode()
 	 */
 
 	screen_refresh_required();
+#endif  //NEC_98
+#line 536
 	return TRUE;
 }
 
 #endif /* EGG */
 #endif /* REAL_VGA */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif  //NEC_98
+#line 745

@@ -500,6 +500,10 @@ typedef struct {
 #define GFI_DRIVE_TYPE_144		4	/* 1.44M 3.5" */
 #define	GFI_DRIVE_TYPE_288		5	/* 2.88M 3.5" */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 506
 
 
 /***************************************************************************

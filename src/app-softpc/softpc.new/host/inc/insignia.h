@@ -35,28 +35,23 @@ DbgPrint(
 #define VOID            void            /* Nothing */
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)    /* Types already defined by windows */
-typedef char            CHAR;           /* Used as a text character */
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 40
 
 typedef signed char     TINY;            /* 8-bit signed integer */
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)    /* Types already defined by windows */
-typedef short           SHORT;          /* 16-bit signed integer */
-//typedef long            LONG;           /* 32-bit signed integer */
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 47
 
 typedef unsigned char   UTINY;          /* 8-bit unsigned integer */
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)    /* Types already defined by windows */
-typedef unsigned char   UCHAR;          /*  8-bit unsigned integer */
-typedef unsigned short  USHORT;         /* 16-bit unsigned integer */
-//typedef unsigned long   ULONG;          /* 32-bit unsigned integer */
-typedef unsigned short  WORD;           /* 16-bit unsigned integer */
-typedef unsigned long   DWORD;          /* 32-bit unsigned integer */
-
-typedef float           FLOAT;          /* 32-bit floating point */
-//typedef double          DOUBLE;         /* 64-bit floating point */
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 60
 
 
 typedef double          EXTENDED;       /* >64-bit floating point */
@@ -94,29 +89,30 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
  */
 
 #ifndef FALSE
-#define FALSE           ((BOOL) 0)      /* Boolean falsehood value */
-#define TRUE            (!FALSE)        /* Boolean truth value */
+#error "Unsupported SoftPC mirror configuration: !FALSE"
 #endif
+#line 100
 
 #ifndef STRINGIFY
-#define STRINGIFY(x)    #x
+#error "Unsupported SoftPC mirror configuration: !STRINGIFY"
 #endif
+#line 104
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)   /* Types already defined by windows */
-//typedef int INT;
-typedef unsigned int UINT;
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
+#line 109
 
 #ifndef NULL
-#define NULL            (0L)    /* Null pointer value */
+#error "Unsupported SoftPC mirror configuration: !NULL"
 #endif
+#line 113
 
 #ifndef BOOL
 #ifdef NT_INCLUDED
-#if !defined(_WINDOWS_) 			  /* Types already defined by windows */
-typedef int BOOL;	/* only defined in windows */
-#endif
+#error "Unsupported SoftPC mirror configuration: NT_INCLUDED"
 #else
+#line 120
 #define BOOL UINT
 #endif
 #endif
@@ -155,40 +151,9 @@ typedef int BOOL;	/* only defined in windows */
 */
 
 #ifdef  ANSI
-
-/* Function prototypes */
-
-#define IPT0()                                  (void)
-#define IPT1(t1, n1)                            (t1 n1)
-#define IPT2(t1, n1, t2, n2)                    (t1 n1, t2 n2)
-#define IPT3(t1, n1, t2, n2, t3, n3)            (t1 n1, t2 n2, t3 n3)
-#define IPT4(t1, n1, t2, n2, t3, n3, t4, n4)    (t1 n1, t2 n2, t3 n3, t4 n4)
-#define IPT5(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5)
-#define IPT6(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6)
-#define IPT7(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6, t7, n7) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6, t7 n7)
-#define IPT8(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6, t7, n7, t8, n8) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6, t7 n7, t8 n8)
-
-/* Function definitions */
-
-#define IFN0()                                  (void)
-#define IFN1(t1, n1)                            (t1 n1)
-#define IFN2(t1, n1, t2, n2)                    (t1 n1, t2 n2)
-#define IFN3(t1, n1, t2, n2, t3, n3)            (t1 n1, t2 n2, t3 n3)
-#define IFN4(t1, n1, t2, n2, t3, n3, t4, n4)    (t1 n1, t2 n2, t3 n3, t4 n4)
-#define IFN5(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5)
-#define IFN6(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6)
-#define IFN7(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6, t7, n7) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6, t7 n7)
-#define IFN8(t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6, t7, n7, t8, n8) \
-        (t1 n1, t2 n2, t3 n3, t4 n4, t5 n5, t6 n6, t7 n7, t8 n8)
-
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else   /* ANSI */
+#line 192
 
 /* Function prototypes */
 

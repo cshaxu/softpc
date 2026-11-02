@@ -1,0 +1,936 @@
+path	line	directive	expression	x86_contexts	x64_contexts	file_sha256	result
+base/bios/bootstra.c	3	ifdef	SECURE	1	1	6ca5afc63c23a4777656fad30bea5a0d582ab488f5c18530f44bf5c591b45925	not-selected-in-all-recorded-contexts
+base/bios/bootstra.c	46	ifdef	SCCSID	1	1	6ca5afc63c23a4777656fad30bea5a0d582ab488f5c18530f44bf5c591b45925	not-selected-in-all-recorded-contexts
+base/bios/bootstra.c	51	ifdef	SEGMENTATION	1	1	6ca5afc63c23a4777656fad30bea5a0d582ab488f5c18530f44bf5c591b45925	not-selected-in-all-recorded-contexts
+base/bios/bootstra.c	72	ifdef	SECURE	1	1	6ca5afc63c23a4777656fad30bea5a0d582ab488f5c18530f44bf5c591b45925	not-selected-in-all-recorded-contexts
+base/bios/bootstra.c	89	ifdef	SECURE	1	1	6ca5afc63c23a4777656fad30bea5a0d582ab488f5c18530f44bf5c591b45925	not-selected-in-all-recorded-contexts
+base/bios/bootstra.c	105	ifdef	SECURE	1	1	6ca5afc63c23a4777656fad30bea5a0d582ab488f5c18530f44bf5c591b45925	not-selected-in-all-recorded-contexts
+base/bios/cmos_bis.c	38	ifdef	SEGMENTATION	1	1	61df9dab59ebfb854791b372139f0f1c99605d82bec6fdc91b8ec14cd8d928f9	not-selected-in-all-recorded-contexts
+base/bios/equipmnt.c	23	ifdef	SEGMENTATION	1	1	d72ffc536de2d78b8e1f937571f44f7337b999bff6249795482b0c6d2a26b15f	not-selected-in-all-recorded-contexts
+base/bios/mem_size.c	17	ifdef	SCCSID	1	1	f2bfa9827245f9f5525bd44ea0a7800a11baf66d0ca0c28a9ba267e71d2d10e6	not-selected-in-all-recorded-contexts
+base/bios/mem_size.c	22	ifdef	SEGMENTATION	1	1	f2bfa9827245f9f5525bd44ea0a7800a11baf66d0ca0c28a9ba267e71d2d10e6	not-selected-in-all-recorded-contexts
+base/bios/rom_basc.c	16	ifdef	SEGMENTATION	1	1	4cb7c96dc8ef8a4bc6e4d951831c286ccd72751c204580170122e0dd0b8d0244	not-selected-in-all-recorded-contexts
+base/bios/slave_bs.c	34	ifdef	SCCSID	1	1	8d8119252a9839b7c92046e2942d509e755fe291396e076769d8aa02d93dfe58	not-selected-in-all-recorded-contexts
+base/bios/slave_bs.c	39	ifdef	SEGMENTATION	1	1	8d8119252a9839b7c92046e2942d509e755fe291396e076769d8aa02d93dfe58	not-selected-in-all-recorded-contexts
+base/ccpu386/bound.c	37	ifdef	ANSI	1	1	4100861f75038de34e594e8792963f902e6bdd7eb3356661b64aff80811be664	not-selected-in-all-recorded-contexts
+base/ccpu386/c_bsic.c	136	ifdef	SPC486	1	1	4b31b87327b6f9c18e8b8e0b86c471130b8085b8f571d2eb3843d50f6f903355	not-selected-in-all-recorded-contexts
+base/ccpu386/c_bsic.c	306	else		1	1	4b31b87327b6f9c18e8b8e0b86c471130b8085b8f571d2eb3843d50f6f903355	not-selected-in-all-recorded-contexts
+base/ccpu386/c_bsic.c	336	ifdef	SPC486	1	1	4b31b87327b6f9c18e8b8e0b86c471130b8085b8f571d2eb3843d50f6f903355	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	35	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	231	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	250	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	258	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	321	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	329	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	395	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	451	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	481	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_intr.c	495	ifdef	PIG	1	1	b10c4567cf416b4b1513b0fa479cdc8292c0c13ef5bae2cac69a02fdb9afedfe	not-selected-in-all-recorded-contexts
+base/ccpu386/c_page.c	70	ifdef	PIG	1	1	2124135bcf43564cfaf053773c9500e2e596b5e840461fa9287222be0300e6a7	not-selected-in-all-recorded-contexts
+base/ccpu386/c_page.c	692	ifdef	PIG	1	1	2124135bcf43564cfaf053773c9500e2e596b5e840461fa9287222be0300e6a7	not-selected-in-all-recorded-contexts
+base/ccpu386/c_reg.c	41	ifdef	PIG	1	1	f60d641210ee7b8c833c59b31445117c66c9dd31a8076db0d01c65d666557084	not-selected-in-all-recorded-contexts
+base/ccpu386/c_reg.c	1202	ifdef	SPC486	1	1	f60d641210ee7b8c833c59b31445117c66c9dd31a8076db0d01c65d666557084	not-selected-in-all-recorded-contexts
+base/ccpu386/c_reg.c	1371	ifdef	SPC486	1	1	f60d641210ee7b8c833c59b31445117c66c9dd31a8076db0d01c65d666557084	not-selected-in-all-recorded-contexts
+base/ccpu386/c_reg.c	1500	ifdef	SPC486	1	1	f60d641210ee7b8c833c59b31445117c66c9dd31a8076db0d01c65d666557084	not-selected-in-all-recorded-contexts
+base/ccpu386/c_seg.c	77	ifdef	SPC486	1	1	f6c7dc897d8d41d057bb7fea5eb8332363dc2ed23be72c85c072ebd8e12f04c8	not-selected-in-all-recorded-contexts
+base/ccpu386/c_seg.c	117	ifdef	SPC486	1	1	f6c7dc897d8d41d057bb7fea5eb8332363dc2ed23be72c85c072ebd8e12f04c8	not-selected-in-all-recorded-contexts
+base/ccpu386/c_seg.c	307	ifdef	SPC486	1	1	f6c7dc897d8d41d057bb7fea5eb8332363dc2ed23be72c85c072ebd8e12f04c8	not-selected-in-all-recorded-contexts
+base/ccpu386/c_stack.c	30	if	defined(PIG) && !defined(PROD)	1	1	4101cded7f18a17af70d970cec1d86519f8c21a640217c701aa2a010865751b0	not-selected-in-all-recorded-contexts
+base/ccpu386/c_stack.c	257	ifdef	PIG	1	1	4101cded7f18a17af70d970cec1d86519f8c21a640217c701aa2a010865751b0	not-selected-in-all-recorded-contexts
+base/ccpu386/c_stack.c	293	ifdef	PIG_DONT_CHECK_OTHER_WORD_ON_STACK	1	1	4101cded7f18a17af70d970cec1d86519f8c21a640217c701aa2a010865751b0	not-selected-in-all-recorded-contexts
+base/ccpu386/c_stack.c	300	ifdef	PIG	1	1	4101cded7f18a17af70d970cec1d86519f8c21a640217c701aa2a010865751b0	not-selected-in-all-recorded-contexts
+base/ccpu386/c_stack.c	377	ifdef	SPC486	1	1	4101cded7f18a17af70d970cec1d86519f8c21a640217c701aa2a010865751b0	not-selected-in-all-recorded-contexts
+base/ccpu386/c_stack.c	555	ifdef	PIG	1	1	4101cded7f18a17af70d970cec1d86519f8c21a640217c701aa2a010865751b0	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	275	ifdef	SPC486	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	327	ifdef	SPC486	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	399	ifdef	SPC486	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	469	ifdef	SPC486	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	546	ifdef	PIG	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	555	ifdef	PIG	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	741	ifdef	SPC486	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	782	ifdef	SPC486	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	825	ifdef	PIG	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	834	ifdef	PIG	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tlb.c	876	ifdef	PIG	1	1	dc386aa415d234cdf0a137135cb0cac8e9847b10e8bd64a968722cf981ca8bf3	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tsksw.c	286	ifdef	PIG	1	1	978a56da875ec54496dadb12d59bbecefde45def01051ddaf4500a13d9259e3b	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tsksw.c	338	ifdef	PIG	1	1	978a56da875ec54496dadb12d59bbecefde45def01051ddaf4500a13d9259e3b	not-selected-in-all-recorded-contexts
+base/ccpu386/c_tsksw.c	562	if	0	1	1	978a56da875ec54496dadb12d59bbecefde45def01051ddaf4500a13d9259e3b	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	161	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	187	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	199	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	243	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	255	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	299	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	311	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	356	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	368	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	416	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	429	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	557	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xcptn.c	568	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xfer.c	143	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	4e45d3d9631f96393b7705e5772c7afe62dbeded4d7c3015e8177b592a0b2880	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xtrn.c	22	if	0	1	1	cf25e07bceea7e7015fb31c93541a79228de4a97d4c0bb0ebb8322b344ddfc97	not-selected-in-all-recorded-contexts
+base/ccpu386/call.c	42	ifdef	ANSI	1	1	9ff24b95fc56adc581324a27af043ceb9696bac84e70cba54671f12725bd1f84	not-selected-in-all-recorded-contexts
+base/ccpu386/call.c	87	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	9ff24b95fc56adc581324a27af043ceb9696bac84e70cba54671f12725bd1f84	not-selected-in-all-recorded-contexts
+base/ccpu386/call.c	250	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	9ff24b95fc56adc581324a27af043ceb9696bac84e70cba54671f12725bd1f84	not-selected-in-all-recorded-contexts
+base/ccpu386/call.c	306	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	9ff24b95fc56adc581324a27af043ceb9696bac84e70cba54671f12725bd1f84	not-selected-in-all-recorded-contexts
+base/ccpu386/into.c	45	ifdef	NTVDM	1	1	99782af50c5ba66ac2f4b0992e97dfb35bdcca4dbd3c64437141303606d4a035	not-selected-in-all-recorded-contexts
+base/ccpu386/intx.c	48	ifdef	NTVDM	1	1	6a84fe055f6bf3d66e0e82a7ea698fc6fb7596815366379573276fbf6e07b9ff	not-selected-in-all-recorded-contexts
+base/ccpu386/iret.c	104	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	fcc3e09c77da176c1ed54eaca0267308f7b1385eeb7727eabb58ec65baf26bc9	not-selected-in-all-recorded-contexts
+base/ccpu386/jmp.c	45	ifdef	ANSI	1	1	9674820a67e72fef6b1b513d235577d0da5733987aa617b90780747246f1c7a8	not-selected-in-all-recorded-contexts
+base/ccpu386/jmp.c	69	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	9674820a67e72fef6b1b513d235577d0da5733987aa617b90780747246f1c7a8	not-selected-in-all-recorded-contexts
+base/ccpu386/jmp.c	140	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	9674820a67e72fef6b1b513d235577d0da5733987aa617b90780747246f1c7a8	not-selected-in-all-recorded-contexts
+base/ccpu386/lgdt.c	36	ifdef	ANSI	1	1	34e68c269bac2bbcd390cc57c55bc73519753e20e54923dc7ac8594ce1e3ba83	not-selected-in-all-recorded-contexts
+base/ccpu386/lgdt.c	46	ifdef	DOUBLE_CPU	1	1	34e68c269bac2bbcd390cc57c55bc73519753e20e54923dc7ac8594ce1e3ba83	not-selected-in-all-recorded-contexts
+base/ccpu386/lgdt.c	54	ifdef	ANSI	1	1	34e68c269bac2bbcd390cc57c55bc73519753e20e54923dc7ac8594ce1e3ba83	not-selected-in-all-recorded-contexts
+base/ccpu386/lgdt.c	64	ifdef	DOUBLE_CPU	1	1	34e68c269bac2bbcd390cc57c55bc73519753e20e54923dc7ac8594ce1e3ba83	not-selected-in-all-recorded-contexts
+base/ccpu386/lidt.c	37	ifdef	ANSI	1	1	cba8d5ffcc18b7f077ef787f3f2ec99dc921952c900192185345ac6be8e7e216	not-selected-in-all-recorded-contexts
+base/ccpu386/lidt.c	51	ifdef	ANSI	1	1	cba8d5ffcc18b7f077ef787f3f2ec99dc921952c900192185345ac6be8e7e216	not-selected-in-all-recorded-contexts
+base/ccpu386/lldt.c	53	else		1	1	6e76e2a8f8977a4816cb2a196f5946907156bf8175103330a0a6c5607d3b0539	not-selected-in-all-recorded-contexts
+base/ccpu386/lxs.c	41	ifdef	ANSI	1	1	8afbafb96ce9f89e7fd5b8f9762c6d4db2e652dbfd02b85512b403d2bcc98ffa	not-selected-in-all-recorded-contexts
+base/ccpu386/lxs.c	62	ifdef	ANSI	1	1	8afbafb96ce9f89e7fd5b8f9762c6d4db2e652dbfd02b85512b403d2bcc98ffa	not-selected-in-all-recorded-contexts
+base/ccpu386/lxs.c	83	ifdef	ANSI	1	1	8afbafb96ce9f89e7fd5b8f9762c6d4db2e652dbfd02b85512b403d2bcc98ffa	not-selected-in-all-recorded-contexts
+base/ccpu386/lxs.c	104	ifdef	ANSI	1	1	8afbafb96ce9f89e7fd5b8f9762c6d4db2e652dbfd02b85512b403d2bcc98ffa	not-selected-in-all-recorded-contexts
+base/ccpu386/lxs.c	125	ifdef	ANSI	1	1	8afbafb96ce9f89e7fd5b8f9762c6d4db2e652dbfd02b85512b403d2bcc98ffa	not-selected-in-all-recorded-contexts
+base/ccpu386/mov.c	93	ifdef	SPC486	1	1	98ce77095a5f90870e0c6bdab4b42213e0c129f7d8dcba853760d6b7f5b316b0	not-selected-in-all-recorded-contexts
+base/ccpu386/ret.c	86	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	3eec45453f4e7c0021ec6fdeb686cd1e5e8e8bc2e7ec96675c123884f8922ee3	not-selected-in-all-recorded-contexts
+base/ccpu386/sgdt.c	37	ifdef	ANSI	1	1	3e8cc8222117d1459f6a20b58b4b3584e471b31afb3f35e38a1c9457fb34017f	not-selected-in-all-recorded-contexts
+base/ccpu386/sgdt.c	58	ifdef	ANSI	1	1	3e8cc8222117d1459f6a20b58b4b3584e471b31afb3f35e38a1c9457fb34017f	not-selected-in-all-recorded-contexts
+base/ccpu386/shld.c	114	else		1	1	624c71265704fb1a495b960e1cf08e35ab6c88438f48e3041e6aee61ffadcd1c	not-selected-in-all-recorded-contexts
+base/ccpu386/shrd.c	116	else		1	1	cf4c81e0da6640ef2febc79bdaf785b3f30b0264178fad88e5b24c48022c33b7	not-selected-in-all-recorded-contexts
+base/ccpu386/sidt.c	37	ifdef	ANSI	1	1	be92f65e6e0d6ace5b135e1239e992d6944041afe3e76fe9899a9dffb209dbd9	not-selected-in-all-recorded-contexts
+base/ccpu386/sidt.c	59	ifdef	ANSI	1	1	be92f65e6e0d6ace5b135e1239e992d6944041afe3e76fe9899a9dffb209dbd9	not-selected-in-all-recorded-contexts
+base/comms/printer.c	779	ifdef	PS_FLUSHING	1	1	909f9cb9b3f2272c7afd65eed6519f1bff3f3e59eb244a10f78280271551bad6	not-selected-in-all-recorded-contexts
+base/comms/printer.c	784	if	defined(NEC_98)	1	1	909f9cb9b3f2272c7afd65eed6519f1bff3f3e59eb244a10f78280271551bad6	not-selected-in-all-recorded-contexts
+base/comms/printer_.c	1	if	defined(NEC_98)	1	1	24445456022537d8b3296079fdadd3e83b9c7b3243966acd77be6ff7d69f1040	not-selected-in-all-recorded-contexts
+base/comms/rs232_io.c	15	ifdef	SCCSID	1	1	c81e2bc7ad44561cf628a302c5195505ef9e55ee9e1dff0420a5ed418b982b34	not-selected-in-all-recorded-contexts
+base/comms/rs232_io.c	20	ifdef	SEGMENTATION	1	1	c81e2bc7ad44561cf628a302c5195505ef9e55ee9e1dff0420a5ed418b982b34	not-selected-in-all-recorded-contexts
+base/comms/rs232_io.c	59	if	defined(NEC_98)	1	1	c81e2bc7ad44561cf628a302c5195505ef9e55ee9e1dff0420a5ed418b982b34	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	1	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	23	ifdef	SCCSID	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	28	ifdef	SEGMENTATION	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	50	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	76	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	118	ifndef	PROD	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	163	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	226	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	376	ifndef	PROD	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	385	ifdef	ANSI	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	392	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	423	ifndef	PROD	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	432	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	436	ifndef	PROD	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	441	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	454	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	462	ifndef	PROD	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	476	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	508	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	527	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	559	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	611	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	660	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	711	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/diskbios.c	1291	if	defined(NEC_98)	1	1	4eba78a00a54cbafb312af6e447786a183acfa16c186e2b7dcf2df3179678a57	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	30	ifdef	SCCSID	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	35	ifdef	SEGMENTATION	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	153	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	185	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	199	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	218	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	246	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	261	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	275	ifndef	PROD	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	292	ifdef	SLAVEPC	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	303	ifdef	SLAVEPC	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	314	ifdef	SLAVEPC	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	325	ifdef	SLAVEPC	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi.c	333	ifdef	SEGMENTATION	1	1	66d385766228127cf599ab82e365e75e4b31e831444091e7824338bd6d44d67c	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	24	ifdef	SCCSID	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	29	ifdef	SEGMENTATION	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	150	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	157	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	164	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	171	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	178	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	185	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	200	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	207	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	214	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/disks/gfi_mpty.c	220	ifndef	PROD	1	1	ebcd1426772b16e57341c2b9dc16db804587b49a597bf376a372f8b0e8f809ff	not-selected-in-all-recorded-contexts
+base/system/dummy_nt.c	17	ifdef	SCCSID	1	1	41dba2fe22724b91a411f14d89b2075384844ec388f0291b30af31da7282122e	not-selected-in-all-recorded-contexts
+base/system/dummy_nt.c	22	ifdef	SEGMENTATION	1	1	41dba2fe22724b91a411f14d89b2075384844ec388f0291b30af31da7282122e	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	16	ifdef	SEGMENTATION	1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	40	ifndef	PROD	1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	53	else		1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	64	if	defined(NTVDM) && defined(MONITOR)	1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	71	ifndef	PROD	1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	82	ifdef	NTVDM	1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	106	else		1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/illegalp.c	181	ifndef	PROD	1	1	cef447eca00ce5d6520f634f18a0aed15a7e8eca564d8114a7a10c5b50979581	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	60	ifdef	SCCSID	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	65	ifdef	SEGMENTATION	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	89	ifdef	SFELLOW	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	103	ifdef	NTVDM	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	169	if	defined(SFELLOW)	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	188	else		1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	205	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	215	ifdef	ANSI	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	233	ifdef	SFELLOW	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	256	ifdef	SFELLOW	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	268	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	281	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	343	if	defined(SFELLOW)	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	352	if	defined(SFELLOW)	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	515	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	529	else		1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	582	else		1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	595	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	630	else		1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	702	else		1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	718	ifndef	PROD	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	806	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	815	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	903	else		1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	919	ifndef	PROD	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	980	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	989	if	defined NTVDM && !defined MONITOR	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	1721	ifdef	QEVENT_TESTER	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/timestrb.c	31	ifdef	SEGMENTATION	1	1	90541eb2b42784064ad099f1e5ce88ed08d729c1626af5e2a6d6171909f9e29b	not-selected-in-all-recorded-contexts
+base/system/timestrb.c	52	ifdef	HUNTER	1	1	90541eb2b42784064ad099f1e5ce88ed08d729c1626af5e2a6d6171909f9e29b	not-selected-in-all-recorded-contexts
+base/system/timestrb.c	77	ifdef	HUNTER	1	1	90541eb2b42784064ad099f1e5ce88ed08d729c1626af5e2a6d6171909f9e29b	not-selected-in-all-recorded-contexts
+base/system/timestrb.c	115	ifdef	EGA_DUMP	1	1	90541eb2b42784064ad099f1e5ce88ed08d729c1626af5e2a6d6171909f9e29b	not-selected-in-all-recorded-contexts
+base/system/unexp_nt.c	18	ifdef	SCCSID	1	1	b6f2f3e306cc48259e9cbef3f3109baf9747a9d66469876d98ddc3e9838b1f0b	not-selected-in-all-recorded-contexts
+base/system/unexp_nt.c	23	ifdef	SEGMENTATION	1	1	b6f2f3e306cc48259e9cbef3f3109baf9747a9d66469876d98ddc3e9838b1f0b	not-selected-in-all-recorded-contexts
+base/video/vga_mode.c	565	if	defined(NEC_98)	1	1	7169f74f170c5146322ebbf9b568c4984bd495366f667f27e9b5299b82fb842c	not-selected-in-all-recorded-contexts
+base/video/video_io.c	47	if	defined(NEC_98)	1	1	6ce43207e47e958eada9160d24fdd8822b671b6ca92f6c267da1030a4b77981a	not-selected-in-all-recorded-contexts
+host/src/nt_ega.c	43	ifdef	MONITOR	1	1	6b5b45bb89a7281bd4b4d6a6f6ea364f4e9659ed547ce7d43c4430454408f9bf	not-selected-in-all-recorded-contexts
+host/src/nt_ega.c	191	ifdef	BIGEND	1	1	6b5b45bb89a7281bd4b4d6a6f6ea364f4e9659ed547ce7d43c4430454408f9bf	not-selected-in-all-recorded-contexts
+host/src/nt_ega.c	398	ifdef	BIGEND	1	1	6b5b45bb89a7281bd4b4d6a6f6ea364f4e9659ed547ce7d43c4430454408f9bf	not-selected-in-all-recorded-contexts
+host/src/nt_ega.c	1663	ifdef	MONITOR	1	1	6b5b45bb89a7281bd4b4d6a6f6ea364f4e9659ed547ce7d43c4430454408f9bf	not-selected-in-all-recorded-contexts
+host/src/nt_sbfm.c	55	if	0	2	2	3cfd5a87e03e5bfc4c1f8c408ec3b0d10865ca650b98d90b4ecfef395e99f128	not-selected-in-all-recorded-contexts
+host/src/nt_sbfm.c	83	if	0	2	2	3cfd5a87e03e5bfc4c1f8c408ec3b0d10865ca650b98d90b4ecfef395e99f128	not-selected-in-all-recorded-contexts
+host/src/nt_sbfm.c	91	if	0	2	2	3cfd5a87e03e5bfc4c1f8c408ec3b0d10865ca650b98d90b4ecfef395e99f128	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	19	if	defined(NEC_98)	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	38	if	defined(NEC_98)	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	312	if	defined(NEC_98)	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	326	ifdef	JAPAN	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	332	if	defined(NEC_98)	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	342	ifdef	JAPAN	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+host/src/nt_keycd.c	348	if	defined(NEC_98)	1	1	fc487e008289ed17272ad9df02811d0b88dba29dd737ff2f9365a0d414040fbd	not-selected-in-all-recorded-contexts
+base/video/video.c	90	ifndef	PROD	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	103	if	defined(NEC_98)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	110	else		1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	134	if	defined(NEC_98)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	148	ifdef	JAPAN	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	159	if	defined(NEC_98)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	325	else		1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	338	ifdef	JAPAN	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	340	elif	defined(KOREA)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	2764	else		1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	2768	if	defined(NEC_98)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/ega_vide.c	1	if	!defined(i386) && defined(JAPAN)	1	1	582468279cb288db3e2f961090979d26b4c7a08d02b58bf2f637c94ab67933b9	not-selected-in-all-recorded-contexts
+host/src/nt_sbdsp.c	707	if	0	1	1	c02e7ee93c11645a5ac65f7c5872e156aa27d2d015a8fb8c2d33fb7f4b341e29	not-selected-in-all-recorded-contexts
+host/src/nt_sbdsp.c	1503	if	0	1	1	c02e7ee93c11645a5ac65f7c5872e156aa27d2d015a8fb8c2d33fb7f4b341e29	not-selected-in-all-recorded-contexts
+base/bios/reset.c	21	ifdef	SEGMENTATION	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	71	ifdef	NOVELL	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	79	ifdef	GISP_SVGA	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	84	ifdef	LICENSING	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	105	ifdef	NPX	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	110	ifdef	DPMI	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	115	ifdef	GISP_SVGA	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	120	if	defined(DELTA) && defined(A2CPU)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	156	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	166	ifdef	PIG	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	179	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	311	ifdef	NPX	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	318	ifdef	FLOPPY_B	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	331	ifdef	CGAMONO	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	349	ifdef	HERC	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	379	ifndef	PROD	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	655	ifdef	NOVELL	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	669	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	696	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	712	ifdef	IPC	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	717	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	775	ifdef	PIG	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	789	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	803	ifdef	SWIN_SNDBLST_NULL	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	902	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	918	ifdef	NPX	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	929	else		1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	943	if	defined(DELTA) && defined(A2CPU)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	948	ifdef	SOFTWIN_API	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	953	ifdef	HUNTER	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	958	ifdef	LIM	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	964	ifdef	NTVDM	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	980	ifdef	NTVDM	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	993	ifdef	HFX	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/bios/reset.c	1020	if	defined(NEC_98)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	217	ifdef	SEGMENTATION	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	362	ifdef	ANSI	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	1484	ifndef	PROD	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	1501	ifdef	JOKER	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	1615	ifdef	BIGEND	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	1622	if	0	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	1634	ifdef	BIGEND	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fdisk.c	1836	ifdef	macintosh	1	1	5b46f7e0e625f79df58f40bc2519f7fd4935680d086445a28cec8855e8085b5c	not-selected-in-all-recorded-contexts
+base/disks/fla.c	47	ifdef	SCCSID	1	1	47d98c0ee6a911127314d1af34f95c6ac65964d48406f385b0e780dd6e9fe105	not-selected-in-all-recorded-contexts
+base/disks/fla.c	52	ifdef	SEGMENTATION	1	1	47d98c0ee6a911127314d1af34f95c6ac65964d48406f385b0e780dd6e9fe105	not-selected-in-all-recorded-contexts
+base/disks/fla.c	168	ifdef	macintosh	1	1	47d98c0ee6a911127314d1af34f95c6ac65964d48406f385b0e780dd6e9fe105	not-selected-in-all-recorded-contexts
+base/disks/fla.c	181	ifdef	BIT_ORDER1	1	1	47d98c0ee6a911127314d1af34f95c6ac65964d48406f385b0e780dd6e9fe105	not-selected-in-all-recorded-contexts
+base/disks/fla.c	837	ifdef	NTVDM	1	1	47d98c0ee6a911127314d1af34f95c6ac65964d48406f385b0e780dd6e9fe105	not-selected-in-all-recorded-contexts
+base/disks/fla.c	1154	ifdef	SEGMENTATION	1	1	47d98c0ee6a911127314d1af34f95c6ac65964d48406f385b0e780dd6e9fe105	not-selected-in-all-recorded-contexts
+base/support/time_day.c	1	if	defined(NEC_98)	1	1	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	not-selected-in-all-recorded-contexts
+base/support/time_day.c	46	ifdef	SCCSID	1	1	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	not-selected-in-all-recorded-contexts
+base/support/time_day.c	51	ifdef	SEGMENTATION	1	1	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	not-selected-in-all-recorded-contexts
+base/support/time_day.c	90	if	defined(NEC_98)	1	1	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	not-selected-in-all-recorded-contexts
+base/support/time_day.c	137	if	defined(NEC_98)	1	1	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	not-selected-in-all-recorded-contexts
+base/support/time_day.c	351	if	defined(NEC_98)	1	1	a0e7f8d708f087a4e8c3b4d793b062b048218332aa3a9e7fff52fe54e0726473	not-selected-in-all-recorded-contexts
+base/ccpu386/zfrsrvd.c	32	ifdef	SFELLOW	1	1	f75f15b57db8bff3804a1ce1357912158b0020145c2500e55007ebbc131da6fe	not-selected-in-all-recorded-contexts
+base/ccpu386/zfrsrvd.c	4867	ifdef	SPC486	1	1	f75f15b57db8bff3804a1ce1357912158b0020145c2500e55007ebbc131da6fe	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	18	ifdef	SCCSID	1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	23	ifdef	SEGMENTATION	1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	41	ifndef	PROD	1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	181	else		1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	187	ifdef	SEGMENTATION	1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	205	else		1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	219	if	!defined(NTVDM) && !defined(SOFTPC_STANDALONE)	1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/keymouse/ppi.c	236	if	!defined(NTVDM) && !defined(SOFTPC_STANDALONE)	1	1	c3ad01c02b52cd9dd0b3a16f2287b8ff91f7146516a23c429eefcbd8904deb72	not-selected-in-all-recorded-contexts
+base/system/idetect.c	165	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	184	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	212	else		1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	251	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	284	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	339	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	352	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/idetect.c	388	ifdef	NTVDM	1	1	d7d52cb02e79d37a5a61731930281c1202bd64598af2efed343417927eebeb31	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	23	ifdef	SEGMENTATION	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	49	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	136	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	196	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	227	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	292	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	321	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	351	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	503	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	582	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	876	ifdef	NTVDM	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	924	ifndef	PM	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	934	ifndef	PM	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	991	ifdef	SEGMENTATION	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	1015	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/at_dma.c	1031	if	defined(NEC_98)	1	1	dd005730facdf3396ab51eeec124a8a8888fda38880aaac454a8c46726b38520	not-selected-in-all-recorded-contexts
+base/system/timer.c	35	ifdef	SCCSID	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	40	ifdef	SEGMENTATION	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	72	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	77	ifdef	HUNTER	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	83	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	105	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	114	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	119	ifdef	HUNTER	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	180	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	373	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	393	ifdef	SYNCH_TIMERS	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	425	if	defined(NTVDM)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	466	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	480	if	defined(NTVDM)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	507	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	589	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	618	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	627	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	632	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	644	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	653	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	691	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	695	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	715	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	726	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	731	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	738	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	761	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	818	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1038	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1061	if	defined(NTVDM) && !defined(PROD)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1075	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1297	ifdef	DOCUMENTATION	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1307	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1319	ifdef	DOCUMENTATION	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1330	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1657	ifdef	DOCUMENTATION	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1664	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1801	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1813	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1824	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1836	ifdef	HUNTER	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1848	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1860	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1866	ifdef	HUNTER	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	1961	else		1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2016	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2021	ifdef	PIG	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2026	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2033	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2039	ifdef	DELAYED_INTS	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2089	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2403	ifndef	PROD	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2413	ifdef	SEGMENTATION	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2418	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2444	ifdef	NTVDM	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2487	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2501	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2513	else		1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2544	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2553	if	defined(NEC_98)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/system/timer.c	2571	ifdef	DOCUMENTATION	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	47	ifdef	SCCSID	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	52	ifdef	SEGMENTATION	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	82	ifdef	macintosh	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	104	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	143	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	151	ifdef	REAL_KBD	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	171	if	defined(KOREA)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	215	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	227	else		1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	233	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	238	if	defined(IRET_HOOKS) && defined(GISP_CPU)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	285	else		1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	301	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	335	ifdef	macintosh	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	644	ifdef	SECURE	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	660	ifdef	SECURE	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	721	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	734	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	745	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	759	ifdef	macintosh	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	767	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	773	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	1458	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	1698	else		1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	1705	else		1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	1745	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	1826	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	1834	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2058	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2128	ifdef	HUNTER	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2138	ifdef	HUNTER	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2170	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2193	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2200	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2352	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2357	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2371	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2452	ifdef	NTVDM	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2457	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2487	else		1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2546	ifdef	SEGMENTATION	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2553	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2569	if	defined(IRET_HOOKS) && defined(GISP_CPU)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2679	else		1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keyba.c	2684	if	defined(NEC_98)	1	1	8c8e41317cc9f358c9abeacb60dd3db663b2346adc260f8de108a84404c7c2e9	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	50	ifdef	SCCSID	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	55	ifdef	SEGMENTATION	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	82	ifndef	PROD	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	145	if	defined(NTVDM) && defined(LOCAL)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	165	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	170	if	defined(IRET_HOOKS) && defined(GISP_CPU)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	175	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	193	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	201	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	205	if	defined(JAPAN) && defined(NTVDM) && !defined(NEC_98)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	209	if	defined(NTVDM) && defined(MONITOR)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	550	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	560	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	617	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	641	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	667	if	defined(IRET_HOOKS)  && defined(GISP_CPU)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	673	if	defined(NTVDM)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	721	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	730	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	746	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	754	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	946	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	1032	else		1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	1340	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	1653	ifdef	SEGMENTATION	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	1663	if	defined(NEC_98)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	1710	ifdef	NTVDM	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	59	ifdef	SEGMENTATION	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	103	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	110	ifdef	MOUSE_16_BIT	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	125	else		1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	406	ifdef	HERC	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	877	ifdef	HERC	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1279	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1283	ifdef	JAPAN	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1290	ifdef	MONITOR	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1307	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1336	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1348	ifdef	MOUSE_16_BIT	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1401	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1406	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1436	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1441	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1585	ifdef	MOUSE_16_BIT	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1592	ifdef	HERC	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1911	if	defined(NTVDM) && defined(MONITOR)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2396	else		1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2402	if	defined(NTVDM) && defined(MONITOR)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2517	else		1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2526	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2704	else		1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2768	ifdef	MOUSE_16_BIT	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2786	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2885	if	defined(MONITOR) && defined(NTVDM)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	2971	if	defined(MONITOR) && defined(NTVDM)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3051	if	defined(NTVDM) && defined(X86GFX)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3089	if	defined(NTVDM) && defined(X86GFX)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3136	if	defined(NTVDM)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3246	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3289	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3442	ifndef	PROD	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3688	ifdef	MOUSE_16_BIT	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3696	if	defined (NTVDM) && defined(MONITOR)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3737	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3745	if	defined(NTVDM) && defined(MONITOR)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3760	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	3767	if	defined(NTVDM) && defined(MONITOR)	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4090	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4106	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4135	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4190	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4266	ifdef	KOREA	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4319	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	4326	ifdef	NTVDM	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	5168	ifndef	PROD	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	5274	ifdef	HERC	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	6275	ifdef	HERC	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	6385	ifdef	HERC	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	6484	ifdef	CPU_30_STYLE	1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/system/ica.c	133	ifdef	SCCSID	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	138	ifdef	SEGMENTATION	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	168	ifdef	NOVELL	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	196	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	207	ifdef	NTVDM	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	369	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	418	if	defined (NTVDM)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	514	if	0	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	565	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	589	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	607	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	616	ifndef	CPU_40_STYLE	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	623	ifdef	A2CPU	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	628	ifdef	NTVDM	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	636	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	668	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	679	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	705	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	723	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	731	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	739	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	745	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	790	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	798	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	809	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	834	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	857	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	866	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	896	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	904	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	916	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	925	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	933	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	942	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	950	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	964	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	973	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	982	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	992	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1000	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1008	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1024	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1032	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1040	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1053	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1061	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1070	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1079	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1086	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1112	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1129	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1148	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1263	ifndef	PROD	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1376	if	defined (NTVDM)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1647	if	defined(NTVDM)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1827	ifdef	SEGMENTATION	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1834	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1870	ifdef	NTVDM	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1879	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1918	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1957	ifdef	NTVDM	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	1966	if	defined(NEC_98)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	2026	else		1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	2036	else		1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/ica.c	2099	if	!defined(PROD)	1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	30	ifdef	X86GFX	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	89	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	122	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	135	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	156	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	177	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	198	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	219	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	240	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	259	ifdef	MONITOR	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	266	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	282	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	296	ifdef	MONITOR	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	532	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	540	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	572	ifdef	X86GFX	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	606	ifdef	X86GFX	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	628	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	646	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	658	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	678	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	696	ifdef	MONITOR	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	782	ifndef	SOFTPC_STANDALONE	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	804	ifdef	MONITOR	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	820	ifdef	X86GFX	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1112	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1127	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1165	ifndef	SOFTPC_STANDALONE	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1255	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1401	ifdef	X86GFX	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1493	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1523	ifdef	MONITOR	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1592	ifndef	SOFTPC_STANDALONE	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1603	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1677	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1695	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1701	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1807	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1835	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1843	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1993	ifndef	PROD	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2014	ifndef	PROD	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2073	ifndef	PROD	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2098	ifndef	PROD	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2120	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2146	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2184	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2204	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2245	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2253	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2262	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2267	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2426	ifndef	PROD	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2435	ifndef	PROD	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2455	if	defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	25	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	217	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	225	ifdef	SFELLOW	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	238	ifdef	SFELLOW	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	244	if	defined(SFELLOW)	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	307	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	336	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	532	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	537	ifdef	SFELLOW	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	589	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	621	if	defined(PIG) && defined(SFELLOW)	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	749	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	762	ifdef	SYNCH_TIMERS	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	793	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	804	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1098	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1218	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1229	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1239	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1392	ifndef	FIX_BT_BUG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1465	ifndef	FIX_BT_BUG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1517	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1528	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1538	ifndef	FIX_BT_BUG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1609	ifndef	FIX_BT_BUG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1672	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1683	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	1701	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2123	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2165	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2189	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2231	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2245	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2252	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	2700	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3173	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3347	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3514	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3540	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3569	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3587	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3600	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3617	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3644	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3693	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3711	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3724	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3741	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	3768	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4036	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4174	ifdef	SYNCH_TIMERS	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4181	ifdef	SYNCH_TIMERS	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4200	ifdef	SYNCH_TIMERS	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4259	ifdef	SYNCH_TIMERS	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4289	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4294	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4326	if	defined(SFELLOW) && !defined(PROD)	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4359	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4471	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4492	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4561	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4597	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4624	ifdef	SPC486	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4637	if	defined(SWITCHNPX)	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4707	ifdef	PIG	1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/comms/com.c	16	ifdef	SCCSID	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	21	ifdef	SEGMENTATION	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	31	if	defined(NTVDM) && defined(MONITOR)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	58	ifdef	GISP_CPU	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	69	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	92	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	148	ifdef	IRET_HOOKS	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	180	if	defined(NTVDM) && defined(FIFO_ON)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	250	ifndef	PROD	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	391	ifdef	PS_FLUSHING	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	407	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	461	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	585	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	636	if	defined(NTVDM) && defined(FIFO_ON)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	676	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	691	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	709	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1209	ifdef	IRET_HOOKS	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1221	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1295	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1309	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1442	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1471	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1482	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1501	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1530	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1543	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1597	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1606	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1613	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1673	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1792	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	1858	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2081	ifdef	SHORT_TRACE	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2089	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2096	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2104	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2111	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2118	ifdef	SEGMENTATION	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2123	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2224	ifndef	COM3_ADAPTOR	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2228	ifndef	COM4_ADAPTOR	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2233	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2259	if	defined(NEC_98)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2313	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2318	ifndef	PROD	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2325	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2331	ifdef	NTVDM	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2336	ifdef	PS_FLUSHING	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/com.c	2348	ifndef	PROD	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	109	ifdef	SEGMENTATION	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	115	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	139	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	148	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	183	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	227	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	392	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	438	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	484	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	544	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	674	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	726	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	920	ifndef	PROD	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1105	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1252	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1314	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1356	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1524	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1562	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1581	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	1599	ifdef	NTVDM	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	2480	ifndef	PROD	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	2999	else		1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	3012	ifdef	FLOPPIES_KEEP_TRYING	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	3224	ifdef	SEGMENTATION	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/disks/floppy.c	3292	if	defined(NEC_98)	1	1	1378570cd219030ef5c645c117433f954a6216700112832eb7378a6520ebd8aa	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	31	ifdef	SCCSID	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	36	ifdef	SEGMENTATION	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	76	ifndef	PROD	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	85	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	193	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	249	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	405	ifdef	SEGMENTATION	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	415	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	439	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	448	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	454	ifdef	SEGMENTATION	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	464	ifndef	PROD	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	478	if	defined(NEC_98)	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	487	ifdef	KIPPER	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/keymouse/mouse.c	492	ifndef	PROD	1	1	51c9e3451dc8cc30b7a18e7cc1d1c8c58140a6dc63d33e5064b569f43e4ac9c0	not-selected-in-all-recorded-contexts
+base/support/ios.c	18	ifdef	SEGMENTATION	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	41	ifdef	NTVDM	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	64	ifdef	MAC68K	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	71	ifndef	PROD	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	158	else		1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	163	ifdef	NTVDM	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	184	else		1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	189	ifdef	NTVDM	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	217	ifdef	BIGEND	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	305	if	defined(NTVDM) && defined(MONITOR)	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	410	if	defined(NTVDM) && defined(MONITOR)	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	443	ifdef	EGA_DUMP	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	485	ifdef	EGA_DUMP	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	522	ifdef	EGA_DUMP	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	563	ifdef	EGA_DUMP	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	664	ifdef	ANSI	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	840	ifdef	NTVDM	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	866	ifdef	NTVDM	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	906	ifdef	SEGMENTATION	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	930	ifdef	MAC68K	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	935	ifndef	PROD	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/support/ios.c	946	ifdef	NTVDM	1	1	d5f61c9195fe11e2aaf3d1eefb1c235c01bbd333afd8e25c1c013d1bfdfc0af9	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	1	if	defined(JAPAN) && defined(i386)	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	23	ifdef	SEGMENTATION	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	33	if	defined(JAPAN) && defined(i386)	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	59	if	defined(JAPAN) && defined(i386)	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	107	if	defined(NTVDM) && defined(MONITOR)	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	126	if	0	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	137	else		1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	204	else		1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	269	else		1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	278	if	defined(NTVDM) && defined(MONITOR)	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	293	ifdef	SPC486	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	302	ifdef	JAPAN	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	310	ifndef	PROD	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/bios/tape_io.c	327	if	defined(JAPAN) && defined(i386)	1	1	3b26b4b58e25ef77a348a582c8256b4326ccad38063850ba945b6c1407c1ed54	not-selected-in-all-recorded-contexts
+base/ccpu386/fpu.c	160	ifndef	NULL	1	1	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	not-selected-in-all-recorded-contexts
+base/ccpu386/fpu.c	263	ifdef	SUN4	1	1	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	not-selected-in-all-recorded-contexts
+base/ccpu386/fpu.c	464	ifdef	BIGEND	1	1	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	not-selected-in-all-recorded-contexts
+base/ccpu386/fpu.c	1289	else		1	1	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	1	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	39	ifdef	SEGMENTATION	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	63	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	68	ifdef	NTVDM	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	73	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	78	ifndef	PROD	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	86	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	103	ifndef	PROD	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	108	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	125	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	164	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	172	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	179	ifndef	PROD	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	238	ifdef	SEGMENTATION	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	249	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	261	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/disks/floppy_i.c	327	if	defined(NEC_98)	1	1	fc27766dc68f8f56e4f880d09e43ba4b6cff6ec48031b576de7dd596dd61b752	not-selected-in-all-recorded-contexts
+base/system/cmos.c	14	ifdef	SEGMENTATION	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	88	ifdef	NTVDM	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	93	ifdef	TEST_HARNESS	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	322	ifdef	SLAVEPC	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	330	ifdef	FLOPPY_B	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	356	else		1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	361	ifdef	NTVDM	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	463	ifdef	NTVDM	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	653	ifdef	NTVDM	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	754	ifdef	SEGMENTATION	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	843	ifndef	PROD	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	1045	ifndef	PROD	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	1052	ifdef	NTVDM	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	1172	ifdef	TEST_HARNESS	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/rom.c	48	if	defined(NEC_98)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	80	ifdef	GISP_SVGA	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	107	if	defined(NEC_98)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	116	if	defined(macintosh) && defined(A2CPU)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	127	ifdef	ANSI	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	136	if	defined(NEC_98)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	181	ifndef	PROD	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	291	if	defined(NEC_98)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	344	if	defined(NEC_98)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	389	if	defined(NEC_98)	1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/system/rom.c	588	else		1	1	1dccf7359efa2a46c87c22ac0a296f098e5c8a30be614ec1e2aa81d5d42e219f	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	93	ifdef	GORE	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	116	ifdef	SEGMENTATION	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	121	if	defined(NEC_98)	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	135	if	defined(NEC_98)	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	174	if	defined(NEC_98)	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	182	ifdef	NO_STRING_OPERATIONS	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	192	if	defined(NEC_98)	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gfx_updt.c	3993	if	defined(NEC_98)	1	1	9e4f3b7e60c07f41e363e25676be0fbaa0506ef8bf3f620c7b8500429eaf318d	not-selected-in-all-recorded-contexts
+base/video/gvi.c	41	ifdef	SEGMENTATION	1	1	294773a935e57d7e7db9416261cf8e946fe244c9a2e50283cad577099c3d837d	not-selected-in-all-recorded-contexts
+base/video/gvi.c	65	ifdef	HERC	1	1	294773a935e57d7e7db9416261cf8e946fe244c9a2e50283cad577099c3d837d	not-selected-in-all-recorded-contexts
+base/video/gvi.c	88	if	defined(NEC_98)	1	1	294773a935e57d7e7db9416261cf8e946fe244c9a2e50283cad577099c3d837d	not-selected-in-all-recorded-contexts
+base/video/gvi.c	160	ifdef	SEGMENTATION	1	1	294773a935e57d7e7db9416261cf8e946fe244c9a2e50283cad577099c3d837d	not-selected-in-all-recorded-contexts
+base/video/gvi.c	165	if	defined(NEC_98)	1	1	294773a935e57d7e7db9416261cf8e946fe244c9a2e50283cad577099c3d837d	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	49	ifdef	MONITOR	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	58	if	defined(NEC_98)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	69	if	defined(NEC_98)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	78	ifdef	BIGWIN	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	93	ifdef	MONITOR	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	109	if	defined(NEC_98)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	126	ifdef	X86GFX	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	132	ifdef	MONITOR	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	181	ifdef	BIGEND	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	529	ifdef	BIGWIN	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	542	ifdef	BIGWIN	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	632	ifdef	BIGWIN	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	645	ifdef	BIGWIN	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	651	ifdef	MONITOR	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	655	if	defined(NEC_98)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_sound.c	32	if	defined(NEC_98)	1	1	0d299daf1782abd597058f59415a996c8f5314fa090280f96e68062bab9513c8	not-selected-in-all-recorded-contexts
+host/src/nt_sound.c	117	ifndef	PROD	1	1	0d299daf1782abd597058f59415a996c8f5314fa090280f96e68062bab9513c8	not-selected-in-all-recorded-contexts
+host/src/nt_sound.c	380	if	defined(NEC_98)	1	1	0d299daf1782abd597058f59415a996c8f5314fa090280f96e68062bab9513c8	not-selected-in-all-recorded-contexts
+host/src/nt_vga.c	36	ifdef	MONITOR	1	1	d4065213aabc2ae3cce5f10e01c94cbc39d013075779d353d8f5a1a26f5212f9	not-selected-in-all-recorded-contexts
+host/src/nt_vga.c	1664	ifdef	MONITOR	1	1	d4065213aabc2ae3cce5f10e01c94cbc39d013075779d353d8f5a1a26f5212f9	not-selected-in-all-recorded-contexts
+base/keymouse/mouse_io.c	1386	else		1	1	bb38dc4b23617ad433767d9484164054004859e998c1104196d39caba8cf7237	not-selected-in-all-recorded-contexts
+base/video/video.c	1	if	(defined(JAPAN) || defined(KOREA)) && !defined(i386)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	98	if	defined(JAPAN) || defined(KOREA)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	140	if	defined(JAPAN) || defined(KOREA)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+base/video/video.c	344	if	defined(JAPAN) || defined(KOREA)	1	1	9ea5d07b795d6ccefcd7aade45e7cc87eb638f18d0291ed827e4f49b08047b0c	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	53	if	defined(JAPAN) || defined(KOREA)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	100	if	(defined(JAPAN) || defined(KOREA)) && defined(i386)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_cga.c	136	if	defined(JAPAN) || defined(KOREA)	1	1	3a3fc3f80679c362d6775b2cb50ca37b9728e0823ccd4d671939bea837c719bd	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	127	if	defined(JAPAN) || defined(KOREA)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	1186	if	(defined(JAPAN) || defined(KOREA)) && !defined(NEC_98)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+host/src/nt_graph.c	2054	if	defined(JAPAN) || defined(KOREA)	1	1	cdd4ce8538c47bb16859a54679b6c5e975022ec3b753432d750adc0fe9b8cb98	not-selected-in-all-recorded-contexts
+base/system/cmos.c	66	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	79	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	526	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	548	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	592	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	759	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	764	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	907	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	1014	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	1022	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/system/cmos.c	1031	if	defined(NTVDM) || defined(macintosh)	1	1	78fb6fbdff3d24003b2109f966e948daef4036c90976103322287617e94f2bd3	not-selected-in-all-recorded-contexts
+base/bios/reset.c	897	if	defined (GEN_DRVR) || defined (CDROM)	1	1	ae666fbd04e54ef1c16c2d43b633e5e1b35d00dc1a4e8f920fcc5966f8ed71ec	not-selected-in-all-recorded-contexts
+base/comms/com.c	386	if	!defined(PROD) || defined(SHORT_TRACE)	1	1	0873505787b34b886a4ab6ae3138cd9744e393637f21a5b1318473772f5abedb	not-selected-in-all-recorded-contexts
+base/comms/rs232_io.c	47	if	defined(IP32) || defined(TK43) || defined(macintosh)	1	1	c81e2bc7ad44561cf628a302c5195505ef9e55ee9e1dff0420a5ed418b982b34	not-selected-in-all-recorded-contexts
+base/keymouse/keybd_io.c	448	if	defined(NTVDM) || defined(GISP_CPU)	1	1	9a43f20302a61378c202156f953cf266afeae065f1d78ae4d37ba44e3c446405	not-selected-in-all-recorded-contexts
+base/system/ica.c	1288	else		1	1	6f6009edd0e2837583e55ccabe4d54734c48dacfb94f6fe886b03a7a33fed558	not-selected-in-all-recorded-contexts
+base/system/quick_ev.c	510	if	(defined(NTVDM) && defined(MONITOR)) || defined(GISP_CPU)	1	1	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	not-selected-in-all-recorded-contexts
+base/system/timer.c	708	if	defined(NTVDM) || defined(GISP_SVGA)	1	1	eb3a5e131b7b35b0681a5e3d029fe853c2215fff396b1725aca12a5de4163c3a	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	757	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4666	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4685	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/c_main.c	4701	else		1	1	06657d231b1ac8a3a5c54f7fb25c705cc28f9b02d9bd0c29e4d85e4afbb9abb9	not-selected-in-all-recorded-contexts
+base/ccpu386/fpu.c	1741	if	(HOST_BIAS >= 16383)	1	1	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	not-selected-in-all-recorded-contexts
+base/ccpu386/fpu.c	1856	if	(HOST_BIAS >= 16383)	1	1	14cb2179e2459ba0bcb16221f9bb1c712344f5397b16225d932ba00324adb374	not-selected-in-all-recorded-contexts
+host/src/nt_sbfm.c	102	if	DBG	2	2	3cfd5a87e03e5bfc4c1f8c408ec3b0d10865ca650b98d90b4ecfef395e99f128	not-selected-in-all-recorded-contexts

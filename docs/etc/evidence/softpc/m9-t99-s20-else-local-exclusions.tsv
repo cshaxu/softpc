@@ -1,0 +1,3 @@
+path	parent_if_line	baseline_else_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/system/ica.c	2025	2029	2034	ifdef	HOOKED_IRETS	58cb1012cf3309983b852aeb75e1a7411509fbdf9ed26bd77673247cd6a84ef1
+base/video/video.c	1875	1880	1885	ifdef	CPU_40_STYLE	c079d7d09fe96bf5be263ed7342329b227bab4308e6aae0241ac443fdeab01cf

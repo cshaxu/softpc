@@ -1,0 +1,5 @@
+path	baseline_if_line	baseline_sibling_next_line	retained_sibling	excluded_body_sha256
+base/keymouse/ppi.c	70	73	#endif	bb6e78e0df5f18a17c8d6cb9151023b44ab74e27aebe73d2bef216dc53379a3b
+base/keymouse/ppi.c	137	150	#endif	3e8dfff053b08637e030cfbe148e6895858e01fa5c72763f13bcc53ba11cb203
+base/keymouse/ppi.c	212	215	#else	9c9e64a49b1fda7d6b3424e1cc2974c8a423952bf79ba82d5db3fdf909e2ba84
+base/keymouse/ppi.c	228	235	#elif defined(SOFTPC_STANDALONE)	03b7a27d9c83b49daff1b80eb03d5968274b13fb48370d7b9271fddef150b9a6

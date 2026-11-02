@@ -1,0 +1,20 @@
+path	baseline_if_line	baseline_next_line	expression	excluded_body_sha256
+base/keymouse/keyba.c	1834	1841	defined(IRET_HOOKS) && defined(GISP_CPU)	fe8bf304a2cc5ae6c5b240d8f47e3e98e4e4790fa2c5da27e24de7f00644ea53
+base/keymouse/keyba.c	2646	2659	defined(IRET_HOOKS) && defined(GISP_CPU)	cb05d3d5060cb2b87a8eae8a3916a7406d87fd7e2c099e08794282ee9fc9f8a1
+base/system/quick_ev.c	541	544	defined NTVDM && !defined MONITOR	2066538f0a42613c9bbdcacfcafd99bb62d8db9facbae212f4769af4893f4225
+base/system/quick_ev.c	619	622	defined NTVDM && !defined MONITOR	eeac7d5bfcbaa2d934087bd12f5820a477a4934543fe7b9a643250eed16e1289
+base/system/quick_ev.c	832	835	defined NTVDM && !defined MONITOR	2066538f0a42613c9bbdcacfcafd99bb62d8db9facbae212f4769af4893f4225
+base/system/quick_ev.c	840	843	defined NTVDM && !defined MONITOR	eeac7d5bfcbaa2d934087bd12f5820a477a4934543fe7b9a643250eed16e1289
+base/system/quick_ev.c	1008	1011	defined NTVDM && !defined MONITOR	2066538f0a42613c9bbdcacfcafd99bb62d8db9facbae212f4769af4893f4225
+base/system/quick_ev.c	1016	1019	defined NTVDM && !defined MONITOR	eeac7d5bfcbaa2d934087bd12f5820a477a4934543fe7b9a643250eed16e1289
+base/system/rom.c	298	301	defined(macintosh) && defined(A2CPU)	6bbbb6aa39b4181d0271721ffa5320782ebcace28ca317931aa7325eec107624
+base/system/rom.c	348	351	defined(macintosh) && defined(A2CPU)	5c864aec6a173f85a5283cc2f033c101c7561fde7b4f20b42d84594117f6e424
+base/system/rom.c	366	369	defined(macintosh) && defined(A2CPU)	41fe5600a79c2d48bc138be23f834226694aaa9f6fe9157be114831153bf749c
+base/system/timer.c	424	430	defined(IRET_HOOKS) && defined(GISP_CPU)	5a93f64c01155b42a67943ab88f4e08b672a83780338db2d5cefbe766d76d5f0
+base/system/timer.c	2295	2334	defined(IRET_HOOKS) && defined(GISP_CPU)	b7d582a5e0f340b65cf53d1b19459d99e20179dfd15f61e7711eaad285d84f2e
+base/system/timer.c	2367	2380	defined(IRET_HOOKS) && defined(GISP_CPU)	08611fe3759398470b25e34a1fdaafb64a70472cca03a125a3b6b318359d42c8
+base/video/cga.c	1134	1325	!defined(EGG) && !defined(A3CPU) && !defined(A2CPU) && !defined(C_VID) && !defined(A_VID)	b744e474a6908fa6776ac5dc724c5f1b2f63068ebafb629a62e4044794f2cb4b
+base/video/cga.c	1397	1400	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	7883fb47b345170aa3c12ea82dd554e2c64046f0986577015c2a954915cf6292
+base/video/cga.c	1470	1490	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	a15c6eee421c55d644a77241fa28ff56ea0afca7917872b72ab7a3a248617bcf
+base/video/video.c	297	300	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	22fe2d776ebe709e4d70ef666f8b1680f8bfab64be3d82247ab0975f1f658c98
+base/video/video.c	307	310	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	22fe2d776ebe709e4d70ef666f8b1680f8bfab64be3d82247ab0975f1f658c98

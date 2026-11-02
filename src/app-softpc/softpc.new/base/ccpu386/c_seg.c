@@ -75,8 +75,9 @@ IFN3(
 
       /* show segment has been accessed (i486 only writes if changed) */
 #ifdef	SPC486
-      if ((entry->AR & ACCESSED) == 0)
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
+#line 80
 	 spr_write_byte(descr_addr+5, (IU8)entry->AR | ACCESSED);
       entry->AR |= ACCESSED;
 
@@ -114,8 +115,9 @@ IFN3(
    {
    /* show segment has been accessed (i486 only writes if changed) */
 #ifdef	SPC486
-   if ((entry->AR & ACCESSED) == 0)
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
+#line 119
       spr_write_byte(descr_addr+5, (IU8)entry->AR | ACCESSED);
    entry->AR |= ACCESSED;
 
@@ -303,8 +305,9 @@ IFN2(
 
 	 /* show segment has been accessed (i486 only writes if changed) */
 #ifdef	SPC486
-	 if ((entry.AR & ACCESSED) == 0)
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
+#line 308
 	    spr_write_byte(descr_addr+5, (IU8)entry.AR | ACCESSED);
 	 entry.AR |= ACCESSED;
 

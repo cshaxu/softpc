@@ -250,11 +250,13 @@
 #ifdef VGG
 #define	MOUSE_VIDEO_MODE_MAXIMUM	0x14
 #else
-#define	MOUSE_VIDEO_MODE_MAXIMUM	0x11	
+#error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
+#line 255
 #else
-#define	MOUSE_VIDEO_MODE_MAXIMUM	8	
+#error "Unsupported SoftPC mirror configuration: !EGG"
 #endif
+#line 258
 
 
 /*
@@ -754,40 +756,9 @@ typedef struct
 } HOSTMOUSEFUNCS;
 
 #if defined(HOST_MOUSE) || defined(NTVDM)
-
-IMPORT HOSTMOUSEFUNCS	*working_mouse_funcs;
-
-#define host_mouse_restore_cursor()\
-	(working_mouse_funcs->restore_cursor)()
-
-#define host_deinstall_host_mouse()\
-	(working_mouse_funcs->deinstall)()
-
-#define host_mouse_installed()\
-	(working_mouse_funcs->installed)()
-
-#define host_mouse_in_use()\
-	(working_mouse_funcs->in_use)()
-
-#define host_mouse_reset()\
-	(working_mouse_funcs->reset)()
-
-#define host_mouse_set_position(x,y)\
-	(working_mouse_funcs->set_position)(x,y)
-
-#define host_mouse_set_graphics(x,y,z)\
-	(working_mouse_funcs->set_graphics)(x,y,z)
-
-#define host_mouse_cursor_display()\
-	(working_mouse_funcs->cursor_display)()
-
-#define host_mouse_cursor_undisplay()\
-	(working_mouse_funcs->cursor_undisplay)()
-
-#define host_mouse_cursor_mode_change()\
-	(working_mouse_funcs->cursor_mode_change)()
-	
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #else	/* HOST_MOUSE */
+#line 791
 
 #define host_mouse_restore_cursor()
 
@@ -812,15 +783,9 @@ IMPORT HOSTMOUSEFUNCS	*working_mouse_funcs;
 #endif	/* HOST_MOUSE */
 
 #ifdef NTVDM
-VOID host_enable_delta_motion IPT0();
-VOID host_disable_delta_motion IPT0();
-#ifdef X86GFX
-extern  void host_mouse_conditional_off_enabled(void);
-#else
-extern  void mouse_video_mode_changed(int new_mode);
-#endif
-
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
+#line 824
 
 
 /*
@@ -980,8 +945,9 @@ typedef struct
    IBOOL             MM_IN_int10_chained;
 
 #ifdef	MOUSE_16_BIT
-   IBOOL             MM_IN_is_graphics_mode;
+#error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif	/* MOUSE_16_BIT */ 
+#line 985
 
 #ifdef EGG
 #ifndef REAL_VGA
@@ -1008,8 +974,9 @@ typedef struct
 #endif /* EGG */
 
 #ifdef HERC
-   MOUSE_AREA        MM_IN_HERC_graphics_virtual_screen;
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
+#line 1013
    boolean           MM_IN_cursor_EM_disabled;
    } MM_INSTANCE_DATA, **MM_INSTANCE_DATA_HANDLE;
 
@@ -1112,8 +1079,9 @@ IMPORT MM_INSTANCE_DATA_HANDLE mm_handle;
 #define int10_chained              ((*mm_handle)->MM_IN_int10_chained)
 
 #ifdef	MOUSE_16_BIT
-#define is_graphics_mode           ((*mm_handle)->MM_IN_is_graphics_mode)
+#error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif	/* MOUSE_16_BIT */ 
+#line 1117
 
 #ifdef EGG
 #ifndef REAL_VGA
@@ -1139,7 +1107,8 @@ IMPORT MM_INSTANCE_DATA_HANDLE mm_handle;
 #endif /* EGG */
 
 #ifdef HERC
-#define HERC_graphics_virtual_screen ((*mm_handle)->MM_IN_HERC_graphics_virtual_screen)
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
+#line 1144
 
 #define cursor_EM_disabled         ((*mm_handle)->MM_IN_cursor_EM_disabled)

@@ -34,10 +34,9 @@ LGDT CPU Functions.
 GLOBAL VOID
 LGDT16
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* src(limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 41
    (op1)
    IU32 op1[2];
 #endif
@@ -45,17 +44,17 @@ LGDT16
    SET_STAR_LIMIT(GDT_REG, op1[0]);
    SET_STAR_BASE(GDT_REG, op1[1] & 0xffffff);   /* store 24-bit base */
 #ifdef DOUBLE_CPU
-   double_switch_to(SOFT_CPU);
+#error "Unsupported SoftPC mirror configuration: DOUBLE_CPU"
 #endif
+#line 50
    }
 
 GLOBAL VOID
 LGDT32
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* src(limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 59
    (op1)
    IU32 op1[2];
 #endif
@@ -63,6 +62,7 @@ LGDT32
    SET_STAR_LIMIT(GDT_REG, op1[0]);
    SET_STAR_BASE(GDT_REG, op1[1]);
 #ifdef DOUBLE_CPU
-   double_switch_to(SOFT_CPU);
+#error "Unsupported SoftPC mirror configuration: DOUBLE_CPU"
 #endif
+#line 68
    }

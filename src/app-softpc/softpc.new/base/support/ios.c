@@ -16,13 +16,9 @@
 ]*/
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_IOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 26
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +38,10 @@
 #define VIRTUALISATION
 #endif
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 45
 
 /*
  *
@@ -62,16 +62,16 @@
  *	only the IO_READ flag set, the other with only the IO_WRITE flag set.
  */
 #ifdef	MAC68K
-GLOBAL char	*Ios_in_adapter_table = NULL;
-GLOBAL char	*Ios_out_adapter_table = NULL;
+#error "Unsupported SoftPC mirror configuration: MAC68K"
 #else
+#line 75
 GLOBAL char	Ios_in_adapter_table[PC_IO_MEM_SIZE];
 GLOBAL char	Ios_out_adapter_table[PC_IO_MEM_SIZE];
 #endif	/* MAC68K */
 #ifndef PROD
-GLOBAL IU32	*ios_empty_in = (IU32 *)0;
-GLOBAL IU32	*ios_empty_out = (IU32 *)0;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* PROD */
+#line 75
 
 /*
  *	Ios_xxx_function - These tables are indexed by the adapter ID obtained
@@ -156,14 +156,14 @@ LOCAL void io_empty_inb IFN2(io_addr, io_address, half_word *, value)
 	UNUSED(io_address);
 
 #else
-	if (BIT_NOT_SET(ios_empty_in, (IU16)io_address))
-	{
-		/* First time for this port */
-		always_trace1 ("INB attempted on empty port 0x%x", io_address);
-		SET_THE_BIT(ios_empty_in, (IU16)io_address);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 166
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif // NTVDM
+#line 198
         *value = IO_EMPTY_PORT_BYTE_VALUE;
 
 }
@@ -182,14 +182,14 @@ LOCAL void io_empty_outb IFN2(io_addr, io_address, half_word, value)
 #ifdef PROD
 	UNUSED(io_address);
 #else
-	if (BIT_NOT_SET(ios_empty_out, (IU16)io_address))
-	{
-		/* First time for this port */
-		always_trace1 ("OUTB attempted on empty port 0x%x", io_address);
-		SET_THE_BIT(ios_empty_out, (IU16)io_address);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
+#line 192
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 193
 }
 
 /*
@@ -215,9 +215,9 @@ LOCAL void generic_inw IFN2(io_addr, io_address, word *, value)
 #endif				/* LITTLEND */
 
 #ifdef BIGEND
-	*((half_word *) value + 0) = temp.byte.high;
-	*((half_word *) value + 1) = temp.byte.low;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif				/* BIGEND */
+#line 221
 }
 
 /*
@@ -263,9 +263,9 @@ LOCAL void generic_ind IFN2(io_addr, io_address, double_word *, value)
 #endif				/* LITTLEND */
 
 #ifdef BIGEND
-	*((word *) value + 0) = high;
-	*((word *) value + 1) = low;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif				/* BIGEND */
+#line 269
 }
 #endif /* SPC386 */
 
@@ -302,6 +302,10 @@ LOCAL void generic_outd IFN2(io_addr, io_address, double_word, value)
 */
 
 /* MS NT monitor uses these string routines {in,out}s{b,w} string io support */
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif	/* NTVDM & MONITOR */
+#line 361
 
 LOCAL void generic_insb IFN3(io_addr, io_address, half_word *, valarray,
 	word, count)
@@ -403,6 +407,10 @@ LOCAL VOID generic_outsd IFN3(io_addr, io_address, double_word *, valarray, word
 #endif
 
 /* ensure any more LOCAL routines remain LOCAL */
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif	/* NTVDM & MONITOR */
+#line 406
 
 /*
  *
@@ -433,15 +441,16 @@ GLOBAL void	inb IFN2(io_addr, io_address, half_word *, value)
 #endif /* VIRTUALISATION */
 
 #ifdef EGA_DUMP
-	if (io_address >= MDA_PORT_START && io_address <= CGA_PORT_END)
-		dump_inb(io_address);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 439
 
 #ifdef VIRTUALISATION
 
 #ifdef SYNCH_TIMERS
-	value32 = 0;
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif	/* SYNCH_TIMERS */
+#line 445
 
 	if (IOVirtualised(io_address, &value32, BIOS_INB_OFFSET, (sizeof(IU8))))
 	{
@@ -474,9 +483,9 @@ GLOBAL void	outb IFN2(io_addr, io_address, half_word, value)
 #endif /* VIRTUALISATION */
 
 #ifdef EGA_DUMP
-	if (io_address >= MDA_PORT_START && io_address <= CGA_PORT_END)
-		dump_outb(io_address, value);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 567
 
 	sub_note_trace2( IOS_VERBOSE, "outb( %x, %x )", io_address, value );
 
@@ -511,15 +520,16 @@ GLOBAL void	inw IFN2(io_addr, io_address, word *, value)
 #endif /* VIRTUALISATION */
 
 #ifdef EGA_DUMP
-	if (io_address >= MDA_PORT_START && io_address <= CGA_PORT_END)
-		dump_inw(io_address);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 517
 
 #ifdef VIRTUALISATION
 
 #ifdef SYNCH_TIMERS
-	value32 = 0;
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif	/* SYNCH_TIMERS */
+#line 523
 
 	if (IOVirtualised(io_address, &value32, BIOS_INW_OFFSET, (sizeof(IU16))))
 	{
@@ -551,9 +561,9 @@ GLOBAL void	outw IFN2(io_addr, io_address, word, value)
 #endif /* VIRTUALISATION */
 
 #ifdef EGA_DUMP
-	if (io_address >= EGA_AC_INDEX_DATA && io_address <= EGA_IPSTAT1_REG)
-		dump_outw(io_address, value);
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
+#line 644
 
 	sub_note_trace2( IOS_VERBOSE, "outw( %x, %x )", io_address, value );
 
@@ -591,8 +601,9 @@ GLOBAL void	ind IFN2(io_addr, io_address, IU32 *, value)
 	IU32 value32;
 
 #ifdef SYNCH_TIMERS
-	value32 = 0;
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif	/* SYNCH_TIMERS */
+#line 596
 
 	if (IOVirtualised(io_address, &value32, BIOS_IND_OFFSET, (sizeof(IU32))))
 	{
@@ -651,9 +662,9 @@ GLOBAL void	outd IFN2(io_addr, io_address, IU32, value)
 )*/
 GLOBAL void
 #ifdef	ANSI
-io_define_inb(half_word adapter,
-	void (*func) IPT2(io_addr, io_address, half_word *, value))
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 744
 io_define_inb(adapter, func)
 half_word       adapter;
 void            (*func) ();
@@ -826,6 +837,10 @@ GLOBAL VOID	io_define_ind_routine IFN3(half_word, adapter,
     OUTPUT:
 ==============================================================================
 )*/
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 929
 GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 	half_word, mode)
 {
@@ -836,6 +851,8 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 		Ios_out_adapter_table[io_address & (PC_IO_MEM_SIZE-1)] = adapter;
 	}
 }
+#endif
+#line 839
 
 
 /*(
@@ -846,12 +863,18 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
     OUTPUT:
 ==============================================================================
 )*/
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 963
 GLOBAL void	io_disconnect_port IFN2(io_addr, io_address, half_word, adapter)
 {
 	UNUSED(adapter);
 	Ios_in_adapter_table[io_address] = EMPTY_ADAPTOR;
 	Ios_out_adapter_table[io_address] = EMPTY_ADAPTOR;
 }
+#endif	/* NTVDM */
+#line 855
 
 
 /*(
@@ -881,13 +904,9 @@ GLOBAL IOS_FUNC_OUTB *get_outb_ptr IFN1(io_addr, io_address)
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * function will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 891
 
 /*(
 ================================ io_init ===================================
@@ -909,25 +928,14 @@ GLOBAL void	io_init IFN0()
 	io_define_outb(EMPTY_ADAPTOR, io_empty_outb);
 
 #ifdef	MAC68K
-	if (Ios_in_adapter_table == NULL) {				/* First time around -- allocate */
-		Ios_in_adapter_table = host_malloc(PC_IO_MEM_SIZE);
-		Ios_out_adapter_table = host_malloc(PC_IO_MEM_SIZE);
-	}
+#error "Unsupported SoftPC mirror configuration: legacy Mac"
 #endif	/* MAC68K */
+#line 917
 
 #ifndef PROD
-	if (host_getenv("EMPTY_IO_VERBOSE") != NULL)
-	{
-		/* User does want empty I/O messages,
-		 * so we must allocate bitmaps with one bit for every
-		 * possible port number.
-		 */
-		ios_empty_in = (IU32 *)host_malloc((64*1024)/8);
-		ios_empty_out = (IU32 *)host_malloc((64*1024)/8);
-		memset((char *)ios_empty_in, 0, (64*1024)/8);
-		memset((char *)ios_empty_out, 0, (64*1024)/8);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* PROD */
+#line 1046
 
 	for (i = 0; i < PC_IO_MEM_SIZE; i++){
 	    Ios_in_adapter_table[i] = EMPTY_ADAPTOR;
@@ -935,4 +943,8 @@ GLOBAL void	io_init IFN0()
 	}
 }
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1071
 

@@ -1,0 +1,2 @@
+path	parent_if_line	baseline_else_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/keymouse/mouse_io.c	1921	1926	1929	ifdef	V7VGA	b00069db4035d7698bb2db47c38863b657100bd960cbbe03e046f7bf18b1e9e4

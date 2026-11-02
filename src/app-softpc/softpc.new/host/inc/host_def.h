@@ -43,8 +43,9 @@
 #define YYLENG_ADJUST 0
 
 #ifdef MONITOR
-#define CpuH "cpu.h"
+#error "Unsupported SoftPC mirror configuration: MONITOR"
 #else
+#line 48
 #define CpuH "cpu4.h"
 #endif
 
@@ -145,8 +146,9 @@ extern void host_simulate(void);
 #define host_pipe_init()
 
 #ifdef HUNTER
-#define RB_MODE "r"
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif /* HUNTER */
+#line 150
 
 #define HOST_TIMER_TOOLONG_DELAY        15000   //BCN 1781
 
@@ -220,6 +222,10 @@ void InitSound(BOOL);
 
 // from config.c
 extern unsigned char PifFgPriPercent;
+#ifdef ARCX86
+#error "Unsupported SoftPC mirror configuration: ARCX86"
+#endif
+#line 220
 
 // fomr unix.c
 void WakeUpNow(void);

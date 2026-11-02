@@ -46,18 +46,16 @@
  *
  */
 
+/* @(#)keybd_io.c	1.35 06/27/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)keybd_io.c	1.35 06/27/95 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 52
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 61
 
 
 /*
@@ -82,8 +80,9 @@ static char SccsID[]="@(#)keybd_io.c	1.35 06/27/95 Copyright Insignia Solutions 
 #include "keyba.h"
 #include "ica.h"
 #ifndef PROD
-#include "trace.h"
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 87
 
 #include "debug.h"
 #include "idetect.h"
@@ -143,6 +142,10 @@ static sys_addr alt_table;
  * or assumed location.
  */
 
+#if defined(NTVDM) && defined(LOCAL)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 146
 
 #ifndef GISP_SVGA
 LOCAL word int15_seg = RCPU_INT15_SEGMENT,
@@ -160,28 +163,22 @@ LOCAL word rcpu_nop_segment = RCPU_NOP_SEGMENT,
 LOCAL word rcpu_poll_segment = RCPU_POLL_SEGMENT,
 	   rcpu_poll_offset  = RCPU_POLL_OFFSET;
 #else /* GISP_SVGA */
-/* If we are GISP_SVGA the segments will be variables anyway */
-#define int15_seg  RCPU_INT15_SEGMENT
-LOCAL word	int15_off = RCPU_INT15_OFFSET;
-
-#define int1b_seg  KEYBOARD_BREAK_INT_SEGMENT
-LOCAL word   int1b_off = KEYBOARD_BREAK_INT_OFFSET;
-
-#define int05_seg  PRINT_SCREEN_INT_SEGMENT
-LOCAL word  int05_off =	PRINT_SCREEN_INT_OFFSET;
-
-#define rcpu_nop_segment  RCPU_NOP_SEGMENT
-LOCAL word  rcpu_nop_offset  = RCPU_NOP_OFFSET;
-
-#define rcpu_poll_segment  RCPU_POLL_SEGMENT
-LOCAL word rcpu_poll_offset  = RCPU_POLL_OFFSET;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 186
 
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
-IMPORT VOID  HostAllowKbdInt();  /* Allow keybd Ints without an IRET */
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
+#line 183
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 184
 #define FREEKBDHDW()	/* Nothing for conventional SoftPC */
+#endif	/* NTVDM */
+#line 185
 
 /*
  * Mix in global defined data as well.
@@ -194,17 +191,25 @@ GLOBAL word rcpu_int1C_off = USER_TIMER_INT_OFFSET;
 GLOBAL word rcpu_int4A_seg = RCPU_INT4A_SEGMENT;
 GLOBAL word rcpu_int4A_off = RCPU_INT4A_OFFSET;
 #else /* GISP_SVGA */
-
-/* For GISPSVGA the segs will already be variables */
-#define	rcpu_int1C_seg = USER_TIMER_INT_SEGMENT;
-GLOBAL word rcpu_int1C_off = USER_TIMER_INT_OFFSET;
-
-#define	rcpu_int4A_seg = RCPU_INT4A_SEGMENT;
-GLOBAL word rcpu_int4A_off = RCPU_INT4A_OFFSET;
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 264
 
 GLOBAL word dummy_int_seg = 0;
 GLOBAL word dummy_int_off = 0;
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 274
+#if defined(JAPAN) && defined(NTVDM) && !defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: JAPAN and NTVDM and not NEC_98"
+#endif // JAPAN, NTVDM, !NEC_98
+#line 279
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#endif
+#line 301
 
 
 
@@ -441,33 +446,9 @@ LOCAL VOID check_indicators IFN1(IBOOL, eoi)
 				outb(0x20, 0x20);
 
 #if defined(NTVDM) || defined(GISP_CPU)
-	/*
-	 *  On the NT port we do not update the real kbd lights
-	 *  so we don't need to do communicate with the kbd hdw (keyba.c)
-	 *
-	 *  If this ever changes for the NT port then do not use
-	 *  send_data which forces us to switch context back to
-	 *  16 bit and waits for a reply. Do this with a direct
-	 *  call to the kbd Hdw
-	 *
-	 */
-
-	/* set kb flag up with new status	*/
-
-	var_kb_flag_2 = (var_kb_flag_2 & 0xf8) | indicators;
-	sas_store_no_check(kb_flag_2, var_kb_flag_2);
-
-#ifdef	GISP_CPU
-	/*
-	** We do update an emulation of the keyboard lights but we don't
-	** want to do it via send_data and switching back to 16-bit.
-	** We call the host routines directly.
-	*/
-	host_kb_light_on (indicators);
-	host_kb_light_off ((~indicators)&0x7);
-
-#endif	/* GISP_CPU */
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #else	/* not NTVDM nor GISP_CPU */
+#line 567
 
 			send_data(LED_CMD);
 
@@ -547,6 +528,8 @@ LOCAL VOID K26 IFN0()
 }
 
 
+#ifndef NTVDM
+#line 647
 
 LOCAL VOID INT15 IFN0()
 {
@@ -564,10 +547,20 @@ LOCAL VOID INT15 IFN0()
 	setIP(saveIP);
 }
 
+#else	/* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif	/* NTVDM */
+#line 567
 
+#ifndef NTVDM
+#line 673
 #define BEEP(message)           always_trace0(message);         \
 				host_alarm(250000L);		\
 				K26A()
+#else   /* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif	/* NTVDM */
+#line 687
 
 
 
@@ -589,6 +582,8 @@ LOCAL VOID INT15 IFN0()
 ** on the Mac from 38K to 12K!) After all, it isn't as if keyboards are
 ** highly speed sensitive!
 */
+#ifndef NTVDM
+#line 709
 
 LOCAL VOID PutInBufferFunc IFN2(half_word, s, half_word, v)
 {
@@ -619,11 +614,19 @@ LOCAL VOID PutInBufferFunc IFN2(half_word, s, half_word, v)
 }
 
 
+#else   /* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif	/* NTVDM */
+#line 775
 
 
 /* <tur 17-Jun-93> Eurrgh; macros with embedded "return"s! */
 
+#ifndef NTVDM
+#line 626
 #define PUT_IN_BUFFER(s, v)		PutInBufferFunc(s,v); return
+#endif	/* !NTVDM */
+#line 782
 
 LOCAL VOID CheckAndPutInBufferFunc IFN2(half_word, s,half_word, v)
 {
@@ -632,7 +635,13 @@ LOCAL VOID CheckAndPutInBufferFunc IFN2(half_word, s,half_word, v)
 		exit_from_kbd_int();
 	}
 	else {
+#ifndef NTVDM
+#line 791
 		PutInBufferFunc(s, v);
+#else /* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* !NTVDM */
+#line 636
 	}
 }
 
@@ -656,10 +665,15 @@ LOCAL VOID PAUSE IFN0()
 
 	do {
 #if defined(IRET_HOOKS)  && defined(GISP_CPU)
-		HostAllowKbdInt();	/* Allow a keypress to generate an interrupt */
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
+#line 820
 
 
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 663
 
 		setCS(rcpu_nop_segment);
 		setIP(rcpu_nop_offset);
@@ -672,16 +686,24 @@ LOCAL VOID PAUSE IFN0()
 	outb(KEYBA_STATUS_CMD, ENA_KBD);
 }
 
+#ifndef NTVDM
+#line 838
 static int re_entry_level=0;
+#endif
+#line 676
 
 /*
 ** All exits from keyboard_int() call this first.
 */
 LOCAL void exit_from_kbd_int IFN0()
 {
+#ifndef NTVDM
+#line 847
 	--re_entry_level;
 	if( re_entry_level >= 4 )
 		always_trace1("ERROR: KBD INT bad exit level %d", re_entry_level);
+#endif
+#line 851
 	note_trace0( BIOS_KB_VERBOSE, "KBD BIOS - END" );
 	setIF( 0 );
 	FREEKBDHDW();	/* JonLe NTVDM Mod */
@@ -696,22 +718,43 @@ void keyboard_int IFN0()
 				chr,		/* ASCII char code		*/
 				last_kb_flag_3,	/* kb_flag_3 saved		*/
 				mask;
+#ifdef	NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif	/* NTVDM */
+#line 871
 
 
 
         boolean                 upper;          /* flag indicating upper case   */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 883
+
+#ifndef NTVDM
+#line 884
 	++re_entry_level;
 	if( re_entry_level > 4 ){
 		always_trace1("ERROR: KBD BIOS re-entered at level %d\n", re_entry_level-1);
 	}
+#endif
+#line 708
 	setIF(0);
         note_trace0(BIOS_KB_VERBOSE,"KBD BIOS start");
 
+#ifdef NTVDM            /* JonLe keyboard mod */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif  /* NTVDM */
+#line 895
 
 	/* disable keyboard	*/
 	outb(KEYBA_STATUS_CMD, DIS_KBD);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 916
             inb(KEYBA_IO_BUFFERS, &code);                           /* get scan_code        */
 
 	/* call recursive CPU to handle int 15 call	*/
@@ -900,6 +943,10 @@ void keyboard_int IFN0()
 			sas_store_no_check(alt_input, 0);		/* Zero the ALT_INPUT char */
 			/* At this point, the ALT input char (now in "code") should be put in the buffer. */
                         PUT_IN_BUFFER(0, code);
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 903
 		}
 		/* SHIFT MAKE FOUND, DETERMINE SET OR TOGGLE	*/
 		if( mask < SCROLL_SHIFT )
@@ -979,7 +1026,13 @@ label2:	/* NOT IN HOLD STATE	*/
 		/* TEST FOR RESET KEY SEQUENCE (CTL ALT DEL)	*/
 		if( (sas_hw_at_no_check(kb_flag) & CTL_SHIFT ) && (code == DEL_KEY) )
                 {
+#ifndef NTVDM
+#line 982
                         reboot();
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 983
 			exit_from_kbd_int();return;
 		}
 		/* IN ALTERNATE SHIFT, RESET NOT FOUND	*/
@@ -1284,6 +1337,10 @@ void kb_idle_poll()
 }
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1287
 void keyboard_io()
 {
     /*
@@ -1590,21 +1647,23 @@ void keyboard_io()
 	break;
     }
 }
+#endif
+#line 1593
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 1892
 
 void keyboard_post()
 {
 
      /* Set up BIOS keyboard variables */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 1958
 
 /* Initialize the keyboard table pointers */
 	shift_keys = K6;
@@ -1628,6 +1687,8 @@ void keyboard_post()
 	sas_store_no_check (kb_flag_2,2);
 	sas_store_no_check (kb_flag_3,KBX);
 	sas_store_no_check (alt_input,0);
+#endif    //NEC_98
+#line 1631
 }
 
 void keyboard_init()
@@ -1645,3 +1706,8 @@ void keyboard_init()
 
 
 
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2281

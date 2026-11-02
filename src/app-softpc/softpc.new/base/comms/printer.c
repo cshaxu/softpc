@@ -66,18 +66,16 @@
  *
  */
 
+/* @(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[] = "@(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 72
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_PRINTER.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 81
 
 
 /*
@@ -87,10 +85,9 @@ static char SccsID[] = "@(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions
 #include TypesH
 #include TimeH
 #ifdef SYSTEMV
-#ifdef STINGER
-#include <sys/termio.h>
+#error "Unsupported SoftPC mirror configuration: SYSTEMV"
 #endif
-#endif
+#line 94
 
 /*
  * SoftPC include files
@@ -110,8 +107,9 @@ static char SccsID[] = "@(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions
 
 #include "debug.h"
 #ifndef PROD
-#include "trace.h"
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 115
 
 
 /*
@@ -139,6 +137,10 @@ static char SccsID[] = "@(#)printer.c	1.19 11/14/94 Copyright Insignia Solutions
 #undef	ERROR
 #endif
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 142
 static half_word output_reg[NUM_PARALLEL_PORTS];
 static half_word control_reg[NUM_PARALLEL_PORTS];
 #define NOTBUSY		(IU8)0x80
@@ -169,6 +171,8 @@ static sys_addr port_address[] = {LPT1_PORT_ADDRESS, LPT2_PORT_ADDRESS, LPT3_POR
 static sys_addr timeout_address[] = {LPT1_TIMEOUT_ADDRESS, LPT2_TIMEOUT_ADDRESS, LPT3_TIMEOUT_ADDRESS};
 static q_ev_handle handle_for_out_event[NUM_PARALLEL_PORTS];
 static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
+#endif // !NEC_98
+#line 172
 
 
 #define STATE_READY     0
@@ -200,9 +204,9 @@ static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
  */
 
 #ifdef PS_FLUSHING
-LOCAL IBOOL psFlushEnabled[NUM_PARALLEL_PORTS];	/* TRUE if PostScript flushing
-						is enabled */
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 206
 
 static void lpr_state_outa_event IPT1(long, adapter);
 static void lpr_state_out_event IPT1(long, adapter);
@@ -300,6 +304,13 @@ const softpc_device_parallel_controller_state *state_in;
  * monitors.
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#else /* NTVDM && MONITOR */
+#line 303
 #define get_status(adap)	(status_reg[adapter])
 #define set_status(adap,val)	(status_reg[adapter] = (val))
 
@@ -308,11 +319,15 @@ const softpc_device_parallel_controller_state *state_in;
 
 #define get_state(adap)		(state[adapter])
 #define set_state(adap,val)	(state[adapter] = (val))
+#endif /* NTVDM && MONITOR */
+#line 311
 
 
 static void printer_inb IPT2(io_addr, port, half_word *, value);
 static void printer_outb IPT2(io_addr, port, half_word, value);
 static void notbusy_check IPT1(int,adapter);
+#endif // !NEC_98
+#line 316
 
 /*
  * ============================================================================
@@ -322,14 +337,27 @@ static void notbusy_check IPT1(int,adapter);
 
 void printer_post IFN1(int,adapter)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 325
 	/*
 	 * Set up BIOS data area.
 	 */
 	sas_storew(port_address[adapter],(word)port_start[adapter]);
 	sas_store(timeout_address[adapter], (half_word)0x14 );		/* timeout */
+#endif // !NEC_98
+#line 330
 }
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#else	/* NTVDM && MONITOR */
+#line 333
 static void lpr_state_outa_event IFN1(long,adapter)
 {
 	set_high(status_reg[adapter],ACK);
@@ -342,9 +370,14 @@ static void lpr_state_out_event IFN1(long,adapter)
 	state[adapter]=STATE_OUTA;
 	handle_for_outa_event[adapter]=add_q_event_t(lpr_state_outa_event,HOST_PRINTER_DELAY,adapter);
 }
+#endif	/* NTVDM && MONITOR */
+#endif // !NEC_98
+#line 345
 
 static void printer_inb IFN2(io_addr,port, half_word *,value)
 {
+#ifndef NEC_98
+#line 348
 	int	adapter, i;
 
 	note_trace1(PRINTER_VERBOSE,"inb from printer port %#x ",port);
@@ -359,6 +392,8 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
         adapter = i % NUM_PARALLEL_PORTS;
 		
 	port = port & PRINTER_BIT_MASK;		/* clear unused bits */
+#endif // !NEC_98
+#line 362
 
 	switch(port)
 	{
@@ -366,6 +401,10 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
                 *value = output_reg[adapter];
 		break;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 369
 	case STATUS_OFFSET:
 		switch(get_state(adapter))
 		{
@@ -388,9 +427,9 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 			delete_q_event(handle_for_out_event[adapter]);
                         lpr_state_out_event(adapter);
 #else
-			set_low(status_reg[adapter], ACK);
-                        state[adapter] = STATE_OUTA;
+#error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #endif /* DELAYED INTS */
+#line 394
 			break;
     	case STATE_OUTA:
 			notbusy_check(adapter);		/* <chrisP 11Sep91> */
@@ -399,9 +438,9 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 			delete_q_event(handle_for_outa_event[adapter]);
 			lpr_state_outa_event(adapter);
 #else
-			set_high(status_reg[adapter], ACK);
-			state[adapter] = STATE_READY;
+#error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #endif
+#line 405
 			break;
     	default:	
 			note_trace1(PRINTER_VERBOSE,
@@ -409,30 +448,42 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 			            get_state(adapter));
 			break;
 		}
+#endif // !NEC_98
+#line 412
 		break;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 413
 	case CONTROL_OFFSET:
 		*value = get_control(adapter) | CONTROL_REG_MASK;
 		negate(*value, STROBE);
 		negate(*value, AUTO_FEED);
 		negate(*value, SELECT_IN);
+#endif // !NEC_98
+#line 418
 		break;
 	}
+#ifndef NEC_98
+#line 420
 	note_trace3(PRINTER_VERBOSE, "<pinb() %x, ret %x, state %x>",
 		    port, *value, get_state(adapter));
+#endif // !NEC_98
+#line 422
 }
 
 static void printer_outb IFN2(io_addr,port, half_word,value)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 426
 	int	adapter, i;
 	half_word old_control;
 #ifdef PC_CONFIG
-	char	variable_text[MAXPATHLEN];
-	int softpcerr;
-	int severity;
-
-	softpcerr = 0;
-	severity = 0;
+#error "Unsupported SoftPC mirror configuration: PC_CONFIG"
 #endif
+#line 436
 
 
 	note_trace2(PRINTER_VERBOSE,"outb to printer port %#x with value %#x",
@@ -458,12 +509,18 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 	case STATE_OUT:
 	case STATE_OUTA:
 	case STATE_READY:
+#endif // !NEC_98
+#line 461
 		switch(port)
 		{
 		case DATA_OFFSET:
 			/* Write char to internal buffer */
 			output_reg[adapter] = value;
 			break;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 467
 
 		case STATUS_OFFSET:
 			/* Not possible */
@@ -473,13 +530,17 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 			/* Write control bits */
 			old_control = get_control(adapter);	/* Save old value to see what's changed */
 			set_control(adapter, value);
+#endif // !NEC_98
+#line 476
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 476
 			if (low_high(old_control, value, INIT_P))
 #ifdef PC_CONFIG
-				/* this was a call to host_print_doc - <chrisP 28Aug91> */
-				host_reset_print(&softpcerr, &severity);
-			if (softpcerr != 0)
-				host_error(softpcerr, severity, variable_text);
+#error "Unsupported SoftPC mirror configuration: PC_CONFIG"
 #else
+#line 483
 				/* this was a call to host_print_doc - <chrisP 28Aug91> */
 				host_reset_print(adapter);
 #endif
@@ -489,22 +550,22 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 					((value & AUTO_FEED) != 0));
 
 			if (low_high(old_control, value, STROBE))
+#endif // !NEC_98
+#line 492
 			{
 
 #ifdef PS_FLUSHING
-				/*
-				 * If PostScript flushing is enabled for this
-				 * port then we flush on a Ctrl-D
-				 */
-				if ( psFlushEnabled[adapter] &&
-				     output_reg[adapter] == 0x04 /* ^D */ ) {
-					host_print_doc(adapter);
-				} else {
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 504
 				       /*
 				 	* Send the stored internal buffer to
 				 	* the printer
 				 	*/
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 508
                                 	if(host_print_byte(adapter,output_reg[adapter]) == FALSE)
 					{
 				    		set_status(adapter, (IU8)(get_status(adapter) & ~ERROR)); /* active Low */
@@ -516,19 +577,34 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 					{
                                     		/* clear ERROR condition */
                                     		set_status(adapter, (IU8)(get_status(adapter) | ERROR));
+#if defined(NTVDM) && !defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: defined(NTVDM) && !defined(MONITOR)"
+#else /* NTVDM && !MONITOR */
+#line 519
 				    		set_status(adapter,
 					       	(IU8)(get_status(adapter) & ~NOTBUSY));
+#endif /* NTVDM && !MONITOR */
+#line 521
 				    		set_state(adapter, STATE_OUT);
 #ifndef DELAYED_INTS
 				    		handle_for_out_event[adapter]=add_q_event_t(lpr_state_out_event,HOST_PRINTER_DELAY,adapter);
 #endif /* DELAYED_INTS */
 					}
+#endif // !NEC_98
+#line 526
 #ifdef PS_FLUSHING
-				}
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 529
 			}
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 530
 			else if (high_low(old_control, value, STROBE)
 				 	&& get_state(adapter) == STATE_OUT)
+#endif // !NEC_98
+#line 532
 			{
 				if (value & IRQ)
 				{
@@ -539,25 +615,34 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 					 * used to check the
 					 * printer status.
 					 */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 542
 					set_state(adapter, STATE_READY);
 					notbusy_check(adapter);
+#endif // !NEC_98
+#line 544
 				}
 			}
 
 
 #ifndef	PROD
-			if (old_control & IRQ)
-				note_trace1(PRINTER_VERBOSE, "Warning: LPT%d is being interrupt driven\n",
-					number_for_adapter(adapter));
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 553
 			break;
 		}
+#ifndef NEC_98
+#line 555
 		break;
 	default:	
 		note_trace1(PRINTER_VERBOSE, "<poutb() - unknown state %x>",
 		            get_state(adapter));
 		break;
 	}
+#endif // !NEC_98
+#line 561
 }
 
 void printer_status_changed IFN1(int,adapter)
@@ -599,6 +684,10 @@ static void notbusy_check IFN1(int,adapter)
 	 */
 
 	/* <chrisP 11Sep91> allow not busy at leading edge of ack pulse too */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 602
 	if (	 (get_state(adapter) == STATE_READY ||
 		  get_state(adapter) == STATE_OUTA)
 	     &&	!(get_status(adapter) & NOTBUSY)
@@ -607,30 +696,32 @@ static void notbusy_check IFN1(int,adapter)
 		set_status(adapter, (IU8)(get_status(adapter) | NOTBUSY));
 
 #ifndef	PROD
-		if (io_verbose & PRINTER_VERBOSE)
-		    fprintf(trace_file, "<printer notbusy_check() - adapter %d changed to NOTBUSY>\n", adapter);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 613
 
 		if (get_control(adapter) & IRQ)
                 {
 			ica_hw_interrupt(0, CPU_PRINTER_INT, 1);
 		}
 	}
+#endif // !NEC_98
+#line 619
 }
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 628
 
 /*
 ** Initialise the printer port required.
 */
 void printer_init IFN1(int,adapter)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 634
 	io_addr i;
 
 	io_define_inb( lpt_adapter[adapter], printer_inb );
@@ -638,6 +729,10 @@ void printer_init IFN1(int,adapter)
 	for(i = port_start[adapter]; i < port_end[adapter]; i++)
 		io_connect_port(i,lpt_adapter[adapter],IO_READ_WRITE);
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif /* NTVDM && MONITOR */
+#line 641
 	{
 	    control_reg[adapter] = 0xEC;
 	    status_reg[adapter] = 0xDF;
@@ -657,48 +752,36 @@ void printer_init IFN1(int,adapter)
 	/* host_print_doc(adapter); */
 	host_print_auto_feed(adapter, FALSE);
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif /* NTVDM && MONITOR */
+#line 660
 	    state[adapter] = STATE_READY;
 
+#endif // !NEC_98
+#line 662
 } /* end of printer_init() */
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif /* NTVDM && MONITOR */
+#line 664
 
 #endif
 
+#ifndef NEC_98
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#endif // !NEC_98
+#line 667
 
 #ifdef PS_FLUSHING
-/*(
-=========================== printer_psflush_change ============================
-PURPOSE:
-	Handle change of PostScript flush configuration option for a printer
-	port.
-INPUT:
-	hostID - Configuration item I.D.
-	apply - TRUE if change to be applied
-OUTPUT:
-	None
-ALGORITHM:
-	If PostScript flushing is being enabled then;
-		set the PostScript flush enable flag for the port;
-		disable autoflush for the port;
-	else;
-		reset the PostScript flush enable flag for the port;
-		enable autoflush for the port;
-===============================================================================
-)*/
-
-GLOBAL void printer_psflush_change IFN2(
-    IU8, hostID,
-    IBOOL, apply
-) {
-    IS32 adapter = hostID - C_LPT1_PSFLUSH;
-
-    assert1(adapter < NUM_PARALLEL_PORTS,"Bad hostID %d",hostID);
-
-    if ( apply )
-        if ( psFlushEnabled[adapter] = (IBOOL)config_inquire(hostID,NULL) )
-            host_lpt_disable_autoflush(adapter);
-        else
-            host_lpt_enable_autoflush(adapter);
-}
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 704
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1102

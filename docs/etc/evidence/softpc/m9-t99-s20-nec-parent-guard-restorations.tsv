@@ -1,0 +1,5 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/comms/com.c	2966	3067	1813	1882	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/comms/com.c	3678	3825	2333	2361	34d6f8f8594063e47cc322cce35179ecf9fcb7514f23fb683cd99a1b5c883566
+base/video/ega_vide.c	765	899	704	788	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/ega_vide.c	1607	1748	1234	1337	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

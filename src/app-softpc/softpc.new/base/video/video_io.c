@@ -16,14 +16,14 @@
  */
 
 
+#ifndef NEC_98
+#line 19
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "VIDEO_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 27
+#endif // !NEC_98
+#line 27
 
 
 /*
@@ -44,6 +44,10 @@
 #include "idetect.h"
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 97
 #define check_video_func(AH)	(AH < EGA_FUNC_SIZE)
 
 void video_io()
@@ -65,3 +69,5 @@ void video_io()
 	(*video_func[getAH()])();
     }
 }
+#endif // !NEC_98
+#line 123

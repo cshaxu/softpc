@@ -1,7 +1,7 @@
 #ifdef NTVDM
-#include "..\..\host\inc\error.h"
-
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
+#line 5
 #ifndef _INS_ERROR_H
 #define _INS_ERROR_H
 /*[
@@ -297,27 +297,28 @@ typedef enum
 	EG_UPDATE_LICFILE_FAILED,
 	EG_WRONG_MSWDVR,
 #ifdef DOS_APP_LIC
-	EG_DAL_TOO_MUCH_NESTING,
-	EG_DAL_LIC_EXPIRED,
-	EG_DAL_LIC_EXCEEDED,
+#error "Unsupported SoftPC mirror configuration: DOS_APP_LIC"
 #endif
+#line 304
 	EG_FAILED_RCLOCAL,
 
 #ifdef SOFTWIN_API
-	EG_API_MISMATCH,
+#error "Unsupported SoftPC mirror configuration: SOFTWIN_API"
 #endif /* SOFTWIN_API */
+#line 309
 
 	EG_OVERWRITE_DRIVE_C,
 
 	EG_NO_SNDBLST_SUPPORT,
 	EG_DIRECTORY,
 #ifdef HOST_HELP
-	EG_HELP_ERROR,
-	EG_HELP_NOT_INSTALLED,
+#error "Unsupported SoftPC mirror configuration: HOST_HELP"
 #endif /* HOST_HELP */
+#line 318
 #ifdef SECURE
-	EG_SYS_INSECURE,
+#error "Unsupported SoftPC mirror configuration: SECURE"
 #endif
+#line 321
 
 	EG_INFINITE_LOOP,
 	EG_DRIVER_MISMATCH,
@@ -375,15 +376,9 @@ typedef struct
  */
 
 #ifdef ANSI
-
-typedef struct
-{
-	SHORT (*error_conf)(int, int, int, char *);
-	SHORT (*error)(int, int, char *);
-	SHORT (*error_ext)(int, int, ErrDataPtr);
-} ERRORFUNCS;
-
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else /* ANSI */
+#line 387
 
 typedef struct
 {

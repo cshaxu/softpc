@@ -45,12 +45,20 @@
 #define AT_CPU_MOUSE_INT      	HOST_AT_CPU_MOUSE_INT
 #define AT_CPU_MOUSE_ADAPTER	HOST_AT_CPU_MOUSE_ADAPTER
 #define	MOUSE_VEC		HOST_AT_MOUSE_INT_VEC
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 48
 #define CPU_RS232_SEC_INT   	3
 #define CPU_RS232_PRI_INT   	4
 #define CPU_DISK_INT   		5
 #define CPU_DISKETTE_INT   	6
 #define CPU_PRINTER_INT   	7
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif
+#line 61
 
 /* Different lines for the AT */
 #define CPU_PRINTER2_INT	5
@@ -61,16 +69,19 @@
 #define CPU_RTC_INT		0
 
 #if defined (NOVELL) || defined (NOVELL_IPX)
-#define NETWORK_INT		2
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif
+#line 73
 
 #if defined (SWIN_HAW) 
-#define SWIN_HAW_INT		3
+#error "Unsupported SoftPC mirror configuration: SWIN_HAW"
 #endif
+#line 77
 
 #if defined (ASPI)
-#define ASPI_INT		4
+#error "Unsupported SoftPC mirror configuration: ASPI"
 #endif
+#line 74
 
 #define CPU_AT_NPX_INT		5	/* NPX exception */
 #define CPU_AT_DISK_INT		6
@@ -104,6 +115,10 @@ extern IU8 ica_scan_irr IPT1(IU32, adapter);
 extern void ica_interrupt_cpu IPT2(IU32, adapter, IU32, line);
 extern void ica_eoi IPT3(IU32, adapter, IS32 *, line, IBOOL, rotate);
 
+#if defined (NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else   /* ndef NTVDM */
+#line 149
 
 extern void SWPIC_clear_int IPT2(IU32, adapter, IU32, line_no);
 extern void SWPIC_init_funcptrs IPT0();
@@ -168,19 +183,16 @@ typedef struct {
 /* 'no callback' define for action_interrupt callbacks */
 #define NO_ICA_CALLBACK ((ICA_CALLBACK) 0L)
 
+#endif  /* NTVDM */
+#line 214
 
 
+#if !defined(NTVDM)
+#line 173
 #ifdef  REAL_ICA
-
-extern void host_ica_hw_interrupt IPT3(IU32, adap, IU32, line, IS32, cnt);
-extern void host_ica_hw_interrupt_delay IPT4(IU32, adap, IU32, line, IS32, cnt, IS32, delay);
-extern void host_ica_clear_int IPT2(IU32, adap, IU32, line);
-
-#define ica_hw_interrupt(ms,line,cnt)				host_ica_hw_interrupt(ms, line, cnt)
-#define	ica_hw_interrupt_delay(ms,line,cnt,delay)	host_ica_hw_interrupt(ms, line, cnt)
-#define ica_clear_int(ms, line)						host_ica_clear_int(ms, line)
-
+#error "Unsupported SoftPC mirror configuration: REAL_ICA"
 #else   /* REAL_ICA */
+#line 184
 
 /*
  *  Change these. They come last.
@@ -202,17 +214,11 @@ extern void (*ica_hw_interrupt_func) IPT3(IU32, adapter, IU32, line_no,
 extern void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
 
 #endif  /* REAL_ICA */
+#endif  /* !NTVDM */
+#line 250
 
 #ifdef GISP_CPU
-/*
- *	Prototype functions for interfaces provided by the ICA.
- */
-
-typedef IBOOL HOOK_AGAIN_FUNC IPT1(IUM32, callers_ref);
-extern void Ica_enable_hooking IPT3(IUM8, line_number,
-			HOOK_AGAIN_FUNC *, hook_again, IUM32, callers_ref);
-
-extern void Ica_hook_bop IPT1(IUM8, line_number);
-
+#error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif /* GISP_CPU */
+#line 218
 

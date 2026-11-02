@@ -35,10 +35,9 @@ SGDT CPU Functions.
 GLOBAL VOID
 SGDT16
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* dst (limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 42
    (op1)
    IU32 op1[2];
 #endif
@@ -57,10 +56,9 @@ SGDT16
 GLOBAL VOID
 SGDT32
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* dst (limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 64
    (op1)
    IU32 op1[2];
 #endif

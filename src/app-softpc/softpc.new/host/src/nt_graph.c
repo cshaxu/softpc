@@ -27,6 +27,10 @@
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Include files */
 
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 30
 #include <sys\types.h>
 
 #include "xt.h"
@@ -82,7 +86,13 @@ extern int  ega_int_enable;
 extern int DAC_data_bits;
 #endif
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 93
 extern byte  *video_copy;
+#endif // !NEC_98
+#line 95
 
 static int flush_count = 0;      /*count of graphic ticks since last flush*/
 
@@ -109,11 +119,23 @@ PBITMAPINFO     VGADIB;
 
 void            (*paint_screen)();
 BOOL            FunnyPaintMode;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 129
 
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // JAPAN || KOREA
+#line 130
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::: Paint functions */
 
 static PAINTFUNCS std_mono_paint_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 117
         nt_text,
         nt_cga_mono_graph_std,
         nt_cga_mono_graph_std,
@@ -131,6 +153,10 @@ static PAINTFUNCS std_mono_paint_funcs =
 
 static PAINTFUNCS big_mono_paint_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 134
         nt_text,
         nt_cga_mono_graph_big,
         nt_cga_mono_graph_big,
@@ -148,6 +174,10 @@ static PAINTFUNCS big_mono_paint_funcs =
 
 static PAINTFUNCS huge_mono_paint_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 151
         nt_text,
         nt_cga_mono_graph_huge,
         nt_cga_mono_graph_huge,
@@ -165,6 +195,10 @@ static PAINTFUNCS huge_mono_paint_funcs =
 
 static PAINTFUNCS std_colour_paint_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 168
         nt_text,
         nt_cga_colour_med_graph_std,
         nt_cga_colour_hi_graph_std,
@@ -182,6 +216,10 @@ static PAINTFUNCS std_colour_paint_funcs =
 
 static PAINTFUNCS big_colour_paint_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 185
         nt_text,
         nt_cga_colour_med_graph_big,
         nt_cga_colour_hi_graph_big,
@@ -199,6 +237,10 @@ static PAINTFUNCS big_colour_paint_funcs =
 
 static PAINTFUNCS huge_colour_paint_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 202
         nt_text,
         nt_cga_colour_med_graph_huge,
         nt_cga_colour_hi_graph_huge,
@@ -214,9 +256,17 @@ static PAINTFUNCS huge_colour_paint_funcs =
 #endif /* V7VGA */
 };
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 372
 
 static INITFUNCS mono_init_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 220
         nt_init_text,
         nt_init_cga_mono_graph,
         nt_init_cga_mono_graph,
@@ -229,6 +279,10 @@ static INITFUNCS mono_init_funcs =
 
 static INITFUNCS colour_init_funcs =
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 232
         nt_init_text,
         nt_init_cga_colour_med_graph,
         nt_init_cga_colour_hi_graph,
@@ -239,6 +293,10 @@ static INITFUNCS colour_init_funcs =
         nt_init_vga_hi_graph,
 };
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 440
 
 /*::::::::::::::::::::::::::::::::::::::::::::::: Adaptor function protocol */
 
@@ -383,6 +441,10 @@ extern BYTE     Red[];
 extern BYTE     Green[];
 extern BYTE     Blue[];
 
+#ifndef NEC_98
+/* NT host stream state is excluded from this source subset. */
+#endif // !NEC_98
+#line 587
 
 GLOBAL COLOURTAB defaultColours =
     {
@@ -467,10 +529,18 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
 
                 MouseDetachMenuItem(TRUE);
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 682
                 if( !SetConsoleActiveScreenBuffer( sc.OutputHandle ) ){
                         assert2( NO, "VDM: SCASB() failed:%#x H=%#x",
                                 GetLastError(), sc.OutputHandle );
                 }
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 474
 
                 /*
                  *  Cleanup ALL handles associated with screen buffer
@@ -486,15 +556,23 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
                 sc.ActiveOutputBufferHandle = sc.OutputHandle;
                 MouseAttachMenuItem(sc.ActiveOutputBufferHandle);
 
+#ifndef MONITOR
+#line 489
                 //
                 // Turn the pointer back on when going from graphics
                 // to text mode since the selected buffer has changed
                 //
 
                 MouseDisplay();
+#endif  // MONITOR
+#line 717
 
                 CloseHandle(sc.ConsoleBufInfo.hMutex);
                 sc.ConsoleBufInfo.hMutex = 0;
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif /* X86GFX */
+#line 498
         }
 } /* end of closeGraphicsBuffer() */
 
@@ -525,6 +603,10 @@ void nt_init_screen(void)
     static int      med_res_swapped = FALSE;
     static boolean  already_called = FALSE;
 
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 756
     sub_note_trace0(ALL_ADAPT_VERBOSE, "nt_init_screen\n");
 
     /* If an error occurs before the user interface has been initialised then
@@ -543,19 +625,40 @@ void nt_init_screen(void)
 
     /*:::::::::::::::::::::::::::::::::::::::::: Allocate video copy buffer */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#else
+#line 546
     if(!video_copy) video_copy = (byte *) host_malloc(0x20000);
+#endif
+#line 547
 
     /*::::::::::::::::::::::::::::::::: Allocate DAC and EGA planes buffers */
 
     if(!EGA_planes) EGA_planes = (byte *) host_malloc(4*EGA_PLANE_SIZE);
     if(!DAC) DAC = (PC_palette *) host_malloc(sizeof(PC_palette) * VGA_DAC_SIZE);
+#endif // !NEC_98
+#line 552
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 793
     if (video_copy == NULL || EGA_planes == NULL || DAC == NULL)
+#endif // !NEC_98
+#line 795
         host_error(EG_MALLOC_FAILURE, ERR_QUIT, "");
 
     /* Set current screen height to prevent the window changing shape between
        init_screen and init_adaptor */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 803
     video_adapter = (half_word) config_inquire(C_GFX_ADAPTER, NULL);
     switch (video_adapter)
     {
@@ -567,11 +670,19 @@ void nt_init_screen(void)
             current_height = EGA_WIN_HEIGHT;  current_width = EGA_WIN_WIDTH;
             break;
     }
+#endif // !NEC_98
+#line 815
 
     /*::::::::::::::::: Setup the screen dimensions for the initial adaptor */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 821
     host_set_screen_scale((SHORT) config_inquire(C_WIN_SIZE, NULL));
     set_screen_sizes(video_adapter);
+#endif // !NEC_98
+#line 824
 
     /*:::: Set pixel values to be used for FG and BG (mainly in mono modes) */
 
@@ -582,6 +693,10 @@ void nt_init_screen(void)
     select_paint_routines();
 }
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 861
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*:::::::::::::::::::::::::: Initialise adaptor ::::::::::::::::::::::::::::*/
@@ -615,6 +730,8 @@ void nt_change_mode(void)
 
     /*:::::::::::::::::::: Setup update vectors and initialise paint system */
 
+#ifndef NEC_98
+#line 895
     switch(video_adapter)
     {
         /*::::::::::::::::::::::::::::::::::::::::::::::: CGA mode selected */
@@ -633,6 +750,8 @@ void nt_change_mode(void)
             sub_note_trace0(ALL_ADAPT_VERBOSE,"**** Unknown video adaptor ****");
             break;
     }
+#endif // !NEC_98
+#line 636
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -656,10 +775,14 @@ void nt_clear_screen(void)
 
     if(sc.ScreenBufHandle) return;
 
-#ifndef SOFTPC_STANDALONE
-    if (sc.ScreenState == FULLSCREEN)   // don't want sudden screen clears
-        return;
+#ifndef X86GFX
+/* Standalone presentation does not use the NT fullscreen clear guard. */
 #endif
+#line 941
+#ifndef SOFTPC_STANDALONE
+#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
+#endif
+#line 941
 
     /*::::::::::::::::::::::::::::: Get information on current screen size */
 
@@ -678,6 +801,10 @@ void nt_clear_screen(void)
     FillConsoleOutputAttribute(sc.OutputHandle, (WORD) sc.PCBackground,
                               ScreenInfo.dwSize.X * ScreenInfo.dwSize.Y,
                               coord,&nCharWritten);
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif
+#line 681
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -690,6 +817,10 @@ void nt_flush_screen(void)
 
     if (ConsoleInitialised == TRUE && ConsoleNoUpdates == FALSE &&
         !get_mode_change_required())
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 693
             (void)(*update_alg.calc_update)();
 }
 
@@ -712,6 +843,8 @@ void nt_mark_screen_refresh(void)
 void nt_graphics_tick(void)
 {
 
+#ifndef NEC_98
+#line 1007
     if (sc.ScreenState == STREAM_IO) {
         if (++flush_count == TICKS_PER_FLUSH){
             stream_io_update();
@@ -719,13 +852,19 @@ void nt_graphics_tick(void)
         }
         return;
     }
+#endif // !NEC_98
+#line 722
 
 #ifdef EGG
+#ifndef NEC_98
+#line 724
     if((video_adapter == EGA) || (video_adapter == VGA))
     {
         /* two timer ticks since mode_change_required became true ?
            (really need same stuff for CGA, but not done yet)
            Now just delay screen update, & only if display REALLY changed */
+#endif // !NEC_98
+#line 729
 
         /*
         ** When VGA registers get hit during a mode change, postpone
@@ -776,6 +915,8 @@ void nt_graphics_tick(void)
     }
     else
 #endif /* EGG */
+#ifndef NEC_98
+#line 779
     {
         /*:::::::::: Update the screen as required for mda and cga and herc */
 
@@ -784,11 +925,17 @@ void nt_graphics_tick(void)
             if(update_vlt) set_the_vlt();
 
             if (ConsoleInitialised == TRUE && ConsoleNoUpdates == FALSE)
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 787
                     (void)(*update_alg.calc_update)();
 
             flush_count = 0;
         }
     }
+#endif // !NEC_98
+#line 792
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -962,7 +1109,13 @@ boolean nt_scroll_down(int tlx,int tly,int brx,int bry,int amount,int col)
 
 void nt_paint_cursor IFN3(int, cursor_x, int, cursor_y, half_word, attr)
 {
+#if defined(NEC_98)         // NEC {
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else                                                           // NEC
+#line 1289
     COORD CursorPos;
+#endif                                                          // NEC
+#line 1291
 
     /*::::::::::::::::::::::::::::::::::::::::::::::::::: Guess where we are */
 
@@ -971,6 +1124,10 @@ void nt_paint_cursor IFN3(int, cursor_x, int, cursor_y, half_word, attr)
 
     /*::::::::::::::::::::::::::::::::::::::::::::::::::::::: Update cursor */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1329
     if(is_cursor_visible() && (get_screen_height() > cursor_y))
     {
 
@@ -985,6 +1142,8 @@ void nt_paint_cursor IFN3(int, cursor_x, int, cursor_y, half_word, attr)
             SetConsoleCursorPosition(sc.OutputHandle,CursorPos);
         }
     }
+#endif // !NEC_98
+#line 988
 }
 
 void nt_cursor_size_changed(int lo, int hi)
@@ -1004,8 +1163,9 @@ void make_cursor_change(void)
     SAVED BOOL CurNowOff = FALSE;
 
 #ifndef SOFTPC_STANDALONE
-    if(sc.ScreenState == FULLSCREEN) return;
+#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
 #endif
+#line 1363
 
     CursorResizeNeeded = FALSE;
 
@@ -1023,7 +1183,13 @@ void make_cursor_change(void)
             if(get_cursor_height())
             {
                 /* value has to be percentage of block filled */
+#if (defined(JAPAN) || defined(KOREA)) && !defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#else // !JAPAN
+#line 1390
                 CursorInfo.dwSize = (get_cursor_height() * 100)/get_char_height();
+#endif // !JAPAN
+#line 1392
                 /* %age may be too small on smaller fonts, check size */
                 fontsize.X = fontsize.Y = 0;
 
@@ -1086,6 +1252,10 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
     switch((int) mode)
     {
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1544
         /* CGA modes (40 columns). */
         case TEXT_40_FUN:
             assert1(NO,"Funny text mode selected %s",get_mode_string(mode));
@@ -1173,6 +1343,10 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
                 {
                     if (get_chain4_mode())
                     {
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 1176
                             paint_screen = nt_paint_funcs->vga_graph;
                     }
                     else
@@ -1216,15 +1390,23 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
             (*nt_init_funcs->ega_lo_graph)();
             break;
 
+#endif // !NEC_98
+#line 1219
         default:
             assert1(NO,"bad mode for host paint routine selection %d\n",(int)mode);
             paint_screen = dummy_paint_screen;
             break;
     }
 
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#else
+#line 1719
 
     /*................................................... Apply mode change */
     check_win_size(height);
+#endif  /* X86GFX */
+#line 1723
     current_mode = mode;
 }
 
@@ -1298,12 +1480,20 @@ static void select_paint_routines(void)
 {
     /*::::::::::::::::::::::::::::::::::::::::::: Display trace information */
 
+#ifndef NEC_98
+#line 1797
     sub_note_trace2((CGA_HOST_VERBOSE | EGA_HOST_VERBOSE),
                     "select_paint_routine scale=%d depth=%d",
                     get_screen_scale(), host_display_depth);
+#endif // !NEC_98
+#line 1801
 
     /*::::::::::::::::::::::::::::::::::::::::::::::: Select paint routines */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1813
     if(host_display_depth > 1)
     {
         if (get_screen_scale() == 2)
@@ -1326,8 +1516,14 @@ static void select_paint_routines(void)
 
         nt_init_funcs = &mono_init_funcs;
     }
+#endif // !NEC_98
+#line 1329
 }
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 1853
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*:::::::::::::::::::::::::::: Prepare surface :::::::::::::::::::::::::::::*/
@@ -1394,9 +1590,9 @@ static void check_win_size(register int height)
     extern int soft_reset;
 
 #ifndef SOFTPC_STANDALONE
-    if (! soft_reset)	// we want top get the chance to integrate with
-	return;		// console before changing size
+#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
 #endif
+#line 1400
     /* A detached VM binds its DIB outlet before the firmware executes; it
        has no NTVDM console-integration phase to wait for.  Retain the
        original geometry, mode selection and painting below, but do not let
@@ -1404,6 +1600,10 @@ static void check_win_size(register int height)
 
     /*:::::::::::::::::::::::::::::::::::::::::::::: Calculate screen width */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 1926
     if(sas_hw_at(vd_video_mode) > 0x10)
     {
         if(alpha_num_mode())
@@ -1416,6 +1616,8 @@ static void check_win_size(register int height)
     }
     else
        width = CGA_WIN_WIDTH;
+#endif // !NEC_98
+#line 1419
 
 #ifdef SOFTPC_STANDALONE
 #ifdef V7VGA
@@ -1458,7 +1660,11 @@ static void check_win_size(register int height)
         {
             sc.PC_W_Width = SCALE(width);
             sc.PC_W_Height = SCALE(height*get_host_pix_height());
+#ifndef NEC_98
+#line 1461
             graphicsResize();
+#endif // !NEC_98
+#line 1462
 
             current_height = height;
             current_width = width;
@@ -1468,6 +1674,10 @@ static void check_win_size(register int height)
         }
     }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1986
     sc.CharHeight = current_char_height;
 
     /*::::::::::::::::::::::::::::::::::::::::::: Display trace information */
@@ -1482,8 +1692,16 @@ static void check_win_size(register int height)
 /*::::::::::::::::::::::::::: Set the VLT ??? ::::::::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2038
 void set_the_vlt(void)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 2078
     PALETTEENTRY vga_color[VGA_DAC_SIZE];
     int i, ind;
     byte mask, top_bit;
@@ -1581,9 +1799,15 @@ void set_the_vlt(void)
 
         set_palette_change_required(FALSE);
     }
+#endif // !NEC_98
+#line 2167
 
     /*::::::::::::::::::::::::::::::::::::::::::::::::::::: Display changes */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 2230
     if (sc.ScreenBufHandle)             // only sensible in gfx context
     {
         /*
@@ -1597,6 +1821,8 @@ void set_the_vlt(void)
         if(!SetConsolePalette(sc.ScreenBufHandle, sc.ColPalette, SYSPAL_STATIC))
             assert1( NO, "SetConsolePalette() failed:%#x\n", GetLastError() );
     }
+#endif // !NEC_98
+#line 2244
 
     update_vlt = FALSE;
 }
@@ -1606,14 +1832,26 @@ void set_the_vlt(void)
 /*::::::: Set screen sizes - update the screen description structure :::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 2256
 static void set_screen_sizes(int adaptor)
+#endif // !NEC_98
+#line 2258
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 2265
     UNUSED(adaptor);
 
     sc.PC_W_Width = SCALE(CGA_WIN_WIDTH);
     sc.PC_W_Height = SCALE(CGA_WIN_HEIGHT);
     sc.CharWidth = CGA_CHAR_WIDTH;
     sc.CharHeight = CGA_CHAR_HEIGHT;
+#endif // !NEC_98
+#line 1617
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -1753,8 +1991,9 @@ VOID windowSize IFN4( int, w, int, h, int, top, int, left )
         WinSize.Right  = left + w - 1;
 
 #ifndef PROD
-        //fprintf(trace_file, "newW: %d.%d at %d.%d\n", h, w, top, left);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 2413
         if( !SetConsoleWindowInfo( sc.OutputHandle, TRUE, &WinSize ) )
                 assert3( NO, "VDM: SetConsoleWindowInfo() w=%d h=%d failed:%#x",
                         w, h, GetLastError() );
@@ -1773,8 +2012,9 @@ VOID bufferSize IFN2( int, w, int, h )
         ScrSize.X = (SHORT)w;
         ScrSize.Y = (SHORT)h;
 #ifndef PROD
-        //fprintf(trace_file, "newB: %d.%d\n", h, w);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 2433
         if( !SetConsoleScreenBufferSize( sc.OutputHandle, ScrSize ) )
                 assert3( NO, "VDM: SetCons...BufferSize() w=%d h=%d failed:%#x",
                         w, h, GetLastError() );
@@ -1811,6 +2051,10 @@ VOID resizeWindow IFN2( int, w, int, h )
                 oldB;           /* present buffer size  */
         CONSOLE_SCREEN_BUFFER_INFO bufferInfo;
 
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
+#endif // JAPAN || KOREA
+#line 2482
         if( h > 50 ){
                 /* Shouldn't get this anymore said Tim */
                 assert1( NO, "VDM: resizeWindow() clipping height:%d", h  );
@@ -1827,11 +2071,9 @@ VOID resizeWindow IFN2( int, w, int, h )
         oldW.Y  = bufferInfo.srWindow.Bottom - bufferInfo.srWindow.Top  + 1;
         oldB    = bufferInfo.dwSize;
 #ifndef PROD
-        //fprintf(trace_file, "resz: %d.%d\n", h, w);
-        //fprintf(trace_file, "oldW: %d.%d\n", oldW.Y, oldW.X);
-        //fprintf(trace_file, "maxW: %d.%d\n", bufferInfo.dwMaximumWindowSize.Y, bufferInfo.dwMaximumWindowSize.X);
-        //fprintf(trace_file, "oldB: %d.%d\n", oldB.Y, oldB.X);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1835
         /*
          * Reduce window width and height as necessary:
          */
@@ -1854,8 +2096,9 @@ VOID resizeWindow IFN2( int, w, int, h )
                         assert1( NO, "VDM: GetConsoleScreenBufferInfo() failed:%#x",
                                 GetLastError() );
 #ifndef PROD
-                //fprintf(trace_file, "maxW: %d.%d\n", bufferInfo.dwMaximumWindowSize.Y, bufferInfo.dwMaximumWindowSize.X);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1859
         }
         /*
         ** Clip requested values to Window maximum and
@@ -1874,6 +2117,10 @@ VOID resizeWindow IFN2( int, w, int, h )
         } else
                 newTop = 0;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // !NEC_98
+#line 1877
         /*
          * Check if we need to enlarge the window now.
          * Settle for old top and left if they were smaller.
@@ -1896,7 +2143,13 @@ VOID resizeWindow IFN2( int, w, int, h )
 */
 
 //Used by the text paint functions
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 2573
 GLOBAL int now_height = 80, now_width = 50;
+#endif // !NEC_98
+#line 2575
 
 void textResize(void)
 {
@@ -1928,10 +2181,15 @@ void graphicsResize(void)
         DWORD    headerSize;
         LPBITMAPINFO     infoStructPtr;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+/* Standalone presentation does not use the NT fullscreen resize guard. */
 #ifndef SOFTPC_STANDALONE
-        if (sc.ScreenState == FULLSCREEN)
-            return;
+#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
 #endif
+#endif // !NEC_98
+#line 2612
 
         /* Destroy previous data. */
         closeGraphicsBuffer(); /* Tim Oct 92 */
@@ -1943,6 +2201,10 @@ void graphicsResize(void)
          * Create a `BITMAPINFO' structure - sc.PC_W_Width pixels x
          * sc.PC_W_Height pixels x sc.BitsPerPixel bits-per-pixel.
          */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 2632
         headerSize = CreateSpcDIB(sc.PC_W_Width,
                                   sc.PC_W_Height,
                                   sc.BitsPerPixel,
@@ -1950,6 +2212,8 @@ void graphicsResize(void)
                                   0,
                                   (COLOURTAB *) NULL,
                                   &infoStructPtr);
+#endif // !NEC_98
+#line 2640
 
         /* Initialise the console info structure. */
         sc.ConsoleBufInfo.dwBitMapInfoLength = headerSize;
@@ -1978,16 +2242,32 @@ void graphicsResize(void)
             set_palette_change_required(TRUE);
         }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2671
         /* save the handle away to a useful place */
         MouseDetachMenuItem(TRUE);
         sc.ActiveOutputBufferHandle = sc.ScreenBufHandle;
         MouseAttachMenuItem(sc.ActiveOutputBufferHandle);
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1985
 
         /*
          * Make it the current screen buffer, which resizes the window
          * on the display.
          */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2695
         SetConsoleActiveScreenBuffer(sc.ScreenBufHandle);
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // !NEC_98
+#line 2705
 
         /*
          * Get a pointer to the last line of the bitmap to build
@@ -2144,16 +2424,18 @@ void nt_mode_select_changed(int dummy)
 {
     UNUSED(dummy);
 #ifndef PROD
-    fprintf(trace_file, "WARNING - nt_mode_select_changed\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 2149
 }
 
 void nt_color_select_changed(int dummy)
 {
     UNUSED(dummy);
 #ifndef PROD
-    fprintf(trace_file, "WARNING - nt_color_select_changed\n");
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 2157
 }
 
 void nt_screen_address_changed(int lo, int hi)
@@ -2165,4 +2447,13 @@ void nt_screen_address_changed(int lo, int hi)
 }
 
 void nt_scroll_complete()        { }
+
+#ifndef NEC_98
+/* Native NT Console streaming is excluded from standalone presentation. */
+#endif // !NEC_98
+#line 2897
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2991
 

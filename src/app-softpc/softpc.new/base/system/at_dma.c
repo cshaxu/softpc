@@ -21,13 +21,9 @@
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "AT_STUFF.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 31
 
 /*
  *      System include files
@@ -49,6 +45,11 @@
 #include "sndblst.h"
 #include "debug.h"
 #include "compat/devices/snapshot.h"
+
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 58
 
 /*
  * ============================================================================
@@ -132,10 +133,16 @@ GLOBAL  void dma_post   IFN0()
                 {
                         adaptor.controller[cntrl].mode[chan].all = 0;
                         /* put the channels into their correct mode */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 143
                         if (dma_logical_channel(cntrl, chan) == DMA_CASCADE_CHANNEL)
                                 adaptor.controller[cntrl].mode[chan].bits.mode = DMA_CASCADE_MODE;
                         else
                                 adaptor.controller[cntrl].mode[chan].bits.mode = DMA_SINGLE_MODE;
+#endif   //NEC_98
+#line 139
                 }
         }
 }
@@ -152,16 +159,24 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
          * The first check is commented out as DMA_PORT_START is zero,
          * so the check on an unsigned variable is unnecessary.
          */
+#ifndef NEC_98
+#line 165
         if (/*port >= DMA_PORT_START &&*/ port <= DMA_PORT_END)
         {
+#endif   //NEC_98
+#line 157
                 dcp = &adaptor.controller[DMA_CONTROLLER];
                 port &= ~DMA_REDUNDANT_BITS;
+#ifndef NEC_98
+#line 171
         }
         else
         {
                 dcp = &adaptor.controller[DMA1_CONTROLLER];
                 port &= ~DMA1_REDUNDANT_BITS;
         }
+#endif   //NEC_98
+#line 178
 
         /*
          *      When the current address and word count are read, the
@@ -178,11 +193,19 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
                 /* XP sound query: compare the decoded channel, once per word. */
                 if (!dcp->first_last && (port-DMA_CH0_ADDRESS)/2 == SbDmaChannel)
                         SbGetDMAPosition();
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 199
                 *value = dcp->current_address[(port-DMA_CH0_ADDRESS)/2][dcp->first_last];
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 203
 
                         /* read channel current address on controller 1 */
+#ifndef NEC_98
+#line 186
         case    DMA_CH4_ADDRESS:
         case    DMA_CH5_ADDRESS:
         case    DMA_CH6_ADDRESS:
@@ -190,6 +213,8 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
                 *value = dcp->current_address[(port-DMA_CH4_ADDRESS)/4][dcp->first_last];
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 214
 
                         /* read channel current word count on controller 0 */
         case    DMA_CH0_COUNT:
@@ -199,11 +224,19 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
                 /* High-byte reads retain the same sampled DMA position. */
                 if (!dcp->first_last && (port-DMA_CH0_COUNT)/2 == SbDmaChannel)
                         SbGetDMAPosition();
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 228
                 *value = dcp->current_count[(port-DMA_CH0_COUNT)/2][dcp->first_last];
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 232
 
                         /* read channel current word count on controller 1 */
+#ifndef NEC_98
+#line 207
         case    DMA_CH4_COUNT:
         case    DMA_CH5_COUNT:
         case    DMA_CH6_COUNT:
@@ -211,17 +244,27 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
                 *value = dcp->current_count[(port-DMA_CH4_COUNT)/4][dcp->first_last];
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 243
 
                         /* read status register - clears terminal counts */
         case    DMA_SHARED_REG_A:
+#ifndef NEC_98
+#line 217
         case    DMA1_SHARED_REG_A:
+#endif   //NEC_98
+#line 249
                 *value = dcp->status.all;
                 dcp->status.bits.terminal_count = 0;
                 break;
 
                         /* read temporary register */
         case    DMA_SHARED_REG_B:
+#ifndef NEC_98
+#line 224
         case    DMA1_SHARED_REG_B:
+#endif   //NEC_98
+#line 258
                 *value = dcp->temporary;
                 break;
 
@@ -246,6 +289,10 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
          * The first check is commented out as DMA_PORT_START is zero,
          * so the check on an unsigned variable is unnecessary.
          */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 285
         if (/*port >= DMA_PORT_START &&*/  port <= DMA_PORT_END)
         {
                 dcp = &adaptor.controller[DMA_CONTROLLER];
@@ -256,6 +303,8 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
                 dcp = &adaptor.controller[DMA1_CONTROLLER];
                 port &= ~DMA1_REDUNDANT_BITS;
         }
+#endif   //NEC_98
+#line 296
 
         /*
          *      When the current address and word count are written, the
@@ -269,12 +318,20 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
         case    DMA_CH1_ADDRESS:
         case    DMA_CH2_ADDRESS:
         case    DMA_CH3_ADDRESS:
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 315
                 dcp->current_address[(port-DMA_CH0_ADDRESS)/2][dcp->first_last] = value;
                 dcp->base_address[(port-DMA_CH0_ADDRESS)/2][dcp->first_last] = value;
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 320
 
                         /* write channel addresses on controller 1 */
+#ifndef NEC_98
+#line 278
         case    DMA_CH4_ADDRESS:
         case    DMA_CH5_ADDRESS:
         case    DMA_CH6_ADDRESS:
@@ -283,18 +340,28 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
                 dcp->base_address[(port-DMA_CH4_ADDRESS)/4][dcp->first_last] = value;
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 332
 
                         /* write channel word counts on controller 0 */
         case    DMA_CH0_COUNT:
         case    DMA_CH1_COUNT:
         case    DMA_CH2_COUNT:
         case    DMA_CH3_COUNT:
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 344
                 dcp->current_count[(port-DMA_CH0_COUNT)/2][dcp->first_last] = value;
                 dcp->base_count[(port-DMA_CH0_COUNT)/2][dcp->first_last] = value;
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 349
 
                         /* write channel word counts on controller 1 */
+#ifndef NEC_98
+#line 298
         case    DMA_CH4_COUNT:
         case    DMA_CH5_COUNT:
         case    DMA_CH6_COUNT:
@@ -303,23 +370,37 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
                 dcp->base_count[(port-DMA_CH4_COUNT)/4][dcp->first_last] = value;
                 dcp->first_last ^= 1;
                 break;
+#endif   //NEC_98
+#line 361
 
                         /* write command register */
         case    DMA_SHARED_REG_A:
+#ifndef NEC_98
+#line 309
         case    DMA1_SHARED_REG_A:
+#endif   //NEC_98
+#line 367
                 dcp->command.all = value;
                 break;
 
                         /* write request register */
         case    DMA_WRITE_REQUEST_REG:
+#ifndef NEC_98
+#line 373
         case    DMA1_WRITE_REQUEST_REG:
+#endif   //NEC_98
+#line 375
                 /* this feature is not supported */
                 note_trace0_no_nl(DMA_VERBOSE, "<software DMA request>");
                 break;
 
                         /* write single mask register bit */
         case    DMA_WRITE_ONE_MASK_BIT:
+#ifndef NEC_98
+#line 382
         case    DMA1_WRITE_ONE_MASK_BIT:
+#endif   //NEC_98
+#line 384
                 if (value & 0x4)
                 {
                         /* set mask bit */
@@ -334,7 +415,11 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
 
                         /* write mode register */
         case    DMA_WRITE_MODE_REG:
+#ifndef NEC_98
+#line 399
         case    DMA1_WRITE_MODE_REG:
+#endif   //NEC_98
+#line 401
                 /* note that the bottom 2 bits of value disappear into
                    the mode padding */
                 dcp->mode[(value & 0x3)].all = value;
@@ -342,13 +427,21 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
 
                         /* clear first/last flip-flop */
         case    DMA_CLEAR_FLIP_FLOP:
+#ifndef NEC_98
+#line 409
         case    DMA1_CLEAR_FLIP_FLOP:
+#endif   //NEC_98
+#line 346
                 dcp->first_last = 0;
                 break;
 
                         /* write master clear */
         case    DMA_SHARED_REG_B:
+#ifndef NEC_98
+#line 351
         case    DMA1_SHARED_REG_B:
+#endif   //NEC_98
+#line 419
                 dcp->command.all = 0;
                 dcp->status.all = 0;
                 dcp->request = 0;
@@ -360,13 +453,21 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
 
                         /* clear mask register */
         case    DMA_CLEAR_MASK:
+#ifndef NEC_98
+#line 431
         case    DMA1_CLEAR_MASK:
+#endif   //NEC_98
+#line 433
                 dcp->mask = 0;
                 break;
 
                         /* write all mask register bits */
         case    DMA_WRITE_ALL_MASK_BITS:
+#ifndef NEC_98
+#line 439
         case    DMA1_WRITE_ALL_MASK_BITS:
+#endif   //NEC_98
+#line 441
                 dcp->mask = value;
 
         default:
@@ -381,8 +482,12 @@ GLOBAL  void dma_page_inb       IFN2(io_addr, port, half_word *, value)
 {
         note_trace0_no_nl(DMA_VERBOSE, "dma_page_inb() ");
 
+#ifndef NEC_98
+#line 384
         /* mask out the port's redundant bits */
         port &= ~DMA_PAGE_REDUNDANT_BITS;
+#endif  //NEC_98
+#line 386
 
         /*
          *      Read the value from the appropriate page register.
@@ -395,6 +500,10 @@ GLOBAL  void dma_page_inb       IFN2(io_addr, port, half_word *, value)
         case    DMA_CH0_PAGE_REG:
                 *value = adaptor.pages.page[DMA_RESERVED_CHANNEL_0];
                 break;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 482
         case    DMA_CH1_PAGE_REG:
                 *value = adaptor.pages.page[DMA_SDLC_CHANNEL];
                 break;
@@ -437,6 +546,8 @@ GLOBAL  void dma_page_inb       IFN2(io_addr, port, half_word *, value)
         case    DMA_FAKE7_REG:
                 *value = adaptor.pages.page[DMA_FAKE_CHANNEL_7];
                 break;
+#endif   //NEC_98
+#line 525
         default:
                 note_trace0_no_nl(DMA_VERBOSE, "<illegal read>");
                 break;
@@ -451,7 +562,11 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
         note_trace0_no_nl(DMA_VERBOSE, "dma_page_outb() ");
 
         /* mask out the port's redundant bits */
+#ifndef NEC_98
+#line 454
         port &= ~DMA_PAGE_REDUNDANT_BITS;
+#endif   //NEC_98
+#line 455
 
         /*
          *      Write the value into the appropriate page register.
@@ -464,6 +579,10 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
         case    DMA_CH0_PAGE_REG:
                 adaptor.pages.page[DMA_RESERVED_CHANNEL_0] = value;
                 break;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 467
         case    DMA_CH1_PAGE_REG:
                 adaptor.pages.page[DMA_SDLC_CHANNEL] = value;
                 break;
@@ -512,6 +631,8 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
         case    DMA_FAKE7_REG:
                 adaptor.pages.page[DMA_FAKE_CHANNEL_7] = value;
                 break;
+#endif   //NEC_98
+#line 515
         default:
                 note_trace0_no_nl(DMA_VERBOSE, "<illegal write>");
                 break;
@@ -752,6 +873,10 @@ GLOBAL  void dma_enquire        IFN3(half_word, channel,
  * ============================================================================
  */
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif  /* NTVDM */
+#line 864
 /* T93: retain XP's controller accessor for the original DSP, without NTVDM. */
 DMA_ADAPT *dmaGetAdaptor(void)
 {
@@ -797,24 +922,9 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
                 if (!decrement)
                 {
 #ifndef PM
-#ifdef LIM
-                        if( !get_lim_setup() ){
-                                if( dma_addr >= ROM_START ){
-                                        if( dma_addr >= ROM_START )
-                                                break;
-                                        length = ROM_START - dma_addr - 1;
-                                }
-                        }
-#else
-                        /* increment case - check for writing to ROM */
-                        if ((dma_addr + length) >= ROM_START)
-                        {
-                                if (dma_addr >= ROM_START)
-                                        break;
-                                length = ROM_START - dma_addr - 1;
-                        }
-#endif /* LIM */
+#error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* nPM */
+#line 929
                         sas_PWS(dma_addr, (host_addr) hw_buffer, length);
 
                 }
@@ -822,25 +932,9 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
                 {
                         /*  decrement case - check for writing to ROM */
 #ifndef PM
-#ifdef LIM
-                        if( !get_lim_setup() ){
-                                if (dma_addr >= ROM_START) {
-                                        if (dma_addr-length >= ROM_START)
-                                                break;
-                                        length = dma_addr-ROM_START+length-1;
-                                        dma_addr = ROM_START - 1;
-                                }
-                        }
-#else
-                        if (dma_addr >= ROM_START)
-                        {
-                                if (dma_addr-length >= ROM_START)
-                                        break;
-                                length = dma_addr - ROM_START + length - 1;
-                                dma_addr = ROM_START - 1;
-                        }
-#endif /* LIM */
+#error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* nPM */
+#line 844
                         bwd_dest_copy_to_M((half_word *)hw_buffer, dma_addr, length, size);
 
                 }
@@ -895,13 +989,9 @@ LOCAL   void    bwd_dest_copy_from_M    IFN4(sys_addr, s, host_addr, d,
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 1005
 
 GLOBAL  void dma_init   IFN0()
 {
@@ -922,18 +1012,30 @@ GLOBAL  void dma_init   IFN0()
         io_define_outb(DMA_ADAPTOR, dma_outb);
 
         /* connect the DMA Controller chips to the I/O bus */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 1029
         for (port = DMA_PORT_START; port <= DMA_PORT_END; port++)
                 io_connect_port(port, DMA_ADAPTOR, IO_READ_WRITE);
         for (port = DMA1_PORT_START; port <= DMA1_PORT_END; port++)
                 io_connect_port(port, DMA_ADAPTOR, IO_READ_WRITE);
+#endif   //NEC_98
+#line 1034
 
         /* establish the DMA Page Register I/O functions that will be used */
         io_define_inb(DMA_PAGE_ADAPTOR, dma_page_inb);
         io_define_outb(DMA_PAGE_ADAPTOR, dma_page_outb);
 
         /* connect the DMA Page Register chip to the I/O bus */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else     //NEC_98
+#line 1044
         for (port = DMA_PAGE_PORT_START; port <= DMA_PAGE_PORT_END; port++)
                 io_connect_port(port, DMA_PAGE_ADAPTOR, IO_READ_WRITE);
+#endif   //NEC_98
+#line 1047
 }
 
 GLOBAL void

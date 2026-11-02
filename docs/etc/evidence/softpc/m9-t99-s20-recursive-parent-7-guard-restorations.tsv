@@ -1,0 +1,3 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	macro	selected_arm	excluded_body_sha256
+base/video/gfx_updt.c	2219	2284	2163	2229	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+base/video/gfx_updt.c	2290	2381	2234	2330	NEC_98	then	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

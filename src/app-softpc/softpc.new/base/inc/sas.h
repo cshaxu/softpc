@@ -106,20 +106,18 @@ extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 
 extern host_addr Start_of_M_area;	/* host addr (char *) of start of M */
 #ifdef	GISP_CPU
-extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
+#error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #else
+#line 111
 extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #endif	/* GISP_CPU */
 
 /* the following is for integration only */
 
 #ifdef CHEAT
-#ifdef M_IS_POINTER
-extern half_word *M;
-#else
-extern half_word M[];
-#endif /* M_IS_POINTER */
+#error "Unsupported SoftPC mirror configuration: CHEAT"
 #endif /* CHEAT */
+#line 123
 
 /*
 	The following is to allow hosts to redefine the sas_interface to
@@ -139,10 +137,9 @@ extern half_word M[];
  */
 
 #ifdef BACK_M
-#define inc_M_ptr(p,o)	(p-(o))
-#define get_byte_addr(addr) ((IU8 *)((IHPE)Start_of_M_area + Length_of_M_area - 1 - (PHY_ADDR)(addr)))
-#define M_get_dw_ptr(address) ((IHPE)Start_of_M_area + Length_of_M_area - 1 - (long)(address) - 3)
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else /* BACK_M */
+#line 146
 #define inc_M_ptr(p,o)	(p+(o))
 #define get_byte_addr(addr) ((IU8 *)((IHPE)Start_of_M_area + (PHY_ADDR)(addr)))
 #define M_get_dw_ptr(address) ((IHPE)Start_of_M_area + (long)(address))
@@ -161,9 +158,9 @@ extern half_word M[];
 #define M_low (long)Start_of_M_area
 #define M_high (long)(Length_of_M_area-1)
 #ifdef BACK_M
-#define get_addr(type,address) (M_low+M_high- (long)(address) - (sizeof(type)-1))
-#define get_offset_into_M(p) (M_high - p)
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else /* BACK_M */
+#line 167
 #define get_addr(type,address) (M_low+ (long)(address))
 #define get_offset_into_M(p) (p - M_low)
 #endif /* BACK_M */
@@ -191,14 +188,19 @@ extern void sas_move_words_backward IPT3(sys_addr, src, sys_addr, dest,
 extern void sas_init IPT1(sys_addr, size);
 extern void sas_term IPT0();
 #ifdef	GISP_CPU
-extern IHPE sas_memory_size IPT0 ();
+#error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #else
+#line 196
 extern sys_addr sas_memory_size IPT0();
 #endif	/* GISP_CPU */
 extern void sas_connect_memory IPT3(sys_addr, low, sys_addr, high,
 	half_word, type);
 extern void sas_overwrite_memory IPT2(sys_addr, addr, int, type);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif  /* NTVDM */
+#line 202
 
 extern half_word sas_memory_type IPT1(sys_addr, addr);
 extern void sas_enable_20_bit_wrapping IPT0();
@@ -218,9 +220,9 @@ extern void sas_loadw IPT2(sys_addr, addr, word *, val);
 extern void sas_storew IPT2(sys_addr, addr, word, val);
 extern void sas_storew_no_check IPT2(sys_addr, addr24, word, val);
 #else
-extern void sas_loadw_swap IPT2(sys_addr, addr, word *, val);
-extern void sas_storew_swap IPT2(sys_addr, addr, word, val);
+#error "Unsupported SoftPC mirror configuration: SUN_VA"
 #endif	/* SUN_VA */
+#line 224
 extern void sas_storedw IPT2(sys_addr, addr, double_word, val);
 extern void sas_loads IPT3(sys_addr, src, host_addr, dest, sys_addr, len);
 extern void sas_stores IPT3(sys_addr, dest, host_addr, src, sys_addr, len);
@@ -279,14 +281,9 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 /* Memory bounds for the colour graphics adaptor */
 
 #ifdef BACK_M
-
-#ifndef HERC_REGEN_BUFF
-#define CGA_REGEN_BUFF	0xBBFFFL
-#define MDA_REGEN_BUFF	0xB7FFFL
-#define HERC_REGEN_BUFF	0xBFFFFL
-#endif /* HERC_REGEN_BUFF */
-
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
+#line 290
 
 #ifndef HERC_REGEN_BUFF
 #define CGA_REGEN_BUFF	0xB8000L
@@ -320,15 +317,27 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 /* General Intel memory parameters */
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 323
 #define BIOS_START_OFFSET	0x0000L
 #define BIOS1_END_SEGMENT	0xF000L
 #define BIOS1_END_OFFSET 	0x7000L 	/* End of 1st half of ROM */
 #define BIOS2_START_SEGMENT	0xF000L
 #define BIOS2_START_OFFSET 	0xE000L		/* 2nd half of BIOS ROM	*/
+#endif // !NEC_98
+#line 328
 #define	BAD_OP			0xC5		/* filling RAM for the use of */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 330
 #define	BASIC_ROM		0xFE000L	/* Start of Basic Rom */
 #define ROM_START		0xC0000L	/* Start of Expansion ROM @ 768k */
+#endif // !NEC_98
+#line 332
 
 #define FIXED_DISK_START	0xC8000L	/* Start fixed disk BIOS*/
 #define FIXED_DISK_END		0xCA000L	/* End fixed disk BIOS +1 */
@@ -336,6 +345,10 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #define	START_SEGMENT		0xF000		/* 8088 start address */
 #define	START_OFFSET		0xFFF0
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 339
 
 /*
  * The follwoing are the offsets for the entry points to the
@@ -354,9 +367,9 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifndef GISP_SVGA
 #define VIDEO_IO_OFFSET		0xF065
 #else		/* GISP_SVGA */
-#define VIDEO_IO_OFFSET		0x0810
-#define CGA_VIDEO_IO_OFFSET	0xF065
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA  */
+#line 360
 #define VIDEO_IO_RE_ENTRY	0xF06C
 #define MEMORY_SIZE_OFFSET	0xF841
 #define EQUIPMENT_OFFSET	0xF84D
@@ -373,6 +386,10 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #define EXTEND_CHAR_OFFSET	0x0000
 #define MOUSE_VIDEO_IO_OFFSET	0xED80
 
+#if defined(NTVDM) && !defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and not X86GFX"
+#endif
+#line 408
 
 #define KEYBOARD_BREAK_INT_OFFSET   0xFF35
 #define PRINT_SCREEN_INT_OFFSET	    0xFF3B
@@ -441,8 +458,9 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifndef GISP_SVGA 
 #define EGA_ENTRY_OFF	0x0898
 #else	 	/* GISP_SVGA */
-#define EGA_ENTRY_OFF	0x0800
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
+#line 446
 
 /* Off set info for EGA character tables */
 #define EGA_CGMN_OFF	0x2230
@@ -685,8 +703,9 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifdef EGG
 #define EGA_ROM_START		0xC0000L	/* start of EGA BIOS ROM */
 #ifdef STINGER
-#define EGA_ROM_END		0xC4A00L	/* end of EGA BIOS ROM +1 */
+#error "Unsupported SoftPC mirror configuration: STINGER"
 #else		/* ~STINGER */
+#line 690
 #ifdef V7VGA
 #define EGA_ROM_END		0xC5000L	/* end of EGA BIOS ROM +1 */
 #else
@@ -710,260 +729,9 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 
 
 #else		/* GISP_SVGA */
-
-/* The segment which the bios is gonna be loaded into */
-extern word	Bios1Segment;
-extern word	Bios2Segment;
-extern word	EgaROMSegment;
-extern word	EgaFontSegment;
-
-/* Define all the segment address values to be out variables, just in case */
-
-#define COPYRIGHT_SEGMENT	Bios1Segment
-#define RESET_SEGMENT		Bios1Segment
-#define BOOT_STRAP_SEGMENT	Bios1Segment
-#define DOS_SEGMENT		0x0000
-#define KEYBOARD_IO_SEGMENT	Bios1Segment
-#define DISKETTE_IO_SEGMENT	Bios1Segment
-#define VIDEO_IO_SEGMENT	Bios1Segment
-#define VIDEO_IO_RE_ENTRY	0xF06C
-#define MEMORY_SIZE_SEGMENT	Bios1Segment
-#define EQUIPMENT_SEGMENT	Bios1Segment
-#define TIME_OF_DAY_SEGMENT	Bios1Segment
-#define DISK_IO_SEGMENT		0xC800
-#define RS232_IO_SEGMENT	Bios1Segment
-#define CASSETTE_IO_SEGMENT	Bios1Segment
-#define PRINTER_IO_SEGMENT	Bios1Segment
-#define PRINT_SCREEN_SEGMENT	Bios1Segment
-#define BASIC_SEGMENT		Bios1Segment
-#define VIDEO_PARM_SEGMENT	Bios1Segment
-#define DISKETTE_TB_SEGMENT	Bios1Segment
-#define DISK_TB_SEGMENT		0xC800
-#define EXTEND_CHAR_SEGMENT	Bios1Segment
-#ifndef MOUSE_VIDEO_IO_SEGMENT
-#define MOUSE_VIDEO_IO_SEGMENT	Bios1Segment
-#endif /* MOUSE_VIDEO_IO_SEGMENT */
-
-#define KEYBOARD_BREAK_INT_SEGMENT  Bios1Segment
-#define PRINT_SCREEN_INT_SEGMENT    Bios1Segment
-#define USER_TIMER_INT_SEGMENT	    Bios1Segment
-
-/* ... and the device interrupts...  */
-#define UNEXP_INT_SEGMENT	Bios1Segment
-#define DUMMY_INT_SEGMENT	Bios1Segment
-#define TIMER_INT_SEGMENT	Bios1Segment
-#define ILL_OP_INT_SEGMENT      Bios1Segment
-#define KB_INT_SEGMENT		Bios1Segment
-#define DISKETTE_INT_SEGMENT	Bios1Segment
-#define DISK_INT_SEGMENT	0xC800
-#ifndef MOUSE_INT1_SEGMENT
-#define MOUSE_INT1_SEGMENT	Bios1Segment
-#endif /* MOUSE_INT1_SEGMENT */
-#ifndef MOUSE_INT2_SEGMENT
-#define MOUSE_INT2_SEGMENT	Bios1Segment
-#endif /* MOUSE_INT2_SEGMENT */
-#ifndef	MOUSE_VERSION_SEGMENT
-#define	MOUSE_VERSION_SEGMENT	Bios1Segment
-#endif /* MOUSE_VERSION_SEGMENT */
-#ifndef	MOUSE_COPYRIGHT_SEGMENT
-#define	MOUSE_COPYRIGHT_SEGMENT	Bios1Segment
-#endif /* MOUSE_COPYRIGHT_SEGMENT */
-#define RTC_INT_SEGMENT		Bios1Segment
-#define D11_INT_SEGMENT		Bios1Segment
-#define	REDIRECT_INT_SEGMENT	Bios1Segment
-#define	X287_INT_SEGMENT	Bios1Segment
-
-/* ...and the dummy return for address compatibility */
-#define ADDR_COMPATIBILITY_SEGMENT Bios1Segment
-
-/* define the location of the code that the recursive CPU will start at */
-#define RCPU_POLL_SEGMENT	KB_INT_SEGMENT
-#define RCPU_NOP_SEGMENT	KB_INT_SEGMENT
-#define RCPU_INT15_SEGMENT	KB_INT_SEGMENT
-#define RCPU_INT4A_SEGMENT	RTC_INT_SEGMENT
-
-/* ...and the data tables */
-#define CONF_TABLE_SEGMENT	Bios1Segment
-
-#define	DISKETTE_IO_1_SEGMENT	Bios2Segment
-#define	DR_TYPE_SEGMENT		DISKETTE_IO_1_SEGMENT
-
-#define MD_TBL1_SEGMENT         DISKETTE_IO_1_SEGMENT
-#define MD_TBL2_SEGMENT         DISKETTE_IO_1_SEGMENT
-#define MD_TBL3_SEGMENT         DISKETTE_IO_1_SEGMENT
-#define MD_TBL4_SEGMENT         DISKETTE_IO_1_SEGMENT
-#define MD_TBL5_SEGMENT         DISKETTE_IO_1_SEGMENT
-#define MD_TBL6_SEGMENT         DISKETTE_IO_1_SEGMENT
-#define DPB0_SEGMENT		Bios1Segment
-#define DPB1_SEGMENT		Bios1Segment
-
-#define RCPU_WAIT_INT_SEGMENT	DISKETTE_IO_1_SEGMENT
-
-/* Video MODE Table stuff etc (CGA) */
-
-#define VID_PARMS_SEGMENT	Bios1Segment
-#define VID_LENS_SEGMENT	Bios1Segment
-#define	VID_COLTAB_SEGMENT	Bios1Segment
-#define VID_MODTAB_SEGMENT	Bios1Segment
-#define	CHAR_GEN_SEGMENT	Bios1Segment
-
-/*
-	All the entrypoints and table locations for the roms are held in
-	this structure (romAddress) - it should be initialised in
-	host_rom_init() 
-*/
-
-extern struct romAddressTag {
-	sys_addr	startAddr;
-	sys_addr	bios1StartAddr;
-	sys_addr	bios2StartAddr;
-	sys_addr	copyrightAddr;
-	sys_addr	resetAddr;
-	sys_addr	bootStrapAddr;
-	sys_addr	keyboardIOAddr;
-	sys_addr	disketteIOAddr;
-	sys_addr	videoIOAddr;
-	sys_addr	memorySizeAddr;
-	sys_addr	equipmentAddr;
-	sys_addr	timeOfDayAddr;
-	sys_addr	diskIOAddr;
-	sys_addr	rs232IOAddr;
-	sys_addr	cassetteIOAddr;
-	sys_addr	printerIOAddr;
-	sys_addr	printScreenAddr;
-	sys_addr	basicAddr;
-	sys_addr	disketteTbAddr;
-	sys_addr	diskTbAddr;
-	sys_addr	mouseIOIntAddr;
-	sys_addr	mouseVideoIOAddr;
-	sys_addr	dummyIntAddr;
-	sys_addr	timerIntAddr;
-	sys_addr	kbIntAddr;
-	sys_addr	diskettIntAddr;
-	sys_addr	diskIntAddr;
-	sys_addr	unexpIntAddr;
-	sys_addr	mouseInt1Addr;
-	sys_addr	mouseInt2Addr;
-	sys_addr	mouseVersionAddr;
-	sys_addr	mouseCopyrightAddr;
-	sys_addr	addrCompatAddr;
-	sys_addr	k6;
-	sys_addr	k7;
-	sys_addr	k8;
-	sys_addr	k9;
-	sys_addr	k10;
-	sys_addr	k11;
-	sys_addr	k30;
-	sys_addr	confTableAddr;
-	sys_addr	diskBaseAddr;
-	sys_addr	drTypeAddr;
-	sys_addr	disketteIO1Addr;
-	sys_addr	mdTbl1Addr;
-	sys_addr	mdTbl2Addr;
-	sys_addr	mdTbl3Addr;
-	sys_addr	mdTbl4Addr;
-	sys_addr	mdTbl5Addr;
-	sys_addr	mdTbl6Addr;
-	sys_addr	rcpuWaitIntAddr;
-	sys_addr	diskParamBlock0;
-	sys_addr	diskParamBlock1;
-	sys_addr	vidParms;
-	sys_addr	vidLens;
-	sys_addr	vidColTab;
-	sys_addr	vidModTab;
-	sys_addr	charGen;
-#ifdef EGG
-	sys_addr	egaStart;
-	sys_addr	egaEnd;
-	sys_addr	egaFonts;
-	sys_addr	egaCgmn;
-	sys_addr	egaCgDot;
-	sys_addr	egaHiFont;
-#endif		/* EGG */
-	sys_addr	dosScratchPad;
-	sys_addr	dosScratchPadEnd;
-}	romAddress;
-
-/* Define out all the 20 bit addresses to be our structure */
-
-#define BIOS_START_SEGMENT		Bios1Segment
-#define	SYSROM_SEG			Bios1Segment
-#define	SYSROMORG_SEG			Bios2Segment
-#define	START_ADDR			romAddress.startAddr
-#define BIOS_START			romAddress.bios1StartAddr
-#define BIOS2_START			romAddress.bios2StartAddr
-#define COPYRIGHT_ADDR 			romAddress.copyrightAddr
-#define RESET_ADDR 			romAddress.resetAddr
-#define BOOT_STRAP_ADDR			romAddress.bootStrapAddr
-#define KEYBOARD_IO_ADDR		romAddress.keyboardIOAddr
-#define DISKETTE_IO_ADDR		romAddress.disketteIOAddr
-#define VIDEO_IO_ADDR			romAddress.videoIOAddr
-#define MEMORY_SIZE_ADDR		romAddress.memoryIOAddr
-#define EQUIPMENT_ADDR			romAddress.equipmentAddr
-#define TIME_OF_DAY_ADDR		romAddress.timeOfDayAddr
-#define DISK_IO_ADDR			romAddress.diskIOAddr
-#define RS232_IO_ADDR			romAddress.rs232IOAddr
-#define CASSETTE_IO_ADDR		romAddress.cassetteIOAddr
-#define PRINTER_IO_ADDR			romAddress.printerIOAddr
-#define PRINT_SCREEN_ADDR		romAddress.printScreenAddr
-#define BASIC_ADDR			romAddress.basicAddr
-#define DISKETTE_TB_ADDR		romAddress.disketteTbAddr
-#define DISK_TB_ADDR			romAddress.diskTbAddr
-#define MOUSE_VIDEO_IO_ADDR		romAddress.mouseVideoIntAddr
-#define DUMMY_INT_ADDR			romAddress.dummyIntAddr
-#define TIMER_INT_ADDR			romAddress.timerIntAddr
-#define KB_INT_ADDR			romAddress.kbIntAddr
-#define DISKETTE_INT_ADDR		romAddress.disketteIntAddr
-#define DISK_INT_ADDR			romAddress.diskIntAddr
-#define UNEXP_INT_ADDR			romAddress.unexpIntAddr
-#define MOUSE_INT1_ADDR			romAddress.mouseInt1Addr
-#define MOUSE_INT2_ADDR			romAddress.mouseInt2Addr
-#define MOUSE_VERSION_ADDR		romAddress.mouseVersionAddr
-#define MOUSE_COPYRIGHT_ADDR		romAddress.mouseCopyrightAddr
-#define ADDR_COMPATIBILITY_ADDR		romAddress.addrCompatAddr
-#define CONF_TABLE_ADDR   		romAddress.confTableAddr
-#define DISK_BASE_ADDR			romAddress.diskBaseAddr
-#define DR_TYPE_ADDR           		romAddress.drTypeAddr
-#define DISKETTE_IO_1_ADDR		romAddress.disketteIO1Addr
-#define MD_TBL1_ADDR			romAddress.mdTbl1Addr
-#define MD_TBL2_ADDR           		romAddress.mdTbl2Addr
-#define MD_TBL3_ADDR		        romAddress.mdTbl3Addr
-#define MD_TBL4_ADDR            	romAddress.mdTbl4Addr
-#define MD_TBL5_ADDR            	romAddress.mdTbl5Addr
-#define MD_TBL6_ADDR            	romAddress.mdTbl6Addr
-#define RCPU_WAIT_INT_ADDR		romAddress.rcpuWaitAddr
-#define DPB0				romAddress.diskParamBlock0
-#define DPB1				romAddress.diskParamBlock1
-#define VID_PARMS			romAddress.vidParms
-#define VID_LENS			romAddress.vidLens
-#define VID_COLTAB			romAddress.vidColTab
-#define VID_MODTAB			romAddress.vidModTab
-#define	CHAR_GEN_ADDR			romAddress.charGen
-#define DOS_SCRATCH_PAD			romAddress.dosScratchPad
-#define DOS_SCRATCH_PAD_END		romAddress.dosScratchPadEnd
-
-/* Addresses in Intel memory of constant keyboard tables */
-
-#define K6		romAddress.k6
-#define K7		romAddress.k7
-#define K8		romAddress.k8
-#define K9		romAddress.k9
-#define K10		romAddress.k10
-#define K11		romAddress.k11
-#define	K30		romAddress.k30
-
-/* The Video Rom Stuff */
-
-#ifdef 	EGG
-#define EGA_SEG		EgaROMSegment
-#define EGA_ROM_START	romAddress.egaStart	/* start of EGA BIOS ROM */
-#define EGA_ROM_END	romAddress.egaEnd	/* end of EGA BIOS ROM +1 */
-#define EGA_CGMN	romAddress.egaCgmn
-#define EGA_CGDDOT	romAddress.egaCgDot
-#define EGA_HIFONT	romAddress.egaHiFont
-#endif		/* EGG */
-
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 967
 
 /*
  * Offsets for a set of instructions that are used in virtualisation
@@ -1011,44 +779,14 @@ extern struct romAddressTag {
 
 /* Union for accessing an entry in the Interrupt Vector table */
 #ifdef BACK_M
-
-#ifdef BIGEND
-typedef union   {
-		double_word all;
-		struct  {
-			half_word hw0;
-			half_word hw1;
-			half_word hw2;
-			half_word hw3;
-	        	} hwords;
-		} IVT_ENTRY;
-#endif
-
-#ifdef LITTLEND
-typedef union   {
-		double_word all;
-		struct  {
-			half_word hw3;
-			half_word hw2;
-			half_word hw1;
-			half_word hw0;
-	        	} hwords;
-		} IVT_ENTRY;
-#endif
-
+#error "Unsupported SoftPC mirror configuration: BACK_M"
 #else /* BACK_M */
+#line 1040
 
 #ifdef BIGEND
-typedef union   {
-		double_word all;
-		struct  {
-			half_word hw3;
-			half_word hw2;
-			half_word hw1;
-			half_word hw0;
-	        	} hwords;
-		} IVT_ENTRY;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 1052
 
 #ifdef LITTLEND
 typedef union   {
@@ -1063,3 +801,7 @@ typedef union   {
 #endif
 #endif /* BACK_M */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 1246

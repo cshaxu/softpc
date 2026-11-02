@@ -11,6 +11,10 @@
  * ==========================================================================
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 14
 
 /*
  * ==========================================================================
@@ -31,7 +35,13 @@
 #define NUM_AC_REGS     21
 #define NUM_DAC_REGS    256
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 34
 #define STATELENGTH             sizeof(VIDEO_HARDWARE_STATE_HEADER)
+#endif // NEC_98
+#line 35
 #define LATCHLENGTH             4
 #define RGBLENGTH               3
 #define PLANELENGTH             0x10000
@@ -76,26 +86,9 @@
 #define AC_MODE_CONTROL_REG     16
 
 #ifndef PROD
-/* Debug stuff. */
-#define FullScreenTrace0(s) \
-        if (FullScreenDebug) always_trace0(s)
-#define FullScreenTrace1(s ,p0) \
-        if (FullScreenDebug) always_trace1(s, p0)
-#define FullScreenTrace2(s, p0, p1) \
-        if (FullScreenDebug) always_trace2(s, p0, p1)
-#define FullScreenTrace3(s, p0, p1, p2) \
-        if (FullScreenDebug) always_trace3(s, p0, p1, p2)
-#define FullScreenTrace4(s, p0, p1, p2, p3) \
-        if (FullScreenDebug) always_trace4(s, p0, p1, p2, p3)
-#define FullScreenTrace5(s, p0, p1, p2, p3, p4) \
-        if (FullScreenDebug) always_trace5(s, p0, p1, p2, p3, p4)
-#define FullScreenTrace6(s, p0, p1, p2, p3, p4, p5) \
-        if (FullScreenDebug) always_trace6(s, p0, p1, p2, p3, p4, p5)
-#define FullScreenTrace7(s, p0, p1, p2, p3, p4, p5, p6) \
-        if (FullScreenDebug) always_trace7(s, p0, p1, p2, p3, p4, p5, p6)
-#define FullScreenTrace8(s, p0, p1, p2, p3, p4, p5, p6, p7) \
-        if (FullScreenDebug) always_trace7(s, p0, p1, p2, p3, p4, p5, p6, p7)
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #else /* !PROD */
+#line 99
 #define FullScreenTrace0(s)
 #define FullScreenTrace1(s ,p0)
 #define FullScreenTrace2(s, p0, p1)
@@ -135,6 +128,10 @@ typedef struct
  */
 IMPORT HANDLE MainThread;
 IMPORT DWORD stateLength;
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 155
 IMPORT PVOID textState; //Tim Nov 92.
 IMPORT WCHAR_STRING videoSection;
 IMPORT WCHAR_STRING textSection;
@@ -143,12 +140,17 @@ IMPORT HANDLE StartTToG;
 IMPORT HANDLE EndTToG;
 IMPORT BOOL BiosModeChange;
 #ifndef PROD
-IMPORT UTINY FullScreenDebug;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* PROD */
+#line 165
 
 extern DWORD savedScreenState;
 extern BOOL  ConsoleInitialised;
 extern BOOL  ConsoleNoUpdates;
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif /* X86GFX */
+#line 173
 extern BOOL blocked_in_gfx_mode;
 
 
@@ -183,5 +185,13 @@ IMPORT HANDLE GetDetectEvent(VOID);
 IMPORT VOID ResetConsoleState IPT0();
 IMPORT int  getModeType(VOID);
 
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 186
 
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 265
 

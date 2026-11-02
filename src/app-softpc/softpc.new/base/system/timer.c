@@ -31,18 +31,16 @@
  *                host_getIdealTime().
  */
 
+/* @(#)timer.c       1.41 05/31/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)timer.c       1.41 05/31/95 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 37
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_SUPPORT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 46
 
 
 /*
@@ -72,13 +70,20 @@ static char SccsID[]="@(#)timer.c       1.41 05/31/95 Copyright Insignia Solutio
 #include "quick_ev.h"
 
 #ifndef PROD
-#include <stdlib.h>
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 77
 
 #ifdef HUNTER
-#include "hunter.h"
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 81
 
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 90
 
 /* Imports */
 
@@ -97,16 +102,24 @@ static char SccsID[]="@(#)timer.c       1.41 05/31/95 Copyright Insignia Solutio
 
 static struct host_timeval idealtime;
 static unsigned long idealInterval;
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else /* NTVDM */
+#line 117
 static unsigned long ticksPerIdealInterval;
 static  int     ticks_blocked = 0;
+#endif /* NTVDM */
+#line 102
 
 #ifndef PROD
-static char buf[80];  /* Used for tracing messages */
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 124
 
 #ifdef HUNTER                   /* Only needed for HUNTER */
-word timer_batch_count;         /* Batch update when PC tick occurs */
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 128
 int timer_int_enabled;          /* Whether Bios timer ints are required */
 
 
@@ -164,7 +177,13 @@ int timer_int_enabled;          /* Whether Bios timer ints are required */
  */
 
 #define TIMER_CLOCK_NUMER       1000
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 167
 #define TIMER_CLOCK_DENOM       1193
+#endif   //NEC_98
+#line 191
 
 typedef half_word TSIGNAL;
 
@@ -228,12 +247,16 @@ typedef struct {
         int             tc;
         int             freezeCounter;
 
+#ifndef NTVDM
+#line 255
         unsigned long lastTicks;
         long            microtick;
         long            timeFrig;
         word            saveCount;
         int             guessesPerHostTick;     /* How often per host tick are we forced to guess? */
         int             guessesSoFar;           /* How many times have we guessed so far? */
+#endif
+#line 262
 
         unsigned int    delay;
 
@@ -347,28 +370,45 @@ LOCAL void loadCounter IPT0();
 LOCAL void updateCounter IPT0();
 LOCAL void startCounting IPT0();
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 378
 LOCAL void updateCount IPT3(unsigned long, ticks, unsigned long *, wrap,
         struct host_timeval *, now);
+#endif
+#line 381
 LOCAL unsigned  short bin_to_bcd IPT1(unsigned long, val);
 LOCAL word bcd_to_bin IPT1(word, val);
 LOCAL void emu_8253 IPT3(io_addr, port, int, signal, half_word, value);
 LOCAL void Timer_init IPT0();
 LOCAL unsigned long timer_conv IPT1(word, count);
 LOCAL void issueIREQ0 IPT1(unsigned int, n);
+#ifndef NTVDM
+#line 388
 LOCAL unsigned long guess IPT0();
 LOCAL void throwaway IPT0();
+#endif
+#line 360
 #ifdef SYNCH_TIMERS
-GLOBAL void IdealTimeInit IPT0();
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
+#line 394
 LOCAL void IdealTimeInit IPT0();
 #endif
 LOCAL void updateIdealTime IPT0();
 LOCAL void getIdealTime IPT1(struct host_timeval *, t);
+#ifndef NTVDM
+#line 399
 LOCAL void getHostSysTime IPT1(struct host_timeval *, t);
 LOCAL void checktimelock IPT0();
+#endif
+#line 402
 LOCAL void setTriggerCond IPT0();
 LOCAL void WtComplete IPT0();
 LOCAL void counter_init IPT1(COUNTER_UNIT *, p);
+#ifndef NTVDM
+#line 406
 LOCAL void setLastWrap IPT2(unsigned int, nclocks, struct host_timeval *, now);
 LOCAL void timer_generate_int IPT1(long, n);
 LOCAL void timer_multiple_ints IPT1(long, n);
@@ -378,8 +418,14 @@ LOCAL IU32 max_backlog = 0;     /* max # of ints allowed to queue up */
 IBOOL active_int_event = FALSE; /* current quick_event for timer queue */
 IU32 more_timer_mult = 0;       /* additions to timer int queue */
 IU32 timer_multiple_delay = 0;  /* us delay to next timer queue elem */
+#endif
+#line 381
 
 
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 448
 static int timelock;            /* locks out time_tick if set */
 static int needtick;            /* causes time_tick() to be called if set */
 
@@ -411,22 +457,30 @@ LOCAL ULONG     n_rm_instrs_before_full_speed = 3000000;/* Nominal number of ins
 LOCAL ULONG     adj_n_real_mode_ticks_before_full_speed = 0;/* The value which real_mode_ticks_in_a_row must reach
                                                            before the hack is disabled */
 #ifndef PROD
-LOCAL ULONG     ticks_ignored = 0;                      /* For information purposes only. */
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#endif /* NTVDM */
+#line 482
 
 
 #ifndef PROD    /* Specific Timer change tracing that isn't timer_verbose */
-
-
-GLOBAL int DoTimerChangeTracing = 0;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 423
 
+#if !defined(NTVDM)
+#line 491
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
-extern IBOOL HostDelayTimerInt IPT1(int, numberInts);
-extern IBOOL HostPendingTimerInt IPT0();
-extern void HostResetTimerInts IPT0();
-
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
+#line 430
+#endif
+#line 498
+
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 504
 
 
 /*
@@ -450,6 +504,10 @@ void (*timer_tick_func) IPT0();
  * External functions
  * ============================================================================
  */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 453
 
 void
 SWTMR_init_funcptrs IFN0()
@@ -462,6 +520,8 @@ SWTMR_init_funcptrs IFN0()
         timer_gate_func                 = SWTMR_gate;
         timer_tick_func                 = SWTMR_time_tick;
 
+#ifndef NTVDM
+#line 465
         /*
          * initialise stuff for PM timer hack
          */
@@ -471,6 +531,8 @@ SWTMR_init_funcptrs IFN0()
                 adj_instrs_per_tick = host_speed (instrs_per_tick);
                 adj_n_real_mode_ticks_before_full_speed = n_rm_instrs_before_full_speed / adj_instrs_per_tick;
         }
+#endif
+#line 474
 }
 
 void
@@ -480,14 +542,20 @@ SWTMR_time_tick IFN0()
     /*
      * Give the idle detector a chance to see if we are really idle.
      */
+#ifndef NTVDM
+#line 564
     /* this is done in Nt's host heartbeat */
     IDLE_tick();
+#endif
+#line 485
 
     /*
      * Interrupt routine - called from time_strobe event/signal handler.
      * That is called from host_timer_event
      */
 
+#ifndef NTVDM
+#line 574
     /* protect ourselves from shafting a timer-channel in midst-program
      * ... the lock is controlled by timer_inb(),_outb() and _gate()
      */
@@ -497,6 +565,8 @@ SWTMR_time_tick IFN0()
         needtick = ~0;
         return;
     }
+#endif
+#line 584
 
     /* ideal time goes up by the number of timer clocks
      * equivalent to the interval between calls to 'time_tick'
@@ -516,7 +586,13 @@ SWTMR_time_tick IFN0()
      * all the time.
      */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 519
     pcu = &timers[2];
+#endif   //NEC_98
+#line 520
     updateCounter();
 }
 
@@ -539,27 +615,48 @@ SWTMR_time_tick IFN0()
 
 void SWTMR_gate IFN2(io_addr, port, half_word, value)
 {
+#ifdef  NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 542
     timelock = LOCKED;
+#endif
+#line 635
 
     emu_8253 (port, GATE_SIGNAL, value);
 #ifndef PROD
-    if (io_verbose & TIMER_VERBOSE)
-    {
-        sprintf(buf, "timer_gate() - sending %d to port 0x%x", value, port);
-        trace(buf, DUMP_REG);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 552
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 553
     checktimelock();
+#endif
+#line 554
 }
 
 
 void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 559
     timelock = LOCKED;
+#endif
+#line 560
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 665
     pcu = &timers[port & 3];
+#endif   //NEC_98
+#line 667
         if (!pcu->countlatched)
                 readCounter();
         switch (pcu->readState)
@@ -592,13 +689,16 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
                         break;
         }
 #ifndef PROD
-    if (io_verbose & TIMER_VERBOSE)
-    {
-        sprintf(buf, "timer_inb() - Returning %d(0x%x) for port 0x%x", *value, *value, port);
-        trace(buf, DUMP_REG);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 601
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 601
     checktimelock();
+#endif
+#line 602
 
 }
 
@@ -606,26 +706,39 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 void SWTMR_outb IFN2(io_addr, port, half_word, value)
 {
 #if defined(NTVDM) || defined(GISP_SVGA)
-    if (port == 0x4f)   /* dead port used by PS/2 XGA bios for DAC delays */
-        return;
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #else
+#line 725
     timelock = LOCKED;
 #endif
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 731
     port = port & TIMER_BIT_MASK;
         if(port == 0x43)
+#endif   //NEC_98
+#line 734
                 controlWordReg(value);
         else
             emu_8253 (port, WRITE_SIGNAL, value);
 #ifndef PROD
-    if (io_verbose & TIMER_VERBOSE)
-    {
-        sprintf(buf, "timer_outb() - Value %d to port 0x%x", value, port);
-        trace(buf, DUMP_REG);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 627
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 748
     checktimelock();
+#endif
+#line 750
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 756
 
 }
 
@@ -636,10 +749,19 @@ void SWTMR_outb IFN2(io_addr, port, half_word, value)
 /*                                                                             */
 /* --------------------------------------------------------------------------- */
 
+#ifndef NTVDM
+#line 767
 GLOBAL ULONG get_DOS_ticks IFN0()
 {
         return( timers[0].Count );
 }
+#endif /* NTVDM */
+#line 643
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 800
 
 
 
@@ -649,6 +771,8 @@ GLOBAL ULONG get_DOS_ticks IFN0()
 /* **************************************************************************** */
 /* **************************************************************************** */
 
+#ifndef NTVDM
+#line 809
 /* check whether a time lock (set while application io is being serviced)
  * has blocked out an alarm signal ... call time_tick() to catch up if so
  * ... (time_tick() sets timelock = ~0, and just returns, if it sees the time
@@ -664,6 +788,8 @@ LOCAL void checktimelock IFN0()
                 time_tick();
         }
 }
+#endif
+#line 667
 
 /*
  *      emulate the 8253 chip.
@@ -689,7 +815,13 @@ LOCAL void emu_8253 IFN3(io_addr, port, int, signal, half_word, value)
         int A0A1;
 
         /* get address lines A0 and A1 */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 853
         A0A1 = port & 3;
+#endif   //NEC_98
+#line 855
 
         /* handle the access */
                 pcu = &timers[A0A1];
@@ -802,8 +934,12 @@ LOCAL void controlWordReg IFN1(half_word, cwd)
                         pcu->countlatched = 0;
                         pcu->tc = 0;
                         pcu->tickadjust = 0;
+#ifndef NTVDM
+#line 805
                         pcu->microtick = 0;
                         pcu->saveCount = 0;
+#endif
+#line 971
 
                         m  = (cwd & 0xe)  >> 1;
                         if(m > 5)m -= 4; /* Modes 6 and 7 don't exist - they are intepreted as modes 2 and 3 */
@@ -866,7 +1002,11 @@ LOCAL void setTriggerCond IFN0()
 LOCAL void loadCounter IFN0()
 {
         unsigned long modulo;
+#ifndef NTVDM
+#line 1034
         IU32 maxback;
+#endif
+#line 1036
 
         /* set counter */
         /* get correct modulo to use for counter calculations */
@@ -895,20 +1035,33 @@ LOCAL void loadCounter IFN0()
         {
             /* Get rid of pending interrupts - these may no longer me appropriate - eg. in Sailing */
             ica_hw_interrupt_cancel(ICA_MASTER,CPU_TIMER_INT);
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1067
 
+#ifndef NTVDM
+#line 1069
                 /* how many interrupts in MAX_BACK_SECS seconds? */
                 maxback = (1193180 * MAX_BACK_SECS) / modulo;
 
                 if (maxback > max_backlog)
                 {
 #ifndef PROD
-                        fprintf(trace_file, "setting max backlog to %d\n", maxback);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 907
                         max_backlog = maxback;
                 }
+#endif
+#line 909
 
         }
 
+#if defined(NTVDM) && !defined(PROD)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /*NTVDM & !PROD*/
+#line 1089
 }
 
 /* read counter into latch, ready for next read */
@@ -919,10 +1072,16 @@ LOCAL void readCounter IFN0()
 
         updateCounter();
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1114
         if(pcu->bcd == BCD)
                 countread = bin_to_bcd(pcu->Count);
         else
                 countread = pcu->Count;
+#endif
+#line 1119
 
         pcu->latchvaluemsb = countread >> 8;
         pcu->latchvaluelsb = countread & 0xff;
@@ -1136,31 +1295,31 @@ LOCAL void outputWaveForm IFN5(unsigned int, delay, unsigned long, lowclocks,
         unsigned long, hiclocks, int, lohi, int, repeat)
 {
 #ifdef DOCUMENTATION
-        int ch;
+#error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif /* DOCUMENTATION */
+#line 1334
         pcu->out.startLogicLevel = lohi;
         pcu->out.repeatWaveForm = repeat;
         pcu->out.clocksAtLoLogicLevel = lowclocks;
         pcu->out.clocksAtHiLogicLevel = hiclocks;
         if (repeat == REPEAT)
                 pcu->out.period = lowclocks + hiclocks;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 1147
         if (pcu == &timers[2])
+#endif   //NEC_98
+#line 1148
         {
                 host_timer2_waveform(delay,lowclocks,hiclocks,lohi,repeat);
         }
         pcu->delay = 0;
 
 #ifdef DOCUMENTATION
-        if (pcu==&timers[0])
-                ch = 0;
-        if (pcu==&timers[1])
-                ch = 1;
-        if (pcu==&timers[2])
-                ch = 2;
-        sprintf(buf,"ch.%d waveform:delay %d lo %d hi %d lohi %d repeat %d\n",
-                ch,delay,lowclocks,hiclocks,lohi,repeat);
-        trace(buf,0);
+#error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif /* DOCUMENTATION */
+#line 1164
 }
 
 /* time stamp the counter unit ... it is counting from this time
@@ -1168,9 +1327,15 @@ LOCAL void outputWaveForm IFN5(unsigned int, delay, unsigned long, lowclocks,
 
 LOCAL void timestamp IFN0()
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1374
         /* Initialise lastTicks before referencing it in updateCount() */
         /* Makes Norton SYSINFO version 5.0 work on fast (HP) machines */
         pcu->lastTicks = 0 ;
+#endif
+#line 1378
         /* Go and get the time since it was activated */
         (*pcu->getTime)(&pcu->activationTime);
 }
@@ -1490,20 +1655,16 @@ LOCAL UNBLOCK_FUNCTION CounterBufferLoaded IFN0()
         loadCounter();
 
 #ifdef DOCUMENTATION
-        /*
-         * Output state of timer if tracing.
-         * Currently dumpCounter has no effect, so just leave this in
-         * case anyone wants to implement it properly.
-         */
-
-        if (io_verbose & TIMER_VERBOSE)
-        {
-                dumpCounter();
-        }
+#error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif /* DOCUMENTATION */
+#line 1708
 
         if (pcu->gate != GATE_SIGNAL_LOW)
         {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 1507
                 if (pcu == &timers[0])
                         timer_int_enabled = TRUE;
                 timestamp();
@@ -1580,6 +1741,8 @@ LOCAL void startCounting IFN0()
         runCount();
 }
 
+#ifndef NTVDM
+#line 1795
 /* calculate the number of 8253 clocks elapsed since counter was last
  * activated
  */
@@ -1600,10 +1763,9 @@ LOCAL unsigned long clocksSinceCounterActivated IFN1(struct host_timeval *, now)
     {
     case 0:  usec_val = now->tv_usec - first->tv_usec;
 #ifndef PROD
-            if (io_verbose & TIMER_VERBOSE)
-                    if ( usec_val == 0 )
-                        trace("clocksSinceCounterActivated() == 0 !", 0);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1607
              nclocks  = (usec_val * TIMER_CLOCK_DENOM) / TIMER_CLOCK_NUMER;
              break;
 
@@ -1615,23 +1777,31 @@ LOCAL unsigned long clocksSinceCounterActivated IFN1(struct host_timeval *, now)
              nclocks   = ((now->tv_usec - first->tv_usec) * TIMER_CLOCK_DENOM) / TIMER_CLOCK_NUMER;
              nclocks  += secs * (1000000L * TIMER_CLOCK_DENOM / TIMER_CLOCK_NUMER);
 #ifndef PROD
-            if (io_verbose & TIMER_VERBOSE) {
-                sprintf(buf, "timer[%d]: %d seconds have passed!", pcu-timers, secs);
-                trace(buf, DUMP_NONE);
-            }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1623
              break;
     }
     return nclocks;
 }
 
+#endif
+#line 1860
 
 
 LOCAL void updateCounter IFN0()
 {
+#ifndef NTVDM
+#line 1865
     unsigned long nticks;
     struct host_timeval now;
+#endif /* NTVDM */
+#line 1868
     unsigned long wrap;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 1872
 
         switch (pcu->m)
         {
@@ -1640,20 +1810,33 @@ LOCAL void updateCounter IFN0()
         case SQUAREWAVE_GEN:
                 if (pcu->gate == GATE_SIGNAL_LOW)
                         return;
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1643
                 nticks = clocksSinceCounterActivated(&now);
                 updateCount(nticks, &wrap,&now);
+#endif
+#line 1645
                 if (wrap)
                         pcu->tickadjust = pcu->Count;
                 if (pcu->m == INT_ON_TERMINALCOUNT && wrap)
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 1648
                         pcu->tc = 1;
+#endif   //NEC_98
+#line 1894
                 if (pcu == &timers[0] && wrap){
                         if (pcu->m != INT_ON_TERMINALCOUNT)
                                 issueIREQ0((unsigned int)wrap);
                         else
                                 issueIREQ0(1);
 #ifdef HUNTER
-                        timer_batch_count = wrap;
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 1657
 
                 }
                 return;
@@ -1662,24 +1845,35 @@ LOCAL void updateCounter IFN0()
         case HW_TRIG_STROBE:
                 if (pcu->tc)
                         return;
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1665
                 nticks = clocksSinceCounterActivated(&now);
                 updateCount(nticks, &wrap,&now);
+#endif
+#line 1667
                 if (wrap)
                 {
                         pcu->Count = 0;
                         pcu->tc = 1;
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1671
 
                 }
 #ifdef HUNTER
-                if (pcu == &timers[0]){
-                        timer_batch_count = wrap;
-                }
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 1678
                 return;
         }
 }
 
 
+#ifndef NTVDM
+#line 1683
 #ifndef DELAYED_INTS
 /*
  *      timer_no_longer_too_soon() - this is the function invoked by the quick event manager
@@ -1748,11 +1942,9 @@ LOCAL void timer_generate_int IFN1(long, n)
                 }else{
                         ticks_lost_this_time = TRUE;
 #ifndef PROD
-                        ticks_ignored++;
-                        if (!(ticks_ignored & 0xFF)){
-                                always_trace0 ("another 256 ticks lost!");
-                        }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1756
                 }
         }else{
 #ifndef GISP_CPU
@@ -1760,24 +1952,20 @@ LOCAL void timer_generate_int IFN1(long, n)
         }
 }
 #else /* GISP_CPU */
-#if defined(IRET_HOOKS)
-                if (!HostDelayTimerInt(n))
-                {       /* no host need to delay this timer int, so generate one now. */
-                        ica_hw_interrupt(ICA_MASTER,CPU_TIMER_INT, 1);
-                }
-
-#else /* !IRET_HOOKS */
-                /* GISP_CPU doesn't use quick events so use ica_hw_interrupt(,,n). */
-                ica_hw_interrupt(ICA_MASTER,CPU_TIMER_INT, n);
-#endif /* IRET_HOOKS */
-        }
-}
+#error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif /* GISP_CPU */
+#line 1776
 
 #endif /* DELAYED_INTS */
 
+#else   /* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1779
 
 
+#ifndef NTVDM
+#line 1781
 /*
  * Handle a cranked up timer where multiple interrupts are
  * required per tick. Schedule 'n' ints over a tick. Period
@@ -1817,6 +2005,8 @@ LOCAL void timer_multiple_ints IFN1(long, num_ints)
         }
 
 }
+#endif
+#line 2237
 
 
 LOCAL void issueIREQ0 IFN1(unsigned int, n)
@@ -1824,55 +2014,32 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
         IU16 int_delay; /* delay before handling wrapped int */
 
 #ifndef PROD
-static  pig_factor  = 0;
-static  time_factor = 0;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1830
 
 #ifdef PIG
-extern  IBOOL ccpu_pig_enabled;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif
+#line 1834
 
 #ifndef PROD
-    if ( time_factor == 0 )
-    {
-        char *env;
-
-        env = host_getenv("TIMER_FACTOR");
-        if ( env )
-                time_factor = atoi(env);
-        if ( time_factor == 0 )
-                time_factor = 1;
-#ifdef PIG
-        if ( pig_factor == 0 )
-        {
-                env = host_getenv("PIG_TIMER_FACTOR");
-                if ( env )
-                        pig_factor = atoi(env);
-                if ( pig_factor == 0 )
-                        pig_factor = 10;
-        }
-#else
-        pig_factor = 1;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-    }
-#endif
+#line 2276
 
     if (ticks_blocked == 0)
     {
 #ifndef PROD
-#ifdef PIG
-                if ( ccpu_pig_enabled ) {
-                        ticks_blocked = pig_factor-1;
-                } else
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-                        ticks_blocked = time_factor-1;
-#endif
+#line 2287
                 if (timer_int_enabled)
                 {
 #ifdef DELAYED_INTS
-                        ica_hw_interrupt_delay(ICA_MASTER,CPU_TIMER_INT, n,
-                                HOST_TIMER_INT_DELAY);
+#error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #else /* !DELAYED_INTS */
+#line 2310
 
 
 
@@ -1919,6 +2086,10 @@ extern  IBOOL ccpu_pig_enabled;
 
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2492
 LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
         struct host_timeval *, now)
 {
@@ -1979,12 +2150,9 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
                         ticks %= modulo;
 
 #ifndef PROD
-                        if (io_verbose & TIMER_VERBOSE)
-                            if ( pcu->m == INT_ON_TERMINALCOUNT ) {
-                                sprintf(buf, "%lx wraps for timer[%d]", *wrap, pcu-timers);
-                                trace(buf, DUMP_NONE);
-                        }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1988
                 }
         }
 
@@ -2030,9 +2198,13 @@ LOCAL void setLastWrap IFN2(unsigned int, nclocks, struct host_timeval *, now)
         pcu->lastTicks = nclocks;
 }
 
+#endif  /* NTVDM*/
+#line 2033
 
 
 
+#ifndef NTVDM
+#line 2036
 /*
  * If the host timer gives the same result as last time it was called,
  * we must give the illusion that time has passed.
@@ -2063,11 +2235,9 @@ LOCAL unsigned long guess IFN0()
                 pcu->saveCount = pcu->Count;
                 pcu->timeFrig = ((ticksPerIdealInterval * 7) >> 3) / pcu->guessesPerHostTick;      /* guesses over 7/8 of tick */
 #ifndef PROD
-                if (io_verbose & TIMER_VERBOSE) {
-                        sprintf(buf, "guess init timer[%d]: timeFrig = %lx", pcu-timers, pcu->timeFrig);
-                        trace(buf, DUMP_NONE);
-                }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 2071
         }
         if(pcu->guessesSoFar++ > pcu->guessesPerHostTick)
         {
@@ -2077,11 +2247,9 @@ LOCAL unsigned long guess IFN0()
          */
                 pcu->timeFrig = (pcu->timeFrig >> 1) + 1;
 #ifndef PROD
-                if (io_verbose & TIMER_VERBOSE) {
-                        sprintf(buf, "guess decay: timeFrig = %lx", pcu->timeFrig);
-                        trace(buf, DUMP_NONE);
-                }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 2085
         }
         pcu->microtick += pcu->timeFrig;
         return (pcu->microtick + pcu->lastTicks);
@@ -2100,16 +2268,15 @@ LOCAL void throwaway IFN0()
         if (!pcu->microtick)
                 return;
 #ifndef PROD
-    if (io_verbose & TIMER_VERBOSE)
-    {
-        sprintf(buf, "throwaway: guessesPerHostTick = %d", (int)pcu->guessesPerHostTick);
-        trace(buf, DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 2109
         pcu->Count = pcu->saveCount;
         pcu->microtick = 0;
 }
 
+#endif  /* ndef NTVDM */
+#line 2694
 
 LOCAL unsigned  short bin_to_bcd IFN1(unsigned long, val)
 {
@@ -2190,6 +2357,8 @@ LOCAL void updateIdealTime IFN0()
         }
 }
 
+#ifndef NTVDM
+#line 2775
 
 /* get current host system time ... used for time-stamping and
  * querying during io from Intel application
@@ -2214,14 +2383,14 @@ LOCAL void getHostSysTime IFN1(struct host_timeval *, t)
                  */
 
 #ifndef PROD
-#ifndef PIG
-                sprintf(buf,"TIME WARP!!");
-                trace(buf,0);
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#endif
+#line 2222
                 *t = idealtime;
         }
 }
+#endif /* !NTVDM */
+#line 2225
 
 
 /*
@@ -2232,12 +2401,9 @@ LOCAL void getHostSysTime IFN1(struct host_timeval *, t)
 void    axe_ticks IFN1(int, ticks)
 {
 #ifndef PROD
-        /*
-         * No need to axe ticks if timers are disabled by toff2 (if
-         * ticks_blocked is negative)
-         */
-        if (ticks_blocked >=0)
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif  /* PROD */
+#line 2824
                 ticks_blocked = ticks;
 }
 
@@ -2245,24 +2411,18 @@ void    axe_ticks IFN1(int, ticks)
  * Initialization code
  */
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 2255
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 2256
 #ifdef SYNCH_TIMERS
-
-GLOBAL void IdealTimeInit IFN0()
-{
-
-    extern IU32 Q_timer_restart_val;
-
-    idealInterval = Q_timer_restart_val;
-
+#error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
+#line 2266
 
 LOCAL void IdealTimeInit IFN0()
 {
@@ -2273,64 +2433,45 @@ LOCAL void IdealTimeInit IFN0()
     getHostSysTime(&idealtime);
         ticksPerIdealInterval = (idealInterval * TIMER_CLOCK_DENOM) / TIMER_CLOCK_NUMER;
 }
+#endif   //NEC_98
+#line 2878
 
 LOCAL void Timer_init IFN0()
 {
         int i;
         for (i=0; i<3; i++)
                 counter_init(&timers[i]);
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2282
         timers[0].getTime = getIdealTime;       /* Use the 'ideal' time for timer 0, ie. calls to time_tick */
         timers[1].getTime = getHostSysTime;     /* We don't really expect anyone to use timer 1 */
         timers[2].getTime = getHostSysTime;     /* Use real host time for timer 2 */
+#endif
+#line 2285
 }
 
 LOCAL void counter_init IFN1(COUNTER_UNIT *, p)
 {
         p->state = uninit;
         p->initialCount = 0x10000L;     /* Avoid dividing by zero in updateCount()! */
+#ifndef NTVDM
+#line 2900
         p->guessesPerHostTick = p->guessesSoFar = 2;            /* Handy to count from 2! */
         p->timeFrig = ticksPerIdealInterval / p->guessesPerHostTick;
+#endif
+#line 2293
 }
 
+#if !defined (NTVDM)
+#line 2906
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
-/*(
- *======================= TimerHookAgain() ============================
- * TimerHookAgain
- *
- * Purpose
- *      This is the function that we tell the ica to call when a timer
- *      interrupt service routine IRETs.
- *
- * Input
- *      adapter_id      The adapter id for the line. (Note the caller doesn't
- *                      know what this is, he's just returning something
- *                      we gave him earlier).
- *
- * Outputs
- *      return  TRUE if there are more interrupts to service, FALSE otherwise.
- *
- * Description
- *      Check if we have a delayed interrupt, if so then generate the timer int
- *      and return TRUE, else return FALSE
-)*/
-
-GLOBAL IBOOL
-TimerHookAgain IFN1(IUM32, adapter)
-{       char scancode;
-
-        if (HostPendingTimerInt())
-        {       /* We have a host delayed interrupt, so generate a timer int. */
-                sure_note_trace0(TIMER_VERBOSE,"callback with delayed timer int.");
-                ica_hw_interrupt(ICA_MASTER,CPU_TIMER_INT, 1);
-                return(TRUE);   /* more to do */
-        }
-        else
-        {
-                return(FALSE);
-        }
-}
-
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
+#line 2334
+#endif
+#line 2946
 
 void timer_init IFN0()
 {
@@ -2343,20 +2484,36 @@ void timer_init IFN0()
     io_define_inb(TIMER_ADAPTOR, timer_inb_func);
     io_define_outb(TIMER_ADAPTOR, timer_outb_func);
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 2963
     for(i = TIMER_PORT_START; i < TIMER_PORT_END; i++)
         {
                 if( (i & 3) == 3 )
+#endif   //NEC_98
+#line 2967
                         io_connect_port(i, TIMER_ADAPTOR, IO_WRITE);            /* Control port - write only */
                 else
                 io_connect_port(i, TIMER_ADAPTOR, IO_READ_WRITE);       /* Timer port - read/write */
         }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 2976
     IdealTimeInit();
 
     Timer_init();
 
+#ifndef NTVDM
+#line 2358
     timelock = UNLOCKED;
     needtick = 0;
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2360
 
         /*
          * Start up the host alarm system
@@ -2364,19 +2521,12 @@ void timer_init IFN0()
 
         host_timer_init();
 
+#if !defined(NTVDM)
+#line 2367
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
-        /*
-         * Remove any existing hook call-back, and re-instate it afresh.
-         * TimerHookAgain is what gets called on a timer int iret.
-         */
-
-        Ica_enable_hooking(CPU_TIMER_INT, NULL, ICA_MASTER);
-        Ica_enable_hooking(CPU_TIMER_INT, TimerHookAgain, ICA_MASTER);
-
-        /* Host routine to reset any internal data for IRET_HOOK delayed ints. */
-        HostResetTimerInts();
-
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
+#line 2380
 
 
         active_int_event = FALSE; /* clear any cranked timer state */
@@ -2385,15 +2535,25 @@ void timer_init IFN0()
 #if defined(CPU_40_STYLE)
         ica_iret_hook_control(ICA_MASTER, CPU_TIMER_INT, TRUE);
 #endif
+#endif /* !NTVDM */
+#line 2388
 }
 
 void    timer_post IFN0()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 3023
     /* enable gates on all timer channels */
     timer_gate(TIMER0_REG,GATE_SIGNAL_RISE);    /* start timer 1 going... */
     timer_gate(TIMER1_REG,GATE_SIGNAL_RISE);
     timer_gate(TIMER2_REG,GATE_SIGNAL_LOW);
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 3047
     timer_outb(TIMER_MODE_REG,0x36);
     timer_outb(TIMER0_REG,0);
     timer_outb(TIMER0_REG,0);
@@ -2404,40 +2564,14 @@ void    timer_post IFN0()
     timer_outb(TIMER_MODE_REG,0xb6);
     timer_outb(TIMER2_REG,0x68);
     timer_outb(TIMER2_REG,0x04);
+#endif   //NEC_98
+#line 2407
 }
 
 #ifdef DOCUMENTATION
-#ifndef PROD
-
-/*
- * Debugging code....
- * This code has no effect.  It is left here in case anyone wants to
- * expand it in future.
- */
-
-dumpCounter IFN0()
-{
-        static char *modes[] =
-        {       "int on tc",
-                "prog one shot",
-                "rate gen",
-                "squarewave gen",
-                "sw trig strobe",
-                "hw trig strobe"
-        };
-
-        static char *as[] =
-        {       "binary",
-                "bcd"
-        };
-
-        char *p, *q;
-
-        p = modes[pcu->m];
-        q = as[pcu->bcd];
-}
-#endif /* nPROD */
+#error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif /* DOCUMENTATION */
+#line 2441
 
 GLOBAL int
 softpc_device_snapshot_encode_timer_callback(callback, callback_id)

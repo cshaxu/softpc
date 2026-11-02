@@ -21,9 +21,6 @@
 ]*/
 
 #ifdef GISP_SVGA
-
-extern void romMessageAddress IPT0( );
-extern void gispROMInit IPT0( );
-
-
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
+#line 30

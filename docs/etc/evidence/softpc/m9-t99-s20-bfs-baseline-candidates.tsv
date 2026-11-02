@@ -1,0 +1,19 @@
+path	xp_line	xp_directive	condition	matched_lines	first_current_line	last_current_line	disposition
+base/bios/reset.c	1027	ifdef	NTVDM	3	731	733	existing_local_override_review
+base/inc/config.h	368	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	9	360	368	deferred_coupled_or_review
+base/inc/config.h	390	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3	380	382	deferred_coupled_or_review
+base/keymouse/mouse_io.c	1126	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	9	1351	1368	deferred_coupled_or_review
+base/keymouse/mouse_io.c	2245	if	!defined(NTVDM) || !defined(MONITOR)	2	2307	2308	deferred_coupled_or_review
+base/keymouse/mouse_io.c	2885	if	!defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))	4	2860	2863	deferred_coupled_or_review
+base/system/rom.c	342	if	!defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )	5	305	326	deferred_coupled_or_review
+base/system/rom.c	602	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	6	449	458	deferred_coupled_or_review
+base/system/rom.c	622	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	2	465	466	deferred_coupled_or_review
+base/system/rom.c	630	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	3	498	524	deferred_coupled_or_review
+base/system/rom.c	784	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	5	603	640	deferred_coupled_or_review
+base/video/cga.c	4	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	288	107	1267	deferred_coupled_or_review
+base/video/ega_vide.c	677	if	!(defined(NTVDM) && defined(X86GFX)) || defined(ARCX86)	2	624	625	deferred_coupled_or_review
+base/video/ega_vide.c	2238	if	!defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	8	1709	1720	deferred_coupled_or_review
+base/video/gfx_updt.c	3746	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove uneeded code */	27	3673	3770	deferred_coupled_or_review
+base/video/gfx_updt.c	3889	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove unneeded code */	12	3804	3820	deferred_coupled_or_review
+base/video/vga_prts.c	2460	ifndef	NEC_98	16	2406	2468	nested_parent_review
+base/ccpu386/c_main.c	4870	ifdef	NTVDM	3	4699	4710	existing_local_override_review

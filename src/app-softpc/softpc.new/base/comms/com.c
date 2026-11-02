@@ -12,9 +12,11 @@
  *
  */
 
+/* @(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 18
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
@@ -26,6 +28,10 @@ static char SccsID[]="@(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd."
  */
 #include <stdio.h>
 #include <ctype.h>
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 33
 #include TypesH
 #include StringH
 
@@ -50,10 +56,20 @@ static char SccsID[]="@(#)com.c	1.45 04/26/94 Copyright Insignia Solutions Ltd."
 #include "ckmalloc.h"
 #include "compat/devices/snapshot.h"
 #ifdef GISP_CPU
-#include "hg_cpu.h"	/* GISP CPU interface */
+#error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif /* GISP_CPU */
+#line 59
 
+#ifndef NEC_98
+#line 63
 LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
+#endif // NEC_98
+#line 65
+
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif
+#line 71
 
 
 /*
@@ -73,6 +89,10 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
  *	running at once on a single adapter.
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 80
 static struct ADAPTER_STATE
 {
 	BUFFER_REG tx_buffer;
@@ -84,6 +104,10 @@ static struct ADAPTER_STATE
 	MODEM_CONTROL_REG modem_control_reg;
 	LINE_STATUS_REG line_status_reg;
 	MODEM_STATUS_REG modem_status_reg;
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#endif
+#line 91
 	half_word scratch;      /* scratch register */
 
 	int break_state;        /* either OFF or ON */
@@ -101,25 +125,30 @@ static struct ADAPTER_STATE
 	int com_baud_ind;
 	int had_first_read;
 #ifdef IRET_HOOKS
-	IUM32 batch_size;
-	IUM32 current_count;
-	IBOOL batch_running;
-	IBOOL qev_running;
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
+#line 113
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 113
 } adapter_state[NUM_SERIAL_PORTS];
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 116
 #define MODEM_STATE_CHANGE()
+#endif
+#endif // NEC_98
+#line 117
 
 
 #ifdef IRET_HOOKS
-/*
- * Also have an overall quick events running flag that is set, if either
- * adapter has an event running.
- */
-
-IBOOL qev_running = FALSE;
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
+#line 127
 
 /*
  * For synchronisation of adapter input.
@@ -136,7 +165,11 @@ static int com_critical[NUM_SERIAL_PORTS];
 /*
  * Used to determine whether a flush input is needed for a LCR change
  */
+#ifndef NEC_98
+#line 208
 static LINE_CONTROL_REG LCRFlushMask;
+#endif // NEC_98
+#line 140
 
 /*
  *	Please note that the following arrays have been made global in order
@@ -144,6 +177,10 @@ static LINE_CONTROL_REG LCRFlushMask;
  *	them static.
  */
 
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 151
 
 /*
  * The delay needed in microseconds between receiving 2 characters
@@ -211,9 +248,9 @@ unsigned long TX_delay[] =
 };
 
 #ifndef PROD
-FILE     *com_trace_fd = NULL;
-int       com_dbg_pollcount = 0;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* !PROD */
+#line 221
 
 GLOBAL void recv_char IPT1(long, adapter);
 static void do_wait_on_send IPT1(long, adapter);
@@ -347,13 +384,14 @@ const softpc_device_serial_controller_state *state;
  */
 
 #if !defined(PROD) || defined(SHORT_TRACE)
-static char buf[80];    /* Buffer for diagnostic prints */
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif /* !PROD || SHORT_TRACE */
+#line 299
 
 #ifdef PS_FLUSHING
-LOCAL IBOOL psFlushEnabled[NUM_SERIAL_PORTS];	/* TRUE if PostScript flushing
-						is enabled */
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 304
 
 /* Control TX pacing */
 IBOOL tx_pacing_enabled = FALSE;
@@ -366,6 +404,10 @@ static void do_wait_on_send IPT1(long, adapter);
  * Static forward declarations
  * =====================================================================
  */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // NEC_98
+#line 348
 static void raise_rls_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void raise_rda_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void raise_ms_interrupt IPT1(struct ADAPTER_STATE *,asp);
@@ -375,7 +417,11 @@ static void raise_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void clear_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void com_flush_input IPT1(int, adapter);
 static void com_send_not_finished IPT1(int, adapter);
+#ifndef NTVDM
+#line 382
 static void do_wait_on_send IPT1(long, adapter);
+#endif
+#line 383
 void   com_inb IPT2(io_addr, port, half_word *, value);
 void   com_outb IPT2(io_addr, port, half_word, value);
 void   com_recv_char IPT1(int, adapter);
@@ -400,6 +446,11 @@ GLOBAL VOID com_init IPT1(int, adapter);
 void   com_post IPT1(int, adapter);
 void   com_close IPT1(int, adapter);
 LOCAL void next_batch IPT1(long, l_adapter);
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#endif // NEC_98
+#line 407
 
 /*
  * =====================================================================
@@ -407,6 +458,10 @@ LOCAL void next_batch IPT1(long, l_adapter);
  * =====================================================================
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 455
 
 static void raise_rls_interrupt IFN1(struct ADAPTER_STATE *, asp)
 {
@@ -503,6 +558,10 @@ static void generate_iir IFN1(struct ADAPTER_STATE *, asp)
 		asp->int_id_reg.bits.interrupt_ID = RDA_INT;
 		asp->int_id_reg.bits.no_int_pending = 0;
 	}
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 510
 	else if ( asp->tx_holding_register_empty_interrupt_state == ON )
 	{
 		asp->int_id_reg.bits.interrupt_ID = THRE_INT;
@@ -520,7 +579,13 @@ static void generate_iir IFN1(struct ADAPTER_STATE *, asp)
 		asp->int_id_reg.bits.interrupt_ID = 0;
 	}
 }
+#endif // NEC_98
+#line 527
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 528
 static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)
 {
 	/*
@@ -531,14 +596,18 @@ static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)
 	&&   ( asp->data_available_interrupt_state            == OFF )
 	&&   ( asp->tx_holding_register_empty_interrupt_state == OFF )
 	&&   ( asp->modem_status_interrupt_state              == OFF )
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
+#endif
+#line 538
        )
 	{
 #ifndef DELAYED_INTS
 		ica_hw_interrupt(0, asp->hw_interrupt_priority, 1);
 #else
-		ica_hw_interrupt_delay(0, asp->hw_interrupt_priority, 1,
-			HOST_COM_INT_DELAY);
+#error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #endif
+#line 546
 	}
 }
 
@@ -552,11 +621,22 @@ static void clear_interrupt IFN1(struct ADAPTER_STATE *, asp)
 	&&   ( asp->data_available_interrupt_state            == OFF )
 	&&   ( asp->tx_holding_register_empty_interrupt_state == OFF )
 	&&   ( asp->modem_status_interrupt_state              == OFF )
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
+#endif
+#line 559
        )
 	{
 		ica_clear_int(0, asp->hw_interrupt_priority);
 	}
 }
+#endif // NEC_98
+#line 564
+
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
+#endif
+#line 677
 
 
 
@@ -593,6 +673,10 @@ static void com_flush_input IFN1(int, adapter)
 	set_xmit_char_status(asp);
 }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 721
 static void com_send_not_finished IFN1(int, adapter)
 {
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];
@@ -600,8 +684,14 @@ static void com_send_not_finished IFN1(int, adapter)
 	asp->line_status_reg.bits.tx_holding_empty=0;
 	asp->line_status_reg.bits.tx_shift_empty=0;
 }
+#endif // NEC_98
+#line 607
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 743
 static void do_wait_on_send IFN1(long, adapter)
 {
 	extern	void	host_com_send_delay_done IPT2(long, p1, int, p2);
@@ -613,6 +703,13 @@ static void do_wait_on_send IFN1(long, adapter)
 }
 
 
+#endif // NEC_98
+#line 755
+
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 620
 void com_inb IFN2(io_addr, port, half_word *, value)
 {
 	int adapter = adapter_for_port(port);
@@ -620,6 +717,10 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	long input_ready = 0;
 	boolean adapter_was_critical;
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 627
 
 	switch(port & 0x7)
 	{
@@ -630,11 +731,17 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 			/*
 			 * Read of rx buffer
 			 */
+#ifndef NTVDM
+#line 637
 			if (!(asp->had_first_read))
 			{
 				com_flush_input(adapter);
 				asp->had_first_read=TRUE;
 			}
+#else /* NTVDM is defined */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* !NTVDM */
+#line 642
 			*value = asp->rx_buffer;
 		
 			adapter_was_critical =
@@ -663,29 +770,19 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 				if (adapter_was_critical)
 				{
 
+#ifndef NTVDM
+#line 670
 #ifdef IRET_HOOKS
-					if (!asp->batch_running) {
-						asp->batch_running = TRUE;
-						asp->current_count = 1;
-						asp->qev_running = TRUE;
-						if (!qev_running) {
-							qev_running = TRUE;
-#ifdef GISP_CPU
-							hg_add_comms_cb(next_batch, MIN_COMMS_RX_QEV);
-#else
-							add_q_event_t(next_batch, MIN_COMMS_RX_QEV, adapter);
-#endif
-						}
-					} else { /* batch running */
-						asp->current_count++;
-					}
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #else /* IRET_HOOKS */
+#line 687
 					host_com_ioctl(adapter, HOST_COM_INPUT_READY,
 						(intptr_t)&input_ready);
 					if (input_ready)
 #ifdef DELAYED_INTS
-						recv_char((long)adapter);
+#error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #else
+#line 693
 						add_q_event_t(recv_char,
 							RX_delay[asp->com_baud_ind],
 							adapter);
@@ -693,6 +790,8 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 					else
 						com_critical_reset(adapter);
 #endif /* IRET_HOOKS */
+#endif /* !NTVDM */
+#line 700
 				}
 
 
@@ -702,37 +801,20 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 				set_xmit_char_status(asp);
 			}
 #ifdef IRET_HOOKS
-			{
-			LOCAL IBOOL	com_hook_again IPT1(IUM32, adapter);
-			GLOBAL IBOOL is_hooked IPT1(IUM8, line_number);
-				if(!is_hooked(asp->hw_interrupt_priority))
-					com_hook_again(adapter);
-			}
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
+#line 716
 		}
 		else
 			*value = (IU8)(asp->divisor_latch.byte.LSByte);
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf, "%cRX  -> %x (%c)\n",
-				id_for_adapter(adapter), *value,
-				isprint(toascii(*value))?toascii(*value):'?');
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 728
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"RX %x (%c)\n",*value,
-				isprint(toascii(*value))?toascii(*value):'?');
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 740
 		break;
 																		
 	case RS232_IER:
@@ -741,24 +823,13 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		else
 			*value = (IU8)(asp->divisor_latch.byte.MSByte);
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cIER -> %x\n", id_for_adapter(adapter),
-				*value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 755
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"IER read %x \n",*value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 766
 		break;
 
 	case RS232_IIR:
@@ -772,24 +843,13 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		}
 
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cIIR -> %x\n", id_for_adapter(adapter),
-				*value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 786
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"IIR read %x \n",*value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 797
 		break;
 	
 	case RS232_LCR:
@@ -797,47 +857,25 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 
 		*value = asp->line_control_reg.all;
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cLCR -> %x\n", id_for_adapter(adapter),
-				*value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 811
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"LCR read %x \n",*value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 822
 		break;
 	
 	case RS232_MCR:
 		*value = asp->modem_control_reg.all;
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cMCR -> %x\n", id_for_adapter(adapter),
-				*value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 834
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"MCR read %x \n",*value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 845
 		break;
 	
 	case RS232_LSR:
@@ -849,51 +887,25 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		asp->line_status_reg.bits.break_interrupt = 0;
 		asp->receiver_line_status_interrupt_state = OFF;
 		clear_interrupt(asp);
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 856
 	
 #ifdef SHORT_TRACE
-		if ((!asp->line_status_reg.bits.tx_holding_empty) ||
-			(!asp->line_status_reg.bits.tx_shift_empty))
-		{
-			IDLE_comlpt();
-		}
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cLSR -> %x\n", id_for_adapter(adapter),
-				*value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 870
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if ((*value & 0x9f) != 0x0)
-			{
-				if (com_dbg_pollcount)
-				{
-					fprintf(com_trace_fd,"\n");
-					com_dbg_pollcount = 0;
-				}
-				fprintf(com_trace_fd,"LSR read %x \n",*value);
-			}
-			else
-			{
-				com_dbg_pollcount++;
-				if (*value == 0)
-					fprintf(com_trace_fd,"0");
-				else
-					fprintf(com_trace_fd,".");
-				if (com_dbg_pollcount > 19)
-				{
-					fprintf(com_trace_fd,"\n");
-					com_dbg_pollcount = 0;
-				}
-			}
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 897
 		break;
 	
 	case RS232_MSR:
 
+#ifndef NTVDM
+#line 901
 		if (asp->loopback_state == OFF)
 		{
                 com_modem_change(adapter);
@@ -914,27 +926,20 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 
 		host_com_msr_callback (adapter, asp->modem_status_reg.all);
 		clear_interrupt(asp);
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* ifndef NTVDM */
+#line 921
 
 
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cMSR -> %x\n", id_for_adapter(adapter),
-				*value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 931
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"MSR read %x \n",*value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 942
 		break;
 
 /*
@@ -947,18 +952,9 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	}
 
 #ifndef PROD
-	if (io_verbose & RS232_VERBOSE)
-	{
-		if (((port & 0xf) == 0xd) && (*value == 0x60))
-			fprintf(trace_file,".");
-		else
-		{
-			sprintf(buf, "com_inb() - port %x, returning val %x", port,
-				*value);
-			trace(buf, DUMP_REG);
-		}
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 966
 
 }
 
@@ -972,13 +968,9 @@ void com_outb IFN2(io_addr, port, half_word, value)
 
 
 #ifndef PROD
-	if (io_verbose & RS232_VERBOSE)
-	{
-		sprintf(buf, "com_outb() - port %x, set to value %x",
-			port, value);
-		trace(buf, DUMP_REG);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 986
 	
 	switch(port & 0x7)
 	{
@@ -997,16 +989,9 @@ void com_outb IFN2(io_addr, port, half_word, value)
 			if ( asp->loopback_state == OFF )
 			{
 #ifdef PS_FLUSHING
-				/*
-				 * If PostScript flushing is enabled for this
-				 * port then we flush on a Ctrl-D
-				 */
-				if ( psFlushEnabled[adapter] &&
-				     asp->tx_buffer == 0x04 /* ^D */ )
-					host_com_ioctl(adapter,HOST_COM_FLUSH,
-					              0);
-				else {
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 1014
 				host_com_write(adapter, asp->tx_buffer);
 #if defined (DELAYED_INTS) || defined (NTVDM)
 				set_xmit_char_status(asp);
@@ -1019,8 +1004,9 @@ void com_outb IFN2(io_addr, port, half_word, value)
 
 #endif /* DELAYED_INTS || NTVDM */
 #ifdef PS_FLUSHING
-				}
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 1028
 			}
 			else
 			{	/* Loopback case requires masking off */
@@ -1036,31 +1022,22 @@ void com_outb IFN2(io_addr, port, half_word, value)
 			set_baud_rate(adapter);
 		}
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cTX  <- %x (%c)\n",
-				id_for_adapter(adapter), value,
-				isprint(toascii(value))?toascii(value):'?');
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1051
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"TX %x (%c)\n",value,
-				isprint(toascii(value))?toascii(value):'?');
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1063
 		break;
 																		
 	case RS232_IER:
 		if (asp->line_control_reg.bits.DLAB == 0)
 		{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1068
 			asp->int_enable_reg.all = value & 0xf;
 			/*
 			 * Kill off any pending interrupts for those items
@@ -1088,6 +1065,10 @@ void com_outb IFN2(io_addr, port, half_word, value)
 			/* lower int line if no outstanding interrupts */
 			clear_interrupt(asp);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1095
 		}
 		else
 		{
@@ -1095,24 +1076,13 @@ void com_outb IFN2(io_addr, port, half_word, value)
 			set_baud_rate(adapter);
 		}
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cIER <- %x\n", id_for_adapter(adapter),
-				value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1109
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"IER write %x \n",value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1120
 		break;
 		
 	case RS232_IIR:
@@ -1120,27 +1090,20 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		 * Essentially a READ ONLY register
 		 */
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cIIR <- READ ONLY\n",
-				id_for_adapter(adapter));
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1134
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"IIR write %x \n",value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1145
 		break;
 
 	case RS232_LCR:
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1148
 
 		if ((value & LCRFlushMask.all)
 		!= (asp->line_control_reg.all & LCRFlushMask.all))
@@ -1149,35 +1112,20 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		set_line_control(adapter, value);
 		set_break(adapter);
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cLCR <- %x\n", id_for_adapter(adapter),
-				value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1163
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"LCR write %x \n",value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1174
 		break;
 		
 	case RS232_MCR:
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cMCR <- %x\n", id_for_adapter(adapter),
-				value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1185
 		/*
 		 * Optimisation - DOS keeps re-writing this register
 		 */
@@ -1194,16 +1142,9 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		set_out1(adapter);
 		set_out2(adapter);
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"MCR write %x \n",value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1211
 		break;
 		
 	case RS232_LSR:
@@ -1211,24 +1152,13 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		asp->line_status_reg.all = value;
 		asp->line_status_reg.bits.tx_shift_empty = (unsigned char)i;
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cLSR <- %x\n", id_for_adapter(adapter),
-				value);
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1225
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"LSR write %x \n",value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1236
 		break;
 		
 	case RS232_MSR:
@@ -1236,24 +1166,13 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		 * Essentially a READ ONLY register.
 		 */
 #ifdef SHORT_TRACE
-		if ( io_verbose & RS232_VERBOSE )
-		{
-			sprintf(buf,"%cMSR <- READ ONLY\n",
-				id_for_adapter(adapter));
-			super_trace(buf);
-		}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 1250
 #ifndef PROD
-		if (com_trace_fd)
-		{
-			if (com_dbg_pollcount)
-			{
-				fprintf(com_trace_fd,"\n");
-				com_dbg_pollcount = 0;
-			}
-			fprintf(com_trace_fd,"MSR write %x \n",value);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 1261
 		/* DrDOS writes to this reg after setting int on MSR change
 		 * and expects to get an interrupt back!!! So we will oblige.
 		 * Writing to this reg only seems to affect the delta bits
@@ -1283,124 +1202,14 @@ void com_outb IFN2(io_addr, port, half_word, value)
 
 
 }
+#endif // NEC_98
+#line 1290
 
 
 #ifdef IRET_HOOKS
-/*(
- *========================== com_hook_again() ==================================
- * com_hook_again
- *
- * Purpose
- *	This is the function that we tell the ica to call when a comms
- *	interrupt service routine IRETs.
- *
- * Input
- *	adapter_id	The adapter id for the line. (Note the caller doesn't
- *			know what this is, he's just returning something
- *			we gave him earlier).
- *
- * Outputs
- *	return	TRUE if there are more interrupts to service, FALSE otherwise.
- *
- * Description
- *	First we call host_com_ioctl to find out if there are characters
- *	waiting.  If not, or we have reached the end of the current batch,
- *	we mark the end of batch and return FALSE.
- *	Otherwise we call recv_char() to kick-off the next character
- *	and return TRUE.
-)*/
-
-LOCAL IBOOL		/* local because we pass a pointer to it */
-com_hook_again IFN1(IUM32, adapter)
-{
-	int input_ready;	/* the host wants a pointer to an 'int'! */
-	struct ADAPTER_STATE *asp = &adapter_state[adapter];
-
-	host_com_ioctl(adapter, HOST_COM_INPUT_READY, (long)&input_ready);
-
-#ifndef PROD
-	if ((input_ready) && (asp->current_count >= asp->batch_size)) {
-		sure_note_trace1(RS232_VERBOSE, "In hook again, adapter %d", adapter);
-	}
-#endif
-
-	if((!input_ready)  || (asp->current_count >= asp->batch_size)) {
-		asp->batch_running = FALSE;
-		return(FALSE);
-	} else {
-		recv_char((long)adapter);
-		return(TRUE);	/* more to do */
-	}
-}
-
-/*(
- *========================== next_batch() ==================================
- * next_batch
- *
- * Purpose
- *	This function is called by the quick event system to kick-off the
- *	next batch of characters.
- *
- * Input
- *	dummy		Sometimes the adapter id, sometimes not.  Don't
- *			use it!
- *
- * Outputs
- *	None.
- *
- * Description
- *	If a batch is already running, now would not be a good time
- *	to start another, so we simply press the snooze button.
- *	Otherwise we check whether there is any data to process,
- *	and if so kick-off the next batch.
-)*/
-
-LOCAL void
-next_batch IFN1 (long, dummy)
-{
-	int input_ready;	/* the host wants a pointer to an 'int'! */
-	IUM8	adapter;	/* check all adapters */
-	struct ADAPTER_STATE *asp;
-	IBOOL	new_qe_reqd;	/* Do we need to restart the quick event */
-
-	UNUSED(dummy);
-
-	new_qe_reqd = FALSE;	/* Dont need another by default */
-
-	for (adapter = 0; adapter < NUM_SERIAL_PORTS; adapter++) {
-		asp = &adapter_state[adapter];
-
-
-		if (asp->batch_running) {
-			new_qe_reqd = TRUE;	/* not finished yet */
-		} else if (asp->qev_running) {
-			/*
-			 * We need to set qev running to false, as it has now
-			 * finished. If there is data to process, we call
-			 * recv_char() which will start-off a new batch (and
-			 * set the batch_running flag).
-			 */
-	
-			asp->qev_running = FALSE;
-			host_com_ioctl((int)adapter,HOST_COM_INPUT_READY, (long)&input_ready);
-			if(input_ready) {
-				recv_char((int)adapter);
-			}
-		}
-	}
-	if (new_qe_reqd) {
-#ifdef GISP_CPU
-		hg_add_comms_cb(next_batch, MIN_COMMS_RX_QEV);
-#else
-		add_q_event_t(next_batch, MIN_COMMS_RX_QEV, 0);
-#endif
-		sure_note_trace0(RS232_VERBOSE, "Reset batch quick event");
-	} else {
-		qev_running = FALSE;
-	}
-}
-
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* of ifdef IRET_HOOKS */
+#line 1408
 
 /*
  * =====================================================================
@@ -1409,6 +1218,14 @@ next_batch IFN1 (long, dummy)
  */
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1417
+#ifdef  NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else /* NTVDM */
+#line 1416
 
 void com_recv_char IFN1(int, adapter)
 {
@@ -1424,6 +1241,8 @@ void com_recv_char IFN1(int, adapter)
 		recv_char((long)adapter);
 	}
 }
+#endif /* NTVDM */
+#line 1431
 
 /*
  * BCN 2151 - recv_char must use long param to match add_event function prototype
@@ -1466,28 +1285,17 @@ recv_char IFN1(long, adapt_long)
 	set_recv_char_status(asp);
 	
 #ifdef DOCUMENTATION
-	/*
-	 * I think this is wrong for polled comms applications WTGC BCN 354
-	 */
-	
-	/*
-	 * If the data available interrupt is not to be delivered to the CPU,
-	 * then the adapter must come out of the critical region at once
-	 */
-	if (asp->data_available_interrupt_state != ON)
-	{
-		long	input_ready = 0;
-		
-		/* check for further input */
-		host_com_ioctl(adapter, HOST_COM_INPUT_READY,
-			(long)&input_ready);
-		if (input_ready)
-			recv_char((long)adapter);
-		else
-			com_critical_reset(adapter);
-	}
+#error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif
+#line 1494
 }
+#endif // NEC_98
+#line 1495
+
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 2312
 
 
 /*
@@ -1498,6 +1306,10 @@ void com_modem_change IFN1(int, adapter)
 	modem_change(adapter);
 }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1505
 static void modem_change IFN1(int, adapter)
 {
 	/*
@@ -1624,7 +1436,13 @@ static void modem_change IFN1(int, adapter)
 		}
 	}
 }
+#endif // NEC_98
+#line 1631
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1632
 static void set_recv_char_status IFN1(struct ADAPTER_STATE *, asp)
 {
 	/*
@@ -1642,17 +1460,29 @@ static void set_recv_char_status IFN1(struct ADAPTER_STATE *, asp)
 		raise_rda_interrupt(asp);
 	}
 }
+#endif // NEC_98
+#line 2503
 
 static void set_xmit_char_status IFN1(struct ADAPTER_STATE *, asp)
 {
 	/*
 	 * Set line status register and raise interrupt
 	 */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1655
 	asp->line_status_reg.bits.tx_holding_empty = 1;
 	asp->line_status_reg.bits.tx_shift_empty = 1;
 	raise_thre_interrupt(asp);
+#endif // NEC_98
+#line 1658
 }
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2542
 
 /*
  * =====================================================================
@@ -1668,8 +1498,14 @@ static void set_break IFN1(int, adapter)
 	 */
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];
 	
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 2561
 	switch ( change_state((int)asp->line_control_reg.bits.set_break,
 		asp->break_state) )
+#endif // NEC_98
+#line 1677
 	{
 	case ON:
 		asp->break_state = ON;
@@ -1691,13 +1527,23 @@ static void set_break IFN1(int, adapter)
  * (except rates above 9600 which are not OFFICIALLY supported on the XT and
  * AT, but are theoretically possible) */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 2633
 static word valid_latches[] =
 {
 	1, 	2, 	3, 	6, 	12, 	16, 	24, 	32,
 	48, 	58, 	64, 	96, 	192,	384, 	768, 	857,
 	1047, 	1536, 	2304
 };
+#endif // NEC_98
+#line 1704
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1705
 #if !defined(PROD) || defined(IRET_HOOKS)
 static IUM32 bauds[] =
 {
@@ -1722,6 +1568,8 @@ static IUM32 bauds[] =
 	50  /* 50 baud */
 };
 #endif /* !PROD or IRET_HOOKS*/
+#endif // NEC_98
+#line 2690
 
 static word speeds[] =
 {
@@ -1746,11 +1594,26 @@ static word speeds[] =
 	HOST_COM_B50
 };
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 2718
 static int no_valid_latches =
 	(int)(sizeof(valid_latches)/sizeof(valid_latches[0]));
+#endif // NEC_98
+#line 2721
+
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2761
 
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1758
 static void set_baud_rate IFN1(int, adapter)
 {
 	/*
@@ -1777,6 +1640,8 @@ static void set_baud_rate IFN1(int, adapter)
 	com_flush_input(adapter);
 
 
+#ifndef NTVDM
+#line 1784
 	/*
 	 * Check for valid divisor latch
 	 */
@@ -1792,20 +1657,26 @@ static void set_baud_rate IFN1(int, adapter)
 			" delay for baud %d RX:%d TX:%d", bauds[i],
 			RX_delay[i], TX_delay[i]);
 #ifdef IRET_HOOKS
-#ifdef VARIABLE_TICK_COMMS
-		asp->batch_size = ((bauds[i] / BITS_PER_ASYNC_CHAR) /
-							(COMMS_QEV_PER_SEC/2)) + 1;
-		sure_note_trace2(RS232_VERBOSE,
-					"baud %d asp->batch_size =%d",bauds[i],asp->batch_size);
-#else /* VARIABLE_TICK_COMMS */
-		asp->batch_size = ((bauds[i] / BITS_PER_ASYNC_CHAR) /
-							COMMS_QEV_PER_SEC) + 1;
-#endif /* VARIABLE_TICK_COMMS */
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
+#line 1809
 	}
+#else /* NTVDM */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1810
 }
+#endif // NEC_98
+#line 1811
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 2965
+
+#ifndef NEC_98
+#line 2967
 static void set_line_control IFN2(int, adapter, int, value)
 {
 	/*
@@ -1835,47 +1706,93 @@ static void set_line_control IFN2(int, adapter, int, value)
 			newLCR.bits.no_of_stop_bits + 1);
 
 	/* What are new settings to check for a difference */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2999
 	if (newLCR.bits.parity_enabled == PARITY_OFF)
+#endif
+#line 3001
 	{
 		newParity = HOST_COM_PARITY_NONE;
 	}
 	else if (newLCR.bits.stick_parity == PARITY_STICK)
 	{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3009
 		newParity = newLCR.bits.even_parity == PARITY_ODD ?
+#endif
+#line 3011
 			HOST_COM_PARITY_MARK : HOST_COM_PARITY_SPACE;
 	}
 	else /* regular parity */
 	{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3018
 		newParity = newLCR.bits.even_parity == PARITY_ODD ?
+#endif
+#line 3020
 			HOST_COM_PARITY_ODD : HOST_COM_PARITY_EVEN;
 	}
 
 	/*
 	 * Try to make sense of the current parity setting
 	 */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3029
 	if (asp->line_control_reg.bits.parity_enabled == PARITY_OFF)
+#endif
+#line 3031
 	{
 		parity = HOST_COM_PARITY_NONE;
 	}
 	else if (asp->line_control_reg.bits.stick_parity == PARITY_STICK)
 	{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3039
 		parity = asp->line_control_reg.bits.even_parity == PARITY_ODD ?
+#endif
+#line 3041
 			HOST_COM_PARITY_MARK : HOST_COM_PARITY_SPACE;
 	}
 	else /* regular parity */
 	{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 3048
 		parity = asp->line_control_reg.bits.even_parity == PARITY_ODD ?
+#endif
+#line 3050
 			HOST_COM_PARITY_ODD : HOST_COM_PARITY_EVEN;
 	}
 
 	if (newParity != parity)
 		host_com_ioctl(adapter, HOST_COM_PARITY, newParity);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1878
 
 	/* finally update the current line control settings */
 	asp->line_control_reg.all = (unsigned char)value;
 }
+#endif // NEC_98
+#line 1882
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1883
 static void set_dtr IFN1(int, adapter)
 {
 	/*
@@ -1935,7 +1852,13 @@ static void set_dtr IFN1(int, adapter)
 		break;
 	}
 }
+#endif // NEC_98
+#line 1942
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 1943
 static void set_rts IFN1(int, adapter)
 {
 	/*
@@ -1989,7 +1912,11 @@ static void set_rts IFN1(int, adapter)
 		break;
 	}
 }
+#endif // NEC_98
+#line 1996
 
+#ifndef NEC_98
+#line 3244
 static void set_out1 IFN1(int, adapter)
 {
 	/*
@@ -2148,54 +2075,55 @@ static void set_loopback IFN1(int, adapter)
 		break;
 	}
 }
+#endif // NEC_98
+#line 2155
 
 #ifdef SHORT_TRACE
-
-static char last_buffer[80];
-static int repeat_count = 0;
-
-static void super_trace IFN1(char *, string)
-{
-	if ( strcmp(string, last_buffer) == 0 )
-		repeat_count++;
-	else
-	{
-		if ( repeat_count != 0 )
-		{
-			fprintf(trace_file,"repeated %d\n",repeat_count);
-			repeat_count = 0;
-		}
-		fprintf(trace_file, "%s", string);
-		strcpy(last_buffer, string);
-	}
-}
+#error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
+#line 3425
 
 
 void com1_flush_printer IFN0()
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 3432
 
 	host_com_ioctl(COM1, HOST_COM_FLUSH, 0);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2184
 }
 
 void com2_flush_printer IFN0()
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 3445
 
        host_com_ioctl(COM2, HOST_COM_FLUSH, 0);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2191
 }
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 2202
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 2203
 static void com_reset IFN1(int, adapter)
 {
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];
@@ -2261,6 +2189,10 @@ static void com_reset IFN1(int, adapter)
 	asp->rts_state = ON;
 	asp->out1_state = ON;
 	asp->out2_state = ON;
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif
+#line 2268
 		
 	/*
 	 * Reset adapter synchronisation
@@ -2282,30 +2214,26 @@ static void com_reset IFN1(int, adapter)
 	set_out2(adapter);
 
 #ifdef IRET_HOOKS
-	/*
-	 * Remove any existing hook call-back, and re-instate it afresh.
-	 */
-
-	Ica_enable_hooking(asp->hw_interrupt_priority, NULL, adapter);
-	Ica_enable_hooking(asp->hw_interrupt_priority, com_hook_again, adapter);
-
-	/*
-	 * Clear the IRET status flags.
-	 */
-
-	asp->batch_running = FALSE;
-	asp->qev_running = FALSE;
-	asp->batch_size = 10;	/* sounds like a safe default ! */
+#error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
+#line 2304
 }
+#endif // NEC_98
+#line 3642
 
 #ifndef COM3_ADAPTOR
-#define COM3_ADAPTOR 0
+#error "Unsupported SoftPC mirror configuration: !COM3_ADAPTOR"
 #endif
+#line 3646
 #ifndef COM4_ADAPTOR
-#define COM4_ADAPTOR 0
+#error "Unsupported SoftPC mirror configuration: !COM4_ADAPTOR"
 #endif
+#line 2312
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 3657
 static IU8 com_adaptor[4] = {COM1_ADAPTOR,COM2_ADAPTOR,
                              COM3_ADAPTOR,COM4_ADAPTOR};
 static io_addr port_start[4] = {RS232_COM1_PORT_START,
@@ -2324,18 +2252,34 @@ static int timeout[4] = {RS232_COM1_TIMEOUT,
                          RS232_COM2_TIMEOUT,
                          RS232_COM3_TIMEOUT,
                          RS232_COM4_TIMEOUT};
+#endif // NEC_98
+#line 2331
 
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else // NEC_98
+#line 2333
 GLOBAL VOID com_init IFN1(int, adapter)
 {
 	io_addr i;
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2337
 
 	adapter_state[adapter].had_first_read = FALSE;
 	
 	/* Set up the IO chip select logic for this adaptor */
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2341
 	io_define_inb(com_adaptor[adapter], com_inb);
 	io_define_outb(com_adaptor[adapter], com_outb);
+#endif /* NTVDM */
+#line 2343
 
 	for(i = port_start[adapter]; i <= port_end[adapter]; i++)
 		io_connect_port(i, com_adaptor[adapter], IO_READ_WRITE);
@@ -2354,6 +2298,8 @@ GLOBAL VOID com_init IFN1(int, adapter)
 
 	return;
 }
+#endif // NEC_98
+#line 3826
 
 void com_post IFN1(int, adapter)
 {
@@ -2364,54 +2310,33 @@ void com_post IFN1(int, adapter)
 
 void com_close IFN1(int, adapter)
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2371
 
 #ifndef PROD
-	if (com_trace_fd)
-		fclose (com_trace_fd);
-	com_trace_fd = NULL;
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 3845
 	/* reset host specific communications channel */
 	config_activate((UTINY)(C_COM1_NAME + adapter), FALSE);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 2380
 }
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 2382
 
 #ifdef PS_FLUSHING
-/*(
-=========================== com_psflush_change ================================
-PURPOSE:
-	Handle change of PostScript flush configuration option for a serial
-	port.
-INPUT:
-	hostID - Configuration item I.D.
-	apply - TRUE if change to be applied
-OUTPUT:
-	None
-ALGORITHM:
-	If PostScript flushing is being enabled then;
-		set the PostScript flush enable flag for the port;
-		disable autoflush for the port;
-	else;
-		reset the PostScript flush enable flag for the port;
-		enable autoflush for the port;
-===============================================================================
-)*/
-
-GLOBAL void com_psflush_change IFN2(
-    IU8, hostID,
-    IBOOL, apply
-) {
-    IS32 adapter = hostID - C_COM1_PSFLUSH;
-
-    assert1(adapter < NUM_SERIAL_PORTS,"Bad hostID %d",hostID);
-
-    if ( apply )
-        if ( psFlushEnabled[adapter] = (IBOOL)config_inquire(hostID,NULL) )
-            host_com_disable_autoflush(adapter);
-        else
-            host_com_enable_autoflush(adapter);
-}
+#error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
+#line 2419
 
 
 
@@ -2421,458 +2346,7 @@ GLOBAL void com_psflush_change IFN2(
  * - comdebug - from the yoda command line....
  */
 #ifndef PROD
-#define   YODA_LOOP       2
-#define   RX_BYTE         1
-#define   TX_BYTE         2
-int       srxcount = 0, stxcount = 0;
-int       com_save_rx = 0, com_save_tx = 0;
-unsigned  char *rxtx_buff = NULL;
-
-int       com_debug_help ();
-void      psaved();
-
-static char *port_debugs[] =
-{
-	"txrx","ier","iir", "lcr", "mcr","lsr", "msr"
-};
-
-static int do_inbs = 0; /* start with inb reporting OFF */
-
-static unsigned char *locate_register ()
-{
-	int i;
-	char ref[10];
-	struct ADAPTER_STATE *asp = &adapter_state[COM1];
-
-	printf ("COM.. reg? ");
-	scanf ("%s", ref);
-	for (i=0; i<7; i++)
-	{
-		if (!strcmp (ref, port_debugs[i]))
-		{
-			switch (i)
-			{	
-				case 0:
-					return (&asp->tx_buffer);
-				case 1:
-					return (&(asp->int_enable_reg.all));
-				case 2:
-					return (&(asp->int_id_reg.all));
-				case 3:
-					return (&(asp->line_control_reg.all));
-				case 4:
-					return (&(asp->modem_control_reg.all));
-				case 5:
-					return (&(asp->line_status_reg.all));
-				case 6:
-					return (&(asp->modem_status_reg.all));
-				default:
-					return (NULL);
-			}
-		}
-	}
-	return (NULL);
-}
-
-int com_debug_stat ()
-{
-	printf ("DEBUG STATUS...\n");
-	printf ("INB mismatch reporting .... %s\n", do_inbs ? "ON" : "OFF");
-	printf ("INB/OUTB tracing .......... %s\n", com_trace_fd ? "ON" : "OFF");
-	return (0);
-}
-
-int com_reg_dump ()
-{
-	/* dump com1 emulations registers */
-	struct ADAPTER_STATE *asp = &adapter_state[COM1];
-
-	printf ("TX %2x RX %2x IER %2x IIR %2x LCR %2x MCR %2x LSR %2x MSR %2x \n",
-		(asp->tx_buffer), (asp->rx_buffer), (asp->int_enable_reg.all),
-		(asp->int_id_reg.all), (asp->line_control_reg.all),
-		(asp->modem_control_reg.all), (asp->line_status_reg.all),
-		(asp->modem_status_reg.all));
-	printf (" break_state		%d\n loopback_state		%d\n",
-	        asp->break_state, asp->loopback_state);
-	printf(" dtr_state		%d\n rts_state		%d\n",
-	        asp->dtr_state, asp->rts_state);
-	printf(" out1_state		%d\n out2_state		%d\n",
-	        asp->out1_state, asp->out2_state);
-	printf(" receiver_line_status_interrupt_state		%d\n",
-	        asp->receiver_line_status_interrupt_state);
-	printf(" data_available_interrupt_state		%d\n",
-	       asp->data_available_interrupt_state);
-	printf(" tx_holding_register_empty_interrupt_state		%d\n",
-	        asp->tx_holding_register_empty_interrupt_state);
-	printf(" modem_status_interrupt_state		%d\n",
-	        asp->modem_status_interrupt_state);
-	printf(" hw_interrupt_priority		%d\n",
-	        asp->hw_interrupt_priority);
-	printf(" com_baud_delay		%d\n had_first_read		%d\n",
-	        TX_delay[asp->com_baud_ind], asp->had_first_read);
-	return (0);
-}
-
-int com_s_reg ()
-{
-	unsigned char *creg;
-	int val1;
-
-	if (creg = locate_register())
-	{
-		printf ("SET to > ");
-		scanf ("%x", &val1);
-
-		*creg = (unsigned char)val1;
-	}
-	else
-		printf ("Unknown reg\n");
-	return (0);
-}
-
-int com_p_reg ()
-{
-	unsigned char *creg;
-
-	if (creg = locate_register())
-		printf ("%x\n", *creg);
-	else
-		printf ("Unknown reg\n");
-	return (0);
-}
-
-io_addr conv_com_reg (com_reg)
-char *com_reg;
-{
-	io_addr loop;
-
-	for (loop = 0; loop < 7; loop++)
-		if (!strcmp (port_debugs[loop], com_reg))
-			return (loop+(io_addr)RS232_COM1_PORT_START);
-	return (0);
-}
-
-int com_do_inb ()
-{
-	char com_reg[10];
-	half_word val;
-	io_addr port;
-
-	printf ("Port > ");
-	scanf ("%s", com_reg);
-	if (!(port = conv_com_reg (com_reg)))
-	{
-		printf ("funny port %s\n", com_reg);
-		return (0);
-	}
-	com_inb (port, &val);
-	printf ("%s = %x\n", val);
-	return (0);
-}
-
-int com_do_outb ()
-{
-	char com_reg[10];
-	half_word val;
-	io_addr port;
-
-	printf ("Port > ");
-	scanf ("%s", com_reg);
-	if (!(port = conv_com_reg (com_reg)))
-	{
-		printf ("funny port %s\n", com_reg);
-		return (0);
-	}
-	printf ("Value >> ");
-	scanf ("%x", &val);
-	com_outb (port, val);
-	return (0);
-}
-
-int com_run_file ()
-{
-	char filename[100], com_reg[10], dir;
-	int val, line;
-	half_word spare_val;
-	io_addr port;
-	FILE *fd = NULL;
-
-	printf ("FILE > ");
-	scanf ("%s", filename);
-	if (!(fd = fopen (filename, "r")))
-	{
-		printf ("Cannot open %s\n", filename);
-		return (0);
-	}
-	line = 1;
-
-	/* dump file is of format : %c-%x-%s
-	 * 1 char I or O denotes inb or outb
-	 * -
-	 * Hex value the value expected in case of inb or value to write in
-	 * case of outb.
-	 * -
-	 * string representing the register port to use..
-	 *
-	 * A typical entry would be
-	 *	O-txrx-60 - which translates to outb(START_OF_COM1+txrx, 0x60);
-	 *
-	 * Files for this feature can be generated using the comdebug 'open' command.
-	 */
-	while (fscanf (fd, "%c-%x-%s", &dir, &val, com_reg) != EOF)
-	{
-		if (!(port = conv_com_reg (com_reg)))
-		{
-			printf ("funny port %s at line %d\n", com_reg, line);
-			break;
-		}
-		switch (dir)
-		{
-			case 'I':
-				/* inb */
-				com_inb (port, &spare_val);
-				if (spare_val != val && do_inbs)
-				{
-					printf ("INB no match at line %d %c-%s-%x val= %x\n",
-						line, dir, com_reg, val, spare_val);
-				}
-				break;
-			case 'O':
-				/* outb */
-				/* convert com_register to COM1 address com_register */
-				com_outb (port, (IU8)val);
-				printf ("outb (%s, %x)\n", com_reg, val);
-				break;
-			default:
-				
-				break;
-		}
-		line ++;
-	}
-	fclose (fd);
-	return (0);
-}
-	
-int com_debug_quit ()
-{
-	printf ("Returning to YODA\n");
-	return (1);
-}
-
-int com_o_debug_file ()
-{
-	char filename[100];
-	printf ("FILE > ");
-	scanf ("%s", filename);
-	if (!(com_trace_fd = fopen (filename, "w")))
-	{
-		printf ("Cannot open %s\n", filename);
-		return (0);
-	}
-	printf ("Com debug file = '%s'\n", filename);
-	return (0);
-}
-
-int com_c_debug_file ()
-{
-	if (com_trace_fd)
-		fclose (com_trace_fd);
-	com_trace_fd = NULL;
-	return (0);
-}
-
-int com_forget_inb ()
-{
-	do_inbs = 1- do_inbs;
-	if (do_inbs)
-		printf ("INB mismatch reporting ON\n");
-	else
-		printf ("INB mismatch reporting OFF\n");
-	return (0);
-}
-
-int com_s_rx()
-{
-	srxcount = stxcount = 0;
-	com_save_rx = 1 - com_save_rx;
-	printf("Save and Dump Received Bytes ");
-	if (com_save_rx)
-		printf("ON\n");
-	else
-		printf("OFF\n");
-	return(0);
-}
-
-int com_s_tx()
-{
-	srxcount = stxcount = 0;
-	com_save_tx = 1 - com_save_tx;
-	printf("Save and Dump Transmitted Bytes ");
-	if (com_save_tx)
-		printf("ON\n");
-	else
-		printf("OFF\n");
-	return(0);
-}
-
-int com_p_rx()
-{
-	printf("There are %d received bytes, out of %d bytes saved.\n",
-	       srxcount, srxcount + stxcount);
-	psaved(RX_BYTE, stdout);
-	return(0);
-}
-
-int com_p_tx()
-{
-	printf("There are %d transmitted bytes, out of %d bytes saved.\n",
-	       stxcount, srxcount + stxcount);
-	psaved(TX_BYTE, stdout);
-	return(0);
-}
-
-int com_p_all()
-{
-	printf("There are %d bytes saved.\n", srxcount + stxcount);
-	psaved(RX_BYTE + TX_BYTE, stdout);
-	return(0);
-}
-
-int com_d_all()
-{
-	int cl_fin = 0;
-
-	if (!com_trace_fd)
-	{
-		com_o_debug_file();
-		cl_fin = 1;
-	}
-
-	fprintf(com_trace_fd, "There are %d bytes saved.\n", srxcount + stxcount);
-	psaved(RX_BYTE + TX_BYTE, com_trace_fd);
-
-	if (cl_fin)
-		com_c_debug_file();
-	return(0);
-}
-
-void psaved(typ, fd)
-
-int typ;
-FILE *fd;
-{
-	int c, nc = 0;
-
-	for (c = 0; c < srxcount + stxcount; c++)
-	{
-		if (rxtx_buff[c * 2] & typ)
-		{
-			if (typ == RX_BYTE + TX_BYTE)
-				if (rxtx_buff[c * 2] & RX_BYTE)
-			  		fprintf(fd, "R ");
-				  else
-				  	fprintf(fd, "T ");
-			fprintf(fd, "%2x  ",rxtx_buff[c * 2 + 1]);
-			nc++;
-			if ((nc % 16) == 0)
-				fprintf(fd, "\n");
-		}
-	}
-	fprintf(fd, "\nAll bytes dumped.\n");
-}
-
-void com_save_rxbytes IFN2(int, n, CHAR *, buf)
-{
-	int tc, bs;
-
-	if (com_save_rx)
-	{
-		bs = srxcount + stxcount;
-		for (tc = 0; tc < n; tc++)
-		{
-			rxtx_buff[(tc + bs) * 2] = RX_BYTE;
-			rxtx_buff[(tc + bs) * 2 + 1] = buf[tc];
-		}
-		srxcount += n;
-	}
-}
-
-void com_save_txbyte IFN1(CHAR, value)
-{
-	if (com_save_tx)
-	{
-		rxtx_buff[(srxcount + stxcount) * 2] = TX_BYTE;
-		rxtx_buff[(srxcount + stxcount) * 2 + 1] = value;
-		stxcount++;
-	}
-}
-
-static struct
-{
-	char *name;
-	int (*fn)();
-	char *comment;
-} comtab[]=
-{
-	{"q",      com_debug_quit,   "	QUIT comdebug return to YODA"},
-	{"h",      com_debug_help,   "	Print this message"},
-	{"stat",   com_debug_stat,   "	Print status of comdebug"},
-	{"s",      com_s_reg,        "	Set the specified register"},
-	{"p",      com_p_reg,        "	Print specified register"},
-	{"dump",   com_reg_dump,     "	Print all registers"},
-	{"open",   com_o_debug_file, "	Open a debug file"},
-	{"close",  com_c_debug_file, "	Close current debug file"},
-	{"runf",   com_run_file,     "	'Run' a trace file"},
-	{"toginb", com_forget_inb,   "	Toggle INB mismatch reporting"},
-	{"inb",    com_do_inb,       "	Perform INB on port"},
-	{"outb",   com_do_outb,      "	Perform OUTB on port"},
-	{"srx",    com_s_rx,         "	Save all received bytes"},
-	{"stx",    com_s_tx,         "	Save all transmitted bytes"},
-	{"prx",    com_p_rx,         "	Print all received bytes"},
-	{"ptx",    com_p_tx,         "	Print all transmitted bytes"},
-	{"pall",   com_p_all,        "	Print all received/transmitted bytes"},
-	{"dall",   com_d_all,        "	Dump all received/transmitted bytes"},
-	{"", NULL, ""}
-};
-
-int com_debug_help ()
-{
-	int i;
-	printf ("COMDEBUG COMMANDS\n");
-	for (i=0; comtab[i].name[0]; i++)
-		printf ("%s\t%s\n", comtab[i].name, comtab[i].comment);
-	printf ("recognised registers :\n");
-	for (i=0; i<7; i++)
-		printf ("%s\n", port_debugs[i]);
-	return (0);
-}
-
-int com_debug()
-{
-	char com[100];
-	int i;
-
-	if (rxtx_buff == NULL)
-		check_malloc(rxtx_buff, 50000, unsigned char);
-
-	printf ("COM1 debugging stuff...\n");
-	while (TRUE)
-	{
-		printf ("COM> ");
-		scanf ("%s", com);
-		for (i=0; comtab[i].name[0]; i++)
-		{	
-			if (!strcmp (comtab[i].name, com))
-			{
-				if ((*comtab[i].fn) ())
-					return(YODA_LOOP);
-				break;
-			}
-		}
-		if (comtab[i].name[0])
-			continue;
-		printf ("Unknown command %s\n", com);
-	}
-}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
+#line 2882
 /********************************************************/

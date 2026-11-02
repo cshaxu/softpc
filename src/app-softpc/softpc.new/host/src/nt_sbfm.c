@@ -52,6 +52,10 @@ FMStatusRead(
     IU8 *data
     )
 {
+#if 0 // This should work but doesn't (ReadFile fails)
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#endif
+#line 102
     *data = Status;
 }
 
@@ -76,8 +80,25 @@ FMDataWrite(
         if (AdlibRegister == AD_MASK && (data & 0x80))
             Status = 0x00;
         if ((data & 1) && !(Status & 0x40))
+#if 0
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#else
+#line 156
             Status |= 0xC0; // simulate immediate expiry of timer1
+#endif
+#line 158
         if ((data & 2) && !(Status & 0x20))
+#if 0
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#else
+#line 167
             Status |= 0xA0; // simulate immediate expiry of timer2
+#endif
+#line 169
     }
 }
+
+#line 199
+#if DBG
+#error "Unsupported SoftPC mirror configuration: native FM debugging"
+#endif //DBG

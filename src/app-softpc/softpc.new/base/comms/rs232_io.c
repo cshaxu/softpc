@@ -11,18 +11,16 @@
  *
  */
 
+/* @(#)rs232_io.c	1.7 08/03/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)rs232_io.c	1.7 08/03/93 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 17
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 26
 
 
 /*
@@ -47,8 +45,9 @@ static word divisors[] = { 1047,768, 384, 192, 96, 48, 24, 12, 6 };
 
 /* workaround for IP32 and Tek43xx compiler bug follows: */
 #if  defined(IP32) || defined(TK43) || defined(macintosh)
-static int port;
+#error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #else
+#line 52
 static io_addr port;
 #endif
 
@@ -57,15 +56,23 @@ static half_word value;
 
 static void return_status()
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 60
 	inb((io_addr)(port + RS232_LSR), (IU8 *)&value);
 	setAH(value);
 	inb((io_addr)(port + RS232_MSR), (IU8 *)&value);
 	setAL(value);
+#endif // !NEC_98
+#line 64
 }
 
 
 void rs232_io()
 {
+#ifndef NEC_98
+#line 69
 #ifdef BIT_ORDER2
    union {
       half_word all;
@@ -78,16 +85,9 @@ void rs232_io()
    } parameters;
 #endif
 #ifdef BIT_ORDER1
-   union {
-      half_word all;
-      struct {
-	 HALF_WORD_BIT_FIELD baud_rate:3;
-	 HALF_WORD_BIT_FIELD parity:2;
-	 HALF_WORD_BIT_FIELD stop_bit:1;
-	 HALF_WORD_BIT_FIELD word_length:2;
-      } bit;
-   } parameters;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 91
 
    DIVISOR_LATCH divisor_latch;
    int j;
@@ -290,5 +290,7 @@ void rs232_io()
 	setAH( (UCHAR)(getAH()-3) );
       	break;
    }
+#endif // !NEC_98
+#line 293
 }
 

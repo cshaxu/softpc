@@ -1,3 +1,7 @@
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 1
 #include "windows.h"   /* included for Sleep() */
 
 
@@ -38,18 +42,16 @@
  *		  host_simulate
  */
 
+/* @(#)time_day.c	1.27 4/20/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)time_day.c	1.27 4/20/94 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 44
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 53
 
 
 /*
@@ -85,28 +87,39 @@ static char SccsID[]="@(#)time_day.c	1.27 4/20/94 Copyright Insignia Solutions L
  * ===========================================================================
  */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 88
 #ifdef XTSFD
-#    define DAY_COUNT	BIOS_VAR_START + 0xCE
+#error "Unsupported SoftPC mirror configuration: XTSFD"
 #endif
+#line 91
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 93
 
 #define UPDATE_IN_PROGRESS      ( cmos_read(CMOS_REG_A ) & 0x80 )
 static sys_addr user_timer_int_vector;
 static IVT_ENTRY standard_user_timer_int_vector;
 static IVT_ENTRY compatibility_user_timer_int_vector;
+#endif
+#line 98
 
 #ifdef ANSI
-LOCAL void get_host_timestamp(word *, word *, half_word *);
-LOCAL void write_host_timestamp(int, int);
-LOCAL void TimeToTicks(int, int, int, word *, word *);
-LOCAL void get_host_time(int *, int *, int *);
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 105
 LOCAL void get_host_timestamp();
 LOCAL void write_host_timestamp();
 LOCAL void TimeToTicks();
 LOCAL void get_host_time();
 #endif /* ANSI */
+#endif   //NEC_98
+#line 110
 
 #define TICKS_PER_HOUR      65543L
 #define TICKS_PER_MIN       1092L
@@ -121,6 +134,10 @@ LOCAL void get_host_time();
 void time_of_day()
 {
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 124
     /*
      * BIOS function to return the number of PC interrupts since boot.
      */
@@ -135,15 +152,21 @@ void time_of_day()
      */
 
 #ifdef BSD4_2
-    host_block_timer();
+#error "Unsupported SoftPC mirror configuration: BSD4_2"
 #endif
+#line 140
 
     switch (getAH()) {
 	case 0x00:			/* Get time	*/
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else   /* ! NTVDM */
+#line 144
 #ifndef PROD
-	if (host_getenv("TIME_OF_DAY_FRIG") == NULL){
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 147
 	    /*
 	     * First get the time from the host
 	     */
@@ -164,24 +187,10 @@ void time_of_day()
 	    sas_store(TIMER_OVFL, 0);	/* Always write zero after read	*/
 
 #ifndef PROD
-	}else{
-	    SAVED int first=1;
-
-	    if (first){
-		first = 0;
-		printf ("FRIG ALERT!!!! - time of day frozen!\n");
-	    }
-
-	    setDX(1);
-	    sas_storew(TIMER_LOW, 1);
-
-	    setCX(1);
-	    sas_storew(TIMER_HIGH, 1);
-
- 	    setAL(0);
-	    sas_store(TIMER_OVFL, 0);	/* Always write zero after read	*/
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#endif /* NTVDM */
+#line 185
 
 	    break;
 
@@ -203,8 +212,9 @@ void time_of_day()
 	case 2:	/* read the real time clock	*/
 
 #ifndef PROD
-	if (host_getenv("TIME_OF_DAY_FRIG") == NULL){
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 208
 		if( UPDATE_IN_PROGRESS )
 			setCF(1);
 		else
@@ -216,21 +226,9 @@ void time_of_day()
 			setCF(0);
 		}
 #ifndef PROD
-	}else{
-	    SAVED int first=1;
-
-	    if (first){
-		first = 0;
-		printf ("FRIG ALERT!!!! - real time clock frozen!\n");
-	    }
-
-			setDH( 1 );
-			setDL( 0 );	/* DSE bit	*/
-			setCL( 1 );
-			setCH( 1 );
-			setCF(0);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 234
 		break;
 
 	case 3:	/* Set the real time clock	*/
@@ -256,8 +254,9 @@ void time_of_day()
 	case 4:	/* read the date from the real time clock	*/
 
 #ifndef PROD
-	if (host_getenv("TIME_OF_DAY_FRIG") == NULL){
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 261
 		if( UPDATE_IN_PROGRESS )
 			setCF(1);
 		else
@@ -269,21 +268,9 @@ void time_of_day()
 			setCF(0);
 		}
 #ifndef PROD
-	}else{
-	    SAVED int first=1;
-
-	    if (first){
-		first = 0;
-		printf ("FRIG ALERT!!!! - date frozen!\n");
-	    }
-
-			setDL( 1 );
-			setDH( 4 );
-			setCL( 91 );
-			setCH( 19 );
-			setCF(0);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 287
 		break;
 
 	case 5:	/* Set the date into the real time clock	*/
@@ -312,8 +299,9 @@ void time_of_day()
 		{
 			setCF(1);
 #ifdef BSD4_2
-			host_release_timer();
+#error "Unsupported SoftPC mirror configuration: BSD4_2"
 #endif
+#line 317
 			return;
 		}
 		if( UPDATE_IN_PROGRESS )
@@ -344,20 +332,9 @@ void time_of_day()
 
 
 #ifdef XTSFD
-	case 0x0A:
-	{
-	    word count;
-
-	    sas_loadw(DAY_COUNT, &count);
-	    setCX( count );
-	    break;
-	}
-	case 0x0B:
-  	    sas_storew(DAY_COUNT, getCX() );
-	    break;
-	default:
-	    setCF( 1 );
+#error "Unsupported SoftPC mirror configuration: XTSFD"
 #else
+#line 361
         default:
             ; /* Do nothing */
 #endif
@@ -365,16 +342,26 @@ void time_of_day()
     setAH( 0 );
 
 #ifdef BSD4_2
-    host_release_timer();
+#error "Unsupported SoftPC mirror configuration: BSD4_2"
 #endif
+#endif   //NEC_98
+#line 370
 }
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif   //NEC_98
+#line 579
 
 void time_int()
 {
+#ifndef NEC_98
+#line 375
     /*
      * NT port does everything in 16 bit int08 handler
      */
+#ifndef NTVDM
+#line 378
 
     /*
      * The BIOS timer interrupt routine.
@@ -457,6 +444,10 @@ void time_int()
 		exec_sw_interrupt(USER_TIMER_INT_SEGMENT,
 				  USER_TIMER_INT_OFFSET);
 	}
+#endif	/* NTVDM */
+#line 460
+#endif   //NEC_98
+#line 460
 }
 
 /*
@@ -471,6 +462,8 @@ void time_int()
  *  Most of the compensation to readjust tics according
  *  to the time of day stuff is not needed
  */
+#ifndef NTVDM
+#line 474
 /*
  * The routines get_host_timestamp() and write_host_timestamp() are used to
  * override the BIOS record of time, since timer events are known to be lost.
@@ -680,13 +673,9 @@ int low, high;
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 690
 
 
 LOCAL void get_host_time( h, m, s )
@@ -702,6 +691,8 @@ int *h, *m, *s; /* hours, minutes and secs */
     *s = tp->tm_sec;
 }
 
+#ifndef NEC_98
+#line 705
 /*
 ** Take a normal time in hours, minutes and seconds then
 ** transmutate it into PC ticks since the beginning of the day.
@@ -727,11 +718,19 @@ word *low, *hi;		/* outputs */
     *low  = ticks & 0xffff;
     *hi = ticks >> 16;
 }
+#endif   //NEC_98
+#line 730
 
 
 
+#endif  /* ifndef NTVDM */
+#line 948
 void time_of_day_init()
 {
+#ifndef NEC_98
+#line 735
+#ifndef NTVDM
+#line 735
     int hour, minutes, sec;		/* Current host time */
     word low, hi;		/* Host time in PC ticks */
 
@@ -762,7 +761,15 @@ void time_of_day_init()
 	
     user_timer_int_vector = BIOS_USER_TIMER_INT * 4;
 
+#endif  /* NTVDM */
+#line 765
+#endif   //NEC_98
+#line 765
 }
 
 
 
+#ifndef NEC_98
+/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#endif // !NEC_98
+#line 1013

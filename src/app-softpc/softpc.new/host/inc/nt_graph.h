@@ -74,6 +74,10 @@ typedef struct
     BOOL        Focus;                    /* Window has Input Focus */
     HANDLE      FocusEvent;               /* Focus has changed event */
     HANDLE      ActiveOutputBufferHandle; /* The current Console screen buffer handle. */
+#ifdef X86GFX
+#error "Unsupported SoftPC mirror configuration: X86GFX"
+#endif
+#line 80
     WORD	ScreenSizeX;
     WORD	ScreenSizeY;
     HANDLE	AltOutputHandle;
@@ -235,6 +239,10 @@ extern BOOL                 FunnyPaintMode;
 
 typedef struct
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 260
         void (*cga_text)();
         void (*cga_med_graph)();
         void (*cga_hi_graph)();
@@ -252,6 +260,10 @@ typedef struct
 
 typedef struct
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 291
         void (*cga_text)();
         void (*cga_med_graph)();
         void (*cga_hi_graph)();
@@ -386,7 +398,15 @@ extern void nt_v7vga_mono_hi_graph_huge(int offset, int screen_x, int screen_y,
                          int width, int height);
 #endif /* V7VGA */
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 471
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 495
 void high_stretch3(unsigned char *buffer, int length);
 void high_stretch4(unsigned char *buffer, int length);
 
@@ -416,6 +436,10 @@ BOOL  CreateDisplayPalette(void);
 int get_screen_scale IFN0();
 void SetupConsoleMode(void);
 
+#ifdef MONITOR
+#error "Unsupported SoftPC mirror configuration: MONITOR"
+#endif /* MONITOR */
+#line 527
 
 void do_new_cursor(void);
 void textResize(void);
@@ -428,6 +452,10 @@ extern word int10_seg;
 extern word int10_caller;
 extern word useHostInt10;
 extern word changing_mode_flag;
+#ifndef NEC_98
+/* NT host stream state is excluded from this source subset. */
+#endif // !NEC_98
+#line 542
 
 
 // from nt_ega.c

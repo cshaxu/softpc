@@ -1,0 +1,3 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/bios/reset.c	885	928	721	760	""
+base/bios/reset.c	919	926	759	759	c3c84b4705a0be2fa02f0025e4172083213df1019602a187042db5ef6aff2ad2

@@ -4302,3 +4302,582 @@ The two inventories do not decide deletability or compile support: outer
 conditions, `#elif`, macro values, include guards, selected local patches,
 original conditions and test dependencies remain relevant. No source, EXE,
 media or configuration was changed by this macro investigation.
+
+#### S20 outermost exclusion reconciliation in progress
+
+The owner directs that an excluded outer arm replaces its entire body including
+inner conditionals, while the arm itself, outer and sibling directives and
+required `#line` mapping remain. Coupled arms remain deferred. This is a
+whole-mirror audit goal, not authorization to assume that an unobserved arm
+is unsupported.
+
+The current batch converts 56 independently observed top-level SEGMENTATION arms
+in 38 mirror files. Each excluded body contains only the original Mac `.seg`
+include and accompanying comments; no local device implementation is removed.
+The prior XP subset projection remains fixed; its local difference and hashes
+are separately visible. The segmentation-exclusions TSV records each baseline
+location, restored next logical line and excluded-body hash. The initial 51
+resulting line-control boundaries were checked against HEAD before the batch.
+Two independent CPU_30_STYLE arms and 73 top-level PIG arms matching XP are
+also replaced, with separate ledgers. The 73 PIG body hashes and line-control
+boundaries were verified. PIG bodies with local patches and mixed line-control
+contexts are not included. The existing pilot in com.c and nested/coupled and other unverified
+branches remain outside this batch. The old branch and macro inventories are
+frozen pre-change evidence, not updated current physical locations.
+
+Before the NEC_98 restorations, both cached x64 and x86 all-target builds
+succeeded. On each architecture 31 focused tests passed: 28 App-owned unit tests, runtime smoke,
+XP mirror and its selftest. X64 preprocessor probes deliberately defining
+SEGMENTATION, CPU_30_STYLE and PIG reached their expected `#error` directives.
+After reversing just the 73 PIG body replacements and their line controls,
+all 14 affected files exactly match the pre-batch source. Full mirror
+reconciliation and full runtime regression remain open; no full audit or
+full-test completion is implied by this batch. Five file-leading NEC_98
+structures were subsequently restored from pinned XP in diskbios.c, floppy.c,
+floppy_i.c, time_day.c and printer_.c, including printer_'s whole-file
+alternative and closing directive. The restoration ledger records excluded
+body hashes and XP locations. `#line 1` preserves the previous local source
+mapping. An x64 NEC_98 preprocess probe reaches the intended error in
+diskbios.c. After these restorations, both architecture builds and the same
+31 focused tests per architecture pass; original directive and excluded-body
+hash checks pass for all five restorations. A subsequent batch replaces 21
+top-level HERC and 14 top-level REAL_VGA bodies uniquely matched in the local
+baseline and present in pinned XP; 16 ambiguous REAL_VGA cases were not changed.
+The video hardware exclusion ledger records hashes and line boundaries, which
+were independently checked. Nineteen standalone HUNTER debug-comparison
+arms in ten files were subsequently excluded after checking their uniquely
+matched current bodies against the pinned XP source. Their body hashes and
+line boundaries are recorded in the HUNTER exclusion ledger and checked.
+An x64 HUNTER probe reaches the intended error. In the current x64 configuration,
+baseline versus changed preprocessing yields identical output for bootstra.c,
+c_intr.c, diskbios.c and printer_.c when each pair is preprocessed at the same
+temporary source path. This is sample evidence, not full-source equivalence.
+Subsequent work reconciles the 16 duplicate REAL_VGA cases using their unique
+baseline order, adds six SECURE arms, the final independent com.c SEGMENTATION
+arm with its prior logical line map, and CPU_30_STYLE under xt.h's include
+guard. It also restores 84 previously omitted, uniquely anchored standalone
+conditions from the pinned subset records: 46 NEC_98, 29 NTVDM, three JAPAN
+and six MONITOR. For every restored arm the fixed XP directive, excluded body
+hash, existing subset exclusion and retained local boundary are recorded and
+checked. All 84 original ranges were rechecked line by line against complete
+subset dispositions; no included or unaccounted lines occur in excluded bodies.
+The subsequent batch restores 108 uniquely anchored selected NEC_98/NTVDM
+guards, ten selected guards with their excluded `#else` bodies, and excludes
+18 independently matched old hardware arms. XP directives, selected and
+excluded hashes, local line controls and the ten excluded subset ranges were
+independently checked. Selected x64 preprocessing matched the baseline for
+reset.c, fdisk.c, keybd_io.c and mouse_io.c. Composite expressions and coupled
+parent contexts remain deferred. This record preceded the correction below.
+
+Against the frozen 3,983-arm observation ledger, the 227 new exclusions plus
+the earlier com.c pilot cover 262 arms once nested arms inside excluded bodies
+are included. All 262 were unselected on both architectures in that ledger;
+2,205 other unselected arms remain to classify, and may include coupled,
+unsupported, unobserved or still-required cases. Their count is not a deletion
+estimate. Preserve the 1,516 arms observed selected in at least one width.
+
+#### S20 correction: classify original parents, not only local depth
+
+The local subset may have lost an enclosing XP condition. An independent
+lexical scan of the matched original blocks found that 59 previously changed
+arms had XP feature parents, despite appearing top-level locally. Those 59
+were restored individually from the pre-batch local bodies, without reverting
+other edits, and are recorded in the coupled-deferred TSV. After subsequent
+independent batches, a repeat scan finds 181 retained new exclusions with no
+XP feature parent; one additional com.c arm uses an existing line-control map
+and was separately verified. Three
+CPU_30_STYLE arms were separately checked against XP parents. This supersedes
+the earlier batch counts and descriptions, not their historical validation.
+
+After correction and further standalone restorations, the intermediate tree
+contains 185 new exclusions of existing arms and 336 restored original
+structures. The frozen inventory accounts for 220 unselected arms covered by
+the new exclusions and the prior com.c pilot, including nested children;
+2,247 unselected arms remain for classification, many in deferred or already
+unsupported contexts. Exact-match restoration scans for standalone selected
+NEC_98/NTVDM guards and simple excluded arms have been exhausted within their
+stated anchors, not across all mirror branches. Two originally missing guards
+became unambiguously matchable after restoring the coupled bodies and were
+reinstated. Current source has not reached whole-domain audit or acceptance.
+After that correction, eight uniquely matched, independently parented legacy
+IPC/VDM-service and null-sound arms were excluded. Their XP body hashes and
+local line boundaries are recorded separately; the coupled candidate in
+ios.h remains unchanged.
+
+The frozen 470 C/H XP bodies were independently rehashed against the pinned
+manifest: 470/470 match. A preliminary per-arm classification of all 3,983
+frozen observations is recorded in the branch-classification-preview TSV.
+Its original positions belong to S19 delivery 23f65b5c, not the later pilot;
+using the S19 mirror resolves the 97 apparent position mismatches previously
+reported against the wrong baseline. It assigns 1,516 observed selected arms
+to preservation, 220 arms to existing outer exclusions, 1,193 to a local
+feature parent, 194 to an XP feature parent, and 98 to composite/value
+conditions. Another 366 independent-looking observations and 351 else-chain
+arms still need semantic review; 19 have XP/local matching questions, and
+22 duplicate and four mixed-parent matches need disambiguation. These are preliminary mechanical dispositions, not
+proof of semantic necessity or permission for bulk deletion. The currently
+last build overlapped source edits and is not final-source qualification; it
+has exited. A clean frozen-source dual build with ccache disabled is running;
+focused tests remain necessary.
+
+Subsequent verification checked all 331 anchored restored structures against
+their XP directive text, selected/excluded body hashes and retained local line
+controls; the five file-leading structures were checked separately. Two
+restored `#if defined(NEC_98)` lines in egacpu.h had original trailing spaces;
+the trailing spaces alone were removed to satisfy the diff whitespace gate.
+This does not change the condition or its original structural placement.
+
+Further review shows why macro observation alone is insufficient. `NPX` is
+defined conditionally by the original host header under non-CCPU/non-WINWORLD
+conditions, and `YODA` under non-MONITOR/non-PROD conditions; neither is a
+globally absent independent selector. `TAKE_REAL_MODE_LIMIT_FAULT` controls
+guest CPU exceptions, and `FLOPPIES_KEEP_TRYING` changes floppy interrupt
+retry behavior. They remain for separate semantic evaluation. Ordinary
+original documentation and historical copyright strings are not silently
+replaced. In contrast, the independently matched SLAVEPC host-floppy and
+PS_FLUSHING host-printer configuration arms were excluded; they are not
+the current media or file-backed LPT paths. Following rollback, actual x64
+preprocessing of cga.c also matches the frozen baseline at the same source
+path. These observations do not finish the remaining per-arm audit.
+
+Additional inspection shows that unselected SPC486 arms affect actual CPU
+instruction/control behavior, while ANSI arms carry alternate C function
+declarations. They are not equivalent to dead host glue and are retained
+pending explicit CPU-model and compiler-support evaluation. The selected
+CPU_486 flag is distinct from SPC486. A matched-block scan found 25 SPC486
+and 23 ANSI arms without XP feature parents, plus two ANSI cases with such
+parents; this is not evidence that every occurrence or future build is covered.
+
+Of the else-chain observations, 270 are generated `CCPU` alternatives;
+the CCPU macro is not uniform across all compile contexts, so the alternate
+ABI and actual consumers need review before any such branch is rejected.
+Other examples include PROD, CPU_40_STYLE and LITTLEND alternatives. Header
+guards, language/type macros, original diagnostics and copyright content
+cannot be treated as unused product features solely from a missing marker.
+
+
+#### S20 CCPU alternatives and current verification
+
+An original-parent and body audit identified 215 direct `#ifdef CCPU`
+alternatives in `base/ccpu386/cpu4gen.h`. Each local excluded body matches
+the pinned XP body byte for byte after newline normalization; all have only
+the file include guard as parent, and both observed architecture builds select
+CCPU at each location. The selected side contains the existing ABI patches,
+which remain unchanged. These 215 excluded bodies are now `#error` with
+original outer directives and baseline `#line` controls retained. The
+excluded-body hashes and locations are in the CCPU exclusion ledger. Nested
+`PROD` directives inside the rejected bodies are intentionally not retained.
+This finding applies to these reached header locations, not every compile
+context or all CCPU alternatives in the mirror.
+
+The frozen-source, ccache-disabled x64 and x86 clean builds both succeeded.
+After this CCPU-only change, ccache-disabled builds of affected targets again
+succeeded for both architectures; the 31 mirror/machine focused checks pass
+on each architecture, including the XP mirror gate. The two published EXEs
+differ from HEAD even after PE timestamp and checksum normalization, so binary
+identity is not established. Other branch categories remain open; the frozen
+preliminary counts above predate the CCPU disposition. No claim of a complete
+mirror audit or full regression is made.
+
+
+#### S20 product and legacy Macintosh branch review
+
+Further exact-source review identified 99 independently parented non-PROD
+diagnostic arms in 24 files and four independently parented legacy Macintosh
+arms in three files. Both actual architectures leave each arm unselected; the
+XP body and its local S19 copy match uniquely, and the original S19 files do
+not contain line directives. The original conditions are retained and the
+removed body is replaced with `#error`; S19 logical line positions are
+restored. Separate ledgers record removed-body hashes and baseline lines.
+
+Other non-PROD and Macintosh cases are not assumed removable: original XP
+feature parents, non-standalone chains or non-unique matches require separate
+review. This is not removal of the public x86 DEBUG component. Final builds
+and checks after these batches are tracked separately; earlier passing results
+do not qualify a later source revision.
+
+After both batches, ccache-disabled affected-target builds succeeded on x64
+and x86. Final-source focused verification passes 36/36 on each architecture,
+including the XP mirror, documentation and dependency checks. This does not
+qualify a full product regression. Relative to the earlier frozen preliminary
+classification, 103 independent observations and 215 branch-chain observations
+are now accounted for by the new ledgers; the remaining 263 and 136 in those
+two preliminary categories, respectively, still require semantic review.
+Coupled, composite, ambiguous and matching cases remain separate.
+
+
+#### S20 owner clarification: excluded local patches and conjunctions
+
+The owner directs the same `#error`/`#line` treatment for branches proved
+unreachable by one false condition or one false conjunct, whether or not the
+body contains a local patch. The patch registration is retired for the removed
+patch, not for unrelated selected patches in the same file. Merely observing
+an unvisited branch is not proof that the condition itself is false, and a
+false operand does not establish an OR expression is false.
+
+Both previously identified PIG arms containing local additions in c_main.c
+were excluded; the retained file still has independently needed ABI and
+lifecycle patches, and its file-level local-patch status remains correct.
+A scan of the observed PIG bodies against pinned XP identified no further
+local-body mismatches. Twenty AND arms were excluded after both-width
+at-location operand checks and original-structure matching; siblings and
+ambiguous original structure remain under review. Further local-modified AND
+arms, including the SoftPC PPI/snapshot paths, need individual treatment
+while preserving the selected branch. Builds after the latest AND changes
+are in progress and prior results do not qualify that later source.
+
+The broader single-condition scan identifies 152 exact-XP-body candidates
+whose relevant macro is false at the observed compile location on both widths.
+Twenty contain historical SCCS copyright strings: when converted, those
+notices must be retained outside the excluded branch, not silently discarded.
+The same scan identifies 12 non-matching local bodies under false single
+conditions; unlike the earlier conservative policy, local difference alone
+is not a reason to retain a proven unreachable body. These candidates and the
+four PPI conjunctions were staged for individual treatment after the current
+owned build, not yet claimed as applied or validated.
+
+The single-condition audit also found 85 exact-XP-body cases with a retained
+`#else` and four with locally divergent excluded bodies. The macro state and actual reachability on both architectures are checked. The selected sibling and its
+original logical line position must be preserved. These staged candidates are
+not yet represented as completed work or qualified builds.
+
+
+#### S20 single-condition reconciliation after owner clarification
+
+After the prior build, 152 single arms and 85 arms with selected `#else`
+were excluded based on at-location macro states and unique XP body matching.
+Twenty SCCS copyright notices were preserved outside their rejected arms.
+Sixteen additional proven-false arms had locally divergent bodies and were
+excluded without touching selected code; four PPI conjunction bodies were
+likewise excluded while retaining their selected snapshot/host paths. Two more
+AND arms with selected siblings were handled and two original PPI NEC_98
+outer structures restored. The original-PPI and local-patch ledgers record
+these separately. The retained file-level local-patch status is still necessary
+where other selected repairs remain.
+
+A transient manifest write error interrupted one script after PPI source was
+written. Its SHA entry and the two-guard evidence ledger were independently
+reconciled before remaining work; the XP mirror gate subsequently passes.
+The resulting 784 newly excluded existing arms and 338 restored structures
+do not include the earlier pilot. Dual builds and final-source tests are in
+progress; no whole-domain completion is asserted.
+
+
+After the above checkpoint, 25 more single-condition arms were excluded,
+including eight outer com.c arms mapped from S19 to the actual probe source.
+Two original NTVDM PPI guards were restored around the rejected non-standalone
+branches. Current totals are 809 newly excluded existing arms and 340 restored
+original structures, plus the earlier pilot; earlier raw counts are historical.
+The last source revision is undergoing dual builds and is not yet qualified.
+
+
+The next batch includes 55 SAS generated non-CCPU alternatives, 33 other
+uniquely matched false `#else` arms, two false `#else` arms with local body
+differences, and the EGA_DUMP arm whose S19/probe lines map 114 to 118.
+The two architecture builds for this 900-arm checkpoint are running.
+Some remaining original XP outer conditions were removed before S19; the
+corresponding local bodies may actually compile, so their parent restoration
+requires source-by-source analysis rather than assuming a nested marker
+proves the current local code is unreachable.
+
+
+Current S20 accounting includes 1,358 directly excluded existing arms and
+341 restored original structures, plus the earlier pilot. Recent batches
+include false single/AND conditions with local differences and selected `#else`
+chains, and 402 nested single-condition arms. Their macro states were
+verified by mapping S19 positions to the 31ee31e1 probe source: 280/280 and
+122/122, respectively. Forty-three earlier branch-chain candidates were
+reviewed further; selected parent polarity is important and a parent-table
+entry alone does not identify whether its `#if` or `#else` arm was selected.
+Nested-body descendants already removed by an excluded outer arm are not
+separate production edits. The latest dual build is still in progress.
+
+
+Current direct ledgers contain 1,568 exclusions and 343 restored structures,
+plus the earlier pilot. This includes false nested `#else` arms, the
+source-point-tested ASPI `#elif`, and restoration of original NEC_98 outer
+guards around retained Video and EGA CPU content. The original NTVDM and
+JAPAN/KOREA child structures within the Video guard remain a separate review;
+restoring the outer guard does not certify those omitted children.
+
+The source-point probes for `ica.c` were built with each architecture's actual
+Ninja compiler flags: the ASPI marker was not selected, while an injected
+marker in the `#else` was reached. Earlier complete build results do not
+qualify the later guard edits; their dual builds are in progress. Prior EXE
+comparison found that after normalizing PE timestamp/checksum and the
+`Built on` date/time strings, both binaries matched the committed reference
+byte for byte. This remains a checkpoint, not evidence about later edits.
+
+
+The retained `video.h` NTVDM guard was restored after an instrumented
+copy of that header was compiled with the actual Ninja commands for all
+38 dependent x86/x64 translation units. All 38 reached the probe with NTVDM,
+JAPAN and KOREA undefined. The separately coupled JAPAN/KOREA structure
+remains deferred under the owner's stated single-condition/AND scope. Four
+additional original NEC_98 structure/member guards were restored in egacpu.h;
+the current count of those original guards now matches XP at seven, while
+selected C-VID ABI changes remain. Current accounting is 1,568 direct
+exclusions and 348 restorations plus the earlier pilot. The latest guard build
+and final-source checks remain in progress.
+
+
+#### Latest S20 verification checkpoint
+
+After the four EGA CPU member guards and the Video NTVDM guard were restored,
+both ccache-disabled architecture builds completed successfully. The current
+source passes 36/36 selected tests on each architecture, including XP mirror,
+documentation and dependency gates; this is not the full product test suite.
+The source diff against HEAD is 165 files, +4,936/-15,863, net -10,927 lines.
+After normalizing only PE timestamp/checksum and the Built on date/time
+strings, both EXEs are byte-identical to HEAD. Literal SHA-256: x86
+`e54435973a3b1095a657d9904b311f7218d3db5c4746512961feda9ff794109c`; x64
+`5272039ee894967c086afe30c4ffbd2a06359be935df8c6e133ae4803acc71d9`.
+Remaining OR/value conditions and original XP structure gaps require audit;
+no complete reconciliation is claimed.
+
+
+#### S20 continued single-condition and AND checkpoint
+
+The corrected scope includes every proven excluded single-condition or AND
+arm, including one containing a local patch; it is not restricted to PIG.
+Additional original guards were restored in BIOS, communications, keyboard,
+video and relevant headers using source-point evidence, while selected code
+and unrelated local changes remain. The accumulated ledgers record 1,568
+existing arms excluded and 378 structures restored, plus the earlier pilot.
+These are ledger entries rather than a claim that all original structures have
+been reconciled. The video-header macro check covered all 38 actual dependent
+x86/x64 compile commands; subsequent guarded video positions were checked with
+the actual commands for each architecture.
+
+After the latest source change, both architecture builds passed with ccache
+disabled, and the focused 36 tests passed per architecture. Both rebuilt
+EXEs match HEAD after normalizing only PE timestamps, checksums and the build
+date/time string; their literal SHA-256 values are x86
+`e66230ac3a7c1b0e7ce0270230b434fd137e13bdcf2b49b54069558d7a91f9eb` and x64
+`79d56112eb0c909cf1d9db2b465f4bc67c810d67ccc15e398b53e101cf9f0395`.
+Original structure gaps and unobserved conditions remain under review; OR and
+other coupled forms are deferred according to the owner scope. This is not
+full-suite qualification or S20 closure.
+
+
+#### S20 recheck of observed single-condition branches
+
+A fresh line-mapped check of the S19 observation inventory identifies 1,573
+single-identifier `ifdef`/`ifndef` arms observed unselected on both
+architectures. Of these, 1,079 match a direct exclusion ledger entry and 478
+lie within a recorded excluded range; seven additional entries are already
+covered by the prior pilot or an outer replacement. The remaining nine are
+listed in `m9-t99-s20-mapped-single-review.tsv`. Eight were not reached by
+the original macro probes and must not be classified false solely from that
+absence; the ninth is an `ifndef GISP_SVGA` with the macro observed undefined
+and thus is not a false condition. Lexical parent reporting alone does not
+identify else polarity.
+
+Among 51 S19 observed-unselected pure AND expressions, 42 map to a current
+condition followed by `#error`; the other nine were changed or eliminated and
+require checking against the outermost replacement and local-patch ledgers.
+These counts are a line-mapping aid, not proof about unobserved contexts or
+removed XP structures. Audit is still active.
+
+
+A further cross-file comparison identified 37 possible omitted original
+single-condition frames using unique surrounding XP/S19/current anchors.
+Actual x86 and x64 preprocessing proved 11 of them unselected, with matching
+original and current outer structures; those 11 were restored in five files
+and recorded in `m9-t99-s20-omitted-single-guard-restorations.tsv`. Other
+candidates include selected or unobserved branches, a header, and cases whose
+outer structure first needs review; they are not automatically replaced. Both
+architecture builds after this batch passed with ccache disabled.
+
+The `sas.h` candidate was tested using 114 actual dependent compile commands.
+Only two test-object invocations reached the shadow header; the other 112
+resolved the original header before the shadow search directory. Both reached
+probes had NTVDM undefined, but this is insufficient to establish all header
+contexts, so no production change was made for that candidate.
+
+Four further original NEC_98 outer guards in communications and video were
+restored after unique XP/S19/current boundary checks and actual x86/x64
+source-point probes. The corresponding five missing, proven-unselected inner
+guards were then restored. Both architecture builds passed after this batch.
+The respective ledgers record source boundaries and retained diagnostic
+line numbers. The total restored structure count is now 398; source review
+continues.
+
+A separate check of bare `#if MACRO` and single `defined(MACRO)` forms
+found one additional false SFELLOW arm in the selected PIG else path of
+`c_main.c`. XP and S19 bodies match, and actual x86/x64 source-point probes
+confirm SFELLOW is undefined there. It is now replaced by `#error` with
+its baseline `#line`; the other four bare expressions are inside previously
+replaced PIG arms. The other 16 observed-unselected single `defined` forms
+are directly replaced or covered by a recorded outer replacement. Both
+architecture builds passed after the correction.
+
+The previously omitted NEC_98 selection enclosing the COM input/output
+functions was restored with both original branch boundaries and baseline
+line controls. Four NTVDM-only guards inside the selected branch were then
+restored after x86/x64 source-point probes. Both architecture builds passed.
+The current restoration-ledger count is 403.
+
+Three additional EGA function-level NEC_98 outer structures and eight
+original unselected JAPAN/NTVDM guards within them were restored after
+XP/S19/current boundary matching and x86/x64 actual source-point probes.
+Both architecture builds passed; the restoration ledger total is 414.
+
+Two originally omitted NEC_98 outer guards in printer and keyboard were
+observed selected in both builds, while their nested NTVDM and JAPAN arms
+were observed unselected at the actual source points. The selected outer
+frames and rejected inner frames are restored without treating the selected
+outer branches as errors. Both architecture builds pass; restoration ledger
+total is 418.
+
+After verifying actual x86/x64 source-point states, two NT graphics NEC_98
+outer structures and their two disabled inner guards, plus the CMOS NTVDM
+outer structure and its disabled nested guard, were restored. Both builds
+passed; the restoration ledger total is 424. A selected, unused NT graphics
+variable remains a subset decision rather than a false-condition candidate.
+
+Owner clarified again that no nested framework may survive inside an excluded
+outer arm. A repository-wide lexical scan of current mirror C/H files finds
+1,871 branch arms containing this task's `Unsupported SoftPC mirror
+configuration` errors; none also contains nested preprocessor structures or
+other code in the same arm. A sibling `else` that is selected remains a
+distinct arm and may retain its original nested conditions. This structural
+scan does not prove that every original omitted frame has been found.
+
+The owner further specified the rule recursively for every selected outer
+branch; `docs/rules/CODING.md` now states that rule explicitly. For the
+previously uncertain `sas.h` candidate, full preprocessor macro-state output
+from all 114 dependent x86/x64 commands shows two reach the relevant
+declaration with NTVDM undefined and the remaining contexts do not reach it.
+The original NTVDM inner guard was restored at that point; no unsupported
+condition was inferred from an unreached context. Both architecture builds
+passed and the restoration ledger total is 425.
+
+
+#### Recursive restoration and verification correction
+
+The recursive comparison identified original selected outer frames. After
+matching XP/S19/current boundaries, checking the existing conditional stack,
+proving source-point macro state with both actual architecture commands and
+excluding overlapping or ambiguous boundaries, 214 additional original
+frames were restored across 31 files. Nested candidates remain for subsequent
+review. The ledger total is 1,569 excluded arms and 639 restored frames.
+A current lexical scan finds 1,933 task error arms and no nested structure or
+other code within those arms.
+
+Some earlier statements above that post-change incremental builds and focused
+tests passed were based on stale status files: the background PowerShell
+scripts were blocked by execution policy. Those intermediate claims must not
+be used as verification evidence. After explicitly passing the execution-policy
+argument, x64 and x86 each completed 99 build steps with exit zero, and both
+Ninja trees reported no pending work. A fresh actual focused test run passed
+36/36 per architecture. The EXEs match HEAD after normalizing PE timestamps,
+checksums and the build date/time; literal SHA-256 is x86
+`296f4582e5aa793074690140905ac485819564223a2cd49c4c790226f5af4828` and x64
+`7cf48b970ba808c316178ed888c27cb47fdce221125827181f6cb9a05b4ee1ad`.
+Existing original mirror compiler warnings remain.
+
+A subsequent recursion pass restored nine more proven selected outer frames,
+including two adjacent printer frames whose shared boundary was explicitly
+ordered as closing the first and then opening the second. Both Ninja builds
+completed successfully with no remaining work. The cumulative restoration
+ledger is 648; the current error-arm scan reports 1,942 with no nested
+condition or other code in the excluded arm. Matching results remain
+candidates, not a claim of comprehensive original-frame reconciliation.
+
+The V7 mode-setting and reset outer frames were restored after actual
+source-point probes. Reset also retains its selected NTVDM-negative frame
+and replaces the contradictory nested NTVDM arm with one `#error`. Both
+architectures were rebuilt and both Ninja trees report no pending work.
+The current ledger counts 1,569 excluded arms and 652 restored frames.
+
+The reset signon path's two selected original frames were restored after
+source-point x86/x64 verification. The latest x86/x64 build completed 33
+steps per architecture with no pending Ninja work. The restoration ledger
+total is 654; the 1,943 current error arms contain no nested conditions or
+other code. Source reconciliation remains active.
+
+The selected NEC_98 outer guards in `host_lpt.h` and `rs232.h` were
+restored after inspecting all actual dependent x86/x64 preprocessing
+contexts (14 and 6 respectively). The former's two original excluded NTVDM
+inner guards, including one conjunction, were restored as `#error` after
+separately checking NTVDM at every reached context. Both builds pass and
+Ninja reports no pending work. The restoration ledger count is 658.
+
+A further original/S19/current line-mapping pass recovered 21 selected
+frames where unique boundary and following-context checks, actual dual
+architecture source-point probes, and matching current preprocessor stack
+proved safe placement. Both builds pass; 1,957 task error arms contain no
+nested directives or other code. The restoration ledger total is 679.
+Candidates with ambiguous mappings remain under review.
+
+Further proven selected outer frames were restored using original/S19/current
+line alignment, matching following context, preprocessor-stack checks and
+x86/x64 actual source-point probes. Both builds pass with no Ninja work
+pending; the ledger totals are 1,569 excluded arms and 693 restorations.
+The current structural scan reports 1,960 error arms without nested content.
+Ambiguous and unreached mappings remain under review.
+
+Additional selected mouse and COM structures were reconciled against the
+original outer/inner hierarchy, including an excluded COM NTVDM/FIFO_ON
+conjunction. Actual x86/x64 source-point probes and builds passed; the latest
+Ninja trees have no pending work. The restoration ledger now contains 720
+frames; the structural scan finds 1,969 task error arms with no nested content.
+Remaining uncertain original boundaries and coupled forms are not claimed done.
+
+The selected `time_day.c` NTVDM-negative parent and two selected NEC-negative
+function guards were restored after x86/x64 source-point probes. Twelve
+identical adjacent line-control duplicates created by nested restoration were
+reduced to one directive each without changing subsequent line mapping. Both
+architectures built successfully; the restoration ledger count is 723.
+
+Additional selected timer and COM declaration/function parent frames were
+restored after dual-architecture source-point checks. COM's excluded NTVDM
+declaration arm is one `#error`; its nested FIFO_ON framework is deliberately
+not retained. Both builds pass and no Ninja work is pending. The ledger now
+contains 728 restorations; the structural audit found 1,973 error arms with
+no nested content.
+
+The COM receive parent was corrected to include the full original selected
+region, including the following `recv_char` function; the ledger boundary
+was corrected. The other restored parent IDs were compared against mapped
+unique XP/current lines, with no remaining mismatch found within those
+mapped positions. ROM and EGA selected outer structures were also restored
+after dual-architecture macro probes. Both architectures build and neither
+Ninja tree has pending work. The current restoration ledger is 732; the
+error-arm structure audit finds 1,975 arms and no nested code.
+
+The selected ICA and graphics split/scroll outer structures were restored
+with actual x86/x64 source-point and header-context evidence; existing inner
+conditions remain in their selected arms. Both architectures built successfully
+and the restoration ledger now contains 738 entries. The current structural
+scan reports 1,975 excluded error arms with no nested content.
+
+Printer NEC and NTVDM/MONITOR nested guards, the corresponding header
+selection, and the selected timer guard were restored using actual x86/x64
+source-point and header-context probes. Both builds completed successfully
+with no Ninja work pending. The restoration ledger is now 749 frames; the
+structure scan finds 1,985 error arms without nested code.
+
+
+#### Owner-directed breadth-first execution
+
+Audit retained mirror conditions by nesting depth, starting at depth 1,
+including sibling arms at their guard's depth. The task-local queue contains
+children only of arms that are selected or potentially selectable in a
+supported build; once an arm is conclusively excluded and replaced, no
+descendant of that arm is queued. An unreached probe is an unknown, not proof
+of exclusion. Each depth reports its total, classified, processed, pending
+and explicitly deferred arms. Previously completed selective edits are
+reconciled with this queue rather than repeated. Batch validation per depth.
+
+Before closing each depth, independently audit every guard and sibling arm
+at that depth against its original boundary and all applicable supported
+production and test compilation contexts. Confirm that retained arms can be
+selected where required and that every `#error` arm is actually excluded in
+all applicable contexts; an unobserved or unreached context is not proof.
+Review the specific mirror exception for any omitted content in a selected
+arm and verify the next-depth queue contains only eligible children. Resolve
+or explicitly account for each point before that depth's build, publication,
+tests, review, commit and push; do not treat a successful build alone as this
+point-by-point audit.

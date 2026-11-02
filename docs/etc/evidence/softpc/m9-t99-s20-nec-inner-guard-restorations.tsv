@@ -1,0 +1,6 @@
+path	xp_if_line	xp_endif_line	baseline_next_line	macro	excluded_body_sha256
+base/comms/com.c	3056	3062	1878	NTVDM	0bd46f6cd03a098c358149dc97c72a9d1114b60fd34b0d8e8481bb5e80741e50
+base/comms/com.c	3781	3784	2337	NTVDM	795983709d245857c2bce4136323f1fb4df8c66f4ef898f4c8fea13dd63fe1f1
+base/video/ega_vide.c	832	838	741	NTVDM	c3e3df249a64d4ecf4fd6b85feb13a3b11737bab160def71d2292651673831c9
+base/video/ega_vide.c	842	854	744	NTVDM	5f7ab5bccf64f0b03f71fa01f49be9158b6a96b5dbc09c04206ac0a5d7d543f5
+base/video/ega_vide.c	1637	1673	1263	JAPAN	5b2932d8db59ba1864e6b743f85e9f88d759e5c71402f1fb983ac01fdd586e65

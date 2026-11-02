@@ -49,14 +49,26 @@ typedef	struct	{
 	int	start;
 	int	end;
 	long	video_copy_offset;
+#ifndef NEC_98
+#line 52
 #ifdef VGG
 	int	v7frig; /* for those annoying V7 (and undocumented VGA) modes */
 			  /* with chars_per_line not a multiple of 4 */
 #endif /* VGG */
+#endif  // !NEC_98
+#line 58
 } DIRTY_PARTS;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif  // NEC_98
+#line 66
 
 typedef enum {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif  // NEC_98
+#line 60
         EGA_HI_SP,
         EGA_HI_SP_WR,
         EGA_MED_SP,
@@ -100,7 +112,13 @@ typedef enum {
 
 typedef struct
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   // !NEC_98
+#line 129
 	void (*init_screen) IPT0();
+#endif  // !NEC_98
+#line 131
 	void (*init_adaptor) IPT2(int,arg1, int,arg2);
 	void (*change_mode) IPT0();
 	void (*set_screen_scale) IPT1(int,arg1);
@@ -118,8 +136,9 @@ typedef struct
 						arg5,int,arg6);
 	void (*paint_cursor) IPT3(int,arg1, int,arg2, half_word,arg3);
 #ifdef GISP_SVGA 
-	void (*hide_cursor) IPT3(int,arg1, int,arg2, half_word,arg3);
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
+#line 123
 #ifdef EGG
 	void (*set_paint) IPT2(DISPLAY_MODE,arg1, int,arg2);
 	void (*change_plane_mask) IPT1(int,arg1);
@@ -136,6 +155,10 @@ typedef struct
 
 extern VIDEOFUNCS *working_video_funcs;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif  // NEC_98
+#line 139
 
 #define host_init_screen()\
 	(working_video_funcs->init_screen)()
@@ -168,9 +191,9 @@ extern VIDEOFUNCS *working_video_funcs;
 #define host_paint_cursor(x,y,attr)\
 	(working_video_funcs->paint_cursor)(x,y,attr)
 #ifdef GISP_SVGA
-#define host_hide_cursor(x,y,attr)\
-	(working_video_funcs->hide_cursor)(x,y,attr)
+#error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
+#line 174
 #ifdef EGG
 #define host_set_paint_routine(mode,ht)\
 	(working_video_funcs->set_paint)(mode,ht)
@@ -227,7 +250,13 @@ extern void (*clear_v7ptr)();	/* ptr to host routine to clear V7 h/w pointer	*/
 #endif /* V7VGA */
 
 extern UPDATE_ALG update_alg;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 269
 extern byte *video_copy;
+#endif // !NEC_98
+#line 271
 extern MEM_HANDLERS vid_handlers;
 
 extern boolean text_scroll_up IPT6(int, start, int, width, int, height,
@@ -245,6 +274,10 @@ extern boolean cga_graph_scroll_down IPT6(int, start, int, width,
 
 extern  void	dummy_calc IPT0();
 extern	void	text_update IPT0();
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif  // NEC_98
+#line 291
 
 extern	void	cga_med_graph_update IPT0();
 extern	void	cga_hi_graph_update IPT0();
@@ -263,8 +296,9 @@ extern	void	vga_graph_update IPT0();
 extern	void	vga_split_graph_update IPT0();
 
 #if defined(HERC)
-extern  void	herc_update_screen IPT0();
+#error "Unsupported SoftPC mirror configuration: HERC"
 #endif
+#line 311
 
 extern	boolean	dummy_scroll IPT6(int,dummy1,int,dummy2,int,dummy3,
 				int,dummy4,int,dummy5,int,dummy6);
@@ -278,3 +312,7 @@ extern	void	flag_mode_change_required IPT0();
 extern  void    reset_graphics_routines IPT0();
 extern	void	reset_paint_routines IPT0();
 
+#ifndef NEC_98
+/* Original nested NTVDM branch is pending depth-2 reconciliation. */
+#endif // !NEC_98
+#line 330

@@ -25,24 +25,9 @@ void    idle_ctl();
 
 
 #ifdef NTVDM
-/*
- * NT VDM idling system based on waits - call funcs for counter idle indicators
- * to allow them to cancel waits.
- */
-VOID HostIdleNoActivity(VOID);
-
-#define IDLE_video()    HostIdleNoActivity()
-#define IDLE_comlpt()   HostIdleNoActivity()
-#define IDLE_disk()     HostIdleNoActivity()
-
-/* exported just for kb_setup_vector intialization */
-extern word *pICounter;
-extern word *pCharPollsPerTick;
-extern word *pMinConsecutiveTicks;
-extern word IdleNoActivity;
-extern word ienabled;
-
+#error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
+#line 46
 #define IDLE_video()    idle_no_video = 0
 #define IDLE_comlpt()   idle_no_comlpt = 0
 #define IDLE_disk()     idle_no_disk = 0

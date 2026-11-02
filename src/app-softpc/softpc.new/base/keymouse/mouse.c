@@ -27,18 +27,16 @@
  *                <Unix file> #endif".
  */
 
+/* @(#)mouse.c	1.17+ 07/10/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
-static char SccsID[]="@(#)mouse.c	1.17+ 07/10/95 Copyright Insignia Solutions Ltd.";
+#error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
+#line 33
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_MOUSE.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 42
 
 
 /*
@@ -76,13 +74,18 @@ int button_right = 0;	/* Current state of right button */
 int delta_x = 0, delta_y = 0;	/* Current mouse delta moves */
 
 #ifndef PROD
-static char buff[132];
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 79
 
 static half_word data1_reg = 0,
 		 data2_reg = 0,
 		 mouse_status_reg = 0;
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif    //NEC_98
+#line 86
 static half_word
 		 last_button_left  = 0,
 		 last_button_right = 0;
@@ -187,6 +190,10 @@ const softpc_device_inport_mouse_state *state;
 void mouse_inb IFN2(io_addr, port, half_word *, value)
 {
     *value = 0xff;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else   //NEC_98
+#line 139
     if (port == MOUSE_PORT_1) {		/* data register */
 
 	/*
@@ -208,11 +215,9 @@ void mouse_inb IFN2(io_addr, port, half_word *, value)
 		break;
 	    default :
 #ifndef PROD
-		if (io_verbose & MOUSE_VERBOSE) {
-			sprintf(buff, "mouse_inb() :  Bad P");
-			trace(buff,DUMP_NONE);
-		}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 216
 		break;
 	}
     }
@@ -232,27 +237,23 @@ void mouse_inb IFN2(io_addr, port, half_word *, value)
     }
 
 #ifndef PROD
-    if (io_verbose & MOUSE_VERBOSE) {
-	sprintf(buff, "mouse_inb() : port %x value %x", port, *value);
-	trace(buff,DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#endif    //NEC_98
+#line 240
 }
 
 
 void mouse_outb IFN2(io_addr, port, half_word, value)
 {
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 245
 #ifndef PROD
-	if (io_verbose & MOUSE_VERBOSE) {
-		if ((port == MOUSE_PORT_0)
-		 || (port == MOUSE_PORT_1)
-		 || (port == MOUSE_PORT_2))
-			sprintf(buff, "mouse_outb() : port %x value %x", port, value);
-		else
-			sprintf(buff, "mouse_outb() : bad port: %x value %x", port, value);
-		trace(buff,DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 256
 
 	/*
 	 * Out to an internal register
@@ -274,11 +275,9 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 
 			if ((value & 0x20) && ((mouse_mode_reg & 0x20) == 0)) {
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse_outb() : hold bit 0 -> 1");
-					trace(buff,DUMP_NONE);
-				}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 282
 				/* clear the interrupt */
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 
@@ -308,11 +307,9 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 			/* ready for next read from queue, so send interrupt */
 			else if ((mouse_mode_reg & 0x20) && ((value & 0x20)==0)){
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse_outb() : hold bit 1 -> 0");
-					trace(buff,DUMP_NONE);
-				}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 316
 			}
 			/*
 			 * Check timer select value (bits 210)
@@ -321,10 +318,9 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 			switch (value & 0x7) {
 			case 0x0 :		/* 0 Hz INTR low */
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse_outb() : INTR low"); trace(buff,DUMP_NONE);
-				}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 328
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 				break;
 
@@ -335,17 +331,15 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				break;
 			case 0x5: /* reserved */
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse: reserved"); trace(buff,DUMP_NONE);
-					}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 342
 				break;
 			case 0x6 :		/* 0 Hz INTR hi */
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse_outb() : INTR hi"); trace(buff,DUMP_NONE);
-				}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 349
 				if (value & 0x10)
 					ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 				break;
@@ -353,11 +347,9 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				break;
 			default:
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff,"mouse_outb() : bad mode");
-					trace(buff,DUMP_NONE);
-				}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 361
 				break;
 
 			}
@@ -383,11 +375,9 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 		else
 		if ((address_reg & 0x07) == INTERFACE_CONTROL_REG){
 #ifndef PROD
-				if (io_verbose & MOUSE_VERBOSE) {
-					sprintf(buff, "mouse_outb() :  interface control reg port %x value %x",port,value);
-					trace(buff,DUMP_NONE);
-				}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 391
 		}
 
 	}
@@ -408,24 +398,28 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 	    else
 		address_reg = value;
 	}
+#endif    //NEC_98
+#line 411
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INPUT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 474
 
 void mouse_send(Delta_x,Delta_y,left,right)
 int	Delta_x,Delta_y,left,right;
 {
 	if(Delta_x != 0 || Delta_y != 0 || button_left != left || button_right != right)
 	{
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 484
 		delta_x += Delta_x;
 		delta_y += Delta_y;
+#endif   //NEC_98
+#line 429
 
 		/***
 		Mouse inport registers can only handle one byte
@@ -442,19 +436,25 @@ int	Delta_x,Delta_y,left,right;
 
 		button_left = left;
 		button_right = right;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 512
 		if ((mouse_mode_reg & 0x08) && !(mouse_mode_reg & HOLD))
 			ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
+#endif   //NEC_98
+#line 514
 	}
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif    //NEC_98
+#line 528
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 538
 
 
 void mouse_init IFN0()
@@ -462,11 +462,9 @@ void mouse_init IFN0()
     IU16 p;
 
 #ifndef PROD
-    if (io_verbose & MOUSE_VERBOSE) {
-	sprintf(buff, "mouse_init()");
-	trace(buff,DUMP_NONE);
-    }
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 550
 
     mouse_inb_toggle = 0;
     /* Cold initialization follows q_event_init: no old handle remains valid. */
@@ -477,22 +475,24 @@ void mouse_init IFN0()
     io_define_inb(MOUSE_ADAPTOR, mouse_inb);
     io_define_outb(MOUSE_ADAPTOR, mouse_outb);
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 565
     for(p = MOUSE_PORT_START; p <= MOUSE_PORT_END; p++) {
+#endif   //NEC_98
+#line 567
 	io_connect_port(p, MOUSE_ADAPTOR, (IU8)IO_READ_WRITE);
 
 #ifdef KIPPER
-#ifdef CPU_40_STYLE
-  /* Enable iret hooks on mouse interrupts */
-  ica_iret_hook_control(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT, TRUE);
+#error "Unsupported SoftPC mirror configuration: KIPPER"
 #endif
-#endif
+#line 489
 
 #ifndef PROD
-	if (io_verbose & MOUSE_VERBOSE) {
-	    sprintf(buff, "Mouse Port connected: %x", p);
-	    trace(buff,DUMP_NONE);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 496
     }
     host_deinstall_host_mouse();
 }

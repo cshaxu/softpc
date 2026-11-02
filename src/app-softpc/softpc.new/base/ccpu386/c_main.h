@@ -126,8 +126,9 @@ typedef struct
 IMPORT IU8 pf_table[];
 
 #ifdef	PIG
-IMPORT IBOOL took_relative_jump;
+#error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
+#line 131
 
 
 /*
@@ -216,11 +217,7 @@ IMPORT ISM32 selector_outside_table IPT2(
 #define SZ2MASK(x) ((IU32)0xffffffff >> 32 - x )
 
 #ifdef DOUBLE_CPU
-
-#define HARD_CPU        0
-#define SOFT_CPU        1
-
-IMPORT VOID double_switch_to IPT1(IU8, cpu_type);
-
+#error "Unsupported SoftPC mirror configuration: DOUBLE_CPU"
 #endif
+#line 226
 

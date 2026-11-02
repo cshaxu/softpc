@@ -32,6 +32,10 @@
  */
 
 #define	INT15_INVALID			0x86
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 35
 
 /*
  * Multi-tasking Extensions

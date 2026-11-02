@@ -20,28 +20,15 @@
  */
 
 #ifdef HUNTER
-#    define MC6845_REGS   18        /* No. of registers in a MC6845 chip     */
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 25
 
 
 #ifdef BIT_ORDER1
-typedef union                       /* Template for character attributes     */
-{
-    half_word all;
-    struct 
-    {
-        HALF_WORD_BIT_FIELD blinking  :1;   /* Blinking attribute                    */
-        HALF_WORD_BIT_FIELD background:3;   /* Background colour R,G,B               */
-        HALF_WORD_BIT_FIELD bold      :1;   /* Intensity bit                         */
-        HALF_WORD_BIT_FIELD foreground:3;   /* Foreground colour R,G,B               */
-    } bits;
-    struct 
-    {
-        HALF_WORD_BIT_FIELD background_and_blink:4;     
-        HALF_WORD_BIT_FIELD foreground_and_bold :4;
-    } plane;
-} ATTRIBUTE;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 45
 
 #ifdef BIT_ORDER2
 typedef union                       /* Template for character attributes     */
@@ -69,9 +56,9 @@ typedef union                       /* Template for character attributes     */
  */
 
 #ifdef HUNTER
-    extern half_word MC6845[];        /* The MC6845 data register values */
-    extern half_word mode_reg;        /* MC6845 mode control register value */
+#error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
+#line 75
 
 extern void cga_init	IPT0();
 extern void cga_term	IPT0();
@@ -98,15 +85,6 @@ extern	CGA_GLOBS	CGA_GLOBALS;
 #define	get_cga_colormask()		(CGA_GLOBALS.colormask)
 
 #if !defined(EGG) && !defined(A_VID) && !defined(C_VID)
-/* This structure is defined solely so that we don't have to ifdef every
-** reference to VGLOBS->dirty_flag and VGLOBS->screen_ptr in the base/host
-** for a CGA-only build.
-*/
-typedef	struct
-{
-	ULONG dirty_flag;
-	UTINY *screen_ptr;
-} CGA_ONLY_GLOBS;
-
-IMPORT CGA_ONLY_GLOBS *VGLOBS;
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* !EGG */
+#line 113

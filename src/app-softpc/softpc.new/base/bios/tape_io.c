@@ -1,3 +1,7 @@
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#endif // JAPAN && i386
+#line 7
 #include "insignia.h"
 #include "host_def.h"
 /*
@@ -17,19 +21,19 @@
 
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_BIOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 27
 
 /*
  *    O/S include files.
  */
 #include <stdio.h>
 #include TypesH
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // JAPAN && i386
+#line 33
 /*
  * SoftPC include files
  */
@@ -52,6 +56,10 @@
 #define SIXTY_FOUR_K    (64 * 1024)
 #define	WRAP_AREA(addr) (addr) >= ONE_MEGABYTE && (addr) < ONE_MEGABYTE + SIXTY_FOUR_K
 
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // JAPAN && i386
+#line 78
 LOCAL q_ev_handle wait_event_handle = (q_ev_handle)0;
 
 /* Call back routine that needs to set a user's flag byte */
@@ -85,9 +93,9 @@ sys_addr      target_limit;
 sys_addr  target_base;
 sys_addr byte_count;   /* Max size is 0x8000 * 2 = 10000 */
 #ifdef CPU_30_STYLE
-DESCR src_entry;
-DESCR dst_entry;
+#error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else
+#line 91
 half_word source_AR;
 half_word target_AR;
 #endif /* CPU_30_STYLE */
@@ -96,6 +104,10 @@ half_word target_AR;
 	half_word	mask,		/* interrupt mask			*/
 			alarm;		/* value read from alarm register	*/	
 
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif /* NTVDM & MONITOR */
+#line 99
         /*
          *	Determine function
          */
@@ -111,6 +123,10 @@ half_word target_AR;
                 break;
 
 	case INT15_EMS_DETERMINE:
+#if 0 /* I'm sure we've all had enough of this one */
+#error "Unsupported SoftPC mirror configuration: disabled branch"
+#endif
+#line 143
 #ifdef PM
                 outb(CMOS_PORT, CMOS_U_M_S_LO);
                 inb(CMOS_DATA, &cmos_u_m_s_lo);
@@ -119,11 +135,16 @@ half_word target_AR;
                 setAH(cmos_u_m_s_hi);
                 setAL(cmos_u_m_s_lo);
 #else
-                setAX ( 0 );
+#error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* PM */
+#line 124
 		break;
         case INT15_MOVE_BLOCK:
 #ifdef PM
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: excluded conjunction"
+#endif // JAPAN && i386
+#line 127
                /* Unlike the real PC we don't have to go into protected
                   mode in order to address memory above 1MB, thanks to
                   the wonders of C this function becomes much simpler
@@ -134,19 +155,9 @@ half_word target_AR;
                target = gdt + 0x18;
 
 #ifdef CPU_30_STYLE
-	       read_descriptor(source, &src_entry);
-	       read_descriptor(target, &dst_entry);
-	       source_base = src_entry.base;
-	       target_base = dst_entry.base;
-#ifndef PROD
-	       source_limit = src_entry.limit;
-	       target_limit = dst_entry.limit;
-#endif
-
-		assert1( (src_entry.AR & 0x9e) == 0x92, "Bad source access rights %x", src_entry.AR );
-		assert1( (dst_entry.AR & 0x9e) == 0x92, "Bad dest access rights %x", dst_entry.AR );
-
+#error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else /* CPU_30_STYLE */
+#line 150
 		/* retrieve descriptor information for source */
 		retrieve_descr_fields(&source_AR, &source_base, &source_limit, source);
 
@@ -172,9 +183,15 @@ half_word target_AR;
 		/* Go to it */
 		if (sas_twenty_bit_wrapping_enabled())
 		{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 175
 			sas_disable_20_bit_wrapping();
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
 			sas_enable_20_bit_wrapping();
+#endif /* NTVDM */
+#line 178
 		}
 		else
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
@@ -185,9 +202,9 @@ half_word target_AR;
 		setZF(1);
 		setIF(1);
 #else
-		setCF(1);
-		setAH(INT15_INVALID);
+#error "Unsupported SoftPC mirror configuration: !PM"
 #endif
+#line 191
 		break;
 
         case INT15_VIRTUAL_MODE:
@@ -250,50 +267,50 @@ half_word target_AR;
 		setDS(getES());
 
 #else
-		setCF(1);
-		setAH(INT15_INVALID);
+#error "Unsupported SoftPC mirror configuration: !PM"
 #endif	/* PM */
+#line 256
                 break;
 
 	case INT15_INTERRUPT_COMPLETE:
 		break;
 	case INT15_CONFIGURATION:
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#else
 		/* The C handler executes in the caller's CPU context; getCS() is
 		 * therefore the guest caller's segment, not the ROM segment.  C0
 		 * must point at the original BIOS configuration table at F000:E6F5. */
+#line 393
 		setES( CONF_TABLE_SEGMENT );
 		setBX( CONF_TABLE_OFFSET );
+#endif
+#line 396
 		setAH( 0 );
 		setCF( 0 );
 		break;
 
 #ifdef	SPC486
-	case 0xc9:
-		setCF( 0 );
-		setAH( 0 );
-		setCX( 0xE401 );
-		note_trace0(GENERAL_VERBOSE, "INT15: C9 chip revision");
-		break;
+#error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
+#line 408
 
 	/* Keyboard intercept 0x4f, wait_event 83, wait 86 are all no longer
 	 * passed through from ROM.
 	 */
 
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 283
 	default:
 		/*
 		 *	All other functions invalid.
 		 */			
 #ifndef	PROD
-	{
-		LIN_ADDR stack=effective_addr(getSS(),getSP());
-
-		IU16 ip = sas_w_at(stack);
-		IU16 cs = sas_w_at(stack+2);
-
-                note_trace3(GENERAL_VERBOSE, "INT15: AH=%02x @ %04x:%04x", getAH(), cs, ip);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif	/* PROD */
+#line 442
 
 		/* Fall through */
 
@@ -307,3 +324,7 @@ half_word target_AR;
 	}
 }
 
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: JAPAN and i386"
+#endif // JAPAN && i386
+#line 553

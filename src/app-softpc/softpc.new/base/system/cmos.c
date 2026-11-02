@@ -12,13 +12,9 @@
  */
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_CMOS.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 22
 
 
 /*
@@ -68,9 +64,9 @@ static int      (*_12to24) ();
 static boolean  twenty4_hour_clock;
 
 #if defined(NTVDM) || defined(macintosh)
-static boolean  cmos_has_changed = FALSE;
-static boolean  cmos_read_in = FALSE;
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif	/* defined(NTVDM) || defined(macintosh) */
+#line 72
 
 static long     filesize;
 static int      cmos_index;
@@ -81,45 +77,23 @@ static struct host_tm *ht;	/* The host time */
 static IU32 rtc_period_mSeconds = 0;
 
 #if defined(NTVDM) || defined(macintosh)
-static half_word cmos[CMOS_SIZE] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* Timing info + alarms */
-	REG_A_INIT,
-	REG_B_INIT,
-	REG_C_INIT,
-	REG_D_INIT,
-	DIAG_INIT,
-	SHUT_INIT,
-	FLOP_INIT,
-	CMOS_RESVD,
-	DISK_INIT,
-	CMOS_RESVD,
-	EQUIP_INIT,
-	BM_LO_INIT, BM_HI_INIT,
-	EXP_LO, EXP_HI,
-	DISK_EXTEND, DISK2_EXTEND,
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x1b - 0x1e */
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x1f - 0x22 */
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x23 - 0x26 */
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x27 - 0x2a */
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x2b - 0x2d */
-	CHK_HI_INIT, CHK_LO_INIT,
-	EXT_LO_INIT, EXT_HI_INIT,
-	CENT_INIT,
-	INFO_128_INIT,
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x34 - 0x37 */
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x38 - 0x3b */
-	CMOS_RESVD, CMOS_RESVD, CMOS_RESVD, CMOS_RESVD,	/* 0x3c - 0x3f */
-};
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #else	/* defined(NTVDM) || defined(macintosh) */
+#line 112
 static half_word cmos[CMOS_SIZE];
 #endif	/* defined(NTVDM) || defined(macintosh) */
 
 static half_word *cmos_register = &cmos[CMOS_SHUT_DOWN];
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 119
 
 #ifdef TEST_HARNESS
-unsigned long   io_verbose = 0;
+#error "Unsupported SoftPC mirror configuration: TEST_HARNESS"
 #endif
+#line 125
 
 int             rtc_int_enabled;
 
@@ -346,23 +320,17 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 		*equip |= CO_PROCESSOR_PRESENT;
 
 #ifdef SLAVEPC
-	if (host_runtime_inquire(C_FLOPPY_SERVER) == GFI_SLAVE_SERVER)
-	{
-		num_flops =
-			(*(CHAR *) config_inquire(C_SLAVEPC_DEVICE, NULL))
-			? 1:0;
-	}
-	else
+#error "Unsupported SoftPC mirror configuration: SLAVEPC"
 #endif /* SLAVEPC */
+#line 357
 	{
 		num_flops  =
 			(*(CHAR *) config_inquire(C_FLOPPY_A_DEVICE, NULL))
 			? 1:0;
 #ifdef FLOPPY_B
-		num_flops +=
-			(*(CHAR *) config_inquire(C_FLOPPY_B_DEVICE, NULL))
-			? 1:0;
+#error "Unsupported SoftPC mirror configuration: FLOPPY_B"
 #endif
+#line 366
 	}
 
 	if (num_flops == 2)
@@ -382,8 +350,18 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 
 GLOBAL void cmos_inb IFN2(io_addr, port, half_word *, value)
 {
+#ifndef NTVDM
+#line 388
 IMPORT ADAPTER_STATE adapter_state[2];
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* !NTVDM */
+#line 394
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 405
 	port = port & CMOS_BIT_MASK;	/* clear unused bits */
 
 	if (port == CMOS_DATA)
@@ -407,10 +385,14 @@ IMPORT ADAPTER_STATE adapter_state[2];
 		}
 		else if (cmos_index < CMOS_REG_A)
 		{
+#ifndef NTVDM
+#line 410
 #ifndef PROD
-			if (host_getenv("TIME_OF_DAY_FRIG") == NULL)
-			{
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
+#line 414
+#endif /* !NTVDM */
+#line 414
 
 				switch (cmos_index)
 				{
@@ -440,19 +422,14 @@ IMPORT ADAPTER_STATE adapter_state[2];
 				default:
 					break;
 				}
+#ifndef NTVDM
+#line 443
 #ifndef PROD
-			} else
-			{
-				static int      first = 1;
-
-				if (first)
-				{
-					first = 0;
-					printf("FRIG ALERT!!!! - cmos clock frozen!");
-				}
-				*cmos_register = 1;
-			}
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
+#line 456
+#endif /* !NTVDM */
+#line 456
 
 			*value = *cmos_register;
 		}
@@ -483,6 +460,10 @@ GLOBAL void cmos_outb IFN2(io_addr, port, half_word, value)
 		500000
 	};
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 486
 
 	port = port & CMOS_BIT_MASK;	/* clear unused bits */
 
@@ -543,8 +524,9 @@ GLOBAL void cmos_outb IFN2(io_addr, port, half_word, value)
 			if (*cmos_register != value)
 			{
 #if defined(NTVDM) || defined(macintosh)
-				cmos_has_changed = TRUE;
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif
+#line 577
 				if ((*cmos_register ^ value) & PIE)
 				{
 					change_pie((value & PIE) != 0);
@@ -564,8 +546,9 @@ GLOBAL void cmos_outb IFN2(io_addr, port, half_word, value)
 					    *cmos_register & 0x70);
 			}
 #if defined(NTVDM) || defined(macintosh)
-			cmos_has_changed = TRUE;
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif
+#line 598
 			break;
 		case CMOS_SECONDS:
 			/* This CMOS byte is read/write except for bit 7 */
@@ -607,8 +590,9 @@ GLOBAL void cmos_outb IFN2(io_addr, port, half_word, value)
 		default:
 			*cmos_register = value;
 #if defined(NTVDM) || defined(macintosh)
-			cmos_has_changed = TRUE;
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif
+#line 641
 			break;
 		}
 	} else
@@ -643,12 +627,20 @@ GLOBAL void rtc_tick IFN0()
 		 */
 		 
 		cmos[CMOS_REG_C] ^= C_UF;
+#ifndef NTVDM
+#line 676
 		cmos[CMOS_REG_A] |= UIP;	/* Set the bit */
+#endif
+#line 647
 		break;
 
 	case 1:
 		cmos[CMOS_REG_C] ^= C_UF;
+#ifndef NTVDM
+#line 683
 		cmos[CMOS_REG_A] &= ~UIP;	/* Clear it again */
+#endif
+#line 652
 		break;
 
 	case 17:
@@ -658,6 +650,10 @@ GLOBAL void rtc_tick IFN0()
 			/* User is updating user_time */
 		} else
 		{
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else /* NTVDM */
+#line 722
 			/* simple update - add 1 second to time */
 			ht->tm_sec++;
 			if (ht->tm_sec == 60)
@@ -676,6 +672,8 @@ GLOBAL void rtc_tick IFN0()
 					}
 				}
 			}
+#endif /* NTVDM */
+#line 679
 		}
 		break;
 
@@ -754,36 +752,19 @@ GLOBAL int cmos_read_byte IFN2(int, cmos_byte, half_word *, value)
 }
 
 #ifdef SEGMENTATION
-/*
- * The following #include specifies the code segment into which this
- * module will by placed by the MPW C compiler on the Mac II running
- * MultiFinder.
- */
-#include "SOFTPC_INIT.seg"
+#error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
+#line 764
 
 #if defined(NTVDM) || defined(macintosh)
-LOCAL void read_cmos IFN0() 
-{
-	filesize = host_read_resource(CMOS_REZ_ID, CMOS_FILE_NAME,
-				      cmos, sizeof(cmos), SILENT);
-
-	/* Set a flag to say we've tried to read the CMOS file */
-	cmos_read_in = TRUE;
-}
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif	/* defined(NTVDM) || defined(macintosh) */
+#line 837
 
 #if defined(NTVDM) || defined(macintosh)
-LOCAL void write_cmos IFN0()
-{
-	/* terminate might be called before reset */
-	if (cmos_read_in && cmos_has_changed)
-	{
-		host_write_resource(CMOS_REZ_ID, CMOS_FILE_NAME,
-				    cmos, sizeof(cmos));
-	}
-}
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif	/* defined(NTVDM) || defined(macintosh) */
+#line 849
 
 LOCAL void cmos_error IFN6(int, err, half_word, diag, half_word, equip,
 	int, equip_err, half_word, floppy, half_word, disk)
@@ -860,9 +841,9 @@ LOCAL void cmos_error IFN6(int, err, half_word, diag, half_word, equip,
 		note_trace0(CMOS_VERBOSE, "bad Checksum - resetting");
 	}
 #ifndef PROD
-	if (!filesize)
-		always_trace1("Incorrect CMOS entries %s", err_string);
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 866
 
 	if (err & BAD_SHUT_DOWN)
 		cmos[CMOS_SHUT_DOWN] = SHUT_INIT;
@@ -902,24 +883,31 @@ GLOBAL void cmos_init IFN0()
 	cmos_io_attach();
 #endif
 
+#ifndef NTVDM
+#line 968
 #ifndef PROD
-	if (host_getenv("TIME_OF_DAY_FRIG") == NULL)
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
+#line 908
+#endif	/* NTVDM */
+#line 972
 		rtc_int_enabled = TRUE;
+#ifndef NTVDM
+#line 974
 #ifndef PROD
-	else
-		rtc_int_enabled = FALSE;
+#error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
+#line 913
+#endif	/* NTVDM */
+#line 979
 
 	rtc_init();
 }
 
 #if defined(NTVDM) || defined(macintosh)
-GLOBAL void cmos_pickup IFN0()
-{
-	read_cmos();
-}
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif	/* defined(NTVDM) || defined(macintosh) */
+#line 989
 
 GLOBAL void cmos_io_attach IFN0()
 {
@@ -1024,25 +1012,26 @@ GLOBAL void cmos_post IFN0()
 	cmos_register = &cmos[cmos_index = CMOS_SHUT_DOWN];
 
 #if defined(NTVDM) || defined(macintosh)
-	cmos_has_changed = FALSE;
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #endif
+#line 1098
 }
 
 GLOBAL void cmos_update IFN0()
 {
 #if defined(NTVDM) || defined(macintosh)
-#ifndef PROD
-	int             i;
-#endif				/* nPROD */
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #else	/* defined(NTVDM) || defined(macintosh) */
+#line 1107
 	ConfigValues *value;
 	char *strPtr;
 	int i;
 #endif	/* defined(NTVDM) || defined(macintosh) */
 
 #if defined(NTVDM) || defined(macintosh)
-	write_cmos();
+#error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"
 #else	/* defined(NTVDM) || defined(macintosh) */
+#line 1115
 	cmos_equip_update();
 	config_get(C_CMOS,&value);
 	strPtr = value->string;
@@ -1054,17 +1043,16 @@ GLOBAL void cmos_update IFN0()
 #endif	/* defined(NTVDM) || defined(macintosh) */
 
 #ifndef PROD
-	if (io_verbose & CMOS_VERBOSE)
-	{
-		for (i = 0; i < 64; i++)
-			fprintf(trace_file, "%02x ", cmos[i]);
-		fprintf(trace_file, "\n");
-		fflush(trace_file);
-	}
+#error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
+#line 1065
 }
 
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1068
 LOCAL void
 sync_rtc_to_host_time IFN1( long, param )
 {
@@ -1097,6 +1085,10 @@ sync_rtc_to_host_time IFN1( long, param )
 
 GLOBAL void  rtc_init IFN0()
 {
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 1100
 
 	/* Set Up the cmos time bytes to be in BCD by default */
 	bin2bcd = yes_bin2bcd;
@@ -1112,6 +1104,8 @@ GLOBAL void  rtc_init IFN0()
 
 	set_alarm();
 }
+#endif	/* NTVDM */
+#line 1115
 
 
 /*(
@@ -1176,32 +1170,9 @@ GLOBAL SHORT ValidateCmos IFN4(
 
 
 #ifdef TEST_HARNESS
-main()
-{
-	int             i;
-	half_word       j;
-
-	cmos_init();
-
-	printf("\n");
-	for (i = 0; i < CMOS_SIZE; i++)
-	{
-		cmos_outb(CMOS_PORT, i);
-		cmos_inb(CMOS_DATA, &j);
-		printf("%c", j);
-	}
-	printf("\n");
-	for (i = 0; i < CMOS_SIZE; i++)
-	{
-		cmos_outb(CMOS_PORT, i);
-		cmos_outb(CMOS_DATA, (i + 0x30));
-		printf("%c", cmos[i]);
-	}
-	printf("\n");
-
-	cmos_update();
-}
+#error "Unsupported SoftPC mirror configuration: TEST_HARNESS"
 #endif				/* TEST_HARNESS */
+#line 1205
 
 GLOBAL int
 softpc_device_snapshot_encode_cmos_callback(callback, callback_id)

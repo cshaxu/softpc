@@ -35,10 +35,9 @@ SIDT CPU Functions.
 GLOBAL VOID
 SIDT16
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* dst (limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 42
    (op1)
    IU32 op1[2];
 #endif
@@ -58,10 +57,9 @@ SIDT16
 GLOBAL VOID
 SIDT32
 #ifdef ANSI
-   (
-   IU32 op1[2]	/* dst (limit:base pair) operand */
-   )
+#error "Unsupported SoftPC mirror configuration: ANSI"
 #else
+#line 65
    (op1)
    IU32 op1[2];
 #endif

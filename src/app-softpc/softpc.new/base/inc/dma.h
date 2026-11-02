@@ -136,22 +136,9 @@ typedef	half_word	DMA_WORD[2];
 
 /* a DMA command */
 #ifdef BIT_ORDER1
-typedef union
-{
-	half_word all;
-	struct
-	{
-		 HALF_WORD_BIT_FIELD DACK_high:1;       /* not supported */
-		 HALF_WORD_BIT_FIELD DREQ_high:1;	/* not supported */
-		 HALF_WORD_BIT_FIELD extended_write:1;  /* not supported */
-		 HALF_WORD_BIT_FIELD rotate_priority:1;	  
-		 HALF_WORD_BIT_FIELD compressed_timing:1;/* not supported */
-		 HALF_WORD_BIT_FIELD controller_disable:1;
-		 HALF_WORD_BIT_FIELD ch0_address_hold:1;/* not supported */
-		 HALF_WORD_BIT_FIELD mm_enable:1;       /* not supported */
-       } bits;
-} DMA_COMMAND;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 155
 #ifdef BIT_ORDER2
 typedef union
 {
@@ -172,19 +159,9 @@ typedef union
 
 /* a DMA mode */
 #ifdef BIT_ORDER1
-typedef union
-{
- 	half_word all;
-	struct
-	{
-		 HALF_WORD_BIT_FIELD mode:2;	    /* single/block/demand/cascade */
-		 HALF_WORD_BIT_FIELD address_dec:1; /* inc or dec count  */
-		 HALF_WORD_BIT_FIELD auto_init:1;   /* autoinitialize ?  */
-		 HALF_WORD_BIT_FIELD transfer_type:2; /* read/write/verify */
-		 HALF_WORD_BIT_FIELD scratch:2;     /* channel select mapped here */
-       } bits;
-} DMA_MODE;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 188
 #ifdef BIT_ORDER2
 typedef union
 {
@@ -200,6 +177,10 @@ typedef union
 } DMA_MODE;
 #endif
 
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 236
 
 /* DMA Mode register mode bit settings */
 #define DMA_DEMAND_MODE		0
@@ -215,16 +196,9 @@ typedef union
 
 /* a DMA status */
 #ifdef BIT_ORDER1
-typedef union
-{
-	half_word all;
-	struct
-	{
-		HALF_WORD_BIT_FIELD request:4;		/* request pending   */
-		HALF_WORD_BIT_FIELD terminal_count:4;	/* terminal count reached */
-	} bits;
-} DMA_STATUS;
+#error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
+#line 228
 #ifdef BIT_ORDER2
 typedef union
 {
@@ -255,6 +229,10 @@ typedef struct
 	DMA_MASK	mask;
 	half_word	request;
 	DMA_FLIP_FLOP	first_last;
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#endif // NEC_98
+#line 294
 } DMA_CNTRL;
 
 /*
@@ -275,7 +253,13 @@ typedef	struct
  */
 
 /* the number of controllers per adaptor */
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 317
 #define	DMA_ADAPTOR_CONTROLLERS	2
+#endif // !NEC_98
+#line 319
 
 /* the numbering convention for the controllers */
 #define	DMA_CONTROLLER	0
@@ -311,6 +295,10 @@ typedef	struct
 
 /* the channel assignments */
 #define	DMA_RESERVED_CHANNEL_0	0
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else  // !NEC_98
+#line 360
 #define	DMA_SDLC_CHANNEL	1
 #define	DMA_DISKETTE_CHANNEL	2
 #define	DMA_DISK_CHANNEL	3
@@ -326,6 +314,8 @@ typedef	struct
 #define DMA_FAKE_CHANNEL_6	13
 #define DMA_FAKE_CHANNEL_7	14
 #define DMA_REFRESH_CHANNEL	15
+#endif  // !NEC_98
+#line 376
 
 /* these masks define the redundant bits of the I/O addresses */
 #define	DMA_REDUNDANT_BITS	0x10
@@ -339,24 +329,9 @@ typedef	struct
  * It is not used within the DMA emulation
  */
 #ifdef BIGEND
-typedef union
-{
-	sys_addr all;
-	half_word array[4];
-	struct
-	{
-		half_word pad;
-		half_word page;
-		half_word high;
-		half_word low;
-	} parts;
-	struct
-	{
-		word high;
-		word low;
-	} words;
-} DMA_ADDRESS;
+#error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
+#line 407
 #ifdef LITTLEND
 typedef union
 {
@@ -515,6 +490,10 @@ IMPORT int dma_request IPT3(half_word, port, char *, hw_buffer, word, length);
  */
 IMPORT VOID dma_enquire IPT3(half_word, channel, sys_addr *, address, word *, length);
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif	/* NTVDM */
+#line 577
 /* T93: XP's existing DMA owner access, now required by the retained DSP. */
 DMA_ADAPT *dmaGetAdaptor(void);
 

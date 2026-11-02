@@ -1,0 +1,4 @@
+path	parent_if_line	baseline_else_line	baseline_next_line	directive	condition	excluded_body_sha256
+base/keymouse/mouse_io.c	1953	1955	1958	ifdef	V7VGA	49383b92e84c45994546a6c1933d26fcaeb6a731a786271a5968406900226930
+base/keymouse/mouse_io.c	1964	1971	1974	ifdef	V7VGA	7d67bfdaf74560a44554e7cca8eebbfa90c56f30231c9701ad0fbbb14602da29
+base/keymouse/mouse_io.c	2353	2382	2385	ifndef	X86GFX	c5953549d7f584bdd22356d25b856e5f20abcff5846f4fbdfd007e148b0fb225

@@ -141,11 +141,9 @@ IFN1(
       new_dest &= WORD_MASK;
 
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
-
-   if ( new_dest > GET_CS_LIMIT() )
-      GP((IU16)0, FAULT_RM_REL_IP_CS_LIMIT);
-
+#error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else	/* TAKE_REAL_MODE_LIMIT_FAULT */
+#line 149
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it
@@ -154,23 +152,9 @@ IFN1(
        */
 
 #ifdef TAKE_PROT_MODE_LIMIT_FAILURE
-
-      /* The Soft486 EDL CPU does not take Protected Mode limit failues
-       * for the instructions with relative offsets, Jxx, LOOPxx, JCXZ,
-       * JMP rel and CALL rel, or instructions with near offsets,
-       * JMP near and CALL near.
-       * Since the Ccpu486 is used as a "reference" cpu we wish it
-       * to behave a C version of the EDL Cpu rather than as a C
-       * version of a i486.
-       */
-
-   if ( GET_PE() == 1 && GET_VM() == 0 )
-      {
-      if ( new_dest > GET_CS_LIMIT() )
-	 GP((IU16)0, FAULT_PM_REL_IP_CS_LIMIT);
-      }
-
+#error "Unsupported SoftPC mirror configuration: TAKE_PROT_MODE_LIMIT_FAILURE"
 #endif /* TAKE_PROT_MODE_LIMIT_FAILURE */
+#line 174
 
 #endif	/* TAKE_REAL_MODE_LIMIT_FAULT */
 

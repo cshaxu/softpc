@@ -1,0 +1,3 @@
+path	xp_if_line	xp_endif_line	baseline_first_line	baseline_after_line	excluded_body_sha256
+base/comms/com.c	2060	2262	1417	1495	65a65e90b4998ce793656c46210e2a4ac76b5235075ab2206a2698aba1cd0631
+base/comms/com.c	2763	2836	1758	1811	3197ded13877a2544e4583d7bb21a29885749dcb9c6a0121cd30a677814d3600
