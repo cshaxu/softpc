@@ -1215,6 +1215,11 @@ already queued. The mouse 3018 selected body has a first-depth `#line 3018` foll
 inserted blank line, so XP source line 3019 already has the correct line.
 The previous proposed 3019 correction was erroneous and has been reverted. See
 `m9-t99-s20-bfs-depth1-unmapped-parent-review.tsv`.
+All 13 parent records omitted by the automated direct-child mapping now have
+boundary classifications in that review. Excluded parents do not enqueue
+children; missing original direct children remain separately queued. The large
+video parent has 27 provisional child candidates, not confirmed absences.
+This resolves these mapping records only, not the full first-depth audit.
 This audit is documentation/evidence only; cross-version root mappings and
 first-depth completeness remain under review.
 After those OR cleanups, cached x86/x64 whole-project builds passed and

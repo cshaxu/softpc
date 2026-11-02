@@ -2,3 +2,13 @@ path	xp_parent	current_parent	xp_child	current_child	result	source_sha256
 base/system/ica.c	1549	1378	1550	1380	selected parent; direct child already queued	d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
 base/keymouse/mouse_io.c	3018	3030	3029	3043	selected parent; direct child already queued; marker 3018 correctly accounts for added blank line before XP 3019	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
 base/keymouse/mouse_io.c	1126	1351	1139,1153	1366,1380	selected parent; both direct children already queued	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/ccpu386/c_main.c	4872	4701	4876		current else is excluded by existing NTVDM-or-TLS parent; no child queued	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8
+base/comms/com.c	741	693	742		selected else; missing XP child already in absent-child queue	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/inc/sas.h	1071	783	1073,1085	786,791	selected else; both direct child groups already queued	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044
+base/keymouse/mouse_io.c	1229	1459	1230		selected parent; missing XP child already in absent-child queue	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/support/ios.c	1054	946	1057,1065		current parent excluded; descendants not queued	057f03035b39188d63967189854c2cdd1976f80a65f4bde45120ac048aec7f20
+base/system/cmos.c	1136	1052	1145		current parent excluded; descendant not queued	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d
+base/system/rom.c	340	293	342		selected else; missing XP child already in absent-child queue	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/video/video.c	115	115	116		selected parent; missing XP child already in absent-child queue	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	670	348	121 XP direct groups	128 current arms	selected parent; 27 unmatched direct child candidates remain provisional	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+host/src/nt_sbdsp.c	2183	677	2218		selected parent; missing XP child already in absent-child queue	5894eb5fef5619829a99e01300e40942b3766916af7463952ee2cbcc83354edf
