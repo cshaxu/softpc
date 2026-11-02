@@ -92,12 +92,13 @@ typedef struct
 	IU32 (*b_read) IPT1(IU32, eaOff);
 	IU32 (*w_read) IPT1(IU32, eaOff);
 
-#ifndef	NO_STRING_OPERATIONS
-	void (*str_read) IPT3(IU8 *, dest, IU32, eaOff, IU32, count);
-#endif	/* NO_STRING_OPERATIONS */
 #else
 #error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && defined(C_VID))"
 #endif
+#line 90
+#ifndef	NO_STRING_OPERATIONS
+	void (*str_read) IPT3(IU8 *, dest, IU32, eaOff, IU32, count);
+#endif	/* NO_STRING_OPERATIONS */
 #line 93
 
 } READ_POINTERS; 

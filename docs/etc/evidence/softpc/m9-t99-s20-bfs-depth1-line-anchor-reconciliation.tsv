@@ -39,8 +39,8 @@ base/inc/floppy.h	190	187	193	191	193	3	#define	2affe5578acc7c74cd9a8052a5d57fbb
 base/inc/floppy.h	434	425	435	435	435	2	#define MAX_FLOPPY	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8
 base/inc/gfx_upd.h	161	139	175	163	176	15	#define host_init_screen()\	2bfa647ff4d85c45f4bb50b4655d28d770b9511802960eeea7f1ca799725040f
 base/inc/gvi.h	220	218	421	221	421	15	#define	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
-base/inc/ica.h	51	48	51	52	51	6	#define CPU_RS232_SEC_INT   	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520
-base/inc/ica.h	84	74	81	86	82	2	#define CPU_AT_NPX_INT	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520
+base/inc/ica.h	51	48	51	52	51	6	#define CPU_RS232_SEC_INT   	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd
+base/inc/ica.h	84	74	81	86	82	2	#define CPU_AT_NPX_INT	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd
 base/inc/mouse.h	25	22	38	26	38	7	#define MOUSE_PORT_0	38d8478fa7de461f6cd5674c982070615d90226be028ba462cad5edf2fc317ca
 base/inc/sas.h	323	323	342	324	342	6	#define BIOS_START_OFFSET	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044
 base/inc/sas.h	336	330	353	337	353	3	#define	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044

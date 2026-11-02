@@ -115,8 +115,8 @@ base/inc/gfx_upd.h	315	ifndef	NEC_98	selected	selected	2bfa647ff4d85c45f4bb50b46
 base/inc/gvi.h	78	else		selected	selected	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
 base/inc/gvi.h	211	else		selected	selected	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
 base/inc/gvi.h	219	else		selected	selected	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
-base/inc/ica.h	120	else		selected	selected	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520
-base/inc/ica.h	190	if	!defined(NTVDM)	selected	selected	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520
+base/inc/ica.h	124	else		selected	selected	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd
+base/inc/ica.h	194	if	!defined(NTVDM)	selected	selected	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd
 base/inc/ios.h	37	else		selected	selected	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
 base/inc/ios.h	485	else		selected	selected	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
 base/inc/mouse.h	24	else		selected	selected	38d8478fa7de461f6cd5674c982070615d90226be028ba462cad5edf2fc317ca
@@ -830,12 +830,12 @@ base/inc/bios.h	379	if	defined(SPC386) && defined(WDCTRL_BOP)	selected	selected	
 base/inc/cga.h	33	ifdef	BIT_ORDER2	selected	selected	de70a4bbe3fd3378ec2c64dc557c93d21c0b45c86851a324c74cb20619882da9
 base/inc/cpu4.h	49	ifdef	CPU_PRIVATE	selected	selected	b674d389fd5f4a2bb3bc6f209ecc467f071a9f4ba4162fecac13d11b520f6a53
 base/inc/cpu4.h	80	else		selected	selected	b674d389fd5f4a2bb3bc6f209ecc467f071a9f4ba4162fecac13d11b520f6a53
-base/inc/cpu_vid.h	32	ifndef	NO_STRING_OPERATIONS	selected	selected	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901
-base/inc/cpu_vid.h	71	ifdef	VGG	selected	selected	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901
-base/inc/cpu_vid.h	79	ifdef	VGG	selected	selected	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901
-base/inc/cpu_vid.h	88	if	defined(CPU_40_STYLE) && defined(C_VID)	selected	selected	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901
-base/inc/cpu_vid.h	114	if	defined(CPU_40_STYLE) && defined(C_VID)	selected	selected	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901
-base/inc/cpu_vid.h	130	ifndef	Cpu_set_vid_wrt_ptrs	selected	selected	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901
+base/inc/cpu_vid.h	32	ifndef	NO_STRING_OPERATIONS	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf
+base/inc/cpu_vid.h	71	ifdef	VGG	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf
+base/inc/cpu_vid.h	79	ifdef	VGG	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf
+base/inc/cpu_vid.h	88	if	defined(CPU_40_STYLE) && defined(C_VID)	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf
+base/inc/cpu_vid.h	115	if	defined(CPU_40_STYLE) && defined(C_VID)	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf
+base/inc/cpu_vid.h	131	ifndef	Cpu_set_vid_wrt_ptrs	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf
 base/inc/debug.h	19	ifdef	PROD	selected	selected	e97e16663bd6c7ecd9568608c7d88070f48f9383cfaf2f3c01a3183e02998ee3
 base/inc/debug.h	29	else		selected	selected	e97e16663bd6c7ecd9568608c7d88070f48f9383cfaf2f3c01a3183e02998ee3
 base/inc/dma.h	142	ifdef	BIT_ORDER2	selected	selected	580e4c4df2c1481fb017235010b80c8d5c0cc928c9afa699f77d247f962add6e
@@ -890,8 +890,8 @@ base/inc/host.h	39	ifndef	host_memset	selected	selected	0ecf84a2436fca0fd5e9a08b
 base/inc/host.h	51	ifndef	REAL_VGA	selected	selected	0ecf84a2436fca0fd5e9a08bc02f74208be0223b73a624bc82e40ce94fe6d0c9
 base/inc/host_lpt.h	1	ifdef	PRINTER	selected	selected	ab575075f1c11522fccd217b2b4b2279da8c70c4602d98237c56878811c748b9
 base/inc/host_sas.h	25	ifndef	BASE_SAS	selected	selected	38b19d98bb839f5548488c22ed3852acf6876421e9effff2b3f98db8ea654377
-base/inc/ica.h	32	ifndef	HOST_CPU_MOUSE_INT	selected	selected	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520
-base/inc/ica.h	90	if	!defined(CPU_30_STYLE) && !defined(CPU_40_STYLE)	selected	selected	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520
+base/inc/ica.h	32	ifndef	HOST_CPU_MOUSE_INT	selected	selected	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd
+base/inc/ica.h	90	ifndef	CPU_30_STYLE	selected	selected	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd
 base/inc/idetect.h	11	ifndef	NTVDM	selected	selected	9d380238a6b77f071a55504cb6f6b4ce22c14e44d1bd3120369fec6c155a5904
 base/inc/idetect.h	29	else		selected	selected	9d380238a6b77f071a55504cb6f6b4ce22c14e44d1bd3120369fec6c155a5904
 base/inc/ios.h	23	if	defined(SOFTPC_STANDALONE) || defined( NTVDM ) || defined ( GISP_SVGA ) || defined ( SFELLOW )	selected	selected	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f
@@ -982,3 +982,4 @@ base/keymouse/mouse_io.c	1351	if	!defined(NTVDM) || (defined(NTVDM) && !defined(
 base/keymouse/mouse_io.c	2895	if	!defined(NTVDM) || (defined(NTVDM) && defined(V7VGA))	selected	selected	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
 host/src/nt_graph.c	1188	else		selected	selected	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
 host/inc/nt_sb.h	109	else		selected	selected	8205351b5e259673f0386280d3eb5d0f5faba7f077fddf83db8811b9c76148ec
+base/inc/cpu_vid.h	99	ifndef	NO_STRING_OPERATIONS	selected	selected	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf

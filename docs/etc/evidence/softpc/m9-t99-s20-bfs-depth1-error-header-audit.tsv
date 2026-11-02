@@ -125,12 +125,12 @@ base/inc/host.h	47	ifdef	SUSPEND	1	1	1	1	0ecf84a2436fca0fd5e9a08bc02f74208be0223
 base/inc/host.h	60	ifdef	SETUID_ROOT	1	1	1	1	0ecf84a2436fca0fd5e9a08bc02f74208be0223b73a624bc82e40ce94fe6d0c9	not-selected-in-all-recorded-contexts
 base/inc/host_sas.h	20	if	defined(BASE_SAS) && defined(HOST_SAS)	57	57	57	57	38b19d98bb839f5548488c22ed3852acf6876421e9effff2b3f98db8ea654377	not-selected-in-all-recorded-contexts
 base/inc/hunter.h	17	ifdef	HUNTER	1	1	1	1	63eb40b4b6c685c878be7d090c00e0f9925de92bbec7517791e00d7dd6bbea23	not-selected-in-all-recorded-contexts
-base/inc/ica.h	48	if	defined(NEC_98)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
-base/inc/ica.h	58	if	defined(NEC_98)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
-base/inc/ica.h	76	if	defined (SWIN_HAW)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
-base/inc/ica.h	81	if	defined (ASPI)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
-base/inc/ica.h	118	if	defined (NTVDM)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
-base/inc/ica.h	220	ifdef	GISP_CPU	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	48	if	defined(NEC_98)	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
+base/inc/ica.h	58	if	defined(NEC_98)	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
+base/inc/ica.h	76	if	defined (SWIN_HAW)	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
+base/inc/ica.h	81	if	defined (ASPI)	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
+base/inc/ica.h	122	if	defined (NTVDM)	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
+base/inc/ica.h	224	ifdef	GISP_CPU	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
 base/inc/idetect.h	27	ifdef	NTVDM	12	12	12	12	9d380238a6b77f071a55504cb6f6b4ce22c14e44d1bd3120369fec6c155a5904	not-selected-in-all-recorded-contexts
 base/inc/j_c_lang.h	42	ifdef	BIGEND	2	2	2	2	604ae70ca3c8720e171301a7211d0966a78da71ab2d5abdd2ad3e685f1ce03f5	not-selected-in-all-recorded-contexts
 base/inc/keyba.h	35	ifdef	HUNTER	4	4	4	4	eae105e1110ce03ce109da7eefb5f5097f2912ac2e25100b885a62258de3b5a6	not-selected-in-all-recorded-contexts
@@ -172,8 +172,8 @@ host/inc/nt_event.h	18	ifdef	YODA	1	1	1	1	1b838ee49e30022453fb9324cd317f98b084b8
 host/inc/nt_event.h	47	ifdef	X86GFX	1	1	1	1	1b838ee49e30022453fb9324cd317f98b084b820bd9d534b6c1c03cc240f0017	not-selected-in-all-recorded-contexts
 host/inc/nt_uis.h	88	ifdef	DBCS	4	4	4	4	9dfb8b2b38f22340bc379ba344e031ac4d7cc2121fadc1f4e9e7d5d141899fe8	not-selected-in-all-recorded-contexts
 host/inc/nt_uis.h	110	ifdef	DBCS	4	4	4	4	9dfb8b2b38f22340bc379ba344e031ac4d7cc2121fadc1f4e9e7d5d141899fe8	not-selected-in-all-recorded-contexts
-base/inc/cpu_vid.h	98	else		15	15	15	15	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901	not-selected-in-all-recorded-contexts
-base/inc/cpu_vid.h	135	ifndef	CPU_40_STYLE	15	15	15	15	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901	not-selected-in-all-recorded-contexts
+base/inc/cpu_vid.h	95	else		15	15	15	15	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf	not-selected-in-all-recorded-contexts
+base/inc/cpu_vid.h	136	ifndef	CPU_40_STYLE	15	15	15	15	7c6c12d8147d873de4dc6ceeaea71e55e8970d6bb9d6945190076ff68cabe7cf	not-selected-in-all-recorded-contexts
 base/inc/egacpu.h	22	ifdef	BIT_ORDER1	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
 base/inc/egacpu.h	91	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
 base/inc/egacpu.h	103	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
@@ -260,6 +260,6 @@ base/inc/bios.h	322	if	defined(SOFTWIN_API) || defined(SWIN_HFX)	35	35	35	35	eb5
 base/inc/cmos.h	335	if	defined(NTVDM) || defined(macintosh)	12	12	12	12	4d3431785b7baf6fc925ef11335c5f613e5913ac24bd50899f1e8723be99a08e	not-selected-in-all-recorded-contexts
 base/inc/egaports.h	76	else		26	26	26	26	f44521f22fa1cb5143cdbe53e96ceda172b38f4ec03c15dd6f169a7c64624c30	not-selected-in-all-recorded-contexts
 base/inc/gendrvr.h	21	if	defined (GEN_DRVR) || defined (CDROM)	1	1	1	1	18ee9e6013b982b6cc3e8932efbfe3f1bde039471f2b0046bf7444f833b6a35a	not-selected-in-all-recorded-contexts
-base/inc/ica.h	71	if	defined (NOVELL) || defined (NOVELL_IPX)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	71	if	defined (NOVELL) || defined (NOVELL_IPX)	32	32	32	32	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	758	if	defined(HOST_MOUSE) || defined(NTVDM)	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 host/inc/nt_sb.h	107	if	DBG	16	16	16	16	8205351b5e259673f0386280d3eb5d0f5faba7f077fddf83db8811b9c76148ec	not-selected-in-all-recorded-contexts

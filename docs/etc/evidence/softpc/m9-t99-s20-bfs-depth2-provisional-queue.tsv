@@ -674,7 +674,6 @@ base/inc/config.h	1	ifndef	_CONFIG_H	include_guard	structural	structural	85	else
 base/inc/config.h	1	ifndef	_CONFIG_H	include_guard	structural	structural	268	if	!defined(NTVDM) && !defined(macintosh)	f4d3a165c0a0d62d2f96e579e92f09d289bcac3228c497e7e4f12b6baf13fb4f	pending-depth2
 base/inc/config.h	1	ifndef	_CONFIG_H	include_guard	structural	structural	392	ifndef	host_expand_environment_vars	f4d3a165c0a0d62d2f96e579e92f09d289bcac3228c497e7e4f12b6baf13fb4f	pending-depth2
 base/inc/config.h	1	ifndef	_CONFIG_H	include_guard	structural	structural	398	ifdef	SWITCHNPX	f4d3a165c0a0d62d2f96e579e92f09d289bcac3228c497e7e4f12b6baf13fb4f	pending-depth2
-base/inc/cpu_vid.h	88	if	defined(CPU_40_STYLE) && defined(C_VID)	selected	selected	selected	95	ifndef	NO_STRING_OPERATIONS	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901	pending-depth2
 base/inc/debug.h	29	else		selected	selected	selected	32	ifdef	HUNTER	e97e16663bd6c7ecd9568608c7d88070f48f9383cfaf2f3c01a3183e02998ee3	pending-depth2
 base/inc/egacpu.h	113	else		selected	selected	selected	115	ifndef	HOST_VGA_GLOBALS	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	pending-depth2
 base/inc/egacpu.h	168	else		selected	selected	selected	170	ifndef	CPU_40_STYLE	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	pending-depth2
@@ -716,12 +715,12 @@ base/inc/host_com.h	1	ifndef	_HOST_COM_H	include_guard	structural	structural	228
 base/inc/host_com.h	1	ifndef	_HOST_COM_H	include_guard	structural	structural	238	ifdef	NTVDM	4e1c45f2cc40bd32302f314f62fde47d264047bc76d15b6e225a54ec7784f2ad	pending-depth2
 base/inc/host_lpt.h	1	ifdef	PRINTER	selected	selected	selected	3	ifndef	_HOST_LPT_H	ab575075f1c11522fccd217b2b4b2279da8c70c4602d98237c56878811c748b9	pending-depth2
 base/inc/host_sas.h	25	ifndef	BASE_SAS	selected	selected	selected	27	ifdef	HOST_SAS	38b19d98bb839f5548488c22ed3852acf6876421e9effff2b3f98db8ea654377	pending-depth2
-base/inc/ica.h	120	else		selected	selected	selected	130	ifdef	HOOKED_IRETS	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	pending-depth2
-base/inc/ica.h	120	else		selected	selected	selected	136	else		5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	pending-depth2
-base/inc/ica.h	120	else		selected	selected	selected	140	ifdef	CPU_40_STYLE	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	pending-depth2
-base/inc/ica.h	120	else		selected	selected	selected	172	ifdef	CPU_40_STYLE	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	pending-depth2
-base/inc/ica.h	190	if	!defined(NTVDM)	selected	selected	selected	192	ifdef	REAL_ICA	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	pending-depth2
-base/inc/ica.h	190	if	!defined(NTVDM)	selected	selected	selected	194	else		5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	pending-depth2
+base/inc/ica.h	124	else		selected	selected	selected	134	ifdef	HOOKED_IRETS	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2
+base/inc/ica.h	124	else		selected	selected	selected	140	else		68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2
+base/inc/ica.h	124	else		selected	selected	selected	144	ifdef	CPU_40_STYLE	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2
+base/inc/ica.h	124	else		selected	selected	selected	176	ifdef	CPU_40_STYLE	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2
+base/inc/ica.h	194	if	!defined(NTVDM)	selected	selected	selected	196	ifdef	REAL_ICA	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2
+base/inc/ica.h	194	if	!defined(NTVDM)	selected	selected	selected	198	else		68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2
 base/inc/ios.h	37	else		selected	selected	selected	47	ifdef	HERC	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f	pending-depth2
 base/inc/ios.h	37	else		selected	selected	selected	84	ifdef	VGG	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f	pending-depth2
 base/inc/ios.h	37	else		selected	selected	selected	300	ifdef	PRINTER	4a873e6143aa5014f1b5df478751b44f75c7ed6244931d9293202501bf9a881f	pending-depth2
@@ -1380,3 +1379,4 @@ host/src/nt_keycd.c	40	else		selected	selected	selected	165	ifdef	JAPAN	4a25e9ae
 host/src/nt_keycd.c	40	else		selected	selected	selected	167	else		4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1	pending-depth2
 host/src/nt_vga.c	166	ifdef	BIGWIN	selected	selected	selected	242	ifdef	BIGEND	d4065213aabc2ae3cce5f10e01c94cbc39d013075779d353d8f5a1a26f5212f9	pending-depth2
 host/src/nt_vga.c	166	ifdef	BIGWIN	selected	selected	selected	246	ifdef	LITTLEND	d4065213aabc2ae3cce5f10e01c94cbc39d013075779d353d8f5a1a26f5212f9	pending-depth2
+base/inc/ica.h	90	ifndef	CPU_30_STYLE	selected	selected	selected	91	ifndef	CPU_40_STYLE	68c16ec811bd53872b36253fd7343bc39ba6a77f0efdabc1bc322bebc43123cd	pending-depth2

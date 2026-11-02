@@ -1170,8 +1170,26 @@ Final x86/x64 builds passed; each width passed all 186 non-native and eight
 serial native tests. EXE SHA-256 values: x86
 `6d4e681a756c61763a3c2d3b682a3eef589d8c900968adae161e1760c314c3bd` and x64
 `1ffe128ccae1aa669a9efa037803bf100b86df06428184b3ef0cf8a4e4361dd6`.
-Commit and push remain pending. Remaining original first-depth adaptations
-and unresolved mappings stay open.
+The 30-marker correction was committed and pushed as `5ff794f8`. During
+retained-arm review, the original `NO_STRING_OPERATIONS` first-depth frame
+in `cpu_vid.h` was moved outside the existing local ABI guard, retaining the
+guard and the structure layout; all 30 actual x86/x64 consumer outputs
+matched before/after. The original `CPU_30_STYLE` outer frame in `ica.h`
+was restored, preserving the existing `CPU_40_STYLE` restriction as a direct
+child; all 64 actual consumer outputs matched. Both original outer
+conditions were observed selected in every respective actual context. The
+provisional depth-2 queue removes the now-first-depth string guard and adds
+ICA's direct `CPU_40_STYLE` child without reviewing its body. Evidence is
+in `m9-t99-s20-bfs-depth1-selected-framework-restorations.tsv`. The current
+first-depth inventory has 2,208 arms: 1,202 excluded, 984 selected and 22
+include guards, with no unclassified or stale selected/guard evidence. The
+1,381-entry provisional direct-child queue exactly matches the current tree.
+Final x86/x64 builds passed; each width passed 186 non-native and eight serial
+native tests. EXE SHA-256: x86
+`84edd752d8923462df563b2333ed8291dfeedb41c43398d620b50134d8bb90ae` and x64
+`7ec56c5321a8e31bcbb03b6a4a451e15a561ea1687c99ed6e75699665b337b77`.
+Delivery remains pending; the six CCPU TLS extensions, IOS capacity
+adaptation and other cross-version mappings remain open.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86
