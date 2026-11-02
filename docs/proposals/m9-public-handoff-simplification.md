@@ -4881,3 +4881,16 @@ arm and verify the next-depth queue contains only eligible children. Resolve
 or explicitly account for each point before that depth's build, publication,
 tests, review, commit and push; do not treat a successful build alone as this
 point-by-point audit.
+
+#### Owner-directed per-depth S allocation
+
+Owner closes T99 S20 after the first-depth mirror reconciliation. Every later
+conditional depth is a separate S task. The owner authorizes automatic
+admission in depth order after the preceding S is built, published, tested,
+committed, pushed and closed.
+The next candidate is depth 2; its provisional queue and known original-child
+candidates are recorded in the [S20 closure](../history/M9-T99-S20-mirror-depth1.md).
+These S tasks remain within T99 and are not global Queue entries. For each
+depth, deliver excluded `#error`/`#line` changes with the required build,
+publication, tests, commit and push before retained-arm audit and queueing
+eligible direct children for the following depth.
