@@ -103,7 +103,7 @@ void diskette_io()
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 309
+#line 540
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

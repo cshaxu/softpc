@@ -115,7 +115,7 @@ HOSTMOUSEFUNCS  *working_mouse_funcs;
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
-#line 114
+#line 116
 
 #if     defined(DELTA) && defined(A2CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
@@ -929,7 +929,7 @@ void reset()
 #else  // NEC_98
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 1001
+#line 1224
 
 
 #ifdef PRINTER

@@ -249,7 +249,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 245
+#line 282
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -492,7 +492,7 @@ void mouse_init IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 496
+#line 582
     }
     host_deinstall_host_mouse();
 }

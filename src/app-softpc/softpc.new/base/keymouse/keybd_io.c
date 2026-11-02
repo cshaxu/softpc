@@ -170,7 +170,7 @@ LOCAL word rcpu_poll_segment = RCPU_POLL_SEGMENT,
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 183
+#line 190
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -550,7 +550,7 @@ LOCAL VOID INT15 IFN0()
 #else	/* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 567
+#line 671
 
 #ifndef NTVDM
 #line 673

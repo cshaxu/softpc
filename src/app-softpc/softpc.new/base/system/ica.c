@@ -196,7 +196,7 @@ void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 192
+#line 194
 
 /*
  * ============================================================================
@@ -723,7 +723,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */		
-#line 712
+#line 809
 	    }
 	    else
 	    {
@@ -731,7 +731,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */		
-#line 719
+#line 816
 	    }
 	else
 	{
@@ -739,7 +739,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* nPROD */	
-#line 726
+#line 823
 	}
 
 #ifndef PROD
@@ -1000,7 +1000,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 988
+#line 1101
 	}
 	else
 	{
@@ -1032,7 +1032,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1018
+#line 1135
 	}
 	else
 	{
@@ -1148,7 +1148,7 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1173
+#line 1320
 
     /*
      * Check the lock flag. If it is set, then this routine is being called

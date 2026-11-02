@@ -456,7 +456,7 @@ IMPORT void     io_define_in_routines
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 489
+#line 780
 );
 
 IMPORT void     io_define_outb
@@ -464,7 +464,7 @@ IMPORT void     io_define_outb
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 497
+#line 788
 );
 
 #ifdef SFELLOW
@@ -477,7 +477,7 @@ IMPORT void     io_define_out_routines
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 528
+#line 819
 );
 
 #ifdef NTVDM

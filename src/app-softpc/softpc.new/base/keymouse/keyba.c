@@ -233,7 +233,7 @@ static int buff_6805_in_ptr,buff_6805_out_ptr;
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 208
+#line 298
 
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
@@ -767,7 +767,7 @@ LOCAL VOID clear_buff_6805 IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 892
+#line 1114
 }
 
 #ifdef NTVDM
@@ -1705,7 +1705,7 @@ if (waiting_for_next_code)
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_KBD"
 #endif
-#line 1786
+#line 2341
 
 #ifndef REAL_KBD
 if (scanning_discontinued && !waiting_for_next_code)
@@ -2679,7 +2679,7 @@ GLOBAL VOID AT_kbd_init IFN0()
 #else	/* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 2742
+#line 3601
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: defined(NEC_98)"

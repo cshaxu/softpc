@@ -1146,8 +1146,18 @@ each width passed all 186 non-native and eight serial native tests. Final
 EXE SHA-256 values: x86
 `20e520fef8ede23cd2bd7166f6f1929330eb53f3a134f32412834b023661e0b6` and x64
 `021e257daeae6ca6db1716f90131562bf1600638bba9397f60b6ca8c64dae99f`.
-Actual production diff is 64 `#line` replacements only; commit and push of
-this batch remain pending.
+Actual production diff was 64 `#line` replacements only; the batch was
+committed and pushed as `d49c6729`. Further first-depth review required exact
+correspondence between the original condition group, its `else` or `endif`,
+and the adjacent retained code or direct condition. This identified 66
+additional markers in 25 files, with 152/152 affected x86/x64 `-E -P`
+outputs unchanged. The current production diff contains only those marker
+replacements. Final x86/x64 builds passed; each architecture passed 186
+non-native and eight serial native tests. Final EXE SHA-256 values: x86
+`b056ddbfb1858dbddef3aa2702c6fd2936bc087f0b3a1c197da430b83a5a4623` and x64
+`e020e5a0f1d23e0336dcd278b1180a3f7b30b888d59b94c3f49af7474620af61`.
+Commit and push remain pending; unmatched cases and the first-depth
+retained-arm audit remain open.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86

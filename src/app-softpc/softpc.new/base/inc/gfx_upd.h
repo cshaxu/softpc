@@ -138,7 +138,7 @@ typedef struct
 #ifdef GISP_SVGA 
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
-#line 123
+#line 150
 #ifdef EGG
 	void (*set_paint) IPT2(DISPLAY_MODE,arg1, int,arg2);
 	void (*change_plane_mask) IPT1(int,arg1);
@@ -193,7 +193,7 @@ extern VIDEOFUNCS *working_video_funcs;
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
-#line 174
+#line 210
 #ifdef EGG
 #define host_set_paint_routine(mode,ht)\
 	(working_video_funcs->set_paint)(mode,ht)

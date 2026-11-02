@@ -160,7 +160,7 @@ void	recalc_screen_params IFN0()
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 165
+#line 169
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

@@ -22,7 +22,7 @@ base/inc/rs232.h	1	_RS232_H	286	include_guard	structural	structural	f95014a600d8
 base/inc/suplib.h	19	_SUPLIB_H	72	include_guard	structural	structural	d7c0e55a6b5a8b2da2d9253532b2363246e297205eba7681cd1e3b87d7484c0d	boundary-verified
 base/inc/trace.h	1	_TRACE_H	142	include_guard	structural	structural	ed9e97faeed4fcc033b0a2a9eddc8a408e5ff21a1cb7a703745939707725b308	boundary-verified
 base/inc/xt.h	1	_XT_H	144	include_guard	structural	structural	6aae9c56ff5bd989d1d273af05a64ddd2b42b7f29a3018a59abcb375acc976f8	boundary-verified
-base/keymouse/keyba.c	100	KBD_CONT_DELAY	102	default_macro	selected	selected	4006ef2b941b10cd447ce2a9b562fec9af18d15324fce539203c22c71d0a34f9	actual-contexts-probed
+base/keymouse/keyba.c	100	KBD_CONT_DELAY	102	default_macro	selected	selected	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	actual-contexts-probed
 base/system/rom.c	85	ADAPTOR_ROM_START	87	default_macro	selected	selected	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	actual-contexts-probed
 base/system/rom.c	89	ADAPTOR_ROM_END	91	default_macro	selected	selected	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	actual-contexts-probed
 base/system/rom.c	95	EXPANSION_ROM_START	97	default_macro	selected	selected	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	actual-contexts-probed

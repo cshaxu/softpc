@@ -158,7 +158,7 @@ LOCAL void io_empty_inb IFN2(io_addr, io_address, half_word *, value)
 #else
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 166
+#line 180
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -184,7 +184,7 @@ LOCAL void io_empty_outb IFN2(io_addr, io_address, half_word, value)
 #else
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 192
+#line 232
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -443,7 +443,7 @@ GLOBAL void	inb IFN2(io_addr, io_address, half_word *, value)
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 439
+#line 526
 
 #ifdef VIRTUALISATION
 
@@ -522,7 +522,7 @@ GLOBAL void	inw IFN2(io_addr, io_address, word *, value)
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 517
+#line 604
 
 #ifdef VIRTUALISATION
 
@@ -930,7 +930,7 @@ GLOBAL void	io_init IFN0()
 #ifdef	MAC68K
 #error "Unsupported SoftPC mirror configuration: legacy Mac"
 #endif	/* MAC68K */
-#line 917
+#line 1032
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"

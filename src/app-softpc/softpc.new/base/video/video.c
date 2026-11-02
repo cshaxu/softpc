@@ -2764,7 +2764,7 @@ GLOBAL void video_init IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // !NEC_98
-#line 2718
+#line 4907
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98

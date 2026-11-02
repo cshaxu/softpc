@@ -139,7 +139,7 @@ extern void host_simulate();
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 135
+#line 193
 
 /*
  *	Definition of the diskette operation function jump table

@@ -122,7 +122,7 @@ BOOL            FunnyPaintMode;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 129
+#line 124
 
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
@@ -2253,7 +2253,7 @@ void graphicsResize(void)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 1985
+#line 2678
 
         /*
          * Make it the current screen buffer, which resizes the window

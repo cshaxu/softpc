@@ -462,7 +462,7 @@ void disk_io IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 642
+#line 933
 
 #ifndef NEC_98
 #line 935

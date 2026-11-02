@@ -72,7 +72,7 @@
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 77
+#line 76
 
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
@@ -627,7 +627,7 @@ void SWTMR_gate IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 552
+#line 644
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -691,7 +691,7 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 601
+#line 705
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
@@ -726,7 +726,7 @@ void SWTMR_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 627
+#line 744
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -1319,7 +1319,7 @@ LOCAL void outputWaveForm IFN5(unsigned int, delay, unsigned long, lowclocks,
 #ifdef DOCUMENTATION
 #error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif /* DOCUMENTATION */
-#line 1164
+#line 1361
 }
 
 /* time stamp the counter unit ... it is counting from this time
@@ -1860,13 +1860,13 @@ LOCAL void updateCounter IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1671
+#line 1923
 
                 }
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 1678
+#line 1930
                 return;
         }
 }
@@ -1961,7 +1961,7 @@ LOCAL void timer_generate_int IFN1(long, n)
 #else   /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1779
+#line 2194
 
 
 #ifndef NTVDM
@@ -2021,7 +2021,7 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 1834
+#line 2251
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"

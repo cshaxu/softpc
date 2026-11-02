@@ -2096,7 +2096,7 @@ void com1_flush_printer IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2184
+#line 3438
 }
 
 void com2_flush_printer IFN0()
@@ -2111,14 +2111,14 @@ void com2_flush_printer IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2191
+#line 3451
 }
 
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 2202
+#line 3462
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -2228,7 +2228,7 @@ static void com_reset IFN1(int, adapter)
 #ifndef COM4_ADAPTOR
 #error "Unsupported SoftPC mirror configuration: !COM4_ADAPTOR"
 #endif
-#line 2312
+#line 3649
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -2313,7 +2313,7 @@ void com_close IFN1(int, adapter)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2371
+#line 3839
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
@@ -2325,7 +2325,7 @@ void com_close IFN1(int, adapter)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2380
+#line 3851
 }
 
 #ifdef NTVDM

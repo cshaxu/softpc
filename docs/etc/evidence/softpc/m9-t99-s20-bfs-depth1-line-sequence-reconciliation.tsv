@@ -3,54 +3,54 @@ host/src/nt_cga.c	139	213	212	141	213	20	}		2f58d0b07ce57beca7b2fdf5609aacc52822
 host/src/nt_cga.c	532	631	741	533	741	9	}		2f58d0b07ce57beca7b2fdf5609aacc5282202289da3a0e4426010ab0100ec50
 host/src/nt_cga.c	545	735	845	546	845	20	}		2f58d0b07ce57beca7b2fdf5609aacc5282202289da3a0e4426010ab0100ec50
 host/src/nt_cga.c	635	898	1008	636	1008	9	}		2f58d0b07ce57beca7b2fdf5609aacc5282202289da3a0e4426010ab0100ec50
-host/src/nt_graph.c	138	117	148	139	148	10	nt_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	159	134	179	160	179	10	nt_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	180	151	210	181	210	10	nt_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	201	168	241	202	241	10	nt_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	222	185	272	223	272	10	nt_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	243	202	303	244	303	10	nt_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	269	220	389	270	389	12	nt_init_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	285	232	415	286	415	10	nt_init_text,		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	575	498	729	576	729	6	}		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	807	681	969	808	969	12	}		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	823	693	984	824	984	20	(void)(*update_alg.calc_update)();		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	2101	1859	2527	2102	2527	18	}		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	2429	2149	2863	2430	2863	5	}		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-host/src/nt_graph.c	2438	2157	2871	2439	2871	12	}		7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
+host/src/nt_graph.c	138	117	148	139	148	10	nt_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	159	134	179	160	179	10	nt_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	180	151	210	181	210	10	nt_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	201	168	241	202	241	10	nt_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	222	185	272	223	272	10	nt_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	243	202	303	244	303	10	nt_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	269	220	389	270	389	12	nt_init_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	285	232	415	286	415	10	nt_init_text,		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	575	498	729	576	729	6	}		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	807	681	969	808	969	12	}		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	823	693	984	824	984	20	(void)(*update_alg.calc_update)();		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	2101	1859	2527	2102	2527	18	}		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	2429	2149	2863	2430	2863	5	}		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
+host/src/nt_graph.c	2438	2157	2871	2439	2871	12	}		41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11
 host/src/nt_keycd.c	41	34	311	42	311	20	BYTE Scan1ToKeynum[] =		767161eba16ea3a0bc743cb23a22464d87c49a62cf01de1a279e44822a316d85
-base/bios/reset.c	182	168	327	183	327	20	IUH count;		4442534e30fdfd43518ad29d1f4e6ffd08897b3d4ac66d011112edd9ff1a8b13
-base/bios/reset.c	352	361	521	353	521	20	default:		4442534e30fdfd43518ad29d1f4e6ffd08897b3d4ac66d011112edd9ff1a8b13
-base/bios/reset.c	996	1080	1313	997	1313	20	}		4442534e30fdfd43518ad29d1f4e6ffd08897b3d4ac66d011112edd9ff1a8b13
+base/bios/reset.c	182	168	327	183	327	20	IUH count;		9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa
+base/bios/reset.c	352	361	521	353	521	20	default:		9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa
+base/bios/reset.c	996	1080	1313	997	1313	20	}		9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa
 base/bios/tape_io.c	207	191	319	208	319	4	break;		57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364
 base/bios/tape_io.c	272	256	384	273	384	5	break;		57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364
-base/ccpu386/c_intr.c	261	270	266	262	266	20	spush(flags);		34c3584a88b3e8046316dc6505064b9ebef8c5e7704637f31268185ae501a5bf
-base/ccpu386/c_intr.c	332	342	338	333	338	20	spush(flags);		34c3584a88b3e8046316dc6505064b9ebef8c5e7704637f31268185ae501a5bf
-base/ccpu386/c_intr.c	454	465	461	455	461	20	spush(flags);		34c3584a88b3e8046316dc6505064b9ebef8c5e7704637f31268185ae501a5bf
-base/ccpu386/c_main.c	228	231	212	231	214	7	#define CPU_HW_INT_MASK         (1 << 0)		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	310	330	305	312	306	4	#define		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	807	887	807	809	808	20	QUICK_EVENT_TICK();		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	1395	1486	1406	1396	1406	20	modRM = GET_INST_BYTE(p);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	1468	1558	1478	1469	1478	20	TYPE0FAB:		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2126	2282	2202	2127	2202	20	PIG_SYNCH(CHECK_SOME_MEM);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2168	2323	2243	2169	2243	20	PIG_SYNCH(CHECK_SOME_MEM);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2192	2346	2266	2193	2266	20	PIG_SYNCH(CHECK_ALL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2234	2387	2307	2235	2307	10	PIG_SYNCH(CHECK_ALL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2248	2442	2362	2249	2362	3	(*inst32)(ops[0].sng);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2255	2467	2387	2256	2387	20	break;		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	2703	2927	2847	2705	2848	20	quick_mode = FALSE;		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3176	3404	3324	3177	3324	5	UPDATE_INTEL_IP(p);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3517	3761	3680	3519	3681	20	modRM = GET_INST_BYTE(p);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3543	3805	3724	3544	3724	20	break;		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3572	3833	3752	3573	3752	14	PIG_SYNCH(CHECK_NO_AL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3603	3862	3781	3604	3781	13	PIG_SYNCH(CHECK_NO_EAX);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3647	3913	3832	3648	3832	20	PIG_SYNCH(CHECK_ALL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3696	3961	3880	3697	3880	14	PIG_SYNCH(CHECK_NO_AL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3727	3990	3909	3728	3909	13	PIG_SYNCH(CHECK_NO_EAX);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3744	4006	3925	3745	3925	20	PIG_SYNCH(CHECK_ALL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	3771	4032	3951	3772	3951	20	PIG_SYNCH(CHECK_ALL);		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	4329	4652	4498	4332	4500	20	SET_OPERAND_SIZE(GET_CS_AR_X());		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	4362	4684	4530	4363	4530	20	)		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
-base/ccpu386/c_main.c	4710	5088	4922	4716	4927	14	GLOBAL VOID		b336eae14ed22e8735a0fe7ffddb5a7c1d3f8b1c0ff0a6e8a0e10aefd168afbf
+base/ccpu386/c_intr.c	261	270	266	262	266	20	spush(flags);		f36c099371bff1b8dc1bc115ec42a5178284c68bb69ec710616166aa37c3cbe3
+base/ccpu386/c_intr.c	332	342	338	333	338	20	spush(flags);		f36c099371bff1b8dc1bc115ec42a5178284c68bb69ec710616166aa37c3cbe3
+base/ccpu386/c_intr.c	454	465	461	455	461	20	spush(flags);		f36c099371bff1b8dc1bc115ec42a5178284c68bb69ec710616166aa37c3cbe3
+base/ccpu386/c_main.c	228	231	212	231	214	7	#define CPU_HW_INT_MASK         (1 << 0)		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	310	330	305	312	306	4	#define		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	807	887	807	809	808	20	QUICK_EVENT_TICK();		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	1395	1486	1406	1396	1406	20	modRM = GET_INST_BYTE(p);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	1468	1558	1478	1469	1478	20	TYPE0FAB:		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2126	2282	2202	2127	2202	20	PIG_SYNCH(CHECK_SOME_MEM);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2168	2323	2243	2169	2243	20	PIG_SYNCH(CHECK_SOME_MEM);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2192	2346	2266	2193	2266	20	PIG_SYNCH(CHECK_ALL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2234	2387	2307	2235	2307	10	PIG_SYNCH(CHECK_ALL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2248	2442	2362	2249	2362	3	(*inst32)(ops[0].sng);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2255	2467	2387	2256	2387	20	break;		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	2703	2927	2847	2705	2848	20	quick_mode = FALSE;		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3176	3404	3324	3177	3324	5	UPDATE_INTEL_IP(p);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3517	3761	3680	3519	3681	20	modRM = GET_INST_BYTE(p);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3543	3805	3724	3544	3724	20	break;		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3572	3833	3752	3573	3752	14	PIG_SYNCH(CHECK_NO_AL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3603	3862	3781	3604	3781	13	PIG_SYNCH(CHECK_NO_EAX);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3647	3913	3832	3648	3832	20	PIG_SYNCH(CHECK_ALL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3696	3961	3880	3697	3880	14	PIG_SYNCH(CHECK_NO_AL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3727	3990	3909	3728	3909	13	PIG_SYNCH(CHECK_NO_EAX);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3744	4006	3925	3745	3925	20	PIG_SYNCH(CHECK_ALL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	3771	4032	3951	3772	3951	20	PIG_SYNCH(CHECK_ALL);		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	4329	4652	4498	4332	4500	20	SET_OPERAND_SIZE(GET_CS_AR_X());		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	4362	4684	4530	4363	4530	20	)		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
+base/ccpu386/c_main.c	4710	5088	4922	4716	4927	14	GLOBAL VOID		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005
 base/ccpu386/c_page.c	73	75	74	76	76	20	=====================================================================		57595631aaa63bd0eaa29d62919f0f66720a3fedc8815a4f7ecdf258f1389db4
 base/ccpu386/c_reg.c	1205	1254	1252	1207	1253	20	GLOBAL IU16		de609017449c71feabd7b20ff6569d8fb99f07dc3ba48eef69faf30d33609081
 base/ccpu386/c_reg.c	1374	1432	1430	1381	1436	20	GLOBAL ISM32		de609017449c71feabd7b20ff6569d8fb99f07dc3ba48eef69faf30d33609081
@@ -61,92 +61,92 @@ base/ccpu386/c_tlb.c	558	610	540	559	540	20	}		78831f2f29080b0b3a42f96ddd1688bd9
 base/ccpu386/c_tlb.c	828	879	809	829	809	5	}		78831f2f29080b0b3a42f96ddd1688bd9a61ac5dbf34252906b95ec7ebaa5498
 base/ccpu386/c_tlb.c	837	890	820	838	820	20	}		78831f2f29080b0b3a42f96ddd1688bd9a61ac5dbf34252906b95ec7ebaa5498
 base/ccpu386/fpu.c	467	488	486	468	486	20	LOCAL FPU_I64 BCDLowNibble[] = {		7f947396331f2a1215556141521dc55e69d83d1607910fae0db4a6d8e19b164b
-base/comms/com.c	95	80	127	96	127	11	static struct ADAPTER_STATE		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	183	151	220	200	236	20	unsigned long RX_delay[] =		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	588	528	612	589	612	10	static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	712	620	1095	713	1095	7	void com_inb IFN2(io_addr, port, half_word *, value)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	1312	1505	2340	1313	2340	13	static void modem_change IFN1(int, adapter)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	1445	1632	2485	1446	2485	17	static void set_recv_char_status IFN1(struct ADAPTER_STATE *, asp)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	1474	1655	2514	1475	2514	3	asp->line_status_reg.bits.tx_holding_empty = 1;		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	1795	1883	3098	1796	3098	20	static void set_dtr IFN1(int, adapter)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	1861	1943	3188	1862	3188	20	static void set_rts IFN1(int, adapter)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
-base/comms/com.c	2126	2203	3526	2127	3526	20	static void com_reset IFN1(int, adapter)		487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
+base/comms/com.c	95	80	127	96	127	11	static struct ADAPTER_STATE		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	183	151	220	200	236	20	unsigned long RX_delay[] =		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	588	528	612	589	612	10	static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	712	620	1095	713	1095	7	void com_inb IFN2(io_addr, port, half_word *, value)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	1312	1505	2340	1313	2340	13	static void modem_change IFN1(int, adapter)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	1445	1632	2485	1446	2485	17	static void set_recv_char_status IFN1(struct ADAPTER_STATE *, asp)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	1474	1655	2514	1475	2514	3	asp->line_status_reg.bits.tx_holding_empty = 1;		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	1795	1883	3098	1796	3098	20	static void set_dtr IFN1(int, adapter)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	1861	1943	3188	1862	3188	20	static void set_rts IFN1(int, adapter)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
+base/comms/com.c	2126	2203	3526	2127	3526	20	static void com_reset IFN1(int, adapter)		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962
 base/comms/rs232_io.c	62	60	63	63	63	4	inb((io_addr)(port + RS232_LSR), (IU8 *)&value);		4655f5b7e8fbe538b3145f924db10c969457140e72207f8db4dd2e57178a0850
-base/disks/diskbios.c	229	214	383	230	383	3	UTINY diag;		2d28b0f3c2d33d20613da1870be087e5635aaaac79b61ba57091901deb9a3722
-base/disks/diskbios.c	479	648	993	481	994	8	com.drive = getDL () & 0x7f;		2d28b0f3c2d33d20613da1870be087e5635aaaac79b61ba57091901deb9a3722
-base/disks/diskbios.c	614	758	1245	615	1245	20	long offset;		2d28b0f3c2d33d20613da1870be087e5635aaaac79b61ba57091901deb9a3722
-base/disks/diskbios.c	663	801	1389	664	1389	20	long offset;		2d28b0f3c2d33d20613da1870be087e5635aaaac79b61ba57091901deb9a3722
-base/disks/fdisk.c	1487	1504	1503	1488	1503	13	break;		cd85d8af178ffc7b97fd77c5911d4e5048758887604b809b0dd092d47c49d512
-base/disks/fdisk.c	1637	1664	1665	1639	1666	13	break;		cd85d8af178ffc7b97fd77c5911d4e5048758887604b809b0dd092d47c49d512
+base/disks/diskbios.c	229	214	383	230	383	3	UTINY diag;		fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37
+base/disks/diskbios.c	479	648	993	481	994	8	com.drive = getDL () & 0x7f;		fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37
+base/disks/diskbios.c	614	758	1245	615	1245	20	long offset;		fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37
+base/disks/diskbios.c	663	801	1389	664	1389	20	long offset;		fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37
+base/disks/fdisk.c	1487	1504	1503	1488	1503	13	break;		f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
+base/disks/fdisk.c	1637	1664	1665	1639	1666	13	break;		f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb
 base/disks/fla.c	840	843	823	848	830	20	static void fla_atomicxqt IFN0()		27c4cd723ab1351bd13dbf79f522b14149f257b779feae75cd25970ddae87504
-base/disks/floppy.c	151	140	228	152	228	20	void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	395	365	949	410	963	20	half_word motor_status;		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	441	405	1434	456	1448	20	half_word motor_status;		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	487	445	1916	501	1929	20	half_word motor_status;		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	547	499	2248	561	2261	20	FDC_CMD_BLOCK fdc_cmd_block[MAX_COMMAND_LEN];		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	729	669	2432	730	2432	2	if (    (equip_flag.bits.diskette_present == 1)		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	923	865	2629	925	2630	20	}		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	3002	2887	4789	3008	4794	4	sas_load(SEEK_STATUS, &seek_status);		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy.c	3015	2912	4814	3017	4815	15	sas_load(FLOPPY_STATUS, &diskette_status);		a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
-base/disks/floppy_i.c	89	294	524	98	532	2	half_word diskette_status;		e52e8bdcfc81d531bc36172a0c7c9fa251397452e2e3212ddd967dcdfdf5c237
-base/inc/gfx_upd.h	71	60	83	72	83	20	EGA_HI_SP,		4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f
+base/disks/floppy.c	151	140	228	152	228	20	void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	395	365	949	410	963	20	half_word motor_status;		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	441	405	1434	456	1448	20	half_word motor_status;		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	487	445	1916	501	1929	20	half_word motor_status;		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	547	499	2248	561	2261	20	FDC_CMD_BLOCK fdc_cmd_block[MAX_COMMAND_LEN];		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	729	669	2432	730	2432	2	if (    (equip_flag.bits.diskette_present == 1)		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	923	865	2629	925	2630	20	}		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	3002	2887	4789	3008	4794	4	sas_load(SEEK_STATUS, &seek_status);		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy.c	3015	2912	4814	3017	4815	15	sas_load(FLOPPY_STATUS, &diskette_status);		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9
+base/disks/floppy_i.c	89	294	524	98	532	2	half_word diskette_status;		6ade53112101a3c4ba85f39148322d4fc8103d0dc84d0ca8db894bd6a32ce22d
+base/inc/gfx_upd.h	71	60	83	72	83	20	EGA_HI_SP,		2bfa647ff4d85c45f4bb50b4655d28d770b9511802960eeea7f1ca799725040f
 base/inc/gmi.h	74	90	76	75	76	7	#define gmi_redefine_mem(type,handlers) \		95fe47bda7aaca69d3ae0c14c327bfde7a0c7a463121cdd7d22fa35d290a8b1d
 base/inc/gvi.h	126	141	208	127	208	3	unsigned        low_byte        : 8,		f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
 base/inc/gvi.h	147	164	231	148	231	4	unsigned        low_byte        : 8,		f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0
 base/inc/sas.h	372	360	388	373	388	16	#define VIDEO_IO_RE_ENTRY		554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044
 base/inc/sas.h	463	446	478	466	480	14	#define EGA_CGMN_OFF		554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044
-base/keymouse/keyba.c	241	215	305	244	307	17	20.5.92 MG		4006ef2b941b10cd447ce2a9b562fec9af18d15324fce539203c22c71d0a34f9
-base/keymouse/keyba.c	1837	1900	2645	1838	2645	20	if (waiting_for_next_8042_code)		4006ef2b941b10cd447ce2a9b562fec9af18d15324fce539203c22c71d0a34f9
-base/keymouse/keyba.c	2360	2422	3130	2361	3130	7	port &= 0x64;		4006ef2b941b10cd447ce2a9b562fec9af18d15324fce539203c22c71d0a34f9
-base/keymouse/keyba.c	2460	2506	3258	2461	3258	18	port &= 0x64;		4006ef2b941b10cd447ce2a9b562fec9af18d15324fce539203c22c71d0a34f9
-base/keymouse/keybd_io.c	644	636	795	645	795	20	}		fc276142f25679b182f4b9185074ada6cd8062c925751b7f7ebb51317b2b92ae
-base/keymouse/keybd_io.c	676	663	825	678	826	11	setCS(rcpu_nop_segment);		fc276142f25679b182f4b9185074ada6cd8062c925751b7f7ebb51317b2b92ae
-base/keymouse/keybd_io.c	949	903	1107	950	1107	20	}		fc276142f25679b182f4b9185074ada6cd8062c925751b7f7ebb51317b2b92ae
-base/keymouse/keybd_io.c	1035	983	1191	1036	1191	20	exit_from_kbd_int();return;		fc276142f25679b182f4b9185074ada6cd8062c925751b7f7ebb51317b2b92ae
-base/keymouse/mouse.c	88	86	96	89	96	8	static half_word		119ae7012698b7cf2de1e8c7d7412ced567ae8e90c3ded41cf789f9c0a920db8
-base/keymouse/mouse_io.c	880	882	957	882	958	9	cursor_EM_disabled = FALSE;		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/keymouse/mouse_io.c	1293	1339	1065	1297	1068	10	save_area_in_use = FALSE;		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/keymouse/mouse_io.c	1310	1352	1084	1311	1084	5	sas_loadw (int_addr(MOUSE_VEC) + 0, &saved_int0A_offset);		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/keymouse/mouse_io.c	2771	2734	2764	2772	2764	14	{		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/keymouse/mouse_io.c	3249	3176	3264	3254	3268	20	cursor_update();		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/keymouse/mouse_io.c	3292	3215	3313	3298	3318	20	cursor_update();		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/keymouse/mouse_io.c	3691	3626	3724	3692	3724	4	{		57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
-base/support/ios.c	166	198	199	169	201	13	}		2c6e28f3a98e388f63271588192e60c5793bd3f8d211a0ad38ecf7c3839a44b0
-base/support/ios.c	192	193	245	193	245	19	}		2c6e28f3a98e388f63271588192e60c5793bd3f8d211a0ad38ecf7c3839a44b0
-base/support/ios.c	220	221	273	221	273	20	}		2c6e28f3a98e388f63271588192e60c5793bd3f8d211a0ad38ecf7c3839a44b0
+base/keymouse/keyba.c	241	215	305	244	307	17	20.5.92 MG		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf
+base/keymouse/keyba.c	1837	1900	2645	1838	2645	20	if (waiting_for_next_8042_code)		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf
+base/keymouse/keyba.c	2360	2422	3130	2361	3130	7	port &= 0x64;		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf
+base/keymouse/keyba.c	2460	2506	3258	2461	3258	18	port &= 0x64;		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf
+base/keymouse/keybd_io.c	644	636	795	645	795	20	}		de43f64d3977d5057b3d98baf88b32f139fbf7d21f5e37f6c98637a316d7638b
+base/keymouse/keybd_io.c	676	663	825	678	826	11	setCS(rcpu_nop_segment);		de43f64d3977d5057b3d98baf88b32f139fbf7d21f5e37f6c98637a316d7638b
+base/keymouse/keybd_io.c	949	903	1107	950	1107	20	}		de43f64d3977d5057b3d98baf88b32f139fbf7d21f5e37f6c98637a316d7638b
+base/keymouse/keybd_io.c	1035	983	1191	1036	1191	20	exit_from_kbd_int();return;		de43f64d3977d5057b3d98baf88b32f139fbf7d21f5e37f6c98637a316d7638b
+base/keymouse/mouse.c	88	86	96	89	96	8	static half_word		c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424
+base/keymouse/mouse_io.c	880	882	957	882	958	9	cursor_EM_disabled = FALSE;		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1293	1339	1065	1297	1068	10	save_area_in_use = FALSE;		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	1310	1352	1084	1311	1084	5	sas_loadw (int_addr(MOUSE_VEC) + 0, &saved_int0A_offset);		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	2771	2734	2764	2772	2764	14	{		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3249	3176	3264	3254	3268	20	cursor_update();		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3292	3215	3313	3298	3318	20	cursor_update();		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3691	3626	3724	3692	3724	4	{		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/support/ios.c	166	198	199	169	201	13	}		057f03035b39188d63967189854c2cdd1976f80a65f4bde45120ac048aec7f20
+base/support/ios.c	192	193	245	193	245	19	}		057f03035b39188d63967189854c2cdd1976f80a65f4bde45120ac048aec7f20
+base/support/ios.c	220	221	273	221	273	20	}		057f03035b39188d63967189854c2cdd1976f80a65f4bde45120ac048aec7f20
 base/system/at_dma.c	585	467	569	586	569	20	case    DMA_CH1_PAGE_REG:		6604880f15cf50a2e7ddaa1eea8c0a3175af7f07f731153faf023d660e6a6032
-base/system/cmos.c	325	357	359	326	359	4	{		54919f022a670549b1b002f8fc609c68311447d5330c24242a11f9a1de6ad117
-base/system/cmos.c	333	366	368	334	368	19	}		54919f022a670549b1b002f8fc609c68311447d5330c24242a11f9a1de6ad117
-base/system/cmos.c	466	486	515	468	516	20	port = port & CMOS_BIT_MASK;		54919f022a670549b1b002f8fc609c68311447d5330c24242a11f9a1de6ad117
-base/system/cmos.c	846	866	928	848	929	20	if (err & BAD_SHUT_DOWN)		54919f022a670549b1b002f8fc609c68311447d5330c24242a11f9a1de6ad117
-base/system/cmos.c	1055	1068	1177	1056	1177	20	LOCAL void		54919f022a670549b1b002f8fc609c68311447d5330c24242a11f9a1de6ad117
-base/system/ica.c	592	573	666	593	666	14	asp->ica_int_line = line;		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	639	620	717	653	730	15	ica_lock_dec();		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	708	695	792	709	792	14	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	748	735	832	749	832	20	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	837	815	920	838	920	19	return;		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	869	844	953	870	953	20	if (asp->ica_cpu_int)		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	899	874	983	900	983	4	break;		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	907	882	991	908	991	8	ica_eoi(adapter, &line, FALSE);		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	919	897	1006	920	1006	5	ica_eoi(adapter, &line, FALSE);		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	928	906	1015	929	1015	4	break;		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	936	914	1023	937	1023	5	ica_eoi(adapter, &line, TRUE);		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	945	926	1035	946	1035	4	break;		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	953	937	1046	954	1046	10	ica_eoi(adapter, &line, TRUE);		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	967	954	1063	968	1063	5	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	976	963	1072	977	1072	5	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	1043	1029	1146	1044	1146	9	if (asp->ica_mode & ICA_IC4)		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	1064	1045	1166	1065	1166	5	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	1073	1066	1187	1074	1187	5	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	1089	1082	1203	1090	1203	18	}		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	1132	1150	1297	1140	1304	8	bit = (1 << line_no);		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
-base/system/ica.c	1266	1290	1428	1268	1429	17	host_ica_unlock();		2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
+base/system/cmos.c	325	357	359	326	359	4	{		777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62
+base/system/cmos.c	333	366	368	334	368	19	}		777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62
+base/system/cmos.c	466	486	515	468	516	20	port = port & CMOS_BIT_MASK;		777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62
+base/system/cmos.c	846	866	928	848	929	20	if (err & BAD_SHUT_DOWN)		777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62
+base/system/cmos.c	1055	1068	1177	1056	1177	20	LOCAL void		777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62
+base/system/ica.c	592	573	666	593	666	14	asp->ica_int_line = line;		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	639	620	717	653	730	15	ica_lock_dec();		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	708	695	792	709	792	14	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	748	735	832	749	832	20	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	837	815	920	838	920	19	return;		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	869	844	953	870	953	20	if (asp->ica_cpu_int)		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	899	874	983	900	983	4	break;		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	907	882	991	908	991	8	ica_eoi(adapter, &line, FALSE);		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	919	897	1006	920	1006	5	ica_eoi(adapter, &line, FALSE);		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	928	906	1015	929	1015	4	break;		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	936	914	1023	937	1023	5	ica_eoi(adapter, &line, TRUE);		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	945	926	1035	946	1035	4	break;		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	953	937	1046	954	1046	10	ica_eoi(adapter, &line, TRUE);		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	967	954	1063	968	1063	5	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	976	963	1072	977	1072	5	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	1043	1029	1146	1044	1146	9	if (asp->ica_mode & ICA_IC4)		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	1064	1045	1166	1065	1166	5	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	1073	1066	1187	1074	1187	5	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	1089	1082	1203	1090	1203	18	}		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	1132	1150	1297	1140	1304	8	bit = (1 << line_no);		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
+base/system/ica.c	1266	1290	1428	1268	1429	17	host_ica_unlock();		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
 base/system/illegalp.c	74	74	77	75	77	7	}		e50bfe3604a5596e96cd149a9059ee63a97ebf5f9b6c9fbd2dcf13f2af25d8af
 base/system/rom.c	139	124	149	165	174	16	)*/		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872
-base/system/timer.c	510	453	531	512	532	11	void		6ffaa1f8e38b9b8aaf577bff29df410436ae969397aac3ea240f6be81e4e707b
-base/system/timer.c	1667	1507	1718	1668	1718	20	if (pcu == &timers[0])		6ffaa1f8e38b9b8aaf577bff29df410436ae969397aac3ea240f6be81e4e707b
-base/system/timer.c	1839	1657	1902	1841	1903	7	}		6ffaa1f8e38b9b8aaf577bff29df410436ae969397aac3ea240f6be81e4e707b
-base/system/timer.c	2447	2282	2889	2448	2889	3	timers[0].getTime = getIdealTime;       /* Use the 'ideal' time for timer 0, ie. calls to time_tick */		6ffaa1f8e38b9b8aaf577bff29df410436ae969397aac3ea240f6be81e4e707b
-base/bios/reset.c	983	1068	1301		1306	0	soft_reset = 1;	manually verified original enclosing and adjacent context	4442534e30fdfd43518ad29d1f4e6ffd08897b3d4ac66d011112edd9ff1a8b13
+base/system/timer.c	510	453	531	512	532	11	void		1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226
+base/system/timer.c	1667	1507	1718	1668	1718	20	if (pcu == &timers[0])		1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226
+base/system/timer.c	1839	1657	1902	1841	1903	7	}		1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226
+base/system/timer.c	2447	2282	2889	2448	2889	3	timers[0].getTime = getIdealTime;       /* Use the 'ideal' time for timer 0, ie. calls to time_tick */		1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226
+base/bios/reset.c	983	1068	1301		1306	0	soft_reset = 1;	manually verified original enclosing and adjacent context	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa
 base/cvidc/j_c_lang.h	52	56	49		49	0	#define __J_C_LANG	manually verified original enclosing and adjacent context	496bfa1112c0e4e60a86a918089c40eb6907f9d52cc042cd51a3374d318c0d2d
-base/keymouse/keyba.c	1461	1558	2087		2087	0	#define AddTo6805BuffImm	manually verified original enclosing and adjacent context	4006ef2b941b10cd447ce2a9b562fec9af18d15324fce539203c22c71d0a34f9
+base/keymouse/keyba.c	1461	1558	2087		2087	0	#define AddTo6805BuffImm	manually verified original enclosing and adjacent context	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf

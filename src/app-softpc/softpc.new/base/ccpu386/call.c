@@ -250,7 +250,7 @@ IFN1(
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
 #error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else /* TAKE_REAL_MODE_LIMIT_FAULT */
-#line 260
+#line 263
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it
@@ -306,7 +306,7 @@ IFN1(
 #ifdef	TAKE_REAL_MODE_LIMIT_FAULT
 #error "Unsupported SoftPC mirror configuration: TAKE_REAL_MODE_LIMIT_FAULT"
 #else /* TAKE_REAL_MODE_LIMIT_FAULT */
-#line 323
+#line 326
 
       /* The Soft486 EDL CPU does not take Real Mode limit failures.
        * Since the Ccpu486 is used as a "reference" cpu we wish it

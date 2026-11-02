@@ -754,7 +754,7 @@ GLOBAL int cmos_read_byte IFN2(int, cmos_byte, half_word *, value)
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 764
+#line 826
 
 #if defined(NTVDM) || defined(macintosh)
 #error "Unsupported SoftPC mirror configuration: NTVDM or macintosh"

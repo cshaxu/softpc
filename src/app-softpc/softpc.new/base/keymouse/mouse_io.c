@@ -2704,7 +2704,7 @@ LOCAL void mouse_update IFN1(MOUSE_CALL_MASK, condition_mask)
 #else   /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2676
+#line 2702
 
 /*
  * if the OS pointer is NOT being used to supply input,
@@ -3767,7 +3767,7 @@ LOCAL void mouse_save_state IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 3685
+#line 3813
 }
 
 

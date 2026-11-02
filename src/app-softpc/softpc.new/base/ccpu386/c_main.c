@@ -3587,7 +3587,7 @@ TYPEE0:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3850
+#line 3769
          PIG_SYNCH(CHECK_NO_AX);
 	 }
       else   /* USE32 */
@@ -3711,7 +3711,7 @@ TYPEE8:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3978
+#line 3897
          PIG_SYNCH(CHECK_NO_AX);
 	 }
       else   /* USE32 */
@@ -4200,7 +4200,7 @@ TYPEFF_3:
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
-#line 4467
+#line 4356
    if (cpu_interrupt_map & CPU_SIGALRM_EXCEPTION_MASK)
       {
       cpu_interrupt_map &= ~CPU_SIGALRM_EXCEPTION_MASK;
@@ -4259,7 +4259,7 @@ TYPEFF_3:
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
-#line 4525
+#line 4402
 #ifndef SFELLOW
    if (GET_IF() && (cpu_interrupt_map & CPU_HW_INT_MASK))
       {
@@ -4289,7 +4289,7 @@ TYPEFF_3:
 #else	/* SFELLOW */
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
-#line 4574
+#line 4443
 
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
@@ -4471,7 +4471,7 @@ LOCAL VOID
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else /* PIG */
-#line 4795
+#line 4641
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else

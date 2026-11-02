@@ -495,5 +495,5 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 519
+#line 515
    }

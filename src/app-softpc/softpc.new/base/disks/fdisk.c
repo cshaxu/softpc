@@ -1501,7 +1501,7 @@ GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 #ifdef	JOKER
 #error "Unsupported SoftPC mirror configuration: JOKER"
 #else	/* JOKER */
-#line 1538
+#line 1537
 
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"

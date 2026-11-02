@@ -205,7 +205,7 @@ void ppi_init IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 202
+#line 206
 }
 
 GLOBAL void
