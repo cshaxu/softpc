@@ -1233,6 +1233,20 @@ exclusions. The sole stale source-probe hash was revalidated: `c_xtrn.c`
 retains `#if 0`, and the later edit only replaced its excluded body and
 restored `#line 25`; its current hash is now recorded. This classification
 check does not by itself establish completeness of the original XP structures.
+The first-depth original-framework reconciliation was independently refreshed
+against all 470 retained text C/H files: all 1,703 XP first-depth opening
+directives are accounted for, 1,665 by exact current first-depth line
+mapping and 38 by the existing hash-valid individual dispositions. Original
+first-depth `else`/`elif` siblings are present in each of those 1,703 matched
+groups, allowing the seven registered local condition extensions. The 315
+OpenNT-first-depth directives moved inward in XP were accounted for separately.
+The refreshed current direct-child queue matches all 1,381 eligible current
+arms; no excluded parent retains a direct child. Eleven known absent XP child
+groups and 140 unverified candidates remain separately listed for depth 2.
+First-depth framework and classification audit is complete for the retained
+XP subset; the previously delivered final source at `9f9dd90f` passed the
+dual builds and 186 plus eight tests per architecture. S20 remains open and
+continues at depth 2; its candidates are not claimed verified.
 This audit is documentation/evidence only; cross-version root mappings and
 first-depth completeness remain under review.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
