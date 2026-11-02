@@ -1,0 +1,98 @@
+path	current_parent_line	xp_parent_line	xp_child_line	directive	expression	parent_mapping	status
+base/inc/ios.h	388	663	667	ifdef	SWIN_SNDBLST_NULL	exact	pending-depth5-xp-direct-child
+base/inc/ios.h	388	663	671	ifndef	IO_MAX_NUMBER_ADAPTORS	exact	pending-depth5-xp-direct-child
+base/keymouse/keyba.c	2139	2842	2843	ifndef	NTVDM	exact	pending-depth5-xp-direct-child
+base/keymouse/keyba.c	2139	2842	2846	ifdef	CPU_30_STYLE	exact	pending-depth5-xp-direct-child
+base/keymouse/keyba.c	2139	2842	2848	else	/* CPU_30_STYLE */	exact	pending-depth5-xp-direct-child
+base/keymouse/mouse_io.c	2384	2272	2274	ifdef	GISP_SVGA	exact	pending-depth5-xp-direct-child
+base/keymouse/mouse_io.c	5438	5439	5442	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/keymouse/mouse_io.c	5438	5439	5447	else		exact	pending-depth5-xp-direct-child
+base/keymouse/mouse_io.c	5536	5533	5536	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/keymouse/mouse_io.c	5536	5533	5541	else		exact	pending-depth5-xp-direct-child
+base/system/rom.c	243	260	262	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/system/rom.c	243	260	264	else	/* V7VGA */	exact	pending-depth5-xp-direct-child
+base/video/cga.c	1184	1399	1402	ifdef	A3CPU	exact	pending-depth5-xp-direct-child
+base/video/cga.c	1184	1399	1412	else	/* not A3CPU */	exact	pending-depth5-xp-direct-child
+base/video/ega_mode.c	541	544	614	ifdef	GORE	exact	pending-depth5-xp-direct-child
+base/video/ega_mode.c	541	544	616	else		exact	pending-depth5-xp-direct-child
+base/video/ega_mode.c	541	544	654	ifdef	GORE	exact	pending-depth5-xp-direct-child
+base/video/ega_mode.c	541	544	656	else		exact	pending-depth5-xp-direct-child
+base/video/ega_prts.c	1381	1910	1911	ifndef	CPU_40_STYLE /* EVID */	explicit	pending-depth5-xp-direct-child
+base/video/ega_prts.c	1381	1910	1915	else		explicit	pending-depth5-xp-direct-child
+base/video/ega_prts.c	2541	3024	3025	if	!(defined(NTVDM) && defined(MONITOR))	reviewed-existing-else	pending-depth5-xp-direct-child
+base/video/ega_read.c	195	378	380	ifdef	C_VID	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	195	378	391	else		exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	246	429	439	ifdef	C_VID	explicit	pending-depth5-xp-direct-child
+base/video/ega_read.c	271	452	472	ifdef	C_VID	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	305	484	509	ifdef	BACK_M	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	305	484	511	else		exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	351	527	547	ifdef	C_VID	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	385	559	589	ifdef	C_VID	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	427	599	603	ifdef	BACK_M	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	427	599	606	else		exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	496	669	673	ifndef	NEC_98	explicit	pending-depth5-xp-direct-child
+base/video/ega_read.c	518	727	736	ifdef	BIGEND	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	518	727	738	else		exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	518	727	756	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	784	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	786	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	821	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	823	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	834	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	836	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	847	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	874	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	876	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	897	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	899	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	910	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	567	773	933	ifndef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	699	953	958	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	699	953	960	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	699	953	972	if	defined(EGA_DUMP) || defined(EGA_STAT)	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	699	953	976	if	!defined(EGATEST) && !defined(A3CPU)	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	699	953	980	ifndef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_read.c	736	1001	1006	ifdef	CPU_40_STYLE	explicit	pending-depth5-xp-direct-child
+base/video/ega_read.c	736	1001	1008	else	/* CPU_40_STYLE */	explicit	pending-depth5-xp-direct-child
+base/video/ega_writ.c	90	301	303	ifdef	C_VID	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	90	301	321	else	/* C_VID */	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	159	380	385	ifndef	CPU_40_STYLE /* EVID */	explicit	pending-depth5-xp-direct-child
+base/video/ega_writ.c	183	460	474	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	183	460	479	ifdef	JOKER	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	183	460	483	else	/* not JOKER */	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	546	ifndef	PROD	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	686	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	721	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	732	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	734	else		exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	740	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	754	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	783	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	822	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	824	else	/* CPU_40_STYLE */	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	850	ifndef	PROD	exact	pending-depth5-xp-direct-child
+base/video/ega_writ.c	265	542	858	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	246	291	292	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	246	291	294	else		exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	2126	2075	2094	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	2126	2075	2117	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	2126	2075	2125	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	2126	2075	2135	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3428	3309	3313	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	explicit	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3457	3337	3341	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	explicit	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3822	3760	3761	ifndef	CPU_40_STYLE /* EVID */	explicit	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3822	3760	3766	else	/* CPU_40_STYLE - EVID */	explicit	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3834	3772	3780	ifndef	CPU_40_STYLE /* EVID */	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3834	3772	3785	else	/* CPU_40_STYLE - EVID */	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3834	3772	3792	ifdef	GORE	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3834	3772	3812	ifdef	GORE	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3834	3772	3817	else		exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3834	3772	3834	ifdef	VGG	exact	pending-depth5-xp-direct-child
+base/video/gfx_updt.c	3949	3889	3898	ifdef	VGG	explicit	pending-depth5-xp-direct-child
+base/video/vga_mode.c	265	303	304	ifdef	GISP_SVGA	exact	pending-depth5-xp-direct-child
+base/video/vga_mode.c	265	303	307	else	/* GISP_SVGA */	exact	pending-depth5-xp-direct-child
+base/video/vga_prts.c	2240	2257	2258	if	!(defined(NTVDM) && defined(X86GFX))	reviewed-existing-else	pending-depth5-xp-direct-child
+base/video/vga_prts.c	2429	2564	2587	ifdef	PROD	exact	pending-depth5-xp-direct-child
+base/video/vga_prts.c	2429	2564	2592	ifdef	V7VGA	exact	pending-depth5-xp-direct-child
+base/video/vga_prts.c	2429	2564	2594	else		exact	pending-depth5-xp-direct-child
+base/video/video.c	1788	2261	2263	ifdef	CPU_40_STYLE	exact	pending-depth5-xp-direct-child

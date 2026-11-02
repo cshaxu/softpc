@@ -242,6 +242,9 @@ rdm0_byte_ch2 IFN1(ULONG, offset )
 {
 	IU32 lsb;
 	UTINY temp;
+#line 429
+#ifndef NEC_98
+#line 430
 
 	lsb = offset & 0x1;
 	offset = ( offset >> 1 ) << 2;
@@ -254,6 +257,8 @@ rdm0_byte_ch2 IFN1(ULONG, offset )
 #ifdef C_VID
 	EasVal = temp;
 #endif
+#endif  //NEC_98
+#line 443
 	return( temp );
 }
 
@@ -487,6 +492,9 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 #endif
 #line 648
 
+#line 669
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 670
 GLOBAL void
 Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 {
@@ -496,6 +504,8 @@ Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 #line 681
 }	
 
+#endif /* !(NTVDM && MONITOR) */
+#line 714
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
@@ -722,6 +732,9 @@ void
 ega_read_term IFN0()
 
 {
+#line 1001
+#ifndef NEC_98
+#line 1002
 	/*
 	 *	Turn off read calculations for non EGA/VGA adaptors
 	 */
@@ -732,6 +745,8 @@ ega_read_term IFN0()
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
 #line 984
+#endif  //NEC_98
+#line 1023
 }
 
 #endif /* REAL_VGA */

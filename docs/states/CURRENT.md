@@ -47,7 +47,15 @@ corrected two-context probe verified its parent and selected arm on both.
 Current fourth-depth accounting is 324 arms: 128 single-error and 196 selected.
 Both architecture builds, mirror/documentation gates and full tests passed:
 each width completed 186 non-native and eight serial native integration tests.
-Actual-diff review and exclusion delivery remain before retained-arm review.
+Exclusion delivery `df6c079d` was pushed after full qualification. In the
+retained phase, 13 original selected frames were restored and three other
+records were confirmed as existing frames. Current fourth depth has 327 arms:
+123 direct single-error, 191 previously observed selected and 13 restored
+selected. Five formerly direct selected arms moved to depth 5. Fifth-depth
+queues contain 94 current arms and 97 XP direct-child candidates; the counts
+overlap. One selected local frame has no one-to-one XP guard and remains in
+the parent map. Final dual builds and all 194 tests per architecture passed.
+Actual-diff review, delivery and S23 closure remain.
 
 ## Technical Baseline
 

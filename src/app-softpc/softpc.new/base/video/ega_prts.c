@@ -1377,6 +1377,9 @@ init_vga_globals IFN0()
 	setVideoscratch(sas_scratch_address(0x10000));
 	setVideoscreen_ptr(EGA_planes);
 	setVideorotate(0);
+#line 1910
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
+#line 1911
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else
@@ -1385,6 +1388,8 @@ init_vga_globals IFN0()
 #endif	/* CPU_40_STYLE - EVID */
 
 
+#endif
+#line 1921
 	update_banking();
 #endif  //NEC_98
 #line 1888

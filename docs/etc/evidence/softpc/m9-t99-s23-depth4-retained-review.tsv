@@ -1,0 +1,4 @@
+path	xp_line	classification	reason	source_sha256
+base/inc/host_lpt.h	151	existing-single-error	The corresponding NTVDM branch already has a single error body.	59504171a1231925981bcdc84a64c4e97a46a05957b2c0d948c814de8849a7b0
+base/video/ega_prts.c	3024	existing-selected-else	The selected else of the A3CPU group is already present.	808f41d45813c0650d9d79c32d12bb358785dbfeabfbfbaabca2498741fe63bc
+base/video/vga_prts.c	2257	existing-selected-else	The selected else of the A3CPU group is already present.	e1f41ecb7b6578be274be12e2a865d9b9572053b55511816ccbf773f302098ef

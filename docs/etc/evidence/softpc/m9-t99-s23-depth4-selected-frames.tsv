@@ -1,0 +1,14 @@
+path	xp_line	xp_end	classification	condition	source_sha256
+base/video/ega_read.c	429	442	restored-selected-frame-exact-body	#ifndef NEC_98	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba
+base/video/gfx_updt.c	3889	3910	restored-selected-frame-exact-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove unneeded code */	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/gfx_updt.c	3252	3255	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/gfx_updt.c	3283	3286	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/gfx_updt.c	3384	3387	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/gfx_updt.c	3416	3419	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/ega_prts.c	1910	1918	restored-selected-frame-local-body-preserved	#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	808f41d45813c0650d9d79c32d12bb358785dbfeabfbfbaabca2498741fe63bc
+base/video/ega_read.c	669	712	restored-selected-frame-local-body-preserved	#if !(defined(NTVDM) && defined(MONITOR))	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba
+base/video/ega_read.c	1001	1022	restored-selected-frame-local-body-preserved	#ifndef NEC_98	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba
+base/video/ega_writ.c	380	444	restored-selected-frame-local-body-preserved	#if !(defined(NTVDM) && defined(MONITOR))	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe
+base/video/gfx_updt.c	3309	3327	restored-selected-frame-local-body-preserved	#ifndef NEC_98	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/gfx_updt.c	3337	3355	restored-selected-frame-local-body-preserved	#ifndef NEC_98	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243
+base/video/gfx_updt.c	3760	3769	restored-selected-frame-local-body-preserved	#ifndef NEC_98	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243

@@ -3356,8 +3356,13 @@ boolean vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy);
 	
+#line 3252
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3253
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3256
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3388,8 +3393,13 @@ boolean vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
+#line 3283
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3284
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3287
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3414,6 +3424,9 @@ boolean v7vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 	int start_offset,tlx,tly;
 	boolean status;
 
+#line 3309
+#ifndef NEC_98
+#line 3311
 	UNUSED(dummy);
 	
 	if ( getVM() )
@@ -3428,6 +3441,8 @@ boolean v7vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 
+#endif  //NEC_98
+#line 3328
 	return(status);
 }
 
@@ -3438,6 +3453,9 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 	int start_offset,tlx,tly;
 	boolean status;
 
+#line 3337
+#ifndef NEC_98
+#line 3339
 	UNUSED(dummy_arg);
 	
 	if ( getVM() )
@@ -3452,6 +3470,8 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 
+#endif  //NEC_98
+#line 3356
 	return(status);
 }
 #endif /* V7VGA */
@@ -3478,8 +3498,13 @@ boolean ega_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy);
 	
+#line 3384
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3385
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3388
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3511,8 +3536,13 @@ boolean ega_graph_scroll_down IFN6(int, start, int, width, int, height,
 	
 	UNUSED(dummy_arg);
 	
+#line 3416
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3417
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3420
 
 	(*update_alg.calc_update)();
 
@@ -3788,12 +3818,17 @@ set_mark_funcs IFN0()
 			update_alg.mark_wfill = (T_mark_wfill)simple_update;
 			update_alg.mark_string = (T_mark_string)simple_update;
 
+#line 3760
+#ifndef NEC_98
+#line 3761
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
 #line 3636
 			SetMarkPointers(0);
 #endif	/* CPU_40_STYLE - EVID */
+#endif  //NEC_98
+#line 3770
 			break;
 
 #ifndef NEC_98
@@ -3910,6 +3945,9 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 #endif	/* NTVDM & MONITOR */
 #line 3753
 			break;
+#line 3889
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove unneeded code */
+#line 3890
 		case	CGA_GRAPH_SCROLL:
 			update_alg.scroll_up = cga_graph_scroll_up;
 			update_alg.scroll_down = cga_graph_scroll_down;
@@ -3930,6 +3968,8 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 			break;
 #endif /* V7VGA */
 #endif /* VGG */
+#endif /* !NTVDM | (NTVDM & !X86GFX) */
+#line 3911
 #endif  //NEC_98
 #line 3774
 	}

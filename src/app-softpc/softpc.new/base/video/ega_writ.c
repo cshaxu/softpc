@@ -155,6 +155,9 @@ GLOBAL ULONG calc_latch_xor;
 #endif
 #line 372
 
+#line 380
+#if !(defined(NTVDM) && defined(MONITOR))
+#line 381
 GLOBAL VOID
 Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 {
@@ -165,6 +168,8 @@ Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 #line 420
 }
 
+#endif /* !(NTVDM && MONITOR) */
+#line 446
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif

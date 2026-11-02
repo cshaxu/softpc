@@ -1,0 +1,95 @@
+path	parent_line	parent_directive	child_line	child_directive	child_expression	source_sha256	status
+base/inc/ios.h	388	else	393	ifdef	SWIN_SNDBLST_NULL	80d5cf08b7a77bba9970a703733a91915a4db1baa01f38014f11979b8e2b6995	selected-parent-pending-depth5
+base/inc/ios.h	388	else	398	ifndef	IO_MAX_NUMBER_ADAPTORS	80d5cf08b7a77bba9970a703733a91915a4db1baa01f38014f11979b8e2b6995	selected-parent-pending-depth5
+base/keymouse/keyba.c	2139	ifdef	2141	ifdef	CPU_30_STYLE	3287fcffbb84084f12985680049b50619819eb42d7c1af57ba289dde124ffa82	selected-parent-pending-depth5
+base/keymouse/keyba.c	2139	ifdef	2143	else		3287fcffbb84084f12985680049b50619819eb42d7c1af57ba289dde124ffa82	selected-parent-pending-depth5
+base/keymouse/mouse_io.c	2384	ifdef	2386	ifdef	GISP_SVGA	8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b	selected-parent-pending-depth5
+base/keymouse/mouse_io.c	5438	ifdef	5441	ifdef	VGG	8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b	selected-parent-pending-depth5
+base/keymouse/mouse_io.c	5438	ifdef	5446	else		8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b	selected-parent-pending-depth5
+base/keymouse/mouse_io.c	5536	ifdef	5539	ifdef	VGG	8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b	selected-parent-pending-depth5
+base/keymouse/mouse_io.c	5536	ifdef	5544	else		8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b	selected-parent-pending-depth5
+base/system/rom.c	243	ifdef	245	ifdef	V7VGA	5abae476bec5a03d52f56348b1a27f03e7803d20e912d408c1215d2a369c5708	selected-parent-pending-depth5
+base/system/rom.c	243	ifdef	247	else		5abae476bec5a03d52f56348b1a27f03e7803d20e912d408c1215d2a369c5708	selected-parent-pending-depth5
+base/video/cga.c	1184	else	1188	ifdef	A3CPU	2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b	selected-parent-pending-depth5
+base/video/cga.c	1184	else	1190	else		2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b	selected-parent-pending-depth5
+base/video/ega_mode.c	541	ifndef	611	ifdef	GORE	4749f904ed37f4d1072f01bcad64c25550cdfc7764a0220f5ffa3b4397a7da9e	selected-parent-pending-depth5
+base/video/ega_mode.c	541	ifndef	613	else		4749f904ed37f4d1072f01bcad64c25550cdfc7764a0220f5ffa3b4397a7da9e	selected-parent-pending-depth5
+base/video/ega_mode.c	541	ifndef	652	ifdef	GORE	4749f904ed37f4d1072f01bcad64c25550cdfc7764a0220f5ffa3b4397a7da9e	selected-parent-pending-depth5
+base/video/ega_mode.c	541	ifndef	654	else		4749f904ed37f4d1072f01bcad64c25550cdfc7764a0220f5ffa3b4397a7da9e	selected-parent-pending-depth5
+base/video/ega_prts.c	1381	if	1383	ifndef	CPU_40_STYLE	808f41d45813c0650d9d79c32d12bb358785dbfeabfbfbaabca2498741fe63bc	selected-parent-pending-depth5
+base/video/ega_prts.c	1381	if	1385	else		808f41d45813c0650d9d79c32d12bb358785dbfeabfbfbaabca2498741fe63bc	selected-parent-pending-depth5
+base/video/ega_read.c	195	else	198	ifdef	C_VID	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	195	else	206	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	246	ifndef	257	ifdef	C_VID	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	271	ifndef	292	ifdef	C_VID	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	305	ifndef	331	ifdef	BACK_M	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	305	ifndef	333	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	351	else	372	ifdef	C_VID	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	385	else	416	ifdef	C_VID	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	427	ifndef	432	ifdef	BACK_M	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	427	ifndef	434	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	496	if	501	ifndef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	518	ifndef	528	ifdef	BIGEND	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	518	ifndef	530	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	518	ifndef	549	ifdef	VGG	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	579	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	581	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	600	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	602	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	609	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	611	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	619	ifdef	VGG	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	641	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	643	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	660	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	662	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	669	ifdef	VGG	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	567	ifndef	688	ifndef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	699	ifndef	705	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	699	ifndef	707	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	699	ifndef	716	if	defined(EGA_DUMP) || defined(EGA_STAT)	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	699	ifndef	720	if	!defined(EGATEST) && !defined(A3CPU)	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	699	ifndef	724	ifndef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	736	ifndef	742	ifdef	CPU_40_STYLE	95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_read.c	736	ifndef	744	else		95f5dd34d3201798f703b8c3eceeeaa0b1688dd14dfb4839c593ab05da1786ba	selected-parent-pending-depth5
+base/video/ega_writ.c	90	else	93	ifdef	C_VID	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	90	else	105	else		fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	159	if	165	ifndef	CPU_40_STYLE	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	183	ifndef	198	ifdef	CPU_40_STYLE	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	183	ifndef	203	ifdef	JOKER	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	183	ifndef	205	else		fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	270	ifndef	PROD	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	411	ifdef	CPU_40_STYLE	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	446	ifdef	VGG	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	457	ifdef	VGG	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	459	else		fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	466	ifdef	V7VGA	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	480	ifdef	CPU_40_STYLE	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	509	ifdef	V7VGA	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	548	ifdef	CPU_40_STYLE	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	550	else		fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	555	ifndef	PROD	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/ega_writ.c	265	ifndef	564	ifdef	V7VGA	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth5
+base/video/gfx_updt.c	246	ifdef	247	ifdef	V7VGA	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	246	ifdef	249	else		2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	2126	ifndef	2146	ifdef	V7VGA	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	2126	ifndef	2170	ifdef	V7VGA	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	2126	ifndef	2178	ifdef	VGG	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	2126	ifndef	2188	ifdef	V7VGA	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3822	ifndef	3824	ifndef	CPU_40_STYLE	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3822	ifndef	3826	else		2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3843	ifndef	CPU_40_STYLE	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3845	else		2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3853	ifdef	GORE	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3867	ifdef	GORE	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3869	else		2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3883	ifdef	CPU_40_STYLE	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3885	else		2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3834	ifndef	3892	ifdef	VGG	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/gfx_updt.c	3949	if	3959	ifdef	VGG	2c286c9822f289a0f93937f5599f57505a1cb24072a2e311847b1894c42e1243	selected-parent-pending-depth5
+base/video/vga_mode.c	265	else	267	ifdef	GISP_SVGA	b3d72eaf79ac220dac77038a9a7d1dc9e68fabc31803840b2c44ac4c30389ccc	selected-parent-pending-depth5
+base/video/vga_mode.c	265	else	269	else		b3d72eaf79ac220dac77038a9a7d1dc9e68fabc31803840b2c44ac4c30389ccc	selected-parent-pending-depth5
+base/video/vga_prts.c	2429	ifndef	2453	ifdef	PROD	e1f41ecb7b6578be274be12e2a865d9b9572053b55511816ccbf773f302098ef	selected-parent-pending-depth5
+base/video/vga_prts.c	2429	ifndef	2458	ifdef	V7VGA	e1f41ecb7b6578be274be12e2a865d9b9572053b55511816ccbf773f302098ef	selected-parent-pending-depth5
+base/video/vga_prts.c	2429	ifndef	2460	else		e1f41ecb7b6578be274be12e2a865d9b9572053b55511816ccbf773f302098ef	selected-parent-pending-depth5
+base/video/video.c	1788	ifdef	1790	ifdef	CPU_40_STYLE	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad	selected-parent-pending-depth5
