@@ -78,7 +78,7 @@ static unsigned int cga_med_graph_lo_nyb[256];
 #ifdef BIGWIN
 #error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif
-#line 71
+#line 118
 
 /*
  *  cga_graph_inc_val depends on whether data is interleaved ( EGA/VGA )
@@ -136,7 +136,7 @@ void nt_init_text()
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // JAPAN || KOREA
-#line 213
+#line 212
 
 }
 
@@ -529,7 +529,7 @@ void nt_cga_colour_med_graph_big(int offset, int screen_x, int screen_y,
 #ifdef BIGWIN
 #error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
-#line 631
+#line 741
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -542,7 +542,7 @@ void nt_cga_colour_med_graph_huge(int offset, int screen_x, int screen_y,
 #ifdef BIGWIN
 #error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
-#line 735
+#line 845
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -632,7 +632,7 @@ void nt_cga_colour_hi_graph_big(int offset, int screen_x, int screen_y,
 #ifdef BIGWIN
 #error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
-#line 898
+#line 1008
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/

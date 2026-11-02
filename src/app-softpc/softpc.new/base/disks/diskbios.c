@@ -1,7 +1,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 1
+#line 7
 #include "insignia.h"
 #include "host_def.h"
 
@@ -118,7 +118,7 @@ LOCAL int tfstatus;
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 114
+#line 181
 
 /*
 * non-zero if drive 1 does not exist
@@ -163,7 +163,7 @@ LOCAL void hd_reset IPT2(int, drive, int, diag);
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 155
+#line 232
 /********************************************************/
 /* POST & DEBUG defines*/
 
@@ -226,7 +226,7 @@ void disk_post IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 214
+#line 383
 	UTINY diag;
 	UTINY disks;
 	UTINY ndisks;
@@ -476,7 +476,7 @@ void disk_io IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 648
+#line 993
 	/* setup our command structure from the remaining registers */
 	com.drive = getDL () & 0x7f;
 	com.sectors = getAL ();
@@ -508,7 +508,7 @@ void disk_io IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 670
+#line 1031
 	/* call our function if sensible ie the drive requested exists */
 	/* and the BIOS command is in a sensible range */
 	if (check_drive (com.drive)
@@ -527,7 +527,7 @@ void disk_io IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 683
+#line 1064
 	/* setup the applications return */
 	if (BIOS_command != 0x15)
 		setAH (rstatus ());
@@ -611,7 +611,7 @@ LOCAL void disk_read IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 758
+#line 1245
 	long offset;
 	host_addr inbuf;
 	sys_addr pdata;
@@ -660,7 +660,7 @@ LOCAL void disk_write IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 801
+#line 1389
 	long offset;
 	host_addr outbuf;
 	sys_addr pdata;

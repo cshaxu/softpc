@@ -103,7 +103,7 @@
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 107
+#line 181
 
 #include "host_gfx.h"
 
@@ -125,7 +125,7 @@
 #else
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif /* CPU_40_STYLE */
-#line 132
+#line 206
 
 /*
    Offsets to data buffers held in MOUSE.COM (built from
@@ -877,7 +877,7 @@ GLOBAL void mouse_driver_initialisation IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 882
+#line 957
 
    cursor_EM_disabled = FALSE;
    }
@@ -1290,7 +1290,7 @@ void mouse_install1()
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
-#line 1339
+#line 1065
         /*
          *      Make sure that old save area does not get re-painted!
          */
@@ -1307,7 +1307,7 @@ void mouse_install1()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1352
+#line 1084
         sas_loadw (int_addr(MOUSE_VEC) + 0, &saved_int0A_offset);
         sas_loadw (int_addr(MOUSE_VEC) + 2, &saved_int0A_segment);
         sas_storew(int_addr(MOUSE_VEC), MOUSE_INT1_OFFSET);
@@ -1386,7 +1386,7 @@ void mouse_install1()
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
 #endif      /* if NTVDM && !X86GFX */
-#line 1163
+#line 1162
 
 
         /*
@@ -2768,7 +2768,7 @@ void mouse_int2()
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 2734
+#line 2764
                         {
                         cursor_display();
                         }
@@ -2971,7 +2971,7 @@ LOCAL void mouse_reset IFN4(word *,installed_ptr,word *,nbuttons_ptr,word *,junk
 #if defined(MONITOR) && defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 2921
+#line 2962
 
         /*
          *      Set default sensitivity
@@ -3246,7 +3246,7 @@ LOCAL void mouse_set_range_x IFN4(word *,junk1,word *,junk2,MOUSE_SCALAR *,minim
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 3176
+#line 3264
 
         /*
          *      Reflect the change in the cursor position on the screen
@@ -3289,7 +3289,7 @@ LOCAL void mouse_set_range_y IFN4(word *,junk1,word *,junk2,MOUSE_SCALAR *,minim
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 3215
+#line 3313
 
 
         /*
@@ -3688,7 +3688,7 @@ LOCAL void mouse_conditional_off IFN4(word *,junk1,word *,junk2,MOUSE_SCALAR *,u
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 3626
+#line 3724
         {
         if (cursor_flag == MOUSE_CURSOR_DISPLAYED)
                 cursor_display();
@@ -6385,7 +6385,7 @@ LOCAL void graphics_cursor_undisplay IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 6433
+#line 6667
 
 
 /*

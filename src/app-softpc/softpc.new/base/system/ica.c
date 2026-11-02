@@ -589,7 +589,7 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 573
+#line 666
         asp->ica_int_line = line;
 
 	return;
@@ -636,7 +636,7 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 620
+#line 717
         /*
          * Signal the Master ICA.
          * NB. A kludge is used here. We know that we have
@@ -679,7 +679,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 666
+#line 763
 
     /*
      * If we are in the middle of a Poll command, then respond to it
@@ -705,7 +705,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 695
+#line 792
     }
 
     /*
@@ -745,7 +745,7 @@ void SWPIC_inb IFN2(io_addr, port, IU8 *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 735
+#line 832
     }
 }
 
@@ -834,7 +834,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 815
+#line 920
         return;
     }
 
@@ -866,7 +866,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 844
+#line 953
 	    if (asp->ica_cpu_int)
 	    {
 		/* We might have masked out a pending interrupt */
@@ -896,7 +896,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 874
+#line 983
 		break;
 
 	    case 1:		/* Non-specific EOI		*/
@@ -904,7 +904,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 882
+#line 991
 		ica_eoi(adapter, &line, FALSE);
 		break;
 
@@ -916,7 +916,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 897
+#line 1006
 		ica_eoi(adapter, &line, FALSE);
 		break;
 
@@ -925,7 +925,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 906
+#line 1015
 		break;
 
 	    case 5:		/* Rotate on non-specific EOI	*/
@@ -933,7 +933,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 914
+#line 1023
 		ica_eoi(adapter, &line, TRUE);
 		break;
 
@@ -942,7 +942,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 926
+#line 1035
 		break;
 
 	    case 7:		/* Rotate on specific EOI	*/
@@ -950,7 +950,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 937
+#line 1046
 		ica_eoi(adapter, &line, TRUE);
 		break;
 	    }
@@ -964,7 +964,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 954
+#line 1063
 	    }
 
 	    if (value & ICA_POLL_CMD)	/* We are being polled	*/
@@ -973,7 +973,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 963
+#line 1072
 	    }
 	    else
 	    if (value & ICA_RR_CMD)	/* Select IRR or ISR	*/
@@ -1040,7 +1040,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1029
+#line 1146
 	    if (asp->ica_mode & ICA_IC4)
 		sequence[adapter] = 4;
 	    else
@@ -1061,7 +1061,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1045
+#line 1166
 	}
 	else
 	{
@@ -1070,7 +1070,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1066
+#line 1187
 	}
 	sequence[adapter] = 0;
 	break;
@@ -1086,7 +1086,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1082
+#line 1203
     }
 
     ica_lock_set(0);
@@ -1112,7 +1112,7 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1129
+#line 1276
 
     /*
      * vddsvc.h defines the NTVDM exported call to this function as:
@@ -1129,7 +1129,7 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1150
+#line 1297
 
     /*
      * If there is a request already outstanding on this line, then leave
@@ -1263,7 +1263,7 @@ void SWPIC_clear_int IFN2(IU32, adapter, IU32, line_no)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1290
+#line 1428
 
     host_ica_unlock();
 }
@@ -1827,7 +1827,7 @@ ica_check_stale_iret_hook IFN0()
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 1858
+#line 2051
 
 #define INIT0_ICW1	(IU8)0x11	
 #define INIT0_ICW2	(IU8)0x08	
@@ -1918,7 +1918,7 @@ void ica0_init IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else     //NEC_98
-#line 1922
+#line 2145
 #define INIT1_ICW2	(IU8)0x70	
 #define INIT1_ICW3	(IU8)0x02	
 #define INIT1_ICW4      (IU8)0x01

@@ -180,7 +180,7 @@ int timer_int_enabled;          /* Whether Bios timer ints are required */
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 167
+#line 189
 #define TIMER_CLOCK_DENOM       1193
 #endif   //NEC_98
 #line 191
@@ -480,7 +480,7 @@ LOCAL ULONG     adj_n_real_mode_ticks_before_full_speed = 0;/* The value which r
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 504
+#line 503
 
 
 /*
@@ -507,7 +507,7 @@ void (*timer_tick_func) IPT0();
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 453
+#line 531
 
 void
 SWTMR_init_funcptrs IFN0()
@@ -1664,7 +1664,7 @@ LOCAL UNBLOCK_FUNCTION CounterBufferLoaded IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 1507
+#line 1718
                 if (pcu == &timers[0])
                         timer_int_enabled = TRUE;
                 timestamp();
@@ -1836,7 +1836,7 @@ LOCAL void updateCounter IFN0()
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 1657
+#line 1902
 
                 }
                 return;
@@ -2444,7 +2444,7 @@ LOCAL void Timer_init IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 2282
+#line 2889
         timers[0].getTime = getIdealTime;       /* Use the 'ideal' time for timer 0, ie. calls to time_tick */
         timers[1].getTime = getHostSysTime;     /* We don't really expect anyone to use timer 1 */
         timers[2].getTime = getHostSysTime;     /* Use real host time for timer 2 */
@@ -2513,7 +2513,7 @@ void timer_init IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2360
+#line 2986
 
         /*
          * Start up the host alarm system

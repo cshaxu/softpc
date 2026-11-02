@@ -320,7 +320,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 323
+#line 342
 #define BIOS_START_OFFSET	0x0000L
 #define BIOS1_END_SEGMENT	0xF000L
 #define BIOS1_END_OFFSET 	0x7000L 	/* End of 1st half of ROM */
@@ -333,7 +333,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 330
+#line 353
 #define	BASIC_ROM		0xFE000L	/* Start of Basic Rom */
 #define ROM_START		0xC0000L	/* Start of Expansion ROM @ 768k */
 #endif // !NEC_98
@@ -348,7 +348,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 339
+#line 367
 
 /*
  * The follwoing are the offsets for the entry points to the
@@ -369,7 +369,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #else		/* GISP_SVGA */
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA  */
-#line 360
+#line 388
 #define VIDEO_IO_RE_ENTRY	0xF06C
 #define MEMORY_SIZE_OFFSET	0xF841
 #define EQUIPMENT_OFFSET	0xF84D
@@ -460,7 +460,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #else	 	/* GISP_SVGA */
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
-#line 446
+#line 478
 
 /* Off set info for EGA character tables */
 #define EGA_CGMN_OFF	0x2230
@@ -731,7 +731,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #else		/* GISP_SVGA */
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
-#line 967
+#line 999
 
 /*
  * Offsets for a set of instructions that are used in virtualisation

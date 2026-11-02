@@ -31,7 +31,7 @@
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 33
+#line 36
 #include TypesH
 #include StringH
 
@@ -92,7 +92,7 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 80
+#line 127
 static struct ADAPTER_STATE
 {
 	BUFFER_REG tx_buffer;
@@ -148,7 +148,7 @@ static struct ADAPTER_STATE
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
-#line 127
+#line 191
 
 /*
  * For synchronisation of adapter input.
@@ -180,7 +180,7 @@ static LINE_CONTROL_REG LCRFlushMask;
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 151
+#line 220
 
 /*
  * The delay needed in microseconds between receiving 2 characters
@@ -585,7 +585,7 @@ static void generate_iir IFN1(struct ADAPTER_STATE *, asp)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 528
+#line 612
 static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)
 {
 	/*
@@ -636,7 +636,7 @@ static void clear_interrupt IFN1(struct ADAPTER_STATE *, asp)
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
 #endif
-#line 677
+#line 676
 
 
 
@@ -709,7 +709,7 @@ static void do_wait_on_send IFN1(long, adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 620
+#line 1095
 void com_inb IFN2(io_addr, port, half_word *, value)
 {
 	int adapter = adapter_for_port(port);
@@ -1295,7 +1295,7 @@ recv_char IFN1(long, adapt_long)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 2312
+#line 2311
 
 
 /*
@@ -1309,7 +1309,7 @@ void com_modem_change IFN1(int, adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1505
+#line 2340
 static void modem_change IFN1(int, adapter)
 {
 	/*
@@ -1442,7 +1442,7 @@ static void modem_change IFN1(int, adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1632
+#line 2485
 static void set_recv_char_status IFN1(struct ADAPTER_STATE *, asp)
 {
 	/*
@@ -1471,7 +1471,7 @@ static void set_xmit_char_status IFN1(struct ADAPTER_STATE *, asp)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1655
+#line 2514
 	asp->line_status_reg.bits.tx_holding_empty = 1;
 	asp->line_status_reg.bits.tx_shift_empty = 1;
 	raise_thre_interrupt(asp);
@@ -1792,7 +1792,7 @@ static void set_line_control IFN2(int, adapter, int, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1883
+#line 3098
 static void set_dtr IFN1(int, adapter)
 {
 	/*
@@ -1858,7 +1858,7 @@ static void set_dtr IFN1(int, adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1943
+#line 3188
 static void set_rts IFN1(int, adapter)
 {
 	/*
@@ -2123,7 +2123,7 @@ void com2_flush_printer IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 2203
+#line 3526
 static void com_reset IFN1(int, adapter)
 {
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];

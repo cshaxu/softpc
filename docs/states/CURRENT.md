@@ -1099,8 +1099,33 @@ x86 and x64 each passed 186 non-native tests and eight serial native tests.
 Final EXE SHA-256: x86 `177f6ac9038e54c18eb8af9bdd455bb38583e9b28565d00a696a01584f1492a4`;
 x64 `23282ef325d191f2bd3e8b660e1145026f3cbadfd607a5ee5e776b91dcb24ae5`.
 The first build was superseded by a final dual build after removing a redundant
-line directive. Delivery is pending; the depth-2 queue remains provisional
-until original first-depth candidates are fully reconciled.
+line directive. The correction was committed and pushed as `33e8bf0b`;
+the depth-2 queue remains provisional until original first-depth candidates
+are fully reconciled.
+Following delivery `33e8bf0b`, a first-depth line-control review found
+78 `#line` directives in 33 files whose immediately following retained XP
+code has a unique original anchor and at least two consecutive matching
+nontrivial source lines. These were adjusted to the verified XP anchor. A
+disposable copy of the full current source/test tree was preprocessed using
+all 550 actual x86/x64 compile contexts that depend on those files: before
+and after `-E -P` outputs were identical in all 550. Evidence is recorded
+in `m9-t99-s20-bfs-depth1-line-anchor-reconciliation.tsv`; this is not a
+claim that every first-depth line directive or original condition has been
+proved. Build, release, full tests, review, commit and push remain pending.
+A second, same-depth comparison using unique contiguous XP sequences and
+manual adjacent-context review identified 151 further line directives.
+Of 226 actual affected x86/x64 compile contexts, 224 had identical `-E -P`
+output; the other two differed solely in the CCPU Invalid Task Reg diagnostic
+`__LINE__`, corrected from 1853 to the actual XP line 1851. The two passes
+cover 229 markers in 46 files, and do not establish completeness for
+unanchored or ambiguous conditions. Both final cached builds passed; each
+architecture passed all 186 non-native and eight serial native tests. The
+final binary SHA-256 values are x86
+`b4f92cbfef7fbc208cddc74455c40dcf7e3ed5a17cfd469d5c3d7e494841dff7` and x64
+`5f61fe1c01226dea3845637880a63bc123286661db89da0109ec558305acdde`.
+No non-mirror compiler warnings occurred. Actual mirror diff independently
+contains exactly 229 `#line` replacements and no other production changes.
+Commit and push of this first-depth exclusion-line batch remain pending.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86

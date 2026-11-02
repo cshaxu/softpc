@@ -70,7 +70,7 @@ Paging Support.
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 75
+#line 74
 
 /*
    =====================================================================

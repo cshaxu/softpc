@@ -23,7 +23,7 @@
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 27
+#line 33
 
 /*
  *    O/S include files.
@@ -33,7 +33,7 @@
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // JAPAN && i386
-#line 33
+#line 42
 /*
  * SoftPC include files
  */
@@ -107,7 +107,7 @@ half_word target_AR;
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM & MONITOR */
-#line 99
+#line 125
         /*
          *	Determine function
          */
@@ -204,7 +204,7 @@ half_word target_AR;
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif
-#line 191
+#line 319
 		break;
 
         case INT15_VIRTUAL_MODE:
@@ -269,7 +269,7 @@ half_word target_AR;
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif	/* PM */
-#line 256
+#line 384
                 break;
 
 	case INT15_INTERRUPT_COMPLETE:

@@ -71,7 +71,7 @@ IMPORT	void	gmi_define_mem IPT2(mem_type, type, MEM_HANDLERS *, handlers);
 #ifdef EGATEST
 #error "Unsupported SoftPC mirror configuration: EGATEST"
 #else
-#line 90
+#line 76
 #define gmi_redefine_mem(type,handlers) \
 b_write_ptrs[(int)type] = handlers.b_write; \
 w_write_ptrs[(int)type] = handlers.w_write; \

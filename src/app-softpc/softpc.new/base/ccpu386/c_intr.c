@@ -258,7 +258,7 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 270
+#line 266
          spush(flags);
 
       spush16((IU32)GET_CS_SELECTOR());
@@ -329,7 +329,7 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 342
+#line 338
 	    spush(flags);
 
 
@@ -451,7 +451,7 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 465
+#line 461
 	    spush(flags);
 
 	 /* push return address */

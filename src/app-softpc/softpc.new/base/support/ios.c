@@ -71,7 +71,7 @@ GLOBAL char	Ios_out_adapter_table[PC_IO_MEM_SIZE];
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* PROD */
-#line 75
+#line 82
 
 /*
  *	Ios_xxx_function - These tables are indexed by the adapter ID obtained
@@ -163,7 +163,7 @@ LOCAL void io_empty_inb IFN2(io_addr, io_address, half_word *, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif // NTVDM
-#line 198
+#line 199
         *value = IO_EMPTY_PORT_BYTE_VALUE;
 
 }
@@ -189,7 +189,7 @@ LOCAL void io_empty_outb IFN2(io_addr, io_address, half_word, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 193
+#line 245
 }
 
 /*
@@ -217,7 +217,7 @@ LOCAL void generic_inw IFN2(io_addr, io_address, word *, value)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif				/* BIGEND */
-#line 221
+#line 273
 }
 
 /*
@@ -410,7 +410,7 @@ LOCAL VOID generic_outsd IFN3(io_addr, io_address, double_word *, valarray, word
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* NTVDM & MONITOR */
-#line 406
+#line 493
 
 /*
  *
@@ -906,7 +906,7 @@ GLOBAL IOS_FUNC_OUTB *get_outb_ptr IFN1(io_addr, io_address)
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 891
+#line 1006
 
 /*(
 ================================ io_init ===================================

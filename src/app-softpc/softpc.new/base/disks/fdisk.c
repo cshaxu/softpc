@@ -1484,7 +1484,7 @@ GLOBAL VOID fdisk_inb IFN2(io_addr, port, UTINY *,value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1504
+#line 1503
 				break;
 			default:
 				dt1(DHW | PORTIO, 0, "inb on port %x(hex)\n", port)
@@ -1634,7 +1634,7 @@ GLOBAL VOID fdisk_outw IFN2(io_addr, port, USHORT, value)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 1664
+#line 1665
 
 			break;
 	default:

@@ -90,7 +90,7 @@
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 89
+#line 94
 #include "egavideo.h"
 #include "host_gfx.h"
 #include "cpu_vid.h"

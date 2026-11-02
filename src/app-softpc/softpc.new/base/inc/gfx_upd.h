@@ -68,7 +68,7 @@ typedef enum {
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif  // NEC_98
-#line 60
+#line 83
         EGA_HI_SP,
         EGA_HI_SP_WR,
         EGA_MED_SP,
@@ -158,7 +158,7 @@ extern VIDEOFUNCS *working_video_funcs;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif  // NEC_98
-#line 139
+#line 175
 
 #define host_init_screen()\
 	(working_video_funcs->init_screen)()

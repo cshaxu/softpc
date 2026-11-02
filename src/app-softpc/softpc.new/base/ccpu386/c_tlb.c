@@ -327,7 +327,7 @@ flush_tlb()
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #endif /* SPC486 */
-#line 382
+#line 312
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Map linear address to physical address.                            */
@@ -546,7 +546,7 @@ IFN2(
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 600
+#line 530
       }
 
    if (new_pde != pde)
@@ -555,7 +555,7 @@ IFN2(
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 610
+#line 540
       }
 
    /* return newly cached physical address */
@@ -825,7 +825,7 @@ xtrn2phy IFN3
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 879
+#line 809
             }
          if (new_pde != pde)
             {
@@ -834,7 +834,7 @@ xtrn2phy IFN3
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 890
+#line 820
             }
 	 }
       }

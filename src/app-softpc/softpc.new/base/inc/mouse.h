@@ -22,7 +22,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 22
+#line 38
 #define MOUSE_PORT_0		0x023c
 #define MOUSE_PORT_1		0x023d
 #define MOUSE_PORT_2		0x023e

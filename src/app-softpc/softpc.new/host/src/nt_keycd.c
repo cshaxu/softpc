@@ -38,7 +38,7 @@ scancode values for the regular keys just to make life a little more fun!
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 34
+#line 311
 BYTE Scan1ToKeynum[] =
 {
     // Keynum		Scancode	US encoding

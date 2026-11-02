@@ -123,7 +123,7 @@ typedef union {
 #ifdef  BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #else
-#line 141
+#line 208
                 unsigned        low_byte        : 8,
                                 top_bit         : 1,
                                 unused          : 7;
@@ -144,7 +144,7 @@ typedef union {
 #ifdef  BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #else
-#line 164
+#line 231
                 unsigned        low_byte        : 8,
 				med_bit		: 1,
                                 top_bit         : 1,
@@ -217,7 +217,7 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 218
+#line 421
 #define	set_mode_change_required(val)	PCDisplay.mode_change_required = (val)
 #define	set_word_addressing(val)	PCDisplay.word_addressing = (val)
 #define	set_offset_per_line(val)	PCDisplay.offset_per_line = (val)

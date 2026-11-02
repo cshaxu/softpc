@@ -160,7 +160,7 @@ GLOBAL void setNpxStackRegs IPT1(FPSTACKENTRY *, loadPtr);
 #ifndef NULL
 #error "Unsupported SoftPC mirror configuration: !NULL"
 #endif
-#line 163
+#line 161
 #define TAG_NEGATIVE_MASK 1
 #define TAG_ZERO_MASK 2
 #define TAG_INFINITY_MASK 4
@@ -464,7 +464,7 @@ INTEL_COMP_NC
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else	/* !BIGEND */
-#line 488
+#line 486
 LOCAL FPU_I64 BCDLowNibble[] = {
 {0x6fc10000, 0x002386f2},
 {0x107a4000, 0x00005af3},

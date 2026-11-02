@@ -48,7 +48,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 48
+#line 51
 #define CPU_RS232_SEC_INT   	3
 #define CPU_RS232_PRI_INT   	4
 #define CPU_DISK_INT   		5
@@ -81,7 +81,7 @@
 #if defined (ASPI)
 #error "Unsupported SoftPC mirror configuration: ASPI"
 #endif
-#line 74
+#line 81
 
 #define CPU_AT_NPX_INT		5	/* NPX exception */
 #define CPU_AT_DISK_INT		6

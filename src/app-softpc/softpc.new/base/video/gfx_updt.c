@@ -174,7 +174,7 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 184
+#line 206
 #define clear_dirty()		{setVideodirty_total(0);setVideodirty_low(0x80001);setVideodirty_high(-1);}
 #endif  //NEC_98
 #line 208
@@ -182,7 +182,7 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 #ifdef	NO_STRING_OPERATIONS
 #error "Unsupported SoftPC mirror configuration: NO_STRING_OPERATIONS"
 #else
-#line 189
+#line 212
 #define	SET_VGLOBS_MARK_STRING(func)	setVideomark_string(func);
 #endif	/* NO_STRING_OPERATIONS */
 

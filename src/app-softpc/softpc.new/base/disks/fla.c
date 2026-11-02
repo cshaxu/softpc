@@ -837,7 +837,7 @@ LOCAL	void fla_int_call_back IFN1(long,junk)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else    /* NTVDM */
-#line 843
+#line 823
 
 /*
  * This routine will 'automatically' execute the current FDC command.

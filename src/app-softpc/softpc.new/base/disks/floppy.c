@@ -1,7 +1,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 1
+#line 7
 #include "insignia.h"
 #include "host_def.h"
 
@@ -109,13 +109,13 @@ extern void host_simulate();
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 113
+#line 119
 
 #include <stdio.h>
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif //NEC_98
-#line 115
+#line 124
 #include TypesH
 
 #include "xt.h"
@@ -148,7 +148,7 @@ extern void host_simulate();
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 140
+#line 228
 void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 {
 	fl_disk_reset,
@@ -183,7 +183,7 @@ void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif    /* NTVDM */
-#line 261
+#line 260
 
 
 /*
@@ -227,7 +227,7 @@ LOCAL chk_stat_2 IPT0();
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 208
+#line 347
 /*
  *	This macro defines the normal behaviour of the FDC after a reset.
  *	Sending a series of sense interrupt status commands following a
@@ -392,7 +392,7 @@ void fl_disk_read IFN1(int, drive)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 365
+#line 949
 	/*
 	 *	Read sectors from the diskette in "drive"
 	 *
@@ -438,7 +438,7 @@ void fl_disk_write IFN1(int, drive)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 405
+#line 1434
 	/*
 	 *	Write sectors to the diskette in "drive"
 	 *
@@ -484,7 +484,7 @@ void fl_disk_verify IFN1(int, drive)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 445
+#line 1916
 	/*
 	 *	Verify sectors in the diskette in "drive"
 	 *
@@ -544,7 +544,7 @@ void fl_disk_format IFN1(int, drive)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 499
+#line 2248
 	/*
 	 *	Format the diskette in "drive"
 	 *
@@ -726,7 +726,7 @@ void fl_disk_parms IFN1(int, drive)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 669
+#line 2432
 	if (    (equip_flag.bits.diskette_present == 1)
 	     && (drive < MAX_FLOPPY))
 #endif /* NTVDM */
@@ -920,7 +920,7 @@ void fl_disk_type IFN1(int, drive)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 865
+#line 2629
 
 }
 
@@ -2999,7 +2999,7 @@ LOCAL wait_int IFN0()
 #else	/* JOKER */
 #error "Unsupported SoftPC mirror configuration: JOKER"
 #endif	/* JOKER */
-#line 2887
+#line 4789
 
 
 	/*
@@ -3012,7 +3012,7 @@ LOCAL wait_int IFN0()
 #ifdef FLOPPIES_KEEP_TRYING
 #error "Unsupported SoftPC mirror configuration: FLOPPIES_KEEP_TRYING"
 #endif /* FLOPPIES_KEEP_TRYING */
-#line 2912
+#line 4814
 
 		sas_load(FLOPPY_STATUS, &diskette_status);
 		diskette_status |= FS_TIME_OUT;

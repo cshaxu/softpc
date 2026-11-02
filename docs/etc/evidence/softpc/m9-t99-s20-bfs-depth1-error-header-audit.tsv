@@ -12,7 +12,7 @@ base/ccpu386/c_reg.h	388	ifdef	SFELLOW	117	117	117	117	8bd9ca370d501fd3caa20104c
 base/ccpu386/c_stack.h	86	ifdef	PIG	116	116	116	116	eee44be4c60cf1c724a728eafed3474dd1e6330ad1088015d69b05637c666b76	not-selected-in-all-recorded-contexts
 base/ccpu386/c_stack.h	98	ifdef	PIG	116	116	116	116	eee44be4c60cf1c724a728eafed3474dd1e6330ad1088015d69b05637c666b76	not-selected-in-all-recorded-contexts
 base/ccpu386/ccpupig.h	12	ifdef	PIG	6	6	6	6	8ce5761c519af7cffb0f4a994ad535de83fc26fe43d44f4cdd758eed2c6d42a9	not-selected-in-all-recorded-contexts
-base/cvidc/j_c_lang.h	49	ifdef	BIGEND	34	34	34	34	2f4745dd9161642f44a061b1c923c6c3416002329f9bb92a632e8139945cc661	not-selected-in-all-recorded-contexts
+base/cvidc/j_c_lang.h	49	ifdef	BIGEND	34	34	34	34	496bfa1112c0e4e60a86a918089c40eb6907f9d52cc042cd51a3374d318c0d2d	not-selected-in-all-recorded-contexts
 base/cvidc/sas4gen.h	125	else		56	56	56	56	08f193c0e0592f9bb43e98965c91ea8271e66ffe63783391bec51d81d9be3897	not-selected-in-all-recorded-contexts
 base/cvidc/sas4gen.h	133	else		56	56	56	56	08f193c0e0592f9bb43e98965c91ea8271e66ffe63783391bec51d81d9be3897	not-selected-in-all-recorded-contexts
 base/cvidc/sas4gen.h	141	else		56	56	56	56	08f193c0e0592f9bb43e98965c91ea8271e66ffe63783391bec51d81d9be3897	not-selected-in-all-recorded-contexts
@@ -108,33 +108,33 @@ base/inc/emm.h	145	ifdef	ANSI	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e285
 base/inc/emm.h	261	if	defined(X86GFX) && defined(NTVDM)	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
 base/inc/equip.h	23	ifdef	BIGEND	7	7	7	7	7e60097207bd18810fb33e7bb85e94ce9c6387aa11c87e006f278cdf242c4373	not-selected-in-all-recorded-contexts
 base/inc/error.h	1	ifdef	NTVDM	20	20	20	20	da0c0ff171c3c2adca46776b56ec61dff79c7529e71c9f63f687238df681a36e	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	187	ifdef	NTVDM	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	431	if	defined(NEC_98)	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	479	ifdef	ANSI	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	492	ifdef	ANSI	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	516	ifdef	ANSI	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	529	ifdef	ANSI	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
-base/inc/floppy.h	563	ifdef	NTVDM	3	3	3	3	8a35026d1864d0497c23535787b41ad8514f601aada90d8f9a196c346341c644	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	187	ifdef	NTVDM	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	431	if	defined(NEC_98)	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	479	ifdef	ANSI	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	492	ifdef	ANSI	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	516	ifdef	ANSI	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	529	ifdef	ANSI	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
+base/inc/floppy.h	563	ifdef	NTVDM	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
 base/inc/gendrvr.h	26	ifdef	GEN_DRVR	1	1	1	1	18ee9e6013b982b6cc3e8932efbfe3f1bde039471f2b0046bf7444f833b6a35a	not-selected-in-all-recorded-contexts
 base/inc/gfi.h	503	ifdef	NTVDM	13	13	13	13	e2b25b7acca46c9a15e0f814a68676bb0ff0b79109e49d0a7a48d1ca6d92f6a6	not-selected-in-all-recorded-contexts
 base/inc/gispsvga.h	23	ifdef	GISP_SVGA	1	1	1	1	77387d38b1fb7f7b12be334a6e3756e4e2c69ee0e01cc600198690b6d49446c0	not-selected-in-all-recorded-contexts
-base/inc/gmi.h	31	else		35	35	35	35	7056c31a7883b122ed8494a0ac43ff58e282372023889585982da5416ebb91d9	not-selected-in-all-recorded-contexts
-base/inc/gmi.h	71	ifdef	EGATEST	35	35	35	35	7056c31a7883b122ed8494a0ac43ff58e282372023889585982da5416ebb91d9	not-selected-in-all-recorded-contexts
+base/inc/gmi.h	31	else		35	35	35	35	95fe47bda7aaca69d3ae0c14c327bfde7a0c7a463121cdd7d22fa35d290a8b1d	not-selected-in-all-recorded-contexts
+base/inc/gmi.h	71	ifdef	EGATEST	35	35	35	35	95fe47bda7aaca69d3ae0c14c327bfde7a0c7a463121cdd7d22fa35d290a8b1d	not-selected-in-all-recorded-contexts
 base/inc/host.h	22	ifdef	PC_CONFIG	1	1	1	1	0ecf84a2436fca0fd5e9a08bc02f74208be0223b73a624bc82e40ce94fe6d0c9	not-selected-in-all-recorded-contexts
 base/inc/host.h	47	ifdef	SUSPEND	1	1	1	1	0ecf84a2436fca0fd5e9a08bc02f74208be0223b73a624bc82e40ce94fe6d0c9	not-selected-in-all-recorded-contexts
 base/inc/host.h	60	ifdef	SETUID_ROOT	1	1	1	1	0ecf84a2436fca0fd5e9a08bc02f74208be0223b73a624bc82e40ce94fe6d0c9	not-selected-in-all-recorded-contexts
 base/inc/host_sas.h	20	if	defined(BASE_SAS) && defined(HOST_SAS)	57	57	57	57	38b19d98bb839f5548488c22ed3852acf6876421e9effff2b3f98db8ea654377	not-selected-in-all-recorded-contexts
 base/inc/hunter.h	17	ifdef	HUNTER	1	1	1	1	63eb40b4b6c685c878be7d090c00e0f9925de92bbec7517791e00d7dd6bbea23	not-selected-in-all-recorded-contexts
-base/inc/ica.h	48	if	defined(NEC_98)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
-base/inc/ica.h	58	if	defined(NEC_98)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
-base/inc/ica.h	76	if	defined (SWIN_HAW)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
-base/inc/ica.h	81	if	defined (ASPI)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
-base/inc/ica.h	118	if	defined (NTVDM)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
-base/inc/ica.h	220	ifdef	GISP_CPU	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
+base/inc/ica.h	48	if	defined(NEC_98)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	58	if	defined(NEC_98)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	76	if	defined (SWIN_HAW)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	81	if	defined (ASPI)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	118	if	defined (NTVDM)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
+base/inc/ica.h	220	ifdef	GISP_CPU	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
 base/inc/idetect.h	27	ifdef	NTVDM	12	12	12	12	9d380238a6b77f071a55504cb6f6b4ce22c14e44d1bd3120369fec6c155a5904	not-selected-in-all-recorded-contexts
 base/inc/j_c_lang.h	42	ifdef	BIGEND	2	2	2	2	604ae70ca3c8720e171301a7211d0966a78da71ab2d5abdd2ad3e685f1ce03f5	not-selected-in-all-recorded-contexts
 base/inc/keyba.h	35	ifdef	HUNTER	4	4	4	4	eae105e1110ce03ce109da7eefb5f5097f2912ac2e25100b885a62258de3b5a6	not-selected-in-all-recorded-contexts
-base/inc/mouse.h	22	if	defined(NEC_98)	4	4	4	4	e9c6a617986bc631e90cb8c089961f32df4bfb46f7439edcda689f52801ac6cd	not-selected-in-all-recorded-contexts
+base/inc/mouse.h	22	if	defined(NEC_98)	4	4	4	4	38d8478fa7de461f6cd5674c982070615d90226be028ba462cad5edf2fc317ca	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	256	else		3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	785	ifdef	NTVDM	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	947	ifdef	MOUSE_16_BIT	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
@@ -142,29 +142,29 @@ base/inc/mouse_io.h	976	ifdef	HERC	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678
 base/inc/mouse_io.h	1081	ifdef	MOUSE_16_BIT	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	1109	ifdef	HERC	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 base/inc/ppi.h	29	ifdef	ANSI	4	4	4	4	582e955790cdf0320956c271b5849f2c2efd8613a3774a58a1aa90957b98aa26	not-selected-in-all-recorded-contexts
-base/inc/sas.h	283	ifdef	BACK_M	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	320	if	defined(NEC_98)	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	333	if	defined(NEC_98)	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	348	if	defined(NEC_98)	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	369	else		57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	389	if	defined(NTVDM) && !defined(X86GFX)	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	460	else		57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	731	else		57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	781	ifdef	BACK_M	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/sas.h	804	if	defined(NEC_98)	57	57	57	57	29ce265919f4ec7f5a6667c47ca1aa4e844df6df56277eab0527715eca603377	not-selected-in-all-recorded-contexts
-base/inc/tape_io.h	35	ifdef	JAPAN	5	5	5	5	44450a283f2e1debd2bbed1e132ef6604565769d4ba3c2797385bceae8fb5915	not-selected-in-all-recorded-contexts
+base/inc/sas.h	283	ifdef	BACK_M	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	320	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	333	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	348	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	369	else		57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	389	if	defined(NTVDM) && !defined(X86GFX)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	460	else		57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	731	else		57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	781	ifdef	BACK_M	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	804	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/tape_io.h	35	ifdef	JAPAN	5	5	5	5	bcc3bbb1b9a55f6515fd1679aa5b9452dc8235a71b444b0d059ecd3b03687c76	not-selected-in-all-recorded-contexts
 base/inc/timer.h	77	ifdef	NTVDM	29	29	29	29	ce5afc91ba27d2c7fe395a587795d2086ff2a4158f9e97fadf1bf3af103b03b4	not-selected-in-all-recorded-contexts
 base/inc/timer.h	91	ifdef	SWIN_MOUSE_OPTS	29	29	29	29	ce5afc91ba27d2c7fe395a587795d2086ff2a4158f9e97fadf1bf3af103b03b4	not-selected-in-all-recorded-contexts
 base/inc/timer.h	102	ifdef	HUNTER	29	29	29	29	ce5afc91ba27d2c7fe395a587795d2086ff2a4158f9e97fadf1bf3af103b03b4	not-selected-in-all-recorded-contexts
 base/inc/timer.h	124	ifdef	NTVDM	29	29	29	29	ce5afc91ba27d2c7fe395a587795d2086ff2a4158f9e97fadf1bf3af103b03b4	not-selected-in-all-recorded-contexts
 base/inc/timeval.h	66	else		8	8	8	8	612dbb7b0bc08fa4e5c71ae14a1ab8da7c26e4dd013dbc8cb9956e1db1729eff	not-selected-in-all-recorded-contexts
-base/inc/video.h	66	if	defined(NEC_98)	19	19	19	19	a5d355fe335d8e06b9d96dc132cc57e81479491f75e3d0cae97b76b2470ae8a7	not-selected-in-all-recorded-contexts
+base/inc/video.h	66	if	defined(NEC_98)	19	19	19	19	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8	not-selected-in-all-recorded-contexts
 base/inc/yoda.h	42	else		6	6	6	6	cc573a311f338003d9e3ec58d71777d64f16d895eb56a4587d6bedd8bc282996	not-selected-in-all-recorded-contexts
 base/inc/yoda.h	51	ifndef	PROD	6	6	6	6	cc573a311f338003d9e3ec58d71777d64f16d895eb56a4587d6bedd8bc282996	not-selected-in-all-recorded-contexts
 host/inc/host_cpu.h	17	ifdef	CPU_30_STYLE	58	58	58	58	57d3c8163c0a849f562d76b3aff508debe10695b10a10ba64c689d1399bd7f49	not-selected-in-all-recorded-contexts
-host/inc/host_def.h	45	ifdef	MONITOR	274	274	274	274	0e979812c42a17cf7f909c985f5af1f9d4093458f110374aff77431b3634d2b1	not-selected-in-all-recorded-contexts
-host/inc/host_def.h	148	ifdef	HUNTER	274	274	274	274	0e979812c42a17cf7f909c985f5af1f9d4093458f110374aff77431b3634d2b1	not-selected-in-all-recorded-contexts
-host/inc/host_def.h	225	ifdef	ARCX86	274	274	274	274	0e979812c42a17cf7f909c985f5af1f9d4093458f110374aff77431b3634d2b1	not-selected-in-all-recorded-contexts
+host/inc/host_def.h	45	ifdef	MONITOR	274	274	274	274	7dbe58365720b285b18e7fdbabb0035a5468ba5083d8c6f30e715552b4b0bb5e	not-selected-in-all-recorded-contexts
+host/inc/host_def.h	148	ifdef	HUNTER	274	274	274	274	7dbe58365720b285b18e7fdbabb0035a5468ba5083d8c6f30e715552b4b0bb5e	not-selected-in-all-recorded-contexts
+host/inc/host_def.h	225	ifdef	ARCX86	274	274	274	274	7dbe58365720b285b18e7fdbabb0035a5468ba5083d8c6f30e715552b4b0bb5e	not-selected-in-all-recorded-contexts
 host/inc/host_hfx.h	16	ifdef	SCCSID	1	1	1	1	541e66158be0f510f291dd409f732e1184c6ba2fe66ebeac68231cf9b8525dd7	not-selected-in-all-recorded-contexts
 host/inc/host_hfx.h	21	ifdef	HFX	1	1	1	1	541e66158be0f510f291dd409f732e1184c6ba2fe66ebeac68231cf9b8525dd7	not-selected-in-all-recorded-contexts
 host/inc/nt_cga.h	23	if	defined(NEC_98)	2	2	2	2	1b9fbdbd7acd401d369b13ed668bda201a059c5ca8d4dacc603e669dbe48f4c5	not-selected-in-all-recorded-contexts
@@ -214,42 +214,42 @@ base/inc/bios.h	362	ifdef	GISP_CPU	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957
 base/inc/bios.h	367	ifdef	HFX	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957cf22c300ed1335f351a9b04afe20c15	not-selected-in-all-recorded-contexts
 base/inc/bios.h	372	ifdef	DOS_APP_LIC	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957cf22c300ed1335f351a9b04afe20c15	not-selected-in-all-recorded-contexts
 base/inc/bios.h	383	if	defined(NEC_98)	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957cf22c300ed1335f351a9b04afe20c15	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	62	if	defined(NEC_98)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	68	if	defined(NEC_98)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	115	if	defined(NEC_98)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	138	ifdef	GISP_SVGA	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	158	if	defined(NEC_98)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	193	ifdef	GISP_SVGA	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	253	if	defined(NEC_98)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	277	if	defined(NEC_98)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gfx_upd.h	298	if	defined(HERC)	29	29	29	29	71ca0a943fd9f52ca25af510fcc60b668e41f99275cc2fb2b8685cb97dfc10c4	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	65	ifdef	HERC	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	76	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	115	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	123	ifdef	BIT_ORDER1	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	144	ifdef	BIT_ORDER1	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	168	else		28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	174	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	203	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	209	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	217	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-base/inc/gvi.h	318	if	defined(NEC_98)	28	28	28	28	2250c43d6f0b557d5e4e1dddee693af121224f17f71140664491fe01e6e98997	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	25	else		3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	36	else		3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	46	else		3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	58	else		3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	70	else		3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	86	else		3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	101	ifdef	BIGEND	3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	134	ifdef	NTVDM	3	3	3	3	67f259e3a199caef58e15e49500bcb751753e54ff9b0d794222593022e1a5c34	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	14	if	defined(NEC_98)	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	38	if	defined(NEC_98)	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	88	ifndef	PROD	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	131	ifdef	X86GFX	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	142	ifndef	PROD	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	150	ifdef	X86GFX	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	188	ifdef	X86GFX	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
-host/inc/nt_fulsc.h	193	ifdef	X86GFX	2	2	2	2	f862298f02ac84915d3a5dbdd1738ef968c1f6b3cd32c76d6921880871f01640	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	62	if	defined(NEC_98)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	68	if	defined(NEC_98)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	115	if	defined(NEC_98)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	138	ifdef	GISP_SVGA	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	158	if	defined(NEC_98)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	193	ifdef	GISP_SVGA	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	253	if	defined(NEC_98)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	277	if	defined(NEC_98)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gfx_upd.h	298	if	defined(HERC)	29	29	29	29	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	65	ifdef	HERC	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	76	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	115	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	123	ifdef	BIT_ORDER1	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	144	ifdef	BIT_ORDER1	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	168	else		28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	174	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	203	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	209	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	217	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+base/inc/gvi.h	318	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	25	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	36	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	46	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	58	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	70	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	86	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	101	ifdef	BIGEND	3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	134	ifdef	NTVDM	3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	14	if	defined(NEC_98)	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	38	if	defined(NEC_98)	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	88	ifndef	PROD	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	131	ifdef	X86GFX	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	142	ifndef	PROD	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	150	ifdef	X86GFX	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	188	ifdef	X86GFX	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
+host/inc/nt_fulsc.h	193	ifdef	X86GFX	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
 host/inc/nt_graph.h	77	ifdef	X86GFX	11	11	11	11	9902bcfa3fa191fe1d2efd21b929a8233d61255978619281ee2a86716a9d3a0d	not-selected-in-all-recorded-contexts
 host/inc/nt_graph.h	242	if	defined(NEC_98)	11	11	11	11	9902bcfa3fa191fe1d2efd21b929a8233d61255978619281ee2a86716a9d3a0d	not-selected-in-all-recorded-contexts
 host/inc/nt_graph.h	263	if	defined(NEC_98)	11	11	11	11	9902bcfa3fa191fe1d2efd21b929a8233d61255978619281ee2a86716a9d3a0d	not-selected-in-all-recorded-contexts
@@ -260,6 +260,6 @@ base/inc/bios.h	322	if	defined(SOFTWIN_API) || defined(SWIN_HFX)	35	35	35	35	eb5
 base/inc/cmos.h	335	if	defined(NTVDM) || defined(macintosh)	12	12	12	12	4d3431785b7baf6fc925ef11335c5f613e5913ac24bd50899f1e8723be99a08e	not-selected-in-all-recorded-contexts
 base/inc/egaports.h	76	else		26	26	26	26	f44521f22fa1cb5143cdbe53e96ceda172b38f4ec03c15dd6f169a7c64624c30	not-selected-in-all-recorded-contexts
 base/inc/gendrvr.h	21	if	defined (GEN_DRVR) || defined (CDROM)	1	1	1	1	18ee9e6013b982b6cc3e8932efbfe3f1bde039471f2b0046bf7444f833b6a35a	not-selected-in-all-recorded-contexts
-base/inc/ica.h	71	if	defined (NOVELL) || defined (NOVELL_IPX)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
+base/inc/ica.h	71	if	defined (NOVELL) || defined (NOVELL_IPX)	32	32	32	32	5ed75d0394ef12c9bc63e5e28301b41a870acc24f5dc1676705dbef9a156b520	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	758	if	defined(HOST_MOUSE) || defined(NTVDM)	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 host/inc/nt_sb.h	107	if	DBG	16	16	16	16	8205351b5e259673f0386280d3eb5d0f5faba7f077fddf83db8811b9c76148ec	not-selected-in-all-recorded-contexts

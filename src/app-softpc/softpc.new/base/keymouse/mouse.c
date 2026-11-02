@@ -85,7 +85,7 @@ static half_word data1_reg = 0,
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif    //NEC_98
-#line 86
+#line 96
 static half_word
 		 last_button_left  = 0,
 		 last_button_right = 0;

@@ -49,5 +49,5 @@ IMPORT void CrulesRuntimeError IPT1(char *, message);
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 56
+#line 49
 #define __J_C_LANG	/* mark as already included */

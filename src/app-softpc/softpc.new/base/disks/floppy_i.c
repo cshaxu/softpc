@@ -1,7 +1,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 1
+#line 7
 #include "insignia.h"
 #include "host_def.h"
 
@@ -39,7 +39,7 @@ extern void host_simulate();
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 43
+#line 49
 
 #include <stdio.h>
 #include TypesH
@@ -86,7 +86,7 @@ void diskette_io()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 294
+#line 524
 	/*
 	 *	Check for valid call and use secondary functions to
 	 *	perform the required operation
@@ -261,7 +261,7 @@ void diskette_post()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 426
+#line 728
 	/*
 	 *	Set the diskette data rate to 250 kbs (low density)
 	 */

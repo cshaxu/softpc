@@ -30,7 +30,7 @@
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif
-#line 30
+#line 33
 #include <sys\types.h>
 
 #include "xt.h"
@@ -135,7 +135,7 @@ static PAINTFUNCS std_mono_paint_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 117
+#line 148
         nt_text,
         nt_cga_mono_graph_std,
         nt_cga_mono_graph_std,
@@ -156,7 +156,7 @@ static PAINTFUNCS big_mono_paint_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 134
+#line 179
         nt_text,
         nt_cga_mono_graph_big,
         nt_cga_mono_graph_big,
@@ -177,7 +177,7 @@ static PAINTFUNCS huge_mono_paint_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 151
+#line 210
         nt_text,
         nt_cga_mono_graph_huge,
         nt_cga_mono_graph_huge,
@@ -198,7 +198,7 @@ static PAINTFUNCS std_colour_paint_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 168
+#line 241
         nt_text,
         nt_cga_colour_med_graph_std,
         nt_cga_colour_hi_graph_std,
@@ -219,7 +219,7 @@ static PAINTFUNCS big_colour_paint_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 185
+#line 272
         nt_text,
         nt_cga_colour_med_graph_big,
         nt_cga_colour_hi_graph_big,
@@ -240,7 +240,7 @@ static PAINTFUNCS huge_colour_paint_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 202
+#line 303
         nt_text,
         nt_cga_colour_med_graph_huge,
         nt_cga_colour_hi_graph_huge,
@@ -266,7 +266,7 @@ static INITFUNCS mono_init_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 220
+#line 389
         nt_init_text,
         nt_init_cga_mono_graph,
         nt_init_cga_mono_graph,
@@ -282,7 +282,7 @@ static INITFUNCS colour_init_funcs =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 232
+#line 415
         nt_init_text,
         nt_init_cga_colour_med_graph,
         nt_init_cga_colour_hi_graph,
@@ -540,7 +540,7 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 474
+#line 694
 
                 /*
                  *  Cleanup ALL handles associated with screen buffer
@@ -572,7 +572,7 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif /* X86GFX */
-#line 498
+#line 729
         }
 } /* end of closeGraphicsBuffer() */
 
@@ -804,7 +804,7 @@ void nt_clear_screen(void)
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif
-#line 681
+#line 969
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -820,7 +820,7 @@ void nt_flush_screen(void)
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif
-#line 693
+#line 984
             (void)(*update_alg.calc_update)();
 }
 
@@ -2073,7 +2073,7 @@ VOID resizeWindow IFN2( int, w, int, h )
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1835
+#line 2503
         /*
          * Reduce window width and height as necessary:
          */
@@ -2098,7 +2098,7 @@ VOID resizeWindow IFN2( int, w, int, h )
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1859
+#line 2527
         }
         /*
         ** Clip requested values to Window maximum and
@@ -2120,7 +2120,7 @@ VOID resizeWindow IFN2( int, w, int, h )
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // !NEC_98
-#line 1877
+#line 2548
         /*
          * Check if we need to enlarge the window now.
          * Settle for old top and left if they were smaller.
@@ -2426,7 +2426,7 @@ void nt_mode_select_changed(int dummy)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 2149
+#line 2863
 }
 
 void nt_color_select_changed(int dummy)
@@ -2435,7 +2435,7 @@ void nt_color_select_changed(int dummy)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 2157
+#line 2871
 }
 
 void nt_screen_address_changed(int lo, int hi)

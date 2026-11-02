@@ -582,7 +582,7 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 467
+#line 569
         case    DMA_CH1_PAGE_REG:
                 adaptor.pages.page[DMA_SDLC_CHANNEL] = value;
                 break;
@@ -876,7 +876,7 @@ GLOBAL  void dma_enquire        IFN3(half_word, channel,
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif  /* NTVDM */
-#line 864
+#line 858
 /* T93: retain XP's controller accessor for the original DSP, without NTVDM. */
 DMA_ADAPT *dmaGetAdaptor(void)
 {

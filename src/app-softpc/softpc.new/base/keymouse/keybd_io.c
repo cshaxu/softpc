@@ -175,7 +175,7 @@ LOCAL word rcpu_poll_segment = RCPU_POLL_SEGMENT,
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 184
+#line 242
 #define FREEKBDHDW()	/* Nothing for conventional SoftPC */
 #endif	/* NTVDM */
 #line 185
@@ -641,7 +641,7 @@ LOCAL VOID CheckAndPutInBufferFunc IFN2(half_word, s,half_word, v)
 #else /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* !NTVDM */
-#line 636
+#line 795
 	}
 }
 
@@ -673,7 +673,7 @@ LOCAL VOID PAUSE IFN0()
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 663
+#line 825
 
 		setCS(rcpu_nop_segment);
 		setIP(rcpu_nop_offset);
@@ -946,7 +946,7 @@ void keyboard_int IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 903
+#line 1107
 		}
 		/* SHIFT MAKE FOUND, DETERMINE SET OR TOGGLE	*/
 		if( mask < SCROLL_SHIFT )
@@ -1032,7 +1032,7 @@ label2:	/* NOT IN HOLD STATE	*/
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 983
+#line 1191
 			exit_from_kbd_int();return;
 		}
 		/* IN ALTERNATE SHIFT, RESET NOT FOUND	*/

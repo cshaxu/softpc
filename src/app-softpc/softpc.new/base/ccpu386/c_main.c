@@ -225,7 +225,7 @@ typedef union
 #ifdef SFELLOW
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
-#line 231
+#line 212
 
 /* CPU hardware interrupt definitions */
 #define CPU_HW_INT_MASK         (1 << 0)
@@ -307,7 +307,7 @@ LOCAL BOOL quick_mode = FALSE;	/* true if no special processing (trap
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else
-#line 330
+#line 305
 
 #define	PIG_SYNCH(action)			\
 	SYNCH_TICK();				\
@@ -336,7 +336,7 @@ LOCAL jmp_buf next_inst[FRAMES];
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else	/* !PIG */
-#line 361
+#line 336
 #define	CHECK_PREFIX_LENGTH()
 #endif	/* PIG */
 
@@ -804,7 +804,7 @@ DO_INST:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 887
+#line 807
 
    QUICK_EVENT_TICK();
 
@@ -1392,7 +1392,7 @@ TYPE0F90:
 #ifndef FIX_BT_BUG
 #error "Unsupported SoftPC mirror configuration: !FIX_BT_BUG"
 #endif
-#line 1486
+#line 1406
 	 modRM = GET_INST_BYTE(p);
 	 if ( GET_OPERAND_SIZE() == USE16 )
 	    {
@@ -1465,7 +1465,7 @@ TYPE0FA5:
 #ifndef FIX_BT_BUG
 #error "Unsupported SoftPC mirror configuration: !FIX_BT_BUG"
 #endif
-#line 1558
+#line 1478
 TYPE0FAB:
 	 modRM = GET_INST_BYTE(p);
 	 if ( GET_OPERAND_SIZE() == USE16 )
@@ -2123,7 +2123,7 @@ TYPE40:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 2282
+#line 2202
       PIG_SYNCH(CHECK_SOME_MEM);
       quick_mode = FALSE;
       break;
@@ -2165,7 +2165,7 @@ TYPE40:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 2323
+#line 2243
       PIG_SYNCH(CHECK_SOME_MEM);
       quick_mode = FALSE;
       break;
@@ -2189,7 +2189,7 @@ TYPE40:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 2346
+#line 2266
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -2231,7 +2231,7 @@ TYPE40:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 2387
+#line 2307
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -2245,14 +2245,14 @@ TYPE70:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 2442
+#line 2362
       (*inst32)(ops[0].sng);
       CANCEL_HOST_IP();
 
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 2467
+#line 2387
       break;
 
    case 0x71:   /* T2 JNO  Jb */   inst32 = JNO;    goto TYPE70;
@@ -2700,7 +2700,7 @@ TYPE9A:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 2927
+#line 2847
 
       quick_mode = FALSE;
       break;
@@ -3173,7 +3173,7 @@ TYPEC4:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else	/* PIG */
-#line 3404
+#line 3324
 	  UPDATE_INTEL_IP(p);
           if ((immed & 0xff) == 0xfe)
           {
@@ -3514,7 +3514,7 @@ TYPED4:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 3761
+#line 3680
 
 	modRM = GET_INST_BYTE(p);
 	ZFRSRVD(((opcode-0xd8)*0x100) + modRM);
@@ -3540,7 +3540,7 @@ TYPEE0:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 3805
+#line 3724
       break;
 
    case 0xe1:   /* T2 LOOPE  Jb */
@@ -3569,7 +3569,7 @@ TYPEE0:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3833
+#line 3752
       PIG_SYNCH(CHECK_NO_AL);
       quick_mode = FALSE;
       break;
@@ -3600,7 +3600,7 @@ TYPEE0:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3862
+#line 3781
 	 PIG_SYNCH(CHECK_NO_EAX);
 	 }
       quick_mode = FALSE;
@@ -3644,7 +3644,7 @@ TYPEE0:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3913
+#line 3832
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -3693,7 +3693,7 @@ TYPEE8:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3961
+#line 3880
       PIG_SYNCH(CHECK_NO_AL);
       quick_mode = FALSE;
       break;
@@ -3724,7 +3724,7 @@ TYPEE8:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 3990
+#line 3909
          PIG_SYNCH(CHECK_NO_EAX);
 	 }
       quick_mode = FALSE;
@@ -3741,7 +3741,7 @@ TYPEE8:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 4006
+#line 3925
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -3768,7 +3768,7 @@ TYPEE8:
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 4032
+#line 3951
       PIG_SYNCH(CHECK_ALL);
       quick_mode = FALSE;
       break;
@@ -4326,7 +4326,7 @@ RESUME_FETCH:
 #if defined(SFELLOW) && !defined(PROD)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* SFELLOW && !PROD */
-#line 4652
+#line 4498
 
    /* Reset default mode */
    SET_OPERAND_SIZE(GET_CS_AR_X());
@@ -4359,7 +4359,7 @@ RESUME_FETCH:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 4684
+#line 4530
 	)
       {
 	quick_mode = TRUE;
@@ -4707,7 +4707,7 @@ LOCAL VOID
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 5088
+#line 4922
 
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

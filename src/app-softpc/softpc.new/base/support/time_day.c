@@ -1,7 +1,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 1
+#line 7
 #include "windows.h"   /* included for Sleep() */
 
 
@@ -51,7 +51,7 @@
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 53
+#line 59
 
 
 /*
@@ -137,7 +137,7 @@ void time_of_day()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 124
+#line 288
     /*
      * BIOS function to return the number of PC interrupts since boot.
      */

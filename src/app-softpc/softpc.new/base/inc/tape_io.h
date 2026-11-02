@@ -35,7 +35,7 @@
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 35
+#line 41
 
 /*
  * Multi-tasking Extensions

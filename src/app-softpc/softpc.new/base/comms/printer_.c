@@ -1,7 +1,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 1
+#line 3
 
 #include "insignia.h"
 #include "host_def.h"

@@ -14,7 +14,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 14
+#line 17
 
 /*
  * ==========================================================================
@@ -38,7 +38,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 34
+#line 40
 #define STATELENGTH             sizeof(VIDEO_HARDWARE_STATE_HEADER)
 #endif // NEC_98
 #line 35
@@ -88,7 +88,7 @@
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #else /* !PROD */
-#line 99
+#line 106
 #define FullScreenTrace0(s)
 #define FullScreenTrace1(s ,p0)
 #define FullScreenTrace2(s, p0, p1)

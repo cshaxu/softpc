@@ -322,7 +322,7 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 #ifdef SLAVEPC
 #error "Unsupported SoftPC mirror configuration: SLAVEPC"
 #endif /* SLAVEPC */
-#line 357
+#line 359
 	{
 		num_flops  =
 			(*(CHAR *) config_inquire(C_FLOPPY_A_DEVICE, NULL))
@@ -330,7 +330,7 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 #ifdef FLOPPY_B
 #error "Unsupported SoftPC mirror configuration: FLOPPY_B"
 #endif
-#line 366
+#line 368
 	}
 
 	if (num_flops == 2)
@@ -463,7 +463,7 @@ GLOBAL void cmos_outb IFN2(io_addr, port, half_word, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 486
+#line 515
 
 	port = port & CMOS_BIT_MASK;	/* clear unused bits */
 
@@ -843,7 +843,7 @@ LOCAL void cmos_error IFN6(int, err, half_word, diag, half_word, equip,
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 866
+#line 928
 
 	if (err & BAD_SHUT_DOWN)
 		cmos[CMOS_SHUT_DOWN] = SHUT_INIT;
@@ -1052,7 +1052,7 @@ GLOBAL void cmos_update IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1068
+#line 1177
 LOCAL void
 sync_rtc_to_host_time IFN1( long, param )
 {

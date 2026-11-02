@@ -134,7 +134,7 @@ FP80SE	sign_exp;
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else	/* !NTVDM */
-#line 222
+#line 187
 
 #define HostGetOverflowException()      (fpgetsticky() & FP_X_OFL)
 #define HostGetUnderflowException()     (fpgetsticky() & FP_X_UFL)

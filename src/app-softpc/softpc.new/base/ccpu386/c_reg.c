@@ -41,7 +41,7 @@ Provide External Interface to CPU Registers.
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else /* PIG */
-#line 54
+#line 52
 #define	AR_FIXUP
 #endif /* PIG */
 
@@ -1202,7 +1202,7 @@ c_getVM()
 #ifdef	SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
-#line 1254
+#line 1252
 
 GLOBAL IU16
 c_getSTATUS()
@@ -1371,7 +1371,7 @@ IFN1(
 #ifdef	SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
-#line 1432
+#line 1430
 
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -1500,7 +1500,7 @@ IFN1(
 #ifdef	SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #endif	/* SPC486 */
-#line 1618
+#line 1616
 
 GLOBAL VOID
 c_setPG

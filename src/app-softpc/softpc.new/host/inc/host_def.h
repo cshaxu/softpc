@@ -45,7 +45,7 @@
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #else
-#line 48
+#line 42
 #define CpuH "cpu4.h"
 #endif
 
@@ -148,7 +148,7 @@ extern void host_simulate(void);
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif /* HUNTER */
-#line 150
+#line 142
 
 #define HOST_TIMER_TOOLONG_DELAY        15000   //BCN 1781
 

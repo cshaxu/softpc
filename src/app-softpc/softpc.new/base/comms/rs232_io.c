@@ -59,7 +59,7 @@ static void return_status()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 60
+#line 63
 	inb((io_addr)(port + RS232_LSR), (IU8 *)&value);
 	setAH(value);
 	inb((io_addr)(port + RS232_MSR), (IU8 *)&value);

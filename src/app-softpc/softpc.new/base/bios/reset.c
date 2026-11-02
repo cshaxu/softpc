@@ -120,7 +120,7 @@ HOSTMOUSEFUNCS  *working_mouse_funcs;
 #if     defined(DELTA) && defined(A2CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* DELTA && A2CPU */
-#line 118
+#line 120
 
 /*
  * ============================================================================
@@ -179,7 +179,7 @@ static void setup_ivt()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 168
+#line 327
         IUH count;
 
         /* make all vectors between 0 and 78 (apart from
@@ -349,7 +349,7 @@ half_word *low, *high;
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 361
+#line 521
     default:
         break;
     }
@@ -980,7 +980,7 @@ void reset()
 #ifdef  NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1068
+#line 1301
 
         /*
          * allow routines to distinguish between the initial boot and the 'soft'
@@ -993,7 +993,7 @@ void reset()
 #ifdef HFX
 #error "Unsupported SoftPC mirror configuration: HFX"
 #endif
-#line 1080
+#line 1313
 }
 
 /*(

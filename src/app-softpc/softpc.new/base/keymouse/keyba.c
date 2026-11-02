@@ -82,7 +82,7 @@
 #ifdef macintosh
 #error "Unsupported SoftPC mirror configuration: legacy Mac"
 #endif /* macintosh */
-#line 87
+#line 86
 
 #include "debug.h"
 
@@ -104,7 +104,7 @@
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 175
+#line 173
 
 
 
@@ -143,7 +143,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 139
+#line 211
 #define DEFAULT_SCAN_CODE_SET 2
 #endif   //NEC_98
 #line 140
@@ -151,7 +151,7 @@
 #ifdef REAL_KBD
 #error "Unsupported SoftPC mirror configuration: REAL_KBD"
 #endif
-#line 145
+#line 218
 
 /*
  * Globally available function pointers
@@ -215,7 +215,7 @@ GLOBAL VOID ( *do_key_repeats_fn_ptr )();
 #ifdef NTVDM	/* JonLe NT Mod */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 197
+#line 280
 #define	BUFF_6805_VMAX	48
 #define	BUFF_6805_PMAX	64
 #define	BUFF_6805_PMASK	(BUFF_6805_PMAX - 1)
@@ -238,7 +238,7 @@ static int buff_6805_in_ptr,buff_6805_out_ptr;
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 215
+#line 305
 
 /*
    20.5.92 MG
@@ -660,7 +660,7 @@ LOCAL INT buffer_status_8042 IPT0();
 #ifdef SECURE /* { */
 #error "Unsupported SoftPC mirror configuration: SECURE"
 #endif /* SECURE } */
-#line 800
+#line 1004
 
 /*
  * 6805 code buffer access procedures
@@ -1458,7 +1458,7 @@ if (!keyboard_disabled)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1558
+#line 2087
 #define  AddTo6805BuffImm(code) add_to_6805_buff(code, IMMEDIATE_OUTPUT);
 #endif
 #line 2089
@@ -1834,7 +1834,7 @@ code_to_send_valid = FALSE;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 1900
+#line 2645
 if (waiting_for_next_8042_code)
 	{
 	switch (next_8042_code_sequence_number)
@@ -2357,7 +2357,7 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 2422
+#line 3130
 	port &= 0x64;
 
 	if (port==0x64)
@@ -2457,7 +2457,7 @@ GLOBAL VOID kbd_outb IFN2(io_addr,port,half_word,val)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 2506
+#line 3258
 	port &= 0x64;
 	if (port == 0x64)
 	{

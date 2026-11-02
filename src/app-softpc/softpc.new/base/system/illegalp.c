@@ -71,7 +71,7 @@ void illegal_op()
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 74
+#line 77
 }
 
 void illegal_op_int()
