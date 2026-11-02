@@ -704,6 +704,15 @@ void recalc_text IFN1(int, height)
         word screen_height;
         half_word oflo;
         half_word protect;
+#line 771
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
+#line 774
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
+#line 778
 
         video_mode = sas_hw_at_no_check(vd_video_mode);
 #ifdef V7VGA
@@ -731,7 +740,14 @@ void recalc_text IFN1(int, height)
                 sas_storew_no_check(VID_LEN, (IU16)((sas_hw_at_no_check(vd_rows_on_screen)+1)*sas_w_at_no_check(VID_COLS)*2));
 #endif // !JAPAN
 #line 730
+#line 809
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 820
     do_outb(EGA_CRTC_INDEX,9,height-1); /* Character height */
+#endif
+#line 822
         do_outb(EGA_CRTC_INDEX,0xA,(IU8)(height-1));    /* Cursor start */
         do_outb(EGA_CRTC_INDEX,0xB,0);          /* Cursor end */
 
@@ -1073,6 +1089,13 @@ GLOBAL void ega_set_mode IFN0()
         sas_store_no_check(vd_video_mode, (IU8)(getAL() & 0x7F)); /* get rid of top bit - indicates clear or not */
         sas_store_no_check(ega_info, (IU8)((sas_hw_at_no_check(ega_info) & 0x7F ) | (getAL() & 0x80))); /* update screen clear flag in ega_info */
 
+#line 1202
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#elif defined(KOREA) // JAPAN
+#error "Unsupported SoftPC mirror configuration: KOREA"
+#endif // KOREA
+#line 1251
 #ifdef CPU_40_STYLE
         if (forceVideoRmSemantics && (!get_EGA_no_clear()))
         {
@@ -1157,6 +1180,11 @@ GLOBAL void ega_set_mode IFN0()
                                 font_offset++;
                         } while(mode_byte != 0xff);
                    }
+#line 1369
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: #if defined(JAPAN) || defined(KOREA)"
+#endif // JAPAN || KOREA
+#line 1398
                 }
         else
         {
@@ -1239,12 +1267,21 @@ GLOBAL void ega_set_mode IFN0()
     }
     inb(EGA_IPSTAT1_REG,&temp_word);
     outb(EGA_AC_INDEX_DATA, EGA_PALETTE_ENABLE);        /* re-enable video */
+#line 1570
+#if defined(JAPAN) || defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: JAPAN or KOREA"
+#endif // JAPAN || KOREA
+#line 1581
+#if defined(NTVDM) && !defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and not X86GFX"
+#endif
+#line 1589
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1220
+#line 1592
 #endif  //NEC_98
-#line 1220
+#line 1593
 }
 
 /*
@@ -1595,13 +1632,27 @@ GLOBAL void ega_char_gen IFN0()
                         set_graph_font(getCX());
                         break;
                 case 0x22:
+#line 1977
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
+#else
+#line 1991
                         sas_storew_no_check(EGA_FONT_INT*4,EGA_CGMN_OFF);
                         sas_storew_no_check(EGA_FONT_INT*4+2,EGA_SEG);
+#endif  /* NTVDM & X86GFX */
+#line 1994
                         set_graph_font(14);
                         break;
                 case 0x23:
+#line 1997
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
+#else
+#line 2011
                         sas_storew_no_check(EGA_FONT_INT*4,EGA_CGDDOT_OFF);
                         sas_storew_no_check(EGA_FONT_INT*4+2,EGA_SEG);
+#endif  /* NTVDM & X86GFX */
+#line 2014
                         set_graph_font(8);
                         break;
 #ifdef VGG
@@ -1786,7 +1837,12 @@ void ega_video_init IFN0()
 void ega_video_io IFN0()
 {
 #ifndef NEC_98
-#line 1693
+#line 2292
+#line 2293
+#if defined(NTVDM) && !defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and not X86GFX"
+#endif
+#line 2295
 
 
 
@@ -2210,6 +2266,11 @@ sys_addr find_mode_table IFN2(int, mode, sys_addr *, save_addr)
         }
 
 
+#line 2697
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && defined(X86GFX)"
+#endif  /* NTVDM & X86GFX */
+#line 2755
 #endif  //NEC_98
 #line 2074
         return params_addr;

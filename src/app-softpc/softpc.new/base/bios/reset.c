@@ -671,6 +671,10 @@ void reset()
 #else  // !NEC_98
 #line 950
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)
+#line 951
+#ifdef ARCX86
+#error "Unsupported SoftPC mirror configuration: ARCX86"
+#endif
 #line 954
     {
         /* Clear out the bottom 32K of memory. */

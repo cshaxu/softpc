@@ -154,8 +154,9 @@ ERROR RECOVERY	  :	none.
 #line 157
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
-#define	change_read_pointers(ptr)	dump_change_read_pointers(&ptr)
+#error "Unsupported SoftPC mirror configuration: #if defined(EGA_DUMP) || defined(EGA_STAT)"
 #else
+#line 162
 #ifdef EGATEST
 #error "Unsupported SoftPC mirror configuration: EGATEST"
 #else

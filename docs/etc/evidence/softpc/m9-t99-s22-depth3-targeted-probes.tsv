@@ -1,0 +1,8 @@
+path	parent_line	child_line	x86_parent	x86_child	x64_parent	x64_child	source_sha256_at_probe	result
+base/inc/rs232.h	318	332	3	0	3	0	5558be8babb6e71aaa1f4963e6aabb7ba4c24b3a83407c89eb72dfc87a025807	parent-reached-child-not-selected
+base/system/timer.c	1895	1921	1	0	1	0	c3ab918ba547ec9aef977d7355dd6918930173a9beeaa0d4ae3942f96633e28e	parent-reached-child-not-selected
+base/video/ega_read.c	124	156	1	0	1	0	1838c994908b8819a7657283a8307e0385e071f7e84da79d0c87e13f203e76f3	parent-reached-child-not-selected
+base/video/ega_writ.c	49	62	1	0	1	0	2ea8490a51c792a449d1eed0276304174eb197ca305498320b2ca48011317ae5	parent-reached-child-not-selected
+base/video/gfx_updt.c	138	147	1	0	1	0	0fb1371af618de224d7761bf3716235bbacbf371116ced9b40ea1e0d0e7e3d05	parent-reached-child-not-selected
+base/video/vga_prts.c	339	2403	1	0	1	0	7141d39472c0b475a78a4863a591318f047eef384a323b3c6fb9ac4a51c5ba21	parent-reached-child-not-selected
+base/video/video.c	1780	1784	1	0	1	0	07381768e36c750156fa737dab457a08021d8ea8ae4c1ad8afc5d41d2c3a5619	parent-reached-child-not-selected

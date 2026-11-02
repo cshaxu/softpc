@@ -132,7 +132,14 @@ typedef union {
 		 HALF_WORD_BIT_FIELD break_interrupt:1;
 		 HALF_WORD_BIT_FIELD tx_holding_empty:1;
 		 HALF_WORD_BIT_FIELD tx_shift_empty:1;
+#line 395
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && defined(FIFO_ON)"
+#else
+#line 398
 		 HALF_WORD_BIT_FIELD pad:1;
+#endif
+#line 400
 	       } bits;
       } LINE_STATUS_REG;
 #endif
@@ -166,11 +173,21 @@ typedef union {
 #line 513
 
 
+#line 481
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
+#endif
+#line 515
 /* register select code definitions follow: */
 
 #define RS232_TX_RX	0
 #define RS232_IER	1
 #define RS232_IIR	2
+#line 520
+#if defined(NTVDM) && defined(FIFO_ON)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && defined(FIFO_ON)"
+#endif
+#line 523
 #define RS232_LCR	3
 #define RS232_MCR	4
 #define RS232_LSR	5
@@ -313,14 +330,9 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #line 309
 
 #else
-
-#define	adapter_for_port(port)	(((port) >= RS232_PRI_PORT_START && (port) <= RS232_PRI_PORT_END) ? COM1 : COM2)
-
-
-#ifdef SHORT_TRACE
-#define	id_for_adapter(adapter)	(adapter == COM1 ? 'P' : 'S')
-#endif
+#error "Unsupported SoftPC mirror configuration: #else"
 #endif /* more than 2 serial ports */
+#line 679
 #endif // !NEC_98
 #line 319
 

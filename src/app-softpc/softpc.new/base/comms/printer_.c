@@ -66,6 +66,15 @@
 
 
 
+#line 66
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && defined(MONITOR)"
+#endif
+#line 70
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
+#endif
+#line 74
 /*
  * Set up arrays of addresses in BIOS data area, pointing to LPT ports and timeout values
  */

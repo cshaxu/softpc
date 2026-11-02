@@ -1919,37 +1919,9 @@ LOCAL void timer_no_longer_too_soon IFN1(long, dummy)
 LOCAL void timer_generate_int IFN1(long, n)
 {
 #if !(defined(GISP_CPU) || defined(CPU_40_STYLE))
-        if (getPE()){
-                /* Prot mode tick... */
-#ifndef PROD
-                if (!hack_active){
-                        SAVED BOOL first=TRUE;
-
-                        always_trace0 ("PM timer Hack activated.");
-                        if (first){
-                                always_trace1 ("Min # instrs between interrupts = %d", HOST_TIMER_TOOLONG_DELAY);
-                                always_trace1 ("        Nominal instrs_per_tick = %d", instrs_per_tick);
-                                always_trace1 ("       adjusted instrs_per_tick = %d", adj_instrs_per_tick);
-                                always_trace1 ("  # rm instrs before full speed = %d", n_rm_instrs_before_full_speed);
-                                always_trace1 ("     rm ticks before full speed = %d", adj_n_real_mode_ticks_before_full_speed);
-                                first = FALSE;
-                        }
-                }
-#endif
-                hack_active = TRUE;
-                real_mode_ticks_in_a_row = 0;
-
-        }else{
-                /* Real Mode Tick... */
-                if (hack_active){
-                        real_mode_ticks_in_a_row++;
-                        if (real_mode_ticks_in_a_row >= adj_n_real_mode_ticks_before_full_speed){
-                                hack_active = FALSE;
-                                always_trace0 ("PM timer Hack deactivated.");
-                        }
-                }
-        }
+#error "Unsupported SoftPC mirror configuration: #if !(defined(GISP_CPU) || defined(CPU_40_STYLE))"
 #endif  /* ! (GISP_CPU||CPU_40_STYLE) */
+#line 1994
 
         if (hack_active){
                 if (!too_soon_after_previous){

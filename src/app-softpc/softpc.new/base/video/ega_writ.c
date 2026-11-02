@@ -60,8 +60,9 @@ SccsID = @(#)ega_write.c	1.40 12/15/95 Copyright Insignia Solutions Ltd.
 
 /* [3.1.2 DECLARATIONS]                                                 */
 #if defined(EGA_DUMP) || defined(EGA_STAT)
-extern WRT_POINTERS dump_writes;
+#error "Unsupported SoftPC mirror configuration: #if defined(EGA_DUMP) || defined(EGA_STAT)"
 #endif
+#line 64
 
 extern WRT_POINTERS mode0_gen_handlers, mode0_copy_handlers;
 extern WRT_POINTERS mode1_handlers, mode2_handlers;

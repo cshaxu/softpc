@@ -54,12 +54,14 @@
 #endif /* BIOS1ROM_FILENAME */
 
 #ifndef BIOS2ROM_FILENAME
-#ifdef	CPU_40_STYLE
+#line 66
+#if defined(CPU_40_STYLE) || defined(ARCX86)
+#line 67
 #define	BIOS2ROM_FILENAME	"bios4.rom"
 #else	/* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 57
+#line 71
 #endif /* BIOS2ROM_FILENAME */
 
 #ifndef EGAROM_FILENAME

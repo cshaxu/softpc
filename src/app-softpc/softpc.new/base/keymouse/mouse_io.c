@@ -2186,9 +2186,23 @@ the application OUTBs the necessary data.
                                                 dirty_attr[first] = 1;
 
                                                 /* Using 'secret' that attrib. chip responds to it's port+1 */
+#line 2086
+#ifndef NTVDM
+#line 2087
                                                 outw(EGA_AC_INDEX_DATA,first+(sas_hw_at(sauce++) << 8));
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* !NTVDM */
+#line 2092
                                         }
+#line 2093
+#ifndef NTVDM
+#line 2094
                                         outb(EGA_AC_INDEX_DATA, EGA_PALETTE_ENABLE);    /* re-enable video */
+#else
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 2098
                                         break;
                                 default:
                                         break;

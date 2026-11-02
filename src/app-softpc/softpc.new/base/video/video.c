@@ -930,8 +930,15 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
 #line 800
+#line 1269
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: #ifdef JAPAN"
+#else // !JAPAN
+#line 1300
 		if( !screen_updated )
 			sas_move_bytes_forward (source, dest, colsdiff*2);
+#endif // !JAPAN
+#line 1303
 #endif
 
 		/* next line */
@@ -956,8 +963,15 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
 #line 817
+#line 1329
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: #ifdef JAPAN"
+#else // !JAPAN
+#line 1366
 		if( !screen_updated )
 			sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
+#endif // !JAPAN
+#line 1369
 #endif
 		dest += col_incr;
 #ifdef JAPAN
@@ -1356,8 +1370,15 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
 #line 1143
+#line 1781
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: #ifdef JAPAN"
+#else // !JAPAN
+#line 1812
 		if( !screen_updated )
 			sas_move_bytes_forward (source, dest, colsdiff*2);
+#endif // !JAPAN
+#line 1815
 #endif
 		source -= col_incr;
 		dest -= col_incr;
@@ -1380,8 +1401,15 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
 #line 1158
+#line 1839
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: #ifdef JAPAN"
+#else // !JAPAN
+#line 1876
 		if( !screen_updated )
 			sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
+#endif // !JAPAN
+#line 1879
 #endif
 		dest -= col_incr;
 #ifdef JAPAN
@@ -1754,8 +1782,9 @@ GLOBAL void vd_write_char_attrib IFN0()
 		for(i = 0; i < getCX(); i++)
 		{
 #if ( defined(NTVDM) && defined(MONITOR) ) || defined(GISP_SVGA)/* No Ega planes... */
-                        *((unsigned short *)( video_pc_low_regen + cpos)) = (getBL() << 8) | getAL();
+#error "Unsupported SoftPC mirror configuration: #if ( defined(NTVDM) && defined(MONITOR) ) || defined(GISP_SVGA)/* No Ega planes... */"
 #else
+#line 2261
 #ifdef	EGG
 			if ( ( (video_adapter != CGA) && (EGA_CPU.chain != CHAIN2) )
 #ifdef CPU_40_STYLE
@@ -1767,7 +1796,17 @@ GLOBAL void vd_write_char_attrib IFN0()
 #endif	/* EGG */
 				(*bios_ch2_word_wrt_fn)( (getBL() << 8) | getAL(), cpos );
 #endif	/* NTVDM & MONITOR */
+#line 2272
+#if defined(JAPAN) && defined(i386)
+#error "Unsupported SoftPC mirror configuration: #if defined(JAPAN) && defined(i386)"
+#endif // JAPAN && i386
+#line 2278
 			cpos += 2;
+#line 2279
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: #ifdef JAPAN"
+#endif // JAPAN
+#line 2296
 		}
 #endif
     }
@@ -2213,7 +2252,14 @@ GLOBAL void vd_write_teletype IFN0()
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #else
 #line 2780
+#line 2771
+#if defined(JAPAN)
+#error "Unsupported SoftPC mirror configuration: #if defined(JAPAN)"
+#else // !JAPAN
+#line 2780
     re_entrant = (sas_w_at_no_check(0x42) < 0xa000);
+#endif // !JAPAN
+#line 2782
 #endif
 #line 2783
 

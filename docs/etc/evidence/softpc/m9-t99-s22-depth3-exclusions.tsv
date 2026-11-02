@@ -1,0 +1,50 @@
+path	xp_parent_line	xp_child_line	xp_end_line	classification	condition	source_sha256
+base/bios/reset.c	950	951	953	false-in-supported-contexts	#ifdef ARCX86	00c4f671888a9d117bf71d9a68dae7513c4b2d0b4a23bf6a88bc5cf11088a530
+base/comms/printer.c	199	200	206	false-in-supported-contexts	#if defined(NTVDM) && defined(MONITOR)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/comms/printer.c	646	647	657	false-in-supported-contexts	#if defined(NTVDM)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/comms/printer.c	741	742	750	false-in-supported-contexts	#if defined(NTVDM)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/keymouse/keyba.c	1387	1388	1425	false-in-supported-contexts	#ifdef JAPAN	7850a9179917393e51abafc31a511225e4a2c44bfc092b817ad4cee7baceda70
+base/comms/printer.c	406	410	418	false-in-supported-contexts	#if defined(NTVDM)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/comms/printer.c	487	520	553	false-in-supported-contexts	#if defined(NTVDM)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/comms/printer.c	563	565	567	false-in-supported-contexts	#if defined(NTVDM)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/comms/printer.c	847	849	851	false-in-supported-contexts	#if defined(NTVDM)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/comms/printer_.c	42	66	68	false-in-supported-contexts	#if defined(NTVDM) && defined(MONITOR)	1c1f7f8a3200ec9197bbf13a2bb7d1e71d9364e193856aec56289abd28873d3d
+base/comms/printer_.c	42	70	72	false-in-supported-contexts	#if defined(NTVDM)	1c1f7f8a3200ec9197bbf13a2bb7d1e71d9364e193856aec56289abd28873d3d
+base/inc/rs232.h	480	520	522	false-in-supported-contexts	#if defined(NTVDM) && defined(FIFO_ON)	a91a4a8ad803cc514a2048bf2b7f56cd360f5fe0bc0a346fb266c5da1db5edd8
+base/video/ega_prts.c	332	1880	1898	false-in-supported-contexts	#if defined(NEC_98)	8fef51e2e56ef1051478516ce8dc0fab75d34650748c5e1538b070d701a47fc8
+base/video/ega_vide.c	1065	1369	1397	false-in-supported-contexts	#if defined(JAPAN) || defined(KOREA)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	2636	2697	2753	false-in-supported-contexts	#if defined(NTVDM) && defined(X86GFX)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/vga_prts.c	339	660	704	false-in-supported-contexts	#if defined(NEC_98)	eec80f7e0a3ee167328007934c719f03964200be62a1581e39b2aefb5a4dc1f5
+base/video/video.c	2255	2272	2277	false-in-supported-contexts	#if defined(JAPAN) && defined(i386)	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/video/video.c	2255	2279	2295	false-in-supported-contexts	#ifdef JAPAN	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/comms/printer.c	847	856	860	false-in-supported-contexts-selected-sibling-preserved	#if defined(NTVDM) && !defined(MONITOR)	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/inc/egagraph.h	101	107	111	false-in-supported-contexts-selected-sibling-preserved	#if defined(NEC_98)	7f9c6018e483018c2b69481555e978f69dda3847e140b99772ae8084c15a5658
+base/inc/egagraph.h	101	119	123	false-in-supported-contexts-selected-sibling-preserved	#if defined(NEC_98)	7f9c6018e483018c2b69481555e978f69dda3847e140b99772ae8084c15a5658
+base/inc/rs232.h	384	395	399	false-in-supported-contexts-selected-sibling-preserved	#if defined(NTVDM) && defined(FIFO_ON)	a91a4a8ad803cc514a2048bf2b7f56cd360f5fe0bc0a346fb266c5da1db5edd8
+base/video/ega_prts.c	332	1802	1806	false-in-supported-contexts-selected-sibling-preserved	#if defined(NEC_98)	8fef51e2e56ef1051478516ce8dc0fab75d34650748c5e1538b070d701a47fc8
+base/video/vga_prts.c	339	564	571	false-in-supported-contexts-selected-sibling-preserved	#ifdef NTVDM	eec80f7e0a3ee167328007934c719f03964200be62a1581e39b2aefb5a4dc1f5
+base/video/video.c	1268	1269	1302	false-in-supported-contexts-selected-sibling-preserved	#ifdef JAPAN	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/video/video.c	1328	1329	1368	false-in-supported-contexts-selected-sibling-preserved	#ifdef JAPAN	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/video/video.c	1780	1781	1814	false-in-supported-contexts-selected-sibling-preserved	#ifdef JAPAN	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/video/video.c	1838	1839	1878	false-in-supported-contexts-selected-sibling-preserved	#ifdef JAPAN	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/video/video.c	2770	2771	2781	false-in-supported-contexts-selected-sibling-preserved	#if defined(JAPAN)	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad
+base/inc/rs232.h	480	481	513	false-in-supported-contexts	#if defined(NTVDM) && defined(FIFO_ON)	a91a4a8ad803cc514a2048bf2b7f56cd360f5fe0bc0a346fb266c5da1db5edd8
+base/video/ega_vide.c	1065	1570	1580	false-in-supported-contexts	#if defined(JAPAN) || defined(KOREA)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	1065	1581	1588	false-in-supported-contexts	#if defined(NTVDM) && !defined(X86GFX)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	2291	2293	2296	false-in-supported-contexts	#if defined(NTVDM) && !defined(X86GFX)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/gfx_updt.c	3239	3246	3266	false-in-supported-contexts-selected-local-sibling-preserved	#if defined(NEC_98)	47aaa6ab9bb5ab117672f674ef7f108f2b8b936956f06f67050f25f54dde877a
+base/video/gfx_updt.c	3239	3277	3297	false-in-supported-contexts-selected-local-sibling-preserved	#if defined(NEC_98)	47aaa6ab9bb5ab117672f674ef7f108f2b8b936956f06f67050f25f54dde877a
+base/video/gfx_updt.c	3361	3378	3399	false-in-supported-contexts-selected-local-sibling-preserved	#if defined(NEC_98)	47aaa6ab9bb5ab117672f674ef7f108f2b8b936956f06f67050f25f54dde877a
+base/video/gfx_updt.c	3361	3410	3432	false-in-supported-contexts-selected-local-sibling-preserved	#if defined(NEC_98)	47aaa6ab9bb5ab117672f674ef7f108f2b8b936956f06f67050f25f54dde877a
+base/inc/ios.h	589	644	676	false-in-supported-contexts-selected-local-sibling-preserved	#ifdef NTVDM /* Spare slots for user supplied VDDs */	80d5cf08b7a77bba9970a703733a91915a4db1baa01f38014f11979b8e2b6995
+base/system/rom.c	65	66	70	original-or-restored-existing-excluded-sibling-preserved	#if defined(CPU_40_STYLE) || defined(ARCX86)	5abae476bec5a03d52f56348b1a27f03e7803d20e912d408c1215d2a369c5708
+base/video/ega_vide.c	1065	1202	1250	two-false-sibling-arms	#ifdef JAPAN	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/keymouse/mouse_io.c	1944	2086	2091	false-ntvdm-sibling-selected-original-preserved	#ifndef NTVDM	8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b
+base/keymouse/mouse_io.c	1944	2093	2097	false-ntvdm-sibling-selected-original-preserved	#ifndef NTVDM	8c80f901147dda5b6ebba14426a913519fc5f69d008361ba83b16b9c7b542d1b
+base/video/ega_vide.c	765	809	821	false-ntvdm-sibling-selected-original-preserved	#ifdef NTVDM	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	765	771	773	false-in-supported-contexts	#ifdef NTVDM	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	765	774	777	false-in-supported-contexts	#ifdef JAPAN	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	1901	1977	1993	false-in-supported-contexts-selected-sibling-preserved	#if defined(NTVDM) && defined(X86GFX)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/video/ega_vide.c	1901	1997	2013	false-in-supported-contexts-selected-sibling-preserved	#if defined(NTVDM) && defined(X86GFX)	f78ca01ff03aa3f08922e48ac6a03080d5a95a91463584f02da56c9cb6602f16
+base/keymouse/keyba.c	442	541	565	false-in-supported-contexts-selected-sibling-preserved	#if defined(NEC_98)	7850a9179917393e51abafc31a511225e4a2c44bfc092b817ad4cee7baceda70
+base/video/vga_vide.c	684	728	734	false-in-supported-contexts-selected-sibling-preserved	#if defined(NTVDM) && defined(X86GFX)	73ff367f16f19cdd6c5d520436d8604f6b0456a5fb7ad9d258cd4c5d16179c55

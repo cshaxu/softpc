@@ -1274,7 +1274,14 @@ LOCAL void	do_chain_majority_decision IFN0()
  */
 
 struct	EGA_GLOBALS	EGA_GRAPH;
+#line 1802
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#else    //NEC_98
+#line 1805
 struct	EGA_CPU_GLOBALS	EGA_CPU;
+#endif   //NEC_98
+#line 1807
 
 byte 	*EGA_planes;
 
@@ -1354,6 +1361,11 @@ update_banking IFN0()
 }
 
 
+#line 1880
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#endif  //NEC_98
+#line 1900
 VOID
 init_vga_globals IFN0()
 {

@@ -182,6 +182,10 @@ static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
 
 #line 199
 #ifndef NEC_98
+#line 200
+#if defined(NTVDM) && defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
+#endif
 #endif // !NEC_98
 #line 209
 #define STATE_READY     0
@@ -437,6 +441,11 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 		switch(get_state(adapter))
 		{
 
+#line 410
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
+#endif
+#line 420
 		case STATE_READY:
 			notbusy_check(adapter);
                         *value = get_status(adapter) | STATUS_REG_MASK;
@@ -541,6 +550,11 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 
 	switch(get_state(adapter))
 	{
+#line 520
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
+#endif
+#line 554
 	case STATE_OUT:
 	case STATE_OUTA:
 	case STATE_READY:
@@ -554,6 +568,11 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #else // !NEC_98
 #line 564
 		case DATA_OFFSET:
+#line 568
+#line 565
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
+#endif
 #line 568
 			/* Write char to internal buffer */
 			output_reg[adapter] = value;
@@ -599,6 +618,10 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 
 #line 646
 #ifndef NEC_98
+#line 647
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
 #endif // !NEC_98
 #line 660
 #ifdef PS_FLUSHING
@@ -683,6 +706,10 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 
 #line 741
 #ifndef NEC_98
+#line 742
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif
 #endif // !NEC_98
 #line 753
 #ifndef NEC_98
@@ -764,11 +791,23 @@ static void notbusy_check IFN1(int,adapter)
 #else  // !NEC_98
 #line 602
 	if (	 (get_state(adapter) == STATE_READY ||
+#line 849
+#if defined(NTVDM)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
+#endif
+#line 852
 		  get_state(adapter) == STATE_OUTA)
 	     &&	!(get_status(adapter) & NOTBUSY)
 	     &&	!(host_lpt_status(adapter) & HOST_LPT_BUSY))
 	{
+#line 856
+#if defined(NTVDM) && !defined(MONITOR)
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && !defined(MONITOR)"
+#else /* NTVDM && !MONITOR */
+#line 859
 		set_status(adapter, (IU8)(get_status(adapter) | NOTBUSY));
+#endif /* NTVDM && !MONITOR */
+#line 861
 
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"

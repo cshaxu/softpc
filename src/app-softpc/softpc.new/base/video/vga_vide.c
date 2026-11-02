@@ -713,8 +713,15 @@ void vga_disp_func()
  * Store VGA capability table pointer. Usually lives in Insignia ROM, on NT
  * x86 it has to live in ntio.sys.
  */
+#line 728
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
+#else
+#line 732
         sas_storew(buf,INT10_1B_DATA);
         sas_storew(buf+2,EGA_SEG);
+#endif  /* NTVDM & X86GFX */
+#line 735
 
         sas_store(buf+0x4, video_mode); /* Current video mode */
         sas_storew(buf+5,sas_w_at_no_check(VID_COLS)); /* Cols on screen */

@@ -377,6 +377,11 @@
 #endif
 
 #define SNDBLST_ADAPTER         36
+#line 644
+#ifdef NTVDM    /* Spare slots for user supplied VDDs */
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else   /* NTVDM */
+#line 659
 
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
@@ -395,6 +400,8 @@
 #endif
 
 #endif          /* GISP_SVGA */
+#endif  /* NTVDM */
+#line 677
 #else   /* SFELLOW */
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif /*SFELLOW */

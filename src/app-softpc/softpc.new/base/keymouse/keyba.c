@@ -425,6 +425,11 @@ static int set_3_make_sizes [13]=
   1			/* Case 5 ctrled size */
 };
 
+#line 541
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: NEC_98"
+#else    //NEC_98
+#line 555
 static int set_1_break_sizes [13]=
 { 1,2,2,2,4,0,		/* categories 1 to 6 inclusive */
   0,			/* size for error case - non existant key */
@@ -435,6 +440,8 @@ static int set_1_break_sizes [13]=
   1,			/* Alt Case 4 size */
   0			/* Case 5 ctrled size */
 };
+#endif    //NEC_98
+#line 566
 
 static int set_2_break_sizes [13]=
 { 2,3,3,3,6,0,		/* categories 1 to 6 inclusive */
@@ -895,6 +902,10 @@ switch (key_set)
 			{
 #line 1387
 #ifndef NEC_98
+#line 1388
+#ifdef	JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#endif // JAPAN
 #endif    //NEC_98
 #line 1427
 			switch (keytypes[key])

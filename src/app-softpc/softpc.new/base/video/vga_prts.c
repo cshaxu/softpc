@@ -565,7 +565,14 @@ LOCAL VOID	do_chain_majority_decision IFN0()
 #line 565
 }
 
+#line 564
+#ifdef	NTVDM
+#error "Unsupported SoftPC mirror configuration: #ifdef NTVDM"
+#else
+#line 570
 LOCAL VOID	do_new_cursor IFN0()
+#endif
+#line 572
 {
 #ifndef NEC_98
 #line 569
@@ -632,6 +639,11 @@ PC_palette *DAC;
 GLOBAL UTINY *vga_gc_outb_index_addr;
 
 
+#line 660
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#endif  //NEC_98
+#line 706
 GLOBAL VOID	vga_init IFN0()
 {
 #ifndef NEC_98
@@ -2389,87 +2401,9 @@ GLOBAL VOID	v_ret_intr_status IFN0()
  */
 
 #if defined(NTVDM) || defined(host_get_time_ms) || defined(host_get_count_ms)
-
- /*
-  * end of periods for each state
-  * Units are 100 usec (0.1 ms) to match GetPerfCounter() resolution
-  * Total period is based on 70 Hz for NTVDM and 50Hz otherwise
-  */
-#define IPSTAT1_STATE_0		(4)			/* End of state 0, ms */
-#define IPSTAT1_STATE_1		(IPSTAT1_STATE_0 + 9)	/* End of state 1, ms */
-#define IPSTAT1_STATE_2		(IPSTAT1_STATE_1 + 4)	/* End of state 2, ms */
-#define IPSTAT1_STATE_3		(IPSTAT1_STATE_2 + 3)	/* End of state 3, ms */
-#define IPSTAT1_CYCLE_TIME	IPSTAT1_STATE_3		/* Cycle time, ms */
-
-GLOBAL VOID  vga_ipstat1_inb IFN2(io_addr,port,half_word *,value)
-{
-   IMPORT ULONG GetPerfCounter(void);
-   SAVED ULONG RefreshStartTime=0;
-   ULONG cycles;
-   ULONG CurrTime;
-
-
-
-#ifdef PROD
-	UNUSED(port);
-#endif
-
-
-    note_entrance2("vga_ipstat1_inb(%x,%x)", port, value);
-
-#ifdef V7VGA
-	attribute_controller.address.as_bfld.index_state = 0;
-#else
-    set_index_state();	/* Initialize the Attribute register flip-flop (EGA tech ref, p 56) */
-#endif /* V7VGA */
-
-#if defined(NTVDM) || defined(host_get_count_ms)
-
-   CurrTime = host_get_count_ms();
-
-   cycles = CurrTime >= RefreshStartTime
-               ? CurrTime - RefreshStartTime
-               : 0xFFFFFFFF - RefreshStartTime + CurrTime;
-
-        /*  If app hasn't checked the status for a long time (for at least
-         *  one Display Refresh Cycle). start the app at end of state 0.
-         */
-   if (cycles > IPSTAT1_CYCLE_TIME) {
-       RefreshStartTime = CurrTime;
-       cycles = 0;
-   }
-
-#else 	/* host_get_time_ms */
-
-    cycles = host_get_time_ms() % IPSTAT1_CYCLE_TIME;
-
-#endif	/* host_get_time_ms */
-
-   if (cycles < IPSTAT1_STATE_0)
-   {
-       *value = 0x05;
-	input_status_register_zero.as_bfld.crt_interrupt = 0;	/* = !VS */
-   }
-   else if (cycles < IPSTAT1_STATE_1)
-   {
-       *value = 0x04;
-       if (((cycles - IPSTAT1_STATE_0) % 3) == 0)
-           *value |= 0x01;
-       input_status_register_zero.as_bfld.crt_interrupt = 0;   /* = !VS */
-   }
-   else if (cycles < IPSTAT1_STATE_2)
-   {
-	*value = 0x05;
-       input_status_register_zero.as_bfld.crt_interrupt = 0;   /* = !VS */
-   }
-   else /* IPSTAT1_STATE_3 */
-   {
-       *value = 0x0d;
-       input_status_register_zero.as_bfld.crt_interrupt = 1;   /* = VS */
-   }
-}
-
+#error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) || defined(host_get_time_ms) || defined(host_get_count_ms)"
 #else   /* !(NTVDM || host_get_time_ms || host_get_count_ms) */
+#line 2561
 
 GLOBAL VOID	vga_ipstat1_inb IFN2(io_addr,port,half_word *,value)
 {

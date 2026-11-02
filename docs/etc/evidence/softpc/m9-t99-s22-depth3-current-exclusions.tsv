@@ -1,0 +1,8 @@
+path	baseline_line	xp_child_line	xp_boundary_line	condition	classification	removed_lines	source_sha256
+base/inc/rs232.h	332	670	678	#else	parent-reached-target-unselected-both-architectures	7	a91a4a8ad803cc514a2048bf2b7f56cd360f5fe0bc0a346fb266c5da1db5edd8
+base/system/timer.c	1921	1962	1993	#if !(defined(GISP_CPU) || defined(CPU_40_STYLE))	parent-reached-target-unselected-both-architectures	30	489bec1c81424c250e3533c6a6d4c110a7a385ca0479191cf618675ae5d93c82
+base/video/ega_read.c	156	159	161	#if defined(EGA_DUMP) || defined(EGA_STAT)	parent-reached-target-unselected-both-architectures	1	293dc0d74cc5ac0b5b8cd4e0165146c41cc728707f8614b8b1934deeaa8e65a2
+base/video/ega_writ.c	62	61	63	#if defined(EGA_DUMP) || defined(EGA_STAT)	parent-reached-target-unselected-both-architectures	1	5ecc6430ed2a7c90a219d5ea3d70393de7943da73401f7ff0b8c86f8d08a8fd1
+base/video/gfx_updt.c	147	155	169	#else	parent-reached-target-unselected-both-architectures	13	47aaa6ab9bb5ab117672f674ef7f108f2b8b936956f06f67050f25f54dde877a
+base/video/vga_prts.c	2403	2437	2560	#if defined(NTVDM) || defined(host_get_time_ms) || defined(host_get_count_ms)	parent-reached-target-unselected-both-architectures	80	eec80f7e0a3ee167328007934c719f03964200be62a1581e39b2aefb5a4dc1f5
+base/video/video.c	1784	2258	2260	#if ( defined(NTVDM) && defined(MONITOR) ) || defined(GISP_SVGA)/* No Ega planes... */	parent-reached-target-unselected-both-architectures	1	2acf6167245eba6dcd9bbf2adc7d7a804d1cce86eb4863be82bf87beed7c70ad

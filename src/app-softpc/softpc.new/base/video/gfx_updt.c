@@ -145,20 +145,9 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 						dirty_next++; \
 					}
 #else
-#define	add_dirty_rec(line,st,len,off,fr)	{	if (io_verbose & EGA_DISPLAY_VERBOSE) {\
-							char	trace_string[80]; \
-							sprintf(trace_string,"dirty[%d]line_no %d, start %d end %d", \
-											dirty_next,(line),(st),(st)+(len));\
-							trace(trace_string,0); \
-						} \
-						dirty[dirty_next].line_no = (line); \
-						dirty[dirty_next].start = (st); \
-						dirty[dirty_next].end = (st) + (len); \
-						dirty[dirty_next].video_copy_offset = (off); \
-						dirty[dirty_next].v7frig = (fr); \
-						dirty_next++; \
-					}
+#error "Unsupported SoftPC mirror configuration: #else"
 #endif
+#line 170
 #else /* VGG */
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
@@ -3313,6 +3302,11 @@ boolean vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 {
 	int start_offset,tlx,tly;
 	boolean status;
+#line 3246
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#else   //NEC_98
+#line 3249
 
 	UNUSED(dummy);
 	
@@ -3328,6 +3322,8 @@ boolean vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 
+#endif  //NEC_98
+#line 3267
 	return(status);
 
 }
@@ -3338,6 +3334,11 @@ boolean vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 {
 	int start_offset,tlx,tly;
 	boolean status;
+#line 3277
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#else   //NEC_98
+#line 3280
 
 	UNUSED(dummy_arg);
 	
@@ -3353,6 +3354,8 @@ boolean vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 
+#endif  //NEC_98
+#line 3298
 	return(status);
 
 }
@@ -3421,6 +3424,11 @@ boolean ega_graph_scroll_up IFN6(int, start, int, width, int, height,
 {
 	int start_offset,tlx,tly;
 	boolean status;
+#line 3378
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#else   //NEC_98
+#line 3381
 
 	UNUSED(dummy);
 	
@@ -3437,6 +3445,8 @@ boolean ega_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 
+#endif  //NEC_98
+#line 3400
 	return(status);
 
 }
@@ -3447,6 +3457,11 @@ boolean ega_graph_scroll_down IFN6(int, start, int, width, int, height,
 {
 	int start_offset,tlx,tly;
 	boolean status;
+#line 3410
+#if defined(NEC_98)
+#error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
+#else   //NEC_98
+#line 3413
 	
 	UNUSED(dummy_arg);
 	
@@ -3464,6 +3479,8 @@ boolean ega_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 
+#endif  //NEC_98
+#line 3433
 	return(status);
 
 }
