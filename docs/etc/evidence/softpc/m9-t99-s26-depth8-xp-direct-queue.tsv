@@ -1,0 +1,2 @@
+path	current_parent_line	xp_parent_line	xp_child_line	directive	expression	status
+base/video/ega_writ.c	214	490	491	ifndef	GISP_CPU	pending-depth8-xp-direct-child

@@ -1,0 +1,2 @@
+path	parent_line	parent_directive	child_line	child_directive	child_expression	source_sha256	status
+base/video/ega_writ.c	214	else	216	ifndef	GISP_CPU	de47208692825bb5c12da14546d36d10aeba3c1fb7b18e440047795ecee51be2	selected-parent-pending-depth8

@@ -41,6 +41,13 @@ change is needed for the exclusion batch. The required dual build, published
 asset checks and full qualification passed: all 194 tests per architecture.
 Selected-frame audit and the eighth-depth queue follow exclusion delivery.
 
+Exclusion delivery `01236cb8` is pushed. All three selected seventh-depth
+parents match their XP direct-child records; no frame restoration or further
+production change was necessary. One current and one corresponding XP
+eighth-depth direct-child candidate are queued. The previously qualified
+dual builds and 194 tests per architecture remain applicable. Final
+documentation delivery and S26 closure remain.
+
 ## Technical Baseline
 
 Latest published binaries are S25's sixth-depth mirror build; hashes and dual-
