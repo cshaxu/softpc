@@ -1,0 +1,754 @@
+path	line	directive	expression	xp_line	basis
+base/bios/reset.c	218	else		371	exact
+base/bios/reset.c	342	ifdef	VGG	511	exact
+base/bios/reset.c	402	ifdef	PM	685	exact
+base/bios/reset.c	673	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)	950	explicit
+base/bios/reset.c	732	ifdef	PRINTER	1018	exact
+base/bios/reset.c	741	if	defined(NTVDM) || defined(SOFTPC_STANDALONE)	1027	local-condition-extension
+base/bios/reset.c	808	ifndef	NTVDM	1095	exact
+base/bios/tape_io.c	79	ifndef	CPU_30_STYLE	94	exact
+base/bios/tape_io.c	89	if	(!defined(PROD) || !defined(CPU_30_STYLE))	104	exact
+base/bios/tape_io.c	97	else		113	exact
+base/bios/tape_io.c	164	else		270	exact
+base/bios/tape_io.c	193	else		301	exact
+base/ccpu386/c_main.c	515	else		496	exact
+base/ccpu386/c_main.c	596	else		606	exact
+base/ccpu386/c_main.c	4477	else		4643	exact
+base/ccpu386/c_mem.h	31	else		31	exact
+base/ccpu386/c_mem.h	44	else		44	exact
+base/ccpu386/ccpusas4.c	199	ifndef	EGATEST	142	exact
+base/ccpu386/ccpusas4.c	303	ifndef	CHECK_ACCESS	246	exact
+base/ccpu386/ccpusas4.c	416	else		386	exact
+base/ccpu386/ccpusas4.c	437	ifndef	EGATEST	405	exact
+base/ccpu386/ccpusas4.c	584	ifdef	EGG	551	exact
+base/ccpu386/ccpusas4.c	838	ifdef	LIM	805	exact
+base/ccpu386/ccpusas4.c	896	ifdef	LIM	863	exact
+base/ccpu386/ccpusas4.c	1267	ifndef	EGATEST	1234	exact
+base/ccpu386/ccpusas4.c	1346	else		1316	exact
+base/ccpu386/ccpusas4.c	1460	ifdef	PROD	1429	exact
+base/ccpu386/ccpusas4.h	31	else		31	exact
+base/ccpu386/cpu4gen.h	13	ifdef	CPU_PRIVATE	12	exact
+base/ccpu386/cpu4gen.h	15	else		14	exact
+base/ccpu386/cpu4gen.h	18	ifdef	CPU_PRIVATE	17	exact
+base/ccpu386/cpu4gen.h	20	else		19	exact
+base/ccpu386/cpu4gen.h	23	ifdef	CPU_PRIVATE	22	exact
+base/ccpu386/cpu4gen.h	25	else		24	exact
+base/ccpu386/cpu4gen.h	188	ifdef	CCPU	187	exact
+base/ccpu386/cpu4gen.h	196	ifdef	CCPU	200	exact
+base/ccpu386/cpu4gen.h	204	ifdef	CCPU	213	exact
+base/ccpu386/cpu4gen.h	212	ifdef	CCPU	226	exact
+base/ccpu386/cpu4gen.h	220	ifdef	CCPU	239	exact
+base/ccpu386/cpu4gen.h	228	ifdef	CCPU	252	exact
+base/ccpu386/cpu4gen.h	236	ifdef	CCPU	265	exact
+base/ccpu386/cpu4gen.h	244	ifdef	CCPU	278	exact
+base/ccpu386/cpu4gen.h	252	ifdef	CCPU	291	exact
+base/ccpu386/cpu4gen.h	260	ifdef	CCPU	304	exact
+base/ccpu386/cpu4gen.h	268	ifdef	CCPU	317	exact
+base/ccpu386/cpu4gen.h	276	ifdef	CCPU	330	exact
+base/ccpu386/cpu4gen.h	284	ifdef	CCPU	343	exact
+base/ccpu386/cpu4gen.h	292	ifdef	CCPU	356	exact
+base/ccpu386/cpu4gen.h	300	ifdef	CCPU	369	exact
+base/ccpu386/cpu4gen.h	308	ifdef	CCPU	382	exact
+base/ccpu386/cpu4gen.h	316	ifdef	CCPU	395	exact
+base/ccpu386/cpu4gen.h	324	ifdef	CCPU	410	exact
+base/ccpu386/cpu4gen.h	332	ifdef	CCPU	425	exact
+base/ccpu386/cpu4gen.h	340	ifdef	CCPU	440	exact
+base/ccpu386/cpu4gen.h	348	ifdef	CCPU	455	exact
+base/ccpu386/cpu4gen.h	356	ifdef	CCPU	470	exact
+base/ccpu386/cpu4gen.h	364	ifdef	CCPU	485	exact
+base/ccpu386/cpu4gen.h	372	ifdef	CCPU	500	exact
+base/ccpu386/cpu4gen.h	380	ifdef	CCPU	515	exact
+base/ccpu386/cpu4gen.h	388	ifdef	CCPU	530	exact
+base/ccpu386/cpu4gen.h	396	ifdef	CCPU	545	exact
+base/ccpu386/cpu4gen.h	404	ifdef	CCPU	560	exact
+base/ccpu386/cpu4gen.h	412	ifdef	CCPU	575	exact
+base/ccpu386/cpu4gen.h	420	ifdef	CCPU	590	exact
+base/ccpu386/cpu4gen.h	428	ifdef	CCPU	605	exact
+base/ccpu386/cpu4gen.h	436	ifdef	CCPU	620	exact
+base/ccpu386/cpu4gen.h	444	ifdef	CCPU	635	exact
+base/ccpu386/cpu4gen.h	452	ifdef	CCPU	650	exact
+base/ccpu386/cpu4gen.h	460	ifdef	CCPU	665	exact
+base/ccpu386/cpu4gen.h	468	ifdef	CCPU	680	exact
+base/ccpu386/cpu4gen.h	476	ifdef	CCPU	695	exact
+base/ccpu386/cpu4gen.h	484	ifdef	CCPU	708	exact
+base/ccpu386/cpu4gen.h	492	ifdef	CCPU	721	exact
+base/ccpu386/cpu4gen.h	500	ifdef	CCPU	736	exact
+base/ccpu386/cpu4gen.h	508	ifdef	CCPU	751	exact
+base/ccpu386/cpu4gen.h	516	ifdef	CCPU	764	exact
+base/ccpu386/cpu4gen.h	524	ifdef	CCPU	777	exact
+base/ccpu386/cpu4gen.h	532	ifdef	CCPU	790	exact
+base/ccpu386/cpu4gen.h	540	ifdef	CCPU	803	exact
+base/ccpu386/cpu4gen.h	548	ifdef	CCPU	816	exact
+base/ccpu386/cpu4gen.h	556	ifdef	CCPU	829	exact
+base/ccpu386/cpu4gen.h	564	ifdef	CCPU	842	exact
+base/ccpu386/cpu4gen.h	572	ifdef	CCPU	855	exact
+base/ccpu386/cpu4gen.h	580	ifdef	CCPU	868	exact
+base/ccpu386/cpu4gen.h	588	ifdef	CCPU	881	exact
+base/ccpu386/cpu4gen.h	596	ifdef	CCPU	894	exact
+base/ccpu386/cpu4gen.h	604	ifdef	CCPU	907	exact
+base/ccpu386/cpu4gen.h	612	ifdef	CCPU	920	exact
+base/ccpu386/cpu4gen.h	620	ifdef	CCPU	933	exact
+base/ccpu386/cpu4gen.h	628	ifdef	CCPU	946	exact
+base/ccpu386/cpu4gen.h	636	ifdef	CCPU	959	exact
+base/ccpu386/cpu4gen.h	644	ifdef	CCPU	972	exact
+base/ccpu386/cpu4gen.h	652	ifdef	CCPU	985	exact
+base/ccpu386/cpu4gen.h	660	ifdef	CCPU	998	exact
+base/ccpu386/cpu4gen.h	668	ifdef	CCPU	1011	exact
+base/ccpu386/cpu4gen.h	676	ifdef	CCPU	1024	exact
+base/ccpu386/cpu4gen.h	684	ifdef	CCPU	1037	exact
+base/ccpu386/cpu4gen.h	692	ifdef	CCPU	1050	exact
+base/ccpu386/cpu4gen.h	700	ifdef	CCPU	1063	exact
+base/ccpu386/cpu4gen.h	708	ifdef	CCPU	1076	exact
+base/ccpu386/cpu4gen.h	716	ifdef	CCPU	1089	exact
+base/ccpu386/cpu4gen.h	724	ifdef	CCPU	1102	exact
+base/ccpu386/cpu4gen.h	732	ifdef	CCPU	1115	exact
+base/ccpu386/cpu4gen.h	740	ifdef	CCPU	1128	exact
+base/ccpu386/cpu4gen.h	748	ifdef	CCPU	1141	exact
+base/ccpu386/cpu4gen.h	756	ifdef	CCPU	1154	exact
+base/ccpu386/cpu4gen.h	764	ifdef	CCPU	1167	exact
+base/ccpu386/cpu4gen.h	772	ifdef	CCPU	1180	exact
+base/ccpu386/cpu4gen.h	780	ifdef	CCPU	1193	exact
+base/ccpu386/cpu4gen.h	788	ifdef	CCPU	1206	exact
+base/ccpu386/cpu4gen.h	796	ifdef	CCPU	1219	exact
+base/ccpu386/cpu4gen.h	804	ifdef	CCPU	1232	exact
+base/ccpu386/cpu4gen.h	812	ifdef	CCPU	1245	exact
+base/ccpu386/cpu4gen.h	820	ifdef	CCPU	1258	exact
+base/ccpu386/cpu4gen.h	828	ifdef	CCPU	1271	exact
+base/ccpu386/cpu4gen.h	836	ifdef	CCPU	1284	exact
+base/ccpu386/cpu4gen.h	844	ifdef	CCPU	1297	exact
+base/ccpu386/cpu4gen.h	852	ifdef	CCPU	1310	exact
+base/ccpu386/cpu4gen.h	860	ifdef	CCPU	1323	exact
+base/ccpu386/cpu4gen.h	868	ifdef	CCPU	1336	exact
+base/ccpu386/cpu4gen.h	876	ifdef	CCPU	1349	exact
+base/ccpu386/cpu4gen.h	884	ifdef	CCPU	1362	exact
+base/ccpu386/cpu4gen.h	892	ifdef	CCPU	1375	exact
+base/ccpu386/cpu4gen.h	900	ifdef	CCPU	1388	exact
+base/ccpu386/cpu4gen.h	908	ifdef	CCPU	1401	exact
+base/ccpu386/cpu4gen.h	916	ifdef	CCPU	1414	exact
+base/ccpu386/cpu4gen.h	924	ifdef	CCPU	1427	exact
+base/ccpu386/cpu4gen.h	932	ifdef	CCPU	1440	exact
+base/ccpu386/cpu4gen.h	940	ifdef	CCPU	1453	exact
+base/ccpu386/cpu4gen.h	948	ifdef	CCPU	1466	exact
+base/ccpu386/cpu4gen.h	956	ifdef	CCPU	1479	exact
+base/ccpu386/cpu4gen.h	964	ifdef	CCPU	1492	exact
+base/ccpu386/cpu4gen.h	972	ifdef	CCPU	1505	exact
+base/ccpu386/cpu4gen.h	980	ifdef	CCPU	1518	exact
+base/ccpu386/cpu4gen.h	988	ifdef	CCPU	1531	exact
+base/ccpu386/cpu4gen.h	996	ifdef	CCPU	1544	exact
+base/ccpu386/cpu4gen.h	1004	ifdef	CCPU	1557	exact
+base/ccpu386/cpu4gen.h	1012	ifdef	CCPU	1570	exact
+base/ccpu386/cpu4gen.h	1020	ifdef	CCPU	1583	exact
+base/ccpu386/cpu4gen.h	1028	ifdef	CCPU	1596	exact
+base/ccpu386/cpu4gen.h	1036	ifdef	CCPU	1609	exact
+base/ccpu386/cpu4gen.h	1044	ifdef	CCPU	1622	exact
+base/ccpu386/cpu4gen.h	1052	ifdef	CCPU	1635	exact
+base/ccpu386/cpu4gen.h	1060	ifdef	CCPU	1648	exact
+base/ccpu386/cpu4gen.h	1068	ifdef	CCPU	1661	exact
+base/ccpu386/cpu4gen.h	1076	ifdef	CCPU	1674	exact
+base/ccpu386/cpu4gen.h	1084	ifdef	CCPU	1687	exact
+base/ccpu386/cpu4gen.h	1092	ifdef	CCPU	1700	exact
+base/ccpu386/cpu4gen.h	1100	ifdef	CCPU	1713	exact
+base/ccpu386/cpu4gen.h	1108	ifdef	CCPU	1726	exact
+base/ccpu386/cpu4gen.h	1116	ifdef	CCPU	1739	exact
+base/ccpu386/cpu4gen.h	1124	ifdef	CCPU	1752	exact
+base/ccpu386/cpu4gen.h	1132	ifdef	CCPU	1765	exact
+base/ccpu386/cpu4gen.h	1140	ifdef	CCPU	1778	exact
+base/ccpu386/cpu4gen.h	1148	ifdef	CCPU	1791	exact
+base/ccpu386/cpu4gen.h	1156	ifdef	CCPU	1804	exact
+base/ccpu386/cpu4gen.h	1164	ifdef	CCPU	1817	exact
+base/ccpu386/cpu4gen.h	1172	ifdef	CCPU	1830	exact
+base/ccpu386/cpu4gen.h	1180	ifdef	CCPU	1843	exact
+base/ccpu386/cpu4gen.h	1188	ifdef	CCPU	1856	exact
+base/ccpu386/cpu4gen.h	1196	ifdef	CCPU	1869	exact
+base/ccpu386/cpu4gen.h	1204	ifdef	CCPU	1882	exact
+base/ccpu386/cpu4gen.h	1212	ifdef	CCPU	1895	exact
+base/ccpu386/cpu4gen.h	1220	ifdef	CCPU	1908	exact
+base/ccpu386/cpu4gen.h	1228	ifdef	CCPU	1921	exact
+base/ccpu386/cpu4gen.h	1236	ifdef	CCPU	1934	exact
+base/ccpu386/cpu4gen.h	1244	ifdef	CCPU	1947	exact
+base/ccpu386/cpu4gen.h	1252	ifdef	CCPU	1960	exact
+base/ccpu386/cpu4gen.h	1260	ifdef	CCPU	1973	exact
+base/ccpu386/cpu4gen.h	1268	ifdef	CCPU	1986	exact
+base/ccpu386/cpu4gen.h	1276	ifdef	CCPU	1999	exact
+base/ccpu386/cpu4gen.h	1284	ifdef	CCPU	2012	exact
+base/ccpu386/cpu4gen.h	1292	ifdef	CCPU	2025	exact
+base/ccpu386/cpu4gen.h	1300	ifdef	CCPU	2038	exact
+base/ccpu386/cpu4gen.h	1308	ifdef	CCPU	2051	exact
+base/ccpu386/cpu4gen.h	1316	ifdef	CCPU	2064	exact
+base/ccpu386/cpu4gen.h	1324	ifdef	CCPU	2077	exact
+base/ccpu386/cpu4gen.h	1332	ifdef	CCPU	2090	exact
+base/ccpu386/cpu4gen.h	1340	ifdef	CCPU	2103	exact
+base/ccpu386/cpu4gen.h	1348	ifdef	CCPU	2116	exact
+base/ccpu386/cpu4gen.h	1356	ifdef	CCPU	2129	exact
+base/ccpu386/cpu4gen.h	1364	ifdef	CCPU	2142	exact
+base/ccpu386/cpu4gen.h	1372	ifdef	CCPU	2155	exact
+base/ccpu386/cpu4gen.h	1380	ifdef	CCPU	2168	exact
+base/ccpu386/cpu4gen.h	1388	ifdef	CCPU	2181	exact
+base/ccpu386/cpu4gen.h	1396	ifdef	CCPU	2194	exact
+base/ccpu386/cpu4gen.h	1404	ifdef	CCPU	2207	exact
+base/ccpu386/cpu4gen.h	1412	ifdef	CCPU	2220	exact
+base/ccpu386/cpu4gen.h	1420	ifdef	CCPU	2233	exact
+base/ccpu386/cpu4gen.h	1428	ifdef	CCPU	2246	exact
+base/ccpu386/cpu4gen.h	1502	ifdef	CCPU	2325	exact
+base/ccpu386/cpu4gen.h	1510	ifdef	CCPU	2338	exact
+base/ccpu386/cpu4gen.h	1518	ifdef	CCPU	2351	exact
+base/ccpu386/cpu4gen.h	1526	ifdef	CCPU	2364	exact
+base/ccpu386/cpu4gen.h	1534	ifdef	CCPU	2377	exact
+base/ccpu386/cpu4gen.h	1542	ifdef	CCPU	2390	exact
+base/ccpu386/cpu4gen.h	1550	ifdef	CCPU	2403	exact
+base/ccpu386/cpu4gen.h	1558	ifdef	CCPU	2416	exact
+base/ccpu386/cpu4gen.h	1566	ifdef	CCPU	2429	exact
+base/ccpu386/cpu4gen.h	1574	ifdef	CCPU	2442	exact
+base/ccpu386/cpu4gen.h	1582	ifdef	CCPU	2455	exact
+base/ccpu386/cpu4gen.h	1590	ifdef	CCPU	2468	exact
+base/ccpu386/cpu4gen.h	1598	ifdef	CCPU	2481	exact
+base/ccpu386/cpu4gen.h	1606	ifdef	CCPU	2494	exact
+base/ccpu386/cpu4gen.h	1614	ifdef	CCPU	2507	exact
+base/ccpu386/cpu4gen.h	1622	ifdef	CCPU	2520	exact
+base/ccpu386/cpu4gen.h	1630	ifdef	CCPU	2533	exact
+base/ccpu386/cpu4gen.h	1638	ifdef	CCPU	2546	exact
+base/ccpu386/cpu4gen.h	1646	ifdef	CCPU	2559	exact
+base/ccpu386/cpu4gen.h	1654	ifdef	CCPU	2572	exact
+base/ccpu386/cpu4gen.h	1662	ifdef	CCPU	2585	exact
+base/ccpu386/cpu4gen.h	1670	ifdef	CCPU	2598	exact
+base/ccpu386/cpu4gen.h	1678	ifdef	CCPU	2611	exact
+base/ccpu386/cpu4gen.h	1686	ifdef	CCPU	2624	exact
+base/ccpu386/cpu4gen.h	1694	ifdef	CCPU	2637	exact
+base/ccpu386/cpu4gen.h	1702	ifdef	CCPU	2650	exact
+base/ccpu386/cpu4gen.h	1710	ifdef	CCPU	2663	exact
+base/ccpu386/cpu4gen.h	1718	ifdef	CCPU	2676	exact
+base/ccpu386/cpu4gen.h	1726	ifdef	CCPU	2689	exact
+base/ccpu386/cpu4gen.h	1734	ifdef	CCPU	2702	exact
+base/ccpu386/cpu4gen.h	1742	ifdef	CCPU	2715	exact
+base/ccpu386/cpu4gen.h	1750	ifdef	CCPU	2728	exact
+base/ccpu386/cpu4gen.h	1758	ifdef	CCPU	2741	exact
+base/ccpu386/cpu4gen.h	1766	ifdef	CCPU	2754	exact
+base/ccpu386/cpu4gen.h	1774	ifdef	CCPU	2767	exact
+base/ccpu386/cpu4gen.h	1782	ifdef	CCPU	2780	exact
+base/ccpu386/cpu4gen.h	1790	ifdef	CCPU	2793	exact
+base/ccpu386/cpu4gen.h	1798	ifdef	CCPU	2806	exact
+base/ccpu386/cpu4gen.h	1806	ifdef	CCPU	2819	exact
+base/ccpu386/cpu4gen.h	1814	ifdef	CCPU	2832	exact
+base/ccpu386/cpu4gen.h	1822	ifdef	CCPU	2845	exact
+base/ccpu386/cpu4gen.h	1830	ifdef	CCPU	2858	exact
+base/ccpu386/cpu4gen.h	1838	ifdef	CCPU	2871	exact
+base/ccpu386/cpu4gen.h	1846	ifdef	CCPU	2884	exact
+base/ccpu386/cpu4gen.h	1854	ifdef	CCPU	2897	exact
+base/ccpu386/cpu4gen.h	1862	ifdef	CCPU	2910	exact
+base/ccpu386/cpu4gen.h	1870	ifdef	CCPU	2923	exact
+base/ccpu386/cpu4gen.h	1878	ifdef	CCPU	2936	exact
+base/ccpu386/cpu4gen.h	1886	ifdef	CCPU	2949	exact
+base/ccpu386/cpu4gen.h	1894	ifdef	CCPU	2962	exact
+base/ccpu386/cpu4gen.h	1902	ifdef	CCPU	2975	exact
+base/ccpu386/cpu4gen.h	1910	ifdef	CCPU	2988	exact
+base/ccpu386/cpu4gen.h	1917	ifdef	CCPU	3000	exact
+base/ccpu386/cpu4gen.h	1925	ifdef	CCPU	3013	exact
+base/ccpu386/cpu4gen.h	1932	ifdef	CCPU	3025	exact
+base/ccpu386/cpu4gen.h	1939	ifdef	CCPU	3037	exact
+base/ccpu386/cpu4gen.h	1946	ifdef	CCPU	3049	exact
+base/ccpu386/cpu4gen.h	1953	ifdef	CCPU	3061	exact
+base/ccpu386/cpu4gen.h	1960	ifdef	CCPU	3073	exact
+base/ccpu386/in.c	91	else		94	exact
+base/ccpu386/jmp.c	151	ifdef	TAKE_PROT_MODE_LIMIT_FAULT	161	exact
+base/ccpu386/out.c	84	else		86	exact
+base/comms/com.c	140	else		177	exact
+base/comms/com.c	420	ifndef	NTVDM	357	exact
+base/comms/com.c	605	ifndef	DELAYED_INTS	627	exact
+base/comms/com.c	695	ifndef	NTVDM	742	explicit
+base/comms/com.c	738	ifndef	NTVDM	1115	exact
+base/comms/com.c	782	ifndef	NTVDM	1181	exact
+base/comms/com.c	921	ifndef	NTVDM	1427	exact
+base/comms/com.c	1023	else		1592	exact
+base/comms/com.c	1049	ifndef	NTVDM	1615	explicit
+base/comms/com.c	1108	ifndef	NTVDM	1690	explicit
+base/comms/com.c	1127	else		1743	group-line-anchor
+base/comms/com.c	1275	else		2181	exact
+base/comms/com.c	1670	ifndef	NTVDM	2798	exact
+base/comms/com.c	1738	else		2998	exact
+base/comms/com.c	1750	else		3008	exact
+base/comms/com.c	1761	else		3017	exact
+base/comms/com.c	1774	else		3028	exact
+base/comms/com.c	1786	else		3038	exact
+base/comms/com.c	1797	else		3047	exact
+base/comms/com.c	2309	else		3798	exact
+base/comms/com.c	2329	ifndef	NTVDM	3815	exact
+base/comms/printer.c	129	ifndef	NEC_98	129	explicit
+base/comms/printer.c	141	ifdef	ERROR	139	exact
+base/comms/printer.c	147	else		166	exact
+base/comms/printer.c	184	ifndef	NEC_98	199	explicit
+base/comms/printer.c	323	else		268	exact
+base/comms/printer.c	356	else		314	exact
+base/comms/printer.c	370	else		334	exact
+base/comms/printer.c	394	else		368	group-line-anchor
+base/comms/printer.c	400	ifndef	NEC_98	372	exact
+base/comms/printer.c	424	else		394	group-line-anchor
+base/comms/printer.c	434	else		406	exact
+base/comms/printer.c	484	else		464	exact
+base/comms/printer.c	495	ifndef	NEC_98	473	exact
+base/comms/printer.c	506	else		481	group-line-anchor
+base/comms/printer.c	514	else		487	exact
+base/comms/printer.c	554	else		563	group-line-anchor
+base/comms/printer.c	565	else		613	exact
+base/comms/printer.c	580	else		627	exact
+base/comms/printer.c	601	ifndef	NEC_98	646	explicit
+base/comms/printer.c	614	else		681	exact
+base/comms/printer.c	649	else		712	exact
+base/comms/printer.c	659	else		719	group-line-anchor
+base/comms/printer.c	674	else		734	exact
+base/comms/printer.c	685	ifndef	NEC_98	741	explicit
+base/comms/printer.c	688	ifndef	NEC_98	753	explicit
+base/comms/printer.c	697	ifndef	NEC_98	762	exact
+base/comms/printer.c	718	else		780	group-line-anchor
+base/comms/printer.c	734	else		793	group-line-anchor
+base/comms/printer.c	764	else		847	exact
+base/comms/printer.c	798	else		902	exact
+base/comms/printer_.c	42	ifdef	PRINTER	42	exact
+base/comms/printer_.c	101	ifdef	PRINTER	105	exact
+base/comms/rs232_io.c	76	ifdef	BIT_ORDER2	74	exact
+base/cvidc/ev_glue.c	791	ifdef	CCPU	746	exact
+base/disks/diskbios.c	233	if	!(defined(NTVDM) && defined(MONITOR))	386	exact
+base/disks/diskbios.c	246	if	!(defined(NTVDM) && defined(MONITOR))	397	exact
+base/disks/fdisk.c	1514	ifdef	LITTLEND	1545	exact
+base/disks/fdisk.c	1525	else		1556	exact
+base/disks/floppy.c	1675	ifndef	NTVDM	3383	exact
+base/disks/floppy.c	2051	ifndef	NTVDM	3785	explicit
+base/disks/floppy.c	2523	else		4277	exact
+base/disks/floppy.c	2581	else		4333	exact
+base/disks/floppy.c	2743	else		4491	exact
+base/disks/floppy.c	2993	else		4737	exact
+base/disks/floppy.c	3019	else		4761	exact
+base/disks/floppy_i.c	144	else		583	exact
+base/disks/floppy_i.c	228	else		662	exact
+base/disks/floppy_i.c	262	ifndef	NTVDM	697	explicit
+base/disks/floppy_i.c	312	ifndef	NTVDM	763	exact
+base/inc/base_def.h	25	else		25	exact
+base/inc/bios.h	343	ifndef	NTVDM	365	explicit
+base/inc/config.h	30	ifndef	_INS_ERROR_H	30	exact
+base/inc/config.h	85	else		87	exact
+base/inc/config.h	268	if	!defined(NTVDM) && !defined(macintosh)	269	exact
+base/inc/config.h	366	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	368	explicit
+base/inc/config.h	391	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	390	explicit
+base/inc/config.h	407	ifndef	host_expand_environment_vars	404	exact
+base/inc/egacpu.h	115	ifndef	HOST_VGA_GLOBALS	152	exact
+base/inc/egacpu.h	172	else		361	exact
+base/inc/egacpu.h	290	ifdef	CPU_40_STYLE	486	exact
+base/inc/egagraph.h	10	ifdef	BIT_ORDER2	10	exact
+base/inc/egagraph.h	29	ifdef	VGG	35	exact
+base/inc/egagraph.h	56	ifdef	VGG	61	exact
+base/inc/egagraph.h	87	ifdef	V7VGA	92	exact
+base/inc/egagraph.h	97	ifdef	VGG	101	exact
+base/inc/egagraph.h	152	ifdef	VGG	164	exact
+base/inc/egagraph.h	156	ifdef	V7VGA	168	exact
+base/inc/egamode.h	15	else		16	group-line-anchor
+base/inc/egaports.h	12	ifdef	V7VGA	12	exact
+base/inc/egaports.h	56	ifdef	V7VGA	55	exact
+base/inc/emm.h	266	ifndef	host_update_logical_page	306	exact
+base/inc/equip.h	33	ifdef	BIT_ORDER2	84	exact
+base/inc/error.h	5	ifndef	_INS_ERROR_H	5	exact
+base/inc/gfx_upd.h	54	ifdef	VGG	53	exact
+base/inc/gmi.h	51	ifdef	CCPU	42	exact
+base/inc/gvi.h	56	ifdef	VGG	56	exact
+base/inc/gvi.h	192	ifdef	V7VGA	273	exact
+base/inc/gvi.h	281	ifdef	VGG	481	exact
+base/inc/gvi.h	293	ifdef	VGG	492	exact
+base/inc/host_com.h	210	ifndef	macintosh	214	exact
+base/inc/host_lpt.h	3	ifndef	_HOST_LPT_H	3	exact
+base/inc/ica.h	91	ifndef	CPU_40_STYLE		local-frame-no-one-to-one-xp-guard
+base/inc/ica.h	134	ifdef	HOOKED_IRETS	157	exact
+base/inc/ica.h	140	else		163	exact
+base/inc/ica.h	144	ifdef	CPU_40_STYLE	167	exact
+base/inc/ica.h	176	ifdef	CPU_40_STYLE	199	exact
+base/inc/ica.h	198	else		227	exact
+base/inc/ios.h	84	ifdef	VGG	346	exact
+base/inc/ios.h	300	ifdef	PRINTER	562	exact
+base/inc/ios.h	325	ifndef	SFELLOW	589	exact
+base/inc/mouse_io.h	250	ifdef	VGG	250	exact
+base/inc/mouse_io.h	953	ifndef	REAL_VGA	987	exact
+base/inc/mouse_io.h	1087	ifndef	REAL_VGA	1119	exact
+base/inc/printer.h	33	else		42	exact
+base/inc/quick_ev.h	79	ifndef	host_calc_q_ev_inst_for_time	39	exact
+base/inc/quick_ev.h	98	ifdef	CPU_40_STYLE	57	exact
+base/inc/rs232.h	23	ifndef	NEC_98	22	exact
+base/inc/rs232.h	47	ifdef	BIT_ORDER2	255	exact
+base/inc/rs232.h	67	else		303	group-line-anchor
+base/inc/rs232.h	87	ifdef	BIT_ORDER2	328	exact
+base/inc/rs232.h	106	ifdef	BIT_ORDER2	357	exact
+base/inc/rs232.h	124	ifdef	BIT_ORDER2	384	exact
+base/inc/rs232.h	144	ifdef	BIT_ORDER2	423	exact
+base/inc/rs232.h	165	else		480	group-line-anchor
+base/inc/rs232.h	228	else		583	exact
+base/inc/rs232.h	238	else		592	exact
+base/inc/rs232.h	252	else		605	group-line-anchor
+base/inc/rs232.h	301	else		658	exact
+base/inc/rs232.h	338	else		698	exact
+base/inc/sas.h	115	else		116	exact
+base/inc/sas.h	132	if	!defined(HOST_SAS) || defined(BASE_SAS)	135	exact
+base/inc/sas.h	293	ifndef	HERC_REGEN_BUFF	306	exact
+base/inc/sas.h	511	ifndef	MOUSE_VIDEO_IO_SEGMENT	520	exact
+base/inc/sas.h	527	ifndef	MOUSE_INT1_SEGMENT	536	exact
+base/inc/sas.h	530	ifndef	MOUSE_INT2_SEGMENT	539	exact
+base/inc/sas.h	533	ifndef	MOUSE_VERSION_SEGMENT	542	exact
+base/inc/sas.h	536	ifndef	MOUSE_COPYRIGHT_SEGMENT	545	exact
+base/inc/sas.h	708	ifdef	EGG	717	exact
+base/inc/sas.h	722	ifdef	EGG	730	exact
+base/inc/sas.h	796	ifdef	LITTLEND	1085	exact
+base/inc/suplib.h	26	ifndef	PATHSEP_CHAR	26	exact
+base/inc/trace.h	127	else		133	exact
+base/inc/vgaports.h	21	ifdef	BIT_ORDER2	395	exact
+base/inc/vgaports.h	399	ifdef	BIT_ORDER2	1356	exact
+base/inc/vgaports.h	952	ifdef	V7VGA	1968	exact
+base/inc/vgaports.h	979	ifndef	cursor_changed	1999	exact
+base/inc/vgaports.h	984	ifdef	V7VGA	2004	exact
+base/inc/vgaports.h	1000	ifdef	V7VGA	2020	exact
+base/inc/video.h	81	ifdef	EGG	146	exact
+base/inc/video.h	135	ifdef	VGG	199	exact
+base/inc/video.h	139	ifdef	VGG	203	exact
+base/inc/video.h	146	ifdef	VGG	210	exact
+base/inc/video.h	155	ifdef	EGG	218	exact
+base/inc/video.h	185	ifdef	V7VGA	248	exact
+base/inc/video.h	190	ifdef	V7VGA	253	exact
+base/inc/video.h	204	else		269	exact
+base/inc/video.h	210	ifdef	EGG	273	exact
+base/inc/video.h	222	ifdef	VGG	285	exact
+base/inc/video.h	257	ifdef	V7VGA	319	exact
+base/inc/video.h	270	ifdef	VGG	331	exact
+base/inc/xt.h	46	ifndef	NULL_STRING	45	exact
+base/inc/xt.h	52	else		51	exact
+base/inc/xt.h	66	ifndef	MAXPATHLEN	64	exact
+base/inc/xt.h	77	else		92	exact
+base/inc/xt.h	94	ifdef	CCPU	113	exact
+base/inc/xt.h	99	else		118	exact
+base/inc/xt.h	118	ifndef	CPU_30_STYLE	137	exact
+base/inc/xt.h	130	else		152	exact
+base/inc/xt.h	138	ifdef	SPC386	159	exact
+base/keymouse/keyba.c	263	ifndef	REAL_KBD	326	exact
+base/keymouse/keyba.c	286	else		358	group-line-anchor
+base/keymouse/keyba.c	332	ifndef	NTVDM	413	explicit
+base/keymouse/keyba.c	354	ifndef	REAL_KBD	442	exact
+base/keymouse/keyba.c	481	else		608	group-line-anchor
+base/keymouse/keyba.c	494	ifndef	REAL_KBD	619	exact
+base/keymouse/keyba.c	857	else		1347	group-line-anchor
+base/keymouse/keyba.c	886	ifndef	NEC_98	1374	exact
+base/keymouse/keyba.c	897	ifndef	NEC_98	1387	explicit
+base/keymouse/keyba.c	942	ifndef	NEC_98	1469	exact
+base/keymouse/keyba.c	1007	else		1558	exact
+base/keymouse/keyba.c	1038	else		1602	exact
+base/keymouse/keyba.c	1068	else		1645	exact
+base/keymouse/keyba.c	1267	ifndef	NTVDM	1841	exact
+base/keymouse/keyba.c	1293	ifndef	NTVDM	1865	explicit
+base/keymouse/keyba.c	1330	ifndef	NTVDM	1898	exact
+base/keymouse/keyba.c	1549	ifndef	NEC_98	2120	exact
+base/keymouse/keyba.c	1571	else		2140	exact
+base/keymouse/keyba.c	1581	ifndef	NTVDM	2148	exact
+base/keymouse/keyba.c	1628	ifndef	NTVDM	2197	explicit
+base/keymouse/keyba.c	1649	ifndef	NTVDM	2215	explicit
+base/keymouse/keyba.c	1690	ifndef	NTVDM	2253	explicit
+base/keymouse/keyba.c	1723	ifndef	NTVDM	2283	explicit
+base/keymouse/keyba.c	1741	ifndef	NTVDM	2298	explicit
+base/keymouse/keyba.c	1770	else		2325	exact
+base/keymouse/keyba.c	1834	else		2489	exact
+base/keymouse/keyba.c	1852	else		2509	exact
+base/keymouse/keyba.c	1870	ifndef	REAL_KBD	2525	exact
+base/keymouse/keyba.c	1966	ifndef	JOKER	2688	exact
+base/keymouse/keyba.c	2002	ifdef	PM	2732	exact
+base/keymouse/keyba.c	2081	ifndef	JOKER	2809	exact
+base/keymouse/keyba.c	2474	else		3169	exact
+base/keymouse/keyba.c	2697	ifndef	NEC_98	3448	explicit
+base/keymouse/keyba.c	2713	ifndef	REAL_KBD	3462	exact
+base/keymouse/keyba.c	2737	else		3488	exact
+base/keymouse/keyba.c	2748	ifdef	PM	3497	exact
+base/keymouse/keyba.c	2759	else		3518	exact
+base/keymouse/keyba.c	2773	ifndef	REAL_KBD	3530	exact
+base/keymouse/mouse_io.c	1366	ifdef	EGG	1139	exact
+base/keymouse/mouse_io.c	1380	ifndef	MOUSE_16_BIT	1153	exact
+base/keymouse/mouse_io.c	1478	ifdef	EGG	1246	exact
+base/keymouse/mouse_io.c	1748	ifndef	NEC_98	1613	exact
+base/keymouse/mouse_io.c	1886	else		1756	exact
+base/keymouse/mouse_io.c	1927	ifdef	EGG	1793	exact
+base/keymouse/mouse_io.c	1932	ifdef	V7VGA	1821	exact
+base/keymouse/mouse_io.c	1948	ifdef	V7VGA	1838	exact
+base/keymouse/mouse_io.c	1961	ifdef	V7VGA	1850	exact
+base/keymouse/mouse_io.c	1972	ifdef	EGG	1860	exact
+base/keymouse/mouse_io.c	2047	ifdef	EGG	1944	exact
+base/keymouse/mouse_io.c	2339	if	!defined(NTVDM) || !defined(MONITOR)	2245	explicit
+base/keymouse/mouse_io.c	2364	ifndef	X86GFX	2266	exact
+base/keymouse/mouse_io.c	3372	else		3382	exact
+base/keymouse/mouse_io.c	3836	ifdef	EGG	3868	exact
+base/keymouse/mouse_io.c	5302	ifdef	V7VGA	5323	exact
+base/keymouse/mouse_io.c	5359	ifndef	NTVDM	5376	exact
+base/keymouse/mouse_io.c	5466	ifndef	NTVDM	5479	exact
+base/keymouse/mouse_io.c	5730	ifndef	NEC_98	5736	exact
+base/keymouse/mouse_io.c	5923	ifndef	NEC_98	5929	exact
+base/keymouse/mouse_io.c	6010	else		6019	exact
+base/keymouse/mouse_io.c	6095	else		6106	exact
+base/keymouse/ppi.c	92	ifdef	PROD	88	exact
+base/keymouse/ppi.c	145	ifndef	NTVDM	139	exact
+base/keymouse/ppi.c	169	if	defined(NTVDM) || defined(SOFTPC_STANDALONE)	170	local-condition-extension
+base/support/ios.c	260	ifdef	LITTLEND	312	exact
+base/support/ios.c	600	ifdef	VIRTUALISATION	677	exact
+base/support/ios.c	638	ifdef	VIRTUALISATION	714	exact
+base/support/time_day.c	102	else		109	exact
+base/support/time_day.c	114	else		122	exact
+base/support/time_day.c	164	else		319	exact
+base/support/time_day.c	207	ifndef	NTVDM	374	explicit
+base/support/time_day.c	220	ifndef	NTVDM	384	explicit
+base/support/time_day.c	238	ifndef	NTVDM	399	explicit
+base/support/time_day.c	270	ifndef	NTVDM	441	explicit
+base/support/time_day.c	288	ifndef	NTVDM	456	explicit
+base/support/time_day.c	357	else		547	exact
+base/support/time_day.c	384	ifndef	NTVDM	586	exact
+base/support/time_day.c	715	ifndef	NEC_98	917	exact
+base/support/time_day.c	753	ifndef	NTVDM	951	exact
+base/system/ica.c	148	if	defined(CPU_40_STYLE) || defined(GISP_CPU)	149	exact
+base/system/ica.c	216	ifdef	PROD	282	exact
+base/system/ica.c	1380	ifdef	HOOKED_IRETS	1550	exact
+base/system/ica.c	1413	ifdef	CPU_40_STYLE	1581	exact
+base/system/ica.c	1652	ifndef	GISP_CPU	1864	exact
+base/system/ica.c	1686	else			local-frame-no-one-to-one-xp-guard
+base/system/ica.c	1708	ifdef	CPU_40_STYLE	1924	exact
+base/system/ica.c	1731	if	defined(CPU_40_STYLE)	1947	exact
+base/system/ica.c	1845	else		2066	exact
+base/system/ica.c	1899	ifdef	CPU_40_STYLE	2115	exact
+base/system/ica.c	1911	ifdef	HOOKED_IRETS	2127	exact
+base/system/ica.c	1935	else		2157	exact
+base/system/idetect.c	240	else		293	exact
+base/system/illegalp.c	99	ifdef	PROD	100	exact
+base/system/quick_ev.c	1244	ifdef	CCPU	1034	exact
+base/system/quick_ev.c	1356	else		1146	exact
+base/system/quick_ev.c	1386	else		1175	exact
+base/system/quick_ev.c	1422	if	defined(CCPU) || !defined(PROD)	1210	exact
+base/system/quick_ev.c	1541	else		1333	exact
+base/system/quick_ev.c	1554	ifndef	NTVDM	1345	exact
+base/system/rom.c	39	ifdef	CCPU	39	exact
+base/system/rom.c	52	ifndef	BIOS1ROM_FILENAME	61	exact
+base/system/rom.c	56	ifndef	BIOS2ROM_FILENAME	65	exact
+base/system/rom.c	65	ifndef	EGAROM_FILENAME	73	exact
+base/system/rom.c	69	ifndef	VGAROM_FILENAME	77	exact
+base/system/rom.c	73	ifndef	V7VGAROM_FILENAME	81	exact
+base/system/rom.c	233	else		254	exact
+base/system/rom.c	295	if	!defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )	342	explicit
+base/system/rom.c	352	if	!(defined(NTVDM) && defined(MONITOR))	454	exact
+base/system/rom.c	458	ifndef	GISP_SVGA	603	exact
+base/system/rom.c	497	ifdef	CPU_40_STYLE	638	exact
+base/system/rom.c	572	if	!(defined(NTVDM) & defined(MONITOR))	758	exact
+base/system/rom.c	610	ifdef	CPU_40_STYLE	795	exact
+base/system/timer.c	1776	else		1828	group-line-anchor
+base/system/timer.c	1787	else		1840	group-line-anchor
+base/system/timer.c	1895	ifndef	DELAYED_INTS	1936	exact
+base/system/timer.c	2063	else		2310	group-line-anchor
+base/system/timer.c	2138	else		2511	group-line-anchor
+base/system/timer.c	2228	else		2597	group-line-anchor
+base/system/timer.c	2467	else		2864	exact
+base/system/timer.c	2477	ifndef	NTVDM	2872	explicit
+base/system/timer.c	2583	if	defined(CPU_40_STYLE)	3012	exact
+base/system/timestrb.c	84	ifndef	REAL_TIMER	87	exact
+base/system/timestrb.c	93	if	defined(CPU_40_STYLE)	96	exact
+base/video/cga.c	87	ifdef	EGG	90	exact
+base/video/cga.c	95	else		98	exact
+base/video/cga.c	172	else		174	exact
+base/video/cga.c	206	ifndef	NEC_98	227	exact
+base/video/cga.c	873	ifndef	NEC_98	886	exact
+base/video/cga.c	1083	ifndef	NEC_98	1094	exact
+base/video/cga.c	1144	ifndef	NEC_98	1356	exact
+base/video/cga.c	1251	ifndef	NEC_98	1470	exact
+base/video/ega_dmmy.c	11	ifdef	EGG	11	exact
+base/video/ega_mode.c	90	ifdef	EGG	90	exact
+base/video/ega_prts.c	332	ifdef	EGG	332	exact
+base/video/ega_read.c	124	ifdef	EGG	123	exact
+base/video/ega_vide.c	151	ifdef	CPU_40_STYLE	150	exact
+base/video/ega_vide.c	164	ifndef	NEC_98	164	exact
+base/video/ega_vide.c	214	ifdef	VGG	214	exact
+base/video/ega_vide.c	376	ifdef	VGG	418	exact
+base/video/ega_vide.c	386	ifndef	NEC_98	428	exact
+base/video/ega_vide.c	396	ifdef	CPU_40_STYLE	436	exact
+base/video/ega_vide.c	421	ifndef	NEC_98	461	exact
+base/video/ega_vide.c	639	ifndef	NEC_98	676	exact
+base/video/ega_vide.c	700	ifndef	NEC_98	765	exact
+base/video/ega_vide.c	806	ifndef	NEC_98	904	exact
+base/video/ega_vide.c	835	ifndef	NEC_98	930	explicit
+base/video/ega_vide.c	908	ifndef	NEC_98	999	explicit
+base/video/ega_vide.c	977	ifndef	NEC_98	1065	exact
+base/video/ega_vide.c	1262	ifndef	NEC_98	1607	exact
+base/video/ega_vide.c	1382	ifndef	NEC_98	1756	exact
+base/video/ega_vide.c	1441	ifndef	NEC_98	1813	exact
+base/video/ega_vide.c	1531	ifndef	NEC_98	1901	exact
+base/video/ega_vide.c	1672	ifndef	NEC_98	2178	exact
+base/video/ega_vide.c	1716	ifndef	NEC_98	2220	exact
+base/video/ega_vide.c	1788	ifndef	NEC_98	2291	explicit
+base/video/ega_vide.c	1830	ifndef	NEC_98	2333	exact
+base/video/ega_vide.c	1877	ifndef	NEC_98	2378	exact
+base/video/ega_vide.c	1930	ifndef	NEC_98	2429	exact
+base/video/ega_vide.c	1980	ifndef	NEC_98	2476	exact
+base/video/ega_vide.c	2030	ifndef	NEC_98	2525	exact
+base/video/ega_vide.c	2055	ifndef	NEC_98	2548	exact
+base/video/ega_vide.c	2086	ifndef	NEC_98	2576	exact
+base/video/ega_vide.c	2150	else		2636	exact
+base/video/ega_vide.c	2234	else		2775	exact
+base/video/ega_writ.c	49	ifdef	EGG	48	exact
+base/video/egawrtm0.c	138	ifdef	EGG	138	exact
+base/video/egwrtm12.c	97	ifdef	EGG	97	exact
+base/video/gfx_updt.c	125	if	defined(PROD) || (!defined(EGG))	127	exact
+base/video/gfx_updt.c	138	ifdef	VGG	146	exact
+base/video/gfx_updt.c	195	ifdef	PROD	221	exact
+base/video/gfx_updt.c	227	ifdef	V7VGA	253	exact
+base/video/gfx_updt.c	236	else		265	exact
+base/video/gfx_updt.c	252	else		287	exact
+base/video/gfx_updt.c	283	ifndef	NEC_98	313	explicit
+base/video/gfx_updt.c	322	ifdef	VGG	353	exact
+base/video/gfx_updt.c	378	ifndef	NEC_98	438	exact
+base/video/gfx_updt.c	425	ifndef	NEC_98	483	exact
+base/video/gfx_updt.c	513	else		570	exact
+base/video/gfx_updt.c	518	ifdef	EGG	574	exact
+base/video/gfx_updt.c	757	ifdef	EGG	798	exact
+base/video/gfx_updt.c	1243	ifndef	NEC_98	1254	exact
+base/video/gfx_updt.c	1358	ifndef	NEC_98	1367	exact
+base/video/gfx_updt.c	1489	ifdef	EGG	1496	exact
+base/video/gfx_updt.c	1827	ifndef	NEC_98	1829	explicit
+base/video/gfx_updt.c	1851	ifndef	NEC_98	1850	explicit
+base/video/gfx_updt.c	1870	ifdef	EGG	1867	exact
+base/video/gfx_updt.c	2463	ifndef	NEC_98	2399	exact
+base/video/gfx_updt.c	2498	ifndef	NEC_98	2432	exact
+base/video/gfx_updt.c	2690	ifndef	NEC_98	2622	exact
+base/video/gfx_updt.c	2832	ifndef	NEC_98	2763	exact
+base/video/gfx_updt.c	2993	ifndef	NEC_98	2923	exact
+base/video/gfx_updt.c	3102	ifndef	NEC_98	3032	exact
+base/video/gfx_updt.c	3206	ifndef	NEC_98	3136	exact
+base/video/gfx_updt.c	3309	ifdef	VGG	3239	exact
+base/video/gfx_updt.c	3411	ifdef	EGG	3361	exact
+base/video/gfx_updt.c	3502	ifdef	EGG	3557	exact
+base/video/gfx_updt.c	3675	else		3723	group-line-anchor
+base/video/gfx_updt.c	3688	ifdef	EGG	3738	exact
+base/video/gfx_updt.c	3881	ifndef	REAL_VGA	3941	exact
+base/video/gfx_updt.c	3911	if	defined(VGG) || defined(EGG)	4195	exact
+base/video/gvi.c	191	ifdef	EGG	203	exact
+base/video/gvi.c	196	ifdef	VGG	208	exact
+base/video/gvi.c	231	ifdef	EGG	245	exact
+base/video/gvi.c	237	ifdef	VGG	251	exact
+base/video/gvi.c	270	ifdef	EGG	289	exact
+base/video/gvi.c	275	ifdef	VGG	294	exact
+base/video/gvi.c	285	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	303	explicit
+base/video/gvi.c	317	ifdef	EGG	333	exact
+base/video/gvi.c	322	ifdef	VGG	338	exact
+base/video/v7_ports.c	88	ifndef	NEC_98	92	exact
+base/video/v7_ports.c	108	ifndef	NEC_98	110	exact
+base/video/v7_ports.c	159	ifndef	NEC_98	159	exact
+base/video/v7_ports.c	484	ifndef	NEC_98	482	exact
+base/video/v7_ports.c	674	ifndef	NEC_98	670	exact
+base/video/v7_ports.c	746	ifdef	CPU_40_STYLE	740	exact
+base/video/v7_video.c	27	ifdef	V7VGA	27	exact
+base/video/vga_mode.c	96	ifdef	VGG	96	exact
+base/video/vga_prts.c	339	ifdef	VGG	339	exact
+base/video/vga_vide.c	111	ifndef	NEC_98	114	exact
+base/video/vga_vide.c	125	ifndef	NEC_98	126	exact
+base/video/vga_vide.c	146	ifndef	NEC_98	145	exact
+base/video/vga_vide.c	192	ifndef	NEC_98	198	exact
+base/video/vga_vide.c	255	ifndef	NEC_98	259	exact
+base/video/vga_vide.c	281	ifndef	NEC_98	285	exact
+base/video/vga_vide.c	325	ifndef	NEC_98	340	exact
+base/video/vga_vide.c	369	ifndef	NEC_98	396	exact
+base/video/vga_vide.c	408	ifndef	NEC_98	432	exact
+base/video/vga_vide.c	429	ifndef	NEC_98	450	exact
+base/video/vga_vide.c	587	ifndef	NEC_98	606	exact
+base/video/vga_vide.c	642	ifndef	NEC_98	659	exact
+base/video/vga_vide.c	669	ifndef	NEC_98	684	exact
+base/video/vga_vide.c	785	ifndef	NEC_98	837	exact
+base/video/video.c	198	else		298	exact
+base/video/video.c	211	ifdef	VGG	310	exact
+base/video/video.c	266	ifdef	VGG	362	exact
+base/video/video.c	273	ifdef	V7VGA	369	exact
+base/video/video.c	428	else		745	exact
+base/video/video.c	451	ifdef	EGG	767	exact
+base/video/video.c	481	else		798	exact
+base/video/video.c	570	else		895	group-line-anchor
+base/video/video.c	662	ifdef	V7VGA	984	exact
+base/video/video.c	681	ifdef	V7VGA	1003	exact
+base/video/video.c	777	else		1108	exact
+base/video/video.c	812	else		1142	group-line-anchor
+base/video/video.c	818	ifdef	EGG	1146	exact
+base/video/video.c	833	ifdef	EGG	1161	exact
+base/video/video.c	883	else		1222	exact
+base/video/video.c	901	else		1242	group-line-anchor
+base/video/video.c	931	else		1268	exact
+base/video/video.c	957	else		1328	exact
+base/video/video.c	1018	else		1428	exact
+base/video/video.c	1027	else		1436	exact
+base/video/video.c	1041	else		1450	exact
+base/video/video.c	1113	else		1523	exact
+base/video/video.c	1126	else		1535	exact
+base/video/video.c	1135	else		1543	exact
+base/video/video.c	1154	else		1561	exact
+base/video/video.c	1166	else		1573	exact
+base/video/video.c	1219	else		1634	exact
+base/video/video.c	1254	else		1668	group-line-anchor
+base/video/video.c	1259	ifdef	EGG	1671	exact
+base/video/video.c	1273	ifdef	EGG	1685	exact
+base/video/video.c	1319	else		1740	exact
+base/video/video.c	1336	else		1760	group-line-anchor
+base/video/video.c	1357	else		1780	exact
+base/video/video.c	1381	else		1838	exact
+base/video/video.c	1439	else		1936	exact
+base/video/video.c	1454	else		1951	exact
+base/video/video.c	1513	else		2008	exact
+base/video/video.c	1525	else		2019	exact
+base/video/video.c	1534	else		2027	exact
+base/video/video.c	1549	else		2041	exact
+base/video/video.c	1561	else		2053	exact
+base/video/video.c	1608	else		2103	exact
+base/video/video.c	1614	ifdef	EGG	2108	exact
+base/video/video.c	1662	ifdef	EGG	2156	exact
+base/video/video.c	1752	else		2255	exact
+base/video/video.c	1774	ifdef	EGG	2299	exact
+base/video/video.c	1841	else		2374	exact
+base/video/video.c	1875	ifdef	EGG	2420	exact
+base/video/video.c	1934	ifdef	EGG	2479	exact
+base/video/video.c	1972	ifdef	EGG	2517	exact
+base/video/video.c	1990	ifdef	EGG	2535	exact
+base/video/video.c	2010	ifdef	EGG	2555	exact
+base/video/video.c	2040	ifdef	EGG	2585	exact
+base/video/video.c	2058	ifdef	EGG	2603	exact
+base/video/video.c	2074	ifdef	EGG	2619	exact
+base/video/video.c	2108	ifdef	EGG	2653	exact
+base/video/video.c	2152	ifdef	CPU_40_STYLE	2697	exact
+base/video/video.c	2182	else		2733	exact
+base/video/video.c	2214	else		2770	exact
+base/video/video.c	2286	else		2887	exact
+base/video/video.c	2309	else		2919	exact
+base/video/video.c	2324	else		2931	exact
+base/video/video.c	2339	ifdef	EGG	2945	exact
+base/video/video.c	2391	else		3020	exact
+base/video/video.c	2470	else		3106	exact
+base/video/video.c	2478	else		3122	group-line-anchor
+base/video/video.c	2485	ifdef	EGG	3127	exact
+base/video/video.c	2719	ifdef	EGG	3602	exact
+base/video/video.c	2872	ifdef	EGG	3791	exact
+host/inc/error.h	222	ifndef	MONITOR	222	exact
+host/inc/error.h	239	if	!defined(BUILDING_CPU_TOOL)	256	exact
+host/inc/host_cpu.h	37	ifdef	LITTLEND		local-frame-no-one-to-one-xp-guard
+host/inc/host_cpu.h	88	ifndef	EGATEST	187	exact
+host/inc/host_cpu.h	249	ifdef	CCPU	357	exact
+host/inc/host_cpu.h	275	ifdef	CCPU		local-frame-no-one-to-one-xp-guard
+host/inc/host_cpu.h	295	ifdef	CCPU	419	exact
+host/inc/host_def.h	86	ifndef	WINWORLD	79	exact
+host/inc/host_def.h	109	ifndef	MONITOR	92	exact
+host/inc/host_def.h	121	else		103	group-line-anchor
+host/inc/host_def.h	132	else		111	group-line-anchor
+host/inc/host_inc.h	30	else		71	exact
+host/inc/insignia.h	25	ifndef	NT_INCLUDED	25	exact
+host/inc/insignia.h	77	ifdef	CVIDC_RULE_WORD		local-frame-no-one-to-one-xp-guard
+host/inc/insignia.h	82	else			local-frame-no-one-to-one-xp-guard
+host/inc/insignia.h	111	ifndef	BOOL	105	exact
+host/inc/insignia.h	155	else		182	exact
+host/inc/nt_graph.h	115	else		114	group-line-anchor
+host/src/nt_cga.c	255	ifndef	MONITOR	378	explicit
+host/src/nt_ega.c	233	ifdef	LITTLEND	251	exact
+host/src/nt_ega.c	426	ifdef	LITTLEND	449	exact
+host/src/nt_ega.c	452	ifdef	LITTLEND	479	exact
+host/src/nt_graph.c	633	else		780	exact
+host/src/nt_graph.c	859	ifndef	NEC_98	1017	exact
+host/src/nt_graph.c	901	else		1060	group-line-anchor
+host/src/nt_graph.c	936	ifndef	NEC_98	1091	explicit
+host/src/nt_graph.c	1360	ifdef	V7VGA	1620	exact
+host/src/nt_graph.c	1648	ifdef	V7VGA		local-frame-no-one-to-one-xp-guard
+host/src/nt_keycd.c	139	else		410	exact
+host/src/nt_keycd.c	167	else		450	exact
+host/src/nt_vga.c	246	ifdef	LITTLEND	238	exact

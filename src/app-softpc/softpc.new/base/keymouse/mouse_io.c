@@ -2335,6 +2335,9 @@ the application OUTBs the necessary data.
                  * parameters subsequently as the screen size may differ!!
                  * this occurred in DOSSHELL.
                  */
+#line 2245
+#if !defined(NTVDM) || !defined(MONITOR)
+#line 2246
 #ifdef EGG
                         if (video_adapter == EGA || video_adapter == VGA)
                         {
@@ -2353,6 +2356,8 @@ the application OUTBs the necessary data.
 #endif          /* GISP_SVGA */
 #line 2349
                                 video_io();
+#endif /* !NTVDM && !MONITOR */
+#line 2263
                         break;
 
                 default:

@@ -362,6 +362,9 @@ typedef struct _resource_node
 extern void config IPT0();
 extern void *config_inquire IPT2(UTINY, hostID, ConfigValues *, values);
 
+#line 368
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 369
 extern void config_get IPT2(UTINY, hostID, ConfigValues **, values);
 extern void config_unget IPT1(UTINY, hostID);
 extern void config_unget_all IPT0();
@@ -371,6 +374,8 @@ extern void IPT0config_get_all();
 extern BOOL config_reboot_check IPT0();
 extern SHORT config_check IPT2(UTINY, hostID, ErrDataPtr, errDataP);
 extern void config_store IPT0();
+#endif
+#line 379
 
 extern void config_activate IPT2(UTINY, hostID, BOOL, reqState);
 extern void config_set_active IPT2(UTINY, hostID, BOOL, state);
@@ -382,9 +387,14 @@ extern UTINY find_hostID IPT1(CHAR *, name);
 extern CHAR *find_optionname IPT1(UTINY, hostID);
 extern void host_config_init IPT1(OptionDescription *, common_defs);
 
+#line 390
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 391
 extern SHORT host_read_resource_file IPT2(BOOL, system, ErrDataPtr, err_buf);
 extern SHORT host_write_resource_file IPT2(LineNode *, head,
                                            ErrDataPtr, err_buf);
+#endif
+#line 395
 
 extern void *host_inquire_extn IPT2(UTINY, hostID, ConfigValues *, values);
 extern SHORT host_runtime_inquire IPT1(UTINY, what);

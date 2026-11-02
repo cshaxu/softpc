@@ -2473,8 +2473,13 @@ LOCAL void IdealTimeInit IFN0()
 
 #endif
 
+#line 2872
+#ifndef NTVDM
+#line 2873
     getHostSysTime(&idealtime);
         ticksPerIdealInterval = (idealInterval * TIMER_CLOCK_DENOM) / TIMER_CLOCK_NUMER;
+#endif
+#line 2876
 }
 #endif   //NEC_98
 #line 2878

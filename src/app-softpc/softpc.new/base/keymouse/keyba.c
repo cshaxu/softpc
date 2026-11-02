@@ -328,7 +328,12 @@ half_word *scan_code_6805_array;
 
 #ifdef PM
 int gate_a20_status;
+#line 413
+#ifndef NTVDM
+#line 414
 long reset_was_by_kbd = FALSE;
+#endif
+#line 416
 #endif
 
 #ifndef NTVDM
@@ -888,6 +893,10 @@ switch (key_set)
 		break_sizes=set_2_break_sizes;
 		for (key=0;key<127;key++)
 			{
+#line 1387
+#ifndef NEC_98
+#endif    //NEC_98
+#line 1427
 			switch (keytypes[key])
 				{
 				case 0:
@@ -1280,7 +1289,12 @@ if (!keyboard_disabled)
 		    codes_to_translate();
 		    }
 
+#line 1865
+#ifndef NTVDM
+#line 1866
 		} /* end of if first press */
+#endif	/* NTVDM */
+#line 1868
 
 	} /* end of if not disabled */
 } /* end of do_host_key_down */
@@ -1610,9 +1624,14 @@ if (waiting_for_next_code)
 			set_3_key_state[key_to_change]=set_3_default_key_state[key_to_change];
 			}
 
+#line 2197
+#ifndef NTVDM 	/* JonLe NTVDM Mod */
+#line 2198
 		repeat_delay_target=2*BASE_DELAY_UNIT;
 		repeat_target=DEFAULT_REPEAT_TARGET;
 		typematic_key_valid=FALSE;
+#endif	/* NTVDM */
+#line 2202
 
 		keyboard_disabled=TRUE;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard disabled");
@@ -1626,7 +1645,12 @@ if (waiting_for_next_code)
 		clear_buff_6805 ();
                 AddTo6805BuffImm(ACK_CODE);
 
+#line 2215
+#ifndef NTVDM 	/* JonLe NTVDM Mod */
+#line 2216
 		typematic_key_valid=FALSE;
+#endif	/* NTVDM */
+#line 2218
 
 		keyboard_disabled=FALSE;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard enabled");
@@ -1662,7 +1686,12 @@ if (waiting_for_next_code)
 		clear_buff_6805 ();
                 AddTo6805BuffImm(ACK_CODE);
 
+#line 2253
+#ifndef NTVDM 	/* JonLe NTVDM Mod */
+#line 2254
 		typematic_key_valid=FALSE;
+#endif	/* NTVDM */
+#line 2256
 
 		next_code_sequence_number=SCAN_CODE_CHANGE_SEQUENCE;
 		held_event_count=0;
@@ -1690,9 +1719,14 @@ if (waiting_for_next_code)
 			set_3_key_state[key_to_change]=set_3_default_key_state[key_to_change];
 			}
 
+#line 2283
+#ifndef NTVDM 	/* JonLe NTVDM Mod */
+#line 2284
 		repeat_delay_target=2*BASE_DELAY_UNIT;
 		repeat_target=DEFAULT_REPEAT_TARGET;
 		typematic_key_valid=FALSE;
+#endif	/* NTVDM */
+#line 2288
 		keyboard_disabled=FALSE;
 		sure_note_trace0(AT_KBD_VERBOSE,"Keyboard set to default (and enabled)");
 		break;
@@ -1703,7 +1737,12 @@ if (waiting_for_next_code)
 		clear_buff_6805 ();
                 AddTo6805BuffImm(ACK_CODE);
 
+#line 2298
+#ifndef NTVDM 	/* JonLe NTVDM Mod */
+#line 2299
 		typematic_key_valid=FALSE;
+#endif	/* NTVDM */
+#line 2301
 
 		next_code_sequence_number=SET_3_KEY_TYPE_SET_SEQUENCE;
 		held_event_count=0;
@@ -2654,7 +2693,12 @@ GLOBAL VOID AT_kbd_init IFN0()
 #endif	/* macintosh */
 #line 2674
 
+#line 3448
+#ifndef NEC_98
+#line 3449
 	videoAdapt = (ULONG) config_inquire(C_GFX_ADAPTER, NULL);
+#endif   //NEC_98
+#line 3451
 
 	buff_6805_out_ptr=0;
 	clear_buff_6805 ();

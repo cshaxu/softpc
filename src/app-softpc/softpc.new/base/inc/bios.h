@@ -339,7 +339,12 @@ extern void bootstrap3 IPT0();
 #else
 #line 364
 extern void host_reset IPT0();
+#line 365
+#ifndef NTVDM
+#line 366
 extern void reboot IPT0();
+#endif /* ! NTVDM */
+#line 368
 extern void display_string IPT0();
 extern void clear_string IPT0();
 #endif /* ANSI */

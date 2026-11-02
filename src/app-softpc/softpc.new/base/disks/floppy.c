@@ -2047,6 +2047,9 @@ LOCAL fmtdma_set IFN0()
 	 *	for wrapping of the bottom 16 bits of the address
 	 */
 
+#line 3785
+#ifndef NTVDM
+#line 3786
 	/* we don't have to worry about this on NT */
 	outb(DMA_WRITE_ONE_MASK_BIT, DMA_DISKETTE_CHANNEL);
 	if (((long)dma_address.words.low + (long)byte_count.X) > 0xffff)
@@ -2054,6 +2057,8 @@ LOCAL fmtdma_set IFN0()
 		sas_store(FLOPPY_STATUS, FS_DMA_BOUNDARY);
 		return(FAILURE);
 	}
+#endif
+#line 3794
 
 	return(SUCCESS);
 #endif // !NEC_98

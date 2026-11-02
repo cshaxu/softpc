@@ -125,9 +125,14 @@
  * ============================================================================
  */
 
+#line 129
+#ifndef NEC_98
+#line 130
 #define PRINTER_BIT_MASK	0x3	/* bits decoded from address bus */
 #define CONTROL_REG_MASK	0xE0;	/* unused bits drift to HIGH */
 #define STATUS_REG_MASK		0x07;	/* unused bits drift to HIGH */
+#endif // !NEC_98
+#line 134
 
 #define DATA_OFFSET	0		/* ouput register */
 #define STATUS_OFFSET	1		/* status register */
@@ -175,6 +180,10 @@ static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
 #line 172
 
 
+#line 199
+#ifndef NEC_98
+#endif // !NEC_98
+#line 209
 #define STATE_READY     0
 #define STATE_OUT       1
 #define STATE_OUTA      2
@@ -588,6 +597,10 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #line 492
 			{
 
+#line 646
+#ifndef NEC_98
+#endif // !NEC_98
+#line 660
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
@@ -668,10 +681,17 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 			}
 
 
+#line 741
+#ifndef NEC_98
+#endif // !NEC_98
+#line 753
+#ifndef NEC_98
+#line 754
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 553
+#endif // !NEC_98
+#line 760
 			break;
 		}
 #ifndef NEC_98

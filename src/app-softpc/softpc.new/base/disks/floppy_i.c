@@ -258,7 +258,12 @@ void diskette_post()
 #else  // !NEC_98
 #line 696
 	half_word diskette_id_reg, hf_cntrl, interrupt_mask;
+#line 697
+#ifndef NTVDM
+#line 698
 	half_word disk_state;
+#endif
+#line 700
 	EQUIPMENT_WORD equip_flag;
 #endif // !NEC_98
 #line 702

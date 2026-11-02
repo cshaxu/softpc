@@ -31,7 +31,10 @@ open. The [S20 closure](../history/M9-T99-S20-mirror-depth1.md) records depth 1.
 S20 recorded 1,381 present second-depth arms, 11 known absent XP groups and
 140 unverified direct-child candidates. These categories can overlap and are
 not a final count. Disposable scratch `build/t99-s21` belongs to S21, with a
-two-hour total and 30-minute no-progress observation budget; promote durable
+four-hour total and 30-minute no-progress observation budget; the total was
+extended from two hours because dual full regression, native integration and
+repeated source-context probes remained active and made observable progress.
+Do not interrupt an active operation at an interactive timeout. Promote durable
 evidence and remove scratch before closure.
 
 The first pending depth-2 batch restores six original NTVDM child frames
@@ -150,6 +153,22 @@ Final-source context observations were refreshed: 40 source preprocessing
 contexts and 68 header dependency contexts all succeeded; 128 source arms
 and three header arms were observed selected in both architectures. After
 the last parent restorations nine earlier queue entries moved to depth 3.
+Exclusion batch P 960b019e was committed and pushed. In the retained phase,
+39 selected frames were restored and one existing selected frame verified.
+The 37 candidate inventory entries are covered by 36 restorations and one
+existing frame; three additional restorations close the known-absent list.
+The current second depth contains 1,549 arms: 796 are single-error excluded
+arms, and 753 retained arms have individual accounting. Of the retained
+arms, 663 map to earlier supported-context evidence, 39 are restored selected
+frames, and 51 are the retained siblings of qualified excluded groups.
+Twenty-nine previously queued depth-2 entries now belong to depth 3. The
+depth-3 queue has 518 present arms under retained parents and 596 XP direct
+child arms of 746 mapped parents; the lists may overlap. Seven locally owned
+parent frames have no one-to-one XP guard and are separately identified for
+depth-3 scope review. These are candidates, not depth-3 dispositions.
+Diagnostic line controls were corrected; final dual builds, context probes,
+and all 194 tests per architecture passed. Actual-diff review, delivery and
+S21 closure remain.
 
 ## Technical Baseline
 

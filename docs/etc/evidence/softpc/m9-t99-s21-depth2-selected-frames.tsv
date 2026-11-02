@@ -1,0 +1,41 @@
+path	xp_line	current_line	condition	status	source_sha256
+base/comms/printer.c	129	129	#ifndef NEC_98	restored-selected-frame	883c29cb15c3aba12c45867d28e11880bb544ec18e2727557bb7f2c861d5ddaa
+base/disks/floppy.c	3785	2051	#ifndef NTVDM	restored-selected-frame	d4732b6644f0b034d055b5d163bd3e270fc724e2dec3f890f3eddbe94b08f52e
+base/disks/floppy_i.c	697	262	#ifndef NTVDM	restored-selected-frame	90c631ae3cfc4e70583e80dba8f6cd395b43cf9bb9a27d0301a04999311dd420
+base/inc/bios.h	365	343	#ifndef NTVDM	restored-selected-frame	a7468b9c92bb4c208b7a1d22e666bdb15d2855fb7d06ca1adb2e0f6772b2ade5
+base/inc/config.h	368	366	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	restored-selected-frame	c889a17dc370b9c22a9da9a0aad1ddcc3fb7e0ded4377764db719be7f29f991f
+base/inc/config.h	390	391	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	restored-selected-frame	c889a17dc370b9c22a9da9a0aad1ddcc3fb7e0ded4377764db719be7f29f991f
+base/keymouse/keyba.c	413	332	#ifndef NTVDM	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/keymouse/keyba.c	1865	1293	#ifndef NTVDM	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/keymouse/keyba.c	3448	2697	#ifndef NEC_98	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/support/time_day.c	374	207	#ifndef NTVDM	restored-selected-frame	f55c84312707ffebfacd07302a6672c3367dada333105275c2d109c908df146f
+base/system/timer.c	2872	2477	#ifndef NTVDM	restored-selected-frame	c3ab918ba547ec9aef977d7355dd6918930173a9beeaa0d4ae3942f96633e28e
+base/video/gfx_updt.c	1829	1827	#ifndef NEC_98	restored-selected-frame	fb41e55d47c7aef1a19e3c94728b263c52dc2ed77074f7490882e0a42d1c64d9
+base/video/gfx_updt.c	1850	1851	#ifndef NEC_98	restored-selected-frame	fb41e55d47c7aef1a19e3c94728b263c52dc2ed77074f7490882e0a42d1c64d9
+base/video/gvi.c	303	285	#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	restored-selected-frame	544d5474c9d195083ff0c1fa81869386dd44454ec57cf2d701a4ba07b014eddb
+host/src/nt_cga.c	378	255	#ifndef MONITOR	restored-selected-frame	159cc8502d1ea2c6c0600fff098e36df48f135681a8070d9f6bb5e185221ad7a
+base/comms/com.c	1615	1049	#ifndef NTVDM	restored-selected-frame	c5192e6a42175e2986349715f7101a6afadf5a1b332bc983ccbafd6542dad0bb
+base/comms/com.c	1690	1108	#ifndef NTVDM	restored-selected-frame	c5192e6a42175e2986349715f7101a6afadf5a1b332bc983ccbafd6542dad0bb
+base/keymouse/keyba.c	2197	1628	#ifndef NTVDM /* JonLe NTVDM Mod */	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/keymouse/keyba.c	2215	1649	#ifndef NTVDM /* JonLe NTVDM Mod */	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/keymouse/keyba.c	2253	1690	#ifndef NTVDM /* JonLe NTVDM Mod */	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/keymouse/keyba.c	2283	1723	#ifndef NTVDM /* JonLe NTVDM Mod */	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/keymouse/keyba.c	2298	1741	#ifndef NTVDM /* JonLe NTVDM Mod */	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+host/src/nt_graph.c	1091	936	#ifndef NEC_98	restored-selected-frame	3eb5bdde6dd0ce7b249fa7686555aaeb06d64dc426279a2a5a0133d6693c0ebe
+base/video/ega_vide.c	930	835	#ifndef NEC_98	restored-selected-frame	c91d3c85faaada463f36ba17229f2b1bbd336623c4750fff4b8add3983547963
+base/video/ega_vide.c	999	908	#ifndef NEC_98	restored-selected-frame	c91d3c85faaada463f36ba17229f2b1bbd336623c4750fff4b8add3983547963
+base/video/gfx_updt.c	313	283	#ifndef NEC_98	restored-selected-frame	fb41e55d47c7aef1a19e3c94728b263c52dc2ed77074f7490882e0a42d1c64d9
+base/keymouse/mouse_io.c	2245	2339	#if !defined(NTVDM) || !defined(MONITOR)	restored-selected-frame	6c058084b203b5903f68901e1f36fe6bb43eb59bb2a86d7e96dd11a51bda5047
+base/comms/printer.c	199	184	#ifndef NEC_98	restored-selected-frame	883c29cb15c3aba12c45867d28e11880bb544ec18e2727557bb7f2c861d5ddaa
+base/comms/printer.c	646	601	#ifndef NEC_98	restored-selected-frame	883c29cb15c3aba12c45867d28e11880bb544ec18e2727557bb7f2c861d5ddaa
+base/comms/printer.c	741	685	#ifndef NEC_98	restored-selected-frame	883c29cb15c3aba12c45867d28e11880bb544ec18e2727557bb7f2c861d5ddaa
+base/keymouse/keyba.c	1387	897	#ifndef NEC_98	restored-selected-frame	7994e6db63fef896a2128c54d6bb5a7674a3df7ea0a4a70905c8ecbe5a4879d1
+base/comms/printer.c	753	688	#ifndef NEC_98	restored-selected-frame	883c29cb15c3aba12c45867d28e11880bb544ec18e2727557bb7f2c861d5ddaa
+base/support/time_day.c	384	220	#ifndef NTVDM	restored-selected-frame	f55c84312707ffebfacd07302a6672c3367dada333105275c2d109c908df146f
+base/support/time_day.c	399	238	#ifndef NTVDM	restored-selected-frame	f55c84312707ffebfacd07302a6672c3367dada333105275c2d109c908df146f
+base/support/time_day.c	441	270	#ifndef NTVDM	restored-selected-frame	f55c84312707ffebfacd07302a6672c3367dada333105275c2d109c908df146f
+base/support/time_day.c	456	288	#ifndef NTVDM	restored-selected-frame	f55c84312707ffebfacd07302a6672c3367dada333105275c2d109c908df146f
+base/comms/com.c	742	695	#ifndef NTVDM	restored-selected-frame	c5192e6a42175e2986349715f7101a6afadf5a1b332bc983ccbafd6542dad0bb
+base/system/rom.c	342	295	#if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )	restored-selected-frame	e8da9bc6defc28f4ef8c56f2d5591eed05a53a861207c47b82e25426aab567a0
+base/bios/reset.c	950	673	#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)	restored-selected-frame	e005241026f1629ee44c9962c2a1ccf5885effcb57f8214226a5e315246467e8
+base/video/ega_vide.c	2291	1788	#ifndef NEC_98	already-existing-selected-frame	c91d3c85faaada463f36ba17229f2b1bbd336623c4750fff4b8add3983547963

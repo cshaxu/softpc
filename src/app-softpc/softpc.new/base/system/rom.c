@@ -292,7 +292,8 @@ GLOBAL void rom_init IFN0()
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
 #line 342
-
+#if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
+#line 343
 	 /*
      * Fill up all of ROM (Intel C0000 upwards) with bad op-codes.
      * This is the Expansion ROM and the BIOS ROM.
@@ -332,6 +333,8 @@ GLOBAL void rom_init IFN0()
 	read_rom (BIOS2ROM_FILENAME, BIOS2_START);
 
 #endif		/* GISP_SVGA */
+#endif /* !NTVDM | (NTVDM & !X86GFX) */
+#line 415
 
 
 	host_rom_init();

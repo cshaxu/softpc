@@ -669,6 +669,8 @@ void reset()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
+#line 950
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)
 #line 954
     {
         /* Clear out the bottom 32K of memory. */
@@ -677,6 +679,8 @@ void reset()
         /* Now set up the interrupt vector table. */
         setup_ivt();
     }
+#endif /* !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86) */
+#line 962
 #endif // !NEC_98
 #line 963
 

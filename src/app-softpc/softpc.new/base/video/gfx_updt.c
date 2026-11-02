@@ -279,6 +279,9 @@ static	int	dirty_next=0;
 static	int	search_video_copy IFN4(int, start_line,
 	int, end_line, int, start_offset, int, alignment)
 {
+#line 313
+#ifndef NEC_98
+#line 314
 	register	byte	*ptr,*k;
 	register	int	j;
 	int offset = (start_offset<<2) + alignment;
@@ -311,6 +314,8 @@ static	int	search_video_copy IFN4(int, start_line,
 		 * Don't clear out the marked area in case the plane wraps
 		 */
 	}
+#endif  //NEC_98
+#line 350
 	return( get_dirty_rec_total() );
 }
 
@@ -1818,6 +1823,9 @@ GLOBAL VOID
 cga_med_graph_update IFN0()
 
 {
+#line 1829
+#ifndef NEC_98
+#line 1830
 
 	/*
 	 *	The med res CGA graphics mode ( mode 4 ) is an EGA CHAIN2 mode !!
@@ -1831,12 +1839,17 @@ cga_med_graph_update IFN0()
 	else
 #endif
 		cga_graph_update_unchained( );
+#endif  //NEC_98
+#line 1844
 }
 
 GLOBAL VOID
 cga_hi_graph_update IFN0()
 
 {
+#line 1850
+#ifndef NEC_98
+#line 1851
 
 	/*
 	 *	The hi res CGA graphics mode ( mode 6 ) is an EGA CHAIN4 mode !!
@@ -1850,6 +1863,8 @@ cga_hi_graph_update IFN0()
 	else
 #endif
 		cga_graph_update_unchained( );
+#endif  //NEC_98
+#line 1865
 }
 
 #ifdef EGG

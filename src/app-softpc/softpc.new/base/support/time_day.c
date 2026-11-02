@@ -203,18 +203,27 @@ void time_of_day()
 	    sas_storew(TIMER_HIGH, getCX());
 	    sas_store(TIMER_OVFL, 0);
 
+#line 374
+#ifndef NTVDM
+#line 375
 	    /*
 	     * Also the host timestamp
 	     */
 
 	    write_host_timestamp(getDX(), getCX());
+#endif
+#line 381
 	    break;
 	case 2:	/* read the real time clock	*/
 
+#line 384
+#ifndef NTVDM
+#line 385
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 208
+#endif
+#line 389
 		if( UPDATE_IN_PROGRESS )
 			setCF(1);
 		else
@@ -225,10 +234,14 @@ void time_of_day()
 			setCH( cmos_read( CMOS_HOURS ) );
 			setCF(0);
 		}
+#line 399
+#ifndef NTVDM
+#line 400
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 234
+#endif
+#line 417
 		break;
 
 	case 3:	/* Set the real time clock	*/
@@ -253,10 +266,14 @@ void time_of_day()
 
 	case 4:	/* read the date from the real time clock	*/
 
+#line 441
+#ifndef NTVDM
+#line 442
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 261
+#endif
+#line 446
 		if( UPDATE_IN_PROGRESS )
 			setCF(1);
 		else
@@ -267,10 +284,14 @@ void time_of_day()
 			setCH( cmos_read( CMOS_CENTURY ) );
 			setCF(0);
 		}
+#line 456
+#ifndef NTVDM
+#line 457
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 287
+#endif
+#line 474
 		break;
 
 	case 5:	/* Set the date into the real time clock	*/

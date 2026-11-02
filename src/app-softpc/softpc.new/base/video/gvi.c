@@ -281,8 +281,13 @@ void gvi_init IFN1(half_word, v_adapter)
         break;
     }
 
+#line 303
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )
+#line 304
     host_init_adaptor(video_adapter,screen_height);
     host_clear_screen();
+#endif	/* !NTVDM | (NTVDM & !X86GFX) */
+#line 307
 
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"

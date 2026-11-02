@@ -831,6 +831,9 @@ LOCAL VOID
 write_ch_set IFN5(sys_addr, char_addr, int, screen_off,
         int, colour, int, nchs, int, scan_length)
 {
+#line 930
+#ifndef NEC_98
+#line 931
         unsigned int i, j, colourmask, data, temp, char_height;
         unsigned int *screen;
         register sys_addr font;
@@ -894,11 +897,16 @@ write_ch_set IFN5(sys_addr, char_addr, int, screen_off,
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
 #line 878
+#endif  //NEC_98
+#line 994
 }
 
 void write_ch_xor IFN5(sys_addr, char_addr, int, screen_off,
         int, colour, int, nchs, int, scan_length)
 {
+#line 999
+#ifndef NEC_98
+#line 1000
         unsigned int i, j, colourmask, data, temp, char_height;
         unsigned int *screen;
         register sys_addr font;
@@ -960,6 +968,8 @@ void write_ch_xor IFN5(sys_addr, char_addr, int, screen_off,
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
 #line 943
+#endif  //NEC_98
+#line 1061
 }
 
 GLOBAL void ega_set_mode IFN0()

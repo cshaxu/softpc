@@ -932,8 +932,13 @@ void nt_graphics_tick(void)
                 flush_count = 0;
              }
         }
+#line 1091
+#ifndef NEC_98
+#line 1092
     }
     else
+#endif // !NEC_98
+#line 1095
 #endif /* EGG */
 #ifndef NEC_98
 #line 779

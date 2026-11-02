@@ -251,9 +251,14 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 
     /*:::::::::::::: Adjust re-paint start location from pixels to characters */
 
+#line 378
+#ifndef MONITOR
+#line 379
     /* Adjust for RISC parameters being in pixels */
     ScreenX = ScreenX / get_pix_char_width();
     ScreenY = ScreenY / get_host_char_height();
+#endif
+#line 383
 
     /* A mode transition may emit an empty text dirty rectangle.  The NTVDM
        console path implicitly filtered these, but the original bulk-copy

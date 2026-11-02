@@ -691,6 +691,8 @@ static void com_send_not_finished IFN1(int, adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
+#line 742
+#ifndef NTVDM
 #line 743
 static void do_wait_on_send IFN1(long, adapter)
 {
@@ -701,6 +703,8 @@ static void do_wait_on_send IFN1(long, adapter)
 	set_xmit_char_status(asp);
 	host_com_send_delay_done(adapter, TX_delay[asp->com_baud_ind]);
 }
+#endif /* NTVDM */
+#line 751
 
 
 #endif // NEC_98
@@ -1041,7 +1045,12 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		else
 		{
 			asp->divisor_latch.byte.LSByte = value;
+#line 1615
+#ifndef NTVDM
+#line 1616
 			set_baud_rate(adapter);
+#endif
+#line 1618
 		}
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
@@ -1095,7 +1104,12 @@ void com_outb IFN2(io_addr, port, half_word, value)
 		else
 		{
 			asp->divisor_latch.byte.MSByte = value;
+#line 1690
+#ifndef NTVDM
+#line 1691
 			set_baud_rate(adapter);
+#endif /* NTVDM */
+#line 1693
 		}
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
