@@ -2,73 +2,17 @@
 
 ## Current Work
 
-Owner authorizes automatic admission of each next depth after the preceding S
-is built, published, tested, committed, pushed and closed. S21 is closed at
-`97cb254b`; [its record](../history/M9-T99-S21-mirror-depth2.md) and
-[final evidence](../etc/evidence/softpc/m9-t99-s21-depth2-final.md) identify
-the first two depth-3 queues. S22 is active for depth 3; T99 remains open.
-
-## M9 T99 S22 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Automatic per-depth admission authorized by owner after S21 closure and push. |
-| Objective | Audit and reconcile third-depth retained mirror conditional arms under the established breadth-first policy. |
-| Non-goals | Do not process fourth-depth bodies, introduce new guest behavior, alter public APIs or modify user media and configuration. |
-| Reference Baseline | S21 closure 97cb254b, pinned XP SP1 subset, OpenNT comparison and S21 depth-3 evidence. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
-| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
-| Verification | Verify actual x86/x64 conditions and original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |
-| Expected Markers | Preserve original third-depth frames; conclusively excluded bodies become one #error and required #line; do not retain inner frames inside excluded bodies. |
-| Asset Needs | Build and publish both EXEs; preserve INI, guest media and snapshots. |
-| Reporting Requirements | Report current depth, actual totals and dispositions, production/test diff, verification and depth-4 queue. |
-| Stop Conditions | Do not equate unobserved code with excluded code; preserve approved local fixes in selected arms; do not process deeper bodies. |
-| Exit Criteria | Deliver excluded third-depth phase with build, publish, tests, commit and push; then audit every retained third-depth arm, enqueue direct fourth-depth children and complete final verification, delivery and closure. |
-| Original Owner Request | 每一层单独作为 S；本层排除分支先集中交付，再审计本层保留分支并排队下一层；每 S 编译、测试、发布、提交、推送、收口后自动准入下一层。 |
-| Similar-Issue Sweep | Account for both current-code and pinned-XP direct-child queues, their overlap, local-condition extensions and seven local frames without one-to-one XP guard. |
-
-The S21 queues contain 518 current third-depth arms and 596 XP direct-child
-arms; these counts overlap and are not final dispositions. Seven local frames
-have no one-to-one XP guard and require scope review. Begin with current depth
-and parent qualification, then compare original frames. Disposable scratch is
-`build/t99-s22`, owned by S22, with a four-hour total and 30-minute no-progress
-observation budget. Promote concise evidence and retire scratch before closure.
-
-Initial depth-3 inventory: 518 present arms, including 204 single-error
-arms, and 596 XP direct-child candidates. Exact alignment matched 498; 98
-needed further review. Signature matching alone is not proof, especially for
-repeated conditions. The exclusion working batch restores 49 original groups,
-including selected-sibling cases, and replaces seven existing unselected arms.
-A 558-context preprocessing probe completed with no failures: 329 arms were
-observed selected on both widths. Seven unobserved arms were separately probed
-in 18 contexts; their parent was reached and target not selected on either
-width, so each body was replaced by one #error. A fresh whole-tree scan finds
-588 present third-depth arms: 259 direct single-error and 329 retained arms,
-with no direct-error body containing extra content. Probe source hashes are
-recorded at the time of probing, before the seven replacements. This remains
-intermediate work: both architecture builds and mirror/documentation gates
-passed. The initial x64 full run passed 185/186; emulator.verifier-negative
-timed out at its existing 60-second budget. Other host work was active, but
-resource contention remains a hypothesis, not a proven cause. A focused retry passed in 18.54 seconds; a full -j4 retry passed on both
-architectures, 186 background and eight serial native integration tests each.
-No timeout budget was changed. Exclusion delivery `23926edf` was pushed.
-In the retained phase, 22 original selected frames were restored; one was
-previously overextended across two functions and was split at its original
-boundary. Two existing error frames and one accepted local condition extension
-were reviewed and preserved. Current depth 3 has 600 arms: 256 direct single-
-error, 322 previously observed selected and 22 restored selected. Seven formerly
-direct arms moved to depth 4. Fourth-depth queues contain 309 current arms and
-326 XP direct-child candidates; the counts overlap. One selected local frame
-has no one-to-one XP guard and remains identified in the parent map. Final dual builds and full tests passed: 186 background and eight native
-integration tests per architecture. Final actual-diff review, delivery and
-S22 closure remain.
+No implementation subtask is active. Open task awaiting owner: T99.
+The owner has already authorized automatic admission of S23, so no further
+owner response is required. S22 is closed after third-depth delivery and full
+qualification; see its [closure](../history/M9-T99-S22-mirror-depth3.md).
+S23 must audit fourth-depth candidates without processing their children;
+current-code and XP queues are linked from the S22 final report.
 
 ## Technical Baseline
 
-Latest published binaries are S21's second-depth mirror build; hashes and dual-
-architecture qualification are in its [closure](../history/M9-T99-S21-mirror-depth2.md).
+Latest published binaries are S22's third-depth mirror build; hashes and dual-
+architecture qualification are in its [closure](../history/M9-T99-S22-mirror-depth3.md).
 The following S17 and earlier paragraphs retain delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,
