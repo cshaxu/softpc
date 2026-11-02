@@ -1,0 +1,15 @@
+path	current_parent_line	xp_parent_line	xp_child_line	directive	expression	status
+base/video/cga.c	1190	1412	1413	ifdef	A2CPU	pending-depth6-xp-direct-child
+base/video/cga.c	1190	1412	1416	else		pending-depth6-xp-direct-child
+base/video/ega_read.c	501	673	674	ifndef	CPU_40_STYLE	pending-depth6-xp-direct-child
+base/video/ega_read.c	622	847	849	ifdef	CPU_40_STYLE	pending-depth6-xp-direct-child
+base/video/ega_read.c	622	847	851	else		pending-depth6-xp-direct-child
+base/video/ega_read.c	672	910	915	ifdef	CPU_40_STYLE	pending-depth6-xp-direct-child
+base/video/ega_read.c	672	910	917	else		pending-depth6-xp-direct-child
+base/video/ega_writ.c	205	483	485	if	defined(EGA_DUMP) || defined(EGA_STAT)	pending-depth6-xp-direct-child
+base/video/ega_writ.c	205	483	487	else		pending-depth6-xp-direct-child
+base/video/gfx_updt.c	3877	3817	3818	ifndef	CPU_40_STYLE	pending-depth6-xp-direct-child
+base/video/gfx_updt.c	3877	3817	3823	else		pending-depth6-xp-direct-child
+base/video/gfx_updt.c	3900	3834	3836	ifdef	GORE	pending-depth6-xp-direct-child
+base/video/gfx_updt.c	3900	3834	3841	else		pending-depth6-xp-direct-child
+base/video/gfx_updt.c	3967	3898	3903	ifdef	V7VGA	pending-depth6-xp-direct-child

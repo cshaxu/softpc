@@ -3429,8 +3429,12 @@ boolean v7vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 #line 3311
 	UNUSED(dummy);
 	
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3313
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3315
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3458,8 +3462,12 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 #line 3339
 	UNUSED(dummy_arg);
 	
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3341
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3343
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */

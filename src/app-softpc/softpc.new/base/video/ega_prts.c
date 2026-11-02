@@ -2539,8 +2539,11 @@ GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 #ifdef A3CPU
 #error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
+#if !(defined(NTVDM) && defined(MONITOR))
 #line 2955
 	Glue_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);
+#endif /* !(NTVDM && MONITOR) */
+#line 2956
 #endif /* A3CPU */
 
 	EGA_CPU.saved_state = state;

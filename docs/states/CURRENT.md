@@ -49,6 +49,18 @@ records binaries and guard checks; exclusion delivery is ready for commit.
 [Current-arm accounting](../etc/evidence/softpc/m9-t99-s24-depth5-excluded-accounting.tsv)
 records the 94 starting arms; it does not dispose the XP candidate queue.
 
+Exclusion batch `2434946c` was committed and pushed. The retained review
+restored six selected XP frames in five mirror sources; preprocessed outputs
+for all five sources matched the exclusion baseline byte-for-byte on both
+architectures. Fifth depth now has 99 arms: 39 direct single-error and 60
+selected; one former fifth-depth error is now sixth-depth under a restored
+selected parent. Fifty-nine selected parents map to XP and the remaining
+parent is the accepted local T88 CHAIN2 frame. Both sixth-depth queues contain
+14 overlapping candidates; they are not dispositions. Dual builds and gates
+passed; all 194 tests passed on each architecture. The [final evidence](../etc/evidence/softpc/m9-t99-s24-depth5-final.md)
+records the exact source diff, queues and published binary hashes. Final
+delivery and S24 closure remain.
+
 ## Technical Baseline
 
 Latest published binaries are S23's fourth-depth mirror build; hashes and dual-

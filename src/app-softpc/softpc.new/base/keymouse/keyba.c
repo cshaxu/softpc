@@ -2137,7 +2137,11 @@ if (!waiting_for_next_8042_code)
 				{
 				/* pulse the reset line */
 #ifdef PM
+#ifndef NTVDM
+#line 2844
 				reset_was_by_kbd = TRUE;
+#endif
+#line 2845
 #ifdef CPU_30_STYLE
 #error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else /* CPU_30_STYLE */

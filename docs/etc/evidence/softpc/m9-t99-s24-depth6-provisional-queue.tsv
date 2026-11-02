@@ -1,0 +1,15 @@
+path	parent_line	parent_directive	child_line	child_directive	child_expression	source_sha256	status
+base/video/cga.c	1190	else	1192	ifdef	A2CPU	2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b	selected-parent-pending-depth6
+base/video/cga.c	1190	else	1194	else		2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b	selected-parent-pending-depth6
+base/video/ega_read.c	501	ifndef	503	ifndef	CPU_40_STYLE	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba	selected-parent-pending-depth6
+base/video/ega_read.c	622	ifdef	624	ifdef	CPU_40_STYLE	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba	selected-parent-pending-depth6
+base/video/ega_read.c	622	ifdef	626	else		76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba	selected-parent-pending-depth6
+base/video/ega_read.c	672	ifdef	677	ifdef	CPU_40_STYLE	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba	selected-parent-pending-depth6
+base/video/ega_read.c	672	ifdef	679	else		76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba	selected-parent-pending-depth6
+base/video/ega_writ.c	205	else	208	if	defined(EGA_DUMP) || defined(EGA_STAT)	fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth6
+base/video/ega_writ.c	205	else	210	else		fd9a91be6a5dd2573a85f5c7ce5548de1980b50fe704900b073e301e350faabe	selected-parent-pending-depth6
+base/video/gfx_updt.c	3877	else	3879	ifndef	CPU_40_STYLE	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth6
+base/video/gfx_updt.c	3877	else	3881	else		9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth6
+base/video/gfx_updt.c	3900	ifdef	3902	ifdef	GORE	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth6
+base/video/gfx_updt.c	3900	ifdef	3904	else		9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth6
+base/video/gfx_updt.c	3967	ifdef	3972	ifdef	V7VGA	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth6

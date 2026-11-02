@@ -1,0 +1,61 @@
+path	current_line	directive	expression	xp_line
+base/inc/ios.h	398	ifndef	IO_MAX_NUMBER_ADAPTORS	671
+base/keymouse/keyba.c	2140	ifndef	NTVDM	2843
+base/keymouse/keyba.c	2147	else		2848
+base/keymouse/mouse_io.c	5441	ifdef	VGG	5442
+base/keymouse/mouse_io.c	5539	ifdef	VGG	5536
+base/system/rom.c	245	ifdef	V7VGA	262
+base/video/cga.c	1190	else		1412
+base/video/ega_mode.c	613	else		616
+base/video/ega_mode.c	654	else		656
+base/video/ega_prts.c	1385	else		1915
+base/video/ega_prts.c	2542	if	!(defined(NTVDM) && defined(MONITOR))	3025
+base/video/ega_read.c	198	ifdef	C_VID	380
+base/video/ega_read.c	257	ifdef	C_VID	439
+base/video/ega_read.c	292	ifdef	C_VID	472
+base/video/ega_read.c	333	else		511
+base/video/ega_read.c	372	ifdef	C_VID	547
+base/video/ega_read.c	416	ifdef	C_VID	589
+base/video/ega_read.c	434	else		606
+base/video/ega_read.c	501	ifndef	NEC_98	673
+base/video/ega_read.c	533	else		738
+base/video/ega_read.c	552	ifdef	VGG	756
+base/video/ega_read.c	582	ifdef	CPU_40_STYLE	784
+base/video/ega_read.c	603	ifdef	CPU_40_STYLE	821
+base/video/ega_read.c	612	ifdef	CPU_40_STYLE	834
+base/video/ega_read.c	622	ifdef	VGG	847
+base/video/ega_read.c	644	ifdef	CPU_40_STYLE	874
+base/video/ega_read.c	663	ifdef	CPU_40_STYLE	897
+base/video/ega_read.c	672	ifdef	VGG	910
+base/video/ega_read.c	708	ifdef	CPU_40_STYLE	958
+base/video/ega_read.c	724	if	!defined(EGATEST) && !defined(A3CPU)	976
+base/video/ega_read.c	746	ifdef	CPU_40_STYLE	1006
+base/video/ega_writ.c	93	ifdef	C_VID	303
+base/video/ega_writ.c	198	ifdef	CPU_40_STYLE	474
+base/video/ega_writ.c	205	else		483
+base/video/ega_writ.c	411	ifdef	CPU_40_STYLE	686
+base/video/ega_writ.c	446	ifdef	VGG	721
+base/video/ega_writ.c	457	ifdef	VGG	732
+base/video/ega_writ.c	466	ifdef	V7VGA	740
+base/video/ega_writ.c	480	ifdef	CPU_40_STYLE	754
+base/video/ega_writ.c	509	ifdef	V7VGA	783
+base/video/ega_writ.c	548	ifdef	CPU_40_STYLE	822
+base/video/ega_writ.c	564	ifdef	V7VGA	858
+base/video/gfx_updt.c	247	ifdef	V7VGA	292
+base/video/gfx_updt.c	2146	ifdef	V7VGA	2094
+base/video/gfx_updt.c	2170	ifdef	V7VGA	2117
+base/video/gfx_updt.c	2178	ifdef	VGG	2125
+base/video/gfx_updt.c	2188	ifdef	V7VGA	2135
+base/video/gfx_updt.c	3432	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3313
+base/video/gfx_updt.c	3465	if	!defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3341
+base/video/gfx_updt.c	3834	else		3766
+base/video/gfx_updt.c	3853	else		3785
+base/video/gfx_updt.c	3877	else		3817
+base/video/gfx_updt.c	3900	ifdef	VGG	3834
+base/video/gfx_updt.c	3967	ifdef	VGG	3898
+base/video/vga_mode.c	269	else		307
+base/video/vga_prts.c	2241	if	!(defined(NTVDM) && defined(X86GFX))	2258
+base/video/vga_prts.c	2456	ifdef	PROD	2587
+base/video/vga_prts.c	2461	ifdef	V7VGA	2592
+base/video/video.c	1790	ifdef	CPU_40_STYLE	2263
+base/video/gfx_updt.c	3891	ifdef	CPU_40_STYLE	LOCAL_T88_CHAIN2
