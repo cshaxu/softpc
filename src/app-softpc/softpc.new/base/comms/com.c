@@ -69,7 +69,7 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif
-#line 71
+#line 69
 
 
 /*
@@ -1221,7 +1221,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1417
+#line 2117
 #ifdef  NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else /* NTVDM */
@@ -1606,7 +1606,7 @@ static int no_valid_latches =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 2761
+#line 2760
 
 
 

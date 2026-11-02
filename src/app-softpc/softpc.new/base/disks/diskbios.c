@@ -436,12 +436,12 @@ void disk_io IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 617
+#line 864
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 892
+#line 893
 #ifndef NEC_98
 #line 894
 	IDLE_disk();

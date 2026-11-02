@@ -110,7 +110,7 @@
 #else
 #error "Unsupported SoftPC mirror configuration: !EGG"
 #endif	/* EGG */
-#line 100
+#line 114
 
 #ifndef NEC_98
 /* Original nested NTVDM branch is pending depth-2 reconciliation. */
@@ -325,7 +325,7 @@ LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, co
 #else
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // !NEC_98
-#line 284
+#line 424
 
 /*
  * ============================================================================
@@ -344,7 +344,7 @@ LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, co
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // JAPAN || KOREA
-#line 669
+#line 670
 #ifndef NEC_98
 #line 671
 GLOBAL VOID

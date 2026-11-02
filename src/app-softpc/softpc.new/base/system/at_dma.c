@@ -49,7 +49,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 58
+#line 57
 
 /*
  * ============================================================================
@@ -934,7 +934,7 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
 #ifndef PM
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* nPM */
-#line 844
+#line 955
                         bwd_dest_copy_to_M((half_word *)hw_buffer, dma_addr, length, size);
 
                 }

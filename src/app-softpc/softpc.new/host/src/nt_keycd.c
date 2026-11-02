@@ -326,13 +326,13 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 739
+#line 738
 	/*............................... the regular keyset is what we need */
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 787
+#line 788
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynum)
 		   ? 0
                    : Scan1ToKeynum[KeyEvent->wVirtualScanCode];
@@ -348,7 +348,7 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 816
+#line 817
 
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynumExtended)
 		   ? 0

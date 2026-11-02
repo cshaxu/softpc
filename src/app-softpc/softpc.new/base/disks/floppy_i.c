@@ -73,7 +73,7 @@ extern void host_simulate();
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 163
+#line 162
 
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
@@ -172,7 +172,7 @@ void diskette_io()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 618
+#line 616
 
 
 

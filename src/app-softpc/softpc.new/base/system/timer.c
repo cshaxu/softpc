@@ -77,7 +77,7 @@
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 81
+#line 79
 
 
 #ifdef NTVDM
@@ -761,7 +761,7 @@ GLOBAL ULONG get_DOS_ticks IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 800
+#line 799
 
 
 

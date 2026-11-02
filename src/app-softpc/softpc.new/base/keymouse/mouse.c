@@ -439,7 +439,7 @@ int	Delta_x,Delta_y,left,right;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 512
+#line 511
 		if ((mouse_mode_reg & 0x08) && !(mouse_mode_reg & HOLD))
 			ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 #endif   //NEC_98

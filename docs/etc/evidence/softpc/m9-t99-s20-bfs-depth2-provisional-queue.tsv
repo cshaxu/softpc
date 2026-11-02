@@ -1,19 +1,19 @@
 path	parent_line	parent_directive	parent_expression	parent_kind	parent_x86	parent_x64	child_line	child_directive	child_expression	source_sha256	status
-base/bios/reset.c	181	else		selected	selected	selected	216	ifdef	GISP_SVGA	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	181	else		selected	selected	selected	218	else		9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	340	ifdef	EGG	selected	selected	selected	342	ifdef	VGG	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	386	ifndef	NTVDM	selected	selected	selected	390	ifdef	LIM	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	400	ifndef	NEC_98	selected	selected	selected	402	ifdef	PM	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	604	ifndef	NTVDM	selected	selected	selected	626	ifdef	HFX	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	604	ifndef	NTVDM	selected	selected	selected	633	ifndef	SOFTPC_STANDALONE	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	604	ifndef	NTVDM	selected	selected	selected	644	ifdef	NTVDM	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	662	ifndef	HostProcessClipData	selected	selected	selected	663	ifdef	MSWDVR	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	719	else		selected	selected	selected	728	ifdef	PRINTER	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	719	else		selected	selected	selected	730	else		9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	719	else		selected	selected	selected	737	if	defined(NTVDM) || defined(SOFTPC_STANDALONE)	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	719	else		selected	selected	selected	749	else		9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	719	else		selected	selected	selected	766	ifdef	GISP_SVGA	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
-base/bios/reset.c	808	ifndef	NEC_98	selected	selected	selected	809	ifndef	NTVDM	9a9456787b7c0d41960dadc2d9d678a7b1d3da1f6b5145821fd3396a0a8a27fa	pending-depth2
+base/bios/reset.c	181	else		selected	selected	selected	216	ifdef	GISP_SVGA	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	181	else		selected	selected	selected	218	else		cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	340	ifdef	EGG	selected	selected	selected	342	ifdef	VGG	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	386	ifndef	NTVDM	selected	selected	selected	390	ifdef	LIM	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	400	ifndef	NEC_98	selected	selected	selected	402	ifdef	PM	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	604	ifndef	NTVDM	selected	selected	selected	626	ifdef	HFX	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	604	ifndef	NTVDM	selected	selected	selected	633	ifndef	SOFTPC_STANDALONE	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	604	ifndef	NTVDM	selected	selected	selected	644	ifdef	NTVDM	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	662	ifndef	HostProcessClipData	selected	selected	selected	663	ifdef	MSWDVR	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	719	else		selected	selected	selected	728	ifdef	PRINTER	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	719	else		selected	selected	selected	730	else		cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	719	else		selected	selected	selected	737	if	defined(NTVDM) || defined(SOFTPC_STANDALONE)	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	719	else		selected	selected	selected	749	else		cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	719	else		selected	selected	selected	766	ifdef	GISP_SVGA	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
+base/bios/reset.c	808	ifndef	NEC_98	selected	selected	selected	809	ifndef	NTVDM	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461	pending-depth2
 base/bios/tape_io.c	78	ifdef	PM	selected	selected	selected	79	ifndef	CPU_30_STYLE	57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364	pending-depth2
 base/bios/tape_io.c	78	ifdef	PM	selected	selected	selected	89	if	(!defined(PROD) || !defined(CPU_30_STYLE))	57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364	pending-depth2
 base/bios/tape_io.c	78	ifdef	PM	selected	selected	selected	95	ifdef	CPU_30_STYLE	57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364	pending-depth2
@@ -24,14 +24,14 @@ base/bios/tape_io.c	143	ifdef	PM	selected	selected	selected	159	else		57fae7e9b8
 base/bios/tape_io.c	143	ifdef	PM	selected	selected	selected	186	ifdef	NTVDM	57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364	pending-depth2
 base/bios/tape_io.c	143	ifdef	PM	selected	selected	selected	188	else		57fae7e9b886d19fafdb7f69cbb671dafa13e4b9d5595ff4371dafd46d814364	pending-depth2
 base/ccpu386/c_intr.c	483	else		selected	selected	selected	485	ifdef	SYNCH_TIMERS	f36c099371bff1b8dc1bc115ec42a5178284c68bb69ec710616166aa37c3cbe3	pending-depth2
-base/ccpu386/c_main.c	512	ifndef	SFELLOW	selected	selected	selected	513	ifdef	SYNCH_TIMERS	6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	512	ifndef	SFELLOW	selected	selected	selected	515	else		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	591	else		selected	selected	selected	594	ifdef	BACK_M	6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	591	else		selected	selected	selected	596	else		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	3175	else		selected	selected	selected	3182	if	defined(SFELLOW)	6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	3804	ifndef	PIG	selected	selected	selected	3832	ifndef	PROD	6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	4473	else		selected	selected	selected	4475	ifdef	BACK_M	6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
-base/ccpu386/c_main.c	4473	else		selected	selected	selected	4477	else		6985bf93a4984845da51f3afa8b1d428a6d970766dacb5c7a04465b126f78005	pending-depth2
+base/ccpu386/c_main.c	512	ifndef	SFELLOW	selected	selected	selected	513	ifdef	SYNCH_TIMERS	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	512	ifndef	SFELLOW	selected	selected	selected	515	else		8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	591	else		selected	selected	selected	594	ifdef	BACK_M	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	591	else		selected	selected	selected	596	else		8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	3175	else		selected	selected	selected	3182	if	defined(SFELLOW)	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	3804	ifndef	PIG	selected	selected	selected	3832	ifndef	PROD	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	4473	else		selected	selected	selected	4475	ifdef	BACK_M	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
+base/ccpu386/c_main.c	4473	else		selected	selected	selected	4477	else		8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8	pending-depth2
 base/ccpu386/c_main.h	141	ifndef	DOUBLE_CPU	selected	selected	selected	168	if	0	639d9e164ce6b41f391563d266fa1e0832fcec0eb210e2bbddeaf1e6b483d559	pending-depth2
 base/ccpu386/c_mem.h	27	else		selected	selected	selected	29	ifdef	BACK_M	b9a982196d217d428ac7c4a75951934861882bd406547b467828b2eeffb82864	pending-depth2
 base/ccpu386/c_mem.h	27	else		selected	selected	selected	31	else		b9a982196d217d428ac7c4a75951934861882bd406547b467828b2eeffb82864	pending-depth2
@@ -504,87 +504,87 @@ base/ccpu386/jmp.c	142	else		selected	selected	selected	151	ifdef	TAKE_PROT_MODE
 base/ccpu386/ntstubs.c	9	ifndef	PIG	selected	selected	selected	87	if	0	8890e129d080c2fd84d3ac781966e90db0c196e0bf6b6ad69b4ac695f9ea96e4	pending-depth2
 base/ccpu386/out.c	81	ifndef	PIG	selected	selected	selected	82	ifdef	SFELLOW	c0e05c495ee87de17d8adff7263a8ea433dd96bbb2b65f20782417df0599dc2f	pending-depth2
 base/ccpu386/out.c	81	ifndef	PIG	selected	selected	selected	84	else		c0e05c495ee87de17d8adff7263a8ea433dd96bbb2b65f20782417df0599dc2f	pending-depth2
-base/comms/com.c	94	else		selected	selected	selected	107	if	defined(NTVDM) && defined(FIFO_ON)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	94	else		selected	selected	selected	127	ifdef	IRET_HOOKS	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	94	else		selected	selected	selected	131	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	94	else		selected	selected	selected	138	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	94	else		selected	selected	selected	140	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	409	else		selected	selected	selected	420	ifndef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	409	else		selected	selected	selected	449	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	463	else		selected	selected	selected	561	if	defined(NTVDM) && defined(FIFO_ON)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	587	else		selected	selected	selected	599	if	defined(NTVDM) && defined(FIFO_ON)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	587	else		selected	selected	selected	605	ifndef	DELAYED_INTS	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	587	else		selected	selected	selected	607	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	587	else		selected	selected	selected	624	if	defined(NTVDM) && defined(FIFO_ON)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	720	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	734	ifndef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	741	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	773	ifndef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	803	ifdef	IRET_HOOKS	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	810	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	814	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	825	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	829	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	845	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	849	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	859	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	863	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	871	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	875	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	890	if	defined(NTVDM) && defined(FIFO_ON)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	895	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	899	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	907	ifndef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	929	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	935	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	939	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	954	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	970	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	991	ifdef	PS_FLUSHING	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	996	if	defined (DELAYED_INTS) || defined (NTVDM)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	998	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1006	ifdef	PS_FLUSHING	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1024	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1028	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1037	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1068	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1078	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1082	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1092	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1096	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1103	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1114	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1118	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1125	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1144	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1154	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1158	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1168	ifdef	SHORT_TRACE	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	711	else		selected	selected	selected	1172	ifndef	PROD	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1223	else		selected	selected	selected	1225	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1223	else		selected	selected	selected	1227	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1223	else		selected	selected	selected	1287	ifdef	DOCUMENTATION	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1545	else		selected	selected	selected	1547	if	!defined(PROD) || defined(IRET_HOOKS)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1615	else		selected	selected	selected	1643	ifndef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1615	else		selected	selected	selected	1664	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1709	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1711	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1721	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1723	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1732	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1734	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1745	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1747	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1757	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1759	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1768	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1770	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1781	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	2125	else		selected	selected	selected	2192	if	defined(NTVDM) && defined(FIFO_ON)	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	2125	else		selected	selected	selected	2216	ifdef	IRET_HOOKS	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	2261	else		selected	selected	selected	2267	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	2261	else		selected	selected	selected	2275	ifdef	NTVDM	3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
-base/comms/com.c	2261	else		selected	selected	selected	2277	else		3e03ecabb1636af810c2b787df897e335403e1eb9abde29bc9d5776bf16d1962	pending-depth2
+base/comms/com.c	94	else		selected	selected	selected	107	if	defined(NTVDM) && defined(FIFO_ON)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	94	else		selected	selected	selected	127	ifdef	IRET_HOOKS	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	94	else		selected	selected	selected	131	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	94	else		selected	selected	selected	138	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	94	else		selected	selected	selected	140	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	409	else		selected	selected	selected	420	ifndef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	409	else		selected	selected	selected	449	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	463	else		selected	selected	selected	561	if	defined(NTVDM) && defined(FIFO_ON)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	587	else		selected	selected	selected	599	if	defined(NTVDM) && defined(FIFO_ON)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	587	else		selected	selected	selected	605	ifndef	DELAYED_INTS	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	587	else		selected	selected	selected	607	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	587	else		selected	selected	selected	624	if	defined(NTVDM) && defined(FIFO_ON)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	720	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	734	ifndef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	741	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	773	ifndef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	803	ifdef	IRET_HOOKS	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	810	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	814	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	825	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	829	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	845	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	849	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	859	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	863	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	871	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	875	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	890	if	defined(NTVDM) && defined(FIFO_ON)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	895	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	899	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	907	ifndef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	929	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	935	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	939	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	954	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	970	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	991	ifdef	PS_FLUSHING	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	996	if	defined (DELAYED_INTS) || defined (NTVDM)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	998	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1006	ifdef	PS_FLUSHING	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1024	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1028	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1037	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1068	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1078	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1082	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1092	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1096	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1103	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1114	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1118	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1125	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1144	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1154	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1158	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1168	ifdef	SHORT_TRACE	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	711	else		selected	selected	selected	1172	ifndef	PROD	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1223	else		selected	selected	selected	1225	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1223	else		selected	selected	selected	1227	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1223	else		selected	selected	selected	1287	ifdef	DOCUMENTATION	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1545	else		selected	selected	selected	1547	if	!defined(PROD) || defined(IRET_HOOKS)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1615	else		selected	selected	selected	1643	ifndef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1615	else		selected	selected	selected	1664	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1709	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1711	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1721	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1723	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1732	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1734	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1745	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1747	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1757	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1759	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1768	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1770	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	1678	ifndef	NEC_98	selected	selected	selected	1781	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	2125	else		selected	selected	selected	2192	if	defined(NTVDM) && defined(FIFO_ON)	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	2125	else		selected	selected	selected	2216	ifdef	IRET_HOOKS	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	2261	else		selected	selected	selected	2267	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	2261	else		selected	selected	selected	2275	ifdef	NTVDM	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
+base/comms/com.c	2261	else		selected	selected	selected	2277	else		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef	pending-depth2
 base/comms/printer.c	3	ifdef	PRINTER	selected	selected	selected	70	ifdef	SCCSID	71aaa07982075fcc00fab277b66824b9949180e966cc90d38f8e91d2b58ece50	pending-depth2
 base/comms/printer.c	3	ifdef	PRINTER	selected	selected	selected	75	ifdef	SEGMENTATION	71aaa07982075fcc00fab277b66824b9949180e966cc90d38f8e91d2b58ece50	pending-depth2
 base/comms/printer.c	3	ifdef	PRINTER	selected	selected	selected	87	ifdef	SYSTEMV	71aaa07982075fcc00fab277b66824b9949180e966cc90d38f8e91d2b58ece50	pending-depth2
@@ -636,12 +636,12 @@ base/comms/printer_.c	3	else		selected	selected	selected	101	ifdef	PRINTER	3599b
 base/comms/rs232_io.c	74	ifndef	NEC_98	selected	selected	selected	76	ifdef	BIT_ORDER2	4655f5b7e8fbe538b3145f924db10c969457140e72207f8db4dd2e57178a0850	pending-depth2
 base/comms/rs232_io.c	74	ifndef	NEC_98	selected	selected	selected	87	ifdef	BIT_ORDER1	4655f5b7e8fbe538b3145f924db10c969457140e72207f8db4dd2e57178a0850	pending-depth2
 base/cvidc/ev_glue.c	57	ifdef	C_VID	selected	selected	selected	791	ifdef	CCPU	051f0a8c54d154cbf3d76ebd8aa377fdf50f4398345270f801ce75552e006b4a	pending-depth2
-base/disks/diskbios.c	228	else		selected	selected	selected	233	if	!(defined(NTVDM) && defined(MONITOR))	fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37	pending-depth2
-base/disks/diskbios.c	228	else		selected	selected	selected	246	if	!(defined(NTVDM) && defined(MONITOR))	fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37	pending-depth2
-base/disks/diskbios.c	529	else		selected	selected	selected	542	ifndef	PROD	fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37	pending-depth2
-base/disks/diskbios.c	1097	ifdef	WDCTRL_BOP	selected	selected	selected	1133	ifndef	PROD	fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37	pending-depth2
-base/disks/diskbios.c	1097	ifdef	WDCTRL_BOP	selected	selected	selected	1255	ifndef	PROD	fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37	pending-depth2
-base/disks/diskbios.c	1097	ifdef	WDCTRL_BOP	selected	selected	selected	1274	ifndef	PROD	fb32c05926dc60e41b2e61f450b5ffe7584709d5204e5e90c97e80482249ce37	pending-depth2
+base/disks/diskbios.c	228	else		selected	selected	selected	233	if	!(defined(NTVDM) && defined(MONITOR))	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737	pending-depth2
+base/disks/diskbios.c	228	else		selected	selected	selected	246	if	!(defined(NTVDM) && defined(MONITOR))	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737	pending-depth2
+base/disks/diskbios.c	529	else		selected	selected	selected	542	ifndef	PROD	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737	pending-depth2
+base/disks/diskbios.c	1097	ifdef	WDCTRL_BOP	selected	selected	selected	1133	ifndef	PROD	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737	pending-depth2
+base/disks/diskbios.c	1097	ifdef	WDCTRL_BOP	selected	selected	selected	1255	ifndef	PROD	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737	pending-depth2
+base/disks/diskbios.c	1097	ifdef	WDCTRL_BOP	selected	selected	selected	1274	ifndef	PROD	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737	pending-depth2
 base/disks/fdisk.c	1503	else		selected	selected	selected	1506	ifdef	BIGEND	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb	pending-depth2
 base/disks/fdisk.c	1503	else		selected	selected	selected	1514	ifdef	LITTLEND	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb	pending-depth2
 base/disks/fdisk.c	1503	else		selected	selected	selected	1518	ifdef	BIGEND	f0f56d800ee50a961810ede4927b80b6e8f787c95c037dab0188d7c0fdee6fbb	pending-depth2
@@ -663,9 +663,9 @@ base/disks/floppy.c	1663	ifndef	NEC_98	selected	selected	selected	1735	else		614
 base/disks/floppy.c	2939	ifndef	JOKER	selected	selected	selected	2977	ifdef	FLOPPIES_KEEP_TRYING	6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9	pending-depth2
 base/disks/floppy.c	2939	ifndef	JOKER	selected	selected	selected	2984	ifdef	NTVDM	6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9	pending-depth2
 base/disks/floppy.c	2939	ifndef	JOKER	selected	selected	selected	2986	else		6140f09a22214704b2d11707f77a7ccf3590d8b9b0b2d9d7a540a51985464ff9	pending-depth2
-base/disks/floppy_i.c	186	ifndef	JOKER	selected	selected	selected	219	ifdef	NTVDM	6ade53112101a3c4ba85f39148322d4fc8103d0dc84d0ca8db894bd6a32ce22d	pending-depth2
-base/disks/floppy_i.c	186	ifndef	JOKER	selected	selected	selected	221	else		6ade53112101a3c4ba85f39148322d4fc8103d0dc84d0ca8db894bd6a32ce22d	pending-depth2
-base/disks/floppy_i.c	263	else		selected	selected	selected	300	ifndef	NTVDM	6ade53112101a3c4ba85f39148322d4fc8103d0dc84d0ca8db894bd6a32ce22d	pending-depth2
+base/disks/floppy_i.c	186	ifndef	JOKER	selected	selected	selected	219	ifdef	NTVDM	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092	pending-depth2
+base/disks/floppy_i.c	186	ifndef	JOKER	selected	selected	selected	221	else		1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092	pending-depth2
+base/disks/floppy_i.c	263	else		selected	selected	selected	300	ifndef	NTVDM	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092	pending-depth2
 base/inc/base_def.h	22	ifndef	UNUSED	selected	selected	selected	23	ifdef	lint	d73b7624af895d7eec7dfaa38473dfe757f2644ae2ff69695d513dad38b82a43	pending-depth2
 base/inc/base_def.h	22	ifndef	UNUSED	selected	selected	selected	25	else		d73b7624af895d7eec7dfaa38473dfe757f2644ae2ff69695d513dad38b82a43	pending-depth2
 base/inc/config.h	1	ifndef	_CONFIG_H	include_guard	structural	structural	30	ifndef	_INS_ERROR_H	f4d3a165c0a0d62d2f96e579e92f09d289bcac3228c497e7e4f12b6baf13fb4f	pending-depth2
@@ -815,58 +815,58 @@ base/inc/xt.h	1	ifndef	_XT_H	include_guard	structural	structural	118	ifndef	CPU_
 base/inc/xt.h	1	ifndef	_XT_H	include_guard	structural	structural	128	ifdef	ANSI	6aae9c56ff5bd989d1d273af05a64ddd2b42b7f29a3018a59abcb375acc976f8	pending-depth2
 base/inc/xt.h	1	ifndef	_XT_H	include_guard	structural	structural	130	else		6aae9c56ff5bd989d1d273af05a64ddd2b42b7f29a3018a59abcb375acc976f8	pending-depth2
 base/inc/xt.h	1	ifndef	_XT_H	include_guard	structural	structural	138	ifdef	SPC386	6aae9c56ff5bd989d1d273af05a64ddd2b42b7f29a3018a59abcb375acc976f8	pending-depth2
-base/keymouse/keyba.c	261	ifndef	macintosh	selected	selected	selected	263	ifndef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	337	else		selected	selected	selected	342	ifndef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	337	else		selected	selected	selected	475	ifndef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	823	ifdef	JAPAN	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	860	ifndef	NEC_98	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	912	ifndef	NEC_98	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	957	ifdef	SECURE	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	981	ifdef	SECURE	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1004	ifdef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1018	ifdef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1020	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1219	ifndef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1235	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1260	ifdef	DEMO_COPY	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1268	ifndef	PROD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1277	ifndef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1290	ifdef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1416	ifdef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1496	ifndef	NEC_98	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1516	ifdef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1518	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1528	ifndef	NTVDM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1543	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1610	ifndef	REAL_KBD	selected	selected	selected	1690	ifdef	JOKER	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1610	ifndef	REAL_KBD	selected	selected	selected	1692	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1747	else		selected	selected	selected	1765	if	defined(IRET_HOOKS) && defined(GISP_CPU)	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1747	else		selected	selected	selected	1767	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1747	else		selected	selected	selected	1785	ifndef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1836	else		selected	selected	selected	1881	ifndef	JOKER	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1836	else		selected	selected	selected	1917	ifdef	PM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1836	else		selected	selected	selected	1919	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	1836	else		selected	selected	selected	1991	ifndef	JOKER	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2584	if	defined(IRET_HOOKS) && defined(GISP_CPU)	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2589	ifdef	macintosh	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2600	ifdef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2606	ifndef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2628	if	defined(NEC_98)	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2630	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2641	ifdef	PM	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2650	if	defined(NEC_98)	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2652	else		0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2666	ifndef	REAL_KBD	0e2ae20d2786b9207da3353265413287f786a5568c6f2056f12bfda80c55dcbf	pending-depth2
-base/keymouse/mouse.c	195	else		selected	selected	selected	217	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	195	else		selected	selected	selected	239	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	253	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	277	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	309	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	320	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	333	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	339	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	349	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
-base/keymouse/mouse.c	251	else		selected	selected	selected	377	ifndef	PROD	c7cdac54a39391fea4cca7fb5a3c1a6f09a37a0f64b1d48eab91e253a0217424	pending-depth2
+base/keymouse/keyba.c	261	ifndef	macintosh	selected	selected	selected	263	ifndef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	337	else		selected	selected	selected	342	ifndef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	337	else		selected	selected	selected	475	ifndef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	823	ifdef	JAPAN	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	860	ifndef	NEC_98	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	912	ifndef	NEC_98	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	957	ifdef	SECURE	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	981	ifdef	SECURE	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1004	ifdef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1018	ifdef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1020	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1219	ifndef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1235	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1260	ifdef	DEMO_COPY	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1268	ifndef	PROD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1277	ifndef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1290	ifdef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	816	ifndef	REAL_KBD	selected	selected	selected	1416	ifdef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1496	ifndef	NEC_98	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1516	ifdef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1518	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1528	ifndef	NTVDM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1474	ifndef	REAL_KBD	selected	selected	selected	1543	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1610	ifndef	REAL_KBD	selected	selected	selected	1690	ifdef	JOKER	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1610	ifndef	REAL_KBD	selected	selected	selected	1692	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1747	else		selected	selected	selected	1765	if	defined(IRET_HOOKS) && defined(GISP_CPU)	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1747	else		selected	selected	selected	1767	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1747	else		selected	selected	selected	1785	ifndef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1836	else		selected	selected	selected	1881	ifndef	JOKER	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1836	else		selected	selected	selected	1917	ifdef	PM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1836	else		selected	selected	selected	1919	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	1836	else		selected	selected	selected	1991	ifndef	JOKER	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2584	if	defined(IRET_HOOKS) && defined(GISP_CPU)	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2589	ifdef	macintosh	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2600	ifdef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2606	ifndef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2628	if	defined(NEC_98)	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2630	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2641	ifdef	PM	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2650	if	defined(NEC_98)	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2652	else		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/keyba.c	2574	ifndef	NTVDM	selected	selected	selected	2666	ifndef	REAL_KBD	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74	pending-depth2
+base/keymouse/mouse.c	195	else		selected	selected	selected	217	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	195	else		selected	selected	selected	239	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	253	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	277	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	309	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	320	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	333	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	339	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	349	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
+base/keymouse/mouse.c	251	else		selected	selected	selected	377	ifndef	PROD	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35	pending-depth2
 base/keymouse/mouse_io.c	1351	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	selected	1366	ifdef	EGG	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274	pending-depth2
 base/keymouse/mouse_io.c	1351	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	selected	1380	ifndef	MOUSE_16_BIT	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274	pending-depth2
 base/keymouse/mouse_io.c	1351	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	selected	1383	else		936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274	pending-depth2
@@ -945,11 +945,11 @@ base/support/time_day.c	358	ifndef	NEC_98	selected	selected	selected	363	ifndef	
 base/support/time_day.c	465	ifndef	NTVDM	selected	selected	selected	675	ifdef	SEGMENTATION	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d	pending-depth2
 base/support/time_day.c	465	ifndef	NTVDM	selected	selected	selected	694	ifndef	NEC_98	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d	pending-depth2
 base/support/time_day.c	730	ifndef	NEC_98	selected	selected	selected	732	ifndef	NTVDM	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d	pending-depth2
-base/system/cmos.c	388	ifndef	NTVDM	selected	selected	selected	390	ifndef	PROD	777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62	pending-depth2
-base/system/cmos.c	425	ifndef	NTVDM	selected	selected	selected	427	ifndef	PROD	777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62	pending-depth2
-base/system/cmos.c	886	ifndef	NTVDM	selected	selected	selected	888	ifndef	PROD	777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62	pending-depth2
-base/system/cmos.c	895	ifndef	NTVDM	selected	selected	selected	897	ifndef	PROD	777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62	pending-depth2
-base/system/cmos.c	1054	else		selected	selected	selected	1088	ifdef	NTVDM	777a4d78528868f6b7d3d7b59ac63037df5c9bee5a202c60117e1d58047f2e62	pending-depth2
+base/system/cmos.c	388	ifndef	NTVDM	selected	selected	selected	390	ifndef	PROD	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d	pending-depth2
+base/system/cmos.c	425	ifndef	NTVDM	selected	selected	selected	427	ifndef	PROD	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d	pending-depth2
+base/system/cmos.c	886	ifndef	NTVDM	selected	selected	selected	888	ifndef	PROD	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d	pending-depth2
+base/system/cmos.c	895	ifndef	NTVDM	selected	selected	selected	897	ifndef	PROD	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d	pending-depth2
+base/system/cmos.c	1054	else		selected	selected	selected	1088	ifdef	NTVDM	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d	pending-depth2
 base/system/ica.c	146	if	!defined(NTVDM)	selected	selected	selected	148	if	defined(CPU_40_STYLE) || defined(GISP_CPU)	d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063	pending-depth2
 base/system/ica.c	209	else		selected	selected	selected	216	ifdef	PROD	d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063	pending-depth2
 base/system/ica.c	209	else		selected	selected	selected	218	else		d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063	pending-depth2
@@ -983,44 +983,44 @@ base/system/quick_ev.c	1238	if	defined(CPU_40_STYLE) && !defined(SFELLOW)	select
 base/system/quick_ev.c	1238	if	defined(CPU_40_STYLE) && !defined(SFELLOW)	selected	selected	selected	1539	ifdef	AVERAGED	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	pending-depth2
 base/system/quick_ev.c	1238	if	defined(CPU_40_STYLE) && !defined(SFELLOW)	selected	selected	selected	1541	else		8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	pending-depth2
 base/system/quick_ev.c	1238	if	defined(CPU_40_STYLE) && !defined(SFELLOW)	selected	selected	selected	1554	ifndef	NTVDM	8402e5083147c46bca15f511de7e605b5357907a57eb6223178ddcfc6d24c8ac	pending-depth2
-base/system/rom.c	38	ifdef	CPU_40_STYLE	selected	selected	selected	39	ifdef	CCPU	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	38	ifdef	CPU_40_STYLE	selected	selected	selected	41	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	50	else		selected	selected	selected	52	ifndef	BIOS1ROM_FILENAME	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	50	else		selected	selected	selected	56	ifndef	BIOS2ROM_FILENAME	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	50	else		selected	selected	selected	65	ifndef	EGAROM_FILENAME	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	50	else		selected	selected	selected	69	ifndef	VGAROM_FILENAME	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	50	else		selected	selected	selected	73	ifndef	V7VGAROM_FILENAME	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	229	ifndef	NEC_98	selected	selected	selected	231	ifdef	REAL_VGA	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	229	ifndef	NEC_98	selected	selected	selected	233	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	293	else		selected	selected	selected	303	ifdef	GISP_SVGA	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	293	else		selected	selected	selected	305	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	293	else		selected	selected	selected	318	if	defined(SPC386) && !defined(GISP_CPU)	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	293	else		selected	selected	selected	326	ifdef	GISP_SVGA	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	293	else		selected	selected	selected	328	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	346	else		selected	selected	selected	349	if	!(defined(NTVDM) && defined(MONITOR))	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	346	else		selected	selected	selected	382	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	453	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	selected	455	ifndef	GISP_SVGA	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	485	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	selected	selected	selected	494	ifdef	CPU_40_STYLE	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	485	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	selected	selected	selected	552	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	561	ifndef	GISP_SVGA	selected	selected	selected	569	if	!(defined(NTVDM) & defined(MONITOR))	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	595	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	selected	selected	selected	603	ifdef	CPU_40_STYLE	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/rom.c	595	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	selected	selected	selected	671	else		77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872	pending-depth2
-base/system/timer.c	427	else		selected	selected	selected	459	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	471	if	!defined(NTVDM)	selected	selected	selected	473	if	defined(IRET_HOOKS) && defined(GISP_CPU)	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	1043	ifndef	NTVDM	selected	selected	selected	1050	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	1744	ifndef	NTVDM	selected	selected	selected	1765	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	1744	ifndef	NTVDM	selected	selected	selected	1779	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	1875	ifndef	NTVDM	selected	selected	selected	1877	ifndef	DELAYED_INTS	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2091	else		selected	selected	selected	2152	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2206	ifndef	NTVDM	selected	selected	selected	2237	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2206	ifndef	NTVDM	selected	selected	selected	2249	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2206	ifndef	NTVDM	selected	selected	selected	2270	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2360	ifndef	NTVDM	selected	selected	selected	2385	ifndef	PROD	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2420	else		selected	selected	selected	2422	ifdef	SYNCH_TIMERS	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2420	else		selected	selected	selected	2424	else		1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2467	if	!defined (NTVDM)	selected	selected	selected	2469	if	defined(IRET_HOOKS) && defined(GISP_CPU)	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2524	if	!defined(NTVDM)	selected	selected	selected	2526	if	defined(IRET_HOOKS) && defined(GISP_CPU)	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
-base/system/timer.c	2524	if	!defined(NTVDM)	selected	selected	selected	2535	if	defined(CPU_40_STYLE)	1f4cbf03c3f8d6a9e5efc5db000569c3fe819c43e76d1a8330e56b743ac2e226	pending-depth2
+base/system/rom.c	38	ifdef	CPU_40_STYLE	selected	selected	selected	39	ifdef	CCPU	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	38	ifdef	CPU_40_STYLE	selected	selected	selected	41	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	50	else		selected	selected	selected	52	ifndef	BIOS1ROM_FILENAME	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	50	else		selected	selected	selected	56	ifndef	BIOS2ROM_FILENAME	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	50	else		selected	selected	selected	65	ifndef	EGAROM_FILENAME	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	50	else		selected	selected	selected	69	ifndef	VGAROM_FILENAME	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	50	else		selected	selected	selected	73	ifndef	V7VGAROM_FILENAME	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	229	ifndef	NEC_98	selected	selected	selected	231	ifdef	REAL_VGA	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	229	ifndef	NEC_98	selected	selected	selected	233	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	293	else		selected	selected	selected	303	ifdef	GISP_SVGA	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	293	else		selected	selected	selected	305	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	293	else		selected	selected	selected	318	if	defined(SPC386) && !defined(GISP_CPU)	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	293	else		selected	selected	selected	326	ifdef	GISP_SVGA	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	293	else		selected	selected	selected	328	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	346	else		selected	selected	selected	349	if	!(defined(NTVDM) && defined(MONITOR))	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	346	else		selected	selected	selected	382	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	453	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	selected	selected	selected	455	ifndef	GISP_SVGA	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	485	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	selected	selected	selected	494	ifdef	CPU_40_STYLE	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	485	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	selected	selected	selected	552	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	561	ifndef	GISP_SVGA	selected	selected	selected	569	if	!(defined(NTVDM) & defined(MONITOR))	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	595	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	selected	selected	selected	603	ifdef	CPU_40_STYLE	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/rom.c	595	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	selected	selected	selected	671	else		149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e	pending-depth2
+base/system/timer.c	427	else		selected	selected	selected	459	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	471	if	!defined(NTVDM)	selected	selected	selected	473	if	defined(IRET_HOOKS) && defined(GISP_CPU)	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	1043	ifndef	NTVDM	selected	selected	selected	1050	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	1744	ifndef	NTVDM	selected	selected	selected	1765	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	1744	ifndef	NTVDM	selected	selected	selected	1779	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	1875	ifndef	NTVDM	selected	selected	selected	1877	ifndef	DELAYED_INTS	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2091	else		selected	selected	selected	2152	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2206	ifndef	NTVDM	selected	selected	selected	2237	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2206	ifndef	NTVDM	selected	selected	selected	2249	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2206	ifndef	NTVDM	selected	selected	selected	2270	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2360	ifndef	NTVDM	selected	selected	selected	2385	ifndef	PROD	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2420	else		selected	selected	selected	2422	ifdef	SYNCH_TIMERS	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2420	else		selected	selected	selected	2424	else		e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2467	if	!defined (NTVDM)	selected	selected	selected	2469	if	defined(IRET_HOOKS) && defined(GISP_CPU)	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2524	if	!defined(NTVDM)	selected	selected	selected	2526	if	defined(IRET_HOOKS) && defined(GISP_CPU)	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
+base/system/timer.c	2524	if	!defined(NTVDM)	selected	selected	selected	2535	if	defined(CPU_40_STYLE)	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db	pending-depth2
 base/system/timestrb.c	83	ifndef	NTVDM	selected	selected	selected	84	ifndef	REAL_TIMER	3c3a8e2245234b775b6679c573b0037e4b2de689fe679ce9fecc661d8b850b21	pending-depth2
 base/system/timestrb.c	83	ifndef	NTVDM	selected	selected	selected	93	if	defined(CPU_40_STYLE)	3c3a8e2245234b775b6679c573b0037e4b2de689fe679ce9fecc661d8b850b21	pending-depth2
 base/video/cga.c	4	if	!defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	selected	selected	selected	54	ifdef	SEGMENTATION	ccce0267e18836251d0f10fb833396524e4e71e00fdf6ba3f82f3190167075f6	pending-depth2
@@ -1191,142 +1191,142 @@ base/video/vga_vide.c	23	ifdef	VGG	selected	selected	selected	587	ifndef	NEC_98	
 base/video/vga_vide.c	23	ifdef	VGG	selected	selected	selected	642	ifndef	NEC_98	320fff000aaf13a37f57a23e5cf329ba400c9c4cd18afc5d3e237d73b5f9c47b	pending-depth2
 base/video/vga_vide.c	23	ifdef	VGG	selected	selected	selected	669	ifndef	NEC_98	320fff000aaf13a37f57a23e5cf329ba400c9c4cd18afc5d3e237d73b5f9c47b	pending-depth2
 base/video/vga_vide.c	23	ifdef	VGG	selected	selected	selected	785	ifndef	NEC_98	320fff000aaf13a37f57a23e5cf329ba400c9c4cd18afc5d3e237d73b5f9c47b	pending-depth2
-base/video/video.c	48	ifndef	NEC_98	selected	selected	selected	50	ifdef	SEGMENTATION	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	161	else		selected	selected	selected	170	ifdef	HERC	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	161	else		selected	selected	selected	193	ifdef	HERC	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	161	else		selected	selected	selected	195	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	161	else		selected	selected	selected	208	ifdef	VGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	161	else		selected	selected	selected	210	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	219	ifndef	NEC_98	selected	selected	selected	263	ifdef	VGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	219	ifndef	NEC_98	selected	selected	selected	270	ifdef	V7VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	354	if	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	365	if	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	397	ifndef	PROD	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	423	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	425	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	448	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	476	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	478	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	634	ifndef	PROD	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	652	ifdef	V7VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	671	ifdef	V7VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	784	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	799	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	809	ifdef	EGA_DUMP	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	819	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	832	if	!defined(i386) && defined(JAPAN)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	839	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	847	if	defined(JAPAN) && defined(i386)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	849	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	877	if	!defined(i386) && defined(JAPAN)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	883	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	885	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	894	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	902	if	!defined(i386) && defined(JAPAN)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	909	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	911	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	917	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	970	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	972	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	979	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	981	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	993	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	995	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1030	ifdef	NTVDM	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1045	ifndef	PROD	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1065	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1067	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1078	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1080	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1087	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1089	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1106	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1108	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1118	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1120	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1189	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1203	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1213	ifdef	EGA_DUMP	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1223	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1237	if	defined(JAPAN) && defined(i386)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1239	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1258	if	!defined(i386) && defined(JAPAN)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1268	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1270	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1277	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1285	if	!defined(i386) && defined(JAPAN)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1292	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1294	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1300	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1350	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1352	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1365	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1367	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1406	ifndef	PROD	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1424	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1426	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1436	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1438	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1445	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1447	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1460	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1462	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1472	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1474	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1514	if	defined(JAPAN) && defined(i386)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1519	ifdef	A2CPU	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1521	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1527	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1575	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1580	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1637	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1651	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1657	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1663	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1665	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1687	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1717	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1741	if	( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1743	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1766	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1825	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1863	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1881	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1901	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1931	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1949	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1965	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1999	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2043	ifdef	CPU_40_STYLE	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2048	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2071	ifdef	ANSI	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2073	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2077	ifdef	NTVDM	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2084	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2107	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2132	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2147	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2168	if	defined(NTVDM) && defined(X86GFX)	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2170	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2198	if	( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2200	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2214	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2237	ifdef	JAPAN	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2264	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2266	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2343	ifdef	A2CPU	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2345	else		e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2353	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2365	ifdef	EGA_DUMP	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2560	ifndef	PROD	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2569	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2683	ifdef	REAL_VGA	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2688	ifdef	SEGMENTATION	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2698	ifdef	HERC	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2718	ifdef	HERC	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2722	ifdef	EGG	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2752	ifdef	HERC	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
-base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2760	ifdef	NTVDM	e760f8b776ee8734dc2c7caff4d4980491d094516d8c3df4b33dd6ddfa553f74	pending-depth2
+base/video/video.c	48	ifndef	NEC_98	selected	selected	selected	50	ifdef	SEGMENTATION	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	161	else		selected	selected	selected	170	ifdef	HERC	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	161	else		selected	selected	selected	193	ifdef	HERC	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	161	else		selected	selected	selected	195	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	161	else		selected	selected	selected	208	ifdef	VGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	161	else		selected	selected	selected	210	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	219	ifndef	NEC_98	selected	selected	selected	263	ifdef	VGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	219	ifndef	NEC_98	selected	selected	selected	270	ifdef	V7VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	354	if	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	365	if	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	397	ifndef	PROD	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	423	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	425	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	448	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	476	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	478	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	634	ifndef	PROD	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	652	ifdef	V7VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	671	ifdef	V7VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	784	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	799	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	809	ifdef	EGA_DUMP	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	819	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	832	if	!defined(i386) && defined(JAPAN)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	839	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	847	if	defined(JAPAN) && defined(i386)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	849	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	877	if	!defined(i386) && defined(JAPAN)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	883	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	885	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	894	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	902	if	!defined(i386) && defined(JAPAN)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	909	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	911	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	917	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	970	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	972	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	979	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	981	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	993	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	995	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1030	ifdef	NTVDM	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1045	ifndef	PROD	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1065	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1067	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1078	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1080	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1087	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1089	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1106	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1108	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1118	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1120	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1189	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1203	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1213	ifdef	EGA_DUMP	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1223	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1237	if	defined(JAPAN) && defined(i386)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1239	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1258	if	!defined(i386) && defined(JAPAN)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1268	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1270	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1277	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1285	if	!defined(i386) && defined(JAPAN)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1292	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1294	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1300	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1350	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1352	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1365	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1367	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1406	ifndef	PROD	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1424	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1426	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1436	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1438	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1445	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1447	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1460	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1462	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1472	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1474	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1514	if	defined(JAPAN) && defined(i386)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1519	ifdef	A2CPU	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1521	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1527	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1575	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1580	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1637	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1651	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1657	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1663	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1665	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1687	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1717	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1741	if	( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1743	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1766	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1825	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1863	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1881	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1901	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1931	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1949	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1965	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	1999	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2043	ifdef	CPU_40_STYLE	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2048	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2071	ifdef	ANSI	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2073	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2077	ifdef	NTVDM	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2084	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2107	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2132	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2147	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2168	if	defined(NTVDM) && defined(X86GFX)	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2170	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2198	if	( defined(NTVDM) && defined(MONITOR) ) || defined( GISP_SVGA )	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2200	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2214	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2237	ifdef	JAPAN	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2264	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2266	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2343	ifdef	A2CPU	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2345	else		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2353	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2365	ifdef	EGA_DUMP	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2560	ifndef	PROD	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2569	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2683	ifdef	REAL_VGA	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2688	ifdef	SEGMENTATION	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2698	ifdef	HERC	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2718	ifdef	HERC	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2722	ifdef	EGG	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2752	ifdef	HERC	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
+base/video/video.c	348	ifndef	NEC_98	selected	selected	selected	2760	ifdef	NTVDM	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff	pending-depth2
 base/video/video_io.c	19	ifndef	NEC_98	selected	selected	selected	21	ifdef	SEGMENTATION	6ce43207e47e958eada9160d24fdd8822b671b6ca92f6c267da1030a4b77981a	pending-depth2
 host/inc/error.h	1	ifndef	_INS_ERROR_H	include_guard	structural	structural	222	ifndef	MONITOR	52b3162f2e9199e5d2f3d90861dd7032b3da54fdf63675fdaee39fc4e07235ac	pending-depth2
 host/inc/error.h	1	ifndef	_INS_ERROR_H	include_guard	structural	structural	239	if	!defined(BUILDING_CPU_TOOL)	52b3162f2e9199e5d2f3d90861dd7032b3da54fdf63675fdaee39fc4e07235ac	pending-depth2
@@ -1359,7 +1359,7 @@ host/inc/insignia.h	1	ifndef	_INSIGNIA_H	include_guard	structural	structural	106
 host/inc/insignia.h	1	ifndef	_INSIGNIA_H	include_guard	structural	structural	111	ifndef	BOOL	6f5db03d62c2a070eaa90e87e2d7ce4d12b93dab88db2bdf81ebdd6eabc4127a	pending-depth2
 host/inc/insignia.h	1	ifndef	_INSIGNIA_H	include_guard	structural	structural	153	ifdef	ANSI	6f5db03d62c2a070eaa90e87e2d7ce4d12b93dab88db2bdf81ebdd6eabc4127a	pending-depth2
 host/inc/insignia.h	1	ifndef	_INSIGNIA_H	include_guard	structural	structural	155	else		6f5db03d62c2a070eaa90e87e2d7ce4d12b93dab88db2bdf81ebdd6eabc4127a	pending-depth2
-host/src/nt_cga.c	186	ifdef	LITTLEND	selected	selected	selected	194	ifdef	BIGWIN	2f58d0b07ce57beca7b2fdf5609aacc5282202289da3a0e4426010ab0100ec50	pending-depth2
+host/src/nt_cga.c	186	ifdef	LITTLEND	selected	selected	selected	194	ifdef	BIGWIN	0ed3b5efea350f940568c2a51c2bad79d6e73fe41f47a2f211dfa2779ccbd3ce	pending-depth2
 host/src/nt_ega.c	227	ifdef	BIGWIN	selected	selected	selected	228	ifdef	BIGEND	e6272c2266c97aa2f7d107c40ffbc268dbe5649ebc8ec6edf39a3e93348ff808	pending-depth2
 host/src/nt_ega.c	227	ifdef	BIGWIN	selected	selected	selected	233	ifdef	LITTLEND	e6272c2266c97aa2f7d107c40ffbc268dbe5649ebc8ec6edf39a3e93348ff808	pending-depth2
 host/src/nt_ega.c	420	ifdef	BIGWIN	selected	selected	selected	421	ifdef	BIGEND	e6272c2266c97aa2f7d107c40ffbc268dbe5649ebc8ec6edf39a3e93348ff808	pending-depth2
@@ -1374,9 +1374,9 @@ host/src/nt_graph.c	1257	else		selected	selected	selected	1335	ifdef	V7VGA	41f60
 host/src/nt_graph.c	1257	else		selected	selected	selected	1346	ifdef	MONITOR	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11	pending-depth2
 host/src/nt_graph.c	1622	ifdef	SOFTPC_STANDALONE	selected	selected	selected	1623	ifdef	V7VGA	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11	pending-depth2
 host/src/nt_graph.c	2186	else		selected	selected	selected	2188	ifndef	SOFTPC_STANDALONE	41f6084e159448a64d6d47781469bffe1f1fc342c32bb7d54b0ef737de250b11	pending-depth2
-host/src/nt_keycd.c	40	else		selected	selected	selected	137	ifdef	JAPAN	767161eba16ea3a0bc743cb23a22464d87c49a62cf01de1a279e44822a316d85	pending-depth2
-host/src/nt_keycd.c	40	else		selected	selected	selected	139	else		767161eba16ea3a0bc743cb23a22464d87c49a62cf01de1a279e44822a316d85	pending-depth2
-host/src/nt_keycd.c	40	else		selected	selected	selected	165	ifdef	JAPAN	767161eba16ea3a0bc743cb23a22464d87c49a62cf01de1a279e44822a316d85	pending-depth2
-host/src/nt_keycd.c	40	else		selected	selected	selected	167	else		767161eba16ea3a0bc743cb23a22464d87c49a62cf01de1a279e44822a316d85	pending-depth2
+host/src/nt_keycd.c	40	else		selected	selected	selected	137	ifdef	JAPAN	4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1	pending-depth2
+host/src/nt_keycd.c	40	else		selected	selected	selected	139	else		4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1	pending-depth2
+host/src/nt_keycd.c	40	else		selected	selected	selected	165	ifdef	JAPAN	4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1	pending-depth2
+host/src/nt_keycd.c	40	else		selected	selected	selected	167	else		4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1	pending-depth2
 host/src/nt_vga.c	166	ifdef	BIGWIN	selected	selected	selected	242	ifdef	BIGEND	d4065213aabc2ae3cce5f10e01c94cbc39d013075779d353d8f5a1a26f5212f9	pending-depth2
 host/src/nt_vga.c	166	ifdef	BIGWIN	selected	selected	selected	246	ifdef	LITTLEND	d4065213aabc2ae3cce5f10e01c94cbc39d013075779d353d8f5a1a26f5212f9	pending-depth2

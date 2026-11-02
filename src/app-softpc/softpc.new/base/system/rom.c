@@ -291,7 +291,7 @@ GLOBAL void rom_init IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 287
+#line 342
 
 	 /*
      * Fill up all of ROM (Intel C0000 upwards) with bad op-codes.

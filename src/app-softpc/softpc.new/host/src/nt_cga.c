@@ -49,7 +49,7 @@
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
-#line 46
+#line 47
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif

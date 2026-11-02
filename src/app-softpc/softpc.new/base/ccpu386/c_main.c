@@ -3347,7 +3347,7 @@ TYPEC4:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 3592
+#line 3511
 
       softpc_host_debug_retired();
       goto NEXT_INST;
@@ -4036,7 +4036,7 @@ TYPEF7_6:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 4306
+#line 4202
       softpc_host_debug_retired();
       goto NEXT_INST;
 
@@ -4492,7 +4492,7 @@ LOCAL VOID
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
-#line 4837
+#line 4683
 
 #if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)
       ccpu386InitThreadStuff();

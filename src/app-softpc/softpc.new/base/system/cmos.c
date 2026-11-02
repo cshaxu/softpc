@@ -1045,7 +1045,7 @@ GLOBAL void cmos_update IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1065
+#line 1134
 }
 
 

@@ -32,7 +32,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 45
+#line 41
 
 
 #include "ica.h"

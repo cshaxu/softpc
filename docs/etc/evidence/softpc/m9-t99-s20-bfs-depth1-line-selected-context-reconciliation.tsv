@@ -1,0 +1,31 @@
+path	marker_line	marker_value	corrected	anchor_line	xp_line	root_current	root_xp	xp_boundary	anchor	reason	file_sha256
+host/inc/nt_fulsc.h	191	186	258	193	259	188	208	256	#ifdef X86GFX		a5dcf1c79c19080bde51500224448c9d77c7b0df8c9a3b51dc2f9ac766241d95
+host/src/nt_cga.c	52	46	47	53	47	49	42	45	#if defined(JAPAN) || defined(KOREA)		0ed3b5efea350f940568c2a51c2bad79d6e73fe41f47a2f211dfa2779ccbd3ce
+base/bios/reset.c	961	1059	1281	964	1283	958	1248	1281	#ifdef NTVDM		cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461
+base/comms/com.c	1224	1417	2117	1225	2117	1221	2060	2115	#ifdef  NTVDM		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1609	2761	2760	1613	2763	1606	2722	2760	#if defined(NEC_98)		52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/disks/diskbios.c	444	892	893	445	893	441	865	891	#ifndef NEC_98		9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/floppy_i.c	175	618	616	179	619	172	612	617	"#ifndef	PROD"		1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/keymouse/keyba.c	2203	3078	3076	2208	3080	2200	3058	3077	#ifndef NTVDM		2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74
+base/keymouse/keybd_io.c	733	883	882	735	883	730	876	882	#ifndef NTVDM		ad5d4dfee50a39d8da2dbae64641ace2bd405e4d0368549923381d183b8ba93b
+base/system/timer.c	80	81	79	83	81	77	77	79	#ifdef NTVDM		e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db
+base/system/timer.c	764	800	799	774	808	761	773	799	#ifndef NTVDM		e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db
+base/video/video.c	113	100	114	115	115	108	108	112	#ifndef NEC_98		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	347	669	670	348	670	344	509	668	#ifndef NEC_98		c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/system/cmos.c	1048	1065	1134	1049	1134				closing brace after original non-PROD guard	manual original context review	e157178a120754cc37182f2790840a313ab3dc08912c6f5077283693c59d545d
+host/src/nt_keycd.c	329	739	738	332	740				original NEC_98 condition after retained keyset comment	manual original context review	4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1
+base/disks/floppy_i.c	76	163	162	78	163				original non-PROD guard after NEC_98 definitions	manual original context review	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/comms/com.c	72	71	69	92	88				original NEC_98 guard after retained adapter-state comments	manual original context review	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/disks/diskbios.c	439	617	864	441	865				original NEC_98 guard after disk_io debug declarations	manual original context review	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/system/rom.c	294	287	342	303	350				original GISP_SVGA guard and ROM initialization comment	manual original context review	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/video/video.c	328	284	424	338	432				original JAPAN guard after external-functions comment	manual original context review	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/ccpu386/c_main.c	4495	4837	4683	4497	4684				original NTVDM guard extended by existing TLS adaptation	manual original context review	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8
+host/src/nt_keycd.c	335	787	788	338	790				retained key lookup with local bounds check	manual original and retained local context review	4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1
+host/src/nt_keycd.c	351	816	817	355	820				retained extended key lookup with local bounds check	manual original and retained local context review	4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1
+host/src/nt_sound.c	35	45	41	44	49				retained GetPerfCounter declaration after local host glue	manual original and retained local context review	fd69ec6b4cd7f67d69e039c2684de8720b675805cb26a4f0d7848b6984b17013
+base/ccpu386/c_main.c	3350	3592	3511	3360	3520				original instruction switch after local debug hook	manual original and retained local context review	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8
+base/ccpu386/c_main.c	4039	4306	4202	4043	4205				original instruction switch after local debug hook	manual original and retained local context review	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8
+base/system/at_dma.c	52	58	57	64	68				original DMA function declaration after local state	manual original and retained local context review	ac1dcb52a91856efa6f34ca95c1e3324502bdda691a6850d013b2aa3e97bc272
+base/system/at_dma.c	937	844	955	943	960				original DMA read case after adapted backward write	manual original and retained local context review	ac1dcb52a91856efa6f34ca95c1e3324502bdda691a6850d013b2aa3e97bc272
+base/keymouse/mouse.c	442	512	511	444	512				original interrupt after local mouse-enable check	manual original and retained local context review	e5eef3dc5add1393a44f1ec8f9f2256cf0d51ca2bda0b22be3f306e9ae2f4d35
+host/src/nt_sbdsp.c	710	2268	2270	712	2271				original DMA position comment and updated local transfer	manual original and retained local context review	5894eb5fef5619829a99e01300e40942b3766916af7463952ee2cbcc83354edf

@@ -1156,8 +1156,22 @@ replacements. Final x86/x64 builds passed; each architecture passed 186
 non-native and eight serial native tests. Final EXE SHA-256 values: x86
 `b056ddbfb1858dbddef3aa2702c6fd2936bc087f0b3a1c197da430b83a5a4623` and x64
 `e020e5a0f1d23e0336dcd278b1180a3f7b30b888d59b94c3f49af7474620af61`.
-Commit and push remain pending; unmatched cases and the first-depth
-retained-arm audit remain open.
+The 66-marker correction was committed and pushed as `490ee9e8`.
+First-depth follow-up reconciled 30 more line markers in 18 files against
+exact original selected context; all 40 affected x86/x64 `-E -P` outputs
+matched. The 23 first-token mapping gaps were reviewed separately: nine
+original-context corrections, five already correct, and nine local additions
+without a unique XP line. The XP `rom.c:342` direct child of the selected
+NEC_98 else was found absent and recorded in the provisional depth-2
+absent-child queue; its body has not been examined in this phase. The 27
+previously ambiguous next-directive mappings were reviewed: 20 corrected
+and seven already correct; see `m9-t99-s20-bfs-depth1-next-directive-review.tsv`.
+Final x86/x64 builds passed; each width passed all 186 non-native and eight
+serial native tests. EXE SHA-256 values: x86
+`6d4e681a756c61763a3c2d3b682a3eef589d8c900968adae161e1760c314c3bd` and x64
+`1ffe128ccae1aa669a9efa037803bf100b86df06428184b3ef0cf8a4e4361dd6`.
+Commit and push remain pending. Remaining original first-depth adaptations
+and unresolved mappings stay open.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86

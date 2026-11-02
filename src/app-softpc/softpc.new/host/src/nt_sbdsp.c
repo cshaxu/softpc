@@ -707,7 +707,7 @@ Return Value:
 #if 0
 #error "Unsupported SoftPC mirror configuration: constant false"
 #endif
-#line 2268
+#line 2270
         //
         // Now update the dma controller with our emulation/real position
         //

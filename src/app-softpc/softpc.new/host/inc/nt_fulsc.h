@@ -188,7 +188,7 @@ IMPORT int  getModeType(VOID);
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif
-#line 186
+#line 258
 
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"

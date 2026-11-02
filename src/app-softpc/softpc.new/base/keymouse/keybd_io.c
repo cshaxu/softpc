@@ -730,7 +730,7 @@ void keyboard_int IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 883
+#line 882
 
 #ifndef NTVDM
 #line 884

@@ -1,0 +1,28 @@
+path	marker_line	marker_value	current_marker_value	next_line	next_directive	xp_mapping	status	reason	file_sha256
+host/inc/nt_fulsc.h	191	186	258	193	#ifdef X86GFX	259	corrected-original-context	Matched selected original boundary and next direct condition.	a5dcf1c79c19080bde51500224448c9d77c7b0df8c9a3b51dc2f9ac766241d95
+host/src/nt_cga.c	52	46	47	53	#if defined(JAPAN) || defined(KOREA)	47	corrected-original-context	Matched selected original boundary and next direct condition.	0ed3b5efea350f940568c2a51c2bad79d6e73fe41f47a2f211dfa2779ccbd3ce
+host/src/nt_cga.c	103	134	134	109	#if defined(NEC_98)		verified-existing	Current next condition maps to XP 139.	0ed3b5efea350f940568c2a51c2bad79d6e73fe41f47a2f211dfa2779ccbd3ce
+host/src/nt_keycd.c	329	739	738	332	#if defined(NEC_98)		corrected-original-context	Matched selected original boundary and next direct condition.	4a25e9ae39497991cde7485f3c8e51bf032d5bc6d823180bc3ec3bb10595f7a1
+base/bios/reset.c	961	1059	1281	964	#ifdef NTVDM	1283	corrected-original-context	Matched selected original boundary and next direct condition.	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461
+base/ccpu386/c_main.c	752	767	767	755	#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)		verified-existing	Existing local TLS condition occupies original XP line 769.	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8
+base/ccpu386/c_main.c	4495	4837	4683	4497	#if defined(NTVDM) || defined(SOFTPC_CCPU_TLS_SIMSTACK)		corrected-original-context	Matched selected original boundary and next direct condition.	8ab7d7ed4affd13763e0d30fd050c1aba9b4349022e58f2f7924b5e960721ea8
+base/comms/com.c	72	71	69	92	#if defined(NEC_98)		corrected-original-context	Matched selected original boundary and next direct condition.	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1212	2052	2052	1221	#if defined(NEC_98)		verified-existing	Retained next condition maps to XP 2060.	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1224	1417	2117	1225	#ifdef  NTVDM	2117	corrected-original-context	Matched selected original boundary and next direct condition.	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/comms/com.c	1609	2761	2760	1613	#if defined(NEC_98)	2763	corrected-original-context	Matched selected original boundary and next direct condition.	52e1fcd79704fa8c907aa1e9d7c2d9f01aba1b4eec33e62986f8ce9756c137ef
+base/disks/diskbios.c	439	617	864	441	#if defined(NEC_98)		corrected-original-context	Matched selected original boundary and next direct condition.	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/diskbios.c	444	892	893	445	#ifndef NEC_98	893	corrected-original-context	Matched selected original boundary and next direct condition.	9701479dddf3f825e6604826302f13fb2033554aa7ac8b2e106ce880c663c737
+base/disks/floppy_i.c	66	71	71	68	#ifdef NTVDM		verified-existing	Retained next condition maps to XP 72.	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/disks/floppy_i.c	71	76	76	73	#if defined(NEC_98)	191	verified-existing	Retained next condition maps to XP 77; XP 191 was a different repeated condition.	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/disks/floppy_i.c	76	163	162	78	"#ifndef	PROD"		corrected-original-context	Matched selected original boundary and next direct condition.	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/disks/floppy_i.c	175	618	616	179	"#ifndef	PROD"	619	corrected-original-context	Matched selected original boundary and next direct condition.	1b5d485798812ff89f92325d741abd30f20dc1970d888bbc1786de4f71936092
+base/inc/sas.h	784	1072	1072	786	#ifdef BIGEND	1047	verified-existing	Selected BACK_M else maps to XP 1073; XP 1047 belongs to the other branch.	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044
+base/keymouse/keyba.c	2203	3078	3076	2208	#ifndef NTVDM	3080	corrected-original-context	Matched selected original boundary and next direct condition.	2acb2a44f709d2e1d66481d182b9c2f07711c16365ac2a9d9cfb4e7706386c74
+base/keymouse/keybd_io.c	733	883	882	735	#ifndef NTVDM	883	corrected-original-context	Matched selected original boundary and next direct condition.	ad5d4dfee50a39d8da2dbae64641ace2bd405e4d0368549923381d183b8ba93b
+base/system/rom.c	294	287	342	303	#ifdef GISP_SVGA	350	corrected-original-context	Matched selected original boundary and next direct condition.	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/system/timer.c	80	81	79	83	#ifdef NTVDM	81	corrected-original-context	Matched selected original boundary and next direct condition.	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db
+base/system/timer.c	764	800	799	774	#ifndef NTVDM	808	corrected-original-context	Matched selected original boundary and next direct condition.	e4b1691e0c3fba7a85093563baca206091f5de3b7c8ab80c8c2aef6a289661db
+base/video/video.c	113	100	114	115	#ifndef NEC_98	115	corrected-original-context	Matched selected original boundary and next direct condition.	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	328	284	424	338	#ifdef JAPAN		corrected-original-context	Matched selected original boundary and next direct condition.	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	343	509	509	344	#if defined(JAPAN) || defined(KOREA)		verified-existing	The restored next condition maps to XP 509.	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
+base/video/video.c	347	669	670	348	#ifndef NEC_98	670	corrected-original-context	Matched selected original boundary and next direct condition.	c185392a603526eecb367c6247f1f350fa493464ac39abfa21507aba83822dff
