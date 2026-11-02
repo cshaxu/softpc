@@ -1,0 +1,15 @@
+path	baseline_line	directive	expression	disposition	x86	x64	current_sha256
+base/video/cga.c	1192	ifdef	A2CPU	single-error	not-selected	not-selected	2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b
+base/video/cga.c	1194	else		selected	selected	selected	2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b
+base/video/ega_read.c	503	ifndef	CPU_40_STYLE	single-error	not-selected	not-selected	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba
+base/video/ega_read.c	624	ifdef	CPU_40_STYLE	selected	selected	selected	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba
+base/video/ega_read.c	626	else		single-error	not-selected	not-selected	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba
+base/video/ega_read.c	677	ifdef	CPU_40_STYLE	selected	selected	selected	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba
+base/video/ega_read.c	679	else		single-error	not-selected	not-selected	76796d4a7accb41ebfab9e0810bc5ab6b2897da855e3e642d67d531a66ac63ba
+base/video/ega_writ.c	208	if	defined(EGA_DUMP) || defined(EGA_STAT)	single-error	not-selected	not-selected	de47208692825bb5c12da14546d36d10aeba3c1fb7b18e440047795ecee51be2
+base/video/ega_writ.c	210	else		selected	selected	selected	de47208692825bb5c12da14546d36d10aeba3c1fb7b18e440047795ecee51be2
+base/video/gfx_updt.c	3879	ifndef	CPU_40_STYLE	single-error	not-selected	not-selected	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604
+base/video/gfx_updt.c	3881	else		selected	selected	selected	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604
+base/video/gfx_updt.c	3902	ifdef	GORE	single-error	not-selected	not-selected	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604
+base/video/gfx_updt.c	3904	else		selected	selected	selected	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604
+base/video/gfx_updt.c	3972	ifdef	V7VGA	selected	selected	selected	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604

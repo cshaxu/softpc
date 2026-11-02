@@ -206,8 +206,9 @@ ega_write_init IFN0()
 #line 459
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
-	dump_writes = handler;
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP or EGA_STAT"
 #else
+#line 463
 #ifdef EGATEST
 #error "Unsupported SoftPC mirror configuration: EGATEST"
 #else

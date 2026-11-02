@@ -12,6 +12,12 @@ T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与�
 双架构编译上下文中不选中，其体替换为 `#error`，保留原条件及
 OpenNT 行号边界；这是镜像条件治理，不改变选中路径。
 
+### T99 S25 第六层排除分支
+
+`base/video/ega_writ.c` 在双架构中未选中的 `EGA_DUMP || EGA_STAT`
+分支体改为 `#error`，保留选中的同级 `#else` 及其原有内层结构，
+并保留诊断行控制；不改变当前编译路径。
+
 ### T99 S24 第五层保留条件框架
 
 在 `keyba.c`、`ega_prts.c`、`ega_read.c`、`gfx_updt.c`、

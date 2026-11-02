@@ -2,12 +2,48 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T99.
-The owner has already authorized automatic admission of S25, so no further
-owner response is required. S24 is closed after fifth-depth delivery and full
-qualification; see its [closure](../history/M9-T99-S24-mirror-depth5.md).
-S25 must audit sixth-depth candidates without processing their children; both
-queues are linked from the S24 final report.
+S24 is closed and pushed at `3ae9618d`; the owner authorized automatic
+admission of each next depth. S25 is active for depth 6; T99 remains open.
+See [S24 closure](../history/M9-T99-S24-mirror-depth5.md) and
+[depth-5 final evidence](../etc/evidence/softpc/m9-t99-s24-depth5-final.md).
+
+## M9 T99 S25 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner-authorized automatic admission following S24 closure and push. |
+| Objective | Audit and reconcile sixth-depth retained mirror conditional arms breadth-first. |
+| Non-goals | Do not process seventh-depth bodies, change guest behavior, public APIs, user media or configuration. |
+| Reference Baseline | S24 closure 3ae9618d, pinned XP SP1 subset, read-only OpenNT and S24 queues. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
+| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
+| Verification | Verify actual x86/x64 conditions, original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |
+| Expected Markers | Preserve original sixth-depth frames; excluded bodies become one #error and required #line without inner frames. |
+| Asset Needs | Build and publish both EXEs; preserve INI, guest media and snapshots. |
+| Reporting Requirements | Report depth, candidate and disposition totals, production/test diff, verification and depth-7 queue. |
+| Stop Conditions | Do not equate unobserved code with excluded code; preserve approved local fixes in selected arms; do not process deeper bodies. |
+| Exit Criteria | Deliver excluded sixth-depth phase with build, publish, tests, commit and push; then audit retained arms, enqueue direct seventh-depth children and complete final verification, delivery and closure. |
+| Original Owner Request | 每层独立 S；先交付本层排除分支，再审计保留分支并排队下一层；每 S 编译、测试、发布、提交、推送、收口后自动准入下一层。 |
+| Similar-Issue Sweep | Account for current-code and pinned-XP direct-child queues and local condition extensions. |
+
+The starting queues contain 14 current sixth-depth arms and 14 XP direct-child
+candidates, corresponding entry by entry; counts overlap and are not
+dispositions. Disposable scratch is `build/t99-s25`, owned by S25, with a
+four-hour total and 30-minute no-progress observation budget. Promote concise
+evidence and retire scratch before closure.
+
+All 14 current queue hashes match. Probing the eight actual source contexts
+found eight selected arms on both architectures and six excluded arms, each
+a single error after the one new `EGA_DUMP || EGA_STAT` exclusion in
+`ega_writ.c`. Its selected sibling confirms the enclosing parent is reached;
+forcing each macro produced the intended error on both architectures. Both
+architecture builds and mirror/documentation gates passed. Full exclusion
+qualification passed: 186 non-native and eight serial native tests per
+architecture, no skips. Retained arms and the seventh-depth queue are not
+yet audited; exclusion delivery is ready for commit. [Accounting](../etc/evidence/softpc/m9-t99-s25-depth6-excluded-accounting.tsv)
+records the initial arms.
 
 ## Technical Baseline
 
