@@ -110,7 +110,7 @@
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif          /* MOUSE_16_BIT */
-#line 115
+#line 189
 
 /*
  * Tidy define to optimise port accesses, motivated by discovering
@@ -1336,7 +1336,7 @@ void mouse_install1()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1375
+#line 1112
         /* Read offset of INT 33 procedure from MOUSE.COM */
         sas_loadw(effective_addr(getCS(), OFF_HOOK_POSN), &hook_offset);
 
@@ -4190,7 +4190,7 @@ LOCAL void mouse_driver_enable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 4072
+#line 4232
         sas_loadw (int_addr(MOUSE_VEC) + 0, &saved_int0A_offset);
         sas_loadw (int_addr(MOUSE_VEC) + 2, &saved_int0A_segment);
         sas_storew(int_addr(MOUSE_VEC), MOUSE_INT1_OFFSET);
@@ -5168,7 +5168,7 @@ LOCAL void mouse_unrecognised IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #else
-#line 4969
+#line 5179
         UNUSED(m1);
         UNUSED(m2);
         UNUSED(m3);

@@ -2138,7 +2138,7 @@ return (code);
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #else
-#line 2228
+#line 2998
 LOCAL INT
 #endif
 buffer_status_8042 IFN0()

@@ -261,7 +261,7 @@ IMPORT int	host_exchg_EM_to_EM	IPT5(int, length,
 #if defined(X86GFX) && defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else /* (NTVDM AND X86GFX) */
-#line 308
+#line 305
 
 #ifndef host_update_logical_page
 #define host_update_logical_page	host_unmap_page

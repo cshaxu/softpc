@@ -1125,7 +1125,17 @@ final binary SHA-256 values are x86
 `5f61fe1c01226dea3845637880a63bc123286661db89da0109ec558305acdde`.
 No non-mirror compiler warnings occurred. Actual mirror diff independently
 contains exactly 229 `#line` replacements and no other production changes.
-Commit and push of this first-depth exclusion-line batch remain pending.
+That exclusion-line batch was committed and pushed as `9893e779`.
+Additional first-depth boundary review identified 52 more `#line` markers in
+19 files, anchored by unique original closing context or unique next
+conditional directives. All 84 actual affected x86/x64 preprocessor outputs
+were identical before and after. The line markers were adjusted and the
+current-source hashes refreshed. Final x86/x64 builds passed; each width
+passed 186 non-native and eight serial native tests. EXE SHA-256 values are
+x86 `47b0d6e5c658cad1d11aed79b56591da3e72faf55e1f56b22008f5de185f334d`
+and x64 `902c3cc909923a04c241bc6ecd5170d283f7eed4563b375024424e1fc0bda90d`.
+Commit and push of this 52-marker batch remain pending; ambiguous and
+unanchored first-depth cases remain open.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86

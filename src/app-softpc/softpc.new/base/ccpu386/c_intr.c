@@ -395,7 +395,7 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else
-#line 408
+#line 404
 	    flags |= BIT16_MASK;   /* SET RF bit */
 #endif
          }
@@ -481,7 +481,7 @@ IFN4(
 #ifdef	PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else /* !PIG */
-#line 503
+#line 499
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */

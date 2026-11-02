@@ -1524,7 +1524,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1441
+#line 3229
 				dt_start = DR_TYPE_ADDR;
 				dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
 #endif /* NTVDM */
@@ -1562,7 +1562,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1473
+#line 3270
 					md_segment = DISKETTE_IO_1_SEGMENT;
 					if ((disk_state & DC_80_TRACK) == 0)
 						md_offset = MD_TBL1_OFFSET;
@@ -1581,7 +1581,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1486
+#line 3292
 				md_segment = DISKETTE_IO_1_SEGMENT;
 				if ((disk_state & DC_80_TRACK) == 0)
 					md_offset = MD_TBL1_OFFSET;
@@ -1599,7 +1599,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1498
+#line 3313
 			md_segment = DISKETTE_IO_1_SEGMENT;
 			if ((disk_state & DC_80_TRACK) == 0)
 				md_offset = MD_TBL1_OFFSET;

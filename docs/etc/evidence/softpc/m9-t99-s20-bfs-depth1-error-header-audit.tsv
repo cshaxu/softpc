@@ -99,13 +99,13 @@ base/inc/egavideo.h	52	if	0	9	9	9	9	1a987501976ebdd35edeec98c32d6e3b62dab4912d70
 base/inc/egavideo.h	91	ifdef	ANSI	9	9	9	9	1a987501976ebdd35edeec98c32d6e3b62dab4912d701a58fdf7e94026f0778f	not-selected-in-all-recorded-contexts
 base/inc/egavideo.h	100	ifdef	MSWDVR	9	9	9	9	1a987501976ebdd35edeec98c32d6e3b62dab4912d701a58fdf7e94026f0778f	not-selected-in-all-recorded-contexts
 base/inc/egavideo.h	120	if	defined(NTVDM) && defined(MONITOR)	9	9	9	9	1a987501976ebdd35edeec98c32d6e3b62dab4912d701a58fdf7e94026f0778f	not-selected-in-all-recorded-contexts
-base/inc/emm.h	24	ifdef	NTVDM	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
-base/inc/emm.h	35	ifndef	PROD	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
-base/inc/emm.h	65	ifdef	NTVDM	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
-base/inc/emm.h	89	ifdef	NTVDM	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
-base/inc/emm.h	102	ifdef	NTVDM	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
-base/inc/emm.h	145	ifdef	ANSI	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
-base/inc/emm.h	261	if	defined(X86GFX) && defined(NTVDM)	2	2	2	2	a662bbd5a8044c003007d1aa17feecd00808f8e28503d40c6c230b9f05779d2d	not-selected-in-all-recorded-contexts
+base/inc/emm.h	24	ifdef	NTVDM	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
+base/inc/emm.h	35	ifndef	PROD	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
+base/inc/emm.h	65	ifdef	NTVDM	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
+base/inc/emm.h	89	ifdef	NTVDM	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
+base/inc/emm.h	102	ifdef	NTVDM	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
+base/inc/emm.h	145	ifdef	ANSI	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
+base/inc/emm.h	261	if	defined(X86GFX) && defined(NTVDM)	2	2	2	2	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655	not-selected-in-all-recorded-contexts
 base/inc/equip.h	23	ifdef	BIGEND	7	7	7	7	7e60097207bd18810fb33e7bb85e94ce9c6387aa11c87e006f278cdf242c4373	not-selected-in-all-recorded-contexts
 base/inc/error.h	1	ifdef	NTVDM	20	20	20	20	da0c0ff171c3c2adca46776b56ec61dff79c7529e71c9f63f687238df681a36e	not-selected-in-all-recorded-contexts
 base/inc/floppy.h	187	ifdef	NTVDM	3	3	3	3	2affe5578acc7c74cd9a8052a5d57fbb8b42de3e72643d2baafed2b8fc950ee8	not-selected-in-all-recorded-contexts
@@ -174,14 +174,14 @@ host/inc/nt_uis.h	88	ifdef	DBCS	4	4	4	4	9dfb8b2b38f22340bc379ba344e031ac4d7cc212
 host/inc/nt_uis.h	110	ifdef	DBCS	4	4	4	4	9dfb8b2b38f22340bc379ba344e031ac4d7cc2121fadc1f4e9e7d5d141899fe8	not-selected-in-all-recorded-contexts
 base/inc/cpu_vid.h	98	else		15	15	15	15	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901	not-selected-in-all-recorded-contexts
 base/inc/cpu_vid.h	135	ifndef	CPU_40_STYLE	15	15	15	15	c452e065a20ce7c939a7698f5f842464a02c6cd4dd63befcfd19b66496391901	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	22	ifdef	BIT_ORDER1	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	91	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	103	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	111	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	131	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	158	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	166	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
-base/inc/egacpu.h	286	if	defined(NEC_98)	25	25	25	25	d8ad98bb56772562e688ed321958ba764fc7fed3bc5ce1d70548fbcc678fc3ac	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	22	ifdef	BIT_ORDER1	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	91	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	103	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	111	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	131	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	158	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	166	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
+base/inc/egacpu.h	286	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
 base/inc/ios.h	31	ifdef	NTVDM	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
 base/inc/ios.h	35	if	defined(NEC_98)	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
 base/inc/ios.h	405	if	defined(NEC_98)	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
@@ -234,14 +234,14 @@ base/inc/gvi.h	203	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5
 base/inc/gvi.h	209	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
 base/inc/gvi.h	217	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
 base/inc/gvi.h	318	if	defined(NEC_98)	28	28	28	28	f70eaee7adfc0f787908d8a075a4b5e3f132d464908e8b2b0050a7b39a499aa0	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	25	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	36	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	46	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	58	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	70	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	86	else		3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	101	ifdef	BIGEND	3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
-host/inc/cfpu_def.h	134	ifdef	NTVDM	3	3	3	3	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	25	else		3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	36	else		3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	46	else		3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	58	else		3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	70	else		3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	86	else		3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	101	ifdef	BIGEND	3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
+host/inc/cfpu_def.h	134	ifdef	NTVDM	3	3	3	3	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a	not-selected-in-all-recorded-contexts
 host/inc/nt_fulsc.h	14	if	defined(NEC_98)	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
 host/inc/nt_fulsc.h	38	if	defined(NEC_98)	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts
 host/inc/nt_fulsc.h	88	ifndef	PROD	2	2	2	2	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962	not-selected-in-all-recorded-contexts

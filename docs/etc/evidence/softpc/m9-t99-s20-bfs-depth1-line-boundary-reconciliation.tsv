@@ -1,0 +1,53 @@
+path	marker_line	marker_value	corrected	anchor_line	xp_line	sequence_lines	anchor	file_sha256
+host/inc/cfpu_def.h	28	30	22	29	22	3	} FP32;	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a
+host/inc/cfpu_def.h	39	42	28	40	28	3	} FP64HI;	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a
+host/inc/cfpu_def.h	49	52	33	50	33	5	} FP80SE;	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a
+host/inc/cfpu_def.h	61	64	40	62	40	4	} FP64;	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a
+host/inc/cfpu_def.h	73	76	46	74	46	9	} FPU_I64;	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a
+base/bios/reset.c	314	322	482	315	482	3	low_switches |= (RAM_256KB | PPI_CO_PROCESSOR_NOT_PRESENT | NO_LOOP_ON_POST);	04f58ddf7207a5ec411173aa45606807f857781f687f31d3227b822be827991b
+base/bios/reset.c	321	332	492	322	492	6	high_switches |= (PPI_ONE_DRIVE);	04f58ddf7207a5ec411173aa45606807f857781f687f31d3227b822be827991b
+base/bios/tape_io.c	140	124	159	141	159	2	break;	2b998d5fb72cb0c1eb50270d2babdb6ef721acc3efc8f30ecf2c19ee1bc21766
+base/ccpu386/c_intr.c	398	408	404	399	404	20	flags |= BIT16_MASK;   /* SET RF bit */	95579741b9c4607c7233297f9681a19035d2a3a9151808799e67d5ab3e9f1c46
+base/ccpu386/c_main.c	1101	1186	1106	1102	1106	20	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1221	1309	1229	1222	1229	7	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1232	1323	1243	1233	1243	6	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1242	1334	1254	1243	1254	20	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1520	1617	1537	1521	1537	7	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1531	1647	1567	1532	1567	6	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1675	1797	1717	1676	1717	7	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1686	1829	1749	1687	1749	14	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	1704	1861	1781	1705	1781	20	Int6();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_main.c	3620	3887	3806	3621	3806	20	SYNCH_TICK();	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
+base/ccpu386/c_tlb.c	402	453	383	403	383	20	if ( access_check[access][e->mode] )	78831f2f29080b0b3a42f96ddd1688bd9a61ac5dbf34252906b95ec7ebaa5498
+base/ccpu386/c_tlb.c	472	522	452	473	452	15	if ( access_check[access][comb] )	78831f2f29080b0b3a42f96ddd1688bd9a61ac5dbf34252906b95ec7ebaa5498
+base/ccpu386/c_tlb.c	744	795	725	745	725	20	if ( access_check[access][e->mode] )	78831f2f29080b0b3a42f96ddd1688bd9a61ac5dbf34252906b95ec7ebaa5498
+base/ccpu386/c_tlb.c	785	835	765	786	765	20	if ( access_check[access][comb] )	78831f2f29080b0b3a42f96ddd1688bd9a61ac5dbf34252906b95ec7ebaa5498
+base/ccpu386/zfrsrvd.c	4870	4880	4858	4871	4858	3	ica_hw_interrupt (ICA_SLAVE, CPU_AT_NPX_INT, 1);	df864df8b053dd284f9822b8d249b3324046ae1a5f083ed3b33a5475602ce0f7
+base/comms/com.c	2262	2333	3777	2263	3777	4	GLOBAL VOID com_init IFN1(int, adapter)	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
+base/disks/diskbios.c	562	712	1097	563	1097	2	wstatus (STATUS_BAD_COMMAND);	a57f1d7b6e3c62c47719a38d1fcdc094d06d0b42307cf561290ae70a6066eb65
+base/disks/floppy.c	1527	1441	3229	1528	3229	3	dt_start = DR_TYPE_ADDR;	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	1565	1473	3270	1566	3270	6	md_segment = DISKETTE_IO_1_SEGMENT;	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	1584	1486	3292	1585	3292	6	md_segment = DISKETTE_IO_1_SEGMENT;	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	1602	1498	3313	1603	3313	6	md_segment = DISKETTE_IO_1_SEGMENT;	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/inc/egacpu.h	161	159	186	162	186	2	} EGA_CPU;	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/keymouse/keyba.c	2141	2228	2998	2142	2998	20	LOCAL INT	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
+base/keymouse/mouse_io.c	1339	1375	1112	1341	1113	5	sas_loadw(effective_addr(getCS(), OFF_HOOK_POSN), &hook_offset);	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	4193	4072	4232	4194	4232	5	sas_loadw (int_addr(MOUSE_VEC) + 0, &saved_int0A_offset);	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	5171	4969	5179	5172	5179	20	UNUSED(m1);	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/system/ica.c	985	975	1084	986	1084	6	}	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/ica.c	1082	1076	1197	1083	1197	3	break;	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/idetect.c	342	318	468	343	468	2	my_host_release_timeslice();	92e874e96426e33f8b4dc8b29c2d5420c4215dc338a4ec32895bc784c2f6ac51
+base/system/idetect.c	355	325	479	356	479	4	idle_no_video = 1;	92e874e96426e33f8b4dc8b29c2d5420c4215dc338a4ec32895bc784c2f6ac51
+base/system/timer.c	592	519	606	593	606	2	pcu = &timers[2];	5a53e31294374121e13f0377266b8a54aaa29e5fa2ce3ee0e18dc64b0e24439b
+base/system/timer.c	1310	1147	1343	1311	1343	2	if (pcu == &timers[2])	5a53e31294374121e13f0377266b8a54aaa29e5fa2ce3ee0e18dc64b0e24439b
+base/system/timer.c	1827	1648	1892	1828	1892	2	pcu->tc = 1;	5a53e31294374121e13f0377266b8a54aaa29e5fa2ce3ee0e18dc64b0e24439b
+base/ccpu386/c_intr.c	484	503	499	485	499		#ifdef SYNCH_TIMERS	95579741b9c4607c7233297f9681a19035d2a3a9151808799e67d5ab3e9f1c46
+base/comms/com.c	1546	1705	2665	1547	2665		#if !defined(PROD) || defined(IRET_HOOKS)	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
+base/inc/egacpu.h	114	125	152	115	152		"#ifndef	HOST_VGA_GLOBALS"	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/inc/egacpu.h	169	161	273	170	273		"#ifndef CPU_40_STYLE	/* Vglobs done via access fns */"	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/inc/egacpu.h	289	359	486	290	486		#ifdef CPU_40_STYLE	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab
+base/inc/emm.h	264	308	305	266	306		#ifndef host_update_logical_page	968d870b7b2de655c54a1fec048c58167c4ff35995a2c378ea3cec60d3cb9655
+base/keymouse/mouse_io.c	113	115	189	120	195		#ifdef CPU_40_STYLE	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/system/ica.c	610	594	687	616	692		"#ifndef CPU_40_STYLE	/* No globals in the 4.0 I/F! */"	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/rom.c	347	341	453	349	454		#if !(defined(NTVDM) && defined(MONITOR))	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872
+base/video/gfx_updt.c	195	195	221	196	221		#ifdef PROD	d98efb8606cd1d59d2922e8c25107d7fdb7b5175442903c35ff20b5d5ca4d462

@@ -339,7 +339,7 @@ int event;
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 318
+#line 468
 		my_host_release_timeslice();
 #endif
 #line 470
@@ -352,7 +352,7 @@ int event;
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 325
+#line 479
 		idle_no_video = 1;
 		idle_no_disk = 1;
 		idle_no_comlpt = 1;

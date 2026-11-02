@@ -399,7 +399,7 @@ IFN2(
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 453
+#line 383
 	 if ( access_check[access][e->mode] )
 #endif /* SPC486 */
 	    {
@@ -469,7 +469,7 @@ IFN2(
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 522
+#line 452
    if ( access_check[access][comb] )
 #endif /* SPC486 */
       {
@@ -741,7 +741,7 @@ xtrn2phy IFN3
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 795
+#line 725
 	 if ( access_check[access][e->mode] )
 #endif /* SPC486 */
 	    {
@@ -782,7 +782,7 @@ xtrn2phy IFN3
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 835
+#line 765
    if ( access_check[access][comb] )
 #endif /* SPC486 */
       {

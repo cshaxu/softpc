@@ -589,7 +589,7 @@ SWTMR_time_tick IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 519
+#line 606
     pcu = &timers[2];
 #endif   //NEC_98
 #line 520
@@ -1307,7 +1307,7 @@ LOCAL void outputWaveForm IFN5(unsigned int, delay, unsigned long, lowclocks,
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 1147
+#line 1343
         if (pcu == &timers[2])
 #endif   //NEC_98
 #line 1148
@@ -1824,7 +1824,7 @@ LOCAL void updateCounter IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 1648
+#line 1892
                         pcu->tc = 1;
 #endif   //NEC_98
 #line 1894

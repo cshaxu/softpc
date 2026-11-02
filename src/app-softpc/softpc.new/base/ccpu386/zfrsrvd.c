@@ -4867,7 +4867,7 @@ void TakeNpxExceptionInt()
 #ifdef	SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else	/* SPC486 */
-#line 4880
+#line 4858
 	ica_hw_interrupt (ICA_SLAVE, CPU_AT_NPX_INT, 1);
 #endif	/* SPC486 */
 

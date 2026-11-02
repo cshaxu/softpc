@@ -559,7 +559,7 @@ LOCAL void badcmd IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 712
+#line 1097
 	wstatus (STATUS_BAD_COMMAND);
 #endif // !NEC_98
 #line 713

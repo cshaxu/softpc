@@ -344,7 +344,7 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 341
+#line 453
 
 #if !(defined(NTVDM) && defined(MONITOR))
 #line 342

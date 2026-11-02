@@ -137,7 +137,7 @@ half_word target_AR;
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* PM */
-#line 124
+#line 159
 		break;
         case INT15_MOVE_BLOCK:
 #ifdef PM

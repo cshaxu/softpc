@@ -1543,7 +1543,7 @@ static word valid_latches[] =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1705
+#line 2665
 #if !defined(PROD) || defined(IRET_HOOKS)
 static IUM32 bauds[] =
 {
@@ -2259,7 +2259,7 @@ static int timeout[4] = {RS232_COM1_TIMEOUT,
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 2333
+#line 3777
 GLOBAL VOID com_init IFN1(int, adapter)
 {
 	io_addr i;

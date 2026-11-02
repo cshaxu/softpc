@@ -1098,7 +1098,7 @@ TYPE0F01_2:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1186
+#line 1106
 	    Int6();
 #endif /* SPC486 */
 
@@ -1218,7 +1218,7 @@ TYPE0F02:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1309
+#line 1229
 	 Int6();
 #endif /* SPC486 */
 
@@ -1229,7 +1229,7 @@ TYPE0F02:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1323
+#line 1243
 	 Int6();
 #endif /* SPC486 */
 
@@ -1239,7 +1239,7 @@ TYPE0F02:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else
-#line 1334
+#line 1254
 	 Int6();
 #endif /* PIG */
 	 break;
@@ -1517,7 +1517,7 @@ TYPE0FAB:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1617
+#line 1537
 	 Int6();
 #endif /* SPC486 */
 
@@ -1528,7 +1528,7 @@ TYPE0FAB:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1647
+#line 1567
 	 Int6();
 #endif /* SPC486 */
 
@@ -1672,7 +1672,7 @@ TYPE0FAB:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1797
+#line 1717
 	 Int6();
 #endif /* SPC486 */
 
@@ -1683,7 +1683,7 @@ TYPE0FAB:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1829
+#line 1749
 	 Int6();
 #endif /* SPC486 */
 
@@ -1701,7 +1701,7 @@ TYPE0FAB:
 #ifdef SPC486
 #error "Unsupported SoftPC mirror configuration: SPC486"
 #else
-#line 1861
+#line 1781
 	 Int6();
 #endif /* SPC486 */
 
@@ -3617,7 +3617,7 @@ TYPEE0:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else
-#line 3887
+#line 3806
       SYNCH_TICK();
 #endif
       break;

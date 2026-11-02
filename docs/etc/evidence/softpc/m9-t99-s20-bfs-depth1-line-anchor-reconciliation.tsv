@@ -1,5 +1,5 @@
 path	marker_line	marker_value	corrected	anchor_line	xp_line	matches	anchor	file_sha256
-host/inc/cfpu_def.h	137	222	187	139	188	10	#define HostGetOverflowException()      (fpgetsticky() & FP_X_OFL)	a1b3a085923a40d57f6c690203e2e3eec6c06f65a5feb6e023c26cda7cc43e65
+host/inc/cfpu_def.h	137	222	187	139	188	10	#define HostGetOverflowException()      (fpgetsticky() & FP_X_OFL)	380755b76ba8ce028dd91e5d8583bdd3624a12d10d498a2f55b2fbdd059ee75a
 host/inc/host_def.h	48	48	42	49	42	7	"#define CpuH ""cpu4.h"""	7dbe58365720b285b18e7fdbabb0035a5468ba5083d8c6f30e715552b4b0bb5e
 host/inc/host_def.h	151	150	142	153	143	2	#define HOST_TIMER_TOOLONG_DELAY        15000   //BCN 1781	7dbe58365720b285b18e7fdbabb0035a5468ba5083d8c6f30e715552b4b0bb5e
 host/inc/nt_fulsc.h	17	14	17	24	23	10	#define ErrorExit() DisplayErrorTerm(EHS_FUNC_FAILED,GetLastError(),__FILE__,__LINE__);	1d37f1b884d581d01cf08437ae6e8d68ce4beab53ea848cd22db1525e585e962
@@ -10,28 +10,28 @@ host/src/nt_graph.c	33	30	33	34	33	14	#include <sys\types.h>	7467096e849d3fbfe07
 host/src/nt_graph.c	543	474	694	549	699	6	CloseHandle(sc.ScreenBufHandle);	7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
 host/src/nt_graph.c	2076	1835	2503	2080	2506	5	if (    bufferInfo.srWindow.Bottom >= h	7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
 host/src/nt_graph.c	2123	1877	2548	2129	2553	3	if ( w > oldW.X || h > oldW.Y )	7467096e849d3fbfe07ebcfce499dafa9b198404acb6df08145e64fd2b298019
-base/bios/reset.c	123	118	120	135	131	2	#define int_addr(int_no)                (int_no * 4)	9b6886312f1c5dfb6b4a14daadfde4a36fa668b5aea5dc25b8f0b49da8e82573
-base/bios/tape_io.c	26	27	33	31	37	3	#include <stdio.h>	5de6379ebba7d4d66c2bbf786d3c352709755911212e24a8cc33f36e8586e21e
-base/bios/tape_io.c	36	33	42	40	45	13	"#include ""xt.h"""	5de6379ebba7d4d66c2bbf786d3c352709755911212e24a8cc33f36e8586e21e
-base/bios/tape_io.c	110	99	125	114	128	10	switch ( getAH() )	5de6379ebba7d4d66c2bbf786d3c352709755911212e24a8cc33f36e8586e21e
-base/ccpu386/c_main.c	339	361	336	340	336	8	#define	b45303f032ae45a7e9460a9b58d018ebf23b2d89b8ec5a9f650c72a480c3b4eb
+base/bios/reset.c	123	118	120	135	131	2	#define int_addr(int_no)                (int_no * 4)	04f58ddf7207a5ec411173aa45606807f857781f687f31d3227b822be827991b
+base/bios/tape_io.c	26	27	33	31	37	3	#include <stdio.h>	2b998d5fb72cb0c1eb50270d2babdb6ef721acc3efc8f30ecf2c19ee1bc21766
+base/bios/tape_io.c	36	33	42	40	45	13	"#include ""xt.h"""	2b998d5fb72cb0c1eb50270d2babdb6ef721acc3efc8f30ecf2c19ee1bc21766
+base/bios/tape_io.c	110	99	125	114	128	10	switch ( getAH() )	2b998d5fb72cb0c1eb50270d2babdb6ef721acc3efc8f30ecf2c19ee1bc21766
+base/ccpu386/c_main.c	339	361	336	340	336	8	#define	f73ea37cb4bf048a5cd47ad31af53b1836dde84c62c8ef40bf505f3a3e1145b1
 base/ccpu386/c_reg.c	44	54	52	45	52	7	#define	de609017449c71feabd7b20ff6569d8fb99f07dc3ba48eef69faf30d33609081
 base/ccpu386/fpu.c	163	163	161	164	161	15	#define TAG_NEGATIVE_MASK 1	7f947396331f2a1215556141521dc55e69d83d1607910fae0db4a6d8e19b164b
-base/comms/com.c	34	33	36	35	36	11	#include TypesH	2a65dfe58020e96be614571b49b3965ddf6ea419efd59cdd47f5cc39999d83c3
-base/comms/com.c	151	127	191	158	197	6	static int com_critical[NUM_SERIAL_PORTS];	2a65dfe58020e96be614571b49b3965ddf6ea419efd59cdd47f5cc39999d83c3
-base/comms/com.c	639	677	676	650	686	9	static void com_flush_input IFN1(int, adapter)	2a65dfe58020e96be614571b49b3965ddf6ea419efd59cdd47f5cc39999d83c3
-base/comms/com.c	1298	2312	2311	1304	2316	3	void com_modem_change IFN1(int, adapter)	2a65dfe58020e96be614571b49b3965ddf6ea419efd59cdd47f5cc39999d83c3
+base/comms/com.c	34	33	36	35	36	11	#include TypesH	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
+base/comms/com.c	151	127	191	158	197	6	static int com_critical[NUM_SERIAL_PORTS];	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
+base/comms/com.c	639	677	676	650	686	9	static void com_flush_input IFN1(int, adapter)	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
+base/comms/com.c	1298	2312	2311	1304	2316	3	void com_modem_change IFN1(int, adapter)	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
 base/comms/printer_.c	4	1	3	6	4	2	"#include ""insignia.h"""	3599bf7a190a66fc2d972e762b3f3664f41ebdba563eb5ed54ed586360b0be46
-base/disks/diskbios.c	4	1	7	5	7	2	"#include ""insignia.h"""	92ae0e5fd0779768f0ac40937a0295cd6d5076bf0c4b175b0a5e9356c9cc3a26
-base/disks/diskbios.c	121	114	181	126	185	9	LOCAL int drive1notwiredup;	92ae0e5fd0779768f0ac40937a0295cd6d5076bf0c4b175b0a5e9356c9cc3a26
-base/disks/diskbios.c	166	155	232	173	238	6	#define	92ae0e5fd0779768f0ac40937a0295cd6d5076bf0c4b175b0a5e9356c9cc3a26
-base/disks/diskbios.c	511	670	1031	514	1033	4	if (check_drive (com.drive)	92ae0e5fd0779768f0ac40937a0295cd6d5076bf0c4b175b0a5e9356c9cc3a26
-base/disks/diskbios.c	530	683	1064	532	1065	4	if (BIOS_command != 0x15)	92ae0e5fd0779768f0ac40937a0295cd6d5076bf0c4b175b0a5e9356c9cc3a26
-base/disks/floppy.c	4	1	7	5	7	3	"#include ""insignia.h"""	a5ce80601aeb46dad2187dc6c3c11e13a3d7f85fe1181578701371770680207b
-base/disks/floppy.c	112	113	119	114	120	2	#include <stdio.h>	a5ce80601aeb46dad2187dc6c3c11e13a3d7f85fe1181578701371770680207b
-base/disks/floppy.c	118	115	124	119	124	14	#include TypesH	a5ce80601aeb46dad2187dc6c3c11e13a3d7f85fe1181578701371770680207b
-base/disks/floppy.c	186	261	260	193	266	15	LOCAL half_word get_parm IPT1(int, index);	a5ce80601aeb46dad2187dc6c3c11e13a3d7f85fe1181578701371770680207b
-base/disks/floppy.c	230	208	347	238	354	5	#define	a5ce80601aeb46dad2187dc6c3c11e13a3d7f85fe1181578701371770680207b
+base/disks/diskbios.c	4	1	7	5	7	2	"#include ""insignia.h"""	a57f1d7b6e3c62c47719a38d1fcdc094d06d0b42307cf561290ae70a6066eb65
+base/disks/diskbios.c	121	114	181	126	185	9	LOCAL int drive1notwiredup;	a57f1d7b6e3c62c47719a38d1fcdc094d06d0b42307cf561290ae70a6066eb65
+base/disks/diskbios.c	166	155	232	173	238	6	#define	a57f1d7b6e3c62c47719a38d1fcdc094d06d0b42307cf561290ae70a6066eb65
+base/disks/diskbios.c	511	670	1031	514	1033	4	if (check_drive (com.drive)	a57f1d7b6e3c62c47719a38d1fcdc094d06d0b42307cf561290ae70a6066eb65
+base/disks/diskbios.c	530	683	1064	532	1065	4	if (BIOS_command != 0x15)	a57f1d7b6e3c62c47719a38d1fcdc094d06d0b42307cf561290ae70a6066eb65
+base/disks/floppy.c	4	1	7	5	7	3	"#include ""insignia.h"""	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	112	113	119	114	120	2	#include <stdio.h>	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	118	115	124	119	124	14	#include TypesH	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	186	261	260	193	266	15	LOCAL half_word get_parm IPT1(int, index);	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
+base/disks/floppy.c	230	208	347	238	354	5	#define	a79a4454865cb999b5632154297c084e8b7bd52ed03401fc11c57936d8a72e77
 base/disks/floppy_i.c	4	1	7	5	7	3	"#include ""insignia.h"""	24484918cd7c2653ba40f1b4598b1294fd304cfa6ef82d97b766d8aa88273d77
 base/disks/floppy_i.c	42	43	49	44	50	15	#include <stdio.h>	24484918cd7c2653ba40f1b4598b1294fd304cfa6ef82d97b766d8aa88273d77
 base/disks/floppy_i.c	264	426	728	269	732	3	outb(DISKETTE_DCR_REG, DCR_RATE_250);	24484918cd7c2653ba40f1b4598b1294fd304cfa6ef82d97b766d8aa88273d77
@@ -48,18 +48,18 @@ base/inc/sas.h	351	339	367	361	376	9	#define COPYRIGHT_OFFSET	3293be30fbfccbbf62
 base/inc/sas.h	734	967	999	741	1005	15	#define BIOS_STI_OFFSET   0x3000	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146
 base/inc/tape_io.h	38	35	41	45	47	7	#define	bcc3bbb1b9a55f6515fd1679aa5b9452dc8235a71b444b0d059ecd3b03687c76
 base/inc/video.h	69	62	135	70	135	11	#define	99ac339d0893236a62fc8124a5f81e546848c82802b1816c35ab0d18909ed1b8
-base/keymouse/keyba.c	85	87	86	87	87	3	"#include ""debug.h"""	bb9a492d54874186eaaefe52650b35c1523b2796353bb7332c7cbc08d586c003
-base/keymouse/keyba.c	107	175	173	113	178	13	#define NUM_LOCK_ADD_ARRAY 127	bb9a492d54874186eaaefe52650b35c1523b2796353bb7332c7cbc08d586c003
-base/keymouse/keyba.c	146	139	211	147	211	2	#define DEFAULT_SCAN_CODE_SET 2	bb9a492d54874186eaaefe52650b35c1523b2796353bb7332c7cbc08d586c003
-base/keymouse/keyba.c	154	145	218	159	222	3	GLOBAL VOID ( *host_key_down_fn_ptr )();	bb9a492d54874186eaaefe52650b35c1523b2796353bb7332c7cbc08d586c003
-base/keymouse/keyba.c	218	197	280	219	280	4	#define	bb9a492d54874186eaaefe52650b35c1523b2796353bb7332c7cbc08d586c003
-base/keymouse/keyba.c	663	800	1004	670	1010	7	=============================== keyba_running ==================================	bb9a492d54874186eaaefe52650b35c1523b2796353bb7332c7cbc08d586c003
+base/keymouse/keyba.c	85	87	86	87	87	3	"#include ""debug.h"""	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
+base/keymouse/keyba.c	107	175	173	113	178	13	#define NUM_LOCK_ADD_ARRAY 127	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
+base/keymouse/keyba.c	146	139	211	147	211	2	#define DEFAULT_SCAN_CODE_SET 2	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
+base/keymouse/keyba.c	154	145	218	159	222	3	GLOBAL VOID ( *host_key_down_fn_ptr )();	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
+base/keymouse/keyba.c	218	197	280	219	280	4	#define	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
+base/keymouse/keyba.c	663	800	1004	670	1010	7	=============================== keyba_running ==================================	d2b252b5d3d1dd6ff1f17fe8de3f2fcadd51722e30c322d8cc05ee1c655ff0ac
 base/keymouse/keybd_io.c	178	184	242	179	242	2	#define FREEKBDHDW()	22e70ae45d745b85acba3467b6b7b5030b5b231c14cc2b4442caa9ae54915564
-base/keymouse/mouse_io.c	106	107	181	108	182	2	"#include ""host_gfx.h"""	6dd8badcad4544b1898f18ea307fe02da63e2cc1743649ba331bf292e0aa14c0
-base/keymouse/mouse_io.c	128	132	206	131	208	9	Offsets to data buffers held in MOUSE.COM (built from	6dd8badcad4544b1898f18ea307fe02da63e2cc1743649ba331bf292e0aa14c0
-base/keymouse/mouse_io.c	1389	1163	1162	1395	1167	3	junk1 = MOUSE_RESET;	6dd8badcad4544b1898f18ea307fe02da63e2cc1743649ba331bf292e0aa14c0
-base/keymouse/mouse_io.c	2974	2921	2962	2979	2966	5	vector_set (&mouse_sens,     MOUSE_SENS_DEF,     MOUSE_SENS_DEF);	6dd8badcad4544b1898f18ea307fe02da63e2cc1743649ba331bf292e0aa14c0
-base/keymouse/mouse_io.c	6388	6433	6667	6396	6674	5	LOCAL void inport_get_event IFN1(MOUSE_INPORT_DATA *,event)	6dd8badcad4544b1898f18ea307fe02da63e2cc1743649ba331bf292e0aa14c0
+base/keymouse/mouse_io.c	106	107	181	108	182	2	"#include ""host_gfx.h"""	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	128	132	206	131	208	9	Offsets to data buffers held in MOUSE.COM (built from	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	1389	1163	1162	1395	1167	3	junk1 = MOUSE_RESET;	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	2974	2921	2962	2979	2966	5	vector_set (&mouse_sens,     MOUSE_SENS_DEF,     MOUSE_SENS_DEF);	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	6388	6433	6667	6396	6674	5	LOCAL void inport_get_event IFN1(MOUSE_INPORT_DATA *,event)	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
 base/support/ios.c	74	75	82	81	88	13	typedef	7e020595cca0d24542d397d96f7e2ec5d74ced1eba8d56b11c0e7b5db1b40eb9
 base/support/ios.c	413	406	493	424	503	9	=================================== inb ======================================	7e020595cca0d24542d397d96f7e2ec5d74ced1eba8d56b11c0e7b5db1b40eb9
 base/support/ios.c	909	891	1006	912	1008	6	================================ io_init ===================================	7e020595cca0d24542d397d96f7e2ec5d74ced1eba8d56b11c0e7b5db1b40eb9
@@ -67,13 +67,13 @@ base/support/time_day.c	4	1	7	5	7	3	"#include ""windows.h""   /* included for Sl
 base/support/time_day.c	54	53	59	60	64	11	#include <stdlib.h>	53e52ddabd7b50a9d2c9b22e491280de52400a4e7fa6004689de3086b60acd22
 base/support/time_day.c	140	124	288	145	292	4	half_word mask;	53e52ddabd7b50a9d2c9b22e491280de52400a4e7fa6004689de3086b60acd22
 base/system/at_dma.c	879	864	858	881	859	2	DMA_ADAPT *dmaGetAdaptor(void)	6604880f15cf50a2e7ddaa1eea8c0a3175af7f07f731153faf023d660e6a6032
-base/system/ica.c	682	666	763	688	768	8	if (asp->ica_mode & ICA_POLL)	47d341c2353da8d3ec720297c4a75d9e33505f3b93103b62a8f1b07a42f2c68d
-base/system/ica.c	1115	1129	1276	1125	1285	3	line_no &= 0xff;	47d341c2353da8d3ec720297c4a75d9e33505f3b93103b62a8f1b07a42f2c68d
-base/system/ica.c	1830	1858	2051	1832	2052	3	#define INIT0_ICW1	47d341c2353da8d3ec720297c4a75d9e33505f3b93103b62a8f1b07a42f2c68d
-base/system/ica.c	1921	1922	2145	1922	2145	4	#define INIT1_ICW2	47d341c2353da8d3ec720297c4a75d9e33505f3b93103b62a8f1b07a42f2c68d
-base/system/timer.c	183	167	189	184	189	2	#define TIMER_CLOCK_DENOM       1193	64dd7da606958aa8c2327220b09f5d69046c0d138bc78c93e5d7a6bfd9072b94
-base/system/timer.c	483	504	503	492	511	5	boolean timer_video_enabled;	64dd7da606958aa8c2327220b09f5d69046c0d138bc78c93e5d7a6bfd9072b94
-base/system/timer.c	2516	2360	2986	2522	2991	2	host_timer_init();	64dd7da606958aa8c2327220b09f5d69046c0d138bc78c93e5d7a6bfd9072b94
-base/video/gfx_updt.c	177	184	206	178	206	2	#define clear_dirty()	d13c373d8b10a704a718f46fe13f041308e189e34bea2618e4e777bf4cf98d81
-base/video/gfx_updt.c	185	189	212	186	212	4	#define	d13c373d8b10a704a718f46fe13f041308e189e34bea2618e4e777bf4cf98d81
+base/system/ica.c	682	666	763	688	768	8	if (asp->ica_mode & ICA_POLL)	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/ica.c	1115	1129	1276	1125	1285	3	line_no &= 0xff;	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/ica.c	1830	1858	2051	1832	2052	3	#define INIT0_ICW1	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/ica.c	1921	1922	2145	1922	2145	4	#define INIT1_ICW2	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
+base/system/timer.c	183	167	189	184	189	2	#define TIMER_CLOCK_DENOM       1193	5a53e31294374121e13f0377266b8a54aaa29e5fa2ce3ee0e18dc64b0e24439b
+base/system/timer.c	483	504	503	492	511	5	boolean timer_video_enabled;	5a53e31294374121e13f0377266b8a54aaa29e5fa2ce3ee0e18dc64b0e24439b
+base/system/timer.c	2516	2360	2986	2522	2991	2	host_timer_init();	5a53e31294374121e13f0377266b8a54aaa29e5fa2ce3ee0e18dc64b0e24439b
+base/video/gfx_updt.c	177	184	206	178	206	2	#define clear_dirty()	d98efb8606cd1d59d2922e8c25107d7fdb7b5175442903c35ff20b5d5ca4d462
+base/video/gfx_updt.c	185	189	212	186	212	4	#define	d98efb8606cd1d59d2922e8c25107d7fdb7b5175442903c35ff20b5d5ca4d462
 base/video/video.c	93	89	94	94	94	5	"#include ""egavideo.h"""	5404a6a9d754955e8a1ce44d115344a4174b47dc833736e41272e6a3429f30c4

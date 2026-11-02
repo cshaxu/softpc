@@ -311,14 +311,14 @@ half_word *low, *high;
 #ifdef  NPX
 #error "Unsupported SoftPC mirror configuration: NPX"
 #else
-#line 322
+#line 482
         low_switches |= (RAM_256KB | PPI_CO_PROCESSOR_NOT_PRESENT | NO_LOOP_ON_POST);
 #endif
 
 #ifdef FLOPPY_B
 #error "Unsupported SoftPC mirror configuration: FLOPPY_B"
 #else
-#line 332
+#line 492
         high_switches |= (PPI_ONE_DRIVE);
 #endif
 

@@ -25,7 +25,7 @@ IU32	sign:1;
 #else
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
-#line 30
+#line 22
 } FP32;
 
 typedef struct {
@@ -36,7 +36,7 @@ IU32	sign:1;
 #else
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
-#line 42
+#line 28
 } FP64HI;
 
 typedef struct {
@@ -46,7 +46,7 @@ IU16	sign:1;
 #else
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
-#line 52
+#line 33
 } FP80SE;
 
 //#ifdef BIGEND
@@ -58,7 +58,7 @@ FP64HI	hiword;
 #else
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
-#line 64
+#line 40
 } FP64;
 
 
@@ -70,7 +70,7 @@ IS32 high_word;
 #else
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
-#line 76
+#line 46
 } FPU_I64;
 
 /*

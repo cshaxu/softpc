@@ -111,7 +111,7 @@ extern struct EGA_CPU_GLOBALS
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 125
+#line 152
 #ifndef	HOST_VGA_GLOBALS
 	/* DIVERGENCE(MVDM-HOST-DIV-062): the original C-video profile stores its
 	 * generated VGAGLOBALSETTINGS carrier here.  NT4's permissive C accepted
@@ -158,7 +158,7 @@ extern struct EGA_CPU_GLOBALS
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 159
+#line 186
 } EGA_CPU;
 #endif // !NEC_98
 #line 160
@@ -166,7 +166,7 @@ extern struct EGA_CPU_GLOBALS
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 161
+#line 273
 #ifndef CPU_40_STYLE	/* Vglobs done via access fns */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE */
@@ -286,7 +286,7 @@ IMPORT ULONG sr_lookup[16];
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 359
+#line 486
 #ifdef CPU_40_STYLE
 extern IU32 latchval;	/* used for following latch macros */
 #define get_latch(n) \

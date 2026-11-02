@@ -607,7 +607,7 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 594
+#line 687
 
         /*
          *  Set the 'hardware interrupt' bit in cpu_interrupt_map
@@ -982,7 +982,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 975
+#line 1084
 	    }
 	}
 	break;
@@ -1079,7 +1079,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1076
+#line 1197
 	break;
 
     default:		/* This cannot happen			*/;

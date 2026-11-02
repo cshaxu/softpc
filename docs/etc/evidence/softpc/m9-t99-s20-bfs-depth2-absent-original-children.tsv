@@ -1,10 +1,10 @@
 path	xp_parent_line	xp_selected_arm_line	xp_child_line	xp_child_directive	status	local_sha256
-base/comms/com.c	731	741	742	ifndef NTVDM	original-child-absent-await-depth-2	2a65dfe58020e96be614571b49b3965ddf6ea419efd59cdd47f5cc39999d83c3
-base/system/ica.c	2054	2059	2063	ifdef NTVDM	original-child-absent-await-depth-2	47d341c2353da8d3ec720297c4a75d9e33505f3b93103b62a8f1b07a42f2c68d
+base/comms/com.c	731	741	742	ifndef NTVDM	original-child-absent-await-depth-2	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
+base/system/ica.c	2054	2059	2063	ifdef NTVDM	original-child-absent-await-depth-2	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
 base/support/time_day.c	988	988	989	ifdef NTVDM	original-child-absent-await-depth-2	53e52ddabd7b50a9d2c9b22e491280de52400a4e7fa6004689de3086b60acd22
-base/video/gfx_updt.c	5969	5969	5970	ifdef NTVDM	original-child-absent-await-depth-2	d13c373d8b10a704a718f46fe13f041308e189e34bea2618e4e777bf4cf98d81
+base/video/gfx_updt.c	5969	5969	5970	ifdef NTVDM	original-child-absent-await-depth-2	d98efb8606cd1d59d2922e8c25107d7fdb7b5175442903c35ff20b5d5ca4d462
 base/inc/gfx_upd.h	325	325	326	ifdef NTVDM	original-child-absent-await-depth-2	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f
 base/video/video.c	115	115	116	ifdef NTVDM	original-child-absent-await-depth-2	5404a6a9d754955e8a1ce44d115344a4174b47dc833736e41272e6a3429f30c4
 host/src/nt_sbdsp.c	2183	2183	2218	if DESCENT	original-child-absent-await-depth-2	c02e7ee93c11645a5ac65f7c5872e156aa27d2d015a8fb8c2d33fb7f4b341e29
-base/keymouse/mouse_io.c	1229	1229	1230	ifdef NTVDM	original-child-absent-await-depth-2	6dd8badcad4544b1898f18ea307fe02da63e2cc1743649ba331bf292e0aa14c0
-base/system/rom.c	784	784	785	ifdef ARCX86	original-child-absent-await-depth-2	6bfd4f5ce763645a7e75dc409ae5b4674776c4b412f449c6e94b05c8692f23e7
+base/keymouse/mouse_io.c	1229	1229	1230	ifdef NTVDM	original-child-absent-await-depth-2	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/system/rom.c	784	784	785	ifdef ARCX86	original-child-absent-await-depth-2	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872

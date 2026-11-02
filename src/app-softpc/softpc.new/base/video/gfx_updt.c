@@ -192,7 +192,7 @@ a 4-byte boundary. This macro makes this true and reports if it wasn't. */
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 195
+#line 221
 #ifdef PROD
 #define ALIGN_SCREEN_START(start) (start &= ~3L)
 #else
