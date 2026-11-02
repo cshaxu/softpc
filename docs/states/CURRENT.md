@@ -2,12 +2,44 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T99.
-The owner has already authorized automatic admission of S26, so no further
-owner response is required. S25 is closed after sixth-depth delivery and full
-qualification; see its [closure](../history/M9-T99-S25-mirror-depth6.md).
-S26 must audit seventh-depth candidates without processing their children; both
-queues are linked from the S25 final report.
+S25 is closed and pushed at `2bfd64ac`; the owner authorized automatic
+admission of each next depth. S26 is active for depth 7; T99 remains open.
+See [S25 closure](../history/M9-T99-S25-mirror-depth6.md) and
+[depth-6 final evidence](../etc/evidence/softpc/m9-t99-s25-depth6-final.md).
+
+## M9 T99 S26 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner-authorized automatic admission following S25 closure and push. |
+| Objective | Audit and reconcile seventh-depth retained mirror conditional arms breadth-first. |
+| Non-goals | Do not process eighth-depth bodies, change guest behavior, public APIs, user media or configuration. |
+| Reference Baseline | S25 closure 2bfd64ac, pinned XP SP1 subset, read-only OpenNT and S25 queues. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
+| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
+| Verification | Verify actual x86/x64 conditions, original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |
+| Expected Markers | Preserve original seventh-depth frames; excluded bodies become one #error and required #line without inner frames. |
+| Asset Needs | Build and publish both EXEs; preserve INI, guest media and snapshots. |
+| Reporting Requirements | Report depth, candidate and disposition totals, production/test diff, verification and depth-8 queue. |
+| Stop Conditions | Do not equate unobserved code with excluded code; preserve approved local fixes in selected arms; do not process deeper bodies. |
+| Exit Criteria | Deliver excluded seventh-depth phase with build, publish, tests, commit and push; then audit retained arms, enqueue direct eighth-depth children and complete final verification, delivery and closure. |
+| Original Owner Request | 每层独立 S；先交付本层排除分支，再审计保留分支并排队下一层；每 S 编译、测试、发布、提交、推送、收口后自动准入下一层。 |
+| Similar-Issue Sweep | Account for current-code and pinned-XP direct-child queues and local condition extensions. |
+
+The starting queues contain six current seventh-depth arms and six XP
+direct-child candidates, corresponding entry by entry; counts overlap and
+are not dispositions. Disposable scratch is `build/t99-s26`, owned by S26,
+with a four-hour total and 30-minute no-progress observation budget. Promote
+concise evidence and retire scratch before closure.
+
+All six queue source hashes match. Six actual translation-unit preprocessing
+contexts (three per architecture) show three selected arms on both widths;
+the other three already have single-error bodies. No seventh-depth production
+change is needed for the exclusion batch. The required dual build, published
+asset checks and full qualification passed: all 194 tests per architecture.
+Selected-frame audit and the eighth-depth queue follow exclusion delivery.
 
 ## Technical Baseline
 
