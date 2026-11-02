@@ -109,4 +109,7 @@ void StopDspTransfer(IBOOL reset);
 #else
 /* T93: unused native debug macros are omitted from the selected subset. */
 #endif // DBG
-#line 330
+#line 337
+#if REPORT_SB_MODE
+#error "Unsupported SoftPC mirror configuration: NTVDM sound mode diagnostics"
+#endif

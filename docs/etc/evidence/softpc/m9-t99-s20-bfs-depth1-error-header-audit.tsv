@@ -262,4 +262,4 @@ base/inc/egaports.h	76	else		26	26	26	26	f44521f22fa1cb5143cdbe53e96ceda172b38f4
 base/inc/gendrvr.h	21	if	defined (GEN_DRVR) || defined (CDROM)	1	1	1	1	18ee9e6013b982b6cc3e8932efbfe3f1bde039471f2b0046bf7444f833b6a35a	not-selected-in-all-recorded-contexts
 base/inc/ica.h	71	if	defined (NOVELL) || defined (NOVELL_IPX)	32	32	32	32	399fb51757105d5bb7a87f898f710126677464ab8b537feef6bf3952d706ff5e	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	758	if	defined(HOST_MOUSE) || defined(NTVDM)	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
-host/inc/nt_sb.h	107	if	DBG	16	16	16	16	05cf866fddc5a87b6612f99c2807d16929f6c2abeeb1d53ae607ec0e1f74de12	not-selected-in-all-recorded-contexts
+host/inc/nt_sb.h	107	if	DBG	16	16	16	16	8205351b5e259673f0386280d3eb5d0f5faba7f077fddf83db8811b9c76148ec	not-selected-in-all-recorded-contexts

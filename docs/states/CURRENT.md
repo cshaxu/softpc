@@ -1086,6 +1086,21 @@ separately recorded. Four stale parent hashes were revalidated against the
 original and current parent anchors and refreshed. The queue is provisional
 until the 12 selected/adapted original-frame candidates and the OpenNT/XP
 cross-version alignment questions are reviewed.
+Retained-arm review found three additionally omitted first-depth
+`REPORT_SB_MODE` frames in the T93 sound subset. The XP header defines this
+only for native diagnostics; that definition and implementation are outside
+the current subset. Actual preprocessing observes the condition unselected
+in all 32 x86/x64 header dependency contexts. Restoring the three original
+frames with `#error` preserves all 32 header and six MIDI source `-E -P`
+outputs. Six injected `REPORT_SB_MODE=1` source contexts reach all three
+errors. Diagnostic `#line` mappings preserve both the XP directive locations
+and the existing local MIDI source location. Both cached builds passed;
+x86 and x64 each passed 186 non-native tests and eight serial native tests.
+Final EXE SHA-256: x86 `177f6ac9038e54c18eb8af9bdd455bb38583e9b28565d00a696a01584f1492a4`;
+x64 `23282ef325d191f2bd3e8b660e1145026f3cbadfd607a5ee5e776b91dcb24ae5`.
+The first build was superseded by a final dual build after removing a redundant
+line directive. Delivery is pending; the depth-2 queue remains provisional
+until original first-depth candidates are fully reconciled.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86

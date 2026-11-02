@@ -2,6 +2,11 @@
 #include "host_def.h"
 #include "sndblst.h"
 #include "nt_sb.h"
+#line 7
+#if REPORT_SB_MODE
+#error "Unsupported SoftPC mirror configuration: NTVDM sound mode diagnostics"
+#endif
+#line 5
 #include "compat/sb_midi.h"
 #include "compat/devices/snapshot.h"
 
@@ -341,3 +346,8 @@ lib_status BufferMidi(IU8 data)
     if (!BytesLeft) return SendMidiRequest();
     return LIB_STATUS_OK;
 }
+
+#line 863
+#if REPORT_SB_MODE
+#error "Unsupported SoftPC mirror configuration: NTVDM sound mode diagnostics"
+#endif

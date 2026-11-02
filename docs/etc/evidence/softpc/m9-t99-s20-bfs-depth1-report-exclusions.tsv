@@ -1,0 +1,4 @@
+path	xp_line	current_line	condition	evidence	file_sha256
+host/inc/nt_sb.h	337	113	REPORT_SB_MODE	32 header contexts unselected; 32 draft header outputs identical; six forced negative probes	8205351b5e259673f0386280d3eb5d0f5faba7f077fddf83db8811b9c76148ec
+host/src/nt_sbmid.c	7	6	REPORT_SB_MODE	six draft source outputs identical; six forced negative probes	79d1acb59e1122b9d5805017e6d3dc2549340af81d0c0e977a105492b23f0ce1
+host/src/nt_sbmid.c	863	351	REPORT_SB_MODE	six draft source outputs identical; six forced negative probes	79d1acb59e1122b9d5805017e6d3dc2549340af81d0c0e977a105492b23f0ce1
