@@ -35,7 +35,7 @@ four-hour total and 30-minute no-progress observation budget. Promote concise
 evidence and retire scratch before closure.
 
 All 14 current queue hashes match. Probing the eight actual source contexts
-found eight selected arms on both architectures and six excluded arms, each
+found seven selected arms on both architectures and seven excluded arms, each
 a single error after the one new `EGA_DUMP || EGA_STAT` exclusion in
 `ega_writ.c`. Its selected sibling confirms the enclosing parent is reached;
 forcing each macro produced the intended error on both architectures. Both
@@ -44,6 +44,14 @@ qualification passed: 186 non-native and eight serial native tests per
 architecture, no skips. Retained arms and the seventh-depth queue are not
 yet audited; exclusion delivery is ready for commit. [Accounting](../etc/evidence/softpc/m9-t99-s25-depth6-excluded-accounting.tsv)
 records the initial arms.
+
+Exclusion delivery `3e7d69fd` is pushed. The seven selected parents all
+match their corresponding XP direct-child records; no selected sixth-depth
+frame is missing. Their direct seventh-depth queues have six current arms
+and six overlapping XP candidates. No production source changed after the
+fully qualified exclusion delivery; the existing dual-build and 194-test
+per-architecture evidence remains applicable. Final documentation review,
+delivery and closure remain.
 
 ## Technical Baseline
 

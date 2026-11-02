@@ -1,0 +1,7 @@
+path	current_parent_line	xp_parent_line	xp_child_line	directive	expression	status
+base/video/cga.c	1194	1416	1417	if	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	pending-depth7-xp-direct-child
+base/video/cga.c	1194	1416	1419	else		pending-depth7-xp-direct-child
+base/video/ega_writ.c	210	487	488	ifdef	EGATEST	pending-depth7-xp-direct-child
+base/video/ega_writ.c	210	487	490	else		pending-depth7-xp-direct-child
+base/video/gfx_updt.c	3904	3841	3842	ifndef	CPU_40_STYLE	pending-depth7-xp-direct-child
+base/video/gfx_updt.c	3904	3841	3847	else		pending-depth7-xp-direct-child

@@ -1,0 +1,7 @@
+path	parent_line	parent_directive	child_line	child_directive	child_expression	source_sha256	status
+base/video/cga.c	1194	else	1196	if	!defined(EGG) && !defined(C_VID) && !defined(A_VID)	2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b	selected-parent-pending-depth7
+base/video/cga.c	1194	else	1198	else		2747d86a5e3fd24ad2a21c85f9461b830aa2331975b81ce402dc8b1316d1b22b	selected-parent-pending-depth7
+base/video/ega_writ.c	210	else	212	ifdef	EGATEST	de47208692825bb5c12da14546d36d10aeba3c1fb7b18e440047795ecee51be2	selected-parent-pending-depth7
+base/video/ega_writ.c	210	else	214	else		de47208692825bb5c12da14546d36d10aeba3c1fb7b18e440047795ecee51be2	selected-parent-pending-depth7
+base/video/gfx_updt.c	3904	else	3906	ifndef	CPU_40_STYLE	9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth7
+base/video/gfx_updt.c	3904	else	3908	else		9f899b5ddd09a653401be7abefd1e6464ba95f9f31c6eeffbf0332bac19e2604	selected-parent-pending-depth7
