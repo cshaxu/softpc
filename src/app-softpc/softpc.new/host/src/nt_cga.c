@@ -100,7 +100,7 @@ static unsigned int cga_med_graph_lo_nyb[256];
 #if (defined(JAPAN) || defined(KOREA)) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // (JAPAN || KOREA) && i386
-#line 138
+#line 134
 
 
 
@@ -645,7 +645,7 @@ void nt_cga_colour_hi_graph_huge(int offset, int screen_x, int screen_y,
 #ifdef BIGWIN
 #error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
-#line 969
+#line 1079
 }
 
 #ifdef MONITOR

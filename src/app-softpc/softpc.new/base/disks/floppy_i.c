@@ -179,7 +179,7 @@ void diskette_io()
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 356
+#line 623
 }
 
 

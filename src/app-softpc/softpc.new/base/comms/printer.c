@@ -779,7 +779,7 @@ void printer_init IFN1(int,adapter)
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 704
+#line 1063
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

@@ -1615,7 +1615,7 @@ GLOBAL VOID fdisk_outw IFN2(io_addr, port, USHORT, value)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 1645
+#line 1646
 		switch (port)
 	{
 	case TFBASE:

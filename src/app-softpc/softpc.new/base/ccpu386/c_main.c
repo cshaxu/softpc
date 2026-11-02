@@ -217,7 +217,7 @@ typedef union
 #else /* BIGEND */
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif /* LITTLEND */
-#line 223
+#line 204
 
 /* CPU hardware interrupt definitions */
 #define CPU_HW_INT_MASK         (1 << 0)
@@ -532,7 +532,7 @@ IMPORT VOID dispatch_q_event();
 #else	/* SFELLOW */
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif	/* SFELLOW */
-#line 598
+#line 537
 
 #ifdef SFELLOW
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
@@ -4174,7 +4174,7 @@ TYPEFF_3:
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
-#line 4443
+#line 4332
    quick_mode = FALSE;
 
    /* Action RESET first. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
@@ -4294,7 +4294,7 @@ TYPEFF_3:
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif /* PIG */
-#line 4618
+#line 4487
 
 NEXT_INST:
 

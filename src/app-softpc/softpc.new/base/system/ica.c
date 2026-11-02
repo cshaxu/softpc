@@ -616,19 +616,19 @@ ica_interrupt_cpu IFN2(IU32, adapter, IU32, line)
 #ifndef CPU_40_STYLE	/* No globals in the 4.0 I/F! */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 602
+#line 695
 
         host_set_hw_int();
 
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif
-#line 608
+#line 701
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 609
+#line 706
 
     }
     else
@@ -798,7 +798,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 785
+#line 886
 	return;
     }
 
@@ -992,7 +992,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 981
+#line 1093
         if (!(port & 1))        /* Should be odd address, so check      */
 #endif   //NEC_98
 #line 982
@@ -1024,7 +1024,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 1011
+#line 1127
         if (!(port & 1))        /* Should be odd address, so check      */
 #endif   //NEC_98
 #line 1012
@@ -1053,7 +1053,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 1038
+#line 1158
         if (!(port & 1))        /* Should be odd address, so check      */
 #endif   //NEC_98
 #line 1039
@@ -1376,7 +1376,7 @@ ica_intack IFN1(IU32 *, hook_address)
 #if defined (NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1399
+#line 1550
 #ifdef HOOKED_IRETS
     /* check whether IRET Hook required for interrupt on this line.
      * If IRET trapping mechanism is via bops on stack then this may

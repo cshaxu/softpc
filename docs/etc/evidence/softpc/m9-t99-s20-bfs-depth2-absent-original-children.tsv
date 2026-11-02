@@ -1,10 +1,10 @@
 path	xp_parent_line	xp_selected_arm_line	xp_child_line	xp_child_directive	status	local_sha256
-base/comms/com.c	731	741	742	ifndef NTVDM	original-child-absent-await-depth-2	8b01295d257fc30710c15a4ea0d79fa1d4a54769d31c4b029ae1fd525e1f6702
-base/system/ica.c	2054	2059	2063	ifdef NTVDM	original-child-absent-await-depth-2	495c49d1730885a7687df384ebcf86edd3fcf9bd1098e047671aab523948e2b6
-base/support/time_day.c	988	988	989	ifdef NTVDM	original-child-absent-await-depth-2	53e52ddabd7b50a9d2c9b22e491280de52400a4e7fa6004689de3086b60acd22
-base/video/gfx_updt.c	5969	5969	5970	ifdef NTVDM	original-child-absent-await-depth-2	d98efb8606cd1d59d2922e8c25107d7fdb7b5175442903c35ff20b5d5ca4d462
+base/comms/com.c	731	741	742	ifndef NTVDM	original-child-absent-await-depth-2	487e17ca513b0f38a8cb937178c05b708b438dee9353e32659f5525d5a605099
+base/system/ica.c	2054	2059	2063	ifdef NTVDM	original-child-absent-await-depth-2	2f5ce4ccdf42c6bafda22de8b5a20f86210cc8b056df6df90479eebb96865479
+base/support/time_day.c	988	988	989	ifdef NTVDM	original-child-absent-await-depth-2	bd150e74597cfa796c263a8052ffbf60bf6fbe492190ffc15d46c09b45753d5d
+base/video/gfx_updt.c	5969	5969	5970	ifdef NTVDM	original-child-absent-await-depth-2	d9588aeddd405063d242529b4aea2c012c935106e8ac55b99f23d697d24c927b
 base/inc/gfx_upd.h	325	325	326	ifdef NTVDM	original-child-absent-await-depth-2	4c77bfc150474f83402e7c7e835512eb99012d1a98352ebd07d6a89622253b6f
-base/video/video.c	115	115	116	ifdef NTVDM	original-child-absent-await-depth-2	5404a6a9d754955e8a1ce44d115344a4174b47dc833736e41272e6a3429f30c4
+base/video/video.c	115	115	116	ifdef NTVDM	original-child-absent-await-depth-2	fddbb79dce02058c5e1dfa8f814140cf9437cb6c73547526841a5de7ef7f8046
 host/src/nt_sbdsp.c	2183	2183	2218	if DESCENT	original-child-absent-await-depth-2	c02e7ee93c11645a5ac65f7c5872e156aa27d2d015a8fb8c2d33fb7f4b341e29
-base/keymouse/mouse_io.c	1229	1229	1230	ifdef NTVDM	original-child-absent-await-depth-2	398b05ecd37759a768c130a70f7710b19e35fe9958db19ecf9279c23b57ff5e6
+base/keymouse/mouse_io.c	1229	1229	1230	ifdef NTVDM	original-child-absent-await-depth-2	57531812bc1ccdf7be8280122393cfee46c2544f6ee87cff979a57184456963d
 base/system/rom.c	784	784	785	ifdef ARCX86	original-child-absent-await-depth-2	77c1b192eafe5b715f3e97d08f8cb98b2ec44bbcb33d88740247191e82ccd872

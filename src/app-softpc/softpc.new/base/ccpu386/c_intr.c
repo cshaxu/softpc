@@ -250,7 +250,7 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else
-#line 261
+#line 257
 	 flags |= BIT16_MASK;   /* SET RF bit */
 #endif
       }
@@ -321,7 +321,7 @@ IFN4(
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #else
-#line 333
+#line 329
 	    flags |= BIT16_MASK;   /* SET RF bit */
 #endif
          }

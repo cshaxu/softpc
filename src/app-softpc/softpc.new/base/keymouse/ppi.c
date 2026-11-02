@@ -181,7 +181,7 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 #else
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 180
+#line 183
 }
 
 #ifdef SEGMENTATION

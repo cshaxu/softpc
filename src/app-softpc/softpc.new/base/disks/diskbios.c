@@ -376,7 +376,7 @@ LOCAL void hd_reset IFN2(int, drive, int, diag)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif				/* nPROD */
-#line 546
+#line 731
 
 
 /********************************************************/

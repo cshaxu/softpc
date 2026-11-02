@@ -41,7 +41,7 @@
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 45
+#line 52
 
 /*
  *

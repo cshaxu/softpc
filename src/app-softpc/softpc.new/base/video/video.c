@@ -340,7 +340,7 @@ LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, co
 #elif defined(KOREA) // JAPAN
 #error "Unsupported SoftPC mirror configuration: KOREA"
 #endif // KOREA
-#line 670
+#line 509
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // JAPAN || KOREA

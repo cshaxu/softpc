@@ -3,7 +3,7 @@
 #ifdef SECURE
 #error "Unsupported SoftPC mirror configuration: SECURE"
 #endif
-#line 7
+#line 6
 /*
  * VPC-XT Revision 1.0
  *

@@ -88,7 +88,7 @@ static half_word *cmos_register = &cmos[CMOS_SHUT_DOWN];
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 119
+#line 121
 
 #ifdef TEST_HARNESS
 #error "Unsupported SoftPC mirror configuration: TEST_HARNESS"

@@ -2396,7 +2396,7 @@ the application OUTBs the necessary data.
 #else
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif    //NEC_98
-#line 2390
+#line 2304
 }
 
 #if defined(NTVDM) && defined(MONITOR)
@@ -2885,7 +2885,7 @@ LOCAL void mouse_reset IFN4(word *,installed_ptr,word *,nbuttons_ptr,word *,junk
 #if defined(MONITOR) && defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 2843
+#line 2879
 
         /*
          *      Get current video mode, and update parameters that are
@@ -3737,7 +3737,7 @@ LOCAL void mouse_save_state IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 3667
+#line 3780
         UNUSED(m1);
         UNUSED(m2);
         UNUSED(m3);
@@ -4319,7 +4319,7 @@ LOCAL void mouse_get_max_coords IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 4185
+#line 4357
 
         UNUSED(m1);
 

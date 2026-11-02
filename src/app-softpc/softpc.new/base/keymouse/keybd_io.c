@@ -145,7 +145,7 @@ static sys_addr alt_table;
 #if defined(NTVDM) && defined(LOCAL)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 146
+#line 153
 
 #ifndef GISP_SVGA
 LOCAL word int15_seg = RCPU_INT15_SEGMENT,
@@ -1340,7 +1340,7 @@ void kb_idle_poll()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1287
+#line 1576
 void keyboard_io()
 {
     /*

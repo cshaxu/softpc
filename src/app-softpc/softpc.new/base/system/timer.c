@@ -466,7 +466,7 @@ LOCAL ULONG     adj_n_real_mode_ticks_before_full_speed = 0;/* The value which r
 #ifndef PROD    /* Specific Timer change tracing that isn't timer_verbose */
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 423
+#line 489
 
 #if !defined(NTVDM)
 #line 491
@@ -618,7 +618,7 @@ void SWTMR_gate IFN2(io_addr, port, half_word, value)
 #ifdef  NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 542
+#line 633
     timelock = LOCKED;
 #endif
 #line 635
@@ -632,7 +632,7 @@ void SWTMR_gate IFN2(io_addr, port, half_word, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 553
+#line 648
     checktimelock();
 #endif
 #line 554
@@ -644,7 +644,7 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 559
+#line 658
     timelock = LOCKED;
 #endif
 #line 560
@@ -695,7 +695,7 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 601
+#line 708
     checktimelock();
 #endif
 #line 602
@@ -1813,7 +1813,7 @@ LOCAL void updateCounter IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1643
+#line 1883
                 nticks = clocksSinceCounterActivated(&now);
                 updateCount(nticks, &wrap,&now);
 #endif
@@ -1848,7 +1848,7 @@ LOCAL void updateCounter IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1665
+#line 1913
                 nticks = clocksSinceCounterActivated(&now);
                 updateCount(nticks, &wrap,&now);
 #endif
@@ -2016,7 +2016,7 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif
-#line 1830
+#line 2247
 
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
@@ -2413,12 +2413,12 @@ void    axe_ticks IFN1(int, ticks)
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 2255
+#line 2838
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 2256
+#line 2855
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else

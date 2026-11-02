@@ -302,7 +302,7 @@ half_word target_AR;
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 283
+#line 428
 	default:
 		/*
 		 *	All other functions invalid.

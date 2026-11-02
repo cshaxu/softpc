@@ -142,16 +142,16 @@ base/inc/mouse_io.h	976	ifdef	HERC	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678
 base/inc/mouse_io.h	1081	ifdef	MOUSE_16_BIT	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 base/inc/mouse_io.h	1109	ifdef	HERC	3	3	3	3	e61916b19d3ce2074bbaacbc107b4d055d678c6ec3b481cbbc80425e5f3e0f58	not-selected-in-all-recorded-contexts
 base/inc/ppi.h	29	ifdef	ANSI	4	4	4	4	582e955790cdf0320956c271b5849f2c2efd8613a3774a58a1aa90957b98aa26	not-selected-in-all-recorded-contexts
-base/inc/sas.h	283	ifdef	BACK_M	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	320	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	333	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	348	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	369	else		57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	389	if	defined(NTVDM) && !defined(X86GFX)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	460	else		57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	731	else		57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	781	ifdef	BACK_M	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
-base/inc/sas.h	804	if	defined(NEC_98)	57	57	57	57	3293be30fbfccbbf6293c9e481a8a3748cf396eef66570fb97229fe62b5af146	not-selected-in-all-recorded-contexts
+base/inc/sas.h	283	ifdef	BACK_M	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	320	if	defined(NEC_98)	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	333	if	defined(NEC_98)	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	348	if	defined(NEC_98)	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	369	else		57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	389	if	defined(NTVDM) && !defined(X86GFX)	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	460	else		57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	731	else		57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	781	ifdef	BACK_M	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
+base/inc/sas.h	804	if	defined(NEC_98)	57	57	57	57	554f26f5afbb3a2184b80e3314dcff0ccc94312f44827702e333102f76f4c044	not-selected-in-all-recorded-contexts
 base/inc/tape_io.h	35	ifdef	JAPAN	5	5	5	5	bcc3bbb1b9a55f6515fd1679aa5b9452dc8235a71b444b0d059ecd3b03687c76	not-selected-in-all-recorded-contexts
 base/inc/timer.h	77	ifdef	NTVDM	29	29	29	29	ce5afc91ba27d2c7fe395a587795d2086ff2a4158f9e97fadf1bf3af103b03b4	not-selected-in-all-recorded-contexts
 base/inc/timer.h	91	ifdef	SWIN_MOUSE_OPTS	29	29	29	29	ce5afc91ba27d2c7fe395a587795d2086ff2a4158f9e97fadf1bf3af103b03b4	not-selected-in-all-recorded-contexts
@@ -182,17 +182,17 @@ base/inc/egacpu.h	131	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab
 base/inc/egacpu.h	158	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
 base/inc/egacpu.h	166	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
 base/inc/egacpu.h	286	if	defined(NEC_98)	25	25	25	25	f58cf195ed3806ed0825180aeab62e545d48495f12f63abeea9db2307901b7ab	not-selected-in-all-recorded-contexts
-base/inc/ios.h	31	ifdef	NTVDM	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	35	if	defined(NEC_98)	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	405	if	defined(NEC_98)	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	443	ifdef	ANSI	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	449	ifdef	SFELLOW	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	456	ifdef	ANSI	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	464	ifdef	ANSI	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	470	ifdef	SFELLOW	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	477	ifdef	ANSI	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	483	ifdef	NTVDM	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
-base/inc/ios.h	496	ifdef	MAC68K	55	55	55	55	b504bba0bc49ab4e1ab64eddde82cdae158709416a7de653de3eb50bfdb23a97	not-selected-in-all-recorded-contexts
+base/inc/ios.h	31	ifdef	NTVDM	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	35	if	defined(NEC_98)	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	405	if	defined(NEC_98)	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	443	ifdef	ANSI	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	449	ifdef	SFELLOW	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	456	ifdef	ANSI	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	464	ifdef	ANSI	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	470	ifdef	SFELLOW	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	477	ifdef	ANSI	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	483	ifdef	NTVDM	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
+base/inc/ios.h	496	ifdef	MAC68K	55	55	55	55	549c4b2e199191391eb898581d5fab2589541df4c5e90ea954486f785ed43f44	not-selected-in-all-recorded-contexts
 base/inc/bios.h	185	ifdef	PTY	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957cf22c300ed1335f351a9b04afe20c15	not-selected-in-all-recorded-contexts
 base/inc/bios.h	190	ifdef	GEN_DRVR	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957cf22c300ed1335f351a9b04afe20c15	not-selected-in-all-recorded-contexts
 base/inc/bios.h	201	ifdef	SUSPEND	35	35	35	35	eb5c6aa11db72284cde18f2dee10a0957cf22c300ed1335f351a9b04afe20c15	not-selected-in-all-recorded-contexts

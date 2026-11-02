@@ -115,6 +115,6 @@ void time_strobe()
 #ifdef	EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 117
+#line 121
 }
 

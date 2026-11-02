@@ -105,12 +105,12 @@ HOSTMOUSEFUNCS  *working_mouse_funcs;
 #ifdef NPX
 #error "Unsupported SoftPC mirror configuration: NPX"
 #endif  /* NPX */
-#line 105
+#line 107
 
 #ifdef DPMI
 #error "Unsupported SoftPC mirror configuration: DPMI"
 #endif /* DPMI */
-#line 109
+#line 111
 
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
@@ -712,7 +712,7 @@ void reset()
 #ifdef IPC
 #error "Unsupported SoftPC mirror configuration: IPC"
 #endif /* IPC */
-#line 808
+#line 994
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -803,7 +803,7 @@ void reset()
 #ifdef SWIN_SNDBLST_NULL
 #error "Unsupported SoftPC mirror configuration: SWIN_SNDBLST_NULL"
 #endif /* SWIN_SNDBLST_NULL */
-#line 884
+#line 1093
 
 #ifndef NEC_98
 #ifndef NTVDM   /* No signon for NTVDM - transparent integration */
@@ -953,7 +953,7 @@ void reset()
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 1024
+#line 1247
 
 #ifdef LIM
 #error "Unsupported SoftPC mirror configuration: LIM"

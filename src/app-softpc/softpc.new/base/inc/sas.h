@@ -283,7 +283,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 290
+#line 305
 
 #ifndef HERC_REGEN_BUFF
 #define CGA_REGEN_BUFF	0xB8000L
@@ -781,7 +781,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else /* BACK_M */
-#line 1040
+#line 1072
 
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"

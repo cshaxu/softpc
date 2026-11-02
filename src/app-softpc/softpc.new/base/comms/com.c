@@ -58,7 +58,7 @@
 #ifdef GISP_CPU
 #error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif /* GISP_CPU */
-#line 59
+#line 61
 
 #ifndef NEC_98
 #line 63
@@ -1209,7 +1209,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* of ifdef IRET_HOOKS */
-#line 1408
+#line 2052
 
 /*
  * =====================================================================
@@ -1613,7 +1613,7 @@ static int no_valid_latches =
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
-#line 1758
+#line 2773
 static void set_baud_rate IFN1(int, adapter)
 {
 	/*
@@ -2331,12 +2331,12 @@ void com_close IFN1(int, adapter)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 2382
+#line 3954
 
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 2419
+#line 3991
 
 
 

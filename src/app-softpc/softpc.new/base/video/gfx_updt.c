@@ -135,7 +135,7 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 132
+#line 146
 #ifdef VGG
 #if	defined(PROD) || (!defined(EGG))
 #define	add_dirty_rec(line,st,len,off,fr)	{	dirty[dirty_next].line_no = (line); \

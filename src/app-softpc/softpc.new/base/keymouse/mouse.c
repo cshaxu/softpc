@@ -487,7 +487,7 @@ void mouse_init IFN0()
 #ifdef KIPPER
 #error "Unsupported SoftPC mirror configuration: KIPPER"
 #endif
-#line 489
+#line 575
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"

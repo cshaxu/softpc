@@ -1134,8 +1134,20 @@ current-source hashes refreshed. Final x86/x64 builds passed; each width
 passed 186 non-native and eight serial native tests. EXE SHA-256 values are
 x86 `47b0d6e5c658cad1d11aed79b56591da3e72faf55e1f56b22008f5de185f334d`
 and x64 `902c3cc909923a04c241bc6ecd5170d283f7eed4563b375024424e1fc0bda90d`.
-Commit and push of this 52-marker batch remain pending; ambiguous and
-unanchored first-depth cases remain open.
+The 52-marker batch was committed and pushed as `5a9577e6`.
+Continued boundary review used comment-aware matching of the original
+first-depth condition, corresponding `else`/`endif`, and either its
+following selected code or the next direct conditional directive. This
+uniquely anchored 64 further markers in 26 files; all 158 actual affected
+x86/x64 `-E -P` outputs matched before/after. Evidence is in
+`m9-t99-s20-bfs-depth1-line-group-reconciliation.tsv`. This does not cover
+ambiguous and unanchored first-depth cases. Final x86/x64 builds passed;
+each width passed all 186 non-native and eight serial native tests. Final
+EXE SHA-256 values: x86
+`20e520fef8ede23cd2bd7166f6f1929330eb53f3a134f32412834b023661e0b6` and x64
+`021e257daeae6ca6db1716f90131562bf1600638bba9397f60b6ca8c64dae99f`.
+Actual production diff is 64 `#line` replacements only; commit and push of
+this batch remain pending.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86

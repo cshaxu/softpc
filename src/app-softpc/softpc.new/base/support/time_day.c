@@ -46,7 +46,7 @@
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
-#line 44
+#line 50
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
@@ -90,7 +90,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 88
+#line 98
 #ifdef XTSFD
 #error "Unsupported SoftPC mirror configuration: XTSFD"
 #endif

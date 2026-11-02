@@ -1698,7 +1698,7 @@ if (waiting_for_next_code)
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_KBD"
 #endif
-#line 1780
+#line 2335
 	} /* end of switch */
 #ifndef REAL_KBD
 }
@@ -2128,7 +2128,7 @@ return (code);
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif /* HUNTER */
-#line 2219
+#line 2989
 
 /*
 ** Returns number of chars in buffer.
@@ -2371,7 +2371,7 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 #ifdef NTVDM	/* JonLe NTVDM Mod */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else	/* not NTVDM */
-#line 2430
+#line 3161
 
 	{
 		*val=output_contents;
@@ -2569,7 +2569,7 @@ GLOBAL VOID AT_kbd_post IFN0()
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 2637
+#line 3409
 
 #ifndef NTVDM
 #line 3411
