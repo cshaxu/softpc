@@ -1,0 +1,35 @@
+path	opennt_line	xp_location	current_location	disposition	reason
+base/bios/reset.c	781	945-961	668-680	queue-xp-direct-child	XP adds ARCX86 and moves original guard into selected NEC_98 else; child queued without body review.
+base/inc/ios.h	299	562	300	xp-and-current-direct-child	XP moves retained PRINTER guard into selected NEC_98 else; current matching direct child is already in provisional queue.
+base/system/rom.c	19	19	19	xp-unconditional-include	XP makes malloc.h unconditional; preserve pinned XP behavior rather than restore the older OpenNT guard.
+host/src/nt_graph.c	1891	2410	1993	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+host/src/nt_graph.c	1911	2430	2014	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+host/src/nt_vga.c	36	36	36	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/bios/reset.c	117	117	120	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/bios/reset.c	300	462	311	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/bios/reset.c	511	673	386	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/bios/reset.c	1017	1234	943	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/bios/reset.c	1070	1287	969	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/bios/reset.c	1079	1296	980	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/inc/bios.h	203	203	206	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/inc/bios.h	251	251	248	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/inc/ios.h	476	745	443	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/inc/ios.h	541	810	477	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/inc/ios.h	595	864	527	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/keymouse/mouse_io.c	1326	1356	1585	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/keymouse/mouse_io.c	2691	2759	2768	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/keymouse/mouse_io.c	3644	3712	3688	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/system/timer.c	122	125	119	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/system/timer.c	476	484	466	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/system/timer.c	2657	2817	2403	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+base/video/gfx_updt.c	3332	3458	3479	matched-xp-current-root	Unique unchanged context anchors pair the OpenNT, XP and current first-depth directive.
+host/src/nt_graph.c	1965	2497	2073	matched-xp-current-root	Original neighboring declaration or diagnostics disambiguates the repeated condition; XP and current root boundaries match.
+host/src/nt_graph.c	1992	2524	2098	matched-xp-current-root	Original neighboring declaration or diagnostics disambiguates the repeated condition; XP and current root boundaries match.
+base/inc/ios.h	502	771	456	matched-xp-current-root	Original neighboring declaration or diagnostics disambiguates the repeated condition; XP and current root boundaries match.
+base/inc/ios.h	515	784	464	matched-xp-current-root	Original neighboring declaration or diagnostics disambiguates the repeated condition; XP and current root boundaries match.
+base/bios/reset.c	199	360	216	xp-current-direct-child	XP places the original GISP_SVGA condition inside selected NEC_98 else; current direct child already queued.
+base/bios/reset.c	890	1095	809	xp-current-direct-child	XP places NTVDM under the selected NEC_98 condition; current direct child already queued.
+base/keymouse/mouse_io.c	1754	1793	1923	xp-current-direct-child	XP places EGG under selected NEC_98 condition; current direct child already queued.
+base/keymouse/mouse_io.c	1817	1884	1994	xp-current-direct-child	XP places MOUSE_16_BIT under selected NEC_98 condition; current direct child already queued.
+base/keymouse/mouse_io.c	3702	3770	3737	xp-root-excluded	XP uses NTVDM outer condition; current excludes that whole root body, so no nested MONITOR child is queued.
+base/system/rom.c	624	784	595	matched-xp-current-root	XP adds ARCX86 to the original complete expression; the selected XP root exists in current source.

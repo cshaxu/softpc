@@ -9,3 +9,4 @@ host/src/nt_sbdsp.c	2183	2183	2218	if DESCENT	original-child-absent-await-depth-
 base/keymouse/mouse_io.c	1229	1229	1230	ifdef NTVDM	original-child-absent-await-depth-2	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
 base/system/rom.c	784	784	785	ifdef ARCX86	original-child-absent-await-depth-2	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
 base/system/rom.c	320	340	342	if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))	original-child-absent-await-depth-2	149ce9b574847e8979e6dd4cfe17eaa146e92a32590905ff6dd84f111afea28e
+base/bios/reset.c	945	949	950	if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86)	original-child-absent-await-depth-2	cbe6929cc886ebcf7cfb95b75572f1fb3b74148860d8337c0f8c7dfe0daad461

@@ -1188,8 +1188,29 @@ Final x86/x64 builds passed; each width passed 186 non-native and eight serial
 native tests. EXE SHA-256: x86
 `84edd752d8923462df563b2333ed8291dfeedb41c43398d620b50134d8bb90ae` and x64
 `7ec56c5321a8e31bcbb03b6a4a451e15a561ea1687c99ed6e75699665b337b77`.
-Delivery remains pending; the six CCPU TLS extensions, IOS capacity
-adaptation and other cross-version mappings remain open.
+The selected-framework restoration was committed and pushed as `9f9dd90f`.
+The six existing CCPU NTVDM-or-TLS conditions have now been independently
+reviewed: both actual CCPU contexts select TLS at all six points, and
+removing TLS deliberately triggers the four existing unsupported errors.
+The local OR extension retains the original NTVDM predicate and one shared
+implementation; it must not be simplified by considering NTVDM alone.
+For IOS, 108 actual header contexts select 0x10000 entries and two mixer
+contexts select 0x400; the existing original-OR-plus-standalone condition
+preserves both and supports masked 16-bit IO dispatch. These necessary local
+condition extensions are recorded in `m9-t99-s20-bfs-depth1-local-condition-review.tsv`.
+The three OpenNT root expressions without the same XP root signature were
+reviewed: the XP reset guard is a direct child now recorded in the provisional
+absent-child queue, IOS PRINTER is already a queued XP/current child, and XP
+ROM includes malloc.h unconditionally. See `m9-t99-s20-bfs-depth1-opennt-xp-version-review.tsv`.
+The 34 previously unaligned OpenNT root candidates have cross-version review
+records; this does not prove all first-depth frames have been reconciled.
+A direct-child-only XP comparison also records 140 unverified child
+candidates separately from the 1,381 present queued arms and 11 known absent
+children. Candidate matching is provisional, not a claim that every candidate
+is absent; unmatched parent mappings still require review. No depth-2 body
+was processed. See `m9-t99-s20-bfs-depth2-xp-child-candidates.tsv`.
+This audit is documentation/evidence only; cross-version root mappings and
+first-depth completeness remain under review.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86
