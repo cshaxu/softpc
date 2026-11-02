@@ -1,4 +1,4 @@
 path	xp_parent	current_parent	xp_child	current_child	result	source_sha256
 base/system/ica.c	1549	1378	1550	1380	selected parent; direct child already queued	d20f0cec661de4e8d8a28c2b8dcb5a4f9fae64845d19261a0ef29f7545c05063
-base/keymouse/mouse_io.c	3018	3030	3029	3043	selected parent; direct child already queued; selected-body line marker 3018 should be 3019	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
+base/keymouse/mouse_io.c	3018	3030	3029	3043	selected parent; direct child already queued; marker 3018 correctly accounts for added blank line before XP 3019	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
 base/keymouse/mouse_io.c	1126	1351	1139,1153	1366,1380	selected parent; both direct children already queued	936a7dbe4b7971878ddb293b9efbf882c8a7b60724b58d174c9cae37624d4274
