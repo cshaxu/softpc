@@ -2,44 +2,14 @@
 
 ## Current Work
 
-S28 is closed and pushed at `107ed85c`. Its depth-10 direct-child queues are
-empty. The owner authorized automatic continuation of the complete mirror
-audit; S29 performs the necessary cross-depth completeness check. T99 remains
-open. See [S28 closure](../history/M9-T99-S28-mirror-depth9.md).
-
-## M9 T99 S29 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner-authorized continuation of complete mirror conditional audit after S28 closure. |
-| Objective | Independently reconcile cross-depth accounting, preserved original frames, local exceptions and empty terminal queues before claiming whole-mirror completion. |
-| Non-goals | Do not assume an empty queue proves scope coverage; do not alter user media/configuration or introduce behavior. |
-| Reference Baseline | S28 closure 107ed85c, pinned XP SP1 subset, read-only OpenNT and S20-S28 evidence. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Mirror source, provenance and audit records only if verified corrections are needed; no public ABI change. |
-| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
-| Verification | Independently inspect prior candidate inventories and mappings, excluded body structure, selected parents, direct-child continuity and evidence; verify exact scope, build and test any production change. |
-| Expected Markers | Explain any unresolved candidates and account for every selected parent or identify necessary follow-up; do not claim completeness from counts alone. |
-| Asset Needs | Preserve user INI, guest media and snapshots; publish binaries if production changes. |
-| Reporting Requirements | Distinguish proven coverage, identified defects and unresolved or unobserved contexts; report actual diff and qualification. |
-| Stop Conditions | Do not guess unsupported configurations or hide failures; do not silently discard prior unverified candidates. |
-| Exit Criteria | Evidence-backed completion assessment and any authorized necessary corrections committed and pushed; T99 remains open unless owner closes it. |
-| Original Owner Request | 全面逐层整理镜像编译条件，落实 #error 和 #line，按层交付并自动继续。 |
-| Similar-Issue Sweep | Recheck unmatched XP and local-only frames, all retained source file inventory and queue continuity from depth 1 to termination. |
-
-Disposable scratch is `build/t99-s29`, owned by S29, with a four-hour total
-and 30-minute no-progress observation budget. Preserve evidence and retire
-scratch before closure.
-
-Cross-depth review covers all 475 manifest paths, with balanced nesting in
-471 text files and 2,427 direct single-error bodies without additional raw
-content. Per-depth counts match S20–S28 evidence; the S20 140 provisional
-candidates were resolved in S21. The nine local-only parents from S21–S23
-have no current direct children. A 64-context header probe confirms that the
-local `ica.h` CPU branch is selected in four unit-test targets per width,
-correcting an overly broad historical description. The [review](../etc/evidence/softpc/m9-t99-s29-cross-depth-review.md)
-records scope and limits; no source changed and S28 qualification remains.
+No implementation subtask is active. Open task awaiting owner: T99.
+The breadth-first mirror conditional layers through depth 9 are delivered;
+their depth-10 direct-child queues are empty. S29 independently reconciled
+the current structural inventory, prior layer evidence and local frame
+exceptions; see its [closure](../history/M9-T99-S29-mirror-completeness.md)
+and [review](../etc/evidence/softpc/m9-t99-s29-cross-depth-review.md).
+T99 remains open; no unsupported-configuration or unperformed customer
+runtime validation is claimed.
 
 ## Technical Baseline
 
