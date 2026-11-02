@@ -40,6 +40,12 @@ change. Dual builds, asset verification and all 194 tests per architecture
 passed without skips. Exclusion delivery is ready; retained-frame review and
 the tenth-depth queue follow.
 
+Exclusion delivery `778d523b` is pushed. The selected ninth-depth else
+corresponds to XP and contains no further condition in either tree; both
+tenth-depth direct-child queues are empty. No production source changed
+after full qualification. Final documentation delivery and S28 closure
+remain; an empty queue alone is not a whole-mirror completeness audit.
+
 ## Technical Baseline
 
 Latest published binaries are S27's eighth-depth verified build; hashes and
