@@ -69,7 +69,7 @@ base/ccpu386/c_xcptn.c	429	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa382845
 base/ccpu386/c_xcptn.c	557	ifdef	NTVDM	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
 base/ccpu386/c_xcptn.c	568	ifdef	PIG	1	1	cfc63cb0a037138dae8f15156d8696efa38284596ef7f53694a4707b9ba2cd19	not-selected-in-all-recorded-contexts
 base/ccpu386/c_xfer.c	143	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	4e45d3d9631f96393b7705e5772c7afe62dbeded4d7c3015e8177b592a0b2880	not-selected-in-all-recorded-contexts
-base/ccpu386/c_xtrn.c	22	if	0	1	1	cf25e07bceea7e7015fb31c93541a79228de4a97d4c0bb0ebb8322b344ddfc97	not-selected-in-all-recorded-contexts
+base/ccpu386/c_xtrn.c	22	if	0	1	1	6f327c5f1338167326b0322f62d8e02dfb7efeb3ae71db82a3d351d10a8007b5	not-selected-in-all-recorded-contexts
 base/ccpu386/call.c	42	ifdef	ANSI	1	1	ec7d9e40ce33603f841fb5bfba06eb2f7120c66972fb64bf93f77e090d5412ab	not-selected-in-all-recorded-contexts
 base/ccpu386/call.c	87	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	ec7d9e40ce33603f841fb5bfba06eb2f7120c66972fb64bf93f77e090d5412ab	not-selected-in-all-recorded-contexts
 base/ccpu386/call.c	250	ifdef	TAKE_REAL_MODE_LIMIT_FAULT	1	1	ec7d9e40ce33603f841fb5bfba06eb2f7120c66972fb64bf93f77e090d5412ab	not-selected-in-all-recorded-contexts

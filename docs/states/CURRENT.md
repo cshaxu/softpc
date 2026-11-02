@@ -1226,6 +1226,13 @@ boundary-verified mappings. Their direct children are accounted for as 274
 present in the depth-2 queue, eight known absent, and 33 provisional
 candidates. These categories do not verify any child body. Evidence:
 `m9-t99-s20-opennt-roots-nested-in-xp.tsv`.
+A fresh current-tree classification cross-check accounts for all 2,208 root
+arms: 984 selected, 22 include guards, 935 source-probed exclusions, 264
+header-probed exclusions and three independently probed REPORT_SB_MODE
+exclusions. The sole stale source-probe hash was revalidated: `c_xtrn.c`
+retains `#if 0`, and the later edit only replaced its excluded body and
+restored `#line 25`; its current hash is now recorded. This classification
+check does not by itself establish completeness of the original XP structures.
 This audit is documentation/evidence only; cross-version root mappings and
 first-depth completeness remain under review.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
