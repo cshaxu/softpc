@@ -6,6 +6,12 @@ T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与�
 [T92 子集及本地补丁记录](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)。
 以下历史数字和语义说明不回写成新的 XP 统计。
 
+### T99 S24 第五层排除分支
+
+`base/video/ega_read.c` 的 `EGA_DUMP || EGA_STAT` 调试分支在当前
+双架构编译上下文中不选中，其体替换为 `#error`，保留原条件及
+OpenNT 行号边界；这是镜像条件治理，不改变选中路径。
+
 ### T99 S21 条件框架恢复
 
 `host/inc/host_inc.h` 原 XP 子集直接保留非 NTVDM 的系统头，S21 恢复

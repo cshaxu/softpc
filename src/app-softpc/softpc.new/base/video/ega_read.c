@@ -714,8 +714,9 @@ ega_read_init IFN0()
 	ega_read_routines_update();			/* initialise M */
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
-	dump_read_pointers_init();
+#error "Unsupported SoftPC mirror configuration: EGA_DUMP or EGA_STAT"
 #endif
+#line 952
 
 #if !defined(EGATEST) && !defined(A3CPU)
 	read_pointers = Glue_reads;

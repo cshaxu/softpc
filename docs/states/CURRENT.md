@@ -2,12 +2,52 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T99.
-The owner has already authorized automatic admission of S24, so no further
-owner response is required. S23 is closed after fourth-depth delivery and full
-qualification; see its [closure](../history/M9-T99-S23-mirror-depth4.md).
-S24 must audit fifth-depth candidates without processing their children; both
-queues are linked from the S23 final report.
+S23 is closed and pushed at `5b7a5bee`; the owner authorized automatic
+admission of each next depth. S24 is active for depth 5; T99 remains open.
+See [S23 closure](../history/M9-T99-S23-mirror-depth4.md) and
+[depth-4 final evidence](../etc/evidence/softpc/m9-t99-s23-depth4-final.md).
+
+## M9 T99 S24 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner-authorized automatic admission following S23 closure and push. |
+| Objective | Audit and reconcile fifth-depth retained mirror conditional arms breadth-first. |
+| Non-goals | Do not process sixth-depth bodies, change guest behavior, public APIs, user media or configuration. |
+| Reference Baseline | S23 closure 5b7a5bee, pinned XP SP1 subset, read-only OpenNT and S23 queues. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
+| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
+| Verification | Verify actual x86/x64 conditions, original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |
+| Expected Markers | Preserve original fifth-depth frames; excluded bodies become one #error and required #line without inner frames. |
+| Asset Needs | Build and publish both EXEs; preserve INI, guest media and snapshots. |
+| Reporting Requirements | Report depth, candidate and disposition totals, production/test diff, verification and depth-6 queue. |
+| Stop Conditions | Do not equate unobserved code with excluded code; preserve approved local fixes in selected arms; do not process deeper bodies. |
+| Exit Criteria | Deliver excluded fifth-depth phase with build, publish, tests, commit and push; then audit retained arms, enqueue direct sixth-depth children and complete final verification, delivery and closure. |
+| Original Owner Request | 每层独立 S；先交付本层排除分支，再审计保留分支并排队下一层；每 S 编译、测试、发布、提交、推送、收口后自动准入下一层。 |
+| Similar-Issue Sweep | Account for current-code and pinned-XP direct-child queues, overlap and local condition extensions. |
+
+The starting queues contain 94 current fifth-depth arms and 97 XP direct-child
+candidates; counts overlap and are not dispositions. One local selected frame
+has no one-to-one XP guard and requires scope review. Disposable scratch is
+`build/t99-s24`, owned by S24, with a four-hour total and 30-minute no-progress
+observation budget. Promote concise evidence and retire scratch before closure.
+
+Fifth-depth source hash verification passed. Preprocessing 24 actual source
+contexts and 110 actual header contexts across both architectures observed 54
+selected arms. The remaining 40 arms are structurally single-error bodies;
+one was newly converted: the `EGA_DUMP || EGA_STAT` branch in `ega_read.c`.
+Its sibling established that the parent is reached on both architectures,
+and forced definitions of each macro reached the intended error on both.
+Six XP direct-child candidates have no corresponding current directive and
+require retained-frame review after excluded delivery. Dual builds and mirror
+and documentation gates passed. Each architecture passed 186 non-native
+and eight serial native tests. The [exclusion report](../etc/evidence/softpc/m9-t99-s24-depth5-excluded.md)
+records binaries and guard checks; exclusion delivery is ready for commit.
+
+[Current-arm accounting](../etc/evidence/softpc/m9-t99-s24-depth5-excluded-accounting.tsv)
+records the 94 starting arms; it does not dispose the XP candidate queue.
 
 ## Technical Baseline
 
