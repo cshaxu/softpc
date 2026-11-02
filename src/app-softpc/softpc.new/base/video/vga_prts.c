@@ -1902,6 +1902,9 @@ MODE new_mode;
 
 GLOBAL VOID	vga_gc_outb_index IFN2(io_addr,port,half_word,value)
 {
+#line 1952
+#ifndef NEC_98
+#line 1953
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -1912,6 +1915,8 @@ GLOBAL VOID	vga_gc_outb_index IFN2(io_addr,port,half_word,value)
 
 	io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_regs[value]);
 	Cpu_define_outb(EGA_GC_ADAP_DATA,ega_gc_regs_cpu[value]);
+#endif  //NEC_98
+#line 1964
 }
 
 
@@ -2829,21 +2834,31 @@ MISC_OUTPUT_REG new;
 
 GLOBAL VOID	vga_misc_inb IFN2(io_addr,port,half_word *, value)
 {
+#line 2959
+#ifndef NEC_98
+#line 2960
 #ifdef PROD
 	UNUSED(port);
 #endif
 	assert1(port==VGA_MISC_READ_REG,"Bad port %x",port);
 	*value = (half_word)miscellaneous_output_register.as.abyte;
+#endif  //NEC_98
+#line 2966
 }
 
 GLOBAL VOID	vga_ipstat0_inb IFN2(io_addr,port,half_word *, value)
 {
+#line 2970
+#ifndef NEC_98
+#line 2971
 #ifdef PROD
 	UNUSED(port);
 #endif
 	note_entrance1("vga_ipstat0_inb(%x)", port);
 	*value = (half_word)input_status_register_zero.as.abyte;
 	note_entrance1("returning %x",*value);
+#endif  //NEC_98
+#line 2978
 }
 
 GLOBAL VOID	vga_feat_outb IFN2(io_addr,port,half_word,value)
@@ -2861,8 +2876,13 @@ GLOBAL VOID	vga_feat_outb IFN2(io_addr,port,half_word,value)
 
 GLOBAL VOID	vga_feat_inb IFN2(io_addr,port,half_word *, value)
 {
+#line 2993
+#ifndef NEC_98
+#line 2994
 	UNUSED(port);
 	*value = (half_word)feature_control_register.as.abyte;
+#endif  //NEC_98
+#line 2997
 }
 
 GLOBAL VOID	vga_dac_outb IFN2(io_addr,port,half_word,value)

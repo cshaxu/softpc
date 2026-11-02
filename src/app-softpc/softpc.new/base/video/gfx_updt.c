@@ -320,6 +320,9 @@ static	int	search_video_copy IFN4(int, start_line,
 static	int	v7_search_video_copy IFN3(int, start_line,
 	int, end_line, int, start_offset)
 {
+#line 365
+#ifndef NEC_98
+#line 366
 	register	byte	*ptr,*k;
 	register	int	j;
 	register	int	half_opl = get_offset_per_line()>>1;
@@ -357,6 +360,8 @@ static	int	v7_search_video_copy IFN3(int, start_line,
 		 * Don't clear out the marked area in case the plane wraps
 		 */
 	}
+#endif  //NEC_98
+#line 431
 	return( get_dirty_rec_total() );
 }
 #endif /* VGG */
@@ -1119,10 +1124,16 @@ void ega_wrap_text_update IFN0()
 	host_end_update();
 
 	setVideodirty_total(0);
+#line 1168
+#endif  //NEC_98
+#line 1169
 }
 
 void ega_text_update IFN0()
 {
+#line 1173
+#ifndef NEC_98
+#line 1174
 	register int i;				/* Loop counter		*/
 	register USHORT *from,*to;
 	register int cur_ypos;
@@ -1214,7 +1225,7 @@ void ega_text_update IFN0()
 
 	host_end_update();
 #endif  //NEC_98
-#line 1166
+#line 1241
 }
 #endif /* EGG */
 
@@ -1909,6 +1920,9 @@ static void paint_wrapped_split IFN1(int, height)
 
 void	ega_wrap_split_graph_update IFN0()
 {
+#line 1875
+#ifndef NEC_98
+#line 1876
 	register	int	bpl; 
 	register	int	opl;
 	register	int	screen_split;
@@ -1968,6 +1982,8 @@ void	ega_wrap_split_graph_update IFN0()
 	clear_dirty();
 
     	host_end_update();
+#endif  //NEC_98
+#line 1941
 }
 
 void	ega_split_graph_update IFN0()
@@ -2501,8 +2517,13 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 
+#line 2448
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 2449
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 2452
 
 	if (video_adapter == MDA)
 	{	
@@ -2689,8 +2710,13 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
+#line 2634
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 2635
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 2638
 
 	if(video_adapter == MDA)
 	{	
@@ -2830,8 +2856,13 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 	register half_word *src,*dest;
 	boolean result;
 
+#line 2774
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 2775
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 2778
 
 	UNUSED(dummy_arg);
 	
@@ -2989,8 +3020,13 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 
 	UNUSED(dummy_arg);
 	
+#line 2932
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 2933
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 2936
 
 	if(video_adapter == MDA)
 	{	
@@ -3095,8 +3131,13 @@ boolean cga_graph_scroll_up IFN6(int, start, int, width, int, height,
 	half_word *src,*dest;
 	boolean result;
 
+#line 3038
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3039
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3042
 
 	/* Do the host stuff */
 
@@ -3199,8 +3240,13 @@ boolean cga_graph_scroll_down IFN6(int, start, int, width, int, height,
 	register half_word *src,*dest;
 	boolean result;
 
+#line 3142
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
+#line 3143
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
+#endif
+#line 3146
 
 	/* Do the host stuff */
 
@@ -3525,6 +3571,9 @@ boolean	dummy_scroll IFN6(int,dummy1,int,dummy2,int,dummy3,int,
 
 GLOBAL VOID cga_mark_byte IFN1(int, addr)
 {
+#line 3566
+#ifndef NEC_98
+#line 3567
 	register	int	offset = BANK_OFFSET(addr);
 	
 	if(offset < getVideodirty_low())
@@ -3534,6 +3583,8 @@ GLOBAL VOID cga_mark_byte IFN1(int, addr)
 		setVideodirty_high(offset);
 
 	setVideodirty_total(getVideodirty_total() + 1);
+#endif  //NEC_98
+#line 3577
 }
 
 GLOBAL VOID cga_mark_word IFN1(int, addr)
@@ -3630,6 +3681,9 @@ GLOBAL VOID ega_mark_word IFN1(int, addr)
 
 GLOBAL VOID ega_mark_wfill IFN3(int, laddr, int, haddr, int, col)
 {
+#line 3662
+#ifndef NEC_98
+#line 3663
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
@@ -3650,10 +3704,15 @@ GLOBAL VOID ega_mark_wfill IFN3(int, laddr, int, haddr, int, col)
 
 	setVideodirty_total(getVideodirty_total() + offset2-offset1+1);
 #endif /* GORE */
+#endif  //NEC_98
+#line 3683
 }
 
 GLOBAL VOID ega_mark_string IFN2(int, laddr, int, haddr)
 {
+#line 3687
+#ifndef NEC_98
+#line 3688
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
@@ -3671,6 +3730,8 @@ GLOBAL VOID ega_mark_string IFN2(int, laddr, int, haddr)
 
 	setVideodirty_total(getVideodirty_total() + offset2-offset1+1);
 #endif /* GORE */
+#endif  //NEC_98
+#line 3705
 }
 
 #endif /* EGG */
@@ -3712,6 +3773,9 @@ GLOBAL VOID screen_refresh_required IFN0()
 LOCAL MARKING_TYPE curr_mark_type;
 
 
+#line 3746
+#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove uneeded code */
+#line 3748
 GLOBAL VOID
 set_mark_funcs IFN0()
 {
@@ -3817,6 +3881,8 @@ set_mark_funcs IFN0()
 	}
 }
 
+#endif	/* !NTVDM | (NTVDM & !X86GFX) */
+#line 3865
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
@@ -3899,7 +3965,12 @@ void cursor_changed IFN2(int, x, int, y)
 	UNUSED(x);
 	UNUSED(y);
 	
+#line 3945
+#ifndef NEC_98
+#line 3946
 	setVideodirty_total(getVideodirty_total() + 1);
+#endif  //NEC_98
+#line 3948
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif

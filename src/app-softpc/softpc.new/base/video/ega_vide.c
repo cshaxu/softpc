@@ -638,9 +638,14 @@ void load_font IFN5
 {
 #ifndef NEC_98
 #line 647
+#line 677
+#if !(defined(NTVDM) && defined(X86GFX)) || defined(ARCX86)
+#line 678
         int i,j;
         sys_addr font_addr;
         sys_addr data_addr;
+#endif /* !(NTVDM && X86GFX) || ARCX86 */
+#line 682
         half_word temp_word;
         half_word video_mode;
         static word font_off[] = { 0, 0x4000, 0x8000, 0xc000, 0x2000, 0x6000, 0xa000, 0xe000 };
@@ -1783,6 +1788,9 @@ void ega_video_init IFN0()
         equip_flag.bits.video_mode = VIDEO_MODE_80X25_COLOUR;
         sas_storew_no_check(EQUIP_FLAG, equip_flag.all);
 
+#line 2238
+#if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
+#line 2239
     {
     /* Initialize the INTs */
         sas_storew_no_check(BIOS_EXTEND_CHAR*4, EGA_INT1F_OFF);
@@ -1798,6 +1806,8 @@ void ega_video_init IFN0()
             sas_storew_no_check(EGA_SAVEPTR,EGA_PARMS_OFFSET);
         sas_storew_no_check(EGA_SAVEPTR+2,EGA_SEG);
     }
+#endif  /* !NTVDM | (NTVDM & !X86GFX) | ARCX86 */
+#line 2258
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
 #else

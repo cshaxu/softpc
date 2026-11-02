@@ -1,0 +1,4 @@
+path	xp_line	classification	reason	source_sha256
+base/bios/reset.c	690	local-ntvdm-or-standalone-condition-retained	The current condition includes standalone for the existing cmos_diskette initialization.	00c4f671888a9d117bf71d9a68dae7513c4b2d0b4a23bf6a88bc5cf11088a530
+base/comms/printer.c	754	existing-single-error	The existing PROD-disabled direct child already has a single error body.	e6b3519cdf6f67c125bc4bfdd21dbb8a0f3ca90e3c188256f3cbc5fe24efdc30
+base/video/ega_vide.c	1589	existing-single-error	The existing PROD-disabled direct child already has a single error body.	f09edb08551c1deb7459bc516a364bff6f298e34d04f67c91a37d631ac7ef904

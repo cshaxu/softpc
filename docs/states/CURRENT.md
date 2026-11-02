@@ -53,8 +53,17 @@ passed. The initial x64 full run passed 185/186; emulator.verifier-negative
 timed out at its existing 60-second budget. Other host work was active, but
 resource contention remains a hypothesis, not a proven cause. A focused retry passed in 18.54 seconds; a full -j4 retry passed on both
 architectures, 186 background and eight serial native integration tests each.
-No timeout budget was changed. Actual-diff review and push remain before
-retained-arm review.
+No timeout budget was changed. Exclusion delivery `23926edf` was pushed.
+In the retained phase, 22 original selected frames were restored; one was
+previously overextended across two functions and was split at its original
+boundary. Two existing error frames and one accepted local condition extension
+were reviewed and preserved. Current depth 3 has 600 arms: 256 direct single-
+error, 322 previously observed selected and 22 restored selected. Seven formerly
+direct arms moved to depth 4. Fourth-depth queues contain 309 current arms and
+326 XP direct-child candidates; the counts overlap. One selected local frame
+has no one-to-one XP guard and remains identified in the parent map. Final dual builds and full tests passed: 186 background and eight native
+integration tests per architecture. Final actual-diff review, delivery and
+S22 closure remain.
 
 ## Technical Baseline
 

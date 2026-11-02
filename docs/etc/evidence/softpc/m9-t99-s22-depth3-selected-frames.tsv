@@ -1,0 +1,23 @@
+path	xp_line	xp_end	classification	condition	source_sha256
+base/video/ega_vide.c	677	681	restored-selected-frame-exact-body	#if !(defined(NTVDM) && defined(X86GFX)) || defined(ARCX86)	f09edb08551c1deb7459bc516a364bff6f298e34d04f67c91a37d631ac7ef904
+base/video/gfx_updt.c	3566	3576	restored-selected-frame-exact-body	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/v7_video.c	142	147	restored-selected-frame-exact-body	#ifndef NEC_98	7045917a834385ccdaf3713bb91413a0878fa28348299ab37434822f038b1df3
+base/video/v7_video.c	527	533	restored-selected-frame-exact-body	#ifndef NEC_98	7045917a834385ccdaf3713bb91413a0878fa28348299ab37434822f038b1df3
+base/video/vga_prts.c	1952	1963	restored-selected-frame-exact-body	#ifndef NEC_98	5b64194e3c40a33bbb2aeb4d1f708dbe3ac7cd0d280e597eade941061821cfe7
+base/video/vga_prts.c	2959	2965	restored-selected-frame-exact-body	#ifndef NEC_98	5b64194e3c40a33bbb2aeb4d1f708dbe3ac7cd0d280e597eade941061821cfe7
+base/video/vga_prts.c	2970	2977	restored-selected-frame-exact-body	#ifndef NEC_98	5b64194e3c40a33bbb2aeb4d1f708dbe3ac7cd0d280e597eade941061821cfe7
+base/video/vga_prts.c	2993	2996	restored-selected-frame-exact-body	#ifndef NEC_98	5b64194e3c40a33bbb2aeb4d1f708dbe3ac7cd0d280e597eade941061821cfe7
+base/video/gfx_updt.c	2448	2451	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	2634	2637	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	2774	2777	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	2932	2935	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	3038	3041	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	3142	3145	restored-selected-frame-anchored-body	#if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	1173	1240	split-existing-overextended-frame-preserve-selected-code	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/ega_vide.c	2238	2257	restored-selected-frame-local-body-preserved	#if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)	f09edb08551c1deb7459bc516a364bff6f298e34d04f67c91a37d631ac7ef904
+base/video/gfx_updt.c	365	430	restored-selected-frame-local-body-preserved	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	1875	1940	restored-selected-frame-local-body-preserved	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	3662	3682	restored-selected-frame-local-body-preserved	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	3687	3704	restored-selected-frame-local-body-preserved	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	3746	3863	restored-selected-frame-local-body-preserved	#if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) ) /* remove uneeded code */	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57
+base/video/gfx_updt.c	3945	3947	restored-selected-frame-local-body-preserved	#ifndef NEC_98	3d83a80a4e451f6e0cc57159b13b0318214e7b8930f43feba4cbb418b277ae57

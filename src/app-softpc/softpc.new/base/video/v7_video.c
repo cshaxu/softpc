@@ -137,10 +137,15 @@ Output:
 GLOBAL VOID
 v7vga_inquire()
 {
+#line 142
+#ifndef NEC_98
+#line 143
 	note_entrance0("v7vga_inquire");
 
 	setAX(0x6f6f);
 	setBX(0x5637);
+#endif  //NEC_98
+#line 148
 }
 
 /*(
@@ -530,11 +535,16 @@ Output:
 GLOBAL VOID
 v7vga_get_memory_configuration()
 {
+#line 527
+#ifndef NEC_98
+#line 528
 	note_entrance0("v7vga_get_memory_configuration");
 
 	setAX(0x826f);
 	setBX(0x7070);
 	setCX(0x0);
+#endif  //NEC_98
+#line 534
 }
 
 #endif /* V7VGA */
