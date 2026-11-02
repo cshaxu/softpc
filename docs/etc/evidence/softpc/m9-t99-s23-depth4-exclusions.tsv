@@ -1,0 +1,10 @@
+path	xp_parent_line	xp_child_line	xp_end_line	classification	condition	source_sha256
+base/keymouse/keyba.c	2695	2698	2703	false-in-supported-contexts-selected-sibling-preserved	#ifdef NTVDM	3287fcffbb84084f12985680049b50619819eb42d7c1af57ba289dde124ffa82
+base/keymouse/keyba.c	2695	2711	2715	false-in-supported-contexts-selected-sibling-preserved	#ifdef NTVDM	3287fcffbb84084f12985680049b50619819eb42d7c1af57ba289dde124ffa82
+base/video/ega_vide.c	2016	2018	2034	false-in-supported-contexts-selected-sibling-preserved	#if defined(NTVDM) && defined(X86GFX)	96cb5127631f418dfd827dd448ed032a3fca716577fefdcf03a2a9641e58e288
+base/video/vga_prts.c	708	922	926	false-in-supported-contexts-selected-sibling-preserved	#ifdef NTVDM	e1f41ecb7b6578be274be12e2a865d9b9572053b55511816ccbf773f302098ef
+base/video/vga_prts.c	1269	1413	1417	false-in-supported-contexts-selected-sibling-preserved	#ifdef NTVDM	e1f41ecb7b6578be274be12e2a865d9b9572053b55511816ccbf773f302098ef
+base/video/ega_vide.c	1472	1473	1556	two-false-sibling-arms-selected-sibling-preserved	#ifdef JAPAN	96cb5127631f418dfd827dd448ed032a3fca716577fefdcf03a2a9641e58e288
+base/video/ega_vide.c	1472	1557	1564	false-in-supported-contexts	#ifdef NTVDM	96cb5127631f418dfd827dd448ed032a3fca716577fefdcf03a2a9641e58e288
+base/video/ega_vide.c	2238	2239	2241	false-in-supported-contexts	#ifdef ARCX86	96cb5127631f418dfd827dd448ed032a3fca716577fefdcf03a2a9641e58e288
+base/video/vga_mode.c	256	298	311	false-in-supported-contexts-selected-local-sibling-preserved	#if defined(NTVDM) && !defined(MONITOR) /* Only get here for NTVDM Riscs */	b3d72eaf79ac220dac77038a9a7d1dc9e68fabc31803840b2c44ac4c30389ccc

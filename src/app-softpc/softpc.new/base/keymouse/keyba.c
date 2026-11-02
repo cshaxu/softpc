@@ -1984,7 +1984,14 @@ if (waiting_for_next_8042_code)
 #ifdef PM
 				   if ( !gate_a20_status )
 				      {
+#line 2698
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2702
 				      sas_disable_20_bit_wrapping();
+#endif /* NTVDM */
+#line 2704
 				      gate_a20_status = 1;
 					}
 				   }
@@ -1992,7 +1999,14 @@ if (waiting_for_next_8042_code)
 				   {
 				   if ( gate_a20_status )
 				      {
+#line 2711
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 2714
 				      sas_enable_20_bit_wrapping();
+#endif /* NTVDM */
+#line 2716
 				      gate_a20_status = 0;
 				      }
 #else

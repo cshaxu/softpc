@@ -1264,9 +1264,21 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else /* REAL_VGA */
-#line 1210
+#line 1473
+#ifdef JAPAN
+#error "Unsupported SoftPC mirror configuration: JAPAN"
+#elif defined(KOREA)
+#error "Unsupported SoftPC mirror configuration: KOREA"
+#else // !JAPAN & KOREA
+#line 1554
             sas_fillsw(video_pc_low_regen, vd_mode_table[video_mode].clear_char,
                                  (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
+#endif // !JAPAN
+#line 1557
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif /* NTVDM */
+#line 1565
 #endif /* REAL_VGA */
         }
     }
@@ -1662,8 +1674,15 @@ GLOBAL void ega_char_gen IFN0()
                         break;
 #ifdef VGG
                 case 0x24:
+#line 2018
+#if defined(NTVDM) && defined(X86GFX)
+#error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
+#else
+#line 2032
                         sas_storew_no_check(EGA_FONT_INT*4,EGA_HIFONT_OFF);
                         sas_storew_no_check(EGA_FONT_INT*4+2,EGA_SEG);
+#endif  /* NTVDM & X86GFX */
+#line 2035
                         set_graph_font(16);
                         break;
 #endif
@@ -1791,6 +1810,10 @@ void ega_video_init IFN0()
 #line 2238
 #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) ) || defined(ARCX86)
 #line 2239
+#ifdef ARCX86
+#error "Unsupported SoftPC mirror configuration: ARCX86"
+#endif
+#line 2242
     {
     /* Initialize the INTs */
         sas_storew_no_check(BIOS_EXTEND_CHAR*4, EGA_INT1F_OFF);

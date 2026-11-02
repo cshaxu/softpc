@@ -863,7 +863,14 @@ GLOBAL VOID	vga_init IFN0()
 	set_actual_offset_per_line(80);
 	set_offset_per_line(160);	/* chained */
 	set_horiz_total(80);	/* calc screen params from this and prev 3 */
+#line 922
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 925
 	set_screen_split(511);	/* make sure there is no split screen to start with ! */
+#endif
+#line 927
 
 	set_prim_font_index(0);
 	set_sec_font_index(0);
@@ -1367,7 +1374,14 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 							set_screen_height_hi_recal(((CRTC_OVERFLOW*)&new)->as_bfld.vertical_display_enab_end_bit_9);
 							flag_mode_change_required();
 						}
+#line 1413
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#else
+#line 1416
 						crt_controller.crtc_overflow.as.abyte = value;
+#endif
+#line 1418
 #ifdef V7VGA
 					}
 #endif /* V7VGA */

@@ -259,6 +259,11 @@ DISPLAY_MODE	mode;
 		case EGA_TEXT_40:
 		case EGA_TEXT_80:
 			assert0( is_it_text(), "In text memory mode, but not in alpha mode !!" );
+#line 298
+#if defined(NTVDM) && !defined(MONITOR)   /* Only get here for NTVDM Riscs */
+#error "Unsupported SoftPC mirror configuration: NTVDM and not MONITOR"
+#else
+#line 304
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else /* GISP_SVGA */
@@ -266,6 +271,8 @@ DISPLAY_MODE	mode;
 			set_gfx_update_routines( ega_text_update, SIMPLE_MARKING, TEXT_SCROLL );
 #endif /* GISP_SVGA */
 			host_update_fonts();
+#endif	/* NTVDM */
+#line 312
 			break;
 		case CGA_TEXT_40_WR:
 		case CGA_TEXT_80_WR:
