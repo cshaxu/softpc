@@ -1075,6 +1075,17 @@ native desktop/audio tests. The published x86 and x64 EXE SHA-256 values are
 and `c369f63e7b8b9ec9b837ce63c7ab88365093543e80cb09f11d56c3697549ff7d`.
 This qualifies the implemented exclusion batch, not the unreviewed retained
 arms or the completeness of all OpenNT-to-XP mappings.
+The exclusion batch was committed and pushed as `f6596bc9`. Retained-arm
+review is now active. The refreshed hash-anchored selected ledger has 983
+first-depth arms: 982 were selected in both architectures and one `i386`
+arm was selected only in x86. Together with 22 include guards, their current
+direct children form a provisional 1,381-arm depth-2 queue in
+`m9-t99-s20-bfs-depth2-provisional-queue.tsv`; no depth-2 body has been
+processed in this phase. Nine additional original-child candidates remain
+separately recorded. Four stale parent hashes were revalidated against the
+original and current parent anchors and refreshed. The queue is provisional
+until the 12 selected/adapted original-frame candidates and the OpenNT/XP
+cross-version alignment questions are reviewed.
 After those OR cleanups, cached x86/x64 whole-project builds passed and
 refreshed the package EXEs; focused App unit and XP mirror checks passed
 49/49 per architecture. The intermediate EXE SHA-256 values are x86
