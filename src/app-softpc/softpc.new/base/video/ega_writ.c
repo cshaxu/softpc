@@ -203,7 +203,7 @@ ega_write_init IFN0()
 #ifdef	JOKER
 #error "Unsupported SoftPC mirror configuration: JOKER"
 #else	/* not JOKER */
-#line 459
+#line 484
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP or EGA_STAT"

@@ -386,7 +386,7 @@ IMPORT ADAPTER_STATE adapter_state[2];
 		else if (cmos_index < CMOS_REG_A)
 		{
 #ifndef NTVDM
-#line 410
+#line 429
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
@@ -423,7 +423,7 @@ IMPORT ADAPTER_STATE adapter_state[2];
 					break;
 				}
 #ifndef NTVDM
-#line 443
+#line 464
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */

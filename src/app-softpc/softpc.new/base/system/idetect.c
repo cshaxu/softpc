@@ -226,7 +226,7 @@ PURPOSE         :       called from keyboard BIOS as result of
 
 
 #ifndef NTVDM
-#line 212
+#line 267
 #ifdef SMEG
 #error "Unsupported SoftPC mirror configuration: SMEG"
 #endif

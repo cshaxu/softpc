@@ -192,7 +192,7 @@ typedef struct {
 
 
 #if !defined(NTVDM)
-#line 173
+#line 217
 #ifdef  REAL_ICA
 #error "Unsupported SoftPC mirror configuration: REAL_ICA"
 #else   /* REAL_ICA */

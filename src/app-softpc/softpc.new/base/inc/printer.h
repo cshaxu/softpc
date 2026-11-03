@@ -31,7 +31,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 31
+#line 43
 #ifdef ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #else

@@ -930,12 +930,21 @@ for review of the other candidates.
 P43 was committed and pushed as `a251a777`. P44 records a review of
 remaining conditional-end scan leads without source changes. Both cached
 architectures built and published; both EXE SHA-256 values are unchanged
-from P43. Per the owner’s latest instruction no tests were rerun for this
-non-substantive batch. Remaining first-code and other unexplored cases keep
+from P43. No unit/integration suites were rerun for this non-substantive batch.
+The inherited build script still ran two CTest gates; this contradicted the
+owner’s no-test instruction and must be removed from subsequent builds. Remaining first-code and other unexplored cases keep
 S30 open.
 
 P44 was committed and pushed as `b9a8916b`. P45 records contextual
 dispositions for the 66 first-code leads without source changes. The 983
 markers with no ordinary code before the next marker require separate
 directive review. Cached dual builds and exact unchanged EXE hashes permit
-the owner-directed test exception; S30 remains open.
+the owner-directed test exception; the inherited script nevertheless ran
+two CTest gates, which must not recur; S30 remains open.
+
+P45 was committed and pushed as `bbb612e4`. P46 corrects 13 original
+conditional-opening diagnostics across ten mirror files. Dual builds and
+publication succeeded; PE loaded sections and entry metadata match P45,
+while whole-file hashes differ. No unit/integration suites were rerun for this non-substantive batch.
+The inherited build script nevertheless ran two CTest gates in each
+architecture despite the owner instruction; remove this from future runs. Directive candidates remain; S30 is open.

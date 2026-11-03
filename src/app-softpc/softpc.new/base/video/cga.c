@@ -1188,7 +1188,7 @@ for(i = CGA_PORT_START; i <= CGA_PORT_END; i++)
 #ifdef A3CPU
 #error "Unsupported SoftPC mirror configuration: A3CPU"
 #else   /* not A3CPU */
-#line 1393
+#line 1413
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #else

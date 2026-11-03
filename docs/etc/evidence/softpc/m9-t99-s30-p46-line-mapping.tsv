@@ -1,0 +1,14 @@
+path	marker_line	marker	classification	local_directive	xp_directive	new_marker
+base/inc/ica.h	195	173	diff-first-directive	196	217	217
+base/inc/printer.h	34	31	diff-first-directive	35	43	43
+base/support/time_day.c	165	144	diff-first-directive	166	320	320
+base/system/cmos.c	389	410	diff-first-directive	390	429	429
+base/system/cmos.c	426	443	diff-first-directive	427	464	464
+base/system/idetect.c	229	212	diff-first-directive	230	267	267
+base/video/cga.c	1191	1393	diff-first-directive	1192	1413	1413
+base/video/ega_vide.c	165	141	diff-first-directive	166	165	165
+base/video/ega_writ.c	206	459	diff-first-directive	208	485	484
+base/video/gfx_updt.c	3672	3501	diff-first-directive	3673	3618	3618
+base/video/gfx_updt.c	3696	3520	diff-first-directive	3697	3639	3639
+base/video/gfx_updt.c	3878	3685	diff-first-directive	3879	3818	3818
+base/video/video.c	49	44	diff-first-directive	50	48	48

@@ -162,7 +162,7 @@ GLOBAL IBOOL forceVideoRmSemantics = FALSE;
 [5.1 LOCAL DECLARATIONS]                                                */
 
 #ifndef NEC_98
-#line 141
+#line 165
 #ifdef ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #else

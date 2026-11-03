@@ -162,7 +162,7 @@ void time_of_day()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else   /* ! NTVDM */
-#line 144
+#line 320
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif

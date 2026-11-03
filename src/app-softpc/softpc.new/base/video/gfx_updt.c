@@ -3669,7 +3669,7 @@ GLOBAL VOID cga_mark_string IFN2(int, laddr, int, haddr)
 GLOBAL VOID ega_mark_byte IFN1(int, off_in)
 {
 #ifndef NEC_98
-#line 3501
+#line 3618
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
@@ -3693,7 +3693,7 @@ GLOBAL VOID ega_mark_byte IFN1(int, off_in)
 GLOBAL VOID ega_mark_word IFN1(int, addr)
 {
 #ifndef NEC_98
-#line 3520
+#line 3639
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
@@ -3875,7 +3875,7 @@ set_mark_funcs IFN0()
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 3685
+#line 3818
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
