@@ -163,7 +163,7 @@ GLOBAL VOID ( *host_key_up_fn_ptr )();
 #line 226
 GLOBAL VOID ( *do_key_repeats_fn_ptr )();
 #endif	/* NTVDM */
-#line 153
+#line 227
 
 
 

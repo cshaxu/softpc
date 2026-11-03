@@ -127,7 +127,7 @@ static struct ADAPTER_STATE
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
-#line 113
+#line 168
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
@@ -819,7 +819,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 728
+#line 1241
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -834,7 +834,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 755
+#line 1268
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -854,7 +854,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 786
+#line 1299
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -873,7 +873,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 811
+#line 1334
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -885,7 +885,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 834
+#line 1357
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -909,7 +909,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 870
+#line 1396
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -949,7 +949,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 931
+#line 1500
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1055,7 +1055,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1051
+#line 1628
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1114,7 +1114,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1109
+#line 1702
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1133,7 +1133,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1134
+#line 1756
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1157,7 +1157,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1163
+#line 1804
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1197,7 +1197,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1225
+#line 1866
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1211,7 +1211,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1250
+#line 1891
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
@@ -1694,7 +1694,7 @@ static void set_baud_rate IFN1(int, adapter)
 #line 2835
 }
 #endif // NEC_98
-#line 1811
+#line 2836
 
 
 #if defined(NEC_98)

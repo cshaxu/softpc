@@ -912,3 +912,8 @@ conditional-end positions in ten files, accounting for local blank lines.
 Both 186-test background groups passed first run; both native groups
 failed compact_console first run and passed 8/8 in randomized full reruns.
 The cause remains unknown. S30 remains open.
+
+P41 was committed and pushed as `31bf6205`. P42 corrects 27 XP
+conditional-end diagnostic positions in ten files, preserving local edits
+and accounting for differing blank lines. Both architectures passed 186
+background and eight native tests first run. S30 remains open.

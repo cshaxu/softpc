@@ -249,11 +249,11 @@ static	DIRTY_PARTS	dirty[768];
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 256
+#line 297
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
-#line 259
+#line 300
 #else
 #error "Unsupported SoftPC mirror configuration: macintosh"
 #endif

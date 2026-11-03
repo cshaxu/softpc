@@ -883,7 +883,7 @@ void reset()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 977
+#line 1187
 
 
 #endif  /* NTVDM */

@@ -138,13 +138,13 @@ IMPORT	void		host_print_auto_feed IPT2(int,adapter, BOOL,auto_feed);
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 134
+#line 154
 
 
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 140
+#line 159
 
 
 #if defined (NTVDM) && defined(MONITOR)

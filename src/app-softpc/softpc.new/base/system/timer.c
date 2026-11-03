@@ -419,7 +419,7 @@ IBOOL active_int_event = FALSE; /* current quick_event for timer queue */
 IU32 more_timer_mult = 0;       /* additions to timer int queue */
 IU32 timer_multiple_delay = 0;  /* us delay to next timer queue elem */
 #endif
-#line 381
+#line 415
 
 
 #if defined(NTVDM)
@@ -473,7 +473,7 @@ LOCAL ULONG     adj_n_real_mode_ticks_before_full_speed = 0;/* The value which r
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 430
+#line 497
 #endif
 #line 498
 
