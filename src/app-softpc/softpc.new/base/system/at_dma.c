@@ -164,7 +164,7 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
         if (/*port >= DMA_PORT_START &&*/ port <= DMA_PORT_END)
         {
 #endif   //NEC_98
-#line 157
+#line 168
                 dcp = &adaptor.controller[DMA_CONTROLLER];
                 port &= ~DMA_REDUNDANT_BITS;
 #ifndef NEC_98
@@ -205,7 +205,7 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
 
                         /* read channel current address on controller 1 */
 #ifndef NEC_98
-#line 186
+#line 206
         case    DMA_CH4_ADDRESS:
         case    DMA_CH5_ADDRESS:
         case    DMA_CH6_ADDRESS:
@@ -236,7 +236,7 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
 
                         /* read channel current word count on controller 1 */
 #ifndef NEC_98
-#line 207
+#line 235
         case    DMA_CH4_COUNT:
         case    DMA_CH5_COUNT:
         case    DMA_CH6_COUNT:
@@ -261,7 +261,7 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
                         /* read temporary register */
         case    DMA_SHARED_REG_B:
 #ifndef NEC_98
-#line 224
+#line 256
         case    DMA1_SHARED_REG_B:
 #endif   //NEC_98
 #line 258
@@ -331,7 +331,7 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
 
                         /* write channel addresses on controller 1 */
 #ifndef NEC_98
-#line 278
+#line 323
         case    DMA_CH4_ADDRESS:
         case    DMA_CH5_ADDRESS:
         case    DMA_CH6_ADDRESS:
@@ -361,7 +361,7 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
 
                         /* write channel word counts on controller 1 */
 #ifndef NEC_98
-#line 298
+#line 352
         case    DMA_CH4_COUNT:
         case    DMA_CH5_COUNT:
         case    DMA_CH6_COUNT:
@@ -376,7 +376,7 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
                         /* write command register */
         case    DMA_SHARED_REG_A:
 #ifndef NEC_98
-#line 309
+#line 365
         case    DMA1_SHARED_REG_A:
 #endif   //NEC_98
 #line 367
@@ -431,14 +431,14 @@ GLOBAL  void dma_outb   IFN2(io_addr, port, half_word, value)
 #line 409
         case    DMA1_CLEAR_FLIP_FLOP:
 #endif   //NEC_98
-#line 346
+#line 411
                 dcp->first_last = 0;
                 break;
 
                         /* write master clear */
         case    DMA_SHARED_REG_B:
 #ifndef NEC_98
-#line 351
+#line 417
         case    DMA1_SHARED_REG_B:
 #endif   //NEC_98
 #line 419
@@ -563,7 +563,7 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
 
         /* mask out the port's redundant bits */
 #ifndef NEC_98
-#line 454
+#line 540
         port &= ~DMA_PAGE_REDUNDANT_BITS;
 #endif   //NEC_98
 #line 455

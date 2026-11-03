@@ -402,7 +402,7 @@ DISPLAY_MODE	mode;
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
-#line 386
+#line 439
 			do_display_trace("dumping EGA_GRAPH struct ...", dump_EGA_GRAPH());
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"

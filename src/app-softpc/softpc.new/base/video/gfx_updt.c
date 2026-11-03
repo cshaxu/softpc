@@ -239,7 +239,7 @@ GLOBAL LONG dirty_curs_y;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 247
+#line 288
 byte *video_copy;		/* video_copy is now allocated in host_init_screen()'s */
 
 #ifndef macintosh
@@ -370,7 +370,7 @@ static	int	search_video_copy_aligned IFN3(int, start_line,
 	int, end_line, int, start_offset)
 {
 #ifndef NEC_98
-#line 362
+#line 439
 	register	unsigned int *ptr4;
 	register	byte	*ptr,*k;
 	register	int	j;
@@ -402,7 +402,7 @@ static	int	search_video_copy_aligned IFN3(int, start_line,
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 394
+#line 471
 		ptr += quarter_opl - j;
 		/*
 		 * Don't clear out the marked area in case the plane wraps
@@ -410,14 +410,14 @@ static	int	search_video_copy_aligned IFN3(int, start_line,
 	}
 	*end_ptr = save;
 #endif  //NEC_98
-#line 400
+#line 478
 	return( get_dirty_rec_total() );
 }
 
 static	void	paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 {
 #ifndef NEC_98
-#line 405
+#line 484
 	register	DIRTY_PARTS	*i,*end_ptr;
 #ifdef VGG
 	int dirty_frig;
@@ -505,7 +505,7 @@ static	void	paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 492
+#line 571
 #define get_char_attr(unsigned_long_ptr)     (((*(unsigned_long_ptr)) & 0xffff))
 #endif
 
@@ -520,7 +520,7 @@ static	int	ega_text_find_dirty_lines IFN5(byte *, vcopy, byte *, planes,
 	int, start_line, int, end_line, int, screen_start)
 {
 #ifndef NEC_98
-#line 504
+#line 584
 	register	int	i,j,k;
 	register	unsigned short	shorts_per_line=(unsigned short)get_chars_per_line();
 	register	int	offset,cur_y;
@@ -561,14 +561,14 @@ static	int	ega_text_find_dirty_lines IFN5(byte *, vcopy, byte *, planes,
 		}
 	}
 #endif  //NEC_98
-#line 542
+#line 623
 	return( get_dirty_rec_total() );
 }
 
 static	void	ega_text_paint_dirty_recs IFN2(int, start_rec, int, end_rec)
 {
 #ifndef NEC_98
-#line 547
+#line 629
 	register	int	char_wid = get_pix_char_width()>>1;
 	register	int	i;
 	register	int	length;
@@ -629,7 +629,7 @@ GLOBAL VOID
 simple_handler IFN0()
 {
 #ifndef NEC_98
-#line 599
+#line 685
 	setVideodirty_total(getVideodirty_total() + 1);
 #endif  //NEC_98
 #line 600
@@ -638,7 +638,7 @@ simple_handler IFN0()
 LOCAL	boolean simple_update IFN0()
 {
 #ifndef NEC_98
-#line 604
+#line 692
 	setVideodirty_total(getVideodirty_total() + 1);
 #endif  //NEC_98
 #line 694
@@ -654,7 +654,7 @@ LOCAL VOID simple_update_b_move IFN4(UTINY *, laddr, UTINY *, haddr,
 	UNUSED(src_type);
 
 #ifndef NEC_98
-#line 616
+#line 706
 	setVideodirty_total(getVideodirty_total() + 1);
 #endif  //NEC_98
 #line 617
@@ -758,7 +758,7 @@ void	reset_paint_routines IFN0()
 void	ega_wrap_split_text_update IFN0()
 {
 #ifndef NEC_98
-#line 715
+#line 807
 	register int i;				/* Loop counter		*/
 	register USHORT *from,*to;
 	register int cur_ypos;
@@ -920,7 +920,7 @@ void	ega_wrap_split_text_update IFN0()
 void	ega_split_text_update IFN0()
 {
 #ifndef NEC_98
-#line 873
+#line 967
 	register int i;				/* Loop counter		*/
 	register USHORT *from,*to;
 	register int cur_ypos;
@@ -1018,7 +1018,7 @@ void	ega_split_text_update IFN0()
 void ega_wrap_text_update IFN0()
 {
 #ifndef NEC_98
-#line 967
+#line 1063
 	register int i;				/* Loop counter		*/
 	register USHORT *from,*to;
 	register int cur_ypos;
@@ -1356,7 +1356,7 @@ LOCAL VOID
 cga_graph_update_unchained IFN0()
 {
 #ifndef NEC_98
-#line 1290
+#line 1368
     LONG i, j, k, l;	/* Loop counters		*/
     IU32 *from,*to;
     LONG cur_ypos;
@@ -1491,7 +1491,7 @@ LOCAL VOID
 cga_graph_update_chain2 IFN0()
 {
 #ifndef NEC_98
-#line 1421
+#line 1501
     LONG i, j, k, l;	/* Loop counters		*/
     USHORT *from,*to;
     LONG cur_ypos;
@@ -1658,7 +1658,7 @@ LOCAL VOID
 cga_graph_update_chain4 IFN0()
 {
 #ifndef NEC_98
-#line 1584
+#line 1666
     LONG i, j, k, l;		/* Loop counters		*/
     UTINY *from,*to;
     LONG cur_ypos;
@@ -1989,7 +1989,7 @@ void	ega_wrap_split_graph_update IFN0()
 void	ega_split_graph_update IFN0()
 {
 #ifndef NEC_98
-#line 1895
+#line 1946
 	register	int	bpl; 
 	register	int	opl;
 	register	int	screen_split;
@@ -2048,7 +2048,7 @@ void	ega_split_graph_update IFN0()
 static	void	vga_paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 {
 #ifndef NEC_98
-#line 1950
+#line 2002
 	register	DIRTY_PARTS	*i,*end_ptr;
 	int dirty_frig;
 
@@ -2124,7 +2124,7 @@ static	void	vga_paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 void	vga_graph_update IFN0()
 {
 #ifndef NEC_98
-#line 2022
+#line 2076
 	register	int	opl = get_offset_per_line();
 	register	int	bpl = get_bytes_per_line();
 	int		screen_height = get_screen_height()/
@@ -2213,7 +2213,7 @@ void	vga_graph_update IFN0()
 void	vga_split_graph_update IFN0()
 {
 #ifndef NEC_98
-#line 2107
+#line 2162
 	register	int	bpl; 
 	register	int	opl;
 	register	int	screen_split;
@@ -2273,7 +2273,7 @@ void	vga_split_graph_update IFN0()
 void	ega_graph_update IFN0()
 {
 #ifndef NEC_98
-#line 2163
+#line 2220
 	register	int	opl = get_offset_per_line();
 	register	int	bpl = get_bytes_per_line();
 
@@ -2348,7 +2348,7 @@ void	ega_graph_update IFN0()
 void	ega_wrap_graph_update IFN0()
 {
 #ifndef NEC_98
-#line 2234
+#line 2291
 	register	int	opl = get_offset_per_line();
 	register	int	bpl = get_bytes_per_line();
 
@@ -2501,7 +2501,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 	int, attr, int, lines, int, dummy_arg)
 {
 #ifndef NEC_98
-#line 2378
+#line 2433
     short blank_word, *ptr, *top_left_ptr,*top_right_ptr, *bottom_right_ptr;
     unsigned short dummy;
     unsigned char *p;
@@ -2668,7 +2668,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 2538
+#line 2595
 	data = (attr << 8) | ' ';
 #endif
 
@@ -2698,7 +2698,7 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 	int, attr, int, lines,int,dummy_arg)
 {
 #ifndef NEC_98
-#line 2564
+#line 2623
 	int i,tlx,tly,htlx,htly,colour;
 	int bpl = 2*get_chars_per_line();
 	long start_offset;
@@ -2813,7 +2813,7 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 2673
+#line 2734
 	data = (attr << 8) | ' ';
 #endif
 
@@ -2845,7 +2845,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 	int, attr, int, lines,int,dummy_arg)
 {
 #ifndef NEC_98
-#line 2701
+#line 2764
     short blank_word, *ptr, *top_left_ptr,*top_right_ptr, *bottom_right_ptr;
     unsigned short dummy;
     unsigned char *p;
@@ -3011,7 +3011,7 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 	int, attr, int, lines,int,dummy_arg)
 {
 #ifndef NEC_98
-#line 2857
+#line 2924
 	int i,tlx,tly,colour;
 	int bpl = 2*get_chars_per_line();
 	long start_offset;
@@ -3125,7 +3125,7 @@ boolean cga_graph_scroll_up IFN6(int, start, int, width, int, height,
 	int, attr, int, lines, int, colour)
 {
 #ifndef NEC_98
-#line 2962
+#line 3033
 	int i,tlx,tly;
 	long start_offset;
 	half_word *src,*dest;
@@ -3234,7 +3234,7 @@ boolean cga_graph_scroll_down IFN6(int, start, int, width, int, height,
 	int, attr, int, lines, int, colour)
 {
 #ifndef NEC_98
-#line 3062
+#line 3137
 	int i,tlx,tly;
 	long start_offset;
 	register half_word *src,*dest;
@@ -3628,7 +3628,7 @@ GLOBAL VOID cga_mark_byte IFN1(int, addr)
 GLOBAL VOID cga_mark_word IFN1(int, addr)
 {
 #ifndef NEC_98
-#line 3469
+#line 3582
 	register	int	offset1 = BANK_OFFSET(addr);
 	register	int	offset2 = offset1 + 1;
 
@@ -3646,7 +3646,7 @@ GLOBAL VOID cga_mark_word IFN1(int, addr)
 GLOBAL VOID cga_mark_string IFN2(int, laddr, int, haddr)
 {
 #ifndef NEC_98
-#line 3483
+#line 3598
 	register	int	offset1 = BANK_OFFSET(laddr);
 	register	int	offset2 = BANK_OFFSET(haddr);
 
@@ -3673,7 +3673,7 @@ GLOBAL VOID ega_mark_byte IFN1(int, off_in)
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 3504
+#line 3621
 	register int offset = off_in>>2;
 
 	video_copy[offset] = 1;
@@ -3754,7 +3754,7 @@ GLOBAL VOID ega_mark_string IFN2(int, laddr, int, haddr)
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 3568
+#line 3691
 	register	int	offset1 = laddr >> 2;
 	register	int	offset2 = haddr >> 2;
 
@@ -3794,7 +3794,7 @@ GLOBAL VOID screen_refresh_required IFN0()
 #ifndef CPU_40_STYLE
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else
-#line 3605
+#line 3733
 	setVideodirty_total(1000000L);
 #endif	/* CPU_40_STYLE */
 #endif // NEC_98
@@ -3840,7 +3840,7 @@ set_mark_funcs IFN0()
 			break;
 
 #ifndef NEC_98
-#line 3640
+#line 3773
 		case	CGA_GRAPHICS_MARKING:
 			update_alg.mark_byte = (T_mark_byte)cga_mark_byte;
 			update_alg.mark_word = (T_mark_word)cga_mark_word;
@@ -3851,7 +3851,7 @@ set_mark_funcs IFN0()
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
-#line 3653
+#line 3786
 			SetMarkPointers(1);
 #endif	/* CPU_40_STYLE - EVID */
 
@@ -3898,11 +3898,11 @@ set_mark_funcs IFN0()
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 3715
+#line 3842
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
-#line 3721
+#line 3848
 					SetMarkPointers(3);
 #endif	/* CPU_40_STYLE - EVID */
 #endif /* GORE */
@@ -3938,12 +3938,12 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 			update_alg.scroll_down = dummy_scroll;
 			break;
 #ifndef NEC_98
-#line 3750
+#line 3880
 		case	TEXT_SCROLL:
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(MONITOR)"
 #else
-#line 3751
+#line 3885
 			update_alg.scroll_up = text_scroll_up;
 			update_alg.scroll_down = text_scroll_down;
 #endif	/* NTVDM & MONITOR */

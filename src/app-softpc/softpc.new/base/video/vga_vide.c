@@ -109,7 +109,7 @@ rgb_struct *rgb;
 {
         if(is_GREY())greyify(rgb);
 #ifndef NEC_98
-#line 114
+#line 115
         outb(VGA_DAC_WADDR,dac);
         outb(VGA_DAC_DATA,rgb->red);
         outb(VGA_DAC_DATA,rgb->green);
@@ -123,7 +123,7 @@ half_word dac;
 rgb_struct *rgb;
 {
 #ifndef NEC_98
-#line 124
+#line 127
         outb(VGA_DAC_RADDR,dac);
         inb(VGA_DAC_DATA,&(rgb->red));
         inb(VGA_DAC_DATA,&(rgb->green));
@@ -190,7 +190,7 @@ GLOBAL VOID vga_graphics_write_char
         IFN6( LONG, col, LONG, row, LONG, ch, IU8, colour, LONG, page, LONG, nchs)
 {
 #ifndef NEC_98
-#line 192
+#line 199
         register sys_addr char_addr;
         register long screen_offset;
         register int i,j,k,char_height,len;
@@ -253,11 +253,11 @@ GLOBAL VOID vga_write_dot
         IFN4(LONG, colour, LONG, page, LONG, pixcol, LONG, row)
 {
 #ifndef NEC_98
-#line 251
+#line 260
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 257
+#line 266
         long screen_offset;
         UTINY bank;
 
@@ -279,7 +279,7 @@ GLOBAL VOID vga_sensible_graph_scroll_up
         IFN6( LONG, row, LONG, col, LONG, rowsdiff, LONG, colsdiff, LONG, lines, LONG, attr)
 {
 #ifndef NEC_98
-#line 275
+#line 286
         register int col_incr = 8*sas_w_at_no_check(VID_COLS);
         register int i;
         register long source,dest;
@@ -293,7 +293,7 @@ GLOBAL VOID vga_sensible_graph_scroll_up
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 302
+#line 313
         dest = sas_w_at_no_check(VID_ADDR)+ row*col_incr*char_height+col;
         source = dest+lines*col_incr;
         screen_updated = (col+colsdiff) <= col_incr;  /* Check for silly scroll */
@@ -323,7 +323,7 @@ GLOBAL VOID vga_sensible_graph_scroll_down
         IFN6( LONG, row, LONG, col, LONG, rowsdiff, LONG, colsdiff, LONG, lines, LONG, attr)
 {
 #ifndef NEC_98
-#line 328
+#line 341
         register int col_incr = 8*sas_w_at_no_check(VID_COLS);
         register int i;
         register long source,dest;
@@ -337,7 +337,7 @@ GLOBAL VOID vga_sensible_graph_scroll_down
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 356
+#line 369
         dest = sas_w_at_no_check(VID_ADDR)+ row*col_incr*char_height+col;
         screen_updated = (col+colsdiff) <= col_incr;  /* Check for silly scroll */
         if(screen_updated)
@@ -367,7 +367,7 @@ GLOBAL VOID vga_sensible_graph_scroll_down
 GLOBAL VOID vga_read_attrib_char IFN3(LONG, col, LONG, row, LONG, page)
 {
 #ifndef NEC_98
-#line 382
+#line 397
         byte the_char[256];
         register host_addr screen;
         register int i,k;
@@ -383,7 +383,7 @@ GLOBAL VOID vga_read_attrib_char IFN3(LONG, col, LONG, row, LONG, page)
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 397
+#line 412
         screen = &EGA_plane0123[row*scan_length*char_height+8*col];
 #endif  /* REAL_VGA */
         for(i=0;i<char_height;i++)
@@ -406,7 +406,7 @@ GLOBAL VOID vga_read_attrib_char IFN3(LONG, col, LONG, row, LONG, page)
 GLOBAL VOID vga_read_dot IFN3(LONG, page, LONG, pixcol, LONG, row)
 {
 #ifndef NEC_98
-#line 416
+#line 433
         register host_addr screen;
 
         UNUSED(page);
@@ -415,7 +415,7 @@ GLOBAL VOID vga_read_dot IFN3(LONG, page, LONG, pixcol, LONG, row)
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 424
+#line 441
         screen = &EGA_plane0123[8*row*sas_w_at_no_check(VID_COLS)+pixcol];
 #endif  /* REAL_VGA */
         setAL(*screen) ; /* WOW - that's easy!! */
@@ -427,7 +427,7 @@ GLOBAL VOID vga_read_dot IFN3(LONG, page, LONG, pixcol, LONG, row)
 void vga_set_palette()
 {
 #ifndef NEC_98
-#line 432
+#line 451
         /*
          * Called via INT 10 AH=10, AL='not understood by ega_set_palette()'
          * Sets/reads VGA DACs.
@@ -585,7 +585,7 @@ void vga_set_palette()
 void vga_func_12()
 {
 #ifndef NEC_98
-#line 586
+#line 607
         half_word       seq_clock;
 
         switch(getBL())
@@ -700,7 +700,7 @@ void vga_disp_func()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif  /* HERC */
-#line 688
+#line 716
         video_mode = sas_hw_at_no_check(vd_video_mode);
 #ifdef V7VGA
         if ((video_mode == 1) && extensions_controller.foreground_latch_1)
@@ -756,7 +756,7 @@ void vga_disp_func()
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 737
+#line 770
         sas_store(buf+0x2A, (IU8)(get_scanlines()));
 
         outb(EGA_SEQ_INDEX,3);
@@ -790,7 +790,7 @@ void vga_disp_func()
 void vga_int_1C()
 {
 #ifndef NEC_98
-#line 803
+#line 838
 sys_addr buff = effective_addr(getES(),getBX());
 UCHAR i;
 int i2;

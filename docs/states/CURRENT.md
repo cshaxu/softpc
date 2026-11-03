@@ -28,24 +28,42 @@ The independent pass found and restored the missing XP `#ifndef PROD` frame
 in `base/keymouse/mouse.c`; dual-architecture selected preprocessing is
 byte-identical to the preceding source. The original diagnostic belonged to
 an obsolete runtime interrupt-burst block; the remaining placement difference
-is recorded. The current P batch has exactly ten modified mirror files:
+is recorded. The preceding P6 batch changed exactly ten mirror files:
 `mouse.c`, `cfpu_def.h`, `cpu_vid.h`, `ica.c`, `ppi.c`, `reset.c`,
 `nt_graph.c`, `gfx_updt.c`, `egacpu.h` and `host_cpu.h`. Repeated guards
 were reduced while retaining selected ABI, failure boundaries, original
-parents and the T88 CHAIN2 marker fix. Stop editing mirror files until this
-batch completes dual-architecture build, publication, full tests, commit
-and push. The owned build and test jobs log under `build/t99-s30/p5-*`;
-monitor progress in bounded polls, investigate after 30 minutes without
-progress without terminating work solely due to the observation interval. Both
-builds and x64 186+8 tests passed; x86 186 passed, and its native group failed
+parents and the T88 CHAIN2 marker fix. It was committed and pushed as
+`6e510e9d`; batch jobs are complete and their transient logs have been retired.
+For P6, both builds and x64 186+8 tests passed; x86 186 passed, and its native group failed
 one compact-console test (child 0xc0000142) before the complete 8/8 rerun
-passed. The cause is not established. Batch delivery is in progress. Both actual
+passed. The cause is not established. Both actual
 architecture commands were separately probed with PROD disabled only at the
 restored mouse frame and reached its error. Earlier comparison and queue line numbers refer
 to baseline `72e16acd`, not the edited file. The independent source review
 confirmed the ten XP/local NTVDM predicate pairs and distinguished the V7
 scanout's local extra guard from its two original siblings. The recursive
 comparison still has unreviewed repeated-boundary and local-exception cases.
+The next P batch contains ten mirror files: `mouse_io.c`, `at_dma.c`,
+`ega_prts.c`, `vga_mode.c`, `vga_vide.c`, `gfx_updt.c`, `vga_prts.c`,
+`ega_vide.c`, `keyba.c` and `printer.c`. It corrects 216 `#line` values
+against paired XP guard boundaries; the per-location evidence distinguishes
+six manually inspected anchors from 210 adjacent-source candidates. Both
+actual architecture contexts for all ten files have byte-identical selected
+preprocessing. P7 dual-architecture build and publication succeeded; each architecture
+passed all 186 background and 8 native tests. Stop changing mirror sources
+until actual-diff review, commit and push are complete. The [line-boundary candidate ledger](../etc/evidence/softpc/m9-t99-s30-p7-line-candidates.tsv)
+keeps 128 pending candidates in 31 files distinct from the 210 scanner matches
+corrected in P7. Owned P7 build and test logs and exit markers are `build/t99-s30/p7-*`; use bounded status polls, investigate
+30 minutes without progress and never terminate solely due to polling.
+The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
+[disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
+separates rechecked cases from pending independent review. The refreshed
+[repeated queue](../etc/evidence/softpc/m9-t99-s30-p6-repeated-queue.tsv)
+uses P6 line numbers and retains only manually reviewed carryovers with a
+matching original location. The [P6 group accounting](../etc/evidence/softpc/m9-t99-s30-p6-group-accounting.tsv)
+records source-boundary or same-arm evidence chains, with unresolved groups
+and candidate files kept separate. These counts are not defect counts and do
+not complete the repeated-boundary review.
 
 ## M9 T99 S30 Packet
 

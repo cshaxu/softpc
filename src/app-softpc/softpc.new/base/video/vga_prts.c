@@ -522,7 +522,7 @@ boolean in_index_state(void);
 LOCAL VOID	do_chain_majority_decision IFN0()
 {
 #ifndef NEC_98
-#line 527
+#line 523
 	SAVED	SHORT	current_votes=0;
 	SHORT		new_votes;
 
@@ -647,7 +647,7 @@ GLOBAL UTINY *vga_gc_outb_index_addr;
 GLOBAL VOID	vga_init IFN0()
 {
 #ifndef NEC_98
-#line 632
+#line 709
 	note_entrance0("vga_init");
 	/*
 	 * Define sequencer's ports
@@ -857,7 +857,7 @@ GLOBAL VOID	vga_init IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 840
+#line 917
 	set_screen_start(0);
 	set_word_addressing(YES);
 	set_actual_offset_per_line(80);
@@ -1025,7 +1025,7 @@ GLOBAL VOID	vga_seq_outb_index IFN2(io_addr,port,half_word,value)
 #ifndef V7VGA
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* !V7VGA */
-#line 997
+#line 1082
 	io_redefine_outb(EGA_SEQ_ADAP_DATA,ega_seq_regs[value & 0x07]);
 #endif  //NEC_98
 #line 998
@@ -1035,7 +1035,7 @@ GLOBAL VOID	vga_seq_outb_index IFN2(io_addr,port,half_word,value)
 GLOBAL VOID	vga_seq_clock IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1003
+#line 1090
 	unsigned dot_clock;
 	unsigned screen_off;
 
@@ -1084,7 +1084,7 @@ GLOBAL VOID	vga_seq_clock IFN2(io_addr,port,half_word,value)
 GLOBAL VOID	vga_seq_char_map IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1048
+#line 1137
 unsigned map_selects;
 FAST TINY select_a, select_b;
 
@@ -1122,7 +1122,7 @@ FAST TINY select_a, select_b;
 GLOBAL VOID	vga_seq_mem_mode IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1082
+#line 1173
     unsigned now_chain4;
 
 #ifdef PROD
@@ -1176,7 +1176,7 @@ GLOBAL VOID	vga_seq_mem_mode IFN2(io_addr,port,half_word,value)
 GLOBAL VOID	vga_seq_inb IFN2(io_addr,port,half_word *,value)
 {
 #ifndef NEC_98
-#line 1132
+#line 1225
 	note_entrance1("vga_seq_inb(%x)", port);
 	if (port == EGA_SEQ_INDEX) {
 	    *value = (half_word)sequencer.address.as.abyte;
@@ -1223,7 +1223,7 @@ GLOBAL VOID	vga_seq_inb IFN2(io_addr,port,half_word *,value)
 GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1175
+#line 1270
 	SHORT offset;
 	struct
 	{	/* aVOID alignment problems with casts */
@@ -1252,7 +1252,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1203
+#line 1298
 						crt_controller.horizontal_total = value;
 					break;
 				case 1:
@@ -1282,7 +1282,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1231
+#line 1326
 						crt_controller.start_horizontal_blanking = value;
 					break;
 				case 3:
@@ -1292,7 +1292,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1240
+#line 1335
 						crt_controller.end_horizontal_blanking.as.abyte = value;
 					break;
 				case 4:
@@ -1302,7 +1302,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1249
+#line 1344
 						crt_controller.start_horizontal_retrace = value;
 					break;
 				case 5:
@@ -1312,7 +1312,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1258
+#line 1353
 						crt_controller.end_horizontal_retrace.as.abyte = value;
 					break;
 				case 6:
@@ -1322,7 +1322,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1267
+#line 1362
 						crt_controller.vertical_total = value;
 					break;
 				case 7:
@@ -1841,7 +1841,7 @@ GLOBAL VOID	vga_crtc_inb IFN2(io_addr,port,half_word *,value)
 GLOBAL VOID	vga_gc_mode IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1771
+#line 1879
 MODE new_mode;
 
 #ifdef PROD
@@ -1967,7 +1967,7 @@ GLOBAL VOID vga_gc_outw IFN2(io_addr, port, word, outval)
 GLOBAL VOID	vga_gc_set_reset IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1884
+#line 1998
 unsigned set_reset;
 
 #ifdef PROD
@@ -1989,7 +1989,7 @@ unsigned set_reset;
 GLOBAL VOID	vga_gc_enable_set IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1902
+#line 2018
 unsigned en_set_reset;
 
 #ifdef PROD
@@ -2013,7 +2013,7 @@ unsigned en_set_reset;
 GLOBAL VOID	vga_gc_compare IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1922
+#line 2040
 unsigned colour_compare;
 
 #ifdef PROD
@@ -2082,7 +2082,7 @@ GLOBAL VOID	vga_gc_read_map IFN2(io_addr,port,half_word,value)
 GLOBAL VOID	vga_gc_misc IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 1979
+#line 2103
 unsigned memory_map;
 
 #ifdef PROD
@@ -2150,7 +2150,7 @@ unsigned memory_map;
 GLOBAL VOID	vga_gc_dont_care IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 2043
+#line 2169
 unsigned colour_dont_care;
 
 #ifdef PROD
@@ -2239,7 +2239,7 @@ GLOBAL VOID vga_mask_register_changed IFN1(BOOL, gotBitProtection)
 #error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
 #if !(defined(NTVDM) && defined(X86GFX))
-#line 2130
+#line 2259
 	Glue_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);
 #endif /* !(NTVDM && X86GFX) */
 #line 2131
@@ -2255,7 +2255,7 @@ GLOBAL VOID vga_mask_register_changed IFN1(BOOL, gotBitProtection)
 GLOBAL VOID	vga_gc_mask IFN2(USHORT,port,FAST UTINY,value)
 {
 #ifndef NEC_98
-#line 2140
+#line 2272
 	FAST ULONG  mask;
 
 #ifdef PROD
@@ -2306,7 +2306,7 @@ GLOBAL VOID	vga_gc_mask IFN2(USHORT,port,FAST UTINY,value)
 GLOBAL VOID	vga_gc_mask_ff IFN2(USHORT,port,FAST UTINY,value)
 {
 #ifndef NEC_98
-#line 2190
+#line 2324
 	FAST ULONG mask;
 
 #ifdef PROD
@@ -2395,7 +2395,7 @@ SAVED TINY vga_ip0_state_count = 1;     /* position in that state */
 GLOBAL VOID	v_ret_intr_status IFN0()
 {
 #ifndef NEC_98
-#line 2274
+#line 2412
     vga_ip0_state = 3;
     vga_ip0_state_count = 6;
 #endif  //NEC_98
@@ -2536,7 +2536,7 @@ GLOBAL VOID	vga_ipstat1_inb IFN2(io_addr,port,half_word *,value)
 GLOBAL VOID	vga_gc_inb IFN2(io_addr,port,half_word *, value)
 {
 #ifndef NEC_98
-#line 2484
+#line 2668
 	note_entrance1("vga_gc_inb(%x)", port);
 	if (port == EGA_GC_INDEX) {
 	    *value = (half_word)graphics_controller.address.as.abyte;
@@ -2616,7 +2616,7 @@ GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 2559
+#line 2737
 		note_entrance1("Setting index to %d", value);
 		if ((unsigned)(((value & 0x20) >> 5)) != attribute_controller.address.as_bfld.palette_address_source)
 		{
@@ -2753,7 +2753,7 @@ GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 GLOBAL VOID	vga_ac_inb IFN2(io_addr,port,half_word *, value)
 {
 #ifndef NEC_98
-#line 2691
+#line 2865
     note_entrance1("vga_ac_inb(%x)", port);
     if (port == EGA_AC_INDEX_DATA) {	/* 3c0 */
 	*value = (half_word)attribute_controller.address.as.abyte;
@@ -2809,7 +2809,7 @@ GLOBAL VOID	vga_ac_inb IFN2(io_addr,port,half_word *, value)
 GLOBAL VOID	vga_misc_outb IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 2743
+#line 2919
 MISC_OUTPUT_REG new;
 
 #ifdef PROD
@@ -2905,7 +2905,7 @@ GLOBAL VOID	vga_feat_inb IFN2(io_addr,port,half_word *, value)
 GLOBAL VOID	vga_dac_outb IFN2(io_addr,port,half_word,value)
 {
 #ifndef NEC_98
-#line 2816
+#line 3002
     note_entrance1("vga_dac_outb %#x",port);
     switch(port) {
 
@@ -2984,7 +2984,7 @@ GLOBAL VOID	vga_dac_data_outb IFN2(io_addr,port,half_word,value)
 GLOBAL VOID	vga_dac_inb IFN2(io_addr,port,half_word *,value)
 {
 #ifndef NEC_98
-#line 2887
+#line 3077
     note_entrance1("vga_dac_inb %#x",port);
     switch(port) {
 

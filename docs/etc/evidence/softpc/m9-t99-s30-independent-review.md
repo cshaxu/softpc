@@ -315,3 +315,114 @@ or snapshot was changed. S30's independent structural review remains open.
 An arm-body structure sweep additionally found zero current arms with a
 direct `#error` plus other non-comment code or nested conditions. That
 lexical fact does not prove an excluded branch was correctly classified.
+
+## Post-P6 continuation
+
+After `6e510e9d`, the parser was rerun against all 475 manifest paths: 471
+text files, four binary files, zero missing original files and 40 overlapping
+structural candidate rows in 15 files. This is a candidate count, not a count
+of defects. The refreshed [P6 tree disposition](m9-t99-s30-p6-tree-disposition.tsv)
+records each current/XP location and distinguishes directly rechecked local
+exceptions from prior evidence that still needs independent review. The older
+independent repeated-group queue remains anchored to `72e16acd`, so changed
+files must be remapped before its line numbers are used. No claim is made that
+the remaining repeated siblings have all been audited.
+
+The [post-P6 repeated queue](m9-t99-s30-p6-repeated-queue.tsv) was rebuilt
+from `6e510e9d` instead of applying stale physical line numbers. It contains
+2,381 repeated-sibling occurrences, including 12 for which the sequence
+matcher has no current/XP pair. Twenty-one previously hand-reviewed or
+registered locations were carried only when path, condition and XP line
+matched; all other entries remain explicitly pending. Outside-group and
+same-retained-arm source anchors are provided as leads, not automatic approval.
+
+The refreshed [P6 group accounting](m9-t99-s30-p6-group-accounting.tsv)
+records 3,614 automatically paired groups. To avoid certifying a false
+alignment, its parent-chain evidence excludes all 15 files with unmatched
+condition candidates. Of the remaining groups, 1,031 have unique sibling
+conditions, 1,219 have both outside-group unique source anchors, and 407 have
+a unique shared token within a retained corresponding arm; each also has an
+evidence-bearing parent chain. Another 460 groups still lack such a chain,
+and 497 paired groups lie in candidate files. An arm anchor never inspects
+the original body when the current arm is an entire `#error`. These are
+structural matching evidence, not proof of unchanged runtime behavior.
+
+Within the 471 text-file universe, 267 have no conditional groups on either
+side. Of 204 files with groups, 110 have this evidence chain for all their
+paired groups and no mismatch candidate; the remaining 94 contain either
+ambiguous pairings or candidate differences. Four binary paths are outside
+the preprocessor-tree comparison. The remaining evidence chains and 94 files
+still require independent completion audit before S30 can be declared done.
+
+The ten manually paired XP-to-local NTVDM predicate extensions were then
+re-entered as paired parents, rather than letting the sequence matcher stop
+at their differing conditions. The [extended-parent review](m9-t99-s30-p6-extended-parent-review.tsv) records the ten pairs: their
+sibling kinds match, no retained direct child group remains unpaired, and
+wholly error-replaced local arms are skipped. One skipped XP arm contains
+its original `#ifndef PROD`, intentionally not reconstructed inside the
+local error. The differing parent predicates themselves remain registered
+as explicit standalone or CCPU TLS exceptions.
+
+## XP diagnostic-line corrections after P6 — batch in progress
+
+Seven same-condition competing-line candidates were checked against their
+actual XP function and condition boundaries. `base/inc/gvi.h` already has
+the correct post-guard `#line 645` (XP guard ends at 644). Six other existing
+line controls in five files referred to old locations that coincided with
+other XP guards. Their values were corrected to the immediately following XP
+source line without changing any conditional directive or body:
+
+| File | Old -> XP line | XP anchor |
+| --- | --- | --- |
+| `base/keymouse/mouse_io.c` | 4735 -> 4938 | Selected `get_min_max_virtual_coords` guard at XP 4937. |
+| `base/system/at_dma.c` | 351 -> 417 | Selected master-clear guard at XP 416. |
+| `base/video/ega_prts.c` | 2617 -> 2667; 2760 -> 2824 | Selected `ega_gc_outb_index` / `ega_gc_mode` guards at XP 2666 / 2823. |
+| `base/video/vga_mode.c` | 386 -> 439 | Excluded `GISP_SVGA` group ends at XP 438. |
+| `base/video/vga_vide.c` | 432 -> 451 | Selected `vga_set_palette` guard at XP 450. |
+
+The actual x86 and x64 command for each of the five translation units was
+preprocessed before and after: all ten selected outputs were byte-identical.
+This establishes those selected preprocessing outputs, not every possible
+macro configuration. The ten-file batch subsequently passed dual-architecture build and full
+testing; submission follows the actual-diff review. Other line-control locations and branch structures remain unaudited.
+
+For repeated groups without unique single-line anchors, an additional pass
+compares unique contiguous two- through four-line source sequences strictly
+outside the whole conditional group; sequences do not cross conditional
+directives, and an anchor is rejected if the same condition occurs between
+it and the group. The current 2,369 paired repeated groups yield 1,433 with
+two such anchors, 550 with one and 386 with none. Against the earlier
+outside/same-arm evidence, 72 previously unsupported pairs gained two n-gram
+anchors; 298 gained only one and 121 gained none. These remain search leads,
+not automatic independent review or proof of local behavior. The P6 queue
+records the physical current and XP line spans for reproducibility.
+
+A subsequent boundary scan of already paired condition groups found 338
+additional diagnostic-line candidates in 40 files. A candidate requires an
+immediate `#line` after a retained arm or complete group and an identical
+next source line at the paired XP boundary; group/parent matching remains
+an explicit prerequisite, not an assumption. Within four of the five files
+already in the next batch, 65 such mappings were corrected; the six directly
+inspected corrections above make 71 line controls in five files. The
+[per-location ledger](m9-t99-s30-p7-line-mapping.tsv) lists the old/new
+numbers and adjacent XP content. The remaining candidate rows are not yet
+classified; the [candidate ledger](m9-t99-s30-p7-line-candidates.tsv) records
+all 338 rows, including 128 still awaiting review in 31 files. Actual x64/x86 preprocessing before versus after all 71 changes
+is byte-identical for each of the five translation units. This does not
+prove a global line-number audit or any not-yet-inspected configuration.
+
+The same adjacent-source test was applied to another five compiled mirror
+files: `gfx_updt.c` (43 locations), `vga_prts.c` (31), `ega_vide.c` (28),
+`keyba.c` (27) and `printer.c` (16). Together with the initial five files,
+this batch corrects 216 individual line controls in ten files; the
+[per-location ledger](m9-t99-s30-p7-line-mapping.tsv) identifies every
+old/new value and matching XP adjacent source. Actual compile-command
+preprocessing for all ten files is byte-identical before and after on both
+architectures. The scanner is conservative but its individual matches remain
+subject to batch review; this does not claim every possible line control was
+autonomously classified. Both architectures built and published successfully. Each passed 186/186
+background tests and 8/8 native desktop/audio tests. Both architecture mirror
+and documentation gates passed; submission follows actual-diff review.
+The x86 and x64 EXE SHA-256 values are respectively
+`e6acd5a0fa85c05a056d55cbca42a4f4ec07d1933be7276d902b8f4d451e1481` and
+`4aff101082327b1a2cbaf1dc0d3dde0581ebbb6fe57a467909d672b3088793f7`.

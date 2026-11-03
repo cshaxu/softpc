@@ -884,7 +884,7 @@ base/inc/gvi.h	root	209	if:defined(NEC_98)	7	312	0	2	207:310	213:315	214	316	207
 base/inc/gvi.h	root	217	if:defined(NEC_98)	7	318	0	1	213:315	283:483	305	504	213:315	-:-	0	-	-	-	-	yes	pending-independent-review	-
 base/inc/gvi.h	root/217	281	ifdef:VGG	2	481	0	1	-:-	283:483	286	486	-:-	-:-	1	ifdef:VGG	283	483	((PCDisplay.screen_height.as_word+1)*get_pc_pix_height()))	yes	pending-independent-review	-
 base/inc/gvi.h	root/217	293	ifdef:VGG	2	492	203	1	283:483	-:-	304	503	283:483	-:-	0	-	-	-	-	yes	pending-independent-review	-
-base/inc/gvi.h	root	318	if:defined(NEC_98)	7	516	204	0	283:483	-:-	320	644	283:483	-:-	0	-	-	-	-	no	source-boundary-reviewed	XP 516: same gvi_pc_check_regen macro before NEC_98
+base/inc/gvi.h	root	318	if:defined(NEC_98)	7	516	204	0	283:483	-:-	320	644	283:483	-:-	0	-	-	-	-	no	source-boundary-reviewed	XP guard 516 ends 644; following #line 645 already correct
 base/inc/host_com.h	root/1	200	ifdef:NTVDM	3	199	1	2	196:196	211:215	202	207	196:196	211:215	0	-	-	-	-	no	pending-independent-review	-
 base/inc/host_com.h	root/1	228	ifdef:NTVDM	3	232	1	1	211:215	-:-	230	234	211:215	-:-	0	-	-	-	-	no	pending-independent-review	-
 base/inc/host_com.h	root/1	238	ifdef:NTVDM	3	241	1	0	-:-	-:-	240	243	-:-	-:-	0	-	-	-	-	no	pending-independent-review	-
@@ -1197,7 +1197,7 @@ base/keymouse/mouse_io.c	root	4779	ifndef:NEC_98	29	4775	194	2	4771:4767	4792:47
 base/keymouse/mouse_io.c	root	4846	ifndef:NEC_98	29	4840	196	2	4838:4832	4857:4850	4858	4851	4838:4832	4862:4854	1	ifndef:NEC_98	4857	4850	"note_trace0(MOUSE_VERBOSE,""mouse_io:microsoft_internalNOTSUPPORTED!"");"	no	pending-independent-review	-
 base/keymouse/mouse_io.c	root	4870	ifndef:NEC_98	29	4862	198	2	4862:4854	4883:4874	4898	4889	4862:4854	4902:4892	8	ifndef:NEC_98	4877	4868	half_wordcrt_mode;	no	pending-independent-review	-
 base/keymouse/mouse_io.c	root	4910	ifndef:NEC_98	29	4900	200	2	4902:4892	4919:4908	4937	4926	4902:4892	4941:4929	6	ifndef:NEC_98	4919	4908	"note_trace0(MOUSE_VERBOSE,""mouse_io:set_get_ballpoint_info"");"	no	pending-independent-review	-
-base/keymouse/mouse_io.c	root	4949	ifndef:NEC_98	29	4937	202	2	4941:4929	4956:4943	4966	4953	4941:4929	4970:4956	8	ifndef:NEC_98	4956	4943	"note_trace0(MOUSE_VERBOSE,""mouse_io:get_min_max_virtual_coords"");"	no	pending-independent-review	-
+base/keymouse/mouse_io.c	root	4949	ifndef:NEC_98	29	4937	202	2	4941:4929	4956:4943	4966	4953	4941:4929	4970:4956	8	ifndef:NEC_98	4956	4943	"note_trace0(MOUSE_VERBOSE,""mouse_io:get_min_max_virtual_coords"");"	no	source-boundary-reviewed	get_min_max_virtual_coords XP 4937; following selected body begins XP 4938; corrected line
 base/keymouse/mouse_io.c	root	4978	ifndef:NEC_98	29	4964	204	2	4970:4956	4985:4970	5012	4997	4970:4956	5016:5000	8	ifndef:NEC_98	4985	4970	"note_trace0(MOUSE_VERBOSE,""mouse_io:get_active_advanced_functions"");"	no	pending-independent-review	-
 base/keymouse/mouse_io.c	root	5024	ifndef:NEC_98	29	5008	206	2	5016:5000	5049:5032	5146	5129	5016:5000	5150:5132	40	ifndef:NEC_98	5049	5032	wordobuf_seg;	no	pending-independent-review	-
 base/keymouse/mouse_io.c	root	5158	ifndef:NEC_98	29	5140	208	2	5150:5132	5170:5151	5179	5160	5150:5132	5183:5163	6	ifndef:NEC_98	5170	5151	"note_trace0(MOUSE_VERBOSE,""mouse_io:get_mouse_ini"");"	no	pending-independent-review	-
@@ -1316,7 +1316,7 @@ base/system/at_dma.c	root	388	ifndef:NEC_98	18	372	0	2	387:371	390:373	391	374	3
 base/system/at_dma.c	root	399	ifndef:NEC_98	18	381	0	2	398:380	401:382	402	383	398:380	404:384	1	ifndef:NEC_98	401	382	caseDMA1_WRITE_ONE_MASK_BIT:	yes	pending-independent-review	-
 base/system/at_dma.c	root	418	ifndef:NEC_98	18	398	0	2	417:397	420:399	421	400	417:397	425:403	1	ifndef:NEC_98	420	399	caseDMA1_WRITE_MODE_REG:	yes	pending-independent-review	-
 base/system/at_dma.c	root	430	ifndef:NEC_98	18	408	0	2	429:407	432:409	433	410	429:407	-:-	1	ifndef:NEC_98	432	409	caseDMA1_CLEAR_FLIP_FLOP:	yes	pending-independent-review	-
-base/system/at_dma.c	root	440	ifndef:NEC_98	18	416	65	2	432:409	445:419	443	418	432:409	445:419	0	-	-	-	-	yes	pending-independent-review	-
+base/system/at_dma.c	root	440	ifndef:NEC_98	18	416	65	2	432:409	445:419	443	418	432:409	445:419	0	-	-	-	-	yes	source-boundary-reviewed	DMA shared master-clear switch XP 416; next case XP 417; corrected line
 base/system/at_dma.c	root	456	ifndef:NEC_98	18	430	0	2	455:429	458:431	459	432	455:429	461:433	1	ifndef:NEC_98	458	431	caseDMA1_CLEAR_MASK:	yes	pending-independent-review	-
 base/system/at_dma.c	root	466	ifndef:NEC_98	18	438	0	2	465:437	468:439	469	440	465:437	471:441	1	ifndef:NEC_98	468	439	caseDMA1_WRITE_ALL_MASK_BITS:	yes	pending-independent-review	-
 base/system/at_dma.c	root	485	ifndef:NEC_98	18	455	0	1	483:453	560:534	489	458	483:453	560:534	0	-	-	-	-	yes	pending-independent-review	-
@@ -1640,14 +1640,14 @@ base/video/ega_prts.c	root/331/332	1743	ifndef:NEC_98	35	2251	41	2	1741:2249	174
 base/video/ega_prts.c	root/331/332	1777	ifndef:NEC_98	35	2283	43	2	1775:2281	1782:2287	1800	2305	1775:2281	1804:2308	3	ifndef:NEC_98	1782	2287	"note_entrance2(""ega_seq_mem_mode(%x,%x)"",port,value);"	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	1806	ifndef:NEC_98	35	2310	45	2	1804:2308	1808:2311	2109	2612	1804:2308	2113:2615	113	ifndef:NEC_98	1808	2311	SHORToffset;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2115	ifndef:NEC_98	35	2617	47	2	2113:2615	2120:2621	2159	2660	2113:2615	2164:2664	17	ifndef:NEC_98	2120	2621	"note_entrance3(""ega_crtc_inb(%x,%x)index%d"",port,value,crt_controller.address.as_bfld.index);"	yes	pending-independent-review	-
-base/video/ega_prts.c	root/331/332	2166	ifndef:NEC_98	35	2666	49	2	2164:2664	2171:2670	2177	2676	2164:2664	2190:2688	4	ifndef:NEC_98	2171	2670	"note_entrance2(""ega_gc_outb_index(%x,%x)"",port,value);"	yes	pending-independent-review	-
+base/video/ega_prts.c	root/331/332	2166	ifndef:NEC_98	35	2666	49	2	2164:2664	2171:2670	2177	2676	2164:2664	2190:2688	4	ifndef:NEC_98	2171	2670	"note_entrance2(""ega_gc_outb_index(%x,%x)"",port,value);"	yes	source-boundary-reviewed	ega_gc_outb_index XP 2666; next directive XP 2667; corrected line
 base/video/ega_prts.c	root/331/332	2192	ifndef:NEC_98	35	2690	51	2	2190:2688	2197:2694	2210	2707	2190:2688	2218:2714	6	ifndef:NEC_98	2197	2694	temp.X=outval;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2220	ifndef:NEC_98	35	2716	53	2	2218:2714	2222:2717	2237	2732	2218:2714	2241:2735	6	ifndef:NEC_98	2222	2717	registerunsignedset_reset;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2243	ifndef:NEC_98	35	2737	55	2	2241:2735	2245:2738	2262	2755	2241:2735	2266:2758	8	ifndef:NEC_98	2245	2738	registerunsigneden_set_reset;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2268	ifndef:NEC_98	35	2760	57	2	2266:2758	2270:2761	2283	2774	2266:2758	2287:2777	6	ifndef:NEC_98	2270	2761	registerunsignedcolour_compare;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2289	ifndef:NEC_98	35	2779	59	2	2287:2777	2298:2787	2315	2804	2287:2777	2319:2807	10	ifndef:NEC_98	2298	2787	"note_entrance2(""ega_gc_rotate(%x,%x)"",port,value);"	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2321	ifndef:NEC_98	35	2809	61	2	2319:2807	2326:2813	2331	2818	2319:2807	2335:2821	3	ifndef:NEC_98	2326	2813	"note_entrance2(""ega_gc_read_map(%x,%x)"",port,value);"	yes	pending-independent-review	-
-base/video/ega_prts.c	root/331/332	2337	ifndef:NEC_98	35	2823	63	2	2335:2821	2339:2824	2385	2870	2335:2821	2389:2873	12	ifndef:NEC_98	2339	2824	MODEnew_mode;	yes	pending-independent-review	-
+base/video/ega_prts.c	root/331/332	2337	ifndef:NEC_98	35	2823	63	2	2335:2821	2339:2824	2385	2870	2335:2821	2389:2873	12	ifndef:NEC_98	2339	2824	MODEnew_mode;	yes	source-boundary-reviewed	ega_gc_mode XP 2823; next declaration XP 2824; corrected line
 base/video/ega_prts.c	root/331/332	2391	ifndef:NEC_98	35	2875	65	2	2389:2873	2393:2876	2451	2934	2389:2873	2455:2937	11	ifndef:NEC_98	2393	2876	registerunsignedmemory_map;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2457	ifndef:NEC_98	35	2939	67	2	2455:2937	2459:2940	2472	2953	2455:2937	2503:2983	6	ifndef:NEC_98	2459	2940	registerunsignedcolour_dont_care;	yes	pending-independent-review	-
 base/video/ega_prts.c	root/331/332	2507	ifndef:NEC_98	35	2987	69	2	2505:2985	2510:2989	2550	3031	2505:2985	2560:3040	8	ifndef:NEC_98	2510	2989	SAVEDIU8masks[]={0x1f,0x01,0x0f,0x0f};	yes	pending-independent-review	-
@@ -1960,7 +1960,7 @@ base/video/vga_mode.c	root/95/96/219	357	ifdef:GISP_SVGA	17	393	53	2	355:391	362
 base/video/vga_mode.c	root/95/96/219	372	ifdef:GISP_SVGA	17	407	53	2	365:400	377:411	374	409	365:400	377:411	0	-	-	-	-	no	pending-independent-review	-
 base/video/vga_mode.c	root/95/96/219	382	ifdef:GISP_SVGA	17	416	53	2	380:414	387:420	384	418	380:414	387:420	0	-	-	-	-	no	pending-independent-review	-
 base/video/vga_mode.c	root/95/96/219	391	ifdef:GISP_SVGA	17	424	53	2	389:422	396:429	393	427	389:422	396:429	0	-	-	-	-	no	pending-independent-review	-
-base/video/vga_mode.c	root/95/96/219	402	ifdef:GISP_SVGA	17	435	53	2	400:433	411:443	404	438	400:433	411:443	0	-	-	-	-	no	pending-independent-review	-
+base/video/vga_mode.c	root/95/96/219	402	ifdef:GISP_SVGA	17	435	53	2	400:433	411:443	404	438	400:433	411:443	0	-	-	-	-	no	source-boundary-reviewed	EGA_FUN selection XP guard 435 ends 438; next trace XP 439; corrected line
 base/video/vga_mode.c	root/95/96/219	407	ifdef:GORE	2	440	53	2	400:433	411:443	412	444	400:433	414:446	1	else:	411	443	set_gfx_update_routines(ega_graph_update,EGA_GRAPHICS_MARKING,NO_SCROLL);	yes	pending-independent-review	-
 base/video/vga_mode.c	root/95/96/219	416	ifdef:GISP_SVGA	17	448	53	2	415:447	420:451	418	450	415:447	420:451	0	-	-	-	-	no	pending-independent-review	-
 base/video/vga_mode.c	root/95/96/219	424	ifdef:GISP_SVGA	17	455	53	2	423:454	445:474	426	457	423:454	445:474	0	-	-	-	-	no	pending-independent-review	-
@@ -2056,7 +2056,7 @@ base/video/vga_vide.c	root/23	281	ifndef:NEC_98	14	285	10	2	278:282	301:317	318	
 base/video/vga_vide.c	root/23	325	ifndef:NEC_98	14	340	12	2	322:337	344:372	363	391	322:337	367:394	0	-	-	-	-	yes	pending-independent-review	-
 base/video/vga_vide.c	root/23	369	ifndef:NEC_98	14	396	14	2	367:394	371:397	402	427	367:394	406:430	9	ifndef:NEC_98	371	397	bytethe_char[256];	yes	pending-independent-review	-
 base/video/vga_vide.c	root/23	408	ifndef:NEC_98	14	432	16	2	406:430	419:441	422	444	406:430	427:448	1	ifndef:NEC_98	421	443	setAL(*screen);	yes	pending-independent-review	-
-base/video/vga_vide.c	root/23	429	ifndef:NEC_98	14	450	18	2	427:448	439:459	576	596	427:448	585:604	29	ifndef:NEC_98	439	459	bytemode_reg;	yes	pending-independent-review	-
+base/video/vga_vide.c	root/23	429	ifndef:NEC_98	14	450	18	2	427:448	439:459	576	596	427:448	585:604	29	ifndef:NEC_98	439	459	bytemode_reg;	yes	source-boundary-reviewed	vga_set_palette XP guard 450; next body begins XP 451; corrected line
 base/video/vga_vide.c	root/23	587	ifndef:NEC_98	14	606	20	2	585:604	589:607	637	655	585:604	640:657	11	ifndef:NEC_98	589	607	half_wordseq_clock;	yes	pending-independent-review	-
 base/video/vga_vide.c	root/23	642	ifndef:NEC_98	14	659	22	2	640:657	660:676	663	679	640:657	667:682	2	ifndef:NEC_98	660	676	setBL(VGA_COLOUR);	yes	pending-independent-review	-
 base/video/vga_vide.c	root/23	669	ifndef:NEC_98	14	684	24	2	667:682	679:693	786	832	667:682	790:835	29	ifndef:NEC_98	679	693	sys_addrbuf=effective_addr(getES(),getDI());	yes	pending-independent-review	-

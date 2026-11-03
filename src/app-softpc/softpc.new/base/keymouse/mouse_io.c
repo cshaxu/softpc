@@ -1894,7 +1894,7 @@ int curr_video_mode;
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
 #endif /* NTVDM */
-#line 1929
+#line 1766
                 ega_default_crtc = parms_addr + EGA_PARMS_CRTC;
                 ega_default_seq = parms_addr + EGA_PARMS_SEQ;
                 ega_default_graph = parms_addr + EGA_PARMS_GRAPH;
@@ -2271,13 +2271,13 @@ the application OUTBs the necessary data.
                                         case 0x18:
                                                         inb(EGA_IPSTAT1_REG,&temp_word);        /* Clear attrib. index */
 #ifndef NTVDM
-#line 2261
+#line 2166
                                                         outw(EGA_AC_INDEX_DATA,sas_hw_at(set_def+2)+(sas_hw_at(set_def+3)<<8)); /* Using 'secret' that attrib. chip responds to it's port+1 */
                                                         outb(EGA_AC_INDEX_DATA, EGA_PALETTE_ENABLE);    /* re-enable video */
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* !NTVDM */
-#line 2263
+#line 2174
                                                         ega_current_attr[sas_hw_at(set_def+2)] = sas_hw_at(set_def+3);
                                                         dirty_attr[sas_hw_at(set_def+2)] = 1;
                                                         break;
@@ -2358,7 +2358,7 @@ the application OUTBs the necessary data.
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
-#line 2340
+#line 2252
                                 ega_video_io();
                                 if (!(getAL() & 0x20))
                                         mouse_ega_mode(current_video_mode); /* only for text */
@@ -2386,7 +2386,7 @@ the application OUTBs the necessary data.
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
-#line 2364
+#line 2277
                                 ega_video_io();
                         else
 #endif
@@ -2532,7 +2532,7 @@ void mouse_int1()
          *      The bus mouse hardware interrupt handler
          */
 #ifndef NTVDM
-#line 2499
+#line 2419
         MOUSE_VECTOR mouse_movement;
         MOUSE_INPORT_DATA inport_event;
 #else
@@ -2764,7 +2764,7 @@ void mouse_int2()
         note_trace0(MOUSE_VERBOSE, "mouse_int2:");
 
 #ifndef NTVDM
-#line 2710
+#line 2739
         user_subroutine_critical = FALSE;
 #endif
 #line 2741
@@ -3851,7 +3851,7 @@ LOCAL void mouse_restore_state IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 3742
+#line 3877
                 if (cursor_flag == MOUSE_CURSOR_DISPLAYED){
                         cursor_display();
                 }
@@ -4115,7 +4115,7 @@ LOCAL void mouse_driver_disable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
         word            current_int0A_offset, current_int0A_segment;
         word            current_int10_offset, current_int10_segment;
 #endif
-#line 3992
+#line 4134
         half_word       interrupt_mask_register;
 
         UNUSED(m4);
@@ -4352,7 +4352,7 @@ LOCAL void mouse_get_max_coords IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
         *m2 = mouse_driver_disabled;
 
 #ifndef NTVDM
-#line 4191
+#line 4368
         get_screen_size();
         *m3 = virtual_screen.bottom_right.x - 1;
         *m4 = virtual_screen.bottom_right.y - 1;
@@ -4947,7 +4947,7 @@ LOCAL void mouse_get_min_max_virtual_coords IFN4
    )
    {
 #ifndef NEC_98
-#line 4735
+#line 4938
    /*
       Func 49: Return minimum and maximum virtual coordinates for
       current screen mode. The values are those set by Funcs 7 and 8.
@@ -5367,9 +5367,9 @@ LOCAL void cursor_update IFN0()
 LOCAL void cursor_display IFN0()
 {
 #ifndef NEC_98
-#line 5157
+#line 5376
 #ifndef NTVDM
-#line 5157
+#line 5377
         UTINY v_mode;
 
         /* Check if Enhanced Mode wants to "see" cursor */
@@ -5420,7 +5420,7 @@ LOCAL void cursor_display IFN0()
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #else /* MOUSE_16_BIT */
-#line 5207
+#line 5427
                 if (host_mouse_installed())
                 {
                         if ( cursor_position.x >= black_hole.top_left.x &&
@@ -5451,7 +5451,7 @@ LOCAL void cursor_display IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 5238
+#line 5458
                                 graphics_cursor_display();
                 }
 #endif /* MOUSE_16_BIT */
@@ -5476,7 +5476,7 @@ LOCAL void cursor_undisplay IFN0()
 {
 #ifndef NEC_98
 #ifndef NTVDM
-#line 5256
+#line 5480
         UTINY v_mode;
 
         /* Check if Enhanced Mode wants to "see" cursor */
@@ -5549,7 +5549,7 @@ LOCAL void cursor_undisplay IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 5328
+#line 5552
                             graphics_cursor_undisplay();
 #endif /* MOUSE_16_BIT */
                         }
@@ -5740,7 +5740,7 @@ void LOCAL EGA_graphics_cursor_display IFN0()
 
 {
 #ifndef NEC_98
-#line 5506
+#line 5737
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
@@ -5933,7 +5933,7 @@ void LOCAL EGA_graphics_cursor_undisplay IFN0()
 
 {
 #ifndef NEC_98
-#line 5697
+#line 5930
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else

@@ -1221,7 +1221,7 @@ RETURN PARAMS   :	None
 LOCAL void	do_chain_majority_decision IFN0()
 {
 #ifndef NEC_98
-#line 1748
+#line 1751
 	static	int	current_votes=0;
 	int		new_votes;
 
@@ -1297,7 +1297,7 @@ GLOBAL void
 set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 {
 #ifndef NEC_98
-#line 1813
+#line 1822
 	ULONG roffs, woffs;
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
@@ -1323,7 +1323,7 @@ set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 1839
+#line 1848
 	setVideorplane(EGA_planes + roffs);
 	setVideowplane(EGA_planes + woffs);
 
@@ -1345,7 +1345,7 @@ GLOBAL void
 update_banking IFN0()
 {
 #ifndef NEC_98
-#line 1857
+#line 1868
 	UTINY rd_bank, wrt_bank;
 
 #ifdef V7VGA
@@ -1370,7 +1370,7 @@ VOID
 init_vga_globals IFN0()
 {
 #ifndef NEC_98
-#line 1872
+#line 1904
 	setVideov7_bank_vid_copy_off(0);
 	setVideosr_lookup(sr_lookup);
 	setVideovideo_copy(&video_copy[0]);
@@ -1383,7 +1383,7 @@ init_vga_globals IFN0()
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else
-#line 1883
+#line 1916
 	SetMarkPointers(0);
 #endif	/* CPU_40_STYLE - EVID */
 
@@ -1398,7 +1398,7 @@ init_vga_globals IFN0()
 void	ega_init IFN0()
 {
 #ifndef NEC_98
-#line 1892
+#line 1928
 	note_entrance0("ega_init");
 	/*
 	 * Define sequencer's ports
@@ -1683,7 +1683,7 @@ void	ega_seq_reset IFN2(io_addr, port, half_word, value)
 void	ega_seq_clock IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2160
+#line 2198
 register unsigned dot_clock;
 
 #ifdef PROD
@@ -1741,7 +1741,7 @@ void	ega_seq_map_mask IFN2(io_addr, port, half_word, value)
 void	ega_seq_char_map IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2210
+#line 2252
 register unsigned map_selects;
 
 #ifdef PROD
@@ -1804,7 +1804,7 @@ void	ega_seq_mem_mode IFN2(io_addr, port, half_word, value)
 LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2265
+#line 2311
 	SHORT offset;
 	struct {	/* avoid alignment problems with casts */
 		unsigned value : 8;
@@ -1872,7 +1872,7 @@ LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
-#line 2333
+#line 2379
 						flag_mode_change_required();
 					}
 					if (crt_controller.crtc_overflow.as_bfld.line_compare_bit_8 !=
@@ -2164,7 +2164,7 @@ LOCAL void	ega_crtc_inb IFN2(io_addr, port, half_word *, value)
 void	ega_gc_outb_index IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2617
+#line 2667
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2218,7 +2218,7 @@ GLOBAL VOID ega_gc_outw IFN2(io_addr, port, word, outval)
 void	ega_gc_set_reset IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2663
+#line 2717
 register unsigned set_reset;
 
 #ifdef PROD
@@ -2241,7 +2241,7 @@ register unsigned set_reset;
 void	ega_gc_enable_set IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2682
+#line 2738
 register unsigned en_set_reset;
 
 #ifdef PROD
@@ -2266,7 +2266,7 @@ register unsigned en_set_reset;
 void	ega_gc_compare IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2703
+#line 2761
 register unsigned colour_compare;
 
 #ifdef PROD
@@ -2335,7 +2335,7 @@ void	ega_gc_read_map IFN2(io_addr, port, half_word, value)
 void	ega_gc_mode IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2760
+#line 2824
 MODE new_mode;
 
 #ifdef PROD
@@ -2389,7 +2389,7 @@ MODE new_mode;
 void	ega_gc_misc IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2810
+#line 2876
 register unsigned memory_map;
 
 #ifdef PROD
@@ -2455,7 +2455,7 @@ register unsigned memory_map;
 void	ega_gc_dont_care IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2872
+#line 2940
 register unsigned colour_dont_care;
 
 #ifdef PROD
@@ -2540,7 +2540,7 @@ GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 #error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
 #if !(defined(NTVDM) && defined(MONITOR))
-#line 2955
+#line 3026
 	Glue_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);
 #endif /* !(NTVDM && MONITOR) */
 #line 2956
@@ -2560,7 +2560,7 @@ GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2969
+#line 3043
 	register unsigned int mask;
 
 #ifdef PROD
@@ -2609,7 +2609,7 @@ LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 void	ega_gc_mask_ff IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 3017
+#line 3093
 	register unsigned int mask;
 
 #ifdef PROD
@@ -2792,7 +2792,7 @@ LOCAL void	ega_ac_outb IFN2(io_addr, port, half_word, value)
 LOCAL void	ega_misc_outb IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 3191
+#line 3273
 MISC_OUTPUT_REG new;
 
 #ifdef PROD
@@ -3017,7 +3017,7 @@ LOCAL void	ega_ipstat1_inb IFN2(io_addr, port, half_word *, value)
 LOCAL	void	vote_ega_mode IFN0()
 {
 #ifndef NEC_98
-#line 3400
+#line 3490
 	static	int	old_votes = 3;
 	int	votes;
 
