@@ -168,7 +168,7 @@ extern struct EGA_CPU_GLOBALS
 #ifndef CPU_40_STYLE	/* Vglobs done via access fns */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE */
-#line 250
+#line 362
 
 extern void setVideorplane IPT1(IU8 *, value);
 extern IU8 * getVideorplane IPT0();
@@ -264,12 +264,12 @@ extern struct VideoVector C_Video;	/* in (generated) vglfunc.c */
 #undef	SetMarkPointers
 #define SetMarkPointers	setMarkPointers
 #endif	/* C_VID */
-#line 347
+#line 456
 #endif	/* CPU_40_STYLE */
 
 #define write_state EGA_CPU.ega_state.state
 #endif // !NEC_98
-#line 350
+#line 460
 
 #define UNCHAINED	0
 #define CHAIN2		1
@@ -315,7 +315,7 @@ extern IU32 latchval;	/* used for following latch macros */
 #endif	/* CPU_40_STYLE */
 #line 405
 #endif // !NEC_98
-#line 405
+#line 533
 
 /*
  * macro to do the logical operations on cpu data and the latch values

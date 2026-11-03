@@ -375,7 +375,7 @@ IMPORT IU8 Currently_emulated_video_mode;
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif 	/* GISP_SVGA */
-#line 378
+#line 374
 
 /*
 5.MODULE INTERNALS   :   (not visible externally, global internally)]
@@ -2281,7 +2281,7 @@ GLOBAL VOID	vga_gc_mask IFN2(USHORT,port,FAST UTINY,value)
 #else
 #error "Unsupported SoftPC mirror configuration: USE_OLD_MASK_CODE"
 #endif	/* USE_OLD_MASK_CODE */
-#line 2168
+#line 2300
 
 		/* Alter the function table used by ega_gc_index */
 		ega_gc_regs[8] = FAST_FUNC_ADDR(vga_gc_mask_ff);
@@ -2289,7 +2289,7 @@ GLOBAL VOID	vga_gc_mask IFN2(USHORT,port,FAST UTINY,value)
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 2178
+#line 2310
 
 		io_redefine_outb(EGA_GC_ADAP_DATA,vga_gc_mask_ff);
 
@@ -2332,7 +2332,7 @@ GLOBAL VOID	vga_gc_mask_ff IFN2(USHORT,port,FAST UTINY,value)
 #else
 #error "Unsupported SoftPC mirror configuration: USE_OLD_MASK_CODE"
 #endif	/* USE_OLD_MASK_CODE*/
-#line 2218
+#line 2352
 
 		/* Alter the function table used by ega_gc_index */
 		ega_gc_regs[8] = FAST_FUNC_ADDR(vga_gc_mask);
@@ -2340,7 +2340,7 @@ GLOBAL VOID	vga_gc_mask_ff IFN2(USHORT,port,FAST UTINY,value)
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 2228
+#line 2362
 
 		io_redefine_outb(EGA_GC_ADAP_DATA,vga_gc_mask);
 
@@ -2399,7 +2399,7 @@ GLOBAL VOID	v_ret_intr_status IFN0()
     vga_ip0_state = 3;
     vga_ip0_state_count = 6;
 #endif  //NEC_98
-#line 2276
+#line 2415
 }
 
 
@@ -3040,7 +3040,7 @@ GLOBAL VOID	vga_dac_data_inb IFN2(io_addr,port,half_word *,value)
     }
     note_entrance1("returning %#x",*value);
 #endif  //NEC_98
-#line 2937
+#line 3130
 }
 
 #if defined(NTVDM) && defined(X86GFX)
@@ -3100,7 +3100,7 @@ VOID    vote_vga_mode IFN0()
                 assert1(NO,"Wierd vote result %d in vote_vga_mode",votes);
         }
 #endif //NEC_98
-#line 2989
+#line 3194
 }       /* vote_vga_mode */
 
 #ifdef GISP_SVGA

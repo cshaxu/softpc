@@ -154,7 +154,7 @@ GLOBAL IBOOL forceVideoRmSemantics = FALSE;
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 135
+#line 158
 
 /*
 5.MODULE INTERNALS   :   (not visible externally, global internally)]
@@ -263,7 +263,7 @@ UTINY   vga_cursor16_start[17][17] = {
 #ifdef  USE_CURSOR_END_TABLES
 #error "Unsupported SoftPC mirror configuration: USE_CURSOR_END_TABLES"
 #endif  /* USE_CURSOR_END_TABLES */
-#line 280
+#line 305
 #endif  /* VGG */
 
 /* [5.1.1 #DEFINES]                                                     */
@@ -766,14 +766,14 @@ void recalc_text IFN1(int, height)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 741
+#line 839
 
                 screen_height = (sas_hw_at_no_check(vd_rows_on_screen)+1)*height-1;
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 744
+#line 855
 
                 outb(EGA_CRTC_INDEX, 7);        /* overflow register */
                 inb(EGA_CRTC_DATA, &oflo);
@@ -1112,7 +1112,7 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef MSWDVR
 #error "Unsupported SoftPC mirror configuration: MSWDVR"
 #endif /* MSWDVR */
-#line 1087
+#line 1276
 
         Currently_emulated_video_mode = video_mode;
 
@@ -1131,7 +1131,7 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1098
+#line 1311
 
                     switch (get_VGA_lines())
                     {
@@ -1140,14 +1140,14 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1103
+#line 1320
                                 break;
                         case S400:
                                 load_font(EGA_HIFONT,256,0,0,16);
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1106
+#line 1332
                                 break;
                         default:
                                 load_font(EGA_CGDDOT,256,0,0,8);

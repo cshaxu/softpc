@@ -551,7 +551,7 @@ IMPORT	ISM32	c_setES	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 829
+#line 828
 
 #ifdef	CCPU
 IMPORT	IUH	c_setFS	IPT1(IU16, val);
@@ -1167,7 +1167,7 @@ IMPORT	ISM32	c_getOF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1830
+#line 1829
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getNT	IPT0();
@@ -1912,7 +1912,7 @@ IMPORT	void	c_setRegConstraint	IPT2(IU32, regId, IU8, constraintType);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3000
+#line 2999
 
 #ifdef	CCPU
 IMPORT	void	c_trashIntelRegisters	IPT0();

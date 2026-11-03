@@ -47,7 +47,7 @@
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 43
+#line 313
 
 /*
  * Memory bounds for the colour graphics adaptor
@@ -313,7 +313,7 @@
 #ifdef SWIN_SNDBLST_NULL
 #error "Unsupported SoftPC mirror configuration: SWIN_SNDBLST_NULL"
 #endif
-#line 311
+#line 581
 
 /*
  * PCI configuration ports.
@@ -360,7 +360,7 @@
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 357
+#line 627
 #if (NUM_SERIAL_PORTS > 2)
 #define COM3_ADAPTOR            29
 #define COM4_ADAPTOR            30
@@ -386,14 +386,14 @@
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else           /* GISP_SVGA */
-#line 378
+#line 664
 
 /* Adapter for SoundBlaster Null Driver */
 
 #ifdef SWIN_SNDBLST_NULL
 #error "Unsupported SoftPC mirror configuration: SWIN_SNDBLST_NULL"
 #endif
-#line 384
+#line 670
 
 #ifndef IO_MAX_NUMBER_ADAPTORS
 #define IO_MAX_NUMBER_ADAPTORS  37      /* make this equal to the highest used plus one please! */
@@ -450,7 +450,7 @@ IMPORT void     io_define_inb
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 749
+#line 766
 );
 
 #ifdef SFELLOW
@@ -471,7 +471,7 @@ IMPORT void     io_define_outb
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 788
+#line 805
 );
 
 #ifdef SFELLOW

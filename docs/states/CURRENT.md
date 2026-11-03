@@ -831,3 +831,11 @@ P27 was committed and pushed as `bd890b4a`. P28 corrects 61 verified XP
 Twenty-eight additional candidate-file boundaries were manually reviewed;
 24 candidate groups remain open. V7 ordinal mispairing and registered ABI
 exceptions remain described in the evidence. P28 dual builds and background suites passed; the x86 native group passed in full after one failed first run. Delivery is pending; the whole-tree line candidate scan is not a completeness proof.
+
+P28 was committed and pushed as `f8dcf67d`. P29 corrects 59 diagnostic
+line directives across ten mirror files; conditions, functionality and
+registered patches remain unchanged. The last 24 candidate-file group
+boundaries have been checked, including their arm signatures; this is not
+proof that all retained descendants or all line directives have been audited.
+The line candidate remainder has 59 sites, including unverified false or
+conflicting matches. P29 dual builds and background suites passed; each native group passed in full after a failed first run. Delivery is pending. S30 remains open.

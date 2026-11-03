@@ -153,7 +153,7 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 #endif /* VGG */
 #line 179
 #endif  //NEC_98
-#line 179
+#line 194
 
 #define	get_dirty_line(ind)	(dirty[(ind)].line_no)
 #define	get_dirty_start(ind)	(dirty[(ind)].start)
@@ -258,7 +258,7 @@ static	DIRTY_PARTS	dirty[768];
 #error "Unsupported SoftPC mirror configuration: macintosh"
 #endif
 #endif  //NEC_98
-#line 262
+#line 304
 
 IMPORT half_word bg_col_mask;
 static	int	dirty_next=0;
@@ -2040,7 +2040,7 @@ void	ega_split_graph_update IFN0()
 
     	host_end_update();
 #endif  //NEC_98
-#line 1944
+#line 1995
 }
 
 #ifdef VGG
@@ -3658,7 +3658,7 @@ GLOBAL VOID cga_mark_string IFN2(int, laddr, int, haddr)
 
 	setVideodirty_total(getVideodirty_total() + offset2-offset1+1);
 #endif  //NEC_98
-#line 3493
+#line 3609
 }
 
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
@@ -3832,7 +3832,7 @@ set_mark_funcs IFN0()
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
-#line 3636
+#line 3767
 			SetMarkPointers(0);
 #endif	/* CPU_40_STYLE - EVID */
 #endif  //NEC_98
@@ -3879,7 +3879,7 @@ set_mark_funcs IFN0()
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
-#line 3691
+#line 3824
 					SetMarkPointers(2);
 #endif	/* CPU_40_STYLE - EVID */
 #endif /* GORE */
@@ -3889,7 +3889,7 @@ set_mark_funcs IFN0()
 					/* DIVERGENCE(T88-CHAIN2-DIRTY): select the EGA
 					 * bitmap marker, not stale CGA/text pointers. */
 					SetMarkPointers(4);
-#line 3704
+#line 3831
 
 					break;
 
@@ -4038,14 +4038,14 @@ void base_cursor_shape_changed IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 4054
+#line 4194
 
 #if defined(VGG) || defined(EGG)
 
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 4060
+#line 4200
 
 /* ============================================================================
  * The following routines enable and disable the GFX update routines

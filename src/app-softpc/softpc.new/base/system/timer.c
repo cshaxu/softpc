@@ -761,7 +761,7 @@ GLOBAL ULONG get_DOS_ticks IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 799
+#line 800
 
 
 
@@ -1054,7 +1054,7 @@ LOCAL void loadCounter IFN0()
                         max_backlog = maxback;
                 }
 #endif
-#line 909
+#line 1080
 
         }
 
@@ -1934,7 +1934,7 @@ LOCAL void timer_generate_int IFN1(long, n)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1756
+#line 2009
                 }
         }else{
 #ifndef GISP_CPU
@@ -1944,7 +1944,7 @@ LOCAL void timer_generate_int IFN1(long, n)
 #else /* GISP_CPU */
 #error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif /* GISP_CPU */
-#line 1776
+#line 2029
 
 #endif /* DELAYED_INTS */
 

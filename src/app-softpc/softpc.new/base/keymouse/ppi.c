@@ -71,7 +71,7 @@ static boolean gate_2_was_low = TRUE;	/* state of timer 2 gate */
 #error "Unsupported SoftPC mirror configuration: non-standalone PPI"
 #endif
 #endif
-#line 73
+#line 72
 
 /*
  * ============================================================================
@@ -111,13 +111,13 @@ void ppi_inb IFN2(io_addr, port, half_word *, value)
 
     note_trace2(PPI_VERBOSE, "ppi_inb() - port %x, returning val %x", port, *value);
 #endif   //NEC_98
-#line 109
+#line 110
 }
 
 void ppi_outb IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 113
+#line 115
     port = port & PPI_BIT_MASK;		/* clear unused bits */
 
     if (port == PPI_GENERAL)
@@ -144,7 +144,7 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 
 #ifndef NTVDM
 #endif
-#line 150
+#line 152
 
 		/*
 		 * Now gate the ppi signal to the timer.
@@ -187,7 +187,7 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 void ppi_init IFN0()
 {
 #ifndef NEC_98
-#line 193
+#line 197
     io_addr i;
     io_define_inb(PPI_ADAPTOR, ppi_inb);
     io_define_outb(PPI_ADAPTOR, ppi_outb);

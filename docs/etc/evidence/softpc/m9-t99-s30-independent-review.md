@@ -762,4 +762,30 @@ conditions and executable statements are unchanged. The [28 manually reviewed bo
 repeated V7 ordinal mismatch and registered local ABI difference; they
 prove boundary correspondence only. The [remaining 24 groups](m9-t99-s30-p28-unresolved-candidate-file-groups.tsv) remain open.
 Line candidate scans are non-exhaustive and their unreviewed rows remain
-outside this proof. The [118 remaining line candidate sites](m9-t99-s30-p28-unreviewed-line-candidates.tsv) span 40 files and include uncertain and conflicting matches; this list is not exhaustive. A four-line exact-context scan of mirrored text files produced 1,992 uniquely matching line numbers, 97 unique differing candidates, 1,307 without unique matches, and 81 with fewer than four following lines. These are scan categories, not a defect count. P28 dual builds and 186 background tests each passed. x64 native passed 8/8 first run; x86 native initially failed compact_console with stage 1 error 6 and child 0xc0000142, then passed all 8/8 on full group rerun. Cause remains unknown. Build warnings: x64 808, x86 808, all from mirror sources. EXE SHA-256: x86 `9bec21672157f27dbfa4fce760e7022cdea84b34a779e342a470fc1f7fca4134`; x64 `eeebbc9191637f645b45711bc052396ca1053691c55a911e4bd6cd65c3f23504`.
+outside this proof. The [118 remaining line candidate sites](m9-t99-s30-p28-unreviewed-line-candidates.tsv) span 40 files and include uncertain and conflicting matches; this list is not exhaustive. A four-line exact-context scan of 469 UTF-8-decodable mirrored files produced 1,992 uniquely matching line numbers, 97 unique differing candidates, 1,307 without unique matches, and 81 with fewer than four following lines. These are scan categories, not a defect count. P28 dual builds and 186 background tests each passed. x64 native passed 8/8 first run; x86 native initially failed compact_console with stage 1 error 6 and child 0xc0000142, then passed all 8/8 on full group rerun. Cause remains unknown. Build warnings: x64 808, x86 808, all from mirror sources. EXE SHA-256: x86 `9bec21672157f27dbfa4fce760e7022cdea84b34a779e342a470fc1f7fca4134`; x64 `eeebbc9191637f645b45711bc052396ca1053691c55a911e4bd6cd65c3f23504`.
+
+## P29 mirror diagnostic locations and remaining boundary checks
+
+The [59 line changes](m9-t99-s30-p29-line-mapping.tsv) cover ten files.
+Every next line was checked against fixed XP and the surrounding branch
+context; two heuristic mismatches were corrected to their actual XP
+locations, while the timer.c 483 candidate was rejected because local extra
+blank lines already put the following source at the right XP line. The
+existing T88 CHAIN2 marker remains intact. [Twenty-four remaining candidate group boundaries](m9-t99-s30-p29-reviewed-boundaries.tsv) were examined
+against supported parents, including arm signatures; error-only bodies were
+skipped. This closes that boundary queue, not the independent audit of all
+retained descendants or line markers. [59 heuristic line candidates](m9-t99-s30-p29-unreviewed-line-candidates.tsv) remain for review. P29
+dual builds and 186 background tests each passed. Both native groups initially failed compact_console with stage 1 error 6 and child 0xc0000142; each full native group reran 8/8 successfully. Cause remains unknown. Build warnings were x64 5230 and x86 5179, all from mirror sources. EXE SHA-256: x86 `17051e7dc4408d30d86694cee2938e49969ca65c543773440196b40aa7585900`; x64 `4251bfb08f03bdba9b4d0d97a9a021be27e39c62a02535450ca5173e08f99936`.
+
+### Additional read-only line scans after P29
+
+The initial UTF-8 scan omitted four binary ROM images and two non-UTF-8
+text pairs. The two texts were separately scanned without changing file bytes;
+[summary](m9-t99-s30-p29-nonutf8-line-scan-summary.tsv) and [15 heuristic candidates](m9-t99-s30-p29-nonutf8-line-candidates.tsv) are recorded. The
+`com.c` line 72 candidate is an identified false match; actual XP context
+points to a different position. A separate [19 structural candidates](m9-t99-s30-p29-structural-line-candidates.tsv) used paired conditions and
+matching next lines: 547 markers matched, 262 had different context and 38
+had insufficient following lines. The method covers only unique sibling
+conditions and is not exhaustive; parent pairing and each candidate remain
+subject to review. Seven structural candidates are new sites beyond the
+preceding 59-site token queue.

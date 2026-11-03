@@ -76,7 +76,7 @@ typedef union
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 184
+#line 179
 
 /*
  * ============================================================================
@@ -89,7 +89,7 @@ extern word m_s_w;
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 199
+#line 194
 
 
 /*  common READ functions  */
@@ -147,7 +147,7 @@ extern word m_s_w;
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 261
+#line 256
 
 /*  common WRITE functions  */
 #define  setAX(val)     ((*setAX_func) (val))
@@ -203,7 +203,7 @@ extern word m_s_w;
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 320
+#line 315
 #endif EGATEST
 
 
@@ -267,7 +267,7 @@ extern word             (*getIOPL_func) ();
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 388
+#line 383
 
 
 
@@ -309,7 +309,7 @@ extern void             (*setIOPL_func) ();
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 467
+#line 444
 
 
 /*  HOST_SIMULATE function  */

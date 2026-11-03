@@ -1357,7 +1357,7 @@ update_banking IFN0()
 
 	set_banking( rd_bank, wrt_bank );
 #endif  //NEC_98
-#line 1866
+#line 1878
 }
 
 
@@ -2584,7 +2584,7 @@ LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 #else
 #error "Unsupported SoftPC mirror configuration: USE_OLD_MASK_CODE"
 #endif	/* USE_OLD_MASK_CODE */
-#line 2995
+#line 3069
 
 		/* Alter the function table used by ega_gc_index */
 		ega_gc_regs[8] = ega_gc_mask_ff;
@@ -2592,7 +2592,7 @@ LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 3005
+#line 3079
 
 		io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_mask_ff);
 
@@ -2633,7 +2633,7 @@ void	ega_gc_mask_ff IFN2(io_addr, port, half_word, value)
 #else
 #error "Unsupported SoftPC mirror configuration: USE_OLD_MASK_CODE"
 #endif	/* USE_OLD_MASK_CODE*/
-#line 3043
+#line 3119
 
 		/* Alter the function table used by ega_gc_index */
 		ega_gc_regs[8] = ega_gc_mask;
@@ -2641,7 +2641,7 @@ void	ega_gc_mask_ff IFN2(io_addr, port, half_word, value)
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 3053
+#line 3129
 
 		io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_mask);
 
