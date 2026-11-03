@@ -525,7 +525,7 @@ void fla_inb IFN2(io_addr, port, half_word *,value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 541
+#line 444
     }
     else
     {
@@ -538,14 +538,14 @@ void fla_inb IFN2(io_addr, port, half_word *,value)
 
 
 #endif // !NEC_98
-#line 552
+#line 456
 }
 
 
 void fla_outb IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 557
+#line 462
     int i;
     DOR new_dor;
 
@@ -802,13 +802,13 @@ void fla_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 814
+#line 719
 
     fla_busy = FALSE;
 
 
 #endif // !NEC_98
-#line 818
+#line 724
 }
 
 
@@ -1159,7 +1159,7 @@ static void fla_ndma_unbump_sectid IFN0()
 void fla_init IFN0()
 {
 #ifndef NEC_98
-#line 1165
+#line 1147
     io_addr i;
 
     note_trace0(FLA_VERBOSE, "fla_init() called");

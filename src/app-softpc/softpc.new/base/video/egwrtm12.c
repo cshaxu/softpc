@@ -245,7 +245,7 @@ fill_both_bytes IFN3(USHORT, data, USHORT *, dest, ULONG, len )
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 295
+#line 301
 
 	if( (ULONG) dest & 1 )
 	{
@@ -269,7 +269,7 @@ fill_both_bytes IFN3(USHORT, data, USHORT *, dest, ULONG, len )
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 318
+#line 324
 			*dest = data;
 #endif
 			dest += 2;
@@ -282,7 +282,7 @@ fill_both_bytes IFN3(USHORT, data, USHORT *, dest, ULONG, len )
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 334
+#line 341
 
 VOID
 ega_mode1_chn_b_write IFN2(ULONG, value, ULONG, offset )
@@ -1025,7 +1025,7 @@ ega_mode2_chn_move_guts IFN8(UTINY *, eas, UTINY *, ead, LONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1052
+#line 1084
 		src++;
 		scratch++;
 #endif
@@ -1072,7 +1072,7 @@ ega_mode2_chn_move_guts IFN8(UTINY *, eas, UTINY *, ead, LONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1098
+#line 1130
 			src += 2;
 #endif
 
@@ -1096,7 +1096,7 @@ ega_mode2_chn_move_guts IFN8(UTINY *, eas, UTINY *, ead, LONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1121
+#line 1153
 			src += 2;
 #endif
 			dst += 4;

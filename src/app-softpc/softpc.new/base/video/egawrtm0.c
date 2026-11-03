@@ -163,7 +163,7 @@ IMPORT VOID fill_both_bytes IPT3( IU16, data, IU16 *, dest, ULONG, len );
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 174
+#line 175
 
 /* [5.1.2 TYPEDEF, STRUCTURE, ENUM DECLARATIONS]			*/
 
@@ -372,7 +372,7 @@ ega_copy_w_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 430
+#line 434
 
     count >>= 1;
 
@@ -1059,7 +1059,7 @@ ega_mode0_chn_move_ram_src IFN5(UTINY *, eas, LONG, count, UTINY *, ead,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1112
+#line 1116
 	srcinc = 2;
 #endif
 
@@ -1124,7 +1124,7 @@ ega_mode0_chn_move_vid_src IFN7(UTINY *, eas, LONG, count, UTINY *, ead,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1176
+#line 1180
 		scratch++;
 #endif
 		offset++;
@@ -1136,7 +1136,7 @@ ega_mode0_chn_move_vid_src IFN7(UTINY *, eas, LONG, count, UTINY *, ead,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1187
+#line 1191
 	srcinc = 2;
 #endif
 	inc = 4;

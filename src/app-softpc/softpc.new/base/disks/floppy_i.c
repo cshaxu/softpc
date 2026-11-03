@@ -129,7 +129,7 @@ void diskette_io()
 	if (!fl_operation_in_range(op))
 		op = FL_FNC_ERR;
 #endif // !NEC_98
-#line 325
+#line 574
 
 	/*
 	 *	If the drive number is applicable in the operation, check it
@@ -148,11 +148,11 @@ void diskette_io()
 #line 586
 			op = FL_FNC_ERR;
 #endif // !NEC_98
-#line 333
+#line 588
 
 
 #ifndef NEC_98
-#line 335
+#line 591
 	/*
 	 *	Save previous diskette status, initialise current diskette
 	 *	status to OK
@@ -230,7 +230,7 @@ void diskette_int()
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
 #endif /* NTVDM */
-#line 394
+#line 666
 
 	host_simulate();
 
@@ -310,7 +310,7 @@ void diskette_post()
 		sas_store(DRIVE_CAPABILITY, hf_cntrl);
 
 #ifndef NTVDM	/* prevent floppies showing up in bios data area */
-#line 461
+#line 764
 		/*
 		 *	Setup the diskette BIOS state according to the
 		 *	types of drives installed
@@ -330,7 +330,7 @@ void diskette_post()
 			sas_storew(EQUIP_FLAG, equip_flag.all);
 		}
 #endif  /* NTVDM */
-#line 479
+#line 783
 	}
 #endif // !NEC_98
 #line 480

@@ -74,6 +74,14 @@ rerun passed; cause remains unknown. Review, commit and push must complete
 before an eleventh mirror file is changed. The candidate queue
 retains 175 pending line mappings, including 63 with differing prefixes or
 line offsets. Conditional structure matching remains independently open.
+P14 was committed and pushed as `4d5ca687`; its initial x86 native failure
+and complete rerun are recorded in the independent review. P15 currently
+changes ten compiled mirror files with 59 matching-prefix line corrections.
+Dual preprocessing, builds and full tests passed: 186 background and 8
+native tests per architecture. Review, commit and push must finish before an
+eleventh mirror file is changed. The candidate queue retains 116
+pending line mappings, including 63 differing-prefix/offset cases; conditional
+structure matching remains independently open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

@@ -142,7 +142,7 @@ GLOBAL  void dma_post   IFN0()
                         else
                                 adaptor.controller[cntrl].mode[chan].bits.mode = DMA_SINGLE_MODE;
 #endif   //NEC_98
-#line 139
+#line 148
                 }
         }
 }
@@ -483,11 +483,11 @@ GLOBAL  void dma_page_inb       IFN2(io_addr, port, half_word *, value)
         note_trace0_no_nl(DMA_VERBOSE, "dma_page_inb() ");
 
 #ifndef NEC_98
-#line 384
+#line 456
         /* mask out the port's redundant bits */
         port &= ~DMA_PAGE_REDUNDANT_BITS;
 #endif  //NEC_98
-#line 386
+#line 459
 
         /*
          *      Read the value from the appropriate page register.
@@ -566,7 +566,7 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
 #line 540
         port &= ~DMA_PAGE_REDUNDANT_BITS;
 #endif   //NEC_98
-#line 455
+#line 542
 
         /*
          *      Write the value into the appropriate page register.
@@ -632,7 +632,7 @@ GLOBAL  void dma_page_outb      IFN2(io_addr, port, half_word, value)
                 adaptor.pages.page[DMA_FAKE_CHANNEL_7] = value;
                 break;
 #endif   //NEC_98
-#line 515
+#line 618
         default:
                 note_trace0_no_nl(DMA_VERBOSE, "<illegal write>");
                 break;

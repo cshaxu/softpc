@@ -631,7 +631,7 @@ GLOBAL void rtc_tick IFN0()
 #line 676
 		cmos[CMOS_REG_A] |= UIP;	/* Set the bit */
 #endif
-#line 647
+#line 678
 		break;
 
 	case 1:
@@ -640,7 +640,7 @@ GLOBAL void rtc_tick IFN0()
 #line 683
 		cmos[CMOS_REG_A] &= ~UIP;	/* Clear it again */
 #endif
-#line 652
+#line 685
 		break;
 
 	case 17:
@@ -673,7 +673,7 @@ GLOBAL void rtc_tick IFN0()
 				}
 			}
 #endif /* NTVDM */
-#line 679
+#line 741
 		}
 		break;
 
@@ -888,7 +888,7 @@ GLOBAL void cmos_init IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 908
+#line 971
 #endif	/* NTVDM */
 #line 972
 		rtc_int_enabled = TRUE;
@@ -897,7 +897,7 @@ GLOBAL void cmos_init IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 913
+#line 978
 #endif	/* NTVDM */
 #line 979
 
@@ -1088,7 +1088,7 @@ GLOBAL void  rtc_init IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1100
+#line 1213
 
 	/* Set Up the cmos time bytes to be in BCD by default */
 	bin2bcd = yes_bin2bcd;

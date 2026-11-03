@@ -265,7 +265,7 @@ LOCAL void generic_ind IFN2(io_addr, io_address, double_word *, value)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif				/* BIGEND */
-#line 269
+#line 321
 }
 #endif /* SPC386 */
 
@@ -450,7 +450,7 @@ GLOBAL void	inb IFN2(io_addr, io_address, half_word *, value)
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif	/* SYNCH_TIMERS */
-#line 445
+#line 532
 
 	if (IOVirtualised(io_address, &value32, BIOS_INB_OFFSET, (sizeof(IU8))))
 	{
@@ -529,7 +529,7 @@ GLOBAL void	inw IFN2(io_addr, io_address, word *, value)
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif	/* SYNCH_TIMERS */
-#line 523
+#line 610
 
 	if (IOVirtualised(io_address, &value32, BIOS_INW_OFFSET, (sizeof(IU16))))
 	{
@@ -603,7 +603,7 @@ GLOBAL void	ind IFN2(io_addr, io_address, IU32 *, value)
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif	/* SYNCH_TIMERS */
-#line 596
+#line 683
 
 	if (IOVirtualised(io_address, &value32, BIOS_IND_OFFSET, (sizeof(IU32))))
 	{
@@ -874,7 +874,7 @@ GLOBAL void	io_disconnect_port IFN2(io_addr, io_address, half_word, adapter)
 	Ios_out_adapter_table[io_address] = EMPTY_ADAPTOR;
 }
 #endif	/* NTVDM */
-#line 855
+#line 970
 
 
 /*(

@@ -539,3 +539,14 @@ values are respectively
 `60b351fb55a7be92c805ece5ae50f89b8bcbce5e7c717bce5d7ad121f72ec3b8` and
 `4c3a053dfb487f5a16cf2104aab2c752ed9e626e0bd506601ae1dd64cd1320a3`.
 No structural audit completion is implied.
+
+P15 changes 59 matching-prefix candidate line controls across ten compiled
+files. The [mapping](m9-t99-s30-p15-line-mapping.tsv) and [updated queue](m9-t99-s30-p15-following-line-candidates.tsv)
+record the batch, with 116 candidates still pending. Actual preprocessing
+matched for all ten translation units on both architectures; both built and
+each passed 186 background and 8 native tests. Build logs contained 762 x64
+and 712 x86 mirror-path warning lines, with no non-mirror warning line observed.
+Published x86 and x64 EXE SHA-256 values are respectively
+`3ed83ba43ea2b5d220f2296c89ada58c53233f368dbea67b4989784a3193ff53` and
+`bee2010cefdf4aa2e5dca711d5d05862d438d1cc209bcaa8316ffa81977252b4`.
+This does not complete conditional structure review.

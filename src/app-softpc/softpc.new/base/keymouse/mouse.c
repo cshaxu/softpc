@@ -217,7 +217,7 @@ void mouse_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 216
+#line 165
 		break;
 	}
     }
@@ -240,7 +240,7 @@ void mouse_inb IFN2(io_addr, port, half_word *, value)
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
 #endif    //NEC_98
-#line 240
+#line 190
 }
 
 
@@ -253,7 +253,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 256
+#line 293
 
 	/*
 	 * Out to an internal register
@@ -277,7 +277,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 282
+#line 320
 				/* clear the interrupt */
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 
@@ -309,7 +309,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 316
+#line 354
 			}
 			/*
 			 * Check timer select value (bits 210)
@@ -381,7 +381,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 391
+#line 448
 		}
 
 	}
@@ -423,7 +423,7 @@ int	Delta_x,Delta_y,left,right;
 		delta_x += Delta_x;
 		delta_y += Delta_y;
 #endif   //NEC_98
-#line 429
+#line 487
 
 		/***
 		Mouse inport registers can only handle one byte

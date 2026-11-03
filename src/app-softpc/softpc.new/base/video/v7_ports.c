@@ -95,7 +95,7 @@ half_word       value;
 	else if (value == 0xae)
 		sequencer.extensions_control.as_bfld.extension_enable = 0;
 #endif  //NEC_98
-#line 99
+#line 101
 }
 
 GLOBAL VOID
@@ -127,7 +127,7 @@ UTINY *wrt_bank;
 		*wrt_bank=(extensions_controller.ram_bank_select.as_bfld.cpu_write_bank_select&1);
 	}
 #endif  //NEC_98
-#line 127
+#line 131
 }
 
 /*(
@@ -454,7 +454,7 @@ half_word       value;
 			break;
 	}
 #endif  //NEC_98
-#line 450
+#line 456
 }
 
 /*(
@@ -647,7 +647,7 @@ half_word       *value;
 	}
 	note_entrance1("returning %x",*value);
 #endif //NEC_98
-#line 639
+#line 647
 }
 
 /*(
@@ -726,7 +726,7 @@ draw_v7ptr()
 		(*paint_v7ptr)(pattern, curr_v7ptr_x, curr_v7ptr_y);
 	}
 #endif  //NEC_98
-#line 714
+#line 724
 }
 
 GLOBAL	VOID	remove_v7ptr IFN0()
@@ -784,7 +784,7 @@ GLOBAL void set_v7_fg_latch_byte IFN2(IU8, index, IU8, value)
 	/* update v7 latches */
 	setVideov7_fg_latches(v7latch);
 #endif  //NEC_98
-#line 768
+#line 780
 }
 #endif	/* CPU_40_STYLE */
 

@@ -247,7 +247,7 @@ GLOBAL void read_video_rom IFN0()
 #else	/* V7VGA */
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif  /* V7VGA */
-#line 242
+#line 274
 		break;
 #endif	/* VGG */
 
@@ -264,7 +264,7 @@ GLOBAL void read_video_rom IFN0()
 #else			/* GISP_SVGA */
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */	
-#line 264
+#line 296
 
 	}
 
@@ -285,7 +285,7 @@ GLOBAL void read_video_rom IFN0()
 	}
 #endif	/* not REAL_VGA */
 #endif   //NEC_98
-#line 283
+#line 316
 }
 
 GLOBAL void rom_init IFN0()
@@ -329,7 +329,7 @@ GLOBAL void rom_init IFN0()
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else		/* GISP_SVGA */
-#line 329
+#line 384
 
 	read_rom (BIOS1ROM_FILENAME, BIOS_START);
 	read_rom (BIOS2ROM_FILENAME, BIOS2_START);
@@ -343,7 +343,7 @@ GLOBAL void rom_init IFN0()
 
 	host_rom_init();
 #endif   //NEC_98
-#line 337
+#line 419
 }
 
 LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
@@ -512,7 +512,7 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 #ifdef macintosh
 #error "Unsupported SoftPC mirror configuration: macintosh"
 #endif /* macintosh */
-#line 489
+#line 664
 
 	/* The page might not be present (Arrggghhhh!!!!!)
 	** so we can't do anything sensible and must give
@@ -559,7 +559,7 @@ GLOBAL VOID patch_rom IFN2(sys_addr, addr, half_word, val)
 #else	/* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 571
+#line 746
 
 #endif	/* !NTVDM | (NTVDM & !X86GFX) */
 #line 748
