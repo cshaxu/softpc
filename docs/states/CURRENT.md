@@ -162,6 +162,15 @@ correspondence. P23 incremental dual builds passed and each architecture
 passed 186 background and 8 native tests on the first run; no production
 source or EXE changed. Review, commit and push remain due; S30 final
 qualification cannot start while required structure and exceptions remain open.
+P23 was committed and pushed as `3ae55494`. P24 independently reviews all
+46 remaining ordinary paired boundaries; 45 have matching retained structures
+at the reviewed boundary and one is the already recorded relocated NT DSP
+thread exception. Four diagnostic line controls in floppy.c and video.c are
+being corrected as a two-file source batch. The [paired review](../etc/evidence/softpc/m9-t99-s30-p24-paired-review.tsv)
+records each disposition; it does not clear other descendants or files.
+The 186 candidate-file group rows and their exceptions remain separately open.
+P24 preprocessing and dual builds passed; each architecture passed 186
+background and 8 native tests. Review, commit and push remain due.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

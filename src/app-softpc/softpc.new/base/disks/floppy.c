@@ -1588,7 +1588,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 				else
 					md_offset = MD_TBL3_OFFSET;
 #endif	/* NTVDM */
-#line 1491
+#line 3298
 			}
 		}
 		else

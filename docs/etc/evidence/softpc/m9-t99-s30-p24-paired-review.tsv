@@ -1,0 +1,47 @@
+path	depth	parent	current_line	xp_line	condition	evidence
+base/system/rom.c	1	root	48	46	if:defined(NEC_98)	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1910	2988	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1925	3013	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1932	3025	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1939	3037	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1946	3049	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1953	3061	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/ccpu386/cpu4gen.h	2	root/6:ifndef:_CPU4GEN_H_	1960	3073	ifdef:CCPU	seven CCPU selected arms empty; sequence anchored by retained trashIntelregisters and closing header; non-CCPU arms wholly error
+base/system/rom.c	2	root/48:else:	52	61	ifndef:BIOS1ROM_FILENAME	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/system/rom.c	2	root/48:else:	56	65	ifndef:BIOS2ROM_FILENAME	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/system/rom.c	2	root/48:else:	67	73	ifndef:EGAROM_FILENAME	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/system/rom.c	2	root/48:else:	71	77	ifndef:VGAROM_FILENAME	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/system/rom.c	2	root/48:else:	75	81	ifndef:V7VGAROM_FILENAME	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/system/rom.c	3	root/48:else:/56:ifndef:BIOS2ROM_FILENAME	58	66	if:defined(CPU_40_STYLE)||defined(ARCX86)	XP NEC_98 outer else ROM filename guards and defaults match; excluded arms wholly error
+base/comms/com.c	1	root	69	66	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/comms/com.c	1	root	2364	3848	ifdef:NTVDM	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/comms/com.c	1	root	2370	3853	ifdef:NTVDM	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/comms/com.c	1	root	2387	3999	ifndef:PROD	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/cvidc/sas4gen.h	1	root	506	746	ifdef:CCPU	empty selected CCPU arm between named neighboring definitions; excluded else not traversed
+base/disks/diskbios.c	1	root	446	865	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/disks/floppy.c	1	root	1581	3284	ifdef:NTVDM	matched else in media-match branch, selected statements compared; excluded NTVDM arm not traversed
+base/disks/floppy_i.c	1	root	73	77	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/inc/cpu4.h	1	root	87	91	ifdef:IRET_HOOKS	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/inc/dsktrace.h	1	root	99	109	ifndef:PROD	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/inc/sas.h	1	root	809	1098	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/keymouse/keyba.c	1	root	2820	3602	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+base/video/gfx_updt.c	1	root	121	124	if:defined(NEC_98)	NEC_98 excluded; else PROD/EGG child and matching dirty initialization retained
+base/video/gfx_updt.c	1	root	4145	5969	ifndef:NEC_98	outer NEC_98 guard and nested NTVDM guard retained; nested NTVDM arm error and original stream declaration excluded
+base/video/video.c	1	root	103	104	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+host/inc/nt_fulsc.h	1	root	193	259	ifdef:X86GFX	whole arm error; original opening/closing and neighboring retained context checked; no descent
+host/src/nt_keycd.c	1	root	19	21	if:defined(NEC_98)	whole arm error; original opening/closing and neighboring retained context checked; no descent
+host/src/nt_sbdsp.c	1	root	1508	2793	if:0	relocated disabled XP native reader thread; existing explicit subset exception, no descent
+base/comms/printer.c	2	root/3:ifdef:PRINTER	715	753	ifndef:NEC_98	selected direct content and arm signatures direct-equal; nested children separately accounted
+base/keymouse/mouse.c	2	root/249:else:	337	408	ifndef:PROD	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/gfx_updt.c	2	root/121:else:	125	127	if:defined(PROD)||(!defined(EGG))	selected direct content and arm signatures direct-equal;excluded-error; nested children separately accounted
+base/video/gfx_updt.c	2	root/4145:ifndef:NEC_98	4147	5970	ifdef:NTVDM	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	773	1094	ifdef:JAPAN	selected direct content and arm signatures excluded-error;direct-equal; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	793	1123	ifdef:JAPAN	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	908	1248	if:!defined(i386)&&defined(JAPAN)	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	921	1260	if:!defined(i386)&&defined(JAPAN)	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	1229	1620	ifdef:JAPAN	selected direct content and arm signatures excluded-error;direct-equal; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	1249	1649	ifdef:JAPAN	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	1549	2017	ifdef:REAL_VGA	selected direct content and arm signatures excluded-error;direct-equal; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	1764	2231	ifdef:JAPAN	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/video/video.c	2	root/349:ifndef:NEC_98	1860	2347	ifdef:JAPAN	selected direct content and arm signatures excluded-error; nested children separately accounted
+base/comms/printer.c	3	root/3:ifdef:PRINTER/715:ifndef:NEC_98	717	754	ifndef:PROD	selected direct content and arm signatures excluded-error; nested children separately accounted

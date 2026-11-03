@@ -694,3 +694,19 @@ rows remain open. Such anchors establish boundary-level evidence only; they
 do not clear retained descendants, local exceptions or entire files. Both incremental builds passed, and each
 architecture passed all 186 background and 8 native tests on the first run.
 No production source changed; both EXE hashes remained those recorded for P20.
+
+P24 checked the 46 remaining ordinary paired boundaries, including empty
+CCPU arms in generated headers, NEC_98/ROM guard chains and video scrolling
+arms. Forty-five have matching boundary signatures and retained direct
+content where present; the remaining `nt_sbdsp.c` #if 0 has the previously
+registered XP native-thread relocation exception. Whole-arm #error contents
+were not examined; descendants and candidate-file groups remain separate.
+The [paired review](m9-t99-s30-p24-paired-review.tsv) records all locations.
+Four stale diagnostic mappings exposed by this check are corrected in
+[floppy/video](m9-t99-s30-p24-line-mapping.tsv). Both translation units had
+byte-identical selected preprocessing on both architectures; dual builds
+passed, and each architecture passed 186 background and 8 native tests on
+the first run. Both build logs had 178 mirror-path warning lines; no non-mirror
+warning line was observed. Published x86 and x64 EXE SHA-256 values are
+`755a5701386b31c814ba1aae0be83ce8baa0a62a9ad94dc4c92e6e6b868ceb33` and
+`659f546965c59d1c7a626b3c6377c630c5dea71476733ce9870f348688dac0c1`.

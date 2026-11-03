@@ -921,7 +921,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // !i386 && JAPAN
-#line 795
+#line 1264
     for(i = 0; i < rowsdiff-lines; i++)
     {
 #ifdef REAL_VGA
@@ -1549,7 +1549,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1295
+#line 2020
 		sas_move_bytes_forward (source, dest, colsdiff);
 #endif
 	        /*
@@ -1764,7 +1764,7 @@ GLOBAL void vd_write_char_attrib IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1496
+#line 2244
 		cpos = vd_cursor_offset(getBH());
 
 #ifdef JAPAN

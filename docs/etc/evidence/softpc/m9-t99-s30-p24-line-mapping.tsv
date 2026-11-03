@@ -1,0 +1,5 @@
+path	directive_line	old	expected
+base/disks/floppy.c	1591	1491	3298
+base/video/video.c	924	795	1264
+base/video/video.c	1552	1295	2020
+base/video/video.c	1767	1496	2244
