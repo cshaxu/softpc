@@ -43,6 +43,7 @@
  */
 
 /* @(#)bootstrap.c	1.9 09/19/94 Copyright Insignia Solutions Ltd. */
+#line 45
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

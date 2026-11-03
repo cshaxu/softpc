@@ -329,6 +329,7 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 #line 739
 	/*............................... the regular keyset is what we need */
 
+#line 740
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98

@@ -1267,6 +1267,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
  */
 
 
+#line 2060
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98

@@ -134,6 +134,7 @@
  * This was done to fix "dots on screen" problem with EGA-PICS, which changes screen
  * mode behind the BIOS's back.
  */
+#line 141
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
@@ -336,6 +337,7 @@ LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, co
 
 
 
+#line 432
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #elif defined(KOREA) // JAPAN

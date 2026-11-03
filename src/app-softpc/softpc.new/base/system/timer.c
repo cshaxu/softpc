@@ -771,6 +771,7 @@ GLOBAL ULONG get_DOS_ticks IFN0()
 /* **************************************************************************** */
 /* **************************************************************************** */
 
+#line 808
 #ifndef NTVDM
 #line 809
 /* check whether a time lock (set while application io is being serviced)

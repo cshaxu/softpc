@@ -1,0 +1,7 @@
+path	marker_line	marker	classification	local_directive	xp_directive
+base/bios/bootstra.c	6	7	diff-first-directive	46	45
+base/comms/com.c	1261	2053	diff-first-directive	1270	2060
+base/system/timer.c	764	800	diff-first-directive	774	808
+base/video/video.c	121	128	diff-first-directive	137	141
+base/video/video.c	329	425	diff-first-directive	339	432
+host/src/nt_keycd.c	329	739	diff-first-directive	332	740

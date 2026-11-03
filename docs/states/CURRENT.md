@@ -956,3 +956,10 @@ publication passed; PE loaded sections and entry metadata match P46, though
 whole-file hashes differ. Per owner instruction no tests or CTest gates ran.
 The 475-file branch rescan still has 39 structural leads and 3,614 paired
 boundaries; S30 remains open for the no-code directive review.
+
+P47 was committed and pushed as `ef20abad`. P48 reanchors six retained
+conditional directives across five mirror files after local blank/comment
+differences. Dual builds and publication passed; PE loaded sections and
+entry metadata match P47, but whole-file hashes differ. Per owner direction
+no tests ran. A fresh no-code scan found no mismatched paired first
+directives; S30 remains open for final cross-check and acceptance delivery.
