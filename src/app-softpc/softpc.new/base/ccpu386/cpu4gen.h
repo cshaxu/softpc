@@ -1905,7 +1905,7 @@ IMPORT	void	c_setRegConstraint	IPT2(IU32, regId, IU8, constraintType);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2988
+#line 2987
 
 #ifdef	CCPU
 
@@ -1920,49 +1920,49 @@ IMPORT	void	c_trashIntelRegisters	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3013
+#line 3012
 
 #ifdef	CCPU
 
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3025
+#line 3024
 
 #ifdef	CCPU
 
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3037
+#line 3036
 
 #ifdef	CCPU
 
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3049
+#line 3048
 
 #ifdef	CCPU
 
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3061
+#line 3060
 
 #ifdef	CCPU
 
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3073
+#line 3072
 
 #ifdef	CCPU
 
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 3085
+#line 3084
 
 #endif	/* _CPU4GEN_H_ */
 /*======================================== END ========================================*/

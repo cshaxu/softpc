@@ -142,7 +142,7 @@ static struct ADAPTER_STATE
 #define MODEM_STATE_CHANGE()
 #endif
 #endif // NEC_98
-#line 117
+#line 181
 
 
 #ifdef IRET_HOOKS
@@ -685,7 +685,7 @@ static void com_send_not_finished IFN1(int, adapter)
 	asp->line_status_reg.bits.tx_shift_empty=0;
 }
 #endif // NEC_98
-#line 607
+#line 729
 
 
 #if defined(NEC_98)
@@ -943,7 +943,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* ifndef NTVDM */
-#line 921
+#line 1490
 
 
 #ifdef SHORT_TRACE
@@ -1251,7 +1251,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #line 1933
 }
 #endif // NEC_98
-#line 1290
+#line 1935
 
 
 #ifdef IRET_HOOKS
@@ -2285,7 +2285,7 @@ static int timeout[4] = {RS232_COM1_TIMEOUT,
                          RS232_COM3_TIMEOUT,
                          RS232_COM4_TIMEOUT};
 #endif // NEC_98
-#line 2331
+#line 3676
 
 
 #if defined(NEC_98)

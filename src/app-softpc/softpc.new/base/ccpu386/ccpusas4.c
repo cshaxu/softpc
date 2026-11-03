@@ -137,7 +137,7 @@ GLOBAL PHY_ADDR  Length_of_M_area = 0;
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #endif
-#line 144
+#line 139
 
 void	    (*temp_func) ();
 

@@ -333,7 +333,7 @@ void diskette_post()
 #line 783
 	}
 #endif // !NEC_98
-#line 480
+#line 785
 }
 
 #if defined(NEC_98)

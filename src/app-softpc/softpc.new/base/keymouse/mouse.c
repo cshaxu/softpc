@@ -403,7 +403,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 		address_reg = value;
 	}
 #endif    //NEC_98
-#line 411
+#line 464
 }
 
 #ifdef SEGMENTATION

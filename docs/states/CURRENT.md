@@ -878,3 +878,9 @@ positions in ten files, preserving branches and functional source. Both
 compact_console failed first run; randomized-order full rerun passed 8/8.
 The unresolved Console initialization instability remains recorded. S30
 remains open.
+
+P35 was committed and pushed as `c6a6bbb2`. P36 corrects 22 line
+positions across ten mirror files, with corresponding XP conditional
+boundaries and subsequent original lines as evidence. Both architectures
+passed their 186 background and eight native tests first run. A separate
+endif-line candidate queue requires review; S30 remains open.

@@ -450,7 +450,7 @@ IMPORT void     io_define_inb
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 766
+#line 749
 );
 
 #ifdef SFELLOW
@@ -471,7 +471,7 @@ IMPORT void     io_define_outb
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #endif  /* ANSI */
-#line 805
+#line 788
 );
 
 #ifdef SFELLOW

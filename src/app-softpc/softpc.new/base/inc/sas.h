@@ -332,7 +332,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #define BIOS2_START_SEGMENT	0xF000L
 #define BIOS2_START_OFFSET 	0xE000L		/* 2nd half of BIOS ROM	*/
 #endif // !NEC_98
-#line 328
+#line 348
 #define	BAD_OP			0xC5		/* filling RAM for the use of */
 
 #if defined(NEC_98)

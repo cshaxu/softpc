@@ -1126,7 +1126,7 @@ static void update_cursor_shape IFN0()
 	host_cursor_size_changed(Ra_cursor_start, Rb_cursor_end);
 
 #endif   //NEC_98
-#line 1132
+#line 1139
 }
 
 #if !defined(EGG) && !defined(A3CPU) && !defined(A2CPU) && !defined(C_VID) && !defined(A_VID)

@@ -647,7 +647,7 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 #line 658
     timelock = LOCKED;
 #endif
-#line 560
+#line 660
 
 
 #if defined(NEC_98)
