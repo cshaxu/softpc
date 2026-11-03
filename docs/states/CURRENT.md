@@ -948,3 +948,11 @@ publication succeeded; PE loaded sections and entry metadata match P45,
 while whole-file hashes differ. No unit/integration suites were rerun for this non-substantive batch.
 The inherited build script nevertheless ran two CTest gates in each
 architecture despite the owner instruction; remove this from future runs. Directive candidates remain; S30 is open.
+
+P46 was committed and pushed as `b1932757`. P47 corrects nine directive
+markers and inserts one necessary reanchor across ten files. It also
+corrects P42’s incorrect `nt_sbdsp.c` outer-end mapping. Dual builds and
+publication passed; PE loaded sections and entry metadata match P46, though
+whole-file hashes differ. Per owner instruction no tests or CTest gates ran.
+The 475-file branch rescan still has 39 structural leads and 3,614 paired
+boundaries; S30 remains open for the no-code directive review.

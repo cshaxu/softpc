@@ -144,7 +144,7 @@ GLOBAL sys_addr video_pc_low_regen,video_pc_high_regen;
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif
 #line 170
-#line 146
+#line 168
 
 
 

@@ -1611,7 +1611,7 @@ static void check_win_size(register int height)
     register int width;
     extern int soft_reset;
 
-#line 1400
+#line 1916
     /* A detached VM binds its DIB outlet before the firmware executes; it
        has no NTVDM console-integration phase to wait for.  Retain the
        original geometry, mode selection and painting below, but do not let

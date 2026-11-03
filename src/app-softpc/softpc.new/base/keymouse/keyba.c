@@ -1861,7 +1861,7 @@ LOCAL VOID do_q_int IFN1(char,scancode)
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else /* !IRET_HOOKS || !GISP_CPU */
-#line 1841
+#line 2510
 
 #ifdef DELAYED_INTS
 #error "Unsupported SoftPC mirror configuration: DELAYED_INTS"

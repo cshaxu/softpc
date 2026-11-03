@@ -734,7 +734,7 @@ void SWTMR_outb IFN2(io_addr, port, half_word, value)
 #line 748
     checktimelock();
 #endif
-#line 750
+#line 751
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98

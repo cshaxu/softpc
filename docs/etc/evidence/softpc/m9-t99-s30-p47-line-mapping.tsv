@@ -1,0 +1,11 @@
+path	operation	local_line	old_marker	new_marker	local_directive_after	xp_directive
+base/bios/reset.c	replace	686	963	962	689	964
+base/inc/egacpu.h	replace	123	135	154	124	154
+base/keymouse/keyba.c	replace	1864	1841	2510	1866	2511
+base/keymouse/mouse_io.c	replace	3381	3281	3380	3382	3380
+base/system/timer.c	replace	737	750	751	738	751
+base/video/video.c	replace	147	146	168	151	171
+host/src/nt_cga.c	replace	99	134	135	100	135
+host/src/nt_graph.c	replace	1614	1400	1916	1622	1923
+host/src/nt_sbdsp.c	replace	709	2229	2232	710	2232
+base/comms/com.c	insert	92	-	88	93	88

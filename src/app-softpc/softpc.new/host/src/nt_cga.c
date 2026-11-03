@@ -96,7 +96,7 @@ static unsigned int cga_med_graph_lo_nyb[256];
 #line 132
 #define TEXT_INCVAL 4
 #endif
-#line 134
+#line 135
 #if (defined(JAPAN) || defined(KOREA)) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // (JAPAN || KOREA) && i386

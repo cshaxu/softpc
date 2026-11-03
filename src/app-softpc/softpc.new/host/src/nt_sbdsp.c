@@ -706,7 +706,7 @@ Return Value:
 #if DESCENT
 #error "Unsupported SoftPC mirror configuration: DESCENT"
 #endif
-#line 2229
+#line 2232
 #endif
 #line 2233
 #if 0

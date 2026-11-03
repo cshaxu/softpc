@@ -683,7 +683,7 @@ void reset()
 #endif /* !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86) */
 #line 962
 #endif // !NEC_98
-#line 963
+#line 962
 
 
 #ifndef NTVDM

@@ -120,7 +120,7 @@ extern struct EGA_CPU_GLOBALS
 #else
 #error "Unsupported SoftPC mirror configuration: !C_VID"
 #endif
-#line 135
+#line 154
 #endif
 #endif // !NEC_98
 #line 156

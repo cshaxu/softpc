@@ -3378,7 +3378,7 @@ LOCAL void mouse_set_graphics IFN4(word *,junk1,MOUSE_SCALAR *,hot_spot_x_ptr,MO
 
 
 #ifndef NTVDM
-#line 3281
+#line 3380
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #else           /* MOUSE_16_BIT */
