@@ -50,6 +50,14 @@ The working structural review now records identified local locations and
 still-open fail-fast / exception-minimality questions. The task remains
 active; these records are not an exhaustive proof of original alignment.
 
+The two local FAST_TLB guards in `c_tlb.c` snapshot save/restore are redundant:
+the file defines FAST_TLB unconditionally and no repository #undef exists.
+They have been removed, keeping the original XP FAST_TLB frame and copies;
+selected preprocessing matched the prior delivery on both architectures.
+Dual builds and both full suites passed: 194 tests per architecture, no
+skips. This correction is ready for delivery; remaining structural and
+exception-minimality review remains open.
+
 ## Technical Baseline
 
 Latest published binaries are S28's ninth-depth verified build; hashes and

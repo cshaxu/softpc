@@ -52,7 +52,7 @@ indispensable or that the tree matcher cannot have missed an occurrence.
 | Current path | Locations / review lead |
 | --- | --- |
 | `base/bios/reset.c` | Standalone floppy topology and omitted DOS mouse-driver calls; compare the two altered NTVDM predicates with XP. |
-| `base/ccpu386/c_tlb.c` | Original FAST_TLB frame exists; a further FAST_TLB frame covers local snapshot state. |
+| `base/ccpu386/c_tlb.c` | Original FAST_TLB frame exists; two redundant local snapshot guards have been removed, preserving copies. |
 | `base/inc/cpu_vid.h`, `base/inc/gmi.h`, `base/inc/egacpu.h` | C-VID generated function signatures and globals carrier; verify existing ABI divergence and any extra unsupported-mode guards. |
 | `base/keymouse/mouse_io.c`, `base/keymouse/ppi.c`, `base/video/video.c` | Some current NEC_98 frames have an extra error sibling; XP corresponding frames lack that sibling. Assess the fail-fast requirement before deciding whether to preserve or remove it. PPI also has standalone and snapshot guards. |
 | `base/keymouse/mouse.c` | The apparent missing PROD frame is present; confirm the full file has no second alignment discrepancy. |
@@ -105,7 +105,7 @@ The conditions are retained pending the full minimality review.
 | --- | --- |
 | `base/bios/reset.c:407,633,745` | Standalone terms select attached-FDC topology and reject an omitted DOS mouse-driver path; compare XP's NTVDM arms. |
 | `base/ccpu386/c_main.c:34,755,4497,4664,4683,4699` | Six predicates extend XP NTVDM with CCPU TLS simulation-stack selection. Each original group was paired; nested original code in the error arm is intentionally excluded. |
-| `base/ccpu386/c_tlb.c:151,188` | FAST_TLB conditions in snapshot save/restore guard local snapshot data; XP's own FAST_TLB declaration frame is present at current 70 / XP 69. |
+| `base/ccpu386/c_tlb.c:151,188` | The original FAST_TLB declaration frame is present at current 70 / XP 69; the two always-true local snapshot guards were removed. |
 | `base/inc/cpu_vid.h:88,115`; `base/inc/gmi.h:19` | CPU_40_STYLE and C_VID guards around adapted generated-function signatures; local ABI divergence explicitly recorded in source. |
 | `base/inc/egacpu.h:99,120,252` | C_VID forward declaration and generated globals carrier, plus an error sibling for unsupported non-C-VID; XP's C_VID frame at 442 has no else. |
 | `base/inc/ica.h:91` | CPU_40_STYLE nested guard separates legacy CPU_HW_INT macro 0 from CCPU's enum value 2; S29 records test consumers. |
@@ -116,10 +116,32 @@ The conditions are retained pending the full minimality review.
 | `base/video/gfx_updt.c:3891`; `base/video/vga_mode.c:462` | CPU_40_STYLE and V7VGA guards around accepted CHAIN2 dirty / packed scanout fixes. |
 | `host/inc/cfpu_def.h:21,32,43,55,66,83`; `host/inc/host_cpu.h:37` | Little-endian guards around local host layouts; original layouts differ and supported x86/x64 bit ordering must be preserved. |
 | `host/inc/host_cpu.h:275`; `host/inc/insignia.h:77` | CCPU vector typing and generated C-video carrier ABI conditions; XP common vectors/carrier were unconditionally declared. |
-| `host/src/nt_cga.c:22`; `host/src/nt_graph.c:83,782,1190,1617,1647,2213` | Standalone graphics integration, V7 DAC declaration and packed-scanout width; local product port paths and rejected non-standalone regions. |
+| `host/src/nt_cga.c:22`; `host/src/nt_graph.c:83,782,1190,1617,1647,1648,2213` | Standalone graphics integration, V7 DAC declaration and packed-scanout width; local product port paths and rejected non-standalone regions. |
 
 `base/keymouse/mouse.c`'s PROD frame, `base/ccpu386/c_tlb.c:70`,
 `base/video/vga_mode.c:488,532` and `host/inc/host_cpu.h:295` are matching
 original structures whose initial pairings were wrong. The 11 low-context
 pairings have individual records in the context review. These findings do
 not dispose every possible repeated-condition pairing in the corpus.
+
+A recursive check of current-only candidate subtrees, stopping at single-error
+arms, found one additional nested local guard: `nt_graph.c:1648` V7VGA under
+the already recorded standalone packed-scanout width condition. The guard is
+now listed explicitly. This is a candidate-sweep check, not a license to
+inspect original code hidden behind error replacements.
+
+## TLB snapshot condition simplification
+
+`base/ccpu386/c_tlb.c` defines `FAST_TLB` unconditionally before its includes;
+no `#undef FAST_TLB` exists in the repository. Its two additional local
+snapshot-save / snapshot-restore guards were therefore always true in current
+compilation and had no XP counterpart. They were removed while preserving all
+four copies and the original XP FAST_TLB frame. `#line 124` resets the original
+source position following the local snapshot functions. Actual x86/x64
+preprocessing of the selected output was byte-identical to `fde49418`; build
+and full test qualification passed: both architectures completed 186
+non-native and eight serial native tests without skips. Snapshot checkpoint
+regression is included. Published binary SHA-256 values are:
+
+- softpc32.exe: `ae26ad03a004098d4291b79ce59831ccf734eb20ddfe6a08127ec59a8c1755cc`
+- softpc64.exe: `db2122acb5e838cb0a1f91f910c72aca6da002caf192d04a5608865c7329c3e8`

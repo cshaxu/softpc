@@ -148,10 +148,8 @@ IFN3(
       }
    }
    memcpy(state->next_set, next_set, sizeof(next_set));
-#ifdef FAST_TLB
    memcpy(snapshot_page_index, page_index, sizeof(page_index));
    memcpy(state->page_address, page_address, sizeof(page_address));
-#endif
 }
 
 GLOBAL IBOOL
@@ -185,12 +183,11 @@ IFN3(
          return FALSE;
    }
    memcpy(next_set, state->next_set, sizeof(next_set));
-#ifdef FAST_TLB
    memcpy(page_index, snapshot_page_index, sizeof(page_index));
    memcpy(page_address, state->page_address, sizeof(page_address));
-#endif
    return TRUE;
 }
+#line 124
 
 /*
    Linear Addresses are composed as follows:-
