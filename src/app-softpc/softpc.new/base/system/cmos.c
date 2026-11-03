@@ -390,7 +390,7 @@ IMPORT ADAPTER_STATE adapter_state[2];
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
-#line 414
+#line 433
 #endif /* !NTVDM */
 #line 434
 
@@ -427,7 +427,7 @@ IMPORT ADAPTER_STATE adapter_state[2];
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
-#line 456
+#line 477
 #endif /* !NTVDM */
 #line 478
 

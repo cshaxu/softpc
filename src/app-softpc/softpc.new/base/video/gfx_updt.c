@@ -151,7 +151,7 @@ int terminal_type = TERMINAL_TYPE_DEFAULT;
 #else /* VGG */
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 179
+#line 193
 #endif  //NEC_98
 #line 194
 
@@ -186,7 +186,7 @@ a 4-byte boundary. This macro makes this true and reports if it wasn't. */
 #else
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 202
+#line 228
 #endif  //NEC_98
 #line 229
 

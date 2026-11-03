@@ -390,7 +390,7 @@ void reset()
 #ifdef LIM
 #error "Unsupported SoftPC mirror configuration: LIM"
 #endif /* LIM */
-#line 518
+#line 679
 #endif /* NTVDM */
 #line 680
         EQUIPMENT_WORD equip_flag;

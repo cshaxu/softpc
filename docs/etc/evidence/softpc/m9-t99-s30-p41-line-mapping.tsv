@@ -1,0 +1,14 @@
+path	local_line	old_line	suggested	condition	xp_condition_line
+base/bios/reset.c	393	518	679	ifdef:LIM	676
+base/disks/floppy_i.c	177	349	611	if:defined(NEC_98)	605
+base/inc/egacpu.h	316	405	532	ifdef:CPU_40_STYLE	486
+base/inc/ios.h	408	419	706	ifndef:SFELLOW	589
+base/inc/rs232.h	41	44	45	ifdef:BIGEND	36
+base/inc/rs232.h	330	309	669	ifdef:SHORT_TRACE	666
+base/system/cmos.c	393	414	433	ifndef:PROD	429
+base/system/cmos.c	430	456	477	ifndef:PROD	464
+base/system/illegalp.c	104	98	106	ifdef:PROD	100
+base/video/ega_read.c	751	984	1022	ifdef:CPU_40_STYLE	1006
+base/video/gfx_updt.c	154	179	193	ifdef:VGG	146
+base/video/gfx_updt.c	189	202	228	ifdef:PROD	221
+base/video/video.c	53	52	56	ifdef:SEGMENTATION	48

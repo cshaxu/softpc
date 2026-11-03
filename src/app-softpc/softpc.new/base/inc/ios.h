@@ -405,7 +405,7 @@
 #else   /* SFELLOW */
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif /*SFELLOW */
-#line 419
+#line 706
 #endif // !NEC_98
 #line 707
 

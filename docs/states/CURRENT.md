@@ -906,3 +906,9 @@ P39 was committed and pushed as `7cd93dba`. P40 corrects 12 XP
 conditional-end positions in ten files. Both 186-test background groups
 and x86 native passed first run; x64 compact_console failed first run and
 the complete randomized native rerun passed 8/8. S30 remains open.
+
+P40 was committed and pushed as `8d88b5a4`. P41 corrects 13 nested
+conditional-end positions in ten files, accounting for local blank lines.
+Both 186-test background groups passed first run; both native groups
+failed compact_console first run and passed 8/8 in randomized full reruns.
+The cause remains unknown. S30 remains open.

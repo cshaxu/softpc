@@ -748,7 +748,7 @@ ega_read_term IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 984
+#line 1022
 #endif  //NEC_98
 #line 1023
 }

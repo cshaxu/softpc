@@ -101,7 +101,7 @@ void illegal_op_int()
 #else  /* PROD */
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 98
+#line 106
 
 #else /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"

@@ -38,7 +38,7 @@ typedef union {
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 44
+#line 45
 #else //NEC_98
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif //NEC_98
@@ -327,7 +327,7 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 309
+#line 669
 
 #else
 #error "Unsupported SoftPC mirror configuration: #else"

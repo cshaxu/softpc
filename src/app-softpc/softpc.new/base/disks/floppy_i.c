@@ -174,7 +174,7 @@ void diskette_io()
 #line 608
 	(*fl_fnc_tab[op])(drive);
 #endif // !NEC_98
-#line 349
+#line 611
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

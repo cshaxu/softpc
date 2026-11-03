@@ -313,7 +313,7 @@ extern IU32 latchval;	/* used for following latch macros */
 #else	/* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 405
+#line 532
 #endif // !NEC_98
 #line 533
 
