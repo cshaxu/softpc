@@ -934,3 +934,11 @@ Dual builds and both 186-test background and eight-test native suites passed fir
 The [141 remaining rows](m9-t99-s30-p44-endif-disposition.tsv) from the P36 candidate list are classified as 91 single-line anchor matches, 16 three-line anchor matches, nine markers superseded before later code by another `#line`, and 25 reviewed local/ambiguous contexts. Anchor matches are evidence, not a proof of correct parent pairing or exhaustive source correspondence. Local additions, ABI changes and snapshot hooks are described per row; no corresponding XP line is claimed for locally inserted content. The separate first-code candidate list and no-code marker universe remain open.
 
 Only documentation and the active packet changed. Both cached architectures built and published; both PE runtime comparisons and whole-file SHA-256 values match P43 exactly. In accordance with the owner’s later instruction, no tests were rerun for a batch with no substantive executable change. This exception is scoped to S30; the earlier test failures and passes remain recorded.
+
+## P45 first-code probe disposition
+
+The [66 first-code leads](m9-t99-s30-p45-first-code-disposition.tsv) are recorded individually: 18 reference the P44 conditional-end review, 13 are original CCPU declarations at the correct XP physical lines with local ABI types, and 35 have separately described source context or local additions. For inserted statements with no original counterpart, this records the ownership difference without asserting an invented XP line or proving every later diagnostic location. The P44 single-anchor classifications remain heuristic rather than independent proof of parent alignment.
+
+The first-code probe excludes ordinary-code-free spans. Of its 983 such markers, 654 precede a further marker with an intervening `#error`, 250 precede a further marker without one, 75 reach EOF without an error, and four reach EOF with an error. These counts identify where directive-level review is still required; they are not defect counts or evidence of correctness.
+
+Only audit documentation changed. Dual cached builds and publication passed; both EXEs match P44 byte-for-byte and all PE loaded sections match. Under the owner’s later instruction no tests were rerun. Earlier full-test evidence and intermittent Console failures remain recorded.

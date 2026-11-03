@@ -1,0 +1,67 @@
+path	local_line	marker	probe_xp_code_line	probe	disposition	evidence
+base/bios/tape_io.c	289	393	393	code-diff	source-context	original BIOS return statement at XP 393 with registered segment correction
+base/ccpu386/c_main.c	28	28	59	code-diff	source-context	original includes at XP 28; changed NTVDM/TLS condition remains registered
+base/ccpu386/c_main.c	752	767	770	code-diff	source-context	original comment and conditional at XP 767; local TLS setjmp adaptation
+base/ccpu386/c_main.c	3350	3511	3512	code-diff	end-review	reviewed-local-context: local retired callback inserted; following goto maps XP 3513 after blank and callback
+base/ccpu386/c_main.c	3835	4008	4014	code-diff	source-context	local HLT event dispatch after XP 4008; local inserted code has no identical original position
+base/ccpu386/c_main.c	4039	4202	4202	code-diff	end-review	reviewed-local-context: local retired callback inserted; following goto maps XP 4203
+base/ccpu386/ccpusas4.c	28	33	67	code-diff	source-context	original include block begins at XP 33; following local declarations differ
+base/ccpu386/cpu4gen.h	522	776	778	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 778 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	530	789	791	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 791 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	538	802	804	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 804 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	546	815	817	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 817 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1098	1712	1714	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1714 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1106	1725	1727	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1727 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1114	1738	1740	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1740 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1122	1751	1753	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1753 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1130	1764	1766	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1766 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1138	1777	1779	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1779 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1146	1790	1792	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1792 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1154	1803	1805	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1805 has local ISM32 ABI type
+base/ccpu386/cpu4gen.h	1162	1816	1818	code-diff	abi-correspondence	blank then original CCPU condition; declaration at XP 1818 has local ISM32 ABI type
+base/comms/com.c	253	221	222	code-diff	end-review	reviewed-local-context: local forward declarations reordered for snapshot callbacks; XP declarations occur in multiple hardware branches; no single sequential original anchor
+base/comms/printer.c	227	206	207	code-diff	end-review	reviewed-local-context: local forward declarations and snapshot callbacks inserted; no immediate original sequential anchor
+base/disks/fdisk.c	220	225	349	code-diff	source-context	original include block begins at XP 225; first-code probe chose later altered item
+base/disks/fla.c	55	58	93	code-diff	source-context	original include block begins at XP 58; first-code probe chose later altered item
+base/inc/cpu_vid.h	98	90	91	code-diff	source-context	NO_STRING_OPERATIONS begins XP 90; following declaration XP 91 has fixed-width ABI change
+base/inc/dma.h	496	577	578	out-of-range	source-context	local T93 DMA accessor follows original file; XP has no corresponding EOF declaration
+base/inc/egacpu.h	97	142	143	code-diff	source-context	local forward declaration added before XP NEC_98 condition; local ABI exception
+base/inc/egacpu.h	112	152	158	code-diff	source-context	HOST_VGA_GLOBALS begins at XP 152; local C-video carrier and ABI change
+base/inc/host.h	50	49	52	code-diff	source-context	REAL_VGA begins at XP 49; local x64 ABI declaration replaces original
+base/inc/sas.h	95	95	99	code-diff	source-context	NTVDM begins at XP 95 and its branch is #error; subsequent local overwrite declaration differs
+base/inc/sas.h	116	117	117	code-diff	source-context	original GISP_CPU alternative at XP 117; PHY_ADDR is a local ABI definition
+base/inc/video.h	293	264	267	code-diff	end-review	reviewed-local-context: local optional stream state declarations after original branch; no identical XP continuation in this location
+base/keymouse/keyba.c	2347	2298	2299	code-diff	end-review	reviewed-local-context: local snapshot callback helper; not a sequential XP statement at this location
+base/keymouse/keyba.c	2513	3174	3177	code-diff	end-review	reviewed-local-context: local keyboard IRQ deassert repair/comment changes original JOKER placement; already separately recorded as functional difference
+base/keymouse/mouse.c	39	42	74	code-diff	source-context	original include block begins at XP 42; later declarations changed locally
+base/keymouse/mouse.c	346	419	419	code-diff	end-review	reviewed-local-context: local InPort IRQ guard at logical 419 precedes retained interrupt statement at XP 420
+base/keymouse/mouse.c	446	511	511	code-diff	source-context	local mouse interrupt guard replaces original XP 511 statement under retained branch
+base/keymouse/ppi.c	44	46	65	code-diff	source-context	original debug include at XP 46; local snapshot include follows
+base/keymouse/ppi.c	212	215	215	out-of-range	source-context	local snapshot code follows XP end of file; no original matching statement
+base/keymouse/ppi.c	226	235	235	out-of-range	source-context	local snapshot code follows XP end of file; no original matching statement
+base/system/at_dma.c	52	57	65	code-diff	end-review	triple-anchor-consistent: 58
+base/system/at_dma.c	937	955	955	code-diff	source-context	original transfer at XP 955; local buffer-size argument is a registered ABI change
+base/system/cmos.c	17	22	63	code-diff	source-context	original include block begins at XP 22; later declarations changed locally
+base/system/cmos.c	1175	1205	1206	code-diff	end-review	reviewed-local-context: local snapshot callback helper; original TEST_HARNESS ends at XP EOF
+base/system/ica.c	421	492	494	code-diff	source-context	original comment at XP 492; local delayed interrupt expression and explanatory comment added
+base/system/ica.c	1687	1901	1901	code-diff	source-context	local CCPU UNUSED alternative after XP 1901; original continuation anchor recorded in P35
+base/system/ica.c	2034	2023	2023	code-diff	source-context	local PIC snapshot state with original branch structure; no sequential original statement
+base/system/ica.c	2044	2034	2034	code-diff	source-context	local PIC snapshot return and restore functions; no sequential original statement
+base/system/rom.c	686	871	871	code-diff	source-context	original ROM cursor increment at XP 871 uses local x64-safe width
+base/system/timer.c	2594	2441	2442	code-diff	end-review	reviewed-local-context: local snapshot helper replaces subsequent original debug material; no sequential XP statement
+base/video/ega_read.c	196	379	382	code-diff	source-context	original blank and C_VID begin at XP 379; local glue declarations differ
+base/video/gfx_updt.c	1875	1785	1787	code-diff	end-review	reviewed-local-context: local T60 panning-dirty helper precedes original continuation; no immediate identical XP statement
+base/video/vga_prts.c	3115	3243	3251	code-diff	end-review	reviewed-local-context: local snapshot port helper precedes retained continuation; no immediate original sequential statement
+host/inc/host_cpu.h	270	383	390	code-diff	source-context	original comment starts XP 386 following three blank lines; local x64 ABI declarations follow
+host/inc/host_def.h	165	142	165	code-diff	source-context	original timer macro starts XP 143 after blank; local NTVDM selection differs
+host/inc/host_rrr.h	43	43	43	code-diff	source-context	original two strings at XP 43–44 use local char rather than wchar_t contract
+host/src/nt_cga.c	261	383	388	code-diff	source-context	local empty-dirty rectangle guard after original position XP 383
+host/src/nt_graph.c	33	33	79	code-diff	source-context	original include block begins XP 33; later host adaptation differs
+host/src/nt_graph.c	1639	1939	1944	code-diff	source-context	local V7 packed-painter correction follows XP conditional end 1938; no identical original statement
+host/src/nt_keycd.c	335	788	788	code-diff	end-review	reviewed-local-context: original statement XP 788 has local >= bounds fix; marker 788 maps it correctly
+host/src/nt_keycd.c	351	817	818	code-diff	end-review	reviewed-local-context: local blank maps XP 817 and bounds-fixed original statement maps XP 818
+host/src/nt_sbdsp.c	715	2270	2274	code-diff	end-review	triple-anchor-consistent: 2270
+host/src/nt_sbfm.c	89	158	158	code-diff	source-context	local T93 FM status emulation differs from original timer implementation
+host/src/nt_sbfm.c	97	169	169	code-diff	source-context	local T93 FM status emulation closes simplified branch; no immediate matching XP statement
+host/src/nt_sbmid.c	9	5	11	code-diff	end-review	reviewed-local-context: local compat headers and MIDI framing changes; no immediate identical XP statement
+host/src/nt_sound.c	35	41	48	code-diff	end-review	reviewed-local-context: local host timing imports differ and retained includes are rearranged; no immediate sequential XP statement

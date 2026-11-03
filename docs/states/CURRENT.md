@@ -933,3 +933,9 @@ architectures built and published; both EXE SHA-256 values are unchanged
 from P43. Per the owner’s latest instruction no tests were rerun for this
 non-substantive batch. Remaining first-code and other unexplored cases keep
 S30 open.
+
+P44 was committed and pushed as `b9a8916b`. P45 records contextual
+dispositions for the 66 first-code leads without source changes. The 983
+markers with no ordinary code before the next marker require separate
+directive review. Cached dual builds and exact unchanged EXE hashes permit
+the owner-directed test exception; S30 remains open.
