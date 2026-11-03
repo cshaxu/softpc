@@ -895,3 +895,9 @@ P37 was committed and pushed as `afbd47a2`. P38 corrects 20 XP
 conditional-end diagnostic positions in ten mirror files; both adjacent
 condition pairings were checked. Dual builds and both full background and
 native groups passed first run. S30 remains open for remaining candidates.
+
+P38 was committed and pushed as `c89c7a58`. P39 corrects 17 XP
+conditional-end diagnostic positions in ten files using adjacent reviewed
+condition pairings. Both 186-test background groups and x64 native passed
+first run; x86 native compact_console failed first run and full randomized
+rerun passed 8/8. S30 remains open.

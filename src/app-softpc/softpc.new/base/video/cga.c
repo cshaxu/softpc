@@ -1132,7 +1132,7 @@ static void update_cursor_shape IFN0()
 #if !defined(EGG) && !defined(A3CPU) && !defined(A2CPU) && !defined(C_VID) && !defined(A_VID)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* not EGG or A3CPU or A2CPU or C_VID or A_VID */
-#line 1325
+#line 1344
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"

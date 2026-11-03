@@ -1318,7 +1318,7 @@ set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
-#line 1835
+#line 1844
 
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"

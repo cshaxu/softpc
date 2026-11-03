@@ -1343,7 +1343,7 @@ void mouse_install1()
         sas_storew(int_addr(0x33), hook_offset);
         sas_storew(int_addr(0x33) + 2, getCS());
 #endif /* NTVDM */
-#line 1380
+#line 1118
 
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
@@ -1993,7 +1993,7 @@ void mouse_video_io()
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 2000
+#line 1883
 
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
@@ -2409,7 +2409,7 @@ the application OUTBs the necessary data.
 #else
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif  /* !X86GFX */
-#line 2385
+#line 2298
         }
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"

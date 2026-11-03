@@ -334,7 +334,7 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #endif /* more than 2 serial ports */
 #line 679
 #endif // !NEC_98
-#line 319
+#line 680
 
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"

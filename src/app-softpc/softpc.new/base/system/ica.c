@@ -1879,7 +1879,7 @@ void ica0_init IFN0()
     io_define_inb(ICA0_ADAPTOR, ica_inb_func);
     io_define_outb(ICA0_ADAPTOR, ica_outb_func);
 #endif
-#line 1892
+#line 2102
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -1966,7 +1966,7 @@ void ica1_init IFN0()
     io_define_inb(ICA1_ADAPTOR, ica_inb_func);
     io_define_outb(ICA1_ADAPTOR, ica_outb_func);
 #endif
-#line 1960
+#line 2189
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

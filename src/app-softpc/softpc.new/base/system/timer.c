@@ -109,7 +109,7 @@ static unsigned long idealInterval;
 static unsigned long ticksPerIdealInterval;
 static  int     ticks_blocked = 0;
 #endif /* NTVDM */
-#line 102
+#line 120
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
@@ -756,7 +756,7 @@ GLOBAL ULONG get_DOS_ticks IFN0()
         return( timers[0].Count );
 }
 #endif /* NTVDM */
-#line 643
+#line 772
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"

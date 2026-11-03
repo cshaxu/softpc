@@ -1648,7 +1648,7 @@ void keyboard_io()
     }
 }
 #endif
-#line 1593
+#line 1883
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"

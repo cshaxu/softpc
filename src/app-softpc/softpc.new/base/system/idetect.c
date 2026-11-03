@@ -246,7 +246,7 @@ LOCAL void my_host_release_timeslice()
     nCharPollsPerTick = 0;
 }
 #endif  /* NTVDM */
-#line 245
+#line 301
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"

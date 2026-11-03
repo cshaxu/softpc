@@ -146,7 +146,7 @@
 #line 211
 #define DEFAULT_SCAN_CODE_SET 2
 #endif   //NEC_98
-#line 140
+#line 213
 
 #ifdef REAL_KBD
 #error "Unsupported SoftPC mirror configuration: REAL_KBD"
@@ -2485,7 +2485,7 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 	}
 	else									/* port == 0x60 */
 #endif    //NEC_98
-#line 2429
+#line 3138
 
 #ifdef NTVDM	/* JonLe NTVDM Mod */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -2672,7 +2672,7 @@ GLOBAL VOID insert_code_into_6805_buf IFN1(half_word,code)
 	}
 }
 #endif /* ! NTVDM */
-#line 2578
+#line 3344
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
@@ -2715,7 +2715,7 @@ GLOBAL VOID AT_kbd_init IFN0()
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 2659
+#line 3432
 
 #ifdef	macintosh
 #error "Unsupported SoftPC mirror configuration: macintosh"

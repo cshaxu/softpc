@@ -107,7 +107,7 @@ static sys_addr user_timer_int_vector;
 static IVT_ENTRY standard_user_timer_int_vector;
 static IVT_ENTRY compatibility_user_timer_int_vector;
 #endif
-#line 98
+#line 116
 
 #ifdef ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
