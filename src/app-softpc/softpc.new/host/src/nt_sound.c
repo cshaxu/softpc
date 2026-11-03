@@ -374,7 +374,7 @@ void PlayContinuousTone(void)
 
     host_ica_unlock();
 #endif // !NEC_98
-#line 346
+#line 455
 }
 
 #if defined(NEC_98)

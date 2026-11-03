@@ -884,3 +884,9 @@ positions across ten mirror files, with corresponding XP conditional
 boundaries and subsequent original lines as evidence. Both architectures
 passed their 186 background and eight native tests first run. A separate
 endif-line candidate queue requires review; S30 remains open.
+
+P36 was committed and pushed as `0f369419`. P37 corrects 11 line
+positions in ten mirror files, with original branch boundaries and
+subsequent source verified. Both architectures passed all 186 background
+and eight native tests first run. The remaining line candidates need
+contextual review; S30 remains open.

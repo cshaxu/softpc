@@ -484,7 +484,7 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 							        & (( *(p23 + offset) ^ comp2 ) | dont_care2 ));
 	}
 #endif  //NEC_98
-#line 638
+#line 658
 }
 
 #ifdef SEGMENTATION

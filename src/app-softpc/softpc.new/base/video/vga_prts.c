@@ -3106,7 +3106,7 @@ VOID    vote_vga_mode IFN0()
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif 		/* GISP_SVGA */
-#line 3196
+#line 3405
 
 
 #ifdef HUNTER

@@ -853,7 +853,7 @@ void nt_graphics_tick(void)
         return;
     }
 #endif // !NEC_98
-#line 722
+#line 1015
 
 #ifdef EGG
 #ifndef NEC_98

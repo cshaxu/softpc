@@ -1770,7 +1770,7 @@ GLOBAL void vd_write_char_attrib IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1498
+#line 2251
 		/* place in memory */
 
 #ifdef REAL_VGA

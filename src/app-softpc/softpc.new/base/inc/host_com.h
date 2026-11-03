@@ -200,7 +200,7 @@ IMPORT VOID host_com_ioctl IPT3(int,adapter, int,request, intptr_t,arg);
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 209
+#line 208
 
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"

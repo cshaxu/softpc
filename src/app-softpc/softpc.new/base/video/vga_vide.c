@@ -1000,7 +1000,7 @@ static byte const5[] = { 1,0,0xff };
                 break;
         }
 #endif  //NEC_98
-#line 1011
+#line 1047
 }
 
 #endif  /* VGG */

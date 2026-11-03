@@ -1,0 +1,12 @@
+path	local_line	old_line	suggested	condition	xp_condition_line
+base/comms/printer_.c	31	26	28	ifdef:SCCSID	25
+base/inc/host_com.h	203	209	208	ifdef:NTVDM	199
+base/video/ega_prts.c	3042	3420	3511	ifndef:NEC_98	3489
+base/video/ega_prts.c	3048	3464	3557	ifdef:HUNTER	3513
+base/video/ega_read.c	487	638	658	ifndef:NEC_98	599
+base/video/vga_prts.c	3109	3196	3405	ifdef:GISP_SVGA	3196
+base/video/vga_vide.c	1003	1011	1047	ifndef:NEC_98	837
+base/video/video.c	1773	1498	2251	ifdef:JAPAN	2246
+host/inc/host_cpu.h	328	528	505	ifdef:A2CPU	456
+host/src/nt_graph.c	856	722	1015	ifndef:NEC_98	1006
+host/src/nt_sound.c	377	346	455	ifndef:NEC_98	424

@@ -325,6 +325,6 @@ extern void             (*host_simulate_func) ();
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif A2CPU
-#line 528
+#line 505
 
 #endif /* CPU_30_STYLE */

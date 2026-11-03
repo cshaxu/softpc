@@ -3039,12 +3039,12 @@ LOCAL	void	vote_ega_mode IFN0()
 	}
 	old_votes = votes;
 #endif  //NEC_98
-#line 3420
+#line 3511
 }
 
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif /* HUNTER */
-#line 3464
+#line 3557
 #endif /* EGG */
 #endif /* REAL_VGA */
