@@ -1,0 +1,10 @@
+path	parent	current_line	xp_line	condition	existing_disposition	anchor_count	current_anchor	xp_anchor	text	independent_boundary_review
+base/ccpu386/c_mem.h	root	38	37	ifdef:PIG	pending-unresolved	1	47	46	((x)>=pg_end?ccpu_new_code_page(&(x)):*(x)++)	root_boundary_and_anchor_match_children_separate
+base/ccpu386/in.c	root	86	86	ifndef:PIG	pending-unresolved	1	95	97	IN16(&temp,op2+2);	root_boundary_and_anchor_match_children_separate
+base/ccpu386/out.c	root	81	81	ifndef:PIG	pending-unresolved	2	86	87	OUT16(op1,op2&0xffff);	root_boundary_and_anchor_match_children_separate
+base/inc/gvi.h	root	217	318	if:defined(NEC_98)	pending-unresolved	1	283	483	((PCDisplay.screen_height.as_word+1)*get_pc_pix_height()))	root_boundary_and_anchor_match_children_separate
+base/inc/quick_ev.h	root	97	56	ifndef:NTVDM	pending-unresolved	4	101	60	typedefstructaqeia_req{	root_boundary_and_anchor_match_children_separate
+base/support/time_day.c	root	90	93	if:defined(NEC_98)	pending-unresolved	7	106	112	staticsys_addruser_timer_int_vector;	root_boundary_and_anchor_match_children_separate
+base/support/time_day.c	root	751	950	ifndef:NEC_98	pending-unresolved	9	755	952	inthour,minutes,sec;	root_boundary_and_anchor_match_children_separate
+base/system/timer.c	root	1893	1935	ifndef:NTVDM	pending-unresolved	8	1902	1943	LOCALvoidtimer_no_longer_too_soonIFN1(long,dummy)	root_boundary_and_anchor_match_children_separate
+base/video/gfx_updt.c	root	4037	3970	ifndef:REAL_VGA	pending-unresolved	27	4060	4211	LOCALUPDATE_ALGsave_update_alg;	root_boundary_matches_xp_5967_unused_nt_stream_declaration_omitted_children_separate

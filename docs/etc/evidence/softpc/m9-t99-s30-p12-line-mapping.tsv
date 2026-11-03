@@ -1,0 +1,8 @@
+path	directive_line	old_number	xp_number	xp_following_source
+base/inc/gvi.h	306	301	505	<blank>
+base/support/time_day.c	122	110	129	<blank>
+base/support/time_day.c	752	735	951	#ifndef NTVDM
+base/support/time_day.c	754	735	952	"int hour, minutes, sec;		/* Current host time */"
+base/support/time_day.c	786	765	983	#endif   //NEC_98
+base/support/time_day.c	788	765	984	}
+base/system/timer.c	1894	1683	1936	#ifndef DELAYED_INTS

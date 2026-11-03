@@ -1891,7 +1891,7 @@ LOCAL void updateCounter IFN0()
 
 
 #ifndef NTVDM
-#line 1683
+#line 1936
 #ifndef DELAYED_INTS
 /*
  *      timer_no_longer_too_soon() - this is the function invoked by the quick event manager

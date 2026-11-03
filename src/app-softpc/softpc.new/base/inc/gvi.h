@@ -303,7 +303,7 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #endif /* V7VGA */
 #endif
 #endif // !NEC_98
-#line 301
+#line 505
 
 /*
  * useful macro to get character height in host pixels

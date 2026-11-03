@@ -483,3 +483,23 @@ paths, and no non-mirror warning line was observed. The x86 and x64 EXE
 SHA-256 values are respectively
 `e9b96f3eea0ac481cdf149f3c3f077ead96832a6427d99a74c654fcacf91b3c6` and
 `6d0e5c0d07d6c32882d9d46fd65b02c21c79ba3ab78dae057f2d255a1aa0cf9e`.
+
+P12 inspected opening and closing boundaries and original adjacent context
+for nine root groups with descendant anchors. All nine root boundary pairs
+match. After the gfx_updt.c XP group, XP line 5967 declares
+`host_stream_io_update`; SoftPC omits this unused declaration with the
+owner-approved NT Console stream exclusion. A repository source search finds
+no remaining consumer, and S20 records exclusion of the corresponding host
+implementation. This omitted declaration is a specific local subset exception. Each child
+remains a separate audit item; root boundary evidence alone does not clear it.
+The [root review](m9-t99-s30-p12-root-boundary-review.tsv) retains the exact
+locations. This manual review uncovered seven stale line controls in three
+files, including cases with blank lines or nested directives that the earlier
+scanner deliberately did not classify. The [mapping](m9-t99-s30-p12-line-mapping.tsv)
+records each XP next line. P12 selected preprocessing matched for three actual
+translation units per architecture, including an actual gvi.h consumer. Both
+architectures built and each passed 186 background and 8 native tests. Both
+build logs contained 1526 mirror-path warning lines and no non-mirror warning
+line was observed. Published x86 and x64 EXE SHA-256 values are respectively
+`0666972945093cc8fcfde280f5548b3c3be81cbac338d4b6cbf079d4cff09418` and
+`0d613f0e51d03ccec783c6e3274154e2f86748d70d07d8423f892373ac260b02`.

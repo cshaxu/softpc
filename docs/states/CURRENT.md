@@ -43,36 +43,17 @@ to baseline `72e16acd`, not the edited file. The independent source review
 confirmed the ten XP/local NTVDM predicate pairs and distinguished the V7
 scanout's local extra guard from its two original siblings. The recursive
 comparison still has unreviewed repeated-boundary and local-exception cases.
-The completed P7 batch contained ten mirror files: `mouse_io.c`, `at_dma.c`,
-`ega_prts.c`, `vga_mode.c`, `vga_vide.c`, `gfx_updt.c`, `vga_prts.c`,
-`ega_vide.c`, `keyba.c` and `printer.c`. It corrects 216 `#line` values
-against paired XP guard boundaries; the per-location evidence distinguishes
-six manually inspected anchors from 210 adjacent-source candidates. Both
-actual architecture contexts for all ten files have byte-identical selected
-preprocessing. P7 dual-architecture build and publication succeeded; each architecture
-passed all 186 background and 8 native tests. It was committed and pushed as
-`505ed1c5`. P8 now modifies ten mirror files (`video.c`, `com.c`,
-`ega_read.c`, `fdisk.c`, `timer.c`, `ega_writ.c`, `egawrtm0.c`,
-`v7_ports.c`, `rom.c`, `v7_video.c`) to correct 89 line controls.
-Each has matching XP adjacent condition boundary and following source; the
-[ledger](../etc/evidence/softpc/m9-t99-s30-p8-line-mapping.tsv) records the
-candidates. P8 dual preprocessing, build and publication succeeded, followed by 186/186
-background and 8/8 native tests per architecture. P8 was committed and pushed as `3c526e55`. P9 is now active: ten
-compiled mirror files have 25 XP diagnostic line corrections. Both architectures passed preprocessing comparison, build, 186 background
-tests and 8 native tests each. P9 was committed and pushed as `b2c829f7`. P10 has ten changed mirror
-files (six C files and four headers) and ten XP line corrections. Its
-preprocessing, dual build and publication passed, as did 186 background and
-8 native tests per architecture. P10 was committed and pushed as `9ae6587e`. P11 has one modified mirror
-file: sas.h, with four diagnostic line corrections. Eight actual
-preprocessed inclusion contexts were byte-identical, both architectures built,
-and each passed 186 background and 8 native tests. Further conditional-structure review continues; P11
-must be built, tested, published, reviewed, committed and pushed before an
-eleventh mirror file is changed. The updated candidate
-queue has four sas.h line locations addressed in P11, pending qualification. Structural correspondence
-is still under review; these line candidates are not a complete audit. The [line-boundary candidate ledger](../etc/evidence/softpc/m9-t99-s30-p7-line-candidates.tsv)
-keeps 128 pending candidates in 31 files distinct from the 210 scanner matches
-corrected in P7. Owned P7 build and test logs and exit markers are `build/t99-s30/p7-*`; use bounded status polls, investigate
-30 minutes without progress and never terminate solely due to polling.
+P7 through P11 were built, tested and pushed as `505ed1c5`, `3c526e55`,
+`b2c829f7`, `9ae6587e` and `5628551c`, respectively. Each passed 186
+background and 8 native tests per architecture. They corrected line mappings;
+these do not establish complete conditional-structure correspondence. P12
+currently modifies `gvi.h`, `time_day.c` and `timer.c` with seven further
+line corrections discovered while reviewing root boundaries. Its actual
+preprocessing comparison is in progress; build, publication, full tests,
+review, commit and push remain due. Do not modify an eleventh mirror file
+before P12 delivery. The 460 unresolved paired conditional groups remain
+under review, with nine root boundaries inspected and children accounted
+separately in the [P12 root review](../etc/evidence/softpc/m9-t99-s30-p12-root-boundary-review.tsv).
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

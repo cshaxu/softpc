@@ -119,7 +119,7 @@ LOCAL void TimeToTicks();
 LOCAL void get_host_time();
 #endif /* ANSI */
 #endif   //NEC_98
-#line 110
+#line 129
 
 #define TICKS_PER_HOUR      65543L
 #define TICKS_PER_MIN       1092L
@@ -749,9 +749,9 @@ word *low, *hi;		/* outputs */
 void time_of_day_init()
 {
 #ifndef NEC_98
-#line 735
+#line 951
 #ifndef NTVDM
-#line 735
+#line 952
     int hour, minutes, sec;		/* Current host time */
     word low, hi;		/* Host time in PC ticks */
 
@@ -783,9 +783,9 @@ void time_of_day_init()
     user_timer_int_vector = BIOS_USER_TIMER_INT * 4;
 
 #endif  /* NTVDM */
-#line 765
+#line 983
 #endif   //NEC_98
-#line 765
+#line 984
 }
 
 
