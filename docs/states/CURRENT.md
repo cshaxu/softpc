@@ -128,6 +128,18 @@ review, commit and push. Both incremental builds passed and each architecture
 passed all 186 background and 8 native tests on the first run; no production
 source changed, and both EXE hashes are unchanged from P19. S30 final
 qualification cannot start while unresolved groups remain.
+P20 was committed and pushed as `4f6d89e6`. P21 adds boundary-level
+context evidence for 215 previously pending paired groups: 47 by two unique
+adjacent contexts or unique child position and 168 by one immediate unique
+context or unique child position. All arm signature arrays matched; the
+[unresolved paired ledger](../etc/evidence/softpc/m9-t99-s30-p21-unresolved-paired-groups.tsv)
+retains the remaining 197 paired groups. The 215 supported boundary pairs do
+not prove their retained descendants, and 497 candidate-file group rows remain
+a separate unresolved category. P21 has no production change; both incremental builds passed and each
+architecture passed 186 background and 8 native tests. The first x64 native
+group had the recorded compact_console initialization failure; its complete
+rerun passed. Review, commit and push remain due. S30 final qualification
+cannot start until every required structure and exception is accounted for.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

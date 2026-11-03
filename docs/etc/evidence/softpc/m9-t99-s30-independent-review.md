@@ -646,3 +646,22 @@ and all 186 background plus 8 native tests per architecture passed on the
 first run. No production source changed; the x86 and x64 EXE hashes remain
 `0ee983daeb4772ccb93da32e6a30bb40aee968791d079f02a5f45c3930c67f36` and
 `a58d1e9da3285c321ece3cf99e247493395fe458afb5dfa8ea3da3a9e747f595`.
+
+P21 compares immediate adjacent source contexts without crossing another
+conditional directive. Two or more nonempty lines must match and be unique
+among the same-condition sibling pairs; their ancestor chain must already be
+supported. Forty-five pairs have unique context on both sides and two are
+unique children; another 154 have a unique context on one side and fourteen
+are unique children under supported parents. All 215 current/XP arm-signature
+arrays match. The [two-sided/unique evidence](m9-t99-s30-p21-supported-boundaries.tsv)
+and [single-sided/unique evidence](m9-t99-s30-p21-single-context-boundaries.tsv)
+record exact groups, boundaries, skip arms and context. These are boundary
+evidence, not independent proof of nested descendants or full file identity.
+Of the original 460 pending paired rows, 197 have no such support and remain
+in the [unresolved ledger](m9-t99-s30-p21-unresolved-paired-groups.tsv);
+497 candidate-file rows are an additional category and are not included in
+that count. Both incremental builds passed; each architecture passed 186
+background and 8 native tests. The first x64 native group failed
+compact_console child initialization (stage 1 / error 6 / 0xc0000142); the
+complete rerun passed 8/8. The cause remains unknown. No production source
+changed and both EXE hashes remained those recorded for P20.
