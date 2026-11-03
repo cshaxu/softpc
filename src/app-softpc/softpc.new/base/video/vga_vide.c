@@ -115,7 +115,7 @@ rgb_struct *rgb;
         outb(VGA_DAC_DATA,rgb->green);
         outb(VGA_DAC_DATA,rgb->blue);
 #endif  //NEC_98
-#line 118
+#line 120
 }
 
 static void get_dac(dac,rgb)
@@ -129,7 +129,7 @@ rgb_struct *rgb;
         inb(VGA_DAC_DATA,&(rgb->green));
         inb(VGA_DAC_DATA,&(rgb->blue));
 #endif  //NEC_98
-#line 128
+#line 132
 }
 
 
@@ -144,7 +144,7 @@ void init_vga_dac(table)
 int table;      /* Which table to use */
 {
 #ifndef NEC_98
-#line 141
+#line 146
     int loop;
     byte *dac;
     rgb_struct rgb;
@@ -152,7 +152,7 @@ int table;      /* Which table to use */
 #ifdef  macintosh
 #error "Unsupported SoftPC mirror configuration: macintosh"
 #else   /* macintosh */
-#line 155
+#line 160
 
     switch (table)
     {
@@ -182,7 +182,7 @@ int table;      /* Which table to use */
 #error "Unsupported SoftPC mirror configuration: macintosh"
 #endif  /* macintosh */
 #endif  //NEC_98
-#line 186
+#line 192
 }
 
 /***** Routines to handle VGA 256 colour modes, called from video.c **********/
@@ -246,7 +246,7 @@ GLOBAL VOID vga_graphics_write_char
         bank = (byte)(( screen_offset - ( scan_length - ( nchs << 3 ))) >> 16);
         set_banking( bank, bank );
 #endif  //NEC_98
-#line 246
+#line 254
 }
 
 GLOBAL VOID vga_write_dot
@@ -272,7 +272,7 @@ GLOBAL VOID vga_write_dot
         (*update_alg.mark_byte)(screen_offset);
 #endif  /* REAL_VGA */
 #endif  //NEC_98
-#line 270
+#line 280
 }
 
 GLOBAL VOID vga_sensible_graph_scroll_up
@@ -316,7 +316,7 @@ GLOBAL VOID vga_sensible_graph_scroll_up
         }
 #endif  /* REAL_VGA */
 #endif  //NEC_98
-#line 323
+#line 335
 }
 
 GLOBAL VOID vga_sensible_graph_scroll_down
@@ -361,7 +361,7 @@ GLOBAL VOID vga_sensible_graph_scroll_down
         }
 #endif  /* REAL_VGA */
 #endif  //NEC_98
-#line 378
+#line 392
 }
 
 GLOBAL VOID vga_read_attrib_char IFN3(LONG, col, LONG, row, LONG, page)
@@ -400,7 +400,7 @@ GLOBAL VOID vga_read_attrib_char IFN3(LONG, col, LONG, row, LONG, page)
         }
         search_font((char *)the_char,(int)char_height);
 #endif  //NEC_98
-#line 412
+#line 428
 }
 
 GLOBAL VOID vga_read_dot IFN3(LONG, page, LONG, pixcol, LONG, row)
@@ -420,7 +420,7 @@ GLOBAL VOID vga_read_dot IFN3(LONG, page, LONG, pixcol, LONG, row)
 #endif  /* REAL_VGA */
         setAL(*screen) ; /* WOW - that's easy!! */
 #endif  //NEC_98
-#line 427
+#line 445
 }
 
 /****** Routines to handle BIOS functions new to VGA *******/
@@ -574,7 +574,7 @@ void vga_set_palette()
                         break;
         }
 #endif  //NEC_98
-#line 577
+#line 597
 }
 
 /*
@@ -635,12 +635,12 @@ void vga_func_12()
                         break;
         }
 #endif  //NEC_98
-#line 634
+#line 656
 }
 void vga_disp_comb()
 {
 #ifndef NEC_98
-#line 637
+#line 660
         /* check that we really are a VGA */
         if (video_adapter != VGA)
         {
@@ -661,13 +661,13 @@ void vga_disp_comb()
         }
         setAX(0x1A); /* Tell him we coped. */
 #endif  //NEC_98
-#line 656
+#line 680
 }
 
 void vga_disp_func()
 {
 #ifndef NEC_98
-#line 660
+#line 685
         /*
          * This function returns masses of info. about the current
          * display and screen mode.
@@ -682,7 +682,7 @@ void vga_disp_func()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* NTVDM & X86GFX */
-#line 671
+#line 699
 
         /* check that we really are a VGA */
 #ifndef HERC
@@ -690,7 +690,7 @@ void vga_disp_func()
 #else
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif  /* HERC */
-#line 678
+#line 706
         {
                 /* we are not -so this function is not implemented */
                 not_imp();
@@ -784,7 +784,7 @@ void vga_disp_func()
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif  /* HERC */
 #endif  //NEC_98
-#line 799
+#line 833
 }
 
 void vga_int_1C()

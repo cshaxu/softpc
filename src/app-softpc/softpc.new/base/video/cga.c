@@ -181,7 +181,7 @@ IMPORT READ_POINTERS simple_reads;
 #ifdef  A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #endif  /* A2CPU */
-#line 205
+#line 206
 
 /*
  *==========================================================================
@@ -352,7 +352,7 @@ else
 
 	*value = 0x00;
 #endif   //NEC_98
-#line 372
+#line 375
 }
 
 
@@ -410,7 +410,7 @@ switch (address) {
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 429
+#line 432
 
 /*
  * This is the data register, the function to be performed depends on the
@@ -644,7 +644,7 @@ switch (address) {
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 660
+#line 663
 		break;
 
 	    case 0x0D:
@@ -662,7 +662,7 @@ switch (address) {
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 677
+#line 680
 		break;
 
 	    /*
@@ -871,7 +871,7 @@ switch (address) {
 static void set_cga_palette     IFN2(int, screen_mode, int, res)
 {
 #ifndef NEC_98
-#line 883
+#line 887
     /*
      * palette for color text - 16 colors for FG and BG
      * These tables are also used to set some graphic mode palette entries
@@ -1075,13 +1075,13 @@ static void set_cga_palette     IFN2(int, screen_mode, int, res)
 	host_set_palette(cga_graph_high,2);
     }
 #endif   //NEC_98
-#line 1085
+#line 1090
 }
 
 static void update_cursor_shape IFN0()
 {
 #ifndef NEC_98
-#line 1089
+#line 1095
 	/*
 	 *      This function actions a change to the cursor shape
 	 *      when either the cursor start or cursor end registers
@@ -1151,7 +1151,7 @@ io_addr i;
 #ifdef HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 1346
+#line 1366
 
 
 /*
@@ -1243,13 +1243,13 @@ for(i = CGA_PORT_START; i <= CGA_PORT_END; i++)
 	bios_ch2_byte_wrt_fn = simple_bios_byte_wrt;
 	bios_ch2_word_wrt_fn = simple_bios_word_wrt;
 #endif   //NEC_98
-#line 1445
+#line 1466
 }
 
 void cga_term   IFN0()
 {
 #ifndef NEC_98
-#line 1449
+#line 1471
     io_addr i;
 
     /*

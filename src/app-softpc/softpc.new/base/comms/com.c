@@ -599,7 +599,7 @@ static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
 #endif
-#line 538
+#line 625
        )
 	{
 #ifndef DELAYED_INTS
@@ -607,7 +607,7 @@ static void raise_interrupt IFN1(struct ADAPTER_STATE *, asp)
 #else
 #error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #endif
-#line 546
+#line 633
 	}
 }
 
@@ -624,7 +624,7 @@ static void clear_interrupt IFN1(struct ADAPTER_STATE *, asp)
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
 #endif
-#line 559
+#line 649
        )
 	{
 		ica_clear_int(0, asp->hw_interrupt_priority);
@@ -800,7 +800,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 						com_critical_reset(adapter);
 #endif /* IRET_HOOKS */
 #endif /* !NTVDM */
-#line 700
+#line 1213
 				}
 
 
@@ -812,7 +812,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
-#line 716
+#line 1229
 		}
 		else
 			*value = (IU8)(asp->divisor_latch.byte.LSByte);
@@ -1032,7 +1032,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 1028
+#line 1603
 			}
 			else
 			{	/* Loopback case requires masking off */
@@ -1059,7 +1059,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1063
+#line 1640
 		break;
 																		
 	case RS232_IER:
@@ -1099,7 +1099,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1095
+#line 1686
 		}
 		else
 		{
@@ -1137,7 +1137,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1145
+#line 1767
 		break;
 
 #endif /* NTVDM && FIFO_ON */
@@ -1146,7 +1146,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1148
+#line 1789
 
 		if ((value & LCRFlushMask.all)
 		!= (asp->line_control_reg.all & LCRFlushMask.all))
@@ -1161,7 +1161,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1174
+#line 1815
 		break;
 		
 	case RS232_MCR:
@@ -1187,7 +1187,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1211
+#line 1852
 		break;
 		
 	case RS232_LSR:
@@ -1273,7 +1273,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef  NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else /* NTVDM */
-#line 1416
+#line 2182
 
 void com_recv_char IFN1(int, adapter)
 {
@@ -1290,7 +1290,7 @@ void com_recv_char IFN1(int, adapter)
 	}
 }
 #endif /* NTVDM */
-#line 1431
+#line 2198
 
 /*
  * BCN 2151 - recv_char must use long param to match add_event function prototype
@@ -1335,7 +1335,7 @@ recv_char IFN1(long, adapt_long)
 #ifdef DOCUMENTATION
 #error "Unsupported SoftPC mirror configuration: DOCUMENTATION"
 #endif
-#line 1494
+#line 2261
 }
 #endif // NEC_98
 #line 1495
@@ -1553,7 +1553,7 @@ static void set_break IFN1(int, adapter)
 	switch ( change_state((int)asp->line_control_reg.bits.set_break,
 		asp->break_state) )
 #endif // NEC_98
-#line 1677
+#line 2564
 	{
 	case ON:
 		asp->break_state = ON;
@@ -1691,7 +1691,7 @@ static void set_baud_rate IFN1(int, adapter)
 #else /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1810
+#line 2835
 }
 #endif // NEC_98
 #line 1811
@@ -1940,7 +1940,7 @@ static void set_rts IFN1(int, adapter)
 	}
 }
 #endif // NEC_98
-#line 1996
+#line 3242
 
 #ifndef NEC_98
 #line 3244
@@ -2224,7 +2224,7 @@ static void com_reset IFN1(int, adapter)
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 2268
+#line 3604
 		
 	/*
 	 * Reset adapter synchronisation
@@ -2248,7 +2248,7 @@ static void com_reset IFN1(int, adapter)
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
-#line 2304
+#line 3640
 }
 #endif // NEC_98
 #line 3642
@@ -2311,7 +2311,7 @@ GLOBAL VOID com_init IFN1(int, adapter)
 	io_define_inb(com_adaptor[adapter], com_inb);
 	io_define_outb(com_adaptor[adapter], com_outb);
 #endif /* NTVDM */
-#line 2343
+#line 3802
 
 	for(i = port_start[adapter]; i <= port_end[adapter]; i++)
 		io_connect_port(i, com_adaptor[adapter], IO_READ_WRITE);

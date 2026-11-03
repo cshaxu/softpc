@@ -154,7 +154,7 @@ void time_of_day()
 #ifdef BSD4_2
 #error "Unsupported SoftPC mirror configuration: BSD4_2"
 #endif
-#line 140
+#line 304
 
     switch (getAH()) {
 	case 0x00:			/* Get time	*/
@@ -166,7 +166,7 @@ void time_of_day()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 147
+#line 323
 	    /*
 	     * First get the time from the host
 	     */
@@ -190,7 +190,7 @@ void time_of_day()
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
 #endif /* NTVDM */
-#line 185
+#line 362
 
 	    break;
 
@@ -322,7 +322,7 @@ void time_of_day()
 #ifdef BSD4_2
 #error "Unsupported SoftPC mirror configuration: BSD4_2"
 #endif
-#line 317
+#line 504
 			return;
 		}
 		if( UPDATE_IN_PROGRESS )
@@ -355,7 +355,7 @@ void time_of_day()
 #ifdef XTSFD
 #error "Unsupported SoftPC mirror configuration: XTSFD"
 #else
-#line 361
+#line 548
         default:
             ; /* Do nothing */
 #endif
@@ -377,12 +377,12 @@ void time_of_day()
 void time_int()
 {
 #ifndef NEC_98
-#line 375
+#line 583
     /*
      * NT port does everything in 16 bit int08 handler
      */
 #ifndef NTVDM
-#line 378
+#line 587
 
     /*
      * The BIOS timer interrupt routine.
@@ -466,9 +466,9 @@ void time_int()
 				  USER_TIMER_INT_OFFSET);
 	}
 #endif	/* NTVDM */
-#line 460
+#line 670
 #endif   //NEC_98
-#line 460
+#line 671
 }
 
 /*
@@ -484,7 +484,7 @@ void time_int()
  *  to the time of day stuff is not needed
  */
 #ifndef NTVDM
-#line 474
+#line 686
 /*
  * The routines get_host_timestamp() and write_host_timestamp() are used to
  * override the BIOS record of time, since timer events are known to be lost.
@@ -696,7 +696,7 @@ int low, high;
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 690
+#line 902
 
 
 LOCAL void get_host_time( h, m, s )
@@ -713,7 +713,7 @@ int *h, *m, *s; /* hours, minutes and secs */
 }
 
 #ifndef NEC_98
-#line 705
+#line 918
 /*
 ** Take a normal time in hours, minutes and seconds then
 ** transmutate it into PC ticks since the beginning of the day.

@@ -345,7 +345,7 @@ static void printer_inb IPT2(io_addr, port, half_word *, value);
 static void printer_outb IPT2(io_addr, port, half_word, value);
 static void notbusy_check IPT1(int,adapter);
 #endif // !NEC_98
-#line 316
+#line 303
 
 /*
  * ============================================================================
@@ -358,7 +358,7 @@ void printer_post IFN1(int,adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 325
+#line 315
 	/*
 	 * Set up BIOS data area.
 	 */
@@ -418,7 +418,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 		
 	port = port & PRINTER_BIT_MASK;		/* clear unused bits */
 #endif // !NEC_98
-#line 362
+#line 388
 
 	switch(port)
 	{
@@ -466,7 +466,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 #else
 #error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #endif /* DELAYED INTS */
-#line 394
+#line 441
 			break;
     	case STATE_OUTA:
 			notbusy_check(adapter);		/* <chrisP 11Sep91> */
@@ -477,7 +477,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 #else
 #error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #endif
-#line 405
+#line 452
 			break;
     	default:	
 			note_trace1(PRINTER_VERBOSE,
@@ -498,7 +498,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 		negate(*value, AUTO_FEED);
 		negate(*value, SELECT_IN);
 #endif // !NEC_98
-#line 418
+#line 471
 		break;
 	}
 #ifndef NEC_98
@@ -527,7 +527,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #ifdef PC_CONFIG
 #error "Unsupported SoftPC mirror configuration: PC_CONFIG"
 #endif
-#line 436
+#line 498
 
 
 	note_trace2(PRINTER_VERBOSE,"outb to printer port %#x with value %#x",
@@ -582,7 +582,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 467
+#line 614
 
 		case STATUS_OFFSET:
 			/* Not possible */
@@ -602,7 +602,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #ifdef PC_CONFIG
 #error "Unsupported SoftPC mirror configuration: PC_CONFIG"
 #else
-#line 483
+#line 635
 				/* this was a call to host_print_doc - <chrisP 28Aug91> */
 				host_reset_print(adapter);
 #endif
@@ -613,7 +613,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 
 			if (low_high(old_control, value, STROBE))
 #endif // !NEC_98
-#line 492
+#line 645
 			{
 
 #line 646
@@ -699,7 +699,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 					set_state(adapter, STATE_READY);
 					notbusy_check(adapter);
 #endif // !NEC_98
-#line 544
+#line 738
 				}
 			}
 
@@ -722,7 +722,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 			break;
 		}
 #ifndef NEC_98
-#line 555
+#line 763
 		break;
 	default:	
 		note_trace1(PRINTER_VERBOSE, "<poutb() - unknown state %x>",
@@ -730,7 +730,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 		break;
 	}
 #endif // !NEC_98
-#line 561
+#line 770
 }
 
 void printer_status_changed IFN1(int,adapter)
@@ -812,7 +812,7 @@ static void notbusy_check IFN1(int,adapter)
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 613
+#line 866
 
 		if (get_control(adapter) & IRQ)
                 {
@@ -825,7 +825,7 @@ static void notbusy_check IFN1(int,adapter)
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 628
+#line 882
 
 /*
 ** Initialise the printer port required.
@@ -835,7 +835,7 @@ void printer_init IFN1(int,adapter)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 634
+#line 903
 	io_addr i;
 
 	io_define_inb( lpt_adapter[adapter], printer_inb );
@@ -846,7 +846,7 @@ void printer_init IFN1(int,adapter)
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM && MONITOR */
-#line 641
+#line 922
 	{
 	    control_reg[adapter] = 0xEC;
 	    status_reg[adapter] = 0xDF;
@@ -879,7 +879,7 @@ void printer_init IFN1(int,adapter)
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM && MONITOR */
-#line 664
+#line 1008
 
 #endif
 

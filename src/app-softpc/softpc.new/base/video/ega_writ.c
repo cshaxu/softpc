@@ -76,7 +76,7 @@ extern WRT_POINTERS mode1_handlers, mode2_handlers;
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 81
+#line 82
 
 #ifndef REAL_VGA
 
@@ -135,7 +135,7 @@ ULONG sr_lookup[16] =
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 350
+#line 357
 };
 
 GLOBAL VOID
@@ -165,7 +165,7 @@ Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif 	/* CPU_40_STYLE - EVID */
-#line 420
+#line 443
 }
 
 #endif /* !(NTVDM && MONITOR) */
@@ -173,7 +173,7 @@ Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 430
+#line 454
 
 /*  Initialize the write module */
 
@@ -233,14 +233,14 @@ ega_write_init IFN0()
 	ega_write_routines_update(ENABLE_SET_RESET);
 	ega_write_routines_update(FUNCTION);
 #endif  //NEC_98
-#line 489
+#line 515
 }
 
 VOID
 ega_write_term IFN0()
 {
 #ifndef NEC_98
-#line 494
+#line 521
 	/*
 	 * ensure that if you are an EGA and then change to a VGA (or vice
 	 * versa) the write mode will be changed by the new adaptor. Otherwise
@@ -254,7 +254,7 @@ ega_write_term IFN0()
 
 	ega_write_routines_update(WRITE_MODE);
 #endif  //NEC_98
-#line 506
+#line 534
 }
 
 
@@ -264,14 +264,14 @@ VOID
 ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 {
 #ifndef NEC_98
-#line 514
+#line 543
 	ULONG state;
 	ULONG mode_and_chain;
 	WRT_POINTERS *handler;
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 520
+#line 549
 
 	note_entrance1("ega_write_routines_update(%d)",reason);
 
@@ -460,7 +460,7 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 708
+#line 737
 
 	if(( EGA_CPU.saved_mode_chain != mode_and_chain )
 		|| ( EGA_CPU.saved_state != state )
@@ -556,7 +556,7 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 824
+#line 853
 
 		set_mark_funcs();
 
@@ -567,7 +567,7 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #endif
 	}
 #endif  //NEC_98
-#line 833
+#line 863
 }
 #endif /* REAL VGA */
 #endif /* EGG */

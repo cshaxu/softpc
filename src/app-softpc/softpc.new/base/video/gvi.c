@@ -185,7 +185,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef CGAMONO 
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif 
-#line 186
+#line 201
             cga_term();
             break;
 #ifdef EGG
@@ -206,7 +206,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 208
+#line 223
 	    break;
         }
 
@@ -227,7 +227,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 230
+#line 245
 #ifdef EGG
     case EGA:
 	screen_height = EGA_HEIGHT;
@@ -260,13 +260,13 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef CGAMONO  
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
-#line 267
+#line 282
         cga_init();
         break;
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 274
+#line 289
 #ifdef EGG
     case EGA:
 	ega_init();
@@ -292,7 +292,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 294
+#line 311
 }
 
 
@@ -307,13 +307,13 @@ void gvi_term IFN0()
 #ifdef CGAMONO  
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
-#line 309
+#line 326
         cga_term();
         break;
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 316
+#line 333
 #ifdef EGG
     case EGA:
 	ega_term();

@@ -235,7 +235,7 @@ void disk_post IFN0()
 	USHORT diskette_offset;
 	USHORT diskette_seg;
 #endif /* !(NTVDM && MONITOR) */
-#line 219
+#line 390
 	int i;
 
 	/*
@@ -244,7 +244,7 @@ void disk_post IFN0()
 	 diag = rcmos (CMOS_DIAG);
 
 #if !(defined(NTVDM) && defined(MONITOR))
-#line 226
+#line 398
 	/* We don't want this section if running on NTVDM MONITOR */
 
 	 drive1notwiredup = ~0;
@@ -336,7 +336,7 @@ void disk_post IFN0()
 		wcmos (CMOS_DIAG, (UTINY)(diag | HF_FAIL));
 	}
 #endif // !NEC_98
-#line 309
+#line 494
 }
 
 
@@ -492,7 +492,7 @@ void disk_io IFN0()
 	com.xfersegment = getES () + ((getBX ()) >> 4);
 	com.xferoffset = getBX () & 0x0f;
 #endif // !NEC_98
-#line 657
+#line 1003
 
 #ifndef NEC_98
 #line 1005
@@ -547,7 +547,7 @@ void disk_io IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 701
+#line 1082
 		setCF (1);	/* cmd fails */
 	}
 	else
@@ -555,7 +555,7 @@ void disk_io IFN0()
         dt2(DBIOS|CALL, 0, "CF=%c, status=%x(hex)\n",
 		getCF()?'T':'F',(unsigned)rstatus())
 #endif // !NEC_98
-#line 707
+#line 1089
 }
 
 /*0x?? badcommand catch all */
@@ -567,7 +567,7 @@ LOCAL void badcmd IFN0()
 #line 1097
 	wstatus (STATUS_BAD_COMMAND);
 #endif // !NEC_98
-#line 713
+#line 1099
 }
 
 /*0x00 reset the hard disk system */
@@ -656,7 +656,7 @@ LOCAL void disk_read IFN0()
 	wstatus (STATUS_CLEAR);
 	setAL ((unsigned char) com.sectors);
 #endif // !NEC_98
-#line 796
+#line 1284
 }
 
 /*0x03 disk write sector(s) */
@@ -1138,7 +1138,7 @@ GLOBAL void wdctrl_bop IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1287
+#line 1919
 
 	/* clear up the status before we kick off */
 	wstatus (STATUS_CLEAR);

@@ -269,7 +269,7 @@ rdm0_word_ch2 IFN1(ULONG, offset )
 {
 	IU32 temp;
 #ifndef NEC_98
-#line 446
+#line 453
 	IU32 lsb;
 
 	setVideolatches(*(IU32 *)( EGA_planes +
@@ -303,7 +303,7 @@ GLOBAL void
 rdm0_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )
 {
 #ifndef NEC_98
-#line 476
+#line 485
 	ULONG lsb;
 	ULONG inc;
 	UTINY *planes;
@@ -338,7 +338,7 @@ rdm0_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )
 		inc ^= 0x2;
     }
 #endif  //NEC_98
-#line 508
+#line 518
 }
 
 /* Used to correct writes to M when in mode 1 */
@@ -374,7 +374,7 @@ rdm1_byte_ch2 IFN1(ULONG, offset )
 #endif
 	return( temp );
 #endif  //NEC_98
-#line 538
+#line 552
 }
 
 GLOBAL IU32
@@ -418,7 +418,7 @@ rdm1_word_ch2 IFN1(ULONG, offset )		/* used to correct writes to M when in mode 
 #endif
 	return( temp1 );
 #endif  //NEC_98
-#line 576
+#line 594
 }
 
 GLOBAL void
@@ -504,7 +504,7 @@ Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE - EVID */
 #endif  //NEC_98
-#line 681
+#line 711
 }	
 
 #endif /* !(NTVDM && MONITOR) */
@@ -512,7 +512,7 @@ Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 691
+#line 722
 
 GLOBAL void
 update_shift_count IFN0()
@@ -560,7 +560,7 @@ update_shift_count IFN0()
 #endif	/* VGG */
 	}
 #endif  //NEC_98
-#line 734
+#line 767
 }
 
 void
@@ -584,7 +584,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif  /* CPU_40_STYLE */
-#line 772
+#line 806
 
 		ram_off = TRUE;	/* prevent recalcs until ram enabled again */
 
@@ -626,7 +626,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 826
+#line 860
 				break;
 #endif	/* VGG */
 		}
@@ -646,7 +646,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 850
+#line 884
 				break;
 
 			case CHAIN2:
@@ -665,7 +665,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 873
+#line 907
 
 				break;
 
@@ -679,7 +679,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 891
+#line 925
 				break;
 #endif	/* VGG */
 		}
@@ -692,7 +692,7 @@ ega_read_routines_update IFN0()
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
 #endif  //NEC_98
-#line 912
+#line 947
 }
 
 void
@@ -710,7 +710,7 @@ ega_read_init IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 931
+#line 967
 
 	setVideoread_mapped_plane(0);
 
@@ -719,7 +719,7 @@ ega_read_init IFN0()
 #if defined(EGA_DUMP) || defined(EGA_STAT)
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP or EGA_STAT"
 #endif
-#line 952
+#line 975
 
 #if !defined(EGATEST) && !defined(A3CPU)
 	read_pointers = Glue_reads;
@@ -729,7 +729,7 @@ ega_read_init IFN0()
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
 #endif  //NEC_98
-#line 958
+#line 995
 }
 
 void

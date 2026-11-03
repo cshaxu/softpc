@@ -65,6 +65,15 @@ on compact_console child initialization before isolated and two full-group
 reruns passed; cause remains unconfirmed and is recorded in independent
 review. Complete review, commit and push before changing an eleventh file. Structural group matching
 and the 63 ambiguous line candidates remain open.
+P13 was committed and pushed as `3dfc2c0e`; its two initial x64 native
+failures and later passes are documented in the independent review. P14
+currently changes ten mirror files with 135 matching-prefix line corrections.
+Dual-architecture preprocessing, builds and full tests passed. The x86
+native group initially failed compact_console initialization and the complete
+rerun passed; cause remains unknown. Review, commit and push must complete
+before an eleventh mirror file is changed. The candidate queue
+retains 175 pending line mappings, including 63 with differing prefixes or
+line offsets. Conditional structure matching remains independently open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

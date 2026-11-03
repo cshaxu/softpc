@@ -524,3 +524,18 @@ passed its native group on its first run. Build logs contained 5230 x64 and
 Published x86 and x64 EXE SHA-256 values are respectively
 `78dc57790f0760827da3367f35a82cf5eea8e972df33e5034256c34cd964eb69` and
 `fb13d3919f78e44622ed658a7264e7181ac28810854b21b0583985c893b764c6`.
+
+P14 changes 135 matching-prefix candidate line controls across ten compiled
+files. The [mapping](m9-t99-s30-p14-line-mapping.tsv) and [updated queue](m9-t99-s30-p14-following-line-candidates.tsv)
+record the batch and retain 175 pending candidates, including the 63 divergent
+prefix/offset cases. Selected preprocessing matched in ten actual translation
+units per architecture; both architectures built and passed 186 background
+and 8 native tests. The first x86 native group had one compact_console child
+initialization failure, stage 1 / error 6 / 0xc0000142; the complete group
+subsequently passed 8/8. The cause is not established. The x64 native group
+passed first run. Each build log contained 807 mirror-path warning lines and
+no non-mirror warning line was observed. Published x86 and x64 EXE SHA-256
+values are respectively
+`60b351fb55a7be92c805ece5ae50f89b8bcbce5e7c717bce5d7ad121f72ec3b8` and
+`4c3a053dfb487f5a16cf2104aab2c752ed9e626e0bd506601ae1dd64cd1320a3`.
+No structural audit completion is implied.

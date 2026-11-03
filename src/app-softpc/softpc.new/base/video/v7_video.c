@@ -102,7 +102,7 @@ GLOBAL VOID
 v7vga_func_6f()
 {
 #ifndef NEC_98
-#line 108
+#line 109
 	byte al;
 
 	note_entrance0("v7vga_func_6f");
@@ -113,7 +113,7 @@ v7vga_func_6f()
 		setAH(2);
 		/* setCF(1) ?? */
 #endif  //NEC_98
-#line 117
+#line 119
 }
 
 /*(
@@ -179,7 +179,7 @@ v7vga_get_info()
 	/* Status register information */
 	setAH(0x04); /* Bit 5 = 0 -> colour. Bit 4 = 0 -> hi-res. Bit 0 = 0 -> display enabled. */
 #endif  //NEC_98
-#line 174
+#line 180
 }
 
 /*(
@@ -257,7 +257,7 @@ v7vga_get_mode_and_screen_res()
 			setCX(get_screen_height()/get_pc_pix_height());
 	}
 #endif  //NEC_98
-#line 248
+#line 256
 }
 
 /*(
@@ -282,7 +282,7 @@ GLOBAL VOID
 v7vga_extended_set_mode()
 {
 #ifndef NEC_98
-#line 271
+#line 280
 	UTINY pag;
 	sys_addr save_addr,font_addr;
 	half_word temp_word;
@@ -471,9 +471,9 @@ v7vga_extended_set_mode()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 458
+#line 467
 #endif  //NEC_98
-#line 458
+#line 468
 }
 
 /*(
@@ -507,7 +507,7 @@ v7vga_select_autoswitch_mode()
 ***/
 	setAH(0x2);
 #endif  //NEC_98
-#line 488
+#line 500
 }
 
 /*(
