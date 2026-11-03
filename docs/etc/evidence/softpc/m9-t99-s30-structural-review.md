@@ -54,7 +54,7 @@ indispensable or that the tree matcher cannot have missed an occurrence.
 | `base/bios/reset.c` | Standalone floppy topology and omitted DOS mouse-driver calls; compare the two altered NTVDM predicates with XP. |
 | `base/ccpu386/c_tlb.c` | Original FAST_TLB frame exists; two redundant local snapshot guards have been removed, preserving copies. |
 | `base/inc/cpu_vid.h`, `base/inc/gmi.h`, `base/inc/egacpu.h` | C-VID generated function signatures and globals carrier; verify existing ABI divergence and any extra unsupported-mode guards. |
-| `base/keymouse/mouse_io.c`, `base/keymouse/ppi.c`, `base/video/video.c` | Some current NEC_98 frames have an extra error sibling; XP corresponding frames lack that sibling. Assess the fail-fast requirement before deciding whether to preserve or remove it. PPI also has standalone and snapshot guards. |
+| `base/keymouse/mouse_io.c`, `base/keymouse/ppi.c`, `base/video/video.c` | Five extra NEC_98 error siblings absent from XP were removed after supported-path and forced-NEC probes; PPI standalone and snapshot guards remain. |
 | `base/keymouse/mouse.c` | The apparent missing PROD frame is present; confirm the full file has no second alignment discrepancy. |
 | `base/system/ica.c` | Local interrupt-line and snapshot handling introduces conditions; assess each against its accepted contract. |
 | `base/video/gfx_updt.c` | Local CPU_40_STYLE guard protects accepted CHAIN2 dirty-marker fix. |
@@ -62,12 +62,10 @@ indispensable or that the tree matcher cannot have missed an occurrence.
 | `host/inc/cfpu_def.h`, `host/inc/host_cpu.h` | Little-endian and selected CCPU ABI guards; distinguish extra fail-fast branches from original conditions. |
 | `host/src/nt_cga.c`, `host/src/nt_graph.c` | Standalone rendering and V7 fields / sizing; assess each local condition against approved port and display behavior. |
 
-The six added `LITTLEND` conditions in `cfpu_def.h` and the added NEC_98
-error siblings retain explicit rejection of unsupported configurations.
-Their extra error-only branches are recorded because they have no XP sibling.
-The port-count checks in `host_def.h` also reject NEC_98 in ordinary builds,
-but are themselves guarded by optional existing port-count definitions;
-this does not prove the per-file error guards universally redundant.
+The six added `LITTLEND` conditions in `cfpu_def.h` retain explicit
+rejection of unsupported configurations. Five NEC_98 error siblings absent
+from XP were later proven redundant in their actual translation units and
+removed; see the guard-probe record below.
 
 ## First correction qualification
 
@@ -109,10 +107,10 @@ device behavior or explicit rejection of unsupported configurations.
 | `base/ccpu386/c_main.c:34,755,4497,4664,4683,4699` | Six predicates extend XP NTVDM with CCPU TLS simulation-stack selection. Each original group was paired; nested original code in the error arm is intentionally excluded. |
 | `base/ccpu386/c_tlb.c:151,188` | The original FAST_TLB declaration frame is present at current 70 / XP 69; the two always-true local snapshot guards were removed. |
 | `base/inc/cpu_vid.h:88,115`; `base/inc/gmi.h:19` | CPU_40_STYLE and C_VID guards around adapted generated-function signatures; local ABI divergence explicitly recorded in source. |
-| `base/inc/egacpu.h:99,120,252` | C_VID forward declaration and generated globals carrier, plus an error sibling for unsupported non-C-VID; XP's C_VID frame at 442 has no else. |
+| `base/inc/egacpu.h:99,120,252` | C_VID forward declaration and generated globals carrier retain required ABI adaptation; the extra error sibling absent from XP was removed after testing all 50 actual x86/x64 consumers with C_VID forced off. |
 | `base/inc/ica.h:91` | CPU_40_STYLE nested guard separates legacy CPU_HW_INT macro 0 from CCPU's enum value 2; S29 records test consumers. |
 | `base/inc/ios.h:23` | Standalone term extends the XP I/O-space selection; existing S20 records I/O sizing consumers. |
-| `base/keymouse/mouse_io.c:2419`; `base/keymouse/ppi.c:181,205`; `base/video/video.c:328,2967` | Explicit error siblings for NEC_98, absent from the corresponding XP frames. They reject unsupported configurations; whether they are redundant with other guards is not yet proven. |
+| `base/keymouse/mouse_io.c:2419`; `base/keymouse/ppi.c:181,205`; `base/video/video.c:328,2967` | The five extra NEC_98 error siblings absent from XP were removed after selected-path and forced-configuration probes; original conditions remain. |
 | `base/keymouse/ppi.c:70,219,236` | Standalone rejection and snapshot PPI state selection, absent from original product code. |
 | `base/system/ica.c:1242,1684,2017,2037,2082,2095` | Standalone PIC line handling, CCPU IRET handling and snapshot callback/hook state paths. |
 | `base/video/gfx_updt.c:3891`; `base/video/vga_mode.c:462` | CPU_40_STYLE and V7VGA guards around accepted CHAIN2 dirty / packed scanout fixes. |
@@ -190,8 +188,57 @@ The original compile-frame comparison intentionally excludes contents wholly
 replaced by `#error`. Existing local guards and changes listed above retain
 ABI, snapshot, device, video or unsupported-configuration contracts.
 
-Relative to S29, mirror production changes are two files: `rom.c` +2/-0 and
-`c_tlb.c` +1/-4, total +3/-4 (net -1). There are no test-source changes.
-Both production deliveries were built, published and fully tested for x86
-and x64; latest qualification is 194/194 per architecture with no skips.
+Relative to S29, final mirror production changes are six files: `rom.c`
++2/-0, `c_tlb.c` +1/-4, `egacpu.h` +0/-2, `mouse_io.c` +0/-2,
+`ppi.c` +0/-4, and `video.c` +0/-4: total +3/-16 (net -13). There are
+no test-source changes. Earlier deliveries passed 194/194 per architecture;
+final-source full qualification is recorded below.
 Neither user INI, media nor snapshots were modified.
+
+## Redundant NEC_98 sibling correction
+
+Five error-only siblings absent from XP were removed from `mouse_io.c`,
+`ppi.c` and `video.c`, preserving each original `#ifndef NEC_98` and its
+post-boundary line control. The three actual translation units directly
+include `ios.h` or `sas.h`, both of which independently reject NEC_98.
+On each architecture, preprocessed selected output of each scratch candidate
+matched its original byte-for-byte. With NEC_98 forced and both optional port
+counts predefined, each actual compilation context still failed at an
+independent included-header guard. This proves the observed contexts, not
+all hypothetical future include graphs. Final-source dual-architecture builds and full qualification passed: 186
+background and 8 native tests per architecture, with no skips.
+
+## Redundant C_VID sibling correction
+
+The XP `C_VID` group in `base/inc/egacpu.h` has no else. Its extra local
+error sibling was removed while preserving the original guard. An overlay
+probe exercised all 50 actual x86/x64 compilation contexts that include the
+header; with `C_VID` forced off, all 50 still reached independent explicit
+`#error` guards. This evidence covers the current consumers, not hypothetical
+future include graphs. The final matcher reports 58 overlapping candidate
+entries in 17 files, compared with 64 entries in 19 files before removing
+the six redundant siblings. The matcher is not a proof of perfect matching.
+Final-source dual-architecture builds and full qualification passed: 186
+background and 8 native tests per architecture, with no skips.
+
+The first background qualification attempt found a manifest registration
+error: the new `egacpu.h` digest initially used raw CRLF bytes, while the
+mirror gate hashes LF-normalized text. The manifest was corrected; that failed
+run is not counted as a full pass. Build timestamps also showed that the
+final header edit had not yet been rebuilt at that point.
+
+## Final qualification
+
+Both final-source cached GCC builds and the XP mirror and documentation
+gates passed. The full test suite passed on each architecture: 186
+background tests and 8 native desktop/audio tests, none skipped. Compiler
+warnings were confined to the preserved mirror sources (1,307 x64 and
+1,257 x86 warning lines); no non-mirror warning was found. Published SHA-256:
+
+- `softpc32.exe`: `2a847dfdc1ea2a3c44bc657c29a9d169afe757bdab25a02b77e534c038b52ab9`
+- `softpc64.exe`: `0b5f31f36709f5ee70a2bc923ba937242519592e3fb28293f3609c25f7b1a4db`
+
+The [final matcher candidates](m9-t99-s30-final-structural-candidates.tsv)
+are 58 entries in 17 files, not 58 confirmed defects. The earlier disposition
+and anchored reviews record the comparisons; automated matching of repeated
+conditions remains a limitation and does not prove complete correspondence.

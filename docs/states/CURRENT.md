@@ -36,24 +36,35 @@ on each architecture with no skips. The source diff from S29 is `rom.c`
 The [structural review](../etc/evidence/softpc/m9-t99-s30-structural-review.md)
 records local exception locations, original-condition repairs, candidate
 dispositions, repeated-condition checks, and the matching method's limits.
-The executor is continuing source-anchor and retained-guard minimality
-review; the current evidence does not establish complete correspondence.
-S30 and T99 remain open. Disposable scratch `build/t99-s30` is owned by S30
-and will be retired after its last jobs finish.
+The evidence does not establish complete correspondence; repeated-condition
+alignment remains a review limitation. S30 and T99 remain open. Disposable
+scratch `build/t99-s30` is owned by S30 and will be retired after its last
+jobs finish.
 
-The corrected arm-aware matcher has 64 overlapping candidates in 19 files;
+The baseline arm-aware matcher had 64 overlapping candidates in 19 files;
 66 disposition rows include those plus two local guards found by context
 review. Separate reviews cover 11 changed-body, 24 low-context, 59 middle
 and 1,376 high-context repeated-condition pairings. Source and line anchors
 provide evidence but are not a formal guarantee of all alignments. The
-remaining work is to resolve whether extra unsupported-configuration guards
-can be removed without weakening the established fail-fast contract and to
-complete an actual-commit review before owner acceptance.
+remaining limitation is that these anchors do not formally prove every
+alignment or the indispensability of every retained guard.
+
+A follow-up probe found five error-only NEC_98 siblings absent from XP are
+redundant in three actual translation units: selected x86/x64 preprocessing
+is unchanged without them, and forcing NEC_98 still reaches unconditional
+errors in directly included ios.h / sas.h even with port counts predefined.
+Those five siblings have been removed, preserving original conditions and
+line controls. One extra C_VID sibling was also removed after all 50 actual
+dual-architecture consumers hit independent errors when C_VID was forced off.
+Final-source dual builds and all 194 tests per architecture passed without
+skips. Relative to S29, six mirror files change by +3/-16 (net -13);
+test source is unchanged. Structural matching is heuristic, so complete
+correspondence is not claimed. S30 remains open pending owner acceptance.
 
 ## Technical Baseline
 
-Latest published binaries are S28's ninth-depth verified build; hashes and
-dual-architecture qualification are in its [closure](../history/M9-T99-S28-mirror-depth9.md).
+Latest published binaries are the final S30 verified builds; hashes and
+dual-architecture qualification are in the [S30 review](../etc/evidence/softpc/m9-t99-s30-structural-review.md).
 The following S17 and earlier paragraphs retain delivery-time evidence.
 
 S13 executor 350dcd95 imports fixed NXVM ad5c532a. All 296 committed paths,

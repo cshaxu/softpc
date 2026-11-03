@@ -325,8 +325,6 @@ LOCAL void sensible_graph_scroll_up IPT6(int, t_row, int, l_col, int, rowsdiff, 
 LOCAL void sensible_graph_scroll_down IPT6(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr);
 LOCAL void kinky_scroll_up IPT7(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr, int, vd_cols_on_screen);
 LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr, int, vd_cols_on_screen);
-#else
-#error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // !NEC_98
 #line 424
 
@@ -2964,8 +2962,6 @@ GLOBAL void video_init IFN0()
 #endif // JAPAN
 #line 4905
 
-#else
-#error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // !NEC_98
 #line 4907
 #if defined(NEC_98)

@@ -178,8 +178,6 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 	}
     else
 	    note_trace2(PPI_VERBOSE, "ppi_outb() - Value %x to unsupported port %x", value, port);
-#else
-#error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
 #line 183
 }
@@ -202,8 +200,6 @@ void ppi_init IFN0()
 
     ppi_register = 0x00;
     gate_2_was_low = TRUE;
-#else
-#error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
 #line 206
 }

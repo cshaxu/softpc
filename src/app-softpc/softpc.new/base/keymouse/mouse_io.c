@@ -2416,8 +2416,6 @@ the application OUTBs the necessary data.
 #endif /* GISP_SVGA */
 #line 2389
 
-#else
-#error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif    //NEC_98
 #line 2304
 }

@@ -20,16 +20,16 @@ base/inc/cpu_vid.h	1	current-unmatched	88	if:defined(CPU_40_STYLE)&&defined(C_VI
 base/inc/cpu_vid.h	1	current-unmatched	115	if:defined(CPU_40_STYLE)&&defined(C_VID)	-	-	local-abi	additional CPU_40_STYLE and C_VID guard around concrete generated video function signatures
 base/inc/egacpu.h	1	current-unmatched	99	ifdef:C_VID	-	-	local-abi	C_VID generated global-carrier declaration and ABI adaptation
 base/inc/egacpu.h	3	current-unmatched	120	ifdef:C_VID	-	-	local-abi	C_VID generated global-carrier declaration and ABI adaptation
-base/inc/egacpu.h	3	arm-mismatch	252	ifdef:C_VID;else:	442	ifdef:C_VID	extra-error-only	original C_VID group has no else; current adds unsupported non-C_VID error sibling
+base/inc/egacpu.h	3	arm-mismatch	252	ifdef:C_VID;else:	442	ifdef:C_VID	corrected-redundant-error-sibling	removed extra else/error; all 50 actual x86/x64 consumers still hit independent #error with C_VID forced off
 base/inc/gmi.h	1	current-unmatched	19	if:defined(CPU_40_STYLE)&&defined(C_VID)	-	-	local-abi	additional CPU_40_STYLE and C_VID guard around concrete generated write signatures
 base/inc/ica.h	2	current-unmatched	91	ifndef:CPU_40_STYLE	-	-	local-macro-boundary	CPU_40_STYLE guard prevents legacy CPU_HW_INT macro 0 from colliding with CCPU enum 2; test contexts use legacy arm
 base/inc/ios.h	1	current-unmatched	23	if:defined(SOFTPC_STANDALONE)||defined(NTVDM)||defined(GISP_SVGA)||defined(SFELLOW)	-	-	local-predicate	XP NTVDM/GISP/SFELLOW predicate paired to local OR including standalone I/O sizing
 base/inc/ios.h	1	xp-unmatched	-	-	23	if:defined(NTVDM)||defined(GISP_SVGA)||defined(SFELLOW)	local-predicate	XP NTVDM/GISP/SFELLOW predicate paired to local OR including standalone I/O sizing
 base/keymouse/mouse.c	2	xp-unmatched	-	-	442	ifndef:PROD	alignment-artifact	XP line 442 PROD group present in current at line 377
-base/keymouse/mouse_io.c	1	arm-mismatch	1921	ifndef:NEC_98;else:	1788	ifndef:NEC_98	extra-error-only	XP NEC_98 group has no else; current adds NEC_98 error sibling
+base/keymouse/mouse_io.c	1	arm-mismatch	1921	ifndef:NEC_98;else:	1788	ifndef:NEC_98	corrected-redundant-error-sibling	removed added NEC_98 else/error; selected outputs identical and direct ios.h/sas.h still rejects NEC_98 in both build contexts
 base/keymouse/ppi.c	2	current-unmatched	70	ifndef:SOFTPC_STANDALONE	-	-	local-port-snapshot	standalone PPI and snapshot state selection / rejection
-base/keymouse/ppi.c	1	arm-mismatch	119	ifndef:NEC_98;else:	114	ifndef:NEC_98	extra-error-only	XP NEC_98 group has no else; current adds NEC_98 error sibling
-base/keymouse/ppi.c	1	arm-mismatch	194	ifndef:NEC_98;else:	196	ifndef:NEC_98	extra-error-only	XP NEC_98 group has no else; current adds NEC_98 error sibling
+base/keymouse/ppi.c	1	arm-mismatch	119	ifndef:NEC_98;else:	114	ifndef:NEC_98	corrected-redundant-error-sibling	removed added NEC_98 else/error; selected outputs identical and direct ios.h/sas.h still rejects NEC_98 in both build contexts
+base/keymouse/ppi.c	1	arm-mismatch	194	ifndef:NEC_98;else:	196	ifndef:NEC_98	corrected-redundant-error-sibling	removed added NEC_98 else/error; selected outputs identical and direct ios.h/sas.h still rejects NEC_98 in both build contexts
 base/keymouse/ppi.c	1	current-unmatched	219	if:!defined(NTVDM)&&!defined(SOFTPC_STANDALONE)	-	-	local-port-snapshot	standalone PPI and snapshot state selection / rejection
 base/keymouse/ppi.c	1	current-unmatched	236	if:!defined(NTVDM)&&!defined(SOFTPC_STANDALONE)	-	-	local-port-snapshot	standalone PPI and snapshot state selection / rejection
 base/system/ica.c	1	current-unmatched	1242	ifdef:SOFTPC_STANDALONE	-	-	local-interrupt-snapshot	standalone interrupt-line handling, CCPU IRET or typed snapshot hook/callback fields
@@ -41,8 +41,8 @@ base/system/ica.c	1	current-unmatched	2095	ifdef:HOOKED_IRETS	-	-	local-interrup
 base/video/gfx_updt.c	5	current-unmatched	3891	ifdef:CPU_40_STYLE	-	-	local-video	CPU_40_STYLE guard covers accepted CHAIN2 dirty marker selection
 base/video/vga_mode.c	4	arm-mismatch	488	ifdef:V7VGA	554	ifdef:V7VGA;else:	alignment-artifact	current line 488 matches XP V7VGA line 510; current 532 matches XP 554; separate local guard at 462 is recorded separately
 base/video/vga_mode.c	4	current-unmatched	532	ifdef:V7VGA	-	-	alignment-artifact	current line 488 matches XP V7VGA line 510; current 532 matches XP 554; separate local guard at 462 is recorded separately
-base/video/video.c	1	arm-mismatch	222	ifndef:NEC_98;else:	319	ifndef:NEC_98	extra-error-only	XP NEC_98 group has no else; current adds NEC_98 error sibling
-base/video/video.c	1	arm-mismatch	351	ifndef:NEC_98;else:	670	ifndef:NEC_98	extra-error-only	XP NEC_98 group has no else; current adds NEC_98 error sibling
+base/video/video.c	1	arm-mismatch	222	ifndef:NEC_98;else:	319	ifndef:NEC_98	corrected-redundant-error-sibling	removed added NEC_98 else/error; selected outputs identical and direct ios.h/sas.h still rejects NEC_98 in both build contexts
+base/video/video.c	1	arm-mismatch	351	ifndef:NEC_98;else:	670	ifndef:NEC_98	corrected-redundant-error-sibling	removed added NEC_98 else/error; selected outputs identical and direct ios.h/sas.h still rejects NEC_98 in both build contexts
 host/inc/cfpu_def.h	1	current-unmatched	21	ifdef:LITTLEND	-	-	local-endian	LITTLEND guard protects local selected host bitfield / word-order layout; non-LITTLEND explicitly rejected
 host/inc/cfpu_def.h	1	current-unmatched	32	ifdef:LITTLEND	-	-	local-endian	LITTLEND guard protects local selected host bitfield / word-order layout; non-LITTLEND explicitly rejected
 host/inc/cfpu_def.h	1	current-unmatched	43	ifdef:LITTLEND	-	-	local-endian	LITTLEND guard protects local selected host bitfield / word-order layout; non-LITTLEND explicitly rejected

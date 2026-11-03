@@ -265,8 +265,6 @@ extern struct VideoVector C_Video;	/* in (generated) vglfunc.c */
 #define SetReadPointers	setReadPointers
 #undef	SetMarkPointers
 #define SetMarkPointers	setMarkPointers
-#else
-#error "Unsupported SoftPC mirror configuration: !C_VID"
 #endif	/* C_VID */
 #line 347
 #endif	/* CPU_40_STYLE */
