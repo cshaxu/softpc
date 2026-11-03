@@ -1,0 +1,1377 @@
+path	depth	current_line	xp_line	condition	context_score	disposition	evidence
+base/bios/bootstra.c	1	105	113	ifdef:SECURE	0.504	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	64	68	ifdef:PRINTER	1.0	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	97	98	ifndef:NTVDM	0.901	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	311	462	ifdef:NPX	0.521	opennt-line	logical line anchors same condition in OpenNT
+base/bios/reset.c	1	386	673	ifndef:NTVDM	0.768	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	400	684	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/bios/reset.c	3	499	782	ifndef:CPU_30_STYLE	1.0	context-identical	adjacent non-directive context is identical
+base/bios/reset.c	3	564	846	ifndef:CPU_30_STYLE	1.0	context-identical	adjacent non-directive context is identical
+base/bios/reset.c	1	604	885	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/bios/reset.c	1	669	945	if:defined(NEC_98)	0.616	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/bios/reset.c	1	692	964	ifndef:NTVDM	0.95	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	725	995	if:defined(NEC_98)	0.67	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	784	1073	ifndef:NEC_98	0.712	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	797	1083	ifndef:NEC_98	0.854	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	811	1094	ifndef:NEC_98	0.888	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	905	1200	if:defined(NEC_98)	0.571	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	914	1207	ifndef:NEC_98	0.939	nearby-source-anchor	matching substantive source line appears in both local windows
+base/bios/reset.c	1	927	1217	ifndef:NEC_98	0.886	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	938	1226	ifdef:PRINTER	0.894	xp-line	logical line within three of XP condition
+base/bios/reset.c	1	972	1287	ifndef:NTVDM	0.5	xp-line	logical line within three of XP condition
+base/bios/tape_io.c	1	78	93	ifdef:PM	0.968	xp-line	logical line within three of XP condition
+base/bios/tape_io.c	1	130	143	ifdef:PM	0.83	xp-line	logical line within three of XP condition
+base/bios/tape_io.c	1	217	323	ifdef:PM	1.0	xp-line	logical line within three of XP condition
+base/bios/tape_io.c	1	283	389	if:defined(NTVDM)&&defined(MONITOR)	0.763	xp-line	logical line within three of XP condition
+base/ccpu386/c_intr.c	1	250	253	ifdef:PIG	0.734	xp-line	logical line within three of XP condition
+base/ccpu386/c_intr.c	1	321	325	ifdef:PIG	0.734	xp-line	logical line within three of XP condition
+base/ccpu386/c_intr.c	1	395	400	ifdef:PIG	0.707	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	307	282	ifdef:PIG	0.663	nearby-source-anchor	matching substantive source line appears in both local windows
+base/ccpu386/c_main.c	1	336	330	ifdef:PIG	0.564	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	512	472	ifndef:SFELLOW	0.911	nearby-source-anchor	matching substantive source line appears in both local windows
+base/ccpu386/c_main.c	1	589	592	ifdef:PIG	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	793	793	ifdef:PIG	0.945	nearby-source-anchor	matching substantive source line appears in both local windows
+base/ccpu386/c_main.c	1	1098	1097	ifdef:SPC486	0.575	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1218	1222	ifdef:SPC486	0.505	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1229	1236	ifdef:SPC486	0.503	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1517	1526	ifdef:SPC486	0.551	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1538	1573	ifndef:FIX_BT_BUG	0.777	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1609	1643	ifndef:FIX_BT_BUG	0.833	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1672	1705	ifdef:SPC486	0.555	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1683	1724	ifdef:SPC486	0.532	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	1701	1763	ifdef:SPC486	0.514	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	3173	3316	ifdef:PIG	0.667	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	3478	3638	ifndef:PIG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	3617	3794	ifdef:PIG	0.764	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	3804	3982	ifndef:PIG	0.574	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	4263	4402	ifndef:SFELLOW	0.669	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	4419	4586	ifndef:SFELLOW	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	4471	4638	ifdef:PIG	0.669	xp-line	logical line within three of XP condition
+base/ccpu386/c_main.c	1	4624	4800	ifdef:SPC486	0.788	xp-line	logical line within three of XP condition
+base/ccpu386/c_mem.h	1	25	25	ifdef:PIG	0.686	xp-line	logical line within three of XP condition
+base/ccpu386/c_mem.h	1	38	37	ifdef:PIG	0.686	xp-line	logical line within three of XP condition
+base/ccpu386/c_oprnd.h	1	704	704	ifdef:PIG	0.8	xp-line	logical line within three of XP condition
+base/ccpu386/c_oprnd.h	1	752	752	ifdef:PIG	0.826	xp-line	logical line within three of XP condition
+base/ccpu386/c_oprnd.h	1	1054	1054	ifdef:PIG	0.854	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	70	69	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	272	205	ifdef:SPC486	0.899	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	313	264	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	360	344	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	396	380	ifdef:SPC486	0.799	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	466	449	ifdef:SPC486	0.705	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	485	467	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	501	483	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	647	631	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	706	690	ifdef:FAST_TLB	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	738	722	ifdef:SPC486	0.788	xp-line	logical line within three of XP condition
+base/ccpu386/c_tlb.c	1	779	762	ifdef:SPC486	0.839	xp-line	logical line within three of XP condition
+base/ccpu386/call.c	1	87	88	ifdef:TAKE_REAL_MODE_LIMIT_FAULT	0.645	xp-line	logical line within three of XP condition
+base/ccpu386/call.c	1	250	257	ifdef:TAKE_REAL_MODE_LIMIT_FAULT	0.735	xp-line	logical line within three of XP condition
+base/ccpu386/call.c	1	306	320	ifdef:TAKE_REAL_MODE_LIMIT_FAULT	0.644	xp-line	logical line within three of XP condition
+base/ccpu386/ccpusas4.c	2	199	142	ifndef:EGATEST	0.778	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/ccpu386/ccpusas4.c	2	414	384	ifdef:BACK_M	0.811	nearby-source-anchor	matching substantive source line appears in both local windows
+base/ccpu386/ccpusas4.c	2	437	405	ifndef:EGATEST	0.802	nearby-source-anchor	matching substantive source line appears in both local windows
+base/ccpu386/ccpusas4.c	2	838	805	ifdef:LIM	1.0	context-identical	adjacent non-directive context is identical
+base/ccpu386/ccpusas4.c	2	896	863	ifdef:LIM	1.0	context-identical	adjacent non-directive context is identical
+base/ccpu386/ccpusas4.c	2	1267	1234	ifndef:EGATEST	1.0	context-identical	adjacent non-directive context is identical
+base/ccpu386/ccpusas4.c	2	1344	1313	ifdef:BACK_M	0.761	nearby-source-anchor	matching substantive source line appears in both local windows
+base/ccpu386/cpu4gen.h	2	13	12	ifdef:CPU_PRIVATE	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	18	17	ifdef:CPU_PRIVATE	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	23	22	ifdef:CPU_PRIVATE	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	188	187	ifdef:CCPU	0.874	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	196	200	ifdef:CCPU	0.719	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	204	213	ifdef:CCPU	0.74	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	212	226	ifdef:CCPU	0.732	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	220	239	ifdef:CCPU	0.592	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	228	252	ifdef:CCPU	0.686	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	236	265	ifdef:CCPU	0.689	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	244	278	ifdef:CCPU	0.606	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	252	291	ifdef:CCPU	0.737	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	260	304	ifdef:CCPU	0.655	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	268	317	ifdef:CCPU	0.786	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	276	330	ifdef:CCPU	0.721	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	284	343	ifdef:CCPU	0.768	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	292	356	ifdef:CCPU	0.816	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	300	369	ifdef:CCPU	0.695	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	308	382	ifdef:CCPU	0.672	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	316	395	ifdef:CCPU	0.622	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	324	410	ifdef:CCPU	0.52	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	332	425	ifdef:CCPU	0.57	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	340	440	ifdef:CCPU	0.648	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	348	455	ifdef:CCPU	0.612	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	356	470	ifdef:CCPU	0.584	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	364	485	ifdef:CCPU	0.596	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	372	500	ifdef:CCPU	0.648	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	380	515	ifdef:CCPU	0.612	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	388	530	ifdef:CCPU	0.584	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	396	545	ifdef:CCPU	0.596	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	404	560	ifdef:CCPU	0.648	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	412	575	ifdef:CCPU	0.612	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	420	590	ifdef:CCPU	0.584	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	428	605	ifdef:CCPU	0.603	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	436	620	ifdef:CCPU	0.657	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	444	635	ifdef:CCPU	0.674	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	452	650	ifdef:CCPU	0.708	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	460	665	ifdef:CCPU	0.727	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	468	680	ifdef:CCPU	0.708	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	476	695	ifdef:CCPU	0.746	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	484	708	ifdef:CCPU	0.678	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	492	721	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	500	736	ifdef:CCPU	0.713	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	508	751	ifdef:CCPU	0.744	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	516	764	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	524	777	ifdef:CCPU	0.775	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	532	790	ifdef:CCPU	0.765	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	540	803	ifdef:CCPU	0.761	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	548	816	ifdef:CCPU	0.64	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	556	829	ifdef:CCPU	0.764	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	564	842	ifdef:CCPU	0.667	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	572	855	ifdef:CCPU	0.679	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	580	868	ifdef:CCPU	0.678	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	588	881	ifdef:CCPU	0.685	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	596	894	ifdef:CCPU	0.8	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	604	907	ifdef:CCPU	0.816	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	612	920	ifdef:CCPU	0.803	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	620	933	ifdef:CCPU	0.678	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	628	946	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	636	959	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	644	972	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	652	985	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	660	998	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	668	1011	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	676	1024	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	684	1037	ifdef:CCPU	0.817	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	692	1050	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	700	1063	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	708	1076	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	716	1089	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	724	1102	ifdef:CCPU	0.817	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	732	1115	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	740	1128	ifdef:CCPU	0.817	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	748	1141	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	756	1154	ifdef:CCPU	0.776	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	764	1167	ifdef:CCPU	0.679	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	772	1180	ifdef:CCPU	0.704	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	780	1193	ifdef:CCPU	0.746	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	788	1206	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	796	1219	ifdef:CCPU	0.676	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	804	1232	ifdef:CCPU	0.748	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	812	1245	ifdef:CCPU	0.8	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	820	1258	ifdef:CCPU	0.807	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	828	1271	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	836	1284	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	844	1297	ifdef:CCPU	0.8	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	852	1310	ifdef:CCPU	0.807	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	860	1323	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	868	1336	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	876	1349	ifdef:CCPU	0.8	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	884	1362	ifdef:CCPU	0.807	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	892	1375	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	900	1388	ifdef:CCPU	0.784	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	908	1401	ifdef:CCPU	0.68	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	916	1414	ifdef:CCPU	0.795	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	924	1427	ifdef:CCPU	0.796	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	932	1440	ifdef:CCPU	0.783	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	940	1453	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	948	1466	ifdef:CCPU	0.79	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	956	1479	ifdef:CCPU	0.796	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	964	1492	ifdef:CCPU	0.79	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	972	1505	ifdef:CCPU	0.796	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	980	1518	ifdef:CCPU	0.783	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	988	1531	ifdef:CCPU	0.799	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	996	1544	ifdef:CCPU	0.814	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1004	1557	ifdef:CCPU	0.819	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1012	1570	ifdef:CCPU	0.816	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1020	1583	ifdef:CCPU	0.818	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1028	1596	ifdef:CCPU	0.801	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1036	1609	ifdef:CCPU	0.681	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1044	1622	ifdef:CCPU	0.687	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1052	1635	ifdef:CCPU	0.681	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1060	1648	ifdef:CCPU	0.689	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1068	1661	ifdef:CCPU	0.79	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1076	1674	ifdef:CCPU	0.811	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1084	1687	ifdef:CCPU	0.681	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1092	1700	ifdef:CCPU	0.781	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1100	1713	ifdef:CCPU	0.744	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1108	1726	ifdef:CCPU	0.719	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1116	1739	ifdef:CCPU	0.7	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1124	1752	ifdef:CCPU	0.7	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1132	1765	ifdef:CCPU	0.7	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1140	1778	ifdef:CCPU	0.7	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1148	1791	ifdef:CCPU	0.7	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1156	1804	ifdef:CCPU	0.719	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1164	1817	ifdef:CCPU	0.613	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1172	1830	ifdef:CCPU	0.762	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1180	1843	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1188	1856	ifdef:CCPU	0.806	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1196	1869	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1204	1882	ifdef:CCPU	0.819	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1212	1895	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1220	1908	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1228	1921	ifdef:CCPU	0.819	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1236	1934	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1244	1947	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1252	1960	ifdef:CCPU	0.782	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1260	1973	ifdef:CCPU	0.679	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1268	1986	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1276	1999	ifdef:CCPU	0.678	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1284	2012	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1292	2025	ifdef:CCPU	0.687	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1300	2038	ifdef:CCPU	0.781	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1308	2051	ifdef:CCPU	0.677	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1316	2064	ifdef:CCPU	0.69	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1324	2077	ifdef:CCPU	0.772	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1332	2090	ifdef:CCPU	0.686	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1340	2103	ifdef:CCPU	0.667	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1348	2116	ifdef:CCPU	0.67	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1356	2129	ifdef:CCPU	0.653	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1364	2142	ifdef:CCPU	0.743	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1372	2155	ifdef:CCPU	0.683	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1380	2168	ifdef:CCPU	0.675	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1388	2181	ifdef:CCPU	0.707	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1396	2194	ifdef:CCPU	0.644	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1404	2207	ifdef:CCPU	0.696	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1412	2220	ifdef:CCPU	0.628	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1420	2233	ifdef:CCPU	0.703	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1428	2246	ifdef:CCPU	0.68	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1502	2325	ifdef:CCPU	0.804	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1510	2338	ifdef:CCPU	0.64	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1518	2351	ifdef:CCPU	0.71	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1526	2364	ifdef:CCPU	0.84	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1534	2377	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1542	2390	ifdef:CCPU	0.838	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1550	2403	ifdef:CCPU	0.967	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1558	2416	ifdef:CCPU	0.839	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1566	2429	ifdef:CCPU	0.828	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1574	2442	ifdef:CCPU	0.828	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1582	2455	ifdef:CCPU	0.764	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1590	2468	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1598	2481	ifdef:CCPU	0.674	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1606	2494	ifdef:CCPU	0.675	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1614	2507	ifdef:CCPU	0.784	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1622	2520	ifdef:CCPU	0.824	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1630	2533	ifdef:CCPU	0.782	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1638	2546	ifdef:CCPU	0.676	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1646	2559	ifdef:CCPU	0.806	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1654	2572	ifdef:CCPU	0.814	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1662	2585	ifdef:CCPU	0.807	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1670	2598	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1678	2611	ifdef:CCPU	0.791	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1686	2624	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1694	2637	ifdef:CCPU	0.811	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1702	2650	ifdef:CCPU	0.816	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1710	2663	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1718	2676	ifdef:CCPU	0.821	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1726	2689	ifdef:CCPU	0.797	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1734	2702	ifdef:CCPU	0.798	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1742	2715	ifdef:CCPU	0.824	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1750	2728	ifdef:CCPU	0.822	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1758	2741	ifdef:CCPU	0.823	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1766	2754	ifdef:CCPU	0.821	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1774	2767	ifdef:CCPU	0.79	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1782	2780	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1790	2793	ifdef:CCPU	0.812	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1798	2806	ifdef:CCPU	0.816	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1806	2819	ifdef:CCPU	0.813	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1814	2832	ifdef:CCPU	0.82	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1822	2845	ifdef:CCPU	0.792	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1830	2858	ifdef:CCPU	0.663	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1838	2871	ifdef:CCPU	0.642	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1846	2884	ifdef:CCPU	0.677	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1854	2897	ifdef:CCPU	0.688	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1862	2910	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1870	2923	ifdef:CCPU	0.696	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1878	2936	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1886	2949	ifdef:CCPU	0.744	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1894	2962	ifdef:CCPU	0.711	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1902	2975	ifdef:CCPU	0.652	xp-line	logical line within three of XP condition
+base/ccpu386/cpu4gen.h	2	1910	2988	ifdef:CCPU	0.616	xp-line	logical line within three of XP condition
+base/ccpu386/div.c	1	81	81	ifdef:SET_UNDEFINED_DIV_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/div.c	1	119	119	ifdef:SET_UNDEFINED_DIV_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/div.c	1	159	159	ifdef:SET_UNDEFINED_DIV_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/fpu.c	1	1741	1755	if:(HOST_BIAS>=16383)	0.957	xp-line	logical line within three of XP condition
+base/ccpu386/idiv.c	1	74	74	ifdef:SET_UNDEFINED_DIV_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/idiv.c	1	120	120	ifdef:SET_UNDEFINED_DIV_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/idiv.c	1	163	163	ifdef:SET_UNDEFINED_DIV_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/imul.c	1	70	70	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/imul.c	1	112	112	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/imul.c	1	154	154	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/imul.c	1	195	195	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/imul.c	1	236	236	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/in.c	1	52	52	ifndef:PIG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/in.c	1	71	71	ifndef:PIG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/in.c	1	86	86	ifndef:PIG	0.569	xp-line	logical line within three of XP condition
+base/ccpu386/jmp.c	1	140	148	ifdef:TAKE_REAL_MODE_LIMIT_FAULT	0.795	xp-line	logical line within three of XP condition
+base/ccpu386/lgdt.c	1	36	36	ifdef:ANSI	0.855	xp-line	logical line within three of XP condition
+base/ccpu386/lgdt.c	1	54	54	ifdef:ANSI	0.689	xp-line	logical line within three of XP condition
+base/ccpu386/lidt.c	1	37	37	ifdef:ANSI	0.855	xp-line	logical line within three of XP condition
+base/ccpu386/lidt.c	1	51	52	ifdef:ANSI	0.689	xp-line	logical line within three of XP condition
+base/ccpu386/lxs.c	1	41	41	ifdef:ANSI	0.754	xp-line	logical line within three of XP condition
+base/ccpu386/lxs.c	1	62	64	ifdef:ANSI	0.556	xp-line	logical line within three of XP condition
+base/ccpu386/lxs.c	1	83	87	ifdef:ANSI	0.556	xp-line	logical line within three of XP condition
+base/ccpu386/lxs.c	1	104	110	ifdef:ANSI	0.556	xp-line	logical line within three of XP condition
+base/ccpu386/lxs.c	1	125	133	ifdef:ANSI	0.556	xp-line	logical line within three of XP condition
+base/ccpu386/mul.c	1	65	65	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/mul.c	1	103	103	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/mul.c	1	140	140	ifdef:SET_UNDEFINED_MUL_FLAG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/out.c	1	51	51	ifndef:PIG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/out.c	1	68	68	ifndef:PIG	1.0	xp-line	logical line within three of XP condition
+base/ccpu386/out.c	1	81	81	ifndef:PIG	0.517	xp-line	logical line within three of XP condition
+base/ccpu386/sgdt.c	1	37	37	ifdef:ANSI	0.855	xp-line	logical line within three of XP condition
+base/ccpu386/sgdt.c	1	58	59	ifdef:ANSI	0.689	xp-line	logical line within three of XP condition
+base/ccpu386/sidt.c	1	37	37	ifdef:ANSI	0.855	xp-line	logical line within three of XP condition
+base/ccpu386/sidt.c	1	59	60	ifdef:ANSI	0.689	xp-line	logical line within three of XP condition
+base/comms/com.c	1	63	62	ifndef:NEC_98	0.689	xp-line	logical line within three of XP condition
+base/comms/com.c	1	92	88	if:defined(NEC_98)	0.736	xp-line	logical line within three of XP condition
+base/comms/com.c	2	138	175	ifdef:NTVDM	0.705	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	1	168	207	ifndef:NEC_98	0.755	xp-line	logical line within three of XP condition
+base/comms/com.c	1	407	313	if:defined(NEC_98)	0.704	xp-line	logical line within three of XP condition
+base/comms/com.c	1	461	398	if:defined(NEC_98)	0.554	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/comms/com.c	1	585	577	if:defined(NEC_98)	0.928	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	1	676	712	if:defined(NEC_98)	0.982	xp-line	logical line within three of XP condition
+base/comms/com.c	1	691	731	if:defined(NEC_98)	1.0	context-identical	adjacent non-directive context is identical
+base/comms/com.c	1	713	756	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/comms/com.c	2	738	1115	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/comms/com.c	2	921	1427	ifndef:NTVDM	0.889	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	2	1049	1615	ifndef:NTVDM	0.844	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1108	1690	ifndef:NTVDM	0.844	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1269	2060	if:defined(NEC_98)	0.582	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1357	2321	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1490	2468	if:defined(NEC_98)	0.95	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	1	1519	2509	if:defined(NEC_98)	0.904	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1549	2557	if:defined(NEC_98)	0.751	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1578	2585	if:defined(NEC_98)	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	1	1591	2641	if:defined(NEC_98)	0.806	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	1	1624	2714	if:defined(NEC_98)	0.87	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1640	2763	if:defined(NEC_98)	0.658	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1705	2966	ifndef:NEC_98	0.726	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1736	2996	ifdef:NTVDM	0.795	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1748	3006	ifdef:NTVDM	0.849	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1759	3015	ifdef:NTVDM	0.822	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1772	3026	ifdef:NTVDM	0.773	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1784	3036	ifdef:NTVDM	0.844	xp-line	logical line within three of XP condition
+base/comms/com.c	2	1795	3045	ifdef:NTVDM	0.805	xp-line	logical line within three of XP condition
+base/comms/com.c	1	1819	3069	if:defined(NEC_98)	0.88	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/com.c	1	1885	3159	if:defined(NEC_98)	1.0	context-identical	adjacent non-directive context is identical
+base/comms/com.c	1	1945	3243	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/comms/com.c	1	2150	3463	if:defined(NEC_98)	0.916	xp-line	logical line within three of XP condition
+base/comms/com.c	1	2265	3650	if:defined(NEC_98)	0.516	xp-line	logical line within three of XP condition
+base/comms/com.c	1	2291	3678	if:defined(NEC_98)	0.919	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer.c	2	129	129	ifndef:NEC_98	0.563	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	145	143	if:defined(NEC_98)	0.563	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	184	199	ifndef:NEC_98	0.802	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	325	264	if:defined(NEC_98)	0.632	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/comms/printer.c	2	358	312	if:defined(NEC_98)	0.921	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer.c	2	372	323	if:defined(NEC_98)	0.91	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer.c	2	396	366	if:defined(NEC_98)	0.854	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	404	372	ifndef:NEC_98	0.872	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	426	391	if:defined(NEC_98)	0.827	xp-line	logical line within three of XP condition
+base/comms/printer.c	3	463	434	ifndef:DELAYED_INTS	0.914	xp-line	logical line within three of XP condition
+base/comms/printer.c	3	474	445	ifndef:DELAYED_INTS	0.908	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer.c	2	491	461	if:defined(NEC_98)	0.729	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer.c	2	504	473	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/comms/printer.c	2	513	479	if:defined(NEC_98)	0.828	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	521	485	if:defined(NEC_98)	0.601	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	566	560	if:defined(NEC_98)	0.605	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	582	572	if:defined(NEC_98)	0.514	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	597	624	if:defined(NEC_98)	0.723	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer.c	2	620	646	ifndef:NEC_98	0.514	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	680	717	if:defined(NEC_98)	0.813	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	695	730	if:defined(NEC_98)	0.772	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	724	762	ifndef:NEC_98	0.856	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	743	778	if:defined(NEC_98)	0.894	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	759	791	if:defined(NEC_98)	0.672	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	789	819	if:defined(NEC_98)	0.774	xp-line	logical line within three of XP condition
+base/comms/printer.c	2	835	888	if:defined(NEC_98)	0.747	nearby-source-anchor	matching substantive source line appears in both local windows
+base/comms/printer_.c	2	110	105	ifdef:PRINTER	0.879	nearby-source-anchor	matching substantive source line appears in both local windows
+base/cvidc/ev_glue.c	1	22	20	ifdef:CCPU	1.0	xp-line	logical line within three of XP condition
+base/cvidc/ev_glue.c	1	51	48	ifdef:CCPU	1.0	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	122	122	ifdef:CCPU	0.851	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	130	135	ifdef:CCPU	0.706	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	138	148	ifdef:CCPU	0.678	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	146	161	ifdef:CCPU	0.723	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	154	174	ifdef:CCPU	0.652	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	162	187	ifdef:CCPU	0.676	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	170	200	ifdef:CCPU	0.68	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	178	213	ifdef:CCPU	0.677	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	186	226	ifdef:CCPU	0.787	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	194	239	ifdef:CCPU	0.662	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	202	252	ifdef:CCPU	0.642	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	210	265	ifdef:CCPU	0.637	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	218	278	ifdef:CCPU	0.652	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	226	291	ifdef:CCPU	0.669	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	234	304	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	242	317	ifdef:CCPU	0.666	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	250	330	ifdef:CCPU	0.642	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	258	343	ifdef:CCPU	0.651	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	266	356	ifdef:CCPU	0.65	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	274	369	ifdef:CCPU	0.665	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	282	382	ifdef:CCPU	0.796	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	290	395	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	298	408	ifdef:CCPU	0.819	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	306	421	ifdef:CCPU	0.808	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	314	434	ifdef:CCPU	0.807	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	322	447	ifdef:CCPU	0.814	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	330	460	ifdef:CCPU	0.687	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	338	473	ifdef:CCPU	0.67	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	346	486	ifdef:CCPU	0.672	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	354	499	ifdef:CCPU	0.682	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	362	512	ifdef:CCPU	0.642	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	370	525	ifdef:CCPU	0.672	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	378	538	ifdef:CCPU	0.673	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	386	551	ifdef:CCPU	0.689	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	394	564	ifdef:CCPU	0.662	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	402	577	ifdef:CCPU	0.647	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	410	590	ifdef:CCPU	0.643	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	418	603	ifdef:CCPU	0.6	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	426	616	ifdef:CCPU	0.658	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	434	629	ifdef:CCPU	0.647	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	442	642	ifdef:CCPU	0.663	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	450	655	ifdef:CCPU	0.663	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	458	668	ifdef:CCPU	0.671	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	466	681	ifdef:CCPU	0.664	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	474	694	ifdef:CCPU	0.66	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	482	707	ifdef:CCPU	0.628	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	490	720	ifdef:CCPU	0.653	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	498	733	ifdef:CCPU	0.696	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	506	746	ifdef:CCPU	0.654	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	513	758	ifdef:CCPU	0.55	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	521	771	ifdef:CCPU	0.603	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	529	784	ifdef:CCPU	0.662	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	537	797	ifdef:CCPU	0.668	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	545	810	ifdef:CCPU	0.737	xp-line	logical line within three of XP condition
+base/cvidc/sas4gen.h	1	553	823	ifdef:CCPU	0.684	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	1	226	291	if:defined(NEC_98)	0.614	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	2	233	386	if:!(defined(NTVDM)&&defined(MONITOR))	1.0	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	2	246	397	if:!(defined(NTVDM)&&defined(MONITOR))	1.0	context-identical	adjacent non-directive context is identical
+base/disks/diskbios.c	1	397	742	if:defined(NEC_98)	0.66	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	1	450	893	ifndef:NEC_98	0.576	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	1	459	900	if:defined(NEC_98)	0.558	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	1	481	941	if:defined(NEC_98)	0.536	xp-line	logical line within three of XP condition
+base/disks/diskbios.c	1	497	1004	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/diskbios.c	1	513	1018	if:defined(NEC_98)	0.749	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/diskbios.c	1	564	1094	if:defined(NEC_98)	0.723	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/fdisk.c	1	1544	1574	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/fdisk.c	1	1653	1679	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/fdisk.c	1	1742	1762	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/fla.c	1	381	294	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/fla.c	1	547	461	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/fla.c	1	1161	1146	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	148	198	if:defined(NEC_98)	0.59	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	276	392	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	544	1971	if:defined(NEC_98)	0.555	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	674	2373	if:defined(NEC_98)	0.735	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	726	2428	ifdef:NTVDM	0.794	opennt-line	logical line anchors same condition in OpenNT
+base/disks/floppy.c	1	1105	2810	ifdef:NTVDM	0.835	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	1252	2956	ifdef:NTVDM	0.779	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	1314	3019	ifdef:NTVDM	0.732	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	1356	3059	ifdef:NTVDM	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	1524	3225	ifdef:NTVDM	0.835	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	1562	3262	ifdef:NTVDM	0.681	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	1581	3284	ifdef:NTVDM	0.631	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	1599	3305	ifdef:NTVDM	0.631	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/disks/floppy.c	1	1663	3372	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	1765	3509	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	1819	3561	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	1874	3614	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	1927	3665	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	1997	3733	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	2509	4263	ifndef:JOKER	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	2564	4316	ifndef:JOKER	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	2613	4363	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	2687	4435	ifndef:JOKER	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	2725	4473	ifndef:JOKER	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	1	2774	4520	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	2965	4709	ifndef:JOKER	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy.c	2	2991	4734	ifdef:NTVDM	0.727	xp-line	logical line within three of XP condition
+base/disks/floppy.c	2	3017	4758	ifdef:NTVDM	0.576	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy.c	1	3065	4830	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/disks/floppy.c	1	3144	4907	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/disks/floppy_i.c	1	86	511	if:defined(NEC_98)	0.576	xp-line	logical line within three of XP condition
+base/disks/floppy_i.c	1	138	579	ifndef:NEC_98	0.815	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy_i.c	1	154	590	ifndef:NEC_98	0.804	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy_i.c	1	171	605	if:defined(NEC_98)	0.802	nearby-source-anchor	matching substantive source line appears in both local windows
+base/disks/floppy_i.c	1	193	626	ifndef:JOKER	0.654	xp-line	logical line within three of XP condition
+base/disks/floppy_i.c	1	256	692	if:defined(NEC_98)	0.686	xp-line	logical line within three of XP condition
+base/disks/floppy_i.c	1	273	705	if:defined(NEC_98)	0.604	xp-line	logical line within three of XP condition
+base/disks/gfi_mpty.c	1	232	236	ifdef:PROD	1.0	xp-line	logical line within three of XP condition
+base/disks/gfi_mpty.c	1	241	245	ifdef:PROD	1.0	xp-line	logical line within three of XP condition
+base/disks/gfi_mpty.c	1	251	255	ifdef:PROD	1.0	xp-line	logical line within three of XP condition
+base/disks/gfi_mpty.c	1	263	267	ifdef:PROD	1.0	xp-line	logical line within three of XP condition
+base/disks/gfi_mpty.c	1	272	276	ifdef:PROD	1.0	xp-line	logical line within three of XP condition
+base/inc/bios.h	1	337	356	ifdef:ANSI	0.791	xp-line	logical line within three of XP condition
+base/inc/bios.h	1	352	372	ifdef:ANSI	0.9	xp-line	logical line within three of XP condition
+base/inc/config.h	2	366	368	if:!defined(NTVDM)||(defined(NTVDM)&&!defined(MONITOR))	1.0	xp-line	logical line within three of XP condition
+base/inc/config.h	2	391	390	if:!defined(NTVDM)||(defined(NTVDM)&&!defined(MONITOR))	1.0	xp-line	logical line within three of XP condition
+base/inc/cpu_vid.h	1	32	32	ifndef:NO_STRING_OPERATIONS	1.0	xp-line	logical line within three of XP condition
+base/inc/cpu_vid.h	1	71	70	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/cpu_vid.h	1	79	78	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/cpu_vid.h	1	99	90	ifndef:NO_STRING_OPERATIONS	0.845	xp-line	logical line within three of XP condition
+base/inc/dma.h	1	165	188	ifdef:BIT_ORDER2	0.787	xp-line	logical line within three of XP condition
+base/inc/dma.h	1	202	261	ifdef:BIT_ORDER2	0.734	xp-line	logical line within three of XP condition
+base/inc/dma.h	1	256	314	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/inc/dma.h	1	298	354	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/inc/egacpu.h	1	91	117	if:defined(NEC_98)	0.519	xp-line	logical line within three of XP condition
+base/inc/egacpu.h	1	111	149	if:defined(NEC_98)	0.674	xp-line	logical line within three of XP condition
+base/inc/egacpu.h	1	131	158	if:defined(NEC_98)	0.862	xp-line	logical line within three of XP condition
+base/inc/egacpu.h	1	158	183	if:defined(NEC_98)	0.635	xp-line	logical line within three of XP condition
+base/inc/egacpu.h	1	166	189	if:defined(NEC_98)	0.692	nearby-source-anchor	matching substantive source line appears in both local windows
+base/inc/egacpu.h	1	286	469	if:defined(NEC_98)	1.0	context-identical	adjacent non-directive context is identical
+base/inc/egagraph.h	2	29	35	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	2	56	61	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	2	87	92	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	2	97	101	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	3	104	107	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	3	119	119	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	2	166	164	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/egagraph.h	2	170	168	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/egaports.h	2	12	12	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/egaports.h	2	56	55	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/egavideo.h	1	57	63	ifdef:VGG	0.933	xp-line	logical line within three of XP condition
+base/inc/egavideo.h	1	110	116	ifdef:VGG	0.873	xp-line	logical line within three of XP condition
+base/inc/emm.h	1	24	24	ifdef:NTVDM	0.713	xp-line	logical line within three of XP condition
+base/inc/floppy.h	1	187	187	ifdef:NTVDM	0.815	xp-line	logical line within three of XP condition
+base/inc/floppy.h	1	479	478	ifdef:ANSI	0.847	nearby-source-anchor	matching substantive source line appears in both local windows
+base/inc/floppy.h	1	492	492	ifdef:ANSI	0.974	xp-line	logical line within three of XP condition
+base/inc/floppy.h	1	516	527	ifdef:ANSI	0.933	xp-line	logical line within three of XP condition
+base/inc/floppy.h	1	529	541	ifdef:ANSI	0.953	xp-line	logical line within three of XP condition
+base/inc/gfx_upd.h	1	52	52	ifndef:NEC_98	0.97	xp-line	logical line within three of XP condition
+base/inc/gfx_upd.h	1	115	126	if:defined(NEC_98)	0.806	xp-line	logical line within three of XP condition
+base/inc/gfx_upd.h	1	142	150	ifdef:EGG	0.761	xp-line	logical line within three of XP condition
+base/inc/gfx_upd.h	1	197	210	ifdef:EGG	0.834	xp-line	logical line within three of XP condition
+base/inc/gfx_upd.h	1	253	266	if:defined(NEC_98)	0.821	xp-line	logical line within three of XP condition
+base/inc/gfx_upd.h	1	315	325	ifndef:NEC_98	0.884	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	55	55	ifdef:EGG	0.709	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	76	99	if:defined(NEC_98)	0.709	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	86	107	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	91	112	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	123	203	ifdef:BIT_ORDER1	0.8	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	144	225	ifdef:BIT_ORDER1	0.786	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	166	249	ifdef:VGG	0.839	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	188	269	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	209	312	if:defined(NEC_98)	0.559	xp-line	logical line within three of XP condition
+base/inc/gvi.h	1	217	318	if:defined(NEC_98)	0.657	xp-line	logical line within three of XP condition
+base/inc/gvi.h	2	281	481	ifdef:VGG	0.657	xp-line	logical line within three of XP condition
+base/inc/gvi.h	2	293	492	ifdef:VGG	0.745	opennt-line	logical line anchors same condition in OpenNT
+base/inc/ica.h	2	144	167	ifdef:CPU_40_STYLE	1.0	xp-line	logical line within three of XP condition
+base/inc/ica.h	2	176	199	ifdef:CPU_40_STYLE	1.0	xp-line	logical line within three of XP condition
+base/inc/ios.h	1	35	38	if:defined(NEC_98)	0.831	xp-line	logical line within three of XP condition
+base/inc/ios.h	1	490	821	ifdef:NTVDM	0.782	xp-line	logical line within three of XP condition
+base/inc/mouse_io.h	1	249	249	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/inc/mouse_io.h	1	952	986	ifdef:EGG	0.88	xp-line	logical line within three of XP condition
+base/inc/mouse_io.h	1	1086	1118	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/inc/quick_ev.h	1	70	30	ifndef:NTVDM	0.586	nearby-source-anchor	matching substantive source line appears in both local windows
+base/inc/quick_ev.h	1	97	56	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/inc/rs232.h	2	47	255	ifdef:BIT_ORDER2	0.793	xp-line	logical line within three of XP condition
+base/inc/rs232.h	2	65	280	if:defined(NTVDM)&&defined(FIFO_ON)	0.914	xp-line	logical line within three of XP condition
+base/inc/rs232.h	2	87	328	ifdef:BIT_ORDER2	0.921	xp-line	logical line within three of XP condition
+base/inc/rs232.h	2	106	357	ifdef:BIT_ORDER2	0.915	nearby-source-anchor	matching substantive source line appears in both local windows
+base/inc/rs232.h	2	124	384	ifdef:BIT_ORDER2	0.958	opennt-line	logical line anchors same condition in OpenNT
+base/inc/rs232.h	2	151	423	ifdef:BIT_ORDER2	0.954	nearby-source-anchor	matching substantive source line appears in both local windows
+base/inc/sas.h	1	30	30	ifdef:CPU_40_STYLE	1.0	xp-line	logical line within three of XP condition
+base/inc/sas.h	1	74	74	ifdef:CPU_40_STYLE	0.851	xp-line	logical line within three of XP condition
+base/inc/sas.h	1	288	296	ifdef:BACK_M	1.0	context-identical	adjacent non-directive context is identical
+base/inc/sas.h	1	325	338	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/inc/sas.h	1	338	350	if:defined(NEC_98)	1.0	context-identical	adjacent non-directive context is identical
+base/inc/sas.h	1	372	382	ifndef:GISP_SVGA	1.0	xp-line	logical line within three of XP condition
+base/inc/sas.h	1	463	473	ifndef:GISP_SVGA	1.0	xp-line	logical line within three of XP condition
+base/inc/sas.h	1	485	494	ifndef:GISP_SVGA	1.0	xp-line	logical line within three of XP condition
+base/inc/sas.h	2	708	717	ifdef:EGG	0.738	xp-line	logical line within three of XP condition
+base/inc/sas.h	2	722	730	ifdef:EGG	0.738	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/inc/sas.h	1	786	1045	ifdef:BACK_M	0.556	xp-line	logical line within three of XP condition
+base/inc/timer.h	1	77	77	ifdef:NTVDM	0.869	xp-line	logical line within three of XP condition
+base/inc/timeval.h	1	38	38	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/inc/timeval.h	1	63	60	ifndef:NTVDM	0.841	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	2	399	1356	ifdef:BIT_ORDER2	0.667	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	3	402	1359	ifdef:V7VGA	0.854	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	3	425	1391	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	3	438	1404	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	3	583	1558	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	3	621	1623	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	3	660	1676	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	2	952	1968	ifdef:V7VGA	0.628	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	2	984	2004	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/vgaports.h	2	1000	2020	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/inc/video.h	2	81	146	ifdef:EGG	0.722	xp-line	logical line within three of XP condition
+base/inc/video.h	2	135	199	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/inc/video.h	2	139	203	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/inc/video.h	2	146	210	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/inc/video.h	2	155	218	ifdef:EGG	1.0	context-identical	adjacent non-directive context is identical
+base/inc/video.h	2	185	248	ifdef:V7VGA	0.987	opennt-line	logical line anchors same condition in OpenNT
+base/inc/video.h	2	190	253	ifdef:V7VGA	0.773	opennt-line	logical line anchors same condition in OpenNT
+base/inc/video.h	2	210	273	ifdef:EGG	0.605	xp-line	logical line within three of XP condition
+base/inc/video.h	2	222	285	ifdef:VGG	0.782	opennt-line	logical line anchors same condition in OpenNT
+base/inc/video.h	2	257	319	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/inc/video.h	2	270	331	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/keyba.c	1	162	225	ifndef:NTVDM	0.679	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	215	275	ifdef:NTVDM	0.907	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	225	285	ifndef:macintosh	0.907	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	1	261	324	ifndef:macintosh	0.995	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	308	389	ifdef:NTVDM	0.8	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	339	418	ifndef:NTVDM	0.984	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	347	424	ifdef:macintosh	0.763	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	354	442	ifndef:REAL_KBD	0.67	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	3	357	445	if:defined(NEC_98)	0.67	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	3	429	541	if:defined(NEC_98)	0.969	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	501	619	ifndef:REAL_KBD	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	842	1325	ifndef:REAL_KBD	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	893	1374	ifndef:NEC_98	0.509	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	904	1387	ifndef:NEC_98	0.613	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	953	1469	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1016	1545	ifdef:NTVDM	0.686	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1047	1600	ifdef:NTVDM	0.764	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1077	1643	ifdef:NTVDM	0.847	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	2	1278	1841	ifndef:NTVDM	0.538	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	2	1304	1865	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1341	1898	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/keyba.c	1	1522	2075	ifdef:NTVDM	0.797	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	1	1538	2098	ifndef:REAL_KBD	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1628	2187	ifndef:REAL_KBD	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/keyba.c	2	1639	2197	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1660	2215	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1684	2237	ifndef:REAL_KBD	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1701	2253	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1734	2283	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1752	2298	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1792	2336	ifndef:REAL_KBD	0.667	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1799	2342	ifndef:REAL_KBD	0.85	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1821	2364	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1834	2375	ifdef:NTVDM	0.673	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	1930	2574	if:defined(NEC_98)	0.599	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	1977	2688	ifndef:JOKER	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	4	1988	2698	ifdef:NTVDM	0.859	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	4	2003	2711	ifdef:NTVDM	0.86	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	2106	2809	ifndef:JOKER	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2177	2876	ifdef:NTVDM	0.625	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2257	2995	ifdef:HUNTER	0.728	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2327	3080	ifndef:NTVDM	0.714	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2490	3139	ifdef:NTVDM	0.667	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	1	2614	3278	ifndef:NTVDM	0.855	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	1	2626	3296	ifndef:NTVDM	0.709	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2684	3356	if:defined(NEC_98)	0.893	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2692	3362	ifndef:NTVDM	0.659	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	1	2705	3410	ifndef:NTVDM	0.697	xp-line	logical line within three of XP condition
+base/keymouse/keyba.c	2	2742	3462	ifndef:REAL_KBD	0.616	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	2	2764	3486	if:defined(NEC_98)	0.898	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	2	2786	3506	if:defined(NEC_98)	0.891	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keyba.c	2	2802	3530	ifndef:REAL_KBD	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/keybd_io.c	1	150	154	ifndef:GISP_SVGA	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	175	191	ifdef:NTVDM	0.674	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	187	249	ifndef:GISP_SVGA	0.646	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/keybd_io.c	1	531	646	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	585	708	ifndef:NTVDM	0.978	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	625	779	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	638	790	ifndef:NTVDM	0.859	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	689	837	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	700	846	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/keybd_io.c	1	735	883	ifndef:NTVDM	0.718	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	1029	1186	ifndef:NTVDM	0.961	xp-line	logical line within three of XP condition
+base/keymouse/keybd_io.c	1	1340	1495	ifdef:NTVDM	0.567	xp-line	logical line within three of XP condition
+base/keymouse/mouse.c	1	249	195	if:defined(NEC_98)	0.537	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse.c	1	415	480	if:defined(NEC_98)	0.828	xp-line	logical line within three of XP condition
+base/keymouse/mouse.c	1	439	503	if:defined(NEC_98)	0.721	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse.c	1	478	556	if:defined(NEC_98)	0.557	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	146	223	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	399	476	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	540	617	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	551	628	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	557	634	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	593	670	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	604	681	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	610	687	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	685	762	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	1307	1078	ifdef:NTVDM	0.774	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	1336	1108	ifdef:NTVDM	0.692	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	1459	1229	ifndef:NEC_98	0.656	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	1476	1245	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	1701	1514	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	2536	2418	ifndef:NTVDM	0.849	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	2705	2657	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	2738	2709	ifndef:NTVDM	0.704	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	2768	2738	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	3053	3018	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	3101	3064	ifndef:NTVDM	0.842	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	3382	3378	ifndef:NTVDM	0.837	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	3478	3479	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	3799	3818	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	4059	4077	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4113	4128	ifdef:NTVDM	0.828	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	4129	4142	ifdef:NTVDM	0.831	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	4158	4172	ifdef:NTVDM	0.797	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	4213	4226	ifdef:NTVDM	0.895	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	4238	4252	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4356	4367	ifndef:NTVDM	0.669	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	4373	4382	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4427	4434	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4481	4487	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4540	4544	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4573	4575	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4625	4625	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4677	4675	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4739	4735	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4781	4775	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4848	4840	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4872	4862	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4912	4900	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4951	4937	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	4980	4964	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5026	5008	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5160	5140	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5191	5169	ifndef:PROD	0.911	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	5239	5223	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	5273	5255	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5304	5312	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/keymouse/mouse_io.c	1	5346	5352	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5371	5375	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	3	5422	5424	ifdef:MOUSE_16_BIT	0.566	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	5479	5478	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	3	5532	5530	ifdef:MOUSE_16_BIT	0.789	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	5574	5570	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5606	5602	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5657	5651	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/keymouse/mouse_io.c	1	5740	5732	ifdef:EGG	0.852	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	2	5744	5736	ifndef:NEC_98	0.552	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	2	5937	5929	ifndef:NEC_98	0.554	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	1	6019	6011	ifdef:VGG	0.777	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	2	6022	6014	ifdef:REAL_VGA	0.525	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/mouse_io.c	2	6107	6101	ifdef:REAL_VGA	0.551	nearby-source-anchor	matching substantive source line appears in both local windows
+base/keymouse/ppi.c	1	90	87	ifndef:NEC_98	0.895	xp-line	logical line within three of XP condition
+base/support/ios.c	1	89	96	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	102	109	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	119	126	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	155	162	ifdef:PROD	0.743	xp-line	logical line within three of XP condition
+base/support/ios.c	1	182	214	ifdef:PROD	0.615	xp-line	logical line within three of XP condition
+base/support/ios.c	1	244	296	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	272	324	ifdef:SPC386	1.0	context-identical	adjacent non-directive context is identical
+base/support/ios.c	1	371	423	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	390	442	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	439	518	ifdef:VIRTUALISATION	0.654	xp-line	logical line within three of XP condition
+base/support/ios.c	1	448	527	ifdef:VIRTUALISATION	0.55	xp-line	logical line within three of XP condition
+base/support/ios.c	1	481	559	ifdef:VIRTUALISATION	0.667	opennt-line	logical line anchors same condition in OpenNT
+base/support/ios.c	1	492	570	ifdef:VIRTUALISATION	0.799	xp-line	logical line within three of XP condition
+base/support/ios.c	1	518	596	ifdef:VIRTUALISATION	0.64	xp-line	logical line within three of XP condition
+base/support/ios.c	1	527	605	ifdef:VIRTUALISATION	0.561	xp-line	logical line within three of XP condition
+base/support/ios.c	1	559	636	ifdef:VIRTUALISATION	0.644	opennt-line	logical line anchors same condition in OpenNT
+base/support/ios.c	1	570	647	ifdef:VIRTUALISATION	0.789	xp-line	logical line within three of XP condition
+base/support/ios.c	1	584	661	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	2	600	677	ifdef:VIRTUALISATION	0.959	xp-line	logical line within three of XP condition
+base/support/ios.c	2	638	714	ifdef:VIRTUALISATION	1.0	context-identical	adjacent non-directive context is identical
+base/support/ios.c	1	677	753	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	703	779	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	731	807	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	758	834	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	772	848	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	802	878	ifdef:SPC386	1.0	xp-line	logical line within three of XP condition
+base/support/ios.c	1	840	916	ifdef:NTVDM	0.976	xp-line	logical line within three of XP condition
+base/support/ios.c	1	866	950	ifdef:NTVDM	0.852	nearby-source-anchor	matching substantive source line appears in both local windows
+base/support/time_day.c	1	137	142	if:defined(NEC_98)	0.617	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+base/support/time_day.c	2	207	374	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/support/time_day.c	2	220	384	ifndef:NTVDM	0.83	xp-line	logical line within three of XP condition
+base/support/time_day.c	2	238	399	ifndef:NTVDM	0.632	xp-line	logical line within three of XP condition
+base/support/time_day.c	2	270	441	ifndef:NTVDM	0.805	xp-line	logical line within three of XP condition
+base/support/time_day.c	2	288	456	ifndef:NTVDM	0.625	xp-line	logical line within three of XP condition
+base/support/time_day.c	1	379	582	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/support/time_day.c	1	751	950	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/support/time_day.c	1	793	988	ifndef:NEC_98	0.818	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/at_dma.c	1	74	77	ifdef:LIM	0.746	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	85	88	ifdef:LIM	0.938	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	97	100	ifdef:LIM	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	136	139	if:defined(NEC_98)	0.602	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	162	164	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/system/at_dma.c	1	170	170	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/system/at_dma.c	1	196	194	if:defined(NEC_98)	0.578	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	207	205	ifndef:NEC_98	0.914	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	227	223	if:defined(NEC_98)	0.582	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	238	234	ifndef:NEC_98	0.909	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	252	246	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	263	255	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	292	282	if:defined(NEC_98)	0.757	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	321	309	if:defined(NEC_98)	0.991	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	333	322	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	351	338	if:defined(NEC_98)	0.991	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	363	351	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	378	364	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	388	372	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	399	381	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	418	398	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	430	408	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	440	416	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/system/at_dma.c	1	456	430	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	466	438	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	485	455	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	503	471	if:defined(NEC_98)	0.966	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/at_dma.c	1	565	539	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	582	554	if:defined(NEC_98)	0.969	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/at_dma.c	1	1002	1012	ifdef:LIM	1.0	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	1015	1025	if:defined(NEC_98)	0.99	xp-line	logical line within three of XP condition
+base/system/at_dma.c	1	1031	1040	if:defined(NEC_98)	0.892	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	79	81	if:defined(NTVDM)||defined(macintosh)	0.754	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	353	387	ifndef:NTVDM	0.747	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	388	428	ifndef:NTVDM	0.652	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	425	463	ifndef:NTVDM	0.511	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/cmos.c	1	630	675	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	639	682	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/system/cmos.c	1	886	967	ifndef:NTVDM	0.72	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	895	973	ifndef:NTVDM	0.529	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	1022	1102	if:defined(NTVDM)||defined(macintosh)	0.923	xp-line	logical line within three of XP condition
+base/system/cmos.c	1	1031	1112	if:defined(NTVDM)||defined(macintosh)	0.839	xp-line	logical line within three of XP condition
+base/system/ica.c	1	146	148	if:!defined(NTVDM)	0.562	xp-line	logical line within three of XP condition
+base/system/ica.c	1	179	176	if:!defined(NTVDM)	0.757	xp-line	logical line within three of XP condition
+base/system/ica.c	1	192	187	if:defined(CPU_40_STYLE)||defined(NTVDM)	0.71	xp-line	logical line within three of XP condition
+base/system/ica.c	1	241	305	ifdef:HOOKED_IRETS	0.88	xp-line	logical line within three of XP condition
+base/system/ica.c	1	303	367	ifdef:HOOKED_IRETS	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	307	371	if:!defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	377	442	ifdef:EOI_HOOKS	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	418	483	if:defined(NTVDM)	0.703	xp-line	logical line within three of XP condition
+base/system/ica.c	1	533	600	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	790	873	if:defined(NEC_98)	0.877	xp-line	logical line within three of XP condition
+base/system/ica.c	1	809	893	if:defined(NEC_98)	0.626	xp-line	logical line within three of XP condition
+base/system/ica.c	1	857	939	if:defined(NEC_98)	0.778	xp-line	logical line within three of XP condition
+base/system/ica.c	1	992	1090	if:defined(NEC_98)	0.92	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1024	1124	if:defined(NEC_98)	0.92	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1053	1155	if:defined(NEC_98)	0.92	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1167	1335	ifndef:NTVDM	0.58	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1184	1353	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1253	1411	ifdef:EOI_HOOKS	0.872	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/ica.c	1	1315	1476	if:defined(CPU_40_STYLE)||defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1329	1490	if:defined(CPU_40_STYLE)||defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1338	1499	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1359	1520	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1376	1537	if:defined(NTVDM)	0.651	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1411	1580	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1651	1863	ifdef:HOOKED_IRETS	0.68	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1834	2054	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1875	2095	ifdef:NTVDM	0.736	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1884	2103	if:defined(NEC_98)	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/ica.c	1	1896	2113	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1923	2138	if:defined(NEC_98)	1.0	context-identical	adjacent non-directive context is identical
+base/system/ica.c	1	1962	2182	ifdef:NTVDM	0.736	xp-line	logical line within three of XP condition
+base/system/ica.c	1	1971	2190	if:defined(NEC_98)	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/ica.c	1	1982	2199	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	1.0	xp-line	logical line within three of XP condition
+base/system/idetect.c	1	184	188	ifdef:NTVDM	0.654	xp-line	logical line within three of XP condition
+base/system/idetect.c	1	199	202	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/idetect.c	1	228	266	ifndef:NTVDM	0.797	xp-line	logical line within three of XP condition
+base/system/idetect.c	1	251	302	ifdef:NTVDM	0.793	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/idetect.c	1	284	364	ifdef:NTVDM	0.834	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/idetect.c	1	328	451	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/system/idetect.c	1	339	460	ifdef:NTVDM	0.568	xp-line	logical line within three of XP condition
+base/system/idetect.c	1	352	476	ifdef:NTVDM	0.832	xp-line	logical line within three of XP condition
+base/system/idetect.c	1	388	510	ifdef:NTVDM	0.538	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/illegalp.c	1	97	99	ifndef:NTVDM	0.826	xp-line	logical line within three of XP condition
+base/system/illegalp.c	1	129	140	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	89	91	ifdef:SFELLOW	0.69	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	99	100	if:defined(CPU_40_STYLE)&&!defined(SFELLOW)	0.69	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	112	112	ifdef:CPU_40_STYLE	0.69	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	148	148	if:defined(CPU_40_STYLE)&&!defined(SFELLOW)	1.0	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	169	169	if:defined(SFELLOW)	1.0	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	182	185	if:defined(CPU_40_STYLE)&&!defined(SFELLOW)	1.0	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	200	202	if:defined(CPU_40_STYLE)&&!defined(SFELLOW)	0.857	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	233	252	ifdef:SFELLOW	0.719	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	256	277	ifdef:SFELLOW	0.69	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	343	371	if:defined(SFELLOW)	0.805	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	352	379	if:defined(SFELLOW)	0.943	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	522	547	if:defined(CPU_40_STYLE)	0.848	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	561	585	ifdef:CPU_40_STYLE	1.0	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	628	651	ifdef:CPU_40_STYLE	0.762	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	694	716	ifdef:CPU_40_STYLE	1.0	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	901	925	if:defined(CPU_40_STYLE)	0.896	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	928	952	ifdef:CPU_40_STYLE	0.536	xp-line	logical line within three of XP condition
+base/system/quick_ev.c	1	1238	1028	if:defined(CPU_40_STYLE)&&!defined(SFELLOW)	0.712	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/quick_ev.c	2	1354	1144	ifdef:SYNCH_TIMERS	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/quick_ev.c	2	1384	1173	ifdef:SYNCH_TIMERS	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/rom.c	1	48	46	if:defined(NEC_98)	0.913	xp-line	logical line within three of XP condition
+base/system/rom.c	1	293	320	if:defined(NEC_98)	0.649	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/rom.c	3	306	350	ifdef:GISP_SVGA	0.595	xp-line	logical line within three of XP condition
+base/system/rom.c	3	329	371	ifdef:GISP_SVGA	0.744	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/rom.c	1	351	423	if:defined(NEC_98)	0.764	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/rom.c	3	364	461	if:defined(macintosh)&&defined(A2CPU)	0.759	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/rom.c	1	460	602	if:!defined(NTVDM)||(defined(NTVDM)&&!defined(X86GFX))	1.0	xp-line	logical line within three of XP condition
+base/system/rom.c	1	482	622	if:!defined(NTVDM)||(defined(NTVDM)&&!defined(X86GFX))	1.0	xp-line	logical line within three of XP condition
+base/system/rom.c	1	492	630	if:!defined(NTVDM)||(defined(NTVDM)&&!defined(X86GFX))	0.836	xp-line	logical line within three of XP condition
+base/system/rom.c	1	568	750	ifndef:GISP_SVGA	0.627	xp-line	logical line within three of XP condition
+base/system/rom.c	1	593	775	ifndef:GISP_SVGA	0.927	xp-line	logical line within three of XP condition
+base/system/timer.c	1	180	185	if:defined(NEC_98)	0.685	xp-line	logical line within three of XP condition
+base/system/timer.c	1	250	254	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	373	375	ifdef:NTVDM	0.817	xp-line	logical line within three of XP condition
+base/system/timer.c	1	387	387	ifndef:NTVDM	0.993	xp-line	logical line within three of XP condition
+base/system/timer.c	1	401	398	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	410	405	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	425	417	if:defined(NTVDM)	0.675	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	523	543	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	545	563	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/system/timer.c	1	557	573	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/system/timer.c	1	589	603	if:defined(NEC_98)	0.911	xp-line	logical line within three of XP condition
+base/system/timer.c	1	618	630	ifdef:NTVDM	0.867	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	644	655	ifdef:NTVDM	0.805	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	653	662	if:defined(NEC_98)	0.599	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	715	728	if:defined(NEC_98)	0.558	xp-line	logical line within three of XP condition
+base/system/timer.c	1	752	766	ifndef:NTVDM	0.717	xp-line	logical line within three of XP condition
+base/system/timer.c	1	774	808	ifndef:NTVDM	0.788	xp-line	logical line within three of XP condition
+base/system/timer.c	1	818	850	if:defined(NEC_98)	0.831	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	937	967	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1005	1033	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1043	1068	ifndef:NTVDM	0.816	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1075	1099	ifdef:NTVDM	0.508	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1307	1340	if:defined(NEC_98)	0.756	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1330	1368	ifdef:NTVDM	0.56	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1744	1794	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	2	1785	1834	if:defined(NEC_98)	0.812	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1812	1864	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1831	1880	ifdef:NTVDM	0.906	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1842	1889	if:defined(NEC_98)	0.829	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	1866	1910	ifdef:NTVDM	0.893	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1893	1935	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	1957	2196	ifndef:NTVDM	0.787	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2085	2352	ifdef:NTVDM	0.587	xp-line	logical line within three of XP condition
+base/system/timer.c	2	2108	2509	if:defined(NEC_98)	0.734	xp-line	logical line within three of XP condition
+base/system/timer.c	2	2198	2591	if:defined(NEC_98)	0.627	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2221	2615	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/system/timer.c	1	2375	2774	ifndef:NTVDM	1.0	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2433	2839	if:defined(NEC_98)	0.653	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2464	2884	ifdef:NTVDM	0.967	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2479	2899	ifndef:NTVDM	1.0	context-identical	adjacent non-directive context is identical
+base/system/timer.c	1	2487	2905	if:!defined(NTVDM)	0.839	nearby-source-anchor	matching substantive source line appears in both local windows
+base/system/timer.c	1	2507	2958	if:defined(NEC_98)	0.979	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2529	2980	ifndef:NTVDM	0.643	xp-line	logical line within three of XP condition
+base/system/timer.c	1	2573	3028	if:defined(NEC_98)	0.981	xp-line	logical line within three of XP condition
+base/video/cga.c	2	93	96	ifdef:REAL_VGA	0.784	xp-line	logical line within three of XP condition
+base/video/cga.c	2	206	227	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/cga.c	2	873	886	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/cga.c	2	1083	1094	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/cga.c	2	1144	1356	ifndef:NEC_98	0.997	xp-line	logical line within three of XP condition
+base/video/cga.c	2	1251	1470	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_mode.c	3	151	154	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_mode.c	3	540	543	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_mode.c	5	611	614	ifdef:GORE	0.788	xp-line	logical line within three of XP condition
+base/video/ega_mode.c	5	652	654	ifdef:GORE	0.839	opennt-line	logical line anchors same condition in OpenNT
+base/video/ega_mode.c	3	684	685	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_mode.c	3	711	712	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1112	1641	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	4	1117	1645	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	4	1189	1717	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	3	1223	1750	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	3	1278	1802	if:defined(NEC_98)	0.853	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	3	1299	1821	ifndef:NEC_98	0.905	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	3	1347	1867	ifndef:NEC_98	0.931	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_prts.c	3	1372	1903	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_prts.c	3	1400	1927	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1565	2089	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1641	2163	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1662	2176	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1685	2197	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1717	2227	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1743	2251	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1777	2283	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	1806	2310	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2115	2617	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2166	2666	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2192	2690	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2220	2716	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2243	2737	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2268	2760	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2289	2779	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2321	2809	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2337	2823	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2391	2875	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2457	2939	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2507	2987	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	4	2512	2991	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	4	2525	3004	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2562	3042	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2611	3092	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2659	3141	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2673	3153	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2794	3272	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2847	3323	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2861	3335	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	2882	3354	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_prts.c	3	3019	3489	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	4	188	189	ifndef:NO_STRING_OPERATIONS	1.0	xp-line	logical line within three of XP condition
+base/video/ega_read.c	4	226	410	ifndef:NO_STRING_OPERATIONS	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	4	246	429	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_read.c	4	271	452	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_read.c	4	305	484	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	4	349	525	if:defined(NEC_98)	0.8	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	4	383	557	if:defined(NEC_98)	0.909	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	4	427	599	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	4	521	727	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	4	570	773	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	5	582	784	ifdef:CPU_40_STYLE	0.646	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	5	603	821	ifdef:CPU_40_STYLE	0.63	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	5	612	834	ifdef:CPU_40_STYLE	0.502	opennt-line	logical line anchors same condition in OpenNT
+base/video/ega_read.c	5	622	847	ifdef:VGG	0.91	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	5	644	874	ifdef:CPU_40_STYLE	0.796	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	5	663	897	ifdef:CPU_40_STYLE	0.823	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	5	672	910	ifdef:VGG	0.778	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_read.c	4	702	953	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_read.c	4	740	1001	ifndef:NEC_98	0.601	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	151	150	ifdef:CPU_40_STYLE	0.575	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	164	164	ifndef:NEC_98	0.875	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	2	214	214	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	376	418	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	386	428	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	396	436	ifdef:CPU_40_STYLE	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	421	461	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	476	514	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	574	612	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	639	676	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	705	765	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	738	795	ifdef:JAPAN	0.708	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	749	809	ifdef:NTVDM	0.752	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	827	904	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	856	930	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	929	999	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	998	1065	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	1006	1072	ifdef:V7VGA	0.682	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	3	1020	1108	ifdef:V7VGA	0.82	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	3	1040	1145	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	1057	1162	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	1127	1300	ifdef:VGG	0.824	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	3	1203	1408	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	1251	1456	ifdef:V7VGA	0.954	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	1316	1607	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	4	1369	1692	ifdef:USE_CURSOR_END_TABLES	0.832	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	4	1382	1704	ifdef:USE_CURSOR_END_TABLES	0.838	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	3	1411	1732	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	1436	1756	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	1495	1813	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	1585	1901	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	1629	1955	ifdef:VGG	0.806	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	3	1653	1977	if:defined(NTVDM)&&defined(X86GFX)	0.877	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	1665	1997	if:defined(NTVDM)&&defined(X86GFX)	0.877	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	1675	2016	ifdef:VGG	0.807	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	1703	2052	if:defined(NTVDM)&&defined(X86GFX)	0.874	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	2	1747	2178	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	1791	2220	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	3	1889	2305	ifdef:V7VGA	0.76	xp-line	logical line within three of XP condition
+base/video/ega_vide.c	3	1901	2316	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	1919	2333	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	1966	2378	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	2019	2429	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	2069	2476	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	2119	2525	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	2144	2548	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	2175	2576	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_vide.c	2	2237	2634	if:defined(NEC_98)	0.828	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_vide.c	2	2326	2773	if:defined(NEC_98)	0.945	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_writ.c	4	183	460	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	4	242	520	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	4	266	542	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	5	412	686	ifdef:CPU_40_STYLE	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	5	447	721	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	5	458	732	ifdef:VGG	0.799	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_writ.c	5	467	740	ifdef:V7VGA	0.986	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_writ.c	5	481	754	ifdef:CPU_40_STYLE	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	5	510	783	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/ega_writ.c	5	549	822	ifdef:CPU_40_STYLE	0.768	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/ega_writ.c	5	565	858	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/egawrtm0.c	3	173	181	ifdef:BIGEND	0.835	xp-line	logical line within three of XP condition
+base/video/egawrtm0.c	4	232	291	ifndef:NO_STRING_OPERATIONS	1.0	xp-line	logical line within three of XP condition
+base/video/egawrtm0.c	4	249	308	ifndef:NO_STRING_OPERATIONS	1.0	xp-line	logical line within three of XP condition
+base/video/egawrtm0.c	3	280	339	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/egawrtm0.c	3	355	414	ifdef:BIGEND	1.0	xp-line	logical line within three of XP condition
+base/video/egawrtm0.c	3	363	422	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/egawrtm0.c	4	469	527	ifdef:BACK_M	0.721	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	481	538	ifdef:BACK_M	0.918	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	491	547	ifdef:BACK_M	0.889	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	1049	1104	ifdef:BACK_M	0.872	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	1059	1113	ifdef:BACK_M	0.754	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	1124	1177	ifdef:BACK_M	0.863	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	1136	1188	ifdef:BACK_M	0.823	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	1216	1267	ifdef:BACK_M	0.842	opennt-line	logical line anchors same condition in OpenNT
+base/video/egawrtm0.c	4	1247	1297	ifdef:BACK_M	0.868	opennt-line	logical line anchors same condition in OpenNT
+base/video/egwrtm12.c	4	173	226	ifndef:NO_STRING_OPERATIONS	1.0	xp-line	logical line within three of XP condition
+base/video/egwrtm12.c	4	191	244	ifndef:NO_STRING_OPERATIONS	1.0	xp-line	logical line within three of XP condition
+base/video/egwrtm12.c	3	209	262	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/egwrtm12.c	3	222	275	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/egwrtm12.c	3	242	295	ifndef:NEC_98	0.823	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/egwrtm12.c	4	269	321	ifdef:BIGEND	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	290	345	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	324	379	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	372	427	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	485	540	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	498	553	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	512	567	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	546	601	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	584	639	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	624	679	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	691	746	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	798	853	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	901	956	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	1008	1063	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	4	1025	1080	ifdef:BACK_M	0.877	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/egwrtm12.c	4	1072	1127	ifdef:BACK_M	0.94	opennt-line	logical line anchors same condition in OpenNT
+base/video/egwrtm12.c	4	1096	1150	ifdef:BACK_M	0.943	opennt-line	logical line anchors same condition in OpenNT
+base/video/egwrtm12.c	3	1117	1170	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	4	1132	1185	ifdef:BACK_M	0.795	opennt-line	logical line anchors same condition in OpenNT
+base/video/egwrtm12.c	4	1151	1203	ifdef:BACK_M	0.853	opennt-line	logical line anchors same condition in OpenNT
+base/video/egwrtm12.c	3	1181	1232	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/egwrtm12.c	3	1194	1245	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	1	121	124	if:defined(NEC_98)	0.664	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	1	134	136	if:defined(NEC_98)	0.65	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	1	180	218	if:defined(NEC_98)	0.638	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	1	197	234	ifndef:REAL_VGA	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	272	313	ifndef:NEC_98	0.809	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	372	438	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	419	483	ifndef:NEC_98	0.943	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	422	485	ifdef:VGG	0.951	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	444	507	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	478	541	ifdef:VGG	0.979	opennt-line	logical line anchors same condition in OpenNT
+base/video/gfx_updt.c	3	492	558	ifdef:VGG	0.671	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	522	583	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	570	628	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	1	611	666	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	1	631	684	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	1	640	691	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	1	656	705	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	1	692	739	ifndef:REAL_VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	751	798	ifdef:EGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	760	806	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	922	966	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	1020	1062	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	1135	1173	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	1243	1254	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	1358	1367	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	1489	1496	ifdef:EGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	1493	1500	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	1660	1665	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	1827	1829	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	1851	1850	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	1870	1867	ifdef:EGG	0.657	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	1924	1875	ifndef:NEC_98	0.964	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	1991	1945	ifndef:NEC_98	0.962	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	4	2050	2001	ifndef:NEC_98	0.945	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	4	2126	2075	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	5	2146	2094	ifdef:V7VGA	0.931	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	5	2170	2117	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	5	2188	2135	ifdef:V7VGA	0.948	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	4	2215	2161	ifndef:NEC_98	0.962	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	2275	2219	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	2350	2290	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	2468	2399	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	2503	2432	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	2700	2622	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	2847	2763	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	3013	2923	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	3127	3032	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	2	3236	3136	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	3352	3246	if:defined(NEC_98)	0.745	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	3389	3277	if:defined(NEC_98)	0.755	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	4	3428	3309	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	4	3461	3337	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	3488	3361	ifdef:EGG	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	3502	3378	if:defined(NEC_98)	0.745	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	3540	3410	if:defined(NEC_98)	0.755	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	1	3594	3458	ifndef:REAL_VGA	0.506	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	2	3603	3557	ifdef:EGG	0.651	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	3613	3566	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	3630	3581	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	3648	3597	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/gfx_updt.c	3	3671	3617	ifndef:NEC_98	0.773	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	3695	3638	ifndef:NEC_98	0.813	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	3	3723	3662	ifndef:NEC_98	0.794	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	3	3752	3687	ifndef:NEC_98	0.702	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	2	3804	3738	ifdef:EGG	0.88	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	4	3830	3760	ifndef:NEC_98	0.726	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	4	3842	3772	ifndef:NEC_98	0.837	xp-line	logical line within three of XP condition
+base/video/gfx_updt.c	5	3875	3812	ifdef:GORE	0.525	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gfx_updt.c	1	4041	3970	ifndef:REAL_VGA	0.509	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/gvi.c	1	88	91	if:defined(NEC_98)	0.816	xp-line	logical line within three of XP condition
+base/video/gvi.c	1	120	121	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/video/gvi.c	1	143	144	ifdef:VGG	1.0	xp-line	logical line within three of XP condition
+base/video/gvi.c	1	165	170	if:defined(NEC_98)	0.82	xp-line	logical line within three of XP condition
+base/video/gvi.c	2	191	203	ifdef:EGG	0.962	opennt-line	logical line anchors same condition in OpenNT
+base/video/gvi.c	2	196	208	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/gvi.c	2	231	245	ifdef:EGG	0.98	opennt-line	logical line anchors same condition in OpenNT
+base/video/gvi.c	2	237	251	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/gvi.c	2	270	289	ifdef:EGG	0.894	opennt-line	logical line anchors same condition in OpenNT
+base/video/gvi.c	2	275	294	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/gvi.c	2	317	333	ifdef:EGG	0.894	opennt-line	logical line anchors same condition in OpenNT
+base/video/gvi.c	2	322	338	ifdef:VGG	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_ports.c	2	88	92	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/v7_ports.c	2	108	110	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/v7_ports.c	2	159	159	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_ports.c	2	484	482	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_ports.c	2	674	670	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_video.c	3	104	108	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/v7_video.c	3	141	142	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/v7_video.c	3	173	172	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/v7_video.c	3	232	229	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_video.c	3	284	279	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_video.c	3	501	492	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/v7_video.c	3	539	527	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_mode.c	3	219	256	ifndef:NEC_98	0.587	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_mode.c	4	227	263	ifdef:GISP_SVGA	0.763	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_mode.c	4	240	276	ifdef:GISP_SVGA	0.752	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_mode.c	4	251	287	ifdef:GISP_SVGA	0.751	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_mode.c	4	332	366	ifdef:GORE	0.774	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_mode.c	4	407	440	ifdef:GORE	0.617	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_mode.c	3	447	476	ifndef:NEC_98	0.997	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	3	395	394	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	424	423	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	429	428	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	445	444	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	524	522	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	577	573	ifndef:NEC_98	0.622	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	649	708	ifndef:NEC_98	0.899	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	4	660	718	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	811	868	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	855	912	ifdef:V7VGA	0.83	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	3	889	941	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1006	1056	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1037	1089	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1086	1136	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1124	1172	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1178	1224	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1225	1269	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1250	1293	ifdef:V7VGA	0.912	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	4	1260	1302	ifdef:V7VGA	0.801	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	4	1280	1321	ifdef:V7VGA	0.9	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_prts.c	4	1290	1330	ifdef:V7VGA	0.903	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_prts.c	4	1300	1339	ifdef:V7VGA	0.9	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	4	1310	1348	ifdef:V7VGA	0.903	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_prts.c	4	1320	1357	ifdef:V7VGA	0.887	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_prts.c	4	1330	1366	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1385	1418	ifdef:V7VGA	0.697	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	4	1391	1424	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	4	1398	1431	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	4	1437	1470	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	4	1443	1476	ifdef:V7VGA	0.838	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	4	1451	1493	ifdef:V7VGA	0.977	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_prts.c	4	1457	1499	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1470	1512	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1476	1518	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1485	1527	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1510	1552	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1521	1563	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	1673	1711	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1717	1754	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1843	1878	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1920	1952	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	1945	1975	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	1969	1997	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	1991	2017	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2015	2039	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2037	2059	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2066	2086	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2084	2102	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2152	2168	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2205	2219	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	2210	2223	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	2224	2237	ifdef:V7VGA	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2257	2271	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2308	2323	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2362	2378	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2397	2411	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2538	2667	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2600	2719	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	4	2613	2731	ifdef:V7VGA	0.939	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	4	2642	2759	ifdef:V7VGA	0.775	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_prts.c	3	2755	2864	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2811	2918	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2855	2959	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	2869	2970	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	2883	2982	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	2897	2993	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	2907	3001	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_prts.c	3	2946	3038	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	2986	3076	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	3013	3101	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_prts.c	3	3053	3145	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	111	114	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_vide.c	2	125	126	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+base/video/vga_vide.c	2	146	145	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	3	152	150	ifdef:macintosh	0.724	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_vide.c	2	192	198	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	255	259	ifndef:NEC_98	0.578	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_vide.c	2	281	285	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	325	340	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	369	396	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	408	432	ifndef:NEC_98	0.923	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_vide.c	2	429	450	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	587	606	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	642	659	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/vga_vide.c	2	669	684	ifndef:NEC_98	0.812	nearby-source-anchor	matching substantive source line appears in both local windows
+base/video/vga_vide.c	3	705	717	ifdef:V7VGA	0.931	opennt-line	logical line anchors same condition in OpenNT
+base/video/vga_vide.c	3	717	728	if:defined(NTVDM)&&defined(X86GFX)	0.805	xp-line	logical line within three of XP condition
+base/video/vga_vide.c	3	740	750	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+base/video/vga_vide.c	2	792	837	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+base/video/video.c	2	196	295	ifdef:HERC	0.713	nearby-source-anchor	matching substantive source line appears in both local windows
+host/inc/cfpu_def.h	1	106	97	ifdef:LITTLEND	0.984	xp-line	logical line within three of XP condition
+host/inc/host_cpu.h	3	128	229	ifdef:CCPU	0.675	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+host/inc/host_cpu.h	3	185	290	ifdef:CCPU	0.675	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+host/inc/host_cpu.h	2	249	357	ifdef:CCPU	1.0	context-identical	adjacent non-directive context is identical
+host/inc/nt_graph.h	1	110	109	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/inc/nt_graph.h	1	198	195	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/inc/nt_graph.h	1	263	270	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/inc/nt_graph.h	1	392	409	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/inc/nt_graph.h	1	427	503	ifdef:BIGWIN	0.812	xp-line	logical line within three of XP condition
+host/src/nt_cga.c	1	93	129	ifdef:MONITOR	0.528	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	67	67	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	129	129	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	165	165	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	196	202	ifdef:LITTLEND	0.734	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	227	233	ifdef:BIGWIN	0.982	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	366	384	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_ega.c	1	403	423	ifdef:LITTLEND	0.689	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	1	420	440	ifdef:BIGWIN	0.781	xp-line	logical line within three of XP condition
+host/src/nt_ega.c	2	426	449	ifdef:LITTLEND	0.729	nearby-source-anchor	matching substantive source line appears in both local windows
+host/src/nt_ega.c	2	452	479	ifdef:LITTLEND	0.686	nearby-source-anchor	matching substantive source line appears in both local windows
+host/src/nt_ega.c	1	683	702	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_ega.c	1	832	851	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_ega.c	1	1096	1107	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_ega.c	1	1173	1184	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_ega.c	1	1334	1337	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_ega.c	1	1458	1461	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_graph.c	1	79	77	ifdef:EGG	0.804	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	108	107	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	149	158	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	170	189	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	191	220	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	212	251	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	233	282	ifdef:V7VGA	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	254	313	ifdef:V7VGA	0.94	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	380	520	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	444	584	ifndef:NEC_98	0.746	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	492	631	ifdef:BIGWIN	0.93	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	621	767	ifdef:BIGWIN	0.792	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	646	790	if:defined(NEC_98)	0.921	nearby-source-anchor	matching substantive source line appears in both local windows
+host/src/nt_graph.c	1	658	800	if:defined(NEC_98)	0.867	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	678	818	if:defined(NEC_98)	0.838	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	733	894	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	846	1006	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	858	1016	ifdef:EGG	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_graph.c	2	859	1017	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_graph.c	2	899	1054	if:defined(NEC_98)	0.909	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	2	936	1091	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	943	1096	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1008	1154	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_graph.c	1	1081	1227	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_graph.c	1	1137	1283	if:defined(NEC_98)	0.6	nearby-source-anchor	matching substantive source line appears in both local windows
+host/src/nt_graph.c	1	1152	1299	if:defined(NEC_98)	0.726	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1280	1454	if:defined(NEC_98)	0.538	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1426	1689	ifdef:X86GFX	0.551	nearby-source-anchor	matching substantive source line appears in both local windows
+host/src/nt_graph.c	1	1438	1726	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1508	1796	ifndef:NEC_98	1.0	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1518	1804	if:defined(NEC_98)	0.793	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1688	1971	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_graph.c	1	1726	2040	if:defined(NEC_98)	0.709	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1832	2170	if:defined(NEC_98)	0.592	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1860	2253	if:defined(NEC_98)	0.753	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	1868	2259	if:defined(NEC_98)	0.713	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	2171	2570	if:defined(NEC_98)	0.897	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	2209	2606	if:defined(NEC_98)	0.542	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	2229	2623	if:defined(NEC_98)	0.868	xp-line	logical line within three of XP condition
+host/src/nt_graph.c	1	2476	2883	ifndef:NEC_98	0.739	xp-line	logical line within three of XP condition
+host/src/nt_keycd.c	1	38	51	if:defined(NEC_98)	1.0	xp-line	logical line within three of XP condition
+host/src/nt_keycd.c	2	137	406	ifdef:JAPAN	0.611	xp-line	logical line within three of XP condition
+host/src/nt_keycd.c	2	165	434	ifdef:JAPAN	0.87	manual-context	manually checked enclosing function, declarations, neighboring conditions or source context
+host/src/nt_sbfm.c	1	91	164	if:0	0.535	nearby-source-anchor	matching substantive source line appears in both local windows
+host/src/nt_sound.c	1	46	51	ifndef:NEC_98	0.739	xp-line	logical line within three of XP condition
+host/src/nt_sound.c	1	168	245	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_sound.c	1	199	274	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_sound.c	1	234	307	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_sound.c	1	262	333	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_sound.c	1	355	424	ifndef:NEC_98	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_vga.c	1	166	159	ifdef:BIGWIN	1.0	context-identical	adjacent non-directive context is identical
+host/src/nt_vga.c	1	287	279	ifdef:BIGWIN	1.0	xp-line	logical line within three of XP condition

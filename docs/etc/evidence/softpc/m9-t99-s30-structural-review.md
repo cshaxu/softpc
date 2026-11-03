@@ -1,11 +1,10 @@
-# M9 T99 S30: mirror condition structure review — in progress
+# M9 T99 S30: mirror condition structure review
 
 The comparison uses the fixed XP SP1 source at
 `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`; OpenNT is read-only diagnostic
 reference. It does not compare inside a current arm wholly replaced by
-`#error`. This is not yet a complete exception inventory: repeated condition
-names can fool sequence-based alignment and each candidate needs source
-anchors and a supported-context disposition.
+`#error`. Repeated condition names can fool sequence-based alignment; candidate
+pairings were therefore checked using source anchors and recorded below.
 
 ## Corrected original structure
 
@@ -16,7 +15,7 @@ anchors and a supported-context disposition.
   x86 and x64 preprocessing is byte-identical for selected paths against
   S29, and forcing NTVDM plus X86GFX reaches the intended error on each.
 
-## Confirmed local differences requiring further disposition
+## Confirmed local differences
 
 - `base/ccpu386/c_main.c`: six XP `#ifdef NTVDM` frames use the existing
   local `NTVDM || SOFTPC_CCPU_TLS_SIMSTACK` selection to provide the CCPU
@@ -41,11 +40,12 @@ present at current line 70 and XP line 69. Likewise, two `V7VGA` groups in
 `vga_mode.c` were paired to the wrong occurrences. Such initial candidates
 are not counted as confirmed defects. The `mouse.c` XP `#ifndef PROD` at
 line 442 is present at current line 377; it too is an alignment artifact.
-More paths remain under review.
+Additional locations are recorded below.
 
-## Additional candidate file groups (review in progress)
+## Additional candidate file groups
 
-The tree comparison currently flags 20 files. The entries below record
+The initial post-ROM tree comparison flagged 20 files; after the TLB
+correction the refreshed provisional list flags 19. The entries below record
 observed origins; they do not yet establish that each additional guard is
 indispensable or that the tree matcher cannot have missed an occurrence.
 
@@ -62,10 +62,12 @@ indispensable or that the tree matcher cannot have missed an occurrence.
 | `host/inc/cfpu_def.h`, `host/inc/host_cpu.h` | Little-endian and selected CCPU ABI guards; distinguish extra fail-fast branches from original conditions. |
 | `host/src/nt_cga.c`, `host/src/nt_graph.c` | Standalone rendering and V7 fields / sizing; assess each local condition against approved port and display behavior. |
 
-The six added `LITTLEND` conditions in `cfpu_def.h`, the added NEC_98 error
-siblings and other local guards must not be removed simply because XP lacks
-them: whether they are necessary to enforce the supported configuration
-remains an explicit review question.
+The six added `LITTLEND` conditions in `cfpu_def.h` and the added NEC_98
+error siblings retain explicit rejection of unsupported configurations.
+Their extra error-only branches are recorded because they have no XP sibling.
+The port-count checks in `host_def.h` also reject NEC_98 in ordinary builds,
+but are themselves guarded by optional existing port-count definitions;
+this does not prove the per-file error guards universally redundant.
 
 ## First correction qualification
 
@@ -92,14 +94,14 @@ in `vga_mode.c` where the local V7 condition was paired with XP's later V7
 condition. This check demonstrates that a nominally matched group cannot be
 assumed to have the same source context. The local V7 condition is included
 in the exception review above. The 11 low-similarity matches were individually dispositioned in the
-[context review](m9-t99-s30-context-review.tsv); wider candidate and
-necessary-exception review remains open.
+[context review](m9-t99-s30-context-review.tsv).
 
 ## Source-anchored local differences identified so far
 
-The following is a location-level record, not an assertion that these are
-the entire remaining set. Line numbers refer to the S30 correction commit.
-The conditions are retained pending the full minimality review.
+The following is a location-level record. Line numbers refer to the
+first S30 correction commit; the later TLB simplification removes two
+snapshot guards. Retained conditions preserve the selected product ABI,
+device behavior or explicit rejection of unsupported configurations.
 
 | Current file and location | Local structural difference and evidence |
 | --- | --- |
@@ -145,3 +147,51 @@ regression is included. Published binary SHA-256 values are:
 
 - softpc32.exe: `ae26ad03a004098d4291b79ce59831ccf734eb20ddfe6a08127ec59a8c1755cc`
 - softpc64.exe: `db2122acb5e838cb0a1f91f910c72aca6da002caf192d04a5608865c7329c3e8`
+
+The post-TLB initial matcher found 61 entries in 19 files. The corrected
+arm-aware matcher found three further PPI entries. The resulting 64 entries
+are overlapping matcher results, not a count of defects. The low-context
+review reflects its pre-TLB baseline.
+
+During the paired `c_main.c` check, a diagnostic listing inadvertently
+enumerated one XP `#ifndef PROD` child inside an arm whose current body is
+a single `#error`. That child was not used to classify or alter the excluded
+arm. Future checks must stop at the error boundary as the S30 packet requires.
+
+The initial matcher incorrectly stopped on a group when current added an
+error-only sibling and XP had no sibling. The corrected matcher continues
+through the matched selected arm and found three previously hidden candidate
+entries in `base/keymouse/ppi.c`: current 146 and 169, paired with XP 170.
+They are recorded in the [candidate dispositions](m9-t99-s30-candidate-disposition.tsv):
+standalone rejection of the obsolete speaker path, and the existing
+standalone extension of the PPI host-state delivery predicate. The refreshed
+matcher reports 64 entries in 19 files; entries overlap, and this is not a
+number of defects. The matched selected arms were then compared rather than discarded.
+
+## Final comparison and disposition
+
+The arm-aware matcher examined all 471 manifest text files, matched 3,613
+conditional groups and stopped at 2,392 matched `#error` arms. It reported
+64 overlapping candidate entries in 19 files. Each is categorized in the
+[candidate disposition](m9-t99-s30-candidate-disposition.tsv), including
+the two manually identified local conditions missed by the first alignment.
+Matched repeated-condition checks are recorded separately: 11 changed-body
+contexts, 24 low-context pairings, 59 middle-context pairings and 1,376
+high-context pairings. Source or original-line anchors were used where
+available; ten high-context cases without automatic anchors were manually
+checked. See the [changed-body review](m9-t99-s30-context-review.tsv),
+[low-context review](m9-t99-s30-repeated-review.tsv),
+[middle-context review](m9-t99-s30-repeated-middle-review.tsv), and
+[high-context review](m9-t99-s30-repeated-high-review.tsv).
+
+The matcher is an audit aid, not a formal proof of every possible textual
+alignment; repeated guards and local code movement require source judgment.
+The original compile-frame comparison intentionally excludes contents wholly
+replaced by `#error`. Existing local guards and changes listed above retain
+ABI, snapshot, device, video or unsupported-configuration contracts.
+
+Relative to S29, mirror production changes are two files: `rom.c` +2/-0 and
+`c_tlb.c` +1/-4, total +3/-4 (net -1). There are no test-source changes.
+Both production deliveries were built, published and fully tested for x86
+and x64; latest qualification is 194/194 per architecture with no skips.
+Neither user INI, media nor snapshots were modified.

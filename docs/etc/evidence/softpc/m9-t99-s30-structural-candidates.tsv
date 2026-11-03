@@ -16,8 +16,6 @@ base/ccpu386/c_main.c	1	current-unmatched	4699	if:defined(NTVDM)||defined(SOFTPC
 base/ccpu386/c_main.c	1	xp-unmatched	-	-	4838	ifdef:NTVDM
 base/ccpu386/c_main.c	1	xp-unmatched	-	-	4855	ifdef:NTVDM
 base/ccpu386/c_main.c	1	xp-unmatched	-	-	4870	ifdef:NTVDM
-base/ccpu386/c_tlb.c	1	current-unmatched	70	ifdef:FAST_TLB	-	-
-base/ccpu386/c_tlb.c	1	current-unmatched	151	ifdef:FAST_TLB	-	-
 base/inc/cpu_vid.h	1	current-unmatched	88	if:defined(CPU_40_STYLE)&&defined(C_VID)	-	-
 base/inc/cpu_vid.h	1	current-unmatched	115	if:defined(CPU_40_STYLE)&&defined(C_VID)	-	-
 base/inc/egacpu.h	1	current-unmatched	99	ifdef:C_VID	-	-
@@ -31,6 +29,9 @@ base/keymouse/mouse.c	2	xp-unmatched	-	-	442	ifndef:PROD
 base/keymouse/mouse_io.c	1	arm-mismatch	1921	ifndef:NEC_98;else:	1788	ifndef:NEC_98
 base/keymouse/ppi.c	2	current-unmatched	70	ifndef:SOFTPC_STANDALONE	-	-
 base/keymouse/ppi.c	1	arm-mismatch	119	ifndef:NEC_98;else:	114	ifndef:NEC_98
+base/keymouse/ppi.c	3	current-unmatched	146	ifndef:SOFTPC_STANDALONE	-	-
+base/keymouse/ppi.c	2	current-unmatched	169	if:defined(NTVDM)||defined(SOFTPC_STANDALONE)	-	-
+base/keymouse/ppi.c	2	xp-unmatched	-	-	170	ifdef:NTVDM
 base/keymouse/ppi.c	1	arm-mismatch	194	ifndef:NEC_98;else:	196	ifndef:NEC_98
 base/keymouse/ppi.c	1	current-unmatched	219	if:!defined(NTVDM)&&!defined(SOFTPC_STANDALONE)	-	-
 base/keymouse/ppi.c	1	current-unmatched	236	if:!defined(NTVDM)&&!defined(SOFTPC_STANDALONE)	-	-

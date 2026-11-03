@@ -28,35 +28,27 @@ records the earlier breadth-first audit and its limits.
 | Original Owner Request | 和原版不一致的，尽量修正得结构一致，实在不能一致的，需要登记diff。 |
 | Similar-Issue Sweep | Scan all 471 retained text files and all corresponding XP originals; account for local-only conditions, changed predicates, omitted selected original guards and excluded arms. |
 
-Disposable scratch is `build/t99-s30`, owned by S30, with a four-hour total
-and 30-minute no-progress observation budget. Retain auditable findings and
-retire scratch before closure.
+S30 executor deliveries `fde49418` and `5573b0dc` were pushed after dual
+builds, publishing and full qualification; the latter passed 194/194 tests
+on each architecture with no skips. The source diff from S29 is `rom.c`
++2/-0 and `c_tlb.c` +1/-4, with no test-source changes.
 
-Initial tree-based XP comparison examined all 471 text files, ignoring
-children under matched single-error arms. It identified 64 provisional
-structural entries in 21 files; sequence alignment can mismatch repeated
-conditions, so these entries require manual disposition. One actual missing
-original sibling in `base/system/rom.c` has been restored as its original
-#else with a single #error and preserved #line. After that correction the
-provisional comparison reports 63 entries in 20 files. Initial dual builds and gates passed. Both widths passed 186 non-native and
-eight native tests without skips. The first correction and [working review](../etc/evidence/softpc/m9-t99-s30-structural-review.md)
-are ready for delivery; the task is not complete and no final count of real
-differences is claimed.
+The [structural review](../etc/evidence/softpc/m9-t99-s30-structural-review.md)
+records local exception locations, original-condition repairs, candidate
+dispositions, repeated-condition checks, and the matching method's limits.
+The executor is continuing source-anchor and retained-guard minimality
+review; the current evidence does not establish complete correspondence.
+S30 and T99 remain open. Disposable scratch `build/t99-s30` is owned by S30
+and will be retired after its last jobs finish.
 
-First correction `fde49418` is pushed. The matcher can misalign repeated
-condition names; a secondary retained-arm context comparison found 11 low
-similarity pairings, each recorded in the [context review](../etc/evidence/softpc/m9-t99-s30-context-review.tsv).
-The working structural review now records identified local locations and
-still-open fail-fast / exception-minimality questions. The task remains
-active; these records are not an exhaustive proof of original alignment.
-
-The two local FAST_TLB guards in `c_tlb.c` snapshot save/restore are redundant:
-the file defines FAST_TLB unconditionally and no repository #undef exists.
-They have been removed, keeping the original XP FAST_TLB frame and copies;
-selected preprocessing matched the prior delivery on both architectures.
-Dual builds and both full suites passed: 194 tests per architecture, no
-skips. This correction is ready for delivery; remaining structural and
-exception-minimality review remains open.
+The corrected arm-aware matcher has 64 overlapping candidates in 19 files;
+66 disposition rows include those plus two local guards found by context
+review. Separate reviews cover 11 changed-body, 24 low-context, 59 middle
+and 1,376 high-context repeated-condition pairings. Source and line anchors
+provide evidence but are not a formal guarantee of all alignments. The
+remaining work is to resolve whether extra unsupported-configuration guards
+can be removed without weakening the established fail-fast contract and to
+complete an actual-commit review before owner acceptance.
 
 ## Technical Baseline
 

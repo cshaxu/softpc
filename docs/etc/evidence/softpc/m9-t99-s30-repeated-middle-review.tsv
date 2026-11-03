@@ -1,0 +1,60 @@
+path	depth	current_line	xp_line	condition	context_score	disposition	evidence
+base/bios/reset.c	1	179	187	if:defined(NEC_98)	0.387	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/bios/tape_io.c	1	148	161	ifdef:PM	0.466	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/c_intr.c	1	481	487	ifdef:PIG	0.402	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/c_main.c	1	762	775	ifdef:SYNCH_TIMERS	0.339	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/c_main.c	1	1239	1249	ifdef:PIG	0.459	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/c_main.c	1	1528	1544	ifdef:SPC486	0.49	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/c_mem.h	1	54	53	ifdef:PIG	0.367	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/cpu4gen.h	2	1917	3000	ifdef:CCPU	0.417	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/cpu4gen.h	2	1925	3013	ifdef:CCPU	0.377	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/cpu4gen.h	2	1946	3049	ifdef:CCPU	0.38	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/cpu4gen.h	2	1953	3061	ifdef:CCPU	0.393	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/cpu4gen.h	2	1960	3073	ifdef:CCPU	0.464	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/ccpu386/jmp.c	1	69	70	ifdef:TAKE_REAL_MODE_LIMIT_FAULT	0.427	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/comms/com.c	2	1125	1715	if:defined(NTVDM)&&defined(FIFO_ON)	0.489	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/comms/com.c	2	2307	3789	ifdef:NTVDM	0.46	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/comms/printer.c	2	436	400	if:defined(NEC_98)	0.419	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/comms/printer.c	2	635	674	if:defined(NEC_98)	0.412	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/comms/printer.c	2	670	709	if:defined(NEC_98)	0.361	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/comms/printer.c	2	708	741	ifndef:NEC_98	0.39	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/disks/diskbios.c	1	472	934	ifndef:NEC_98	0.486	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/disks/diskbios.c	1	532	1045	if:defined(NEC_98)	0.44	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/disks/diskbios.c	1	616	1144	if:defined(NEC_98)	0.486	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/disks/diskbios.c	1	665	1289	if:defined(NEC_98)	0.486	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/disks/floppy.c	1	392	506	if:defined(NEC_98)	0.447	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/disks/floppy.c	1	438	990	if:defined(NEC_98)	0.452	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/disks/floppy.c	1	484	1475	if:defined(NEC_98)	0.456	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/disks/floppy_i.c	1	112	553	ifndef:JOKER	0.457	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/disks/floppy_i.c	1	125	566	if:defined(NEC_98)	0.43	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/inc/dma.h	1	142	155	ifdef:BIT_ORDER2	0.443	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/inc/egacpu.h	1	103	143	if:defined(NEC_98)	0.479	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/inc/rs232.h	2	170	454	if:defined(NEC_98)	0.462	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/inc/rs232.h	2	243	579	ifdef:NTVDM	0.467	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/inc/rs232.h	2	253	588	ifdef:NTVDM	0.467	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/inc/rs232.h	2	267	601	if:defined(NEC_98)	0.467	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/inc/vgaports.h	2	21	395	ifdef:BIT_ORDER2	0.378	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/keymouse/keyba.c	1	2476	3121	if:defined(NEC_98)	0.315	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/keymouse/keyba.c	1	2588	3249	if:defined(NEC_98)	0.312	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/keymouse/keybd_io.c	1	555	672	ifndef:NTVDM	0.433	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/keymouse/mouse.c	1	193	113	if:defined(NEC_98)	0.497	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/keymouse/mouse_io.c	1	2549	2429	ifdef:NTVDM	0.482	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/support/ios.c	1	64	71	ifdef:MAC68K	0.338	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/cmos.c	1	653	694	ifdef:NTVDM	0.321	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/system/cmos.c	1	1052	1136	ifdef:NTVDM	0.412	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/ica.c	1	207	201	ifdef:NTVDM	0.491	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/idetect.c	2	238	277	ifdef:SMEG	0.42	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/system/timer.c	1	105	108	ifdef:NTVDM	0.412	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/timer.c	1	632	645	ifdef:NTVDM	0.344	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/timer.c	1	731	745	ifdef:NTVDM	0.383	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/timer.c	2	1774	1822	if:defined(NEC_98)	0.422	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/system/timer.c	1	2544	2993	if:!defined(NTVDM)	0.385	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/video/ega_prts.c	3	753	1282	ifdef:BIT_ORDER2	0.375	logical-line-near-xp	existing logical line is within three lines of XP guard
+base/video/ega_vide.c	3	1352	1675	ifdef:VGG	0.478	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/video/ega_vide.c	2	1872	2291	ifndef:NEC_98	0.381	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/video/gfx_updt.c	1	162	199	if:defined(NEC_98)	0.452	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+base/video/video.c	1	137	141	if:defined(NEC_98)	0.396	logical-line-near-xp	existing logical line is within three lines of XP guard
+host/src/nt_graph.c	1	89	81	if:defined(NEC_98)	0.312	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+host/src/nt_graph.c	1	628	774	if:defined(NEC_98)	0.472	logical-line-near-xp	existing logical line is within three lines of XP guard
+host/src/nt_graph.c	1	1628	1923	if:defined(NEC_98)	0.352	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches
+host/src/nt_sbfm.c	1	83	153	if:0	0.492	source-context-confirmed	surrounding function, declaration or comment identifies the same original guard; differences include excluded arms and local patches

@@ -1,0 +1,25 @@
+path	depth	current_line	xp_line	condition	disposition	evidence
+base/ccpu386/cpu4gen.h	2	1932	3025	ifdef:CCPU	same-frame-line-anchor	existing line control anchors current frame to XP line 3025; excluded bodies are not compared
+base/ccpu386/cpu4gen.h	2	1939	3037	ifdef:CCPU	same-frame-line-anchor	existing line control anchors current frame to XP line 3037; excluded bodies are not compared
+base/comms/com.c	2	782	1181	ifndef:NTVDM	same-frame-line-anchor	existing line control anchors current frame to XP line 1181; excluded bodies are not compared
+base/comms/printer.c	2	715	753	ifndef:NEC_98	same-frame-line-anchor	existing line control anchors current frame to XP line 753; excluded bodies are not compared
+base/comms/printer_.c	2	42	42	ifdef:PRINTER	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/inc/base_def.h	1	38	37	ifdef:ANSI	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/inc/base_def.h	1	119	116	ifdef:ANSI	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/inc/dsktrace.h	1	87	87	ifndef:PROD	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/inc/rs232.h	2	316	649	if:defined(NEC_98)	same-frame-line-anchor	existing line control anchors current frame to XP line 649; excluded bodies are not compared
+base/keymouse/keyba.c	1	143	208	if:defined(NEC_98)	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/keymouse/mouse_io.c	1	85	89	ifdef:EGG	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/support/time_day.c	1	90	93	if:defined(NEC_98)	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/system/timer.c	1	471	490	if:!defined(NTVDM)	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/system/timer.c	1	695	705	ifdef:NTVDM	same-frame-line-anchor	existing line control anchors current frame to XP line 705; excluded bodies are not compared
+base/video/ega_prts.c	3	410	722	ifdef:BIT_ORDER2	same-frame-line-anchor	existing line control anchors current frame to XP line 722; excluded bodies are not compared
+base/video/gfx_updt.c	1	4149	5969	ifndef:NEC_98	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/video/vga_mode.c	4	462	510	ifdef:V7VGA	alignment-artifact	local V7 frame at 462; XP frame 510 corresponds to current 488, as separately recorded
+base/video/video.c	1	48	47	ifndef:NEC_98	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/video/video.c	1	83	84	ifdef:EGG	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/video/video.c	1	108	108	ifdef:EGG	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/video/video.c	1	115	115	ifndef:NEC_98	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+base/video/video.c	1	162	185	if:defined(NEC_98)	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+host/inc/nt_fulsc.h	1	38	37	if:defined(NEC_98)	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
+host/inc/nt_fulsc.h	1	88	85	ifndef:PROD	same-frame-source-anchor	matched surrounding declarations or control flow; low score reflects omitted error body or line / formatting differences
