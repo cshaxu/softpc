@@ -274,7 +274,7 @@ LOCAL BOOL high_density IFN1(int, drive)
 void fl_disk_reset IFN1(int, drive)
 {
 #ifndef NEC_98
-#line 253
+#line 393
 	/*
 	 *	Reset the FDC and all drives. "drive" is not significant
 	 *
@@ -366,7 +366,7 @@ void fl_disk_reset IFN1(int, drive)
 
 	setup_end(IGNORE_SECTORS_TRANSFERRED);
 #endif // !NEC_98
-#line 343
+#line 484
 }
 
 void fl_disk_status IFN1(int, drive)
@@ -430,7 +430,7 @@ void fl_disk_read IFN1(int, drive)
         put_c0_MT(fdc_cmd_block, 1);
 	rd_wr_vf(drive, fdc_cmd_block, BIOS_DMA_READ);
 #endif // !NEC_98
-#line 401
+#line 986
 }
 
 void fl_disk_write IFN1(int, drive)
@@ -476,7 +476,7 @@ void fl_disk_write IFN1(int, drive)
 	put_c1_MT(fdc_cmd_block, 1);
 	rd_wr_vf(drive, fdc_cmd_block, BIOS_DMA_WRITE);
 #endif // !NEC_98
-#line 441
+#line 1471
 }
 
 void fl_disk_verify IFN1(int, drive)
@@ -522,7 +522,7 @@ void fl_disk_verify IFN1(int, drive)
 	put_c0_MT(fdc_cmd_block, 1);
 	rd_wr_vf(drive, fdc_cmd_block, BIOS_DMA_VERIFY);
 #endif // !NEC_98
-#line 481
+#line 1953
 }
 
 /*
@@ -653,7 +653,7 @@ void fl_disk_format IFN1(int, drive)
 	setup_end(IGNORE_SECTORS_TRANSFERRED);
 
 #endif // !NEC_98
-#line 606
+#line 2356
 }
 
 void fl_fnc_err IFN1(int, drive)
@@ -679,7 +679,7 @@ void fl_fnc_err IFN1(int, drive)
 	sas_store(FLOPPY_STATUS, FS_BAD_COMMAND);
 	setCF(1);
 #endif // !NEC_98
-#line 626
+#line 2385
 }
 
 void fl_disk_parms IFN1(int, drive)
@@ -730,7 +730,7 @@ void fl_disk_parms IFN1(int, drive)
 	if (    (equip_flag.bits.diskette_present == 1)
 	     && (drive < MAX_FLOPPY))
 #endif /* NTVDM */
-#line 671
+#line 2435
 	{
 
 		if (! high_density(drive))
@@ -1258,7 +1258,7 @@ LOCAL dr_type_check IFN3(half_word, drive_type, word *, seg_ptr, word *, off_ptr
 	dt_start = DR_TYPE_ADDR;
 	dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
 #endif  /* NTVDM */
-#line 1191
+#line 2967
 
 	while (dt_start < dt_end)
 	{
@@ -1317,7 +1317,7 @@ LOCAL void translate_new IFN1(int, drive)
 #line 3022
 	if (high_density(drive) && (drive < MAX_FLOPPY))
 #endif /* NTVDM */
-#line 1244
+#line 3024
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
 		if (disk_state == 0)
@@ -1359,7 +1359,7 @@ void translate_old IFN1(int, drive)
 #line 3062
 	if (high_density(drive) && (drive < MAX_FLOPPY) && (disk_state != 0))
 #endif  /* NTVDM */
-#line 1280
+#line 3064
 
 	{
 		/*
@@ -1735,7 +1735,7 @@ if( cmos_type( drive, &drive_type ) != FAILURE ){
 #else /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1624
+#line 3484
 
 			/*
 			 *	Set up disk state with current data
@@ -1757,13 +1757,13 @@ if( cmos_type( drive, &drive_type ) != FAILURE ){
 		}
 	}
 #endif // !NEC_98
-#line 1644
+#line 3505
 }
 
 LOCAL void fmt_init IFN1(int, drive)
 {
 #ifndef NEC_98
-#line 1648
+#line 3510
 	/*
 	 *	If the media type has not already been set up, establish
 	 *	the default media type for the drive type
@@ -1811,13 +1811,13 @@ LOCAL void fmt_init IFN1(int, drive)
 		}
 	}
 #endif // !NEC_98
-#line 1694
+#line 3557
 }
 
 LOCAL med_change IFN1(int, drive)
 {
 #ifndef NEC_98
-#line 1698
+#line 3562
 	/*
 	 *	Checks for media change, resets media change,
 	 *	checks media change again
@@ -1866,13 +1866,13 @@ LOCAL med_change IFN1(int, drive)
 	}
 	return(FAILURE);
 #endif // !NEC_98
-#line 1745
+#line 3610
 }
 
 LOCAL void send_rate IFN1(int, drive)
 {
 #ifndef NEC_98
-#line 1749
+#line 3615
 	/*
 	 *	Update the data rate for "drive"
 	 */
@@ -1899,7 +1899,7 @@ LOCAL void send_rate IFN1(int, drive)
 		outb(DISKETTE_DCR_REG, (IU8)(disk_state >> 6));
 	}
 #endif // !NEC_98
-#line 1774
+#line 3641
 }
 
 LOCAL chk_lastrate IFN1(int, drive)
@@ -1925,7 +1925,7 @@ LOCAL chk_lastrate IFN1(int, drive)
 LOCAL dma_setup IFN1(half_word, dma_mode)
 {
 #ifndef NEC_98
-#line 1798
+#line 3666
 	/*
 	 *	This routine sets up the DMA for read/write/verify
 	 *	operations
@@ -1989,13 +1989,13 @@ LOCAL dma_setup IFN1(half_word, dma_mode)
 
 	return(SUCCESS);
 #endif // !NEC_98
-#line 1860
+#line 3729
 }
 
 LOCAL fmtdma_set IFN0()
 {
 #ifndef NEC_98
-#line 1864
+#line 3734
 	/*
 	 *	This routine sets up the DMA for format operations
 	 */
@@ -2062,7 +2062,7 @@ LOCAL fmtdma_set IFN0()
 
 	return(SUCCESS);
 #endif // !NEC_98
-#line 1924
+#line 3797
 }
 
 LOCAL void nec_init IFN2(int, drive, FDC_CMD_BLOCK *, fcbp)
@@ -2611,7 +2611,7 @@ LOCAL void motor_on IFN1(int, drive)
 LOCAL turn_on IFN1(int, drive)
 {
 #ifndef NEC_98
-#line 2480
+#line 4364
 	/*
 	 *	Turn motor on and return wait state
 	 */
@@ -2674,7 +2674,7 @@ LOCAL turn_on IFN1(int, drive)
 	setIF(1);
 	return(FAILURE);
 #endif // !NEC_98
-#line 2541
+#line 4426
 }
 
 LOCAL void hd_wait IFN1(int, drive)
@@ -2772,7 +2772,7 @@ LOCAL void hd_wait IFN1(int, drive)
 LOCAL void nec_output IFN1(half_word, byte_value)
 {
 #ifndef NEC_98
-#line 2630
+#line 4521
 	/*
 	 *	This routine sends a byte to the FDC after testing for
 	 *	correct direction and controller ready. If the FDC does
@@ -2806,7 +2806,7 @@ LOCAL void nec_output IFN1(half_word, byte_value)
 	 */
 	waitf(FDC_SETTLE);
 #endif // !NEC_98
-#line 2662
+#line 4554
 }
 
 LOCAL seek IFN2(int, drive, int, track)
@@ -3021,7 +3021,7 @@ LOCAL wait_int IFN0()
 	setCS(RCPU_WAIT_INT_SEGMENT);
 	setIP(RCPU_WAIT_INT_OFFSET);
 #endif /* NTVDM */
-#line 2863
+#line 4765
 
 	host_simulate();
 
@@ -3063,7 +3063,7 @@ LOCAL wait_int IFN0()
 LOCAL results IFN0()
 {
 #ifndef NEC_98
-#line 2928
+#line 4831
 
 	/*
 	 *	This routine will read anything that the FDC controller
@@ -3136,13 +3136,13 @@ LOCAL results IFN0()
 
 	return(SUCCESS);
 #endif // !NEC_98
-#line 2999
+#line 4903
 }
 
 LOCAL read_dskchng IFN1(int, drive)
 {
 #ifndef NEC_98
-#line 3003
+#line 4908
 	/*
 	 *	Reads the state of the disk change line for "drive"
 	 */
@@ -3160,7 +3160,7 @@ LOCAL read_dskchng IFN1(int, drive)
 	inb(DISKETTE_DIR_REG, &diskette_dir_reg);
 	return(((diskette_dir_reg & DIR_DISKETTE_CHANGE) != 0) ? FAILURE : SUCCESS);
 #endif // !NEC_98
-#line 3019
+#line 4925
 }
 
 void drive_detect IFN1(int, drive)

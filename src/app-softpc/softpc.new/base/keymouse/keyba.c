@@ -220,7 +220,7 @@ GLOBAL VOID ( *do_key_repeats_fn_ptr )();
 #define	BUFF_6805_PMAX	64
 #define	BUFF_6805_PMASK	(BUFF_6805_PMAX - 1)
 #endif	/* NTVDM */
-#line 200
+#line 284
 
 #ifndef macintosh
 static half_word buff_6805[BUFF_6805_PMAX];
@@ -264,7 +264,7 @@ LOCAL	BOOL	sent_overrun=FALSE;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 237
+#line 338
 /* make arrays */
 static int *make_sizes;
 static half_word *make_arrays [134];
@@ -357,7 +357,7 @@ half_word scan_codes_temp_area[300];
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 324
+#line 476
 /*
  * The meaning of the keytype values as far as I can tell (IanJa) :
  *
@@ -401,7 +401,7 @@ static int set_1_make_sizes [13]=
   4			/* Case 5 ctrled size */
 };
 #endif   //NEC_98
-#line 360
+#line 518
 
 static int set_2_make_sizes [13]=
 { 1,2,2,2,4,8,		/* categories 1 to 6 inclusive */
@@ -554,7 +554,7 @@ static half_word most_set_1_make_codes [127]=
   0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x58,0x00,0x46,0x00			/* 70-7e */
 };
 #endif    //NEC_98
-#line 493
+#line 691
 
 static half_word most_set_2_make_codes [127]=
 { 0x00,0x0e,0x16,0x1e,0x26,0x25,0x2e,0x36,0x3d,0x3e,0x46,0x45,0x4e,0x55,0x6a,0x66,		/* 00-0f */
@@ -849,7 +849,7 @@ half_word *next_free, *extra_ptr, *extra_bk_ptr;
 #ifdef  JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 940
+#line 1337
 
 sure_note_trace1(AT_KBD_VERBOSE,"Keyboard key set initialisation: key set %d",key_set);
 next_free = scan_codes_temp_area;
@@ -988,7 +988,7 @@ switch (key_set)
 	break_arrays[CASE_5_CTRLED_ARRAY]=extra_bk_ptr;
 	extra_bk_ptr+=break_sizes[12];
 #endif   //NEC_98
-#line 1054
+#line 1506
 } /* end of init_key_arrays () */
 
 
@@ -998,7 +998,7 @@ GLOBAL VOID host_key_down IFN1(int,key)
 #ifdef SECURE /* { */
 #error "Unsupported SoftPC mirror configuration: SECURE"
 #endif /* SECURE } */
-#line 1080
+#line 1532
 {
 if (scanning_discontinued)
 	{
@@ -1029,7 +1029,7 @@ GLOBAL VOID host_key_up IFN1(int,key)
 #ifdef SECURE /* { */
 #error "Unsupported SoftPC mirror configuration: SECURE"
 #endif /* SECURE } */
-#line 1120
+#line 1587
 {
 if (scanning_discontinued)
 	{
@@ -1063,7 +1063,7 @@ else
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1139
+#line 1633
 
 LOCAL VOID do_host_key_down IFN1(int,key)
 {
@@ -1282,7 +1282,7 @@ if (!keyboard_disabled)
 #line 1847
 		if (key!=126)
 #endif    //NEC_98
-#line 1345
+#line 1849
 		    {
 		    if ((key_set != 3) || (set_3_key_state[key] == 1) || (set_3_key_state[key] == 4))
 			    {
@@ -1332,7 +1332,7 @@ if (!keyboard_disabled)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1384
+#line 1893
 	}
 	else
 	{
@@ -1345,7 +1345,7 @@ if (!keyboard_disabled)
 			typematic_key_valid=FALSE;
 			}
 #endif	/* NTVDM */
-#line 1393
+#line 1904
 
 		keytype=keytypes[key];
 		overrun=FALSE;
@@ -1480,7 +1480,7 @@ if (!keyboard_disabled)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1520
+#line 2037
 			} /* end of if not set 3 etc. */
 		switch (key)
 			{
@@ -1562,7 +1562,7 @@ if (waiting_for_next_code)
 					 key_set=cmd_code;
 					 init_key_arrays();
 #endif   //NEC_98
-#line 1592
+#line 2124
 					}
 				}
 			break;
@@ -1585,7 +1585,7 @@ if (waiting_for_next_code)
 			host_kb_light_on (cmd_code);
 			host_kb_light_off ((~cmd_code)&0x7);
 #endif
-#line 1609
+#line 2145
 			}
 			break;
 		case SET_RATE_DELAY_SEQUENCE:
@@ -1607,7 +1607,7 @@ if (waiting_for_next_code)
 #else	/* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 1625
+#line 2170
 			break;
 		}
 		waiting_for_next_code = FALSE;
@@ -1883,7 +1883,7 @@ GLOBAL VOID do_key_repeats IFN0()
 #ifdef JOKER
 #error "Unsupported SoftPC mirror configuration: JOKER"
 #endif
-#line 1863
+#line 2532
 
 if (typematic_key_valid)
 	{
@@ -2012,7 +2012,7 @@ if (waiting_for_next_8042_code)
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* PM */
-#line 1967
+#line 2721
 				   }
 #endif /* JOKER */
 
@@ -2029,7 +2029,7 @@ if (waiting_for_next_8042_code)
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
 #endif /* PM */
-#line 1983
+#line 2737
 				}
 			else
 				{
@@ -2186,7 +2186,7 @@ if (code_to_send_valid)
 		kbd_status |= 1;			/* Character now available! */
 
 #endif /* end of NTVDM else */
-#line 2122
+#line 2892
 	}
 
 } /* end of cmd_to_8042 */
@@ -2797,7 +2797,7 @@ GLOBAL VOID AT_kbd_init IFN0()
 	for (i=KEYBA_PORT_START;i<=KEYBA_PORT_END;i+=2)
 		io_connect_port(i, AT_KEYB_ADAPTOR, IO_READ_WRITE);
 #endif   //NEC_98
-#line 2728
+#line 3529
 
 #ifndef REAL_KBD
 	init_key_arrays();

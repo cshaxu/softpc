@@ -503,3 +503,24 @@ build logs contained 1526 mirror-path warning lines and no non-mirror warning
 line was observed. Published x86 and x64 EXE SHA-256 values are respectively
 `0666972945093cc8fcfde280f5548b3c3be81cbac338d4b6cbf079d4cff09418` and
 `0d613f0e51d03ccec783c6e3274154e2f86748d70d07d8423f892373ac260b02`.
+
+P13 extends the boundary search to three following nonempty source lines,
+including cases where the next line is blank or a directive. Of 913 leads in
+55 files, 850 also have an exact normalized prefix through the first anchor;
+63 have a differing prefix or offset and require individual review. The
+[lead list](m9-t99-s30-p13-following-line-candidates.tsv) remains a search aid,
+not proof of parent matching. The first batch changes 603 line controls in ten
+files with matching prefixes; every location appears in the
+[mapping](m9-t99-s30-p13-line-mapping.tsv). P13 selected preprocessing matched for nine actual translation units on
+each architecture, including a cpu4gen.h consumer; both builds passed. Both
+architectures passed 186/186 background and 8/8 native tests. On x64 the first
+two complete native runs each failed compact_console before AttachConsole,
+with child status 0xc0000142 and fixture stage 1 / error 6; the desktop session
+was active. A standalone compact test passed, as did two subsequent complete
+native runs, the last without concurrent x86 background testing. No cause has
+been established; the initial failures are not erased by the reruns. x86
+passed its native group on its first run. Build logs contained 5230 x64 and
+5179 x86 mirror-path warning lines and no non-mirror warning line was observed.
+Published x86 and x64 EXE SHA-256 values are respectively
+`78dc57790f0760827da3367f35a82cf5eea8e972df33e5034256c34cd964eb69` and
+`fb13d3919f78e44622ed658a7264e7181ac28810854b21b0583985c893b764c6`.

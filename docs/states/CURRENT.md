@@ -54,6 +54,17 @@ review, commit and push remain due. Do not modify an eleventh mirror file
 before P12 delivery. The 460 unresolved paired conditional groups remain
 under review, with nine root boundaries inspected and children accounted
 separately in the [P12 root review](../etc/evidence/softpc/m9-t99-s30-p12-root-boundary-review.tsv).
+P12 was committed and pushed as `df8f6af7`. A broader line-boundary scan
+found 913 further candidates: 850 have an exact source prefix through the
+first anchor, while 63 have a differing prefix or line offset and need separate
+review. The [candidate list](../etc/evidence/softpc/m9-t99-s30-p13-following-line-candidates.tsv)
+is not a proof that all mappings are correct. P13 modifies exactly ten mirror
+files, correcting 603 matching-prefix diagnostic lines. Actual preprocessing, dual build and publication passed; both architectures
+passed 186 background and 8 native tests. The x64 native group failed twice
+on compact_console child initialization before isolated and two full-group
+reruns passed; cause remains unconfirmed and is recorded in independent
+review. Complete review, commit and push before changing an eleventh file. Structural group matching
+and the 63 ambiguous line candidates remain open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

@@ -173,7 +173,7 @@ LOCAL void 	vd_dummy IPT0();
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 138
+#line 276
 
 void (*video_func[]) () = {
 				vd_set_mode,
@@ -196,7 +196,7 @@ void (*video_func[]) () = {
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #else /* !HERC */
-#line 161
+#line 299
 				vd_dummy,
 				vd_dummy,
 #endif /* HERC */
@@ -213,11 +213,11 @@ void (*video_func[]) () = {
 #else /* !VGG */
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 177
+#line 315
 				vd_dummy,
 			   };
 #endif // !NEC_98
-#line 179
+#line 318
 
 #ifndef NEC_98
 #line 320
@@ -355,7 +355,7 @@ simple_bios_byte_wrt IFN2(ULONG, ch, ULONG, ch_addr)
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* not EGG or C_VID or A_VID */
-#line 300
+#line 678
 }
 
 GLOBAL VOID
@@ -366,7 +366,7 @@ simple_bios_word_wrt IFN2(ULONG, ch_attr, ULONG, ch_addr)
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif	/* not EGG or C_VID or A_VID */
-#line 310
+#line 688
 }
 
 /*
@@ -398,7 +398,7 @@ GLOBAL void vd_set_mode IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 341
+#line 719
         return;
     }
     if (equip_flag.bits.video_mode == VIDEO_MODE_80X25_BW) {
@@ -642,7 +642,7 @@ GLOBAL void vd_get_light_pen IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 578
+#line 970
     }
 }
 
@@ -841,7 +841,7 @@ GLOBAL void vd_scroll_up IFN0()
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 753
+#line 1175
     /*
      * re-enable video for this mode, if on a CGA adaptor (fixes ROUND42 bug).
      */
@@ -851,7 +851,7 @@ GLOBAL void vd_scroll_up IFN0()
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 759
+#line 1186
 }
 
 /*
@@ -1103,7 +1103,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 942
+#line 1505
 	;
     }
 
@@ -1295,7 +1295,7 @@ GLOBAL void vd_scroll_down IFN0()
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 1106
+#line 1699
     /*
      * re-enable video for this mode, if on a CGA adaptor (fixes ROUND42 bug).
      */
@@ -1305,7 +1305,7 @@ GLOBAL void vd_scroll_down IFN0()
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1112
+#line 1710
 }
 
 LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr)
@@ -1519,7 +1519,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1267
+#line 1992
 	;
     }
 
@@ -1693,7 +1693,7 @@ GLOBAL void vd_read_attrib_char IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !EGG"
 #endif
-#line 1433
+#line 2164
 	if (cgen != 0)
 		for(i = 0; i < CHARS_IN_GEN; i++) {
 			sas_loads (cgen, tmp, sizeof(tmp));
@@ -2194,7 +2194,7 @@ GLOBAL void vd_read_dot IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif /* CPU_40_STYLE */
-#line 1885
+#line 2712
 
 GLOBAL void vd_write_teletype IFN0()
 {
@@ -2223,14 +2223,14 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1909
+#line 2739
 
     unsigned short savedAX, savedBX, savedCX, savedIP, savedCS, savedDX;
     unsigned short re_entrant = FALSE;
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1912
+#line 2746
 
     /* Load internal variables with the values stored in BIOS
      * data area.
@@ -2267,7 +2267,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1931
+#line 2811
     /*
      * First check to see if it is a control character and if so action
      * it here rather than call the write char function.
@@ -2307,7 +2307,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1963
+#line 2860
         /*
          * It's a real character, place it in the regen buffer.
          */
@@ -2334,7 +2334,7 @@ GLOBAL void vd_write_teletype IFN0()
                  host_simulate();
 
 #endif	/* NTVDM & MONITOR */
-#line 1984
+#line 2893
 
 		/*
 		 * Note: Always make sure CS comes before IP
@@ -2456,7 +2456,7 @@ GLOBAL void vd_write_teletype IFN0()
              host_simulate();
 
 #endif	/* NTVDM & MONITOR */
-#line 2099
+#line 3050
 
 		/*
 		 * Note: Always make sure CS comes before IP
@@ -2541,7 +2541,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef EGA_DUMP
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP"
 #endif
-#line 2179
+#line 3144
 
     }
 }
@@ -2754,7 +2754,7 @@ GLOBAL void graphics_write_char IFN5(half_word, x, half_word, y, half_word, wcha
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 2373
+#line 3597
             return;
         }
         else
@@ -2882,7 +2882,7 @@ LOCAL void vd_dummy IFN0()
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 2528
+#line 3752
 
 GLOBAL void video_init IFN0()
 {
@@ -2892,7 +2892,7 @@ GLOBAL void video_init IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 2537
+#line 3761
 
 
     /*
@@ -2912,7 +2912,7 @@ GLOBAL void video_init IFN0()
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif /* HERC */
-#line 2567
+#line 3791
 #ifdef EGG
     	case EGA:
     	case VGA:

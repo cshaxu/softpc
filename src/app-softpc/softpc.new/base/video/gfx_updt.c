@@ -206,7 +206,7 @@ GLOBAL LONG dirty_curs_y;
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM & MONITOR */
-#line 216
+#line 247
 
 	LOCAL VOID save_gfx_update_routines IPT0();
 	LOCAL VOID inhibit_gfx_update_routines IPT0();
@@ -223,7 +223,7 @@ GLOBAL LONG dirty_curs_y;
 #ifdef	HOST_SCREEN_UPDATES
 #error "Unsupported SoftPC mirror configuration: HOST_SCREEN_UPDATES"
 #else	/* HOST_SCREEN_UPDATES */
-#line 235
+#line 266
 
 #define	HostUpdatedVGA()	FALSE
 #define	HostUpdatedEGA()	FALSE
@@ -483,7 +483,7 @@ static	void	paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 473
+#line 552
 	}
 	/* Clear out video copy */
 	for(i = &dirty[start_rec];i<end_ptr;i++)
@@ -514,7 +514,7 @@ static	void	paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 500
+#line 579
 
 static	int	ega_text_find_dirty_lines IFN5(byte *, vcopy, byte *, planes,
 	int, start_line, int, end_line, int, screen_start)
@@ -555,7 +555,7 @@ static	int	ega_text_find_dirty_lines IFN5(byte *, vcopy, byte *, planes,
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 538
+#line 618
 				break;	/* onto next line */
 			}
 		}
@@ -594,7 +594,7 @@ static	void	ega_text_paint_dirty_recs IFN2(int, start_rec, int, end_rec)
 		}
 	}
 #endif  //NEC_98
-#line 571
+#line 654
 }
 
 #endif /* EGG */
@@ -602,7 +602,7 @@ static	void	ega_text_paint_dirty_recs IFN2(int, start_rec, int, end_rec)
 #ifdef SEGMENTATION 			/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 578
+#line 661
 
 #endif /* REAL_VGA */
 
@@ -621,7 +621,7 @@ VOID remove_old_cursor IFN0()
 		dirty_curs_offs = -1;
 	}
 #endif  //NEC_98
-#line 593
+#line 678
 }
 
 
@@ -632,7 +632,7 @@ simple_handler IFN0()
 #line 685
 	setVideodirty_total(getVideodirty_total() + 1);
 #endif  //NEC_98
-#line 600
+#line 687
 }
 
 LOCAL	boolean simple_update IFN0()
@@ -657,7 +657,7 @@ LOCAL VOID simple_update_b_move IFN4(UTINY *, laddr, UTINY *, haddr,
 #line 706
 	setVideodirty_total(getVideodirty_total() + 1);
 #endif  //NEC_98
-#line 617
+#line 708
 }
 
 MEM_HANDLERS vid_handlers =
@@ -753,7 +753,7 @@ void	reset_paint_routines IFN0()
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 712
+#line 803
 
 void	ega_wrap_split_text_update IFN0()
 {
@@ -914,7 +914,7 @@ void	ega_wrap_split_text_update IFN0()
 
 	setVideodirty_total(0);
 #endif  //NEC_98
-#line 869
+#line 962
 }
 
 void	ega_split_text_update IFN0()
@@ -1012,7 +1012,7 @@ void	ega_split_text_update IFN0()
 
 	setVideodirty_total(0);
 #endif  //NEC_98
-#line 963
+#line 1058
 }
 
 void ega_wrap_text_update IFN0()
@@ -1232,7 +1232,7 @@ void ega_text_update IFN0()
 #ifdef SEGMENTATION 			/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 1172
+#line 1247
 
 /*
  * Update the window to look like the regen buffer says it should
@@ -1241,7 +1241,7 @@ void ega_text_update IFN0()
 void text_update IFN0()
 {
 #ifndef NEC_98
-#line 1179
+#line 1255
 
     register int i;	/* Loop counters		*/
     register int j,k;
@@ -1345,7 +1345,7 @@ void text_update IFN0()
 
     host_end_update();
 #endif  //NEC_98
-#line 1281
+#line 1358
 }
 
 /*
@@ -1483,7 +1483,7 @@ cga_graph_update_unchained IFN0()
 
     setVideodirty_total(0);
 #endif  //NEC_98
-#line 1415
+#line 1494
 }
 
 #ifdef	EGG
@@ -1651,7 +1651,7 @@ cga_graph_update_chain2 IFN0()
 
     host_end_update();
 #endif  //NEC_98
-#line 1579
+#line 1660
 }
 
 LOCAL VOID
@@ -1815,7 +1815,7 @@ cga_graph_update_chain4 IFN0()
 
     host_end_update();
 #endif  //NEC_98
-#line 1739
+#line 1822
 }
 #endif	/* EGG */
 
@@ -2116,7 +2116,7 @@ static	void	vga_paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 		do *j++ = 0; while(j<end);
 	}
 #endif  //NEC_98
-#line 2016
+#line 2069
 }
 
 
@@ -2207,7 +2207,7 @@ void	vga_graph_update IFN0()
 
 	host_end_update();
 #endif  //NEC_98
-#line 2103
+#line 2157
 }
 
 void	vga_split_graph_update IFN0()
@@ -2265,7 +2265,7 @@ void	vga_split_graph_update IFN0()
 
     	host_end_update();
 #endif  //NEC_98
-#line 2157
+#line 2213
 }
 
 #endif /* VGG */
@@ -2341,7 +2341,7 @@ void	ega_graph_update IFN0()
 
 	host_end_update();
 #endif  //NEC_98
-#line 2229
+#line 2285
 }
 
 
@@ -2446,7 +2446,7 @@ void	ega_wrap_graph_update IFN0()
 
     	host_end_update();
 #endif  //NEC_98
-#line 2330
+#line 2382
 }
 
 #endif /* EGG */
@@ -2454,7 +2454,7 @@ void	ega_wrap_graph_update IFN0()
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 2337
+#line 2389
 
 /*---------------------  Scrolling routines --------------------------*/
 
@@ -2466,7 +2466,7 @@ adjust_cursor IFN7(ULONG, dirn, ULONG, tlx, ULONG, tly, ULONG, width,
 	ULONG, height, ULONG, lines, ULONG, bpl )
 {
 #ifndef NEC_98
-#line 2347
+#line 2400
 
 	/*
 	 * We must not adjust dirty_curs_offset here if it is -1, as this tells
@@ -2493,7 +2493,7 @@ adjust_cursor IFN7(ULONG, dirn, ULONG, tlx, ULONG, tly, ULONG, width,
 				setVideodirty_total(getVideodirty_total() + 1);
 			}
 #endif  //NEC_98
-#line 2372
+#line 2426
 }
 
 /*ARGSUSED5*/
@@ -2554,7 +2554,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 2426
+#line 2483
 
 		/* originally dummy was char [2] */
 		/* unfortunately doing (short) *dummy */
@@ -2589,7 +2589,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 2460
+#line 2517
 
 	/* Do the host stuff */
 
@@ -2689,7 +2689,7 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 	host_scroll_complete();
 
 #endif  //NEC_98
-#line 2557
+#line 2615
 	return TRUE;
 }
 
@@ -2834,7 +2834,7 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 	host_scroll_complete();
 
 #endif  //NEC_98
-#line 2692
+#line 2754
 	return TRUE;
 }
 
@@ -3003,7 +3003,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 
 	return TRUE;
 #endif  //NEC_98
-#line 2851
+#line 2917
 }
 
 /*ARGSUSED5*/
@@ -3117,7 +3117,7 @@ boolean cga_text_scroll_down IFN6(int, start, int, width, int, height,
 	host_scroll_complete();
 
 #endif  //NEC_98
-#line 2956
+#line 3026
 	return TRUE;
 }
 
@@ -3430,11 +3430,11 @@ boolean v7vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 	UNUSED(dummy);
 	
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
-#line 3313
+#line 3314
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
 #endif
-#line 3315
+#line 3317
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3463,11 +3463,11 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 	UNUSED(dummy_arg);
 	
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(MONITOR))
-#line 3341
+#line 3342
 	if ( getVM() )
 	   return FALSE;   /* Don't optimise in V86 Mode */
 #endif
-#line 3343
+#line 3345
 
 	(*update_alg.calc_update)();
 	/* do the host stuff */
@@ -3490,7 +3490,7 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 3273
+#line 3371
 
 /*ARGSUSED5*/
 boolean ega_graph_scroll_up IFN6(int, start, int, width, int, height,
@@ -3573,7 +3573,7 @@ boolean ega_graph_scroll_down IFN6(int, start, int, width, int, height,
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 3331
+#line 3441
 
 #endif /* REAL_VGA */
 
@@ -3598,7 +3598,7 @@ boolean	dummy_scroll IFN6(int,dummy1,int,dummy2,int,dummy3,int,
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
-#line 3446
+#line 3556
 
 #ifdef	EGG
 /*
@@ -3640,7 +3640,7 @@ GLOBAL VOID cga_mark_word IFN1(int, addr)
 
 	setVideodirty_total(getVideodirty_total() + 2);
 #endif  //NEC_98
-#line 3479
+#line 3593
 }
 
 GLOBAL VOID cga_mark_string IFN2(int, laddr, int, haddr)
@@ -3664,7 +3664,7 @@ GLOBAL VOID cga_mark_string IFN2(int, laddr, int, haddr)
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 3498
+#line 3614
 
 GLOBAL VOID ega_mark_byte IFN1(int, off_in)
 {
@@ -3687,7 +3687,7 @@ GLOBAL VOID ega_mark_byte IFN1(int, off_in)
 	setVideodirty_total(getVideodirty_total() + 1);
 #endif /* GORE */
 #endif  //NEC_98
-#line 3516
+#line 3634
 }
 
 GLOBAL VOID ega_mark_word IFN1(int, addr)
@@ -3697,7 +3697,7 @@ GLOBAL VOID ega_mark_word IFN1(int, addr)
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 3523
+#line 3642
 
 	register	int	offset1 = addr >> 2;
 	register	int	offset2 = (addr+1) >> 2;
@@ -3714,7 +3714,7 @@ GLOBAL VOID ega_mark_word IFN1(int, addr)
 	setVideodirty_total(getVideodirty_total() + 2);
 #endif /* GORE */
 #endif  //NEC_98
-#line 3538
+#line 3658
 }
 
 GLOBAL VOID ega_mark_wfill IFN3(int, laddr, int, haddr, int, col)
@@ -3725,7 +3725,7 @@ GLOBAL VOID ega_mark_wfill IFN3(int, laddr, int, haddr, int, col)
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 3545
+#line 3666
 
 	register	int	offset1 = laddr >> 2;
 	register	int	offset2 = haddr >> 2;
@@ -3777,7 +3777,7 @@ GLOBAL VOID ega_mark_string IFN2(int, laddr, int, haddr)
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 3588
+#line 3712
 
 GLOBAL VOID screen_refresh_required IFN0()
 {
@@ -3806,7 +3806,7 @@ GLOBAL VOID screen_refresh_required IFN0()
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 3614
+#line 3743
 
 LOCAL MARKING_TYPE curr_mark_type;
 
@@ -3861,7 +3861,7 @@ set_mark_funcs IFN0()
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
-#line 3669
+#line 3802
 
 			update_alg.mark_byte = (T_mark_byte)ega_mark_byte;
 			update_alg.mark_word = (T_mark_word)ega_mark_word;
@@ -3916,7 +3916,7 @@ set_mark_funcs IFN0()
 			assert1(NO,"Unknown marking type %d", (int) curr_mark_type);
 			break;
 #endif  //NEC_98
-#line 3733
+#line 3861
 	}
 }
 
@@ -3925,7 +3925,7 @@ set_mark_funcs IFN0()
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 3739
+#line 3868
 
 GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 		MARKING_TYPE, marking_type, SCROLL_TYPE, scroll_type)
@@ -3947,7 +3947,7 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 			update_alg.scroll_up = text_scroll_up;
 			update_alg.scroll_down = text_scroll_down;
 #endif	/* NTVDM & MONITOR */
-#line 3753
+#line 3888
 			break;
 #line 3889
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove unneeded code */
@@ -3975,7 +3975,7 @@ GLOBAL void set_gfx_update_routines IFN3(T_calc_update, update_routine,
 #endif /* !NTVDM | (NTVDM & !X86GFX) */
 #line 3911
 #endif  //NEC_98
-#line 3774
+#line 3912
 	}
 
 	curr_mark_type = marking_type;
@@ -4018,7 +4018,7 @@ void cursor_changed IFN2(int, x, int, y)
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 3815
+#line 3955
 }
 #endif
 

@@ -521,7 +521,7 @@ SWTMR_init_funcptrs IFN0()
         timer_tick_func                 = SWTMR_time_tick;
 
 #ifndef NTVDM
-#line 465
+#line 544
         /*
          * initialise stuff for PM timer hack
          */
@@ -532,7 +532,7 @@ SWTMR_init_funcptrs IFN0()
                 adj_n_real_mode_ticks_before_full_speed = n_rm_instrs_before_full_speed / adj_instrs_per_tick;
         }
 #endif
-#line 474
+#line 554
 }
 
 void
@@ -547,7 +547,7 @@ SWTMR_time_tick IFN0()
     /* this is done in Nt's host heartbeat */
     IDLE_tick();
 #endif
-#line 485
+#line 567
 
     /*
      * Interrupt routine - called from time_strobe event/signal handler.
@@ -635,7 +635,7 @@ void SWTMR_gate IFN2(io_addr, port, half_word, value)
 #line 648
     checktimelock();
 #endif
-#line 554
+#line 650
 }
 
 
@@ -698,7 +698,7 @@ void SWTMR_inb IFN2(io_addr, port, half_word *, value)
 #line 708
     checktimelock();
 #endif
-#line 602
+#line 710
 
 }
 
@@ -789,7 +789,7 @@ LOCAL void checktimelock IFN0()
         }
 }
 #endif
-#line 667
+#line 825
 
 /*
  *      emulate the 8253 chip.
@@ -1310,7 +1310,7 @@ LOCAL void outputWaveForm IFN5(unsigned int, delay, unsigned long, lowclocks,
 #line 1343
         if (pcu == &timers[2])
 #endif   //NEC_98
-#line 1148
+#line 1345
         {
                 host_timer2_waveform(delay,lowclocks,hiclocks,lohi,repeat);
         }
@@ -1797,7 +1797,7 @@ LOCAL unsigned long clocksSinceCounterActivated IFN1(struct host_timeval *, now)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1623
+#line 1854
              break;
     }
     return nclocks;
@@ -1835,7 +1835,7 @@ LOCAL void updateCounter IFN0()
                 nticks = clocksSinceCounterActivated(&now);
                 updateCount(nticks, &wrap,&now);
 #endif
-#line 1645
+#line 1886
                 if (wrap)
                         pcu->tickadjust = pcu->Count;
                 if (pcu->m == INT_ON_TERMINALCOUNT && wrap)
@@ -1870,7 +1870,7 @@ LOCAL void updateCounter IFN0()
                 nticks = clocksSinceCounterActivated(&now);
                 updateCount(nticks, &wrap,&now);
 #endif
-#line 1667
+#line 1916
                 if (wrap)
                 {
                         pcu->Count = 0;
@@ -1955,7 +1955,7 @@ LOCAL void timer_generate_int IFN1(long, n)
 
 
 #ifndef NTVDM
-#line 1781
+#line 2197
 /*
  * Handle a cranked up timer where multiple interrupts are
  * required per tick. Schedule 'n' ints over a tick. Period
@@ -2155,7 +2155,7 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1988
+#line 2560
                 }
         }
 
@@ -2214,12 +2214,12 @@ LOCAL void setLastWrap IFN2(unsigned int, nclocks, struct host_timeval *, now)
 }
 
 #endif  /* NTVDM*/
-#line 2033
+#line 2612
 
 
 
 #ifndef NTVDM
-#line 2036
+#line 2616
 /*
  * If the host timer gives the same result as last time it was called,
  * we must give the illusion that time has passed.
@@ -2252,7 +2252,7 @@ LOCAL unsigned long guess IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 2071
+#line 2651
         }
         if(pcu->guessesSoFar++ > pcu->guessesPerHostTick)
         {
@@ -2264,7 +2264,7 @@ LOCAL unsigned long guess IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 2085
+#line 2665
         }
         pcu->microtick += pcu->timeFrig;
         return (pcu->microtick + pcu->lastTicks);
@@ -2405,7 +2405,7 @@ LOCAL void getHostSysTime IFN1(struct host_timeval *, t)
         }
 }
 #endif /* !NTVDM */
-#line 2225
+#line 2808
 
 
 /*
@@ -2437,7 +2437,7 @@ void    axe_ticks IFN1(int, ticks)
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
-#line 2266
+#line 2865
 
 LOCAL void IdealTimeInit IFN0()
 {
@@ -2469,7 +2469,7 @@ LOCAL void Timer_init IFN0()
         timers[1].getTime = getHostSysTime;     /* We don't really expect anyone to use timer 1 */
         timers[2].getTime = getHostSysTime;     /* Use real host time for timer 2 */
 #endif
-#line 2285
+#line 2893
 }
 
 LOCAL void counter_init IFN1(COUNTER_UNIT *, p)
@@ -2481,7 +2481,7 @@ LOCAL void counter_init IFN1(COUNTER_UNIT *, p)
         p->guessesPerHostTick = p->guessesSoFar = 2;            /* Handy to count from 2! */
         p->timeFrig = ticksPerIdealInterval / p->guessesPerHostTick;
 #endif
-#line 2293
+#line 2903
 }
 
 #if !defined (NTVDM)
@@ -2546,7 +2546,7 @@ void timer_init IFN0()
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 2380
+#line 3007
 
 
         active_int_event = FALSE; /* clear any cranked timer state */
@@ -2556,7 +2556,7 @@ void timer_init IFN0()
         ica_iret_hook_control(ICA_MASTER, CPU_TIMER_INT, TRUE);
 #endif
 #endif /* !NTVDM */
-#line 2388
+#line 3016
 }
 
 void    timer_post IFN0()

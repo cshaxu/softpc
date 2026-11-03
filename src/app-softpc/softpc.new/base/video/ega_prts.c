@@ -1110,7 +1110,7 @@ RETURN PARAMS   :	None
 LOCAL void	do_new_cursor IFN0()
 {
 #ifndef NEC_98
-#line 1641
+#line 1642
 
 	note_entrance0("do_new_cursor()");
 
@@ -1198,7 +1198,7 @@ LOCAL void	do_new_cursor IFN0()
 
 	base_cursor_shape_changed();
 #endif   //NEC_98
-#line 1727
+#line 1729
 }
 
 /*
@@ -1259,7 +1259,7 @@ LOCAL void	do_chain_majority_decision IFN0()
 
 	current_votes = new_votes;
 #endif   //NEC_98
-#line 1784
+#line 1788
 }
 
 
@@ -1302,7 +1302,7 @@ set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif
-#line 1817
+#line 1826
 
 #ifdef V7VGA
 	if( get_seq_chain4_mode() && get_chain4_mode() )
@@ -1338,7 +1338,7 @@ set_banking IFN2(UTINY, rd_bank, UTINY, wrt_bank)
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
 #endif   //NEC_98
-#line 1852
+#line 1862
 }
 
 GLOBAL void
@@ -1353,7 +1353,7 @@ update_banking IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
-#line 1864
+#line 1875
 
 	set_banking( rd_bank, wrt_bank );
 #endif  //NEC_98
@@ -1392,7 +1392,7 @@ init_vga_globals IFN0()
 #line 1921
 	update_banking();
 #endif  //NEC_98
-#line 1888
+#line 1923
 }
 
 void	ega_init IFN0()
@@ -1430,7 +1430,7 @@ void	ega_init IFN0()
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 1923
+#line 1959
 
 	io_define_outb(EGA_GC_ADAP_DATA,ega_gc_set_reset);
 	Cpu_define_outb(EGA_GC_ADAP_DATA,NULL);
@@ -1557,13 +1557,13 @@ void	ega_init IFN0()
 	timer_video_enabled = TRUE;
 
 #endif  //NEC_98
-#line 2048
+#line 2085
 }
 
 void	ega_term IFN0()
 {
 #ifndef NEC_98
-#line 2052
+#line 2090
 
 int	index;
 
@@ -1633,13 +1633,13 @@ int	index;
 	ega_read_term();
 	ega_write_term();
 #endif  //NEC_98
-#line 2120
+#line 2159
 }
 
 LOCAL void	ega_seq_outb_index IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2124
+#line 2164
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -1660,7 +1660,7 @@ GLOBAL half_word ega_snapshot_seq_reset IFN0()
 void	ega_seq_reset IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2141
+#line 2177
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -1677,7 +1677,7 @@ void	ega_seq_reset IFN2(io_addr, port, half_word, value)
 	else
 		 clear_bit_display_disabled(SYNC_RESET);
 #endif  //NEC_98
-#line 2156
+#line 2193
 }
 
 void	ega_seq_clock IFN2(io_addr, port, half_word, value)
@@ -1709,13 +1709,13 @@ register unsigned dot_clock;
 		flag_mode_change_required();
 	}
 #endif  //NEC_98
-#line 2184
+#line 2223
 }
 
 void	ega_seq_map_mask IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2188
+#line 2228
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -1735,7 +1735,7 @@ void	ega_seq_map_mask IFN2(io_addr, port, half_word, value)
 
 	ega_write_routines_update(PLANES_ENABLED);
 #endif  //NEC_98
-#line 2206
+#line 2247
 }
 
 void	ega_seq_char_map IFN2(io_addr, port, half_word, value)
@@ -1769,13 +1769,13 @@ register unsigned map_selects;
 		flag_mode_change_required();
 	}
 #endif  //NEC_98
-#line 2236
+#line 2279
 }
 
 void	ega_seq_mem_mode IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2240
+#line 2284
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -1798,7 +1798,7 @@ void	ega_seq_mem_mode IFN2(io_addr, port, half_word, value)
 
 	assert1(sequencer.memory_mode.as_bfld.extended_memory == 1,"Someone is trying to set extended memory to 0 (reg=%x)",value);
 #endif  //NEC_98
-#line 2261
+#line 2306
 }
 
 LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
@@ -2107,13 +2107,13 @@ LOCAL void	ega_crtc_outb IFN2(io_addr, port, half_word, value)
 			break;
 	}
 #endif  //NEC_98
-#line 2566
+#line 2613
 }
 
 LOCAL void	ega_crtc_inb IFN2(io_addr, port, half_word *, value)
 {
 #ifndef NEC_98
-#line 2570
+#line 2618
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2157,7 +2157,7 @@ LOCAL void	ega_crtc_inb IFN2(io_addr, port, half_word *, value)
 			break;
 	}
 #endif  //NEC_98
-#line 2612
+#line 2661
 }
 
 
@@ -2175,7 +2175,7 @@ void	ega_gc_outb_index IFN2(io_addr, port, half_word, value)
 	io_redefine_outb(EGA_GC_ADAP_DATA,ega_gc_regs[value & 15]);
 	Cpu_define_outb(EGA_GC_ADAP_DATA,ega_gc_regs_cpu[value & 15]);
 #endif  //NEC_98
-#line 2626
+#line 2677
 }
 
 
@@ -2190,7 +2190,7 @@ void	ega_gc_outb_index IFN2(io_addr, port, half_word, value)
 GLOBAL VOID ega_gc_outw IFN2(io_addr, port, word, outval)
 {
 #ifndef NEC_98
-#line 2639
+#line 2691
 	reg     temp;
 	INT		value;
 
@@ -2208,7 +2208,7 @@ GLOBAL VOID ega_gc_outw IFN2(io_addr, port, word, outval)
 
 	(*(ega_gc_regs[value]))((IU16)(port+1), temp.byte.high);
 #endif  //NEC_98
-#line 2655
+#line 2708
 }
 
 
@@ -2235,7 +2235,7 @@ register unsigned set_reset;
 		ega_write_routines_update(SET_RESET);
 	}
 #endif  //NEC_98
-#line 2678
+#line 2733
 }
 
 void	ega_gc_enable_set IFN2(io_addr, port, half_word, value)
@@ -2260,7 +2260,7 @@ register unsigned en_set_reset;
 		ega_write_routines_update(ENABLE_SET_RESET);
 	}
 #endif  //NEC_98
-#line 2699
+#line 2756
 }
 
 void	ega_gc_compare IFN2(io_addr, port, half_word, value)
@@ -2281,13 +2281,13 @@ register unsigned colour_compare;
 		if (read_state.mode == 1) ega_read_routines_update();
 	}
 #endif  //NEC_98
-#line 2716
+#line 2775
 }
 
 void	ega_gc_rotate IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2720
+#line 2780
 	struct {
 		unsigned value : 8;
 	} new;
@@ -2313,13 +2313,13 @@ void	ega_gc_rotate IFN2(io_addr, port, half_word, value)
 	EGA_CPU.fun_or_protection = (value != 0) || write_state.bp;
 	graphics_controller.data_rotate.as.abyte = value;
 #endif  //NEC_98
-#line 2744
+#line 2805
 }
 
 void	ega_gc_read_map IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 2748
+#line 2810
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2329,7 +2329,7 @@ void	ega_gc_read_map IFN2(io_addr, port, half_word, value)
 
 	update_shift_count();
 #endif  //NEC_98
-#line 2756
+#line 2819
 }
 
 void	ega_gc_mode IFN2(io_addr, port, half_word, value)
@@ -2383,7 +2383,7 @@ MODE new_mode;
 
 	assert0(graphics_controller.mode.as_bfld.test_condition == 0,"Test conditon set");
 #endif  //NEC_98
-#line 2806
+#line 2871
 }
 
 void	ega_gc_misc IFN2(io_addr, port, half_word, value)
@@ -2449,7 +2449,7 @@ register unsigned memory_map;
 
 	do_chain_majority_decision();
 #endif  //NEC_98
-#line 2868
+#line 2935
 }
 
 void	ega_gc_dont_care IFN2(io_addr, port, half_word, value)
@@ -2470,7 +2470,7 @@ register unsigned colour_dont_care;
 		if (read_state.mode == 1) ega_read_routines_update();
 	}
 #endif  //NEC_98
-#line 2885
+#line 2954
 }
 
 /*
@@ -2505,7 +2505,7 @@ IMPORT void Glue_set_vid_wrt_ptrs (WRT_POINTERS * handler );
 GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 {
 #ifndef NEC_98
-#line 2918
+#line 2988
 	ULONG				state;
 	SAVED IU8			masks[] = {0x1f, 0x01, 0x0f, 0x0f};
 	IMPORT WRT_POINTERS	*mode_chain_handler_table[];
@@ -2543,12 +2543,12 @@ GLOBAL VOID ega_mask_register_changed IFN1(BOOL, gotBitProtection)
 #line 3026
 	Glue_set_vid_wrt_ptrs(&mode_chain_handler_table[EGA_CPU.saved_mode_chain][state]);
 #endif /* !(NTVDM && MONITOR) */
-#line 2956
+#line 3028
 #endif /* A3CPU */
 
 	EGA_CPU.saved_state = state;
 #endif  //NEC_98
-#line 2959
+#line 3032
 }
 
 
@@ -2599,10 +2599,10 @@ LOCAL void	ega_gc_mask IFN2(io_addr, port, half_word, value)
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 3011
+#line 3085
 	}
 #endif  //NEC_98
-#line 3012
+#line 3087
 }
 
 /* This version isn't called so often */
@@ -2648,16 +2648,16 @@ void	ega_gc_mask_ff IFN2(io_addr, port, half_word, value)
 #ifndef CPU_40_STYLE	/* TEMPORARY */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif
-#line 3059
+#line 3135
 	}
 #endif  //NEC_98
-#line 3060
+#line 3137
 }
 
 LOCAL void	ega_index_invalid IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 3064
+#line 3142
 #ifdef PROD
 	UNUSED(port);
 	UNUSED(value);
@@ -2665,13 +2665,13 @@ LOCAL void	ega_index_invalid IFN2(io_addr, port, half_word, value)
 	note_entrance2("ega_index_invalid(%x,%x)", port, value);
 	assert1(NO,"Invalid index %d",graphics_controller.address.as_bfld.index);
 #endif  //NEC_98
-#line 3070
+#line 3149
 }
 
 LOCAL void	ega_ac_outb IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 3074
+#line 3154
 	struct {
 		unsigned value : 8;
 	} new;
@@ -2786,7 +2786,7 @@ LOCAL void	ega_ac_outb IFN2(io_addr, port, half_word, value)
 		}
 	}
 #endif  //NEC_98
-#line 3187
+#line 3268
 }
 
 LOCAL void	ega_misc_outb IFN2(io_addr, port, half_word, value)
@@ -2839,13 +2839,13 @@ MISC_OUTPUT_REG new;
 	 * so that correct switch setting can be returned.
 	 */
 #endif  //NEC_98
-#line 3236
+#line 3319
 }
 
 LOCAL void	ega_feat_outb IFN2(io_addr, port, half_word, value)
 {
 #ifndef NEC_98
-#line 3240
+#line 3324
 #ifdef PROD
 	UNUSED(port);
 	UNUSED(value);
@@ -2853,13 +2853,13 @@ LOCAL void	ega_feat_outb IFN2(io_addr, port, half_word, value)
 	note_entrance2("ega_feat_outb(%x,%x)", port, value);
 	NON_PROD(feature_control_register.as.abyte = value);
 #endif  //NEC_98
-#line 3246
+#line 3331
 }
 
 LOCAL void	ega_ipstat0_inb IFN2(io_addr, port, half_word *, value)
 {
 #ifndef NEC_98
-#line 3250
+#line 3336
 #ifdef PROD
 	UNUSED(port);
 #endif
@@ -2874,13 +2874,13 @@ LOCAL void	ega_ipstat0_inb IFN2(io_addr, port, half_word *, value)
 	*value = (half_word)input_status_register_zero.as.abyte;
 	note_entrance1("returning %x",*value);
 #endif  //NEC_98
-#line 3263
+#line 3350
 }
 
 LOCAL void	ega_ipstat1_inb IFN2(io_addr, port, half_word *, value)
 {
 #ifndef NEC_98
-#line 3267
+#line 3355
 
 	/*
 	 * The whole of this routine has been nicked from the cga without modification
@@ -3011,7 +3011,7 @@ LOCAL void	ega_ipstat1_inb IFN2(io_addr, port, half_word *, value)
     }
     note_entrance1("returning %x",*value);
 #endif  //NEC_98
-#line 3396
+#line 3485
 }
 
 LOCAL	void	vote_ega_mode IFN0()

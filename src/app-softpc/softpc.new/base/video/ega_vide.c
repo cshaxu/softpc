@@ -206,7 +206,7 @@ static void (*ega_video_func[]) () = {
 #endif
                            };
 #endif  //NEC_98
-#line 185
+#line 210
 
 static int v7_mode_64_munge[4] ={0, 3, 12, 15};
 IMPORT half_word bg_col_mask;
@@ -270,7 +270,7 @@ UTINY   vga_cursor16_start[17][17] = {
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 291
+#line 316
 
 /* [5.1.2 TYPEDEF, STRUCTURE, ENUM DECLARATIONS]                        */
 
@@ -388,7 +388,7 @@ static void do_outb IFN3(int, index,int, ega_reg, byte, value)
         outb((IU16)index,(IU8)ega_reg);
         outb((IU16)(index+1),value);
 #endif  //NEC_98
-#line 405
+#line 432
 }
 
 sys_addr video_effective_addr IFN2(IU16, seg, IU16, offset)
@@ -419,7 +419,7 @@ sys_addr follow_ptr IFN1(sys_addr, addr)
 void low_set_mode IFN1(int, mode)
 {
 #ifndef NEC_98
-#line 434
+#line 462
         int i;
         sys_addr save_addr,params_addr,palette_addr;
         word temp_word;
@@ -598,7 +598,7 @@ void low_set_mode IFN1(int, mode)
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 612
+#line 640
 
 #ifdef VGG
     if (video_adapter == VGA) {
@@ -623,7 +623,7 @@ void low_set_mode IFN1(int, mode)
     }
 #endif
 #endif  //NEC_98
-#line 635
+#line 664
 }
 
 /* Load part of a font into EGA font memory. */
@@ -661,7 +661,7 @@ void load_font IFN5
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else /* GISP_SVGA */
-#line 668
+#line 727
 
 
         /* Work out where to put the font. */
@@ -681,7 +681,7 @@ void load_font IFN5
         }
 #endif  /* GISP_SVGA */
 #endif  /* NTVDM && X86GFX */
-#line 686
+#line 746
 
 /* Finally switch back to the BIOS mode */
         video_mode = sas_hw_at_no_check(vd_video_mode);
@@ -697,7 +697,7 @@ void load_font IFN5
         inb(EGA_IPSTAT1_REG,&temp_word);
         outb(EGA_AC_INDEX_DATA, EGA_PALETTE_ENABLE);    /* re-enable video */
 #endif  //NEC_98
-#line 700
+#line 761
 }
 
 void recalc_text IFN1(int, height)
@@ -819,7 +819,7 @@ void recalc_text IFN1(int, height)
 
         do_outb(EGA_CRTC_INDEX,0x14,(IU8)height); /* Underline scan line - ie no underline */
 #endif  //NEC_98
-#line 788
+#line 900
 }
 
 static void set_graph_font IFN1(int, height)
@@ -845,7 +845,7 @@ static void set_graph_font IFN1(int, height)
         }
         sas_store_no_check(ega_char_height, (IU8)height);
 #endif  //NEC_98
-#line 810
+#line 924
 }
 
 LOCAL VOID
@@ -917,7 +917,7 @@ write_ch_set IFN5(sys_addr, char_addr, int, screen_off,
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 878
+#line 993
 #endif  //NEC_98
 #line 994
 }
@@ -988,7 +988,7 @@ void write_ch_xor IFN5(sys_addr, char_addr, int, screen_off,
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 943
+#line 1060
 #endif  //NEC_98
 #line 1061
 }
@@ -996,7 +996,7 @@ void write_ch_xor IFN5(sys_addr, char_addr, int, screen_off,
 GLOBAL void ega_set_mode IFN0()
 {
 #ifndef NEC_98
-#line 947
+#line 1066
         int pag;
         sys_addr save_addr,font_addr;
         int font_offset;
@@ -1015,7 +1015,7 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
-#line 988
+#line 1107
 
 #ifdef V7VGA
         /*
@@ -1119,7 +1119,7 @@ GLOBAL void ega_set_mode IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* NTVDM & X86GFX */
-#line 1090
+#line 1296
 
         save_addr = follow_ptr(EGA_SAVEPTR);
         if(alpha_num_mode())
@@ -1256,7 +1256,7 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1202
+#line 1465
     {
         /* Clear screen */
         if(!get_EGA_no_clear())
@@ -1314,7 +1314,7 @@ GLOBAL void ega_set_mode IFN0()
 GLOBAL void ega_set_cursor_mode IFN0()
 {
 #ifndef NEC_98
-#line 1234
+#line 1608
     /*
      * Set cursor mode
      * Parameters:
@@ -1347,7 +1347,7 @@ GLOBAL void ega_set_cursor_mode IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1263
+#line 1674
 
 #ifdef  VGG
         if (video_adapter == VGA) {
@@ -1425,7 +1425,7 @@ GLOBAL void ega_set_cursor_mode IFN0()
     sas_storew_no_check((sys_addr)VID_CURMOD, getCX());
     setAH(0);
 #endif  //NEC_98
-#line 1337
+#line 1749
 }
 
 /* This routine is an approximate conversion of the corresponding IBM BIOS routine.
@@ -1487,13 +1487,13 @@ static void ega_emul_set_palette IFN0()
         }
         outb(EGA_AC_INDEX_DATA, EGA_PALETTE_ENABLE);    /* re-enable video */
 #endif  //NEC_98
-#line 1395
+#line 1809
 }
 
 static void ega_set_palette IFN0()
 {
 #ifndef NEC_98
-#line 1399
+#line 1814
         IU8 i;
         byte temp;
         sys_addr save_table, palette_table;
@@ -1573,11 +1573,11 @@ static void ega_set_palette IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
-#line 1479
+#line 1894
                         break;
         }
 #endif  //NEC_98
-#line 1481
+#line 1897
 }
 
 GLOBAL void ega_char_gen IFN0()
@@ -1602,7 +1602,7 @@ GLOBAL void ega_char_gen IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM && X86GFX */
-#line 1496
+#line 1934
                         break;
                 case 1:
                 case 0x11:
@@ -1613,7 +1613,7 @@ GLOBAL void ega_char_gen IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* NTVDM & X86GFX */
-#line 1503
+#line 1944
                         break;
                 case 2:
                 case 0x12:
@@ -1624,7 +1624,7 @@ GLOBAL void ega_char_gen IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* NTVDM & X86GFX */
-#line 1510
+#line 1954
                         break;
 #ifdef VGG
                 case 4:
@@ -1636,7 +1636,7 @@ GLOBAL void ega_char_gen IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* NTVDM & X86GFX */
-#line 1518
+#line 1965
                         break;
 #endif  /* VGG */
                 case 0x20:
@@ -1703,7 +1703,7 @@ GLOBAL void ega_char_gen IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(X86GFX)"
 #else   /* NTVDM & X86GFX */
-#line 1560
+#line 2140
 
                                 case 2:
                                         setBP(EGA_CGMN_OFF);
@@ -1730,7 +1730,7 @@ GLOBAL void ega_char_gen IFN0()
                                         break;
 #endif  /* VGG */
 #endif  /* NTVDM & X86GFX */
-#line 1585
+#line 2166
                                 default:
                                         assert2(FALSE,"Illegal char_gen subfunction %#x %#x",getAL(),getBH());
                         }
@@ -1739,7 +1739,7 @@ GLOBAL void ega_char_gen IFN0()
                         assert1(FALSE,"Illegal char_gen %#x",getAL());
         }
 #endif  //NEC_98
-#line 1592
+#line 2174
 }
 
 static void ega_alt_sel IFN0()
@@ -1774,7 +1774,7 @@ static void ega_alt_sel IFN0()
                 }
         }
 #endif  //NEC_98
-#line 1623
+#line 2207
 }
 
 
@@ -1834,7 +1834,7 @@ void ega_video_init IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
 #else
-#line 1668
+#line 2261
 #ifdef V7VGA
         if ( video_adapter == VGA )
                 sas_store_no_check(ega_info, 0x70);   /* Clear on mode change, 256K, Extensions allowed, EGA active, emulate cursor */
@@ -1848,13 +1848,13 @@ void ega_video_init IFN0()
 #line 1676
 
 #if !(defined(NTVDM) && defined(X86GFX))
-#line 1677
+#line 2272
         /* Some VGA cards eg ET4000, store info here needed for sync.
          * Inherit that info from page 0 copy.
          */
         sas_store_no_check(ega_info3, 0xf9);  /* feature bits = 0xF, EGA installed, use 8*14 font */
 #endif
-#line 1681
+#line 2277
 
 
 #ifdef VGG
@@ -1864,7 +1864,7 @@ void ega_video_init IFN0()
 /* Set the default mode */
         ega_set_mode();
 #endif  //NEC_98
-#line 1689
+#line 2286
 }
 
 void ega_video_io IFN0()
@@ -1891,7 +1891,7 @@ void ega_video_io IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
-#line 1708
+#line 2310
 
     if (getAH() != 0xff)
         assert1(check_video_func(getAH()),"Illegal EGA VIO:%#x",getAH());
@@ -1909,7 +1909,7 @@ void ega_video_io IFN0()
     else
         setCF(1);
 #endif  //NEC_98
-#line 1724
+#line 2327
 }
 
 /***** Routines to handle the EGA graphics modes,called from video.c **********/
@@ -1958,7 +1958,7 @@ void ega_graphics_write_char IFN6(int, col, int, row, int, ch,
         }
 #endif
 #endif  //NEC_98
-#line 1769
+#line 2374
 }
 
 void ega_write_dot IFN4(int, colour, int, page, int, pixcol, int, row)
@@ -2010,7 +2010,7 @@ void ega_write_dot IFN4(int, colour, int, page, int, pixcol, int, row)
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
 #endif  //NEC_98
-#line 1817
+#line 2424
 }
 
 void ega_sensible_graph_scroll_up IFN6(int, row,
@@ -2060,7 +2060,7 @@ void ega_sensible_graph_scroll_up IFN6(int, row,
         }
 #endif
 #endif  //NEC_98
-#line 1862
+#line 2471
 }
 
 void ega_sensible_graph_scroll_down IFN6(int, row,
@@ -2110,7 +2110,7 @@ void ega_sensible_graph_scroll_down IFN6(int, row,
         }
 #endif
 #endif  //NEC_98
-#line 1909
+#line 2520
 }
 
 /* This is called from vga_video.c as well. */
@@ -2136,7 +2136,7 @@ void search_font IFN2(char *, the_char,int, height)
         else
                 setAL(0); /* Didn't find a character */
 #endif  //NEC_98
-#line 1931
+#line 2544
 }
 
 void ega_read_attrib_char IFN3(int, col, int, row, int, page)
@@ -2164,11 +2164,11 @@ void ega_read_attrib_char IFN3(int, col, int, row, int, page)
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 1956
+#line 2570
         /* Now search the font */
         search_font((char *)the_char,(int)char_height);
 #endif  //NEC_98
-#line 1958
+#line 2573
 }
 void ega_read_dot IFN3(int, page, int, col, int, row)
 {
@@ -2182,7 +2182,7 @@ void ega_read_dot IFN3(int, page, int, col, int, row)
 #ifdef  REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 1969
+#line 2585
 
 
         /*
@@ -2220,10 +2220,10 @@ void ega_read_dot IFN3(int, page, int, col, int, row)
 #else
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 2006
+#line 2622
         setAL(val);
 #endif  //NEC_98
-#line 2007
+#line 2624
 }
 
 /*
@@ -2237,7 +2237,7 @@ sys_addr find_mode_table IFN2(int, mode, sys_addr *, save_addr)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 2017
+#line 2637
 /*  get address of the SAVEPTR table, and hence the video params table. */
         *save_addr = follow_ptr(EGA_SAVEPTR);
         params_addr = follow_ptr(*save_addr) + mode*EGA_PARMS_SIZE;
@@ -2326,7 +2326,7 @@ int get_scanlines IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 2091
+#line 2776
 
         scanlines = sas_hw_at_no_check(ega_char_height) * sas_hw_at_no_check(vd_rows_on_screen);
 

@@ -191,7 +191,7 @@ IMPORT	void	c_cpu_simulate	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 200
+#line 199
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_interrupt	IPT2(CPU_INT_TYPE, intType, IU16, intNum);
@@ -199,7 +199,7 @@ IMPORT	void	c_cpu_interrupt	IPT2(CPU_INT_TYPE, intType, IU16, intNum);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 213
+#line 212
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_clearHwInt	IPT0();
@@ -207,7 +207,7 @@ IMPORT	void	c_cpu_clearHwInt	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 226
+#line 225
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_EOA_hook	IPT0();
@@ -215,7 +215,7 @@ IMPORT	void	c_cpu_EOA_hook	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 239
+#line 238
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_terminate	IPT0();
@@ -223,7 +223,7 @@ IMPORT	void	c_cpu_terminate	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 252
+#line 251
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_init	IPT0();
@@ -231,7 +231,7 @@ IMPORT	void	c_cpu_init	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 265
+#line 264
 
 #ifdef	CCPU
 IMPORT	IU32	c_effective_addr	IPT2(IU16, seg, IU32, offset);
@@ -239,7 +239,7 @@ IMPORT	IU32	c_effective_addr	IPT2(IU16, seg, IU32, offset);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 278
+#line 277
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_q_ev_set_count	IPT1(IU32, val);
@@ -247,7 +247,7 @@ IMPORT	void	c_cpu_q_ev_set_count	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 291
+#line 290
 
 #ifdef	CCPU
 IMPORT	IU32	c_cpu_q_ev_get_count	IPT0();
@@ -255,7 +255,7 @@ IMPORT	IU32	c_cpu_q_ev_get_count	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 304
+#line 303
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_init_ios_in	IPT4(IHP, InTables, IHP, OutTables, IUH, maxAdaptor, IU16, portMask);
@@ -263,7 +263,7 @@ IMPORT	void	c_cpu_init_ios_in	IPT4(IHP, InTables, IHP, OutTables, IUH, maxAdapto
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 317
+#line 316
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_define_inb	IPT2(IUH, adaptor, IHP, func);
@@ -271,7 +271,7 @@ IMPORT	void	c_cpu_define_inb	IPT2(IUH, adaptor, IHP, func);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 330
+#line 329
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_define_inw	IPT2(IUH, adaptor, IHP, func);
@@ -279,7 +279,7 @@ IMPORT	void	c_cpu_define_inw	IPT2(IUH, adaptor, IHP, func);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 343
+#line 342
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_define_ind	IPT2(IUH, adaptor, IHP, func);
@@ -287,7 +287,7 @@ IMPORT	void	c_cpu_define_ind	IPT2(IUH, adaptor, IHP, func);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 356
+#line 355
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_define_outb	IPT2(IUH, adaptor, IHP, func);
@@ -295,7 +295,7 @@ IMPORT	void	c_cpu_define_outb	IPT2(IUH, adaptor, IHP, func);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 369
+#line 368
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_define_outw	IPT2(IUH, adaptor, IHP, func);
@@ -303,7 +303,7 @@ IMPORT	void	c_cpu_define_outw	IPT2(IUH, adaptor, IHP, func);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 382
+#line 381
 
 #ifdef	CCPU
 IMPORT	void	c_cpu_define_outd	IPT2(IUH, adaptor, IHP, func);
@@ -311,7 +311,7 @@ IMPORT	void	c_cpu_define_outd	IPT2(IUH, adaptor, IHP, func);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 395
+#line 394
 
 #ifdef	CCPU
 IMPORT	void	c_setAL	IPT1(IU8, val);
@@ -319,7 +319,7 @@ IMPORT	void	c_setAL	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 410
+#line 409
 
 #ifdef	CCPU
 IMPORT	void	c_setAH	IPT1(IU8, val);
@@ -327,7 +327,7 @@ IMPORT	void	c_setAH	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 425
+#line 424
 
 #ifdef	CCPU
 IMPORT	void	c_setAX	IPT1(IU16, val);
@@ -335,7 +335,7 @@ IMPORT	void	c_setAX	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 440
+#line 439
 
 #ifdef	CCPU
 IMPORT	void	c_setEAX	IPT1(IU32, val);
@@ -343,7 +343,7 @@ IMPORT	void	c_setEAX	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 455
+#line 454
 
 #ifdef	CCPU
 IMPORT	void	c_setBL	IPT1(IU8, val);
@@ -351,7 +351,7 @@ IMPORT	void	c_setBL	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 470
+#line 469
 
 #ifdef	CCPU
 IMPORT	void	c_setBH	IPT1(IU8, val);
@@ -359,7 +359,7 @@ IMPORT	void	c_setBH	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 485
+#line 484
 
 #ifdef	CCPU
 IMPORT	void	c_setBX	IPT1(IU16, val);
@@ -367,7 +367,7 @@ IMPORT	void	c_setBX	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 500
+#line 499
 
 #ifdef	CCPU
 IMPORT	void	c_setEBX	IPT1(IU32, val);
@@ -375,7 +375,7 @@ IMPORT	void	c_setEBX	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 515
+#line 514
 
 #ifdef	CCPU
 IMPORT	void	c_setCL	IPT1(IU8, val);
@@ -383,7 +383,7 @@ IMPORT	void	c_setCL	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 530
+#line 529
 
 #ifdef	CCPU
 IMPORT	void	c_setCH	IPT1(IU8, val);
@@ -391,7 +391,7 @@ IMPORT	void	c_setCH	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 545
+#line 544
 
 #ifdef	CCPU
 IMPORT	void	c_setCX	IPT1(IU16, val);
@@ -399,7 +399,7 @@ IMPORT	void	c_setCX	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 560
+#line 559
 
 #ifdef	CCPU
 IMPORT	void	c_setECX	IPT1(IU32, val);
@@ -407,7 +407,7 @@ IMPORT	void	c_setECX	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 575
+#line 574
 
 #ifdef	CCPU
 IMPORT	void	c_setDL	IPT1(IU8, val);
@@ -415,7 +415,7 @@ IMPORT	void	c_setDL	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 590
+#line 589
 
 #ifdef	CCPU
 IMPORT	void	c_setDH	IPT1(IU8, val);
@@ -423,7 +423,7 @@ IMPORT	void	c_setDH	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 605
+#line 604
 
 #ifdef	CCPU
 IMPORT	void	c_setDX	IPT1(IU16, val);
@@ -431,7 +431,7 @@ IMPORT	void	c_setDX	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 620
+#line 619
 
 #ifdef	CCPU
 IMPORT	void	c_setEDX	IPT1(IU32, val);
@@ -439,7 +439,7 @@ IMPORT	void	c_setEDX	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 635
+#line 634
 
 #ifdef	CCPU
 IMPORT	void	c_setSI	IPT1(IU16, val);
@@ -447,7 +447,7 @@ IMPORT	void	c_setSI	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 650
+#line 649
 
 #ifdef	CCPU
 IMPORT	void	c_setESI	IPT1(IU32, val);
@@ -455,7 +455,7 @@ IMPORT	void	c_setESI	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 665
+#line 664
 
 #ifdef	CCPU
 IMPORT	void	c_setDI	IPT1(IU16, val);
@@ -463,7 +463,7 @@ IMPORT	void	c_setDI	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 680
+#line 679
 
 #ifdef	CCPU
 IMPORT	void	c_setEDI	IPT1(IU32, val);
@@ -471,7 +471,7 @@ IMPORT	void	c_setEDI	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 695
+#line 694
 
 #ifdef	CCPU
 IMPORT	void	c_setSP	IPT1(IU16, val);
@@ -479,7 +479,7 @@ IMPORT	void	c_setSP	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 708
+#line 707
 
 #ifdef	CCPU
 IMPORT	void	c_setESP	IPT1(IU32, val);
@@ -487,7 +487,7 @@ IMPORT	void	c_setESP	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 721
+#line 720
 
 #ifdef	CCPU
 IMPORT	void	c_setBP	IPT1(IU16, val);
@@ -495,7 +495,7 @@ IMPORT	void	c_setBP	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 736
+#line 735
 
 #ifdef	CCPU
 IMPORT	void	c_setEBP	IPT1(IU32, val);
@@ -503,7 +503,7 @@ IMPORT	void	c_setEBP	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 751
+#line 750
 
 #ifdef	CCPU
 IMPORT	void	c_setIP	IPT1(IU16, val);
@@ -511,7 +511,7 @@ IMPORT	void	c_setIP	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 764
+#line 763
 
 #ifdef	CCPU
 IMPORT	void	c_setEIP	IPT1(IU32, val);
@@ -559,7 +559,7 @@ IMPORT	IUH	c_setFS	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 842
+#line 841
 
 #ifdef	CCPU
 IMPORT	IUH	c_setGS	IPT1(IU16, val);
@@ -567,7 +567,7 @@ IMPORT	IUH	c_setGS	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 855
+#line 854
 
 #ifdef	CCPU
 IMPORT	void	c_setEFLAGS	IPT1(IU32, val);
@@ -575,7 +575,7 @@ IMPORT	void	c_setEFLAGS	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 868
+#line 867
 
 #ifdef	CCPU
 IMPORT	void	c_setSTATUS	IPT1(IU16, val);
@@ -583,7 +583,7 @@ IMPORT	void	c_setSTATUS	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 881
+#line 880
 
 #ifdef	CCPU
 IMPORT	void	c_setIOPL	IPT1(IU8, val);
@@ -591,7 +591,7 @@ IMPORT	void	c_setIOPL	IPT1(IU8, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 894
+#line 893
 
 #ifdef	CCPU
 IMPORT	void	c_setMSW	IPT1(IU16, val);
@@ -599,7 +599,7 @@ IMPORT	void	c_setMSW	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 907
+#line 906
 
 #ifdef	CCPU
 IMPORT	void	c_setCR0	IPT1(IU32, val);
@@ -607,7 +607,7 @@ IMPORT	void	c_setCR0	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 920
+#line 919
 
 #ifdef	CCPU
 IMPORT	void	c_setCR2	IPT1(IU32, val);
@@ -615,7 +615,7 @@ IMPORT	void	c_setCR2	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 933
+#line 932
 
 #ifdef	CCPU
 IMPORT	void	c_setCR3	IPT1(IU32, val);
@@ -623,7 +623,7 @@ IMPORT	void	c_setCR3	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 946
+#line 945
 
 #ifdef	CCPU
 IMPORT	void	c_setCF	IPT1(IBOOL, val);
@@ -631,7 +631,7 @@ IMPORT	void	c_setCF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 959
+#line 958
 
 #ifdef	CCPU
 IMPORT	void	c_setPF	IPT1(IBOOL, val);
@@ -639,7 +639,7 @@ IMPORT	void	c_setPF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 972
+#line 971
 
 #ifdef	CCPU
 IMPORT	void	c_setAF	IPT1(IBOOL, val);
@@ -647,7 +647,7 @@ IMPORT	void	c_setAF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 985
+#line 984
 
 #ifdef	CCPU
 IMPORT	void	c_setZF	IPT1(IBOOL, val);
@@ -655,7 +655,7 @@ IMPORT	void	c_setZF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 998
+#line 997
 
 #ifdef	CCPU
 IMPORT	void	c_setSF	IPT1(IBOOL, val);
@@ -663,7 +663,7 @@ IMPORT	void	c_setSF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1011
+#line 1010
 
 #ifdef	CCPU
 IMPORT	void	c_setTF	IPT1(IBOOL, val);
@@ -671,7 +671,7 @@ IMPORT	void	c_setTF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1024
+#line 1023
 
 #ifdef	CCPU
 IMPORT	void	c_setIF	IPT1(IBOOL, val);
@@ -679,7 +679,7 @@ IMPORT	void	c_setIF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1037
+#line 1036
 
 #ifdef	CCPU
 IMPORT	void	c_setDF	IPT1(IBOOL, val);
@@ -687,7 +687,7 @@ IMPORT	void	c_setDF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1050
+#line 1049
 
 #ifdef	CCPU
 IMPORT	void	c_setOF	IPT1(IBOOL, val);
@@ -695,7 +695,7 @@ IMPORT	void	c_setOF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1063
+#line 1062
 
 #ifdef	CCPU
 IMPORT	void	c_setNT	IPT1(IBOOL, val);
@@ -703,7 +703,7 @@ IMPORT	void	c_setNT	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1076
+#line 1075
 
 #ifdef	CCPU
 IMPORT	void	c_setRF	IPT1(IBOOL, val);
@@ -711,7 +711,7 @@ IMPORT	void	c_setRF	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1089
+#line 1088
 
 #ifdef	CCPU
 IMPORT	void	c_setVM	IPT1(IBOOL, val);
@@ -719,7 +719,7 @@ IMPORT	void	c_setVM	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1102
+#line 1101
 
 #ifdef	CCPU
 IMPORT	void	c_setAC	IPT1(IBOOL, val);
@@ -727,7 +727,7 @@ IMPORT	void	c_setAC	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1115
+#line 1114
 
 #ifdef	CCPU
 IMPORT	void	c_setPE	IPT1(IBOOL, val);
@@ -735,7 +735,7 @@ IMPORT	void	c_setPE	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1128
+#line 1127
 
 #ifdef	CCPU
 IMPORT	void	c_setMP	IPT1(IBOOL, val);
@@ -743,7 +743,7 @@ IMPORT	void	c_setMP	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1141
+#line 1140
 
 #ifdef	CCPU
 IMPORT	void	c_setEM	IPT1(IBOOL, val);
@@ -751,7 +751,7 @@ IMPORT	void	c_setEM	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1154
+#line 1153
 
 #ifdef	CCPU
 IMPORT	void	c_setTS	IPT1(IBOOL, val);
@@ -759,7 +759,7 @@ IMPORT	void	c_setTS	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1167
+#line 1166
 
 #ifdef	CCPU
 IMPORT	void	c_setPG	IPT1(IBOOL, val);
@@ -767,7 +767,7 @@ IMPORT	void	c_setPG	IPT1(IBOOL, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1180
+#line 1179
 
 #ifdef	CCPU
 IMPORT	void	c_setLDT_SELECTOR	IPT1(IU16, val);
@@ -775,7 +775,7 @@ IMPORT	void	c_setLDT_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1193
+#line 1192
 
 #ifdef	CCPU
 IMPORT	void	c_setTR_SELECTOR	IPT1(IU16, val);
@@ -783,7 +783,7 @@ IMPORT	void	c_setTR_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1206
+#line 1205
 
 #ifdef	CCPU
 IMPORT	IU8	c_getAL	IPT0();
@@ -791,7 +791,7 @@ IMPORT	IU8	c_getAL	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1219
+#line 1218
 
 #ifdef	CCPU
 IMPORT	IU8	c_getAH	IPT0();
@@ -799,7 +799,7 @@ IMPORT	IU8	c_getAH	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1232
+#line 1231
 
 #ifdef	CCPU
 IMPORT	IU16	c_getAX	IPT0();
@@ -807,7 +807,7 @@ IMPORT	IU16	c_getAX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1245
+#line 1244
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEAX	IPT0();
@@ -815,7 +815,7 @@ IMPORT	IU32	c_getEAX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1258
+#line 1257
 
 #ifdef	CCPU
 IMPORT	IU8	c_getBL	IPT0();
@@ -823,7 +823,7 @@ IMPORT	IU8	c_getBL	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1271
+#line 1270
 
 #ifdef	CCPU
 IMPORT	IU8	c_getBH	IPT0();
@@ -831,7 +831,7 @@ IMPORT	IU8	c_getBH	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1284
+#line 1283
 
 #ifdef	CCPU
 IMPORT	IU16	c_getBX	IPT0();
@@ -839,7 +839,7 @@ IMPORT	IU16	c_getBX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1297
+#line 1296
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEBX	IPT0();
@@ -847,7 +847,7 @@ IMPORT	IU32	c_getEBX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1310
+#line 1309
 
 #ifdef	CCPU
 IMPORT	IU8	c_getCL	IPT0();
@@ -855,7 +855,7 @@ IMPORT	IU8	c_getCL	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1323
+#line 1322
 
 #ifdef	CCPU
 IMPORT	IU8	c_getCH	IPT0();
@@ -863,7 +863,7 @@ IMPORT	IU8	c_getCH	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1336
+#line 1335
 
 #ifdef	CCPU
 IMPORT	IU16	c_getCX	IPT0();
@@ -871,7 +871,7 @@ IMPORT	IU16	c_getCX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1349
+#line 1348
 
 #ifdef	CCPU
 IMPORT	IU32	c_getECX	IPT0();
@@ -879,7 +879,7 @@ IMPORT	IU32	c_getECX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1362
+#line 1361
 
 #ifdef	CCPU
 IMPORT	IU8	c_getDL	IPT0();
@@ -887,7 +887,7 @@ IMPORT	IU8	c_getDL	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1375
+#line 1374
 
 #ifdef	CCPU
 IMPORT	IU8	c_getDH	IPT0();
@@ -895,7 +895,7 @@ IMPORT	IU8	c_getDH	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1388
+#line 1387
 
 #ifdef	CCPU
 IMPORT	IU16	c_getDX	IPT0();
@@ -903,7 +903,7 @@ IMPORT	IU16	c_getDX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1401
+#line 1400
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEDX	IPT0();
@@ -911,7 +911,7 @@ IMPORT	IU32	c_getEDX	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1414
+#line 1413
 
 #ifdef	CCPU
 IMPORT	IU16	c_getSI	IPT0();
@@ -919,7 +919,7 @@ IMPORT	IU16	c_getSI	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1427
+#line 1426
 
 #ifdef	CCPU
 IMPORT	IU32	c_getESI	IPT0();
@@ -927,7 +927,7 @@ IMPORT	IU32	c_getESI	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1440
+#line 1439
 
 #ifdef	CCPU
 IMPORT	IU16	c_getDI	IPT0();
@@ -935,7 +935,7 @@ IMPORT	IU16	c_getDI	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1453
+#line 1452
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEDI	IPT0();
@@ -943,7 +943,7 @@ IMPORT	IU32	c_getEDI	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1466
+#line 1465
 
 #ifdef	CCPU
 IMPORT	IU16	c_getSP	IPT0();
@@ -951,7 +951,7 @@ IMPORT	IU16	c_getSP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1479
+#line 1478
 
 #ifdef	CCPU
 IMPORT	IU32	c_getESP	IPT0();
@@ -959,7 +959,7 @@ IMPORT	IU32	c_getESP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1492
+#line 1491
 
 #ifdef	CCPU
 IMPORT	IU16	c_getBP	IPT0();
@@ -967,7 +967,7 @@ IMPORT	IU16	c_getBP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1505
+#line 1504
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEBP	IPT0();
@@ -975,7 +975,7 @@ IMPORT	IU32	c_getEBP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1518
+#line 1517
 
 #ifdef	CCPU
 IMPORT	IU16	c_getIP	IPT0();
@@ -983,7 +983,7 @@ IMPORT	IU16	c_getIP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1531
+#line 1530
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEIP	IPT0();
@@ -991,7 +991,7 @@ IMPORT	IU32	c_getEIP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1544
+#line 1543
 
 #ifdef	CCPU
 IMPORT	IU16	c_getCS	IPT0();
@@ -999,7 +999,7 @@ IMPORT	IU16	c_getCS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1557
+#line 1556
 
 #ifdef	CCPU
 IMPORT	IU16	c_getSS	IPT0();
@@ -1007,7 +1007,7 @@ IMPORT	IU16	c_getSS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1570
+#line 1569
 
 #ifdef	CCPU
 IMPORT	IU16	c_getDS	IPT0();
@@ -1015,7 +1015,7 @@ IMPORT	IU16	c_getDS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1583
+#line 1582
 
 #ifdef	CCPU
 IMPORT	IU16	c_getES	IPT0();
@@ -1023,7 +1023,7 @@ IMPORT	IU16	c_getES	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1596
+#line 1595
 
 #ifdef	CCPU
 IMPORT	IU16	c_getFS	IPT0();
@@ -1031,7 +1031,7 @@ IMPORT	IU16	c_getFS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1609
+#line 1608
 
 #ifdef	CCPU
 IMPORT	IU16	c_getGS	IPT0();
@@ -1039,7 +1039,7 @@ IMPORT	IU16	c_getGS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1622
+#line 1621
 
 #ifdef	CCPU
 IMPORT	IU32	c_getEFLAGS	IPT0();
@@ -1047,7 +1047,7 @@ IMPORT	IU32	c_getEFLAGS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1635
+#line 1634
 
 #ifdef	CCPU
 IMPORT	IU16	c_getSTATUS	IPT0();
@@ -1055,7 +1055,7 @@ IMPORT	IU16	c_getSTATUS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1648
+#line 1647
 
 #ifdef	CCPU
 IMPORT	IU8	c_getIOPL	IPT0();
@@ -1063,7 +1063,7 @@ IMPORT	IU8	c_getIOPL	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1661
+#line 1660
 
 #ifdef	CCPU
 IMPORT	IU16	c_getMSW	IPT0();
@@ -1071,7 +1071,7 @@ IMPORT	IU16	c_getMSW	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1674
+#line 1673
 
 #ifdef	CCPU
 IMPORT	IU32	c_getCR0	IPT0();
@@ -1079,7 +1079,7 @@ IMPORT	IU32	c_getCR0	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1687
+#line 1686
 
 #ifdef	CCPU
 IMPORT	IU32	c_getCR2	IPT0();
@@ -1087,7 +1087,7 @@ IMPORT	IU32	c_getCR2	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1700
+#line 1699
 
 #ifdef	CCPU
 IMPORT	IU32	c_getCR3	IPT0();
@@ -1175,7 +1175,7 @@ IMPORT	IBOOL	c_getNT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1843
+#line 1842
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getRF	IPT0();
@@ -1183,7 +1183,7 @@ IMPORT	IBOOL	c_getRF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1856
+#line 1855
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getVM	IPT0();
@@ -1191,7 +1191,7 @@ IMPORT	IBOOL	c_getVM	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1869
+#line 1868
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getAC	IPT0();
@@ -1199,7 +1199,7 @@ IMPORT	IBOOL	c_getAC	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1882
+#line 1881
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getPE	IPT0();
@@ -1207,7 +1207,7 @@ IMPORT	IBOOL	c_getPE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1895
+#line 1894
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getMP	IPT0();
@@ -1215,7 +1215,7 @@ IMPORT	IBOOL	c_getMP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1908
+#line 1907
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getEM	IPT0();
@@ -1223,7 +1223,7 @@ IMPORT	IBOOL	c_getEM	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1921
+#line 1920
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getTS	IPT0();
@@ -1231,7 +1231,7 @@ IMPORT	IBOOL	c_getTS	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1934
+#line 1933
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getET	IPT0();
@@ -1239,7 +1239,7 @@ IMPORT	IBOOL	c_getET	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1947
+#line 1946
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getNE	IPT0();
@@ -1247,7 +1247,7 @@ IMPORT	IBOOL	c_getNE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1960
+#line 1959
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getWP	IPT0();
@@ -1255,7 +1255,7 @@ IMPORT	IBOOL	c_getWP	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1973
+#line 1972
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_getPG	IPT0();
@@ -1263,7 +1263,7 @@ IMPORT	IBOOL	c_getPG	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1986
+#line 1985
 
 #ifdef	CCPU
 IMPORT	IU32	c_getGDT_BASE	IPT0();
@@ -1271,7 +1271,7 @@ IMPORT	IU32	c_getGDT_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1999
+#line 1998
 
 #ifdef	CCPU
 IMPORT	IU16	c_getGDT_LIMIT	IPT0();
@@ -1279,7 +1279,7 @@ IMPORT	IU16	c_getGDT_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2012
+#line 2011
 
 #ifdef	CCPU
 IMPORT	IU32	c_getIDT_BASE	IPT0();
@@ -1287,7 +1287,7 @@ IMPORT	IU32	c_getIDT_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2025
+#line 2024
 
 #ifdef	CCPU
 IMPORT	IU16	c_getIDT_LIMIT	IPT0();
@@ -1295,7 +1295,7 @@ IMPORT	IU16	c_getIDT_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2038
+#line 2037
 
 #ifdef	CCPU
 IMPORT	IU16	c_getLDT_SELECTOR	IPT0();
@@ -1303,7 +1303,7 @@ IMPORT	IU16	c_getLDT_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2051
+#line 2050
 
 #ifdef	CCPU
 IMPORT	IU32	c_getLDT_BASE	IPT0();
@@ -1311,7 +1311,7 @@ IMPORT	IU32	c_getLDT_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2064
+#line 2063
 
 #ifdef	CCPU
 IMPORT	IU32	c_getLDT_LIMIT	IPT0();
@@ -1319,7 +1319,7 @@ IMPORT	IU32	c_getLDT_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2077
+#line 2076
 
 #ifdef	CCPU
 IMPORT	IU16	c_getTR_SELECTOR	IPT0();
@@ -1327,7 +1327,7 @@ IMPORT	IU16	c_getTR_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2090
+#line 2089
 
 #ifdef	CCPU
 IMPORT	IU32	c_getTR_BASE	IPT0();
@@ -1335,7 +1335,7 @@ IMPORT	IU32	c_getTR_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2103
+#line 2102
 
 #ifdef	CCPU
 IMPORT	IU32	c_getTR_LIMIT	IPT0();
@@ -1343,7 +1343,7 @@ IMPORT	IU32	c_getTR_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2116
+#line 2115
 
 #ifdef	CCPU
 IMPORT	IU16	c_getTR_AR	IPT0();
@@ -1351,7 +1351,7 @@ IMPORT	IU16	c_getTR_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2129
+#line 2128
 
 #ifdef	CCPU
 IMPORT	IUH	host_get_q_calib_val	IPT0();
@@ -1359,7 +1359,7 @@ IMPORT	IUH	host_get_q_calib_val	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2142
+#line 2141
 
 #ifdef	CCPU
 IMPORT	IUH	host_get_jump_restart	IPT0();
@@ -1367,7 +1367,7 @@ IMPORT	IUH	host_get_jump_restart	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2155
+#line 2154
 
 #ifdef	CCPU
 IMPORT	void	host_set_jump_restart	IPT1(IUH, initialVal);
@@ -1375,7 +1375,7 @@ IMPORT	void	host_set_jump_restart	IPT1(IUH, initialVal);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2168
+#line 2167
 
 #ifdef	CCPU
 IMPORT	void	setEOIEnableAddr	IPT1(IU8 *, initialVal);
@@ -1383,7 +1383,7 @@ IMPORT	void	setEOIEnableAddr	IPT1(IU8 *, initialVal);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2181
+#line 2180
 
 #ifdef	CCPU
 IMPORT	void	setAddProfileDataPtr	IPT1(IHP, initialVal);
@@ -1391,7 +1391,7 @@ IMPORT	void	setAddProfileDataPtr	IPT1(IHP, initialVal);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2194
+#line 2193
 
 #ifdef	CCPU
 IMPORT	void	setMaxProfileDataAddr	IPT1(IHP, initialVal);
@@ -1399,7 +1399,7 @@ IMPORT	void	setMaxProfileDataAddr	IPT1(IHP, initialVal);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2207
+#line 2206
 
 #ifdef	CCPU
 IMPORT	IHP	getAddProfileDataAddr	IPT0();
@@ -1407,7 +1407,7 @@ IMPORT	IHP	getAddProfileDataAddr	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2220
+#line 2219
 
 #ifdef	CCPU
 IMPORT	void	PurgeLostIretHookLine	IPT2(IU16, lineNum, IU32, depth);
@@ -1415,7 +1415,7 @@ IMPORT	void	PurgeLostIretHookLine	IPT2(IU16, lineNum, IU32, depth);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2233
+#line 2232
 
 #ifdef	CCPU
 IMPORT	void	ActivityCheckAfterTimeSlice	IPT0();
@@ -1423,7 +1423,7 @@ IMPORT	void	ActivityCheckAfterTimeSlice	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2246
+#line 2245
 
 #ifdef	CCPU
 IMPORT	IBOOL	CheckCsSelectorAndEipForCallFarPatching	IPT3(IU16, csSel, IU32, eip, IU32 *, pCsBase);
@@ -1431,7 +1431,7 @@ IMPORT	IBOOL	CheckCsSelectorAndEipForCallFarPatching	IPT3(IU16, csSel, IU32, eip
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2259
+#line 2258
 
 typedef struct CpuStateREC * TypeCpuStateRECptr;
 typedef struct ConstraintBitMapREC * TypeConstraintBitMapRECptr;
@@ -1505,7 +1505,7 @@ IMPORT	IHP	c_getSadInfoTable	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2338
+#line 2337
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setGDT_BASE_LIMIT	IPT2(IU32, base, IU16, limit);
@@ -1513,7 +1513,7 @@ IMPORT	IBOOL	c_setGDT_BASE_LIMIT	IPT2(IU32, base, IU16, limit);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2351
+#line 2350
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setIDT_BASE_LIMIT	IPT2(IU32, base, IU16, limit);
@@ -1521,7 +1521,7 @@ IMPORT	IBOOL	c_setIDT_BASE_LIMIT	IPT2(IU32, base, IU16, limit);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2364
+#line 2363
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setLDT_BASE_LIMIT	IPT2(IU32, base, IU32, limit);
@@ -1529,7 +1529,7 @@ IMPORT	IBOOL	c_setLDT_BASE_LIMIT	IPT2(IU32, base, IU32, limit);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2377
+#line 2376
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setTR_BASE_LIMIT	IPT2(IU32, base, IU32, limit);
@@ -1537,7 +1537,7 @@ IMPORT	IBOOL	c_setTR_BASE_LIMIT	IPT2(IU32, base, IU32, limit);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2390
+#line 2389
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setTR_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1545,7 +1545,7 @@ IMPORT	IBOOL	c_setTR_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2403
+#line 2402
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setCS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1553,7 +1553,7 @@ IMPORT	IBOOL	c_setCS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2416
+#line 2415
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setSS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1561,7 +1561,7 @@ IMPORT	IBOOL	c_setSS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2429
+#line 2428
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setDS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1569,7 +1569,7 @@ IMPORT	IBOOL	c_setDS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2442
+#line 2441
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setES_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1577,7 +1577,7 @@ IMPORT	IBOOL	c_setES_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2455
+#line 2454
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setFS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1585,7 +1585,7 @@ IMPORT	IBOOL	c_setFS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2468
+#line 2467
 
 #ifdef	CCPU
 IMPORT	IBOOL	c_setGS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
@@ -1593,7 +1593,7 @@ IMPORT	IBOOL	c_setGS_BASE_LIMIT_AR	IPT3(IU32, base, IU32, limit, IU16, ar);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2481
+#line 2480
 
 #ifdef	CCPU
 IMPORT	void	c_setCS_SELECTOR	IPT1(IU16, val);
@@ -1601,7 +1601,7 @@ IMPORT	void	c_setCS_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2494
+#line 2493
 
 #ifdef	CCPU
 IMPORT	void	c_setSS_SELECTOR	IPT1(IU16, val);
@@ -1609,7 +1609,7 @@ IMPORT	void	c_setSS_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2507
+#line 2506
 
 #ifdef	CCPU
 IMPORT	void	c_setDS_SELECTOR	IPT1(IU16, val);
@@ -1617,7 +1617,7 @@ IMPORT	void	c_setDS_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2520
+#line 2519
 
 #ifdef	CCPU
 IMPORT	void	c_setES_SELECTOR	IPT1(IU16, val);
@@ -1625,7 +1625,7 @@ IMPORT	void	c_setES_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2533
+#line 2532
 
 #ifdef	CCPU
 IMPORT	void	c_setFS_SELECTOR	IPT1(IU16, val);
@@ -1633,7 +1633,7 @@ IMPORT	void	c_setFS_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2546
+#line 2545
 
 #ifdef	CCPU
 IMPORT	void	c_setGS_SELECTOR	IPT1(IU16, val);
@@ -1641,7 +1641,7 @@ IMPORT	void	c_setGS_SELECTOR	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2559
+#line 2558
 
 #ifdef	CCPU
 IMPORT	IU16	c_getCS_SELECTOR	IPT0();
@@ -1649,7 +1649,7 @@ IMPORT	IU16	c_getCS_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2572
+#line 2571
 
 #ifdef	CCPU
 IMPORT	IU16	c_getSS_SELECTOR	IPT0();
@@ -1657,7 +1657,7 @@ IMPORT	IU16	c_getSS_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2585
+#line 2584
 
 #ifdef	CCPU
 IMPORT	IU16	c_getDS_SELECTOR	IPT0();
@@ -1665,7 +1665,7 @@ IMPORT	IU16	c_getDS_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2598
+#line 2597
 
 #ifdef	CCPU
 IMPORT	IU16	c_getES_SELECTOR	IPT0();
@@ -1673,7 +1673,7 @@ IMPORT	IU16	c_getES_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2611
+#line 2610
 
 #ifdef	CCPU
 IMPORT	IU16	c_getFS_SELECTOR	IPT0();
@@ -1681,7 +1681,7 @@ IMPORT	IU16	c_getFS_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2624
+#line 2623
 
 #ifdef	CCPU
 IMPORT	IU16	c_getGS_SELECTOR	IPT0();
@@ -1689,7 +1689,7 @@ IMPORT	IU16	c_getGS_SELECTOR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2637
+#line 2636
 
 #ifdef	CCPU
 IMPORT	IU32	c_getCS_BASE	IPT0();
@@ -1697,7 +1697,7 @@ IMPORT	IU32	c_getCS_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2650
+#line 2649
 
 #ifdef	CCPU
 IMPORT	IU32	c_getSS_BASE	IPT0();
@@ -1705,7 +1705,7 @@ IMPORT	IU32	c_getSS_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2663
+#line 2662
 
 #ifdef	CCPU
 IMPORT	IU32	c_getDS_BASE	IPT0();
@@ -1713,7 +1713,7 @@ IMPORT	IU32	c_getDS_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2676
+#line 2675
 
 #ifdef	CCPU
 IMPORT	IU32	c_getES_BASE	IPT0();
@@ -1721,7 +1721,7 @@ IMPORT	IU32	c_getES_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2689
+#line 2688
 
 #ifdef	CCPU
 IMPORT	IU32	c_getFS_BASE	IPT0();
@@ -1729,7 +1729,7 @@ IMPORT	IU32	c_getFS_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2702
+#line 2701
 
 #ifdef	CCPU
 IMPORT	IU32	c_getGS_BASE	IPT0();
@@ -1737,7 +1737,7 @@ IMPORT	IU32	c_getGS_BASE	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2715
+#line 2714
 
 #ifdef	CCPU
 IMPORT	IU32	c_getCS_LIMIT	IPT0();
@@ -1745,7 +1745,7 @@ IMPORT	IU32	c_getCS_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2728
+#line 2727
 
 #ifdef	CCPU
 IMPORT	IU32	c_getSS_LIMIT	IPT0();
@@ -1753,7 +1753,7 @@ IMPORT	IU32	c_getSS_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2741
+#line 2740
 
 #ifdef	CCPU
 IMPORT	IU32	c_getDS_LIMIT	IPT0();
@@ -1761,7 +1761,7 @@ IMPORT	IU32	c_getDS_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2754
+#line 2753
 
 #ifdef	CCPU
 IMPORT	IU32	c_getES_LIMIT	IPT0();
@@ -1769,7 +1769,7 @@ IMPORT	IU32	c_getES_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2767
+#line 2766
 
 #ifdef	CCPU
 IMPORT	IU32	c_getFS_LIMIT	IPT0();
@@ -1777,7 +1777,7 @@ IMPORT	IU32	c_getFS_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2780
+#line 2779
 
 #ifdef	CCPU
 IMPORT	IU32	c_getGS_LIMIT	IPT0();
@@ -1785,7 +1785,7 @@ IMPORT	IU32	c_getGS_LIMIT	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2793
+#line 2792
 
 #ifdef	CCPU
 IMPORT	IU16	c_getCS_AR	IPT0();
@@ -1793,7 +1793,7 @@ IMPORT	IU16	c_getCS_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2806
+#line 2805
 
 #ifdef	CCPU
 IMPORT	IU16	c_getSS_AR	IPT0();
@@ -1801,7 +1801,7 @@ IMPORT	IU16	c_getSS_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2819
+#line 2818
 
 #ifdef	CCPU
 IMPORT	IU16	c_getDS_AR	IPT0();
@@ -1809,7 +1809,7 @@ IMPORT	IU16	c_getDS_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2832
+#line 2831
 
 #ifdef	CCPU
 IMPORT	IU16	c_getES_AR	IPT0();
@@ -1817,7 +1817,7 @@ IMPORT	IU16	c_getES_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2845
+#line 2844
 
 #ifdef	CCPU
 IMPORT	IU16	c_getFS_AR	IPT0();
@@ -1825,7 +1825,7 @@ IMPORT	IU16	c_getFS_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2858
+#line 2857
 
 #ifdef	CCPU
 IMPORT	IU16	c_getGS_AR	IPT0();
@@ -1833,7 +1833,7 @@ IMPORT	IU16	c_getGS_AR	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2871
+#line 2870
 
 #ifdef	CCPU
 IMPORT	IUH	c_getCPL	IPT0();
@@ -1841,7 +1841,7 @@ IMPORT	IUH	c_getCPL	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2884
+#line 2883
 
 #ifdef	CCPU
 IMPORT	void	c_setCPL	IPT1(IUH, prot);
@@ -1849,7 +1849,7 @@ IMPORT	void	c_setCPL	IPT1(IUH, prot);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2897
+#line 2896
 
 #ifdef	CCPU
 IMPORT	void	c_getCpuState	IPT1(TypeCpuStateRECptr, state);
@@ -1857,7 +1857,7 @@ IMPORT	void	c_getCpuState	IPT1(TypeCpuStateRECptr, state);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2910
+#line 2909
 
 #ifdef	CCPU
 IMPORT	void	c_setCpuState	IPT1(TypeCpuStateRECptr, state);
@@ -1865,7 +1865,7 @@ IMPORT	void	c_setCpuState	IPT1(TypeCpuStateRECptr, state);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2923
+#line 2922
 
 #ifdef	CCPU
 IMPORT	void	c_InitNanoCpu	IPT1(IU32, variety);
@@ -1873,7 +1873,7 @@ IMPORT	void	c_InitNanoCpu	IPT1(IU32, variety);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2936
+#line 2935
 
 #ifdef	CCPU
 IMPORT	void	c_PrepareBlocksToCompile	IPT1(IU32, variety);
@@ -1881,7 +1881,7 @@ IMPORT	void	c_PrepareBlocksToCompile	IPT1(IU32, variety);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2949
+#line 2948
 
 #ifdef	CCPU
 IMPORT	void	c_InitRdWrCacheAndCookies	IPT1(IU32, variety);
@@ -1889,7 +1889,7 @@ IMPORT	void	c_InitRdWrCacheAndCookies	IPT1(IU32, variety);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2962
+#line 2961
 
 #ifdef	CCPU
 IMPORT	void	c_ResetRdWrCacheAndCookies	IPT1(IU32, variety);
@@ -1897,7 +1897,7 @@ IMPORT	void	c_ResetRdWrCacheAndCookies	IPT1(IU32, variety);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 2975
+#line 2974
 
 #ifdef	CCPU
 IMPORT	void	c_setRegConstraint	IPT2(IU32, regId, IU8, constraintType);

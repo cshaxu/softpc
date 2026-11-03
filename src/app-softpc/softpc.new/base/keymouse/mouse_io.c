@@ -690,7 +690,7 @@ LOCAL ACCELERATION_CURVE_DATA default_acceleration_curve =
         /* check if page requested is valid */
 #define is_valid_page_number(pg) ((pg) < vd_mode_table[sas_hw_at(vd_video_mode)].npages)
 #endif // !NEC_98
-#line 693
+#line 769
 
 /*
  *      Mouse Driver Version
@@ -1314,7 +1314,7 @@ void mouse_install1()
         sas_storew(int_addr(MOUSE_VEC) + 2, MOUSE_INT1_SEGMENT);
 
 #endif NTVDM
-#line 1357
+#line 1090
 
         /*
          *      Enable mouse hardware interrupts in the ica
@@ -1474,14 +1474,14 @@ void mouse_io_interrupt()
         local_DX = getDX();
 
 #ifndef NEC_98
-#line 1483
+#line 1246
 #ifdef EGG
         jap_mouse = ((sas_hw_at(vd_video_mode) != Currently_emulated_video_mode) && alpha_num_mode());
         if (jap_mouse)
                 note_trace0(MOUSE_VERBOSE, "In Japanese mode - will emulate textmouse");
 #endif /* EGG */
 #endif // !NEC_98
-#line 1488
+#line 1252
 
         note_trace4(MOUSE_VERBOSE,
                     "mouse function %d, position is %d,%d, button state is %d",
@@ -1740,13 +1740,13 @@ LOCAL void dirty_all_regs()
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM && MONITOR */
-#line 1789
+#line 1609
 
 LOCAL void restore_ega_defaults(to_hw)
 boolean to_hw;
 {
 #ifndef NEC_98
-#line 1793
+#line 1614
         IU8 i;
         half_word temp_word;
 
@@ -1819,7 +1819,7 @@ boolean to_hw;
                 clean_all_regs();
         }
 #endif    //NEC_98
-#line 1864
+#line 1686
 }
 
 
@@ -1867,7 +1867,7 @@ void LOCAL mouse_adjust_screen_size()
 #if defined(NTVDM) && !defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 1908
+#line 1741
 
 void GLOBAL mouse_ega_mode(curr_video_mode)
 int curr_video_mode;
@@ -1884,7 +1884,7 @@ int curr_video_mode;
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1921
+#line 1757
 #ifdef V7VGA            /* suret */
                 if( (getAH()) == 0x6F )
                         parms_addr = find_mode_table(getBL(),&temp_word);
@@ -1919,7 +1919,7 @@ int curr_video_mode;
 void mouse_video_io()
 {
 #ifndef NEC_98
-#line 1944
+#line 1789
         /*
          *      This is the entry point for video accesses via the INT 10H
          *      interface
@@ -1934,7 +1934,7 @@ void mouse_video_io()
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1958
+#line 1826
         {
                 note_trace1(MOUSE_VERBOSE, "mouse_video_io:set_mode(%d)",
                             getAL());
@@ -1944,7 +1944,7 @@ void mouse_video_io()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1964
+#line 1838
 #ifdef V7VGA
                 if (mouse_video_function == 0x6f)
                         current_video_mode = getBL() & 0x7f;
@@ -1955,7 +1955,7 @@ void mouse_video_io()
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1974
+#line 1848
                 {
                         always_trace1("Bad video mode - %d.\n", current_video_mode);
 #ifdef V7VGA
@@ -1968,7 +1968,7 @@ void mouse_video_io()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1983
+#line 1860
 #ifdef EGG
                 mouse_ega_mode(current_video_mode);
                 dirty_all_regs();
@@ -1998,7 +1998,7 @@ void mouse_video_io()
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 2008
+#line 1891
 
                 note_trace0(MOUSE_VERBOSE, "mouse_video_io:return()");
         }
@@ -2037,7 +2037,7 @@ void mouse_video_io()
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM && MONITOR */
-#line 2043
+#line 1938
 
         /*
          *      Now do the standard video io processing
@@ -2368,7 +2368,7 @@ the application OUTBs the necessary data.
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
-#line 2349
+#line 2261
                                 video_io();
 #endif /* !NTVDM && !MONITOR */
 #line 2263
@@ -2398,7 +2398,7 @@ the application OUTBs the necessary data.
 #else /* GISP_SVGA */
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
-#line 2375
+#line 2288
         }
                         else
                         {
@@ -2414,7 +2414,7 @@ the application OUTBs the necessary data.
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif /* GISP_SVGA */
-#line 2389
+#line 2302
 
 #endif    //NEC_98
 #line 2304
@@ -2734,7 +2734,7 @@ LOCAL void mouse_update IFN1(MOUSE_CALL_MASK, condition_mask)
 /*@ACW*/
 
 #ifndef NTVDM
-#line 2683
+#line 2710
         /*
          *      If the cursor is currently displayed, move it to the new
          *      position
@@ -2744,12 +2744,12 @@ LOCAL void mouse_update IFN1(MOUSE_CALL_MASK, condition_mask)
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 2694
+#line 2721
                         {
                         cursor_display();
                         }
 #endif /*NTVDM*/
-#line 2697
+#line 2725
 }
 
 
@@ -3064,7 +3064,7 @@ LOCAL void mouse_show_cursor IFN4(word *,junk1,word *,junk2,word *,junk3,word *,
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 2992
+#line 3034
                         {
                         cursor_display();
                         }
@@ -3102,7 +3102,7 @@ LOCAL void mouse_hide_cursor IFN4(word *,junk1,word *,junk2,word *,junk3,word *,
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 3024
+#line 3071
                 {
                 cursor_undisplay();
                 }
@@ -3382,7 +3382,7 @@ LOCAL void mouse_set_graphics IFN4(word *,junk1,MOUSE_SCALAR *,hot_spot_x_ptr,MO
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #else           /* MOUSE_16_BIT */
-#line 3284
+#line 3383
 
         if (host_mouse_installed())
         {
@@ -3442,7 +3442,7 @@ LOCAL void mouse_set_graphics IFN4(word *,junk1,MOUSE_SCALAR *,hot_spot_x_ptr,MO
         }
 #endif /* MOUSE_16_BIT */
 #endif /* NTVDM */
-#line 3342
+#line 3440
         /*
          *      Redisplay cursor if necessary
          */
@@ -3795,7 +3795,7 @@ LOCAL void mouse_save_state IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 LOCAL void mouse_restore_state IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 {
 #ifndef NEC_98
-#line 3690
+#line 3819
         /*
          *      This function restores the state of the driver from the user-supplied
          *      buffer which was set up by a call to mouse function 22.
@@ -3860,10 +3860,10 @@ LOCAL void mouse_restore_state IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 3750
+#line 3885
         }
 #endif   //NEC_98
-#line 3751
+#line 3887
 }
 
 
@@ -4055,7 +4055,7 @@ LOCAL void mouse_set_int_rate IFN4
 LOCAL void mouse_set_pointer_page IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 {
 #ifndef NEC_98
-#line 3941
+#line 4078
         /*
          *      This function sets the current mouse pointer video page.
          */
@@ -4076,10 +4076,10 @@ LOCAL void mouse_set_pointer_page IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 3961
+#line 4098
         }
 #endif    //NEC_98
-#line 3962
+#line 4100
 }
 
 
@@ -4137,7 +4137,7 @@ LOCAL void mouse_driver_disable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
                          current_int10_offset  != MOUSE_VIDEO_IO_OFFSET ||
                          current_int10_segment != MOUSE_VIDEO_IO_SEGMENT;
 #endif
-#line 4008
+#line 4157
         }
         if (!failed){
                 /*
@@ -4162,7 +4162,7 @@ LOCAL void mouse_driver_disable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
                 sas_storew (int_addr(0x10) + 0, saved_int10_offset);
                 sas_storew (int_addr(0x10) + 2, saved_int10_segment);
 #endif
-#line 4027
+#line 4181
                 /*
                  *      Return success status and old INT33h vector
                  */
@@ -4217,7 +4217,7 @@ LOCAL void mouse_driver_enable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
         sas_storew(int_addr(MOUSE_VEC), MOUSE_INT1_OFFSET);
         sas_storew(int_addr(MOUSE_VEC) + 2, MOUSE_INT1_SEGMENT);
 #endif
-#line 4076
+#line 4237
 
         /*
          *      Enable mouse hardware interrupts in the ica
@@ -4234,7 +4234,7 @@ LOCAL void mouse_driver_enable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
          */
 
 #ifndef NTVDM
-#line 4091
+#line 4253
         /* Read offset of INT 33 procedure from MOUSE.COM */
         sas_loadw(effective_addr(getCS(), OFF_HOOK_POSN), &hook_offset);
 
@@ -4249,7 +4249,7 @@ LOCAL void mouse_driver_enable IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
         sas_storew(int_addr(0x10), MOUSE_VIDEO_IO_OFFSET);
         sas_storew(int_addr(0x10) + 2, MOUSE_VIDEO_IO_SEGMENT);
 #endif /* NTVDM */
-#line 4104
+#line 4267
 }
 
 
@@ -4287,10 +4287,10 @@ LOCAL void mouse_get_language IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
 #ifdef KOREA
 #error "Unsupported SoftPC mirror configuration: KOREA"
 #else   0 = English
-#line 4138
+#line 4306
         *m2 = 0;
 #endif
-#line 4139
+#line 4308
 
         note_trace1(MOUSE_VERBOSE,
                     "mouse_io: mouse_get_language returning m2=0x%04x.", *m2);
@@ -4357,7 +4357,7 @@ LOCAL void mouse_get_max_coords IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
         *m3 = virtual_screen.bottom_right.x - 1;
         *m4 = virtual_screen.bottom_right.y - 1;
 #endif
-#line 4194
+#line 4372
 }
 
 LOCAL void mouse_get_masks_and_mickeys IFN4
@@ -4369,7 +4369,7 @@ LOCAL void mouse_get_masks_and_mickeys IFN4
    )
    {
 #ifndef NEC_98
-#line 4204
+#line 4383
    /*
       Func 39: Get Screen/Cursor Masks and Mickey Counts.
     */
@@ -4411,7 +4411,7 @@ LOCAL void mouse_get_masks_and_mickeys IFN4
          *raw_vert_count_ptr);
       }
 #endif   //NEC_98
-#line 4244
+#line 4424
    }
 
 LOCAL void mouse_set_video_mode IFN4
@@ -4423,7 +4423,7 @@ LOCAL void mouse_set_video_mode IFN4
    )
    {
 #ifndef NEC_98
-#line 4254
+#line 4435
    /*
       Func 40 Set Video Mode. NB. This only sets the mouse state to
       match the video mode. Actual changes to the video mode are still
@@ -4457,7 +4457,7 @@ LOCAL void mouse_set_video_mode IFN4
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif /* MOUSE_16_BIT */
-#line 4289
+#line 4470
 
       *video_mode_ptr = 0;   /* Indicate success */
       }
@@ -4465,7 +4465,7 @@ LOCAL void mouse_set_video_mode IFN4
    note_trace1(MOUSE_VERBOSE, "mouse_io: return(mode=0x%x)",
       *video_mode_ptr);
 #endif    //NEC_98
-#line 4295
+#line 4477
    }
 
 LOCAL void mouse_enumerate_video_modes IFN4
@@ -4477,7 +4477,7 @@ LOCAL void mouse_enumerate_video_modes IFN4
    )
    {
 #ifndef NEC_98
-#line 4305
+#line 4488
    /*
       Func 41 Enumerate Video Modes.
     */
@@ -4524,7 +4524,7 @@ LOCAL void mouse_enumerate_video_modes IFN4
    note_trace3(MOUSE_VERBOSE, "mouse_io: return(mode=0x%x, seg=0x%x, off=0x%x)",
       *video_nr_ptr, getES(), *offset_ptr);
 #endif    //NEC_98
-#line 4350
+#line 4534
    }
 
 LOCAL void mouse_get_cursor_hot_spot IFN4
@@ -4536,7 +4536,7 @@ LOCAL void mouse_get_cursor_hot_spot IFN4
    )
    {
 #ifndef NEC_98
-#line 4360
+#line 4545
    /*
       Func 42: Return cursor hot spot location, the type of mouse in
       use, and the internal counter that controls cursor visibility.
@@ -4557,7 +4557,7 @@ LOCAL void mouse_get_cursor_hot_spot IFN4
       *hot_spot_x_ptr, *hot_spot_y_ptr,
       *mouse_type_ptr);
 #endif    //NEC_98
-#line 4379
+#line 4565
    }
 
 /* Load acceleration curve from Intel memory to Host memory */
@@ -4569,7 +4569,7 @@ LOCAL void load_acceleration_curve IFN3
    )
    {
 #ifndef NEC_98
-#line 4389
+#line 4576
    int i, j;
 
    /* Read lengths */
@@ -4609,7 +4609,7 @@ LOCAL void load_acceleration_curve IFN3
          }
       }
 #endif    //NEC_98
-#line 4427
+#line 4615
    }
 
 /* Store acceleration curve from Host memory to Intel memory */
@@ -4621,7 +4621,7 @@ LOCAL void store_acceleration_curve IFN3
    )
    {
 #ifndef NEC_98
-#line 4437
+#line 4626
    int i, j;
 
    /* Write lengths */
@@ -4661,7 +4661,7 @@ LOCAL void store_acceleration_curve IFN3
          }
       }
 #endif    //NEC_98
-#line 4475
+#line 4665
    }
 
 LOCAL void mouse_load_acceleration_curves IFN4
@@ -4673,7 +4673,7 @@ LOCAL void mouse_load_acceleration_curves IFN4
    )
    {
 #ifndef NEC_98
-#line 4485
+#line 4676
    /*
       Func 43: Load Acceleration Curves.
     */
@@ -4723,7 +4723,7 @@ LOCAL void mouse_load_acceleration_curves IFN4
 
    note_trace1(MOUSE_VERBOSE, "mouse_io: return(success=0x%x)", *success_ptr);
 #endif  //NEC_98
-#line 4533
+#line 4725
    }
 
 LOCAL void mouse_read_acceleration_curves IFN4
@@ -4735,7 +4735,7 @@ LOCAL void mouse_read_acceleration_curves IFN4
    )
    {
 #ifndef NEC_98
-#line 4543
+#line 4736
    /*
       Func 44: Read Acceleration Curves.
     */
@@ -4765,7 +4765,7 @@ LOCAL void mouse_read_acceleration_curves IFN4
       "mouse_io: return(success=0x%x, curve=%d, seg=0x%x, off=0x%x)",
       *success_ptr, *curve_ptr, getES(), getSI());
 #endif //NEC_98
-#line 4571
+#line 4765
    }
 
 LOCAL void mouse_set_get_active_acceleration_curve IFN4
@@ -4777,7 +4777,7 @@ LOCAL void mouse_set_get_active_acceleration_curve IFN4
    )
    {
 #ifndef NEC_98
-#line 4581
+#line 4776
    /*
       Func 45: Set/Get Active Acceleration Curve.
     */
@@ -4832,7 +4832,7 @@ LOCAL void mouse_set_get_active_acceleration_curve IFN4
       "mouse_io: return(success=0x%x, curve=%d, seg=0x%x, off=0x%x)",
       *success_ptr, *curve_ptr, getES(), getSI());
 #endif //NEC_98
-#line 4634
+#line 4830
    }
 
 LOCAL void mouse_microsoft_internal IFN4
@@ -4844,7 +4844,7 @@ LOCAL void mouse_microsoft_internal IFN4
    )
    {
 #ifndef NEC_98
-#line 4644
+#line 4841
    /*
       Func 46: Microsoft Internal. We don't support it.
     */
@@ -4856,7 +4856,7 @@ LOCAL void mouse_microsoft_internal IFN4
 
    note_trace0(MOUSE_VERBOSE, "mouse_io: microsoft_internal NOT SUPPORTED!");
 #endif    //NEC_98
-#line 4654
+#line 4852
    }
 
 LOCAL void mouse_hardware_reset IFN4
@@ -4868,7 +4868,7 @@ LOCAL void mouse_hardware_reset IFN4
    )
    {
 #ifndef NEC_98
-#line 4664
+#line 4863
    /*
       Func 47: Reset the mouse hardware and display variables.
       This is not a full software reset as per Func 0 or Func 33.
@@ -4896,7 +4896,7 @@ LOCAL void mouse_hardware_reset IFN4
 
    note_trace0(MOUSE_VERBOSE, "mouse_io: return()");
 #endif    //NEC_98
-#line 4690
+#line 4890
    }
 
 LOCAL void mouse_set_get_ballpoint_info IFN4
@@ -4908,7 +4908,7 @@ LOCAL void mouse_set_get_ballpoint_info IFN4
    )
    {
 #ifndef NEC_98
-#line 4700
+#line 4901
    /*
       Func 48: Get/Set Ballpoint Information.
       Note: We do not support a ballpoint device.
@@ -4935,7 +4935,7 @@ LOCAL void mouse_set_get_ballpoint_info IFN4
    *status_ptr = MOUSE_M1;   /* ie not supported */
    note_trace0(MOUSE_VERBOSE, "mouse_io: return(NOT_SUPPORTED)");
 #endif    //NEC_98
-#line 4725
+#line 4927
    }
 
 LOCAL void mouse_get_min_max_virtual_coords IFN4
@@ -4964,7 +4964,7 @@ LOCAL void mouse_get_min_max_virtual_coords IFN4
       *min_x_ptr, *min_y_ptr,
       *max_x_ptr, *max_y_ptr);
 #endif    //NEC_98
-#line 4750
+#line 4954
    }
 
 LOCAL void mouse_get_active_advanced_functions IFN4
@@ -4976,7 +4976,7 @@ LOCAL void mouse_get_active_advanced_functions IFN4
    )
    {
 #ifndef NEC_98
-#line 4760
+#line 4965
    /*
       Func 50: Get Active Advanced Functions, ie define which functions
       above or equal to 37 are supported.
@@ -5010,7 +5010,7 @@ LOCAL void mouse_get_active_advanced_functions IFN4
       *active_flag3_ptr,
       *active_flag4_ptr);
 #endif    //NEC_98
-#line 4792
+#line 4998
    }
 
 LOCAL void mouse_get_switch_settings IFN4
@@ -5022,7 +5022,7 @@ LOCAL void mouse_get_switch_settings IFN4
    )
    {
 #ifndef NEC_98
-#line 4802
+#line 5009
    /*
       Func 51: Get switch settings. Returns output buffer (340 bytes)
       with:-
@@ -5144,7 +5144,7 @@ LOCAL void mouse_get_switch_settings IFN4
    note_trace1(MOUSE_VERBOSE, "mouse_io: return(bytes_returned=0x%x)",
       *buffer_length_ptr);
 #endif    //NEC_98
-#line 4922
+#line 5130
    }
 
 LOCAL void mouse_get_mouse_ini IFN4
@@ -5156,7 +5156,7 @@ LOCAL void mouse_get_mouse_ini IFN4
    )
    {
 #ifndef NEC_98
-#line 4932
+#line 5141
    /*
       Func 52: Return Segment:Offset pointer to full pathname of
       MOUSE.INI.
@@ -5177,7 +5177,7 @@ LOCAL void mouse_get_mouse_ini IFN4
    note_trace2(MOUSE_VERBOSE, "mouse_io: return(seg=%04x,off=%04x)",
       getES(), *offset_ptr);
 #endif    //NEC_98
-#line 4951
+#line 5161
    }
 
 LOCAL void mouse_unrecognised IFN4(word *,m1,word *,m2,word *,m3,word *,m4)
@@ -5235,7 +5235,7 @@ LOCAL void mouse_set_double_speed IFN4(word *,junk1,word *,junk2,word *,junk3,wo
 LOCAL MOUSE_BYTE_ADDRESS point_as_text_cell_address IFN1(MOUSE_POINT *,point_ptr)
 {
 #ifndef NEC_98
-#line 5013
+#line 5224
         /*
          *      Return the byte offset of the character in the text mode regen
          *      buffer corresponding to the virtual screen position
@@ -5263,13 +5263,13 @@ LOCAL MOUSE_BYTE_ADDRESS point_as_text_cell_address IFN1(MOUSE_POINT *,point_ptr
 
         return(byte_address);
 #endif    //NEC_98
-#line 5039
+#line 5251
 }
 
 LOCAL MOUSE_BIT_ADDRESS point_as_graphics_cell_address IFN1(MOUSE_POINT *,point_ptr)
 {
 #ifndef NEC_98
-#line 5043
+#line 5256
         /*
          *      Return the bit offset of the pixel in the graphics mode regen
          *      buffer (odd or even) bank corresponding to the virtual screen
@@ -5300,7 +5300,7 @@ LOCAL MOUSE_BIT_ADDRESS point_as_graphics_cell_address IFN1(MOUSE_POINT *,point_
 LOCAL MOUSE_BIT_ADDRESS ega_point_as_graphics_cell_address IFN1(MOUSE_POINT *,point_ptr)
 {
 #ifndef NEC_98
-#line 5098
+#line 5313
         /*
          *      Return the bit offset of the pixel in the graphics mode regen
          *      buffer corresponding to the virtual screen position "*point_ptr"
@@ -5335,14 +5335,14 @@ LOCAL MOUSE_BIT_ADDRESS ega_point_as_graphics_cell_address IFN1(MOUSE_POINT *,po
 
         return(bit_address);
 #endif   //NEC_98
-#line 5131
+#line 5347
 }
 
 
 LOCAL void cursor_update IFN0()
 {
 #ifndef NTVDM
-#line 5136
+#line 5353
         /*
          *      This function is used to update the displayed cursor
          *      position on the screen following a change to the
@@ -5358,7 +5358,7 @@ LOCAL void cursor_update IFN0()
                                                                 cursor_status.position.y * mouse_gear.y * mouse_sens.y / 800);
 
 #endif
-#line 5150
+#line 5368
 }
 
 
@@ -5386,7 +5386,7 @@ LOCAL void cursor_display IFN0()
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 5174
+#line 5394
 
         /*
          *      Remove the old representation of the
@@ -5444,7 +5444,7 @@ LOCAL void cursor_display IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 5230
+#line 5450
                         }
                         else
 #endif
@@ -5464,9 +5464,9 @@ LOCAL void cursor_display IFN0()
          */
         host_flush_screen();
 #endif /* !NTVDM */
-#line 5249
+#line 5470
 #endif   //NEC_98
-#line 5249
+#line 5471
 }
 
 
@@ -5488,7 +5488,7 @@ LOCAL void cursor_undisplay IFN0()
 #ifdef  MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif  /* MOUSE_16_BIT */
-#line 5268
+#line 5492
 
         /*
          *      Undisplay the representation of the current mouse status on
@@ -5530,7 +5530,7 @@ LOCAL void cursor_undisplay IFN0()
 #ifdef MOUSE_16_BIT
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #else /* MOUSE_16_BIT */
-#line 5309
+#line 5533
 #ifdef EGG
                         if ((video_adapter == EGA  || video_adapter == VGA) && (v_mode > 6))
                         {
@@ -5542,7 +5542,7 @@ LOCAL void cursor_undisplay IFN0()
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
-#line 5320
+#line 5544
                         }
                         else
 #endif
@@ -5557,7 +5557,7 @@ LOCAL void cursor_undisplay IFN0()
         }
 #endif /* !NTVDM */
 #endif   //NEC_98
-#line 5333
+#line 5559
 }
 
 
@@ -5602,7 +5602,7 @@ LOCAL void cursor_mode_change IFN1(int,new_mode)
 GLOBAL void software_text_cursor_display IFN0()
 {
 #ifndef NEC_98
-#line 5376
+#line 5603
         /*
          *      Get the area the cursor will occupy on the
          *      screen, and display the cursor if its area
@@ -5644,7 +5644,7 @@ GLOBAL void software_text_cursor_display IFN0()
                         software_text_cursor.cursor));
         }
 #endif    //NEC_98
-#line 5416
+#line 5644
 }
 
 
@@ -5653,7 +5653,7 @@ GLOBAL void software_text_cursor_display IFN0()
 GLOBAL void software_text_cursor_undisplay IFN0()
 {
 #ifndef NEC_98
-#line 5423
+#line 5652
         /*
          *      Remove old text cursor
          *      Should we look at video mode? Or is 0xb8000 OK?
@@ -5668,7 +5668,7 @@ GLOBAL void software_text_cursor_undisplay IFN0()
          */
         sas_storew(text_address, text_cursor_background);
 #endif    //NEC_98
-#line 5436
+#line 5666
 }
 
 
@@ -5744,7 +5744,7 @@ void LOCAL EGA_graphics_cursor_display IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 5512
+#line 5743
         /*
          *      Display a representation of the current mouse status on
          *      the screen using the graphics cursor, provided the
@@ -5925,7 +5925,7 @@ void LOCAL EGA_graphics_cursor_display IFN0()
         }
 #endif /* REAL_VGA */
 #endif   //NEC_98
-#line 5691
+#line 5923
 }
 
 
@@ -5937,7 +5937,7 @@ void LOCAL EGA_graphics_cursor_undisplay IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 5703
+#line 5936
         /*
          *      Remove the graphics cursor representation of the mouse
          *      status
@@ -6008,7 +6008,7 @@ void LOCAL EGA_graphics_cursor_undisplay IFN0()
         }
 #endif /* REAL_VGA */
 #endif   //NEC_98
-#line 5772
+#line 6006
 }
 
 #endif
@@ -6020,7 +6020,7 @@ LOCAL VOID      VGA_graphics_cursor_display IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else /* REAL_VGA */
-#line 5786
+#line 6020
 
         MOUSE_BYTE_ADDRESS byte_offset;
         SHORT line, line_max, index;
@@ -6105,7 +6105,7 @@ LOCAL VOID      VGA_graphics_cursor_undisplay IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else /* REAL_VGA */
-#line 5873
+#line 6107
 
         /*
          *      Remove the graphics cursor representation of the mouse
