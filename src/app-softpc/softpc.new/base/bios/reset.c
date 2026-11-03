@@ -770,7 +770,7 @@ void reset()
 
         gvi_init((half_word) gfxAdapt);
 #endif // !NEC_98
-#line 864
+#line 1066
 
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"

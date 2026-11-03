@@ -1518,7 +1518,7 @@ GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 1554
+#line 1553
 
 #if 0
 #error "Unsupported SoftPC mirror configuration: constant false"

@@ -159,7 +159,7 @@ extern struct EGA_CPU_GLOBALS
 #line 186
 } EGA_CPU;
 #endif // !NEC_98
-#line 160
+#line 188
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

@@ -407,7 +407,7 @@
 #endif /*SFELLOW */
 #line 419
 #endif // !NEC_98
-#line 419
+#line 707
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

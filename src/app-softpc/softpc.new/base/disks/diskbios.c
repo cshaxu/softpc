@@ -462,7 +462,7 @@ void disk_io IFN0()
 #line 903
 	BIOS_command = getAH ();
 #endif // !NEC_98
-#line 624
+#line 905
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
@@ -508,7 +508,7 @@ void disk_io IFN0()
 		maxoffset = 0;
 	}
 #endif // !NEC_98
-#line 669
+#line 1017
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -527,7 +527,7 @@ void disk_io IFN0()
 		badcmd ();
 	}
 #endif // !NEC_98
-#line 682
+#line 1044
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

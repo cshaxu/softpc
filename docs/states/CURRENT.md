@@ -890,3 +890,8 @@ positions in ten mirror files, with original branch boundaries and
 subsequent source verified. Both architectures passed all 186 background
 and eight native tests first run. The remaining line candidates need
 contextual review; S30 remains open.
+
+P37 was committed and pushed as `afbd47a2`. P38 corrects 20 XP
+conditional-end diagnostic positions in ten mirror files; both adjacent
+condition pairings were checked. Dual builds and both full background and
+native groups passed first run. S30 remains open for remaining candidates.

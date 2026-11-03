@@ -888,7 +888,7 @@ void printer_init IFN1(int,adapter)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
 #endif // !NEC_98
-#line 667
+#line 1026
 
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"

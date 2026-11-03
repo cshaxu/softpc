@@ -178,7 +178,7 @@ void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 	fl_set_media,
 };
 #endif // !NEC_98
-#line 168
+#line 257
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"

@@ -580,7 +580,7 @@ static void generate_iir IFN1(struct ADAPTER_STATE *, asp)
 	}
 }
 #endif // NEC_98
-#line 527
+#line 576
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -631,7 +631,7 @@ static void clear_interrupt IFN1(struct ADAPTER_STATE *, asp)
 	}
 }
 #endif // NEC_98
-#line 564
+#line 655
 
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM && FIFO_ON"
@@ -904,7 +904,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 856
+#line 1382
 	
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
@@ -1338,7 +1338,7 @@ recv_char IFN1(long, adapt_long)
 #line 2261
 }
 #endif // NEC_98
-#line 1495
+#line 2263
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -1485,7 +1485,7 @@ static void modem_change IFN1(int, adapter)
 	}
 }
 #endif // NEC_98
-#line 1631
+#line 2467
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -1586,7 +1586,7 @@ static word valid_latches[] =
 	1047, 	1536, 	2304
 };
 #endif // NEC_98
-#line 1704
+#line 2640
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -1814,7 +1814,7 @@ static void set_line_control IFN2(int, adapter, int, value)
 	asp->line_control_reg.all = (unsigned char)value;
 }
 #endif // NEC_98
-#line 1882
+#line 3068
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -1880,7 +1880,7 @@ static void set_dtr IFN1(int, adapter)
 	}
 }
 #endif // NEC_98
-#line 1942
+#line 3158
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -2103,7 +2103,7 @@ static void set_loopback IFN1(int, adapter)
 	}
 }
 #endif // NEC_98
-#line 2155
+#line 3403
 
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"

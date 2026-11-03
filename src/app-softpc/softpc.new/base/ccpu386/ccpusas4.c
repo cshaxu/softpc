@@ -305,7 +305,7 @@ GLOBAL IBOOL c_SasRegisterVirtualSelectors IFN2(IU16, sel1, IU16, sel2)
 #else
 #error "Unsupported SoftPC mirror configuration: CHECK_ACCESS"
 #endif /* !CHECK_ACCESS else */
-#line 317
+#line 257
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"

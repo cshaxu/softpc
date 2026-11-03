@@ -98,7 +98,7 @@ void diskette_io()
 	half_word diskette_status;
 	int op = getAH(), drive = getDL();
 #endif // !NEC_98
-#line 304
+#line 535
 
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
