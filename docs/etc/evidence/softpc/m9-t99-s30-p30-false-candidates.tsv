@@ -1,0 +1,5 @@
+path	local_line	existing_line	audit_result
+base/system/cmos.c	1048	1134	Original closing brace is XP 1134; candidate 1169 belongs to another function.
+base/system/rom.c	393	513	Original closing brace is XP 513; candidate 541 belongs to another function.
+base/system/timer.c	483	503	Two local blank lines align the next comment with XP 505; candidate 92 is unrelated.
+base/keymouse/mouse_io.c	3052	3018	A local blank line aligns the following comment and code to XP 3019 onward; candidate 2953 is a different block.

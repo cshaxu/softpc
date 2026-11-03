@@ -201,7 +201,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef HERC
 #error "Unsupported SoftPC mirror configuration: HERC"
 #endif
-#line 203
+#line 218
         default:
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
@@ -248,7 +248,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
-#line 255
+#line 270
 
 /* Setting all these variables should be done in the appropriate xxx_init() */
     switch (video_adapter) {
@@ -330,7 +330,7 @@ void gvi_term IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 333
+#line 350
 	break;
     }
 

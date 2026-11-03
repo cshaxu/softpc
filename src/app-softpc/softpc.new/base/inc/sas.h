@@ -122,7 +122,7 @@ extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #ifdef CHEAT
 #error "Unsupported SoftPC mirror configuration: CHEAT"
 #endif /* CHEAT */
-#line 123
+#line 129
 
 /*
 	The following is to allow hosts to redefine the sas_interface to
@@ -342,7 +342,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #define	BASIC_ROM		0xFE000L	/* Start of Basic Rom */
 #define ROM_START		0xC0000L	/* Start of Expansion ROM @ 768k */
 #endif // !NEC_98
-#line 332
+#line 356
 
 #define FIXED_DISK_START	0xC8000L	/* Start fixed disk BIOS*/
 #define FIXED_DISK_END		0xCA000L	/* End fixed disk BIOS +1 */
@@ -710,7 +710,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifdef STINGER
 #error "Unsupported SoftPC mirror configuration: STINGER"
 #else		/* ~STINGER */
-#line 690
+#line 722
 #ifdef V7VGA
 #define EGA_ROM_END		0xC5000L	/* end of EGA BIOS ROM +1 */
 #else
@@ -791,7 +791,7 @@ extern void sas_stores_from_transbuf IPT3(sys_addr, dest, host_addr, src, sys_ad
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 1052
+#line 1084
 
 #ifdef LITTLEND
 typedef union   {

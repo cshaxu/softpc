@@ -354,7 +354,7 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 #line 453
 
 #if !(defined(NTVDM) && defined(MONITOR))
-#line 342
+#line 455
 	host_addr tmp;
 	long size = 0;
 
@@ -364,7 +364,7 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 #if defined(macintosh) && defined(A2CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
-#line 351
+#line 464
 	tmp = (host_addr)sas_scratch_address(ROM_BUFFER_SIZE);
 #endif
 

@@ -839,3 +839,11 @@ boundaries have been checked, including their arm signatures; this is not
 proof that all retained descendants or all line directives have been audited.
 The line candidate remainder has 59 sites, including unverified false or
 conflicting matches. P29 dual builds and background suites passed; each native group passed in full after a failed first run. Delivery is pending. S30 remains open.
+
+P29 was committed and pushed as `b6abbbe9`. P30 corrects 28 diagnostic
+line positions in ten mirror files and records four false line candidates.
+The combined known candidate queue contains 49 unreviewed sites; it is not
+exhaustive. The line mapping in `mouse_io.c` accounts for an extra local
+blank line so the next original comment and executable statement obtain
+their XP positions. Conditions and executable statements are unchanged.
+P30 dual builds and both 186-test background suites passed. Both native groups initially failed compact_console and each full group reran 8/8 successfully; delivery remains pending. S30 remains open.

@@ -392,7 +392,7 @@ IMPORT ADAPTER_STATE adapter_state[2];
 #endif /* !PROD */
 #line 414
 #endif /* !NTVDM */
-#line 414
+#line 434
 
 				switch (cmos_index)
 				{
@@ -429,7 +429,7 @@ IMPORT ADAPTER_STATE adapter_state[2];
 #endif /* !PROD */
 #line 456
 #endif /* !NTVDM */
-#line 456
+#line 478
 
 			*value = *cmos_register;
 		}

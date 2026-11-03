@@ -94,13 +94,13 @@
 #ifdef XTSFD
 #error "Unsupported SoftPC mirror configuration: XTSFD"
 #endif
-#line 91
+#line 101
 
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 93
+#line 110
 
 #define UPDATE_IN_PROGRESS      ( cmos_read(CMOS_REG_A ) & 0x80 )
 static sys_addr user_timer_int_vector;
@@ -112,7 +112,7 @@ static IVT_ENTRY compatibility_user_timer_int_vector;
 #ifdef ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #else
-#line 105
+#line 123
 LOCAL void get_host_timestamp();
 LOCAL void write_host_timestamp();
 LOCAL void TimeToTicks();
@@ -366,7 +366,7 @@ void time_of_day()
 #error "Unsupported SoftPC mirror configuration: BSD4_2"
 #endif
 #endif   //NEC_98
-#line 370
+#line 558
 }
 
 #if defined(NEC_98)

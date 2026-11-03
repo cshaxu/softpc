@@ -1349,7 +1349,7 @@ void mouse_install1()
 #error "Unsupported SoftPC mirror configuration: MOUSE_16_BIT"
 #endif
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX))
-#line 1127
+#line 1126
 
         /*
          *      Mouse video io user interrupt
@@ -5289,7 +5289,7 @@ LOCAL MOUSE_BIT_ADDRESS point_as_graphics_cell_address IFN1(MOUSE_POINT *,point_
 
         return(bit_address);
 #endif    //NEC_98
-#line 5061
+#line 5275
 }
 
 #ifdef HERC

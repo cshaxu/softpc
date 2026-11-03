@@ -54,7 +54,7 @@
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 60
+#line 61
 
 /*
  *    O/S include files.
@@ -93,7 +93,7 @@
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 98
+#line 99
 #include "host_gfx.h"
 #endif
 
@@ -1182,7 +1182,7 @@ for(i = CGA_PORT_START; i <= CGA_PORT_END; i++)
 #ifdef  JOKER
 #error "Unsupported SoftPC mirror configuration: JOKER"
 #else   /* not JOKER */
-#line 1380
+#line 1400
 
 
 #ifdef A3CPU
@@ -1269,7 +1269,7 @@ void cga_term   IFN0()
 	cga_screen_buf = 0;
     }
 #endif   //NEC_98
-#line 1467
+#line 1490
 }
 
 

@@ -789,3 +789,36 @@ had insufficient following lines. The method covers only unique sibling
 conditions and is not exhaustive; parent pairing and each candidate remain
 subject to review. Seven structural candidates are new sites beyond the
 preceding 59-site token queue.
+
+## P30 line mapping and heuristic candidate disposition
+
+The [28 XP mappings](m9-t99-s30-p30-line-mapping.tsv) in ten files were
+checked using the actual surrounding function and conditions. This includes
+resolving repeated closing braces in disk BIOS, GVI, time and mouse code,
+and accounting for an extra local blank line in `mouse_io.c`. [Four false candidates](m9-t99-s30-p30-false-candidates.tsv) were left unchanged after
+checking the correct original context. The combined token, structural and
+non-UTF-8 queues retain [49 candidate sites](m9-t99-s30-p30-unreviewed-line-candidates.tsv);
+these are not all proven faults and the scan is not exhaustive. This batch
+changes no condition or executable statement. P30 dual builds and 186 background tests per architecture passed. Both native groups initially failed compact_console at stage 1 error 6 with child exit 0xc0000142, and each complete native group reran 8/8 successfully; the cause is unknown. Mirror-only warnings: x64 4247, x86 4196. EXE SHA-256: x86 `6c48cf7a2890a281eaf582791fe015dc177b1fbef71d0d02321daed24e6fdc2b`; x64 `636d6502b4a96aec12bbfbaf0c32267f433d59a04b1ec367268fee9e9f7ccfd4`.
+
+### P30 structural re-enumeration and line coverage limits
+
+A fresh [475-file ledger](m9-t99-s30-p30-file-ledger.tsv) reports 471 text
+and four non-applicable binary files. Its 39 structural candidate rows
+match P25 byte-for-byte; the [P6 accounting](m9-t99-s30-p6-group-accounting.tsv)
+and fresh parser have the same 3,614 paired group keys. [Later boundary evidence](m9-t99-s30-p30-consolidated-paired-boundaries.tsv) indexes the 957
+previously unresolved paired groups; [summary counts](m9-t99-s30-p30-boundary-accounting.tsv)
+cover all 3,614. The historical repeated queue retains stale pending labels;
+this index links their subsequent evidence. These are paired-boundary checks,
+not a blanket claim that local code or every descendant equals XP.
+
+A separate first-code line probe across 471 text pairs counted 3,849 markers:
+2,724 had matching first code at the declared original position, 964 had no
+code before the next marker or EOF, 157 had differing first code, and four
+pointed beyond XP file length. The [161 candidates](m9-t99-s30-p30-first-code-candidates.tsv)
+are leads, not 161 established errors: locally added code, differences in
+conditional content and non-code spans need contextual review. Four beyond
+EOF include one identifiable mismatched original closing brace and three
+locations in existing local-only declarations or snapshot code; their
+meaning must be audited, not automatically rewritten. This probe establishes
+only first-code evidence and does not prove complete line mapping.

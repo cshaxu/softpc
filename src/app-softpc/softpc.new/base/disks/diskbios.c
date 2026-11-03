@@ -422,7 +422,7 @@ LOCAL void (*disk_func[]) () =
 	read_dasd,		/* 0x15 */
 	/* 0x16 - 0x19 are all floppy commands */
 #endif // !NEC_98
-#line 580
+#line 791
 };
 
 #ifndef PROD
@@ -710,7 +710,7 @@ LOCAL void disk_write IFN0()
 	wstatus (STATUS_CLEAR);
 	setAL ((unsigned char) com.sectors);
 #endif // !NEC_98
-#line 844
+#line 1433
 }
 
 #if defined(NEC_98)
@@ -1279,7 +1279,7 @@ GLOBAL void wdctrl_bop IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 1447
+#line 2079
 		setCF (1);	/* cmd fails */
 	}
 	else

@@ -469,7 +469,7 @@ ega_copy_move IFN6(UTINY *, dst, UTINY *, eas, ULONG, count, ULONG, src_flag,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 526
+#line 530
 			eas += w;
 #endif
 		}
@@ -481,7 +481,7 @@ ega_copy_move IFN6(UTINY *, dst, UTINY *, eas, ULONG, count, ULONG, src_flag,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 537
+#line 541
 			easinc = 1;
 #endif
 			dstinc = lsbdst ? 3 : 1;
@@ -491,7 +491,7 @@ ega_copy_move IFN6(UTINY *, dst, UTINY *, eas, ULONG, count, ULONG, src_flag,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 546
+#line 550
 			easinc = -1;
 #endif
 			dstinc = lsbdst ? -1 : -3;

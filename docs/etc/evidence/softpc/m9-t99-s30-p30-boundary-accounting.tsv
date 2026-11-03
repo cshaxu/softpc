@@ -1,0 +1,14 @@
+evidence_stage	scope	count
+P6	already supported unique, boundary or retained arm	2657
+P20	pending paired groups resolved	48
+P21	pending paired groups resolved	215
+P22	pending paired groups resolved	123
+P23	pending paired groups resolved	28
+P24	pending paired groups manually reviewed	46
+P22	candidate-file groups reviewed	276
+P23	candidate-file groups reviewed	35
+P25	candidate-file group restored plus parent reviewed	2
+P26	candidate-file boundaries supported	119
+P27	candidate-file root boundaries reviewed	13
+P28	candidate-file boundaries reviewed	28
+P29	candidate-file boundaries reviewed	24

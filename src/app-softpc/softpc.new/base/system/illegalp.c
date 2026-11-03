@@ -174,7 +174,7 @@ void illegal_dvr_bop IFN0()
 	host_error(EG_DRIVER_MISMATCH, ERR_CONT, buf);
 	setCF(0);
 #endif /* ! NTVDM */
-#line 163
+#line 187
 }
 
 
