@@ -171,7 +171,7 @@ GLOBAL VOID
 v7vga_get_info()
 {
 #ifndef NEC_98
-#line 168
+#line 173
 	note_entrance0("v7vga_get_info");
 
 	/* Reserved */
@@ -230,7 +230,7 @@ GLOBAL VOID
 v7vga_get_mode_and_screen_res()
 {
 #ifndef NEC_98
-#line 223
+#line 230
 	half_word video_mode;
 
 	note_entrance0("v7vga_get_mode_and_screen_res");
@@ -293,7 +293,7 @@ v7vga_extended_set_mode()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 281
+#line 290
 	set_host_pix_height(1);
 	set_banking( 0, 0 );
 
@@ -461,7 +461,7 @@ v7vga_extended_set_mode()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 449
+#line 458
     	sas_fillsw(video_pc_low_regen, clr_char,
 				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
 #endif
@@ -499,7 +499,7 @@ GLOBAL VOID
 v7vga_select_autoswitch_mode()
 {
 #ifndef NEC_98
-#line 482
+#line 493
 	note_entrance0("v7vga_select_autoswitch_mode");
 
 /***

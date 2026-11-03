@@ -1506,7 +1506,7 @@ GLOBAL VOID fdisk_inw IFN2(io_addr, port, USHORT *, value)
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif
-#line 1542
+#line 1541
 		switch (port)
 	{
 	case TFBASE:
@@ -1691,7 +1691,7 @@ GLOBAL VOID fdisk_ioattach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1717
+#line 1719
 		patch_rom(DPB0, (unsigned char) (ncyls & 0xff));
 		patch_rom(DPB0+1, (unsigned char) (ncyls >> 8));
 		patch_rom(DPB0+2, nheads);
@@ -1699,7 +1699,7 @@ GLOBAL VOID fdisk_ioattach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1724
+#line 1726
 		dt1(DHW | IOAD, 0, "drive 0 wiredup, total cyls %d\n",
 		    (unsigned) ncyls)
 	}
@@ -1721,7 +1721,7 @@ GLOBAL VOID fdisk_ioattach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1745
+#line 1747
 		patch_rom(DPB1, (unsigned char)(ncyls & 0xff));
 		patch_rom(DPB1 + 1, (unsigned char)((ncyls >> 8)));
 		patch_rom(DPB1+2, nheads);
@@ -1729,7 +1729,7 @@ GLOBAL VOID fdisk_ioattach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1752
+#line 1754
 		dt1(DHW | IOAD, 0, "drive 1 wiredup, total cyls %d\n",
 		    (unsigned) ncyls)
 	}
@@ -1762,7 +1762,7 @@ GLOBAL VOID fdisk_iodetach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1780
+#line 1784
 		patch_rom(DPB0, 0);
 		patch_rom(DPB0 + 1, 0);
 		patch_rom(DPB0 + 2, 0);
@@ -1770,7 +1770,7 @@ GLOBAL VOID fdisk_iodetach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1787
+#line 1791
 		dt0(DHW | IOAD, 0, "drive 0 unplugged\n")
 	}
 	if (drives[1].physattached)
@@ -1784,7 +1784,7 @@ GLOBAL VOID fdisk_iodetach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1800
+#line 1804
 		patch_rom(DPB1, 0);
 		patch_rom(DPB1 + 1, 0);
 		patch_rom(DPB1 + 2, 0);
@@ -1792,7 +1792,7 @@ GLOBAL VOID fdisk_iodetach IFN0()
 #ifdef REAL_ROM
 #error "Unsupported SoftPC mirror configuration: REAL_ROM"
 #endif
-#line 1807
+#line 1811
 		dt0(DHW | IOAD, 0, "drive 1 unplugged\n")
 	}
 #endif // !NEC_98

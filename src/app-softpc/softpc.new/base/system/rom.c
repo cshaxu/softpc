@@ -229,11 +229,11 @@ OUTPUT:		None.
 GLOBAL void read_video_rom IFN0()
 {
 #ifndef NEC_98
-#line 226
+#line 252
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else /* REAL_VGA */
-#line 229
+#line 255
 	PHY_ADDR romLength = 0;
 
 	/* DIVERGENCE MVDM-HOST-DIV-075: config scalar is pointer-sized on x86/x64. */
@@ -306,11 +306,11 @@ GLOBAL void rom_init IFN0()
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else		/* GISP_SVGA */
-#line 298
+#line 353
 #if	defined(macintosh) && defined(A2CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
-#line 301
+#line 356
 	sas_fills( ROM_START, BAD_OP, PC_MEM_SIZE - ROM_START);
 #endif		/* macintosh && A2CPU */
 #endif		/* GISP_SVGA */
@@ -653,7 +653,7 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 656
+#line 834
 		if ((DOS_SCRATCH_PAD_END ^ DOS_SCRATCH_PAD) > 0xfff)
 		{
 			/* The defined DOS scratch pad crosses a page

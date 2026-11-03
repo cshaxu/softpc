@@ -424,7 +424,7 @@ GLOBAL void vd_set_mode IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 368
+#line 746
 	    sas_fillsw(video_pc_low_regen,
 				vd_mode_table[sas_hw_at_no_check(vd_video_mode)].clear_char,
 				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
@@ -477,7 +477,7 @@ GLOBAL void vd_set_mode IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 421
+#line 799
     sas_fillsw(video_pc_low_regen, vd_mode_table[sas_hw_at_no_check(vd_video_mode)].clear_char,
 				 (video_pc_high_regen - video_pc_low_regen)/ 2 + 1);
 #endif
@@ -864,7 +864,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // !i386 && JAPAN
-#line 768
+#line 1200
     register int	col_incr,i;
     boolean 		screen_updated = FALSE;
     int			vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
@@ -1088,7 +1088,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 928
+#line 1491
 	if (sas_hw_at_no_check(vd_video_mode) != 6) {
 	    colsdiff *= 2;		/* 4 pixels/byte */
 	    /* set origin of data movement for calculating screen refresh */
@@ -1463,7 +1463,7 @@ LOCAL void sensible_graph_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1212
+#line 1937
 		sas_move_bytes_forward (source, dest, colsdiff);
 		sas_move_bytes_forward (source+ODD_OFF, dest+ODD_OFF, colsdiff);
 #endif
@@ -1478,7 +1478,7 @@ LOCAL void sensible_graph_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1227
+#line 1952
 		sas_fills(dest, (IU8)attr, colsdiff);
 		sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -1627,12 +1627,12 @@ GLOBAL void vd_read_attrib_char IFN0()
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // JAPAN && i386
-#line 1367
+#line 2098
 	cpos = video_pc_low_regen + vd_cursor_offset(getBH());
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
-#line 1373
+#line 2104
 	sas_loadw(cpos,&chattr);
 #endif /* A2CPU */
 	setAX(chattr);			/* hmm that was easy */
@@ -1776,7 +1776,7 @@ GLOBAL void vd_write_char_attrib IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1503
+#line 2256
 		for(i = 0; i < getCX(); i++)
 		{
 #if ( defined(NTVDM) && defined(MONITOR) ) || defined(GISP_SVGA)/* No Ega planes... */
@@ -2217,7 +2217,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #else
-#line 1907
+#line 2734
      IMPORT VOID (**get_outb_ptr())();
 #endif
 #ifdef NTVDM
@@ -2292,7 +2292,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1952
+#line 2846
 	if (vd_cursor_row == VD_ROWS_ON_SCREEN)
 		scroll_required = TRUE;
 	else
@@ -2328,7 +2328,7 @@ GLOBAL void vd_write_teletype IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(X86GFX)"
 #else
-#line 1980
+#line 2888
                  setCS(VIDEO_IO_SEGMENT);
                  setIP(VIDEO_IO_RE_ENTRY);
                  host_simulate();
@@ -2406,7 +2406,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 2043
+#line 2982
 	    if (vd_cursor_row == VD_ROWS_ON_SCREEN)
 		scroll_required = TRUE;
 	    else
@@ -2433,7 +2433,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 2082
+#line 3021
 	if(re_entrant)
         {
              savedAX = getAX();
@@ -2450,7 +2450,7 @@ GLOBAL void vd_write_teletype IFN0()
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(X86GFX)"
 #else
-#line 2095
+#line 3045
              setCS(VIDEO_IO_SEGMENT);
              setIP(VIDEO_IO_RE_ENTRY);
              host_simulate();
@@ -2512,7 +2512,7 @@ GLOBAL void vd_write_teletype IFN0()
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
-#line 2156
+#line 3107
 		sas_load( video_pc_low_regen + sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,vd_cursor_row) + 1, &attrib);
 #endif /* A2CPU */
 

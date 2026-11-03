@@ -173,7 +173,7 @@ typedef	union {
 #ifdef	BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 184
+#line 185
 		unsigned char	lo_byte;
 		unsigned char	hi_byte;
 #endif
@@ -203,7 +203,7 @@ typedef	union {
 #ifdef A_VID
 #error "Unsupported SoftPC mirror configuration: A_VID"
 #else
-#line 265
+#line 266
 VOID  ega_copy_b_write(ULONG, ULONG);
 VOID  ega_copy_w_write(ULONG, ULONG);
 VOID  ega_copy_b_fill(ULONG, ULONG, ULONG);
@@ -355,7 +355,7 @@ ega_copy_b_fill IFN3(ULONG, value, ULONG, offset, ULONG, count )
 #ifdef  BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 415
+#line 418
 #define first_half(wd)      ((wd) & 0xff)
 #define sec_half(wd)        (((wd) & 0xff00) >> 8)
 #endif
@@ -1049,7 +1049,7 @@ ega_mode0_chn_move_ram_src IFN5(UTINY *, eas, LONG, count, UTINY *, ead,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1103
+#line 1107
 		src_offset++;
 #endif
 		offset++;
@@ -1216,7 +1216,7 @@ ega_mode0_chn_move IFN6(UTINY, w, UTINY *, ead, UTINY *, eas, ULONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1266
+#line 1270
 		scratch = getVideoscratch();
 #endif
 
@@ -1247,7 +1247,7 @@ ega_mode0_chn_move IFN6(UTINY, w, UTINY *, ead, UTINY *, eas, ULONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1296
+#line 1300
 			eas += - count + 1 + w;
 #endif
 			ead += - count + 1 + w;

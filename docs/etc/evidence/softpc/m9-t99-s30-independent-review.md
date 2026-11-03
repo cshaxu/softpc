@@ -426,3 +426,17 @@ and documentation gates passed; submission follows actual-diff review.
 The x86 and x64 EXE SHA-256 values are respectively
 `e6acd5a0fa85c05a056d55cbca42a4f4ec07d1933be7276d902b8f4d451e1481` and
 `4aff101082327b1a2cbaf1dc0d3dde0581ebbb6fe57a467909d672b3088793f7`.
+
+P8 independently checked the adjacent condition boundary and next source for
+89 previously pending line candidates in ten compiled files. All corresponding
+XP originals contain no existing line controls. The [P8 mapping](m9-t99-s30-p8-line-mapping.tsv)
+records original and corrected values; the [updated queue](m9-t99-s30-p8-line-candidates.tsv)
+leaves 39 candidates in 21 files pending. The actual x86 and x64 preprocessing
+outputs for all ten translation units match byte for byte before and after.
+This is diagnostic line mapping, not proof that all structural differences
+have been audited. Both architectures built and each passed 186/186 background
+and 8/8 native tests; actual-diff review precedes submission. Build logs contain
+840 x64 and 807 x86 warning lines, all from the preserved mirror paths; no
+non-mirror warning line was observed. Published x86 and x64 EXE SHA-256 are
+`9b7acd9d865de7350b8226bd839b5b7c26cdaa8da1c857fec7738b5651f296d8` and
+`24a4e0758c16653303f92dd94c58203ff6d4c388c1e235766fa5a76245754a2b`.

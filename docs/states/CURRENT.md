@@ -43,15 +43,24 @@ to baseline `72e16acd`, not the edited file. The independent source review
 confirmed the ten XP/local NTVDM predicate pairs and distinguished the V7
 scanout's local extra guard from its two original siblings. The recursive
 comparison still has unreviewed repeated-boundary and local-exception cases.
-The next P batch contains ten mirror files: `mouse_io.c`, `at_dma.c`,
+The completed P7 batch contained ten mirror files: `mouse_io.c`, `at_dma.c`,
 `ega_prts.c`, `vga_mode.c`, `vga_vide.c`, `gfx_updt.c`, `vga_prts.c`,
 `ega_vide.c`, `keyba.c` and `printer.c`. It corrects 216 `#line` values
 against paired XP guard boundaries; the per-location evidence distinguishes
 six manually inspected anchors from 210 adjacent-source candidates. Both
 actual architecture contexts for all ten files have byte-identical selected
 preprocessing. P7 dual-architecture build and publication succeeded; each architecture
-passed all 186 background and 8 native tests. Stop changing mirror sources
-until actual-diff review, commit and push are complete. The [line-boundary candidate ledger](../etc/evidence/softpc/m9-t99-s30-p7-line-candidates.tsv)
+passed all 186 background and 8 native tests. It was committed and pushed as
+`505ed1c5`. P8 now modifies ten mirror files (`video.c`, `com.c`,
+`ega_read.c`, `fdisk.c`, `timer.c`, `ega_writ.c`, `egawrtm0.c`,
+`v7_ports.c`, `rom.c`, `v7_video.c`) to correct 89 line controls.
+Each has matching XP adjacent condition boundary and following source; the
+[ledger](../etc/evidence/softpc/m9-t99-s30-p8-line-mapping.tsv) records the
+candidates. P8 dual preprocessing, build and publication succeeded, followed by 186/186
+background and 8/8 native tests per architecture. Complete actual-diff review,
+commit and push before modifying an eleventh mirror file. The updated candidate
+queue retains 39 pending line locations in 21 files. Structural correspondence
+is still under review; these line candidates are not a complete audit. The [line-boundary candidate ledger](../etc/evidence/softpc/m9-t99-s30-p7-line-candidates.tsv)
 keeps 128 pending candidates in 31 files distinct from the 210 scanner matches
 corrected in P7. Owned P7 build and test logs and exit markers are `build/t99-s30/p7-*`; use bounded status polls, investigate
 30 minutes without progress and never terminate solely due to polling.

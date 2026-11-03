@@ -389,7 +389,7 @@ LOCAL void issueIREQ0 IPT1(unsigned int, n);
 LOCAL unsigned long guess IPT0();
 LOCAL void throwaway IPT0();
 #endif
-#line 360
+#line 391
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
@@ -592,7 +592,7 @@ SWTMR_time_tick IFN0()
 #line 606
     pcu = &timers[2];
 #endif   //NEC_98
-#line 520
+#line 608
     updateCounter();
 }
 
@@ -935,7 +935,7 @@ LOCAL void controlWordReg IFN1(half_word, cwd)
                         pcu->tc = 0;
                         pcu->tickadjust = 0;
 #ifndef NTVDM
-#line 805
+#line 968
                         pcu->microtick = 0;
                         pcu->saveCount = 0;
 #endif
@@ -1050,7 +1050,7 @@ LOCAL void loadCounter IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 907
+#line 1077
                         max_backlog = maxback;
                 }
 #endif
@@ -2285,7 +2285,7 @@ LOCAL void throwaway IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 2109
+#line 2689
         pcu->Count = pcu->saveCount;
         pcu->microtick = 0;
 }
@@ -2400,7 +2400,7 @@ LOCAL void getHostSysTime IFN1(struct host_timeval *, t)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 2222
+#line 2804
                 *t = idealtime;
         }
 }
@@ -2527,7 +2527,7 @@ void timer_init IFN0()
     Timer_init();
 
 #ifndef NTVDM
-#line 2358
+#line 2981
     timelock = UNLOCKED;
     needtick = 0;
 #else
@@ -2542,7 +2542,7 @@ void timer_init IFN0()
         host_timer_init();
 
 #if !defined(NTVDM)
-#line 2367
+#line 2994
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */

@@ -86,7 +86,7 @@ half_word       value;
 
 {
 #ifndef NEC_98
-#line 92
+#line 93
 	NON_PROD(if(io_verbose & EGA_PORTS_VERBOSE)fprintf(trace_file,"seq(6,%#x)\n",value);)
 	note_entrance2("vga_seq_extn_control(%x,%x)", port, value);
 
@@ -106,7 +106,7 @@ UTINY *wrt_bank;
 
 {
 #ifndef NEC_98
-#line 108
+#line 111
 	if( get_seq_chain4_mode() && get_chain4_mode() ) {
 		set_v7_bank_for_seq_chain4( rd_bank, wrt_bank );
 	}
@@ -157,7 +157,7 @@ half_word       value;
 
 {
 #ifndef NEC_98
-#line 155
+#line 160
 	half_word	old_value;
 
 	note_entrance2("vga_extn_outb(%x,%x)", port, value);
@@ -482,7 +482,7 @@ io_addr         port;
 half_word       *value;
 {
 #ifndef NEC_98
-#line 476
+#line 483
 	note_entrance1("vga_extn_inb(%x)", port);
 
 	switch (sequencer.address.as.abyte) {
@@ -672,7 +672,7 @@ GLOBAL VOID
 draw_v7ptr()
 {
 #ifndef NEC_98
-#line 662
+#line 671
 	sys_addr pattern;
 
 	if (extensions_controller.cursor_attrs.as_bfld.pointer_enable)
@@ -752,7 +752,7 @@ GLOBAL	BOOL	v7ptr_between_lines IFN2(int, start_line, int, end_line)
 GLOBAL void set_v7_fg_latch_byte IFN2(IU8, index, IU8, value)
 {
 #ifndef NEC_98
-#line 738
+#line 749
 	IU32 v7latch;
 
 	/* get current value */

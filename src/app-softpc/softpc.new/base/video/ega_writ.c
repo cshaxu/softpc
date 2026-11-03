@@ -88,7 +88,7 @@ GLOBAL UTINY Last_v7_fg_bg;			/* used by {ev}ga_mask_register_changed() */
 #ifndef CPU_40_STYLE	/* EVID without introducing EVID define */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - EVID */
-#line 301
+#line 302
 WRT_POINTERS *mode_chain_handler_table[] = { 0 };
 #ifdef C_VID
 
@@ -105,7 +105,7 @@ MEM_HANDLERS Glue_writes =
 #else	/* C_VID */
 #error "Unsupported SoftPC mirror configuration: !C_VID"
 #endif	/* CVID */
-#line 318
+#line 325
 WRT_POINTERS dth_md0_writes;
 WRT_POINTERS dth_md2_writes;
 WRT_POINTERS simple_writes;
@@ -181,7 +181,7 @@ VOID
 ega_write_init IFN0()
 {
 #ifndef NEC_98
-#line 436
+#line 461
 	WRT_POINTERS *handler;
 
 	note_entrance0("ega_write_init");
@@ -208,16 +208,16 @@ ega_write_init IFN0()
 #if defined(EGA_DUMP) || defined(EGA_STAT)
 #error "Unsupported SoftPC mirror configuration: EGA_DUMP or EGA_STAT"
 #else
-#line 463
+#line 488
 #ifdef EGATEST
 #error "Unsupported SoftPC mirror configuration: EGATEST"
 #else
-#line 466
+#line 491
 #ifndef GISP_CPU
 #ifdef A3CPU
 #error "Unsupported SoftPC mirror configuration: A3CPU"
 #else
-#line 475
+#line 500
 	gmi_define_mem(VIDEO,&Glue_writes);
 	Glue_set_vid_wrt_ptrs( handler );
 #endif /* A3CPU */

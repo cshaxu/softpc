@@ -160,7 +160,7 @@ ERROR RECOVERY	  :	none.
 #ifdef EGATEST
 #error "Unsupported SoftPC mirror configuration: EGATEST"
 #else
-#line 164
+#line 165
 #define	change_read_pointers(ptr)	read_glue_ptrs = ptr
 #endif /* EGATEST */
 #endif
@@ -206,7 +206,7 @@ READ_POINTERS Glue_reads =
 #else
 #error "Unsupported SoftPC mirror configuration: !C_VID"
 #endif /* C_VID */
-#line 390
+#line 394
 READ_POINTERS	simple_reads;
 READ_POINTERS	pointers_mode0_nch;
 READ_POINTERS	pointers_mode1_nch;
@@ -293,7 +293,7 @@ rdm0_word_ch2 IFN1(ULONG, offset )
 	EasVal = temp;
 #endif
 #endif  //NEC_98
-#line 468
+#line 476
 	return( temp );
 }
 
@@ -331,7 +331,7 @@ rdm0_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 503
+#line 512
         *dest++ = *(planes + offset);
 #endif
 		offset += inc;
@@ -349,7 +349,7 @@ rdm1_byte_ch2 IFN1(ULONG, offset )
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 515
+#line 528
 	IU32 temp, lsb;
 
 	lsb = offset & 0x1;
@@ -383,7 +383,7 @@ rdm1_word_ch2 IFN1(ULONG, offset )		/* used to correct writes to M when in mode 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 543
+#line 560
 	IU32 temp1, temp2, lsb;
 
 	setVideolatches(*(IU32 *)( EGA_planes + ((( offset + 1 ) >> 1 ) << 2 )));
@@ -425,14 +425,14 @@ GLOBAL void
 rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to correct writes to M when in mode 1 */
 {
 #ifndef NEC_98
-#line 581
+#line 600
 	UTINY *p01, *p23;
 	ULONG tcount, lsb;
 
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 588
+#line 607
 #define	PLUS +
 #define	MINUS -
 #endif
@@ -499,7 +499,7 @@ GLOBAL void
 Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 {
 #ifndef NEC_98
-#line 673
+#line 674
 #ifndef CPU_40_STYLE	/* EVID */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE - EVID */
@@ -519,7 +519,7 @@ update_shift_count IFN0()
 
 {
 #ifndef NEC_98
-#line 696
+#line 728
 	switch( EGA_CPU.chain )
 	{
 		case UNCHAINED:
@@ -531,7 +531,7 @@ update_shift_count IFN0()
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 707
+#line 739
  			setVideoread_shift_count(getVideoread_mapped_plane() << 3);
 #endif /* BIGEND */
 
@@ -568,7 +568,7 @@ ega_read_routines_update IFN0()
 
 {
 #ifndef NEC_98
-#line 740
+#line 774
 	LOCAL BOOL ram_off = TRUE;	/* optimised to avoid updates if ram disabled */
 	LOCAL READ_POINTERS *read_ptrs;
 
@@ -700,7 +700,7 @@ ega_read_init IFN0()
 
 {
 #ifndef NEC_98
-#line 918
+#line 954
 	read_state.mode = 0;
 	read_state.colour_compare = 0x0f;		/* looking for bright white */
 	read_state.colour_dont_care = 0xf;		/* all planes significant */

@@ -107,7 +107,7 @@ static struct ADAPTER_STATE
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
 #endif
-#line 91
+#line 146
 	half_word scratch;      /* scratch register */
 
 	int break_state;        /* either OFF or ON */
@@ -131,14 +131,14 @@ static struct ADAPTER_STATE
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 113
+#line 172
 } adapter_state[NUM_SERIAL_PORTS];
 
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 116
+#line 178
 #define MODEM_STATE_CHANGE()
 #endif
 #endif // NEC_98
@@ -418,10 +418,10 @@ static void clear_interrupt IPT1(struct ADAPTER_STATE *, asp);
 static void com_flush_input IPT1(int, adapter);
 static void com_send_not_finished IPT1(int, adapter);
 #ifndef NTVDM
-#line 382
+#line 358
 static void do_wait_on_send IPT1(long, adapter);
 #endif
-#line 383
+#line 360
 void   com_inb IPT2(io_addr, port, half_word *, value);
 void   com_outb IPT2(io_addr, port, half_word, value);
 void   com_recv_char IPT1(int, adapter);
@@ -561,7 +561,7 @@ static void generate_iir IFN1(struct ADAPTER_STATE *, asp)
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 510
+#line 558
 	else if ( asp->tx_holding_register_empty_interrupt_state == ON )
 	{
 		asp->int_id_reg.bits.interrupt_ID = THRE_INT;
@@ -736,7 +736,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 			 * Read of rx buffer
 			 */
 #ifndef NTVDM
-#line 637
+#line 1116
 			if (!(asp->had_first_read))
 			{
 				com_flush_input(adapter);
@@ -745,7 +745,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #else /* NTVDM is defined */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* !NTVDM */
-#line 642
+#line 1128
 			*value = asp->rx_buffer;
 		
 			adapter_was_critical =
@@ -780,18 +780,18 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #endif /* NTVDM */
 #line 1181
 #ifndef NTVDM
-#line 670
+#line 1182
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #else /* IRET_HOOKS */
-#line 687
+#line 1199
 					host_com_ioctl(adapter, HOST_COM_INPUT_READY,
 						(intptr_t)&input_ready);
 					if (input_ready)
 #ifdef DELAYED_INTS
 #error "Unsupported SoftPC mirror configuration: DELAYED_INTS"
 #else
-#line 693
+#line 1205
 						add_q_event_t(recv_char,
 							RX_delay[asp->com_baud_ind],
 							adapter);
@@ -919,7 +919,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 	case RS232_MSR:
 
 #ifndef NTVDM
-#line 901
+#line 1428
 		if (asp->loopback_state == OFF)
 		{
                 com_modem_change(adapter);
@@ -1015,7 +1015,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 1014
+#line 1589
 				host_com_write(adapter, asp->tx_buffer);
 #line 1590
 #if defined (DELAYED_INTS) || defined (NTVDM)
@@ -1068,7 +1068,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1068
+#line 1648
 			asp->int_enable_reg.all = value & 0xf;
 			/*
 			 * Kill off any pending interrupts for those items
@@ -2307,7 +2307,7 @@ GLOBAL VOID com_init IFN1(int, adapter)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 2341
+#line 3799
 	io_define_inb(com_adaptor[adapter], com_inb);
 	io_define_outb(com_adaptor[adapter], com_outb);
 #endif /* NTVDM */
