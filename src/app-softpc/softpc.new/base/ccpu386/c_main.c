@@ -3832,7 +3832,7 @@ RESUME_HALT:
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 4099
+#line 4008
 
          /* HLT is still an original CCPU instruction-safe
             rendezvous.  Consume host mailbox records here

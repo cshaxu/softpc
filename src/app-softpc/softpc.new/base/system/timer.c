@@ -2585,7 +2585,7 @@ void    timer_post IFN0()
     timer_outb(TIMER2_REG,0x68);
     timer_outb(TIMER2_REG,0x04);
 #endif   //NEC_98
-#line 2407
+#line 3058
 }
 
 #ifdef DOCUMENTATION

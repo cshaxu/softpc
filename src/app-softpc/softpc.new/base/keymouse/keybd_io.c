@@ -1027,7 +1027,7 @@ label2:	/* NOT IN HOLD STATE	*/
 		if( (sas_hw_at_no_check(kb_flag) & CTL_SHIFT ) && (code == DEL_KEY) )
                 {
 #ifndef NTVDM
-#line 982
+#line 1187
                         reboot();
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"

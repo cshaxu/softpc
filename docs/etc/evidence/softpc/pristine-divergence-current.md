@@ -1513,3 +1513,9 @@ owns hardware evidence, actual-port research and implementation qualification.
 其余源码字节不变。双架构后台全量及原生组通过，x86 原生固定顺序
 三次发生 Console 附着失败、单项和随机顺序整组通过，原因未定位；
 具体证据及剩余候选见独立审查记录。
+
+### T99 S30 P35 XP 诊断行号
+
+十个镜像文件各修正一处原版行号，保留所有原有分支与本地功能补丁；
+上下文映射见 P35 清单。两架构后台全套和原生组均有通过记录；
+x64 原生首轮 Console 附着失败及完整复验见独立审查记录。

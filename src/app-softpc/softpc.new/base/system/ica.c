@@ -1684,7 +1684,7 @@ ica_iret_hook_control IFN3(IU32, adapter, IU32, line, IBOOL, enable)
 #ifndef CCPU
 #error "Unsupported SoftPC mirror configuration: !CCPU"
 #else
-#line 1708
+#line 1901
 	UNUSED(adapter);
 	UNUSED(line);
 	UNUSED(enable);

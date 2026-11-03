@@ -1,0 +1,11 @@
+path	local_line	old_xp_line	correct_xp_line	local_anchor	xp_anchor
+base/disks/diskbios.c	1263	1427	2059	1264	2059
+base/inc/sas.h	116	111	117	118	118
+base/keymouse/keybd_io.c	1030	982	1187	1031	1187
+base/system/ica.c	1687	1708	1901	1696	1909
+base/system/rom.c	386	369	482	388	483
+base/system/timer.c	2588	2407	3058	2589	3058
+base/video/ega_prts.c	1651	2131	2172	1652	2172
+base/video/ega_vide.c	1157	1109	1339	1158	1339
+host/src/nt_graph.c	1639	1419	1939	1649	1940
+base/ccpu386/c_main.c	3835	4099	4008	3847	4010

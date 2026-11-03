@@ -113,7 +113,7 @@ extern host_addr Start_of_M_area;	/* host addr (char *) of start of M */
 #ifdef	GISP_CPU
 #error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #else
-#line 111
+#line 117
 extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #endif	/* GISP_CPU */
 

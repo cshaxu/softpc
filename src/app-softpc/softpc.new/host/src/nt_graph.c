@@ -1636,7 +1636,7 @@ static void check_win_size(register int height)
     else
        width = CGA_WIN_WIDTH;
 #endif // !NEC_98
-#line 1419
+#line 1939
 
 #ifdef V7VGA
     /* The selected packed painter emits one pixel per source byte, unlike

@@ -1154,7 +1154,7 @@ GLOBAL void ega_set_mode IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 1109
+#line 1339
                     }
                 }
                 else

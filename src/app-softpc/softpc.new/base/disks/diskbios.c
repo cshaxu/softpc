@@ -1260,7 +1260,7 @@ GLOBAL void wdctrl_bop IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 1427
+#line 2059
 	else
 	{
 		badcmd ();

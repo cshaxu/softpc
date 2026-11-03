@@ -871,3 +871,10 @@ functional patches. Both 186-test background suites and x64 native passed
 first run. x86 native compact_console failed in three fixed-order runs,
 passed individually, and the full randomized-order group passed 8/8.
 The Console initialization instability remains unexplained; S30 remains open.
+
+P34 was committed and pushed as `85adeba8`. P35 corrects ten XP line
+positions in ten files, preserving branches and functional source. Both
+186-test background suites and x86 native passed first run. x64 native
+compact_console failed first run; randomized-order full rerun passed 8/8.
+The unresolved Console initialization instability remains recorded. S30
+remains open.

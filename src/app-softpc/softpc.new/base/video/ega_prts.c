@@ -1648,7 +1648,7 @@ LOCAL void	ega_seq_outb_index IFN2(io_addr, port, half_word, value)
 	NON_PROD(sequencer.address.as.abyte = value);
 	io_redefine_outb(EGA_SEQ_ADAP_DATA,ega_seq_regs[value & 7]);
 #endif  //NEC_98
-#line 2131
+#line 2172
 }
 
 /* Snapshot port ABI: this receiver owns reset even when VGA ports are used. */

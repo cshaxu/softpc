@@ -383,7 +383,7 @@ LOCAL LONG read_rom IFN2(char *, name, sys_addr, address)
 #if defined(macintosh) && defined(A2CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 369
+#line 482
 
     return( size );
 #else
