@@ -2079,7 +2079,6 @@ const softpc_device_pic_state *state;
 		target->ica_cpu_int = source->cpu_interrupt;
 		for (line = 0; line < SOFTPC_DEVICE_PIC_LINE_COUNT; ++line) {
 			target->ica_count[line] = source->count[line];
-#if defined(CPU_40_STYLE) && !defined(NTVDM)
 			target->callback_fn[line] = NO_ICA_CALLBACK;
 			target->callback_parm[line] = source->callback_parameter[line];
 			target->isr_depth[line] = source->isr_depth[line];
@@ -2089,14 +2088,11 @@ const softpc_device_pic_state *state;
 			for (depth = 0; depth < SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
 				target->isr_time_decay[line][depth] =
 					source->isr_time_decay[line][depth];
-#endif
 		}
 	}
-#ifdef HOOKED_IRETS
 	iretHooksEnabled = state->iret_hooks_enabled ? TRUE : FALSE;
 	iretHookMask = state->iret_hook_mask;
 	iretHookActive = state->iret_hook_active;
-#endif
 	return TRUE;
 }
 

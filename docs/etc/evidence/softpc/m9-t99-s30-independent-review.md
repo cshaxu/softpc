@@ -1,0 +1,317 @@
+# T99 S30 independent recursive mirror review — in progress
+
+## Scope and first-pass results
+
+The universe is the 475 paths in the current XP SP1 mirror manifest. Each
+same-path XP file exists, and its manifest identity matches after the same
+LF normalization used by the repository's text-hash gate (binary files are
+hashed as bytes). The comparison baseline is XP SP1
+`a2f6d7c93aa4f11efc51147566d5961c59a8ef89`. There are 471 text files and
+four binary files. Binary files have no textual preprocessor branch tree.
+
+The first pass lexically constructs nested conditional groups and their sibling
+arms on both sides. It stops recursion when the complete current arm consists
+of one `#error`, and otherwise compares the corresponding arms recursively.
+[File inventory](m9-t99-s30-independent-file-ledger.tsv) records 349 text
+files without a detected difference or repeated condition name, 105 whose
+sequence matches but that have repeated condition names requiring review, and
+17 with structural comparison candidates. The
+[58 candidates](m9-t99-s30-independent-tree-candidates.tsv) are positional
+matching leads, not a count of confirmed defects or exceptions.
+
+## Important unresolved matching work
+
+The matcher uses ordered condition signatures, so equal signatures are not
+proof of correct pairing when siblings repeat. The separate
+[repeated-sibling queue](m9-t99-s30-independent-repeated-queue.tsv) lists
+2,394 current positions in 118 files, including locations from the 17 files
+with other candidates. When compared by current path and line number against
+the three previous repeated-review tables, 1,407 positions had a prior row
+and 987 did not. The latter number is conservative: a line can have shifted,
+a group can be covered by another record, or its whole arm can be excluded.
+It is not a defect count. A prior row also does not automatically establish
+that its parent and sibling boundaries were matched correctly.
+
+The parser and all sequence comparisons are audit aids, not formal proof.
+Each retained group and necessary local difference must be matched to its
+actual XP parent and source boundary, or remain explicitly unresolved. Groups
+inside entirely replaced error arms must not be reconstructed or reviewed as
+current retained children. No source correction is claimed by this first pass;
+no build, runtime test or guest behavior has been established by it.
+
+A second report adds the matcher's candidate XP position and the distance
+between it and the current source's `#line`-derived location for each repeated
+position. Of the 2,394 entries, 1,554 have a candidate within three lines,
+814 have a more distant location, and 26 have no candidate at this level.
+A nearby line number is only a clue, not proof: the `#line` mapping may itself
+be stale or a repeated sibling may be incorrectly aligned. The queue records individual independent reviews; the existing prior-row flag
+is informational and does not silently accept old results.
+The unmatched candidates include accepted local CCPU, ABI, snapshot and V7
+guards, but their individual parent/arm pairing still requires confirmation.
+
+The 26 unpaired repeated locations all occur in files with a prior structural
+disposition. Twenty-four match a prior entry by exact path and line; the two
+PPI locations correspond to lines 219 and 236 in the earlier inventory,
+before four preceding lines were removed. This establishes a review trail,
+not by itself proof that every prior disposition or nested alignment is correct.
+
+For 2,368 repeated groups that the tree matcher paired, a separate heuristic
+looked for unique matching source lines both before and after the candidate
+boundaries. It found two directional context anchors for 1,747 pairs, one for
+446, and none for 175. These are search aids only: proximity and unique text
+do not prove the complete parent/arm boundaries or branch semantics. The
+queue records the counts without marking these entries as reviewed. Among
+3,613 paired groups, no case had a condition unique among current siblings
+but repeated among XP siblings. Unpaired groups and descendants of unequal
+groups require separate handling.
+
+The first-pass comparer does not recurse through unequal parent signatures.
+A targeted descendant sweep found one XP child and one current child under
+such parents. XP `base/ccpu386/c_main.c:4876` (`#ifndef PROD`) belongs to the
+original `c_cpu_unsimulate` NTVDM `#else` body; its corresponding current
+non-TLS arm is wholly replaced by `#error`, so the child is intentionally
+skipped. Current `host/src/nt_graph.c:1648` (`#ifdef V7VGA`) belongs to the
+local standalone packed-painter width correction and is already listed as a
+local exception in the earlier disposition. These checks do not settle other
+repeated-boundary pairings.
+
+The first four high-risk locations have now been inspected against the
+actual XP source: one `JAPAN` branch within the video cursor path and three
+trace branches in `com_inb` have matching surrounding source boundaries.
+Their large XP-versus-logical-line distances are not themselves evidence of
+a structure defect; the queue records each reviewed location and source
+anchor. The remaining repeated locations are not yet independently cleared.
+
+A potentially significant placement mismatch is retained for follow-up:
+`host/src/nt_sbdsp.c:1508` has an error-only `#if 0` after `ContinueDMA`,
+whereas the apparently matching XP `#if 0` at 2793 is inside the original
+DMA reader-thread body. The earlier `#if 0` at current 712 corresponds to
+XP 2233 in a different routine. The subtree's XP host-thread adaptation is
+a substantial existing local divergence; sequence equality alone does not
+explain whether the second disabled frame should remain at its present
+location or how it belongs in the subset exception. No production edit has
+been made for this candidate.
+
+Follow-up: T20 explicitly mapped current `#if 0` to XP 2793 and recorded
+that the native wave-output reader thread was replaced by the existing audio
+endpoint. XP names the removed host routine `DspThreadEntry`; current code
+contains no such routine. Its selected-source relocation has now been
+registered specifically in the pristine-divergence ledger. The error-only
+frame and line control remain; no dormant host worker or extra path is added.
+
+A stricter context pass records individual original/current line pairs before
+and after repeated groups, requiring each source line to be unique in its
+file and excluding anchors that cross a same-condition occurrence. It found
+two such anchors for 1,761 paired groups, one for 441, and none for 166.
+These still require parent/arm review: anchors only help establish position
+and do not independently validate selected code or prove logical equivalence.
+The queue contains the line numbers so the actual source can be rechecked.
+
+The parser's applicability was checked across the entire 471-file text
+universe: neither current nor XP has an apparent conditional directive
+immediately following a line ending in a continuation backslash. No parser
+reported an unmatched or unclosed conditional. The repeated-sibling scan
+refines the original per-file classification: 352 files have matching
+recursive conditional signatures and no duplicate signature under the same
+parent; 102 matching files have same-parent repetitions requiring alignment
+evidence; 17 have mismatch candidates; four are binary. The three additional
+unambiguous files contain repeated names under different parents, not under
+the same parent. This is a structural check and does not attest source-body
+behavior or replace checks of differences in the 17 files.
+
+An earlier group-alignment pass reported 1,109 single-per-parent groups,
+1,675 repeated groups with two condition-adjacent anchors, and 829 other
+groups. Those results were provisional and have been superseded by the
+outside-boundary correction below. The corrected
+[group alignment](m9-t99-s30-independent-group-alignment.tsv) records all 3,613 paired
+groups and their current parent chains. The classifications are mechanical
+evidence, not completed independent human review; they do not include the
+58 unmatched/mismatched candidate entries.
+
+Correction to the earlier anchor passes: their after-anchor search started
+after the opening directive and could select text inside the conditional group.
+Those counts do not prove the `#endif` boundary. A fresh pass first finds each
+group's matching `#endif` and searches strictly outside the whole group;
+unique non-directive source anchors do not cross a same-condition occurrence.
+For 2,368 repeated matched groups, 1,422 have both outside anchors, 756 have
+one, and 190 have none. After requiring a verified-anchor chain through
+repeated parents and rejecting arm mismatch markers, 1,289 repeated groups
+have both boundary anchors and 1,066 unambiguous groups have an anchored
+parent chain; 1,258 groups still need review. The group-alignment table now
+uses the corrected outside-boundary method. Even both anchors establish
+location evidence only, not equivalent code behavior.
+
+Independent review identified a real omission behind the earlier mouse.c
+"alignment-artifact" disposition. In the selected NEC_98 else arm, XP has
+nine `#ifndef PROD` groups while the pre-edit local source has eight. The
+last local group corresponds to XP 442, not XP 425; the omitted group is XP
+393, in the discarded legacy timed-interrupt body. The existing replacement
+timer keeps `case 0x1` through `0x4` but not that legacy runtime if. A
+condition-only error frame was restored immediately before the shared break,
+which is XP line 406. This retains the existing timer implementation and
+records the unavoidable runtime-scope placement difference in the pristine
+ledger. Both actual architecture compile commands define PROD, and pre-edit
+versus candidate selected preprocessor output is byte-identical. A private localized probe temporarily undefines PROD only at the new frame;
+the corresponding error is reached on both architectures. Full batch build and tests subsequently completed as recorded below.
+
+The first-pass inventories, queue lines and source anchors are frozen to
+committed S30 baseline `72e16acd`; lines after the mouse edit need remapping.
+Do not interpret their status as a scan of the edited file.
+
+The source-boundary review separately inspected the NTVDM-to-standalone
+predicate changes in `reset.c`, `c_main.c`, `ppi.c`, and `ios.h` against the
+same XP locations. The 20 paired matcher entries represent ten original
+frames and ten corresponding local frames, not twenty independent defects.
+The local predicate terms select the existing CCPU TLS, CMOS/FDC, PPI or I/O
+behavior; they are retained and recorded in the candidate disposition.
+The V7VGA case was also independently realigned by its enclosing function,
+retained code and both original siblings; the added packed-scanout guard is
+a distinct local exception. Six additional low-anchor video/serial groups
+were checked against their actual XP surrounding source; their selected
+siblings and operation contexts match.
+
+A separate retained-arm pass compares non-directive code inside each matched
+sibling arm. It skips any current arm wholly replaced by `#error` and skips
+nested condition bodies; an anchor must be unique among matching-condition
+siblings on both sides and occur in the same arm. It found at least one such
+anchor for 1,108 of 2,369 currently matched repeated groups. The frozen
+pre-edit review queue receives 1,104 directly corresponding anchors; the
+changed mouse file is excluded from this cross-version merge. This evidence
+helps locate groups and does not itself prove all child structures or resolve
+unequal parent conditions.
+
+When the outside-boundary and same-arm anchor evidence are combined and
+recursively constrained by the matched parent chain, the current experimental
+matcher finds locating evidence for 1,875 repeated and 1,168 unique-sibling
+groups. It leaves 494 repeated and 77 unique-sibling matched groups without a
+complete evidence chain. These 571 groups, as well as the 57 unmatched or
+arm-mismatch candidate entries, remain under review. This is an aid to narrow
+manual checking, not a declaration that all evidenced matches or all ancestor
+exceptions are correct; same-arm uniqueness is calculated among the paired
+siblings, and files containing unmatched siblings must be checked separately.
+
+In `host/inc/cfpu_def.h`, six added `LITTLEND` guards independently wrapped
+adjacent locally reordered floating-point layout declarations. No intervening
+conditional mutates that macro. The first guard already rejects non-little-
+endian configurations, so the following five were redundant and have been
+removed while retaining the original structs, layout and existing `#line`
+directives. Both actual architecture compilers produce byte-identical
+selected preprocessor output before and after; forcing LITTLEND undefined
+still reaches the retained first error. The first guard is recorded as the
+necessary local exception. Batch build/test subsequently completed as recorded below.
+
+`base/inc/cpu_vid.h` had two added checks of the identical conjunction
+`CPU_40_STYLE && C_VID`. The first already emits a hard error when either
+term is absent, and no intervening code changes either macro. The later
+conditional around the local glue prototypes was removed, preserving the
+prototypes and the necessary first ABI guard. Both compilers produce identical
+selected preprocessor output, and each of the three unsupported combinations
+still reaches the retained error. Full batch build/test subsequently completed as recorded below.
+
+`base/system/ica.c`'s local PIC snapshot capture already enforces
+`CPU_40_STYLE && !NTVDM` and `HOOKED_IRETS`, each with an explicit error
+otherwise. The same checks around later restore statements were removed; no
+macro mutation occurs between the sections. Actual x86/x64 compile-context
+preprocessing remains byte-identical, and localized probes forcing each of
+the three invalid states hit the respective first guard. Snapshot state and
+runtime ordering are unchanged. Full batch build/test subsequently completed as recorded below.
+
+`base/keymouse/ppi.c` first rejects the unsupported case where neither
+NTVDM nor SOFTPC_STANDALONE is defined, inside an XP-original NTVDM parent.
+After confirming no intervening macro change, duplicate local rejection was
+removed in ppi_outb and snapshot capture/restore. The original selected
+ppi_outb NTVDM parent remains, with its intentionally omitted old speaker
+body recorded as an exception. The restore-only HostPpiState call remains
+conditioned on standalone. Preprocessing is identical in actual x86/x64
+compile contexts and in two isolated local NTVDM macro combinations; a fourth
+localized combination still triggers the first error. These macro simulations
+do not establish support for NTVDM. Batch qualification subsequently completed as recorded below.
+
+`base/bios/reset.c`'s local standalone-only guard inside the retained
+original `#ifndef NTVDM` path rejects `!NTVDM && !standalone`. The later
+equipment-selection frame already rejects the same configuration, and an
+independent NEC_98 error precedes it when that alternative is selected.
+There is no intervening mutation of NTVDM or SOFTPC_STANDALONE. The extra
+local guard was removed; the original outer frame and explanation of the
+omitted DOS mouse-driver body remain. Actual x86/x64 preprocessing is
+identical, and forcing neither macro at the local point reaches the later
+error in both architectures. Full batch build/test subsequently completed as recorded below.
+
+`host/src/nt_graph.c` first rejects !SOFTPC_STANDALONE at top level. Three
+later identical error guards and one standalone wrapper around an existing V7
+selection were redundant: no include or macro mutation intervenes. They were
+removed; the first guard, V7 condition, original NEC sibling and rendering
+code remain. Both actual architecture preprocessor outputs are byte-identical;
+locally undefining standalone at the first check triggers its retained error.
+The XP native fullscreen content remains an explicitly described subset
+omission. Full batch build/test subsequently completed as recorded below.
+
+In `base/video/gfx_updt.c`, the original CPU40 guard in the retained NEC
+parent's CGA-mark setup already rejects the unsupported CPU mode before the
+local CHAIN2 repair. The added guard around `SetMarkPointers(4)` was removed,
+but that T88 functional repair remains and is still accounted for. No
+relevant macro changes between the two checks. Actual x86/x64 preprocessing
+is identical, and a localized invalid CPU mode hits the original guard. Full batch build/test subsequently completed as recorded below.
+
+`base/inc/egacpu.h`'s local `VGAGLOBALSETTINGS` forward declaration is
+required for the selected generated type, but its extra `#ifdef C_VID` frame
+is not required to declare an incomplete C tag. The frame was removed while
+the declaration and later selected type/fail-fast check remain. All 50 actual
+x86/x64 dependent compile contexts were preprocessed before and with the
+candidate header through a verified include overlay; outputs were byte-identical.
+The non-CVID configuration can now see an incomplete tag, so identity of all
+hypothetical consumers is not asserted; previous actual-context probes showed
+non-CVID is rejected. Full batch build/test subsequently completed as recorded below.
+
+`host/inc/host_cpu.h` contained an added `#ifdef CCPU` around common WRITE
+ABI declarations immediately before XP's original CCPU-specific WRITE group.
+No macro mutation intervenes. The extra first frame was removed and its
+mandatory non-CCPU error moved to a new else on the original frame; that
+else is recorded as the remaining local structural exception. All ABI
+declarations remain. Existing `#line 442` incorrectly mapped XP's original
+CCPU-specific group (XP line 419), and was corrected to `#line 419`. With
+both architecture compilers the selected header preprocessing is identical
+before and after; CCPU undefined triggers the retained error both before
+and after. Full batch build/test subsequently completed as recorded below.
+
+## Ten-file delivery batch — qualification
+
+Relative to `72e16acd`, mirror production numstat from `git diff --numstat`:
+
+| File | Added | Deleted |
+| --- | ---: | ---: |
+| `base/bios/reset.c` | 0 | 3 |
+| `base/inc/cpu_vid.h` | 0 | 2 |
+| `base/inc/egacpu.h` | 0 | 2 |
+| `base/keymouse/mouse.c` | 4 | 0 |
+| `base/keymouse/ppi.c` | 1 | 10 |
+| `base/system/ica.c` | 0 | 4 |
+| `base/video/gfx_updt.c` | 0 | 4 |
+| `host/inc/cfpu_def.h` | 0 | 20 |
+| `host/inc/host_cpu.h` | 3 | 5 |
+| `host/src/nt_graph.c` | 0 | 11 |
+| **Total** | **8** | **61** |
+
+The original actual-context tests for each change are recorded above; they
+prove the stated preprocessor behavior, not guest use of every display mode.
+Cached builds and mirror/documentation gates passed on x64/x86. The two EXEs were refreshed. x64 passed all 186 background and 8 native
+tests. x86 passed all 186 background tests; its first native run passed seven
+and failed `package_smoke/compact_console` (stage 1, error 6, child exit
+0xc0000142). A subsequent read-only session query showed the local Console
+active, so disconnection is not established as the cause. A complete x86
+native-group rerun passed all eight. The failure and rerun are separate facts;
+this is not an all-green first run and does not establish the cause.
+
+Published SHA-256:
+
+- `softpc32.exe`: `b852275a70b719f064873afac04b944353f4a5b97d68b32f548d5186ca03af71`
+- `softpc64.exe`: `a4b48e493e54a1bb4211cdc3be144fd29e2b9dde9f7fd73c77299211051f7267`
+
+Build logs contain 5,246 x64 and 5,195 x86 original-mirror warning lines;
+no non-mirror warning line was detected. No test source, INI, guest media
+or snapshot was changed. S30's independent structural review remains open.
+
+
+An arm-body structure sweep additionally found zero current arms with a
+direct `#error` plus other non-comment code or nested conditions. That
+lexical fact does not prove an excluded branch was correctly classified.

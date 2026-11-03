@@ -630,9 +630,6 @@ void reset()
 		/* These calls manage DOS mouse-driver instance storage, not INT 33
 		 * installation.  Standalone omits that software driver; physical
 		 * mouse hardware is initialised separately by mouse_init() below. */
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
-#endif
 #line 752
 
                 q_event_init();

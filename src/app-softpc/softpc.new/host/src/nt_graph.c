@@ -1187,9 +1187,6 @@ void make_cursor_change(void)
     SAVED DWORD CurrentCursorSize = (DWORD)-1;
     SAVED BOOL CurNowOff = FALSE;
 
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
-#endif
 #line 1363
 
     CursorResizeNeeded = FALSE;
@@ -1614,9 +1611,6 @@ static void check_win_size(register int height)
     register int width;
     extern int soft_reset;
 
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
-#endif
 #line 1400
     /* A detached VM binds its DIB outlet before the firmware executes; it
        has no NTVDM console-integration phase to wait for.  Retain the
@@ -1644,14 +1638,12 @@ static void check_win_size(register int height)
 #endif // !NEC_98
 #line 1419
 
-#ifdef SOFTPC_STANDALONE
 #ifdef V7VGA
     /* The selected packed painter emits one pixel per source byte, unlike
        the standard VGA painter's doubled pixels.  Use its row contract,
        not BIOS bookkeeping which need not describe the active display. */
     if (paint_screen == nt_paint_funcs->v7vga_hi_graph)
         width = get_bytes_per_line();
-#endif
 #endif
 
     /*::::::::::::::::::::::::::::::::::::::::::::::::::::::: Resize window */
@@ -2210,9 +2202,6 @@ void graphicsResize(void)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
 /* Standalone presentation does not use the NT fullscreen resize guard. */
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
-#endif
 #endif // !NEC_98
 #line 2612
 

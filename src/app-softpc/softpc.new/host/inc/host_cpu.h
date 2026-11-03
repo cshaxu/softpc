@@ -272,7 +272,6 @@ extern word             (*getIOPL_func) ();
 
 
 /*  common WRITE functions  */
-#ifdef CCPU
 /* DIVERGENCE: MVDM-HOST-DIV-102 keeps original common vector names and
  * selection macros, but exposes the selected generated CCPU contracts.
  * Empty NT4 parameter lists do not prove the x86/x64 call ABI. */
@@ -288,10 +287,7 @@ extern VOID (*setMSW_func)(IU16);
 extern VOID (*setDF_func)(IBOOL); extern VOID (*setIF_func)(IBOOL); extern VOID (*setTF_func)(IBOOL);
 extern VOID (*setPF_func)(IBOOL); extern VOID (*setAF_func)(IBOOL); extern VOID (*setSF_func)(IBOOL);
 extern VOID (*setZF_func)(IBOOL); extern VOID (*setOF_func)(IBOOL); extern VOID (*setCF_func)(IBOOL);
-#else
-#error "Unsupported SoftPC mirror configuration: !CCPU"
-#endif
-#line 442
+#line 419
 #ifdef CCPU
 /* CCPU-specific WRITE functions */
 extern void             (*setCPL_func) ();
@@ -308,6 +304,8 @@ extern void             (*setMP_func) ();
 extern void             (*setPE_func) ();
 extern void             (*setNT_func) ();
 extern void             (*setIOPL_func) ();
+#else
+#error "Unsupported SoftPC mirror configuration: !CCPU"
 #endif CCPU
 
 #ifdef A2CPU

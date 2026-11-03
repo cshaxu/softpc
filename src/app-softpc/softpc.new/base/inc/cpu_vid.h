@@ -112,7 +112,6 @@ typedef struct
 	void (*str_bwd_read) IPT3(IU8 *, dest, IU32, eaOff, IU32, count);
 } EVID_READ_POINTERS; 
 
-#if defined(CPU_40_STYLE) && defined(C_VID)
 /* SOFTPC_PORT_ABI: selected C-VID EVID glue crosses the CPU/video table
  * boundary with these concrete, generated-provider signatures. */
 extern void write_byte_ev_glue(IU32 eaOff, IU8 eaVal);
@@ -124,7 +123,6 @@ extern void move_word_fwd_ev_glue(IU32 eaOff, IHPE fromOff, IU32 count, IBOOL sr
 extern IU32 read_byte_ev_glue(IU32 eaOff);
 extern IU32 read_word_ev_glue(IU32 eaOff);
 extern void read_str_fwd_ev_glue(IU8 *dest, IU32 eaOff, IU32 count);
-#endif /* CPU_40_STYLE && C_VID */
 
 extern READ_POINTERS read_pointers;
 

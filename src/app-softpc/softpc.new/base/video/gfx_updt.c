@@ -3888,11 +3888,7 @@ set_mark_funcs IFN0()
 				case CHAIN2:
 					/* DIVERGENCE(T88-CHAIN2-DIRTY): select the EGA
 					 * bitmap marker, not stale CGA/text pointers. */
-#ifdef CPU_40_STYLE
 					SetMarkPointers(4);
-#else
-#error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
-#endif
 #line 3704
 
 					break;

@@ -96,9 +96,7 @@ typedef struct
 #endif // !NEC_98
 #line 142
 
-#ifdef C_VID
 struct VGAGLOBALSETTINGS;
-#endif
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

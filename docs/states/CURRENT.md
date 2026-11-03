@@ -7,6 +7,46 @@ conditional structure differences with the fixed XP source. S29 closed at
 `f5af155b`; its [review](../etc/evidence/softpc/m9-t99-s29-cross-depth-review.md)
 records the earlier breadth-first audit and its limits.
 
+Owner continues S30 with an independent full-file recursive comparison: enumerate
+all mirror files, verify their XP counterparts, compare every retained arm,
+and stop descending only at a whole-arm `#error`. The owner requires each batch
+of 10 changed mirror files to be a P delivery with build, publication, tests,
+commit and push; after all batches, repeat full build, publication, testing,
+commit and push before S30 acceptance. Unifiable structural changes
+should be corrected; necessary local differences must be recorded individually.
+The new comparison is in progress, not an accepted closure. The
+[independent review](../etc/evidence/softpc/m9-t99-s30-independent-review.md)
+explains the evidence and unresolved boundaries. Its first-pass
+[file inventory](../etc/evidence/softpc/m9-t99-s30-independent-file-ledger.tsv),
+[tree candidates](../etc/evidence/softpc/m9-t99-s30-independent-tree-candidates.tsv),
+and [repeated-sibling queue](../etc/evidence/softpc/m9-t99-s30-independent-repeated-queue.tsv)
+are candidates, not proof of correct alignment. The task-owned scratch is
+`build/t99-s30` (one bounded scan at a time; no timeout-based termination), to be
+removed after the work completes.
+
+The independent pass found and restored the missing XP `#ifndef PROD` frame
+in `base/keymouse/mouse.c`; dual-architecture selected preprocessing is
+byte-identical to the preceding source. The original diagnostic belonged to
+an obsolete runtime interrupt-burst block; the remaining placement difference
+is recorded. The current P batch has exactly ten modified mirror files:
+`mouse.c`, `cfpu_def.h`, `cpu_vid.h`, `ica.c`, `ppi.c`, `reset.c`,
+`nt_graph.c`, `gfx_updt.c`, `egacpu.h` and `host_cpu.h`. Repeated guards
+were reduced while retaining selected ABI, failure boundaries, original
+parents and the T88 CHAIN2 marker fix. Stop editing mirror files until this
+batch completes dual-architecture build, publication, full tests, commit
+and push. The owned build and test jobs log under `build/t99-s30/p5-*`;
+monitor progress in bounded polls, investigate after 30 minutes without
+progress without terminating work solely due to the observation interval. Both
+builds and x64 186+8 tests passed; x86 186 passed, and its native group failed
+one compact-console test (child 0xc0000142) before the complete 8/8 rerun
+passed. The cause is not established. Batch delivery is in progress. Both actual
+architecture commands were separately probed with PROD disabled only at the
+restored mouse frame and reached its error. Earlier comparison and queue line numbers refer
+to baseline `72e16acd`, not the edited file. The independent source review
+confirmed the ten XP/local NTVDM predicate pairs and distinguished the V7
+scanout's local extra guard from its two original siblings. The recursive
+comparison still has unreviewed repeated-boundary and local-exception cases.
+
 ## M9 T99 S30 Packet
 
 | Field | Required record |
@@ -59,7 +99,7 @@ dual-architecture consumers hit independent errors when C_VID was forced off.
 Final-source dual builds and all 194 tests per architecture passed without
 skips. Relative to S29, six mirror files change by +3/-16 (net -13);
 test source is unchanged. Structural matching is heuristic, so complete
-correspondence is not claimed. S30 remains open pending owner acceptance.
+correspondence is not claimed. S30 remains active for the owner-requested independent recursive review.
 
 ## Technical Baseline
 

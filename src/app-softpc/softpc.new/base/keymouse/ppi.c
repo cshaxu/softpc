@@ -143,9 +143,6 @@ void ppi_outb IFN2(io_addr, port, half_word, value)
 	 */
 
 #ifndef NTVDM
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
-#endif
 #endif
 #line 150
 
@@ -212,12 +209,8 @@ softpc_device_ppi_state *state;
 		return;
 	state->register_value = ppi_register;
 	state->gate_2_was_low = gate_2_was_low ? 1u : 0u;
-#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
-#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
-#else
 #line 215
 	state->speaker_data_was_low = (ppi_register & 0x02u) == 0u ? 1u : 0u;
-#endif
 }
 
 GLOBAL int
@@ -229,9 +222,7 @@ const softpc_device_ppi_state *state;
 		return FALSE;
 	ppi_register = state->register_value;
 	gate_2_was_low = state->gate_2_was_low ? TRUE : FALSE;
-#if !defined(NTVDM) && !defined(SOFTPC_STANDALONE)
-#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
-#elif defined(SOFTPC_STANDALONE)
+#if defined(SOFTPC_STANDALONE)
 #line 235
 	HostPpiState(ppi_register);
 #endif

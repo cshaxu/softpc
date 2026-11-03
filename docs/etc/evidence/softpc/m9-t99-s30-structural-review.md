@@ -1,5 +1,10 @@
 # M9 T99 S30: mirror condition structure review
 
+> Independent-review correction: the earlier `mouse.c` alignment-artifact
+> conclusion below was incomplete. XP 442 does map to current 377, but a
+> different sibling, XP 393, was missing. Its original frame has now been
+> restored in the active batch. See the [independent review](m9-t99-s30-independent-review.md); batch qualification is recorded in the independent review, including the initial x86 native failure and complete rerun.
+
 The comparison uses the fixed XP SP1 source at
 `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`; OpenNT is read-only diagnostic
 reference. It does not compare inside a current arm wholly replaced by

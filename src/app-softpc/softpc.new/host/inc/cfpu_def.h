@@ -29,47 +29,31 @@ IU32	sign:1;
 } FP32;
 
 typedef struct {
-#ifdef LITTLEND
 IU32	mant_hi:20;
 IU32	exp:11;
 IU32	sign:1;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 28
 } FP64HI;
 
 typedef struct {
-#ifdef LITTLEND
 IU16	exp:15;
 IU16	sign:1;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 33
 } FP80SE;
 
 //#ifdef BIGEND
 
 typedef struct {
-#ifdef LITTLEND
 IU32	mant_lo;
 FP64HI	hiword;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 40
 } FP64;
 
 
 typedef struct {
-#ifdef LITTLEND
 /* fpu.c's little-endian BCD tables initialize low word before high word. */
 IU32 low_word;
 IS32 high_word;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 46
 } FPU_I64;
 
@@ -80,12 +64,8 @@ IS32 high_word;
  */
 
 typedef struct {
-#ifdef LITTLEND
 IU32	mant_lo;
 IU32	mant_hi;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 57
 FP80SE	sign_exp;
 } FP80;
