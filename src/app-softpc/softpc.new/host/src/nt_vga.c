@@ -242,7 +242,7 @@ void nt_vga_graph_big(int offset, int screen_x, int screen_y,
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
-#line 241
+#line 238
 #ifdef LITTLEND
                 *(dest_ptr + 1) = (unsigned short) ((temp2 << 8) | temp1);
 #endif /* LITTLEND */

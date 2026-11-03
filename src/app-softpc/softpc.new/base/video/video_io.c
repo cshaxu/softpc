@@ -17,7 +17,7 @@
 
 
 #ifndef NEC_98
-#line 19
+#line 20
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif

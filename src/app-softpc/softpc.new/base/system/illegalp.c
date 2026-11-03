@@ -127,7 +127,7 @@ void illegal_op_int()
 void illegal_dvr_bop IFN0()
 {
 #ifndef NTVDM
-#line 118
+#line 141
 	sys_addr bop_addr;
 	CHAR buf[256];
 

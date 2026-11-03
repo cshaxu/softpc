@@ -453,3 +453,17 @@ non-mirror warning line observed. Published x86 and x64 EXE SHA-256 values are
 `cde8f48c3cb0fc7a204070b1a8fcc0a2ae48c1c35b80e77b0c8aaa12d58d52cf` and
 `19982265e27369d51504016aec8e248f7297359db44ed1013aeabd207675e5e7`.
 No conclusion about the remaining conditional trees is implied.
+
+P10 maps ten further XP line candidates in six C files and four headers.
+The [mapping](m9-t99-s30-p10-line-mapping.tsv) and [queue](m9-t99-s30-p10-line-candidates.tsv)
+record old and new lines, leaving four `sas.h` candidates pending. The actual
+source units including the changed headers are included in two-architecture
+preprocessing comparisons. Nine translation units per architecture matched
+before and after, covering all six changed C files and representative actual
+consumers of the four headers. Both architectures built and each passed all
+186 background and 8 native tests. Build logs have 2292 x64 and 2242 x86
+warning lines, all with mirror paths; no non-mirror warning line was observed.
+The x86 and x64 EXE SHA-256 values are respectively
+`74a5b6afea8fb7edd3797eeee1820c7f490ab70ddcb586052e7a0d472035d570` and
+`c141e2b77ca92d37242772638f9413ee201a52cfde5753fe08f5277295701753`.
+This queue concerns line mapping, not complete conditional-structure review.

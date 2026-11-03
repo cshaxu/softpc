@@ -32,7 +32,7 @@
 #ifdef	HUNTER
 #error "Unsupported SoftPC mirror configuration: HUNTER"
 #endif
-#line 37
+#line 35
 	IMPORT VOID update_banking IPT0();
 	IMPORT VOID set_banking IPT2(IU8, rd_bank, IU8, wrt_bank);
 

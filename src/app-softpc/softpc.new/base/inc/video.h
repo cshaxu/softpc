@@ -148,7 +148,7 @@ IMPORT void vga_int_1C IPT0();
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif
-#line 142
+#line 215
 #define CGA_FUNC_SIZE	0x14
 
 #define SET_MODE 0

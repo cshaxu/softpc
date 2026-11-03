@@ -35,7 +35,7 @@
 #ifdef ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #else
-#line 36
+#line 48
 extern	void printer_init();
 extern	void printer_post();
 extern	void printer_status_changed();

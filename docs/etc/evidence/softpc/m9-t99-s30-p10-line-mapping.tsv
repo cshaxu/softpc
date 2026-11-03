@@ -1,0 +1,11 @@
+path	kind	current_directive_line	old_number	xp_number	current_following_line	xp_following_line	matching_content	review_status
+base/inc/egaports.h	after-group	35	37	35	36	35	IMPORTVOIDupdate_bankingIPT0();	pending_review
+base/inc/printer.h	retained-arm	38	36	48	39	48	externvoidprinter_init();	pending_review
+base/inc/rs232.h	retained-arm	351	338	699	352	699	#defineTCGETTCGETA	pending_review
+base/inc/video.h	after-group	151	142	215	152	215	#defineCGA_FUNC_SIZE0x14	pending_review
+base/keymouse/keybd_io.c	retained-arm	626	626	780	627	780	#definePUT_IN_BUFFER(s,v)PutInBufferFunc(s,v);return	pending_review
+base/system/idetect.c	retained-arm	241	239	294	242	294	host_release_timeslice();	pending_review
+base/system/illegalp.c	retained-arm	130	118	141	131	141	sys_addrbop_addr;	pending_review
+base/video/gvi.c	after-group	223	221	236	224	236	screen_height=CGA_HEIGHT;	pending_review
+base/video/video_io.c	retained-arm	20	19	20	21	20	#ifdefSEGMENTATION	pending_review
+host/src/nt_vga.c	after-group	245	241	238	246	238	#ifdefLITTLEND	pending_review

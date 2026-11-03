@@ -59,9 +59,12 @@ Each has matching XP adjacent condition boundary and following source; the
 candidates. P8 dual preprocessing, build and publication succeeded, followed by 186/186
 background and 8/8 native tests per architecture. P8 was committed and pushed as `3c526e55`. P9 is now active: ten
 compiled mirror files have 25 XP diagnostic line corrections. Both architectures passed preprocessing comparison, build, 186 background
-tests and 8 native tests each. Actual-diff review, commit and push must finish
-before an eleventh mirror file is modified. The updated candidate
-queue retains 14 pending line locations after the P9 candidates. Structural correspondence
+tests and 8 native tests each. P9 was committed and pushed as `b2c829f7`. P10 has ten changed mirror
+files (six C files and four headers) and ten XP line corrections. Its
+preprocessing, dual build and publication passed, as did 186 background and
+8 native tests per architecture. Review, commit and push must finish before
+modifying an eleventh mirror file. The updated candidate
+queue retains four pending line locations in sas.h after the P10 candidates. Structural correspondence
 is still under review; these line candidates are not a complete audit. The [line-boundary candidate ledger](../etc/evidence/softpc/m9-t99-s30-p7-line-candidates.tsv)
 keeps 128 pending candidates in 31 files distinct from the 210 scanner matches
 corrected in P7. Owned P7 build and test logs and exit markers are `build/t99-s30/p7-*`; use bounded status polls, investigate

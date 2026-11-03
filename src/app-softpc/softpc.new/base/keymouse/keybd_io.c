@@ -623,7 +623,7 @@ LOCAL VOID PutInBufferFunc IFN2(half_word, s, half_word, v)
 /* <tur 17-Jun-93> Eurrgh; macros with embedded "return"s! */
 
 #ifndef NTVDM
-#line 626
+#line 780
 #define PUT_IN_BUFFER(s, v)		PutInBufferFunc(s,v); return
 #endif	/* !NTVDM */
 #line 782

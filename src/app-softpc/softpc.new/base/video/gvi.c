@@ -220,7 +220,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef CGAMONO  
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
 #endif
-#line 221
+#line 236
 	screen_height = CGA_HEIGHT;
         video_adapter = v_adapter;
         break;

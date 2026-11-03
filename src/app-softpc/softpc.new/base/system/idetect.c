@@ -238,7 +238,7 @@ LOCAL void my_host_release_timeslice()
 #ifdef SMEG
 #error "Unsupported SoftPC mirror configuration: SMEG"
 #else
-#line 239
+#line 294
     host_release_timeslice();
 #endif
 

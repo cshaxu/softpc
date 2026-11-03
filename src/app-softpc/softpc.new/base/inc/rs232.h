@@ -348,7 +348,7 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #ifdef SVID3_TCGET
 #error "Unsupported SoftPC mirror configuration: SVID3_TCGET"
 #else
-#line 338
+#line 699
 #define	TCGET TCGETA
 #define	TCSET TCSETA
 #define	TCSETF TCSETAF
