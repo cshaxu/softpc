@@ -261,7 +261,7 @@ IFN1(
 #ifdef TAKE_PROT_MODE_LIMIT_FAULT
 #error "Unsupported SoftPC mirror configuration: TAKE_PROT_MODE_LIMIT_FAULT"
 #endif /* TAKE_PROT_MODE_LIMIT_FAULT */
-#line 276
+#line 279
 
       /* The Soft486 EDL CPU does not take Protected Mode limit failues
        * for the instructions with relative offsets, Jxx, LOOPxx, JCXZ,
@@ -317,7 +317,7 @@ IFN1(
 #ifdef TAKE_PROT_MODE_LIMIT_FAULT
 #error "Unsupported SoftPC mirror configuration: TAKE_PROT_MODE_LIMIT_FAULT"
 #endif /* TAKE_PROT_MODE_LIMIT_FAULT */
-#line 339
+#line 342
 
       /* The Soft486 EDL CPU does not take Protected Mode limit failues
        * for the instructions with relative offsets, Jxx, LOOPxx, JCXZ,

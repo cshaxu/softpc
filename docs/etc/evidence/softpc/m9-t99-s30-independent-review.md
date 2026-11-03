@@ -550,3 +550,14 @@ Published x86 and x64 EXE SHA-256 values are respectively
 `3ed83ba43ea2b5d220f2296c89ada58c53233f368dbea67b4989784a3193ff53` and
 `bee2010cefdf4aa2e5dca711d5d05862d438d1cc209bcaa8316ffa81977252b4`.
 This does not complete conditional structure review.
+
+P16 changes 34 matching-prefix candidate line controls across ten compiled
+files. The [mapping](m9-t99-s30-p16-line-mapping.tsv) and [updated queue](m9-t99-s30-p16-following-line-candidates.tsv)
+record the batch, with 82 candidates still pending. Actual preprocessing
+matched for all ten translation units on both architectures; both built and
+each passed 186 background and 8 native tests. Both build logs contained 536
+mirror-path warning lines, with no non-mirror warning line observed.
+Published x86 and x64 EXE SHA-256 values are respectively
+`07fc48290579d94b3890e5f9c68b39f6d732526aa5d63c4a0687259070bca4bf` and
+`296b89e6d81a6bf0003c360cd00f9dc7b5fbd9bc02fb7e88a390083730f536f7`.
+This does not complete conditional structure review.

@@ -1608,7 +1608,7 @@ GLOBAL VOID fdisk_outb IFN2(io_addr, port, UTINY, value)
 	}
 	dt0(DHW, 0, ")\n")
 #endif // !NEC_98
-#line 1638
+#line 1639
 }
 
 GLOBAL VOID fdisk_outw IFN2(io_addr, port, USHORT, value)
@@ -1734,13 +1734,13 @@ GLOBAL VOID fdisk_ioattach IFN0()
 		    (unsigned) ncyls)
 	}
 #endif // !NEC_98
-#line 1755
+#line 1758
 }
 
 GLOBAL VOID fdisk_iodetach IFN0()
 {
 #ifndef NEC_98
-#line 1759
+#line 1763
 	io_addr         p;
 
 	/*
@@ -1796,7 +1796,7 @@ GLOBAL VOID fdisk_iodetach IFN0()
 		dt0(DHW | IOAD, 0, "drive 1 unplugged\n")
 	}
 #endif // !NEC_98
-#line 1809
+#line 1814
 }
 
 GLOBAL VOID fdisk_physattach IFN1(int,driveno)

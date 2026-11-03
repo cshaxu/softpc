@@ -180,7 +180,7 @@ void PlaySound(BOOL bPulsedPpi)
       LazyBeep(0,0);
       }
 #endif // !NEC_98
-#line 168
+#line 259
 }
 
 
@@ -197,7 +197,7 @@ void host_timer2_waveform(int delay,
                           int repeat)
 {
 #ifndef NEC_98
-#line 183
+#line 275
     ULONG ul;
 
     if (loclocks == INFINITE || hiclocks == INFINITE) {
@@ -221,7 +221,7 @@ void host_timer2_waveform(int delay,
 
     PlaySound(FALSE);
 #endif // !NEC_98
-#line 205
+#line 298
 }
 
 
@@ -251,7 +251,7 @@ void HostPpiState(BYTE PortValue)
 
     host_ica_unlock();
 #endif // !NEC_98
-#line 231
+#line 326
 }
 
 
@@ -338,7 +338,7 @@ void PulsePpi(void)
     PpiCycles = 0;
 
 #endif // !NEC_98
-#line 314
+#line 411
 }
 
 

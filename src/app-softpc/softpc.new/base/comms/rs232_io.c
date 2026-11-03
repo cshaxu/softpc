@@ -65,7 +65,7 @@ static void return_status()
 	inb((io_addr)(port + RS232_MSR), (IU8 *)&value);
 	setAL(value);
 #endif // !NEC_98
-#line 64
+#line 68
 }
 
 
@@ -87,7 +87,7 @@ void rs232_io()
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 91
+#line 96
 
    DIVISOR_LATCH divisor_latch;
    int j;

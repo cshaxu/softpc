@@ -178,7 +178,7 @@ LOCAL word rcpu_poll_segment = RCPU_POLL_SEGMENT,
 #line 242
 #define FREEKBDHDW()	/* Nothing for conventional SoftPC */
 #endif	/* NTVDM */
-#line 185
+#line 244
 
 /*
  * Mix in global defined data as well.
@@ -690,7 +690,7 @@ LOCAL VOID PAUSE IFN0()
 #line 838
 static int re_entry_level=0;
 #endif
-#line 676
+#line 840
 
 /*
 ** All exits from keyboard_int() call this first.
@@ -739,7 +739,7 @@ void keyboard_int IFN0()
 		always_trace1("ERROR: KBD BIOS re-entered at level %d\n", re_entry_level-1);
 	}
 #endif
-#line 708
+#line 889
 	setIF(0);
         note_trace0(BIOS_KB_VERBOSE,"KBD BIOS start");
 
@@ -1688,7 +1688,7 @@ void keyboard_post()
 	sas_store_no_check (kb_flag_3,KBX);
 	sas_store_no_check (alt_input,0);
 #endif    //NEC_98
-#line 1631
+#line 1982
 }
 
 void keyboard_init()

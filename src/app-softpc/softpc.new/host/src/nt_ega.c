@@ -228,7 +228,7 @@ void nt_init_ega_lo_graph()
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
-#line 246
+#line 250
 
 #ifdef LITTLEND
 
@@ -421,7 +421,7 @@ void nt_init_ega_med_and_hi_graph_luts()
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /*BIGEND */
-#line 444
+#line 448
 
 #ifdef LITTLEND
 
@@ -447,7 +447,7 @@ void nt_init_ega_med_and_hi_graph_luts()
 #ifdef BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #endif /* BIGEND */
-#line 474
+#line 478
 
 #ifdef LITTLEND
 

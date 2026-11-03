@@ -230,7 +230,7 @@ PURPOSE         :       called from keyboard BIOS as result of
 #ifdef SMEG
 #error "Unsupported SoftPC mirror configuration: SMEG"
 #endif
-#line 218
+#line 273
 
 
 LOCAL void my_host_release_timeslice()
@@ -310,7 +310,7 @@ LOCAL void idle_tick()
 	nCharPollsPerTick = 0;
 }
 #endif
-#line 297
+#line 437
 
 /*
 7.INTERMODULE INTERFACE IMPLEMENTATION :
@@ -357,7 +357,7 @@ int event;
 		idle_no_disk = 1;
 		idle_no_comlpt = 1;
 #endif
-#line 328
+#line 483
 		break;
 
 	/* application polling for keyboard input */

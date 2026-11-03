@@ -149,7 +149,7 @@ half_word target_AR;
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // JAPAN && i386
-#line 127
+#line 248
                /* Unlike the real PC we don't have to go into protected
                   mode in order to address memory above 1MB, thanks to
                   the wonders of C this function becomes much simpler
@@ -162,7 +162,7 @@ half_word target_AR;
 #ifdef CPU_30_STYLE
 #error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else /* CPU_30_STYLE */
-#line 150
+#line 271
 		/* retrieve descriptor information for source */
 		retrieve_descr_fields(&source_AR, &source_base, &source_limit, source);
 
@@ -196,7 +196,7 @@ half_word target_AR;
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
 			sas_enable_20_bit_wrapping();
 #endif /* NTVDM */
-#line 178
+#line 306
 		}
 		else
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);

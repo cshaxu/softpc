@@ -33,7 +33,7 @@
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 35
+#line 37
 
 
 /*
@@ -47,7 +47,7 @@
 #ifdef SYSTEMV
 #error "Unsupported SoftPC mirror configuration: SYSTEMV"
 #endif
-#line 48
+#line 50
 
 /*
  * SoftPC include files
@@ -92,7 +92,7 @@ static sys_addr timeout_address[] = {
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 80
+#line 91
 /*
  * The printer bios consists of three functions:
  *
@@ -118,7 +118,7 @@ void printer_io()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 102
+#line 131
 
     setIF(1);
     adapter = getDX() % NUM_PARALLEL_PORTS;

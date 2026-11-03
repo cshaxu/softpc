@@ -310,7 +310,7 @@ GLOBAL IBOOL c_SasRegisterVirtualSelectors IFN2(IU16, sel1, IU16, sel2)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* ndef PROD */
-#line 344
+#line 284
 
 
 /*********** INIT & ADMIN FUNCS  ***********/
@@ -430,7 +430,7 @@ sas_init IFN1(PHY_ADDR, size)
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #endif
-#line 462
+#line 402
 
 	/* init the ROM (load the bios roms etc) */
 
@@ -1462,7 +1462,7 @@ biosDoInst IFN5(IU16, vCS, LIN_ADDR, vEIP, IU32, vEAX, IU16, vDS, IU32, vEDX)
 #else
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1496
+#line 1435
 	}
 
 	result = getEAX();
@@ -1974,7 +1974,7 @@ LOCAL	void	c_sas_not_used	IFN0()
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 2007
+#line 1946
 }
 
 

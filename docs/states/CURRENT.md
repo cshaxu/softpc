@@ -82,6 +82,12 @@ native tests per architecture. Review, commit and push must finish before an
 eleventh mirror file is changed. The candidate queue retains 116
 pending line mappings, including 63 differing-prefix/offset cases; conditional
 structure matching remains independently open.
+P15 was committed and pushed as `ac3d9577`. P16 currently changes ten
+compiled mirror files with 34 matching-prefix line corrections. Dual preprocessing, builds and full tests passed: 186 background and 8
+native tests per architecture. Review, commit and push must finish before an
+eleventh mirror file is changed. The candidate queue retains 82 pending
+line mappings, including 63 differing-prefix/offset cases; conditional
+structure matching remains independently open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed
