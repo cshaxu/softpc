@@ -757,4 +757,4 @@ ega_read_term IFN0()
 #endif /* EGG */
 
 #endif	/* !(NTVDM && MONITOR) */
-#line 989
+#line 1029

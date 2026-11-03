@@ -60,5 +60,5 @@ IMPORT VOID fill_both_bytes IPT3( IU16, data, IU16 *, dest, ULONG, len );
 #ifdef	SETUID_ROOT
 #error "Unsupported SoftPC mirror configuration: SETUID_ROOT"
 #endif	/* SETUID_ROOT */
-#line 66
+#line 63
 

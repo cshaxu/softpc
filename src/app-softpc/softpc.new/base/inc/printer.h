@@ -63,7 +63,7 @@ extern	void printer_status_changed();
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
 #endif // !NEC_98
-#line 58
+#line 74
 
 
 #endif

@@ -66,4 +66,4 @@ extern void host_gettimeofday IPT2(struct host_timeval *, time,
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 70
+#line 67

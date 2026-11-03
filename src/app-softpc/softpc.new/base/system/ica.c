@@ -2100,5 +2100,5 @@ const softpc_device_pic_state *state;
 #if !defined(PROD)
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 2200
+#line 2317
 

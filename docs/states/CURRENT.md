@@ -917,3 +917,8 @@ P41 was committed and pushed as `31bf6205`. P42 corrects 27 XP
 conditional-end diagnostic positions in ten files, preserving local edits
 and accounting for differing blank lines. Both architectures passed 186
 background and eight native tests first run. S30 remains open.
+
+P42 was committed and pushed as `f1f23d59`. P43 aligns nine EOF
+markers and one nested closing position in ten files; both architectures
+passed 186 background and eight native tests first run. S30 remains open
+for review of the other candidates.

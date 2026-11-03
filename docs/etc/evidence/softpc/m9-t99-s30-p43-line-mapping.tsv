@@ -1,0 +1,11 @@
+path	local_line	old_line	suggested	condition	xp_condition_line
+base/inc/host.h	63	66	63	ifdef:SETUID_ROOT	55
+base/inc/ica.h	227	218	263	ifdef:GISP_CPU	251
+base/inc/timeval.h	69	70	67	ifndef:NTVDM	60
+base/system/ica.c	2103	2200	2317	if:!defined(PROD)	2210
+base/system/illegalp.c	184	372	396	ifndef:PROD	190
+base/system/quick_ev.c	1724	1793	1557	ifdef:QEVENT_TESTER	1512
+base/video/ega_read.c	760	989	1029	if:!(defined(NTVDM)&&defined(MONITOR))	4
+base/video/ega_writ.c	576	837	868	if:!(defined(NTVDM)&&defined(MONITOR))	4
+base/video/gvi.c	343	340	358	if:defined(NEC_98)	170
+base/inc/printer.h	66	58	74	if:defined(NEC_98)	31

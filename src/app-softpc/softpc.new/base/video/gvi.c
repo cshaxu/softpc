@@ -340,4 +340,4 @@ void gvi_term IFN0()
 #line 356
 }
 #endif  //NEC_98
-#line 340
+#line 358
