@@ -740,7 +740,7 @@ word *low, *hi;		/* outputs */
     *hi = ticks >> 16;
 }
 #endif   //NEC_98
-#line 730
+#line 942
 
 
 

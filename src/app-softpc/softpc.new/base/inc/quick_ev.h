@@ -82,7 +82,7 @@ extern ULONG host_calc_q_ev_inst_for_time IPT1( ULONG, time );
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 85
+#line 45
 
 extern void host_q_ev_set_count IPT1( ULONG, count );
 extern ULONG host_q_ev_get_count IPT0();

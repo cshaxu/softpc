@@ -1294,7 +1294,7 @@ if (!keyboard_disabled)
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 1353
+#line 1860
 		if (free_6805_buff_size < BUFF_6805_VMAX)
 		    {
 		    codes_to_translate();
@@ -2608,7 +2608,7 @@ GLOBAL VOID kbd_outb IFN2(io_addr,port,half_word,val)
 			cmd_to_6805(val);
 	}
 #endif // NEC_98
-#line 2524
+#line 3276
 
 
 #ifndef NTVDM	/* JonLe NTVDM Mod */

@@ -97,6 +97,14 @@ initialization; the full rerun passed, and cause is unknown. Complete review,
 commit and push before changing an eleventh mirror file. The candidate queue retains 66
 pending line mappings, including 63 differing-prefix/offset cases; conditional
 structure matching remains independently open.
+P17 was committed and pushed as `f3683962`; its initial x64 native failure
+and complete rerun are recorded in the independent review. P18 currently
+changes ten mirror files with 12 diagnostic corrections, aligning actual
+source anchors rather than blindly using a changed physical offset. Dual preprocessing, builds and full tests passed: 186 background and 8
+native tests per architecture. Review, commit and push must finish before an
+eleventh mirror file is changed. Of 63 differing-prefix/offset leads,
+46 already map their first source anchor correctly, 11 differed and six have
+intervening #line directives; this classification is not full branch review.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

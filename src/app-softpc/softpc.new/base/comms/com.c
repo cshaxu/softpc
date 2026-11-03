@@ -1668,7 +1668,7 @@ static void set_baud_rate IFN1(int, adapter)
 
 
 #ifndef NTVDM
-#line 1784
+#line 2800
 	/*
 	 * Check for valid divisor latch
 	 */

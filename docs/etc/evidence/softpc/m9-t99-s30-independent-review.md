@@ -577,3 +577,26 @@ line observed. Published x86 and x64 EXE SHA-256 values are respectively
 `f3adbde1cbc8e0f8e074a192ca26f117ccfc12067665ac13648ec7bab6425608` and
 `d994b0479441cd62fba15be455438b1d114d18192dd419dc6d5b4ee0cd760c15`.
 Conditional structure review is not complete.
+
+P18 classifies the 63 differing-prefix/offset leads: 46 already map the
+first actual XP source anchor correctly, 11 do not, and six have another
+line directive between the candidate and first anchor. The
+[offset review](m9-t99-s30-p18-offset-review.tsv) does not claim that a
+correct first anchor proves subsequent contents. This batch corrects nine
+of the direct mismatches and three previously matching-prefix leads in ten
+files using the actual anchor offset; see [mapping](m9-t99-s30-p18-line-mapping.tsv)
+and [updated queue](m9-t99-s30-p18-following-line-candidates.tsv). Two direct
+mismatches, six intervening-directive cases and further structural group
+checks remain open. Seven actual consumer/changed translation units per
+architecture produced byte-identical preprocessing; both architectures built
+and passed 186 background and 8 native tests each. Build logs contained
+4425 x64 and 4374 x86 mirror-path warning lines, with no non-mirror warning
+line observed. Published x86 and x64 EXE SHA-256 values are respectively
+`e89c1a793dbd6ff3604cdd3345a00bd62893cf0c1c5c12c5935d81b6b40d919e` and
+`3587a8472b39df209eeac623a5df8d71ed7e9234396a92ef3eb9d4ac59803456`.
+
+For the 46 leads with a correct first source anchor, a further comparison of
+the next three nonempty lines and their XP diagnostic line numbers verified
+34 for those three anchors; 12 need more review, including intervening
+directives or unequal subsequent line distances. The [three-anchor record](m9-t99-s30-p18-three-anchor-review.tsv)
+is evidence only for those tested anchors, not complete line or branch proof.

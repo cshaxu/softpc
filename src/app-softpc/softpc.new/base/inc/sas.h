@@ -205,7 +205,7 @@ extern void sas_overwrite_memory IPT2(sys_addr, addr, int, type);
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif  /* NTVDM */
-#line 202
+#line 217
 
 extern half_word sas_memory_type IPT1(sys_addr, addr);
 extern void sas_enable_20_bit_wrapping IPT0();

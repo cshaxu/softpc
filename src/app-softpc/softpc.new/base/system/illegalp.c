@@ -95,7 +95,7 @@ void illegal_op_int()
 	where(string, cs, ip);
 
 #ifndef NTVDM
-#line 92
+#line 100
 #ifdef PROD
 	host_error(EG_BAD_OP, ERR_QU_CO_RE, string);
 #else  /* PROD */

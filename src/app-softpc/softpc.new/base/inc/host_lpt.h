@@ -150,7 +150,7 @@ IMPORT	void		host_print_auto_feed IPT2(int,adapter, BOOL,auto_feed);
 #if defined (NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #endif
-#line 142
+#line 165
 #define	HOST_LPT_BUSY	(1 << 0)
 #define	HOST_LPT_PEND	(1 << 1)
 #define	HOST_LPT_SELECT	(1 << 2)

@@ -328,7 +328,7 @@ const softpc_device_parallel_controller_state *state_in;
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #else /* NTVDM && MONITOR */
-#line 303
+#line 288
 #define get_status(adap)	(status_reg[adapter])
 #define set_status(adap,val)	(status_reg[adapter] = (val))
 
@@ -338,7 +338,7 @@ const softpc_device_parallel_controller_state *state_in;
 #define get_state(adap)		(state[adapter])
 #define set_state(adap,val)	(state[adapter] = (val))
 #endif /* NTVDM && MONITOR */
-#line 311
+#line 297
 
 
 static void printer_inb IPT2(io_addr, port, half_word *, value);

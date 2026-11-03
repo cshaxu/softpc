@@ -2489,7 +2489,7 @@ LOCAL void counter_init IFN1(COUNTER_UNIT *, p)
 #if defined(IRET_HOOKS) && defined(GISP_CPU)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* IRET_HOOKS && GISP_CPU */
-#line 2334
+#line 2945
 #endif
 #line 2946
 

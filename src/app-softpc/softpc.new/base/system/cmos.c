@@ -1105,7 +1105,7 @@ GLOBAL void  rtc_init IFN0()
 	set_alarm();
 }
 #endif	/* NTVDM */
-#line 1115
+#line 1229
 
 
 /*(
