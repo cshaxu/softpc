@@ -10,8 +10,12 @@ records the earlier breadth-first audit and its limits.
 Owner continues S30 with an independent full-file recursive comparison: enumerate
 all mirror files, verify their XP counterparts, compare every retained arm,
 and stop descending only at a whole-arm `#error`. The owner requires each batch
-of 10 changed mirror files to be a P delivery with build, publication, tests,
-commit and push; after all batches, repeat full build, publication, testing,
+of 10 changed mirror files to be a P delivery with build, publication,
+commit and push. The owner subsequently directed that, when the resulting
+EXEs have no substantive change, the batch skips tests; verify that claim
+against the previous published executables before using the exception.
+Substantive executable changes still require appropriate testing. After all
+batches, repeat the build, publication, comparison, applicable testing,
 commit and push before S30 acceptance. Unifiable structural changes
 should be corrected; necessary local differences must be recorded individually.
 The new comparison is in progress, not an accepted closure. The
@@ -922,3 +926,10 @@ P42 was committed and pushed as `f1f23d59`. P43 aligns nine EOF
 markers and one nested closing position in ten files; both architectures
 passed 186 background and eight native tests first run. S30 remains open
 for review of the other candidates.
+
+P43 was committed and pushed as `a251a777`. P44 records a review of
+remaining conditional-end scan leads without source changes. Both cached
+architectures built and published; both EXE SHA-256 values are unchanged
+from P43. Per the owner’s latest instruction no tests were rerun for this
+non-substantive batch. Remaining first-code and other unexplored cases keep
+S30 open.
