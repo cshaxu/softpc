@@ -180,7 +180,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 182
+#line 197
         case CGA:
 #ifdef CGAMONO 
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
@@ -255,7 +255,7 @@ void gvi_init IFN1(half_word, v_adapter)
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 263
+#line 278
     case CGA:
 #ifdef CGAMONO  
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
@@ -302,7 +302,7 @@ void gvi_term IFN0()
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 305
+#line 322
     case CGA:
 #ifdef CGAMONO  
 #error "Unsupported SoftPC mirror configuration: CGAMONO"
@@ -337,7 +337,7 @@ void gvi_term IFN0()
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
-#line 339
+#line 356
 }
 #endif  //NEC_98
 #line 340

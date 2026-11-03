@@ -101,7 +101,7 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 121
+#line 356
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -119,7 +119,7 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 148
+#line 383
 
 #ifdef BIT_ORDER2
 typedef union {

@@ -40,7 +40,7 @@ typedef union
 #else
 #error "Unsupported SoftPC mirror configuration: !LITTLEND"
 #endif
-#line 136
+#line 131
         word pad;
         } byte;
     struct

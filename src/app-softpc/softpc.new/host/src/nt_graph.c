@@ -1539,7 +1539,7 @@ static void select_paint_routines(void)
         nt_init_funcs = &mono_init_funcs;
     }
 #endif // !NEC_98
-#line 1329
+#line 1836
 }
 
 #ifdef MONITOR

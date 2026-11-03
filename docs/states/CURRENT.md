@@ -864,3 +864,10 @@ positions across seven mirror files, including seven physical-line corrections
 in `vgaports.h`. The earlier four-site heuristic queue is exhausted, but the
 separate comment-aware first-code queue and no-code marker coverage remain
 open. Conditions and executable statements are unchanged. P33 dual builds and both 186-test background and 8-test native suites passed on the first run. Delivery is pending; S30 remains open.
+
+P33 was committed and pushed as `cdecec2b`. P34 corrects 35 verified XP
+`#line` positions in ten mirror files, preserving branch structure and
+functional patches. Both 186-test background suites and x64 native passed
+first run. x86 native compact_console failed in three fixed-order runs,
+passed individually, and the full randomized-order group passed 8/8.
+The Console initialization instability remains unexplained; S30 remains open.

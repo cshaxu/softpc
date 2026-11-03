@@ -1,0 +1,6 @@
+path	local_line	reason
+base/ccpu386/c_main.c	28	Next declaration is project-local host integration; no same XP statement.
+base/ccpu386/c_main.c	752	Next setjmp uses project CCPU thread-context ABI; no same XP statement.
+base/ccpu386/c_main.c	3350	Next host debug retirement call is project-local integration.
+base/ccpu386/c_main.c	3835	Heuristic treated a continuation line inside a block comment as code.
+base/ccpu386/c_main.c	4039	Next host debug retirement call is project-local integration.

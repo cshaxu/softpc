@@ -793,7 +793,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #line 876
     if ((port & 0xfffe) != ICA_PORT_0)
 #endif   //NEC_98
-#line 777
+#line 878
     {
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
@@ -995,7 +995,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #line 1093
         if (!(port & 1))        /* Should be odd address, so check      */
 #endif   //NEC_98
-#line 982
+#line 1095
 	{
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
@@ -1027,7 +1027,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #line 1127
         if (!(port & 1))        /* Should be odd address, so check      */
 #endif   //NEC_98
-#line 1012
+#line 1129
 	{
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
@@ -1056,7 +1056,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #line 1158
         if (!(port & 1))        /* Should be odd address, so check      */
 #endif   //NEC_98
-#line 1039
+#line 1160
 	{
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"
@@ -1914,7 +1914,7 @@ void ica0_init IFN0()
 #endif
 
 #endif  /* !NTVDM */
-#line 1917
+#line 2133
 
 }
 

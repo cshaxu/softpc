@@ -365,7 +365,7 @@ void printer_post IFN1(int,adapter)
 	sas_storew(port_address[adapter],(word)port_start[adapter]);
 	sas_store(timeout_address[adapter], (half_word)0x14 );		/* timeout */
 #endif // !NEC_98
-#line 330
+#line 321
 }
 
 
@@ -506,7 +506,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 	note_trace3(PRINTER_VERBOSE, "<pinb() %x, ret %x, state %x>",
 		    port, *value, get_state(adapter));
 #endif // !NEC_98
-#line 422
+#line 477
 }
 
 #line 479
@@ -665,7 +665,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 529
+#line 708
 			}
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -674,7 +674,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 			else if (high_low(old_control, value, STROBE)
 				 	&& get_state(adapter) == STATE_OUT)
 #endif // !NEC_98
-#line 532
+#line 716
 			{
 #line 717
 #if defined(NEC_98)
@@ -820,7 +820,7 @@ static void notbusy_check IFN1(int,adapter)
 		}
 	}
 #endif // !NEC_98
-#line 619
+#line 873
 }
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"

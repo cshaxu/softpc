@@ -297,7 +297,7 @@ static	int	search_video_copy IFN4(int, start_line,
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 298
+#line 343
 
 		/*
 		 * Don't clear out the marked area in case the plane wraps
@@ -495,11 +495,11 @@ static	void	paint_records IFN3(int, start_rec, int, end_rec, int, alignment)
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 485
+#line 563
 		do *j++ = 0; while(j<end);
 	}
 #endif  //NEC_98
-#line 487
+#line 566
 }
 
 #ifdef BIGEND
@@ -2895,7 +2895,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 2746
+#line 2811
 
 		/* originally dummy was char [2] */
 		/* unfortunately doing (short) *dummy */
@@ -2930,7 +2930,7 @@ boolean cga_text_scroll_up IFN6(int, start, int, width, int, height,
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
-#line 2780
+#line 2845
 
 	/* do the host stuff */
 	start_offset = start - get_screen_start()*2 - gvi_pc_low_regen;

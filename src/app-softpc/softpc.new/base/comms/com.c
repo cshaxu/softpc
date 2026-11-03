@@ -724,7 +724,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 627
+#line 1105
 
 	switch(port & 0x7)
 	{
@@ -823,7 +823,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 740
+#line 1253
 		break;
 																		
 	case RS232_IER:
@@ -858,7 +858,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 797
+#line 1310
 		break;
 	
 	case RS232_LCR:
@@ -994,7 +994,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 986
+#line 1561
 	
 	switch(port & 0x7)
 	{
@@ -1118,7 +1118,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1120
+#line 1713
 		break;
 		
 #line 1715
@@ -1524,7 +1524,7 @@ static void set_xmit_char_status IFN1(struct ADAPTER_STATE *, asp)
 	asp->line_status_reg.bits.tx_shift_empty = 1;
 	raise_thre_interrupt(asp);
 #endif // NEC_98
-#line 1658
+#line 2518
 }
 
 #ifdef NTVDM
@@ -1686,7 +1686,7 @@ static void set_baud_rate IFN1(int, adapter)
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
-#line 1809
+#line 2825
 	}
 #else /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"

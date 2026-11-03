@@ -343,7 +343,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 349
+#line 419
 				if (value & 0x10)
 					ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 				break;
@@ -353,7 +353,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 361
+#line 431
 				break;
 
 			}

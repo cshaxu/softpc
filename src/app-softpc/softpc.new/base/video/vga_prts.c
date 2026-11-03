@@ -562,7 +562,7 @@ LOCAL VOID	do_chain_majority_decision IFN0()
 
 	current_votes = new_votes;
 #endif  //NEC_98
-#line 565
+#line 562
 }
 
 #line 564
@@ -575,7 +575,7 @@ LOCAL VOID	do_new_cursor IFN0()
 #line 572
 {
 #ifndef NEC_98
-#line 569
+#line 574
 
 	note_entrance0("do_new_cursor()");
 
@@ -2584,7 +2584,7 @@ GLOBAL VOID	vga_gc_inb IFN2(io_addr,port,half_word *, value)
 	    *value = IO_EMPTY_PORT_BYTE_VALUE;
 	}
 #endif  //NEC_98
-#line 2530
+#line 2715
 }
 
 GLOBAL int ega_get_pel_panning IFN1(int,line)
