@@ -467,3 +467,19 @@ The x86 and x64 EXE SHA-256 values are respectively
 `74a5b6afea8fb7edd3797eeee1820c7f490ab70ddcb586052e7a0d472035d570` and
 `c141e2b77ca92d37242772638f9413ee201a52cfde5753fe08f5277295701753`.
 This queue concerns line mapping, not complete conditional-structure review.
+
+P11 checks the four remaining adjacent-line candidates in `base/inc/sas.h`,
+recorded in the [mapping](m9-t99-s30-p11-line-mapping.tsv). Four actual
+translation units that include sas.h were preprocessed on each architecture;
+all outputs were byte-identical before and after. This exhausts the 338-row
+line-boundary candidate queue, not all possible line controls. A separate
+[descendant-source anchor lead list](m9-t99-s30-p11-descendant-anchor-leads.tsv)
+examines the 460 previously unresolved paired groups: 35 have distinct
+descendant anchors, 425 lack them. Anchors are search leads, not proof or
+classification. Conditional structures remain unresolved. P11 built and
+published both architectures, each passing all 186 background and 8 native
+tests. Build logs contained 4247 x64 and 4196 x86 warning lines with mirror
+paths, and no non-mirror warning line was observed. The x86 and x64 EXE
+SHA-256 values are respectively
+`e9b96f3eea0ac481cdf149f3c3f077ead96832a6427d99a74c654fcacf91b3c6` and
+`6d0e5c0d07d6c32882d9d46fd65b02c21c79ba3ab78dae057f2d255a1aa0cf9e`.

@@ -62,9 +62,13 @@ compiled mirror files have 25 XP diagnostic line corrections. Both architectures
 tests and 8 native tests each. P9 was committed and pushed as `b2c829f7`. P10 has ten changed mirror
 files (six C files and four headers) and ten XP line corrections. Its
 preprocessing, dual build and publication passed, as did 186 background and
-8 native tests per architecture. Review, commit and push must finish before
-modifying an eleventh mirror file. The updated candidate
-queue retains four pending line locations in sas.h after the P10 candidates. Structural correspondence
+8 native tests per architecture. P10 was committed and pushed as `9ae6587e`. P11 has one modified mirror
+file: sas.h, with four diagnostic line corrections. Eight actual
+preprocessed inclusion contexts were byte-identical, both architectures built,
+and each passed 186 background and 8 native tests. Further conditional-structure review continues; P11
+must be built, tested, published, reviewed, committed and pushed before an
+eleventh mirror file is changed. The updated candidate
+queue has four sas.h line locations addressed in P11, pending qualification. Structural correspondence
 is still under review; these line candidates are not a complete audit. The [line-boundary candidate ledger](../etc/evidence/softpc/m9-t99-s30-p7-line-candidates.tsv)
 keeps 128 pending candidates in 31 files distinct from the 210 scanner matches
 corrected in P7. Owned P7 build and test logs and exit markers are `build/t99-s30/p7-*`; use bounded status polls, investigate

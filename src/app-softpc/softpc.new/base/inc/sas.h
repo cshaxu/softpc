@@ -144,7 +144,7 @@ extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else /* BACK_M */
-#line 146
+#line 152
 #define inc_M_ptr(p,o)	(p+(o))
 #define get_byte_addr(addr) ((IU8 *)((IHPE)Start_of_M_area + (PHY_ADDR)(addr)))
 #define M_get_dw_ptr(address) ((IHPE)Start_of_M_area + (long)(address))
@@ -165,7 +165,7 @@ extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else /* BACK_M */
-#line 167
+#line 173
 #define get_addr(type,address) (M_low+ (long)(address))
 #define get_offset_into_M(p) (p - M_low)
 #endif /* BACK_M */
@@ -195,7 +195,7 @@ extern void sas_term IPT0();
 #ifdef	GISP_CPU
 #error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #else
-#line 196
+#line 202
 extern sys_addr sas_memory_size IPT0();
 #endif	/* GISP_CPU */
 extern void sas_connect_memory IPT3(sys_addr, low, sys_addr, high,
@@ -227,7 +227,7 @@ extern void sas_storew_no_check IPT2(sys_addr, addr24, word, val);
 #else
 #error "Unsupported SoftPC mirror configuration: SUN_VA"
 #endif	/* SUN_VA */
-#line 224
+#line 239
 extern void sas_storedw IPT2(sys_addr, addr, double_word, val);
 extern void sas_loads IPT3(sys_addr, src, host_addr, dest, sys_addr, len);
 extern void sas_stores IPT3(sys_addr, dest, host_addr, src, sys_addr, len);

@@ -1,0 +1,5 @@
+path	kind	current_directive_line	old_number	xp_number	current_following_line	xp_following_line	matching_content	review_status
+base/inc/sas.h	retained-arm	147	146	152	148	152	#defineinc_M_ptr(p,o)(p+(o))	pending_review
+base/inc/sas.h	retained-arm	168	167	173	169	173	#defineget_addr(type,address)(M_low+(long)(address))	pending_review
+base/inc/sas.h	retained-arm	198	196	202	199	202	externsys_addrsas_memory_sizeIPT0();	pending_review
+base/inc/sas.h	after-group	230	224	239	231	239	externvoidsas_storedwIPT2(sys_addr,addr,double_word,val);	pending_review
