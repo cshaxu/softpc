@@ -728,3 +728,13 @@ keeps 184 unresolved group rows after this resolved arm difference and
 with two shifted host_cpu.h locations updated. The selected outer arm retains
 registered x64 ABI differences, which are not cleared by that boundary review. Other alignments are not automatically
 accepted by this refresh. P25 x86 and x64 builds passed; both architectures passed all 186 background and 8 native tests on the first run. Published executable SHA-256: x86 2acd05b2d9eaefdbc84480c31d4cebadd8706db60fc2450a2fcf750610471edd; x64 e25a4f63a28a555c5035c3b484b4ab88222ee0a82c1e848c7b566650ca624275.
+
+## P26 candidate boundary evidence
+
+Using the post-P25 tree and previously supported parent boundaries, 119 of
+the 184 outstanding candidate-file groups have uniquely identifying local
+source context and matching arm signatures. The [boundary evidence](m9-t99-s30-p26-supported-boundaries.tsv) records those anchors; it is not a
+claim that selected contents or descendants match XP. Four retained-content
+differences include previously registered EGA ABI and V7 changes. The
+[remaining 65 groups](m9-t99-s30-p26-unresolved-candidate-file-groups.tsv)
+require separate examination. P26 dual builds and all 186 background and 8 native tests per architecture passed on the first run; this batch changes documentation only and does not change the executables.

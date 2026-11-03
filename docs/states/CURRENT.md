@@ -180,7 +180,7 @@ both architectures before and after. This resolves the previously recorded
 host_cpu.h arms-differ exception; a fresh full-tree scan now reports 39 structural candidates rather than 40.
 The [candidate-file remainder](../etc/evidence/softpc/m9-t99-s30-p25-unresolved-candidate-file-groups.tsv)
 has 184 rows after the restored CCPU arm, the manually reviewed enclosing
-CPU_30_STYLE boundary, and updated shifted physical locations; pairing remains audit evidence, not complete proof. P25 dual builds and the full test suite passed on both architectures (186 background and 8 native tests each); submission remains pending; do not change ten or more mirror files without a
+CPU_30_STYLE boundary, and updated shifted physical locations; pairing remains audit evidence, not complete proof. P25 dual builds and the full test suite passed on both architectures (186 background and 8 native tests each); P25 was submitted as `30fdf4bb`; do not change ten or more mirror files without a
 batch delivery. S30 remains open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
@@ -811,3 +811,9 @@ T98 S3 and S4 remain closed in [S3 history](../history/M9-T98-S3-shared-import.m
 - M9 Td S21 approved bounded frame ownership; see the
   [record](../history/M9-Td-S21-frame-ownership-transfer.md).
   T96 completed that implementation; no rule change accompanies T97 closure.
+
+P25 was committed and pushed as `30fdf4bb`. P26 records 119 additional
+candidate-file boundary pairings supported by unique surrounding source and
+a supported parent; 65 candidate groups remain open. These records establish
+boundary correspondence only, not equality of retained code or descendants.
+The documented local changes in EGA and V7 remain in force. P26 passed dual builds and 186 background plus 8 native tests per architecture on the first run. Delivery is pending; S30 remains open.
