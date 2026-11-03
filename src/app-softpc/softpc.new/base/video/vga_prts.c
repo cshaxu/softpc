@@ -1458,6 +1458,7 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 					if (crtc_9_b_protect == FALSE)
 					{
 #endif /* V7VGA */
+#line 1503
 						new.value = value;
 						if (crt_controller.cursor_end.as_bfld.cursor_end !=
 							((CURSOR_END*)&new)->as_bfld.cursor_end)

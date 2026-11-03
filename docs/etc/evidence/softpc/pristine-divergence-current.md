@@ -537,7 +537,7 @@ Git 2.49.0.windows.1，`core.autocrlf=false`、`core.safecrlf=false`、
 | base/ccpu386/cpu4gen.h | 14/13/14 | GDP 头；段寄存器 setter 和 flag getter 类型匹配真实 CCPU 定义。R |
 | base/ccpu386/evid_c.h | 10/6/2 | 生成 callback 字段使用原生字宽 IUH。R |
 | base/ccpu386/fpu.c | 12/6/5 | FPU_I64 参数指针；T60 S7 FIST64 符号/舍入及 memcpy 表示读取。R |
-| base/ccpu386/ntstubs.c | 4/11/2 | 正确 cvidc include、stdio、GDP extern；移除会遮蔽真实 copyROM/NPX 实现的空 stub。R；遗留空白 F |
+| base/ccpu386/ntstubs.c | 4/11/2 | 正确 cvidc include、stdio、GDP extern；移除与同时编译的 rom.c 和 fpu.c 中原版同名空函数重复的 copyROM/NPX 空 stub，避免重复定义。两处实现均为空，不能称作遮蔽非空实现。R；遗留空白 F |
 | base/ccpu386/ntthread.c | 41/3/3 | 多层模拟退出到最外层；类型化 null 返回及宽度格式。R |
 | base/ccpu386/popf.c | 3/0/2 | stdio 与 note_486_instruction 声明。R |
 | base/ccpu386/vglob.c | 2/1/1 | 选择真实 Evid_c 和 GDP 声明。R |

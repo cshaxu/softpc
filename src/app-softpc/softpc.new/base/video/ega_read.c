@@ -197,6 +197,7 @@ GLOBAL READ_POINTERS read_pointers;
 
 #ifdef C_VID
 /* C_Evid glue */
+#line 385
 READ_POINTERS Glue_reads = 
 {
 	read_byte_ev_glue,

@@ -883,6 +883,7 @@ DMA_ADAPT *dmaGetAdaptor(void)
   return &adaptor;
 }
 
+#line 872
 LOCAL void do_transfer  IFN6(int, type, int, decrement,
         sys_addr, dma_addr, char *, hw_buffer, unsigned long, length,
         unsigned long, size)

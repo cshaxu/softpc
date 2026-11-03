@@ -93,6 +93,7 @@ WRT_POINTERS *mode_chain_handler_table[] = { 0 };
 #ifdef C_VID
 
 /* C_Evid glue */
+#line 312
 MEM_HANDLERS Glue_writes =
 {
 	write_byte_ev_glue,

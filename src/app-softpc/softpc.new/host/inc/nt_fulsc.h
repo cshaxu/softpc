@@ -164,6 +164,7 @@ IMPORT VOID ConsoleInit(VOID);
 IMPORT VOID GfxReset(VOID);
 IMPORT VOID ResetConsoleState(VOID);
 IMPORT VOID InitTToG(VOID);
+#line 187
 IMPORT VOID CheckForFullscreenSwitch(VOID);
 IMPORT UTINY getNtScreenState(VOID);
 IMPORT BOOL hostModeChange(VOID);

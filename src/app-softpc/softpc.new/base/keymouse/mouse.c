@@ -324,10 +324,12 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 				break;
 
+#line 385
 			case 0x1: /* 30 Hz */
 			case 0x2: /* 50 Hz */
 			case 0x3: /* 100 Hz */
 			case 0x4: /* 200 Hz */
+#line 393
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
