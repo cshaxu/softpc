@@ -2,14 +2,46 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T99.
-The breadth-first mirror conditional layers through depth 9 are delivered;
-their depth-10 direct-child queues are empty. S29 independently reconciled
-the current structural inventory, prior layer evidence and local frame
-exceptions; see its [closure](../history/M9-T99-S29-mirror-completeness.md)
-and [review](../etc/evidence/softpc/m9-t99-s29-cross-depth-review.md).
-T99 remains open; no unsupported-configuration or unperformed customer
-runtime validation is claimed.
+T99 remains open. The owner admits S30 to reconcile remaining mirror
+conditional structure differences with the fixed XP source. S29 closed at
+`f5af155b`; its [review](../etc/evidence/softpc/m9-t99-s29-cross-depth-review.md)
+records the earlier breadth-first audit and its limits.
+
+## M9 T99 S30 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests correction of original conditional structure where feasible and registration of necessary differences. |
+| Objective | Compare all retained mirror files with their fixed XP counterparts, restore original conditional structures where behavior and approved local fixes permit, and record necessary remaining exceptions. |
+| Non-goals | Do not inspect inside branches already wholly replaced by #error, introduce new behavior, modify public components, media, snapshots or user configuration. |
+| Reference Baseline | S29 closure f5af155b, XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89, read-only OpenNT for line mapping. |
+| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Preserved SoftPC mirror and provenance/exception evidence; no public ABI change. |
+| Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
+| Verification | Audit actual conditional parent and arm alignment, retain local behavior, validate diagnostic lines and mirror manifest; dual architecture build, publish and full tests if production changes; actual-diff review, commit and push. |
+| Expected Markers | Restore original frames without inspecting inside excluded arms; explicitly register non-reconcilable local structural differences and their necessity. |
+| Asset Needs | Preserve user INI, media and snapshots; build and publish both EXEs for production changes. |
+| Reporting Requirements | Give complete per-file differences and dispositions, proof limits, production/test diff and verification. |
+| Stop Conditions | Do not mistake raw directive sequence mismatch for a defect; do not remove local behavior or create second paths. |
+| Exit Criteria | All retained text files and corresponding original conditional structures accounted for, necessary corrections and registrations verified, reviewed, committed and pushed. |
+| Original Owner Request | 和原版不一致的，尽量修正得结构一致，实在不能一致的，需要登记diff。 |
+| Similar-Issue Sweep | Scan all 471 retained text files and all corresponding XP originals; account for local-only conditions, changed predicates, omitted selected original guards and excluded arms. |
+
+Disposable scratch is `build/t99-s30`, owned by S30, with a four-hour total
+and 30-minute no-progress observation budget. Retain auditable findings and
+retire scratch before closure.
+
+Initial tree-based XP comparison examined all 471 text files, ignoring
+children under matched single-error arms. It identified 64 provisional
+structural entries in 21 files; sequence alignment can mismatch repeated
+conditions, so these entries require manual disposition. One actual missing
+original sibling in `base/system/rom.c` has been restored as its original
+#else with a single #error and preserved #line. After that correction the
+provisional comparison reports 63 entries in 20 files. Initial dual builds and gates passed. Both widths passed 186 non-native and
+eight native tests without skips. The first correction and [working review](../etc/evidence/softpc/m9-t99-s30-structural-review.md)
+are ready for delivery; the task is not complete and no final count of real
+differences is claimed.
 
 ## Technical Baseline
 

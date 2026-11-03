@@ -335,6 +335,8 @@ GLOBAL void rom_init IFN0()
 	read_rom (BIOS2ROM_FILENAME, BIOS2_START);
 
 #endif		/* GISP_SVGA */
+#else	/* !NTVDM | (NTVDM & !X86GFX) */
+#error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
 #endif /* !NTVDM | (NTVDM & !X86GFX) */
 #line 415
 

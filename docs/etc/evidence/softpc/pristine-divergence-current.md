@@ -12,6 +12,12 @@ T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与�
 双架构编译上下文中不选中，其体替换为 `#error`，保留原条件及
 OpenNT 行号边界；这是镜像条件治理，不改变选中路径。
 
+### T99 S30 ROM 原始条件结构
+
+`base/system/rom.c` 的 `rom_init` 恢复 XP 原条件的 `#else`；其内部
+NTVDM 与 X86GFX 条件在本项目非支持配置下以单个 `#error` 代替，
+保留既有 `#line 415`。支持配置的 ROM 初始化路径未变。
+
 ### T99 S25 第六层排除分支
 
 `base/video/ega_writ.c` 在双架构中未选中的 `EGA_DUMP || EGA_STAT`
