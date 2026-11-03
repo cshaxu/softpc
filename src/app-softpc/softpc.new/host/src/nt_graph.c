@@ -557,7 +557,7 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
                 MouseAttachMenuItem(sc.ActiveOutputBufferHandle);
 
 #ifndef MONITOR
-#line 489
+#line 710
                 //
                 // Turn the pointer back on when going from graphics
                 // to text mode since the selected buffer has changed
@@ -631,10 +631,10 @@ void nt_init_screen(void)
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #else
-#line 546
+#line 781
     if(!video_copy) video_copy = (byte *) host_malloc(0x20000);
 #endif
-#line 547
+#line 783
 
     /*::::::::::::::::::::::::::::::::: Allocate DAC and EGA planes buffers */
 
@@ -751,7 +751,7 @@ void nt_change_mode(void)
             break;
     }
 #endif // !NEC_98
-#line 636
+#line 914
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -857,14 +857,14 @@ void nt_graphics_tick(void)
 
 #ifdef EGG
 #ifndef NEC_98
-#line 724
+#line 1018
     if((video_adapter == EGA) || (video_adapter == VGA))
     {
         /* two timer ticks since mode_change_required became true ?
            (really need same stuff for CGA, but not done yet)
            Now just delay screen update, & only if display REALLY changed */
 #endif // !NEC_98
-#line 729
+#line 1024
 
         /*
         ** When VGA registers get hit during a mode change, postpone
@@ -941,7 +941,7 @@ void nt_graphics_tick(void)
 #line 1095
 #endif /* EGG */
 #ifndef NEC_98
-#line 779
+#line 1097
     {
         /*:::::::::: Update the screen as required for mda and cga and herc */
 
@@ -953,14 +953,14 @@ void nt_graphics_tick(void)
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif
-#line 787
+#line 1108
                     (void)(*update_alg.calc_update)();
 
             flush_count = 0;
         }
     }
 #endif // !NEC_98
-#line 792
+#line 1114
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -1168,7 +1168,7 @@ void nt_paint_cursor IFN3(int, cursor_x, int, cursor_y, half_word, attr)
         }
     }
 #endif // !NEC_98
-#line 988
+#line 1344
 }
 
 void nt_cursor_size_changed(int lo, int hi)
@@ -1368,7 +1368,7 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
-#line 1176
+#line 1639
                             paint_screen = nt_paint_funcs->vga_graph;
                     }
                     else
@@ -1413,7 +1413,7 @@ void nt_set_paint_routine(DISPLAY_MODE mode, int height)
             break;
 
 #endif // !NEC_98
-#line 1219
+#line 1683
         default:
             assert1(NO,"bad mode for host paint routine selection %d\n",(int)mode);
             paint_screen = dummy_paint_screen;
@@ -1678,10 +1678,10 @@ static void check_win_size(register int height)
             sc.PC_W_Width = SCALE(width);
             sc.PC_W_Height = SCALE(height*get_host_pix_height());
 #ifndef NEC_98
-#line 1461
+#line 1972
             graphicsResize();
 #endif // !NEC_98
-#line 1462
+#line 1974
 
             current_height = height;
             current_width = width;
@@ -1868,7 +1868,7 @@ static void set_screen_sizes(int adaptor)
     sc.CharWidth = CGA_CHAR_WIDTH;
     sc.CharHeight = CGA_CHAR_HEIGHT;
 #endif // !NEC_98
-#line 1617
+#line 2272
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/

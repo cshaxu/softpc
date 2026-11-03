@@ -177,7 +177,7 @@
  */
 
 #if !defined(NTVDM)
-#line 176
+#line 177
 /*
  *  Table of function pointers to access PIC routines
  */
@@ -187,7 +187,7 @@ void (*ica_hw_interrupt_func) IPT3(IU32, adapter, IU32, line_no,
 	IS32, call_count);
 void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
 #endif
-#line 184
+#line 186
 
 #if defined (CPU_40_STYLE) || defined (NTVDM)
 #define ICA_INTACK_REJECT       -1
@@ -218,7 +218,7 @@ ADAPTER_STATE adapter_state[2];
 #else		/* allow disabling of iret hooks whilst debugging */
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 209
+#line 287
 #define host_bop_style_iret_hooks()	(FALSE)
 #define host_iret_bop_table_addr(line)	(0)
 
@@ -318,7 +318,7 @@ SWPIC_init_funcptrs IFN0()
 	ica_clear_int_func		= SWPIC_clear_int;
 }
 #endif
-#line 303
+#line 384
 
 /*
  *	Please note that ica_eoi is called by SUN_VA code and thus needs to
@@ -1409,7 +1409,7 @@ ica_intack IFN1(IU32 *, hook_address)
 
 
 #ifndef NTVDM
-#line 1428
+#line 1581
 #ifdef CPU_40_STYLE
 
 /*(
@@ -1478,7 +1478,7 @@ GLOBAL void ica_async_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* !PROD */
-#line 1496
+#line 1649
 
 	for (iahp = async_handlers; iahp->line_no != ICA_IMPOSSIBLE_LINE; iahp++) {
 		if (iahp->adapter == adapter && iahp->line_no == line_no) {
@@ -1720,7 +1720,7 @@ ica_iret_hook_called IFN1(IU32, abs_line)
 #else
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 1747
+#line 1940
 
 
 	if ((i = ica_scan_irr(adapter)) & 0x80)
@@ -1894,7 +1894,7 @@ void ica0_init IFN0()
 
 
 #ifndef NTVDM
-#line 1899
+#line 2114
 
 #ifdef CPU_40_STYLE
     for (i = 0; i < 8; i++)

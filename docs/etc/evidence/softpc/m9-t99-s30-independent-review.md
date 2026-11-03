@@ -751,3 +751,15 @@ report: local 488 maps to XP 510 and local 532 maps to XP 554; local 462 is
 the registered T88 V7 display fix. The [13 reviewed CCPU root boundaries](m9-t99-s30-p27-manual-boundaries.tsv) have individually checked context;
 excluded bodies remain skipped. [52 candidate-file groups](m9-t99-s30-p27-unresolved-candidate-file-groups.tsv) still need examination.
 P27 x86 and x64 builds and all 186 background plus 8 native tests per architecture passed on the first run. EXE SHA-256: x86 `c394d58752dc1b83a256ca19cf125389fe5e5dc9fe93f2e562711fc2819fdbb0`; x64 `e411b66d3eb63395b49d84afcb4e3735b09d69a5e325b9a4d95598fab9bb8509`. Earlier line-anchor coverage claims did not include all candidate files: additional whole-tree scans identified 178 possible line mismatches in 47 files, including false and conflicting matches. These are candidates requiring contextual review, not confirmed defects or a complete accounting.
+
+## P28 diagnostic positions and candidate boundaries
+
+The [61 line mappings](m9-t99-s30-p28-line-mapping.tsv) across ten files
+were checked against the pinned XP next line and surrounding context.
+Four-line matching was used as a lead, not authority: ambiguous matches
+were rejected, including a wrong closing brace in `illegalp.c`. Existing
+conditions and executable statements are unchanged. The [28 manually reviewed boundaries](m9-t99-s30-p28-manual-boundaries.tsv) include the
+repeated V7 ordinal mismatch and registered local ABI difference; they
+prove boundary correspondence only. The [remaining 24 groups](m9-t99-s30-p28-unresolved-candidate-file-groups.tsv) remain open.
+Line candidate scans are non-exhaustive and their unreviewed rows remain
+outside this proof. The [118 remaining line candidate sites](m9-t99-s30-p28-unreviewed-line-candidates.tsv) span 40 files and include uncertain and conflicting matches; this list is not exhaustive. A four-line exact-context scan of mirrored text files produced 1,992 uniquely matching line numbers, 97 unique differing candidates, 1,307 without unique matches, and 81 with fewer than four following lines. These are scan categories, not a defect count. P28 dual builds and 186 background tests each passed. x64 native passed 8/8 first run; x86 native initially failed compact_console with stage 1 error 6 and child 0xc0000142, then passed all 8/8 on full group rerun. Cause remains unknown. Build warnings: x64 808, x86 808, all from mirror sources. EXE SHA-256: x86 `9bec21672157f27dbfa4fce760e7022cdea84b34a779e342a470fc1f7fca4134`; x64 `eeebbc9191637f645b45711bc052396ca1053691c55a911e4bd6cd65c3f23504`.

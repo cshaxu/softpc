@@ -513,7 +513,7 @@ IMPORT VOID dispatch_q_event();
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else	/* !SYNCH_TIMERS */
-#line 558
+#line 497
 
 #define SYNCH_TICK()	/* Nothing */
 
@@ -594,7 +594,7 @@ GLOBAL UTINY *CCPU_M;
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 669
+#line 607
 #define SETUP_HOST_IP(x)							\
    ip_phy_addr = usr_chk_byte(GET_CS_BASE() + GET_EIP(), PG_R) &		\
 		    SasWrapMask;						\
@@ -3182,7 +3182,7 @@ TYPEC4:
 #if defined(SFELLOW)
 #error "Unsupported SoftPC mirror configuration: SFELLOW"
 #endif /* SFELLOW */
-#line 3420
+#line 3340
 		  case 0xfe:
 			  c_cpu_unsimulate();
 			  /* Never returns (?) */
@@ -4475,7 +4475,7 @@ LOCAL VOID
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 4798
+#line 4644
       return *(*q)++;
 #endif /* BACK_M */
 #endif /* PIG */

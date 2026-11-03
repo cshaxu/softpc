@@ -280,7 +280,7 @@ static void setup_ivt()
         sas_storew(int_addr(0x77), D11_INT_OFFSET);
         sas_storew(int_addr(0x77) + 2, D11_INT_SEGMENT);
 #endif // !NEC_98
-#line 275
+#line 435
 }
 
 /* Low Switch Settings */
@@ -398,7 +398,7 @@ void reset()
         LONG gfxAdapt;
         int adapter;
 #ifndef NEC_98
-#line 522
+#line 685
 #ifdef PM
 	half_word status_byte;
 	half_word cmos_shutdown;
@@ -584,7 +584,7 @@ void reset()
 #ifdef DPMI
 #error "Unsupported SoftPC mirror configuration: DPMI"
 #endif /* DPMI */
-#line 707
+#line 870
 #endif /* PM */
 
         /*
@@ -596,13 +596,13 @@ void reset()
         cmos_write_byte(CMOS_DISKETTE,
                 (IU8)((half_word) gfi_drive_type(0) << 4 | gfi_drive_type(1)));
 #endif // !NEC_98
-#line 717
+#line 881
 
         /*
          * NTVDM: if soft reset We will never get here...
          */
 #ifndef NTVDM
-#line 721
+#line 886
         /*
          * If this isn't the first (re)set, then allow hosts to close down
          * timer and keyboard systems. Most ports will need to disable ALRM and
@@ -630,7 +630,7 @@ void reset()
 		/* These calls manage DOS mouse-driver instance storage, not INT 33
 		 * installation.  Standalone omits that software driver; physical
 		 * mouse hardware is initialised separately by mouse_init() below. */
-#line 752
+#line 912
 
                 q_event_init();
                 tic_event_init();
@@ -644,7 +644,7 @@ void reset()
 #line 759
         }
 #endif /* NTVDM */
-#line 760
+#line 929
 
         /*
          * Shutdown ODI network driver in case it was running

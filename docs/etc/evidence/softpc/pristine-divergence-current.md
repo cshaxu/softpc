@@ -1471,3 +1471,8 @@ owns hardware evidence, actual-port research and implementation qualification.
 对照固定 XP 原文，将 `vga_mode.c` 28 处、`reset.c` 9 处、
 `ica.c` 10 处失准的 `#line` 修回原文位置；不改变条件、设备逻辑
 或既有本地功能差异。实际映射见 P27 行号审计清单；双架构构建及每架构 186 项后台、8 项原生测试首轮通过。
+
+### T99 S30 P28 XP 诊断行号
+
+十个镜像文件中 61 处诊断行号按固定 XP 原文修正；不改变条件或
+设备语义。具体行号与文件见 P28 对应清单。双架构构建及后台全量通过，x64 原生首轮通过，x86 原生一项首轮失败、整组重跑通过；具体见独立审查记录。

@@ -1569,7 +1569,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 					else
 						md_offset = MD_TBL3_OFFSET;
 #endif  /* NTVDM */
-#line 1478
+#line 3276
 						
 				}
 			}
@@ -1606,7 +1606,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 			else
 				md_offset = MD_TBL3_OFFSET;
 #endif /* NTVDM */
-#line 1503
+#line 3319
 		}
 
 		/*

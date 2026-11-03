@@ -375,7 +375,7 @@ void printer_post IFN1(int,adapter)
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #else	/* NTVDM && MONITOR */
-#line 333
+#line 351
 static void lpr_state_outa_event IFN1(long,adapter)
 {
 	set_high(status_reg[adapter],ACK);
@@ -627,7 +627,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 504
+#line 670
 				       /*
 				 	* Send the stored internal buffer to
 				 	* the printer
@@ -869,11 +869,11 @@ void printer_init IFN1(int,adapter)
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif /* NTVDM && MONITOR */
-#line 660
+#line 946
 	    state[adapter] = STATE_READY;
 
 #endif // !NEC_98
-#line 662
+#line 949
 } /* end of printer_init() */
 
 #if defined(NTVDM) && defined(MONITOR)

@@ -137,11 +137,11 @@ BYTE Scan1ToKeynum[] =
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #else // !JAPAN
-#line 129
+#line 411
     UNDEFINED,		//  0x5a	
     UNDEFINED,		//  0x5b	
 #endif // !JAPAN
-#line 131
+#line 414
     UNDEFINED,		//  0x5c	
     UNDEFINED,		//  0x5d
     UNDEFINED,		//  0x5e
@@ -165,7 +165,7 @@ BYTE Scan1ToKeynum[] =
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #else
-#line 151
+#line 451
     UNDEFINED,		//  0x70	
     UNDEFINED,		//  0x71	
     UNDEFINED,		//  0x72	
@@ -182,7 +182,7 @@ BYTE Scan1ToKeynum[] =
     14,			//  0x7d	Extended kbd (IBM 122 key)
     107,		//  0x7e	Brazilian ABNT numpad .
 #endif
-#line 166
+#line 467
     UNDEFINED,		//  0x7f
     UNDEFINED,		//  0x80
     UNDEFINED,		//  0x81

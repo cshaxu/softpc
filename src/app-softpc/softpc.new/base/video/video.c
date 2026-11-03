@@ -52,7 +52,7 @@
 #endif
 #line 52
 #endif // !NEC_98
-#line 52
+#line 57
 
 
 /*
@@ -326,7 +326,7 @@ LOCAL void sensible_graph_scroll_down IPT6(int, t_row, int, l_col, int, rowsdiff
 LOCAL void kinky_scroll_up IPT7(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr, int, vd_cols_on_screen);
 LOCAL void kinky_scroll_down IPT7(int, t_row, int, l_col, int, rowsdiff, int, colsdiff, int, lines, int, attr, int, vd_cols_on_screen);
 #endif // !NEC_98
-#line 424
+#line 425
 
 /*
  * ============================================================================
@@ -871,7 +871,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 771
+#line 1207
 
 
 	/* Set origin of data movement for calculating screen refresh */
@@ -975,7 +975,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 821
+#line 1377
     }
 }
 
@@ -1123,7 +1123,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 961
+#line 1524
 		sas_move_bytes_forward (source,dest, colsdiff*2);
 #endif
 	        /* next line */
@@ -1164,7 +1164,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 999
+#line 1562
 	    sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
 #endif
 	    dest += col_incr;
@@ -1357,7 +1357,7 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // !i386 && JAPAN
-#line 1134
+#line 1772
 /*
  * NB if we are just doing a clear area, the scrolling 'for' loop will terminate immediately
  */
@@ -1413,7 +1413,7 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1162
+#line 1887
 	}
 }
 
@@ -1537,7 +1537,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1284
+#line 2009
 		sas_move_bytes_forward (source, dest, colsdiff*2);
 #endif
 	        source -= col_incr;
@@ -1558,7 +1558,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1303
+#line 2028
 		sas_move_bytes_forward (source+ODD_OFF, dest+ODD_OFF, colsdiff);
 #endif
 	        source -= col_incr;
@@ -1573,7 +1573,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1317
+#line 2042
 	    sas_fillsw(dest, (IU16)((attr << 8)|' '), colsdiff);
 #endif
 	    dest -= col_incr;
@@ -1585,7 +1585,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1329
+#line 2054
 	    sas_fills(dest, (IU8)attr, colsdiff);
 	    sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif

@@ -1,0 +1,29 @@
+path	depth	parent	current_line	xp_line	condition	current_siblings	xp_siblings	current_end	xp_end	current_before	xp_before	current_after	xp_after	arm	current_arm_anchor	xp_arm_anchor	anchor_text	disposition
+base/bios/reset.c	1	root	110	108	ifdef:DPMI	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/bios/reset.c	1	root	115	112	ifdef:GISP_SVGA	2	2	117	115	102	101	143	139	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/bios/reset.c	1	root	659	939	ifndef:HostProcessClipData	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/bios/reset.c	1	root	948	1238	ifdef:SOFTWIN_API	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/bios/reset.c	1	root	953	1243	ifdef:HUNTER	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/bios/reset.c	1	root	958	1248	ifdef:LIM	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	616	692	ifndef:CPU_40_STYLE	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	623	698	ifdef:A2CPU	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	628	702	ifdef:NTVDM	4	4	630	705	603	676	655	732	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	1000	1096	ifndef:PROD	38	38	1002	1100	-	-	1007	1104	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	1032	1130	ifndef:PROD	38	38	1034	1134	1013	1113	1039	1138	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	1061	1161	ifndef:PROD	38	38	1063	1165	-	-	1068	1169	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/system/ica.c	1	root	2100	2210	if:!defined(PROD)	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	1	root	1	1	ifndef:_INSIGNIA_H	1	1	-	-	-	-	-	-	-	-	-	-	same outer guard; retained local ABI differences remain registered
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	25	25	ifndef:NT_INCLUDED	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	37	37	if:!defined(_WINDOWS_)&&!defined(NT_INCLUDED)	4	4	39	39	-	-	42	41	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	44	43	if:!defined(_WINDOWS_)&&!defined(NT_INCLUDED)	4	4	46	46	42	41	49	48	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	51	50	if:!defined(_WINDOWS_)&&!defined(NT_INCLUDED)	4	4	53	59	49	48	57	62	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	91	87	ifndef:FALSE	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	96	92	ifndef:STRINGIFY	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	101	96	if:!defined(_WINDOWS_)&&!defined(NT_INCLUDED)	4	4	103	99	83	80	179	205	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	106	101	ifndef:NULL	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	111	105	ifndef:BOOL	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	2	root/1:ifndef:_INSIGNIA_H	153	148	ifdef:ANSI	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/video/vga_mode.c	3	root/95:ifndef:REAL_VGA/96:ifdef:VGG	124	123	ifdef:GISP_SVGA	2	2	126	126	-	-	158	161	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+host/inc/insignia.h	3	root/1:ifndef:_INSIGNIA_H/111:ifndef:BOOL	112	106	ifdef:NT_INCLUDED	1	1	-	-	-	-	-	-	-	-	-	-	manual boundary pair; excluded arm not descended; descendants require own review
+base/video/vga_mode.c	4	root/95:ifndef:REAL_VGA/96:ifdef:VGG/447:ifndef:NEC_98	462	510	ifdef:V7VGA	3	2	464	512	451	479	-	-	-	-	-	-	local-only T88 V7 conditional; registered existing exception
+base/video/vga_mode.c	4	root/95:ifndef:REAL_VGA/96:ifdef:VGG/447:ifndef:NEC_98	488	554	ifdef:V7VGA	3	2	490	559	-	-	-	-	-	-	-	-	correct pair local 488 to XP 510; next XP 554 pair is local 532

@@ -825,3 +825,9 @@ against XP; 52 candidate-file groups remain open. The V7 matcher paired
 two repeated conditions by ordinal and was wrong: local line 488 corresponds
 to XP line 510, local line 532 to XP line 554, while local line 462 is the
 previously registered T88 display correction. P27 dual builds and all 186 background and 8 native tests per architecture passed on the first run; delivery remains pending. S30 remains open.
+
+P27 was committed and pushed as `bd890b4a`. P28 corrects 61 verified XP
+`#line` positions in ten mirror files, preserving all branches and behavior.
+Twenty-eight additional candidate-file boundaries were manually reviewed;
+24 candidate groups remain open. V7 ordinal mispairing and registered ABI
+exceptions remain described in the evidence. P28 dual builds and background suites passed; the x86 native group passed in full after one failed first run. Delivery is pending; the whole-tree line candidate scan is not a completeness proof.

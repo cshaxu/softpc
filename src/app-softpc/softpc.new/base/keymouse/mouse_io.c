@@ -1905,7 +1905,7 @@ int curr_video_mode;
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 1936
+#line 1776
 
 }
 #endif
@@ -1984,7 +1984,7 @@ void mouse_video_io()
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 1995
+#line 1875
                 /*
                  *      Deal with the mode change
                  */
@@ -2393,7 +2393,7 @@ the application OUTBs the necessary data.
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
-#line 2370
+#line 2283
                                 video_io();
 #else /* GISP_SVGA */
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
