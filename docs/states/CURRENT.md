@@ -18,7 +18,7 @@ Substantive executable changes still require appropriate testing. After all
 batches, repeat the build, publication, comparison, applicable testing,
 commit and push before S30 acceptance. Unifiable structural changes
 should be corrected; necessary local differences must be recorded individually.
-The new comparison is in progress, not an accepted closure. The
+The executor review and final build are complete; S30 remains open pending owner acceptance. The
 [independent review](../etc/evidence/softpc/m9-t99-s30-independent-review.md)
 explains the evidence and unresolved boundaries. Its first-pass
 [file inventory](../etc/evidence/softpc/m9-t99-s30-independent-file-ledger.tsv),
@@ -208,7 +208,7 @@ not complete the repeated-boundary review.
 | Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
 | Files And ABI Surface | Preserved SoftPC mirror and provenance/exception evidence; no public ABI change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
-| Verification | Audit actual conditional parent and arm alignment, retain local behavior, validate diagnostic lines and mirror manifest; dual architecture build, publish and full tests if production changes; actual-diff review, commit and push. |
+| Verification | Audit original conditional parents and arms, preserve necessary local differences and line controls; build and publish both architectures and compare executable runtime content. Per owner direction skip tests when the EXEs have no substantive change; otherwise run proportionate tests. Review actual diffs, commit and push. |
 | Expected Markers | Restore original frames without inspecting inside excluded arms; explicitly register non-reconcilable local structural differences and their necessity. |
 | Asset Needs | Preserve user INI, media and snapshots; build and publish both EXEs for production changes. |
 | Reporting Requirements | Give complete per-file differences and dispositions, proof limits, production/test diff and verification. |
@@ -963,3 +963,10 @@ differences. Dual builds and publication passed; PE loaded sections and
 entry metadata match P47, but whole-file hashes differ. Per owner direction
 no tests ran. A fresh no-code scan found no mismatched paired first
 directives; S30 remains open for final cross-check and acceptance delivery.
+
+P48 was committed and pushed as `03207f60`. The S30 final cached dual
+architecture builds and publication succeeded with byte-identical P48 EXEs;
+under the owner’s latest direction no tests or CTest gates were rerun. The
+[final review](../etc/evidence/softpc/m9-t99-s30-final-review.md) indexes
+all structural dispositions and states evidence limits. Await owner
+acceptance; do not close S30 or T99 yet.

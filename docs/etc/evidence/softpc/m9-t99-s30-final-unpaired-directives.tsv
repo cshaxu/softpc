@@ -1,0 +1,159 @@
+path	marker_line	marker	local_directive	effective_xp_line	disposition	directive
+base/bios/bootstra.c	55	57	62	63	text-matches-effective-XP-line	#include <stdio.h>
+base/bios/reset.c	24	29	30	34	text-matches-effective-XP-line	#include <stdlib.h>
+base/bios/reset.c	74	78	75	78	text-matches-effective-XP-line	"#include ""emm.h"""
+base/bios/reset.c	82	85	83	85	text-matches-effective-XP-line	"#include ""hunter.h"""
+base/bios/tape_io.c	4	7	5	7	text-matches-effective-XP-line	"#include ""insignia.h"""
+base/bios/tape_io.c	26	33	31	37	text-matches-effective-XP-line	#include <stdio.h>
+base/bios/tape_io.c	36	42	40	45	text-matches-effective-XP-line	"#include ""xt.h"""
+base/ccpu386/c_main.c	220	204	223	206	text-matches-effective-XP-line	#define CPU_HW_INT_MASK         (1 << 0)
+base/ccpu386/c_main.c	228	212	231	214	text-matches-effective-XP-line	#define CPU_HW_INT_MASK         (1 << 0)
+base/ccpu386/c_mem.h	32	32	33	32	text-matches-effective-XP-line	#define DIFF_INST_BYTE(n, o) ((n) - (o))
+base/ccpu386/c_mem.h	57	66	59	67	text-matches-effective-XP-line	"#define phy_read_byte(x)	((IU8)(phy_r8((PHY_ADDR)x)))"
+base/ccpu386/c_tlb.c	190	124	202	135	text-matches-effective-XP-line	#define OFFSET_MASK 0xfff
+base/ccpu386/ccpusas4.h	32	32	33	32	text-matches-effective-XP-line	#define IncCpuPtrLS8(ptr) (ptr)++
+base/comms/com.c	24	27	29	31	text-matches-effective-XP-line	#include <stdio.h>
+base/comms/com.c	34	36	35	36	text-matches-effective-XP-line	#include TypesH
+base/comms/com.c	142	178	143	178	text-matches-effective-XP-line	#define MODEM_STATE_CHANGE()
+base/comms/printer.c	78	81	84	86	text-matches-effective-XP-line	#include <stdio.h>
+base/comms/printer.c	90	94	95	98	text-matches-effective-XP-line	"#include ""xt.h"""
+base/comms/printer.c	130	130	131	130	text-matches-effective-XP-line	"#define PRINTER_BIT_MASK	0x3"
+base/comms/printer.c	135	134	137	135	text-matches-effective-XP-line	"#define DATA_OFFSET	0"
+base/comms/printer.c	190	209	191	209	text-matches-effective-XP-line	#define STATE_READY     0
+base/comms/printer.c	331	288	332	288	text-matches-effective-XP-line	"#define get_status(adap)	(status_reg[adapter])"
+base/comms/printer_.c	4	3	6	4	text-matches-effective-XP-line	"#include ""insignia.h"""
+base/comms/printer_.c	50	50	55	54	text-matches-effective-XP-line	"#include ""xt.h"""
+base/cvidc/j_c_lang.h	52	49	53	49	text-matches-effective-XP-line	#define __J_C_LANG
+base/disks/diskbios.c	4	7	5	7	text-matches-effective-XP-line	"#include ""insignia.h"""
+base/disks/diskbios.c	31	36	34	38	text-matches-effective-XP-line	#include <stdio.h>
+base/disks/diskbios.c	53	57	56	59	text-matches-effective-XP-line	#define DISK_STATUS1 0x474
+base/disks/floppy.c	112	119	114	120	text-matches-effective-XP-line	#include <stdio.h>
+base/disks/floppy.c	118	124	119	124	text-matches-effective-XP-line	#include TypesH
+base/disks/floppy_i.c	42	49	44	50	text-matches-effective-XP-line	#include <stdio.h>
+base/inc/base_def.h	26	26	27	26	text-matches-effective-XP-line	#define UNUSED(x)
+base/inc/base_def.h	41	41	42	41	text-matches-effective-XP-line	"#define STRINGIFY(x)    ""x"""
+base/inc/base_def.h	55	53	57	54	text-matches-effective-XP-line	"#define	PRIVATETYPE"
+base/inc/config.h	86	88	87	88	text-matches-effective-XP-line	"#define C_DEVICE_DEFAULT	1"
+base/inc/debug.h	35	300	37	301	text-matches-effective-XP-line	"#define	init_debugging()"
+base/inc/dma.h	183	236	186	238	text-matches-effective-XP-line	"#define DMA_DEMAND_MODE		0"
+base/inc/dma.h	259	317	260	317	text-matches-effective-XP-line	"#define	DMA_ADAPTOR_CONTROLLERS	2"
+base/inc/dma.h	301	360	302	360	text-matches-effective-XP-line	"#define	DMA_SDLC_CHANNEL	1"
+base/inc/dma.h	318	376	321	378	text-matches-effective-XP-line	"#define	DMA_REDUNDANT_BITS	0x10"
+base/inc/dsktrace.h	90	101	91	101	text-matches-effective-XP-line	#define dt0(infoid,hndl,fmt) ;
+base/inc/egagraph.h	92	97	93	97	text-matches-effective-XP-line	"#define	get_prim_font_index()		(EGA_GRAPH.prim_font_index)"
+base/inc/egagraph.h	107	110	108	110	text-matches-effective-XP-line	"#define get_palette_change_required()	(EGA_GRAPH.palette_change_required)"
+base/inc/egagraph.h	110	112	111	112	text-matches-effective-XP-line	"#define get_palette_val(idx)		(EGA_GRAPH.palette_ind[(idx)])"
+base/inc/egagraph.h	122	122	123	122	text-matches-effective-XP-line	"#define set_palette_change_required(v)	EGA_GRAPH.palette_change_required = (v)"
+base/inc/emm.h	27	41	28	41	text-matches-effective-XP-line	"#define MAX_NO_PAGES		32"
+base/inc/emm.h	38	51	39	51	text-matches-effective-XP-line	"#define	MAX_FUNC_NO		0x5d"
+base/inc/emm.h	68	80	69	80	text-matches-effective-XP-line	"#define	EMM_HW_ERROR		0x81"
+base/inc/emm.h	92	105	94	106	text-matches-effective-XP-line	"#define NO_ALT_REGS		0x9c"
+base/inc/floppy.h	195	197	201	202	text-matches-effective-XP-line	"#define HF_STATUS		(BIOS_VAR_START + 0x8C)"
+base/inc/floppy.h	434	435	435	435	text-matches-effective-XP-line	"#define MAX_FLOPPY	0x02"
+base/inc/floppy.h	437	437	443	442	text-matches-effective-XP-line	"#define	IGNORE_SECTORS_TRANSFERRED	-1"
+base/inc/gvi.h	287	487	288	487	text-matches-effective-XP-line	#define get_screen_height_lo()          (PCDisplay.screen_height.as_bfld.low_byte)
+base/inc/gvi.h	306	505	311	509	text-matches-effective-XP-line	"#define get_host_char_height()		(get_char_height()*get_host_pix_height()*get_pc_pix_height())"
+base/inc/host_com.h	231	235	233	236	text-matches-effective-XP-line	"#define	HOST_COM_FRAMING_ERROR	(1 << 0)"
+base/inc/host_com.h	241	244	243	245	text-matches-effective-XP-line	"#define	HOST_COM_MODEM_CTS	(1 << 0)"
+base/inc/host_lpt.h	153	165	154	165	text-matches-effective-XP-line	"#define	HOST_LPT_BUSY	(1 << 0)"
+base/inc/ica.h	51	51	52	51	text-matches-effective-XP-line	"#define CPU_RS232_SEC_INT   	3"
+base/inc/ica.h	61	61	64	63	text-matches-effective-XP-line	"#define CPU_PRINTER2_INT	5"
+base/inc/ica.h	84	81	86	82	text-matches-effective-XP-line	"#define CPU_AT_NPX_INT		5"
+base/inc/ica.h	92	87	95	89	text-matches-effective-XP-line	"#define CPU_HW_INT		0"
+base/inc/idetect.h	30	46	31	46	text-matches-effective-XP-line	#define IDLE_video()    idle_no_video = 0
+base/inc/ios.h	38	301	43	305	text-matches-effective-XP-line	#define MDA_PORT_START          0x3B0
+base/inc/ios.h	50	313	56	318	text-matches-effective-XP-line	#define CGA_PORT_START          0x3D0
+base/inc/ios.h	316	581	322	586	text-matches-effective-XP-line	#define PCI_CONFIG_ADDRESS       0xcf8
+base/inc/j_c_lang.h	45	49	46	49	text-matches-effective-XP-line	#define __J_C_LANG
+base/inc/mouse.h	25	38	26	38	text-matches-effective-XP-line	"#define MOUSE_PORT_0		0x023c"
+base/inc/mouse_io.h	761	791	763	792	text-matches-effective-XP-line	#define host_mouse_restore_cursor()
+base/inc/mouse_io.h	1112	1144	1114	1145	text-matches-effective-XP-line	#define cursor_EM_disabled         ((*mm_handle)->MM_IN_cursor_EM_disabled)
+base/inc/printer.h	47	56	55	63	text-matches-effective-XP-line	"#define LPT1_PORT_ADDRESS	(BIOS_VAR_START + 8)"
+base/inc/rs232.h	180	515	183	517	text-matches-effective-XP-line	"#define RS232_TX_RX	0"
+base/inc/rs232.h	190	523	191	523	text-matches-effective-XP-line	"#define RS232_LCR	3"
+base/inc/rs232.h	197	529	199	530	text-matches-effective-XP-line	#define RS232_COM1_TIMEOUT (BIOS_VAR_START + 0x7c)
+base/inc/rs232.h	227	565	228	565	text-matches-effective-XP-line	#define RLS_INT 3
+base/inc/rs232.h	246	584	247	584	text-matches-effective-XP-line	#define PARITY_ON 1
+base/inc/rs232.h	256	593	257	593	text-matches-effective-XP-line	#define PARITY_ODD 0
+base/inc/rs232.h	260	596	262	597	text-matches-effective-XP-line	#define PARITY_STICK 1
+base/inc/rs232.h	270	606	271	606	text-matches-effective-XP-line	#define COM1 0
+base/inc/rs232.h	351	699	352	699	text-matches-effective-XP-line	"#define	TCGET TCGETA"
+base/inc/sas.h	147	152	148	152	text-matches-effective-XP-line	"#define inc_M_ptr(p,o)	(p+(o))"
+base/inc/sas.h	328	342	329	342	text-matches-effective-XP-line	"#define BIOS_START_OFFSET	0x0000L"
+base/inc/sas.h	335	348	336	348	text-matches-effective-XP-line	"#define	BAD_OP			0xC5"
+base/inc/sas.h	341	353	342	353	text-matches-effective-XP-line	"#define	BASIC_ROM		0xFE000L"
+base/inc/sas.h	345	356	347	357	text-matches-effective-XP-line	"#define FIXED_DISK_START	0xC8000L"
+base/inc/sas.h	356	367	366	376	text-matches-effective-XP-line	"#define COPYRIGHT_OFFSET	0xE008"
+base/inc/sas.h	377	388	378	388	text-matches-effective-XP-line	"#define VIDEO_IO_RE_ENTRY	0xF06C"
+base/inc/sas.h	397	408	399	409	text-matches-effective-XP-line	#define KEYBOARD_BREAK_INT_OFFSET   0xFF35
+base/inc/sas.h	739	999	746	1005	text-matches-effective-XP-line	#define BIOS_STI_OFFSET   0x3000
+base/inc/trace.h	74	74	75	74	text-matches-effective-XP-line	"#define IPC_VERBOSE		0x10000000L"
+base/inc/video.h	4	4	9	8	text-matches-effective-XP-line	"#define R10_CURS_START	        10"
+base/inc/video.h	43	42	50	48	text-matches-effective-XP-line	"#define VD_BS		0x8"
+base/inc/video.h	69	135	70	135	text-matches-effective-XP-line	"#define	vd_video_mode	0x449"
+base/inc/video.h	205	270	206	270	text-matches-effective-XP-line	"#define	alpha_num_mode()	(sas_hw_at_no_check(vd_video_mode) < 4 || sas_hw_at_no_check(vd_video_mode) == 7)"
+base/inc/xt.h	34	35	36	36	text-matches-effective-XP-line	#undef SUCCESS
+base/inc/xt.h	53	52	54	52	text-matches-effective-XP-line	"#define SPC_PRODUCT_NAME ""SoftPC"""
+base/keymouse/keyba.c	55	58	61	63	text-matches-effective-XP-line	#include <stdio.h>
+base/keymouse/keyba.c	85	86	87	87	text-matches-effective-XP-line	"#include ""debug.h"""
+base/keymouse/keyba.c	107	173	113	178	text-matches-effective-XP-line	#define NUM_LOCK_ADD_ARRAY 127
+base/keymouse/keyba.c	146	211	147	211	text-matches-effective-XP-line	#define DEFAULT_SCAN_CODE_SET 2
+base/keymouse/keyba.c	218	280	219	280	text-matches-effective-XP-line	"#define	BUFF_6805_VMAX	48"
+base/keymouse/keyba.c	1525	2087	1526	2087	text-matches-effective-XP-line	#define  AddTo6805BuffImm(code) add_to_6805_buff(code, IMMEDIATE_OUTPUT);
+base/keymouse/keybd_io.c	58	61	64	66	text-matches-effective-XP-line	#include <stdio.h>
+base/keymouse/keybd_io.c	178	242	179	242	text-matches-effective-XP-line	#define FREEKBDHDW()
+base/keymouse/keybd_io.c	626	780	627	780	text-matches-effective-XP-line	"#define PUT_IN_BUFFER(s, v)		PutInBufferFunc(s,v); return"
+base/keymouse/mouse_io.c	62	67	69	73	text-matches-effective-XP-line	#include <stdio.h>
+base/keymouse/mouse_io.c	106	181	108	182	text-matches-effective-XP-line	"#include ""host_gfx.h"""
+base/keymouse/mouse_io.c	686	763	688	764	text-matches-effective-XP-line	#define video_page_size() (sas_w_at(VID_LEN))
+base/keymouse/ppi.c	26	29	32	34	text-matches-effective-XP-line	#include <stdio.h>
+base/support/ios.c	21	26	23	27	text-matches-effective-XP-line	#include <stdio.h>
+base/support/time_day.c	4	7	5	7	text-matches-effective-XP-line	"#include ""windows.h"""
+base/support/time_day.c	54	59	60	64	text-matches-effective-XP-line	#include <stdlib.h>
+base/system/at_dma.c	26	31	31	35	text-matches-effective-XP-line	#include <stdio.h>
+base/system/ica.c	152	153	157	157	text-matches-effective-XP-line	"#include ""xt.h"""
+base/system/ica.c	1830	2051	1832	2052	text-matches-effective-XP-line	"#define INIT0_ICW1	(IU8)0x11"
+base/system/ica.c	1837	2060	1838	2060	text-matches-effective-XP-line	"#define INIT0_ICW3	(IU8)0x04"
+base/system/ica.c	1846	2068	1853	2074	text-matches-effective-XP-line	#define INIT0_OCW1      (IU8)0xb8
+base/system/ica.c	1926	2145	1927	2145	text-matches-effective-XP-line	"#define INIT1_ICW2	(IU8)0x70"
+base/system/ica.c	1936	2158	1937	2158	text-matches-effective-XP-line	"#define INIT1_OCW1	(IU8)0x9d"
+base/system/idetect.c	168	173	171	175	text-matches-effective-XP-line	"#include ""idetect.h"""
+base/system/illegalp.c	19	24	25	29	text-matches-effective-XP-line	#include <stdio.h>
+base/system/quick_ev.c	68	71	73	75	text-matches-effective-XP-line	#include <stdlib.h>
+base/system/quick_ev.c	92	94	94	95	text-matches-effective-XP-line	"#include ""host_hfx.h"""
+base/system/rom.c	59	67	60	67	text-matches-effective-XP-line	"#define	BIOS2ROM_FILENAME	""bios4.rom"""
+base/system/rom.c	112	119	115	121	text-matches-effective-XP-line	"#define MAJOR_VER	0x03"
+base/system/timer.c	43	46	50	52	text-matches-effective-XP-line	#include <stdio.h>
+base/system/timer.c	183	189	184	189	text-matches-effective-XP-line	#define TIMER_CLOCK_DENOM       1193
+base/system/timestrb.c	34	39	44	48	text-matches-effective-XP-line	"#include ""xt.h"""
+base/video/cga.c	57	61	62	65	text-matches-effective-XP-line	#include <stdio.h>
+base/video/ega_vide.c	4	4	5	4	text-matches-effective-XP-line	"#include ""insignia.h"""
+base/video/ega_vide.c	121	120	122	120	text-matches-effective-XP-line	"#include ""host.h"""
+base/video/ega_writ.c	5	5	45	44	text-matches-effective-XP-line	#include <stdio.h>
+base/video/gfx_updt.c	131	134	133	135	text-matches-effective-XP-line	"#define	get_dirty_rec_total()		(dirty_next)"
+base/video/gfx_updt.c	156	194	158	195	text-matches-effective-XP-line	"#define	get_dirty_line(ind)	(dirty[(ind)].line_no)"
+base/video/gfx_updt.c	165	206	166	206	text-matches-effective-XP-line	"#define clear_dirty()		{setVideodirty_total(0);setVideodirty_low(0x80001);setVideodirty_high(-1);}"
+base/video/gfx_updt.c	173	212	174	212	text-matches-effective-XP-line	"#define	SET_VGLOBS_MARK_STRING(func)	setVideomark_string(func);"
+base/video/gfx_updt.c	226	266	228	267	text-matches-effective-XP-line	"#define	HostUpdatedVGA()	FALSE"
+base/video/gfx_updt.c	508	571	509	571	text-matches-effective-XP-line	#define get_char_attr(unsigned_long_ptr)     (((*(unsigned_long_ptr)) & 0xffff))
+base/video/gvi.c	44	49	50	54	text-matches-effective-XP-line	#include <stdio.h>
+base/video/vga_mode.c	116	116	122	121	text-matches-effective-XP-line	"#include	""egamode.h"""
+base/video/vga_vide.c	28	33	33	37	text-matches-effective-XP-line	#include <stdio.h>
+base/video/video.c	4	4	5	4	text-matches-effective-XP-line	"#include ""insignia.h"""
+base/video/video.c	55	57	61	62	text-matches-effective-XP-line	#include <stdio.h>
+base/video/video.c	93	94	94	94	text-matches-effective-XP-line	"#include ""egavideo.h"""
+base/video/video_io.c	26	29	32	34	text-matches-effective-XP-line	#include <stdio.h>
+host/inc/host_cpu.h	92	194	96	197	text-matches-effective-XP-line	#define  getAX()        ((*getAX_func) ())
+host/inc/host_cpu.h	150	256	153	258	text-matches-effective-XP-line	#define  setAX(val)     ((*setAX_func) (val))
+host/inc/host_def.h	122	104	123	104	text-matches-effective-XP-line	"#define NUM_PARALLEL_PORTS	3"
+host/inc/host_def.h	133	112	134	112	text-matches-effective-XP-line	"#define NUM_SERIAL_PORTS	4"
+host/inc/host_inc.h	31	73	32	73	text-matches-effective-XP-line	#include <sys/param.h>
+host/inc/insignia.h	115	111	116	111	text-matches-effective-XP-line	#define BOOL UINT
+host/inc/nt_fulsc.h	17	17	24	23	text-matches-effective-XP-line	#define ErrorExit() DisplayErrorTerm(EHS_FUNC_FAILED,GetLastError(),__FILE__,__LINE__);
+host/inc/nt_fulsc.h	41	40	42	40	text-matches-effective-XP-line	#define STATELENGTH             sizeof(VIDEO_HARDWARE_STATE_HEADER)
+host/inc/nt_fulsc.h	44	42	45	42	text-matches-effective-XP-line	#define LATCHLENGTH             4
+host/inc/nt_graph.h	116	115	117	115	text-matches-effective-XP-line	#define SCALE(value) ((host_screen_scale * (value)) >> 1)
+host/inc/nt_uis.h	91	94	93	95	text-matches-effective-XP-line	#define ED_BADSYSFILE   336
+host/src/nt_cga.c	81	118	87	123	text-matches-effective-XP-line	#define CGA_GRAPH_INCVAL 4
+host/src/nt_cga.c	96	132	97	132	text-matches-effective-XP-line	#define TEXT_INCVAL 4
+host/src/nt_graph.c	781	941	782	941	local-conditional-exception	#ifndef SOFTPC_STANDALONE
