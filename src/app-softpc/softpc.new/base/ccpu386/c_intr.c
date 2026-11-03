@@ -485,7 +485,7 @@ IFN4(
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #endif /* SYNCH_TIMERS */
-#line 510
+#line 506
 #endif /* PIG */
    /* mark successful end to interrupt */
    doing_fault = FALSE;

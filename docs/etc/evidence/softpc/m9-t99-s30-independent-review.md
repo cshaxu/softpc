@@ -561,3 +561,19 @@ Published x86 and x64 EXE SHA-256 values are respectively
 `07fc48290579d94b3890e5f9c68b39f6d732526aa5d63c4a0687259070bca4bf` and
 `296b89e6d81a6bf0003c360cd00f9dc7b5fbd9bc02fb7e88a390083730f536f7`.
 This does not complete conditional structure review.
+
+P17 changes 16 matching-prefix candidate line controls across seven headers
+and three C files. The [mapping](m9-t99-s30-p17-line-mapping.tsv) and
+[updated queue](m9-t99-s30-p17-following-line-candidates.tsv) record the
+batch, with 66 candidates pending. Actual header consumers were identified
+using Ninja dependency records. Seven actual consumer/changed translation
+units per architecture produced byte-identical preprocessed output. Both
+architectures built and each passed 186 background and 8 native tests. The
+first x64 native group had one compact_console child initialization failure
+(stage 1 / error 6 / 0xc0000142); the complete rerun passed 8/8. Its cause
+remains unconfirmed. The x86 native group passed first run. Build logs had
+3092 x64 and 3041 x86 mirror-path warning lines, with no non-mirror warning
+line observed. Published x86 and x64 EXE SHA-256 values are respectively
+`f3adbde1cbc8e0f8e074a192ca26f117ccfc12067665ac13648ec7bab6425608` and
+`d994b0479441cd62fba15be455438b1d114d18192dd419dc6d5b4ee0cd760c15`.
+Conditional structure review is not complete.

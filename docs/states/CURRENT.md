@@ -88,6 +88,15 @@ native tests per architecture. Review, commit and push must finish before an
 eleventh mirror file is changed. The candidate queue retains 82 pending
 line mappings, including 63 differing-prefix/offset cases; conditional
 structure matching remains independently open.
+P16 was committed and pushed as `30023c26`. P17 currently changes ten
+mirror files (seven headers and three C files) with 16 matching-prefix line
+corrections. Actual header consumers have been identified using Ninja deps;
+dual preprocessing, builds and full tests passed (186 background and 8
+native per architecture). The first x64 native group failed compact_console
+initialization; the full rerun passed, and cause is unknown. Complete review,
+commit and push before changing an eleventh mirror file. The candidate queue retains 66
+pending line mappings, including 63 differing-prefix/offset cases; conditional
+structure matching remains independently open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

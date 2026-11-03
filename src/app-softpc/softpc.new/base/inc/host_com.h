@@ -205,7 +205,7 @@ IMPORT VOID host_com_ioctl IPT3(int,adapter, int,request, intptr_t,arg);
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 214
+#line 213
 
 #ifndef macintosh
 IMPORT void host_com_xon_change IPT2(IU8,hostID, IBOOL,apply);

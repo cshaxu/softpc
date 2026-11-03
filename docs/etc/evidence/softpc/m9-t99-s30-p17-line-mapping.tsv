@@ -1,0 +1,17 @@
+path	kind	directive_line	old	expected	current_anchor	xp_anchor	first	second	third	evidence	status
+base/inc/video.h	retained-arm	4	3	4	9	8	#defineR10_CURS_START10	#defineR11_CURS_END11	#defineCGA_R12_START_ADDRH12	matching_full_prefix	pending_review
+base/inc/video.h	after-group	43	40	42	50	48	#defineVD_BS0x8	#defineVD_CR0xD	#defineVD_LF0xA	matching_full_prefix	pending_review
+base/inc/video.h	after-group	219	202	283	220	283	#endif	#ifdefVGG	#ifdefV7VGA	matching_full_prefix	pending_review
+base/inc/video.h	after-group	228	210	291	229	291	#endif	IMPORTunsignedcharvalid_modes[];	#defineNO_MODES0	matching_full_prefix	pending_review
+base/inc/video.h	after-group	262	243	324	264	325	IMPORTVOID(*bios_ch2_byte_wrt_fn)IPT2(ULONG,ch_attr,ULONG,ch_addr);	IMPORTVOID(*bios_ch2_word_wrt_fn)IPT2(ULONG,ch_attr,ULONG,ch_addr);	IMPORTVOIDsimple_bios_byte_wrtIPT2(ULONG,ch_attr,ULONG,ch_addr);	matching_full_prefix	pending_review
+base/inc/floppy.h	after-group	195	190	197	201	202	#defineHF_STATUS(BIOS_VAR_START+0x8C)	#defineHF_ERROR(BIOS_VAR_START+0x8D)	#defineHF_INT_FLAG(BIOS_VAR_START+0x8E)	matching_full_prefix	pending_review
+base/inc/floppy.h	after-group	437	426	437	443	442	#defineIGNORE_SECTORS_TRANSFERRED-1	#defineWAIT_A_SECOND8	#defineHEAD_SETTLE_36020	matching_full_prefix	pending_review
+base/video/video_io.c	after-group	26	27	29	32	34	#include<stdio.h>	#includeTypesH	"#include""xt.h"""	matching_full_prefix	pending_review
+base/video/video_io.c	after-group	24	27	28	25	28	#endif	#include<stdio.h>	#includeTypesH	matching_full_prefix	pending_review
+base/ccpu386/c_intr.c	after-group	488	510	506	489	506	#endif	doing_fault=FALSE;	doing_contributory=FALSE;	matching_full_prefix	pending_review
+base/cvidc/ev_glue.c	after-group	819	820	775	820	775	}	GLOBALIHP	setup_global_data_ptrIFN0()	matching_full_prefix	pending_review
+base/inc/config.h	after-group	416	402	413	419	415	externIBOOLConfig_has_been_edited;	"#include""host_cfg.h"""	#endif	matching_full_prefix	pending_review
+base/inc/gfx_upd.h	retained-arm	53	52	53	54	53	#ifdefVGG	intv7frig;	#endif	matching_full_prefix	pending_review
+base/inc/host_com.h	after-group	208	214	213	210	214	#ifndefmacintosh	IMPORTvoidhost_com_xon_changeIPT2(IU8,hostID,IBOOL,apply);	#endif	matching_full_prefix	pending_review
+base/inc/host_lpt.h	retained-arm	8	5	21	127	139	IMPORTSHORThost_lpt_valid	IPT4(UTINY,hostID,ConfigValues*,val,NameTable*,dummy,CHAR*,errString);	IMPORTVOIDhost_lpt_changeIPT2(UTINY,hostID,BOOL,apply);	matching_full_prefix	pending_review
+base/inc/printer.h	after-group	47	44	56	55	63	#defineLPT1_PORT_ADDRESS(BIOS_VAR_START+8)	#defineLPT2_PORT_ADDRESS(BIOS_VAR_START+0xa)	#defineLPT3_PORT_ADDRESS(BIOS_VAR_START+0xc)	matching_full_prefix	pending_review

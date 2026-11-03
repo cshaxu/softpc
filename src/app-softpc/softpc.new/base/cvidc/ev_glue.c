@@ -816,7 +816,7 @@ setup_vga_globals IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 820
+#line 775
 }
 
 /*(

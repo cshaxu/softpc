@@ -1,7 +1,7 @@
 /* SccsID @(#)video.h	1.24 08/19/94 Copyright Insignia Solutions Inc. */
 
 #ifndef NEC_98
-#line 3
+#line 4
 /*
  * M6845 video chip registers
  */
@@ -40,7 +40,7 @@
 /* 4 full scanlines is the (offset/size) of one text line PER bank */
 #define ONELINEOFF      320
 #endif // !NEC_98
-#line 40
+#line 42
 
 
 /*
@@ -216,7 +216,7 @@ IMPORT MODE_ENTRY vd_ext_graph_table[];
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 202
+#line 283
 #endif
 
 #ifdef VGG
@@ -225,7 +225,7 @@ IMPORT MODE_ENTRY vd_ext_graph_table[];
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 210
+#line 291
 #endif /* VGG */
 
 /*
@@ -259,7 +259,7 @@ IMPORT unsigned char	valid_modes[];
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 243
+#line 324
 
 IMPORT VOID (*bios_ch2_byte_wrt_fn) IPT2(ULONG, ch_attr, ULONG, ch_addr);
 IMPORT VOID (*bios_ch2_word_wrt_fn) IPT2(ULONG, ch_attr, ULONG, ch_addr);

@@ -44,7 +44,7 @@ extern	void printer_status_changed();
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 44
+#line 56
 
 /*
  * The following 6 defines refer to the address in the BIOS data area

@@ -192,7 +192,7 @@
 			(rate == RS_250 ? RS_300: \
 			(rate == RS_300 ? RS_1000: RS_500)))
 #endif
-#line 190
+#line 197
 
 /*
  *	Unused high density floppy variables
@@ -434,7 +434,7 @@
 #line 435
 #define MAX_FLOPPY	0x02
 #endif // !NEC_98
-#line 426
+#line 437
 
 /*
  *	Special value of sectors transferred count

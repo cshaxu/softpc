@@ -5,7 +5,7 @@
 #if defined(NEC_98)         // NEC {
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else
-#line 5
+#line 21
 /*[
 	Name:		host_lpt.h
 	Derived From:	Base 2.0

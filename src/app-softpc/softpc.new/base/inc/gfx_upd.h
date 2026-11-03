@@ -50,7 +50,7 @@ typedef	struct	{
 	int	end;
 	long	video_copy_offset;
 #ifndef NEC_98
-#line 52
+#line 53
 #ifdef VGG
 	int	v7frig; /* for those annoying V7 (and undocumented VGA) modes */
 			  /* with chars_per_line not a multiple of 4 */

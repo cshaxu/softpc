@@ -413,7 +413,7 @@ extern CHAR ptr_to_empty[];
 #ifdef SWITCHNPX
 #error "Unsupported SoftPC mirror configuration: SWITCHNPX"
 #endif /* SWITCHNPX */
-#line 402
+#line 413
 
 /* Dumb Terminal UIF Flag */
 extern IBOOL Config_has_been_edited;
