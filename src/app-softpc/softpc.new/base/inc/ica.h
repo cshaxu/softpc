@@ -196,7 +196,7 @@ typedef struct {
 #ifdef  REAL_ICA
 #error "Unsupported SoftPC mirror configuration: REAL_ICA"
 #else   /* REAL_ICA */
-#line 184
+#line 228
 
 /*
  *  Change these. They come last.

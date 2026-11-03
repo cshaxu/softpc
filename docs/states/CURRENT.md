@@ -852,3 +852,9 @@ P30 was committed and pushed as `723c17f4`. P31 corrects 48 XP diagnostic
 line positions in ten files, including `com.c` and `keyba.c`; their original
 raw bytes and CRLF are preserved apart from line-number edits. Two false
 candidates were adjudicated without source changes. Fourteen earlier heuristic candidates and 127 comment-aware first-code probe candidates remain; they overlap and are not confirmed defects or complete coverage. P31 dual builds and full suites passed after an x86 serial unsandboxed rerun; earlier failures are recorded. Delivery remains pending; S30 remains open.
+
+P31 was committed and pushed as `a625ef35`. P32 corrects 13 XP diagnostic
+positions across ten mirror files. The initial heuristic queue now has four
+remaining sites; the separate comment-aware first-code queue is not exhausted
+and may contain local-only code. Conditions and executable statements are
+unchanged. P32 dual builds and background suites passed; x64 native passed after a failed first run and x86 native passed first run. Delivery remains pending; S30 remains open.

@@ -167,7 +167,7 @@ IMPORT	void		host_print_auto_feed IPT2(int,adapter, BOOL,auto_feed);
 #define	number_for_adapter(adapter)	(adapter + 1)
 
 #endif	// NEC_98                                          // NEC }
-#line 157
+#line 181
 
 #endif /* _HOST_LPT_H */
 

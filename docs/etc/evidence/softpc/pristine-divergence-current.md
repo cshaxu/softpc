@@ -1494,3 +1494,8 @@ owns hardware evidence, actual-port research and implementation qualification.
 十个镜像文件中修正 48 处 XP 诊断行号，包括两份非 UTF-8 源文件；
 保留其原始非行号字节及 CRLF，不改变设备逻辑。具体映射与误报
 排除见 P31 记录；双架构构建和完整测试通过，首轮超时与沙箱 Junction 拒绝及重跑结果见独立审查记录。
+
+### T99 S30 P32 XP 诊断行号
+
+十个镜像文件中 13 处诊断行号对齐固定 XP 原文，不改变条件或设备
+逻辑。具体映射见 P32 清单；双架构构建及后台测试通过，x64 原生首轮一项失败、整组重跑通过，x86 原生首轮通过。

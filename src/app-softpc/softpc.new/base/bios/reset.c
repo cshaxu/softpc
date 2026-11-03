@@ -641,7 +641,7 @@ void reset()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-#line 759
+#line 927
         }
 #endif /* NTVDM */
 #line 929
@@ -766,7 +766,7 @@ void reset()
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
-#line 862
+#line 1063
 
         gvi_init((half_word) gfxAdapt);
 #endif // !NEC_98
@@ -887,7 +887,7 @@ void reset()
 
 
 #endif  /* NTVDM */
-#line 979
+#line 1191
         /* Now search for extra ROM modules */
         search_for_roms();
 #endif // !NEC_98
@@ -912,7 +912,7 @@ void reset()
 #line 1208
                 com_post(adapter);
 #endif // !NEC_98
-#line 991
+#line 1210
         }
 
 #ifdef NPX

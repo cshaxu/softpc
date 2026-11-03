@@ -57,7 +57,7 @@ IMPORT	void	gmi_define_mem IPT2(mem_type, type, MEM_HANDLERS *, handlers);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: !CCPU"
 #endif	/* CCPU */
-#line 69
+#line 55
 
 #endif /* UNIVERSAL */
 

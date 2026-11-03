@@ -852,7 +852,7 @@ GLOBAL void	io_connect_port IFN3(io_addr, io_address, half_word, adapter,
 	}
 }
 #endif
-#line 839
+#line 940
 
 
 /*(

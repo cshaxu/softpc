@@ -162,7 +162,7 @@ void diskette_io()
 	setAH(diskette_status);
 	sas_store(FLOPPY_STATUS, FS_OK);
 #endif // !NEC_98
-#line 343
+#line 600
 
 	/*
 	 *	Do the operation

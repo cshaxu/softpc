@@ -284,7 +284,7 @@ extern	DISPLAY_GLOBS	PCDisplay;
 #else
 #error "Unsupported SoftPC mirror configuration: !VGG"
 #endif /* VGG */
-#line 284
+#line 487
 #define get_screen_height_lo()          (PCDisplay.screen_height.as_bfld.low_byte)
 #define get_screen_height_hi()          (PCDisplay.screen_height.as_bfld.top_bit)
 #define	get_screen_end()		(get_screen_start() + get_screen_length() + gvi_pc_low_regen)

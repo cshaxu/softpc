@@ -1,0 +1,5 @@
+path	local_line	old_line	xp_candidates	sources
+base/system/ica.c	1936	1935	2158	structural
+base/system/idetect.c	270	260	351	token
+base/video/egwrtm12.c	126	134	135	token
+host/inc/nt_fulsc.h	44	35	42	token

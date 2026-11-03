@@ -250,7 +250,7 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
                         /* read status register - clears terminal counts */
         case    DMA_SHARED_REG_A:
 #ifndef NEC_98
-#line 217
+#line 247
         case    DMA1_SHARED_REG_A:
 #endif   //NEC_98
 #line 249

@@ -849,3 +849,11 @@ The comment-aware physical first-code scan found 2,739 matching first-code
 locations, 983 with no code before the next marker, 123 differing and four
 beyond the XP file. These 127 candidates are not proof of defects and the
 probe does not establish complete mapping.
+
+## P32 original line mapping
+
+The [13 mappings](m9-t99-s30-p32-line-mapping.tsv) cover ten files. They
+were checked against the matching XP conditions and adjacent original code;
+no condition or executable statement was changed. Four [earlier heuristic candidates](m9-t99-s30-p32-unreviewed-line-candidates.tsv) remain; the
+[comment-aware first-code queue](m9-t99-s30-p32-first-code-candidates.tsv)
+is separate and includes local differences and false positives. P32 dual builds and both 186-test background suites passed in serial outside the sandbox. x64 native initially failed compact_console with stage 1 error 6 and child exit 0xc0000142; a full native rerun passed 8/8. x86 native passed 8/8 first run. The intermittent initialization failure remains unexplained. Mirror-only warnings: x64 3450, x86 3399. EXE SHA-256: x86 `acc5571e5f241774b9b66d98a1ff7394f41ccd10e9a834930a36063523cb3a1f`; x64 `33913090111cda45d28b7bf55b6b53055016354adb9c07bd9fbb40e438dc8adf`. A fresh byte- and comment-aware first-code scan produced 2,746 equal, 983 no-code, 116 different and four out-of-range markers; its 120 candidate rows exactly match the P32 queue and are not all established defects.

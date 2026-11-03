@@ -291,6 +291,6 @@ void rs232_io()
       	break;
    }
 #endif // !NEC_98
-#line 293
+#line 299
 }
 
