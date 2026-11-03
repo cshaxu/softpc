@@ -1,0 +1,14 @@
+path	local_line	xp_line	condition	parent	local_preceding	xp_preceding	result
+base/ccpu386/c_main.c	244	226	if:defined(SFELLOW)	root	 | LOCAL IU16 cpu_hw_interrupt_number;	 | LOCAL IU16 cpu_hw_interrupt_number;	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	2231	2304	ifdef:PIG	root	} | }	} | }	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3569	3749	ifdef:PIG	root	IN8(&ops[0].sng, ops[1].sng); | P_Fal(0);	IN8(&ops[0].sng, ops[1].sng); | P_Fal(0);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3587	3766	ifdef:PIG	root	IN16(&ops[0].sng, ops[1].sng); | P_Fax(0);	IN16(&ops[0].sng, ops[1].sng); | P_Fax(0);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3600	3778	ifdef:PIG	root	IN32(&ops[0].sng, ops[1].sng); | P_Feax(0);	IN32(&ops[0].sng, ops[1].sng); | P_Feax(0);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3644	3829	ifdef:PIG	root	OUT32(ops[0].sng, ops[1].sng); | }	OUT32(ops[0].sng, ops[1].sng); | }	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3693	3877	ifdef:PIG	root	IN8(&ops[0].sng, ops[1].sng); | P_Fal(0);	IN8(&ops[0].sng, ops[1].sng); | P_Fal(0);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3711	3894	ifdef:PIG	root	IN16(&ops[0].sng, ops[1].sng); | P_Fax(0);	IN16(&ops[0].sng, ops[1].sng); | P_Fax(0);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3724	3906	ifdef:PIG	root	IN32(&ops[0].sng, ops[1].sng); | P_Feax(0);	IN32(&ops[0].sng, ops[1].sng); | P_Feax(0);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3741	3922	ifdef:PIG	root	F_Fal(1); | OUT8(ops[0].sng, ops[1].sng);	F_Fal(1); | OUT8(ops[0].sng, ops[1].sng);	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	3768	3948	ifdef:PIG	root	OUT32(ops[0].sng, ops[1].sng); | }	OUT32(ops[0].sng, ops[1].sng); | }	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	4174	4329	ifdef:SYNCH_TIMERS	root	goto DO_INST; | 	goto DO_INST; | 	boundary matches; excluded arm not descended
+base/ccpu386/c_main.c	4294	4444	ifdef:PIG	root	#line 4443 | 	"#endif	/* SFELLOW */ | "	boundary matches; excluded arm not descended

@@ -305,7 +305,7 @@ extern IU32 ica_iret_hook_needed IPT1(IU32, line);
 #endif
 
 #if !defined (NTVDM)
-#line 292
+#line 372
 void
 SWPIC_init_funcptrs IFN0()
 {
@@ -812,7 +812,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #line 896
     if (((port & 1) == 0) && (value & 0x10))            /****  ICW1  ****/
 #endif   //NEC_98
-#line 793
+#line 898
     {
         asp->ica_irr  = 0;	/* Clear all pending interrupts		*/
         asp->ica_isr  = 0;	/* Clear all in-progress interrupts	*/
@@ -860,7 +860,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
 #line 942
         if (port & 1)           /* Odd address -> OCW1          */
 #endif   //NEC_98
-#line 835
+#line 944
 	{
 	    asp->ica_imr = value & 0xff;
 #ifndef PROD
@@ -1173,7 +1173,7 @@ void SWPIC_hw_interrupt IFN3(IU32, adapter, IU32, line_no, IS32, call_count)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1199
+#line 1347
 		ica_lock_dec();
 		return;
 	}
@@ -1440,17 +1440,17 @@ GLOBAL ICA_ASYNC_HANDLER async_handlers[] = {
 #ifdef NOVELL
 #error "Unsupported SoftPC mirror configuration: NOVELL"
 #endif /* NOVELL */
-#line 1458
+#line 1611
 
 #ifdef SWIN_HAW
 #error "Unsupported SoftPC mirror configuration: SWIN_HAW"
 #endif /* SWIN_HAW */
-#line 1462
+#line 1615
 
 #ifdef ASPI
 #error "Unsupported SoftPC mirror configuration: ASPI"
 #endif /* ASPI */
-#line 1466
+#line 1619
 
 	{ 0, ICA_IMPOSSIBLE_LINE, 0}
 };
@@ -1571,7 +1571,7 @@ action_interrupt IFN4(IU32, adapter, IU32, line, ICA_CALLBACK, func, IU32, parm)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
-#line 1592
+#line 1745
 		host_ica_unlock();	/* real unlock if available */
 		return(FALSE);
 	}
@@ -1658,7 +1658,7 @@ GLOBAL IU32 ica_iret_hook_needed IFN1(IU32, line)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1678
+#line 1879
 
 	/* does this line require iret hooks */
 	if (!(iretHookMask & ireq_mask))
@@ -1703,7 +1703,7 @@ ica_iret_hook_called IFN1(IU32, abs_line)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1730
+#line 1923
 
 #ifdef CPU_40_STYLE
 	asp = &adapter_state[adapter];

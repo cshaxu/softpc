@@ -738,3 +738,16 @@ claim that selected contents or descendants match XP. Four retained-content
 differences include previously registered EGA ABI and V7 changes. The
 [remaining 65 groups](m9-t99-s30-p26-unresolved-candidate-file-groups.tsv)
 require separate examination. P26 dual builds and all 186 background and 8 native tests per architecture passed on the first run; this batch changes documentation only and does not change the executables.
+
+## P27 diagnostic line numbers and repeated root conditions
+
+[Mapping](m9-t99-s30-p27-line-mapping.tsv) records 28 corrections in
+`vga_mode.c`, nine in `reset.c`, and ten in `ica.c`. Each next source line
+was checked against the pinned XP file, with surrounding context for
+ambiguous and empty lines. These are diagnostic positions only; V7
+functional changes and all existing conditions remain unchanged. A repeated
+V7 condition was paired by ordinal incorrectly in the earlier candidate
+report: local 488 maps to XP 510 and local 532 maps to XP 554; local 462 is
+the registered T88 V7 display fix. The [13 reviewed CCPU root boundaries](m9-t99-s30-p27-manual-boundaries.tsv) have individually checked context;
+excluded bodies remain skipped. [52 candidate-file groups](m9-t99-s30-p27-unresolved-candidate-file-groups.tsv) still need examination.
+P27 x86 and x64 builds and all 186 background plus 8 native tests per architecture passed on the first run. EXE SHA-256: x86 `c394d58752dc1b83a256ca19cf125389fe5e5dc9fe93f2e562711fc2819fdbb0`; x64 `e411b66d3eb63395b49d84afcb4e3735b09d69a5e325b9a4d95598fab9bb8509`. Earlier line-anchor coverage claims did not include all candidate files: additional whole-tree scans identified 178 possible line mismatches in 47 files, including false and conflicting matches. These are candidates requiring contextual review, not confirmed defects or a complete accounting.

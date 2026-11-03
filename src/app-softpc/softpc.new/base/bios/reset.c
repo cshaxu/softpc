@@ -216,7 +216,7 @@ static void setup_ivt()
 #ifdef  GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #else           /* GISP_SVGA */
-#line 213
+#line 372
         sas_storew(int_addr(0x10), VIDEO_IO_OFFSET);
         sas_storew(int_addr(0x10) + 2, VIDEO_IO_SEGMENT);
 #endif          /* GISP_SVGA */
@@ -384,7 +384,7 @@ GLOBAL CHAR *get_copyright IFN0()
 void reset()
 {
 #ifndef NTVDM
-#line 513
+#line 674
         char *cp;
         char temp_str[256];
 #ifdef LIM
@@ -526,7 +526,7 @@ void reset()
 #ifdef  NPX
 #error "Unsupported SoftPC mirror configuration: NPX"
 #endif  /* NPX */
-#line 649
+#line 812
                                 outb(ICA0_PORT_0, (half_word)0x11);
                                 outb(ICA0_PORT_1, (half_word)0x08);
                                 outb(ICA0_PORT_1, (half_word)0x04);
@@ -660,7 +660,7 @@ void reset()
 #ifdef MSWDVR
 #error "Unsupported SoftPC mirror configuration: MSWDVR"
 #endif
-#line 774
+#line 943
 #endif
 
 #if defined(NEC_98)
@@ -735,7 +735,7 @@ void reset()
 #else /* PRINTER */
 #error "Unsupported SoftPC mirror configuration: !PRINTER"
 #endif /* PRINTER */
-#line 821
+#line 1023
 	equip_flag.bits.game_io_present = FALSE;
 	equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
 	equip_flag.bits.ram_size = 0;
@@ -807,7 +807,7 @@ void reset()
 
 #ifndef NEC_98
 #ifndef NTVDM   /* No signon for NTVDM - transparent integration */
-#line 885
+#line 1096
         if (soft_reset == 0)
         {
                 sprintf(temp_str,"%d KB OK", sas_w_at(MEMORY_VAR)
@@ -869,7 +869,7 @@ void reset()
 #ifdef LICENSING
 #error "Unsupported SoftPC mirror configuration: LICENSING"
 #endif /* LICENSING */
-#line 964
+#line 1175
 
         /* skip another 1 line */
         setAH(14);
@@ -905,7 +905,7 @@ void reset()
 #line 1203
         for (adapter = 0; adapter < NUM_SERIAL_PORTS; adapter++)
 #endif // !NEC_98
-#line 988
+#line 1205
         {
                 com_init(adapter);
 #ifndef NEC_98
@@ -922,7 +922,7 @@ void reset()
         dma_init();
         dma_post();
 #ifndef NEC_98
-#line 998
+#line 1218
         fla_init();
         mouse_init();
         hda_init();

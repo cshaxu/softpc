@@ -816,4 +816,12 @@ P25 was committed and pushed as `30fdf4bb`. P26 records 119 additional
 candidate-file boundary pairings supported by unique surrounding source and
 a supported parent; 65 candidate groups remain open. These records establish
 boundary correspondence only, not equality of retained code or descendants.
-The documented local changes in EGA and V7 remain in force. P26 passed dual builds and 186 background plus 8 native tests per architecture on the first run. Delivery is pending; S30 remains open.
+The documented local changes in EGA and V7 remain in force. P26 passed dual builds and 186 background plus 8 native tests per architecture on the first run and was committed as `4467954b`; S30 remains open.
+
+P26 was committed and pushed as `4467954b`. P27 corrects 47 stale XP
+`#line` numbers in three mirror files, without changing branch conditions or
+executable statements. Thirteen repeated CCPU root boundaries were checked
+against XP; 52 candidate-file groups remain open. The V7 matcher paired
+two repeated conditions by ordinal and was wrong: local line 488 corresponds
+to XP line 510, local line 532 to XP line 554, while local line 462 is the
+previously registered T88 display correction. P27 dual builds and all 186 background and 8 native tests per architecture passed on the first run; delivery remains pending. S30 remains open.

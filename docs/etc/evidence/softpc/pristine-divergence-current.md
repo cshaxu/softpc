@@ -1465,3 +1465,9 @@ Source diff +6/-33, net -27; necessary-subset mirror diff +226/-12 becomes
 selection ranges are unchanged; only the local manifest hash changes.
 The [S14 proposal](../../../proposals/m9-public-handoff-simplification.md#s14-approved-implementation)
 owns hardware evidence, actual-port research and implementation qualification.
+
+### T99 S30 P27 XP 诊断行号
+
+对照固定 XP 原文，将 `vga_mode.c` 28 处、`reset.c` 9 处、
+`ica.c` 10 处失准的 `#line` 修回原文位置；不改变条件、设备逻辑
+或既有本地功能差异。实际映射见 P27 行号审计清单；双架构构建及每架构 186 项后台、8 项原生测试首轮通过。
