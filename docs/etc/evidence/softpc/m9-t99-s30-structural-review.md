@@ -80,3 +80,46 @@ Published EXE SHA-256:
 The [post-correction candidate list](m9-t99-s30-structural-candidates.tsv)
 is a provisional structural-matcher output, not a list of confirmed defects
 or complete exception dispositions. More source-anchor review remains.
+
+## Matching caution: retained-arm context
+
+A second heuristic compared non-directive text inside paired arms and flagged
+11 low-similarity matches in eight files. These are candidates, not defects.
+Spot checks found several legitimate reasons: C-VID ABI signature changes
+(`cpu_vid.h`, `host.h`), existing XP-excluded bodies (`sas.h`, `ica.c`),
+accepted dirty-region changes (`gfx_updt.c`), and a genuine alignment error
+in `vga_mode.c` where the local V7 condition was paired with XP's later V7
+condition. This check demonstrates that a nominally matched group cannot be
+assumed to have the same source context. The local V7 condition is included
+in the exception review above. The 11 low-similarity matches were individually dispositioned in the
+[context review](m9-t99-s30-context-review.tsv); wider candidate and
+necessary-exception review remains open.
+
+## Source-anchored local differences identified so far
+
+The following is a location-level record, not an assertion that these are
+the entire remaining set. Line numbers refer to the S30 correction commit.
+The conditions are retained pending the full minimality review.
+
+| Current file and location | Local structural difference and evidence |
+| --- | --- |
+| `base/bios/reset.c:407,633,745` | Standalone terms select attached-FDC topology and reject an omitted DOS mouse-driver path; compare XP's NTVDM arms. |
+| `base/ccpu386/c_main.c:34,755,4497,4664,4683,4699` | Six predicates extend XP NTVDM with CCPU TLS simulation-stack selection. Each original group was paired; nested original code in the error arm is intentionally excluded. |
+| `base/ccpu386/c_tlb.c:151,188` | FAST_TLB conditions in snapshot save/restore guard local snapshot data; XP's own FAST_TLB declaration frame is present at current 70 / XP 69. |
+| `base/inc/cpu_vid.h:88,115`; `base/inc/gmi.h:19` | CPU_40_STYLE and C_VID guards around adapted generated-function signatures; local ABI divergence explicitly recorded in source. |
+| `base/inc/egacpu.h:99,120,252` | C_VID forward declaration and generated globals carrier, plus an error sibling for unsupported non-C-VID; XP's C_VID frame at 442 has no else. |
+| `base/inc/ica.h:91` | CPU_40_STYLE nested guard separates legacy CPU_HW_INT macro 0 from CCPU's enum value 2; S29 records test consumers. |
+| `base/inc/ios.h:23` | Standalone term extends the XP I/O-space selection; existing S20 records I/O sizing consumers. |
+| `base/keymouse/mouse_io.c:2419`; `base/keymouse/ppi.c:181,205`; `base/video/video.c:328,2967` | Explicit error siblings for NEC_98, absent from the corresponding XP frames. They reject unsupported configurations; whether they are redundant with other guards is not yet proven. |
+| `base/keymouse/ppi.c:70,219,236` | Standalone rejection and snapshot PPI state selection, absent from original product code. |
+| `base/system/ica.c:1242,1684,2017,2037,2082,2095` | Standalone PIC line handling, CCPU IRET handling and snapshot callback/hook state paths. |
+| `base/video/gfx_updt.c:3891`; `base/video/vga_mode.c:462` | CPU_40_STYLE and V7VGA guards around accepted CHAIN2 dirty / packed scanout fixes. |
+| `host/inc/cfpu_def.h:21,32,43,55,66,83`; `host/inc/host_cpu.h:37` | Little-endian guards around local host layouts; original layouts differ and supported x86/x64 bit ordering must be preserved. |
+| `host/inc/host_cpu.h:275`; `host/inc/insignia.h:77` | CCPU vector typing and generated C-video carrier ABI conditions; XP common vectors/carrier were unconditionally declared. |
+| `host/src/nt_cga.c:22`; `host/src/nt_graph.c:83,782,1190,1617,1647,2213` | Standalone graphics integration, V7 DAC declaration and packed-scanout width; local product port paths and rejected non-standalone regions. |
+
+`base/keymouse/mouse.c`'s PROD frame, `base/ccpu386/c_tlb.c:70`,
+`base/video/vga_mode.c:488,532` and `host/inc/host_cpu.h:295` are matching
+original structures whose initial pairings were wrong. The 11 low-context
+pairings have individual records in the context review. These findings do
+not dispose every possible repeated-condition pairing in the corpus.

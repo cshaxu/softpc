@@ -43,6 +43,13 @@ eight native tests without skips. The first correction and [working review](../e
 are ready for delivery; the task is not complete and no final count of real
 differences is claimed.
 
+First correction `fde49418` is pushed. The matcher can misalign repeated
+condition names; a secondary retained-arm context comparison found 11 low
+similarity pairings, each recorded in the [context review](../etc/evidence/softpc/m9-t99-s30-context-review.tsv).
+The working structural review now records identified local locations and
+still-open fail-fast / exception-minimality questions. The task remains
+active; these records are not an exhaustive proof of original alignment.
+
 ## Technical Baseline
 
 Latest published binaries are S28's ninth-depth verified build; hashes and

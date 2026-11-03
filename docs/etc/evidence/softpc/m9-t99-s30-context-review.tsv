@@ -1,0 +1,12 @@
+path	depth	current_line	xp_line	condition	disposition
+base/ccpu386/c_tlb.c	1	188	69	ifdef:FAST_TLB	Alignment error: current snapshot restore guard is local; XP line 69 matches current line 70.
+base/inc/cpu_vid.h	1	99	90	ifndef:NO_STRING_OPERATIONS	Same NO_STRING_OPERATIONS frame; selected function-pointer types carry existing C-VID ABI adaptation.
+base/inc/host.h	1	51	49	ifndef:REAL_VGA	Same REAL_VGA frame; selected memset4 signature uses existing host ABI correction.
+base/inc/sas.h	2	113	114	ifdef:GISP_CPU	Same GISP_CPU frame; current original GISP arm is a single error and its contents are excluded.
+base/system/ica.c	1	418	483	if:defined(NTVDM)	Same NTVDM frame; low score comes from the original NTVDM arm being replaced by a single error.
+base/video/gfx_updt.c	2	272	313	ifndef:NEC_98	Same NEC_98 frame anchored by #line 313 and matching surrounding function; selected dirty calculation has local changes.
+base/video/gfx_updt.c	3	294	335	ifdef:VGG	Same VGG frame within XP line 313 NEC_98 group; selected dirty calculation has local changes; non-VGG arm is error.
+base/video/gfx_updt.c	3	324	365	ifndef:NEC_98	Same NEC_98 frame anchored by #line 365 and matching surrounding function; selected dirty calculation has local changes.
+base/video/gfx_updt.c	3	492	558	ifdef:VGG	Same VGG frame near XP 558; selected dirty calculation has local changes; non-VGG arm is error.
+base/video/vga_mode.c	4	462	510	ifdef:V7VGA	Alignment error: local V7VGA guard is an accepted chain4 patch; XP 510 corresponds to current V7VGA guard at line 488.
+host/src/nt_graph.c	1	492	631	ifdef:BIGWIN	Same BIGWIN frame around init_lut declaration; local linkage differs, not the conditional structure.
