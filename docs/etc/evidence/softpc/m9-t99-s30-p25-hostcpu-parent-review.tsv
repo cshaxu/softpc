@@ -1,0 +1,2 @@
+path	depth	parent	current_line	xp_line	condition	current_end	xp_end	arm_status	current_before	xp_before	current_after	xp_after	review_basis
+host/inc/host_cpu.h	1	root	17	17	ifdef:CPU_30_STYLE	330	506	whole-error-skip;direct-diff	-	-	-	-	XP outer CPU_30_STYLE if/else preserved; removed true arm replaced by error; retained else carries registered x64 ABI and LITTLEND local differences; child groups separate

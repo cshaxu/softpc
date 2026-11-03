@@ -171,6 +171,17 @@ records each disposition; it does not clear other descendants or files.
 The 186 candidate-file group rows and their exceptions remain separately open.
 P24 preprocessing and dual builds passed; each architecture passed 186
 background and 8 native tests. Review, commit and push remain due.
+P24 was committed and pushed as `a2a8266b`. P25 restores the original
+`host_cpu.h` CCPU write-declaration conditional by removing the added non-CCPU
+else/error. All 58 dependency blocks on each architecture that include this
+header also include `cpu4.h`, which rejects non-CCPU. An isolated actual-command
+probe confirmed equal selected preprocessing and forced non-CCPU rejection for
+both architectures before and after. This resolves the previously recorded
+host_cpu.h arms-differ exception; a fresh full-tree scan now reports 39 structural candidates rather than 40.
+The [candidate-file remainder](../etc/evidence/softpc/m9-t99-s30-p25-unresolved-candidate-file-groups.tsv)
+has 184 rows after the restored CCPU arm, the manually reviewed enclosing
+CPU_30_STYLE boundary, and updated shifted physical locations; pairing remains audit evidence, not complete proof. P25 dual builds and the full test suite passed on both architectures (186 background and 8 native tests each); submission remains pending; do not change ten or more mirror files without a
+batch delivery. S30 remains open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

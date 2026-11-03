@@ -710,3 +710,21 @@ the first run. Both build logs had 178 mirror-path warning lines; no non-mirror
 warning line was observed. Published x86 and x64 EXE SHA-256 values are
 `755a5701386b31c814ba1aae0be83ce8baa0a62a9ad94dc4c92e6e6b868ceb33` and
 `659f546965c59d1c7a626b3c6377c630c5dea71476733ce9870f348688dac0c1`.
+
+P25 re-evaluates the earlier host_cpu.h CCPU declaration exception. XP has
+only #ifdef CCPU, whereas the local version added an else/error. Removing
+that two-line addition restores the original arm structure and leaves the
+CCPU declarations unchanged. Every one of the 58 Ninja dependency blocks per
+architecture that includes host_cpu.h also includes cpu4.h, whose existing
+#ifndef CCPU error preserves the actual build boundary. An isolated overlay
+using the real reset.c compiler flags showed identical selected preprocessing
+and non-CCPU rejection in the cpu4 path before and after, on both architectures.
+This does not promise standalone preprocessing of host_cpu.h will reject the
+unsupported mode; the documented include contract and actual consumer path
+provide the boundary. The full-tree scan now reports 39 structural candidates
+instead of 40. The [candidate-file remainder](m9-t99-s30-p25-unresolved-candidate-file-groups.tsv)
+keeps 184 unresolved group rows after this resolved arm difference and
+[review of its enclosing CPU_30_STYLE boundary](m9-t99-s30-p25-hostcpu-parent-review.tsv),
+with two shifted host_cpu.h locations updated. The selected outer arm retains
+registered x64 ABI differences, which are not cleared by that boundary review. Other alignments are not automatically
+accepted by this refresh. P25 x86 and x64 builds passed; both architectures passed all 186 background and 8 native tests on the first run. Published executable SHA-256: x86 2acd05b2d9eaefdbc84480c31d4cebadd8706db60fc2450a2fcf750610471edd; x64 e25a4f63a28a555c5035c3b484b4ab88222ee0a82c1e848c7b566650ca624275.

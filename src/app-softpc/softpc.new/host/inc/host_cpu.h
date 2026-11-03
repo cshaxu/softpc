@@ -304,8 +304,6 @@ extern void             (*setMP_func) ();
 extern void             (*setPE_func) ();
 extern void             (*setNT_func) ();
 extern void             (*setIOPL_func) ();
-#else
-#error "Unsupported SoftPC mirror configuration: !CCPU"
 #endif CCPU
 
 #ifdef A2CPU
