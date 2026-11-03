@@ -682,3 +682,15 @@ architecture passed 186 background and 8 native tests. The initial x64 native
 group failed compact_console child initialization (stage 1 / error 6 /
 0xc0000142); the complete rerun passed, with cause still unknown. No production
 source or EXE changed in this batch.
+
+P23 adds same-arm, sibling-unique #define or source anchors to the prior
+context checks. Ancestor chains must already be supported and current/XP arm
+signature arrays must match. The [paired boundary evidence](m9-t99-s30-p23-paired-boundaries.tsv)
+supports 28 of the former 74 pending paired groups; the [candidate-file boundary
+evidence](m9-t99-s30-p23-candidate-file-boundaries.tsv) supports 35 of the
+former 221 candidate-file rows. The remaining [46 paired](m9-t99-s30-p23-unresolved-paired-groups.tsv)
+and [186 candidate-file](m9-t99-s30-p23-unresolved-candidate-file-groups.tsv)
+rows remain open. Such anchors establish boundary-level evidence only; they
+do not clear retained descendants, local exceptions or entire files. Both incremental builds passed, and each
+architecture passed all 186 background and 8 native tests on the first run.
+No production source changed; both EXE hashes remained those recorded for P20.

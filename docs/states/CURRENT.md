@@ -151,6 +151,17 @@ retained descendants, historical exceptions or full file correspondence. P22 inc
 native per architecture); x64 native first failed compact_console initialization
 and passed on complete rerun, cause unknown. Review, commit and push are due; S30 final qualification
 cannot start while required structure and exception checks remain open.
+P22 was committed and pushed as `24e4ec24`; its x64 native first-run failure
+and complete rerun are preserved in independent review. P23 is a documentation-
+only boundary audit. Same-arm unique #define or source anchors, supported
+ancestor chains and equal arm-signature arrays support 28 previously unresolved
+paired boundaries and 35 candidate-file boundaries. The [paired remainder](../etc/evidence/softpc/m9-t99-s30-p23-unresolved-paired-groups.tsv)
+contains 46 rows; the [candidate-file remainder](../etc/evidence/softpc/m9-t99-s30-p23-unresolved-candidate-file-groups.tsv)
+contains 186. Boundary evidence does not establish descendant or whole-file
+correspondence. P23 incremental dual builds passed and each architecture
+passed 186 background and 8 native tests on the first run; no production
+source or EXE changed. Review, commit and push remain due; S30 final
+qualification cannot start while required structure and exceptions remain open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed
