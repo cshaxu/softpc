@@ -140,6 +140,17 @@ architecture passed 186 background and 8 native tests. The first x64 native
 group had the recorded compact_console initialization failure; its complete
 rerun passed. Review, commit and push remain due. S30 final qualification
 cannot start until every required structure and exception is accounted for.
+P21 was committed and pushed as `4586811b`; its x64 native first-run failure
+and complete rerun are preserved in independent review. P22 is a documentation-
+only boundary audit. Context and arm-signature evidence supports 123 more of
+P21's paired rows and 276 candidate-file rows, with supported ancestor chains.
+The [paired remainder](../etc/evidence/softpc/m9-t99-s30-p22-unresolved-paired-groups.tsv)
+contains 74 groups; the [candidate-file remainder](../etc/evidence/softpc/m9-t99-s30-p22-unresolved-candidate-file-groups.tsv)
+contains 221. These are distinct categories. Supported boundaries do not prove
+retained descendants, historical exceptions or full file correspondence. P22 incremental dual builds and full tests passed (186 background and 8
+native per architecture); x64 native first failed compact_console initialization
+and passed on complete rerun, cause unknown. Review, commit and push are due; S30 final qualification
+cannot start while required structure and exception checks remain open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

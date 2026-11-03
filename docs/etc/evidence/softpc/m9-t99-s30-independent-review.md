@@ -665,3 +665,20 @@ background and 8 native tests. The first x64 native group failed
 compact_console child initialization (stage 1 / error 6 / 0xc0000142); the
 complete rerun passed 8/8. The cause remains unknown. No production source
 changed and both EXE hashes remained those recorded for P20.
+
+P22 applies the same immediate unique source-context and matching-arm checks
+inside candidate files only when the ancestor chain is supported. The
+[candidate-file boundaries](m9-t99-s30-p22-candidate-file-boundaries.tsv)
+record 276 supported pairs; 221 candidate-file group rows remain in their
+[separate ledger](m9-t99-s30-p22-unresolved-candidate-file-groups.tsv).
+For the other P21 unresolved pairs, unique two- to four-line source sequences
+with no intervening same condition on either side, or unique children under
+supported parents, plus matching arm signatures support 123 pairs. Their
+[boundary evidence](m9-t99-s30-p22-ngram-boundaries.tsv) leaves 74 in the
+[paired remainder](m9-t99-s30-p22-unresolved-paired-groups.tsv). These
+evidence counts are boundary-level only; they do not clear children, existing
+local exceptions or the entire file. Both incremental builds passed and each
+architecture passed 186 background and 8 native tests. The initial x64 native
+group failed compact_console child initialization (stage 1 / error 6 /
+0xc0000142); the complete rerun passed, with cause still unknown. No production
+source or EXE changed in this batch.

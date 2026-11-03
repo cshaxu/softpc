@@ -1,0 +1,277 @@
+path	depth	parent	current_line	xp_line	condition	basis	before	after	current_end	xp_end	arms	local_arm_skip
+base/bios/reset.c	1	root	21	21	ifdef:SEGMENTATION	two_context	"#include""insignia.h"" | #include""host_def.h"""	#include<stdlib.h> | #include<stdio.h> | #includeTypesH	23	28	ifdef:SEGMENTATION	True
+base/bios/reset.c	1	root	64	68	ifdef:PRINTER	two_context	"#include""timer.h"" | #include""gendrvr.h"" | #include""virtual.h"""	"#include""fdisk.h"" | #include""trace.h"" | #include""debug.h"""	66	70	ifdef:PRINTER	False
+base/bios/reset.c	1	root	71	75	ifdef:NOVELL	two_context	"#include""trace.h"" | #include""debug.h"" | #include""video.h"""	"#include""emm.h"" | #include""quick_ev.h"" | #include""keyba.h"""	73	77	ifdef:NOVELL	True
+base/bios/reset.c	1	root	79	82	ifdef:GISP_SVGA	one_context	"#include""quick_ev.h"" | #include""keyba.h"" | #include""rom.h"""	-	81	84	ifdef:GISP_SVGA	True
+base/bios/reset.c	1	root	84	86	ifdef:LICENSING	one_context	-	VIDEOFUNCS*working_video_funcs; | KEYBDFUNCS*working_keybd_funcs;	86	88	ifdef:LICENSING	True
+base/bios/reset.c	1	root	97	98	ifndef:NTVDM	one_context	VIDEOFUNCS*working_video_funcs; | KEYBDFUNCS*working_keybd_funcs;	-	100	100	ifndef:NTVDM	False
+base/bios/reset.c	1	root	120	117	if:defined(DELTA)&&defined(A2CPU)	one_context	-	#defineint_addr(int_no)(int_no*4) | intsoft_reset=0; | externvoidnpx_resetIPT0();	122	119	if:defined(DELTA)&&defined(A2CPU)	True
+base/bios/reset.c	1	root	156	152	if:defined(NEC_98)	two_context	externvoidnpx_resetIPT0(); | externvoidcmos_clear_shutdown_byteIPT0(); | externwordmsw;	IMPORTCHAR*host_get_versionIPT0(); | IMPORTCHAR*host_get_unpublished_versionIPT0(); | IMPORTCHAR*host_get_yearsIPT0();	158	168	if:defined(NEC_98)	True
+base/bios/reset.c	1	root	166	175	ifdef:PIG	two_context	IMPORTCHAR*host_get_unpublished_versionIPT0(); | IMPORTCHAR*host_get_yearsIPT0(); | IMPORTCHAR*host_get_copyrightIPT0();	#defineSTATUS_PORT0x64 | #defineSYS_FLAG0x4 | #definePORT_A0x60	168	177	ifdef:PIG	True
+base/bios/reset.c	1	root	179	187	if:defined(NEC_98)	two_context	#defineIO_ROM_INIT0x67 | staticvoidsetup_ivt() | {	} | #defineRAM_64KB0x0 | #defineRAM_128KB0x4	282	434	if:defined(NEC_98);else:	True,False
+base/bios/reset.c	1	root	311	462	ifdef:NPX	one_context	half_word*low,*high; | { | half_wordlow_switches=0,high_switches=0;	-	316	483	ifdef:NPX;else:	True,False
+base/bios/reset.c	1	root	331	501	ifdef:CGAMONO	one_context	switch((ULONG_PTR)config_inquire(C_GFX_ADAPTER,NULL)) | { | caseCGA:	high_switches|=(PPI_CGA_80_COLUMN); | break; | caseMDA:	333	503	ifdef:CGAMONO	True
+base/bios/reset.c	1	root	340	509	ifdef:EGG	one_context	caseMDA: | high_switches|=(MDA_OR_MULTI); | break;	-	347	516	ifdef:EGG	False
+base/bios/reset.c	1	root	379	547	ifndef:PROD	one_context	"assert1(sizeof(buffer)>strlen(buffer),""get_copyrightbufferoverflow(strlen=%d)"",strlen(buffer)); | return(buffer); | }"	-	381	669	ifndef:PROD	True
+base/bios/reset.c	1	root	386	673	ifndef:NTVDM	one_context	-	EQUIPMENT_WORDequip_flag; | half_wordlow_switches,high_switches; | LONGgfxAdapt;	394	679	ifndef:NTVDM	False
+base/bios/reset.c	1	root	400	684	ifndef:NEC_98	one_context	half_wordlow_switches,high_switches; | LONGgfxAdapt; | intadapter;	-	598	880	ifndef:NEC_98	False
+base/bios/reset.c	1	root	701	975	if:defined(NEC_98)	one_context	-	ica0_init(); | ica0_post(); | ica1_init();	703	978	if:defined(NEC_98)	True
+base/bios/reset.c	1	root	717	991	ifdef:IPC	one_context	ica0_post(); | ica1_init(); | ica1_post();	-	719	993	ifdef:IPC	True
+base/bios/reset.c	1	root	781	1073	ifndef:NEC_98	one_context	-	timer_init(); | timer_post(); | keyboard_init();	784	1075	ifndef:NEC_98	False
+base/bios/reset.c	1	root	789	1079	if:defined(NEC_98)	one_context	timer_init(); | timer_post(); | keyboard_init();	-	791	1081	if:defined(NEC_98)	True
+base/bios/reset.c	1	root	794	1083	ifndef:NEC_98	one_context	-	AT_kbd_post(); | video_init();	797	1085	ifndef:NEC_98	False
+base/bios/reset.c	1	root	803	1090	ifdef:SWIN_SNDBLST_NULL	one_context	AT_kbd_post(); | video_init();	-	805	1092	ifdef:SWIN_SNDBLST_NULL	True
+base/bios/reset.c	1	root	969	1287	ifndef:NTVDM	one_context	-	diskette_post(); | disk_post();	972	1289	ifndef:NTVDM	False
+base/bios/reset.c	1	root	980	1296	ifdef:NTVDM	one_context	diskette_post(); | disk_post();	-	982	1300	ifdef:NTVDM	True
+base/bios/reset.c	1	root	993	1310	ifdef:HFX	one_context	-	} | GLOBALvoidreset_bios_flagsIFN0() | {	995	1312	ifdef:HFX	True
+base/bios/reset.c	1	root	1020	1336	if:defined(NEC_98)	one_context	sas_PW8(alt_input,0); | cmos_clear_shutdown_byte(); | }	-	1022	1760	if:defined(NEC_98)	True
+base/ccpu386/c_main.c	1	root	25	25	ifdef:PIG	two_context	#include<xt.h> | #include<sas.h> | #include<ccpusas4.h>	#includeCpuH | #include<bios.h> | #include<debug.h>	27	27	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	175	155	ifdef:CPU_486	two_context	#include<xlat.h> | #include<xor.h> | #include<zfrsrvd.h>	#defineFIX_BT_BUG | #defineSYNCH_BOTH_WAYS | typedefunion	182	162	ifdef:CPU_486	False
+base/ccpu386/c_main.c	1	root	211	191	ifdef:LITTLEND	one_context	#defineREP_CLR(IU8)0 | #defineREP_NE(IU8)1 | #defineREP_E(IU8)2	-	219	203	ifdef:LITTLEND;else:	False,True
+base/ccpu386/c_main.c	1	root	225	208	ifdef:SFELLOW	one_context	-	#defineCPU_HW_INT_MASK(1<<0) | #defineCPU_SIGIO_EXCEPTION_MASK(1<<12) | #defineCPU_SAD_EXCEPTION_MASK(1<<13)	227	211	ifdef:SFELLOW	True
+base/ccpu386/c_main.c	1	root	238	221	ifdef:SFELLOW	one_context	#defineCPU_SAD_EXCEPTION_MASK(1<<13) | #defineCPU_RESET_EXCEPTION_MASK(1<<14) | #defineCPU_SIGALRM_EXCEPTION_MASK(1<<15)	-	240	223	ifdef:SFELLOW	True
+base/ccpu386/c_main.c	1	root	307	282	ifdef:PIG	two_context	LOCALVOIDcheck_io_permission_mapIPT2(IU32,port_addr,IUM8,port_width); | ISM32in_C; | LOCALBOOLquick_mode=FALSE;	#defineFRAMES9 | GLOBALIS32simulate_level=0; | LOCALjmp_buflongjmp_env_stack[FRAMES];	316	310	ifdef:PIG;else:	True,False
+base/ccpu386/c_main.c	1	root	336	330	ifdef:PIG	two_context	GLOBALIS32simulate_level=0; | LOCALjmp_buflongjmp_env_stack[FRAMES]; | LOCALjmp_bufnext_inst[FRAMES];	GLOBALSEGMENT_REGISTERCCPU_SR[6]; | GLOBALIU32CCPU_TR[8]; | GLOBALIU32CCPU_DR[8];	341	337	ifdef:PIG;else:	True,False
+base/ccpu386/c_main.c	1	root	512	472	ifndef:SFELLOW	one_context	LOCALIU32cpu_heartbeat; | GLOBALIUHPigSynchCount=0; | IMPORTVOIDdispatch_q_event();	-	534	536	ifndef:SFELLOW;else:	False,True
+base/ccpu386/c_main.c	1	root	537	538	ifdef:SFELLOW	one_context	-	IMPORTintdo_condition_checks; | IMPORTvoidcheck_I(); | GLOBALPHY_ADDRSasWrapMask=0xfffff;	539	544	ifdef:SFELLOW	True
+base/ccpu386/c_main.c	1	root	589	592	ifdef:PIG	two_context	#defineCANCEL_HOST_IP()\ | quick_mode=FALSE;\ | p_start=p=(IU8*)0;	GLOBALINTm_seg[3]; | GLOBALULONGm_off[3]; | GLOBALULONGm_la[3];	605	614	ifdef:PIG;else:	True,False
+base/ccpu386/c_main.c	1	root	621	630	if:defined(PIG)&&defined(SFELLOW)	two_context	GLOBALULONGsave_id[3]; | GLOBALULONGm_la2[3]; | GLOBALULONGm_pa2[3];	externvoidInitNpxIPT1(IBOOL,disable); | LOCALVOID | invalidFunctionIFN0()	623	637	if:defined(PIG)&&defined(SFELLOW)	True
+base/ccpu386/c_main.c	1	root	749	761	ifdef:PIG	one_context	single_instruction_delay=FALSE; | took_relative_jump=FALSE; | took_absolute_toc=FALSE;	-	751	766	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	804	803	ifdef:PIG	one_context	-	QUICK_EVENT_TICK(); | p_start=p; | segment_override=SEG_CLR;	806	806	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	1098	1097	ifdef:SPC486	one_context	inst32=LMSW; | gotoTYPE0F00_2; | case7:	-	1103	1107	ifdef:SPC486;else:	True,False
+base/ccpu386/c_main.c	1	root	1239	1249	ifdef:PIG	one_context	-	break; | case0x20: | if(GET_CPL()!=0)	1244	1255	ifdef:PIG;else:	True,False
+base/ccpu386/c_main.c	1	root	1326	1337	ifdef:SYNCH_BOTH_WAYS	two_context	UPDATE_INTEL_IP_USE_OP_SIZE(p); | (*inst32)(ops[0].sng); | CANCEL_HOST_IP();	if(took_relative_jump) | { | PIG_SYNCH(CHECK_ALL);	1328	1339	ifdef:SYNCH_BOTH_WAYS	False
+base/ccpu386/c_main.c	1	root	1392	1403	ifndef:FIX_BT_BUG	two_context	break; | case0xa3: | inst32328=BT;	modRM=GET_INST_BYTE(p); | if(GET_OPERAND_SIZE()==USE16) | {	1394	1405	ifndef:FIX_BT_BUG	True
+base/ccpu386/c_main.c	1	root	1465	1475	ifndef:FIX_BT_BUG	two_context	break; | case0xab: | instp32328=BTS;	TYPE0FAB: | modRM=GET_INST_BYTE(p); | if(GET_OPERAND_SIZE()==USE16)	1467	1477	ifndef:FIX_BT_BUG	True
+base/ccpu386/c_main.c	1	root	1528	1544	ifdef:SPC486	one_context	-	break; | case0xb2:instp32p32=LSS;gotoTYPEC4;	1533	1568	ifdef:SPC486;else:	True,False
+base/ccpu386/c_main.c	1	root	1538	1573	ifndef:FIX_BT_BUG	two_context	break; | case0xb2:instp32p32=LSS;gotoTYPEC4;	case0xb4:instp32p32=LFS;gotoTYPEC4; | case0xb5:instp32p32=LGS;gotoTYPEC4; | case0xb6:	1543	1577	ifndef:FIX_BT_BUG;else:	True,False
+base/ccpu386/c_main.c	1	root	1609	1643	ifndef:FIX_BT_BUG	two_context	break; | case0xbb: | instp32328=BTC;	case0xbc: | modRM=GET_INST_BYTE(p); | if(GET_OPERAND_SIZE()==USE16)	1614	1647	ifndef:FIX_BT_BUG;else:	True,False
+base/ccpu386/c_main.c	1	root	1683	1724	ifdef:SPC486	one_context	-	break; | case0xc8: | case0xc9:	1688	1750	ifdef:SPC486;else:	True,False
+base/ccpu386/c_main.c	1	root	1701	1763	ifdef:SPC486	one_context	case0xcd: | case0xce: | case0xcf:	-	1706	1782	ifdef:SPC486;else:	True,False
+base/ccpu386/c_main.c	1	root	2245	2317	ifdef:PIG	two_context	TYPE70: | D_Jb(0); | UPDATE_INTEL_IP_USE_OP_SIZE(p);	(*inst32)(ops[0].sng); | CANCEL_HOST_IP();	2247	2361	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	2252	2365	ifdef:PIG	two_context	(*inst32)(ops[0].sng); | CANCEL_HOST_IP();	break; | case0x71:inst32=JNO;gotoTYPE70; | case0x72:inst32=JB;gotoTYPE70;	2254	2386	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	2700	2831	ifdef:PIG	one_context	-	quick_mode=FALSE; | break; | }	2702	2846	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	3173	3316	ifdef:PIG	two_context	immed<<=8; | } | immed|=ops[0].sng;	break; | } | if(GET_OPERAND_SIZE()==USE16)	3202	3356	ifdef:PIG;else:	True,False
+base/ccpu386/c_main.c	1	root	3347	3501	ifdef:PIG	one_context	IRET(); | CANCEL_HOST_IP(); | PIG_SYNCH(CHECK_ALL);	softpc_host_debug_retired(); | gotoNEXT_INST; | break;	3349	3511	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	3478	3638	ifndef:PIG	two_context	D_Ib(0); | UPDATE_INTEL_IP(p); | PIG_SYNCH(CHECK_NO_EXEC);	SYNCH_TICK(); | break; | case0xd7:	3487	3647	ifndef:PIG	False
+base/ccpu386/c_main.c	1	root	3514	3674	ifdef:PIG	two_context	TakeNpxExceptionInt(); | gotoDO_INST; | }	modRM=GET_INST_BYTE(p); | ZFRSRVD(((opcode-0xd8)*0x100)+modRM); | break;	3516	3679	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	3540	3702	ifdef:PIG	two_context	(*inst232)(ops[0].sng); | } | CANCEL_HOST_IP();	break; | case0xe1: | inst32=LOOPE16;	3542	3723	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	4036	4196	ifdef:PIG	one_context	GP((IU16)0,FAULT_CCPU_STI_ACCESS); | STI(); | UPDATE_INTEL_IP(p);	softpc_host_debug_retired(); | gotoNEXT_INST; | case0xfc:	4038	4202	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	4181	4335	ifdef:SYNCH_TIMERS	one_context	-	if(cpu_interrupt_map&CPU_RESET_EXCEPTION_MASK) | { | cpu_interrupt_map&=~CPU_RESET_EXCEPTION_MASK;	4183	4337	ifdef:SYNCH_TIMERS	True
+base/ccpu386/c_main.c	1	root	4200	4353	ifdef:SYNCH_TIMERS	two_context	SET_POP_DISP(0); | gotoNEXT_INST; | }	if(cpu_interrupt_map&CPU_SIGALRM_EXCEPTION_MASK) | { | cpu_interrupt_map&=~CPU_SIGALRM_EXCEPTION_MASK;	4202	4355	ifdef:SYNCH_TIMERS	True
+base/ccpu386/c_main.c	1	root	4326	4492	if:defined(SFELLOW)&&!defined(PROD)	one_context	RESUME_FETCH: | softpc_ccpu_lifecycle_checkpoint(FALSE,0); | CCPU_save_EIP=GET_EIP();	SET_OPERAND_SIZE(GET_CS_AR_X()); | SET_ADDRESS_SIZE(GET_CS_AR_X()); | took_relative_jump=FALSE;	4328	4497	if:defined(SFELLOW)&&!defined(PROD)	True
+base/ccpu386/c_main.c	1	root	4359	4527	ifdef:PIG	one_context	if(cpu_interrupt_map==0&& | start_trap==0&& | nr_inst_break==0	-	4361	4529	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	4419	4586	ifndef:SFELLOW	two_context	if(map_word&width_mask[width-1]) | GP((IU16)0,FAULT_CHKIOMAP_ACCESS); | }	GLOBALIU8 | ccpu_new_code_page | IFN1(	4448	4615	ifndef:SFELLOW	False
+base/ccpu386/c_main.c	1	root	4471	4638	ifdef:PIG	one_context	SET_EIP(GET_EIP()+CCPU_INSTRUCTION_DELTA(*q)); | SETUP_HOST_IP(*q) | p_start=*q;	} | GLOBALVOID | c_cpu_initIFN0()	4481	4646	ifdef:PIG;else:	True,False
+base/ccpu386/c_main.c	1	root	4492	4657	ifdef:PIG	one_context	c_cpu_initIFN0() | { | SAVEDIBOOLfirst=TRUE;	-	4494	4682	ifdef:PIG	True
+base/ccpu386/c_main.c	1	root	4561	4738	ifdef:SPC486	two_context	c_cpu_resetIFN0() | { | IBOOLdisableNpx=FALSE;	SET_RF(0);SET_VM(0);SET_NT(0);SET_IOPL(0); | SET_PF(0);SET_CF(0);SET_AF(0);SET_ZF(0);SET_SF(0);SET_OF(0); | SET_TF(0);SET_IF(0);SET_DF(0);	4563	4740	ifdef:SPC486	True
+base/ccpu386/c_main.c	1	root	4597	4773	ifdef:SPC486	two_context	SET_GS_BASE(0); | load_pseudo_descr(GS_REG); | SET_CR(CR_STAT,0);	SET_DR(DR_DAR0,0); | SET_DR(DR_DAR1,0); | SET_DR(DR_DAR2,0);	4599	4776	ifdef:SPC486	True
+base/ccpu386/c_main.c	1	root	4624	4800	ifdef:SPC486	two_context	SET_TR_AR_SUPER(3); | SET_EAX(0); | SET_ECX(0);	SET_EBX(0); | SET_ESP(0); | SET_EBP(0);	4629	4804	ifdef:SPC486;else:	True,False
+base/ccpu386/c_main.c	1	root	4637	4812	if:defined(SWITCHNPX)	two_context	SET_EBP(0); | SET_ESI(0); | SET_EDI(0);	if(disableNpx) | SET_ET(0); | else	4639	4815	if:defined(SWITCHNPX)	True
+base/ccpu386/c_main.c	1	root	4707	4889	ifdef:PIG	one_context	-	GLOBALVOID | c_cpu_EOA_hookIFN0() | {	4709	4921	ifdef:PIG	True
+base/inc/cpu_vid.h	1	root	32	32	ifndef:NO_STRING_OPERATIONS	two_context	{ | void(*b_write)IPT2(ULONG,value,ULONG,offset); | void(*w_write)IPT2(ULONG,value,ULONG,offset);	}WRT_POINTERS; | typedefstruct | {	45	45	ifndef:NO_STRING_OPERATIONS	False
+base/inc/cpu_vid.h	1	root	71	70	ifdef:VGG	two_context	WRT_POINTERSmode_0[32]; | WRT_POINTERSmode_1[2]; | WRT_POINTERSmode_2[16];	}CHN_TABLE; | typedefstruct | {	73	72	ifdef:VGG	False
+base/inc/cpu_vid.h	1	root	79	78	ifdef:VGG	two_context	typedefstruct | { | CHN_TABLEnch;	}MODE_TABLE; | externMODE_TABLEmode_table; | typedefstruct	81	80	ifdef:VGG	False
+base/inc/cpu_vid.h	1	root	99	90	ifndef:NO_STRING_OPERATIONS	one_context	-	}READ_POINTERS; | typedefstruct | {	101	92	ifndef:NO_STRING_OPERATIONS	False
+base/inc/cpu_vid.h	1	root	134	112	ifndef:CPU_40_STYLE	one_context	-	externWRT_POINTERSsimple_writes; | externWRT_POINTERSdth_md0_writes,dth_md1_writes,dth_md2_writes,dth_md3_writes; | externWRT_POINTERSch2_md0,ch2_md1,ch2_md2,ch2_md3,ch2_mdcopy;	136	126	ifndef:CPU_40_STYLE	True
+base/inc/egacpu.h	1	root	22	22	ifdef:BIT_ORDER1	one_context	}CHANGE_TYPE; | typedefunion | {	-	54	80	ifdef:BIT_ORDER1;else:	True,False
+base/inc/egacpu.h	1	root	91	117	if:defined(NEC_98)	one_context	UTINY*route_reg2; | UTINY*screen_ptr; | ULONGrotate;	-	96	141	if:defined(NEC_98);else:	True,False
+base/inc/egacpu.h	1	root	109	149	if:defined(NEC_98)	one_context	-	ULONGsaved_state; | ULONGsaved_mode_chain;	125	155	if:defined(NEC_98);else:	True,False
+base/inc/egacpu.h	1	root	129	158	if:defined(NEC_98)	two_context	ULONGsaved_state; | ULONGsaved_mode_chain;	ULONGfun_or_protection; | ULONGcalc_data_xor; | ULONGcalc_latch_xor;	134	162	if:defined(NEC_98);else:	True,False
+base/inc/egacpu.h	1	root	152	179	ifdef:V7VGA	one_context	UTINYdoubleword; | UTINY*plane_offset; | UTINY*read_mapped_plane_ch2;	-	155	182	ifdef:V7VGA	False
+base/inc/egacpu.h	1	root	164	189	if:defined(NEC_98)	one_context	-	#defineUNCHAINED0 | #defineCHAIN21 | #defineCHAIN42	271	459	if:defined(NEC_98);else:	True,False
+base/inc/egacpu.h	1	root	282	469	if:defined(NEC_98)	two_context	#defineCHAIN42 | IMPORTULONGsr_lookup[16]; | #defineN_WRITE_TYPES24	#definedo_logicals(val,latch)(((latch)&((val&getVideodata_and_mask())\ | ^getVideodata_xor_mask()))|(val&((latch)^getVideolatch_xor_mask()))) | externvoidega_mode0_gen_chn_b_writeIPT1(byte*,arg1);	317	532	if:defined(NEC_98);else:	True,False
+base/inc/egacpu.h	1	root	356	570	ifdef:VGG	one_context	externvoidega_mode0_copy1_mask_b_write1IPT1(byte*,arg1); | externvoidega_mode0_copy1_mask_b_write2IPT1(byte*,arg1); | externvoidega_mode0_copy1_mask_b_write3IPT1(byte*,arg1);	-	397	611	ifdef:VGG	False
+base/inc/gmi.h	1	root	37	28	ifndef:UNIVERSAL	one_context	-	#defineFORWARDS0 | #defineBACKWARDS1	62	56	ifndef:UNIVERSAL	False
+base/inc/gmi.h	1	root	71	65	ifdef:EGATEST	one_context	#defineFORWARDS0 | #defineBACKWARDS1	-	82	83	ifdef:EGATEST;else:	True,False
+base/inc/ica.h	1	root	32	32	ifndef:HOST_CPU_MOUSE_INT	two_context	#defineEGA_VTRACE_INT2 | #defineAT_EGA_VTRACE_INT1 | #defineAT_EGA_VTRACE_ADAPTER1	#defineCPU_TIMER_INT0 | #defineCPU_KB_INT1 | #defineCPU_MOUSE_INTHOST_CPU_MOUSE_INT	37	37	ifndef:HOST_CPU_MOUSE_INT	False
+base/inc/ica.h	1	root	48	48	if:defined(NEC_98)	two_context	#defineAT_CPU_MOUSE_INTHOST_AT_CPU_MOUSE_INT | #defineAT_CPU_MOUSE_ADAPTERHOST_AT_CPU_MOUSE_ADAPTER | #defineMOUSE_VECHOST_AT_MOUSE_INT_VEC	#defineCPU_RS232_SEC_INT3 | #defineCPU_RS232_PRI_INT4 | #defineCPU_DISK_INT5	50	50	if:defined(NEC_98)	True
+base/inc/ica.h	1	root	58	57	if:defined(NEC_98)	two_context	#defineCPU_DISK_INT5 | #defineCPU_DISKETTE_INT6 | #defineCPU_PRINTER_INT7	#defineCPU_PRINTER2_INT5 | #defineCPU_RTC_INT0	60	60	if:defined(NEC_98)	True
+base/inc/ica.h	1	root	71	70	if:defined(NOVELL)||defined(NOVELL_IPX)	one_context	#defineCPU_PRINTER2_INT5 | #defineCPU_RTC_INT0	-	73	72	if:defined(NOVELL)||defined(NOVELL_IPX)	True
+base/inc/ica.h	1	root	81	78	if:defined(ASPI)	one_context	-	#defineCPU_AT_NPX_INT5 | #defineCPU_AT_DISK_INT6	83	80	if:defined(ASPI)	True
+base/inc/ica.h	1	root	90	86	ifndef:CPU_30_STYLE	two_context	#defineCPU_AT_NPX_INT5 | #defineCPU_AT_DISK_INT6	#defineDIVIDE_OVERFLOW_INT0 | #defineEND_INTERRUPT0x20 | externvoidica0_initIPT0();	105	98	ifndef:CPU_30_STYLE	False
+base/inc/ica.h	1	root	122	114	if:defined(NTVDM)	one_context	externIU8ica_scan_irrIPT1(IU32,adapter); | externvoidica_interrupt_cpuIPT2(IU32,adapter,IU32,line); | externvoidica_eoiIPT3(IU32,adapter,IS32*,line,IBOOL,rotate);	-	190	213	if:defined(NTVDM);else:	True,False
+base/inc/ios.h	1	root	412	708	if:defined(NEC_98)	one_context	-	#defineIO_READ1 | #defineIO_WRITE2 | #defineIO_READ_WRITE(IO_READ|IO_WRITE)	414	710	if:defined(NEC_98)	True
+base/inc/ios.h	1	root	443	738	ifdef:SPC386	two_context	IMPORTvoidoutbIPT2(io_addr,io_address,half_word,value); | IMPORTvoidinwIPT2(io_addr,io_address,word*,value); | IMPORTvoidoutwIPT2(io_addr,io_address,word,value);	IMPORTvoidio_define_inb | (	446	741	ifdef:SPC386	False
+base/inc/ios.h	1	root	450	745	ifdef:ANSI	one_context	IMPORTvoidio_define_inb | (	-	452	748	ifdef:ANSI	True
+base/inc/ios.h	1	root	456	751	ifdef:SFELLOW	one_context	-	IMPORTvoidio_define_in_routines | (	458	767	ifdef:SFELLOW	True
+base/inc/ios.h	1	root	463	771	ifdef:ANSI	two_context	IMPORTvoidio_define_in_routines | (	); | IMPORTvoidio_define_outb | (	465	779	ifdef:ANSI	True
+base/inc/ios.h	1	root	471	784	ifdef:ANSI	one_context	); | IMPORTvoidio_define_outb | (	-	473	787	ifdef:ANSI	True
+base/inc/ios.h	1	root	477	790	ifdef:SFELLOW	one_context	-	IMPORTvoidio_define_out_routines | (	479	806	ifdef:SFELLOW	True
+base/inc/ios.h	1	root	484	810	ifdef:ANSI	one_context	IMPORTvoidio_define_out_routines | (	-	486	818	ifdef:ANSI	True
+base/inc/ios.h	1	root	490	821	ifdef:NTVDM	one_context	-	IMPORTvoidio_disconnect_portIPT2(io_addr,io_address,half_word,adapter); | IMPORTvoidio_initIPT0();	496	827	ifdef:NTVDM;else:	True,False
+base/inc/ios.h	1	root	503	833	ifdef:MAC68K	two_context	IMPORTvoidio_disconnect_portIPT2(io_addr,io_address,half_word,adapter); | IMPORTvoidio_initIPT0();	IMPORTvoid(*Ios_inb_function[]) | IPT2(io_addr,io_address,half_word*,value); | IMPORTvoid(*Ios_inw_function[])	509	839	ifdef:MAC68K;else:	True,False
+base/inc/ios.h	1	root	534	864	ifndef:FAST_FUNC_ADDR	two_context	IPT3(io_addr,io_address,half_word*,valarray,word,count); | IMPORTvoid(*Ios_outsw_function[]) | IPT3(io_addr,io_address,word*,valarray,word,count);	#defineio_redefine_outb(adaptor,func)Ios_outb_function[adaptor]=FAST_FUNC_ADDR(func) | #defineio_redefine_inb(adaptor,func)Ios_inb_function[adaptor]=FAST_FUNC_ADDR(func)	536	866	ifndef:FAST_FUNC_ADDR	False
+base/keymouse/ppi.c	1	root	18	17	ifdef:SCCSID	one_context	"#include""insignia.h"" | #include""host_def.h"""	-	20	19	ifdef:SCCSID	True
+base/keymouse/ppi.c	1	root	23	21	ifdef:SEGMENTATION	one_context	-	"#include<stdio.h> | #include""xt.h"" | #include""ios.h"""	25	28	ifdef:SEGMENTATION	True
+base/keymouse/ppi.c	1	root	41	43	ifndef:PROD	one_context	"#include""ios.h"" | #include""ppi.h"" | #include""timer.h"""	"#include""debug.h"" | #include""compat/devices/snapshot.h"" | statichalf_wordppi_register;"	43	45	ifndef:PROD	True
+base/keymouse/ppi.c	1	root	69	69	ifndef:NTVDM	two_context	statichalf_wordppi_register; | #definePPI_BIT_MASK0x3F1 | staticbooleangate_2_was_low=TRUE;	voidppi_inbIFN2(io_addr,port,half_word*,value) | {	73	71	ifndef:NTVDM	False
+base/keymouse/ppi.c	1	root	90	87	ifndef:NEC_98	two_context	voidppi_inbIFN2(io_addr,port,half_word*,value) | {	} | voidppi_outbIFN2(io_addr,port,half_word,value) | {	113	109	ifndef:NEC_98	False
+base/keymouse/ppi.c	1	root	119	114	ifndef:NEC_98	one_context	} | voidppi_outbIFN2(io_addr,port,half_word,value) | {	-	178	182	ifndef:NEC_98	False
+base/system/ica.c	1	root	133	132	ifdef:SCCSID	one_context	"#include""host_def.h"" | #include<stdio.h> | #includeTypesH"	-	135	134	ifdef:SCCSID	True
+base/system/ica.c	1	root	146	148	if:!defined(NTVDM)	one_context	-	"#include""xt.h"" | #include""trace.h"" | #include""ios.h"""	151	152	if:!defined(NTVDM)	False
+base/system/ica.c	1	root	241	305	ifdef:HOOKED_IRETS	one_context	-	#defineICA_BASE_MASK0xf8 | #defineICA_IC40x0001 | #defineICA_SINGL0x0002	245	309	ifdef:HOOKED_IRETS	False
+base/system/ica.c	1	root	303	367	ifdef:HOOKED_IRETS	one_context	:ICA_SLAVE\ | ) | IS32ica_acceptIPT1(IU32,adapter);	-	305	369	ifdef:HOOKED_IRETS	False
+base/system/ica.c	1	root	307	371	if:!defined(NTVDM)	one_context	-	GLOBALvoid | ica_eoiIFN3(IU32,adapter,IS32*,line,IBOOL,rotate) | {	320	383	if:!defined(NTVDM)	False
+base/system/ica.c	1	root	369	431	ifndef:PROD	two_context	EoiLineNo=*line; | asp->ica_isr&=~bit; | }	if(rotate&&(*line>=0)) | asp->ica_hipri=(USHORT)((*line+1)&0x07);	371	437	ifndef:PROD	True
+base/system/ica.c	1	root	377	442	ifdef:EOI_HOOKS	two_context	if(rotate&&(*line>=0)) | asp->ica_hipri=(USHORT)((*line+1)&0x07);	if((i=ica_scan_irr(adapter))&0x80) | ica_interrupt_cpu(adapter,i&0x07); | }	383	448	ifdef:EOI_HOOKS	False
+base/system/ica.c	1	root	418	483	if:defined(NTVDM)	two_context	IU32i,j; | IUM8bit,irr_and_not_imr,active_isr; | IUM8iret_hook_mask;	irr_and_not_imr=asp->ica_irr&~(asp->ica_imr|iret_hook_mask); | if(asp->ica_mode&(ICA_SMM|ICA_SFNM)) | {	425	494	if:defined(NTVDM);else:	True,False
+base/system/ica.c	1	root	514	582	if:0	one_context	"if(!((line1=(IU32)ica_scan_irr(adapter))&0x80)) | { | note_trace1(ICA_VERBOSE,""ica_int_accept(%c):Nointerruptfound!!"",(adapter==ICA_MASTER?'M':'S'));"	-	516	584	if:0	True
+base/system/ica.c	1	root	533	600	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	one_context	-	bit=(1<<line1); | asp->ica_isr|=bit; | if(--(asp->ica_count[line1])<=0)	543	610	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	False
+base/system/ica.c	1	root	565	632	ifndef:PROD	two_context	line2=-1; | ica_eoi(adapter,&line2,(asp->ica_mode&ICA_RAEOI)==ICA_RAEOI); | }	return((IS32)line1); | } | GLOBALvoid	567	638	ifndef:PROD	True
+base/system/ica.c	1	root	589	659	ifndef:PROD	two_context	ADAPTER_STATE*asp=&adapter_state[adapter]; | if(asp->ica_cpu_int) | {	asp->ica_int_line=line; | return; | }	591	665	ifndef:PROD	True
+base/system/ica.c	1	root	607	680	ifndef:PROD	one_context	asp->ica_cpu_int=TRUE; | if(asp->ica_master) | {	-	609	686	ifndef:PROD	True
+base/system/ica.c	1	root	636	710	ifndef:PROD	one_context	-	ica_lock_dec(); | ica_hw_interrupt(ICA_MASTER,asp->ica_ssr,1); | ica_lock_inc();	638	716	ifndef:PROD	True
+base/system/ica.c	1	root	668	745	ifndef:PROD	two_context	} | voidSWPIC_inbIFN2(io_addr,port,IU8*,value) | {	IU32adapter=adapter_for_port(port); | ADAPTER_STATE*asp=&adapter_state[adapter];	670	747	ifndef:PROD	True
+base/system/ica.c	1	root	679	755	ifndef:PROD	two_context	IU32adapter=adapter_for_port(port); | ADAPTER_STATE*asp=&adapter_state[adapter];	if(asp->ica_mode&ICA_POLL) | { | ica_lock_set(1);	681	762	ifndef:PROD	True
+base/system/ica.c	1	root	705	785	ifndef:PROD	one_context	} | ica_lock_set(0); | host_ica_unlock();	-	707	791	ifndef:PROD	True
+base/system/ica.c	1	root	723	806	ifndef:PROD	one_context	if(asp->ica_mode&ICA_RIS) | { | *value=asp->ica_isr;	-	725	808	ifndef:PROD	True
+base/system/ica.c	1	root	731	813	ifndef:PROD	one_context	else | { | *value=asp->ica_irr;	-	733	815	ifndef:PROD	True
+base/system/ica.c	1	root	739	820	ifndef:PROD	one_context	else | { | *value=asp->ica_imr;	-	741	822	ifndef:PROD	True
+base/system/ica.c	1	root	745	825	ifndef:PROD	one_context	-	} | } | voidSWPIC_outbIFN2(io_addr,port,IU8,value)	747	831	ifndef:PROD	True
+base/system/ica.c	1	root	790	873	if:defined(NEC_98)	one_context	={-1,-1}; | IU32i; | IS32line;	-	795	877	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	809	893	if:defined(NEC_98)	one_context	-	{ | asp->ica_irr=0; | asp->ica_isr=0;	814	897	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	834	916	ifndef:PROD	two_context	asp->ica_count[i]=0; | asp->ica_cpu_int=FALSE; | sequence[adapter]=2;	return; | } | ica_lock_set(1);	836	919	ifndef:PROD	True
+base/system/ica.c	1	root	857	939	if:defined(NEC_98)	two_context	switch(sequence[adapter]) | { | case0:	{ | asp->ica_imr=value&0xff;	862	943	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	866	946	ifndef:PROD	two_context	{ | asp->ica_imr=value&0xff;	if(asp->ica_cpu_int) | { | if(asp->ica_imr&(1<<asp->ica_int_line))	868	952	ifndef:PROD	True
+base/system/ica.c	1	root	896	979	ifndef:PROD	one_context	{ | case0: | asp->ica_mode&=~ICA_RAEOI;	-	898	982	ifndef:PROD	True
+base/system/ica.c	1	root	904	987	ifndef:PROD	one_context	-	ica_eoi(adapter,&line,FALSE); | break; | case2:	906	990	ifndef:PROD	True
+base/system/ica.c	1	root	916	999	ifndef:PROD	two_context	break; | case3: | line=value&0x07;	ica_eoi(adapter,&line,FALSE); | break; | case4:	918	1005	ifndef:PROD	True
+base/system/ica.c	1	root	925	1011	ifndef:PROD	one_context	break; | case4: | asp->ica_mode|=ICA_RAEOI;	-	927	1014	ifndef:PROD	True
+base/system/ica.c	1	root	933	1019	ifndef:PROD	one_context	-	ica_eoi(adapter,&line,TRUE); | break; | case6:	935	1022	ifndef:PROD	True
+base/system/ica.c	1	root	942	1028	ifndef:PROD	two_context	break; | case6: | asp->ica_hipri=(value+1)&0x07;	break; | case7: | line=value&0x07;	944	1034	ifndef:PROD	True
+base/system/ica.c	1	root	950	1039	ifndef:PROD	two_context	break; | case7: | line=value&0x07;	ica_eoi(adapter,&line,TRUE); | break; | }	952	1045	ifndef:PROD	True
+base/system/ica.c	1	root	964	1056	ifndef:PROD	two_context	if(value&ICA_SMM_CMD) | { | asp->ica_mode=(asp->ica_mode&~ICA_SMM)|(((IU16)value<<4)&ICA_SMM);	} | if(value&ICA_POLL_CMD) | {	966	1062	ifndef:PROD	True
+base/system/ica.c	1	root	973	1068	ifndef:PROD	two_context	if(value&ICA_POLL_CMD) | { | asp->ica_mode|=ICA_POLL;	} | else | if(value&ICA_RR_CMD)	975	1071	ifndef:PROD	True
+base/system/ica.c	1	root	982	1077	ifndef:PROD	one_context	if(value&ICA_RR_CMD) | { | asp->ica_mode=(asp->ica_mode&~ICA_RIS)|(((IU16)value<<11)&ICA_RIS);	-	984	1083	ifndef:PROD	True
+base/system/ica.c	1	root	1008	1105	ifndef:PROD	two_context	else | { | asp->ica_base=value&ICA_BASE_MASK;	if(!(asp->ica_mode&ICA_SINGL)) | sequence[adapter]=3; | else	1010	1111	ifndef:PROD	True
+base/system/ica.c	1	root	1040	1139	ifndef:PROD	two_context	else | { | asp->ica_ssr=value&0xff;	if(asp->ica_mode&ICA_IC4) | sequence[adapter]=4; | else	1042	1145	ifndef:PROD	True
+base/system/ica.c	1	root	1070	1171	ifndef:PROD	two_context	{ | asp->ica_mode=(asp->ica_mode&~ICA_ICW4_MASK) | |(((IU16)value<<4)&ICA_ICW4_MASK);	} | sequence[adapter]=0; | break;	1072	1186	ifndef:PROD	True
+base/system/ica.c	1	root	1079	1192	ifndef:PROD	one_context	sequence[adapter]=0; | break; | case-1:	-	1081	1196	ifndef:PROD	True
+base/system/ica.c	1	root	1086	1200	ifndef:PROD	one_context	-	} | ica_lock_set(0); | host_ica_unlock();	1088	1202	ifndef:PROD	True
+base/system/ica.c	1	root	1108	1221	ifdef:CPU_40_STYLE	one_context	ADAPTER_STATE*asp=&adapter_state[adapter]; | IU8bit; | IU32line;	-	1110	1223	ifdef:CPU_40_STYLE	False
+base/system/ica.c	1	root	1112	1225	ifndef:PROD	one_context	-	line_no&=0xff; | host_ica_lock();	1114	1275	ifndef:PROD	True
+base/system/ica.c	1	root	1129	1289	ifndef:PROD	two_context	line_no&=0xff; | host_ica_lock();	bit=(1<<line_no); | if(!(asp->ica_irr&bit)) | {	1131	1296	ifndef:PROD	True
+base/system/ica.c	1	root	1148	1312	ifndef:PROD	one_context	asp->ica_irr|=bit; | } | asp->ica_count[line_no]+=call_count;	-	1150	1319	ifndef:PROD	True
+base/system/ica.c	1	root	1184	1353	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	one_context	-	if((line=ica_scan_irr(adapter))&0x80) | ica_interrupt_cpu(adapter,line&0x07); | ica_lock_set(0);	1202	1371	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	False
+base/system/ica.c	1	root	1263	1421	ifndef:PROD	one_context	-	host_ica_unlock(); | } | voidica_hw_interrupt_cancelIFN2(IU32,adapter,IU32,line_no)	1265	1427	ifndef:PROD	True
+base/system/ica.c	1	root	1285	1446	if:defined(HOOKED_IRETS)||defined(NTVDM)	one_context	host_ica_unlock(); | ica_clear_int(adapter,line_no); | }	-	1290	1452	if:defined(HOOKED_IRETS)||defined(NTVDM);else:	False,True
+base/system/ica.c	1	root	1315	1476	if:defined(CPU_40_STYLE)||defined(NTVDM)	two_context	ADAPTER_STATE*asp; | host_ica_lock(); | line=ica_accept(ICA_MASTER);	bit=(1<<line); | if(adapter_state[ICA_MASTER].ica_ssr&bit) | {	1321	1482	if:defined(CPU_40_STYLE)||defined(NTVDM)	False
+base/system/ica.c	1	root	1329	1490	if:defined(CPU_40_STYLE)||defined(NTVDM)	one_context	{ | line=ica_accept(ICA_SLAVE); | int_no=line+adapter_state[ICA_SLAVE].ica_base;	-	1336	1497	if:defined(CPU_40_STYLE)||defined(NTVDM)	False
+base/system/ica.c	1	root	1359	1520	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	two_context	else | { | asp=&adapter_state[ICA_MASTER];	int_no=line+asp->ica_base; | }	1370	1531	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	False
+base/system/ica.c	1	root	1376	1537	if:defined(NTVDM)	two_context	int_no=line+asp->ica_base; | }	host_ica_unlock(); | return(int_no); | }	1402	1572	if:defined(NTVDM);else:	True,False
+base/system/ica.c	1	root	1411	1580	ifndef:NTVDM	one_context	host_ica_unlock(); | return(int_no); | }	-	1640	1810	ifndef:NTVDM	False
+base/system/ica.c	1	root	1827	2043	ifdef:SEGMENTATION	one_context	-	#defineINIT0_ICW1(IU8)0x11 | #defineINIT0_ICW2(IU8)0x08	1829	2050	ifdef:SEGMENTATION	True
+base/system/ica.c	1	root	1834	2054	if:defined(NEC_98)	two_context	#defineINIT0_ICW1(IU8)0x11 | #defineINIT0_ICW2(IU8)0x08	voidica0_postIFN0() | { | ica_outb(ICA0_PORT_0,INIT0_ICW1);	1855	2076	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	1875	2095	ifdef:NTVDM	one_context	voidica0_initIFN0() | { | io_addri;	-	1881	2101	ifdef:NTVDM;else:	True,False
+base/system/ica.c	1	root	1884	2103	if:defined(NEC_98)	one_context	-	io_connect_port(i,ICA0_ADAPTOR,IO_READ_WRITE); | adapter_state[ICA_MASTER].ica_master=TRUE;	1889	2107	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	1896	2113	ifndef:NTVDM	two_context	io_connect_port(i,ICA0_ADAPTOR,IO_READ_WRITE); | adapter_state[ICA_MASTER].ica_master=TRUE;	} | #defineINIT1_ICW1(IU8)0x11	1916	2132	ifndef:NTVDM	False
+base/system/ica.c	1	root	1923	2138	if:defined(NEC_98)	two_context	} | #defineINIT1_ICW1(IU8)0x11	voidica1_postIFN0() | { | ica_outb(ICA1_PORT_0,INIT1_ICW1);	1939	2160	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	1962	2182	ifdef:NTVDM	one_context	voidica1_initIFN0() | { | io_addri;	-	1968	2188	ifdef:NTVDM;else:	True,False
+base/system/ica.c	1	root	1971	2190	if:defined(NEC_98)	one_context	-	io_connect_port(i,ICA1_ADAPTOR,IO_READ_WRITE); | adapter_state[ICA_SLAVE].ica_master=FALSE;	1976	2194	if:defined(NEC_98);else:	True,False
+base/system/ica.c	1	root	1982	2199	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	one_context	io_connect_port(i,ICA1_ADAPTOR,IO_READ_WRITE); | adapter_state[ICA_SLAVE].ica_master=FALSE;	} | GLOBALint | softpc_device_snapshot_capture_pic(state)	1988	2205	if:defined(CPU_40_STYLE)&&!defined(NTVDM)	False
+base/video/vga_mode.c	1	root	95	95	ifndef:REAL_VGA	one_context	"#include""insignia.h"" | #include""host_def.h"""	-	570	590	ifndef:REAL_VGA	False
+host/inc/cfpu_def.h	1	root	15	15	if:!defined(HOST_BIAS)	one_context	typedefdoubleFPH; | #defineFPHOSTFP64 | #defineHOST_MAX_EXP2047	-	17	17	if:!defined(HOST_BIAS)	False
+host/src/nt_cga.c	1	root	69	99	if:defined(NEC_98)	one_context	-	staticunsignedintcga_med_graph_hi_nyb[256]; | staticunsignedintcga_med_graph_lo_nyb[256];	71	102	if:defined(NEC_98)	True
+host/src/nt_cga.c	1	root	78	108	ifdef:BIGWIN	one_context	staticunsignedintcga_med_graph_hi_nyb[256]; | staticunsignedintcga_med_graph_lo_nyb[256];	-	80	117	ifdef:BIGWIN	True
+host/src/nt_cga.c	1	root	109	139	if:defined(NEC_98)	one_context	-	voidnt_init_text() | { | half_wordmisc;	111	164	if:defined(NEC_98)	True
+host/src/nt_cga.c	1	root	126	181	ifdef:X86GFX	one_context	"half_wordmisc; | IMPORTvoidvga_misc_inb(io_addr,half_word*); | sub_note_trace0(HERC_HOST_VERBOSE,""nt_init_text"");"	-	128	183	ifdef:X86GFX	True
+host/src/nt_cga.c	1	root	136	197	if:defined(JAPAN)||defined(KOREA)	one_context	-	} | voidnt_init_cga_mono_graph() | {	138	212	if:defined(JAPAN)||defined(KOREA)	True
+host/src/nt_cga.c	1	root	181	253	ifdef:BIGEND	one_context	byte2=(i&0x0C)>>2; | byte3=(i&0x30)>>4; | byte4=(i&0xC0)>>6;	-	183	288	ifdef:BIGEND	True
+host/src/nt_cga.c	1	root	186	290	ifdef:LITTLEND	one_context	-	} | cga_colour_med_deja_vu=TRUE; | }	198	325	ifdef:LITTLEND	False
+host/src/nt_cga.c	1	root	219	346	ifndef:NEC_98	two_context	"sub_note_trace0(CGA_HOST_VERBOSE,""nt_init_cga_colour_hi_graph""); | sc.BitsPerPixel=MONO_BITS_PER_PIXEL; | }"	voidnt_cga_mono_graph_std(intoffset,intscreen_x,intscreen_y, | intlen,intheight) | {	398	508	ifndef:NEC_98	False
+host/src/nt_cga.c	1	root	543	652	ifdef:BIGWIN	two_context	voidnt_cga_colour_med_graph_big(intoffset,intscreen_x,intscreen_y, | intlen,intheight) | {	} | voidnt_cga_colour_med_graph_huge(intoffset,intscreen_x,intscreen_y, | intlen,intheight)	545	740	ifdef:BIGWIN	True
+host/src/nt_cga.c	1	root	556	750	ifdef:BIGWIN	two_context	voidnt_cga_colour_med_graph_huge(intoffset,intscreen_x,intscreen_y, | intlen,intheight) | {	} | voidnt_cga_colour_hi_graph_std(intoffset,intscreen_x,intscreen_y, | intlen,intheight)	558	844	ifdef:BIGWIN	True
+host/src/nt_cga.c	1	root	646	931	ifdef:BIGWIN	two_context	voidnt_cga_colour_hi_graph_big(intoffset,intscreen_x,intscreen_y, | intlen,intheight) | {	} | voidnt_cga_colour_hi_graph_huge(intoffset,intscreen_x,intscreen_y, | intlen,intheight)	648	1007	ifdef:BIGWIN	True
+host/src/nt_cga.c	1	root	659	1017	ifdef:BIGWIN	one_context	voidnt_cga_colour_hi_graph_huge(intoffset,intscreen_x,intscreen_y, | intlen,intheight) | {	-	661	1078	ifdef:BIGWIN	True
+host/src/nt_graph.c	1	root	30	30	ifdef:X86GFX	two_context	"#include<windows.h> | #include""host_def.h"" | #include""insignia.h"""	"#include<sys\types.h> | #include""xt.h"" | #includeCpuH"	32	32	ifdef:X86GFX	True
+host/src/nt_graph.c	1	root	79	77	ifdef:EGG	one_context	"#include<malloc.h> | #include""trace.h"" | #include""debug.h"""	-	81	79	ifdef:EGG	False
+host/src/nt_graph.c	1	root	89	81	if:defined(NEC_98)	one_context	-	staticintflush_count=0; | #defineDIB_PAL_INDICES2 | SCREEN_DESCRIPTIONsc;	94	94	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	108	107	ifdef:BIGWIN	two_context	staticintflush_count=0; | #defineDIB_PAL_INDICES2 | SCREEN_DESCRIPTIONsc;	inthost_screen_scale; | inthost_display_depth=8; | inttop_plane;	110	109	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	122	121	if:defined(NEC_98)	one_context	PBITMAPINFOVGADIB; | void(*paint_screen)(); | BOOLFunnyPaintMode;	-	124	123	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	127	125	if:defined(JAPAN)||defined(KOREA)	one_context	-	staticPAINTFUNCSstd_mono_paint_funcs= | {	129	129	if:defined(JAPAN)||defined(KOREA)	True
+host/src/nt_graph.c	1	root	135	134	if:defined(NEC_98)	two_context	staticPAINTFUNCSstd_mono_paint_funcs= | {	nt_text, | nt_cga_mono_graph_std, | nt_cga_mono_graph_std,	137	147	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	149	158	ifdef:V7VGA	two_context	nt_vga_mono_graph_std, | nt_vga_mono_med_graph_std, | nt_vga_mono_hi_graph_std,	}; | staticPAINTFUNCSbig_mono_paint_funcs= | {	151	160	ifdef:V7VGA	False
+host/src/nt_graph.c	1	root	156	165	if:defined(NEC_98)	two_context	}; | staticPAINTFUNCSbig_mono_paint_funcs= | {	nt_text, | nt_cga_mono_graph_big, | nt_cga_mono_graph_big,	158	178	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	170	189	ifdef:V7VGA	two_context	nt_vga_mono_graph_big, | nt_vga_mono_med_graph_big, | nt_vga_mono_hi_graph_big,	}; | staticPAINTFUNCShuge_mono_paint_funcs= | {	172	191	ifdef:V7VGA	False
+host/src/nt_graph.c	1	root	177	196	if:defined(NEC_98)	two_context	}; | staticPAINTFUNCShuge_mono_paint_funcs= | {	nt_text, | nt_cga_mono_graph_huge, | nt_cga_mono_graph_huge,	179	209	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	191	220	ifdef:V7VGA	two_context	nt_vga_mono_graph_huge, | nt_vga_mono_med_graph_huge, | nt_vga_mono_hi_graph_huge,	}; | staticPAINTFUNCSstd_colour_paint_funcs= | {	193	222	ifdef:V7VGA	False
+host/src/nt_graph.c	1	root	198	227	if:defined(NEC_98)	two_context	}; | staticPAINTFUNCSstd_colour_paint_funcs= | {	nt_text, | nt_cga_colour_med_graph_std, | nt_cga_colour_hi_graph_std,	200	240	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	212	251	ifdef:V7VGA	two_context	nt_vga_graph_std, | nt_vga_med_graph_std, | nt_vga_hi_graph_std,	}; | staticPAINTFUNCSbig_colour_paint_funcs= | {	214	253	ifdef:V7VGA	False
+host/src/nt_graph.c	1	root	219	258	if:defined(NEC_98)	two_context	}; | staticPAINTFUNCSbig_colour_paint_funcs= | {	nt_text, | nt_cga_colour_med_graph_big, | nt_cga_colour_hi_graph_big,	221	271	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	233	282	ifdef:V7VGA	two_context	nt_vga_graph_big, | nt_vga_med_graph_big, | nt_vga_hi_graph_big,	}; | staticPAINTFUNCShuge_colour_paint_funcs= | {	235	284	ifdef:V7VGA	False
+host/src/nt_graph.c	1	root	240	289	if:defined(NEC_98)	two_context	}; | staticPAINTFUNCShuge_colour_paint_funcs= | {	nt_text, | nt_cga_colour_med_graph_huge, | nt_cga_colour_hi_graph_huge,	242	302	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	254	313	ifdef:V7VGA	one_context	nt_vga_graph_huge, | nt_vga_med_graph_huge, | nt_vga_hi_graph_huge,	-	256	315	ifdef:V7VGA	False
+host/src/nt_graph.c	1	root	259	318	ifdef:MONITOR	one_context	-	staticINITFUNCSmono_init_funcs= | {	261	371	ifdef:MONITOR	True
+host/src/nt_graph.c	1	root	266	375	if:defined(NEC_98)	two_context	staticINITFUNCSmono_init_funcs= | {	nt_init_text, | nt_init_cga_mono_graph, | nt_init_cga_mono_graph,	268	388	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	282	401	if:defined(NEC_98)	two_context	}; | staticINITFUNCScolour_init_funcs= | {	nt_init_text, | nt_init_cga_colour_med_graph, | nt_init_cga_colour_hi_graph,	284	414	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	296	425	ifdef:MONITOR	two_context	nt_init_ega_hi_graph, | nt_init_vga_hi_graph, | };	voidnt_init_screen(void); | voidnt_init_adaptor(int,int); | voidnt_change_mode(void);	298	439	ifdef:MONITOR	True
+host/src/nt_graph.c	1	root	380	520	ifdef:BIGWIN	two_context	staticintupdate_vlt=FALSE; | staticinthost_plane_mask=0xf; | staticintplane_masks[4];	externBYTERed[]; | externBYTEGreen[]; | externBYTEBlue[];	437	577	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	444	584	ifndef:NEC_98	two_context	externBYTERed[]; | externBYTEGreen[]; | externBYTEBlue[];	GLOBALCOLOURTABdefaultColours= | { | DEFAULT_NUM_COLOURS,	446	586	ifndef:NEC_98	False
+host/src/nt_graph.c	1	root	492	631	ifdef:BIGWIN	one_context	staticvoidcheck_win_size(); | staticvoidselect_paint_routines(); | staticvoiddummy_paint_screen();	voidprepare_surface(); | GLOBALVOIDcloseGraphicsBufferIFN0() | {	494	633	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	532	671	if:defined(NEC_98)	two_context	{ | if(sc.ScreenBufHandle!=(HANDLE)0){ | MouseDetachMenuItem(TRUE);	"if(!SetConsoleActiveScreenBuffer(sc.OutputHandle)){ | assert2(NO,""VDM:SCASB()failed:%#xH=%#x"", | GetLastError(),sc.OutputHandle);"	534	681	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	540	686	if:defined(NEC_98)	two_context	"assert2(NO,""VDM:SCASB()failed:%#xH=%#x"", | GetLastError(),sc.OutputHandle); | }"	CloseHandle(sc.ScreenBufHandle); | sc.ScreenBufHandle=(HANDLE)0; | sc.ColPalette=(HPALETTE)0;	542	693	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	559	709	ifndef:MONITOR	two_context	sc.ColPalette=(HPALETTE)0; | sc.ActiveOutputBufferHandle=sc.OutputHandle; | MouseAttachMenuItem(sc.ActiveOutputBufferHandle);	CloseHandle(sc.ConsoleBufInfo.hMutex); | sc.ConsoleBufInfo.hMutex=0;	567	716	ifndef:MONITOR	False
+host/src/nt_graph.c	1	root	572	720	ifdef:X86GFX	two_context	CloseHandle(sc.ConsoleBufInfo.hMutex); | sc.ConsoleBufInfo.hMutex=0;	} | } | GLOBALvoidresetWindowParams()	574	728	ifdef:X86GFX	True
+host/src/nt_graph.c	1	root	606	753	ifdef:X86GFX	two_context	{ | staticintmed_res_swapped=FALSE; | staticbooleanalready_called=FALSE;	"sub_note_trace0(ALL_ADAPT_VERBOSE,""nt_init_screen\n""); | if(already_called)return; | already_called=TRUE;"	608	755	ifdef:X86GFX	True
+host/src/nt_graph.c	1	root	621	767	ifdef:BIGWIN	one_context	"sub_note_trace0(ALL_ADAPT_VERBOSE,""nt_init_screen\n""); | if(already_called)return; | already_called=TRUE;"	-	624	770	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	678	818	if:defined(NEC_98)	one_context	-	sc.PCForeground=RGB(255,255,255); | sc.PCBackground=RGB(0,0,0); | select_paint_routines();	684	823	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	696	834	ifdef:MONITOR	two_context	sc.PCBackground=RGB(0,0,0); | select_paint_routines(); | }	voidnt_init_adaptor(intadaptor,intheight) | { | sub_note_trace2(ALL_ADAPT_VERBOSE,	698	860	ifdef:MONITOR	True
+host/src/nt_graph.c	1	root	733	894	ifndef:NEC_98	two_context	"voidnt_change_mode(void) | { | sub_note_trace0(ALL_ADAPT_VERBOSE,""nt_change_mode"");"	} | voidnt_clear_screen(void) | {	753	913	ifndef:NEC_98	False
+host/src/nt_graph.c	1	root	778	937	ifndef:X86GFX	one_context	"return; | sub_note_trace0(ALL_ADAPT_VERBOSE,""nt_clear_screen""); | if(sc.ScreenBufHandle)return;"	-	780	940	ifndef:X86GFX	False
+host/src/nt_graph.c	1	root	804	959	ifdef:MONITOR	two_context	FillConsoleOutputAttribute(sc.OutputHandle,(WORD)sc.PCBackground, | ScreenInfo.dwSize.X*ScreenInfo.dwSize.Y, | coord,&nCharWritten);	} | voidnt_flush_screen(void) | {	806	968	ifdef:MONITOR	True
+host/src/nt_graph.c	1	root	820	981	ifdef:X86GFX	two_context	"sub_note_trace0(ALL_ADAPT_VERBOSE,""nt_flush_screen""); | if(ConsoleInitialised==TRUE&&ConsoleNoUpdates==FALSE&& | !get_mode_change_required())"	(void)(*update_alg.calc_update)(); | } | voidnt_mark_screen_refresh(void)	822	983	ifdef:X86GFX	True
+host/src/nt_graph.c	1	root	846	1006	ifndef:NEC_98	one_context	} | voidnt_graphics_tick(void) | {	-	855	1014	ifndef:NEC_98	False
+host/src/nt_graph.c	1	root	943	1096	ifndef:NEC_98	one_context	-	} | voidnt_start_update(void) | {	962	1113	ifndef:NEC_98	False
+host/src/nt_graph.c	1	root	1008	1154	ifdef:BIGWIN	two_context	tlx,tly,brx,bry,amount,col); | if(sc.ScreenBufHandle||sc.ModeType==GRAPHICS) | return(FALSE);	if(bry-tly-amount+1==0) | { | return(FALSE);	1016	1162	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	1081	1227	ifdef:BIGWIN	two_context	tlx,tly,brx,bry,amount,col); | return(FALSE); | if(sc.ScreenBufHandle)return(FALSE);	if(sc.ModeType==GRAPHICS) | return(FALSE); | if(bry-tly-amount+1==0){	1089	1235	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	1137	1283	if:defined(NEC_98)	two_context	} | voidnt_paint_cursorIFN3(int,cursor_x,int,cursor_y,half_word,attr) | {	"sub_note_trace3(ALL_ADAPT_VERBOSE,""nt_paint_cursorx=%d,y=%d,attr=%d\n"", | cursor_x,cursor_y,attr);"	1142	1290	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	1152	1299	if:defined(NEC_98)	two_context	"sub_note_trace3(ALL_ADAPT_VERBOSE,""nt_paint_cursorx=%d,y=%d,attr=%d\n"", | cursor_x,cursor_y,attr);"	} | voidnt_cursor_size_changed(intlo,inthi) | {	1170	1343	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	1208	1380	if:(defined(JAPAN)||defined(KOREA))&&!defined(NEC_98)	two_context	{ | if(get_cursor_height()) | {	fontsize.X=fontsize.Y=0; | if(GetCurrentConsoleFont(sc.OutputHandle,TRUE,&font)==FALSE) | CursorInfo.dwSize=20;	1213	1391	if:(defined(JAPAN)||defined(KOREA))&&!defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	1277	1454	if:defined(NEC_98)	two_context	FunnyPaintMode=FALSE; | switch((int)mode) | {	"default: | assert1(NO,""badmodeforhostpaintroutineselection%d\n"",(int)mode); | paint_screen=dummy_paint_screen;"	1415	1682	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	1423	1689	ifdef:X86GFX	one_context	paint_screen=dummy_paint_screen; | break; | }	-	1430	1722	ifdef:X86GFX;else:	True,False
+host/src/nt_graph.c	1	root	1435	1726	ifdef:BIGWIN	one_context	-	staticvoidselect_paint_routines(void) | {	1495	1786	ifdef:BIGWIN	False
+host/src/nt_graph.c	1	root	1505	1796	ifndef:NEC_98	one_context	staticvoidselect_paint_routines(void) | {	-	1510	1800	ifndef:NEC_98	False
+host/src/nt_graph.c	1	root	1545	1838	ifdef:MONITOR	one_context	-	voidprepare_surface(void) | { | CONSOLE_SCREEN_BUFFER_INFOScreenInfo;	1547	1852	ifdef:MONITOR	True
+host/src/nt_graph.c	1	root	1680	1971	ifndef:NEC_98	two_context	{ | sc.PC_W_Width=SCALE(width); | sc.PC_W_Height=SCALE(height*get_host_pix_height());	current_height=height; | current_width=width; | current_mode_type=GRAPHICS;	1683	1973	ifndef:NEC_98	False
+host/src/nt_graph.c	1	root	1694	1983	if:defined(NEC_98)	two_context	current_scale=host_screen_scale; | } | }	"sc.CharHeight=current_char_height; | sub_note_trace2(ALL_ADAPT_VERBOSE, | ""check_win_sizewidth=%d,height=%d"","	1696	1985	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	1712	2000	if:defined(NEC_98)	one_context	"""check_win_sizewidth=%d,height=%d"", | width,height); | }"	-	1714	2037	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	1860	2259	if:defined(NEC_98)	one_context	-	} | voidnt_change_plane_mask(intplane_mask) | {	1870	2271	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	2010	2410	ifndef:PROD	two_context	WinSize.Left=(SHORT)left; | WinSize.Bottom=top+h-1; | WinSize.Right=left+w-1;	"if(!SetConsoleWindowInfo(sc.OutputHandle,TRUE,&WinSize)) | assert3(NO,""VDM:SetConsoleWindowInfo()w=%dh=%dfailed:%#x"", | w,h,GetLastError());"	2012	2412	ifndef:PROD	True
+host/src/nt_graph.c	1	root	2031	2430	ifndef:PROD	two_context	COORDScrSize; | ScrSize.X=(SHORT)w; | ScrSize.Y=(SHORT)h;	"if(!SetConsoleScreenBufferSize(sc.OutputHandle,ScrSize)) | assert3(NO,""VDM:SetCons...BufferSize()w=%dh=%dfailed:%#x"", | w,h,GetLastError());"	2033	2432	ifndef:PROD	True
+host/src/nt_graph.c	1	root	2071	2469	if:defined(JAPAN)||defined(KOREA)	two_context	COORDoldW, | oldB; | CONSOLE_SCREEN_BUFFER_INFObufferInfo;	"if(h>50){ | assert1(NO,""VDM:resizeWindow()clippingheight:%d"",h); | h=50;"	2073	2481	if:defined(JAPAN)||defined(KOREA)	True
+host/src/nt_graph.c	1	root	2090	2497	ifndef:PROD	two_context	oldW.X=bufferInfo.srWindow.Right-bufferInfo.srWindow.Left+1; | oldW.Y=bufferInfo.srWindow.Bottom-bufferInfo.srWindow.Top+1; | oldB=bufferInfo.dwSize;	if(bufferInfo.srWindow.Bottom>=h | ||bufferInfo.srWindow.Right>=w){ | windowSize(MIN(w,oldW.X),MIN(h,oldW.Y),0,0);	2092	2502	ifndef:PROD	True
+host/src/nt_graph.c	1	root	2115	2524	ifndef:PROD	two_context	"if(!GetConsoleScreenBufferInfo(sc.OutputHandle,&bufferInfo)) | assert1(NO,""VDM:GetConsoleScreenBufferInfo()failed:%#x"", | GetLastError());"	} | newLeft=w-bufferInfo.dwMaximumWindowSize.X; | if(newLeft>0){	2117	2526	ifndef:PROD	True
+host/src/nt_graph.c	1	root	2137	2545	if:defined(NEC_98)	two_context	h=bufferInfo.dwMaximumWindowSize.Y; | }else | newTop=0;	if(w>oldW.X||h>oldW.Y) | windowSize(w,h,MIN(newTop,oldTop),MIN(newLeft,oldLeft)); | }	2139	2547	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	2163	2570	if:defined(NEC_98)	two_context	if(w>oldW.X||h>oldW.Y) | windowSize(w,h,MIN(newTop,oldTop),MIN(newLeft,oldLeft)); | }	voidtextResize(void) | { | if(sc.PC_W_Height&&sc.PC_W_Width&&	2168	2574	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	2201	2606	if:defined(NEC_98)	two_context	{ | DWORDheaderSize; | LPBITMAPINFOinfoStructPtr;	closeGraphicsBuffer(); | if(sc.ConsoleBufInfo.lpBitMapInfo!=NULL) | free((char*)sc.ConsoleBufInfo.lpBitMapInfo);	2205	2611	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	2218	2623	if:defined(NEC_98)	two_context	closeGraphicsBuffer(); | if(sc.ConsoleBufInfo.lpBitMapInfo!=NULL) | free((char*)sc.ConsoleBufInfo.lpBitMapInfo);	sc.ConsoleBufInfo.dwBitMapInfoLength=headerSize; | sc.ConsoleBufInfo.lpBitMapInfo=infoStructPtr; | sc.ConsoleBufInfo.dwUsage=DIB_PAL_COLORS;	2229	2639	if:defined(NEC_98);else:	True,False
+host/src/nt_graph.c	1	root	2259	2668	if:defined(NEC_98)	two_context	CreateDisplayPalette(); | set_palette_change_required(TRUE); | }	MouseDetachMenuItem(TRUE); | sc.ActiveOutputBufferHandle=sc.ScreenBufHandle; | MouseAttachMenuItem(sc.ActiveOutputBufferHandle);	2261	2670	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	2267	2675	if:defined(NEC_98)	one_context	MouseDetachMenuItem(TRUE); | sc.ActiveOutputBufferHandle=sc.ScreenBufHandle; | MouseAttachMenuItem(sc.ActiveOutputBufferHandle);	-	2269	2677	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	2281	2696	if:defined(NEC_98)	one_context	-	sc.BitmapLastLine=(char*)sc.ConsoleBufInfo.lpBitMap+ | (sc.PC_W_Height-1)* | BYTES_PER_SCANLINE(sc.ConsoleBufInfo.lpBitMapInfo);	2283	2704	if:defined(NEC_98)	True
+host/src/nt_graph.c	1	root	2440	2860	ifndef:PROD	two_context	voidnt_mode_select_changed(intdummy) | { | UNUSED(dummy);	} | voidnt_color_select_changed(intdummy) | {	2442	2862	ifndef:PROD	True
+host/src/nt_graph.c	1	root	2449	2868	ifndef:PROD	two_context	voidnt_color_select_changed(intdummy) | { | UNUSED(dummy);	} | voidnt_screen_address_changed(intlo,inthi) | {	2451	2870	ifndef:PROD	True
+host/src/nt_graph.c	1	root	2465	2883	ifndef:NEC_98	one_context	"sub_note_trace0(EGA_HOST_VERBOSE,""WARNING-nt_screen_address_changed\n""); | } | voidnt_scroll_complete(){}"	-	2467	2896	ifndef:NEC_98	False
+base/bios/reset.c	2	root/179:else:	216	360	ifdef:GISP_SVGA	two_context	sas_storew(int_addr(0x9)+2,KB_INT_SEGMENT); | sas_storew(int_addr(0xE),DISKETTE_INT_OFFSET); | sas_storew(int_addr(0xE)+2,DISKETTE_INT_SEGMENT);	sas_storew(int_addr(0x11),EQUIPMENT_OFFSET); | sas_storew(int_addr(0x11)+2,EQUIPMENT_SEGMENT); | sas_storew(int_addr(0x12),MEMORY_SIZE_OFFSET);	222	374	ifdef:GISP_SVGA;else:	True,False
+base/bios/reset.c	2	root/340:ifdef:EGG	342	511	ifdef:VGG	one_context	-	high_switches|=EGA_INSTALLED; | break;	344	513	ifdef:VGG	False
+base/bios/reset.c	2	root/386:ifndef:NTVDM	390	676	ifdef:LIM	one_context	char*cp; | chartemp_str[256];	-	392	678	ifdef:LIM	True
+base/bios/reset.c	2	root/400:ifndef:NEC_98	402	685	ifdef:PM	one_context	-	reset_paint_routines(); | cmos_write_byte(CMOS_DISKETTE, | (IU8)((half_word)gfi_drive_type(0)<<4|gfi_drive_type(1)));	588	870	ifdef:PM	False
+base/ccpu386/c_main.c	2	root/3173:else:	3182	3329	if:defined(SFELLOW)	one_context	-	case0xfe: | c_cpu_unsimulate(); | default:	3184	3339	if:defined(SFELLOW)	True
+base/inc/gmi.h	2	root/37:ifndef:UNIVERSAL	51	42	ifdef:CCPU	one_context	IMPORTbooleangmi_w_checkIPT3(host_addr,laddr,host_addr,haddr, | host_addr*,endaddr); | IMPORTvoidgmi_initIPT1(sys_addr,size);	-	59	54	ifdef:CCPU;else:	False,True
+base/inc/ica.h	2	root/122:else:	134	157	ifdef:HOOKED_IRETS	one_context	externvoidSWPIC_outbIPT2(io_addr,port,IU8,value); | externvoidSWPIC_hw_interruptIPT3(IU32,adapter,IU32,line_no, | IS32,call_count);	-	142	165	ifdef:HOOKED_IRETS;else:	False,False
+base/inc/ica.h	2	root/122:else:	144	167	ifdef:CPU_40_STYLE	one_context	-	typedefstruct{ | IBOOLica_master; | IU8ica_irr;	154	177	ifdef:CPU_40_STYLE	False
+base/inc/ica.h	2	root/122:else:	176	199	ifdef:CPU_40_STYLE	two_context	IS32ica_count[8]; | IU32ica_int_line; | IU32ica_cpu_int;	}ADAPTER_STATE; | #defineNO_ICA_CALLBACK((ICA_CALLBACK)0L)	182	205	ifdef:CPU_40_STYLE	False
+base/keymouse/ppi.c	2	root/90:ifndef:NEC_98	92	88	ifdef:PROD	one_context	-	port=port&PPI_BIT_MASK; | ppi_register^=0x30; | *value=ppi_register;	94	90	ifdef:PROD	False
+base/keymouse/ppi.c	2	root/119:ifndef:NEC_98	145	139	ifndef:NTVDM	two_context	"{ | ppi_register=value&0x0f; | note_trace2(PPI_VERBOSE,""ppi_outb()-port%x,val%x"",port,value);"	if((value&0x01)&&gate_2_was_low) | { | timer_gate(TIMER2_REG,GATE_SIGNAL_RISE);	146	151	ifndef:NTVDM	False
+base/system/ica.c	2	root/1834:else:	1843	2063	ifdef:NTVDM	one_context	#defineINIT0_ICW3(IU8)0x04 | #defineINIT0_ICW4(IU8)0x01	-	1854	2075	ifdef:NTVDM;else:	True,False
+base/system/ica.c	2	root/1923:else:	1931	2149	ifdef:NTVDM	one_context	#defineINIT1_ICW2(IU8)0x70 | #defineINIT1_ICW3(IU8)0x02 | #defineINIT1_ICW4(IU8)0x01	-	1938	2159	ifdef:NTVDM;elif:ASPI;else:	True,True,False
+host/src/nt_cga.c	2	root/186:ifdef:LITTLEND	194	298	ifdef:BIGWIN	one_context	cga_med_graph_lo_nyb[i] | =(byte1<<24)|(byte1<<16) | |(byte2<<8)|byte2;	-	196	324	ifdef:BIGWIN	True
+host/src/nt_cga.c	2	root/219:ifndef:NEC_98	237	362	if:defined(JAPAN)&&defined(i386)	one_context	SMALL_RECTWriteRegion; | PBYTEto; | PBYTEpScreenText=get_screen_ptr(ScreenOffset);	-	239	365	if:defined(JAPAN)&&defined(i386)	True
+host/src/nt_cga.c	2	root/219:ifndef:NEC_98	241	366	if:defined(KOREA)&&defined(i386)	one_context	-	"sub_note_trace6(CGA_HOST_VERBOSE, | ""nt_cga_textoff=%dx=%dy=%dlen=%dh=%do=%#x"", | ScreenOffset,ScreenX,ScreenY,len,height,pScreenText);"	243	368	if:defined(KOREA)&&defined(i386)	True
+host/src/nt_cga.c	2	root/219:ifndef:NEC_98	255	378	ifndef:MONITOR	one_context	"sub_note_trace6(CGA_HOST_VERBOSE, | ""nt_cga_textoff=%dx=%dy=%dlen=%dh=%do=%#x"", | ScreenOffset,ScreenX,ScreenY,len,height,pScreenText);"	if(pScreenText==NULL||len<=0||height<=0) | return; | if(ScreenX<0||ScreenY<0||now_width<=0||now_height<=0||	260	382	ifndef:MONITOR	False
+host/src/nt_graph.c	2	root/943:ifndef:NEC_98	953	1105	ifdef:X86GFX	two_context	{ | if(update_vlt)set_the_vlt(); | if(ConsoleInitialised==TRUE&&ConsoleNoUpdates==FALSE)	(void)(*update_alg.calc_update)(); | flush_count=0; | }	955	1107	ifdef:X86GFX	True
+host/src/nt_graph.c	2	root/1277:else:	1357	1620	ifdef:V7VGA	one_context	sc.ModeType=GRAPHICS; | if(get_256_colour_mode()) | {	-	1364	1627	ifdef:V7VGA	False
+host/src/nt_graph.c	2	root/1277:else:	1368	1631	ifdef:MONITOR	one_context	-	paint_screen=nt_paint_funcs->vga_graph; | } | else	1370	1638	ifdef:MONITOR	True
+base/bios/reset.c	3	root/400:ifndef:NEC_98/402:ifdef:PM	499	782	ifndef:CPU_30_STYLE	two_context	setAX(temp_word); | user_stack+=2; | sas_loadw(user_stack,&temp_word);	setIP(temp_word); | user_stack+=2; | sas_loadw(user_stack,&temp_word);	501	784	ifndef:CPU_30_STYLE	False
+base/bios/reset.c	3	root/400:ifndef:NEC_98/402:ifdef:PM	526	809	ifdef:NPX	two_context	caseJMP_DWORD_ICA: | { | half_worddummy;	outb(ICA0_PORT_0,(half_word)0x11); | outb(ICA0_PORT_1,(half_word)0x08); | outb(ICA0_PORT_1,(half_word)0x04);	528	811	ifdef:NPX	True
+base/bios/reset.c	3	root/400:ifndef:NEC_98/402:ifdef:PM	564	846	ifndef:CPU_30_STYLE	two_context	setSS(0); | setSP(0x400); | sas_loadw(effective_addr(BIOS_VAR_SEGMENT,IO_ROM_INIT),&temp_word);	setIP(temp_word); | sas_loadw(effective_addr(BIOS_VAR_SEGMENT,IO_ROM_SEG),&temp_word); | setCS(temp_word);	566	848	ifndef:CPU_30_STYLE	False
