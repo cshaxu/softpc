@@ -151,7 +151,7 @@ ERROR RECOVERY	  :	none.
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 157
+#line 158
 
 #if defined(EGA_DUMP) || defined(EGA_STAT)
 #error "Unsupported SoftPC mirror configuration: #if defined(EGA_DUMP) || defined(EGA_STAT)"

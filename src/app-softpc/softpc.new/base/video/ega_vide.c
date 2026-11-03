@@ -1010,7 +1010,7 @@ GLOBAL void ega_set_mode IFN0()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 960
+#line 1079
 
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"

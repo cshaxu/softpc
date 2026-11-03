@@ -2877,7 +2877,7 @@ LOCAL void vd_dummy IFN0()
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 2519
+#line 3743
 
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"

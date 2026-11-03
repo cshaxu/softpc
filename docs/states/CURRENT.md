@@ -901,3 +901,8 @@ conditional-end diagnostic positions in ten files using adjacent reviewed
 condition pairings. Both 186-test background groups and x64 native passed
 first run; x86 native compact_console failed first run and full randomized
 rerun passed 8/8. S30 remains open.
+
+P39 was committed and pushed as `7cd93dba`. P40 corrects 12 XP
+conditional-end positions in ten files. Both 186-test background groups
+and x86 native passed first run; x64 compact_console failed first run and
+the complete randomized native rerun passed 8/8. S30 remains open.

@@ -641,7 +641,7 @@ void nt_init_screen(void)
     if(!EGA_planes) EGA_planes = (byte *) host_malloc(4*EGA_PLANE_SIZE);
     if(!DAC) DAC = (PC_palette *) host_malloc(sizeof(PC_palette) * VGA_DAC_SIZE);
 #endif // !NEC_98
-#line 552
+#line 789
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

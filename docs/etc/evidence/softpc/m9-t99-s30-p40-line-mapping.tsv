@@ -1,0 +1,13 @@
+path	local_line	old_line	suggested	condition	xp_condition_line
+base/comms/com.c	2390	2882	4526	ifndef:PROD	3999
+base/keymouse/keyba.c	280	248	350	if:defined(NEC_98)	327
+base/video/cga.c	1279	1490	1515	if:!defined(EGG)&&!defined(C_VID)&&!defined(A_VID)	1493
+base/video/ega_read.c	154	157	158	ifdef:SEGMENTATION	150
+base/video/ega_vide.c	1013	960	1079	ifndef:PROD	1076
+base/video/ega_writ.c	554	820	849	ifdef:CPU_40_STYLE	822
+base/video/video.c	2880	2519	3743	ifdef:REAL_VGA	3716
+host/inc/insignia.h	94	100	91	ifndef:FALSE	87
+host/inc/insignia.h	99	104	95	ifndef:STRINGIFY	92
+host/inc/insignia.h	104	109	100	if:!defined(_WINDOWS_)&&!defined(NT_INCLUDED)	96
+host/src/nt_graph.c	644	552	789	if:defined(NEC_98)	774
+host/src/nt_keycd.c	329	738	739	ifdef:JAPAN	729

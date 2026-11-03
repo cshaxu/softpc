@@ -277,7 +277,7 @@ static half_word *break_arrays [134];
 
 static half_word set_3_key_state [127];
 #endif    //NEC_98
-#line 248
+#line 350
 #endif	/* REAL_KBD */
 
 #line 352

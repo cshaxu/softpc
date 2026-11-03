@@ -326,7 +326,7 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 738
+#line 739
 	/*............................... the regular keyset is what we need */
 
 #if defined(NEC_98)

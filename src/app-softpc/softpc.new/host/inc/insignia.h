@@ -91,17 +91,17 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
 #ifndef FALSE
 #error "Unsupported SoftPC mirror configuration: !FALSE"
 #endif
-#line 100
+#line 91
 
 #ifndef STRINGIFY
 #error "Unsupported SoftPC mirror configuration: !STRINGIFY"
 #endif
-#line 104
+#line 95
 
 #if !defined(_WINDOWS_) && !defined(NT_INCLUDED)   /* Types already defined by windows */
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif
-#line 109
+#line 100
 
 #ifndef NULL
 #error "Unsupported SoftPC mirror configuration: !NULL"

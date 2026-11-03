@@ -1276,5 +1276,5 @@ void cga_term   IFN0()
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif  /* not EGG or C_VID or A_VID */
-#line 1490
+#line 1515
 #endif  /* !NTVDM | (NTVDM & !X86GFX) */

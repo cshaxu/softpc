@@ -551,7 +551,7 @@ ega_write_routines_update IFN1(CHANGE_TYPE, reason )
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 820
+#line 849
 
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
