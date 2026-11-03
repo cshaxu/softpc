@@ -1,0 +1,8 @@
+path	directive_line	old	expected	evidence
+base/comms/printer.c	112	115	114	matching blank prefix before next line directive
+base/keymouse/keyba.c	2723	2674	3447	XP blank line before separately mapped guard
+base/video/ega_read.c	493	648	668	XP blank line before separately mapped guard
+base/video/ega_vide.c	1848	1676	2270	XP blank line before guard 2271
+base/video/ega_writ.c	156	372	379	XP blank line before separately mapped guard
+base/video/gfx_updt.c	3228	3055	3129	XP return at 3130 follows one local blank line
+base/video/gfx_updt.c	3339	3157	3235	XP return at 3236 follows one local blank line

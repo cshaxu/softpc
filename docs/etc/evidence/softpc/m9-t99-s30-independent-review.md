@@ -600,3 +600,28 @@ the next three nonempty lines and their XP diagnostic line numbers verified
 34 for those three anchors; 12 need more review, including intervening
 directives or unequal subsequent line distances. The [three-anchor record](m9-t99-s30-p18-three-anchor-review.tsv)
 is evidence only for those tested anchors, not complete line or branch proof.
+
+P19 independently checked the 12 first-anchor cases with fewer than three
+visible subsequent anchors: each available source anchor before the next
+line directive matches its XP logical line. Of six intervening-directive
+cases, four earlier mappings and one effective later mapping were corrected;
+two earlier immediately overridden directives have no intervening source
+and are recorded as inert, not as proof of other code. Two remaining direct
+anchor mismatches were corrected. The [disposition](m9-t99-s30-p19-offset-disposition.tsv)
+and [seven-value mapping](m9-t99-s30-p19-line-mapping.tsv) retain the evidence.
+No conclusion is made about as-yet-unreviewed nested conditional structures.
+Six actual translation units per architecture produced byte-identical selected
+preprocessing; both architectures built and each passed 186 background and 8
+native tests. Build logs contained 541 x64 and 540 x86 mirror-path warning
+lines, with no non-mirror warning line observed. Published x86 and x64 EXE
+SHA-256 values are respectively
+`0ee983daeb4772ccb93da32e6a30bb40aee968791d079f02a5f45c3930c67f36` and
+`a58d1e9da3285c321ece3cf99e247493395fe458afb5dfa8ea3da3a9e747f595`.
+
+The remaining 26 descendant-anchor leads were inspected at their opening and
+closing directives and adjacent original source. Their reported boundary pairs
+correspond; cases where the next XP arm contains code but the current arm is
+whole-arm #error are not descended into. The [nested-boundary record](m9-t99-s30-p19-nested-boundary-review.tsv)
+records exact positions and anchors. Some parent pairs remain pending, and
+children are separate audit items, so these boundary observations do not claim
+that all 26 complete subtrees or their full ancestor chains are verified.

@@ -153,7 +153,7 @@ GLOBAL ULONG calc_latch_xor;
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 372
+#line 379
 
 #line 380
 #if !(defined(NTVDM) && defined(MONITOR))

@@ -490,7 +490,7 @@ rdm1_string_ch2 IFN3(UTINY *, dest, ULONG, offset, ULONG, count )	/* used to cor
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
 #endif
-#line 648
+#line 668
 
 #line 669
 #if !(defined(NTVDM) && defined(MONITOR))

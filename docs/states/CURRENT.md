@@ -105,6 +105,16 @@ native tests per architecture. Review, commit and push must finish before an
 eleventh mirror file is changed. Of 63 differing-prefix/offset leads,
 46 already map their first source anchor correctly, 11 differed and six have
 intervening #line directives; this classification is not full branch review.
+P18 was committed and pushed as `e9aa3e42`. P19 currently changes six mirror
+files with seven corrections of direct or intervening diagnostic mappings.
+The 63 offset candidates have been classified in the [disposition](../etc/evidence/softpc/m9-t99-s30-p19-offset-disposition.tsv):
+46 are supported through the available source anchors before the next #line,
+11 corrected across P18/P19, and six intervening-directive cases are explained;
+this is not a complete conditional-structure audit. P19 preprocessing, builds and full tests passed (186 background and 8
+native tests per architecture); review, commit and push remain due. No eleventh mirror file may be changed
+before delivery. Twenty-six additional nested boundary pairs were inspected and recorded,
+without marking unverified ancestors or children complete. Remaining
+repeated/nested structure work stays open.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

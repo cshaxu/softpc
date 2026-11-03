@@ -3225,7 +3225,7 @@ boolean cga_graph_scroll_up IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 #endif  //NEC_98
-#line 3055
+#line 3129
 
 	return TRUE;
 }
@@ -3336,7 +3336,7 @@ boolean cga_graph_scroll_down IFN6(int, start, int, width, int, height,
 
 	host_scroll_complete();
 #endif  //NEC_98
-#line 3157
+#line 3235
 
 	return TRUE;
 }

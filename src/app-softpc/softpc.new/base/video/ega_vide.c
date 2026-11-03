@@ -1845,7 +1845,7 @@ void ega_video_init IFN0()
 #endif /* V7VGA */
 #endif /* NTVDM & X86GFX */
 #line 1676
-#line 1676
+#line 2270
 
 #if !(defined(NTVDM) && defined(X86GFX))
 #line 2272

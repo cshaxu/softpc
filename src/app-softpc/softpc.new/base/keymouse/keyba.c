@@ -2720,7 +2720,7 @@ GLOBAL VOID AT_kbd_init IFN0()
 #ifdef	macintosh
 #error "Unsupported SoftPC mirror configuration: macintosh"
 #endif	/* macintosh */
-#line 2674
+#line 3447
 
 #line 3448
 #ifndef NEC_98
