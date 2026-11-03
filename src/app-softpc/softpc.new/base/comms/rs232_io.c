@@ -72,7 +72,7 @@ static void return_status()
 void rs232_io()
 {
 #ifndef NEC_98
-#line 69
+#line 74
 #ifdef BIT_ORDER2
    union {
       half_word all;

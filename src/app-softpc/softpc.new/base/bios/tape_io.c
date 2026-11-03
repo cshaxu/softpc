@@ -95,7 +95,7 @@ sys_addr byte_count;   /* Max size is 0x8000 * 2 = 10000 */
 #ifdef CPU_30_STYLE
 #error "Unsupported SoftPC mirror configuration: CPU_30_STYLE"
 #else
-#line 91
+#line 114
 half_word source_AR;
 half_word target_AR;
 #endif /* CPU_30_STYLE */
@@ -191,7 +191,7 @@ half_word target_AR;
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 175
+#line 302
 			sas_disable_20_bit_wrapping();
 			sas_move_words_forward ( source_base, target_base, byte_count >> 1);
 			sas_enable_20_bit_wrapping();

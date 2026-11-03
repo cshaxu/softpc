@@ -231,7 +231,7 @@ void disk_post IFN0()
 	UTINY disks;
 	UTINY ndisks;
 #if !(defined(NTVDM) && defined(MONITOR))
-#line 217
+#line 387
 	USHORT diskette_offset;
 	USHORT diskette_seg;
 #endif /* !(NTVDM && MONITOR) */

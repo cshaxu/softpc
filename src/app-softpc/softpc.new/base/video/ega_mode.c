@@ -611,7 +611,7 @@ DISPLAY_MODE	mode;
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 613
+#line 617
 			set_gfx_update_routines( ega_graph_update, EGA_GRAPHICS_MARKING, EGA_GRAPH_SCROLL );
 #endif /* GORE */
 			break;
@@ -652,7 +652,7 @@ DISPLAY_MODE	mode;
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #else
-#line 653
+#line 657
 			set_gfx_update_routines( ega_graph_update, EGA_GRAPHICS_MARKING, NO_SCROLL );
 #endif /* GORE */
 			break;

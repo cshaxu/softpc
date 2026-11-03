@@ -440,3 +440,16 @@ and 8/8 native tests; actual-diff review precedes submission. Build logs contain
 non-mirror warning line was observed. Published x86 and x64 EXE SHA-256 are
 `9b7acd9d865de7350b8226bd839b5b7c26cdaa8da1c857fec7738b5651f296d8` and
 `24a4e0758c16653303f92dd94c58203ff6d4c388c1e235766fa5a76245754a2b`.
+
+P9 maps 25 further line candidates in ten compiled C files, using the
+matching XP boundary and next source line; the [mapping](m9-t99-s30-p9-line-mapping.tsv)
+and [candidate queue](m9-t99-s30-p9-line-candidates.tsv) preserve the evidence.
+Fourteen line candidates remain pending, including header cases requiring
+actual inclusion-context validation. P9 preprocessing and qualification
+passed: both architectures built, selected preprocessing remained byte-identical
+for ten translation units, and each passed 186/186 background and 8/8 native
+tests. Build logs contained 820 x64 and 803 x86 mirror-path warnings, with no
+non-mirror warning line observed. Published x86 and x64 EXE SHA-256 values are
+`cde8f48c3cb0fc7a204070b1a8fcc0a2ae48c1c35b80e77b0c8aaa12d58d52cf` and
+`19982265e27369d51504016aec8e248f7297359db44ed1013aeabd207675e5e7`.
+No conclusion about the remaining conditional trees is implied.

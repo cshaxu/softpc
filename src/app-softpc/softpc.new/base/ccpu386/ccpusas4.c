@@ -414,7 +414,7 @@ sas_init IFN1(PHY_ADDR, size)
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 447
+#line 387
 		CCPU_M = Start_of_M_area;
 #endif				/* BACK_M */
 	}
@@ -1312,7 +1312,7 @@ c_GetLinAdd IFN1(PHY_ADDR, linAddr)
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1346
+#line 1285
 		return(c_GetPhyAdd(0));	/* as good as anything! */
 	}
 }
@@ -1344,7 +1344,7 @@ c_GetPhyAdd IFN1(PHY_ADDR, addr)
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else 
-#line 1378
+#line 1317
 	return((IU8 *)((IHPE)Start_of_M_area + (IHPE)addr));
 #endif
 }

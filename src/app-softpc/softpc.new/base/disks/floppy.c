@@ -1528,7 +1528,7 @@ LOCAL void rd_wr_vf IFN3(int, drive, FDC_CMD_BLOCK *, fcbp, half_word, dma_type)
 				dt_start = DR_TYPE_ADDR;
 				dt_end = DR_TYPE_ADDR + DR_CNT * DR_SIZE_OF_ENTRY;
 #endif /* NTVDM */
-#line 1443
+#line 3232
 				while (dt_start < dt_end)
 				{
 					/*
@@ -1673,7 +1673,7 @@ LOCAL void setup_state IFN1(int, drive)
 	{
 		sas_load(FDD_STATUS+drive, &disk_state);
 #ifndef NTVDM
-#line 1566
+#line 3384
 		if ((disk_state & FS_MEDIA_DET) == 0)
 		{
 
@@ -3010,14 +3010,14 @@ LOCAL wait_int IFN0()
 #ifdef FLOPPIES_KEEP_TRYING
 #error "Unsupported SoftPC mirror configuration: FLOPPIES_KEEP_TRYING"
 #endif
-#line 2858
+#line 4755
 	savedCS = getCS();
 	savedIP = getIP();
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 2861
+#line 4762
 	setCS(RCPU_WAIT_INT_SEGMENT);
 	setIP(RCPU_WAIT_INT_OFFSET);
 #endif /* NTVDM */

@@ -609,7 +609,7 @@ switch (address) {
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 627
+#line 630
 		    update_cursor_shape();
 		}
 		break;
@@ -621,7 +621,7 @@ switch (address) {
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #endif
-#line 638
+#line 641
 		    update_cursor_shape();
 		}
 		break;
@@ -1192,11 +1192,11 @@ for(i = CGA_PORT_START; i <= CGA_PORT_END; i++)
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
-#line 1397
+#line 1417
 #if !defined(EGG) && !defined(C_VID) && !defined(A_VID)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #else
-#line 1400
+#line 1420
 	gmi_define_mem(SAS_VIDEO, &Glue_writes);
 	read_pointers = Glue_reads;
 	Glue_set_vid_wrt_ptrs( &simple_writes );

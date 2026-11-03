@@ -1354,7 +1354,7 @@ calc_q_inst_for_time IFN1(IU32, time)
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
-#line 1383
+#line 1147
 	IU32 inst, jumps;
 
 	/* be crude before initialisation */
@@ -1384,7 +1384,7 @@ calc_q_time_for_inst IFN1(IU32, inst)
 #ifdef SYNCH_TIMERS
 #error "Unsupported SoftPC mirror configuration: SYNCH_TIMERS"
 #else
-#line 1412
+#line 1176
 	IU32 time, jumps;
 
 	/* be crude before initialisation */
@@ -1539,7 +1539,7 @@ quick_tick_recalibrate IFN0()
 #ifdef AVERAGED	/* not for the moment */
 #error "Unsupported SoftPC mirror configuration: AVERAGED"
 #else
-#line 1570
+#line 1334
 	ideal_q_rate = idealrate;
 	real_q_rate = realrate;
 #endif

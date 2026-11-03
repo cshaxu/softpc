@@ -148,7 +148,7 @@ SIGNALS ISSUED	  :	NONE
 #ifdef A_VID
 #error "Unsupported SoftPC mirror configuration: A_VID"
 #else
-#line 204
+#line 205
 VOID	ega_mode1_chn_b_write(ULONG, ULONG);
 VOID	ega_mode1_chn_w_write(ULONG, ULONG);
 VOID	ega_mode1_chn_b_fill(ULONG, ULONG, ULONG);
@@ -231,7 +231,7 @@ fill_alternate_bytes IFN3(byte *, start, byte *, end, byte, value )
 #ifdef  BIGEND
 #error "Unsupported SoftPC mirror configuration: BIGEND"
 #else
-#line 283
+#line 288
 #define first_half(wd)      (wd & 0xff)
 #define sec_half(wd)        ((wd & 0xff00) >> 8)
 #endif
@@ -1132,7 +1132,7 @@ ega_mode2_chn_move IFN5(UTINY, w, UTINY *, ead, UTINY *, eas, ULONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1154
+#line 1188
 		scr = getVideoscratch();
 #endif
 
@@ -1151,7 +1151,7 @@ ega_mode2_chn_move IFN5(UTINY, w, UTINY *, ead, UTINY *, eas, ULONG, count,
 #ifdef BACK_M
 #error "Unsupported SoftPC mirror configuration: BACK_M"
 #else
-#line 1172
+#line 1206
 			eas = eas - count + 1 + w;
 #endif
 			ead = ead - count + 1 + w;

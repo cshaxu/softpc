@@ -226,7 +226,7 @@ void diskette_int()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 392
+#line 663
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
 #endif /* NTVDM */
