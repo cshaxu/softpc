@@ -115,6 +115,19 @@ native tests per architecture); review, commit and push remain due. No eleventh 
 before delivery. Twenty-six additional nested boundary pairs were inspected and recorded,
 without marking unverified ancestors or children complete. Remaining
 repeated/nested structure work stays open.
+P19 was committed and pushed as `cd9b22c6`. P20 is a documentation-only
+independent structure review: 27 manually matched boundaries and nine unique
+children under supported ancestors establish 36 additional local/XP group
+pairs; six wholly #error root arms in bootstra.c and tape_io.c were separately
+matched against original boundaries. Of the former 460 pending paired groups,
+Six c_intr.c PIG root boundaries were also reviewed in their actual real-mode,
+protected-mode and fault-reset contexts; 412 remain pending. Excluded-arm
+contents are not traversed. Group-boundary
+support does not mean descendants or full files are cleared. P20 still requires
+review, commit and push. Both incremental builds passed and each architecture
+passed all 186 background and 8 native tests on the first run; no production
+source changed, and both EXE hashes are unchanged from P19. S30 final
+qualification cannot start while unresolved groups remain.
 The post-P6 scan finds 40 overlapping candidate rows in 15 files; the refreshed
 [disposition](../etc/evidence/softpc/m9-t99-s30-p6-tree-disposition.tsv)
 separates rechecked cases from pending independent review. The refreshed

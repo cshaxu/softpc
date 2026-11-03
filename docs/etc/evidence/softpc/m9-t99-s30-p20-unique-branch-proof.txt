@@ -1,0 +1,11 @@
+files 475 status {'matched-repeat-review': 107, 'matched': 349, 'candidate': 15, 'not-applicable': 4} candidates 40
+same-parent repeated occurrences 2381 files 118
+base/support/time_day.c 94 98 arms equal True arms ['ifdef:XTSFD'] ends 96 100
+base/video/gfx_updt.c 4038 3971 arms equal True arms ['ifdef:HERC'] ends 4040 4193
+base/video/gfx_updt.c 4132 4283 arms equal True arms ['ifdef:SEGMENTATION'] ends 4134 4285
+base/video/gfx_updt.c 4137 4287 arms equal True arms ['ifdef:NTVDM'] ends 4139 5964
+base/system/timer.c 1921 1962 arms equal True arms ['if:!(defined(GISP_CPU)||defined(CPU_40_STYLE))'] ends 1923 1993
+base/system/timer.c 1934 2003 arms equal True arms ['ifndef:PROD'] ends 1936 2008
+base/system/timer.c 1940 2011 arms equal True arms ['ifndef:GISP_CPU', 'else:'] ends 1946 2028
+base/video/gfx_updt.c 4045 4197 arms equal True arms ['ifdef:SEGMENTATION'] ends 4047 4199
+base/inc/rs232.h 327 666 arms equal True arms ['ifdef:SHORT_TRACE'] ends 329 668

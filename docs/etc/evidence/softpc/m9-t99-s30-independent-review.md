@@ -625,3 +625,24 @@ whole-arm #error are not descended into. The [nested-boundary record](m9-t99-s30
 records exact positions and anchors. Some parent pairs remain pending, and
 children are separate audit items, so these boundary observations do not claim
 that all 26 complete subtrees or their full ancestor chains are verified.
+
+P20 propagates independently inspected group-boundary evidence only through
+verified ancestor chains: 27 of the previously inspected boundaries have
+supported ancestors, and nine unique sibling groups under those ancestors were
+rechecked for equal arm signatures. The [propagation record](m9-t99-s30-p20-group-propagation.tsv)
+and [nine-group proof](m9-t99-s30-p20-unique-branch-proof.txt) retain their
+locations. Six further original root groups in bootstra.c and tape_io.c were
+matched to existing whole-arm #error groups by their original opening/closing
+and adjacent context; their excluded contents were not examined. The
+[excluded root review](m9-t99-s30-p20-excluded-root-review.tsv) records each.
+Six additional c_intr.c root PIG groups were checked against XP in their
+actual real-mode, protected-mode, declaration and fault-reset contexts. Two
+retain a matching else arm; wholly excluded arms were not descended into.
+The [interrupt root review](m9-t99-s30-p20-interrupt-root-review.tsv) records
+each boundary. Together these support 48 of the previous 460 pending paired
+boundaries; 412 remain pending. Matched boundaries do not automatically prove children,
+whole files, or remaining differing-parent cases. Both incremental builds
+and all 186 background plus 8 native tests per architecture passed on the
+first run. No production source changed; the x86 and x64 EXE hashes remain
+`0ee983daeb4772ccb93da32e6a30bb40aee968791d079f02a5f45c3930c67f36` and
+`a58d1e9da3285c321ece3cf99e247493395fe458afb5dfa8ea3da3a9e747f595`.
