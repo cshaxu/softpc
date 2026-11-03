@@ -41,7 +41,7 @@
 #line 40
 #define STATELENGTH             sizeof(VIDEO_HARDWARE_STATE_HEADER)
 #endif // NEC_98
-#line 35
+#line 42
 #define LATCHLENGTH             4
 #define RGBLENGTH               3
 #define PLANELENGTH             0x10000

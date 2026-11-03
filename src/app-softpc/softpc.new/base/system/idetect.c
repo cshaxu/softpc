@@ -267,7 +267,7 @@ LOCAL void idle_kybd_poll()
 	nCharPollsPerTick++;
 }
 #endif
-#line 260
+#line 351
 
 /*
 ======================================================================

@@ -1933,7 +1933,7 @@ void ica0_init IFN0()
 #elif ASPI
 #error "Unsupported SoftPC mirror configuration: ASPI"
 #else /* ASPI */	
-#line 1935
+#line 2158
 #define INIT1_OCW1	(IU8)0x9d	
 #endif /* ASPI */
 #endif   //NEC_98

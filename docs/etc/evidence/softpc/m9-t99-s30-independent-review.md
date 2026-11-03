@@ -857,3 +857,14 @@ were checked against the matching XP conditions and adjacent original code;
 no condition or executable statement was changed. Four [earlier heuristic candidates](m9-t99-s30-p32-unreviewed-line-candidates.tsv) remain; the
 [comment-aware first-code queue](m9-t99-s30-p32-first-code-candidates.tsv)
 is separate and includes local differences and false positives. P32 dual builds and both 186-test background suites passed in serial outside the sandbox. x64 native initially failed compact_console with stage 1 error 6 and child exit 0xc0000142; a full native rerun passed 8/8. x86 native passed 8/8 first run. The intermittent initialization failure remains unexplained. Mirror-only warnings: x64 3450, x86 3399. EXE SHA-256: x86 `acc5571e5f241774b9b66d98a1ff7394f41ccd10e9a834930a36063523cb3a1f`; x64 `33913090111cda45d28b7bf55b6b53055016354adb9c07bd9fbb40e438dc8adf`. A fresh byte- and comment-aware first-code scan produced 2,746 equal, 983 no-code, 116 different and four out-of-range markers; its 120 candidate rows exactly match the P32 queue and are not all established defects.
+
+## P33 physical and original XP line mapping
+
+The [25 mappings](m9-t99-s30-p33-line-mapping.tsv) cover seven files,
+including seven `vgaports.h` markers checked against XP physical bytes and
+thirteen CCPU accessor boundaries whose local ABI declarations differ from
+XP. They preserve existing declarations and functional patches. The four
+remaining sites in the earlier heuristic queue were corrected. The separate
+[comment-aware first-code queue](m9-t99-s30-p33-first-code-candidates.tsv)
+remains provisional and includes local changes and possible false matches;
+markers without subsequent code also remain outside its proof. The fresh physical-byte scan reports 2,753 first-code matches, 983 no-code spans, 110 differing and three out-of-range markers. These 113 candidates require contextual review and are not a completeness proof. Dual builds and both architectures’ 186 background and 8 native tests passed first run outside the sandbox. Mirror-only warnings: x64 5230, x86 5179; no non-mirror warnings. EXE SHA-256: x86 `334978b4cf58e33e2baee6ed7623672b9bf049f433c62c3d4ddab484e2d34c25`; x64 `1c016d5c25a3c7bfeb2b7395fd56ebb68c6a79a18ed53d8b871604e23c1fd1a0`.

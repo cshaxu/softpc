@@ -1194,5 +1194,5 @@ void fla_init IFN0()
     fla_ndma = FALSE;
     fla_busy = FALSE;
 #endif // !NEC_98
-#line 1198
+#line 1181
 }

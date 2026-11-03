@@ -394,7 +394,7 @@ typedef	union
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif /* BIT_ORDER1 */
-#line 1355
+#line 1352
 
 #ifdef BIT_ORDER2
 struct sequencer
@@ -415,7 +415,7 @@ struct sequencer
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1385
+#line 1382
 
 	SEQ_RESET           reset;
 	CLOCKING_MODE       clocking_mode;
@@ -449,7 +449,7 @@ struct crt_controller
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1429
+#line 1425
 
 	byte horizontal_total;				/* NO - screen trash if wrong value	*/
 	byte horizontal_display_end;			/* YES - defines line length!!		*/
@@ -611,7 +611,7 @@ struct attribute_controller
 #else  
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1620
+#line 1614
 
 	AC_MODE_CONTROL	mode_control;
 
@@ -635,7 +635,7 @@ struct attribute_controller
 #else  
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
-#line 1658
+#line 1652
 
 	COLOR_PLANE_ENABLE	color_plane_enable;
 
@@ -953,13 +953,13 @@ extern void set_v7_fg_latch_byte IPT2(IU8, index, IU8, value);
 #else
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 1980
+#line 1974
 #endif /* V7VGA */
 
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif		/* GISP_SVGA */
-#line 1986
+#line 1980
  
 /* Global data structures to import into modules
  */

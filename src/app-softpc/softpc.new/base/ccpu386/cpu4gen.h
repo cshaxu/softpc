@@ -519,7 +519,7 @@ IMPORT	void	c_setEIP	IPT1(IU32, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 777
+#line 776
 
 #ifdef	CCPU
 IMPORT	ISM32	c_setCS	IPT1(IU16, val);
@@ -527,7 +527,7 @@ IMPORT	ISM32	c_setCS	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 790
+#line 789
 
 #ifdef	CCPU
 IMPORT	ISM32	c_setSS	IPT1(IU16, val);
@@ -535,7 +535,7 @@ IMPORT	ISM32	c_setSS	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 803
+#line 802
 
 #ifdef	CCPU
 IMPORT	ISM32	c_setDS	IPT1(IU16, val);
@@ -543,7 +543,7 @@ IMPORT	ISM32	c_setDS	IPT1(IU16, val);
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 816
+#line 815
 
 #ifdef	CCPU
 IMPORT	ISM32	c_setES	IPT1(IU16, val);
@@ -1095,7 +1095,7 @@ IMPORT	IU32	c_getCR3	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1713
+#line 1712
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getCF	IPT0();
@@ -1103,7 +1103,7 @@ IMPORT	ISM32	c_getCF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1726
+#line 1725
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getPF	IPT0();
@@ -1111,7 +1111,7 @@ IMPORT	ISM32	c_getPF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1739
+#line 1738
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getAF	IPT0();
@@ -1119,7 +1119,7 @@ IMPORT	ISM32	c_getAF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1752
+#line 1751
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getZF	IPT0();
@@ -1127,7 +1127,7 @@ IMPORT	ISM32	c_getZF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1765
+#line 1764
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getSF	IPT0();
@@ -1135,7 +1135,7 @@ IMPORT	ISM32	c_getSF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1778
+#line 1777
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getTF	IPT0();
@@ -1143,7 +1143,7 @@ IMPORT	ISM32	c_getTF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1791
+#line 1790
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getIF	IPT0();
@@ -1151,7 +1151,7 @@ IMPORT	ISM32	c_getIF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1804
+#line 1803
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getDF	IPT0();
@@ -1159,7 +1159,7 @@ IMPORT	ISM32	c_getDF	IPT0();
 #else	/* CCPU */
 #error "Unsupported SoftPC mirror configuration: non-CCPU"
 #endif	/* CCPU */
-#line 1817
+#line 1816
 
 #ifdef	CCPU
 IMPORT	ISM32	c_getOF	IPT0();

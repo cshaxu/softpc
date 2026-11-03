@@ -858,3 +858,9 @@ positions across ten mirror files. The initial heuristic queue now has four
 remaining sites; the separate comment-aware first-code queue is not exhausted
 and may contain local-only code. Conditions and executable statements are
 unchanged. P32 dual builds and background suites passed; x64 native passed after a failed first run and x86 native passed first run. Delivery remains pending; S30 remains open.
+
+P32 was committed and pushed as `448b7ea0`. P33 corrects 25 XP diagnostic
+positions across seven mirror files, including seven physical-line corrections
+in `vgaports.h`. The earlier four-site heuristic queue is exhausted, but the
+separate comment-aware first-code queue and no-code marker coverage remain
+open. Conditions and executable statements are unchanged. P33 dual builds and both 186-test background and 8-test native suites passed on the first run. Delivery is pending; S30 remains open.
