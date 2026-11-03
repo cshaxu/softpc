@@ -316,7 +316,7 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 299
+#line 659
 #if (NUM_SERIAL_PORTS > 2)
 #define	adapter_for_port(port) \
 	(((port & 0x300) == 0x300) ? \
@@ -339,7 +339,7 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* IRET_HOOKS */
-#line 328
+#line 689
 
 /* BCN 2730 define generic macros which can be SVID3 or old style
  * in either case the structure used should be a termios

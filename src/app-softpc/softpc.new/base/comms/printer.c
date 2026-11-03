@@ -486,7 +486,7 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 			break;
 		}
 #endif // !NEC_98
-#line 412
+#line 460
 		break;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

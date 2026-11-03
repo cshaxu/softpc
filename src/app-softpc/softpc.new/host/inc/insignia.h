@@ -106,13 +106,13 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
 #ifndef NULL
 #error "Unsupported SoftPC mirror configuration: !NULL"
 #endif
-#line 113
+#line 104
 
 #ifndef BOOL
 #ifdef NT_INCLUDED
 #error "Unsupported SoftPC mirror configuration: NT_INCLUDED"
 #else
-#line 120
+#line 111
 #define BOOL UINT
 #endif
 #endif
@@ -153,7 +153,7 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
 #ifdef  ANSI
 #error "Unsupported SoftPC mirror configuration: ANSI"
 #else   /* ANSI */
-#line 192
+#line 183
 
 /* Function prototypes */
 

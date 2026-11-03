@@ -822,3 +822,30 @@ EOF include one identifiable mismatched original closing brace and three
 locations in existing local-only declarations or snapshot code; their
 meaning must be audited, not automatically rewritten. This probe establishes
 only first-code evidence and does not prove complete line mapping.
+
+## P31 diagnostic positions and non-UTF-8 preservation
+
+The [48 XP line mappings](m9-t99-s30-p31-line-mapping.tsv) cover ten files.
+Repeated video operations and printer functions were mapped to the correct
+original function and branch, and a `com.c` line with an extra local blank
+was mapped by its subsequent original content. For `com.c` and `keyba.c`,
+raw bytes were compared against the previous Git content after normalizing
+only Git CRLF representation: aside from the mapped numeric edits, bytes
+match, and the workspace retains CRLF. [Two false candidates](m9-t99-s30-p31-false-candidates.tsv)
+were rejected based on original function context. Remaining [14 heuristic candidates](m9-t99-s30-p31-unreviewed-line-candidates.tsv) and [127 comment-aware first-code probe candidates](m9-t99-s30-p31-first-code-candidates.tsv) overlap and
+are not all faults; the probes are not exhaustive. Conditions and executable
+statements remain unchanged. Dual builds passed. x64 background and native groups passed first run; x86 first background run had verifier-negative timeout at 60 seconds and types-layout-selftest timeout at 180 seconds. Both passed separately in serial. A full serial sandboxed run passed those two but its cleanup selftest was denied creating a Junction. The same test passed outside the sandbox; the full x86 background run outside the sandbox then passed 186/186 and the native group passed 8/8. No budget or test assertion was changed. Mirror-only warnings: x64 5304, x86 5253. EXE SHA-256: x86 `ab75952810a57ef7e18c2977817d330f0518c1ae7fde76892b81e4f7afd50189`; x64 `d011f8675bd204fdcd7a612ac7e9f9af6ffa26f4ab34e1387144a304401f9c92`.
+
+### P31 physical-line parser correction
+
+The earlier Latin-1 text parser treated bytes within valid UTF-8 multibyte
+sequences as line separators in `vgaports.h`. A fresh byte-line parse of all
+475 files preserved the same 3,614 ordered paired-condition identities and
+the same 39 candidate rows. The [18-node correction map](m9-t99-s30-p31-vgaports-line-correction.tsv)
+records 13 changed physical positions in that one file; condition signatures
+and nesting were unchanged. Seven confirmed existing marker corrections are
+[queued](m9-t99-s30-p31-vgaports-line-candidates.tsv) for a later source batch.
+The comment-aware physical first-code scan found 2,739 matching first-code
+locations, 983 with no code before the next marker, 123 differing and four
+beyond the XP file. These 127 candidates are not proof of defects and the
+probe does not establish complete mapping.

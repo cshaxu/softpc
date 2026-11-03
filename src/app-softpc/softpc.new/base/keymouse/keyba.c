@@ -171,7 +171,7 @@ GLOBAL VOID ( *do_key_repeats_fn_ptr )();
 #if defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: KOREA"
 #endif
-#line 234
+#line 235
 /*
  * 6805 code buffer:
  *

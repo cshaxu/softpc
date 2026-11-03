@@ -879,15 +879,15 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: JAPAN and i386"
 #else // !JAPAN || !i386
-#line 775
+#line 1223
     source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + video_pc_low_regen;
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: !i386 and JAPAN"
 #endif // !i386 && JAPAN
-#line 776
+#line 1227
     col_incr = sas_w_at_no_check(VID_COLS) * 2;	/* offset to next line */
 #endif // !JAPAN || !i386
-#line 777
+#line 1229
 
 	/* Try to scroll the adaptor memory & host screen. */
 
@@ -945,7 +945,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 807
+#line 1315
     }
 
 /* moved all the data we were going to move - blank the cleared region */
@@ -953,7 +953,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // !i386 && JAPAN
-#line 811
+#line 1323
 
     while(lines--)
     {
@@ -1028,7 +1028,7 @@ LOCAL void sensible_graph_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, 
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 873
+#line 1429
 		sas_move_bytes_forward (source,dest, colsdiff);
 #endif
 		/*
@@ -1037,7 +1037,7 @@ LOCAL void sensible_graph_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, 
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 881
+#line 1437
 		sas_move_bytes_forward (source+ODD_OFF,dest+ODD_OFF, colsdiff);
 #endif
 		source += SCAN_LINE_LENGTH;
@@ -1051,7 +1051,7 @@ LOCAL void sensible_graph_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, 
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 895
+#line 1451
 		sas_fills(dest, (IU8)attr, colsdiff);
 		sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -1136,7 +1136,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 973
+#line 1536
 		sas_move_bytes_forward (source,dest, colsdiff);
 #endif
 	        /*
@@ -1145,7 +1145,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 981
+#line 1544
 		sas_move_bytes_forward (source+ODD_OFF,dest+ODD_OFF, colsdiff);
 #endif
 	        source += SCAN_LINE_LENGTH;
@@ -1176,7 +1176,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
 #ifdef REAL_VGA
 #error "Unsupported SoftPC mirror configuration: REAL_VGA"
 #else
-#line 1011
+#line 1574
 	    sas_fills(dest, (IU8)attr, colsdiff);
 	    sas_fills(dest+ODD_OFF, (IU8)attr, colsdiff);
 #endif
@@ -1329,14 +1329,14 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: JAPAN and i386"
 #else // !JAPAN || !i386
-#line 1122
+#line 1741
 	source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + video_pc_low_regen;
 	col_incr = sas_w_at_no_check(VID_COLS) * 2;
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: !i386 and JAPAN"
 #endif // !i386 && JAPAN
 #endif // !386 || !JAPAN
-#line 1124
+#line 1747
 
 	/* Try to scroll the adaptor memory & host screen. */
 
@@ -1383,7 +1383,7 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1148
+#line 1825
 	}
 
     /* moved all the data we were going to move - blank the cleared region */
@@ -1391,7 +1391,7 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // !i386 && JAPAN
-#line 1152
+#line 1833
 
 	while(lines--)
 	{
@@ -1750,7 +1750,7 @@ GLOBAL void vd_write_char_attrib IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1486
+#line 2221
 
     /* Load internal variables with the values stored in BIOS
      * data area.
@@ -1841,7 +1841,7 @@ GLOBAL void vd_write_char IFN0()
 #ifdef JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
 #endif // JAPAN
-#line 1553
+#line 2333
 
     /* Load internal variables with the values stored in BIOS
      * data area.

@@ -847,3 +847,8 @@ exhaustive. The line mapping in `mouse_io.c` accounts for an extra local
 blank line so the next original comment and executable statement obtain
 their XP positions. Conditions and executable statements are unchanged.
 P30 dual builds and both 186-test background suites passed. Both native groups initially failed compact_console and each full group reran 8/8 successfully; delivery remains pending. S30 remains open.
+
+P30 was committed and pushed as `723c17f4`. P31 corrects 48 XP diagnostic
+line positions in ten files, including `com.c` and `keyba.c`; their original
+raw bytes and CRLF are preserved apart from line-number edits. Two false
+candidates were adjudicated without source changes. Fourteen earlier heuristic candidates and 127 comment-aware first-code probe candidates remain; they overlap and are not confirmed defects or complete coverage. P31 dual builds and full suites passed after an x86 serial unsandboxed rerun; earlier failures are recorded. Delivery remains pending; S30 remains open.

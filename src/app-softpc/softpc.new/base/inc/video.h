@@ -83,7 +83,7 @@
 #else
 #error "Unsupported SoftPC mirror configuration: !EGG"
 #endif
-#line 78
+#line 151
 
 extern IU8 Video_mode;	/* Shadow copy of BIOS video mode */
 
@@ -192,7 +192,7 @@ IMPORT MODE_ENTRY vd_ext_graph_table[];
 #else
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif
-#line 185
+#line 258
 
 /*
  * Mode macros to distinguish between alphanumeric & graphics video modes

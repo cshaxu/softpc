@@ -69,7 +69,7 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif
-#line 69
+#line 70
 
 
 /*
@@ -169,7 +169,7 @@ static int com_critical[NUM_SERIAL_PORTS];
 #line 208
 static LINE_CONTROL_REG LCRFlushMask;
 #endif // NEC_98
-#line 140
+#line 210
 
 /*
  *	Please note that the following arrays have been made global in order
@@ -450,7 +450,7 @@ LOCAL void next_batch IPT1(long, l_adapter);
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
 #endif // NEC_98
-#line 407
+#line 391
 
 /*
  * =====================================================================
@@ -838,7 +838,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 766
+#line 1279
 		break;
 
 	case RS232_IIR:
@@ -877,7 +877,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 822
+#line 1345
 		break;
 	
 	case RS232_MCR:
@@ -889,7 +889,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 845
+#line 1368
 		break;
 	
 	case RS232_LSR:
@@ -913,7 +913,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 897
+#line 1423
 		break;
 	
 	case RS232_MSR:
@@ -953,7 +953,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 942
+#line 1511
 		break;
 
 /*
@@ -1168,7 +1168,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef SHORT_TRACE
 #error "Unsupported SoftPC mirror configuration: SHORT_TRACE"
 #endif
-#line 1185
+#line 1826
 		/*
 		 * Optimisation - DOS keeps re-writing this register
 		 */
@@ -1201,7 +1201,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1236
+#line 1877
 		break;
 		
 	case RS232_MSR:
@@ -1215,7 +1215,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
-#line 1261
+#line 1902
 		/* DrDOS writes to this reg after setting int on MSR change
 		 * and expects to get an interrupt back!!! So we will oblige.
 		 * Writing to this reg only seems to affect the delta bits
@@ -1257,7 +1257,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #ifdef IRET_HOOKS
 #error "Unsupported SoftPC mirror configuration: IRET_HOOKS"
 #endif /* of ifdef IRET_HOOKS */
-#line 2052
+#line 2053
 
 /*
  * =====================================================================
@@ -1808,7 +1808,7 @@ static void set_line_control IFN2(int, adapter, int, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 1878
+#line 3063
 
 	/* finally update the current line control settings */
 	asp->line_control_reg.all = (unsigned char)value;
@@ -2299,7 +2299,7 @@ GLOBAL VOID com_init IFN1(int, adapter)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 2337
+#line 3785
 
 	adapter_state[adapter].had_first_read = FALSE;
 	

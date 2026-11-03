@@ -193,7 +193,7 @@ GLOBAL READ_POINTERS read_pointers;
 #ifndef CPU_40_STYLE	/* i.e. EVID without introducing an EVID define */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else	/* CPU_40_STYLE - evid */
-#line 378
+#line 379
 
 #ifdef C_VID
 /* C_Evid glue */
@@ -605,7 +605,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 797
+#line 831
 				break;
 				
 			case CHAIN2:
@@ -614,7 +614,7 @@ ega_read_routines_update IFN0()
 #else  /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif	/* CPU_40_STYLE */
-#line 809
+#line 843
 				EGA_CPU.read_mapped_plane_ch2 = EGA_planes +
 							(getVideoread_mapped_plane() & 2)*EGA_PLANE_SIZE;
 				break;

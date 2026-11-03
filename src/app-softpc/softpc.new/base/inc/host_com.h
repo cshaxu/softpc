@@ -228,7 +228,7 @@ IMPORT void host_com_xon_change IPT2(IU8,hostID, IBOOL,apply);
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 236
+#line 235
 
 #define	HOST_COM_FRAMING_ERROR	(1 << 0)
 #define	HOST_COM_OVERRUN_ERROR	(1 << 1)
@@ -238,7 +238,7 @@ IMPORT void host_com_xon_change IPT2(IU8,hostID, IBOOL,apply);
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 245
+#line 244
 
 #define	HOST_COM_MODEM_CTS	(1 << 0)
 #define	HOST_COM_MODEM_RI	(1 << 1)

@@ -1,0 +1,15 @@
+path	local_line	old_line	xp_candidates	sources
+base/bios/bootstra.c	6	6	7	token
+base/bios/reset.c	769	862	1063	structural
+base/comms/rs232_io.c	294	293	299	token
+base/disks/floppy_i.c	165	343	600	token
+base/inc/gmi.h	60	69	55	structural,token
+base/inc/gvi.h	287	284	487	token
+base/inc/host_lpt.h	170	157	181	structural,token
+base/inc/ica.h	199	184	228	structural,token
+base/support/ios.c	855	839	940	token
+base/system/at_dma.c	253	217	247	token
+base/system/ica.c	1936	1935	2158	structural
+base/system/idetect.c	270	260	351	token
+base/video/egwrtm12.c	126	134	135	token
+host/inc/nt_fulsc.h	44	35	42	token

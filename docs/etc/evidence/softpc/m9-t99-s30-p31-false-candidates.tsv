@@ -1,0 +1,3 @@
+path	local_line	existing_line	audit_result
+base/comms/printer.c	519	484	XP 484 is the printer_outb opening brace; candidate 371 belongs to printer_inb.
+base/video/video.c	1552	2020	The original target is XP 2020; candidate 1937 is a different graphics operation.

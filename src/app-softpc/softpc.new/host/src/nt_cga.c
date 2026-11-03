@@ -194,7 +194,7 @@ void nt_init_cga_colour_med_graph()
 #ifdef BIGWIN
 #error "Unsupported SoftPC mirror configuration: BIGWIN"
 #endif /* BIGWIN */
-#line 215
+#line 325
 #endif /* LITTLEND */
 
                 }
@@ -217,7 +217,7 @@ void nt_init_cga_colour_hi_graph()
 }
 
 #ifndef NEC_98
-#line 236
+#line 347
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*:::::::::::::::::::::::::: Output CGA text :::::::::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -396,7 +396,7 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 
 }   /* end of nt_text() */
 #endif // !NEC_98
-#line 399
+#line 509
 
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
