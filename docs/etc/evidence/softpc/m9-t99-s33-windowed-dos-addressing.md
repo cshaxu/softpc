@@ -270,7 +270,7 @@ prompt, without alternating-character loss; returned full-screen text contains
 the same complete strings. This is native-probe evidence, not Computer Use or
 owner acceptance. Test probes and raw captures are retired after delivery.
 
-## P2 necessity audit
+## P2 necessity audit (superseded by owner correction below)
 
 Owner requires keeping both the original repair and newly discovered error
 corrections; only proven unnecessary edits may be restored. The frozen audit
@@ -313,3 +313,19 @@ P2 focused results: x64 5/5 and x86 5/5, all exit 0. Published SHA-256:
 
 - softpc32.exe: `95e00841c76c89007a09b5bf809bb1a57881fb9b05bbd9ba44d27e428f81936a`.
 - softpc64.exe: `e019f3760344f3c8c6259083b2d2444cb643ee70601f66e9dd7874e7bb36857d`.
+
+## P3 semantic consistency correction
+
+The owner rejected P2's criterion: an identity calculation can still correctly
+express the shared address-space contract. All nine sites belong to CHAIN2
+scanout, so get_chain2_screen_ptr(0) is the consistent spelling even though it
+returns the same base pointer. P2 was execution-equivalent but weakened the
+uniform pattern without simplifying runtime logic. Its nine reversions are
+withdrawn; no valid behavioral correction is removed.
+
+Production, tests, mirror manifest and published EXEs are restored exactly to
+qualified P1 4ecab43b, checked against Git bytes. Consequently P1's 388 passing
+tests, final focused reruns and real Win31 roundtrip evidence apply directly.
+There is no new executable behavior to rebuild or requalify. Mirror difference
+growth remains 368, not 350. This review has established no justified reduction
+in the admitted repair under the owner's semantic-consistency requirement.

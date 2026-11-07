@@ -40,10 +40,10 @@ traced it to CHAIN2/unchained video-plane address layout. See the
 The minimal repair and snapshot format boundary are implemented. Both EXEs
 are refreshed; x64/x86 each pass 186 background tests and 8 native integration
 tests. Actual-diff review and final cold-boot Win31 bidirectional verification passed.
-S33 P1 is delivered. The owner requested a follow-up necessity audit: P2 restores
-nine identity zero-offset calls only; all behavioral fixes remain. Dual builds prove byte-identical objects and identical EXEs except link
-timestamp/checksum. Focused qualification and P2 delivery complete the audit;
-S33 remains open pending owner acceptance. Legacy odd dword-fill
+S33 P1 is delivered. The owner rejected P2's identity-call reduction because
+all CHAIN2 sites should express one address-space contract. P3 restores the
+production/tests/manifest/EXEs exactly to qualified P1; no behavioral fixes are
+removed. S33 remains open pending owner acceptance. Legacy odd dword-fill
 value assembly outside the selected CPU path is explicitly recorded in TODO.
 
 ## Recent M9 Closures
