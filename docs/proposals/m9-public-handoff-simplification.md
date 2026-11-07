@@ -4894,3 +4894,15 @@ These S tasks remain within T99 and are not global Queue entries. For each
 depth, deliver excluded `#error`/`#line` changes with the required build,
 publication, tests, commit and push before retained-arm audit and queueing
 eligible direct children for the following depth.
+
+## T99 S34 unchanged shared import
+
+Owner accepted S33 and admitted import from NXVM 09ebe521e7fede9c6e5985efadf1acbad4ecfc8e.
+Frozen universe: all 296 files across src/test lib, emulator, x86-debug and
+x86-ibmpc. Six changed files in Lib (including two manifests), no additions or
+deletions; every other file must remain byte-identical. The five new code lines
+preserve Break separately from Pause and test native decoding. SoftPC needs one
+private Break-to-VK_CANCEL case and a regression through the existing adapter.
+Estimated production +5/-0, tests +10 to 20/-0, plus manifest hash updates.
+Completion requires every file compared, full cached dual builds and tests,
+published EXEs and an actual-diff review. Owner snapshot changes join delivery.

@@ -2,60 +2,45 @@
 
 ## Current Work
 
-Owner approves T99 S33 repair following the reproduced investigation. S32 delivery is retained in its
-[record](../history/M9-T99-S32-line-endings.md). T99 remains open.
+Owner accepts S33 and admits S34 unchanged NXVM shared import.
+See [S33 closure](../history/M9-T99-S33-windowed-dos.md). T99 remains open.
 
-## M9 T99 S33 Packet
+## M9 T99 S34 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves minimal unified repair and delivery; follow-up audit must retain correct and newly discovered fixes, reverting only proven unnecessary changes. |
-| Objective | Correct the CHAIN2/unchained video-plane layout mismatch and virtual text BIOS aperture; verify bidirectional DOS transitions and subsequent input/clear/scroll. |
-| Non-goals | No guest modification, public-component redesign, second video-memory path or guest-specific workaround; preserve user INI, original media and snapshot. No Computer Use. |
-| Reference Baseline | SoftPC 9250732e and owner-provided failing snapshot; fixed XP SP1 source for mirror comparison. |
+| Admission And Approval | Owner requests unchanged NXVM public-eight-tree import, dual build/publication, full tests, commit/push and pending acceptance; explicitly includes snapshot changes. |
+| Objective | Import the fixed latest shared corpus and connect its new Break key in SoftPC's private input adapter. |
+| Non-goals | No NXVM edits, mirror changes, new input path, user INI/media edits or Computer Use. |
+| Reference Baseline | SoftPC 1ec0d551; NXVM 09ebe521e7fede9c6e5985efadf1acbad4ecfc8e (shared trees unchanged from audited 7794e25f). |
 | Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Existing mirror C-VID address arithmetic, video dirty/display consumers, existing video snapshot boundary and owner-local tests; no public frame/API change. |
+| Files And ABI Surface | src/test of lib, emulator, x86-debug, x86-ibmpc; private machine/input.c and its existing Machine smoke. Additive Base Break identity only. |
 | Applicable Rules | Execution, documentation, architecture, coding and source-research policy. |
-| Verification | Focused read/write/plane/display and snapshot regressions on x86/x64; real Win31 bidirectional DOS transitions; cached dual builds, publish both EXEs, all unit/gate/integration tests including native desktop/audio. Background jobs only. |
-| Expected Markers | Identify whether corruption first exists in guest state, original rendering, frame conversion or host presentation. |
-| Asset Needs | Read owner snapshot; use task-owned configuration and overlay media only. |
-| Reporting Requirements | Separate owner reproduction, local dynamic proof and source deductions; give root cause evidence, proposed files and diff estimate. |
-| Stop Conditions | Do not overwrite user assets, infer cause solely from a shared symptom, or terminate long probes at tool observation timeout. |
-| Exit Criteria | Minimal single-path repair reviewed, focused and full regressions passed, dual EXEs published, provenance updated, changes committed/pushed; wait for owner acceptance. |
-| Original Owner Request | 准入新 S 调研 Win31 全屏 MS-DOS Prompt 经 CAF 切换后窗口字符错乱；使用已保存故障快照，可只读研究 Win3.x。 |
-| Similar-Issue Sweep | Review VGA font/plane/palette/stride and video mode transition handling, including snapshot reconstruction. |
+| Verification | Cached x86/x64 full builds, both published EXEs, complete background unit/gate and native desktop/audio/package tests; byte comparison of all eight trees. |
+| Expected Markers | 296 shared files match fixed source; Break make/break accepted by actual private adapter; all prescribed tests pass. |
+| Asset Needs | Publish both EXEs; include owner-modified assets/binary/snapshot and owner-deleted snapshot-midi without rewriting snapshot contents. |
+| Reporting Requirements | Actual production/test diff, source provenance, full test results, shared parity, published hashes and remaining limits. |
+| Stop Conditions | Preserve unrelated changes; no timeout killing of long jobs; do not modify NXVM or mirror sources. |
+| Exit Criteria | Full qualification and actual-diff review complete, published and pushed with clean worktree; wait for owner acceptance. |
+| Original Owner Request | 从隔壁nxvm原样导入公共八组件，编译发布测试提交推送后等我验收；snapshot文件变化一起提交推送。 |
+| Similar-Issue Sweep | Inspect all Base input consumers and private key mapping; retain original scan-code translation and shared platform boundaries. |
 
-Disposable probes belong to build/t99-s33, owned by this executor; review
-after 15 minutes without progress and preserve logs until findings are recorded.
+Disposable scratch: build/t99-s34, owned by this executor. Review after 15 minutes
+without log progress; retain only until concise evidence is recorded, then clean.
 
 ## Current Technical Baseline
 
-S32 full cached builds and background/native tests completed; first-run failures
-and successful reruns are documented in its verification record.
-
-S33 reproduced the windowed DOS corruption before host Window rendering and
-traced it to CHAIN2/unchained video-plane address layout. See the
-[investigation and repair boundary](../etc/evidence/softpc/m9-t99-s33-windowed-dos-addressing.md).
-The minimal repair and snapshot format boundary are implemented. Both EXEs
-are refreshed; x64/x86 each pass 186 background tests and 8 native integration
-tests. Actual-diff review and final cold-boot Win31 bidirectional verification passed.
-S33 P1 is delivered. The owner rejected P2's identity-call reduction because
-all CHAIN2 sites should express one address-space contract. P3 restores the
-production/tests/manifest/EXEs exactly to qualified P1; no behavioral fixes are
-removed. Owner acceptance is partial: after windowed DOS -> full screen ->
-windowed DOS, newly typed characters do not appear although the cursor moves.
-The follow-up is reproduced: text BIOS used the physical graphics aperture
-instead of the caller's BDA text aperture. Text read/write/scroll now share that
-existing mode entry for both bounds. Dual focused tests and the real Win31
-input/roundtrip/DIR/CLS probe pass. Final cached builds/publication and all
-186 background plus 8 native tests pass on each architecture (388 total).
-P4 is ready for owner acceptance after actual-diff review; S33 stays open. Legacy odd dword-fill
-value assembly outside the selected CPU path is explicitly recorded in TODO.
+S33 accepted: video-plane and BDA-aperture repairs retained, with 186 background
+and 8 native tests passing per architecture. S34 P1 is qualified for owner acceptance: 296 shared files match NXVM
+09ebe521e7; cached dual builds publish both EXEs. All 388 distinct test cases
+pass, including a corrected x64 documentation-gate rerun and 16 native tests.
+See [actual changes and evidence](../etc/evidence/softpc/m9-t99-s34-shared-import.md).
+Owner snapshot changes join delivery. S34 awaits acceptance; T99 remains open.
 
 ## Recent M9 Closures
 
-See [S32 delivery](../history/M9-T99-S32-line-endings.md).
+See [S33 delivery](../history/M9-T99-S33-windowed-dos.md).
 
 | Task | Closure |
 | --- | --- |

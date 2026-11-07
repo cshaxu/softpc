@@ -1,5 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
+#include "machine/input.h"
 #include "../../fixture_cleanup.h"
 
 #include <assert.h>
@@ -671,6 +672,16 @@ static void run_keyboard_boot_image(const char *path)
     boot_machine(machine);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x1eu);
+    /* Exercise the public-key -> private adapter -> original keycode path. */
+    kvm_input_event event = { 0 };
+    event.type = KVM_EVENT_KEY;
+    event.data.key.key = BASE_KEY_BREAK;
+    event.data.key.scan_code = 0x46u;
+    event.data.key.flags = BASE_KEY_FLAG_EXTENDED;
+    event.data.key.pressed = LIB_TRUE;
+    assert(vm_keyboard_inject_machine_event(machine, &event));
+    event.data.key.pressed = LIB_FALSE;
+    assert(vm_keyboard_inject_machine_event(machine, &event));
     softpc_machine_destroy(machine);
 }
 

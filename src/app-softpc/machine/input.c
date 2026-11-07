@@ -27,6 +27,7 @@ static WORD vm_keyboard_to_virtual_key(lib_u32 key)
     case BASE_KEY_SHIFT: return VK_SHIFT; case BASE_KEY_CONTROL: return VK_CONTROL;
     case BASE_KEY_ALT: return VK_MENU; case BASE_KEY_CAPS_LOCK: return VK_CAPITAL;
     case BASE_KEY_NUM_LOCK: return VK_NUMLOCK; case BASE_KEY_SCROLL_LOCK: return VK_SCROLL;
+    case BASE_KEY_BREAK: return VK_CANCEL;
     case BASE_KEY_PAUSE: return VK_PAUSE; case BASE_KEY_PRINT_SCREEN: return VK_SNAPSHOT;
     case BASE_KEY_HOME: return VK_HOME; case BASE_KEY_END: return VK_END;
     case BASE_KEY_PAGE_UP: return VK_PRIOR; case BASE_KEY_PAGE_DOWN: return VK_NEXT;
