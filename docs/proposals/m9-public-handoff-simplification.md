@@ -4906,3 +4906,25 @@ private Break-to-VK_CANCEL case and a regression through the existing adapter.
 Estimated production +5/-0, tests +10 to 20/-0, plus manifest hash updates.
 Completion requires every file compared, full cached dual builds and tests,
 published EXEs and an actual-diff review. Owner snapshot changes join delivery.
+
+## T99 S36 CHAIN2 DWORD read composition
+
+Owner requests independent repair of the reported read-mode 0/1 DWORD rules.
+S35 was withdrawn without production changes; do not reuse its number.
+Both current rules advance the second WORD address by four instead of two,
+and modify r20 without committing that high WORD to the returned local value.
+Keep the two existing WORD calls; change the byte offset and explicitly compose
+the result. No new helper, layout, ABI, frame or guest-specific behavior.
+Estimated source +8 to 12/-24 to 30, tests +30 to 50/-0. Update mirror identity
+and exception evidence. Frozen coverage: both readers, odd/even and crossing
+addresses, complete high/low values and real read-mode masks. Demonstrate the
+old failure and dual-width corrected pass, then full cached qualification.
+Do not attribute historic Win31 corruption to this independent defect.
+
+The independent odd-address mode-1 oracle also exposed the WORD dependency's
+remaining next-group offsets +4/+6 after the S33 plane-spacing repair. Correct
+these to +8/+10 in the same original path; without this prerequisite DWORD
+composition is correct but returns wrong bytes. This adds only two changed
+constant lines, no layout change. A separate GDP byte-mask alias omission
+(offsets 1379/1383 versus 1376/1380) was exposed during mask variation; record
+that adapter defect in TODO rather than mixing it into this original read fix.

@@ -1598,3 +1598,13 @@ which retains the last physical mode-set value. Win31 virtual DOS can have
 BDA mode 3 while the physical display remains graphics at A0000. Existing
 SAS translation, direct writer selection and virtualized scroll checks remain.
 This is not a Win31 branch or a second framebuffer. See the S33 evidence.
+
+### T99 S36 CHAIN2 DWORD read composition
+
+Owner-admitted semantic repair in sevid000.c, S_2089/S_2101: retain both
+original WORD calls, advance the second guest address by two, and explicitly
+combine the saved low WORD with the returned high WORD. Remove the dead
+extraction into r20; no layout or ABI change. The independent odd-address
+mode-1 test additionally requires S_2100's next physical group offsets to be
+8/10 rather than 4/6, consistent with the already retained S33 A0 gap.
+See [S36 evidence](m9-t99-s36-chain2-dword-read.md). No NTVDM64 patch copied.

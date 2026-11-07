@@ -878,7 +878,7 @@ switch ( id )
 	*((IU16	*)(LocalIUH+2)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16207)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16206)	;
-	*((IUH	*)&(r21))	=	(IS32)(4)	;	
+	*((IUH	*)&(r21))	=	(IS32)(2)	;	
 	*((IU32	*)&(r20)	+	REGLONG)	=	*((IU32	*)(LocalIUH+0)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	;		
 	*((IU32	*)&(r3)	+	REGLONG)	=	*((IU32	*)&(r20)	+	REGLONG)	;	
 /*	J_SAVE_RETURN	NOT	IMPLIMENTED	*/
@@ -886,15 +886,11 @@ switch ( id )
 	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;	returnValue	=	S_2088_RdMode0Chain2WordRead(v1,v2,v3,v4);	}
 	/*	j_state	(IS32)(-2013004277),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
-	*((IUH	*)&(r21))	=	(IS32)(16)	;	
-	*((IUH	*)&(r22))	=	(IS32)(16)	;	
-	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
-	CrulesRuntimeError("Bad	long	bitfield");
-	else
-	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+2)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IU16	*)&(r20)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16207)	;
-	*((IU32	*)&(r2)	+	REGLONG)	=	*((IU32	*)(LocalIUH+2)	+	REGLONG)	;	
+	/* DIVERGENCE(T99-S36): consecutive WORDs form the low/high DWORD halves. */
+	*((IU32	*)&(r2)	+	REGLONG)	=
+		(IU32)*((IU16	*)(LocalIUH+2)	+	REGWORD) |
+		((IU32)*((IU16	*)&(r2)	+	REGWORD) << 16);
 /*J_KILL__*/
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1686,7 +1682,7 @@ switch ( id )
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*((IU8	*)(LocalIUH+2)	+	REGBYTE)	=	*((IU8	*)(LocalIUH+2)	+	REGBYTE)	&	*((IU8	*)(LocalIUH+3)	+	REGBYTE);	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16230)	;
-	*((IUH	*)&(r20))	=	(IS32)(4)	;	
+	*((IUH	*)&(r20))	=	(IS32)(8) /* T99-S36: next odd/even group retains the A0 gap. */	;	
 	*((IU32	*)&(r23)	+	REGLONG)	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
 	*((IUH	*)&(r20))	=	(IS32)(1379)	;	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
@@ -1696,7 +1692,7 @@ switch ( id )
 	*(UOFF_15_8(	(LocalIUH+2)	))	=	*((IU8	*)&(r21)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16230)	;
-	*((IUH	*)&(r20))	=	(IS32)(6)	;	
+	*((IUH	*)&(r20))	=	(IS32)(10) /* T99-S36: next odd/even group retains the A0 gap. */	;	
 	*((IU32	*)&(r23)	+	REGLONG)	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
 	*((IUH	*)&(r20))	=	(IS32)(1379)	;	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
@@ -1793,7 +1789,7 @@ switch ( id )
 	*((IU16	*)(LocalIUH+2)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16237)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16236)	;
-	*((IUH	*)&(r21))	=	(IS32)(4)	;	
+	*((IUH	*)&(r21))	=	(IS32)(2)	;	
 	*((IU32	*)&(r20)	+	REGLONG)	=	*((IU32	*)(LocalIUH+0)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	;		
 	*((IU32	*)&(r3)	+	REGLONG)	=	*((IU32	*)&(r20)	+	REGLONG)	;	
 /*	J_SAVE_RETURN	NOT	IMPLIMENTED	*/
@@ -1801,15 +1797,11 @@ switch ( id )
 	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;	returnValue	=	S_2100_RdMode1Chain2WordRead(v1,v2,v3,v4);	}
 	/*	j_state	(IS32)(-2013004277),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
-	*((IUH	*)&(r21))	=	(IS32)(16)	;	
-	*((IUH	*)&(r22))	=	(IS32)(16)	;	
-	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
-	CrulesRuntimeError("Bad	long	bitfield");
-	else
-	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+2)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IU16	*)&(r20)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16237)	;
-	*((IU32	*)&(r2)	+	REGLONG)	=	*((IU32	*)(LocalIUH+2)	+	REGLONG)	;	
+	/* DIVERGENCE(T99-S36): consecutive WORDs form the low/high DWORD halves. */
+	*((IU32	*)&(r2)	+	REGLONG)	=
+		(IU32)*((IU16	*)(LocalIUH+2)	+	REGWORD) |
+		((IU32)*((IU16	*)&(r2)	+	REGWORD) << 16);
 /*J_KILL__*/
 /*J_KILL__*/
 /*J_KILL__*/

@@ -16,12 +16,45 @@ extern IU8 *EGA_planes;
 extern EVID_WRT_POINTERS c_ev_write_ptr, chain2_evid[];
 extern EVID_READ_POINTERS read_mode0_evid[], read_mode1_evid[];
 
+static void check_chain2_dword_reads(void)
+{
+    const lib_u32 offsets[] = { 0x100, 0x101, 0x103, 0x107, 0x3fff, 0xfffd };
+    const lib_u8 bytes[] = { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66 };
+    IU32 compare = getVideocolour_comp(), care = getVideodont_care();
+    lib_u32 mode, entry, i;
+    for (mode = 0; mode < 2; ++mode)
+    for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
+        lib_u32 offset = offsets[entry];
+        lib_u32 expected = mode ? 0x40302010u : 0x44332211u;
+        EVID_READ_POINTERS reader = mode ? read_mode1_evid[1] : read_mode0_evid[1];
+        setVideocolour_comp(0);
+        setVideodont_care(0);
+        /* Independent odd/even plane locations; later bytes catch a +4 skip.
+           Mode 1 intersects each byte with its paired plane (0xf0). */
+        for (i = 0; i < sizeof(bytes); ++i) {
+            lib_u32 address = offset + i;
+            lib_u32 physical = 4u * (address & ~1u) + (address & 1u);
+            EGA_planes[physical] = bytes[i];
+            EGA_planes[physical + 2u] = 0xf0;
+        }
+        r1 = (IUH)Gdp; r2 = 0xa5a5a5a5u; r3 = offset;
+        reader.d_read(offset);
+        if ((lib_u32)r2 != expected)
+            fprintf(stderr, "CHAIN2 dword mode=%u offset=%x expected=%08x actual=%08x\n",
+                mode, offset, expected, (lib_u32)r2);
+        assert((lib_u32)r2 == expected);
+    }
+    setVideocolour_comp(compare);
+    setVideodont_care(care);
+}
+
 void softpc_test_chain2_continuations(void)
 {
     static lib_u8 expected[4u * EGA_PLANE_SIZE];
     lib_u8 input[128], output[64], first[64];
     EVID_WRT_POINTERS saved = c_ev_write_ptr;
     lib_u32 mode, parity, slot, pass, flag, i, offset;
+    check_chain2_dword_reads();
     /* Odd/even selects a plane without compacting its address. Independent
        physical offsets distinguish adjacent cells and preserve font planes. */
     lib_memory_set(EGA_planes, 0x5a, sizeof(expected));
