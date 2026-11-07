@@ -1452,6 +1452,39 @@ static void verify_bios_cga_pixel_handoff(void)
     }
 }
 
+static void verify_text_bios_aperture(void)
+{
+    extern sys_addr video_pc_low_regen, video_pc_high_regen;
+    extern IU32 read_byte_ev_glue(IU32 address);
+    c_setAH(0); c_setAL(3);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    /* Select the existing SAS path with unchained access, still at B8000.
+       The cached physical-mode aperture must not override the BDA text mode. */
+    outb(0x3c4, 4); outb(0x3c5, 6);
+    outb(0x3ce, 5); outb(0x3cf, 0);
+    outb(0x3ce, 6); outb(0x3cf, 0x0c);
+    video_pc_low_regen = 0xa0000;
+    video_pc_high_regen = 0xaffff;
+    c_setAH(2); c_setBX(0); c_setDX(0);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    c_setAH(9); c_setAL('A'); c_setBX(7); c_setCX(1);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    assert((IU8)read_byte_ev_glue(0xb8000) == 'A');
+    assert((IU8)read_byte_ev_glue(0xb8001) == 7);
+    c_setAH(0x0a); c_setAL('B'); c_setBX(0); c_setCX(1);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    c_setAH(8);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    assert(c_getAX() == 0x0742);
+    /* Full-width clear uses the text aperture's upper bound as well. */
+    c_setAH(6); c_setAL(0); c_setBX(0x0700); c_setCX(0); c_setDX(79);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    assert((IU8)read_byte_ev_glue(0xb8000) == ' ');
+    assert((IU8)read_byte_ev_glue(0xb809e) == ' ');
+    video_pc_low_regen = 0xb8000;
+    video_pc_high_regen = 0xbffff;
+}
+
 static void verify_text_plane_handoff(void)
 {
     extern void outb(io_addr port, half_word value);
@@ -2247,6 +2280,7 @@ int main(void)
     verify_preserved_v7_modes();
     verify_v7_cpu_scanout(machine);
     verify_bios_cga_pixel_handoff();
+    verify_text_bios_aperture();
     verify_text_plane_handoff();
     verify_chain2_dirty_entries();
     const unsigned colour_resolution_failures = verify_colour_resolution_matrix(machine);

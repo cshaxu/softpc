@@ -300,6 +300,10 @@ MODE_ENTRY vd_ext_graph_table[] = {
  * and start of page for a given row and column.
  */
 
+/* T99: text BIOS accesses follow the caller's BDA mode, not the last
+ * physical mode set by another V86 task. SAS retains address translation. */
+#define vd_text_mode() (vd_mode_table[sas_hw_at_no_check(vd_video_mode)])
+#line 398
 #define vd_page_offset(col, row)       ( ((row) * vd_cols_on_screen + (col))<<1)
 
 #define vd_regen_offset(page, col, row)					  \
@@ -882,7 +886,7 @@ LOCAL void sensible_text_scroll_up IFN6(int, t_row, int, l_col, int, rowsdiff, i
 #error "Unsupported SoftPC mirror configuration: JAPAN and i386"
 #else // !JAPAN || !i386
 #line 1223
-    source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + video_pc_low_regen;
+    source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + vd_text_mode().start_addr;
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: !i386 and JAPAN"
 #endif // !i386 && JAPAN
@@ -1079,7 +1083,7 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
     case 3: case 7:
 	is_alpha = TRUE;
 	/* set origin of data movement for calculating screen refresh */
-	source = sas_w_at_no_check(VID_ADDR)+vd_page_offset(l_col, t_row) + video_pc_low_regen;
+	source = sas_w_at_no_check(VID_ADDR)+vd_page_offset(l_col, t_row) + vd_text_mode().start_addr;
 	col_incr = vd_cols_on_screen * 2;	/* offset to next line */
 	break;
 
@@ -1158,9 +1162,9 @@ LOCAL void kinky_scroll_up IFN7(int, t_row, int, l_col, int, rowsdiff, int, cols
     if (is_alpha) {
 
 	while(lines--) {
-	    if((dest + 2*colsdiff) > video_pc_high_regen+1)
+	    if((dest + 2*colsdiff) > vd_text_mode().end_addr+1)
 	    {
-		colsdiff = (int)((video_pc_high_regen+1-dest)/2);
+		colsdiff = (int)((vd_text_mode().end_addr+1-dest)/2);
 		lines = 0; /* force termination */
 	    }
 #ifdef REAL_VGA
@@ -1332,7 +1336,7 @@ LOCAL void sensible_text_scroll_down IFN6(int, t_row, int, l_col, int, rowsdiff,
 #error "Unsupported SoftPC mirror configuration: JAPAN and i386"
 #else // !JAPAN || !i386
 #line 1741
-	source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + video_pc_low_regen;
+	source = sas_w_at_no_check(VID_ADDR) + vd_page_offset(l_col, t_row) + vd_text_mode().start_addr;
 	col_incr = sas_w_at_no_check(VID_COLS) * 2;
 #if !defined(i386) && defined(JAPAN)
 #error "Unsupported SoftPC mirror configuration: !i386 and JAPAN"
@@ -1501,7 +1505,7 @@ LOCAL void kinky_scroll_down IFN7(int, t_row, int, l_col, int, rowsdiff, int, co
     case 3: case 7:
 	is_alpha = TRUE;
 	col_incr = vd_cols_on_screen * 2;
-	source = sas_w_at_no_check(VID_ADDR)+vd_page_offset(l_col, t_row)+video_pc_low_regen;	/* top left */
+	source = sas_w_at_no_check(VID_ADDR)+vd_page_offset(l_col, t_row)+vd_text_mode().start_addr;	/* top left */
 	break;
 
     case 4: case 5: case 6:
@@ -1630,7 +1634,7 @@ GLOBAL void vd_read_attrib_char IFN0()
 #error "Unsupported SoftPC mirror configuration: excluded conjunction"
 #endif // JAPAN && i386
 #line 2098
-	cpos = video_pc_low_regen + vd_cursor_offset(getBH());
+	cpos = vd_text_mode().start_addr + vd_cursor_offset(getBH());
 #ifdef A2CPU
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
@@ -1791,7 +1795,7 @@ GLOBAL void vd_write_char_attrib IFN0()
 				|| (getVM())	/* if we are in V86 mode, the memory may be mapped... */
 #endif
 				)
-				sas_storew(video_pc_low_regen + cpos, (getBL() << 8) | getAL());
+				sas_storew(vd_text_mode().start_addr + cpos, (getBL() << 8) | getAL());
 			else
 #endif	/* EGG */
 				(*bios_ch2_word_wrt_fn)( (getBL() << 8) | getAL(), cpos );
@@ -1885,7 +1889,7 @@ GLOBAL void vd_write_char IFN0()
 				|| (getVM())	/* if we are in V86 mode, the memory may be mapped... */
 #endif
 				)
-				sas_store(video_pc_low_regen + cpos, getAL());
+				sas_store(vd_text_mode().start_addr + cpos, getAL());
 			else
 #endif	/* EGG */
 				(*bios_ch2_byte_wrt_fn)( getAL(), cpos );
@@ -2375,7 +2379,7 @@ GLOBAL void vd_write_teletype IFN0()
 				|| (getVM())	/* if we are in V86 mode, the memory may be mapped... */
 #endif
 				)
-				sas_store(video_pc_low_regen + ch_addr, ch);
+				sas_store(vd_text_mode().start_addr + ch_addr, ch);
 			else
 #endif	/* EGG */
 				(*bios_ch2_byte_wrt_fn)( ch, ch_addr );
@@ -2515,7 +2519,7 @@ GLOBAL void vd_write_teletype IFN0()
 #error "Unsupported SoftPC mirror configuration: A2CPU"
 #else
 #line 3107
-		sas_load( video_pc_low_regen + sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,vd_cursor_row) + 1, &attrib);
+		sas_load( vd_text_mode().start_addr + sas_w_at_no_check(VID_ADDR)+vd_page_offset(vd_cursor_col,vd_cursor_row) + 1, &attrib);
 #endif /* A2CPU */
 
 #line 3110

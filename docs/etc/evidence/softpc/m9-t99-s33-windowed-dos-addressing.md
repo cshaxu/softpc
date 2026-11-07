@@ -329,3 +329,97 @@ tests, final focused reruns and real Win31 roundtrip evidence apply directly.
 There is no new executable behavior to rebuild or requalify. Mirror difference
 growth remains 368, not 350. This review has established no justified reduction
 in the admitted repair under the owner's semantic-consistency requirement.
+
+## P4 follow-up: input after returning to windowed DOS
+
+Owner acceptance was partial: prior real-machine captures checked restored
+content but omitted subsequent typing. A cold-boot probe sends guest keys
+through the actual Machine FIFO, using existing Win31 overlay media and fixture
+audio, without a native Window or Computer Use. It reproduces invisible input
+both on first windowing and after the requested roundtrip.
+
+Before repair, abc and abcdef appear in DOS's input buffer, but are absent from
+the restored fullscreen text. The window framebuffer changes only the cursor.
+A diagnostic-only video object records INT 10h AH=0A writes for a..f at offsets
+0836..0840: VM=1, BDA mode=3, but video_pc_low_regen=A0000. Windows's physical
+graphics mode owns that cached base; the virtual text caller needs B8000.
+The original XP code and pre-S33 source use the same erroneous expression.
+S33's prior video.c changes only concern CGA pixel writes, not this path.
+This establishes an existing source defect; no historical introduction commit
+for the observed symptom is claimed.
+
+An isolated one-site experiment changes only AH=0A's address source to the
+existing BDA mode-table entry. The same cold boot and toggles then show abcdef
+in both the window framebuffer and final fullscreen text. No dirty override,
+extra frame publication, memory repacking or guest modification is involved.
+
+The formal repair applies that address rule at nine text origins and the two
+uses of the text clear upper limit:
+four scroll origins, read character/attribute, both character writes, teletype
+write and its scroll attribute read. One local expression names the existing
+BDA table lookup; it adds no state. Graphics accesses and mode setters retain
+their cached aperture. Existing getVM checks already decline native scrolling
+and use SAS for virtualized memory. Scope was enumerated by searching all
+video_pc_low_regen uses in base/video; mode setup and non-text accesses remain
+outside this text-only defect, without a claim that all virtual graphics work.
+
+An initial unit fixture set VM without providing a real V86 environment;
+BIOS I/O recursively entered the simulator and the fixture failed. It was
+removed. The replacement uses valid unchained SAS access at B8000 with a stale
+cached aperture and checks actual BIOS character/attribute writes and reads.
+Actual paged V86 behavior is established separately by the guest probe.
+Final qualification is recorded below when complete.
+
+The first full x64 run passed 185/186 background and 8/8 native tests, but
+runtime_restart_boot_smoke exposed an omission in the first repair: full-width
+CLS retained the physical graphics end address while its start was corrected.
+The resulting negative clear length caused out-of-range writes. Both bounds
+now come from the same BDA mode entry, and the existing unit fixture includes
+a full-width clear with both cached bounds deliberately stale. This was a
+real intermediate patch defect, not an environmental or flaky-test dismissal.
+The first x86 build also encountered the owner's running package EXE; the
+precisely identified local process was closed under standing authorization.
+
+The final production-path guest probe (no diagnostic object or modified RAM)
+completed cold DOS -> Win31 -> COMMAND -> window -> fullscreen -> window,
+accepted abc then def, and showed abcdef both windowed and fullscreen.
+Subsequent DIR output scrolled correctly; CLS returned a clean C:\WINDOWS>
+prompt. Graphics frame captures were inspected directly. This is guest evidence,
+not a claim that every VGA mode or Windows VDD path has been exhausted.
+
+The new unit fixture fails against the pre-P4 video object at the first
+B8000 character assertion and passes with the repair on both architectures.
+Its final form also checks full-width clearing with stale start/end caches.
+P4 production is one file +15/-11 (net +4); tests are one file +34/-0.
+All added production structure is a pure BDA mode-table expression, its reason
+comment and restored XP line mapping. Eleven uses change (nine starts and two
+end bounds); no state, driver interface, fallback or renderer path is added.
+Relative XP mirror diff volume grows by 26 lines in this P, not 368; the latter
+was the prior S33 repair's comparison figure. The accumulated S33 growth is 394.
+
+### P4 final qualification and review
+
+After the bound correction, cached x64 and x86 builds and publication succeed.
+Each architecture passes all 186 background unit/gate/integration tests and
+all 8 native desktop/audio/package tests: 388/388 final results. The previously
+failing runtime restart/Win31 roundtrip test passes on both architectures.
+The existing snapshot and CGA/EGA/VGA regressions remain in that full run.
+Mirror-source compiler macro warnings remain pre-existing; no new warning in
+the changed autonomous test source was observed. No extra snapshot-format or
+public-component change occurs in P4.
+
+Coordinator actual-diff review checked all eleven changed uses against their
+text-only call contexts, both cached-bound replacements, the XP line mapping,
+manifest, regression negative control and final guest captures. No second
+state owner, transport, drawing path or guest-specific condition was added.
+The only tracked changes are video.c, the existing VGA test, this evidence,
+pristine ledger, mirror hash manifest, CURRENT and the two published EXEs.
+User INI/media/snapshots remain untouched. The owner's untracked bad-prompt
+snapshot is retained. Task-owned probes, temporary objects and captures are
+removed after promoting these results. S33 remains open for owner acceptance.
+
+Published SHA-256:
+
+- softpc32.exe: `ef83d9249f1ca6aafc50d3624c583d3c67497477d8c05a13c7870de741fb1287`.
+
+- softpc64.exe: `c6e03ae046a25a6a70d3bce660d43b063fa6f3e87a30782068cb5da748001a51`.

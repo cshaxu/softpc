@@ -1589,3 +1589,12 @@ gvi/gfx_updt and nt_cga consume that layout in their existing scanout path.
 No mode-transition VRAM conversion or public renderer workaround is added.
 The changed raw plane representation requires the explicit snapshot format
 identity outside the mirror. See the [S33 evidence](m9-t99-s33-windowed-dos-addressing.md).
+
+### T99 S33 text BIOS caller aperture
+
+The text-only BIOS read/write/scroll sites in video.c derive their aperture
+start and limit from the caller's existing BDA mode table rather than the cache,
+which retains the last physical mode-set value. Win31 virtual DOS can have
+BDA mode 3 while the physical display remains graphics at A0000. Existing
+SAS translation, direct writer selection and virtualized scroll checks remain.
+This is not a Win31 branch or a second framebuffer. See the S33 evidence.

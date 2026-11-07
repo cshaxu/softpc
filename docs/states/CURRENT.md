@@ -11,7 +11,7 @@ Owner approves T99 S33 repair following the reproduced investigation. S32 delive
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner approves minimal unified repair and delivery; follow-up audit must retain correct and newly discovered fixes, reverting only proven unnecessary changes. |
-| Objective | Correct the confirmed CHAIN2/unchained video-plane layout mismatch and verify both directions of the full-screen/windowed DOS transition. |
+| Objective | Correct the CHAIN2/unchained video-plane layout mismatch and virtual text BIOS aperture; verify bidirectional DOS transitions and subsequent input/clear/scroll. |
 | Non-goals | No guest modification, public-component redesign, second video-memory path or guest-specific workaround; preserve user INI, original media and snapshot. No Computer Use. |
 | Reference Baseline | SoftPC 9250732e and owner-provided failing snapshot; fixed XP SP1 source for mirror comparison. |
 | Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
@@ -43,7 +43,14 @@ tests. Actual-diff review and final cold-boot Win31 bidirectional verification p
 S33 P1 is delivered. The owner rejected P2's identity-call reduction because
 all CHAIN2 sites should express one address-space contract. P3 restores the
 production/tests/manifest/EXEs exactly to qualified P1; no behavioral fixes are
-removed. S33 remains open pending owner acceptance. Legacy odd dword-fill
+removed. Owner acceptance is partial: after windowed DOS -> full screen ->
+windowed DOS, newly typed characters do not appear although the cursor moves.
+The follow-up is reproduced: text BIOS used the physical graphics aperture
+instead of the caller's BDA text aperture. Text read/write/scroll now share that
+existing mode entry for both bounds. Dual focused tests and the real Win31
+input/roundtrip/DIR/CLS probe pass. Final cached builds/publication and all
+186 background plus 8 native tests pass on each architecture (388 total).
+P4 is ready for owner acceptance after actual-diff review; S33 stays open. Legacy odd dword-fill
 value assembly outside the selected CPU path is explicitly recorded in TODO.
 
 ## Recent M9 Closures
