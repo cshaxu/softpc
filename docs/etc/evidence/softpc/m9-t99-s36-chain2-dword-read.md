@@ -109,4 +109,5 @@ the prior Win31 visual report. No new real Win31/Win95 manual acceptance is
 claimed. Existing production snapshot format, media and INI are unchanged.
 
 Task-owned build/t99-s36 logs/scripts are disposable after this promotion.
-S36 remains delivered pending owner acceptance; T99 stays open.
+Owner accepted and closed S36 on 2026-11-07; delivery is 8c27a3b6.
+See [closure](../../../history/M9-T99-S36-chain2-dword-read.md). T99 stays open.
