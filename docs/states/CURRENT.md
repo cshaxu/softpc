@@ -10,7 +10,7 @@ Owner approves T99 S33 repair following the reproduced investigation. S32 delive
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves minimal unified repair, dual-architecture build/release, full tests, review, commit and push, then owner acceptance. |
+| Admission And Approval | Owner approves minimal unified repair and delivery; follow-up audit must retain correct and newly discovered fixes, reverting only proven unnecessary changes. |
 | Objective | Correct the confirmed CHAIN2/unchained video-plane layout mismatch and verify both directions of the full-screen/windowed DOS transition. |
 | Non-goals | No guest modification, public-component redesign, second video-memory path or guest-specific workaround; preserve user INI, original media and snapshot. No Computer Use. |
 | Reference Baseline | SoftPC 9250732e and owner-provided failing snapshot; fixed XP SP1 source for mirror comparison. |
@@ -40,7 +40,10 @@ traced it to CHAIN2/unchained video-plane address layout. See the
 The minimal repair and snapshot format boundary are implemented. Both EXEs
 are refreshed; x64/x86 each pass 186 background tests and 8 native integration
 tests. Actual-diff review and final cold-boot Win31 bidirectional verification passed.
-S33 P1 is the implementation delivery; S33 remains open pending owner acceptance. Legacy odd dword-fill
+S33 P1 is delivered. The owner requested a follow-up necessity audit: P2 restores
+nine identity zero-offset calls only; all behavioral fixes remain. Dual builds prove byte-identical objects and identical EXEs except link
+timestamp/checksum. Focused qualification and P2 delivery complete the audit;
+S33 remains open pending owner acceptance. Legacy odd dword-fill
 value assembly outside the selected CPU path is explicitly recorded in TODO.
 
 ## Recent M9 Closures

@@ -218,7 +218,7 @@ The final qualification rerun follows externally interrupted prior jobs
 first rounds also ran with approximately 100 MiB free host RAM and timed out
 in unrelated static gates. No test budget was increased.
 
-## Actual-change review and delivery accounting
+## P1 actual-change review and delivery accounting
 
 The executor and coordinator roles reviewed the actual diff against 9250732e.
 One physical plane layout remains authoritative. No public component, guest
@@ -269,3 +269,47 @@ was inspected: complete instruction text, MS-DOS 6.22 version/copyright and
 prompt, without alternating-character loss; returned full-screen text contains
 the same complete strings. This is native-probe evidence, not Computer Use or
 owner acceptance. Test probes and raw captures are retired after delivery.
+
+## P2 necessity audit
+
+Owner requires keeping both the original repair and newly discovered error
+corrections; only proven unnecessary edits may be restored. The frozen audit
+universe is P1 versus 9250732e: 15 production files and 169 zero-context Git
+hunks. The audit covered their arithmetic, actual owner and consumer, rather
+than treating lack of a direct CCPU caller as permission to revert a fix.
+
+| Change group | Disposition |
+| --- | --- |
+| C-VID byte/word address shifts, odd-pair advance | Keep: the actual physical layout repair. |
+| String/fill/move address and traversal changes | Keep: the retained entries must use the same layout, even where the selected CPU delegates to scalar stores. |
+| Newly found string start/parity/latch and even dword-fill stride errors | Keep: actual corrections, not cosmetic edits. The separately recorded odd dword-fill value defect remains deferred. |
+| BIOS scalar writes and CGA pixel writes | Keep: independent original writers must agree with CPU reads. |
+| Dirty indices and nonzero text/CGA scanout, scroll and cursor offsets | Keep: address units changed; restoring these would read/mark the wrong locations. |
+| nt_text gather loop and removal of contiguous-copy branches | Keep: source cells are eight bytes apart; neither old contiguous-copy branch can represent the repaired layout. |
+| Snapshot format identity and original line-control markers | Keep: explicit compatibility boundary and correct diagnostics. |
+| Nine literal-zero display pointer replacements | Restore: both macros return precisely PCDisplay.screen_ptr, with no side effects. |
+
+Only gfx_updt.c changed in P2: nine get_chain2_screen_ptr(0) calls returned to
+the original get_screen_ptr(0). Actual variable-offset mappings and every
+stride correction remain. No correct fix or new error correction was reverted.
+No dead-path exemption or second representation was introduced.
+
+Both architectures were rebuilt and published from the persistent cached Ninja
+trees. The gfx_updt object is byte-identical to P1 on both architectures.
+The entire EXEs are byte-identical after masking only PE TimeDateStamp and
+CheckSum; all section contents, sizes and remaining bytes are identical.
+This proves the narrowing has no executable behavior change. P1's full 388
+passing results remain applicable; the focused VGA/mirror/documentation checks
+were also rerun for this delivery. No needless full-suite repetition is claimed.
+
+Against the original pre-S33 source baseline, production now totals +187/-211
+(net -24), mirror code +178/-210 (net -32); test changes remain +147/-22.
+Against pinned XP, these mirror files now total +5186/-14261: the difference
+volume increase is 350 rather than 368, a reduction of 18 lines. This is removal
+of nine no-op substitutions, not a redesign or an assertion that the remaining
+patch is the mathematical minimum.
+
+P2 focused results: x64 5/5 and x86 5/5, all exit 0. Published SHA-256:
+
+- softpc32.exe: `95e00841c76c89007a09b5bf809bb1a57881fb9b05bbd9ba44d27e428f81936a`.
+- softpc64.exe: `e019f3760344f3c8c6259083b2d2444cb643ee70601f66e9dd7874e7bb36857d`.

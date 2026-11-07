@@ -805,7 +805,7 @@ void	ega_wrap_split_text_update IFN0()
 			}
 
 			to = (USHORT *) &video_copy[0];
-			from = (USHORT * ) get_chain2_screen_ptr(0);
+			from = (USHORT * ) get_screen_ptr(0);
 			limit = (screen_start + ((get_screen_length() - 2 * EGA_PLANE_DISP_SIZE) << 1)) >> 2;
 
 			for( i = 0; i < limit; i++ )
@@ -851,7 +851,7 @@ void	ega_wrap_split_text_update IFN0()
 		if( no_of_split_lines > 0 )
 		{
 			to = (USHORT *) &video_copy[0];
-			from = (USHORT * ) get_chain2_screen_ptr(0);
+			from = (USHORT * ) get_screen_ptr(0);
 			limit = (no_of_split_lines * get_offset_per_line()) >> 1;
 
 			for( i = 0; i < limit; i++ )
@@ -885,10 +885,10 @@ void	ega_wrap_split_text_update IFN0()
 										wrap_line, screen_start );
 
 			next1 = ega_text_find_dirty_lines(&video_copy[0],
-						get_chain2_screen_ptr(0), wrap_line, split_line, 0 );
+						get_screen_ptr(0), wrap_line, split_line, 0 );
 
 			next2 = ega_text_find_dirty_lines(&video_copy[0],
-						get_chain2_screen_ptr(0), split_line, lines_per_screen, 0 );
+						get_screen_ptr(0), split_line, lines_per_screen, 0 );
 
 			ega_text_paint_dirty_recs(0,next);
 			ega_text_paint_dirty_recs(next,next1);
@@ -902,7 +902,7 @@ void	ega_wrap_split_text_update IFN0()
 			next = ega_text_find_dirty_lines( &video_copy[screen_start >> 1],
 					get_chain2_screen_ptr(screen_start), 0, split_line, screen_start );
 
-			next1 = ega_text_find_dirty_lines( &video_copy[0], get_chain2_screen_ptr(0),
+			next1 = ega_text_find_dirty_lines( &video_copy[0], get_screen_ptr(0),
 									split_line, lines_per_screen, 0 );
 
 			ega_text_paint_dirty_recs(0,next);
@@ -974,7 +974,7 @@ void	ega_split_text_update IFN0()
 		if( no_of_split_lines > 0 )
 		{
 			to = (USHORT *) &video_copy[0];
-			from = (USHORT *) get_chain2_screen_ptr(0);
+			from = (USHORT *) get_screen_ptr(0);
 
 			for( i = 0; i < (no_of_split_lines * get_offset_per_line()) >> 1; i++ )
 			{
@@ -1001,7 +1001,7 @@ void	ega_split_text_update IFN0()
 		next = ega_text_find_dirty_lines( &video_copy[screen_start >> 1],
 					get_chain2_screen_ptr(screen_start) , 0, split_line, screen_start );
 
-		next1 = ega_text_find_dirty_lines( &video_copy[0], get_chain2_screen_ptr(0),
+		next1 = ega_text_find_dirty_lines( &video_copy[0], get_screen_ptr(0),
 								split_line, lines_per_screen, 0 );
 
 		ega_text_paint_dirty_recs(0,next);
@@ -1102,7 +1102,7 @@ void ega_wrap_text_update IFN0()
 						get_chain2_screen_ptr(screen_start), 0,
 							lines_per_screen - lines_left, screen_start);
 
-			next1 = ega_text_find_dirty_lines( video_copy, get_chain2_screen_ptr(0),
+			next1 = ega_text_find_dirty_lines( video_copy, get_screen_ptr(0),
 						lines_per_screen - lines_left, lines_per_screen, 0 );
 
 			ega_text_paint_dirty_recs(0,next);
@@ -1508,7 +1508,7 @@ cga_graph_update_chain2 IFN0()
 	 */
 
 	to = (USHORT *)&video_copy[0];
-	from = (USHORT *) get_chain2_screen_ptr(0);
+	from = (USHORT *) get_screen_ptr(0);
 
 	if (getVideodirty_total() > 5000)	
 	{
