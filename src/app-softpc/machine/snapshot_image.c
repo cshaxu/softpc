@@ -3,6 +3,9 @@
 
 #include "compat/devices/archive.h"
 
+/* Physical odd/even video-plane layout; older raw planes are incompatible. */
+#define SOFTPC_SNAPSHOT_FORMAT 0x32504353u
+
 typedef struct softpc_snapshot_count_stream {
     lib_u64 count;
 } softpc_snapshot_count_stream;
@@ -99,6 +102,8 @@ lib_status softpc_snapshot_image_write(const softpc_snapshot_image *image,
     if (status == LIB_STATUS_OK && image->ccpu.sas.memory_bytes > UINT32_MAX)
         status = LIB_STATUS_LIMIT_EXCEEDED;
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
+        context, SOFTPC_SNAPSHOT_FORMAT);
+    if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u32(write,
         context, (lib_u32)image->ccpu.sas.memory_bytes);
     if (status == LIB_STATUS_OK) status = softpc_snapshot_stream_write_u64(write,
         context, core.count);
@@ -125,11 +130,14 @@ lib_status softpc_snapshot_image_read(softpc_snapshot_image *image,
 {
     softpc_snapshot_section_reader core = {0}, devices = {0}, media = {0};
     softpc_snapshot_image decoded = {0};
-    lib_u32 memory_bytes, halted, trap;
+    lib_u32 format, memory_bytes, halted, trap;
     lib_u64 length;
     lib_status status;
     if (image == NULL || expected_memory_bytes == 0u || read == NULL)
         return LIB_STATUS_INVALID_ARGUMENT;
+    status = softpc_snapshot_stream_read_u32(read, context, &format);
+    if (status != LIB_STATUS_OK) return status;
+    if (format != SOFTPC_SNAPSHOT_FORMAT) return LIB_STATUS_INVALID_ARGUMENT;
     status = softpc_snapshot_stream_read_u32(read, context, &memory_bytes);
     if (status != LIB_STATUS_OK) return status;
     if (memory_bytes != expected_memory_bytes) {

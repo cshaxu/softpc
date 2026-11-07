@@ -671,8 +671,8 @@ OUTPUT: None.
 
 ====================================================================
 */
-/* DIVERGENCE(T88-CHAIN2-DIRTY): CHAIN2 CPU bytes share a plane offset
- * in pairs; the selected EGA marker owns bitmap, bounds and bank units. */
+/* DIVERGENCE(T88-CHAIN2-DIRTY): CHAIN2 CPU bytes select even plane offsets
+ * in pairs (T99 hardware layout); the selected EGA marker owns bitmap, bounds and bank units. */
 LOCAL IUH chain2_mark_range IFN1(IU32, count)
 {
 	IU32 offset = (IU32)jccc_parm1;
@@ -680,8 +680,8 @@ LOCAL IUH chain2_mark_range IFN1(IU32, count)
 
 	if (count != 0)
 	{
-		jccc_parm1 = offset >> 1;
-		jccc_parm2 = ((offset + count - 1) >> 1) - (offset >> 1) + 1;
+		jccc_parm1 = offset & ~1u;
+		jccc_parm2 = ((offset + count - 1) & ~1u) - (offset & ~1u) + 1;
 		((IUH (*)())unchained_mark_evid.str_mark)(0, 0, 0, 0);
 		jccc_parm1 = saved_parm1;
 		jccc_parm2 = saved_parm2;

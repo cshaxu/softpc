@@ -533,13 +533,13 @@ static	int	ega_text_find_dirty_lines IFN5(byte *, vcopy, byte *, planes,
 						i++,offset += opl, cur_y += char_height )
 	{
 		to = (USHORT *) &vcopy[offset];
-		from = (IU32 *) &planes[(offset<<1)];
-		for(j=0;j<shorts_per_line;j++)
+		from = (IU32 *) &planes[(offset<<2)];
+		for(j=0;j<shorts_per_line;j++,from+=2)
 		{
-			if(*to++ != get_char_attr(from++))
+			if(*to++ != get_char_attr(from))
 			{
-				to--;from--;
-				for(k=shorts_per_line-1-j;*(to+k) == get_char_attr(from+k);k--)
+				to--;
+				for(k=shorts_per_line-1-j;*(to+k) == get_char_attr(from+(k<<1));k--)
 					;
 
 				/*
@@ -585,12 +585,12 @@ static	void	ega_text_paint_dirty_recs IFN2(int, start_rec, int, end_rec)
 		to = (USHORT *) &video_copy[(get_dirty_offset(i)+
 									  get_dirty_start (i))>>1];
 
-		from = (USHORT *)get_screen_ptr(get_dirty_offset(i)+get_dirty_start(i));
+		from = (USHORT *)get_chain2_screen_ptr(get_dirty_offset(i)+get_dirty_start(i));
 
 		while ( length-- > 0 )
 		{
 			*to++ = *from;		/* char and attribute bytes */
-			from += 2;			/* skip over the planes 2,3 */
+			from += 4;			/* skip over the planes 2,3 */
 		}
 	}
 #endif  //NEC_98
@@ -783,7 +783,7 @@ void	ega_wrap_split_text_update IFN0()
 		split_line=lines_per_screen;
 
 	to = (USHORT *) &video_copy[screen_start >> 1];
-	from = (USHORT *) get_screen_ptr(screen_start);
+	from = (USHORT *) get_chain2_screen_ptr(screen_start);
 
 	if( getVideodirty_total() > 1500 )	/* paint the whole lot */
 	{
@@ -801,17 +801,17 @@ void	ega_wrap_split_text_update IFN0()
 			for( i = 0; i < limit; i++ )
 			{
 				*to++ = *from;
-				from += 2;
+				from += 4;
 			}
 
 			to = (USHORT *) &video_copy[0];
-			from = (USHORT * ) get_screen_ptr(0);
+			from = (USHORT * ) get_chain2_screen_ptr(0);
 			limit = (screen_start + ((get_screen_length() - 2 * EGA_PLANE_DISP_SIZE) << 1)) >> 2;
 
 			for( i = 0; i < limit; i++ )
 			{
 				*to++ = *from;
-				from += 2;
+				from += 4;
 			}
 			limit = 4 * EGA_PLANE_DISP_SIZE;
 			for( i = 0, offset = screen_start; offset < limit;
@@ -831,13 +831,13 @@ void	ega_wrap_split_text_update IFN0()
 		else
 		{
 			to = (USHORT *) &video_copy[screen_start >> 1];
-			from = (USHORT * ) get_screen_ptr(screen_start);
+			from = (USHORT * ) get_chain2_screen_ptr(screen_start);
 			limit = (split_line * get_offset_per_line()) >> 1;
 
 			for( i = 0; i < limit; i++ )
 			{
 				*to++ = *from;
-				from += 2;
+				from += 4;
 			}
 
 			for( i = 0, offset = screen_start; i < split_line;
@@ -851,13 +851,13 @@ void	ega_wrap_split_text_update IFN0()
 		if( no_of_split_lines > 0 )
 		{
 			to = (USHORT *) &video_copy[0];
-			from = (USHORT * ) get_screen_ptr(0);
+			from = (USHORT * ) get_chain2_screen_ptr(0);
 			limit = (no_of_split_lines * get_offset_per_line()) >> 1;
 
 			for( i = 0; i < limit; i++ )
 			{
 				*to++ = *from;
-				from += 2;
+				from += 4;
 			}
 
 			for( i = split_line, offset = 0; i < lines_per_screen;
@@ -881,14 +881,14 @@ void	ega_wrap_split_text_update IFN0()
 			init_dirty_recs();
 
 			next = ega_text_find_dirty_lines(&video_copy[screen_start >> 1],
-							get_screen_ptr(screen_start), 0,
+							get_chain2_screen_ptr(screen_start), 0,
 										wrap_line, screen_start );
 
 			next1 = ega_text_find_dirty_lines(&video_copy[0],
-						get_screen_ptr(0), wrap_line, split_line, 0 );
+						get_chain2_screen_ptr(0), wrap_line, split_line, 0 );
 
 			next2 = ega_text_find_dirty_lines(&video_copy[0],
-						get_screen_ptr(0), split_line, lines_per_screen, 0 );
+						get_chain2_screen_ptr(0), split_line, lines_per_screen, 0 );
 
 			ega_text_paint_dirty_recs(0,next);
 			ega_text_paint_dirty_recs(next,next1);
@@ -900,9 +900,9 @@ void	ega_wrap_split_text_update IFN0()
 
 			init_dirty_recs();
 			next = ega_text_find_dirty_lines( &video_copy[screen_start >> 1],
-					get_screen_ptr(screen_start), 0, split_line, screen_start );
+					get_chain2_screen_ptr(screen_start), 0, split_line, screen_start );
 
-			next1 = ega_text_find_dirty_lines( &video_copy[0], get_screen_ptr(0),
+			next1 = ega_text_find_dirty_lines( &video_copy[0], get_chain2_screen_ptr(0),
 									split_line, lines_per_screen, 0 );
 
 			ega_text_paint_dirty_recs(0,next);
@@ -946,7 +946,7 @@ void	ega_split_text_update IFN0()
 		split_line = lines_per_screen;
 
 	to = (USHORT *) &video_copy[screen_start >> 1];
-	from = (USHORT *) get_screen_ptr(screen_start);
+	from = (USHORT *) get_chain2_screen_ptr(screen_start);
 
 	if( getVideodirty_total() > 1500 )	/* paint the whole lot */
 	{
@@ -961,7 +961,7 @@ void	ega_split_text_update IFN0()
 		for( i = 0; i < (split_line * get_offset_per_line()) >> 1; i++ )
 		{
 			*to++ = *from;
-			from += 2;
+			from += 4;
 		}
 
 		for( i = 0, offset = screen_start; i < split_line;
@@ -974,12 +974,12 @@ void	ega_split_text_update IFN0()
 		if( no_of_split_lines > 0 )
 		{
 			to = (USHORT *) &video_copy[0];
-			from = (USHORT *) get_screen_ptr(0);
+			from = (USHORT *) get_chain2_screen_ptr(0);
 
 			for( i = 0; i < (no_of_split_lines * get_offset_per_line()) >> 1; i++ )
 			{
 				*to++ = *from;
-				from += 2;
+				from += 4;
 			}
 
 			for( i = split_line, offset = 0; i < lines_per_screen;
@@ -999,9 +999,9 @@ void	ega_split_text_update IFN0()
 		init_dirty_recs();
 
 		next = ega_text_find_dirty_lines( &video_copy[screen_start >> 1],
-					get_screen_ptr(screen_start) , 0, split_line, screen_start );
+					get_chain2_screen_ptr(screen_start) , 0, split_line, screen_start );
 
-		next1 = ega_text_find_dirty_lines( &video_copy[0], get_screen_ptr(0),
+		next1 = ega_text_find_dirty_lines( &video_copy[0], get_chain2_screen_ptr(0),
 								split_line, lines_per_screen, 0 );
 
 		ega_text_paint_dirty_recs(0,next);
@@ -1040,12 +1040,12 @@ void ega_wrap_text_update IFN0()
 	if( getVideodirty_total() > 1500 )	/* paint the whole lot */
 	{
 		to = (USHORT *) &video_copy[screen_start >> 1];
-		from = (USHORT *) get_screen_ptr(screen_start);
+		from = (USHORT *) get_chain2_screen_ptr(screen_start);
 
 		for( i = get_screen_length() >> 1; i > 0; i-- )
 		{
 			*to++ = *from;
-			from += 2;
+			from += 4;
 		}
 
 		cur_ypos = 0;
@@ -1099,10 +1099,10 @@ void ega_wrap_text_update IFN0()
 
 			init_dirty_recs();
 			next = ega_text_find_dirty_lines( &video_copy[screen_start >> 1],
-						get_screen_ptr(screen_start), 0,
+						get_chain2_screen_ptr(screen_start), 0,
 							lines_per_screen - lines_left, screen_start);
 
-			next1 = ega_text_find_dirty_lines( video_copy, get_screen_ptr(0),
+			next1 = ega_text_find_dirty_lines( video_copy, get_chain2_screen_ptr(0),
 						lines_per_screen - lines_left, lines_per_screen, 0 );
 
 			ega_text_paint_dirty_recs(0,next);
@@ -1114,7 +1114,7 @@ void ega_wrap_text_update IFN0()
 
 			init_dirty_recs();
 			next = ega_text_find_dirty_lines( &video_copy[screen_start >> 1],
-						get_screen_ptr(screen_start), 0,
+						get_chain2_screen_ptr(screen_start), 0,
 							lines_per_screen, screen_start);
 
 			ega_text_paint_dirty_recs(0,next);
@@ -1179,12 +1179,12 @@ void ega_text_update IFN0()
 	if(getVideodirty_total()>1500)	/* paint the whole lot */
 	{
 		to = (USHORT *)&video_copy[screen_start>>1];
-		from = (USHORT *) get_screen_ptr(screen_start);
+		from = (USHORT *) get_chain2_screen_ptr(screen_start);
 
 		for(i=get_screen_length()>>1;i>0;i--)
 		{
 			*to++ = *from;	/* char and attribute bytes */
-			from += 2;		/* planes 2,3 interleaved */
+			from += 4;		/* planes 2,3 interleaved */
 		}
 
 		cur_ypos = 0;
@@ -1201,7 +1201,7 @@ void ega_text_update IFN0()
 
 		init_dirty_recs();
 		next = ega_text_find_dirty_lines( &video_copy[screen_start>>1],
-			get_screen_ptr(screen_start), 0, lines_per_screen, screen_start);
+			get_chain2_screen_ptr(screen_start), 0, lines_per_screen, screen_start);
 
 		ega_text_paint_dirty_recs(0,next);
 
@@ -1218,7 +1218,7 @@ void ega_text_update IFN0()
 		dirty_curs_y = get_cur_y();
 
 		dirty_curs_offs = screen_start+dirty_curs_y * (get_offset_per_line()<<1) + (dirty_curs_x<<2);
-		attr = *(get_screen_ptr(dirty_curs_offs + 1));
+		attr = *(get_chain2_screen_ptr(dirty_curs_offs + 1));
 
 		host_paint_cursor( dirty_curs_x, dirty_curs_y, attr );
 	}
@@ -1508,7 +1508,7 @@ cga_graph_update_chain2 IFN0()
 	 */
 
 	to = (USHORT *)&video_copy[0];
-	from = (USHORT *) get_screen_ptr(0);
+	from = (USHORT *) get_chain2_screen_ptr(0);
 
 	if (getVideodirty_total() > 5000)	
 	{
@@ -1519,7 +1519,7 @@ cga_graph_update_chain2 IFN0()
 		for(i=4096*2;i>0;i--)
 		{
 			*to++ = *from;
-			from += 2;
+			from += 4;
 		}
 
 		for (cur_ypos = 0,offs=0; cur_ypos < 400;
@@ -1557,7 +1557,7 @@ cga_graph_update_chain2 IFN0()
 				end_line = 100;
 
 		    to = (USHORT *)&video_copy[start_line * SCAN_LINE_LENGTH];
-		    from = (USHORT *)get_screen_ptr((start_line *
+		    from = (USHORT *)get_chain2_screen_ptr((start_line *
 						     SCAN_LINE_LENGTH) << 1);
 
 			/* do even lines */
@@ -1568,7 +1568,7 @@ cga_graph_update_chain2 IFN0()
 				{
 					if(*to != *from)
 					{
-						for(k=j-1;*(to+k)== *(from+(k<<1));k--)
+						for(k=j-1;*(to+k)== *(from+(k<<2));k--)
 							;
 	
 	
@@ -1587,24 +1587,24 @@ cga_graph_update_chain2 IFN0()
 						for(l=k+1;l>0;l--)
 						{
 							*to++ = *from;
-							from += 2;
+							from += 4;
 						}
 	
 						l = j - k - 1;
 						to += l;
-						from += l << 1;
+						from += l << 2;
 	
 						break;	/* onto next line */
 					}
 	
 					to++;
-					from += 2;
+					from += 4;
 				}
 			}
 	
 			/* do odd  lines */
 	
-			from = (USHORT *) get_screen_ptr((start_line * SCAN_LINE_LENGTH + ODD_OFFSET) << 1);
+			from = (USHORT *) get_chain2_screen_ptr((start_line * SCAN_LINE_LENGTH + ODD_OFFSET) << 1);
 			to = (USHORT *)&video_copy[start_line * SCAN_LINE_LENGTH + ODD_OFFSET];
 	
 			for (i = start_line; i < end_line; i++ )
@@ -1613,7 +1613,7 @@ cga_graph_update_chain2 IFN0()
 				{
 					if(*to != *from)
 					{
-						for(k=j-1;*(to+k)== *(from+(k<<1));k--)
+						for(k=j-1;*(to+k)== *(from+(k<<2));k--)
 							;
 	
 /*
@@ -1630,18 +1630,18 @@ cga_graph_update_chain2 IFN0()
 						for(l=k+1;l>0;l--)
 						{
 							*to++ = *from;
-							from += 2;
+							from += 4;
 						}
 	
 						l = j - k - 1;
 						to += l;
-						from += l << 1;
+						from += l << 2;
 	
 						break;	/* onto next line */
 					}
 	
 					to++;
-					from += 2;
+					from += 4;
 				}
 			}
 		}
@@ -2565,9 +2565,9 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 	    blank_word = dummy;
 
 	    words_per_line   = get_chars_per_line();
-	    top_left_ptr = (short *) get_screen_ptr((start - gvi_pc_low_regen)<<1);
-        top_right_ptr    = top_left_ptr + width - 2;
-	    bottom_right_ptr = top_right_ptr + bpl * (height - 1);
+	    top_left_ptr = (short *) get_chain2_screen_ptr((start - gvi_pc_low_regen)<<1);
+        top_right_ptr    = top_left_ptr + 2 * (width - 2);
+	    bottom_right_ptr = top_right_ptr + 2 * bpl * (height - 1);
 	    ptr = bottom_right_ptr;
 	    if (width > 2) /* dont want to get a zero rectangle for safetys sake */
 	    {
@@ -2575,17 +2575,17 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 	        {
 	            if (ptr == top_right_ptr) 	/* reached top of column? */
 	            {
-		        top_right_ptr -= 2;	/* yes go to bottom of next */
-		        bottom_right_ptr -= 2;
+		        top_right_ptr -= 4;	/* yes go to bottom of next */
+		        bottom_right_ptr -= 4;
 		        if (top_right_ptr == top_left_ptr)
 		            break;
 		        ptr = bottom_right_ptr;
 	            }
 	            else
-		        ptr -= bpl;	/* skipping interleaved planes */
+		        ptr -= 2 * bpl;	/* skipping interleaved planes */
 	        }
 	    }
-	    width = (int)(top_right_ptr - top_left_ptr + 2) << 1;
+	    width = (int)(top_right_ptr - top_left_ptr + 4);
 #ifdef DUMB_TERMINAL
 #error "Unsupported SoftPC mirror configuration: DUMB_TERMINAL"
 #endif /* DUMB_TERMINAL */
@@ -2643,8 +2643,8 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 
 	/* Update video buffer */
 
-	dest = get_screen_ptr((start - gvi_pc_low_regen)<<1);
-	src = dest + lines * bpl * 2;
+	dest = get_chain2_screen_ptr((start - gvi_pc_low_regen)<<1);
+	src = dest + lines * bpl * 4;
 
 	for(i=0;i<height-lines;i++)
 	{
@@ -2655,12 +2655,12 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 		while( j-- > 0 )
 		{
 			*d_ptr = *s_ptr;		/* CHAR  and  ATTRIB */
-			d_ptr += 2;			/* skip FONT and plane 3 */
-			s_ptr += 2;
+			d_ptr += 4;			/* skip FONT and plane 3 */
+			s_ptr += 4;
 		}
 
-		dest += bpl * 2;
-		src += bpl * 2;
+		dest += bpl * 4;
+		src += bpl * 4;
 	}
 
 	/* Fill exposed area of buffer */
@@ -2680,10 +2680,10 @@ boolean text_scroll_up IFN6(int, start, int, width, int, height,
 		while( j-- > 0 )
 		{
 			*d_ptr = data;
-			d_ptr += 2;
+			d_ptr += 4;
 		}
 
-		dest += bpl * 2;
+		dest += bpl * 4;
 	}
 
 	host_scroll_complete();
@@ -2788,8 +2788,8 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 
 	/* Update video buffer */
 
-	dest = get_screen_ptr((start - gvi_pc_low_regen)<<1) + (height-1) * bpl * 2;
-	src = dest - lines * bpl * 2;
+	dest = get_chain2_screen_ptr((start - gvi_pc_low_regen)<<1) + (height-1) * bpl * 4;
+	src = dest - lines * bpl * 4;
 
 	for(i=0;i<height-lines;i++)
 	{
@@ -2800,12 +2800,12 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 		while( j-- > 0 )
 		{
 			*d_ptr = *s_ptr;
-			d_ptr += 2;
-			s_ptr += 2;
+			d_ptr += 4;
+			s_ptr += 4;
 		}
 
-		dest -= bpl * 2;
-		src -= bpl * 2;
+		dest -= bpl * 4;
+		src -= bpl * 4;
 	}
 
 	/* Fill exposed area of buffer */
@@ -2825,10 +2825,10 @@ boolean text_scroll_down IFN6(int, start, int, width, int, height,
 		while( j-- > 0 )
 		{
 			*d_ptr = data;
-			d_ptr += 2;
+			d_ptr += 4;
 		}
 
-		dest -= bpl * 2;
+		dest -= bpl * 4;
 	}
 
 	host_scroll_complete();

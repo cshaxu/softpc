@@ -9,6 +9,7 @@
 #include "egaports.h"
 #undef const
 #include <assert.h>
+#include <stdio.h>
 
 extern IHP Gdp;
 extern IU8 *EGA_planes;
@@ -21,6 +22,65 @@ void softpc_test_chain2_continuations(void)
     lib_u8 input[128], output[64], first[64];
     EVID_WRT_POINTERS saved = c_ev_write_ptr;
     lib_u32 mode, parity, slot, pass, flag, i, offset;
+    /* Odd/even selects a plane without compacting its address. Independent
+       physical offsets distinguish adjacent cells and preserve font planes. */
+    lib_memory_set(EGA_planes, 0x5a, sizeof(expected));
+    c_ev_write_ptr = chain2_evid[4];
+    for (i = 0; i < 8; ++i) {
+        r1 = (IUH)Gdp; r2 = 0x100u + i; r3 = 0x30u + i;
+        c_ev_write_ptr.b_write(0x100u + i, 0x30u + i);
+    }
+    for (i = 0; i < 4; ++i) {
+        assert(EGA_planes[0x400u + i * 8u] == 0x30u + i * 2u);
+        assert(EGA_planes[0x401u + i * 8u] == 0x31u + i * 2u);
+        assert(EGA_planes[0x402u + i * 8u] == 0x5a);
+        assert(EGA_planes[0x404u + i * 8u] == 0x5a);
+        r1 = (IUH)Gdp; r3 = 0x100u + i * 2u;
+        read_mode0_evid[1].w_read(0x100u + i * 2u);
+        assert((lib_u16)r2 == (lib_u16)((0x31u + i * 2u) * 256u + 0x30u + i * 2u));
+    }
+    for (i = 0; i < 7; ++i) {
+        r1 = (IUH)Gdp; r3 = 0x100u + i;
+        read_mode0_evid[1].w_read(0x100u + i);
+        assert((lib_u16)r2 == (lib_u16)((0x31u + i) * 256u + 0x30u + i));
+    }
+    /* String readers must traverse the same cells as scalar reads. */
+    for (mode = 0; mode < 2; ++mode)
+    for (parity = 0; parity < 2; ++parity)
+    for (slot = 0; slot < 2; ++slot) {
+        EVID_READ_POINTERS reader = mode ? read_mode1_evid[1] : read_mode0_evid[1];
+        offset = slot ? 0x107u - parity : 0x100u + parity;
+        for (i = 0; i < 4; ++i) {
+            lib_u32 address = slot ? offset - i : offset + i;
+            r1 = (IUH)Gdp; r3 = address;
+            reader.b_read(address);
+            first[i] = (lib_u8)r2;
+        }
+        lib_memory_set(output, 0xcc, sizeof(output));
+        r1 = (IUH)Gdp; r2 = (IUH)(output + 24); r3 = offset; r4 = 4; r5 = slot;
+        if (slot) reader.str_bwd_read(output + 24, offset, 4);
+        else reader.str_fwd_read(output + 24, offset, 4);
+        if (lib_memory_compare(first, output + 24, 4) != 0)
+            fprintf(stderr, "string read mode=%u parity=%u backward=%u expected=%02x actual=%02x\n", mode, parity, slot, first[0], output[24]);
+        assert(lib_memory_compare(first, output + 24, 4) == 0);
+    }
+    /* Independent physical-plane oracle for the registered byte/word Copy fills.
+       Legacy odd dword fill value assembly is tracked separately in S33 evidence. */
+    for (parity = 0; parity < 2; ++parity)
+    for (slot = 0; slot < 2; ++slot) {
+        lib_u32 width = 1u << slot;
+        lib_memory_set(EGA_planes, 0x5a, sizeof(expected));
+        r1 = (IUH)Gdp; r2 = 0x100u + parity; r3 = 0x11111111u; r4 = 8u / width;
+        if (slot == 0) c_ev_write_ptr.b_fill(0x100u + parity, 0x11, 8);
+        else c_ev_write_ptr.w_fill(0x100u + parity, 0x1111, 4);
+        for (i = 0; i < 8; ++i) {
+            lib_u32 address = 0x100u + parity + i;
+            if (EGA_planes[4u * (address & ~1u) + (address & 1u)] != (lib_u8)(0x11111111u >> ((i % width) * 8u)))
+                fprintf(stderr, "copy fill parity=%u width=%u byte=%u actual=%02x\n", parity, width, i, EGA_planes[4u * (address & ~1u) + (address & 1u)]);
+            assert(EGA_planes[4u * (address & ~1u) + (address & 1u)] ==
+                (lib_u8)(0x11111111u >> ((i % width) * 8u)));
+        }
+    }
     for (i = 0; i < sizeof(input); ++i) input[i] = (lib_u8)(i * 17u + 0x35u);
     for (mode = 0; mode < 4; ++mode)
     for (parity = 0; parity < 4; ++parity) {

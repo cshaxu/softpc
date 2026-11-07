@@ -2,50 +2,50 @@
 
 ## Current Work
 
-Owner admits T99 S32 to normalize tracked text working-tree line endings,
-then perform cached full dual-architecture build, publication and tests.
-S31 delivery and evidence are retained in its
-[record](../history/M9-T99-S31-mirror-condition-audit.md); T99 remains open.
-S32 normalization, dual builds and test results are in its
-[review](../etc/evidence/softpc/m9-t99-s32-eol-review.md); delivery is in progress.
+Owner approves T99 S33 repair following the reproduced investigation. S32 delivery is retained in its
+[record](../history/M9-T99-S32-line-endings.md). T99 remains open.
 
-## M9 T99 S32 Packet
+## M9 T99 S33 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S32 for line-ending correction and full cached verification. |
-| Objective | Make tracked text follow Git attributes in the worktree and verify the entire product. |
-| Non-goals | Preserve user INI, media, snapshots, binary assets and file contents except line endings; do not change shared APIs or machine behavior. |
-| Reference Baseline | SoftPC dff86c90; .gitattributes specifies LF generally and CRLF for the mirror and user INI. |
+| Admission And Approval | Owner approves minimal unified repair, dual-architecture build/release, full tests, review, commit and push, then owner acceptance. |
+| Objective | Correct the confirmed CHAIN2/unchained video-plane layout mismatch and verify both directions of the full-screen/windowed DOS transition. |
+| Non-goals | No guest modification, public-component redesign, second video-memory path or guest-specific workaround; preserve user INI, original media and snapshot. No Computer Use. |
+| Reference Baseline | SoftPC 9250732e and owner-provided failing snapshot; fixed XP SP1 source for mirror comparison. |
 | Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Tracked text with nonconforming worktree line endings, task records and dual EXE artifacts; no ABI changes. |
-| Applicable Rules | Execution, documentation, architecture and coding rules; Git attributes. |
-| Verification | Audit all tracked text, confirm normalized content unchanged, cached x86/x64 full builds, publish both EXEs, full background and desktop/native-audio tests, governance and mirror gates. |
-| Expected Markers | LF outside mirror; CRLF within mirror; explicit INI exception and binaries preserved. |
-| Asset Needs | Update both package EXEs, preserve INI, guest media and snapshots. |
-| Reporting Requirements | Report normalized paths, Git and worktree representation, test results, release hashes and any limitations. |
-| Stop Conditions | Do not normalize user INI or binary files; preserve unrelated changes; do not terminate tests on observation timeout. |
-| Exit Criteria | Tracked text conforms to attributes, full builds and required tests pass, release and records committed and pushed. |
-| Original Owner Request | 准入一个 S，按照规范修复所有换行，然后 cached 全量编译发布测试提交推送。 |
-| Similar-Issue Sweep | Classify every tracked file by Git index and worktree EOL, include mixed endings and binary exceptions. |
+| Files And ABI Surface | Existing mirror C-VID address arithmetic, video dirty/display consumers, existing video snapshot boundary and owner-local tests; no public frame/API change. |
+| Applicable Rules | Execution, documentation, architecture, coding and source-research policy. |
+| Verification | Focused read/write/plane/display and snapshot regressions on x86/x64; real Win31 bidirectional DOS transitions; cached dual builds, publish both EXEs, all unit/gate/integration tests including native desktop/audio. Background jobs only. |
+| Expected Markers | Identify whether corruption first exists in guest state, original rendering, frame conversion or host presentation. |
+| Asset Needs | Read owner snapshot; use task-owned configuration and overlay media only. |
+| Reporting Requirements | Separate owner reproduction, local dynamic proof and source deductions; give root cause evidence, proposed files and diff estimate. |
+| Stop Conditions | Do not overwrite user assets, infer cause solely from a shared symptom, or terminate long probes at tool observation timeout. |
+| Exit Criteria | Minimal single-path repair reviewed, focused and full regressions passed, dual EXEs published, provenance updated, changes committed/pushed; wait for owner acceptance. |
+| Original Owner Request | 准入新 S 调研 Win31 全屏 MS-DOS Prompt 经 CAF 切换后窗口字符错乱；使用已保存故障快照，可只读研究 Win3.x。 |
+| Similar-Issue Sweep | Review VGA font/plane/palette/stride and video mode transition handling, including snapshot reconstruction. |
 
-Disposable work belongs to build/t99-s32; owner is this executor. Build and
-test jobs have a 60-minute overall budget and a 15-minute no-progress review;
-logs and exit files remain until work is verified and are then cleaned.
+Disposable probes belong to build/t99-s33, owned by this executor; review
+after 15 minutes without progress and preserve logs until findings are recorded.
 
 ## Current Technical Baseline
 
-S30 final delivery and binary hashes are recorded in its
-[final review](../etc/evidence/softpc/m9-t99-s30-final-review.md). The last
-full suite passed at P43; later builds had unchanged loadable PE sections and
-were not retested per owner direction. The prior intermittent compact-console
-initialization failure is not claimed resolved.
+S32 full cached builds and background/native tests completed; first-run failures
+and successful reruns are documented in its verification record.
+
+S33 reproduced the windowed DOS corruption before host Window rendering and
+traced it to CHAIN2/unchained video-plane address layout. See the
+[investigation and repair boundary](../etc/evidence/softpc/m9-t99-s33-windowed-dos-addressing.md).
+The minimal repair and snapshot format boundary are implemented. Both EXEs
+are refreshed; x64/x86 each pass 186 background tests and 8 native integration
+tests. Actual-diff review and final cold-boot Win31 bidirectional verification passed.
+S33 P1 is the implementation delivery; S33 remains open pending owner acceptance. Legacy odd dword-fill
+value assembly outside the selected CPU path is explicitly recorded in TODO.
 
 ## Recent M9 Closures
 
-S30 is owner-closed; its retained evidence and archived packet are in the
-[closure](../history/M9-T99-S30-mirror-structure.md).
+See [S32 delivery](../history/M9-T99-S32-line-endings.md).
 
 | Task | Closure |
 | --- | --- |
@@ -53,4 +53,4 @@ S30 is owner-closed; its retained evidence and archived packet are in the
 
 ## Recent Governance
 
-Build caches and disposable work follow the execution rules.
+Follow existing build cache and task-owned probe cleanup rules.

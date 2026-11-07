@@ -1579,3 +1579,13 @@ PE 内容与前一批一致，完整文件哈希不同。未重跑单元与集�
 
 五个镜像文件为六处原始条件增加诊断行号重定位，保留本地注释和
 条件结构。双架构构建发布后可加载 PE 内容不变，按用户要求未跑测试。
+
+### T99 S33 CHAIN2 plane-address repair
+
+Pinned XP SP1 remains the comparison baseline. C-VID sevid000/001/016..020
+retain odd/even plane-address spacing; ev_glue selected dirty ranges and
+original BIOS scalar writes in egawrtm0/egwrtm12/video use the same units.
+gvi/gfx_updt and nt_cga consume that layout in their existing scanout path.
+No mode-transition VRAM conversion or public renderer workaround is added.
+The changed raw plane representation requires the explicit snapshot format
+identity outside the mirror. See the [S33 evidence](m9-t99-s33-windowed-dos-addressing.md).

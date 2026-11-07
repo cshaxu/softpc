@@ -295,7 +295,7 @@ ega_mode1_chn_b_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode1_chn_b_write");
 
 	lsb = offset & 1;
-	offset = (offset >> 1) << 2;
+	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
 
 	if( lsb )	/* odd address, in plane 1 or 3 */
 	{
@@ -329,7 +329,7 @@ ega_mode1_chn_w_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode1_chn_w_write");
 
 	lsb = offset & 1;
-	offset = (offset >> 1) << 2;
+	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
 
 	if( lsb )	/* odd address, low byte in planes 1 and 3 */
 	{
@@ -337,13 +337,13 @@ ega_mode1_chn_w_write IFN2(ULONG, value, ULONG, offset )
 			EGA_plane01[offset + 1] = get_latch1;
 
 		if( getVideoplane_enable() & 1 )
-			EGA_plane01[offset + 4] = get_latch0;
+			EGA_plane01[offset + 8] = get_latch0;
 
 		if( getVideoplane_enable() & 8 )
 			EGA_plane23[offset + 1] = get_latch3;
 
 		if( getVideoplane_enable() & 4 )
-			EGA_plane23[offset + 4] = get_latch2;
+			EGA_plane23[offset + 8] = get_latch2;
 	}
 	else		/* even address, low byte in planes 0 and 2 */
 	{
@@ -628,7 +628,7 @@ ega_mode2_chn_b_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode2_chn_b_write");
 
 	lsb = offset & 1;
-	offset = (offset >> 1) << 2;
+	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
 
 	if( EGA_CPU.fun_or_protection )
 	{
@@ -699,7 +699,7 @@ ega_mode2_chn_w_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode2_chn_w_write");
 
 	lsb = offset & 1;
-	offset = (offset >> 1) << 2;
+	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
 
 	if( EGA_CPU.fun_or_protection )
 	{
@@ -714,7 +714,7 @@ ega_mode2_chn_w_write IFN2(ULONG, value, ULONG, offset )
 			if( getVideoplane_enable() & 1 )
 			{
 				value2 = high & 1 ? 0xff : 0;
-				EGA_plane01[offset + 4] = (byte) do_logicals( value2, get_latch0 );
+				EGA_plane01[offset + 8] = (byte) do_logicals( value2, get_latch0 );
 			}
 
 			if( getVideoplane_enable() & 8 )
@@ -726,7 +726,7 @@ ega_mode2_chn_w_write IFN2(ULONG, value, ULONG, offset )
 			if( getVideoplane_enable() & 4 )
 			{
 				value2 = high & 4 ? 0xff : 0;
-				EGA_plane23[offset + 4] = (byte) do_logicals( value2, get_latch2 );
+				EGA_plane23[offset + 8] = (byte) do_logicals( value2, get_latch2 );
 			}
 		}
 		else		/* even address, low byte in planes 0 and 2 */
@@ -764,13 +764,13 @@ ega_mode2_chn_w_write IFN2(ULONG, value, ULONG, offset )
 				EGA_plane01[offset + 1] = low & 2 ? 0xff : 0;
 
 			if( getVideoplane_enable() & 1 )
-				EGA_plane01[offset + 4] = high & 1 ? 0xff : 0;
+				EGA_plane01[offset + 8] = high & 1 ? 0xff : 0;
 
 			if( getVideoplane_enable() & 8 )
 				EGA_plane23[offset + 1] = low & 8 ? 0xff : 0;
 
 			if( getVideoplane_enable() & 4 )
-				EGA_plane23[offset + 4] = high & 4 ? 0xff : 0;
+				EGA_plane23[offset + 8] = high & 4 ? 0xff : 0;
 		}
 		else		/* even address, low byte in planes 0 and 2 */
 		{

@@ -350,7 +350,7 @@ static void verify_text_stride(void)
 {
     extern int now_width, now_height;
     enum { cell_size = 4 }; /* Original interleaved CCPU text cells. */
-    unsigned char source[4u * 150u * cell_size];
+    unsigned char source[4u * 150u * 8u];
     unsigned char expected[5u * 132u * cell_size];
     const int widths[] = {40, 80, 100, 132};
     unsigned char *saved_source = get_screen_ptr(0);
@@ -370,8 +370,6 @@ static void verify_text_stride(void)
     for (int count = 1; count <= 3; count += 2) {
         int visible = widths[mode];
         int x = partial ? 3 : 0, width = partial ? 7 : visible;
-        /* Preserve the standard bulk path's intentional inter-row copying. */
-        if (visible == pitch && partial && count > 1) continue;
         now_width = visible;
         set_chars_per_line(visible);
         set_offset_per_line(pitch * 2);
@@ -382,8 +380,9 @@ static void verify_text_stride(void)
         lib_memory_set(cells, 0xcc, bytes);
         lib_memory_set(expected, 0xcc, bytes);
         for (int row = 0; row < count; ++row)
-            lib_memory_copy(expected + ((row + 1) * visible + x) * cell_size,
-                source + (row * pitch + x) * cell_size, width * cell_size);
+        for (int column = 0; column < width; ++column)
+            lib_memory_copy(expected + ((row + 1) * visible + x + column) * cell_size,
+                source + (row * pitch + x + column) * 8u, cell_size);
         /* The real painter receives pixels; destination row deliberately != 0. */
         nt_text(x * cell_size, x * get_pix_char_width(),
             get_host_char_height(), width * 2, count);
@@ -1435,6 +1434,66 @@ static void verify_v7_cpu_scanout(softpc_machine *machine)
     }
 }
 
+static void verify_bios_cga_pixel_handoff(void)
+{
+    for (unsigned mode = 4; mode <= 6; ++mode) {
+        c_setAH(0); c_setAL((IU8)mode);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        for (unsigned y = 0; y < 3; ++y)
+        for (unsigned x = 0; x < 20; ++x) {
+            IU8 colour = (IU8)(mode == 6 ? 1 : 3);
+            c_setAH(0x0c); c_setAL(colour); c_setBX(0);
+            c_setCX((IU16)x); c_setDX((IU16)y);
+            assert(softpc_device_bop_dispatch(0x42, 0));
+            c_setAH(0x0d);
+            assert(softpc_device_bop_dispatch(0x42, 0));
+            assert((c_getAX() & 0xff) == colour);
+        }
+    }
+}
+
+static void verify_text_plane_handoff(void)
+{
+    extern void outb(io_addr port, half_word value);
+    extern IU32 read_byte_ev_glue(IU32 address);
+    extern void (*bios_ch2_byte_wrt_fn)(ULONG value, ULONG offset);
+    extern void (*bios_ch2_word_wrt_fn)(ULONG value, ULONG offset);
+    unsigned cell, plane;
+    c_setAH(0); c_setAL(3);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    for (cell = 0; cell < 160; ++cell) {
+        if (cell & 1u) {
+            bios_ch2_word_wrt_fn(((1u + cell % 15u) << 8) | ('A' + cell % 26u), 2u * cell);
+        } else {
+            write_byte_ev_glue(0xb8000u + 2u * cell, (IU8)('A' + cell % 26u));
+            bios_ch2_byte_wrt_fn(1u + cell % 15u, 2u * cell + 1u);
+        }
+    }
+    /* Win31 VDD's text save/restore changes access mode, not video RAM.
+       Plane byte offsets keep their low address bit; cells use even offsets. */
+    outb(0x3c4, 4); outb(0x3c5, 6);
+    outb(0x3ce, 5); outb(0x3cf, 0);
+    outb(0x3ce, 6); outb(0x3cf, 4);
+    for (plane = 0; plane < 2; ++plane) {
+        outb(0x3ce, 4); outb(0x3cf, (IU8)plane);
+        outb(0x3c4, 2); outb(0x3c5, (IU8)(1u << plane));
+        for (cell = 0; cell < 160; ++cell) {
+            unsigned expected = plane ? 1u + cell % 15u : 'A' + cell % 26u;
+            assert((IU8)read_byte_ev_glue(0xa0000u + 2u * cell) == expected);
+            write_byte_ev_glue(0xa0000u + 2u * cell, (IU8)(expected + 1u));
+        }
+    }
+    outb(0x3c4, 2); outb(0x3c5, 3);
+    outb(0x3ce, 4); outb(0x3cf, 0);
+    outb(0x3c4, 4); outb(0x3c5, 2);
+    outb(0x3ce, 5); outb(0x3cf, 0x10);
+    outb(0x3ce, 6); outb(0x3cf, 0x0e);
+    for (cell = 0; cell < 160; ++cell) {
+        assert((IU8)read_byte_ev_glue(0xb8000u + 2u * cell) == 'B' + cell % 26u);
+        assert((IU8)read_byte_ev_glue(0xb8001u + 2u * cell) == 2u + cell % 15u);
+    }
+}
+
 static void verify_chain2_dirty_entries(void)
 {
     extern void softpc_test_chain2_continuations(void);
@@ -1465,10 +1524,10 @@ static void verify_chain2_dirty_entries(void)
         c_ev_write_ptr.b_write(offset, 0xa5);
         assert(getVideodirty_total() != 0);
         if (marking == 2) {
-            assert(getVideodirty_low() == (offset >> 3));
-            assert(getVideodirty_high() >= (offset >> 3));
-            assert(getVideodirty_high() <= (offset >> 3) + 1);
-            assert(video_copy[offset >> 3] != 0);
+            assert(getVideodirty_low() == (offset >> 2));
+            assert(getVideodirty_high() >= (offset >> 2));
+            assert(getVideodirty_high() <= (offset >> 2) + 1);
+            assert(video_copy[offset >> 2] != 0);
         } else {
             for (group = 0; group < EGA_PLANE_SIZE; ++group)
                 assert(video_copy[group] == 0);
@@ -1485,10 +1544,10 @@ static void verify_chain2_dirty_entries(void)
         setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
         r1 = (IHPE)Gdp; r2 = offset; r3 = 0xa5;
         ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_word())(0, 0, 0, 0);
-        assert(video_copy[offset >> 3] != 0);
-        assert(video_copy[(offset + 1) >> 3] != 0);
-        assert(getVideodirty_low() == (offset >> 3));
-        assert(getVideodirty_high() >= ((offset + 1) >> 3));
+        assert(video_copy[offset >> 2] != 0);
+        assert(video_copy[(offset + 1) >> 2] != 0);
+        assert(getVideodirty_low() == (offset >> 2));
+        assert(getVideodirty_high() >= ((offset + 1) >> 2));
         assert(r2 == offset && r3 == 0xa5);
     }
     for (group = 0; group < 2; ++group) {
@@ -1498,9 +1557,9 @@ static void verify_chain2_dirty_entries(void)
         setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
         r1 = (IHPE)Gdp; r2 = 0x100; r3 = 16;
         ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
-        assert(video_copy[bank + 0x20] != 0 && video_copy[bank + 0x21] != 0);
-        assert(getVideodirty_low() == bank + 0x20);
-        assert(getVideodirty_high() >= bank + 0x21);
+        assert(video_copy[bank + 0x40] != 0 && video_copy[bank + 0x43] != 0);
+        assert(getVideodirty_low() == bank + 0x40);
+        assert(getVideodirty_high() >= bank + 0x43);
         assert(r2 == 0x100 && r3 == 16);
         setVideodirty_total(0); r2 = 0x100; r3 = 0;
         ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
@@ -2187,6 +2246,8 @@ int main(void)
     verify_bios_dac_block_and_state();
     verify_preserved_v7_modes();
     verify_v7_cpu_scanout(machine);
+    verify_bios_cga_pixel_handoff();
+    verify_text_plane_handoff();
     verify_chain2_dirty_entries();
     const unsigned colour_resolution_failures = verify_colour_resolution_matrix(machine);
     verify_display_stride();

@@ -246,8 +246,12 @@ static int snapshot_run_transaction(void)
     assert(emulator_machine_stop(machine));
     assert(wait_for_state(machine, EMULATOR_MACHINE_STOPPED));
 
-    /* The fixed layout begins with guest RAM size, not a host-width/version tag. */
-    assert(stream.count >= 12u);
+    /* Fixed-width format identity rejects incompatible raw video layouts. */
+    assert(stream.count >= 16u);
+    stream.offset = 4u; /* Legacy format began directly with guest RAM size. */
+    assert(softpc_snapshot_image_read(&expected,
+        softpc_machine_memory_bytes(product), snapshot_read, &stream) ==
+        LIB_STATUS_INVALID_ARGUMENT);
     stream.offset = 0u;
     assert(softpc_snapshot_image_read(&expected,
         softpc_machine_memory_bytes(product), snapshot_read, &stream) ==
@@ -278,17 +282,17 @@ static int snapshot_run_transaction(void)
 
     /* A declared payload boundary must be consumed exactly, never ignored. */
     {
-        lib_u64 core_bytes = snapshot_get_u64_le(stream.bytes + 4u);
+        lib_u64 core_bytes = snapshot_get_u64_le(stream.bytes + 8u);
         assert(core_bytes != UINT64_MAX);
-        snapshot_set_u64_le(stream.bytes + 4u, core_bytes + 1u);
+        snapshot_set_u64_le(stream.bytes + 8u, core_bytes + 1u);
     }
     stream.offset = 0u;
     assert(emulator_machine_write_state(machine,
         &(emulator_machine_state_reader) { snapshot_read, &stream }) !=
         LIB_STATUS_OK);
     assert(emulator_machine_state_get(machine) == EMULATOR_MACHINE_STOPPED);
-    snapshot_set_u64_le(stream.bytes + 4u,
-        snapshot_get_u64_le(stream.bytes + 4u) - 1u);
+    snapshot_set_u64_le(stream.bytes + 8u,
+        snapshot_get_u64_le(stream.bytes + 8u) - 1u);
 
     stream.bytes[0] ^= 0xffu;
     stream.offset = 0u;

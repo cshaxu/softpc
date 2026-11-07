@@ -2030,7 +2030,7 @@ GLOBAL void vd_write_dot IFN0()
 			if( video_adapter != CGA )
 			{
 				lsb = dotpos & 1;
-				dotpos = (dotpos >> 1) << 2;
+				dotpos = (dotpos & ~1u) << 2; /* T99: physical odd/even plane offset. */
 				dotpos |= lsb;
 
 				data = EGA_planes[dotpos];
@@ -2050,7 +2050,7 @@ GLOBAL void vd_write_dot IFN0()
 			if( video_adapter != CGA )
 			{
 				lsb = dotpos & 1;
-				dotpos = (dotpos >> 1) << 2;
+				dotpos = (dotpos & ~1u) << 2; /* T99: physical odd/even plane offset. */
 				dotpos |= lsb;
 
 				data = EGA_planes[dotpos];
