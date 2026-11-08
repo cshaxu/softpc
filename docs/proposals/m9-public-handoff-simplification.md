@@ -5119,3 +5119,18 @@ validation gaps affect four files; no source change is admitted or implemented.
 Estimated production reduction is about 13 lines without a shared registry or
 new execution path. The two failure cases are source-proven conditional defects,
 not demonstrated normal guest failures. Await owner implementation decision.
+
+## T99 S41 admitted cleanup
+
+Owner approves S40 candidates as a new S. S40 is closed; S41 implements C1–C3
+and F1–F2 in the four existing owners. Mirror diff (XP additions + deletions)
+is the primary benefit: estimated -13, separate from source net line counts.
+Frozen completion units: HDD mapping IDs/invalid IDs; Mixer declaration owner;
+queue next assignment; inconsistent hash/list failure; anomalous keyboard
+capture validity. Each requires focused proof and the packet's full delivery.
+
+S41 implements all five units and passes cached dual builds plus 392/392 tests.
+Actual mirror diff decreases by 13 lines, with all original snapshot IDs retained.
+[Delivery evidence](../etc/evidence/softpc/m9-t99-s41-mirror-cleanup.md) records
+test growth, initial fixture link failure, final qualification and limits.
+S41 awaits owner acceptance; no subsequent S is admitted.

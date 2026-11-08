@@ -1038,7 +1038,7 @@ Q_SNAPSHOT_ENCODE_CALLBACK encode;
 		hash_head[i] = 0;
 		for (hash_ptr = table[i]; hash_ptr != NULL;
 		     hash_ptr = hash_ptr->next_free) {
-			for (j = 0, ptr = head; ptr != hash_ptr;
+			for (j = 0, ptr = head; ptr != NULL && ptr != hash_ptr;
 			     ++j, ptr = ptr->next)
 				;
 			if (ptr == NULL)
@@ -1141,7 +1141,7 @@ Q_SNAPSHOT_DECODE_CALLBACK decode;
 		ptr->param = entries[i].param;
 		ptr->event_type = (EVENTTYPE)entries[i].event_type;
 		ptr->previous = i == 0 ? NULL : nodes[i - 1];
-		ptr->next = i + 1 == count ? NULL : NULL;
+		ptr->next = NULL;
 		ptr->next_free = NULL;
 		if (i != 0)
 			nodes[i - 1]->next = ptr;

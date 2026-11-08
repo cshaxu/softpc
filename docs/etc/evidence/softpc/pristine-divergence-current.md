@@ -1655,3 +1655,20 @@ excluded #error bodies are not modified. Both production compile contexts
 select SOFTPC_STANDALONE; all six preprocessed outputs match byte-for-byte
 before/after with line directives omitted. Production +0/-6. Final verification
 is recorded in [S39 delivery](m9-t99-s39-wrapper-cleanup.md).
+
+## T99 S41: snapshot adapter cleanup and capture guards
+
+Owner-admitted continuation of S40 at 76e1d839. Four retained local-patch owners
+change; no XP subset, #error body, guest algorithm or public interface changes.
+HDD command IDs 0–9 now have one file-local table shared by encode/decode;
+Mixer uses nt_sb.h declarations only. Queue restore assigns NULL directly.
+Queue capture stops at NULL before following next; keyboard capture rejects an
+active sequence that cannot be mapped to its original break array. Existing
+failure returns and device ownership remain unchanged. These guard defects are
+proven for injected inconsistent state, not claimed ordinary guest failures.
+
+Normalized-LF SequenceMatcher(autojunk=False) against pinned XP: fdisk +176/-73
+becomes +166/-73; nt_sbmxr +70/-65 becomes +67/-65; quick_ev +303/-135 and keyba
++418/-1214 are unchanged in count. Mirror additions+deletions decrease by 13.
+No patch is hidden by changing the upstream or selected-subset baseline.
+Verification and final delivery: [S41 evidence](m9-t99-s41-mirror-cleanup.md).

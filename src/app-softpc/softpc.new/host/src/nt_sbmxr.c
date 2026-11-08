@@ -18,9 +18,6 @@
 #include "nt_sb.h"
 #include "compat/devices/snapshot.h"
 
-void MixerSetMasterVolume(IU8 level);
-void MixerSetVoiceVolume(IU8 level);
-void MixerSetMidiVolume(IU8 level);
 
 //
 // Mixer globals

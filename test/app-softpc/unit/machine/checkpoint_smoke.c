@@ -26,6 +26,8 @@
 
 extern void insert_code_into_6805_buf(half_word code);
 extern void host_key_down(int key);
+extern half_word *anomalous_array;
+extern int in_anomalous_state;
 extern void mouse_driver_initialisation(void);
 extern void mouse_driver_termination(void);
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
@@ -599,7 +601,8 @@ static void verify_controller_archives(void)
     softpc_device_parallel_controller_state parallel_saved, parallel_restored;
     softpc_device_parallel_host_state parallel_host_saved, parallel_host_restored;
     softpc_device_archive *keyboard_archive, *parallel_archive;
-    half_word value;
+    half_word value, invalid_break = 0;
+    int command;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
 
@@ -657,6 +660,18 @@ static void verify_controller_archives(void)
     assert(softpc_device_snapshot_capture_hdd(&hdd_restored));
     assert(lib_memory_compare(hdd_restored.taskfile, hdd_saved.taskfile,
         sizeof(hdd_saved.taskfile)) == 0);
+    for (command = 0; command <= 9; ++command) {
+        hdd_restored = hdd_saved;
+        hdd_restored.active_command = command;
+        assert(softpc_device_snapshot_restore_hdd(&hdd_restored));
+        assert(softpc_device_snapshot_capture_hdd(&hdd_restored));
+        assert(hdd_restored.active_command == command);
+    }
+    hdd_restored.active_command = -1;
+    assert(!softpc_device_snapshot_restore_hdd(&hdd_restored));
+    hdd_restored.active_command = 10;
+    assert(!softpc_device_snapshot_restore_hdd(&hdd_restored));
+    assert(softpc_device_snapshot_restore_hdd(&hdd_saved));
 
     outb(0x61u, 0x01u);
     softpc_device_snapshot_capture_ppi(&ppi_saved);
@@ -829,6 +844,15 @@ static void verify_controller_archives(void)
         sizeof(keyboard_saved)) == 0);
     keyboard_restored.fifo_count = 49;
     assert(!softpc_device_snapshot_restore_keyboard(&keyboard_restored));
+    /* Inject an unregistered break sequence into the existing device globals.
+       Inactive -1 is valid; an active unencodable pointer must fail capture. */
+    anomalous_array = &invalid_break;
+    in_anomalous_state = 0;
+    assert(softpc_device_snapshot_capture_keyboard(&keyboard_restored));
+    assert(keyboard_restored.anomalous_index == -1);
+    in_anomalous_state = 1;
+    assert(!softpc_device_snapshot_capture_keyboard(&keyboard_restored));
+    assert(softpc_device_snapshot_restore_keyboard(&keyboard_saved));
 
     /* The archive must preserve the delayed 8042 interrupt as semantic work,
        rather than accepting the controller state while rejecting its pending

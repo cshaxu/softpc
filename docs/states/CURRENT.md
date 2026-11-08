@@ -2,38 +2,34 @@
 
 ## Current Work
 
-T99 S40 is active: read-only audit of the remaining retained differences in
-S39's 110 mixed files. Identical content, already-reviewed changes and already-
-#error bodies are excluded. No production modification is admitted. The read-only report is ready for owner
-review; three simplifications and two guard gaps affect four files. See
-[the report](../etc/evidence/softpc/m9-t99-s40-retained-differences.md).
+T99 S41 is verified and awaiting owner acceptance: S40 cleanup and existing
+snapshot guard repairs. Cached dual builds publish both EXEs; 392/392 tests pass.
+Mirror diff decreases by 13 lines. See [S41 evidence](../etc/evidence/softpc/m9-t99-s41-mirror-cleanup.md).
+S40 read-only delivery 76e1d839 is accepted for implementation in this new S.
 
-## M9 T99 S40 Packet
+## M9 T99 S41 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner requests continued audit of the 110 mixed files for necessary differences and unified simplification. |
-| Objective | Give each remaining retained change a necessity or concrete cleanup disposition tied to real consumers. |
-| Non-goals | No repeat audit of identical/reviewed/#error content; no production edits, external import, guest/media/config modification or unsupported all-path runtime claim. |
-| Reference Baseline | SoftPC f7537b1c; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89; S39 REVIEW rows define the 110-file universe. |
+| Admission And Approval | Owner approves a new S to implement the S40 candidates, measured by mirror diff reduction, not source net lines. |
+| Objective | One HDD command-ID table; remove three Mixer declarations; simplify next assignment and repair queue/keyboard capture guards. |
+| Non-goals | No #error body review, public-component changes, new runtime path, guest/media/config change or snapshot ID renumbering. |
+| Reference Baseline | SoftPC 76e1d839; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | Retained mirror differences in the 110 files, callers/build/tests read-only; documentation and evidence only. |
-| Applicable Rules | Execution, architecture, coding, documentation and source-research policy. No OpenNT source comparison. |
-| Verification | Mask excluded bodies, reuse exact prior proof, inspect remaining changes and consumers; documentation/whitespace gates. No rebuild for read-only work. |
-| Expected Markers | Per-file/per-change disposition with evidence; necessary versus simplifiable versus unproven clearly separated. |
-| Asset Needs | None; preserve published EXEs and all user data. |
-| Reporting Requirements | Bounded coverage, skipped prior proof, concrete findings, unified minimal proposals and estimates; do not count inventory as semantic proof. |
-| Stop Conditions | Unknown necessity is not permission to delete. Do not trade fewer mirror lines for duplicated logic elsewhere. |
-| Exit Criteria | Audited remaining scope with traceable dispositions, reviewed report committed/pushed; await implementation decision. |
-| Original Owner Request | 继续审计剩下110个混合差异文件；完全相同、已经审计过和#error替代部分不用审计。 |
-| Similar-Issue Sweep | Compare new candidates across related headers, callbacks and device snapshot paths; report all remaining hits without broad code changes. |
+| Files And ABI Surface | fdisk.c, nt_sbmxr.c, quick_ev.c, keyba.c; owner tests, root test registration and mirror evidence. No public ABI change. |
+| Applicable Rules | Execution, architecture, coding, documentation and source-research policy; single-agent executor/coordinator review. |
+| Verification | Focused x86/x64 snapshot mapping and failure tests; cached dual builds, publication, all background and serial native tests; manifest and documentation gates. |
+| Expected Markers | Five findings disposed; XP additions/deletions before/after separately counted; original IDs and normal behavior preserved. |
+| Asset Needs | Existing package only; refresh two EXEs, preserve INI/media/snapshots. |
+| Reporting Requirements | Mirror diff reduction primary; source/test change counts separately; actual failure proofs and limits. |
+| Stop Conditions | Do not introduce a production test API, generic registry or compensating device implementation. |
+| Exit Criteria | Build/publish/test/review/commit/push complete and clean workspace; await owner acceptance. |
+| Original Owner Request | 批准，请你准入新的S任务予以清理。 |
+| Similar-Issue Sweep | Snapshot callback maps, duplicate Mixer declarations, hash/list NULL guards and anomalous capture/restore conditions. |
 
-S40 owns disposable build/t99-s40 for read-only extraction and comparison;
-15-minute no-progress review budget, hidden long runners, concise evidence
-promotion and cleanup before delivery. The 110-file list is frozen; each row
-records reused proof or remaining-change disposition, not a new whole-file
-review when only part is unreviewed.
+S41 used disposable build/t99-s41 with hidden background jobs and a 15-minute
+no-progress review budget. Jobs finished; scratch is removed before delivery.
 
 ## Current Technical Baseline
 

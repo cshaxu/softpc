@@ -663,6 +663,18 @@ set(SOFTPC_TEST_TARGETS softpc-bios-access-smoke
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
 )
+add_executable(softpc-queue-archive-smoke test/app-softpc/unit/softpc.new/queue_archive_smoke.c)
+target_include_directories(softpc-queue-archive-smoke PRIVATE src src/app-softpc
+    $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)
+target_compile_definitions(softpc-queue-archive-smoke PRIVATE
+    $<TARGET_PROPERTY:softpc-machine-devices,COMPILE_DEFINITIONS>)
+# The source-local fixture calls the real private capture path; discard unrelated
+# device entry points instead of exporting a test-only production interface.
+target_compile_options(softpc-queue-archive-smoke PRIVATE -fwhole-program)
+set_target_properties(softpc-queue-archive-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
+add_test(NAME "app-softpc/unit/softpc.new/queue_archive_smoke" COMMAND softpc-queue-archive-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/queue_archive_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-queue-archive-smoke)
 add_executable(softpc-sound-state-smoke test/app-softpc/unit/softpc.new/sound_state_smoke.c)
 target_include_directories(softpc-sound-state-smoke PRIVATE src src/app-softpc
     $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)

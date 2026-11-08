@@ -1920,20 +1920,19 @@ unsigned long callback_id;
 	return NULL;
 }
 
+LOCAL void (*const snapshot_active_commands[])() = {
+	NULL, restore, seek, rsector, wsector, format,
+	rverify, diagnose, setparams, bad
+};
+
 LOCAL int
 snapshot_encode_active_command(command)
 void (*command)();
 {
-	if (command == NULL) return 0;
-	if (command == restore) return 1;
-	if (command == seek) return 2;
-	if (command == rsector) return 3;
-	if (command == wsector) return 4;
-	if (command == format) return 5;
-	if (command == rverify) return 6;
-	if (command == diagnose) return 7;
-	if (command == setparams) return 8;
-	if (command == bad) return 9;
+	int index;
+	for (index = 0; index < (int)(sizeof(snapshot_active_commands) /
+	                            sizeof(snapshot_active_commands[0])); ++index)
+		if (command == snapshot_active_commands[index]) return index;
 	return -1;
 }
 
@@ -1941,19 +1940,10 @@ LOCAL void (*
 snapshot_decode_active_command(command))()
 int command;
 {
-	switch (command) {
-	case 0: return NULL;
-	case 1: return restore;
-	case 2: return seek;
-	case 3: return rsector;
-	case 4: return wsector;
-	case 5: return format;
-	case 6: return rverify;
-	case 7: return diagnose;
-	case 8: return setparams;
-	case 9: return bad;
-	default: return NULL;
-	}
+	if (command < 0 || command >= (int)(sizeof(snapshot_active_commands) /
+	                                  sizeof(snapshot_active_commands[0])))
+		return NULL;
+	return snapshot_active_commands[command];
 }
 
 GLOBAL int

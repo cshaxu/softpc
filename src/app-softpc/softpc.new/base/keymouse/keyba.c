@@ -2388,7 +2388,7 @@ softpc_device_keyboard_state *state;
 	if (count > BUFF_6805_VMAX || held_event_count < 0 || held_event_count > HELD_EVENT_MAX)
 		return FALSE;
 	state->anomalous_index = in_anomalous_state ? keyboard_anomalous_index() : -1;
-	if (state->anomalous_index < -1) return FALSE;
+	if (in_anomalous_state && state->anomalous_index < 0) return FALSE;
 	for (index = 0; index < count; ++index)
 		state->fifo[index] = buff_6805[(buff_6805_out_ptr + index) & BUFF_6805_PMASK];
 	for (; index < BUFF_6805_VMAX; ++index) state->fifo[index] = 0;
