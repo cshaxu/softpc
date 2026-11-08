@@ -143,6 +143,16 @@ policy in preset parsers or documentation validators. Its selftest exercises
 the real script in-process, including unsafe deletion rejection.
 Raw traces are never committed as fixtures or product inputs.
 
+### Build timestamp freshness
+
+Timestamp-bearing production objects must rebuild on every build of their
+owning product and bypass compiler launchers/caches. Incremental dependency
+skipping is also caching: disabling ccache alone is insufficient. Keep normal
+objects cached; never clear whole build trees or touch tracked sources to
+refresh a banner. Publication must verify the fresh object's compiler date/time
+in each EXE, not merely its filesystem modification time. Qualification includes
+an unchanged-source rebuild and rejection of an older published timestamp.
+
 ### Long-running execution
 
 An executor must classify a build, test, probe, or package operation as

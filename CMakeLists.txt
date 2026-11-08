@@ -339,6 +339,14 @@ set_target_properties(softpcvm PROPERTIES
     OUTPUT_NAME "${SOFTPC_LAUNCHER_NAME}"
     RUNTIME_OUTPUT_DIRECTORY "${SOFTPC_OUTPUT_DIRECTORY}")
 
+add_custom_command(TARGET softpcvm POST_BUILD
+    COMMAND "${CMAKE_COMMAND}"
+        "-DOBJECT=$<TARGET_OBJECTS:emulator-product-build>"
+        "-DSTAMP=${CMAKE_BINARY_DIR}/src/emulator/product/build.stamp"
+        "-DEXE=$<TARGET_FILE:softpcvm>"
+        -P "${CMAKE_SOURCE_DIR}/tools/checks/build_timestamp.cmake"
+    VERBATIM)
+
 enable_testing()
 add_executable(softpc-machine-smoke test/app-softpc/unit/machine/machine_smoke.c)
 add_executable(softpc-config-smoke test/app-softpc/unit/product/config_smoke.c src/app-softpc/product/config.c)

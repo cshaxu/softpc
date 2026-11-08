@@ -2,34 +2,36 @@
 
 ## Current Work
 
-T99 S41 is verified and awaiting owner acceptance: S40 cleanup and existing
-snapshot guard repairs. Cached dual builds publish both EXEs; 392/392 tests pass.
-Mirror diff decreases by 13 lines. See [S41 evidence](../etc/evidence/softpc/m9-t99-s41-mirror-cleanup.md).
-S40 read-only delivery 76e1d839 is accepted for implementation in this new S.
+M9 Td S23 is verified, awaiting owner acceptance: build-timestamp freshness repaired.
+T99 S41 remains verified, awaiting owner acceptance; it is not closed.
+Open task awaiting owner: T99.
 
-## M9 T99 S41 Packet
+## M9 Td S23 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves a new S to implement the S40 candidates, measured by mirror diff reduction, not source net lines. |
-| Objective | One HDD command-ID table; remove three Mixer declarations; simplify next assignment and repair queue/keyboard capture guards. |
-| Non-goals | No #error body review, public-component changes, new runtime path, guest/media/config change or snapshot ID renumbering. |
-| Reference Baseline | SoftPC 76e1d839; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
-| Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | fdisk.c, nt_sbmxr.c, quick_ev.c, keyba.c; owner tests, root test registration and mirror evidence. No public ABI change. |
-| Applicable Rules | Execution, architecture, coding, documentation and source-research policy; single-agent executor/coordinator review. |
-| Verification | Focused x86/x64 snapshot mapping and failure tests; cached dual builds, publication, all background and serial native tests; manifest and documentation gates. |
-| Expected Markers | Five findings disposed; XP additions/deletions before/after separately counted; original IDs and normal behavior preserved. |
-| Asset Needs | Existing package only; refresh two EXEs, preserve INI/media/snapshots. |
-| Reporting Requirements | Mirror diff reduction primary; source/test change counts separately; actual failure proofs and limits. |
-| Stop Conditions | Do not introduce a production test API, generic registry or compensating device implementation. |
-| Exit Criteria | Build/publish/test/review/commit/push complete and clean workspace; await owner acceptance. |
-| Original Owner Request | 批准，请你准入新的S任务予以清理。 |
-| Similar-Issue Sweep | Snapshot callback maps, duplicate Mixer declarations, hash/list NULL guards and anomalous capture/restore conditions. |
+| Identifier Mode | Governance |
+| Admission And Approval | Owner reports stale Nov 6 banner and explicitly orders timestamp cache exclusion, execution/gate repair and implementation. |
+| Objective | Refresh the timestamp-bearing object on each product build, bypass its compiler cache, verify both published EXEs, retain other caches. |
+| Non-goals | No guest, mirror, banner ABI, device behavior or user configuration change; do not close S41. |
+| Reference Baseline | ecf263a8, T99 S41 delivery. |
+| Candidate Proposal | [Build timestamp governance](../proposals/m9-build-timestamp-governance.md). |
+| Files And ABI Surface | Emulator Product CMake/verifier/manifest, root publication/source gate, execution rules and evidence; no C API change. |
+| Applicable Rules | Execution, architecture, coding and documentation; Td owns execution-rule update. |
+| Verification | Repeated cached builds without source edits; fresh timestamp object and EXE content checks; stale-artifact rejection; dual full regression. |
+| Expected Markers | Only composition.c forced/no launcher; normal source cache remains; EXEs contain fresh date/time. |
+| Asset Needs | Refresh package EXEs only; preserve INI/media/snapshots. |
+| Reporting Requirements | Root cause, build dependency and cache proof, actual timestamp strings, test results and public-tree changes. |
+| Stop Conditions | No blanket cache clearing, touching tracked source, generated C/H or runtime date substitution. |
+| Exit Criteria | Verified/published/committed/pushed; clean workspace; report owner acceptance status. |
+| Original Owner Request | 带timestamp的这部分不可以缓存；去做！ |
+| Similar-Issue Sweep | Search __DATE__/__TIME__ and build-time generators across production sources and build scripts. |
 
-S41 used disposable build/t99-s41 with hidden background jobs and a 15-minute
-no-progress review budget. Jobs finished; scratch is removed before delivery.
+See [timestamp evidence](../etc/evidence/softpc/m9-td-s23-build-timestamp.md).
+
+Td S23 used disposable build/td-s23 with hidden jobs and a 15-minute
+no-progress review budget. All jobs completed; scratch is removed at delivery.
+Both architectures pass 196/196 tests; both published EXEs contain Nov 8 timestamps.
 
 ## Current Technical Baseline
 

@@ -41,3 +41,6 @@ The XP SP1 SoftPC mirror baseline upgrade was owner-admitted as T92 on
 Previously admitted:
 [Windows 1.01 startup diagnosis and repair](../proposals/m9-windows-101-startup-repair.md).
 Its current task status is owned solely by [CURRENT](CURRENT.md).
+
+[Build timestamp governance](../proposals/m9-build-timestamp-governance.md) is
+owner-admitted as Td S23, not an additional queued candidate.

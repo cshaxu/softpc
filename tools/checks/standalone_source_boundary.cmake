@@ -370,6 +370,9 @@ file(GLOB retired_source_transform_scripts
 if(retired_source_transform_scripts)
     message(FATAL_ERROR "Standalone build retains source-transform scripts: ${retired_source_transform_scripts}")
 endif()
+# Target post-build validation does not generate source files.
+string(REGEX REPLACE "add_custom_command[ \t\r\n]*\\([ \t\r\n]*target[ \t\r\n]+[a-z0-9_-]+[ \t\r\n]+post_build[^)]*\\)" ""
+    normalized_build_definition "${normalized_build_definition}")
 if(normalized_build_definition MATCHES
     "(add_custom_command|python3|generated-(ccpu|cvid|device))")
     message(FATAL_ERROR "Standalone build retains generated-source machinery")
