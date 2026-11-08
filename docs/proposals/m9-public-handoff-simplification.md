@@ -5062,3 +5062,21 @@ mechanical inventory is not proof that every semantic patch is necessary.
 No code is changed in this research stage. Any proposed restoration must
 preserve an equivalent single path and identify the test/counterfactual needed
 before implementation. Keep already accepted fixes unless equivalence is shown.
+
+### S39 owner scope clarification
+
+Already-#error branch bodies are outside this audit. Do not review their old
+contents, re-prove exclusion or count them as completed semantic audit work.
+File identity enumeration remains only an inventory. Mask those bodies when
+comparing retained code; review remaining ABI/behavior changes and added
+product/host conditions. Do not reopen approved subset policy.
+
+### S39 retained-difference findings
+
+See [the bounded review](../etc/evidence/softpc/m9-t99-s39-mirror-necessity.md)
+and its 475-file inventory. Already-#error bodies are excluded. There are
+27 exact generated-rule ABI pattern matches and 110 mixed residual files;
+file classification is not individual-hunk minimality proof. Three added
+fixed-profile wrappers are concrete -6-line cleanup candidates, preserving
+their actual bodies. No broad rollback is justified. Production is unchanged;
+individual-hunk necessity in mixed adapters remains explicitly unproven.
