@@ -5080,3 +5080,17 @@ file classification is not individual-hunk minimality proof. Three added
 fixed-profile wrappers are concrete -6-line cleanup candidates, preserving
 their actual bodies. No broad rollback is justified. Production is unchanged;
 individual-hunk necessity in mixed adapters remains explicitly unproven.
+
+### S39 owner-approved wrapper cleanup
+
+Owner authorizes the three concrete candidates, not a broad rollback. Remove
+only six local preprocessor lines; retain CGA BIGWIN selection, PIC INTR
+withdrawal and PPI snapshot host update. Compare both architecture compile
+contexts before/after, build/publish with existing caches, run all background
+and serial native tests, then deliver and review before authorized closure.
+The frozen review inventory remains evidence of its original baseline.
+
+S39 implementation resolves all three admitted candidates: production +0/-6,
+no test changes, six identical preprocessed comparisons, and dual builds with
+390/390 full qualification. See [delivery evidence](../etc/evidence/softpc/m9-t99-s39-wrapper-cleanup.md).
+The initial research inventory and its stated proof limits remain historical.

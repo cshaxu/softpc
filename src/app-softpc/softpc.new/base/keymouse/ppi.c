@@ -222,9 +222,7 @@ const softpc_device_ppi_state *state;
 		return FALSE;
 	ppi_register = state->register_value;
 	gate_2_was_low = state->gate_2_was_low ? TRUE : FALSE;
-#if defined(SOFTPC_STANDALONE)
 #line 235
 	HostPpiState(ppi_register);
-#endif
 	return TRUE;
 }

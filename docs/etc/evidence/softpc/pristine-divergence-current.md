@@ -1644,3 +1644,14 @@ remain. No CPU bulk consumer is enabled. See [S38 evidence](m9-t99-s38-gdp-subfi
 The same-file S_2700 Copy WORD fill also exits through its existing cleanup
 for zero count before writing/decrementing an odd head. Nonempty WORD behavior
 is unchanged. The shared fixture covers empty BYTE, WORD and DWORD fills.
+
+### T99 S39 fixed-profile wrapper removal
+
+The owner authorizes removing only the locally added SOFTPC_STANDALONE
+wrappers around nt_cga.c's #undef BIGWIN, ica.c's master-INTR withdrawal,
+and ppi.c's snapshot HostPpiState call. The three bodies and their original
+repairs remain registered and unchanged. Original XP conditionals and already
+excluded #error bodies are not modified. Both production compile contexts
+select SOFTPC_STANDALONE; all six preprocessed outputs match byte-for-byte
+before/after with line directives omitted. Production +0/-6. Final verification
+is recorded in [S39 delivery](m9-t99-s39-wrapper-cleanup.md).

@@ -1239,7 +1239,6 @@ void SWPIC_clear_int IFN2(IU32, adapter, IU32, line_no)
 		asp->ica_cpu_int=FALSE;
 		ica_clear_int(ICA_MASTER,asp->ica_ssr);
 		}
-#ifdef SOFTPC_STANDALONE
 	/* A source can withdraw the only pending master request after the CCPU
 	 * has seen INTR but before it accepts it. Mirror the physical INTR line
 	 * here so a later unmask/reassertion is observable by the executor. */
@@ -1249,7 +1248,6 @@ void SWPIC_clear_int IFN2(IU32, adapter, IU32, line_no)
 		asp->ica_cpu_int = FALSE;
 		host_clear_hw_int();
 		}
-#endif
 #ifdef EOI_HOOKS
 	/*
 	// If the line has a pending interrupt, call the eoi hook
