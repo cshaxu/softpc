@@ -5094,3 +5094,10 @@ S39 implementation resolves all three admitted candidates: production +0/-6,
 no test changes, six identical preprocessed comparisons, and dual builds with
 390/390 full qualification. See [delivery evidence](../etc/evidence/softpc/m9-t99-s39-wrapper-cleanup.md).
 The initial research inventory and its stated proof limits remain historical.
+
+### S39 authorized closure
+
+Implementation 26e659c8 passed post-push actual-diff review. The owner's
+authorization includes closure after verification; S39 is closed with all
+three cleanup candidates resolved. See [closure](../history/M9-T99-S39-mirror-wrapper-cleanup.md).
+The initial research limitations remain explicit; T99 is not closed.
