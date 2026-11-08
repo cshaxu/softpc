@@ -5046,3 +5046,19 @@ Owner accepts P1/P2 and closes S38 on 2026-11-08. See
 [S38 closure](../history/M9-T99-S38-cvid-rules.md). The next owner-requested
 S39 audits all current mirror differences for necessity and simplification;
 no rollback of accepted repairs is authorized by that research request.
+
+## T99 S39 whole-mirror necessity audit
+
+Freeze production at 19a68782 and XP at a2f6d7c93aa4f11efc51147566d5961c59a8ef89.
+Enumerate every tracked file beneath softpc.new, matching the current manifest
+and same-relative XP path. Separate identical, binary/format identity,
+necessary-subset exclusions, ABI/compiler adapters, semantic repairs and
+unresolved/cleanup candidates. Count each file and diff block; an exclusion is
+not an invented runtime feature. Read all suspicious added conditions and
+adapter families against actual callers and existing evidence.
+
+Completion requires a per-file disposition and explicit coverage limits; a
+mechanical inventory is not proof that every semantic patch is necessary.
+No code is changed in this research stage. Any proposed restoration must
+preserve an equivalent single path and identify the test/counterfactual needed
+before implementation. Keep already accepted fixes unless equivalence is shown.

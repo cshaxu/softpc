@@ -18,5 +18,6 @@ bounded tails and cleanup ownership. Public eight trees, INI, media and
 snapshots are unchanged. All admitted TODO findings are repaired.
 
 Scratch was removed and only reusable caches remain. This owner closure changes
-documentation only; no redundant build/test run. Documentation, whitespace and
-build-residue checks pass. S39 admission follows separately; T99 is not closed.
+documentation only; no redundant build/test run. Whitespace and build-residue checks pass. The initial idle CURRENT wording
+failed the open-T documentation gate; S39 admission corrects that state record
+and reruns the gate. T99 is not closed.
