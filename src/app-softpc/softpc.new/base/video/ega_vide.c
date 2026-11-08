@@ -730,6 +730,19 @@ void recalc_text IFN1(int, height)
 
         if(video_adapter == EGA && !(get_EGA_switches() & 1) && (video_mode < 4))
                 scan_lines = 200; /* Low res text mode */
+        else if (video_adapter == VGA && getVM())
+        {
+                half_word index, low, high;
+                /* T99 S37: BIOS sees this VM's CRTC, not the physical display. */
+                inb(EGA_CRTC_INDEX, &index);
+                outb(EGA_CRTC_INDEX, 0x12);
+                inb(EGA_CRTC_DATA, &low);
+                outb(EGA_CRTC_INDEX, 7);
+                inb(EGA_CRTC_DATA, &high);
+                outb(EGA_CRTC_INDEX, index);
+                scan_lines = low | ((high & 2) << 7) | ((high & 0x40) << 3);
+                scan_lines = ((scan_lines + 1) << EGA_GRAPH.multiply_vert_by_two) + 1;
+        }
         else
                 scan_lines = get_screen_height() + 1;
 

@@ -131,6 +131,39 @@ static void keyboard_expect(half_word expected)
     assert(keyboard_read() == expected);
 }
 
+static void verify_keyboard_eoi_order(void)
+{
+    softpc_device_keyboard_state saved, state;
+    unsigned early, i;
+    assert(softpc_device_snapshot_capture_keyboard(&saved));
+    for (early = 0; early < 2; ++early) {
+        half_word status, value;
+        IU32 hook = 0;
+        ica0_post(); ica1_post(); outb(0x21, 0xfd);
+        state = saved;
+        state.translating = 0; state.interface_disabled = 0;
+        state.interrupt_enabled = 1; state.output_full = state.pending_8042 = 0;
+        state.status &= ~1u; state.fifo_count = 2;
+        state.fifo[0] = 0x1e; state.fifo[1] = 0x9e;
+        assert(softpc_device_snapshot_restore_keyboard(&state));
+        continue_output(); dispatch_q_event();
+        assert(ica_intack(&hook) == 9);
+        if (early) outb(0x20, 0x61);
+        for (i = 0; i < 4; ++i) {
+            inb(0x64, &status); assert(status & 1);
+            continue_output(); dispatch_q_event();
+            assert(softpc_device_snapshot_capture_keyboard(&state));
+            assert(state.output_full && state.output_contents == 0x1e);
+        }
+        inb(0x60, &value); assert(value == 0x1e);
+        if (!early) outb(0x20, 0x61);
+        keyboard_expect(0x9e);
+        outb(0x20, 0x61);
+        dispatch_q_event();
+    }
+    assert(softpc_device_snapshot_restore_keyboard(&saved));
+}
+
 static void verify_keyboard_translation(void)
 {
     softpc_device_keyboard_state saved, state;
@@ -292,6 +325,7 @@ int main(void)
     verify_rejected_interrupt(machine);
     verify_scan_input();
     verify_keyboard_sets();
+    verify_keyboard_eoi_order();
     verify_keyboard_translation();
     verify_keyboard_read_releases_irq();
 

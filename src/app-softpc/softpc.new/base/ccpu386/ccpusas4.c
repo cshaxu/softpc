@@ -1583,6 +1583,7 @@ c_IOVirtualised IFN4(io_addr, port, IU32 *, value, LIN_ADDR, offset, IU8, width)
 	return FALSE;
 }
 
+/* T99 S37: all six BIOS accessors request PG_U only for user CPL 3. */
 /* Read byte from memory, if V86 Mode let CPU do it. */
 LOCAL IU8 
 bios_read_byte IFN1(LIN_ADDR, linAddr)
@@ -1608,7 +1609,7 @@ bios_read_byte IFN1(LIN_ADDR, linAddr)
 	   that the access and dirty bits are kosher.
 	 */
 
-	if ( getCPL() != 3 )
+	if ( getCPL() == 3 )
 	{
 		access_request = access_request | PG_U;
 	}
@@ -1673,7 +1674,7 @@ bios_read_word IFN1(LIN_ADDR, linAddr)
 	   that the access and dirty bits are kosher.
 	 */
 
-	if ( getCPL() != 3 )
+	if ( getCPL() == 3 )
 	{
 		access_request = access_request | PG_U;
 	}
@@ -1737,7 +1738,7 @@ bios_read_double IFN1(LIN_ADDR, linAddr)
 	   that the access and dirty bits are kosher.
 	 */
 
-	if ( getCPL() != 3 )
+	if ( getCPL() == 3 )
 	{
 		access_request = access_request | PG_U;
 	}
@@ -1802,7 +1803,7 @@ bios_write_byte IFN2(LIN_ADDR, linAddr, IU8, value)
 	   that the access and dirty bits are kosher.
 	 */
 
-	if ( getCPL() != 3 )
+	if ( getCPL() == 3 )
 	{
 		access_request = access_request | PG_U;
 	}
@@ -1866,7 +1867,7 @@ bios_write_word IFN2(LIN_ADDR, linAddr, IU16, value)
 	   that the access and dirty bits are kosher.
 	 */
 
-	if ( getCPL() != 3 )
+	if ( getCPL() == 3 )
 	{
 		access_request = access_request | PG_U;
 	}
@@ -1930,7 +1931,7 @@ bios_write_double IFN2(LIN_ADDR, linAddr, IU32, value)
 	   that the access and dirty bits are kosher.
 	 */
 
-	if ( getCPL() != 3 )
+	if ( getCPL() == 3 )
 	{
 		access_request = access_request | PG_U;
 	}

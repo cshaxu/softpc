@@ -4928,3 +4928,49 @@ composition is correct but returns wrong bytes. This adds only two changed
 constant lines, no layout change. A separate GDP byte-mask alias omission
 (offsets 1379/1383 versus 1376/1380) was exposed during mask variation; record
 that adapter defect in TODO rather than mixing it into this original read fix.
+
+## T99 S37 five original-device defect audit
+
+Frozen universe: the five owner-reported items below. Each needs actual compile
+and call evidence, a failing/passing local behavioral proof if repaired, or
+specific non-applicability evidence. Audit all before grouped implementation.
+
+1. Six BIOS SAS access checks: PG_U/access_check/paging/fallback; CPL 0-3,
+   supervisor/user pages, read/write, byte/word/dword and relevant V86 cases.
+2. D11 slave EOI: ISR clearing, mask preservation, master EOI and exceptional
+   no-slave/no-hardware paths through actual PIC operations.
+3. recalc_text: establish whether virtual CRTC differs from physical height
+   and is reached locally; only then change it, retaining V7, EGA and index
+   behavior and proving Win31 mode/font transitions where applicable.
+4. PIC ICW1: enumerate real EOI callbacks and negative-count semantics; pending,
+   in-service/empty, both chips, repeated init/auto EOI, requeue/locking and
+   Sound Blaster effects. Do not infer an absent TimerEoiHook.
+5. Keyboard: actual controller/PIC ordering; read-before/after EOI, status reads,
+   controller replies, reset/cancel and queue advancement if the defect applies.
+
+No guest binary edits/recompiles or foreign patch imports. Same fixtures before
+and after any fixes; keep source proofs separate from dynamic and guest proof.
+Production/test estimates follow completion of the overall applicability audit.
+Public components and unrelated queued debt are outside this scope.
+
+### S37 audited implementation decision
+
+Real compiled CCPU/SAS test observes all six reversed PG_U requests across
+120 cases (CPL0-3 plus V86, S/U and RO/RW, read/write, three widths). D11's
+slave ISR remains 08 and its mask becomes 20 after the old EOI. Real Win31
+V86 probe, using the existing snapshot and original BIOS font entry, reads
+virtual CRTC 400 versus physical calculation 481: 8/16-dot fonts produce
+60/30 rows instead of 50/25. Repair these three original sites only.
+
+PIC reset matrix and Sound Blaster negative-notification/restart tests pass;
+only AutoInitEoiHook is registered and negative count intentionally does not
+advance DMA. Keyboard's existing output_full ownership already passes both
+EOI/read orders. No PIC or keyboard production change is justified.
+
+Minimal production estimate: three mirror files, six CPL conditions, one EOI
+port, and one VGA V86 CRTC read with index restoration and unchanged multiplier
+and rounding (about +21/-7, net +14). Tests approximately +300 lines in existing
+owner-local fixtures plus one SAS permission executable. No public ABI/state,
+guest binary edits, imported patches or new device implementation. The actual
+Win31 probe invokes the original BIOS entry from a real V86 checkpoint; it is
+not evidence that an unmodified guest application naturally issued that call.

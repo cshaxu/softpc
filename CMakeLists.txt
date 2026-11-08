@@ -468,6 +468,13 @@ target_include_directories(softpc-bop-smoke PRIVATE
     src/app-softpc/softpc.new/host/inc
     src/app-softpc/softpc.new/base/inc)
 add_test(NAME "app-softpc/unit/machine/bop_smoke" COMMAND softpc-bop-smoke)
+add_executable(softpc-bios-access-smoke test/app-softpc/unit/machine/bios_access_smoke.c)
+target_link_libraries(softpc-bios-access-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-bios-access-smoke PRIVATE
+    src/app-softpc/softpc.new/host/inc src/app-softpc/softpc.new/base/inc)
+target_link_options(softpc-bios-access-smoke PRIVATE
+    -Wl,--wrap=xtrn2phy)
+add_test(NAME "app-softpc/unit/machine/bios_access_smoke" COMMAND softpc-bios-access-smoke)
 add_executable(softpc-device-contract-smoke
     test/app-softpc/unit/machine/device_contract_smoke.c)
 target_link_libraries(softpc-device-contract-smoke PRIVATE softpc-vm)
@@ -628,7 +635,7 @@ set_tests_properties("checks/inward_component_boundaries/selftest" PROPERTIES LA
 # Smoke tests intentionally use assert() for both the operation and its
 # postcondition.  Keep those checks live even when validating an optimized
 # machine library; production targets retain their normal Release NDEBUG.
-set(SOFTPC_TEST_TARGETS
+set(SOFTPC_TEST_TARGETS softpc-bios-access-smoke
     softpc-pit-smoke
     softpc-media-snapshot-smoke
     softpc-machine-smoke
@@ -780,7 +787,7 @@ foreach(kind IN ITEMS pcm midi)
         target_compile_options(softpc-test-${kind} PRIVATE -UNDEBUG)
     endif()
 endforeach()
-foreach(target IN ITEMS softpc-machine-smoke softpc-dual-media-smoke
+foreach(target IN ITEMS softpc-bios-access-smoke softpc-machine-smoke softpc-dual-media-smoke
         softpc-partition-image-smoke softpc-pit-smoke softpc-irq-smoke
         softpc-fdc-smoke softpc-printer-smoke softpc-parallel-failure-smoke
         softpc-serial-smoke softpc-mouse-smoke softpc-keycode-smoke

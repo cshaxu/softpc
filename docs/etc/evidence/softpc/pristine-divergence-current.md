@@ -1608,3 +1608,13 @@ extraction into r20; no layout or ABI change. The independent odd-address
 mode-1 test additionally requires S_2100's next physical group offsets to be
 8/10 rather than 4/6, consistent with the already retained S33 A0 gap.
 See [S36 evidence](m9-t99-s36-chain2-dword-read.md). No NTVDM64 patch copied.
+
+### T99 S37 BIOS permissions, EOI and virtual text height
+
+Owner-admitted original-semantic repairs, independently verified against pinned
+XP SP1. ccpusas4.c: six BIOS SAS helpers request PG_U for CPL 3, not CPL 0-2.
+slave_bs.c: D11 sends slave EOI to its command port, retaining the mask already
+written to the data port. ega_vide.c: VGA V86 recalc_text reads this VM's VDE
+and overflow through existing virtual I/O, restores the index, and retains V7
+multiplier and existing rounding. EGA/non-V86 paths remain unchanged. No new
+state, callback or alternate device implementation. See [S37 evidence](m9-t99-s37-original-device-audit.md).

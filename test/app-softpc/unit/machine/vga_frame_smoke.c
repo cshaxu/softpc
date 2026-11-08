@@ -1,6 +1,7 @@
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "machine/driver.h"
+#include "compat/ccpu/abi.h"
 #include "../../fixture_cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
@@ -1931,6 +1932,78 @@ static void verify_bios_dac_block_and_state(void)
     }
 }
 
+/* Exercise the actual BIOS/SAS virtual-I/O boundary; replace only the nested
+   guest instruction executor, not recalc_text or its register accessors. */
+extern void recalc_text(int height);
+extern IU8 c_sas_hw_at(IU32 addr);
+extern IU16 c_sas_w_at(IU32 addr);
+extern void c_sas_store(IU32 addr, IU8 value);
+extern void c_sas_storew(IU32 addr, IU16 value);
+extern void c_setVM(ISM32 value);
+extern void c_setCPL(ISM32 value);
+extern void (*host_simulate_func)(void);
+static IU8 virtual_crtc[256], virtual_index, initial_index;
+static unsigned virtual_height_reads;
+static void execute_virtual_crtc(void)
+{
+    IU16 port = (IU16)c_getEDX();
+    IU8 value = (IU8)c_getEAX();
+    assert(port == 0x3d4 || port == 0x3d5);
+    if (c_getEIP() == 0x3020) {
+        if (port == 0x3d5 && (virtual_index == 7 || virtual_index == 0x12))
+            ++virtual_height_reads;
+        c_setEAX(port == 0x3d4 ? virtual_index : virtual_crtc[virtual_index]);
+    } else {
+        assert(c_getEIP() == 0x3050);
+        if (port == 0x3d4) {
+            if (value == 9 && virtual_height_reads != 0)
+                assert(virtual_index == initial_index); /* Read preserves index. */
+            virtual_index = value;
+        } else virtual_crtc[virtual_index] = value;
+    }
+}
+static void verify_virtual_text_height(void)
+{
+    static const unsigned heights[] = { 8, 14, 16 };
+    static const unsigned extents[] = { 399, 599 };
+    unsigned mode, scale, extent, font;
+    IU32 flags = c_getEFLAGS(), cr0 = c_getCR0();
+    void (*simulate)(void) = host_simulate_func;
+    host_simulate_func = execute_virtual_crtc;
+    c_setCR0((cr0 | 1u) & ~0x80000000u);
+    for (mode = 0; mode < 3; ++mode)
+    for (scale = 0; scale < 2; ++scale)
+    for (extent = 0; extent < 2; ++extent)
+    for (font = 0; font < 3; ++font) {
+        unsigned scan_lines, rows;
+        c_setVM(0); c_setCPL(0);
+        video_adapter = mode == 2 ? EGA : VGA;
+        set_screen_height(479);
+        set_pc_pix_height(1);
+        EGA_GRAPH.multiply_vert_by_two = scale;
+        /* Mode 7 avoids EGA's separate 200-line low-resolution rule. */
+        c_sas_store(0x449, 7); c_sas_storew(0x44a, 80);
+        virtual_index = initial_index = 0x18;
+        lib_memory_set(virtual_crtc, 0, sizeof(virtual_crtc));
+        virtual_crtc[0x12] = (IU8)extents[extent];
+        virtual_crtc[7] = (IU8)(((extents[extent] & 0x100) >> 7) |
+            ((extents[extent] & 0x200) >> 3));
+        virtual_height_reads = 0;
+        c_setVM(mode != 0); c_setCPL(mode != 0 ? 3 : 0);
+        recalc_text((int)heights[font]);
+        scan_lines = mode == 1 ? ((extents[extent] + 1) << scale) + 1 :
+            mode == 0 ? (480u << scale) + 1 : 481;
+        rows = scan_lines / heights[font];
+        assert(c_sas_hw_at(0x484) == rows - 1);
+        assert(c_sas_hw_at(0x485) == heights[font]);
+        assert(c_sas_w_at(0x44c) == rows * 160);
+        if (mode == 1) assert(virtual_height_reads >= 2);
+    }
+    c_setVM(0); c_setCPL(0); c_setEFLAGS(flags); c_setCR0(cr0);
+    host_simulate_func = simulate;
+    video_adapter = VGA;
+}
+
 int main(void)
 {
     const char *path = "softpc-original-dib-smoke.img";
@@ -2287,6 +2360,7 @@ int main(void)
     verify_display_stride();
     verify_pointer_update_pixels();
     verify_dib_generation_readiness();
+    verify_virtual_text_height();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     assert(colour_resolution_failures == 0);

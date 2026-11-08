@@ -25,4 +25,11 @@
   Unchained compound-read audit before routing CCPU directly through this
   legacy DWORD entry. Current phy_r32 instead performs two WORD reads at +2.
 
+- P2: CCPU BIOS WORD/DWORD mapping-failure reads in ccpusas4.c cast biosDoInst's result to IU8 in both protected-mode and V86
+  fallbacks. Source inspection during S37 confirms truncation remains separate
+  from PG_U admission. Owner: app-softpc mirror. Admit a focused fallback-width
+  repair with actual nested guest-handler results before claiming full-width
+  fallback correctness; the S37 permission fixture substitutes that handler
+  and only proves permission/fallback selection.
+
 CURRENT owns active tasks; the runtime-performance candidate remains in Queue.

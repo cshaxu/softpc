@@ -104,6 +104,37 @@ static void verify_eoi(void)
     assert(eoi_calls == 5); /* Teardown removes the only dispatch authority. */
 }
 
+static void verify_unused_irq(void)
+{
+    unsigned scenario, failures = 0;
+    extern void D11_int(void);
+    for (scenario = 0; scenario < 4; ++scenario) {
+        IU32 hook = 0;
+        IU8 master, slave, mask;
+        ica0_post(); ica1_post();
+        ica_outb(0x21, 0xdb); ica_outb(0xa1, 0xf7);
+        if (scenario != 0) {
+            /* Slave IRQ11, master IRQ5, or spurious cascade IRQ2. */
+            ica_hw_interrupt(scenario == 1 ? ICA_SLAVE : ICA_MASTER,
+                scenario == 1 ? 3 : scenario == 2 ? 5 : 2, 1);
+            (void)ica_intack(&hook);
+        }
+        D11_int();
+        ica_outb(0x20, 0x0b); ica_inb(0x20, &master);
+        ica_outb(0xa0, 0x0b); ica_inb(0xa0, &slave);
+        ica_inb(0xa1, &mask);
+        if (master != 0 || slave != 0 || mask != (scenario == 1 ? 0xff : 0xf7)) {
+            fprintf(stderr, "D11 scenario=%u master=%02x slave=%02x mask=%02x\n",
+                scenario, master, slave, mask);
+            ++failures;
+        }
+        ica_inb(0x21, &mask);
+        assert(mask == (scenario == 2 ? 0xfb : 0xdb));
+        assert(sas_hw_at(0x46b) == (scenario == 2 ? 0x20 : scenario == 1 ? 4 : 0xff));
+    }
+    assert(failures == 0);
+}
+
 static void verify_delayed_irq(void)
 {
     unsigned adapter;
@@ -146,6 +177,46 @@ static void verify_delayed_irq(void)
         dispatch_q_event();
         assert(!(ica_scan_irr(adapter) & 0x80));
         assert(host_DelayHwInterrupt(irq, 0, 0xfffffffful));
+    }
+}
+
+/* PIC initialization discards old requests; the delayed-release callback must
+   not recreate them. Fresh requests still work in normal and automatic EOI. */
+static void verify_pic_reinitialization(void)
+{
+    unsigned adapter, automatic, state, repeat;
+    for (adapter = 0; adapter < 2; ++adapter)
+    for (automatic = 0; automatic < 2; ++automatic)
+    for (state = 0; state < 3; ++state) {
+        io_addr port = adapter ? 0xa0 : 0x20;
+        int irq = (int)(adapter * 8 + 5);
+        IU32 hook = 0;
+        IU8 value;
+        ica0_post(); ica1_post();
+        ica_outb(0x21, adapter ? 0xfb : 0xdf);
+        ica_outb(0xa1, 0xdf);
+        if (state == 1) assert(host_DelayHwInterrupt(irq, 1, 1000));
+        if (state == 2) {
+            ica_hw_interrupt(adapter, 5, 1);
+            assert(ica_intack(&hook) == (adapter ? 0x75 : 0x0d));
+            if (adapter) ica_outb(0x20, 0x62);
+        }
+        for (repeat = 0; repeat < 2; ++repeat) {
+            ica_outb(port, 0x11);
+            ica_outb(port + 1, adapter ? 0x70 : 0x08);
+            ica_outb(port + 1, adapter ? 2 : 4);
+            ica_outb(port + 1, automatic ? 3 : 1);
+            ica_outb(port + 1, 0xdf);
+            dispatch_q_event();
+            ica_outb(port, 0x0a); ica_inb(port, &value); assert(value == 0);
+            ica_outb(port, 0x0b); ica_inb(port, &value); assert(value == 0);
+            assert(!(DelayIrqLine & (1ul << irq)));
+        }
+        ica_hw_interrupt(adapter, 5, 1);
+        assert(ica_intack(&hook) == (adapter ? 0x75 : 0x0d));
+        ica_outb(port, 0x65);
+        if (adapter) ica_outb(0x20, 0x62);
+        assert(!(ica_scan_irr(adapter) & 0x80));
     }
 }
 
@@ -503,6 +574,8 @@ static void verify_sb_transfer(void)
         assert(QueryDMA(&actual));
         assert(actual.addr == (direction ? 0x0fe0 : 0x1020) && actual.count == 31);
         assert(sb_pcm_count == 32); /* IRQ alone does not capture another block. */
+        host_EOI_hook(SbInterrupt, -1);
+        assert(sb_pcm_count == 32 && !bWriteBurstStarted);
         verify_sb_interrupt(0); /* Actual PIC acknowledge + EOI starts block two. */
         assert(sb_pcm_count == 64 && bWriteBurstStarted);
         for (i = 32; i != 64; ++i) assert(sb_pcm_bytes[i] == i);
@@ -519,6 +592,17 @@ static void verify_sb_transfer(void)
         assert(DspMode == None && sb_pcm_count == 128);
         dispatch_q_event(); verify_sb_interrupt(0);
         assert(sb_pcm_count == 128); /* Last submitted block retains its IRQ. */
+        DspWrite(DSP_WRITE_AUTO);
+        dispatch_q_event();
+        i = sb_pcm_count;
+        ica0_post(); ica_outb(0x21, 0xdf); /* Guest discarded the pending IRQ. */
+        host_EOI_hook(SbInterrupt, -1); /* Negative notification does not restart DMA. */
+        assert(DspServiceTransfer() == LIB_STATUS_OK);
+        assert(sb_pcm_count == i && !bWriteBurstStarted);
+        assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
+        DspWrite(DSP_WRITE_AUTO); /* Explicit guest restart recovers normally. */
+        assert(sb_pcm_count == i + 32);
+        StopDspTransfer(TRUE); TimeConstant = 0xa6;
         assert(StartDspTransfer(Single));
         assert(sb_pcm_count == 32);
         StopDspTransfer(TRUE);
@@ -1838,7 +1922,7 @@ int main(int argc, char **argv)
     else if (lib_text_compare(argv[1], "cmos") == 0)
         verify_cmos();
     else if (lib_text_compare(argv[1], "eoi") == 0)
-        verify_eoi();
+    { verify_eoi(); verify_pic_reinitialization(); verify_unused_irq(); }
     else if (lib_text_compare(argv[1], "irq") == 0)
         verify_delayed_irq();
     else if (lib_text_compare(argv[1], "sb-dma") == 0)
