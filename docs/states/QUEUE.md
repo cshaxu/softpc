@@ -43,4 +43,5 @@ Previously admitted:
 Its current task status is owned solely by [CURRENT](CURRENT.md).
 
 [Build timestamp governance](../proposals/m9-build-timestamp-governance.md) is
-owner-admitted as Td S23, not an additional queued candidate.
+owner-accepted and closed as [Td S23](../history/M9-Td-S23-build-timestamp.md),
+not an additional queued candidate.

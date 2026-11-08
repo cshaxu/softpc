@@ -90,4 +90,4 @@ CRLF; new tests and documents use LF. Public eight trees and INI are unchanged.
 Actual-diff self-review checks exact command IDs, failure-before-dereference,
 restoration after test mutation, no production-only test interfaces and no
 #error changes. Task scratch is removed after promoting this evidence.
-Await owner acceptance before closing S41.
+Owner acceptance and closure followed on 2026-11-08; see [closure](../../../history/M9-T99-S41-mirror-cleanup.md).

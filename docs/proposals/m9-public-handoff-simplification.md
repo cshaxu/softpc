@@ -5133,4 +5133,4 @@ S41 implements all five units and passes cached dual builds plus 392/392 tests.
 Actual mirror diff decreases by 13 lines, with all original snapshot IDs retained.
 [Delivery evidence](../etc/evidence/softpc/m9-t99-s41-mirror-cleanup.md) records
 test growth, initial fixture link failure, final qualification and limits.
-S41 awaits owner acceptance; no subsequent S is admitted.
+Owner accepts and closes S41 on 2026-11-08; see [closure](../history/M9-T99-S41-mirror-cleanup.md). No subsequent S is admitted; T99 remains open.

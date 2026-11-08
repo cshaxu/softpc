@@ -8,4 +8,4 @@ recompilation through a build-local stamp. Keep other caches and the banner ABI.
 Root publication checks fresh object ordering and embedded date/time; repeated
 unchanged-source builds plus old-artifact rejection prove the missing contract.
 No runtime clock substitute, source touching or generated C/H is admitted.
-CURRENT owns Td S23 admission; T99 S41 still awaits owner acceptance.
+Owner accepts the delivery on 2026-11-08; see [Td S23 closure](../history/M9-Td-S23-build-timestamp.md). CURRENT owns remaining T99 status.
