@@ -4974,3 +4974,16 @@ owner-local fixtures plus one SAS permission executable. No public ABI/state,
 guest binary edits, imported patches or new device implementation. The actual
 Win31 probe invokes the original BIOS entry from a real V86 checkpoint; it is
 not evidence that an unmodified guest application naturally issued that call.
+
+### S37 P2 admitted fallback-width completion
+
+Owner explicitly adds the adjacent IU8 truncation to this S. Four casts in the
+WORD/DWORD protected/V86 fallbacks become their return widths. Existing mapper,
+ROM entry, register save/restore and byte/write paths remain. Estimate: no net
+production growth; about 60 test lines in bios_access_smoke, no new target/API.
+The existing test-local mapper wrapper will request fallback once for a valid
+address, then the original CCPU executes the unchanged embedded ROM read entry.
+Two nonzero-high-byte values, both CPU modes and all three widths verify the
+result and saved registers. This proves fallback transport, not an OS page-fault
+handler. Record before/after, dual-architecture full qualification and actual
+diff; retire the corresponding TODO only after proof.

@@ -76,7 +76,8 @@ Enumerated PG_U requests and CPL checks in CCPU, EOI writes in BIOS and all
 RegisterEOIHook production call sites. Only the six helpers have this inverted
 condition; other permission logic remains unchanged. BIOS re_direct/int_287
 already use slave command port. Found a separate IU8 truncation in WORD/DWORD
-fallback return values; explicitly transferred to TODO, not claimed repaired.
+fallback return values; P1 transferred it to TODO. Owner-admitted P2 below
+repairs it and removes that resolved entry.
 
 The fixes affect DOS/Win31/Win95 through shared original BIOS/CCPU paths.
 The Win31 evidence is specifically the real V86 font case above. Full tests
@@ -145,3 +146,63 @@ Published SHA-256:
 Temporary traces, guest probe, its private cached target artifacts and task
 scratch are removed after promotion of these concise results. Owner acceptance
 is still required; T99 is not closed by this S delivery.
+
+## P2: full-width original ROM fallback
+
+Owner additionally admits the adjacent WORD/DWORD truncation on top of P1
+7a77c818. The four return casts in bios_read_word/bios_read_double used IU8,
+although biosDoInst captures the full EAX result. They now use IU16/IU32.
+No new path, state, interface or guest instruction is introduced.
+
+The existing BIOS access fixture retains its 120 permission cases and adds
+12 original-ROM cases: V86 and protected mode, BYTE/WORD/DWORD, values
+0x12345678 and 0xfedcba98. Its existing linker wrapper forces only the first
+outer translation to miss; the original CPU then executes the embedded ROM
+against valid mapped memory. Protected mode uses the original registered
+virtual selectors with a valid LDT. No guest binary is edited or rebuilt.
+The test asserts full results and restoration of CS, DS, EIP, EAX, EDX and EBP.
+
+Before the production change, all eight WORD/DWORD cases return only 0x78 or
+0x98; four BYTE cases pass, and the original 120 permission cases still pass.
+An initial fixture attempt omitted a valid LDTR selector and was corrected
+before this complete before/after comparison; it was not a product defect.
+This proves original ROM fallback return widths, not an OS page-fault handler's
+policy, exhaustive paging/V86 behavior, or a particular Windows symptom.
+
+Similar-issue sweep: searching all biosDoInst returns in ccpusas4.c finds the
+four defective casts and two valid BYTE IU8 casts. Write argument widening and
+c_IOVirtualised's full-width result need no change. The resolved TODO entry is
+removed; the three unrelated existing findings remain deferred.
+
+P2 production: +4/-4, net zero, one mirror file. Test: +61/-3, net +58 in the
+existing fixture; no new target or framework. The accumulated normalized-LF
+ccpusas4.c difference from pinned XP changes from +89/-56 to +93/-60: eight
+additional changed mirror lines, no added production lines. Mirror CRLF,
+autonomous LF and all original conditional structure remain unchanged.
+
+P2 qualification: cached x64/x86 builds completed and published
+both EXEs. Background suites pass 187/187 each (85.38/80.29 seconds).
+No non-mirror compiler warnings were observed; existing mirror warnings remain.
+Documentation, all 475 mirror hashes and changed-file newline checks pass.
+Native suites each pass the three Window/Console cases but fail the three
+native audio/MIDI and two package cases while quser reports the session Disc.
+PCM/MIDI open fails; package cannot compose its machine or reach the prompt.
+After the desktop became Active, both unchanged-artifact native suites pass
+8/8 (x64 24.76 seconds; x86 24.39 seconds). The first-run failures are retained
+here rather than relabelled as passes; all 390 distinct architecture/test cases
+now have passing results. Final verbose focused runs confirm 120 permission
+cases plus 12 original-ROM width cases on each architecture, zero failures.
+No specific Windows symptom is attributed to the four-cast repair.
+
+Published P2 SHA-256:
+
+| Artifact | SHA-256 |
+| --- | --- |
+| softpc32.exe | 730b985ad48a013d631b4a756c8833c274ef1f302cb95166bd8d65eb52ca5738 |
+| softpc64.exe | 3dae6c5c2453b22a101aa8794defc14cecefdf10a1c9da04aedf417916dcd306 |
+
+Executor actual-diff review confirms four width substitutions, the unchanged
+BYTE path, real-ROM execution and saved-register assertions. No public tree,
+CMake, product configuration, media or snapshot changes. No new production
+interface, state or alternative path. Task scratch is removed after promotion
+of these results; persistent Ninja/ccache trees remain. Await owner acceptance.

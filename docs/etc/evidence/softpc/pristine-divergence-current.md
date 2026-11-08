@@ -1618,3 +1618,8 @@ written to the data port. ega_vide.c: VGA V86 recalc_text reads this VM's VDE
 and overflow through existing virtual I/O, restores the index, and retains V7
 multiplier and existing rounding. EGA/non-V86 paths remain unchanged. No new
 state, callback or alternate device implementation. See [S37 evidence](m9-t99-s37-original-device-audit.md).
+
+S37 P2 additionally preserves the existing ROM fallback result width: the two
+WORD returns use IU16 and the two DWORD returns use IU32 instead of IU8.
+BYTE reads, mapping, ROM instructions and register save/restore are unchanged.
+The same real-ROM fixture fails eight width cases before this four-line repair.
