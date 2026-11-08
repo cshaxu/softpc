@@ -1403,7 +1403,7 @@ switch ( id )
 	*((IU16	*)(LocalIUH+2)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16225)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16224)	;
-	*((IUH	*)&(r20))	=	(IS32)(8)	;	
+	*((IUH	*)&(r20))	=	(IS32)(2)	; /* T99 S38: next WORD is two guest bytes later. */
 	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32	*)(LocalIUH+0)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
 	*((IU32	*)&(r3)	+	REGLONG)	=	*((IU32	*)&(r21)	+	REGLONG)	;	
 /*	J_SAVE_RETURN	NOT	IMPLIMENTED	*/

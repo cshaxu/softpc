@@ -1623,3 +1623,12 @@ S37 P2 additionally preserves the existing ROM fallback result width: the two
 WORD returns use IU16 and the two DWORD returns use IU32 instead of IU8.
 BYTE reads, mapping, ROM instructions and register save/restore are unchanged.
 The same real-ROM fixture fails eight width cases before this four-line repair.
+
+### T99 S38 Unchained DWORD address spacing
+
+Owner-approved sevid000.c S_2097 correction: advance the second WORD call by
++2 guest bytes, not +8. Its callee performs plane scaling itself; retain both
+calls, saved locals and existing high/low assembly. Original rule tests fail
+with the old address and pass with this one-line correction. Compat GDP
+subfield mapping is separately repaired without changing generated consumers.
+See [S38 evidence](m9-t99-s38-gdp-subfields.md).

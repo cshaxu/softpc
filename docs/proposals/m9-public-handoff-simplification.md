@@ -4994,3 +4994,24 @@ Owner accepted P1/P2 and approved S37 closure on 2026-11-08. See
 [S37 closure](../history/M9-T99-S37-original-device-audit.md) for final scope,
 verification and remaining debt. No next S is admitted; CURRENT owns the
 open T99 state. Earlier pending statements above describe historical stages.
+
+## T99 S38 GDP aliases and Unchained WORD spacing
+
+Owner approves the preceding read-only audit's two fixes. Frozen scope: five
+subfield aliases (1378/1379, 1382/1383, 1407), one Unchained +8 offset,
+existing original-rule regression and investigation-only bulk-fill suitability.
+The x64 counterfactual already proves 16 Unchained mismatches become correct
+with +2 alone; WORD composition remains unchanged. Alias correction makes
+non-default CHAIN2/CHAIN4 comparison and rotate reads see their shared fields.
+
+Native GDP mapping groups each subfield with its existing full field; original
+historical suffixes identify low-order bytes/WORDs, not native +2/+3 addresses.
+No duplicated field storage or consumer compensation. Estimate production
++8/-1 (net +7), existing tests about +80 to 110 lines. Verify nonuniform masks
+and field values to prevent an all-zero/all-one endian-blind oracle.
+
+Bulk fill remains a separate capability question: CCPU SAS fill iterates
+linear scalar stores, while C-VID glue receives video addresses and subtracts
+the current aperture base. Admission requires valid mapped/type-homogeneous
+ranges and preserved boundary/fault behavior, plus measured benefit. Do not
+activate or remove it as a side effect of the two approved correctness fixes.

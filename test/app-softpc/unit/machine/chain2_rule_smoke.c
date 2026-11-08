@@ -7,6 +7,7 @@
 #include "cpu_vid.h"
 #include "egacpu.h"
 #include "egaports.h"
+#include "cvidc/gdp_rule_access.h"
 #undef const
 #include <assert.h>
 #include <stdio.h>
@@ -15,6 +16,66 @@ extern IHP Gdp;
 extern IU8 *EGA_planes;
 extern EVID_WRT_POINTERS c_ev_write_ptr, chain2_evid[];
 extern EVID_READ_POINTERS read_mode0_evid[], read_mode1_evid[];
+
+static void check_gdp_subfields(void)
+{
+    const lib_u32 masks[][2] = {
+        { 0, 0 }, { 0xffffffffu, 0 }, { 0, 0xffffffffu },
+        { 0x12345678u, 0x87654321u }
+    };
+    IU32 compare = getVideocolour_comp(), care = getVideodont_care();
+    IU32 rotate = getVideorotate();
+    lib_u32 i;
+    for (i = 0; i < sizeof(masks) / sizeof(masks[0]); ++i) {
+        lib_u32 expected = masks[i][0] | masks[i][1];
+        setVideocolour_comp(masks[i][0]);
+        setVideodont_care(masks[i][1]);
+        /* Historical subfield offsets address the low-order native value. */
+        assert(softpc_gdp_rule_slot(Gdp, 1378, sizeof(IU16)) ==
+            softpc_gdp_rule_slot(Gdp, 1376, sizeof(IU32)));
+        assert(*(IU8 *)softpc_gdp_rule_slot(Gdp, 1379, sizeof(IU8)) ==
+            (IU8)masks[i][0]);
+        assert(softpc_gdp_rule_slot(Gdp, 1382, sizeof(IU16)) ==
+            softpc_gdp_rule_slot(Gdp, 1380, sizeof(IU32)));
+        assert(*(IU8 *)softpc_gdp_rule_slot(Gdp, 1383, sizeof(IU8)) ==
+            (IU8)masks[i][1]);
+        lib_memory_set(EGA_planes, 0, 0x1000);
+        r1 = (IUH)Gdp; r3 = 0x100;
+        read_mode1_evid[1].b_read(0x100);
+        assert((lib_u8)r2 == (lib_u8)expected);
+        r1 = (IUH)Gdp; r3 = 0x100;
+        read_mode1_evid[2].w_read(0x100);
+        assert((lib_u16)r2 == (lib_u16)expected);
+    }
+    for (i = 0; i < 8; ++i) {
+        setVideorotate(i);
+        assert(*(IU8 *)softpc_gdp_rule_slot(Gdp, 1407, sizeof(IU8)) == i);
+    }
+    setVideocolour_comp(compare); setVideodont_care(care);
+    setVideorotate(rotate);
+}
+
+static void check_unchained_dword_reads(void)
+{
+    const lib_u32 offsets[] = { 0x100, 0x101, 0x103, 0x107, 0x3fff };
+    IU32 shift = getVideoread_shift_count();
+    lib_u32 plane, entry, i;
+    for (plane = 0; plane < 4; ++plane)
+    for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
+        lib_u32 offset = offsets[entry];
+        setVideoread_shift_count(plane * 8u);
+        /* Byte 8/9 differ from byte 2/3, exposing the old +8 guest offset. */
+        for (i = 0; i < 12; ++i)
+            EGA_planes[4u * (offset + i) + plane] = (lib_u8)(0x11u * (i + 1u));
+        r1 = (IUH)Gdp; r3 = offset;
+        read_mode0_evid[0].w_read(offset);
+        assert((lib_u16)r2 == 0x2211u);
+        r1 = (IUH)Gdp; r3 = offset; r2 = 0xa5a5a5a5u;
+        read_mode0_evid[0].d_read(offset);
+        assert((lib_u32)r2 == 0x44332211u);
+    }
+    setVideoread_shift_count(shift);
+}
 
 static void check_chain2_dword_reads(void)
 {
@@ -54,6 +115,8 @@ void softpc_test_chain2_continuations(void)
     lib_u8 input[128], output[64], first[64];
     EVID_WRT_POINTERS saved = c_ev_write_ptr;
     lib_u32 mode, parity, slot, pass, flag, i, offset;
+    check_gdp_subfields();
+    check_unchained_dword_reads();
     check_chain2_dword_reads();
     /* Odd/even selects a plane without compacting its address. Independent
        physical offsets distinguish adjacent cells and preserve font planes. */

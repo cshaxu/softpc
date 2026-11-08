@@ -53,7 +53,13 @@ static lib_size softpc_gdp_vga_native_offset(unsigned int original_offset)
     case 1364u: return offsetof(struct VGAGLOBALSETTINGS, mark_string);
     case 1368u: return offsetof(struct VGAGLOBALSETTINGS, read_shift_count);
     case 1372u: return offsetof(struct VGAGLOBALSETTINGS, read_mapped_plane);
+    /* Generated suffixes denote low-order subfields, not native byte offsets.
+     * Keep their storage identical to the existing full-width field. */
+    case 1378u:
+    case 1379u:
     case 1376u: return offsetof(struct VGAGLOBALSETTINGS, colour_comp);
+    case 1382u:
+    case 1383u:
     case 1380u: return offsetof(struct VGAGLOBALSETTINGS, dont_care);
     case 1384u: return offsetof(struct VGAGLOBALSETTINGS, v7_bank_vid_copy_off);
     /* The original 32-bit C-VID name at this offset is
@@ -63,6 +69,7 @@ static lib_size softpc_gdp_vga_native_offset(unsigned int original_offset)
     case 1392u: return offsetof(struct VGAGLOBALSETTINGS, route_reg1);
     case 1396u: return offsetof(struct VGAGLOBALSETTINGS, route_reg2);
     case 1400u: return offsetof(struct VGAGLOBALSETTINGS, screen_ptr);
+    case 1407u:
     case 1404u: return offsetof(struct VGAGLOBALSETTINGS, rotate);
     case 1408u: return offsetof(struct VGAGLOBALSETTINGS, calc_data_xor);
     case 1412u: return offsetof(struct VGAGLOBALSETTINGS, calc_latch_xor);
