@@ -4987,3 +4987,10 @@ Two nonzero-high-byte values, both CPU modes and all three widths verify the
 result and saved registers. This proves fallback transport, not an OS page-fault
 handler. Record before/after, dual-architecture full qualification and actual
 diff; retire the corresponding TODO only after proof.
+
+### S37 owner acceptance
+
+Owner accepted P1/P2 and approved S37 closure on 2026-11-08. See
+[S37 closure](../history/M9-T99-S37-original-device-audit.md) for final scope,
+verification and remaining debt. No next S is admitted; CURRENT owns the
+open T99 state. Earlier pending statements above describe historical stages.
