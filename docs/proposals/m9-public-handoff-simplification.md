@@ -5101,3 +5101,21 @@ Implementation 26e659c8 passed post-push actual-diff review. The owner's
 authorization includes closure after verification; S39 is closed with all
 three cleanup candidates resolved. See [closure](../history/M9-T99-S39-mirror-wrapper-cleanup.md).
 The initial research limitations remain explicit; T99 is not closed.
+
+## T99 S40 remaining mixed differences
+
+Owner admits read-only continuation over S39's 110 REVIEW rows at f7537b1c.
+Exclude identical text, already-#error bodies and changes with exact prior
+audit evidence. Do not skip an entire mixed file merely because its family
+was mentioned before. Classify each remaining retained change as necessary,
+concrete simplification, or unresolved with the missing proof stated. Reuse
+accepted repairs and ABI-pattern evidence without re-investigating them.
+Completion requires all 110 rows accounted and residual scope explicitly
+disposed; broad inventory or name scans alone do not prove minimality.
+
+S40 read-only results are recorded in [the retained-difference audit](../etc/evidence/softpc/m9-t99-s40-retained-differences.md)
+and its frozen 110-row ledger. Three local simplifications and two conditional
+validation gaps affect four files; no source change is admitted or implemented.
+Estimated production reduction is about 13 lines without a shared registry or
+new execution path. The two failure cases are source-proven conditional defects,
+not demonstrated normal guest failures. Await owner implementation decision.

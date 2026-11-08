@@ -1,0 +1,111 @@
+path	local_lf_sha256	disposition	retained_change_or_candidate	evidence_group
+base/bios/reset.c	cdd88770a0fb51bb0cff3237a7927b97aa67c8435b58eaee71be2a8d18d4cedc	RETAIN_OR_REUSE	Host-width config values; actual media equipment flags; DOS mouse instance lifetime belongs to its driver, not hardware reset.	D
+base/bios/slave_bs.c	9955c1d33018c95489d01e71786e839bb91918a563ba53215ae55bb300ef7dbf	RETAIN_OR_REUSE	S37 slave command-port EOI repair; reuse accepted proof.	D
+base/bios/tape_io.c	8c496e5ee8cbc5135dc0cd9cd9ee0b3ca1d6ee3edc5525e241bee02de6b46d43	RETAIN_OR_REUSE	Descriptor limit pointer width, declaration owner and BIOS configuration-table segment; retain accepted fixes.	D
+base/ccpu386/c-files	398a137e7cdf1b642d5033406e26e6ee70232d38b29dd20b8ab4b73414a317e5	RETAIN_OR_REUSE	Root CMake and source-boundary gate actively consume this source list.	A
+base/ccpu386/c_bsic.h	5b9c6f51a6abcadd67bf87195e881717443b00a19dd97fe14b133081ab64701a	RETAIN_OR_REUSE	Correct EFLAGS declaration.	A
+base/ccpu386/c_debug.c	33f1bf7e42af0c915549c7309763c5ce4737d02ae0d7a722c0099c3d3884d7a0	RETAIN_OR_REUSE	Private debug-register state archive.	A
+base/ccpu386/c_intr.c	333e4c4794cbfdd27ef2042487e722100c6e6ac1299b402b3577efe893291f1c	RETAIN_OR_REUSE	Rejected PIC acknowledgement must not become vector -1.	A
+base/ccpu386/c_main.c	5f8cc5d211461bd1d1f5798a064d402523ce14dc9ffa944e228af68bb30f12b3	RETAIN_OR_REUSE	Executor retirement, debug observation, safe points, HLT and TLS stack; different execution boundaries are not duplicate calls.	A
+base/ccpu386/c_page.c	94db22bf5d865578f59d884e2e9da89bbaaa43f3da498d2dc0dca3b069e2badd	RETAIN_OR_REUSE	Observe actual successful memory access without a second guest read.	A
+base/ccpu386/c_reg.c	690e1c7d2411f510795fcafa99cd8745ef760cf7ff44c0c1b47333659d7d43f3	RETAIN_OR_REUSE	Architectural registers and hidden segment caches in archive.	A
+base/ccpu386/c_tlb.c	9ee791a7e3454b1ba3a747f124a8455c37aed94829b878fd388baf4aef1a2f44	RETAIN_OR_REUSE	TLB and fast-TLB transport and reconstruction.	A
+base/ccpu386/c_xcptn.c	047b0cdb1e09f9bc3044dd790b1024527568392c6ca41425c63c6d37a6896670	RETAIN_OR_REUSE	Use authoritative declarations rather than conflicting local prototypes.	A
+base/ccpu386/call.c	f67ce1e5243988a34dcf322350d3af6897c3f8d3f496c0ff3050997f1e922707	RETAIN_OR_REUSE	Stack-address width when updating SP after stack switch.	A
+base/ccpu386/ccpusas4.c	821df93de6682f5c6859e03386cc4e2a602a84e0d88247d483436f126ed1ac15	RETAIN_OR_REUSE	SAS archive and accepted S37 CPL/PG_U and full-width fallback fixes.	A
+base/ccpu386/cpu4gen.h	010edde551b72aa82f858c53d1e2c6f8aee7ef9478ebe108cb3cc02115cf9ace	RETAIN_OR_REUSE	Unique GDP declarations and real CCPU setter/getter ABI.	A
+base/ccpu386/evid_c.h	6285430c2ffa09884e042474d00610c0391fe7181f66d4d722610a5c5fd599bb	RETAIN_OR_REUSE	Native-width rule addresses and marker pointers.	A
+base/ccpu386/fpu.c	5fff1fe1a34b5730fd3e54ed76f036d3b070f869ff5a8c5c4240fafabb658241	RETAIN_OR_REUSE	Delayed NPX state bridge consumed by zfrsrvd and archive.	A
+base/ccpu386/iret.c	85d79523e9c408f5d013660d01bdac982f37c390e6582417f45f2bedecc962ab	RETAIN_OR_REUSE	Stack-address width after privilege/stack transition.	A
+base/ccpu386/ntstubs.c	eab2b059881b5b7b383e8a5445edda8cf7d7955de52fc04fc0ffc0193ca4dac3	RETAIN_OR_REUSE	Unique GDP owner; omit duplicate empty ROM/FPU symbols already defined by compiled originals.	A
+base/ccpu386/ntthread.c	a88e305d79b2328929ad439409b33d000df69b5510db4bfb98b82847b0eb7195	RETAIN_OR_REUSE	Outermost simulation exit and correctly typed jump-buffer failure handling.	A
+base/ccpu386/popf.c	3d13953ddac72ef5a3d455d65891bcf6bf9848e6186e641be919d93db528d190	RETAIN_OR_REUSE	Correct stdio and note_486_instruction declarations.	A
+base/ccpu386/ret.c	334e0aafd827c3bfcba3b6ad421d1e67068ae9ee79016db29e1f5e3bd1a630bf	RETAIN_OR_REUSE	Stack-address rather than operand width for new SP.	A
+base/ccpu386/vglob.c	b95cd798d14c66a13e249297a73e91ad5689b94c07e5201d7ef9f014cd088970	RETAIN_OR_REUSE	Unique generated-video ABI source.	A
+base/ccpu386/zfrsrvd.c	7fabb46943b01d7bef78dab0cb7dfeffe15620bc6f1b039bb2f2fd5eb85d8580	RETAIN_OR_REUSE	Delayed NPX exception EIP state; counterpart to fpu.c.	A
+base/comms/com.c	473711071f11d3cb4ef345601cc5631876e756ffb3c63933bbdedf0c7a4f5d1d	RETAIN_OR_REUSE	Native-width ioctl pointers; two callback IDs; explicit UART state archive, prevalidate baud index before restore.	D
+base/comms/printer.c	d1f8fca61098fc1ca1eda03ab7273364ccca8b5979c8a41fdea831c0fe70c11c	RETAIN_OR_REUSE	Two event callback IDs plus controller/queued-event state; event identity is not serial-port state.	D
+base/comms/printer_.c	85b16fba9c89abd6ec64e19fe95013423d2f92c638e11082e8641e067b292312	RETAIN_OR_REUSE	Existing subset conditional envelope and removed unused host_lpt declarations; no new behavior to revert.	D
+base/cvidc/ev_glue.c	db893c83476e07c347c2fbdec4df248dbd79d6db9d52e4a0956241d13b7a804d	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/evidfunc.h	09ae231db42490c7c377c39f6a8608c559e2d91093e38d786386d9528cee17e9	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/evidgen.h	6fb12488fe80541641cd11cf85669aa330bff38582c77c45183fff0c566ac52d	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/j_c_lang.c	2eb5f3786bf5e20a91597fddc1bb09edda8aac8260b6f9441a601784ba32c157	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/j_c_lang.h	8971ceb73c7d315d82c2beb1a4407a4fb6d58d7a33f8fa4e7d16aaa3fd49f573	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid000.c	fe261cd6edb10de150e7c3db96258fc6e59b7bf3d6a07f4919c7185541c0a8da	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid001.c	55d884e2b7b2dd917d3896b6c9c0c1c0c73d4ff3f6e5f9c25133e38854e488d2	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid016.c	1cbd0cfaa1edf813d9be70d8774969384cc9f40fbb6bd95a3000c5ae6d74473c	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid017.c	117de357265e6f407b5a69169a157bfaa1161bb4f645d286f5c34d95437ca170	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid018.c	74bfb545e3b09f4dedcf63181fdb808be229082effc8fffab2b4a768ed5c936e	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid019.c	359433dfdde2a815e1eb41ca38dd788988b238dd60a522a462fef255bd9b034d	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/sevid020.c	2e2ac820364432102d66c5c7bb1231ad3923fb4d450fea3fc2ac16f5d6dd271f	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/cvidc/vglfunc.c	766901e9c6a6dbd93a9a67f149a114562b0053cd1dd70b2b45410e6177f94a13	RETAIN_OR_REUSE	Reuse exact generated ABI/continuation/selected-marker evidence; overlay S36/S38 read, GDP and bulk repairs where applicable. Do not reopen accepted rules.	A
+base/disks/diskbios.c	bbf4199563432e8e47465326241d0202779b42258007e2dd6a65dcc3f7f4ce82	RETAIN_OR_REUSE	Accepted 16-bit CX:DX capacity split, correct declarations and guest buffer addressing.	D
+base/disks/fdisk.c	cfdfa7c78cc83be319c87464e364115a32739cee21103f2f3fbd4d0d9741124e	CANDIDATE	C1: unify exact duplicate command-ID mapping; retain taskfile, drive pointer/index and sector archive.	D
+base/disks/fla.c	461a551b028ea920061032e00a14dd2ad3ac18107883f49b91d055633970cf89	RETAIN_OR_REUSE	One callback ID plus FDC command/result/non-DMA buffers; limits and cast conversions prohibit blind native memcpy.	D
+base/inc/ckmalloc.h	6095bd5405a74759ba66a1f7d94c1138810b06193541cf40d3561c04fe96e99a	RETAIN_OR_REUSE	Correct pointer-return allocation declaration.	A
+base/inc/cpu_vid.h	12ff044906244a1cb56aa51cd1bc6c80520bbc4f38a057e95a6701a9832ec2bb	RETAIN_OR_REUSE	Native-width generated ABI and correct address/value argument order.	A
+base/inc/dma.h	b16dd793b1415e51ba1d2223930e36dac701cfcae81a01a24a7ab2c88f0aecab	RETAIN_OR_REUSE	dmaGetAdaptor declaration has real DSP consumer.	A
+base/inc/egacpu.h	eff6abd487bed528591435a0e708529805b213590769af488e431bb87431dc65	RETAIN_OR_REUSE	Selected C-VID layout and declaration ownership.	A
+base/inc/egaports.h	d9c35103c9b584f06a486d6e84e14914d667635a028f5a82016206e778e3ef0f	RETAIN_OR_REUSE	Panning query owned by original register logic.	V
+base/inc/egavideo.h	8d4315ee832e8c282a3ebfc6f6f65ba10677e06567b92c8e0c8f6cf9c4cb163f	RETAIN_OR_REUSE	Original video state accessors, decoration and controller archive integration.	V
+base/inc/emm.h	05f074409162f4cc3071b2175eaf995eff8d8ff9c0159dcef796b00f53cb2f0e	RETAIN_OR_REUSE	Native-width host pointer/size contract.	A
+base/inc/gmi.h	3b823d8bf5cbf5d298636af54502dd16b42585776e1be893108083c0e933267a	RETAIN_OR_REUSE	Generated function table signature and argument ABI.	A
+base/inc/gvi.h	28f54fdd18d9a901d20bda59354695cb2517898aa343ae6b3afc868bff3798de	RETAIN_OR_REUSE	Accepted CHAIN2 interleaved address conversion; zero-offset call sites still express the correct representation.	V
+base/inc/host.h	f9c077591b6021125bf06ce7039ccfe693ec4f95ad81afbcb0aeee00af3b6fff	RETAIN_OR_REUSE	Provider-compatible memory and host contracts.	A
+base/inc/host_com.h	5a492bd4d16bc53ef0326948fa453a8e5a4ffe324b32327900d1a0794c73ffbf	RETAIN_OR_REUSE	Native-width serial ioctl pointer transport.	A
+base/inc/ica.h	c7e619e23a82c37d978aa889d8279248584f78a8088f41e6a586b5ba9586e554	RETAIN_OR_REUSE	Existing PIC/EOI contracts used by Compat sound; no new timer owner.	A
+base/inc/ios.h	c6d5fa656224e46511e41f3dc83ab8c1fad8389331aee1f2a824c3b92225e38e	RETAIN_OR_REUSE	Full 16-bit I/O space needed by the standalone machine; not NTVDM host enablement.	A
+base/inc/quick_ev.h	7d4876a6d1c44bb2343e887974ce168600f4ddff132a370c434de21450dd1692	RETAIN_OR_REUSE	Fixed callback-ID queue archive contract; no native function addresses serialized.	A
+base/inc/sas.h	35bff7f8d3dc19e4a5259c24f6bc5391d9bea90f22303a76cc78686d825868d5	RETAIN_OR_REUSE	Authoritative CCPU/SAS signatures and archive-facing contracts.	A
+base/inc/sndblst.h	10b71efe19e28eb93d2fddb7c3a83fb6b2786c86a4576e5c9df21cd0a4d7898c	RETAIN_OR_REUSE	Original guest DSP/DMA/PIC definitions with neutral host scalar contracts.	S
+base/inc/tape_io.h	a65ef845b258d22202f6251e5fdb5cdb2d7bea6dd5ff1f2c096e15695109881e	RETAIN_OR_REUSE	BIOS call declarations shared with actual BOP implementation.	A
+base/inc/timeval.h	697d044f92c266a0972eab560557cee6495dfa26be9f4e16b0d189afd5bd1a9a	RETAIN_OR_REUSE	Actual host time provider ABI.	A
+base/inc/video.h	ca081cb5cd0a9526bf3a25a3f49b941020cb76db3b672f442c94ab05686f1484	RETAIN_OR_REUSE	stream_io declarations are referenced by compiled video.c; disabled state has an explicit Compat owner, not unreferenced declarations.	A
+base/keymouse/keyba.c	e818817b8dfca07f834e6633e337d70652987c0251e952366e2c384405e01106	CANDIDATE	F2: impossible anomalous_index guard; retain FIFO, held events, sequence pointers and callback-ID transport.	D
+base/keymouse/mouse.c	63a01c6712d407c1066d38c5b094e1dca075625eaa3cf1d3dcf03e24e0abcd02	RETAIN_OR_REUSE	Existing periodic event identity and controller archive; retain original device owner.	D
+base/keymouse/mouse_io.c	b417a90cdfbb63831c00d9c8b8b74f7b2ad53e36a4b36633752b576abcbb2004	RETAIN_OR_REUSE	DOS-driver instance, cursor background and saved register state archive; restore geometry before saved state; BIOS full-width coordinate and guest-address fixes.	D
+base/keymouse/ppi.c	9ef987e068387f852f95b714286a735e6d25f4dcfa61b6ac9e9c0cd073ee2931	RETAIN_OR_REUSE	Snapshot host PPI reconciliation retained; S39 removed only its redundant wrapper.	D
+base/support/ios.c	d4fe62c7c42e5afa754c07bba1f343eabe29c1f5e62f80824280b7128488283e	RETAIN_OR_REUSE	Only redundant lexical braces outside masked bodies; no functional local repair to remove.	D
+base/system/at_dma.c	174a01141e91bfe6a2991a9834505fc774ad2930395b0a4f3e2e87942f9e4c30	RETAIN_OR_REUSE	Accepted auto-init and decrement transfer width fixes; real DSP adaptor getter; explicit controller field archive.	D
+base/system/cmos.c	b0edee6641d461190e2506b9c60ffe65e18ca859c9d5c6f9780293069d5bd76a	RETAIN_OR_REUSE	Current media topology and pointer width; RTC callbacks/time fields reconstructed from semantic state.	D
+base/system/ica.c	09cc44d68715195716204c86423047ae7cd54be5e6bcdbe107a98859cc0e9881	RETAIN_OR_REUSE	Accepted master INTR withdrawal and delayed IRQ gate; PIC state/callback restrictions retained.	D
+base/system/idetect.c	2c3f902b883472773d74db200c8c09fac6b04acd4db5266d9651382f04f70935	RETAIN_OR_REUSE	Native pointer-to-integer width at config queries.	D
+base/system/quick_ev.c	d44eaa5764f38f6433905580776e1b80c6da5ba99cd4f84187c78232e3b11c2e	CANDIDATE	C3/F1: tautological next assignment and NULL guard ordering; retain exact callback-ID/order/hash transport, no callback execution during restore.	D
+base/system/rom.c	9bad11b8353b85327d8f97e46dadf4c68dd2a87aa045c32d99807d448721bde2	RETAIN_OR_REUSE	Full CS retained, host-width length/address arithmetic; second strlen follows possible string truncation and is necessary.	D
+base/system/timer.c	825363ff7b373cc2e941378da002a88ef4181e2a5040f84168d8888825795c9f	RETAIN_OR_REUSE	State and action IDs retained; wait and gate restore allow different callback sets, so a common unrestricted decoder is incorrect.	D
+base/system/unexp_nt.c	d59af290e855979f9e014a3f9569505a57ba000d43248a4bba6dbdb25d7e22df	RETAIN_OR_REUSE	Removed NTVDM-only DOS service dispatch; existing standalone BIOS owns applicable service.	D
+base/video/cga.c	688e983c66e1c97a03d8da077ca545ac5c70650297e66970cbeefe1177c43397	RETAIN_OR_REUSE	Correct BIOS video write declaration.	V
+base/video/ega_prts.c	3874d5f90952a941fd48cacab0b3622c972db51ed797f0c1781b3bc8321e0ccc	RETAIN_OR_REUSE	Sequencer reset-state getter used by video archive; not a redundant public interface.	V
+base/video/ega_read.c	ac39b915f2fcfb41e4521f68cb8da476ca2f423a016a5f3d784cbf1c4f444ecb	RETAIN_OR_REUSE	Remove conflicting duplicated generated read declarations; authoritative header retained.	V
+base/video/ega_vide.c	b50ec07d458111a5725f48ce7c766258149fa37efce26243457091942911f6d8	RETAIN_OR_REUSE	Accepted S37 virtual CRTC row calculation and existing text/graphics state; no new rollback candidate.	V
+base/video/ega_writ.c	5ab7fc91cf46f207a5dc2eac8126fc6fa0f949c4f1ee1528d27f15f22fc0e56e	RETAIN_OR_REUSE	Remove conflicting duplicated generated write declarations; retain correct ABI.	V
+base/video/egawrtm0.c	caa75045c7a9f07dcaba6b551f79b8e6570058983499bc70c43f8eb9de2c7fff	RETAIN_OR_REUSE	Accepted CHAIN2 storage layout and original selected write path.	V
+base/video/egwrtm12.c	1dd351b1fa803ea59d3d759f5c27005b5ef8c0bd3ad35f3c47046d107df78b27	RETAIN_OR_REUSE	Accepted CHAIN2 storage layout across write modes.	V
+base/video/gfx_updt.c	1bba23c128f437db7232d2b57c966e34973d3fdecd14c783fc33eee1ae699e21	RETAIN_OR_REUSE	Accepted byte alignment, dirty ranges, wrapping/split/panning and CHAIN2 scrolling fixes; replaying identical zero-offset pointer helper is not a cleanup.	V
+base/video/v7_ports.c	f7b25e8dc613cc2e5951aa6a516fd2ef70d15423984f02a76fa2d15e62d8fe2e	RETAIN_OR_REUSE	Accepted cursor enable-bit comparison, display-mode and pointer dirty repairs.	V
+base/video/v7_video.c	848215fca95bdf21fa72f318a152c50b025f047af768c416de3c21e721f03899	RETAIN_OR_REUSE	Validate masked BIOS mode and preserve accepted V7 geometry semantics.	V
+base/video/vga_mode.c	cd5d4dcabf3b4421f1e4f8712903f222e62198d361b476e404de67e96d5dd824	RETAIN_OR_REUSE	Accepted colour-mode geometry/cursor semantics; local excluded nested arm is outside audit.	V
+base/video/vga_prts.c	5b8fed4bce5d3f3085540a7da67865dda2aa178af0554188f7562d34ae844756	RETAIN_OR_REUSE	Decoration invalidation and panning; archive capture preserves indices, restore replays existing register path in protection-safe order.	V
+base/video/video.c	1661955a370a4e2941666c0e45edbd615c8a4c880c72913b54a42bb795e834f6	RETAIN_OR_REUSE	Accepted VM BIOS text aperture and CHAIN2 pixel addressing; not another renderer.	V
+host/inc/cfpu_def.h	0088924707422da5273c678c5444f853b764a7cc399f2849f093250b9cbfe05a	RETAIN_OR_REUSE	Little-endian float/BCD layouts; reuse ABI proof.	A
+host/inc/host_cpu.h	c5f6e1e2e358d31ab7c24c06c421e3b4a3a70f1fdd43c70c501a2aa0dfee16ff	RETAIN_OR_REUSE	Little-endian registers and real CCPU vector signature; reuse ABI proof.	A
+host/inc/host_def.h	9634c587822aaee686eaa4f16da87339210a86656024a1ba283bbb7b791fd86d	RETAIN_OR_REUSE	Correct CRT/provider declarations; compile profile owns CPU/NT selection.	A
+host/inc/host_rrr.h	8f0e845c355156b3915c2973766794a8418519a1c3e85423354c6d8a5bf8bc13	RETAIN_OR_REUSE	Existing selected host text declarations; no runtime restoration of native NT resources proposed.	A
+host/inc/insignia.h	689c25846a0c613e4c1bbec41b7901379dff714653d146f966fa43dd17a2703f	RETAIN_OR_REUSE	IHPE native-width, IUH widened only for generated-rule units; guest scalar widths must stay distinct.	A
+host/inc/nt_event.h	b745a436dcd3abb26a8d09820e2c25a85db8ecfb7cd3a1f145bcb1b0941f5ee0	RETAIN_OR_REUSE	Previously reviewed BOOL declaration; no fresh deletion justified by a currently absent consumer.	A
+host/inc/nt_fulsc.h	9244975d8fd2d4116485e96eecb668d73b38556e6de790615da287bc11ad41fa	RETAIN_OR_REUSE	Removed obsolete native full-screen entry; actual KVM display lifecycle retained.	A
+host/inc/nt_graph.h	11380d958f81bab19bfd05c8d7bef2df2e025bf05ba8ed03f746f583626f30a5	RETAIN_OR_REUSE	Actual graphics adapter ABI and state interface; no duplicate display owner.	A
+host/inc/nt_sb.h	8205351b5e259673f0386280d3eb5d0f5faba7f077fddf83db8811b9c76148ec	RETAIN_OR_REUSE	Sole selected DSP/MIDI/Mixer API; C2 removes duplicate declarations in implementation only.	S
+host/inc/nt_uis.h	ad1d86f911e9721233ab6bfd6abffa6694c1ff8d8c9aa3e43d9130100d9177e4	RETAIN_OR_REUSE	Removed APIs/resources belong to omitted native host frontend, not current input pipeline.	A
+host/src/nt_cga.c	c9bf346ba15332b5038cb5194ec25ef04873979f3181fc4d10388a089cc8b3b1	RETAIN_OR_REUSE	Original CGA conversion retained with selected framebuffer bounds/stride; S39 wrapper already removed.	V
+host/src/nt_ega.c	6e656f1c7a7d94e5a03baf0045681fa98456710d2a1bca0fcf30d8e0304d3c75	RETAIN_OR_REUSE	Original planar painter with accepted dimensions/stride and panning wiring.	V
+host/src/nt_graph.c	6c2335b21dd12677f36dde74c39fa18538ca334923ec8ecbde77d65492f5c479	RETAIN_OR_REUSE	Existing framebuffer bridge, mode changes and reset state; omitted native full-screen body excluded from review.	V
+host/src/nt_keycd.c	de1a716c72e6b4b73a2d506556d3c618908636c2ba70faa2f7f28d067ac88b57	RETAIN_OR_REUSE	Keep original Scan1 tables and >= bound fix; native BIOS-to-host reverse translation has no current consumer.	D
+host/src/nt_munge.c	0ea3791865493acf5c9fc3ab7e905b04b72d68b4c945c333477b2c9eff850010	RETAIN_OR_REUSE	Accepted panning across planes and wrap; reuse previous proof.	V
+host/src/nt_sb.c	e3d1e08a9d17454781bf5ad7dc06dc03d00197b2222041b12074d66af1bfe680	RETAIN_OR_REUSE	Original ports/parser/IRQ ownership, executor service and state transport; remove native NT host wiring only as already admitted.	S
+host/src/nt_sbdsp.c	02875fb88f98c1eab699c8eb0282b4328516cd6161c199bfa640d14b23f7c6c5	RETAIN_OR_REUSE	Existing DSP/DMA state machine with Compat PCM progress and quick-event service; old native worker cannot be restored without a second owner.	S
+host/src/nt_sbfm.c	439e0d540ed6bebdf560276f3a84c7c8b2c86147d69d871efaf393aac249ec35	RETAIN_OR_REUSE	Approved no-host FM status behavior and archive remain required for guest probes; absence of Lib FM does not make guest register behavior dead.	S
+host/src/nt_sbmid.c	79d1acb59e1122b9d5805017e6d3dc2549340af81d0c0e977a105492b23f0ce1	RETAIN_OR_REUSE	One message parser, neutral output/status propagation and archive; native NT MIDI buffer/worker ownership intentionally omitted.	S
+host/src/nt_sbmxr.c	62626845061b9a6bbb3da23eded383926df23b53eb1578ec3f84593d556cd522	CANDIDATE	C2: three duplicate prototypes; preserve original Mixer register state and actual PCM/MIDI volume effects.	S
+host/src/nt_sound.c	8cd51ad3f28dfbee9c25c62e895527ced49d32f287d1dd7ac35dee6cc35f6aa0	RETAIN_OR_REUSE	Original speaker decision logic plus executor-owned host tone callback; do not reintroduce native worker/locking.	S
+host/src/nt_vga.c	e4303a09a5cf7a406264bab02080eb1418830505a0a29d63374a9e370826631b	RETAIN_OR_REUSE	Original indexed graphics conversion with accepted geometry/stride bounds.	V

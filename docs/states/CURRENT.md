@@ -2,12 +2,38 @@
 
 ## Current Work
 
-No implementation subtask is active.
-Open task awaiting owner: T99.
+T99 S40 is active: read-only audit of the remaining retained differences in
+S39's 110 mixed files. Identical content, already-reviewed changes and already-
+#error bodies are excluded. No production modification is admitted. The read-only report is ready for owner
+review; three simplifications and two guard gaps affect four files. See
+[the report](../etc/evidence/softpc/m9-t99-s40-retained-differences.md).
 
-Owner-authorized S39 wrapper cleanup is verified, reviewed, pushed and closed.
-See [S39 closure](../history/M9-T99-S39-mirror-wrapper-cleanup.md).
-No next S is admitted; T99 still requires its separate completion audit.
+## M9 T99 S40 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner requests continued audit of the 110 mixed files for necessary differences and unified simplification. |
+| Objective | Give each remaining retained change a necessity or concrete cleanup disposition tied to real consumers. |
+| Non-goals | No repeat audit of identical/reviewed/#error content; no production edits, external import, guest/media/config modification or unsupported all-path runtime claim. |
+| Reference Baseline | SoftPC f7537b1c; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89; S39 REVIEW rows define the 110-file universe. |
+| Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | Retained mirror differences in the 110 files, callers/build/tests read-only; documentation and evidence only. |
+| Applicable Rules | Execution, architecture, coding, documentation and source-research policy. No OpenNT source comparison. |
+| Verification | Mask excluded bodies, reuse exact prior proof, inspect remaining changes and consumers; documentation/whitespace gates. No rebuild for read-only work. |
+| Expected Markers | Per-file/per-change disposition with evidence; necessary versus simplifiable versus unproven clearly separated. |
+| Asset Needs | None; preserve published EXEs and all user data. |
+| Reporting Requirements | Bounded coverage, skipped prior proof, concrete findings, unified minimal proposals and estimates; do not count inventory as semantic proof. |
+| Stop Conditions | Unknown necessity is not permission to delete. Do not trade fewer mirror lines for duplicated logic elsewhere. |
+| Exit Criteria | Audited remaining scope with traceable dispositions, reviewed report committed/pushed; await implementation decision. |
+| Original Owner Request | 继续审计剩下110个混合差异文件；完全相同、已经审计过和#error替代部分不用审计。 |
+| Similar-Issue Sweep | Compare new candidates across related headers, callbacks and device snapshot paths; report all remaining hits without broad code changes. |
+
+S40 owns disposable build/t99-s40 for read-only extraction and comparison;
+15-minute no-progress review budget, hidden long runners, concise evidence
+promotion and cleanup before delivery. The 110-file list is frozen; each row
+records reused proof or remaining-change disposition, not a new whole-file
+review when only part is unreviewed.
 
 ## Current Technical Baseline
 
