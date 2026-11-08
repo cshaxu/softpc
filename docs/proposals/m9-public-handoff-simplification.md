@@ -5039,3 +5039,10 @@ pass 187 background and eight native cases each, with refreshed EXEs. See
 [S38 evidence](../etc/evidence/softpc/m9-t99-s38-gdp-subfields.md) for the
 independent pattern oracle, exact XP accounting and concrete SAS integration
 boundary. No bulk consumer is enabled; S38 remains pending owner acceptance.
+
+### S38 owner acceptance
+
+Owner accepts P1/P2 and closes S38 on 2026-11-08. See
+[S38 closure](../history/M9-T99-S38-cvid-rules.md). The next owner-requested
+S39 audits all current mirror differences for necessity and simplification;
+no rollback of accepted repairs is authorized by that research request.
