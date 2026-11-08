@@ -1537,6 +1537,8 @@ switch ( id )
 	}
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IUH *)&(r3)) = *((IUH *)(LocalIUH+1));
+	/* T99 S38: an empty fill must not write or decrement the odd head. */
+	if (*((IU32 *)(LocalIUH+2) + REGLONG) == 0) goto L21_155if_d;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16296)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16297)	;
 	*((IUH	*)&(r21))	=	(IS32)(0)	;	
@@ -1827,6 +1829,8 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	}
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IUH *)&(r3)) = *((IUH *)(LocalIUH+1));
+	/* T99 S38: empty fills have no odd head; rotate the full DWORD. */
+	if (*((IU32 *)(LocalIUH+2) + REGLONG) == 0) goto L21_165w_d;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16296)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16297)	;
 	*((IUH	*)&(r21))	=	(IS32)(0)	;	
@@ -1854,21 +1858,21 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	;	
 	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	=	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	;
 	*((IUH	*)&(r22))	=	(IS32)(8)	;	
-	*((IU16	*)&(r20)	+	REGWORD	)	=	*((IU16	*)(LocalIUH+1)	+	REGWORD)	;	
-if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
+	*((IU32	*)&(r20)	+	REGLONG	)	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
+if(*((IU32	*)&(r22)	+	REGLONG	)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
-	if(*((IU16	*)&(r22)	+	REGWORD	)!=0)
-		*((IU16	*)&(r20)	+	REGWORD	)	=	(*((IU16	*)(LocalIUH+1)	+	REGWORD)	<<	((16)	-	*((IU16	*)&(r22)	+	REGWORD	))	)	|	(*((IU16	*)&(r20)	+	REGWORD	)	>>	*((IU16	*)&(r22)	+	REGWORD	));
+	if(*((IU32	*)&(r22)	+	REGLONG	)!=0)
+		*((IU32	*)&(r20)	+	REGLONG	)	=	(*((IU32	*)(LocalIUH+1)	+	REGLONG)	<<	((32)	-	*((IU32	*)&(r22)	+	REGLONG	))	)	|	(*((IU32	*)&(r20)	+	REGLONG	)	>>	*((IU32	*)&(r22)	+	REGLONG	));
 	*((IU16	*)&(r21)	+	REGWORD)	=	*((IU16	*)&(r20)	+	REGWORD)	;	
 	*((IU16	*)(LocalIUH+4)	+	REGWORD)	=	*((IU16	*)&(r21)	+	REGWORD	)	;	
-	*((IUH	*)&(r20))	=	(IS32)(16)	;	
-	*((IUH	*)&(r22))	=	(IS32)(16)	;	
+	*((IUH	*)&(r20))	=	(IS32)(0)	;
+	*((IUH	*)&(r22))	=	(IS32)(32)	;
 	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+1)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(8)	;	
+	*((IUH	*)&(r22))	=	(IS32)(24)	;
 if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1920,6 +1924,11 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r21))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	;	
+	/* T99 S38: the odd head leaves one byte, not a WORD, at the tail. */
+	if (*((IU32 *)(LocalIUH+6) + REGLONG) == 0 &&
+	    (*((IU32 *)(LocalIUH+0) + REGLONG) & 1u) != 0)
+	    *((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU8))) = *((IU8 *)(LocalIUH+5) + REGBYTE);
+	else
 	*((IU16 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU16)))	=	*((IU16	*)(LocalIUH+5)	+	REGWORD)	;
 	*((IUH	*)&(r20))	=	(IS32)(8) /* T99: next odd/even plane pair. */	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r20))	;		

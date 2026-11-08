@@ -1632,3 +1632,15 @@ calls, saved locals and existing high/low assembly. Original rule tests fail
 with the old address and pass with this one-line correction. Compat GDP
 subfield mapping is separately repaired without changing generated consumers.
 See [S38 evidence](m9-t99-s38-gdp-subfields.md).
+
+### T99 S38 Copy DWORD fill byte sequence
+
+Owner-approved sevid019.c S_2703 correction: zero count exits through the
+existing cleanup; odd starts rotate the full DWORD into the two existing
+WORD locals; the last odd-start store writes only its remaining BYTE.
+The original head, loop, selected dirty marker and plane-address mapping
+remain. No CPU bulk consumer is enabled. See [S38 evidence](m9-t99-s38-gdp-subfields.md).
+
+The same-file S_2700 Copy WORD fill also exits through its existing cleanup
+for zero count before writing/decrementing an odd head. Nonempty WORD behavior
+is unchanged. The shared fixture covers empty BYTE, WORD and DWORD fills.

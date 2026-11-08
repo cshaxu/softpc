@@ -65,8 +65,8 @@ existence does not prove that any SAS linear fill can safely be redirected.
 Connecting it would require bounded spans preserving mapping, permissions,
 fault/order behavior and RAM/ROM/video transitions, and a measured benefit.
 Keep it for this correctness task, neither delete it as dead text nor activate
-it merely to exercise an existing API. The known odd Copy DWORD-fill defect
-remains in TODO and must be resolved before that consumer is enabled. No new
+it merely to exercise an existing API. At P1 delivery the odd Copy DWORD-fill defect remained in TODO; the
+owner-admitted P2 below repairs it before any consumer is enabled. No new
 fast/slow path is introduced here, and no speedup is claimed.
 
 ## Verification and limits
@@ -108,3 +108,121 @@ architecture/test cases pass against the final builds. Both EXE hashes remain
 as listed above. Documentation, 475-body mirror, whitespace and newline gates
 pass. No new non-mirror warnings are observed. Task scratch is retired after
 promotion of these results; only reusable caches remain. Await owner acceptance.
+
+## P2: retained Copy fill correction
+
+Baseline a43c6d24. The owner's additional request repairs the bulk entry itself
+and asks how a future consumer should use it; it does not enable that consumer.
+Frozen scope is S_2703 Copy DWORD fill and the adjacent S_2700 empty-fill
+boundary identified by the mandatory same-class sweep, in sevid019.c only.
+
+For odd addresses, the old DWORD algorithm writes a first BYTE, forms its
+middle WORDs using incomplete portions of the pattern, then writes one extra
+BYTE at the end. With pattern 44332211, the desired memory sequence is
+11 22 33 44 repeated, regardless of start parity. Keep the head and common
+loop: rotate all 32 pattern bits by 8/24 into the existing two WORD locals;
+on the final odd-start iteration write only the low BYTE of the second WORD.
+Zero count exits through the existing local-storage cleanup before the head.
+Selected dirty dispatch, plane strides, original labels and ABI remain intact.
+
+The unchanged-production fixture passes only 16/96 independent DWORD cases;
+all 80 odd-start cases fail. With the correction, the same 96 cases pass.
+They cover six start addresses (even, odd and near a plane boundary), four
+patterns including nonuniform values, and counts 0/1/2/7. The oracle builds
+expected repeated guest bytes in independently selected physical plane cells
+and compares the entire plane allocation, including untouched planes and tail.
+It neither replays the implementation as its expected result nor merely tests
+continuation survival. Existing nonempty BYTE/WORD controls remain.
+
+Adjacent-source sweep: BYTE Copy fill checks its count before its first store.
+WORD Copy fill writes an odd head before decrementing count; zero underflows
+to FFFFFFFF. Add the same early cleanup exit there. This second finding is
+source-proven; the unguarded zero-WORD loop was not deliberately run until
+memory corruption. Four additional even/odd BYTE/WORD empty-fill cases check
+that all planes stay unchanged after the repair. ModeX compound replay tests
+remain lifecycle checks, not a claim of complete mode-specific value coverage.
+The current CPU still uses scalar stores, so these observations do not establish
+a DOS/Win31/Win95 symptom or a runtime speed improvement.
+
+### Concrete future integration boundary
+
+1. First measure actual existing SAS callers. The whole-source scan finds BIOS
+   clear/scroll uses of sas_fills/sas_fillsw in video.c, ega_vide.c, v7_video.c
+   and cga.c, and ROM initialization uses sas_fills. It finds no direct DWORD
+   fill call beyond declarations, definition and the SAS function table.
+   CCPU c_main.c executes STOSB/STOSW/STOSD through its per-element operand
+   decode/check/commit path, not through c_sas_fillsdw. Merely connecting the
+   latter therefore does not accelerate CPU REP STOSD.
+2. Retain one SAS linear-memory entry. Translate and validate only the next
+   bounded span, respecting the current page, permissions, wrap, physical
+   memory type, aperture/bank and fault ordering. Do not prevalidate the entire
+   operation and suppress writes that should precede a later fault. An empty
+   operation returns before backend dispatch; the physical span is nonempty.
+3. Dispatch through the existing memory-type handler ownership. VIDEO calls
+   the original selected C-VID fill glue, which subtracts gvi_pc_low_regen and
+   invokes the current mode's handler. RAM/ROM and boundary effects retain
+   their existing semantics. No Machine, Session, public Lib or Compat video
+   special case, and no duplicate video algorithm is appropriate.
+4. MEM_HANDLERS/gmi_define_mem currently register BYTE/WORD fills only. Start
+   with measured BYTE/WORD callers if a bulk optimization is warranted. A real
+   DWORD consumer would require a coherent extension of that same physical
+   dispatch contract and all its providers, not a direct hard-coded call to
+   fill_dword_ev_glue from a linear SAS or product path. Do not add that field
+   without a real beneficial caller. Integrating REP itself is a distinct CPU
+   semantic task: preserve address direction, segment/page faults and completed
+   element/register progress; it is not part of this repair.
+5. Before enabling any bulk dispatch, compare against the current scalar path
+   for modes actually selectable by that consumer, masks/latches, odd addresses,
+   direction, page/type/bank boundaries, partial faults and dirty effects on
+   both architectures. Existing WORD/DWORD rules are not assumed universally
+   equivalent from this Copy-only result. Measure total workload improvement,
+   including original generated-rule allocation and GDP lookup overhead.
+
+Recommendation: keep the now-correct retained Copy DWORD capability, but do not
+wire an unused entry merely to give it a consumer. Investigate a measured BIOS
+BYTE/WORD bulk opportunity first; add DWORD dispatch only with an identified
+consumer. This describes a future admission boundary, not shipped optimization.
+
+### P2 actual-diff review and accounting
+
+Relative to a43c6d24, production sevid019.c is +16/-7 (net +9); the existing
+chain2_rule_smoke.c fixture is +36/-2 (net +34), including removal of its
+obsolete deferred-DWORD comment. No new target or fixture framework is added.
+Against the pinned raw XP file, normalized-LF SequenceMatcher with
+autojunk=False changes from +710/-1113 to +726/-1120: 23 more mirror-diff
+lines, not 23 net production lines. CRLF remains intact in the mirror;
+non-mirror changed text remains LF. Only the local manifest hash changes;
+raw/subset hashes and condition structure are unchanged.
+
+The executor's actual-source review confirms that the full-width rotations
+use unsigned 32-bit operations with fixed legal shifts, both empty exits reach
+existing cleanup, and the final odd byte cannot overwrite the next guest
+address. Original BYTE and nonempty WORD code, plane mapping, callbacks and
+selected dirty dispatch are preserved. No new owner, interface, state or
+consumer appears. Public eight trees, root build infrastructure, guest media,
+snapshots and user configuration remain unchanged.
+
+The first full run (before the additional WORD empty guard) passed all 390
+cases: background x64 187/187 (87.29 s), x86 187/187 (81.38 s); native x64
+8/8 (25.23 s), x86 8/8 (25.17 s). Final-source qualification is recorded below
+separately; the earlier run does not certify the later change.
+
+### P2 final qualification
+
+Final cached x64/x86 builds publish both EXEs. Background x64 passes 187/187
+(87.27 s), x86 passes 187/187 (85.07 s); native x64 passes 8/8 (24.90 s),
+x86 passes 8/8 (24.40 s). All 390 distinct architecture/test cases pass,
+without failure or skip. Both fixtures execute 96/96 DWORD pattern cases and
+the four additional empty BYTE/WORD controls. The DWORD before/after mismatch
+is observed dynamically; the unguarded WORD underflow is source proof only.
+No fresh manual DOS/Win31/Win95 reproduction is claimed.
+
+Documentation, 475-body XP manifest and whitespace/newline checks pass.
+The only observed final-build warning is the existing mirror switch-unreachable
+statement in sevid019.c; there are no new non-mirror warnings. Task processes
+finish before scratch retirement. Final published SHA-256:
+
+| Artifact | SHA-256 |
+| --- | --- |
+| softpc32.exe | d6be3942694f0ca2ec26b0c4057fdf1eb8f2d0e08a63498011c1177f8aea68e6 |
+| softpc64.exe | 8906b7f0f38d547679329776c8e273b45cfcadedf2ea0ac6019b5c3425e4ec13 |

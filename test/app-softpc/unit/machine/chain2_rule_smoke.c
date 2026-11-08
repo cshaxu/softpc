@@ -160,8 +160,7 @@ void softpc_test_chain2_continuations(void)
             fprintf(stderr, "string read mode=%u parity=%u backward=%u expected=%02x actual=%02x\n", mode, parity, slot, first[0], output[24]);
         assert(lib_memory_compare(first, output + 24, 4) == 0);
     }
-    /* Independent physical-plane oracle for the registered byte/word Copy fills.
-       Legacy odd dword fill value assembly is tracked separately in S33 evidence. */
+    /* Independent physical-plane oracle for the registered byte/word Copy fills. */
     for (parity = 0; parity < 2; ++parity)
     for (slot = 0; slot < 2; ++slot) {
         lib_u32 width = 1u << slot;
@@ -176,6 +175,41 @@ void softpc_test_chain2_continuations(void)
             assert(EGA_planes[4u * (address & ~1u) + (address & 1u)] ==
                 (lib_u8)(0x11111111u >> ((i % width) * 8u)));
         }
+    }
+    /* Empty byte/word fills also leave every plane untouched. */
+    for (parity = 0; parity < 2; ++parity)
+    for (slot = 0; slot < 2; ++slot) {
+        lib_memory_set(EGA_planes, 0x5a, sizeof(expected));
+        lib_memory_set(expected, 0x5a, sizeof(expected));
+        r1 = (IUH)Gdp; r2 = 0x100u + parity; r3 = 0x2211; r4 = 0;
+        if (slot == 0) c_ev_write_ptr.b_fill(0x100u + parity, 0x11, 0);
+        else c_ev_write_ptr.w_fill(0x100u + parity, 0x2211, 0);
+        assert(lib_memory_compare(EGA_planes, expected, sizeof(expected)) == 0);
+    }
+    /* A complete plane oracle also catches writes beyond the requested tail. */
+    {
+        const lib_u32 starts[] = { 0x100, 0x101, 0x103, 0x107, 0x3fff, 0xffe1 };
+        const lib_u32 values[] = { 0x44332211u, 0x89abcdefu, 0, 0xffffffffu };
+        const lib_u32 counts[] = { 1, 2, 7, 0 };
+        lib_u32 start, value, count, cases = 0, failures = 0;
+        for (start = 0; start < sizeof(starts) / sizeof(starts[0]); ++start)
+        for (value = 0; value < sizeof(values) / sizeof(values[0]); ++value)
+        for (count = 0; count < sizeof(counts) / sizeof(counts[0]); ++count) {
+            lib_memory_set(EGA_planes, 0x5a, sizeof(expected));
+            lib_memory_set(expected, 0x5a, sizeof(expected));
+            for (i = 0; i < counts[count] * 4u; ++i) {
+                lib_u32 address = starts[start] + i;
+                expected[4u * (address & ~1u) + (address & 1u)] =
+                    (lib_u8)(values[value] >> ((i % 4u) * 8u));
+            }
+            r1 = (IUH)Gdp; r2 = starts[start]; r3 = values[value]; r4 = counts[count];
+            c_ev_write_ptr.d_fill(starts[start], values[value], counts[count]);
+            ++cases;
+            if (lib_memory_compare(EGA_planes, expected, sizeof(expected)) != 0)
+                ++failures;
+        }
+        printf("CHAIN2 Copy DWORD fill: %u/%u passed\n", cases - failures, cases);
+        assert(failures == 0);
     }
     for (i = 0; i < sizeof(input); ++i) input[i] = (lib_u8)(i * 17u + 0x35u);
     for (mode = 0; mode < 4; ++mode)

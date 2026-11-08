@@ -5015,3 +5015,27 @@ linear scalar stores, while C-VID glue receives video addresses and subtracts
 the current aperture base. Admission requires valid mapped/type-homogeneous
 ranges and preserved boundary/fault behavior, plus measured benefit. Do not
 activate or remove it as a side effect of the two approved correctness fixes.
+
+### S38 P2 admitted Copy DWORD fill correction
+
+Owner requests repair of the retained bulk entry plus a concrete integration
+recommendation, without asking to enable a new CPU consumer. Original odd-start
+code writes a leading byte, forms incorrect rotated WORDs and writes one extra
+tail byte; zero count still enters the leading-byte path. Preserve the existing
+loop and selected dirty marker, fix word formation and bounded final write,
+and skip all writes for zero count. Estimate roughly 10-20 changed production
+lines and 30-40 existing-fixture test lines, with no new interface or state.
+Compare complete physical plane storage against independent repeated-byte
+expectations for odd/even/boundary addresses, nonuniform patterns and counts
+0/1/2/7. Full dual-width qualification follows; bulk activation stays separate.
+
+The same-file sweep also finds that Copy WORD odd-start fill writes its head
+and decrements zero before checking count. Include the identical early exit
+through its existing cleanup, plus byte/word zero-count control cases. This
+is the same admitted bulk-fill boundary, not activation of another consumer.
+
+P2 implementation: production +16/-7, existing tests +36/-2; both architectures
+pass 187 background and eight native cases each, with refreshed EXEs. See
+[S38 evidence](../etc/evidence/softpc/m9-t99-s38-gdp-subfields.md) for the
+independent pattern oracle, exact XP accounting and concrete SAS integration
+boundary. No bulk consumer is enabled; S38 remains pending owner acceptance.
