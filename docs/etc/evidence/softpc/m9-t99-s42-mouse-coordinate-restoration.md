@@ -122,3 +122,84 @@ Published artifacts:
 
 Task-owned scratch/negative binaries are removed after evidence promotion;
 reusable Ninja/ccache roots remain.
+
+## P2 owner-approved whole-file retirement
+
+Owner request: 太好了 准入s42 整个删除本文件及其接线.
+Baseline 42533c7d. This supersedes P1's repaired unused implementation within
+S42; it does not reopen or renumber another S.
+
+Call-graph review finds mouse_io.c compiled unconditionally in the devices
+object target, but no old driver BOPs registered by device_bop.c. The existing
+bop_smoke checks the absent registrations. Outside callers are only snapshot
+capture/restore and the legacy-only checkpoint/P1 fixtures. Normal mouse
+input uses mouse.c, InPort, PIC and guest handlers. No guest driver is rebuilt.
+
+Removal units: mouse_io.c (6546 lines), dedicated mouse_instance.c (32 lines),
+P1 source-local cursor fixture (86 lines), their CMake and mock wiring, legacy
+checkpoint initialization tests and obsolete audit inventory entry. Capture
+and restore declarations/calls are removed, with no replacement stubs.
+The shared mouse_io.h stays: mouse.c uses host_deinstall_host_mouse and reset
+uses HOSTMOUSEFUNCS. virtual.h/reboot is also still used by platform/reset.
+Original header declarations are not executable registrations and are retained
+to avoid unrelated changes to the selected mirror.
+
+Archive compatibility remains in the existing archive owner: the 1808-byte
+legacy wire slot and all subsequent field positions/widths are unchanged.
+Capture writes the absent state. Archive read rejects initialized != 0 with
+LIB_STATUS_UNSUPPORTED and destroys its temporary archive before publishing
+an output pointer; it invokes no device restore. This deliberately rejects an
+installed legacy-driver snapshot, rather than silently dropping its state.
+Previously normal production snapshots have initialized == 0; no claim is
+made that every externally constructed or historical snapshot is inactive.
+
+The existing checkpoint fixture identifies the video-plane write in the real
+serialized stream and edits the immediately preceding 1808-byte legacy slot.
+It checks active-state rejection/null output, then inactive full-byte roundtrip
+and real InPort restore/IRQ continuation. No test-only production API is added.
+The old field map is unchanged, not reconstructed from native struct padding.
+
+The selected mirror inventory is 474 files instead of 475. Removing the whole
+source is subset retirement, not 6546 lines of local patch reduction. Its
+previous fixed-XP +694/-949 difference and all associated local patches retire
+with that file. Remaining mirror bodies and their hashes are unchanged.
+
+Similar-issue disposition: all runtime references to the removed driver,
+instance allocator and snapshot entries were scanned. Shared mirror headers
+are retained for their original declarations; no live runtime caller remains.
+No public eight-tree source or test is changed. No new renderer, input route,
+recovery logic or product special case is introduced.
+
+### P2 verification and actual-diff review
+
+Cached Ninja/ccache builds published both EXEs. x64 and x86 each pass
+188/188 background tests and 8/8 native tests: 392/392, zero failures/skips.
+Native coverage includes five desktop and three audio tests per architecture.
+Real Win3.1 restart/mode-switch integration passes (x86 53.82 seconds); this
+is product regression, not a claim of a newly exercised legacy driver.
+Checkpoint checks include unsupported installed-driver archives, unchanged
+inactive wire roundtrip, InPort state restoration and subsequent IRQ delivery.
+
+Both EXEs' defined symbols contain InPort mouse_init/send/inb/outb, with no
+legacy installation, interrupt, snapshot or instance allocation symbols.
+Mirror verification covers all 474 remaining files; source/Types/boundary,
+documentation and other full-suite gates pass. Build diagnostics are exclusively
+original mirror/header warnings (893 x64, 892 x86), not new shared/App warnings.
+Timestamp-bearing objects rebuild and both publication timestamp gates pass.
+
+Actual git diff --numstat from 42533c7d, excluding artifacts/docs:
+production src +6/-6593, net -6587; test +13/-114, net -101;
+root CMake, checker and audit script +2/-16, net -14.
+Reviewer independently inspected the actual diff after executor verification:
+no live driver callers, no fake restore success, no shared-component changes,
+no altered media/INI/snapshots, no additional state owner or lifetime machinery.
+Historical shared mirror declarations stay unchanged; they do not register or
+link the retired driver. No manual mouse UX test or exhaustive guest claim.
+
+Published P2 SHA-256:
+
+- softpc32.exe: `19fa54a2d45f90f8ef95af49ec115411927f2ecfd6ac08bcbd19c0133b7b847b`.
+- softpc64.exe: `b013d6c28ac4301fb132786508e81ae483b945748a07ad7e8e26f6a19433540f`.
+
+Owned background job completed successfully; raw scratch is removed before
+P2 delivery. Acceptance remains with the owner; T99 remains open.

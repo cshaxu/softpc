@@ -162,8 +162,8 @@ softpc_device_archive *archive;
         return FALSE;
     if (!softpc_device_snapshot_capture_keyboard(&archive->keyboard))
         return FALSE;
-    if (!softpc_device_snapshot_capture_dos_mouse(&archive->dos_mouse))
-        return FALSE;
+    /* Retain the inactive legacy-driver wire slot, not its retired runtime. */
+    lib_memory_set(&archive->dos_mouse, 0, sizeof(archive->dos_mouse));
     if (!softpc_device_snapshot_capture_video_memory(&archive->video_memory))
         return FALSE;
     if (!softpc_device_snapshot_capture_video_controller(
@@ -234,7 +234,6 @@ softpc_device_archive *archive;
         !softpc_device_snapshot_restore_video_memory(&archive->video_memory) ||
         !softpc_device_snapshot_restore_video_controller(
             &archive->video_controller) ||
-        !softpc_device_snapshot_restore_dos_mouse(&archive->dos_mouse) ||
         !softpc_device_snapshot_restore_hdd(&archive->hdd) ||
         !q_event_snapshot_restore(&archive->events, archive->quick_entries,
             archive->quick_capacity, archive->tick_entries,
@@ -938,6 +937,8 @@ softpc_device_archive_read(softpc_device_archive **out_archive,
     archive = softpc_device_archive_create();
     if (archive == NULL) return LIB_STATUS_NO_MEMORY;
     status = device_read_all(archive, read, context);
+    if (status == LIB_STATUS_OK && archive->dos_mouse.initialized != 0)
+        status = LIB_STATUS_UNSUPPORTED;
     if (status != LIB_STATUS_OK) { softpc_device_archive_dispose(archive); return status; }
     archive->valid = TRUE; *out_archive = archive; return LIB_STATUS_OK;
 }

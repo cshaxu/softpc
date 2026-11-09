@@ -303,13 +303,8 @@ int softpc_device_snapshot_capture_keyboard(softpc_device_keyboard_state *state)
 int softpc_device_snapshot_restore_keyboard(
     const softpc_device_keyboard_state *state);
 
-/*
- * DOS INT 33h driver state.  This is deliberately a field map, rather than
- * the historical MOUSE_CONTEXT/MM_INSTANCE_DATA layout: the latter contains
- * host-width fields, derived addresses and host drawing resources.  Cursor
- * backing bytes are guest-visible data because the driver needs them to
- * remove an already drawn cursor after restore.
- */
+/* Historical snapshot wire fields only. The retired INT 33h driver cannot
+ * be restored; archives with initialized != 0 are rejected on read. */
 typedef struct softpc_device_dos_mouse_state {
     uint32_t initialized;
     uint16_t interrupt_rate;
@@ -393,11 +388,6 @@ typedef struct softpc_device_dos_mouse_state {
     uint16_t archive_ega_current_misc;
     uint32_t cursor_em_disabled;
 } softpc_device_dos_mouse_state;
-
-int softpc_device_snapshot_capture_dos_mouse(
-    softpc_device_dos_mouse_state *state);
-int softpc_device_snapshot_restore_dos_mouse(
-    const softpc_device_dos_mouse_state *state);
 
 /*
  * Guest video memory and the programmable DAC are fixed-size semantic data.

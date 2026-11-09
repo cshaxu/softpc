@@ -28,8 +28,6 @@ extern void insert_code_into_6805_buf(half_word code);
 extern void host_key_down(int key);
 extern half_word *anomalous_array;
 extern int in_anomalous_state;
-extern void mouse_driver_initialisation(void);
-extern void mouse_driver_termination(void);
 /* base_def.h's non-ANSI compatibility macro must not alter this C17 test. */
 #undef const
 
@@ -80,6 +78,7 @@ typedef struct checkpoint_byte_stream {
     lib_size byte_count;
     lib_size capacity;
     lib_size offset;
+    lib_size video_offset;
 } checkpoint_byte_stream;
 
 static lib_status checkpoint_write_bytes(void *context,
@@ -92,6 +91,8 @@ static lib_status checkpoint_write_bytes(void *context,
     if (stream == NULL || (byte_count != 0u && bytes == NULL) ||
         byte_count > (lib_size)-1 - stream->byte_count)
         return LIB_STATUS_INVALID_ARGUMENT;
+    if (byte_count == SOFTPC_DEVICE_VIDEO_PLANE_BYTES)
+        stream->video_offset = stream->byte_count;
     required = stream->byte_count + byte_count;
     if (required > stream->capacity) {
         replacement = lib_reallocate(stream->bytes, required);
@@ -463,6 +464,15 @@ static void verify_snapshot_archive(void)
         checkpoint_read_bytes, &device_stream) != LIB_STATUS_OK);
     assert(decoded_devices == NULL);
     device_stream.byte_count += 8u;
+    /* The historical DOS-driver slot is 1808 wire bytes immediately before
+       video RAM. Its first u32 is initialized, independent of host padding. */
+    assert(device_stream.video_offset >= 1808u);
+    device_stream.bytes[device_stream.video_offset - 1808u] = 1u;
+    device_stream.offset = 0u;
+    assert(softpc_device_archive_read(&decoded_devices,
+        checkpoint_read_bytes, &device_stream) == LIB_STATUS_UNSUPPORTED);
+    assert(decoded_devices == NULL);
+    device_stream.bytes[device_stream.video_offset - 1808u] = 0u;
     device_stream.offset = 0u;
     assert(softpc_device_archive_read(&decoded_devices,
         checkpoint_read_bytes, &device_stream) == LIB_STATUS_OK);
@@ -590,8 +600,6 @@ static void verify_controller_archives(void)
     softpc_device_ppi_state ppi_saved, ppi_restored;
     softpc_device_inport_mouse_state mouse_saved, mouse_restored;
     softpc_device_keyboard_state keyboard_saved, keyboard_restored;
-    softpc_device_dos_mouse_state dos_mouse_inactive, dos_mouse_saved,
-        dos_mouse_restored;
     static softpc_device_video_memory_state video_memory_saved,
         video_memory_restored;
     softpc_device_video_controller_state video_controller_saved,
@@ -739,7 +747,7 @@ static void verify_controller_archives(void)
 
     /* Preserve the InPort's held movement and selected register without
        replaying port I/O.
-       The DOS INT 33h driver is deliberately a separate future receiver. */
+       The guest owns its DOS INT 33h driver. */
     outb(MOUSE_PORT_0, 0x87u);
     mouse_send(11, -7, 1, 0);
     outb(MOUSE_PORT_1, 0x30u);
@@ -756,29 +764,6 @@ static void verify_controller_archives(void)
     assert(!softpc_device_snapshot_restore_inport_mouse(&mouse_restored));
     inb(MOUSE_PORT_1, &value);
     assert(value == 11u);
-
-    /* The DOS INT 33h driver has state distinct from the InPort adapter.
-       Prove both its absent state and a restored installed state. */
-    /* The driver is normally absent until guest MOUSE.COM installs it. */
-    lib_memory_set(&dos_mouse_inactive, 0, sizeof(dos_mouse_inactive));
-    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_inactive));
-    assert(!dos_mouse_inactive.initialized);
-
-    mouse_driver_initialisation();
-    lib_memory_set(&dos_mouse_saved, 0, sizeof(dos_mouse_saved));
-    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_saved));
-    assert(dos_mouse_saved.initialized);
-    mouse_driver_termination();
-    /* Restore owns reconstruction of the archived driver instance. */
-    assert(softpc_device_snapshot_restore_dos_mouse(&dos_mouse_saved));
-    lib_memory_set(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
-    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
-    assert(lib_memory_compare(&dos_mouse_restored, &dos_mouse_saved,
-        sizeof(dos_mouse_saved)) == 0);
-    assert(softpc_device_snapshot_restore_dos_mouse(&dos_mouse_inactive));
-    lib_memory_set(&dos_mouse_restored, 0, sizeof(dos_mouse_restored));
-    assert(softpc_device_snapshot_capture_dos_mouse(&dos_mouse_restored));
-    assert(!dos_mouse_restored.initialized);
 
     /* Plane bytes and programmable DAC entries are guest state.  This does
        not claim controller-register restore; that is a later receiver. */

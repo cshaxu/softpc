@@ -418,7 +418,6 @@ set(required_original_controller_sources
     "src/app-softpc/softpc.new/base/keymouse/keyba.c"
     "src/app-softpc/softpc.new/base/keymouse/keybd_io.c"
     "src/app-softpc/softpc.new/base/keymouse/mouse.c"
-    "src/app-softpc/softpc.new/base/keymouse/mouse_io.c"
     "src/app-softpc/softpc.new/base/disks/fla.c"
     "src/app-softpc/softpc.new/base/disks/gfi.c"
     "src/app-softpc/softpc.new/base/disks/gfi_mpty.c"

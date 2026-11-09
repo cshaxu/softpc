@@ -33,7 +33,7 @@ $portAbiPaths = @(
     'base\inc\host_com.h', 'base\inc\host.h', 'base\inc\ica.h',
     'base\inc\ios.h', 'base\inc\timeval.h', 'base\inc\video.h',
     'base\comms\com.c', 'base\keymouse\keybd_io.c',
-    'base\keymouse\mouse_io.c', 'base\support\time_day.c',
+    'base\support\time_day.c',
     'base\system\cmosnt.c', 'base\system\idetect.c',
     'base\system\ica.c', 'base\system\rom.c', 'base\support\main.c',
     'base\video\gfx_updt.c', 'host\inc\x86\prod\gdpvar.h',

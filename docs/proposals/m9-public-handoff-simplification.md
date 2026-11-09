@@ -5154,3 +5154,18 @@ S42 implemented the two-hunk repair (+7/-6 production) and the actual-source
 fixture. [Investigation/evidence](../etc/evidence/softpc/m9-t99-s42-mouse-coordinate-restoration.md)
 records the confirmed seven-call negative, compile/dispatch distinction and
 fixed-XP diff increase of 13. Final validation and acceptance remain in CURRENT.
+
+### S42 P2 owner-approved retirement
+
+Remove the unused old INT 33h driver and dedicated instance adapter/test.
+Frozen units: production call graph; build and test retirement; unchanged
+InPort path; inactive legacy archive compatibility and active-state rejection;
+mirror inventory and patch retirement; dual build/publication/full regression.
+Preserve serialized field order and widths, but remove driver capture/restore
+entry points. Estimated source deletion exceeds 6,500 lines, test deletion
+about 110 lines with a small archive rejection regression. This is whole-file
+subset retirement, not a claim that all removed lines were local mirror diff.
+
+P2 completes all six retirement units with 392/392 passing tests and both EXEs
+published. Source net -6587; test net -101. See the S42 evidence for symbol,
+wire compatibility, actual review and limitations. CURRENT owns acceptance.

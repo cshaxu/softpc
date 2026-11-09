@@ -1690,3 +1690,16 @@ The source-local regression uses this actual function with real machine/video
 memory and a controlled mark callback, and reproduces the seven-call -4889
 sequence before repair. No external project's patch or test result is imported.
 See [S42 evidence](m9-t99-s42-mouse-coordinate-restoration.md).
+
+## T99 S42 P2: retired legacy DOS mouse source
+
+Owner authorizes whole-file removal of base/keymouse/mouse_io.c and its
+Compat instance adapter. All patches in that file, including S42 P1, are
+retired with the file, not active retained-source exceptions. P1 evidence
+above remains historical. The selected XP corpus excludes this whole file;
+its original bytes are not rewritten as a new subset baseline.
+The shared mouse_io.h still supplies original mouse/reset declarations and
+constants; it is retained. No normal guest path registered the old BOPs.
+Snapshot wire fields remain for inactive old archives; installed old-driver
+state is rejected before any device restore. InPort remains the single
+hardware path and guest drivers remain guest-owned.
