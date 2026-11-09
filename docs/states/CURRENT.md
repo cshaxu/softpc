@@ -2,43 +2,19 @@
 
 ## Current Work
 
-M9 T99 S42 P4 is verified, awaiting owner acceptance: retired DOS mouse snapshot payload removed without backward compatibility.
-S41 and Td S23 remain owner-accepted and closed.
-
-## M9 T99 S42 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner approves deleting all legacy snapshot compatibility residue, rebuilding, publishing, testing, committing and pushing within S42. |
-| Objective | Remove the unused DOS mouse archive fields and mappings; advance the existing snapshot format discriminator and reject older files. |
-| Non-goals | No guest modification, driver activation, rendering rewrite, public-component change or unrelated cleanup. |
-| Reference Baseline | b12bc8be (P3); no new mirror changes. |
-| Candidate Proposal | [T99 retained scope](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | compat/devices/archive.c and snapshot.h; machine/snapshot_image.c; checkpoint_smoke.c; task records. Snapshot SCP2 becomes SCP3; no public-component ABI change. |
-| Applicable Rules | Execution, architecture, coding, documentation and source/research policy. |
-| Verification | Old format rejected at header; current archive/image round trip and device restoration; cached x86/x64 full background and native tests. |
-| Expected Markers | One current snapshot format, no legacy DOS mouse payload or compatibility reader. |
-| Asset Needs | Refresh both EXEs; preserve all INI, guest media and snapshots. |
-| Reporting Requirements | Report source/test diff, format break, full test evidence and published hashes. |
-| Stop Conditions | No external code import, original guest recompilation, Computer Use, new recovery path or hiding failures. |
-| Exit Criteria | Reviewed, built, published, tested, committed and pushed; wait for owner acceptance. |
-| Original Owner Request | 不考虑兼容性，直接给我清理干净，然后重新编译发布测试提交推送。 |
-| Similar-Issue Sweep | Scan src/test for all dos_mouse, DOS_MOUSE, legacy slot and version references; retain the actual InPort mouse state. |
-
-See [S42 investigation and proof](../etc/evidence/softpc/m9-t99-s42-mouse-coordinate-restoration.md).
-
-S42 P4 publishes both EXEs and passes 392/392: each architecture 188
-background and eight native tests, no failures/skips. Production +4/-135
-(net -131), tests +4/-14 (net -10). Snapshot format is now SCP3; earlier
-SCP2 files are rejected at the header and must be recreated. Existing user
-snapshot files remain untouched. The 472-file mirror and public eight trees
-are unchanged. Build warnings are confined to existing mirror source.
-P4 owned hidden jobs are finished; disposable build/t99-s42 is removed before
-delivery, with only reusable Ninja/ccache roots retained.
-No external repository is a build dependency.
+No implementation subtask is active. Owner accepts and closes M9 T99 S42.
+Open task awaiting owner: T99.
+No next S is admitted.
+See [S42 closure](../history/M9-T99-S42-unused-mirror-retirement.md).
 
 ## Current Technical Baseline
+
+S42 final implementation 60bdbaa4 removes unused mouse_io.c, nop.c, vglob.c
+and their obsolete wiring/state. Both published EXEs pass 392/392 tests.
+Snapshots now use SCP3; older SCP2 files are rejected without compatibility.
+The retained mirror has 472 files. User media/configuration are preserved;
+a separately modified assets/binary/snapshot is outside this closure commit.
+
 
 S41 delivery ecf263a8 completes the five admitted mirror cleanup/guard units:
 production +16/-29, with XP mirror added+deleted diff reduced by 13 lines.
@@ -57,6 +33,8 @@ remains in [Queue](QUEUE.md). T99 still requires its overall completion audit
 and owner-approved closure.
 
 ## Recent M9 Closures
+
+- [S42 unused mirror retirement](../history/M9-T99-S42-unused-mirror-retirement.md).
 
 - [S41 mirror cleanup](../history/M9-T99-S41-mirror-cleanup.md).
 - [S40 retained-difference audit](../history/M9-T99-S40-retained-difference-audit.md).

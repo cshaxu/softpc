@@ -5191,3 +5191,6 @@ rejection and retain current-format round trips, (4) build/publish both EXEs,
 run full background/native tests and review/commit/push. No fallback reader,
 padding or user snapshot rewrite. Expected source reduction about 140 lines;
 tests also shrink. Completion requires all four units and clean delivery.
+
+S42 is owner-accepted and closed; see [closure](../history/M9-T99-S42-unused-mirror-retirement.md).
+P4 supersedes the earlier P2 compatibility policy. T99 remains open.
