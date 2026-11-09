@@ -24,7 +24,6 @@ struct softpc_device_archive {
     softpc_device_ppi_state ppi;
     softpc_device_inport_mouse_state inport_mouse;
     softpc_device_keyboard_state keyboard;
-    softpc_device_dos_mouse_state dos_mouse;
     softpc_device_video_memory_state video_memory;
     softpc_device_video_controller_state video_controller;
     softpc_device_serial_controller_state serial_controller;
@@ -162,8 +161,6 @@ softpc_device_archive *archive;
         return FALSE;
     if (!softpc_device_snapshot_capture_keyboard(&archive->keyboard))
         return FALSE;
-    /* Retain the inactive legacy-driver wire slot, not its retired runtime. */
-    lib_memory_set(&archive->dos_mouse, 0, sizeof(archive->dos_mouse));
     if (!softpc_device_snapshot_capture_video_memory(&archive->video_memory))
         return FALSE;
     if (!softpc_device_snapshot_capture_video_controller(
@@ -686,34 +683,6 @@ static const softpc_device_wire_field pit_fields[] = {
     DEVICE_U32(softpc_device_pit_state, active_interrupt_event)
 };
 
-static const softpc_device_wire_field dos_mouse_fields[] = {
-    DEVICE_U32(softpc_device_dos_mouse_state, initialized), DEVICE_U16(softpc_device_dos_mouse_state, interrupt_rate), DEVICE_U16(softpc_device_dos_mouse_state, com_revision),
-    DEVICE_U16(softpc_device_dos_mouse_state, button_press_x), DEVICE_U16(softpc_device_dos_mouse_state, button_press_y), DEVICE_U16(softpc_device_dos_mouse_state, button_release_x), DEVICE_U16(softpc_device_dos_mouse_state, button_release_y),
-    DEVICE_U16(softpc_device_dos_mouse_state, button_press_count), DEVICE_U16(softpc_device_dos_mouse_state, button_release_count),
-    DEVICE_U16(softpc_device_dos_mouse_state, mouse_gear_x), DEVICE_U16(softpc_device_dos_mouse_state, mouse_gear_y), DEVICE_U16(softpc_device_dos_mouse_state, mouse_sensitivity_x), DEVICE_U16(softpc_device_dos_mouse_state, mouse_sensitivity_y), DEVICE_U16(softpc_device_dos_mouse_state, mouse_sensitivity_value_x), DEVICE_U16(softpc_device_dos_mouse_state, mouse_sensitivity_value_y),
-    DEVICE_U16(softpc_device_dos_mouse_state, mouse_double_threshold), DEVICE_U16(softpc_device_dos_mouse_state, archive_text_cursor_type), DEVICE_U16(softpc_device_dos_mouse_state, text_cursor_screen), DEVICE_U16(softpc_device_dos_mouse_state, text_cursor_cursor),
-    DEVICE_U16(softpc_device_dos_mouse_state, graphics_hot_spot_x), DEVICE_U16(softpc_device_dos_mouse_state, graphics_hot_spot_y), DEVICE_U16(softpc_device_dos_mouse_state, graphics_size_x), DEVICE_U16(softpc_device_dos_mouse_state, graphics_size_y),
-    DEVICE_U16(softpc_device_dos_mouse_state, graphics_screen), DEVICE_U16(softpc_device_dos_mouse_state, graphics_cursor_words), DEVICE_U32(softpc_device_dos_mouse_state, graphics_screen_lo), DEVICE_U32(softpc_device_dos_mouse_state, graphics_screen_hi), DEVICE_U32(softpc_device_dos_mouse_state, graphics_cursor_lo), DEVICE_U32(softpc_device_dos_mouse_state, graphics_cursor_hi),
-    DEVICE_U16(softpc_device_dos_mouse_state, user_handler_segment), DEVICE_U16(softpc_device_dos_mouse_state, user_handler_offset), DEVICE_U16(softpc_device_dos_mouse_state, user_handler_mask), DEVICE_U32(softpc_device_dos_mouse_state, alternate_handlers_active),
-    DEVICE_U16(softpc_device_dos_mouse_state, alternate_handler_segment), DEVICE_U16(softpc_device_dos_mouse_state, alternate_handler_offset), DEVICE_U16(softpc_device_dos_mouse_state, alternate_handler_mask),
-    DEVICE_U16(softpc_device_dos_mouse_state, black_hole_left), DEVICE_U16(softpc_device_dos_mouse_state, black_hole_top), DEVICE_U16(softpc_device_dos_mouse_state, black_hole_right), DEVICE_U16(softpc_device_dos_mouse_state, black_hole_bottom), DEVICE_U16(softpc_device_dos_mouse_state, archive_double_speed_threshold),
-    DEVICE_U32(softpc_device_dos_mouse_state, archive_cursor_flag), DEVICE_U16(softpc_device_dos_mouse_state, cursor_x), DEVICE_U16(softpc_device_dos_mouse_state, cursor_y), DEVICE_U16(softpc_device_dos_mouse_state, button_status),
-    DEVICE_U16(softpc_device_dos_mouse_state, cursor_window_left), DEVICE_U16(softpc_device_dos_mouse_state, cursor_window_top), DEVICE_U16(softpc_device_dos_mouse_state, cursor_window_right), DEVICE_U16(softpc_device_dos_mouse_state, cursor_window_bottom), DEVICE_U32(softpc_device_dos_mouse_state, archive_light_pen_mode),
-    DEVICE_U16(softpc_device_dos_mouse_state, motion_x), DEVICE_U16(softpc_device_dos_mouse_state, motion_y), DEVICE_U16(softpc_device_dos_mouse_state, raw_motion_x), DEVICE_U16(softpc_device_dos_mouse_state, raw_motion_y),
-    DEVICE_U16(softpc_device_dos_mouse_state, default_cursor_x), DEVICE_U16(softpc_device_dos_mouse_state, default_cursor_y), DEVICE_U16(softpc_device_dos_mouse_state, cursor_position_x), DEVICE_U16(softpc_device_dos_mouse_state, cursor_position_y), DEVICE_U16(softpc_device_dos_mouse_state, fractional_cursor_x), DEVICE_U16(softpc_device_dos_mouse_state, fractional_cursor_y),
-    DEVICE_U32(softpc_device_dos_mouse_state, archive_cursor_page), DEVICE_U32(softpc_device_dos_mouse_state, archive_active_acceleration_curve), DEVICE_U32(softpc_device_dos_mouse_state, archive_next_video_mode),
-    DEVICE_U16(softpc_device_dos_mouse_state, acceleration_length), DEVICE_U16(softpc_device_dos_mouse_state, acceleration_count), DEVICE_U16(softpc_device_dos_mouse_state, acceleration_scale), DEVICE_U16(softpc_device_dos_mouse_state, acceleration_name),
-    DEVICE_U16(softpc_device_dos_mouse_state, driver_disabled), DEVICE_U16(softpc_device_dos_mouse_state, archive_current_video_mode), DEVICE_U16(softpc_device_dos_mouse_state, archive_text_cursor_background), DEVICE_U16(softpc_device_dos_mouse_state, archive_graphics_cursor_background), DEVICE_U32(softpc_device_dos_mouse_state, archive_save_area_in_use),
-    DEVICE_U16(softpc_device_dos_mouse_state, save_position_x), DEVICE_U16(softpc_device_dos_mouse_state, save_position_y), DEVICE_U16(softpc_device_dos_mouse_state, save_area_left), DEVICE_U16(softpc_device_dos_mouse_state, save_area_top), DEVICE_U16(softpc_device_dos_mouse_state, save_area_right), DEVICE_U16(softpc_device_dos_mouse_state, save_area_bottom),
-    DEVICE_U32(softpc_device_dos_mouse_state, archive_user_subroutine_critical), DEVICE_U16(softpc_device_dos_mouse_state, archive_last_condition_mask),
-    DEVICE_U16(softpc_device_dos_mouse_state, saved_ax), DEVICE_U16(softpc_device_dos_mouse_state, saved_bx), DEVICE_U16(softpc_device_dos_mouse_state, saved_cx), DEVICE_U16(softpc_device_dos_mouse_state, saved_dx), DEVICE_U16(softpc_device_dos_mouse_state, saved_si), DEVICE_U16(softpc_device_dos_mouse_state, saved_di), DEVICE_U16(softpc_device_dos_mouse_state, saved_es), DEVICE_U16(softpc_device_dos_mouse_state, saved_bp), DEVICE_U16(softpc_device_dos_mouse_state, saved_ds),
-    DEVICE_U16(softpc_device_dos_mouse_state, virtual_screen_left), DEVICE_U16(softpc_device_dos_mouse_state, virtual_screen_top), DEVICE_U16(softpc_device_dos_mouse_state, virtual_screen_right), DEVICE_U16(softpc_device_dos_mouse_state, virtual_screen_bottom), DEVICE_U16(softpc_device_dos_mouse_state, cursor_grid_x), DEVICE_U16(softpc_device_dos_mouse_state, cursor_grid_y), DEVICE_U16(softpc_device_dos_mouse_state, text_grid_x), DEVICE_U16(softpc_device_dos_mouse_state, text_grid_y),
-    DEVICE_U16(softpc_device_dos_mouse_state, default_black_hole_left), DEVICE_U16(softpc_device_dos_mouse_state, default_black_hole_top), DEVICE_U16(softpc_device_dos_mouse_state, default_black_hole_right), DEVICE_U16(softpc_device_dos_mouse_state, default_black_hole_bottom),
-    DEVICE_U16(softpc_device_dos_mouse_state, archive_saved_int33_segment), DEVICE_U16(softpc_device_dos_mouse_state, archive_saved_int33_offset), DEVICE_U16(softpc_device_dos_mouse_state, archive_saved_int10_segment), DEVICE_U16(softpc_device_dos_mouse_state, archive_saved_int10_offset), DEVICE_U16(softpc_device_dos_mouse_state, archive_saved_int0a_segment), DEVICE_U16(softpc_device_dos_mouse_state, archive_saved_int0a_offset), DEVICE_U32(softpc_device_dos_mouse_state, archive_int10_chained),
-    DEVICE_U8(softpc_device_dos_mouse_state, archive_vga_background), DEVICE_U32(softpc_device_dos_mouse_state, ega_background_lo), DEVICE_U32(softpc_device_dos_mouse_state, ega_background_mid), DEVICE_U32(softpc_device_dos_mouse_state, ega_background_hi),
-    DEVICE_U16(softpc_device_dos_mouse_state, archive_ega_current_crtc), DEVICE_U16(softpc_device_dos_mouse_state, archive_ega_current_graph), DEVICE_U16(softpc_device_dos_mouse_state, archive_ega_current_seq), DEVICE_U16(softpc_device_dos_mouse_state, archive_ega_current_attr), DEVICE_U16(softpc_device_dos_mouse_state, archive_ega_current_misc), DEVICE_U32(softpc_device_dos_mouse_state, cursor_em_disabled)
-};
-
 static lib_status
 device_write_queue(const softpc_device_archive *archive,
     softpc_snapshot_bytes_write write, void *context)
@@ -872,7 +841,7 @@ device_write_all(const softpc_device_archive *archive,
     for (index = 0u; index < SOFTPC_DEVICE_PIT_COUNTER_COUNT; ++index) WRITE_MAP(&archive->pit.counter[index], pit_counter_fields);
     WRITE_MAP(&archive->pit, pit_fields); WRITE_MAP(&archive->cmos, cmos_fields); WRITE_MAP(&archive->fdc, fdc_fields);
     for (index = 0u; index < SOFTPC_DEVICE_HDD_DRIVE_COUNT; ++index) WRITE_MAP(&archive->hdd.drive[index], hdd_drive_fields);
-    WRITE_MAP(&archive->hdd, hdd_fields); WRITE_MAP(&archive->ppi, ppi_fields); WRITE_MAP(&archive->inport_mouse, inport_mouse_fields); WRITE_MAP(&archive->keyboard, keyboard_fields); WRITE_MAP(&archive->dos_mouse, dos_mouse_fields); WRITE_MAP(&archive->video_memory, video_memory_fields); WRITE_MAP(&archive->video_controller, video_controller_fields);
+    WRITE_MAP(&archive->hdd, hdd_fields); WRITE_MAP(&archive->ppi, ppi_fields); WRITE_MAP(&archive->inport_mouse, inport_mouse_fields); WRITE_MAP(&archive->keyboard, keyboard_fields); WRITE_MAP(&archive->video_memory, video_memory_fields); WRITE_MAP(&archive->video_controller, video_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_SERIAL_PORT_COUNT; ++index) WRITE_MAP(&archive->serial_controller.port[index], serial_port_fields);
     WRITE_MAP(&archive->serial_controller, serial_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_SERIAL_PORT_COUNT; ++index) WRITE_MAP(&archive->serial_host.port[index], serial_host_port_fields);
@@ -902,7 +871,7 @@ device_read_all(softpc_device_archive *archive, softpc_snapshot_bytes_read read,
     for (index = 0u; index < SOFTPC_DEVICE_PIT_COUNTER_COUNT; ++index) READ_MAP(&archive->pit.counter[index], pit_counter_fields);
     READ_MAP(&archive->pit, pit_fields); READ_MAP(&archive->cmos, cmos_fields); READ_MAP(&archive->fdc, fdc_fields);
     for (index = 0u; index < SOFTPC_DEVICE_HDD_DRIVE_COUNT; ++index) READ_MAP(&archive->hdd.drive[index], hdd_drive_fields);
-    READ_MAP(&archive->hdd, hdd_fields); READ_MAP(&archive->ppi, ppi_fields); READ_MAP(&archive->inport_mouse, inport_mouse_fields); READ_MAP(&archive->keyboard, keyboard_fields); READ_MAP(&archive->dos_mouse, dos_mouse_fields); READ_MAP(&archive->video_memory, video_memory_fields); READ_MAP(&archive->video_controller, video_controller_fields);
+    READ_MAP(&archive->hdd, hdd_fields); READ_MAP(&archive->ppi, ppi_fields); READ_MAP(&archive->inport_mouse, inport_mouse_fields); READ_MAP(&archive->keyboard, keyboard_fields); READ_MAP(&archive->video_memory, video_memory_fields); READ_MAP(&archive->video_controller, video_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_SERIAL_PORT_COUNT; ++index) READ_MAP(&archive->serial_controller.port[index], serial_port_fields);
     READ_MAP(&archive->serial_controller, serial_controller_fields);
     for (index = 0u; index < SOFTPC_DEVICE_SERIAL_PORT_COUNT; ++index) READ_MAP(&archive->serial_host.port[index], serial_host_port_fields);
@@ -937,8 +906,6 @@ softpc_device_archive_read(softpc_device_archive **out_archive,
     archive = softpc_device_archive_create();
     if (archive == NULL) return LIB_STATUS_NO_MEMORY;
     status = device_read_all(archive, read, context);
-    if (status == LIB_STATUS_OK && archive->dos_mouse.initialized != 0)
-        status = LIB_STATUS_UNSUPPORTED;
     if (status != LIB_STATUS_OK) { softpc_device_archive_dispose(archive); return status; }
     archive->valid = TRUE; *out_archive = archive; return LIB_STATUS_OK;
 }

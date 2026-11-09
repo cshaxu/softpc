@@ -5181,3 +5181,13 @@ one c-files entry and one CMake entry, no new production or test mechanism.
 P3 completes all four units: dual EXEs published, 392/392 tests pass, code
 sections unchanged, source/list -491 lines, no test changes. CURRENT owns
 acceptance; S42 evidence records actual diff and original-source disposition.
+
+### S42 P4: retire the legacy snapshot payload
+
+Owner explicitly waives compatibility. Frozen units: (1) remove DOS mouse
+state/constants and archive mappings, (2) advance SCP2 to SCP3 using the existing
+header check, (3) replace the obsolete compatibility fixture with old-version
+rejection and retain current-format round trips, (4) build/publish both EXEs,
+run full background/native tests and review/commit/push. No fallback reader,
+padding or user snapshot rewrite. Expected source reduction about 140 lines;
+tests also shrink. Completion requires all four units and clean delivery.

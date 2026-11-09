@@ -3,8 +3,8 @@
 
 #include "compat/devices/archive.h"
 
-/* Physical odd/even video-plane layout; older raw planes are incompatible. */
-#define SOFTPC_SNAPSHOT_FORMAT 0x32504353u
+/* Retired DOS mouse payload removed; older snapshot layouts are incompatible. */
+#define SOFTPC_SNAPSHOT_FORMAT 0x33504353u
 
 typedef struct softpc_snapshot_count_stream {
     lib_u64 count;

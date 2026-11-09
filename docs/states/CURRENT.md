@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T99 S42 P3 is verified, awaiting owner acceptance: unused nop.c and vglob.c and their build wiring are removed.
+M9 T99 S42 P4 is verified, awaiting owner acceptance: retired DOS mouse snapshot payload removed without backward compatibility.
 S41 and Td S23 remain owner-accepted and closed.
 
 ## M9 T99 S42 Packet
@@ -10,30 +10,32 @@ S41 and Td S23 remain owner-accepted and closed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner approves P3 retirement of vglob.c and previously explicitly requests deletion of unused nop.c; build, publish, test, commit and push in current S42. |
-| Objective | Remove unused nop.c and vglob.c with source-list wiring; retain the current generated C-VID path and decoder NOP semantics. |
+| Admission And Approval | Owner approves deleting all legacy snapshot compatibility residue, rebuilding, publishing, testing, committing and pushing within S42. |
+| Objective | Remove the unused DOS mouse archive fields and mappings; advance the existing snapshot format discriminator and reject older files. |
 | Non-goals | No guest modification, driver activation, rendering rewrite, public-component change or unrelated cleanup. |
-| Reference Baseline | 421b2fcb (P2); pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
+| Reference Baseline | b12bc8be (P3); no new mirror changes. |
 | Candidate Proposal | [T99 retained scope](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | nop.c and vglob.c removal, c-files, CMake, audit inventory and mirror manifest/ledger; no public ABI. |
+| Files And ABI Surface | compat/devices/archive.c and snapshot.h; machine/snapshot_image.c; checkpoint_smoke.c; task records. Snapshot SCP2 becomes SCP3; no public-component ABI change. |
 | Applicable Rules | Execution, architecture, coding, documentation and source/research policy. |
-| Verification | Dual-width object reachability and final EXE symbols; retained CPU/video regression; cached x86/x64 full runtime/native tests and publication comparison. |
-| Expected Markers | One generated C-VID accessor path; NOP handled directly by the existing CPU decoder. |
+| Verification | Old format rejected at header; current archive/image round trip and device restoration; cached x86/x64 full background and native tests. |
+| Expected Markers | One current snapshot format, no legacy DOS mouse payload or compatibility reader. |
 | Asset Needs | Refresh both EXEs; preserve all INI, guest media and snapshots. |
-| Reporting Requirements | Report whole-file retirement separately from local patch counts, unchanged active path, actual diff and binary comparison. |
+| Reporting Requirements | Report source/test diff, format break, full test evidence and published hashes. |
 | Stop Conditions | No external code import, original guest recompilation, Computer Use, new recovery path or hiding failures. |
 | Exit Criteria | Reviewed, built, published, tested, committed and pushed; wait for owner acceptance. |
-| Original Owner Request | nop完全没被生产调用 当然也要删了啊？ / 既然如此 那就还是应该删除吧。 |
-| Similar-Issue Sweep | Audit all 228 pre-removal mirror C files for unused whole objects and isolated reference groups; nop.c and vglob.c are the only remaining candidates. |
+| Original Owner Request | 不考虑兼容性，直接给我清理干净，然后重新编译发布测试提交推送。 |
+| Similar-Issue Sweep | Scan src/test for all dos_mouse, DOS_MOUSE, legacy slot and version references; retain the actual InPort mouse state. |
 
 See [S42 investigation and proof](../etc/evidence/softpc/m9-t99-s42-mouse-coordinate-restoration.md).
 
-S42 used disposable build/t99-s42 with hidden jobs and a 15-minute no-progress
-review budget; P3 owned jobs are finished and scratch is removed before delivery.
-P3 publishes both EXEs and passes 392/392: each architecture 188 background
-and eight native tests. Production source/list net -491, test code unchanged.
-Both executable code sections are identical to P2; only build time/PE metadata
-changes. The 472-file mirror manifest passes. P2 archive compatibility remains.
+S42 P4 publishes both EXEs and passes 392/392: each architecture 188
+background and eight native tests, no failures/skips. Production +4/-135
+(net -131), tests +4/-14 (net -10). Snapshot format is now SCP3; earlier
+SCP2 files are rejected at the header and must be recreated. Existing user
+snapshot files remain untouched. The 472-file mirror and public eight trees
+are unchanged. Build warnings are confined to existing mirror source.
+P4 owned hidden jobs are finished; disposable build/t99-s42 is removed before
+delivery, with only reusable Ninja/ccache roots retained.
 No external repository is a build dependency.
 
 ## Current Technical Baseline

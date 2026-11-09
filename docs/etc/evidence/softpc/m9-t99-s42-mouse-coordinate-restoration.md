@@ -266,3 +266,48 @@ Actual-change self-review confirms the original decoder NOP and generated
 C-VID remain the only active implementations, with no altered shared trees,
 INI, snapshot or guest media. Owned jobs completed; scratch is removed before
 delivery. S42 remains awaiting owner acceptance, T99 open.
+
+## P4 owner-approved snapshot compatibility retirement
+
+Baseline b12bc8be. Owner explicitly requests complete cleanup without backward
+compatibility. This supersedes P2's retained historical DOS mouse wire slot.
+Remove its 12 constants, state structure, archive member, zero-fill, field map,
+read/write calls and initialized-state rejection. The real InPort controller,
+its queued timer restoration and the guest mouse driver remain unchanged.
+
+The existing format discriminator advances from SCP2 to SCP3. The existing
+header check rejects SCP2 with INVALID_ARGUMENT before reading any section or
+restoring machine state. There is no compatibility reader, padding, fallback,
+or migration. Existing user snapshots are untouched and must be recreated
+with the new executable. New snapshots omit the former 1808-byte device slot.
+
+The checkpoint test removes the retired wire-offset fixture and instead
+substitutes the exact previous format tag, checking rejection after four bytes.
+It retains current-format archive/image round trips, truncated-data rejection,
+wrong-memory-size rejection and actual InPort controller restoration.
+
+Source review: all dos_mouse/DOS_MOUSE/video_offset references in src/test
+are gone; the snapshot decoder rejects a different format before allocations
+and device changes. Production +4/-135 (net -131); test +4/-14 (net -10).
+Mirror and public eight trees have no changes in P4. No additional runtime
+path or test-only production interface is introduced.
+
+Cached x64/x86 builds publish both EXEs. Full regression passes 392/392:
+188 background and eight native tests per architecture, zero failures/skips.
+The changed checkpoint tests pass on both widths. Background includes seven
+integration tests per width; native includes five desktop and three audio.
+Build logs have 893/892 warnings, all located in unchanged mirror sources;
+no non-mirror warning occurs. This is automated regression proof, not a new
+manual DOS/Win3.1/Win95 guest acceptance claim.
+
+Published SHA-256:
+
+- softpc32.exe: `d9c5e955bcbeac011eaf1f0ea84d81339163237512754741688bc6f08099f5d0`.
+- softpc64.exe: `bd4d3ff9c795c3670751667c872eab4e58be2011e51934250863d54e244c98aa`.
+
+Actual-change review confirms symmetric deletion from writer and reader,
+header rejection before section interpretation, unchanged InPort state,
+no new ownership or recovery path, and no modified media/configuration.
+All four proposal units are complete. Owned jobs exited successfully; durable
+evidence is promoted here and scratch is removed before delivery. S42 waits
+for owner acceptance; T99 remains open.

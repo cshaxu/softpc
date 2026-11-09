@@ -78,7 +78,6 @@ typedef struct checkpoint_byte_stream {
     lib_size byte_count;
     lib_size capacity;
     lib_size offset;
-    lib_size video_offset;
 } checkpoint_byte_stream;
 
 static lib_status checkpoint_write_bytes(void *context,
@@ -91,8 +90,6 @@ static lib_status checkpoint_write_bytes(void *context,
     if (stream == NULL || (byte_count != 0u && bytes == NULL) ||
         byte_count > (lib_size)-1 - stream->byte_count)
         return LIB_STATUS_INVALID_ARGUMENT;
-    if (byte_count == SOFTPC_DEVICE_VIDEO_PLANE_BYTES)
-        stream->video_offset = stream->byte_count;
     required = stream->byte_count + byte_count;
     if (required > stream->capacity) {
         replacement = lib_reallocate(stream->bytes, required);
@@ -464,15 +461,6 @@ static void verify_snapshot_archive(void)
         checkpoint_read_bytes, &device_stream) != LIB_STATUS_OK);
     assert(decoded_devices == NULL);
     device_stream.byte_count += 8u;
-    /* The historical DOS-driver slot is 1808 wire bytes immediately before
-       video RAM. Its first u32 is initialized, independent of host padding. */
-    assert(device_stream.video_offset >= 1808u);
-    device_stream.bytes[device_stream.video_offset - 1808u] = 1u;
-    device_stream.offset = 0u;
-    assert(softpc_device_archive_read(&decoded_devices,
-        checkpoint_read_bytes, &device_stream) == LIB_STATUS_UNSUPPORTED);
-    assert(decoded_devices == NULL);
-    device_stream.bytes[device_stream.video_offset - 1808u] = 0u;
     device_stream.offset = 0u;
     assert(softpc_device_archive_read(&decoded_devices,
         checkpoint_read_bytes, &device_stream) == LIB_STATUS_OK);
@@ -499,11 +487,13 @@ static void verify_snapshot_archive(void)
     assert(softpc_snapshot_image_write(&image, checkpoint_write_bytes,
         &image_stream) == LIB_STATUS_OK);
     assert(image_stream.byte_count != 0u);
-    image_stream.bytes[0] ^= 1u;
+    assert(image_stream.bytes[3] == '3');
+    image_stream.bytes[3] = '2';
     assert(softpc_snapshot_image_read(&decoded_image,
         image.ccpu.sas.memory_bytes, checkpoint_read_bytes,
         &image_stream) == LIB_STATUS_INVALID_ARGUMENT);
-    image_stream.bytes[0] ^= 1u;
+    assert(image_stream.offset == 4u);
+    image_stream.bytes[3] = '3';
     image_stream.offset = 0u;
     assert(softpc_snapshot_image_read(&decoded_image,
         image.ccpu.sas.memory_bytes + 4096u, checkpoint_read_bytes,
