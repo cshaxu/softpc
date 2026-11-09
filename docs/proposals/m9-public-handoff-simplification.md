@@ -5134,3 +5134,23 @@ Actual mirror diff decreases by 13 lines, with all original snapshot IDs retaine
 [Delivery evidence](../etc/evidence/softpc/m9-t99-s41-mirror-cleanup.md) records
 test growth, initial fixture link failure, final qualification and limits.
 Owner accepts and closes S41 on 2026-11-08; see [closure](../history/M9-T99-S41-mirror-cleanup.md). No subsequent S is admitted; T99 remains open.
+
+
+## T99 S42 original mouse coordinate restoration
+
+Owner admits the reported EGA mouse temporary Y/height restoration defect.
+The file is compiled with EGG/VGG/V7VGA, but existing standalone BOP registration
+intentionally excludes this old INT 33h driver. Do not activate it to manufacture
+a product failure. Repair retained function semantics and prove actual-function
+cases, separately running applicable product regressions.
+
+Frozen units: off-screen seven calls, exclusion region, normal draw, unscaled
+draw, and mode changes during drawing (both directions). Save scaling decision
+at entry; move paired restoration outside drawing eligibility. Estimated mirror
+production +8/-6 and about 90 test lines, plus small test registration; actual
+diff and supported runtime limits must be recorded at delivery.
+
+S42 implemented the two-hunk repair (+7/-6 production) and the actual-source
+fixture. [Investigation/evidence](../etc/evidence/softpc/m9-t99-s42-mouse-coordinate-restoration.md)
+records the confirmed seven-call negative, compile/dispatch distinction and
+fixed-XP diff increase of 13. Final validation and acceptance remain in CURRENT.

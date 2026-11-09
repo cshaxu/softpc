@@ -671,6 +671,17 @@ set(SOFTPC_TEST_TARGETS softpc-bios-access-smoke
     softpc-runtime-restart-boot-smoke
     softpc-runtime-input-continuation-smoke
 )
+add_executable(softpc-mouse-cursor-state-smoke test/app-softpc/unit/softpc.new/mouse_cursor_state_smoke.c)
+target_link_libraries(softpc-mouse-cursor-state-smoke PRIVATE softpc-vm)
+target_include_directories(softpc-mouse-cursor-state-smoke PRIVATE
+    $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)
+target_compile_definitions(softpc-mouse-cursor-state-smoke PRIVATE
+    $<TARGET_PROPERTY:softpc-machine-devices,COMPILE_DEFINITIONS>)
+target_compile_options(softpc-mouse-cursor-state-smoke PRIVATE -fwhole-program)
+set_target_properties(softpc-mouse-cursor-state-smoke PROPERTIES C_STANDARD 90 C_EXTENSIONS ON)
+add_test(NAME "app-softpc/unit/softpc.new/mouse_cursor_state_smoke" COMMAND softpc-mouse-cursor-state-smoke)
+set_tests_properties("app-softpc/unit/softpc.new/mouse_cursor_state_smoke" PROPERTIES LABELS "unit" TIMEOUT 15)
+list(APPEND SOFTPC_TEST_TARGETS softpc-mouse-cursor-state-smoke)
 add_executable(softpc-queue-archive-smoke test/app-softpc/unit/softpc.new/queue_archive_smoke.c)
 target_include_directories(softpc-queue-archive-smoke PRIVATE src src/app-softpc
     $<TARGET_PROPERTY:softpc-machine-devices,INCLUDE_DIRECTORIES>)
@@ -810,7 +821,7 @@ endforeach()
 foreach(target IN ITEMS softpc-bios-access-smoke softpc-machine-smoke softpc-dual-media-smoke
         softpc-partition-image-smoke softpc-pit-smoke softpc-irq-smoke
         softpc-fdc-smoke softpc-printer-smoke softpc-parallel-failure-smoke
-        softpc-serial-smoke softpc-mouse-smoke softpc-keycode-smoke
+        softpc-serial-smoke softpc-mouse-smoke softpc-mouse-cursor-state-smoke softpc-keycode-smoke
         softpc-vga-frame-smoke softpc-text-console-compat-smoke softpc-bop-smoke
         softpc-quick-time-smoke softpc-lifecycle-smoke softpc-checkpoint-smoke
         softpc-platform-failure-smoke softpc-snapshot-transaction-smoke

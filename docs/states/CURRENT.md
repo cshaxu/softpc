@@ -2,10 +2,37 @@
 
 ## Current Work
 
-No implementation subtask is active.
-T99 S41 and Td S23 are owner-accepted and closed on 2026-11-08.
-Open task awaiting owner: T99.
-No next S is admitted; T99 overall closure remains separate.
+M9 T99 S42 is verified, awaiting owner acceptance: original EGA mouse coordinates restore on all drawing outcomes.
+S41 and Td S23 remain owner-accepted and closed.
+
+## M9 T99 S42 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits S42 and authorizes audit, minimal repair, regression, publication, commit and push. |
+| Objective | Restore both temporarily scaled mouse coordinates on every return from EGA_graphics_cursor_display. |
+| Non-goals | No guest modification, driver activation, rendering rewrite, public-component change or unrelated cleanup. |
+| Reference Baseline | 2c0b0646; pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
+| Candidate Proposal | [T99 retained scope](../proposals/m9-public-handoff-simplification.md). |
+| Files And ABI Surface | mouse_io.c, source-local regression, CMake and mirror evidence/manifest; no public ABI. |
+| Applicable Rules | Execution, architecture, coding, documentation and source/research policy. |
+| Verification | Actual-function before/after cases; actual supported compile/call graph; cached x86/x64 builds and full applicable runtime/native regression. |
+| Expected Markers | One entry scaling decision, one paired restoration outside clipping; no new dispatch path. |
+| Asset Needs | Refresh both EXEs; preserve all INI, guest media and snapshots. |
+| Reporting Requirements | Distinguish compiled retained code from guest reachability, injected proof from real guest regression; report mirror diff and limits. |
+| Stop Conditions | No external code import, original guest recompilation, Computer Use, new recovery path or hiding failures. |
+| Exit Criteria | Reviewed, built, published, tested, committed and pushed; wait for owner acceptance. |
+| Original Owner Request | 准入s42处理：审计并修复原版鼠标绘制中临时坐标未恢复的问题。 |
+| Similar-Issue Sweep | Inspect jap_mouse, temporary coordinate assignments and paired restoration in mouse_io.c and adjacent cursor display/undisplay paths. |
+
+See [S42 investigation and proof](../etc/evidence/softpc/m9-t99-s42-mouse-coordinate-restoration.md).
+
+S42 used disposable build/t99-s42 with hidden jobs and a 15-minute no-progress
+review budget; all jobs have finished and scratch is removed before delivery.
+Both EXEs are published; x64/x86 each pass 197/197 cases, 394/394 total.
+The actual-function negative fails before and passes after on both architectures.
+No external repository is a build dependency.
 
 ## Current Technical Baseline
 

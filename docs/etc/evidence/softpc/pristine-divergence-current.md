@@ -1672,3 +1672,21 @@ becomes +166/-73; nt_sbmxr +70/-65 becomes +67/-65; quick_ev +303/-135 and keyba
 +418/-1214 are unchanged in count. Mirror additions+deletions decrease by 13.
 No patch is hidden by changing the upstream or selected-subset baseline.
 Verification and final delivery: [S41 evidence](m9-t99-s41-mirror-cleanup.md).
+
+
+## T99 S42: EGA mouse temporary-coordinate restoration
+
+Owner-admitted original defect repair at 2c0b0646, in the retained XP SP1
+base/keymouse/mouse_io.c EGA_graphics_cursor_display body. Capture jap_mouse
+once at entry and restore the saved Y/virtual height outside drawing eligibility.
+The drawing algorithm, clipping and original conditional/#line structure remain.
+No driver activation, product special case, clamp or alternate rendering path.
+
+The file is a real x86/x64 device compile input (EGG/VGG from host_def.h;
+V7VGA from the device target). Its historical mouse BOPs are intentionally not
+registered by this product, so ordinary guests use their own InPort drivers.
+Compiled availability is not evidence of the NTVDM64 incident occurring here.
+The source-local regression uses this actual function with real machine/video
+memory and a controlled mark callback, and reproduces the seven-call -4889
+sequence before repair. No external project's patch or test result is imported.
+See [S42 evidence](m9-t99-s42-mouse-coordinate-restoration.md).

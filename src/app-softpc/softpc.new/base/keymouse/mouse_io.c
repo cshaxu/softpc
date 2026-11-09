@@ -5760,8 +5760,9 @@ void LOCAL EGA_graphics_cursor_display IFN0()
 
         MOUSE_SCALAR saved_cursor_pos;
         MOUSE_SCALAR saved_bottom_right;
+        BOOL scaled_position = jap_mouse; /* Restore even if drawing is skipped. */
 
-        if (jap_mouse) {
+        if (scaled_position) {
                 /* fake up the mode 0x12 cursor position, saving original */
                 saved_cursor_pos=cursor_status.position.y;
                 saved_bottom_right=virtual_screen.bottom_right.y;
@@ -5917,11 +5918,11 @@ void LOCAL EGA_graphics_cursor_display IFN0()
                                 byte_offset += get_actual_offset_per_line();
                         line++;
                 }
-                if (jap_mouse) {
-                        /* put things back how they should be */
-                        cursor_status.position.y = saved_cursor_pos;
-                        virtual_screen.bottom_right.y = saved_bottom_right;
-                }
+        }
+        if (scaled_position) {
+                /* put things back how they should be */
+                cursor_status.position.y = saved_cursor_pos;
+                virtual_screen.bottom_right.y = saved_bottom_right;
         }
 #endif /* REAL_VGA */
 #endif   //NEC_98
