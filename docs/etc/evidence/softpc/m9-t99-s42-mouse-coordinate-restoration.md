@@ -203,3 +203,66 @@ Published P2 SHA-256:
 
 Owned background job completed successfully; raw scratch is removed before
 P2 delivery. Acceptance remains with the owner; T99 remains open.
+
+## P3 owner-approved unused mirror-file retirement
+
+Owner asks to delete unused nop.c, then approves vglob.c deletion after the
+XP wiring investigation. Baseline 421b2fcb. The current generated C-VID route
+is retained; no experimental direct-accessor substitution is performed.
+
+The dual-architecture object audit covers 263 non-public production objects,
+including all 228 mirror C files. Reachability starts at the non-mirror
+production boundary and follows object references, including data/function
+pointer relocations. Only nop.c and vglob.c have no reachable production
+owner; there is no additional isolated mirror-object cycle. All 476 root
+production/test C objects in each architecture have no unresolved reference
+to their 77 function symbols. Final EXE symbol checks likewise identify only
+these two mirror objects with no named code/data contribution. This is a
+whole-translation-unit audit, not a claim that every function in retained
+files executes in a guest workload.
+
+Original XP evidence: ccpu386/vglob.c provides 76 direct field accessors and
+explicitly excludes latches. The original ccpu386/sources does not compile
+it; cvidc/sources lists sinit011-013 and vglfunc instead. The five-entry
+ccpu386/evidgen.h and complete cvidc/evidgen.h are different interfaces.
+Local 3ccd67fa initially added both paths; 757053cb selected the complete
+header and added Video = C_Video, leaving direct accessors unused. The local
+bootstrap comment is not proof of an identical original XP assignment; none
+was found in the inspected mvdm C/H/ASM/INC sources. No claim is made about
+all historical/external XP build configurations.
+
+P3 removes the two entire files (38 + 452 lines), the nop.c c-files entry,
+the explicit vglob.c CMake entry and obsolete audit inventory ownership.
+All vglob.c local include/GDP patches retire with that file. The only new
+retained mirror difference is the one-line c-files source selection; the
+original XP and subset hash provenance are unchanged. The manifest now owns
+472 retained files. CPU opcode 0x90 still directly breaks in c_main.c;
+Video/C_Video and generated accessors, shared VGA storage, ABI mappings and
+snapshot paths are unchanged. No new runtime or test code is needed.
+
+P3 cached x64/x86 builds publish both EXEs and pass all tests: each has
+188/188 background and 8/8 native cases, 392/392 total, no failures/skips.
+Both incremental build logs contain zero warnings. This does not assert that
+a clean build of all retained original sources would be warning-free.
+Mirror (472 paths), documentation and the full-suite boundary gates pass.
+
+Binary comparison with 421b2fcb finds identical executable .text and all
+sections except .rdata; the changed bytes are only compiler time literals,
+PE timestamps and checksums. EXE sizes are unchanged. Timestamp refresh and
+publication gates pass. No runtime instructions changed by this retirement.
+
+Actual diff: production source/manifests +0/-491, tests +0/-0; root CMake
++0/-1; audit script +1/-1. The two removed source bodies total 490 lines.
+Relative to fixed XP, nop.c was identical and vglob.c had +2/-1 local lines;
+those retire with the files. c-files changes from +0/-8 to +0/-9. Whole-file
+retirement is not misreported as 490 lines of reduced local mirror patch.
+
+Published SHA-256:
+
+- softpc32.exe: `c18966063b29c06a72ce99ac52cbfc8683328dfff72d37c019a7dc3b08520dec`.
+- softpc64.exe: `b35b47844e9b7c8d78df0f751eb6e619a81bd7a2a61c21647ce70f31f5bdfc74`.
+
+Actual-change self-review confirms the original decoder NOP and generated
+C-VID remain the only active implementations, with no altered shared trees,
+INI, snapshot or guest media. Owned jobs completed; scratch is removed before
+delivery. S42 remains awaiting owner acceptance, T99 open.

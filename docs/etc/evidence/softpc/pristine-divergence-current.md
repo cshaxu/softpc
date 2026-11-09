@@ -1703,3 +1703,14 @@ constants; it is retained. No normal guest path registered the old BOPs.
 Snapshot wire fields remain for inactive old archives; installed old-driver
 state is rejected before any device restore. InPort remains the single
 hardware path and guest drivers remain guest-owned.
+
+## T99 S42 P3: unused NOP and direct VGLOB accessors retired
+
+Owner approves whole-file retirement of base/ccpu386/nop.c and vglob.c.
+The latter's include/GDP patches and earlier retained-ABI disposition are
+superseded: actual dual-width production/test symbol audits found no callers.
+The source manifest c-files drops only nop.c; CMake drops only vglob.c.
+This one-line source-list exception implements the approved subset selection.
+The CPU decoder handles opcode 0x90 directly. Existing generated C-VID vector,
+GDP mapping, callbacks and snapshot behavior remain unchanged. No new accessor
+implementation or runtime selection is introduced.

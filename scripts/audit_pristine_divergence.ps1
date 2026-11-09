@@ -47,7 +47,7 @@ $directPortPaths = @(
     'base\ccpu386\c_xcptn.c', 'base\ccpu386\ccpusas4.c',
     'base\ccpu386\cpu4gen.h', 'base\ccpu386\fpu.c',
     'base\ccpu386\ntstubs.c', 'base\ccpu386\ntthread.c',
-    'base\ccpu386\popf.c', 'base\ccpu386\vglob.c',
+    'base\ccpu386\popf.c',
     'base\ccpu386\zfrsrvd.c', 'base\inc\sas.h',
     'base\cvidc\ev_glue.c',
     'base\cvidc\sevid000.c', 'base\cvidc\sevid001.c',

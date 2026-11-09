@@ -75,7 +75,6 @@ mov.c
 movsx.c
 mul.c
 neg.c
-nop.c
 not.c
 or.c
 out.c

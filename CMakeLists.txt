@@ -136,7 +136,6 @@ add_library(softpc-ccpu-core OBJECT
     src/app-softpc/softpc.new/base/ccpu386/ntstubs.c
     ${SOFTPC_CCPU_DIRECT_PORT_TAIL}
     src/app-softpc/compat/ccpu/facade.c
-    src/app-softpc/softpc.new/base/ccpu386/vglob.c
     ${SOFTPC_CVIDC_RULE_SOURCES}
     src/app-softpc/softpc.new/base/cvidc/ev_glue.c
     src/app-softpc/softpc.new/base/cvidc/evidfunc.c

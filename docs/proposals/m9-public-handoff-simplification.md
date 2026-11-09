@@ -5169,3 +5169,15 @@ subset retirement, not a claim that all removed lines were local mirror diff.
 P2 completes all six retirement units with 392/392 passing tests and both EXEs
 published. Source net -6587; test net -101. See the S42 evidence for symbol,
 wire compatibility, actual review and limitations. CURRENT owns acceptance.
+
+### S42 P3 unused accessor retirement
+
+Owner approves deleting vglob.c after original-XP wiring review, together with
+the explicitly requested unused nop.c. Frozen units: both files and build
+wiring; preserve active C-VID and decoder semantics; manifest/patch retirement;
+dual cached build/publication/full regression. Estimate: -490 source lines,
+one c-files entry and one CMake entry, no new production or test mechanism.
+
+P3 completes all four units: dual EXEs published, 392/392 tests pass, code
+sections unchanged, source/list -491 lines, no test changes. CURRENT owns
+acceptance; S42 evidence records actual diff and original-source disposition.

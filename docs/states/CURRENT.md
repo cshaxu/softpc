@@ -2,7 +2,7 @@
 
 ## Current Work
 
-M9 T99 S42 P2 is verified, awaiting owner acceptance: unused legacy DOS mouse driver and runtime wiring removed.
+M9 T99 S42 P3 is verified, awaiting owner acceptance: unused nop.c and vglob.c and their build wiring are removed.
 S41 and Td S23 remain owner-accepted and closed.
 
 ## M9 T99 S42 Packet
@@ -10,30 +10,30 @@ S41 and Td S23 remain owner-accepted and closed.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner authorizes P2 whole-file retirement in current S42, including dependent wiring, builds, tests, publication, commit and push. |
-| Objective | Remove mouse_io.c and its dedicated instance/test wiring; preserve snapshot wire layout and reject installed legacy-driver archives before device mutation. |
+| Admission And Approval | Owner approves P3 retirement of vglob.c and previously explicitly requests deletion of unused nop.c; build, publish, test, commit and push in current S42. |
+| Objective | Remove unused nop.c and vglob.c with source-list wiring; retain the current generated C-VID path and decoder NOP semantics. |
 | Non-goals | No guest modification, driver activation, rendering rewrite, public-component change or unrelated cleanup. |
-| Reference Baseline | 42533c7d (P1); pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
+| Reference Baseline | 421b2fcb (P2); pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [T99 retained scope](../proposals/m9-public-handoff-simplification.md). |
-| Files And ABI Surface | mouse_io.c removal, dedicated Compat instance removal, archive compatibility, checkpoint tests, CMake and mirror manifest/ledger; no public ABI. |
+| Files And ABI Surface | nop.c and vglob.c removal, c-files, CMake, audit inventory and mirror manifest/ledger; no public ABI. |
 | Applicable Rules | Execution, architecture, coding, documentation and source/research policy. |
-| Verification | Actual compile/call graph and removed EXE symbols; archive rejection/roundtrip and InPort regression; cached x86/x64 full runtime/native tests. |
-| Expected Markers | One retained InPort hardware path; no old driver runtime or replacement stubs. |
+| Verification | Dual-width object reachability and final EXE symbols; retained CPU/video regression; cached x86/x64 full runtime/native tests and publication comparison. |
+| Expected Markers | One generated C-VID accessor path; NOP handled directly by the existing CPU decoder. |
 | Asset Needs | Refresh both EXEs; preserve all INI, guest media and snapshots. |
-| Reporting Requirements | Report whole-file subset retirement separately from local patch counts, archive compatibility, actual diff and regression limits. |
+| Reporting Requirements | Report whole-file retirement separately from local patch counts, unchanged active path, actual diff and binary comparison. |
 | Stop Conditions | No external code import, original guest recompilation, Computer Use, new recovery path or hiding failures. |
 | Exit Criteria | Reviewed, built, published, tested, committed and pushed; wait for owner acceptance. |
-| Original Owner Request | 太好了 准入s42 整个删除本文件及其接线。 P1 remains historical; P2 supersedes the repaired unused file. |
-| Similar-Issue Sweep | Scan all old driver/instance/snapshot references and build/audit inventories; preserve shared headers and the real InPort owner. |
+| Original Owner Request | nop完全没被生产调用 当然也要删了啊？ / 既然如此 那就还是应该删除吧。 |
+| Similar-Issue Sweep | Audit all 228 pre-removal mirror C files for unused whole objects and isolated reference groups; nop.c and vglob.c are the only remaining candidates. |
 
 See [S42 investigation and proof](../etc/evidence/softpc/m9-t99-s42-mouse-coordinate-restoration.md).
 
 S42 used disposable build/t99-s42 with hidden jobs and a 15-minute no-progress
-review budget; all owned jobs are finished and scratch is removed before P2 delivery.
-P2 publishes both EXEs and passes 392/392: each architecture 188 background
-and eight native tests. Legacy symbols are absent; InPort remains. Production
-net -6587, test net -101. Normal inactive legacy wire layout is unchanged;
-installed legacy-driver archives return UNSUPPORTED before device restore.
+review budget; P3 owned jobs are finished and scratch is removed before delivery.
+P3 publishes both EXEs and passes 392/392: each architecture 188 background
+and eight native tests. Production source/list net -491, test code unchanged.
+Both executable code sections are identical to P2; only build time/PE metadata
+changes. The 472-file mirror manifest passes. P2 archive compatibility remains.
 No external repository is a build dependency.
 
 ## Current Technical Baseline
