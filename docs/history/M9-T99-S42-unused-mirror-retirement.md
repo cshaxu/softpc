@@ -33,3 +33,13 @@ Closure changes documentation only; no redundant runtime rebuild is needed.
 Documentation, whitespace and build-residue checks pass. Owned scratch is
 removed; reusable caches remain. A new owner-side assets/binary/snapshot
 modification is preserved and excluded from this documentation commit.
+
+
+## P6 owner snapshot supplement
+
+Owner explicitly requests committing and pushing the current snapshot as part
+of S42. P6 includes assets/binary/snapshot unchanged (18,700,025 bytes), SHA-256
+`f519bf14842856aefd7209cac6449443ed1d6aab21358d3d6a1279303350519f`.
+This supersedes P5's exclusion of that owner modification. No source, EXE,
+configuration or other media changes; no additional runtime validation is
+claimed for this user-provided snapshot. S42 remains closed and T99 open.

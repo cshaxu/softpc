@@ -13,7 +13,7 @@ S42 final implementation 60bdbaa4 removes unused mouse_io.c, nop.c, vglob.c
 and their obsolete wiring/state. Both published EXEs pass 392/392 tests.
 Snapshots now use SCP3; older SCP2 files are rejected without compatibility.
 The retained mirror has 472 files. User media/configuration are preserved;
-a separately modified assets/binary/snapshot is outside this closure commit.
+the owner-provided assets/binary/snapshot update ships in S42 P6.
 
 
 S41 delivery ecf263a8 completes the five admitted mirror cleanup/guard units:
