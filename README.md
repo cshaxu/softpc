@@ -42,6 +42,19 @@ INI merely to try the bundled machine.
 
 ### Build from source
 
+On Windows, double-click [`tools/Build.cmd`](tools/Build.cmd) to build and
+publish both `assets/binary/softpc32.exe` and `softpc64.exe`. Put CMake, Ninja,
+ccache and both MinGW toolchains on PATH: `gcc` must target x64 and
+`i686-w64-mingw32-gcc` must target x86, with their resource/binutils tools.
+The entry uses cmd.exe and the existing CMake presets, without PowerShell.
+It reuses `build/.ninja` and `build/.ccache`, refreshes the embedded build time,
+and preserves INI, snapshots and media. Close running package EXEs before
+building. A failure stops the build; an earlier architecture may already
+have been published. The window stays open to show the result.
+
+For automation, use `tools\Build.cmd --no-pause`; its exit code is zero only
+when both architectures succeed. Tests are a separate operation.
+
 The supported source-build environment is the [MSYS2 UCRT64
 shell](https://www.msys2.org/). Install MSYS2, open **MSYS2 UCRT64**, and run:
 
@@ -86,9 +99,9 @@ repository-specific toolchain variable is required.
 
 ### Faster local Ninja route
 
-The default Makefiles presets remain the conservative package route.  For
-faster local incremental builds, Ninja uses a separate build directory and the
-same compiler and Release flags:
+The double-click entry uses the cached Ninja presets. For direct incremental
+builds without ccache, Ninja also has presets using the same compiler and
+Release flags:
 
 ```sh
 cmake --preset ninja-gcc-x64-release

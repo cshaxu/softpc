@@ -5194,3 +5194,92 @@ tests also shrink. Completion requires all four units and clean delivery.
 
 S42 is owner-accepted and closed; see [closure](../history/M9-T99-S42-unused-mirror-retirement.md).
 P4 supersedes the earlier P2 compatibility policy. T99 remains open.
+
+
+## T99 S43 double-click build entry: audited design
+
+Owner requests tools/Build.cmd to build and publish x86 and x64 with no
+PowerShell in the build chain. Baseline 6acc1193. This phase records the
+investigation and design, not a completed implementation or tested script.
+
+Current configure/build owners are CMakePresets.json and root CMakeLists.txt.
+The package presets build only softpcvm and its dependencies. CMake links
+straight into assets/binary/softpc32.exe or softpc64.exe; POST_BUILD verifies
+the freshly compiled timestamp. tools/build_cache.cmake owns build/.ninja
+and build/.ccache (5G ccache limit). No configure, compile, link or publication
+command found in the tracked CMake chain invokes PowerShell. The root CTest
+registration separately invokes build_cleanup_selftest.ps1; Clean-Build.ps1
+is the existing manual task-cleanup tool. Neither runs for a package build.
+Previous agent-owned PowerShell background runners are not a product build
+requirement and will not be called by Build.cmd.
+
+Minimal entry design, approximately 35-55 batch lines plus usage documentation:
+
+- Resolve repository root from %~dp0 and use pushd/popd; launch directory does
+  not matter. Keep paths quoted and avoid delayed expansion of user paths.
+- Check PATH for CMake, Ninja, ccache, gcc and i686-w64-mingw32-gcc. The current
+  machine has all five. MinGW resource/binutils dependencies remain part of
+  the installed compiler toolchain. Report missing tools; do not install them.
+- Sequentially configure/build the existing ninja-ccache x86 and x64 package
+  presets. Keep their eight build jobs and stable caches. Use the same presets
+  for double-click and automation; no alternate compiler/cache route.
+- Stop on the first failing command and preserve a nonzero exit code. Do not
+  claim both EXEs refreshed if only the first architecture succeeded.
+- Show the result and pause for double-click use; allow one explicit no-pause
+  option for automated invocation. Do not invoke PowerShell, copy EXEs,
+  rewrite configuration, purge caches or automatically terminate user programs.
+- Existing link failure reports an occupied EXE. There is no need to add
+  process management or transactional publication machinery.
+
+Frozen validation units: path-independent invocation; missing-tool/command
+failure propagation; x86/x64 configure/build/publication; unchanged-source
+rebuild with timestamp refresh and cache reuse; build-chain PowerShell scan;
+INI/snapshot preservation. Tests remain a separate qualification action rather
+than silently running all desktop tests on double-click. The existing cleanup
+selftest PowerShell dependency is explicitly outside this build-only entry;
+removing PowerShell from all repository maintenance/tests would be additional
+scope, not necessary for PowerShell-free compilation and publication.
+
+No source/mirror/public-component change is expected. No new framework, tool
+search registry, package installer or duplicate CMake policy is required.
+
+### S43 P1 implementation and verification
+
+Owner approves creating and testing the tool. Implemented tools/Build.cmd
+(42 lines, LF): cmd.exe only, quoted root-relative pushd, executable checks,
+existing x86 then x64 cached package presets, fail-fast preserved command
+status, default pause and --no-pause. No new build/publication/cache policy.
+README adds usage and corrects the older Makefiles-default description.
+Runtime, mirror, public source/test trees, presets and CMake are unchanged.
+
+Entry fixtures pass: missing PATH dependency -> 1; invalid extra argument -> 1;
+configure/build stub failures -> 37; quoted path containing spaces and !;
+default pause with supplied key; successful no-pause actual runs from another
+working directory. Failure fixtures use disposable tool stubs, not production
+hooks. Two real dual-architecture runs pass, without any compiler warning.
+Round one timestamps: x86 Nov 11 2026 18:12:19, x64 18:12:23; round two:
+x86 18:12:28, x64 18:12:31. Each repeat has only four steps: stamp refresh,
+composition compilation (cache bypass), archive relink and EXE link/check.
+All other existing objects are reused; no cache deletion is performed.
+
+Ninja -t commands softpcvm for both architectures contains no powershell,
+pwsh or .ps1 command. Hidden verification launch used Python -> cmd.exe,
+not PowerShell. Existing cleanup maintenance/selftest is separate and remains
+unchanged. Package integration tests pass 2/2 per architecture (4/4 total,
+no failures/skips), including compact Console. This is focused tool/package
+verification; it does not claim a fresh full runtime suite or manual mouse
+click in Explorer. Default double-click pause behavior is exercised through
+cmd.exe. All non-EXE files directly in assets/binary retain their hashes.
+
+Published SHA-256:
+
+- softpc32.exe: `563ba8dce0034c3635e3747e9565cbf026a81e2bf23e8766dd3bebb9236ea23e`.
+
+- softpc64.exe: `74512422f7e88ac4aed5789579a25e1e20cffedefa6beb1bf00a6c79a11476af`.
+
+Actual-change review confirms no hidden shell adapter or duplicate publication,
+no silent fallback, and command failures stop before the next architecture.
+A prior architecture may already be published on later failure, as documented.
+No unresolved issue was found in this bounded review. All frozen verification
+units are complete. Task-owned jobs ended and scratch is cleaned before
+commit/push; S43 waits for owner acceptance, T99 stays open.
