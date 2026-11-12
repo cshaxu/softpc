@@ -5283,3 +5283,6 @@ A prior architecture may already be published on later failure, as documented.
 No unresolved issue was found in this bounded review. All frozen verification
 units are complete. Task-owned jobs ended and scratch is cleaned before
 commit/push; S43 waits for owner acceptance, T99 stays open.
+
+S43 is owner-accepted and closed; see [closure](../history/M9-T99-S43-build-entry.md).
+T99 remains open; no subsequent S is admitted.
