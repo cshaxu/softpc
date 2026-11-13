@@ -60,14 +60,12 @@ Actual worker routines are spun off elsewhere.
 extern void force_yoda(void);
 extern void TakeNpxExceptionInt(void);
 extern void softpc_platform_executor_event(void);
-extern void softpc_platform_timer_event(void);
 extern IBOOL softpc_platform_has_pending_executor_event(void);
 extern IBOOL softpc_platform_consume_clock_tick(void);
 extern IBOOL softpc_platform_consume_executor_wake(void);
 extern IBOOL softpc_platform_consume_instruction_budget(void);
 extern void softpc_platform_pace_instruction(void);
 extern void softpc_platform_wait_for_executor_event(void);
-/* T56 port ABI: observation only; debug policy/state remains in host. */
 extern int softpc_host_debug_begin(void);
 extern void softpc_host_debug_retired(void);
 #include  <aaa.h>	/* The workers */
@@ -424,9 +422,6 @@ GLOBAL IU32 CCPU_MODE[3];	/* Current Operating Mode */
  */
 LOCAL IU32 start_trap;
 
-/* Standalone snapshot port ABI.  These are the CCPU execution values that
-   are not architectural register state and cannot be reconstructed by a
-   future c_cpu_simulate invocation. */
 GLOBAL VOID
 softpc_ccpu_snapshot_capture_execution
 IFN1(
@@ -562,9 +557,8 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
  * Note we only mask to 16 bits if the original EIP was 16bits so that
  * pigger scripts that result in very large EIP values pig correctly.
  */
-#define CCPU_INSTRUCTION_DELTA(x) ((IU32)DIFF_INST_BYTE((x), p_start))
 #define UPDATE_INTEL_IP(x)						\
-   {  IU32 len = CCPU_INSTRUCTION_DELTA(x);				\
+   {  int len = DIFF_INST_BYTE(x, p_start);				\
       IU32 mask = 0xFFFFFFFF;						\
       IU32 oldEIP = GET_EIP();						\
       if ((oldEIP < 0x10000) && (GET_CS_AR_X() == USE16))		\
@@ -575,9 +569,9 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
 /* update Intel format EIP from host format IP (mask if 16 operand) */
 #define UPDATE_INTEL_IP_USE_OP_SIZE(x)					\
    if ( GET_OPERAND_SIZE() == USE16 )					\
-      SET_EIP(GET_EIP() + (CCPU_INSTRUCTION_DELTA(x) & WORD_MASK));\
+      SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start) & WORD_MASK);\
    else								\
-      SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(x));
+      SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start));
 
 /* mark host format IP as inoperative */
 #define CANCEL_HOST_IP()					\
@@ -738,7 +732,7 @@ IFN1(
    IU32 immed;			/* For immediate generation. */
 
    ISM32 i;
-   softpc_ccpu_entry entry; /* T63 port ABI: copied CPU continuation. */
+   softpc_ccpu_entry entry;
    /*
       Initialise.   ----------------------------------------------------
     */
@@ -767,7 +761,6 @@ IFN1(
    quick_mode = FALSE;
 #endif /* SYNCH_TIMERS */
 
-   /* T63 port ABI: resume the original phase, not the completed instruction. */
    if (softpc_ccpu_lifecycle_take_entry(&entry))
       {
       if (entry.halted)
@@ -781,10 +774,8 @@ IFN1(
    goto NEXT_INST;
 
 DO_INST:
-   /* A paused debugger may change CS:EIP, code or address translation. */
    if (softpc_host_debug_begin())
       {
-      /* T99: debug edits must re-enter with slow-path trap eligibility. */
       quick_mode = FALSE;
       goto NEXT_INST;
       }
@@ -3805,7 +3796,6 @@ RESUME_HALT:
 
        while ( TRUE )
 	 {
-	 /* T63 port ABI: observe halt with IP already advanced. */
 	 softpc_ccpu_lifecycle_checkpoint(TRUE, start_trap);
 	 /* RESET ends the halt state. */
 	 if ( cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK )
@@ -3822,25 +3812,13 @@ RESUME_HALT:
 	    host_timer_event();
 	    }
 
-	 if (cpu_interrupt_map & CPU_SIGIO_EXCEPTION_MASK)
-	    {
-	    cpu_interrupt_map &= ~CPU_SIGIO_EXCEPTION_MASK;
-	    ica_sigio_event();
-	    }
-
-
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif	/* PROD */
 #line 4008
 
-         /* HLT is still an original CCPU instruction-safe
-            rendezvous.  Consume host mailbox records here
-            before the original quick-event dispatch; an
-            event wake alone must not return directly to
-            WaitForSingleObject and starve 8042 input. */
          if (softpc_platform_consume_clock_tick())
-            softpc_platform_timer_event();
+            host_timer_event();
          if (softpc_platform_consume_executor_wake())
             softpc_platform_executor_event();
          SYNCH_TICK();
@@ -4162,9 +4140,6 @@ TYPEFF_3:
     */
    softpc_host_debug_retired();
 
-   /* The original quick path skips NEXT_INST.  A standalone host
-      timer or control wake must therefore first leave quick mode,
-      then be consumed at the normal CCPU safe point below. */
    if (quick_mode && softpc_platform_has_pending_executor_event())
       quick_mode = FALSE;
 
@@ -4207,14 +4182,8 @@ TYPEFF_3:
       host_timer_event();
       }
 
-   if (cpu_interrupt_map & CPU_SIGIO_EXCEPTION_MASK)
-      {
-      cpu_interrupt_map &= ~CPU_SIGIO_EXCEPTION_MASK;
-      ica_sigio_event();
-      }
-
    if (softpc_platform_consume_clock_tick())
-      softpc_platform_timer_event();
+      host_timer_event();
 
    if (softpc_platform_consume_executor_wake())
       softpc_platform_executor_event();
@@ -4270,16 +4239,11 @@ TYPEFF_3:
  */
 
 	 IU32 hook_address;	
-	 IS32 acknowledged_interrupt;
 
-	 acknowledged_interrupt = ica_intack(&hook_address);
+	 cpu_hw_interrupt_number = ica_intack(&hook_address);
 	 cpu_interrupt_map &= ~CPU_HW_INT_MASK;
-	 /* A modern host wake can outlive the original PIC request.
-	    The original PIC rejects that stale acknowledgement with -1; it is not
-	    an IU16 vector and must not enter the external-delivery path. */
-	 if (acknowledged_interrupt != -1)
+	 if (cpu_hw_interrupt_number != (IU16)-1)
 	 {
-	    cpu_hw_interrupt_number = (IU16)acknowledged_interrupt;
 	    EXT = EXTERNAL;
 	    SYNCH_TICK();
 	    do_intrupt(cpu_hw_interrupt_number, FALSE, FALSE, (IU16)0);
@@ -4298,17 +4262,12 @@ TYPEFF_3:
 
 NEXT_INST:
 
-   /* Standalone executor mailbox: this is the original CCPU
-      instruction boundary, including quick-mode iterations. */
    if (softpc_platform_consume_clock_tick())
-      softpc_platform_timer_event();
+      host_timer_event();
 
    if (softpc_platform_consume_executor_wake())
       softpc_platform_executor_event();
 
-   /* The original CCPU quick-event contract maps one decoded
-      instruction to one microsecond.  Pace only the standalone
-      continuous executor here, outside all machine controllers. */
    softpc_platform_pace_instruction();
 
    if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&
@@ -4318,7 +4277,6 @@ NEXT_INST:
       softpc_platform_executor_event();
       }
 
-   /* T63 port ABI: capture policy stays outside the original CPU. */
 RESUME_FETCH:
    softpc_ccpu_lifecycle_checkpoint(FALSE, 0);
    CCPU_save_EIP = GET_EIP();   /* to reflect IP change */
@@ -4462,7 +4420,7 @@ LOCAL VOID
       IU32 ip_phy_addr;	/* Used when setting up IP (cf SETUP_HOST_IP) */
 
       /* update Intel IP up to end of the old page */
-      SET_EIP(GET_EIP() + CCPU_INSTRUCTION_DELTA(*q));
+      SET_EIP(GET_EIP() + DIFF_INST_BYTE(*q, p_start));
 
       /* move onto new page in host format */
       SETUP_HOST_IP(*q)
@@ -4538,10 +4496,6 @@ LOCAL VOID
       quick_mode = FALSE;
       }
 
-   /* The CPU vector declares this physical-INTR deassertion operation, but
-      the original standalone CCPU object never supplied its endpoint.  A
-      PIC line that is masked before the CPU accepts it must lower the CCPU
-      pending bit; otherwise a later reassertion is lost. */
    GLOBAL VOID
    c_cpu_clearHwInt IFN0()
       {

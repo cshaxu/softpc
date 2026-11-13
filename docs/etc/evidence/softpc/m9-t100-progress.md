@@ -653,3 +653,162 @@ pending owner decisions with explicit source/probe evidence limits. Documentatio
 and XP mirror gates pass. Owned jobs exited; scratch is removed after promoting
 these results. Source audit coverage is 79/472, 393 remaining; next file is
 80 c_main.c. S1 and T100 remain active, not ready for closure.
+
+## File 80 c_main.c: complete selected-code review, candidate P8
+
+The review uses the fixed XP file and real CCPU/Compat/Machine callers; existing
+exclusions are skipped. Initial non-excluded difference is +186/-20. Candidate
+is +135/-15, reducing XP diff by 56 lines, with no new mirror difference point.
+This is separate from production +10/-65 (including Compat -9) and test +34/-0.
+Only c_main.c, Compat platform.c and the existing checkpoint test change code.
+
+The table follows original/current source order. Anchors identify the actual
+code blocks; added blocks have no original body and are located between their
+unchanged surrounding anchors. Related blank lines and local explanation-only
+comments are restored in the same point, never counted as excluded-body work.
+
+| Point | Location / original versus local | Initial analysis and counter-review disposition |
+| --- | --- | --- |
+| R0059 | ntthread include condition | Pending owner: select original TLS simulation-stack implementation without enabling NTVDM behavior globally. The alternative retained branch is deliberately unavailable; no new thread implementation is added. |
+| R0060 | added c_addr.h | Pending owner: internal operand/address macros call the original typed address helpers. No duplicate implementation or new API. |
+| R0061 | added lifecycle.h | Pending owner: copied entry shape and lifecycle observer interface, described below. |
+| R0062 | added c_seg.h | Pending owner: original reset uses load_pseudo_descr and operand helpers use the original segment contract; avoids implicit mismatched declarations. |
+| R0063 | added ica.h | Pending owner: actual PIC acknowledge declaration and selected ABI. |
+| R0064 | added timer.h | Pending owner: original host_timer_event declaration; no separate timer implementation. |
+| R0065 | added snapshot.h | Pending owner: bounded execution-state accessors for private state. |
+| R0066 | force_yoda declaration | Pending owner: real calls in invalidFunction/note_486_instruction/SAD handling require the actual void host signature; not only excluded debug code. |
+| R0067 | TakeNpxExceptionInt declaration | Pending owner: selected NPX path calls the original void function. |
+| R0068 | executor_event declaration | Pending owner: one host callback at original CPU safe points, no device logic copied. |
+| R0069 | timer_event declaration and three calls | Restore direct original host_timer_event; remove the unnecessary Compat forwarding function. |
+| R0070 | has_pending_executor_event declaration | Pending owner: source proof for leaving the original quick loop before host events can be consumed. |
+| R0071 | consume_clock_tick declaration | Pending owner: host timer thread records work; original executor owns device mutation. |
+| R0072 | consume_executor_wake declaration | Pending owner: input/control wake must not manufacture a guest clock tick. |
+| R0073 | consume_instruction_budget declaration | Pending owner: public finite run cannot return at an arbitrary host stack location. |
+| R0074 | pace_instruction declaration | Pending owner: existing continuous-run clock policy is owned outside the CPU and is not applied to finite runs. |
+| R0075 | wait_for_executor_event declaration | Pending owner: blocked HLT needs original executor wake, without consuming CPU in a spin. |
+| R0076 | debug observer declarations/comment | Pending owner for declarations; restore explanation-only comment. Actual policy remains machine/debug.c. |
+| R0077 | interrupt_map_address after private map | Pending owner: original keyba resets this private bit map; Compat lifecycle clears pending bits at new cold run. Original reset does not clear the map; no public original clear-all operation replaces this access. |
+| R0078 | capture_execution after start_trap | Pending owner: private start_trap and interrupt_map cannot be recovered solely from architectural registers. DR/TR copies travel with the same bounded state accessor. Restore the local explanatory comment. |
+| R0079 | restore_execution | Pending owner: restores the same private state and discards transient quick_mode, so the next host-pointer fetch is rebuilt. Does not recreate device state. |
+| R0080 | CCPU_INSTRUCTION_DELTA helper | Restore original: no necessary native-pointer narrowing; pointer difference is bytes within the current decode page, not a pointer value. |
+| R0081 | UPDATE_INTEL_IP len type/expression | Restore original int len and DIFF_INST_BYTE. Page-boundary decoder resets p_start; original int can represent this bounded delta on both supported builds. |
+| R0082 | UPDATE_INTEL_IP_USE_OP_SIZE, USE16 | Restore original entire-sum mask. Local mask placement changes actual wrap behavior; dual-architecture negative/positive evidence below. |
+| R0083 | same macro, USE32 | Restore original DIFF_INST_BYTE; assignment to original IU32 EIP supplies the architectural width. |
+| R0084 | local softpc_ccpu_entry | Pending owner: carries only the saved fetch/HLT phase and trap bit. Remove inline task comment. |
+| R0085 | exception setjmp condition and dereference | Pending owner: existing TLS jmp_buf pointer must be dereferenced to the buffer expected by the compiler; preserve original setjmp lifetime inside ccpu. |
+| R0086 | take_entry before NEXT_INST | Pending owner: restored HLT must remain halted, not fetch the following instruction; fetch resume skips duplicate boundary work. Remove task comment. |
+| R0087 | debug_begin at DO_INST | Pending owner: debugger can edit CS:EIP/code while parked; original cached p/p_start must be invalidated by NEXT_INST, with quick_mode cleared so a pending TF trap is not skipped. Remove explanation-only comments. |
+| R0088 | debug_retired after POP SS | Pending owner: this original early NEXT_INST path bypasses ordinary retirement; removing it loses instruction counts and trace-stop completion. |
+| R0089 | debug_retired after MOV SS | Pending owner: same distinct original early path, without changing interrupt inhibition. |
+| R0090 | debug_retired after IRET | Pending owner: original IRET jumps directly to NEXT_INST; do not move retirement across the original interrupt/trap rules. |
+| R0091 | RESUME_HALT and HLT checkpoint | Pending owner: precise saved HLT/trap phase and outer-depth capture; original BOP recursion can remain active. Remove task comment. |
+| R0092 | added HLT SIGIO block | Restore original: selected async_handlers has only the terminating entry; full source/test search finds no other SIGIO producer. |
+| R0093 | HLT clock/wake consumers | Pending owner for consumers; use original host_timer_event and remove local explanation. Without consumption a wake returns to waiting without delivering input/devices. |
+| R0094 | HLT empty-map/quick-event wait | Pending owner: wait only when neither original interrupt map nor quick-event work can progress; actual event wait is owned by Compat. |
+| R0095 | debug_retired after STI | Pending owner: original interrupt-inhibition jump bypasses normal retirement. |
+| R0096 | normal debug_retired | Pending owner: single observer for ordinary retired instructions; four early paths above do not reach it. |
+| R0097 | quick-mode host-event escape | Pending owner: original quick loop jumps straight to DO_INST, bypassing mailbox consumption and indefinite stop/timer/input progress otherwise. Remove local comment. |
+| R0098 | added normal SIGIO block | Restore original for the same verified no-producer reason as R0092. Keep original event enum/definitions and original PIC implementation unchanged. |
+| R0099 | normal clock/wake consumers before traps | Pending owner: deliver queued host/device changes before original trap/IRQ tests. NEXT_INST also has direct-entry callers, so simply retaining only one location would change this order or omit entry work. Use original timer callback. |
+| R0100 | PIC acknowledged_interrupt/filter block | Minimize existing repair: original IU16 variable/assignment can carry valid 0..255 vectors or the converted -1 sentinel; compare with (IU16)-1 just as do_intrupt does. Remove the added signed temporary, redundant copy and explanation. Remaining filter pending owner: reject before setting EXT or performing interrupt-boundary work, not only after calling do_intrupt. |
+| R0101 | NEXT_INST clock/wake consumers | Pending owner: entry, restart and inhibited-interrupt paths reach this label without passing the normal checks. No second queue or device state owner. Use original timer callback; remove comment. |
+| R0102 | NEXT_INST pace call | Pending owner: existing host timing contract; the hook does not implement time policy in the mirror. Remove comment. |
+| R0103 | finite budget exit | Pending owner: requests the existing outer unwind only at a safe boundary, and lets pending hardware reset win. Removing it makes finite machine_run unbounded. |
+| R0104 | RESUME_FETCH/checkpoint | Pending owner: saved phase resumes before original decode setup; does not repeat pacing/budget consumption. Remove comment. |
+| R0105 | ccpu_new_code_page IP delta | Restore original expression, completing removal of the delta helper rather than leaving a divergent replacement. |
+| R0106 | init TLS condition | Pending owner: initializes the original TLS stack used by selected simulate/exception paths. |
+| R0107 | c_cpu_clearHwInt | Pending owner: original CPU vector declares this operation; actual PIC deassertion calls it. Original standalone body is missing, while c_cpu_interrupt only sets bits. Remove added explanation; retain narrow bit clear. |
+| R0108 | lifecycle_enter in c_cpu_simulate | Pending owner: counts real nested simulation frames for safe snapshot capture; no second CPU executor. |
+| R0109 | simulation setjmp condition/dereference | Pending owner: same selected original TLS buffer contract as R0085. |
+| R0110 | lifecycle_leave after simulation return | Pending owner: balances normal original unsimulate, including nested BIOS/BOP returns. |
+| R0111 | c_cpu_continue TLS condition | Pending owner: exception resumes the active original C frame, not a new interpreter path. |
+| R0112 | c_cpu_unsimulate TLS condition | Pending owner: returns through the original matching TLS simulation frame. |
+
+### Counter-review evidence and limits
+
+The original CPU executes nested host_simulate calls from BIOS callbacks; native
+C stack frames cannot be serialized as a fresh-run continuation. Existing
+checkpoint_smoke covers depth-two capture deferral, normal nested BOP return,
+outer HLT continuation, saved trap versus changed TF, fetch continuation and
+large finite budgets. Private start_trap is sampled on instruction entry and
+need not equal current TF when HLT is paused. This establishes why architectural
+register restoration alone is insufficient. These tests are existing evidence;
+new final-source qualification is reported separately below when complete.
+
+The mirror has five retirement call sites, not five retirement owners: POP SS,
+MOV SS, IRET and STI each bypass the ordinary end-of-instruction observer. All
+share machine/debug.c's existing observer. Resume refetch needs quick_mode false
+because the original quick loop skips trap/event checks. No debug policy is moved
+into the CPU. The host timer/control producers only post atomic pending work;
+removing their consumption or quick escape leaves a non-branching instruction
+stream unable to observe host input/stop/timers. HLT needs the same consumption
+before its auto-reset event wait. This is supported source-flow proof, not a
+claim that every scheduling interleaving has been replayed.
+
+The old timer wrapper's comment described a macro that is not present in the
+selected translation unit. Full source/test search finds only c_main's three
+calls and the wrapper itself. Existing original host_timer_event calls and its
+timer.h declaration are already selected; the wrapper body is exactly that call.
+Direct use removes nine Compat lines without moving device logic into c_main.
+
+Original ICA async_handlers in the selected configuration contains only its
+terminator. Its sole CPU_SIGIO_EVENT producer is inside the iteration over real
+entries, so cannot post an event. Full source/test search finds no other caller
+posting that event or modifying the table. The two added consumers have no
+supported source. The original enum/cpu_interrupt case remain unchanged; this is
+not a new feature toggle or re-audit of excluded device branches. Snapshots made
+by the supported producer cannot contain an organically posted SIGIO bit;
+forged/transplanted private snapshot state is not a supported input claim.
+
+The PIC returns -1 or a vector from its byte-sized base plus a 0..7 line. The
+existing IU16 vector therefore uniquely represents rejection as (IU16)-1.
+The minimized filter still runs before EXT/SYNCH_TICK/do_intrupt; no normal
+interrupt, callback, mask or EOI rule changes. R0057's common guard is still
+needed by the separate original NPX path; neither existing guard is replaced
+with an extra delivery route.
+
+### Real-CCPU IP restoration experiment
+
+A task-local native probe reuses the actual machine objects, device mock owners
+and original firmware already used by checkpoint_smoke. It installs only its
+own instruction bytes into disposable emulated RAM and uses a task-owned blank
+boot fixture; no user guest binary/media is changed or recompiled. The first
+setup omitted the required boot medium and failed machine creation in all four
+variants; that setup result is not CPU evidence. The corrected fixture runs the
+actual CCPU for one JNZ instruction (two budget boundaries), not an extracted
+arithmetic substitute. One linked variant uses the current CCPU; the other
+replaces only the five IP-macro changes with exact XP expressions in an isolated
+c_main object. Both reuse the same remaining production library.
+
+Per architecture, 24 cases cover starts 0xFFE, 0xFFF, 0xFFFC, 0xFFFD, 0xFFFE,
+0xFFFF; taken/not-taken JNZ with zero displacement; default 16-bit and 0x66
+operand override. Current x86 and x64 each produce 2/24 mismatches: default
+16-bit not-taken cases at FFFE/FFFF yield 10000/10001 instead of 0/1. Original
+expressions produce 0/24 mismatches on each architecture. Page crossings,
+taken paths and 32-bit override cases agree. Pointer subtraction is a bounded
+decode-byte count; the selected page decoder advances EIP and resets p_start at
+page crossings, so there is no evidence requiring the added narrowing helper.
+This does not claim coverage of every branch encoding, protected-mode paging,
+or all CPU flags. The existing checkpoint test gains the same 24 cases with
+explicit expected next-IP values, independent of implementation formulas.
+
+P8 final-source qualification on 2026-11-13 completed both cached builds and
+both publications. x86 and x64 each pass 188 background and eight native
+integration tests: 392/392 fresh passes, all six command exits zero. The
+checkpoint regression includes the 24 new real CCPU cases per architecture;
+existing IRQ, snapshot, debug, package, Console/Window and audio tests pass.
+Runtime behavior changes, so no artifact-equivalence exemption is used.
+These tests do not claim fresh manual DOS/Win3.1/Win95 desktop acceptance.
+
+Coordinator actual-diff review confirms the changes restore original expressions
+and direct callbacks, preserve checkpoint/debug/budget and invalid-vector
+contracts, introduce no new mirror diff point, and leave public packages,
+user configuration, media and snapshots untouched. The existing mirror manifest
+is refreshed for c_main.c only. Reviewed residuals remain owner decisions,
+not approved retention. File coverage is 80/472; next is c_main.h.
+
+Published artifact SHA-256:
+
+- softpc32.exe: `137d17620d0012bf2f7ad0710dd9d59ea94a7246b08591856b76d273da98b832`.
+
+- softpc64.exe: `f3df955dd5046d539d6ecf7340686f96030a743926bccc4f1dc79ef3b4daeea6`.

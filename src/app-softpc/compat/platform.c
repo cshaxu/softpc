@@ -666,15 +666,6 @@ void host_timer_event(void)
     softpc_platform_executor_event();
 }
 
-/* c_main.c's original SFELLOW compatibility branch deliberately defines its
- * historical host_timer_event() token away.  The detached executor consumes
- * a real host-clock mailbox, so expose an unambiguous standalone port rather
- * than changing the original CCPU macro or touching any device controller. */
-void softpc_platform_timer_event(void)
-{
-    host_timer_event();
-}
-
 void softpc_platform_executor_event(void)
 {
     if (softpc_executor_callback != NULL)

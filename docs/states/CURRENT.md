@@ -30,12 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P7 restores three nonsemantic added lines in c_bsic.h/c_intr.c:
-source +0/-3, mirror diff reduced by three lines without new points. Both
-published EXEs equal P6 except verified PE fields and fresh compiler date/time;
-P4's 392/392 remains the runtime baseline. Source review is 79/472; file 80
-c_main.c is next. Evidence-qualified residuals remain pending owner decisions
-in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P8 restores original c_main.c IP calculations, removes unproduced
+SIGIO consumption and a redundant Compat timer wrapper, and minimizes the PIC
+rejection guard. Production +10/-65; tests +34/-0; XP-relative mirror diff
+reduces by 56 lines without new points. Both published EXEs pass 392/392
+fresh tests. Real CCPU before/after tests prove the restored 16-bit IP wrap.
+Source review is 80/472; file 81 c_main.h is next. Evidence-qualified residuals
+remain pending owner decisions in the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
