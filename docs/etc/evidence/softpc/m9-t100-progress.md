@@ -1676,3 +1676,159 @@ aggregate-timeout/retry result, not a proven scheduler root cause or a first-pas
 - P21 softpc32.exe SHA-256 `e5c60f60ae2c402eb3e6fbb3ebca0acd4e2eabd9032988d75facb9aa8c8b390a`.
 
 - P21 softpc64.exe SHA-256 `ae2a1ba32a8407b09ae01a5d98de6eb0beaf0dc6a0b4091b86bfe4f18e5d09c1`.
+
+## File 267 com.c: investigation in progress after P21
+
+All in-scope differences were enumerated against fixed XP after masking existing
+#error bodies from comparison; those bodies receive no ledger entries. Actual
+code is the original UART controller, backed by Compat host_com_ioctl.
+The latter receives lib_iptr and writes an int through the supplied address.
+Windows x64 long is 32-bit; original casts therefore cannot carry the address
+of a normal high-address local. Actual production-command comparisons compile
+and link the existing serial_smoke executable with current/original-cast com
+objects, not a replacement controller or a changed guest.
+
+| Architecture/candidate | Actual serial test result |
+| --- | --- |
+| x86 current | Pass |
+| x86 all three original long casts | Pass |
+| x64 current | Pass |
+| x64 all three original long casts | Access violation, exit 3221225477 |
+| x64 only com_flush_input cast restored | Access violation, exit 3221225477 |
+| x64 only com_inb follow-up-input cast restored | Pass; current test does not establish branch coverage |
+| x64 only modem_change cast restored | Access violation, exit 3221225477 |
+
+The middle call requires a previously data-ready RX byte and non-loopback
+read. Source tracing identifies that precise condition; no dynamic claim is
+yet made for it. Compat receive storage starts empty and has no live native
+serial receive thread, so its availability must not be fabricated as an observed
+normal product input. Existing snapshot restore can carry receive data.
+
+Other candidates: duplicate recv_char/do_wait_on_send declarations; whitespace
+and directive-comment changes; copied copyright notice; snapshot include and
+controller/callback serialization. Snapshot state is private original UART
+registers, interrupt reasons, pacing and callback identity; existing snapshot
+tests exercise controller capture/restore, but that alone is not a coherent
+original-restoration negative. Complete state/callback necessity and exact
+nonsemantic restoration are still under investigation. No file-267 production
+change has been made and file 267 is not counted as audited or delivered.
+
+File 267 RX follow-up evidence: extend the existing checkpoint device-archive
+fixture using its existing serial host state. Finish original first-read flush,
+restore one byte (51h) into the finite host RX state, invoke original
+com_recv_char, then read COM1 data via inb. This reaches data-ready/non-loopback
+follow-up input query without inventing a live external serial driver. Current
+checkpoint passes both x86/x64. Linking the same test with only that second
+com.c cast restored to long causes x64 exit 3221225477. Together with the
+previous independent flush/modem tests, all three pointer casts have direct
+x64 negative evidence. This is a restored-state/control-path test, not proof
+that today's virtual endpoint receives live physical serial traffic.
+
+The changed checkpoint test is pending complete-file qualification and has not
+been delivered. The UART snapshot/callback and original formatting review
+remains active; no P22 or file-267 completion is claimed.
+
+## P22 file 267: original UART formatting and duplicate declarations
+
+Completed-file review uses fixed XP SP1, the actual original UART compilation
+and callers in Compat serial, the original event queue and device archives.
+The excluded bodies remain untouched and receive no accounting. Existing
+#line directives are byte-for-byte unchanged. The remaining selected differences
+are the relocated historical notice, snapshot header/state/callback extension,
+and three pointer-width corrections. No Compat substitute or new path is added.
+
+Initial analysis considered removing the snapshot extension. Counter-review:
+UART registers, interrupt causes, critical counters, pacing and flush mask are
+private controller state. Original reads consume RX/status/interrupt state;
+replaying writes invokes host output and scheduling, so register replay cannot
+replace direct restoration without different behavior. Existing device archive
+regression mutates/restores these actual fields. The added receive regression
+restores finite host RX bytes 51h/52h, invokes original com_recv_char, reads 51h
+through inb, and captures the remaining original queued receive callback.
+Both widths pass. A coherent archive variant omitting serial callback encoding
+and decoding rejects that actual capture (x86 3221226505, x64 3, assertion at
+pending archive capture). This is a real controller/queue/archive negative,
+not undefined-symbol evidence. No live external serial endpoint is claimed.
+The initial isolated archive compilation used the wrong quoted snapshot.h;
+that probe was discarded, original quote-search ordering restored, and both
+negative controls were then built and executed successfully.
+
+Three retained pointer conversions have independent x64 access-violation
+controls, exit 3221225477: flush input, data-ready read follow-up and modem
+query. x86 original-cast/current checks pass. These and the snapshot residual
+are evidence-qualified existing differences pending owner decision, not newly
+approved additions. The historical notice remains under source policy.
+
+Remove duplicate recv_char/do_wait_on_send declarations and the added long
+explanatory comment; exact XP formatting/directive suffixes are restored.
+Before/after objects compiled from the actual production commands are byte
+identical on both architectures. Both directive lists (#line and #error) are
+unchanged; no claim of reauditing excluded bodies is made. Exact original
+whitespace restoration intentionally brings back one tab-only line at local
+2172, reported by git diff --check; it is not stripped again to create a new
+XP formatting difference. Original #endif NTVDM suffixes also remain original.
+
+Selected-scope SequenceMatcher accounting (autojunk=False, #line omitted,
+existing excluded bodies masked symmetrically): +156/-19 in 33 differing blocks
+becomes +126/-3 in 6 blocks: XP diff decreases 46 lines and 27 points.
+Tracked production is +18/-32 (net -14); checkpoint test +19/-0.
+Qualification and delivery are pending; no full-pass claim yet.
+
+P22 complete selected-point ledger. Ranges are physical lines in pinned XP
+and pre-P22 local source; insertion/deletion anchors are explicit. These are
+non-excluded differences only. Counter-review is the final column.
+
+| Point | XP range | Before range | Initial analysis | Counter-review/disposition |
+| --- | --- | --- | --- | --- |
+| R0173 | before 15 | 15-15 | Historical notice relocated | Retain existing notice under source policy; no source-ownership change. |
+| R0174 | before 58 | 57-57 | Added snapshot declaration dependency | Required by the private state extension below; evidence-qualified pending decision. |
+| R0175 | before 71 | 73-73 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0176 | before 88 | 91-91 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0177 | 126-126 | before 97 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0178 | before 290 | 255-380 | Private UART snapshot/callback extension | Actual controller archive plus queued-callback negative; strip added long comment, retain minimal existing extension pending decision. |
+| R0179 | before 307 | 399-401 | Duplicate callback prototypes | Restore original absence; both final objects identical. |
+| R0180 | before 680 | 644-644 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0181 | 698-698 | 663-663 | Pointer widened from original long | Independent actual x64 access violation on original cast; pending decision. |
+| R0182 | 752-752 | 707-710 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0183 | 754-754 | before 713 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0184 | before 1155 | 777-777 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0185 | 1180-1180 | before 783 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0186 | 1200-1200 | 790-790 | Pointer widened from original long | Independent actual x64 access violation on original cast; pending decision. |
+| R0187 | 1313-1322 | before 866 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0188 | before 1325 | 869-871 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0189 | 1538-1538 | 977-977 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0190 | 1548-1550 | before 988 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0191 | before 1553 | 991-993 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0192 | 1743-1743 | 1128-1128 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0193 | before 1768 | 1143-1143 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0194 | 1769-1769 | before 1146 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0195 | 1932-1932 | 1251-1251 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0196 | before 2060 | 1269-1269 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0197 | 2116-2116 | before 1275 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0198 | before 2313 | 1350-1350 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0199 | 2353-2353 | 1376-1376 | Pointer widened from original long | Independent actual x64 access violation on original cast; pending decision. |
+| R0200 | before 2763 | 1641-1641 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0201 | before 2798 | 1671-1671 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0202 | 2799-2799 | before 1674 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0203 | before 2837 | 1700-1700 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0204 | before 3550 | 2180-2181 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+| R0205 | 3554-3555 | before 2187 | Whitespace or directive suffix differs | Restore exact XP; both final objects identical. |
+
+P22 final-source qualification: x86 and x64 cached builds/publication pass;
+each passes 188 background and 8 native desktop/audio/package tests (392 total).
+Mirror/documentation gates pass. No retry was required this batch. Build warnings
+are confined to original mirror sources, including two restored XP #endif
+suffix warnings; no shared/Compat/test warning was introduced. No manual
+DOS/Windows guest or physical serial endpoint acceptance is claimed.
+
+Coordinator actual-diff review confirms the existing single UART/state owner,
+no new production branch/API, private callback lifetime unchanged, unchanged
+#error/#line directives, CRLF mirror and LF owned source/docs. The original
+whitespace exception to diff --check is identified above. No unrelated file,
+configuration, media, guest, snapshot or shared-package change is included.
+Ordered reviewed files now 267/472; next is base/comms/printer.c (268).
+Evidence-qualified existing residual decisions remain open; S1/T100 not closed.
+
+- P22 softpc32.exe SHA-256 `dd201db674a275cff565549fade15f8a8e79944794037d44db1ef5988cf9fd17`.
+
+- P22 softpc64.exe SHA-256 `780d2da88e82747241eb07c46431c403ebd9d64345c4288f4cdd5268eabf57e8`.

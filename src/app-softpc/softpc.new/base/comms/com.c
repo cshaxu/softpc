@@ -71,7 +71,6 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
 #endif
 #line 70
 
-
 /*
  * =====================================================================
  * The rs232 adaptor state
@@ -88,12 +87,12 @@ LOCAL UTINY selectBits[4] = { 0x1f, 0x3f, 0x7f, 0xff } ;
  *	These variables are used to prevent multiple quick events or batches
  *	running at once on a single adapter.
  */
-
 #line 88
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
 #line 127
+
 static struct ADAPTER_STATE
 {
 	BUFFER_REG tx_buffer;
@@ -257,11 +256,6 @@ GLOBAL void recv_char IPT1(long, adapter);
 static void do_wait_on_send IPT1(long, adapter);
 extern IBOOL tx_pacing_enabled;
 
-/*
- * DIVERGENCE(MVDM-SERIAL-SNAPSHOT-001): export only the selected UART's
- * fixed semantic registers for the standalone snapshot boundary.  Host
- * endpoint buffers belong to compat/serial.c; no host pointer is exported.
- */
 int
 softpc_device_snapshot_encode_serial_callback(callback, callback_id)
 Q_CALLBACK_FN callback;
@@ -396,9 +390,6 @@ const softpc_device_serial_controller_state *state;
 
 /* Control TX pacing */
 IBOOL tx_pacing_enabled = FALSE;
-
-GLOBAL void recv_char IPT1(long, adapter);
-static void do_wait_on_send IPT1(long, adapter);
 
 /*
  * =====================================================================
@@ -641,7 +632,6 @@ static void clear_interrupt IFN1(struct ADAPTER_STATE *, asp)
 
 
 
-
 /*
  * =====================================================================
  * The Adaptor functions
@@ -704,12 +694,11 @@ static void do_wait_on_send IFN1(long, adapter)
 	set_xmit_char_status(asp);
 	host_com_send_delay_done(adapter, TX_delay[asp->com_baud_ind]);
 }
-#endif /* NTVDM */
+#endif
 #line 751
-
-
 #endif // NEC_98
 #line 755
+
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -774,12 +763,12 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 				 */
 				if (adapter_was_critical)
 				{
-
 #line 1155
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
 #line 1181
+
 #ifndef NTVDM
 #line 1182
 #ifdef IRET_HOOKS
@@ -863,12 +852,12 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 		break;
 	
 	case RS232_LCR:
-
-
 #line 1313
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif
+
+
 #line 1325
 		*value = asp->line_control_reg.all;
 #ifdef SHORT_TRACE
@@ -974,7 +963,7 @@ void com_inb IFN2(io_addr, port, half_word *, value)
 #line 1536
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif NTVDM
 #line 1539
 }
 
@@ -985,12 +974,12 @@ void com_outb IFN2(io_addr, port, half_word, value)
 	struct ADAPTER_STATE *asp = &adapter_state[adapter];
 	int	i;
 
-
-
 #line 1548
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif NTVDM
+
+
 #line 1553
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
@@ -1125,7 +1114,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #line 1715
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
-#else
+#else /* !(NTVDM && FIFO_ON) */
 #line 1744
 	case RS232_IIR:
 		/*
@@ -1140,9 +1129,9 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #endif
 #line 1767
 		break;
-
 #endif /* NTVDM && FIFO_ON */
 #line 1770
+
 	case RS232_LCR:
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
@@ -1248,7 +1237,7 @@ void com_outb IFN2(io_addr, port, half_word, value)
 #line 1930
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif
 #line 1933
 }
 #endif // NEC_98
@@ -1266,12 +1255,12 @@ void com_outb IFN2(io_addr, port, half_word, value)
  * =====================================================================
  */
 
-
 #line 2060
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
 #line 2117
+
 #ifdef  NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else /* NTVDM */
@@ -1346,7 +1335,6 @@ recv_char IFN1(long, adapt_long)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
 #line 2311
-
 
 /*
  * One of the modem control input lines has changed state
@@ -1638,7 +1626,6 @@ static int no_valid_latches =
 #line 2760
 
 
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else // NEC_98
@@ -1668,9 +1655,9 @@ static void set_baud_rate IFN1(int, adapter)
 
 	com_flush_input(adapter);
 
-
 #ifndef NTVDM
 #line 2800
+
 	/*
 	 * Check for valid divisor latch
 	 */
@@ -1697,7 +1684,6 @@ static void set_baud_rate IFN1(int, adapter)
 }
 #endif // NEC_98
 #line 2836
-
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
@@ -2177,13 +2163,13 @@ static void com_reset IFN1(int, adapter)
 	 */
 	asp->int_enable_reg.all = 0;
 
-
-	
 #line 3550
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
 #line 3556
+
+	
 	asp->int_id_reg.all = 0;
 	asp->int_id_reg.bits.no_int_pending = 1;
 	

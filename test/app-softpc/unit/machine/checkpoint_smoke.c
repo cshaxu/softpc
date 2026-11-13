@@ -714,6 +714,25 @@ static void verify_controller_archives(void)
     outb(0x3fbu, 0x1bu);
     assert(softpc_device_snapshot_capture_serial_controller(&serial_saved));
     assert(softpc_device_snapshot_capture_serial_host(&serial_host_saved));
+    {
+        half_word received;
+        extern void com_recv_char(int adapter);
+        inb(0x3f8u, &received); /* Finish the original first-read flush. */
+        serial_host_saved.port[0].rx[0] = 0x51u;
+        serial_host_saved.port[0].rx[1] = 0x52u;
+        serial_host_saved.port[0].rx_count = 2u;
+        assert(softpc_device_snapshot_restore_serial_host(&serial_host_saved));
+        com_recv_char(0);
+        inb(0x3f8u, &received); /* Data-ready -> follow-up input query. */
+        assert(received == 0x51u);
+        {
+            softpc_device_archive *pending = softpc_device_archive_create();
+            assert(pending != NULL && softpc_device_archive_capture(pending));
+            softpc_device_archive_dispose(pending);
+        }
+        assert(softpc_device_snapshot_capture_serial_controller(&serial_saved));
+        assert(softpc_device_snapshot_capture_serial_host(&serial_host_saved));
+    }
     outb(0x3f8u, 0u);
     outb(0x3fbu, 0u);
     assert(softpc_device_snapshot_restore_serial_controller(&serial_saved));

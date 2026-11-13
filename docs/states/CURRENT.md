@@ -30,13 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P21 restores original zfrsrvd declarations/signature. The private
-NPX snapshot access remains evidence-qualified pending owner: coherent removal
-fails actual snapshot/delivery checks on both architectures. Production +2/-7;
-tests +10/-0; XP diff decreases nine lines and six points. Final-source dual
-build/publication passes; all 392 tests pass after one x86 verifier timeout
-and successful unchanged-budget retry (recorded in evidence). Sequential review is 266/472;
-file 267 com.c is next.
+T100 S1 P22 restores original UART formatting and removes duplicate declarations
+in com.c. Production +18/-32; tests +19/-0. XP-relative selected diff decreases
+46 lines and 27 points. Both production object files are byte-identical before/
+after. Three pointer corrections and private UART snapshot/callback state remain
+evidence-qualified pending owner decision, supported by actual negative controls.
+Final-source cached dual build/publication, 392 tests and mirror/documentation
+gates pass without retry. Original mirror warnings remain, including restored
+XP directive suffixes; one exact-original whitespace line is documented.
+Sequential review is 267/472; next is base/comms/printer.c (268).
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
