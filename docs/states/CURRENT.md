@@ -30,19 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P55 restores ten native-address expressions and 25 malloc calls in
-file 307 sevid024.c. Production +35/-35 (net zero); permanent test code
-unchanged. XP diff decreases 995 -> 975 lines. Continuous ranges increase
-400 -> 406 solely because exact restoration splits existing ranges; owner
-confirms this is not an increase in actual difference points. Native GDP,
-capacities and seven mixed-width initializations remain qualified decisions.
-Actual-body current/full-restoration/poison controls pass both widths over
-132 cases with identical output; removing initialization or native capacity
-fails on x64, while x86 passes. Both EXEs are freshly built/published;
-392/392 pass first full run. Original switch warning unchanged. Actual diff
-review and source identity pass. Sequential review is 307/472; next file 308
-base/cvidc/sevid025.c after correcting the two P39/P40 range-count retentions. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P56 corrects the two P39/P40 range-count retentions in files 292/293,
+sevid009.c and sevid010.c. Both native-address lines now match pinned XP.
+Production +2/-2 (net zero); no permanent test code change. Fixed original-line
+correspondence proves four fewer replacement-diff lines. Heuristic ranges and
+line totals realign in repetitive generated code; those artifacts are not
+counted as extra cleanup. Existing ABI residuals remain qualified decisions.
+Current/candidate actual bodies pass 576 independent pixel cases on x86/x64.
+Both EXEs are freshly built/published; full regression 392/392 passes first
+run. Original switch warnings unchanged. Actual diff, source identity and
+gates pass. The frozen frontier remains 307/472; next file 308 sevid025.c.
+See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 

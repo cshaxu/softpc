@@ -1978,3 +1978,14 @@ body controls cover 132 cases per width/version; no new guest acceptance.
 See [P55 audit](m9-t100-progress.md#file-307-sevid024c-p55),
 [range map](m9-t100-sevid024-points.tsv) and
 [allocation inventory](m9-t100-sevid024-allocations.tsv).
+
+### T100 S1 P56 correction of counting-only retentions
+
+Restore sevid009.c line 2780 and sevid010.c line 3228 to their pinned XP
+counterparts (R0308/R0312). This supersedes P39/P40's retention solely to avoid
+contiguous-range fragmentation. No address-adapter calls remain in either file.
+Production +2/-2; two differing locations/four replacement-diff lines removed
+under fixed original-line correspondence. Heuristic realignment is disclosed
+in the evidence, not claimed as additional cleanup. Both widths pass 576
+independent pixel cases before/after and the full 392-test regression.
+See [P56 evidence](m9-t100-progress.md#p56-correction-revisit-files-292293-sevid009c-and-sevid010c).

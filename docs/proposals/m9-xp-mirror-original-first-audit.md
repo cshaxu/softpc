@@ -45,6 +45,10 @@ introducing any new difference. Report ranges transparently, but do not retain
 unnecessary adaptations merely to prevent this fragmentation. Prefer exact
 original restoration; verify changed locations and added/deleted diff lines.
 The prohibition on new unjustified mirror differences remains in force.
+Repeated generated lines can also change heuristic alignment and displayed
+line totals. When a fixed original correspondence is provable, report that
+anchored count alongside heuristic output; do not claim alignment artifacts
+as restored code.
 
 ## Original-defect decision ownership
 

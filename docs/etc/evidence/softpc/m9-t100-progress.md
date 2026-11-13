@@ -4705,3 +4705,96 @@ base/cvidc/sevid025.c after the recorded P39/P40 correction revisit. S1 remains 
 P55 process inventory confirms no owned worker remains. Task scratch was
 previewed and removed via Clean-Build; residue verification passes. Persistent
 caches, user configuration, media and snapshots remain untouched.
+
+## P56 correction revisit: files 292/293, sevid009.c and sevid010.c
+
+Owner's P55 clarification requires correcting two prior range-count decisions.
+This revisits R0308/R0312 without renumbering or advancing the frozen file
+frontier (307/472). No excluded bodies or already proven ABI residuals are
+re-audited. P39/P40 remain historical records; their counting-based retention
+of these two wrappers is superseded by this correction.
+
+| Existing point | Restored location | Actual source proof |
+| --- | --- | --- |
+| R0308 | sevid009.c line 2780, XP line 2779, S2405 byte write | r21 is native sr_lookup (GDP field 1328) plus a bounded nibble index times four. Restore the original IU32 dereference; it is not a GDP offset identity. |
+| R0312 | sevid010.c line 3228, XP line 3227, S2425 word write | r20 is native VGA_wplane (GDP field 1288) plus the guest offset expanded by four and advanced to the second word. Restore the original IU32 store, matching the preceding store's existing path. |
+
+Exactly two lines change (+2/-2, net zero), each matching the pinned XP
+line verbatim. Both files now contain no softpc_gdp_rule_address call.
+No allocation, initialization, algorithm, continuation, public interface,
+permanent test source or guest input changes. Native GDP field mappings and
+previously justified allocation adaptations are unaffected.
+
+### Metrics: fixed original-line correspondence versus heuristic matching
+
+These two files have exactly the XP line count plus the native GDP include
+at line 3. Removing that include for comparison establishes a fixed one-to-one
+original line correspondence throughout each file; this is not a semantic
+normalization or removal of local patch content from the metric. Count the
+include itself separately as one added line.
+
+| File | Anchored changed-line pairs | Anchored added+deleted lines, include counted | SequenceMatcher ranges | SequenceMatcher added+deleted lines |
+| --- | --- | --- | --- | --- |
+| sevid009.c | 436 -> 435 | 873 -> 871 | 342 -> 343 | 873 -> 871 |
+| sevid010.c | 774 -> 773 | 1549 -> 1547 | 608 -> 632 | 1713 -> 1547 |
+
+Actual restoration removes two changed locations/four replacement-diff lines.
+The apparent heuristic reduction of 168 lines includes 164 lines of matching
+realignment in repetitive generated code; it is not claimed as additional
+cleanup. Likewise, the 25 added contiguous ranges are not new differences.
+Original anchored content, changed lines and metrics remain independently
+checkable against the fixed XP commit. Historical heuristic totals are retained
+as such, not silently rewritten into anchored totals.
+
+### Actual-body verification
+
+The existing initialized VGA fixture is extended only in task scratch. Current
+and candidate versions of both actual compilation units are explicitly linked
+before the archive. Real unchained_evid entries select S2405 byte write and
+S2425 word write. Each of four runs (x86/x64, current/candidate) passes 576
+independent full-plane pixel cases: 16 low-nibble values (complementary high
+nibble for WORD), three masks, three plane-enable patterns, two address
+parities and both operations. Assertions cover the second WORD's destination
+and untouched bytes, not merely successful return or repeated output. Existing
+VGA assertions also pass. This tests these address restorations, not every
+VGA mode or new interactive DOS/Win3.1/Win95 acceptance.
+
+Original switch-unreachable warnings at lines 537 and 909 appear before and
+after on both architectures. No new warning is introduced. Both production
+files equal their tested candidates and retain CRLF. Normalized-LF hashes:
+
+- sevid009.c: 6578f99fc8aab76d6ae111b7bee5aa7246fbcdceacc8907e7ef53a2dc51aeaee.
+
+- sevid010.c: 97ce0562d31d38ff53032150d1eb37fa6ac30ec2e6ac41a9726002a983a285f8.
+
+Cached dual builds, publication and full qualification are running. The
+correction is not delivered until qualification and actual-diff review pass.
+
+### P56 final qualification and actual-change review
+
+Both cached builds/publications pass. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first full run**, no retries or
+budget changes. Only the existing original switch warnings remain unchanged.
+
+- x86-build: 9.08 seconds, exit 0.
+- x86-background: 132.09 seconds, exit 0.
+- x86-native: 25.03 seconds, exit 0.
+- x64-build: 12.1 seconds, exit 0.
+- x64-background: 150.13 seconds, exit 0.
+- x64-native: 28.03 seconds, exit 0.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 11:29:30;
+SHA-256 59ad3d1655f6ba9d7de9380bd0c9e5be46941898992b07c83a892d9d8c08f6cc.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 11:32:16;
+SHA-256 dee06db2ac1d3f9931d2d4421e47f462a4c94bc61e9d156351055a8abe274b2b.
+
+Actual-change review verifies exactly two XP-original line restorations,
+matching the tested files. Public components, permanent tests, INI, media and
+snapshots are unchanged. Both P39/P40 counting-only retentions are corrected.
+The frozen frontier remains 307/472; resume at file 308 sevid025.c. S1 and
+qualified residual decisions remain open; no new guest acceptance is claimed.
+
+P56 process inventory confirms all owned jobs exited. Task scratch was
+previewed and removed via Clean-Build; residue verification passes. Reusable
+caches, configuration, media and snapshots are preserved.
