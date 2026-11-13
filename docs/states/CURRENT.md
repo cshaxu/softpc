@@ -30,18 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P45 restores 111 native-address expressions and 21 malloc sites in
-file 297 sevid014.c. Actual GDP mapping, native capacities and eleven mixed-width
-zeroed move locals remain qualified residuals. Production +132/-132 (net zero);
-tests unchanged. XP diff decreases 1793 -> 1587 lines and 678 -> 591 ranges.
-Actual-body controls pass 1248 backward WORD-copy captures per architecture,
-including eight independent zero-mask cases; original four-byte capacities
-corrupt the x64 heap. Both EXEs are freshly built/published; all 392 registered
-tests qualify after an isolated x64 verifier-negative retry at the unchanged
-budget; the initial aggregate timeout is recorded. Original mirror warning remains; no new
-warning appears. Actual review, source identity and gates pass. Sequential review
-is 297/472; next is file 298 base/cvidc/sevid015.c. Qualified residuals and
-pending original defects remain distinct in the
+T100 S1 P46 restores 82 native-address expressions and 24 malloc sites in
+file 298 sevid015.c. GDP mapping, native capacities and eight mixed-width zeroed
+move locals remain qualified residuals. Production +106/-106 (net zero);
+tests unchanged. XP diff decreases 1429 -> 1277 lines and 547 -> 519 ranges.
+Actual-body controls pass 960 captures per architecture, including 240
+independent zero-count cases; original four-byte capacities corrupt the x64
+heap. Both EXEs are freshly built/published; 392/392 pass on the first full run.
+The original mirror switch warning remains; no new warning appears.
+Actual review, source identity and gates pass.
+Sequential review is 298/472; next is file 299 base/cvidc/sevid016.c. Qualified
+residuals and pending original defects remain distinct in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no routine approval is awaited to continue ordered auditing.
 

@@ -3785,3 +3785,79 @@ is inferred from the retry.
 P45 actual process inventory confirms all task workers exited. Exact disposable
 scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
 user configuration, media and snapshots remain intact.
+
+## P46 file 298 sevid015.c audit and restoration
+
+Initial review: R0332 restores 82 native source/plane/table address expressions;
+R0333 retains original GDP offset to native-field translation. R0334 retains
+native allocation sizes and zeroing in eight outer BYTE/WORD moves:
+S2576/S2579/S2581/S2584/S2586/S2589/S2591/S2594. Their LocalIUH[1] is
+written through IU32 and read through IUH in the RAM-source arm. R0335 restores
+malloc in the other 24 allocations. This changes 106 lines (+106/-106, net zero).
+No production helper, alternative route, shared component or test source changes.
+
+Counter-review: reversing the enumerated ABI forms reproduces the fixed XP
+full token stream, not just selected hunks. CMake selects sevid015.c through its
+C-VID source set; evidfunc registers the BYTE/WORD/DWORD moves. Source-derived
+buffer addresses originate in native source, plane and expansion-table pointers;
+GDP operands retain their separate field mapping. Original copy loops, callback
+order and continuation behavior are not rewritten. The
+[547-range map](m9-t100-sevid015-points.tsv) and
+[32-allocation inventory](m9-t100-sevid015-allocations.tsv) account for all
+initial differences. Existing ABI residuals remain pending owner decisions.
+
+XP diff initially +715/-714 (1429 lines), 547 ranges; candidate +639/-638
+(1277 lines), 519 ranges: 152 fewer diff lines and 28 fewer ranges. Counts use
+full-file SequenceMatcher with autojunk disabled, independently of source LOC.
+
+Actual-body unchanged/minimal/poison controls pass on both architectures.
+Each captures 960 cases across eight BYTE/WORD copy helpers, RAM/video,
+three masks, counts 0/1/2/7, parity and four single-plane shifts. 240 zero-count
+cases independently assert that the full destination buffer remains untouched;
+nonzero cases establish preservation, not an exhaustive hardware oracle.
+Existing CHAIN2 controls pass 96/96. No complete outer-move matrix or new
+interactive guest reproduction is claimed. Poison fills the 24 restored malloc
+sites with 0xa5, retaining the eight mixed-width calloc sites.
+
+All successful capture files contain 3932160 bytes with SHA-256
+ef1cadca78517b78c17595a47f926814d76ca37cc0c2450b8ffb5fb803b31ff2.
+Original four-byte allocation sizes pass x86 but fail x64; the exact process
+result is recorded with final qualification below. Allocation safety does not
+authorize altering any original device algorithm. Source capacities remain
+native-width, and the installed source is byte-identical to the tested candidate.
+
+Pinned XP normalized SHA-256:
+761881d731c670ab688a5e3391f3162b78fd7518634a59595cce70169a0960d8.
+Initial local normalized SHA-256:
+9b7999beb1ae848be29f24c3a9e0c9c0a8813bb72a7ae9f7972a33a876a54081.
+Final normalized SHA-256: 297355ae73793093a24a5a2e4e10a088e08835d40f46d362c1279f1ef19393ca.
+CRLF and original line count remain. Full dual cached qualification follows.
+
+### P46 final qualification and actual-change review
+
+Both cached x86/x64 builds and EXE publications succeed. Both retain the
+sevid015.c:969 unreachable-switch warning also emitted by unchanged control
+compiles; there is no new warning.
+Each architecture completes all 188 background and eight native audio/desktop/
+package tests. 392/392 pass on the first full run.
+Actual review confirms only the 82 address and 24 allocation replacements,
+CRLF, tested-source identity, local-only manifest hash change and no new
+production/test interface. Original-capacity x64 failure is 0xc0000374 (heap
+corruption). Mirror, documentation and whitespace gates pass. Focused captures
+do not claim complete guest or outer-move coverage; existing residuals still
+need owner disposition.
+
+x86: 186/188 Test #172: emulator.verifier-negative ................................   Passed   44.78 sec
+x64: 186/188 Test #172: emulator.verifier-negative ................................   Passed   38.78 sec
+
+Published softpc32.exe: Nov 13 2026 08:35:35;
+SHA-256 72bc0d5225675cbbf779f470efaaef797d2514d3c23e62086bb09e2f81f4b104.
+Published softpc64.exe: Nov 13 2026 08:39:14;
+SHA-256 26c54375a3a7094352d2dc3537641801f72e326690ddab77eccf1f69db835a88.
+
+Sequential audited scope is 298/472; next file 299 base/cvidc/sevid016.c.
+S1 remains active; no routine approval is awaited.
+
+P46 actual process inventory confirms all task workers exited. Exact disposable
+scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
+user configuration, guest media and snapshots remain intact.
