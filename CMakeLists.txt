@@ -456,7 +456,8 @@ target_compile_options(softpc-vga-frame-smoke PRIVATE
 target_include_directories(softpc-vga-frame-smoke PRIVATE
     src/app-softpc/compat
     src/app-softpc/softpc.new/host/inc
-    src/app-softpc/softpc.new/base/inc)
+    src/app-softpc/softpc.new/base/inc
+    src/app-softpc/softpc.new/base/cvidc)
 target_compile_definitions(softpc-vga-frame-smoke PRIVATE
     CPU_40_STYLE CCPU C_VID CPU_486 V7VGA PROD SOFTPC_STANDALONE=1
     SOFTPC_HOST_POINTER_BITS=${SOFTPC_HOST_POINTER_BITS})

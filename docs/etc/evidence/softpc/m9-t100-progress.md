@@ -5903,3 +5903,104 @@ pending owner decision. No production/test/build/manifest/EXE change and no XP
 diff reduction. No new full regression or audio session run; P76 remains the
 published 392/392 full baseline. Frozen frontier 337/472; next file 338 dsktrace.h.
 S1 and previous owner decisions remain open.
+
+
+## Files 338-339: disk trace and EGA CPU header investigation (not delivered)
+
+Pinned XP raw SHA-256:
+
+- dsktrace.h: 587ad1ebae181ea51d1373f7c23f3580bf21d63bd8f9e7d141e72eecf2273d60.
+- egacpu.h: 17b5cebb9c603a24f179d19df0966026877ea20e70bcc17a1cc2880a0f99bf56.
+
+Retained dsktrace.h matches XP outside existing exclusions/scaffolding and is
+included by diskbios.c/fdisk.c. No source change is required. It is not yet
+advanced in the delivered frontier while the adjacent file is investigated.
+
+The egacpu.h retained differences include a VGAGLOBALSETTINGS forward tag,
+the selected globals pointer type and reason comment, and the evidgen include
+path/location plus reason comment. Whole-hunk suppression when a hunk contains
+#error would hide the selected pointer adaptation; contextual inspection of
+the full file identified it explicitly. Excluded bodies themselves are skipped.
+
+Current repository contains only base/cvidc/evidgen.h; the historical competing
+CCPU header described by the include comment no longer exists. Private-header
+experiments with the actual ev_glue.c and vga_prts.c build flags on x86/x64
+show: current, exact original include spelling/location, and removal of the
+forward tag each compile successfully (twelve successful syntax checks).
+Restoring VGA_GLOBALS * instead produces an incompatible-pointer diagnostic
+at ev_glue.c:766, where the original generated GLOBAL_VGAGlobals is assigned;
+both widths exit 1 with explicit -Werror=incompatible-pointer-types. vga_prts.c
+passes that variant because its only globals use is a null check. This is a
+compiler/type proof, not a dynamic guest failure. The extra diagnostic flag
+is disclosed and is not claimed as the unchanged production warning policy.
+
+These separate experiments support combining include/tag reductions while
+keeping the actual provider pointer type for owner disposition. No production
+file has yet been changed, and combined final-source/full regression has not
+run. Frozen delivered frontier remains 337/472. The active task owns temporary
+probes until the complete-file delivery; no investigation is reported closed.
+
+
+### P78 applied candidate and difference decisions
+
+R0425 removes the redundant VGAGLOBALSETTINGS forward tag and separator;
+the selected member declaration supplies the same struct tag, and both actual
+consumers compile without the extra declaration on both widths.
+R0426 retains the actual generated globals pointer type and local reason as an
+evidence-qualified owner decision. The original incompatible VGA_GLOBALS pointer
+would not describe GLOBAL_VGAGlobals; adding a cast or changing the original
+provider to hide the mismatch is not an equivalent smaller single-owner fix.
+R0427 restores the exact XP evidgen.h include spelling and original position
+before C_VID, deleting the obsolete duplicate-header explanation. The current
+repository has only the correct generated C-VID header, already on the selected
+include path. No include directory or other production file is modified.
+Existing #error bodies and scaffolding remain untouched and unaccounted.
+
+Combined production change is +2/-5 (net -3). XP added/deleted difference
+reduction is seven lines: removed forward tag/separator plus restoration of
+the original include/separator and removal of its replacement/comment. The
+excluded-body contribution is unchanged and is not introduced as a new metric.
+Final normalized candidate SHA-256:
+c566977f387b59d68fcf7c0d144ec814cf824bcdeea72a3ed43ef57142b7757a.
+Manifest local hash is updated; baseline hashes remain fixed. Full cached
+build/publication/regression is running on the combined final candidate.
+Frozen delivered frontier remains 337/472 until verified delivery.
+
+
+P78 first combined x86 build failed at the two softpc-vga-frame-smoke sources:
+its private include path omitted base/cvidc, so the restored original evidgen.h
+include was not found. Both actual test consumers share this one target. Root
+CMake now adds that existing dependency directory to the target (one added
+build-configuration line); production include paths already contain it.
+This is disclosed coupled test build wiring, not a new mirror fallback or
+source implementation. The first failed build is not a passing qualification.
+Full dual-width qualification restarts after this final configuration change.
+
+
+### P78 final-source delivery qualification
+
+After the disclosed initial test-target include failure was corrected, both
+cached builds and publications complete successfully. Each architecture passes
+188 background and eight native tests: 392/392 in the final qualification run.
+Stage exit codes and elapsed seconds: [["x86-build", 0, 10.09], ["x86-background", 0, 135.47], ["x86-native", 0, 25.52], ["x64-build", 0, 26.12], ["x64-background", 0, 146.78], ["x64-native", 0, 24.89]].
+
+- softpc32.exe: Nov 13 2026 14:30:51; SHA-256 97888789d3eeeb4affea72732635ffd25bb3f15b4b4f5740a3942cdb1838a316.
+- softpc64.exe: Nov 13 2026 14:33:42; SHA-256 b1fb577bf87bd92e910b80fa9c7d45f6b67905c7ba7f6e3ca1e47f828b5ff279.
+
+Counter-review confirms exact XP include spelling/location and removal only of
+the redundant struct tag. The current generated carrier type remains R0426,
+pending owner decision; no cast, new initializer, fallback or device logic is
+introduced. The only coupled root build change gives the existing VGA fixture
+its actual header dependency. Production +2/-5, net -3; permanent test source
++0/-0; build configuration +2/-1, net +1. Anchored XP diff decreases seven lines.
+Existing exclusions are unchanged and not counted. Final mirror bytes match the
+focused final candidate, and manifest local identity matches. No guest/media/INI
+or shared-component changes. Full regression does not claim exhaustive guest
+video modes; P61 explains the separate unsupported legacy bulk callback path.
+
+Frozen delivered frontier advances to 339/472. Next is file 340 base/inc/egagraph.h.
+S1 and qualified residual owner decisions remain open.
+
+P78 final actual-diff and documentation-governance reviews pass. Authoritative
+process inventory confirms the qualification worker exited. Task-scratch cleanup
+preview, exact removal and residue check pass; reusable caches are preserved.

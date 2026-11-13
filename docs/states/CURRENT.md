@@ -30,12 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P77 audits debug.h and dma.h. Retained debug declarations match XP;
-the DMA accessor declaration has a real DSP caller and dual-width negative
-compilation proof, remaining an owner decision. No production or EXE changes;
-P76 remains the published 392/392 full baseline. Frozen frontier 337/472;
-next file 338 base/inc/dsktrace.h. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P78 restores egacpu.h's original generated-vector include and removes
+its redundant struct forward tag; XP-relative diff decreases seven lines.
+The generated-carrier pointer adaptation remains an evidence-qualified owner decision.
+Production +2/-5; coupled test-target include wiring +2/-1. After correcting
+that fixture's missing include directory, both cached builds/publications and
+392/392 tests pass. Frozen frontier 339/472; next file 340 base/inc/egagraph.h.
+See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 

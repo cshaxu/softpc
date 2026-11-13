@@ -2024,3 +2024,11 @@ produce identical preprocessed code on both widths. Nine explicit glue provider
 declarations remain necessary for actual read/write table initialization.
 The historical table above is not the current XP-relative metric; see T100's
 ordered evidence for the fourteen-line XP-difference reduction and verification.
+
+
+T100 S1 P78 qualification supersedes the egacpu.h forward-tag and explicit
+relative-header rationale: the redundant tag is removed and the XP evidgen.h
+include spelling/location restored. The competing header no longer exists.
+The generated globals member type remains evidence-qualified by actual provider
+assignment diagnostics. See T100 evidence for current XP-difference metrics;
+the earlier historical table does not represent this candidate's current count.
