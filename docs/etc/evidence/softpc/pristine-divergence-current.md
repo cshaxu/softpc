@@ -1953,3 +1953,15 @@ the existing original switch warning unchanged. Actual-body controls cover
 See [P53 audit](m9-t100-progress.md#file-305-sevid022c-p53),
 [range map](m9-t100-sevid022-points.tsv) and
 [allocation inventory](m9-t100-sevid022-allocations.tsv).
+
+### T100 S1 P54 sevid023 restoration
+
+File 306 restores 23 native dereferences and all 32 malloc calls. Native
+GDP mapping/capacities remain qualified owner decisions. Production +55/-55;
+XP diff falls 1019 -> 973 lines and 393 -> 370 ranges. Both architectures
+pass full regression first run, with no compiler warnings. Actual-body
+controls cover 112 cases per width/version; original capacity corrupts x64
+heap. Original Chain4 bulk-fill overlap is pending D003, not a new patch.
+See [P54 audit](m9-t100-progress.md#file-306-sevid023c-p54),
+[range map](m9-t100-sevid023-points.tsv) and
+[allocation inventory](m9-t100-sevid023-allocations.tsv).

@@ -3476,8 +3476,8 @@ configuration, guest media and snapshots remain intact.
 ## Pending original-defect diff decisions
 
 Owner moves these discoveries out of TODO into this audit's pending diff-point
-list. D001/D002 identify proposed differences, not existing local patch ranges;
-they do not inflate the measured XP diff or the restored-point counts. Neither
+list. D001-D003 identify proposed differences, not existing local patch ranges;
+they do not inflate the measured XP diff or the restored-point counts. None
 is repaired or approved for a new mirror patch. Continue ordered auditing
 without waiting; the no-increase constraint remains in force.
 
@@ -3485,6 +3485,8 @@ without waiting; the no-increase constraint remains in force.
 | --- | --- | --- | --- |
 | D001 | base/cvidc/sevid004.c, GenericByteFill nested continuation: a potential change to preserve caller locals across GenericByteWrite. Exact minimal patch is not yet established. | P34 actual bodies fail with 0xc0000005 on x86/x64 before and after restoration; nested continuation loses LocalIUH. Current CCPU fills use individual stores; no guest batch consumer established. Related nested callers were source-scanned, not dynamically proven faulty. | Pending diff decision; original behavior unchanged. |
 | D002 | base/cvidc/sevid008.c, S2360/S2372: potential second-WORD offset correction from +8 to +2, with multi-DWORD fill ordering still to verify. | P38 unchanged/candidate actual bodies put 33 44 at +8/+9 instead of +2/+3 on both architectures. Current CCPU DWORD stores use two WORD operations at +0/+2; no guest use of these generated DWORD entries established. | Pending diff decision; original behavior unchanged. |
+
+| D003 | base/cvidc/sevid023.c, Chain4DwordFill (S2844 demonstrated): proposed correction of multi-element WORD-pass overlap. Minimal implementation is not yet established. | P54 actual bodies on x86/x64 request four copies of 0x44332211 but produce 11 22 33 44 33 44 33 44 33 44 followed by six untouched bytes. Current, candidate and poisoned candidate agree. Pinned XP uses the same two count-wide WORD fills at offsets +0/+2. c_sas_fillsdw loops over c_sas_storedw; no production caller of fill_dword_ev_glue was found. No guest symptom established. | Pending diff decision; original behavior unchanged. |
 
 The P34/P38 sections retain the detailed controls and caller evidence. This
 transfer does not claim a guest symptom, a completed fix, or authority to add
@@ -4529,3 +4531,81 @@ S1 remains active; qualified residuals still await owner decisions.
 P53 process inventory confirms no owned worker remains. Task scratch was
 previewed and removed via Clean-Build; closure residue verification passes.
 Only reusable caches remain. User configuration, media and snapshots are intact.
+
+## File 306: sevid023.c (P54)
+
+Pinned XP comparison contains 393 ranges, +510/-509 lines (1019 total).
+Restore 23 native address dereferences and all 32 malloc calls, retaining
+native allocation capacity. Production +55/-55, net zero; no permanent test
+code change. Candidate XP diff is 370 ranges, +487/-486 lines (973 total):
+23 fewer ranges and 46 fewer added/deleted lines. All initial ranges are
+reconciled in the [point map](m9-t100-sevid023-points.tsv); all 32 arrays are
+listed in the [allocation inventory](m9-t100-sevid023-allocations.tsv).
+
+| Point | Executor analysis | Independent actual-diff review and disposition |
+| --- | --- | --- |
+| R0381 | Native GDP field mapping and its declaration include. | Retain pending owner decision: the GDP owner uses native slot storage rather than original contiguous 32-bit offsets. Resolved address dereferences are separate from field lookups. |
+| R0382 | Twenty-three resolved native addresses routed through GDP address mapping. | Restore exact XP lines. CopyWord helpers operate on native source/plane pointers already loaded through GDP or native local slots. Both widths preserve output under actual-body controls. |
+| R0383 | Thirty-two zeroed native local arrays. | Restore malloc in every array: no partial-store/native-load intersection was found in these function bodies. Poisoned malloc controls pass both widths. Keep native capacity pending decision: restoring original four-byte capacities produces x64 heap corruption (0xc0000374), while x86 passes. |
+
+The file is compiled in the C-VID target and selected through chain4_evid.
+It contains CopyWord helpers, five WordMove variants, twelve DwordWrite
+variants and eleven DwordFill variants. There is no duplicate Compat device
+implementation or basis for whole-file retirement. Original DwordWrite uses
+second WORD offset +2, unlike the previously recorded Unchained case; its
+correct offset is unchanged. No algorithm, continuation or guest changes.
+
+Task-local actual-body tests use the existing initialized VGA fixture and
+replace only this unit's object. There are 112 cases per run: twelve DWORD
+write variants, eleven DWORD fill variants and five RAM-source WORD move
+variants, each at four address residues, with repeated full-plane comparison.
+Current, candidate and poisoned-malloc candidate pass on both widths; all
+six hashes equal ec525591. Existing VGA assertions also pass. An independent
+four-byte write oracle covers the first two write variants; other variants
+provide restoration equivalence, not exhaustive hardware correctness.
+Original-capacity controls pass x86 and fail x64 with heap corruption; no
+observation timeout is treated as evidence.
+
+The fill diagnostic demonstrates D003 above, not a new regression: four
+requested DWORDs occupy only ten bytes because the high-WORD pass overwrites
+the low-WORD pass. Pinned XP contains the same count-wide calls at +0/+2.
+Full src search finds fill_dword_ev_glue only at its definition; the current
+CCPU c_sas_fillsdw loop instead invokes c_sas_storedw and advances by four.
+No real guest use of the defective bulk entry or guest symptom is claimed.
+The discovery stays in pending diff decisions, not TODO, with no new patch.
+
+Review confirms exactly 55 replacements: 23 address lines match pinned XP
+exactly, and 32 calloc calls become malloc with native capacities unchanged.
+Source equals the tested candidate, retains CRLF, normalized-LF SHA-256:
+a0b4b10edf25a6a35915c9fe8ea4f47b49a490a01952b6c1e945e860cb39b3e9.
+Full cached dual-architecture qualification is running; delivered scope stays
+305/472 until qualification, review and delivery complete. S1 remains active.
+
+### P54 final qualification and actual-change review
+
+Both cached builds/publications succeed. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first full run**, no retries or
+budget changes. No compiler warnings in this unit's current/candidate controls
+or either full incremental build.
+
+- x86-build: 9.09 seconds, exit 0.
+- x86-background: 134.1 seconds, exit 0.
+- x86-native: 25.03 seconds, exit 0.
+- x64-build: 10.09 seconds, exit 0.
+- x64-background: 131.1 seconds, exit 0.
+- x64-native: 25.03 seconds, exit 0.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 11:04:50;
+SHA-256 91979831c2c853e3f99dd89b180151d02a59eb43c8b5fdc805acf1d4f4463202.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 11:07:38;
+SHA-256 fdd7efb990c9211f86f5d64afe5b9e880712eadf53fbaf0be4f37d6cbb695971.
+
+Final source identity, CRLF, actual-diff review and gates pass. No permanent
+test source or public component changes. No new interactive guest acceptance
+is claimed. Sequential audited scope is 306/472; next file 307
+base/cvidc/sevid024.c. S1 remains active; residual decisions are not closed.
+
+P54 process inventory confirms no owned worker remains. Exact task scratch
+was previewed and removed through Clean-Build; residue verification passes.
+Reusable caches, user configuration, media and snapshots are unchanged.

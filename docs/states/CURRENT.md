@@ -30,17 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P53 restores 21 native-address expressions and 28 malloc calls in
-file 305 sevid022.c. Production +49/-49 (net zero); permanent test code
-unchanged. XP diff decreases 1547 -> 1505 lines and 614 -> 593 ranges.
-GDP/native-local ABI and four mixed-width initializations remain qualified
-owner decisions. Actual-body current/candidate/poison controls pass both
-widths with identical output over 96 Chain4 WORD cases; removing the four
-initializations faults on x64, and original capacities corrupt its heap even
-with zeroing preserved. Both EXEs are freshly built/published; 392/392 pass
-first full run. Only the unchanged original switch warning remains; no new
-warning. Actual diff review, source identity and gates pass. Sequential review
-is 305/472; next file 306 base/cvidc/sevid023.c. See the
+T100 S1 P54 restores 23 native-address expressions and all 32 malloc calls
+in file 306 sevid023.c. Production +55/-55 (net zero); permanent test code
+unchanged. XP diff decreases 1019 -> 973 lines and 393 -> 370 ranges.
+Native GDP/capacity remain qualified owner decisions; no calloc remains in
+this unit. Actual-body current/candidate/poison controls pass both widths
+over 112 Chain4 cases with identical output. Original capacity corrupts the
+x64 heap; x86 passes. Both EXEs are freshly built/published; 392/392 pass
+first full run, no compiler warnings. Actual diff review, source identity
+and gates pass. Sequential review is 306/472; next file 307
+base/cvidc/sevid024.c. Original bulk-fill overlap is pending decision D003,
+not a new patch or TODO. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
@@ -70,7 +70,7 @@ Nov 8 timestamps. See [timestamp closure](../history/M9-Td-S23-build-timestamp.m
 Only Emulator build configuration/verifier/manifest changed within the public
 eight trees; no fresh NXVM alignment is claimed.
 
-Original GenericByteFill and Unchained DWORD defects belong to the
+Original GenericByteFill, Unchained DWORD and Chain4 bulk-fill defects belong to the
 [pending diff decisions](../etc/evidence/softpc/m9-t100-progress.md#pending-original-defect-diff-decisions), not TODO.
 [TODO](TODO.md) retains shared-fixture aggregate timing debt. The runtime-performance candidate
 remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
