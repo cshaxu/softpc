@@ -1982,3 +1982,54 @@ Next is evidfunc.h (272), whose generated-rule ABI needs actual investigation.
 - P24 x86 EXE SHA-256 `223a91e6f04ab23e4c56a3ded0e9174e3f4a2fbbacc0bef5ef4d55baf73aab4a`; compiler time 03:21:48.
 
 - P24 x64 EXE SHA-256 `89806253b1c4c53d5a464c70257fac2f4f0337ed6b86b2ff1e5e2d3f76046f04`; compiler time 03:21:58.
+
+## P25 file 272 evidfunc.h: restore original mark declarations
+
+R0245, XP lines 641-657 / pre-P25 local 641-659: original seventeen default-int
+mark declarations (including four repeated declarations) were replaced by a
+six-line explanation and thirteen explicit IUH/four-argument declarations.
+Initial claim was generated-rule ABI necessity (MVDM-HOST-DIV-121).
+Counter-review rejects that claim as evidence for this particular edit.
+
+Real compiled consumer evidfunc.c includes its adjacent cvidc/evidfunc.h and
+initializes original EVID_MARK_POINTERS globals with function addresses. It
+contains no mark calls or return conversions. ga_mark.h still supplies the
+same original table field contracts. Generated sevid001.c defines the actual
+IUH rules independently. ev_glue.c uses angle-bracket evidfunc.h and the actual
+include search chooses base/ccpu386/evidfunc.h, not this adjacent C-VID header.
+Whole production/test/tool caller scan found no additional direct consumer of
+these changed declarations. Merely matching generated definitions therefore
+does not establish that this local declaration rewrite fixes actual dispatch.
+
+Coherent original restoration in the actual evidfunc.c compilation succeeds
+at both widths. Isolated copies preserve the original source/header filenames
+and use actual production flags/include paths. Before/after object bytes are
+identical on x86 and x64. Original incompatible-pointer initializer warnings
+are reported; they are original mirror diagnostics, not a new shared/test
+warning or an assertion of universal compiler portability. No table cast,
+helper, Compat adaptation or warning-suppression option is added.
+
+Restore the complete header exactly to fixed XP (CRLF repository policy),
+including original duplicate declarations. The current normalized hash equals
+the pinned subset hash. XP diff +19/-17 becomes zero: 36 lines/one point removed.
+Production +17/-19 (net -2); no test changes. Retire this current local patch;
+historical DIV-121 records remain historical and are superseded by this result.
+Qualification is running; full-file delivery is not yet claimed.
+
+P25 final-source verification: cached dual build/publication and actual VGA
+frame regression pass on both architectures; mirror and documentation gates
+pass. Final EXEs equal P24 byte-for-byte except PE COFF time/checksum and one
+same-offset compiler time literal (eight changed x86 bytes, six x64 bytes).
+Approved equivalence exception reuses P22's 392 full passes through P23/P24;
+no new full-suite or manual guest validation is claimed. Actual VGA test is
+fresh final-source evidence, not a substitute for the equivalence proof.
+
+Coordinator review checked the actual original header diff, real table/definition/
+include consumers, byte-identical production objects, final binary equivalence,
+CRLF/provenance and diff --check. No new test-only production mechanism,
+Compat rearrangement, guest/configuration/media/snapshot or shared change.
+Ordered review reaches 272/472; next base/cvidc/evidgen.h (273).
+
+- P25 x86 EXE SHA-256 `f9c3ce422eb46a1a98cbdc1d42cf470355dd444a936a42d30d45b0feb99f19fd`; compiler time 03:26:02.
+
+- P25 x64 EXE SHA-256 `c53bfb696fb81908d8ead25e5cee73ebb289742ddb97f21fed23f9a73a12704f`; compiler time 03:26:18.
