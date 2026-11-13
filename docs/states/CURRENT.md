@@ -33,8 +33,10 @@ skipped without new bookkeeping. T99 remains closed; see its
 T100 S1 P60 completes file 311 sevid028.c. Restore 62 native-address expressions
 and 30 malloc calls; native capacities and two mixed-width zero initializations
 remain qualified owner decisions. Production +92/-92; XP difference 1433 -> 1309
-lines. RAM-source actual-body controls pass 68 cases per width; video-source
-callback is an unverified boundary. Both EXEs are built and published; full
+lines. RAM-source actual-body controls pass 68 cases per width. The video-source
+callback investigation confirms the selected CCPU uses scalar MOVS access;
+six actual instruction cases per width pass with the legacy callbacks NULL.
+Direct legacy video-source bulk calls are not qualified. Both EXEs are built and published; full
 regression 392/392 passes first run. Frozen frontier 311/472; next file 312
 sevid029.c. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.

@@ -4975,3 +4975,64 @@ softpc32.exe: Nov 13 2026 12:32:03, SHA-256 431841c12d5859311d2e8b0c1fe7e0d927e4
 softpc64.exe: Nov 13 2026 12:35:10, SHA-256 cdbe6b20be7f8c0eaeb5300759050ae6f6514e3b8a308461258be075a5f8858a
 
 P60 owned jobs exited; task scratch was previewed and removed via Clean-Build. Residue check passes; caches, configuration, media and snapshots remain intact.
+
+### P61: P59/P60 video-source callback investigation
+
+Owner rejected advancing with an unexplained callback boundary. File 312 work
+was held without production edits. This follow-up supersedes the unexplained
+boundary classification above; it does not add direct legacy bulk calls to
+the passing test count.
+
+Source proof at e1b0ca18:
+
+- Both supported architectures select CCPU, C_VID and CPU_40_STYLE in root
+  CMake. In pinned XP ega_read.c, assignments to bwd_str_read_addr occur in
+  the alternative !CPU_40_STYLE path. The selected original path calls
+  SetReadPointers instead. Current ev_glue.c setReadPointers installs the
+  c_ev_read_ptr table and read_byte_addr, not GDP offsets 1332/1336.
+- GDP aggregate storage starts zeroed. Its offset mapping identifies 1332
+  and 1336 as fwd_str_read_addr and bwd_str_read_addr. Their presence in the
+  generated getter/setter vector is not a production setter invocation.
+- Production symbol search finds the three backward glue wrappers only as
+  definitions. The active Glue_writes registration supplies forward moves;
+  ccpu386's move-pointer arrays are populated but their read macros have no
+  consumers. CCPU MOVSB/MOVSW/MOVSD in c_main.c directly use F_X/P_Y operands;
+  c_oprnd.h selects vir_read/vir_write and updates SI/DI according to DF.
+  Thus the actual instruction path does not dispatch the legacy bulk wrapper.
+- The earlier direct bulk probe bypassed that instruction path. With
+  srcInRAM=0, sevid027.c calls GDP offset 1336, which is NULL under this
+  configuration. The fault predates P59/P60 restoration. It is not a Window
+  frame-publication callback and not evidence of a guest MOVS failure.
+
+Dynamic proof: a disposable variant of the existing vga_frame_smoke fixture
+uses the actual machine create/reset, original BIOS mode 13h dispatch, and
+softpc_machine_run. It writes a small diagnostic instruction sequence to
+scratch guest RAM, without changing firmware or original guest binaries.
+REP MOVSB, MOVSW and MOVSD each copy four elements between disjoint video
+offsets 0x100 and 0x400 with DF=0 and DF=1. Every destination byte and completed
+CX is asserted. GDP callback 1336 is asserted NULL before and after every
+case; both callback values are printed after mode initialization.
+
+Cached x86 and x64 production objects were linked with only the disposable
+fixture object replaced. Compile, link and execution all exit 0: six cases
+per architecture, twelve total. Forward final SI/DI are 104/404, 108/408,
+110/410; backward values are ff/3ff, fe/3fe, fc/3fc. Both callbacks are NULL
+on both architectures. This independently proves the selected scalar path
+can copy video data while the legacy callback remains unbound.
+
+Counter-review: no initializer was lost in P59/P60; the pinned XP conditional
+choice explains its absence. No new initializer, fallback, source branch or
+mirror patch is justified by this probe. The direct legacy video-source
+bulk entry remains unusable in the current configuration and must not be
+treated as a supported production entry by future callers without separate
+integration work. The six instruction cases cover mode 13h, disjoint ranges
+and read/write mode 0, not all video modes, overlap, paging or real DOS/Windows
+sessions. The earlier RAM-source equivalence results retain their stated scope.
+
+No production, permanent test or published EXE changes; this is a source and
+focused dynamic investigation, not another full-suite run. The frozen frontier
+remains 311/472. Existing residual decisions remain open.
+
+P61 owned-process inventory confirms all probes exited. Clean-Build preview,
+exact task-scratch removal and residue check pass. Documentation gate and
+actual documentation diff review pass; configuration and guest assets are untouched.
