@@ -36,6 +36,15 @@ The owner rejected bswap.h retirement on this basis; its original file and
 include remain. Evidence-backed existing residuals still follow the owner's
 original keep-or-restore decision process; this does not authorize new diffs.
 
+## Original-defect decision ownership
+
+Owner correction: original-code defects discovered during this mirror audit
+belong to its pending diff-point decisions, not TODO or a separate queued repair.
+Record the original behavior, actual consumers, evidence and limits, and the
+proposed difference requiring a decision. An unchanged original defect is not
+an existing local patch or approved new diff. Preserve the no-increase rule;
+record the decision without implementing a new patch or stopping ordered work.
+
 ## Method sources
 
 Read on 2026-11-12 in the read-only NTVDM64 comparison tree:

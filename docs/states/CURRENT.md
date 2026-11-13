@@ -68,8 +68,9 @@ Nov 8 timestamps. See [timestamp closure](../history/M9-Td-S23-build-timestamp.m
 Only Emulator build configuration/verifier/manifest changed within the public
 eight trees; no fresh NXVM alignment is claimed.
 
-[TODO](TODO.md) records the original GenericByteFill nested-call defect and
-verifier-negative aggregate timing debt. The runtime-performance candidate
+Original GenericByteFill and Unchained DWORD defects belong to the
+[pending diff decisions](../etc/evidence/softpc/m9-t100-progress.md#pending-original-defect-diff-decisions), not TODO.
+[TODO](TODO.md) retains verifier-negative aggregate timing debt. The runtime-performance candidate
 remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
 did not admit S44 or a new implementation task.
 

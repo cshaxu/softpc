@@ -2866,7 +2866,7 @@ ccpusas4 stores its address in b_fill_ptrs. However, the currently compiled
 c_sas_fills/fillsw/fillsdw loop over individual stores; the source scan finds no
 consumer of read_b_fill_ptrs beyond its definition. No actual guest-triggered
 failure is claimed. This original same-file nested-entry defect is recorded in
-TODO for separate admission/before batch-path activation, not repaired by adding
+the pending original-defect diff decisions below, not repaired by adding
 a forbidden new mirror patch during this original-first diff audit.
 
 | Actual-body control | x86 | x64 |
@@ -2889,7 +2889,7 @@ running; the result and cleanup must be reconciled before delivery.
 P34 same-file nested-call scan finds GenericByteFill/GenericByteMove_Fwd
 calling GenericByteWrite, and GenericWordFill/GenericWordMove_Fwd/
 GenericDwordWrite calling GenericWordWrite. Only the first fill path has the
-recorded dynamic failure; the other callers require the linked TODO review,
+recorded dynamic failure; the other callers require the pending diff-point review,
 not a claim that all have been dynamically reproduced or are guest-reachable.
 
 
@@ -2969,7 +2969,7 @@ result and untouched bytes. Existing VGA/CHAIN2 assertions also execute.
 
 These controls do not establish every specialized mode, RAM move, guest behavior
 or an exhaustive hardware oracle. The previous GenericByteFill defect remains
-separate TODO debt; passing registered tests does not repair it. No guest,
+a pending original-defect diff decision; passing registered tests does not repair it. No guest,
 configuration, media, snapshot or sibling repository is changed.
 
 Final normalized source SHA-256:
@@ -3065,7 +3065,7 @@ Existing VGA/CHAIN2 assertions also execute in each process.
 
 These controls do not qualify all eleven outer move entries, all specialized
 mode combinations or guest-triggered batch reachability. The original nested
-continuation defect documented in P34 remains separate TODO debt. No new
+continuation defect documented in P34 remains a pending original-defect diff decision. No new
 interactive guest reproduction, guest/configuration/media/snapshot change,
 production testing API or sibling change is claimed.
 
@@ -3164,8 +3164,8 @@ The task does not establish a new guest-visible defect from the initial oracle.
 | Candidate malloc filled with 0xa5 | pass | pass |
 
 These results do not cover every specialized move or establish guest-triggered
-batch reachability. The P34 original nested-call defect stays separate TODO
-debt. No guest, configuration, snapshot, media or sibling is changed; no new
+batch reachability. The P34 original nested-call defect stays a pending original-defect diff
+decision. No guest, configuration, snapshot, media or sibling is changed; no new
 production test interface is introduced.
 
 Final normalized source SHA-256:
@@ -3277,7 +3277,7 @@ byte/word operations only; write_dword_ev_glue has no production caller in
 the repository search. Current CCPU c_sas_storedw reaches phy_w32, which uses
 two phy_w16 calls at start and start+2. c_sas_fillsdw loops those stores.
 Thus no current guest-triggered instance of the generated DWORD fault has
-been established. Repair requires separate admission before enabling these
+been established. Repair remains a pending diff-point decision before enabling these
 entries; this reduction-only audit does not add a new mirror patch.
 
 Final source SHA-256 (LF normalized):
@@ -3299,7 +3299,7 @@ or fresh interactive guest reproduction is claimed.
 The 368640-byte DWORD preservation captures match on both architectures:
 SHA-256 1264a241a1eed501b4f531ad3209b8c5f07a0c024ef001535f98fc7b84e3add7.
 This preserves the demonstrated original defect too; it is not proof of
-correct DWORD semantics. That separate issue is recorded in TODO.
+correct DWORD semantics. That issue is recorded in the pending original-defect diff decisions below.
 
 Published softpc32.exe: Nov 13 2026 06:48:38;
 SHA-256 7d5856c16267622101b84e411b179689e0c26622ac4de8bebcd0f33cbe91b809.
@@ -3472,3 +3472,20 @@ S1 remains active; no routine approval is awaited.
 P40 process inventory confirms no task worker remains. Exact disposable scratch
 cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
 configuration, guest media and snapshots remain intact.
+
+## Pending original-defect diff decisions
+
+Owner moves these discoveries out of TODO into this audit's pending diff-point
+list. D001/D002 identify proposed differences, not existing local patch ranges;
+they do not inflate the measured XP diff or the restored-point counts. Neither
+is repaired or approved for a new mirror patch. Continue ordered auditing
+without waiting; the no-increase constraint remains in force.
+
+| Decision | Source and proposed difference | Evidence and reachability | Status |
+| --- | --- | --- | --- |
+| D001 | base/cvidc/sevid004.c, GenericByteFill nested continuation: a potential change to preserve caller locals across GenericByteWrite. Exact minimal patch is not yet established. | P34 actual bodies fail with 0xc0000005 on x86/x64 before and after restoration; nested continuation loses LocalIUH. Current CCPU fills use individual stores; no guest batch consumer established. Related nested callers were source-scanned, not dynamically proven faulty. | Pending diff decision; original behavior unchanged. |
+| D002 | base/cvidc/sevid008.c, S2360/S2372: potential second-WORD offset correction from +8 to +2, with multi-DWORD fill ordering still to verify. | P38 unchanged/candidate actual bodies put 33 44 at +8/+9 instead of +2/+3 on both architectures. Current CCPU DWORD stores use two WORD operations at +0/+2; no guest use of these generated DWORD entries established. | Pending diff decision; original behavior unchanged. |
+
+The P34/P38 sections retain the detailed controls and caller evidence. This
+transfer does not claim a guest symptom, a completed fix, or authority to add
+a new diff. The unrelated verifier-negative timing issue remains in TODO.
