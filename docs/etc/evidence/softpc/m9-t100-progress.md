@@ -4893,3 +4893,29 @@ S1 and qualified residual decisions remain open.
 P57 process inventory confirms all owned jobs exited. Exact task scratch was
 previewed and removed via Clean-Build; residue verification passes. Reusable
 caches, user configuration, media and snapshots are preserved.
+
+## File 309: sevid026.c (P58 in qualification)
+
+Pinned XP: a2f6d7c93aa4f11efc51147566d5961c59a8ef89; XP raw SHA-256 ea77886c01c66fe91c2021b870a1f0f100735decfdc3d88be4f2ebb893cc2fa2.
+Initial 540 ranges; anchored original-relative diff 1245 lines. Candidate 515 ranges; 1195 lines, 50 fewer. Production +47/-47: 25 exact XP address expressions; 22 malloc restorations retain native-size allocation. Ten zero-initialized allocations and 32 native-size capacities remain pending decisions.
+Actual VGA body fixture: mode 3 byte/word write, fill and move across four table variants and four parities; mode 2 three dword move entries; six helper entries with two source flags and four parities. Current/candidate/poisoned candidate pass x86 and x64: 156 cases per run, hash 61d0054f. Repetition and full-plane equivalence, not independent hardware conformance. Combined removal of ten zero initializations passes x86 but fails x64 with 0xc0000005; this does not attribute failure to every allocation. Source paths separately show partial-width writes before native-width reads.
+Current mirror normalized SHA-256 88ec8914b47be3b4269692f30f202ad0af769f82b01f16a3de8e7ac44083bd3d. No guest reproduction asserted. Final build, tests, actual diff and publication remain pending.
+
+Initial difference ranges and individual allocation dispositions are recorded in [point map](m9-t100-sevid026-points.tsv) and [allocation inventory](m9-t100-sevid026-allocations.tsv). Original GDP field mapping is retained pending owner decision; native-address and allocation changes are limited to this file. Source and dynamic evidence do not establish every guest configuration.
+
+### P58 final qualification
+
+Both cached builds and publications pass. Each architecture passes 188 background and 8 native tests: 392/392, first run. Mirror and documentation gates pass. Final source matches the tested candidate. No guest acceptance is claimed.
+
+- x86-build: 11.09 seconds, exit 0.
+- x86-background: 138.09 seconds, exit 0.
+- x86-native: 26.03 seconds, exit 0.
+- x64-build: 14.09 seconds, exit 0.
+- x64-background: 137.1 seconds, exit 0.
+- x64-native: 26.03 seconds, exit 0.
+
+softpc32.exe: Nov 13 2026 12:04:02, SHA-256 4eef0ab34e9bfbcbc2acd2e9c694dae2083688c435b8e8da3d6e45407a1ce6f2
+
+softpc64.exe: Nov 13 2026 12:06:57, SHA-256 4f3df6391feb222fc3756e38e95100270cf62cd06a3b3dd63107f83ae019ab4c
+
+P58 owned jobs exited; task scratch was previewed and removed via Clean-Build. Residue check passes; caches, configuration, media and snapshots remain intact.

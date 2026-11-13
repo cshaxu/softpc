@@ -30,16 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P57 completes file 308 sevid025.c. Restore 66 native-address expressions
-exactly to XP and 26 malloc calls, retaining evidenced native capacities and
-six mixed-width zero initializations pending owner decision. Production +92/-92
-(net zero); XP-relative diff decreases 1465 -> 1333 lines (132 fewer).
-Current/restored/poisoned actual bodies agree in 148 cases per width; this is
-restoration equivalence, not hardware conformance. D004 separately records an
-unchanged original CHAIN4 mode-2 pixel discrepancy, with no new patch.
-Both EXEs are freshly built/published; full regression 392/392 passes first run.
-Actual diff, final-source identity and gates pass. The frozen frontier is
-308/472; next file 309 sevid026.c. See the
+T100 S1 P58 completes file 309 sevid026.c. Restore 25 native-address expressions
+and 22 malloc calls; native capacities and ten mixed-width zero initializations
+remain qualified owner decisions. Production +47/-47; XP difference 1245 -> 1195
+lines. Actual-body current/candidate/poison controls pass 156 cases per width.
+Both EXEs are built and published; full regression 392/392 passes first run.
+The frozen frontier is 309/472; next file 310 sevid027.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

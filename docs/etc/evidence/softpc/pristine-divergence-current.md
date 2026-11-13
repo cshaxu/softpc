@@ -2004,3 +2004,7 @@ not a repaired bug or guest reproduction. Full regression passes 392/392.
 See [P57 audit](m9-t100-progress.md#file-308-sevid025c-p57),
 [range map](m9-t100-sevid025-points.tsv) and
 [allocation inventory](m9-t100-sevid025-allocations.tsv).
+
+### T100 S1 P58 sevid026 restoration
+
+File 309 restores 25 original native-pointer expressions and 22 malloc calls. Production +47/-47; XP-relative difference 1245 -> 1195 lines, reduction 50. Native capacity and ten mixed-width zero initializations remain pending owner decision. Both architectures pass 156 actual-body equivalence cases and full regression 392/392. See [P58 evidence](m9-t100-progress.md#file-309-sevid026c-p58-in-qualification).
