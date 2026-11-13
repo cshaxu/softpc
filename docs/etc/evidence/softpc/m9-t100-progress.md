@@ -5104,3 +5104,69 @@ S1 and qualified residual owner decisions remain open.
 P62 process inventory confirms all owned jobs exited. Exact task scratch was
 previewed and removed using Clean-Build; residue verification passes. Reusable
 caches, configuration, media and snapshots remain intact.
+
+## File 313: sevid030.c (P63 in qualification)
+
+Pinned XP raw SHA-256 2b5337bc2a577e43d54e060d901c775af8e9b1e91918e0913c79d50a9cbd54dd.
+Full fixed-line correspondence identifies 329 GDP mapping lines, 34 native
+address wrappers, 23 allocations and the GDP include; no other changed lines.
+The [point map](m9-t100-sevid030-points.tsv) and
+[allocation inventory](m9-t100-sevid030-allocations.tsv) cover those differences.
+R0402 retains native GDP layout pending owner decision. R0403 restores 34 exact
+XP native-address expressions. R0404 restores 21 malloc calls with native
+capacity retained. S_3050 and S_3054 retain zero initialization: their local
+slot 7 receives an IU32 offset, then is read as IUH for native address addition.
+Full-width initialization in other mixed-width slots does not justify calloc.
+
+Production +55/-55; anchored XP added+deleted diff 773 -> 705, reduction 68;
+SequenceMatcher ranges 333 -> 299. Final normalized candidate SHA-256
+32448fead96be5ac96d5419c60c373bef4b04a43b63e024679c79ce33c054ca9.
+
+Actual-body probe uses original machine initialization and mode 13h, all 23
+generated entries, four destination parities and two bit-protection masks.
+The eight direct copy helpers also exercise both source flags; the public
+bulk entries use RAM source only. Nonzero latches and set/reset values make
+mode 3 output observable. Each invocation starts from the same patterned
+256 KiB plane image. Current, candidate and poisoned-malloc candidate complete
+23 isolated processes per architecture, with 248 cases per variant, and
+corresponding complete-plane hashes agree. This is restoration equivalence,
+not independent hardware conformance or all guest modes. The unbound legacy
+video-source callback remains outside supported bulk-entry coverage, for the
+specific source and dynamic reasons established in P61.
+
+With only the two remaining zero initializations removed and malloc poisoned,
+all x86 entries pass but direct S_3050 and S_3054 calls fail on x64 with
+0xc0000005. Dependent byte/word/dword entry failures inherit those helper faults;
+they do not justify retaining zero initialization in other allocations. No
+new initializer, callback connection, algorithm or production test API is added.
+
+Final cached build, publication and full regression are pending. The frozen
+frontier remains 312/472 until complete P63 delivery.
+
+### P63 final qualification
+
+Both cached builds and publications pass. Each architecture passes 188 background
+and eight native tests, 392/392 first run. Final source equals the actual-body
+candidate. The function-level comparisons do not establish every guest mode.
+
+- x86-build: 9.47 seconds, exit 0.
+- x86-background: 137.97 seconds, exit 0.
+- x86-native: 24.78 seconds, exit 0.
+- x64-build: 12.4 seconds, exit 0.
+- x64-background: 142.73 seconds, exit 0.
+- x64-native: 24.75 seconds, exit 0.
+
+softpc32.exe: Nov 13 2026 13:06:46, SHA-256 5ecd0d3d0462fd4f20f3706941e0b09a2e09c7907aa28f4b52aa791e1b7e6555.
+
+softpc64.exe: Nov 13 2026 13:09:38, SHA-256 ac9d5c9cf721ac8fd3c374b03944cf99c9481c32a0d1140c3cd59da27b3adb17.
+
+Actual-change counter-review reconciles all 55 production changes to the tested
+candidate: 34 exact original dereferences and 21 malloc restorations retaining
+native capacity. No new algorithm, public component, permanent test, INI, media
+or snapshot change. Original whitespace is preserved on restored mirror lines.
+Manifest and documentation gates pass. Frontier advances to 313/472; next is
+sinit011.c. S1 and evidence-qualified residual owner decisions remain open.
+
+P63 process inventory confirms all owned jobs exited. Task scratch was previewed
+and removed with Clean-Build; residue verification passes. Reusable caches and
+user configuration, media and snapshots are preserved.

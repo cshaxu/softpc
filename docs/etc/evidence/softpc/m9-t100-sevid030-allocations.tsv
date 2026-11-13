@@ -1,0 +1,24 @@
+function	disposition	evidence_scope
+S_3046_Chain4DwordMove_00000002_00000009_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3047_Chain4DwordMove_00000002_0000000e_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3048_Chain4DwordMove_00000002_0000000f_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3049_Chain4ByteMove_00000003_00000008_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3050_CopyBytePlnByPlnChain4_00000003_00000008_00000000_00000001_id	retain zero initialization; native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3051_Chain4ByteMove_00000003_00000009_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3052_CopyByte4PlaneChain4_00000003_00000009_00000000_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3053_Chain4ByteMove_00000003_0000000e_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3054_CopyBytePlnByPlnChain4_00000003_0000000e_00000000_00000001_id	retain zero initialization; native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3055_Chain4ByteMove_00000003_0000000f_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3056_CopyByte4PlaneChain4_00000003_0000000f_00000000_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3057_Chain4WordMove_00000003_00000008_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3058_CopyWordPlnByPlnChain4_00000003_00000008_00000000_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3059_Chain4WordMove_00000003_00000009_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3060_CopyWord4PlaneChain4_00000003_00000009_00000000_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3061_Chain4WordMove_00000003_0000000e_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3062_CopyWordPlnByPlnChain4_00000003_0000000e_00000000_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3063_Chain4WordMove_00000003_0000000f_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3064_CopyWord4PlaneChain4_00000003_0000000f_00000000_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3065_Chain4DwordMove_00000003_00000008_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3066_Chain4DwordMove_00000003_00000009_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3067_Chain4DwordMove_00000003_0000000e_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
+S_3068_Chain4DwordMove_00000003_0000000f_00000001_id	restore malloc; retain native capacity	actual body equivalence, poisoned-allocation controls and source data flow
