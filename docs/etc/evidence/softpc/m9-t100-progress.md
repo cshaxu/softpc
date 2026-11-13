@@ -5669,3 +5669,35 @@ build/manifest/EXE delta and XP-diff delta are zero. No new build or test is
 claimed for this read-only comparison. P66 remains the published 392/392 full
 regression baseline. Frozen frontier 325/472; next file 326 base/inc/base_def.h.
 S1 and earlier evidence-qualified residual decisions remain open.
+
+
+## Files 326-329: original base headers (P73 read-only qualification)
+
+Fixed XP raw SHA-256:
+
+| File | SHA-256 | Whole-file disposition |
+| --- | --- | --- |
+| base_def.h | a862bc34af1b24820530e2bf4e5651f4ad81eccb86856a869316f6691e7075d0 | Retained content equals XP outside existing exclusions/scaffolding. |
+| bios.h | 333eecd7ab1e4a48da56894256670a0a256eb0393df963fe96454c26d55a2a0f | Retained content equals XP outside existing exclusions/scaffolding. |
+| build_id.h | 6b140e5550335468ba615ea7f911da2b425bc2c7a1b467ea9260c5920ca8e970 | Entire normalized text equals XP. |
+| cga.h | 55eb38e415d7582b80a8bb52ff0dc935fdc7b232bbcd2bce5e768287ba318cb0 | Retained content equals XP outside existing exclusions/scaffolding. |
+
+Each file was compared in frozen order across its full original/current text.
+Apparent bios.h deletion fragments belong to existing excluded branches and
+were checked in context; no selected declaration restoration is missing.
+Existing excluded bodies and boundaries receive no new point IDs or accounting.
+No new residual decision exists in this group.
+
+Actual consumers remain: host/inc/insignia.h includes base_def.h; original BIOS
+and Compat device_bop/gfi_image users include bios.h; base/bios/build_id.c uses
+build_id.h; original mouse.c and video/cga.c include cga.h. These are retained
+original declaration/constants dependencies, not dead test-only files.
+The original build_id.h date fields encode the legacy BIOS build ID, not the
+standalone product's fresh compiler timestamp. No version rewrite is warranted.
+
+Counter-review finds no non-excluded local type, macro, declaration or formatting
+adaptation to restore. Preserve mirror CRLF; normalized equality is not a claim
+of identical raw LF/CRLF bytes. No source/test/build/manifest/EXE change, no
+XP-relative diff reduction, no new compilation or dynamic test result. P66 is
+still the published 392/392 full baseline. Frozen frontier advances to 329/472;
+next file 330 base/inc/ckmalloc.h. S1 and pending decisions remain open.

@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P72 audits files 324 gfi.c and 325 gfi_mpty.c. Only relocated historical
-notices differ outside existing exclusions/scaffolding; original runtime code
-and live empty-medium registration remain intact. No code/build/test changes.
-Published EXEs remain P66 with 392/392 full regression. Frozen frontier 325/472;
-next file 326 base/inc/base_def.h. See the
+T100 S1 P73 audits files 326-329: base_def.h, bios.h, build_id.h and cga.h.
+Retained content equals fixed XP outside existing exclusions/scaffolding;
+build_id.h equals the complete normalized original. No code changes or new
+residual decisions. Published EXEs remain P66 with 392/392 full regression;
+no new build/test run is claimed. Frozen frontier 329/472; next file 330
+base/inc/ckmalloc.h. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
