@@ -30,15 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P18 passes final qualification: cached dual-EXE publication and
-392/392 tests (188 background plus 8 native per architecture). ntthread.c outer exit now selects
-its frame then uses original ccpu386Unsimulate instead of repeating the unwind.
-Original-only single-frame exit fails actual nested BIOS checks at both widths;
-retention evidence remains pending owner decision. Original bounded allocation
-diagnostic is restored; explicit null failure returns remain with observed
-invalid original-return evidence, not a claim of safe recovery. Production
-+4/-20 (net -16), tests unchanged; XP diff shrinks by 18 lines and one point.
-Sequential review is 193/472; file 194 popf.c is next.
+T100 S1 P19 restores popf.c exactly to normalized fixed XP source.
+Production +0/-3, tests unchanged; XP diff shrinks by three lines and two
+points. Cached dual-EXE publication passes; complete EXEs differ from P18
+only in timestamp/checksum metadata. P18's 392/392 final qualification is
+reused under the artifact-equivalence rule, not reported as a fresh run.
+Sequential review is 205/472; file 206 ret.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

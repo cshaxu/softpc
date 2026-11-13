@@ -1524,3 +1524,41 @@ no warning diagnostics in this incremental run.
 - P18 softpc32.exe SHA-256: `44bdca5c28e44f1de6a501a2ca7b4324bf9f97a22e5effc18acd691786cff255`.
 
 - P18 softpc64.exe SHA-256: `b4f2d57f707fb5b3afb2c6ad9a721615fa8b5b18ce47370c15bd4ec2c9326f29`.
+
+## P19 file 194: restore original POPF declarations
+
+popf.c is an actual softpc-ccpu-core input. POPF/POPFD retain their original
+stack, flags and note_486_instruction calls. The latter is defined by original
+c_main.c with a char pointer argument; no callback or alternative Compat path
+is involved. The only differences are added stdio.h (R0163) and an added
+extern declaration plus blank line (R0164). Initial rationale is modern
+declaration completeness; counter-review finds no actual ABI difference: the
+existing fixed-format sprintf call and pointer diagnostic call compile to
+byte-identical objects after exact whole-file XP restoration on both supported
+architectures. Original implicit declaration warnings are mirror diagnostics,
+not evidence of incorrect execution or a relaxed shared-library warning rule.
+
+Restore both additions without replacing them elsewhere. Production +0/-3,
+tests unchanged; XP-relative +3/-0 becomes exactly +0/-0, eliminating two
+points. Preserved CRLF is the repository mirror policy; normalized contents
+match the fixed XP original and selected-subset hash. No added interface or
+behavior is introduced. Files 195-205 compare normalized-identical in frozen
+order. File 206 ret.c is next and has not yet completed semantic review.
+
+Final cached x86/x64 builds/publication pass. Both entire EXEs have unchanged
+length; every changed byte is within the PE timestamp/checksum or the single
+compiler time literal at its unchanged offset. All other bytes are identical.
+Under the owner artifact-equivalence exception, P18 392/392 qualification is
+reused; no fresh runtime regression is claimed. Coordinator review inspected
+the actual three deleted lines, original diagnostic signature, both object
+identities, exact normalized XP restoration, final full EXE equivalence,
+manifest/documentation gates and preserved CRLF. No shared code, guest,
+configuration or test source changed.
+
+- P19 softpc32.exe `f3ed3f718d26b22107b5781220d9043fe4e2276822ce11cb326b215e1106448e`; 7 metadata-only changed bytes; compiler time 02:13:10 to 02:22:40.
+
+- P19 softpc64.exe `c72114528f2329d979483cacb41f17433236e1ccbf17300c9b453f697cb8898b`; 8 metadata-only changed bytes; compiler time 02:16:31 to 02:22:55.
+
+- Final x86 popf object `b573573185adb0e88da23fee1e10d33db9b1f29b39a08bcfa99effdeca4043a0` matches the original-candidate object.
+
+- Final x64 popf object `2c52185d0987683aaae21427b25c2d04fa7c35113e6cf23af5abf5ed25258558` matches the original-candidate object.

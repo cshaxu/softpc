@@ -13,7 +13,6 @@ POPF CPU Functions.
 #include <insignia.h>
 
 #include <host_def.h>
-#include <stdio.h>
 #include <xt.h>
 #include CpuH
 #include <c_main.h>
@@ -27,8 +26,6 @@ POPF CPU Functions.
 #include <popf.h>
 #include <debug.h>
 #include <config.h>
-
-extern void note_486_instruction(char *text);
 
 
 /*
