@@ -1989,3 +1989,18 @@ under fixed original-line correspondence. Heuristic realignment is disclosed
 in the evidence, not claimed as additional cleanup. Both widths pass 576
 independent pixel cases before/after and the full 392-test regression.
 See [P56 evidence](m9-t100-progress.md#p56-correction-revisit-files-292293-sevid009c-and-sevid010c).
+
+
+### T100 S1 P57 sevid025 restoration
+
+File 308 restores 66 native-pointer dereferences and 26 malloc calls. Native
+GDP mapping, all native capacities and six mixed-width zero initializations
+remain qualified owner decisions. Production +92/-92, net zero; XP diff
+1465 -> 1333 lines, reduction 132; contiguous ranges 558 -> 556. No new mirror
+patch is introduced. Actual-body equivalence covers 148 cases per run on each
+width, including poisoned malloc; both original-capacity and removed-zeroing
+controls fail on x64. D004 records an unchanged original mode-2 pixel discrepancy,
+not a repaired bug or guest reproduction. Full regression passes 392/392.
+See [P57 audit](m9-t100-progress.md#file-308-sevid025c-p57),
+[range map](m9-t100-sevid025-points.tsv) and
+[allocation inventory](m9-t100-sevid025-allocations.tsv).

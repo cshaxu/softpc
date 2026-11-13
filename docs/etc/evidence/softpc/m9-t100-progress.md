@@ -3476,7 +3476,7 @@ configuration, guest media and snapshots remain intact.
 ## Pending original-defect diff decisions
 
 Owner moves these discoveries out of TODO into this audit's pending diff-point
-list. D001-D003 identify proposed differences, not existing local patch ranges;
+list. D001-D004 identify proposed differences, not existing local patch ranges;
 they do not inflate the measured XP diff or the restored-point counts. None
 is repaired or approved for a new mirror patch. Continue ordered auditing
 without waiting; the no-increase constraint remains in force.
@@ -3487,6 +3487,8 @@ without waiting; the no-increase constraint remains in force.
 | D002 | base/cvidc/sevid008.c, S2360/S2372: potential second-WORD offset correction from +8 to +2, with multi-DWORD fill ordering still to verify. | P38 unchanged/candidate actual bodies put 33 44 at +8/+9 instead of +2/+3 on both architectures. Current CCPU DWORD stores use two WORD operations at +0/+2; no guest use of these generated DWORD entries established. | Pending diff decision; original behavior unchanged. |
 
 | D003 | base/cvidc/sevid023.c, Chain4DwordFill (S2844 demonstrated): proposed correction of multi-element WORD-pass overlap. Minimal implementation is not yet established. | P54 actual bodies on x86/x64 request four copies of 0x44332211 but produce 11 22 33 44 33 44 33 44 33 44 followed by six untouched bytes. Current, candidate and poisoned candidate agree. Pinned XP uses the same two count-wide WORD fills at offsets +0/+2. c_sas_fillsdw loops over c_sas_storedw; no production caller of fill_dword_ev_glue was found. No guest symptom established. | Pending diff decision; original behavior unchanged. |
+
+| D004 | base/cvidc/sevid025.c, CHAIN4 mode-2 WORD/DWORD writes: plane-selection discrepancy; a possible correction would select the addressed plane's expanded byte rather than always the low byte. No patch is admitted. | P57 real setWritePointers selects all four mode-2 variants. On x86/x64, offset 0x100, WORD 0x0201 writes ff 00, whereas the per-plane expansion expectation is ff ff; DWORD 0x08040201 writes ff 00 00 00 rather than ff ff ff ff. Current, restored and poisoned-restored bodies agree. Pinned XP stores the low byte after lookup expansion. write_word_ev_glue is in the production video write vector. This is a source/fixture discrepancy, not a reproduced guest failure or completed hardware conformance investigation. | Pending diff decision and hardware/guest applicability verification; original behavior unchanged. |
 
 The P34/P38 sections retain the detailed controls and caller evidence. This
 transfer does not claim a guest symptom, a completed fix, or authority to add
@@ -4798,3 +4800,96 @@ qualified residual decisions remain open; no new guest acceptance is claimed.
 P56 process inventory confirms all owned jobs exited. Task scratch was
 previewed and removed via Clean-Build; residue verification passes. Reusable
 caches, configuration, media and snapshots are preserved.
+
+## File 308: sevid025.c (P57)
+
+Initial review covers the complete retained compilation unit in frozen order.
+Pinned XP is a2f6d7c93aa4f11efc51147566d5961c59a8ef89, corresponding
+Source/XPSP1/NT/base/mvdm/softpc.new/base/cvidc/sevid025.c. Its supported
+C-VID object and evidfunc table entries remain production-linked; Compat does
+not implement a duplicate of these rules. Whole-file retirement is inapplicable.
+No existing exclusion body is inventoried.
+
+The [initial range map](m9-t100-sevid025-points.tsv) covers 558 non-equal
+ranges. The [allocation inventory](m9-t100-sevid025-allocations.tsv) covers all
+32 local arrays, S2886-S2917. Complete line correspondence, allowing only the
+existing GDP include at local line 3, classifies every initial changed line:
+634 GDP accesses, 66 native-address accesses, 32 allocations and the include.
+There is no unclassified algorithm, continuation or formatting difference.
+
+| Point | Initial review | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0387 | GDP mapped-field access and declaration. | Existing native GDP storage is not the original packed 32-bit layout. Keep the field mapping pending owner decision; restoring unrelated native-address dereferences does not require restoring this different representation. |
+| R0388 | 66 address adapters around already resolved native pointers. | Trace lookup loads to native sr_lookup plus nibble*4 and plane/source accesses to native pointers plus offsets. Every restored line equals XP exactly. All address-adapter calls disappear from this file; no new helper or relocated logic. |
+| R0389 | All 32 arrays use calloc and native capacity. | Restore malloc in 26 arrays. Six arrays write an IU32 slot and later read it as IUH: S2886/S2890 slot 7 and S2893-S2896 slot 0. Retain their zero initialization and all native capacities pending decision. Combined poisoned no-zero and original-capacity controls fail on x64; source review identifies each retained mixed-width slot. |
+
+Production changes +92/-92, net zero; permanent tests are unchanged. Of those
+92 lines, 66 restore exact XP address expressions and 26 remove unnecessary
+zero initialization while retaining necessary native allocation size. XP-relative
+heuristic and fixed-correspondence counts agree: +733/-732 (1465) before,
++667/-666 (1333) after, a reduction of 132 difference lines. Contiguous ranges
+558 -> 556 are descriptive, not the reason for retention or restoration.
+
+### Actual-body controls and an original discrepancy
+
+The scratch fixture extends the existing initialized VGA unit, explicitly
+linking current or candidate sevid025 before the production archive. Real
+setWritePointers selects CHAIN4 mode 2 with states 8/9/14/15, rotate zero and
+no dithering; assertions verify the selected vector, and calls use that vector.
+It covers four address parities, WORD/DWORD write/fill/move, byte move, and
+six directly called copy helpers with both source flags. The first DWORD move
+belongs to this file; other variants are not falsely counted as its coverage.
+Each run has 148 cases and repeats the full 4096-byte result for determinism.
+
+Current, candidate and candidate-with-malloc-filled-0xa5 pass on both widths,
+all with result hash 5bb43715. Existing VGA assertions also pass. Removing the
+six retained zero initializations under poisoned allocation fails x64 with
+0xc0000005; restoring 4-byte allocation capacity while preserving the six
+calloc choices also fails x64 with 0xc0000005. Both controls complete on x86.
+These are actual-body ABI controls, not a substitute for hardware correctness
+or exhaustive proof of all possible register states.
+
+The initial independently calculated per-plane pixel assertion fails on the
+unchanged file as well as the candidate. Diagnostic runs isolate D004 above:
+expanded bits for planes 1-3 are not selected by the generated stores. The
+lookup table and low-byte stores are in pinned XP too. Later equivalence runs
+print these mismatches instead of counting them as pixel-correctness passes;
+they preserve the original result rather than quietly changing the oracle to
+make it green. The recorded 148 cases prove restoration equivalence and
+allocation behavior, not correction of D004. No new original-bug patch, TODO
+item, guest symptom claim or sibling-project change is made.
+
+Normalized-LF candidate SHA-256:
+0df51b6df36f911d300cf25b6456866f556115e6badf0e54e24499e64536a5de.
+The production file equals the tested candidate and retains CRLF. Cached
+build/publication and full regression are running; the sequential frontier
+remains 307/472 until final qualification and delivery.
+
+### P57 final qualification and actual-change review
+
+Both cached builds and publications pass. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first full run**, no retries or
+budget changes. Current and candidate isolated compiles have no warnings.
+
+- x86-build: 14.18 seconds, exit 0.
+- x86-background: 141.09 seconds, exit 0.
+- x86-native: 26.03 seconds, exit 0.
+- x64-build: 15.09 seconds, exit 0.
+- x64-background: 133.1 seconds, exit 0.
+- x64-native: 22.03 seconds, exit 0.
+
+Published softpc32.exe: embedded Nov 13 2026 11:46:36; SHA-256 0f2a53f05b58ca003eeef04e7e1a7797af115db57f63b67199a2835a7acd1baa.
+
+Published softpc64.exe: embedded Nov 13 2026 11:49:37; SHA-256 9a1aa24234b92131a144f5da4661c8010e2b9772bcff4e9e092c47c1c6258a39.
+
+Actual-change review matches all 92 changed production lines to the tested
+candidate: 66 exact XP address restorations and 26 malloc restorations with
+necessary native capacity. No production algorithm, public component, permanent
+test, INI, media or snapshot change. XP export hash matches frozen provenance.
+Mirror and documentation gates pass; no new guest acceptance is claimed.
+The sequential frontier advances to 308/472; next file 309 sevid026.c.
+S1 and qualified residual decisions remain open.
+
+P57 process inventory confirms all owned jobs exited. Exact task scratch was
+previewed and removed via Clean-Build; residue verification passes. Reusable
+caches, user configuration, media and snapshots are preserved.
