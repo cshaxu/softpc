@@ -5036,3 +5036,71 @@ remains 311/472. Existing residual decisions remain open.
 P61 owned-process inventory confirms all probes exited. Clean-Build preview,
 exact task-scratch removal and residue check pass. Documentation gate and
 actual documentation diff review pass; configuration and guest assets are untouched.
+
+## File 312: sevid029.c (P62 in qualification)
+
+Pinned XP raw SHA-256 0b7477892fb8e55fddd49bdf7712ca0e61d86a40b09879e026e6fb5684d85428.
+Complete fixed-line correspondence identifies 497 GDP mapping lines, 52 native
+address wrappers, 32 allocations and the GDP include; no other changed lines.
+The [point map](m9-t100-sevid029-points.tsv) and
+[allocation inventory](m9-t100-sevid029-allocations.tsv) record these differences.
+R0399 retains native GDP layout pending owner decision. R0400 restores 52 exact
+XP native address expressions. R0401 restores 29 malloc calls, retaining native
+capacity; three zero initializations remain qualified decisions. Their local
+slot 7 is assigned through IU32 and then read through IUH for address addition.
+Other mixed-width mentions include a full-width initialization and do not
+justify preserving calloc merely because two widths occur in one function.
+
+Production +81/-81. Anchored XP added+deleted difference 1163 -> 1059, reduction
+104; SequenceMatcher ranges 456 -> 436. Normalized final candidate SHA-256
+9e383214bf702c6b739891198273b541edb3a20b4aa87521e501a03f1a0fbb78.
+
+Disposable actual-body fixture calls all 32 generated entries with RAM-source
+flag and four destination parities. Original production machine initialization
+and BIOS mode 13h precede calls; each case initializes source and video bytes,
+then hashes the complete 256 KiB plane image. Current, candidate and malloc
+poison candidate pass all 32 processes per architecture, 128 parity cases per
+variant. All corresponding output hashes match. This proves these restoration
+cases equivalent, not independent hardware conformance or every guest mode.
+Legacy video-source callback scope is governed by the completed P61 investigation,
+not silently counted as passing here.
+
+Removing the three remaining zero initializations under poisoned allocation
+passes all 32 x86 entry processes but causes x64 access violations, including
+direct helper entries S_3026, S_3030 and S_3034. Each helper has its own allocation
+and the identified partial-write/native-read slot. Other failing callers inherit
+those helper faults; their allocations are not thereby qualified for calloc.
+No new production repair or initialization path is introduced.
+
+Final cached build, publication and full regression remain in progress.
+The sequential frontier stays 311/472 until complete P62 delivery.
+
+### P62 final qualification
+
+Both cached builds and publications pass. Each architecture passes 188 background
+and eight native tests, 392/392 first run. Final production source equals the
+actual-body candidate. No original guest or desktop acceptance is inferred
+from the function-level equivalence probes.
+
+- x86-build: 13.02 seconds, exit 0.
+- x86-background: 141.43 seconds, exit 0.
+- x86-native: 25.05 seconds, exit 0.
+- x64-build: 15.75 seconds, exit 0.
+- x64-background: 141.65 seconds, exit 0.
+- x64-native: 24.82 seconds, exit 0.
+
+softpc32.exe: Nov 13 2026 12:54:56, SHA-256 11c1c86a0f1619727f7b0e085f09d87cc5655b42888cade475d44a24eae75aa4.
+
+softpc64.exe: Nov 13 2026 12:57:55, SHA-256 2518ac9c3b50a9228a471dd44b5fa5f280d9feaba05208df030fd2dca21d9096.
+
+Independent actual-change review reconciles all 81 production changes with the
+tested candidate: 52 exact original dereferences, 29 malloc restorations with
+required native capacity. There is no new algorithm, public-component change,
+permanent test, INI, media or snapshot change. Original trailing whitespace on
+restored lines is deliberately preserved, not reformatted. Manifest and
+documentation gates pass. Frontier advances to 312/472; next is sevid030.c.
+S1 and qualified residual owner decisions remain open.
+
+P62 process inventory confirms all owned jobs exited. Exact task scratch was
+previewed and removed using Clean-Build; residue verification passes. Reusable
+caches, configuration, media and snapshots remain intact.
