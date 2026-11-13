@@ -4144,3 +4144,148 @@ S1 remains active; no routine approval is awaited.
 P49 process inventory confirms all owned workers exited. Exact disposable
 scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
 user configuration, guest media and snapshots remain intact.
+
+## File 302 sevid019.c investigation in progress
+
+No production change or P50 delivery is claimed yet. The scratch candidate
+restores 40 native-address expressions, 20 malloc calls, 168 original private
+declaration lines and the shift literal at former DIV-123. That shift's
+immediately preceding assignment fixes its count to zero; the widened literal
+has no demonstrated necessity there. Exact original whitespace reconciliation
+and remaining point review are still required. Initial XP difference is
++726/-1120, 486 ranges; this intermediate candidate is +688/-917, 432 ranges.
+These are candidate metrics, not delivered reductions.
+
+Actual production-flag translation-unit replacements linked into the existing
+VGA fixture pass on x86/x64 for unchanged code, candidate and candidate malloc
+storage poisoned with 0xa5. All include 96/96 independent Copy DWORD fill cases.
+Original four-byte allocation capacity passes x86 but faults with 0xc0000005
+on x64. Restoring the 28 layout constant lines fails actual VGA readback at
+vga_frame_smoke.c:1516 on both architectures. Removing the WORD empty-fill
+guard faults on both; removing the DWORD empty guard or odd-tail repair fails
+the independent fill oracle on both. No guest-triggered reproduction is claimed.
+
+Restoring all 16 continuation calls passes the pixel assertions on both
+architectures, so those assertions alone do not justify retention. A separate
+actual-body allocation/free counter supplies the missing ownership evidence:
+both architectures allocate 672566 blocks in this unit. Candidate frees all
+672566; restored continuations free only 672462, leaving 104 allocations.
+The original continuation enters a fresh crules activation with CopyLocalIUH
+zero; its cleanup loses the enclosing same-file caller's saved local pointer.
+This is an observed resource leak, not a claimed crash in this file. Counters
+are task-only instrumentation; no production test API is introduced.
+
+All three probe runners completed. Remaining work includes selected-marker,
+DWORD rotation and mixed-width local proof reconciliation, exact original
+restoration review, point registration and the required final-source dual
+build/publication/full regression. Sequential delivered coverage remains
+301/472. Task-owned scratch remains solely for this active investigation.
+
+### File 302 final-source review and qualification pending
+
+The exact candidate is now applied: production +228/-63 (net +165), test
+sources unchanged. XP difference changes +726/-1120 (1846 lines, 486 ranges)
+to +687/-916 (1603 lines, 432 ranges): 243 fewer diff lines, 54 fewer ranges.
+The added source is original private scaffolding, not additional runtime logic.
+The point map covers all 486 initial ranges; the allocation inventory names
+all 32 local allocations, with 20 malloc restorations and 12 zeroing residuals.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0358 | GDP slot access differs from the original byte-offset carrier. | Native field offsets and pointer-sized fields differ on x64; keep existing mapped GDP access pending owner decision. Direct RAM addresses are reviewed separately. |
+| R0359 | Forty native-address wrappers treat already resolved pointers as possible GDP offsets. | The addresses derive from plane/native RAM buffers and the original native pointer carriers; restore exact original dereferences. Final-source and poisoned-malloc controls pass both architectures. |
+| R0360 | All local arrays use native-sized calloc. | Twenty arrays have no partial-store/full-native-load overlap and recover malloc with native capacity. Twelve have narrow stores followed by native loads (Copy value/address slots or backward source-offset slot 8); retain initialization pending decision. Native capacity is required: original four-byte allocation faults on x64. Poisoning all formerly zeroed arrays also faults on x64; it does not individually prove every retained array. |
+| R0361 | Fourteen original inline CGA dirty blocks were replaced by selected markers. | Coherent restoration includes original L25 labels and intervening address computation, retaining native GDP mapping. Both architectures fail the actual EGA dirty-low assertion at vga_frame_smoke.c:1561. Retain selected byte/word/string marker wiring, including backward span conversion, pending decision. |
+| R0362 | Twenty-eight address/stride constants preserve odd/even plane gaps. | Exact original constant restoration fails actual VGA readback at vga_frame_smoke.c:1516 on both architectures; preserve layout fixes pending decision. |
+| R0363 | Sixteen continuation calls became same-activation gotos. | Pixel tests alone pass with original calls. Actual-body counters independently show 104 leaked allocations on each architecture with original calls versus zero with the candidate. Retain ownership fixes pending decision, without claiming this file crashes. |
+| R0364 | Copy WORD/DWORD fills have empty-count protection, full-DWORD rotation and a byte-sized odd tail. | Separate original restorations of each category fail: WORD empty access faults; DWORD empty, rotation and tail fail the 96-case independent plane oracle. Both widths reproduce. Preserve existing fixes pending decision; no new bulk caller is enabled. |
+| R0365 | Original private L25 enum/function/pointer declarations were omitted. | Restore 168 exact original lines. No active case/goto/label or old CGA accounting is reintroduced by these declarations. Both widths compile and run. |
+| R0366 | DIV-123 widens literal 1 at a shift-count-zero test. | The preceding assignment fixes the count to zero. Restore the complete exact original line and remove the three-line explanation. Both final-source controls pass; no new behavior or mirror point is added. |
+
+These generated entry points remain in the existing C-VID controller tables;
+no duplicate Compat implementation or removable compilation unit was found.
+Native RAM and controller-rule tests exercise registered batch entries, but
+this does not establish ordinary guest use of every bulk entry. No guest,
+media, configuration, snapshot or sibling repository changed.
+
+Single-person executor review verifies every source delta is an exact original
+private block, direct address, allocator spelling with unchanged native capacity,
+or the exact shift line. Counter-review checks that original private declarations
+do not reactivate removed CGA marker branches. Native-width GDP/local ownership,
+selected-marker and plane-layout differences remain explicit; passing modified
+tests is not their only justification. Mixed-array evidence is bounded as stated.
+
+Final LF-normalized SHA-256:
+9ea9816db5c005e129a6f82e684e1dd62b3318a9336e88583c4869f6e57a77d5.
+CRLF source equals the final tested candidate. Mirror manifest verification
+passes. Full cached dual build/publication and registered regression are now
+running; file 302 is not counted delivered until they and final review finish.
+
+### File 302 counter-review refinement: restore five direct continuations
+
+Further same-file call analysis splits R0363 rather than treating all sixteen
+sites as one necessary repair. S2697, S2699, S2700, S2702 and S2703 have no
+same-file nested callers. Their L21_137/153/155/161/163 continuations can use
+the exact original tail-return call without losing an enclosing local array.
+The other eleven sites occur in the same-file move-wrapper chains and retain
+their ownership fix pending decision. This supersedes the all-sixteen
+retention suggestion above; a group-level leak test alone was insufficient.
+
+Restoring only those five calls passes the actual VGA fixture on both widths.
+Independent allocation/free instrumentation records 672566/672566, zero
+residual blocks, on x86 and x64, with 96/96 Copy DWORD fill cases. Restoring
+all sixteen still loses 104 allocations as recorded above. Each newly restored
+two-line block matches pinned XP exactly. No production instrumentation remains.
+
+Final production change is now +238/-68 (net +170). XP difference is
++682/-906 (1588 lines), 428 ranges: **258 fewer diff lines, 58 fewer ranges**
+than the file's initial state. Final LF-normalized SHA-256:
+5c7a9b564215ecc9734da69ada668e2146c92e1326ed8dcec1a996dfc5049d18.
+The prior candidate completed 392/392 with no retries (x86 build/background/
+native 10.09/140.11/26.04 seconds; x64 11.09/145.10/25.03). That suite is
+not reused as proof of the refined final source. After all prior workers
+exited, the five original calls were applied and a fresh complete cached
+dual build/publication/regression was started. Delivery remains pending.
+
+### P50 final qualification and actual-change review
+
+Both final-source cached builds and fresh publications succeed. Each
+architecture initially passes 187/188 background and 8/8 native tests. The
+sole failure is the old source gate requiring all sixteen continuation gotos.
+After the full run ends, its list is narrowed to the eleven entries with
+same-file nested callers; both exact gate reruns pass. Qualification is
+**392/392**, not a first-full-run pass. No budget changes. The original
+switch-unreachable warning remains the sole build warning, shifted from
+line 981 to 1149 by original declarations; no new warning appears.
+
+- x86 build: 10.08 seconds, exit 0.
+- x86 background: 132.09 seconds, exit 8.
+- x86 native: 26.03 seconds, exit 0.
+- x64 build: 11.1 seconds, exit 0.
+- x64 background: 142.1 seconds, exit 8.
+- x64 native: 25.03 seconds, exit 0.
+- x86 corrected source gate: 5.98 seconds, exit 0.
+- x64 corrected source gate: 6.85 seconds, exit 0.
+
+Counted tracked production change is sevid019.c +238/-68; test C/H sources
+are unchanged. The coupled root gate changes +3/-2: one explanatory comment
+and removal of five proven direct-only entries from its continuation list.
+Other files' continuation requirements and the 28-marker gate are unchanged.
+
+Final-source identity, CRLF, actual-change review and mirror/documentation
+gates pass. This completes file 302 delivery qualification, not the whole S1
+audit or the owner decisions. No new interactive DOS/Win3.1/Win95 validation
+is claimed beyond the registered integration suite and actual-body controls.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 10:06:59;
+SHA-256 5110100ac34582fa2b06786c7fe351331fffda2bbd4ac99f85e74cd70832321d.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 10:09:48;
+SHA-256 25e6f6a924543d4a8690b16420c6ca2907472c0c24ee559259e8f70fbf252396.
+
+Sequential audited scope is 302/472; next file 303 base/cvidc/sevid020.c.
+S1 remains active; no routine approval is awaited.
+
+P50 process inventory confirms all owned workers exited. Task scratch was
+previewed and removed through Clean-Build; its closure residue check passes.
+Reusable Ninja/ccache roots, user configuration, media and snapshots remain.

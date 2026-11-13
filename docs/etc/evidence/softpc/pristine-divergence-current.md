@@ -1901,3 +1901,18 @@ decisions. Production +98/-38; XP diff falls 1173 -> 1097 lines and
 See [P49 audit](m9-t100-progress.md#p49-file-301-sevid018c-audit-and-restoration),
 [range map](m9-t100-sevid018-points.tsv) and
 [allocation inventory](m9-t100-sevid018-allocations.tsv).
+
+### T100 S1 P50 sevid019 restoration
+
+File 302 restores 40 native addresses, 20 malloc calls, 168 private declaration
+lines, five direct continuation calls and the original shift literal at DIV-123.
+The historical DIV-123 statement no longer applies to sevid019; sevid020 is
+not yet audited. Necessary GDP/native-local, dirty, layout, fill and continuation
+differences remain qualified owner decisions. Production +238/-68; XP diff
+falls 1846 -> 1588 lines and 486 -> 428 ranges. Both architectures pass all
+registered tests after the overbroad source gate is corrected and rerun.
+Original continuation controls show
+104 unreleased allocations despite correct pixel output; candidate releases all.
+See [file audit](m9-t100-progress.md#file-302-final-source-review-and-qualification-pending),
+[range map](m9-t100-sevid019-points.tsv) and
+[allocation inventory](m9-t100-sevid019-allocations.tsv).
