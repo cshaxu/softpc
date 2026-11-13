@@ -30,14 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P81 restores egavideo.h by removing the duplicate ega_read_dot
-header declaration; the original caller-local declaration remains. All fourteen
-dual-width object pairs are byte-identical. Both cached builds/publications pass;
-EXEs differ only in verified build metadata, so the owner-approved equivalence
-exception applies without a new full-suite run. P80's 392/392 remains the runtime
-baseline. Production +0/-4; XP diff decreases four lines. Frontier 344/472;
-next file 345 base/inc/emm.h. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P82 restores emm.h's unused host-storage declarations to XP; their
+historical native-pointer rationale has no current implementation or caller.
+Both reset-object pairs are byte-identical. Cached dual builds/publications pass;
+complete EXEs differ only in verified build metadata, so no repeat full suite
+is run under the owner's equivalence exception. P80's 392/392 remains the
+runtime baseline. Production +3/-6; XP diff decreases nine lines. equip.h,
+error.h and fdisk.h retained content matches XP. Frontier 348/472; next file
+349 base/inc/fla.h. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 

@@ -2047,3 +2047,10 @@ the added header copy and explanation are restored away. Fourteen dual-width
 object pairs and both final executables establish the stated equivalence.
 See T100 evidence for the four-line XP-difference reduction; historical totals
 above are not current mirror-diff measurements.
+
+
+T100 S1 P82 restores emm.h's three host-storage declarations to XP long types
+and removes their added MVDM-HOST-DIV-061 explanation. No current implementation
+or caller exists, and both reset-object pairs plus final EXEs prove the stated
+equivalence. This supersedes only the emm.h rationale, not other files' ABI
+points. See T100 evidence for the nine-line XP-difference reduction.

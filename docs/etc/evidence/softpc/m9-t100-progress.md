@@ -6202,3 +6202,70 @@ Frozen delivered frontier 344/472; next file 345 base/inc/emm.h. S1 remains acti
 P81 mirror-manifest and documentation gates pass. Actual eight-file diff review
 passes. Both owned workers exited; scratch preview, removal and residue check
 pass. Reusable caches are preserved, with no unrelated worktree changes.
+
+
+## P82: files 345-348 ordered review and restoration candidate
+
+Fixed XP raw identities:
+- base/inc/emm.h: eb018c490a67e91b62af865f0ff6f75a1d4af9a08cd33186e8b74867ee0b7e8a.
+- base/inc/equip.h: 8121528b389fa0ce6653bda8ccb6a042282d6c018cd7badf8bc72deb1b0c364e.
+- base/inc/error.h: a262dcddcb4059e50a24c7795e09f493c9ba6e576ca0e7d904c3e60e6da08e51.
+- base/inc/fdisk.h: 7bb7f6bcad81fe7bc980e61689cb29d069abc0eeea1337a0e81b0c918c69a044.
+
+R0431 concerns emm.h's three host-storage declarations changed from long to
+IHP, with a three-line native-pointer rationale. Whole source/test search finds
+no implementation or caller for host_allocate_storage, host_free_storage or
+host_reallocate_storage. Both actual machine archives also contain no defined
+or unresolved symbol with these names. The only active direct header consumer
+is original reset.c. Keeping a historical pointer adaptation for nonexistent
+consumers is not justified by generic x64 concerns.
+
+Restore the exact three XP declarations and remove the added explanation.
+Actual reset.c compiled with current/restored headers under identical Ninja
+flags yields identical objects on both widths (four successful compilations):
+- ["x86", "2c63ec66bb03e09f86987d33eebb900b91ff516159e224da75ff91596f85dd1d", "2c63ec66bb03e09f86987d33eebb900b91ff516159e224da75ff91596f85dd1d", true]
+- ["x64", "ab53371ca25a897711f81e1efb7b310f90e05a6e94d5e07ce0f52a0e80a97788", "ab53371ca25a897711f81e1efb7b310f90e05a6e94d5e07ce0f52a0e80a97788", true]
+
+Counter-review: no active allocator or ABI is changed. The original header and
+include remain; deleting an unused original declaration/file would increase
+mirror differences and is not proposed. No Compat implementation substitutes
+for these functions. Existing #error exclusions are skipped without accounting.
+Production +3/-6, net -3; XP added/deleted diff decreases nine lines.
+Final normalized emm.h SHA-256: 52bb00c12434a96968c185329dc88f0cf5a963dd3666fcb2c98c9fad1f83bedf.
+
+Complete retained-content comparisons for equip.h and error.h show no changes
+outside existing excluded scaffolding. Actual production consumers include
+reset/equipmnt/floppy/ega_vide for equipment and diskbios/cmos/video code for
+error contracts. fdisk.h matches XP after newline normalization and is consumed
+by diskbios/fdisk/fla/reset. These live declarations do not duplicate Compat
+behavior. No modifications or new residual decisions are required for 346-348.
+
+Final-source cached build/publication and EXE comparison are pending. The
+owner's no-repeat-test exception applies only after actual artifact-equivalence
+verification; delivered frontier remains 344/472 until P82 delivery.
+
+
+### P82 final-source delivery qualification
+
+Cached build/publication results: [["x86", 0, 8.02], ["x64", 0, 9.51]].
+
+- softpc32.exe: 3463049 bytes, 7 differing bytes. Prior stamp 14:53:37 Nov 13 2026; current 14:57:16 Nov 13 2026; SHA-256 acb67db7b7d3c97e22719922718baa10e8dabe6a91eab6e5144397a914f7b35a.
+- softpc64.exe: 3082345 bytes, 6 differing bytes. Prior stamp 14:53:49 Nov 13 2026; current 14:57:24 Nov 13 2026; SHA-256 3c6c252918e3c8bf32021f5cd4d47bc29de219e980252f901b0a62c7b90b2164.
+
+Both complete EXEs compare identical outside the explicitly located COFF
+TimeDateStamp, PE optional-header CheckSum and eight-byte compiler-time literal.
+Lengths, PE positions and unique date/time-literal positions match. No other
+byte differs. The owner-approved equivalence exception therefore omits a repeat
+full runtime suite; P80's 392/392 remains the runtime baseline, not a P82 count.
+Both final mirrored header bytes and declaration scope match the tested variant.
+
+Actual-change review: only emm.h changes in production, +3/-6 (net -3), while
+XP-relative added/deleted difference decreases nine lines. Test/build source
++0/-0. R0431 is restored rather than retained for approval. Other reviewed
+headers have no retained-content difference. No guest, configuration, media,
+shared component or device behavior changes. Delivered frontier 348/472;
+next file 349 base/inc/fla.h. S1 and prior owner decisions remain open.
+
+P82 manifest/documentation gates and actual eight-file diff review pass. Both
+owned workers exited; scratch preview, exact removal and residue check pass.
+Reusable caches and unrelated assets remain unchanged.
