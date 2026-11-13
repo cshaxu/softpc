@@ -5388,3 +5388,47 @@ advances to 316/472; next file 317 univer_c.h. S1 remains active.
 P66 owned-process inspection confirms all jobs exited. Clean-Build preview,
 exact task scratch removal and residue check pass. Reusable caches remain;
 temporary probes/logs and disposable binaries are removed.
+
+## Files 317-318: univer_c.h and vglfunc.c (P67 read-only qualification)
+
+File 317, univer_c.h: fixed XP SHA-256
+6aa718d4f8fcd4e0774c21eef3516b6fa37c1c2d1fecc1433c739cedef9a3c1d.
+Entire normalized text equals XP; local CRLF follows mirror policy. No code
+restoration or diff decision is needed. Repository source/test/CMake search
+finds no include consumer. Whole-file removal would introduce a new difference
+against an otherwise identical original file, prohibited by the owner's
+no-increase clarification; retain the original file, not a claimed runtime
+dependency. No excluded-body accounting is introduced.
+
+File 318, vglfunc.c: fixed XP SHA-256
+d1adc782d8a812db646ccf71abc9e59a394086ae2bbba236bbb407e7c80de36b.
+Only one addition exists: local source lines 6-10, five lines (+5/-0).
+R0412 is an evidence-qualified declaration adaptation pending owner decision.
+It undefines IFN1 and redefines it to a typed parameter list for this translation
+unit; the three-line comment is its existing required local reason marker.
+All original declarations, vector entries and their order remain unchanged.
+
+Real consumer/compile proof: root CMake includes vglfunc.c in the C-VID core.
+Its C_Video vector registers the generated getters/setters examined in the
+preceding files. The selected insignia.h IFN1 is a K&R function-definition
+macro, expanding to a parameter-name list followed by a parameter declaration;
+that expansion is not a valid standalone extern declaration. Restoring the
+entire fixed XP vglfunc.c, rather than a broken subset of its declarations,
+fails with the actual x86 and x64 production compiler flags. Both report
+"expected declaration specifiers before ';' token" at XP line 46, the first
+setter declaration. Current unchanged vglfunc.c compiles on both architectures.
+All four jobs terminate normally: XP exits 1/1, current exits 0/0.
+
+Counter-review: changing the global IFN1 would affect actual old-style function
+definitions outside this declaration-only unit; it is not a smaller coherent
+restoration. The current local adaptation preserves the existing single vector
+and introduces no second path, lifecycle or guest behavior. Retain its five
+lines for the owner's decision with this concrete compilation evidence.
+No new source/test/manifest/EXE changes; no new full-suite or guest validation
+is claimed. P66 remains the published 392/392 executable baseline.
+Verified ordered audit frontier advances to 318/472; next file 319 diskbios.c.
+This is not S1 closure or approval of the retained difference.
+
+P67 compiler processes have exited. Owned scratch was previewed and removed
+with Clean-Build; residue and documentation checks pass. Worktree review
+confirms documentation/inventory changes only, with production and assets intact.
