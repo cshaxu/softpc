@@ -6681,3 +6681,36 @@ next file 370 base/inc/j_c_lang.h. S1 and pending decisions remain open.
 P90 actual three-file documentation review and mirror/documentation gates pass.
 The worker and children exited; scratch preview, exact removal and residue
 check pass. No user configuration, media or unrelated files were changed.
+
+## Files 370-376: register/device headers (P91)
+
+Each full normalized file was compared with its pinned XP counterpart, in
+frozen order. Existing excluded bodies/scaffolding are skipped without new
+accounting. No selected semantic or nonsemantic adaptation was found.
+
+| File | Fixed XP raw SHA-256 | Actual retained relationship |
+| --- | --- | --- |
+| 370 base/inc/j_c_lang.h | d98ec1630242cda361ad334193c0919d651ae673d3fd1e997784e77db229cc7a | Original generated C-VID register declarations/little-endian offsets, included by sevid/sinit units, ev_glue.c and chain2_rule_smoke. Non-excluded content matches XP. |
+| 371 base/inc/keyba.h | b946d6fa9a2e4af545b2499d49042047155c628007c272449a19658d9f97897d | Original controller prototypes/function pointers used by keyba.c, keybd_io.c, reset.c and Compat keyboard.c. Non-excluded content matches XP. |
+| 372 base/inc/keyboard.h | dc63ed1ca7c58c80f0869427a09df6799e96ae4191413a7eecfe9ab751700fa6 | Complete normalized file equals XP. Original keyboard/BIOS and Compat consumers remain. |
+| 373 base/inc/mouse.h | 5def51c2afcf05668fcd9516fad0f1c91802c000d6d6cfac1b1a842ca54af1f4 | Original mouse.c/reset.c and mouse/checkpoint fixture includes remain; selected constants/interfaces match XP. |
+| 374 base/inc/mouse_io.h | bd398b6b37123919be5aa7f9807b45c715d4f0caac8aa04ec2ea5602ca5a112f | Original mouse.c and reset.c still include it. The former same-name implementation's retirement does not make the header/include disposable. Non-excluded content matches XP. |
+| 375 base/inc/ppi.h | f4e0c66e1dd7ab4e6976fde1c5a996613d18a6430ec1718147ce0d9b226844dd | Original ppi.c, keyba.c, keybd_io.c and reset.c declarations; selected content matches XP. |
+| 376 base/inc/printer.h | c15f20e8729b12e3a903c7bc8bc818e72baccfcac1372ad493e7af9c534d128a | Original printer.c, printer_.c and reset.c includes, declarations and BIOS constants match XP outside existing exclusion scaffolding. |
+
+Independent counter-review: no point requires restoration or retention approval
+in this group. Original declarations and includes are preserved; do not remove
+whole headers or unused-looking declarations at the cost of additional XP
+differences. A textual include does not independently prove every historical
+function declared in a header is an active runtime capability. No such claim is
+made, and excluded implementations are not reopened.
+
+Production/test/build/EXE changes zero; XP diff change zero. This read-only
+source audit does not claim another runtime test or rebuild. Published baseline
+remains P87 and full-runtime baseline P80's 392/392. Frozen frontier 376/472;
+next file 377 base/inc/quick_ev.h has snapshot interface additions requiring
+separate actual-caller/ownership investigation. It is not marked audited.
+S1 and earlier qualified pending decisions remain open.
+
+P91 actual three-file documentation review, mirror/documentation gates and
+build residue check pass. No task processes, scratch or unrelated edits exist.

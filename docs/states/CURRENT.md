@@ -30,12 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P90 verifies idetect.h's selected XP equivalence and qualifies ios.h's
-full I/O-map selection for owner decision. Coherent original table/mask
-restoration aliases unregistered 07FD onto COM1 on both architectures; current
-actual CCPU IN8 controls pass. No production/test/EXE changes. P87 remains the
-artifact baseline, P80's 392/392 the full-runtime baseline. Frozen frontier
-369/472; next file 370 base/inc/j_c_lang.h.
+T100 S1 P91 completes files 370-376: selected register, keyboard, mouse,
+PPI and printer header content matches XP outside existing exclusions/scaffolding.
+Original includes remain; no production/test/EXE changes or new retention points.
+P87 remains the artifact baseline, P80's 392/392 the full-runtime baseline.
+Frozen frontier 376/472; next file 377 base/inc/quick_ev.h requires investigation.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
