@@ -1463,3 +1463,64 @@ Sequential source review is 182/472; ntthread.c (183) is next and not yet audite
 - x86: object `8ab6d6e33c2363ae92c940f2c72ebcce390cc42ef579684ecb3bb40776b7a20e`; EXE `1804d7c4c8afec0c6c8e53e499dd50a24d3d6ae27e99f600500607acf89c9931`; 9 metadata-only changed bytes; compiler time 01:52:13 to 02:05:58.
 
 - x64: object `0fff0b1f2de64767e6d73e56b94311eae43eb4a671de358749a475c4880b6183`; EXE `c25162c4ae7fc41b6d017bde91d69dc43a0977d9a52bc6544a25fb711b5aaaa7`; 9 metadata-only changed bytes; compiler time 01:55:32 to 02:06:09.
+
+
+## P18 file 183: original thread unwind reuse
+
+ntthread.c is compiled in softpc-ccpu-core. The selected c_main simulate,
+exception and unsimulate paths call its original TLS-frame functions through
+SOFTPC_CCPU_TLS_SIMSTACK. Machine executor enter/leave uses the corresponding
+original thread entry/exit, and Compat lifecycle invokes the added outer exit.
+The file is live and has no replacement Compat simulation-stack owner.
+
+| Point | Initial analysis | Counter-review/disposition |
+| --- | --- | --- |
+| R0159 | Allocation diagnostic %d became %zu, with a three-line note. | The size is the fixed ThreadSimBuf object, not an unbounded input. Failure injection into the real function reports 2564 bytes on x86 and 10256 on x64 with both formats, matching the allocator request. Restore exact original line; no broader portable-format claim. |
+| R0160 | Added outer-exit implementation repeats in_C/longjmp logic. | Coherent original-only exit reaches the wrong host frame in the actual nested BIOS test. Retain outer-frame selection, but set level=1 and invoke original ccpu386Unsimulate, which owns decrement, in_C and longjmp. Remove duplicated mechanics and verbose local commentary. Residual necessity pending owner decision. |
+| R0161 | BADID failure returns typed null rather than bare return. | Actual original-body injection returns 0x31 instead of a valid frame/null on both architectures. Keep explicit failure value, remove the long added explanation; residual pending owner decision. |
+| R0162 | Missing-TLS failure returns typed null rather than bare return. | Actual original-body injection returns 0x39 on both architectures. Same limited failure-result evidence and disposition. |
+
+The pointer results are isolated-helper evidence, not proof of safe application
+failure recovery. c_main passes the returned frame directly to setjmp and does
+not check null. Thus the retained null returns do not make TLS setup failure a
+supported recoverable path; no such claim is made. No new failure handling or
+lifecycle redesign is included. The native diagnostic format restoration is
+bounded to the two actual Windows builds; it is not a generic C varargs rule.
+
+Original-only exit comparison is coherent: remove the added outer function and
+adapt its actual lifecycle caller to original c_cpu_unsimulate, then link the
+real checkpoint executable with those two objects. Both compile/link, but x86
+exits 3221226505 and x64 exits 3 at nested_bios, c_getEIP() == 0x604u. The nested
+HLT stop incorrectly resumes the host BIOS frame instead of escaping it.
+Unmodified and original-unwind-relay variants pass the same complete checkpoint
+suite on both architectures. This covers actual CCPU recursion, snapshot timeout
+cleanup, reentry and finite-budget paths, rather than a duplicate longjmp model.
+
+The reduced outer function retains its existing BADID/absent-frame checks. On
+its owning executor, choosing level 1 followed by the original decrement selects
+frame 0; there is no callback, wait or cross-thread mutation between selection
+and unwind. Original BOP/device returns continue to pop their ordinary current
+frame. No signature, TLS schema, owner, new helper or alternate execution path
+is introduced; the actual unwind implementation is now the original one.
+
+The isolated failure harness replaces malloc only in the actual ntthread object,
+uses real Windows TLS, and never changes guest or production allocator behavior.
+Current and original-format diagnostics both match the fixed allocator request
+on both widths. BADID and allocated-but-empty TLS exercise the two actual failure
+branches separately. The results are not a low-memory desktop reproduction.
+
+Files 184-193 were compared in frozen order: out.c has no in-scope difference;
+the others are normalized-identical. File 194 popf.c remains the next review.
+Production +4/-20 (net -16), tests unchanged. Fixed-XP diff drops from +41/-3
+(44 lines) to +24/-2 (26), 18 fewer difference lines and one fewer point.
+Existing #error exclusions receive no new accounting. Final-source cached builds and publication pass for x86/x64. Each width
+passes all 188 background and 8 native desktop/audio tests: 392/392 total.
+No manual guest session or broader TLS failure recovery is claimed.
+Coordinator review confirms the actual source diff, original single unwind,
+unchanged tests/interfaces, preserved mirror CRLF, manifest and documentation
+gates, and no guest/configuration/shared-package changes. Build logs contain
+no warning diagnostics in this incremental run.
+
+- P18 softpc32.exe SHA-256: `44bdca5c28e44f1de6a501a2ca7b4324bf9f97a22e5effc18acd691786cff255`.
+
+- P18 softpc64.exe SHA-256: `b4f2d57f707fb5b3afb2c6ad9a721615fa8b5b18ce47370c15bd4ec2c9326f29`.

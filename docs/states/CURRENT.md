@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P17 restores ntstubs.c original includes and removes redundant gap lines.
-Production +1/-5 (net -4), tests unchanged; XP-relative diff shrinks by six
-lines and two points. Duplicate Gdp and three original no-op definitions fail
-actual links at both widths; their residual omission/declaration is pending
-owner decision. Both final cached builds and publication pass. Final objects
-are byte-identical and complete EXEs differ only in build metadata, so P16's
-392/392 qualification applies under the approved equivalence exception;
-this batch also runs dual-width isolated checkpoint comparisons.
-Sequential source review is 182/472; file 183 ntthread.c is next.
+T100 S1 P18 passes final qualification: cached dual-EXE publication and
+392/392 tests (188 background plus 8 native per architecture). ntthread.c outer exit now selects
+its frame then uses original ccpu386Unsimulate instead of repeating the unwind.
+Original-only single-frame exit fails actual nested BIOS checks at both widths;
+retention evidence remains pending owner decision. Original bounded allocation
+diagnostic is restored; explicit null failure returns remain with observed
+invalid original-return evidence, not a claim of safe recovery. Production
++4/-20 (net -16), tests unchanged; XP diff shrinks by 18 lines and one point.
+Sequential review is 193/472; file 194 popf.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

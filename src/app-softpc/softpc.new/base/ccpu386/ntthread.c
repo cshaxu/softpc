@@ -71,10 +71,7 @@ void ccpu386foundnewthread()
 
     if (simstack == (ThreadSimBufPtr)0)
     {
-        /* DIVERGENCE(SOFTPC-PORT-116): sizeof is native-width on both
-         * supported hosts; retain the original diagnostic while using its
-         * matching C varargs conversion instead of the NT4 x86-only %d. */
-        fprintf(stderr, "ccpu386foundnewthread id:%#x cant malloc %zu bytes. Err:%#x\n", GetCurrentThreadId(), sizeof(ThreadSimBuf), GetLastError());
+        fprintf(stderr, "ccpu386foundnewthread id:%#x cant malloc %d bytes. Err:%#x\n", GetCurrentThreadId(), sizeof(ThreadSimBuf), GetLastError());
         return;
     }
     simstack->level = 0;
@@ -216,14 +213,10 @@ void ccpu386Unsimulate()
 }
 
 
-/* Standalone runtime control reaches this only from a CCPU host event on the
- * executor thread.  Normal SoftPC BOP/device unwinds retain ccpu386Unsimulate
- * above; a shutdown must bypass nested host_simulate frames (for example the
- * original keyboard polling loop) and return to the outer executor frame. */
+/* Select the outer frame, then use the original unwind. */
 void ccpu386UnsimulateOuter()
 {
     ThreadSimBufPtr simstack;
-    extern ISM32 in_C;
 
     if (ccpuSimId == BADID)
     {
@@ -237,12 +230,8 @@ void ccpu386UnsimulateOuter()
         return;
     }
 
-    in_C = 1;
-    /* ccpu386SimulatePtr increments the level before setjmp.  The ordinary
-       c_cpu_unsimulate path decrements it before jumping back; mirror that
-       invariant when returning across nested host_simulate frames. */
-    simstack->level = 0;
-    longjmp(simstack->sims[0], 1);
+    simstack->level = 1;
+    ccpu386Unsimulate();
 }
 
    /* somewhere for exceptions to return to */
@@ -253,17 +242,12 @@ jmp_buf *ccpu386ThrdExptnPtr()
     if (ccpuSimId == BADID)
     {
         fprintf(stderr, "ccpu386ThrdExptnPtr id:%#x called with Bad Id\n", GetCurrentThreadId());
-        /* DIVERGENCE(SOFTPC-PORT-128): this pointer-returning helper used
-         * a bare return on its two original failure paths.  Match the
-         * same-package ccpu386SimulatePtr failure contract: retain the
-         * diagnostic and failure branch, but return a typed null jmp frame. */
         return ((jmp_buf *)0);
     }
     simstack = (ThreadSimBufPtr)TlsGetValue(ccpuSimId);
     if (simstack == (ThreadSimBufPtr)0)
     {
         fprintf(stderr, "ccpu386ThrdExptnPtr id:%#x TlsGetValue failed (err:%#x)\n", GetCurrentThreadId(), GetLastError());
-        /* DIVERGENCE(SOFTPC-PORT-128): see the BADID failure branch above. */
         return ((jmp_buf *)0);
     }
     
