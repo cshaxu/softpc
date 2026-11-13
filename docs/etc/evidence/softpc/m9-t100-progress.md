@@ -6546,3 +6546,34 @@ with original/subset provenance fixed. Frozen frontier 362/472; next file
 P87 actual eight-file review and mirror/documentation gates pass. The owned
 worker exited; scratch preview, exact removal and residue check pass. No
 configuration, media or unrelated worktree changes were made.
+
+## Files 363-366: original host headers (P88)
+
+Full normalized pinned-XP comparisons and actual include scans complete this
+ordered group. Existing excluded bodies and their established scaffolding are
+skipped without new accounting; no exclusion point or count is introduced.
+
+| File | Fixed XP raw SHA-256 | Selected-content disposition and actual wiring |
+| --- | --- | --- |
+| 363 base/inc/host_gwi.h | 7f5fd9d64ecf10f700c774e367740d8c761a6345e73ed1352288a39b33a73526 | Complete normalized content equals XP. Original includes remain in error.h, keyboard.h and gfx_upd.h. The comment-only file is not a reason to introduce include-removal differences. |
+| 364 base/inc/host_lpt.h | 71e4e9fd3253ecaad3b8209b90d8bf7497bdfc6bad67890d9534d4512c902459 | Selected declarations, constants and comments match XP; remaining differences belong to existing exclusion scaffolding. Includes occur in original reset.c, printer.c, printer_.c, Compat parallel.c and the printer/checkpoint fixtures. No new native-printer capability is claimed. |
+| 365 base/inc/host_sas.h | 00c5ab25083ff6a19ce2ad461c43bb37adbd2aeb241865cc9b3a2c4847ea8d2e | Non-excluded content matches XP; original sas.h still includes the file. No HOST_SAS dispatch implementation is claimed active merely because the header exists. |
+| 366 base/inc/hunter.h | deb671235433d87e347299b07832c1b9a8261fb0827005baf5fdd0252983e5b5 | Non-excluded content matches XP; original reset.c still includes the header. The HUNTER implementation remains excluded; retaining the original include does not enable it. |
+
+Independent counter-review: keep the original files and include wiring, with
+no duplicate Compat path or gratuitous declaration cleanup. Removing these
+files would require new include-removal differences and violate the owner's
+no-increase rule. Whole-file diff review found no selected residual requiring
+an owner decision in these four files.
+
+Production/test/build changes zero; XP diff change zero. This is a read-only
+source audit and documentation delivery, not a new runtime/build qualification.
+P87's dual-EXE publication and P80's 392/392 runtime baseline remain unchanged.
+Frozen frontier 366/472; next file 367 base/inc/ica.h. Its preliminary scan
+finds an added CPU_40_STYLE guard around PIC interrupt-name macros. The CCPU
+enum uses the same CPU_HW_INT name for value two, whereas the PIC macro is
+zero; actual restoration still requires a bounded check. This observation is
+not a completed file audit or an approved retention decision. S1 remains open.
+
+P88 actual three-file documentation review, mirror/documentation gates and
+build residue check pass. No task processes or scratch were created.
