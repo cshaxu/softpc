@@ -30,15 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P12 simplifies the private c_tlb.c snapshot interface: remove its
-fixed-length argument and duplicate null/size guards; archive allocation owns
-that invariant. Actual cache copies and state validation remain. Production
-+9/-17 (net -8), tests unchanged; fixed-XP diff reduces from +67/-0 to +59/-0.
-Both published EXEs pass 392/392 fresh tests. The coherent original-flush
-alternative fails the existing old-mapping checkpoint assertion on both
-architectures, so the residual snapshot bridge remains evidence-qualified,
-not automatically approved. Snapshot layout and guest behavior are unchanged.
-Source review is 101/472; file 102 c_xcptn.c is next.
+T100 S1 P13 restores both c_xcptn.c differences: remove the added yoda.h
+include and restore the original local host_getenv declaration. The existing
+original empty force_yoda stub remains the sole selected call implementation.
+Production +1/-1 (net zero), tests unchanged; this file's in-scope XP diff
+falls from +1/-1 to zero. Both published EXEs pass 392/392 fresh tests.
+Source review is 118/472; file 119 evid_c.h is next. Its original pointer
+fields already produce identical actual-consumer objects on both architectures;
+restoration and final-source publication are not yet delivered.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

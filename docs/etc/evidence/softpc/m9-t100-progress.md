@@ -1098,3 +1098,83 @@ P12 published artifact SHA-256:
 
 - softpc32.exe: `73c16db7ed529ed4a0924a946dd6b92e1262faa9bebe99298307a5673b4ea5a7`.
 - softpc64.exe: `77de7e0549332033cfb4ecd467a297fd146cb41f94c7a49f465d8292053934cc`.
+
+
+## P13: file 102 original exception declarations and no-op call
+
+File 102 c_xcptn.c has two in-scope differences. R0139 is the added yoda.h
+include after fault.h; R0140 is the removed local host_getenv declaration in
+check_exception_env. Both are restored to fixed XP. The selected content is
+now exact original text; existing excluded bodies are untouched and uncounted.
+
+Executor review follows real exception paths: benign/contributory/IDT/double
+fault, divide and page fault all use the original environment check. With PROD,
+the added yoda.h changes force_yoda calls into empty macros. Without that
+addition, they call the existing original empty force_yoda in stubs.c, which
+already belongs to the production CCPU object set. No new stub or host callback
+is required, and exception register/control behavior is unchanged.
+
+Counter-review specifically tests the removed declaration rather than assuming
+its char-pointer spelling conflicts with modern getenv. Current selected
+insignia.h expands IPT1 to (), not a typed parameter list. host_def.h maps
+host_getenv to getenv and includes the CRT declaration. Restoring the original
+local declaration compiles successfully on both architectures, and produces
+byte-identical isolated objects against control with identical pathname/flags:
+
+- x86 pair: bdad0939599e72cae0cbff8589e671068c290b482509921f553a61a6ac3da05a.
+- x64 pair: 5cac435b118583f2dc7bafe6b9f7692b7a239d538b965cc0a844ed0944dc047a.
+
+The no-yoda isolated variant also compiles on both architectures; its objects
+change because original no-op calls return. This is not used to claim full
+artifact equivalence or omit regression. No compiler failure proves either
+historical deviation necessary. Tests of unsupported ANSI configurations are
+not required to justify changing the actual selected original path.
+
+Production is +1/-1 (net zero), tests unchanged. Fixed-XP in-scope difference
+falls from +1/-1 to zero: two fewer lines and two restored points. No pending
+retention decision remains for this file. Original CRLF, exception handlers,
+monitor environment behavior and guest assets are preserved.
+
+Ordered files 103-118 also complete comparison. c_xfer.c and c_xtrn.c have no
+in-scope difference. c_xcptn.h, c_xfer.h, c_xtrn.h, daa.c/h, das.c/h, dec.c/h,
+div.c/h, enter.c/h and evidfunc.h are entirely normalized-identical. No code
+edits are made to them. File 119 evid_c.h is the next diff-bearing file and
+requires caller/type investigation; reading its diff is not completed audit.
+Final-source cached x86/x64 builds/publication and all six qualification
+commands pass: 188 background and eight native tests per architecture,
+392/392 fresh passes. Actual-diff coordinator review confirms exact selected
+original content, existing empty stub linkage, no replacement implementation,
+no shared-package change and no guest/media/configuration mutation. Manifest
+and documentation gates pass. Original mirror warnings remain permitted;
+no new manual guest session verification is claimed. Review is 118/472.
+
+
+### Next-file investigation: evid_c.h (119), not yet restored
+
+The six changed callback fields are pointer-to-IU32 versus pointer-to-IUH;
+they are not embedded integer storage. Both forms have native pointer size
+and alignment. Actual Ninja dependency records on x86/x64 identify the sole
+compiled consumer as Compat cvidc/gdp_state.c. Its use is offsetof for these
+fields and sizeof the aggregate, not dereference through their pointee types.
+Source search confirms that it includes the CCPU header through the selected
+include order; the separate C-VID header is not this file's consumer contract.
+
+An isolated compile uses that real consumer, actual Ninja flags and the same
+header-override pathname for current and exact XP contents. Both succeed and
+objects are byte-identical per architecture:
+
+- x86: c23f08bcb762237882f4178194abcf5ff5ec4ef75be756f3ab9b2f18b05d0e3a.
+- x64: 21fc70faf79c3218fef6e637cc4d06a8c959101918e229cfcc8eb524b48789a2.
+
+This disproves the historical comment's claimed need to change these pointer
+pointee types just to store native-width addresses in this selected aggregate.
+Candidate: restore the entire header to XP (+6/-10 production, mirror diff
+-16 to zero), keeping existing wiring. No change is implemented in P13;
+final-source rebuild/publication and artifact comparison still belong to the
+next delivery. No previously excluded body or guest asset is involved.
+
+
+P13 published artifact SHA-256:
+
+- softpc32.exe: `461149983ad018d866e48a7e5f15faeca1276cef7c9de0177ab2bf762325d3ef`.
+- softpc64.exe: `f5afec8d7b1351cbc5690f9664b2e2b2069cb999a5a11a1537bea2b7df26c000`.

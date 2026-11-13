@@ -29,7 +29,6 @@ Exception Handling Support.
 #include <c_xtrn.h>
 #include <ccpupig.h>
 #include <fault.h>
-#include <yoda.h>
 
 /*
    Allow print out of exceptions or disallow it.
@@ -40,6 +39,7 @@ LOCAL  BOOL first_exception = TRUE;
 
 #define check_exception_env()						\
 {									\
+	IMPORT char *host_getenv IPT1 (char *, name);			\
 	if (first_exception)						\
 	{								\
 		char *env = host_getenv ("CCPU_SHOW_EXCEPTIONS");	\
