@@ -1785,3 +1785,13 @@ and 717 -> 683 ranges; production +89/-89, no new mirror point or device path.
 See [P37 audit](m9-t100-progress.md#p37-file-290-sevid007c-audit-and-restoration),
 [range map](m9-t100-sevid007-points.tsv) and
 [allocation inventory](m9-t100-sevid007-allocations.tsv).
+
+### T100 S1 P38 allocation and address minimization
+
+File 291 sevid008.c restores 76 native-address accesses and 25 malloc sites.
+Native capacities and seven mixed-width move locals remain qualified ABI
+residuals pending owner disposition. XP-relative diff falls 1515 -> 1371 lines
+and 565 -> 505 ranges; production +101/-101. No new mirror patch is added.
+See [P38 audit](m9-t100-progress.md#p38-file-291-sevid008c-audit-and-restoration),
+[range map](m9-t100-sevid008-points.tsv) and
+[allocation inventory](m9-t100-sevid008-allocations.tsv).

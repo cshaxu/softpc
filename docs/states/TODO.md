@@ -2,6 +2,14 @@
 
 CURRENT owns active work; the runtime-performance candidate remains in Queue.
 
+- [ ] TODO(Medium): Original Unchained DWORD write/fill entries S2360/S2372
+  place the second WORD at +8 rather than the contiguous +2. Actual bodies
+  reproduce the mismatch on both architectures, unchanged and restored.
+  Current CCPU DWORD stores split into two WORD operations and do not use
+  these generated entries; no guest-triggered case is established. Admit a
+  separate rule repair before enabling them, including multi-DWORD fill order.
+  [P38 evidence](../etc/evidence/softpc/m9-t100-progress.md#original-dword-write-and-fill-defect).
+
 - [ ] TODO(Medium): Original GenericByteFill loses its local storage after a
   nested GenericByteWrite continuation, producing access violation on x86/x64.
   Current CCPU fills use individual stores; no actual guest-triggered batch call

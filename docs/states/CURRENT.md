@@ -30,18 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P37 restores 62 native-address accesses and malloc at 27 sites in file
-290 sevid007.c. Native capacities and five mixed-width move locals remain.
-Production +89/-89 (net 0); tests unchanged. XP-relative diff decreases
-1983 -> 1867 lines and 717 -> 683 points. Actual-body controls verify selected
-WORD fills and preserve copy results; original x64 capacities corrupt the heap.
-Both EXEs are built/published. All 392 registered tests have passing evidence,
-with two aggregate verifier-negative timeouts and two successful isolated
-retries under unchanged budgets. This is not first-run all-green; timing debt
-is in TODO. Both compiles retain the same original mirror warning, no new one.
-Actual review, gates and source identity pass. Sequential review is 290/472;
-next is file 291 base/cvidc/sevid008.c. Qualified ABI residuals remain owner
-decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P38 restores 76 native-address accesses and 25 malloc sites in file
+291 sevid008.c. Native capacities and seven mixed-width move locals remain.
+Production +101/-101 (net zero); tests unchanged. XP-relative diff decreases
+1515 -> 1371 lines and 565 -> 505 points. Actual-body controls preserve selected
+WORD-copy and DWORD results; original x64 capacities corrupt the heap.
+Both EXEs are built/published. All 392 registered tests pass on the first run;
+both build logs contain no warnings. Actual review, source identity and gates
+pass. Sequential review is 291/472; next is file 292 base/cvidc/sevid009.c.
+The original generated DWORD write/fill +8 defect has dynamic evidence but no
+established current guest trigger; it is separate TODO debt, not a new patch.
+Qualified ABI residuals remain owner decisions in the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

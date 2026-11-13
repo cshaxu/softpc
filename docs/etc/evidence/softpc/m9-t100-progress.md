@@ -3227,3 +3227,89 @@ user assets and reusable caches remain intact.
 P37 actual process inventory confirms no task worker remains. Exact scratch
 cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
 configuration, guest media and snapshots are preserved.
+
+## P38 file 291 sevid008.c audit and restoration
+
+Pinned XP normalized SHA-256:
+011fc67217c7a176da5ef1555db4416f343f53df2c6af059d5a51c3421712ff3.
+Initial local normalized SHA-256:
+53b23c5956355e74d95eb7462391a012cca19e4dc823f0f7204d1c206e1db33b.
+The [565-range inventory](m9-t100-sevid008-points.tsv) covers every initial
+changed range. The [32-allocation inventory](m9-t100-sevid008-allocations.tsv)
+records native capacity and mixed-width slots.
+
+Initial review: R0304 restores 76 native-address expressions; these addresses
+already refer to native pointers, not GDP offsets. R0305 retains actual GDP
+field translation. R0306 retains native-sized local capacities and seven
+zeroed move allocations: S2343/S2345/S2348/S2350/S2353/S2355/S2358 write
+LocalIUH[1] as IU32 and subsequently consume its complete IUH representation.
+R0307 restores malloc at the other 25 sites. Necessary residuals remain
+qualified owner decisions, not automatic approval. No extra approval wait
+blocks subsequent ordered work.
+
+Counter-review: reversing only the enumerated ABI adaptations restores the
+complete XP token stream. No new device arithmetic, branch or callback is
+introduced. The replacement preserves 32 native capacities, including seven
+mixed-width zeroed slots. Production is +101/-101, net zero; tests unchanged.
+XP-relative scope falls from +758/-757, 565 ranges to +686/-685, 505 ranges:
+144 fewer diff lines and 60 fewer points, not a source-line reduction claim.
+
+Actual-body controls run unchanged, address-only, minimal, original-capacity
+and poisoned-malloc variants on x86/x64. Each successful variant completes
+48 independent four-plane WORD-copy cases, 90 DWORD result-preservation cases
+and the existing 96 CHAIN2 checks. Candidate captures match the unchanged
+baseline byte-for-byte. Poisoned candidate locals pass with the seven necessary
+calloc sites retained. Original four-byte allocation capacities pass x86 but
+fail x64 with heap corruption 0xc0000374; all other variants pass both widths.
+These controls establish the selected cases, not every specialized rule.
+
+### Original DWORD write and fill defect
+
+The unchanged actual body and candidate both write 11 22 at the starting
+address and 33 44 at +8/+9, leaving +2/+3 untouched when asked to write
+0x44332211. Fill count one shows the same mismatch. S2360 and S2372 pass
+start+8 to their second WORD operation; this is present in pinned XP, not
+introduced by restoration. The preservation controls intentionally distinguish
+equal existing output from correct contiguous DWORD semantics.
+
+evidfunc.c registers these generated entries. However Glue_writes registers
+byte/word operations only; write_dword_ev_glue has no production caller in
+the repository search. Current CCPU c_sas_storedw reaches phy_w32, which uses
+two phy_w16 calls at start and start+2. c_sas_fillsdw loops those stores.
+Thus no current guest-triggered instance of the generated DWORD fault has
+been established. Repair requires separate admission before enabling these
+entries; this reduction-only audit does not add a new mirror patch.
+
+Final source SHA-256 (LF normalized):
+6d4f22abde30c30c376aaa90600675ba1fdbe6e42716fac42e51dd8bd4301ae9.
+Installed source is byte-identical to the tested minimal candidate and remains
+CRLF. Cached dual builds and full qualification are running; P38 is not yet
+a completed delivery.
+
+### P38 final qualification and review
+
+Both cached builds and publications succeed. Each architecture passes 188/188
+background tests plus 8/8 native audio/desktop/package tests: 392/392, first
+run, without budget changes or suppressed checks. Both build logs contain no
+warnings. Actual-change review classifies all 101 changed lines as the stated
+76 native accesses and 25 allocation statements; tested candidate identity,
+CRLF mirror format and manifest checks pass. No full specialized-rule matrix
+or fresh interactive guest reproduction is claimed.
+
+The 368640-byte DWORD preservation captures match on both architectures:
+SHA-256 1264a241a1eed501b4f531ad3209b8c5f07a0c024ef001535f98fc7b84e3add7.
+This preserves the demonstrated original defect too; it is not proof of
+correct DWORD semantics. That separate issue is recorded in TODO.
+
+Published softpc32.exe: Nov 13 2026 06:48:38;
+SHA-256 7d5856c16267622101b84e411b179689e0c26622ac4de8bebcd0f33cbe91b809.
+Published softpc64.exe: Nov 13 2026 06:52:16;
+SHA-256 8e2062b508c81b6eaa76a5e84abe2538f20b2edf15364188d642480cfeb28c3d.
+
+Sequential audited scope is 291/472; next file 292 base/cvidc/sevid009.c.
+S1 remains active, with qualified ABI decisions distinguished from delivered
+restorations. No routine approval is awaited to continue.
+
+P38 process inventory confirms no task worker remains. Exact disposable scratch
+cleanup was previewed/applied and Clean-Build -Check passes. The two reusable
+caches, configuration, guest media and snapshots remain intact.
