@@ -1817,3 +1817,13 @@ owner's no-increase constraint. XP diff falls 1729 -> 1713 lines and
 See [P40 audit](m9-t100-progress.md#p40-file-293-sevid010c-audit-and-restoration),
 [range map](m9-t100-sevid010-points.tsv) and
 [allocation inventory](m9-t100-sevid010-allocations.tsv).
+
+### T100 S1 P42 allocation and address minimization
+
+File 294 sevid011.c restores 52 native address expressions and 27 malloc
+calls. Actual GDP translation, native capacities and five mixed-width zeroed
+move locals remain qualified residuals pending owner decision. Production
++79/-79; XP diff falls 1233 -> 1139 lines and 482 -> 457 ranges.
+See [P42 audit](m9-t100-progress.md#p42-file-294-sevid011c-audit-and-restoration),
+[range map](m9-t100-sevid011-points.tsv) and
+[allocation inventory](m9-t100-sevid011-allocations.tsv).

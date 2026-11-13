@@ -3489,3 +3489,67 @@ without waiting; the no-increase constraint remains in force.
 The P34/P38 sections retain the detailed controls and caller evidence. This
 transfer does not claim a guest symptom, a completed fix, or authority to add
 a new diff. The unrelated verifier-negative timing issue remains in TODO.
+
+## P42 file 294 sevid011.c audit and restoration
+
+Initial review: R0316 restores 52 native-address expressions; R0317 retains
+actual GDP field translation. R0318 retains native local capacities and zeroing
+for S2439/S2461/S2464/S2466/S2469, which store LocalIUH[1] as IU32 and read it
+as native IUH in the RAM-source branch. R0319 restores malloc for the other
+27 allocations. Original algorithms and callback order are unchanged.
+
+Counter-review: reversing the enumerated ABI forms reproduces the pinned XP
+full token stream. CMake's selected C-VID sources compile this file; evidfunc
+registers its mode-2/mode-3 entries. The [482-range map](m9-t100-sevid011-points.tsv)
+and [32-allocation inventory](m9-t100-sevid011-allocations.tsv) account for the
+initial differences and remaining mixed-width locals. Qualified ABI residuals
+remain pending owner disposition, not automatically approved.
+
+Exactly 79 lines change: 52 native address expressions and 27 allocation calls,
+production +79/-79, net zero. Tests are unchanged. With the same full-file
+SequenceMatcher method, XP diff falls from +617/-616, 482 ranges to +570/-569,
+457 ranges: 94 fewer diff lines and 25 fewer ranges. Neither metric increases.
+
+Unchanged, minimal and poisoned-malloc actual bodies pass on x86/x64. Each
+executes 1440 independent mode-3 BYTE write/fill pixel cases across data,
+bit masks, plane enables, address parity, zero/one/two/seven fill counts and
+untouched full-buffer bounds, plus existing CHAIN2 checks (96/96). The fixture
+sets both plane-enable bitmap and expanded mask. Original four-byte allocation
+capacities pass x86 but corrupt the x64 heap (0xc0000374). Only the 27 restored
+malloc blocks are poisoned with 0xa5; the five mixed-width calloc blocks remain.
+This does not prove every specialized move or a new interactive guest scenario.
+No test-only production API or new device fix is introduced.
+
+Installed source is byte-identical to the tested candidate, retaining CRLF.
+Final LF-normalized SHA-256: ab1a94696436969ea900903837978d8e6c30b7dff8afc29296522ff365ade9a2.
+Dual cached build/publication and full regressions remain to be completed;
+file 294 is not yet counted as delivered.
+
+P42 also finds the D002 source pattern in sevid011.c S2441-S2448: original
+and current mode-2 DWORD write/fill wrappers pass start+8 to the second WORD
+operation. This extends D002's source-review scope, not its dynamic proof:
+these eight entries were not exercised by the mode-3 BYTE oracle. No new
+mirror fix or TODO is introduced, and no guest-triggered symptom is claimed.
+
+### P42 final qualification and actual-change review
+
+Both cached builds and publications succeed without warnings. Each architecture
+passes 188/188 background tests plus 8/8 native audio/desktop/package tests:
+392/392 on the first full run, with unchanged test budgets. Actual-change review
+confirms precisely 52 address and 27 allocation replacements, no new behavior,
+no shared-component or test-source changes. Candidate byte identity, CRLF,
+manifest provenance, mirror/documentation gates and command-local whitespace
+checks pass. Specialized moves and guest-driven DWORD paths are not newly
+qualified by the selected mode-3 oracle; D002 remains a pending decision.
+
+Published softpc32.exe: Nov 13 2026 07:35:42;
+SHA-256 c809c876d1c199b252e1364e96a07efc1e7d4e5e3f6d60a79cae1d24316d5305.
+Published softpc64.exe: Nov 13 2026 07:39:23;
+SHA-256 f8f1ebe135a2c9e4b26f18300f76e7570b6d3ae662887a6fc9be4fa605370018.
+
+Sequential audit is 294/472; next is file 295 base/cvidc/sevid012.c.
+S1 remains active. Qualified residual decisions are not closed by these tests.
+
+P42 process inventory confirms no task worker remains. Exact scratch cleanup
+was previewed and applied; Clean-Build -Check passes. Reusable caches,
+configuration, media and snapshots remain unchanged.
