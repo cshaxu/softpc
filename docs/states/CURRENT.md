@@ -30,12 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P78 restores egacpu.h's original generated-vector include and removes
-its redundant struct forward tag; XP-relative diff decreases seven lines.
-The generated-carrier pointer adaptation remains an evidence-qualified owner decision.
-Production +2/-5; coupled test-target include wiring +2/-1. After correcting
-that fixture's missing include directory, both cached builds/publications and
-392/392 tests pass. Frozen frontier 339/472; next file 340 base/inc/egagraph.h.
+T100 S1 P79 audits egagraph.h and egamode.h: retained content matches XP
+outside existing exclusions/scaffolding, with actual production consumers.
+No production or artifact changes; P78 remains the published 392/392 baseline.
+Frozen frontier 341/472; next file 342 base/inc/egaports.h. Its panning
+query declaration is under investigation, not an approved retention.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

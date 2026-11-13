@@ -6004,3 +6004,45 @@ S1 and qualified residual owner decisions remain open.
 P78 final actual-diff and documentation-governance reviews pass. Authoritative
 process inventory confirms the qualification worker exited. Task-scratch cleanup
 preview, exact removal and residue check pass; reusable caches are preserved.
+
+
+## P79: files 340-341 retained-content comparison
+
+Fixed XP raw SHA-256:
+
+- base/inc/egagraph.h: 376143cae84f8d1965d28e4d82273539fe2a541cf80cf97927eb7223efb60f12.
+- base/inc/egamode.h: 8c3ac82156131dbec6b892bda14ba2fcae4e883e18777f124960181e429eca45.
+
+The full newline-normalized comparisons show no retained-content differences
+outside existing exclusions and their surrounding scaffolding. No whole-hunk
+suppression is used to infer equivalence. egagraph.h retains its display-state,
+palette/font/underline, split/panning state macros, enumeration and update
+contracts. egamode.h retains the display selector and EGA/VGA declarations.
+Existing #error bodies/scaffolding are skipped without additional accounting.
+Mirror CRLF is preserved; raw upstream hashes are not newline-normalized hashes.
+
+Actual production includes remain: ega_mode.c/ega_prts.c/vga_mode.c/vga_prts.c
+and Compat video.c/platform.c consume these declarations; original nt_graph.c
+also includes both. These are not test-only unused files. No duplicate behavior
+implementation exists in these declaration-only headers to relocate or delete.
+Counter-review finds no selected declaration or macro-body edit concealed by
+an adjacent excluded branch. Preserve both files exactly as currently retained.
+
+No production, permanent test, build, manifest or EXE changes; no XP diff
+reduction is claimed. No fresh runtime/full-suite run: P78's 392/392 published
+baseline remains unchanged. Frozen delivered frontier is 341/472, next file
+342 base/inc/egaports.h. S1 and existing evidence-qualified owner decisions remain open.
+
+### Next-file investigation, not a delivered disposition
+
+The non-excluded egaports.h addition is the ega_get_pel_panning declaration
+and its T60 comment. Actual calls occur in nt_ega.c painting and gfx_updt.c
+neighbour marking; vga_prts.c owns the implementation, reading attribute
+panning and split cancellation. Those consumers alone do not prove the added
+behavior necessary. The next complete-file investigation must examine coherent
+restoration and actual panning evidence before qualifying a residual. File 342
+remains unreviewed in the delivered ledger; no production edit has been made.
+
+P79 documentation gate and actual three-file diff review pass. No background
+job was started; task-owned comparison scratch was previewed and removed,
+and the build residue check passes. No new approval or closure is inferred.
