@@ -1806,3 +1806,14 @@ falls 889 -> 873 lines; range count remains 342. Production +40/-40.
 See [P39 audit](m9-t100-progress.md#p39-file-292-sevid009c-audit-and-restoration),
 [range map](m9-t100-sevid009-points.tsv) and
 [allocation inventory](m9-t100-sevid009-allocations.tsv).
+
+### T100 S1 P40 allocation and address minimization
+
+File 293 sevid010.c restores 92 native-address expressions and 25 malloc
+sites. Native capacities and seven mixed-width move allocations retain their
+qualified ABI differences. One existing store wrapper remains under the
+owner's no-increase constraint. XP diff falls 1729 -> 1713 lines and
+629 -> 608 ranges; source +117/-117, no new device behavior.
+See [P40 audit](m9-t100-progress.md#p40-file-293-sevid010c-audit-and-restoration),
+[range map](m9-t100-sevid010-points.tsv) and
+[allocation inventory](m9-t100-sevid010-allocations.tsv).

@@ -3387,3 +3387,88 @@ S1 remains active; ordered work does not wait for routine approval.
 P39 actual process inventory confirms no task worker remains. Exact scratch
 cleanup was previewed/applied; Clean-Build -Check passes. Reusable caches,
 configuration, media and snapshots are preserved.
+
+## P40 file 293 sevid010.c audit and restoration
+
+Pinned XP normalized hash:
+777f007854e409742de11bd83d4e4b7bc6df0fbde8729d88d8706e9f83dc91cf.
+Initial local normalized hash:
+f1caddd84ebef15e549e317578e9d741a412aa9e1b9c5091b3e490d2251b8cf8.
+The [629-range map](m9-t100-sevid010-points.tsv) accounts for the initial diff;
+the [32-allocation map](m9-t100-sevid010-allocations.tsv) separates capacities
+and mixed-width locals. No existing excluded body is counted.
+
+Initial review: R0312 native pointers refer to plane data or expansion-table
+entries, whereas R0313 actual GDP fields still require translation. R0314
+native local capacities remain necessary; S2413/S2416/S2418/S2421/S2431/
+S2434/S2436 also retain zeroing because LocalIUH[1] receives IU32 then is
+consumed as native IUH in the RAM-move branch. R0315 restores malloc for the
+other 25 allocations. The original rule arithmetic and callback order remain.
+
+Counter-review: reversing the enumerated ABI adaptations reproduces the
+entire pinned XP token stream. The selected core compiles this file and the
+existing evidfunc tables select its mode-2 operations. Actual source changes
+are exactly 92 native-address expressions and 25 allocations: +117/-117,
+net zero. Tests and public components are unchanged. Qualified necessary ABI
+residuals are not automatic owner approvals.
+
+Restoring all 93 address expressions would yield 632 changed ranges instead
+of 629, violating the no-increase rule. Candidate selection also checks line
+count: a different retained wrapper reduced range count but increased lines
+to 1887 and was rejected. The selected candidate leaves only the existing
+framebuffer-store wrapper at current line 3228. Using the same full-file
+SequenceMatcher method as previous batches, XP diff changes from +865/-864,
+629 ranges to +857/-856, 608 ranges: 16 fewer diff lines and 21 fewer points.
+Repeated generated statements affect matching; these are diff metrics, not
+a claim that 16 source lines were deleted. The remaining wrapper is retained
+under the explicit no-increase constraint, not described as necessary ABI.
+
+### P40 actual-body controls and fixture correction
+
+The first unchanged-source test failed at BYTE fill with mask=0, planes=0,
+count=1: offset 1024 contained 17 instead of the fixture's expected 90.
+Inspection showed the fixture set plane_enable_mask (GDP1324), but the
+per-plane fill dispatch checks plane_enable (GDP1320). This was an incomplete
+fixture setup, not evidence of a production defect. The corrected fixture
+saves, sets and restores both representations coherently; the initial failure
+is not hidden as a passing run.
+
+With corrected setup, unchanged, minimal and poisoned-malloc actual bodies
+pass x86/x64. Each runs 1440 independent full-buffer pixel cases: mode-2
+BYTE/WORD write and BYTE/WORD fill, 16 nibbles, three bit masks, three plane
+sets, alternating parity, zero/one/two/seven fill counts and untouched bounds.
+Existing CHAIN2 checks also pass 96/96. Restoring original four-byte allocation
+capacities passes x86 but corrupts the x64 heap (0xc0000374). Poisoning the
+25 restored malloc blocks with 0xa5 passes with the seven mixed-width calloc
+blocks retained. This does not establish every specialized move variant or
+a new interactive guest reproduction. No test-only production API is added.
+
+Final source hash, LF normalized:
+ea9c578eb771cc49995a7fd74b1491cec9e02630c1ec9621201a9b1c559be95c.
+Installed source is byte-identical to the tested candidate and retains CRLF.
+Full cached build/publication/regression qualification follows before delivery.
+
+### P40 final qualification and actual-change review
+
+Both cached builds and publications succeed. Each architecture passes 188/188
+background tests plus 8/8 native audio/desktop/package tests: 392/392 on the
+first full run, without changing budgets or suppressing checks. Both builds
+retain the original sevid010.c:909 unreachable-switch warning, also present
+in unchanged control compiles. No new warning is introduced. Actual review
+classifies all 117 replacements as the declared 92 native accesses and
+25 malloc statements; tested-source identity, CRLF, mirror/documentation
+gates and command-local whitespace verification pass. This does not turn
+the initial incorrect fixture run into a pass or claim complete move coverage.
+The reduced differences and qualified remaining ABI decisions stay separate.
+
+Published softpc32.exe: Nov 13 2026 07:17:58;
+SHA-256 db168a14ed63b693c0ef5b037acba3ceae5c6289936256587cf98257d42b0239.
+Published softpc64.exe: Nov 13 2026 07:21:34;
+SHA-256 b8ecd3705e5a061571343693b2bd1e38241bf208742030d0dac59aeb3726021c.
+
+Sequential audited scope is 293/472; next file 294 base/cvidc/sevid011.c.
+S1 remains active; no routine approval is awaited.
+
+P40 process inventory confirms no task worker remains. Exact disposable scratch
+cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
+configuration, guest media and snapshots remain intact.
