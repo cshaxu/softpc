@@ -3553,3 +3553,70 @@ S1 remains active. Qualified residual decisions are not closed by these tests.
 P42 process inventory confirms no task worker remains. Exact scratch cleanup
 was previewed and applied; Clean-Build -Check passes. Reusable caches,
 configuration, media and snapshots remain unchanged.
+
+## P43 file 295 sevid012.c audit and restoration
+
+Initial review: R0320 restores 62 native plane/table address expressions;
+R0321 retains actual GDP field translation. R0322 retains native local
+capacities, with zeroing only for S2479/S2482/S2484/S2487/S2501: their
+LocalIUH[1] receives IU32 and is consumed as native IUH for RAM-source input.
+R0323 restores malloc in the other 27 entries. No device algorithm changes.
+
+Counter-review: reversing the identified ABI forms reproduces the full pinned
+XP token stream. CMake's selected C-VID target compiles this file, and evidfunc
+registers its mode-3 operations. The [550-range map](m9-t100-sevid012-points.tsv)
+and [32-allocation inventory](m9-t100-sevid012-allocations.tsv) account for the
+original differences. Necessary ABI residuals remain qualified owner decisions,
+not implicitly approved. The source changes exactly 89 lines (+89/-89, net zero):
+62 native addresses and 27 allocation calls. No test source is changed.
+
+The same full-file SequenceMatcher measurement gives XP diff +695/-694,
+550 ranges before, +638/-637, 509 ranges after: 114 fewer diff lines and
+41 fewer ranges. Both required metrics decrease.
+
+Actual unchanged, minimal and poisoned-malloc bodies pass on x86/x64. Each
+runs 1440 independent mode-3 WORD write/fill cases with different low/high
+bytes, three masks, three plane sets, address parity, zero/one/two/seven
+counts and full-buffer untouched bounds; existing CHAIN2 tests pass 96/96.
+Both plane-enable bitmap and expanded mask are set coherently. Original
+four-byte capacities pass x86 but produce x64 heap corruption (0xc0000374).
+The 27 restored malloc blocks also pass when filled with 0xa5; five mixed-width
+calloc blocks remain. These controls do not qualify every specialized move
+or constitute new interactive guest evidence.
+
+D002 source review extends to S2489-S2496 in this file: pinned XP and local
+mode-3 DWORD write/fill wrappers pass start+8 to the second WORD operation.
+Those entries were not exercised by this WORD oracle, so no new dynamic or
+guest reachability claim is made. Record this in pending diff decisions only;
+no new repair patch or TODO is introduced.
+
+Pinned XP normalized SHA-256:
+ba9e4272cc22e491cac6362596c5bcecb5629309f1b90a1d986844bbfdfc1c10.
+Initial local normalized SHA-256:
+983045c2221014ddb6e02a473bef176eafd7761616054e95cfc4d3d6f79302d5.
+Final normalized SHA-256: 092ecf4a6541efda1f3d1019adda2e556f8a941701cdb17ba915cd353f1a7566.
+Installed source is byte-identical to the tested candidate and remains CRLF.
+Full cached dual builds/publication and regressions follow before delivery.
+
+### P43 final qualification and actual-change review
+
+Both cached builds/publications succeed without warnings. Each architecture
+passes 188/188 background tests plus 8/8 native audio/desktop/package tests:
+392/392 on the first full run, with no timeout changes or suppressed checks.
+Actual-change review verifies exactly 62 native address and 27 allocation
+replacements. Installed bytes match the tested candidate; CRLF, manifest
+provenance, mirror/documentation gates and command-local whitespace checks pass.
+No test or public component source is changed. The selected WORD oracle does
+not claim complete specialized-move coverage or guest-triggered DWORD proof.
+
+Published softpc32.exe: Nov 13 2026 07:50:27;
+SHA-256 d8f1f3ff0f7d9585e1d9525f14a1c201fece2bdc065795d8012ad194ac89d2ae.
+Published softpc64.exe: Nov 13 2026 07:54:16;
+SHA-256 c4d8f9d4f1a04e1aab365d25e205bf65337a324c38016318324b202059db28e9.
+
+Sequential audited scope is 295/472; next is file 296 base/cvidc/sevid013.c.
+S1 remains active; qualified residual decisions are not closed by passing tests.
+
+P43 process inventory confirms all task workers exited. Exact scratch cleanup
+was previewed/applied and Clean-Build -Check passes. Reusable caches,
+configuration, media and snapshots are preserved.
