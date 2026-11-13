@@ -5637,3 +5637,35 @@ published executable/full 392/392 regression baseline; P69 remains the latest
 focused dual-width checkpoint result. No broader guest assertion is made.
 Verified frozen frontier advances to 323/472; next file 324 gfi.c. S1 and the
 previous evidence-qualified owner decisions remain open.
+
+
+## Files 324-325: gfi.c and gfi_mpty.c (P72 read-only qualification)
+
+Pinned XP raw SHA-256:
+
+- gfi.c: 88321cdfcc0bf9063814bd6a01d95dec9205ec382f2e3f3cd33fb76915740e25.
+- gfi_mpty.c: ed31f747a67892278b2f9a27ef63361617b8deaffa4d51459f71983eb554d125.
+
+Full-file retained-text comparison finds only one relocated original historical
+notice per file (current gfi.c line 29, gfi_mpty.c line 23). R0418 and R0419
+preserve those notices under source policy. Each is +1/-0 outside already
+skipped exclusions/scaffolding; this audit changes neither. No excluded-body
+accounting or new runtime-difference decision is introduced.
+
+Both files are root-CMake production sources. gfi_fdc_command routes commands
+through the original per-drive table; SPECIFY reaches each drive. gfi_init
+installs gfi_empty_active for the drive slots. gfi_mpty.c supplies that original
+empty server and populates command, drive/motor, density, type and change
+callbacks. Compat gfi_image.c also invokes gfi_empty_active on its media detach
+path. This is a live no-medium/default implementation, not an unused stub;
+it does not imply that the product lacks floppy hardware. Host image I/O and
+the empty backend implement distinct medium states, not duplicate controllers.
+Original behavior and registration are retained without extra Compat changes.
+
+Counter-review checks the only additions against the original notice text and
+source policy. No remaining functional expression or controller algorithm
+diff exists outside skipped regions; no restoration is needed. Source/test/
+build/manifest/EXE delta and XP-diff delta are zero. No new build or test is
+claimed for this read-only comparison. P66 remains the published 392/392 full
+regression baseline. Frozen frontier 325/472; next file 326 base/inc/base_def.h.
+S1 and earlier evidence-qualified residual decisions remain open.
