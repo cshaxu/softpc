@@ -335,3 +335,80 @@ only as withdrawn-candidate evidence, not qualification of a new delivery.
 Both published EXEs are restored byte-for-byte to accepted P2 along with all
 source/test/manifest contents. Only audit progress and owner-rule documentation
 remain changed. No code or binary retirement ships in this continuation.
+
+## P4 file 42 call.c minimization (verifying)
+
+R0015 is the sole non-excluded semantic difference: XP CALLF chooses SET_SP
+versus SET_ESP using GET_OPERAND_SIZE after loading a more-privileged SS.
+The existing repair calls original set_current_SP. Actual c_main CALLF dispatch
+is compiled and accepts call gates; after TSS stack selection and load_SS_cache,
+original spush/spush16 address the new stack using SS's address-size attribute.
+A 16-bit gate entering a 32-bit stack with a different ESP high half demonstrates
+the mismatch: XP updates only low SP, then spush writes via the stale high ESP.
+This is source proof, not a newly reproduced guest incident. The checkpoint
+verify_stack_address_width test only calls the helper and does not execute a
+CALL gate; do not overstate its coverage.
+
+Fixed XP c_stack.c already implements set_current_SP by SS width. Restore XP's
+four-line if/else structure and change only GET_OPERAND_SIZE to GET_SS_AR_X.
+The attribute has the two supported USE16/USE32 values; branch effects equal
+the existing original helper. No new condition/path/helper/state is added.
+Residual changes from +1/-4 to +1/-1, reducing original-relative diff by three
+lines without a new point. Source +4/-1, net +3; tests unchanged. Counter-review
+checks the newly loaded SS owns this choice and distinguishes operand item size
+from stack address size. R0015's remaining one-line semantic correction awaits
+owner disposition; minimization is allowed by the approved method.
+
+Files 43-46 (call.h, cbw.c/h, ccpupig.h) have no in-scope differences against
+fixed XP. CALL/CBW declarations and workers are consumed by c_main. Preserve
+ccpupig.h and original includes under the owner's no-diff-growth rule; existing
+#error bodies are not revisited or counted. Source review now 46/472; 426 remain.
+File 47 ccpusas4.c is under investigation: added declarations/includes, snapshot
+accessors, range check, BIOS privilege selection and fallback return widths.
+No changes to that file are included in P4 or qualified by this batch's tests.
+
+File 47 investigation notes (not dispositions): host_sas_init returns UTINY*
+from Compat memory.c and assigns the live RAM base; lack of its prototype can
+truncate a native pointer on x64. The added emm.h/host.h macros are not referenced
+by this translation unit; verify declaration and preprocessing effects before
+restoring these includes. Snapshot accessors are called from Compat archive.c,
+and include private selectors_set/code_sel/data_sel as well as RAM/page kinds;
+a caller alone does not establish why original public APIs cannot replace them.
+Original c_page.c independently requests PG_U at CPL3. The existing BIOS access
+test distinguishes instrumented permission checks from real ROM fallback width
+execution; inspect each category's actual assertions before claiming coverage.
+No changes or completed audit status for file 47 yet.
+
+File 47 additional source evidence: phyR's original addr+typeSize+1 >= size
+rejects valid terminal byte/word/dword accesses. device_contract_smoke directly
+asserts phy_r16(size-2)==0x8776 and phy_r32(size-4)==0x87766554 after independently
+checking host RAM bytes; distinguish these from VM argument-rejection tests.
+The existing virtual-selector setter is not a substitute for raw snapshot
+restoration: c_SasRegisterVirtualSelectors reconstructs two guest LDT descriptors
+and always sets selectors_set TRUE. Reusing it would mutate restored guest RAM
+and could not express an unregistered snapshot. This establishes a concrete
+private-state requirement, not merely a dependency on a current caller.
+No file 47 modification or completed-file claim yet.
+
+### P4 final qualification
+
+Final x86 and x64 builds publish both EXEs; each architecture passes 188/188
+background and 8/8 native tests: 392/392, zero failures/skips. No new manual
+guest acceptance or complete call-gate matrix is claimed. Existing source proof
+and unchanged semantics justify minimization, not a new general CPU correctness
+claim. Raw normalized XP diff changes from +13/-34 to +13/-31 for call.c:
+three fewer diff lines, no new difference point. Production +4/-1 (net +3),
+tests unchanged. This deliberately reduces mirror difference, not source size.
+
+Published timestamps: Nov 12 2026 23:31:18 x86; 23:31:27 x64. SHA-256:
+
+- softpc32.exe: e62fbbb4253a752efa4aecf554684e05bed185a07bd0beb2e70e837f706a438b
+- softpc64.exe: 45e2d8525f3f28b91276c36ce89893da151c09a044ac17f07754a20949233fc0
+
+Actual-change counter-review verifies USE16=0, USE32=1 and the new SS attribute
+is the same source used by original set_current_SP. Only call.c production
+changes, with its manifest, audit records and published artifacts. No shared
+component, Compat, guest, media, configuration or snapshot changes. R0015 is
+still a pending owner decision, not an automatically accepted semantic patch.
+Full runner exited zero and no longer exists. Promote this evidence and remove
+P4 scratch; caches remain. S1/T100 remain active at 46/472 files reviewed.

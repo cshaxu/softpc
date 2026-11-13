@@ -33,11 +33,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 T100 S1 P2 restores original INT15/C0 segment selection and nonsemantic
 BIOS differences; raw XP-relative diff reduces by 10 lines. Both EXEs are
 published and final x86/x64 regression passes 392/392. Source review stands
-at 41/472 files. Owner rejects bswap.h retirement because its include removal
-increases mirror diff; source and manifest are restored exactly to P2. The
-withdrawn candidate test run ended; both EXEs also match accepted P2. File 41
-c-files omissions are source-reviewed. Four
-residual points (DOS mouse calls, slave EOI port, descriptor pointer ABI, source list)
+at 46/472 files. P4 minimizes call.c's existing stack-width repair from
++1/-4 to +1/-1 against XP; both EXEs are published and final regression
+passes 392/392.
+File 47 ccpusas4.c is under investigation. Five residual points (DOS mouse
+calls, slave EOI port, descriptor pointer ABI, source list, call stack width)
 await owner decisions. See [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; this is a batch delivery, not task closure.
 
