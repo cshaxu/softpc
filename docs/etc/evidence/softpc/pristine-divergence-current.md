@@ -1847,3 +1847,13 @@ move locals remain qualified ABI residuals pending owner decision. Production
 See [P44 audit](m9-t100-progress.md#p44-file-296-sevid013c-audit-and-restoration),
 [range map](m9-t100-sevid013-points.tsv) and
 [allocation inventory](m9-t100-sevid013-allocations.tsv).
+
+### T100 S1 P45 allocation and address minimization
+
+File 297 sevid014.c restores 111 native address expressions and 21 malloc
+calls. Actual GDP mapping, native capacities and eleven mixed-width zeroed
+move locals remain qualified ABI residuals pending owner disposition. Production
++132/-132; XP diff falls 1793 -> 1587 lines and 678 -> 591 ranges.
+See [P45 audit](m9-t100-progress.md#p45-file-297-sevid014c-audit-and-restoration),
+[range map](m9-t100-sevid014-points.tsv) and
+[allocation inventory](m9-t100-sevid014-allocations.tsv).

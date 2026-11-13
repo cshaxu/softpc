@@ -3703,3 +3703,85 @@ This does not establish the scheduling root cause; existing timing debt remains.
 P44 actual process inventory confirms all task workers exited. Exact scratch
 cleanup was previewed/applied; Clean-Build -Check passes. Reusable caches,
 user configuration, media and snapshots remain intact.
+
+## P45 file 297 sevid014.c audit and restoration
+
+Initial review: R0328 restores 111 native source/plane address expressions;
+R0329 retains actual GDP field translation. R0330 retains native capacities
+and zeroing in eleven outer WORD move entries: S2534/S2536/S2539/S2541/
+S2544/S2546/S2549/S2551/S2554/S2556/S2559. Their LocalIUH[1] receives IU32
+and is read as native IUH in the RAM-source branch. R0331 restores malloc
+for the other 21 allocations. Original algorithms and callback order remain.
+
+Counter-review: reversing all enumerated ABI forms reproduces the pinned XP
+full token stream. The selected C-VID target compiles this file and evidfunc
+registers its backward WORD moves. The [678-range map](m9-t100-sevid014-points.tsv)
+and [32-allocation inventory](m9-t100-sevid014-allocations.tsv) account for
+initial differences. Qualified remaining ABI differences still await owner
+disposition. Exactly 132 lines change (+132/-132, net zero): 111 address
+expressions and 21 allocation calls. Test sources are unchanged.
+
+The same full-file SequenceMatcher metric gives XP diff +897/-896, 678 ranges
+before, +794/-793, 591 ranges after: 206 fewer diff lines and 87 fewer ranges.
+No new mirror repair, helper or second path is introduced.
+
+Unchanged, minimal and poisoned-malloc actual bodies pass x86/x64. Each runs
+1248 captures across eleven real WORD copy helpers (six four-plane, five
+one-plane), RAM/video sources, three masks, zero/one/two/seven counts, address
+parity and four one-plane shifts. Eight zero-mask RAM cases independently
+assert latch output and untouched full-buffer bytes. Other captures prove
+preservation, not correctness of every original traversal or video-latch rule.
+Existing CHAIN2 checks pass 96/96. No complete outer-move matrix or new guest
+reproduction is claimed. No test-only production API is introduced.
+
+All successful captures match byte-for-byte: 5111808 bytes, SHA-256
+20bd537e29f50e6a5d177c84ad58c48f3266e7c5d9a5f842f88ab93971dbfff7.
+Original four-byte allocation capacities pass x86 but corrupt the x64 heap
+(0xc0000374). Poisoning only the 21 restored malloc blocks with 0xa5 passes;
+eleven mixed-width calloc blocks remain. No arbitrary high-address input
+contract is inferred from direct helper tests.
+
+Pinned XP normalized SHA-256:
+ae9fb6f14e10f79e859ab8777348f9cfa87451c87047e9f2e26ee0bc7ee896b1.
+Initial local normalized SHA-256:
+fe2a542ad98b757c99f6bb413c60a38046b852305a8e89fba91ac65ef2c0ed8e.
+Final normalized SHA-256: 44008656d3d7efb4e4b48872bdc900c8df463b67a5318134bd3c4d7768be70c8.
+Installed source equals the tested candidate bytes and retains CRLF.
+Full dual cached build/publication/regression qualification follows.
+
+### P45 final qualification and actual-change review
+
+Both cached builds/publications succeed. Each architecture passes 188/188
+background tests plus 8/8 native audio/desktop/package tests after the isolated
+retry recorded below: 392/392 qualified with unchanged budgets. Initial
+aggregate timeout evidence is retained, not called a first-run pass.
+Both builds emit the original
+sevid014.c:1065 unreachable-switch warning; unchanged actual-body control
+compiles emit the same warning on both architectures. No new warning appears.
+Actual review verifies exactly the 111 address and 21 allocation replacements,
+no test/public-component changes, final-source identity, CRLF and local-only
+manifest hash changes. Mirror/documentation gates and command-local whitespace
+checks pass. Captures prove selected helper preservation, not all original
+WORD traversal semantics or interactive guest coverage. Qualified ABI residuals
+remain pending owner decisions.
+
+Aggregate verifier-negative timeout architectures: x64.
+Only the affected test was retried alone with its unchanged 60-second budget.
+Existing timing debt remains; retry success does not establish its root cause.
+
+Published softpc32.exe: Nov 13 2026 08:20:54;
+SHA-256 9f36852f3f776a5077e4e72c1e3d9017ee6a073c1f0e3777435797dcd2e0997e.
+Published softpc64.exe: Nov 13 2026 08:24:35;
+SHA-256 3719736797fc1ad26159547c27c0997f45c4a60ee0cfadd042eed085c5255b77.
+
+Sequential audited scope is 297/472; next is file 298 base/cvidc/sevid015.c.
+S1 stays active; no routine approval is awaited for ordered work.
+
+P45 timing evidence: x64 aggregate verifier-negative timed out at 60.36 seconds;
+its isolated unchanged-budget retry passed in 26.29 seconds. All other tests
+passed on the first aggregate run. No timing-cause or interactive guest claim
+is inferred from the retry.
+
+P45 actual process inventory confirms all task workers exited. Exact disposable
+scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
+user configuration, media and snapshots remain intact.

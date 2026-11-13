@@ -30,17 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P44 restores 81 native-address expressions and 20 malloc sites in
-file 296 sevid013.c. Actual GDP mapping, native capacities and twelve mixed-width
-zeroed move locals remain qualified residuals. Production +101/-101 (net zero);
-tests unchanged. XP diff decreases 1505 -> 1351 lines and 581 -> 506 ranges.
-Actual-body controls pass 1440 backward-copy captures per architecture, including
-48 independent result cases; original four-byte capacities corrupt the x64 heap.
-Both EXEs are freshly built/published; all 392 registered tests qualify after
-one isolated x86 verifier-negative retry at the unchanged budget. Its initial
-aggregate timeout remains recorded; builds have no warnings. Actual review and gates pass.
-Sequential review is 296/472; next is file 297 base/cvidc/sevid014.c. Qualified
-residuals and pending original defects remain distinct in the
+T100 S1 P45 restores 111 native-address expressions and 21 malloc sites in
+file 297 sevid014.c. Actual GDP mapping, native capacities and eleven mixed-width
+zeroed move locals remain qualified residuals. Production +132/-132 (net zero);
+tests unchanged. XP diff decreases 1793 -> 1587 lines and 678 -> 591 ranges.
+Actual-body controls pass 1248 backward WORD-copy captures per architecture,
+including eight independent zero-mask cases; original four-byte capacities
+corrupt the x64 heap. Both EXEs are freshly built/published; all 392 registered
+tests qualify after an isolated x64 verifier-negative retry at the unchanged
+budget; the initial aggregate timeout is recorded. Original mirror warning remains; no new
+warning appears. Actual review, source identity and gates pass. Sequential review
+is 297/472; next is file 298 base/cvidc/sevid015.c. Qualified residuals and
+pending original defects remain distinct in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no routine approval is awaited to continue ordered auditing.
 
