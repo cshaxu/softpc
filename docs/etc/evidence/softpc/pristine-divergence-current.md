@@ -2091,3 +2091,13 @@ records/callback types/entry declarations for owner decision using actual
 private-queue and snapshot consumer evidence. This is not automatic retention
 approval or a completed audit of quick_ev.c. Existing exclusions are unchanged.
 See m9-t100-progress.md for source proof and dual-architecture verification.
+
+### T100 S1 P94 sas.h restoration and type minimization
+
+Historical sas.h overwrite/length counts are superseded by R0443-R0445 in
+m9-t100-progress.md. The unused added overwrite declaration is removed; the
+inactive sys_addr declaration and original comment/spacing are restored.
+Only the selected IHPE-to-PHY_ADDR token remains, matching the original CCPU
+storage definition; actual x86/x64 original-declaration countercompiles fail.
+Selected XP-relative diff drops by four lines to +1/-1. Existing exclusion and
+line-control scaffolding is unchanged, and retention still awaits owner choice.

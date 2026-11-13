@@ -96,8 +96,6 @@ extern void sas_term IPT0();
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
-
-extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
 #line 103
 
 /*
@@ -105,7 +103,7 @@ extern void sas_overwrite_memory IPT2(PHY_ADDR, addr, PHY_ADDR, len);
  */
 
 extern host_addr Start_of_M_area;       /* host addr (char *) of start of M */
-extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
+extern  PHY_ADDR    Length_of_M_area;       /* offset of end of M */
 #else /* CPU_40_STYLE */
 #define sas_set_buf(buf,addr)	buf=get_byte_addr(addr)
 
@@ -114,7 +112,7 @@ extern host_addr Start_of_M_area;	/* host addr (char *) of start of M */
 #error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #else
 #line 117
-extern PHY_ADDR Length_of_M_area;	/* guest physical byte count */
+extern sys_addr Length_of_M_area;	/* sys addr (long) offset of end of M */
 #endif	/* GISP_CPU */
 
 /* the following is for integration only */

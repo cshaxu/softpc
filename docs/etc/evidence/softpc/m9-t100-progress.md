@@ -6831,3 +6831,66 @@ qualified owner decisions and S1 remain open.
 P93 actual three-file documentation diff review, mirror/documentation gates,
 whitespace and build-residue checks pass. No task scratch or background jobs
 were created. The initial frozen file hashes remain unchanged.
+
+## File 381: sas.h (P94)
+
+Pinned XP raw SHA-256:
+`ac96517e65ef664fac67ec56220c1ac6d060e72acd58339347ef21484c45f4c3`.
+Full-file opcode comparison identifies the following non-excluded differences;
+existing exclusion bodies and line/control scaffolding are unchanged and receive
+no new accounting. Broad inclusion of sas.h does not make every declaration used.
+
+| Point | XP/current scope | Initial analysis | Independent counter-review | Disposition |
+| --- | --- | --- | --- | --- |
+| R0443 | XP before line 103; added blank and sas_overwrite_memory declaration | No actual call uses the added public name. | Whole src/test/tools C/H search finds only declarations, a generated function type, c_sas_overwrite_memory provider and ntstubs wrapper definition; none needs this added header declaration. Preserve original generated types, implementations and non-CPU40 declaration. | Restore original absence, +0/-2 production. |
+| R0444 | XP line 109; CPU40 Length_of_M_area | PHY_ADDR matches the actual storage definition; IHPE is pointer-width. | Both pinned XP ccpusas4.c and zfrsrvd.c already define/import PHY_ADDR. Changing those to match the old header would add new mirror differences, while globally narrowing IHPE would break its pointer-carrier role. Actual compiler counterprobe confirms the local mismatch, detailed below. | Retain only IHPE-to-PHY_ADDR token change as qualified pending owner decision, +1/-1 relative XP; restore original spacing and trailing comment. |
+| R0445 | XP line 117; non-CPU40, non-GISP declaration | Current PHY_ADDR replacement has no supported CPU40 consumer. | Both sys_addr and PHY_ADDR expand to IU32; exact XP spelling/comment is sufficient even in this retained inactive branch. No new conditional exclusion is added in this audit. | Restore exact XP sys_addr declaration, +1/-1 production and two fewer XP-relative diff lines. |
+
+base_def.h defines PHY_ADDR and sys_addr as IU32, while current insignia.h
+uses unsigned long for IU32 and UINT_PTR for IHPE. The original CCPU's
+Length_of_M_area storage is a guest physical byte count, not a native pointer.
+The active root configuration selects CPU_40_STYLE for x86 and x64. sas.h has
+actual original BIOS, device, video and CCPU includes; root CMake compiles those
+consumers. Compat has no duplicate definition that should replace the original
+storage owner.
+
+Counterprobe uses each real Ninja ccpusas4.c compile command, changing only
+output/dependency paths and prepending a task-private sas.h with the selected
+Length_of_M_area declaration restored to IHPE. Other local necessary changes
+and exclusions remain unchanged. Current final header compiles; the original
+selected declaration conflicts with the unmodified original PHY_ADDR storage.
+An initial runner incorrectly expected x86 success on equal bit widths. Actual
+x86 diagnostic reports unsigned int versus unsigned long, so that assumption
+was rejected; no build or EXE publication had begun in that first run. After
+confirming process exit, the expectation was corrected and both architectures
+were rerun. Equal widths do not make distinct C types compatible. This is
+compile/source proof, not a runtime memory-corruption reproduction.
+
+Production change +2/-4, net -2; tests unchanged. Excluding existing scaffolding,
+selected XP added/deleted diff falls from +4/-2 to +1/-1, four fewer diff lines.
+The surviving line is reduced to one type-token deviation; restored comments
+and spacing do not falsely count as removal of that surviving line difference.
+Historical sas.h register counts are superseded by this precise scope.
+
+Final counterprobe: current compile exits 0 on both architectures; the original
+IHPE declaration exits 1 on both. x86 reports unsigned long versus unsigned int;
+x64 reports unsigned long versus unsigned long long. No runtime fault is claimed.
+Both cached builds then succeed, x86 32.11 s and x64 45.46 s. Their 4107/4160
+warning lines all originate in the preserved mirror, none outside softpc.new.
+Published EXEs have unchanged lengths; full-byte comparison to P92 finds only
+8/7 bytes changed inside verified compiler-time and PE timestamp/checksum fields.
+Fresh compiler stamps are Nov 13 2026 15:45:36 / 15:46:12. SHA-256:
+
+- x86: `aabbb8a911ac347f20b259aa1a181b686880132febcaefb89cadfc0af011efbd`.
+- x64: `fd8e52be68a9f7dde709685ccc521bb48b58412c9c9f69654d3af2169793ea0e`.
+
+Artifact equivalence invokes the approved test-omission rule: no new runtime
+suite is claimed. P92 checkpoint tests and P80's 392/392 remain the respective
+focused/full runtime baselines. Final header CRLF and local manifest hash are
+preserved/updated; upstream and selected-subset hashes are unchanged. Frozen
+frontier is 381/472, next file 382 base/inc/sasp.h. S1 remains active and R0444
+awaits owner disposition, not automatic approval.
+
+P94 actual eight-file diff review, mirror/documentation gates and whitespace
+check pass. CIM confirms task processes exited; exact task scratch preview,
+removal and residue check pass. User INI/media/snapshots are untouched.

@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P93 completes files 378-380: rom.h and rtc_bios.h match XP fully;
-rs232.h selected content matches outside existing exclusion scaffolding.
-All named original consumers are compiled. No source, test or EXE changes.
-P92 remains the artifact/focused checkpoint baseline; P80's 392/392 remains
-the full-runtime baseline. Frozen frontier 380/472; next file 381 base/inc/sas.h.
+T100 S1 P94 completes file 381 sas.h: remove an unused added declaration,
+restore inactive original text and minimize the required memory-size declaration
+to one type token. Both architectures reject the original conflicting type;
+the residual is qualified for owner decision. XP-relative diff reduces by four lines.
+Both cached builds/published EXEs pass metadata-only equivalence. P92 checkpoint
+and P80 392/392 remain runtime baselines. Frontier 381/472; next base/inc/sasp.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
