@@ -3861,3 +3861,97 @@ S1 remains active; no routine approval is awaited.
 P46 actual process inventory confirms all task workers exited. Exact disposable
 scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
 user configuration, guest media and snapshots remain intact.
+
+## P47 file 299 sevid016.c audit and restoration
+
+Initial review: R0336 restores 69 native buffer/table address expressions;
+R0337 retains GDP field mapping. R0338 retains native capacities and nine
+mixed-width calloc sites: eight mode-3 outer moves use LocalIUH[1] as IU32/IUH,
+and S2629 uses LocalIUH[8] as an IU32 counter and native pointer offset.
+R0339 restores the other 23 malloc sites. R0343 restores four original private
+enum entries and their four static wrapper/pointer declarations (24 lines).
+Whole-repository symbol search finds no consumers of these L25_18/19/20/21
+entries outside their own former definitions. Their removal is not necessary
+to retain selected marker dispatch; restoring the dormant private scaffolding
+passes both actual-body VGA controls and does not create a public entry path.
+
+Counter-review finds substantive differences beyond the ABI patterns:
+R0340 retains selected byte/string dirty dispatch; R0341 retains two CHAIN2
+address A0-gap shift corrections; R0342 retains two local continuation gotos.
+Each was independently restored in an isolated actual-body control, preserving
+the other current patches and native GDP bindings. These are qualified existing
+residuals, not new patches or automatically approved retention.
+
+The [534-range map](m9-t100-sevid016-points.tsv) and
+[32-allocation inventory](m9-t100-sevid016-allocations.tsv) reconcile initial
+differences. Production +116/-92 (net +24) restores original scaffolding rather
+than adding logic. XP diff falls +656/-717 (1373 lines), 534 ranges, to
++593/-630 (1223 lines), 471 ranges: 150 fewer diff lines and 63 fewer ranges.
+No public component, test source or build interface changes.
+
+Actual-body controls link the existing complete VGA regression against each
+isolated sevid016 object. Unchanged, minimal, scaffold-restored and poisoned
+malloc controls pass on x86/x64. Original four-byte capacities pass x86 but
+fail x64 with 0xc0000374. Poison touches only the 23 restored allocations;
+nine mixed-width calloc sites remain. This does not exhaust every generated
+helper or arbitrary input combination.
+
+Coherent original dirty restoration fails the selected EGA dirty-low assertion
+on both architectures (vga_frame_smoke.c:1561). An earlier dirty control omitted
+native GDP translation and is discarded, not counted as evidence. The corrected
+control restores both complete original blocks and generated entries with GDP
+bindings maintained. Isolating only the string marker additionally fails the
+zero-length dirty-low sentinel on both architectures. The current candidate
+passes zero/one/two/seven-byte string checks. These are actual function-body
+tests, not a new guest reproduction or a claim that CCPU uses every bulk entry.
+
+Restoring only the A0-gap shifts fails existing mode-64 incremental/full-frame
+assertions on both architectures. Restoring only the two nested continuation
+calls causes 0xc0000005 on both. Neither failure justifies changing other
+original algorithms. Existing source/caller evidence distinguishes scalar CCPU
+routes from generated bulk routes and their direct regression coverage.
+
+Pinned XP normalized SHA-256:
+779010fc9ac72e8ffc0c760d434588526e6fb417b467917a43828d3870826794.
+Initial local normalized SHA-256:
+1cbd0cfaa1edf813d9be70d8774969384cc9f40fbb6bd95a3000c5ae6d74473c.
+Final candidate normalized SHA-256: 744a3a3e227d2ff1648e50e0156e67f729ca49af206458b187dfe36921879a8f.
+Installed source equals the tested scaffold candidate and retains CRLF.
+Full dual cached qualification follows.
+
+### P47 final qualification and actual-change review
+
+Both cached x86/x64 builds and publications succeed. Each architecture completes
+188 background plus eight native audio/desktop/package tests. 392/392 qualify after correcting and rerunning the source-boundary gate on both architectures; the initial gate failures remain recorded.
+The original unreachable-switch warning remains (now line 1029 after original
+scaffolding restoration); unchanged controls emit the same warning. No new
+warning appears. Source identity, CRLF, actual change accounting, local-only
+manifest hash, mirror/documentation gates and whitespace checks are verified.
+No guest reproduction or exhaustive helper coverage is inferred from these
+tests. Qualified existing ABI/device residuals remain pending owner decisions.
+
+The initial full runs each passed 187/188 background and 8/8 native tests.
+The sole failure was the root gate's blanket prohibition of retired L25 names,
+which also rejected dormant private declarations. Its two-line adjustment
+rejects actual case/goto/label control flow while allowing the original private
+scaffolding; the existing inline-CGA and 28 selected-marker checks remain.
+Executing the actual check fragment accepts the declaration fixture and rejects
+case, goto and label negative controls. Both complete source-boundary tests
+pass after correction. No product source changed after its full build/test run;
+only this affected gate needed rerunning. Root validation script +2/-2 is
+reported separately from mirror production +116/-92; test sources are unchanged.
+
+x86: 186/188 Test #172: emulator.verifier-negative ................................   Passed   49.62 sec
+x64: 186/188 Test #172: emulator.verifier-negative ................................   Passed   43.15 sec
+
+Published softpc32.exe: Nov 13 2026 08:57:15;
+SHA-256 5c1fb1f40677d5cb42f5d7261539a837d46d47f2091db4452bc456c44f102fcd.
+Published softpc64.exe: Nov 13 2026 09:00:59;
+SHA-256 e4f9872e6be4dcc8823cd11e10cf57cda389d75499279f1034403a968764ac16.
+
+Sequential audited scope is 299/472; next file 300 base/cvidc/sevid017.c.
+S1 remains active; no routine approval is awaited.
+
+P47 process inventory confirms all owned workers exited. Exact disposable
+scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
+user configuration, guest media and snapshots remain intact.

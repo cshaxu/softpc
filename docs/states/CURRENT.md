@@ -30,18 +30,20 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P46 restores 82 native-address expressions and 24 malloc sites in
-file 298 sevid015.c. GDP mapping, native capacities and eight mixed-width zeroed
-move locals remain qualified residuals. Production +106/-106 (net zero);
-tests unchanged. XP diff decreases 1429 -> 1277 lines and 547 -> 519 ranges.
-Actual-body controls pass 960 captures per architecture, including 240
-independent zero-count cases; original four-byte capacities corrupt the x64
-heap. Both EXEs are freshly built/published; 392/392 pass on the first full run.
-The original mirror switch warning remains; no new warning appears.
-Actual review, source identity and gates pass.
-Sequential review is 298/472; next is file 299 base/cvidc/sevid016.c. Qualified
-residuals and pending original defects remain distinct in the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P47 restores 69 native-address expressions, 23 malloc calls and
+24 lines of original private scaffolding in file 299 sevid016.c.
+Production +116/-92 (net +24); test sources unchanged; root gate +2/-2. XP diff decreases
+1373 -> 1223 lines and 534 -> 471 ranges. Existing GDP/native-local ABI,
+selected dirty, CHAIN2 address-gap and continuation repairs remain qualified
+residuals; isolated coherent restorations fail actual-body controls on both
+architectures. Candidate and poisoned allocations pass; original capacities
+corrupt the x64 heap. Both EXEs are freshly built/published; 392/392 qualify
+after correcting and rerunning the source-boundary gate on both architectures;
+the initial gate failures remain recorded.
+Original mirror warning remains; no new warning appears. Actual review,
+source identity and gates pass. Sequential review is 299/472; next is file
+300 base/cvidc/sevid017.c. Qualified residuals and pending original defects
+remain distinct in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no routine approval is awaited to continue ordered auditing.
 
 

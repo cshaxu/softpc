@@ -1867,3 +1867,14 @@ XP diff falls 1429 -> 1277 lines and 547 -> 519 ranges.
 See [P46 audit](m9-t100-progress.md#p46-file-298-sevid015c-audit-and-restoration),
 [range map](m9-t100-sevid015-points.tsv) and
 [allocation inventory](m9-t100-sevid015-allocations.tsv).
+
+### T100 S1 P47 sevid016 minimization
+
+File 299 restores 69 native address expressions, 23 malloc calls and 24 lines
+of original private generated scaffolding. Existing GDP/native local ABI,
+selected dirty, CHAIN2 address gap and local continuation differences remain
+evidence-qualified owner decisions. Production +116/-92; XP diff falls
+1373 -> 1223 lines and 534 -> 471 ranges. No new device patch is introduced.
+See [P47 audit](m9-t100-progress.md#p47-file-299-sevid016c-audit-and-restoration),
+[range map](m9-t100-sevid016-points.tsv) and
+[allocation inventory](m9-t100-sevid016-allocations.tsv).
