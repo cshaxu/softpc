@@ -30,21 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P47 restores 69 native-address expressions, 23 malloc calls and
-24 lines of original private scaffolding in file 299 sevid016.c.
-Production +116/-92 (net +24); test sources unchanged; root gate +2/-2. XP diff decreases
-1373 -> 1223 lines and 534 -> 471 ranges. Existing GDP/native-local ABI,
-selected dirty, CHAIN2 address-gap and continuation repairs remain qualified
-residuals; isolated coherent restorations fail actual-body controls on both
-architectures. Candidate and poisoned allocations pass; original capacities
-corrupt the x64 heap. Both EXEs are freshly built/published; 392/392 qualify
-after correcting and rerunning the source-boundary gate on both architectures;
-the initial gate failures remain recorded.
-Original mirror warning remains; no new warning appears. Actual review,
-source identity and gates pass. Sequential review is 299/472; next is file
-300 base/cvidc/sevid017.c. Qualified residuals and pending original defects
-remain distinct in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
-S1 stays active; no routine approval is awaited to continue ordered auditing.
+T100 S1 P48 restores ten native-address expressions, 29 malloc calls and
+60 original private declaration lines in file 300 sevid017.c. Production
++99/-39 (net +60); test sources unchanged. XP diff decreases 1131 -> 1055
+lines and 367 -> 353 ranges. Existing GDP/native-local ABI, selected dirty,
+CHAIN2 address-gap and continuation repairs remain evidence-qualified owner
+decisions. Independent actual-body and physical-address controls distinguish
+the required repairs from harmless restoration. Both EXEs are freshly built
+and published; 392/392 qualify after unchanged-budget timeout retries, with
+initial aggregate failures retained. No new warning appears. Actual diff,
+tested-source identity and gates pass. Sequential review is 300/472; next is
+file 301 base/cvidc/sevid018.c. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+S1 remains active; no routine approval is awaited.
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
@@ -74,7 +71,7 @@ eight trees; no fresh NXVM alignment is claimed.
 
 Original GenericByteFill and Unchained DWORD defects belong to the
 [pending diff decisions](../etc/evidence/softpc/m9-t100-progress.md#pending-original-defect-diff-decisions), not TODO.
-[TODO](TODO.md) retains verifier-negative aggregate timing debt. The runtime-performance candidate
+[TODO](TODO.md) retains shared-fixture aggregate timing debt. The runtime-performance candidate
 remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
 did not admit S44 or a new implementation task.
 

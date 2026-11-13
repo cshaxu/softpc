@@ -1878,3 +1878,15 @@ evidence-qualified owner decisions. Production +116/-92; XP diff falls
 See [P47 audit](m9-t100-progress.md#p47-file-299-sevid016c-audit-and-restoration),
 [range map](m9-t100-sevid016-points.tsv) and
 [allocation inventory](m9-t100-sevid016-allocations.tsv).
+
+### T100 S1 P48 sevid017 restoration
+
+File 300 restores ten native-address expressions, 29 malloc calls and 60
+original private declaration lines. Existing GDP/native-local ABI, selected
+dirty, CHAIN2 address-gap and continuation repairs remain evidence-qualified
+owner decisions. Production +99/-39; XP diff decreases 1131 -> 1055 lines
+and 367 -> 353 ranges. Dual full qualification passes with the recorded
+unchanged-budget timeout retries.
+See [P48 audit](m9-t100-progress.md#p48-file-300-sevid017c-audit-and-restoration),
+[range map](m9-t100-sevid017-points.tsv) and
+[allocation inventory](m9-t100-sevid017-allocations.tsv).
