@@ -30,13 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P58 completes file 309 sevid026.c. Restore 25 native-address expressions
-and 22 malloc calls; native capacities and ten mixed-width zero initializations
-remain qualified owner decisions. Production +47/-47; XP difference 1245 -> 1195
-lines. Actual-body current/candidate/poison controls pass 156 cases per width.
-Both EXEs are built and published; full regression 392/392 passes first run.
-The frozen frontier is 309/472; next file 310 sevid027.c. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P59 completes file 310 sevid027.c. Restore 41 native-address expressions
+and 28 malloc calls; native capacities and four mixed-width zero initializations
+remain qualified owner decisions. Production +69/-69; XP difference 1129 -> 1047
+lines. RAM-source actual-body controls pass 56 cases per width; video-source
+callback is an unverified boundary. Both EXEs are built and published; full
+regression 392/392 passes first run. Frozen frontier 310/472; next file 311
+sevid028.c. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 

@@ -2008,3 +2008,7 @@ See [P57 audit](m9-t100-progress.md#file-308-sevid025c-p57),
 ### T100 S1 P58 sevid026 restoration
 
 File 309 restores 25 original native-pointer expressions and 22 malloc calls. Production +47/-47; XP-relative difference 1245 -> 1195 lines, reduction 50. Native capacity and ten mixed-width zero initializations remain pending owner decision. Both architectures pass 156 actual-body equivalence cases and full regression 392/392. See [P58 evidence](m9-t100-progress.md#file-309-sevid026c-p58-in-qualification).
+
+### T100 S1 P59 sevid027 restoration
+
+File 310 restores 41 original native-pointer expressions and 28 malloc calls. Production +69/-69; XP-relative difference 1129 -> 1047 lines, reduction 82. Native capacity and four mixed-width zero initializations remain pending owner decision. RAM-source equivalence passes 56 cases per width; video-source callback is an unverified boundary. Full regression passes 392/392. See [P59 evidence](m9-t100-progress.md#file-310-sevid027c-p59-in-qualification).

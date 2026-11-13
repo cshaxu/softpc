@@ -4919,3 +4919,32 @@ softpc32.exe: Nov 13 2026 12:04:02, SHA-256 4eef0ab34e9bfbcbc2acd2e9c694dae20836
 softpc64.exe: Nov 13 2026 12:06:57, SHA-256 4f3df6391feb222fc3756e38e95100270cf62cd06a3b3dd63107f83ae019ab4c
 
 P58 owned jobs exited; task scratch was previewed and removed via Clean-Build. Residue check passes; caches, configuration, media and snapshots remain intact.
+
+## File 310: sevid027.c (P59 in qualification)
+
+Pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89, raw SHA-256 2ba72a0b38f90c4371e02a2ead62b0ba338d061ea63f114adb3b18fb6d4d52b1. Initial fixed correspondence finds 491 GDP mapping lines, 41 native-address wrappers, 32 allocation lines and the GDP include; no other changed lines. Initial 449 ranges are classified in [point map](m9-t100-sevid027-points.tsv); [allocation inventory](m9-t100-sevid027-allocations.tsv) records all 32.
+
+R0393 retains GDP native layout pending owner decision. R0394 restores 41 exact XP dereferences. R0395 restores 28 malloc calls while retaining native capacity; four partial-width-write/native-width-read calloc calls remain pending owner decision. Production +69/-69. XP difference 1129 -> 1047 lines, reduction 82; ranges 449 -> 408.
+
+Current, candidate and poisoned candidate each pass 56 RAM-source actual-body cases on x86 and x64, hash e5c42581. These exercise mode 0 backward byte move entries and four copy helpers, plus one mode 3 word move. Repeated full-plane comparison proves equivalence for these cases, not independent hardware correctness. Removing four retained zero initializations under poisoned allocation passes x86 but faults x64 (0xc0000005); this combined negative does not individually prove all four. Source review shows partial writes followed by native reads.
+
+Video-source backward test cannot complete: actual fixture GDP backward string-read callback is NULL, and unchanged current and candidate both fault. Source search finds no setter call and backward glue functions only as definitions; CCPU backward move stubs call c_sas_not_used, while forward CCPU moves use scalar access. No guest failure or all-indirect-call impossibility is claimed. No new patch is added. This video-source path is not included in passing coverage.
+
+Normalized LF final candidate SHA-256 16e804f7faa65927c40d05a297dd79bde17f4508c5077c6d892d3590c0703cac. Builds and full regression are running; frontier remains 309/472 until delivery.
+
+### P59 final qualification
+
+Both cached builds and publications pass. Each architecture passes 188 background and 8 native tests: 392/392 first run. Final source matches tested candidate. Video-source callback remains an unverified boundary, not a passed test or confirmed guest defect.
+
+- x86-build: 13.09 seconds, exit 0.
+- x86-background: 140.09 seconds, exit 0.
+- x86-native: 26.03 seconds, exit 0.
+- x64-build: 12.09 seconds, exit 0.
+- x64-background: 140.09 seconds, exit 0.
+- x64-native: 26.03 seconds, exit 0.
+
+softpc32.exe: Nov 13 2026 12:19:56, SHA-256 0495315d3845a08fa96cdb4956a87747c81958ac0cf7d70eb07ca2f5ba8b5d53
+
+softpc64.exe: Nov 13 2026 12:22:56, SHA-256 d0819099715403bd0c6033db9476c5099f841392d599789942d1bd9c0c3acb7c
+
+P59 owned jobs exited; task scratch was previewed and removed via Clean-Build. Residue check passes; caches, configuration, media and snapshots remain intact.
