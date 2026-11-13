@@ -838,3 +838,108 @@ exception semantics. Existing command_provider_smoke exercises read/write
 watch overlap, trace values, byte/dword/stack and reverse-buffer x87 operands.
 These call traces guide the next restoration comparison; they alone do not
 qualify all added notifications for retention or complete this file's audit.
+
+## File 88 c_page.c: original stubs and operand observation
+
+The executor compared the entire file to the fixed XP counterpart, omitting
+existing excluded bodies from consideration. Non-excluded XP difference is
++22/-6 before this batch and +20/-6 after: two fewer lines and one removed
+point, no new point. Production change is +0/-2; no test source changes.
+
+Ordered point review (XP original lines; current lines after restoration):
+
+| ID | XP/current anchor | Initial finding and disposition |
+| --- | --- | --- |
+| R0113 | after 29 / before 30 | Added yoda.h. Restore original absence: real original check_D stub already links; macro replacement is unnecessary. |
+| R0114 | before 435 / before 434 | Added T56 explanation. Restore original absence; no tokens or behavior require it. |
+| R0115 | before 435 / 434-435 | Access observer declaration. Pending owner: required typed call to the host observation owner; not original guest DR machinery. |
+| R0116 | before 435 / 436 | Read observer declaration. Pending owner: returns the existing operand value while recording it once; signature matches machine/debug.c. |
+| R0117 | before 445 / 447-449 | Read-buffer starting pointer, width and address. Pending owner: original loop increments buffer, decrements address and consumes count; final observation needs original values. |
+| R0118 | before 462 / 467 | Bulk read observation. Pending owner: after successful original read, reversed x87 buffer is reported without another device access. |
+| R0119 | 484 / 490 | Byte direct-physical return. Pending owner: records byte-width successful operand. |
+| R0120 | 488 / 494 | Byte supervisor return. Pending owner: records same operand when no cached physical address is supplied. |
+| R0121 | 512 / 518 | DWORD direct-physical return. Pending owner: preserves full four-byte data and observation width. |
+| R0122 | 516 / 522 | DWORD supervisor return. Pending owner: same contract for uncached path. |
+| R0123 | 540 / 546 | WORD direct-physical return. Pending owner: preserves two-byte observation and original returned value. |
+| R0124 | 544 / 550 | WORD supervisor return. Pending owner: same contract for uncached path. |
+| R0125 | before 562 / 568-570 | Write-buffer original values. Pending owner: original reverse-memory loop consumes pointer/count/address; snapshot of inputs is needed for one completed observation. |
+| R0126 | before 582 / 591 | Bulk write observation. Pending owner: reports original reverse-buffer layout only after the write completes. |
+| R0127 | before 613 / 623 | Byte write observation. Pending owner: records one byte after either original write branch. |
+| R0128 | before 643 / 654 | DWORD write observation. Pending owner: records four bytes after either branch. |
+| R0129 | before 673 / 685 | WORD write observation. Pending owner: records two bytes after either branch. |
+
+### Real-path comparison
+
+Both architectures use the actual CCPU compile command from the existing Ninja
+tree, an isolated c_page object inserted before the normal machine archive,
+and the existing command-provider integration test plus all its real machine,
+Emulator and X86 objects. Device mocks remain the test's existing PCM/MIDI
+fixtures. No production build object, guest binary or user media is modified
+by these comparisons. All variants compile and link successfully.
+
+- Current source: command-provider test passes on x86 and x64.
+- Remove only added yoda.h: passes on both architectures. Preprocessing retains
+  original check_D calls; nm confirms they bind the linked check_D symbol.
+  Whole-src symbol search and fixed-XP stubs.c inspection confirm the original
+  PROD CCPU empty implementation, not an invented Compat replacement. The
+  earlier narrow search for a parenthesis immediately after check_D missed
+  its original IFN0 definition; no missing-symbol claim is made.
+- Restore original operand functions and remove their added observer locals,
+  declarations and calls: both runs reach the real watchpoint sequence but
+  fail the existing bounded wait for PAUSED after g. x86 exits 0xc0000409,
+  x64 exits 3; both log the same WaitForSingleObject(..., 10000) assertion.
+  This is an observed missing watch completion, not an external timeout or
+  a proof of all debugger/CPU cases. Current/no-header controls complete.
+
+### Independent source review
+
+The coordinator traced original c_oprnd.h callers: byte/word/dword operand
+macros, and x87 buffer reads/writes for qword, extended, environment and state
+operands. The original physical-cache and supervisor alternatives are both
+real routes; moving hooks below them would include non-operand internal memory
+traffic and lose the common original linear address. Original c_debug.c
+checks guest DR enable/type/address and sets guest DR6; it neither supplies
+host operand values nor invokes the host's watch state. Reusing it as the
+host debugger would change guest debug-register/exception ownership.
+
+machine/debug.c has the single active-debug owner: observations are accepted
+only during the current instruction, retirement commits a watch hit, and the
+existing executor rendezvous stops before the next instruction. Debugger
+inspection does not count as guest access. Read hooks return the already-read
+value; write hooks inspect the supplied value, not a second device read.
+On supported Windows x86/x64, their unsigned long contracts match the original
+32-bit IU32/LIN_ADDR representation. No second tracing state or queue is added.
+
+Existing command_provider_smoke covers byte/dword reads and writes, word
+watch overlap, implicit stack and reverse x87 operands with copied-value and
+width assertions; those tests qualify the current implementation, while the
+isolated negative comparison proves that deleting the whole observer route
+breaks actual watch completion. It does not dynamically isolate every hook
+or every paging/fault case. Restoring declarations or relocating this same
+logic to another mirror point would not reduce the required semantics.
+The minimal evidenced residual is the existing observation path (+20/-6),
+submitted for owner decision; it is not automatically approved retention.
+
+P10 final-source cached x86/x64 build and publication complete successfully.
+Each architecture passes 188 background and eight native integration tests:
+392/392 fresh passes, all six qualification command exits zero. The empty-stub
+call replaces a no-op macro, so code bytes change; no artifact-equivalence
+exemption is claimed. No new tests or generalized test framework are added.
+No fresh manual DOS/Win3.1/Win95 session validation is claimed.
+
+The ordered comparison also completes files 89-91: c_page.h has no in-scope
+difference, and c_prot.c/c_prot.h are entirely identical after LF normalization.
+No change is made to those files. File 92 c_reg.c is the next investigation;
+its public-register snapshot copy must be evaluated separately from the
+private CPU execution/debug-state bridges already reviewed. No automatic
+retention is inferred from a snapshot caller or earlier design comment.
+
+P10 coordinator actual-change review: only the two disclosed production lines
+are removed; the current manifest refreshes c_page.c only. Observation state,
+CPU/device semantics, guest media, user configuration and snapshots are unchanged.
+Qualification includes real native package, audio and desktop tests.
+Published artifact SHA-256:
+
+- softpc32.exe: `f5b1f24e5b87d929e590dae14c4836e9a08b21652350d6c1f5da475425b473e1`.
+
+- softpc64.exe: `967f98fa7075f969a05947a6818d00215dfea519e6c14f6cf60bc85e0e9d8ee3`.

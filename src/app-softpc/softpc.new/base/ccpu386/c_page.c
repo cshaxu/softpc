@@ -27,7 +27,6 @@ Paging Support.
 #include <c_tlb.h>	/* Translation Lookaside Buffer interface */
 #include <ccpusas4.h>	/* CPU <-> sas interface */
 #include <c_debug.h>	/* Debugging Regs and Breakpoint interface */
-#include <yoda.h>
 
 
 /*[
@@ -432,7 +431,6 @@ IFN2(
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Virtual Read Bytes from memory.                                   */
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-/* T56 port ABI: copied successful operand access, no debugger memory read. */
 extern void softpc_host_debug_access(unsigned long, unsigned long, int,
                                     const unsigned char *, int);
 extern unsigned long softpc_host_debug_read(unsigned long, unsigned long, unsigned long);

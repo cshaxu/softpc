@@ -30,13 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P8 restores original c_main.c IP calculations, removes unproduced
-SIGIO consumption and a redundant Compat timer wrapper, and minimizes the PIC
-rejection guard. Production +10/-65; tests +34/-0; XP-relative mirror diff
-reduces by 56 lines without new points. Both published EXEs pass 392/392
-fresh tests. Real CCPU before/after tests prove the restored 16-bit IP wrap.
-Source review is 87/472; file 88 c_page.c is under investigation. Evidence-qualified residuals
-remain pending owner decisions in the
+T100 S1 P10 restores c_page.c's original use of the already-linked empty
+check_D stub and removes its added explanation: production +0/-2, tests
+unchanged, XP-relative diff reduced by two lines with no new points. Both
+published EXEs pass 392/392 fresh tests. Isolated original-operand restoration
+fails the real debugger watch-completion test on both architectures; the
+minimal observer residual is recorded for owner decision.
+Source review is 91/472; file 92 c_reg.c is under investigation.
+Evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
 
