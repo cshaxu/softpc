@@ -30,17 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P51 restores nine native-address expressions, 19 malloc calls,
-24 original private declaration lines, one direct continuation and a redundant
-shift literal in file 303 sevid020.c. Production +53/-31 (net +22); test
-sources unchanged; root continuation gate +1/-1. XP diff decreases
-1348 -> 1304 lines and 503 -> 493 ranges. Existing GDP/native-local,
-selected dirty, plane-layout and five nested continuation differences remain
-qualified owner decisions. Actual-body counters give candidate 290/290
-allocation/free pairs; original continuations leak 36 allocations on both
-widths. Both EXEs are freshly built/published; 392/392 pass first full run,
-without warnings. Actual diff review, source identity and gates pass.
-Sequential review is 303/472; next file 304 base/cvidc/sevid021.c. See the
+T100 S1 P52 restores 50 native-address expressions and 18 malloc calls in
+file 304 sevid021.c. Production +68/-68 (net zero); permanent test code
+unchanged. XP diff decreases 1481 -> 1381 lines and 583 -> 533 ranges.
+GDP/native-local ABI and 14 mixed-width initializations remain qualified
+owner decisions. Actual-body current/candidate/poison controls pass both
+widths, including 256 Chain4 cases; removal of remaining initialization
+faults on x64 and original capacities corrupt its heap. Both EXEs are freshly
+built/published; 392/392 pass first full run. Only the unchanged original
+switch-unreachable warning remains; no new warning. Actual diff review,
+source identity and gates pass. Sequential review is 304/472; next file 305
+base/cvidc/sevid022.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

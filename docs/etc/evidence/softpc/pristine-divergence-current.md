@@ -1929,3 +1929,15 @@ architectures pass the full suite without warnings or retries.
 See [P51 audit](m9-t100-progress.md#p51-file-303-sevid020c-audit-and-restoration),
 [range map](m9-t100-sevid020-points.tsv) and
 [allocation inventory](m9-t100-sevid020-allocations.tsv).
+
+### T100 S1 P52 sevid021 restoration
+
+File 304 restores 50 native dereferences and 18 malloc calls. GDP field
+mapping, native capacities and 14 mixed-width initializations remain qualified
+owner decisions. Production +68/-68; XP diff falls 1481 -> 1381 lines and
+583 -> 533 ranges. Both architectures pass the full suite on its first run;
+the existing original switch warning is unchanged. Actual-entry controls cover
+256 Chain4 cases per width/version; no new guest acceptance is claimed.
+See [P52 audit](m9-t100-progress.md#file-304-sevid021c-p52),
+[range map](m9-t100-sevid021-points.tsv) and
+[allocation inventory](m9-t100-sevid021-allocations.tsv).

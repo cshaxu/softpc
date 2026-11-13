@@ -4366,3 +4366,90 @@ S1 remains active; no routine approval is awaited.
 P51 process inventory confirms no owned worker remains. Task scratch was
 previewed and removed; Clean-Build closure residue verification passes.
 Only reusable caches remain. User configuration, media and snapshots are intact.
+
+## File 304: sevid021.c (P52)
+
+Pinned XP comparison has 583 non-equal ranges, +741/-740 lines (1481 total).
+The candidate restores 50 native-address dereferences and malloc in 18 of
+32 local arrays. Production +68/-68, net zero; permanent test code unchanged.
+XP difference becomes 533 ranges, +691/-690 lines (1381 total): reduction
+of 50 ranges and 100 added/deleted lines, not merely a source line reduction.
+The [point map](m9-t100-sevid021-points.tsv) covers all initial ranges;
+the [allocation inventory](m9-t100-sevid021-allocations.tsv) names all 32 arrays.
+
+| Point | Initial executor analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0375 | GDP accesses use an explicit field mapping rather than original byte offsets. | Retain pending decision. The actual GDP owner is an opaque slot aggregate, and native pointer fields differ in width; arithmetic into that aggregate cannot substitute for its field storage. Both immediate and register-selected offsets are audited separately from already resolved pointers. |
+| R0376 | Fifty native byte accesses use the GDP address adapter. | Every operand comes from native local slots 6, 7, 9 or 10: RAM source or native read/write plane base plus offset. They are not small GDP offsets. Restore each complete original XP line; source comparison verifies exact equality. |
+| R0377 | All 32 local arrays use native capacity and zero initialization. | Restore malloc in twelve ByteMove wrappers and six CopyByte4Plane helpers, whose partial stores are not later consumed as native-width values. Retain zero initialization in six CopyBytePlnByPln helpers (slot 7) and eight WordWrite entries (slot 0): an IU32 address store precedes an IUH address load. Poisoned removal of these initializations faults on x64; original four-byte capacities corrupt the x64 heap. Both controls pass on x86, which has no corresponding upper half. Native capacity and the 14 mixed-width initializations remain owner decisions. |
+
+The compilation unit belongs to the real C-VID target. SetWritePointers in
+ev_glue.c selects chain4_evid for CHAIN_4 with zero rotate, then selects a
+mode/state entry. evidfunc.c registers this file's ByteMove and WordWrite
+entries; the Copy helpers are called from the generated entries. There is
+no duplicate Compat implementation to replace and no unused-file deletion.
+No new guest use of every legacy bulk entry is claimed.
+
+The unchanged, candidate and poisoned-malloc candidate bodies each pass the
+existing VGA fixture on x86/x64. A task-local extension additionally invokes
+160 Chain4 entry cases: all twelve ByteMove variants, eight WordWrite variants,
+four address residues and two plane masks, with repeated full-output checks.
+The first two variants have independent byte-position/mask expectations;
+other variants establish restoration equivalence, not exhaustive hardware
+correctness. All six runs give the same output hash 0306c195.
+
+A second task-local extension invokes all twelve Copy helpers directly with
+both RAM and video-source flags and four address residues. This exercises
+the native source/read-plane branches without inventing a missing bulk-read
+callback. Together with the preceding entries it yields 256 cases per run,
+with full-output hash 83654095 for current/candidate/poisoned candidate on
+both widths. The first two helper variants again have independent byte-position
+expectations. This is actual generated-body evidence, not a new guest program
+or proof that every entry has an active guest bulk caller.
+
+Original-capacity control exits 0 on x86 and 0xc0000374 on x64. Removing the
+remaining zero initialization with poisoned malloc exits 0 on x86 and
+0xc0000005 on x64. These are actual-body controls, not predictions from
+uninitialized storage. No new mirror patch follows from unrelated original
+behavior; such discoveries remain pending diff decisions rather than TODO.
+
+Counter-review verifies all 50 restored address lines exactly match XP,
+the other 18 changes only restore malloc while preserving native capacity,
+and no condition, continuation, calculation, callback or device path changes.
+Final CRLF source equals the tested candidate. LF-normalized SHA-256:
+a2f9ecb65cbdaa804bf53af922b9dbc788337053f247046114afbb3baf33fa77.
+The original switch-unreachable warning remains at line 1113 in both current
+and candidate builds on both widths; it is not a new warning.
+Full qualification is in progress; delivered scope remains 303/472.
+
+### P52 final qualification and actual-change review
+
+Both cached builds/publications succeed. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first full run**, without retries
+or budget changes. The sole reported compiler warning is the unchanged
+original switch-unreachable statement at line 1113, present before and after
+on both widths. No new warning is observed.
+
+- x86 build: 9.08 seconds, exit 0.
+- x86 background: 133.09 seconds, exit 0.
+- x86 native: 25.03 seconds, exit 0.
+- x64 build: 11.09 seconds, exit 0.
+- x64 background: 135.11 seconds, exit 0.
+- x64 native: 25.03 seconds, exit 0.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 10:38:51;
+SHA-256 5db7c3abf9b5a25d2e4f6206bf8681a5c7af4aa05cede24460c44d7bc504db98.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 10:41:38;
+SHA-256 a5da2e60dd59989046007197a0e10f67182ce6d080c5ac15aa44a537458b519f.
+
+Final source identity, CRLF, point reconciliation and actual-change review
+pass. No guest/configuration/media/snapshot changes and no new production
+path. No new interactive guest acceptance is claimed. Sequential audited
+scope is 304/472; next file 305 base/cvidc/sevid022.c. S1 remains active;
+qualified residual decisions are not owner-approved retention or closure.
+
+P52 process inventory confirms all owned workers have exited. Task scratch
+was previewed and removed through Clean-Build; closure residue verification
+passes. Only reusable caches remain. User configuration, media and snapshots
+are unchanged.
