@@ -17,11 +17,9 @@
 ]*/
 #include "insignia.h"
 #include "host_def.h"
-#include <stdio.h>
 #include <math.h>
 #include "cfpu_def.h"
 #include "ckmalloc.h"
-#include "snapshot.h"
 
 typedef enum {
 FPSTACK,
@@ -1028,7 +1026,6 @@ LOCAL VOID CVTFPHI64 IFN2(FPU_I64 *, as64, FPH *, FPPtr)
 	IU32	holder;
 	IU32	signbit = 0;
 
-	/* T60: copy the representation without aliasing a double as FP64. */
 	memcpy(&bits, FPPtr, sizeof(bits));
 	exp = bits.hiword.exp;
 	if (exp != 0) {
@@ -3223,9 +3220,8 @@ GLOBAL VOID FIST IFN1(VOID *, memPtr)
 						exp_value = 1;	/* flag exception */
 					  }
 				          break;
-			case M64I	: /* T60: convert the rounded value, as for M16I/M32I. */
-					  FPRes = npx_rint(TOSPtr->fpvalue);
-					  CVTFPHI64((FPU_I64 *)&FPTemp, &FPRes);
+			case M64I	: FPRes = npx_rint(TOSPtr->fpvalue);
+					  CVTFPHI64((FPU_I64 *)&FPTemp, &FPRes); /* Must be writing the result to FPTemp as well... */
 					  CVTI64FPH((FPU_I64 *)&FPTemp);	/* Result in FPRes */
 					  /* Check for overflow */
 					  if (FPRes != npx_rint(TOSPtr->fpvalue)) {
@@ -5832,7 +5828,7 @@ GLOBAL	void NpxStackRegAsString IFN3(FPSTACKENTRY *, fpStPtr, char *, buf, IU32,
 /* this one is only ever used in trace.c and only if pure CCPU */
 GLOBAL char * getNpxStackReg IFN2(IU32, reg_num, char *, buffer)
 {
-	reg_num += (IU32)(TOSPtr - FPUStackBase);
+	reg_num += TOSPtr - FPUStackBase;
 	NpxStackRegAsString (&FPUStackBase[reg_num&7], buffer, 12);
 	return buffer;
 }
@@ -5910,77 +5906,6 @@ GLOBAL void getNpxStackRegs IFN1(FPSTACKENTRY *, dumpPtr)
 GLOBAL void setNpxStackRegs IFN1(FPSTACKENTRY *, loadPtr)
 {
 	memcpy((char *)FPUStackBase, (char *)loadPtr, 8 * sizeof(FPSTACKENTRY));
-}
-
-extern IU32 softpc_ccpu_snapshot_delayed_npx_eip IPT0();
-extern VOID softpc_ccpu_snapshot_set_delayed_npx IPT2(IBOOL, pending,
-   IU32, eip);
-extern IBOOL NpxIntrNeeded;
-
-GLOBAL VOID
-softpc_ccpu_snapshot_capture_fpu
-IFN1(
-   softpc_ccpu_fpu_state *, state
-)
-{
-   IU32 index;
-
-   state->control = getNpxControlReg();
-   state->status = getNpxStatusReg();
-   state->last_selector = NpxLastSel;
-   state->last_offset = NpxLastOff;
-   state->fea = NpxFEA;
-   state->fds = NpxFDS;
-   state->fip = NpxFIP;
-   state->fop = NpxFOP;
-   state->fcs = NpxFCS;
-   state->pop_stack = POPST;
-   state->double_pop = DOUBLEPOP;
-   state->unordered = UNORDERED;
-   state->reverse = REVERSE;
-   state->address_size_32 = NPX_ADDRESS_SIZE_32;
-   state->protected_mode = NPX_PROT_MODE;
-   state->exception_pending = NpxException;
-   state->delayed_interrupt = NpxIntrNeeded;
-   state->delayed_exception_eip = softpc_ccpu_snapshot_delayed_npx_eip();
-   for (index = 0; index < 8; index++) {
-      memcpy(&state->stack[index].value_bits, &FPUStackBase[index].fpvalue,
-         sizeof(state->stack[index].value_bits));
-      state->stack[index].tag = FPUStackBase[index].tagvalue;
-   }
-}
-
-GLOBAL VOID
-softpc_ccpu_snapshot_restore_fpu
-IFN1(
-   const softpc_ccpu_fpu_state *, state
-)
-{
-   IU32 index;
-
-   for (index = 0; index < 8; index++) {
-      memcpy(&FPUStackBase[index].fpvalue, &state->stack[index].value_bits,
-         sizeof(state->stack[index].value_bits));
-      FPUStackBase[index].tagvalue = state->stack[index].tag;
-   }
-   setNpxControlReg(state->control);
-   setNpxStatusReg(state->status);
-   NpxLastSel = state->last_selector;
-   NpxLastOff = state->last_offset;
-   NpxFEA = state->fea;
-   NpxFDS = state->fds;
-   NpxFIP = state->fip;
-   NpxFOP = state->fop;
-   NpxFCS = state->fcs;
-   POPST = state->pop_stack != 0;
-   DOUBLEPOP = state->double_pop != 0;
-   UNORDERED = state->unordered != 0;
-   REVERSE = state->reverse != 0;
-   NPX_ADDRESS_SIZE_32 = state->address_size_32 != 0;
-   NPX_PROT_MODE = state->protected_mode != 0;
-   NpxException = state->exception_pending != 0;
-   softpc_ccpu_snapshot_set_delayed_npx(state->delayed_interrupt != 0,
-      state->delayed_exception_eip);
 }
 
 

@@ -23,6 +23,7 @@
 #include "host_com.h"
 #include "host_lpt.h"
 #include "c_stack.h"
+#include "cfpu_def.h"
 
 extern void insert_code_into_6805_buf(half_word code);
 extern void host_key_down(int key);
@@ -57,6 +58,8 @@ extern IU32 getNpxControlReg(void);
 extern void setNpxControlReg(IU32 value);
 extern IU32 getNpxStatusReg(void);
 extern void setNpxStatusReg(IU32 value);
+extern void getNpxStackRegs(FPSTACKENTRY *stack);
+extern void setNpxStackRegs(FPSTACKENTRY *stack);
 
 typedef struct checkpoint_probe {
     softpc_machine *machine;
@@ -383,6 +386,8 @@ static void verify_snapshot_archive(void)
     half_word cmos_value;
     softpc_device_inport_mouse_state mouse_before, mouse_after;
     softpc_device_pic_state mouse_pic;
+    FPSTACKENTRY fpu_stack[8] = {0};
+    unsigned index;
 
     assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_write_physical(probe.machine, 0x1004u, directory,
@@ -398,6 +403,11 @@ static void verify_snapshot_archive(void)
     CCPU_DR[0] = 0x1234u;
     CCPU_DR[7] = 1u;
     setup_breakpoints();
+    for (index = 0; index < 8u; ++index) {
+        fpu_stack[index].fpvalue = (index & 1u ? -1.25 : 1.25) * (index + 1u);
+        fpu_stack[index].tagvalue = index & 1u;
+    }
+    setNpxStackRegs(fpu_stack);
     setNpxControlReg(0x027fu);
     setNpxStatusReg(0x2800u);
     cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
@@ -515,6 +525,8 @@ static void verify_snapshot_archive(void)
     c_setEIP(0u);
     CCPU_DR[0] = CCPU_DR[7] = 0u;
     setup_breakpoints();
+    lib_memory_set(fpu_stack, 0, sizeof(fpu_stack));
+    setNpxStackRegs(fpu_stack);
     setNpxControlReg(0x037fu);
     setNpxStatusReg(0u);
     cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
@@ -539,6 +551,11 @@ static void verify_snapshot_archive(void)
     assert(c_getEAX() == 0x12345678u && c_getEIP() == 0x7654u);
     assert(CCPU_DR[0] == 0x1234u && CCPU_DR[7] == 1u);
     assert(getNpxControlReg() == 0x027fu && getNpxStatusReg() == 0x2800u);
+    getNpxStackRegs(fpu_stack);
+    for (index = 0; index < 8u; ++index) {
+        assert(fpu_stack[index].fpvalue == (index & 1u ? -1.25 : 1.25) * (index + 1u));
+        assert(fpu_stack[index].tagvalue == (index & 1u));
+    }
     cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
     cmos_inb(CMOS_DATA, &cmos_value);
     assert(cmos_value == 0x5au);

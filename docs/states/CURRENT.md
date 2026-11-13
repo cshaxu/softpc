@@ -30,14 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P14 restores evid_c.h entirely to fixed XP; its changed pointer
-pointee types were unnecessary for the sole actual offset/size consumer.
-Production +6/-10 (net -4), tests unchanged; mirror diff reduces by 16 lines
-to zero for this file. Final x86/x64 objects are identical; both published
-EXEs differ from P13 only in required compiler/PE metadata. The approved
-artifact-equivalence exception applies: no fresh P14 runtime test is claimed,
-and P13's 392/392 fresh full tests remain the behavior regression baseline.
-Source review is 120/472; file 121 fpu.c is next.
+T100 S1 P15 removes added FPU mirror snapshot entries: the existing archive
+owner directly uses original register/stack accessors. Unnecessary declaration,
+cast and comment changes are restored. Production +71/-82 (net -11), tests
++17; fixed-XP fpu.c diff falls from +84/-6 to +8/-5, 77 fewer difference lines.
+Independent dual-width negative probes prove the two remaining integer
+conversion repairs necessary; retention remains pending owner decision.
+Full qualification passes 392/392; final comment-only refinement has identical
+objects and metadata-only EXE changes, with the strengthened checkpoint test
+freshly passing at both widths. Both final EXEs are published.
+Source review is 137/472; file 138 iret.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

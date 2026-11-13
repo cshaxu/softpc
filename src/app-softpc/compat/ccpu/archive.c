@@ -2,7 +2,19 @@
 #include "archive.h"
 #include "abi.h"
 #include "../devices/archive.h"
+#include "mirror_types.h"
+#include "host_def.h"
+#include "cfpu_def.h"
 
+extern IU32 NpxLastSel, NpxLastOff, NpxFEA, NpxFDS, NpxFIP, NpxFOP, NpxFCS;
+extern BOOL POPST, DOUBLEPOP, UNORDERED, REVERSE;
+extern BOOL NPX_ADDRESS_SIZE_32, NPX_PROT_MODE, NpxException;
+extern IBOOL NpxIntrNeeded;
+extern IU32 getNpxControlReg(void), getNpxStatusReg(void);
+extern void setNpxControlReg(IU32), setNpxStatusReg(IU32);
+extern void getNpxStackRegs(FPSTACKENTRY *), setNpxStackRegs(FPSTACKENTRY *);
+extern IU32 softpc_ccpu_snapshot_delayed_npx_eip(void);
+extern void softpc_ccpu_snapshot_set_delayed_npx(IBOOL, IU32);
 
 static int softpc_ccpu_archive_allocate(softpc_ccpu_archive *archive,
     lib_u32 memory_bytes, lib_u32 page_type_bytes)
@@ -47,6 +59,8 @@ void softpc_ccpu_archive_dispose(softpc_ccpu_archive *archive)
 int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
 {
     softpc_ccpu_sas_state sas;
+    FPSTACKENTRY fpu_stack[8];
+    lib_u32 index;
 
     if (archive == NULL) return 0;
     archive->valid = 0;
@@ -87,7 +101,31 @@ int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
     softpc_ccpu_snapshot_capture_execution(&archive->execution);
     softpc_ccpu_snapshot_capture_debug(&archive->debug);
     softpc_ccpu_snapshot_capture_tlb(&archive->tlb, archive->tlb_page_index);
-    softpc_ccpu_snapshot_capture_fpu(&archive->fpu);
+
+    archive->fpu.control = getNpxControlReg();
+    archive->fpu.status = getNpxStatusReg();
+    archive->fpu.last_selector = NpxLastSel;
+    archive->fpu.last_offset = NpxLastOff;
+    archive->fpu.fea = NpxFEA;
+    archive->fpu.fds = NpxFDS;
+    archive->fpu.fip = NpxFIP;
+    archive->fpu.fop = NpxFOP;
+    archive->fpu.fcs = NpxFCS;
+    archive->fpu.pop_stack = POPST;
+    archive->fpu.double_pop = DOUBLEPOP;
+    archive->fpu.unordered = UNORDERED;
+    archive->fpu.reverse = REVERSE;
+    archive->fpu.address_size_32 = NPX_ADDRESS_SIZE_32;
+    archive->fpu.protected_mode = NPX_PROT_MODE;
+    archive->fpu.exception_pending = NpxException;
+    archive->fpu.delayed_interrupt = NpxIntrNeeded;
+    archive->fpu.delayed_exception_eip = softpc_ccpu_snapshot_delayed_npx_eip();
+    getNpxStackRegs(fpu_stack);
+    for (index = 0; index < 8; index++) {
+        lib_memory_copy(&archive->fpu.stack[index].value_bits, &fpu_stack[index].fpvalue,
+            sizeof(archive->fpu.stack[index].value_bits));
+        archive->fpu.stack[index].tag = fpu_stack[index].tagvalue;
+    }
     if (archive->devices == NULL)
         archive->devices = softpc_device_archive_create();
     if (archive->devices == NULL ||
@@ -98,6 +136,9 @@ int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
 
 int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive)
 {
+    FPSTACKENTRY fpu_stack[8];
+    lib_u32 index;
+
     if (archive == NULL || !archive->valid || archive->memory == NULL ||
         archive->page_types == NULL || archive->tlb_page_index == NULL ||
         !softpc_ccpu_snapshot_restore_sas(&archive->sas, archive->memory,
@@ -132,7 +173,32 @@ int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive)
         !softpc_ccpu_snapshot_restore_tlb(&archive->tlb,
             archive->tlb_page_index))
         return 0;
-    softpc_ccpu_snapshot_restore_fpu(&archive->fpu);
+    /* Preserve native padding outside the serialized value/tag fields. */
+    getNpxStackRegs(fpu_stack);
+    for (index = 0; index < 8; index++) {
+        lib_memory_copy(&fpu_stack[index].fpvalue, &archive->fpu.stack[index].value_bits,
+            sizeof(archive->fpu.stack[index].value_bits));
+        fpu_stack[index].tagvalue = archive->fpu.stack[index].tag;
+    }
+    setNpxStackRegs(fpu_stack);
+    setNpxControlReg(archive->fpu.control);
+    setNpxStatusReg(archive->fpu.status);
+    NpxLastSel = archive->fpu.last_selector;
+    NpxLastOff = archive->fpu.last_offset;
+    NpxFEA = archive->fpu.fea;
+    NpxFDS = archive->fpu.fds;
+    NpxFIP = archive->fpu.fip;
+    NpxFOP = archive->fpu.fop;
+    NpxFCS = archive->fpu.fcs;
+    POPST = archive->fpu.pop_stack != 0;
+    DOUBLEPOP = archive->fpu.double_pop != 0;
+    UNORDERED = archive->fpu.unordered != 0;
+    REVERSE = archive->fpu.reverse != 0;
+    NPX_ADDRESS_SIZE_32 = archive->fpu.address_size_32 != 0;
+    NPX_PROT_MODE = archive->fpu.protected_mode != 0;
+    NpxException = archive->fpu.exception_pending != 0;
+    softpc_ccpu_snapshot_set_delayed_npx(archive->fpu.delayed_interrupt != 0,
+        archive->fpu.delayed_exception_eip);
     return softpc_device_archive_restore(archive->devices);
 }
 

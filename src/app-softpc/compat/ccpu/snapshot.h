@@ -109,8 +109,6 @@ void softpc_ccpu_snapshot_capture_tlb(softpc_ccpu_tlb_state *state,
     uint8_t *page_index);
 int softpc_ccpu_snapshot_restore_tlb(const softpc_ccpu_tlb_state *state,
     const uint8_t *page_index);
-void softpc_ccpu_snapshot_capture_fpu(softpc_ccpu_fpu_state *state);
-void softpc_ccpu_snapshot_restore_fpu(const softpc_ccpu_fpu_state *state);
 void softpc_ccpu_snapshot_capture_sas(softpc_ccpu_sas_state *state,
     uint8_t *memory, uint32_t memory_bytes, uint8_t *page_types,
     uint32_t page_type_bytes);

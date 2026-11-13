@@ -1225,3 +1225,97 @@ P14 published artifact SHA-256:
 
 - softpc32.exe: `2a4bbd58c733e0cbbe4352b0aae15360b835f1826db0835575ef5220bc03f979`.
 - softpc64.exe: `3203d4d1383ada135f180c8832246c7cfa7173315fa2163df0926d3650917d7b`.
+
+
+## P15: file 121 FPU original-accessor restoration
+
+The complete file comparison identifies these in-scope points; existing
+excluded bodies and their line-control are not re-audited or counted.
+
+| Point | Difference | Executor and counter-review disposition |
+| --- | --- | --- |
+| R0144 | added stdio.h | Restore original absence; actual isolated objects are identical with the original cast restored too. |
+| R0145 | added snapshot.h | Remove after deleting the added mirror snapshot entry points. |
+| R0146 | CVTFPHI64 representation copy | Residual necessity demonstrated independently on x86/x64: restoring pointer punning fails the existing exact large-integer instruction assertion. Pending owner decision, not automatic retention. |
+| R0147 | FIST M64I rounding | Residual necessity independently demonstrated on x86/x64: original unrounded conversion fails 3.5 nearest-even storage. Pending owner decision. |
+| R0148 | getNpxStackReg pointer-difference cast | Restore original expression; no ABI/behavior need shown, and isolated objects are identical. |
+| R0149 | added delayed-NPX declarations | Remove from mirror with snapshot functions; actual archive consumer keeps exact typed declarations of the existing bridge. |
+| R0150 | added capture_fpu | Delete: archive uses original register/stack accessors and original exported state directly. |
+| R0151 | added restore_fpu | Delete: same original accessor path, without a replacement helper or snapshot-specific mirror API. |
+
+Independent restoration probes use actual CCPU compiler flags and the actual
+command-provider test link, with a single replacement fpu object preceding
+the production archive. Current and declaration/cast-restored controls pass
+on both architectures. Declaration/cast variants have identical objects:
+
+- x86: 149ef6ce516600027dd3e622c09e5e3cf6157c9e11d78bc9898f3637a2345790.
+- x64: e14265b866e23cb0b18627ae0946a99ad1ea04a0e6ca9c5c5791554a2f6ce520.
+
+Restoring only original CVTFPHI64 representation reads compiles/links, then
+fails command_provider_smoke.c:508, stored == 0x0000123400001234ull, at both
+widths. Restoring only M64I original conversion compiles/links, then fails
+line 693 with mode=0, input=3.5, width=8, first stored byte 00 instead of 04.
+Both x86 negative processes exit 3221226505; both x64 negatives exit 3. Current
+controls pass the existing 228 conversion cases and surrounding instruction
+checks. No inference of complete x87 correctness follows from this finite set.
+
+Counter-review rejects retaining snapshot wrappers just because they currently
+have callers. Original getNpxStackRegs/setNpxStackRegs copy the complete native
+FPSTACKENTRY array; get/setNpxControlReg and get/setNpxStatusReg already own
+control, rounding and TOS updates. Other serialized flags/addresses are
+original exported variables. FSAVE/FRSTOR are not substituted: they are guest
+instructions with reset/conversion/exception effects. Existing archive capture
+and restore call the direct state-copy accessors instead.
+
+The archive includes the original native stack type, not a guessed layout or
+new type alias. It maps serialized value bits/tags through one temporary native
+stack array; restore first reads existing stack storage to preserve padding
+outside those fields, matching the removed implementation. No snapshot schema,
+serialized byte order, guest format or existing padding policy changes. It
+introduces no new allocation, state owner, helper or execution route. Original
+control/status setter order and delayed-NPX bridge remain unchanged.
+
+The isolated accessor-only candidate compiles/links and passes both the real
+command-provider and checkpoint tests at both widths. Final tests extend the
+existing snapshot checkpoint with eight distinct FPU stack values, clear them,
+restore the image, and verify all values/tags through original accessors.
+This is actual archive/CCPU coverage, not a duplicate serializer test.
+
+Files 122-137 are also compared in frozen order: in.c, into.c and intx.c have
+no in-scope differences; the remaining files are normalized-identical. No
+changes are made to them. File 138 iret.c is next and not yet fully audited.
+Final cached x86/x64 builds/publication and all six full-qualification
+commands pass: 188 background plus eight native tests per architecture,
+392/392. Post-qualification counter-review removes two unnecessary T60
+comments and restores the original conversion comment at its relevant call;
+only formatting/comments change. The snapshot test then strengthens tag
+coverage using alternating signed values with nonzero negative tags.
+Both final builds and both revised checkpoint tests pass.
+
+Final fpu objects are byte-identical to the fully qualified ones. Each entire
+EXE has exactly eight differing bytes, exclusively within PE COFF timestamp,
+OptionalHeader checksum and one compiler time literal; all other bytes and
+file lengths are identical. This applies the artifact-equivalence rule to
+that final nonsemantic refinement rather than claiming a second fresh full
+runtime run. The changed test itself is freshly rerun on both architectures.
+No manual DOS/Win3.1/Win95 session or exhaustive x87 conformance is claimed.
+
+Production +71/-82 (net -11): archive +68/-2, removed declarations 0/-2,
+mirror +3/-78. Test source +17/-0. Fixed-XP in-scope diff falls from +84/-6
+(90 changed lines) to +8/-5 (13), a reduction of 77 mirror difference lines.
+No new mirror point is added. The only residuals are the independently proven
+representation and rounding repairs; their necessity evidence is ready for
+owner decision, not silently recorded as approval.
+
+Coordinator actual-diff review checks original accessor types, single archive
+ownership, original setter order, unchanged serialization and padding policy,
+no removed-entry references anywhere in src/test, preserved mirror CRLF and
+unchanged shared packages/media/configuration. Original mirror warnings remain
+within the approved exception; no changed Compat/test warning is observed.
+Manifest/documentation gates and diff checks pass. Source review is 137/472.
+
+Final artifact/object evidence:
+
+- x86: final FPU object `073fb41b8b71331ed7692c69f312eb1723c9f1c997bcc46d436f64928cf7ad76`; EXE `9597f6ec038e388439dd168ff84e38346bcad4593b5714e2fcd14ec65da82959`; compiler time 01:33:27 to 01:41:19, at offset 2435392.
+
+- x64: final FPU object `458b0ae88430995c70061aa88d2207b1238160fea6bd606b9dc1bd8d25e4c2ac`; EXE `9c74596b0f8d63b6c14ea2e6e8227372bdd641089e4b9f6ea99563a11eb0788c`; compiler time 01:33:42 to 01:41:38, at offset 2289664.
