@@ -2062,3 +2062,13 @@ so the original selected member declarations and absence of the added comment
 are restored. Existing excluded scaffolding remains. gfx_upd.h also regains
 its omitted original STREAM_IO comment. Eight preprocessing pairs and both
 EXEs prove the recorded equivalence; XP diff decreases nineteen lines.
+
+### T100 S1 P86 host.h declaration restoration
+
+The historical host.h 4/1/1 entry and DIV-090 rationale are superseded by
+R0435 in m9-t100-progress.md. The supported IPT3 macro erases the parameter
+list; twenty actual consumer/architecture preprocessed pairs are identical.
+The exact XP memset4 declaration is restored and its two-line local comment
+removed, reducing XP-relative diff by five lines. The concrete host_def.h
+prototype/provider and existing excluded-branch scaffolding are unchanged.
+Historical counts above are provenance, not current selected-difference totals.

@@ -6444,3 +6444,53 @@ S1 and the pending difference decisions remain open.
 P85 actual three-file documentation review and mirror/documentation gates pass.
 The worker and owned children exited; task-scratch preview, exact removal and
 residue check pass. No configuration, guest asset or published binary changed.
+
+## File 360: host.h (P86)
+
+Pinned XP raw SHA-256 3b5397efd06f83fbe2c31766d250ae807409e174e673812d08b5ad8ae916a716.
+Full normalized comparison finds one selected difference: original line 50
+versus local lines 52-55, the memset4 declaration and DIV-090 explanation.
+All other differences are existing exclusions/line scaffolding, skipped
+without new accounting. The original include wiring remains required.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0435 | DIV-090 changes IU32/ULONG parameters to unsigned int to agree with host_def.h and Compat's provider. | Restore the exact original declaration and remove the two-line rationale. The supported insignia.h branch expands IPT3 to (), so neither version contributes parameter types. The actual host_def.h prototype and provider remain unchanged. Twenty full preprocessed pairs are identical; the claimed active declaration mismatch does not exist. |
+
+The only production calls are ega_vide.c's two memset4 calls. The original
+host_def.h declaration remains a concrete unsigned-int prototype. This audit
+does not widen its types, alter the implementation, enable ANSI, remove any
+include or introduce a replacement wrapper. No duplicate device implementation
+is moved into Compat. Other files' differences are not declared audited here.
+
+All ten direct C consumers were obtained by scanning the current source tree:
+rom_basc.c, nt_graph.c, cga.c, ega_vide.c, egawrtm0.c, vga_vide.c, video.c,
+ica.c, timer.c and time_day.c. For each architecture, both header versions
+were preprocessed with that consumer's actual Ninja compiler flags, with only
+output/dependency flags replaced by -E -P. Forty compiler runs succeed; all
+twenty complete-output pairs match byte for byte. This is stronger than merely
+matching the memset4 line, but is not a dynamic memset4 behavior test.
+
+Final-source cached builds and publication succeed: x86 7.89 seconds, x64
+9.66 seconds. Both logs contain 89 warning lines, all from preserved mirror
+files; no non-mirror warning or build failure was found. Whole EXE byte
+comparison permits only the exact PE COFF timestamp, optional-header checksum
+and uniquely located compiler-time literal; file lengths and all other bytes
+match. Both EXEs change seven bytes, within those fields only. Under the
+owner-approved artifact-equivalence exception no full suite is rerun; P80's
+392/392 remains the runtime baseline, not a new P86 test count.
+
+- x32: Nov 13 2026 15:15:10; SHA-256 5d1d22b0e6b6db214097f51a2fe8e27e768a598db5f77c95ad03a4f8a59e8df9; previous 436d680ba23d25005c61b47de7a0b211003cd140aba04303c0eb8d00510aef08.
+- x64: Nov 13 2026 15:15:17; SHA-256 33d3a3cbcafe4e868f47f2c7814c68af17c9646f0fa48a4ad442acc200221d39; previous b131b9116b5d662479ee457035b89db3e0b02d541c1bc2b81afa78ab67d64156.
+
+Actual production diff +1/-4, net -3; test/build source changes zero.
+XP-relative selected diff decreases five lines (+4/-1 becomes +0/-0).
+R0435 is restored, not a new pending retention decision. Existing exclusion
+scaffolding and original declarations are unchanged. Mirror manifest local
+hash is refreshed; original/subset provenance hashes remain fixed.
+Frozen frontier 360/472; next file 361 base/inc/host_cfg.h. S1 and prior
+qualified owner decisions remain open.
+
+P86 actual eight-file review and mirror/documentation gates pass. Both owned
+workers exited; scratch preview, exact removal and residue check pass. No
+unrelated configuration/media changes remain.
