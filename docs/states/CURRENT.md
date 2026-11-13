@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P88 completes files 363-366: host_gwi.h equals XP; host_lpt.h,
-host_sas.h and hunter.h have no selected differences outside existing exclusion
-scaffolding. Original include wiring remains. No production, test or EXE change;
-P87 remains the published artifact baseline and P80's 392/392 the runtime baseline.
-Frozen frontier 366/472; next file 367 base/inc/ica.h remains under investigation.
+T100 S1 P89 qualifies ica.h's added CPU_40_STYLE guard and removed Ctrl-Z
+EOF byte as pending owner decisions. Corrected isolated original restorations
+fail actual CCPU compilation on both architectures; current controls pass.
+No production/test/EXE changes. P87 remains the artifact baseline and P80's
+392/392 the full-runtime baseline. Frozen frontier 367/472; next file
+368 base/inc/idetect.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

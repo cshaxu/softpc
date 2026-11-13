@@ -6577,3 +6577,46 @@ not a completed file audit or an approved retention decision. S1 remains open.
 
 P88 actual three-file documentation review, mirror/documentation gates and
 build residue check pass. No task processes or scratch were created.
+
+## File 367: ica.h (P89)
+
+Pinned XP raw SHA-256 c7d4feeec4957ee0a9cbc60aebfb77936686df9c4109fbcf808e182ff89b8e6f.
+The complete comparison identifies two non-exclusion differences. Existing
+excluded bodies/scaffolding are skipped without new accounting. Selected
+original declarations, data structures and interrupt constants otherwise match.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0438 | Local lines 91-106 add a CPU_40_STYLE guard and two line-control directives around original lines 87-98. | Qualified residual pending owner decision. Removing just the added guard/scaffolding makes actual c_main.c fail to compile on both architectures: CPU_HW_INT becomes macro zero and duplicates CPU_HW_RESET's switch case. Current controls compile successfully. |
+| R0439 | Original final Ctrl-Z line is absent. | Qualified format/compiler residual pending owner decision. Restoring byte 0x1a with its newline after the retained header makes actual c_main.c fail on both architectures with stray '\32' in program. Current controls compile successfully. This byte is outside the excluded GISP body, so it is not silently skipped with that body. |
+
+The active root targets select CPU_40_STYLE/CCPU. cpuint_c.h defines the
+CPU_INT_TYPE enum with CPU_HW_RESET=0 and CPU_HW_INT=2. c_main.c includes
+the CPU interface before ica.h, then c_cpu_interrupt switches on those enum
+names. The original PIC header's CPU_HW_INT macro means bitmap bit zero,
+not the CPU enum. Restoring it substitutes zero into the later hardware case
+and collides with reset. Renaming the CPU enum or rewriting consumers would
+create additional differences; no such alternate repair is made. The original
+CPU_40_STYLE callback block later in ica.h is separate and remains unchanged.
+
+Probe correction: the first task-local candidate used an unrestricted text
+replacement and accidentally removed that later block's endif too. Its results
+are rejected. The corrected candidate removes only the first added guard and
+its two line-control lines; its exact four-line deletion was reviewed before
+rerunning. Both corrected unguarded builds fail only with duplicate case value,
+not unterminated conditional structure. The Ctrl-Z candidate is separate and
+retains all guards. Six final compiler runs use the real Ninja c_main.c commands:
+current x86/x64 exit 0, corrected unguarded x86/x64 exit 1, Ctrl-Z x86/x64 exit 1.
+All jobs exit naturally. These are compile-contract proofs, not guest runtime
+reproductions or a new full regression run.
+
+The existing residuals are +4/-0 guard/line control and +0/-1 EOF line. No
+source reduction or XP diff reduction is claimed. Production/test/build changes
+zero; published EXEs remain P87, full runtime baseline remains P80's 392/392.
+No initializer, compatibility alias, fallback or new permanent probe API is
+introduced. Frozen frontier 367/472; next file 368 base/inc/idetect.h. S1 and
+these evidence-qualified owner decisions remain open.
+
+P89 actual three-file documentation review and mirror/documentation gates pass.
+Both probe workers and their children exited; scratch preview, exact removal
+and residue check pass. No unrelated source, configuration or asset changed.
