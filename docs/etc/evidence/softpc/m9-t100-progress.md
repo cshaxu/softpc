@@ -5432,3 +5432,59 @@ This is not S1 closure or approval of the retained difference.
 P67 compiler processes have exited. Owned scratch was previewed and removed
 with Clean-Build; residue and documentation checks pass. Worktree review
 confirms documentation/inventory changes only, with production and assets intact.
+
+
+## File 319: diskbios.c (P68 read-only qualification)
+
+Pinned XP raw SHA-256:
+779cb7418924632a9ec3ef7a5b5dd1a6d5c7bf88ba9afc8cf69b66e10876d98d.
+Full-file comparison outside the skipped exclusions/line controls identifies
+only the relocated historical notice and the two read_dasd register assignments.
+No excluded bodies receive new accounting. No production restoration is justified.
+
+| Point | XP/current location | Disposition and evidence |
+| --- | --- | --- |
+| R0413 | Historical notice, current line 22 | Preserve existing notice under source policy, as in preceding audited files. |
+| R0414 | XP 1663-1664/current 905-906 | Existing capacity-return correction is evidence-qualified, pending owner decision. XP divides/remainders by 256 and casts both results to UCHAR; current code splits the sector count into two 16-bit registers with 65536. |
+
+Real production path: root CMake includes diskbios.c. disk_io reads AH and
+its command table selects read_dasd for 0x15. getdpb reads the guest disk
+parameter table; read_dasd computes the original reserved-cylinder capacity
+and returns AH=3, CF=0 and CX:DX. No Compat capacity implementation replaces
+this path. The audited difference changes only the two register assignments,
+not geometry, connection policy, the reserved cylinder or media access.
+
+Focused proof reuses the actual device_contract_smoke disk case and cached
+production objects. A disposable copy restores both assignments together to
+exact XP; current and restored copies compile/link with each architecture's
+actual production flags. Test fixture and all other linked objects are the same.
+The initial invocation omitted the required disk argument: all four executions
+failed the argc assertion before exercising BIOS. Those failures are invalid
+capacity evidence and were corrected, not counted as product failures.
+
+With the correct argument, current x86 and x64 return 0. Both verify all three
+capacity pairs (0000:0484, 0001:0000, 000f:bc10), AH/CF and absent-drive dispatcher
+semantics through BIOS[BIOS_DISK_IO], without real media or guest modification.
+Both exact-XP controls fail the first CX assertion at fixture line 1542
+(x86 exit 3221226505, x64 exit 3). For that 1156-sector case XP's source expression
+produces CX=4 and DX=132, rather than CX=0 and DX=1156. These numerical original
+values are source calculation; the dynamic negative stops at the CX assertion
+and does not prove execution of the other two negative capacity cases.
+
+Counter-review: restoring only the UCHAR casts or only the divisor would not
+restore the original, and would not provide a correct 16-bit register pair.
+The coherent two-line control demonstrates a real supported BIOS contract
+failure. Preserve the existing two-line correction for owner disposition;
+no new wrapper, special case, test API or production patch is introduced.
+This focused BIOS test is not a DOS/Win3.1/Win95 boot or complete disk regression.
+
+Production/test/build/manifest/EXE delta is zero; XP-relative diff delta is zero.
+The reviewed active semantic replacement remains +2/-2, plus the one-line
+historical notice. No whole-file excluded-content metric is added. Published
+EXEs and the last full 392/392 qualification remain P66; no new full-suite run
+is claimed. Ordered frontier advances to 319/472; next file 320 fdisk.c.
+S1 remains active and qualified residual decisions remain pending.
+
+P68 authoritative process inspection confirms the owned jobs exited. Clean-Build
+preview, exact scratch removal and residue check pass. Documentation gate and
+actual diff review pass; only the three audit/state documents change.

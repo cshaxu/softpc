@@ -30,13 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P67 audits files 317 univer_c.h and 318 vglfunc.c without production
-changes. The header equals fixed XP text. The vector's sole five-line IFN1
-adaptation is qualified by original-source compile failures on x86/x64 and
-successful current-source compilation; owner decision remains pending.
-Published EXEs remain P66, with 392/392 full regression. No new full-suite run
-is claimed for this read-only audit. Frozen frontier 318/472; next file 319
-diskbios.c. See the
+T100 S1 P68 audits file 319 diskbios.c without production changes. The existing
+capacity-return correction passes the real BIOS fixture on x86/x64; restoring
+the exact XP assignments fails CX validation on both. It remains an evidence-
+qualified owner decision, not automatic approval. Published EXEs remain P66
+with 392/392 full regression; P68 adds focused evidence only. Frozen frontier
+319/472; next file 320 fdisk.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
