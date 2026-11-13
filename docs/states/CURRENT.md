@@ -23,24 +23,25 @@ skipped without new bookkeeping. T99 remains closed; see its
 | Expected Markers | Ordered file/point progress, exact restoration, evidence-qualified owner decisions; no excluded-body ledger. |
 | Asset Needs | Preserve configuration/media/snapshots. S1 owns build/t100-s1 if needed; background jobs bounded to 2 hours and 15 minutes no progress, scratch removed after delivery. |
 | Reporting Requirements | Explain evidence threshold, exact restoration, pending decisions, file order, diff metrics and proposed delivery cadence. |
-| Stop Conditions | Unproven necessity remains investigation; evidence-backed retained differences require owner decision; any increase in XP-relative diff points or lines is prohibited, including unused-file/wiring removal; discard such candidates and continue without requesting an exception. |
+| Stop Conditions | Unproven necessity remains investigation; evidence-backed retained differences require owner decision; new unjustified XP-relative differences or added/deleted diff-line increases are prohibited, including unused-file/wiring removal; exact restoration may split contiguous ranges without adding a difference. Discard genuinely increasing candidates without requesting an exception. |
 | Exit Criteria | Reconcile ordered audit dispositions and delivered changes with actual diff review; no unresolved point may be reported closed. |
 | Original Owner Request | Preserved verbatim in the linked proposal. |
 | Similar-Issue Sweep | All non-excluded mirror differences, including previously approved ones, are subject to the same evidence threshold. |
 
 ## Current Technical Baseline
 
-T100 S1 P54 restores 23 native-address expressions and all 32 malloc calls
-in file 306 sevid023.c. Production +55/-55 (net zero); permanent test code
-unchanged. XP diff decreases 1019 -> 973 lines and 393 -> 370 ranges.
-Native GDP/capacity remain qualified owner decisions; no calloc remains in
-this unit. Actual-body current/candidate/poison controls pass both widths
-over 112 Chain4 cases with identical output. Original capacity corrupts the
-x64 heap; x86 passes. Both EXEs are freshly built/published; 392/392 pass
-first full run, no compiler warnings. Actual diff review, source identity
-and gates pass. Sequential review is 306/472; next file 307
-base/cvidc/sevid024.c. Original bulk-fill overlap is pending decision D003,
-not a new patch or TODO. See the
+T100 S1 P55 restores ten native-address expressions and 25 malloc calls in
+file 307 sevid024.c. Production +35/-35 (net zero); permanent test code
+unchanged. XP diff decreases 995 -> 975 lines. Continuous ranges increase
+400 -> 406 solely because exact restoration splits existing ranges; owner
+confirms this is not an increase in actual difference points. Native GDP,
+capacities and seven mixed-width initializations remain qualified decisions.
+Actual-body current/full-restoration/poison controls pass both widths over
+132 cases with identical output; removing initialization or native capacity
+fails on x64, while x86 passes. Both EXEs are freshly built/published;
+392/392 pass first full run. Original switch warning unchanged. Actual diff
+review and source identity pass. Sequential review is 307/472; next file 308
+base/cvidc/sevid025.c after correcting the two P39/P40 range-count retentions. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

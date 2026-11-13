@@ -4609,3 +4609,99 @@ base/cvidc/sevid024.c. S1 remains active; residual decisions are not closed.
 P54 process inventory confirms no owned worker remains. Exact task scratch
 was previewed and removed through Clean-Build; residue verification passes.
 Reusable caches, user configuration, media and snapshots are unchanged.
+
+## File 307: sevid024.c (P55)
+
+Pinned XP comparison contains 400 contiguous ranges, +498/-497 lines (995
+total). Restore ten native address dereferences and malloc in 25 of 32 local
+arrays. Production +35/-35, net zero; permanent test code unchanged. Final
+XP diff is 406 ranges, +488/-487 lines (975 total): twenty fewer added/deleted
+lines, with six additional contiguous ranges caused solely by restoring
+intervening original lines. No new differing location is introduced.
+All original ranges appear in the [point map](m9-t100-sevid024-points.tsv);
+all arrays appear in the [allocation inventory](m9-t100-sevid024-allocations.tsv).
+
+The executor initially conflated contiguous range count with independent
+mirror differences and tried restoring only two address expressions. That
+candidate gave 398 ranges/991 lines but unnecessarily retained eight redundant
+address adapters. The owner explicitly confirms restoring original code takes
+priority over range fragmentation. All ten address lines now match pinned XP
+exactly. The no-new-unjustified-difference requirement remains intact.
+
+| Point | Executor analysis | Actual-diff counter-review and disposition |
+| --- | --- | --- |
+| R0384 | GDP native field mapping and declaration include. | Retain pending decision. The existing GDP owner is native slot storage, not a contiguous original 32-bit object. No second device implementation is added. |
+| R0385 | Ten resolved native addresses routed through GDP address mapping. | Restore all ten exact XP lines. Two byte reads use native source locals 6/9; eight IU32 reads use sr_lookup (native field 1328) plus a bounded nibble-derived offset. These are host addresses, not GDP offset identities. Restoring eight of these splits existing ranges, not semantic differences. |
+| R0386 | All 32 arrays use calloc and native capacities. | Restore malloc in 25 arrays with no partial-store/native-load overlap. Keep initialization in seven arrays: S2867/S2871/S2877-S2880 slot 0 and S2870 slot 7. These narrow assignments feed native address expressions. Poisoning all seven causes x64 access violation; original four-byte capacities with retained calloc zeroing independently cause x64 heap corruption. Both controls pass x86. Native capacities and the seven initializations remain owner decisions. |
+
+The actual C-VID target and chain4_evid table retain this file: the final
+mode-0 DWORD fill, twelve mode-0 DWORD moves, mode-1 byte/word/dword operations
+and CopyByte helper, four mode-2 byte writes/fills and the first byte move.
+There is no duplicate Compat device implementation to replace or basis for
+whole-file deletion. Device algorithms, continuation calls, modes, guest
+media/configuration and frame ownership are unchanged.
+
+Task-local actual-body controls extend the initialized VGA fixture and
+replace only this compilation unit. Each run executes 132 cases at four
+address residues: twelve mode-0 DWORD moves plus final DWORD fill, nine
+mode-1 operations, four mode-2 byte writes/fills plus the first move, and
+direct S2870 calls with both source flags. Inputs are nonuniform, full planes
+are compared across repeated runs. Current, full restoration and poisoned
+malloc restoration pass on x86/x64; all six outputs hash to 9cdffc1d and the
+existing VGA assertions pass. This is restoration/replay equivalence, not an
+independent hardware oracle for every mode or proof of guest bulk consumers.
+
+The earlier two-address candidate and its poisoned-malloc variant also pass
+both widths with the same hash. Negative controls on that candidate remove
+all seven retained initializations (x64 0xc0000005) or restore original slot
+capacities while preserving remaining calloc zeroing (x64 0xc0000374); x86
+passes both. These controls establish collective necessity, not independent
+dynamic proof for each of the seven arrays. No timeout counts as evidence.
+
+Actual-change review confirms 35 replacements only: ten exact original lines
+and 25 malloc restorations with native capacity unchanged. Final source equals
+the tested full candidate, preserves CRLF; normalized-LF SHA-256:
+c7ce2e2a4ed8a5f308c8b3bb08649b99d2c3beaf834493878070d0f1df5d529e.
+Full dual-architecture qualification is running. Delivered scope remains
+306/472 until qualification, review and delivery complete.
+
+### Follow-up required by the range-count clarification
+
+A scan of prior range-increase dispositions identifies two existing wrappers
+retained solely because of the earlier counting interpretation: file 292
+sevid009.c line 2780 (R0308), and file 293 sevid010.c line 3228 (R0312).
+Current source confirms both remain. Revisit them in the next complete P
+under this S before advancing to file 308; do not put them in TODO or claim
+the earlier interpretation proves necessity. Historical P39/P40 evidence
+remains unchanged as history. This is an explicit correction revisit, not a
+change to the frozen order of previously unaudited files. No production
+change to those files is made during P55 qualification.
+
+### P55 final qualification and actual-change review
+
+Both cached builds/publications succeed. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first full run**, without retries
+or changed budgets. Only the original switch-unreachable warning at line 651
+remains, present in current and restored controls on both architectures.
+
+- x86-build: 9.08 seconds, exit 0.
+- x86-background: 135.1 seconds, exit 0.
+- x86-native: 25.04 seconds, exit 0.
+- x64-build: 12.09 seconds, exit 0.
+- x64-background: 131.09 seconds, exit 0.
+- x64-native: 25.15 seconds, exit 0.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 11:19:03;
+SHA-256 cccc805e88b0c07d4f81c384a15bc07ea366be4cd6b1f585d311b392e36a4c11.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 11:21:52;
+SHA-256 fccf9195df11c3a6beceb7ddf9091914ffd5d46ce80d0c95a3db6be230e9aaac.
+
+Final source identity, CRLF and actual-change review pass. No permanent
+test code or public-component changes. No new interactive guest acceptance
+is claimed. Sequential audited scope is 307/472; next file 308
+base/cvidc/sevid025.c after the recorded P39/P40 correction revisit. S1 remains active; residual decisions are not closed.
+
+P55 process inventory confirms no owned worker remains. Task scratch was
+previewed and removed via Clean-Build; residue verification passes. Persistent
+caches, user configuration, media and snapshots remain untouched.

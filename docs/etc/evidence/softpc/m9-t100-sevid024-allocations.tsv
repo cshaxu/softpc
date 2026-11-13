@@ -1,0 +1,33 @@
+function	partial_and_native_slots	disposition
+S_2854_Chain4DwordFill_00000000_0000001f_id	-	restore malloc; retain native capacity
+S_2855_Chain4DwordMove_00000000_00000008_00000000_id	-	restore malloc; retain native capacity
+S_2856_Chain4DwordMove_00000000_00000009_00000000_id	-	restore malloc; retain native capacity
+S_2857_Chain4DwordMove_00000000_0000000e_00000000_id	-	restore malloc; retain native capacity
+S_2858_Chain4DwordMove_00000000_0000000f_00000000_id	-	restore malloc; retain native capacity
+S_2859_Chain4DwordMove_00000000_00000010_00000000_id	-	restore malloc; retain native capacity
+S_2860_Chain4DwordMove_00000000_00000011_00000000_id	-	restore malloc; retain native capacity
+S_2861_Chain4DwordMove_00000000_00000016_00000000_id	-	restore malloc; retain native capacity
+S_2862_Chain4DwordMove_00000000_00000017_00000000_id	-	restore malloc; retain native capacity
+S_2863_Chain4DwordMove_00000000_00000018_00000000_id	-	restore malloc; retain native capacity
+S_2864_Chain4DwordMove_00000000_00000019_00000000_id	-	restore malloc; retain native capacity
+S_2865_Chain4DwordMove_00000000_0000001e_00000000_id	-	restore malloc; retain native capacity
+S_2866_Chain4DwordMove_00000000_0000001f_00000000_id	-	restore malloc; retain native capacity
+S_2867_Chain4ByteWrite_00000001_00000000_id	0	retain calloc pending decision
+S_2868_Chain4ByteFill_00000001_00000000_id	-	restore malloc; retain native capacity
+S_2869_Chain4ByteMove_00000001_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2870_CopyBytePlnByPlnChain4_00000001_00000000_00000000_00000000_id	7	retain calloc pending decision
+S_2871_Chain4WordWrite_00000001_00000000_id	0	retain calloc pending decision
+S_2872_Chain4WordFill_00000001_00000000_id	-	restore malloc; retain native capacity
+S_2873_Chain4WordMove_00000001_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2874_Chain4DwordWrite_00000001_00000000_id	-	restore malloc; retain native capacity
+S_2875_Chain4DwordFill_00000001_00000000_id	-	restore malloc; retain native capacity
+S_2876_Chain4DwordMove_00000001_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2877_Chain4ByteWrite_00000002_00000008_id	0	retain calloc pending decision
+S_2878_Chain4ByteWrite_00000002_00000009_id	0	retain calloc pending decision
+S_2879_Chain4ByteWrite_00000002_0000000e_id	0	retain calloc pending decision
+S_2880_Chain4ByteWrite_00000002_0000000f_id	0	retain calloc pending decision
+S_2881_Chain4ByteFill_00000002_00000008_id	-	restore malloc; retain native capacity
+S_2882_Chain4ByteFill_00000002_00000009_id	-	restore malloc; retain native capacity
+S_2883_Chain4ByteFill_00000002_0000000e_id	-	restore malloc; retain native capacity
+S_2884_Chain4ByteFill_00000002_0000000f_id	-	restore malloc; retain native capacity
+S_2885_Chain4ByteMove_00000002_00000008_00000000_id	-	restore malloc; retain native capacity

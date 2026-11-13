@@ -1965,3 +1965,16 @@ heap. Original Chain4 bulk-fill overlap is pending D003, not a new patch.
 See [P54 audit](m9-t100-progress.md#file-306-sevid023c-p54),
 [range map](m9-t100-sevid023-points.tsv) and
 [allocation inventory](m9-t100-sevid023-allocations.tsv).
+
+### T100 S1 P55 sevid024 restoration
+
+File 307 restores ten native dereferences and 25 malloc calls. Native GDP,
+capacities and seven mixed-width initializations remain qualified decisions.
+Production +35/-35; XP diff decreases 995 -> 975 lines. Continuous ranges
+400 -> 406 reflect restored lines separating old differences, not new patches;
+owner confirms this does not block exact restoration. Both architectures pass
+full regression first run. Original switch warning remains unchanged. Actual
+body controls cover 132 cases per width/version; no new guest acceptance.
+See [P55 audit](m9-t100-progress.md#file-307-sevid024c-p55),
+[range map](m9-t100-sevid024-points.tsv) and
+[allocation inventory](m9-t100-sevid024-allocations.tsv).

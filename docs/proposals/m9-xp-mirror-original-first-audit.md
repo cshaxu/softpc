@@ -36,6 +36,16 @@ The owner rejected bswap.h retirement on this basis; its original file and
 include remain. Evidence-backed existing residuals still follow the owner's
 original keep-or-restore decision process; this does not authorize new diffs.
 
+## Owner clarification: diff ranges versus differences
+
+Owner confirms: 尽力恢复；diff 区块数不能准确反映实际情况。
+A contiguous diff range is not an independent semantic difference point.
+Restoring an original line can split one existing range into two without
+introducing any new difference. Report ranges transparently, but do not retain
+unnecessary adaptations merely to prevent this fragmentation. Prefer exact
+original restoration; verify changed locations and added/deleted diff lines.
+The prohibition on new unjustified mirror differences remains in force.
+
 ## Original-defect decision ownership
 
 Owner correction: original-code defects discovered during this mirror audit
