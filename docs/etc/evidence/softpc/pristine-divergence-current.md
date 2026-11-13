@@ -2054,3 +2054,11 @@ and removes their added MVDM-HOST-DIV-061 explanation. No current implementation
 or caller exists, and both reset-object pairs plus final EXEs prove the stated
 equivalence. This supersedes only the emm.h rationale, not other files' ABI
 points. See T100 evidence for the nine-line XP-difference reduction.
+
+
+T100 S1 P84 supersedes gmi.h's selected MEM_HANDLERS prototype adaptation
+rationale: actual supported IPT macros make its declarations equivalent to XP,
+so the original selected member declarations and absence of the added comment
+are restored. Existing excluded scaffolding remains. gfx_upd.h also regains
+its omitted original STREAM_IO comment. Eight preprocessing pairs and both
+EXEs prove the recorded equivalence; XP diff decreases nineteen lines.

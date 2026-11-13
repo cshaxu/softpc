@@ -312,6 +312,7 @@ extern	void	flag_mode_change_required IPT0();
 extern  void    reset_graphics_routines IPT0();
 extern	void	reset_paint_routines IPT0();
 
+// STREAM_IO codes are disabled on NEC_98 machines, enabled on others.
 #ifndef NEC_98
 #line 326
 #ifdef NTVDM

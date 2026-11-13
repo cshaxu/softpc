@@ -30,11 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P83 audits fla.h through gfi.h: retained content matches XP outside
-existing excluded scaffolding. No production or artifact changes; P82's
-published equivalent EXEs and P80's 392/392 runtime baseline remain.
-The original reset.c/gendrvr.h include is preserved without claiming an active
-driver implementation. Frozen frontier 354/472; next file 355 base/inc/gfitest.h.
+T100 S1 P84 restores gfx_upd.h's original comment and gmi.h's original
+selected member declarations. Eight actual dual-width preprocessed pairs match;
+both cached builds/publications pass and complete EXEs differ only in verified
+build metadata. The owner-approved equivalence exception omits a repeat full
+suite; P80's 392/392 remains the runtime baseline. Production +8/-11; XP diff
+decreases nineteen lines. gfitest.h/gispsvga.h retained content also matches XP.
+Frozen frontier 358/472; next file 359 base/inc/gvi.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

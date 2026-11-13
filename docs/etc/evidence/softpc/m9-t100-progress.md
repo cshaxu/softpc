@@ -6311,3 +6311,82 @@ P80's 392/392 runtime baseline. Frozen delivered frontier 354/472; next file
 P83 documentation gate and actual three-file diff review pass. No background
 worker was started. Comparison scratch preview, exact removal and build
 residue check pass; no unrelated changes are present.
+
+
+## P84: files 355-358 ordered review and restoration candidates
+
+Fixed XP raw identities:
+- base/inc/gfitest.h: f831f93a2ac5fab542c5300e41194662482fd9302fe5a69472ee477c08477c9d.
+- base/inc/gfx_upd.h: c0faaed46835b8d769bed149cf4d4b60715f721ea9a8d14fe93d7fd1ab5298cc.
+- base/inc/gispsvga.h: 2efdde6a1f36b5dcf088ed8690d9f15295b36d4d5189bb87948d89da1d5d85ed.
+- base/inc/gmi.h: 01ec314cb52fc3051e7c6135be6262f1cc0791ef2fcb0af4c442e3a26b709c08.
+
+gfitest.h matches XP after newline normalization; original gfi.c includes it.
+Its historical tester name is not grounds to delete an original include.
+gispsvga.h differs only at existing excluded scaffolding and remains included
+by original rom.c; no active GISP implementation is claimed. No changes to
+either header. All existing #error exclusions/scaffolding remain untouched
+and are skipped without new accounting.
+
+R0432 restores the one original STREAM_IO comment before the NEC_98 conditional
+in gfx_upd.h. It is outside the excluded body; no macro continuation or token
+is affected, and the existing line-control directive remains. Full comparison
+finds no other retained-content change in that header.
+
+R0433 restores the original MEM_HANDLERS member declarations in gmi.h's selected
+body and removes the three-line historical explanation. Existing outer branch
+scaffolding remains. Current supported !ANSI IPT0..IPT4 macros all expand to (),
+so the added parameter vocabulary supplied no concrete prototype under either
+actual architecture. Restoring the original declarations does not alter the
+selected table's types, layout or call arguments. The original b_move also uses
+IPT4 and therefore has the same expansion. No new pointer cast/provider/helper.
+
+Actual Ninja-command preprocessing with -E -P compares current/restored headers
+for ev_glue.c, ccpusas4.c, ega_writ.c and the VGA fixture on each architecture.
+All sixteen operations pass; all eight complete preprocessed pairs match bytes:
+- ["x86", "src/app-softpc/softpc.new/base/cvidc/ev_glue.c", "73d55916aa1289620aa441a763543e0aaa63d7bfe8efdaefd80b7e5d7753f075", "73d55916aa1289620aa441a763543e0aaa63d7bfe8efdaefd80b7e5d7753f075", true]
+- ["x86", "src/app-softpc/softpc.new/base/ccpu386/ccpusas4.c", "709e1c18542cc538a781aaf76517c580536e719a8c4b9d20b742dfb73920b440", "709e1c18542cc538a781aaf76517c580536e719a8c4b9d20b742dfb73920b440", true]
+- ["x86", "src/app-softpc/softpc.new/base/video/ega_writ.c", "10d72bb728465c90bc0a33a8e4cebb35cae0334f77ebed0e6435cc495f13dd1d", "10d72bb728465c90bc0a33a8e4cebb35cae0334f77ebed0e6435cc495f13dd1d", true]
+- ["x86", "test/app-softpc/unit/machine/vga_frame_smoke.c", "141276a2e4e528377a4b0612f829b64fc3d85aba4c2868b9c0f6c52c675237d7", "141276a2e4e528377a4b0612f829b64fc3d85aba4c2868b9c0f6c52c675237d7", true]
+- ["x64", "src/app-softpc/softpc.new/base/cvidc/ev_glue.c", "04dff869bc4fed10d1d8c677c94df3572b4481ca461ecb3958c81a2e0a2240fb", "04dff869bc4fed10d1d8c677c94df3572b4481ca461ecb3958c81a2e0a2240fb", true]
+- ["x64", "src/app-softpc/softpc.new/base/ccpu386/ccpusas4.c", "1bb0f89c1bd669146a4e7fe1c04916618d48c77b46cae3397993099af92ebcb9", "1bb0f89c1bd669146a4e7fe1c04916618d48c77b46cae3397993099af92ebcb9", true]
+- ["x64", "src/app-softpc/softpc.new/base/video/ega_writ.c", "6c7138fc801088a5aca61a4980aa49558586ea442ad2566e7008d79dd15e7ffc", "6c7138fc801088a5aca61a4980aa49558586ea442ad2566e7008d79dd15e7ffc", true]
+- ["x64", "test/app-softpc/unit/machine/vga_frame_smoke.c", "a7f3dec3e632306af37edc3a97aa3e8c9f08cc8e291e983304a60331cfc1b7c6", "a7f3dec3e632306af37edc3a97aa3e8c9f08cc8e291e983304a60331cfc1b7c6", true]
+
+Counter-review distinguishes the old ANSI-related rationale from actual selected
+macro behavior. No consumer-specific exception is introduced. Complete final
+cached build/publication and EXE-equivalence proof are pending before delivery.
+Final normalized header identities: {"base/inc/gmi.h": "1298cfa1304729c5619328360e02aa6d28766f11e603ad4a53893dba11db515c", "base/inc/gfx_upd.h": "3450e83aee27dc45a79a013fdf85b5aefc95ee8a578590f36c732c1465a26e88"}.
+Delivered frontier remains 354/472 pending final qualification. File 359 gvi.h
+has only been inventoried; no completed disposition is claimed.
+
+
+### P84 final-source and artifact-equivalence qualification
+
+Cached build/publication results: [["x86", 0, 22.8], ["x64", 0, 31.85]].
+
+- softpc32.exe: 3463049 bytes, 9 changed bytes; prior stamp 14:57:16 Nov 13 2026, final 15:03:04 Nov 13 2026; SHA-256 436d680ba23d25005c61b47de7a0b211003cd140aba04303c0eb8d00510aef08.
+- softpc64.exe: 3082345 bytes, 8 changed bytes; prior stamp 14:57:24 Nov 13 2026, final 15:03:27 Nov 13 2026; SHA-256 b131b9116b5d662479ee457035b89db3e0b02d541c1bc2b81afa78ab67d64156.
+
+Complete EXE byte comparison permits only located COFF TimeDateStamp,
+OptionalHeader CheckSum and the eight compiler-time bytes at the unique date/time
+literal. Lengths, PE offsets and literal positions match. No bytes outside
+those fields differ. Final source is the proven declaration candidate plus
+one literal original comment. Under the owner's artifact-equivalence exception,
+no repeat full runtime suite is run; P80's 392/392 remains the runtime baseline.
+
+Actual-change review: production +8/-11, net -3; no test/build source changes.
+XP-relative diff decreases nineteen lines: eighteen from restoring seven
+original member lines in place of eight adapted lines plus three comment lines,
+and one from restoring the omitted original comment. Existing excluded-body
+scaffolding is unchanged and not included in that reduction. No new mirror
+point, state owner, fallback, provider, calling path or shared-component change.
+R0432/R0433 are restored, with no retention decision added. Manifest/gate
+verification remains separate from the artifact proof.
+
+Frozen delivered frontier 358/472; next file 359 base/inc/gvi.h. S1 and prior
+qualified owner decisions remain open. User configuration/media are untouched.
+
+P84 mirror/documentation gates and actual nine-file diff review pass. Both
+owned workers exited; scratch preview, exact removal and residue check pass.
+No unrelated worktree changes or retained temporary probe files remain.
