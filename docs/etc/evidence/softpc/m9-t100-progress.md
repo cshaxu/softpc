@@ -5241,3 +5241,69 @@ consumers. Configuration/media/snapshots are unchanged. Verified frontier is
 P64 owned-process inspection confirms all probes and qualification jobs exited.
 Clean-Build preview, exact scratch removal and residue check pass. Only the
 two reusable cache roots remain; no raw logs or probe binaries are retained.
+
+## File 315: sinit012.c (P65 verified delivery)
+
+Pinned XP raw SHA-256: 6f0868fde324613c1d55c0bece49d42978ee2e9b37c30ca3d48a5e3a025009ef.
+After removing the one GDP include, every line has a fixed XP correspondence:
+672 GDP replacements and 32 allocation replacements, no other change. No
+excluded bodies are counted. R0407 covers the include and native GDP accesses;
+R0408 covers the local allocations. Exact locations are recorded in
+[m9-t100-sinit012-points.tsv](m9-t100-sinit012-points.tsv).
+
+The 32 entries comprise five pointer getters, nine IU32 getters, five byte
+getters and thirteen setters. Each allocates one local slot. Pointer getters
+and setters fully initialize the native slot before reading it: restore
+18 malloc operations, retaining sizeof(IUH). Byte getters only read/write
+IU8 within the slot, so restore all five original malloc(4) lines exactly,
+including original whitespace with the required mirror CRLF. Nine IU32 getters
+write a low word and load IUH at return; their zero initialization remains an
+evidence-qualified native-width residual, as distinguished from typed IU32
+consumer behavior in P64. Native GDP mapping remains necessary because current
+GDP is indexed storage and native VGAGLOBALSETTINGS members, not the original
+flat 32-bit byte layout. No duplicate Compat accessor implementation replaces
+these generated entries; vglfunc.c registers them in the existing VideoVector.
+Video read-mode and V7 bank consumers remain in ega_read.c/ega_prts.c.
+
+Focused proof uses complete actual source bodies and the real GDP allocator
+and mapping, linked with cached production dependencies. All 32 entries receive
+four values, including pointer upper bits on x64; getters assert their result,
+setters assert the stored field. Byte getter assertions use their actual byte
+contract. Current/candidate/poisoned-malloc variants each pass 128 assertions
+on x86 and x64. Removing the nine remaining zero allocations also passes x86,
+but x64 returns A5A5A5A587654321 rather than 87654321 at read_shift_count.
+This demonstrates indeterminate high return bits, not a reproduced guest
+failure through the typed scalar consumers. The first disposable harness
+mistakenly supplied zero as setter v1, producing identical current/candidate
+failures at the first setter; corrected argument delivery passes. No production
+change was made to accommodate that fixture mistake.
+
+Candidate +23/-23 restores 23 allocation operations, including five entire XP
+lines. Anchored XP added+deleted diff is 1409 -> 1399, a reduction of ten lines;
+source line count is unchanged. Final normalized source SHA-256 is
+c80398bd17c057fb0a33a19f6be7c262247ae02bd10ce1df71ca33324c82bdd9.
+Exact-final-source probes and dual-width full qualification are running.
+Verified delivery frontier remains 314/472; no S closure or residual approval
+is claimed.
+
+P65 final qualification results (seconds): x86-build 8.88, x86-background 138.85, x86-native 25.35, x64-build 13.92, x64-background 141.62, x64-native 24.42.
+Each architecture passes 188 background and eight native tests, all first run:
+392/392 total. Final-source focused probes, mirror and documentation gates pass.
+Actual-diff counter-review reconciles all 23 changed production lines and no
+other production/test changes. Five byte allocations match XP verbatim except
+required mirror line endings; 18 native-sized allocations restore malloc.
+SequenceMatcher with autojunk=False reports XP ranges 97 -> 92 and
++705/-704 -> +700/-699, agreeing with the anchored ten-line reduction.
+
+softpc32.exe: Nov 13 2026 13:30:13, SHA-256 9d156dbe60a4904fb0a1b25f124476f4e6b3f7e5402cf573724b7b22f487ab39.
+
+softpc64.exe: Nov 13 2026 13:33:06, SHA-256 eebbcff13ac9018062db744ab8ff6b508b2e2ffdf9bafaf7785e18b50c6d2e82.
+
+The nine mixed-width zero initializations and GDP mapping remain qualified
+owner decisions, not approved retention. No guest session acceptance or
+full video-mode matrix is inferred from getter/setter probes. Verified frontier
+advances to 315/472; file 316 sinit013.c is next. S1 remains active.
+
+P65 owned-process inventory confirms all probes and test jobs exited.
+Clean-Build preview, task scratch removal and residue check pass. No probe
+binary or raw log is retained; reusable caches and user assets are preserved.

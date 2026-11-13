@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P64 completes file 314 sinit011.c. Eight pointer-getter calloc calls
-restore malloc while preserving native allocation capacity. Production +8/-8;
-anchored XP diff stays 881 lines. Current/candidate/poisoned-candidate actual
-getters pass 80 assertions per variant per architecture. Twelve scalar
-mixed-width zero initializations and GDP mapping remain evidence-qualified
-owner decisions; their consumer limits are explicit. Both EXEs are published;
+T100 S1 P65 completes file 315 sinit012.c. Restore 23 malloc operations,
+including five exact original byte-getter allocations; 18 keep native capacity.
+Production +23/-23; anchored XP difference 1409 -> 1399 lines. Actual-body
+current/candidate/poisoned-candidate tests pass 128 assertions per variant on
+both widths. Nine mixed-width zero initializations and GDP mapping remain
+qualified owner decisions with consumer limits recorded. Both EXEs published;
 full regression 392/392 passes first run. P61 resolved the legacy video-source
-callback boundary without adding a production path. Frozen frontier 314/472;
-next file 315 sinit012.c. See the
+callback boundary without adding a production path. Frozen frontier 315/472;
+next file 316 sinit013.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
