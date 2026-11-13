@@ -775,8 +775,11 @@ static void verify_controller_archives(void)
     parallel_archive = softpc_device_archive_create();
     assert(parallel_archive != NULL);
     assert(softpc_device_archive_capture(parallel_archive));
+    outb(0x378u, 0u);
     q_event_init();
     assert(softpc_device_archive_restore(parallel_archive));
+    inb(0x378u, &value);
+    assert(value == 0x33u);
     c_cpu_q_ev_set_count(0u);
     dispatch_q_event();
     softpc_device_archive_dispose(parallel_archive);

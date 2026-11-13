@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P22 restores original UART formatting and removes duplicate declarations
-in com.c. Production +18/-32; tests +19/-0. XP-relative selected diff decreases
-46 lines and 27 points. Both production object files are byte-identical before/
-after. Three pointer corrections and private UART snapshot/callback state remain
-evidence-qualified pending owner decision, supported by actual negative controls.
-Final-source cached dual build/publication, 392 tests and mirror/documentation
-gates pass without retry. Original mirror warnings remain, including restored
-XP directive suffixes; one exact-original whitespace line is documented.
-Sequential review is 267/472; next is base/comms/printer.c (268).
+T100 S1 P23 restores original printer.c formatting and trims added commentary.
+Production +21/-26; tests +3/-0. Selected XP diff decreases 47 lines/29 points.
+The existing controller/callback snapshot extension remains evidence-qualified
+pending owner decision, supported by actual dual-width omission negatives.
+Cached dual build/publication and changed checkpoint tests pass; final EXEs
+are byte-identical to P22 except eight timestamp/PE metadata bytes each.
+The approved equivalence exception reuses P22's 392 full-regression passes;
+no fresh P23 full-suite run is claimed. Mirror/documentation/diff checks pass.
+Sequential review is 268/472; next base/comms/printer_.c (269).
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

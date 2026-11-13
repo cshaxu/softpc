@@ -179,7 +179,6 @@ static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
 #endif // !NEC_98
 #line 172
 
-
 #line 199
 #ifndef NEC_98
 #line 200
@@ -188,15 +187,16 @@ static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
 #endif
 #endif // !NEC_98
 #line 209
+
 #define STATE_READY     0
 #define STATE_OUT       1
 #define STATE_OUTA      2
-
 #line 212
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
 #line 217
+
 /*
  * State transitions:
  *
@@ -229,11 +229,6 @@ static q_ev_handle handle_for_outa_event[NUM_PARALLEL_PORTS];
 static void lpr_state_outa_event IPT1(long, adapter);
 static void lpr_state_out_event IPT1(long, adapter);
 
-/*
- * DIVERGENCE(MVDM-PARALLEL-SNAPSHOT-001): export the selected parallel
- * controller's finite register and delayed-event state.  The standalone
- * virtual printer buffer is owned separately by compat/parallel.c.
- */
 int
 softpc_device_snapshot_encode_parallel_callback(callback, callback_id)
 Q_CALLBACK_FN callback;
@@ -321,7 +316,6 @@ const softpc_device_parallel_controller_state *state_in;
  * Defines and variables to handle tables stored in 16-bit code for NT
  * monitors.
  */
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
@@ -329,6 +323,7 @@ const softpc_device_parallel_controller_state *state_in;
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #else /* NTVDM && MONITOR */
 #line 288
+
 #define get_status(adap)	(status_reg[adapter])
 #define set_status(adap,val)	(status_reg[adapter] = (val))
 
@@ -337,9 +332,9 @@ const softpc_device_parallel_controller_state *state_in;
 
 #define get_state(adap)		(state[adapter])
 #define set_state(adap,val)	(state[adapter] = (val))
+
 #endif /* NTVDM && MONITOR */
 #line 297
-
 
 static void printer_inb IPT2(io_addr, port, half_word *, value);
 static void printer_outb IPT2(io_addr, port, half_word, value);
@@ -368,7 +363,6 @@ void printer_post IFN1(int,adapter)
 #line 321
 }
 
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
@@ -376,6 +370,7 @@ void printer_post IFN1(int,adapter)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #else	/* NTVDM && MONITOR */
 #line 351
+
 static void lpr_state_outa_event IFN1(long,adapter)
 {
 	set_high(status_reg[adapter],ACK);
@@ -395,10 +390,10 @@ static void lpr_state_out_event IFN1(long,adapter)
 #line 366
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 369
 static void printer_inb IFN2(io_addr,port, half_word *,value)
-#endif
+#endif // !NEC_98
 #line 371
 {
 #ifndef NEC_98
@@ -425,11 +420,11 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 #line 391
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 395
 	case DATA_OFFSET:
                 *value = output_reg[adapter];
-#endif
+#endif // !NEC_98
 #line 398
 		break;
 
@@ -440,12 +435,12 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 	case STATUS_OFFSET:
 		switch(get_state(adapter))
 		{
-
 #line 410
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
 #endif
 #line 420
+
 		case STATE_READY:
 			notbusy_check(adapter);
                         *value = get_status(adapter) | STATUS_REG_MASK;
@@ -512,10 +507,10 @@ static void printer_inb IFN2(io_addr,port, half_word *,value)
 #line 479
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 482
 static void printer_outb IFN2(io_addr,port, half_word,value)
-#endif
+#endif // !NEC_98
 #line 484
 {
 #if defined(NEC_98)
@@ -565,7 +560,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #line 560
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else // !NEC_98
+#else  // !NEC_98
 #line 564
 		case DATA_OFFSET:
 #line 568
@@ -615,7 +610,6 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #endif // !NEC_98
 #line 645
 			{
-
 #line 646
 #ifndef NEC_98
 #line 647
@@ -624,6 +618,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #endif
 #endif // !NEC_98
 #line 660
+
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
@@ -679,10 +674,10 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #line 717
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 720
 				if (value & IRQ)
-#endif
+#endif // !NEC_98
 #line 722
 				{
 					/*
@@ -703,7 +698,6 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 				}
 			}
 
-
 #line 741
 #ifndef NEC_98
 #line 742
@@ -712,6 +706,7 @@ static void printer_outb IFN2(io_addr,port, half_word,value)
 #endif
 #endif // !NEC_98
 #line 753
+
 #ifndef NEC_98
 #line 754
 #ifndef	PROD
@@ -742,10 +737,10 @@ void printer_status_changed IFN1(int,adapter)
 #line 778
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 781
 	notbusy_check(adapter);
-#endif
+#endif // !NEC_98
 #line 783
 }
 
@@ -758,10 +753,10 @@ void printer_status_changed IFN1(int,adapter)
 #line 791
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 794
 static void notbusy_check IFN1(int,adapter)
-#endif
+#endif // !NEC_98
 #line 796
 {
 	/*

@@ -1832,3 +1832,104 @@ Evidence-qualified existing residual decisions remain open; S1/T100 not closed.
 - P22 softpc32.exe SHA-256 `dd201db674a275cff565549fade15f8a8e79944794037d44db1ef5988cf9fd17`.
 
 - P22 softpc64.exe SHA-256 `780d2da88e82747241eb07c46431c403ebd9d64345c4288f4cdd5268eabf57e8`.
+
+## File 268 printer.c investigation after P22
+
+Actual root CMakeLists.txt includes base/comms/printer.c. The supported
+compiled body owns original output/control/status registers, READY/OUT/OUTA
+state and delayed ACK event handles. Compat parallel.c owns the host sink and
+buffers; it does not replace these controller transitions. Original port reads
+can advance ACK state and writes can schedule output, so replay is not a neutral
+replacement for private controller state restoration.
+
+Complete selected diff enumeration against fixed XP finds the relocated
+historical notice, snapshot include and controller/callback extension, plus
+whitespace and directive-suffix changes. Existing #error bodies are skipped
+without records. Nonsemantic restoration/minimization remains unfinished;
+production printer.c is unchanged and file 268 is not counted completed.
+
+The existing real checkpoint test emits 33h through actual LPT I/O, creates a
+delayed original ACK, captures the device archive, resets the event queue and
+restores/dispatches it. Coherent removal of parallel callback encode/decode
+from archive dispatch makes capture fail on both widths (x86 3221226505,
+x64 3). Current passes. However omission of controller restore originally
+still passed: this test had not changed its controller state after capture.
+
+Add three test lines: write 00h to LPT data after capture; after archive restore,
+read the actual data port and assert 33h. Current x86/x64 both pass. With only
+archive controller restoration omitted, both now fail precisely at that data
+assertion (x86 3221226505, x64 3). The same updated test still rejects omitted
+callback mapping at capture. Tests use actual original port/queue/archive code,
+not a replacement printer or fabricated callback. This establishes a real
+snapshot-state contract, not physical printer or manual DOS/Windows evidence.
+No production/public API, guest, configuration, media or snapshot change made.
+The three-line regression remains local pending complete-file qualification.
+
+## P23 printer.c complete-file candidate
+
+Before selected XP diff +100/-21 in 32 points; candidate +74/-0 in
+3 points, a reduction of 47 diff lines and 29 points. Both actual production
+objects are byte-identical before/after. All #line/#error directives remain
+byte-identical; original historical notice is preserved. The added long
+explanation is removed, original whitespace/directive suffixes restored.
+No new production path or change to guest behavior. Qualification pending.
+
+Each non-excluded point below records original/pre-P23 ranges and counter-review
+disposition. Initial hypotheses and actual archive controls appear above.
+
+| Point | XP range | Before range | Counter-review/disposition |
+| --- | --- | --- | --- |
+| R0206 | before 69 | 69-69 | Existing historical notice retained under source policy. |
+| R0207 | before 109 | 106-106 | Private state extension declaration; residual pending owner decision. |
+| R0208 | before 199 | 182-182 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0209 | 208-208 | before 191 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0210 | before 212 | 194-194 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0211 | 216-216 | before 200 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0212 | before 246 | 229-305 | Actual archive negatives prove controller/callback necessity; remove long comment, remaining extension pending owner decision. |
+| R0213 | before 264 | 324-324 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0214 | 287-287 | before 332 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0215 | before 296 | 340-340 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0216 | 297-297 | before 343 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0217 | before 323 | 371-371 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0218 | 350-350 | before 379 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0219 | 368-368 | 398-398 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0220 | 370-370 | 401-401 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0221 | 394-394 | 428-428 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0222 | 397-397 | 432-432 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0223 | before 410 | 443-443 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0224 | 419-419 | before 449 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0225 | 481-481 | 515-515 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0226 | 483-483 | 518-518 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0227 | 563-563 | 568-568 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0228 | before 646 | 618-618 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0229 | 659-659 | before 627 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0230 | 719-719 | 682-682 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0231 | 721-721 | 685-685 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0232 | before 741 | 706-706 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0233 | 752-752 | before 715 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0234 | 780-780 | 745-745 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0235 | 782-782 | 748-748 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0236 | 793-793 | 761-761 | Restore exact XP whitespace/directive suffix; both objects identical. |
+| R0237 | 795-795 | 764-764 | Restore exact XP whitespace/directive suffix; both objects identical. |
+
+P23 final-source verification: both cached x86/x64 build/publication pass;
+the changed actual checkpoint test passes at both widths. Mirror and final
+packet/documentation gates pass. Both final EXEs have identical length and
+all bytes equal to P22 outside PE COFF time, PE checksum and exactly one
+same-offset HH:MM:SS literal. Each EXE changes eight bytes total. Thus the
+owner's artifact-equivalence exception applies: P22's 392 passing full tests
+remain the full-regression baseline; P23 does not claim a fresh full-suite run.
+
+Coordinator actual-diff review confirms production +21/-26 (net -5), test
++3/-0; original controller and Compat host retain distinct ownership, no
+new branch/API/callback/state and no mirror complexity moved into Compat.
+Original declaration order required for callback addressing stays. Existing
+snapshot extension and declaration remain evidence-qualified pending owner;
+original notice remains protected. CRLF mirror, LF own files, manifest and
+diff --check pass. Excluded bodies and all #line directives remain untouched.
+No guest/configuration/media/snapshot/shared-component modification.
+Sequential reviewed files: 268/472; next base/comms/printer_.c (269).
+
+- P23 x86 EXE SHA-256 `9a0356dff13c94bcbcc09c880130f2e0fa3725d5581753d7231105612a2c0397`; literal 03:02:48 -> 03:17:51, offset 2435904.
+
+- P23 x64 EXE SHA-256 `3f03d1d26534d98da4e2699aa1b0257788672eb7f2aa05417368cb4e2fe7dc88`; literal 03:06:13 -> 03:18:05, offset 2289664.
