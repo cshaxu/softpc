@@ -1562,3 +1562,50 @@ configuration or test source changed.
 - Final x86 popf object `b573573185adb0e88da23fee1e10d33db9b1f29b39a08bcfa99effdeca4043a0` matches the original-candidate object.
 
 - Final x64 popf object `2c52185d0987683aaae21427b25c2d04fa7c35113e6cf23af5abf5ed25258558` matches the original-candidate object.
+
+## P20 file 206: original RETF operand-size restoration
+
+R0165 replaces original GET_OPERAND_SIZE/SET_SP/SET_ESP with set_current_SP.
+The actual decoder calls RETF in softpc-ccpu-core; there is no replacement
+Compat return implementation. Initial rationale analogized a TSS stack switch
+to restoring a return frame. Counter-review separates the saved operand width
+from the target stack address size: restoring a 32-bit saved ESP must not discard
+its upper half just because the target SS.B is zero. The existing final
+change_SP/byte_change_SP still owns parameter adjustment by stack address size.
+
+Intel SDM 325383-078US, December 2022, RET RETURN-TO-OUTER-PRIVILEGE-LEVEL,
+volume 2B pages 4-568 through 4-570, restores tempESP from the operand-width
+frame and then assigns ESP; subsequent immediate adjustment uses stack address
+size. Source: https://cdrdv2-public.intel.com/671110/325383-sdm-vol-2abcd.pdf .
+The full official PDF was fetched and its RET section read, not inferred from
+the already-audited IRET behavior. The 16-bit high-half hardware behavior is
+not claimed from this test; original code is restored under original-first
+policy rather than retaining an unproven target-stack-width replacement.
+
+The existing checkpoint suite now runs IRET, RETF and RETF 4, each with two
+operand widths and two target SS sizes. Actual CPU decoding transfers ring 0
+to 3 through a real GDT and stack frame. Assertions check CS/SS/CPL/EIP, low
+SP for 16-bit operands, and full saved ESP for 32-bit operands, plus the
+immediate adjustment for RETF 4. It reuses the existing fixture, not a new
+CPU or guest binary. Pre-restoration x86 exits 3221226505 and x64 exits 3 at
+the full-ESP assertion: both builds compile/link but the current RETF loses
+the saved upper half. These are instruction tests, not a Windows reproduction.
+
+Restore the four original lines, preserving the whole surrounding original
+path. Production +4/-1 (net +3); tests +16/-12 (net +4), by git diff --numstat.
+XP in-scope diff +1/-4 becomes zero: five fewer lines and one fewer point,
+with no new condition, helper or error policy. Existing #error bodies are not
+accounted. Files 207-264 have no in-scope differences (normalized identical
+except sgdt.c, shld.c, shrd.c and sidt.c); file 265 zfrsrvd.c is next.
+Final-source cached x86/x64 builds and dual-EXE publication pass. Each
+architecture passes 188 background plus 8 native desktop/audio tests: 392/392.
+Both final checkpoint tests pass the 12 return configurations. No fresh manual
+DOS/Windows session or exhaustive fault/16-bit-upper-half hardware coverage
+is claimed. Coordinator review checked actual source/test diff, preserved
+parameter-adjustment path, fixed XP identity outside existing exclusions,
+CRLF, negative controls, final tests, manifests and documentation gates.
+No shared-package, Compat, snapshot schema, user configuration or media changed.
+
+- P20 softpc32.exe SHA-256 `532546145416597f2ffdfd3dc5e7d76f4c32cc2b398e26fa1a4eead04fdb23c2`.
+
+- P20 softpc64.exe SHA-256 `4fdb4cda47e445bf88fbb03e08e96302b021b54a583aeec748c48bbba42fbab3`.

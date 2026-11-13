@@ -30,12 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P19 restores popf.c exactly to normalized fixed XP source.
-Production +0/-3, tests unchanged; XP diff shrinks by three lines and two
-points. Cached dual-EXE publication passes; complete EXEs differ from P18
-only in timestamp/checksum metadata. P18's 392/392 final qualification is
-reused under the artifact-equivalence rule, not reported as a fresh run.
-Sequential review is 205/472; file 206 ret.c is next.
+T100 S1 P20 restores original RETF operand-width stack-pointer handling.
+Actual pre-restoration x86/x64 instruction tests both fail the full-ESP
+assertion. Final-source cached dual builds/publication and all 392 tests
+pass (188 background plus 8 native per architecture). Production +4/-1; tests +16/-12; XP diff shrinks five lines and
+one point. Sequential review is 264/472; file 265 zfrsrvd.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
