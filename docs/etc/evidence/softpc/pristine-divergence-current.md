@@ -2039,3 +2039,11 @@ Its single live query declaration remains an evidence-qualified owner decision;
 actual painter pixel and declaration negatives are recorded in the T100 evidence.
 This supersedes the earlier header size rationale, not the later implementation
 audit. No additional mirror behavior is introduced.
+
+
+T100 S1 P81 supersedes the egavideo.h BIOS dot-service declaration rationale:
+the original video.c already supplies its exact caller-local declaration, so
+the added header copy and explanation are restored away. Fourteen dual-width
+object pairs and both final executables establish the stated equivalence.
+See T100 evidence for the four-line XP-difference reduction; historical totals
+above are not current mirror-diff measurements.

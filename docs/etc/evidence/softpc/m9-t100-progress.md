@@ -6127,3 +6127,78 @@ S1 remains active; neither that next file nor existing owner decisions is closed
 P80 documentation gate and actual eight-file diff review pass. Authoritative
 process inventory finds no live task-owned probes/builds. Scratch cleanup
 preview, exact removal and residue check pass; reusable caches remain.
+
+
+## P81: file 344 egavideo.h investigation and restoration candidate
+
+Pinned XP raw SHA-256:
+7c3428b6b211f9682749de07d41c699e3c1f8d13c13aff59b8b84195dd0c639b.
+The only retained addition is the ega_read_dot declaration, its two-line
+explanation and separator. Actual symbol search finds the function definition
+in ega_vide.c and its single call in video.c. The latter already declares
+extern void ega_read_dot(int, int, int) immediately before vd_read_dot; that
+precise declaration is original XP video.c:2637. No caller needs the new header
+copy. Existing exclusions/scaffolding are unchanged and not newly accounted.
+
+R0430 restores original absence of all four added header lines. No declaration
+is moved and no Compat replacement is introduced. Every actual direct consumer
+was compiled with current/restored headers and otherwise identical actual Ninja
+flags on both widths: Compat platform.c/video.c/v7_pointer.c and original
+ega_vide.c/video.c/v7_video.c/vga_vide.c. All 28 compile operations succeed and
+all fourteen object pairs are byte-identical. Tests do not directly include
+this header; the header is not transitively included by another active header.
+The mouse_io.h occurrence is an original explanatory comment, not an include.
+
+Object-pair identities (architecture, source, current, restored, equal):
+- ["x86", "src/app-softpc/compat/platform.c", "edc02e2aa8319d1c940696091a36a18fab85f4902eac37a323f015ed8185f21a", "edc02e2aa8319d1c940696091a36a18fab85f4902eac37a323f015ed8185f21a", true]
+- ["x86", "src/app-softpc/compat/video.c", "ba29eab142031287a0692a45d8b3f98f44485fad245ba4591190ef7efc7f48a2", "ba29eab142031287a0692a45d8b3f98f44485fad245ba4591190ef7efc7f48a2", true]
+- ["x86", "src/app-softpc/compat/v7_pointer.c", "90663464c9146e02b7fe61ca40e8e0b2145f7147ca5e713b7c98d62a9bb5cf4a", "90663464c9146e02b7fe61ca40e8e0b2145f7147ca5e713b7c98d62a9bb5cf4a", true]
+- ["x86", "src/app-softpc/softpc.new/base/video/ega_vide.c", "e461cfb47deb229fdb15bd8a6e298a34c16cdf1ff16951df6df08a9a9917838d", "e461cfb47deb229fdb15bd8a6e298a34c16cdf1ff16951df6df08a9a9917838d", true]
+- ["x86", "src/app-softpc/softpc.new/base/video/video.c", "82d6cf9bd9bc50471f3d793f37867948d7d94eeeabcaf0ca1df1b7e83fea056f", "82d6cf9bd9bc50471f3d793f37867948d7d94eeeabcaf0ca1df1b7e83fea056f", true]
+- ["x86", "src/app-softpc/softpc.new/base/video/v7_video.c", "125da31ca13711e174fe7c4b3708c0279cc3ccdfa6d5d5e8f71b19c2d43f964e", "125da31ca13711e174fe7c4b3708c0279cc3ccdfa6d5d5e8f71b19c2d43f964e", true]
+- ["x86", "src/app-softpc/softpc.new/base/video/vga_vide.c", "7f70de8c0dfad16b3bf756c467ee8c9326d6993bb838e414628c435df6118da6", "7f70de8c0dfad16b3bf756c467ee8c9326d6993bb838e414628c435df6118da6", true]
+- ["x64", "src/app-softpc/compat/platform.c", "3809881f84e2217e14bb955b0e139622414b909ffefc462d2815ed47e1065cc8", "3809881f84e2217e14bb955b0e139622414b909ffefc462d2815ed47e1065cc8", true]
+- ["x64", "src/app-softpc/compat/video.c", "eed76e86a47a2653a1adb1cf36dfc788464d69be6ed67c3f5074caeef2866d11", "eed76e86a47a2653a1adb1cf36dfc788464d69be6ed67c3f5074caeef2866d11", true]
+- ["x64", "src/app-softpc/compat/v7_pointer.c", "aa927ba35f1cc8540e9811cdcd2d7d4667fe33c2dc6d9d616b31635d02524295", "aa927ba35f1cc8540e9811cdcd2d7d4667fe33c2dc6d9d616b31635d02524295", true]
+- ["x64", "src/app-softpc/softpc.new/base/video/ega_vide.c", "ed9e568095052b0e1bec41ad8c016940ca95d6ddda3d7e4ddcc96b3f3b835601", "ed9e568095052b0e1bec41ad8c016940ca95d6ddda3d7e4ddcc96b3f3b835601", true]
+- ["x64", "src/app-softpc/softpc.new/base/video/video.c", "0ecfcdb33270187c0704833880a820ba32dbf571e06bc6a2b256c7f45ab8c9dc", "0ecfcdb33270187c0704833880a820ba32dbf571e06bc6a2b256c7f45ab8c9dc", true]
+- ["x64", "src/app-softpc/softpc.new/base/video/v7_video.c", "eab6297ec326f31f0742e57e256e479b89866f3f343fbcfe92d42d75d1b929ee", "eab6297ec326f31f0742e57e256e479b89866f3f343fbcfe92d42d75d1b929ee", true]
+- ["x64", "src/app-softpc/softpc.new/base/video/vga_vide.c", "b8a949fc5c37e994964d9126fa3c140fd00542beecfd8d0eff6931fe018eb783", "b8a949fc5c37e994964d9126fa3c140fd00542beecfd8d0eff6931fe018eb783", true]
+
+Counter-review confirms this is a duplicate declaration, not a change to the
+BIOS dot service, its argument passing or provider. Production +0/-4, net -4;
+XP added/deleted difference decreases four lines. Final normalized SHA-256:
+6377e7acb5dfdf78e5f563f287fd4ebd1ac4d0414dff91b22edcdf25effb12a4. No permanent test/build change.
+
+Candidate applied; cached dual-width build/publication and executable
+comparison are pending. Full-suite omission requires actual artifact-equivalence
+proof apart from required timestamp fields. Delivered frontier remains 343/472.
+
+
+### P81 final-source and artifact-equivalence qualification
+
+Cached build/publication results: [["x86", 0, 12.26], ["x64", 0, 14.59]].
+
+- softpc32.exe: 3463049 bytes; 8 changed bytes, zero unexpected differences. Old stamp 14:44:14 Nov 13 2026; new stamp 14:53:37 Nov 13 2026; final SHA-256 f1f8b91be48ae9d59dfd2fea2f8a1d9360ae96e7d809b50e93aade927a1f2a0a.
+- softpc64.exe: 3082345 bytes; 8 changed bytes, zero unexpected differences. Old stamp 14:47:15 Nov 13 2026; new stamp 14:53:49 Nov 13 2026; final SHA-256 1e5cf3e4f6028b62492481a4fadd62b5a4555ceab4a8e5d34c27857e9c04a5c5.
+
+Comparison checks equal file length and PE header location, then every byte.
+Only COFF TimeDateStamp (PE+8, four bytes), OptionalHeader CheckSum (+64, four
+bytes) and the eight-byte compiler time at the matching unique date/time literal
+are permitted to differ. Every byte outside those precisely identified fields
+is identical. The date is unchanged (Nov 13 2026); fresh times are verified.
+This is actual artifact equality apart from required build metadata, not merely
+a source-equivalence claim. Per the owner's equivalence exception no full suite
+is rerun; P80's 392/392 is the runtime baseline, not a new P81 test count.
+
+Final mirror matches the restored header used in the object comparisons.
+Production +0/-4, permanent tests and build configuration +0/-0; XP-relative
+diff decreases four lines. No guest/media/INI/shared-component change. Complete
+selected-content comparison leaves no non-excluded local difference in this
+header. R0430 is restored, with no new owner-retention decision. Counter-review
+confirms the original function definition and caller-local prototype remain.
+Frozen delivered frontier 344/472; next file 345 base/inc/emm.h. S1 remains active.
+
+P81 mirror-manifest and documentation gates pass. Actual eight-file diff review
+passes. Both owned workers exited; scratch preview, removal and residue check
+pass. Reusable caches are preserved, with no unrelated worktree changes.

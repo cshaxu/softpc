@@ -30,13 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P80 removes egaports.h's unnecessary historical panning comment;
-its real query declaration remains evidence-qualified pending owner decision.
-Dual-width pixel negatives and declaration controls establish the stated scope.
-egaread.h retained content matches XP. Production +0/-1; XP diff decreases one
-line. Both cached builds/publications and 392/392 full tests pass.
-Frozen frontier 343/472; next file 344 base/inc/egavideo.h.
-See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P81 restores egavideo.h by removing the duplicate ega_read_dot
+header declaration; the original caller-local declaration remains. All fourteen
+dual-width object pairs are byte-identical. Both cached builds/publications pass;
+EXEs differ only in verified build metadata, so the owner-approved equivalence
+exception applies without a new full-suite run. P80's 392/392 remains the runtime
+baseline. Production +0/-4; XP diff decreases four lines. Frontier 344/472;
+next file 345 base/inc/emm.h. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 
