@@ -5701,3 +5701,59 @@ of identical raw LF/CRLF bytes. No source/test/build/manifest/EXE change, no
 XP-relative diff reduction, no new compilation or dynamic test result. P66 is
 still the published 392/392 full baseline. Frozen frontier advances to 329/472;
 next file 330 base/inc/ckmalloc.h. S1 and pending decisions remain open.
+
+
+## File 330: ckmalloc.h (P74 qualification in progress)
+
+Pinned XP raw SHA-256:
+9f05409d3a7414620614b1b4c0f050b0ec2a81dfb792a0f3ced264a684804f3f.
+The entire header differs only by a three-line rationale and stdlib.h include.
+R0420 restores exact XP text, retaining repository-required CRLF. Production
++0/-4; XP-relative +4/-0 becomes zero, eliminating all four diff lines and the
+one local adaptation. Manifest local identity is updated; historical audit
+records remain historical, while the current divergence row records retirement.
+
+All include consumers were inspected: nt_graph.c, com.c, rom.c, cga.c,
+ccpusas4.c (two includes) and fpu.c include host_def.h earlier. That header
+already includes stdlib.h before defining host_malloc/host_calloc. rom.c also
+includes malloc.h and ccpusas4.c directly includes stdlib.h. Removing the
+ckmalloc include therefore does not remove allocator declarations at any real
+consumer. The comment's historical MSVC justification does not establish a
+current necessary difference. No host header change or new dependency is added.
+Future host_def.h auditing must recheck coherent declarations if its own include
+is considered for restoration; this file's removal does not predetermine that
+later decision or authorize an implicit-int allocator call.
+
+Executor review confirms exact XP equality after newline normalization and a
+four-line deletion only. No helper, macro rewrite, allocation behavior, guest,
+configuration, snapshot or permanent test changes. Cached dual-width builds,
+publication and full regressions are running on this final source. The verified
+frontier stays 329/472 until delivery; no passing status is inferred from launch.
+
+
+### P74 final qualification
+
+Final-source cached builds and publication succeed: x86 9.06 seconds, x64
+8.96 seconds. Each architecture passes 188 background and eight native tests
+first run: 392/392 total. Background times are 139.25/141.98 seconds; native
+times are 24.95/24.65 seconds. Full regression includes component manifests,
+source/dependency gates, snapshot tests and native package/audio/desktop paths.
+No allocator implicit-declaration error appears in either build log.
+
+Published softpc32.exe: Nov 13 2026 14:07:35; SHA-256
+9b6250038470c07fc17c075b46fabec5538f7c55fae4f2c330123b331236e36d.
+Published softpc64.exe: Nov 13 2026 14:10:28; SHA-256
+97c87c5dca86d180cfac38eececd48b3f475ffeb960ca40165cf243c4970eec8.
+
+Coordinator counter-review of the actual diff confirms the production change
+is exactly four deleted lines and the final normalized header equals fixed XP.
+The single header adaptation is retired in the current divergence record;
+manifest XP/raw/subset fields are preserved and local hash now equals XP.
+No test or other production source change, no asset/configuration/media/snapshot
+change except the two required published EXEs. No new retained decision.
+Verified frontier advances to 330/472; next file 331 base/inc/cmos.h. S1 and
+previous evidence-qualified decisions remain open; this is not task closure.
+
+P74 process inventory confirms all owned jobs exited. Clean-Build preview,
+exact disposable scratch removal and residue check pass; reusable caches stay.
+Final documentation gate and actual diff review pass before commit.

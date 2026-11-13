@@ -550,7 +550,7 @@ Git 2.49.0.windows.1，`core.autocrlf=false`、`core.safecrlf=false`、
 | base/cvidc/j_c_lang.h | 7/0/1 | CrulesRuntimeError 显式声明。R |
 | base/cvidc/sascdef.c | 4/1/1 | SAS vector 空槽与 c_IOVirtualised 实际结构对齐。R |
 | base/cvidc/vglfunc.c | 5/0/1 | IFN1 在仅声明处生成有效函数原型。R |
-| base/inc/ckmalloc.h | 4/0/1 | stdlib 防止 malloc 隐式 int 截断。R |
+| base/inc/ckmalloc.h | 0/0/0 | T100 S1 P74 restores fixed XP text; actual callers already include stdlib.h. |
 | base/inc/cpu_vid.h | 15/2/2 | READ_POINTERS 选中 ABI；T60 S5 writer 声明。R |
 | base/inc/egacpu.h | 17/2/3 | C_VID 字段类型及选中头，保留原有非 C_VID 分支。R |
 | base/inc/egaports.h | 2/0/1 | T60 pel panning 查询声明。R |

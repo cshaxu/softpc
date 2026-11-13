@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P73 audits files 326-329: base_def.h, bios.h, build_id.h and cga.h.
-Retained content equals fixed XP outside existing exclusions/scaffolding;
-build_id.h equals the complete normalized original. No code changes or new
-residual decisions. Published EXEs remain P66 with 392/392 full regression;
-no new build/test run is claimed. Frozen frontier 329/472; next file 330
-base/inc/ckmalloc.h. See the
+T100 S1 P74 restores file 330 ckmalloc.h exactly to fixed XP text, removing
+four redundant include/reason lines. Production +0/-4; XP diff reduces by four
+lines. All actual callers already include allocator declarations. Both cached
+builds and fresh EXE publication pass; x86/x64 each pass 188 background and
+eight native tests, 392/392 first run. Frozen frontier 330/472; next file 331
+base/inc/cmos.h. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
