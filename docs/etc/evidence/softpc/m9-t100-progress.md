@@ -6390,3 +6390,57 @@ qualified owner decisions remain open. User configuration/media are untouched.
 P84 mirror/documentation gates and actual nine-file diff review pass. Both
 owned workers exited; scratch preview, exact removal and residue check pass.
 No unrelated worktree changes or retained temporary probe files remain.
+
+## File 359: gvi.h (P85)
+
+Pinned XP raw SHA-256 4c49d9dc3c0107f5090e446ec72d59ec466c5d3b22e0c7a47f52bd0aad404c62.
+The complete normalized file comparison finds one non-exclusion addition before
+XP line 491: local lines 292-294, the reason comment, get_chain2_screen_ptr
+macro and diagnostic line restoration. Existing excluded bodies/scaffolding
+are skipped without new accounting. All remaining selected text matches XP.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0434 | Added CHAIN2 display-offset conversion, three added lines including reason and line control. | Qualified residual pending owner decision. Actual nt_cga.c and gfx_updt.c consumers need the selected odd/even plane layout; restoring the original direct offset in both consumers fails the actual text painter oracle on x86 and x64. This is coupled to the independently demonstrated layout requirement, including R0362, not proof merely from current caller dependence. |
+
+Source chain: the existing BIOS/C-VID writes and unchained readback retain
+character and attribute lanes in the four-plane backing. Text update offsets
+advance four units per cell, while successive backing cells are eight bytes
+apart. The added conversion maps offset 12 to 24 and offset 13 to 25;
+blind doubling would incorrectly move the attribute lane. nt_text gathers
+four-byte host cells with an eight-byte source step; gfx_updt uses the same
+conversion for initial addresses and cursor attributes. All production macro
+references occur in those two files. Zero-offset calls remain deliberately
+consistent with this address contract; replacing them individually provides
+no coherent simplification. No duplicate Compat implementation is substituted.
+
+Focused dynamic proof on the unchanged P84 production baseline: the existing
+vga_frame_smoke executable passes on x86 and x64, exit 0. A task-local header
+variant maps get_chain2_screen_ptr directly to the original get_screen_ptr.
+Both actual consumer objects are recompiled with their real Ninja arguments,
+inserted into a copied machine archive, and linked to the unchanged fixture.
+Both compile/link successfully, then fail the identical full-cell comparison
+at vga_frame_smoke.c:390. x86 exits 3221226505 and x64 exits 3; both processes
+exit naturally. The oracle independently selects raw source bytes by cell,
+including nonzero partial-region origin, multiple pitches and row counts.
+This is an actual painter regression, not a new Win3.1 guest reproduction.
+The earlier actual BIOS/C-VID handoff proof supplies the independent layout
+basis; this probe does not claim a whole-layout XP rollback was performed.
+
+The local reason marker explains a qualified semantic difference and the
+#line restores the original diagnostic location; removing either is not an
+exact restoration of a separately unnecessary adaptation. The pending option
+is retain this three-line addition together with the established layout
+contract, or owner-directed coherent restoration of that contract. No new
+mirror patch, fallback, dispatch or permanent test API is added.
+
+Production/test/build source changes: zero. XP-relative diff reduction: zero;
+qualified residual: +3/-0, awaiting owner decision. Existing published EXEs
+are unchanged; no new build/publication or full regression is claimed. P84
+remains the published artifact baseline, P80 the 392/392 full-runtime baseline.
+Frozen audited frontier advances to 359/472; next is file 360 base/inc/host.h.
+S1 and the pending difference decisions remain open.
+
+P85 actual three-file documentation review and mirror/documentation gates pass.
+The worker and owned children exited; task-scratch preview, exact removal and
+residue check pass. No configuration, guest asset or published binary changed.

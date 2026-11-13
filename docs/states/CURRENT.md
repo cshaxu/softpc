@@ -30,13 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P84 restores gfx_upd.h's original comment and gmi.h's original
-selected member declarations. Eight actual dual-width preprocessed pairs match;
-both cached builds/publications pass and complete EXEs differ only in verified
-build metadata. The owner-approved equivalence exception omits a repeat full
-suite; P80's 392/392 remains the runtime baseline. Production +8/-11; XP diff
-decreases nineteen lines. gfitest.h/gispsvga.h retained content also matches XP.
-Frozen frontier 358/472; next file 359 base/inc/gvi.h.
+T100 S1 P85 completes file 359 gvi.h's selected-difference audit. Its CHAIN2
+address conversion is a qualified residual pending owner decision: both current
+VGA fixtures pass, while original direct-offset consumers fail the same painter
+oracle on both architectures. No production, test source or EXE changes.
+P84 remains the published artifact baseline; P80's 392/392 is the full runtime
+baseline. Frozen frontier 359/472; next file 360 base/inc/host.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
