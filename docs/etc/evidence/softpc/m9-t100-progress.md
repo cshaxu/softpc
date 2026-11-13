@@ -2124,3 +2124,173 @@ Actual dependency object paths (same set on both widths; all unchanged):
 - `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/compat/dib_surface.c.obj`
 - `CMakeFiles/softpc-vga-frame-smoke.dir/test/app-softpc/unit/machine/chain2_rule_smoke.c.obj`
 - `CMakeFiles/softpc-vga-frame-smoke.dir/test/app-softpc/unit/machine/vga_frame_smoke.c.obj`
+
+## File 275 ev_glue.c investigation after P26
+
+Enumerated current/fixed-XP differences: stdio/inttypes includes, three header
+selection changes, GDP slot include/allocation, two diagnostic formats,
+CHAIN2 range bridge/selection, two BIOS writer parameter changes. Existing
+#error body is skipped without an entry. No production edit has been made.
+
+Actual command-line isolated compilation and actual VGA test link provide:
+
+| Candidate | x86 | x64 |
+| --- | --- | --- |
+| Current | Compile and actual VGA pass | Compile and actual VGA pass |
+| Remove added stdio | Object identical | Object identical |
+| Restore quoted evidfunc.h | Object identical | Object identical |
+| Restore quoted Evid_c.h | Object identical | Compiles, object differs |
+| Restore quoted j_c_lang.h | Object identical | Object identical |
+| Restore original BIOS byte parameter types | Compiles, object differs | Compiles, object differs |
+| Restore original BIOS word parameter types | Compiles, object differs | Compiles, object differs |
+| Restore original diagnostic formats/remove inttypes | Compiles, object differs | Compiles, object differs |
+| Remove CHAIN2 bridge; case 4 selects existing Unchained functions directly | Actual VGA passes | Actual VGA passes |
+
+The first isolated link attempt assumed a separate CCPU archive which the
+actual link does not contain; it terminated before testing. Corrected probe
+uses the actual combined libsoftpc-machine.a and overrides only ev_glue's
+object. Current and direct-marker executions above are the corrected actual
+results, not the abandoned link attempt. Each source retains original local
+quoted-header search paths, and no test/guest source is altered.
+
+These results are not yet complete necessity conclusions. In particular the
+CHAIN2 bridge cannot be retained just because it was previously accepted:
+its replacement by existing Unchained markers passes both actual VGA suites.
+Need inspect exact dirty footprint, odd/even offsets, zero/edge counts and
+bank bounds before deciding removal; tests may allow excess marking. Real
+producer gfx_updt selects case 4 for CHAIN2. If removal is justified, coupling
+that selection to original case 2 must be assessed against original XP diff,
+not leave an unnecessary alias path merely to preserve current tests.
+
+GDP include/create are a separate representation issue: original direct
+SubrRing pointer slots at offsets 8/12/16 are four bytes apart, whereas pointers
+are eight bytes on x64. Simply restoring malloc while retaining slot APIs is
+not a coherent original control. Original setup_global_data_ptr and
+setup_vga_globals need a paired raw-layout comparison; this remains unfinished.
+No claim of dynamic GDP failure is made in this investigation record.
+
+BIOS original narrow argument types can change truncation relative to the
+current ULONG callback contract; inspect actual caller values before deciding.
+Quoted Evid_c.h x64 differences also require semantic review, not automatic
+retention based solely on changed object bytes. File 275 remains under audit,
+reviewed count 274/472; no P27, publication or full-file completion claimed.
+
+### File 275 extended controls (no production edit)
+
+The paired GDP control uses the actual ev_glue setup_global_data_ptr and
+setup_vga_globals bodies. Its original variant restores both host_malloc(64 KiB)
+and original direct GDP macros together, not a malloc/slot-API mismatch. It
+checks all three ring pointers against the actual SubrRingBuffer. x86 current
+and original both pass (1/1/1); x64 current passes, original returns 1 with
+ptr/low/high = 0/0/1. Original offsets 8/12/16 overlap eight-byte pointers.
+This proves the narrow initialization ABI failure, not guest execution.
+
+Extended actual VGA executable controls independently restore the BIOS byte
+and word parameter declarations, printf formats and quoted Evid_c header.
+Byte, word and printf restorations pass on both architectures. Quoted Evid_c
+passes x86 but x64 exits 3221225477. The two headers differ in the native-width
+video-base member; the GDP adapter and other consumers use the CCPU aggregate.
+Counter-review: this single-header failure is not yet proof against every
+coherent aggregate restoration; inspect that boundary before qualifying it.
+
+Source counter-review of direct Unchained marking found that its string marker
+marks through (offset+count)>>2 inclusively, whereas the bridge rounds the
+last included address. Zero count also writes a bitmap cell although total
+remains zero. Existing passing tests check total for zero count and permit
+excess high bounds, so they do not prove identical dirty footprints. These
+findings require real caller/capacity analysis, not an automatic retention
+claim. Actual host allocation is 0x20000 bytes; the source scan found it in
+host/src/nt_graph.c. File 275 remains unfinished at sequential count 274/472.
+
+## File 275 P27 restoration and counter-review (verification running)
+
+Before: ev_glue.c in-scope XP diff +53/-8 = 61 lines, 11 contiguous
+SequenceMatcher non-equal ranges. After: +3/-2 = 5 lines, three ranges.
+Delta -56 lines/-8 contiguous points. Existing exclusions are omitted from
+this comparison, without individual accounting. IDs below split independent
+changes sharing a range; they are not the mechanical contiguous-point count.
+
+| ID | Original/current point | Executor disposition | Independent counter-review |
+| --- | --- | --- | --- |
+| R0252 | After host_def include: added stdio/inttypes | Remove both additions | stdio-only object identical; diagnostic restoration passes actual VGA both widths; original mirror warnings remain unsuppressed. |
+| R0253 | XP line 28 evidfunc include | Restore exact quoted original | Actual consumer selects original declarations and vector addresses; both objects identical in control. |
+| R0254 | Added gdp_slots include | Evidence-qualified pending owner decision | Pair with R0263; original fixed-offset initialization actually corrupts x64 ring pointers. |
+| R0255 | XP line 35 Evid_c include | Evidence-qualified pending owner decision | CCPU aggregate is 240 bytes x64, original CVID 232; route_reg1 offsets 168/160, wrstate 236/228. x86 both 156 bytes. Existing GDP owner requires one matching aggregate width. Single-header x64 VGA control access-violates; no claim of all-family restoration testing. Rewriting the other original aggregate/users adds differences and is not an admitted reduction. |
+| R0256 | XP line 36 j_c_lang include | Restore exact quoted original | Both objects identical; shared jcode register declarations remain native width. |
+| R0257 | XP line 503 mode-0 diagnostic | Restore original format/argument | chain index is actual mode selector 0..2; cevid_verbose remains false in production, no surviving production setter found. No evidence of a required product behavior fix. |
+| R0258 | XP line 514 mode-1 diagnostic | Restore original format/argument | Same supported domain; both actual VGA controls pass. No claim of general varargs type compatibility. |
+| R0259 | Added CHAIN2 bridge before setMarkPointers | Remove helper and three wrappers | Original markers cover all affected groups. Extra inclusive string-end mark is bounded, not lost drawing; no necessary bridge semantics established. |
+| R0260 | Added mark selector 4 | Restore original switch | Production gfx_updt selects existing 2 instead; no alias/second marker path remains. |
+| R0261 | XP line 709 BIOS byte signature | Restore IU8/IU32 | Real video.c callers pass getAL()/byte ch; valid values already fit. Actual VGA passes both widths. Original callback declaration mismatch is not concealed. |
+| R0262 | XP line 719 BIOS word signature | Restore IU16/IU32 | Real caller combines BL:AL; values fit 16 bits. Actual VGA passes both widths. |
+| R0263 | XP line 792 GDP allocation | Evidence-qualified pending owner decision | Paired original allocation/macros control x64 ptr/low/high=0/0/1 versus current 1/1/1; x86 both pass. No partial malloc/slot mismatch used as proof. |
+
+CHAIN2 boundary reasoning: original v7_get_banks masks non-CHAIN4 bank to
+0/1; set_banking translates this to bitmap bias 0/0x4000. A 64-KiB source
+range ends at most at bitmap cell 0x8000 including the original string
+marker's extra endpoint, inside host_init_screen's 0x20000-byte allocation.
+Byte and word markers cover the same required quarter-address groups. The
+string marker may dirty one extra group and reports original byte-count work;
+this can cause conservative redraw/full-refresh threshold timing, not missing
+writes. ega_graph_update returns when dirty_total is zero and clips dirty
+lines to the displayed extent. Zero-count bitmap marking alone does not
+request painting. We do not claim byte-identical internal bookkeeping.
+
+Coupled gfx_updt edit changes only existing SetMarkPointers(4) to (2); its
+XP-relative diff size/point count does not increase. This is not a full audit
+of that later ordered file. Existing actual VGA regression now also covers
+end-of-aperture byte/word addresses, both bank offsets, string lengths 1..16
+clipped to the aperture, every required dirty group, outer sentinel cells,
+zero dirty total, and saved argument registers. No test-only production API.
+Production +7/-51 (net -44), tests +20/-13 (net +7). Four functions and the
+additional selector are removed rather than relocated to Compat.
+
+Only the already-existing GDP include/allocation and matching aggregate
+selection remain, pending owner disposition; no new mirror difference is
+introduced. Manifest reflects final candidate bytes. Final dual build/full
+regression/publication and delivery results follow after their actual exit.
+
+Following identical files, checked directly against the fixed XP commit:
+
+- 276 base/cvidc/fpu_c.h: normalized identical, SHA-256
+  bc4960c41d182fc7da103a32f1229b5e5f725fee14808988129ca0763bb4892a.
+- 277 base/cvidc/gdpvar.h: normalized identical, SHA-256
+  d88750cd024f1ac99e06560593e07cf4712a8aec043cb052b738739f9fc4dad7.
+
+No restoration, new point or caller change is needed for these two files.
+
+### P27 final-source verification and actual-change review
+
+Both cached ninja-ccache-tests builds exit 0 and publish the final EXEs.
+Each architecture passes all 188 background tests and all eight explicitly
+selected desktop/native-audio tests: fresh 392/392, no retry or previous-run
+substitution. VGA tests include the actual selected rule writers, bank/end
+boundaries and composed pixel/mode regressions. Package tests pass in the
+active Console session. This is automated regression evidence, not a fresh
+manual Win3.1/Win95 media session or exhaustive register-state proof.
+
+Published compiler timestamps: x86 Nov 13 2026 03:44:12; x64 Nov 13 2026
+03:47:44. Relative to P26, EXEs decrease 676 and 673 bytes respectively;
+these are substantive artifacts, so the equivalence exemption is not used.
+Mirror gate and documentation gate pass. Warning scan finds only original
+mirror code/header diagnostics, not new shared/Compat/test-source warnings;
+no suppression was introduced. git diff --check passes.
+
+Coordinator actual-diff review: exact original restores except the three
+qualified residuals; the only coupled production change selects existing
+marker 2; no new function, alias, branch, allocation owner or Compat path.
+Tests extend the existing owner fixture and retain actual rule calls. No user
+configuration, snapshot, media, firmware, shared package or sibling changes.
+In-scope mirror reduction is 56 lines/eight contiguous diff points; the
+producer selector replacement adds no new XP difference. Final reviewed
+sequence is 277/472; next is 278 base/cvidc/j_c_lang.c. R0254/R0255/R0263
+and earlier evidence-qualified items remain pending owner decision.
+
+Published softpc32.exe SHA-256: 3780db1c2a480c1c320a841e29ce5c1861ddf33912d6598b364a7fdb85cd464a.
+
+Published softpc64.exe SHA-256: 12b71510ce0058132c5b3c9cc16463ab7692f69692b3aed9409759af19f540c1.
+
+All owned probe/build/test processes were terminal before cleanup. The exact
+active scratch child was previewed and removed; Clean-Build -Check passes.
+Reusable Ninja/ccache roots remain. P27 is a complete file delivery, not S1
+closure or approval of the evidence-qualified residuals.

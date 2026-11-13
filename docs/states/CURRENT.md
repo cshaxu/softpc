@@ -30,14 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P26 restores evidgen.h completely to XP, removing unnecessary callback
-type rewriting and direct declarations. All 28 actual dependent objects at each
-architecture remain byte-identical. Production +8/-21; no test changes; XP diff
-decreases 29 lines/six points. Cached dual build/publication and actual VGA
-regressions pass; EXEs equal P25 except timestamp/PE metadata. The approved
-equivalence exception reuses P22's 392 full passes through equivalent deliveries;
-no fresh P26 full suite is claimed. Mirror/documentation/diff checks pass.
-evid_c.h is normalized identical. Sequential review is 274/472; next ev_glue.c (275).
+T100 S1 P27 restores unnecessary ev_glue declarations/formats and removes the
+CHAIN2 bridge/extra selector. Its producer uses existing marker 2. Production
++7/-51; tests +20/-13. In-scope XP diff falls 61 to five lines, 11 to three
+contiguous points; coupled gfx_updt gains no diff. GDP/native aggregate
+residuals have concrete ABI evidence and remain pending owner decision.
+Cached dual build/publication and fresh full tests pass: 188 background plus
+eight native tests per architecture, 392/392 without retry. Mirror/documentation
+and diff checks pass; only original mirror warnings remain. Actual-change
+review finds no new path or ownership. Following fpu_c.h/gdpvar.h match fixed
+XP exactly after newline normalization. Reviewed sequence: 277/472; next is
+278 base/cvidc/j_c_lang.c. S1 is active, not closed.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

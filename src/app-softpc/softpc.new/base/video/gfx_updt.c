@@ -3888,7 +3888,7 @@ set_mark_funcs IFN0()
 				case CHAIN2:
 					/* DIVERGENCE(T88-CHAIN2-DIRTY): select the EGA
 					 * bitmap marker, not stale CGA/text pointers. */
-					SetMarkPointers(4);
+					SetMarkPointers(2);
 #line 3831
 
 					break;

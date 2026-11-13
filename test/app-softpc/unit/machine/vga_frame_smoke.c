@@ -1531,7 +1531,7 @@ static void verify_text_plane_handoff(void)
 static void verify_chain2_dirty_entries(void)
 {
     extern void softpc_test_chain2_continuations(void);
-    const unsigned offsets[] = { 0x100, 0x101, 0x107, 0x2100 };
+    const unsigned offsets[] = { 0x100, 0x101, 0x107, 0x2100, 0xfffe, 0xffff };
     EVID_WRT_POINTERS saved_writer;
     unsigned marking, mode, entry, group;
 
@@ -1548,7 +1548,7 @@ static void verify_chain2_dirty_entries(void)
     for (mode = 0; mode < 5; ++mode)
     for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
         unsigned offset = offsets[entry];
-        setMarkPointers(marking == 2 ? 4 : marking);
+        setMarkPointers(marking);
         c_ev_write_ptr = chain2_evid[mode];
         lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
         setVideodirty_total(0);
@@ -1571,7 +1571,7 @@ static void verify_chain2_dirty_entries(void)
     }
     /* Bank conversion belongs to the existing marker, not each writer.
        Probe it without manufacturing a different physical write mapping. */
-    setMarkPointers(4);
+    setMarkPointers(2);
     for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
         unsigned offset = offsets[entry];
         lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
@@ -1584,18 +1584,25 @@ static void verify_chain2_dirty_entries(void)
         assert(getVideodirty_high() >= ((offset + 1) >> 2));
         assert(r2 == offset && r3 == 0xa5);
     }
-    for (group = 0; group < 2; ++group) {
+    for (group = 0; group < 2; ++group)
+    for (entry = 0; entry < sizeof(offsets) / sizeof(offsets[0]); ++entry) {
         unsigned bank = group ? 0x4000 : 0;
+        unsigned offset = offsets[entry], count;
         setVideov7_bank_vid_copy_off(bank);
-        lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
-        setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
-        r1 = (IHPE)Gdp; r2 = 0x100; r3 = 16;
-        ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
-        assert(video_copy[bank + 0x40] != 0 && video_copy[bank + 0x43] != 0);
-        assert(getVideodirty_low() == bank + 0x40);
-        assert(getVideodirty_high() >= bank + 0x43);
-        assert(r2 == 0x100 && r3 == 16);
-        setVideodirty_total(0); r2 = 0x100; r3 = 0;
+        for (count = 1; count <= 16 && count <= 0x10000 - offset; ++count) {
+            unsigned first = bank + offset / 4;
+            unsigned last = bank + (offset + count - 1) / 4, cell;
+            lib_memory_set(video_copy, 0, EGA_PLANE_SIZE);
+            setVideodirty_total(0); setVideodirty_low(INT_MAX); setVideodirty_high(-1);
+            r1 = (IHPE)Gdp; r2 = offset; r3 = count;
+            ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
+            for (cell = first; cell <= last; ++cell) assert(video_copy[cell] != 0);
+            assert(getVideodirty_low() == first);
+            assert(getVideodirty_high() >= last && getVideodirty_high() <= last + 1);
+            assert(video_copy[first - 1] == 0 && video_copy[last + 2] == 0);
+            assert(r2 == offset && r3 == count);
+        }
+        setVideodirty_total(0); r2 = offset; r3 = 0;
         ((IHPE (*)(IHPE, IHPE, IHPE, IHPE))getVideomark_string())(0, 0, 0, 0);
         assert(getVideodirty_total() == 0);
     }
