@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P91 completes files 370-376: selected register, keyboard, mouse,
-PPI and printer header content matches XP outside existing exclusions/scaffolding.
-Original includes remain; no production/test/EXE changes or new retention points.
-P87 remains the artifact baseline, P80's 392/392 the full-runtime baseline.
-Frozen frontier 376/472; next file 377 base/inc/quick_ev.h requires investigation.
+T100 S1 P92 completes file 377 quick_ev.h: remove five redundant explanation
+lines; retain 35 snapshot declaration lines as an evidence-qualified owner
+decision. Original queue ownership and actual snapshot consumers are traced.
+Both cached builds and focused checkpoint tests pass; published EXEs differ
+only in verified timestamp metadata. P80's 392/392 remains the full-runtime baseline.
+Frozen frontier 377/472; next file 378 base/inc/rom.h requires investigation.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

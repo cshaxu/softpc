@@ -18,11 +18,6 @@
 
 typedef void (*Q_CALLBACK_FN) IPT1(long, parm);
 
-/*
- * Snapshot records describe pending work only.  They deliberately contain no
- * queue links or callback addresses: the caller translates callbacks to its
- * own stable semantic identifiers, and quick_ev rebuilds its private lists.
- */
 typedef struct q_event_snapshot_entry {
 	unsigned long time_from_last;
 	unsigned long original_time;

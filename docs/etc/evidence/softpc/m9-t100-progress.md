@@ -6714,3 +6714,84 @@ S1 and earlier qualified pending decisions remain open.
 
 P91 actual three-file documentation review, mirror/documentation gates and
 build residue check pass. No task processes, scratch or unrelated edits exist.
+
+## File 377: quick_ev.h (P92)
+
+Pinned XP raw SHA-256:
+`5f1c17105d08a7604cc5cc5101ad2276b1825a46200d28e36cd52d81debb5874`.
+The complete selected-header comparison has two insertion ranges before XP
+lines 21 and 29. Existing NTVDM exclusion/scaffolding is skipped without new
+accounting. All other selected text matches the pinned XP file.
+
+| Point | Original/local scope | Initial analysis | Independent counter-review | Disposition |
+| --- | --- | --- | --- | --- |
+| R0441 | XP before line 21; previous local lines 21-25 | Five added explanation lines do not declare state or affect preprocessing. | They are an ordinary complete comment, not a notice, directive, macro continuation or required line-control marker; the implementation already explains the same archive boundary. | Restore absence exactly: +0/-5 production and five fewer XP-relative added lines. |
+| R0442 | XP before lines 21 and 29; final local lines 21-46 and 55-63 | Two snapshot record types, two callback types and three snapshot entry declarations support actual pending-event archival. | Mere current references would not suffice. The original private queue and original add API cannot enumerate or reconstruct the saved state; see source proof below. No separate Compat scheduler replaces it. | Qualified pending owner decision, +35/-0 relative XP; not automatically approved. |
+
+Actual compilation/call chain: root CMake includes base/system/quick_ev.c in
+softpc-machine. Machine snapshot_image.c capture/restore calls Compat CCPU
+archive.c, then Compat devices/archive.c. The latter measures queue capacities,
+captures records, serializes them with explicit u32 fields, and restores them
+with stable callback-ID decoding. All three added APIs have production calls.
+The structures are also used by the actual quick_ev.c provider, not merely tests.
+
+Source necessity proof: the original Q_EVENT node and both queue heads, hash
+tables, next-handle counters and tic countdown belong to quick_ev.c's private
+state. The XP public interface supplies add/delete/dispatch/init, but no readout
+or restore operation. add_event allocates a new handle and changes queue timing;
+it immediately calls the callback when time is zero. Replaying adds therefore
+cannot restore the original handles/countdowns and would allow callbacks during
+load. Removing the declarations together with their provider/caller wiring would
+remove pending-event restoration from an actual supported snapshot operation;
+moving a copy of queue internals into Compat would duplicate the state owner.
+This is source/contract evidence, not a claim that a deliberately uncompilable
+header alone proves necessity or that every possible redesign has been tested.
+
+Field mapping was checked end to end: time_from_last/original_time/event_type
+retain the original queue scheduling representation; handle/param retain device
+references and callback argument; callback_id replaces process-local function
+addresses. hash_next_index and the two 16-entry heads retain the original
+hash-list ordering as indices rather than native pointers. next handles, counts
+and entry totals cover allocator position, countdown and payload bounds.
+Capture and restore read/write every field; device_write_queue/device_read_queue
+serialize every field. No unused field or unused entry was found. The original
+queue remains the only scheduler; archive records are copies, not another live
+queue. This header audit does not claim the later quick_ev.c file's complete
+implementation has already passed its ordered diff audit.
+
+Fresh focused dynamic proof: existing checkpoint_smoke invokes
+verify_event_queue_archive through its main. It captures two quick events and
+one tick event, rejects an invalid late callback without destroying the live
+queue, clears and restores the queues without running callbacks, checks saved
+countdown, and then dispatches the expected event order. The same executable
+also exercises the existing snapshot integration assertions. Both current x86
+and x64 tests pass (1/1 each, 1.67 s and 3.18 s). No new test/source fixture or
+user snapshot was created or changed. These tests do not exhaust hash collision,
+all callback types, malformed archives or real Windows guest sessions; the
+field/ownership necessity above is source proof rather than such a claim.
+
+P92 actual production change is +0/-5, test change zero. Selected XP differences
+fall from +40/-0 to +35/-0; excluded scaffolding is unchanged. Both original
+insertion ranges remain, illustrating why range count alone is not progress.
+Manifest local hash is refreshed; XP/subset hashes remain unchanged.
+
+Cached background builds finish successfully: x86 17.27 s, x64 21.20 s. The
+985/988 warning lines all originate in preserved softpc.new, with none outside
+that mirror. Published EXE lengths are unchanged. Full-file comparison to P87
+finds 8 changed bytes in x86 and 6 in x64, all within verified compiler time,
+PE timestamp/checksum fields. No other byte changes. Compiler stamps are
+Nov 13 2026 15:38:52 / 15:39:11. Published SHA-256:
+
+- x86: `4e872186efa35a0bb8afb220f05980f0100cd92c067c5a0aa284fe3cf9c751f8`.
+- x64: `29ec4cfabddf7c2deb7537c905b2fce7c0cafb4fb94eb1d7dd2d72029f3b6072`.
+
+The owner-approved artifact-equivalence exception applies: no full-suite rerun
+is claimed; P80's 392/392 remains the latest full-runtime evidence. The focused
+snapshot results above are fresh. Frontier advances to 377/472 after this
+complete header audit; next is file 378 base/inc/rom.h. S1 and qualified owner
+decisions remain open.
+
+P92 independent actual eight-file diff review, mirror and documentation gates,
+and whitespace check pass. CIM confirms the owned runner and child jobs have
+exited. Clean-Build preview/apply removes only the task scratch; residue check
+passes. No INI, media, snapshot, unrelated source or sibling repository changed.

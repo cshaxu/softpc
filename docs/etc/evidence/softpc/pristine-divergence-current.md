@@ -2082,3 +2082,12 @@ preprocessed pairs are identical. This removes five XP-relative diff lines
 without changing native-width runtime arguments in com.c or Compat serial.c.
 The original excluded-body scaffolding remains; historical counts are not
 current selected-difference totals.
+
+### T100 S1 P92 quick_ev.h explanation restoration
+
+R0441 removes five added explanation lines, reducing the selected header's
+XP-relative additions from 40 to 35. R0442 qualifies the remaining snapshot
+records/callback types/entry declarations for owner decision using actual
+private-queue and snapshot consumer evidence. This is not automatic retention
+approval or a completed audit of quick_ev.c. Existing exclusions are unchanged.
+See m9-t100-progress.md for source proof and dual-architecture verification.
