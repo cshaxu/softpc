@@ -30,17 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P28 completely restores j_c_lang.c to fixed XP: production +2/-8,
-no test changes; mirror diff decreases 10 lines/three points to zero.
-Actual compiler controls validate 560 x86 and 2144 x64 mask combinations for
-both original/current bodies plus two invalid bounds. Cached dual build and
-publication pass; fresh full regression passes 188 background plus eight
-native tests per architecture (392/392, no retry). Original mirror printf
-warnings remain; no new suppression or non-mirror/test warning. Mirror,
-documentation and diff checks pass; actual-change review confirms complete
-normalized XP identity. Sequential review: 278/472; next 279 j_c_lang.h.
-P27's GDP/native aggregate residuals remain evidence-qualified pending owner
-decision. S1 is active, not closed.
+T100 S1 P29 restores j_c_lang.h's sole in-scope difference: production +0/-7,
+no test changes; seven XP diff lines/one point removed. Existing exclusions
+are untouched. All 35 actual dependent objects per architecture are identical
+(70/70). Cached dual build/publication passes; EXEs differ from P28 only in
+validated timestamp/PE metadata (nine bytes each). Fresh x86/x64 VGA tests
+pass; approved equivalence reuses P28's 392/392 full result, not a new full run.
+Mirror/documentation/diff checks and actual-change review pass; only original
+mirror warnings remain. Following pigger_c.h matches fixed XP. Sequential
+review: 280/472; next 281 base/cvidc/sas4gen.h. Prior evidence-qualified ABI
+residuals remain pending owner decision. S1 is active, not closed.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

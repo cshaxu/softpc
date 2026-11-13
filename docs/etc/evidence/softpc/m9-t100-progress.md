@@ -2364,3 +2364,68 @@ softpc64.exe: compiler timestamp Nov 13 2026 03:59:05; SHA-256 ed1f58f20315aa297
 P28 owned processes were terminal before the exact task scratch was previewed
 and removed. Clean-Build -Check passes; only reusable caches remain. This is
 a verified complete-file delivery, not S1 closure.
+
+## File 279 j_c_lang.h / P29 candidate
+
+R0267 covers the only in-scope difference: seven added lines after rolb's
+original prototype, declaring CrulesRuntimeError and asserting an ABI need.
+Remove that whole addition; retain all original declarations and established
+excluded-body scaffolding unchanged. Production +0/-7, no tests changed;
+in-scope XP diff +7/-0, one point, becomes zero. This is not whole-file raw
+identity because existing exclusions remain; they receive no new accounting.
+
+Executor: 2465 actual source call expressions across 31 C-VID files pass
+literal string pointers as standalone statements. They do not consume a
+return value. Original ev_glue supplies void(char *) with the same pointer
+parameter. No Compat/test use is found. Original implicit-call rules do not
+narrow pointer arguments through default promotion, and the ignored return
+does not provide a necessary conversion. Historical marker wording alone
+cannot establish an ABI repair.
+
+Counter-review: test compiler acceptance and emitted code, not source intent
+alone. Normalize Ninja's CRLF dependency dump before parsing blocks; assert
+actual source object identities. Final capture finds 35 real consumers per
+architecture: 31 sevid units, sinit011/012/013 and ev_glue. Their before hashes
+and P28 published EXEs are captured before the header edit. Both cached builds
+and whole-object/artifact comparison are running. Only exact object identity
+and EXE differences restricted to validated timestamp/PE metadata may reuse
+P28's fresh 392-pass full result; otherwise run a fresh full suite.
+
+Following file 280 pigger_c.h is normalized identical to the fixed XP commit,
+SHA-256 da8c15abd4725222119197bdbfe4c9abcfd89dd1f281f0573b573a196a2ab180.
+No modification or new audit point is required for it.
+
+### P29 final verification and actual-change review
+
+Both cached builds/publications pass. All 35 actual consumer objects per
+architecture are byte-identical before/after (70/70). P28 and P29 EXE sizes
+are equal: x86 3515785, x64 3115113 bytes. Each EXE differs at nine bytes only,
+within PE COFF timestamp, PE optional-header checksum and one same-offset
+validated HH:MM:SS literal. A separate review zeros exactly those ranges and
+compares every remaining byte again: both pass. No executable section or
+arbitrary changed byte is excluded. Literal offsets/times: x86 2435392,
+03:55:23 -> 04:06:38; x64 2289120, 03:59:05 -> 04:07:10 (Nov 13 2026).
+
+Fresh actual VGA tests pass x86/x64 (6.51/5.41 seconds). The owner-approved
+artifact-equivalence exception reuses P28's fresh 392/392 full result; no
+fresh P29 full-suite run is claimed. Mirror, documentation and diff gates
+pass. Recompiled original generated-rule/header warnings remain; no new
+suppression or non-mirror/test warning is introduced.
+
+Coordinator actual-diff review: only seven added declaration/comment lines
+are removed; no argument/register/field conversion or resource path changes.
+Original diagnostics and call expressions remain. Zero in-scope XP difference
+is not a claim of whole raw-header identity: established excluded content
+remains untouched. R0267 is restored/verified, not retained for approval.
+Following identical pigger_c.h needs no edit. Sequential review is 280/472;
+next 281 base/cvidc/sas4gen.h. Production +0/-7, tests +0/-0; XP difference
+reduced seven lines/one point. No configuration, snapshots, media, guests,
+shared packages or external repositories are modified.
+
+Published softpc32.exe SHA-256: d7b0fe27e918573f06326f5b70952bc4c6a51ee5323bbfc2e094c9c6a120c6ec.
+
+Published softpc64.exe SHA-256: 0e0aa4eb3d777201633c7aafe4906d7d21f314dbebf4369a93fabd216d040698.
+
+P29 owned processes were terminal; exact task scratch was previewed and
+removed. Clean-Build -Check passes. Reusable caches are preserved; no pending
+probe or unfinished verification is represented as completed.
