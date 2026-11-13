@@ -325,7 +325,7 @@ half_word *low, *high;
 
     /* set the value of the high switches from the config settings */
 
-    switch((ULONG_PTR)config_inquire(C_GFX_ADAPTER, NULL))
+    switch((ULONG)config_inquire(C_GFX_ADAPTER, NULL))
     {
     case CGA:
 #ifdef CGAMONO
@@ -400,11 +400,11 @@ void reset()
 #ifndef NEC_98
 #line 685
 #ifdef PM
-	half_word status_byte;
-	half_word cmos_shutdown;
-	sys_addr user_stack;
-	word temp_word;
-#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
+        half_word status_byte;
+        half_word cmos_shutdown;
+        sys_addr user_stack;
+        word temp_word;
+#ifdef NTVDM
         half_word cmos_diskette;
 #endif
 
@@ -626,10 +626,6 @@ void reset()
 #ifdef HFX
 #error "Unsupported SoftPC mirror configuration: HFX"
 #endif
-#line 745
-		/* These calls manage DOS mouse-driver instance storage, not INT 33
-		 * installation.  Standalone omits that software driver; physical
-		 * mouse hardware is initialised separately by mouse_init() below. */
 #line 912
 
                 q_event_init();
@@ -683,11 +679,10 @@ void reset()
 #endif /* !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX)) || defined(ARCX86) */
 #line 962
 #endif // !NEC_98
-#line 962
-
+#line 963
 
 #ifndef NTVDM
-#line 966
+
         /* Initialise the physical devices */
         SWPIC_init_funcptrs ();
 
@@ -736,23 +731,28 @@ void reset()
 #error "Unsupported SoftPC mirror configuration: !PRINTER"
 #endif /* PRINTER */
 #line 1023
-	equip_flag.bits.game_io_present = FALSE;
-	equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
-	equip_flag.bits.ram_size = 0;
-#if defined(NTVDM) || defined(SOFTPC_STANDALONE)
-	/* Standalone equipment is the attached FDC topology, not the
-	   original product default that always exposed a floppy. */
-	equip_flag.bits.diskette_present = FALSE;
-	equip_flag.bits.max_diskette = 0;
-	if (cmos_read_byte(CMOS_DISKETTE, &cmos_diskette) == SUCCESS &&
-	    cmos_diskette != 0)
+        equip_flag.bits.game_io_present = FALSE;
+        equip_flag.bits.rs232_count = NUM_SERIAL_PORTS;
+        equip_flag.bits.ram_size = 0;
+
+#ifdef NTVDM
+        equip_flag.bits.diskette_present = FALSE;
+        equip_flag.bits.max_diskette = 0;
+        if (cmos_read_byte(CMOS_DISKETTE, &cmos_diskette) == SUCCESS &&
+            cmos_diskette != 0)
         {
             equip_flag.bits.diskette_present = TRUE;
             if ((cmos_diskette & 0xF)  && (cmos_diskette >> 4))
                 equip_flag.bits.max_diskette++;
-	}
+        }
 #else
-#error "Unsupported SoftPC mirror configuration: non-NTVDM outside standalone"
+
+        /* 20/10/93 PaulC - set the diskette_present bit regardless of */
+        /* whether or not any floppies are configured. Not having the  */
+        /* bit set confuses DOS and Windows. See BCN 2262.             */
+
+        equip_flag.bits.diskette_present = TRUE;
+
 #endif /* NTVDM */
 #line 1046
 
@@ -761,7 +761,7 @@ void reset()
         /* Load up the amount of memory into the BIOS. */
         sas_storew(MEMORY_VAR, host_get_memory_size());
 
-	gfxAdapt = (LONG)(ULONG_PTR)config_inquire(C_GFX_ADAPTER, NULL);
+        gfxAdapt = (LONG)config_inquire(C_GFX_ADAPTER, NULL);
 
 #ifdef GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
@@ -883,11 +883,10 @@ void reset()
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* PROD */
-#line 1187
-
+#line 1188
 
 #endif  /* NTVDM */
-#line 1191
+
         /* Now search for extra ROM modules */
         search_for_roms();
 #endif // !NEC_98
@@ -959,7 +958,6 @@ void reset()
 #error "Unsupported SoftPC mirror configuration: LIM"
 #endif /* LIM */
 #line 1281
-
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"

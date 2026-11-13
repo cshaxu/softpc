@@ -2,11 +2,39 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner closes M9 T99 on 2026-11-12.
-See [T99 completion audit](../history/M9-T99-completion-audit.md).
-No next T or S is admitted.
+Owner admits M9 T100 S1 on 2026-11-12: original-first mirror audit.
+Owner confirms the method and activates S1; existing #error exclusions are
+skipped without new bookkeeping. T99 remains closed; see its
+[completion audit](../history/M9-T99-completion-audit.md).
+
+## M9 T100 S1 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | New |
+| Admission And Approval | Owner confirms the method and admits S1 execution on 2026-11-12; existing #error exclusions need no new accounting. |
+| Objective | Audit/restore mirror differences in frozen literal directory order; replace duplicate Compat behavior with original mirror implementation first, then delete whole mirror files left without necessary integration. |
+| Non-goals | No guest changes, excluded-body re-audit, automatic retention, new implementation paths or sibling modifications. |
+| Reference Baseline | SoftPC ac9d8dc85a6d9b0cc66d0a6649f60e8903406f18; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89; existing manifest records 472 retained files, not a new audit result. |
+| Candidate Proposal | [Original-first audit method](../proposals/m9-xp-mirror-original-first-audit.md). |
+| Files And ABI Surface | Selected softpc.new mirror, its provenance and necessary coupled callers/tests; disclose ABI consequences per point. |
+| Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING mirror policy and source-research-policy; owner order supersedes comparison project's ordering. |
+| Verification | Per complete substantive file: cached x86/x64 build, publish, focused/full regression, manifest and documentation gates; final-source identity required. |
+| Expected Markers | Ordered file/point progress, exact restoration, evidence-qualified owner decisions; no excluded-body ledger. |
+| Asset Needs | Preserve configuration/media/snapshots. S1 owns build/t100-s1 if needed; background jobs bounded to 2 hours and 15 minutes no progress, scratch removed after delivery. |
+| Reporting Requirements | Explain evidence threshold, exact restoration, pending decisions, file order, diff metrics and proposed delivery cadence. |
+| Stop Conditions | Unproven necessity remains investigation; evidence-backed retained differences and diff increases require owner decision. |
+| Exit Criteria | Reconcile ordered audit dispositions and delivered changes with actual diff review; no unresolved point may be reported closed. |
+| Original Owner Request | Preserved verbatim in the linked proposal. |
+| Similar-Issue Sweep | All non-excluded mirror differences, including previously approved ones, are subject to the same evidence threshold. |
 
 ## Current Technical Baseline
+
+T100 S1 P1 restores the first batch: three mirror files, XP-relative diff
+reduced by 57 lines; final dual-width builds publish both EXEs and pass
+392/392 tests. Seven of 472 files audited; reset.c DOS mouse-call omission
+awaits owner decision. File 8 slave_bs.c is next. See
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md). S1 remains active.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
 build/publication via existing cached Ninja presets. Two dual-width runs and

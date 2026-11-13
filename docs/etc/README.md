@@ -6,6 +6,7 @@ active work, current architecture, rules, or queue order.
 | Indexed subtree | Owner and purpose | Promotion or retirement condition |
 | --- | --- | --- |
 | `evidence/` | The creating task; reproducible audits, verification notes, and retained migration ledgers. | Retain while linked history/current design needs it; promote a current decision into `design/` or `rules/`, or retire it through an admitted task. |
+| `evidence/softpc/m9-t100-*` | T100 frozen file order, audit progress and original-first evidence; no existing exclusion-body records. | Retain with T100 audit history; update through the ordered audit. |
 | `evidence/m9-t85-s7-ibmpc-import-ledger.md` | T85 S7 frozen IBM PC import and prior test-exclusion dispositions. | Retain through shared import acceptance; update only through a newly admitted corpus audit. |
 | `evidence/softpc/m9-t99-s20-*.tsv` | T99 S20 frozen mirror file, conditional-arm and macro-state inventories with bounded x86/x64 observations. | Retain as audit evidence until superseded by an admitted mirror-selection audit. |
 | `evidence/softpc/pristine-divergence-current.md` | T61 frozen MVDM/OpenNT inventory, per-file reasons and cleanup dispositions; old M1 table is separately marked historical. | Recompute during admitted mirror changes; T61 S6 reconciles every original member and final disposition. |
