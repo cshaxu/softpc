@@ -30,14 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P16 restores original IRET operand-width stack-pointer loading.
-Actual dual-width CCPU probes show the removed replacement corrupts ESP on
-IRETD returning to a 16-bit stack. The new real-instruction regression rejects
-the prior object on both architectures. Production +4/-1 (net +3), tests +42;
-XP-relative difference shrinks by five lines and one point to zero outside
-existing exclusions. Both cached builds, publication and full qualification
-pass: 188 background plus eight native tests per architecture, 392/392.
-Sequential source review is 181/472; file 182 ntstubs.c is next.
+T100 S1 P17 restores ntstubs.c original includes and removes redundant gap lines.
+Production +1/-5 (net -4), tests unchanged; XP-relative diff shrinks by six
+lines and two points. Duplicate Gdp and three original no-op definitions fail
+actual links at both widths; their residual omission/declaration is pending
+owner decision. Both final cached builds and publication pass. Final objects
+are byte-identical and complete EXEs differ only in build metadata, so P16's
+392/392 qualification applies under the approved equivalence exception;
+this batch also runs dual-width isolated checkpoint comparisons.
+Sequential source review is 182/472; file 183 ntthread.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

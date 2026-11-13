@@ -1405,3 +1405,61 @@ remain pending. S1 is not closed.
 - x86 EXE SHA-256 `7f799ae3d6f7c4bda7fdfd0024479e969608532058c8d54e58a5645fb42c6901`; Nov 13 2026 01:52:13.
 
 - x64 EXE SHA-256 `7fad72fe61c90eaf3251a473de60cfc6488669f7209083115de24314107996e2`; Nov 13 2026 01:55:32.
+
+
+## P17 file 182: ntstubs original include restoration
+
+The actual softpc-ccpu-core target compiles ntstubs.c with CCPU/CPU_40_STYLE
+and without PIG. Its Video object is populated by the existing Compat bootstrap;
+its CPU/SAS bridge symbols remain required by the production archive. It cannot
+be deleted as an unused file. This is not duplicate host device implementation.
+All file differences outside skipped bodies were reviewed in source order:
+
+| Point | Original/local difference | Analysis and counter-review |
+| --- | --- | --- |
+| R0153 | evidgen.h changed to ../cvidc/evidgen.h | Restore the original spelling: the existing target already searches base/cvidc, and no competing evidgen.h exists. No CMake change is needed. |
+| R0154 | added stdio.h and separator | Restore original absence: both actual compilers accept the original builtin printf call and produce byte-identical objects. The recovered declaration warning is a mirror warning, not proof of broken supported behavior. |
+| R0155 | Gdp definition changed to extern | Both original-restoration links fail with duplicate Gdp from ev_glue.c. Original ev_glue is the active CCPU/C-VID owner; introducing flags or another mirror change merely to relocate the difference is not a reduction. Residual pending owner decision. |
+| R0156 | copyROM stub omitted | Restoring it duplicates the original rom.c definition at both widths. That file supplies real ROM discovery and cannot be omitted. Residual pending owner decision. |
+| R0157 | initialise_npx stub omitted | Restoring it duplicates the original fpu.c definition at both widths; the original FPU implementation is required. Residual pending owner decision. |
+| R0158 | npx_reset stub omitted | Same actual duplicate-symbol proof against original fpu.c. Residual pending owner decision. |
+
+The three missing functions are no-ops in both original owners. This is not a
+claim that the stubs' behavior is wrong: exactly one original definition must
+be linked. They are not replaced by new Compat implementations. Moving their
+omission to fpu.c/rom.c would add new mirror points, so that candidate is rejected
+without requesting an exception. Removing two redundant gap lines in the
+existing omission reduces its diff; existing conditional/line directives remain.
+
+Actual isolated build/link tests use the production command lines and the
+real checkpoint executable link. Independent Gdp restoration fails with one
+duplicate-symbol diagnostic per architecture. Restoring the three functions
+fails for all three named symbols on each architecture. Both links exit 1.
+Current and original-include candidates compile/link and run checkpoint on
+x86/x64. The first object hashes used distinct source filenames and therefore
+were not equivalence evidence; repeating with the same ntstubs.c basename gives
+byte-identical objects at each width. Final in-tree builds confirm that identity.
+
+Final cached x86/x64 builds and publication pass. Both complete EXEs retain
+exact lengths and differ from P16 only inside the COFF timestamp, PE checksum,
+and one compiler time string at the same offset. Every other byte is identical.
+The approved artifact-equivalence exception therefore reuses P16's 392/392
+qualification; no fresh full runtime run is claimed. The focused isolated
+checkpoint comparisons were run on both architectures in this batch.
+
+Production +1/-5 (net -4); tests unchanged. Non-excluded XP-relative diff falls
+from +6/-13 (19 lines) to +1/-12 (13 lines): six fewer difference lines, with
+the two include/declaration points removed and no new point added. The remaining
+extern and three omitted definitions have necessity evidence, not owner approval.
+The original printf declaration warning is explicitly restored under the mirror
+warning exception; shared/owned source warnings are not relaxed.
+
+Coordinator review checks actual source diff, original active definition owners,
+unchanged symbol signatures, supported include resolution, final object and EXE
+identity, preserved CRLF and no guest/configuration/shared-package changes.
+Manifest/documentation checks and build-residue cleanup accompany delivery.
+Sequential source review is 182/472; ntthread.c (183) is next and not yet audited.
+
+- x86: object `8ab6d6e33c2363ae92c940f2c72ebcce390cc42ef579684ecb3bb40776b7a20e`; EXE `1804d7c4c8afec0c6c8e53e499dd50a24d3d6ae27e99f600500607acf89c9931`; 9 metadata-only changed bytes; compiler time 01:52:13 to 02:05:58.
+
+- x64: object `0fff0b1f2de64767e6d73e56b94311eae43eb4a671de358749a475c4880b6183`; EXE `c25162c4ae7fc41b6d017bde91d69dc43a0977d9a52bc6544a25fb711b5aaaa7`; 9 metadata-only changed bytes; compiler time 01:55:32 to 02:06:09.

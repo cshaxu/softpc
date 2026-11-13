@@ -1,10 +1,8 @@
 #include "insignia.h"
 #include "host_def.h"
-#include "../cvidc/evidgen.h"
+#include "evidgen.h"
 
 #include "cpu4.h"
-
-#include <stdio.h>
 
 #ifndef PIG
 
@@ -88,8 +86,6 @@ void _asm_simulate()
 #error "Unsupported SoftPC mirror configuration: constant false"
 #endif
 #line 100
-
-
 
 
 IHPE Cpu_outb_function;
