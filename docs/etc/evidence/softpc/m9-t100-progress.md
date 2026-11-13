@@ -5757,3 +5757,32 @@ previous evidence-qualified decisions remain open; this is not task closure.
 P74 process inventory confirms all owned jobs exited. Clean-Build preview,
 exact disposable scratch removal and residue check pass; reusable caches stay.
 Final documentation gate and actual diff review pass before commit.
+
+
+## Files 331-334: CMOS, configuration and CPU headers (P75 read-only)
+
+| File | Fixed XP raw SHA-256 | Disposition |
+| --- | --- | --- |
+| cmos.h | ed45d50c623bbb896bf3c9f00b494663730f1b4829514d75657bfcc2ba6fce35 | Retained text equals XP outside existing exclusions/scaffolding. |
+| cmosbios.h | d2f031fec3938ebda4c42c2a372579b3448383ee76af71a1e20ee563af5cd3f4 | Entire normalized text equals XP. |
+| config.h | 24f83045f8fd71e60da8a83f4d670794d8306090d56c21c4d2637166ff7f3196 | Retained text equals XP outside existing exclusions/scaffolding. |
+| cpu4.h | 556863f1abb245ad9850a22e3ab9c9732f0ebb29fb5c3179faf32f1b873bec18 | Retained text equals XP outside existing exclusions/scaffolding. |
+
+All four complete files were compared in frozen sequence. config.h's apparent
+standalone deletion is inside its existing NTVDM exclusion, confirmed against
+both surrounding originals and local directives. No excluded-body accounting
+or new decision point is introduced. There is no non-excluded local change to
+restore in these files.
+
+Production consumers include original system/cmos.c (cmos.h, cmosbios.h and
+config.h), diskbios.c (cmos.h/config.h), Compat platform.c (config.h), and
+host_def.h's selected CpuH mapping to cpu4.h. These are live original interfaces.
+No duplicate replacement or file deletion is justified. Existing original
+constants, types, declarations, register mappings and notices remain unchanged.
+
+Counter-review confirms source-only equivalence, not a new dynamic device proof.
+No source/test/build/manifest/EXE changes, no new build/test execution, and zero
+XP-diff delta. P74 remains the freshly published 392/392 full regression baseline.
+Ordered frontier 334/472; file 335 cpu_vid.h has real retained ABI/declaration
+differences and is not counted complete. It requires separate coherent caller
+and provider verification. S1 and previous residual decisions remain open.
