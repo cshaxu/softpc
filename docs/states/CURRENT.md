@@ -30,15 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P65 completes file 315 sinit012.c. Restore 23 malloc operations,
-including five exact original byte-getter allocations; 18 keep native capacity.
-Production +23/-23; anchored XP difference 1409 -> 1399 lines. Actual-body
-current/candidate/poisoned-candidate tests pass 128 assertions per variant on
-both widths. Nine mixed-width zero initializations and GDP mapping remain
-qualified owner decisions with consumer limits recorded. Both EXEs published;
-full regression 392/392 passes first run. P61 resolved the legacy video-source
-callback boundary without adding a production path. Frozen frontier 315/472;
-next file 316 sinit013.c. See the
+T100 S1 P66 completes file 316 sinit013.c. Restore 29 malloc operations and
+three exact original native dereferences. Production +32/-32; XP difference
++722/-721 -> +719/-718, reducing six diff lines. Actual-body comparisons pass
+104 setter assertions and 112 controlled legacy-selector cases per variant
+per architecture; production uses the original C selectors in ev_glue.c.
+Native GDP mapping and allocation capacities remain qualified owner decisions.
+Both EXEs are published; full regression 392/392 passes first run. Frozen
+frontier 316/472; next file 317 univer_c.h. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

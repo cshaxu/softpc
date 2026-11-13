@@ -382,7 +382,7 @@ switch ( id )
 		S_0415_CiSetVideofwd_str_read_addr_00000034	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -420,7 +420,7 @@ switch ( id )
 		S_0416_CiSetVideobwd_str_read_addr_00000035	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -458,7 +458,7 @@ switch ( id )
 		S_0417_CiSetVideodirty_total_00000036	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -496,7 +496,7 @@ switch ( id )
 		S_0418_CiSetVideodirty_low_00000037	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -534,7 +534,7 @@ switch ( id )
 		S_0419_CiSetVideodirty_high_00000038	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -572,7 +572,7 @@ switch ( id )
 		S_0420_CiSetVideovideo_copy_00000039	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -610,7 +610,7 @@ switch ( id )
 		S_0421_CiSetVideomark_byte_0000003a	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -648,7 +648,7 @@ switch ( id )
 		S_0422_CiSetVideomark_word_0000003b	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -686,7 +686,7 @@ switch ( id )
 		S_0423_CiSetVideomark_string_0000003c	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -724,7 +724,7 @@ switch ( id )
 		S_0424_CiSetVideoread_shift_count_0000003d	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -762,7 +762,7 @@ switch ( id )
 		S_0425_CiSetVideoread_mapped_plane_0000003e	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -800,7 +800,7 @@ switch ( id )
 		S_0426_CiSetVideocolour_comp_0000003f	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -838,7 +838,7 @@ switch ( id )
 		S_0427_CiSetVideodont_care_00000040	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -876,7 +876,7 @@ switch ( id )
 		S_0428_CiSetVideov7_bank_vid_copy_off_00000041	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -914,7 +914,7 @@ switch ( id )
 		S_0429_CiSetVideoscreen_ptr_00000042	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -952,7 +952,7 @@ switch ( id )
 		S_0430_CiSetVideorotate_00000043	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -990,7 +990,7 @@ switch ( id )
 		S_0431_CiSetVideocalc_data_xor_00000044	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1028,7 +1028,7 @@ switch ( id )
 		S_0432_CiSetVideocalc_latch_xor_00000045	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1066,7 +1066,7 @@ switch ( id )
 		S_0433_CiSetVideoread_byte_addr_00000046	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1104,7 +1104,7 @@ switch ( id )
 		S_0434_CiSetVideov7_fg_latches_00000047	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1142,7 +1142,7 @@ switch ( id )
 		S_0435_CiSetVideoGC_regs_00000048	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1180,7 +1180,7 @@ switch ( id )
 		S_0436_CiSetVideolast_GC_index_00000049	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1218,7 +1218,7 @@ switch ( id )
 		S_0437_CiSetVideodither_0000004a	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1256,7 +1256,7 @@ switch ( id )
 		S_0438_CiSetVideowrmode_0000004b	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1294,7 +1294,7 @@ switch ( id )
 		S_0439_CiSetVideochain_0000004c	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1332,7 +1332,7 @@ switch ( id )
 		S_0440_CiSetVideowrstate_0000004d	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r21))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r21))	;	
@@ -1370,7 +1370,7 @@ switch ( id )
 		S_0441_CisetWritePointers_0000004e	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -1591,7 +1591,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	*	*((IUH	*)&(r23))	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)&(r22))	=	(IS32)(12)	;	
-	*((IUH	*)&(r20))	=	*((IUH *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IUH)))	*	*((IUH	*)&(r22))	;
+	*((IUH	*)&(r20))	=	*((IUH	*)(*((IHPE	*)&(r21)))	)	*	*((IUH	*)&(r22))	;	
 	*((IUH	*)&(r22))	=	(IS32)(4)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	*	*((IUH	*)&(r22))	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH	*)(LocalIUH+0))	;		
@@ -1627,7 +1627,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	*	*((IUH	*)&(r23))	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH	*)&(r21))	;		
 	*((IUH	*)&(r22))	=	(IS32)(12)	;	
-	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IUH)))	*	*((IUH	*)&(r22))	;
+	*((IUH	*)&(r21))	=	*((IUH	*)(*((IHPE	*)&(r20)))	)	*	*((IUH	*)&(r22))	;	
 	*((IUH	*)&(r22))	=	(IS32)(4)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	*	*((IUH	*)&(r22))	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH	*)(LocalIUH+0))	;		
@@ -1649,7 +1649,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	*	*((IUH	*)&(r23))	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)&(r22))	=	(IS32)(12)	;	
-	*((IUH	*)&(r20))	=	*((IUH *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IUH)))	*	*((IUH	*)&(r22))	;
+	*((IUH	*)&(r20))	=	*((IUH	*)(*((IHPE	*)&(r21)))	)	*	*((IUH	*)&(r22))	;	
 	*((IUH	*)&(r22))	=	(IS32)(4)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	*	*((IUH	*)&(r22))	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH	*)(LocalIUH+0))	;		
@@ -1784,7 +1784,7 @@ switch ( id )
 		S_0442_CisetReadPointers_0000004f	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	8	>	0	)	LocalIUH	=	(IUH	*)calloc	(	2u, sizeof(IUH)	)	;
+	if(	8	>	0	)	LocalIUH	=	(IUH	*)malloc	(	2u * sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -1994,7 +1994,7 @@ switch ( id )
 		S_0443_CisetMarkPointers_00000050	:	
 	*((IUH	*)&(r2))	=	v1	;	
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	8	>	0	)	LocalIUH	=	(IUH	*)calloc	(	2u, sizeof(IUH)	)	;
+	if(	8	>	0	)	LocalIUH	=	(IUH	*)malloc	(	2u * sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	

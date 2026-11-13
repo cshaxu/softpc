@@ -5307,3 +5307,84 @@ advances to 315/472; file 316 sinit013.c is next. S1 remains active.
 P65 owned-process inventory confirms all probes and test jobs exited.
 Clean-Build preview, task scratch removal and residue check pass. No probe
 binary or raw log is retained; reusable caches and user assets are preserved.
+
+## File 316: sinit013.c (P66 verified delivery)
+
+Pinned XP raw SHA-256: 384a566f06caa49330ad57b385fcc8dfe489efefb319e4673e30d7a95831ada4.
+One added include accounts for the line shift; all remaining lines align with
+XP. Complete classification: 689 GDP access replacements, 29 allocations,
+three ordinary-address wrappers, no other changed lines or excluded bodies.
+Locations are in [m9-t100-sinit013-points.tsv](m9-t100-sinit013-points.tsv).
+
+R0409: retain the existing native GDP mapping as an evidence-qualified owner
+decision. Actual GDP indexed storage and native VGAGLOBALSETTINGS members do
+not implement the original flat 32-bit byte layout. The 26 field setters are
+registered by vglfunc.c; no duplicate Compat setter substitutes for them.
+This file remains required and cannot be retired as test-only code.
+
+R0410: restore all three original dereferences. Each address comes from
+j_modeLookup plus a table index, not an encoded GDP offset. The original
+symbol is initialized to a native object's address in ev_glue.c. The removed
+wrapper would return that same native address; it does not repair the table
+indexing. Restore original syntax and whitespace, not an equivalent rewrite.
+
+R0411: restore all 29 malloc operations, preserving native capacities. The
+26 setters write their full IUH local from v1 before reading it, including
+byte setters. Write-pointer selection initializes its local from the table
+base before branching. Read/mark selectors initialize both native locals
+from the argument and table base before use. No allocation in this file needs
+zero initialization. Single-slot capacities remain sizeof(IUH); two-slot
+capacities remain 2u * sizeof(IUH), avoiding x64 undersized allocations.
+
+Production wiring was independently checked against pinned XP: selected
+CPU_40_STYLE/C_VID egacpu.h undefines SetWritePointers/SetReadPointers/
+SetMarkPointers to the C functions in ev_glue.c. The original ev_glue.c note
+explicitly says generated selection was replaced by C and placeholder symbols
+remain for linking. Current C_Video registers field accessors but not the
+three S_0441/S_0442/S_0443 selectors. Symbol search finds those generated
+entries only in their own definitions/address exports. This is original
+wiring, not a new local bypass or a newly supported legacy interface.
+
+Focused actual-body proof: compile the complete current/candidate/poisoned
+candidate file with production flags and real GDP mapping, linked to cached
+production dependencies. Each width passes 26 setters times four values =
+104 storage assertions (native pointer high bits included on x64). Separately,
+controlled aligned table storage exercises old selectors: 96 write combinations
+(dither, chain, write mode, rotate, write state), 12 read selections and four
+mark selections. Resulting GDP-field fingerprints match all three variants
+within each width. All compile/link/process exits are zero. The 112 selector
+cases are isolated restoration comparisons with controlled tables, not proof
+that the unregistered legacy selectors work with current production tables.
+No guest binary is changed; no DOS/Windows-mode acceptance is inferred.
+
+Candidate production +32/-32; XP +722/-721 -> +719/-718, reducing six diff
+lines. SequenceMatcher autojunk=False ranges 174 -> 171; fixed line alignment
+agrees. Normalized final SHA-256:
+05a717cff69ad8740cc64784eaefff2bd4d00b43603966b502f16e9a15334e15.
+Full dual-width qualification is running. Verified frontier stays 315/472;
+S1 and owner decisions remain open.
+
+P66 qualification times (seconds): x86-build 8.87, x86-background 139.56, x86-native 23.46, x64-build 10.8, x64-background 138.66, x64-native 24.78.
+Each architecture passes 188 background and eight native tests first run:
+392/392 total. Mirror and documentation gates pass. Final source is byte-for-byte
+the tested candidate and uses CRLF throughout. Counter-review checks every
+changed line: 29 malloc operations and three exact original native dereferences;
+no other production or permanent test-source change. No public component,
+user configuration, media or snapshot is modified.
+
+x86 current/candidate/poison focused output SHA-256 (identical within width): 4fb4562283ec22ca11d759384e3e1f66b93fe9ac3b95a74edfbfa4ed381ab2fc.
+
+x64 current/candidate/poison focused output SHA-256 (identical within width): 718b69c3ba7165f6154de3e5feebe5f2e7010a44450eb4131152891654c20bb5.
+
+softpc32.exe: Nov 13 2026 13:40:34, SHA-256 5f07d82496aaad29eb6d0efa2c0d7c4e416a911def25163ead4375bc40a2c2bb.
+
+softpc64.exe: Nov 13 2026 13:43:26, SHA-256 68283ce57b80536cb7ae74f4e336ae62d2f552711ccc677ee4d7919b969b9f27.
+
+Production +32/-32; anchored XP diff decreases by six lines. Native GDP and
+capacity residuals remain qualified owner decisions. Isolated legacy-selector
+comparisons do not establish a new supported production path. Verified frontier
+advances to 316/472; next file 317 univer_c.h. S1 remains active.
+
+P66 owned-process inspection confirms all jobs exited. Clean-Build preview,
+exact task scratch removal and residue check pass. Reusable caches remain;
+temporary probes/logs and disposable binaries are removed.
