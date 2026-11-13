@@ -4289,3 +4289,80 @@ S1 remains active; no routine approval is awaited.
 P50 process inventory confirms all owned workers exited. Task scratch was
 previewed and removed through Clean-Build; its closure residue check passes.
 Reusable Ninja/ccache roots, user configuration, media and snapshots remain.
+
+## P51 file 303 sevid020.c audit and restoration
+
+Initial XP difference is +648/-700 (1348 lines), 503 ranges. The final
+candidate is +637/-667 (1304 lines), 493 ranges: **44 fewer diff lines,
+10 fewer ranges**. Production +53/-31 (net +22), test sources unchanged.
+The root continuation gate drops the one restored direct-only call (+1/-1).
+The range map accounts for all 503 initial ranges; the allocator inventory
+records 32 arrays, 19 malloc restorations and 13 retained zeroing arrays.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0367 | GDP byte-offset accesses use native field mapping. | Keep existing ABI mapping pending decision: native offsets/widths differ on x64, and real generated callers consume those fields. Not equivalent to the already resolved pointers below. |
+| R0368 | Nine native RAM/plane address accesses use GDP-address wrappers. | Follow plane-buffer and native source-pointer assignments; restore exact original dereferences. Candidate and poisoned-allocation actual-body controls pass both widths. |
+| R0369 | All local arrays are native-sized and zero initialized. | Restore malloc for 19 arrays without partial-store/full-native-load overlap. Keep 13 arrays: backward ModeX slot 8 and twelve Chain4 writer slot-0 addresses are written narrow then read native for address calculation. Original four-byte capacities corrupt the heap on x64; no failure is claimed for x86 capacities. |
+| R0370 | Two backward Move entries replace original CGA inline marking. | Coherent original restoration, with native GDP mapping preserved, makes dirty_high 0x100 instead of the actual EGA group range around 0x3e..0x41 at offset 0x104. Both widths fail the corrected actual-entry oracle. Retain selected marker/span conversion pending decision. |
+| R0371 | Ten Copy backward address/stride constants retain plane gaps. | Exact original constant restoration leaves physical storage for guest address 0x101 untouched at start 0x104; both widths fail the independent constant-byte Copy oracle. Retain existing layout fixes pending decision. |
+| R0372 | Six continuation calls were made same-activation gotos. | S2730 has no same-file nested caller: restore its exact L21_251 tail call. S2726 is called by S2728, and S2729 by S2730/S2731: retain the other five pending decision. Actual-body counters on both widths give candidate 290 allocations/290 frees; restoring all calls gives 290/254, 36 residual allocations despite passing pixels. |
+| R0373 | Original private L25 declarations were omitted. | Restore 24 exact original enum/function/pointer lines without reintroducing any active CGA accounting or case/goto/label. |
+| R0374 | DIV-123 widens a literal shifted by zero. | The immediately preceding assignment sets the count to zero; restore the full exact original test line and remove its three-line explanation. No concrete necessity remains. |
+
+The real C-VID compile unit and controller tables remain the single path;
+this file also contains original Chain4 writers/fills, not duplicate Compat
+device logic. No file deletion is justified. Native source pointers remain
+native; GDP adaptation is not restored indiscriminately. No guest, media,
+configuration, snapshot or sibling repository changes.
+
+Both widths pass unchanged/candidate actual VGA fixture and poisoned candidate
+malloc controls, including 96/96 Copy DWORD fill assertions. A task-only
+helper adds sixteen backward-entry cases: exact dirty/physical-address checks
+for Copy, bounded EGA group marking for ModeX WORD, whose existing nested
+writers also mark their individual writes. An initial helper incorrectly
+required a simple contiguous WORD lower bound for ModeX; it failed unchanged
+behavior and was withdrawn, not counted as a production defect. The corrected
+candidate passes on both widths; original dirty and layout controls fail as
+described separately. These probes do not establish every Chain4 mode or
+interactive guest use of legacy bulk entries.
+
+Actual-change review confirms all insertions are exact original declarations
+or the direct continuation block. Other changes are direct native addresses,
+malloc spelling with unchanged native capacity, and the original shift line.
+Root gate adaptation removes only L21_251 from this file's required-goto list;
+the other five and all unrelated files' checks remain. Final CRLF source equals
+the tested candidate. LF-normalized SHA-256:
+cb95f3bb73e2bc49547e29328ea7c6179165f250773975d1ed67534985ec6196.
+Mirror verification passes. Full cached dual build/publication and regression
+are running; delivered scope remains 302/472 until completion and review.
+
+### P51 final qualification and actual-change review
+
+Both cached builds/publications succeed without warnings. Each architecture
+passes 188/188 background and 8/8 native tests: **392/392 first full run**,
+without retries or budget changes. Final-source identity, CRLF, actual-change
+review, mirror and documentation gates pass.
+
+- x86 build: 9.09 seconds, exit 0.
+- x86 background: 135.09 seconds, exit 0.
+- x86 native: 25.03 seconds, exit 0.
+- x64 build: 11.09 seconds, exit 0.
+- x64 background: 137.08 seconds, exit 0.
+- x64 native: 25.03 seconds, exit 0.
+
+No new interactive guest validation or exhaustive Chain4 qualification is
+claimed. The retained differences remain qualified owner decisions.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 10:21:56;
+SHA-256 1820f999c16e35ac50469d5e0f8015a474e1d901560847cfc42854bd91ad998e.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 10:24:45;
+SHA-256 f221049454e08003dec13ad7348f7e9481496d8a60439c6a8c677f6192567138.
+
+Sequential audited scope is 303/472; next file 304 base/cvidc/sevid021.c.
+S1 remains active; no routine approval is awaited.
+
+P51 process inventory confirms no owned worker remains. Task scratch was
+previewed and removed; Clean-Build closure residue verification passes.
+Only reusable caches remain. User configuration, media and snapshots are intact.

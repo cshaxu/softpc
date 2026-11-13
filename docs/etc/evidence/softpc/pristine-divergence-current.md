@@ -1916,3 +1916,16 @@ Original continuation controls show
 See [file audit](m9-t100-progress.md#file-302-final-source-review-and-qualification-pending),
 [range map](m9-t100-sevid019-points.tsv) and
 [allocation inventory](m9-t100-sevid019-allocations.tsv).
+
+### T100 S1 P51 sevid020 restoration
+
+File 303 restores nine native addresses, 19 malloc calls, 24 original private
+declaration lines, L21_251's direct continuation and the shift-count-zero
+literal. DIV-123's historical literal adaptation now applies to neither
+sevid019 nor sevid020. Existing GDP/native-local, selected dirty, layout and
+five nested continuations remain qualified owner decisions. Production
++53/-31; XP diff falls 1348 -> 1304 lines and 503 -> 493 ranges. Both
+architectures pass the full suite without warnings or retries.
+See [P51 audit](m9-t100-progress.md#p51-file-303-sevid020c-audit-and-restoration),
+[range map](m9-t100-sevid020-points.tsv) and
+[allocation inventory](m9-t100-sevid020-allocations.tsv).

@@ -648,7 +648,7 @@ foreach(record IN ITEMS
     "sevid017.c:L21_19if_d,L21_24if_d,L21_35if_d,L21_43if_d,L21_53if_d,L21_58if_d,L21_69if_d"
     "sevid018.c:L21_77if_d,L21_87if_d,L21_92if_d,L21_103if_d,L21_111if_d,L21_121if_d,L21_126if_d"
     "sevid019.c:L21_143if_d,L21_141if_d,L21_147if_d,L21_149if_d,L21_167if_d,L21_177if_d,L21_185if_d,L21_195if_d,L21_203if_d,L21_213if_d,L21_221if_d"
-    "sevid020.c:L21_231if_d,L21_241if_d,L21_239if_d,L21_245if_d,L21_247if_d,L21_251if_d")
+    "sevid020.c:L21_231if_d,L21_241if_d,L21_239if_d,L21_245if_d,L21_247if_d")
     string(REPLACE ":" ";" fields "${record}")
     list(GET fields 0 unit)
     list(GET fields 1 labels)
