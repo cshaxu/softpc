@@ -1043,6 +1043,47 @@ static void verify_branch_ip_width(void)
     }
 }
 
+static void verify_iret_stack_width(void)
+{
+    /* Real CCPU execution: ring 0 -> ring 3, with independent operand/SS sizes.
+       The existing stack is 16-bit, so its high ESP bits are distinguishable. */
+    unsigned wide, big;
+    for (wide = 0; wide < 2; ++wide) for (big = 0; big < 2; ++big) {
+        unsigned char gdt[24] = {0};
+        unsigned char stack[20] = {0};
+        const unsigned char code[] = {0x66, 0xcf};
+        const unsigned long values[] = {0x600, 0x0b, 2, 0x12345678, 0x13};
+        unsigned i, j, width = wide ? 4 : 2;
+        assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+        gdt[8] = gdt[9] = 0xff;
+        gdt[13] = 0xfb; /* Present ring-3 code. */
+        gdt[16] = gdt[17] = 0xff;
+        gdt[21] = 0xf3; /* Present ring-3 writable data. */
+        gdt[22] = big ? 0x40 : 0;
+        for (i = 0; i < 5; ++i) for (j = 0; j < width; ++j)
+            stack[i * width + j] = (unsigned char)(values[i] >> (8 * j));
+        assert(softpc_machine_write_physical(probe.machine, 0x700, gdt, sizeof(gdt)) == SOFTPC_MACHINE_OK);
+        assert(softpc_machine_write_physical(probe.machine, 0x900, stack, sizeof(stack)) == SOFTPC_MACHINE_OK);
+        assert(softpc_machine_write_physical(probe.machine, 0x500, code + !wide, wide ? 2 : 1) == SOFTPC_MACHINE_OK);
+        c_setGDT_BASE_LIMIT(0x700, sizeof(gdt) - 1);
+        c_setCS_SELECTOR(8);
+        c_setCS_BASE_LIMIT_AR(0, 0xffff, 0x9b);
+        c_setSS_SELECTOR(16);
+        c_setSS_BASE_LIMIT_AR(0, 0xffff, 0x93);
+        c_setEFLAGS(2);
+        c_setESP(0xabcd0900);
+        c_setEIP(0x500);
+        c_setCPL(0);
+        c_setCR0(1);
+        assert(softpc_machine_run(probe.machine, 2) == SOFTPC_MACHINE_OK);
+        assert(c_getCPL() == 3 && c_getEIP() == 0x600u);
+        assert(c_getCS() == 0x0bu && c_getSS() == 0x13u);
+        /* IRETD restores all 32 bits even when the returned SS has B=0. */
+        if (wide) assert(c_getESP() == 0x12345678u);
+        else assert((c_getESP() & 0xffffu) == 0x5678u);
+    }
+}
+
 int main(void)
 {
     const char *path = "softpc-checkpoint-smoke.img";
@@ -1088,6 +1129,7 @@ int main(void)
     verify_event_queue_archive();
     verify_run_budget();
     verify_branch_ip_width();
+    verify_iret_stack_width();
     softpc_machine_destroy(probe.machine);
     assert(softpc_test_remove_image(path));
     return 0;

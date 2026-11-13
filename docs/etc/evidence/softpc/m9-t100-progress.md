@@ -1319,3 +1319,89 @@ Final artifact/object evidence:
 - x86: final FPU object `073fb41b8b71331ed7692c69f312eb1723c9f1c997bcc46d436f64928cf7ad76`; EXE `9597f6ec038e388439dd168ff84e38346bcad4593b5714e2fcd14ec65da82959`; compiler time 01:33:27 to 01:41:19, at offset 2435392.
 
 - x64: final FPU object `458b0ae88430995c70061aa88d2207b1238160fea6bd606b9dc1bd8d25e4c2ac`; EXE `9c74596b0f8d63b6c14ea2e6e8227372bdd641089e4b9f6ea99563a11eb0788c`; compiler time 01:33:42 to 01:41:38, at offset 2289664.
+
+
+## P16 file 138: IRET original operand-width restoration
+
+T100-R0152 is the sole in-scope iret.c difference: original XP lines 316-319
+select SET_SP/SET_ESP by operand size; the local replacement selects by the
+returned SS B bit through set_current_SP. Initial analysis considered the
+previous CALL repair analogous. Counter-review rejects that assumption:
+restoring a stack pointer from an IRET frame is not selecting a new CALL stack
+from a TSS. The actual decoder dispatches IRET in the supported CCPU build;
+there is no duplicate Compat implementation to substitute.
+
+Intel SDM 325383-078US, December 2022, volume 2A, IRET operation,
+RETURN-TO-OUTER-PRIVILEGE-LEVEL (3-541/3-542), explicitly restores the popped
+32-bit value to ESP. Reference:
+https://cdrdv2-public.intel.com/671110/325383-sdm-vol-2abcd.pdf
+This does not depend on the returned SS B bit. The 2003 manual's omitted
+SS/ESP restoration in its pseudocode is not used as contrary evidence.
+The current manual and the original 386 presentation differ in detail around
+16-bit returns; this audit does not claim real-hardware validation of upper
+ESP bits after a 16-bit IRET.
+
+Isolated actual-machine probes execute CF or 66 CF through softpc_machine_run,
+with a real GDT and ring-0-to-ring-3 return frame. The incoming stack is 16-bit
+with ESP=ABCD0900. The saved pointer is 12345678 for IRETD, 5678 for IRET.
+Both x86 and x64 give the same results:
+
+| Operand size | Returned SS size | Before restoration | Original XP |
+| --- | --- | --- | --- |
+| 16 | 16 | ABCD5678 | ABCD5678 |
+| 16 | 32 | 00005678 | ABCD5678 |
+| 32 | 16 | ABCD5678 | 12345678 |
+| 32 | 32 | 12345678 | 12345678 |
+
+Every case reaches CS=000B, SS=0013, EIP=00000600 and CPL=3. The initial
+probe omitted the disposable floppy fixture and failed machine creation;
+it supplied no CPU evidence and was corrected before the above comparisons.
+The isolated build uses existing production compiler/link settings and a
+single replacement IRET object, not a substitute CPU or modified guest binary.
+
+Restore all four original lines, without a new helper or condition. The
+32-bit/16-bit-stack case demonstrates a regression in the local replacement;
+no supported necessity was established for retaining it. The original 16-bit
+path is restored under the original-first rule rather than asserting exhaustive
+hardware conformance. Existing V86, same-level and real-mode bodies are unchanged.
+
+The existing machine checkpoint suite gains four real-instruction cases,
+checking control transfer and low SP in every case, and the full saved ESP
+for both IRETD cases. It deliberately does not freeze an unverified high-half
+hardware expectation for 16-bit IRET. The same new test is also linked to the
+pre-restoration object for a negative control: x86 exits 3221226505 and x64
+exits 3, both at c_getESP() == 0x12345678u in the new test. This is not a BIOS/Windows
+reproduction or an exhaustive protected-mode/VM86 instruction test.
+
+Frozen files 139-181 are checked in order: jmp.c, lgdt.c, lidt.c, lldt.c,
+lxs.c and mov.c have no in-scope differences; the rest are normalized-identical.
+No changes are made to them. File 182 ntstubs.c is the next substantive review.
+The historical CALL/IRET/RETF same-class claim does not constitute necessity
+proof; RETF remains subject to its own later frozen-order audit.
+
+Production +4/-1 (net +3) restores original source. Mirror in-scope diff falls
+from +1/-4 to zero: five fewer difference lines and one fewer difference point.
+Test source +42/-0; no shared package, Compat, ABI, snapshot or media change.
+Final cached x86/x64 builds and publication pass. Both full suites pass:
+188 background plus eight native desktop/audio tests per architecture, 392/392.
+The exact final checkpoint test passes at both widths; the pre-restoration
+negative controls fail at its intended ESP assertion. Documentation and mirror
+manifest checks pass. No manual guest session or exhaustive hardware test is
+claimed.
+
+Coordinator actual-diff review confirms exact XP operand-width syntax, unchanged
+surrounding IRET sequencing and line mapping, no new production path or owner,
+preserved mirror CRLF and owned-test LF, and no changes to shared packages,
+configuration or guest assets. Compiler warnings are confined to existing mirror
+headers; no added test/owned-code warning is observed. Historical claims that
+CALL, IRET and RETF required the same repair are superseded for this IRET point.
+
+The original retained file remains required by the actual instruction decoder.
+No additional mirror difference is introduced and no owner exception is sought.
+Task scratch is removed after owned jobs terminate. Sequential review is 181/472;
+ntstubs.c (182) remains unfinished, and earlier qualified residual decisions
+remain pending. S1 is not closed.
+
+- x86 EXE SHA-256 `7f799ae3d6f7c4bda7fdfd0024479e969608532058c8d54e58a5645fb42c6901`; Nov 13 2026 01:52:13.
+
+- x64 EXE SHA-256 `7fad72fe61c90eaf3251a473de60cfc6488669f7209083115de24314107996e2`; Nov 13 2026 01:55:32.

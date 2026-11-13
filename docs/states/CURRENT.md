@@ -30,16 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P15 removes added FPU mirror snapshot entries: the existing archive
-owner directly uses original register/stack accessors. Unnecessary declaration,
-cast and comment changes are restored. Production +71/-82 (net -11), tests
-+17; fixed-XP fpu.c diff falls from +84/-6 to +8/-5, 77 fewer difference lines.
-Independent dual-width negative probes prove the two remaining integer
-conversion repairs necessary; retention remains pending owner decision.
-Full qualification passes 392/392; final comment-only refinement has identical
-objects and metadata-only EXE changes, with the strengthened checkpoint test
-freshly passing at both widths. Both final EXEs are published.
-Source review is 137/472; file 138 iret.c is next.
+T100 S1 P16 restores original IRET operand-width stack-pointer loading.
+Actual dual-width CCPU probes show the removed replacement corrupts ESP on
+IRETD returning to a 16-bit stack. The new real-instruction regression rejects
+the prior object on both architectures. Production +4/-1 (net +3), tests +42;
+XP-relative difference shrinks by five lines and one point to zero outside
+existing exclusions. Both cached builds, publication and full qualification
+pass: 188 background plus eight native tests per architecture, 392/392.
+Sequential source review is 181/472; file 182 ntstubs.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
