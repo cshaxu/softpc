@@ -48,9 +48,8 @@ typedef struct
 
 typedef struct
 {
-	/* T60: addresses stay 32-bit; only the written value is byte/word-sized. */
-	void	(*b_write) IPT2(IU32, eaOff, IU8, eaVal);
-	void	(*w_write) IPT2(IU32, eaOff, IU16, eaVal);
+	void	(*b_write) IPT2(IU8, eaOff, IU32, eaVal);
+	void	(*w_write) IPT2(IU16, eaOff, IU32, eaVal);
 	void	(*d_write) IPT2(IU32, eaOff, IU32, eaVal);
 	void	(*b_fill) IPT3(IU32, eaOff, IU8, eaVal, IU32, count);
 	void	(*w_fill) IPT3(IU32, eaOff, IU16, eaVal, IU32, count);
@@ -86,18 +85,15 @@ extern MODE_TABLE mode_table;
 typedef struct 
 {
 #if defined(CPU_40_STYLE) && defined(C_VID)
-	/* DIVERGENCE MVDM-HOST-DIV-089: selected C-video EVID glue uses the
-	 * exact IU32 offset/count contract below.  The historical ULONG carrier
-	 * only matched it by 32-bit typedef coincidence. */
-	IU32 (*b_read) IPT1(IU32, eaOff);
-	IU32 (*w_read) IPT1(IU32, eaOff);
+	IU32 (*b_read) IPT1(ULONG, offset);
+	IU32 (*w_read) IPT1(ULONG, offset);
 
 #else
 #error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && defined(C_VID))"
 #endif
 #line 90
 #ifndef	NO_STRING_OPERATIONS
-	void (*str_read) IPT3(IU8 *, dest, IU32, eaOff, IU32, count);
+	void (*str_read) IPT3(IU8 *, dest, ULONG, offset, ULONG, count);
 #endif	/* NO_STRING_OPERATIONS */
 #line 93
 

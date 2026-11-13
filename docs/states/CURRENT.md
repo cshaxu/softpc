@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P75 audits files 331-334: cmos.h, cmosbios.h, config.h and cpu4.h.
-Retained content equals fixed XP outside existing exclusions/scaffolding;
-cmosbios.h equals the complete normalized original. No source or new test
-changes. Published EXEs remain P74 with 392/392 full regression. Frozen
-frontier 334/472; next file 335 cpu_vid.h has ABI/declaration differences still
-to investigate. See the
+T100 S1 P76 minimizes file 335 cpu_vid.h: five original IPT argument lines
+restored and four explanatory lines removed. Production +5/-9; anchored XP
+diff reduces by 14 lines. Eight dual-width preprocessing comparisons are exact;
+nine explicit provider declarations remain qualified by negative compilation.
+Both cached builds, dual EXE publication and 392/392 tests pass first run.
+Frozen frontier 335/472; next file 336 base/inc/debug.h. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

@@ -5786,3 +5786,75 @@ XP-diff delta. P74 remains the freshly published 392/392 full regression baselin
 Ordered frontier 334/472; file 335 cpu_vid.h has real retained ABI/declaration
 differences and is not counted complete. It requires separate coherent caller
 and provider verification. S1 and previous residual decisions remain open.
+
+
+## File 335: cpu_vid.h (P76 qualification in progress)
+
+Pinned XP raw SHA-256:
+5df752f3e978f2e9b3bf0df4acd843148584b711b438933dca4d0d5f77ce542f.
+The retained differences are writer IPT arguments/comment, reader IPT arguments/
+comment, and nine explicit provider declarations with their reason comment.
+Existing excluded bodies/scaffolding remain untouched and receive no new ledger.
+
+R0421 restores exact XP arguments in EVID_WRT_POINTERS b_write/w_write and
+removes the one-line T60 explanation. R0422 restores READ_POINTERS b_read,
+w_read and str_read exact XP arguments and removes the three-line ABI rationale.
+Selected insignia.h defines IPT1/IPT2/IPT3 as (), so these changed parameter
+spellings do not become typed prototypes under the actual supported builds.
+The restored argument spelling is not a claim that a future ANSI configuration
+has correct typed parameters; that configuration is currently excluded.
+
+Source-to-compiler proof uses actual Ninja compiler/options for ev_glue.c,
+ega_read.c, ega_writ.c and ccpusas4.c. Private current/candidate include roots
+supply cpu_vid.h without changing other headers or production files during the
+probe. On x86 and x64, all eight current/candidate preprocessor output pairs
+(-E -P) are byte-identical; every preprocessing command exits zero. Thus this
+restoration preserves actual selected declarations and implementation tokens.
+
+R0423 retains the nine explicit glue declarations as an evidence-qualified
+owner decision. Actual ega_read.c Glue_reads and ega_writ.c Glue_writes tables
+use these function identifiers; ev_glue.c provides them. Removing the whole
+added declaration block in a separate candidate causes syntax compilation to
+fail on both architectures: the three read and six write/fill/move identifiers
+are undeclared in the actual table initializers. All four negative compiles
+exit 1. This is concrete compilation proof, not a claimed guest crash.
+The original unprototyped IPT table fields do not themselves declare provider
+function names; retaining those fields and removing providers is not equivalent.
+
+Counter-review of the candidate confirms five restored original lines and four
+removed comment lines: production +5/-9. The five restored replacements remove
+ten XP added/deleted lines; four deleted added comments remove four more,
+reducing anchored XP differences by 14 lines. No runtime function, public API,
+state, dispatch path, original guest or permanent test changes. Existing skipped
+conditional scaffolding remains unchanged. Candidate normalized SHA-256:
+690cb9668f24f45405734f67d517e5ecda4bf0cdce0f71be8c1fce4daa234a38.
+Full cached builds, dual publication and regression are running on the applied
+candidate. Verified frontier remains 334/472 until this delivery completes.
+
+
+### P76 final qualification
+
+Both cached final-source builds and EXE publication pass (x86 14.54 seconds,
+x64 21.91 seconds). Each architecture passes 188 background and eight native
+tests first run: 392/392 total. Background times 141.65/136.24 seconds; native
+24.90/24.85 seconds. This is full repository regression, not a new claim that
+legacy bulk video-source callbacks are production-supported (P61 scope remains).
+
+Published softpc32.exe: Nov 13 2026 14:17:59; SHA-256
+92336d1f4193700b832f5919e783179225d12e3f5eecaf228291b98d9e348595.
+Published softpc64.exe: Nov 13 2026 14:21:00; SHA-256
+8f924c8c9fd7c40b1f417d4ee7f72b302c64849dd2d167ff203095a33c23ec55.
+
+Final header matches the preprocessor-tested candidate after LF normalization,
+with CRLF preserved in the mirror. Actual diff review confirms only the five
+original IPT lines and four removed comment lines: production +5/-9, permanent
+tests zero, anchored XP added/deleted differences reduced by 14. No extra source
+or behavior change. Manifest local hash and current divergence explanation are
+updated; historical metrics are not silently presented as current XP counts.
+R0423 remains a qualified owner decision, not approved retention.
+Verified frontier advances to 335/472; next file 336 base/inc/debug.h.
+S1 remains active; no completed-file delivery implies whole-audit closure.
+
+P76 authoritative process inspection confirms all owned jobs exited. Clean-Build
+preview, exact scratch removal and residue check pass. Final documentation gate
+and actual source/manifest/artifact review pass before commit.
