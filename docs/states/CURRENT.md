@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P69 audits file 320 fdisk.c without production changes. Its existing
-HDD snapshot extension has real archive consumers and owns access to private
-controller state; retention remains an evidence-qualified owner decision.
-Existing checkpoint tests pass on both architectures. Published EXEs remain
-P66 with 392/392 full regression; no new full-suite run is claimed. Frozen
-frontier 320/472; next file 321 fla.c. See the
+T100 S1 P70 audits file 321 fla.c without production changes. Its FDC snapshot
+extension accesses original private controller state and the actual delayed
+interrupt callback; retention remains an evidence-qualified owner decision.
+The unchanged-source P69 checkpoint tests cover basic FDC restore on both
+architectures. Published EXEs remain P66 with 392/392 full regression. Frozen
+frontier 321/472; next file 322 floppy.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
