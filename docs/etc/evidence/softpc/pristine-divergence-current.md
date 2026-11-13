@@ -1837,3 +1837,13 @@ XP diff falls 1389 -> 1275 lines and 550 -> 509 ranges. No new device fix.
 See [P43 audit](m9-t100-progress.md#p43-file-295-sevid012c-audit-and-restoration),
 [range map](m9-t100-sevid012-points.tsv) and
 [allocation inventory](m9-t100-sevid012-allocations.tsv).
+
+### T100 S1 P44 allocation and address minimization
+
+File 296 sevid013.c restores 81 native address expressions and 20 malloc
+calls. Actual GDP mapping, native capacities and twelve mixed-width zeroed
+move locals remain qualified ABI residuals pending owner decision. Production
++101/-101; XP diff falls 1505 -> 1351 lines and 581 -> 506 ranges.
+See [P44 audit](m9-t100-progress.md#p44-file-296-sevid013c-audit-and-restoration),
+[range map](m9-t100-sevid013-points.tsv) and
+[allocation inventory](m9-t100-sevid013-allocations.tsv).

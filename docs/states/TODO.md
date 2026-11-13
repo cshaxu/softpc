@@ -4,7 +4,9 @@ CURRENT owns active work; the runtime-performance candidate remains in Queue.
 
 - [ ] TODO(Medium): Emulator verifier-negative aggregate timing margin.
   P37 x86/x64 full runs exceed the existing 60-second budget, while unchanged
-  isolated retries pass in 25.81/25.35 seconds. Exact scheduling cause is not
+  isolated retries pass in 25.81/25.35 seconds. P44 x86 repeats this pattern:
+  60.01-second aggregate timeout, 28.31-second unchanged-budget isolated pass;
+  x64 aggregate passes in 57.29 seconds. Exact scheduling cause is not
   established. Investigate repeated CMake-launch cost and aggregate scheduling
   in the next shared-test governance task; preserve every negative check and
   do not treat blanket budget increases as the fix.

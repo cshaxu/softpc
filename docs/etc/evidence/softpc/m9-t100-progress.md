@@ -3620,3 +3620,86 @@ S1 remains active; qualified residual decisions are not closed by passing tests.
 P43 process inventory confirms all task workers exited. Exact scratch cleanup
 was previewed/applied and Clean-Build -Check passes. Reusable caches,
 configuration, media and snapshots are preserved.
+
+## P44 file 296 sevid013.c audit and restoration
+
+Initial review: R0324 restores 81 native source/plane address expressions;
+R0325 retains actual GDP field translation. R0326 retains native capacities
+and zeroing in 12 outer move entries: S2504/S2506/S2509/S2511/S2514/S2516/
+S2519/S2521/S2524/S2526/S2529/S2531. Their LocalIUH[1] receives IU32 and is
+consumed as native IUH in the RAM-source branch. R0327 restores malloc for
+the other 20 allocations. Original move direction and callback order remain.
+
+Counter-review: reversing the enumerated ABI forms reproduces the complete
+pinned XP token stream. Selected C-VID CMake sources compile this file;
+evidfunc registers its backward mode-0 moves. The [581-range map](m9-t100-sevid013-points.tsv)
+and [32-allocation inventory](m9-t100-sevid013-allocations.tsv) account for
+initial differences. Necessary residuals are qualified pending owner decisions,
+not automatically approved. Exactly 101 lines change (+101/-101, net zero):
+81 native-address expressions and 20 allocation calls. Tests remain unchanged.
+
+Using the same full-file SequenceMatcher metric, XP diff changes from
++753/-752, 581 ranges to +676/-675, 506 ranges: 154 fewer diff lines and
+75 fewer ranges. No new mirror patch is introduced.
+
+### P44 actual-body controls
+
+Unchanged, minimal and poisoned-malloc bodies pass on x86/x64. Each executes
+1440 captures across 12 real copy helpers (six four-plane, six one-plane),
+RAM/video sources, three masks, zero/one/two/seven counts, address parity and
+four one-plane shifts. Forty-eight four-plane copy cases additionally use an
+independent full-buffer expected result with untouched-byte checks. The other
+captures establish preservation, not complete hardware correctness. Existing
+CHAIN2 tests also pass 96/96. The original RAM-source helper traversal is
+preserved; no stronger backward-order contract is inferred from its name.
+
+All successful capture files are byte-identical, 5898240 bytes, SHA-256
+1904bd411833cd4b91d1bf22591cd2871ac5308a81cb13c53f5e3898f011be39.
+Restoring original four-byte capacities passes x86 but corrupts the x64 heap
+(0xc0000374). Poisoning only the 20 restored malloc blocks with 0xa5 passes;
+the 12 mixed-width calloc blocks remain. No complete outer-move matrix,
+arbitrary high-address RAM input or new interactive guest reproduction is
+claimed. No test-only production interface is added.
+
+Pinned XP normalized SHA-256:
+b6c22a09b7cb906143dac06d291bad67fed63044c54a31914bf0dc7c52102c09.
+Initial local normalized SHA-256:
+c6e673b16d8135717cb2d6f1f1fc34d13d685f0cfc84b5c198ba77525ff8071d.
+Final normalized SHA-256: d949492f6d9d965047a81d007ba07b4034f868ac5263e667cd3ab3a7d42fa8bd.
+Installed source matches the tested candidate byte-for-byte and retains CRLF.
+Full cached dual build/publication/regression qualification follows.
+
+### P44 final qualification and actual-change review
+
+Both cached builds/publications succeed without warnings. Each architecture
+qualifies 188 background tests plus 8 native audio/desktop/package tests,
+392/392 after the isolated retries documented below, with unchanged budgets.
+The initial aggregate timeout is retained and is not called a first-run pass.
+Actual review confirms
+exactly the 81 native address and 20 allocation changes, with no shared-component
+or test-source changes. Source/candidate byte identity, CRLF, provenance,
+mirror/documentation gates and command-local whitespace checks pass. The
+capture controls establish preservation for the exercised helpers, not complete
+original algorithm correctness or interactive guest coverage. Necessary ABI
+residuals remain qualified pending decisions.
+
+Aggregate verifier-negative timeout architectures: x86.
+Only that test was retried alone at its unchanged 60-second budget; each retry passed.
+The existing TODO timing debt remains, with no root cause asserted from this retry.
+
+Published softpc32.exe: Nov 13 2026 08:05:02;
+SHA-256 9f9b7120a7701716c3d9a03626c64efd31b2f6dfd4f4fd5676fda9392eaf37ac.
+Published softpc64.exe: Nov 13 2026 08:09:12;
+SHA-256 105712780c8106aaa190949600f7b595a0c03d18d5d74326a8bb3c55a1a9fd76.
+
+Sequential audited scope is 296/472; next is file 297 base/cvidc/sevid014.c.
+S1 remains active; pending decisions are not closed by the passing tests.
+
+P44 timing evidence: x86 aggregate verifier-negative timed out at 60.01 seconds;
+the isolated same-budget retry passed in 28.31 seconds. x64 aggregate passed
+in 57.29 seconds. All other registered tests passed in their initial runs.
+This does not establish the scheduling root cause; existing timing debt remains.
+
+P44 actual process inventory confirms all task workers exited. Exact scratch
+cleanup was previewed/applied; Clean-Build -Check passes. Reusable caches,
+user configuration, media and snapshots remain intact.
