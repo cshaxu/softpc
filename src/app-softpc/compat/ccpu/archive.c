@@ -1,5 +1,6 @@
 #include "lib/types/types_interface.h"
 #include "archive.h"
+#include "abi.h"
 #include "../devices/archive.h"
 
 
@@ -60,7 +61,29 @@ int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
     if (archive->sas.memory_bytes != sas.memory_bytes ||
         archive->sas.page_type_bytes != sas.page_type_bytes)
         return 0;
-    softpc_ccpu_snapshot_capture_registers(&archive->registers);
+    archive->registers.eax = c_getEAX(); archive->registers.ecx = c_getECX();
+    archive->registers.edx = c_getEDX(); archive->registers.ebx = c_getEBX();
+    archive->registers.esp = c_getESP(); archive->registers.ebp = c_getEBP();
+    archive->registers.esi = c_getESI(); archive->registers.edi = c_getEDI();
+    archive->registers.eip = c_getEIP(); archive->registers.eflags = c_getEFLAGS();
+    archive->registers.cr0 = c_getCR0(); archive->registers.cr2 = c_getCR2(); archive->registers.cr3 = c_getCR3();
+    archive->registers.cpl = c_getCPL();
+    archive->registers.gdt_base = c_getGDT_BASE(); archive->registers.gdt_limit = c_getGDT_LIMIT();
+    archive->registers.idt_base = c_getIDT_BASE(); archive->registers.idt_limit = c_getIDT_LIMIT();
+    archive->registers.ldt_selector = c_getLDT_SELECTOR();
+    archive->registers.ldt_base = c_getLDT_BASE(); archive->registers.ldt_limit = c_getLDT_LIMIT();
+    archive->registers.tr_selector = c_getTR_SELECTOR();
+    archive->registers.tr_base = c_getTR_BASE(); archive->registers.tr_limit = c_getTR_LIMIT();
+    archive->registers.tr_access_rights = c_getTR_AR();
+#define SNAPSHOT_SEGMENT(slot, name) \
+    archive->registers.segments[slot].selector = c_get##name##_SELECTOR(); \
+    archive->registers.segments[slot].base = c_get##name##_BASE(); \
+    archive->registers.segments[slot].limit = c_get##name##_LIMIT(); \
+    archive->registers.segments[slot].access_rights = c_get##name##_AR()
+    SNAPSHOT_SEGMENT(0, ES); SNAPSHOT_SEGMENT(1, CS);
+    SNAPSHOT_SEGMENT(2, SS); SNAPSHOT_SEGMENT(3, DS);
+    SNAPSHOT_SEGMENT(4, FS); SNAPSHOT_SEGMENT(5, GS);
+#undef SNAPSHOT_SEGMENT
     softpc_ccpu_snapshot_capture_execution(&archive->execution);
     softpc_ccpu_snapshot_capture_debug(&archive->debug);
     softpc_ccpu_snapshot_capture_tlb(&archive->tlb, archive->tlb_page_index,
@@ -82,7 +105,29 @@ int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive)
             archive->sas.memory_bytes, archive->page_types,
             archive->sas.page_type_bytes))
         return 0;
-    softpc_ccpu_snapshot_restore_registers(&archive->registers);
+    c_setCPL(0);
+    c_setCR0(archive->registers.cr0); c_setCR2(archive->registers.cr2); c_setCR3(archive->registers.cr3);
+    c_setEAX(archive->registers.eax); c_setECX(archive->registers.ecx);
+    c_setEDX(archive->registers.edx); c_setEBX(archive->registers.ebx);
+    c_setESP(archive->registers.esp); c_setEBP(archive->registers.ebp);
+    c_setESI(archive->registers.esi); c_setEDI(archive->registers.edi);
+    c_setEIP(archive->registers.eip); c_setEFLAGS(archive->registers.eflags);
+    c_setGDT_BASE_LIMIT(archive->registers.gdt_base, archive->registers.gdt_limit);
+    c_setIDT_BASE_LIMIT(archive->registers.idt_base, archive->registers.idt_limit);
+    c_setLDT_SELECTOR(archive->registers.ldt_selector);
+    c_setLDT_BASE_LIMIT(archive->registers.ldt_base, archive->registers.ldt_limit);
+    c_setTR_SELECTOR(archive->registers.tr_selector);
+    c_setTR_BASE_LIMIT_AR(archive->registers.tr_base, archive->registers.tr_limit,
+        archive->registers.tr_access_rights);
+#define RESTORE_SNAPSHOT_SEGMENT(slot, name) \
+    c_set##name##_SELECTOR(archive->registers.segments[slot].selector); \
+    c_set##name##_BASE_LIMIT_AR(archive->registers.segments[slot].base, \
+        archive->registers.segments[slot].limit, archive->registers.segments[slot].access_rights)
+    RESTORE_SNAPSHOT_SEGMENT(0, ES); RESTORE_SNAPSHOT_SEGMENT(1, CS);
+    RESTORE_SNAPSHOT_SEGMENT(2, SS); RESTORE_SNAPSHOT_SEGMENT(3, DS);
+    RESTORE_SNAPSHOT_SEGMENT(4, FS); RESTORE_SNAPSHOT_SEGMENT(5, GS);
+#undef RESTORE_SNAPSHOT_SEGMENT
+    c_setCPL(archive->registers.cpl);
     softpc_ccpu_snapshot_restore_execution(&archive->execution);
     if (!softpc_ccpu_snapshot_restore_debug(&archive->debug) ||
         !softpc_ccpu_snapshot_restore_tlb(&archive->tlb,

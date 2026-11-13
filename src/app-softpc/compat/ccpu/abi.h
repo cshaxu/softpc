@@ -26,7 +26,11 @@ DECLARE_REGISTER(CR3);
     extern long c_set##name(unsigned short value); \
     extern unsigned long c_get##name##_BASE(void); \
     extern unsigned long c_get##name##_LIMIT(void); \
-    extern unsigned short c_get##name##_AR(void)
+    extern unsigned short c_get##name##_AR(void); \
+    extern unsigned short c_get##name##_SELECTOR(void); \
+    extern void c_set##name##_SELECTOR(unsigned short value); \
+    extern void c_set##name##_BASE_LIMIT_AR(unsigned long base, \
+        unsigned long limit, unsigned short ar)
 DECLARE_SEGMENT(ES);
 DECLARE_SEGMENT(CS);
 DECLARE_SEGMENT(SS);
@@ -40,6 +44,16 @@ extern unsigned long c_getLDT_BASE(void), c_getLDT_LIMIT(void);
 extern unsigned short c_getLDT_SELECTOR(void);
 extern unsigned long c_getTR_BASE(void), c_getTR_LIMIT(void);
 extern unsigned short c_getTR_SELECTOR(void), c_getTR_AR(void);
+
+extern long c_getCPL(void);
+extern void c_setCPL(long value);
+extern void c_setGDT_BASE_LIMIT(unsigned long base, unsigned short limit);
+extern void c_setIDT_BASE_LIMIT(unsigned long base, unsigned short limit);
+extern void c_setLDT_SELECTOR(unsigned short selector);
+extern void c_setLDT_BASE_LIMIT(unsigned long base, unsigned long limit);
+extern void c_setTR_SELECTOR(unsigned short selector);
+extern void c_setTR_BASE_LIMIT_AR(unsigned long base, unsigned long limit,
+    unsigned short ar);
 
 void c_cpu_init(void);
 void c_cpu_reset(void);

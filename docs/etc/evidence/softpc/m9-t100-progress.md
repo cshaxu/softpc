@@ -943,3 +943,84 @@ Published artifact SHA-256:
 - softpc32.exe: `f5b1f24e5b87d929e590dae14c4836e9a08b21652350d6c1f5da475425b473e1`.
 
 - softpc64.exe: `967f98fa7075f969a05947a6818d00215dfea519e6c14f6cf60bc85e0e9d8ee3`.
+
+## File 92 c_reg.c: use original accessors from the archive owner
+
+Complete fixed-XP comparison finds +69/-0 non-excluded lines before this
+batch. The final candidate has zero non-excluded difference, including original
+formatting and final newlines. Existing excluded bodies receive no accounting.
+
+| ID | Original/local anchor before restoration | Initial finding and final disposition |
+| --- | --- | --- |
+| R0130 | after Pigger_c.h / added stdio.h | Restore original absence. Actual x86/x64 isolated objects with and without the header are byte-identical. Original printf produces a compiler builtin-declaration warning; no compile or ABI failure is observed. |
+| R0131 | same include block / snapshot.h | Delete: original register owner no longer knows the host snapshot schema. |
+| R0132 | original EOF / five-line snapshot explanation | Delete: no original content or independent semantic requirement. |
+| R0133 | original EOF / capture_registers | Remove the added mirror entry. Existing archive capture uses the original typed register accessors directly. |
+| R0134 | original EOF / restore_registers | Remove the added mirror entry. Existing archive restore uses the same original setters in the same order. |
+
+### Coherent restoration and independent counter-review
+
+Initial caller inspection alone would have justified retaining the two mirror
+snapshot entries. Counter-review rejects that conclusion: unlike c_main's
+private continuation or c_debug's cached breakpoint table, this entire copy
+already uses externally available original accessors. No private register
+storage is accessed. Its placement in the mirror is not necessary.
+
+The existing Compat archive owner now executes those ordered accessor calls
+inside its existing capture/restore functions. Both added mirror functions,
+their public declarations in compat/ccpu/snapshot.h, and the corresponding
+calls are removed. No replacement helper or second entry is created. The
+existing compat/ccpu/abi.h receives one-to-one declarations for the original
+segment/descriptor/CPL accessors; native Windows long is the original ISM32,
+unsigned long is IU32, unsigned short is IU16. Actual original definitions,
+not the historical generated vector's mismatched return declarations, are the
+authority. All six segment accessor families are declared through the existing
+macro; no new dispatch table or framework is introduced.
+
+This is not equal-complexity relocation: two function boundaries and their
+snapshot-specific API disappear, while the pre-existing archive owner invokes
+original APIs directly. Total production is +62/-75 (net -13); test source
+is unchanged; mirror difference is reduced by 69 lines to zero. The original
+register implementation is retained rather than duplicated. No new mirror
+point or line is introduced, and no public shared package changes.
+
+Mechanical token comparison verifies that capture and restore statements are
+identical after substituting state-> with archive->registers. and ignoring
+formatting. The CPL-zero preparation, CR0/CR2/CR3 order, all general registers,
+EIP/flags, descriptor tables, TR, six hidden segment states and final CPL
+restoration keep their order. Original selector-only setters are retained;
+architectural c_setCS/c_setSS loaders are not substituted because they would
+reload descriptor state. Snapshot schema and serialized bytes are unchanged.
+The existing snapshot test captures non-default EAX/EIP/CR3, alters state,
+restores the archive and verifies registers, memory, TLB/debug/FPU/device state.
+No user snapshot or guest binary is rewritten.
+
+The stdio-only isolated build uses identical source pathname and actual Ninja
+compile arguments for each pair, and succeeds on both architectures:
+
+- x86 objects both SHA-256
+  7c4b65208f1c947035b067f6b0ac06369de44cde35821d17d78a0b068fc3ac4a.
+- x64 objects both SHA-256
+  ed5833096d755f1ee53a91daf0201825eeebd7293ab12e813bb764508de88891.
+
+This proves only header-removal object equivalence, not the complete archive
+restoration. P11 final-source cached x86/x64 builds and publication pass. Each
+architecture passes 188 background and eight native integration tests, for
+392/392 fresh passes; all six qualification commands exit zero. No exemption
+is claimed for the whole change. Restoring original printf retains its original
+mirror warning, within the owner exception; this is not a zero-warning mirror
+build. No new shared-package or changed Compat declaration warning is observed.
+No fresh manual DOS/Win3.1/Win95 session validation is claimed.
+
+Ordered files 93-97 also complete comparison: c_reg.h, c_seg.c, c_stack.c and
+c_stack.h have no in-scope difference; c_seg.h is entirely normalized-identical.
+No edits are needed for them. File 98 c_tlb.c is next and not yet audited.
+
+P11 coordinator actual-diff review confirms one archive owner, direct original
+accessor calls, exact original non-excluded c_reg.c, no remaining removed API
+callers in src/test, unchanged snapshot layout, and no user asset mutation.
+Published artifact SHA-256:
+
+- softpc32.exe: `438b8428418003da1cabee4ac83f09b5d58aed30a12d6cdf21daac97dfd44ce7`.
+
+- softpc64.exe: `1a899975f5cd30742e2daafe790f37d0ae02f6b26b0185e759d3eb5961cecd77`.

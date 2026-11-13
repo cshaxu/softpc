@@ -99,9 +99,6 @@ typedef struct softpc_ccpu_sas_state {
     uint32_t selectors_set, code_selector, data_selector;
 } softpc_ccpu_sas_state;
 
-void softpc_ccpu_snapshot_capture_registers(softpc_ccpu_register_state *state);
-void softpc_ccpu_snapshot_restore_registers(
-    const softpc_ccpu_register_state *state);
 void softpc_ccpu_snapshot_capture_execution(softpc_ccpu_execution_state *state);
 void softpc_ccpu_snapshot_restore_execution(
     const softpc_ccpu_execution_state *state);
