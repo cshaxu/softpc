@@ -6620,3 +6620,64 @@ these evidence-qualified owner decisions remain open.
 P89 actual three-file documentation review and mirror/documentation gates pass.
 Both probe workers and their children exited; scratch preview, exact removal
 and residue check pass. No unrelated source, configuration or asset changed.
+
+## Files 368-369: idetect.h and ios.h (P90)
+
+File 368 idetect.h: pinned XP raw SHA-256
+b95cbdd0bc63b85852f0bd71132f0045cae86b5e571dba24816f6f3c6a696c6b.
+Full-file comparison finds no selected difference outside the established
+NTVDM exclusion/scaffolding. Original consumers include idetect.c, keyboard,
+video, disk and communications code; Compat platform.c uses the original idle
+contract. Retain the original header/include wiring, with no new point.
+
+File 369 ios.h: pinned XP raw SHA-256
+5cc2d50b2027c42f9fae436f4767507c503bd1eeeef4b26be647f005f4dd9b8d.
+The only selected difference is line 23: adding SOFTPC_STANDALONE to the
+original OR expression selects the existing 0x10000 table instead of 0x400.
+All other differences are established excluded bodies/scaffolding, skipped
+without new accounting. The remainder of the selected interface matches XP.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0440 | One-line product profile addition selects a full 16-bit I/O dispatch table. | Qualified residual pending owner decision. Coherent restoration of the original expression aliases an unregistered high port onto actual COM1; both architecture controls distinguish them, while restored configurations fail the same assertion. No new I/O implementation is required. |
+
+Source chain: ios.c owns and initializes both adapter tables, registers actual
+ports, and masks indices by PC_IO_MEM_SIZE-1. Original CCPU in.c/out.c use the
+same mask directly; these are the only C units containing this size macro.
+COM1 is registered at 03F8-03FF. There is no registration of 07FD. The UART's
+adapter_for_port and low-three-bit register decode accept the aliased address,
+so the smaller dispatch map incorrectly invokes the COM1 status handler for
+that unregistered port. This is distinct from a device deliberately registering
+an alias; the table mask imposes it on every device. Historical profile claims
+alone were not accepted as proof.
+
+Focused evidence: a disposable extension of the existing serial_smoke fixture
+creates/resets the actual machine and invokes actual CCPU IN8 at 03FD and 07FD.
+The expected high result is IO_EMPTY_PORT_BYTE_VALUE (FF), independently of
+table size; the registered COM1 status is 60. Current x86/x64 controls both
+report low=60, high=FF and complete the remaining fixture with exit 0.
+For the counterexample, the exact original header condition is restored in a
+private include directory. Actual ios.c, in.c and out.c objects are recompiled
+with their real Ninja flags and replaced together in a copied machine archive;
+all compile/link steps succeed. Both variants report low=60, high=60 and fail
+the same explicit isolation assertion. x86 exits 3221226505, x64 exits 3;
+all processes exit naturally. No product source, original guest or published
+binary is changed. Disposable fixture files remain task-local.
+
+Proof boundary: this exercises the actual CPU I/O worker and UART dispatch,
+not a new real DOS/Windows reproduction, an exhaustive port matrix, or a guest
+instruction-decoder test. It demonstrates the full-map contract's observable
+failure under coherent original restoration; it does not prove every historic
+PC should lack hardware aliases. Defining NTVDM/GISP_SVGA/SFELLOW merely to
+select 64 KiB would also change unrelated machine profiles, not simplify the
+current port adaptation. No alternative flag, duplicate table or fallback is
+introduced.
+
+Production/test/build source changes zero; XP diff change zero. The qualified
+residual is +1/-1 awaiting owner choice. Published EXEs remain P87; P80's
+392/392 is the unchanged full-runtime baseline. Frozen frontier 369/472;
+next file 370 base/inc/j_c_lang.h. S1 and pending decisions remain open.
+
+P90 actual three-file documentation review and mirror/documentation gates pass.
+The worker and children exited; scratch preview, exact removal and residue
+check pass. No user configuration, media or unrelated files were changed.

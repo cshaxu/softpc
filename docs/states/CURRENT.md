@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P89 qualifies ica.h's added CPU_40_STYLE guard and removed Ctrl-Z
-EOF byte as pending owner decisions. Corrected isolated original restorations
-fail actual CCPU compilation on both architectures; current controls pass.
-No production/test/EXE changes. P87 remains the artifact baseline and P80's
-392/392 the full-runtime baseline. Frozen frontier 367/472; next file
-368 base/inc/idetect.h.
+T100 S1 P90 verifies idetect.h's selected XP equivalence and qualifies ios.h's
+full I/O-map selection for owner decision. Coherent original table/mask
+restoration aliases unregistered 07FD onto COM1 on both architectures; current
+actual CCPU IN8 controls pass. No production/test/EXE changes. P87 remains the
+artifact baseline, P80's 392/392 the full-runtime baseline. Frozen frontier
+369/472; next file 370 base/inc/j_c_lang.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
