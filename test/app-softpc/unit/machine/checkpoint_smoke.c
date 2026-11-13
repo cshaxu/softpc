@@ -410,6 +410,10 @@ static void verify_snapshot_archive(void)
     setNpxStackRegs(fpu_stack);
     setNpxControlReg(0x027fu);
     setNpxStatusReg(0x2800u);
+    c_setEFLAGS(2u);
+    NpxFIP = 0x11223344u;
+    DoNpxException();
+    NpxFIP = 0x55667788u;
     cmos_outb(CMOS_PORT, CMOS_SHUT_DOWN);
     cmos_outb(CMOS_DATA, 0x5au);
     /* A callback without a reviewed semantic identifier blocks capture rather
@@ -521,6 +525,9 @@ static void verify_snapshot_archive(void)
     softpc_snapshot_image_dispose(&decoded_image);
     lib_release(image_stream.bytes);
 
+    NpxFIP = 0x99aabbccu;
+    DoNpxException();
+    NpxIntrNeeded = FALSE;
     c_setEAX(0u);
     c_setEIP(0u);
     CCPU_DR[0] = CCPU_DR[7] = 0u;
@@ -547,6 +554,9 @@ static void verify_snapshot_archive(void)
         assert(!softpc_device_snapshot_restore_floppy_host(
             &(softpc_device_floppy_host_state){{4u, 4u}}));
     }
+    assert(NpxIntrNeeded && NpxFIP == 0x55667788u);
+    TakeNpxExceptionInt();
+    assert(!NpxIntrNeeded && NpxFIP == 0x11223344u);
     assert(restored.halted && restored.trap == 0u);
     assert(c_getEAX() == 0x12345678u && c_getEIP() == 0x7654u);
     assert(CCPU_DR[0] == 0x1234u && CCPU_DR[7] == 1u);

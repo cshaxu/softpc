@@ -1609,3 +1609,70 @@ No shared-package, Compat, snapshot schema, user configuration or media changed.
 - P20 softpc32.exe SHA-256 `532546145416597f2ffdfd3dc5e7d76f4c32cc2b398e26fa1a4eead04fdb23c2`.
 
 - P20 softpc64.exe SHA-256 `4fdb4cda47e445bf88fbb03e08e96302b021b54a583aeec748c48bbba42fbab3`.
+
+## P21 file 265: reserved FPU declarations and private snapshot state
+
+zfrsrvd.c is compiled by softpc-ccpu-core and actual original c_main dispatches
+ZFRSRVD with the integer x87 opcode index. Its original functions own address
+decoding, environment loads and delayed exception delivery; Compat is not a
+replacement implementation. Every non-excluded hunk was reviewed separately.
+
+| Point | Initial analysis | Counter-review and disposition |
+| --- | --- | --- |
+| R0166 | Added c_addr.h supplies d_mem/limit_check declarations. | Parameters are existing integral values and pointers, with no float/default-promotion or pointer-return truncation. Default integral promotions preserve the small input values; address_add is a 32-bit result assigned to the existing 32-bit offset. Actual object differences are call preparation scheduling, not evidence of a broken ABI. Restore original absence, qualify actual executable. |
+| R0167 | Added c_intr.h supplies do_intrupt declaration. | x64 object is identical; x86 disassembly differs only in ordering two writes of the same arguments before the call. No necessity established; restore. |
+| R0168 | Added intx.h declaration. | Both objects byte-identical without it; restore. |
+| R0169 | Added snapshot.h include. | Its archive types are not used by this file; both objects byte-identical without it; restore. |
+| R0170 | Added FLDENV prototype and blank. | Both objects byte-identical without it; restore original absence. |
+| R0171 | ZFRSRVD old-style definition rewritten to prototype form. | Actual unsigned opcode index and signatures remain compatible under the supported build; both objects identical after exact restoration. |
+| R0172 | Added private delayed-NPX state accessors. | Existing NpxExceptionEIP is private and distinct from NpxFIP; coherent removal loses saved exception delivery across snapshot restore. Retention evidence pending owner decision. |
+
+Declaration candidates were compiled independently under both production
+command lines, then the combined original-declaration candidate was compiled.
+Only c_addr.h at both widths and c_intr.h on x86 changed objects. This is not
+a generic claim that undeclared functions are portable to every compiler; no
+new compiler support or shared warning relaxation is introduced. No declaration
+is moved to Compat or another mirror file to conceal an equal difference.
+
+The snapshot regression extends existing verify_snapshot_archive by ten lines:
+DoNpxException saves 11223344, current FIP then becomes 55667788, capture occurs;
+a later exception saves 99AABBCC and its pending flag is cleared. Actual restore
+recovers pending/current FIP; TakeNpxExceptionInt then restores 11223344. Both
+architectures pass using the actual original functions and normal snapshot
+image path. No private accessor is directly asserted by the test.
+
+The negative is coherent: remove both added mirror accessors, omit their
+archive getter/setter use, preserve ordinary pending-flag restoration through
+the original global. Both variants compile/link the real checkpoint executable,
+but x86 exits 3221226505 and x64 exits 3 at the delivered FIP assertion. Thus
+the evidence is wrong subsequent exception IP, not merely undefined symbols.
+Original TakeNpxExceptionInt mutates pending state and injects an interrupt;
+using it to observe the private IP would change capture behavior. Creating a
+second owner or altering the static original state adds mirror difference
+points and is not a minimization candidate. The 17-line existing access remains
+a qualified residual, not approved retention. No archive format changes.
+
+Production +2/-7 (net -5); tests +10/-0. Non-excluded XP diff +24/-2 (26 lines)
+becomes +17/-0: nine fewer lines and six removed points. Existing #error bodies
+are skipped without bookkeeping. File 266 matches normalized XP; 267 com.c is
+next. Final-source cached dual-width builds and publication pass. All 392 distinct
+tests pass after the single x86 verifier retry documented below: each width
+has 188 background and 8 native tests. Both actual final checkpoint suites
+pass, including the added delayed-NPX snapshot case. No manual guest session
+or exhaustive x87 opcode/fault validation is claimed. Coordinator review
+inspected the actual production/test diff, fixed XP signature restoration,
+individual declarations and ABI call sites, coherent negative controls,
+final-source tests, preserved CRLF, manifests and documentation gates.
+No user configuration/media, shared package or snapshot schema changed.
+
+P21 qualification note: the first x86 background run passed 187 tests but
+emulator.verifier-negative reached its existing 60-second budget (59.90 s
+reported). After that CTest process ended, the same test passed alone in
+23.48 s under the unchanged budget. No test source/configuration or compiler
+settings changed for the retry. Native x86 passes 8/8. This is an observed
+aggregate-timeout/retry result, not a proven scheduler root cause or a first-pass
+392/392 claim. The original timeout result is retained in this evidence.
+
+- P21 softpc32.exe SHA-256 `e5c60f60ae2c402eb3e6fbb3ebca0acd4e2eabd9032988d75facb9aa8c8b390a`.
+
+- P21 softpc64.exe SHA-256 `ae2a1ba32a8407b09ae01a5d98de6eb0beaf0dc6a0b4091b86bfe4f18e5d09c1`.

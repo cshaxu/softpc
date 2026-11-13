@@ -30,11 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P20 restores original RETF operand-width stack-pointer handling.
-Actual pre-restoration x86/x64 instruction tests both fail the full-ESP
-assertion. Final-source cached dual builds/publication and all 392 tests
-pass (188 background plus 8 native per architecture). Production +4/-1; tests +16/-12; XP diff shrinks five lines and
-one point. Sequential review is 264/472; file 265 zfrsrvd.c is next.
+T100 S1 P21 restores original zfrsrvd declarations/signature. The private
+NPX snapshot access remains evidence-qualified pending owner: coherent removal
+fails actual snapshot/delivery checks on both architectures. Production +2/-7;
+tests +10/-0; XP diff decreases nine lines and six points. Final-source dual
+build/publication passes; all 392 tests pass after one x86 verifier timeout
+and successful unchanged-budget retry (recorded in evidence). Sequential review is 266/472;
+file 267 com.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
