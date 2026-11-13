@@ -3012,3 +3012,94 @@ and exact scratch cleanup precede delivery.
 P35 actual process inventory finds no remaining task worker. Exact scratch
 cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
 user configuration, guest media and snapshots remain intact.
+
+## P36 file 289 sevid006.c audit and restoration
+
+Original normalized SHA-256 is
+067262f7ca9ebbb4577264d2872db835b6e6ec45c3f55db777140471b636ee64,
+matching the pinned XP SP1 manifest. The actual compiled file defines S2278-
+S2309: Unchained moves/copies and WORD writes. unchained_evid registers the
+entry functions; their existing copy helpers remain in the same original
+implementation. No duplicate Compat device path or test-only file is removed.
+
+The [range map](m9-t100-sevid006-points.tsv) covers 605 initial unequal ranges;
+the [allocation map](m9-t100-sevid006-allocations.tsv) covers 32 allocations.
+There is no new accounting for existing exclusions.
+
+| Point | Initial finding | Counter-review and disposition |
+| --- | --- | --- |
+| R0296 | 85 native-address dereferences have GDP address wrappers. | Copy inputs, native read/write plane bases (GDP 1284/1288), and their local pointer arithmetic produce host addresses, not fixed GDP field offsets. Restore original dereferences and formatting, retaining the fixed-field mapping at pointer sources. |
+| R0297 | Original fixed GDP offsets use native-field mapping. | Original 32-bit field layout is not current native pointer/callback/IUH storage. Preserve existing mapping/header as an evidence-qualified residual pending owner decision; no new helper/state. |
+| R0298 | 32 allocations differ in capacity/zeroing. | Original four-byte capacities corrupt the x64 heap in actual-body controls. Eleven UnchainedByteMove entries store LocalIUH[1] as IU32 and later pass it as IUH RAM-source pointer. Preserve their native capacity and zeroing; this is not proof of support for arbitrary high-address RAM-source input. |
+| R0299 | Other 21 allocations use blanket calloc. | Local storage review finds no equivalent partial-store/full-IUH-read requirement. Restore malloc with native capacity. Poisoned candidate allocations pass the selected controls; not every specialized move is dynamically covered. |
+
+All eleven retained cases are named individually in the allocation inventory:
+S2278, S2280, S2283, S2285, S2288, S2290, S2293, S2295, S2298, S2300, S2303.
+Reversing only the existing ABI forms makes the entire token stream identical
+to XP. No unrelated semantic patch is hidden in the file.
+
+Actual diff is 106 replacement lines: 85 address accesses and 21 allocations.
+Production +106/-106, net 0; tracked tests unchanged. XP-relative diff falls
+from +794/-793 = 1587 lines / 605 ranges to +713/-712 = 1425 lines / 542 ranges:
+**162 fewer diff lines, 63 fewer points**. No new mirror point, branch, helper,
+second device implementation or complexity moved into Compat.
+
+### Actual-body controls
+
+Task-local test compilation uses each architecture's actual compile/link
+commands. S2305 is called through unchained_evid[0].w_write; S2279 is exercised
+directly with the original rule-register arguments. Eighteen WORD-write cases
+combine masks 0/0xf0/0xff, plane enables 0/5/15 and odd/even destinations.
+Forty-eight four-plane copy cases combine both existing source branches,
+three masks, odd/even destinations and lengths 0/1/2/7. Independent byte
+expectations check copied data, latch/memory masks and untouched regions.
+Existing VGA/CHAIN2 assertions also execute in each process.
+
+| Variant | x86 | x64 |
+| --- | --- | --- |
+| Unmodified current, 66 cases plus existing VGA tests | pass | pass |
+| Address restoration | pass | pass |
+| Minimal address/malloc restoration | pass | pass |
+| Original four-byte allocation capacities | pass | heap corruption 0xc0000374 |
+| Candidate malloc storage prefilled 0xa5 | pass | pass |
+
+These controls do not qualify all eleven outer move entries, all specialized
+mode combinations or guest-triggered batch reachability. The original nested
+continuation defect documented in P34 remains separate TODO debt. No new
+interactive guest reproduction, guest/configuration/media/snapshot change,
+production testing API or sibling change is claimed.
+
+Final normalized source SHA-256:
+eceedf41812475259448a4fa8a417810b92e8a8e41c8c36d6f6c5e6cc762e5f4.
+Installed source is byte-identical to the tested minimal candidate. Actual
+counter-review verifies the 106 changed lines, unchanged arithmetic and
+callbacks, and exact XP formatting for restored lines. Mirror CRLF is kept.
+Full qualification and final evidence reconciliation follow before delivery.
+
+### P36 final qualification and review
+
+Cached dual builds and publication complete. x86 and x64 each pass 188/188
+background plus 8/8 native tests: **392/392 first run**, no retries or budget
+changes. Each build retains the same original sevid006.c:1065 unreachable-switch
+warning present in unmodified actual-body controls; no new warnings. No warning
+suppression or extra mirror patch is introduced.
+
+The complete actual diff remains 106 replacements, no algorithm/callback
+changes. All 81 restored trailing-space lines match XP exactly. Source identity,
+mirror CRLF, documentation/evidence LF and command-local whitespace checks pass.
+All 605 initial ranges are classified; qualified residuals are not automatically
+approved. Documentation and mirror gates pass. No exhaustive VGA or new
+interactive guest validation is claimed.
+
+Published softpc32.exe: Nov 13 2026 06:15:39;
+SHA-256 3d96799eccf894e8a14390c308a35e36f01670309d55829b6f35329452cfed5c.
+Published softpc64.exe: Nov 13 2026 06:19:17;
+SHA-256 2d1af296ff41c74a1e92da8f5e7f18b6552d704273ed3b7d822d5fd2e8cd99e2.
+
+Sequential audited scope is 289/472; next file 290 base/cvidc/sevid007.c.
+S1 remains active without a routine approval wait. Exact process verification
+and scratch cleanup precede delivery; caches and user assets are preserved.
+
+P36 actual process inventory confirms all task workers exited. Exact scratch
+cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
+user configuration, guest media and snapshots remain intact.

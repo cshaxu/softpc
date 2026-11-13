@@ -1765,3 +1765,13 @@ production +57/-57, no new mirror difference or relocated Compat behavior.
 See [P35 audit](m9-t100-progress.md#p35-file-288-sevid005c-audit-and-restoration),
 [range map](m9-t100-sevid005-points.tsv) and
 [allocation inventory](m9-t100-sevid005-allocations.tsv).
+
+### T100 S1 P36 allocation and address minimization
+
+File 289 sevid006.c restores 85 native-address accesses and 21 malloc sites.
+Native capacities and eleven mixed-width move locals retain zeroing as
+qualified ABI residuals, not automatic owner approval. XP-relative diff drops
+1587 -> 1425 lines and 605 -> 542 ranges; production +106/-106.
+See [P36 audit](m9-t100-progress.md#p36-file-289-sevid006c-audit-and-restoration),
+[range map](m9-t100-sevid006-points.tsv) and
+[allocation inventory](m9-t100-sevid006-allocations.tsv).

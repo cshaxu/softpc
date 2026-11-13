@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P35 restores 26 native-address accesses and malloc at 31 sites in file
-288 sevid005.c. Native capacities and S2275 mixed-width zeroing remain.
-Production +57/-57 (net 0); tests unchanged. XP-relative diff decreases
-1379 -> 1327 lines and 506 -> 499 points. Actual-body controls cover 90 selected
-Unchained write/fill cases on x86/x64; original x64 capacities corrupt the heap.
+T100 S1 P36 restores 85 native-address accesses and malloc at 21 sites in file
+289 sevid006.c. Native capacities and eleven mixed-width move locals remain.
+Production +106/-106 (net 0); tests unchanged. XP-relative diff decreases
+1587 -> 1425 lines and 605 -> 542 points. Actual-body controls verify 66 selected
+WORD-write/copy cases on x86/x64; original x64 capacities corrupt the heap.
 Cached dual builds/publication and 392/392 registered tests pass first run.
 Both compiles retain the same original mirror unreachable-switch warning;
 no new warning is introduced. Actual review, gates and source identity pass.
-Sequential review is 288/472; next is file 289 base/cvidc/sevid006.c.
+Sequential review is 289/472; next is file 290 base/cvidc/sevid007.c.
 Qualified ABI residuals remain owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
