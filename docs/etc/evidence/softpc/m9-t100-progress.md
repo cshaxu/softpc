@@ -144,3 +144,114 @@ owner decision, not approved retention. File 7 is read-only complete; file 8
 is the next incomplete file. Overall 7/472 audited, 465 remaining, zero whole
 files deleted. P1 is a batch delivery, not S1 or T100 closure. The two runners
 completed; their disposable logs and probes are removed after promoting results.
+
+## P2 ordered investigation (not delivered)
+
+File 8, base/bios/slave_bs.c: complete source review; original-relative
+in-scope diff +2/-1 becomes +1/-1 after removing the relocated SCCSID comment
+(R0007, nonsemantic restoration, local and not yet built/delivered).
+R0008 remains an owner decision: D11_int writes EOI 0x20 to ICA1_PORT_0
+rather than XP ICA1_PORT_1. The actual BIOS dispatch installs D11_int in
+slots 72/73/74/76/77. Original SWPIC_outb treats odd ports as IMR writes,
+whereas even-port OCW2 command 0x20 invokes ica_eoi. Thus the original write
+changes the mask to 0x20 and leaves the active slave ISR uncleared. This is
+source proof, not a newly run negative probe. Existing device_contract_smoke
+verify_unused_irq covers idle, slave IRQ11, master IRQ5 and spurious master2;
+P1's final run passed that test. No current P2 test result is claimed.
+Counter-review: this file is a real BIOS consumer, not duplicate Compat logic;
+restoring the original port cannot be justified by absence of a GUI symptom.
+The retained one-line correction still requires owner disposition.
+
+File 9, base/bios/tape_io.c: investigation ongoing, not complete. R0009
+restores the two unused original xms A20 declarations; R0011 restores the
+original JAPAN conditional end comment. Both are local nonsemantic changes.
+R0010 (descriptor limit pointer type) and R0012 (INT15/C0 segment) remain
+investigations, not admitted retention decisions. The descriptor caller's
+source_limit/target_limit are sys_addr and the current compatibility helper
+uses original CPU40 read_descriptor_linear; inspect coherent old-helper ABI
+before disposition. For C0, reset.c installs INT15 at F000:F859 and CCPU BOP
+dispatch does not itself replace CS. Therefore the current comment claiming
+the handler necessarily executes in the guest caller's segment is not proof.
+Trace the ROM entry and execute the actual INT15 path before deciding.
+No guest, user configuration or snapshot changed. No P2 build started yet.
+Eight of 472 files source-audited; 464 remain, including file 9. Pending
+owner decisions and local unverified restoration are not closed work.
+
+### File 9 completed source review and focused proof
+
+R0012 restored XP getCS() and removed the unsupported local explanation.
+The fixed in-tree bios4.rom is loaded at F000:E000. INT15 enters F000:F859;
+AH=C0 follows comparisons at F85A/F865/F86A/F871 to BOP bytes C4 C4 15 at
+F87A, without a far transfer or change of CS. CCPU dispatch keeps that CS.
+An added sequence in the existing machine_smoke INT15 boot fixture executes
+INT15/C0 through this ROM and stores AX, ES, BX and flags in guest RAM.
+Both x86 and x64 rebuilt machine_smoke and passed: ES=F000, BX=E6F5,
+AH=0 and CF clear after entering with CF set. The original AH88 memory-size
+assertion still passes. This is actual generated-test guest execution, not a
+changed original guest binary or a direct cassette_io stub. No new manual
+DOS/Windows acceptance is claimed.
+
+R0010 is now evidence-qualified pending owner decision, not unknown:
+XP tape_io.c:95-96 declares limit as word* (IU16*), but its original local
+source_limit/target_limit and their passed addresses are sys_addr (IU32).
+Original CPU40 read_descriptor_linear decodes a 20-bit limit, including
+page granularity expansion to 32 bits. The Compat facade only delegates that
+original decoder and copies its results. Fixed XP base contains no definition
+of retrieve_descr_fields, only this declaration and two calls. Narrowing the
+adapter to match the old prototype would either leave half of the caller's
+32-bit object unwritten or truncate real descriptor limits; retaining the
+adapter and reverting only the prototype creates incompatible pointer types.
+The existing device_contract descriptor tests exercise limits through FFFFFFFF
+and surrounding guards; P1 passed them. Counter-review distinguishes an ABI
+mismatch from a claim of an observed customer fault. Minimal residual +1/-1
+is the corrected sys_addr* declaration; no extra helper or state is proposed.
+
+File 9 in-scope residual +6/-5 becomes +1/-1 (10 fewer XP-relative diff
+lines). The original declarations and end comment were restored exactly;
+existing excluded bodies were not reopened or entered into the ledger.
+Nine of 472 files source-audited; 463 remain. P2 full dual build/publication
+and regression is running in the active task scratch; focused success is not
+full qualification or delivery. No P2 commit or closure yet.
+
+### Following read-only checks during P2 regression
+
+Files 10-25 (aaa through arpl, source/header pairs) are byte-identical after
+required line-ending normalization to fixed XP. Files 26-31 (bound, bsf, bsr
+pairs) have no in-scope differences. Original c_main directly calls or selects
+these instruction workers; their declarations are included there and the CMake
+CCPU source list compiles their definitions. These files remain necessary;
+Compat does not provide duplicate instruction workers.
+File 32 bswap.h is under consumer investigation: CPU_486 selects its include,
+but SPC486 implementation branches are excluded and BSWAP opcodes use Int6.
+Do not equate an included declaration with an actual implementation consumer.
+Preliminary read-only comparisons of later files do not advance ordered audit
+completion beyond file 31. Thus 31/472 audited, 441 remaining.
+
+P2 source changes are +4/-6 (net -2), tests +13/-3 (net +10). Raw normalized
+XP-relative diff added/deleted delta is -6/-4, ten fewer diff lines across the
+two changed files. The residual display ignoring required line controls goes
+from slave +2/-1 to +1/-1 and tape +6/-5 to +1/-1; do not confuse its eleven-line
+reduction with the raw comparison's ten. Existing excluded bodies receive no
+new ledger or counts. Actual diff review confirms the only runtime restoration
+is INT15/C0 getCS; EOI and descriptor corrections are unchanged pending decisions.
+
+### P2 final qualification and review
+
+Final source passes x86 188/188 background plus 8/8 native and x64 188/188
+background plus 8/8 native: 392/392, no failures or skips. Both focused actual
+INT15 ROM tests also passed. Documentation, XP manifest and whitespace gates
+pass. Builds published fresh timestamps Nov 12 2026 23:12:02 (x86) and
+23:12:09 (x64). Published SHA-256:
+
+- softpc32.exe: 7e8781e7c8d68311a2a79aff04d441ad2f0e0e49adddfd9dbd742ecce8b2723f8
+- softpc64.exe: c9f5c98fdd40819165f3b340f320fffa5c567136443ccfd767d73fe1302be2ad
+
+Executor review of actual diff: two mirror files, one existing machine test,
+manifest/audit/state records and two published EXEs only. No public package,
+Compat implementation, configuration, firmware or snapshot changes. This
+restoration adds no runtime branch or duplicate path. The test extends one
+existing boot fixture rather than adding a parallel BIOS fixture. Previously
+qualified residuals R0006/R0008/R0010 remain owner decisions, not approval.
+Runner completed with exit zero and is no longer live. Disposable P2 evidence
+is removed after promotion here; caches are retained. P2 delivery does not
+close S1 or T100. Source review stands at 31/472; file 32 remains investigation.

@@ -51,6 +51,8 @@
 #include "debug.h"
 #include "quick_ev.h"
 
+extern void xmsEnableA20Wrapping(void);
+extern void xmsDisableA20Wrapping(void);
 
 #define ONE_MEGABYTE    (1024 * 1024)
 #define SIXTY_FOUR_K    (64 * 1024)
@@ -137,7 +139,7 @@ half_word target_AR;
 #line 150
 #if defined(JAPAN) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: defined(JAPAN) && defined(i386)"
-#endif
+#endif // JAPAN && i386
 #line 156
 #else
 #error "Unsupported SoftPC mirror configuration: !PM"
@@ -283,11 +285,8 @@ half_word target_AR;
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #else
-		/* The C handler executes in the caller's CPU context; getCS() is
-		 * therefore the guest caller's segment, not the ROM segment.  C0
-		 * must point at the original BIOS configuration table at F000:E6F5. */
 #line 393
-		setES( CONF_TABLE_SEGMENT );
+		setES( getCS() );
 		setBX( CONF_TABLE_OFFSET );
 #endif
 #line 396

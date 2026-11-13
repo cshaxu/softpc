@@ -30,7 +30,6 @@ AMMENDMENTS	:
 =========================================================================
 */
 
-/*  @(#)slave_bios.c	1.6 08/10/92 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

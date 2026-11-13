@@ -98,9 +98,15 @@ static void write_int15_memory_boot_image(const char *path)
 {
     unsigned char sector[512] = { 0 };
     FILE *file;
-    /* AH=88h; INT 15h; store AX at 0500h; jmp $. */
+    /* Exercise memory size and configuration through the original INT 15h ROM. */
     unsigned char program[] = {
-        0xb4u, 0x88u, 0xcdu, 0x15u, 0xa3u, 0x00u, 0x05u, 0xebu, 0xfeu
+        0xb4u, 0x88u, 0xcdu, 0x15u, 0xa3u, 0x00u, 0x05u,
+        0xb4u, 0xc0u, 0xf9u, 0xcdu, 0x15u, /* AH=C0, CF set before call */
+        0xa3u, 0x02u, 0x05u,             /* save AX */
+        0x8cu, 0x06u, 0x04u, 0x05u,      /* save ES */
+        0x89u, 0x1eu, 0x06u, 0x05u,      /* save BX */
+        0x9cu, 0x58u, 0xa3u, 0x08u, 0x05u, /* save flags */
+        0xebu, 0xfeu
     };
     lib_memory_copy(sector, program, sizeof(program));
     sector[510] = 0x55u; sector[511] = 0xaau;
@@ -739,7 +745,7 @@ static void run_int75_boot_image(const char *path)
 static void run_int15_memory_boot_image(const char *path)
 {
     softpc_machine_smoke_note(__func__);
-    unsigned char memory_kib[2] = { 0, 0 };
+    unsigned char memory_kib[10] = { 0 };
     softpc_machine_options options = { path, NULL };
     softpc_machine *machine = NULL;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
@@ -748,6 +754,10 @@ static void run_int15_memory_boot_image(const char *path)
     assert(softpc_machine_read_physical(machine, 0x500u, memory_kib,
         sizeof(memory_kib)) == SOFTPC_MACHINE_OK);
     assert(memory_kib[0] == 0u && memory_kib[1] == 0x3cu);
+    assert(memory_kib[3] == 0u); /* AH success */
+    assert(memory_kib[4] == 0u && memory_kib[5] == 0xf0u); /* ES */
+    assert(memory_kib[6] == 0xf5u && memory_kib[7] == 0xe6u); /* BX */
+    assert((memory_kib[8] & 1u) == 0u); /* CF clear */
     softpc_machine_destroy(machine);
 }
 

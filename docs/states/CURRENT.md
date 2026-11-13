@@ -30,11 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P1 restores the first batch: three mirror files, XP-relative diff
-reduced by 57 lines; final dual-width builds publish both EXEs and pass
-392/392 tests. Seven of 472 files audited; reset.c DOS mouse-call omission
-awaits owner decision. File 8 slave_bs.c is next. See
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md). S1 remains active.
+T100 S1 P2 restores original INT15/C0 segment selection and nonsemantic
+BIOS differences; raw XP-relative diff reduces by 10 lines. Both EXEs are
+published and final x86/x64 regression passes 392/392. Source review stands
+at 31/472 files; file 32 bswap.h is under consumer investigation. Three
+residual points (DOS mouse calls, slave EOI port, descriptor pointer ABI)
+await owner decisions. See [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+S1 remains active; this is a batch delivery, not task closure.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
 build/publication via existing cached Ninja presets. Two dual-width runs and
