@@ -30,14 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P11 restores all non-excluded c_reg.c content to fixed XP. Existing
-Compat archive functions directly use original register accessors; two added
-mirror snapshot wrappers and their declarations are deleted. Production
-+62/-75 (net -13), tests unchanged; mirror diff reduces by 69 lines to zero
-for this file. Both published EXEs pass 392/392 fresh tests. Snapshot format
-and ordered state copying are unchanged; original mirror printf warning is
-reported, not disguised as a zero-warning build.
-Source review is 97/472; file 98 c_tlb.c is next.
+T100 S1 P12 simplifies the private c_tlb.c snapshot interface: remove its
+fixed-length argument and duplicate null/size guards; archive allocation owns
+that invariant. Actual cache copies and state validation remain. Production
++9/-17 (net -8), tests unchanged; fixed-XP diff reduces from +67/-0 to +59/-0.
+Both published EXEs pass 392/392 fresh tests. The coherent original-flush
+alternative fails the existing old-mapping checkpoint assertion on both
+architectures, so the residual snapshot bridge remains evidence-qualified,
+not automatically approved. Snapshot layout and guest behavior are unchanged.
+Source review is 101/472; file 102 c_xcptn.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

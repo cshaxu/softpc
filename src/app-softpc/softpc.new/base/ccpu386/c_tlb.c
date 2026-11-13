@@ -125,17 +125,13 @@ LOCAL IU32 page_address[NR_TLB_SETS * NR_TLB_ENTRIES * NR_ACCESS_MODES];
 
 GLOBAL VOID
 softpc_ccpu_snapshot_capture_tlb
-IFN3(
+IFN2(
    softpc_ccpu_tlb_state *, state,
-   IU8 *, snapshot_page_index,
-   uint32_t, snapshot_page_index_bytes
+   IU8 *, snapshot_page_index
 )
 {
    IU32 set, entry;
 
-   if (snapshot_page_index_bytes != SOFTPC_CCPU_FAST_TLB_PAGE_COUNT ||
-       snapshot_page_index == NULL)
-      return;
    for (set = 0; set < NR_TLB_SETS; set++) {
       for (entry = 0; entry < NR_TLB_ENTRIES; entry++) {
          TLB_ENTRY *source = &tlb[set][entry];
@@ -154,17 +150,13 @@ IFN3(
 
 GLOBAL IBOOL
 softpc_ccpu_snapshot_restore_tlb
-IFN3(
+IFN2(
    const softpc_ccpu_tlb_state *, state,
-   const IU8 *, snapshot_page_index,
-   uint32_t, snapshot_page_index_bytes
+   const IU8 *, snapshot_page_index
 )
 {
    IU32 set, entry;
 
-   if (snapshot_page_index_bytes != SOFTPC_CCPU_FAST_TLB_PAGE_COUNT ||
-       snapshot_page_index == NULL)
-      return FALSE;
    for (set = 0; set < NR_TLB_SETS; set++) {
       for (entry = 0; entry < NR_TLB_ENTRIES; entry++) {
          const softpc_ccpu_tlb_entry_state *source = &state->entries[set][entry];

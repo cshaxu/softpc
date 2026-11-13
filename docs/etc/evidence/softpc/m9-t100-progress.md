@@ -1024,3 +1024,77 @@ Published artifact SHA-256:
 - softpc32.exe: `438b8428418003da1cabee4ac83f09b5d58aed30a12d6cdf21daac97dfd44ce7`.
 
 - softpc64.exe: `1a899975f5cd30742e2daafe790f37d0ae02f6b26b0185e759d3eb5961cecd77`.
+
+
+## P12: file 98 TLB snapshot boundary
+
+Fixed-XP comparison of c_tlb.c finds only the added snapshot include, two
+snapshot functions and their following #line 124 outside previously excluded
+bodies. The line directive preserves original subsequent diagnostics and is
+counted as an actual local addition, not excluded-body bookkeeping.
+
+| Point | Original/current location | Executor conclusion and counter-review |
+| --- | --- | --- |
+| R0135 | include block / snapshot.h | Original has no snapshot schema. Retain provisionally as the declaration for the private-state copy boundary; the coherent original-flush alternative fails on both architectures. Pending owner decision. |
+| R0136 | after FAST_TLB arrays / capture_tlb | Remove redundant fixed-size argument and null/size guard. Remaining capture accesses original private arrays unavailable through original external accessors. Pending owner decision on the residual. |
+| R0137 | same block / restore_tlb | Remove the same redundant argument/guard; retain actual copies and validity/next-set checks. A flush is not equivalent restoration. Pending owner decision on the residual. |
+| R0138 | before original line 124 | Retain line-control for the added snapshot block; its removal would change subsequent diagnostic locations. Pending owner decision with that block. |
+
+Counter-review distinguishes this file from c_reg.c: the original tlb,
+next_set, page_index and page_address are LOCAL storage, with no original
+full-state export/import accessors. test_tlb operates architectural test
+registers and mutates cache state; it is not an equivalent snapshot API.
+Moving the same implementation elsewhere or exposing the arrays would not
+remove complexity. Original flush_tlb invalidates cached translations, causing
+a subsequent lookup to observe page tables rather than saved cache contents.
+
+The isolated comparison uses actual Ninja flags and the existing checkpoint
+fixture/link path on each architecture. Control builds and runs pass. The
+alternative removes the added mirror snapshot entries, omits archive capture
+of TLB state and invokes original flush_tlb in place of archive TLB restore.
+Both alternatives compile/link successfully, but fail the existing assertion
+at checkpoint_smoke.c:552: lin2phy(0x400123u, 0) == 0x3123u. x86 exits
+3221226505; x64 exits 3. The fixture changes the page-table entry after restore,
+so original cached translation must survive. Source predicts a fresh lookup
+would produce 0x4123; the probe did not print that actual value, so only the
+failed old-mapping assertion is claimed as dynamic proof. These are SoftPC
+results, not sibling-project evidence or manual guest reproduction.
+
+The only production callers are archive.c capture/restore. Its allocator
+creates exactly SOFTPC_CCPU_FAST_TLB_PAGE_COUNT bytes, matching original
+NR_PAGES (1048576); allocation failure returns before capture, dispose clears
+the archive, and stream reading uses the same allocation and fixed read size.
+Restore rejects invalid archives and null page-index storage before calling
+the bridge. Both old length arguments were the same literal constant, not
+an external capacity. Removing that argument and duplicate guards leaves one
+allocation owner and does not remove payload-value validation. Variable SAS
+buffer sizes are different and are not changed.
+
+Production diff is +9/-17 (net -8): mirror +4/-12, archive +2/-3,
+snapshot declarations/comment +3/-2. Test code is unchanged. Relative to
+fixed XP, c_tlb.c changes from +67/-0 to +59/-0: eight fewer difference lines,
+no new mirror point. Counts normalize CRLF and omit only existing excluded
+bodies/their line-control; the new snapshot block's #line 124 remains counted.
+Snapshot serialization/layout and original TLB algorithms are unchanged.
+
+Files 99 c_tlb.h and 101 c_tsksw.h are entirely normalized-identical to fixed
+XP; file 100 c_tsksw.c has no in-scope difference. They require no edits.
+P12 final-source cached x86/x64 builds/publication pass. Each architecture
+passes 188 background plus eight native integration tests: 392/392 fresh
+passes, all six qualification commands exit zero. Existing original-mirror
+warnings remain permitted; this is not a zero-warning mirror build. No fresh
+manual DOS/Win3.1/Win95 session validation or exhaustive TLB-state proof is
+claimed. The existing checkpoint regression exercises the real original cache.
+
+Coordinator actual-diff review confirms only the fixed-capacity private TLB
+argument/checks are removed, original copying order and validation remain,
+all real callers are updated, mirror CRLF is preserved, and no shared package,
+guest, INI, media or snapshot is modified. Manifest and documentation gates
+pass. This delivers the simplification without approving residual retention.
+Ordered review is 101/472; file 102 c_xcptn.c is next.
+
+
+P12 published artifact SHA-256:
+
+- softpc32.exe: `73c16db7ed529ed4a0924a946dd6b92e1262faa9bebe99298307a5673b4ea5a7`.
+- softpc64.exe: `77de7e0549332033cfb4ecd467a297fd146cb41f94c7a49f465d8292053934cc`.

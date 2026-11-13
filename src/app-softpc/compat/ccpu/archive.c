@@ -86,8 +86,7 @@ int softpc_ccpu_archive_capture(softpc_ccpu_archive *archive)
 #undef SNAPSHOT_SEGMENT
     softpc_ccpu_snapshot_capture_execution(&archive->execution);
     softpc_ccpu_snapshot_capture_debug(&archive->debug);
-    softpc_ccpu_snapshot_capture_tlb(&archive->tlb, archive->tlb_page_index,
-        SOFTPC_CCPU_FAST_TLB_PAGE_COUNT);
+    softpc_ccpu_snapshot_capture_tlb(&archive->tlb, archive->tlb_page_index);
     softpc_ccpu_snapshot_capture_fpu(&archive->fpu);
     if (archive->devices == NULL)
         archive->devices = softpc_device_archive_create();
@@ -131,7 +130,7 @@ int softpc_ccpu_archive_restore(const softpc_ccpu_archive *archive)
     softpc_ccpu_snapshot_restore_execution(&archive->execution);
     if (!softpc_ccpu_snapshot_restore_debug(&archive->debug) ||
         !softpc_ccpu_snapshot_restore_tlb(&archive->tlb,
-            archive->tlb_page_index, SOFTPC_CCPU_FAST_TLB_PAGE_COUNT))
+            archive->tlb_page_index))
         return 0;
     softpc_ccpu_snapshot_restore_fpu(&archive->fpu);
     return softpc_device_archive_restore(archive->devices);

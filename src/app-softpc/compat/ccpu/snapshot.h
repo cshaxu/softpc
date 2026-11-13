@@ -104,10 +104,11 @@ void softpc_ccpu_snapshot_restore_execution(
     const softpc_ccpu_execution_state *state);
 void softpc_ccpu_snapshot_capture_debug(softpc_ccpu_debug_state *state);
 int softpc_ccpu_snapshot_restore_debug(const softpc_ccpu_debug_state *state);
+/* TLB buffers use the archive-owned SOFTPC_CCPU_FAST_TLB_PAGE_COUNT allocation. */
 void softpc_ccpu_snapshot_capture_tlb(softpc_ccpu_tlb_state *state,
-    uint8_t *page_index, uint32_t page_index_bytes);
+    uint8_t *page_index);
 int softpc_ccpu_snapshot_restore_tlb(const softpc_ccpu_tlb_state *state,
-    const uint8_t *page_index, uint32_t page_index_bytes);
+    const uint8_t *page_index);
 void softpc_ccpu_snapshot_capture_fpu(softpc_ccpu_fpu_state *state);
 void softpc_ccpu_snapshot_restore_fpu(const softpc_ccpu_fpu_state *state);
 void softpc_ccpu_snapshot_capture_sas(softpc_ccpu_sas_state *state,
