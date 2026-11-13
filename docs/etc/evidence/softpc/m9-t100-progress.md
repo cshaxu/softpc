@@ -5607,3 +5607,33 @@ under the existing snapshot contract and no-new-diff constraint. R0417 remains
 an owner decision. No production/test/build/manifest/EXE change or new full
 regression; published P66 and its 392/392 result remain the last full baseline.
 Verified ordered frontier 321/472; next file 322 floppy.c. S1 remains active.
+
+
+## Files 322-323: floppy.c and floppy_i.c (P71 read-only qualification)
+
+Fixed XP raw SHA-256:
+
+- floppy.c: 0d477d6dcea01fb9af2976729fc14b56d02ee3f34d37f38075bbd6b1bc023815.
+- floppy_i.c: 9feb3e43eefeefa09f803897c34be6a975deeef96296fb5437d60bc5e49427f1.
+
+Complete per-file original/current text comparison and contextual review find
+no retained-code differences outside already excluded bodies and their existing
+conditional/line-control scaffolding. Diff alignment fragments were checked
+against their enclosing original and current conditions, rather than mistaken
+for additional selected-code deletions. Those exclusions are skipped without
+new accounting, point IDs or retention decisions, as required by the owner.
+This is retained-subset equivalence, not whole-file byte identity with XP.
+
+Both files are production inputs explicitly listed in root CMake. They retain
+the original floppy BIOS implementation and interrupt entry. Their removal
+would remove production code, and no removal or alternative Compat path is
+proposed. No source restoration is needed in this pair.
+
+Counter-review: neither an original-body exclusion nor its line-control boundary
+is used to claim a new restoration or diff reduction. Production, test, build,
+manifest and EXE changes are all zero; mirror diff delta zero. This is a read-only
+source comparison, with no new compilation or dynamic tests. P66 remains the
+published executable/full 392/392 regression baseline; P69 remains the latest
+focused dual-width checkpoint result. No broader guest assertion is made.
+Verified frozen frontier advances to 323/472; next file 324 gfi.c. S1 and the
+previous evidence-qualified owner decisions remain open.
