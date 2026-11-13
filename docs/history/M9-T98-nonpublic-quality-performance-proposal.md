@@ -87,7 +87,7 @@ to sizing and carries its storage audit forward to S8; no completed S is reused.
    closed after owner-authorized self-verification, delivery and actual-diff review.
 9. S15: [Pause/input handoff](../history/M9-T98-S15-pause-input-handoff.md), owner-accepted and closed.
 10. S16: unimplemented research transferred by owner to
-    [T99 S1](../proposals/m9-public-handoff-simplification.md) at T98 closure;
+    [T99 S1](../history/M9-T99-public-handoff-simplification-proposal.md) at T98 closure;
     not reported as completed research.
 
 ### S13 - Manual edges and native snap regions

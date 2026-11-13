@@ -20,6 +20,6 @@ no blocking issue or new queue, thread, polling, retry or compatibility path.
 Documentation, 505-body mirror, whitespace and residue checks pass. Temporary
 work is retired; HEAD equals origin/main and the worktree is clean.
 
-The [proposal](../proposals/m9-public-handoff-simplification.md#s9-executor-delivery-and-quality-review)
+The [proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s9-executor-delivery-and-quality-review)
 retains qualification, artifact hashes, similar-issue dispositions and proof
 limits. This closure adds no fresh build/test or downstream-sync claim.

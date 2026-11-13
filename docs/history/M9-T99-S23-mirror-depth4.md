@@ -28,7 +28,7 @@ the first two depth-4 queues. S23 is active for depth 4; T99 remains open.
 | Objective | Audit and reconcile fourth-depth retained mirror conditional arms under the established breadth-first policy. |
 | Non-goals | Do not process fifth-depth bodies, introduce new guest behavior, alter public APIs or modify user media and configuration. |
 | Reference Baseline | S22 closure 83caa3f9, pinned XP SP1 subset, OpenNT comparison and S22 depth-4 evidence. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification review](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Verify actual x86/x64 conditions and original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |

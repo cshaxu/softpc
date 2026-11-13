@@ -1421,7 +1421,7 @@ before Git default diff with CR line endings ignored. No source range is
 excluded to hide local repairs. Only the local manifest hash changes.
 The existing App VGA test owns real register/readback, font/protection/mode
 and Driver frame proof; full qualification and limitations are recorded in
-the [S10 proposal](../../../proposals/m9-public-handoff-simplification.md#s10-research-two-site-cursor-disable-repair).
+the [S10 proposal](../../../history/M9-T99-public-handoff-simplification-proposal.md#s10-research-two-site-cursor-disable-repair).
 
 ## T99 S11 unsupported SB-MIDI framing
 
@@ -1449,7 +1449,7 @@ is not additive: matching/context can realign. With Git --diff-algorithm=minimal
 the same combined bodies count +772/-1396 -> +793/-1395 (2168 -> 2188, +20).
 Neither number proves fewer semantic local patches; the earlier estimate of
 an unconditional +26 in the historical diff was too strong. No selection range
-is changed or excluded to improve these counts. The [S11 record](../../../proposals/m9-public-handoff-simplification.md#s11-approved-implementation)
+is changed or excluded to improve these counts. The [S11 record](../../../history/M9-T99-public-handoff-simplification-proposal.md#s11-approved-implementation)
 owns permanent port/IRQ/archive proof, full qualification and limitations.
 
 ## T99 S14 original VGA cursor shape
@@ -1463,7 +1463,7 @@ without End-1 underflow. EGA/CGA and Lib's two-span schema are unchanged.
 Source diff +6/-33, net -27; necessary-subset mirror diff +226/-12 becomes
 +232/-45 (238 to 277 changed lines, +39). Fixed XP raw/subset identities and
 selection ranges are unchanged; only the local manifest hash changes.
-The [S14 proposal](../../../proposals/m9-public-handoff-simplification.md#s14-approved-implementation)
+The [S14 proposal](../../../history/M9-T99-public-handoff-simplification-proposal.md#s14-approved-implementation)
 owns hardware evidence, actual-port research and implementation qualification.
 
 ### T99 S30 P27 XP 诊断行号

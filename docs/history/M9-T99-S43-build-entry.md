@@ -15,7 +15,7 @@ All frozen validation units pass: missing dependencies, invalid arguments,
 configure/build failure propagation, spaced/! path, pause behavior, two real
 dual-width builds, cache reuse, timestamp refresh, PowerShell-free Ninja target
 commands, unchanged user assets, and four package integration cases. See
-[S43 design and evidence](../proposals/m9-public-handoff-simplification.md#t99-s43-double-click-build-entry-audited-design).
+[S43 design and evidence](../history/M9-T99-public-handoff-simplification-proposal.md#t99-s43-double-click-build-entry-audited-design).
 The full runtime suite was not rerun for this build-entry-only change.
 
 Coordinator review confirms a single build/publication owner with no hidden

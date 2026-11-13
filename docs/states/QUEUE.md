@@ -14,9 +14,10 @@ allocates a numeric task identifier.
 Owner closes Td S22 [build-cache governance](../history/M9-Td-S22-build-cache-governance.md).
 It is not an outstanding candidate or active task.
 
-T99 [public handoff simplification](../proposals/m9-public-handoff-simplification.md)
-is admitted, not a duplicate queued candidate; CURRENT owns its status. T98 is
-owner-closed; see its [completion audit](../history/M9-T98-completion-audit.md).
+T99 is owner-closed on 2026-11-12; see its
+[completion audit](../history/M9-T99-completion-audit.md) and
+[retained proposal](../history/M9-T99-public-handoff-simplification-proposal.md).
+T98 is owner-closed; see its [completion audit](../history/M9-T98-completion-audit.md).
 
 Owner accepts and closes [Windows 95 volume control and restart](../history/M9-T97-completion-audit.md)
 as T97 on 2026-10-18. Both candidates were investigated together in S1.

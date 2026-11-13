@@ -25,5 +25,5 @@ The initial test-draft macro naming failure and legacy-only header warnings
 remain disclosed. Public eight trees, Compat/Driver, root build/registration,
 INI/media/snapshots are unchanged. Scratch is retired, committed/published EXE
 blobs match and mirror/documentation/whitespace/residue checks pass.
-The [proposal](../proposals/m9-public-handoff-simplification.md#s11-approved-implementation)
+The [proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s11-approved-implementation)
 owns full proof, hashes, limitations and actual-change review.

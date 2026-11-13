@@ -215,7 +215,7 @@ not complete the repeated-boundary review.
 | Objective | Compare all retained mirror files with their fixed XP counterparts, restore original conditional structures where behavior and approved local fixes permit, and record necessary remaining exceptions. |
 | Non-goals | Do not inspect inside branches already wholly replaced by #error, introduce new behavior, modify public components, media, snapshots or user configuration. |
 | Reference Baseline | S29 closure f5af155b, XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89, read-only OpenNT for line mapping. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification review](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Preserved SoftPC mirror and provenance/exception evidence; no public ABI change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Audit original conditional parents and arms, preserve necessary local differences and line controls; build and publish both architectures and compare executable runtime content. Per owner direction skip tests when the EXEs have no substantive change; otherwise run proportionate tests. Review actual diffs, commit and push. |

@@ -15,7 +15,7 @@ Current dependency databases have valid records and exact EOF. Historical
 premature-end recovery belongs to .ninja_deps, not the text .ninja_log version.
 The damaged historical bytes and writer timeline are unavailable. Owner accepts
 no speculative code/tooling fix; this is not a claim that historical corruption
-has been causally repaired. The [research report](../proposals/m9-public-handoff-simplification.md#s12-research-and-minimum-disposition)
+has been causally repaired. The [research report](../history/M9-T99-public-handoff-simplification-proposal.md#s12-research-and-minimum-disposition)
 retains the finite ledger, source references, exact hashes and limitations.
 
 Production, test and build-script diff is zero. Both EXEs retain S11 identities;

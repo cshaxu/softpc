@@ -15,7 +15,7 @@ timeout root cause or repair is claimed.
 Production, public eight trees, mirror, root test inventory, media and user
 INI are unchanged. Published dual EXEs retain the S6 identities. Detailed
 counterfactuals, failed experimental drafts and limits remain in the
-[proposal](../proposals/m9-public-handoff-simplification.md#s7-approved-implementation-and-qualification).
+[proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s7-approved-implementation-and-qualification).
 
 ## Qualification and closure
 

@@ -10,7 +10,7 @@ regression for palette and invalidation. No public component was changed.
 Final follow-up builds publish both EXEs and pass 193/193 tests per width,
 combining background and reconnected desktop/native groups; two earlier
 disconnected-session package failures are explicitly retained in the
-[proposal](../proposals/m9-public-handoff-simplification.md#s15-admission-v7-pointerbody-handoff).
+[proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s15-admission-v7-pointerbody-handoff).
 The earlier stage-5 package failure and real-guest proof limits also remain
 documented there. Task scratch was retired; INI and media remain unchanged.
 This closes S15 only; T99 remains open.

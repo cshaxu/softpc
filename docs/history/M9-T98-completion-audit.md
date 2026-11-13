@@ -43,7 +43,7 @@ checks and snapshot I/O) were transferred by the owner to the separate
 They are not measured speedups or completed optimizations.
 
 The five handoff observations were removed from TODO and now belong solely to
-[T99 S1](../proposals/m9-public-handoff-simplification.md), not a duplicate queue
+[T99 S1](../history/M9-T99-public-handoff-simplification-proposal.md), not a duplicate queue
 entry. Eight other TODOs retain their owners: VGA cursor-off, SB MIDI parser,
 physical-memory adapters, Ninja recovery, checkpoint timeout, clock-test oracle,
 null BOP and guest readiness. Closure does not claim those debts repaired.

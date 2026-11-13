@@ -16,7 +16,7 @@ heights and snapshot register replay. No new state/API/thread/alternate path.
 Production +6/-33 (net -27); test C +49/-19 (net +30); combined net +3.
 Relative to the immutable XP necessary subset, the file's historical changed
 line count grows by 39; source deletion is not reduced mirror divergence.
-The [implementation record](../proposals/m9-public-handoff-simplification.md#s14-approved-implementation)
+The [implementation record](../history/M9-T99-public-handoff-simplification-proposal.md#s14-approved-implementation)
 retains primary references, five-member research dispositions, exact mirror
 identities, hashes, counts, timings, corrected runner selector and proof limits.
 

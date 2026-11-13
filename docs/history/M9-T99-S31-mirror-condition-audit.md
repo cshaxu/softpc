@@ -11,7 +11,7 @@ Owner admitted the next S after delivery of S31 commit dff86c90.
 | Objective | Inventory compiled MVDM-host and non-MVDM mirror files, map each to XP, reconcile selected recursive conditional structures and excluded arms, and record a disposition per file. |
 | Non-goals | Do not read OpenNT code, alter selected behavior, public components, user configuration, guest media or snapshots, or inspect inside fully excluded error arms. |
 | Reference Baseline | SoftPC ee2250bb; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89, read-only. |
-| Candidate Proposal | [Public handoff simplification](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Compiled mirror source and headers, per-file evidence and necessary provenance; preserve selected ABI and approved fixes. |
 | Applicable Rules | Execution, documentation, architecture, coding, and source-research policy. |
 | Verification | Compare recursively against XP and real x86/x64 compilation contexts; every ten changed source files build both architectures and compare executable runtime content. If changed, run full tests before publication; if not, skip tests as owner directed. Review, publish, commit and push each batch. |

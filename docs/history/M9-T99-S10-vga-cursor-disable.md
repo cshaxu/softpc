@@ -29,6 +29,6 @@ Public eight trees, Compat/Driver, root infrastructure, INI, guest media and
 snapshots remain unchanged. Non-mirror warning locations are zero; retained
 original-header diagnostics are explicitly recorded. Mirror, documentation,
 whitespace and residue checks pass. Task scratch is retired and both pushed
-commits are clean. The [proposal](../proposals/m9-public-handoff-simplification.md#s10-approved-implementation)
+commits are clean. The [proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s10-approved-implementation)
 retains complete evidence, artifact hashes, failed drafts and proof limits.
 This closure adds no fresh build/test or downstream-sync claim.

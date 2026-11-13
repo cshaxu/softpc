@@ -1,5 +1,10 @@
 # Public Handoff Simplification Review
 
+Retained historical proposal: owner closes T99 on 2026-11-12.
+Intermediate active/pending statements below are historical; the
+[completion audit](M9-T99-completion-audit.md) owns the final disposition.
+
+
 ## Admission and scope
 
 ### S16: NXVM public eight-tree import audit

@@ -3,7 +3,7 @@
 The owner advances to S9 after executor 349057b1 and actual-diff review 304cea4f.
 Closure follows that authorization, not an invented explicit manual acceptance.
 T99 stays open. Detailed findings and proof remain in the
-[proposal](../proposals/m9-public-handoff-simplification.md#s8-approved-implementation-and-qualification).
+[proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s8-approved-implementation-and-qualification).
 
 Compat uses original physical SAS; the approved original phyR boundary condition
 is repaired with marker and XP accounting. Production +7/-6, test C +111/-1,

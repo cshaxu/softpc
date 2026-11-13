@@ -2,16 +2,16 @@
 
 ## Current Work
 
-No implementation subtask is active. Owner accepts and closes M9 T99 S43.
-Open task awaiting owner: T99.
-No next S is admitted. See [S43 closure](../history/M9-T99-S43-build-entry.md).
+No implementation subtask is active. Owner closes M9 T99 on 2026-11-12.
+See [T99 completion audit](../history/M9-T99-completion-audit.md).
+No next T or S is admitted.
 
 ## Current Technical Baseline
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
 build/publication via existing cached Ninja presets. Two dual-width runs and
-four package integration tests pass. Post-delivery local changes to both
-EXEs are preserved outside this documentation-only closure.
+four package integration tests pass. The owner requested reverting subsequent
+local EXE changes; published files match the accepted 51d0bc15 delivery.
 
 
 S42 final implementation 60bdbaa4 removes unused mouse_io.c, nop.c, vglob.c
@@ -34,8 +34,8 @@ Only Emulator build configuration/verifier/manifest changed within the public
 eight trees; no fresh NXVM alignment is claimed.
 
 [TODO](TODO.md) has no deferred entries. The runtime-performance candidate
-remains in [Queue](QUEUE.md). T99 still requires its overall completion audit
-and owner-approved closure.
+remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
+did not admit S44 or a new implementation task.
 
 ## Recent M9 Closures
 
@@ -53,6 +53,7 @@ and owner-approved closure.
 - [S36 CHAIN2 DWORD reads](../history/M9-T99-S36-chain2-dword-read.md).
 | Task | Closure |
 | --- | --- |
+| T99 | [Completion audit](../history/M9-T99-completion-audit.md). |
 | T98 | [Completion audit](../history/M9-T98-completion-audit.md). |
 
 ## Recent Governance

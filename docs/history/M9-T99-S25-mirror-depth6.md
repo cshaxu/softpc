@@ -27,7 +27,7 @@ See [S24 closure](../history/M9-T99-S24-mirror-depth5.md) and
 | Objective | Audit and reconcile sixth-depth retained mirror conditional arms breadth-first. |
 | Non-goals | Do not process seventh-depth bodies, change guest behavior, public APIs, user media or configuration. |
 | Reference Baseline | S24 closure 3ae9618d, pinned XP SP1 subset, read-only OpenNT and S24 queues. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification review](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Verify actual x86/x64 conditions, original frame mapping, diagnostic lines and mirror gates; dual builds, published EXEs, complete tests, actual-diff review, commit and push. |

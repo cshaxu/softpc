@@ -10,7 +10,7 @@
 12 行；按 --minimal 则增加 20 行。历史 diff 对齐不具可加性，不能将本次
 自身 26 行改动误报成必然增加 26 行历史差异，也不能据默认统计宣称减少
 本地功能修正。精确逐文件账目见当前本地修正台账；验证与能力限制由
-[S11 record](../../../proposals/m9-public-handoff-simplification.md#s11-approved-implementation)
+[S11 record](../../../history/M9-T99-public-handoff-simplification-proposal.md#s11-approved-implementation)
 承接。
 
 ## T99 S10 原始 VGA 光标禁用位修正
@@ -21,7 +21,7 @@
 生产 +5/-12、净 -7；相对已固定 XP 必要子集的完整文件差异为 +226/-12，
 修前为 +221/-0，增删合计增加 17 行。原始与子集哈希、S5 XP 选择范围不变，
 只更新本地哈希；来源和验证边界由
-[S10 proposal](../../../proposals/m9-public-handoff-simplification.md#s10-research-two-site-cursor-disable-repair)
+[S10 proposal](../../../history/M9-T99-public-handoff-simplification-proposal.md#s10-research-two-site-cursor-disable-repair)
 及当前本地修正台账承接。End-Start 和 end<start 相邻语义另留 TODO。
 
 ## T99 S8 已批准的物理读取边界修正
@@ -32,7 +32,7 @@
 越界返回值和全部快照代码。合法的末尾字节、字及双字访问不再被误拒绝，
 也不通过 Compat 绕过原有物理路径。固定 XP 身份与 whole 子集不变，
 只更新本地哈希和 reviewed patch 处置。验证及当前交付状态见
-[T99 S8](../../../proposals/m9-public-handoff-simplification.md#s8-research-physical-sas-callers-and-minimal-repair)。
+[T99 S8](../../../history/M9-T99-public-handoff-simplification-proposal.md#s8-research-physical-sas-callers-and-minimal-repair)。
 
 迁移政策纠偏（2026-10-15）：当前采用 **XP 必要源码子集**，不是保留路径
 的整文件导入。文末 T40 历史材料中的“全部采用文件”“保留未编译分支”

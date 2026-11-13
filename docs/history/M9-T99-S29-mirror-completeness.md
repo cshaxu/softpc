@@ -28,7 +28,7 @@ open. See [S28 closure](../history/M9-T99-S28-mirror-depth9.md).
 | Objective | Independently reconcile cross-depth accounting, preserved original frames, local exceptions and empty terminal queues before claiming whole-mirror completion. |
 | Non-goals | Do not assume an empty queue proves scope coverage; do not alter user media/configuration or introduce behavior. |
 | Reference Baseline | S28 closure 107ed85c, pinned XP SP1 subset, read-only OpenNT and S20-S28 evidence. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification review](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Mirror source, provenance and audit records only if verified corrections are needed; no public ABI change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Independently inspect prior candidate inventories and mappings, excluded body structure, selected parents, direct-child continuity and evidence; verify exact scope, build and test any production change. |

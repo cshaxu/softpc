@@ -28,7 +28,7 @@ open. The [S20 closure](../history/M9-T99-S20-mirror-depth1.md) records depth 1.
 | Objective | Reconcile the second-depth mirror conditional frames using the established breadth-first policy. |
 | Non-goals | Do not process third-depth bodies, add guest behavior, alter public APIs, or modify user media and configuration. |
 | Reference Baseline | S20 closure 36be4a7a, pinned XP SP1 subset, OpenNT comparison, and S20 depth-2 evidence. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification review](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Retained SoftPC mirror conditional frames and provenance evidence; no public ABI change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Probe supported x86/x64 contexts, validate line controls and mirror gates, dual builds and published EXEs, full tests, independent actual-diff review, commit and push. |

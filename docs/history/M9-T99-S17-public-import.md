@@ -9,7 +9,7 @@ the accepted window-sizing semantics.
 Both EXEs were rebuilt and published. Each architecture has passing evidence
 for all 193 registered tests, combining initial and supplemental runs; the
 initial compact Console failures and their limits remain recorded in the
-[S17 qualification](../proposals/m9-public-handoff-simplification.md#s17-import-qualification-and-self-review).
+[S17 qualification](../history/M9-T99-public-handoff-simplification-proposal.md#s17-import-qualification-and-self-review).
 The owner reports functional acceptance; no independent native snap-message
 trace is claimed. Scratch was retired; user INI and media were preserved.
 This closes S17 only; T99 remains open.

@@ -27,7 +27,7 @@ pass. Public/nonpublic unit, Types/dependency/naming/manifest and mirror gates
 are covered. No CMake/root helper, App/mirror, public API or asset changes.
 Both shipping EXEs remain up-to-date, unchanged at S11 identities; no forced
 relink/publication is justified for this test-only import. INI/media/snapshots
-are unchanged. The [proposal](../proposals/m9-public-handoff-simplification.md#s13-executor-qualification-and-quality-review)
+are unchanged. The [proposal](../history/M9-T99-public-handoff-simplification-proposal.md#s13-executor-qualification-and-quality-review)
 owns complete timings, hashes, source ledger and quality/proof limits.
 
 Coordinator reviews all four actual executor paths and independently compares

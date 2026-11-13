@@ -24,7 +24,7 @@ This closes only depth 1, not the remaining mirror audit or T99.
 | Objective | Audit retained mirror conditional branches and reconcile proven excluded bodies with the owner-directed outermost `#error` rule, preserving selected code and validating x86/x64 builds. |
 | Non-goals | No unverified bulk pruning, new feature import, guest behavior change, or modifications outside the admitted mirror and provenance scope. |
 | Reference Baseline | S19 delivery 23f65b5c, selected XP SP1 mirror and existing manifest. |
-| Candidate Proposal | [Public handoff simplification review](../proposals/m9-public-handoff-simplification.md). |
+| Candidate Proposal | [Public handoff simplification review](../history/M9-T99-public-handoff-simplification-proposal.md). |
 | Files And ABI Surface | Audited retained mirror conditional structure, XP subset/provenance records and relevant build verification; no public API change. |
 | Applicable Rules | Execution, documentation, architecture, coding and mirror source policy. |
 | Verification | Account for the finite branch universe; validate selected and deliberately rejected branches, diagnostic line mappings, actual x86/x64 builds, mirror gate and published binary comparison; build, publish, test and push the excluded phase before the retained-arm audit at each depth. |
