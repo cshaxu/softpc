@@ -489,3 +489,80 @@ File 63 cmpxchg.h stays identical under no-diff-growth policy; no unused-header
 cleanup is delivered. Ordered coverage 63/472, 409 remaining; file 64 cpu4gen.h
 is investigating. Owned compilation/publication jobs exited; scratch is removed
 after evidence promotion. S1 and T100 remain active.
+
+## File 64 cpu4gen.h: GDP include restoration and declaration review
+
+Initial analysis: the non-excluded difference is +15/-14. Two include changes
+force the C-VID GDP header and inject gdp_slots.h; thirteen declarations change
+return types. Current dependency alone does not establish either include needed.
+Counter-review uses the pinned XP c_reg.c definitions, actual selected CCPU
+callers and each Ninja dependency graph, not the historical patch comments.
+
+| Point | Difference | Disposition and concrete evidence |
+| --- | --- | --- |
+| R0036 | Force ../cvidc/gdpvar.h and replace the original comment | Restore exact XP angle-bracket include and comment; the selected CCPU interface expands no GDP macro requiring this forced vocabulary. |
+| R0037 | Add gdp_slots.h | Remove this include; real C-VID glue retains its own existing native-slot adapter include. No adapter is deleted or replaced. |
+| R0038 | c_setCS: IUH to ISM32 | Pending owner: original definition returns ISM32, not IUH. |
+| R0039 | c_setSS: IUH to ISM32 | Pending owner: same original return-type mismatch. |
+| R0040 | c_setDS: IUH to ISM32 | Pending owner: same original return-type mismatch. |
+| R0041 | c_setES: IUH to ISM32 | Pending owner: same original return-type mismatch. |
+| R0042 | c_getCF: IBOOL to ISM32 | Pending owner: original definition returns ISM32, not IBOOL. |
+| R0043 | c_getPF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0044 | c_getAF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0045 | c_getZF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0046 | c_getSF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0047 | c_getTF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0048 | c_getIF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0049 | c_getDF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+| R0050 | c_getOF: IBOOL to ISM32 | Pending owner: same original return-type mismatch. |
+
+The original c_reg.c explicitly avoids including cpu.h because internal/external
+register macros conflict. Thus a normal separate compilation does not diagnose
+these cross-translation-unit incompatible function types. Selected host types
+are ISM32=long and IBOOL=int; IUH is unsigned int or native UINT_PTR for the
+C-VID compilation contract. Equal 32-bit widths do not make int and long the
+same C type. Keeping the declarations consistent with the original definitions
+is a source/type-ABI necessity claim, not a reproduced guest failure. Changing
+original providers or global typedefs instead would relocate and enlarge the
+patch, and is not this minimal audit disposition. These thirteen points remain
+owner decisions, not approved retention.
+
+Both architectures have 58 actual Ninja compilation dependencies on cpu4gen.h.
+All 116 were preprocessed before and after the two include restorations, using
+actual compiler flags and no compiler cache. Every changed token line is a
+removed unused GDP function declaration or a removed/relocated CRT thread
+function declaration. No function body or expression changes. The temporary
+probe restored its input before final candidate application. This comparison
+is compiler/source evidence, not runtime coverage or object equivalence.
+
+Candidate production +1/-2; tests unchanged. Remaining non-excluded XP diff
+is +13/-13: three fewer diff lines and two removed difference points, no new
+point. Actual native GDP adaptation remains in its existing C-VID owner.
+Dual product builds and final artifact qualification pass as recorded below.
+
+### P6 final evidence and independent actual-diff review
+
+Both cached product builds finish successfully and publish the final header.
+Across 1088 recorded object files, only the two mandatory timestamp-bearing
+composition.c objects change. Both entire EXEs have exactly eight changed bytes,
+all within PE COFF TimeDateStamp, OptionalHeader CheckSum and the changed compiler
+HH:MM:SS literal; file lengths and every other byte match P5. This satisfies the
+owner's artifact-equivalence exception. No runtime test rerun is claimed;
+P4's 392/392 remains the behavior baseline through equivalent P5 and P6.
+
+Published compiler times on Nov 12 2026: x86 23:58:31, x64 23:59:03.
+SHA-256:
+
+- softpc32.exe: a7cc9b34d313faf9d5f2ef81d8350c45c19ab14bd4aa2785cba8ecf5311a38cd
+- softpc64.exe: 78c3184532cf421a4361f038812d9441fd8916da6114247d66a74289d28065b5
+
+Actual coordinator review: only the two include restorations change production;
++1/-2 source, zero tests, XP-relative non-excluded diff +15/-14 to +13/-13.
+No new difference point, no alternate GDP path, no Compat or shared-tree edits.
+The C-VID glue's own slot adaptation remains unchanged; the selected CCPU
+interface no longer injects it into unrelated consumers. Original-return-type
+proof is separate from this equivalence test and does not claim a guest failure.
+Mirror/compiler warnings are not reported as new shared-component defects.
+File 64 is reviewed and restored; thirteen residual declaration decisions remain
+pending owner choice. Ordered coverage is 64/472, 408 remaining; file 65
+cpuint_c.h is next. S1 and T100 remain active.
