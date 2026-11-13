@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P79 audits egagraph.h and egamode.h: retained content matches XP
-outside existing exclusions/scaffolding, with actual production consumers.
-No production or artifact changes; P78 remains the published 392/392 baseline.
-Frozen frontier 341/472; next file 342 base/inc/egaports.h. Its panning
-query declaration is under investigation, not an approved retention.
+T100 S1 P80 removes egaports.h's unnecessary historical panning comment;
+its real query declaration remains evidence-qualified pending owner decision.
+Dual-width pixel negatives and declaration controls establish the stated scope.
+egaread.h retained content matches XP. Production +0/-1; XP diff decreases one
+line. Both cached builds/publications and 392/392 full tests pass.
+Frozen frontier 343/472; next file 344 base/inc/egavideo.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

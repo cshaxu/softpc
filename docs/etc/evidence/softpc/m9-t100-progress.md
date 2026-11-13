@@ -6046,3 +6046,84 @@ remains unreviewed in the delivered ledger; no production edit has been made.
 P79 documentation gate and actual three-file diff review pass. No background
 job was started; task-owned comparison scratch was previewed and removed,
 and the build residue check passes. No new approval or closure is inferred.
+
+
+## P80: file 342 egaports.h investigation and candidate
+
+The only retained addition outside existing excluded scaffolding is the pel
+panning query declaration and its historical explanation. Actual production
+nt_ega.c painters and gfx_updt.c call it; vga_prts.c owns the attribute-controller
+query. The query derives the scanline's shift from the existing register and
+split-screen cancellation, without owning a second state. Root CMake compiles
+all three implementation files in the original-device object target.
+
+The real existing VGA fixture passes unchanged on x86/x64. A disposable copy
+of vga_prts.c changes only the query result to zero, is compiled using the
+actual Ninja command, and replaces its member in a private copy of the machine
+archive. It links to the same fixture/cached other objects. Both copies fail
+at vga_frame_smoke.c:501: after actual 3C0h writes set pan=1, visible pixels
+must equal unpanned pixels 1..8. x86 exits 3221226505 and x64 exits 3 following
+the assertion; the original current fixture exits 0 on each. Windows crash
+reporting completed; no observation timeout is counted as a failed assertion.
+This is an isolated no-panning behavior counterexample, not a claim to have
+restored every original T60 source change or reproduced a real guest session.
+
+The passing existing fixture also checks three EGA painters, shifts 0..7,
+bank/wrap variants and split cancellation against unpanned pixel sequences.
+Those scopes do not establish every video mode. The actual port-write test,
+provider register read and actual output assertions establish a consumed
+panning capability, rather than merely the existence of adapter callers.
+
+Private-header removal of the added declaration yields the specific implicit
+query-declaration diagnostic in nt_ega.c and gfx_updt.c on both widths, with
+explicit extra -Werror=implicit-function-declaration. Current-header nt_ega.c
+passes that same check. gfx_updt.c also has an unrelated setMarkPointers
+implicit declaration under the extra flag with BOTH headers, so its exit code
+alone is not attributed to this query. The normal build policy is unchanged.
+
+R0428: retain the single query declaration as an evidence-qualified owner
+decision. Moving it into another mirror file does not reduce the declaration
+surface and adds a new point. Removing the real panning effect breaks the
+observable pixel contract. Counter-review distinguishes declaration necessity
+from exhaustive proof of every existing panning patch; implementation files
+retain their later ordered reviews.
+R0429: remove the unnecessary one-line T60 explanation, restoring XP absence.
+Production +0/-1, net -1; XP added/deleted diff decreases one line. No test
+source or build configuration change. Existing exclusions/scaffolding remain
+untouched and unaccounted. Final normalized SHA-256: b1a4bc2d7f1c8311fd3d8983ed83d6d1ab9caedccbb305c2ce2ffeb4f4e263b3.
+
+Candidate applied; full final-source qualification is pending. Delivered
+frontier remains 341/472 until P80 delivery. No residual is owner-approved.
+
+
+### File 343 egaread.h retained-content review
+
+Pinned XP raw SHA-256:
+e84f967733ed9e18df9e372a4a2bbf942d4984a685cf12b3410eca07ba973097.
+Complete normalized comparison shows only existing excluded-body scaffolding;
+all retained read declarations and READ_STATE fields match XP. Actual consumers
+include ega_read.c, ega_prts.c, vga_prts.c, ega_vide.c, vga_vide.c and v7_ports.c.
+This is a live declaration owner, not test-only behavior. No restoration or
+new residual point is required. Existing exclusions are skipped without ledger
+entries. Delivery of files 342-343 remains pending P80 final qualification.
+
+
+### P80 final-source qualification
+
+Both cached builds and publications pass; x86 and x64 each pass 188 background
+and eight native tests, 392/392 first final-source run. Stage results:
+[["x86-build", 0, 18.47], ["x86-background", 0, 138.05], ["x86-native", 0, 24.83], ["x64-build", 0, 22.88], ["x64-background", 0, 139.33], ["x64-native", 0, 24.46]].
+
+- softpc32.exe: Nov 13 2026 14:44:14; SHA-256 01d81afaf70f82898d4d5fb7525c64f764ae3e2809de967082524c4b1aa60f6f.
+- softpc64.exe: Nov 13 2026 14:47:15; SHA-256 a517c31bf8e6e8881793b11b35ec81f799f29808d11da751001db001cbe4e40d.
+
+Actual-change review confirms production +0/-1, test source +0/-0, build
+configuration +0/-0; XP-relative diff decreases one line. No device algorithm,
+register state, callback, shared component, media or INI is changed. The
+manifest matches final tested source. R0428 remains a qualified owner decision.
+Frozen delivered frontier 343/472; next file 344 base/inc/egavideo.h.
+S1 remains active; neither that next file nor existing owner decisions is closed.
+
+P80 documentation gate and actual eight-file diff review pass. Authoritative
+process inventory finds no live task-owned probes/builds. Scratch cleanup
+preview, exact removal and residue check pass; reusable caches remain.

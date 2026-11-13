@@ -2032,3 +2032,10 @@ include spelling/location restored. The competing header no longer exists.
 The generated globals member type remains evidence-qualified by actual provider
 assignment diagnostics. See T100 evidence for current XP-difference metrics;
 the earlier historical table does not represent this candidate's current count.
+
+
+T100 S1 P80 removes the redundant historical pel-panning comment in egaports.h.
+Its single live query declaration remains an evidence-qualified owner decision;
+actual painter pixel and declaration negatives are recorded in the T100 evidence.
+This supersedes the earlier header size rationale, not the later implementation
+audit. No additional mirror behavior is introduced.
