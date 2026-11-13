@@ -2012,3 +2012,7 @@ File 309 restores 25 original native-pointer expressions and 22 malloc calls. Pr
 ### T100 S1 P59 sevid027 restoration
 
 File 310 restores 41 original native-pointer expressions and 28 malloc calls. Production +69/-69; XP-relative difference 1129 -> 1047 lines, reduction 82. Native capacity and four mixed-width zero initializations remain pending owner decision. RAM-source equivalence passes 56 cases per width; video-source callback is an unverified boundary. Full regression passes 392/392. See [P59 evidence](m9-t100-progress.md#file-310-sevid027c-p59-in-qualification).
+
+### T100 S1 P60 sevid028 restoration
+
+File 311 restores 62 original native-pointer expressions and 30 malloc calls. Production +92/-92; XP-relative difference 1433 -> 1309 lines, reduction 124. Native capacity and two mixed-width zero initializations remain pending owner decision. RAM-source equivalence passes 68 cases per width; video-source callback is an unverified boundary. Full regression passes 392/392. See [P60 evidence](m9-t100-progress.md#file-311-sevid028c-p60-in-qualification).

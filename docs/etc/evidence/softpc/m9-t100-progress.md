@@ -4948,3 +4948,30 @@ softpc32.exe: Nov 13 2026 12:19:56, SHA-256 0495315d3845a08fa96cdb4956a87747c819
 softpc64.exe: Nov 13 2026 12:22:56, SHA-256 d0819099715403bd0c6033db9476c5099f841392d599789942d1bd9c0c3acb7c
 
 P59 owned jobs exited; task scratch was previewed and removed via Clean-Build. Residue check passes; caches, configuration, media and snapshots remain intact.
+
+## File 311: sevid028.c (P60 in qualification)
+
+Pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89, raw SHA-256 5dcaf32b871e4d86717642fc17962a3d54092206ea293f1df521c28a674adb61. Initial fixed correspondence finds 622 GDP mapping lines, 62 native-address wrappers, 32 allocation lines and the GDP include; no other changed lines. Initial 572 ranges are classified in [point map](m9-t100-sevid028-points.tsv); [allocation inventory](m9-t100-sevid028-allocations.tsv) records all 32.
+
+R0396 retains GDP native layout pending owner decision. R0397 restores 62 exact XP dereferences. R0398 restores 30 malloc calls while retaining native capacity; two partial-width-write/native-width-read calloc calls remain pending owner decision. Production +92/-92. XP difference 1433 -> 1309 lines, reduction 124; ranges 572 -> 510.
+
+Current, candidate and poisoned candidate each pass 68 RAM-source actual-body cases on x86 and x64, hash 90163a59. These exercise 12 mode 0 backward word entries, three backward byte entries and two direct copy helpers. Repeated full-plane comparison proves equivalence for these cases, not independent hardware correctness. Removing both retained zero initializations under poisoned allocation passes x86 but faults x64 (0xc0000005); this combined negative does not individually prove both. Source review shows partial writes followed by native reads.
+
+Video-source backward callback remains the unverified boundary documented in P59; it is not included in passing coverage. Normalized LF candidate SHA-256 1cea245a945bf9cbddd800344d6893235b4556447a767deb70e4cf83d9f8b75f. Builds and full regression are running; frontier remains 310/472 until delivery.
+
+### P60 final qualification
+
+Both cached builds and publications pass. Each architecture passes 188 background and 8 native tests: 392/392 first run. Final source matches tested candidate. Video-source callback remains an unverified boundary, not a passed test or confirmed guest defect.
+
+- x86-build: 11.09 seconds, exit 0.
+- x86-background: 150.09 seconds, exit 0.
+- x86-native: 25.03 seconds, exit 0.
+- x64-build: 14.1 seconds, exit 0.
+- x64-background: 141.1 seconds, exit 0.
+- x64-native: 25.03 seconds, exit 0.
+
+softpc32.exe: Nov 13 2026 12:32:03, SHA-256 431841c12d5859311d2e8b0c1fe7e0d927e40360ec85acd9546044e4b89f3a74
+
+softpc64.exe: Nov 13 2026 12:35:10, SHA-256 cdbe6b20be7f8c0eaeb5300759050ae6f6514e3b8a308461258be075a5f8858a
+
+P60 owned jobs exited; task scratch was previewed and removed via Clean-Build. Residue check passes; caches, configuration, media and snapshots remain intact.
