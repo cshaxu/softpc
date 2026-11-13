@@ -30,14 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P82 restores emm.h's unused host-storage declarations to XP; their
-historical native-pointer rationale has no current implementation or caller.
-Both reset-object pairs are byte-identical. Cached dual builds/publications pass;
-complete EXEs differ only in verified build metadata, so no repeat full suite
-is run under the owner's equivalence exception. P80's 392/392 remains the
-runtime baseline. Production +3/-6; XP diff decreases nine lines. equip.h,
-error.h and fdisk.h retained content matches XP. Frontier 348/472; next file
-349 base/inc/fla.h. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P83 audits fla.h through gfi.h: retained content matches XP outside
+existing excluded scaffolding. No production or artifact changes; P82's
+published equivalent EXEs and P80's 392/392 runtime baseline remain.
+The original reset.c/gendrvr.h include is preserved without claiming an active
+driver implementation. Frozen frontier 354/472; next file 355 base/inc/gfitest.h.
+See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 

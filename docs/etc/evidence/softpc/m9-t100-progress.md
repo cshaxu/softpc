@@ -6269,3 +6269,45 @@ next file 349 base/inc/fla.h. S1 and prior owner decisions remain open.
 P82 manifest/documentation gates and actual eight-file diff review pass. Both
 owned workers exited; scratch preview, exact removal and residue check pass.
 Reusable caches and unrelated assets remain unchanged.
+
+
+## P83: files 349-354 retained-content audit
+
+Pinned XP raw identities:
+- base/inc/fla.h: 2343c83bb8ff48b88b30bb9ed003bf4f922546971bd178b378a389b3abd34b80.
+- base/inc/floppy.h: e12f73f715763b9a860e9e2b6128b8e08ab930aacb8917bfd7951334c9f803ed.
+- base/inc/ga_defs.h: e8c8d47ff6f355dfc2ca34055ee428718d67afb5951b25e23a5d7050d4cc9f10.
+- base/inc/ga_mark.h: 9f510835e14e6d1293512b3e2cf8358270fb58f36cef08d87fbc5d3627f11489.
+- base/inc/gendrvr.h: 013b5d77b7d28a921f52eecdd2d00ae687576d3419e007901050d37bd7b5e599.
+- base/inc/gfi.h: 407735b7f27f596377711cd1976b60d252b83abe75ce956a1103c042e25320ea.
+
+Complete newline-normalized comparisons: fla.h, ga_defs.h and ga_mark.h match
+XP outright. floppy.h, gendrvr.h and gfi.h differ only at existing excluded-body
+scaffolding. Each complete difference was inspected with retained context;
+no whole-hunk suppression hides a neighboring selected declaration change.
+Existing exclusions are skipped without new accounting or approval points.
+
+Actual production wiring:
+
+- fla.h: original reset/floppy/fla/gfi and Compat gfi_image consumers.
+- floppy.h: original reset/floppy/floppy_i declarations and constants.
+- ga_defs.h: original video/gfx_updt/ega_read/ega_prts includes.
+- ga_mark.h: generated evidfunc/ev_glue and original EGA/update consumers;
+  the mark-table structures and declarations remain original.
+- gendrvr.h: original reset.c include remains, but the retained header has no
+  active driver declarations under the selected excluded branches. It is not
+  described as a functioning driver. Removing the file would require another
+  mirror include deletion, prohibited by the owner's no-increase clarification.
+- gfi.h: original controller/BIOS/CMOS and actual Compat image bindings.
+
+Counter-review distinguishes historical comments (ga_defs names a tester) from
+actual production includes. No duplicate Compat implementation is demonstrated
+by these headers, and no new deletion/rewiring is justified. Preserve all six
+files. No production/test/build/manifest/EXE change; no XP diff reduction or
+fresh runtime suite is claimed. P82's published equivalent EXEs remain, with
+P80's 392/392 runtime baseline. Frozen delivered frontier 354/472; next file
+355 base/inc/gfitest.h. S1 and prior owner decisions remain open.
+
+P83 documentation gate and actual three-file diff review pass. No background
+worker was started. Comparison scratch preview, exact removal and build
+residue check pass; no unrelated changes are present.
