@@ -812,3 +812,29 @@ Published artifact SHA-256:
 - softpc32.exe: `137d17620d0012bf2f7ad0710dd9d59ea94a7246b08591856b76d273da98b832`.
 
 - softpc64.exe: `f3df955dd5046d539d6ecf7340686f96030a743926bccc4f1dc79ef3b4daeea6`.
+
+## P9 ordered source comparison: files 81-87
+
+Compared each complete file against the same fixed XP commit and path using
+Git show and normalized-line unified comparison, in frozen order:
+
+- 81 c_main.h, 82 c_mem.h, 87 c_oprnd.h: no in-scope differences.
+- 83 c_mul64.c, 84 c_mul64.h, 85 c_neg64.c, 86 c_neg64.h:
+  entire normalized files identical.
+
+Existing excluded content remains outside this audit and receives no new
+accounting. No source, test, manifest or executable changes are needed.
+Coordinator review reconciles all seven file dispositions with the actual
+comparison. This documentation-only progress does not rerun or replace P8's
+392/392 runtime evidence. Coverage is 87/472, not a completed S or T.
+
+File 88 c_page.c remains investigation, not a retention decision. Initial
+trace identifies added yoda.h and successful-operand debug notifications.
+The original check_D calls remain in the file; the only selected definition
+found by whole-src search is the PROD no-op macro in yoda.h. The new host
+observer records linear address, width and copied values only during a live
+debug instruction; original guest DR checks have separate architectural
+exception semantics. Existing command_provider_smoke exercises read/write
+watch overlap, trace values, byte/dword/stack and reverse-buffer x87 operands.
+These call traces guide the next restoration comparison; they alone do not
+qualify all added notifications for retention or complete this file's audit.

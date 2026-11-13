@@ -35,7 +35,7 @@ SIGIO consumption and a redundant Compat timer wrapper, and minimizes the PIC
 rejection guard. Production +10/-65; tests +34/-0; XP-relative mirror diff
 reduces by 56 lines without new points. Both published EXEs pass 392/392
 fresh tests. Real CCPU before/after tests prove the restored 16-bit IP wrap.
-Source review is 80/472; file 81 c_main.h is next. Evidence-qualified residuals
+Source review is 87/472; file 88 c_page.c is under investigation. Evidence-qualified residuals
 remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
