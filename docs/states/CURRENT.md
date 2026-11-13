@@ -30,17 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P33 restores 55 native-address wrappers and original malloc semantics
-at 27 sites in file 286 sevid003.c. Native allocation width remains; five
-partial-to-native local reads retain zeroing. Production +82/-82 (net 0),
-tests unchanged. XP-relative diff decreases 1435 -> 1343 lines and 557 -> 521
-points. Thirty actual V7 dither write/fill cases pass per control on x86/x64;
-original allocation capacities expose x64 heap corruption. Cached dual
-builds/publication and all 392 background/native tests pass first run (188+8
-per architecture), without build warnings. Actual-diff review, mirror and
-documentation gates and source identity checks pass. Sequential review is
-286/472; next file 287 base/cvidc/sevid004.c. Evidence-qualified ABI residuals
-remain pending owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P34 restores 53 native-address accesses and malloc at 26 sites in file
+287 sevid004.c. Native capacities and six mixed-width zeroing cases remain.
+Production +77/-77 (net 0); tests unchanged. XP-relative diff decreases
+1419 -> 1329 lines and 566 -> 536 points. Actual-body x86/x64 controls verify
+write results and backward-move preservation; original x64 capacities corrupt
+the heap. Cached dual builds/publication and 392/392 registered tests pass
+first run without build warnings. Separate probes expose an unchanged original
+GenericByteFill nested-call defect on both architectures; current CCPU fills
+do not use that batch path. It remains explicitly in TODO, not a repaired bug.
+Actual-change review, gates and source identity checks pass. Sequential review
+is 287/472; next file 288 base/cvidc/sevid005.c. Qualified ABI residuals remain
+owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

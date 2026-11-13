@@ -2808,3 +2808,117 @@ S1 remains active, and qualified ABI residuals remain owner decisions.
 P33 actual process inventory confirms all task jobs have exited. Exact scratch
 cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
 configuration, guest media and snapshots are preserved.
+
+## P34 file 287 sevid004.c audit and restoration
+
+Original normalized SHA-256 is
+2475f9a09749173b9d4dde8b947d20af221ffaed4b0fb1db68ed336270e28959,
+verified against the pinned XP SP1 commit. This compiled file defines S2214-
+S2245, including V7 backward moves, graphics-controller port handlers and
+Generic writes/fills. ev_glue selects dith_evid for V7 dither and gricvid_evid
+for supported unchained/chain4 rotation. These are original device operations,
+not duplicate Compat behavior or a removable test-only file.
+
+The [initial range map](m9-t100-sevid004-points.tsv) accounts for all 566
+non-equal ranges; the [allocation inventory](m9-t100-sevid004-allocations.tsv)
+covers all 32 local allocations. Existing #error exclusions are not recorded.
+
+| Point | Initial finding | Counter-review and disposition |
+| --- | --- | --- |
+| R0288 | 53 native-address accesses wrapped in softpc_gdp_rule_address. | Actual sources are native planes, move/copy pointers and the expanded-data table pointer (GDP field 1328). These are addresses rather than fixed GDP offsets. Restore original accesses, retaining field mapping at the pointer source and unchanged arithmetic. |
+| R0289 | Fixed original GDP offsets adapted to native field storage. | Native pointer, callback and IUH layout does not match original 32-bit storage. Keep existing mapped field access and its header; no new state/helper/device implementation. Evidence-qualified residual, not automatic owner approval. |
+| R0290 | Native capacities and blanket zeroing replace original malloc byte sizes. | Native slots require their current width; the x64 original-capacity control corrupts the heap. Six entries have narrow stores followed by full IUH reads: S2219/S2222/S2226/S2229 LocalIUH[1], S2238/S2241 LocalIUH[0]. The first group passes RAM source arguments; the latter uses a guest offset in a native address expression in the chained branch. Retain their existing zeroing. This does not qualify arbitrary high-address RAM inputs. |
+| R0291 | Other 26 allocations were also changed to calloc. | No required upper-byte initialization is established for those local accesses. Restore malloc semantics, preserving native capacity and all original control flow. Do not apply that restoration to the six mixed-width cases. |
+
+Reversing only the known ABI forms leaves the entire token stream identical to
+XP. A first analysis unnecessarily ran character-level matching on equal streams;
+it was stopped after direct equality had already proved the result, then the
+corrected short analysis completed. No build/test was killed by that action.
+
+Production +77/-77, net 0; tracked tests unchanged. XP-relative diff decreases
+from +710/-709 = 1419 lines / 566 ranges to +665/-664 = 1329 lines / 536 ranges:
+**90 fewer diff lines, 30 fewer points**. Address-wrapper occurrences and changed
+source lines differ because some lines contain multiple accesses. No new mirror
+point, helper, second route, device behavior or relocated Compat complexity.
+
+### Actual-body controls and newly exposed original entry defect
+
+The temporary fixture links actual sevid004 bodies with the existing VGA test
+using each architecture's real compiler/link options. Four Generic byte/word
+writes have independent plane-byte expectations. Six mode1 backward-word moves
+check untouched boundaries and compare complete output bytes with unchanged
+production. The first backward oracle incorrectly assumed ordinary memcpy
+semantics; it failed unchanged code and was withdrawn. The differential result
+proves preservation, not complete hardware correctness of the original move.
+
+The first unchanged-production preflight exposed GenericByteFill(count=1)
+crashing after its nested GenericByteWrite. A task-only diagnostic in the original
+body records LocalIUH non-null before the call and zero after it. GenericByteWrite
+calls its continuation as a new crules activation; that activation initializes
+CopyLocalIUH to zero, frees the active local storage and restores zero. Fill
+then dereferences its lost locals. Both original/current and candidate binaries
+reproduce access violation 0xc0000005 on x86 and x64. This is not introduced by
+the restoration, and it is not silently counted as a passed test.
+
+The registered chain is gricvid_evid -> GenericByteFill -> GenericByteWrite ->
+continuation -> return to Fill. Glue_writes registers fill_byte_ev_glue, and
+ccpusas4 stores its address in b_fill_ptrs. However, the currently compiled
+c_sas_fills/fillsw/fillsdw loop over individual stores; the source scan finds no
+consumer of read_b_fill_ptrs beyond its definition. No actual guest-triggered
+failure is claimed. This original same-file nested-entry defect is recorded in
+TODO for separate admission/before batch-path activation, not repaired by adding
+a forbidden new mirror patch during this original-first diff audit.
+
+| Actual-body control | x86 | x64 |
+| --- | --- | --- |
+| Current: four write oracles + six backward comparisons and existing VGA tests | pass | pass |
+| Address restoration, same controls | pass | pass |
+| Minimal address/malloc restoration, same controls | pass | pass |
+| Original four-byte allocation capacity | pass | heap corruption 0xc0000374 |
+| Candidate malloc allocations filled with 0xa5 | pass | pass |
+| Current GenericByteFill count=1, separate process | access violation | access violation |
+| Candidate GenericByteFill count=1, separate process | same access violation | same access violation |
+
+Normal controls do not exhaust every mode or RAM-move path; zeroing retention
+uses explicit source/ABI evidence. No guest, media, INI, snapshot or sibling is
+modified. Temporary probes introduce no production API. Final normalized source
+hash: 3b637469838126481b3f0520eb52b7ad3c81325ad1784d2b659dfa2c5cbd0ff3.
+Final source matches the tested candidate. Full cached dual qualification is
+running; the result and cleanup must be reconciled before delivery.
+
+P34 same-file nested-call scan finds GenericByteFill/GenericByteMove_Fwd
+calling GenericByteWrite, and GenericWordFill/GenericWordMove_Fwd/
+GenericDwordWrite calling GenericWordWrite. Only the first fill path has the
+recorded dynamic failure; the other callers require the linked TODO review,
+not a claim that all have been dynamically reproduced or are guest-reachable.
+
+
+### P34 final verification and actual-change review
+
+Actual-diff counter-review confirms 77 replacement lines only: 53 address
+accesses on 51 lines and 26 allocation statements. No pointer arithmetic, GDP
+field selection, continuation or original device behavior changes. All 566
+initial ranges are accounted for; six zeroed mixed-width local cases remain.
+No complexity is moved to Compat. Qualified residuals are not owner approval.
+All 44 restored trailing-space lines match XP exactly. Mirror CRLF and owned
+LF are preserved; command-local whitespace checking passes. Final source is
+identical to the tested candidate. Production +77/-77 (net 0), tests unchanged.
+
+Both cached builds publish fresh Nov 13 2026 EXEs without warnings. Registered
+qualification passes x86 188/188 background + 8/8 native and x64 188/188 + 8/8:
+**392/392 first run**, no retries or budget changes. That full-suite result does
+not erase the separately reproduced GenericByteFill defect: four current/
+candidate negative controls still fail identically. No new interactive guest
+reproduction, exhaustive VGA qualification or batch-call integration is claimed.
+Mirror/documentation gates and source identity checks pass.
+
+Published softpc32.exe: 05:47:08; SHA-256 775187098e72035b49813fb6f9f64c57e54aa2d43bfd10b9c587df64e971255a.
+
+Published softpc64.exe: 05:50:44; SHA-256 a9d691e6b1daf761435b97f60594ad3ee06b779b7a0b202c158e8747bb53e9c1.
+
+Sequential audited scope is 287/472; next file 288 base/cvidc/sevid005.c.
+S1 remains active. Cleanup and actual-process checks precede delivery.
+
+P34 actual process inventory confirms no task-owned worker remains. Exact task
+scratch cleanup was previewed/applied; Clean-Build -Check passes. Caches and
+user configuration, guest media and snapshots are preserved.

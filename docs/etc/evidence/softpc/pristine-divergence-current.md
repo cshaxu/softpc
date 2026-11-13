@@ -1744,3 +1744,14 @@ retention in this file, without changing device rules or other files' proofs.
 See the [complete-file audit](m9-t100-progress.md#p33-file-286-sevid003c-audit-and-restoration),
 [range map](m9-t100-sevid003-points.tsv) and
 [allocation inventory](m9-t100-sevid003-allocations.tsv).
+
+### T100 S1 P34 allocation and address minimization
+
+File 287 sevid004.c restores 53 native-address accesses and 26 malloc sites.
+Native capacities and six narrow-to-native local reads remain evidence-qualified
+ABI residuals. No continuation or device algorithm changes are made. The
+original GenericByteFill nested-call defect exposed by focused testing is
+separately recorded, not hidden by this restoration or claimed resolved.
+See [P34 audit](m9-t100-progress.md#p34-file-287-sevid004c-audit-and-restoration),
+[range map](m9-t100-sevid004-points.tsv) and
+[allocation inventory](m9-t100-sevid004-allocations.tsv).
