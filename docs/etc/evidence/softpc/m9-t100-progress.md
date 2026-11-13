@@ -5858,3 +5858,48 @@ S1 remains active; no completed-file delivery implies whole-audit closure.
 P76 authoritative process inspection confirms all owned jobs exited. Clean-Build
 preview, exact scratch removal and residue check pass. Final documentation gate
 and actual source/manifest/artifact review pass before commit.
+
+
+## Files 336-337: debug.h and dma.h (P77 qualification)
+
+Pinned XP raw SHA-256:
+
+- debug.h: 388f486956e939fd24e9f2b4ba37f71dc8b7506ece928fb878bb68c30e4db618.
+- dma.h: 88f5c9d2dbfdb620fcd6ae34346298e0ce31da9132e32edd480648138764660c.
+
+Complete debug.h retained text equals XP outside existing exclusions/scaffolding.
+It remains used by the original controller code (including at_dma.c). No new
+difference point or restoration is needed; this is not whole-file raw equality.
+
+R0424: dma.h adds the dmaGetAdaptor pointer-return declaration and its one-line
+T93 reason after the existing excluded declaration branch, plus a separating
+blank. Non-scaffolding addition +3/-0 is unchanged. Existing excluded bodies
+and diagnostic line controls are not separately counted or reopened.
+
+Actual production use: nt_sbdsp.c includes dma.h and SbInitializeDMA calls
+dmaGetAdaptor, then indexes the returned controller array for the selected DMA
+channel. The retained at_dma.c accessor returns the address of its original
+adaptor state. This is access to the existing device owner, not a second DMA
+model in Compat. XP exposes the declaration only under NTVDM, which is not the
+selected build; the selected DSP integration requires its declaration here.
+Removing the declaration and also deleting the DSP's controller access would
+remove supported audio DMA behavior, not preserve the product by restoring XP.
+
+Compiler proof uses the actual nt_sbdsp.c Ninja compile flags on x86 and x64,
+with private current and restored-declaration-scope dma.h include roots.
+-Werror=implicit-function-declaration is added explicitly to turn the observed
+missing declaration into a decisive compile result; it is not represented as
+the unchanged production warning policy. Current passes both (exit 0).
+Removing the added declaration/reason, while preserving excluded scaffolding,
+fails both (exit 1): implicit declaration of dmaGetAdaptor and assignment from
+int to DMA_ADAPT *. Original diagnostic location is nt_sbdsp.c:2288. The pointer
+return contract is required on both widths; no guest crash or observed runtime
+pointer truncation is claimed from this compilation experiment.
+
+Counter-review: existing original controller access avoids a separate DMA
+implementation. Relocating the same declaration into another source adds a new
+mirror difference rather than removing the necessary contract. Retain R0424
+pending owner decision. No production/test/build/manifest/EXE change and no XP
+diff reduction. No new full regression or audio session run; P76 remains the
+published 392/392 full baseline. Frozen frontier 337/472; next file 338 dsktrace.h.
+S1 and previous owner decisions remain open.

@@ -30,12 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P76 minimizes file 335 cpu_vid.h: five original IPT argument lines
-restored and four explanatory lines removed. Production +5/-9; anchored XP
-diff reduces by 14 lines. Eight dual-width preprocessing comparisons are exact;
-nine explicit provider declarations remain qualified by negative compilation.
-Both cached builds, dual EXE publication and 392/392 tests pass first run.
-Frozen frontier 335/472; next file 336 base/inc/debug.h. See the
+T100 S1 P77 audits debug.h and dma.h. Retained debug declarations match XP;
+the DMA accessor declaration has a real DSP caller and dual-width negative
+compilation proof, remaining an owner decision. No production or EXE changes;
+P76 remains the published 392/392 full baseline. Frozen frontier 337/472;
+next file 338 base/inc/dsktrace.h. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
