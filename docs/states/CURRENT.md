@@ -30,15 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P23 restores original printer.c formatting and trims added commentary.
-Production +21/-26; tests +3/-0. Selected XP diff decreases 47 lines/29 points.
-The existing controller/callback snapshot extension remains evidence-qualified
-pending owner decision, supported by actual dual-width omission negatives.
-Cached dual build/publication and changed checkpoint tests pass; final EXEs
-are byte-identical to P22 except eight timestamp/PE metadata bytes each.
-The approved equivalence exception reuses P22's 392 full-regression passes;
-no fresh P23 full-suite run is claimed. Mirror/documentation/diff checks pass.
-Sequential review is 268/472; next base/comms/printer_.c (269).
+T100 S1 P24 restores original printer BIOS declarations and formatting.
+Production +6/-2; no test changes. XP diff decreases eight lines/five points.
+Cached dual build/publication and actual BOP tests pass. Final EXEs are identical
+to P23 except timestamp/PE metadata (nine x86 and eight x64 bytes). The approved
+equivalence exception reuses P22's 392 full-regression passes through P23;
+no fresh P24 full suite is claimed. Mirror/documentation/diff checks pass.
+rs232_io.c has only its retained historical notice; evidfunc.c is normalized
+identical to XP. Sequential review is 271/472; next evidfunc.h (272).
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

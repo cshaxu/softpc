@@ -1933,3 +1933,52 @@ Sequential reviewed files: 268/472; next base/comms/printer_.c (269).
 - P23 x86 EXE SHA-256 `9a0356dff13c94bcbcc09c880130f2e0fa3725d5581753d7231105612a2c0397`; literal 03:02:48 -> 03:17:51, offset 2435904.
 
 - P23 x64 EXE SHA-256 `3f03d1d26534d98da4e2699aa1b0257788672eb7f2aa05417368cb4e2fe7dc88`; literal 03:06:13 -> 03:18:05, offset 2289664.
+
+## P24 files 269-271: original printer BIOS declarations and equality checks
+
+File 269 printer_.c remains production BIOS code: root CMake includes it and
+Compat device_bop installs printer_io in BIOS[BIOS_PRINTER_IO]. Its original
+host_lpt_dos_open/close external declarations were removed despite matching
+existing Compat definitions. Restore them, together with original whitespace.
+Declarations do not create a call or enable an excluded NTVDM branch; no
+removal/rewiring of other files is justified. Actual compiler objects before/
+after are byte-identical on x86 and x64. Historical notice stays under policy.
+All existing #line/#error lines remain byte-identical; excluded bodies skipped.
+Selected XP diff +3/-6 in six points becomes +1/-0 in one point: eight fewer
+diff lines and five fewer points. No new implementation or test added.
+
+| Point | XP range | Before range | Counter-review/disposition |
+| --- | --- | --- | --- |
+| R0238 | before 25 | 27-27 | Preserve existing historical notice under source policy. |
+| R0239 | before 66 | 67-68 | Restore exact original whitespace; no behavior difference, identical objects at both widths. |
+| R0240 | 69-69 | before 74 | Restore exact original whitespace; no behavior difference, identical objects at both widths. |
+| R0241 | 73-73 | before 78 | Restore exact original whitespace; no behavior difference, identical objects at both widths. |
+| R0242 | 202-204 | before 194 | Restore original external declarations. They match existing Compat definitions and introduce no reference/call; identical objects at both widths. |
+| R0243 | 227-227 | before 198 | Restore exact original whitespace; no behavior difference, identical objects at both widths. |
+
+R0244: file 270 rs232_io.c has only its relocated original historical notice
+outside skipped bodies/line controls. Retain existing notice under source
+policy. Original BIOS implementation is compiled by root CMake and registered
+at BIOS[BIOS_RS232_IO]; no implementation difference is present.
+
+File 271 evidfunc.c is equal to fixed XP after line-ending normalization
+and selected-scope comparison. Root CMake compiles this original C-VID table.
+No changed point or excluded-body entry is invented. Subsequent evidfunc.h /
+evidgen.h were previewed solely to identify the next ABI investigation; they
+are not counted audited. File 274 preview equality is also not advanced past
+those intervening unfinished files. Qualification/delivery pending.
+
+P24 final-source cached dual build/publication, actual BOP smoke and mirror/
+documentation gates pass. Actual diff review confirms production +6/-2 (net
++4) restores original text; no test changes. This reduces XP diff, rather than
+optimizing local line count. CRLF, manifest and diff --check pass. No change
+to shared components, guest/configuration/media/snapshot or Compat behavior.
+Both EXEs match P23 byte-for-byte except COFF timestamp, PE checksum and one
+same-offset HH:MM:SS literal (x86 nine changed bytes, x64 eight). Approved
+artifact-equivalence exception reuses P22's 392 full passes through P23;
+P24 claims fresh BOP tests, not a fresh full suite. Ordered review is 271/472.
+Next is evidfunc.h (272), whose generated-rule ABI needs actual investigation.
+
+- P24 x86 EXE SHA-256 `223a91e6f04ab23e4c56a3ded0e9174e3f4a2fbbacc0bef5ef4d55baf73aab4a`; compiler time 03:21:48.
+
+- P24 x64 EXE SHA-256 `89806253b1c4c53d5a464c70257fac2f4f0337ed6b86b2ff1e5e2d3f76046f04`; compiler time 03:21:58.

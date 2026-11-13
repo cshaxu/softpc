@@ -64,17 +64,17 @@
 #include "host_lpt.h"
 #include "idetect.h"
 
-
-
 #line 66
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && defined(MONITOR)"
 #endif
 #line 70
+
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: #if defined(NTVDM)"
 #endif
 #line 74
+
 /*
  * Set up arrays of addresses in BIOS data area, pointing to LPT ports and timeout values
  */
@@ -191,10 +191,14 @@ void printer_io()
 }
 
 #line 205
+extern  void  host_lpt_dos_open(int);
+extern  void  host_lpt_dos_close(int);
+
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #endif
 #line 228
+
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
