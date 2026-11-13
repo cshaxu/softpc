@@ -1941,3 +1941,15 @@ the existing original switch warning is unchanged. Actual-entry controls cover
 See [P52 audit](m9-t100-progress.md#file-304-sevid021c-p52),
 [range map](m9-t100-sevid021-points.tsv) and
 [allocation inventory](m9-t100-sevid021-allocations.tsv).
+
+### T100 S1 P53 sevid022 restoration
+
+File 305 restores 21 native dereferences and 28 malloc calls. Native GDP
+mapping/capacity and four mixed-width initializations remain qualified owner
+decisions. Production +49/-49; XP diff falls 1547 -> 1505 lines and
+614 -> 593 ranges. Both architectures pass the full suite first run, with
+the existing original switch warning unchanged. Actual-body controls cover
+96 Chain4 WORD cases per width/version; no new guest acceptance is claimed.
+See [P53 audit](m9-t100-progress.md#file-305-sevid022c-p53),
+[range map](m9-t100-sevid022-points.tsv) and
+[allocation inventory](m9-t100-sevid022-allocations.tsv).

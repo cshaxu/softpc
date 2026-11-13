@@ -1,0 +1,33 @@
+function	partial_and_native_slots	disposition
+S_2790_Chain4WordWrite_00000000_00000018_id	0	retain calloc pending decision
+S_2791_Chain4WordWrite_00000000_00000019_id	0	retain calloc pending decision
+S_2792_Chain4WordWrite_00000000_0000001e_id	0	retain calloc pending decision
+S_2793_Chain4WordWrite_00000000_0000001f_id	0	retain calloc pending decision
+S_2794_Chain4WordFill_00000000_00000008_id	-	restore malloc; retain native capacity
+S_2795_Chain4WordFill_00000000_00000009_id	-	restore malloc; retain native capacity
+S_2796_Chain44PlaneWordFill_id	-	restore malloc; retain native capacity
+S_2797_Chain4WordFill_00000000_0000000e_id	-	restore malloc; retain native capacity
+S_2798_Chain4WordFill_00000000_0000000f_id	-	restore malloc; retain native capacity
+S_2799_Chain4WordFill_00000000_00000010_id	-	restore malloc; retain native capacity
+S_2800_Chain4WordFill_00000000_00000011_id	-	restore malloc; retain native capacity
+S_2801_Chain4WordFill_00000000_00000016_id	-	restore malloc; retain native capacity
+S_2802_Chain4WordFill_00000000_00000017_id	-	restore malloc; retain native capacity
+S_2803_Chain4WordFill_00000000_00000018_id	-	restore malloc; retain native capacity
+S_2804_Chain4WordFill_00000000_00000019_id	-	restore malloc; retain native capacity
+S_2805_Chain4WordFill_00000000_0000001e_id	-	restore malloc; retain native capacity
+S_2806_Chain4WordFill_00000000_0000001f_id	-	restore malloc; retain native capacity
+S_2807_Chain4WordMove_00000000_00000008_00000000_id	-	restore malloc; retain native capacity
+S_2808_CopyWordPlnByPlnChain4_00000000_00000008_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2809_Chain4WordMove_00000000_00000009_00000000_id	-	restore malloc; retain native capacity
+S_2810_CopyWord4PlaneChain4_00000000_00000009_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2811_Chain4WordMove_00000000_0000000e_00000000_id	-	restore malloc; retain native capacity
+S_2812_CopyWordPlnByPlnChain4_00000000_0000000e_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2813_Chain4WordMove_00000000_0000000f_00000000_id	-	restore malloc; retain native capacity
+S_2814_CopyWord4PlaneChain4_00000000_0000000f_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2815_Chain4WordMove_00000000_00000010_00000000_id	-	restore malloc; retain native capacity
+S_2816_CopyWordPlnByPlnChain4_00000000_00000010_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2817_Chain4WordMove_00000000_00000011_00000000_id	-	restore malloc; retain native capacity
+S_2818_CopyWord4PlaneChain4_00000000_00000011_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2819_Chain4WordMove_00000000_00000016_00000000_id	-	restore malloc; retain native capacity
+S_2820_CopyWordPlnByPlnChain4_00000000_00000016_00000000_00000000_id	-	restore malloc; retain native capacity
+S_2821_Chain4WordMove_00000000_00000017_00000000_id	-	restore malloc; retain native capacity

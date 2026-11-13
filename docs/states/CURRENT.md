@@ -30,17 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P52 restores 50 native-address expressions and 18 malloc calls in
-file 304 sevid021.c. Production +68/-68 (net zero); permanent test code
-unchanged. XP diff decreases 1481 -> 1381 lines and 583 -> 533 ranges.
-GDP/native-local ABI and 14 mixed-width initializations remain qualified
+T100 S1 P53 restores 21 native-address expressions and 28 malloc calls in
+file 305 sevid022.c. Production +49/-49 (net zero); permanent test code
+unchanged. XP diff decreases 1547 -> 1505 lines and 614 -> 593 ranges.
+GDP/native-local ABI and four mixed-width initializations remain qualified
 owner decisions. Actual-body current/candidate/poison controls pass both
-widths, including 256 Chain4 cases; removal of remaining initialization
-faults on x64 and original capacities corrupt its heap. Both EXEs are freshly
-built/published; 392/392 pass first full run. Only the unchanged original
-switch-unreachable warning remains; no new warning. Actual diff review,
-source identity and gates pass. Sequential review is 304/472; next file 305
-base/cvidc/sevid022.c. See the
+widths with identical output over 96 Chain4 WORD cases; removing the four
+initializations faults on x64, and original capacities corrupt its heap even
+with zeroing preserved. Both EXEs are freshly built/published; 392/392 pass
+first full run. Only the unchanged original switch warning remains; no new
+warning. Actual diff review, source identity and gates pass. Sequential review
+is 305/472; next file 306 base/cvidc/sevid023.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

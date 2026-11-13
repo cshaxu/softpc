@@ -4453,3 +4453,79 @@ P52 process inventory confirms all owned workers have exited. Task scratch
 was previewed and removed through Clean-Build; closure residue verification
 passes. Only reusable caches remain. User configuration, media and snapshots
 are unchanged.
+
+## File 305: sevid022.c (P53)
+
+Pinned XP comparison has 614 ranges, +774/-773 lines (1547 total). Restore
+21 native address dereferences and malloc in 28 of 32 local arrays.
+Production +49/-49, net zero; permanent test code unchanged. XP difference
+becomes 593 ranges, +753/-752 lines (1505 total): 21 fewer ranges and 42
+fewer added/deleted lines. Every initial non-equal range, including potential
+delete-only ranges, is reconciled by the [point map](m9-t100-sevid022-points.tsv).
+The [allocation inventory](m9-t100-sevid022-allocations.tsv) lists all 32 arrays.
+
+| Point | Initial executor analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0378 | Original GDP byte-offset accesses use explicit native field mapping. | Retain pending decision. The current GDP owner is opaque slot storage, not the original contiguous 32-bit layout; real generated callers require native field widths. Distinguish field lookup from dereferencing an already resolved pointer. |
+| R0379 | Twenty-one byte accesses use the GDP address adapter. | Restore exact XP lines. Registers load native local slots 6/7/9/10, sometimes minus one for the second byte. Source assignments originate in native RAM pointers or native plane bases plus offsets; none is a small GDP field offset. Actual current/candidate/poison output agrees on both widths. |
+| R0380 | All 32 arrays use native capacities and calloc. | Restore malloc in 28 arrays with no partial-store/native-load overlap. Keep calloc in S2790-S2793 slot 0: IU32 guest address assignment is followed by IUH address arithmetic. Poisoning these four arrays faults on x64. A separate capacity control keeps zero initialization but uses original four-byte slots; x64 heap corruption proves the width requirement independently. Both controls pass x86. These four initializations and native capacity remain owner decisions. |
+
+The file remains in the actual C-VID compile target and the chain4_evid
+controller table. It supplies four WordWrite entries, twelve WordFill entries
+and their four-plane helper, eight WordMove entries and seven CopyWord helpers.
+CopyWordPlnByPln delegates to existing CopyByte helpers in the preceding unit;
+CopyWord4Plane uses native pointer locals. There is no duplicate Compat device
+implementation to replace, nor a basis to remove the file. No continuation,
+device algorithm, branch, callback, guest, media or configuration is changed.
+
+Task-local actual-body controls replace only this unit's object and extend
+the existing VGA fixture at its initialized controller boundary. Ninety-six
+cases cover four WordWrite variants, twelve WordFill variants and eight
+WordMove variants, each at four address residues, with repeated complete-plane
+output. Current, candidate and poisoned-malloc candidate pass on x86/x64;
+all six runs give hash 528a38a5. The existing VGA assertions also pass.
+These are restoration-equivalence/replay tests, not an independent oracle
+for every hardware mode, video-source callback or guest bulk consumer.
+
+Two separate negative controls use the same fixture: removal of the remaining
+four initializations exits 0 on x86 and 0xc0000005 on x64; original four-byte
+capacities with calloc zeroing preserved exit 0 on x86 and 0xc0000374 on x64.
+No timeout/retry is counted as failure evidence and no new original defect
+patch is introduced. Existing original-defect decisions remain outside TODO.
+
+Actual-change review verifies exactly 49 line replacements. All 21 address
+lines match pinned XP byte-for-byte apart from repository CRLF; the other
+28 restore malloc without changing the needed native capacities. The final
+source equals the tested candidate; normalized-LF SHA-256:
+cf2f6ffe21bbc067f1bd08f0f92c15711f635a8cdb3dd02f0efbc281d7888b37.
+Full cached dual-architecture qualification is running; delivered scope
+remains 304/472 until it completes and is reviewed.
+
+### P53 final qualification and actual-change review
+
+Both cached builds/publications succeed. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first full run**, without retries
+or changed budgets. No new warning: the original switch-unreachable statement
+at line 801 appears in current and candidate on both widths.
+
+- x86 build: 9.09 seconds, exit 0.
+- x86 background: 132.08 seconds, exit 0.
+- x86 native: 25.03 seconds, exit 0.
+- x64 build: 12.09 seconds, exit 0.
+- x64 background: 131.12 seconds, exit 0.
+- x64 native: 25.03 seconds, exit 0.
+
+Published softpc32.exe: embedded dates Nov 13 2026; times 10:51:22;
+SHA-256 c58a156d88a0fa6f72ec22106c5b9de23081233867ca9b56dd207f46380ef9c2.
+
+Published softpc64.exe: embedded dates Nov 13 2026; times 10:54:09;
+SHA-256 160144d0f9ee54d54e5d1f630d6d4abddb00668de8267abebbbf3f1372d0f4fa.
+
+Final source identity, CRLF and actual-change review pass. No permanent test
+source or public component changes. No new interactive guest acceptance is
+claimed. Sequential audited scope is 305/472; next file 306 base/cvidc/sevid023.c.
+S1 remains active; qualified residuals still await owner decisions.
+
+P53 process inventory confirms no owned worker remains. Task scratch was
+previewed and removed via Clean-Build; closure residue verification passes.
+Only reusable caches remain. User configuration, media and snapshots are intact.
