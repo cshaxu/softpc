@@ -4058,3 +4058,89 @@ Qualified residuals await owner decisions; S1 remains active.
 P48 process inventory confirms all owned workers exited. Exact disposable
 scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
 user configuration, media and snapshots remain intact.
+
+## P49 file 301 sevid018.c audit and restoration
+
+The selected production C-VID unit supplies CHAIN2 mode-2/mode-3 generated
+entries registered by evidfunc.c. CCPU scalar paths and direct compound-rule
+regression consumers are distinguished; no new guest reachability is claimed.
+The [384-range map](m9-t100-sevid018-points.tsv) reconciles all initial
+differences, with no excluded-body bookkeeping. The
+[allocation inventory](m9-t100-sevid018-allocations.tsv) covers all 32 sites.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0351 | GDP offsets differ from native field/pointer layout. | Existing gdp_state field mapping supplies the supported native ABI; semantic controls retain this binding. Qualified residual, pending owner decision. |
+| R0352 | Ten wrappers translate already-native RAM/video-buffer addresses. | Trace confirms native input local 6 and GDP video-buffer field 1292, not small GDP offsets. Restore exact original dereferences; current/candidate/poisoned controls pass both widths. |
+| R0353 | All 32 allocations were zeroed and widened. | Restore 28 malloc calls; preserve native slot capacity. S2665/S2671/S2683/S2689 slot 8 is initialized through IU32 and subsequently read through IUH as a buffer offset, requiring zero upper storage. Original capacity restoration corrupts x64 heap; x86 passes. |
+| R0354 | Five inline CGA dirty blocks use the selected marker instead. | Coherent original blocks plus private scaffolding and GDP translation fail the EGA dirty-low assertion on both architectures. Qualified residual; no new marker path. |
+| R0355 | Two mode-3 address shifts preserve the A0 gap. | Independent physical oracle checks eight addresses and the entire plane buffer. Candidate passes; original shifts put address 0x100 at physical 0x200 instead of 0x400. Qualified residual on both widths. |
+| R0356 | Seven local continuations replace nested crules calls. | Exact original call restoration causes 0xc0000005 on both widths. Source shows local activation ownership; grouped dynamic proof does not claim every continuation independently triggered. |
+| R0357 | Ten private L25 declaration groups were removed with dirty bodies. | Restore 60 exact original enum/function/pointer lines. No old case/goto/label is restored; no external or persisted dispatch identity exists. Actual candidate passes both widths. |
+
+Production +98/-38 (net +60); test sources unchanged. XP-relative diff falls
++503/-670 (1173 lines), 384 ranges, to +495/-602 (1097 lines), 368 ranges:
+76 fewer diff lines and 16 fewer ranges. No new device repair, API, secondary
+path or public-component change is introduced.
+
+Actual-body controls use production compilation flags and the existing full
+VGA regression linked with an explicit replacement sevid018 object. Current,
+candidate and candidate malloc filled with 0xa5 pass on both architectures.
+Original four-byte capacities pass x86 and fail x64 with 0xc0000374. Original
+dirty logic fails vga_frame_smoke.c:1561 getVideodirty_low()==offset>>2;
+original continuation calls fail with 0xc0000005 on both architectures.
+
+The task-local mode-3 physical oracle sets/restores existing latch/plane-enable
+state, calls actual CHAIN2 byte writers with zero input, and checks all plane
+bytes against independent interleaved offsets. Candidate passes eight addresses
+per width; original shifts fail at address 0x100. This is not a guest
+reproduction or exhaustive arbitrary-state qualification. Original defects
+remain pending diff decisions, not new TODOs or unauthorized fixes.
+
+xp normalized SHA-256: 870093e49a0bf12cc26b0b21e8bd0d13cd2d084d0685b3968950351592b37f0a.
+before normalized SHA-256: 74bfb545e3b09f4dedcf63181fdb808be229082effc8fffab2b4a768ed5c936e.
+candidate normalized SHA-256: 7f11e41102c8e83fe3b29eb96bb678d736781d2986c4b2d5d46c79ac7a913c73.
+
+Installed bytes equal the tested candidate and retain CRLF. Full cached dual
+qualification is pending; file 301 is not yet counted as delivered.
+
+### P49 final qualification and actual-change review
+
+Both cached x86/x64 builds and dual EXE publications succeed. Each architecture
+completes 188 background and eight native audio/desktop/package tests.
+392/392 pass on the first full run.
+Actual diff review confirms exactly ten restored native-address expressions,
+28 allocation-kind restorations with native capacities intact, and 60 exact
+original private declaration lines. Final source equals the tested candidate;
+mirror CRLF and local-only manifest hash are verified. The original
+unreachable-switch warning remains (control line 801, final line 861); no new
+warning appears. Mirror/documentation gates and whitespace checks pass.
+No public component, test source, media, INI or snapshot is changed. Existing
+evidence-qualified ABI/device residuals remain pending owner decisions.
+
+- x86 build: exit 0, 10.08 seconds.
+- x86 background: exit 0, 136.12 seconds.
+- x86 native: exit 0, 25.03 seconds.
+- x64 build: exit 0, 13.09 seconds.
+- x64 background: exit 0, 153.14 seconds.
+- x64 native: exit 0, 25.03 seconds.
+
+Aggregate fixture records:
+
+x86: 186/188 Test #172: emulator.verifier-negative ................................   Passed   24.60 sec
+x86: 187/188 Test #149: lib.types-layout-selftest .................................   Passed   85.42 sec
+x64: 187/188 Test #172: emulator.verifier-negative ................................   Passed   22.37 sec
+x64: 188/188 Test #149: lib.types-layout-selftest .................................   Passed   65.43 sec
+
+Published softpc32.exe: Nov 13 2026 09:39:52;
+SHA-256 9f7c2189b740c1875153fe9f17457fcede7281fd8c1865222cd77594da7962f9.
+
+Published softpc64.exe: Nov 13 2026 09:42:43;
+SHA-256 0a605a7f965df1bd817c19293bf31592f03fb5aa9261051a5af449873b1c96df.
+
+Sequential audited scope is 301/472; next file 302 base/cvidc/sevid019.c.
+S1 remains active; no routine approval is awaited.
+
+P49 process inventory confirms all owned workers exited. Exact disposable
+scratch was previewed and removed; Clean-Build -Check passes. Reusable caches,
+user configuration, guest media and snapshots remain intact.

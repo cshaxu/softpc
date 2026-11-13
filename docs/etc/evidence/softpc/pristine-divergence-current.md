@@ -1890,3 +1890,14 @@ unchanged-budget timeout retries.
 See [P48 audit](m9-t100-progress.md#p48-file-300-sevid017c-audit-and-restoration),
 [range map](m9-t100-sevid017-points.tsv) and
 [allocation inventory](m9-t100-sevid017-allocations.tsv).
+
+### T100 S1 P49 sevid018 restoration
+
+File 301 restores ten native-address expressions, 28 malloc calls and 60
+original private declaration lines. Necessary GDP/native-local ABI, selected
+dirty, address-gap and continuation differences remain qualified owner
+decisions. Production +98/-38; XP diff falls 1173 -> 1097 lines and
+384 -> 368 ranges. 392/392 pass on the first full run.
+See [P49 audit](m9-t100-progress.md#p49-file-301-sevid018c-audit-and-restoration),
+[range map](m9-t100-sevid018-points.tsv) and
+[allocation inventory](m9-t100-sevid018-allocations.tsv).

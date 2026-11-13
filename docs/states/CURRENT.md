@@ -30,17 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P48 restores ten native-address expressions, 29 malloc calls and
-60 original private declaration lines in file 300 sevid017.c. Production
-+99/-39 (net +60); test sources unchanged. XP diff decreases 1131 -> 1055
-lines and 367 -> 353 ranges. Existing GDP/native-local ABI, selected dirty,
-CHAIN2 address-gap and continuation repairs remain evidence-qualified owner
-decisions. Independent actual-body and physical-address controls distinguish
-the required repairs from harmless restoration. Both EXEs are freshly built
-and published; 392/392 qualify after unchanged-budget timeout retries, with
-initial aggregate failures retained. No new warning appears. Actual diff,
-tested-source identity and gates pass. Sequential review is 300/472; next is
-file 301 base/cvidc/sevid018.c. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P49 restores ten native-address expressions, 28 malloc calls and
+60 original private declaration lines in file 301 sevid018.c. Production
++98/-38 (net +60); test sources unchanged. XP diff decreases 1173 -> 1097
+lines and 384 -> 368 ranges. Existing GDP/native-local ABI, selected dirty,
+CHAIN2 address-gap and continuation differences remain evidence-qualified
+owner decisions. Actual-body controls and an independent physical-address
+oracle demonstrate necessary residuals. Both EXEs are freshly built/published;
+392/392 pass on the first full run. No new warning appears.
+Actual diff review, tested-source identity and gates pass. Sequential review
+is 301/472; next file 302 base/cvidc/sevid019.c. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
 
