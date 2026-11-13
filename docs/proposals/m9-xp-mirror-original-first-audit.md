@@ -23,6 +23,19 @@ the resulting single path. Existing Compat consumers do not prove a mirror
 deviation necessary. Genuine native host/ABI adaptation remains at its proper
 boundary; do not mistake required native bindings for duplicate device logic.
 
+Owner clarification: 类似情况相同规则处理，不得擅自增加 diff 点位或行数。
+Final owner instruction: 不要停下来等我批准，类似情况不得发生，一概禁止。
+Within this audit, increases in XP-relative diff points or added/deleted diff
+lines are prohibited, including removal of unused files/includes/declarations.
+Do not seek an exception or stop for approval of an increasing candidate.
+Abandon that candidate, preserve the original file and wiring, and continue
+ordered auditing. Net source reduction does not justify more mirror differences.
+Report point count and line delta separately. This supersedes the earlier
+increase-approval clause and broad whole-file retirement interpretation.
+The owner rejected bswap.h retirement on this basis; its original file and
+include remain. Evidence-backed existing residuals still follow the owner's
+original keep-or-restore decision process; this does not authorize new diffs.
+
 ## Method sources
 
 Read on 2026-11-12 in the read-only NTVDM64 comparison tree:
@@ -82,8 +95,8 @@ than its committed revision; no immutable neighbor revision is claimed.
 9. Approved adoption of the neighbor's minimization rule: implement proven
    reductions in necessary differences, without new helpers/second paths or
    moving equal complexity outside the mirror. Residual differences still
-   require owner approval; any increase in original-relative diff requires
-   approval before implementation. Existing out-of-mirror caller edits must
+   require owner approval; increases in original-relative diff points or lines
+   are prohibited, not candidates for a new approval request. Existing out-of-mirror caller edits must
    be disclosed and limited to necessary coherent restoration, not redesign.
 10. Complete all current-file investigations and reducible edits before a
     substantive batch delivery. Qualified owner decisions may remain pending

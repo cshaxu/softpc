@@ -255,3 +255,83 @@ qualified residuals R0006/R0008/R0010 remain owner decisions, not approval.
 Runner completed with exit zero and is no longer live. Disposable P2 evidence
 is removed after promotion here; caches are retained. P2 delivery does not
 close S1 or T100. Source review stands at 31/472; file 32 remains investigation.
+
+## P3 file 32 whole-file retirement (local, verifying)
+
+R0013: bswap.h is identical to XP but has no necessary production declaration
+consumer. It declares only BSWAP(IU32*); repository source/test scans find no
+call or address-taking reference. c_main includes it under CPU_486 (enabled),
+but opcodes 0FC8-0FCF use the original Int6 path under the supported SPC386
+selection. The SPC486 implementations are already excluded; they are not
+reopened or counted. bswap.c is absent and there is no Compat implementation.
+Thus adding the declaration is not implementing a supported instruction.
+
+Owner's explicit whole-file-and-wiring deletion supplement authorizes retiring
+this file. Delete its 16 lines and its sole include, replacing the include with
+an empty line to preserve all following diagnostic locations. This is a coupled
+edit in c_main.c, not completion of that later file's audit. The remaining
+CPU_486 conditional and its other headers are untouched. Counter-review:
+removing an unreferenced declaration cannot change opcode dispatch; do not
+accidentally enable original SPC486 code or claim increased CPU support.
+Current mirror inventory becomes 471; frozen audit universe remains 472 with
+one explicit deletion disposition. This is not claimed as a mirror-diff
+reduction: the retained c_main file gains one original-relative replacement
+line pair, and the removed identical file is reported separately.
+Production +1/-17 (net -16), tests unchanged. Dual builds and regressions run
+before delivery; object hashes before the change are captured for comparison.
+
+Files 33-40, bt/btc/btr/bts source and header pairs, have no in-scope differences
+against fixed XP. CMake includes the original CCPU source list; c_main includes
+their headers and selects their functions for bit opcodes. They are necessary
+original instruction implementations, with no duplicate Compat path. No edit.
+40/472 source-audited; 432 remain. File 41 c-files is under investigation:
+its nine omitted entries require coherent source-selection review, not blind
+restoration of references to retired files. No new approval of those omissions
+is implied by their historical presence.
+
+### File 41 source-selection decision
+
+R0014, c-files, original-relative +0/-9: omitted bswap.c, ccpupig.c,
+cmpxchg.c, c_getset.c, invd.c, invlpg.c, nop.c, wbinvd.c and xadd.c.
+Fixed XP inspection shows six instruction bodies are entirely SPC486-owned;
+ccpupig and c_getset implement the PIG comparison harness. Neither selection
+is supported here. NOP is an empty original worker and original c_main's
+0x90 case already breaks without calling it. No corresponding Compat
+instruction/harness implementation exists to replace with these originals.
+The build reads c-files directly; restoring only entries would reference absent
+files. Coherent restoration would also restore unnecessary whole source files,
+contrary to the owner's explicit whole-file retirement policy. These are
+source-selection omissions, not fixes to original algorithms. Minimal remaining
+option is the nine omitted lines; owner disposition remains pending, not inferred
+from prior retirement approvals. No new runtime negative test is claimed.
+Counter-review explicitly inspected original c_getset's PIG purpose instead of
+assuming its name denoted the product's register-access implementation.
+File 41 completes source review; 41/472 audited, 431 remain.
+
+P3 dual builds succeeded. Before/after c_main object hashes are identical:
+x86 46fa193708f6d2a64c1d4c441a2a4b6fdd802b69a4497d253a62c7275b2372f8;
+x64 03e80b78a3fdbdab7ece859a53d2843b0ca0b89e20be192e8712597807c914fb.
+This proves equality of these compiled objects, not a new manual guest test.
+Already started full regression continues; no cancellation on equivalence.
+
+### Owner rejection: withdraw file 32 retirement
+
+Owner rejects removing bswap.h and its include because that increases mirror
+diff. Restore both files and the current manifest exactly to P2 HEAD. File 32
+is retained XP-identical by explicit owner direction; no deletion is delivered.
+Earlier P3 retirement descriptions above are withdrawn candidate history, not
+current disposition. The original 472-file current inventory is restored.
+No P3 source/test change remains. The already-running candidate qualification
+is not final-source proof for the restored tree; it is allowed to finish rather
+than killing a live test. P2 already qualified this exact source/test state.
+Do not retire an identical header merely to remove an unused declaration when
+its include removal adds mirror diff. Other audit progress is preserved.
+
+Final owner clarification prohibits any increase in mirror diff points or lines;
+do not request an exception. Discard increasing candidates and continue. This
+supersedes the earlier retirement rationale and increase-approval language.
+The withdrawn candidate run finished 392/392 with exit zero; this is recorded
+only as withdrawn-candidate evidence, not qualification of a new delivery.
+Both published EXEs are restored byte-for-byte to accepted P2 along with all
+source/test/manifest contents. Only audit progress and owner-rule documentation
+remain changed. No code or binary retirement ships in this continuation.

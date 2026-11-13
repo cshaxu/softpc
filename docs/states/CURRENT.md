@@ -23,7 +23,7 @@ skipped without new bookkeeping. T99 remains closed; see its
 | Expected Markers | Ordered file/point progress, exact restoration, evidence-qualified owner decisions; no excluded-body ledger. |
 | Asset Needs | Preserve configuration/media/snapshots. S1 owns build/t100-s1 if needed; background jobs bounded to 2 hours and 15 minutes no progress, scratch removed after delivery. |
 | Reporting Requirements | Explain evidence threshold, exact restoration, pending decisions, file order, diff metrics and proposed delivery cadence. |
-| Stop Conditions | Unproven necessity remains investigation; evidence-backed retained differences and diff increases require owner decision. |
+| Stop Conditions | Unproven necessity remains investigation; evidence-backed retained differences require owner decision; any increase in XP-relative diff points or lines is prohibited, including unused-file/wiring removal; discard such candidates and continue without requesting an exception. |
 | Exit Criteria | Reconcile ordered audit dispositions and delivered changes with actual diff review; no unresolved point may be reported closed. |
 | Original Owner Request | Preserved verbatim in the linked proposal. |
 | Similar-Issue Sweep | All non-excluded mirror differences, including previously approved ones, are subject to the same evidence threshold. |
@@ -33,8 +33,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 T100 S1 P2 restores original INT15/C0 segment selection and nonsemantic
 BIOS differences; raw XP-relative diff reduces by 10 lines. Both EXEs are
 published and final x86/x64 regression passes 392/392. Source review stands
-at 31/472 files; file 32 bswap.h is under consumer investigation. Three
-residual points (DOS mouse calls, slave EOI port, descriptor pointer ABI)
+at 41/472 files. Owner rejects bswap.h retirement because its include removal
+increases mirror diff; source and manifest are restored exactly to P2. The
+withdrawn candidate test run ended; both EXEs also match accepted P2. File 41
+c-files omissions are source-reviewed. Four
+residual points (DOS mouse calls, slave EOI port, descriptor pointer ABI, source list)
 await owner decisions. See [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; this is a batch delivery, not task closure.
 
