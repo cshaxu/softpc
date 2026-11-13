@@ -412,3 +412,80 @@ component, Compat, guest, media, configuration or snapshot changes. R0015 is
 still a pending owner decision, not an automatically accepted semantic patch.
 Full runner exited zero and no longer exists. Promote this evidence and remove
 P4 scratch; caches remain. S1/T100 remain active at 46/472 files reviewed.
+
+## P5 file 47 ccpusas4.c review
+
+Point order follows the source. Existing exclusions are skipped without ledger.
+
+| Point | Difference and disposition | Concrete evidence / counter-review |
+| --- | --- | --- |
+| R0016 | Added emm.h: restore XP omission | No used macro/declaration; final x86/x64 object hashes unchanged after removal. |
+| R0017 | Added host.h: restore XP omission | Native calls used here are declared elsewhere; final object identity verifies removal. |
+| R0018 | Added snapshot.h: pending owner | Declares the snapshot state ABI used by the two private-state accessors below; original has no equivalent private-state export. |
+| R0019 | host_sas_init pointer prototype: pending owner | Actual allocator returns UTINY*, assigned as RAM base; implicit int return would truncate native pointers on x64. |
+| R0020 | host_sas_term pointer prototype: pending owner | Actual provider returns UTINY* and original caller compares it with NULL; prototype restores matching C ABI. |
+| R0021 | SAS capture accessor: pending owner | Captures RAM, page-type data and private virtual-selector state for existing snapshot behavior; no original getter for selectors_set/code_sel/data_sel. |
+| R0022 | SAS restore accessor: pending owner | Original selector registration rewrites guest LDT and cannot express unregistered state; cannot replace raw snapshot restoration without changing saved state. Length checks bound the copies to current allocations. |
+| R0023 | phyR local explanatory comment: restore XP omission | Nonsemantic; reason retained in this ledger. |
+| R0024 | phyR bounds condition: pending owner | XP rejects complete end-of-RAM accesses; real device_contract assertions use independent RAM bytes and terminal WORD/DWORD reads. Subtraction also avoids addition wrap. |
+| R0025 | BIOS accessor local explanatory comment: restore XP omission | Nonsemantic; permission rationale is recorded here. |
+| R0026 | BIOS byte-read CPL comparison: pending owner | PG_U=2 means user; original c_page independently chooses it only at CPL3. |
+| R0027 | BIOS word-read CPL comparison: pending owner | Same direct mapping permission contract, with real BIOS wrapper coverage. |
+| R0028 | Protected fallback word cast IU8 to IU16: pending owner | Original biosDoInst returns EAX; IU8 discards bits 8-15 before the IU16 function return. |
+| R0029 | V86 fallback word cast IU8 to IU16: pending owner | Same narrowing at the other actual ROM fallback entry. |
+| R0030 | BIOS dword-read CPL comparison: pending owner | Same user/supervisor permission selection. |
+| R0031 | Protected fallback dword cast IU8 to IU32: pending owner | Original IU8 discards high 24 bits before the DWORD result. |
+| R0032 | V86 fallback dword cast IU8 to IU32: pending owner | Same narrowing on real-mode ROM fallback. |
+| R0033 | BIOS byte-write CPL comparison: pending owner | User flag must accompany CPL3 writes, not supervisor writes. |
+| R0034 | BIOS word-write CPL comparison: pending owner | Same actual access_check contract. |
+| R0035 | BIOS dword-write CPL comparison: pending owner | Same actual access_check contract. |
+
+Permission evidence is source proof plus the existing BIOS test's instrumented
+translation/access wrapper assertions, not exhaustive paging verification.
+Fallback-width tests execute unchanged original ROM instructions for protected
+and V86 paths; only the outer translation miss is controlled. P4 passed these
+tests, but no new original-negative run is claimed in this read-only review.
+Snapshot encode/decode and cross-process tests cover existing accessors; private
+selector necessity is additionally established by the original setter's guest
+memory side effects. These are narrow state accessors, not duplicate device or
+CPU logic suitable for replacing with Compat. The only native allocation owner
+is Compat memory.c; original SAS still owns reads/writes and page semantics.
+
+Four nonsemantic added lines are removed; production +0/-4, no test changes.
+Remaining non-excluded display difference +69/-11, versus +73/-11 before.
+Two final-width targeted builds pass and ccpusas4.c.obj is byte-identical to P4:
+x86 11d088a1b15ddfa1e96b87629d7635eaac4700b64796091240c22ddede860505;
+x64 db5a7afa408a3c716a37f8da41264aeb78d9ab079452d6b842c1d9b7445428da.
+This is final-source object equivalence, not fresh runtime coverage.
+
+File 48 ccpusas4.h has no non-excluded difference and is used by real CPU/SAS
+consumers. Files 49-62 (cdq/clc/cld/cli/clts/cmc/cmp source/header pairs) and 63
+cmpxchg.h are normalized-identical to XP. Preserve the unused instruction header
+under the no-diff-growth rule; no deletion is attempted. Verify actual instruction
+wiring before assigning final completion to these preliminary comparisons.
+
+### P5 final evidence and actual-diff review
+
+Final ccpusas4 object comparison passes on both architectures after all four
+restorations. Both product builds succeed and publish fresh EXEs. Entire EXE
+byte comparisons against accepted P4 find exactly seven differing bytes each.
+They lie only in PE COFF TimeDateStamp (PE+8), OptionalHeader CheckSum
+(PE+24+64), and the single changed NUL-terminated compiler HH:MM:SS string.
+All other bytes and file lengths are identical. This validates the owner's
+artifact-equivalence exception; no full runtime rerun is claimed or needed.
+P4's 392/392 remains the behavior regression baseline, not a fresh P5 test run.
+
+Published compile times Nov 12 2026: 23:43:17 x86, 23:43:20 x64. SHA-256:
+
+- softpc32.exe: 2365a7bf86378673ce1b7d399007e8b4dfc8b8e144977043b69bb9a04d68b927
+- softpc64.exe: b4ef20365db48485713a9342f028664c7df6fff752ee779d99f2061851d19719
+
+Actual review: source +0/-4, tests unchanged, no new difference point; only
+four existing added lines restored. No Compat/shared package/config/media/guest
+change. Pending semantic/ABI/snapshot differences in the table are not owner
+approved. Source caller review confirms original CCPU dispatch for CDQ, CLC,
+CLD, CLI, CLTS, CMC and CMP, with original header and source-list wiring.
+File 63 cmpxchg.h stays identical under no-diff-growth policy; no unused-header
+cleanup is delivered. Ordered coverage 63/472, 409 remaining; file 64 cpu4gen.h
+is investigating. Owned compilation/publication jobs exited; scratch is removed
+after evidence promotion. S1 and T100 remain active.

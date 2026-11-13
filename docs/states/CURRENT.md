@@ -30,16 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P2 restores original INT15/C0 segment selection and nonsemantic
-BIOS differences; raw XP-relative diff reduces by 10 lines. Both EXEs are
-published and final x86/x64 regression passes 392/392. Source review stands
-at 46/472 files. P4 minimizes call.c's existing stack-width repair from
-+1/-4 to +1/-1 against XP; both EXEs are published and final regression
-passes 392/392.
-File 47 ccpusas4.c is under investigation. Five residual points (DOS mouse
-calls, slave EOI port, descriptor pointer ABI, source list, call stack width)
-await owner decisions. See [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
-S1 remains active; this is a batch delivery, not task closure.
+T100 S1 P5 restores four nonsemantic added lines in ccpusas4.c, reducing
+mirror diff by four lines without new points. Both published EXEs are byte
+identical to accepted P4 except verified PE timestamp/checksum and fresh
+compiler time; P4's 392/392 remains the runtime baseline. Source review is
+63/472; file 64 cpu4gen.h is investigating. Existing evidenced residuals
+remain pending owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+S1 remains active; no whole-task completion is claimed.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
 build/publication via existing cached Ninja presets. Two dual-width runs and

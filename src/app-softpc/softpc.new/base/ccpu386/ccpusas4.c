@@ -57,8 +57,6 @@
 #include <c_reg.h>
 #include <timer.h>
 #include <yoda.h>
-#include <emm.h>
-#include <host.h>
 #include "snapshot.h"
 extern UTINY *host_sas_init IPT1(sys_addr, size);
 extern UTINY *host_sas_term IPT0();
@@ -553,7 +551,6 @@ phyR IFN4(PHY_ADDR, addr, IUM8, typeSize, VID_READ_FP, vidFP, char *, name)
 
 	addr &= SasWrapMask;
 
-	/* T99 S8: accept complete in-range accesses without overflowing the end. */
 	if (addr >= Length_of_M_area || typeSize > Length_of_M_area - addr) {
 		SAVED IBOOL first = TRUE;
 		SAVED IU32 junk_value = 0xfefefefe;
@@ -1583,7 +1580,6 @@ c_IOVirtualised IFN4(io_addr, port, IU32 *, value, LIN_ADDR, offset, IU8, width)
 	return FALSE;
 }
 
-/* T99 S37: all six BIOS accessors request PG_U only for user CPL 3. */
 /* Read byte from memory, if V86 Mode let CPU do it. */
 LOCAL IU8 
 bios_read_byte IFN1(LIN_ADDR, linAddr)
