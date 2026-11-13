@@ -2535,3 +2535,86 @@ Sequential reviewed scope is 283/472. Next is 284 base/cvidc/sevid001.c.
 P30 actual process inventory confirms no remaining task-owned probe or
 qualification job. Exact scratch cleanup was previewed, applied and checked;
 Clean-Build -Check passes. Reusable caches and user assets are preserved.
+
+## P31 file 284 sevid001.c audit and restoration
+
+Pinned XP and pre-P31 HEAD 130619e4838d482feb7cb04ff490f1057cb64456 are
+compared in full. Initial +467/-470 = 937 diff lines, 381 changed ranges;
+[point map](m9-t100-sevid001-points.tsv) assigns every initial range. No
+existing excluded body is reopened. This compiled rule file remains required:
+read/mark/write/fill/move tables use its S2118-S2149 implementations.
+
+| Point | Executor disposition | Independent counter-review |
+| --- | --- | --- |
+| R0275 | Restore 31 native-address wrappers to XP dereferences. | String destinations retain full native r2; latch addresses derive from read-plane pointer slot 1284 plus physical offset; backward move destinations derive from screen pointer slot 1400, and RAM sources retain native r3. These are addresses, not GDP offsets. No truncation or replacement helper is introduced. |
+| R0276 | GDP slot mapping: qualified residual, pending owner decision. | Raw XP offsets describe the original 32-bit GDP layout; current native pointer/IUH fields require mapped native storage. Existing mapping remains; this file has 528 slot calls. Shared GDP layout proof from preceding audit applies, not a claim of a new failure probe for every slot. |
+| R0277 | Native-size zeroed locals: qualified residual, pending owner decision. | Actual original four-byte allocations pass x86 but crash x64; native-size allocations poisoned with 0xa5 also crash x64. Generated partial-width writes subsequently feed full-width address/register reads. 31 calloc sites remain. |
+| R0278 | Restore four original continuation calls and immediate returns. | Unlike sevid000, no nested same-translation-unit caller into these string readers is present. ev_glue enters through the selected reader table; same-file non-tail calls only connect Chain4 marking to Unchained marking, not these readers. Tail calls release the active locals once and return immediately. No supported-path necessity for the four gotos was established. Both architectures pass current and restored actual-body controls and the expanded independent oracle. Earlier file-specific continuation failures do not justify these patches. |
+| R0279 | CHAIN2 backward physical addressing: qualified residual, pending owner decision. | Restoring the complete original layout while retaining ABI fixes fails both architectures: mode0 even backward string expects 0x37 but reads 0x5a. Current odd/even plane stride and latch alignment match scalar reads and independently located plane bytes. No new layout or dispatch is added. |
+
+The expanded temporary fixture executes the actual registered backward readers,
+not a replacement implementation: modes 0/1, offsets 0x108/109/110/111,
+counts 0/1/2/7, both destination directions and three repetitions. Independent
+plane bytes and a complete 64-byte destination oracle verify 384 combinations
+per executable, including untouched surrounding bytes. Current and final
+restoration pass all combinations in x86 and x64. Existing VGA tests also pass
+in each executable. Temporary fixtures expose no new production API.
+
+All variants use actual Ninja compile/link commands and separate disposable
+working directories, run serially. Original-layout failure exits with assertion
+failure (x86 0xc0000409; x64 3); original allocation and poisoned native-size
+allocation fail x64 with 0xc0000005. These are actual rule-test results, not
+DOS/Win3.1/Win95 interactive reproduction or exhaustive hardware coverage.
+
+Final production diff: +37/-33 (net +4), one mirror file; tracked tests unchanged.
+XP-relative diff: +448/-447 = 895 lines, 366 points. Reduction: **42 diff lines
+and 15 points**. Four extra source lines restore original two-line continuations;
+source line count is not the minimization measure. No Compat relocation, shared
+package change, guest, configuration, media or snapshot change. Normalized source
+SHA-256: 588f4fdc95430046870d7db87719625904fa970f1a806765d6aba440cd2ee389.
+Cached dual build/publication and complete regression are in progress.
+
+P31 qualification exposed a coupled stale gate: standalone_source_boundary
+required those four sevid001 gotos unconditionally. Remove its one file/list
+entry after the actual-call-chain and runtime evidence above; retain the
+other files' continuation checks. Gate configuration -1 line; no new exception
+framework or production path. Initial x86 gate failure is retained as a real
+first-run failure, not silently relabelled success.
+
+### P31 final verification and actual-change review
+
+Final source byte identity matches the restored-continuation candidate tested
+in both architectures; CRLF retained. All 23 added trailing-whitespace lines
+exactly match pinned XP. Command-local core.whitespace=-blank-at-eol diff check
+passes; no global Git configuration or formatting policy changes.
+
+Both cached builds publish fresh EXEs. The original switch-unreachable warning
+at sevid001.c:1053 appears in both unchanged-source controls and final builds;
+it is not introduced by this patch. No warning cleanup is used to add mirror
+differences. x86 timestamp Nov 13 2026 04:46:47; x64 04:50:24.
+
+Full qualification: x64 188/188 background and 8/8 native first pass. x86
+186/188 background first pass: the stale continuation gate fails and the
+unchanged emulator.verifier-negative reaches its existing timeout (58.95s).
+After removing the stale gate entry, serial rechecks pass: gate 3.70s,
+verifier 26.29s under the same budget. x64 gate is also rechecked (3.49s).
+x86 native 8/8 passes. All 392 tests have passing final observations, with
+explicit initial failures and rechecks; no claim of first-pass 392/392.
+No deeper host cause of the aggregate verifier timeout is proven.
+
+Coordinator actual-diff review checks every changed expression and all four
+tail calls against XP, caller ownership, probe-source identity and the complete
+381-range map. Other files' continuation guards remain intact. Existing GDP,
+local-storage ABI and CHAIN2 layout residuals remain evidence-qualified pending
+owner decisions. No public component, user input asset or sibling repo changes.
+Production +37/-33, tests +0/-0, gate +0/-1; documentation/provenance are separate.
+Mirror and documentation gates pass. Sequential review is 284/472; next file
+285 base/cvidc/sevid002.c, not an assertion of whole-task completion.
+
+Published softpc32.exe SHA-256: ae1e9746e1c9a252c0813735f0be270cfbca7a0368ec7723433bf9b7f027392f.
+
+Published softpc64.exe SHA-256: d129f69fd3bf99c38ea965043a9727b621b45dcb41c0ef50bdbc77a62ab65075.
+
+P31 process inventory confirms all task-owned jobs have exited. Exact scratch
+cleanup was previewed/applied; Clean-Build -Check passes. Reusable caches and
+user assets are preserved.

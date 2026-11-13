@@ -643,7 +643,6 @@ endif()
 # T88 S6: continuation transfers stay in their owning activation.
 foreach(record IN ITEMS
     "sevid000.c:L26_1if_d,L26_3if_d,L26_5if_d,L26_24if_d,L26_26if_d,L26_28if_d"
-    "sevid001.c:L26_58if_d,L26_60if_d,L26_78if_d,L26_80if_d"
     "sevid016.c:L21_1if_d,L21_9if_d"
     "sevid017.c:L21_19if_d,L21_24if_d,L21_35if_d,L21_43if_d,L21_53if_d,L21_58if_d,L21_69if_d"
     "sevid018.c:L21_77if_d,L21_87if_d,L21_92if_d,L21_103if_d,L21_111if_d,L21_121if_d,L21_126if_d"

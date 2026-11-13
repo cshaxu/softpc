@@ -1714,3 +1714,13 @@ This one-line source-list exception implements the approved subset selection.
 The CPU decoder handles opcode 0x90 directly. Existing generated C-VID vector,
 GDP mapping, callbacks and snapshot behavior remain unchanged. No new accessor
 implementation or runtime selection is introduced.
+
+### T100 S1 P31 continuation scope correction
+
+File 284 sevid001.c restores its four T88 continuation calls to XP. Its actual
+call graph and dual-architecture actual-rule controls do not demonstrate the
+nested activation failure that still justifies patches in other files. This
+supersedes retention of those four points, not the historical T88 record or
+other files' evidence. It also restores 31 redundant native-address wrappers.
+See [P31 audit](m9-t100-progress.md#p31-file-284-sevid001c-audit-and-restoration)
+and the complete [range map](m9-t100-sevid001-points.tsv).
