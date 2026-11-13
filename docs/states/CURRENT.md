@@ -30,19 +30,19 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P31 restores 31 native-address expressions and four original tail
-continuation calls in file 284 sevid001.c, and removes its stale gate entry.
-Production +37/-33 (net +4); tracked tests unchanged; gate configuration -1.
-XP-relative diff decreases 937 -> 895 lines and 381 -> 366 points. Dual actual
-rule controls and the expanded 384-case backward oracle pass. Cached x86/x64
-builds publish fresh dual EXEs. x64 188+8 first pass; x86 186/188 background
-initially (stale gate plus unchanged verifier timeout), then both rechecks pass
-and native 8/8 passes. All 392 have passing observations, not all first pass.
-The known mirror switch-unreachable warning is unchanged in pre-change controls.
-Mirror/documentation gates and actual-source review pass. Sequential review is
-284/472; next 285 base/cvidc/sevid002.c. Evidence-qualified ABI/layout residuals
-remain pending owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
-S1 remains active. No approval is awaited to continue ordered auditing.
+T100 S1 P32 restores 42 native-address wrappers and original malloc semantics
+at 29 sites in file 285 sevid002.c. Native allocation width remains; three
+partial-to-native local reads retain zeroing. Production +68/-68 (net 0),
+tests unchanged. XP-relative diff decreases 1257 -> 1187 lines and 478 -> 457
+points. Actual V7 dither controls verify the final candidate on x86/x64 and
+expose x64 heap corruption with original allocation capacities. Cached dual
+builds/publication and all 392 background/native tests pass first run (188+8
+per architecture). The existing mirror switch-unreachable warning is unchanged
+in the pre-change control. Actual-diff review, mirror/documentation gates and
+source identity checks pass. Sequential review is 285/472; next file 286
+base/cvidc/sevid003.c. Evidence-qualified ABI residuals remain pending owner
+decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
 build/publication via existing cached Ninja presets. Two dual-width runs and

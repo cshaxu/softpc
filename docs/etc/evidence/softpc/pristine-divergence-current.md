@@ -1724,3 +1724,13 @@ supersedes retention of those four points, not the historical T88 record or
 other files' evidence. It also restores 31 redundant native-address wrappers.
 See [P31 audit](m9-t100-progress.md#p31-file-284-sevid001c-audit-and-restoration)
 and the complete [range map](m9-t100-sevid001-points.tsv).
+
+### T100 S1 P32 allocation and address minimization
+
+File 285 sevid002.c restores 42 native-address dereferences and original malloc
+semantics at 29 sites. Native slot capacity remains necessary; only the three
+partial-to-native-width local cases retain calloc. This narrows that file's
+existing ABI adaptation without changing other rules' proven requirements.
+See the [complete-file audit](m9-t100-progress.md#p32-file-285-sevid002c-audit-and-restoration),
+[range map](m9-t100-sevid002-points.tsv) and
+[allocation inventory](m9-t100-sevid002-allocations.tsv).
