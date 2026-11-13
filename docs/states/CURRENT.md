@@ -30,12 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P92 completes file 377 quick_ev.h: remove five redundant explanation
-lines; retain 35 snapshot declaration lines as an evidence-qualified owner
-decision. Original queue ownership and actual snapshot consumers are traced.
-Both cached builds and focused checkpoint tests pass; published EXEs differ
-only in verified timestamp metadata. P80's 392/392 remains the full-runtime baseline.
-Frozen frontier 377/472; next file 378 base/inc/rom.h requires investigation.
+T100 S1 P93 completes files 378-380: rom.h and rtc_bios.h match XP fully;
+rs232.h selected content matches outside existing exclusion scaffolding.
+All named original consumers are compiled. No source, test or EXE changes.
+P92 remains the artifact/focused checkpoint baseline; P80's 392/392 remains
+the full-runtime baseline. Frozen frontier 380/472; next file 381 base/inc/sas.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

@@ -6795,3 +6795,39 @@ P92 independent actual eight-file diff review, mirror and documentation gates,
 and whitespace check pass. CIM confirms the owned runner and child jobs have
 exited. Clean-Build preview/apply removes only the task scratch; residue check
 passes. No INI, media, snapshot, unrelated source or sibling repository changed.
+
+## Files 378-380: ROM, serial and RTC headers (P93)
+
+Read-only full-file comparison against the pinned XP revision, in frozen order:
+
+| File | XP raw SHA-256 | Selected-content result and actual consumer |
+| --- | --- | --- |
+| 378 base/inc/rom.h | 8beb30e866d660cb7c7d02b6364ea092f8e8974dfaef6e19c3f9a7c5de17d1ec | Complete LF-normalized identity, including notices, original macintosh condition and ROM entry declarations; included by original rom.c, reset.c and ccpusas4.c. |
+| 379 base/inc/rs232.h | 54cf3d4437b813e87124d70cd54ae193b89700e3096236d99b73dcf791cd1d75 | Selected UART bitfields, register/port/timeout constants, serial entry declarations and adapter_for_port match XP; original com.c, rs232_io.c and reset.c include it. Differences are existing exclusions and their surrounding line/control scaffolding, not a claim of whole-file identity. |
+| 380 base/inc/rtc_bios.h | 5351e07637a4925311775332104c0617411780a7a7977eea3daa8c2162a80bf5 | Complete LF-normalized identity, including notices, BIOS offsets, TIME_DEC and DOUBLE_TIME; included by original floppy.c, cmos_bis.c and tape_io.c. |
+
+Initial review used full normalized comparisons. The first rs232.h display was
+truncated by its excluded bodies, so it was not accepted as complete evidence;
+a second bounded opcode listing and selected local spans were inspected. That
+review explicitly checked selected sibling content sharing replacement ranges
+with excluded code, including the UART ID/status fields, FIFO-adjacent register
+constants, parity constants and serial-port mapping. No selected declaration or
+runtime macro difference was found. Existing directive comments/spacing and
+blank/line-control scaffolding around excluded bodies remain under the approved
+skip boundary; no new points or exclusion ledger were created.
+
+Counter-review: root CMake explicitly compiles all the named original consumers.
+Their includes are retained, and their original declarations do not duplicate
+a new Compat implementation. The header's historical platform declarations do
+not imply that all historical backends are supported; none is newly enabled.
+No whole-file retirement or include removal is justified or attempted.
+
+Production/test/build/EXE changes zero; XP-relative diff change zero. This is
+source evidence, with no new compile or runtime claim. P92 remains the published
+artifact and focused checkpoint baseline; P80's 392/392 remains the full-runtime
+baseline. Frontier 380/472; next file 381 base/inc/sas.h is unreviewed. All earlier
+qualified owner decisions and S1 remain open.
+
+P93 actual three-file documentation diff review, mirror/documentation gates,
+whitespace and build-residue checks pass. No task scratch or background jobs
+were created. The initial frozen file hashes remain unchanged.
