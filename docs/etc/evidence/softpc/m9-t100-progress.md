@@ -2711,3 +2711,100 @@ S1 and the whole audit remain open.
 P32 actual process inventory confirms no task-owned job remains. Exact scratch
 cleanup was previewed/applied, and Clean-Build -Check passes. Caches and user
 assets are preserved.
+
+## P33 file 286 sevid003.c audit and restoration
+
+Pinned XP SP1 is the same fixed revision as admission; normalized original hash
+19f87d7cdd00a65c725dea946a413238d30e1328d3d78e648f8830b958c602a5.
+This compiled file implements S2182-S2213, reached through original evidfunc
+write tables and ev_glue's dith_evid selection. ega_writ selects those tables
+for the supported V7 dither setting. The file is needed, not test-only, and no
+Compat duplicate replaces these device operations.
+
+The [initial range inventory](m9-t100-sevid003-points.tsv) classifies all 557
+non-equal ranges; the [allocation inventory](m9-t100-sevid003-allocations.tsv)
+records each of 32 entry allocations. Existing excluded bodies are not counted.
+
+| Point | Initial finding | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0284 | 55 native memory dereferences wrapped in softpc_gdp_rule_address. | Addresses derive from native video plane pointers or native move/copy arguments, not fixed GDP offsets. The helper returns those pointers unchanged; restore original dereference spelling and formatting. Retain GDP field lookup at each pointer's source. |
+| R0285 | GDP access and required header differ from original fixed 32-bit storage. | Native IUH/IHPE and callbacks require actual native-width field storage; direct original offsets do not describe that layout. Keep the existing ABI mapping, with no new helper or duplicate device behavior. Qualified residual, not owner-approved retention. |
+| R0286 | 32 native-slot allocations replace original byte capacities; the pre-audit local tree used calloc at every site. | Original capacities assume four-byte locals. On x64 the original-size control corrupts the heap. Five entry bodies save LocalIUH[1] through IU32 and later read IUH in their RAM branch: S2186, S2194, S2199, S2205, S2208. Keep their existing zeroing and native capacity. This prevents reading unspecified upper storage but does not establish arbitrary high-address RAM-source correctness. Qualified residual. |
+| R0287 | Remaining 27 entries zero their whole local storage without demonstrated need. | Native pointer locals are fully written before native reads; other accesses consume defined narrow values. Restore malloc semantics, retaining only native-size capacity. Do not apply this to the five mixed-width entries. |
+
+Outside these mechanical categories, reversal of the ABI adaptations leaves
+no token difference from XP. No device algorithm, continuation, stride, guest
+address, callback selection or lifecycle is changed. No guest or other tree is
+modified. Existing input-width limitations are not redesigned in this audit.
+
+Production +82/-82 (net 0); tracked tests +0/-0. XP-relative diff changes from
++718/-717 = 1435 lines / 557 ranges to +672/-671 = 1343 lines / 521 ranges:
+**92 fewer diff lines and 36 fewer points**. Metrics use line SequenceMatcher
+with autojunk disabled, consistently with the preceding file. Native-width
+malloc restoration does not add XP-relative points or lines. All 46 newly
+restored trailing-whitespace lines exactly match XP; source retains CRLF.
+
+Task-local tests compile the actual sevid003 body with the actual Ninja flags
+and replace its archive definition in the existing VGA test executable. An
+additional local fixture calls original registered V7 dither mode2 word and
+mode3 byte/word write/fill entries: two address parities, single writes and fill
+counts 0/1/2/7. Thirty cases check independent four-plane foreground bytes and
+all surrounding memory. Latches, masks, plane selection and plane pointer are
+set explicitly and restored before existing VGA/CHAIN2 checks. Each control
+runs in a distinct disposable directory. No test-only production API is added.
+
+| Actual-body control | x86 | x64 |
+| --- | --- | --- |
+| Unchanged production | pass | pass |
+| Address-only restoration | pass | pass |
+| Final 55-address / 27-malloc candidate | pass | pass |
+| Original four-byte allocation capacity | pass | heap corruption 0xc0000374 |
+| Candidate malloc storage poisoned with 0xa5 | pass | pass |
+
+A first task script stopped before compilation because its insertion anchor
+used the wrong header spelling. Correcting that task-only script did not change
+production or the fixture oracle. The corrected unchanged-production preflight
+passes before candidate comparisons. Poisoning covers the exercised write/fill
+paths, not every copy/move branch; the five retained zeroing cases have source
+ABI evidence rather than a claimed exhaustive dynamic RAM-move proof.
+
+Final normalized source hash:
+029fe47a57faae30a9687245b25389950d965870c1f44ec7fbfbc2d824090df5.
+Tracked source exactly matches the tested minimal candidate. Cached dual
+build/publication and full qualification are running; this paragraph does not
+claim those results or P33 delivery complete.
+
+
+### P33 final verification and actual-change review
+
+Coordinator review checks the actual 82 replacement lines against the original
+expressions and the tested candidate. The 55 pointer restores leave GDP source
+loads and address arithmetic intact. The 27 malloc restores retain native slot
+capacity. Five mixed-width local reads still retain zeroing. No out-of-file
+behavior, shared package, test API, device algorithm or continuation is changed.
+After reversing only retained ABI forms (529 fixed and 225 dynamic GDP accesses,
+plus allocation capacities/zeroing), whitespace-stripped content equals XP.
+The 557-range inventory accounts for the complete initial non-excluded diff.
+
+Production +82/-82 (net 0); tests unchanged. Source remains CRLF and owned
+records LF. All 46 restored trailing-space lines exactly match XP; command-local
+whitespace checking passes without changing Git configuration. Final source
+identity equals the candidate used in all actual-body controls. These tests
+are bounded rule evidence, not exhaustive V7 mode/RAM-move coverage or a new
+interactive DOS/Win3.1/Win95 reproduction.
+
+Fresh cached builds and publication pass without warnings. x86 and x64 each
+pass 188/188 background and 8/8 native tests: **392/392 first run**, no retries
+or timeout changes. Both compiler timestamps are Nov 13 2026. Mirror and
+documentation gates pass; cleanup/process verification follows before delivery.
+
+Published softpc32.exe: 05:24:56; SHA-256 7be919924a411d5f3bc630841d0c6ba0efaeb9c9974c4b5c5bcf26f2ac634c6c.
+
+Published softpc64.exe: 05:28:33; SHA-256 c3b0fa073a077c1224b04b6e67cf814c77855ae87ff3357ee820ae3d6f76cc07.
+
+Sequential audited scope is 286/472; next file 287 base/cvidc/sevid004.c.
+S1 remains active, and qualified ABI residuals remain owner decisions.
+
+P33 actual process inventory confirms all task jobs have exited. Exact scratch
+cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
+configuration, guest media and snapshots are preserved.

@@ -1734,3 +1734,13 @@ existing ABI adaptation without changing other rules' proven requirements.
 See the [complete-file audit](m9-t100-progress.md#p32-file-285-sevid002c-audit-and-restoration),
 [range map](m9-t100-sevid002-points.tsv) and
 [allocation inventory](m9-t100-sevid002-allocations.tsv).
+
+### T100 S1 P33 allocation and address minimization
+
+File 286 sevid003.c restores 55 native-address dereferences and malloc semantics
+at 27 sites. Native slot capacities and five partial-to-native-width zeroing
+cases remain evidence-qualified ABI residuals. This supersedes blanket calloc
+retention in this file, without changing device rules or other files' proofs.
+See the [complete-file audit](m9-t100-progress.md#p33-file-286-sevid003c-audit-and-restoration),
+[range map](m9-t100-sevid003-points.tsv) and
+[allocation inventory](m9-t100-sevid003-allocations.tsv).

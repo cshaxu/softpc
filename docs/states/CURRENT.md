@@ -30,18 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P32 restores 42 native-address wrappers and original malloc semantics
-at 29 sites in file 285 sevid002.c. Native allocation width remains; three
-partial-to-native local reads retain zeroing. Production +68/-68 (net 0),
-tests unchanged. XP-relative diff decreases 1257 -> 1187 lines and 478 -> 457
-points. Actual V7 dither controls verify the final candidate on x86/x64 and
-expose x64 heap corruption with original allocation capacities. Cached dual
+T100 S1 P33 restores 55 native-address wrappers and original malloc semantics
+at 27 sites in file 286 sevid003.c. Native allocation width remains; five
+partial-to-native local reads retain zeroing. Production +82/-82 (net 0),
+tests unchanged. XP-relative diff decreases 1435 -> 1343 lines and 557 -> 521
+points. Thirty actual V7 dither write/fill cases pass per control on x86/x64;
+original allocation capacities expose x64 heap corruption. Cached dual
 builds/publication and all 392 background/native tests pass first run (188+8
-per architecture). The existing mirror switch-unreachable warning is unchanged
-in the pre-change control. Actual-diff review, mirror/documentation gates and
-source identity checks pass. Sequential review is 285/472; next file 286
-base/cvidc/sevid003.c. Evidence-qualified ABI residuals remain pending owner
-decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+per architecture), without build warnings. Actual-diff review, mirror and
+documentation gates and source identity checks pass. Sequential review is
+286/472; next file 287 base/cvidc/sevid004.c. Evidence-qualified ABI residuals
+remain pending owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
