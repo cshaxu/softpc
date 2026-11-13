@@ -194,7 +194,7 @@ switch ( id )
 		S_0364_CiGetVideorplane_00000001	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -232,7 +232,7 @@ switch ( id )
 		S_0365_CiGetVideowplane_00000002	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -270,7 +270,7 @@ switch ( id )
 		S_0366_CiGetVideoscratch_00000003	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -628,7 +628,7 @@ switch ( id )
 		S_0375_CiGetVideosr_lookup_0000000c	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -666,7 +666,7 @@ switch ( id )
 		S_0376_CiGetVideofwd_str_read_addr_0000000d	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -704,7 +704,7 @@ switch ( id )
 		S_0377_CiGetVideobwd_str_read_addr_0000000e	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -862,7 +862,7 @@ switch ( id )
 		S_0381_CiGetVideovideo_copy_00000012	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	
@@ -900,7 +900,7 @@ switch ( id )
 		S_0382_CiGetVideomark_byte_00000013	:	
 
 	/*	ENTER_SECTION	*/	CopyLocalIUH=LocalIUH;	CopyLocalFPH=LocalFPH;	
-	if(	4	>	0	)	LocalIUH	=	(IUH	*)calloc	(	1u, sizeof(IUH)	)	;
+	if(	4	>	0	)	LocalIUH	=	(IUH	*)malloc	(	sizeof(IUH)	)	;
 	if(	0	>	0	)	LocalFPH	=		(EXTENDED	*)malloc	(	0	)		;	
 	{	extern	IHPE	j_Gdp;	*((IUH	*)&(r20))	=	j_Gdp;	}	
 	*((IUH	*)&(r1))	=	*((IUH	*)&(r20))	;	

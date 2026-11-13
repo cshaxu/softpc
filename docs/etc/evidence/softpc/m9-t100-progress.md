@@ -5170,3 +5170,74 @@ sinit011.c. S1 and evidence-qualified residual owner decisions remain open.
 P63 process inventory confirms all owned jobs exited. Task scratch was previewed
 and removed with Clean-Build; residue verification passes. Reusable caches and
 user configuration, media and snapshots are preserved.
+
+## File 314: sinit011.c (P64 verified delivery)
+
+Pinned XP raw SHA-256: 57ebd03b4e94c8ef89556cfd8d19d5963d5680f66757635fc0b8cfed24847771.
+Removing only the added GDP include aligns every remaining line with XP:
+420 GDP access replacements and 20 allocation replacements; no other changed
+line or excluded body occurs. This initial classification covers the entire file.
+
+R0405: the include and 420 accesses use the existing original-offset-to-native
+GDP mapping. The actual state is the Compat-owned indexed allocation, with VGA
+members at native VGAGLOBALSETTINGS offsets, not one original flat 32-bit GDP.
+Restoring raw offsets would access the wrong object; no new mapping is added.
+The generated getters remain registered in VideoVector by vglfunc.c. Existing
+video consumers include snapshot capture in vga_prts.c and dirty accounting in
+gfx_updt.c; this file cannot be classified as an unused test-only component.
+
+R0406: all 20 entries allocate one IUH local. Eight pointer getters fully write
+that native-width slot before reading it: rplane, wplane, scratch, sr_lookup,
+fwd_str_read_addr, bwd_str_read_addr, video_copy and mark_byte. Restore their
+original malloc operation, retaining sizeof(IUH) capacity for x64. The twelve
+scalar entries write IU32 and then load IUH for the generated function return.
+Their zero initialization is an evidence-qualified mixed-width ABI residual:
+the generated function body returns IUH and must not read an indeterminate
+upper half after the host-width expansion. The typed VideoVector consumers
+return IU32: a high-half mismatch
+alone is not evidence that those consumers malfunction.
+
+Focused experiment compiles the actual complete generated source with cached
+production flags and links the existing VGA fixture dependencies, replacing
+only its disposable main and this generated object. The real GDP allocator and
+mapping are used, not duplicate mapping stubs. All 20 getters receive four
+values; pointer cases also carry nonzero upper bits on x64. Current, candidate
+and candidate with malloc memory filled with A5 pass 80 full-return assertions
+each on both architectures. A negative variant also removes the remaining
+twelve zero allocations: x86 passes, x64 fails at latches with
+A5A5A5A587654321 instead of 87654321. This proves the generated native return
+depends on zero initialization, not a guest video failure. No guest binary is
+modified, and this isolated proof is not a real DOS/Windows session test.
+
+Candidate production delta is +8/-8. Anchored XP differing lines remain
+881 (one include plus 440 replaced lines counted on both sides): malloc is
+closer to the original operation, but native capacities still differ. No
+mirror diff-line reduction is claimed. Final normalized source SHA-256 is
+a19fb94bbc6826d8831a31e6bf5a4bf2dd941fe9110da00353171845c4d0c755.
+Dual-width build/publication and full regression are running in owned scratch.
+File 314 is not delivered, the verified frontier remains 313/472, and no
+residual decision is reported approved.
+
+P64 final qualification: x86 build 9.38s, background 139.71s, native 23.45s;
+x64 build 14.39s, background 139.41s, native 23.83s. Each architecture passes
+188 background and eight native tests on the first run: 392/392 total.
+Mirror manifest and documentation gates pass. Production is exactly the tested
+candidate, +8/-8; no permanent test-source change. The line inventory is
+[m9-t100-sinit011-points.tsv](m9-t100-sinit011-points.tsv).
+
+Published softpc32.exe: Nov 13 2026 13:19:19, SHA-256
+f835b53aba6f48e5c88ea52c70ec2e23015daeb3755e92484602a58b89e8c23e.
+Published softpc64.exe: Nov 13 2026 13:22:12, SHA-256
+95fb7998ec5326886b5d7b829960c32da9beef6b0bb03e207ded2d886544b8bd.
+
+Independent actual-diff counter-review confirms only eight allocation-operation
+restorations, with original whitespace and native capacity preserved. GDP
+mapping and mixed-width initialization remain evidence-qualified owner
+choices; no new helper, path or interface was introduced. The native-return
+negative test must not be described as a guest failure through typed IU32
+consumers. Configuration/media/snapshots are unchanged. Verified frontier is
+314/472, next file 315 sinit012.c; S1 remains active.
+
+P64 owned-process inspection confirms all probes and qualification jobs exited.
+Clean-Build preview, exact scratch removal and residue check pass. Only the
+two reusable cache roots remain; no raw logs or probe binaries are retained.
