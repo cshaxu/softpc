@@ -30,17 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P27 restores unnecessary ev_glue declarations/formats and removes the
-CHAIN2 bridge/extra selector. Its producer uses existing marker 2. Production
-+7/-51; tests +20/-13. In-scope XP diff falls 61 to five lines, 11 to three
-contiguous points; coupled gfx_updt gains no diff. GDP/native aggregate
-residuals have concrete ABI evidence and remain pending owner decision.
-Cached dual build/publication and fresh full tests pass: 188 background plus
-eight native tests per architecture, 392/392 without retry. Mirror/documentation
-and diff checks pass; only original mirror warnings remain. Actual-change
-review finds no new path or ownership. Following fpu_c.h/gdpvar.h match fixed
-XP exactly after newline normalization. Reviewed sequence: 277/472; next is
-278 base/cvidc/j_c_lang.c. S1 is active, not closed.
+T100 S1 P28 completely restores j_c_lang.c to fixed XP: production +2/-8,
+no test changes; mirror diff decreases 10 lines/three points to zero.
+Actual compiler controls validate 560 x86 and 2144 x64 mask combinations for
+both original/current bodies plus two invalid bounds. Cached dual build and
+publication pass; fresh full regression passes 188 background plus eight
+native tests per architecture (392/392, no retry). Original mirror printf
+warnings remain; no new suppression or non-mirror/test warning. Mirror,
+documentation and diff checks pass; actual-change review confirms complete
+normalized XP identity. Sequential review: 278/472; next 279 j_c_lang.h.
+P27's GDP/native aggregate residuals remain evidence-qualified pending owner
+decision. S1 is active, not closed.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

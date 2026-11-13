@@ -2294,3 +2294,73 @@ All owned probe/build/test processes were terminal before cleanup. The exact
 active scratch child was previewed and removed; Clean-Build -Check passes.
 Reusable Ninja/ccache roots remain. P27 is a complete file delivery, not S1
 closure or approval of the evidence-qualified residuals.
+
+## File 278 j_c_lang.c / P28 candidate
+
+Only three in-scope ranges differ: added stdio/inttypes and reason comments,
+bit-position diagnostic format, length/start diagnostic format. XP diff
++8/-2 = 10 lines/three contiguous points becomes zero by exact restoration.
+Production +2/-8, no test/source relocation or added helper. Entire file now
+matches fixed XP after CRLF normalization.
+
+| Point | Executor analysis | Counter-review |
+| --- | --- | --- |
+| R0264 | Remove five-line added includes/comments after host_def | Actual compiler accepts original; no caller-visible computation or return changed. Original diagnostic declarations warn; no suppression or false warning-free claim. |
+| R0265 | Restore original bit-position diagnostic | No actual supported requirement for widened invalid-input text established; this is not a computation repair. |
+| R0266 | Restore original length/start diagnostic | Same; restore original rather than retain speculative modernization. |
+
+Repository C source scan outside this file finds 432 mask call expressions in
+14 C-VID source files and no calls to its six rotation helpers. This is a
+source inventory, not proof that every expression executes. Generated rules
+and the shared r0..r31 definitions are actual CCPU object inputs; the file is
+not unused. Uncalled original helpers remain: deleting them would increase
+mirror diff. No behavior is copied to Compat.
+
+Isolated actual-compiler controls append a bounded test main to each complete
+original/current function body. Every start in 0..width-1 and length in
+0..width-start is checked bit by bit, including zero/full-width masks:
+560 pairs each on x86, 2144 each on
+x64. Both variants pass on both widths; invalid start=width and len=width+1
+also return zero and print the same tested values. This does not claim all
+invalid native-width diagnostic values produce identical text, nor validate
+unused rotation semantics. Current/original diagnostic difference for extreme
+invalid arguments is consciously restored under the original-first policy.
+Final dual build/publication and full regression follow; no old results are
+substituted for final-source qualification.
+
+Adjacent file-279 read-only preparation: j_c_lang.h adds one seven-line
+CrulesRuntimeError declaration/comment block outside existing exclusions.
+Actual CVID C source scan finds 2465 direct literal-string statement calls in
+31 files; no other use outside the original ev_glue provider is found in that
+scope. All discard the result. The provider is void(char *) and only prints
+its argument. This is not yet a full necessity disposition or header change;
+compile/object ABI controls belong to the next complete-file delivery. Do not
+count file 279 reviewed or alter it while P28's build/tests are running.
+
+### P28 final verification and actual-change review
+
+Cached x86/x64 build and publication pass. Each final architecture passes
+188 background tests and eight desktop/native-audio tests: fresh 392/392,
+no retry or equivalence exemption. Mirror/documentation gates and diff check
+pass. The only compiler warnings in this build are original mirror printf
+declarations; no new flags or suppression. Test and non-mirror production
+code are unchanged.
+
+Coordinator review checks all three actual diff ranges against fixed XP,
+not only the candidate summary: the full normalized file is identical with
+SHA-256 f8e31bc5d63f810f73da165084a5a498a8261e48ff20daf7efdc1393216f2f48.
+No calling interface, register storage, bit computation, original helper,
+Compat implementation or lifecycle is added/removed. Diagnostic wording is
+restored to XP; arbitrary malformed arguments are not claimed text-equivalent.
+No guest/configuration/snapshot changes. Production +2/-8 (net -6), tests
++0/-0; mirror diff -10 lines/-3 contiguous points, with no new pending
+retention decision in this file. Reviewed sequence reaches 278/472; next
+279 j_c_lang.h remains unreviewed pending its actual ABI controls.
+
+softpc32.exe: compiler timestamp Nov 13 2026 03:55:23; SHA-256 9ffecd3156f419201c06d67a304c3293b9013b55351464907b156ba4f16149a9.
+
+softpc64.exe: compiler timestamp Nov 13 2026 03:59:05; SHA-256 ed1f58f20315aa297469d25d76faf79e7c731fc1bf66dbd77b80d3153fe5b9d3.
+
+P28 owned processes were terminal before the exact task scratch was previewed
+and removed. Clean-Build -Check passes; only reusable caches remain. This is
+a verified complete-file delivery, not S1 closure.
