@@ -2429,3 +2429,109 @@ Published softpc64.exe SHA-256: 0e0aa4eb3d777201633c7aafe4906d7d21f314dbebf4369a
 P29 owned processes were terminal; exact task scratch was previewed and
 removed. Clean-Build -Check passes. Reusable caches are preserved; no pending
 probe or unfinished verification is represented as completed.
+
+## P30 file 283 sevid000.c audit and minimization (verification in progress)
+
+Files 281 sas4gen.h and 282 sascdef.c are reviewed in frozen order. For 281,
+recursive comparison preserves exact selected text/conditional directives,
+skipping complete existing #error bodies and their line controls without
+accounting for those exclusions. File 282 is normalized identical to pinned
+XP. Neither needs a production edit.
+
+File 283 compares with the fixed XP SP1 counterpart. The initial 412 contiguous
+non-equal ranges (+514/-527, 1041 diff lines) are individually mapped in
+[m9-t100-sevid000-points.tsv](m9-t100-sevid000-points.tsv). Ranges refer to XP
+and the pre-P30 source at b12197bf3e654fba973ce0e11df44289a22f4e7c;
+multiple evidence groups may cover one range. No exclusion-body entries exist.
+Reversing the precisely enumerated ABI expressions for comparison, then
+comparing retained tokens, leaves only the layout, continuation and DWORD
+repairs below; there is no unclassified semantic remainder.
+
+| Point | Initial analysis and proposed disposition | Independent counter-review / evidence |
+| --- | --- | --- |
+| R0268 | Restore all 35 native-address dereferences exactly, including original trailing whitespace where the whole line matches. | 26 sources are VGA read-plane pointer slot 1284 plus offset; eight are native string destination LocalIUH[0], saved from r2; one is screen base slot 1400 plus offset. ev_glue read_str_fwd passes native dest through jccc_parm1. None is a GDP field offset. Existing adapter returns those valid host addresses unchanged. Original dereference candidate passes real VGA executable in both architectures. No new helper or alternate path. |
+| R0269 | Existing GDP slot access/include: evidence-qualified residual, pending owner decision. | GDP is the existing opaque slot owner, not a flat original byte array. Earlier R0254/R0263 paired original allocation plus original initialization already demonstrates native-width pointer overlap on x64; restoring only this consumer would be an invalid partial experiment. This file consumes the same 0/8/12/16 tracing slots and native VGA fields. Replacing the entire owner/family is not a justified reduction within this file. No claim that a coherent whole-family restoration was dynamically run here. |
+| R0270 | Existing native-width zeroed LocalIUH storage: evidence-qualified residual, pending owner decision. | XP allocation counts four bytes per IUH; supported x64 rules use eight. E.g. two-slot local offset 1 is already beyond an original eight-byte allocation. Original allocation passes x86 but x64 fails with heap-corruption termination. Sized nonzero malloc also fails x64; deliberate 0xa5-filled allocation reproduces access violation. Source confirms partial IU32 stores followed by IUH loads (e.g. Chain4 byte reader LocalIUH[0]); high halves must be initialized. Both malloc controls pass x86, so no x86-specific need is claimed. |
+| R0271 | Six existing local goto continuations: evidence-qualified residual, pending owner decision. | Original recursive dispatch enters crules with fresh CopyLocal pointers initialized null, while using the saved LocalIUH allocation; leaving that activation frees it and restores null, losing the enclosing activation. Restoring the exact six calls fails the real VGA executable with access violation in both architectures. Current local transfers pass without adding another call/ownership path. |
+| R0272 | Existing CHAIN2 layout correction: evidence-qualified residual, pending owner decision. | Existing production planes retain the A0 gap: physical 4*(address & ~1)+(address & 1). Original shift/stride/alignment restoration fails BIOS pixel-read colour assertion in both architectures. Original read expressions cannot consume the actual selected layout. This control preserves GDP, allocation and continuation adaptations; it is not proof of a fresh Win3.1 guest reproduction. |
+| R0273 | Preserve both CHAIN2 DWORD fixes but minimize their original-relative scope. | Exact original +4 second WORD offset returns 0x66552211 instead of 0x44332211. Original final composition returns 0x00002211. Both fail real rule assertions in x86/x64. New candidate restores the original extraction/register sequence and changes only final combination to low WORD plus r20 shifted 16; r20 was just assigned the second WORD. Its preceding extraction bounds r20 to 16 bits. Offset stays +2. Both architectures pass the actual VGA suite; no widened read or changed guest layout. |
+| R0274 | Existing Unchained DWORD +2 correction: evidence-qualified residual, pending owner decision. | Restoring +8 fails the real DWORD assertion in both architectures. Existing tests place independent bytes at +2/+3 and +8/+9, across four planes and several offsets; the second WORD is two guest bytes later. No additional rule implementation is introduced. |
+
+Controls compile the actual source body with each architecture's real Ninja
+compile command and link its object before the machine archive in the real
+VGA test command. No test-only production entry or guest modification is used.
+Early overlapping harness runs shared a relative disposable disk pathname;
+file-open assertion failures from those runs were discarded as harness
+interference. A subsequent single runner executes every variant serially in
+its own architecture/variant working directory. Final isolated results:
+
+| Variant | x86 | x64 |
+| --- | --- | --- |
+| Native-address restoration | pass | pass |
+| Final minimal candidate | pass | pass |
+| Original four-byte-slot allocation | pass | heap corruption 0xc0000374 |
+| Native-size malloc | pass | access violation 0xc0000005 |
+| Native-size malloc filled 0xa5 | pass | access violation 0xc0000005 |
+| Original continuation calls | access violation | access violation |
+| Original CHAIN2 layout | colour assertion | colour assertion |
+| Original Unchained DWORD offset | DWORD assertion | DWORD assertion |
+| Original CHAIN2 DWORD offset | 0x66552211 assertion | same assertion |
+| Original CHAIN2 DWORD combination | 0x00002211 assertion | same assertion |
+
+Source/ABI reasoning, actual rule-test evidence and guest reproduction are
+separate: no new DOS/Win3.1/Win95 interactive session is claimed. The existing
+suite includes original BIOS/controller paths; this is not proof of every
+hardware mode/register combination. Tests are unchanged.
+
+Proposed production diff is +53/-45 (net +8) in one mirror source. XP-relative
+diff is +492/-497 = 989 lines, 408 points: **52 fewer diff lines, four fewer
+points**, despite the source line increase. Original calculation statements
+are restored, not moved into Compat. No shared component, configuration,
+media, snapshot or external tree changes. Final cached dual build/publication,
+full background/native suites and actual-change acceptance remain pending.
+
+### P30 final verification and actual-change review
+
+Final production source exactly matches the minimal candidate exercised by the
+isolated x86/x64 VGA controls; normalized SHA-256
+f6d4200da8381889e4a361eea441b0f34edb4abba062d47b7f5e46b71c8c7d57.
+The source retains CRLF. Both cached builds/publications pass without compiler
+warnings in this batch. Published timestamps: x86 Nov 13 2026 04:25:31;
+x64 Nov 13 2026 04:29:07. No equivalence exemption is used.
+
+Fresh qualification: x86 188/188 background and 8/8 native pass. x64 first
+background run passes 187/188; emulator.verifier-negative reaches its existing
+60s timeout (60.47s). Its unchanged, isolated recheck passes in 22.71s under
+the same 60s budget; all 8/8 x64 native tests then pass. Thus all 392 required
+tests have passing final observations, with one explicit retry, not a clean
+first-pass full-suite claim. The verifier copies/configures Emulator fixtures;
+it neither compiles nor executes the changed mirror. Aggregate timeout is
+observed; a deeper host scheduling cause is not proven. No timeout widening,
+product change or test change is made to obtain the recheck pass.
+
+Coordinator review of actual changes confirms all 35 addresses retain their
+native widths and origins, with no new ownership or dispatch path. Both DWORD
+expressions mask by the low-WORD load and shift unsigned IU32 r20 by 16; the
+original preceding extraction and WORD overwrite establish its bounded value.
+No argument, guest address layout, selected mode or allocation contract changes.
+The 412-range evidence map covers the initial diff; final XP difference is
++492/-497, 408 points. Source +53/-45 is not presented as a source reduction.
+Required existing residuals remain qualified pending owner decision, not
+silently approved. No sibling or shared-package edits are included.
+
+Plain git diff --check reports restored original trailing tabs. All 26 such
+added lines were checked against exact XP text (two retain the already-required
+GDP ABI expression); this is required original formatting, not new style churn.
+A command-local core.whitespace=-blank-at-eol check passes for other whitespace
+errors, and the separate exact-original check passes. No Git configuration or
+repository whitespace policy is changed. Mirror and documentation gates pass.
+
+Published softpc32.exe SHA-256: 40c6363bc958382cc6122a8e99497e2cc66c055f10080dc72b1449641076480a.
+
+Published softpc64.exe SHA-256: 9208689e5bd9414c1565ff6baf1172e7c38a816a437b5345e20182a1b482a019.
+
+Sequential reviewed scope is 283/472. Next is 284 base/cvidc/sevid001.c.
+
+P30 actual process inventory confirms no remaining task-owned probe or
+qualification job. Exact scratch cleanup was previewed, applied and checked;
+Clean-Build -Check passes. Reusable caches and user assets are preserved.

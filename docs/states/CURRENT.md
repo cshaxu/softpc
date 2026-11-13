@@ -30,19 +30,19 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P29 restores j_c_lang.h's sole in-scope difference: production +0/-7,
-no test changes; seven XP diff lines/one point removed. Existing exclusions
-are untouched. All 35 actual dependent objects per architecture are identical
-(70/70). Cached dual build/publication passes; EXEs differ from P28 only in
-validated timestamp/PE metadata (nine bytes each). Fresh x86/x64 VGA tests
-pass; approved equivalence reuses P28's 392/392 full result, not a new full run.
-Mirror/documentation/diff checks and actual-change review pass; only original
-mirror warnings remain. Following pigger_c.h matches fixed XP. Sequential
-review: 280/472; next 281 base/cvidc/sas4gen.h. Prior evidence-qualified ABI
-residuals remain pending owner decision. S1 is active, not closed.
-Earlier evidence-qualified residuals remain pending owner decisions in the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
-S1 remains active; no whole-task completion is claimed.
+T100 S1 P30 restores native-address expressions and minimizes two CHAIN2
+DWORD repairs in sevid000.c: production +53/-45 (net +8), tests unchanged;
+XP-relative diff decreases 1041 -> 989 lines and 412 -> 408 points. All initial
+ranges are mapped to evidence. Cached x86/x64 builds publish fresh dual EXEs.
+Fresh background/native qualification obtains passes for all 392 tests: x86
+188+8 first pass; x64 187/188 initially, unchanged emulator.verifier-negative
+passes its isolated recheck in 22.71s under the same 60s budget, then 8/8 native.
+No first-pass 392/392 claim. Mirror/documentation gates and actual-source review
+pass; original whitespace restoration is separately verified against XP.
+Sequential review is 283/472; next 284 base/cvidc/sevid001.c. Evidence-qualified
+ABI/layout/continuation/read-repair residuals remain pending owner decisions
+in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md). S1 remains
+active; this delivery does not close the whole audit.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
 build/publication via existing cached Ninja presets. Two dual-width runs and

@@ -742,7 +742,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IUH)))	+	*((IUH	*)&(r22))	;
 	*((IUH	*)&(r21))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	*((IUH	*)&(r22))	=	(IS32)(1)	;	
 	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
@@ -799,7 +799,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH	*)&(r22))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r21))	=	(IS32)(1)	;	
 	*((IUH	*)&(r22))	=	(IS32)(31)	;	
 	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
@@ -886,11 +886,15 @@ switch ( id )
 	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;	returnValue	=	S_2088_RdMode0Chain2WordRead(v1,v2,v3,v4);	}
 	/*	j_state	(IS32)(-2013004277),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
-	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16207)	;
-	/* DIVERGENCE(T99-S36): consecutive WORDs form the low/high DWORD halves. */
-	*((IU32	*)&(r2)	+	REGLONG)	=
-		(IU32)*((IU16	*)(LocalIUH+2)	+	REGWORD) |
-		((IU32)*((IU16	*)&(r2)	+	REGWORD) << 16);
+	*((IUH	*)&(r21))	=	(IS32)(16)	;	
+	*((IUH	*)&(r22))	=	(IS32)(16)	;	
+	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
+	CrulesRuntimeError("Bad	long	bitfield");
+	else
+	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+2)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
+	*((IU16	*)&(r20)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
+	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16207)	;	
+	*((IU32	*)&(r2)	+	REGLONG)	=	(IU32)*((IU16	*)(LocalIUH+2)	+	REGWORD) | (*((IU32	*)&(r20)	+	REGLONG) << 16)	; /* T99-S36: combine consecutive WORDs. */
 /*J_KILL__*/
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1007,7 +1011,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IUH	*)&(r2))	=	*((IUH	*)(LocalIUH+0))	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1047,7 +1051,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IU8	*)&(r2)	+	REGBYTE)	=	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1093,7 +1097,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IU16	*)&(r2)	+	REGWORD	)	=	*((IU16	*)(LocalIUH+1)	+	REGWORD)	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1159,7 +1163,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IU32	*)&(r2)	+	REGLONG)	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1252,7 +1256,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IUH	*)&(r2))	=	*((IUH	*)(LocalIUH+0))	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1292,7 +1296,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	+	*((IUH	*)&(r22))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r21))	=	(IS32)(1280)	;	
 	*((IUH	*)&(r22))	=	(IS32)(1368)	;	
 	if(*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IU32)))>=32)
@@ -1342,7 +1346,7 @@ switch ( id )
 	if(*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IU32)))>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
-	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU32)))	>>	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r20)))	)	>>	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IU32)))	;
 	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	=	*((IU8	*)&(r21)	+	REGBYTE)	;	
 	*((IUH	*)&(r20))	=	(IS32)(2)	;	
 	if(*((IU32	*)&(r20)	+	REGLONG)>=32)
@@ -1355,7 +1359,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	+	*((IUH	*)&(r22))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r21))	=	(IS32)(1280)	;	
 	*((IUH	*)&(r22))	=	(IS32)(1368)	;	
 	if(*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IU32)))>=32)
@@ -1517,7 +1521,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IUH	*)&(r2))	=	*((IUH	*)(LocalIUH+0))	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1564,7 +1568,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IUH)))	+	*((IUH	*)&(r22))	;
 	*((IUH	*)&(r21))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
@@ -1642,7 +1646,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH	*)&(r22))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r21))	=	(IS32)(1)	;	
 	*((IUH	*)&(r22))	=	(IS32)(31)	;	
 	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
@@ -1797,11 +1801,15 @@ switch ( id )
 	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;	returnValue	=	S_2100_RdMode1Chain2WordRead(v1,v2,v3,v4);	}
 	/*	j_state	(IS32)(-2013004277),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
-	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16237)	;
-	/* DIVERGENCE(T99-S36): consecutive WORDs form the low/high DWORD halves. */
-	*((IU32	*)&(r2)	+	REGLONG)	=
-		(IU32)*((IU16	*)(LocalIUH+2)	+	REGWORD) |
-		((IU32)*((IU16	*)&(r2)	+	REGWORD) << 16);
+	*((IUH	*)&(r21))	=	(IS32)(16)	;	
+	*((IUH	*)&(r22))	=	(IS32)(16)	;	
+	if	(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	>	32	||	*((IU32	*)&(r22)	+	REGLONG)	==	0)
+	CrulesRuntimeError("Bad	long	bitfield");
+	else
+	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+2)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
+	*((IU16	*)&(r20)	+	REGWORD)	=	*((IU16	*)&(r2)	+	REGWORD	)	;	
+	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16237)	;	
+	*((IU32	*)&(r2)	+	REGLONG)	=	(IU32)*((IU16	*)(LocalIUH+2)	+	REGWORD) | (*((IU32	*)&(r20)	+	REGLONG) << 16)	; /* T99-S36: combine consecutive WORDs. */
 /*J_KILL__*/
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1878,7 +1886,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	(IS32)(1383)	;	
 	*((IU8	*)&(r22)	+	REGBYTE)	=	*((IU8	*)&(r22)	+	REGBYTE)	|	*((IU8 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU8)))	;
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU8)))	=	*((IU8	*)&(r22)	+	REGBYTE)	;
+	*((IU8	*)(*((IHPE	*)&(r21)))	)	=	*((IU8	*)&(r22)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16230)	;
 	*((IUH	*)&(r20))	=	(IS32)(2)	;	
@@ -1891,9 +1899,9 @@ switch ( id )
 	*((IU8	*)(LocalIUH+7)	+	REGBYTE)	=	*((IU8	*)&(r21)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8	*)&(r22)	+	REGBYTE)	=	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	&	*((IU8	*)(LocalIUH+7)	+	REGBYTE);
+	*((IU8	*)&(r22)	+	REGBYTE)	=	*((IU8	*)(*((IHPE	*)&(r20)))	)	&	*((IU8	*)(LocalIUH+7)	+	REGBYTE);	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU8)))	=	*((IU8	*)&(r22)	+	REGBYTE)	;
+	*((IU8	*)(*((IHPE	*)&(r21)))	)	=	*((IU8	*)&(r22)	+	REGBYTE)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	-	*((IUH	*)&(r20));	
 	*((IUH	*)(LocalIUH+0))	=	*((IUH	*)&(r21))	;	
@@ -1922,7 +1930,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	(IS32)(1383)	;	
 	*((IU8	*)&(r22)	+	REGBYTE)	=	*((IU8	*)&(r22)	+	REGBYTE)	|	*((IU8 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU8)))	;
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU8)))	=	*((IU8	*)&(r22)	+	REGBYTE)	;
+	*((IU8	*)(*((IHPE	*)&(r21)))	)	=	*((IU8	*)&(r22)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16230)	;
 	*((IUH	*)&(r20))	=	(IS32)(2)	;	
@@ -1935,9 +1943,9 @@ switch ( id )
 	*((IU8	*)(LocalIUH+7)	+	REGBYTE)	=	*((IU8	*)&(r21)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16231)	;
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8	*)&(r22)	+	REGBYTE)	=	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	&	*((IU8	*)(LocalIUH+7)	+	REGBYTE);
+	*((IU8	*)&(r22)	+	REGBYTE)	=	*((IU8	*)(*((IHPE	*)&(r20)))	)	&	*((IU8	*)(LocalIUH+7)	+	REGBYTE);	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	=	*((IU8	*)&(r22)	+	REGBYTE)	;
+	*((IU8	*)(*((IHPE	*)&(r20)))	)	=	*((IU8	*)&(r22)	+	REGBYTE)	;	
 	*((IUH	*)&(r21))	=	(IS32)(1)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	+	*((IUH	*)&(r21))	;		
 	*((IUH	*)(LocalIUH+0))	=	*((IUH	*)&(r20))	;	
@@ -1958,7 +1966,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IUH	*)&(r2))	=	*((IUH	*)(LocalIUH+0))	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -1995,7 +2003,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH	*)&(r22))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16230)	;
 	*((IUH	*)&(r21))	=	(IS32)(1379)	;	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
@@ -2048,7 +2056,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH	*)&(r22))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r21))	=	(IS32)(1378)	;	
 	*((IU16	*)&(r20)	+	REGWORD	)	=	*((IU16 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IU16)))	^	*((IU16	*)(LocalIUH+1)	+	REGWORD)	;
 	*((IUH	*)&(r21))	=	(IS32)(1382)	;	
@@ -2119,7 +2127,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r22))	=	*((IUH	*)&(r22))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r22))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r22)))	)	;
 	*((IUH	*)&(r21))	=	(IS32)(1376)	;	
 	*((IU32	*)&(r20)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IU32)))	^	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r21))	=	(IS32)(1380)	;	
@@ -2223,7 +2231,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IUH	*)&(r2))	=	*((IUH	*)(LocalIUH+0))	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -2262,7 +2270,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
 	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r21))	=	(IS32)(1376)	;	
@@ -2338,7 +2346,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1376)	;	
 	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	^	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r22))	=	(IS32)(1380)	;	
@@ -2384,7 +2392,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
 	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r21))	=	(IS32)(1376)	;	
@@ -2460,7 +2468,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1376)	;	
 	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	^	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r22))	=	(IS32)(1380)	;	
@@ -2506,7 +2514,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1376)	;	
 	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	^	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r22))	=	(IS32)(1380)	;	
@@ -2552,7 +2560,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1376)	;	
 	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	^	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r22))	=	(IS32)(1380)	;	
@@ -2604,7 +2612,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IU32	*)&(r21)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
-	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;	
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
 	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(LocalIUH+1)	+	REGLONG)	;
 	*((IUH	*)&(r21))	=	(IS32)(1376)	;	
@@ -2735,7 +2743,7 @@ switch ( id )
 	*((IU32	*)(LocalIUH+7)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+6)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r23)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r23)	+	REGLONG));	
 	*((IU32	*)&(r22)	+	REGLONG)	=	*((IU32	*)&(r22)	+	REGLONG)	&	*((IU32	*)(LocalIUH+7)	+	REGLONG);	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU8)))	=	*((IU8	*)&(r22)	+	REGBYTE)	;
+	*((IU8	*)(*((IHPE	*)&(r21)))	)	=	*((IU8	*)&(r22)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16251)	;
 	*((IUH	*)&(r20))	=	(IS32)(1)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	-	*((IUH	*)&(r20));	
@@ -2794,7 +2802,7 @@ switch ( id )
 	*((IU32	*)(LocalIUH+8)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+6)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r23)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r23)	+	REGLONG));	
 	*((IU32	*)&(r22)	+	REGLONG)	=	*((IU32	*)&(r22)	+	REGLONG)	&	*((IU32	*)(LocalIUH+8)	+	REGLONG);	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	;	
-	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	=	*((IU8	*)&(r22)	+	REGBYTE)	;
+	*((IU8	*)(*((IHPE	*)&(r20)))	)	=	*((IU8	*)&(r22)	+	REGBYTE)	;	
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16251)	;
 	*((IUH	*)&(r21))	=	(IS32)(1)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	+	*((IUH	*)&(r21))	;		
@@ -2815,7 +2823,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	+	*((IUH	*)&(r21))	;
 	*((IUH	*)&(r20))	=	(IS32)(1280)	;	
-	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r21))), sizeof(IU32)))	;
+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	=	*((IU32	*)(*((IHPE	*)&(r21)))	)	;
 	*((IUH	*)&(r2))	=	*((IUH	*)(LocalIUH+0))	;	
 /*J_KILL__*/
 /*J_KILL__*/
@@ -3022,7 +3030,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IU32	*)(LocalIUH+0)	+	REGLONG);	
 	*((IUH	*)&(r21))	=	(IS32)(1400)	;	
 	*((IUH	*)&(r20))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	+	*((IUH	*)&(r20))	;
-	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	=	*((IU8 *)softpc_gdp_rule_address((void *)r1, (uintptr_t)(*((IHPE *)&(r20))), sizeof(IU8)))	;
+	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	=	*((IU8	*)(*((IHPE	*)&(r20)))	)	;	
 	*((IU8	*)&(r2)	+	REGBYTE)	=	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	;	
 /*J_KILL__*/
 /*J_KILL__*/
