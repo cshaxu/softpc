@@ -1178,3 +1178,50 @@ P13 published artifact SHA-256:
 
 - softpc32.exe: `461149983ad018d866e48a7e5f15faeca1276cef7c9de0177ab2bf762325d3ef`.
 - softpc64.exe: `f5afec8d7b1351cbc5690f9664b2e2b2069cb999a5a11a1537bea2b7df26c000`.
+
+
+## P14: file 119 original pointer declarations
+
+The preceding isolated investigation is now implemented and final-source
+verified. Restore evid_c.h entirely to fixed XP: R0141 restores the two string
+read pointer declarations and removes their erroneous native-width comment;
+R0142 restores the three marker pointer declarations; R0143 restores the byte
+read pointer declaration. These are pointer pointee types, not 32-bit storage
+for pointer values. The sole actual compiled consumer uses offsets/aggregate
+size. No cast, helper, new header or alternative layout is introduced.
+
+Executor review and separate actual-diff counter-review confirm exact original
+header bytes after CRLF normalization, unchanged member order/offsets/native
+pointer widths, and unchanged gdp_state consumer code. Do not generalize this
+result to scalar pointer storage or generated-rule dereferences elsewhere.
+The file's former SOFTPC-PORT-051 marker is removed with the restored content;
+its current manifest disposition changes to XP_SUBSET_IDENTICAL. Historical
+ledgers remain historical, rather than being rewritten as current XP counts.
+
+Production +6/-10 (net -4), tests unchanged. Fixed-XP diff falls from +10/-6
+to zero: 16 fewer difference lines, no added point. File 120 fault.h is also
+normalized-identical to XP and needs no change. Ordered review is 120/472;
+file 121 fpu.c is next and not yet audited.
+
+Cached x86/x64 builds of the final source and publication both pass. Final
+production gdp_state objects are byte-identical to P13, with the same hashes
+recorded in the preceding isolated proof. Entire published EXEs have identical
+lengths and differ by exactly eight bytes each. Every differing byte belongs
+to COFF TimeDateStamp (PE+8), OptionalHeader CheckSum (PE+24+64), or the single
+changed NUL-terminated compiler time literal at the same file offset:
+
+- x86 offset 2435392: 01:16:35 to 01:24:49.
+- x64 offset 2289664: 01:16:44 to 01:25:00.
+
+All remaining bytes are identical. This proves the approved artifact-equivalence
+exception; no fresh P14 runtime run is claimed. P13's fresh 392/392 full tests
+remain the behavior regression baseline. Manifest initially rejected the stale
+PRESERVED_LOCAL_PATCH identity after exact restoration; updating that row to
+XP_SUBSET_IDENTICAL fixes the metadata, and the gate passes. No production
+change is hidden behind that metadata correction. Documentation and diff checks
+pass; user assets and shared packages are unchanged.
+
+P14 published artifact SHA-256:
+
+- softpc32.exe: `2a4bbd58c733e0cbbe4352b0aae15360b835f1826db0835575ef5220bc03f979`.
+- softpc64.exe: `3203d4d1383ada135f180c8832246c7cfa7173315fa2163df0926d3650917d7b`.

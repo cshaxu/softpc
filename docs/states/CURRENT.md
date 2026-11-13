@@ -30,14 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P13 restores both c_xcptn.c differences: remove the added yoda.h
-include and restore the original local host_getenv declaration. The existing
-original empty force_yoda stub remains the sole selected call implementation.
-Production +1/-1 (net zero), tests unchanged; this file's in-scope XP diff
-falls from +1/-1 to zero. Both published EXEs pass 392/392 fresh tests.
-Source review is 118/472; file 119 evid_c.h is next. Its original pointer
-fields already produce identical actual-consumer objects on both architectures;
-restoration and final-source publication are not yet delivered.
+T100 S1 P14 restores evid_c.h entirely to fixed XP; its changed pointer
+pointee types were unnecessary for the sole actual offset/size consumer.
+Production +6/-10 (net -4), tests unchanged; mirror diff reduces by 16 lines
+to zero for this file. Final x86/x64 objects are identical; both published
+EXEs differ from P13 only in required compiler/PE metadata. The approved
+artifact-equivalence exception applies: no fresh P14 runtime test is claimed,
+and P13's 392/392 fresh full tests remain the behavior regression baseline.
+Source review is 120/472; file 121 fpu.c is next.
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
