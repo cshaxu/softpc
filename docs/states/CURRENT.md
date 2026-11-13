@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P68 audits file 319 diskbios.c without production changes. The existing
-capacity-return correction passes the real BIOS fixture on x86/x64; restoring
-the exact XP assignments fails CX validation on both. It remains an evidence-
-qualified owner decision, not automatic approval. Published EXEs remain P66
-with 392/392 full regression; P68 adds focused evidence only. Frozen frontier
-319/472; next file 320 fdisk.c. See the
+T100 S1 P69 audits file 320 fdisk.c without production changes. Its existing
+HDD snapshot extension has real archive consumers and owns access to private
+controller state; retention remains an evidence-qualified owner decision.
+Existing checkpoint tests pass on both architectures. Published EXEs remain
+P66 with 392/392 full regression; no new full-suite run is claimed. Frozen
+frontier 320/472; next file 321 fla.c. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

@@ -5488,3 +5488,67 @@ S1 remains active and qualified residual decisions remain pending.
 P68 authoritative process inspection confirms the owned jobs exited. Clean-Build
 preview, exact scratch removal and residue check pass. Documentation gate and
 actual diff review pass; only the three audit/state documents change.
+
+
+## File 320: fdisk.c (P69 read-only qualification)
+
+Fixed XP raw SHA-256:
+bd7218dcec4af7db766845baa45356ab9c5f812e0159c603904a897ad785c2e4.
+Complete comparison outside existing skipped exclusions/line controls finds
+one include at current line 236 and an appended 119-line block at 1896-2014.
+No original retained controller algorithm, declaration or expression is changed.
+Active additions are +120/-0, unchanged by this audit. No excluded-body accounting.
+
+| Point | Location | Evidence-qualified residual, pending owner decision |
+| --- | --- | --- |
+| R0415 | current 236, 1896-2014; XP insertion before 1922 | Existing HDD snapshot types, stable callback/command encoding and private controller-state capture/restore. |
+
+Production chain: machine/snapshot_image.c calls the CCPU archive; compat/ccpu/
+archive.c invokes device archive capture/restore, whose archive.c directly calls
+both HDD state functions and dispatches both HDD callback codecs. The root build
+includes the original fdisk controller. Its private drives[2], pseldrv, taskfile,
+sector buffer/index, fixed/digital registers and activecmd are the actual device
+state, not a duplicate model in Compat. The archive only stores and serializes
+that state. Removing this extension loses access to the private state; deleting
+its callers as well removes HDD checkpoint coverage rather than restoring an
+equivalent supported snapshot path. Exporting the original locals or recreating
+the device in Compat would add different mirror changes or a second authority.
+
+The added fields are consumed by hdd_drive_fields and hdd_fields in archive.c.
+Each copied drive scalar, all ten taskfile bytes, 256 sector words, registers,
+sector index and selected-drive/command IDs map back to the same original owner.
+Pointers are encoded rather than serialized as process addresses: pseldrv maps
+to -1/0/1, and the ten-entry command table includes null and the original command
+functions. This table is not interchangeable with the original dispatch table:
+its stable IDs/order differ and it includes diagnose. Restore validates indices
+before changing state. No extra device command execution is introduced.
+
+The two callback IDs refer to actual delayed events: rsector schedules
+fdisk_pause at current line 769; irq schedules disk_int_call_back at
+1346. The former resumes activecmd. The archive's shared event codec calls the
+HDD encoder/decoder; these are not test-only entry points. Codecs reject unknown
+pointers/IDs and do not invent a fallback. Their necessity is established by
+this source/caller/private-state proof, not by pretending the focused checkpoint
+test dynamically exercises every delayed HDD callback or in-flight command.
+
+Focused dynamic evidence: the existing checkpoint_smoke CTest passes on x86
+and x64 (1.69 and 1.66 seconds including CTest). Its HDD section changes taskfile
+ports, captures state, overwrites ports, restores and compares the taskfile.
+All ten active-command IDs round-trip through the actual capture/restore
+functions; -1 and 10 are rejected. The full existing fixture also runs its
+Machine checkpoint path. This does not prove all disk geometries, every partial
+sector transfer, every delayed callback timing or DOS/Windows guest sessions.
+No new permanent test or production API is added.
+
+Counter-review: all non-excluded additions serve the existing snapshot contract;
+no exact XP restoration preserving that contract was identified. Merely deleting
+snapshot functionality, moving the same state access elsewhere or replacing
+stable IDs with process pointers is not a valid simplification. Retain R0415
+for owner disposition, not automatic approval. No code/test/build/manifest or
+EXE changes; XP-relative diff delta zero. P66 remains the published full-suite
+392/392 baseline; this batch adds only the two focused test results.
+Ordered frontier 320/472; next file 321 fla.c. S1 remains active.
+
+P69 actual-source counter-review and documentation gate pass. Owned process
+inventory confirms the runner exited. Clean-Build preview, exact task-scratch
+removal and residue check complete; only audit/state documents are delivered.
