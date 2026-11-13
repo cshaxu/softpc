@@ -30,17 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P36 restores 85 native-address accesses and malloc at 21 sites in file
-289 sevid006.c. Native capacities and eleven mixed-width move locals remain.
-Production +106/-106 (net 0); tests unchanged. XP-relative diff decreases
-1587 -> 1425 lines and 605 -> 542 points. Actual-body controls verify 66 selected
-WORD-write/copy cases on x86/x64; original x64 capacities corrupt the heap.
-Cached dual builds/publication and 392/392 registered tests pass first run.
-Both compiles retain the same original mirror unreachable-switch warning;
-no new warning is introduced. Actual review, gates and source identity pass.
-Sequential review is 289/472; next is file 290 base/cvidc/sevid007.c.
-Qualified ABI residuals remain owner decisions in the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P37 restores 62 native-address accesses and malloc at 27 sites in file
+290 sevid007.c. Native capacities and five mixed-width move locals remain.
+Production +89/-89 (net 0); tests unchanged. XP-relative diff decreases
+1983 -> 1867 lines and 717 -> 683 points. Actual-body controls verify selected
+WORD fills and preserve copy results; original x64 capacities corrupt the heap.
+Both EXEs are built/published. All 392 registered tests have passing evidence,
+with two aggregate verifier-negative timeouts and two successful isolated
+retries under unchanged budgets. This is not first-run all-green; timing debt
+is in TODO. Both compiles retain the same original mirror warning, no new one.
+Actual review, gates and source identity pass. Sequential review is 290/472;
+next is file 291 base/cvidc/sevid008.c. Qualified ABI residuals remain owner
+decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
@@ -68,8 +69,8 @@ Nov 8 timestamps. See [timestamp closure](../history/M9-Td-S23-build-timestamp.m
 Only Emulator build configuration/verifier/manifest changed within the public
 eight trees; no fresh NXVM alignment is claimed.
 
-[TODO](TODO.md) records the original GenericByteFill nested-call defect exposed
-in P34; current CCPU fills do not call that batch entry. The runtime-performance candidate
+[TODO](TODO.md) records the original GenericByteFill nested-call defect and
+verifier-negative aggregate timing debt. The runtime-performance candidate
 remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
 did not admit S44 or a new implementation task.
 

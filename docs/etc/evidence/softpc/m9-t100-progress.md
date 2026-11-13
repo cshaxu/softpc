@@ -3103,3 +3103,127 @@ and scratch cleanup precede delivery; caches and user assets are preserved.
 P36 actual process inventory confirms all task workers exited. Exact scratch
 cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
 user configuration, guest media and snapshots remain intact.
+
+## P37 file 290 sevid007.c audit and restoration
+
+Original normalized SHA-256 is
+a0d23a551a0a1d70d0df184bb86fab7f870d6d155ac6a9dc5936716c448e06c7,
+matching the fixed XP SP1 manifest. This compiled file supplies S2310-S2341:
+Unchained WORD writes, fills, moves and their original copy helpers. The
+unchained_evid table registers the public rule entries; their normal selection
+and all caller wiring remain unchanged. No duplicate Compat device code or
+test-only mirror file is removed.
+
+The [range map](m9-t100-sevid007-points.tsv) covers all 717 initial unequal
+ranges; the [allocation map](m9-t100-sevid007-allocations.tsv) covers 32 entries.
+Existing excluded bodies are not recorded.
+
+| Point | Initial finding | Counter-review and disposition |
+| --- | --- | --- |
+| R0300 | 62 native-address accesses use GDP address wrappers. | Inputs are native source pointers and native read/write plane bases plus original offsets, not GDP field identifiers. Restore original dereferences/formatting; retain field translation where the native pointer is obtained. |
+| R0301 | Fixed GDP fields use native mapping/header. | Original 32-bit field layout differs from native IUH, pointer and callback layout. Preserve the existing adapter as an evidence-qualified residual pending owner disposition, without new helpers or device logic. |
+| R0302 | 32 allocations use native capacities and calloc. | Original four-byte capacities corrupt the x64 heap in actual-body controls. S2330/S2333/S2335/S2338/S2340 store LocalIUH[1] as IU32 then read it as IUH for RAM-source arguments; retain their zeroing. No arbitrary high-address RAM-source support is claimed. |
+| R0303 | Other 27 entries also use calloc. | Local access review finds no corresponding upper-byte dependency. Restore malloc with native capacity; selected poisoned-storage controls pass. No claim that all specialized entry paths were dynamically exercised. |
+
+Reversing the known ABI forms leaves the complete token stream identical to XP.
+Actual diff is 89 replacement lines: 62 address accesses and 27 allocations.
+Production +89/-89 (net 0), tracked tests unchanged. XP-relative diff drops
+from +992/-991 = 1983 lines / 717 ranges to +934/-933 = 1867 lines / 683 ranges:
+**116 fewer diff lines, 34 fewer points**. No new mirror point, algorithm,
+branch, state or relocated Compat complexity is introduced.
+
+### Actual-body controls and corrected fixture assumption
+
+The task fixture compiles with actual x86/x64 build commands and links real
+rule bodies. S2317 runs through unchained_evid[0].w_fill: 72 combinations of
+three masks, three plane enables, odd/even addresses and lengths 0/1/2/7 have
+independent repeated-WORD and untouched-region expectations. S2334 is called
+directly for 48 four-plane WORD-copy cases: two source branches, three masks,
+two destination parities and four lengths. Existing VGA/CHAIN2 assertions run
+in every successful control.
+
+The first unchanged x86 preflight failed the copy oracle, not the fill checks.
+A diagnostic recorded mask=0, RAM=false, count=1, second byte/plane0:
+actual 7 versus expected 59. The fixture had assumed the source-plane latch
+advanced per byte. The original WORD-copy body reuses one plane group for both
+bytes and advances it per word. That assumption was withdrawn, not repaired
+in production or silently reported as a passed hardware oracle.
+
+Final copy checks retain independent RAM-source/full-mask results and untouched
+boundaries. All 48 complete 4096-byte output images are also compared byte-for-
+byte against unchanged production per architecture. Thus partial-mask video
+source cases prove preservation, not an exhaustive VGA hardware specification.
+The task does not establish a new guest-visible defect from the initial oracle.
+
+| Final control, 120 cases plus existing VGA tests | x86 | x64 |
+| --- | --- | --- |
+| Unchanged current | pass | pass |
+| Address restoration | pass | pass |
+| Minimal address/malloc restoration | pass | pass |
+| Original four-byte capacities | pass | heap corruption 0xc0000374 |
+| Candidate malloc filled with 0xa5 | pass | pass |
+
+These results do not cover every specialized move or establish guest-triggered
+batch reachability. The P34 original nested-call defect stays separate TODO
+debt. No guest, configuration, snapshot, media or sibling is changed; no new
+production test interface is introduced.
+
+Final normalized source SHA-256:
+ab931c53f7465b3e72943a76a0d045544ae3e814503aca97755fbf6b44d61f39.
+Installed source is byte-identical to the tested minimal candidate. Actual
+counter-review confirms unchanged field selection/arithmetic/callbacks and
+mirror CRLF. Full qualification follows before delivery.
+
+### P37 first regression result and controlled retry
+
+The first x86 background run finishes 187/188: emulator.verifier-negative
+hits its existing 60-second budget (CTest displays 58.88 seconds). The other
+187 tests pass, including Types and runtime boot. The fixture left at timeout
+contains the expected private-path negative include ../session/control.h; no
+corpus assertion failure is reported. That script launches repeated CMake
+negative checks and does not execute the modified C-VID body.
+
+After the first runner terminates, the same test runs alone with its unchanged
+60-second budget and passes in 25.81 seconds. No source change, timeout change
+or suppression is used. This establishes a completed retry, not the exact host
+scheduling cause or a claim that the first aggregate run passed. x86 native
+qualification then passes 8/8. x64 qualification follows independently.
+
+Both architectures' successful copy controls produce identical 196608-byte
+captures, SHA-256 bbb57146913550f0e8ceea7faf72f3d6266a57561648226d99e63b0f51a1fcb7.
+Address/minimal/poison candidates match their unchanged baseline bytes.
+
+### P37 final qualification and actual-change review
+
+x64 aggregate testing also finishes 187/188, with only emulator.verifier-negative
+hitting its unchanged 60-second budget (60.30 seconds displayed). It then passes
+alone in 25.35 seconds without any source/budget change. x64 native tests pass
+8/8. Across architectures all 392 registered tests have passing evidence, with
+**two aggregate timeouts and two successful targeted retries**. This is not a
+first-run all-green claim. Exact host scheduling cause is unproved; the shared
+test's aggregate timing margin is recorded separately in TODO for investigation,
+not repaired or weakened within this mirror-restoration scope.
+
+Both cached builds/publications succeed and retain only the same original
+sevid007.c:849 unreachable-switch warning seen in baseline compiles. No new
+warning, suppressed check or product timeout adjustment is introduced.
+Final source equals the focused-tested candidate. All 89 replacement lines
+remain the declared 62 native accesses and 27 allocation statements; all 58
+restored trailing-space lines match XP exactly. Fixed-field translation,
+original arithmetic, callbacks and device control flow stay unchanged.
+Mirror CRLF, evidence LF, source identity and command-local whitespace checks
+pass. Documentation/mirror gates pass. No complete hardware or new interactive
+guest qualification is claimed. Qualified ABI residuals await owner decisions.
+
+Published softpc32.exe: Nov 13 2026 06:30:35;
+SHA-256 ea1055a9367779823024cf2e12f807fbba3d1d93225bc2f3145d00eaa520ebe0.
+Published softpc64.exe: Nov 13 2026 06:35:10;
+SHA-256 d36d3352a1879d908f481115b39f2ae983dcf9544d4a9d09d8922ba0c357080a.
+
+Sequential audited scope is 290/472; next file 291 base/cvidc/sevid008.c.
+S1 remains active. Process verification and scratch cleanup precede delivery;
+user assets and reusable caches remain intact.
+
+P37 actual process inventory confirms no task worker remains. Exact scratch
+cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
+configuration, guest media and snapshots are preserved.

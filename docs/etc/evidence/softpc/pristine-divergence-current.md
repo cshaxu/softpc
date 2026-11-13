@@ -1775,3 +1775,13 @@ qualified ABI residuals, not automatic owner approval. XP-relative diff drops
 See [P36 audit](m9-t100-progress.md#p36-file-289-sevid006c-audit-and-restoration),
 [range map](m9-t100-sevid006-points.tsv) and
 [allocation inventory](m9-t100-sevid006-allocations.tsv).
+
+### T100 S1 P37 allocation and address minimization
+
+File 290 sevid007.c restores 62 native-address accesses and 27 malloc sites.
+Native capacities and five mixed-width move locals remain qualified ABI
+residuals pending owner disposition. XP-relative diff drops 1983 -> 1867 lines
+and 717 -> 683 ranges; production +89/-89, no new mirror point or device path.
+See [P37 audit](m9-t100-progress.md#p37-file-290-sevid007c-audit-and-restoration),
+[range map](m9-t100-sevid007-points.tsv) and
+[allocation inventory](m9-t100-sevid007-allocations.tsv).
