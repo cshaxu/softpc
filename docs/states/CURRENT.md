@@ -30,14 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P25 restores evidfunc.h completely to XP, removing the old unsupported
-mark-declaration ABI patch rationale. Actual x86/x64 table objects are identical
-before/after. Production +17/-19; no test changes. XP diff decreases 36 lines /
-one point, leaving no local header difference. Cached dual build/publication
-and actual VGA regressions pass. EXEs equal P24 except timestamp/PE metadata;
-the approved equivalence exception reuses P22's 392 full passes through P23/P24.
-No fresh P25 full suite is claimed. Mirror/documentation/diff checks pass.
-Sequential review is 272/472; next base/cvidc/evidgen.h (273).
+T100 S1 P26 restores evidgen.h completely to XP, removing unnecessary callback
+type rewriting and direct declarations. All 28 actual dependent objects at each
+architecture remain byte-identical. Production +8/-21; no test changes; XP diff
+decreases 29 lines/six points. Cached dual build/publication and actual VGA
+regressions pass; EXEs equal P25 except timestamp/PE metadata. The approved
+equivalence exception reuses P22's 392 full passes through equivalent deliveries;
+no fresh P26 full suite is claimed. Mirror/documentation/diff checks pass.
+evid_c.h is normalized identical. Sequential review is 274/472; next ev_glue.c (275).
 Earlier evidence-qualified residuals remain pending owner decisions in the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.

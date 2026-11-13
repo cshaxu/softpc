@@ -2033,3 +2033,94 @@ Ordered review reaches 272/472; next base/cvidc/evidgen.h (273).
 - P25 x86 EXE SHA-256 `f9c3ce422eb46a1a98cbdc1d42cf470355dd444a936a42d30d45b0feb99f19fd`; compiler time 03:26:02.
 
 - P25 x64 EXE SHA-256 `c53bfb696fb81908d8ead25e5cee73ebb289742ddb97f21fed23f9a73a12704f`; compiler time 03:26:18.
+
+## P26 file 273 evidgen.h: original vector contract investigation/restoration
+
+The local header replaced eight IHP callback-carrying fields with three added
+callback aliases, added a long rationale and two direct read/write-pointer
+function declarations. No consumer uses the aliases outside this header.
+IHP is already a native pointer, so its historical spelling alone is not
+proof of 32-bit truncation. The generated getter/setter transport remains
+native-width. Do not confuse this change with prior proven GDP slot defects.
+
+Actual consumers include adjacent vglfunc.c/sascdef.c, ntstubs.c, facade.c
+and egacpu.h users. Original egacpu.h maps SetReadPointers/SetWritePointers
+to direct names; actual calls pass only readset 0-3 or no arguments and do
+not consume returns. Direct declarations therefore need actual compiler/ABI
+proof, not the assertion that every modern declaration is necessary.
+
+Ninja's actual dependency database identifies 28 existing objects per
+architecture depending on this header. Their before hashes were captured;
+the complete exact-XP header, not a partial broken rewrite, is used for final
+cached rebuild. No Compat casts, typedef moves or alternate header were added.
+XP diff +21/-8 in six points becomes zero (29 lines/six points removed).
+Production +8/-21, no tests changed. Current manifest equals pinned subset.
+
+| Point | XP range | Before range | Initial analysis/counter-review |
+| --- | --- | --- | --- |
+| R0246 | 6-5 | 6-15 | Remove added comment and callback aliases together with their field uses; no independent consumers exist. |
+| R0247 | 27-29 | 37-39 | Restore original IHP fields: pointer-width representation is unchanged, actual dependent-object/EXE proof required. |
+| R0248 | 39-39 | 49-49 | Restore original IHP fields: pointer-width representation is unchanged, actual dependent-object/EXE proof required. |
+| R0249 | 66-68 | 76-78 | Restore original IHP fields: pointer-width representation is unchanged, actual dependent-object/EXE proof required. |
+| R0250 | 78-78 | 88-88 | Restore original IHP fields: pointer-width representation is unchanged, actual dependent-object/EXE proof required. |
+| R0251 | 92-91 | 102-104 | Restore original absence of direct declarations; real calls have no pointer arguments/returns and bounded readset values 0-3. Verify actual generated code, not hypothetical ABI need. |
+
+The next file 274 evid_c.h is normalized identical to pinned XP; no local
+point exists. Its ordered completion is recorded only after file 273 is
+verified. Build/EXE comparison is underway; this record alone is not a pass.
+
+P26 final-source verification: both cached builds and publication pass. All
+28 actual dependent objects at each architecture retain identical hashes;
+both EXEs equal P25 byte-for-byte except COFF timestamp, PE checksum and one
+same-offset HH:MM:SS literal (seven changed x86 bytes, six x64 bytes).
+Actual VGA frame regression passes on both architectures. Mirror/documentation
+and diff --check pass. Build warnings remain confined to original mirror
+sources; no new shared/Compat/test warning or suppression introduced.
+
+Approved artifact-equivalence exception reuses P22's 392 full-regression passes
+through subsequent proven-equivalent deliveries; P26 does not claim a fresh
+full suite or manual guest validation. No universal function/data-pointer
+interchangeability claim is made beyond the actual supported Windows x86/x64
+build/ABI and unchanged generated code. The old DIV-062 explanation is retired
+as a current necessity claim; historical records remain historical.
+
+Coordinator actual-change review confirms exact XP header restoration, all six
+points removed with no moved aliases/casts or additional production paths.
+Production +8/-21, no test changes. CRLF source and manifest match pinned XP.
+No shared package, Compat source, guest, configuration, media or snapshot edit.
+Sequential review reaches 274/472; next base/cvidc/ev_glue.c (275).
+
+- P26 x86 EXE SHA-256 `fe2ac6d03f68eed7ad41d3b5a1635e2c7f1b3c6705dbfa171e9762447716bc1e`; compiler time 03:29:45.
+
+- P26 x64 EXE SHA-256 `e3d0c0aebec5c6d8542c2eaa866afd1ed87659f5a0ac6e0949baec9349125d4f`; compiler time 03:30:16.
+
+Actual dependency object paths (same set on both widths; all unchanged):
+
+- `CMakeFiles/softpc-ccpu-core.dir/src/app-softpc/softpc.new/base/ccpu386/ntstubs.c.obj`
+- `CMakeFiles/softpc-ccpu-core.dir/src/app-softpc/compat/ccpu/facade.c.obj`
+- `CMakeFiles/softpc-ccpu-core.dir/src/app-softpc/softpc.new/base/cvidc/ev_glue.c.obj`
+- `CMakeFiles/softpc-ccpu-core.dir/src/app-softpc/softpc.new/base/cvidc/vglfunc.c.obj`
+- `CMakeFiles/softpc-ccpu-core.dir/src/app-softpc/softpc.new/base/cvidc/sascdef.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/ega_mode.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/ega_prts.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/ega_vide.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/gvi.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/gfx_updt.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/v7_ports.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/video.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/v7_video.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/vga_mode.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/vga_prts.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/ega_read.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/ega_dmmy.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/vga_vide.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/ega_writ.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/egawrtm0.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/egwrtm12.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/base/video/cga.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/host/src/nt_ega.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/host/src/nt_graph.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/softpc.new/host/src/nt_vga.c.obj`
+- `CMakeFiles/softpc-machine-devices.dir/src/app-softpc/compat/dib_surface.c.obj`
+- `CMakeFiles/softpc-vga-frame-smoke.dir/test/app-softpc/unit/machine/chain2_rule_smoke.c.obj`
+- `CMakeFiles/softpc-vga-frame-smoke.dir/test/app-softpc/unit/machine/vga_frame_smoke.c.obj`
