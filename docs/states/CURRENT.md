@@ -30,18 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P34 restores 53 native-address accesses and malloc at 26 sites in file
-287 sevid004.c. Native capacities and six mixed-width zeroing cases remain.
-Production +77/-77 (net 0); tests unchanged. XP-relative diff decreases
-1419 -> 1329 lines and 566 -> 536 points. Actual-body x86/x64 controls verify
-write results and backward-move preservation; original x64 capacities corrupt
-the heap. Cached dual builds/publication and 392/392 registered tests pass
-first run without build warnings. Separate probes expose an unchanged original
-GenericByteFill nested-call defect on both architectures; current CCPU fills
-do not use that batch path. It remains explicitly in TODO, not a repaired bug.
-Actual-change review, gates and source identity checks pass. Sequential review
-is 287/472; next file 288 base/cvidc/sevid005.c. Qualified ABI residuals remain
-owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P35 restores 26 native-address accesses and malloc at 31 sites in file
+288 sevid005.c. Native capacities and S2275 mixed-width zeroing remain.
+Production +57/-57 (net 0); tests unchanged. XP-relative diff decreases
+1379 -> 1327 lines and 506 -> 499 points. Actual-body controls cover 90 selected
+Unchained write/fill cases on x86/x64; original x64 capacities corrupt the heap.
+Cached dual builds/publication and 392/392 registered tests pass first run.
+Both compiles retain the same original mirror unreachable-switch warning;
+no new warning is introduced. Actual review, gates and source identity pass.
+Sequential review is 288/472; next is file 289 base/cvidc/sevid006.c.
+Qualified ABI residuals remain owner decisions in the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
@@ -69,7 +68,8 @@ Nov 8 timestamps. See [timestamp closure](../history/M9-Td-S23-build-timestamp.m
 Only Emulator build configuration/verifier/manifest changed within the public
 eight trees; no fresh NXVM alignment is claimed.
 
-[TODO](TODO.md) has no deferred entries. The runtime-performance candidate
+[TODO](TODO.md) records the original GenericByteFill nested-call defect exposed
+in P34; current CCPU fills do not call that batch entry. The runtime-performance candidate
 remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
 did not admit S44 or a new implementation task.
 

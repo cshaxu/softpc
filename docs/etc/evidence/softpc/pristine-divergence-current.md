@@ -1755,3 +1755,13 @@ separately recorded, not hidden by this restoration or claimed resolved.
 See [P34 audit](m9-t100-progress.md#p34-file-287-sevid004c-audit-and-restoration),
 [range map](m9-t100-sevid004-points.tsv) and
 [allocation inventory](m9-t100-sevid004-allocations.tsv).
+
+### T100 S1 P35 allocation and address minimization
+
+File 288 sevid005.c restores 26 native-address accesses and 31 malloc sites.
+Native local capacities and S2275 mixed-width zeroing remain evidence-qualified
+owner decisions. XP-relative diff drops 1379 -> 1327 lines and 506 -> 499 ranges;
+production +57/-57, no new mirror difference or relocated Compat behavior.
+See [P35 audit](m9-t100-progress.md#p35-file-288-sevid005c-audit-and-restoration),
+[range map](m9-t100-sevid005-points.tsv) and
+[allocation inventory](m9-t100-sevid005-allocations.tsv).

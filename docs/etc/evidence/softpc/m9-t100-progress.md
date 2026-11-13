@@ -2922,3 +2922,93 @@ S1 remains active. Cleanup and actual-process checks precede delivery.
 P34 actual process inventory confirms no task-owned worker remains. Exact task
 scratch cleanup was previewed/applied; Clean-Build -Check passes. Caches and
 user configuration, guest media and snapshots are preserved.
+
+## P35 file 288 sevid005.c audit and restoration
+
+Original normalized SHA-256 is
+8afc078a1048d820dde939729c6c79fc61550a5e947e14d1c9aec87ecea8e87d,
+matching the pinned XP SP1 manifest. This compiled file supplies S2246-S2277:
+Generic moves and selected Unchained mode-0 writes, fills and copies. The
+unchained_evid table registers these functions, including S2250/S2262/S2275;
+existing ev_glue selection and production machine integration remain intact.
+This is not a test-only file or a duplicate Compat device implementation.
+
+The [range map](m9-t100-sevid005-points.tsv) classifies all 506 initial unequal
+ranges; the [allocation map](m9-t100-sevid005-allocations.tsv) covers 32 entries.
+Existing excluded bodies are not inventoried.
+
+| Point | Initial finding | Counter-review and disposition |
+| --- | --- | --- |
+| R0292 | 26 native-address accesses use the GDP address wrapper. | Sources are caller RAM pointers, native read/write planes and copied pointer locals, not fixed GDP offsets. Restore original dereferences and original formatting; retain native field mapping at the pointer source. No arithmetic changes. |
+| R0293 | Fixed GDP offsets use mapped native fields. | Original fixed 32-bit layout cannot represent the current native pointer/callback/IUH fields. Preserve existing mapping and header, pending owner decision; no new helper or path. |
+| R0294 | 32 local allocations use native capacities and calloc. | Original four-byte capacities fail the x64 actual-body control with heap corruption. S2275 LocalIUH[1] stores IU32 then supplies a full IUH RAM-source argument to S2276; retain its zeroing and native capacity. This does not validate arbitrary high-address input pointers. |
+| R0295 | Remaining 31 allocations also use calloc. | Local access review finds no corresponding partial-store/full-native-read dependence. Restore malloc, retaining native capacity. Poisoned allocations pass the selected actual-body controls, not exhaustive coverage of every move/write variant. |
+
+After reversing only known ABI forms, the complete token stream matches XP.
+The actual change is 57 replacement lines: 26 address accesses and 31 malloc
+statements; production +57/-57, net 0; tracked tests unchanged. XP-relative
+diff decreases from +690/-689 = 1379 lines / 506 ranges to +664/-663 = 1327
+lines / 499 ranges: **52 fewer diff lines and seven fewer points**. No added
+mirror point, state, second route or relocated Compat implementation.
+
+### Actual-body verification
+
+Task-local fixtures use each architecture's real compiler/link commands and
+actual S2250/S2262 bodies through unchained_evid[0]. Ninety cases combine masks
+0/0xf0/0xff, plane enables 0/5/15, odd/even destinations, byte writes and fill
+counts 0/1/2/7. Independent plane-byte expectations verify the masked data/latch
+result and untouched bytes. Existing VGA/CHAIN2 assertions also execute.
+
+| Variant | x86 | x64 |
+| --- | --- | --- |
+| Unchanged current | pass | pass |
+| Address restoration | pass | pass |
+| Minimal address/malloc restoration | pass | pass |
+| Original four-byte local allocation capacities | pass | heap corruption 0xc0000374 |
+| Candidate malloc storage prefilled 0xa5 | pass | pass |
+
+These controls do not establish every specialized mode, RAM move, guest behavior
+or an exhaustive hardware oracle. The previous GenericByteFill defect remains
+separate TODO debt; passing registered tests does not repair it. No guest,
+configuration, media, snapshot or sibling repository is changed.
+
+Final normalized source SHA-256:
+c7d92bfba8047658fb8a13cde0b552370524be1c80441b32db127d62d21b499d.
+The installed source is byte-identical to the tested minimal candidate.
+Full qualification and final actual-diff review follow before delivery.
+
+### P35 actual-change counter-review
+
+All 57 replacement lines were inspected and mechanically classified: 26 native
+address dereferences plus 31 allocation statements. No arithmetic, branch,
+continuation, callback selection or device algorithm changed. All 26 added
+trailing-space lines exactly match XP. Mirror CRLF, evidence LF and source
+identity checks pass. GDP field mapping remains at native pointer sources;
+removing address wrappers does not remove fixed-field translation.
+
+Unmodified and candidate isolated compiles both emit the same existing
+sevid005.c:742 -Wswitch-unreachable warning on x86 and x64. This is preserved
+mirror code, not a new warning or justification for an extra mirror patch.
+
+### P35 final qualification
+
+Cached x86/x64 builds publish both EXEs. Each architecture passes 188/188
+background and 8/8 native tests: **392/392 first run**, with no retries or test
+budget changes. Both builds have the one unchanged mirror warning documented
+above, and no new warnings. Documentation/mirror gates, source identity and
+command-local whitespace checks pass. No new interactive guest validation or
+exhaustive device qualification is claimed.
+
+Published softpc32.exe: Nov 13 2026 06:01:49;
+SHA-256 e33e13b8b1d29a61e5171a8989a0c2c69fb634ef745be3d5c8f439ea96fb8b55.
+Published softpc64.exe: Nov 13 2026 06:05:24;
+SHA-256 9e5a7b7939d597a73fb1cd7fd8c95906679f938b6a386d4a7e2032dbb54bfc55.
+
+Sequential audited scope is 288/472; next is file 289 base/cvidc/sevid006.c.
+S1 remains active. Qualified retained ABI differences await owner disposition,
+but ordered auditing does not pause for approval. Final process verification
+and exact scratch cleanup precede delivery.
+
+P35 actual process inventory finds no remaining task worker. Exact scratch
+cleanup was previewed/applied and Clean-Build -Check passes. Reusable caches,
+user configuration, guest media and snapshots remain intact.
