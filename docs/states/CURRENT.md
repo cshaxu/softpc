@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P6 restores the original GDP include in cpu4gen.h and removes its
-unneeded slot-adapter include: source +1/-2, mirror diff reduced by three lines
-and two points. Both published EXEs equal P5 except verified PE fields and fresh
-compiler time; P4's 392/392 remains the runtime baseline. Source review is
-64/472; file 65 cpuint_c.h is next. Evidence-qualified residuals remain pending
-owner decisions in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P7 restores three nonsemantic added lines in c_bsic.h/c_intr.c:
+source +0/-3, mirror diff reduced by three lines without new points. Both
+published EXEs equal P6 except verified PE fields and fresh compiler date/time;
+P4's 392/392 remains the runtime baseline. Source review is 79/472; file 80
+c_main.c is next. Evidence-qualified residuals remain pending owner decisions
+in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no whole-task completion is claimed.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

@@ -566,3 +566,90 @@ Mirror/compiler warnings are not reported as new shared-component defects.
 File 64 is reviewed and restored; thirteen residual declaration decisions remain
 pending owner choice. Ordered coverage is 64/472, 408 remaining; file 65
 cpuint_c.h is next. S1 and T100 remain active.
+
+## Files 65-79: original CCPU contracts and private state
+
+Files 65-71 (cpuint_c.h, cwd/cwde C/H and c_addr C/H) are normalized-identical
+to fixed XP. cpu4.h includes CpuInt_c.h; the actual c-files build includes the
+instruction/address sources, and c_main dispatches CWD/CWDE through their original
+headers. File 72 c_bsic.c has no non-excluded difference. Files 75-77 c_debug.h
+and c_div64 C/H are normalized-identical; original DIV/IDIV call divu64/div64.
+File 79 c_intr.h is normalized-identical and declares the actual interrupt entry.
+No original file or original wiring is removed.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0051 | c_bsic.h adds c_getEFLAGS declaration. | Pending owner: the original internal PUSHF/c_intr/c_tsksw callers use c_bsic.h, not the external cpu4gen.h interface. c_bsic.c returns IU32 (unsigned long); without this declaration an implicit int function is called across translation units. |
+| R0052 | Blank line added after that declaration. | Restore the original spacing by removing the extra line; no token change. |
+| R0053 | c_debug.c adds snapshot.h. | Pending owner: type declaration for the bounded private-state accessors below; original public debug API cannot capture its private arrays. |
+| R0054 | c_debug.c adds capture_debug. | Pending owner: original i_brk/d_brk contents can differ from a fresh DR7-derived table, so capturing only registers is not equivalent. |
+| R0055 | c_debug.c adds restore_debug. | Pending owner: restore those private arrays/counts exactly; count bounds protect original exception loops from indexing beyond four entries. |
+| R0056 | c_intr.c adds the T60 explanatory comment. | Restore original by deleting this nonsemantic task comment. |
+| R0057 | c_intr.c rejects the IU16 representation of -1. | Pending owner: not redundant with c_main's filter; actual original NPX interrupt delivery also calls do_intrupt with the unchecked PIC result. |
+| R0058 | Blank line added after the rejection. | Restore original spacing; retain only the two executable lines pending owner decision. |
+
+R0051 proof boundary: an isolated original-header override compiled the real
+pushf.c with each architecture's actual compiler flags, including gnu90.
+Both current and original-header variants return compiler success. Therefore
+this is NOT a demonstrated build failure. The source/type mismatch remains:
+the original c_getEFLAGS definition is unsigned long, while an undeclared call
+implicitly uses int. The separate external CPU interface cannot be included in
+these internal CPU units without replacing their register macros (the original
+c_reg.c explains that boundary). This is C function-type consistency evidence,
+not a demonstrated Windows flag-value truncation or guest failure. Keeping one
+internal declaration is the minimal candidate; no new declaration path is added.
+
+R0053-55 counterexample is in original XP, not inferred solely from an existing
+snapshot consumer: c_tsksw.c clears LOCAL_BRK_ENABLE in DR7 without calling
+setup_breakpoints. check_for_inst_exception then reads the cached i_brk table
+and nr_inst_break, independently of current DR7. Calling setup_breakpoints on
+load would erase that state and change subsequent behavior. Existing
+checkpoint_smoke verify_cpu_side_state explicitly demonstrates that distinction;
+P4 passed it, but this source review does not claim a fresh dynamic run. Compat
+archive.c already owns serialization and calls these accessors; it does not
+reimplement breakpoint matching. No private table is moved or duplicated.
+
+R0057 complete caller check: c_main filters acknowledged_interrupt before its
+external-delivery path. However, original zfrsrvd.c TakeNpxExceptionInt raises
+IRQ13, and when IF is set calls ica_intack then do_intrupt without filtering.
+An asserted but masked IRQ13 does not guarantee a deliverable PIC vector.
+Original ica_int_accept returns -1 when its pending scan finds no eligible IRQ,
+and also on the selected non-NTVDM ISR-depth rejection path. Without the shared
+check, do_intrupt treats 65535 as an IVT/IDT index and enters interrupt delivery
+instead of rejecting it. INTx/INTO and exception callers use actual architectural
+vectors; there is no additional product caller. Existing irq_smoke covers a real
+PIC -1 result and unchanged stack/registers at do_intrupt, plus the actual stale
+CPU-request loop. It does not dynamically reproduce the NPX masked-IRQ scenario;
+that applicability is source proof. Moving a new guard into zfrsrvd would add a
+new mirror point and is prohibited. The existing common check remains pending
+owner choice; no new guard or special case is introduced.
+
+Candidate source +0/-3, tests unchanged. c_bsic.h's non-excluded XP diff is
++2/-0 to +1/-0; c_intr.c +4/-0 to +2/-0. c_debug.c remains +45/-0.
+The aggregate mirror reduction is three added lines, with no new point.
+Final dual product qualification passes as detailed below; no new runtime run claimed.
+
+### P7 final evidence and actual-diff review
+
+Both final-source cached product builds pass and publish. All recorded objects
+remain identical to P6 except the two required compiler-timestamp objects.
+Entire EXE comparison finds exactly eleven changed bytes per architecture,
+limited to PE timestamp/checksum and compiler date/time strings (the build
+crossed midnight). Every other byte and file length equals P6. Per the approved
+artifact-equivalence exception, no runtime rerun is required or claimed;
+P4's 392/392 remains the runtime baseline through the equivalent deliveries.
+
+Published compile stamps: Nov 13 2026 00:06:15 x86, 00:07:11 x64.
+SHA-256:
+
+- softpc32.exe: b0643e3f3125ff5761af7c3118bffdf4728f820191e03247651cb2aee05c0380
+- softpc64.exe: 7dd8901ac40f5d56f40b10a0a630fa1e1c5529f8112b52806a5aff84515ecc08
+
+Coordinator actual-change review confirms source +0/-3, zero test changes;
+only one added blank line and one task comment/blank line are restored.
+No function, error handling, snapshot layout, guest, configuration or shared
+component changes. Existing semantic points R0051/R0053-R0055/R0057 remain
+pending owner decisions with explicit source/probe evidence limits. Documentation
+and XP mirror gates pass. Owned jobs exited; scratch is removed after promoting
+these results. Source audit coverage is 79/472, 393 remaining; next file is
+80 c_main.c. S1 and T100 remain active, not ready for closure.
