@@ -2072,3 +2072,13 @@ The exact XP memset4 declaration is restored and its two-line local comment
 removed, reducing XP-relative diff by five lines. The concrete host_def.h
 prototype/provider and existing excluded-branch scaffolding are unchanged.
 Historical counts above are provenance, not current selected-difference totals.
+
+### T100 S1 P87 host_com.h declaration restoration
+
+Historical host_com.h 3/2/2 counts are superseded by R0436/R0437 in
+m9-t100-progress.md. Restore the original documentation example and IPT3
+argument text, removing the local DIV-068 header marker. Ten actual full
+preprocessed pairs are identical. This removes five XP-relative diff lines
+without changing native-width runtime arguments in com.c or Compat serial.c.
+The original excluded-body scaffolding remains; historical counts are not
+current selected-difference totals.

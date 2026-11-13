@@ -30,13 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P86 restores host.h's exact original memset4 declaration, removing
-an adaptation erased by the supported IPT3 macro. Twenty actual dual-width
+T100 S1 P87 restores host_com.h's original comment/declaration; the runtime
+native-width ioctl calls/provider are unchanged. Ten actual dual-width
 preprocessed pairs match; both cached builds/publications pass. Whole EXEs
 differ only in verified build metadata, so the owner-approved equivalence
 exception omits repeat full testing; P80's 392/392 remains the runtime baseline.
-Production +1/-4; XP diff decreases five lines. Frozen frontier 360/472;
-next file 361 base/inc/host_cfg.h.
+Production +2/-3; XP diff decreases five lines. host_cfg.h matches original XP.
+Frozen frontier 362/472; next file 363 base/inc/host_gwi.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

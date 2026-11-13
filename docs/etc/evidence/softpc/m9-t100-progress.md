@@ -6494,3 +6494,55 @@ qualified owner decisions remain open.
 P86 actual eight-file review and mirror/documentation gates pass. Both owned
 workers exited; scratch preview, exact removal and residue check pass. No
 unrelated configuration/media changes remain.
+
+## Files 361-362: host_cfg.h and host_com.h (P87)
+
+File 361 host_cfg.h: the complete normalized file equals pinned XP SHA-256
+cc396afb209e97d88fd9ef66a180bbecc442f56562de6cb24b6971a172e45a07.
+Its original config.h include remains. The empty guarded body is original,
+not a reason to create a new include-removal diff. No point or code change.
+
+File 362 host_com.h: pinned XP raw SHA-256
+efcdcc996c542a3c726e192bd1d0c1f4b8979d223bd037f7fe1ebe580ea7340f.
+Full-file comparison finds two selected differences outside the existing
+excluded bodies/scaffolding, which are skipped without new accounting.
+
+| Point | Initial analysis | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0436 | Original line 77's long argument in the documentation example changed to intptr_t. | Restore the exact original comment text. The entire example is inside the original block comment, not a function definition or executable signature. |
+| R0437 | Original line 197's LONG argument changed to intptr_t and gained a DIV-068 marker. | Restore the exact original declaration and remove the marker. Current supported IPT3 expands both declarations to an empty parameter list. All actual consumer preprocessing is identical; changing this header does not narrow any runtime pointer. |
+
+Actual pointer-bearing calls in com.c still pass intptr_t, and serial.c's
+provider still receives lib_iptr; HOST_COM_INPUT_READY and HOST_COM_MODEM
+still dereference that native-width argument. No caller or provider is changed.
+This is not a rollback of the independently necessary x64 pointer transport.
+The header is retained by three production C consumers (com.c, platform.c,
+serial.c) and two fixtures (serial_smoke.c, checkpoint_smoke.c).
+
+For all five consumers, both versions were preprocessed under their actual
+Ninja compiler arguments on each architecture. Twenty compiler runs succeed;
+ten complete -E -P output pairs match byte for byte. The candidate header is
+then applied unchanged. Independent review confirms both changes restore exact
+XP text, preserve the include guard and excluded branches, add no API or path,
+and leave no selected difference in this file.
+
+Final cached builds/publications pass: x86 9.75 seconds, x64 11.24 seconds.
+Each build log contains 271 warning lines, all within preserved mirror files;
+there is no non-mirror warning or build error. Full EXE comparison confirms
+identical lengths and all bytes outside the exact COFF timestamp, PE checksum
+and unique compiler-time literal. Changed byte counts: x86 six, x64 five.
+The owner-approved artifact-equivalence exception omits repeat full testing;
+P80's 392/392 remains the full-runtime baseline, not a new P87 run.
+
+- 32-bit publication: Nov 13 2026 15:19:05; SHA-256 f1dd971c8f74fd79bf7b215d0253841716ea8009eafe0ee6e6656b30448efd6f.
+- 64-bit publication: Nov 13 2026 15:19:14; SHA-256 4d67c0edf40e58725e5d1341a92ba2374261f6e66811ca90b68f6b0e9b3e6189.
+
+Actual production +2/-3, net -1; test/build source changes zero. XP-relative
+selected diff decreases five lines (+3/-2 becomes +0/-0). R0436/R0437 are
+restored; no retention decision is added. Manifest local hash is refreshed,
+with original/subset provenance fixed. Frozen frontier 362/472; next file
+363 base/inc/host_gwi.h. S1 and prior pending decisions remain open.
+
+P87 actual eight-file review and mirror/documentation gates pass. The owned
+worker exited; scratch preview, exact removal and residue check pass. No
+configuration, media or unrelated worktree changes were made.
