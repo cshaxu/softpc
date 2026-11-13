@@ -1795,3 +1795,14 @@ and 565 -> 505 ranges; production +101/-101. No new mirror patch is added.
 See [P38 audit](m9-t100-progress.md#p38-file-291-sevid008c-audit-and-restoration),
 [range map](m9-t100-sevid008-points.tsv) and
 [allocation inventory](m9-t100-sevid008-allocations.tsv).
+
+### T100 S1 P39 allocation and address minimization
+
+File 292 sevid009.c restores eight native-address expressions and 32 malloc
+sites. Native capacities and actual GDP translation remain qualified ABI
+residuals. One address wrapper is retained solely because its restoration
+increases changed-range count, prohibited by the owner. XP-relative diff
+falls 889 -> 873 lines; range count remains 342. Production +40/-40.
+See [P39 audit](m9-t100-progress.md#p39-file-292-sevid009c-audit-and-restoration),
+[range map](m9-t100-sevid009-points.tsv) and
+[allocation inventory](m9-t100-sevid009-allocations.tsv).

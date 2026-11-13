@@ -30,18 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P38 restores 76 native-address accesses and 25 malloc sites in file
-291 sevid008.c. Native capacities and seven mixed-width move locals remain.
-Production +101/-101 (net zero); tests unchanged. XP-relative diff decreases
-1515 -> 1371 lines and 565 -> 505 points. Actual-body controls preserve selected
-WORD-copy and DWORD results; original x64 capacities corrupt the heap.
-Both EXEs are built/published. All 392 registered tests pass on the first run;
-both build logs contain no warnings. Actual review, source identity and gates
-pass. Sequential review is 291/472; next is file 292 base/cvidc/sevid009.c.
-The original generated DWORD write/fill +8 defect has dynamic evidence but no
-established current guest trigger; it is separate TODO debt, not a new patch.
-Qualified ABI residuals remain owner decisions in the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P39 restores eight native-address expressions and 32 malloc sites in
+file 292 sevid009.c. Actual GDP translation and native capacities remain;
+one address wrapper stays because restoring it would increase diff points.
+Production +40/-40 (net zero); tests unchanged. XP-relative diff decreases
+889 -> 873 lines; range count remains 342. Actual-body controls verify 432
+write cases on both architectures; original x64 capacities corrupt the heap.
+Both EXEs are built/published. All 392 registered tests pass on the first run.
+The same original mirror warning remains, with no new warning. Actual review,
+source identity and gates pass. Sequential review is 292/472; next is file
+293 base/cvidc/sevid010.c. Qualified residuals and the no-increase constraint
+are distinguished in the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 stays active; no approval is awaited to continue ordered auditing.
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

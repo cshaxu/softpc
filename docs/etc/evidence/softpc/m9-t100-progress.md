@@ -3313,3 +3313,77 @@ restorations. No routine approval is awaited to continue.
 P38 process inventory confirms no task worker remains. Exact disposable scratch
 cleanup was previewed/applied and Clean-Build -Check passes. The two reusable
 caches, configuration, guest media and snapshots remain intact.
+
+## P39 file 292 sevid009.c audit and restoration
+
+Pinned XP normalized hash is
+1aeffcd2a58d19189c680ef1b36016c97fc27f3ada9d1545122ea603e50030ee;
+pre-audit local hash is
+ab2f1a3bfa3b19a55d380db933fef21ede34e29f296c81996073a5a38c5c99b2.
+The [342-range map](m9-t100-sevid009-points.tsv) covers the complete initial
+diff. The [allocation inventory](m9-t100-sevid009-allocations.tsv) covers all
+32 functions. No excluded body is introduced into this accounting.
+
+Initial analysis: R0308 native accesses refer to framebuffer storage or the
+native expansion table, not fixed GDP offsets. R0309 actual GDP accesses
+still require field translation. R0310 original local capacities use four
+bytes per slot, insufficient for native IUH on x64. Unlike previous move
+files, all 32 local blocks here use matching narrow reads/writes or initialize
+native slots before use; no narrow-store/native-read slot needs zeroing.
+R0311 restores malloc while retaining the native capacities.
+
+Counter-review: reversing the enumerated ABI forms gives the entire pinned
+XP token stream. The supported Ninja core compiles this file; evidfunc.c
+selects its write-mode 1 BYTE/WORD and mode 2 BYTE entries through the existing
+memory-handler route. No alternative device implementation is introduced.
+The actual candidate changes 40 lines: eight native address expressions and
+32 malloc statements. Tests and shared packages remain unchanged.
+
+The all-nine-address restoration would reduce XP diff lines 889 -> 871 but
+increase changed ranges 342 -> 343 by splitting a previous range at line 2780.
+It is rejected under the owner's no-increase rule, without requesting an
+exception. Keeping only that existing expansion-table access wrapper yields
+342 ranges and 873 diff lines (+437/-436): 16 fewer lines, no extra points.
+The remaining wrapper is constrained by that rule, not falsely justified as
+an ABI necessity. Native-address restoration alone and combined malloc
+restoration have the same diff metrics. Production is +40/-40, net zero.
+
+Actual-body controls use the existing VGA fixture and original rule functions:
+432 independent pixel cases cover mode 1 BYTE/WORD and mode 2 BYTE writes,
+all 16 nibble values, three masks, three plane-enable patterns, alternating
+address parity, full 4096-byte output and untouched boundaries. Original,
+minimal and 0xa5-poisoned malloc variants pass on x86 and x64, along with the
+existing 96 CHAIN2 cases. Restoring original four-byte allocation capacities
+passes x86 and corrupts the x64 heap (0xc0000374). No permanent test-only
+production API is added. These controls do not claim a complete specialized
+DWORD fill/move matrix or a guest-triggered reproduction of those entries.
+
+Installed candidate SHA-256, normalized LF:
+fe021542acfc229b7530ca438bf5bcb349340cebe3c6dd4c9bcd7b70ae4f228e.
+It is byte-identical to the tested minimal source and retains CRLF. Full
+cached dual-build/publication/regression qualification follows before delivery.
+
+### P39 final qualification and actual-change review
+
+Both cached builds and publications succeed. Each architecture passes 188/188
+background tests plus 8/8 native audio/desktop/package tests: 392/392, first
+run, without budget changes or suppressed checks. Both builds retain the same
+sevid009.c:537 unreachable-switch warning also present in the unchanged
+actual-body controls; no new warning is introduced. Actual review classifies
+all 40 changed lines as eight native addresses and 32 malloc statements.
+Tested candidate identity, mirror CRLF, manifest/documentation gates and
+command-local whitespace checks pass. No specialized-rule full matrix or new
+interactive guest qualification is claimed. Qualified necessary ABI residuals
+remain owner decisions, distinct from the explicit no-increase constraint.
+
+Published softpc32.exe: Nov 13 2026 07:02:06;
+SHA-256 1ca4901c6ff21b9bc7dd4549aedd68c7d8ac3f5af4c5a7dc0989a10b0be7a025.
+Published softpc64.exe: Nov 13 2026 07:05:46;
+SHA-256 a41377f174e0018730440b93f9e957d57a6a40e674da995f039fd9606a091824.
+
+Sequential audited scope is 292/472; next file 293 base/cvidc/sevid010.c.
+S1 remains active; ordered work does not wait for routine approval.
+
+P39 actual process inventory confirms no task worker remains. Exact scratch
+cleanup was previewed/applied; Clean-Build -Check passes. Reusable caches,
+configuration, media and snapshots are preserved.
