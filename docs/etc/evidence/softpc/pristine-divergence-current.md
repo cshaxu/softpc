@@ -2196,3 +2196,15 @@ established. Source +4/-4 reduces mirror diff by eight lines. Fixed-disk host
 presence and private snapshot/queue serialization remain qualified pending
 owner decisions. Actual original disk-selection negative controls fail on both
 widths. Final dual-EXE builds/publication and full 392/392 regression pass.
+
+
+### T100 S1 P110 PIC original-first audit
+
+R0488-R0493 supersede prior ica.c retention summaries. Six explanatory comment
+lines are removed, reducing mirror diff by six lines. Actual original-body
+negative controls establish delayed delivery, master output withdrawal and
+CCPU IRET-policy necessity on both widths. Notice/declaration/private-state
+residuals remain qualified owner decisions; P109's missing snapshot ICW phase
+L001 is not repaired or hidden. Both final published EXEs are P107-equivalent
+apart from build metadata; six focused tests and six current-path probes pass.
+No new full-suite result is claimed.

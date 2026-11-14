@@ -420,7 +420,6 @@ ica_scan_irr IFN1(IU32, adapter)
 #else  /* !NTVDM */
 #line 492
     /* if iret hooks are not being used, iretHookActive will always be 0 */
-    /* Retain both original IRET protection and XP host delayed delivery. */
     iret_hook_mask = (IU8)((iretHookActive | DelayIrqLine) >> (adapter << 3));
 #endif
 #line 495
@@ -1239,9 +1238,6 @@ void SWPIC_clear_int IFN2(IU32, adapter, IU32, line_no)
 		asp->ica_cpu_int=FALSE;
 		ica_clear_int(ICA_MASTER,asp->ica_ssr);
 		}
-	/* A source can withdraw the only pending master request after the CCPU
-	 * has seen INTR but before it accepts it. Mirror the physical INTR line
-	 * here so a later unmask/reassertion is observable by the executor. */
 	else if (asp->ica_master && asp->ica_cpu_int &&
 	         ica_scan_irr(adapter) == 7)
 		{
@@ -1677,8 +1673,6 @@ GLOBAL IU32 ica_iret_hook_needed IFN1(IU32, line)
 GLOBAL void
 ica_iret_hook_control IFN3(IU32, adapter, IU32, line, IBOOL, enable)
 {
-	/* The CCPU interrupt path receives but does not consume IRET hooks.
-	 * Keep hook bookkeeping disabled for that executor, as in ica.old. */
 #ifndef CCPU
 #error "Unsupported SoftPC mirror configuration: !CCPU"
 #else

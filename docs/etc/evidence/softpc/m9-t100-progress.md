@@ -7970,3 +7970,98 @@ remains 406/472; file 407 investigation stays active.
 
 P109 owned probe process exited; exact scratch cleanup and build residue check
 pass. Documentation gate and actual diff review pass. No user assets changed.
+
+
+## File 407: base/system/ica.c (P110 complete-file review)
+
+This completes the remaining P109 investigation without resolving its separately
+qualified L001 owner decision. CMakeLists.txt selects CCPU, CPU_40_STYLE, PROD
+and EOI_HOOKS on both widths; the actual device target includes ica.c. Full
+selected-file comparison, including live code at excluded-range edges, finds
+these difference points. Excluded bodies/scaffolding have no new ledger entries.
+
+- R0488, current132 / XP133: one relocated historical notice. Source-policy
+  necessity, no executable effect; qualified pending owner decision.
+- R0489, snapshot header at165 and capture/restore extension after original
+  selected body: actual device archive needs private PIC counts, ISR nesting,
+  register and IRET bookkeeping. Port reads do not enumerate those fields;
+  writing ports to replay initialization cannot restore arbitrary in-service
+  state. Removing functions breaks real archive linkage; exposing all private
+  state to move equal code into Compat does not simplify ownership. Pending
+  qualified retention, with the specifically proven missing initialization
+  phase L001 explicitly unresolved. No claim of complete snapshot correctness.
+  The callback pointer rejection is a deliberate capture failure instead of
+  serializing a native address; no parallel callback reconstruction is added.
+- R0490, EOI header at166: the original host notification calls are selected by
+  EOI_HOOKS, while original NTVDM declarations are not. The actual Compat EOI
+  boundary declares these callbacks and the delayed mask used by R0491. This
+  is a needed declaration, not duplicate PIC state. Pending source/ABI decision.
+- R0491, current scan_irr / XP493: original uses iretHookActive only; local
+  expression also masks DelayIrqLine. Original nt_sbdsp transfer completion
+  uses host_DelayHwInterrupt. The host records a request in the actual PIC while
+  delaying delivery until the existing quick event clears its mask. Restoring
+  the original expression in the actual controller immediately makes that
+  queued IRQ eligible; both architectures fail the existing assertion that
+  scan_irr has no deliverable IRQ before release (fixture157). Current cases
+  pass on both adapters, including release, accumulation and cancellation.
+  Keep the one-line residual pending owner decision; remove its nonoriginal
+  one-line explanatory comment without changing execution.
+- R0492, master withdrawal after original XP1410: added else-if clears
+  ica_cpu_int and host INTR when the only pending master request disappears.
+  Original clears IRR but leaves the master output flag asserted. A private
+  fixture using real PIC initialization, raise, withdrawal, capture and re-raise
+  proves current output ownership clears then reasserts. Coherent removal of
+  only the added branch leaves cpu_interrupt true after withdrawal and fails
+  fixture289 on both architectures. Actual devices withdraw via ica_clear_int;
+  the unchanged slave path recursively withdraws the master cascade. The test
+  proves the PIC output flag contract, not a captured real guest lockup. Pending
+  qualified retention; remove the added three-line explanation only.
+- R0493, IRET control / XP1899-1904: original enables per-line IRET hook masks;
+  selected CCPU adaptation is no-op. keyboard_init and timer_init really request
+  hooks. Original c_main.c and zfrsrvd.c receive hook_address but never consume
+  the return-hook protocol; original c_main explicitly documents that absence.
+  Restoring the full original function body in a private controller, then using
+  the actual keyboard registration/intack/EOI sequence, delivers IRQ1 three
+  times but rejects the fourth: vector -1 instead of 9, hook=2 throughout.
+  Current implementation delivers all eight requests with no hook on both
+  widths. This is the unbalanced ISR-depth protection, not an invented caller
+  obligation to invoke a hook the CCPU never uses. Pending qualified retention;
+  remove only the added two-line explanatory comment. Existing branch scaffold
+  remains, with no new compile-time configuration or fallback.
+
+Every private production variant compiles and links with exit zero. Current
+three probes pass on x86/x64 (six passes). Three original-restoration controls
+per architecture fail their stated assertions: x86 3221226505, x64 3. The
+IRET control logs deliveries 0/1/2 at vector9 and delivery3 at -1 on both widths.
+No guest program, firmware, media or permanent test source is modified; this
+uses one replacement real controller object before the existing archive and
+one disposable variant of the existing device fixture, not a second PIC model.
+
+Independent counter-review: delayed delivery and IRET completion are distinct
+owners; neither mask can replace the other. ICW1 clearing remains original;
+neighbor timer cancellation behavior is not transplanted. Snapshot state is
+needed but L001 prevents claiming its completeness. The only final production
+edit is six removed comment lines (+0/-6), permanent tests +0/-0; XP-relative
+added lines decrease by six, deleted lines unchanged. No new difference point
+is introduced. Points R0488-R0493 and L001 await owner disposition.
+
+Both cached builds/publications pass. Each architecture passes three focused
+CTest entries (device_contract_eoi, device_contract_irq, checkpoint_smoke):
+six total. Whole published EXEs match P107 after excluding only the PE build
+timestamp/checksum and the eight compiler time bytes; all other bytes match.
+The owner equivalence exception applies: no new full or native-suite run is
+claimed, and the P107 392/392 baseline remains applicable to unchanged code.
+This does not qualify the user's changed package configuration.
+
+Final x86 compiler timestamp 17:26:39 Nov 13 2026, SHA-256 2fe2d88d177eef0a0c452835da7a29735cf8d85f4eadd3bfbede6d1c816382ac.
+
+Final x64 compiler timestamp 17:27:24 Nov 13 2026, SHA-256 02ef43877bffc5ff0d839fb0d266f5fe91e570fc7cd317f217da79edcb283fc1.
+
+The user changed assets/binary/softpc.ini before this batch. The build/probe job
+verified its bytes unchanged throughout; its existing change accompanies the
+completed batch under the package-configuration rule. No agent edits to it.
+File 407 now has a complete investigation disposition; frontier 407/472, next
+408 base/system/idetect.c. S1 remains active with qualified decisions open.
+
+P110 owned-process inventory is quiescent. Exact temporary-directory cleanup,
+build residue check, manifest/documentation gates and final diff review pass.
