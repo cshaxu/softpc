@@ -3,12 +3,20 @@
 #include "lib/base/sync_interface.h"
 #include <assert.h>
 #include <stdio.h>
+#include <time.h>
 #include "../../fixture_cleanup.h"
 
 static int fail_event, fail_timer, fail_wait, fake_timer, fail_delete;
 static int signal_on_wait;
 static unsigned wait_calls, timer_calls;
 static unsigned delete_calls;
+static time_t supplied_time;
+static time_t read_time(time_t *output)
+{
+    if (!supplied_time) return time(output);
+    if (output) *output = supplied_time;
+    return supplied_time;
+}
 static int fail_sound_init, fail_sound_term;
 static unsigned sound_init_calls, sound_term_calls;
 extern unsigned int SbInitialize(void);
@@ -74,7 +82,9 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #define WaitForSingleObject wait_event
 #define SbInitialize initialize_sound
 #define SbTerminate terminate_sound
+#define time read_time
 #include "compat/platform.c"
+#undef time
 #undef SbTerminate
 #undef SbInitialize
 #undef WaitForSingleObject
@@ -120,6 +130,13 @@ static void assert_sound_ports(void)
 
 int main(void)
 {
+    time_t written = 0;
+    supplied_time = sizeof(time_t) > 4 ? (time_t)4294967297LL : (time_t)1234567890;
+    assert(host_time(&written) == supplied_time && written == supplied_time);
+    assert(host_time(NULL) == supplied_time);
+    supplied_time = (time_t)-1;
+    assert(host_time(&written) == supplied_time && written == supplied_time);
+    supplied_time = 0;
     const char *path = "softpc-platform-failure.img";
     unsigned char sector[512] = {0};
     const unsigned char halt[] = {0xfa, 0xf4, 0xeb, 0xfd}; /* cli; hlt; loop */

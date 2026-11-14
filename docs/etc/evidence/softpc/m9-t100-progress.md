@@ -7029,3 +7029,73 @@ P96 CIM inventory confirms the owned probe has exited. Exact scratch cleanup
 preview, removal and residue check pass, as do documentation and whitespace
 gates. The actual three-file documentation diff preserves frozen order and
 initial hashes; no production, test, asset or unrelated changes are present.
+
+## File 389: timeval.h original host-time contract (P97)
+
+Pinned XP raw SHA-256 is
+47909596ce2ff91bb96b86333efd13b639ef7a4240b6c8bbca14923eed7a7b2d.
+Existing NTVDM exclusion is skipped. The only selected difference is R0452:
+XP line 57 declares time_t host_time(time_t *); local lines 57-60 replaced
+that with long host_time(long *) and three rationale-comment lines.
+
+Initial necessity claim was that every reached caller required 32-bit seconds.
+Actual caller inspection contradicts it: cmos.c sync_rtc_to_host_time stores
+the result in time_t bintim, and time_day.c get_host_time uses time_t
+SecsSince1970. Both pass that same type to host_localtime. Neither supplies
+a non-null argument to host_time. The sole provider is Compat platform.c,
+where an unnecessary (long)time(NULL) conversion created the narrower ABI.
+There is no original device requirement for this narrowing. The similarly
+named snapshot host_time array contains nine broken-down calendar fields,
+not this function's return storage; snapshot schema and callers stay unchanged.
+
+R0452 disposition: restore the exact XP declaration and remove the local
+marker/comment; coherently change the existing native provider to
+time_t host_time(time_t *location) { return time(location); }. This removes
+the conversion and duplicated CRT pointer-write operation rather than moving
+the mirror patch elsewhere. Native CRT remains the single wall-clock source.
+No new interface, conditional, fallback, device state or shared-package change.
+
+Independent counter-review distinguishes an artificially conflicting partial
+header restoration from the coherent implementation. Preserving the current
+Compat long signature would prove only that the two declarations disagree,
+not that the mirror adaptation is necessary. Both real callers already use
+the original time_t contract. Full final-header comparison leaves only the
+previous exclusion/line scaffolding; no selected residual awaits approval.
+
+Production +3/-9 (net -6): mirror +1/-4, Compat +2/-5. Selected XP-relative
+diff drops from +4/-1 to zero, five fewer difference lines. The existing
+platform_failure_smoke fixture adds 17 lines for an injected CRT time source
+and return/writeback checks. A value 4294967297 is used when time_t exceeds
+32 bits, otherwise 1234567890; NULL output and -1 propagation are checked.
+The injection is reset before the pre-existing machine tests, which retain
+the actual clock. No timing sleeps or wall-clock ordering assertions are used.
+These checks do not claim complete guest calendar support beyond 2038 or
+all native localtime failure behavior. Build/runtime qualification follows.
+
+### P97 final-source qualification
+
+Cached builds complete: x86 10.12 seconds; x64 13.33 seconds. Full background
+regression passes 188/188 per architecture (140.36 / 140.26 seconds); serial
+native desktop/audio tests pass 8/8 each (24.56 / 24.67 seconds), 392/392 total.
+The updated platform-failure fixture passes on both architectures. Build logs
+contain 623 x86 / 624 x64 warning diagnostics, all in preserved mirror paths;
+none originate in Compat or test changes. These are not warning-free mirror
+builds. No metadata-equivalence exemption was used; full tests ran.
+
+Fresh published EXEs on Nov 13 2026:
+
+- x86 16:09:15: dc81bfe41978046b34261943e3a808856707a3599ca01a451a2484a89242984c.
+- x64 16:12:09: 5ce1558a09494d8d4891076a7252760b56b643a5638ebcc7c14110678b6a860f.
+
+Current production calls and pointer types were scanned across src/test.
+The mirror manifest updates only local identity; pinned raw/subset hashes
+remain unchanged. Actual source review confirms no archive change, no shared
+component change and no unrelated provider edits. This is source/call-chain,
+controlled time injection and existing full-suite evidence, not new manual
+DOS/Windows guest-date validation. Frontier advances to 389/472, next 390
+tmstrobe.h; S1 remains active with earlier qualified owner decisions pending.
+
+P97 actual ten-file diff review passes. CIM confirms task runner 11728 and
+its jobs exited. Exact scratch preview/removal and residue check pass;
+final mirror, documentation and whitespace gates pass. No user configuration,
+media, snapshot or unrelated worktree modification is included.

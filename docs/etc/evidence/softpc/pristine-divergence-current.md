@@ -2113,3 +2113,13 @@ diff decreases by 73 lines. Whole mixed-file alignment reports a combined
 70-line reduction; fixed signature correspondence gives 78. These are distinct
 metrics, not newly added mirror behavior. Production +63/-15, tests +2/-2.
 Final-source dual-architecture builds/publication and 392/392 tests pass.
+
+### T100 S1 P97 original time declaration restoration
+
+R0452 in m9-t100-progress.md supersedes the timeval.h retention rationale
+and MVDM-HOST-DIV-032 marker. Both actual callers use time_t; the Compat
+long conversion was not an original-device requirement. Restore XP's exact
+time_t declaration and coherently delegate the existing host callback to
+time(location). Selected mirror diff +4/-1 becomes zero; existing exclusion
+scaffolding is unchanged. Qualification is recorded with R0452, not inferred
+from the historical retention entry above.

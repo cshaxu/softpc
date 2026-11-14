@@ -523,12 +523,9 @@ BOOL apply;
     UNUSED(apply);
 }
 
-long host_time(long *location)
+time_t host_time(time_t *location)
 {
-    long value = (long)time(NULL);
-    if (location != NULL)
-        *location = value;
-    return value;
+    return time(location);
 }
 
 struct host_tm *host_localtime(time_t *clock_value)

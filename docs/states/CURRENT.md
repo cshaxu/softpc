@@ -30,16 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P95 completes files 382-383. sasp.h matches XP; sndblst.h restores
-original declarations/constants/layout, retaining only two qualified decisions.
-SbInitialize's original signature is restored with the matching test types;
-that coupled edit does not complete the later nt_sb.c file audit. Header diff
-reduces by 73 lines; full mixed-file alignment and anchored counts are recorded.
-Both EXEs are built/published and all 392/392 tests pass on final source.
-P96 completes read-only file audits 384-388. Four headers match XP outside
-existing exclusions; tape_io.h retains one compiler-proven Ctrl-Z deletion
-as a qualified owner decision. No source or artifact changes; P95 remains
-the full-runtime baseline. Frozen frontier 388/472; next file 389 timeval.h.
+T100 S1 P97 completes file 389 timeval.h. Restore XP's time_t declaration
+and simplify the matching Compat host callback; the prior long-only rationale
+is contradicted by both actual callers. Selected mirror diff decreases by five
+lines to zero. Production is +3/-9; tests add 17 lines. Both EXEs are freshly
+built/published; full final-source x86/x64 qualification passes 392/392.
+Frozen frontier 389/472; next file 390 base/inc/tmstrobe.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
