@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P159 removes nt_vga.c unnecessary explanations/spacing: production
-+0/-5, no test changes, XP diff reduced by five lines. Final-source x86/x64
-builds/publication and all 392 tests pass. Four boundary blocks remain qualified
-owner choices R0683-R0686 after actual-body negative/positive comparison;
-R0682 is restored. No executable behavior changes in this batch.
-All 472 frozen files now have ordered review dispositions; the final four
-resources are byte-identical to XP. Next: reconcile delivered restorations and
-qualified owner decisions. Pending decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-468-hostsrcnt_vgac-p159).
+T100 S1 P161 removes only the redundant inline explanation on slave_bs.c's
+existing EOI correction: production +1/-1, no test change, mirror diff-line
+total unchanged. Final-source x86/x64 builds/publication and all 392 tests pass.
+All 472 frozen files have review dispositions. P160 verified inventory/delivery
+integrity; P161 reconciles positions 1-72 into the
+[owner decision view](../etc/evidence/softpc/m9-t100-owner-decisions.md).
+Thirty-four reconciled IDs remain unapproved. Next: positions 73-472 and
+D001-D006/L001; pending decisions keep S1/T100 open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p161-final-qualification).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

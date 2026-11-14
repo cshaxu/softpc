@@ -104,7 +104,7 @@ void D11_int()
 			outb( ICA1_PORT_1, mask );
 
 			/* send EOI to 2nd chip		*/
-			outb( ICA1_PORT_0, 0x20 ); /* T99 S37: EOI uses the command port. */
+			outb( ICA1_PORT_0, 0x20 );
 		}
 		/* send EOI to 1st chip	*/
 		outb( ICA0_PORT_0, 0x20 );

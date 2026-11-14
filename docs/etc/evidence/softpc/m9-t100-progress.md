@@ -11988,3 +11988,55 @@ reviewable evidence, including mixed restored/pending groups, D001-D006 and
 L001. Historical provisional wording does not override later qualification;
 qualification does not mean owner approval. This check neither proves every
 residual necessary nor closes unresolved design or original-defect decisions.
+
+## P161 final-decision reconciliation, positions 1-72
+
+The [owner review view](m9-t100-owner-decisions.md) reconciles the first 72
+frozen positions with current bindings and P1-P6 final evidence. Thirty-four
+point IDs remain qualified recommendations, not approvals: R0006/R0008/R0010,
+R0014/R0015, sixteen SAS points and thirteen cpu4gen.h declaration points.
+Withdrawn bswap.h retirement R0013 is explicitly not a pending change.
+Artifact-equivalent P5/P6 deliveries are not misreported as fresh full tests.
+Positions 73-472 and D001-D006/L001 still need final-decision reconciliation;
+the earlier file-level audit remains complete, but S1/T100 is open.
+
+Current-source review finds the R0008 EOI line still carries an unnecessary
+T99 explanatory comment. Remove only that inline text, keeping the corrected
+ICA1_PORT_0 token and all other bytes/line endings. The root source target
+compiles this file and the existing device_contract fixture exercises idle,
+slave IRQ11, master IRQ5 and spurious cascade with ISR/mask/BDA assertions.
+No new fixture or guest modification is needed for comment removal.
+
+Production +1/-1, tests +0/-0; normalized source text is 42 bytes shorter.
+The same fixed-XP SequenceMatcher comparison has unchanged added/deleted
+line totals: removing text on an already changed line does not reduce the
+line-based mirror diff. No new point, exclusion record, path or behavior is
+introduced. The local manifest hash changes; pinned original/subset hashes do
+not. Builds/publication and full regression are running; final results follow.
+
+### P161 final qualification
+
+| Architecture | Build | Background | Native |
+| --- | --- | --- | --- |
+| x86 | 8.26 s | 188/188, 156.93 s | 8/8, 17.39 s |
+| x64 | 10.18 s | 188/188, 154.42 s | 8/8, 15.91 s |
+
+All 392 final-source tests pass without retries or skips. Cached build logs
+contain no warning/error diagnostics; this is not a fresh warning audit of
+unchanged original source. Publication refreshed both timestamp-bearing EXEs.
+
+- softpc32.exe: `2e4ae95bfab0722015b81c30cd321c799acecd85acfc5a7932440ec906b90333`.
+- softpc64.exe: `90612e4da6ac3d8376b7595216d124411b1304dc238e5848d7eedb0e33378660`.
+
+Actual-change review confirms only the inline comment changed in production,
+with the same CRLF and source line count; manifest changes only its local hash.
+The new review view is bounded to positions 1-72 and preserves all thirty-four
+qualified decisions as unapproved. No test, public component, configuration,
+media, snapshot or guest binary changed. A supplementary documentation-gate
+invocation reported its script temporarily unavailable; a subsequent same-path
+read and gate pass succeeded. No cause is inferred for that transient lookup.
+Final mirror/documentation/whitespace checks are rerun after the jobs finish.
+
+P161 final gates pass. The owned runner is confirmed exited; temporary logs
+and script were promoted above and removed through Clean-Build. Residue check
+passes, retaining only reusable caches. S1/T100 remains open.
