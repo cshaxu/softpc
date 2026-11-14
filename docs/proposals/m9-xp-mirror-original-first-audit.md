@@ -376,3 +376,22 @@ No binary rebuild/publication is claimed or needed for test scheduling only.
 The existing bounded similar-issue sweep stands; no wider scheduling policy
 is introduced. Disposable task scripts/logs are removed after jobs terminate;
 reusable caches remain. P6 awaits owner acceptance; S2/T100 stay open.
+
+## S3 owner-admitted remaining-difference review
+
+Owner: "批准收口s2 准入s3 一起来审批剩余diff清单". S2 is accepted and
+closed; S3 begins at `62474beb`. Review the existing S1 residual IDs with the
+owner, in the frozen `dir /a/b/s` file order. The finite ledger is 381 S1 IDs
+(375 semantic/ABI and six compiler/format), plus nineteen separately identified
+historical notices. S2's approved new repairs and declined candidates keep
+their explicit decisions; they are not silently reset or counted as approvals
+of other existing changes in the same files. Excluded #error bodies are not
+enumerated or re-audited.
+
+Use the [existing decision view](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
+as the only point-level approval ledger. For each batch show original/current
+behavior, actual consumer, evidence and limitation, exact local diff and the
+consequence of restoring XP. Record owner retain/restore decisions explicitly;
+missing evidence requires investigation, not presumed necessity. No production
+restoration or new repair follows merely from admitting this review. Start
+with the first three pending points R0006/R0008/R0010 (BIOS files 6/8/9).

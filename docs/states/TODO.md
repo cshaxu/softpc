@@ -2,7 +2,6 @@
 
 CURRENT owns active work; the runtime-performance candidate remains in Queue.
 
-No deferred items remain. Shared-fixture aggregate timing is transferred to
-owner-admitted T100 S2 TEST01; see the
-[active candidate review](../proposals/m9-xp-mirror-original-first-audit.md#s2-owner-admitted-candidate-review).
-Transfer is not a claim that the timing problem is fixed.
+No deferred items remain. Shared-fixture timing TEST01 was resolved and accepted
+in [T100 S2](../history/M9-T100-S2-candidate-review.md). Remaining mirror approval
+decisions belong to active S3, not TODO.

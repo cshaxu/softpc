@@ -2,7 +2,30 @@
 
 This is the review view of the [ordered audit](m9-t100-progress.md), not a new
 retention authority. CURRENT owns task status. Existing exclusions are outside
-this review and receive no entries. All choices below remain unapproved.
+this review and receive no entries. Existing A/B residual retention choices
+remain unapproved until recorded in S3 below. S1's new-repair recommendations
+are historical; S2 decisions supersede them.
+
+## S3 approval progress
+
+S3 starts at `62474beb` after owner closure of
+[S2](../../../history/M9-T100-S2-candidate-review.md). Its remaining existing
+residual ledger is the 381 S1 IDs below (375 semantic/ABI, six compiler), with
+nineteen notices tracked separately. No approval is inferred from S2 closure.
+S2 repairs D004/D005/D006 and TEST01 are accepted; L001/D001-D003 were declined
+this round. Those outcomes do not authorize or reject another ID in their files.
+
+Review order remains the frozen 472-file order; restored/identical files and
+#error-excluded bodies are not reviewed again. Current first pending batch:
+
+| File position / ID | Difference | Recommendation | Owner decision |
+| --- | --- | --- | --- |
+| 6 / R0006 | Omit two reset calls to the retired optional DOS software mouse driver. | Retain product-boundary omission; hardware mouse initialization remains. | Pending |
+| 8 / R0008 | Slave PIC EOI targets command rather than mask port. | Retain one-token port correction. | Pending |
+| 9 / R0010 | Descriptor limit output declaration uses sys_addr rather than word. | Retain declaration matching the actual 32-bit result/callers. | Pending |
+
+At S3 admission: zero of the 381 residual IDs have a new S3 approval. Existing
+evidence below remains linked, not regenerated into a second inventory.
 
 ## Coverage and decision rules
 
@@ -18,6 +41,10 @@ does not approve the remaining patch. Source/ABI evidence is identified as such.
 Do not infer approval from delivery of other restorations in the same file.
 
 ## Compact owner decision packet
+
+This section and the detailed evidence below preserve the S1 review snapshot;
+its admission/closure wording is historical. S3 progress above and CURRENT
+own current decisions and task status.
 
 The delivered restoration baseline is P164; P165-P189 reconcile evidence and
 decisions without changing production, tests or published executables. All 472
