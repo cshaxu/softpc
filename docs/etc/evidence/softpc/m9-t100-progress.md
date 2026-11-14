@@ -8751,3 +8751,69 @@ baseline. No new full build/runtime run is claimed. Frontier 419/472, next
 P122 owned runner has exited and its PID is absent. Exact scratch cleanup,
 residue check, documentation gate and actual three-document diff review pass.
 User INI/media/snapshots remain unchanged.
+
+## File 420: ega_read.c and coupled cpu_vid.h restoration (P123)
+
+Pinned XP ega_read.c raw SHA-256 c9a284cca09e307fe4f6da47f2d696c0f4ec378d1d88159c84a5e94ccd419127.
+Full comparison finds three removed original local declarations and one added
+trailing space; other differences are existing excluded bodies/scaffolding,
+which are skipped without new accounting. The selected CPU_40_STYLE path uses
+SetReadPointers; old alternate bulk callback wiring retains the P61 disposition.
+
+R0515 restores the exact three original read-provider declarations beside
+Glue_reads, and removes the corresponding three added declarations from
+cpu_vid.h. The old deletion's now-unneeded #line 385 is removed because the
+original lines 382-384 are back. R0516 restores the original Glue_reads
+initializer-line whitespace. No selected residual remains in ega_read.c.
+
+Initial isolated restoration fails x86/x64 with conflicting int() versus
+IU32/void declarations. That proves only an incompatibility with our own
+header additions, not that original local declarations are necessary to omit.
+Counter-review therefore removes the three added header reader declarations
+in a private include root while restoring original local declarations.
+Actual ega_read.c and ev_glue.c compiler commands all succeed on x86 and x64,
+four coherent builds. Repository search finds no other production consumer
+of these three provider identifiers; existing VGA tests declare their byte
+reader locally. The original table receives the same actual provider addresses;
+provider definitions and table call types are unchanged. No runtime adapter,
+new type, second dispatch route or substitute implementation is introduced.
+
+This supersedes R0423's retention conclusion for its three reader declarations.
+P76's isolated removal lacked the original local declarations and therefore
+was incomplete evidence for their retention. Its six writer declarations
+remain a separate qualified decision, subject to their own consumer review.
+The earlier result is preserved as history, not treated as current proof.
+
+Final production delta: +4/-5 (net -1); tests unchanged. XP raw comparison
+before/after: ega_read.c +77/-344 -> +75/-340, cpu_vid.h +20/-13 -> +17/-13;
+combined reduction is nine added/deleted difference lines (-5 added/-4 deleted).
+These whole-file delta metrics do not create new exclusion records. Current
+mirror CRLF and required diagnostic mapping are retained; manifests updated.
+
+A preliminary whitespace-only build preceded the coherent-restoration result.
+Final delivery was rebuilt from the complete two-file source changes, not
+inferred from that preliminary build. Final x86 build 15.15 seconds and x64
+18.63 seconds pass. Whole-EXE comparison masks only PE timestamp/checksum and
+eight compiler time characters at the unique same-position Nov 13 2026 literal;
+all remaining bytes and lengths match. The final artifacts are metadata-
+equivalent to the preliminary artifacts and P119. The approved test-omission
+exception applies; P114 remains the full 392/392 runtime baseline. No fresh
+full-suite or all-guest validation is claimed.
+
+x86-final-artifact: 18:32:22 Nov 13 2026, SHA-256 8a1b6a4ad3fc4ae986d8e50d0d3b55f558f2a2cc8e8bfc8262e4a57c13d54e7b.
+
+x64-final-artifact: 18:32:37 Nov 13 2026, SHA-256 e84f3a7737552f5ec42be71fa98b1c4be760e4e62239835d2451db61f430ef48.
+
+x86: 1013 mirror-path warnings, none outside the mirror.
+
+x64: 1063 mirror-path warnings, none outside the mirror.
+
+Original implicit-int declarations cause pointer-initializer warnings in the
+mirror; this is explicitly not a warning-free build. Actual diff review finds
+only original restoration and removal of the coupled header additions. No
+user configuration, media, snapshots or permanent tests change. Frontier
+420/472; next 421 base/video/ega_vide.c. Other qualified decisions remain open.
+
+P123 owned probe/build processes exited and their PIDs are absent. Exact scratch
+cleanup and residue check pass. Mirror/documentation gates and final diff
+review pass; final-source evidence, not the preliminary build, owns delivery.

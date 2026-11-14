@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P122 completes file 419 ega_prts.c: its sole selected addition is
-the narrow reset-state snapshot getter, qualified pending decision R0514.
-Actual EGA write ownership and fixed VGA readback are verified; existing VGA
-reset capture/restore tests pass both architectures. No source/EXE changes;
-P119 publication and P114 full 392/392 baseline remain. Frontier 419/472;
-next 420 base/video/ega_read.c. D005, L001 and earlier decisions remain open.
+T100 S1 P123 completes file 420 ega_read.c with coherent cpu_vid.h cleanup:
+restore original local reader declarations and remove added header duplicates,
+reducing XP diff by nine lines. R0423 reader retention is superseded; writer
+residuals remain pending. Final cached dual-EXE publication is metadata-equivalent
+to P119; P114 retains full 392/392 baseline. Frontier 420/472; next 421
+base/video/ega_vide.c. D005, L001 and earlier decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

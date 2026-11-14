@@ -116,9 +116,6 @@ extern void fill_byte_ev_glue(IU32 eaOff, IU8 eaVal, IU32 count);
 extern void fill_word_ev_glue(IU32 eaOff, IU16 eaVal, IU32 count);
 extern void move_byte_fwd_ev_glue(IU32 eaOff, IHPE fromOff, IU32 count, IBOOL srcInRAM);
 extern void move_word_fwd_ev_glue(IU32 eaOff, IHPE fromOff, IU32 count, IBOOL srcInRAM);
-extern IU32 read_byte_ev_glue(IU32 eaOff);
-extern IU32 read_word_ev_glue(IU32 eaOff);
-extern void read_str_fwd_ev_glue(IU8 *dest, IU32 eaOff, IU32 count);
 
 extern READ_POINTERS read_pointers;
 

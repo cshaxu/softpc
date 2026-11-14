@@ -2265,3 +2265,13 @@ expands to () in both supported configurations; full preprocessing differs
 only by the two definition spaces. Source +2/-2, XP-relative diff -2 added/-2
 deleted, four fewer difference lines. No selected residual remains in this file;
 existing excluded bodies and line-control scaffolding are not re-accounted.
+
+### T100 S1 P123 coherent original read-provider declarations
+
+Restore ega_read.c's three original local declarations and initializer spelling;
+remove cpu_vid.h's three added reader declarations. This supersedes R0423 only
+for those readers: a coherent restoration compiles both consumers/providers
+and produces metadata-equivalent final EXEs. The earlier isolated removal
+was incomplete evidence. Source +4/-5; combined XP diff decreases nine lines
+(-5 added/-4 deleted). Six writer declarations remain separately qualified.
+No selected ega_read.c residual remains; exclusion scaffolding is not re-accounted.
