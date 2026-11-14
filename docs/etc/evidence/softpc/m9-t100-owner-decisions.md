@@ -57,6 +57,9 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 80 / R0096 | Ordinary instruction retirement notification (+2/-0 including separator). | Shared debug observer counts completed ordinary instructions; early jumps do not also pass here. | Owner approves retention, S3 P12 |
 | 80 / R0097 | Escape quick mode for pending host events (+2/-0). | Otherwise the original direct DO_INST shortcut bypasses host clock/control consumption. | Owner approves retention, S3 P12 |
 | 80 / R0099 | Consume clock/control events before original trap/IRQ checks (+6/-0 including two blanks). | These checks must see events produced at this boundary; direct NEXT_INST entry still needs its own consumption point. | Owner approves retention, S3 P13 |
+| 80 / R0100 | Guard the complete PIC acknowledgement block (+7/-4). | Reject -1 before EXT, SYNCH_TICK and interrupt entry; four original operations are only reindented. | Owner approves retention, S3 P14 |
+| 80 / R0102 | Existing Compat pacing call (+2/-0 including separator). | Actual host pacing provider owns timing; removing the instruction-boundary call bypasses that policy. | Retained under owner small-diff delegation, S3 P14 |
+| 80 / R0104 | RESUME_FETCH label and checkpoint (+2/-0). | Saved fetch resumes after pacing/budget work and before decode setup; observer retains existing depth/phase ownership. | Retained under owner small-diff delegation, S3 P14 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -80,15 +83,21 @@ Owner then approves R0095-R0097 (+5/-0), expanding automatic retention to
 existing points with added plus deleted lines strictly less than five (at most
 four). Evidence remains required; do not split IDs or count net growth. This
 supersedes the earlier two-line threshold without authorizing new repairs.
-Owner then approves R0099 (+6/-0). Progress: 73/381 retained
-(53 explicit and twenty delegated), zero restoration decisions, 308 pending;
+Owner then approves R0099 (+6/-0) and R0100 (+7/-4). P14 independently
+checks and retains R0102/R0104 under the expanded delegation (+2/-0 each).
+Progress: 76/381 retained (54 explicit and twenty-two delegated), zero
+restoration decisions, 305 pending;
 notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next review is R0100 (+7/-4): the PIC
-reject guard also protects EXT and SYNCH_TICK before do_intrupt; four original
-body lines are reindented, not new operations. The selected ica_intack path
-returns ICA_INTACK_REJECT when ica_accept rejects the request. Source evidence,
-not a fresh dynamic run, supports this review. R0098 was
+stays the single detailed inventory. Next manual review is R0101 (+6/-0,
+including two separators) and R0103 (+7/-0 including separator). Together
+with R0102/R0104 these partition the existing seventeen-line NEXT_INST
+addition without dropping or double-counting blanks. Machine run enables a
+nonzero finite budget; the Compat consumer decrements it and the existing
+executor callback performs the requested outer unwind. The reset bit retains
+priority. Pacing already uses a clock-check/sleep/yield loop in Compat; retaining
+its mirror call does not claim that the provider is polling-free. Source
+evidence, not a fresh dynamic run, supports this review. R0098 was
 already restored in S1. R0095-R0097 counts include one separator blank and
 exclude the existing exclusion-related #line.
 R0092 was already restored in S1. HLT checkpoint, pending clock/control
