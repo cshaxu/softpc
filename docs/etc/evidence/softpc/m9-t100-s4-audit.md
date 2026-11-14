@@ -145,3 +145,14 @@ one large block can contain several purposes. Manual review must determine that
 ownership rather than infer it from this arithmetic. P2 advances statistical
 coverage to 121/121, not semantic review or owner approval. No source, test or
 artifact changes; documentation, manifest and table reconciliation checks apply.
+
+## P3 manual review classification update
+
+The first ten remaining files have been presented in order and their points
+classified in the [current decision ledger](m9-t100-owner-decisions.md#s4-current-file-by-file-classifications).
+This supersedes P1's pending/reset and sequential-progress counts above, not
+its evidence limits. Owner explicitly approves reset.c; subsequent next-file
+requests do not constitute retention approval. Purpose categories distinguish
+product selection, declarations, native pointer ABI, snapshots and behavioral
+corrections. Future file reviews update the same ledger immediately.
+No production edits, builds or fresh runtime tests are part of this update.

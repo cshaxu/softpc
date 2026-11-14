@@ -29,6 +29,13 @@ approval or automatic small-diff delegation is restored.
 
 ## Current Technical Baseline
 
+S4 P3 records actual purpose classifications for the first ten of 121 manual
+file reviews: +133/-38, 41 text hunks. Only reset.c has explicit fresh retention
+approval; next-file requests do not approve other points. The
+[decision ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-current-file-by-file-classifications)
+is updated after each subsequent file review. No source or runtime change.
+Next: order 80, ccpu386/c_main.c; 111 files remain to present.
+
 S4 P2 adds per-file counts to the complete 121-file list: 15,778 zero-context
 text diff blocks, +24,764/-24,069 selected-content lines relative to fixed XP.
 Every frozen hash matches; excluded bodies and separately handled line controls

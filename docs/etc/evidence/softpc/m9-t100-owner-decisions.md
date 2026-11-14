@@ -6,10 +6,54 @@ this review and receive no entries. Existing A/B residual retention choices
 remain unapproved until recorded in S3 below. S1's new-repair recommendations
 are historical; S2 decisions supersede them.
 
+## S4 current file-by-file classifications
+
+This section records the fresh 121-file manual review, in frozen directory
+order. Historical IDs below identify locations, not inherited approvals.
+After each file is presented, append its point classifications, XP-relative
+added/deleted lines, evidence limits and explicit owner disposition here.
+A request for the next file advances presentation only; it does not approve
+retention. Only reset.c has explicit fresh retention approval so far.
+Existing #error bodies and separately counted line controls remain excluded.
+
+| Review / order | File under base/ | Points | Actual purpose | + / - | Fresh disposition / evidence limit |
+| --- | --- | --- | --- | --- | --- |
+| 1 / 6 | bios/reset.c | R0006 | Product boundary: retired software mouse-driver lifecycle calls | 0 / 2 | Retain approved by owner; hardware mouse initialization remains. |
+| 2 / 8 | bios/slave_bs.c | R0008 | Original device defect: slave PIC EOI command port | 1 / 1 | Retain recommended; actual BOP/PIC path checked; fixture read, not rerun. |
+| 3 / 9 | bios/tape_io.c | R0010 | Selected CPU interface declaration: descriptor limit sys_addr pointer | 1 / 1 | Retain recommended; provider/caller agree; no demonstrated runtime truncation. |
+| 4 / 41 | ccpu386/c-files | R0014 (nine entries) | Product build subset: six SPC486 workers, two PIG workers, unused NOP | 0 / 9 | Retain recommended; actual CMake consumer and XP guards checked. Not an algorithm repair. |
+| 5 / 42 | ccpu386/call.c | R0015 | Original CPU defect: destination SS determines stack address width | 1 / 1 | Retain recommended; source proof; no fresh executed call-gate transition test. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0018, R0021, R0022 | Snapshot: private SAS state declaration/capture/restore | 56 / 0 | Retain recommended; archive callers checked; not exhaustive snapshot-state proof. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0019, R0020 | Host pointer ABI: typed RAM init/term declarations | 2 / 0 | Retain recommended; pointer-return provider verified; x64 truncation risk, not every allocation reproduced. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0024 | Original memory defect: complete physical read span bound | 1 / 1 | Retain recommended; terminal-span source example; no fresh test run. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0026, R0027, R0030, R0033-R0035 | Original permission defect: six CPL3 user-access predicates | 6 / 6 | Retain recommended; controlled existing fixture is not exhaustive paging/V86 proof. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0028, R0029, R0031, R0032 | Original data-width defect: four WORD/DWORD fallback casts | 4 / 4 | Retain recommended; original IU8 truncation verified; existing tests not rerun. |
+| 7 / 64 | ccpu386/cpu4gen.h | R0038-R0041 | C declaration consistency: four segment setter returns | 4 / 4 | Retain recommended; original ISM32 providers verified; not a reproduced guest failure. |
+| 7 / 64 | ccpu386/cpu4gen.h | R0042-R0050 | C declaration consistency: nine flag getter returns | 9 / 9 | Retain recommended; equal storage width does not make C types identical. |
+| 8 / 73 | ccpu386/c_bsic.h | R0051 | C declaration completeness: internal EFLAGS getter | 1 / 0 | Retain recommended; actual IU32 provider/callers checked; no proven EFLAGS truncation. |
+| 9 / 74 | ccpu386/c_debug.c | R0053-R0055 | Snapshot: private instruction/data breakpoint caches | 45 / 0 | Retain recommended; DR7 alone cannot preserve observed cache state; fixture read, not rerun. |
+| 10 / 78 | ccpu386/c_intr.c | R0057 | Interrupt delivery boundary: reject PIC no-vector sentinel | 2 / 0 | Retain recommended; independent NPX caller checked; no traced guest NPX incident. |
+
+Classification totals for these ten files only:
+
+| Purpose | Added | Deleted | Added + deleted |
+| --- | ---: | ---: | ---: |
+| Product/source-subset selection | 0 | 11 | 11 |
+| C interface declaration consistency/completeness | 15 | 14 | 29 |
+| Host pointer ABI adaptation | 2 | 0 | 2 |
+| Snapshot integration | 101 | 0 | 101 |
+| Original behavior / interrupt-boundary corrections | 15 | 13 | 28 |
+| Total | 133 | 38 | 171 |
+
+These reconcile with the first ten rows of the frozen count ledger: 41 Git
+text hunks. Hunks, grouped rows and individual semantic locations are not
+interchangeable counts. No production changes or new dynamic verification are
+claimed. The next file is order 80, ccpu386/c_main.c; 111 files remain to present.
+
 ## S3 approval progress
 
 **Superseded by owner revocation:** all retention approvals and automatic
-delegation recorded below are withdrawn. Current approved count is zero.
+delegation recorded below are withdrawn. The revoked S3 approval count is zero; fresh S4 decisions are recorded above.
 The tables and P2-P15 narratives are historical traceability, not permission
 to retain any point. The owner requires fresh review of all current differences,
 including former approvals, with category block/line/point totals. This is not
