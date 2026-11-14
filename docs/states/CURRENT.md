@@ -30,14 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P158 restores nt_sound.c original declarations and inactive native
-cleanup. Production +23/-11; no permanent test changes; XP diff falls by
-30 lines. Final-source x86/x64 builds/publication and all 392 tests pass.
-The existing PPI/Timer2 algorithm and Compat/Lib output remain the sole active
-path. R0679 is restored; R0677/R0678/R0680/R0681 remain qualified owner choices.
-Frontier 467/472; next host/src/nt_vga.c. Five files and qualified owner
-decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-467-hostsrcnt_soundc-p158).
+T100 S1 P159 removes nt_vga.c unnecessary explanations/spacing: production
++0/-5, no test changes, XP diff reduced by five lines. Final-source x86/x64
+builds/publication and all 392 tests pass. Four boundary blocks remain qualified
+owner choices R0683-R0686 after actual-body negative/positive comparison;
+R0682 is restored. No executable behavior changes in this batch.
+All 472 frozen files now have ordered review dispositions; the final four
+resources are byte-identical to XP. Next: reconcile delivered restorations and
+qualified owner decisions. Pending decisions keep S1/T100 open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-468-hostsrcnt_vgac-p159).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

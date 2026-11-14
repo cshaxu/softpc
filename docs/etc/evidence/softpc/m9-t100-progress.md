@@ -11829,3 +11829,127 @@ have no warnings/errors; this is not a clean rebuild of every old mirror object.
 All task processes were confirmed exited. Concise evidence was promoted before
 removing the task's disposable probes/logs; build residue verification passes,
 with only the reusable Ninja/ccache trees retained. User assets are unchanged.
+
+## File 468 host/src/nt_vga.c review (qualification pending)
+
+The fixed XP normalized file SHA-256 is
+75fe56ba5e12147d8ba08cb6bfaf02e8aae1d819f3a16ad335d3354ab1521e68.
+All non-excluded differences are four standard-painter validation/clipping
+blocks, four added explanations and an extra EOF blank. Existing exclusions
+and necessary line controls are not re-audited or counted.
+
+Actual binding is softpc-machine-devices -> nt_graph.c std_colour_paint_funcs
+-> its original selected paint_screen -> gfx_updt.c refresh/split/wrap/dirty
+callbacks. Compat provides the DIB and invalidation endpoint, not duplicate
+VGA pixel conversion. EGA_PLANE_SIZE is 0x20000 in this V7 build: four-plane
+capacity is 512 KiB, not 256 KiB. Packed offsets are bytes; medium/high offsets
+are four-byte plane groups. The medium output doubles source rows. Original
+vga_split_graph_update can submit a zero-height first region when the screen
+split is zero; it does not filter that call before the painter's do/while loop.
+This is source-path evidence, not a claim that a guest was observed programming
+every boundary value used in the fixture.
+
+| Point | Original / local anchor | Executor review and independent counter-review |
+| --- | --- | --- |
+| R0682 | Four T60 explanation lines and trailing selected blank | Restore original absence, production +0/-5. No executable statement or exclusion framework changes. |
+| R0683 | XP nt_vga_graph_std around 84-102 | Qualified owner choice: original guard/clipping does not reject empty/negative regions or constrain backing-source span. Exact whole-function restoration crashes on the zero-height fixture; adding only a nonpositive-size check then fails destination-byte assertions for negative x. Current passes. Overflow-sized clipping remains a boundary contract, not a claimed guest reproduction. |
+| R0684 | XP nt_vga_med_graph_std around 439-461 | Qualified owner choice: current validation/clipping uses source groups/rows before vertical doubling. Whole original function crashes on zero height; nonempty-only variant fails the negative-x destination oracle. The existing original conversion loop remains unchanged. |
+| R0685 | XP nt_vga_hi_graph_std around 840-856 | Qualified owner choice: original function crashes on explicit empty input. Nonempty-only restoration still crashes on the fixture's final plane-group offset with height 768; the current source-span clip prevents the next out-of-range row. This latter case is a controlled boundary probe, not a traced Win3.1 failure. |
+| R0686 | XP nt_v7vga_hi_graph_std around 1350-1358 | Qualified owner choice: original fixed height 400/width 640 ceiling rejects the actual BIOS/BOP-selected 640x480 packed mode. Both original and nonempty-only restoration fail dirty publication after host_flush_screen in that mode. Actual-size clipping supports the existing 640x480/720x540/800x600 paths without a second painter or enlarged virtual card. |
+
+Private variants use the real cached Ninja compile flags and link the existing
+VGA fixture with one overridden full nt_vga.c object before the machine archive.
+Each standard function is independently replaced by its exact XP body; excluded
+bodies are not restored. Four additional diagnostic variants add only an empty
+size return ahead of each original body. They are experiments, not proposed
+production paths. Baseline passes on x86/x64; all sixteen restored diagnostic
+runs compile/link but fail:
+
+- Standard/medium/high original bodies: access violation 0xC0000005 on both.
+- Standard/medium nonempty-only: destination byte assertion at fixture line 706
+  (x86 0xC0000409, x64 exit 3).
+- High nonempty-only: access violation 0xC0000005 on both.
+- V7 original and nonempty-only: dirty publication assertion at line 2330 after
+  the real mode-67h BIOS/BOP sequence (x86 0xC0000409, x64 exit 3).
+
+The tests run serially in separate task-owned working directories; no fixed
+fixture image is shared with another experiment or the background qualification.
+Additional fixture-local diagnostics identify zero-height, negative-x and final
+source-group requests at the failures, instead of inferring causes from process
+exit codes alone. They do not change production or add a testing API.
+The fixture exercises arbitrary negative/overflow arguments as well as real
+mode/register paths; those evidence scopes are explicitly distinct. No manual
+guest reproduction, universal hardware fidelity or safety of all other painters
+is claimed. Existing unsupported-branch content receives no new ledger.
+
+The installed reduction is production +0/-5, no permanent test changes, and
+five fewer XP-relative diff lines. Final-source cached dual builds/publication
+and all 392 tests are running. The delivered frontier remains 467/472 pending
+P159 qualification and push; retained boundary blocks require owner choice.
+
+## File 468 host/src/nt_vga.c P159
+
+Final-source cached builds/publication and all 392 tests pass:
+
+| Architecture | Build | Background | Native desktop/audio/package |
+| --- | --- | --- | --- |
+| x86 | 10.75 s | 188/188, 149.48 s | 8/8, 17.35 s |
+| x64 | 13.35 s | 188/188, 142.47 s | 8/8, 15.23 s |
+
+Actual-diff review verifies five selected nonsemantic lines removed and no
+executable change: production +0/-5, tests unchanged, XP diff reduced by five
+lines. R0682 is restored; R0683-R0686 remain qualified owner decisions. All
+eighteen primary actual-body runs and twelve diagnostic reruns completed without
+timeout; their controlled failures are distinguished from final green tests.
+No public component, guest, configuration, media or snapshot change is included.
+
+Published SHA-256:
+
+- softpc32.exe: `1496556dc83c0acc7352feddac0dbe6f8b04ce11a8b8ac07faef03c82fa2eaaf`.
+- softpc64.exe: `025e424f2ea39700a8d33fe23574f5562b0d0db6ce6b63370839f57d6ea35b1b`.
+
+The source portion of P159 reaches 468/472. The final four fixed resource
+reviews follow below; qualified owner decisions still prevent S1/T100 closure.
+
+## Files 469-472 fixed resources P159
+
+Each resource is read in frozen order and compared byte-for-byte with its same
+path at fixed XP a2f6d7c93aa4f11efc51147566d5961c59a8ef89. Byte hashes also match
+the original manifest and the frozen initial inventory. No resource is modified,
+rebuilt, replaced or newly imported.
+
+| Order | Resource | Bytes | Byte SHA-256 | Result |
+| --- | --- | --- | --- | --- |
+| 469 | roms/bios1.rom | 28420 | 1ce33544249fef59865b91308faf60f354563cf854f80eb196d47c968899a574 | Exact XP identity; no diff. |
+| 470 | roms/bios4.rom | 8191 | b09fdff1a500971d54233378ce9c36f1b6a58bf577e4a544da03a0d78d7e0d6f | Exact XP identity; no diff. |
+| 471 | roms/cmos.ram | 64 | 97fca7adb543bdac4e571185a3f37c17a30a6ad937e0817048d965a850edddd9 | Exact XP identity; no diff. |
+| 472 | roms/v7vga.rom | 18832 | 970f105cd9e42ee56f07aae695bac89786d3455ab9d4c1ea9a1d1643b1e8f6f0 | Exact XP identity; no diff. |
+
+Production references are checked separately from identity. firmware.rc embeds
+bios1.rom/bios4.rom/v7vga.rom as RCDATA 101/102/103; the product and machine
+fixtures compile that resource file. Original rom.c selects the three filenames
+and calls Compat host_read_resource, which maps them to these embedded IDs.
+They are actual fixed firmware consumers, not runtime dependencies on XP checkout.
+
+cmos.ram is different: it is an unchanged 64-byte original resource, but it is
+not embedded by firmware.rc, accepted by host_read_resource or opened by any
+current production path. The filename remains an original host_def.h macro;
+cmos.c initializes the RTC/CMOS and POST derives equipment/memory from current
+machine state. No claim of a runtime cmos.ram consumer is made. Removing an
+identical original file would introduce a new whole-file difference, prohibited
+by the owner's later no-new-diff clarification. It therefore remains unchanged;
+no compatibility loader or new use is invented to justify its presence.
+
+The ordered file-level audit now covers 472/472 frozen files. This means each
+file has a recorded disposition, not that all semantic differences are approved
+or that S1/T100 is closed. Next work is reconciliation of restored deliveries,
+qualified pending owner decisions and the unchanged-original-defect decisions.
+The resource-only check changes no executable input; P159's final-source dual
+build/publication and 392/392 regression evidence remains applicable. No additional
+build is needed for these documentation-only dispositions.
+
+P159 final mirror/documentation/whitespace gates pass. Both cached build logs
+contain no warning/error lines. All owned probe and qualification processes
+were confirmed exited, their bounded evidence promoted, and disposable task
+scratch removed. Build residue checks pass; reusable caches remain. No skipped
+native tests or unrelated worktree changes are hidden by this delivery.

@@ -2531,3 +2531,14 @@ Both cached builds/publication and all 392 tests pass. Finite native Beep and
 actual-body cleanup evidence are bounded as recorded in
 [the audit evidence](m9-t100-progress.md#file-467-hostsrcnt_soundc-p158).
 Existing exclusions receive no new bookkeeping.
+
+## T100 S1 P159 nt_vga.c original-first reconciliation
+
+Removes four unnecessary explanation lines and one trailing blank: production
++0/-5, tests unchanged, five fewer XP diff lines. Four current standard-painter
+boundary blocks remain evidence-qualified owner choices R0683-R0686. Exact
+original-body and nonempty-only restoration failures are distinguished from
+real BIOS-selected V7 mode publication and artificial boundary inputs in
+[the audit evidence](m9-t100-progress.md#file-468-hostsrcnt_vgac-p159).
+Final-source cached dual builds/publication and all 392 tests pass. Existing
+excluded bodies are unchanged and receive no new accounting.

@@ -83,7 +83,6 @@ void nt_vga_graph_std(int offset, int screen_x, int screen_y,
     }
 
     /* If the image is completely outside the display area do nothing. */
-    /* T60: reject before adding/scaling dimensions or entering paint loops. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= max_width || screen_y >= max_height ||
         offset < 0 || offset >= 4 * EGA_PLANE_SIZE || get_bytes_per_line() <= 0)
@@ -444,7 +443,6 @@ void nt_vga_med_graph_std(int offset, int screen_x, int screen_y,
         return;
     }
 
-    /* T60: clip in source rows/groups before doubling the vertical extent. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width / 8 || screen_y >= sc.PC_W_Height / 2 ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
@@ -849,7 +847,6 @@ void nt_vga_hi_graph_std(int offset, int screen_x, int screen_y,
     }
 
     /* If the image is completely outside the display area do nothing. */
-    /* T60: validate in plane groups before any offset multiplication. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= max_width || screen_y >= sc.PC_W_Height ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
@@ -1365,7 +1362,6 @@ void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     ** Tim Septemver 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    /* T60: packed bytes are pixels; bound the actual DIB and source rows. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height ||
         offset < 0 || offset >= 4 * EGA_PLANE_SIZE || get_offset_per_line() <= 0){
@@ -1665,4 +1661,3 @@ sub_note_trace5(EGA_HOST_VERBOSE,
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
 #line 2189
-
