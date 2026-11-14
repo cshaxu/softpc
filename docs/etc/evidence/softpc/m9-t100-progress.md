@@ -12409,3 +12409,26 @@ Next is file 416; final D001-D006/L001 and owner decisions keep S1/T100 open.
 
 P174 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three task documents change.
+
+## P175 final-decision reconciliation, positions 416-423
+
+All eight current normalized files match their committed P126 versions. Current
+source confirms actual BIOS writer selection distinct from CPU SetWritePointers,
+EGA reset getter/archive use, virtual recalc_text branch, original local reader/
+writer declarations and absent added provider declarations in cpu_vid.h.
+The no-match header search is expected restoration evidence, not a tool failure.
+
+Reconcile P120-P126 final evidence, including individual and whole-group writer
+negative controls, controlled virtual-I/O matrix versus historical guest probe,
+and fully superseded R0423 declaration retention. Sixteen semantic IDs are added:
+275 residuals (272 semantic, three compiler/format), eighteen notice items.
+D006 remains a separately reproduced original plane-enable defect, not fixed by
+retained address corrections or hidden by suite success.
+
+Executor/counter-review changes three task records only. No source/tests/EXEs,
+configuration or media change, and no scratch/job created. P164 fresh 392/392
+remains applicable without a new runtime claim. Next is file 424; final original
+defect decisions and owner retention choices keep S1/T100 open.
+
+P175 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. The three task records are the complete changed-file set.

@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-415 only. Positions 416-472, original
+This view currently reconciles positions 1-423 only. Positions 424-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1561,6 +1561,104 @@ residuals (256 semantic, three compiler/format). Existing exclusions are not
 counted. Production/test/EXE bytes remain unchanged; P164 fresh 392/392 applies.
 D005 and all owner retention decisions remain unapproved.
 
+## Positions 416-423: original BIOS video writers and virtual text height
+
+All eight normalized current files match their final P126 committed versions.
+Current ega_write_routines_update still selects BIOS callbacks for modes 0-2;
+CPU_40_STYLE SetWritePointers does not replace them. Defining SetBiosWrites
+without a production caller does not make those BIOS writers unreachable.
+Current EGA reset getter, virtual-height branch and original local provider
+declarations also match the final evidence. No new runtime result is claimed.
+
+### R0510-R0513: mode-0 BIOS CHAIN2 address mapping
+
+Four existing changed lines (+4/-4) retain the independently established plane
+layout: aligned byte address preserves plane A0; an odd WORD's second byte
+advances eight physical bytes, not four. R0510 is copy-byte mapping, R0511
+copy-WORD start, R0512 odd-WORD next cell, R0513 generic mode-0 byte mapping.
+
+P120 initializes the actual machine and BIOS mode 3, asserts selected callback
+identity, changes GC ports to select generic behavior, invokes the real callback
+and reads back through C-VID. Each individual original-line restoration compiles
+and links but fails the intended assertion on both architectures: byte expected
+11 observed 20; even WORD 22,33 observed 20,07; odd WORD 44,55 observed 44,20;
+generic first byte ff observed 20. Current controls also cover odd generic
+plane selection. These are BIOS/controller/C-VID integration proofs, not all
+V86, bulk fill/move or a newly reproduced Win3.1 session. Retention remains
+coupled to the earlier independently evidenced layout R0272/R0362/R0434.
+
+ega_dmmy.c and ega_mode.c have no selected differences. The original zero
+switch-setting stub has a real status-port consumer; deleting it would add
+unnecessary wiring changes.
+
+### R0514: actual EGA sequencer-reset readout
+
+The existing seven-line getter reads the private reset byte written by the
+registered EGA reset receiver. VGA archive capture calls it. Original VGA
+register-zero readback returns constant 3 and the VGA reset member is another
+object; neither represents pending EGA reset state. Display-disable bits alone
+also do not retain the whole byte. Exposing/copying state elsewhere would
+expand ownership rather than remove adaptation.
+P122 current VGA fixtures write reset values 0..3, capture, alter, restore and
+check disable bits on both widths. Fixed-readback failure for 0..2 is source
+proof, not a newly executed negative or all-register guest snapshot validation.
+The existing getter remains pending, with no added fallback or state owner.
+
+### R0515/R0516/R0518: coherent declaration restorations, no residual
+
+P123 restored three original reader declarations in ega_read.c and removed
+their additions from cpu_vid.h, plus original initializer whitespace: nine
+XP difference lines removed. P125 restored six local writer declarations and
+removed the remaining header block: sixteen more difference lines removed.
+Two existing direct tests received private extern declarations (+2 test lines).
+The selected IPT macros already erase argument lists; original spellings,
+including fill_word IU8, were not modernized.
+
+The initial isolated restoration conflicted with our added header declarations.
+Coherent restoration compiled actual provider/consumer objects and retained
+original Glue_reads/Glue_writes and unchanged providers. Final EXEs were
+metadata-equivalent; rebuilt VGA fixtures passed. This supersedes all of
+R0423's old retention conclusion, already removed from the earlier header
+section. Neither these restorations nor that superseded claim is counted as
+a new residual here. Mirror implicit-int warnings were disclosed, not suppressed.
+
+### R0517: current-VM virtual CRTC height
+
+The thirteen-line VGA/V86 addition uses the existing virtual I/O route for
+CRTC VDE/overflow, saves/restores the index and keeps original multiplier/row
+rounding plus EGA/non-V86 behavior. Actual BIOS font handlers call recalc_text;
+physical height alone cannot describe another VM's virtual CRTC.
+P124's actual recalc_text/SAS/BIOS route with controlled nested guest registers
+covers 36 native-VGA/V86-VGA/V86-EGA extent/font/multiplier combinations; current
+passes and full original-branch restoration fails row count on both widths.
+Separately, historical S37 actual Win3.1 VDD snapshot evidence used a probe-
+issued font request: virtual 400 versus physical 481 produced 60/30 instead
+of 50/25 rows. That is not a new guest run or proof that an unmodified guest
+application issued those exact requests. Retention is pending, +13/-0.
+
+### R0519-R0528: mode-1/mode-2 BIOS CHAIN2 writers
+
+Ten existing +1/-1 replacements preserve the same layout, with no new writer:
+R0519/R0520 mode-1 byte/WORD start; R0521/R0522 odd-WORD next cell for planes
+0/2; R0523/R0524 mode-2 byte/WORD start; R0525/R0526 logical odd-WORD next
+cell for planes 0/2; R0527/R0528 simple odd-WORD next cell for planes 0/2.
+P126 actual machine/BIOS/ports select and assert callbacks. Independent explicit
+cell locations, not a copied offset formula, cover byte 2, even WORD 6, odd
+WORD 9, no logic and AND. Twenty individual original-line variants plus two
+whole-ten-line restorations compile/link and fail their expected assertions;
+current controls pass. The initial undeclared fixture setter was corrected
+before these results and is not counted as defect evidence.
+
+D006 is separate: original mode-2 no-logical-operation code tests the wrong
+plane enable bit. A mask-4/value-4 offset-zero probe observes plane2=00 on both
+widths. The address fixes do not repair it; no unapproved new patch is added.
+This does not establish all masks/modes/overlap/paging or guest-session coverage.
+
+Sixteen semantic IDs are added: cumulative 275 qualified residuals (272
+semantic, three compiler/format); eighteen notices unchanged. D006 remains a
+separate proposed repair. This reconciliation changes no source/tests/EXEs;
+P164 fresh 392/392 remains applicable, without approving pending residuals.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1570,4 +1668,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 416.
+recommendations into owner approval. The next position is 424.
