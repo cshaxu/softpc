@@ -2352,3 +2352,9 @@ zero; tracked production +5/-5, tests unchanged. Both builds/publications and
 BOP/VGA 2/2 per width pass; EXEs are metadata-equivalent to P134. Existing
 excluded bodies receive no new accounting. No retained semantic decision is
 needed for this file; earlier owner decisions remain in the T100 evidence.
+
+
+T100 S1 P136 audits host/inc/cfpu_def.h: removes one redundant comment,
+retains the six evidence-qualified little-endian representations and required
+ABI reason marker pending owner decision R0554. Existing exclusions are not
+re-accounted. See [ordered evidence](m9-t100-progress.md#file-433-cfpu_defh-p136).

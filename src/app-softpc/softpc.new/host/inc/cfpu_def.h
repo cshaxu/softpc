@@ -51,7 +51,6 @@ FP64HI	hiword;
 
 
 typedef struct {
-/* fpu.c's little-endian BCD tables initialize low word before high word. */
 IU32 low_word;
 IS32 high_word;
 #line 46

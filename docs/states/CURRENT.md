@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P135 completes file 432 video_io.c: restore original whitespace and
-associated diagnostic line controls. Production +5/-5, tests unchanged;
-selected XP diff falls from +3/-3 to zero (six fewer diff lines).
-Both cached builds/publications and BOP/VGA fixtures (2/2 per width) pass.
-EXEs are byte-equivalent to P134 after only PE timestamp/checksum and unique
-compiler-time normalization; full regression is not repeated under the owner
-exception. P133 background 188/188 per width remains applicable. Native final
-acceptance, earlier owner decisions, D001-D006 and L001 remain open.
-Frontier 432/472; next file 433 host/inc/cfpu_def.h. No S/T closure is claimed.
+T100 S1 P136 completes file 433 cfpu_def.h: removes one redundant comment
+(production +0/-1, tests unchanged; one fewer XP-relative diff line).
+Six little-endian layouts remain evidence-qualified owner decision R0554;
+individual and coherent XP restorations fail the existing layout fixture on
+both widths, while current controls pass. Cached builds/publication and final
+x87 fixtures pass. Both EXEs equal P135 after permitted timestamp/checksum/time
+normalization, so full regression is not repeated. P133 background 188/188 per
+width remains applicable; native final acceptance and earlier decisions remain
+open. Frontier 433/472; next file 434 host/inc/error.h. No S/T closure is claimed.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 

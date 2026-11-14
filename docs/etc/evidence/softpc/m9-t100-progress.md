@@ -9762,3 +9762,72 @@ line controls, provenance/task records and fresh EXEs changed. No public tree,
 Compat, guest, INI or snapshot changed. Completed owned jobs permit scratch
 cleanup. Frontier 432/472; next file 433 host/inc/cfpu_def.h. S1/T100 and all
 earlier qualified owner decisions remain open.
+
+
+## File 433: cfpu_def.h (P136)
+
+Pinned XP raw SHA-256:
+5e1fff78ae51d0548295fc84d7396318e0d201be908eb70ea13d26682495d6cd.
+Actual consumers are original ccpu386/fpu.c and zfrsrvd.c plus Compat's CPU
+archive.c. The Compat cfpu_def.h wrapper includes this mirror and supplies
+native fenv bindings; it does not duplicate the mirror's FPU implementation.
+FPSTACKENTRY remains original and is used by snapshot get/setNpxStackRegs.
+Deleting the mirror or its wrapper would remove a live, distinct responsibility.
+
+R0553 restores the original absence of the extra FPU_I64 comment. The existing
+two-line host-ABI reason marker remains as required by Coding Rules; it covers
+these adjacent layout adjustments. Production +0/-1, tests unchanged; the
+XP-relative selected diff decreases by exactly one added comment line. No
+existing error exclusion or line-control framework receives new accounting.
+The #line 46 anchor after the integer fields remains correct after deletion.
+
+R0554 is the evidence-qualified, pending owner decision for six little-endian
+representations: FP32 and FP64HI sign/exponent/mantissa bitfields, FP80SE
+sign/exponent bitfields, FP64 words, FPU_I64 words and FP80 mantissa words.
+fpu.c reads these representations directly in LoadValue, CVTFPHI64 and
+extended conversion; wrong offsets cannot be cured by its existing byte-order
+macros. CVTI64FPH computes high_word * 4294967296.0 + low_word. The selected
+original BCD tables initialize low then high (their final entries are {1,0}
+and {10,0}); restoring high-first would turn these into 2^32 and 10*2^32.
+This is source proof of the integer requirement, not a claim of a new guest
+BCD playback or arithmetic trace. No new Compat arithmetic is introduced.
+
+Private comparison compiles the existing x87_layout_smoke with its real fenv
+wrapper and only a substituted mirror header. Current, each of the six
+individual XP type restorations, and all six coherently restored compile/link
+successfully on x86 and x64. Current runs pass (0.11/0.22 seconds). Every
+restored variant fails its corresponding assertion on both widths: FP32 at
+line 67, FP64HI at 69, FP80SE at 73, FP64 at 58, FPU_I64 at 61, FP80 at 59;
+coherent original first fails at 58. Negative exits are 3221226505 on x86 and
+3 on x64, with explicit assertion diagnostics, not timeouts. The offset
+assertions establish the representation boundary; source consumers above
+establish why those offsets matter. These probes do not prove exhaustive
+x87 opcode, rounding, exception, guest or snapshot compatibility. The existing
+fixture additionally exercises native rounding and exception bindings.
+
+Remaining selected content matches the fixed XP counterpart apart from the
+six representations and required reason marker. No original guest, public
+component, Compat implementation, configuration, media or snapshot changed.
+Final LF-normalized source SHA-256: 5e5f4421f951f009607a426822c9617c242d612a36391c68972fa3d6269cce17.
+
+### P136 final-source qualification
+
+- x86 cached build/publication: 12.87 s; x87 fixture 1/1 in 0.18 s.
+- x64 cached build/publication: 14.19 s; x87 fixture 1/1 in 0.18 s.
+- softpc32.exe SHA-256: f7fcc9cbc4eed7cb897f6e7f6578741135e324400263f55564075bc2c76bc11d.
+- softpc64.exe SHA-256: ad9eec8f276872dc5b2909a444fa7cebcf7cf234fc2caa05febb4f3da0cbd2c5.
+
+Both delivered EXEs equal P135 after masking only PE COFF timestamp/checksum
+and the unique NUL-terminated compiler HH:MM:SS literal. All other bytes and
+lengths are equal. Under the owner exception, full regression is not repeated;
+P133 background 188/188 per architecture remains applicable. Final native
+acceptance is pending, not passed. Coordinator review checks the actual one-line
+source deletion against XP, the unchanged six layouts, exact negative oracles
+and current passing fixture; required ABI differences remain owner decisions.
+Frontier 433/472 after this delivery; next file 434 host/inc/error.h. S1/T100,
+earlier pending owner decisions and original-defect decisions remain open.
+
+P136 gates pass: XP manifest, documentation governance and git diff whitespace.
+Each incremental build emits four existing mirror fpu.c sprintf-declaration
+warnings and none outside the mirror. Both owned jobs are terminal; scratch
+is removed after promoting the evidence above. No native test pass is claimed.
