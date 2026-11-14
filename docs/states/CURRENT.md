@@ -30,11 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P111 completes file 408 idetect.c. Both original word conversions
-are restored; selected code now matches XP, reducing mirror diff by four
-lines. No residual decision for this file. Final cached dual-EXE builds and
-publication pass full regression 392/392. Frontier 408/472; next 409
-base/system/illegalp.c. Earlier qualified residuals and L001 remain open.
+T100 S1 P112 completes file 409 illegalp.c: selected original code matches
+XP and the BIOS invalid-op service remains production-connected. No source
+changes or new retention decisions. P111 remains the dual-EXE publication and
+full regression baseline, 392/392. Frontier 409/472; next 410
+base/system/quick_ev.c. Earlier qualified residuals and L001 remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

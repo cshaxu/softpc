@@ -8127,3 +8127,34 @@ All earlier qualified decisions, including L001, remain open; S1 is not closed.
 
 P111 owned process has exited; exact disposable cleanup and build residue
 checks pass. Reusable cache trees are preserved.
+
+
+## File 409: base/system/illegalp.c (P112)
+
+Pinned XP raw SHA-256 2f67c567c269779994da89f615de5dbcd103892d545e65f652730463702f4804.
+Whole-file original/current comparison finds no selected-code difference.
+Existing excluded bodies, line-control scaffold and adjacent scaffold spacing
+are skipped without new point records or counts. The original historical
+notice remains intact; no residual retention decision is needed.
+
+Actual integration: root CMake compiles illegalp.c into softpc-machine-devices
+and supplies its existing Compat system error declaration include directory.
+Compat device_bop.c registers illegal_op_int at BIOS[0x06]; the common device
+BOP dispatcher obtains and calls that table entry. The original routine reads
+the saved CS/IP, reports the invalid operation through host_error, adjusts the
+saved instruction address on continuation and calls unexpected_int. No copied
+Compat implementation replaces it.
+
+Counter-review distinguishes the other functions: illegal_op is an original
+empty function in PROD, not an invented local stub. Whole src/test search finds
+illegal_dvr_bop's direct test caller in bop_smoke.c, but no production service
+registration for that particular entry. This does not make the file unused:
+BIOS[0x06] remains a real consumer. Removing original functions or includes
+would introduce differences without reducing an existing patch. Keep them.
+
+Production/test/build changes: zero; XP-relative diff delta: zero. This is
+source/caller proof, not a fresh guest invalid-op or driver-mismatch experiment.
+No build, publication or runtime rerun is warranted for this documentation-only
+delivery; P111 remains the unchanged dual-EXE and 392/392 regression baseline.
+No scratch, configuration, media or snapshot changes. Frontier advances to
+409/472, next 410 base/system/quick_ev.c; prior pending decisions remain open.
