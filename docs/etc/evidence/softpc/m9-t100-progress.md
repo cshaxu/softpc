@@ -12266,3 +12266,30 @@ this document-only delivery. Next is file 331. S1/T100 remain open.
 
 P168 documentation/mirror/whitespace gates and build-residue check pass. No
 new worker or disposable scratch exists; final diff contains task records only.
+
+## P169 final-decision reconciliation, positions 331-358
+
+Reconcile P75-P84 with current source and later coupled P123/P125 restoration.
+A current-hash check deliberately rejects P76 as cpu_vid's final identity;
+Git history identifies the later coherent reader/writer restoration. Current
+cpu_vid contains no added provider block; original local declarations exist
+in ega_read/ega_writ. R0423 therefore is restored, not a qualified retention.
+This corrects the incomplete isolated-removal evidence instead of propagating
+its superseded conclusion into the owner's approval list.
+
+The other six restored/retained header hashes match their recorded final
+candidates. Current searches confirm local ega_read_dot declaration, unused EMS
+storage declarations, the DMA pointer declaration and panning/provider types.
+Only R0424/R0426/R0428 remain pending: three new IDs, cumulative 220 through
+file 358. Eight historical notice items remain separate. No existing excluded
+body is recorded. Coupled VGA-test include wiring and private test declarations
+are disclosed, not new public paths. Original compilation warnings and extra
+probe warning flags are distinguished from runtime/guest failure claims.
+
+Actual-change review finds task records only. No production/test/EXE change or
+new scratch/worker. Current production retains P164's fresh 392/392 evidence;
+no new compilation, publication or runtime run is claimed. Next file is 359;
+S1/T100 and owner decisions remain open.
+
+P169 documentation/mirror/whitespace gates and build-residue check pass. Final
+diff contains only the three reviewed task records; no unrelated changes.

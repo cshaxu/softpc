@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-330 only. Positions 331-472, original
+This view currently reconciles positions 1-358 only. Positions 359-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -974,6 +974,94 @@ and four notice-policy items, cumulative eight. Production/test/EXE bytes are
 unchanged; P164's fresh 392/392 remains applicable. D001-D006/L001 and owner
 approval still require final reconciliation; no task closure is claimed.
 
+## Positions 331-358: base/video declarations
+
+The original-content-only dispositions in P75/P77/P79/P80/P82/P83/P84 remain
+applicable for positions 331-334, 336, 338, 340-341, 343, 346-348, 349-355 and
+357. Existing exclusions are skipped, not new decision entries. These retained
+headers have actual original includes; gendrvr.h/gispsvga.h do not thereby
+supply active excluded drivers. Removing original files and their includes
+would introduce new differences and is not an admitted cleanup.
+
+### R0421-R0423: cpu_vid.h is restored, not pending
+
+P76 restored five original IPT argument lists and removed four rationale lines.
+Actual selected non-ANSI IPT macros expand to empty argument lists, with eight
+current/restored preprocessor pairs byte-identical. This does not qualify the
+excluded future ANSI configuration.
+
+P76 initially retained nine added glue-provider declarations (R0423), based on
+isolated removal failing table initializers. P123/P125 supersede that conclusion:
+the coherent restoration restores three original declarations beside Glue_reads
+and six beside Glue_writes, and removes the added header block. Current source
+and its last two commits confirm this final form. No selected provider addition
+remains in cpu_vid.h. The former test proves missing declarations in an
+incomplete restoration, not necessity of the local header patch.
+
+The coherent compiler controls and complete EXE metadata-equivalence checks
+passed. Two existing direct writer tests gained private declarations in P125;
+the rebuilt VGA fixture passed both widths. Those coupled test declarations do
+not justify retaining a production-only-for-tests API. Original provider/table
+calling paths remain unchanged. R0421/R0422/R0423 are restored, with no owner
+retention choice. Later file 420/422 accounting must reference these same
+restorations rather than count an additional header approval item.
+
+### Three remaining semantic IDs
+
+- R0424, dma.h: retain dmaGetAdaptor's pointer-return declaration (+3/-0 with
+  existing reason/separator). Actual nt_sbdsp SbInitializeDMA indexes the
+  original controller array returned by at_dma. XP's declaration sits in an
+  unselected NTVDM branch. Private-header controls pass current and fail removal
+  on both widths with explicit extra -Werror=implicit-function-declaration.
+  That flag is disclosed; this proves the missing pointer contract, not an
+  observed guest crash or unchanged production warning-policy failure.
+- R0426, egacpu.h: retain the actual generated VGAGLOBALSETTINGS pointer type
+  and existing reason. Restoring VGA_GLOBALS* produces the provider-assignment
+  mismatch in ev_glue on both widths under extra incompatible-pointer Werror;
+  vga_prts's null-only use still compiles. No cast or second carrier is proposed.
+  R0425's redundant forward tag and R0427's relocated include/comment were
+  restored. P78's initial VGA-test build lacked the existing cvidc include
+  directory; adding that single target dependency fixed the build. Final dual
+  full regression passed. This is disclosed root build wiring, not a fallback.
+- R0428, egaports.h: retain one panning query declaration. Its provider reads
+  original attribute/split state, not another state owner. A no-pan actual-body
+  control fails port-written pan=1 pixel assertions on both widths. This proves
+  the consumed panning capability, not a coherent restoration of every panning
+  implementation patch. Header removal emits the specific undeclared-query
+  diagnostic under an extra flag; gfx_updt also fails for unrelated setMarkPointers
+  with either header, so its exit code alone is not supporting evidence.
+  R0429 removed the unnecessary T60 comment; implementation files retain their
+  separate ordered decisions.
+
+Current egacpu/egaports hashes match P78/P80 final candidates; dma's source and
+actual DSP/controller consumer chain remain. These three IDs require owner
+approval; successful regression does not supply it.
+
+### Completed declaration/comment reductions
+
+- R0430, egavideo.h: the added ega_read_dot declaration/comment was removed.
+  The actual single caller already has the original local declaration. All
+  fourteen current/restored consumer-object pairs match, and EXEs differ only
+  in metadata. Four XP diff lines removed; no provider behavior changed.
+- R0431, emm.h: three unused storage declarations restored from IHP to original
+  long and the rationale removed. No implementation/caller or machine-archive
+  symbol exists; reset consumer objects match on both widths. Nine XP diff
+  lines removed. This does not truncate an active allocation pointer.
+- R0432, gfx_upd.h: original STREAM_IO comment restored outside the excluded
+  branch. R0433, gmi.h: original MEM_HANDLERS member declarations restored;
+  selected IPT macro expansion is unchanged. Eight preprocessed pairs and full
+  metadata-adjusted EXEs match. Combined nineteen XP diff lines removed.
+
+Current hashes for these four headers match the final P81/P82/P84 candidates.
+Their artifact-equivalence exception is documented, not described as fresh
+runtime testing. P164 subsequently ran the full current 392/392 without retries.
+No original BIOS date or inactive header is rewritten for cosmetic uniformity.
+
+This group adds only three pending semantic IDs: cumulative 220 through file
+358. Historical notice items remain eight. Production/test/EXE bytes are
+unchanged in this reconciliation; original-defect review and owner choices
+remain outstanding.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -983,4 +1071,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 331.
+recommendations into owner approval. The next position is 359.
