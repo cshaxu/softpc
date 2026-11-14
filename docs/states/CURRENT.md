@@ -37,6 +37,10 @@ is updated after each subsequent file review. No source or runtime change.
 S4 P4 adds c_main.c classification: 11 files presented, +269/-54, 70 text
 hunks cumulatively; 110 files remain. Pointer exposure, pacing and budget
 precision are explicit discussion boundaries, not blanket approvals.
+S4 P5 counter-review separates necessary capabilities from unproved minimal
+forms: no unconditional equivalent restoration established; pacing remains a
+product-policy decision and budget consumes the initial pre-fetch boundary.
+No fresh ablation/runtime test or new source change is claimed.
 
 S4 P2 adds per-file counts to the complete 121-file list: 15,778 zero-context
 text diff blocks, +24,764/-24,069 selected-content lines relative to fixed XP.

@@ -82,6 +82,71 @@ they are not silently declared optimal or approved by this presentation.
 Next file: order 88, ccpu386/c_page.c, verified against the frozen list.
 110 files remain to present. No production changes.
 
+### S4 P5: c_main.c necessity counter-review
+
+Owner requests proof of necessity rather than consumer existence. No source is
+restored by this review. A passing baseline suite is not an ablation proof.
+Fresh source reads distinguish the following conclusions:
+
+- Declarations (R0060/R0062-R0064/R0066-R0067): actual typed providers and
+  selected calls establish C interface requirements. This is not proof of a
+  reproduced runtime failure from every removed declaration.
+- TLS selection (R0059/R0085/R0106/R0109/R0111/R0112): the current lifecycle
+  outer-unwind uses ntthread frames; restoring only conditions splits the
+  simulate/continue/unsimulate owner. Two setjmp expressions receive pointers
+  to buffers and require matching argument types. An alternative coherent
+  original static-stack implementation has NOT been proven impossible; it
+  would require a separate lifecycle redesign, not removal of these lines.
+- Snapshot/HLT (R0061/R0065/R0078-R0079/R0084/R0086/R0091/R0104 and nesting
+  R0108/R0110): callers preserve private interrupt/trap state, halt/fetch phase
+  and native nesting depth. Registers alone do not reproduce these states.
+  Existing checkpoint tests cover real nested BIOS execution and retained HLT.
+  Historical original-only outer-unwind comparison failed both architectures
+  (S1 progress, original-only exit comparison); that proves the coupled unwind
+  requirement, NOT independent necessity of every current line or TLS choice.
+- Executor hooks (R0068/R0070-R0072/R0075/R0093-R0094/R0097/R0099/R0101):
+  removing all consumption disconnects host work. Original quick_mode jumps
+  directly to DO_INST; the added predicate provides an exit for pending host
+  events. HLT needs its own consumption/wait. Ordinary-boundary versus direct
+  NEXT_INST placement preserves different ordering. This is control-flow proof;
+  there is no fresh per-site ablation matrix proving the three placements are
+  the only minimal arrangement.
+- Debug hooks (R0076/R0087-R0090/R0095-R0096): begin/refetch serves edits while
+  paused; four early retirement edges bypass the ordinary site. Removing these
+  loses existing observation/counting. No new all-instruction dynamic matrix.
+- Map access (R0077): keyba.c:2148 writes the reset bit through the Compat
+  macro; lifecycle clear is called from machine create/reset. Restoring just
+  the function deletion breaks actual access. This proves an access requirement,
+  not that a writable pointer is the uniquely minimal interface. Changing it
+  needs coordinated callers and may introduce other mirror differences.
+- Deassertion (R0107): existing c_cpu_interrupt only sets bits; platform.c
+  consumes c_cpu_clearHwInt to clear the hardware bit. It cannot substitute
+  for clear-all initialization or keyboard reset.
+- PIC guard (R0100): rejection occurs before EXT/SYNCH_TICK; do_intrupt's later
+  guard cannot undo those operations. No independent new negative control of
+  this caller's side effects was run.
+- Pacing (R0074/R0102): continuous-run setup enables a nominal 1,000,000
+  counted boundaries/second, checking every 1024, with sleep/yield waiting.
+  Original device heartbeat remains separate. Removing declaration/call would
+  reduce three added mirror lines (including separator) but removes a real speed
+  policy. No evidence establishes that this exact limiter is required for CPU
+  correctness or is the simplest timing design. Reclassify as product-policy
+  decision, not proven indispensable bug repair or safe equivalent restoration.
+- Budget (R0073/R0103): cold entry goes through NEXT_INST before first fetch;
+  budget one requests outer exit before any instruction executes. The existing
+  observe_budget test explicitly expects initial decrement; the two-boundary
+  JNZ historical probe executes one instruction. It is a safe-point budget,
+  not evidence of precise retired-instruction count. Removal makes finite runs
+  lose their termination mechanism, so is not equivalent restoration. Exact
+  instruction semantics require a separate decision, not a new patch here.
+
+Result: no unconditional behavior-preserving restoration candidate established.
+It is also NOT established that every retained line is minimal or independently
+negative-tested. Pacing is an explicit policy choice; budget naming/semantics,
+map-interface shape and event-site minimization remain qualified decisions.
+No new compilation/runtime test is claimed; no source, guest or media changed.
+This report updates evidence strength, not owner approval or file frontier.
+
 ## S3 approval progress
 
 **Superseded by owner revocation:** all retention approvals and automatic
