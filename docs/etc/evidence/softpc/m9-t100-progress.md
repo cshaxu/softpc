@@ -10078,3 +10078,68 @@ production files, public trees, Compat, configuration, media and snapshots
 remain untouched. Owned jobs are terminal and scratch can be removed after
 this evidence promotion. Frontier 443/472; next file 444 host/inc/insignia.h.
 R0560 and earlier owner decisions, S1 and T100 remain open.
+
+
+## File 444: host/inc/insignia.h (P141)
+
+Complete selected-file comparison uses pinned XP SP1, raw SHA-256
+fabcbf3571d0a56826b18f57bb734412295c237c586cf888d9cf06a5425c8973.
+Existing excluded bodies/line controls receive no new accounting.
+
+- R0563: original IHPE is unsigned int (XP line 77), whose comment promises
+  an integer the size of IHP. Current UINT_PTR plus its reason comment is
+  +3/-1 relative to XP. Actual sevid000.c global function-address initializers
+  require native pointer width. Private original-IHPE restoration makes the
+  actual x64 translation unit fail at line 134 with "initializer element is
+  not constant"; x86 compiles. This is concrete supported-build ABI evidence,
+  not a claim that an original 32-bit XP product was defective.
+- R0564: original IUH remains unsigned int for ordinary CCPU. Only existing
+  CVIDC_RULE_WORD selection adds a native pointer carrier (+7/-0). Root CMake
+  selects it on x64 for sinit/sevid, j_c_lang, ev_glue and vglfunc. Actual
+  j_c_lang rule registers and C-VID local/return pointers require that width;
+  removing it globally from the private header truncates a real heap pointer.
+  No universal widening or second implementation is introduced here.
+- R0565: restore the original single blank before the final warning pragma,
+  deleting one extra blank. No token, declaration or layout changes.
+
+The private experiment derives the real sevid000.c Ninja command for each
+architecture, prepends only a task-owned header variant, and checks current,
+original IHPE, original IUH and both originals. All eight scalar probes build.
+All four x86 consumer compilations and heap round trips pass (both types 4).
+On x64 current is 8/8 and round-trips heap pointer 000002378F482440 unchanged;
+IHPE-original is 4/8 and truncates 000002443E532440 (result bit 1);
+IUH-original is 8/4 and truncates 0000026EFB982440 (result bit 2);
+both-original is 4/4 and truncates 000002CB54BF2440 (result bits 3).
+Current and IUH-only x64 actual consumer compilation succeed; IHPE-only and
+both-original fail. The coherent both-original variant was checked as well as
+individual deltas. These are compiler and pointer-representation proofs, not
+an exhaustive guest/video matrix or a new desktop reproduction.
+
+Executor proposes retaining R0563/R0564; independent counter-review confirms
+the real source users and source-specific CMake scope, and rejects interpreting
+x86 success as x64 evidence. Both remain qualified pending owner decisions.
+Restoring neither now is automatic approval. No duplicate Compat behavior is
+introduced or transferred. This header remains directly needed by the core.
+
+Production +0/-1, permanent tests unchanged. Selected XP difference decreases
+from +11/-1 to +10/-1: one fewer diff line, two semantic residual sites.
+Final LF-normalized source SHA-256:
+01c8a4488fc13ee4d3ceb6d9c181a0b5bcb489fcd1f8f8f2c0e0e66ee7313761.
+
+### P141 final-source qualification
+
+- x86: cached build/publication 144.97 s; VGA/checkpoint **2/2** in 8.45 s including runner overhead; 5271 warning occurrences, all in mirror paths.
+- x86 EXE SHA-256: a08de712acaeb770093f123b9cdb5c6db62d8addcfccae6780d6d4dce7335e3c.
+- x64: cached build/publication 213.24 s; VGA/checkpoint **2/2** in 8.51 s including runner overhead; 5326 warning occurrences, all in mirror paths.
+- x64 EXE SHA-256: 439e14009a0529f3a6643ef4338b36a46b527865f620610f391fed249c62081c.
+
+CHAIN2 rule assertions are linked into and invoked by vga_frame_smoke; there
+is no separate chain2_rule_smoke CTest registration, so it is not counted as
+a third test. Both EXEs equal P140 after masking only PE COFF timestamp,
+optional-header checksum and the unique NUL-terminated compiler-time literal.
+All other bytes/lengths equal. The owner exception avoids repeated full suites;
+P133 background 188/188 per width remains applicable. Native final acceptance
+is pending, not passed. No desktop path changed in this blank restoration.
+Final gates and actual-change review accompany delivery; only the blank,
+manifest, audit records and fresh EXEs change. S1/T100 and owner decisions
+remain open. Frontier 444/472; next file 445 host/inc/ntcheese.h.

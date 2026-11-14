@@ -30,14 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P140 completes files 438-443. host_gen/host_gfx/host_qev equal XP;
-host_hfx retains only qualified notice R0560. host_inc original blank and
-host_rrr original wide-character declarations are restored. Production +4/-3,
-tests unchanged; XP diff decreases by five lines. Both cached builds publish
-fresh EXEs; VGA/BOP/quick-time tests pass 3/3 per width. EXEs equal P139 after
-permitted metadata/time normalization; no repeated full suite. P133 background
-188/188 per width remains applicable; final native acceptance and prior owner
-decisions remain pending. Frontier 443/472; next file 444 host/inc/insignia.h.
+T100 S1 P141 completes file 444 insignia.h: one extra blank restored to XP,
+production +0/-1, tests unchanged, one fewer mirror diff line. Native IHPE and
+source-specific C-VID IUH remain qualified owner decisions R0563/R0564, with
+actual consumer compilation and live heap-pointer negative comparisons.
+Both cached builds publish fresh EXEs and VGA/checkpoint pass 2/2 per width.
+EXEs equal P140 after permitted metadata/time normalization; no repeated full
+suite. P133 background 188/188 per width remains applicable; native final
+acceptance remains pending. Frontier 444/472; next file 445 host/inc/ntcheese.h.
 S1/T100 remain open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 

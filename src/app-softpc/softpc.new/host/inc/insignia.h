@@ -198,7 +198,6 @@ typedef unsigned int         IUH;	    /* Host register sized unsigned quantity *
 
 #endif  /* ANSI */
 
-
 #pragma warning (3:4013)
 
 #endif /* _INSIGNIA_H */

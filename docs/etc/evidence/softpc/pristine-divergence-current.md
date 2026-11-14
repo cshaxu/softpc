@@ -2383,3 +2383,8 @@ host_rrr.h's two unused original wchar_t declarations. Selected XP diff falls
 by five lines. host_gen/host_gfx/host_qev already equal XP; host_hfx retains
 only its policy-qualified historical notice R0560 outside existing exclusions.
 See [ordered evidence](m9-t100-progress.md#files-438-443-host-generalgraphicsevent-headers-p140).
+
+T100 S1 P141 restores insignia.h's extra blank (one fewer XP diff line).
+IHPE native width and source-specific C-VID IUH remain qualified pending
+owner decisions R0563/R0564, supported by real compilation/pointer evidence.
+See [ordered evidence](m9-t100-progress.md#file-444-hostincinsigniah-p141).
