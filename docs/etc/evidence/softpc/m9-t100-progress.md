@@ -9484,3 +9484,135 @@ unchanged production semantics of the cleanup. Manifest is synchronized.
 Owned jobs have completed; promoted evidence permits scratch cleanup.
 Frontier 428/472; next file 429 base/video/vga_prts.c. Owner decisions and
 S1/T100 remain open.
+
+## File 429 investigation stage: vga_prts.c
+
+Intermediate record below is superseded by the P133 final qualification.
+
+This record is not a completed-file disposition or a P delivery. Frontier
+remains 428/472. Fixed XP raw SHA-256 is
+57a3318256a0b9392329fd4afada8b9926b32345c4262f08c3f3324b65d291f2.
+Selected differences comprise snapshot declarations/capture/restore, cursor
+shape and disable-register storage, underline refresh, line-specific pel
+panning, and attribute-register-only refresh. Existing HUNTER exclusions must
+be removed from comparison alignment before assessing the appended snapshot
+block; a raw sequence matcher incorrectly aligns that block with excluded
+HUNTER functions. No excluded content is re-audited or counted.
+
+Private real-object probes compare current code, exact original cursor shape,
+exact original cursor-start register handling, coherent restoration of both,
+and a reduced candidate. All use actual Ninja production compilation and the
+existing VGA fixture link. Current controls pass x86/x64 in 6.75/6.77 s.
+All three original restorations fail the cursor register/visibility oracle at
+fixture line 788 on both widths (x86 3221226505, x64 3). The reduced candidate
+restores the original reversed/equal-shape blocks and original end-bound and
+assert expressions, while retaining initial disable/reversed guards and the
+inclusive final height. It passes in 6.16/6.34 s. The reversed branch remains
+unreachable behind the earlier VGA hiding guard; equality now uses the original
+one-line cursor branch. This restores original text without restoring the
+incorrect special treatment of end=0. No tracked production edit yet.
+
+Snapshot source review finds actual archive.c capture/restore consumers and
+write-only/internal state that ordinary port reads cannot reproduce. The V7
+snapshot getter duplicates 28 register reads, but only four need values different
+from the original read handler: A5 and F3 are masked, F9 returns a subfield, FE
+is masked. A private candidate reuses vga_extn_inb for the remaining reads and
+preserves the sequencer index around it, retaining those four raw-state cases.
+The original selected register set does not include side-effecting F0/F2 reads.
+
+A private copy of the actual VGA fixture assigns all 28 archived fields each
+byte value 0..255, calls the real snapshot capture, asserts all captured values
+and preserved sequencer/attribute indices, then restores its setup state. This
+is 7,168 value assertions per run, not an interactive guest reproduction.
+Current and reduced candidates pass x86 (6.10/5.96 s) and x64 (6.84/6.86 s),
+including the existing complete fixture thereafter. A preparation attempt used
+the wrong fixture-function signature and stopped before launching; corrected
+preparation uses its actual machine parameter. No production failure is inferred.
+
+Separate negative probes have now completed on both widths. Restoring the
+original underline register path fails produced-frame assertion line 911;
+restoring split-panning refresh fails dirty assertion line 507; restoring pan
+register refresh fails dirty assertion line 496. Removing only the added
+line-specific split behavior fails the existing resolved-pixel comparison.
+That last probe isolates the helper's semantics; it is not described as coherent
+restoration of all coupled painter changes. All negative runs exit through
+assertion failure (x86 3221226505, x64 3), not timeout. This file still requires
+complete snapshot-path review, final diff minimization and ordinary batch
+qualification. Private candidates are not published or committed product
+implementations. Task-owned scratch remains for that continuing work.
+
+## File 429: vga_prts.c (P133)
+
+Complete selected-source review uses the pinned XP file above. Comparison
+parses conditional branch paths, omits each existing excluded body from both
+sides, then compares retained text after removing line-control directives.
+This avoids aligning the appended snapshot ABI against the excluded HUNTER
+body. No excluded branch receives a new ledger entry or count.
+
+The implemented candidate changes production +35/-57 (net -22), tests 0/0.
+Selected XP diff is +233/-46 before, +188/-23 after: 68 fewer added/deleted
+diff lines, independently of source net size. Original whitespace around the
+NEC_98 boundary is restored with the corresponding original line mapping.
+The final LF-normalized source SHA-256 is
+8074e00b5a6415b514f33aa402874b64b4e042a1b91bc7f3be1f00015fa6af69.
+
+| Point | Original location / local boundary | Executor disposition and concrete evidence |
+| --- | --- | --- |
+| R0542 | XP 577-630 and added snapshot block | Restore original reversed/equal cursor blocks, block-bound and assertion spelling; remove added explanations, duplicate V7 getters and redundant initialization. Original reversed block remains unreachable behind the necessary VGA guard. No executed second cursor path is introduced. Reduced candidate passes both actual VGA fixtures. |
+| R0543 | XP 364, 455; appended snapshot ABI | Qualified pending owner decision: archive.c captures/restores live controller state on the executor, including V7 registers, C-VID latches, controller indices and DAC phase. Original vga_int_1C is a guest-memory BIOS service: it saves five sequencer registers, 25 CRTC registers, 20 attributes, nine GC registers and optional BIOS/palette state; it omits V7 and live latch/phase state and changes indices while capturing. It cannot replace the complete snapshot contract. Keep the existing copied-state ABI, using original port handlers for restoration and 24 of 28 V7 reads. A5/F3/FE port reads mask raw bits and F9 reads only a subfield, so these four raw reads remain. |
+| R0544 | XP 577-630 | Qualified pending owner decision: VGA disable/reversed/out-of-font visibility, zero-end shape and inclusive normal end. Coherent original shape/register restoration fails actual fixture visibility; existing 8/14/16/32-height shape assertions pass the reduced candidate. Original equal-range branch produces the required one scanline. No guest-interactive claim follows from this fixture. |
+| R0545 | XP 1480-1490 | Qualified pending owner decision: storing the complete start register preserves disable-only writes. Original code compares only start bits and reads the previous disable flag, losing the new disable bit. Exact original register block fails the same real write/visibility oracle on both widths. |
+| R0546 | XP 1674 | Qualified pending owner decision: underline-only writes request existing refresh. Original path fails the produced-frame oracle on both widths. No separate drawing path is added. |
+| R0547 | XP 2717 | Qualified pending owner decision: line-specific panning is consumed by original-host painters in nt_ega.c and the original dirty updater in gfx_updt.c. Split mode requires zero panning below the split. Removing this helper alone breaks those real callers; the isolated raw-only helper probe fails resolved-pixel comparison. This is source/coupled-contract plus fixture evidence, not a claim that all coupled painter changes were restored in that probe. |
+| R0548 | XP 2802, 2836 | Qualified pending owner decision: split-panning and horizontal-panning register changes request the existing refresh when VRAM itself is unchanged. Separate exact-original restorations fail actual dirty assertions on both widths. |
+
+Snapshot reset review distinguishes required derived-state initialization from
+dead writes. vga_init already initializes DAC_data_mask and DAC_data_bits;
+DAC phase/address temporaries have no intervening consumer before the final
+saved assignments (their only readers/writers are DAC port handlers, which
+register replay does not call). The temporary sequencer index 6 is overwritten
+by the first V7 replay iteration before any consumer. These five statements
+are deleted. Protection clearing and zero-state/chain consistency remain:
+change-only original handlers otherwise retain unrelated live derived state.
+Separate removal probes fail EGA_CPU.set_reset at fixture line 1856, character
+height at 1323 and double-pixel width at 1318, respectively, on x86 and x64.
+All failures are assertions, not timeouts. The small declaration additions
+have actual copied-state/memset/reset-state consumers; no original header
+supplies the added private state declarations.
+
+The final candidate preserves all 7,168 raw-value checks and both selector
+indices in the private real-body fixture, followed by the complete existing
+VGA tests: x86 7.66 s, x64 7.00 s, both pass. An initial run overlapped another
+probe using the same disposable media filename and failed its file-open
+assertion; that run is invalid qualification, not a product defect. It was
+rerun serially after confirming the other PID exited. Initial non-elevated
+background launches exited without producing logs; authoritative PID queries
+confirmed termination before the explicit hidden Python launches. No live
+job was restarted on a timeout inference.
+
+Coordinator counter-review inspected the actual patch and original caller
+chains: restored text does not restore the wrong zero-end behavior; unsigned
+end-minus-one underflow cannot reach the restored block test because zero
+is either hidden or handled by equality first. Reused V7 reads preserve the
+index and exclude F0/F2 side-effect reads. Raw four-register cases remain for
+complete copied state. No Compat implementation was substituted for original
+logic, no new helper/API or public-component change is introduced, and the
+existing snapshot format/layout is unchanged. Necessary explanations move to
+this evidence; the port-ABI reason marker remains in source.
+
+At candidate freeze, cached builds/publication and background regressions
+were pending; the results below complete that qualification. Native desktop,
+audio and package qualification remains deferred to final acceptance under
+the owner's unaffected-path authorization.
+
+### P133 final qualification and delivery
+
+x86: cached build/publication 9.20 s; final VGA fixture 7.02 s; background **188/188** in 142.43 s.
+x64: cached build/publication 12.66 s; final VGA fixture 5.42 s; background **188/188** in 138.62 s.
+
+Both builds report 89 warnings, all in mirror sources/headers; none in public or autonomous code. Mirror, documentation and whitespace gates pass.
+
+- softpc32.exe: Nov 13 2026 21:09:40, SHA-256 7f410a64adbc479fe7db913d6d66c340137755f65da95dbd5bd07897e6816a5a.
+- softpc64.exe: Nov 13 2026 21:12:19, SHA-256 c2688195129f767cb265fcb5d674f669a696f35d4a5d669d1bb9a1e7597d28a6.
+
+Final-source identity, CRLF mirror policy and pinned XP raw identity were rechecked. Actual changed-path review confirms only this mirror source, manifest/provenance/task records and the two published EXEs change; no test, public-component, Compat, INI or guest-medium edit. Native checks are explicitly deferred, not counted as passes. No new interactive DOS/Windows guest reproduction is claimed. Existing qualification limits and pending owner decisions remain. Completed owned jobs and promoted evidence permit scratch cleanup before commit. Frontier 429/472; next file 430 base/video/vga_vide.c. S1/T100 remain open.

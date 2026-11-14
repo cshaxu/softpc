@@ -579,9 +579,7 @@ LOCAL VOID	do_new_cursor IFN0()
 
 	note_entrance0("do_new_cursor()");
 
-	/* T99 S10: disable remains authoritative during shape recomputation. */
 	if (crt_controller.cursor_start.as_bfld.cursor_off ||
-		/* T99 S14: VGA hides reversed ranges; only EGA wraps. */
 		crt_controller.cursor_end.as_bfld.cursor_end < crt_controller.cursor_start.as_bfld.cursor_start ||
 		crt_controller.cursor_start.as_bfld.cursor_start >= (unsigned)get_char_height() ) {
 		note_entrance0("No cursor");
@@ -589,7 +587,27 @@ LOCAL VOID	do_new_cursor IFN0()
 		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start | 0x20,
 					crt_controller.cursor_end.as_bfld.cursor_end);
 	}
-	else if (crt_controller.cursor_end.as_bfld.cursor_end > (unsigned)get_char_height()) {
+	else if (crt_controller.cursor_end.as_bfld.cursor_end < crt_controller.cursor_start.as_bfld.cursor_start) {
+		note_entrance0("2 cursors");
+		set_cursor_start1(0);
+		set_cursor_height1(crt_controller.cursor_end.as_bfld.cursor_end);
+		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
+		set_cursor_height(get_char_height() - get_cursor_start());
+		set_cursor_visible(TRUE);
+		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start,
+					crt_controller.cursor_end.as_bfld.cursor_end);
+	}
+	else if (crt_controller.cursor_end.as_bfld.cursor_end == crt_controller.cursor_start.as_bfld.cursor_start) {
+		note_entrance0("One line cursor");
+		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
+		set_cursor_height(1);
+		set_cursor_start1(0);
+		set_cursor_height1(0);
+		set_cursor_visible(TRUE);
+		host_cursor_size_changed(crt_controller.cursor_start.as_bfld.cursor_start,
+					crt_controller.cursor_end.as_bfld.cursor_end);
+	}
+	else if (crt_controller.cursor_end.as_bfld.cursor_end - 1 >= (unsigned)get_char_height()) {
 		note_entrance0("block cursor");
 		set_cursor_start(0);
 		set_cursor_height(get_char_height());
@@ -600,13 +618,12 @@ LOCAL VOID	do_new_cursor IFN0()
 					crt_controller.cursor_end.as_bfld.cursor_end);
 	}
 	else {
-		assert2((crt_controller.cursor_end.as_bfld.cursor_end >= crt_controller.cursor_start.as_bfld.cursor_start),
+		assert2(((crt_controller.cursor_end.as_bfld.cursor_end - 1) >= crt_controller.cursor_start.as_bfld.cursor_start),
 				"cursor values do not match default set Start %d, End %d",
 				crt_controller.cursor_end.as_bfld.cursor_end,
 				crt_controller.cursor_start.as_bfld.cursor_start);
 		note_entrance0("normal cursor");
 		set_cursor_start(crt_controller.cursor_start.as_bfld.cursor_start);
-		/* T99 S14: VGA includes the ending scanline, including 0..0. */
 		set_cursor_height(crt_controller.cursor_end.as_bfld.cursor_end - crt_controller.cursor_start.as_bfld.cursor_start + 1);
 		set_cursor_start1(0);
 		set_cursor_height1(0);
@@ -638,12 +655,12 @@ PC_palette *DAC;
 
 GLOBAL UTINY *vga_gc_outb_index_addr;
 
-
 #line 660
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
 #endif  //NEC_98
-#line 706
+#line 705
+
 GLOBAL VOID	vga_init IFN0()
 {
 #ifndef NEC_98
@@ -1444,7 +1461,6 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 					if (crtc_9_b_protect == FALSE)
 					{
 #endif /* V7VGA */
-						/* T99 S10: retain disable-only register writes. */
 						crt_controller.cursor_start.as.abyte = value;
 
 						do_new_cursor();
@@ -1630,8 +1646,6 @@ GLOBAL VOID	vga_crtc_outb IFN2(io_addr,port,half_word,value)
 				case 0x14:
 					note_entrance0("underline loc");
 					crt_controller.underline_location.as.abyte = value;
-					/* SoftPC presentation: underline-only writes use the
-					 * same refresh contract as the original EGA path. */
 					if (get_underline_start() != crt_controller.underline_location.as_bfld.underline_location)
 						screen_refresh_required();
 					set_underline_start(crt_controller.underline_location.as_bfld.underline_location);
@@ -2684,7 +2698,6 @@ GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 				set_colour_select(((AC_MODE_CONTROL*)&new)->as_bfld.select_video_bits);
 				flag_palette_change_required();
 			}
-			/* T60: changing split panning changes pixels without a VRAM write. */
 			if ((attribute_controller.mode_control.as.abyte ^ value) & 0x20)
 				screen_refresh_required();
 			attribute_controller.mode_control.as.abyte = value;
@@ -2721,7 +2734,6 @@ GLOBAL VOID	vga_ac_outb IFN2(io_addr,port,half_word,value)
 			break;
 		case 0x13:
 			note_entrance0("horiz pel panning");
-			/* T60: register-only scrolling changes the visible pixels. */
 			if (attribute_controller.horizontal_pel_panning.as.abyte != value)
 				screen_refresh_required();
 			attribute_controller.horizontal_pel_panning.as.abyte = value;
@@ -3115,13 +3127,7 @@ VOID    vote_vga_mode IFN0()
 #endif /* HUNTER */
 #line 3243
 
-/*
- * DIVERGENCE(MVDM-VIDEO-SNAPSHOT-001): standalone snapshot port ABI.  This
- * deliberately maps guest register bytes
- * and the two live C-VID latches; it never copies the legacy bitfield
- * carriers, GDP allocation, generated vectors or host pointers.  Restore
- * recreates the derived C-VID bindings through the original port handlers.
- */
+/* DIVERGENCE(MVDM-VIDEO-SNAPSHOT-001): standalone snapshot port ABI. */
 LOCAL byte snapshot_v7_selectors[SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT] = {
     0x83, 0x94, 0x9c, 0x9d, 0x9e, 0x9f, 0xa4, 0xa5, 0xc1, 0xeb,
     0xec, 0xed, 0xee, 0xef, 0xf1, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
@@ -3132,37 +3138,19 @@ LOCAL byte
 snapshot_v7_value(selector)
 byte selector;
 {
+    half_word value;
+    byte saved_index;
     switch (selector) {
-    case 0x83: return attribute_controller.address.as.abyte;
-    case 0x94: return extensions_controller.pointer_pattern;
-    case 0x9c: return extensions_controller.ptr_horiz_posn_hi.as.abyte;
-    case 0x9d: return extensions_controller.ptr_horiz_posn_lo;
-    case 0x9e: return extensions_controller.ptr_vert_posn_hi.as.abyte;
-    case 0x9f: return extensions_controller.ptr_vert_posn_lo;
-    case 0xa4: return extensions_controller.clock_select.as.abyte;
     case 0xa5: return extensions_controller.cursor_attrs.as.abyte;
-    case 0xc1: return extensions_controller.dac_control.as.abyte;
-    case 0xeb: return extensions_controller.emulation_control.as.abyte;
-    case 0xec: return extensions_controller.foreground_latch_0;
-    case 0xed: return extensions_controller.foreground_latch_1;
-    case 0xee: return extensions_controller.foreground_latch_2;
-    case 0xef: return extensions_controller.foreground_latch_3;
-    case 0xf1: return extensions_controller.fast_latch_load_state.as.abyte;
     case 0xf3: return extensions_controller.masked_write_control.as.abyte;
-    case 0xf4: return extensions_controller.masked_write_mask;
-    case 0xf5: return extensions_controller.fg_bg_pattern;
-    case 0xf6: return extensions_controller.ram_bank_select.as.abyte;
-    case 0xf7: return extensions_controller.switch_readback;
-    case 0xf8: return extensions_controller.clock_control.as.abyte;
     case 0xf9: return extensions_controller.page_select.as.abyte;
-    case 0xfa: return extensions_controller.foreground_color.as.abyte;
-    case 0xfb: return extensions_controller.background_color.as.abyte;
-    case 0xfc: return extensions_controller.compatibility_control.as.abyte;
-    case 0xfd: return extensions_controller.timing_select.as.abyte;
     case 0xfe: return extensions_controller.fg_bg_control.as.abyte;
-    case 0xff: return extensions_controller.interface_control.as.abyte;
     }
-    return 0;
+    saved_index = sequencer.address.as.abyte;
+    sequencer.address.as.abyte = selector;
+    vga_extn_inb(EGA_SEQ_DATA, &value);
+    sequencer.address.as.abyte = saved_index;
+    return value;
 }
 
 GLOBAL int
@@ -3238,24 +3226,15 @@ const softpc_device_video_controller_state *state;
     crtc_0_8_protect = FALSE;
     crtc_9_b_protect = FALSE;
     crtc_c_protect = FALSE;
-    DAC_rgb_state = DAC_RED;
-    DAC_rd_addr = DAC_wr_addr = DAC_state = 0;
-    DAC_data_mask = 0x3f;
-    DAC_data_bits = 6;
-    /* Match the cleared register file before init rebuilds C-VID rules.
-       Zero-valued replay writes deliberately skip change-only handlers. */
+
     EGA_CPU.ega_state.mode_0.lookup = 0;
     EGA_CPU.set_reset = 0;
     EGA_CPU.sr_enable = 0;
     EGA_CPU.ram_enabled = 0;
     vga_init();
 
-    /* The cleared CRTC maximum-scan-line register describes one scan line.
-       vga_init's boot-time eight-line default is not that register's state;
-       a replay of zero otherwise skips its change-only recalculation. */
     set_char_height(1);
-    /* ega_write_init starts unchained; its display-side flags must agree
-       before the transition-based sequencer handlers replay registers. */
+
     set_chain4_mode(NO);
     set_memory_chained(NO);
     set_double_pix_wid(NO);
@@ -3266,8 +3245,7 @@ const softpc_device_video_controller_state *state;
     vga_seq_map_mask(EGA_SEQ_DATA, state->sequencer[2]);
     vga_seq_char_map(EGA_SEQ_DATA, state->sequencer[3]);
     vga_seq_mem_mode(EGA_SEQ_DATA, state->sequencer[4]);
-    sequencer.address.as.abyte = 6;
-    /* The saved byte is a latch, not the EA/AE unlock/lock command. */
+
     sequencer.extensions_control.as.abyte = state->sequencer_extension_control;
 
     for (index = 0; index < SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT; ++index) {

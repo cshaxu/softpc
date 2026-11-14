@@ -30,17 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P132 completes file 428 vga_mode.c: production +1/-7, tests unchanged;
-selected XP difference falls from +9/-3 to +3/-3 (six fewer diff lines).
-Both cached builds/publications and final VGA fixtures pass. EXEs are byte
-identical to P130 after masking only PE timestamp/checksum and the unique
-compiler time string, so full regression is not repeated under the approved
-equivalence exception. P130 background 188/188 per width and P131 online
-qualification remain applicable. Default CTest Console startup is still
-qualified separately by the unchanged explicit-hidden-Console test execution.
-R0539-R0541 and earlier qualified owner decisions remain open, as do D001-D006
-and L001. Frontier 428/472; next file 429 base/video/vga_prts.c. Later unaffected
-batches may defer native tests until final acceptance. No S/T closure is claimed.
+T100 S1 P133 completes file 429 vga_prts.c: production +35/-57, tests unchanged;
+selected XP diff falls from +233/-46 to +188/-23 (68 fewer diff lines).
+Original cursor text is restored where behavior permits; snapshot V7 reads
+reuse the original handler except four required raw-state cases. Redundant
+initialization and added explanations are removed. Both cached builds and
+publications, final VGA fixtures and background 188/188 per width pass.
+Native desktop/audio/package tests are deferred to final acceptance under the
+owner's unaffected-path authorization, not counted as passes. R0543-R0548 and
+earlier qualified owner decisions remain open, as do D001-D006 and L001.
+Frontier 429/472; next file 430 base/video/vga_vide.c. No S/T closure is claimed.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 

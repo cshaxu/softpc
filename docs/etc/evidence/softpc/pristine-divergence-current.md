@@ -2316,3 +2316,17 @@ tests +70/-0. Both final builds and background suites pass; native coverage is
 14 passing CTest cases plus the two unchanged Console binaries passing in
 explicit hidden Console processes. The default CTest Console startup limitation
 remains separately recorded, not misreported as repaired.
+
+
+### T100 S1 P133 vga_prts.c original-first minimization
+
+The current selected diff is +188/-23 versus +233/-46 before (68 fewer diff
+lines). Original cursor branches/expressions are restored where compatible;
+required VGA disable/reversed guards and inclusive end remain. Snapshot V7
+capture reuses original reads except four raw masked/subfield cases; redundant
+DAC/index initialization and added commentary are removed. Production +35/-57,
+tests unchanged. R0542-R0548 in T100 evidence supersede blanket historical
+retention: required snapshot/cursor/refresh residuals remain qualified pending
+owner choice. Both widths build/publish and pass focused plus 188 background
+tests each; unaffected native checks are deferred by owner authorization.
+Existing excluded bodies are unchanged and receive no new accounting.
