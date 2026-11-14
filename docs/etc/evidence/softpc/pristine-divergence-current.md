@@ -2497,3 +2497,14 @@ both widths. Full final qualification passes 392/392. R0657/R0662/R0663 retain
 qualified native-header, NTVDM host and archive decisions, supported by compile
 failures and field-withdrawal assertions. No native FM output is activated.
 See [ordered evidence](m9-t100-progress.md#file-464-hostsrcnt_sbfmc-p155).
+
+## T100 S1 P156 nt_sbmid.c original-first reconciliation
+
+Restores original declarations, six complete inactive native helpers and matching
+parser structure; source +438/-37, tests +16/-0, XP diff reduced by 407 lines.
+The actual output remains the single existing Compat/Lib path. R0665-R0672 in
+[the audit evidence](m9-t100-progress.md#file-465-hostsrcnt_sbmidc-p156) supersede
+blanket retention claims: copied-message, host lifetime, archive and pause
+differences remain qualified owner choices. Unchanged original inactive defects
+are recorded there, not silently patched or sent to TODO. Final-source dual-width
+builds and all 392 tests pass; excluded bodies receive no new accounting.

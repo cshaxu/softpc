@@ -5,6 +5,14 @@
 #include "host_def.h"
 #include "nt_sb.h"
 
+MIDIOPENPROC MidiOpenProc;
+MIDIPREPAREHEADERPROC MidiPrepareHeaderProc;
+MIDICLOSEPROC MidiCloseProc;
+GETMIDIVOLUMEPROC GetMidiVolumeProc;
+SETMIDIVOLUMEPROC SetMidiVolumeProc;
+MIDIRESETPROC MidiResetProc;
+MIDIUNPREPAREHEADERPROC MidiUnprepareHeaderProc;
+
 /* The executor is quiescent here; parser, Compat and native Lib output are
  * real. This test does not emulate CPU execution or measure acoustic output. */
 int softpc_ccpu_lifecycle_exit_requested(void) { return 0; }

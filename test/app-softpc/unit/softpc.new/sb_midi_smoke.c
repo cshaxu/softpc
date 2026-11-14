@@ -5,6 +5,14 @@
 #include "compat/sb_midi.h"
 #include "compat/devices/snapshot.h"
 
+MIDIOPENPROC MidiOpenProc;
+MIDIPREPAREHEADERPROC MidiPrepareHeaderProc;
+MIDICLOSEPROC MidiCloseProc;
+GETMIDIVOLUMEPROC GetMidiVolumeProc;
+SETMIDIVOLUMEPROC SetMidiVolumeProc;
+MIDIRESETPROC MidiResetProc;
+MIDIUNPREPAREHEADERPROC MidiUnprepareHeaderProc;
+
 static lib_u8 messages[64][LIB_AUDIO_MIDI_SYSEX_MAX_BYTES];
 static lib_u32 lengths[64], sent, attempts, resets, fail_attempt;
 static lib_status host_status;

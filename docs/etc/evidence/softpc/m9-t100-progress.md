@@ -11517,3 +11517,141 @@ Published SHA-256:
 
 P155 advances the delivered frontier to 464/472; next host/src/nt_sbmid.c.
 Eight files and qualified owner decisions keep S1/T100 open.
+
+## File 465 host/src/nt_sbmid.c investigation (not delivered)
+
+The fixed XP counterpart is read from the pinned commit, not a sibling working
+tree. Current production compiles the file in softpc-machine-devices. The actual
+MPU UART data path is SbIOWrite -> BufferMidi; SbService drains SendMidiRequest;
+SbSetRunning invokes MidiSetRunning. The SB archive captures/restores the MIDI
+parser and logical voices. Compat sb_midi owns Lib MIDI output, cancellation,
+volume and native lifetime. These consumers establish scope, not necessity of
+every local deviation. No production or permanent test changes are installed.
+
+An isolated experiment includes the complete, unchanged XP nt_sbmid.c body.
+Only platform declarations/diagnostics and the native short-message sink are
+provided by a private fixture. REPORT_SB_MODE remains disabled. Both compiler
+widths build and execute. To isolate parser behavior from pointer truncation,
+the fixture reserves its buffer at 0x20000000 and initializes the original ring
+fields as InitializeMidi does; it does not run native device initialization.
+Input 90 3C 64 produces zero sends; an explicit SendMidiRequest still produces
+zero. Completing running-status bytes 3D 65 sends only the preceding 00643C90.
+A following F8 sends 0000653D; another explicit drain still leaves F8 queued.
+Both architectures produce the same trace. This proves original tail retention
+at the native-call boundary, not a real synth's interpretation of running status
+or a historical guest symptom.
+
+A separate x64 invocation reserves the buffer at 0x120000000. Reservation is
+asserted successful before calling the original parser; its ULONG-based pointer
+arithmetic then exits with 0xc0000005. This isolates the pointer-width defect
+from the tail observation. The negative exit is expected evidence, not a passing
+test. No real MIDI device, guest, media, configuration or published EXE is used.
+
+Counter-review: these two failures do not justify the whole replacement parser,
+voice continuation or all omitted original host helpers. Full-file reconciliation,
+coherent smaller-restoration experiments, archive/lifetime withdrawal evidence
+and XP-relative metrics remain unfinished. No point is declared qualified solely
+because current tests pass. Frontier remains 464/472; R0665 is still the next
+unallocated decision ID. Task-owned probes remain in build/t100-s1 only while
+this investigation is active; their actual processes have exited.
+
+### File 465 point review and restoration candidate
+
+| Point | Original/current difference and first review | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0665 | XP includes windows.h and defines the ring constants, CMDHDR, LONG parser counters and native declarations. Local storage uses a bounded copied-message array and extra pending fields. | Restore original include, constants, type, independent declarations and LONG counter spelling/initialization. Keep the array/pending fields as qualified message-boundary choices: the high-address probe proves original pointer arithmetic unsafe, but does not by itself justify every field. |
+| R0666 | XP OpenMidiDevice, SetMidiOutVolume, ResetMidiDevice, CloseMidiDevice, MidiCopyMessages and DetachMidi were absent. | Restore all six complete original bodies. None has a current production caller; the preserved native declarations are initialized inactive. Current output stays on the existing Compat/Lib path. Original flaws in these inactive helpers are not silently fixed. |
+| R0667 | XP InitializeMidi allocates/owns the ring, native message buffers and native device; current SbInitialize opens Compat/Lib and resets the parser. | Whole original activation cannot simply replace the current path: both-width original probes show tail retention, and even a pointer/tail-corrected original ring fails the real Lib message validator for running status, interrupted SysEx and undefined common messages. Native reset waits for queued headers before issuing cancellation; this is different from current cancellable lifetime. The omission remains a qualified owner choice, not proof that no redesign could reuse more original code. |
+| R0668 | Current capture/restore additions serialize parser prefixes, pending messages and logical voices; XP has no archive implementation. | Withdrawing prefix restoration fails the actual existing round-trip fixture on both widths. The state validator prevents restored out-of-range indices and invalid message prefixes; existing negative archives are checked before mutation. The evidence supports the copied state contract, not blanket approval of its implementation or future archive formats. Qualified owner choice. |
+| R0669 | PruneMidiNotes, RememberMidiMessage, RestoreMidiNotes and MidiSetRunning add pause/reset and voice continuation absent from XP. | Removing note tracking fails expected restored notes; omitting host reset on pause fails the reset assertion, both widths. Supported current user behavior includes approximate continuation. Keep these as qualified owner choices; no claim of sample-exact synth envelopes or host polyphony. |
+| R0670 | ResetMidiParser initializes current message/pedal state without opening a second host device. | Current MPU reset/initialization callers are traced in nt_sb.c. This is coupled to the retained copied-message/archive contract; original InitializeMidi is not an equivalent parser-only reset. No new entry is added. Qualified owner choice. |
+| R0671 | SendMidiRequest returns status, sends complete messages including the final one, keeps failed output pending and accounts for notes. XP's void sender excludes LastCommand and ignores native submission errors. | Tail retention is dynamically proved against the unchanged original body. Removing current failure propagation fails the exact host-error fixture on both widths. Restore original function layout and description; complete-message/status behavior remains a qualified owner choice. |
+| R0672 | BufferMidi differs in real-time interleaving, incomplete-message handling, SysEx bounds/EOX and materialized running status. Its unchanged command length calculation and diagnostics were reformatted/removed. | Restore the original signature layout, descriptions, matching length calculation, running-status diagnostic/control structure and final byte-store/increment statements. Removing materialized status or oversize tracking fails both-width fixtures. The corrected-original-ring probe isolates further incompatibility after fixing pointer/tail defects. Keep necessary parser adaptations as qualified owner choices, not a newly approved wholesale rewrite. |
+
+The actual existing sb_midi_smoke is compiled with each architecture's Ninja
+fixture flags. Baseline and the first restoration candidate pass on both widths.
+Six controlled withdrawals per width fail at their intended observable assertions:
+note tracking (message bytes), prefix restore (message existence/length), host
+reset on pause (reset count), host error propagation (LIMIT_EXCEEDED), materialized
+running status (message existence/length), and SysEx overflow rejection
+(UNSUPPORTED). All variants compile/link; these are twelve intentional assertion
+failures, not failed release tests. This evidence is limited to those contracts.
+
+A further coherent private original-ring experiment corrects pointer width and
+the ready-tail boundary in both copy/send loops. Its native sinks call the real
+audio_midi_short_pack/audio_midi_sysex_validate implementation, without opening
+audio. Both widths accept 90 3C 64; they reject original packed 3D 65 without a
+status, F0 01 and 02 F7 fragments around F8, and F4. This is a boundary comparison,
+not a proposed patch or a guest reproduction. No new production path is added.
+
+Original SetMidiOutVolume is also exercised with controlled MMRESULT values.
+MMSYSERR_NOERROR leads to zero set calls and unchanged saved volume; an error
+leads to one set call and adoption of the output value. Both widths agree. This
+is an original error-check inversion, recorded with this diff decision rather
+than TODO; the restored inactive function is not patched. Current Compat volume
+logic already distinguishes OK/UNSUPPORTED and retains cancellation ownership.
+
+The larger candidate restores all six independent original helpers and passes
+the existing MIDI fixture on both widths. Its seven null native callback-pointer
+definitions belong only to the isolated test link; production obtains these from
+nt_sb.c. They do not open a synthesizer. Source growth is intentional original
+restoration; the normalized XP-relative added/deleted diff decreases by 407
+lines. Excluded bodies remain untouched and receive no new accounting.
+The smaller candidate passed 392/392 but does not qualify the larger candidate.
+The larger candidate's first full build caught missing native callback-pointer
+objects in the separate sb_midi_native_smoke fixture. The same seven declaration
+objects were added there, with no behavior mocks or new test paths. Both owned
+fixtures use LF; the mirror stays CRLF. This link failure is not described as a
+host MIDI failure. Its evidence is retained until final delivery.
+
+Final source is installed: production +438/-37 (net +401), tests +16/-0 across
+the two existing MIDI fixtures. Independent brace-aware review verifies all six
+restored bodies exactly match the fixed XP source, whose normalized SHA-256 is
+75b271b759c1da2b940dbc54c5c227b10546167b49c0f1394b385392b41b603d.
+The existing SbInitialize -> ResetAll -> ResetMidiParser chain initializes the
+active parser before use; restoring original static initializers does not replace
+that lifecycle. The restored native helper chain has no existing activation
+caller; internal calls among those original helpers do not activate a device.
+Final-source dual-architecture qualification is in progress. No full-file
+delivery/frontier advance is claimed until it passes and the P is pushed.
+
+## File 465 host/src/nt_sbmid.c P156
+
+Final-source cached builds and all 392 tests pass:
+
+| Architecture | Build | Background | Native desktop/audio/package |
+| --- | --- | --- | --- |
+| x86 | 7.22 s | 188/188, 151.87 s | 8/8, 20.26 s |
+| x64 | 12.53 s | 188/188, 149.9 s | 8/8, 15.89 s |
+
+Actual production diff is +438/-37 (net +401); test fixture declarations are
++16/-0 (net +16). XP-relative added/deleted diff decreases by 407 lines. This is
+original code restoration, not a claim that fewer source lines mean less diff.
+The complete six-body comparison, real caller scan, fixed XP hash, CRLF/LF
+verification and final source identity have been independently checked. No
+shared eight-tree, guest, configuration, media or snapshot changes are included.
+No native test is deferred. No new real-guest MIDI symptom or audible fidelity
+claim is made from isolated parser/native-call evidence.
+
+R0666 is restored; R0665 and R0667-R0672 retain qualified owner decisions.
+Original inactive helper defects are not new repairs. The first incomplete
+native fixture link is superseded by the complete final build, not hidden as a
+desktop failure. The earlier smaller candidate's passes remain separate evidence.
+Task jobs were confirmed exited and disposable scratch removed before commit;
+the build-residue check passes. Neither final test log reports skipped tests.
+
+Published SHA-256:
+
+- softpc32.exe: `31dfefd2b2ce6f797121506fa77cf4668915b6e75a4a6541236cac108fbed5cf`.
+- softpc64.exe: `bf63631f5412b2c8b01f55130f5860aba8e66b7121d907548a2d3465d335953a`.
+
+P156 advances the delivered frontier to 465/472; next host/src/nt_sbmxr.c.
+Seven files and qualified owner decisions keep S1/T100 open.
+
+Build warning scope: x86 emits no warning; x64 emits twelve pointer-conversion
+warnings, all in the restored original inactive nt_sbmid.c helpers/macros across
+its compile consumers. No public component or owned fixture warning is present.
+These original bodies are not safe for an unreviewed future x64 activation; their
+lack of an actual activation caller is checked, not assumed from passing tests.
+The owner's mirror-warning exemption applies; no suppression or new original
+pointer patch is introduced to make this audit look warning-free.

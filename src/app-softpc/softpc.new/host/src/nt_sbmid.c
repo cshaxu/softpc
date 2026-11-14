@@ -1,5 +1,6 @@
 #include "insignia.h"
 #include "host_def.h"
+#include <windows.h>
 #include "sndblst.h"
 #include "nt_sb.h"
 #line 7
@@ -13,13 +14,243 @@
 /* T93: complete copied messages replace native CMDHDR/MIDIHDR ring framing.
  * Guest parsing remains here; Compat owns only the host output. No pointer
  * is narrowed to a buffer index and no following command flushes a tail. */
+#define MIDI_BUFFER_SIZE 0x1000
+#define MESSAGE_HEADERS 4
+#define MESSAGE_CHUNK_SIZE (256+128)
+#define MIDI_BUFFER_FULL_THRESHOLD (256 - sizeof(MIDIHDR))
+#define MESSAGE_BUFFER_SIZE (MESSAGE_CHUNK_SIZE * MESSAGE_HEADERS)
+#define Align(addr) (addr = (addr + Alignment) & ~Alignment)
+#define ToBufferIndex(i) (i = i % MIDI_BUFFER_SIZE)
+#define ToBufferAddr(i) (i + (ULONG)MidiBuffer);
+
 static IU8 MidiBuffer[LIB_AUDIO_MIDI_SYSEX_MAX_BYTES];
-static IU32 NextData;
-static IU32 BytesLeft;
-static IU32 LastCommandLength;
-static IU8 RunningStatus;
+
+UCHAR *MessageBuffer;
+PMIDIHDR MidiHdrs[MESSAGE_HEADERS];
+
+HMIDIOUT HMidiOut;
+LONG NextData,LastData;
+LONG BytesLeft;
+LONG NextCopyPosition = 0;
+LONG LastCommand;
+LONG LastCommandLength = 1;
+LONG RunningStatus;
+ULONG Alignment;
+BOOL MidiInitialized = FALSE;
+
+DWORD OriginalMidiVol;
+DWORD PreviousMidiVol;
+
+typedef struct {
+    //ULONG Time;
+    ULONG Length;
+} CMDHDR;
+
 static IU8 RealtimePending;
 static IBOOL DiscardSysEx;
+
+BOOL
+OpenMidiDevice(
+    HANDLE CallbackEvent
+    )
+
+/*++
+
+Routine Description:
+
+    This function opens MIDI device.
+
+Arguments:
+
+    CallbackEvent - specifies the callback Event
+
+Return Value:
+
+    TRUE - if success otherwise FALSE.
+
+--*/
+
+{
+   UINT rc,i;
+
+   for (i = 0 ; i < MESSAGE_HEADERS; i++) {
+       MidiHdrs[i] = (MIDIHDR *) (MessageBuffer + i *  MESSAGE_CHUNK_SIZE);
+       MidiHdrs[i]->lpData = (LPSTR)((ULONG)MidiHdrs[i] + sizeof(MIDIHDR));
+       MidiHdrs[i]->dwBufferLength = MESSAGE_CHUNK_SIZE - sizeof(MIDIHDR);
+       MidiHdrs[i]->dwUser = 0;
+       MidiHdrs[i]->dwFlags = 0;
+   }
+
+   if (CallbackEvent) {
+      rc = MidiOpenProc(&HMidiOut, (UINT)MIDIMAPPER, (DWORD)CallbackEvent, 0, CALLBACK_EVENT);
+   } else {
+      rc = MidiOpenProc(&HMidiOut, (UINT)MIDIMAPPER, 0, 0, CALLBACK_NULL);
+   }
+
+   if (rc != MMSYSERR_NOERROR) {
+      dprintf1(("Failed to open MIDI device - code %d", rc));
+      return FALSE;
+   }
+   if (HMidiOut) {
+       for (i = 0 ; i < MESSAGE_HEADERS; i++) {
+           if (MMSYSERR_NOERROR != MidiPrepareHeaderProc(HMidiOut, MidiHdrs[i], sizeof(MIDIHDR))) {
+               dprintf1(("Prepare MIDI hdr failed"));
+               MidiCloseProc(HMidiOut);
+               HMidiOut = NULL;
+               return FALSE;
+           }
+       }
+       GetMidiVolumeProc(HMidiOut, &OriginalMidiVol);
+       PreviousMidiVol = OriginalMidiVol;
+   }
+   return TRUE;
+}
+
+VOID
+SetMidiOutVolume(
+    DWORD Volume
+    )
+
+/*++
+
+Routine Description:
+
+    This function sets MidiOut volume
+
+Arguments:
+
+    Volume - specifies the volume scale
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    DWORD currentVol;
+
+    if (HMidiOut) {
+        if (GetMidiVolumeProc(HMidiOut, &currentVol)) {
+            if (currentVol != PreviousMidiVol) {
+                //
+                // SOmeone changed the volume besides NTVDM
+                //
+
+                OriginalMidiVol = currentVol;
+            }
+            PreviousMidiVol = Volume;
+            SetMidiVolumeProc(HMidiOut, Volume);
+        }
+    }
+}
+
+VOID
+ResetMidiDevice(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function resets MIDI device.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    ULONG i;
+
+    dprintf2(("Resetting MIDI device"));
+    if (HMidiOut) {
+
+        //
+        // Make sure all the headers are done playing
+        //
+
+        i = 0;
+        while (i < MESSAGE_HEADERS) {
+            if (MidiHdrs[i]->dwFlags & MHDR_INQUEUE) {
+                Sleep(5000);
+            } else {
+                i++;
+            }
+        }
+
+        //
+        // Now reset the MIDI out device
+        //
+
+        if (MMSYSERR_NOERROR != MidiResetProc(HMidiOut)) {
+            dprintf1(("Unable to reset MIDI out device"));
+        }
+    }
+    dprintf2(("MIDI device reset"));
+}
+
+VOID
+CloseMidiDevice(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function shuts down and closes MIDI device.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+   ULONG i;
+   DWORD currentVol;
+
+   dprintf2(("Closing MIDI device"));
+
+   if (MidiInitialized) {
+       ResetMidiDevice();
+   }
+
+   if (HMidiOut) {
+
+       if (GetMidiVolumeProc(HMidiOut, &currentVol)) {
+           if (currentVol == PreviousMidiVol) {
+               //
+               // If we are the last one changed volume restore it
+               // otherwise leave it alone.
+               //
+               SetMidiVolumeProc(HMidiOut, OriginalMidiVol);
+           }
+       }
+
+       for (i = 0 ; i < MESSAGE_HEADERS; i++) {
+           if (MMSYSERR_NOERROR != MidiUnprepareHeaderProc(HMidiOut, MidiHdrs[i], sizeof(MIDIHDR))) {
+               dprintf1(("Unprepare MIDI hdr failed"));
+           }
+       }
+       if (MMSYSERR_NOERROR != MidiCloseProc(HMidiOut)) {
+          dprintf1(("Unable to close MIDI out device"));
+       }
+       HMidiOut = NULL;
+   }
+   dprintf2(("Midi Closed"));
+}
 
 /* T93: logical sounding notes survive a host pause, not native handles or
  * envelopes. One voice per channel/key is the deliberate host-MIDI limit. */
@@ -231,32 +462,30 @@ void ResetMidiParser(void)
     MidiRunning = TRUE;
 }
 
-lib_status SendMidiRequest(void)
-{
-    lib_status result;
-    /* A stop can release the paused executor before its CCPU exit signal.
-     * Servicing retained output while paused is idle, not a host fault. */
-    if (!MidiRunning) return LIB_STATUS_OK;
-    if (RealtimePending) {
-        result = softpc_sb_midi_write(&RealtimePending, 1);
-        if (result != LIB_STATUS_OK) return result;
-        if (RealtimePending == 0xff) {
-            memset(MidiNotes, 0, sizeof(MidiNotes));
-            memset(MidiSustain, 0, sizeof(MidiSustain));
-            memset(MidiSostenuto, 0, sizeof(MidiSostenuto));
-        }
-        RealtimePending = 0;
-    }
-    if (NextData && !BytesLeft && RunningStatus != 0xf0) {
-        result = softpc_sb_midi_write(MidiBuffer, NextData);
-        if (result != LIB_STATUS_OK) return result;
-        RememberMidiMessage(MidiBuffer);
-        NextData = 0;
-    }
-    return LIB_STATUS_OK;
-}
+lib_status
+BufferMidi(
+    BYTE data
+    )
 
-lib_status BufferMidi(IU8 data)
+/*++
+
+Routine Description:
+
+    This function receives MIDI command/data.  Make sure that while we are loading
+    a command that we track the midi state correctly.  In other words, handle system
+    realtime messages and system common messages correctly.  Also handle cases when
+    bytes get dropped out of commands.
+
+Arguments:
+
+    data - supplies a byte as data or command.
+
+Return Value:
+
+    None.
+
+--*/
+
 {
     lib_status result;
     if (!MidiRunning) return LIB_STATUS_INVALID_STATE;
@@ -302,7 +531,10 @@ lib_status BufferMidi(IU8 data)
         NextData = 0;
         BytesLeft = 0;
         if (data >= 0xf0) {
+            //
             // This is a system common message. It cancels any running status.
+            //
+
             RunningStatus = 0;
             LastCommandLength = 0;
             switch (data) {
@@ -312,10 +544,10 @@ lib_status BufferMidi(IU8 data)
                 return LIB_STATUS_OK;
             case 0xf1:
             case 0xf3:
-                BytesLeft = 2;
+                BytesLeft=2;
                 break;
             case 0xf2:
-                BytesLeft = 3;
+                BytesLeft=3;
                 break;
             case 0xf6:
                 BytesLeft = 1;
@@ -324,27 +556,196 @@ lib_status BufferMidi(IU8 data)
                 return LIB_STATUS_OK;
             }
         } else {
+            //
             // This is the start of a standard midi command.
             // Track the running status.
+            //
+
             RunningStatus = data;
+
             if (data < 0xc0 || data > 0xdf) {
-                BytesLeft = 3;
+                BytesLeft=3;
             } else {
-                BytesLeft = 2;
+                BytesLeft=2;
             }
             LastCommandLength = BytesLeft;
+
         }
     } else if (!BytesLeft) {
-        if (!RunningStatus) return LIB_STATUS_OK;
+            //
+            // This should be the start of a new command.
+            // We better have a valid running status.
+            //
+
+            if (RunningStatus) {
+                dprintf3(("Using running status 0x%x!", RunningStatus));
+                BytesLeft = LastCommandLength - 1;
+
+            } else {
+                // No valid running status, so we drop these bits
+                // on the floor.
+                dprintf1(("Received data 0x%x without running status.  Dropping!", data));
+                return LIB_STATUS_OK;
+            }
+
         /* Lib receives complete messages, never implicit running status. */
         MidiBuffer[NextData++] = RunningStatus;
-        BytesLeft = LastCommandLength - 1;
     }
 
-    MidiBuffer[NextData++] = data;
-    --BytesLeft;
+    //
+    // Now save the data and update the indeces
+    // and counts.
+
+    MidiBuffer[NextData] = data;
+    NextData++;
+    BytesLeft--;
     if (!BytesLeft) return SendMidiRequest();
     return LIB_STATUS_OK;
+}
+
+DWORD
+MidiCopyMessages (
+    PUCHAR Buffer
+    )
+
+/*++
+
+Routine Description:
+
+    This function copies MIDI data from MIDI buffer to Message Buffer.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    CMDHDR *header;
+    ULONG totalLength = 0, length;
+
+    dprintf3(("Midi: copy messages"));
+    while (NextCopyPosition != LastCommand) {
+        header = (CMDHDR *)ToBufferAddr(NextCopyPosition);
+        length = header->Length;
+
+        //
+        // perform copy from MidiBuffer to message buffer
+        // take care of the wrapping condition
+        //
+
+        NextCopyPosition += sizeof(CMDHDR);
+        ToBufferIndex(NextCopyPosition);
+        totalLength += length;
+        while (length != 0) {
+            *Buffer++ = MidiBuffer[NextCopyPosition++];
+            length--;
+            ToBufferIndex(NextCopyPosition);
+        }
+
+        //
+        // Leave NextCopyPosition at the beginning of next command
+        //
+
+        Align(NextCopyPosition);
+        ToBufferIndex(NextCopyPosition);
+
+        //
+        // Don't overflow our message buffer
+        //
+
+        if (totalLength >= MIDI_BUFFER_FULL_THRESHOLD) {
+            break;
+        }
+    }
+    return totalLength;
+}
+
+lib_status
+SendMidiRequest(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function calls MidiOut API to send midi request.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    always returns 0
+
+--*/
+
+{
+    lib_status result;
+    /* A stop can release the paused executor before its CCPU exit signal.
+     * Servicing retained output while paused is idle, not a host fault. */
+    if (!MidiRunning) return LIB_STATUS_OK;
+    if (RealtimePending) {
+        result = softpc_sb_midi_write(&RealtimePending, 1);
+        if (result != LIB_STATUS_OK) return result;
+        if (RealtimePending == 0xff) {
+            memset(MidiNotes, 0, sizeof(MidiNotes));
+            memset(MidiSustain, 0, sizeof(MidiSustain));
+            memset(MidiSostenuto, 0, sizeof(MidiSostenuto));
+        }
+        RealtimePending = 0;
+    }
+    if (NextData && !BytesLeft && RunningStatus != 0xf0) {
+        result = softpc_sb_midi_write(MidiBuffer, NextData);
+        if (result != LIB_STATUS_OK) return result;
+        RememberMidiMessage(MidiBuffer);
+        NextData = 0;
+    }
+    return LIB_STATUS_OK;
+}
+
+VOID
+DetachMidi(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function cleans up the MIDI process to prepare to exit.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    dprintf2(("Detach MIDI"));
+
+    if (MidiInitialized) {
+
+        //
+        // Free allocated memory
+        //
+
+        CloseMidiDevice();
+        VirtualFree(MidiBuffer, 0, MEM_RELEASE);
+        VirtualFree(MessageBuffer, 0, MEM_RELEASE);
+
+        MidiInitialized = FALSE;
+    }
 }
 
 #line 863

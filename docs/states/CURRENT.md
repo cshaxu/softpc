@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P155 restores original nt_sbfm.c selected behavior and structure,
-including the AD_MASK-only timer status guard. Production +171/-26; tests +4/-1;
-XP diff falls by 189 lines. Both architectures pass all 392 tests; corrected
-expectations fail against the prior implementation, and archive withdrawals
-fail their corresponding assertions. R0657-R0664 record the complete review;
-NTVDM host and archive residuals remain qualified owner choices.
-Frontier 464/472; next host/src/nt_sbmid.c. Eight files and qualified owner
+T100 S1 P156 restores original nt_sbmid.c declarations, six inactive native
+helpers and matching parser structure. Production +438/-37; tests +16/-0;
+XP diff falls by 407 lines. Final-source x86/x64 builds and all 392 tests pass.
+Original-body and controlled withdrawal probes qualify the remaining copied
+message, archive and pause contracts; they do not approve every residual line.
+R0665-R0672 record the complete review and pending owner choices.
+Frontier 465/472; next host/src/nt_sbmxr.c. Seven files and qualified owner
 decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-464-hostsrcnt_sbfmc-p155).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-465-hostsrcnt_sbmidc-p156).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
