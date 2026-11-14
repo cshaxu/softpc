@@ -2217,3 +2217,14 @@ expanded parameter values; original thresholds and retained keyboard/timer
 idle integration are unchanged. Selected code now matches XP. Source +2/-2
 reduces mirror diff by four lines, without a residual decision for this file.
 Both final dual EXEs are rebuilt/published and full regression passes 392/392.
+
+
+### T100 S1 P113 quick_ev.c original-first review
+
+The selected original event/calibration implementation matches pinned XP.
+Remove six added explanation lines before the snapshot extension (source
++0/-6; XP-relative added/deleted difference decreases by six). The remaining
+230-line snapshot extension and one relocated historical notice are qualified
+pending decisions R0496/R0495 in the T100 evidence, not automatically approved
+retention. Actual archive consumers and original API limitations are recorded
+there. Existing excluded bodies/scaffolding are not re-audited or counted.

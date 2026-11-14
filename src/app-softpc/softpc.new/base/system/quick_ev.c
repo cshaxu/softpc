@@ -999,12 +999,6 @@ VOID delete_tic_event IFN1(q_ev_handle,  handle )
 		tic_ev_get_count );
 }
 
-/*
- * Archive only the semantic queue state.  The live links and callbacks remain
- * process-local; callers provide the small, audited callback-ID translation.
- * This intentionally does not reuse add_event(): zero-delay records must not
- * execute while an archive is being restored.
- */
 LOCAL int
 snapshot_capture_list(head, table, entries, capacity, count, hash_head,
                       encode)

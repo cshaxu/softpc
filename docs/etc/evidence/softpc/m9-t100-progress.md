@@ -8158,3 +8158,84 @@ No build, publication or runtime rerun is warranted for this documentation-only
 delivery; P111 remains the unchanged dual-EXE and 392/392 regression baseline.
 No scratch, configuration, media or snapshot changes. Frontier advances to
 409/472, next 410 base/system/quick_ev.c; prior pending decisions remain open.
+
+
+## File 410: base/system/quick_ev.c (P113)
+
+Pinned XP raw SHA-256 e2ca6ab27c1e8b474902bda1c6c8a4b06e634cce062fa7ca07daac7b1e8658f4.
+Full comparison outside existing excluded bodies/scaffolding finds the
+relocated historical notice and the snapshot extension between delete_tic_event
+and the original calibration functions. Original selected event insertion,
+deletion, dispatch and calibration code is unchanged. Exclusions receive no
+new accounting.
+
+R0495, local59 / original60: one relocated historical copyright notice remains
+necessary under source policy after the excluded SCCSID body. Qualified
+retention decision, +1 original-relative line; not a runtime modification.
+
+R0496, original insertion boundary1026 / local1002 onward: the snapshot
+extension owns capture, measurement and restoration of private quick/tick
+queues. Actual consumers are Compat devices/archive.c capture/restore, reached
+by Compat ccpu/archive.c; queue records are serialized by device_write_queue
+and device_read_queue. Callback translation covers actual timer, CMOS, floppy,
+hard-disk, keyboard, serial, parallel, mouse, Sound Blaster and delayed-EOI
+callbacks. Native pointers are not serialized. Existing quick_ev.h declarations
+were separately audited in P92, not taken as proof by themselves.
+
+Source necessity: the original queues, hash chains, handles and tick counter
+are private to this translation unit. The original public add/delete APIs do
+not capture these states, cannot prescribe restored handles/hash order, and
+add_event immediately executes a zero-delay callback. Replacing reconstruction
+with those calls would not preserve restore-without-dispatch semantics. Removing
+the extension breaks the actual archive consumers; moving these same private
+operations to Compat would not remove complexity or improve ownership.
+
+Counter-review of the implementation: capture translates callbacks and checks
+hash membership against the ordered list; restore constructs temporary lists,
+validates callback IDs and hash links, cleans temporary allocations on failure,
+and only replaces live queues after both lists succeed. The original free-list
+cleanup helper is reused. Measurement enables actual-size archive allocation.
+No second event dispatcher or timer policy is added. These are concrete source
+reasons for the retained extension, not a claim that every malformed archive
+or allocation-failure combination has been dynamically covered.
+
+R0497 removes the six-line added explanatory comment before the extension;
+its rationale is preserved here. Source +0/-6; permanent tests unchanged;
+XP-relative added lines decrease by six, deleted lines unchanged. The remaining
+extension is 230 added lines, including its separators, and remains a qualified
+owner decision under R0496. No original selected statement is changed.
+
+Existing checkpoint_smoke exercises real Machine/reset and the real quick/tick
+queues: capture, late invalid callback restore failure preserving live state,
+successful restore without executing callbacks, then ordered dispatch. Existing
+queue_archive_smoke checks hash-chain membership including an orphan after a
+valid prefix. These cover distinct observable contracts, not exhaustive guest
+snapshot behavior. Final-source dual-width builds and these tests are running;
+frontier remains 409/472 until this delivery is verified.
+
+### P113 final verification and independent review
+
+Both cached builds and publication complete successfully. Whole-EXE comparison
+to P111 is identical on each architecture after masking only PE timestamp and
+checksum (PE+8 and PE+88, four bytes each) and the eight compiler-time bytes
+at the unique unchanged Nov 13 date/time literal location. All other bytes,
+lengths and that literal position match. Under the owner-approved equivalence
+exception the full suite is not repeated; P111 remains the 392/392 full-runtime
+baseline. Fresh checkpoint_smoke and queue_archive_smoke both pass on both
+architectures: 4/4 (x86 1.86 seconds, x64 4.05 seconds total).
+
+Each build emits 178 diagnostics marked warning, all located in the preserved
+mirror tree, not the public components. No warning cleanup is mixed into this
+audit and this delivery is not claimed warning-free.
+
+x86: compiler timestamp 17:45:15 Nov 13 2026, SHA-256 bb40ba3f8a9edd203281d193cb87e40363b566cb1b6d075270aed7657d6520ea.
+
+x64: compiler timestamp 17:45:31 Nov 13 2026, SHA-256 e92b69169daa2702cd0eda7d7f945a0efe3d5fc8290f2b067fd5efa00fa2c912.
+
+Independent actual-diff review confirms exactly six removed comment lines,
+no executable-code change, no new path, no moved implementation, and the
+normalized local manifest update. Mirror CRLF remains intact; documentation
+uses LF. User INI is unchanged and guest/media/snapshot files are untouched.
+The owned background process exited. Frontier advances to 410/472; next 411
+base/system/rom.c. R0495/R0496 and earlier qualified decisions remain open;
+no task closure or complete snapshot correctness is claimed.
