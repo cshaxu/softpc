@@ -8705,3 +8705,49 @@ and integration inspection, not new runtime proof. No rebuild/test run is
 needed for the documentation-only update; P119 artifacts and P114 full 392/392
 baseline remain. Frontier 418/472; next 419 base/video/ega_prts.c. S1 remains
 active and earlier qualified decisions remain open. No scratch or job created.
+
+## File 419: ega_prts.c (P122)
+
+Pinned XP raw SHA-256 a8e0f61aa9e9424b1cda069e814d7e04b761e9ad8342424e3602457cc00eda5f.
+Complete-file comparison, including mixed diff ranges and deletion-only
+fragments, finds only the added reset-state getter outside existing exclusion
+and line-control scaffolding. Those excluded bodies/scaffolding receive no
+new accounting. Original cursor calculations and other selected register
+handlers remain exactly XP; no new repair is inferred from their presence.
+
+R0514: ega_snapshot_seq_reset, seven added lines including reason comment and
+separators, is qualified pending owner decision. This accesses the actual
+static EGA sequencer.reset.as.abyte; it does not create a second state owner.
+Actual chain: Compat devices/archive.c captures video_controller through
+softpc_device_snapshot_capture_video_controller in vga_prts.c, which invokes
+this getter. Both EGA and VGA port initialization register ega_seq_reset as
+the reset write receiver. The receiver writes this private EGA storage and
+updates ASYNC_RESET/SYNC_RESET display-disable bits.
+
+Independent counter-review of original alternatives: the ordinary original
+vga_seq_inb register-zero case always returns 3, regardless of the receiver's
+current stored value. The VGA structure's reset field is a different object.
+Neither can capture the actual pending reset state. Reading visible disable
+bits alone also does not preserve the stored byte's complete value. Making
+the EGA storage global or duplicating it in Compat increases the ownership
+surface rather than coherently restoring an existing capture mechanism.
+The current narrow getter is the minimal existing state-access adaptation;
+no new fallback, synchronization, or archive representation is proposed.
+
+Focused verification runs the unchanged production-linked vga_frame_smoke
+executable on both architectures: x86 7.18 seconds, x64 5.29 seconds, both
+exit 0. Its existing reset loop writes each value 0..3 through ega_seq_reset,
+captures and asserts that byte, changes the live reset, restores the archive,
+and checks the resulting disable bits. This proves the current capture/restore
+contract. The failure of substituting fixed original port readback for values
+0..2 is source proof, not a newly executed negative build. The fixture is not
+an actual guest snapshot acceptance or all-register/invalid-archive matrix.
+
+Production/test source and mirror diff delta are zero. No permanent test or
+published EXE changes; P119 remains published, P114 retains full 392/392
+baseline. No new full build/runtime run is claimed. Frontier 419/472, next
+420 base/video/ega_read.c. R0514 and earlier decisions remain open; S1 active.
+
+P122 owned runner has exited and its PID is absent. Exact scratch cleanup,
+residue check, documentation gate and actual three-document diff review pass.
+User INI/media/snapshots remain unchanged.

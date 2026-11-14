@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P121 completes files 417-418 ega_dmmy.c and ega_mode.c: selected
-code matches pinned XP; actual port/status and mode-initialization callers
-are confirmed. No production/test or EXE change; P119 publication and P114
-full 392/392 baseline remain. Frontier 418/472; next 419 base/video/ega_prts.c.
-D005, L001 and earlier qualified decisions remain open.
+T100 S1 P122 completes file 419 ega_prts.c: its sole selected addition is
+the narrow reset-state snapshot getter, qualified pending decision R0514.
+Actual EGA write ownership and fixed VGA readback are verified; existing VGA
+reset capture/restore tests pass both architectures. No source/EXE changes;
+P119 publication and P114 full 392/392 baseline remain. Frontier 419/472;
+next 420 base/video/ega_read.c. D005, L001 and earlier decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
