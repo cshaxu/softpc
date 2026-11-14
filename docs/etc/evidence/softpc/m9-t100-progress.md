@@ -10202,3 +10202,50 @@ claimed. Final mirror/documentation/whitespace and newline checks accompany
 delivery. Actual-change review confirms only this declaration/comment, manifest,
 audit records and fresh EXEs change. Frontier 451/472; next file 452
 host/inc/nt_fulsc.h. Earlier owner decisions, S1 and T100 remain open.
+
+
+## File 452: host/inc/nt_fulsc.h (P143)
+
+Complete comparison uses fixed XP SP1 raw SHA-256
+9bb9026596879d81d4a1e2a7e28210877f9ab707c2cb6c83f8bd11443a206104.
+Existing excluded bodies and their framework/line controls are not re-audited
+or entered as new decisions. Retained production nt_graph.c and VGA fixture
+both include this header; its original constants/types/declarations remain
+needed, with no whole-file deletion or replacement Compat implementation.
+
+R0567 restores `IMPORT VOID SwitchToFullScreen(BOOL);` at original line 186.
+Full src/test/tools search before restoration finds no definition or call;
+there is no competing declaration requiring omission. The preceding source
+already maps InitTToG to line 185. Replacing the omission's #line 187 with the
+original declaration keeps CheckForFullscreenSwitch at line 187. This does not
+enable an NTVDM host fullscreen operation or change public KVM behavior.
+
+R0568 restores the second original blank preceding the final X86GFX condition.
+The boundary's #line 258 becomes 257; two original blanks then put the next
+condition at original line 259, unchanged. Existing excluded contents remain
+untouched. No standalone implementation, extra conditional or helper is added.
+
+Executor restores both unproven deviations. Counter-review checks complete
+original/current text, original line anchors, actual include users and absent
+SwitchToFullScreen consumers. Compilation and final EXE equivalence below
+support current restoration; they are not new fullscreen runtime verification.
+Production +3/-2 (net +1), permanent tests unchanged; two missing original
+lines restored, two fewer selected XP diff lines. Existing exclusion line
+controls are not claimed as newly removed functional patches.
+Final LF-normalized source SHA-256: 917f6dccb55130fa060ff1af0136d4cb5470a274a9082117c41fbb156706a10c.
+
+### P143 final-source qualification
+
+- x86: cached build/publication 9.23 s; VGA **1/1** in 7.62 s including runner overhead; 91 warning occurrences, all in mirror paths.
+- x86 EXE SHA-256: f482b0acabe9088caccda663434ee2db9e2e322b69305118300fbdb557a2b76f.
+- x64: cached build/publication 10.65 s; VGA **1/1** in 5.72 s including runner overhead; 91 warning occurrences, all in mirror paths.
+- x64 EXE SHA-256: bba8806ff39457844f1280be0e4b220528dbcb995c38dfab3a75429bd19736ca.
+
+Both EXEs equal P142 after masking only PE COFF timestamp, optional-header
+checksum and unique NUL-terminated compiler-time literal; all other bytes and
+lengths equal. Under the owner's exception no repeated full suite is required;
+P133 background 188/188 per width remains applicable. Native final acceptance
+remains pending. Final manifest/documentation/whitespace checks and actual-diff
+review accompany delivery. Only this header, manifest, audit records and fresh
+EXEs change. Frontier 452/472; next file 453 host/inc/nt_graph.h. S1/T100 and
+earlier owner decisions remain open.

@@ -2395,3 +2395,9 @@ the original implicit-int declaration on both widths, and no current caller
 uses the variable. R0566 restores the declaration and removes the rationale;
 five fewer selected XP diff lines. Other headers 445-450 need no source edit.
 See [ordered evidence](m9-t100-progress.md#files-445-451-host-graphics-and-event-headers-p142).
+
+
+T100 S1 P143 restores nt_fulsc.h's unused original fullscreen declaration
+and original blank with unchanged diagnostic anchors (R0567/R0568). Two fewer
+selected XP diff lines; no native fullscreen path is enabled.
+See [ordered evidence](m9-t100-progress.md#file-452-hostincnt_fulsch-p143).

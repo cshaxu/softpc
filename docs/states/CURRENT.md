@@ -30,15 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P142 completes files 445-451. Five headers equal XP; nt_cga has no
-selected difference. nt_event's unnecessary explicit type/comment is restored
-to its original declaration (R0566), proven through actual GNU90 consumers.
-Production +1/-4; five fewer XP diff lines; permanent tests unchanged.
+T100 S1 P143 completes file 452 nt_fulsc.h: restores its unused original
+SwitchToFullScreen declaration and missing original blank, preserving diagnostic
+line anchors. Production +3/-2; two fewer selected XP diff lines; tests unchanged.
 Both cached builds publish fresh EXEs; VGA passes 1/1 per width. EXEs equal
-P141 after permitted metadata/time normalization, so no repeated full suite.
-P133 background 188/188 per width remains applicable; native final acceptance
-and earlier owner decisions remain pending. Frontier 451/472; next file 452
-host/inc/nt_fulsc.h. S1/T100 remain open. See the
+P142 after permitted metadata/time normalization; no repeated full suite.
+P133 background 188/188 per width remains applicable. Native final acceptance
+and earlier owner decisions remain pending. Frontier 452/472; next file 453
+host/inc/nt_graph.h. S1/T100 remain open. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 

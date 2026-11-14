@@ -164,7 +164,7 @@ IMPORT VOID ConsoleInit(VOID);
 IMPORT VOID GfxReset(VOID);
 IMPORT VOID ResetConsoleState(VOID);
 IMPORT VOID InitTToG(VOID);
-#line 187
+IMPORT VOID SwitchToFullScreen(BOOL);
 IMPORT VOID CheckForFullscreenSwitch(VOID);
 IMPORT UTINY getNtScreenState(VOID);
 IMPORT BOOL hostModeChange(VOID);
@@ -189,7 +189,8 @@ IMPORT int  getModeType(VOID);
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif
-#line 258
+#line 257
+
 
 #ifdef X86GFX
 #error "Unsupported SoftPC mirror configuration: X86GFX"
