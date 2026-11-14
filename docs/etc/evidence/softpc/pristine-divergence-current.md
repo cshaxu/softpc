@@ -2208,3 +2208,12 @@ residuals remain qualified owner decisions; P109's missing snapshot ICW phase
 L001 is not repaired or hidden. Both final published EXEs are P107-equivalent
 apart from build metadata; six focused tests and six current-path probes pass.
 No new full-suite result is claimed.
+
+
+### T100 S1 P111 idle detector original-first restoration
+
+R0494 restores both XP word conversions in idle_set. No actual caller requires
+expanded parameter values; original thresholds and retained keyboard/timer
+idle integration are unchanged. Selected code now matches XP. Source +2/-2
+reduces mirror diff by four lines, without a residual decision for this file.
+Both final dual EXEs are rebuilt/published and full regression passes 392/392.

@@ -376,10 +376,10 @@ void idle_set (minpoll, minperiod)
 int minpoll, minperiod;
 {
 	if (minperiod > 0)
-		minConsecutiveTicks = minperiod;
+		minConsecutiveTicks = (word)minperiod;
 
 	if (minpoll > 0)
-		minFailedPolls = minpoll;
+		minFailedPolls = (word)minpoll;
 }
 
 void idle_ctl (flag)

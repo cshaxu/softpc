@@ -8065,3 +8065,65 @@ File 407 now has a complete investigation disposition; frontier 407/472, next
 
 P110 owned-process inventory is quiescent. Exact temporary-directory cleanup,
 build residue check, manifest/documentation gates and final diff review pass.
+
+
+## File 408: base/system/idetect.c (P111)
+
+Pinned XP raw SHA-256 7bd4b2f03ca2befbf1807a8aa31b5f8a897e4c0165330bb438373ba4f03d5e00.
+Complete file comparison finds exactly two non-excluded selected-code changes;
+its original historical notice is already intact. Existing excluded bodies,
+line-control scaffold and associated formatting are skipped without accounting.
+
+R0494, original XP501/504, local379/382: idle_set originally assigns
+(word)minperiod and (word)minpoll after the positive-value guards. Local code
+removed the casts. Original base_def.h defines word as IU16, while this selected
+!NTVDM implementation keeps the thresholds as int. Thus the removed casts can
+change values above 65535; this is not automatically a mechanical x64 repair.
+Whole source/test symbol and macro search finds only the definition, declaration
+and IDLE_set macro, with no actual threshold-setting caller. No supported use
+requires an expanded range. Restore both original statements exactly; do not
+invent a new clamp or preserve unproven behavior as a compatibility contract.
+
+Counter-review follows the real retained execution path: CMakeLists.txt includes
+idetect.c; original keyboard code calls IDLE_poll/waitio/init, timer.c calls
+IDLE_tick, and original video/disk/comms paths clear the activity flags.
+Compat platform.c only toggles IDLE_ctl and resets IDLE_init on continuous-run
+entry. The original detector decides when to call host_release_timeslice;
+that existing host callback waits for the executor event and preserves finite
+instruction budgets. Neither that integration nor original default thresholds
+(12 ticks, 10 failed polls) changes. No competing idle implementation is added.
+
+After restoration all selected original code matches XP. Source +2/-2, tests
+unchanged, XP-relative added/deleted diff reduces by four lines. No residual
+retention decision belongs to this file. Removing the whole file would remove
+real keyboard/timer idle behavior and is not justified by the unused setter.
+
+Final-source dual-width cached builds/publication and full regression are in
+qualification. x86 EXE is not metadata-equivalent, so the owner exception is
+not used merely because no actual setter consumer was found. No historical
+full-suite result is substituted for this final-source run. Frontier remains
+407/472 until verification and delivery; no guest/configuration changes.
+
+### P111 final verification and review
+
+Both final cached builds and publications succeed. x86 passes 188 background
+in 143.70 seconds and eight native tests in 14.82 seconds; x64 passes 188
+background in 149.18 seconds and eight native tests in 16.12 seconds: 392/392.
+Both EXEs have actual nonmetadata changes from restored conversion code; no
+artifact-equivalence test omission is claimed. Full-suite success is regression
+evidence, not a new requirement that applications supply oversized idle limits.
+
+Final x86 timestamp 17:31:50 Nov 13 2026, SHA-256 9730b9470aad50ee90170b7ba3579f60035b65113dbd283eb6f2c00db6461895.
+
+Final x64 timestamp 17:34:39 Nov 13 2026, SHA-256 48df2431b5dd271920dbac1794bad2a631b9b50104c3573dd3a23e647e093f35.
+
+Independent review verifies the two exact original casts, source +2/-2,
+permanent tests unchanged and XP diff delta -2 added/-2 deleted lines. No new
+helpers, Compat implementation or semantic special cases. Mirror CRLF and
+normalized manifest identity remain correct. User INI is byte-unchanged by the
+job; no media/snapshot/guest modifications. Documentation/manifest and actual
+diff checks pass. Frontier advances to 408/472, next 409 base/system/illegalp.c.
+All earlier qualified decisions, including L001, remain open; S1 is not closed.
+
+P111 owned process has exited; exact disposable cleanup and build residue
+checks pass. Reusable cache trees are preserved.

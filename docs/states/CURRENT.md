@@ -30,14 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P110 completes file 407 ica.c investigation and removes six
-nonoriginal comment lines. Three actual-controller restoration controls fail
-on both widths, qualifying existing IRQ/IRET residuals for owner decision.
-L001 (missing snapshot ICW phase) remains a known pending local-extension
-point, not repaired. Dual published EXEs are P107-equivalent except build
-metadata; six focused tests and six current-path probes pass. P107 remains
-the full 392/392 regression baseline. Frontier 407/472; next 408
-base/system/idetect.c. User INI changes accompany this batch without agent edits.
+T100 S1 P111 completes file 408 idetect.c. Both original word conversions
+are restored; selected code now matches XP, reducing mirror diff by four
+lines. No residual decision for this file. Final cached dual-EXE builds and
+publication pass full regression 392/392. Frontier 408/472; next 409
+base/system/illegalp.c. Earlier qualified residuals and L001 remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
