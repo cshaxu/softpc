@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-288 only. Positions 289-472, original
+This view currently reconciles positions 1-300 only. Positions 301-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -633,6 +633,115 @@ from the four historical notice-policy items. These recommendations remain
 unapproved. This reconciliation changes documentation only; current production
 hashes and P164's fresh full-regression evidence remain applicable.
 
+## Positions 289-298: Unchained generated rules
+
+For sevid006-sevid015 the remaining semantic decisions are exactly the existing
+GDP mapping and native local-storage groups below. All native-address wrappers
+have been restored. Current source hashes match the delivered candidates in
+P36-P46, except sevid009/sevid010 which match their later P56 correction.
+The linked per-file range/allocation inventories in those records supply the
+original/current locations and individual mixed-width uses.
+
+| File | Pending GDP / local-storage IDs | Retained calloc / restored malloc | Final XP added / deleted lines |
+| --- | --- | --- | --- |
+| sevid006.c | R0297 / R0298 | 11 / 21 | 713 / 712 |
+| sevid007.c | R0301 / R0302 | 5 / 27 | 934 / 933 |
+| sevid008.c | R0305 / R0306 | 7 / 25 | 686 / 685 |
+| sevid009.c | R0309 / R0310 | 0 / 32 | 436 / 435 |
+| sevid010.c | R0313 / R0314 | 7 / 25 | 774 / 773 |
+| sevid011.c | R0317 / R0318 | 5 / 27 | 570 / 569 |
+| sevid012.c | R0321 / R0322 | 5 / 27 | 638 / 637 |
+| sevid013.c | R0325 / R0326 | 12 / 20 | 676 / 675 |
+| sevid014.c | R0329 / R0330 | 11 / 21 | 794 / 793 |
+| sevid015.c | R0333 / R0334 | 8 / 24 | 639 / 638 |
+
+All ten actual-body original-capacity controls pass x86 and heap-corrupt x64.
+The native GDP owner/layout proof is shared, not individually repeated for every
+slot. Zeroing is confined to identified partial IU32 stores followed by IUH
+reads; calloc elsewhere was restored to malloc. This does not fix or qualify
+arbitrary high-address RAM inputs. The corresponding address-restoration and
+unnecessary-zeroing IDs R0296/R0299 through R0332/R0335 are not retention choices.
+
+P39/P40 initially kept one address wrapper each solely to avoid increasing
+contiguous diff ranges. P56 supersedes those decisions: both original lines
+were restored, and current files contain neither wrapper. Fixed original-line
+correspondence proves four replacement-diff lines removed; heuristic matching
+also realigned 164 lines in sevid010. That realignment is not additional restored
+code. Table totals for these two files use P56's anchored count, including the
+GDP include; no counting-based retention remains.
+
+Evidence limits remain file-specific:
+
+- P36 exercises 18 WORD writes and 48 copy cases; P37 exercises 72 WORD fills
+  and 48 copies. P37's partial-mask video-source copies prove preservation
+  against baseline, not the discarded per-byte-latch oracle.
+- P38's 48 copies and 90 DWORD preservation cases also preserve the original
+  second-WORD +8 defect in S2360/S2372. P42/P43 find the same source pattern
+  in S2441-S2448 and S2489-S2496; their BYTE/WORD oracles do not dynamically
+  prove those DWORD entries. Current phy_w32 calls phy_w16 at +0/+2 and
+  c_sas_fillsdw loops scalar stores. No current guest trigger of those generated
+  DWORD faults is established; they belong to the separate original-defect list.
+- P39's 432 pixels, P40/P42/P43's 1440 pixel cases each, and P56's 576 pixels
+  independently check selected real registered writers/fillers and boundaries.
+  The corrected P40 fixture sets both plane-enable representations.
+- P44/P45/P46 helper captures establish bounded preservation. Their independent
+  subsets check 48 copies, eight zero-mask RAM cases and 240 zero-count cases,
+  respectively. They are not a complete hardware oracle or outer-move matrix.
+
+P37 had two verifier timeouts and successful same-budget retries; P44 had an
+x86 retry, P45 an x64 retry. Other listed final deliveries passed their full
+suites without such retries. P164 freshly passed the entire current 392/392.
+Historical timeouts and withdrawn fixture assumptions are not rewritten as
+initial passes or new production defects.
+
+## Positions 299-300: CHAIN2 write rules
+
+Five pending IDs per file remain; declarations/address syntax/extra zeroing
+restored in P47/P48 are not additional decisions.
+
+| Responsibility | sevid016.c | sevid017.c |
+| --- | --- | --- |
+| Native GDP fields | R0337 | R0344 |
+| Native locals and required zeroing | R0338: 9 calloc, 23 malloc | R0346: 3 calloc, 29 malloc |
+| Selected dirty markers | R0340 | R0347 |
+| A0-gap address corrections | R0341: two shifts | R0348: four shifts |
+| Local continuations | R0342: two gotos | R0349: seven gotos |
+
+Original local capacities heap-corrupt x64. Retained zeroing includes S2629
+and S2635/S2647/S2653 slot 8, where an IU32 counter later becomes an IUH buffer
+offset, in addition to the eight sevid016 outer-move pointer cases. Current
+source confirms these allocation counts and the required continuation targets.
+
+Coherent original dirty restoration, retaining native GDP bindings, fails the
+EGA dirty-low assertion on both architectures. P47 separately restores the
+string marker and fails the zero-length sentinel. The discarded control that
+omitted native GDP mapping is not evidence. Existing selected markers remain
+one path; no additional marker implementation is proposed.
+
+Original sevid016 shifts fail mode-64 incremental/full-frame assertions. The
+ordinary regression did not reject original sevid017 shifts; its independent
+physical oracle did: mode 1/address 100h wrote physical 200h instead of 400h.
+Sixteen mode/address cases pass with the current source per architecture.
+This is bounded actual-rule evidence, not a fresh guest reproduction.
+
+Restoring the original continuation calls access-violates on both widths.
+The evidence covers the restored groups, not an isolated failure proof for each
+goto. Keeping the same activation preserves enclosing local ownership.
+R0343 and R0350 restored 24 and 60 original private declaration lines, without
+reactivating obsolete case/goto/label paths. The gate was narrowed in P47 to
+permit declarations while still rejecting that old active control flow.
+R0336/R0339/R0345 and the malloc portion of R0346 were also restored.
+
+Residual XP scopes: sevid016 +593/-630; sevid017 +471/-584. Source growth from
+restoring declarations is not added mirror difference. P47's initial stale-gate
+failures and P48's aggregate timeout/retry results remain in their delivery
+records; neither is a first-run full-pass claim. Current source hashes match
+the tested final candidates. No new mirror patch is added by this review.
+
+These twelve files add 30 pending semantic IDs, bringing the review view to
+171 through position 300, plus the four separate notice-policy items. Approval
+and the final original-defect reconciliation remain outstanding.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -642,4 +751,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 289.
+recommendations into owner approval. The next position is 301.

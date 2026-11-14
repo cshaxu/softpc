@@ -12187,3 +12187,31 @@ Next reconciliation position is 289; S1/T100 are not closed.
 
 P165 documentation/mirror/whitespace checks and build-residue check pass.
 No disposable scratch or live job is created by this document-only delivery.
+
+## P166 final-decision reconciliation, positions 289-300
+
+Reconcile sevid006-sevid017 with P36-P48 and the superseding P56 corrections.
+Current normalized hashes match their latest tested candidates. Direct source
+checks confirm no softpc_gdp_rule_address calls in these twelve files, and
+calloc/malloc counts 11/21, 5/27, 7/25, 0/32, 7/25, 5/27, 5/27, 12/20,
+11/21, 8/24, 9/23, 3/29. The mixed-width allocation entries match their named
+inventories. Actual CCPU phy_w32 uses two WORD stores at +0/+2 and DWORD fill
+loops those scalar stores; generated DWORD faults are not mislabeled current
+guest triggers. Current continuation guards retain only the demonstrated
+same-file nested cases, allowing restored private declarations.
+
+The decision view adds 30 semantic IDs, cumulative 171 through file 300.
+The two wrapper retentions in P39/P40 are explicitly superseded by P56, not
+carried forward as necessity claims. Anchored versus heuristic diff counts,
+source-only zeroing proof, bounded preservation controls, independent pixel
+oracles, old gate failures and timeout retries remain distinguishable.
+No new source, test, product, mirror or asset change is needed in this batch.
+
+Executor/counter-review inspect these current facts and historical final
+controls rather than treating a prior initial proposal as delivered evidence.
+This delivery changes only task records and uses P164's fresh 392/392 for
+unchanged production. No new compilation/publication or runtime test is claimed.
+Next is position 301; D001-D006/L001 and owner decisions remain unclosed.
+
+P166 documentation/mirror/whitespace gates and build-residue check pass. No
+new task scratch or worker exists. Only the three reviewed task records change.
