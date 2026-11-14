@@ -44,6 +44,9 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 80 / R0077 | Return private interrupt-map address (+6/-0 including separator blanks). | Actual cold-run lifecycle clears the original map through this accessor; original timer-bit clear does not clear all pending bits. | Owner approves retention, S3 P8 |
 | 80 / R0078 | Capture private execution state (+16/-0 including separator). | Preserve DR/TR, pending interrupt map and sampled start_trap. | Owner approves retention, S3 P8 |
 | 80 / R0079 | Restore private execution state (+17/-0 including separator). | Restore saved state and discard transient quick_mode before refetch. | Owner approves retention, S3 P8 |
+| 80 / R0084 | Local saved-entry variable (+1/-0). | Carries the one-shot saved HLT/fetch phase and sampled trap bit. | Owner approves retention, S3 P9 |
+| 80 / R0085 | TLS exception selection and jmp_buf dereference (+2/-2). | Selected TLS provider returns jmp_buf pointer; setjmp stays within the live CPU execution frame. | Owner approves retention, S3 P9 |
+| 80 / R0086 | Consume saved entry before ordinary NEXT_INST (+11/-0). | Resume HLT waiting or saved fetch phase without executing the following instruction prematurely or repeating boundary work. | Owner approves retention, S3 P9 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -58,10 +61,13 @@ the full diff and why private-state access belongs in c_debug.c. S3 P7 also
 retains seventeen qualifying c_main.c header/declaration/TLS points (+18/-1)
 under the same delegation. Owner then approves R0077-R0079 (+39/-0) after
 reviewing their code, consumers and the mutable-pointer encapsulation limit.
-Progress: 59/381 retained (39 explicit and twenty delegated), zero restoration
-decisions, 322 pending; notices stay separate.
+Owner then approves R0084-R0086 (+14/-2) after reviewing the actual code,
+TLS declaration and one-shot Compat resume consumer. All three count as explicit
+approvals, including the qualifying one-line R0084. Progress: 62/381 retained
+(42 explicit and twenty delegated), zero restoration decisions, 319 pending;
+notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next review starts at R0084; R0080-R0083
+stays the single detailed inventory. Next review starts at R0087; R0080-R0083
 were already restored in S1. Approved counts include pinned-XP separator lines. The map accessor
 returns a mutable pointer, not a bounded clear operation; its actual consumer
 only clears the map. Do not claim this API shape is the sole possible design.
