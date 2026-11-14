@@ -2358,3 +2358,12 @@ T100 S1 P136 audits host/inc/cfpu_def.h: removes one redundant comment,
 retains the six evidence-qualified little-endian representations and required
 ABI reason marker pending owner decision R0554. Existing exclusions are not
 re-accounted. See [ordered evidence](m9-t100-progress.md#file-433-cfpu_defh-p136).
+
+
+T100 S1 P138 supersedes the earlier host_cpu.h common WRITE declaration
+retention rationale: current CCPU calls use cpu4gen.h direct c_set* contracts,
+not the unused *set*_func vectors. Original declarations are restored and
+MVDM-HOST-DIV-102's local marker removed. Only low/high byte order remains
+qualified as R0556, with actual controller and scalar negative evidence.
+Selected XP diff decreases by 47 lines; source +32/-16 is a different measure.
+See [ordered evidence](m9-t100-progress.md#file-436-host_cpuh-p138).

@@ -9863,3 +9863,72 @@ pending native final acceptance remain the existing evidence, not new passes.
 Documentation and whitespace gates qualify these records. No scratch was
 created. Frontier 435/472; next file 436 host/inc/host_cpu.h is under investigation
 and is not marked audited. S1/T100 and earlier owner decisions remain open.
+
+
+## File 436: host_cpu.h (P138)
+
+Fixed XP raw SHA-256:
+2a5b8bc3a6d6cccdb2639f777be34f62b595ffbfe5c7ab7656fd41b194d3270c.
+The actual cpu4.h includes this header, then generated cpu4gen.h. The latter
+redefines selected CCPU setters as direct c_set* calls with their actual typed
+prototypes. Whole src/app-softpc search finds setAX_func/setCS_func only in
+this header's declarations/macros, not vector definitions or assignments.
+The previous reason marker claiming these unused vector declarations were
+necessary CCPU call-ABI contracts is not supported by current consumers.
+
+R0555 restores the complete original common WRITE declaration block, including
+original spelling, separate lines and trailing blank. Removes the local
+MVDM-HOST-DIV-102 marker and now-unnecessary #line 419; the preceding #line 383
+and restored original text already establish that original next location.
+Generated CCPU declarations and actual calls remain unchanged. Production
++32/-16 (net +16), tests unchanged. Selecting current supported conditions and
+omitting existing excluded bodies/framework and line controls gives XP-relative
++16/-33 before, +1/-1 after: 47 fewer diff lines, despite more source lines.
+No excluded body receives new accounting. The retained original unused
+vector declarations are not a second implemented dispatch path.
+
+R0556 remains evidence-qualified pending owner decision: reg.byte.low precedes
+high for the actual little-endian hosts. generic_outw assigns temp.X then
+sends low to the first port and high to the next. Actual VGA vga_gc_outw also
+assigns temp.X, takes low as register index and high as register value.
+Original high-first storage reverses those meanings. The header cannot be
+removed because these original I/O/video consumers use its reg union.
+Original nibble/bit members and all other selected contents are unchanged.
+
+A private scalar probe compiled with the real device object's flags/header
+chain assigns reg.X=0x0104. Current prints low=4 high=1 and returns 0 on both
+widths; original byte order prints low=1 high=4 and returns 1 on both.
+A separate actual-controller probe recompiles complete vga_prts.c against only
+the private header and links the existing vga_frame_smoke, without replacing
+machine initialization or rendering logic. Current controls pass x86/x64 in
+7.14/7.17 s. Original-byte variants compile/link but terminate with access
+violation 3221225477 in 10.90/11.21 s. No timeout is counted as a failure.
+The scalar probe proves the exact swapped values; source proves their index/
+data use. The broader negative proves unsafe behavior with the real module,
+not a captured stack trace identifying the first faulting instruction. No
+claim of real DOS/Win3.1/Win95 manual reproduction or exhaustive register-path
+coverage follows from these tests.
+
+### P138 final-source qualification
+
+Both cached builds publish fresh EXEs: x86 32.96 s, x64 48.03 s. Actual selected
+focused tests are VGA and BOP, 2/2 per architecture in 7.64/7.23 s including
+runner overhead. The attempted device_contract_smoke regex names no registered
+test; it is not counted as tested (actual device cases have individual suffixes).
+Both EXEs are byte-equal to P136 after masking only PE timestamp/checksum and
+unique compiler HH:MM:SS literal; no code/data byte is ignored. The owner
+exception skips duplicate full suites. P133 background 188/188 per width
+remains applicable; native final acceptance is still pending.
+
+- softpc32.exe SHA-256: 18c1e79a9650d4f4fdc6d63b320a185d394bd0db51d56ffa78406c92a271b603.
+- softpc64.exe SHA-256: 2e4fb8e12f8d86e1c83cd16fe1c17564d876285d28f612503d87f47581c317eb.
+- Final source LF-normalized SHA-256: 789d83449a610fd4a9ea9fdffb11eec491845a1b578cf27fd93ee2931fa3c036.
+
+Build logs contain 5179/5233 warning occurrences, all within mirror paths
+(including original macro redefinitions); no outside-mirror warning is present.
+Coordinator review checks original correspondence, removal of the unjustified
+ABI reason, actual consumer routing, retained byte-order evidence and artifact
+equality. Public components, Compat, guest, configuration, media and snapshots
+are unchanged. Manifest/documentation/whitespace checks qualify this delivery.
+Completed owned jobs permit scratch cleanup. Frontier 436/472; next file 437
+host/inc/host_def.h. S1/T100 and retained owner decisions remain open.
