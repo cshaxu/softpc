@@ -8681,3 +8681,27 @@ is claimed for this source investigation. Frontier advances to 416/472; next
 P120 actual diff review confirms only evidence, frontier and CURRENT changed.
 Owned runner exited and its PID is absent; task scratch preview/removal and
 residue check pass. Documentation gate passes. Configuration/media are intact.
+
+## Files 417-418: ega_dmmy.c and ega_mode.c (P121)
+
+Reviewed in frozen order, completing 417 before inspecting 418. Complete
+pinned-XP comparisons find no selected-code differences in either file.
+Existing excluded bodies and line-control scaffolding are skipped without
+new bookkeeping; original notices and formatting remain intact.
+
+| Order | File | Pinned XP raw SHA-256 | Actual production integration |
+| --- | --- | --- | --- |
+| 417 | base/video/ega_dmmy.c | 82c69f46436fd64c47d0e62b479f684084375160bcaf9ed1a6b513ac2d91df16 | Root device object; get_ega_switch_setting returns original zero and is called by ega_ipstat0_inb in ega_prts.c to fill the switch-sense bit. |
+| 418 | base/video/ega_mode.c | f4c062454b54800c2979b0acd9d2ae75726dbdc0169443b7f5ed0379d879da7b | Root device object; EGA/VGA port initialization invokes ega_mode_init; original mode tables, screen-plane selection and update routing remain unchanged. |
+
+Independent counter-review: a function being an original stub is not a reason
+to delete it or replace it with a Compat implementation. File 417 has a real
+consumer and exactly preserves XP behavior. File 418's unchanged original
+selection logic needs no new patch merely because other video files contain
+qualified differences. Neither file acquires a new decision point.
+
+Production, tests, mirror diff and published EXEs are unchanged. This is source
+and integration inspection, not new runtime proof. No rebuild/test run is
+needed for the documentation-only update; P119 artifacts and P114 full 392/392
+baseline remain. Frontier 418/472; next 419 base/video/ega_prts.c. S1 remains
+active and earlier qualified decisions remain open. No scratch or job created.
