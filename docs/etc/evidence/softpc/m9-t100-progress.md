@@ -9249,3 +9249,49 @@ artifacts and its precisely qualified native-launch evidence remain unchanged;
 no new build or runtime verification is claimed for this documentation-only P.
 Frozen frontier advances to 425/472, next file 426 base/video/v7_ports.c.
 S1, T100, existing owner decisions and original-defect entries remain open.
+
+## File 426: v7_ports.c (P129)
+
+Pinned XP raw SHA-256 7abc5b3922bff2321225493b5aa91f1edb866d3e345cb4a208964cccc306b875.
+Full selected-file comparison finds exactly one residual: R0536, XP line 679
+in draw_v7ptr. Existing #error exclusions and necessary #line are skipped
+without new bookkeeping. No other selected spelling or semantic change exists.
+
+XP tests get_seq_chain4_mode() && get_chain4_mode(); current code tests
+get_seq_chain4_mode() && get_256_colour_mode(). This is +1/-1 relative to XP,
+with no new source change in P129. The original halving and drawing path remain.
+Root CMake includes v7_ports.c in both production device builds. Actual pointer
+register writes invoke draw_v7ptr, which calls the selected paint_v7ptr callback.
+
+Executor analysis traces SR4 to vga_seq_mem_mode: changing CPU chain4 changes
+EGA_CPU.chain, get_chain4_mode and the original read/write routines. V7 FC owns
+the separate sequential_chain4 display state; the colour state is separate too.
+Thus CPU addressing can change while the packed display interpretation stays
+the same. Using CPU chain4 to decide pointer coordinates then moves the pointer
+without changing its position registers or display interpretation.
+
+Counter-review tested coherent restoration of the only selected difference,
+not a stub or a new alternate renderer. Private current/restored translation
+units use each architecture's actual Ninja production compilation command and
+the existing VGA fixture link, overriding only the v7_ports object. Both compile
+and link. Current runs pass (x86 6.18 s, x64 7.29 s); exact XP-condition runs
+both fail the same existing assertion at vga_frame_smoke.c:1432:
+surface[6 * width + 8] == 0xff. Failure exits are 3221226505 and 3 respectively;
+neither is counted as a successful test or an interactive timeout.
+
+The fixture enters V7 modes 66-69 through the real BIOS, changes SR4 through
+outb, checks CPU address selection independently, then writes original pointer
+position registers with X=16 and Y=6. Its pixel oracle expects display X=8.
+Both current full-fixture controls cover the complete mode/origin/SR4 sequence;
+the restored negative runs stop at their first failed pixel assertion, so they
+do not prove failure at every later matrix member. This is actual original-body
+and controller-path evidence, not a new interactive Win3.1/RDP reproduction.
+
+R0536 is evidence-qualified for owner keep/restore decision, not automatically
+approved. No redundant Compat implementation or smaller equivalent XP
+restoration was identified. Source/test delta and mirror-diff delta are zero;
+no shared code, user asset or published EXE changes. P127's exact build and
+native-launch qualification remains the artifact baseline. P129 needs no
+product rebuild or unrelated full regression. Owned probe work has finished;
+concise evidence is promoted before scratch removal and documentation gates.
+Frontier is 426/472; next file 427 base/video/v7_video.c. S1/T100 remain active.
