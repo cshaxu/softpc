@@ -308,11 +308,11 @@ static void dma_word(io_addr port, IU16 value)
 /* Until the DSP port owner is attached, this fixture supplies its channel. */
 extern IU32 TimeConstant;
 extern IU32 SBBlockSize;
-extern IBOOL bHighSpeedMode, bExitAuto, bDspPaused;
+extern IBOOL bExitAuto, bDspPaused;
 extern IBOOL bDspActive, SbAnswerDMAPosition, bWriteBurstStarted;
 extern IU32 PreviousWaveOutPos, DspNumberDmaQueries, DspVirtualInc;
 extern IU16 StartingDmaAddr, StartingDmaCount;
-extern SB_DMA_INFO DmaInfo;
+extern VDD_DMA_INFO DmaInfo;
 extern DSP_MODE DspMode;
 static lib_u8 sb_pcm_bytes[65536];
 static lib_u32 sb_pcm_count, sb_pcm_budget;
@@ -416,7 +416,7 @@ static void verify_sb_block(void)
 {
     static const unsigned lengths[] = { 32, 700, 65536 };
     unsigned direction, length, i;
-    SB_DMA_INFO actual;
+    VDD_DMA_INFO actual;
     SbDmaChannel = 1;
     assert(SbInitializeDMA());
     for (direction = 0; direction != 2; ++direction)
@@ -537,7 +537,7 @@ static void verify_sb_transfer(void)
 {
     unsigned direction, i;
     unsigned char value;
-    SB_DMA_INFO actual;
+    VDD_DMA_INFO actual;
     for (direction = 0; direction != 2; ++direction) {
         StopDspTransfer(TRUE); DspCancelTransfer();
         TimeConstant = 0xa6; ResetMixer();
@@ -893,7 +893,7 @@ static void verify_sb_executor(softpc_machine *machine)
 static void verify_sb_machine_pause(softpc_machine *machine)
 {
     unsigned partial, consumed, i;
-    SB_DMA_INFO before, after;
+    VDD_DMA_INFO before, after;
     for (partial = 0; partial != 2; ++partial)
     for (consumed = 0; consumed != 3; ++consumed) {
         lib_u32 played = consumed == 0 ? 0 : consumed == 1 ? 3 : partial ? 7 : 64;
@@ -957,7 +957,7 @@ static void verify_sb_midi_framing(void)
 {
     static const IU8 commands[] = {0x38, 0x34, 0x35, 0x36, 0x37};
     softpc_device_sb_dsp_state pending, actual, invalid;
-    SB_DMA_INFO before, after;
+    VDD_DMA_INFO before, after;
     unsigned command, data;
     IU8 value;
     outb(0x0a, 5); /* No test payload may start an actual PCM transfer. */
@@ -1018,7 +1018,7 @@ static void verify_sb_commands(void)
         { 0x0001, 0x0004, 0xfffe }
     };
     unsigned i, automatic, decrement, edge;
-    SB_DMA_INFO info;
+    VDD_DMA_INFO info;
     unsigned char observed;
     SbDmaChannel = 1;
     assert(SbInitializeDMA());
@@ -1149,7 +1149,7 @@ static void verify_sb_deadline(void)
 static void verify_sb_completion(void)
 {
     unsigned direction, automatic, scenario, i;
-    SB_DMA_INFO actual;
+    VDD_DMA_INFO actual;
     DspCancelTransfer();
     for (direction = 0; direction != 2; ++direction)
     for (automatic = 0; automatic != 2; ++automatic)
@@ -1246,7 +1246,7 @@ static void verify_sb_dma_read_ports(void)
 static void verify_sb_position(void)
 {
     unsigned decrement, small, automatic, i;
-    SB_DMA_INFO actual;
+    VDD_DMA_INFO actual;
     SbDmaChannel = 1;
     assert(SbInitializeDMA());
     for (decrement = 0; decrement != 2; ++decrement)
@@ -1296,7 +1296,7 @@ static void verify_sb_dma(void)
         { 0xe9, 44100, 0xe9 }, { 0xea, 44100, 0xea }, { 0xff, 44100, 0xea }
     };
     unsigned i, channel, automatic, decrement;
-    SB_DMA_INFO info;
+    VDD_DMA_INFO info;
     half_word low, high, status;
     for (i = 0; i != sizeof(rates) / sizeof(rates[0]); ++i) {
         TimeConstant = rates[i].constant;
@@ -1602,7 +1602,7 @@ static void verify_sb_parser_archive(void)
     for (prefix = 1; prefix < commands[command].length; ++prefix) {
         softpc_device_archive *saved = softpc_device_archive_create(), *decoded = NULL;
         softpc_device_sb_dsp_state initial, expected, actual;
-        SB_DMA_INFO expected_dma, actual_dma;
+        VDD_DMA_INFO expected_dma, actual_dma;
         FILE *file = tmpfile();
         assert(saved && file);
         ResetAll();
@@ -1649,7 +1649,7 @@ static void verify_sb_archive(softpc_machine *machine, const char *write_path,
         if ((write_path || read_path) && (automatic != 0 || prefix != 1)) continue;
         softpc_device_archive *saved = softpc_device_archive_create(), *decoded = NULL;
         softpc_device_sb_state sound;
-        SB_DMA_INFO dma;
+        VDD_DMA_INFO dma;
         IU8 value, sample;
         FILE *file = write_path ? fopen(write_path, "w+b") :
             read_path ? fopen(read_path, "rb") : tmpfile();

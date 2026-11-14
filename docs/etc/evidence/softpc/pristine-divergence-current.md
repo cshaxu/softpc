@@ -2408,3 +2408,12 @@ layout, and removes its redundant T60 explanation: five fewer selected XP diff
 lines. Pan argument/helper declarations remain qualified owner decisions
 R0571/R0573; original implementations still have later ordered reviews.
 See [ordered evidence](m9-t100-progress.md#file-453-hostincnt_graphh-p144).
+
+T100 S1 P146 restores nt_sb.h's original MM declarations, prototype spelling,
+port globals and coherent BOOL providers, and restores the original DMA type
+and provider signatures. The coupled XP-relative diff decreases 346 lines.
+Header-specific rewrites and duplicate SB_DMA_INFO naming are retired; the
+remaining status/service, local SDK declaration and constrained declaration
+placement points R0577-R0580 remain qualified owner decisions, not approved
+retention. Later provider whole-file audits remain open.
+See [ordered evidence](m9-t100-progress.md#file-455-hostincnt_sbh-p146).

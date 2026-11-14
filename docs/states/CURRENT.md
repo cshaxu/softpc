@@ -30,14 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P145 completes file 454 nt_mouse.h: full normalized XP identity,
-original include retained, no source/test/artifact changes. P144 dual cached
-build/publication and VGA 1/1 per width remain the final-source evidence;
-no rebuild for this documentation-only audit. P133 background 188/188 per width
-remains applicable; native final acceptance and prior owner decisions are pending.
-Frontier 454/472; file 455 nt_sb.h has a preliminary consumer/restoration
-inventory but remains unreviewed pending complete investigation. S1/T100 remain
-open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P146 completes the nt_sb.h declaration audit and coherent provider/test
+restorations: XP-relative diff decreases 346 lines; production +347/-75 and
+test +12/-12. Cached dual builds/publication and focused 8/8 per width pass.
+Final EXEs are equivalent to this batch's candidate that passed background
+188/188 and related native 4/4 per width. Unchanged Lib desktop final acceptance
+and qualified owner decisions remain pending. Frontier 455/472; next file is
+456 host/inc/nt_uis.h. S1/T100 remain open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-455-hostincnt_sbh-p146).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

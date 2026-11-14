@@ -7,13 +7,11 @@
 #include "compat/ccpu/lifecycle.h"
 #include "compat/devices/snapshot.h"
 /* T93: XP default binding; native WinMM/NTVDM loading is not a device path. */
-static IU16 BasePort = 0x220;
-extern IBOOL bHighSpeedMode;
+WORD BasePort, MpuBasePort;     // Where the card is mapped, ie the base I/O address
 extern IBOOL bExitDMAThread;
 IU16 SbInterrupt = VSB_INTERRUPT;
 IU16 SbDmaChannel = VSB_DMA_CHANNEL;
 static IBOOL bSBAttached;
-static IU16 MpuBasePort;
 static IU16 MpuMode = MPU_INTELLIGENT_MODE;
 static IU8 MpuInData = 0xFF;
 static lib_status MidiStatus;
@@ -118,6 +116,7 @@ SbInitialize(
         if (Ios_in_adapter_table[port] != EMPTY_ADAPTOR ||
             Ios_out_adapter_table[port] != EMPTY_ADAPTOR) return FALSE;
     }
+    BasePort = 0x220;
     SbInterrupt = VSB_INTERRUPT;
     SbDmaChannel = VSB_DMA_CHANNEL;
     if (!SbInitializeDMA()) return FALSE;

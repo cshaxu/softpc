@@ -38,12 +38,12 @@ IBOOL            bWriteBurstStarted = FALSE;
 IBOOL            bExitDMAThread= FALSE;  // Exit DSP DMA thread flag
 IBOOL            bDspReset = FALSE;
 IBOOL            bExitAuto = FALSE;
-IBOOL            bHighSpeedMode = FALSE; // Are we in High Speed transfer mode?
+BOOL            bHighSpeedMode = FALSE; // Are we in High Speed transfer mode?
 DSP_MODE DspMode;
 IU32 PreviousWaveOutPos;
 IU16 StartingDmaAddr, StartingDmaCount;
 IU32 DspNumberDmaQueries, DspVirtualInc;
-SB_DMA_INFO DmaInfo;
+VDD_DMA_INFO DmaInfo;
 /* T93: copied guest block replaces native WaveHdr storage. Only the executor
  * advances its accepted prefix; DMA progress remains the original controller. */
 static IU8 DspBuffer[65536];
@@ -231,7 +231,7 @@ void SbApplyMixer(void)
             DspSpeakerEnabled ? MixerGetVoiceGain() : 0);
 }
 
-void SetSpeaker(IBOOL on)
+void SetSpeaker(BOOL on)
 {
     /* XP ignores speaker commands until an output device exists. */
     if (DspOutputRate == 0) return;
@@ -948,7 +948,7 @@ Return Value:
             //
 
             if (SBBlockSize > 0) {
-                SB_DMA_INFO dmaInfo;
+                VDD_DMA_INFO dmaInfo;
 
                 QueryDMA(&dmaInfo);
                 dmaInfo.count -= (IU16)(SBBlockSize + 1);
@@ -1103,7 +1103,7 @@ Return Value:
             //
 
             if (SBBlockSize > 0) {
-                SB_DMA_INFO dmaInfo;
+                VDD_DMA_INFO dmaInfo;
 
                 QueryDMA(&dmaInfo);
                 dmaInfo.count -= (IU16)(SBBlockSize + 1);
@@ -1183,7 +1183,7 @@ Return Value:
 
 {
     IU8 comp, dataCopy;
-    SB_DMA_INFO dMAInfo;
+    VDD_DMA_INFO dMAInfo;
     IU32 dMAPhysicalAddress;
 
     if (TableMungeFirstByte) {
@@ -1325,9 +1325,9 @@ Return Value:
     return samplingRate;
 }
 
-IBOOL
+BOOL
 SetDMACountAddr(
-    SB_DMA_INFO * pDmaInfo
+    PVDD_DMA_INFO pDmaInfo
     )
 
 /*++
@@ -1372,9 +1372,9 @@ Return Value:
     return TRUE;
 }
 
-IBOOL
+BOOL
 QueryDMA(
-    SB_DMA_INFO * DmaInfo
+    PVDD_DMA_INFO DmaInfo
     )
 
 /*++
@@ -1446,11 +1446,11 @@ Return Value:
 }
 
 
-void
+VOID
 SetDMAStatus(
-    SB_DMA_INFO * DmaInfo,
-    IBOOL requesting,
-    IBOOL tc
+    PVDD_DMA_INFO DmaInfo,
+    BOOL requesting,
+    BOOL tc
     )
 
 /*++

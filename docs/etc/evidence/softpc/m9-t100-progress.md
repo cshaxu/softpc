@@ -10363,3 +10363,213 @@ No nt_sb.h edit or retention decision has been made. The next complete-file
 work must test coherent restoration, classify every selected difference and
 finish that file before advancing its ledger. This record does not close the
 investigation or pre-approve its existing device/host adaptation.
+
+### File 455 private compilation experiments (not a P delivery)
+
+Task-owned variants now provide concrete evidence beyond the initial inventory.
+No tracked production/test source or published EXE has changed.
+
+1. Restore XP's mmsystem include, MM API typedefs and function-pointer externs
+   before the current selected header. Actual Ninja commands for 16 source/target
+   combinations per architecture, current versus restored, give 64/64 successful
+   syntax compilations. They include all five original sound modules, Compat
+   platform, real device-contract fixture, mixer/FM/MIDI fixtures and native MIDI
+   fixture compilation. This is not native MIDI playback verification.
+2. A fuller private candidate restores original prototypes/layout, unused host
+   declarations and selected empty debug macros. It keeps existing diagnostic
+   exclusions and current additional service/DMA contracts; BufferMidi retains
+   its status return. Coherent private providers restore BasePort/MpuBasePort
+   external WORD storage, bHighSpeedMode BOOL and SetSpeaker BOOL together.
+   Of 64 syntax compilations, 62 pass; the two failures are solely the actual
+   device-contract test's repeated IBOOL bHighSpeedMode declaration.
+3. Removing that redundant test declaration lets the restored owning header
+   supply the type. An initial copied-fixture run failed because its relative
+   fixture_cleanup.h include no longer resolved in the scratch directory;
+   this is a probe relocation error, not product evidence. Preserving the real
+   test directory as an -iquote search root corrects that probe. Current and
+   candidate then compile on both architectures, 4/4.
+
+These results support further exact restoration, not a completed ABI/runtime
+proof. The fuller candidate is still private and requires original provider
+format reconciliation, remaining-contract necessity review, final diff accounting,
+link/runtime regressions and publication. In particular, existing consumers of
+new status/DMA/lifecycle calls are a map of the next investigation, not approval
+to retain all current adaptations. File 455 remains unfinished and no later
+file has been advanced. The active packet retains its bounded scratch for this
+ongoing experiment; it is not a completed batch's permanent log archive.
+
+### File 455 coherent worktree qualification (investigation still open)
+
+The previously private candidate is now in the worktree, with exact original
+WORD port storage, initialization-time BasePort assignment, BOOL high-speed
+flag and multiline BOOL SetSpeaker signature restored together. The device
+fixture removes its conflicting redundant flag declaration and uses the header.
+Port dispatch is connected only after SbInitialize assigns BasePort and completes
+DMA initialization; moving the default from static initialization does not expose
+an uninitialized production port handler. This is source-chain evidence, not a
+claim that all initialisation failures were manually exercised.
+
+Both cached builds and publication succeeded (x86 13.20 s; x64 20.01 s).
+Both EXEs differ beyond the permitted timestamp/checksum normalization, so the
+equivalence exception was not used. Each architecture passed eight focused
+sound tests and all 188 background tests (149.90 s and 140.32 s). After the owner
+reconnected and the console session was verified Active, each also passed four
+serial native tests: audio_lifecycle_smoke, sb_midi_native_smoke and both package
+variants (7.50 s and 7.62 s). Unchanged Lib desktop tests remain pending final
+acceptance under the owner-approved changed-path selection; these eight native
+passes do not represent the entire desktop suite or a manual guest music test.
+
+Published candidate SHA-256:
+
+- x86: e506f763514e2aa1037a37f123883fbdfb7f70bf019e019edf1e3abdef94b9e4
+- x64: 6421a17afaf5f7b6b1667eedddf8cb37210931bca04120798e611e369555814c
+
+Counter-review of remaining declarations found that XP's public/sdk/inc/vddsvc.h
+at the pinned commit defines VDD_DMA_INFO with WORD addr/count/page and BYTE
+status/mode/mask: the same six fields as local SB_DMA_INFO. XP nt_sbdsp.c owns
+DSP_MODE internally and declares its DMA helpers there. Current cross-file
+production uses of SbInitializeDMA and DspCloseOutput are confirmed in nt_sb.c;
+DSP_MODE and several other helper declarations also have direct fixture users.
+This establishes actual ownership/call sites, not necessity of putting every
+helper in nt_sb.h. Coherent original type/declaration placement and the remaining
+status/service contracts still require review before file 455 can be completed.
+No later file is advanced, no retention decision is approved by these passing
+tests, and this candidate is not yet a complete P delivery.
+
+### File 455 internal declaration restoration
+
+The next source review establishes that DSP_MODE, PauseDMA, ContinueDMA,
+StartDspTransfer and DmaDataToDsp have no cross-file production consumer.
+DSP_MODE and the original PauseDMA/ContinueDMA declaration blocks are restored
+inside nt_sbdsp.c. DmaDataToDsp needs an internal forward declaration because
+StartDspTransfer calls it earlier; its current success result remains unchanged.
+StartDspTransfer is defined before its production callers and needs no added
+forward declaration. These five declarations/types are removed from nt_sb.h.
+The existing direct device fixture declares the same enum and its two tested
+functions locally; no test-only production entry or second implementation is
+introduced. Cross-translation-unit enum values and function types are unchanged.
+
+Counter-review confirms the remaining external production callers of
+SbInitializeDMA (nt_sb.c initialization), DspCloseOutput (nt_sb.c teardown),
+SbService/SbGetStatus (Compat platform service/fault reporting), SbSetRunning
+(Compat executor activation), mixer gain/application functions (original mixer
+and DSP/MPU owners), and MIDI parser service/reset calls (original port owner).
+This is distinct from asserting that all their internal implementations are
+minimal; the later whole-file DSP/MIDI audits remain in their frozen order.
+
+Final declaration-restoration builds pass on x86 (12.97 s) and x64 (17.45 s),
+with focused sound tests 8/8 on each. Both binaries match the immediately prior
+fully tested candidate byte-for-byte after masking only the PE timestamp,
+checksum and unique compiler-time literal. The owner's equivalence exception
+therefore applies to repeating its 188/188 background and 4/4 related native
+tests. This evidence does not waive final native desktop acceptance.
+
+- x86 SHA-256: 8e0cbaef4de13d242d505f84ba6e9577b323b6345d8e4fec9c29826bd933c94f
+- x64 SHA-256: 9ee287108b42eb013b8c715a3cb2b58a684bcb0b95a40b6ad250d12cb3bb7dd8
+
+File 455 remains local pending reconciliation of the residual type/status
+necessity decisions and exact original-relative diff accounting. Passing this
+round does not mark the file complete or authorize moving to file 456.
+
+### File 455 final counter-review and diff accounting
+
+The internal-declaration migration above was rejected after measuring the whole
+coupled difference: it reduced nt_sb.h by ten XP-diff lines but increased
+nt_sbdsp.c by eleven relative to the prior candidate, a net increase of one.
+Its source changes and extra test declarations have been reversed. This corrects
+the earlier inference that restoring their location would necessarily reduce
+the mirror difference. The later DSP whole-file review may find a coherent
+original ordering that avoids that increase; none is claimed here.
+
+Likewise the expanded SetSpeaker signature is not retained at the current
+non-original function position: it added three XP-diff lines. Only the BOOL
+parameter type is corrected to agree with the restored original header; current
+one-line layout and parameter spelling stay unchanged. The redundant PCM include
+is removed from nt_sb.h: actual PCM producers already include that contract.
+The MIDI include remains for lib_status and the actual nt_sb.c host calls.
+
+Using SequenceMatcher with autojunk disabled over LF-normalized fixed-XP and
+HEAD/current files, with the two previously excluded header bodies omitted on
+both sides, the net XP added+deleted difference decreases by **328 lines**:
+nt_sb.h -325, nt_sb.c -3, nt_sbdsp.c unchanged. No excluded body is assigned
+a point or new accounting entry. This measures mirror difference, not source
+length. Tracked production changes are +324/-56 (net +268); the device fixture
+changes +1/-1. Added source is principally restored original declarations.
+
+The x86 final build and eight focused tests pass (12.86 s, 0.94 s). The first
+x64 link was blocked by the running repository softpc64.exe (PID 19188), not by
+a compile error. After closing that exact instance under existing owner
+authorization, x64 build and eight focused tests pass (7.84 s, 0.81 s).
+Both final binaries are equivalent to the already fully qualified candidate
+under the strict timestamp/checksum-only normalization. Final publication hashes:
+
+- x86: 8714984c762d60b38e559dcf25ce5bc06203cf35a1a462c003fd4556fc1480a2
+- x64: 91783edec40524944ab15bd98ef429088c662583523c2c056ebf1195af5bf89c
+
+Remaining decisions must distinguish declaration necessity from implementation
+approval. BufferMidi's status reaches MidiResult in VsbByteOut; the real parser
+fixture observes IO_ERROR, paused rejection and retained-message service. The
+original void API cannot report those outcomes to the port owner. SbService and
+SbGetStatus are checked by platform.c before executor progress; SbSetRunning
+connects the same executor's activation to PCM/MIDI suspension. Original native
+worker/event contracts cannot be silently substituted for this executor-only
+device contract. Mixer gain callbacks connect the existing register owner to
+stream-local PCM gain and optional MIDI host gain, rather than creating another
+mixer. These are concrete supported contracts, not proof that every later
+provider implementation line is necessary.
+
+The DMA structure retains the original six field widths without introducing
+an NTVDM SDK dependency: neither supported MinGW include tree supplies the
+original vddsvc.h type, and no retained repository header defines it. Its
+QueryDMA/SetDMACountAddr users access the original controller fields; replacing
+it with a native handle or guest pointer is not an equivalent restoration.
+An exact original type-name/declaration restoration still needs a coherent
+provider-level check, rather than a same-layout observation alone. File 455 is
+therefore **not yet marked complete**: this remaining original-type alternative
+must be resolved before recording its residual decision and delivering P146.
+
+## File 455 host/inc/nt_sb.h (P146)
+
+The original-type alternative is now resolved: restore VDD_DMA_INFO and
+PVDD_DMA_INFO, the original six WORD/BYTE fields, original DMA function return
+and parameter types, all provider uses and the existing fixture declarations.
+There is no SB_DMA_INFO compatibility alias. The declaration remains local
+because the supported SDKs do not provide vddsvc.h; this does not import any
+NTVDM service implementation. Its field order and storage widths are unchanged.
+This coherent restoration adds four header-diff lines but removes 22 provider
+diff lines, a further net reduction of 18. Unlike the rejected internal
+declaration relocation, it reduces the complete coupled mirror difference.
+
+| Point | Initial analysis | Counter-review / disposition |
+| --- | --- | --- |
+| R0575 | Original MM include, typedefs, handle/port externs, unused prototypes and selected empty macros were removed/reformatted. | Actual consumers compile with original declarations. Restore them; unused declarations do not require recreating native workers. Existing excluded bodies remain unexamined. |
+| R0576 | Original WORD port globals and BOOL declarations conflicted with current signed/private providers. | Restore providers coherently, including initialization-time BasePort assignment and the single owning high-speed flag declaration. Remove the fixture's redundant conflicting declaration. Header-only failure is not used as retention evidence. |
+| R0577 | BufferMidi differs from XP VOID by returning lib_status. | Qualified pending owner decision: VsbByteOut consumes the status; the real parser and host-failure fixtures verify rejected input, IO_ERROR and retained-message service. The original void contract cannot convey these outcomes. This is supported-contract/source proof plus current-path tests, not a claim that the original NTVDM product failed. |
+| R0578 | Additional status/service, suspension, reset, completion and mixer declarations plus MIDI adapter include. | Qualified pending owner decision: sole-executor platform service checks SbService/SbGetStatus and activation calls SbSetRunning; original port/mixer owners call the parser and output owners. Native-worker replacement would change the supported executor/host ownership contract. Retain declarations for those existing paths; provider whole-file implementation review is still outstanding. Remove the redundant PCM include instead of retaining both transitively. |
+| R0579 | SB_DMA_INFO renamed and compressed the original SDK record. | Restore original VDD_DMA_INFO/PVDD_DMA_INFO and corresponding provider types; tests use the unique restored declaration. Local placement remains a qualified owner decision because supported SDKs lack the original type and actual controller query/update calls require its layout. No guest/native handle conversion or second DMA controller is introduced. |
+| R0580 | DSP_MODE and internal forward declarations sit in the added header tail rather than their original provider positions. | A coherent private relocation compiled and was binary-equivalent but increased total XP diff by one line, so reject it under the owner's no-increase rule. The existing declarations supply types before real production calls; retaining their location is a qualified constrained decision, not a claim that header ownership is inherently required. No extra test enum or declarations remain. |
+
+Every remaining selected header difference is accounted for by these declaration,
+status, SDK-layout and placement groups. Necessary original line mappings and
+the established exclusions are unchanged in meaning and receive no new points.
+The two provider files have only coupled edits here; their complete-file audits
+have not been advanced. Historical comments removed from the rewritten header
+do not constitute new executable behavior or approval of the prior adaptation.
+
+Final validation: cached x86/x64 builds 13.94/25.10 s; focused sound tests 8/8
+per architecture (0.99/1.44 s). Both EXEs again match the already qualified
+candidate under the strict timestamp/checksum normalization. Thus the preceding
+188/188 background and 4/4 related native tests per architecture remain
+applicable; unchanged Lib desktop tests remain pending final acceptance.
+Mirror/documentation gates and actual source/test diff review pass. No source
+changes after these builds are part of this delivery.
+
+- Final x86 SHA-256: 550b98b814cf0f2750f1c96c3c9c00044672d77e7dc8ad3ec9f0383bd894d139
+- Final x64 SHA-256: 61a447b595e7fc89dcf140a85862c84bdd111ec174c15cef078e3629bd6f7f4d
+- Production +347/-75, net +272; test +12/-12, net zero. This is restored source.
+- XP-relative added+deleted diff **decreases 346 lines**: header -321,
+  nt_sb.c -3, nt_sbdsp.c -22. Existing exclusion bodies are skipped.
+
+File 455 is audited with restored and qualified-pending dispositions. Frontier
+455/472, with 17 files not yet completely audited. These qualified points and
+earlier owner decisions remain open; S1/T100 are not closed.
