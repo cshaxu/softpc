@@ -8991,3 +8991,235 @@ frozen file 424. S1 and all qualified owner decisions remain open.
 P126 runners exited with their PIDs absent. Scratch preview/removal and residue
 check pass. Documentation gate and actual diff review pass; delivery changes
 only the three task evidence/status files. User media/configuration are intact.
+
+
+## File 424: gfx_updt.c (P127)
+
+Pinned XP raw SHA-256 3d8218d31fa1c9845900b431e5c25d1a6df6fa6ed61fb42d084a93ad3d323a4e.
+The file is compiled into softpc-machine-devices on both architectures. The
+original update selector and host timer dispatch its text/graphics painters;
+original mode selection also calls set_mark_funcs. This is the original
+producer/update machinery, not a replacement in Session or KVM.
+Existing excluded bodies and their conditional/line-control scaffolding are
+skipped without new accounting. The frozen frontier remains 423 until delivery.
+
+### Restoration and remaining decisions
+
+R0529 restores original spelling by removing added explanatory comments and
+three trailing spaces. R0530 minimizes the existing ega_text_update guard:
+remove four local copies and unsupported 160-column/200-row/32-pixel limits,
+restore the original lines_per_screen expression, and retain only nonzero
+stride, actual backing-store spans and the actual dirty-array capacity.
+The latter capacity is sizeof(dirty)/sizeof(dirty[0]), 768 in the selected
+configuration; it is not a new public text-size limit. This removes restrictions
+which reject real CRTC-generated geometry. Zero stride cannot be restored
+unconditionally: the actual original divide faults after a CRTC offset write.
+The remaining guard is qualified pending owner decision, not automatically
+approved. No extra update path or compatibility mode is added.
+
+Other selected residuals, grouped by one shared representation/algorithm rule:
+
+| Point | XP source interval | Residual and source justification |
+| --- | --- | --- |
+| R0531 | 310-565, 1868-2374 | Dirty scanning, painting and clearing preserve byte alignment within four-byte dirty groups; paired V7 rows retain the shared-group residue. Converting offsets to groups early drops bytes at row boundaries. Clear extent rounds up to include the final intersecting group. |
+| R0532 | 596-602, 645-650, 831-1158, 1195-1234, 1517-1650, 2493-2748 | CHAIN2 text, split/wrap, both CGA banks and scrolling use the same existing interleaved-cell mapping and stride. WORD pointers advance four elements; DWORD pointers advance two. Keep zero-offset get_chain2_screen_ptr calls consistent with the mapping, as required by the owner; an isolated equal-base substitution is not an independent simplification. |
+| R0533 | 673 | remove_old_cursor supplies the fifth paint argument, height=1. The actual host paint contract has five arguments; the original four-argument call exposes an indeterminate height. |
+| R0534 | 1868-2374 | Panning marks the preceding group read by the output pixel dependency, including bank wrap; ascending traversal does not repeatedly propagate newly marked predecessors. Wrapped split paints both portions before clearing shared marks. Split heights use the correct host/scanline units and separately painted boundary rows are cleared once. These use the original dirty bitmap and paint dispatch, not a second renderer. |
+| R0535 | 3830 | CHAIN2 graph mode selects the existing EGA bitmap marker. The original assert-only case leaves stale text/CGA marking when the actual controller changes mode. |
+
+The selected ranges above include all changed text/dirty/paint/marker bodies;
+there is no additional selected algorithm silently classified as formatting.
+The grouped negative tests below prove the relevant behavioral dependency;
+they are not represented as an independent negative for every repeated line.
+The source review checks each repeated address/clear rule against its caller
+and representation. R0531-R0535 remain evidence-qualified owner decisions.
+
+### Actual-body comparisons
+
+Private variants compile the real gfx_updt.c body with the production command
+and link its object ahead of the unchanged machine archive. Current controls
+pass on both architectures. Restoring the dirty group to original fails the
+existing route-0 full-mark residue assertion (stride 80, residue 1, address
+320). Restoring the complete text-mapping group, including both CGA banks
+through XP line 1650, fails the independent incremental colour matrix in modes
+04/05 on both widths. An earlier partial text restoration stopped at 1625;
+it is superseded by this complete group and is not the final justification.
+
+A focused real BIOS mode-3 to V7 mode-63 transition followed by c_sas_store at
+0xa0100 produces bitmap[0x40]=1, low=high=64 with the selected marker. Restoring
+the original assert-only branch leaves bitmap[0x40]=0, low=INT_MAX, high=-1
+although dirty_total increments. Both originals fail the bitmap assertion;
+current controls pass. This closes a gap in the older fixture which installed
+mark pointers directly and therefore could not validate mode-selection wiring.
+
+The actual remove_old_cursor body calls a five-argument recording painter.
+Current height is 1 on both widths; original four-argument bodies yield
+17651156 (x86) and -1082140016 (x64) in these runs and fail the height assertion.
+Those incidental values are not a stable ABI promise; the missing argument is
+the defect. A first undeclared probe entry failed compilation and was corrected
+before this comparison; it does not count as behavior evidence.
+
+### Geometry restoration evidence
+
+Original BIOS mode 3, CRTC protection unlock, horizontal-display register 160
+and offset register 81 produce 161 columns, stride 324 and 25 rows. The old
+local guard paints nothing; the minimized guard paints 25 rows on both widths.
+CRTC font height 1 and vertical-display/overflow writes produce 400, 768 and
+769 rows. The old 200-row guard rejects the first two; the candidate paints
+400/768 and rejects 769, preserving the actual dirty-array bound. These are
+original controller and updater calls, not direct replacement geometry setters.
+
+Writing CRTC offset zero then running the original two-tick mode update yields
+stride/length zero. Current guarded execution returns; restoring the original
+unguarded calculation faults with 0xc0000094 on both widths. The initial probe
+omitted the ticks and therefore did not establish zero stride; that setup
+failure is excluded. The initial wide-column probe omitted the CRTC protection
+unlock and similarly did not establish the requested width; it is excluded.
+
+The permanent regression extends vga_frame_smoke with the CRTC geometries and
+actual backing-store boundaries.
+Its first placement after the virtual-CRTC test inherited that test's vertical
+multiply flag: observed 800 lines, stride 648 and length 32400 instead of
+400/324/8100. Reset did not undo the test's direct flag assignment. The new
+regression runs before those state-mutating probes and restores BIOS mode 3
+on exit. Sequential runs also erase an old cursor through a separate two-byte
+paint: 400 full rows plus one cursor erase is 401 callbacks, not a row defect.
+The assertion counts full-row paints separately; it does not disable cursor
+behavior or change production to accommodate a test.
+
+No new guest session, every malformed snapshot combination, all paging modes
+or complete graphics hardware conformance is claimed. The guard is not presented as a validator for arbitrary corrupted snapshot state.
+Final-source dual-architecture build/full regression is in progress.
+
+### Counter-review: reject the first capacity candidate
+
+The first candidate retained screen_length <= 2*EGA_PLANE_DISP_SIZE while
+relaxing 200 rows to the actual dirty-array capacity. Actual V7 register F6
+bit 6 doubles that display span, but nt_graph.c still allocates video_copy at
+0x20000 and EGA_planes at 4*EGA_PLANE_SIZE. A controlled private fixture gives
+the updater larger scratch buffers and observes writes past those real limits,
+without performing an uncontrolled heap overrun.
+
+BIOS mode 3, extension unlock, F6=40h, CRTC offset=127 and 400 one-scanline rows
+produce stride 508, screen_length 203200 and display bank 131072. The first
+candidate writes 72128 bytes beyond video_copy's real capacity on both widths;
+the pre-audit guard writes none. The first candidate is rejected, despite its
+passing 188/188 background suites on both widths. Those passes are not final
+qualification. A private-probe compilation initially used incorrect allocation
+wrapper names; correcting only the probe to lib_allocate/lib_release establishes
+the actual-body comparison.
+
+The length check must include 2*screen_start and use the real backing size,
+not the selectable display-bank span. A second counter-review also covers
+visible columns wider than the row stride: 160 columns, stride 256, 512 rows
+have screen_length 131072 but the last visible row extends another 64 bytes.
+Checking the full-copy extent alone permits those writes; checking the final
+visible-row extent as well rejects them. The two checks share the existing
+failure return, with no additional painter, allocation or retry mechanism.
+The candidate correction and final qualification are still being completed.
+
+
+The final-row private comparison explicitly compiles both candidate bodies,
+rather than mixing the concurrently rebuilt x86/x64 archive revisions. Both
+architectures observe 64 out-of-capacity bytes with the full-copy-only guard
+and zero with both extents checked. Its first diagnostic accidentally retained
+stride 508; that run is not last-row evidence. Final private full VGA fixtures
+with the seven planned geometry cases pass x86 (7.48 s) and x64 (7.07 s).
+They establish focused candidate behavior, not final published qualification.
+
+Counter-review of the guard uses the actual accesses: full copies touch
+2*screen_start + screen_length cached bytes; dirty scanning's final visible
+row ends at 2*screen_start + screen_length - stride + 2*columns. The interleaved
+source uses four times that byte domain and is allocated four times as large.
+The original CRTC fields bound these arithmetic inputs; this is not a claim
+that arbitrary externally corrupted internal values are accepted safely.
+Both spans must fit EGA_PLANE_SIZE, independently of the bank wrapping control.
+The original nonzero-stride check precedes division, and dirty-record capacity
+bounds the number of rows. No new allocation, producer state or hidden retry is
+introduced. Earlier arbitrary column/font limits have no role in those bounds.
+
+### P127 final-source qualification status (not delivered)
+
+Actual production delta +9/-34, net -25; permanent test delta +70/-0.
+XP-relative added/deleted diff delta is -29/-4, 33 fewer difference lines.
+Existing exclusions are unchanged, not separately re-counted. Mirror CRLF and
+non-mirror LF are preserved. Final normalized source SHA-256 is
+d177cfcb603265f074c76c7a4145251639a16afa9044fc97dae46e71d5b4619a;
+final test SHA-256 is
+9cc84ae3374bd3b3fd9ad1f9d3478542d347423768289fa604113767120ba913.
+
+Final cached builds pass x86 (9.71 s) and x64 (12.81 s); final VGA fixtures pass
+5.91/5.57 s. Background suites pass 188/188 on each width, 137.21/140.27 s.
+Both build logs have 89 warnings, all located in mirror source/headers, none
+in shared components or autonomous test source. This is not a warning-free
+mirror claim. Actual source/test diff, XP manifest and documentation gates pass.
+
+Native suites pass only 2/8 on each architecture: Window retirement/modal pass;
+audio lifecycle, SB MIDI, native MIDI, both package variants and Console display
+fail. Audio failures are device-open assertions; package initialization fails;
+Console display fails its 80*25 write assertion. The actual executing neko
+session (ID 3) is Disc at both observation points. These are observed failures,
+not passes or conclusively all explained by disconnection; a connected rerun
+is required. The owner has been asked to reconnect. Full result is 380/392,
+not complete acceptance, and no P127 commit/push/frontier advance is claimed.
+
+Published candidate artifacts (not accepted delivery):
+- x86-artifact: 19:36:48 Nov 13 2026; SHA-256 78d5b8cc2319f6ba53a642ee5908ad92cdd106bfeee1bb7c172231b4a94088c8.
+- x64-artifact: 19:39:31 Nov 13 2026; SHA-256 a34feecb86871c2250091263c92db6909dc3b3795634926f9c73d7ebddc6aa1a.
+
+Final delivery runner exited with code 1 because native tests failed. Process
+inventory confirms no owned Python/compiler/CTest task remains. Scratch stays
+under the active packet's build/t100-s1 pending connected qualification; it is
+not archived evidence. Source investigation for this file is recorded, but file
+424 remains undelivered and the frozen delivered frontier remains 423/472.
+
+### P127 connected revalidation and delivery review
+
+Owner requested retry and the executing neko session was Active. The native
+CTest suites then pass 7/8 on each width (43.75/15.18 s): audio lifecycle,
+SB MIDI, native MIDI, both package routes and both Window tests pass.
+Console display alone still fails its initial 2000-character write assertion.
+The owner reported another disconnection during this interval; after a fresh
+Active observation, isolated Console CTest runs also fail. Do not attribute
+this residual solely to disconnection or claim CTest 392/392.
+
+A disposable instrumented copy of the actual Console fixture records its
+setup before broker creation. x86 requests 120x60, but observes 42x14 before
+console_broker_create; native fill reports 588. The backend retains that same
+geometry, so this first failure precedes broker operation and does not execute
+the changed VGA object. The instrumented x64 fixture passes without production
+changes, while the original CTest launch remains sensitive. No shared code,
+assertion, system setting or user configuration was changed.
+
+The exact original test binaries pass with CREATE_NEW_CONSOLE and
+STARTF_USESHOWWINDOW/SW_HIDE set at process creation. Fixed three-run sequences
+pass on both architectures (x86 0.43/0.42/0.53 s; x64 0.41/0.40/0.40 s).
+A further direct run uses the exact WORKING_DIRECTORY registered in
+CTestTestfile.cmake and passes x86/x64 (0.44/0.47 s), with no changed arguments.
+The binary SHA-256 values are:
+- x86: 1f7587e3f20858edb4a2ccd1bdedacdda197e87e4e08ca4d9328eed9cba36c86.
+- x64: 933a32e7d962d568ab0456ffbbee1da5cda5169228fe33fa343f134ade0e9328.
+
+Running CTest itself in a new hidden Console, including its documented
+interactive-debug option, does not fix the child's initial geometry. Thus the
+qualification consists of 376 passing background CTest cases, 14 passing native
+CTest cases and two original native Console binaries passing in explicit hidden
+Console processes. All required test bodies ran unchanged; this is not a claim
+that the default CTest launch is fixed. Its host-startup geometry limitation is
+recorded here separately from mirror behavior, with no unrelated shared patch.
+An exploratory headless-host launch also exited zero but is not needed for or
+counted in the acceptance evidence.
+
+Coordinator review re-read the actual production/test diff, the original-first
+request and failure controls. Restored text reduces XP-relative difference;
+retained guards correspond to proven division, array and memory-span needs.
+The two unsafe intermediate candidates were rejected before delivery. There is
+one original update/paint path, no alternate renderer or generated build input.
+Final binaries, source and fixture hashes match their verified final builds.
+Qualified R0530-R0535 remain owner decisions; D001-D006 and L001 stay open.
+This completes file 424's delivery scope, not S1 or T100. Frontier 424/472;
+next frozen file is 425 base/video/gvi.c.
+
+P127 owned-process inventory is empty. Exact scratch preview/removal and build
+residue check pass; reusable caches and user configuration/media remain intact.
+XP manifest, documentation gate and final actual-diff checks pass.

@@ -30,15 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P126 completes file 423 egwrtm12.c: ten existing CHAIN2 address
-corrections are qualified pending R0519-R0528. Both current controls pass;
-twenty independent and two combined original restorations fail expected data
-assertions. New original plane-enable defect D006 is recorded, not patched.
-No production/test/artifact changes; P125 publication and P114 full 392/392
-baseline remain. Frontier 423/472; next frozen file 424. D001-D006, L001 and
-other qualified decisions remain open.
-See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
-S1 remains active; no routine approval is awaited.
+T100 S1 P127 completes file 424 gfx_updt.c original-first minimization.
+Production +9/-34, test +70/-0; XP-relative difference decreases 33 lines.
+Both final cached builds/publications and VGA fixtures pass, with 188/188
+background CTest cases per architecture. Native coverage is 7/8 via CTest per
+width plus the unchanged Console test passing in an explicit hidden Console
+process on each width. Default CTest Console startup still has an initial
+geometry limitation; it is documented, not falsely counted as repaired.
+No shared-component or user-asset changes. R0530-R0535 and other qualified
+owner decisions remain open, as do D001-D006 and L001. Frontier 424/472;
+next frozen file 425 base/video/gvi.c. S1 remains active; no routine approval
+is awaited. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

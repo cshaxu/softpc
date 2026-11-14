@@ -2013,6 +2013,75 @@ static void verify_virtual_text_height(void)
     video_adapter = VGA;
 }
 
+static unsigned text_geometry_paints;
+
+static void text_geometry_paint(int offset, int x, int y, int width, int height)
+{
+    (void)offset;
+    (void)x;
+    (void)y;
+    assert(height == 1);
+    /* Cursor erasure is a separate, single-cell paint. */
+    if (width != 2) ++text_geometry_paints;
+}
+
+static void verify_text_geometry_capacity(softpc_machine *machine)
+{
+    const unsigned rows[] = {25, 400, 768, 769, 400, 400, 512};
+
+    for (unsigned i = 0; i < sizeof(rows) / sizeof(rows[0]); ++i) {
+        half_word protect, overflow;
+        unsigned extent = rows[i] - 1;
+        assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+        c_setAH(0); c_setAL(3);
+        assert(softpc_device_bop_dispatch(0x42, 0));
+        outb(0x3d4, 0x11); inb(0x3d5, &protect);
+        outb(0x3d5, protect & 0x7f);
+        if (i == 0) {
+            outb(0x3d4, 1); outb(0x3d5, 160);
+            outb(0x3d4, 0x13); outb(0x3d5, 81);
+        } else {
+            outb(0x3d4, 9); outb(0x3d5, 0);
+            outb(0x3d4, 7); inb(0x3d5, &overflow);
+            outb(0x3d5, (overflow & ~0x42) |
+                ((extent & 0x100) >> 7) | ((extent & 0x200) >> 3));
+            outb(0x3d4, 0x12); outb(0x3d5, extent & 255);
+        }
+        if (i >= 4) {
+            outb(0x3c4, 6); outb(0x3c5, 0xea);
+            outb(0x3c4, 0xf6); outb(0x3c5, 0x40);
+            if (i == 4) {
+                outb(0x3d4, 0x13); outb(0x3d5, 127);
+            } else if (i == 5) {
+                outb(0x3d4, 0x0c); outb(0x3d5, 0x9c);
+                outb(0x3d4, 0x0d); outb(0x3d5, 0x40);
+            } else {
+                outb(0x3d4, 1); outb(0x3d5, 159);
+                outb(0x3d4, 0x13); outb(0x3d5, 64);
+            }
+        }
+        host_timer_event(); host_timer_event();
+        assert(get_chars_per_line() == (i == 0 ? 161 : i == 6 ? 160 : 80));
+        assert(get_screen_length() / get_offset_per_line() == (int)rows[i]);
+        assert(get_display_disabled() == 0);
+        assert(get_screen_start() == (i == 5 ? 40000 : 0));
+        void (*saved_paint)() = paint_screen;
+        paint_screen = (void (*)())text_geometry_paint;
+        text_geometry_paints = 0;
+        lib_memory_set(video_copy, 0, 0x20000);
+        lib_memory_set(EGA_planes, 0x41, 4 * EGA_PLANE_SIZE);
+        setVideodirty_total(1);
+        ega_text_update();
+        assert(text_geometry_paints == (i < 3 ? rows[i] : 0));
+        paint_screen = saved_paint;
+    }
+    outb(0x3c4, 6); outb(0x3c5, 0xea);
+    outb(0x3c4, 0xf6); outb(0x3c5, 0);
+    c_setAH(0); c_setAL(3);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    host_timer_event(); host_timer_event();
+}
+
 int main(void)
 {
     const char *path = "softpc-original-dib-smoke.img";
@@ -2037,6 +2106,7 @@ int main(void)
         &height));
     assert(bits != NULL && info != NULL);
     assert(width == 1280u && height == 768u);
+    verify_text_geometry_capacity(machine);
     verify_text_stride();
     verify_fullscreen_text_clear();
     verify_fullscreen_cursor_metadata();

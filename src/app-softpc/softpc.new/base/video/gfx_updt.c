@@ -276,7 +276,6 @@ static	int	search_video_copy IFN4(int, start_line,
 	int offset = (start_offset<<2) + alignment;
 	byte *vcopy,*end_ptr;
 
-	/* T60: a four-byte mark can intersect both adjacent display rows. */
 	for (; start_line < end_line; start_line++, offset += get_offset_per_line())
 	{
 		vcopy = &video_copy[offset>>2];
@@ -330,7 +329,6 @@ static	int	v7_search_video_copy IFN3(int, start_line,
 	byte *end_ptr;
 	int offset, row_offset, first, last;
 
-	/* T60: retain paired-row scanning, including groups shared by pairs. */
 	offset = (start_offset<<2) +
 		((get_screen_start()+start_line*get_offset_per_line()) & 3);
 	for (; start_line < end_line; start_line += 2, offset += half_opl<<2)
@@ -1140,30 +1138,15 @@ void ega_text_update IFN0()
 	int	lines_per_screen;
 	int	offset;
 	int	screen_start;
-	int	offset_per_line;
-	int	screen_length;
-	int	chars_per_line;
-	int	char_height;
 
 	if (getVideodirty_total() == 0 || get_display_disabled() )
 		return;
 
-	/* A real mode change writes the CRTC fields one at a time.  The NT host
-	   happened not to call this painter until those writes had settled; the
-	   detached host ticks independently and can observe the transient.  Do
-	   not interpret incomplete geometry as text memory: that would overrun
-	   video_copy/dirty records before the next controller tick selects the
-	   final original paint routine. */
-	offset_per_line = get_offset_per_line();
-	screen_length = get_screen_length();
-	chars_per_line = get_chars_per_line();
-	char_height = get_host_char_height();
-	if (offset_per_line <= 0 || screen_length <= 0 ||
-		chars_per_line <= 0 || chars_per_line > 160 || char_height <= 0 ||
-		char_height > 32 || screen_length > 2 * EGA_PLANE_DISP_SIZE ||
-		(screen_length % offset_per_line) != 0 ||
-		(screen_length / offset_per_line) > 200 ||
-		get_screen_start() > EGA_PLANE_DISP_SIZE) {
+	if (get_offset_per_line() <= 0 ||
+		(get_screen_start()<<1) + get_screen_length() > EGA_PLANE_SIZE ||
+		(get_screen_start()<<1) + get_screen_length() - get_offset_per_line() +
+			2 * get_chars_per_line() > EGA_PLANE_SIZE ||
+		(get_screen_length() / get_offset_per_line()) > (int)(sizeof(dirty)/sizeof(dirty[0]))) {
 		setVideodirty_total(0);
 		return;
 	}
@@ -1174,7 +1157,7 @@ void ega_text_update IFN0()
 
 	ALIGN_SCREEN_START(screen_start);
 
-	lines_per_screen = screen_length/offset_per_line;
+	lines_per_screen = get_screen_length()/get_offset_per_line();
 
 	if(getVideodirty_total()>1500)	/* paint the whole lot */
 	{
@@ -1874,7 +1857,6 @@ cga_hi_graph_update IFN0()
 #endif
 #line 1785
 
-/* T60: panning reads one byte ahead, including across a row/bank boundary. */
 static void mark_panned_neighbours IFN0()
 {
 	int first, last, mark, wrap;
@@ -1884,7 +1866,6 @@ static void mark_panned_neighbours IFN0()
 	if (first >= (EGA_PLANE_DISP_SIZE>>2)) return;
 	if (last >= (EGA_PLANE_DISP_SIZE>>2)) last = (EGA_PLANE_DISP_SIZE>>2)-1;
 	wrap = first == 0 && video_copy[0];
-	/* Ascending order never propagates a newly added mark again. */
 	for (mark = first ? first : 1; mark <= last; mark++)
 		if (video_copy[mark]) video_copy[mark-1] = 1;
 	if (first) setVideodirty_low(first-1);
@@ -1894,7 +1875,6 @@ static void mark_panned_neighbours IFN0()
 	}
 }
 
-/* T60: complete the original wrap+split upper-region placeholder. */
 static void paint_wrapped_split IFN1(int, height)
 {
 	int row, offset, x, width, first, last, mark, pass;
@@ -1923,7 +1903,7 @@ void	ega_wrap_split_graph_update IFN0()
 #line 1875
 #ifndef NEC_98
 #line 1876
-	register	int	bpl; 
+	register	int	bpl;
 	register	int	opl;
 	register	int	screen_split;
 
@@ -1990,7 +1970,7 @@ void	ega_split_graph_update IFN0()
 {
 #ifndef NEC_98
 #line 1946
-	register	int	bpl; 
+	register	int	bpl;
 	register	int	opl;
 	register	int	screen_split;
 	register	int	screen_height;
@@ -2152,7 +2132,6 @@ void	vga_graph_update IFN0()
 			register	int	next;
 			register	int	start_line,end_line;
 	
-			/* T60: a dirty group spans four bytes and may precede screen_start. */
 			start_line = ((int)(getVideodirty_low()<<2) - get_screen_start())/opl;
 			end_line = ((int)(getVideodirty_high()<<2) + 3 - get_screen_start())/opl + 1;
 	
@@ -2214,7 +2193,7 @@ void	vga_split_graph_update IFN0()
 {
 #ifndef NEC_98
 #line 2162
-	register	int	bpl; 
+	register	int	bpl;
 	register	int	opl;
 	register	int	screen_split;
 	register	int	screen_height;
@@ -2296,7 +2275,6 @@ void	ega_graph_update IFN0()
 			register	int	next;
 			register	int	start_line,end_line;
 	
-			/* T60: a dirty group spans four bytes and may precede screen_start. */
 			start_line = ((int)(getVideodirty_low()<<2) - get_screen_start())/opl;
 			end_line = ((int)(getVideodirty_high()<<2) + 3 - get_screen_start())/opl + 1;
 			if(start_line<0)start_line = 0;
@@ -2430,7 +2408,6 @@ void	ega_wrap_graph_update IFN0()
 			 */
 
 			paint_records(next,next1,wrapped_bytes & 3);
-			/* T60: the separately painted boundary row has no dirty record. */
 			memset(&video_copy[(EGA_PLANE_DISP_SIZE-left_over)>>2],0,
 				(((EGA_PLANE_DISP_SIZE-left_over) & 3)+(left_over < bpl ? left_over : bpl)+3)>>2);
 			if (left_over < bpl)
@@ -3886,8 +3863,6 @@ set_mark_funcs IFN0()
 					break;
 
 				case CHAIN2:
-					/* DIVERGENCE(T88-CHAIN2-DIRTY): select the EGA
-					 * bitmap marker, not stale CGA/text pointers. */
 					SetMarkPointers(2);
 #line 3831
 

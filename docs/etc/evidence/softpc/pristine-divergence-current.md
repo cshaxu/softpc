@@ -2285,3 +2285,22 @@ the existing private fixture. Production +6/-10, test +2/-0; XP diff decreases
 16 lines (-10 added/-6 deleted). Both final EXEs are metadata-equivalent and
 both rebuilt VGA fixtures pass. No selected declaration residual remains in
 cpu_vid.h or ega_writ.c; existing exclusion scaffolding is not re-accounted.
+
+
+### T100 S1 P127 gfx_updt.c original-first minimization
+
+Original-spelling restoration removes added explanations and whitespace.
+The existing text updater guard is minimized around actual allocation spans
+and dirty-record capacity; arbitrary 160-column/200-row/32-pixel restrictions
+are removed. Counter-review rejected a display-bank-based length check and a
+full-copy-only replacement: the last visible row must also fit real storage.
+R0529-R0535 and actual-body negative controls are in the T100 evidence.
+Retained text mapping, dirty/panning/wrap handling, cursor argument and selected
+marker wiring remain qualified pending owner decisions. This supersedes the
+older blanket retention rationale for this file without approving the residuals.
+Existing exclusions are unchanged and not accounted anew. Production +9/-34,
+net -25; XP-relative diff decreases 33 lines (-29 added/-4 deleted). Permanent
+tests +70/-0. Both final builds and background suites pass; native coverage is
+14 passing CTest cases plus the two unchanged Console binaries passing in
+explicit hidden Console processes. The default CTest Console startup limitation
+remains separately recorded, not misreported as repaired.
