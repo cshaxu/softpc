@@ -2,30 +2,10 @@
 
 ## Current Work
 
-Owner accepts and closes T100 S2 and admits M9 T100 S3 to review the remaining
-existing mirror differences together. T100 remains open. See the
-[S2 closure](../history/M9-T100-S2-candidate-review.md).
-
-## M9 T100 S3 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner revokes all previous mirror-difference retention approvals and all small-diff automatic approval delegation. Reaudit every current point and classify with category-level diff-block, added/deleted-line and point totals. This revokes decisions, not production code. Owner subsequently authorizes S3 P16 to restore the audited nonsemantic text candidates and verify their line controls; no semantic retention approval is reinstated. |
-| Objective | Fresh full-mirror difference audit against pinned XP, including formerly approved points and delivered repairs; every nonexcluded changed line must have a reviewed purpose and reconcile to category totals. |
-| Non-goals | No semantic source change, new repair, excluded-body inventory, sibling writes, guest changes or reopening S2-declined repairs. |
-| Reference Baseline | Accepted S2 P6 62474beb; S1 frozen 472-file order and 381 residual IDs; pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
-| Candidate Proposal | [S3 remaining-difference review](../proposals/m9-xp-mirror-original-first-audit.md#s3-owner-admitted-remaining-difference-review). |
-| Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, P16 restores approved text candidates only; task records own approval status. |
-| Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP only; no OpenNT reads. |
-| Verification | Cross-check current source and prior evidence for each presented point. Separate source/ABI proof, controlled tests and guest reproduction. Documentation-only admission uses documentation/whitespace checks, not invented fresh runtime qualification. |
-| Expected Markers | Zero current retention approvals. Reconcile all 472 current mirror files to the 381 historical residual IDs, separate notices and subsequent repairs; do not assume the historical count is the fresh inventory. Every current difference receives source ranges, classification and reproducible counts. |
-| Asset Needs | Preserve configuration/media/snapshots. S3 owns build/t100-s3 for disposable review scripts; two-hour run/fifteen-minute no-progress budget if probes are needed; clean at each delivery. |
-| Reporting Requirements | Original/current code, necessity evidence and limits, restoration consequence and actual XP diff; distinguish recommendation from approval. |
-| Stop Conditions | Admission does not authorize arbitrary restoration or new patches. Unproved necessity returns to investigation. Do not revive declined bulk repairs or approve a whole family from one representative. |
-| Exit Criteria | Every current nonexcluded difference is reviewed and categorized; category totals reconcile to all-file counts with no unclassified changes. Deliver the full inventory for fresh owner review; no inherited retention approvals. |
-| Original Owner Request | 批准收口s2 准入s3 一起来审批剩余diff清单. |
-| Similar-Issue Sweep | Check related declarations/callers when presenting a point, without silently widening implementation scope or duplicating the existing residual ledger. |
+No implementation subtask is active. Open task awaiting owner: T100.
+Owner accepts P16 and closes M9 T100 S3. No next S is admitted. See the
+[S3 closure](../history/M9-T100-S3-mirror-review.md). Remaining whole-mirror
+classification and retention decisions stay in the T100 proposal for later admission.
 
 ## Current Technical Baseline
 
@@ -36,10 +16,11 @@ EXEs; full-byte comparison permits only compiler time and PE metadata changes.
 Under the existing owner exception, runtime tests are not repeated. Manifest
 and documentation gates pass. [P16 evidence](../etc/evidence/softpc/m9-t100-s3-p16.md)
 records exclusions, correction of a failed intermediate candidate, historical
-ID relationships, and limits. S3 remains open with no semantic retention approvals.
+ID relationships, and limits. S3 is owner-closed; semantic retention approvals
+remain revoked, and the uncompleted full classification stays with open T100.
 
 Owner rejects the limited P15 purpose summary and revokes all prior mirror
-retention approvals, including automatic small-point delegation. S3 now performs
+retention approvals, including automatic small-point delegation. The outstanding requirement is
 a fresh all-point audit with category diff-block/line/point accounting. No source
 is reverted by this instruction; previous approvals are historical only. The
 [point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
@@ -52,7 +33,7 @@ and full tests pass 392/392 without retries/skips, including native desktop,
 audio and package tests. Registration comparison proves only the two serial
 properties change; scheduling logs prove exclusive execution. P4 EXEs remain
 byte-identical. [P6 evidence](../proposals/m9-xp-mirror-original-first-audit.md#test01-p6-delivery)
-records timings, review and scope. Owner accepts S2; S3 is active and T100 remains open.
+records timings, review and scope. Owner accepts S2; S3 is now owner-closed and T100 remains open.
 
 
 T100 S2 P4 repairs CHAIN4 mode2 scalar plane-byte selection: production +12/-12,
@@ -75,7 +56,7 @@ Owner declines L001 and D001-D003 repairs this round: retain evidence and
 known limits without new code or snapshot-format changes. D004 hardware/path
 investigation confirms a scalar plane-byte selection defect on both widths;
 [diagnostic evidence and candidate](../etc/evidence/softpc/m9-t100-s2-d004.md)
-are delivered in P4 with fresh full qualification. TEST01 P6 is accepted with S2 closure. S3 reviews remaining existing differences; T100 stays open.
+are delivered in P4 with fresh full qualification. TEST01 P6 is accepted with S2 closure. Remaining difference review stays with open T100 after S3 closure.
 
 
 T100 S1 P164 restores only ev_glue.c's XP include-line comment:
@@ -94,7 +75,7 @@ net growth and anchored per-point counts. P189 provides the
 [compact owner decision packet](../etc/evidence/softpc/m9-t100-owner-decisions.md#compact-owner-decision-packet):
 existing functional/ABI differences, six compiler items, historical notices,
 and unimplemented new repairs are separate choices. The audit-delivery
-completion review is recorded. S1 and S2 are owner-closed; remaining existing-difference approvals are under S3. T100 remains open. See the
+completion review is recorded. S1-S3 are owner-closed; remaining existing-difference approvals await further T100 work. T100 remains open. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p189-compact-owner-decision-packet).
 
 
@@ -130,6 +111,8 @@ remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
 did not admit S44 or a new implementation task.
 
 ## Recent M9 Closures
+
+- [T100 S3 mirror review and text restoration](../history/M9-T100-S3-mirror-review.md).
 
 - [S2 candidate review](../history/M9-T100-S2-candidate-review.md).
 

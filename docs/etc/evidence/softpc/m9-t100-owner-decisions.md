@@ -21,6 +21,10 @@ semantic retention: 176 text hunks in 37 files are restored. Their relationship
 to historical IDs is recorded separately, including text within R0344/R0345 and
 R0619. These restorations are not new semantic points or revived approvals.
 
+Owner subsequently closes [S3](../../../history/M9-T100-S3-mirror-review.md).
+Outstanding full reclassification and retention decisions remain with the open
+T100 proposal; this closure supplies no additional semantic approval.
+
 S3 starts at `62474beb` after owner closure of
 [S2](../../../history/M9-T100-S2-candidate-review.md). Its remaining existing
 residual ledger is the 381 S1 IDs below (375 semantic/ABI, six compiler), with

@@ -441,3 +441,15 @@ behavior-dependent original comment omissions remain. Selected text diff falls
 by 277 lines; raw fixed-XP Git diff falls by 243. Final cached dual EXEs differ
 only in timestamp/PE metadata, allowing the owner's no-runtime-retest exception.
 This limited implementation does not close S3 or reinstate revoked approvals.
+
+### Remaining work after S3 owner closure
+
+Owner subsequently accepts P16 and closes S3; see the
+[closure record](../history/M9-T100-S3-mirror-review.md). T100 remains open and
+no next S is admitted. The earlier full re-audit/classification request is not
+declared complete by this closure. Its remaining scope is to re-enumerate the
+current nonexcluded differences after P16, establish each semantic purpose and
+necessity with evidence, reconcile category block/line/point totals, and present
+the remaining retention decisions for fresh owner review. Earlier approvals
+and automatic small-diff delegation remain revoked. The S3 text-restoration
+delivery is complete; it is not a substitute for that outstanding work.
