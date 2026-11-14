@@ -2506,14 +2506,13 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 #endif   //NEC_98
 #line 3172
 
+		/* Other ports should really clear this IRQ as well, but... */
+
 #line 3175
 #ifdef JOKER
 #error "Unsupported SoftPC mirror configuration: JOKER"
 #endif /* JOKER */
 #line 3174
-		/* The output buffer is now empty, so deassert its IRQ1 request.
-		 * Normal interrupt delivery may already have acknowledged it; this
-		 * also covers a guest which temporarily masks IRQ1 and polls the PIC. */
 		ica_clear_int(KEYBOARD_INT_ADAPTER, KEYBOARD_INT_LINE);
 
 		/* <tur 06-Jul-93> BCN 2040 Replace previous horrible hack with a better one!

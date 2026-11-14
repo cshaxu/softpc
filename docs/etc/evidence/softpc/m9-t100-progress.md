@@ -7235,3 +7235,109 @@ P99 actual eight-file diff review and mirror/documentation/whitespace gates
 pass. CIM confirms probe and build jobs exited; exact scratch preview,
 cleanup and residue check pass. Configuration, guest assets and snapshots
 are untouched. Frozen initial hashes and file order are preserved.
+
+## File 398: keyba.c keyboard behavior and archival (P100)
+
+Pinned XP raw SHA-256:
+6096d9f805d832c0f939e511e0f2d56e37a4eee48187376b6c6465844923a5a2.
+The file is compiled in both production device targets. Existing exclusions,
+conditional/line-control scaffolding and adjacent scaffold spacing are skipped.
+The selected differences are reconciled below; later keyboard files are not
+implicitly audited.
+
+| Point | Initial local / XP anchor | Disposition |
+| --- | --- | --- |
+| R0456 | Local 46 / original SCCSID notice at XP 47 | Original notice retained outside the excluded SCCSID body under source policy; +1/-0, qualified pending owner choice. |
+| R0457 | Local include 81 and implementation beginning 2349 / XP before 83 and 3099 | Existing snapshot declaration dependency and keyboard state/callback codecs; qualified pending owner choice. Implementation span is 118 physical lines including separators, plus the include. |
+| R0458 | Local 2087 / XP before 2791 | code_to_send=input_port_val; +1/-0, qualified by actual command-path negative controls. |
+| R0459 | Initial local 2514-2516 / XP 3173-3174 | Restore the original IRQ comment and following blank; delete the three-line replacement explanation. No behavior change. |
+| R0460 | Initial local 2517 / original call inside JOKER at XP 3176 | Existing IRQ1 clear remains in selected read-port path; one selected call, qualified by actual controller/PIC negative controls. |
+
+### Actual supported behavior, rather than historical retention claims
+
+For R0458, original cmd_to_8042 declares automatic code_to_send without an
+initializer. Its C0 case marks the value valid without assigning the input
+port value. Current one-line assignment fills that missing value; other
+command cases retain original assignments and dispatch. The real bop_smoke
+fixture sends C0 to the actual 8042 and reads port 60, requiring the initialized
+input-port value BFh. This is not a test-only implementation of the controller.
+
+For R0460, original selected kbd_inb consumes output_contents and clears
+output_full/status but the explicit PIC clear resides only under JOKER. In
+the actual non-JOKER configuration, a masked IRQ1 can remain pending after
+the byte is consumed. irq_smoke sends the keyboard identification command,
+observes IRR bit 1, consumes FAh from port 60, then requires bit 1 to clear.
+The retained call uses the existing PIC clear operation, not a synthesized
+EOI or a second keyboard queue. The explanatory comment need not differ
+from XP, so R0459 restores its original text and blank line.
+
+Private counterprobes compile the actual keyba.c with its Ninja compiler
+flags, replacing only the source/object output paths. Each resulting explicit
+object is linked before the existing archive into existing real test fixtures;
+cached production objects and archives are never overwritten. Current-body
+bop/irq/checkpoint tests exit 0 on both architectures. Independently removing
+only C0 assignment fails bop_smoke line 90 (input_port == 0xbf); removing
+only the selected IRQ clear fails irq_smoke line 79 ((irr & 0x02) == 0).
+Both x86 negatives exit 3221226505; both x64 negatives exit 3. Assertion
+messages establish the intended failures, not merely nonzero exit status.
+These four negative controls prove bounded command/PIC regressions, not that
+the patches explain a particular historical DOS/Windows user incident.
+
+### Snapshot necessity and limits (R0457)
+
+Production ownership is Machine snapshot_image -> CCPU archive -> device
+archive -> keyboard capture/restore and callback codecs. device archive's
+keyboard_fields serializes the captured fields, including FIFO, held keys,
+scan-set/key-type arrays, command/response latches, modifiers/repeat counters,
+output/status and refill handle. Original keyba.c keeps the FIFO indices/data,
+key-type arrays and make/break lookup state private. Original port commands
+cannot enumerate or restore these states without consuming input, scheduling
+new work or changing the controller. Removing the archive hook therefore
+cannot be replaced by an equivalent replay through original public commands.
+
+The two encoded callbacks are real original delayed do_int and allowRefill
+entries. Numeric IDs reconstruct their addresses rather than persisting host
+pointers. The anomalous sequence pointer is encoded as an original break-table
+index and resolved after init_key_arrays selects the restored scan set. FIFO
+free capacity is reconstructed from count; temporary translation scratch is
+cleared, not persisted as a host pointer. Capture happens at the existing
+executor safe boundary, not midway through synchronous scan-code construction.
+No duplicate keyboard device lives in Compat.
+
+The real checkpoint fixture captures pending FIFO/command state, mutates via
+ports, restores and compares a fresh semantic capture; rejects FIFO count 49;
+checks anomalous pointer encoding and restores a queued keyboard interrupt
+through the device/event archive. irq_smoke also restores scan sets 1-3 and
+checks actual make/break paths. These pass on both architectures. This does
+not claim every malformed field or every allowRefill timing was dynamically
+enumerated. Restore is not a transactional standalone device API: it may
+select key arrays before a later validation fails. Production staged-image
+restoration resets the machine and returns failure without resuming guest
+execution if any device restore fails; no rollback guarantee is invented.
+Necessity is established by private-state ownership and original API limits,
+with these focused dynamic checks, not by link references alone.
+
+### P100 restoration and final verification
+
+Production +2/-3 (net -1); tests +0/-0. Exact XP comparison using LF-delimited
+SequenceMatcher with autojunk disabled shows added-diff delta -3 and
+deleted-diff delta -2: five fewer mirror difference lines. Existing exclusions
+are unchanged and not newly counted. R0456/R0457/R0458/R0460 remain qualified
+owner decisions; R0459 is restored, not retained as a patch.
+
+Final cached builds complete in 8.70 seconds x86 / 11.81 seconds x64. Final
+bop/irq/checkpoint tests pass 3/3 each. Fresh EXEs on Nov 13 2026:
+
+- x86 16:29:14: ec10a6f5027323a979cbbb3dff0e842ba8943f73b5cca47d1e97a178009a5e62.
+- x64 16:29:25: 1b9dc218a5b3f5df4a0ae92194ebc77b063cc286ac85bc5e4b94eb65991fe8e7.
+
+Both entire EXEs match P99 after masking only PE timestamp/checksum and
+eight compiler-time bytes at the same unique date/time literal. No other
+bytes are ignored; lengths and PE offsets match. No repeated full suite under
+the authorized equivalence exception; P97's 392/392 remains the full-runtime
+baseline. Frontier advances to 398/472, next 399 base/keymouse/keybd_io.c.
+
+P100 actual eight-file change review, mirror/documentation/whitespace gates
+and cleanup residue check pass. CIM confirms all owned probes/build/tests
+exited before exact scratch removal. No user configuration, media, snapshot
+or unrelated changes are included. S1 remains active.

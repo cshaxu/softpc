@@ -2141,3 +2141,14 @@ Four declarations remain outside NTVDM because original selected video.c
 references them unconditionally; actual x86/x64 declaration-restoration
 countercompiles fail on all four names. The +4/-0 residual is qualified pending
 owner decision. Selected diff decreases by three lines; no new display path.
+
+### T100 S1 P100 keyboard file audit
+
+R0456-R0460 reconcile keyba.c. Restore original IRQ comment/blank and remove
+its replacement explanation: five fewer mirror diff lines, production +2/-3.
+The C0 returned-value and selected IRQ-clear differences have independent
+actual-controller negative controls on x86/x64. Snapshot extension necessity
+is grounded in private state and actual archive callers, with bounded device
+roundtrip/callback tests. These residuals and the historical notice remain
+qualified owner decisions, not automatically approved retention. Both fresh
+EXEs are metadata-equivalent to P99; final focused tests pass 6/6.
