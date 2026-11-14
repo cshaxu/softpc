@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P151 restores nt_keycd.c's original BIOS conversion tables and selected
-spacing. Production +128/-5, tests unchanged; selected XP diff decreases 127
-lines. Actual table consumers and original NT dependencies are checked on both
-widths; boundary repair and NT omissions remain qualified owner decisions.
-Dual cached builds/publication and 392/392 complete tests pass. Final exact
-spacing restoration passes dual rebuilds, strict artifact equivalence and 4/4
-focused checks per width. No native coverage deferred. Frontier 460/472; next
-is host/src/nt_munge.c. Twelve files and qualified owner decisions keep S1/T100
-open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-460-hostsrcnt_keycdc-p151).
+T100 S1 P152 completes nt_munge.c audit with no production/test changes.
+All 26 existing XP diff lines belong to shared panning; coherent original-unit
+restoration fails ten pixel matrices across x86/x64 while current passes ten.
+Two added header dependencies and both plane-mask branches are checked.
+R0622-R0626 remain qualified owner decisions. Published EXEs are byte-identical
+to P151, whose 392/392 qualification remains valid; no fresh full run is claimed.
+Frontier 461/472; next host/src/nt_sb.c. Eleven files and qualified owner
+decisions keep S1/T100 open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-461-hostsrcnt_mungec-p152).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

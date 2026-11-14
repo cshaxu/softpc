@@ -11026,3 +11026,70 @@ own-document LF are preserved. The task scratch is removed after promoting
 these results and verifying all owned jobs have exited. Completed frontier
 460/472; next host/src/nt_munge.c. Twelve files and outstanding owner decisions
 keep S1/T100 open.
+
+## File 461 host/src/nt_munge.c (P152)
+
+The complete file has six diff ranges, all belonging to one horizontal-panning
+adaptation: +25/-1 against fixed XP (26 diff lines). No formatting-only or
+unproven semantic residue was found. No source/test/build change is made.
+The original BIGWIN implementations remain identical to XP.
+
+Actual production is nt_graph.c painter selection -> nt_ega.c low/medium/high
+painters -> the shared group helper or ega_colour_hi_munge. The sole helper
+consumers are the low painter and both original munging branches; medium/high
+painters pass their scanline's panning amount. vga_prts.c's existing
+ ega_get_pel_panning returns zero for the configured split region, otherwise
+horizontal_pel_panning & 7. No new state, device policy or alternate renderer
+is introduced here. Compat has no duplicate plane-to-pixel implementation.
+
+| Point | XP/current anchors | Initial analysis and independent counter-review |
+| --- | --- | --- |
+| R0622 | XP before conapi.h; current 25-26 | Two includes are qualified pending with the panning unit. Removing egaports.h fails compilation at EGA_planes/EGA_PLANE_DISP_SIZE; removing vgaports.h fails at extensions_controller in the bank-size macro, on both widths. They are direct data dependencies, not gratuitous includes. |
+| R0623 | XP before ega_colour_hi_munge; current 45-59 | Qualified pending: shared 15-line group reader. Zero pan returns the original word; nonzero pan combines corresponding plane bytes with the next group, wrapped at the existing V7 display-bank boundary. Actual low painter and original medium/high paths fail pixel assertions when the whole original no-pan unit is restored. |
+| R0624 | XP 46/55; current 63/72 | Qualified pending: pan argument and local panned word. The argument comes from existing per-scanline controller state; the local word lets the original lookup-table code consume shifted bytes without changing guest VRAM. Coherent restoration includes the original declaration and callers, so argument mismatch is not evidence. |
+| R0625 | XP before 65; current 83-85 | Qualified pending: feed the panned word to the original all-planes-enabled loop. Medium/high matrix with mask 0xf passes current and fails complete original restoration on both widths. |
+| R0626 | XP before 109; current 130-132 | Qualified pending: same feed in the original masked-plane loop. Medium/high matrix with mask 0x5 passes current and fails original restoration on both widths. It reuses original masking/LUT logic rather than implementing a second renderer. |
+
+### P152 coherent restoration and verification
+
+Task-local experiments compile the entire exact original nt_munge.c with the
+actual device compiler flags. Its original six-argument declaration is restored
+in a private header and all selected nt_ega.c consumers are coherently restored:
+low directly loads the original word, medium/high remove the panning argument.
+The existing Compat nt_graph.h mutex adapter remains intact. Link overrides
+only these two device objects in the existing VGA fixture; each run has its
+own disposable directory and the runs are serial.
+
+An initial probe accidentally bypassed that Compat header and failed fixture
+compilation at assert4. This harness result is not original-code evidence. The
+corrected harness preserves the actual wrapper and both complete variants
+compile/link on both architectures.
+
+Five independent matrix runs per implementation and architecture select low,
+medium, high with mask 0xf, and medium/high with mask 0x5. Each matrix covers
+pan 0-7, both bank sizes, normal/wrapping addresses, split on/off and both rows.
+The fixture compares shifted output against independently captured unpanned
+adjacent output. All ten current runs pass. All ten original runs reach and
+fail that pixel comparison (private fixture line 557); x86 returns 0xc0000409,
+x64 returns 3. Neither prototype nor linkage failure is counted as runtime
+necessity. Four separate include-removal compiles establish R0622 dependencies.
+
+These are actual original renderer/controller-state fixtures, not a new guest
+or a new desktop incident. Mask 0x5 and 0xf exercise the two branches; no claim
+is made that all possible masks, every display mode or all native scaling paths
+were exhaustively tested. Prior P149 real-port panning proof remains separately
+identified; it is not substituted for this full-original-unit experiment.
+
+Independent review re-enumerates all six diff ranges and all real consumers.
+The residual is one coherent panning capability; R0622-R0626 remain qualified
+owner decisions, not automatic retention approval. There is no justified
+restoration or smaller existing difference to deliver in this file.
+
+Production +0/-0, tests +0/-0, XP diff delta 0. No production files or build
+inputs changed; no redundant EXE rebuild/publication is performed. Published
+EXEs are byte-identical to P151 (x86 8938e3be62c517ea3cd101d98d514430a39b6fcfa3a98dc6f8ace24cad07934d;
+x64 0608c054bf12f2ef2f4b88fc7d07850b0ee4a02b90a2d864430e2e6f53209bfe).
+P151's 392/392 qualification applies unchanged; this is reused evidence, not a
+new full-suite run. Documentation/mirror/whitespace gates pass. Task probes
+are removed after evidence promotion and verified exit. Frontier 461/472;
+next host/src/nt_sb.c. Eleven files and outstanding owner decisions keep S1/T100 open.

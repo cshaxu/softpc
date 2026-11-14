@@ -2457,3 +2457,11 @@ three missing NT includes, original BIOS converter omission and two table-bound
 repairs remain qualified owner decisions R0617/R0619/R0621, supported by dual
 compiler/linker and independent bounds-trap evidence. No new input path exists.
 See [ordered evidence](m9-t100-progress.md#file-460-hostsrcnt_keycdc-p151).
+
+
+T100 S1 P152 completes nt_munge.c review without code changes. Its existing
+26 XP diff lines form the shared panning unit; coherent whole-original
+restoration fails all ten corresponding pixel matrices while current passes.
+Includes and both original plane-mask branches are independently checked.
+R0622-R0626 remain qualified owner decisions, not approved retention.
+See [ordered evidence](m9-t100-progress.md#file-461-hostsrcnt_mungec-p152).
