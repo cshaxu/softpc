@@ -2152,3 +2152,14 @@ is grounded in private state and actual archive callers, with bounded device
 roundtrip/callback tests. These residuals and the historical notice remain
 qualified owner decisions, not automatically approved retention. Both fresh
 EXEs are metadata-equivalent to P99; final focused tests pass 6/6.
+
+
+### T100 S1 P102 InPort audit
+
+R0462-R0467 reconcile mouse.c against pinned XP. Remove four nonsemantic
+comment lines, reducing mirror diff by four lines. The finite-burst versus
+periodic-timer difference, enable/HOLD IRQ gating, controller reset, private
+snapshot state and default input value remain qualified owner decisions with
+explicit source proofs and bounded current tests; historical acceptance alone
+is not their evidence. Fresh dual EXEs equal P100 except build metadata;
+mouse/checkpoint tests pass 4/4. No new device path is introduced.

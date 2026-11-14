@@ -7373,3 +7373,112 @@ XP-relative diff change zero. This delivery changes only audit documentation;
 no build, publication or runtime test is claimed. P100 artifacts and P97's
 392/392 runtime baseline remain unchanged. Frontier 399/472; next file 400
 base/keymouse/mouse.c. Qualified owner decisions remain open; S1 is active.
+
+
+## File 400: mouse.c (P102)
+
+Pinned XP raw SHA-256
+d449af5953821629584958ecb29217ac7114b246169d4d0e6526c6ed2f67ec64.
+Complete LF-delimited correspondence includes original burst-comment/body
+removals as selected differences; they are not hidden among excluded bodies.
+Existing #error exclusions and line scaffolding receive no new accounting.
+
+| Point | Original/current anchors | Disposition |
+| --- | --- | --- |
+| R0462 | XP SCCSID notice / local 30 | Preserved historical notice, +1 comment line; source-policy qualified owner decision. |
+| R0463 | XP 104-106, 369-405, 420, 434, 456, 512 / local quick_ev include, 97, 102-120, mode/send/reset timer wiring | Original finite burst replaced by one existing quick-event timer and enable/HOLD-aware IRQ delivery; qualified owner decision. |
+| R0464 | XP insertion before mouse_inb / local snapshot include, 122-187 | Private InPort state and callback archival; qualified owner decision. |
+| R0465 | XP mouse_inb entry / local 190 | +1 default-return assignment prevents uninitialized CPU input; qualified owner decision. |
+| R0466 | XP reset and mouse_init / local 389-399, 473-475 | Clear stale movement/latches and initialize cold controller state; qualified owner decision. |
+| R0467 | Three added comment sites before timer declaration, rescheduling and cold init | Four nonsemantic lines removed exactly; no replacement commentary or code. |
+
+### Initial analysis and actual consumers
+
+The actual Machine mouse ingress calls mouse_send at machine.c:280. BIOS
+reset calls q_event_init at reset.c:631 and mouse_init at 926. mouse_init
+registers the original adapter handlers for ports 23Ch-23Fh. No parallel
+Compat device implementation is substituted.
+
+R0463 source proof: XP explicitly uses loadsainterrupts=5, decrements it on
+eligible mode writes, and queues 100 PIC interrupts each time. It neither
+schedules the selected 30/50/100/200 Hz period nor recurs after the five bursts.
+The original comment itself describes this Windows-specific workaround.
+Coherent restoration would remove the single quick-event timer and its
+associated snapshot callback/handle, restoring finite bursts, not an
+alternative functioning periodic source. Current timer tick clears its
+consumed handle, tests enabled rate, suppresses IRQ during HOLD, then schedules
+one next event. HOLD-only writes preserve that handle; disabling/rate changes
+cancel it. Data IRQ requires mode bit 3; constant timer-high requires timer
+enable bit 4. Restoring original unconditional mouse_send/constant-high IRQ
+would generate interrupts even when the respective source is disabled.
+These are concrete source/contract differences, not a claim that every old
+Windows driver fails. No new driver-specific branch is justified.
+
+R0464: archive.c captures/restores the controller and serializes all thirteen
+fields, including selected register, alternating ID phase, held data/status,
+current and previous buttons, accumulated deltas, mode and timer handle. Its
+callback codec connects the actual recurring quick event to the existing
+queue archive. Original port reads cannot enumerate this private state
+without changing ID phase/selected register; HOLD writes latch and clear
+movement, while mode writes schedule interrupts. Replaying ports cannot
+replace exact state restoration without side effects. Existing original
+ports therefore do not provide a coherent substitute for this extension.
+
+R0465: mouse_inb originally leaves the output untouched for unsupported
+internal register selections and other registered ports. The actual CCPU
+IN8 in ccpu386/in.c declares an uninitialized IU8 temp, calls the registered
+handler and assigns temp to its destination. support/ios.c inb also forwards
+the caller pointer without a default. Original restoration thus permits an
+indeterminate guest result; the one assignment is a bounded default, not
+another controller path. This is source proof, not a fresh historical guest
+reproduction or a claim about all bus electrical behavior.
+
+R0466: original reset clears only mode, burst count, address and IRQ. Pending
+movement and held data survive it. Current reset also clears accumulated and
+latched data and sets last buttons to the current buttons; cold initialization
+clears buttons and discards the obsolete queue handle before reset. Because
+q_event_init already ran, deleting an old handle during cold init could act
+on a newly allocated queue entry. No second reset owner or event loop exists.
+
+### Independent counter-review and verification
+
+Counter-review considered restoring the complete timer/burst design rather
+than deleting isolated scheduling statements and blaming broken references.
+The original finite burst cannot satisfy recurring rate-selected interrupts;
+retention is evidence-qualified but still awaits the owner's decision.
+Snapshot retention rests on private state and original port side effects,
+not merely on existing adapter calls. Nonsemantic explanations are removed.
+
+Existing actual-controller mouse and checkpoint tests pass 2/2 on each
+architecture before and after the comment restoration. They exercise guest
+IRQ delivery through CCPU/PIC, movement latching, four scheduled periods,
+recurrence across HOLD, timer cancellation, queue/controller archival and
+restored register reads. Checkpoint verifies held data, selected register and
+invalid ID-phase rejection. The first attempted filter selected no tests;
+that invocation is not counted. Correct path-qualified filters selected the
+four reported tests. No new permanent fixture or production test API is added.
+
+Coverage limits: this batch does not repeat real Windows sessions, inject
+quick-event allocation failure, or enumerate every malformed snapshot field.
+Default invalid-port initialization and the cold-reset ordering are established
+by the concrete source chain above, not newly claimed dynamic negative tests.
+
+Production +0/-4, tests +0/-0; XP-relative added-diff delta -4 and deleted-diff
+delta 0: four fewer mirror difference lines. Final cached builds succeed in
+9.79 seconds x86 and 13.35 seconds x64. Fresh Nov 13 2026 EXEs:
+
+- x86 16:39:26: 0cd080f36f9a0aa0487ad1e98efa2b86b58d47e87c8bf7b785a6479dd4a7a374.
+- x64 16:39:37: a69dd8b015309179d3f9643e80d031d352a8d457d433e543b489e2ec02aa8bf9.
+
+Entire files equal P100 after masking only PE timestamp/checksum and eight
+compiler-time bytes in the unique same-position Nov 13 literal. No other
+bytes are ignored. Final focused tests pass 4/4; full tests are not repeated
+under the owner's artifact-equivalence exception. P97's 392/392 remains the
+full runtime baseline. Frontier 400/472; next 401 base/keymouse/ppi.c.
+S1 remains active, with R0462-R0466 qualified pending owner decisions.
+
+P102 final actual eight-file diff review, mirror/documentation/whitespace
+gates and residue check pass. CIM confirms both test/build jobs exited before
+exact scratch cleanup. No user configuration, media, snapshot or unrelated
+change is included. Full-file SequenceMatcher confirms the four-line added-
+diff reduction with unchanged deleted-diff count; exclusions were not changed.

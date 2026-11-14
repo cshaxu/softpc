@@ -30,10 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P101 completes file 399 keybd_io.c without source changes. Selected
-implementation matches XP; the preserved historical notice remains a qualified
-owner decision. P100 published EXEs and P97's 392/392 runtime baseline remain
-unchanged. Frontier 399/472; next 400 base/keymouse/mouse.c.
+T100 S1 P102 completes file 400 mouse.c. Four nonsemantic comment lines
+are restored away; timer/IRQ/reset/snapshot/default-read residuals have explicit
+source and bounded test evidence and remain qualified owner decisions. Fresh
+dual EXEs are metadata-equivalent to P100; final focused tests pass 4/4.
+P97's 392/392 remains the full runtime baseline. Frontier 400/472; next 401
+base/keymouse/ppi.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

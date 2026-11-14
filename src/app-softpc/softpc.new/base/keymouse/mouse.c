@@ -94,8 +94,6 @@ static half_word
                  mouse_mode_reg          = 0, /* mode register 		*/
 		 address_reg       = 0; /* address pointer register	*/
 
-/* T85: one original quick event models the InPort timer, not driver-specific
- * interrupt bursts. Device state and scheduling stay with this controller. */
 static q_ev_handle mouse_timer = 0;
 
 
@@ -359,7 +357,6 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				break;
 
 			}
-		/* HOLD changes do not restart the free-running timer. */
 		if ((mouse_mode_reg ^ value) & 0x17) {
 			if (mouse_timer != 0) delete_q_event(mouse_timer);
 			mouse_timer = 0;
@@ -473,7 +470,6 @@ void mouse_init IFN0()
 #line 550
 
     mouse_inb_toggle = 0;
-    /* Cold initialization follows q_event_init: no old handle remains valid. */
     mouse_timer = 0;
     button_left = button_right = 0;
     mouse_outb(MOUSE_PORT_0, 0x80);
