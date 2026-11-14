@@ -9831,3 +9831,35 @@ P136 gates pass: XP manifest, documentation governance and git diff whitespace.
 Each incremental build emits four existing mirror fpu.c sprintf-declaration
 warnings and none outside the mirror. Both owned jobs are terminal; scratch
 is removed after promoting the evidence above. No native test pass is claimed.
+
+
+## Files 434-435: error.h and host.h (P137)
+
+Compared complete files with the fixed XP commit, in frozen order.
+File 434 host/inc/error.h has only existing excluded ANSI, BUILDING_CPU_TOOL
+and non-PROD bodies plus their necessary line controls. All remaining lines,
+including original macros and declarations, match XP. These excluded bodies
+receive no new point or accounting. Fixed XP raw SHA-256 is
+938a9e29bcf81a76de3c15c02ac6dbdc2d1f976702d5bcd43160352135c7a672;
+current LF-normalized SHA-256 is
+8acb0a52f075ab97ebb0e582442db9d9f5d5ed5a28612702693960c7c1f926f8.
+
+File 435 host/inc/host.h matches XP after CRLF/LF normalization throughout:
+10801b826f2438763d70217c1a5883cdfb9bb25f080bea61bda3857c088dc1d0.
+No source restoration or new retention decision exists for either file.
+Ninja's VALID dependency records for the actual rom_basc.c object explicitly
+include both mirror headers on x86 and x64. CMake builds rom_basc.c in
+softpc-machine-devices; rom_basic calls host_error(EG_NO_ROM_BASIC, ERR_CONT,
+NULL). Other actual video and device source consumers also include them.
+The Compat system/error.h overlay selects the distinct original Base enum
+for illegal-instruction handling; it is not a replacement implementation of
+these host declarations. There is no basis to retire these live mirror files.
+
+Executor whole-file comparison and coordinator review agree: production +0/-0,
+tests +0/-0, XP diff unchanged. Only audit status/evidence change. No rebuild,
+publication or test rerun is required for this read-only audit batch; P136
+published EXEs and x87 results, P133 full background results and explicitly
+pending native final acceptance remain the existing evidence, not new passes.
+Documentation and whitespace gates qualify these records. No scratch was
+created. Frontier 435/472; next file 436 host/inc/host_cpu.h is under investigation
+and is not marked audited. S1/T100 and earlier owner decisions remain open.

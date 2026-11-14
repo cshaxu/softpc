@@ -30,15 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P136 completes file 433 cfpu_def.h: removes one redundant comment
-(production +0/-1, tests unchanged; one fewer XP-relative diff line).
-Six little-endian layouts remain evidence-qualified owner decision R0554;
-individual and coherent XP restorations fail the existing layout fixture on
-both widths, while current controls pass. Cached builds/publication and final
-x87 fixtures pass. Both EXEs equal P135 after permitted timestamp/checksum/time
-normalization, so full regression is not repeated. P133 background 188/188 per
-width remains applicable; native final acceptance and earlier decisions remain
-open. Frontier 433/472; next file 434 host/inc/error.h. No S/T closure is claimed.
+T100 S1 P137 completes read-only audits of files 434 error.h and 435 host.h:
+selected error declarations match XP outside existing exclusions; host.h fully
+matches XP after newline normalization. Both remain actual production headers.
+No production/test/artifact changes or repeated builds/tests occur in P137.
+P136 dual EXEs and x87 qualification remain current; P133 full background
+188/188 per width remains applicable. Native final acceptance and earlier
+qualified owner decisions remain open. Frontier 435/472; next file 436
+host/inc/host_cpu.h is under investigation, not yet audited. No S/T closure.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
