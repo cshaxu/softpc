@@ -6,6 +6,12 @@ T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与�
 [T92 子集及本地补丁记录](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)。
 以下历史数字和语义说明不回写成新的 XP 统计。
 
+T100 S1 P132 compacts vga_mode.c's existing packed-scanout predicate and
+restores original comment text. Supported EXEs are unchanged except build
+metadata. Selected fixed-XP diff falls from +9/-3 to +3/-3; the three retained
+conditions and independent restoration evidence are R0539-R0541 in the
+[T100 audit](m9-t100-progress.md). Historical entries below are unchanged.
+
 T100 S1 P130 narrows the existing v7_video.c preserve-memory validation
 repair to the V7 predicate argument. Original assignment order and surrounding
 text are restored; fixed-XP selected difference changes from +3/-3 to +1/-1.

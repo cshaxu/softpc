@@ -30,20 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P130 delivers file 427 v7_video.c minimization: selected XP
-difference shrinks from +3/-3 to +1/-1 (four fewer mirror-diff lines).
-Both cached builds/publications and focused VGA tests pass; both background
-suites are 188/188. Native Window tests pass; unchanged Console binaries pass
-in explicit hidden Consoles, not the default CTest launch. P131 supplements
-P130 after session 3 reconnects: all five deferred audio/MIDI/package tests
-pass on each width. Earlier disconnected failures remain recorded. Later
-unaffected batches may defer native tests until final acceptance by owner
-instruction. This is not a claim that default CTest Console startup is fixed
-or that S1/T100 is closed.
-No shared-component or user-asset changes. R0537 and earlier qualified owner
-choices remain open, as do D001-D006 and L001. Frontier 427/472; next frozen
-file 428 base/video/vga_mode.c. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P132 completes file 428 vga_mode.c: production +1/-7, tests unchanged;
+selected XP difference falls from +9/-3 to +3/-3 (six fewer diff lines).
+Both cached builds/publications and final VGA fixtures pass. EXEs are byte
+identical to P130 after masking only PE timestamp/checksum and the unique
+compiler time string, so full regression is not repeated under the approved
+equivalence exception. P130 background 188/188 per width and P131 online
+qualification remain applicable. Default CTest Console startup is still
+qualified separately by the unchanged explicit-hidden-Console test execution.
+R0539-R0541 and earlier qualified owner decisions remain open, as do D001-D006
+and L001. Frontier 428/472; next file 429 base/video/vga_prts.c. Later unaffected
+batches may defer native tests until final acceptance. No S/T closure is claimed.
+See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

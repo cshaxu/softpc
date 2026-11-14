@@ -454,15 +454,9 @@ boolean	choose_vga_display_mode()
 	 * offset_per_line depends upon whether chained addressing is being
 	 * used. This is because we interleave the planes, rather than
 	 * anything the EGA does.
-	 * T70 S10: planar 256-colour scanout is independent of odd/even CPU addressing.
 	 */
 
-	/* Packed V7 scanout keeps byte units when CPU chain4 is disabled. */
-	if( get_chain4_mode()
-#ifdef V7VGA
-		|| (get_256_colour_mode() && get_seq_chain4_mode())
-#endif
-	)
+	if( get_chain4_mode() || (get_256_colour_mode() && get_seq_chain4_mode()) )
 	{
 		set_offset_per_line_recal(get_actual_offset_per_line() << 2);
 	}

@@ -9412,3 +9412,75 @@ audio and package checks until final acceptance rather than block ordered work.
 The proposal and CURRENT reflect that authorization. Final native acceptance
 remains required. P131 changes documentation only; frontier remains 427/472,
 with file 428 vga_mode.c under investigation and no edit to it yet.
+
+## File 428: vga_mode.c (P132)
+
+Pinned XP raw SHA-256 56895920930e023f46ecebe22639b0462c920b4b4a25a0908fb8137b22d6e1e8.
+Full selected-file comparison finds added explanations and three changed
+conditions in choose_vga_display_mode. Existing excluded bodies and required
+line scaffolding are skipped without new records. Root CMake compiles this
+file in both production device targets; vga_init installs the chooser and
+actual controller changes select it. No duplicate Compat mode selector exists.
+
+R0538 removes two added explanatory lines and compacts the packed-display
+condition. Its additional V7VGA wrapper was local, not original XP structure.
+All supported device builds explicitly define V7VGA; gvi.h defines the queried
+state independently. Removing this added wrapper restores the original single
+if layout without deleting any original conditional or changing supported
+preprocessing. No non-V7 build support is newly claimed or introduced.
+
+Three remaining semantic points are evidence-qualified, pending owner choice:
+
+| Point | XP line | Necessary residual and evidence |
+| --- | --- | --- |
+| R0539 | 487 | Packed V7 display retains four-byte address units while CPU chain4 is off. Exact restoration fails actual BIOS/SR4 display stride at fixture line 1380 on x86/x64. |
+| R0540 | 492 | Planar 256-colour display uses per-plane stride independently of CPU odd/even. Restoring the original condition doubles the stride and fails line 1762 on both widths. |
+| R0541 | 519 | Planar wrap uses the same per-plane address units. Restoring only this condition fails the wrap oracle at line 1764 on both widths. |
+
+Private variants compile the actual source with the real Ninja command and
+override only its object in the existing VGA fixture link. Current controls
+and comment-only cleanup controls pass on both widths; each individual
+restoration fails as above. Coherent restoration of all three conditions also
+fails at line 1380 on both widths, so the result does not depend solely on
+isolated, potentially incoherent restoration. Negative runs stop at their
+first failed assertion; they do not establish failure for every later case.
+
+Counter-review additionally checks register reachability rather than relying
+only on the fixture's direct state matrix. A private copy of the actual fixture
+enters BIOS mode 13, unlocks V7, clears FC sequential flags, writes SR4=02,
+GC5=50, GC6=07, CRTC offset=28 and start=C200. Both widths report colour=1,
+memory_chained=1, chain4=0, sequential_chain4=0, actual stride=80 and start=49664.
+Current code derives stride=80, length=16000, wrap=1. Restoring only R0540
+derives stride=160, length=32000. Restoring only R0541 retains stride=80 and
+length=16000 but reports wrap=0, although 49664+16000 exceeds 65536. Current
+register-fixture controls pass; both negative variants fail on both widths.
+The first private fixture compilation lacked its original relative-header
+search directory; adding that original directory fixes the experiment setup.
+That setup failure is not a production defect. No tracked test is modified.
+
+Final change is production +1/-7, net -6; tests +0/-0. Fixed-XP selected diff
+changes from +9/-3 to +3/-3: six fewer added lines, unchanged deleted lines.
+All three necessary conditions remain in the original chooser; no new state,
+helper, product special case or alternate renderer is introduced. Final source
+LF-normalized SHA-256 is
+f2d8484de4ef2fc4f545c537174fe2869a2b43d47649058ffd6c98ac54359629.
+
+Final cached builds/publications pass x86/x64 in 10.09/10.88 s, with zero build
+warnings. Final VGA fixtures pass in 6.71/5.24 s. Both EXEs compare exactly to
+their P130 predecessors after masking only the PE COFF timestamp, optional
+header checksum and the single NUL-terminated compiler-time literal. No code,
+data, layout or other bytes differ. Thus the owner-approved equivalent-artifact
+exception applies: no redundant full or native regression. P130/P131's precise
+test qualification remains the baseline; no new interactive guest run is claimed.
+
+- x86 compiler stamp Nov 13 2026 20:49:47; EXE SHA-256
+  b51aa658eecf222d4846c65352918937e09185ec45c54061a86d03982e015bae.
+- x64 compiler stamp Nov 13 2026 20:50:04; EXE SHA-256
+  4c06f759544a6e85e25e2e37e173afcc363f90d400126ad8c1c8818d15190c0a.
+
+Executor and coordinator actual-diff review confirm the fixed source baseline,
+complete selected-file comparison, real caller path, negative controls and
+unchanged production semantics of the cleanup. Manifest is synchronized.
+Owned jobs have completed; promoted evidence permits scratch cleanup.
+Frontier 428/472; next file 429 base/video/vga_prts.c. Owner decisions and
+S1/T100 remain open.
