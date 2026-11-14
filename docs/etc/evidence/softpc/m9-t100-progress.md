@@ -8476,3 +8476,26 @@ D005, L001 and earlier decisions are open. S1 is not closed.
 P116 emits 89 existing mirror-path warnings per architecture, none outside
 the mirror; no warning-free claim. Owned process exit, exact scratch cleanup,
 residue check, manifest/documentation gates and actual diff review pass.
+
+## File 413: timestrb.c (P117)
+
+Pinned XP raw SHA-256 897275811dc989e7676598292c0811dbe0cc648d17837665ec443ba608e55dca.
+The complete file comparison finds no selected-code difference. Existing
+excluded bodies and their line-control scaffolding are skipped without new
+accounting. The original historical notice and empty dummy_alarm remain.
+
+Actual production wiring: the root device source list includes timestrb.c;
+CCPU c_main.c calls host_timer_event, whose Compat platform implementation
+calls time_strobe. The selected original function invokes time_tick,
+rtc_tick, dispatch_tic_event and ica_check_stale_iret_hook, and preserves the
+original video-off counter, clear and refresh behavior. The unused original
+empty function is not a reason to introduce a new mirror difference.
+
+Independent counter-review distinguishes this unchanged file from timer.c's
+D005 finding: this file adds no timer repair and does not resolve that pending
+decision. No production, test, manifest, binary, configuration or guest change.
+No new build/runtime test is needed for this documentation-only disposition;
+P116 published artifacts and P114 full 392/392 baseline remain unchanged.
+Frontier advances to 413/472; next is 414 base/system/unexp_nt.c. Its terminal
+Ctrl-Z difference has been inspected but is not yet a completed disposition.
+S1 remains active, with all prior pending decisions still open.

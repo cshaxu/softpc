@@ -30,13 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P116 completes file 412 timer.c: selected original formatting restored
-and extra explanations removed, reducing XP diff by 75 lines. Proven behavior
-repairs, snapshot extension and notice remain qualified pending decisions.
-Dual-EXE cached publication is metadata-equivalent to P114; focused tests pass
-6/6, with P114 retaining the full 392/392 regression baseline. Frontier 412/472;
-next 413 base/system/timestrb.c. D005 is not fixed; L001 and earlier qualified
-residuals/decisions also remain open.
+T100 S1 P117 completes file 413 timestrb.c: selected code matches pinned XP;
+actual CCPU/host timer wiring is confirmed. This documentation-only delivery
+changes no source or EXE. P116 remains the published artifact baseline,
+metadata-equivalent to P114; P114 retains the full 392/392 regression baseline.
+Frontier 413/472; next 414 base/system/unexp_nt.c. D005 is not fixed; L001 and
+earlier qualified residuals/decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
