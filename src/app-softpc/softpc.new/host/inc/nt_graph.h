@@ -404,7 +404,6 @@ extern void nt_v7vga_mono_hi_graph_big(int offset, int screen_x, int screen_y,
 extern void nt_v7vga_mono_hi_graph_huge(int offset, int screen_x, int screen_y,
                          int width, int height);
 #endif /* V7VGA */
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
@@ -413,7 +412,8 @@ extern void nt_v7vga_mono_hi_graph_huge(int offset, int screen_x, int screen_y,
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
-#line 495
+#line 494
+
 void high_stretch3(unsigned char *buffer, int length);
 void high_stretch4(unsigned char *buffer, int length);
 
@@ -421,7 +421,6 @@ void high_stretch4(unsigned char *buffer, int length);
 
 IMPORT VOID ega_colour_hi_munge(unsigned char *, int, unsigned int *,
                                 unsigned int *, int, int, int);
-/* T60: shift interleaved plane bytes without mixing their bits. */
 IMPORT unsigned int ega_colour_panned_group(unsigned char *, int);
 
 #ifdef BIGWIN
@@ -460,9 +459,8 @@ extern word int10_caller;
 extern word useHostInt10;
 extern word changing_mode_flag;
 #ifndef NEC_98
-/* NT host stream state is excluded from this source subset. */
+extern boolean host_stream_io_enabled;
 #endif // !NEC_98
-#line 542
 
 
 // from nt_ega.c

@@ -30,14 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P143 completes file 452 nt_fulsc.h: restores its unused original
-SwitchToFullScreen declaration and missing original blank, preserving diagnostic
-line anchors. Production +3/-2; two fewer selected XP diff lines; tests unchanged.
+T100 S1 P144 completes file 453 nt_graph.h: restores original blank layout
+and unused stream declaration, removes redundant panning explanation. Existing
+pan argument/helper declarations remain qualified owner decisions R0571/R0573.
+Production +3/-5; five fewer selected XP diff lines; permanent tests unchanged.
 Both cached builds publish fresh EXEs; VGA passes 1/1 per width. EXEs equal
-P142 after permitted metadata/time normalization; no repeated full suite.
+P143 after permitted metadata/time normalization; no repeated full suite.
 P133 background 188/188 per width remains applicable. Native final acceptance
-and earlier owner decisions remain pending. Frontier 452/472; next file 453
-host/inc/nt_graph.h. S1/T100 remain open. See the
+and owner decisions remain pending. Frontier 453/472; next file 454
+host/inc/nt_mouse.h. S1/T100 remain open. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 

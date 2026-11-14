@@ -2401,3 +2401,10 @@ T100 S1 P143 restores nt_fulsc.h's unused original fullscreen declaration
 and original blank with unchanged diagnostic anchors (R0567/R0568). Two fewer
 selected XP diff lines; no native fullscreen path is enabled.
 See [ordered evidence](m9-t100-progress.md#file-452-hostincnt_fulsch-p143).
+
+
+T100 S1 P144 restores nt_graph.h's unused original stream declaration and blank
+layout, and removes its redundant T60 explanation: five fewer selected XP diff
+lines. Pan argument/helper declarations remain qualified owner decisions
+R0571/R0573; original implementations still have later ordered reviews.
+See [ordered evidence](m9-t100-progress.md#file-453-hostincnt_graphh-p144).

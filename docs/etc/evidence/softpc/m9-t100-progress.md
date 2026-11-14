@@ -10249,3 +10249,71 @@ remains pending. Final manifest/documentation/whitespace checks and actual-diff
 review accompany delivery. Only this header, manifest, audit records and fresh
 EXEs change. Frontier 452/472; next file 453 host/inc/nt_graph.h. S1/T100 and
 earlier owner decisions remain open.
+
+
+## File 453: host/inc/nt_graph.h (P144)
+
+Complete comparison uses fixed XP raw SHA-256
+42d0ad0e3d43ea838cddc769f8535a0728e3838d327716704d551bc1ff7b2eaa.
+Existing excluded bodies/framework/line controls are skipped without new
+accounting. Actual consumers include original nt_cga/nt_ega/nt_graph/nt_munge/
+nt_vga, the Compat nt_graph.h include bridge, video/DIB adapters and VGA tests.
+SCREEN_DESCRIPTION, paint vectors and scanline contracts remain original;
+no second schema, host state or rendering implementation is introduced.
+
+| Point | Original anchor | Disposition |
+| --- | --- | --- |
+| R0569 | after V7VGA prototypes, before XP NEC_98 condition | Restore original adjacency by removing one added blank. |
+| R0570 | XP 494 | Restore missing blank, with line control 495 -> 494 so high_stretch3 remains logical line 495. |
+| R0571 | XP 500-501 ega_colour_hi_munge | Qualified pending owner decision: seventh int carries scanline-specific pel pan; original has six arguments. |
+| R0572 | before added group declaration | Remove redundant T60 explanation; no behavior or declaration removed. |
+| R0573 | after XP 501 | Qualified pending owner decision: declare the shared interleaved-plane panning helper. |
+| R0574 | XP 540 | Restore original extern boolean host_stream_io_enabled, remove omission comment and redundant #line 542. |
+
+R0574 has no production/test/tool reference or definition before restoration.
+base_def.h already maps boolean to IBOOL; restoring an unused extern requires
+no provider, storage or NT stream implementation. The original !NEC_98 branch
+is selected and retained. The declaration is logical line 540, as in XP.
+Earlier content-exclusion rationale does not prove the declaration harmful.
+
+For R0571/R0573, original-device nt_ega medium/high painters call the munging
+function with pan derived for each scanline. The low painter calls the group
+helper directly. nt_munge owns the helper and both masked/unmasked munging
+loops use it; it shifts each plane byte independently and wraps the next group
+at the existing plane-display extent. This is existing device rendering, not
+a Compat duplicate. Restoring only the six-argument declaration conflicts with
+the seven-argument definition/callers; that alone is not the retention proof.
+The P80/R0428 actual-renderer experiment already compiled a private coherent
+no-pan query variant and linked the actual fixture: x86 and x64 failed the
+pixel assertion after real 3C0h pan=1 writes, while current passed. Current
+verify_panning_pixels covers all three painters, shifts 0..7, bank/wrap and
+split cancellation against independently shifted unpanned pixels. This batch
+reruns that actual VGA fixture on both widths. These results qualify the
+existing pan contract, not every implementation patch or a fresh guest-session
+reproduction. nt_ega/nt_munge implementation files retain their later ordered
+reviews; no claim of fully restoring their coupled XP bodies is made here.
+
+Executor removes unsupported omissions/nonsemantic additions and proposes
+retaining just the consumed pan declarations. Counter-review checks real
+port-to-pixel evidence rather than treating existing callers as sufficient.
+R0571/R0573 remain pending owner choice, not automatically accepted.
+Production +3/-5 (net -2), permanent tests unchanged. Selected XP diff decreases
+by five lines (two blanks, one explanation, and replacement of an omission
+comment by its original declaration). Remaining selected pan declaration diff
+is +2/-1. No new difference site or public component change.
+Final LF-normalized source SHA-256: f53d0e2a588499bc9e2aa48b847d9b65383764e029aa6e6308c57951ee36ff5f.
+
+### P144 final-source qualification
+
+- x86: cached build/publication 14.22 s; VGA **1/1** in 7.33 s including runner overhead; 269 warning occurrences, all inside mirror paths.
+- x86 EXE SHA-256: 9852a737516840eded6610590b217c808fb4ffef9827c2a012d18170d7f22800.
+- x64: cached build/publication 18.17 s; VGA **1/1** in 5.51 s including runner overhead; 269 warning occurrences, all inside mirror paths.
+- x64 EXE SHA-256: 4d008289f1732344439954d67b555eb43db5acee4ca91d0f2bc5259322cf70d2.
+
+Both EXEs equal P143 after masking only PE COFF timestamp, optional-header
+checksum and unique NUL-terminated compiler-time literal; every other byte and
+length is equal. Owner equivalence exception avoids repeated full suites;
+P133 background 188/188 per width remains applicable. Native final acceptance
+is pending. Final manifest/documentation/whitespace checks and actual-change
+review accompany delivery. Frontier 453/472; next file 454 host/inc/nt_mouse.h.
+S1/T100, R0571/R0573 and previous owner decisions remain open.
