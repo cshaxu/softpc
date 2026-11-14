@@ -2132,3 +2132,12 @@ line-control structure. Both freshly built/published EXEs are equivalent to
 P97 except verified build/PE metadata, so P97's 392/392 runtime evidence is
 retained without a repeated suite. Exact original trailing whitespace is
 intentional and independently checked against pinned XP.
+
+### T100 S1 P99 video declaration minimization
+
+R0454/R0455 supersede historical video.h selected-patch counts. Remove the
+nonessential three-line comment and restore original declaration spacing.
+Four declarations remain outside NTVDM because original selected video.c
+references them unconditionally; actual x86/x64 declaration-restoration
+countercompiles fail on all four names. The +4/-0 residual is qualified pending
+owner decision. Selected diff decreases by three lines; no new display path.

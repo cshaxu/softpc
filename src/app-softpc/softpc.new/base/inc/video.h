@@ -291,10 +291,7 @@ IMPORT VOID vga_write_dot IPT4(LONG, colour, LONG, page, LONG, pixcol, LONG, row
 #line 384
 #endif // NEC98
 #line 264
-/* The detached machine keeps this optional presentation path disabled, but
-   the original video controller references its state independently of the
-   product-specific enable/disable services above. */
 IMPORT half_word * stream_io_buffer;
 IMPORT word * stream_io_dirty_count_ptr;
 IMPORT word stream_io_buffer_size;
-IMPORT boolean stream_io_enabled;
+IMPORT boolean  stream_io_enabled;

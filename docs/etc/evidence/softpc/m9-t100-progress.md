@@ -7156,3 +7156,82 @@ non-mirror whitespace check pass; the three exact-XP whitespace diagnostics
 are explicitly accounted for above. CIM confirms all owned jobs exited;
 scratch preview, cleanup and residue check pass. No user assets or unrelated
 changes are included.
+
+## Files 394-397: video stream declarations and remaining headers (P99)
+
+Pinned XP SP1 remains a2f6d7c93aa4f11efc51147566d5961c59a8ef89. Existing
+excluded bodies and their conditional/line-control scaffolding, including
+adjacent scaffolding spacing, are skipped without additional accounting.
+
+| Order | base/inc file | XP raw SHA-256 | Result / actual consumer |
+| --- | --- | --- | --- |
+| 394 | video.h | 72fda2adc7a26d137b7ca5b4ac03d35712e4bdcd628d56c633faacc391597257 | R0454 reduces the selected patch; R0455 qualifies four remaining declarations. Original video.c and ega_vide.c consume the interface. |
+| 395 | virtual.h | 57ae800ca06293867949f1e7bc6130ba8a93f226c95a111956933bdeff19a21e | Normalized whole-file XP identity; production reset.c. |
+| 396 | xt.h | bc57c977dfd0ba3262fa8aef0a55ce6bab8ce8d1255dfff57dd8587299cfa02e | Identity outside existing exclusions; actual BIOS, controllers and Compat use the original definitions. |
+| 397 | yoda.h | 73dd5141b0b8e3f9ff139283ee6dd78c5ecc1d5b51cff46a6437c0154ee955ff | Identity outside existing exclusions; production ica.c includes it. |
+
+### R0454: remove nonessential selected comment and restore declaration spelling
+
+Remove video.h's three-line detached-presentation comment immediately before
+the added stream declarations, and restore the original two spaces between
+boolean and stream_io_enabled. The explanation is captured in R0455 rather
+than retained as unnecessary mirror text. Final declarations use exact XP
+spelling. Production +1/-4, net -3; tests +0/-0. Selected patch +7/-0 becomes
++4/-0, a three-line mirror-diff reduction. Existing line scaffolding is unchanged.
+
+### R0455: stream I/O declarations outside NTVDM
+
+Original XP video.h lines 352-355 declare stream_io_buffer,
+stream_io_dirty_count_ptr, stream_io_buffer_size and stream_io_enabled inside
+NTVDM. Current final lines 294-297 expose those four declarations to the
+selected non-NTVDM build. Initial analysis questioned whether this was merely
+an adapter-created dependency that should disappear with coherent restoration.
+
+Source evidence contradicts that interpretation: pinned XP video.c lines
+2751-2756 reference all four unconditionally inside vd_write_teletype, after
+the earlier NTVDM local-declaration block has ended. The original function is
+registered in video.c and ega_vide.c service tables and called by the original
+write-string implementation. Current selected code preserves that block.
+Compat video.c supplies disabled initial state (FALSE, NULL pointers, zero
+capacity); whole-src/test symbol search finds no subsequent enable assignment.
+This is not a second display implementation, nor a working stream backend.
+
+Actual dual-architecture countercompilation uses each Ninja production
+video.c command with only dependency/object outputs redirected. A private
+header copy removes these four added declarations, leaving all existing
+conditional choices and original consumer code unchanged. Current-header
+compiles exit 0 on x86/x64; restored declaration visibility exits 1 on each:
+stream_io_enabled, stream_io_dirty_count_ptr, stream_io_buffer_size and
+stream_io_buffer are each undeclared at original lines 2751/2752/2754.
+
+Independent counter-review: a header-only compile failure would not suffice
+if a coherent original caller restoration removed the references. Here the
+references themselves are original XP selected code. Deleting that original
+block would add a new mirror behavior difference; moving the same declarations
+to another header would merely relocate the adaptation. Neither is a justified
+original-first reduction. Four original-spelling declarations remain the
+minimal existing patch, evidence-qualified and pending owner decision, not
+automatically approved. This proves compilation need, not live stream-I/O
+behavior, and does not complete the later video.c whole-file audit.
+
+### P99 qualification
+
+Final-source cached builds complete in 15.62 seconds (x86) and 19.06 seconds
+(x64). Fresh published EXEs on Nov 13 2026:
+
+- x86 16:22:39: 28905a8241a2b2422597c2db0f7d97a2d897e292ad1a15bdf1456dfea0676944.
+- x64 16:22:54: f5d338e1dfb98e67c82258fd8b9183e4ad140f85418faa2c87fd0105e03c5024.
+
+Each full EXE matches P98 after masking only PE timestamp/checksum and eight
+compiler-time bytes at the same unique date/time literal. Lengths and PE
+offsets match; no code/data bytes are otherwise ignored. The authorized
+equivalence exception applies: no repeated runtime suite; P97's 392/392
+remains the full-runtime baseline. The compile counterprobe is separate from
+that baseline and never overwrote production objects. Frontier is 397/472;
+next file 398 base/keymouse/keyba.c. S1 and earlier qualified decisions remain
+open; no whole-task completion is claimed.
+
+P99 actual eight-file diff review and mirror/documentation/whitespace gates
+pass. CIM confirms probe and build jobs exited; exact scratch preview,
+cleanup and residue check pass. Configuration, guest assets and snapshots
+are untouched. Frozen initial hashes and file order are preserved.

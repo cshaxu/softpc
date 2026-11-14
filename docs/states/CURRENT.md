@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P98 completes files 390-393. Three selected vgaports.h whitespace
-lines are restored exactly to XP; selected mirror diff decreases by six lines.
-Other audited headers match XP outside existing exclusions. Both EXEs are
-freshly built/published and whole-file equivalent to P97 except verified
-build/PE metadata; P97's 392/392 remains the runtime baseline.
-Frozen frontier 393/472; next file 394 base/inc/video.h.
+T100 S1 P99 completes files 394-397. video.h selected diff decreases by
+three lines; four stream declarations remain compiler-proven pending owner
+choice because original selected video.c references them outside NTVDM.
+Other headers match XP outside existing exclusions. Both EXEs are freshly
+built/published and metadata-equivalent to P98; P97's 392/392 remains the
+runtime baseline. Frontier 397/472; next file 398 base/keymouse/keyba.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
