@@ -12432,3 +12432,24 @@ defect decisions and owner retention choices keep S1/T100 open.
 
 P175 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. The three task records are the complete changed-file set.
+
+## P176 final-decision reconciliation, positions 424-427
+
+All four normalized current files match the P131 committed versions. Actual
+source confirms the final two backing-span checks and dirty capacity, pointer
+colour condition and one-argument V7 validation mask. Reconcile P127-P131 final
+results without treating intermediate unsafe guards or disconnected tests as
+passed. Default CTest Console launch and exact-binary explicit-Console execution
+remain distinct; P164 is the later fresh 392/392 current-source evidence.
+
+Eight semantic IDs are added: 283 residuals (280 semantic, three compiler/format),
+eighteen notices. Grouped dirty/mapping proof is not claimed as independent
+negative execution of every repeated line. R0529/R0530/R0537 actual minimization
+is preserved; no new renderer or extra limit is introduced by this review.
+
+Executor/counter-review changes only three task records. No source, test,
+EXE or user asset changes; no worker/scratch created. Next is file 428 and
+final D001-D006/L001 reconciliation. All owner decisions and S1/T100 remain open.
+
+P176 actual three-document diff review, mirror/documentation/whitespace gates
+and build-residue check pass. No unrelated modifications are present.

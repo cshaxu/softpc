@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-423 only. Positions 424-472, original
+This view currently reconciles positions 1-427 only. Positions 428-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1659,6 +1659,110 @@ semantic, three compiler/format); eighteen notices unchanged. D006 remains a
 separate proposed repair. This reconciliation changes no source/tests/EXEs;
 P164 fresh 392/392 remains applicable, without approving pending residuals.
 
+## Positions 424-427: update geometry, dirty mapping and V7 display state
+
+All four normalized current files match their final P131 committed versions.
+Current guard expressions use real backing spans and dirty-array capacity;
+V7 pointer scaling uses display colour state, and mode validation masks only
+the argument. P127-P131 final deliveries, including failed/intermediate test
+results and later revalidation, are distinguished below.
+
+### R0530: minimized text geometry guard
+
+P127 removed arbitrary 160-column/200-row/32-pixel limits and four copied locals,
+restoring original row calculation. The retained guard checks nonzero stride,
+full-copy extent 2*start+length, final-visible-row extent
+2*start+length-stride+2*columns, and sizeof(dirty)/sizeof(dirty[0]) rows. Both
+byte spans must fit actual EGA_PLANE_SIZE, not the selectable display-bank span.
+Source pixels occupy four times that byte domain in a four-times allocation.
+This is not a public text-size policy or arbitrary-corrupted-snapshot validator.
+
+Real BIOS/CRTC tests prove 161-column output and 400/768 rows work; 769 rows
+exceed the actual dirty records. Zero offset plus real update ticks reaches
+zero stride; original unguarded division faults on both widths. Two rejected
+intermediate guards matter: display-bank capacity permitted 72128 bytes beyond
+real video_copy; checking full-copy alone missed 64 bytes at the last visible
+row. Enlarged private scratch observed those writes without an uncontrolled
+heap overrun. Final both-span checks prevent them. Earlier background passes
+on an unsafe candidate were NOT accepted as final-source qualification.
+The regression orders state-mutating probes correctly and counts full rows
+separately from the legitimate extra old-cursor erase callback.
+
+### R0531-R0535: one original update path, grouped evidence
+
+- R0531 preserves dirty byte residue within four-byte groups through scan,
+  paint and clear, including paired V7 rows and the last intersecting group.
+  Original-group restoration fails the real route-0 full-mark residue oracle
+  on both widths (stride 80, residue 1, address 320).
+- R0532 retains one CHAIN2 mapping across text, split/wrap, both CGA banks and
+  scrolling. WORD/DWORD pointer steps reflect the same interleaved layout;
+  zero-offset calls retain the owner's uniform pattern. Complete group
+  restoration through both CGA banks fails the incremental modes 04/05 colour
+  matrix on both widths. Earlier partial restoration was superseded.
+- R0533 supplies missing fifth paint argument height=1 when erasing the old
+  cursor. The actual body with a five-argument recording painter returns 1;
+  original four-argument calls expose indeterminate heights and fail both
+  widths. Incidental observed garbage values are not stable ABI semantics.
+- R0534 marks panning predecessor dependencies including bank wrap; traversal
+  avoids recursive propagation of newly added marks, paints wrapped portions
+  before clearing shared marks, and uses correct split scanline/host units.
+  It uses the existing bitmap and painter. Grouped tests and per-rule source
+  checks are not independent negatives for every repeated changed line.
+- R0535 selects the existing EGA marker on CHAIN2 graphics mode. Actual BIOS
+  mode 3 to V7 mode 63 then c_sas_store(a0100) marks bitmap[40] and low/high=64.
+  Original assert-only restoration leaves bitmap clear and invalid bounds
+  despite dirty_total incrementing. Both widths fail that assertion. Unlike
+  the older fixture's direct marker installation, this verifies mode wiring.
+
+R0529 restored spelling/comments; R0530's minimization reduced XP difference
+by 33 lines overall (+9/-34 production, +70 test). No second renderer, retry,
+extra allocation or producer state is introduced. The six residuals remain
+pending, not approved by a successful regression.
+
+gvi.c has no selected residual. Original initialization and geometry setter
+consumers require it; absent direct termination callers do not justify deletion.
+
+### R0536: V7 pointer coordinates follow display interpretation
+
+The single +1/-1 changes draw_v7ptr's second condition from CPU chain4 to
+256-colour display, preserving sequential-chain4 first condition and original
+halving/drawing. SR4 CPU addressing can change independently of packed display.
+P129 actual BIOS modes 66-69, SR4 writes and pointer registers use X=16/Y=6
+with expected pixel X=8. Current full fixtures pass; exact XP-condition
+restoration fails the first pixel oracle on both widths. This is a real
+controller/body test, not a fresh interactive RDP or Win3.1 reproduction and
+not failure evidence for every later negative-matrix case.
+
+### R0537: minimal V7 preserve-mode validation
+
+Original raw BL=E7 fails is_v7vga_mode even though the existing later code
+supports mode 67 plus preserve bit. The minimized patch leaves original
+assignment placement/blank lines and masks only the predicate argument.
+Double parentheses protect the original macro's unparenthesized parameter;
+getBL is a non-mutating read and the preserve flag remains intact downstream.
+Coherent original restoration fails actual different-mode BIOS request on both
+widths; a same-mode request alone could hide rejection. Minimal controls pass
+mode/preserve/clear/bank/invalid-FF cases. Four XP difference lines were removed;
+remaining +1/-1 is pending, with no helper or guest-specific path.
+
+### Exact qualification history, not retroactive passes
+
+P127 final background suites passed but disconnected native cases failed.
+After reconnection fourteen native CTest cases passed; Console still failed
+initial geometry before broker creation or the changed VGA object. The exact
+unchanged Console binaries passed explicit hidden-new-Console launches using
+the registered working directories. Thus that batch qualified all required
+bodies, not default-launch CTest 392/392 or a repaired Console launcher.
+P130 V7 predicate code changed EXEs: full background and Window tests passed,
+explicit Console tests passed, five native cases per width were owner-deferred.
+P131 connected reruns then passed those ten cases without source changes.
+P164 subsequently ran fresh full 392/392 without retry/skip on current artifacts.
+These outcomes do not erase earlier observed failures or rejected candidates.
+
+Eight semantic IDs are added: cumulative 283 residuals (280 semantic, three
+compiler/format), eighteen notice items unchanged. This reconciliation edits
+only task records; code/tests/EXEs are unchanged, and owner decisions stay open.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1668,4 +1772,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 424.
+recommendations into owner approval. The next position is 428.
