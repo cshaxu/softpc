@@ -53,6 +53,9 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 80 / R0091 | HLT resume label and checkpoint (+2/-0). | Resume saved halt phase and expose the existing lifecycle checkpoint while halted. | Owner approves retention, S3 P11 |
 | 80 / R0093 | Consume host clock/control events while halted (+4/-0). | Wake alone does not deliver pending device/control work; keep execution on the executor. | Owner approves retention, S3 P11 |
 | 80 / R0094 | Wait when interrupt map and quick-event work are empty (+3/-0). | Existing Compat event wait avoids idle spinning without blocking pending quick-event work. | Owner approves retention, S3 P11 |
+| 80 / R0095 | STI retirement notification (+1/-0). | Original STI inhibited-interrupt jump bypasses ordinary retirement. | Owner approves retention, S3 P12 |
+| 80 / R0096 | Ordinary instruction retirement notification (+2/-0 including separator). | Shared debug observer counts completed ordinary instructions; early jumps do not also pass here. | Owner approves retention, S3 P12 |
+| 80 / R0097 | Escape quick mode for pending host events (+2/-0). | Otherwise the original direct DO_INST shortcut bypasses host clock/control consumption. | Owner approves retention, S3 P12 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -72,13 +75,17 @@ TLS declaration and one-shot Compat resume consumer. All three count as explicit
 approvals, including the qualifying one-line R0084. Owner then approves
 R0087-R0090 (+8/-3 including replaced blank lines), all recorded as explicit
 approvals. Owner then approves R0091/R0093/R0094 (+9/-0).
-Progress: 69/381 retained (49 explicit and twenty delegated),
-zero restoration decisions, 312 pending;
+Owner then approves R0095-R0097 (+5/-0), expanding automatic retention to
+existing points with added plus deleted lines strictly less than five (at most
+four). Evidence remains required; do not split IDs or count net growth. This
+supersedes the earlier two-line threshold without authorizing new repairs.
+Progress: 72/381 retained (52 explicit and twenty delegated),
+zero restoration decisions, 309 pending;
 notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next review covers R0095-R0097: STI and
-ordinary retirement plus quick-mode host-event escape (+5/-0 including one
-separator blank, excluding the existing exclusion-related #line).
+stays the single detailed inventory. Next review starts at R0099; R0098 was
+already restored in S1. R0095-R0097 counts include one separator blank and
+exclude the existing exclusion-related #line.
 R0092 was already restored in S1. HLT checkpoint, pending clock/control
 consumption and event wait are source-checked against pinned XP and Compat
 providers; no new dynamic qualification is claimed.

@@ -11,7 +11,7 @@ existing mirror differences together. T100 remains open. See the
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S3 review and approves individual batches. Owner now delegates retention of strongly evidenced existing points with added plus deleted lines at most two. Larger/uncertain points require explicit review; no blanket restoration or new patch. |
+| Admission And Approval | Owner admits S3 review and approves individual batches. Owner now delegates retention of evidenced existing points with added plus deleted lines strictly less than five (at most four); do not split IDs or use net counts. Larger/uncertain points require explicit review; no new patch authorization. |
 | Objective | Obtain explicit retain/restore decisions for the remaining S1 residuals, with actual consumers, evidence and restoration consequences. |
 | Non-goals | No unapproved source change, new repair, excluded-body inventory, sibling writes, guest changes or reopening S2-declined repairs. |
 | Reference Baseline | Accepted S2 P6 62474beb; S1 frozen 472-file order and 381 residual IDs; pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
@@ -19,7 +19,7 @@ existing mirror differences together. T100 remains open. See the
 | Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, read-only until a concrete owner implementation decision; task records own approval status. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP only; no OpenNT reads. |
 | Verification | Cross-check current source and prior evidence for each presented point. Separate source/ABI proof, controlled tests and guest reproduction. Documentation-only admission uses documentation/whitespace checks, not invented fresh runtime qualification. |
-| Expected Markers | 381 IDs retain individual dispositions; nineteen notices stay separate. 69 retained (49 explicit, twenty delegated); next review R0095-R0097, in frozen file order. |
+| Expected Markers | 381 IDs retain individual dispositions; nineteen notices stay separate. 72 retained (52 explicit, twenty delegated); next review starts at R0099, in frozen file order. |
 | Asset Needs | Preserve configuration/media/snapshots. S3 owns build/t100-s3 for disposable review scripts; two-hour run/fifteen-minute no-progress budget if probes are needed; clean at each delivery. |
 | Reporting Requirements | Original/current code, necessity evidence and limits, restoration consequence and actual XP diff; distinguish recommendation from approval. |
 | Stop Conditions | Admission does not authorize arbitrary restoration or new patches. Unproved necessity returns to investigation. Do not revive declined bulk repairs or approve a whole family from one representative. |
@@ -29,9 +29,9 @@ existing mirror differences together. T100 remains open. See the
 
 ## Current Technical Baseline
 
-S3 P11 records explicit R0091/R0093/R0094 retention (+9/-0 existing XP
-difference): HLT checkpoint, host-event consumption and idle wait.
-Progress: 69/381 retained, 312 pending; next review R0095-R0097. The
+S3 P12 records explicit R0095-R0097 retention (+5/-0 existing XP difference)
+and the expanded small-point delegation (added plus deleted strictly below five).
+Progress: 72/381 retained, 309 pending; next review starts at R0099. The
 [point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
 owns individual decisions. This documentation-only delivery changes no source,
 tests, EXEs or user assets and claims no new runtime qualification.

@@ -402,3 +402,11 @@ plus deleted lines at most two. Do not use net line count, split larger blocks,
 or infer approval from passing tests alone. Record the ID, exact size, evidence
 and delegated status in the existing decision ledger. Larger or uncertain
 points still require owner review; no new production patch is authorized.
+
+Owner later expands the threshold: "批准 所有小于5行diff的点位自动通过".
+Use added plus deleted lines strictly below five (at most four) for each
+existing ID, superseding the two-line threshold. Keep necessity/caller evidence,
+never split points or use net growth, and record automatic decisions in the
+same ledger. Uncertain points remain under investigation; this does not
+authorize new repairs. Present the next reviewed group after recording each
+batch without waiting for a separate owner request to show it.
