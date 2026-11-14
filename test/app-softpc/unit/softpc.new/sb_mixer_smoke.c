@@ -5,6 +5,11 @@
 #include "nt_sb.h"
 #include "compat/devices/snapshot.h"
 
+HWAVEOUT HWaveOut;
+HMIDIOUT HFM, HMidiOut;
+SETVOLUMEPROC SetVolumeProc;
+SETMIDIVOLUMEPROC SetMidiVolumeProc;
+
 static lib_u32 applied;
 static IU16 voice_gain, midi_gain;
 

@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P156 restores original nt_sbmid.c declarations, six inactive native
-helpers and matching parser structure. Production +438/-37; tests +16/-0;
-XP diff falls by 407 lines. Final-source x86/x64 builds and all 392 tests pass.
-Original-body and controlled withdrawal probes qualify the remaining copied
-message, archive and pause contracts; they do not approve every residual line.
-R0665-R0672 record the complete review and pending owner choices.
-Frontier 465/472; next host/src/nt_sbmxr.c. Seven files and qualified owner
+T100 S1 P157 restores every original nt_sbmxr.c line and removes a redundant
+zero-gain branch after exhaustive equivalence proof. Production +69/-23; tests
++5/-0; XP diff falls by 84 lines. Final-source x86/x64 builds and all 392 tests
+pass. R0673-R0676 record the restored declarations/branches and qualified owner
+choices for archive, host application and composed gain. Original native output
+remains inactive; the existing Compat/Lib path is unchanged.
+Frontier 466/472; next host/src/nt_sound.c. Six files and qualified owner
 decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-465-hostsrcnt_sbmidc-p156).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-466-hostsrcnt_sbmxrc-p157).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

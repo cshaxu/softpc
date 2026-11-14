@@ -11655,3 +11655,93 @@ These original bodies are not safe for an unreviewed future x64 activation; thei
 lack of an actual activation caller is checked, not assumed from passing tests.
 The owner's mirror-warning exemption applies; no suppression or new original
 pointer patch is introduced to make this audit look warning-free.
+
+## File 466 host/src/nt_sbmxr.c review (qualification pending)
+
+The fixed XP file and current complete body are compared in frozen order. The
+production device object owns CT1335 registers; SbIOWrite calls MixerAddrWrite/
+MixerDataWrite and SbIORead calls MixerDataRead. SbApplyMixer routes the current
+register-derived gain to MIDI and to an active PCM stream. Stream creation and
+archive reconstruction also obtain gain from these registers; Compat does not
+own a second mixer. Current native HWaveOut/HFM/HMidiOut are inactive: their
+opening functions have no production activation callers. Restored native handle
+branches therefore do not start another output path.
+
+| Point | Original/current difference and first review | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0673 | Windows include, original local prototypes, BYTE fields/parameters and VOID spelling had been replaced/removed. | Restore exact original declarations and spelling. Current widths/ABI are unchanged, confirmed by both-width fixture builds and behavior. No rationale remains for these substitutions. |
+| R0674 | The local mixer archive copies selected register and four byte values; XP has no archive functions. | Withdrawing those restorations fails the saved selector/value assertion on both widths. Invalid selector rejection and absence of premature host application remain covered. Existing SB snapshot callers need this contract. Qualified owner choice, not a claim that XP had snapshots. |
+| R0675 | Three setters replaced original native branches with SbApplyMixer. | Restore all original branch bodies, declarations and comments; retain the one existing apply call in each setter. Withdrawing those calls fails reset's three-application assertion on both widths. Original native handles are not the current Lib stream objects; no second activation or opaque-handle alias is introduced. The three apply lines remain a qualified owner choice. |
+| R0676 | MixerGain/MixerGetVoiceGain/MixerGetMidiGain combine master and device registers and special-case decoded zero. | Original-body probes show direct zero writes yield FFFEFFFF and independent master/voice writes overwrite each other. Withdrawing composition fails current combined-gain assertions. However, withdrawing the zero special case unexpectedly passes: unsigned 32-bit composition and final 16-bit conversion already produce zero. Exhaustive before/after proof confirms equivalence, so remove that unnecessary branch instead of qualifying it for retention. The remaining gain functions are a qualified owner choice for the current single output contract. |
+
+The exact original function bodies run with controlled native sink callbacks on
+x86/x64, without opening host devices. Master, voice and MIDI zero each produce
+FFFEFFFF. Master 2 followed by voice 4 produces 7FFF7FFF; reversed order produces
+1FFF1FFF. These are native-call values, not acoustic measurements or a new claim
+of hardware-perfect CT1335 calibration. They show why independent original writes
+cannot substitute unchanged for the existing composed output contract.
+
+The first withdrawal experiment expected a failure without the zero guard but
+observed a pass; that expectation was rejected, not concealed. Independent tables
+of eight master/FM and four voice levels, using 64-bit expected multiplication,
+then check every pair of raw register bytes through the actual before and after
+functions on each architecture: 131072 voice/MIDI output assertions per run,
+524288 total across two versions and two widths. Each verifies IU32 is 32 bits;
+all pass. A separate explicit 32-bit arithmetic enumeration also finds zero
+differences. This is evidence for removing the branch, not for retaining it.
+The source argument is bounded to these callers: positive decoded gains are at
+least 8191 and at most 57343. A zero factor becomes UINT32_MAX; multiplication
+by a positive supported factor wraps to 2^32 minus that factor, whose quotient
+by 65535 is 65536 and whose final IU16 value is zero. Two zero factors wrap to
+one, also yielding zero. Positive-factor products fit IU32. This is not a generic
+identity for arbitrary future gain ranges or a wider intermediate type.
+
+The existing mixer fixture passes for baseline, restored and guarded variants on
+both widths. Withdrawing host application, composition or archive restoration
+fails the intended assertions on both widths (six controlled failures); every
+variant compiles/links. Test additions supply four original native handle/callback
+declarations only, initialized inactive; no test-only production API is added.
+
+Installed candidate restores every original XP line in its original order:
+normalized XP comparison has zero deletions and 48 local added lines, versus
+67 additions/65 deletions before; mirror diff decreases by 84 lines. Production
+diff is +69/-23 (net +46), tests +5/-0. Remaining additions are the archive include/
+functions, three apply calls and the current gain calculation. No excluded-body
+accounting is introduced. Final-source dual builds/publication and full regression
+are running; delivered frontier remains 465/472 until P157 completes.
+
+Independent final-diff check verifies fixed XP normalized SHA-256
+12d2a9c58306ab4ba7686e80afeeabd429c61a926ad2d816e38ba98978b0a890,
+48 additions/zero deletions against that original, exact installed/candidate
+identity, mirror CRLF and owned-test LF. Both cached build logs contain no
+warnings or errors; this is not a claim about recompiling unrelated old mirror
+objects without cache.
+
+## File 466 host/src/nt_sbmxr.c P157
+
+Final-source cached builds and all 392 tests pass:
+
+| Architecture | Build | Background | Native desktop/audio/package |
+| --- | --- | --- | --- |
+| x86 | 9.33 s | 188/188, 143.82 s | 8/8, 15.63 s |
+| x64 | 12.39 s | 188/188, 142.61 s | 8/8, 15.95 s |
+
+Final actual-diff review confirms all original XP lines are preserved, the native
+handle branches remain inactive in production, and the existing Lib gain/archive
+path remains the sole active one. Production +69/-23 (net +46), tests +5/-0;
+XP-relative diff reduced by 84 lines. No public eight-tree, guest, configuration,
+media or snapshot-format change is included. R0673 is restored; R0674-R0676 retain
+qualified owner decisions. The proven-redundant zero branch is removed, not sent
+for approval as necessary. Tests establish present contracts and exhaustive gain
+equivalence, not hardware/acoustic fidelity or all future arithmetic changes.
+No final test was skipped. Mirror/documentation/diff and scratch cleanup checks
+pass; all task jobs were confirmed exited and disposable scratch removed before
+commit. Reusable Ninja/ccache trees and user assets remain intact.
+
+Published SHA-256:
+
+- softpc32.exe: `4a96e3782d9204b872b5543f6b4c15c770da4a31c0d816f25a3c7d48d44ae3bd`.
+- softpc64.exe: `e775b29e3faf5fd8e8e71cb33238aad427c7826ac2a426fbe1fd82dd8055b5d9`.
+
+P157 advances the delivered frontier to 466/472; next host/src/nt_sound.c.
+Six files and qualified owner decisions keep S1/T100 open.

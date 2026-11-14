@@ -2508,3 +2508,14 @@ blanket retention claims: copied-message, host lifetime, archive and pause
 differences remain qualified owner choices. Unchanged original inactive defects
 are recorded there, not silently patched or sent to TODO. Final-source dual-width
 builds and all 392 tests pass; excluded bodies receive no new accounting.
+
+## T100 S1 P157 nt_sbmxr.c original-first reconciliation
+
+Every original XP line is restored; only 48 local added lines remain, reducing
+XP-relative diff by 84 lines. Source +69/-23; tests +5/-0. The native handle
+branches have no active opener; output still uses the existing Compat/Lib path.
+The zero special case was proved unnecessary and removed. R0674-R0676 retain
+qualified owner choices for archive, host application and composed gain, as
+recorded in [the audit evidence](m9-t100-progress.md#file-466-hostsrcnt_sbmxrc-p157).
+Final-source dual-width builds and all 392 tests pass. Original direct-volume
+underflow/overwrite evidence is not a newly applied mirror patch or TODO transfer.

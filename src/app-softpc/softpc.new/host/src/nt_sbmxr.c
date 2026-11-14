@@ -13,21 +13,24 @@
 #include "host_def.h"
 #include "ios.h"
 
-/* T93: use the existing core scalar ABI, not WinMM host types. */
+#include <windows.h>
 #include "sndblst.h"
 #include "nt_sb.h"
 #include "compat/devices/snapshot.h"
 
+void MixerSetMasterVolume(BYTE level);
+void MixerSetVoiceVolume(BYTE level);
+void MixerSetMidiVolume(BYTE level);
 
 //
 // Mixer globals
 //
 
 struct {
-    IU8 MasterVolume;     // current master volume
-    IU8 FMVolume;         // current volume of fm device
-    IU8 CDVolume;         // current volume of cd
-    IU8 VoiceVolume;      // current volume of wave device
+    BYTE MasterVolume;     // current master volume
+    BYTE FMVolume;         // current volume of fm device
+    BYTE CDVolume;         // current volume of cd
+    BYTE VoiceVolume;      // current volume of wave device
 } MixerSettings;
 
 //
@@ -64,9 +67,10 @@ int softpc_device_snapshot_restore_sb_mixer(const softpc_device_sb_mixer_state *
     return TRUE;
 }
 
-void
+
+VOID
 MixerDataRead(
-    IU8 * data
+    BYTE * data
     )
 
 /*++
@@ -109,9 +113,9 @@ Return Value:
     }
 }
 
-void
+VOID
 MixerAddrWrite(
-    IU8 data
+    BYTE data
     )
 
 /*++
@@ -154,9 +158,9 @@ Return Value:
     }
 }
 
-void
+VOID
 MixerDataWrite(
-    IU8 data
+    BYTE data
     )
 
 /*++
@@ -199,9 +203,9 @@ Return Value:
     }
 }
 
-void
+VOID
 ResetMixer(
-    void
+    VOID
     )
 
 /*++
@@ -229,9 +233,9 @@ Return Value:
     MixerState = MixerReset;
 }
 
-void
+VOID
 MixerSetMasterVolume(
-    IU8 level
+    BYTE level
     )
 
 /*++
@@ -251,13 +255,23 @@ Return Value:
 --*/
 
 {
+    ULONG volume = 0;
+
     MixerSettings.MasterVolume = level;
+    if (HWaveOut) {
+        level = level >> 1;
+        level = level & 0x07;
+
+        volume = level*0x2000 - 1;          // 0x10000/8
+        volume = volume + (volume << 16);   // Both speaker
+        SetVolumeProc(HWaveOut, volume);    // ????
+    }
     SbApplyMixer();
 }
 
-void
+VOID
 MixerSetVoiceVolume(
-    IU8 level
+    BYTE level
     )
 
 /*++
@@ -277,13 +291,30 @@ Return Value:
 --*/
 
 {
+    ULONG volume = 0;
+
     MixerSettings.VoiceVolume = level;
+
+    //
+    // Don't let apps set voice volume.  At least not through MM WaveOut
+    // device.  Because On mixer reset, the voice volume will be set to zero.
+    // It will set WaveOut volume to zero.
+    //
+
+    if (HWaveOut) {
+        level = level >> 1;
+        level = level & 0x03;
+
+        volume = level*0x4000 - 1;          // 0x10000/4
+        volume = volume + (volume << 16);   // Both speaker
+        SetVolumeProc(HWaveOut, volume);
+    }
     SbApplyMixer();
 }
 
-void
+VOID
 MixerSetMidiVolume(
-    IU8 level
+    BYTE level
     )
 
 /*++
@@ -303,17 +334,32 @@ Return Value:
 --*/
 
 {
+    ULONG volume = 0;
+    HANDLE hMidi;
+
     MixerSettings.FMVolume = level;
+    if (HFM || HMidiOut) {
+        level = level >> 1;
+        level = level & 0x07;
+
+        volume = level*0x2000 - 1;        // 0x10000/8
+        volume = volume + (volume << 16); // set both speaker
+        if (HFM) {
+            SetMidiVolumeProc(HFM, volume);
+        }
+        if (HMidiOut) {
+            SetMidiVolumeProc(HMidiOut, volume);
+        }
+    }
     SbApplyMixer();
 }
 
-
-/* T93: retain XP's positive-level scale, but zero is silent. Compose the
- * existing device registers here; the host must not own another mixer. */
+/* T93: compose the existing device registers here using XP's unsigned
+ * scale; the host must not own another mixer. */
 static IU32 MixerGain(IU8 level, IU8 mask, IU32 step)
 {
     IU32 decoded = (level >> 1) & mask;
-    return decoded ? decoded * step - 1 : 0;
+    return decoded * step - 1;
 }
 
 IU16 MixerGetVoiceGain(void)
