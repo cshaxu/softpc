@@ -12314,3 +12314,28 @@ remain open. S1/T100 are not closed.
 
 P170 mirror/documentation/whitespace gates and build-residue check pass. Actual
 diff review confirms only the three task records and no unrelated modifications.
+
+## P171 final-decision reconciliation, positions 370-393
+
+Normalized current contents of all twenty-four headers match the committed P98
+state. Actual provider/caller searches confirm queue capture/restore wiring,
+PHY_ADDR storage, Sound Blaster teardown consumers and unsupported UART parser,
+and Compat's restored time_t provider. The initial time_day path search used
+the wrong directory; file inventory located base/support/time_day.c rather
+than treating a missing search path as evidence of no consumer.
+
+Reconcile P91-P98 final evidence, including coherent BOOL provider/header/test
+restoration, original time_t reinstatement and exact whitespace restoration.
+Retained R0442/R0444/R0448/R0449 add four semantic IDs; R0451 adds a compiler
+EOF residual. Totals: 229 residual IDs (227 semantic, two compiler/format),
+plus eight historical notice items. Compile proofs, current-behavior tests,
+original-negative controls and actual full suites remain distinguished.
+
+Executor/counter-review find three task records only. No production, tests,
+EXEs or user assets changed; no scratch/job was created. P164 fresh 392/392
+applies to unchanged artifacts; no new runtime result is claimed. Next file
+394 and D001-D006/L001 remain to reconcile. Owner decisions and S1/T100 remain
+open, not closed by the accumulated file coverage.
+
+P171 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Final changes are limited to the three task records.

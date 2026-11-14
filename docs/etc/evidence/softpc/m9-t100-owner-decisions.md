@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-369 only. Positions 370-472, original
+This view currently reconciles positions 1-393 only. Positions 394-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1135,6 +1135,101 @@ qualified residual IDs: 224 (223 semantic, one format/compiler), plus eight
 separate historical notice items. R0435-R0437 are restored, not pending.
 Production/test/EXE bytes are unchanged; P164's fresh 392/392 remains applicable.
 
+## Positions 370-393: device, snapshot and native-time headers
+
+All twenty-four current normalized files equal their final P98 versions.
+Current providers/callers confirm the queue archive APIs, physical memory count,
+Sound Blaster teardown/parser contract and restored native time_t function.
+This is final-source reconciliation of P91-P98, not another runtime test run.
+
+### Original selected headers and completed restorations
+
+No pending selected difference exists in j_c_lang.h, keyba.h, keyboard.h,
+mouse.h, mouse_io.h, ppi.h, printer.h, rom.h, rs232.h, rtc_bios.h, sasp.h,
+spcfile.h, suplib.h, timer.h, timestmp.h, tmstrobe.h, trace.h or vga_dac.h.
+Original include wiring remains; in particular retiring mouse_io.c did not
+justify removing the original mouse_io.h includes. A retained declaration does
+not claim all historical implementations are active. Exclusions get no entries.
+
+- R0441 removed five redundant quick_ev.h explanation lines; the separately
+  justified API below remains. R0443 removed the unused added overwrite-memory
+  declaration; R0445 restored the original inactive sys_addr spelling. R0444's
+  spacing/comment were restored while its single type token remains pending.
+- R0446/R0447/R0450 restored sndblst.h constants, positions, omitted text and
+  aliases, together with nt_sb.c's original BOOL initialization signature.
+  Header-only restoration was correctly rejected as a partial mismatch;
+  coherent restoration also adapted the fixture's unsigned declarations.
+  Anchored XP diff reduction is 78 lines (heuristic total 70, due to repetitive
+  provider alignment). Source +48 is not increased mirror difference. EXE
+  instructions changed, so P95 actually ran all 392 tests, not the metadata
+  exemption. No parser or lifetime body was changed by that restoration.
+- R0452 restored timeval.h's original time_t interface and made Compat's sole
+  provider return time(location), removing the long conversion and duplicate
+  writeback. Both real callers already use time_t. The separate snapshot
+  broken-down calendar array is unaffected. P97's injected-time test checks
+  wide values where supported, NULL output and -1; full 392/392 passed. This
+  does not establish every guest's post-2038 calendar behavior.
+- R0453 restored three exact-XP whitespace lines in vgaports.h, removing six
+  difference lines without changing bitfields. Dual published EXEs differ only
+  in precisely identified metadata. The three intentional mirror whitespace
+  diagnostics were accounted for; this is not an unreported failed gate.
+
+### R0442: private event-queue snapshot contract
+
+The remaining +35 header lines define two record types, two callback types
+and measure/capture/restore declarations. All are used by the original queue
+provider and Compat archive capture/serialization/load. The original queue,
+hash lists, handles and countdowns are private; original add/delete APIs cannot
+read them or reconstruct handles/timing without potentially running a zero-time
+callback. This is source/ownership proof for snapshot behavior, not merely a
+missing-declaration compiler failure. Copying the scheduler into Compat would
+create a second owner. Every record field has a capture/restore/serialization
+use; callbacks are persisted as stable IDs rather than process addresses.
+P92 checkpoint controls cover two quick events and one tick event, invalid late
+callback rejection preserving the live queue, callback-free load, countdown and
+subsequent order. They do not exhaust hash collisions or guest sessions.
+Retention remains pending; later implementation review is a separate position.
+
+### R0444: physical memory length type
+
+Only IHPE to PHY_ADDR differs on the selected Length_of_M_area declaration,
++1/-1. Original ccpusas4.c owns PHY_ADDR storage; zfrsrvd.c imports the same.
+Restoring the pointer-width header type conflicts on both architectures:
+x86 unsigned int versus unsigned long, x64 unsigned long long versus unsigned
+long. P94 corrected its initial mistaken expectation that equal widths imply
+compatible C types, then reran actual compiles. Current controls pass. This is
+compile/ABI evidence, not a reproduced runtime overwrite. Do not widen the
+original storage or globally narrow pointer carriers to avoid this local fix.
+
+### R0448/R0449: Sound Blaster teardown and parser state
+
+R0448 retains SbTerminate's IBOOL return instead of VOID, +1/-1. The current
+provider returns actual PCM/MIDI close status; Machine destroy/reset and
+platform reboot consume failure. Returning void coherently would remove the
+existing stop-on-failed-teardown contract; the platform failure fixture checks
+that boundary. No new recovery callback is proposed.
+
+R0449 retains the 0x36 UART command definition, +1/-0. Existing nt_sbdsp.c uses
+it to enter UnsupportedMidiUart and consume following bytes as UART data,
+instead of misinterpreting them as later PCM commands. Current device tests
+cover the command, following bytes, retained state, reset and snapshot. This is
+source plus current-behavior evidence, not a fresh original-negative replay.
+Both are existing residuals awaiting owner approval, not approved by P95's
+successful signature restoration or by the latest full suite.
+
+### R0451: tape_io.h compiler EOF
+
+The only selected difference omits XP's terminal Ctrl-Z line, +0/-1. P96 used
+the actual production tape_io.c compiler commands: current passes both widths,
+restoring that byte fails both with stray byte 0x1a. Existing macro warnings
+were not the failure cause. This is a format/compiler residual, separately
+pending like R0439, with no claimed guest behavior change.
+
+This group adds four semantic and one compiler/format ID: cumulative 229
+qualified residual IDs (227 semantic, two compiler/format), plus eight separate
+historical notice items. Sources/tests/EXEs are unchanged in this reconciliation;
+P164's fresh 392/392 still applies, with all owner choices remaining open.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1144,4 +1239,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 370.
+recommendations into owner approval. The next position is 394.
