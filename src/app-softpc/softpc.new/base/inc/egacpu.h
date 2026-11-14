@@ -88,7 +88,7 @@ typedef struct
 	UTINY	*route_reg2;
 	UTINY	*screen_ptr;
 	ULONG	rotate;
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
 #line 140
@@ -96,7 +96,7 @@ typedef struct
 #endif // !NEC_98
 #line 142
 
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
 #line 146
@@ -104,7 +104,7 @@ extern struct EGA_CPU_GLOBALS
 #endif // !NEC_98
 #line 148
 {
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
 #line 152
@@ -124,7 +124,7 @@ extern struct EGA_CPU_GLOBALS
 #line 156
 	ULONG		saved_state;		/* Last value of EGA_CPU.ega_state.state */
 	ULONG		saved_mode_chain;		/* Last value of mode/chain combined */
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
 #line 161
@@ -276,7 +276,7 @@ IMPORT ULONG sr_lookup[16];
 
 #define N_WRITE_TYPES 24
 
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
 #line 486

@@ -62,11 +62,11 @@
  * intel memory position defines for data stored in bios variables
  */
 
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 135
+#line 134
+
 #define	vd_video_mode	0x449
 #define VID_COLS	0x44A	/* vd_cols_on_screen */
 #define	VID_LEN  	0x44C	/* vd_crt_len */
@@ -279,7 +279,6 @@ IMPORT VOID vga_read_dot IPT3(LONG, page, LONG, pixcol, LONG, row);
 IMPORT VOID vga_write_dot IPT4(LONG, colour, LONG, page, LONG, pixcol, LONG, row);
 
 #endif
-
 
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"

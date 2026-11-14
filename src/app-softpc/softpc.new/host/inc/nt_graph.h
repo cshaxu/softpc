@@ -110,13 +110,13 @@ typedef struct
 #ifdef BIGWIN
 
 #line 111
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 115
 #define SCALE(value) ((host_screen_scale * (value)) >> 1)
 #define UNSCALE(value) (((value) << 1) / host_screen_scale)
-#endif
+#endif // !NEC_98
 #line 118
 #define MAX_SCALE(value) ((value) << 1)
 
@@ -246,7 +246,7 @@ extern BOOL                 FunnyPaintMode;
 
 typedef struct
 {
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
 #line 260
@@ -267,7 +267,7 @@ typedef struct
 
 typedef struct
 {
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
 #line 291
@@ -404,7 +404,7 @@ extern void nt_v7vga_mono_hi_graph_big(int offset, int screen_x, int screen_y,
 extern void nt_v7vga_mono_hi_graph_huge(int offset, int screen_x, int screen_y,
                          int width, int height);
 #endif /* V7VGA */
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
 #line 471

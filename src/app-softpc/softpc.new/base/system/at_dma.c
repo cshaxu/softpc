@@ -49,8 +49,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif   //NEC_98
-#line 57
-
+#line 58
 /*
  * ============================================================================
  * Local static data and defines

@@ -946,8 +946,8 @@ GLOBAL void	io_init IFN0()
 	}
 }
 
+
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
 #line 1071
-

@@ -115,5 +115,5 @@ IMPORT VOID init_vga_dac IPT1( int, table );
 
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: defined(NTVDM) && defined(MONITOR)"
-#endif
+#endif  /* NTVDM & MONITOR */
 #line 138

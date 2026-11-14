@@ -1360,12 +1360,12 @@ update_banking IFN0()
 #line 1878
 }
 
-
 #line 1880
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
 #endif  //NEC_98
-#line 1900
+#line 1899
+
 VOID
 init_vga_globals IFN0()
 {

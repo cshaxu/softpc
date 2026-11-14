@@ -101,12 +101,11 @@
 #define	KBD_CONT_DELAY	7000		/* microseconds */
 #endif	/* KBD_CONT_DELAY */
 
+
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
-#line 173
-
-
+#endif	/* NTVDM */
+#line 175
 
 
 
@@ -163,15 +162,15 @@ GLOBAL VOID ( *host_key_up_fn_ptr )();
 #line 226
 GLOBAL VOID ( *do_key_repeats_fn_ptr )();
 #endif	/* NTVDM */
-#line 227
-
+#line 228
 
 
 
 #if defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: KOREA"
 #endif
-#line 235
+#line 234
+
 /*
  * 6805 code buffer:
  *
@@ -283,10 +282,10 @@ static half_word set_3_key_state [127];
 #line 352
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else   //NEC_98
 #line 359
 static int key_down_count [127];
-#endif
+#endif  //NEC_98
 #line 361
 
 #else	/* macintosh */
@@ -485,10 +484,10 @@ static half_word trans_8042 [256] =
 #line 606
 #ifdef	JAPAN
 #error "Unsupported SoftPC mirror configuration: JAPAN"
-#else
+#else // !JAPAN
 #line 609
   0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,		/* 90-9f */
-#endif
+#endif // !JAPAN
 #line 611
   0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,		/* a0-af */
   0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,		/* b0-bf */
@@ -861,10 +860,10 @@ switch (key_set)
 #line 1345
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else   //NEC_98
 #line 1348
 		for (key=0;key<127;key++)
-#endif
+#endif  //NEC_98
 #line 1350
 			{
 			switch (keytypes[key])
@@ -1054,7 +1053,7 @@ else
 #line 1606
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif
 #line 1609
 	do_host_key_up(key);
 	}
@@ -1290,11 +1289,11 @@ if (!keyboard_disabled)
 			    typematic_key_valid = TRUE;
 			    }
 		    }
-
 #else
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 1860
+#line 1859
+
 		if (free_6805_buff_size < BUFF_6805_VMAX)
 		    {
 		    codes_to_translate();
@@ -2316,12 +2315,11 @@ if(!output_full)
 
 } /* end of continuous_output */
 
+
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
-#line 3076
-
-
+#endif	/* NTVDM */
+#line 3078
 
 
 #ifndef NTVDM
@@ -2614,11 +2612,11 @@ GLOBAL VOID kbd_outb IFN2(io_addr,port,half_word,val)
 #line 3280
 	if (free_6805_buff_size < BUFF_6805_VMAX)
 		codes_to_translate();
+
 #else   /* NTVDM */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
-#line 3292
-
+#line 3293
 
 } /*end of kbd_outb */
 
@@ -2818,5 +2816,5 @@ GLOBAL VOID AT_kbd_init IFN0()
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: defined(NEC_98)"
-#endif
+#endif    //NEC_98
 #line 3620

@@ -59,12 +59,11 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 278
-
+#line 279
 
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
-#else /* NTVDM */
+#else   /* NTVDM */
 #line 304
 
 #ifdef BIT_ORDER2
@@ -166,18 +165,18 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#line 454
+#line 453
+
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else // !NEC_98
+#else  // !NEC_98
 #line 513
-
-
 #line 481
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
 #endif
-#line 515
+#line 514
+
 /* register select code definitions follow: */
 
 #define RS232_TX_RX	0
@@ -207,24 +206,24 @@ typedef union {
 #define NO_GO_SPEED 1  /* We can't emulate requested line speed */
 #define NO_GO_LINE  2  /* We can't emulate requested line setup */
 
-
 #line 541
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
 #endif
-#line 555
+#line 554
+
 #define OFF 0
 #define ON 1
 #define LEAVE_ALONE 2
 #define	change_state(external_state, internal_state) \
 	((external_state == internal_state) ? LEAVE_ALONE : external_state)
 
-
 #line 561
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
 #endif
-#line 565
+#line 564
+
 #define RLS_INT 3     /* receiver line status interrupt ID */
 #define RDA_INT 2     /* data available interrupt ID */
 #define THRE_INT 1    /* tx holding register empty interrupt ID */
@@ -266,7 +265,7 @@ typedef union {
 #line 601
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else // !NEC_98
+#else  // !NEC_98
 #line 606
 #define COM1 0
 #define COM2 1
@@ -276,12 +275,12 @@ typedef union {
 #endif
 #endif // !NEC_98
 
-
 #line 614
 #if defined(NTVDM) && defined(FIFO_ON)
 #error "Unsupported SoftPC mirror configuration: NTVDM and FIFO_ON"
 #endif
-#line 621
+#line 620
+
 /*
  * ============================================================================
  * External declarations and macros

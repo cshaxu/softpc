@@ -3,17 +3,15 @@
 #include <windows.h>
 #include "sndblst.h"
 #include "nt_sb.h"
-#line 7
+#line 6
+
 #if REPORT_SB_MODE
 #error "Unsupported SoftPC mirror configuration: NTVDM sound mode diagnostics"
 #endif
-#line 5
+#line 8
 #include "compat/sb_midi.h"
 #include "compat/devices/snapshot.h"
 
-/* T93: complete copied messages replace native CMDHDR/MIDIHDR ring framing.
- * Guest parsing remains here; Compat owns only the host output. No pointer
- * is narrowed to a buffer index and no following command flushes a tail. */
 #define MIDI_BUFFER_SIZE 0x1000
 #define MESSAGE_HEADERS 4
 #define MESSAGE_CHUNK_SIZE (256+128)
@@ -537,6 +535,7 @@ Return Value:
 
             RunningStatus = 0;
             LastCommandLength = 0;
+
             switch (data) {
             case 0xf0:
                 RunningStatus = data;

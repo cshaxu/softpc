@@ -8,6 +8,19 @@ are historical; S2 decisions supersede them.
 
 ## S3 approval progress
 
+**Superseded by owner revocation:** all retention approvals and automatic
+delegation recorded below are withdrawn. Current approved count is zero.
+The tables and P2-P15 narratives are historical traceability, not permission
+to retain any point. The owner requires fresh review of all current differences,
+including former approvals, with category block/line/point totals. This is not
+an instruction to revert production code. P15's limited classification does
+not satisfy that whole-domain request.
+
+Owner subsequently authorizes [P16 text restoration](m9-t100-s3-p16.md), not
+semantic retention: 176 text hunks in 37 files are restored. Their relationship
+to historical IDs is recorded separately, including text within R0344/R0345 and
+R0619. These restorations are not new semantic points or revived approvals.
+
 S3 starts at `62474beb` after owner closure of
 [S2](../../../history/M9-T100-S2-candidate-review.md). Its remaining existing
 residual ledger is the 381 S1 IDs below (375 semantic/ABI, six compiler), with

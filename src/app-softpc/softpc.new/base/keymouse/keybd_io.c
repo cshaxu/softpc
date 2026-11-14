@@ -205,13 +205,12 @@ GLOBAL word dummy_int_off = 0;
 #if defined(JAPAN) && defined(NTVDM) && !defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: JAPAN and NTVDM and not NEC_98"
 #endif // JAPAN, NTVDM, !NEC_98
-#line 279
+#line 278
+
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
-#endif
-#line 301
-
-
+#endif /* NTVDM & MONITOR */
+#line 303
 
 extern int soft_reset   ;	/* set for ctl-alt-dels			*/
 
@@ -730,8 +729,7 @@ void keyboard_int IFN0()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 882
-
+#line 883
 #ifndef NTVDM
 #line 884
 	++re_entry_level;
@@ -1706,8 +1704,7 @@ void keyboard_init()
 
 
 
-
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif
+#endif /* NTVDM */
 #line 2281

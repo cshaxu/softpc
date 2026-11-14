@@ -44,11 +44,11 @@
 #line 44
 #endif	/* CPU_40_STYLE */
 
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 61
+#line 60
+
 #ifndef BIOS1ROM_FILENAME
 #define	BIOS1ROM_FILENAME	"bios1.rom"
 #endif /* BIOS1ROM_FILENAME */
@@ -75,9 +75,9 @@
 #ifndef V7VGAROM_FILENAME
 #define	V7VGAROM_FILENAME	"v7vga.rom"
 #endif /* V7VGAROM_FILENAME */
-#endif   //NEC_98
-#line 85
 
+#endif   //NEC_98
+#line 86
 
 #ifdef 	GISP_SVGA
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
@@ -292,7 +292,8 @@ GLOBAL void rom_init IFN0()
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 342
+#line 341
+
 #if !defined(NTVDM) || ( defined(NTVDM) && !defined(X86GFX) )
 #line 343
 	 /*
@@ -334,11 +335,11 @@ GLOBAL void rom_init IFN0()
 	read_rom (BIOS2ROM_FILENAME, BIOS2_START);
 
 #endif		/* GISP_SVGA */
+
 #else	/* !NTVDM | (NTVDM & !X86GFX) */
 #error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
 #endif /* !NTVDM | (NTVDM & !X86GFX) */
-#line 415
-
+#line 416
 
 	host_rom_init();
 #endif   //NEC_98

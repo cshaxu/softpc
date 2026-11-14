@@ -101,7 +101,7 @@ extern PC_palette *DAC;			/* Size is `VGA_DAC_SIZE' */
 #define get_top_pixel_pad()		(EGA_GRAPH.top_pixel_pad)
 #define get_mid_pixel_pad()		(EGA_GRAPH.mid_pixel_pad)
 #line 107
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
 #else  // !NEC_98
 #line 110
@@ -116,7 +116,7 @@ extern PC_palette *DAC;			/* Size is `VGA_DAC_SIZE' */
 #define set_top_pixel_pad(val)		EGA_GRAPH.top_pixel_pad = (val)
 #define set_mid_pixel_pad(val)		EGA_GRAPH.mid_pixel_pad = (val)
 #line 119
-#if defined(NEC_98)
+#if defined(NEC_98)         
 #error "Unsupported SoftPC mirror configuration: #if defined(NEC_98)"
 #else  // !NEC_98
 #line 122

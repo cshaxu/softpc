@@ -32,8 +32,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 41
-
+#line 45
 
 void host_ica_lock(void);
 void host_ica_unlock(void);

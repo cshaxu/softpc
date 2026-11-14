@@ -258,6 +258,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 	 */
 
 	if (port == MOUSE_PORT_1) {	/* data register */
+
 		/*
 		 * Out to Mode register
 		 */

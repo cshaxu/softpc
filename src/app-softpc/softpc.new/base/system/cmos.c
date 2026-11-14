@@ -1048,11 +1048,11 @@ GLOBAL void cmos_update IFN0()
 #line 1134
 }
 
-
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else
-#line 1177
+#line 1176
+
 LOCAL void
 sync_rtc_to_host_time IFN1( long, param )
 {
@@ -1104,9 +1104,9 @@ GLOBAL void  rtc_init IFN0()
 
 	set_alarm();
 }
-#endif	/* NTVDM */
-#line 1229
 
+#endif	/* NTVDM */
+#line 1230
 
 /*(
 ========================= cmos_clear_shutdown_byte ============================

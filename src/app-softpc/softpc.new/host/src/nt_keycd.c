@@ -429,11 +429,10 @@ WORD aNumPadSCode[] = // index by VK_NUMPAD0 as zero offset
 BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 {
     /*:::::::::::::::::::::::::::::::::::: do we need the enhanced key set ? */
-    /* Correct original one-past-end guards: byte count is exclusive. */
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#endif // NEC_98
+#endif // !NEC_98
 #line 719
 
     // Both Pause and Numlock have ScanCode==0x45,

@@ -59,7 +59,6 @@ extern void host_simulate();
 #include "debug.h"
 
 #include "tape_io.h"
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
@@ -73,8 +72,7 @@ extern void host_simulate();
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 162
-
+#line 163
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif /* nPROD */
@@ -144,7 +142,7 @@ void diskette_io()
 #else
 #line 584
 		if (drive >= MAX_FLOPPY)
-#endif
+#endif /* NTVDM */
 #line 586
 			op = FL_FNC_ERR;
 #endif // !NEC_98
@@ -174,14 +172,13 @@ void diskette_io()
 #line 608
 	(*fl_fnc_tab[op])(drive);
 #endif // !NEC_98
-#line 611
+#line 610
+
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 616
-
-
+#line 618
 
 #ifndef	PROD
 #error "Unsupported SoftPC mirror configuration: non-PROD"

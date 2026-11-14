@@ -135,22 +135,22 @@ IMPORT	BOOL		host_print_byte IPT2(int,adapter, byte, value);
 IMPORT	BOOL		host_print_doc IPT1(int,adapter);
 IMPORT	void		host_reset_print IPT1(int,adapter);
 IMPORT	void		host_print_auto_feed IPT2(int,adapter, BOOL,auto_feed);
+
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#line 154
-
+#line 155
 
 #ifdef PS_FLUSHING
 #error "Unsupported SoftPC mirror configuration: PS_FLUSHING"
 #endif	/* PS_FLUSHING */
-#line 159
-
+#line 160
 
 #if defined (NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #endif
-#line 165
+#line 164
+
 #define	HOST_LPT_BUSY	(1 << 0)
 #define	HOST_LPT_PEND	(1 << 1)
 #define	HOST_LPT_SELECT	(1 << 2)

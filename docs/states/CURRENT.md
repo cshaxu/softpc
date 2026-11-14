@@ -11,31 +11,40 @@ existing mirror differences together. T100 remains open. See the
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits S3 review and approves individual batches. Owner now delegates retention of evidenced existing points with added plus deleted lines strictly less than five (at most four); do not split IDs or use net counts. Larger/uncertain points require explicit review; no new patch authorization. |
-| Objective | Re-review purposes across existing mirror differences, including approved points, distinguishing original defects, host ABI, standalone integration, product extensions and source selection; then continue explicit retain/restore decisions with consumers, evidence and restoration consequences. |
-| Non-goals | No unapproved source change, new repair, excluded-body inventory, sibling writes, guest changes or reopening S2-declined repairs. |
+| Admission And Approval | Owner revokes all previous mirror-difference retention approvals and all small-diff automatic approval delegation. Reaudit every current point and classify with category-level diff-block, added/deleted-line and point totals. This revokes decisions, not production code. Owner subsequently authorizes S3 P16 to restore the audited nonsemantic text candidates and verify their line controls; no semantic retention approval is reinstated. |
+| Objective | Fresh full-mirror difference audit against pinned XP, including formerly approved points and delivered repairs; every nonexcluded changed line must have a reviewed purpose and reconcile to category totals. |
+| Non-goals | No semantic source change, new repair, excluded-body inventory, sibling writes, guest changes or reopening S2-declined repairs. |
 | Reference Baseline | Accepted S2 P6 62474beb; S1 frozen 472-file order and 381 residual IDs; pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S3 remaining-difference review](../proposals/m9-xp-mirror-original-first-audit.md#s3-owner-admitted-remaining-difference-review). |
-| Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, read-only until a concrete owner implementation decision; task records own approval status. |
+| Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, P16 restores approved text candidates only; task records own approval status. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP only; no OpenNT reads. |
 | Verification | Cross-check current source and prior evidence for each presented point. Separate source/ABI proof, controlled tests and guest reproduction. Documentation-only admission uses documentation/whitespace checks, not invented fresh runtime qualification. |
-| Expected Markers | 381 IDs retain individual dispositions; nineteen notices stay separate. 76 retained (54 explicit, twenty-two delegated); next manual review R0101/R0103, in frozen file order. |
+| Expected Markers | Zero current retention approvals. Reconcile all 472 current mirror files to the 381 historical residual IDs, separate notices and subsequent repairs; do not assume the historical count is the fresh inventory. Every current difference receives source ranges, classification and reproducible counts. |
 | Asset Needs | Preserve configuration/media/snapshots. S3 owns build/t100-s3 for disposable review scripts; two-hour run/fifteen-minute no-progress budget if probes are needed; clean at each delivery. |
 | Reporting Requirements | Original/current code, necessity evidence and limits, restoration consequence and actual XP diff; distinguish recommendation from approval. |
 | Stop Conditions | Admission does not authorize arbitrary restoration or new patches. Unproved necessity returns to investigation. Do not revive declined bulk repairs or approve a whole family from one representative. |
-| Exit Criteria | Every in-scope residual has an explicit owner disposition, with any approved implementation separately qualified and delivered; owner accepts closure. |
+| Exit Criteria | Every current nonexcluded difference is reviewed and categorized; category totals reconcile to all-file counts with no unclassified changes. Deliver the full inventory for fresh owner review; no inherited retention approvals. |
 | Original Owner Request | 批准收口s2 准入s3 一起来审批剩余diff清单. |
 | Similar-Issue Sweep | Check related declarations/callers when presenting a point, without silently widening implementation scope or duplicating the existing residual ledger. |
 
 ## Current Technical Baseline
 
-S3 P15 records the owner-requested purpose re-review, including all 76 approved
-IDs, without changing decisions or production. Classification is not a fresh
-381-point necessity/runtime qualification. Progress remains 76/381 retained,
-305 pending; R0101/R0103 (+13/-0 combined) remain unapproved. The
+S3 P16 delivers the owner-approved nonsemantic restoration: 37 mirror files,
+176 text hunks, production +192/-207, no test changes. Selected text diff drops
+277 lines; raw fixed-XP diff drops 243. Final cached x86/x64 builds publish fresh
+EXEs; full-byte comparison permits only compiler time and PE metadata changes.
+Under the existing owner exception, runtime tests are not repeated. Manifest
+and documentation gates pass. [P16 evidence](../etc/evidence/softpc/m9-t100-s3-p16.md)
+records exclusions, correction of a failed intermediate candidate, historical
+ID relationships, and limits. S3 remains open with no semantic retention approvals.
+
+Owner rejects the limited P15 purpose summary and revokes all prior mirror
+retention approvals, including automatic small-point delegation. S3 now performs
+a fresh all-point audit with category diff-block/line/point accounting. No source
+is reverted by this instruction; previous approvals are historical only. The
 [point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
-owns individual decisions. This documentation-only delivery changes no source,
-tests, EXEs or user assets and claims no new runtime qualification.
+owns individual decisions. That prior documentation-only instruction is followed
+by the narrowly authorized P16 restoration above, without new runtime claims.
 
 TEST01 P6 implements the approved two-line RUN_SERIAL repair; 60/180-second
 budgets and all coverage remain unchanged. Cached dual-width configuration

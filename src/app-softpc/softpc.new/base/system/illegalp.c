@@ -59,12 +59,11 @@ LOCAL VOID where IFN3(CHAR *, string, word, cs, LIN_ADDR, ip)
 		sas_hw_at(ea+3),sas_hw_at(ea+4));
 }
 
-
-
 #if defined(NTVDM) && defined(MONITOR)
 #error "Unsupported SoftPC mirror configuration: NTVDM and MONITOR"
 #endif
-#line 68
+#line 67
+
 
 void illegal_op()
 {

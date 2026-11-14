@@ -2425,3 +2425,4 @@ Return Value:
     NextWaveOutPos = 0;
     dprintf2(("Auto-Init block done"));
 }
+

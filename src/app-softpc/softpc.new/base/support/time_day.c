@@ -86,11 +86,11 @@
  * Local static data and defines
  * ===========================================================================
  */
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else   //NEC_98
-#line 98
+#line 97
+
 #ifdef XTSFD
 #error "Unsupported SoftPC mirror configuration: XTSFD"
 #endif
@@ -133,11 +133,11 @@ LOCAL void get_host_time();
 
 void time_of_day()
 {
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
-#line 288
+#line 287
+
     /*
      * BIOS function to return the number of PC interrupts since boot.
      */
@@ -795,5 +795,5 @@ void time_of_day_init()
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
-#endif // !NEC_98
+#endif   //NEC_98
 #line 1013

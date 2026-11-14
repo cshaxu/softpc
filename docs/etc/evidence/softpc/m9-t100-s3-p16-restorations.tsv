@@ -1,0 +1,177 @@
+order	path	before_hunk	kind	xp_lines	before_local_lines	before_added	before_removed	historical_context
+300	base/cvidc/sevid017.c	59	expression_whitespace	1218	1193	1	1	R0344_GDP_ABI;R0345_NATIVE_ADDRESS_RESTORE
+300	base/cvidc/sevid017.c	259	expression_whitespace	2692	2602	1	1	R0344_GDP_ABI;R0345_NATIVE_ADDRESS_RESTORE
+301	base/cvidc/sevid018.c	114	expression_whitespace	1696	1655	1	1	R0351_GDP_ABI;R0352_NATIVE_ADDRESS_RESTORE
+301	base/cvidc/sevid018.c	318	expression_whitespace	3183	3077	1	1	R0351_GDP_ABI;R0352_NATIVE_ADDRESS_RESTORE
+302	base/cvidc/sevid019.c	191	expression_whitespace	2739	2586	1	1	R0359_NATIVE_ADDRESS_RESTORE
+302	base/cvidc/sevid019.c	274	expression_whitespace	3395	3214	1	1	R0359_NATIVE_ADDRESS_RESTORE
+302	base/cvidc/sevid019.c	357	expression_whitespace	4051	3842	1	1	R0359_NATIVE_ADDRESS_RESTORE
+303	base/cvidc/sevid020.c	13	expression_whitespace	895	883	1	1	R0368_NATIVE_ADDRESS_RESTORE
+319	base/disks/diskbios.c	4	blank_only		445	1	0	File-level prior review; not a separately approved semantic point
+319	base/disks/diskbios.c	5	blank_only	892		0	1	File-level prior review; not a separately approved semantic point
+322	base/disks/floppy.c	1	blank_only		188	1	0	File-level prior review; not a separately approved semantic point
+322	base/disks/floppy.c	2	directive_spelling	4280	2527	1	1	File-level prior review; not a separately approved semantic point
+322	base/disks/floppy.c	3	directive_spelling	4336	2585	1	1	File-level prior review; not a separately approved semantic point
+322	base/disks/floppy.c	4	directive_spelling	4494	2747	1	1	File-level prior review; not a separately approved semantic point
+322	base/disks/floppy.c	5	directive_spelling	4740	2997	1	1	File-level prior review; not a separately approved semantic point
+323	base/disks/floppy_i.c	1	blank_only		62	1	0	File-level prior review; not a separately approved semantic point
+323	base/disks/floppy_i.c	2	blank_only		77	1	0	File-level prior review; not a separately approved semantic point
+323	base/disks/floppy_i.c	3	directive_spelling	585	147	1	1	File-level prior review; not a separately approved semantic point
+323	base/disks/floppy_i.c	4	blank_only	611		0	1	File-level prior review; not a separately approved semantic point
+323	base/disks/floppy_i.c	5	blank_only		184,185	2	0	File-level prior review; not a separately approved semantic point
+339	base/inc/egacpu.h	1	directive_spelling	117	91	1	1	File-level prior review; not a separately approved semantic point
+339	base/inc/egacpu.h	2	directive_spelling	143	99	1	1	File-level prior review; not a separately approved semantic point
+339	base/inc/egacpu.h	3	directive_spelling	149	107	1	1	File-level prior review; not a separately approved semantic point
+339	base/inc/egacpu.h	5	directive_spelling	158	127	1	1	File-level prior review; not a separately approved semantic point
+339	base/inc/egacpu.h	6	directive_spelling	469	279	1	1	File-level prior review; not a separately approved semantic point
+340	base/inc/egagraph.h	1	directive_spelling	107	104	1	1	File-level prior review; not a separately approved semantic point
+340	base/inc/egagraph.h	2	directive_spelling	119	119	1	1	File-level prior review; not a separately approved semantic point
+341	base/inc/egamode.h	1	directive_spelling	12,16	13,15	2	2	File-level prior review; not a separately approved semantic point
+341	base/inc/egamode.h	2	directive_spelling	18	18	1	1	File-level prior review; not a separately approved semantic point
+344	base/inc/egavideo.h	1	directive_spelling	137	118	1	1	File-level prior review; not a separately approved semantic point
+364	base/inc/host_lpt.h	1	blank_only	150		0	1	File-level prior review; not a separately approved semantic point
+364	base/inc/host_lpt.h	2	blank_only		143	1	0	File-level prior review; not a separately approved semantic point
+364	base/inc/host_lpt.h	3	blank_only		149	1	0	File-level prior review; not a separately approved semantic point
+364	base/inc/host_lpt.h	4	blank_only	164		0	1	File-level prior review; not a separately approved semantic point
+369	base/inc/ios.h	4	blank_only	643		0	1	File-level prior review; not a separately approved semantic point
+376	base/inc/printer.h	1	blank_only	70		0	1	File-level prior review; not a separately approved semantic point
+376	base/inc/printer.h	2	blank_only		68	1	0	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	1	blank_only		64	1	0	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	2	directive_spelling	303	67	1	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	5	blank_only	453		0	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	6	directive_spelling	480	172,174,175	3	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	7	blank_only	514		0	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	8	blank_only		210	1	0	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	9	blank_only	554		0	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	10	blank_only		222	1	0	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	11	blank_only	564		0	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	12	directive_spelling	605	269	1	1	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	13	blank_only		279	1	0	File-level prior review; not a separately approved semantic point
+379	base/inc/rs232.h	14	blank_only	620		0	1	File-level prior review; not a separately approved semantic point
+394	base/inc/video.h	1	blank_only		65	1	0	File-level prior review; not a separately approved semantic point
+394	base/inc/video.h	2	blank_only	134		0	1	File-level prior review; not a separately approved semantic point
+394	base/inc/video.h	3	blank_only		283	1	0	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	3	blank_only	104		0	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	4	directive_spelling	174	106,108,109	3	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	5	blank_only		170	1	0	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	6	blank_only	234		0	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	7	directive_spelling	358	286	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	8	directive_spelling	360	289	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	9	directive_spelling	608	488	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	10	directive_spelling	610	491	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	11	directive_spelling	1347	864	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	12	directive_spelling	1349	867	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	13	directive_spelling	1608	1057	1	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	16	blank_only		1293	1	0	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	17	blank_only	1859		0	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	21	blank_only	3057		0	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	22	directive_spelling	3077	2321,2323,2324	3	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	27	blank_only	3282		0	1	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	28	blank_only		2622	1	0	File-level prior review; not a separately approved semantic point
+398	base/keymouse/keyba.c	29	directive_spelling	3619	2821	1	1	File-level prior review; not a separately approved semantic point
+399	base/keymouse/keybd_io.c	2	blank_only	278		0	1	File-level prior review; not a separately approved semantic point
+399	base/keymouse/keybd_io.c	3	directive_spelling	302	211,213,214	3	1	File-level prior review; not a separately approved semantic point
+399	base/keymouse/keybd_io.c	4	blank_only		734	1	0	File-level prior review; not a separately approved semantic point
+399	base/keymouse/keybd_io.c	5	blank_only		1709	1	0	File-level prior review; not a separately approved semantic point
+399	base/keymouse/keybd_io.c	6	directive_spelling	2280	1712	1	1	File-level prior review; not a separately approved semantic point
+400	base/keymouse/mouse.c	6	blank_only	299		0	1	File-level prior review; not a separately approved semantic point
+402	base/support/ios.c	1	blank_only	1053		0	1	File-level prior review; not a separately approved semantic point
+402	base/support/ios.c	2	blank_only		954	1	0	File-level prior review; not a separately approved semantic point
+403	base/support/time_day.c	2	blank_only		89	1	0	File-level prior review; not a separately approved semantic point
+403	base/support/time_day.c	3	blank_only	97		0	1	File-level prior review; not a separately approved semantic point
+403	base/support/time_day.c	4	blank_only		136	1	0	File-level prior review; not a separately approved semantic point
+403	base/support/time_day.c	5	blank_only	287		0	1	File-level prior review; not a separately approved semantic point
+403	base/support/time_day.c	8	directive_spelling	1012	798	1	1	File-level prior review; not a separately approved semantic point
+404	base/system/at_dma.c	2	blank_only		53	1	0	File-level prior review; not a separately approved semantic point
+405	base/system/cmos.c	4	blank_only		1051	1	0	File-level prior review; not a separately approved semantic point
+405	base/system/cmos.c	5	blank_only	1176		0	1	File-level prior review; not a separately approved semantic point
+405	base/system/cmos.c	6	blank_only	1228		0	1	File-level prior review; not a separately approved semantic point
+405	base/system/cmos.c	7	blank_only		1110	1	0	File-level prior review; not a separately approved semantic point
+407	base/system/ica.c	8	blank_only		1833	1	0	File-level prior review; not a separately approved semantic point
+407	base/system/ica.c	9	blank_only	2067		0	1	File-level prior review; not a separately approved semantic point
+409	base/system/illegalp.c	1	blank_only		62,63	2	0	File-level prior review; not a separately approved semantic point
+409	base/system/illegalp.c	2	blank_only	68		0	1	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	1	blank_only		47	1	0	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	2	blank_only	60		0	1	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	3	blank_only	84		0	1	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	4	blank_only		81	1	0	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	5	blank_only	341		0	1	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	6	blank_only	389		0	1	File-level prior review; not a separately approved semantic point
+411	base/system/rom.c	7	blank_only		342	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	3	blank_only		82	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	4	blank_only		424	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	5	blank_only	447		0	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	6	blank_only	481		0	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	7	blank_only		465	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	8	blank_only		485	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	9	blank_only	750		0	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	10	blank_only		742	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	11	blank_only		769	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	14	directive_spelling	1828	1777	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	15	directive_spelling	1830	1780	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	16	directive_spelling	1840	1788	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	17	directive_spelling	1842	1791	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	18	blank_only	2293		0	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	19	blank_only		2040	1	0	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	23	directive_spelling	2511	2110	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	24	directive_spelling	2513	2113	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	29	directive_spelling	2597	2198	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	30	directive_spelling	2599	2201	1	1	File-level prior review; not a separately approved semantic point
+412	base/system/timer.c	31	directive_spelling	2945	2491	1	1	File-level prior review; not a separately approved semantic point
+419	base/video/ega_prts.c	1	blank_only		1363	1	0	File-level prior review; not a separately approved semantic point
+419	base/video/ega_prts.c	2	blank_only	1899		0	1	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	3	blank_only		140,141	2	0	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	4	blank_only	140		0	1	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	5	directive_spelling	148,149	149	1	2	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	7	blank_only	2269		0	1	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	8	blank_only		1862	1	0	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	9	blank_only	2290		0	1	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	10	blank_only	2292		0	1	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	11	blank_only		1894,1895	2	0	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	12	blank_only		2314	1	0	File-level prior review; not a separately approved semantic point
+421	base/video/ega_vide.c	13	blank_only	2754		0	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	130	blank_only	3128		0	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	131	blank_only		3206	1	0	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	132	blank_only	3234		0	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	133	blank_only		3317	1	0	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	138	blank_only	3719		0	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	139	directive_spelling	3723	3768,3770	2	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	140	directive_spelling	3735	3777	1	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	147	blank_only	5992		0	1	File-level prior review; not a separately approved semantic point
+424	base/video/gfx_updt.c	148	directive_spelling	7092	4129	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	2	directive_spelling	895	571	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	3	directive_spelling	1080	760	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	4	directive_spelling	1128	798	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	5	directive_spelling	1142	813	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	6	directive_spelling	1144	816	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	8	directive_spelling	1242	902	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	9	directive_spelling	1244	905	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	10	directive_spelling	1250	913	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	14	directive_spelling	1606	1216	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	15	directive_spelling	1654	1254	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	16	directive_spelling	1668	1269	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	17	directive_spelling	1670	1272	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	18	directive_spelling	1719	1320	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	19	directive_spelling	1727	1329	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	21	directive_spelling	1760	1351	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	22	directive_spelling	1762	1354	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	26	directive_spelling	2359	1865	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	27	directive_spelling	2366	1871	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	29	directive_spelling	2391	1897	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	30	directive_spelling	2409	1903	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	35	directive_spelling	3122	2525	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	36	directive_spelling	3124	2528	1	1	File-level prior review; not a separately approved semantic point
+431	base/video/video.c	37	directive_spelling	3247	2589	1	1	File-level prior review; not a separately approved semantic point
+452	host/inc/nt_fulsc.h	1	blank_only		200	1	0	File-level prior review; not a separately approved semantic point
+453	host/inc/nt_graph.h	1	directive_spelling	111,114	113,115	2	2	File-level prior review; not a separately approved semantic point
+453	host/inc/nt_graph.h	2	directive_spelling	117	119	1	1	File-level prior review; not a separately approved semantic point
+453	host/inc/nt_graph.h	3	directive_spelling	246	249	1	1	File-level prior review; not a separately approved semantic point
+453	host/inc/nt_graph.h	4	directive_spelling	277	270	1	1	File-level prior review; not a separately approved semantic point
+453	host/inc/nt_graph.h	5	directive_spelling	424	407	1	1	File-level prior review; not a separately approved semantic point
+460	host/src/nt_keycd.c	2	local_or_original_comment		432	1	0	R0619 (remove explanation only; boundary fixes remain pending)
+460	host/src/nt_keycd.c	3	directive_spelling	718	436	1	1	File-level prior review; not a separately approved semantic point
+463	host/src/nt_sbdsp.c	61	blank_only	2963		0	1	File-level prior review; not a separately approved semantic point
+465	host/src/nt_sbmid.c	1	blank_only	6		0	1	File-level prior review; not a separately approved semantic point
+465	host/src/nt_sbmid.c	3	local_or_original_comment		14,15,16	3	0	File-level prior review; not a separately approved semantic point
+465	host/src/nt_sbmid.c	25	blank_only	564		0	1	File-level prior review; not a separately approved semantic point
+467	host/src/nt_sound.c	3	blank_only		37	1	0	File-level prior review; not a separately approved semantic point

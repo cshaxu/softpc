@@ -183,8 +183,7 @@ void ((*(fl_fnc_tab[FL_JUMP_TABLE_SIZE])) IPT1(int, drive)) =
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif    /* NTVDM */
-#line 260
-
+#line 261
 
 /*
  *	Functions defined later
@@ -2524,7 +2523,7 @@ LOCAL void motor_on IFN1(int, drive)
 #line 4278
 		setCS(RCPU_INT15_SEGMENT);
 		setIP(RCPU_INT15_OFFSET);
-#endif
+#endif /* NTVDM */
 #line 4281
 
 		host_simulate();
@@ -2582,7 +2581,7 @@ LOCAL void motor_on IFN1(int, drive)
 #line 4334
 		setCS(RCPU_INT15_SEGMENT);
 		setIP(RCPU_INT15_OFFSET);
-#endif
+#endif /* NTVDM */
 #line 4337
 
 		host_simulate();
@@ -2744,7 +2743,7 @@ LOCAL void hd_wait IFN1(int, drive)
 #line 4492
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
-#endif
+#endif /* NTVDM */
 #line 4495
 
 	host_simulate();
@@ -2994,7 +2993,7 @@ LOCAL wait_int IFN0()
 #line 4738
 	setCS(RCPU_INT15_SEGMENT);
 	setIP(RCPU_INT15_OFFSET);
-#endif
+#endif  /* NTVDM */
 #line 4741
 
 	host_simulate();

@@ -3201,9 +3201,9 @@ boolean cga_graph_scroll_up IFN6(int, start, int, width, int, height,
 #endif /* EGG */
 
 	host_scroll_complete();
-#endif  //NEC_98
-#line 3129
 
+#endif  //NEC_98
+#line 3130
 	return TRUE;
 }
 
@@ -3312,9 +3312,9 @@ boolean cga_graph_scroll_down IFN6(int, start, int, width, int, height,
 #endif /* EGG */
 
 	host_scroll_complete();
-#endif  //NEC_98
-#line 3235
 
+#endif  //NEC_98
+#line 3236
 	return TRUE;
 }
 
@@ -3762,19 +3762,19 @@ GLOBAL VOID screen_refresh_required IFN0()
 #ifdef GORE
 #error "Unsupported SoftPC mirror configuration: GORE"
 #endif /* GORE */
-#line 3720
+#line 3719
+
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else // NEC_98
-#line 3723
-
+#else   //NEC_98
+#line 3724
 #ifndef CPU_40_STYLE
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #else
 #line 3733
 	setVideodirty_total(1000000L);
 #endif	/* CPU_40_STYLE */
-#endif // NEC_98
+#endif  //      NEC_98
 #line 3736
 }
 
@@ -4123,8 +4123,9 @@ GLOBAL void enable_gfx_update_routines IFN0()
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
 #endif // !NEC_98
-#line 5993
+#line 5992
+
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#endif // NEC_98
+#endif  //NEC_98
 #line 7093

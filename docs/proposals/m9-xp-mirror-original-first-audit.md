@@ -410,3 +410,34 @@ never split points or use net growth, and record automatic decisions in the
 same ledger. Uncertain points remain under investigation; this does not
 authorize new repairs. Present the next reviewed group after recording each
 batch without waiting for a separate owner request to show it.
+
+### Superseding owner instruction: full re-audit and revoked approvals
+
+Owner revokes all previous mirror-difference approvals and automatic small-diff
+delegation. Audit all current differences, not only the 76 former approvals.
+Keep production unchanged while collecting fresh evidence. Use the frozen
+472-file order and pinned XP identity; reconcile current changes to historical
+IDs and subsequent repairs rather than assuming 381 is still a complete count.
+Existing #error exclusion bodies remain outside review and accounting.
+
+Each included point records file, XP/current ranges, actual changed content,
+purpose category, caller/ownership evidence and limitations. Category totals
+must report diff blocks, added and deleted lines, added-plus-deleted lines and
+semantic points. Fix one comparison method and context width; do not confuse
+textual hunks with semantic decisions, double-count mixed groups, or use net
+growth as difference size. Mixed hunks need explicit line ownership or a mixed
+category rather than arbitrary allocation. Source/ABI proof, historical tests
+and fresh dynamic verification remain distinct. Finish only when every current
+nonexcluded change is covered and category totals reconcile with the all-file
+inventory. Prior P15 purpose counts are historical and insufficient.
+
+### P16 authorized text restoration
+
+Owner authorizes restoring the audited condition-comment/whitespace candidates
+as one P. The [P16 delivery](../etc/evidence/softpc/m9-t100-s3-p16.md) and its
+range inventory distinguish restored text from remaining semantic choices.
+176 hunks across 37 mirror files are restored; necessary ABI notices and
+behavior-dependent original comment omissions remain. Selected text diff falls
+by 277 lines; raw fixed-XP Git diff falls by 243. Final cached dual EXEs differ
+only in timestamp/PE metadata, allowing the owner's no-runtime-retest exception.
+This limited implementation does not close S3 or reinstate revoked approvals.

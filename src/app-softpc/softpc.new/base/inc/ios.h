@@ -377,7 +377,8 @@
 #endif
 
 #define SNDBLST_ADAPTER         36
-#line 644
+#line 643
+
 #ifdef NTVDM    /* Spare slots for user supplied VDDs */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else   /* NTVDM */

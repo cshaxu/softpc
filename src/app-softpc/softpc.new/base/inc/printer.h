@@ -59,11 +59,11 @@ extern	void printer_status_changed();
 #define LPT1_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x78)
 #define LPT2_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x79)
 #define LPT3_TIMEOUT_ADDRESS	(BIOS_VAR_START + 0x7a)
+
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
 #endif // !NEC_98
-#line 74
-
+#line 75
 
 #endif

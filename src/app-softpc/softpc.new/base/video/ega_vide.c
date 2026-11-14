@@ -137,16 +137,16 @@ GLOBAL IU8 Video_mode;  /* Shadow copy of BIOS video mode */
 GLOBAL IU8 Currently_emulated_video_mode = 0;   /* Holds last video mode
                                                  * set through bios */
 
-
-
 #line 136
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: NTVDM and X86GFX"
 #endif
-#line 141
+#line 140
+
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif  /* NTVDM */
+
 #line 150
 #ifdef CPU_40_STYLE
 GLOBAL IBOOL forceVideoRmSemantics = FALSE;
@@ -1856,10 +1856,10 @@ void ega_video_init IFN0()
 #else   /* V7VGA  -- Macs don't have V7 */
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
+
 #endif /* NTVDM & X86GFX */
 #line 1676
-#line 2270
-
+#line 2271
 #if !(defined(NTVDM) && defined(X86GFX))
 #line 2272
         /* Some VGA cards eg ET4000, store info here needed for sync.
@@ -1882,15 +1882,15 @@ void ega_video_init IFN0()
 
 void ega_video_io IFN0()
 {
+
 #ifndef NEC_98
 #line 2292
-#line 2293
+#line 2292
+
 #if defined(NTVDM) && !defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: NTVDM and not X86GFX"
 #endif
-#line 2295
-
-
+#line 2297
 
 
     /*
@@ -2311,12 +2311,12 @@ sys_addr find_mode_table IFN2(int, mode, sys_addr *, save_addr)
                         params_addr += 19*EGA_PARMS_SIZE;
         }
 
-
 #line 2697
 #if defined(NTVDM) && defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: #if defined(NTVDM) && defined(X86GFX)"
 #endif  /* NTVDM & X86GFX */
-#line 2755
+#line 2754
+
 #endif  //NEC_98
 #line 2756
         return params_addr;
