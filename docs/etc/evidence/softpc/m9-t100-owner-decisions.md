@@ -7,10 +7,10 @@ this review and receive no entries. All choices below remain unapproved.
 ## Coverage and decision rules
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
-File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-466 only. Positions 467-472, original
-defect decisions D001-D006 and local-extension defect L001 still require their
-final review here. Their existing evidence and pending status remain in force.
+File-level auditing and final file-decision reconciliation cover all 472 files.
+Original defect decisions D001-D006 and local-extension defect L001 still require
+their final review here. Their existing evidence and pending status remain in
+force; completing file coverage does not approve residuals or close S1/T100.
 
 An existing residual and a proposed new repair are distinct decisions. A failed
 original-body probe proves only the exercised contract; a passing current test
@@ -2441,6 +2441,84 @@ Thirteen IDs are added: cumulative 373 (368 semantic/ABI, five compiler/format),
 nineteen notices. All residuals remain owner decisions. P164's later fresh
 392/392 remains current runtime evidence; this batch changes only documents.
 
+## Positions 467-472: tone, VGA and fixed firmware
+
+The two normalized source files and four byte-exact resources still match P159.
+Current tone calls, painter bounds and resource wiring were checked separately
+from this source identity. Existing excluded bodies receive no accounting.
+
+### Tone endpoint
+
+R0679 restores original lock declarations, inactive Beep handle/count and native
+cleanup, removing unnecessary includes/prose. Actual disposable event-handle
+probes confirm InitSound(FALSE) closes/clears, and countdown closes only at zero,
+on both widths. Production does not open the handle or initialize the countdown;
+this is cleanup proof, not activation of a second output path. P158 production
++23/-11 reduces XP difference by 30 lines; permanent tests unchanged.
+
+Four residual IDs remain pending:
+
+- R0677: unavailable NT-private headers. Full original source fails at nt.h on
+  both toolchains; that does not qualify every changed runtime statement.
+- R0678: PlaySound undef prevents the SDK macro from conflicting with the original
+  one-argument function. Withdrawal fails both compilers; compiler/name decision.
+- R0680: existing empty host_ica_lock/unlock adapters match selected ICA and the
+  sole executor owner. Removing them yields unresolved symbols on both widths;
+  the PCM worker has separate request synchronization. No general thread-safety
+  guarantee follows for future callers.
+- R0681: tone submission endpoint instead of NT session/device ownership.
+  Original producer emits INFINITE duration, while nonzero-session Beep waits
+  synchronously; Session-0 requires unavailable NT-private services/owner.
+  Historical finite Beep(440,250) probes take about 262/259 ms on x86/x64.
+  The infinite-duration mismatch is source/API reasoning, not an executed
+  infinite call or audible guest test. InitSound has no production caller;
+  its test does not prove a user-visible shutdown requirement.
+
+Original PPI/Timer2 frequency and gating remain the sole device state authority;
+Compat converts/transports requests through Lib. P158 final builds and all
+392 tests pass without native deferral. A future redesigned native backend is
+not ruled out, but is not an exact restoration within this audit.
+
+### VGA painters
+
+R0682 removes five nonsemantic lines; production +0/-5 and XP diff -5, tests
+unchanged. R0683-R0686 remain four boundary/geometry decisions for standard,
+medium, high and V7 packed standard painters. Actual device callbacks call the
+original conversion loops. This V7 build has EGA_PLANE_SIZE 0x20000, hence
+512 KiB over four planes; packed offsets are bytes and planar offsets groups.
+
+Each complete original function is restored independently with real object/
+fixture linkage on both widths. Standard/medium/high fail zero-height cases;
+adding only a nonpositive guard still fails standard/medium negative-x output
+assertions and high final-group source bounds. V7 original and nonempty-only
+variants fail dirty publication after actual BIOS/BOP mode 67h (640x480), since
+original 640x400 ceilings reject the mode. Current clipping follows actual mode
+and backing capacity without a second painter or larger virtual card.
+
+All eighteen primary runs and twelve diagnostic reruns complete; local probes
+identify failing request arguments rather than guessing from exit codes.
+Original split-update can submit an empty first region: source-path proof is
+separate from arbitrary negative/overflow boundary fixtures. No particular
+Win3.1 failure or universal painter safety is claimed. Final P159 builds and
+all 392 tests pass; no executable statements changed in its restoration.
+
+### Fixed resources
+
+Current byte hashes match the P159 fixed-XP comparisons and initial inventory:
+bios1.rom (28420 bytes), bios4.rom (8191), cmos.ram (64), v7vga.rom (18832).
+firmware.rc embeds BIOS1/BIOS4/V7 as 101/102/103; original rom.c names reach
+Compat host_read_resource's same mapping. No external checkout is needed at
+runtime. cmos.ram has no current loader/embedding consumer; only its original
+filename macro remains. It stays byte-identical because deleting it creates a
+new whole-file difference forbidden by the later owner clarification, not
+because a fictional runtime consumer is needed. No ROM/guest resource changed.
+
+Eight IDs are added: cumulative 381 (375 semantic/ABI, six compiler/format),
+nineteen notices. All 472 file decisions are now reconciled, but original/local
+extension defect decisions and final accounting remain. All residual choices
+are unapproved. P164 fresh 392/392 remains the current full runtime result;
+this batch changes only records, with no source/test/artifact change.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2450,4 +2528,5 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 467.
+recommendations into owner approval. The remaining reconciliation concerns
+D001-D006/L001 and final accounting.

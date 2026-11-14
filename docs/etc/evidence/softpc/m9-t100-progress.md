@@ -12625,3 +12625,23 @@ D001-D006/L001 decisions keep S1/T100 open.
 
 P184 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Final changes are restricted to the three task records.
+
+## P185 final-decision reconciliation, positions 467-472
+
+Current normalized tone/VGA files and four byte-exact resources match P159.
+Resource hashes are freshly checked; actual embedded mappings and the absent
+cmos.ram consumer are distinguished. Tone submission/native Beep reasoning,
+painter complete-body probes and actual extended-mode evidence retain their
+scope limits. No excluded body is counted or resource removed.
+
+Eight residual IDs are added: cumulative 381 (375 semantic/ABI, six compiler/
+format), nineteen notices. All 472 file dispositions are reconciled. D001-D006/
+L001 and final accounting still require work; file coverage is not retention
+approval, S1/T100 closure or a fresh complete runtime qualification.
+
+Executor/counter-review changes only three task records. No production/tests,
+EXEs, configuration, media or snapshots change; no job/scratch created. P164
+fresh 392/392 remains applicable without a new run. Owner decisions stay open.
+
+P185 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task records change.
