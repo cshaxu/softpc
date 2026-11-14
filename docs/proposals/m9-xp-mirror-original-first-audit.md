@@ -248,3 +248,85 @@ in isolated objects; no production repair is yet authorized or applied.
 Owner approves D004 implementation after reviewing the twelve-line candidate.
 P4 delivers those scalar stores and permanent regression; all other stated
 dispositions and TEST01 pending investigation remain unchanged.
+
+### TEST01 investigation scope
+
+Owner says "好 下一个" after P4, then approves "批准调研". This is a
+read-only investigation of test scheduling and fixture cost, not permission
+to change production code, timeout budgets or test coverage. Its finite scope
+is `emulator.verifier-negative` and `lib.types-layout-selftest`; inspect the
+two X86 verifier-negative scripts only for the same process-launch pattern.
+Measure the unchanged scripts in isolation and the unchanged x86/x64
+eight-job background suites. Separate host-load inference from measured
+elapsed time and preserve setup failures. No native desktop run or EXE rebuild
+is required for this investigation because no runtime code changes.
+
+### TEST01 measured findings and proposed disposition
+
+Investigation baseline: `403ee272`, November 14, 2026. Unchanged registered
+eight-job background suites pass 188/188 on each architecture, without retries:
+x86 158.71 seconds, x64 157.65 seconds. No historical timeout reproduces in
+this run; this is 376 background tests, not a fresh 392-test desktop qualification.
+
+| Fixture | Isolated script | Aggregate x86 | Aggregate x64 | Child checks |
+| --- | ---: | ---: | ---: | ---: |
+| Emulator verifier-negative | 20.557 s | 54.64 s | 52.77 s | 103 |
+| Types layout selftest | 71.255 s | 106.63 s | 106.22 s | 321 |
+
+Isolated timings use the original scripts with parent-only CMake JSON tracing
+and task-owned fixture directories. Trace intervals around `execute_process`
+total 20.212/70.470 seconds respectively, roughly 99% of their script duration.
+These intervals include process startup and verifier execution, not CPU time.
+A separate 100-launch empty `cmake -P` control takes 18.246 seconds: startup
+alone is a substantial cost. The Types direct-edge matrix accounts for 200
+checks (ten by ten owner/dependency combinations, include and link separately).
+Both fixtures use script mode, not compiler invocation or CMake configuration.
+Fatal-error rejection is deliberately isolated in child processes; replacing
+it with an in-process error protocol would change the checker design.
+
+Emulator has no fixture lock. Types' process-scoped file lock has a measured
+sub-millisecond wait in the corrected run. Its registered x86/x64 work paths
+are distinct. No shared-lock deadlock is demonstrated. Aggregate runtime
+amplification is measured; the precise OS contribution (CPU scheduling, file
+scanning, security software or other builds) is not isolated. An unrelated
+repository's CMake process was present and was not modified or stopped.
+
+Setup failures are not product failures: the first hidden launcher produced
+no test execution evidence; the confirmed replacement completed. The first
+Types trace attempt passed Windows backslashes into its generated include and
+stopped after 34 checks with an invalid escape. Using forward-slash roots,
+as registered CTest already does, completes all 321 checks. The failed setup
+is excluded from the timing comparison. A later inline trace-summary command
+had a shell quoting error; the file-based analyzer produced the figures above.
+
+Recommended minimal implementation, pending owner approval:
+
+```cmake
+# test/emulator/CMakeLists.txt: extend the existing property assignment
+set_tests_properties(emulator.verifier-negative PROPERTIES TIMEOUT 60 RUN_SERIAL TRUE)
+# test/lib/CMakeLists.txt: extend the existing property assignment
+set_tests_properties(lib.types-layout-selftest PROPERTIES TIMEOUT 180 RUN_SERIAL TRUE)
+```
+
+Expected code/config diff: two replaced lines (+2/-2), plus two manifest hash
+updates and documentation. No source, test case, budget or EXE change. CTest's
+documented RUN_SERIAL property excludes every other test in the same invocation;
+a shared RESOURCE_LOCK on just these two would still permit unrelated expensive
+checks alongside them. All other tests remain parallel. This does not control
+another CTest invocation or external machine load and is not a guarantee under
+arbitrary host contention. Actual aggregate qualification of the proposed
+property is still required after implementation; it was not applied here.
+
+Retain the positive/negative cases and exact dependency matrix: no redundant
+case has been proved safe to delete in this investigation. The two X86 negative
+fixtures have the same child-process technique but only 13/12 launches by source
+enumeration, with fresh aggregate maxima 13.84/10.79 seconds against 30-second
+budgets. No scheduling change is proposed for them. Do not introduce a test
+runner framework, automatic retry, larger blanket timeout or checker error API.
+
+Single-person counter-review checked actual scripts, original timeout records,
+trace counts, registered budgets and the distinction between fresh measured
+amplification and an unproven historical OS-level cause. Only this proposal and
+CURRENT change. Task-owned traces/scripts are discarded after recording these
+results; cached build trees are retained. TEST01 remains implementation-pending,
+not fixed; S2/T100 remain open.

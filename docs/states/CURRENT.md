@@ -4,8 +4,8 @@
 
 Owner closes T100 S1 and admits M9 T100 S2 to review eight outstanding
 repair candidates. D005/D006 repairs and minimal tests are now owner-approved
-and implemented in S2 P2. D004 is implemented and qualified in P4, pending
-owner acceptance. T100 stays open. See the
+and implemented in S2 P2. D004 is implemented and qualified in P4; owner
+proceeds to TEST01 and approves timing investigation. T100 stays open. See the
 [S1 closure](../history/M9-T100-S1-original-first-audit.md).
 
 ## M9 T100 S2 Packet
@@ -31,6 +31,14 @@ owner acceptance. T100 stays open. See the
 
 ## Current Technical Baseline
 
+TEST01 investigation is complete; [measured findings and the two-line scheduling
+proposal](../proposals/m9-xp-mirror-original-first-audit.md#test01-measured-findings-and-proposed-disposition)
+await an implementation decision. Fresh unchanged background suites pass
+376/376. Child-process cost and aggregate slowdown are measured; historical
+timeouts do not reproduce this round. No timeout, test coverage or production
+code changes; no native qualification or EXE publication is claimed for this
+documentation-only investigation.
+
 T100 S2 P4 repairs CHAIN4 mode2 scalar plane-byte selection: production +12/-12,
 tests +52/-0, no public/snapshot ABI change. Fixed-XP normalized diff totals for
 the two mirror files remain unchanged (2308 added+deleted lines); the local
@@ -51,7 +59,7 @@ Owner declines L001 and D001-D003 repairs this round: retain evidence and
 known limits without new code or snapshot-format changes. D004 hardware/path
 investigation confirms a scalar plane-byte selection defect on both widths;
 [diagnostic evidence and candidate](../etc/evidence/softpc/m9-t100-s2-d004.md)
-are delivered in P4 with fresh full qualification. TEST01 remains pending. S2 and T100 stay open.
+are delivered in P4 with fresh full qualification. TEST01 scheduling implementation remains pending. S2 and T100 stay open.
 
 
 T100 S1 P164 restores only ev_glue.c's XP include-line comment:
