@@ -12113,3 +12113,51 @@ and scratch cleanup follow; owner approval and S1/T100 closure remain pending.
 P163 final mirror/documentation/whitespace gates pass. Task scratch was previewed
 and removed after runner exit; build residue check passes. No live job or
 unrelated change is removed.
+
+## P164 final-decision reconciliation, positions 267-282
+
+The owner decision view now covers positions 1-282, adding ten pending semantic
+IDs for UART/LPT private archive state and pointer-width host arguments, plus
+GDP allocation and aggregate selection. The cumulative semantic count is 124;
+four historical notice-policy items are separately identified, not added to
+that count. Restored points and evidence limitations remain explicit. Next is
+position 283; D001-D006/L001 reconciliation and owner approval remain pending.
+
+### P164 final evidence
+
+Restore only ev_glue.c's include-line comment to exact XP wording. Preserve
+angle-bracket selection and all executable tokens. Production +1/-1, tests
++0/-0; normalized source is 27 bytes shorter. XP added/deleted diff-line total
+is unchanged because the necessary header selection still differs on that line.
+Only this file's local manifest hash changes; mirror CRLF is preserved.
+
+Cached full-target builds and dual publication pass: x86 9.23 s, x64 11.52 s.
+Complete comparison against P163 finds equal sizes and no changes outside PE
+COFF timestamps/checksums and same-offset, validated compiler time literals:
+
+- x86: 3478046 bytes; six changed bytes; time 03:21:12 to 03:25:31 at 2394688;
+  SHA-256 `1c4f19f8f9840a86fdb796ebec035fea8c45704d0f25edde7a3ba7d92f65fe1c`.
+- x64: 3095494 bytes; seven changed bytes; time 03:21:22 to 03:25:40 at 2262240;
+  SHA-256 `f4fb0f42bf7b7e91db40b2ca44fdda2341fd164ee4c820736b29c3acfb493a05`.
+
+Each incremental build reports 11 original ev_glue.c printf declaration warnings
+and no errors. These are preserved mirror declarations, not new shared-code
+warnings or an assertion that a clean rebuild is warning-free. Actual diff
+review confirms no behavior, tests, Compat, shared component, guest, media,
+snapshot or user configuration changes.
+
+The owner reports returning to the desktop and permits complete verification.
+Session 3 is Active; a hidden, owned runner executes both background suites and
+serial native desktop/audio/package suites against these published artifacts.
+Each stage has a 900-second budget within the packet's two-hour limit. Fresh
+results below replace reliance on the metadata-equivalence test exception.
+
+Fresh full regression: x86 background 188/188 (150.62 s), native 8/8
+(15.60 s); x64 background 188/188 (147.11 s), native 8/8 (15.69 s).
+Total 392/392, no retries, failures or skips. Both runner PIDs have exited.
+Native results include real audio, Console/Window and package tests; these
+are automated regression results, not new manual guest acceptance.
+
+P164 final mirror/documentation/whitespace gates pass. Task-owned scratch was
+previewed and removed after runner exit; build residue check passes. Reusable
+Ninja/ccache roots and user assets are preserved. S1/T100 remain open.

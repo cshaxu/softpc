@@ -32,7 +32,7 @@
 #undef FORWARDS		/* all these redefined in EDL code */
 #undef BACKWARDS
 #undef UNCHAINED
-#include <Evid_c.h>	/* SOFTPC_PORT_ABI: select the CCPU glue declaration. */
+#include <Evid_c.h>	/* generated from Evid.edl */
 #include "j_c_lang.h"   /* jcode to ccode register definition header */
 
 EVID_WRT_POINTERS c_ev_write_ptr;

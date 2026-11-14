@@ -30,16 +30,18 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P163 removes only ntthread.c's redundant outer-unwind explanation:
-production +0/-1, tests unchanged, mirror diff reduced by one line. Dual cached
-builds/publication pass; complete EXE comparison shows metadata-only changes,
-so the approved equivalence exception reuses P161's 392/392 runtime evidence.
+T100 S1 P164 restores only ev_glue.c's XP include-line comment:
+production +1/-1, tests unchanged, mirror diff-line count unchanged. Dual cached
+builds/publication pass; complete EXE comparison shows metadata-only changes.
+After the owner returned to the desktop, fresh full regression passed 392/392
+with no retries or skips, including both native desktop/audio/package suites.
 All 472 frozen files have review dispositions. P160 verified inventory/delivery
-integrity; P163 reconciles positions 1-266 into the
+integrity; P164 reconciles positions 1-282 into the
 [owner decision view](../etc/evidence/softpc/m9-t100-owner-decisions.md).
-114 reconciled IDs remain unapproved. Next: positions 267-472 and
-D001-D006/L001; pending decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p163-final-evidence).
+124 reconciled semantic IDs remain unapproved, with four historical notice
+items separately identified. Next: positions 283-472 and D001-D006/L001;
+pending decisions keep S1/T100 open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p164-final-evidence).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

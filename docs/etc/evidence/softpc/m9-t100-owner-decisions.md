@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-266 only. Positions 267-472, original
+This view currently reconciles positions 1-282 only. Positions 283-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -427,6 +427,123 @@ isolated retry passed. That delivery is not called first-pass 392/392. P161
 later passed the complete suite without retries. Position 266 is original
 normalized-identical and has no pending difference. R0172 remains unapproved.
 
+## Positions 267-270: UART, LPT and source notices
+
+Four historical notice items are separately identified: R0173 in com.c,
+R0206 in printer.c, R0238 in printer_.c and R0244 in rs232_io.c. They remain
+under source/notice policy, not as functional repair recommendations. They are
+not included in the semantic pending-ID count and are not erased by restoring
+unneeded technical comments. There is no claim of new ownership or licensing.
+
+### R0174/R0178/R0181/R0186/R0199: com.c
+
+- Retain snapshot declarations and private controller/callback encoding
+  (R0174/R0178). UART registers, interrupt reasons, pacing and pending callback
+  identity belong to the original controller. Register replay consumes RX or
+  triggers host output/scheduling, so it is not neutral restoration.
+- Existing archive tests restore finite host RX bytes 51h/52h, call original
+  com_recv_char and read 51h through the real port. Coherent omission of serial
+  callback encode/decode rejects capture of the remaining receive event on both
+  architectures. This is controller/queue/archive proof, not a live physical
+  serial receive test; the current host endpoint has no live receive thread.
+- Retain all three pointer-width ioctl arguments (R0181 flush, R0186 data-ready
+  follow-up, R0199 modem). Current host_com_ioctl receives lib_iptr and writes
+  an int through the address. Windows x64 long truncates it. Each original-cast
+  variant independently access-violated on x64. The follow-up case required
+  the restored RX fixture above; its earlier passing test did not reach that
+  branch and is not counted as proof. Original/current x86 controls passed.
+
+P22 restored the other R0175-R0205 formatting/declaration differences. Combined
+remaining selected scope is +126/-3 including the protected notice. It passed
+fresh 392/392; no physical UART or manual guest acceptance is claimed. Current
+source and archive dispatch retain the same single controller/host ownership.
+
+### R0207/R0212: printer.c
+
+Retain the private controller-state/callback extension and its declaration.
+Original port access can advance ACK state or schedule output; replay cannot
+replace copying the actual READY/OUT/OUTA and delayed-event state.
+
+P23's actual LPT test writes 33h, captures with a pending ACK, changes the data
+port to 00h, restores, then reads 33h. Omitting controller restoration fails
+that last assertion on both widths; omitting callback mapping fails capture.
+The earlier test without the post-capture mutation could not prove controller
+restoration and is not used as evidence. No physical printer is claimed.
+
+P23 restored the remaining R0208-R0237 text differences and removed the long
+added explanation. Residual +74/-0 includes the notice. Final objects/EXEs were
+equivalent; the changed checkpoint test was freshly run, with full regression
+inherited from P22. P161 later passed all 392. Current original controller and
+Compat host sink remain distinct, without a second device implementation.
+
+Positions 269-270 have no semantic patch beyond the notices: P24 restored
+R0239-R0243, including original host_lpt_dos_open/close declarations. These
+matching declarations do not introduce a call or enable an unsupported branch.
+Original BIOS printer/serial functions remain wired by device_bop.
+
+## Positions 271-274: generated interfaces restored
+
+Position 271 evidfunc.c and position 274 evid_c.h have no pending differences.
+P25 fully restored R0245 in evidfunc.h, including original duplicate mark
+prototypes; actual consumer stores function addresses and does not use the
+changed return contract. Before/after objects and complete EXEs were equivalent.
+Original initializer warnings are disclosed, not called new execution failures.
+
+P26 fully restored R0246-R0251 in evidgen.h: removed added aliases/rationale and
+unused direct declarations; restored original IHP fields. IHP already has native
+pointer width. All 28 actual dependent objects per architecture were unchanged,
+and complete EXEs were metadata-equivalent. This does not prove universal
+function/data-pointer interchangeability outside supported Windows builds.
+No aliases/casts were moved to Compat. None of these seven restored IDs remains
+an owner retention choice.
+
+## Position 275: ev_glue.c GDP and matching aggregate
+
+P27 removed the CHAIN2-only bridge, three wrappers and selector 4, restoring
+original markers and selecting existing 2 from gfx_updt. Original string marking
+can conservatively include one extra dirty group; real bank/aperture bounds keep
+it inside allocated storage and painting clips to the display. Passing tests
+alone were insufficient until that source-boundary review. No claim of identical
+internal dirty bookkeeping is made. R0259/R0260 are restored, not pending.
+R0252/R0253/R0256-R0258/R0261/R0262 were also restored.
+
+Three existing differences remain recommended, selected residual +3/-2:
+
+- R0254/R0263: GDP slot include and native allocation owner. A paired original
+  allocation plus original direct-layout initialization control passed all three
+  ring pointers on x86, but x64 preserved only the last: offsets 8/12/16 overlap
+  eight-byte pointers. Current initialization preserved all three. This is a
+  real initialization ABI proof, not a full guest run or a deliberately broken
+  malloc/adapter mixture. Restoring only one consumer would be incoherent.
+- R0255: select the existing CCPU Evid_c.h aggregate via angle brackets.
+  Actual x64 CCPU/CVID sizes were 240/232 with corresponding later-field offsets
+  168/160 and 236/228; x86 both were 156. The quoted-header x64 VGA control
+  access-violated, while x86 passed. This is not a dynamic proof against every
+  possible coherent whole-family rewrite; making another aggregate and its
+  consumers differ merely to move this patch is not an admitted reduction.
+  P164 restores the adjacent comment to exact XP wording while retaining the
+  angle-bracket selection; no semantic or diff-line-count change is claimed.
+
+Current source still selects existing marker 2 for the relevant producer paths,
+uses one GDP creation/slot owner and has no extra CHAIN2 marker bridge. P27's
+fresh 392/392 and independent controls qualify the delivered reduction. The
+three remaining IDs are not automatically approved by those passes.
+
+## Positions 276-282: original helpers and declarations
+
+Positions 276-277 and 280-282 have no pending in-scope differences. P28 fully
+restored j_c_lang.c (R0264-R0266): original includes and diagnostics, retaining
+all mask/rotation helpers. Bounded actual-body mask tests passed; arbitrary
+invalid native-width diagnostic strings and unused rotation semantics were not
+claimed equivalent or exhaustively correct.
+
+P29 restored R0267 in j_c_lang.h. Its actual CrulesRuntimeError consumers pass
+literal strings and ignore results; all 70 dependent objects (35 per width)
+were unchanged after removing the added declaration/comment. Full EXEs were
+metadata-equivalent and actual VGA tests were rerun. No new compiler support,
+warning suppression or testing-only API was introduced. All four IDs are
+restored, not retained recommendations.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -436,4 +553,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 267.
+recommendations into owner approval. The next position is 283.
