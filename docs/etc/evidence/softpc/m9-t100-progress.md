@@ -12387,3 +12387,25 @@ remaining files and final D001-D006/L001 decisions keep S1/T100 open.
 
 P173 actual three-document diff review, mirror/documentation/whitespace gates
 and build-residue check pass. No unrelated changes are present.
+
+## P174 final-decision reconciliation, positions 409-415
+
+All seven normalized current files match their P119 committed versions. Actual
+source checks confirm temporary event-queue construction precedes live replacement,
+ROM segment width, original restored length operations, PIT first-event guard
+and still-unprotected active-backlog divide, and registered original interrupt
+handlers. P112-P119 final evidence is reconciled, not rerun.
+
+Six semantic IDs, one compiler/format ID and three notices are added: 259
+residual IDs (256 semantic, three compiler/format), eighteen notices through 415.
+D005 remains a reproduced current device/queue failure and isolated candidate,
+not an implemented repair. The current suite does not cover that dispatch case.
+R0497/R0498/R0500/R0506/R0509 and the extra R0508 blank remain restored.
+
+Executor/counter-review limits actual changes to three task documents. No code,
+tests, EXEs, configuration or guest assets change; no scratch/job exists.
+P164 fresh 392/392 applies to identical artifacts, without a new runtime claim.
+Next is file 416; final D001-D006/L001 and owner decisions keep S1/T100 open.
+
+P174 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three task documents change.
