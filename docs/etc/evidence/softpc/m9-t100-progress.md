@@ -12582,3 +12582,25 @@ D001-D006/L001 remain; S1/T100 are not closed.
 
 P182 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Final changes are restricted to the three task records.
+
+## P183 final-decision reconciliation, positions 462-463
+
+Both normalized current sources match P154. Current device archive/status,
+executor handoff, actual physical DMA/consumption and pause/EOI ownership were
+checked against final P153/P154 evidence. The prototype-only PauseDMA experiment
+is explicitly invalid; corrected real-function negatives and the permanent
+active-DMA regression are retained. Redundant outer EOI removal guard remains
+restored to original, not proposed for retention.
+
+Twenty-six residual IDs are added: cumulative 360 (355 semantic/ABI, five
+compiler/format), nineteen notices. Whole-original host ownership is a source
+analysis, not a dynamically recreated native backend. Narrow withdrawals and
+full suite results retain their actual scopes; no owner approval is implied.
+
+Executor/counter-review changes only the three task records. No source/tests,
+EXEs, configuration, media or snapshots change; no job/scratch created. P164
+fresh 392/392 remains applicable without a new run. Next position 464 and
+D001-D006/L001 remain; S1/T100 stay open.
+
+P183 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task records change.

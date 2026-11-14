@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-461 only. Positions 462-472, original
+This view currently reconciles positions 1-463 only. Positions 464-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -2234,6 +2234,118 @@ compiler/format), nineteen notices. All remain pending owner decisions.
 P164's later fresh 392/392 remains current runtime qualification. This batch
 changes only task records; no source, test, executable or user asset changes.
 
+## Positions 462-463: Sound Blaster owner and DSP
+
+Both normalized current files match P154. Current status, archive, executor,
+physical DMA, pause and EOI paths were inspected against final P153/P154
+records. The large earlier rewrite is not accepted merely because tests pass;
+restored independent original code and retained ownership changes are separate.
+
+### Device owner
+
+R0628/R0639 restore MM globals, original types/linkage/defaults, declarations,
+InitializeIoAddresses, LoadWinmm, DeInstallIoHook, diagnostics, port-switch
+structure and debug tail. Restored unused helpers are not newly called;
+alternative port case labels do not register those ports. P153 production
++415/-37 removes 412 XP difference lines (940 to 528); tests unchanged.
+
+Eleven residual IDs remain pending:
+
+- R0627/R0634/R0638: unavailable NT/VDM headers and coupled original device
+  initialization/shutdown/registration/reconfiguration owner omitted. Actual
+  original code fails both compilers on VDM_PM_CLI_DATA and PM_CLI control;
+  original ConnectPorts also requires a boolean where actual registration is
+  void. No second kernel-control/output/configuration path is introduced.
+- R0629: archive preparation/restoration and MPU mode/unread ACK. Actual-port
+  save/reset/restore/resume probe fails both widths without MPU assignments;
+  invalid saved mode is rejected. Not a proof of every archive field/path.
+- R0630: status aggregation and distinction between ordinary INVALID_STATE and
+  actual CCPU exit cancellation. Removing error storage or that distinction
+  fails separate current-contract assertions on both widths. The cancellation
+  probe explicitly enters/leaves CCPU; its earlier missing context was a harness
+  error, as was the first snapshot probe's missing resume handoff.
+- R0631: existing mixer/service/running handoff. Deleting it loses the expected
+  33-message resume restoration on both widths; no extra worker/timer is added.
+- R0632: port admission and new-lifetime initialization. Withdrawal overwrites
+  foreign port ownership or retains old TimeConstant, failing the actual tests.
+  Optional unsupported MIDI remains absent, not a falsely present device.
+- R0633: status-returning termination consumed by machine reset/destruction.
+  Close failure preserves machine/RAM ownership; repeat termination and port
+  removal are exercised. The original kernel shutdown is not this lifecycle.
+- R0635: lazy native InitDevices/report calls omitted, while original handler
+  protocol/diagnostics/defaults are restored. Dependencies are the already
+  established host boundary; excluded diagnostic bodies are not inventoried.
+- R0636: parser/status/output-owned MPU reset. Removing parser reset breaks
+  subsequent note restoration. Original native Close/OpenMidiDevice would
+  create a different owner; intelligent-mode no-op behavior remains original.
+- R0637: parser, MPU mode/ACK and status reset precede original device reset.
+  Exact original ResetAll fails machine reset after injected MIDI failure on
+  both widths; original reset order/comments/diagnostics remain restored.
+
+P153's before/candidate device/archive controls pass sixteen runs. Six separate
+withdrawals fail their named assertions on both widths. Full final qualification
+passes 392/392; native coverage is not deferred. These are controlled host/device
+fixtures, not a reproduced failure of the original NTVDM product.
+
+### DSP transfer and host ownership
+
+R0649/R0656 restore original independent functions, scalar spelling, descriptions,
+no-op cases, placement and formatting. P154 production +1257/-341 (net +916)
+removes 1628 XP difference lines. Tests add two lines for active-DMA pause.
+The final brace-aware review verifies 21 complete original function bodies,
+not merely their prototypes. Fifteen residual IDs remain pending:
+
+- R0640/R0648: actual SAS/EOI/event/archive/PCM declarations and controller
+  preparation replace unavailable NTVDM/native-ring ownership. Available original
+  includes and independent native helpers are restored. Sim32 host pointers
+  through ULONG are not x64-safe guest physical addresses.
+- R0641/R0642: one complete 65536-byte DMA block and sole-executor transfer/EOI
+  state, rather than original WaveOut ring plus worker. Runtime pause/capture/
+  teardown quiesce this executor; they do not quiesce an added native worker.
+  Whole-original backend ownership was analyzed in source, not dynamically
+  rebuilt as a second backend. Current callers alone do not prove necessity.
+- R0643/R0644: Lib format/gain/running ownership and cancellable q-event completion
+  track accepted samples, consumption and epoch. Original event waits in its
+  own worker cannot be inserted into the sole executor without preventing guest
+  progress/pause service. Running-handoff withdrawal fails paused output on both;
+  current tests cover deadline, cancellation, lag, progress error and epoch
+  mismatch, not real-hardware timing equivalence.
+- R0645/R0651: physical DMA, wrap/decrement and accepted-prefix submission.
+  Increment-only withdrawals fail small-block/table-munge data; logical access
+  fails nonidentity-paging ADC; requested-count advance fails backpressure.
+  Original virtual-increment assignment/diagnostics and ULONG declaration return.
+- R0646/R0650: original parser names/values restored; final unsupported UART state
+  consumes payload without treating it as PCM commands. MPU remains the supported
+  MIDI route. Partial command/table state is file-owned for archive access;
+  original function-static state cannot satisfy that capture contract.
+- R0647: copied PCM/parser/DMA and consumed-prefix archive. The negative removes
+  both pause and restore assignments, not restore alone; it fails capture on
+  both widths. Native handles/threads cannot represent a restored host lifetime.
+- R0652: executor reset/clear plus new-lifetime ResetState clear. Removing the
+  latter completes an old lifetime's partial reset in the new one and fails real
+  port tests on both. This does not prove every reset race.
+- R0653: original PauseDMA position query omitted; ContinueDMA and independent
+  helpers are restored. LoadWinmm has no production caller, so GetPositionProc
+  is null. The earlier allegedly safe restoration changed a prototype and is
+  invalid evidence. Corrected active Single-DMA function-body restoration crashes
+  both widths with 0xc0000005; current passes. No such crash was published.
+- R0654: active-transfer position rather than native HWaveOut/worker readiness,
+  with decrement/wrap. Original finite yields/diagnostics return; DspVirtualIncx
+  controls those yields, not guest DMA address arithmetic or snapshot layout.
+- R0655: only archive-visible EOI registration flag clear remains. Original
+  unconditional RemoveEOIHook is restored: it already checks IRQ/callback
+  ownership. The rejected outer guard was redundant, not necessary recovery.
+
+Final P154 builds and all 392 tests pass after the guard/line corrections.
+The two-line active-DMA test addition then passes its affected target on both
+widths, without changing either fully qualified EXE. No hypothetical original
+backend execution or broad guest/audio guarantee is inferred.
+
+Twenty-six IDs are added: cumulative 360 (355 semantic/ABI, five compiler/
+format), nineteen notices. P164's later fresh 392/392 remains the current full
+qualification. This document-only reconciliation approves no residual and
+changes no source, test, binary, configuration or media.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2243,4 +2355,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 462.
+recommendations into owner approval. The next position is 464.
