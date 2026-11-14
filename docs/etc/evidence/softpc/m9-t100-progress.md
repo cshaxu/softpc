@@ -12495,3 +12495,24 @@ final D001-D006/L001 reconciliation remain; S1/T100 and owner decisions stay ope
 
 P178 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Final changes are restricted to the three task records.
+
+## P179 final-decision reconciliation, positions 438-452
+
+All fifteen normalized current files match P143 committed contents. Current
+whole-tree searches confirm restored unused declarations have no implementation
+or caller; source/CMake confirms native IHPE and scoped C-VID IUH with ordinary
+CCPU unchanged. P140-P143 final evidence distinguishes declarations, actual
+compiler failures and real heap truncation, including coherent both-type control.
+
+Two ABI IDs and one historical notice are added: 300 residual IDs (297 semantic/
+ABI, three compiler/format), nineteen notices. R0561/R0562/R0565-R0568 remain
+completed restorations; original include wiring is retained without claiming
+unused historical APIs are implemented. No new pointer representation or path.
+
+Executor/counter-review changes only three task documents. No source/tests,
+EXEs, user configuration/media or snapshots change; no job/scratch created.
+P164 fresh 392/392 remains applicable without a new run. Next is file 453;
+remaining files, D001-D006/L001 and owner choices keep S1/T100 open.
+
+P179 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task records change.

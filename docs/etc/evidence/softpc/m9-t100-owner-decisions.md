@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-437 only. Positions 438-472, original
+This view currently reconciles positions 1-452 only. Positions 453-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1940,6 +1940,79 @@ tests or EXEs change in this reconciliation. P164 later supplied current full
 392/392; earlier deferred native checks are not retroactively claimed as passes.
 All owner decisions remain open.
 
+## Positions 438-452: host graphics/event headers and native pointer types
+
+All fifteen current normalized files match their final P143 committed versions.
+Current whole-tree searches find the restored menu strings, attached-window and
+fullscreen symbols only at their original declarations. CMake/source checks
+confirm the source-specific C-VID word override and ordinary CCPU IUH remaining
+unsigned int. P140-P143 final evidence is reconciled below.
+
+### Original files and delivered restoration
+
+host_gen.h, host_gfx.h and host_qev.h are normalized-XP-identical; the original
+quick-event handle is LONGLONG, not a newly invented widening. host_hfx.h has
+no selected runtime definition, but original include wiring remains required
+under the no-new-diff rule. Actual dependency observations establish includes,
+not a claim that every historical declaration has runtime consumers.
+
+R0561 restores host_inc.h's original blank and diagnostic anchor. R0562
+restores wchar_t wszHideMouseMenuStr/wszDisplayMouseMenuStr declarations.
+Neither original nor replacement names have definition/call/assignment consumers;
+no font/encoding capability depended on the local adaptation. Combined XP
+difference reduction is five lines, production +4/-3, no test change. P140
+VGA/BOP/quick-time tests passed three per width; EXEs were metadata-equivalent.
+
+ntcheese.h, nt_cgalt.h, nt_det.h, nt_ega.h and nt_egalt.h are wholly normalized
+XP matches; nt_cga.h selected text matches. Original host graphics includes
+remain. R0566 restores exactly extern PointerAttachedWindowed and removes its
+three-line modern-C rationale. No provider/consumer exists in the retained
+repository; actual GNU90 mirror compilation accepts it. Four real nt_graph
+syntax controls pass without extra implicit-int diagnostics. Five XP diff
+lines are removed (source +1/-4), without a runtime/layout change. P142 final
+VGA tests passed and EXEs were metadata-equivalent.
+
+R0567/R0568 restore original SwitchToFullScreen(BOOL), the terminal blank and
+proper existing line anchors in nt_fulsc.h. No implementation/call was found;
+this does not enable NTVDM fullscreen or alter KVM. Two missing XP lines are
+restored (source +3/-2). Final VGA tests passed, and complete EXEs differ only
+in identified build metadata. No fullscreen interaction test is claimed.
+
+### R0563: IHPE carries native pointers
+
+The original comment requires an integer the size of IHP, but XP's unsigned
+int is only four bytes on the supported x64 host. The existing UINT_PTR plus
+reason is +3/-1. Actual sevid000 global function-address initializers fail x64
+compilation under original IHPE; current compiles, x86 original also compiles.
+This is a host ABI requirement, not a defect claim about a 32-bit XP product.
+
+### R0564: native word only for generated C-VID rules
+
+Ordinary CCPU IUH remains unsigned int. The existing +7-line CVIDC_RULE_WORD
+selection is scoped by x64 CMake to sinit/sevid, j_c_lang, ev_glue and vglfunc.
+Those real rule registers, locals and returns carry pointers. This is not
+universal guest-word widening, a second rule engine or a new definition added
+by this audit.
+
+P141 uses real consumer flags with current, each original type and both restored
+coherently. All x86 builds/heap roundtrips pass with four-byte types. On x64,
+current eight-byte carriers roundtrip real heap addresses; original IHPE,
+original IUH and both truncate their respective carriers. IHPE-only/both also
+fail actual sevid000 compilation; IUH-only compiles but loses the pointer.
+Thus compile success alone is insufficient. Scalar roundtrip and consumer
+proofs do not imply exhaustive video/guest/snapshot coverage.
+
+R0565 removes one extra blank, not either justified carrier. Final VGA and
+checkpoint tests passed on both widths; CHAIN2 assertions are inside VGA, not
+a separately registered third test. Both EXEs were metadata-equivalent. Current
+full runtime qualification is the later P164 fresh 392/392, not an invented
+native pass at P141. R0563/R0564 remain owner decisions.
+
+R0560 is one historical notice-policy item; notice total becomes nineteen.
+Two ABI IDs are added: cumulative 300 residuals (297 semantic/ABI, three
+compiler/format). No excluded body is counted. This reconciliation changes
+only task documents, with code/tests/EXEs unchanged and S1/T100 still open.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1949,4 +2022,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 438.
+recommendations into owner approval. The next position is 453.
