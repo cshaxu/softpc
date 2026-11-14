@@ -330,3 +330,49 @@ amplification and an unproven historical OS-level cause. Only this proposal and
 CURRENT change. Task-owned traces/scripts are discarded after recording these
 results; cached build trees are retained. TEST01 remains implementation-pending,
 not fixed; S2/T100 remain open.
+
+### TEST01 P6 implementation approval
+
+Owner: "批准，就按这两行极简方案修复，保留现有超时和测试覆盖，跑完双架构全量测试，提交推送后等我验收。"
+P6 changes only the two existing property assignments and their test manifests.
+Configure the cached x86/x64 trees, compare registered tests before/after and
+prove that only RUN_SERIAL changes for these two tests. Run all 188 background
+and eight native tests per architecture. Inspect scheduling output to verify
+these fixtures actually run without another test in that CTest invocation.
+No production change means no EXE rebuild/publication is necessary; preserve
+the already published P4 binaries and verify their hashes remain unchanged.
+
+### TEST01 P6 delivery
+
+Implemented exactly the two approved RUN_SERIAL assignments (+2/-2), plus
+their two manifest hashes. No production or test-case source changes, new
+runner, timeout adjustment, retry or coverage deletion. Reconfigured both
+cached Ninja trees; before/after CTest JSON comparison confirms all 196 tests
+per architecture retain identical names, commands and properties except these
+two RUN_SERIAL additions. The 60/180-second budgets are unchanged.
+
+Fresh qualification passes 392/392 without retries or skips: each architecture
+passes 188 background and eight native desktop/audio/package tests. x86
+background/native take 181.64/16.47 seconds; x64 background takes 182.98 seconds
+and native 24.26 seconds (CTest elapsed). Types takes 68.38/72.16 seconds and
+Emulator 23.33/23.22 seconds on x86/x64. Parsing actual Start/completion records
+confirms neither fixture overlaps another test in the same invocation.
+The modest whole-suite cost versus P5 is expected; scheduling protects the
+existing budgets instead of deleting checks. External load remains outside
+CTest's authority; this is not a guarantee against arbitrary host starvation.
+
+Single-person actual-diff counter-review confirms agent edits are limited to
+the approved properties, matching manifests and task documents. An external
+owner-configuration change appeared during qualification (`display=window` to
+`display=console`); it is preserved byte-for-byte and committed under the
+existing user-configuration rule, not attributed to the scheduling repair.
+No claim is made that both package runs used the same unchanged INI.
+Whitespace and documentation
+governance checks pass; configure logs contain no warnings. P4 EXE SHA-256
+identities remain exactly unchanged before/after all tests:
+32-bit `c28cf648118e7f8635f431b7f1af823e2a10094a880929fc25016255d47868ab`;
+64-bit `b33fd04f544181e3ad6a7a4a2e503107187545d6699132224f97ed2ea24d111f`.
+No binary rebuild/publication is claimed or needed for test scheduling only.
+The existing bounded similar-issue sweep stands; no wider scheduling policy
+is introduced. Disposable task scripts/logs are removed after jobs terminate;
+reusable caches remain. P6 awaits owner acceptance; S2/T100 stay open.

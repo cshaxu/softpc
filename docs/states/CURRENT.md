@@ -5,7 +5,7 @@
 Owner closes T100 S1 and admits M9 T100 S2 to review eight outstanding
 repair candidates. D005/D006 repairs and minimal tests are now owner-approved
 and implemented in S2 P2. D004 is implemented and qualified in P4; owner
-proceeds to TEST01 and approves timing investigation. T100 stays open. See the
+approves TEST01 two-line scheduling repair as P6 and full dual-width tests. T100 stays open. See the
 [S1 closure](../history/M9-T100-S1-original-first-audit.md).
 
 ## M9 T100 S2 Packet
@@ -13,31 +13,32 @@ proceeds to TEST01 and approves timing investigation. T100 stays open. See the
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Owner subsequently approves D005/D006 minimal code repairs, minimal regressions, cached full dual-width build/publication/test and one P commit/push. Owner now approves D004 twelve-store scalar correction, minimal regression and cached full dual-width build/publication/test/commit/push as P4. L001/D001-D003 stay declined. |
+| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Owner subsequently approves D005/D006 minimal code repairs, minimal regressions, cached full dual-width build/publication/test and one P commit/push. Owner now approves D004 twelve-store scalar correction, minimal regression and cached full dual-width build/publication/test/commit/push as P4. P6 TEST01 adds RUN_SERIAL to the two existing test property assignments, preserves budgets/coverage and runs all tests before commit/push and owner acceptance. L001/D001-D003 stay declined. |
 | Objective | Recheck D001-D006, L001 and TEST01, establish actual failures and consumers, and present minimal coherent repair or non-repair dispositions for owner review. |
 | Non-goals | No unapproved new mirror patch, bulk-path activation, duplicate implementation, guest changes, sibling writes, excluded-body audit or blanket timeout increase. |
 | Reference Baseline | S1 P189 4951c99a; final production P164 21e56aa077334ed5db04a3ab1d64e026bcc2656f; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [Eight-item review](../proposals/m9-xp-mirror-original-first-audit.md#s2-owner-admitted-candidate-review). |
-| Files And ABI Surface | Candidate C-VID rules, timer.c, egwrtm12, PIC snapshot/Compat archive and their tests; shared Emulator/Lib test timing infrastructure for investigation only. Disclose any proposed public or archive contract change. |
+| Files And ABI Surface | Candidate C-VID rules, timer.c, egwrtm12, PIC snapshot/Compat archive and their tests; shared Emulator/Lib test timing investigation and the two approved RUN_SERIAL property changes. Disclose any proposed public or archive contract change. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP is the only original comparison baseline; no OpenNT source reads. |
 | Verification | Existing failures are leads; new probes use actual production bodies/callers on x86/x64 with independent expected values. Source/ABI reasoning, controlled probes and real guest reproduction remain distinct. P2 requires focused pre-fix failure controls, corrected tests, full cached dual-width builds/publication, background and native regression. Preserve actual failures; no stale P164 result substitutes for P2 qualification. |
 | Expected Markers | Eight-item finite ledger with actual path, evidence, minimal diff estimate, regression scope and owner decision; distinguish D004 applicability from confirmed defects. |
 | Asset Needs | Preserve configuration/media/snapshots. S2 owns build/t100-s2 if needed; hidden background jobs, two-hour total and fifteen-minute no-progress budgets; remove disposable output after delivery. |
 | Reporting Requirements | Explain cause, failure example, production reachability, proposed single-path fix and source/XP diff separately. Report uncertainty without presenting it as a repair. |
-| Stop Conditions | D005/D006 P2 and D004 scalar stores P4 are authorized; no bulk-path activation or other candidate patch is authorized. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
+| Stop Conditions | D005/D006 P2 and D004 scalar stores P4 are authorized; TEST01 two-line scheduling repair P6 is authorized; no bulk-path activation or other candidate patch is authorized. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
 | Exit Criteria | Every one of eight items has a sourced review disposition and executable plan or reason not to modify; later implementation requires its own authorized scope and qualification before closure. |
 | Original Owner Request | Owner asks to close S1, admit S2 and go through the outstanding mirror/test candidates; original wording and corrected count are preserved in the proposal. |
 | Similar-Issue Sweep | For each confirmed defect, inspect adjacent operations and actual caller families; do not silently add unrelated candidates or activate unused APIs. |
 
 ## Current Technical Baseline
 
-TEST01 investigation is complete; [measured findings and the two-line scheduling
-proposal](../proposals/m9-xp-mirror-original-first-audit.md#test01-measured-findings-and-proposed-disposition)
-await an implementation decision. Fresh unchanged background suites pass
-376/376. Child-process cost and aggregate slowdown are measured; historical
-timeouts do not reproduce this round. No timeout, test coverage or production
-code changes; no native qualification or EXE publication is claimed for this
-documentation-only investigation.
+TEST01 P6 implements the approved two-line RUN_SERIAL repair; 60/180-second
+budgets and all coverage remain unchanged. Cached dual-width configuration
+and full tests pass 392/392 without retries/skips, including native desktop,
+audio and package tests. Registration comparison proves only the two serial
+properties change; scheduling logs prove exclusive execution. P4 EXEs remain
+byte-identical. [P6 evidence](../proposals/m9-xp-mirror-original-first-audit.md#test01-p6-delivery)
+records timings, review and scope. Await owner acceptance; S2/T100 remain open.
+
 
 T100 S2 P4 repairs CHAIN4 mode2 scalar plane-byte selection: production +12/-12,
 tests +52/-0, no public/snapshot ABI change. Fixed-XP normalized diff totals for
@@ -59,7 +60,7 @@ Owner declines L001 and D001-D003 repairs this round: retain evidence and
 known limits without new code or snapshot-format changes. D004 hardware/path
 investigation confirms a scalar plane-byte selection defect on both widths;
 [diagnostic evidence and candidate](../etc/evidence/softpc/m9-t100-s2-d004.md)
-are delivered in P4 with fresh full qualification. TEST01 scheduling implementation remains pending. S2 and T100 stay open.
+are delivered in P4 with fresh full qualification. TEST01 P6 is implemented and qualified, pending owner acceptance. S2 and T100 stay open.
 
 
 T100 S1 P164 restores only ev_glue.c's XP include-line comment:
