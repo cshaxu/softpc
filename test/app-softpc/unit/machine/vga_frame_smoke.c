@@ -45,6 +45,8 @@ typedef struct {
 
 /* Direct original-renderer probes use the existing detached DIB, not a UI. */
 extern unsigned char *EGA_planes;
+extern void write_byte_ev_glue(IU32 address, IU8 value);
+extern void write_word_ev_glue(IU32 address, IU16 value);
 extern void outb(io_addr port, half_word value);
 extern void inb(io_addr port, half_word *value);
 extern void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,

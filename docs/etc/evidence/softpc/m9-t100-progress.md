@@ -8873,3 +8873,54 @@ open, including R0517; S1 is not closed.
 P124 owned runner exited and its PID is absent. Scratch preview/removal and
 residue check pass. Actual diff review confirms documentation-only delivery;
 documentation gate passes and user configuration/media/snapshots are intact.
+
+## File 422: ega_writ.c (P125)
+
+Pinned XP raw SHA-256 7afd11d2b5d392f74d0a6ddb1b97aee587a6808ea305d09f4c8a9d3477a06cbb.
+Complete-file comparison finds the six omitted original local C-EVID writer
+declarations. Other differences are existing excluded bodies and associated
+conditional/line-control scaffolding, skipped without new accounting.
+
+R0518 restores the six exact XP declarations and removes the now unnecessary
+nine-line added writer declaration block from cpu_vid.h. Production registration
+remains the original Glue_writes table in ega_writ.c; providers remain ev_glue.c.
+No new callback wiring, conversion or runtime path is introduced. In the actual
+supported non-ANSI macro selection IPT2/IPT3/IPT4 expand to empty argument lists;
+the original fill_word declaration's IU8 spelling is preserved, not modernized.
+Two existing direct test consumers of byte/word writes receive local private
+extern declarations. No production header extension is retained solely for tests.
+
+This coherent restoration supersedes the remaining writer part of R0423/P76.
+The old isolated deletion result did not restore the original local declarations
+and was insufficient evidence for retention. Together P123 (three readers) and
+P125 (six writers) remove that entire added provider declaration block. The
+remaining cpu_vid.h differences are existing selection/exclusion scaffolding;
+no selected provider declaration residual remains pending there.
+
+Actual delta: production +6/-10 (net -4), tests +2/-0 (net +2). XP-relative
+raw added/deleted counts: ega_writ.c +46/-336 becomes +45/-330; cpu_vid.h
++17/-13 becomes +8/-13. The combined reduction is 16 difference lines
+(-10 added/-6 deleted), not a claim based on heuristic hunk count. Excluded
+bodies are unchanged and not newly accounted. Both mirror files retain CRLF.
+
+Final cached builds pass: x86 14.69 seconds, x64 18.47 seconds. The actual
+rebuilt VGA frame fixture passes x86 in 6.97 seconds and x64 in 5.64 seconds.
+Build warning lines number 1009 and 1059 respectively, all in softpc.new;
+no public-component warning is present. Published artifacts:
+
+- x86: 51a4c9a4d0554b0a190d75b68367995af192254da93f8e06e0e1c892031bffaf,
+  18:39:13 Nov 13 2026.
+- x64: 75ec3fa9e12b7e565aaa69d0812b4eb8a896e247ec8622837b858a2bc1befceb,
+  18:39:35 Nov 13 2026.
+
+Each full EXE matches the P123 published baseline after masking only PE
+creation timestamp/checksum and the unique eight-character compiler time;
+compiler date and literal offset remain identical. Under the owner's confirmed
+artifact-equivalence rule, full runtime tests are not repeated; P114's 392/392
+remains the full-suite baseline. This is not a new desktop or guest verification.
+Frontier 422/472; next frozen file 423. Other qualified decisions remain open.
+Runner PID 25912 is absent and exit.txt records zero; no active job is replaced.
+
+P125 scratch preview/removal and residue check pass after owned process exit.
+Mirror/documentation gates and actual source/test/artifact diff review pass.
+User configuration, snapshots and guest media remain untouched.

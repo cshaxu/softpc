@@ -2275,3 +2275,13 @@ and produces metadata-equivalent final EXEs. The earlier isolated removal
 was incomplete evidence. Source +4/-5; combined XP diff decreases nine lines
 (-5 added/-4 deleted). Six writer declarations remain separately qualified.
 No selected ega_read.c residual remains; exclusion scaffolding is not re-accounted.
+
+### T100 S1 P125 coherent original write-provider declarations
+
+Restore six original ega_writ.c declarations; remove the remaining nine-line
+added cpu_vid.h provider block. R0423's writer retention is superseded, completing
+the reader restoration already delivered in P123. Two test-only externs stay in
+the existing private fixture. Production +6/-10, test +2/-0; XP diff decreases
+16 lines (-10 added/-6 deleted). Both final EXEs are metadata-equivalent and
+both rebuilt VGA fixtures pass. No selected declaration residual remains in
+cpu_vid.h or ega_writ.c; existing exclusion scaffolding is not re-accounted.
