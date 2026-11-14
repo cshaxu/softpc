@@ -193,3 +193,37 @@ ordered progress; no historical exclusion ledger is duplicated.
 
 No mirror code, guest assets or binaries were changed or exercised by this
 planning record. Documentation checks do not establish restoration safety.
+
+## S2 owner-admitted candidate review
+
+The owner closes S1 and admits S2: "好 加上测试一共发现9个问题待修复 是吧
+收口s1 准入s2 我们来过一下". The actual preceding list contains eight items:
+seven mirror candidates and one shared-fixture timing issue. Do not invent a
+ninth issue or split the timing observations merely to match that estimate.
+CURRENT owns activation. This admission authorizes review/design, not blanket
+implementation of the proposed new patches or changes to the mirror policy.
+
+| Item | Observed problem | Review outcome required |
+| --- | --- | --- |
+| D005 | Active PIT backlog reaches zero event delay and stack overflow in the controlled real Machine/PIT probe. | Recheck the two-line candidate's ordering and timing semantics; propose permanent boundary regression and actual diff. |
+| D006 | Mode-2 byte write checks bit8 while writing plane2; mask4/value4 yields 00 instead of ff. | Recheck bit4 correction and neighboring masks/paths; give minimal diff and regression scope. |
+| L001 | PIC snapshot omits the private ICW sequence phase; restored remaining writes become mask operations. | Specify same-owner archive/schema change and validation, without replay or another state machine. |
+| D001 | Generated GenericByteFill loses caller locals across nested GenericByteWrite and crashes. | Establish real consumers and minimal caller-local preservation; do not activate a batch path without need. |
+| D002 | Generated DWORD's second WORD goes to +8 rather than +2. | Verify related entries and multi-DWORD fill ordering before prescribing the offset change. |
+| D003 | Two overlapping WORD fills produce ten bytes instead of four complete DWORDs. | Establish minimal original-path fill repair separately from D002 and disclose consumer reachability. |
+| D004 | Production-wired CHAIN4 mode-2 WORD/DWORD results disagree with the fixture. | Determine actual hardware semantics first; disposition may be test correction rather than production repair. |
+| TEST01 | Shared verifier-negative and Types-layout tests time out in aggregate but pass alone within unchanged budgets. | Establish scheduling/startup cost with evidence; preserve negative checks, no blanket timeout increase. |
+
+TEST01 is transferred from TODO into this active review. Its historical evidence
+is [P37](../etc/evidence/softpc/m9-t100-progress.md#p37-final-qualification-and-actual-change-review)
+and [P48](../etc/evidence/softpc/m9-t100-progress.md#p48-final-qualification-and-actual-change-review):
+verifier-negative x86/x64 60.09/60.16 seconds time out, isolated 22.67/19.20
+seconds pass; x64 Types reaches 180 seconds then passes alone in 58.65 seconds,
+and x86 aggregate passes in 174.99 seconds. No established scheduling root cause.
+
+For each of these eight review units, record actual path, reproducible failure
+or unsupported inference, smallest coherent correction, source/XP diff estimate,
+regression and remaining uncertainty. Finite completion means every item has a
+review disposition; no unproved defect is called fixed and no proposed patch
+is silently implemented. Inactive native MIDI observations remain with their
+existing S1 decisions, not silently added as a ninth active candidate.

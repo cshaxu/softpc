@@ -2,31 +2,30 @@
 
 ## Current Work
 
-Owner admits M9 T100 S1 on 2026-11-12: original-first mirror audit.
-Owner confirms the method and activates S1; existing #error exclusions are
-skipped without new bookkeeping. T99 remains closed; see its
-[completion audit](../history/M9-T99-completion-audit.md).
+Owner closes T100 S1 and admits M9 T100 S2 to review eight outstanding
+repair candidates. T100 stays open. See the
+[S1 closure](../history/M9-T100-S1-original-first-audit.md).
 
-## M9 T100 S1 Packet
+## M9 T100 S2 Packet
 
 | Field | Required record |
 | --- | --- |
-| Identifier Mode | New |
-| Admission And Approval | Owner confirms the method and admits S1 execution on 2026-11-12; existing #error exclusions need no new accounting. |
-| Objective | Audit/restore mirror differences in frozen literal directory order; replace duplicate Compat behavior with original mirror implementation first, then delete whole mirror files left without necessary integration. |
-| Non-goals | No guest changes, excluded-body re-audit, automatic retention, new implementation paths or sibling modifications. |
-| Reference Baseline | SoftPC ac9d8dc85a6d9b0cc66d0a6649f60e8903406f18; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89; existing manifest records 472 retained files, not a new audit result. |
-| Candidate Proposal | [Original-first audit method](../proposals/m9-xp-mirror-original-first-audit.md). |
-| Files And ABI Surface | Selected softpc.new mirror, its provenance and necessary coupled callers/tests; disclose ABI consequences per point. |
-| Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING mirror policy and source-research-policy; owner order supersedes comparison project's ordering. |
-| Verification | Per complete substantive file: cached x86/x64 build, publish, focused/full regression, manifest and documentation gates; final-source identity required. Owner permits later batches unaffected by native desktop/audio/package paths to defer those tests until final acceptance; preserve pending coverage explicitly. |
-| Expected Markers | Ordered file/point progress, exact restoration, evidence-qualified owner decisions; no excluded-body ledger. |
-| Asset Needs | Preserve configuration/media/snapshots. S1 owns build/t100-s1 if needed; background jobs bounded to 2 hours and 15 minutes no progress, scratch removed after delivery. |
-| Reporting Requirements | Explain evidence threshold, exact restoration, pending decisions, file order, diff metrics and proposed delivery cadence. |
-| Stop Conditions | Unproven necessity remains investigation; evidence-backed retained differences require owner decision; new unjustified XP-relative differences or added/deleted diff-line increases are prohibited, including unused-file/wiring removal; exact restoration may split contiguous ranges without adding a difference. Discard genuinely increasing candidates without requesting an exception. |
-| Exit Criteria | Reconcile ordered audit dispositions and delivered changes with actual diff review; no unresolved point may be reported closed. |
-| Original Owner Request | Preserved verbatim in the linked proposal. |
-| Similar-Issue Sweep | All non-excluded mirror differences, including previously approved ones, are subject to the same evidence threshold. |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Review/design is authorized, not blanket patch implementation. |
+| Objective | Recheck D001-D006, L001 and TEST01, establish actual failures and consumers, and present minimal coherent repair or non-repair dispositions for owner review. |
+| Non-goals | No unapproved new mirror patch, bulk-path activation, duplicate implementation, guest changes, sibling writes, excluded-body audit or blanket timeout increase. |
+| Reference Baseline | S1 P189 4951c99a; final production P164 21e56aa077334ed5db04a3ab1d64e026bcc2656f; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
+| Candidate Proposal | [Eight-item review](../proposals/m9-xp-mirror-original-first-audit.md#s2-owner-admitted-candidate-review). |
+| Files And ABI Surface | Candidate C-VID rules, timer.c, egwrtm12, PIC snapshot/Compat archive and their tests; shared Emulator/Lib test timing infrastructure for investigation only. Disclose any proposed public or archive contract change. |
+| Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP is the only original comparison baseline; no OpenNT source reads. |
+| Verification | Existing failures are leads; new probes use actual production bodies/callers on x86/x64 with independent expected values. Source/ABI reasoning, controlled probes and real guest reproduction remain distinct. Documentation-only admission reuses unchanged P164 392/392, not a fresh run. |
+| Expected Markers | Eight-item finite ledger with actual path, evidence, minimal diff estimate, regression scope and owner decision; distinguish D004 applicability from confirmed defects. |
+| Asset Needs | Preserve configuration/media/snapshots. S2 owns build/t100-s2 if needed; hidden background jobs, two-hour total and fifteen-minute no-progress budgets; remove disposable output after delivery. |
+| Reporting Requirements | Explain cause, failure example, production reachability, proposed single-path fix and source/XP diff separately. Report uncertainty without presenting it as a repair. |
+| Stop Conditions | Do not implement candidate patches before a concrete reviewable design is authorized. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
+| Exit Criteria | Every one of eight items has a sourced review disposition and executable plan or reason not to modify; later implementation requires its own authorized scope and qualification before closure. |
+| Original Owner Request | Owner asks to close S1, admit S2 and go through the outstanding mirror/test candidates; original wording and corrected count are preserved in the proposal. |
+| Similar-Issue Sweep | For each confirmed defect, inspect adjacent operations and actual caller families; do not silently add unrelated candidates or activate unused APIs. |
 
 ## Current Technical Baseline
 
@@ -46,7 +45,8 @@ net growth and anchored per-point counts. P189 provides the
 [compact owner decision packet](../etc/evidence/softpc/m9-t100-owner-decisions.md#compact-owner-decision-packet):
 existing functional/ABI differences, six compiler items, historical notices,
 and unimplemented new repairs are separate choices. The audit-delivery
-completion review is recorded; owner disposition remains and S1/T100 are open. See the
+completion review is recorded. S1 is owner-closed; new repairs are unimplemented
+and now under S2 review. T100 remains open. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p189-compact-owner-decision-packet).
 
 
@@ -77,7 +77,7 @@ eight trees; no fresh NXVM alignment is claimed.
 
 Original GenericByteFill, Unchained DWORD and Chain4 bulk-fill defects belong to the
 [pending diff decisions](../etc/evidence/softpc/m9-t100-progress.md#pending-original-defect-diff-decisions), not TODO.
-[TODO](TODO.md) retains shared-fixture aggregate timing debt. The runtime-performance candidate
+Shared-fixture aggregate timing moved from [TODO](TODO.md) to S2 TEST01. The runtime-performance candidate
 remains in [Queue](QUEUE.md), unnumbered and unadmitted. JIT/WHP discussion
 did not admit S44 or a new implementation task.
 
