@@ -9716,3 +9716,49 @@ remain evidence-qualified owner decisions, not automatic approvals. Final
 mirror bytes equal the tested reduced candidate and retain CRLF. Owned jobs
 are terminal; promoted evidence permits scratch cleanup. Completed delivered
 frontier is 431/472, next file 432 base/video/video_io.c. S1/T100 remain open.
+
+
+## File 432: video_io.c (P135)
+
+Pinned XP raw SHA-256:
+24ada0ef848aed12dba720b680338ca1f1c71b4a7b0c3485d7fbe850ad21b833.
+Root CMake compiles this file in softpc-machine-devices. The original BIOS
+entry table calls video_io, and bop_smoke asserts BIOS[BIOS_VIDEO_IO] is that
+exact entry, distinct from EGA's 0x42 dispatch. Its check_video_func guard,
+IDLE_video call and video_func dispatch match XP. No Compat replacement is
+needed; deleting this live implementation is not justified.
+
+R0552 restores only blank placement: one blank moves from before NEC_98 to
+the selected else body, and two blanks move from before the excluded NTVDM
+arm to after it. Existing line directives change 97->96 and 109->107 so the
+original define/function/comment positions remain 97/99/109. No excluded
+body is audited, restored, counted or given a new point. Executor comparison
+and independent counter-review find no remaining selected code difference.
+Normalized selected XP diff falls from +3/-3 to +0/-0: six fewer diff lines.
+Tracked production changes +5/-5 include the two line-control adjustments;
+test changes are zero. The retained file is not claimed byte-identical to XP.
+
+Final source LF-normalized SHA-256:
+7e300b8b5956ffb0525dce0f76c990b21af103db8e21a8fd99492102c54a2fad.
+The complete final comparison, excluding existing error bodies and line
+controls, equals the original; no semantic residual needs an owner decision
+for this file. Cached final-source builds/publication and the real BOP/VGA
+fixtures qualify the cleanup. Applicable equivalence/full-test disposition
+follows below. Earlier pending decisions and final native acceptance remain.
+
+### P135 final-source qualification
+
+- x86: cached build/publication 8.86 s; BOP and VGA **2/2** in 7.48 s; 89 mirror/header warnings, none outside the mirror.
+- x64: cached build/publication 12.96 s; BOP and VGA **2/2** in 7.50 s; 89 mirror/header warnings, none outside the mirror.
+- softpc32.exe: Nov 13 2026 21:27:05, SHA-256 a709ae6b5215c21da4b0a72931846ee11ff02d7c54fb4d9811cfc12f5e597002.
+- softpc64.exe: Nov 13 2026 21:27:21, SHA-256 75f9a7b042f7cf3743cac305cac137ec1a3bcb4afda47a44e4a8b60dbdef3180.
+
+Both EXEs are byte-equal to P134 after masking only PE timestamp/checksum and
+the one compiler-time literal. The owner equivalence exception skips duplicate
+full regression; P133 background 188/188 per architecture remains applicable.
+Native final acceptance is still pending. Manifest, documentation and diff
+checks pass. Actual changed-path review confirms only original whitespace,
+line controls, provenance/task records and fresh EXEs changed. No public tree,
+Compat, guest, INI or snapshot changed. Completed owned jobs permit scratch
+cleanup. Frontier 432/472; next file 433 host/inc/cfpu_def.h. S1/T100 and all
+earlier qualified owner decisions remain open.

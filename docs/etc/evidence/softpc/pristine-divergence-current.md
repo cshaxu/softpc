@@ -2342,3 +2342,13 @@ probes fail actual BIOS address/pixel oracles on x86/x64. Existing exclusions
 are not re-accounted. Both final EXEs are metadata-equivalent to P133; both
 rebuilt VGA fixtures pass. Production +17/-23, test changes zero. See T100
 file evidence for boundaries and owner-decision status.
+
+
+### T100 S1 P135 video_io.c selected-original equality
+
+R0552 restores original blank placement and corresponding existing line
+controls; no selected-source difference remains. Selected XP diff +3/-3 becomes
+zero; tracked production +5/-5, tests unchanged. Both builds/publications and
+BOP/VGA 2/2 per width pass; EXEs are metadata-equivalent to P134. Existing
+excluded bodies receive no new accounting. No retained semantic decision is
+needed for this file; earlier owner decisions remain in the T100 evidence.

@@ -43,24 +43,24 @@
 #include "debug.h"
 #include "idetect.h"
 
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-#line 97
+#line 96
+
 #define check_video_func(AH)	(AH < EGA_FUNC_SIZE)
 
 void video_io()
 {
 
 
-
-
 #line 103
 #if defined(NTVDM) && !defined(X86GFX)
 #error "Unsupported SoftPC mirror configuration: NTVDM and not X86GFX"
 #endif
-#line 109
+#line 107
+
+
     /*
      * The type of operation is coded into the AH register.  Some PC code
      * calls AH functions that are for other more advanced cards - so we
