@@ -3476,7 +3476,7 @@ configuration, guest media and snapshots remain intact.
 ## Pending original-defect diff decisions
 
 Owner moves these discoveries out of TODO into this audit's pending diff-point
-list. D001-D005 identify proposed differences, not existing local patch ranges;
+list. D001-D006 identify proposed differences, not existing local patch ranges;
 they do not inflate the measured XP diff or the restored-point counts. None
 is repaired or approved for a new mirror patch. Continue ordered auditing
 without waiting; the no-increase constraint remains in force.
@@ -3491,6 +3491,8 @@ without waiting; the no-increase constraint remains in force.
 | D004 | base/cvidc/sevid025.c, CHAIN4 mode-2 WORD/DWORD writes: plane-selection discrepancy; a possible correction would select the addressed plane's expanded byte rather than always the low byte. No patch is admitted. | P57 real setWritePointers selects all four mode-2 variants. On x86/x64, offset 0x100, WORD 0x0201 writes ff 00, whereas the per-plane expansion expectation is ff ff; DWORD 0x08040201 writes ff 00 00 00 rather than ff ff ff ff. Current, restored and poisoned-restored bodies agree. Pinned XP stores the low byte after lookup expansion. write_word_ev_glue is in the production video write vector. This is a source/fixture discrepancy, not a reproduced guest failure or completed hardware conformance investigation. | Pending diff decision and hardware/guest applicability verification; original behavior unchanged. |
 
 | D005 | base/system/timer.c, issueIREQ0 existing-active-event branch: clamp the newly computed zero int_delay to one before assigning timer_multiple_delay; isolated candidate adds two lines, no production edit admitted. | P115 uses real Machine/PIT ports, two heartbeats and actual quick-event dispatch. Both current architectures reach divisor=1, mode=2, delay=0, active=1, more=65525, then exit 0xc00000fd. The original active-event calculation is unchanged; the existing first-event guard does not cover it. Two-line isolated candidate passes all nine mode/divisor combinations on each architecture. | Pending new diff decision; not implemented, not TODO, no observed real-guest crash claimed. |
+
+| D006 | base/video/egwrtm12.c, ega_mode2_chn_b_write easy even-address path: proposed plane-2 enable test 8 to 4. | P126 actual Machine/BIOS mode 3 and GC mode 2 select the original BIOS writer. With sequencer plane mask 4, no logical operation and value 4 at offset 0, both architectures leave plane 2 at 00 rather than ff. The original XP condition tests bit 8 while writing plane 2; logical and WORD paths test bit 4. This line is not an existing local diff. | Pending new diff decision; no production patch or full mask matrix, no guest symptom claimed. |
 
 The P34/P38 sections retain the detailed controls and caller evidence. This
 transfer does not claim a guest symptom, a completed fix, or authority to add
@@ -8924,3 +8926,68 @@ Runner PID 25912 is absent and exit.txt records zero; no active job is replaced.
 P125 scratch preview/removal and residue check pass after owned process exit.
 Mirror/documentation gates and actual source/test/artifact diff review pass.
 User configuration, snapshots and guest media remain untouched.
+
+## File 423: egwrtm12.c (P126)
+
+Pinned XP raw SHA-256 c8719090315333503c86824121a6342dca3749903a677b001faa75005b35e838.
+Full-file comparison finds ten selected changed lines; existing excluded bodies
+and associated scaffolding are skipped without new accounting. Root CMake
+includes the file in softpc-machine-devices. Original ega_write_routines_update
+selects its mode-1/mode-2 byte/word routines into bios_ch2_*_wrt_fn. Original
+video.c invokes those callbacks for non-V86 CHAIN2 BIOS text writes. Compat
+and Machine do not provide duplicate implementations of these routines.
+
+Each difference is evidence-qualified pending owner decision, +1/-1 per point:
+
+| Point | Current line / XP line | Necessary behavior shown by independent restoration |
+| --- | --- | --- |
+| R0519 | 298 / 353 | Mode-1 byte offset preserves plane address A0. |
+| R0520 | 332 / 387 | Mode-1 word start preserves plane address A0. |
+| R0521 | 340 / 395 | Mode-1 odd WORD second byte reaches next plane-0 cell (+8). |
+| R0522 | 346 / 401 | Same next-cell step for plane 2. |
+| R0523 | 631 / 686 | Mode-2 byte offset preserves plane address A0. |
+| R0524 | 702 / 757 | Mode-2 word start preserves plane address A0. |
+| R0525 | 717 / 772 | Mode-2 logical odd WORD advances plane 0 by +8. |
+| R0526 | 729 / 784 | Same logical next-cell step for plane 2. |
+| R0527 | 767 / 822 | Mode-2 simple odd WORD advances plane 0 by +8. |
+| R0528 | 773 / 828 | Same simple next-cell step for plane 2. |
+
+The ten original-line variants compile the actual source body, each reverting
+only its named line, then link ahead of the unchanged production machine archive.
+An additional variant restores all ten together, avoiding a conclusion based
+only on incomplete restoration. A disposable copy of the existing VGA fixture
+uses actual machine create/reset and BIOS mode 3, sets the original sequencer/GC
+ports, and asserts callback identities before invoking those selected writers.
+It covers mode 1 and mode 2, no logical function and AND, byte offset 2, even
+WORD offset 6 and odd WORD offset 9. Latches/values are all ones and planes
+start zero. Expected positions are explicit cells 8/10, 24..27 and 33/35/40/42,
+not a copy of the implementation's offset expression. The selected four-byte
+plane layout and the original controller read/write path already have separate
+P120/P61 evidence; no new layout or renderer is introduced here.
+
+Both current controls pass (x86 0.19 s, x64 3.10 s). All twenty independently
+restored bodies compile/link successfully and fail the corresponding byte,
+even-WORD or second-byte plane assertion. x86 assertion exits are 3221226505;
+x64 exits are 3. Both full ten-line restorations also fail the first mode-1
+byte-address assertion. No build error is counted as a behavior failure.
+An initial private fixture used undeclared c_setAX and failed compilation;
+that setup was corrected to the existing c_setAH/c_setAL interfaces only after
+the first runner exited. This setup failure is excluded from the proof count.
+
+A separate one-case mask probe confirms D006 on both architectures: plane mask
+4, mode 2, no logical operation, value 4 at offset zero yields plane2=00.
+Pinned XP contains the same bit-8 test; it is a newly recorded original defect,
+not a reason to add an unapproved patch. The four-byte layout does not explain
+away a wrong enable bit, and the ten retained address corrections do not fix it.
+No all-mask, all-mode, overlap, paging or real DOS/Windows session claim is made.
+
+No safe reduction of these selected differences is identified. Production,
+permanent test and artifact deltas are zero; XP diff reduction is zero. The
+existing ten changed lines remain for owner review, not automatic approval.
+No full rebuild or full runtime rerun is needed for this audit-only delivery;
+P125 artifacts and P114 full 392/392 baseline remain. Frontier 423/472; next
+frozen file 424. S1 and all qualified owner decisions remain open.
+
+P126 runners exited with their PIDs absent. Scratch preview/removal and residue
+check pass. Documentation gate and actual diff review pass; delivery changes
+only the three task evidence/status files. User media/configuration are intact.

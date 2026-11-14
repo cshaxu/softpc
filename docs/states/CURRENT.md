@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P125 completes file 422 ega_writ.c: six original local declarations
-are restored and the remaining added cpu_vid.h provider block is removed.
-Production +6/-10, test +2/-0; XP diff decreases 16 lines. Both cached builds
-and rebuilt VGA fixtures pass; published EXEs are metadata-equivalent to P123.
-P114 full 392/392 baseline remains. Frontier 422/472; continue at frozen file
-423. R0423 provider retention is superseded by P123/P125; D005, L001 and
+T100 S1 P126 completes file 423 egwrtm12.c: ten existing CHAIN2 address
+corrections are qualified pending R0519-R0528. Both current controls pass;
+twenty independent and two combined original restorations fail expected data
+assertions. New original plane-enable defect D006 is recorded, not patched.
+No production/test/artifact changes; P125 publication and P114 full 392/392
+baseline remain. Frontier 423/472; next frozen file 424. D001-D006, L001 and
 other qualified decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
