@@ -19,9 +19,6 @@
 
 #include "insignia.h"
 #include "host_def.h"
-/* The fixed standalone profile has no user-selectable scale.  Compile the
-   original standard-size CGA paint path only; this is not a replacement
-   renderer. */
 #undef BIGWIN
 
 #include "xt.h"
@@ -47,7 +44,8 @@
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
-#line 47
+#line 46
+
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif
@@ -56,9 +54,7 @@
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 92
-
-
+#line 94
 
 /* Externs */
 
@@ -94,20 +90,20 @@ static unsigned int cga_med_graph_lo_nyb[256];
 #line 132
 #define TEXT_INCVAL 4
 #endif
-#line 135
+#line 134
+
 #if (defined(JAPAN) || defined(KOREA)) && defined(i386)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // (JAPAN || KOREA) && i386
-#line 134
-
-
-
-
+#line 138
 
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 168
+#line 165
+
+
+
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 /*:::::::::::::::::::::: Initialise CGA text output ::::::::::::::::::::::::*/
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -134,8 +130,7 @@ void nt_init_text()
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: excluded original OR condition"
 #endif // JAPAN || KOREA
-#line 212
-
+#line 213
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -258,15 +253,9 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 #endif
 #line 383
 
-    /* A mode transition may emit an empty text dirty rectangle.  The NTVDM
-       console path implicitly filtered these, but the original bulk-copy
-       calculation below uses (height - 1), turning height == 0 into a huge
-       unsigned copy length in the standalone DIB host. */
     if (pScreenText == NULL || len <= 0 || height <= 0)
         return;
 
-    /* Host sharing storage follows the selected painter, not a fixed 80-column
-       Console allocation. Keep the original copying and source-stride path. */
     if (ScreenX < 0 || ScreenY < 0 || now_width <= 0 || now_height <= 0 ||
         !softpc_standalone_text_prepare(now_width, now_height))
         return;
@@ -311,7 +300,6 @@ void nt_text(int ScreenOffset, int ScreenX, int ScreenY,
 		org_height,clen);
     }
 
-    /* T99: gather the existing host cells from hardware odd/even planes. */
     to = &textBuffer[(ScreenY*now_width + ScreenX) * TEXT_INCVAL];
     for (lines = height; lines; lines--)
     {
@@ -458,7 +446,7 @@ void nt_cga_colour_med_graph_std(int offset, int screen_x, int screen_y,
 
 
     /* Build up DIB. */
-    inc = offset & 1 ? 7 : 1; /* T99: odd/even plane spacing. */
+    inc = offset & 1 ? 7 : 1;
     intelmem_ptr = get_chain2_screen_ptr(offset);
     graph_ptr = (ULONG *) ((UTINY *) sc.ConsoleBufInfo.lpBitMap +
                            (screen_y * bytes_per_scanline + screen_x));
@@ -633,5 +621,4 @@ void nt_cga_colour_hi_graph_huge(int offset, int screen_x, int screen_y,
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
 #line 2889
-
 

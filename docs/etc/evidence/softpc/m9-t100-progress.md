@@ -10619,3 +10619,106 @@ the mirror is observed. Only the identified declaration/constants/spacing and
 source-line boundary change; no keyboard conversion implementation changes.
 Frontier 456/472. The remaining 16 files and earlier qualified decisions keep
 S1/T100 open; no task closure is implied by full regression success.
+
+### File 457 nt_cga.c investigation (not a completed P)
+
+Fixed-XP comparison is now complete at the selected-text inventory level.
+Existing excluded bodies are omitted using matching conditional paths, without
+new IDs or exclusion accounting. Differences comprise the local BIGWIN undef,
+DIB contract include, spacing/line boundaries, text pointer/gather/stride,
+empty-region and allocation guards, a trailing trace comma, and the CGA
+odd/even pointer/increment mapping. No tracked production edit has been made.
+
+Task-owned copies use actual cached Ninja compiler flags and the actual VGA
+fixture linker inputs, replacing only the CGA object before the original static
+library. Neither cache objects nor published EXEs are overwritten. The current
+variant builds, links and passes the VGA fixture on both architectures.
+
+- Restoring the original trace comma fails both compilations: sub_note_trace4
+  receives seven arguments but its actual selected definition takes six.
+- Removing the local BIGWIN undef fails both compilations: host_def.h defines
+  BIGWIN and selects the established unsupported profile. This does not reopen
+  or account for the excluded implementation.
+- Coherently restoring the original text source pointer and both original copy
+  branches builds/links, but both runs fail the existing text-stride byte-content
+  comparison at vga_frame_smoke.c:392.
+- Coherently restoring the CGA pointer, 3/1 increment and XOR-2 alternation
+  builds/links, but both runs report mode 04/05 incremental/full mismatches and
+  fail colour_resolution_failures == 0 at vga_frame_smoke.c:2445.
+- Removing either the empty-region guard or the allocation guard passes the
+  unmodified VGA fixture on both architectures. This alone does not prove either
+  deletion safe. In particular verify_text_stride preallocates every size itself,
+  bypassing the production obligation under investigation.
+
+An additional private fixture changes the requested dimensions to 100x5 and
+calls the actual nt_text before any test-side prepare, then queries actual
+surface dimensions. Current CGA passes on both widths; the no-allocation
+variant fails columns == 100 && rows == 5 && stride == 100 on both. Thus the
+producer allocation call has direct evidence, not merely a historical rationale.
+The copied fixture has no new production entry or alternate broker/renderer.
+The observed negative exits are assertion failures (x86 fast-fail 3221226505,
+x64 3), not observation timeouts or manually reproduced guest failures.
+
+The empty-region guard's necessity and exact reducible formatting remain under
+review. Its old bulk-copy-underflow comment does not describe the current gather
+loop, which executes no cell copies for zero height. Actual caller preconditions
+and null/negative cases must be checked before disposition. File 457 remains
+unreviewed in the convergence ledger; no later file has been advanced. These
+probe results are not a delivered source change or approval of residual patches.
+
+
+## File 457 host/src/nt_cga.c (P148)
+
+The earlier investigation is resolved by actual empty-transition evidence:
+request 100x5 while the existing surface has the saved dimensions, then call
+nt_text with height zero. Current code preserves the old surface on x86/x64;
+removing the empty guard replaces it and fails the saved-dimensions assertion
+on both. This is premature surface replacement, not the obsolete bulk-copy
+underflow rationale. A positive-height call then creates the requested 100x5
+surface. Both checks now extend the existing verify_text_stride fixture; no
+production test entry, second rendering path or test-side prepare is added.
+
+Actual selected compilation is CCPU/C-VID with host_def.h defining BIGWIN;
+nt_graph.c's selected text and CGA painter tables call these original functions.
+The C-VID dirty producers in gfx_updt.c supply the source offsets and repaint
+rectangles; compat/dib_surface.c owns the dynamically sized host text surface.
+Its allocation is not a duplicate guest text renderer. All selected differences
+are reconciled below; existing excluded bodies are not inventoried.
+
+| Point | Initial analysis | Counter-review / disposition |
+| --- | --- | --- |
+| R0586 | Local BIGWIN undef and its explanatory paragraph. | Remove the non-original paragraph. Undef remains qualified pending: coherent removal selects the unsupported host profile and fails both actual compile commands. No excluded body is reopened. |
+| R0587 | dib_surface.h include. | Qualified pending with R0591: declares the actual host allocation contract used here; restoring original fixed Console allocation cannot supply the supported dynamic surface. |
+| R0588 | Selected spacing and mismatched source-line boundaries. | Restore exact original spacing and line positions, including EOF. No executable expression changes. |
+| R0589 | CHAIN2 text source pointer, cell gather, physical source pitch and dynamic destination pitch replace original bulk-copy branches. | Qualified pending: restoring the original pointer and both original branches together builds but fails text byte comparisons on both architectures. Existing matrix covers 40/80/100/132 columns, padded pitch and partial/full updates. Remove only the extra local gather comment. |
+| R0590 | Empty/null/nonpositive text guard. | Qualified pending: empty transition before allocation must preserve the existing surface; both negative variants fail, both current variants pass. Source inspection additionally shows negative height would not terminate the decrement-to-zero loop and null source is not readable; these are source proofs, not injected runtime cases. Remove the stale underflow rationale, keep the single existing guard. |
+| R0591 | Geometry validation and text surface prepare. | Qualified pending: direct positive-height production call must resize without fixture preparation; removing the guard fails the actual queried 100x5 dimensions on both architectures. Nonpositive dimensions are invalid for allocation and negative origins are invalid for the destination indexing; no separate workaround is introduced. Remove the misleading claim that copying remained original. |
+| R0592 | Removed trailing trace comma. | Qualified pending: exact original invocation has seven arguments versus the selected six-argument macro and fails both compilers. |
+| R0593 | CGA odd/even pointer plus 7/1 increments and XOR-6. | Qualified pending: coherent original pointer/3/1/XOR-2 restoration builds but fails mode 04/05 incremental versus full pixel comparisons on both architectures. Remove only the extra inline comment. |
+
+The before/after selected XP added+deleted difference is 95 -> 74, a reduction
+of 21 lines, using matching conditional paths and SequenceMatcher with autojunk
+false. Line-control directives are checked against the fixed XP positions,
+not treated as executable changes. Production +12/-25 (net -13), test +10/-3
+(net +7). Selected residuals above are evidence-qualified owner decisions, not
+automatically approved retention. No guest/manual reproduction is claimed by
+these host fixture results; no original guest, media or configuration changed.
+
+Final-source cached builds/publication pass: x86 9.23 s, x64 12.87 s. Background
+regression passes 188/188 on each architecture (147.25/149.38 s). x86 native
+passes 8/8. x64 native initially passes 6/8: the two package cases receive
+extra characters, showing `uodapause` and `eviewpause` instead of `pause`.
+This is observed input contamination, not evidence of a disconnected session
+or a renderer defect. The same binaries pass both isolated reruns in 5.50 s.
+Final coverage is 392/392, preserving the first-run failure disposition; this
+is not a claim of a completely clean first pass. No native verification deferred.
+
+Both published binaries are equivalent to P147 when masking only PE timestamp,
+checksum and the unique compiler-time string. Full tests were still executed.
+
+- x86 SHA-256: 63314d80a34b4fbd49506b45a8a0c0b188749aafaa50858f9b48c7537c5a4ed3
+- x64 SHA-256: f30606e9c012cdf363558ccd94d0ea31dafd0cee0368ea18d8a5b8667b3db7de
+
+Actual-diff review confirms no executable production change and no new
+mirror difference. Frontier 457/472; next is host/src/nt_ega.c. Fifteen files
+and qualified owner decisions remain open; S1/T100 are not closed.

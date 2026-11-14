@@ -2424,3 +2424,11 @@ enabled. All selected content matches XP and ten selected diff lines disappear.
 The earlier removal of these header declarations is no longer a retained patch;
 historical provider exclusions are not reopened by this declaration restoration.
 See [ordered evidence](m9-t100-progress.md#file-456-hostincnt_uish-p147).
+
+
+T100 S1 P148 restores selected nt_cga.c spacing/source-line correspondence and
+removes obsolete local explanations, reducing selected XP diff by 21 lines.
+The old empty-region bulk-copy-underflow rationale is superseded by direct
+empty-resize surface-preservation evidence. Text/CGA layout, allocation and
+compile-contract residuals R0586-R0593 remain qualified owner decisions.
+See [ordered evidence](m9-t100-progress.md#file-457-hostsrcnt_cgac-p148).

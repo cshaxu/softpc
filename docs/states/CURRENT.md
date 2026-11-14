@@ -30,14 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P147 restores nt_uis.h declarations/constants and original spacing:
-all selected content matches fixed XP; ten fewer selected diff lines.
-Production +10/-2, no test source changes. Cached dual builds/publication and
-full regression pass: 188 background plus eight native tests per architecture,
-392/392 total. The owner returned to the desktop; no native tests remain
-deferred for this baseline. Frontier 456/472; next is host/src/nt_cga.c.
-Earlier qualified owner decisions and 16 remaining files keep S1/T100 open.
-See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-456-hostincnt_uish-p147).
+T100 S1 P148 completes nt_cga.c selected-difference investigation and restores
+original spacing while removing obsolete local explanations: 21 fewer XP diff
+lines. Production +12/-25, test +10/-3. Cached dual builds/publication pass;
+all 392 tests pass after rerunning two x64 package cases whose first run received
+extraneous keyboard input. No native coverage remains deferred. Actual original
+restoration and guard-removal probes qualify R0586-R0593 dispositions; semantic
+residuals remain owner decisions, not automatically approved retention.
+Frontier 457/472; next is host/src/nt_ega.c. Fifteen files and earlier decisions
+keep S1/T100 open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-457-hostsrcnt_cgac-p148).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

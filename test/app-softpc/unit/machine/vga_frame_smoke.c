@@ -367,6 +367,15 @@ static void verify_text_stride(void)
     for (unsigned i = 0; i < sizeof(source); ++i) source[i] = (unsigned char)(i * 37u + i / 11u);
     set_screen_ptr(source);
     now_height = 5;
+    now_width = 100;
+    set_chars_per_line(100);
+    set_offset_per_line(200);
+    nt_text(0, 0, 0, 200, 0);
+    assert(softpc_standalone_text_surface(&cells, &columns, &rows, &stride, &cell_bytes));
+    assert(columns == (unsigned)saved_width && rows == (unsigned)saved_height && stride == columns);
+    nt_text(0, 0, 0, 200, 1);
+    assert(softpc_standalone_text_surface(&cells, &columns, &rows, &stride, &cell_bytes));
+    assert(columns == 100u && rows == 5u && stride == 100u);
     for (unsigned mode = 0; mode < sizeof(widths)/sizeof(widths[0]); ++mode)
     for (int pitch = widths[mode]; pitch <= widths[mode]+10; pitch += 10)
     for (int partial = 0; partial < 2; ++partial)
@@ -2188,9 +2197,7 @@ int main(void)
         }
     }
 
-    /* The C-VID mode-transition path can emit an empty text repaint.  The
-       original nt_text bulk-copy calculation must discard it rather than
-       treating (height - 1) as an enormous byte count. */
+    /* The C-VID mode-transition path can emit an empty text repaint. */
     nt_text(0, 0, 0, 160, 0);
 
     /* The V7 ROM hands INT 10h extension 6Fh to the original EGA BOP 42h.
