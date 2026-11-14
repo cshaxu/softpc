@@ -8239,3 +8239,87 @@ uses LF. User INI is unchanged and guest/media/snapshot files are untouched.
 The owned background process exited. Frontier advances to 410/472; next 411
 base/system/rom.c. R0495/R0496 and earlier qualified decisions remain open;
 no task closure or complete snapshot correctness is claimed.
+
+
+## File 411: base/system/rom.c (P114)
+
+Pinned XP raw SHA-256 dce7d1cfce5bbe7f8c27cbebe1f5a4294f882a8d148618cdb0a78aa485de62a4.
+Whole-file review outside existing excluded bodies/line-control scaffold finds
+three selected difference groups. Original notices are already intact.
+Existing exclusions receive no new accounting.
+
+R0498, XP257 / initial local239-240: restore the original ULONG conversion of
+config_inquire(C_GFX_ADAPTER, NULL) and remove the added portability comment.
+The actual Compat platform.c provider returns SOFTPC_VGA_ADAPTER, constant 5,
+encoded through void *. No pointer is dereferenced or needs to survive the
+conversion. Original consumers in reset.c, cmos.c and keyba.c already use the
+original ULONG form. A native-pointer-width conversion is not necessary for
+this scalar domain; a warning alone does not establish changed semantics.
+
+R0499, XP585 / initial local442: retain the removal of the original UCHAR cast
+from setCS((addr & 0xf0000) >> 4), qualified pending owner decision. The actual
+reset.c path calls search_for_roms, which checks signatures/checksums, pushes
+the original FE00:095A return trampoline, sets CS/IP and invokes host_simulate.
+For an option ROM at C8000, the entry is C000:8003. The original eight-bit cast
+turns C000 into 0000, selecting physical 08003 instead of C8003. This is a
+concrete segment-address error, not a host x64 representation requirement.
+The existing device_contract_rom test installs a generated 512-byte valid ROM
+whose entry stores its actual CS at physical 0500 and returns through the
+original trampoline; expected bytes are 00 C0. It uses the real scanner and
+CPU, not an arithmetic-only mock. No original guest binary or firmware asset
+is modified. Current-source proof does not imply all option-ROM layouts or
+all protected-mode scenarios were tested. Residual XP difference is +1/-1.
+
+R0500, XP799/828/851/871 / initial local618-620/649-650/674-675/687:
+restore original IU32 endLinAddr, original strlen-based calculation/loop and
+cur_loc update, removing the added size_t/stringLength adaptation and comment.
+Whole src/test symbol search finds only display_string and clear_string in
+this original file (the latter calls the former), with no external production
+or test consumer. No supported caller requires a host-size-length expansion
+or cached strlen. Restoring the complete original group avoids retaining a
+partial adaptation. Original empty copyROM/update_romcopy and other functions
+are kept; no extra deletion differences are introduced.
+
+Counter-review: root CMake still compiles rom.c, original ccpusas4.c SAS initialization loads ROM through
+rom_init/read_video_rom, while reset.c calls the scanner. The embedded-resource host
+provider remains the host boundary, not a competing ROM initialization
+implementation. Necessary CS correction is preserved; no renderer or Compat
+rewrite substitutes for original logic. Source +5/-10, tests unchanged;
+XP-relative diff decreases by 15 added/deleted lines, not merely net five
+source lines. Remaining selected difference is solely R0499.
+
+Final-source cached dual-architecture build/publication and regression are in
+progress. x86 has nonmetadata executable changes, so full regression is run;
+no source-equivalence claim substitutes for actual artifact comparison.
+Frontier remains 410/472 until verification and complete delivery.
+
+### P114 final-source verification and independent review
+
+Both final cached builds/publications succeed and both EXEs have nonmetadata
+changes, so the complete regression is run on each architecture. x86 passes
+188 background tests in 141.97 seconds and eight native tests in 15.82 seconds;
+x64 passes 188 background in 137.64 seconds and eight native in 15.56 seconds:
+392/392. Both real device_contract_rom tests pass. This verifies the current
+retained CS correction through generated-ROM execution; original failure is
+proved here by the exact address truncation, not a newly run original-code
+negative or a claimed DOS/Windows guest symptom.
+
+x86: compiler timestamp 17:49:06 Nov 13 2026, SHA-256 5b4f9c57becd81c3c91dd1668a298e8c04321f4cf5eff124a5588afbc5b41de2.
+
+x64: compiler timestamp 17:51:55 Nov 13 2026, SHA-256 3476ba2577d9cb62f124076b03f62a82f1237fe268be896bd1a3d9c3b5f5023c.
+
+Independent review confirms the five exact XP statement restorations and
+removal of the two corresponding added comments. Source +5/-10, tests zero;
+raw-baseline comparison delta is -10 added/-5 deleted, reducing mirror diff
+by 15 lines. Only the CS conversion remains as a selected-code difference.
+All other mismatches belong to already excluded bodies/scaffolding and receive
+no new records. No replacement implementation, fallback or new mirror point.
+
+Build warnings: x86 89 and x64 90, all originating in preserved mirror paths;
+this is not a warning-free claim. The original scalar conversion adds the
+expected x64 pointer-width diagnostic without changing its actual value domain.
+No warning suppression or unrelated original-code cleanup is added. Mirror
+CRLF, normalized manifest and documentation LF are preserved. User INI is
+byte-unchanged, guest/media/snapshot files untouched, owned job exited.
+Frontier advances to 411/472; next 412 base/system/timer.c. R0499 and earlier
+qualified decisions remain open. S1 remains active.

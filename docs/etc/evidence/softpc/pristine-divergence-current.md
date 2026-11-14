@@ -2228,3 +2228,13 @@ Remove six added explanation lines before the snapshot extension (source
 pending decisions R0496/R0495 in the T100 evidence, not automatically approved
 retention. Actual archive consumers and original API limitations are recorded
 there. Existing excluded bodies/scaffolding are not re-audited or counted.
+
+
+### T100 S1 P114 rom.c original-first restoration
+
+Supersede DIV-075/DIV-076 retention for rom.c: restore the original scalar
+conversion and display_string implementation. Source +5/-10; XP-relative
+added/deleted difference decreases by 15 lines. The original XP UCHAR ROM
+segment truncation remains corrected as qualified pending decision R0499;
+real scanner/reset consumers and the generated-ROM execution oracle are
+recorded in T100 evidence. No excluded-body accounting or new mirror point.
