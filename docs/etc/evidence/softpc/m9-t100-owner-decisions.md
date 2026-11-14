@@ -34,9 +34,16 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 64 / R0042-R0050 | Nine flag getter return declarations, IBOOL to ISM32 (+1/-1 each). | Match original c_reg.c providers; type consistency, not a claimed reproduced guest fault. | Owner approves retention, S3 P6 |
 | 73 / R0051 | Internal c_getEFLAGS declaration (+1/-0). | Actual provider returns IU32 and internal callers require the matching prototype. | Retained under owner small-diff delegation, S3 P6 |
 | 74 / R0053 | Include snapshot.h (+1/-0). | Actual capture/restore definitions require the shared state declaration; this does not approve their larger bodies. | Retained under owner small-diff delegation, S3 P6 |
-| 74 / R0054 | Capture private breakpoint state (+20/-0 including separator). | Registers alone cannot reproduce original cached breakpoint state. | Pending |
-| 74 / R0055 | Restore private breakpoint state (+24/-0 including separator). | Preserve cache/count state with bounds on the original four-entry arrays. | Pending |
+| 74 / R0054 | Capture private breakpoint state (+20/-0 including separator). | Registers alone cannot reproduce original cached breakpoint state. | Owner approves retention in the owning mirror file, S3 P7 |
+| 74 / R0055 | Restore private breakpoint state (+24/-0 including separator). | Preserve cache/count state with bounds on the original four-entry arrays. | Owner approves retention in the owning mirror file, S3 P7 |
 | 78 / R0057 | Reject PIC -1 sentinel in do_intrupt (+2/-0). | Original NPX caller lacks c_main's filter; real PIC/interrupt test checks unchanged stack/registers. | Retained under owner small-diff delegation, S3 P6 |
+| 80 / R0059 | Select original TLS simulation header (+1/-1). | Selected SOFTPC_CCPU_TLS_SIMSTACK build uses the original TLS/setjmp path; no second interpreter. | Retained under owner small-diff delegation, S3 P7 |
+| 80 / R0060-R0068 | Nine headers/typed declarations (+1/-0 each). | Actual address, lifecycle, segment, PIC, timer, snapshot, Yoda, NPX and executor consumers require their declarations. | Retained under owner small-diff delegation, S3 P7 |
+| 80 / R0070-R0075 | Six host event/budget/pacing/wait declarations (+1/-0 each). | Current original-loop calls match actual Compat platform.c providers. | Retained under owner small-diff delegation, S3 P7 |
+| 80 / R0076 | Two debug observer declarations (+2/-0). | Actual begin/retired calls match machine/debug.c providers. | Retained under owner small-diff delegation, S3 P7 |
+| 80 / R0077 | Return private interrupt-map address (+6/-0 including separator blanks). | Actual cold-run lifecycle clears the original map through this accessor; original timer-bit clear does not clear all pending bits. | Pending |
+| 80 / R0078 | Capture private execution state (+16/-0 including separator). | Preserve DR/TR, pending interrupt map and sampled start_trap. | Pending |
+| 80 / R0079 | Restore private execution state (+17/-0 including separator). | Restore saved state and discard transient quick_mode before refetch. | Pending |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -46,14 +53,19 @@ permission and fallback-width points (+11/-11), followed by R0038-R0050.
 Owner additionally delegates strongly evidenced points of at most two changed
 lines. Count added plus deleted lines per existing point, never net growth or
 artificially split functions. R0051/R0053/R0057 meet that rule after individual
-provider/caller/state checks. S3 P6 records 37/381 retained (34 explicit and
-three delegated), zero restoration decisions, 344 pending; notices stay separate.
+provider/caller/state checks. Owner then approves R0054/R0055 after reviewing
+the full diff and why private-state access belongs in c_debug.c. S3 P7 also
+retains seventeen qualifying c_main.c header/declaration/TLS points (+18/-1)
+under the same delegation. Progress: 56/381 retained (36 explicit and twenty
+delegated), zero restoration decisions, 325 pending; notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next manual decisions R0054/R0055 total
-+44/-0. Actual archive callers, private arrays, task-switch DR7 update and
-checkpoint_smoke's existing cache/register distinction are rechecked. No fresh
-dynamic run is claimed for approval bookkeeping and no larger block is approved
-merely because its include is covered by the delegated rule.
+stays the single detailed inventory. Next manual decisions R0077-R0079 total
++39/-0; counts are checked against pinned XP surrounding lines. The map accessor
+returns a mutable pointer, not a bounded clear operation; its actual consumer
+only clears the map. Do not claim this API shape is the sole possible design.
+Archive capture/restore callers and original CPU private state are rechecked.
+No fresh dynamic run is claimed for approval bookkeeping and no larger block
+is approved merely because its include/declaration is covered by delegation.
 
 ## Coverage and decision rules
 
