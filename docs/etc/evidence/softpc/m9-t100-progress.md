@@ -10936,3 +10936,93 @@ none outside the mirror. Manifest, documentation and whitespace checks pass.
 Mirror CRLF and own-code/docs LF are preserved. Owner decisions R0602/R0603,
 R0605/R0609/R0611/R0613/R0614 remain open. Completed frontier 459/472, next
 host/src/nt_keycd.c; thirteen files and earlier decisions keep S1/T100 open.
+
+## File 460: host/src/nt_keycd.c (P151 investigation)
+
+The actual device object is linked into softpc-machine and consumed by
+machine/input.c: vm_keyboard_inject_machine_event constructs a private
+KEY_EVENT_RECORD, masks the supplied scan code to eight bits, and calls
+KeyMsgToKeyCode. The original tables are the single mapping implementation.
+Whole src/test search finds no caller of BiosKeyToInputRecord and no duplicate
+BIOS-buffer-to-host-input conversion in Compat; nt_uis.h retains its declaration.
+
+Private copies use the actual Ninja device compiler flags and replace only
+nt_keycd's archive member at link time for the existing keycode fixture.
+Both x86 and x64 compile, link and pass the fixture with the original
+NULLCHARSCAN/aNullCharScan and aNumPadSCode restored verbatim. Their prior
+omission has no demonstrated necessity. Restoration does not introduce a
+caller or change key delivery.
+
+Restoring the original three NT includes fails at missing nt.h on both
+architectures. Restoring the complete BIOS function together with its original
+tables, while keeping the existing Windows include, compiles but cannot link:
+RtlOemToUnicodeN and NT_SUCCESS are unresolved on both widths. This is a
+selected-host dependency omission, not proof of an original BIOS algorithm bug.
+No native RTL replacement, new import wiring or duplicate converter was added.
+
+The two original greater-than table guards are tested separately with actual
+KeyMsgToKeyCode and -fsanitize=bounds -fsanitize-undefined-trap-on-error.
+Each architecture accepts both guarded current calls (regular index 133,
+extended index 84), while each restored original call terminates with
+0xC000001D at the compiler-inserted bounds trap. These are isolated synthetic
+boundary inputs, not a recorded desktop keyboard incident. The ordinary
+production caller's eight-bit mask does not independently bound either table.
+The first experimental sanitizer link required unavailable libubsan; that
+attempt supplies no runtime evidence. Trap instrumentation avoids that missing
+runtime. Separate processes ensure the first failure does not hide the second.
+
+Executor proposal: restore original standalone tables and nonsemantic spacing;
+retain the existing two >= repairs and the necessary NT-dependent omission as
+qualified owner decisions. Current full qualification remains in progress;
+no completed frontier advance or delivery is claimed by this entry.
+
+## File 460 host/src/nt_keycd.c (P151)
+
+All selected differences are reconciled against pinned XP. Existing excluded
+bodies remain untouched and uncounted. No duplicate Compat implementation or
+new product input path is introduced.
+
+| Point | Original/current anchors | Executor analysis and counter-review disposition |
+| --- | --- | --- |
+| R0617 | XP 10-12; current before windows.h | Qualified pending: omission of nt.h/ntrtl.h/nturtl.h. Coherent original include restoration fails at unavailable nt.h on both supported toolchains. Remove the non-original standalone summary; retain accurate original line mapping. Coupled NT conversion omission is R0621. |
+| R0618 | XP 575-697; current original BIOS conversion tables | Restore all original declarations, data and spacing verbatim. Original tables compile/link and existing mapping tests pass on both architectures. Unused data alone does not justify keeping this 123-line omission. |
+| R0619 | XP 713/788/818; current 432/459/477 | Qualified pending: one local explanation and two >= repairs, five selected diff lines total. Original > admits indices equal to 133/84-byte arrays. Both distinct boundaries trap in actual original function on both widths; current guards return zero. No second mapper or caller workaround. |
+| R0620 | Selected spacing adjacent to declarations/conditions | Restore exact original blank lines, including the two found in final review. Necessary diagnostic anchors are adjusted accordingly; no executable behavior changes. |
+| R0621 | XP 828-995; current EOF | Qualified pending: original BiosKeyToInputRecord omission (168 lines). Restore its tables and function together in the isolated object: actual fixture linkage fails on RtlOemToUnicodeN and NT_SUCCESS on both widths. Full original headers are also unavailable (R0617). No production caller or equivalent Compat converter exists. Retention concerns the selected host ABI, not a claimed defect in the original function. |
+
+Independent counter-review checked every non-excluded diff opcode, including
+adjacent selected content, original source mapping and actual consumer scope.
+Final selected residuals are exactly three missing NT includes, the five-line
+bounds repair, and the missing BIOS conversion function. Existing exclusions
+receive no new identifiers or accounting. There is no new semantic difference;
+R0617/R0619/R0621 remain owner decisions, not approved retention.
+
+Production source: +128/-5, net +123; tests: +0/-0. Original-relative
+added+deleted selected diff decreases 127 lines. This is restored original
+source, not a source-line reduction. Measurement uses normalized line endings,
+ignores necessary line directives, and verifies unchanged excluded regions
+cancel from the before/after delta. No exclusion-body totals are recorded.
+
+### P151 verification and delivery
+
+Cached builds pass: x86 9.53 s and x64 13.07 s. Background full suites pass
+188/188 on each width (188.12/148.38 s); native Console/Window, audio and package
+suites pass 8/8 on each width (16.34/15.78 s). Total 392/392; no native test is
+deferred and no original failure is hidden by retry.
+
+Final exact blank-line restoration is followed by cached rebuilds (9.07/9.76 s)
+and 4/4 focused checks per width (keycode, runtime input continuation, mirror
+and mirror selftest; 3.51/3.85 s). Both final EXEs equal the fully qualified
+candidate after masking only PE COFF timestamp, PE checksum and the unique
+NUL-terminated compiler-time literal. No other byte is ignored. All four
+incremental build logs contain zero warnings; this does not assert warning-free
+recompilation of every cached original source.
+
+- Final x86 SHA-256: 8938e3be62c517ea3cd101d98d514430a39b6fcfa3a98dc6f8ace24cad07934d
+- Final x64 SHA-256: 0608c054bf12f2ef2f4b88fc7d07850b0ee4a02b90a2d864430e2e6f53209bfe
+
+Manifest and documentation gates and whitespace checks pass. Mirror CRLF and
+own-document LF are preserved. The task scratch is removed after promoting
+these results and verifying all owned jobs have exited. Completed frontier
+460/472; next host/src/nt_munge.c. Twelve files and outstanding owner decisions
+keep S1/T100 open.

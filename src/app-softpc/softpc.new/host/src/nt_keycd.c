@@ -7,7 +7,7 @@
  *  FUNCTIONS	: KeyMsgToKeyCode()					   *
  *									   *
  ****************************************************************************/
-/* Standalone uses the original key tables, without NT BIOS conversion. */
+#line 13
 
 #include "windows.h"
 
@@ -291,7 +291,129 @@ BYTE Scan1ToKeynumExtended[] =
 
 };
 #endif // !NEC_98
-#line 698
+
+
+
+/*
+ *  Table for translating BiosBuffer scan codes with special
+ *  NULL ascii chars, and their associated control flags
+ *  If it is not in this table The Bios scan code should
+ *  be the same as the win32 Scan code.
+ */
+#define FIRST_NULLCHARSCAN      0x54
+#define LAST_NULLCHARSCAN       0xa6
+
+typedef struct _NullAsciiCharScan {
+    WORD    wWinSCode;
+    DWORD   dwControlState;
+} NULLCHARSCAN;
+
+NULLCHARSCAN aNullCharScan[] =
+{
+// WinSCode    dwControlState           BiosSCode      Keys
+
+      0x3b,    SHIFT_PRESSED,           //  0x54       Shift+F1
+      0x3c,    SHIFT_PRESSED,           //  0x55       Shift+F2
+      0x3d,    SHIFT_PRESSED,           //  0x56       Shift+F3
+      0x3e,    SHIFT_PRESSED,           //  0x57       Shift+F4
+      0x3f,    SHIFT_PRESSED,           //  0x58       Shift+F5
+      0x40,    SHIFT_PRESSED,           //  0x59       Shift+F6
+      0x41,    SHIFT_PRESSED,           //  0x5a       Shift+F7
+      0x42,    SHIFT_PRESSED,           //  0x5b       Shift+F8
+      0x43,    SHIFT_PRESSED,           //  0x5c       Shift+F9
+      0x44,    SHIFT_PRESSED,           //  0x5d       Shift+F10
+      0x3b,    LEFT_CTRL_PRESSED,       //  0x5e       Ctrl+F1
+      0x3c,    LEFT_CTRL_PRESSED,       //  0x5f       Ctrl+F2
+      0x3d,    LEFT_CTRL_PRESSED,       //  0x60       Ctrl+F3
+      0x3e,    LEFT_CTRL_PRESSED,       //  0x61       Ctrl+F4
+      0x3f,    LEFT_CTRL_PRESSED,       //  0x62       Ctrl+F5
+      0x40,    LEFT_CTRL_PRESSED,       //  0x63       Ctrl+F6
+      0x41,    LEFT_CTRL_PRESSED,       //  0x64       Ctrl+F7
+      0x42,    LEFT_CTRL_PRESSED,       //  0x65       Ctrl+F8
+      0x43,    LEFT_CTRL_PRESSED,       //  0x66       Ctrl+F9
+      0x44,    LEFT_CTRL_PRESSED,       //  0x67       Ctrl+F10
+      0x3b,    LEFT_ALT_PRESSED,        //  0x68       Alt+F1
+      0x3c,    LEFT_ALT_PRESSED,        //  0x69       Alt+F2
+      0x3d,    LEFT_ALT_PRESSED,        //  0x6a       Alt+F3
+      0x3e,    LEFT_ALT_PRESSED,        //  0x6b       Alt+F4
+      0x3f,    LEFT_ALT_PRESSED,        //  0x6c       Alt+F5
+      0x40,    LEFT_ALT_PRESSED,        //  0x6d       Alt+F6
+      0x41,    LEFT_ALT_PRESSED,        //  0x6e       Alt+F7
+      0x42,    LEFT_ALT_PRESSED,        //  0x6f       Alt+F8
+      0x43,    LEFT_ALT_PRESSED,        //  0x70       Alt+F9
+      0x44,    LEFT_ALT_PRESSED,        //  0x71       Alt+F10
+      0,       0,                       //  0x72       Ctrl+PrtSc
+      0x4b,    LEFT_CTRL_PRESSED,       //  0x73       Ctrl+Left
+      0x4d,    LEFT_CTRL_PRESSED,       //  0x74       Ctrl+Right
+      0x4f,    LEFT_CTRL_PRESSED,       //  0x75       Ctrl+End
+      0x51,    LEFT_CTRL_PRESSED,       //  0x76       Ctrl+PgDn
+      0x47,    LEFT_CTRL_PRESSED,       //  0x77       Ctrl+Home
+      0x2,     LEFT_ALT_PRESSED,        //  0x78       Alt+1
+      0x3,     LEFT_ALT_PRESSED,        //  0x79       Alt+2
+      0x4,     LEFT_ALT_PRESSED,        //  0x7a       Alt+3
+      0x5,     LEFT_ALT_PRESSED,        //  0x7b       Alt+4
+      0x6,     LEFT_ALT_PRESSED,        //  0x7c       Alt+5
+      0x7,     LEFT_ALT_PRESSED,        //  0x7d       Alt+6
+      0x8,     LEFT_ALT_PRESSED,        //  0x7e       Alt+7
+      0x9,     LEFT_ALT_PRESSED,        //  0x7f       Alt+8
+      0xa,     LEFT_ALT_PRESSED,        //  0x80       Alt+9
+      0xb,     LEFT_ALT_PRESSED,        //  0x81       Alt+0
+      0xc,     LEFT_ALT_PRESSED,        //  0x82       Alt+-
+      0xd,     LEFT_ALT_PRESSED,        //  0x83       Alt+=
+      0x49,    LEFT_CTRL_PRESSED,       //  0x84       Ctrl+PgUp
+      0,       0,                       //  0x85       ?????
+      0,       0,                       //  0x86       ?????
+      0x85,    SHIFT_PRESSED,           //  0x87       Shift+F11
+      0x86,    SHIFT_PRESSED,           //  0x88       Shift+F12
+      0x85,    LEFT_CTRL_PRESSED,       //  0x89       Ctrl+F11
+      0x86,    LEFT_CTRL_PRESSED,       //  0x8a       Ctrl+F12
+      0x85,    LEFT_ALT_PRESSED,        //  0x8b       Alt+F11
+      0x86,    LEFT_ALT_PRESSED,        //  0x8c       Alt+F12
+      0x48,    LEFT_CTRL_PRESSED,       //  0x8d       Ctrl+Up
+      0x4a,    LEFT_CTRL_PRESSED,       //  0x8e       Ctrl+-
+      0x4c,    LEFT_CTRL_PRESSED,       //  0x8f       Ctrl+5
+      0x4e,    LEFT_CTRL_PRESSED,       //  0x90       Ctrl++
+      0x50,    LEFT_CTRL_PRESSED,       //  0x91       Ctrl+Down
+      0x52,    LEFT_CTRL_PRESSED,       //  0x92       Ctrl+Ins
+      0x53,    LEFT_CTRL_PRESSED,       //  0x93       Ctrl+Del
+      0,       0,                       //  0x94       ?????
+      0,       0,                       //  0x95       ?????
+      0,       0,                       //  0x96       ?????
+      0x47,    LEFT_ALT_PRESSED,        //  0x97       Alt+Home
+      0x48,    LEFT_ALT_PRESSED,        //  0x98       Alt+Up
+      0x49,    LEFT_ALT_PRESSED,        //  0x99       Alt+PgUp
+      0,       0,                       //  0x9a       ?????
+      0x4b,    LEFT_ALT_PRESSED,        //  0x9b       Alt+Left
+      0,       0,                       //  0x9c       ?????
+      0x4d,    LEFT_ALT_PRESSED,        //  0x9d       Alt+Right
+      0,       0,                       //  0x9e       ?????
+      0x4f,    LEFT_ALT_PRESSED,        //  0x9f       Alt+End
+      0x50,    LEFT_ALT_PRESSED,        //  0xa0       Alt+Down
+      0x51,    LEFT_ALT_PRESSED,        //  0xa1       Alt+PgDn
+      0x52,    LEFT_ALT_PRESSED,        //  0xa2       Alt+Ins
+      0x53,    LEFT_ALT_PRESSED,        //  0xa3       Alt+Del
+      0,       0,                       //  0xa4       ?????
+      0xf,     LEFT_ALT_PRESSED,        //  0xa5       Alt+Tab
+      0x1c,    LEFT_ALT_PRESSED         //  0xa6       Alt+Enter
+};
+
+
+WORD aNumPadSCode[] = // index by VK_NUMPAD0 as zero offset
+{
+    0x52,      // VK_NUMPAD0 - 60
+    0x4f,      // VK_NUMPAD1   61
+    0x50,      // VK_NUMPAD2   62
+    0x51,      // VK_NUMPAD3   63
+    0x4b,      // VK_NUMPAD4   64
+    0x4c,      // VK_NUMPAD5   65
+    0x4d,      // VK_NUMPAD6   66
+    0x47,      // VK_NUMPAD7   67
+    0x48,      // VK_NUMPAD8   68
+    0x49       // VK_NUMPAD9   69
+};
+
+
+
 
 
 
@@ -328,12 +450,12 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 #endif // JAPAN
 #line 739
 	/*............................... the regular keyset is what we need */
-
 #line 740
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 788
+#line 787
+
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynum)
 		   ? 0
                    : Scan1ToKeynum[KeyEvent->wVirtualScanCode];
@@ -349,7 +471,8 @@ BYTE KeyMsgToKeyCode(PKEY_EVENT_RECORD KeyEvent)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
-#line 817
+#line 816
+
 
         return  KeyEvent->wVirtualScanCode >= sizeof(Scan1ToKeynumExtended)
 		   ? 0

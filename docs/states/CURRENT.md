@@ -30,16 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P150 restores nt_graph.c's original reset body, soft_reset/fullscreen
-checks and unused stream state/function, plus original selected formatting.
-Actual production remains WINDOWED; tests no longer manufacture FULLSCREEN.
-Six/eight-bit DAC tests cover real port writes. Production +35/-41, tests
-+34/-14; selected XP diff decreases 70 lines. Dual cached builds/publication
-and 392/392 complete tests pass; final nonsemantic/declaration minimization
-passes dual rebuilds, strict artifact equivalence and 4/4 focused tests per width.
-No native coverage deferred. Frontier 459/472; next is host/src/nt_keycd.c.
-Thirteen files and qualified owner decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-459-hostsrcnt_graphc-p150).
+T100 S1 P151 restores nt_keycd.c's original BIOS conversion tables and selected
+spacing. Production +128/-5, tests unchanged; selected XP diff decreases 127
+lines. Actual table consumers and original NT dependencies are checked on both
+widths; boundary repair and NT omissions remain qualified owner decisions.
+Dual cached builds/publication and 392/392 complete tests pass. Final exact
+spacing restoration passes dual rebuilds, strict artifact equivalence and 4/4
+focused checks per width. No native coverage deferred. Frontier 460/472; next
+is host/src/nt_munge.c. Twelve files and qualified owner decisions keep S1/T100
+open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-460-hostsrcnt_keycdc-p151).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

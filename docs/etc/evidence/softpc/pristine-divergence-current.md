@@ -2449,3 +2449,11 @@ Original selected formatting is restored and the DAC declaration is minimized.
 Selected XP diff decreases 70 lines. Static declarations, host update pairing,
 packed selection/width and DAC conversion remain qualified owner decisions.
 See [ordered evidence](m9-t100-progress.md#file-459-hostsrcnt_graphc-p150).
+
+
+T100 S1 P151 restores nt_keycd.c's original BIOS conversion tables and selected
+spacing: 127 fewer XP diff lines, production +128/-5, no test changes. The
+three missing NT includes, original BIOS converter omission and two table-bound
+repairs remain qualified owner decisions R0617/R0619/R0621, supported by dual
+compiler/linker and independent bounds-trap evidence. No new input path exists.
+See [ordered evidence](m9-t100-progress.md#file-460-hostsrcnt_keycdc-p151).
