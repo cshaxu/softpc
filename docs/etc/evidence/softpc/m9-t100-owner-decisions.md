@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-427 only. Positions 428-472, original
+This view currently reconciles positions 1-431 only. Positions 432-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1763,6 +1763,101 @@ Eight semantic IDs are added: cumulative 283 residuals (280 semantic, three
 compiler/format), eighteen notice items unchanged. This reconciliation edits
 only task records; code/tests/EXEs are unchanged, and owner decisions stay open.
 
+## Positions 428-431: VGA selection, controller state and BIOS addressing
+
+All four current normalized files match final P134 committed contents. Source
+checks confirm packed/planar conditions, four raw V7 snapshot cases with all
+other reads delegated to original handlers, cursor disable/reversed guards and
+original BIOS implementation. P132-P134 final results qualify the following
+existing residuals without adding new patches or new runtime claims.
+
+### R0539-R0541: display units independent of CPU addressing
+
+R0539 retains four-byte packed V7 address units while CPU chain4 is off.
+R0540 keeps planar 256-colour per-plane stride independent of CPU odd/even;
+R0541 uses the same units for wrapping. Three individual original-condition
+restorations and one coherent all-three restoration compile/link, then fail
+actual stride/wrap assertions on both architectures. Negative execution stops
+at the first failure, not proof of all later matrix members.
+
+Register reachability was separately checked: BIOS mode 13, V7 unlock, FC/SR4/
+GC/CRTC writes produce colour=1, chain4=0, sequential_chain4=0, stride 80,
+start 49664. Original R0540 yields stride 160 instead of 80; original R0541 yields
+wrap 0 even though 49664+16000 exceeds 65536. This supplements direct-state
+matrix coverage with original register paths. R0538 removed two explanations
+and a local-only V7 wrapper; supported targets already define V7VGA. Six XP
+difference lines were removed, leaving three +1/-1 conditions. No non-V7
+support or alternate chooser is claimed. Final VGA tests passed and EXEs were
+metadata-equivalent, with no new full-suite run in P132.
+
+### R0543: complete copied controller state with original port reuse
+
+The BIOS vga_int_1C service cannot substitute for this archive: its guest-memory
+record omits V7/live latches/DAC phase and mutates indices. Existing archive
+captures these private fields on the executor and restores through original
+port handlers. The reduced getter reuses vga_extn_inb for 24 of 28 V7 registers,
+preserving selector index. A5/F3/FE mask raw bits and F9 exposes a subfield, so
+four direct raw reads remain; side-effecting F0/F2 are not selected.
+Private actual-body fixtures check all 28 registers at every byte value (7,168
+assertions/run) and preserved indices, then run the full VGA fixture on both
+widths. This is not an exhaustive guest snapshot or malformed-archive proof.
+
+R0542 removed duplicate getters and five dead initialization writes: vga_init
+already sets DAC mask/bits, phase/address values have no intervening reader,
+and the temporary selector is overwritten before use. Required protection and
+zero-state/chain initialization remain because change-only original handlers
+otherwise preserve unrelated derived state; independent removal probes fail
+set-reset, character-height and double-pixel assertions. Snapshot schema is
+unchanged. This is reduced same-owner serialization, not a Compat substitute.
+
+### R0544-R0548: cursor, underline and panning
+
+R0544 retains VGA disabled/reversed/out-of-font hiding, zero-end correctness
+and inclusive normal end. R0542 restored original equal/reversed blocks and
+bounds/assertion spelling: reversed remains unreachable behind hiding, and
+equal range correctly produces one scanline. Current 8/14/16/32-height fixtures
+pass; coherent original shape/register restoration fails actual visibility.
+R0545 stores the entire cursor-start byte, so a disable-only write is not lost
+by comparing only start bits then reading the old disable flag. Its separate
+original-register negative fails on both widths.
+R0546 requests existing refresh on underline-only writes; original restoration
+fails the produced-frame assertion. R0547 provides line-specific panning,
+zero below the split, to original host painters and dirty updater. The isolated
+raw-only helper negative fails pixels; it is expressly not coherent restoration
+of every coupled painter change. R0548 refreshes split/horizontal-pan register
+changes even with unchanged VRAM; separate original negatives fail dirty tests.
+No second drawing or cursor-clock path is introduced.
+
+P133 reduced selected XP difference by 68 lines (production +35/-57, tests 0).
+Actual final VGA fixtures and 188 background tests per width passed. One private
+run collided on scratch media; it was discarded and rerun serially after the
+other process exited. Native tests were explicitly deferred then, not passed;
+P164 later supplies the fresh full 392/392 current-source baseline.
+
+### R0550/R0551: active BIOS caller text aperture and CGA pixels
+
+vga_vide.c has no selected residual and retains the original BIOS state service.
+video.c remains the original BIOS implementation. R0550 derives nine text
+origins and two clear bounds from the active caller's BDA table, not physical
+mode cache. Coherent original restoration of all eleven uses and removal of
+the macro fails the actual B8000 character oracle on both widths; clearing
+bounds are tested consistently. Historical S33 Win3.1 VM=1 evidence observed
+BDA mode 3 with physical A0000 and restored typing after selecting the BDA
+aperture. It is not a new interactive run here. The current focused stale-cache
+fixture is not a full paged-V86 model; original graphics callers stay unchanged.
+R0551 preserves odd/even plane spacing for both XOR and replacement CGA pixel
+writes. Coherently restoring both expressions fails BIOS write/read-dot tests
+on both widths (modes 4..6, x 0..19, y 0..2). There is no separate XOR-only negative
+or claim covering every coordinate/V86 graphics combination.
+R0549 restores blanks/comments and verified diagnostic anchors, reducing XP
+difference by 28 lines (source +17/-23, tests 0). Final VGA tests pass and whole
+EXEs match P133 except precisely identified metadata, so no redundant full
+runtime test was claimed. All coupled source identity checks use final builds.
+
+Eleven semantic IDs are added: cumulative 294 residuals (291 semantic, three
+compiler/format), eighteen notices. This reconciliation changes only task
+records; owner choices and original-defect decisions remain open.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1772,4 +1867,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 428.
+recommendations into owner approval. The next position is 432.

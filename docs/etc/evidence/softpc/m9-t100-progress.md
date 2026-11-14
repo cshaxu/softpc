@@ -2747,7 +2747,7 @@ restored trailing-whitespace lines exactly match XP; source retains CRLF.
 Task-local tests compile the actual sevid003 body with the actual Ninja flags
 and replace its archive definition in the existing VGA test executable. An
 additional local fixture calls original registered V7 dither mode2 word and
-mode3 byte/word write/fill entries: two address parities, single writes and fill
+mode 3 byte/word write/fill entries: two address parities, single writes and fill
 counts 0/1/2/7. Thirty cases check independent four-plane foreground bytes and
 all surrounding memory. Latches, masks, plane selection and plane pointer are
 set explicitly and restored before existing VGA/CHAIN2 checks. Each control
@@ -8386,7 +8386,7 @@ the active-event int_delay calculation, before the existing comparison:
 
 It preserves the original comparison and scheduling path. Both architectures
 compile/link successfully and complete all nine real mode/divisor/dispatch
-cases: eighteen total. Mode2 and mode3 divisor1 now report delay1, active1,
+cases: eighteen total. Mode2 and mode 3 divisor1 now report delay1, active1,
 more65525 and return from dispatch. No production change or new permanent
 test is made: these two lines would introduce a new XP-relative point, barred
 by the current no-increase policy. D005 belongs to pending diff decisions,
@@ -12453,3 +12453,24 @@ final D001-D006/L001 reconciliation. All owner decisions and S1/T100 remain open
 
 P176 actual three-document diff review, mirror/documentation/whitespace gates
 and build-residue check pass. No unrelated modifications are present.
+
+## P177 final-decision reconciliation, positions 428-431
+
+All four normalized current files match final P134 committed contents. Actual
+source confirms mode conditions, four necessary raw V7 reads and reuse of
+original port handling, cursor guards and original BIOS integration. Reconcile
+P132-P134 final proofs, not intermediate candidates or invalid overlapping
+scratch-fixture results. Controlled matrix, real register path and historical
+guest probe are distinct evidence; native deferral is not retroactive success.
+
+Eleven semantic IDs are added: 294 residuals (291 semantic, three compiler/format),
+eighteen notices. R0538/R0542/R0549 reductions remain delivered; no new state,
+renderer, callback, source/test or public API is added in this reconciliation.
+Current source artifacts retain P164 fresh 392/392 evidence without a new run.
+
+Executor/counter-review changes only three task documents. No source, tests,
+EXEs, user configuration/media or snapshot change; no job/scratch created.
+Next is 432 and final D001-D006/L001 reconciliation. S1/T100 remain open.
+
+P177 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task documents change.
