@@ -8817,3 +8817,59 @@ user configuration, media, snapshots or permanent tests change. Frontier
 P123 owned probe/build processes exited and their PIDs are absent. Exact scratch
 cleanup and residue check pass. Mirror/documentation gates and final diff
 review pass; final-source evidence, not the preliminary build, owns delivery.
+
+## File 421: ega_vide.c (P124)
+
+Pinned XP raw SHA-256 96981fb8adfd00b298c1ab0486d17e328639b11d49f2030036ebdd1e37d5d131.
+Complete-file comparison identifies one selected addition: thirteen lines in
+recalc_text, including its hardware/source explanation. Existing excluded
+bodies and associated conditional/line-control scaffolding are skipped without
+new accounting. No other selected declaration or executable change is present.
+
+R0517 concerns the VGA V86 branch reading the current virtual CRTC height.
+Actual original BIOS font handlers call recalc_text for user and built-in
+font heights. The supported SPC386/no-GISP_CPU path enables support/ios.c
+virtual I/O; inb/outb enter IOVirtualised, which executes the ROM I/O request
+in the guest context. Physical get_screen_height cannot represent a different
+VM's virtual CRTC. The addition preserves the original EGA low-resolution case,
+non-V86 fallback, existing vertical multiplier and row-rounding convention.
+It saves/restores the CRTC index and combines both VDE overflow bits.
+
+Counter-review considers coherent removal of the entire branch, not a broken
+partial rewrite. A private actual ega_vide.c copy restores that exact original
+selection and links ahead of the unchanged machine archive. Both controls and
+restorations use the existing vga_frame_smoke fixture. Its actual recalc_text,
+SAS and BIOS virtual-I/O paths run with only the nested guest executor replaced
+by controlled virtual registers. The 36 combinations cover VGA native/V86 and
+EGA V86, two extents, three font heights and both multipliers; assertions check
+rows, font height, page length and index restoration before later CRTC writes.
+
+Historical evidence remains distinct: T99 S37 recorded actual Win3.1 VDD
+execution from an existing snapshot, with a probe-issued BIOS font request.
+Virtual 400-line CRTC versus physical 481-line calculation yielded 60/30 rows
+instead of 50/25 for 8/16-dot requests; the repaired probe returned 50/25.
+This is not a new Win3.1 run in P124 and not proof that a particular unmodified
+guest application naturally issued those requests. See the existing S37
+original-device audit evidence; no guest binary or media is changed here.
+
+Final dynamic results: private original copies compile/link successfully on
+both architectures. Current controls pass (x86 7.53 seconds, x64 5.62 seconds).
+Both original restorations fail the expected BIOS row-count assertion at
+vga_frame_smoke.c:2004, not a build or fixture-start failure. x86 exits
+3221226505 after 13.29 seconds; x64 exits 3 after 10.18 seconds. The controlled
+matrix is component integration proof, not a repeat of the historical VDD run.
+
+R0517 is evidence-qualified pending owner decision: retain the existing
+thirteen-line branch (+13/-0 versus XP). Its condition, index preservation,
+register reads, overflow assembly and original scaling/rounding each serve
+the single current-VM computation; no new helper or special guest version is
+introduced. No safe minimization or other selected difference was identified.
+Production/test delta and mirror-diff reduction are zero. No full rebuild,
+published EXE replacement or full runtime rerun is required for this audit-only
+delivery; P123 publication and P114 full 392/392 baseline remain unchanged.
+Frontier 421/472; next frozen file 422. All qualified owner decisions remain
+open, including R0517; S1 is not closed.
+
+P124 owned runner exited and its PID is absent. Scratch preview/removal and
+residue check pass. Actual diff review confirms documentation-only delivery;
+documentation gate passes and user configuration/media/snapshots are intact.

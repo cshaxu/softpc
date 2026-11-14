@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P123 completes file 420 ega_read.c with coherent cpu_vid.h cleanup:
-restore original local reader declarations and remove added header duplicates,
-reducing XP diff by nine lines. R0423 reader retention is superseded; writer
-residuals remain pending. Final cached dual-EXE publication is metadata-equivalent
-to P119; P114 retains full 392/392 baseline. Frontier 420/472; next 421
-base/video/ega_vide.c. D005, L001 and earlier decisions remain open.
+T100 S1 P124 completes file 421 ega_vide.c: the existing 13-line VGA V86
+height correction is qualified pending R0517. Full original restoration fails
+the BIOS row-count assertion on both architectures; current controls pass.
+No source/EXE changes; P123 publication and P114 full 392/392 baseline remain.
+Frontier 421/472; continue at frozen file 422. D005, L001 and earlier qualified
+decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
