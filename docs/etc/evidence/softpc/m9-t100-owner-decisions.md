@@ -8,9 +8,9 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing and final file-decision reconciliation cover all 472 files.
-Original defect decisions D001-D006 and local-extension defect L001 still require
-their final review here. Their existing evidence and pending status remain in
-force; completing file coverage does not approve residuals or close S1/T100.
+D001-D006 and L001 are reconciled below as unimplemented proposed repairs,
+separate from existing residuals. Final accounting remains; neither file coverage
+nor reconciliation approves residuals or closes S1/T100.
 
 An existing residual and a proposed new repair are distinct decisions. A failed
 original-body probe proves only the exercised contract; a passing current test
@@ -2519,6 +2519,44 @@ extension defect decisions and final accounting remain. All residual choices
 are unapproved. P164 fresh 392/392 remains the current full runtime result;
 this batch changes only records, with no source/test/artifact change.
 
+## Proposed new repairs: D001-D006 and L001
+
+These are separate decisions, not existing residual IDs or delivered fixes.
+Current source still contains the affected behavior. The no-new-diff rule
+prevents silently adding these repairs. No item is moved back into TODO;
+unknown minimal patches and unproved reachability remain explicit limitations.
+
+| Decision | Current evidence and scope | Proposed disposition before implementation |
+| --- | --- | --- |
+| D001 | sevid004 GenericByteFill calls GenericByteWrite then continues using shared LocalIUH. P34 actual bodies crash on both widths before/after restoration. Current CCPU fills use individual stores; no guest batch consumer established. Related nested sites were source-scanned, not dynamically proved faulty. | Keep unimplemented. A minimal caller-local preservation patch is not yet established; do not add a second write path or claim guest impact. |
+| D002 | sevid008 S2360/S2372 second WORD starts at +8. P38 actual bodies place 33 44 at +8/+9, not +2/+3, on both widths. sevid011 S2441-S2448 share the source pattern but lack equivalent dynamic proof. Current guest DWORD video access uses existing WORD operations rather than these generated DWORD entries. | Potential +8 to +2 correction requires multi-DWORD fill-order verification; a scalar correction alone does not prove the fill. No new patch or guest symptom claim. |
+| D003 | sevid023 S2844 fills two overlapping count-wide WORD runs at +0/+2. P54 four requested 44332211 values produce 11 22 33 44 33 44 33 44 33 44 and six untouched bytes on both widths; current/restored/poisoned variants agree. Current c_sas_fillsdw loops through scalar stores; no production fill_dword_ev_glue caller established. | Minimal whole-DWORD fill repair remains undesigned. Keep separate from D002 offset repair; no unproved activation of the batch API. |
+| D004 | sevid025 CHAIN4 mode-2 WORD/DWORD expansion writes low-byte results to subsequent addressed planes. Real selector tests yield ff 00 for 0201 and ff 00 00 00 for 08040201, versus the per-plane fixture expectation, on both widths. WORD vector is production-wired. | Hardware/guest applicability is not fully verified. Treat as a source/fixture discrepancy requiring that investigation before approving an addressed-plane-byte repair; no universal hardware defect claim. |
+| D005 | timer.c active-event backlog computes zero int_delay and lowers timer_multiple_delay to zero. P115 real Machine/PIT ports, two heartbeats and actual quick-event dispatch reach divisor1/mode2/delay0/active1/more65525, then stack overflow on both widths. | Concrete isolated two-line candidate clamps int_delay to one before the existing comparison; all nine mode/divisor cases pass per width. Recommend a separately authorized minimal repair plus permanent regression. Current first-event guard is necessary but incomplete. No real guest crash was observed. |
+| D006 | egwrtm12 easy even-address mode-2 byte path tests plane-enable bit8 while writing plane2. Real Machine/BIOS mode3 and GC mode2, mask4/value4/offset0 leave plane2=00 instead of ff on both widths. Logical/WORD counterparts use bit4. | Concrete candidate changes 8 to 4 in the existing condition. Recommend a separately authorized minimal correction with mask/path regression. Current evidence is one controlled case, not a full mask matrix or guest reproduction. |
+| L001 | Local PIC snapshot extension omits SWPIC_outb's per-adapter sequence phase. P109 actual controller snapshots after ICW1/2/3 on master/slave: all six uninterrupted controls pass per width, all six restored cases diverge in base/mask/mode. POST leaves phase0, so remaining ICWs become OCW1 mask writes. | Add the existing phase to the same archive, validate and restore it without port replay or another state machine. Requires new mirror difference and archive schema/format decision; exact patch size is not established. Do not call current PIC snapshot complete. |
+
+For L001 the expected master/slave bases are 56/112, mask0/mode17. After ICW1
+restore the actual base is0, mask1/mode1; after ICW2/3 base is correct but
+mask1/mode1 persists. This is twelve failures with twelve matching controls,
+not twelve passes. Instruction-boundary capture does not ensure a multi-write
+ICW transaction has completed. No guest-issued snapshot scenario was run.
+
+For D005 the private probe deliberately advances the existing quick-event
+countdown/dispatch boundary; it is not a parallel timer or a record of normal
+guest timing. The tested two-line correction is not installed. For D006 the
+retained CHAIN2 address corrections do not fix the unrelated wrong enable bit.
+
+Additional inactive-original MIDI ring/volume findings remain with R0665/R0667
+and R0666's restored native helper discussion. They are not silently counted as
+D007 or implemented: the active copied-message path is distinct and the original
+helpers have no activation caller. They remain visible to owner review.
+
+This reconciliation adds no residual ID, patch, test or new runtime result.
+381 existing residual IDs and nineteen notice items remain separately counted.
+No pending defect is erased by the final P164 suite passing 392/392: the temporary
+negative probes above exercise cases outside that permanent passing suite.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2529,4 +2567,4 @@ current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
 recommendations into owner approval. The remaining reconciliation concerns
-D001-D006/L001 and final accounting.
+final accounting and the owner decision package.

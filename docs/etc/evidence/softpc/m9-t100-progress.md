@@ -12645,3 +12645,27 @@ fresh 392/392 remains applicable without a new run. Owner decisions stay open.
 
 P185 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task records change.
+
+## P186 proposed-defect decision reconciliation
+
+Current generated GenericByteFill continuation, second-WORD +8, overlapping
+WORD-fill passes, CCPU scalar fill route, active PIT int_delay, plane2 enable
+condition and PIC private sequence/wire map were checked against the prior
+D001-D006/L001 evidence. Earlier read commands used two incorrect path guesses;
+actual ccpu386 and compat/devices paths were located and inspected instead.
+No absent-path output is treated as absence of a production consumer.
+
+All seven decisions now have scope/limits in the owner view. D001/D003 minimal
+patches, D002 fill ordering, D004 hardware applicability and L001 exact schema
+change remain unproved, not marked implemented. D005/D006 have concrete minimal
+candidate directions but no new-diff authorization. Original inactive MIDI
+findings remain visible with their existing decisions, not silently dropped.
+
+Existing counts remain 381 residual IDs and nineteen notices; proposed repairs
+are not added to that total. P164's passing suite does not cover away these
+negative probes. Only three task documents change; no code/tests/artifacts,
+configuration, media, snapshots or scratch change. Final accounting and owner
+review remain; S1/T100 are open.
+
+P186 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task records change.
