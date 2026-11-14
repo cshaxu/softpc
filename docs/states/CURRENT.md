@@ -30,15 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P141 completes file 444 insignia.h: one extra blank restored to XP,
-production +0/-1, tests unchanged, one fewer mirror diff line. Native IHPE and
-source-specific C-VID IUH remain qualified owner decisions R0563/R0564, with
-actual consumer compilation and live heap-pointer negative comparisons.
-Both cached builds publish fresh EXEs and VGA/checkpoint pass 2/2 per width.
-EXEs equal P140 after permitted metadata/time normalization; no repeated full
-suite. P133 background 188/188 per width remains applicable; native final
-acceptance remains pending. Frontier 444/472; next file 445 host/inc/ntcheese.h.
-S1/T100 remain open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P142 completes files 445-451. Five headers equal XP; nt_cga has no
+selected difference. nt_event's unnecessary explicit type/comment is restored
+to its original declaration (R0566), proven through actual GNU90 consumers.
+Production +1/-4; five fewer XP diff lines; permanent tests unchanged.
+Both cached builds publish fresh EXEs; VGA passes 1/1 per width. EXEs equal
+P141 after permitted metadata/time normalization, so no repeated full suite.
+P133 background 188/188 per width remains applicable; native final acceptance
+and earlier owner decisions remain pending. Frontier 451/472; next file 452
+host/inc/nt_fulsc.h. S1/T100 remain open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

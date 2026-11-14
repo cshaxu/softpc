@@ -10143,3 +10143,62 @@ is pending, not passed. No desktop path changed in this blank restoration.
 Final gates and actual-change review accompany delivery; only the blank,
 manifest, audit records and fresh EXEs change. S1/T100 and owner decisions
 remain open. Frontier 444/472; next file 445 host/inc/ntcheese.h.
+
+
+## Files 445-451: host graphics and event headers (P142)
+
+Complete comparisons in frozen order use the fixed XP SP1 commit. Five files
+are byte-identical after CRLF/LF normalization; nt_cga has no selected-body
+difference. Existing error bodies/line controls are skipped, not counted.
+
+| Order/file | Fixed XP SHA-256 | Disposition |
+| --- | --- | --- |
+| 445 ntcheese.h | 80575edceb22f7daf924bb605d2dfb7d3a081352018677986679f8b7f1d9df84 | Normalized full XP match; unchanged. |
+| 446 nt_cga.h | 7c186c4861f27b438804c15974f96c4c89cc142a31a27ebc71ec56544489f372 | Selected content matches; unchanged. |
+| 447 nt_cgalt.h | af4f0a1c5806c8f653cf31b57d20904f145c772e7dc5f7977c9b1ae56614b187 | Normalized full XP match; unchanged. |
+| 448 nt_det.h | 06f2e58d129de66771e2256af934cec7c7440082298fe7e637497717e80ef463 | Normalized full XP match; unchanged. |
+| 449 nt_ega.h | 5681131039a17c68b93adcd73e61e4092166581ab3846c7772d6b63254c36cdb | Normalized full XP match; unchanged. |
+| 450 nt_egalt.h | 8c21868a5bf708c885193be91e2a12528df63e0f2ce09825ded09d98453bc57b | Normalized full XP match; unchanged. |
+| 451 nt_event.h | a380a809c97fb7c1d2cd15b156ce7e0812d7c0f69034544fa098cb5cf1eca2c9 | Restore original declaration, R0566. |
+
+Real retained includes are nt_graph -> ntcheese/nt_cga/nt_ega/nt_event/nt_det,
+nt_cga.c -> nt_cga/nt_cgalt/nt_det, and nt_ega.c -> nt_ega/nt_egalt.
+These carry original graphics dimensions, lookup tables and host declarations;
+they are not independently removable unused files. No Compat duplicate is
+created or moved, and original include wiring is preserved.
+
+R0566 removes DIV-099's three-line modern-C rationale and restores the exact
+XP declaration `extern PointerAttachedWindowed;` (XP line 58). Full source/test/
+tool search finds no reference or definition outside this declaration. The
+comment's historical nt_event.c provider is not a current retained provider.
+Implicit int is valid in the actual mirror target's GNU90 language selection;
+the current supported build does not require a modern typed declaration here.
+Private current/original header variants were separately compiled through the
+real nt_graph.c Ninja commands, x86 and x64, four successful syntax checks.
+The only variant edit was this complete declaration/comment restoration.
+No compiler error or extra implicit-int diagnostic occurred in either width.
+This establishes current compilation, not hypothetical future C dialect support.
+
+Executor restores rather than retaining a patch on the strength of its old
+comment. Counter-review checks the language flags, actual include route and
+absence of runtime use; no caller/layout change is involved. The final selected
+body now matches XP. Production +1/-4 (net -3), permanent tests unchanged;
+XP-relative +4/-1 becomes zero, five fewer diff lines. No new difference site.
+Final LF-normalized source SHA-256: 6939e6c2448496c7fd629e2ca3c9f939beab5f072fa9010c0c04ef09f99654d9.
+
+### P142 final-source qualification
+
+- x86: cached build/publication 8.66 s; VGA **1/1** in 6.74 s including runner overhead; 91 warning occurrences, all inside mirror paths.
+- x86 EXE SHA-256: 9df563e238cb851b5bf2ef02d0422bae8b7bc89a7efb26b0e96a8f696a4e4b64.
+- x64: cached build/publication 10.01 s; VGA **1/1** in 5.56 s including runner overhead; 91 warning occurrences, all inside mirror paths.
+- x64 EXE SHA-256: 066ec216837f42ccc6444b7c1eaba27066ec7eb5dab450334dd432095f8c1389.
+
+Both EXEs equal P141 after masking only PE COFF timestamp, optional-header
+checksum and the unique NUL-terminated compiler-time literal; every other byte
+and length is equal. No repeated full suite under the owner's equivalence
+exception; P133 background 188/188 per width remains applicable. Native final
+acceptance remains pending. No new desktop behavior or guest validation is
+claimed. Final mirror/documentation/whitespace and newline checks accompany
+delivery. Actual-change review confirms only this declaration/comment, manifest,
+audit records and fresh EXEs change. Frontier 451/472; next file 452
+host/inc/nt_fulsc.h. Earlier owner decisions, S1 and T100 remain open.

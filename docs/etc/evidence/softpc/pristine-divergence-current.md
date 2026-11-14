@@ -2388,3 +2388,10 @@ T100 S1 P141 restores insignia.h's extra blank (one fewer XP diff line).
 IHPE native width and source-specific C-VID IUH remain qualified pending
 owner decisions R0563/R0564, supported by real compilation/pointer evidence.
 See [ordered evidence](m9-t100-progress.md#file-444-hostincinsigniah-p141).
+
+
+T100 S1 P142 retires nt_event.h DIV-099: the actual GNU90 consumer compiles
+the original implicit-int declaration on both widths, and no current caller
+uses the variable. R0566 restores the declaration and removes the rationale;
+five fewer selected XP diff lines. Other headers 445-450 need no source edit.
+See [ordered evidence](m9-t100-progress.md#files-445-451-host-graphics-and-event-headers-p142).

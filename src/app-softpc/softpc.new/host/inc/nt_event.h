@@ -57,8 +57,5 @@ void SyncToggleKeys(WORD wVirtualKeyCode, DWORD dwControlKeyState);
 extern DWORD ToggleKeyState;
 
 extern HANDLE hWndConsole;
-/* DIVERGENCE(MVDM-HOST-DIV-099): original aggregate headers supplied this
- * Boolean external type implicitly.  Its provider is nt_event.c; make the
- * exact existing BOOL contract visible to modern C. */
-extern BOOL PointerAttachedWindowed;
+extern PointerAttachedWindowed;
 extern BOOL DelayedReattachMouse;
