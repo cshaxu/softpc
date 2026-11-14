@@ -12720,3 +12720,40 @@ The compact approval package remains; S1/T100 stay open.
 P188 actual three-document diff review, XP mirror and documentation gates,
 whitespace check and build-residue check pass. The aggregate job is terminal;
 its task-owned scratch was removed through the cleanup tool after preview.
+
+## P189 compact owner decision packet
+
+The owner view now begins with a concise navigation/decision packet: 375 existing
+semantic/ABI IDs, six named compiler/format IDs, nineteen historical notices,
+and D001-D006/L001 proposed new changes are distinct choices. The complete ordered
+file/point evidence remains authoritative for each recommendation. R0006's
+retired-subsystem choice and R0580's no-increase constraint are explicitly not
+presented as universal architectural necessity.
+
+D005/D006 have concrete minimal candidate directions; L001 still requires its
+archive/schema design. D001-D003 do not establish a live bulk guest consumer or
+complete repair design; D004 still requires hardware interpretation. None is
+implemented, silently transferred to TODO, or included in residual-retention
+approval. Delivery does not create owner approval or close S1/T100.
+
+Fresh Git comparison confirms no source/test/tools/build/assets changes since
+P164. Its 392/392 qualification remains applicable, not newly executed. Only
+three task records change; no scratch/job, user configuration, media or snapshot
+is touched.
+
+### Audit-delivery completion review, not S/T closure
+
+| Admitted requirement | Final evidence and boundary |
+| --- | --- |
+| Frozen literal file order and full mirror scope | P187 verifies P1 inventory identity; fresh P189 scan verifies ordered owner sections cover positions 1-472 exactly once and index R0001-R0686. No file was silently dropped. |
+| Fixed XP original, existing exclusions skipped | Fixed manifest gate verifies 472 bodies; proposal/reference hashes remain unchanged. P188 excludes existing bodies without new IDs and explains correspondence limits. No OpenNT source is used. |
+| Restore unnecessary differences, original owner before duplicate Compat | Complete per-file P deliveries and final reconciliation distinguish restored code from retained differences, including coherent CPU reader/writer/register and sound declaration/helper restorations. Rejected partial trials are not final evidence. |
+| Necessary residuals prepared for owner review | All 381 residual IDs have reconciled evidence/limits; the compact packet separates functional/ABI, compiler, notice-policy and unimplemented new-defect choices. Policy-constrained retention is explicit. Owner approval remains absent. |
+| Dual-width cached build, publication and applicable regression | P164 is the final production commit and records fresh 392/392 without retry/skip. Fresh P189 Git comparison verifies source/test/build/assets identity; both published EXE SHA-256 values match the recorded qualified artifacts. Documentation-only reconciliation does not claim new runtime tests. |
+| Actual diff review, delivery hygiene and records | P189 reviews its actual three-document diff; documentation/mirror/whitespace gates pass, all 25 internal decision links resolve, and cleanup check finds no disposable build residue. Commit/push follow this review. |
+| Unresolved issues not called closed | D001-D006/L001 remain unimplemented with their original proof limits; no new patch or TODO transfer is hidden. S1/T100 still require owner disposition and are not closed by audit delivery. |
+
+The audit/restoration and review-package deliverables are ready. This review
+does not approve retention, authorize new repairs, or certify all possible
+guest/device behavior. Rejected owner choices require new coherent changes
+and corresponding qualification before they can replace this delivered state.

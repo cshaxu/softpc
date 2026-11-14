@@ -42,9 +42,12 @@ integrity; P187 verifies final identity and indexes positions 1-472 plus D001-D0
 format/compiler), with nineteen historical notice items separately identified.
 P188's fixed-XP normalized Git comparison reduces added-plus-deleted diff by
 7328 lines across 123 changed mirror files; this is distinct from source-line
-net growth and anchored per-point counts. Next: compact owner decision package;
-pending decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p188-fixed-xp-aggregate-comparison).
+net growth and anchored per-point counts. P189 provides the
+[compact owner decision packet](../etc/evidence/softpc/m9-t100-owner-decisions.md#compact-owner-decision-packet):
+existing functional/ABI differences, six compiler items, historical notices,
+and unimplemented new repairs are separate choices. The audit-delivery
+completion review is recorded; owner disposition remains and S1/T100 are open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p189-compact-owner-decision-packet).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

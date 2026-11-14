@@ -9,13 +9,92 @@ this review and receive no entries. All choices below remain unapproved.
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing and final file-decision reconciliation cover all 472 files.
 D001-D006 and L001 are reconciled below as unimplemented proposed repairs,
-separate from existing residuals. Final accounting remains; neither file coverage
+separate from existing residuals. P188 records final accounting; neither file coverage
 nor reconciliation approves residuals or closes S1/T100.
 
 An existing residual and a proposed new repair are distinct decisions. A failed
 original-body probe proves only the exercised contract; a passing current test
 does not approve the remaining patch. Source/ABI evidence is identified as such.
 Do not infer approval from delivery of other restorations in the same file.
+
+## Compact owner decision packet
+
+The delivered restoration baseline is P164; P165-P189 reconcile evidence and
+decisions without changing production, tests or published executables. All 472
+frozen file positions are covered. The task-start-to-current normalized XP
+added-plus-deleted comparison decreases by 7328 lines across 123 changed files;
+mirror source itself grows by 2201 lines. Restoring original code explains why
+those two metrics move in different directions. Full qualification is P164's
+fresh x86/x64 392/392 with no retries/skips, including native tests.
+
+### A. Existing functional and ABI differences: recommendation to retain
+
+The 375 semantic/ABI IDs below are existing differences, not 375 newly written
+fixes. The following is a navigation summary, not a replacement ID ledger or
+permission to retain unlisted changes. Each linked section gives original/local
+behavior, actual consumers, evidence and its limits. Evidence can be a concrete
+ABI/source requirement or a controlled original/current failure comparison;
+neither a missing symbol after partial restoration nor a passing suite alone
+establishes necessity.
+
+| Reason for retaining existing differences | Representative decisions and complete evidence sections | Consequence of coherent restoration where proved |
+| --- | --- | --- |
+| Native pointer widths and generated-rule calling conventions | R0563/R0564, [host representation](#positions-438-452-host-graphicsevent-headers-and-native-pointer-types); [generated interfaces and rules](#positions-271-274-generated-interfaces-restored) through position 318 | x64 pointer truncation, incompatible rule calls or lost nested state; x86 and x64 conclusions are distinguished. |
+| Current executor, shutdown and observation boundaries | [c_main](#position-80-c_mainc-execution-integration), [operand observation](#positions-81-97-operand-observation-and-restored-register-implementation), [TLS unwind](#positions-182-193-selected-symbols-and-original-tls-unwind) | Guest execution can bypass queued host work, fail to stop at the admitted boundary, or lose required debug/return information. No new worker or duplicate device owner is proposed. |
+| Snapshot access to original private device/CPU state | [TLB](#positions-98-118-private-tlb-state-and-original-exception-paths), [FPU](#positions-265-266-delayed-fpu-exception-state), [UART/LPT](#positions-267-270-uart-lpt-and-source-notices), [device headers](#positions-370-393-device-snapshot-and-native-time-headers), [DMA/CMOS/PIC](#positions-402-408-io-dma-cmos-pic-and-idle-detection), [event/PIT](#positions-409-415-queue-rom-pit-and-original-interrupt-handlers) | Required private state cannot be restored through the remaining original public API alone. L001 explicitly prevents claiming complete mid-ICW PIC restoration. |
+| Demonstrated original register/address/permission errors | R0008, R0015, [SAS](#positions-47-63-sas-and-following-ccpu-files), [disk BIOS](#positions-319-325-disk-bios-private-checkpoints-and-empty-media), [DMA](#dma-r0476-r0480), [BIOS video writers](#positions-416-423-original-bios-video-writers-and-virtual-text-height) | Wrong EOI port, access width/permission, address reload or display-memory mapping reappears in the specified source paths/probes. This is not proof that every customer symptom came from them. |
+| One coherent video representation and published update transaction | [display addressing](#positions-359-369-display-addressing-and-hostpicio-headers), [geometry/dirty/V7](#positions-424-427-update-geometry-dirty-mapping-and-v7-display-state), [VGA](#positions-428-431-vga-selection-controller-state-and-bios-addressing), [painters](#positions-455-458-sound-declarations-and-cgaega-painters) through position 468 | Address/stride, palette, cursor or produced-frame assertions fail in the named controls. Empty/invalid geometry tests are distinguished from real controller-programmed modes. |
+| Standalone host binding and original device ownership | [selected symbols](#positions-182-193-selected-symbols-and-original-tls-unwind), [profile](#positions-432-437-bios-entry-and-host-representationdeclarations), [sound/DSP](#positions-462-463-sound-blaster-owner-and-dsp), [FM/MIDI/mixer](#positions-464-466-fm-midi-and-mixer), [tone](#positions-467-472-tone-vga-and-fixed-firmware) | XP NT-private services and asynchronous ownership are not the supported host contract. Restored independent original helpers remain; Lib endpoints are bindings, not a replacement guest device. |
+
+Two policy-constrained cases should not be mistaken for universal technical
+necessity: R0006 omits calls into the explicitly retired optional DOS mouse
+driver; R0580 retains existing shared sound declaration placement because the
+tested relocation increased XP diff by one, prohibited by the owner's rule.
+Neither recommendation authorizes restoring a retired subsystem or changing
+the no-increase policy. Original unused files/declarations stay when deleting
+them would create new differences (for example bswap.h and cmos.ram).
+
+### B. Existing compiler differences: recommendation to retain separately
+
+Exactly six IDs are compiler/format decisions: R0439 (ica.h), R0451 (tape_io.h)
+and R0508 (unexp_nt.c) omit the terminal Ctrl-Z rejected by actual compiler
+commands; R0592 removes the extra trace argument comma; R0605 aligns static
+forward declarations with static definitions; R0678 undefines the SDK
+PlaySound macro conflicting with the original function. These have actual
+dual-width compilation evidence, not claimed guest behavior benefits.
+
+### C. Historical notices: preserve, no license decision inferred
+
+The nineteen notice-policy IDs are R0173, R0206, R0238, R0244, R0413, R0416,
+R0418, R0419, R0456, R0461, R0462, R0468, R0473, R0487, R0488, R0495, R0501,
+R0507 and R0560. They are separate from the 381 functional/compiler IDs.
+Technical cleanup does not authorize deleting these historical notices or
+asserting redistribution rights. Existing excluded bodies receive no entries.
+
+### D. New repairs: not part of existing-difference retention approval
+
+See [the seven proposed decisions](#proposed-new-repairs-d001-d006-and-l001)
+for actual failing controls and limits. The recommended next choices are:
+
+- D005: authorize the isolated two-line PIT backlog correction and permanent
+  regression; current first-event protection does not cover an active backlog.
+- D006: authorize the one-bit EGA plane-enable correction and mask/path tests.
+- L001: authorize design/implementation of PIC initialization-phase snapshot
+  state in the existing archive. Include its schema consequence; exact patch
+  size is not established, so this is not approval of an unseen final diff.
+- D001-D003: keep unimplemented unless the owner admits further repair design.
+  Actual generated-body failures exist, but current bulk guest consumers and
+  complete minimal fill fixes are not established. Do not activate an unused
+  batch path merely to create a consumer.
+- D004: investigate hardware interpretation before a repair decision. The
+  production-wired selector/fixture discrepancy is proved; the expected
+  hardware behavior is not yet fully established.
+
+Approving A/B retains only the documented existing differences; it does not
+approve D, erase remaining proof limits, or declare all guest behavior correct.
+Rejecting an A/B point requires coherent restoration and appropriate rebuild/
+regression before that alternative can be delivered. S1/T100 remain open for
+the owner's disposition; no approval is inferred from this packet's push.
 
 ## Positions 1-9: BIOS
 
@@ -2700,5 +2779,6 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The remaining reconciliation concerns
-the compact owner decision package and its approval boundaries.
+recommendations into owner approval. The compact decision packet and P189
+audit-delivery completion review preserve those approval boundaries; owner
+disposition remains outstanding.
