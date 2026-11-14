@@ -23,15 +23,18 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 6 / R0006 | Omit two reset calls to the retired optional DOS software mouse driver. | Retain product-boundary omission; hardware mouse initialization remains. | Owner approves retention, S3 P2 |
 | 8 / R0008 | Slave PIC EOI targets command rather than mask port. | Retain one-token port correction. | Owner approves retention, S3 P2 |
 | 9 / R0010 | Descriptor limit output declaration uses sys_addr rather than word. | Retain declaration matching the actual 32-bit result/callers. | Owner approves retention, S3 P2 |
-| 41 / R0014 | Omit nine retired/unselected CCPU source entries from c-files. | Retain existing selected-source list; this is a product selection, not a runtime defect repair. | Pending |
-| 42 / R0015 | CALLF chooses SP/ESP using destination SS address size. | Retain the one-condition correction; operand width is not stack address width. | Pending |
+| 41 / R0014 | Omit nine retired/unselected CCPU source entries from c-files. | Retain existing selected-source list; this is a product selection, not a runtime defect repair. | Owner approves retention, S3 P3 |
+| 42 / R0015 | CALLF chooses SP/ESP using destination SS address size. | Retain the one-condition correction; operand width is not stack address width. | Owner approves retention, S3 P3 |
+| 47 / R0018, R0021, R0022 | Snapshot declaration and private SAS capture/restore accessors. | Retain access to existing owner state; original selector registration mutates LDT and cannot substitute for restoration. | Pending |
+| 47 / R0019, R0020 | Pointer-return prototypes for host_sas_init/term. | Retain declarations matching the actual provider and pointer-using callers. | Pending |
 
-Owner says "批准" to the first three-point retention batch. S3 P2 records
-3/381 approved for retention, zero restoration decisions, 378 awaiting review;
-nineteen historical notices remain separate. No source changes follow from
-retaining existing code. Existing evidence below stays the single detailed
-inventory. Next points R0014/R0015 are rechecked against current c-files,
-root CMake, CALLF and c_stack; their prior evidence limits are preserved.
+Owner says "批准" to the first three-point retention batch and "好 批准这两"
+to R0014/R0015. S3 P3 records 5/381 approved for retention, zero restoration
+decisions, 376 awaiting review; nineteen historical notices remain separate.
+No source changes follow from retaining existing code. Existing evidence below
+stays the single detailed inventory. Next five points in ccpusas4.c are
+rechecked against the actual Compat archive/memory callers and the original
+selector-registration side effects; prior test/evidence limits are preserved.
 
 ## Coverage and decision rules
 

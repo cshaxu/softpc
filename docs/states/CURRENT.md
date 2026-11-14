@@ -19,7 +19,7 @@ existing mirror differences together. T100 remains open. See the
 | Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, read-only until a concrete owner implementation decision; task records own approval status. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP only; no OpenNT reads. |
 | Verification | Cross-check current source and prior evidence for each presented point. Separate source/ABI proof, controlled tests and guest reproduction. Documentation-only admission uses documentation/whitespace checks, not invented fresh runtime qualification. |
-| Expected Markers | 381 IDs retain individual dispositions; nineteen historical notices stay separate. Owner approves R0006/R0008/R0010 retention (3/381); next R0014/R0015, in frozen file order. |
+| Expected Markers | 381 IDs retain individual dispositions; nineteen historical notices stay separate. Owner approves R0006/R0008/R0010/R0014/R0015 retention (5/381); next R0018-R0022 in ccpusas4.c, in frozen file order. |
 | Asset Needs | Preserve configuration/media/snapshots. S3 owns build/t100-s3 for disposable review scripts; two-hour run/fifteen-minute no-progress budget if probes are needed; clean at each delivery. |
 | Reporting Requirements | Original/current code, necessity evidence and limits, restoration consequence and actual XP diff; distinguish recommendation from approval. |
 | Stop Conditions | Admission does not authorize arbitrary restoration or new patches. Unproved necessity returns to investigation. Do not revive declined bulk repairs or approve a whole family from one representative. |
@@ -29,8 +29,8 @@ existing mirror differences together. T100 remains open. See the
 
 ## Current Technical Baseline
 
-S3 P2 records explicit owner approval to retain R0006/R0008/R0010. Progress:
-3/381 approved, 378 pending; next R0014/R0015. The
+S3 P3 adds explicit owner approval to retain R0014/R0015 after R0006/R0008/R0010.
+Progress: 5/381 approved, 376 pending; next R0018-R0022. The
 [point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
 owns individual decisions. This documentation-only delivery changes no source,
 tests, EXEs or user assets and claims no new runtime qualification.
