@@ -7762,3 +7762,103 @@ P106 actual eight-file review, mirror/documentation/whitespace gates and
 cleanup residue check pass. CIM confirms all owned build/test/probe processes
 exited before exact task-scratch removal. No unrelated worktree changes are
 included; the frozen initial hashes and file order are unchanged.
+
+
+## File 405: base/system/cmos.c (P107)
+
+Pinned XP raw SHA-256 ffcc54503743e559d4b6180f5c3a6215fb6d4ea140a466b66e5e40b87bde7647.
+The complete selected-file comparison checks all differing ranges, including
+selected edges adjacent to excluded bodies; existing exclusions are not counted.
+CMakeLists.txt compiles this controller into the original device group. Original
+reset.c calls cmos_post; no independent Compat CMOS register owner exists.
+
+- R0482, current include line 40 and disk selection at 963, XP 1041-1044:
+  the added cmos/port.h and replacement disk selection report attached HDDs.
+  Original unconditionally declares C: type 3, adding D: type 4 when configured.
+  Actual config_inquire already returns the mounted paths, but its original
+  caller never asks whether C: exists. The FDC-only production configuration
+  has no HDD; this is unrelated to the always-present A: drive without media.
+  Coherent original disk selection in the real controller, linked into the
+  existing fdc_smoke fixture, fails CMOS_DISK == 0 on x86 and x64. The current
+  fixture passes, and dual_media_smoke checks C: 0x30. Residual source scope is
+  one include plus one replacement line against four original lines (+2/-4).
+  Counter-review: this is host media presence, not duplicate CMOS state. Moving
+  original disk policy into another new path would not reduce complexity.
+  Qualified pending owner decision; no new patch is added. D-only topology is
+  source-reviewed, not dynamically claimed by these fixtures.
+- R0483, snapshot include at 49 and 118-line extension after selected source:
+  archive.c captures/restores the private CMOS bytes, selected index, conversion
+  mode, clock state and periodic event handle, and maps three actual queued RTC
+  callbacks. Their original owners are static in this file. Reading register C
+  acknowledges interrupt state; ports neither enumerate the private tick count
+  and callback handle nor safely reconstruct a suspended queue. Removing these
+  methods leaves real archive consumers unlinked; replacing them with port
+  replay does not preserve the same state. Moving equal serialization into
+  Compat by exposing private globals is not a reduction. Qualified source/ABI
+  necessity, pending owner decision. Existing checkpoint_smoke verifies a CMOS
+  byte across capture/mutation/restore; it does not exhaust RTC phase/mode
+  combinations. Restore is not a transactional public API: a rejected archive
+  is not resumed. No claim that every malformed archive was dynamically tested.
+- R0484, XP343/current315: restore the exact original ULONG conversion.
+  The actual config provider returns pointer-encoded constant VGA adapter 5;
+  the extra ULONG_PTR cast changes neither width's result. A mirror compiler
+  warning alone does not justify retaining a semantic-free adaptation.
+- R0485, XP1040/current962: restore the original fixed-disk comment verbatim.
+- R0486, XP1054/1056/current973/975: restore original comparison parentheses.
+  Investigation initially found the original precedence misclassifies correct
+  extended-memory bytes as BAD_XMS when the total KiB exceeds 255. A disposable
+  observation in the actual cmos_error body proves that internal classification:
+  current comparison passes an after-POST zero-error assertion; coherent original
+  comparison fails it on both widths. This is NOT proof of a guest-visible fault.
+  Counter-review follows cmos_error in the selected PROD branch: it writes the
+  correct capacity bytes and recomputes the checksum, including when those bytes
+  were already correct. Trace text is not emitted in this configuration. Other
+  error bits and repairs remain independent. The only proven difference is
+  redundant internal correction, so no supported observable-contract necessity
+  has been established for the local parentheses. Original-first restoration
+  therefore takes precedence; do not list the prior internal assertion as a
+  required product regression. Existing CMOS tests check the actual register
+  values after all four low/high corruption combinations.
+
+Initial proof uses private replacement controller objects before the original
+archive, not a copied device implementation. All variant compile/link steps
+exit zero. Current observation passes both architectures. Original-memory
+observation fails audit_xms_error == 0 (fixture line 300); original-disk fails
+CMOS_DISK == 0 (existing fixture line 235). x86 exits 3221226505, x64 exits 3.
+The initial two-line candidate passed four focused tests per architecture and
+was artifact-equivalent to P106 except build metadata, but it is not the final
+source: R0486 was subsequently restored and receives fresh qualification.
+
+Final candidate changes source +4/-4 (net zero), permanent tests unchanged.
+Four original lines restored reduce XP-relative added/deleted diff by eight
+lines; no new difference point, helper or implementation path is introduced.
+Full final-source dual-width build/publication and regression are running.
+Frontier remains 404/472 until final evidence and delivery.
+
+### P107 final qualification and counter-review
+
+Both final cached builds and publications succeed. x86 passes 188 background
+in 142.52 seconds and eight native tests in 23.92 seconds; x64 passes 188
+background in 139.61 seconds and eight native tests in 24.79 seconds: 392/392.
+The final CMOS register-value regression passes after original parentheses
+are restored. Initial observation-only negative assertions are not acceptance
+requirements and are removed with their disposable probes.
+
+Final Nov 13 2026 compiler timestamps and published SHA-256:
+- x86 17:10:02, cfbcef3a9638ad46db5f1d296311b900a0972f2be6c6010383ac21c81b9358e7.
+- x64 17:12:59, ce43561599d3862e199b73eb130e1a091aa20f37ba2876cd5e737b679d0feb1a.
+
+Independent review of the actual final diff confirms four exact original-line
+restorations, source +4/-4, permanent tests unchanged, and XP-relative delta
+-4 added/-4 deleted lines. The original comparison's internal false-positive
+classification is explicitly retained rather than pretending it was fixed.
+Only the topology and snapshot residuals are source/dynamically qualified
+pending owner decisions. No guest binary, user configuration, media, snapshot,
+shared component or Compat implementation changed. Existing exclusions have
+no new ledger entries. Manifest/documentation and whitespace checks pass.
+No exhaustive RTC phase, all HDD topologies or real DOS/Windows session claim
+is made from these tests. Ordered file audit frontier is now 405/472; next is
+406 base/system/dummy_nt.c. S1 remains active, not closed.
+
+P107 process inventory confirms both owned jobs exited. Exact scratch cleanup
+and build residue check pass; reusable Ninja and ccache roots are preserved.

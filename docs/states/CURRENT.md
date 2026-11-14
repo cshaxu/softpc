@@ -30,13 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P106 completes file 404 at_dma.c. Restore original visibility,
-include order and syntax; remove five nonsemantic comment lines. Mirror diff
-shrinks by fifteen lines. Necessary query/wrap/copy differences have actual
-x86/x64 negative controls; these and snapshot/accessor residuals await owner
-decision. Full regression passes 392/392; final equivalent dual EXEs and 6/6
-focused tests establish the P106 baseline. Frontier 404/472; next 405
-base/system/cmos.c.
+T100 S1 P107 completes file 405 cmos.c. Restore four original lines:
+scalar cast, disk comment and memory-comparison parentheses. Mirror diff
+shrinks by eight lines. HDD topology and private snapshot residuals remain
+qualified pending owner decisions; the original internal memory error
+classification does not establish an observable need for the removed patch.
+Final dual-EXE publication and full regression pass 392/392. Frontier 405/472;
+next 406 base/system/dummy_nt.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

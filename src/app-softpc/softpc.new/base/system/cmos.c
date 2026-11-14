@@ -312,7 +312,7 @@ LOCAL int verify_equip_byte IFN1(half_word *, equip)
 
 	/* Check the Equipment Byte */
 	*equip = 0;
-	adapter = (ULONG)(ULONG_PTR) config_inquire(C_GFX_ADAPTER, NULL);
+	adapter = (ULONG) config_inquire(C_GFX_ADAPTER, NULL);
 	if(adapter != -1)
 		*equip |= display_mask[adapter];
 
@@ -959,7 +959,7 @@ GLOBAL void cmos_post IFN0()
 	if (floppy != cmos[CMOS_DISKETTE])
 		cmos_err |= BAD_FLOPPY;
 
-	/* Check the Fixed Disk Type through the standalone media port. */
+	/* Check the Fixed Disk Type */
 	 disk = softpc_host_cmos_fixed_disk_type();
 	if (disk != cmos[CMOS_DISK])
 		cmos_err |= BAD_DISK;
@@ -970,9 +970,9 @@ GLOBAL void cmos_post IFN0()
 
 	/* Check the extended memory */
 	if ((cmos[CMOS_E_M_S_LO] !=
-	     (((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 10) & 0xff)) ||
+	     ((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 10) & 0xff) ||
 	    (cmos[CMOS_E_M_S_HI] !=
-	     (((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 18) & 0xff)))
+	     ((sys_addr) (sas_memory_size() - PC_MEM_SIZE) >> 18) & 0xff))
 		cmos_err |= BAD_XMS;
 
 	/* Ignore the Contents of the Drive C and Drive D extended bytes */

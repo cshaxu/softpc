@@ -2184,3 +2184,15 @@ have independent actual-object negative controls on both widths. Snapshot and
 original DSP accessor remain source-qualified owner decisions. Full 392/392
 regression and final equivalent EXEs plus 6/6 focused tests pass. No new DMA
 implementation or guest-specific behavior is introduced.
+
+
+### T100 S1 P107 CMOS original-first audit
+
+R0482-R0486 supersede prior cmos.c retention summaries. Restore original scalar
+cast, disk comment and memory-comparison parentheses. The last difference
+misclassifies an internal error but the selected production repair writes the
+same correct bytes/checksum; its necessity for observable behavior was not
+established. Source +4/-4 reduces mirror diff by eight lines. Fixed-disk host
+presence and private snapshot/queue serialization remain qualified pending
+owner decisions. Actual original disk-selection negative controls fail on both
+widths. Final dual-EXE builds/publication and full 392/392 regression pass.
