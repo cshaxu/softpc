@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-300 only. Positions 301-472, original
+This view currently reconciles positions 1-311 only. Positions 312-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -742,6 +742,121 @@ These twelve files add 30 pending semantic IDs, bringing the review view to
 171 through position 300, plus the four separate notice-policy items. Approval
 and the final original-defect reconciliation remain outstanding.
 
+## Positions 301-303: remaining CHAIN2 ownership and layout
+
+Current sevid018-sevid020 hashes equal the final P49-P51 candidates, including
+the refined continuation restoration in P50. Existing range and allocation maps
+provide original/current locations. No initial proposal supersedes its final
+counter-review. Sixteen semantic IDs remain across these three files:
+
+| File | Pending IDs | Final XP added / deleted | calloc / malloc |
+| --- | --- | --- | --- |
+| sevid018.c | R0351, R0353-R0356 | 495 / 602 | 4 / 28 |
+| sevid019.c | R0358, R0360-R0364 | 682 / 906 | 12 / 20 |
+| sevid020.c | R0367, R0369-R0372 | 637 / 667 | 13 / 19 |
+
+GDP and native local-storage evidence retain the established separation:
+original field spacing differs from native fields; original local capacities
+fail x64. Zeroing remains only where identified narrow writes feed native
+loads. Whole-group poisoning is not individual dynamic proof for every array.
+R0352/R0359/R0368 native dereferences are restored. R0357/R0365/R0373 restore
+60/168/24 private declaration lines without old active CGA control flow.
+R0366/R0374 restore original shift-by-zero literals and remove their explanations.
+
+Selected-marker decisions R0354/R0361/R0370 have coherent original-body
+negative controls with native GDP mapping preserved. The first two fail the
+EGA dirty-low assertion on both widths. The backward Move control in sevid020
+marks dirty_high=100h instead of the bounded EGA group span around 3eh-41h.
+Its initial simple-WORD lower-bound fixture failed unchanged code and was
+withdrawn; the corrected original/candidate comparison is the evidence.
+
+Layout decisions R0355/R0362/R0371 retain the A0 gap. The independent mode-3
+oracle in P49 catches guest address 100h stored at physical 200h instead of
+400h. P50 original constants fail VGA readback. P51's backward Copy oracle
+finds guest address 101h storage untouched. These are actual-rule tests, not
+claims of every bulk entry being reached by a guest.
+
+Continuation decisions are not blanket replacements:
+
+- R0356 retains seven calls as same-activation gotos; grouped original-call
+  restoration access-violates on both architectures.
+- R0363 retains eleven, not sixteen. P50 restored the five direct-only tail
+  calls L21_137/153/155/161/163. Current final controls allocate/free
+  672566/672566; restoring all sixteen leaves 104 allocations on each width,
+  despite passing pixels. This is a demonstrated leak, not a claimed crash.
+- R0372 retains five, not six. S2730's L21_251 tail call was restored. Remaining
+  same-file chains lose 36 allocations with all original calls: 290/254 versus
+  290/290 with the final candidate, on both widths.
+
+R0364 retains the existing Copy WORD/DWORD empty-count guards, full-DWORD
+rotation and byte-sized odd tail. Separate original restorations fault or fail
+the 96-case independent fill oracle on both widths. No new bulk caller is
+introduced. P50's initial gate failure was corrected to require only the eleven
+necessary gotos; P49/P51 passed full suites directly. P164 now passes 392/392
+on unchanged final production, without erasing those earlier failure records.
+
+## Positions 304-311: Chain4 rules and legacy callback boundary
+
+These eight files retain only GDP mapping and native local-storage groups.
+All resolved native-address wrappers are restored. Current hashes equal final
+P52-P60 candidates and the exact calloc/malloc counts below are verified:
+
+| File | Pending GDP / local-storage IDs | calloc / malloc | XP added+deleted lines |
+| --- | --- | --- | --- |
+| sevid021.c | R0375 / R0377 | 14 / 18 | 1381 |
+| sevid022.c | R0378 / R0380 | 4 / 28 | 1505 |
+| sevid023.c | R0381 / R0383 | 0 / 32 | 973 |
+| sevid024.c | R0384 / R0386 | 7 / 25 | 975 |
+| sevid025.c | R0387 / R0389 | 6 / 26 | 1333 |
+| sevid026.c | R0390 / R0392 | 10 / 22 | 1195 |
+| sevid027.c | R0393 / R0395 | 4 / 28 | 1047 |
+| sevid028.c | R0396 / R0398 | 2 / 30 | 1309 |
+
+R0390-R0392 are recorded in sevid026's point map, not missing decisions:
+R0391's 25 addresses are restored; R0392 restores 22 malloc calls while retaining
+native capacities and ten mixed-width initializations. P160 replaced stale
+qualification-pending text with P58 final-evidence references; no new IDs arise.
+
+The per-function allocation inventories distinguish native capacity from
+zeroing. P52/P53/P55/P57 separately test original capacity and poisoned removal
+of remaining zeroing; x86 controls pass while x64 faults. P54 has no remaining
+zeroing. P58-P60 record combined no-zero failures and source-level capacity/data
+flow evidence; do not invent an independent original-capacity runtime result
+where their record does not supply one. Each retained initialization has the
+named narrow-write/native-read use, not a general claim that calloc is safer.
+
+The selected actual-body cases (256/96/112/132/148/156/56/68 respectively)
+primarily prove restoration equivalence. Independent pixel subsets and their
+limits remain in P52-P60. P54's four-DWORD fill occupies ten bytes, preserving
+original D003. P57's independent plane oracle exposes original D004; subsequent
+148-case equality checks do not become pixel-correctness proof. These defects
+remain separate decisions; no new repair or guest symptom is claimed here.
+P55's all-ten-address restoration follows the owner's range-count correction,
+so splitting ranges is not a reason to retain redundant wrappers.
+
+P61 supersedes the unexplained video-source callback limitation in P59/P60:
+
+- The selected CPU_40_STYLE original path installs c_ev_read_ptr/read_byte_addr;
+  the legacy forward/backward GDP string callbacks remain null. Generated
+  setters existing in a vector are not production setter invocations.
+- CCPU MOVSB/MOVSW/MOVSD use scalar operands; move-array read macros have no
+  active consumers. Direct legacy video-source bulk calls bypass that path and
+  fault on the null callback. The condition predates the restorations.
+- An actual machine/BIOS mode-13h probe ran REP MOVSB/MOVSW/MOVSD with both DF
+  directions: six cases per width, destination bytes, CX and SI/DI checked,
+  callbacks null before/after. Those twelve passes prove this selected path;
+  they do not cover overlapping ranges, paging or all DOS/Windows video modes.
+
+No lost initializer, new fallback or additional callback path is warranted.
+The unsupported direct legacy bulk entry must not be advertised as usable
+without separate integration. This boundary is explained, not an unfinished
+mystery carried forward. No new guest binary or production API was introduced.
+
+All final P52-P60 full suites passed. This reconciliation adds 32 semantic
+pending IDs, cumulative 203 through file 311, with the four historical notices
+still separate. Source/test/EXE bytes are unchanged from P164 qualification;
+original-defect decisions and owner approval remain outstanding.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -751,4 +866,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 301.
+recommendations into owner approval. The next position is 312.

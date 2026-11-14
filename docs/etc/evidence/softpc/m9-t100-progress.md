@@ -12215,3 +12215,28 @@ Next is position 301; D001-D006/L001 and owner decisions remain unclosed.
 
 P166 documentation/mirror/whitespace gates and build-residue check pass. No
 new task scratch or worker exists. Only the three reviewed task records change.
+
+## P167 final-decision reconciliation, positions 301-311
+
+Current hashes for sevid018-sevid028 match their latest final candidates in
+P49-P60. Actual source confirms the refined P50 five original tail calls,
+P51 direct-only tail restoration, GDP read-byte binding and the per-file
+calloc/malloc counts recorded in the owner decision view. All eleven files
+have no softpc_gdp_rule_address calls. No source changes result from this check.
+
+Reconcile 32 pending semantic IDs, cumulative 203 through file 311. The record
+uses P50's final eleven-continuation disposition, not its superseded sixteen-
+site proposal. Allocation/free counters distinguish observed leaks from crash
+claims. P61 resolves P59/P60's legacy video-source callback boundary with the
+selected compilation path and actual CCPU REP MOVS evidence; the old unexplained
+limitation is not carried forward. Original D003/D004 remain decisions, not
+new fixes or hidden failures erased by equality tests. R0390-R0392 map through
+the P58 point ledger and its final qualification, without inventing new IDs.
+
+Executor/counter-review classify this P as three task-record changes only.
+P164's fresh 392/392 applies to identical production/test artifacts. No new
+build, publication or runtime proof is claimed. Next reconciliation position
+is 312; S1/T100 and owner decisions remain open.
+
+P167 documentation/mirror/whitespace gates and build-residue check pass. No
+new scratch or background worker was created. Actual diff is task records only.
