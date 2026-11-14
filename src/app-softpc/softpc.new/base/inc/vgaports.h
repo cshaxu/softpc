@@ -181,7 +181,7 @@ typedef	union
 	struct {
 		unsigned
 		extension_enable	: 1,	/* YES */
-		not_used		: 7;
+		not_used		: 7;	
 	} as_bfld;
 } EXTN_CONTROL;
 #endif /* V7VGA */
@@ -433,7 +433,7 @@ struct sequencer
 
 struct crt_controller
 {
-
+	 
 #ifdef V7VGA
 	union
 	{
@@ -450,7 +450,7 @@ struct crt_controller
 #error "Unsupported SoftPC mirror configuration: !V7VGA"
 #endif /* V7VGA */
 #line 1425
-
+												 
 	byte horizontal_total;				/* NO - screen trash if wrong value	*/
 	byte horizontal_display_end;			/* YES - defines line length!!		*/
 	byte start_horizontal_blanking;			/* NO	*/

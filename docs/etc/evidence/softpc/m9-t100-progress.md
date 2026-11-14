@@ -7099,3 +7099,60 @@ P97 actual ten-file diff review passes. CIM confirms task runner 11728 and
 its jobs exited. Exact scratch preview/removal and residue check pass;
 final mirror, documentation and whitespace gates pass. No user configuration,
 media, snapshot or unrelated worktree modification is included.
+
+## Files 390-393: original header whitespace restoration (P98)
+
+Pinned XP SP1 remains a2f6d7c93aa4f11efc51147566d5961c59a8ef89. Existing
+exclusions and their scaffolding are skipped without additional accounting.
+
+| Order | base/inc file | XP raw SHA-256 | Result / production consumer |
+| --- | --- | --- | --- |
+| 390 | tmstrobe.h | 59ae1702556022757b133c494b2dcfb140b55efbed72daa5c70a8e939e368d3a | Normalized whole-file identity; cmos.c and timestrb.c. |
+| 391 | trace.h | 6d772999cfb9162e2567989be13d4b040c3f09ec1df2972930affc071359ff6a | Selected-content identity; ica.c and other compiled original controllers. |
+| 392 | vgaports.h | c9e1221af93b3bad79d396ea0c7c517ec9d826cb44245227153c4fb3d4d4a0de | R0453 restores three whitespace lines; actual ega_mode.c, v7_ports.c and host nt_munge.c include it. |
+| 393 | vga_dac.h | d10f721bd10a3844c94398a51dc3587cfbcd97caf4023f35c95ec79ae6b9adad | Normalized whole-file identity; production vga_vide.c. |
+
+### R0453: exact original selected whitespace
+
+Initial selected difference: local vgaports.h lines 184, 436 and 453 had
+removed trailing whitespace from the original EXTN_CONTROL not_used bitfield
+line, the blank line opening struct crt_controller, and the blank line before
+horizontal_total. No syntax, bit width, layout or register meaning changed.
+No necessity supports this formatting deviation. Restore those exact bytes,
+preserving CRLF, form-feed bytes, all conditional structures and #line values.
+
+Independent full-file byte/line comparison after restoration leaves only
+existing exclusion and line-control scaffolding. Comparisons use LF as the
+line delimiter; form feeds must not be interpreted as additional source lines.
+No original bitfield defect was found or changed. No Compat implementation
+duplicates these declarations. Production +3/-3, tests +0/-0; selected
+XP-relative difference +3/-3 becomes zero: six fewer difference lines,
+not six fewer source lines. No new residual decision is required.
+
+### P98 final-source verification
+
+Cached x86 build completes in 9.29 seconds; x64 in 12.94 seconds. Both EXEs
+are published with fresh Nov 13 2026 timestamps:
+
+- x86 16:18:46: be153dcab45a872e17d6268b5a5599bc73ee6a235ab2de7bde94b78da1a813e1.
+- x64 16:18:55: e739454bc2e3e2a7856cf4b4bb66e6de0baf5fee7f4099246d14c4064835f332.
+
+Both complete EXEs equal their P97 predecessors after masking only PE
+timestamp/checksum (PE+8/PE+88, four bytes each) and the eight-byte compiler
+time at the unique unchanged date/time literal location. Lengths and PE
+offsets also match. No other bytes are ignored. Under the owner's artifact
+equivalence exception, no repeated full runtime suite is run; P97's 392/392
+remains the full-runtime baseline. This batch establishes no new behavior.
+
+Ordinary git diff --check reports exactly the three restored mirror trailing-
+whitespace lines. They match pinned XP and are intentional original-first
+restoration, not newly invented formatting. The remaining tracked diff must
+pass the ordinary whitespace check. Mirror identity gate passes. Frontier
+advances to 393/472, next file 394 video.h; later dependency reads do not
+constitute completed file audits. S1 and qualified earlier decisions stay open.
+
+P98 actual eight-file diff review is complete. Documentation gate and the
+non-mirror whitespace check pass; the three exact-XP whitespace diagnostics
+are explicitly accounted for above. CIM confirms all owned jobs exited;
+scratch preview, cleanup and residue check pass. No user assets or unrelated
+changes are included.

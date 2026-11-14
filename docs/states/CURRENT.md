@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P97 completes file 389 timeval.h. Restore XP's time_t declaration
-and simplify the matching Compat host callback; the prior long-only rationale
-is contradicted by both actual callers. Selected mirror diff decreases by five
-lines to zero. Production is +3/-9; tests add 17 lines. Both EXEs are freshly
-built/published; full final-source x86/x64 qualification passes 392/392.
-Frozen frontier 389/472; next file 390 base/inc/tmstrobe.h.
+T100 S1 P98 completes files 390-393. Three selected vgaports.h whitespace
+lines are restored exactly to XP; selected mirror diff decreases by six lines.
+Other audited headers match XP outside existing exclusions. Both EXEs are
+freshly built/published and whole-file equivalent to P97 except verified
+build/PE metadata; P97's 392/392 remains the runtime baseline.
+Frozen frontier 393/472; next file 394 base/inc/video.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

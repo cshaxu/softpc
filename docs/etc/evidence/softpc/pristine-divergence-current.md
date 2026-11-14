@@ -2123,3 +2123,12 @@ time_t declaration and coherently delegate the existing host callback to
 time(location). Selected mirror diff +4/-1 becomes zero; existing exclusion
 scaffolding is unchanged. Qualification is recorded with R0452, not inferred
 from the historical retention entry above.
+
+### T100 S1 P98 VGA header formatting restoration
+
+R0453 restores three original whitespace lines in vgaports.h. Selected
+XP-relative +3/-3 becomes zero, without changing the excluded bodies or
+line-control structure. Both freshly built/published EXEs are equivalent to
+P97 except verified build/PE metadata, so P97's 392/392 runtime evidence is
+retained without a repeated suite. Exact original trailing whitespace is
+intentional and independently checked against pinned XP.
