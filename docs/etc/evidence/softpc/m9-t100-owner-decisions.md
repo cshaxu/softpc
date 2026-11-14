@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-458 only. Positions 459-472, original
+This view currently reconciles positions 1-461 only. Positions 462-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -2140,6 +2140,100 @@ These four files add seventeen residual IDs: cumulative 319 (315 semantic/ABI,
 four compiler/format), nineteen notices. All remain owner choices. This
 reconciliation changes only documents, not source, tests or artifacts.
 
+## Positions 459-461: host graphics, keycode and plane conversion
+
+All three normalized current files match P152. Current source/caller checks
+confirm the final dispositions below; earlier incomplete experiments are not
+used as final-source results.
+
+### Host graphics
+
+R0604/R0616 restore the original unused stream global/function. R0606 restores
+resetWindowParams rather than retaining extra flush/palette/mode/cursor resets;
+R0612 restores the soft_reset startup guard. Separate original restorations pass
+actual VGA and snapshot transaction/cross-process fixtures. R0607/R0610/R0615
+restore fullscreen checks: production sc stays statically WINDOWED, and the
+fixture's invented FULLSCREEN state was not proof of a product requirement.
+Current fixture asserts the actual WINDOWED state. R0608 restores spacing and
+source positions. P150 removes 70 XP difference lines (production +35/-41,
+tests +34/-14), not merely six source lines.
+
+Seven residual IDs remain pending:
+
+- R0602/R0609: DIB include and paired update calls. Restoring both original
+  update bodies loses actual produced-frame evidence on both widths. Existing
+  host update depth and V7 pointer clear/draw form one rendering transaction.
+- R0603/R0614: the single DAC_data_bits declaration and packed/planar conversion.
+  Real C1/3C8/3C9 writes distinguish 6-bit scaling from 8-bit components; original
+  unconditional multiply-by-four fails the 8-bit assertion on both widths.
+  The previously passing fixture missed this case; both branches are now covered.
+- R0605: five static forward declarations match the original static definitions.
+  Original external declarations fail actual compilation on both architectures;
+  this is a compiler/linkage decision, not new exported functionality.
+- R0611: painter selection independent of transient memory-access CHAIN4;
+  original conjunction fails controller-programmed expected geometry on both.
+- R0613: selected packed painter's source-byte width; original calculation fails
+  actual 640x400 expected output on both widths.
+
+P150's substantive restored candidate passes 392/392. Final line-position,
+blank and declaration-wrapper adjustments are rebuilt and pass VGA, snapshot
+transaction/cross-process and mirror checks, four per width, with strict EXE
+metadata equivalence to that fully qualified candidate. This is automated host
+and snapshot evidence, not a fresh manual Win3.1/Win95 session.
+
+### Keycode conversion
+
+R0618 restores all original BIOS conversion tables; R0620 restores blank lines.
+P151 production +128/-5 removes 127 XP difference lines, tests unchanged.
+Actual machine/input.c still masks scan codes to eight bits and calls the
+original KeyMsgToKeyCode tables; this mask does not bound their 133/84 entries.
+
+Three residual IDs remain pending:
+
+- R0617: three unavailable NT headers omitted. Coherent original includes fail
+  at nt.h on both supported toolchains; this is a host dependency boundary.
+- R0619: two >= table guards plus their local explanation (five diff lines).
+  Actual function calls with regular index 133 and extended index 84 return
+  zero currently; each original > variant traps separately on both widths
+  under compiler bounds instrumentation. These are synthetic boundary tests,
+  not recorded physical keyboard incidents. The failed libubsan-link attempt
+  supplies no evidence; the trap-instrumented runs do not need that runtime.
+- R0621: omitted original BiosKeyToInputRecord. Full function and tables restored
+  together compile but fail actual fixture linkage at RtlOemToUnicodeN and
+  NT_SUCCESS on both widths. No current production caller or Compat duplicate
+  exists. This does not establish an original algorithm defect or justify a
+  second converter/native import path.
+
+P151 complete suites pass 392/392; final blank restoration is rebuilt and
+passes keycode, runtime continuation and both mirror gates on each width.
+Final EXEs are strictly metadata-equivalent to the qualified candidate.
+
+### Plane-to-pixel panning
+
+R0622-R0626 are five IDs belonging to one coherent capability, not five
+independent renderers. Current nt_munge.c differs +25/-1 across six ranges;
+P152 made no source/test change. The includes provide plane storage/bank
+extent, the shared reader combines corresponding bytes of adjacent groups,
+the per-scanline argument comes from existing register state, and a local word
+feeds the original LUT/masking branches without mutating guest VRAM. Zero pan
+returns the original word. No duplicate Compat converter was found.
+
+Unlike an isolated zero-pan query experiment, P152 restores the complete exact
+original nt_munge.c, original six-argument declaration and all selected nt_ega
+consumers together. The real Compat header adapter remains intact. Five
+independent matrices per width exercise low, medium/high mask 0xf, and
+medium/high mask 0x5, with pan 0-7, both banks, wrap, split and two rows.
+All ten current runs pass; all ten original runs fail independently shifted
+pixel assertions. Four include-removal compilations establish the direct data
+dependencies. An initial adapter-bypass compile failure is discarded as harness
+error. Neither argument mismatch nor that failed harness counts as necessity.
+These tests do not cover every mask, video mode or native scaling path.
+
+Fifteen residual IDs are added: cumulative 334 (329 semantic/ABI, five
+compiler/format), nineteen notices. All remain pending owner decisions.
+P164's later fresh 392/392 remains current runtime qualification. This batch
+changes only task records; no source, test, executable or user asset changes.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2149,4 +2243,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 459.
+recommendations into owner approval. The next position is 462.

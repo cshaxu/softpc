@@ -12560,3 +12560,25 @@ D001-D006/L001 reconciliation; S1/T100 and owner decisions remain open.
 
 P181 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task records change.
+
+## P182 final-decision reconciliation, positions 459-461
+
+All three normalized current files match P152. Current graphics update/DAC,
+original fullscreen checks, keyboard caller/array guards and both plane-munging
+branches were checked against P150-P152 final evidence. Unused stream state and
+original reset/guards stay restored. Artificial FULLSCREEN fixture state is
+not production necessity; original keyboard traps and complete coherent
+no-panning restoration are distinguished from partial interface failures.
+
+Fifteen residual IDs are added: 334 cumulative (329 semantic/ABI, five compiler/
+format), nineteen notices. No excluded-body accounting. All owner choices stay
+open. Tests establish their stated boundaries, not every keyboard/video mode
+or a fresh guest session.
+
+Executor/counter-review changes only three task records. No production/tests,
+EXEs, configuration, media or snapshots change; no owned jobs or scratch.
+P164 fresh 392/392 remains applicable, not a new run. Next position 462 and
+D001-D006/L001 remain; S1/T100 are not closed.
+
+P182 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Final changes are restricted to the three task records.
