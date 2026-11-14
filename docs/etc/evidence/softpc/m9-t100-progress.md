@@ -7561,3 +7561,47 @@ delta zero. No production build or republication is required for this read-only
 source audit; P102 dual EXEs remain unchanged. P97's 392/392 remains the full
 runtime baseline. Frontier 401/472; next 402 base/support/ios.c. S1 remains
 active and R0468-R0471 await owner disposition.
+
+
+## File 402: ios.c (P104)
+
+Pinned XP raw SHA-256
+b7a07d41a99d14c6d8444135c1f5230e0bfd283f15b973be7afbfb8b8c5ddbbc.
+Complete original/local correspondence and every replaced-range boundary were
+reviewed. Existing #error bodies are skipped without new bookkeeping. The
+final GetExtIo adapter deletions belong to the existing NTVDM exclusion;
+they are not missing selected dispatcher functions.
+
+R0472: XP lines 196-199 place the empty-port byte assignment inside an
+unconditional block, with its original default-value comment. Current source
+had omitted the opening brace, comment and closing brace. Restore those three
+original lines exactly and adjust the adjacent line-control marker from 198
+to 196. The selected path neither declares block-local variables nor jumps
+across this block; restoration changes no expression, return value or call.
+The NTVDM exclusion is unchanged.
+
+Initial analysis and independent counter-review agree that this is a genuine
+selected-body difference, not excluded content to skip. Restoring it removes
+an unnecessary adaptation. All remaining selected code matches XP. CMakeLists
+line 163 includes the file, BIOS reset.c:692 calls io_init, and actual CCPU
+in.c/out.c dispatch through its adapter tables. No unused-file deletion,
+Compat duplicate or additional virtualized-I/O path is introduced.
+
+Production +4/-1 (net +3), including the line-control replacement; tests +0/-0.
+Exact LF-delimited SequenceMatcher comparison with autojunk disabled shows
+XP-relative added-diff unchanged and deleted-diff reduced by three lines.
+No exclusion body is changed or newly counted. There is no residual selected
+patch requiring an owner decision for this file.
+
+Final cached builds pass in 10.30 seconds x86 / 11.31 seconds x64 and publish
+both EXEs. Their unique Nov 13 2026 compiler-time literals are:
+
+- x86 16:48:28: 177b8ac8e89a642d59de593f05052eb82dfb56b436aff09841bb8c0e2f5d6010.
+- x64 16:48:39: bcba006d00ce63e42f2b16eb61c5f615ffd23f6b68d06ee827b182f0fdd9c9aa.
+
+Entire EXEs match P102 after masking only PE timestamp/checksum and eight
+compiler-time bytes at the unique same-position date/time literal. No other
+bytes or length changes are ignored. No runtime tests are repeated under the
+owner's artifact-equivalence exception; P97's 392/392 remains the full runtime
+baseline. This is build/artifact equivalence evidence, not a new guest session.
+Frontier 402/472; next 403 base/support/time_day.c. S1 remains active.

@@ -30,11 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P103 completes file 401 ppi.c without production changes. Full-state
-sound wiring, gate reset and private snapshot residuals are evidence-qualified
-owner decisions; the reset has deterministic x86/x64 negative controls.
-Focused existing tests pass 6/6. P102 EXEs and P97's 392/392 full runtime
-baseline remain unchanged. Frontier 401/472; next 402 base/support/ios.c.
+T100 S1 P104 completes file 402 ios.c. Restore the original empty-port
+assignment block/comment; selected implementation now matches XP, reducing
+mirror diff by three lines. Fresh dual EXEs are metadata-equivalent to P102;
+P97's 392/392 remains the full runtime baseline. Frontier 402/472; next 403
+base/support/time_day.c. Existing qualified owner decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

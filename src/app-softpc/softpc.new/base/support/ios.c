@@ -163,8 +163,11 @@ LOCAL void io_empty_inb IFN2(io_addr, io_address, half_word *, value)
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif // NTVDM
-#line 198
+#line 196
+    {
+        // Nothing dynamically loaded, just use default value
         *value = IO_EMPTY_PORT_BYTE_VALUE;
+    }
 
 }
 

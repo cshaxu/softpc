@@ -2163,3 +2163,12 @@ snapshot state and default input value remain qualified owner decisions with
 explicit source proofs and bounded current tests; historical acceptance alone
 is not their evidence. Fresh dual EXEs equal P100 except build metadata;
 mouse/checkpoint tests pass 4/4. No new device path is introduced.
+
+
+### T100 S1 P104 I/O dispatcher restoration
+
+R0472 restores the original empty-port assignment braces and comment in ios.c,
+with corresponding line control. Selected code now matches pinned XP; existing
+exclusions remain untouched. Source net +3 is mirror diff reduction of three
+lines, not a new adaptation. Both published EXEs match P102 except build
+metadata; no new runtime test is claimed.
