@@ -2257,3 +2257,11 @@ XP-relative added/deleted diff reduced by one line. Actual translation-unit
 negative builds prove Ctrl-Z restoration fails both architectures. Its omission
 and the relocated historical notice remain qualified decisions R0507/R0508;
 the selected interrupt handler matches XP. No excluded-body accounting.
+
+### T100 S1 P119 cga.c original callback declarations
+
+Restore two exact original function-pointer declarations. Added IPT2 vocabulary
+expands to () in both supported configurations; full preprocessing differs
+only by the two definition spaces. Source +2/-2, XP-relative diff -2 added/-2
+deleted, four fewer difference lines. No selected residual remains in this file;
+existing excluded bodies and line-control scaffolding are not re-accounted.

@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P118 completes file 414 unexp_nt.c: one unnecessary replacement blank
-line removed; actual x86/x64 compilation proves original Ctrl-Z is unsupported.
-The original handler is unchanged; notice and Ctrl-Z omission remain qualified
-pending decisions. Cached dual-EXE publication passes and is metadata-equivalent
-to P116/P114. P114 retains the full 392/392 regression baseline. Frontier 414/472;
-next 415 base/video/cga.c. D005, L001 and earlier decisions remain open.
+T100 S1 P119 completes file 415 cga.c: two callback declarations restored to
+exact XP spelling, removing four mirror-diff lines with no selected residual.
+Actual dual-width preprocessing and cached EXE publication prove equivalence
+apart from two declaration spaces and build metadata respectively. P114 retains
+the full 392/392 runtime baseline. Frontier 415/472; next 416 base/video/egawrtm0.c.
+D005, L001 and earlier qualified decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

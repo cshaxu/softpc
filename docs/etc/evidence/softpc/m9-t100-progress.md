@@ -8546,3 +8546,59 @@ Both builds emit 89 existing mirror-path warnings, none outside the mirror.
 The owned runner exited successfully and its PID is absent. Task scratch was
 previewed, removed and residue-checked. Manifest/documentation gates and
 actual diff review pass; no warning-free or fresh full-runtime claim.
+
+## File 415: cga.c (P119)
+
+Pinned XP raw SHA-256 568555cd33693f885beaa8768178ae85cdebb141738c41d7fd31237ed501f3b4.
+Full-file comparison finds only two selected declaration changes beyond the
+existing excluded bodies and line-control scaffolding, which are skipped
+without new accounting. The original historical notice is already intact.
+
+R0509 restores both bios_ch2_byte_wrt_fn and bios_ch2_word_wrt_fn definitions
+from added IPT2 parameter vocabulary to exact original (). Under the actual
+supported non-ANSI macro branch IPT2 expands to (), so the added spelling
+provides no parameter-type contract. It does not repair argument width or
+calling convention. Source +2/-2; XP diff reduced by two additions and two
+deletions, four difference lines. No selected residual difference remains.
+
+Actual consumers are the original video.c BIOS text writes; cga_init installs
+simple_bios_byte_wrt/simple_bios_word_wrt, and the selected C-VID SetBiosWrites
+installs write_bios_byte/write_bios_word. Root CMake includes cga.c and gvi.c
+calls its initialization/termination. The header's existing IPT2 declaration
+has the same active expansion and needs no coupled edit. No Compat substitute
+or new dispatch route is introduced.
+
+Counter-review uses the real x86/x64 Ninja GCC preprocessing commands before
+and after exact restoration. Complete outputs differ only by the space before
+() at these two definitions; all other bytes match. The initial raw comparison
+correctly detected those spaces. A first normalization attempt also touched
+unchanged extern declarations and was rejected; the final comparison matches
+only the two definition lines and passes both architectures. Each failed
+probe process exited before correction; none was killed or restarted live.
+No failed preliminary probe is counted as passing evidence.
+
+Final cached builds and dual-EXE publication pass. Whole-file EXE equivalence
+against P118 masks only PE timestamp/checksum and eight compiler time bytes
+at the unique same-position Nov 13 2026 literal; every other byte and length
+matches. The approved equivalence exception applies: no fresh full runtime
+run is claimed; P114 remains the full 392/392 baseline.
+
+x86-build: 8.92 seconds, exit 0.
+
+x86-artifact: 18:17:41 Nov 13 2026, SHA-256 239394f2d7f438f9d37b71aef5987a7454d5701caf7807af54de73dce05808ff.
+
+x64-build: 10.11 seconds, exit 0.
+
+x64-artifact: 18:17:50 Nov 13 2026, SHA-256 b7fbe5f8457db0e27000d1cc7f5ca12fa844ee51739d051ef42718c9c0949467.
+
+x86: 89 existing mirror warnings; none outside the mirror.
+
+x64: 89 existing mirror warnings; none outside the mirror.
+
+Actual production diff is exactly the two original declarations; mirror CRLF
+and manifest identity are preserved. No tests, other source, user INI, media
+or snapshots change. Frontier 415/472, next 416 base/video/egawrtm0.c.
+Earlier qualified decisions remain open; S1 is not closed.
+
+P119 owned runner exited and its PID is absent. Exact scratch cleanup and
+residue check pass, as do mirror/documentation gates and actual diff review.
