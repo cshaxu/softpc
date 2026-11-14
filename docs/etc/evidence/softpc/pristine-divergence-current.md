@@ -2486,3 +2486,14 @@ current passes. The earlier prototype-only restoration claim is withdrawn.
 All 392 final-source tests and the added two-width regression pass. No second
 native audio owner is activated; no guest binary is changed.
 See [ordered evidence](m9-t100-progress.md#file-463-hostsrcnt_sbdspc-p154).
+
+
+T100 S1 P155 restores nt_sbfm.c original selected behavior, batch helper,
+independent declarations/functions and formatting: 189 fewer XP diff lines,
+production +171/-26, tests +4/-1. The old note-register timer-status expansion
+and its fixture expectation were not XP behavior; both return to the original
+AD_MASK guard. Same-fixture negative/positive comparison proves the change on
+both widths. Full final qualification passes 392/392. R0657/R0662/R0663 retain
+qualified native-header, NTVDM host and archive decisions, supported by compile
+failures and field-withdrawal assertions. No native FM output is activated.
+See [ordered evidence](m9-t100-progress.md#file-464-hostsrcnt_sbfmc-p155).

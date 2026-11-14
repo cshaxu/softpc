@@ -4,6 +4,9 @@
 #include "nt_sb.h"
 #include "compat/devices/snapshot.h"
 
+MIDIGETNUMDEVSPROC MidiGetNumDevsProc;
+MIDIGETDEVCAPSPROC MidiGetDevCapsProc;
+
 static IU8 status(void)
 {
     IU8 value = 0xff;
@@ -31,7 +34,7 @@ int main(void)
                     lib_test_assert(status() == expected);
                     FMDataWrite((IU8)data);
                     if (index == 4 && data >= 128) expected = 0;
-                    if (index == 4 || (index >= 176 && index <= 189))
+                    if (index == 4)
                         expected = (IU8)(expected | flags[data % 4]);
                     lib_test_assert(status() == expected);
                     lib_test_assert(status() == expected); /* Reads do not clear. */

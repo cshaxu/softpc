@@ -11414,3 +11414,106 @@ choices; no retention approval is inferred from passing tests. All task jobs are
 build residue check passes. File frontier advances
 to 463/472 on P154 delivery; next host/src/nt_sbfm.c. Nine files and qualified
 owner decisions keep S1/T100 open.
+
+
+## File 464 host/src/nt_sbfm.c investigation (not delivered)
+
+The fixed XP raw hash matches its manifest. Production is unchanged after P154.
+Source-body brace review finds a real semantic difference: XP FMDataWrite updates
+timer flags inside AdlibRegister == AD_MASK (04h). Note-register writes may flush
+its native batch, but are not inside that status-update condition. Current code
+updates flags for B0h..BDh too; the current exhaustive fixture encodes that same
+broadened behavior. Its green result is not evidence for retaining the difference.
+The local comment claiming that note-register behavior matches XP is incorrect.
+No guest failure is inferred from this source fact alone.
+
+Next coherent experiment will restore original selected declarations, reset/read/
+select/write structure and the inactive native batch helper, retaining existing
+exclusions and the actual archive boundary. FMActive starts false and production
+has no OpenFMDevice caller; the original batch helper's false branch clears its
+position and succeeds without native WriteFile. Source review must distinguish
+this reachable no-hardware path from the NTVDM kernel/direct-I/O open/close path.
+No new synthesizer, port owner or runtime route is admitted. The fixture's
+expected transitions must follow the original AD_MASK guard rather than copying
+the current expanded condition. No file completion or P155 qualification is
+claimed yet; delivered frontier remains 463/472.
+
+
+## File 464 host/src/nt_sbfm.c P155
+
+The fixed XP normalized raw hash d2ee18de413c7b2b0c12314bc1316afb040d9339d12087853bbc4361fe845607
+matches the manifest. Actual production handlers remain VsbByteIn/VsbByteOut and
+ResetAll in nt_sb.c; the device archive calls capture/restore of selected register
+and Status. No native FM open/close caller is added. The unit target compiles this
+actual mirror source, not a duplicate implementation.
+
+| Point | Location | Initial analysis and counter-review |
+| --- | --- | --- |
+| R0657 | XP includes 11-20 | Restore windows.h and original host_def.h/insignia.h order. Qualified pending: omit unavailable nt.h/ntrtl.h/nturtl.h/softpc.h and retain the actual archive declaration. Exact whole-original compilation fails at nt.h on both supported toolchains; no external source is made a build dependency. |
+| R0658 | XP globals 22-41 and ResetFM 49-59 | Restore original globals, SDK types, native batch declarations, timer bookkeeping and exact ResetFM body. FMActive remains false: neither the original native open routine nor another production writer is wired. Therefore batch position/timer bookkeeping do not acquire an independent state owner. |
+| R0659 | XP FMStatusRead 61-103 and FMRegisterSelect 105-111 | Restore original types, declarations and selected formatting. Existing excluded input body is untouched. Reads retain the original Status semantics and do not clear flags. |
+| R0660 | XP FMDataWrite 113-176 | Restore original selected function structure, including batching and AD_MASK-only status updates. The former simplification treated note registers B0h..BDh as timer-control writes. Its explanatory comment and corresponding fixture expectation were incorrect, not evidence of an intentional required device behavior. No user symptom is claimed as its consequence. |
+| R0661 | XP FMPortWrite 184-214 and FindFMSynthDevice 216-262 | Restore original selected helper bodies. FMPortWrite with FMActive false clears Position and succeeds without WriteFile. FindFMSynthDevice has no new caller; its original callback declarations resolve from nt_sb.c in production. The isolated FM fixture supplies the two unused callback pointer objects, leaving them null, rather than linking an unrelated whole machine or activating MIDI hardware. No FM output backend is introduced. |
+| R0662 | Existing capture/restore additions | Qualified pending: selected register and Status are the guest-observable archived state. Restore validates the eight reachable status encodings before mutation; all selected byte values are legal. The exhaustive fixture proves archive round-trip and invalid-state rejection. Newly restored batch storage is inactive host submission bookkeeping: with FMActive false, flushing cannot change Status except through the original AD_MASK branch and has no host side effect. |
+| R0663 | XP OpenFMDevice/CloseFMDevice 264-360 | Qualified pending omission: these call NtVdmControl for direct I/O and kernel/user ADLIB emulation, using VDM_ADLIB_DATA and NTVDM service constants. Complete original bodies, with the restored original globals/helper declarations and ordinary Windows headers, fail compilation on both widths at the unavailable NTVDM types/constants. This demonstrates a native host boundary, not a runtime failure of the XP product. Adding those declarations alone would not provide the interpreter's missing NTVDM kernel service. No new stub, alternate lifecycle or host capability is invented. |
+| R0664 | Nonsemantic differences and original EOF | Restore original descriptions, comments, spacing and trailing blanks; remove local prose asserting the wrong note-register behavior. Existing exclusions remain skipped. The existing native-debug line-control directive follows its restored original position and resumes at original line 209; no new excluded body is created. |
+
+Controlled comparison uses actual Ninja compile/link flags and the actual source
+on x86/x64, with no guest or asset modification. Each width runs three variants:
+old implementation plus old fixture expectation passes; old implementation plus
+the XP AD_MASK expectation fails the status assertion at fixture line 39;
+restored implementation plus that same expectation passes. These are four passes
+and two deliberate failures, all compiling/linking successfully. The corrected
+matrix checks both low-bit reset states, four prior flag combinations, every
+register and byte value (524288 transitions), repeat reads and snapshot round-trip.
+The new expected guard is derived from original scope/braces, not from the
+modified implementation's condition. The old assertion's success is explicitly
+not treated as correctness evidence.
+
+Separate production-flag compiles of the exact whole XP file fail at nt.h on
+both widths. Compiles of the coherent native open/close bodies with ordinary
+Windows declarations fail at VDM_ADLIB_DATA and related service definitions.
+These four negative builds qualify only the native boundary; they do not justify
+omitting ordinary no-hardware behavior or independent original helpers.
+
+Installed candidate: production +171/-26 (net +145), tests +4/-1 (net +3).
+Using the same normalized Git comparison before/after, XP-relative added/deleted
+diff decreases by 189 lines. Existing excluded bodies cancel and receive no
+accounting. The first cached x86 build passes; full x86/x64 qualification is
+running. Remaining choices are qualified owner decisions, not approved retention.
+Delivered frontier remains 463/472 until P155 verification, cleanup and push.
+
+### Final verification and P155 delivery
+
+Final-source cached builds and all 392 tests pass:
+
+| Architecture | Build | Background | Native desktop/audio/package |
+| --- | --- | --- | --- |
+| x86 | 11.21 s | 188/188, 143.38 s | 8/8, 16.15 s |
+| x64 | 12.92 s | 188/188, 142.63 s | 8/8, 15.84 s |
+
+Additional controlled archive withdrawals compile/link on both widths. Omitting
+selected-register restoration fails the next-write assertion (fixture line 47);
+omitting Status restoration fails the immediate restored-state assertion (44).
+These four deliberate failures qualify the archive fields in R0662, not every
+possible future archive format. The restored fixture passes the full matrix.
+No desktop verification is deferred; no real OPL audio capability is claimed.
+
+Independent actual-diff review confirms the frozen before file equals HEAD,
+fixed XP identity, CRLF mirror format, exact complete ResetFM/FMRegisterSelect/
+FindFMSynthDevice bodies, and original selected FMDataWrite/FMPortWrite structure.
+The production reference scan finds only HFM and native open/close declarations
+outside this file, no caller that activates native FM. Original batch data remains
+host-inactive; no additional archived guest state is needed for that buffer.
+Production +171/-26 (net +145), tests +4/-1 (net +3); XP diff falls by 189 lines.
+Mirror and documentation gates plus actual-diff checks pass. Task jobs are
+checked exited and scratch removed before commit. Qualified owner decisions
+remain R0657/R0662/R0663; restored behavior is not declared a new OPL implementation.
+
+Published SHA-256:
+
+- softpc32.exe: `01a3c46ada247b30e97bd0a37b7179bffef697c3b1952c2ca1baad9fffa309a0`.
+- softpc64.exe: `39c06e1784703f6621b0990b7eb7d0010bd46b8f30225c6ccf5a2341c13c6e4c`.
+
+P155 advances the delivered frontier to 464/472; next host/src/nt_sbmid.c.
+Eight files and qualified owner decisions keep S1/T100 open.
