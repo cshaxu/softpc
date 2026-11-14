@@ -12339,3 +12339,28 @@ open, not closed by the accumulated file coverage.
 
 P171 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Final changes are limited to the three task records.
+
+## P172 final-decision reconciliation, positions 394-401
+
+All eight current normalized files equal their P103 committed contents.
+Current actual-source searches confirm teletype stream references and disabled
+storage, keyboard command/PIC operations, device archive calls, Machine mouse
+ingress and BIOS reset order, mouse timer/clearing, and original PPI sound
+notification after the timer gate. No later superseding edit is hidden.
+
+Reconcile P99-P103 evidence with precise limits: keyboard C0/IRQ and PPI gate
+have actual-source original-negative controls; mouse defaults/reset and finite
+burst replacement rely on identified source contracts and current tests rather
+than a claimed fresh original guest reproduction. Snapshot ownership evidence
+is not reduced to mere references. Notice policy is separate from behavior.
+Eleven semantic IDs and four notices are added: 240 residual IDs (238 semantic,
+two compiler/format) and twelve historical notice items through position 401.
+R0454/R0459/R0467 remain delivered restorations, not approval candidates.
+
+Executor/counter-review changes only three task records. No code, tests, EXEs,
+configuration or media changed; no job/scratch created. P164's fresh 392/392
+remains applicable without claiming a new run. Next is position 402; original
+D001-D006/L001 and owner decisions remain open. S1/T100 are not closed.
+
+P172 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task documents are changed.

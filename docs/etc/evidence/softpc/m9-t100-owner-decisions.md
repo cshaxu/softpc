@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-393 only. Positions 394-472, original
+This view currently reconciles positions 1-401 only. Positions 402-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1230,6 +1230,115 @@ qualified residual IDs (227 semantic, two compiler/format), plus eight separate
 historical notice items. Sources/tests/EXEs are unchanged in this reconciliation;
 P164's fresh 392/392 still applies, with all owner choices remaining open.
 
+## Positions 394-401: video declarations and keyboard/mouse/PPI
+
+All eight current normalized files match their committed P103 versions.
+Current source confirms original teletype references, disabled stream storage,
+keyboard command/IRQ changes, real Machine mouse ingress, reset ordering,
+recurring mouse event and PPI gate/HostPpiState wiring. P99-P103 evidence is
+reconciled below without inventing new runtime results.
+
+### R0455: original stream declarations in the selected build
+
+Four declarations in video.h remain added outside NTVDM, +4/-0. The actual
+original vd_write_teletype body references all four after its NTVDM-local
+block, so removing them fails actual video.c compilation on both widths.
+Compat supplies FALSE/NULL/zero initial state; no later enable assignment was
+found. This is not an implemented stream backend. Deleting the original body
+would introduce another behavioral difference, while moving declarations would
+only relocate the adaptation. R0454 already restored spelling and removed the
+three unnecessary explanation lines. virtual.h, xt.h and yoda.h have no
+selected pending differences. Their original include wiring remains.
+
+### Keyboard: R0457/R0458/R0460
+
+R0457 retains snapshot integration (118 implementation/separator lines and its
+include). FIFO, scan sets, held/key-type arrays, response latches, repeat state,
+refill handle and anomalous sequence pointer are private. Original port APIs
+consume/mutate input and schedule work, so cannot provide equivalent capture
+and restoration. Callback IDs encode actual do_int/allowRefill entries;
+anomalous pointer state uses a break-table index, not a saved host address.
+The existing archive is invoked at the executor safe boundary. Checkpoint and
+IRQ tests cover queued state, invalid FIFO count, pointer reconstruction and
+scan sets 1-3. A late validation failure can already have selected key arrays;
+production staged restore resets/fails without resuming, not transactional
+per-device rollback. No exhaustive refill timing claim is made.
+
+R0458 adds the missing code_to_send=input_port_val assignment in C0. Original
+C0 marks the automatic value valid without assigning it. Actual bop fixture
+expects BFh at port 60; individually reverting the assignment fails that same
+assertion on both architectures, while controls pass.
+
+R0460 keeps existing PIC IRQ1 clearing on consumption of port 60 outside the
+original JOKER selection. Actual IRQ fixture sees pending masked IRQ1, reads
+FAh and requires IRR bit 1 cleared; individual original restoration fails both
+widths. This clears a pending request, not a fabricated EOI or second queue.
+R0459 restored original comment/blank text, removing five mirror diff lines.
+These are bounded controller/PIC negatives, not proof of a specific old guest
+incident. keybd_io.c otherwise has no selected implementation difference.
+
+### Mouse: R0463-R0466
+
+- R0463 replaces original five finite bursts of 100 interrupts with the one
+  rate-selected recurring quick event and enable/HOLD-aware delivery. Original
+  bursts cannot sustain 30/50/100/200 Hz; no-argument or partial restoration is
+  not used as proof. Timer tick consumes its handle, suppresses IRQ during HOLD
+  and schedules one successor; rate changes/disable cancel it. Data and timer
+  IRQ enables remain separate. Existing actual-controller tests cover periods,
+  HOLD recurrence, cancellation and CCPU/PIC delivery. They are not a new
+  coherent-original runtime negative or universal Windows driver proof.
+- R0464 archives thirteen private InPort fields and the actual timer callback.
+  Reading ports changes ID phase; HOLD latches/clears movement; mode writes
+  schedule interrupts. Replay therefore cannot replace side-effect-free state
+  restoration. Checkpoint tests exercise held data, selection, ID validation
+  and queue/controller roundtrip, not every malformed field.
+- R0465 initializes the byte returned by mouse_inb even for unsupported internal
+  selections. Actual CCPU IN8 otherwise passes an uninitialized IU8 to a handler
+  which may leave it untouched. This is concrete source proof of indeterminate
+  input, not a fresh guest or exhaustive electrical-bus experiment.
+- R0466 clears stale accumulated/latched data on reset, aligns prior/current
+  button state, and initializes cold controller state. BIOS already called
+  q_event_init before mouse_init; the obsolete handle must be discarded rather
+  than deleting a possibly reused queue entry. Reset ordering is source proof,
+  with current mouse/checkpoint behavior tests, not new allocation-failure or
+  exhaustive timing tests.
+
+R0467 removed four redundant comment lines. The device itself remains the
+original port handler receiving Machine mouse_send; Compat has no parallel
+mouse implementation. All four residuals still require owner choice.
+
+### PPI: R0469-R0471
+
+R0469 selects original HostPpiState after timer_gate, removing duplicate legacy
+speaker-edge handling. Original host sound uses both bits 0 and 1; the legacy
+branch only notified bit-1 changes through no-argument callbacks, losing bit-0
+transitions. Reconstructing those elsewhere would duplicate the state owner.
+The remaining Compat disable wrapper serves BIOS reset, not PPI decoding.
+This is an existing selection patch, not a newly introduced product branch.
+
+R0470 resets gate_2_was_low alongside ppi_register on repeated initialization.
+Otherwise an earlier high-gate write leaves the next high transition missing.
+P103's initial sound timing failure was not taken as decisive proof: a direct
+state fixture restores a high gate, calls actual ppi_init, captures state and
+checks zero register plus low-gate history. Current passes both widths;
+single-line original restoration fails the same gate assertion on both.
+
+R0471 captures/restores private register phase and gate history; original reads
+toggle status and writes mask/change state and trigger edges. Archive restore
+notifies the same HostPpiState. Three fields remain in the existing serialized
+contract; this audit does not silently alter that schema. Six current sound,
+checkpoint and sound-state tests passed in P103 with mocked audio, not evidence
+of native-device availability or a new Windows session.
+
+### Counts and separate notice policy
+
+R0456/R0461/R0462/R0468 each preserve one historical notice outside its excluded
+SCCSID block. These four policy decisions are separate from runtime patches;
+no excluded body is counted. Historical notice items total twelve.
+This group adds eleven semantic IDs: cumulative 240 qualified residual IDs
+(238 semantic, two compiler/format). Current production/test/EXE bytes remain
+unchanged; P164's full 392/392 applies. No pending choice is treated as approval.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1239,4 +1348,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 394.
+recommendations into owner approval. The next position is 402.
