@@ -30,15 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P149 audits nt_ega.c's three bounds blocks and three panning connections
-with serial isolated restoration probes, then removes four nonsemantic lines.
-Production +0/-4, no test changes; selected XP diff 49 -> 45. Semantic residuals
-remain qualified owner decisions. Cached dual builds/publication and final
-392/392 test coverage pass after correcting and rerunning one x86 manifest gate;
-both architectures pass all native tests. No native coverage is deferred.
-Frontier 458/472; next is host/src/nt_graph.c. Fourteen files and pending decisions
-keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-458-hostsrcnt_egac-p149).
+T100 S1 P150 restores nt_graph.c's original reset body, soft_reset/fullscreen
+checks and unused stream state/function, plus original selected formatting.
+Actual production remains WINDOWED; tests no longer manufacture FULLSCREEN.
+Six/eight-bit DAC tests cover real port writes. Production +35/-41, tests
++34/-14; selected XP diff decreases 70 lines. Dual cached builds/publication
+and 392/392 complete tests pass; final nonsemantic/declaration minimization
+passes dual rebuilds, strict artifact equivalence and 4/4 focused tests per width.
+No native coverage deferred. Frontier 459/472; next is host/src/nt_keycd.c.
+Thirteen files and qualified owner decisions keep S1/T100 open. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-459-hostsrcnt_graphc-p150).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

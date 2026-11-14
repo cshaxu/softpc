@@ -408,7 +408,7 @@ static void verify_text_stride(void)
     assert(softpc_standalone_text_prepare(now_width, now_height));
 }
 
-static void verify_fullscreen_text_clear(void)
+static void verify_text_clear(void)
 {
     void *cells;
     unsigned long columns;
@@ -416,7 +416,6 @@ static void verify_fullscreen_text_clear(void)
     unsigned long stride;
     unsigned long cell_bytes;
     HANDLE saved_screen_buffer = sc.ScreenBufHandle;
-    int saved_screen_state = sc.ScreenState;
     int saved_soft_reset = soft_reset;
     BOOL saved_console_initialised = ConsoleInitialised;
     BOOL saved_console_no_updates = ConsoleNoUpdates;
@@ -434,11 +433,9 @@ static void verify_fullscreen_text_clear(void)
         origin, &written));
     assert(written == 80u * 25u);
 
-    /* A detached renderer has one text surface for every guest display
-       state. The original native Console fullscreen policy must not suppress
-       a guest clear before it reaches that surface. */
+    /* Production retains the original WINDOWED host state. */
     sc.ScreenBufHandle = NULL;
-    sc.ScreenState = FULLSCREEN;
+    assert(sc.ScreenState == WINDOWED);
     soft_reset = 1;
     ConsoleInitialised = TRUE;
     ConsoleNoUpdates = FALSE;
@@ -447,16 +444,14 @@ static void verify_fullscreen_text_clear(void)
         assert(((const unsigned char *)cells)[cell * cell_bytes] == ' ');
 
     sc.ScreenBufHandle = saved_screen_buffer;
-    sc.ScreenState = saved_screen_state;
     soft_reset = saved_soft_reset;
     ConsoleInitialised = saved_console_initialised;
     ConsoleNoUpdates = saved_console_no_updates;
 }
 
-static void verify_fullscreen_cursor_metadata(void)
+static void verify_cursor_metadata(void)
 {
     DISPLAY_GLOBS saved_display = PCDisplay;
-    int saved_screen_state = sc.ScreenState;
     CONSOLE_CURSOR_INFO hidden;
     COORD position;
     kvm_text_frame text = {0};
@@ -469,19 +464,18 @@ static void verify_fullscreen_cursor_metadata(void)
     assert(softpc_compat_set_console_cursor_info(NULL, &hidden));
 
     /* Legacy host percentage caches are not the presentation authority. */
-    sc.ScreenState = WINDOWED;
+    assert(sc.ScreenState == WINDOWED);
     set_cursor_visible(FALSE);
     make_cursor_change();
     set_cursor_visible(TRUE);
     set_cursor_height(1);
-    sc.ScreenState = FULLSCREEN;
+    assert(sc.ScreenState == WINDOWED);
     make_cursor_change();
     softpc_platform_presentation_text_style(&text);
     assert(text.cursor_column == get_cur_x() && text.cursor_row == get_cur_y());
     assert(text.cursor_mode == KVM_CURSOR_HOST && text.cursor[0].height == 1u);
 
     PCDisplay = saved_display;
-    sc.ScreenState = saved_screen_state;
 }
 
 static void verify_panning_refresh(void)
@@ -2117,8 +2111,8 @@ int main(void)
     assert(width == 1280u && height == 768u);
     verify_text_geometry_capacity(machine);
     verify_text_stride();
-    verify_fullscreen_text_clear();
-    verify_fullscreen_cursor_metadata();
+    verify_text_clear();
+    verify_cursor_metadata();
 
     /* Original mode selection has a bounded two-tick wait. Repeated
        invalidations must not indefinitely postpone selecting the painter. */
@@ -2427,6 +2421,32 @@ int main(void)
             &right, &bottom));
         assert(left == 0 && top == 0 && right == (lib_i32)width - 1 &&
             bottom == (lib_i32)height - 1);
+    }
+    {
+        const softpc_test_dib_info *dib = (const softpc_test_dib_info *)info;
+        half_word saved_dac_control = extensions_controller.dac_control.as.abyte;
+        PC_palette saved_dac = DAC[1];
+        int saved_256 = get_256_colour_mode();
+        for (int eight = 0; eight < 2; ++eight) {
+            outb(0x3c4, 6); outb(0x3c5, 0xea);
+            outb(0x3c4, 0xc1);
+            outb(0x3c5, (saved_dac_control & ~1u) | eight);
+            outb(0x3c8, 1);
+            outb(0x3c9, eight ? 0x81 : 0x21);
+            outb(0x3c9, eight ? 0x96 : 0x16);
+            outb(0x3c9, eight ? 0xfb : 0x3b);
+            for (int packed = 0; packed < 2; ++packed) {
+                set_256_colour_mode(packed);
+                set_the_vlt();
+                assert(dib->colours[packed ? 1 : 0].red == (eight ? 129 : 132));
+                assert(dib->colours[packed ? 1 : 0].green == (eight ? 150 : 88));
+                assert(dib->colours[packed ? 1 : 0].blue == (eight ? 251 : 236));
+            }
+        }
+        outb(0x3c4, 0xc1); outb(0x3c5, saved_dac_control);
+        DAC[1] = saved_dac;
+        set_256_colour_mode(saved_256);
+        set_the_vlt();
     }
     verify_ega_dirty_alignment();
     verify_panning_refresh();

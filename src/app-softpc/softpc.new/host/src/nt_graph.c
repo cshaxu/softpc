@@ -80,12 +80,7 @@
 extern int  ega_int_enable;
 #endif
 
-#ifdef V7VGA
-/* vgaports.h declares this for controller code; nt_graph deliberately keeps
-   its historic narrower include set, so declare the V7 DAC width here. */
 extern int DAC_data_bits;
-#endif
-
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
@@ -442,7 +437,7 @@ extern BYTE     Green[];
 extern BYTE     Blue[];
 
 #ifndef NEC_98
-/* NT host stream state is excluded from this source subset. */
+GLOBAL boolean  host_stream_io_enabled = FALSE;
 #endif // !NEC_98
 #line 587
 
@@ -578,20 +573,14 @@ GLOBAL VOID closeGraphicsBuffer IFN0()
 
 GLOBAL void resetWindowParams()
 {
-	/*
-	 * Reset host-only presentation caches.  They describe deferred painting
-	 * work for the old DIB and must never survive an archive restore: the
-	 * restored controller is rebuilt and painted synchronously by its caller.
-	 */
-	current_height = current_width = 0;
-	current_char_height = 0;
-	current_mode_type = TEXT;
-	current_bits_per_pixel = 0;
-	current_scale = 0;
-	flush_count = 0;
-	update_vlt = FALSE;
-	mode_change_now = ega_tick_delay = 0;
-	CursorResizeNeeded = FALSE;
+        /*
+         * Reset saved video params
+         */
+        current_height = current_width = 0;
+        current_char_height = 0;
+        current_mode_type = TEXT;
+        current_bits_per_pixel = 0;
+        current_scale = 0;
 }
 
 /*::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
@@ -776,7 +765,8 @@ void nt_clear_screen(void)
     if(sc.ScreenBufHandle) return;
 
 #ifndef X86GFX
-/* Standalone presentation does not use the NT fullscreen clear guard. */
+    if (sc.ScreenState == FULLSCREEN)   // don't want sudden screen clears
+        return;
 #endif
 #line 941
 #ifndef SOFTPC_STANDALONE
@@ -898,7 +888,7 @@ void nt_graphics_tick(void)
 #line 1054
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else // !NEC_98
+#else  // !NEC_98
 #line 1061
                 if(update_vlt || get_palette_change_required())
                     set_the_vlt();
@@ -912,15 +902,15 @@ void nt_graphics_tick(void)
 #line 1069
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#endif
+#endif // !NEC_98
 #line 1072
                         (void)(*update_alg.calc_update)();
-
 #line 1073
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#endif
-#line 1080
+#endif // NEC_98
+#line 1079
+
                 ega_tick_delay = EGA_TICK_DELAY;
 
                 /* batch cursor changes as some naffola apps (Word) change
@@ -1187,7 +1177,8 @@ void make_cursor_change(void)
     SAVED DWORD CurrentCursorSize = (DWORD)-1;
     SAVED BOOL CurNowOff = FALSE;
 
-#line 1363
+#line 1362
+    if(sc.ScreenState == FULLSCREEN) return;
 
     CursorResizeNeeded = FALSE;
 
@@ -1611,11 +1602,9 @@ static void check_win_size(register int height)
     register int width;
     extern int soft_reset;
 
-#line 1916
-    /* A detached VM binds its DIB outlet before the firmware executes; it
-       has no NTVDM console-integration phase to wait for.  Retain the
-       original geometry, mode selection and painting below, but do not let
-       the historical console-lifecycle guard suppress surface creation. */
+#line 1918
+    if (! soft_reset)   // we want top get the chance to integrate with
+        return;         // console before changing size
 
     /*:::::::::::::::::::::::::::::::::::::::::::::: Calculate screen width */
 
@@ -1639,9 +1628,6 @@ static void check_win_size(register int height)
 #line 1939
 
 #ifdef V7VGA
-    /* The selected packed painter emits one pixel per source byte, unlike
-       the standard VGA painter's doubled pixels.  Use its row contract,
-       not BIOS bookkeeping which need not describe the active display. */
     if (paint_screen == nt_paint_funcs->v7vga_hi_graph)
         width = get_bytes_per_line();
 #endif
@@ -1737,9 +1723,6 @@ void set_the_vlt(void)
 
                 vga_color[i].peFlags = 0;
 
-                /* The VGA DAC is normally six bits, whereas the original
-                   V7 extension can select an eight-bit DAC.  The NT palette
-                   sink wants an eight-bit component in both cases. */
                 vga_color[i].peRed = (BYTE)(DAC_data_bits == 8 ?
                     DAC[ind].red : DAC[ind].red * 4);
                 vga_color[i].peGreen = (BYTE)(DAC_data_bits == 8 ?
@@ -2201,7 +2184,8 @@ void graphicsResize(void)
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else  // !NEC_98
-/* Standalone presentation does not use the NT fullscreen resize guard. */
+        if (sc.ScreenState == FULLSCREEN)
+            return;
 #endif // !NEC_98
 #line 2612
 
@@ -2463,11 +2447,21 @@ void nt_screen_address_changed(int lo, int hi)
 void nt_scroll_complete()        { }
 
 #ifndef NEC_98
-/* Native NT Console streaming is excluded from standalone presentation. */
+void host_stream_io_update(half_word * buffer, word count)
+{
+    DWORD dwBytesWritten;
+
+    WriteConsoleA(sc.OutputHandle,
+                  buffer,
+                  count,
+                  &dwBytesWritten,
+                  NULL
+                  );
+    flush_count = 0;
+}
 #endif // !NEC_98
 #line 2897
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #endif // NEC_98
 #line 2991
-

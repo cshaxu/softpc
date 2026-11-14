@@ -2440,3 +2440,12 @@ and three per-scanline panning adaptations remain qualified owner decisions
 R0595-R0600 after isolated original-restoration failures on both architectures.
 R0594/R0601 are exact nonsemantic restorations, not retained patches.
 See [ordered evidence](m9-t100-progress.md#file-458-hostsrcnt_egac-p149).
+
+
+T100 S1 P150 retires nt_graph.c's extra host-cache resets, deleted soft_reset
+and fullscreen checks, and removed stream global/function. Actual production
+never sets FULLSCREEN; the former test-only state was not retention evidence.
+Original selected formatting is restored and the DAC declaration is minimized.
+Selected XP diff decreases 70 lines. Static declarations, host update pairing,
+packed selection/width and DAC conversion remain qualified owner decisions.
+See [ordered evidence](m9-t100-progress.md#file-459-hostsrcnt_graphc-p150).

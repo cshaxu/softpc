@@ -10818,3 +10818,121 @@ notices preserved, mirror CRLF preserved, and the pinned XP subset hash intact.
 Manifest, documentation and whitespace gates pass. Completed file frontier is
 458/472; host/src/nt_graph.c is next. Fourteen files and qualified owner decisions
 remain; S1/T100 are not closed.
+
+
+### File 459 nt_graph.c investigation (not a completed P)
+
+Complete selected-difference inventory is established against pinned XP, skipping
+existing excluded bodies without new IDs/accounting. The selected differences
+are: DIB contract include; V7 DAC-width declaration; removed stream state/function;
+five static forward declarations; resetWindowParams; three removed fullscreen
+checks; selected formatting; host update begin/end; packed-painter selection and
+width; soft_reset guard; and the two palette conversion loops.
+
+Current production sc is the original static SCREEN_DESCRIPTION object, hence
+ScreenState starts WINDOWED (zero). Whole src/test search finds no production
+write to this field or whole sc assignment/copy; compat/video.c only reads it.
+The archive stores controller/device state, not the host SCREEN_DESCRIPTION.
+Only two VGA fixture functions assign FULLSCREEN. Their historical failure under
+original guards is therefore not evidence of a supported production requirement.
+Private fixture copies exercise the actual WINDOWED state instead. Restoring
+all three original guards and the uncalled original stream global/function
+passes on x86/x64. Production tests are revised to assert the actual host state,
+retaining clear/cursor assertions without manufacturing FULLSCREEN.
+
+The same actual Ninja compiler/linker inputs build isolated complete nt_graph
+objects, replacing the archive member, and run in separate scratch directories.
+An initial copied fixture lacked the original directory for relative includes;
+compilation failed before testing. Adding that original include search directory
+resolved the harness error; it is not evidence against original code.
+
+- Restoring the original five external forward declarations fails both compilers
+  because the original definitions are static. The minimal static declarations
+  remain a candidate for owner approval; no implementation linkage is changed.
+- Restoring resetWindowParams exactly passes both VGA fixtures and both actual
+  snapshot transaction/cross-process fixtures. Restoring the original soft_reset
+  early return separately passes the same tests. No concrete necessity for the
+  extra reset writes or deleted startup guard was established; restore both.
+- Restoring the original CHAIN4 conjunction fails expected geometry at fixture
+  line 1388; removing packed-width selection fails 640x400 at line 2302, both
+  architectures. These are actual controller/mode paths, not declaration errors.
+- Restoring nt_start_update/nt_end_update together fails produced-frame evidence
+  at the cursor-output assertion, line 800, on both. Source tracing reaches the
+  existing DIB update depth and V7 pointer clear/draw integration; no duplicate
+  device implementation was found in Compat.
+- Original fixed DAC multiply-by-four passes the old fixture. A separate actual
+  C1/3C8/3C9 port-write fixture covers 6-bit and 8-bit DAC values in both planar
+  and packed palette branches. Current passes both widths; original fails the
+  8-bit red component assertion (line 2447). The source C1 path sets DAC_data_bits
+  to 8 and preserves byte values, so multiplying them by four is not equivalent.
+  This missing coverage is added to the existing VGA fixture, with original DAC
+  control/value and mode restored afterward; no test-only production interface.
+
+Candidate changes restore the unproved removals and original reset body,
+remove non-original explanations, and restore selected spacing/diagnostic line
+positions. Retained semantic candidates are the DIB update contract, five static
+forward declarations, CHAIN4 painter selection, packed width and DAC conversion.
+No guest or user configuration/media/snapshot changes. This is host fixture and
+source evidence, not a claim of fresh real Win3.1/Win95 manual verification.
+
+Cached full qualification is running. The x86 build preceded the final
+nonsemantic blank/line-control correction, so it requires a final-source build
+and relevant verification before delivery. No file-ledger advancement or P150
+commit is claimed yet; the last delivered frontier remains 458/472.
+
+
+## File 459 host/src/nt_graph.c (P150)
+
+The preceding investigation is complete. Actual-diff counter-review reconciles
+all selected points as follows; retained items require owner choice, not an
+inferred blanket approval. Existing excluded bodies/framework receive no point.
+
+| Point | Original/current anchor | Disposition and counter-review |
+| --- | --- | --- |
+| R0602 | Include list: dib_surface.h | Qualified pending with R0609: the declared paired host-update contract is exercised by the actual original video callbacks, not a second renderer. |
+| R0603 | Globals: DAC_data_bits | Qualified pending with R0614; reduce to one extern int declaration. Remove the local V7 conditional wrapper and explanation: an unused external declaration needs neither implementation nor a runtime guard. No broad extra header is introduced. |
+| R0604 | host_stream_io_enabled | Restore exact original definition. No actual production reader was found; the separate disabled guest stream_io state is not this host global. Restoration does not enable streaming. |
+| R0605 | Forward declarations: set_screen_sizes/check_win_size/select_paint_routines/dummy_paint_screen/init_lut | Qualified pending: exact original external declarations conflict with the original static definitions on both real compilers. Keep only the matching static declaration correction. |
+| R0606 | resetWindowParams | Restore the exact original body, indentation and comment, removing extra flush/palette/mode/cursor cache resets. Separate original restoration passes both VGA and snapshot transaction/cross-process tests; no necessity was established for the additional writes. |
+| R0607 | nt_clear_screen fullscreen check | Restore exact original check inside its existing original condition. Production never changes sc.ScreenState from static WINDOWED; an artificial test-only FULLSCREEN value does not justify deleting native policy. |
+| R0608 | nt_graphics_tick and EOF selected spacing/comments | Restore original spacing/directive comments and diagnostic positions. Preserve existing excluded bodies without new accounting. |
+| R0609 | nt_start_update/nt_end_update | Qualified pending: restoring the pair to original behavior fails actual produced-frame evidence on both widths. Existing host depth and V7 pointer integration remains the single rendering transaction. |
+| R0610 | make_cursor_change fullscreen check | Restore original check and source-line position. Fixture now validates actual WINDOWED presentation, retaining cursor visibility/shape assertions. |
+| R0611 | nt_set_paint_routine CHAIN4 conjunction | Qualified pending: coherent original condition fails real controller-programmed geometry on both widths (fixture line 1388). Sequencer selection remains independent of transient memory access chaining. |
+| R0612 | check_win_size soft_reset guard | Restore original guard/spelling. Separate VGA and snapshot transaction/cross-process probes pass on both widths; no necessary production behavior difference was established. |
+| R0613 | Packed painter width | Qualified pending: original width calculation fails actual 640x400 expected output (fixture line 2302) on both widths. Retain the selected painter's source-byte width; remove added explanatory prose. |
+| R0614 | set_the_vlt packed and planar DAC conversion | Qualified pending: actual C1/3C8/3C9 writes prove 8-bit components must not be multiplied by four. Both branches and 6/8-bit cases are now covered by the existing fixture. Remove the added explanation, retain one conversion rule. |
+| R0615 | graphicsResize fullscreen check | Restore exact original check; same actual WINDOWED host contract as R0607/R0610. |
+| R0616 | host_stream_io_update | Restore the exact uncalled original function and original selected tail spacing. No new wiring or native Console streaming consumer is enabled; this avoids retaining an unsupported source omission. |
+
+Production delta is +35/-41 (net -6); test delta +34/-14 (net +20). The important
+metric is XP-relative added+deleted diff: **70 fewer selected difference lines**,
+not the net source count. Comparison uses matching conditional paths and
+SequenceMatcher(autojunk=False); unchanged excluded material is not re-audited.
+The remaining code has no added helper, fallback, recovery state or second
+renderer. No unrelated public component, configuration, media or snapshot changed.
+
+The initial whole-file restored candidate passes both complete suites:
+x86 cached build 13.23 s, background 188/188 in 143.79 s and native 8/8 in
+15.80 s; x64 build 10.99 s, background 188/188 in 146.37 s and native 8/8 in
+15.13 s. Total 392/392, including native audio/desktop/package coverage.
+These EXEs differ materially from P149 because original code/guards/reset body
+are restored; equivalence to P149 is not claimed or used to omit full testing.
+
+Final review then corrects the cursor/soft_reset source-line correspondence,
+one extra blank and the unnecessary declaration wrapper. Final cached builds
+pass (x86 9.38 s, x64 10.79 s); final VGA, snapshot transaction, snapshot
+cross-process and mirror gate pass 4/4 on each width (9.53/8.73 s). Final EXEs
+are equivalent to the already fully qualified candidate under only the PE
+COFF timestamp/checksum and unique compiler-time mask. The intermediate x86
+line-control-only rebuild also passed equivalence and its two focused checks;
+no stale-source build is presented as final-source proof.
+
+- Final x86 SHA-256: b8a97800380d3531aba96abc1a2b37a0c31fc000d9d760cca0d0d3e78c7bb18d
+- Final x64 SHA-256: 30a8cc0416fd6d8e0ef65b7f613349ecb0af54d609073e64100c856884defd36
+
+Each final incremental build reports 91 warnings, all in retained mirror code;
+none outside the mirror. Manifest, documentation and whitespace checks pass.
+Mirror CRLF and own-code/docs LF are preserved. Owner decisions R0602/R0603,
+R0605/R0609/R0611/R0613/R0614 remain open. Completed frontier 459/472, next
+host/src/nt_keycd.c; thirteen files and earlier decisions keep S1/T100 open.
