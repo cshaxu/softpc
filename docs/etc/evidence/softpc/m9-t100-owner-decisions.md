@@ -41,9 +41,9 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 80 / R0060-R0068 | Nine headers/typed declarations (+1/-0 each). | Actual address, lifecycle, segment, PIC, timer, snapshot, Yoda, NPX and executor consumers require their declarations. | Retained under owner small-diff delegation, S3 P7 |
 | 80 / R0070-R0075 | Six host event/budget/pacing/wait declarations (+1/-0 each). | Current original-loop calls match actual Compat platform.c providers. | Retained under owner small-diff delegation, S3 P7 |
 | 80 / R0076 | Two debug observer declarations (+2/-0). | Actual begin/retired calls match machine/debug.c providers. | Retained under owner small-diff delegation, S3 P7 |
-| 80 / R0077 | Return private interrupt-map address (+6/-0 including separator blanks). | Actual cold-run lifecycle clears the original map through this accessor; original timer-bit clear does not clear all pending bits. | Pending |
-| 80 / R0078 | Capture private execution state (+16/-0 including separator). | Preserve DR/TR, pending interrupt map and sampled start_trap. | Pending |
-| 80 / R0079 | Restore private execution state (+17/-0 including separator). | Restore saved state and discard transient quick_mode before refetch. | Pending |
+| 80 / R0077 | Return private interrupt-map address (+6/-0 including separator blanks). | Actual cold-run lifecycle clears the original map through this accessor; original timer-bit clear does not clear all pending bits. | Owner approves retention, S3 P8 |
+| 80 / R0078 | Capture private execution state (+16/-0 including separator). | Preserve DR/TR, pending interrupt map and sampled start_trap. | Owner approves retention, S3 P8 |
+| 80 / R0079 | Restore private execution state (+17/-0 including separator). | Restore saved state and discard transient quick_mode before refetch. | Owner approves retention, S3 P8 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -56,11 +56,13 @@ artificially split functions. R0051/R0053/R0057 meet that rule after individual
 provider/caller/state checks. Owner then approves R0054/R0055 after reviewing
 the full diff and why private-state access belongs in c_debug.c. S3 P7 also
 retains seventeen qualifying c_main.c header/declaration/TLS points (+18/-1)
-under the same delegation. Progress: 56/381 retained (36 explicit and twenty
-delegated), zero restoration decisions, 325 pending; notices stay separate.
+under the same delegation. Owner then approves R0077-R0079 (+39/-0) after
+reviewing their code, consumers and the mutable-pointer encapsulation limit.
+Progress: 59/381 retained (39 explicit and twenty delegated), zero restoration
+decisions, 322 pending; notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next manual decisions R0077-R0079 total
-+39/-0; counts are checked against pinned XP surrounding lines. The map accessor
+stays the single detailed inventory. Next review starts at R0084; R0080-R0083
+were already restored in S1. Approved counts include pinned-XP separator lines. The map accessor
 returns a mutable pointer, not a bounded clear operation; its actual consumer
 only clears the map. Do not claim this API shape is the sole possible design.
 Archive capture/restore callers and original CPU private state are rechecked.
