@@ -7482,3 +7482,82 @@ gates and residue check pass. CIM confirms both test/build jobs exited before
 exact scratch cleanup. No user configuration, media, snapshot or unrelated
 change is included. Full-file SequenceMatcher confirms the four-line added-
 diff reduction with unchanged deleted-diff count; exclusions were not changed.
+
+
+## File 401: ppi.c (P103)
+
+Pinned XP raw SHA-256
+e0c63cb92be4c82da7037f1263bf897e74c4089ee5b9806162389bec800dfe5a.
+Complete original/local correspondence inspected; existing #error bodies and
+line scaffolding are skipped without additional accounting. No production
+restoration is justified by this file review.
+
+| Point | XP/current anchors | Evidence-qualified disposition |
+| --- | --- | --- |
+| R0468 | XP SCCSID notice / local 17 | One historical notice comment preserved outside exclusion; source policy, pending owner decision. |
+| R0469 | XP SPKRDATA state and 140-150, 170 / local 69-74, 144-147, 166 | Remove duplicate speaker-edge state/legacy calls and select original post-gate HostPpiState; pending owner decision. |
+| R0470 | XP ppi_init after register assignment / local 199 | One gate_2_was_low reset assignment; deterministic dual-architecture negative controls, pending owner decision. |
+| R0471 | XP snapshot additions absent / local include 46 and 204-229 | Private PPI state capture/restore, pending owner decision. |
+
+### Initial source proof and coherent-restoration review
+
+Root CMake compiles both ppi.c (line 189) and original host/src/nt_sound.c
+(line 221). BIOS reset.c:724 calls ppi_init; registered port 61h writes invoke
+ppi_outb. Original nt_sound.c HostPpiState consumes both bit 0 (T2State) and
+bit 1 (PpiState); PlaySound requires the correct combination and FreqT2.
+The selected original timer_gate runs before this full-state notification.
+
+The legacy non-NTVDM branch observes only changes to bit 1 and passes no
+port value to host_enable_timer2_sound/host_disable_timer2_sound. Restoring
+that whole branch would lose independent bit-0 updates to the actual original
+host sound owner. An implementation of those callbacks cannot recover the
+missing transitions merely by translating its no-argument call. Reimplementing
+this state elsewhere would duplicate original HostPpiState rather than restore
+one original path. Compat audio.c's remaining disable wrapper is a BIOS reset
+sink and clears pending onset; it is not another PPI port interpreter. The
+SOFTPC_STANDALONE condition is an existing host-selection difference, not a new
+product-specific branch added by this audit.
+
+For R0470, static initialization only establishes the first process lifetime's
+gate state. A prior port-61h write with bit 0 high leaves gate_2_was_low false;
+original ppi_init clears the register but not that history. A subsequent high
+write then misses the required timer_gate rising transition. Resetting the
+history alongside the register is therefore a supported repeated-reset fix.
+
+For R0471, archive.c:159/228 calls the capture/restore pair and its wire map
+483-486 stores all three fields. ppi_inb toggles bits 4/5 before returning;
+ppi_outb masks written state to four bits and triggers timer and sound edges.
+The public ports cannot inspect/restore the private register phase and gate
+history without mutation. Direct archival restores them and notifies the same
+original HostPpiState owner. The derived speaker-data field is part of the
+existing serialized snapshot contract; this audit does not silently change it.
+
+### Dynamic proof, counter-review and delivery
+
+Existing machine sound, checkpoint and original sound-state tests pass 3/3 on
+each architecture, six total. Their mock output boundary does not prove native
+audio-device availability. The actual source-chain coverage includes CCPU port
+writes, original PPI/PIT state, sound delivery and snapshot roundtrip.
+
+A private PPI object differs only by removing the added ppi_init gate reset.
+It is linked before the normal device archive, without changing persistent
+production objects or archives. Both original sound tests then fail at the
+fast-frame-count assertion, but that timing-bearing result alone is not used
+as causal proof. A disposable version of the existing checkpoint fixture adds
+ppi_init after its real high-gate state restore, then captures the state and
+asserts register zero and gate_2_was_low==1. Actual current PPI passes on x86
+and x64. The single-line-restored objects both fail exactly the gate assertion
+(line 714): x86 exit 3221226505, x64 exit 3. All private compiles and links pass.
+No fixed sleep is used for this direct-state comparison.
+
+Independent counter-review verified the complete original host-call choice,
+not an artificially unresolved-link restoration. Existing snapshot consumers
+alone do not establish necessity; the side effects of the original port API
+above do. No Compat state machine, helper or public API is added.
+
+No new Windows guest session, native-device playback or exhaustive malformed
+snapshot validation is claimed. Production +0/-0, tests +0/-0, mirror diff
+delta zero. No production build or republication is required for this read-only
+source audit; P102 dual EXEs remain unchanged. P97's 392/392 remains the full
+runtime baseline. Frontier 401/472; next 402 base/support/ios.c. S1 remains
+active and R0468-R0471 await owner disposition.
