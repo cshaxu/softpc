@@ -30,16 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P148 completes nt_cga.c selected-difference investigation and restores
-original spacing while removing obsolete local explanations: 21 fewer XP diff
-lines. Production +12/-25, test +10/-3. Cached dual builds/publication pass;
-all 392 tests pass after rerunning two x64 package cases whose first run received
-extraneous keyboard input. No native coverage remains deferred. Actual original
-restoration and guard-removal probes qualify R0586-R0593 dispositions; semantic
-residuals remain owner decisions, not automatically approved retention.
-Frontier 457/472; next is host/src/nt_ega.c. Fifteen files and earlier decisions
+T100 S1 P149 audits nt_ega.c's three bounds blocks and three panning connections
+with serial isolated restoration probes, then removes four nonsemantic lines.
+Production +0/-4, no test changes; selected XP diff 49 -> 45. Semantic residuals
+remain qualified owner decisions. Cached dual builds/publication and final
+392/392 test coverage pass after correcting and rerunning one x86 manifest gate;
+both architectures pass all native tests. No native coverage is deferred.
+Frontier 458/472; next is host/src/nt_graph.c. Fourteen files and pending decisions
 keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-457-hostsrcnt_cgac-p148).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-458-hostsrcnt_egac-p149).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

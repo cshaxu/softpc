@@ -10722,3 +10722,99 @@ checksum and the unique compiler-time string. Full tests were still executed.
 Actual-diff review confirms no executable production change and no new
 mirror difference. Frontier 457/472; next is host/src/nt_ega.c. Fifteen files
 and qualified owner decisions remain open; S1/T100 are not closed.
+
+
+## File 458 host/src/nt_ega.c (P149)
+
+The pinned XP counterpart and every selected difference were compared in order.
+Current selected differences comprise three size/bounds blocks, three panning
+connections, three extra explanatory lines and a trailing blank. Existing
+excluded bodies are skipped without IDs or new accounting. Their surrounding
+selected structure otherwise matches the pinned original.
+
+Actual consumers are the std_colour_paint_funcs table in nt_graph.c and
+C-VID gfx_updt.c's paint_screen callbacks. EGA split/wrap updates derive source
+pitch, offsets and row counts from the current device display state; the full
+split update can request zero first-region rows. The host DIB has the actual
+mode dimensions. In particular the original fixed high-mode width/height
+ceiling does not cover V7 65h's 1024x768 planar output. These are selected
+production paths, not test-only copies or alternate Compat rendering.
+
+Private variants compile using actual cached Ninja flags and link the existing
+VGA fixture with only the tested EGA object overridden before the machine
+archive. All variants compile and link. Three variants restore the exact
+original guard, one painter at a time. Three variants restore the original
+no-panning computation, one painter at a time: low uses the original direct
+word load; medium/high pass zero through the existing shared signature so no
+artificial argument-count failure is used as evidence. The helper's zero-pan
+branch returns the original word unchanged. Three additional diagnostic variants
+retain only a nonpositive-size check ahead of the original guard, separating
+empty-region failure from the remaining bounds/extended-mode requirement.
+These diagnostic variants are not proposed production implementations.
+
+Initial parallel experiment groups accidentally shared the fixture's fixed
+scratch-disk filename; one x64 run failed at fopen rather than the renderer.
+That result is invalid for code necessity. Both groups terminated; all twenty
+runs were repeated serially in separate task-owned working directories. The
+serial results supersede the contaminated run, not erase its disposition:
+
+- Current fixture: x86 and x64 pass.
+- Each original low/medium/high guard: both widths exit with access violation
+  0xC0000005; current equivalents pass the same complete fixture.
+- Original guards plus nonpositive-size protection: low/medium fail the actual
+  destination-byte boundary assertion (fixture line 712); high fails the dirty
+  publication assertion after the real V7 65h BIOS/BOP mode setup (line 2279).
+- No-pan low/medium variants fail the independently shifted pixel comparison
+  (line 561); high fails the pixel comparison after the actual 3C0h pan write
+  (line 512). Both architectures reproduce all three failures.
+- Assertion exits are x86 fast-fail 0xC0000409 or x64 3. These are observed
+  assertions/access violations, not timeout diagnoses. No manual guest
+  reproduction or universal safety claim is made.
+
+| Point | Original / local anchor | Executor and counter-review disposition |
+| --- | --- | --- |
+| R0594 | Extra T60 explanations in the three standard painters | Restore original by removing all three lines; they add no behavior and no longer justify a mirror difference. |
+| R0595 | XP low guard near 606 vs current nt_ega_lo_graph_std | Qualified pending. Original guard fails empty-region and destination bounds cases. Source and destination spans must match the actual DIB and plane capacity; the existing checks precede division/indexing and the do/while loops. No separate clamp or second render path is introduced. |
+| R0596 | XP low word load near 639 | Qualified pending. Direct original word load loses required pixel panning in the low painter; same fixture fails with only this coherent change. |
+| R0597 | XP medium guard near 1048 | Qualified pending for the same actual buffer/loop contract as R0595, independently reproduced in the medium painter. |
+| R0598 | XP medium munge call near 1076 | Qualified pending. Original no-pan semantics through the current ABI fail independently expected pixels; a declaration mismatch is not the proof. |
+| R0599 | XP high guard near 1282 | Qualified pending. Besides empty and bounds safety, original fixed limits reject actual V7 extended planar rendering. High-mode negative variant loses the required dirty publication after BIOS mode 65h. |
+| R0600 | XP high munge call near 1305 | Qualified pending. Actual register-write/pixel test fails without this per-scanline panning argument. |
+| R0601 | EOF selected blank after line control | Restore original spacing by removing the extra blank; existing excluded body and line control remain intact. |
+
+Counter-review distinguishes arbitrary-input boundary assertions from actual
+mode/register paths: negative origins/pitch and overflow-sized requests have
+fixture/source safety evidence, not proof that a particular guest emits every
+such request. The existing predicate ordering prevents invalid division and
+pointer formation; positive span clipping limits each row and source advance.
+No unchanged helper implementation is declared fully audited here; nt_munge.c
+retains its later ordered review. Residual decisions are not auto-approved.
+
+Final source changes are nonsemantic only: production +0/-4, tests unchanged.
+Selected XP added+deleted diff is 49 -> 45 (-4), using matching conditional
+paths and SequenceMatcher with autojunk false. Final-source validation and delivery evidence follows.
+
+
+Final-source x86/x64 cached builds pass (11.42/14.24 seconds), with zero warning
+lines in these incremental build logs. Both artifacts are equivalent to P148
+under only the PE timestamp/checksum and unique compiler-time mask. This does
+not claim an unrelated clean build has no historical mirror warnings.
+
+- x86 SHA-256: 6f9842d9a9834f83111f4bf2ba114289501a32b0a35367ab17f3727ac8ad7177
+- x64 SHA-256: 151706b8c15da3ad905e501661487d44ebef98c52872d0b8a8bc360927bf4bd6
+
+x86 background initially passes 187/188 in 159.08 seconds: checks/xp_mirror
+rejects my incorrect manifest column update. The fixed XP subset hash is restored
+unchanged and only local_sha256 is updated by column name. The actual CTest gate
+rerun passes 1/1 in 0.79 seconds; this metadata correction changes no compiled
+source or artifact. x86 native passes 8/8 in 15.39 seconds. x64 background passes
+188/188 in 143.99 seconds and native passes 8/8 in 14.76 seconds. Final coverage
+is 392/392 with the first-run failure explicitly retained, not a clean-first-pass
+claim. Native desktop/audio/package coverage is not deferred.
+
+Actual-diff counter-review confirms only the four identified nonsemantic lines
+are removed, no test source changes or added production path, all original
+notices preserved, mirror CRLF preserved, and the pinned XP subset hash intact.
+Manifest, documentation and whitespace gates pass. Completed file frontier is
+458/472; host/src/nt_graph.c is next. Fourteen files and qualified owner decisions
+remain; S1/T100 are not closed.

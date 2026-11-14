@@ -2432,3 +2432,11 @@ The old empty-region bulk-copy-underflow rationale is superseded by direct
 empty-resize surface-preservation evidence. Text/CGA layout, allocation and
 compile-contract residuals R0586-R0593 remain qualified owner decisions.
 See [ordered evidence](m9-t100-progress.md#file-457-hostsrcnt_cgac-p148).
+
+
+T100 S1 P149 removes three non-original nt_ega.c explanations and one trailing
+blank: four fewer selected XP diff lines, no executable changes. Three bounds
+and three per-scanline panning adaptations remain qualified owner decisions
+R0595-R0600 after isolated original-restoration failures on both architectures.
+R0594/R0601 are exact nonsemantic restorations, not retained patches.
+See [ordered evidence](m9-t100-progress.md#file-458-hostsrcnt_egac-p149).

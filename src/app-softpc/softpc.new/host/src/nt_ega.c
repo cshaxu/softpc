@@ -578,7 +578,6 @@ void nt_ega_lo_graph_std(int offset, int screen_x, int screen_y,
     ** Tim September 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    /* T60: x is a PC pixel; each width unit paints 16 host pixels. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width / 2 || screen_y >= sc.PC_W_Height / 2 ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
@@ -1028,7 +1027,6 @@ void nt_ega_med_graph_std(int offset, int screen_x, int screen_y,
     ** Tim September 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    /* T60: x is a host pixel; width counts eight-pixel plane groups. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height / 2 ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
@@ -1270,7 +1268,6 @@ void nt_ega_hi_graph_std(int offset, int screen_x, int screen_y,
     ** Tim September 92, sanity check parameters, if they're too big
     ** it can cause a crash.
     */
-    /* T60: x is a host pixel; width counts eight-pixel plane groups. */
     if (width <= 0 || height <= 0 || screen_x < 0 || screen_y < 0 ||
         screen_x >= sc.PC_W_Width || screen_y >= sc.PC_W_Height ||
         offset < 0 || offset >= EGA_PLANE_SIZE || get_offset_per_line() <= 0)
@@ -1664,4 +1661,3 @@ sub_note_trace5(EGA_HOST_VERBOSE,
 #error "Unsupported SoftPC mirror configuration: MONITOR"
 #endif /* MONITOR */
 #line 2145
-
