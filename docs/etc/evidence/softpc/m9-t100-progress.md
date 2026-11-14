@@ -10573,3 +10573,49 @@ changes after these builds are part of this delivery.
 File 455 is audited with restored and qualified-pending dispositions. Frontier
 455/472, with 17 files not yet completely audited. These qualified points and
 earlier owner decisions remain open; S1/T100 are not closed.
+
+## File 456 host/inc/nt_uis.h (P147)
+
+Pinned XP normalized SHA-256 is
+2e766aed26843dd76c1eb34cb752cfeaca73f55ac1314f6f6a5b8c5d1389ca2a.
+The actual consumers are machine/input.c, compat/keyboard.c, original
+host/src/nt_graph.c and the existing keycode fixture. A full src/test symbol
+search before restoration found no remaining declaration, definition or caller
+of the omitted names. Thus there is no conflict or unsupported runtime service
+enabled merely by restoring their declarations/constants.
+
+| Point | Initial analysis | Counter-review / disposition |
+| --- | --- | --- |
+| R0581 | BiosKeyToInputRecord prototype and aNumPadSCode extern removed. | Restore exact original declarations; neither is called by current production. An unused declaration is not a request to restore the original provider or NT service. |
+| R0582 | ED_DOSTITLE 335 removed. | Restore original resource constant/comment; no current consumer or collision found. |
+| R0583 | ED_INITGRAPHICS 345 removed. | Restore original constant; no current consumer. Do not reinterpret the skipped DBCS body as an enabled resource registration. |
+| R0584 | Original blank before the second DBCS condition removed. | Restore formatting; its excluded body stays untouched. The following original source position is 117, so the existing line-control boundary follows that original position. |
+| R0585 | ED_FORMATSTR0-3 removed and an extra blank inserted instead. | Restore all four original constants and exact surrounding spacing; no current consumers. |
+
+After excluding the already-excluded bodies and their line controls, the entire
+remaining file is exactly equal to fixed XP, not just the restored hunks. The
+selected added+deleted difference decreases from ten lines to zero. Working-tree
+production delta is +10/-2 (net +8); no test source changes. There is no residual
+selected semantic difference or new owner decision for this file.
+
+The owner has returned to the desktop and explicitly requests complete tests.
+This batch therefore runs both cached builds and all 188 background plus eight
+native tests per architecture even if EXE equivalence permits a smaller run.
+Final validation passes: x86 cached build 10.40 s, background 188/188 in
+142.32 s, native 8/8 in 13.52 s; x64 build 22.89 s, background 188/188 in
+149.99 s, native 8/8 in 14.17 s. Total 392/392, including actual PCM/MIDI,
+both package cases, Lib MIDI, Window retirement/modal and Console broker tests.
+No native test remains deferred for this final-source baseline. These automated
+tests do not claim every guest/manual scenario or resolve pending diff decisions.
+Both EXEs are equivalent to P146 under the strict timestamp/checksum mask,
+but the owner-requested full tests were nevertheless executed.
+
+- x86 SHA-256: 3dc3065e7c50773401061471a9283eeb5a52c1aa3ed4ed2f312961214ba740cb
+- x64 SHA-256: 44887d25f83ebe5b47119ca86894fd20707fa9948aedca59678346535c004dd6
+
+Actual-diff counter-review, manifest and documentation gates pass. Each build
+has 91 warnings, all attributed to retained mirror files; no warning outside
+the mirror is observed. Only the identified declaration/constants/spacing and
+source-line boundary change; no keyboard conversion implementation changes.
+Frontier 456/472. The remaining 16 files and earlier qualified decisions keep
+S1/T100 open; no task closure is implied by full regression success.

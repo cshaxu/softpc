@@ -2417,3 +2417,10 @@ remaining status/service, local SDK declaration and constrained declaration
 placement points R0577-R0580 remain qualified owner decisions, not approved
 retention. Later provider whole-file audits remain open.
 See [ordered evidence](m9-t100-progress.md#file-455-hostincnt_sbh-p146).
+
+T100 S1 P147 restores nt_uis.h's two original keyboard declarations, six
+resource constants and spacing. No original keyboard provider or NT service is
+enabled. All selected content matches XP and ten selected diff lines disappear.
+The earlier removal of these header declarations is no longer a retained patch;
+historical provider exclusions are not reopened by this declaration restoration.
+See [ordered evidence](m9-t100-progress.md#file-456-hostincnt_uish-p147).
