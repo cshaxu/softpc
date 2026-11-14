@@ -7341,3 +7341,35 @@ P100 actual eight-file change review, mirror/documentation/whitespace gates
 and cleanup residue check pass. CIM confirms all owned probes/build/tests
 exited before exact scratch removal. No user configuration, media, snapshot
 or unrelated changes are included. S1 remains active.
+
+
+## File 399: keybd_io.c (P101)
+
+Pinned XP raw SHA-256
+c0e79e4d4015be8a57ecfcc8e335e44c54ee497c9b634e5d85fc1f4332c999e2.
+Full LF-delimited correspondence against the pinned XP file was inspected,
+including deletion anchors that SequenceMatcher separated from their existing
+#error replacement. Those deletions belong to the existing NTVDM/MONITOR
+and final NTVDM excluded bodies, not omitted selected implementation.
+Existing exclusions, line scaffolding and adjacent scaffold spacing are
+skipped without new bookkeeping.
+
+R0461: local line 49 preserves the original Insignia notice from XP line 50
+outside the excluded SCCSID body. It adds one comment line and no runtime
+behavior. Source policy requires preserving historical notices; removing this
+line would remove that notice from the retained source. This is an
+evidence-qualified owner decision, not automatic approval.
+
+All remaining selected implementation is unchanged from XP. CMakeLists.txt
+line 191 includes this file, both persistent Ninja trees contain its real
+softpc-machine-devices object rule, and BIOS reset.c calls keyboard_init at
+line 788. It is not a test-only or snapshot-only file. No duplicate Compat
+implementation or replacement is introduced by this review.
+
+Independent counter-review rechecked the complete non-equal ranges and their
+original/current surrounding conditions. No selected semantic restoration is
+needed; no unused-file retirement is justified. Source +0/-0, tests +0/-0,
+XP-relative diff change zero. This delivery changes only audit documentation;
+no build, publication or runtime test is claimed. P100 artifacts and P97's
+392/392 runtime baseline remain unchanged. Frontier 399/472; next file 400
+base/keymouse/mouse.c. Qualified owner decisions remain open; S1 is active.

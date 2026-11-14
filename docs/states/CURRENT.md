@@ -30,12 +30,10 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P100 completes file 398 keyba.c. Restore the original IRQ comment
-and blank, reducing mirror diff by five lines. C0 return/IRQ-clear patches
-have dual-architecture negative controls; snapshot/private-state and notice
-residuals remain qualified owner decisions. Both EXEs are freshly published,
-metadata-equivalent to P99; final focused tests pass 6/6. P97's 392/392 remains
-the runtime baseline. Frontier 398/472; next 399 base/keymouse/keybd_io.c.
+T100 S1 P101 completes file 399 keybd_io.c without source changes. Selected
+implementation matches XP; the preserved historical notice remains a qualified
+owner decision. P100 published EXEs and P97's 392/392 runtime baseline remain
+unchanged. Frontier 399/472; next 400 base/keymouse/mouse.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
