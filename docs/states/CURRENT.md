@@ -19,7 +19,7 @@ skipped without new bookkeeping. T99 remains closed; see its
 | Candidate Proposal | [Original-first audit method](../proposals/m9-xp-mirror-original-first-audit.md). |
 | Files And ABI Surface | Selected softpc.new mirror, its provenance and necessary coupled callers/tests; disclose ABI consequences per point. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING mirror policy and source-research-policy; owner order supersedes comparison project's ordering. |
-| Verification | Per complete substantive file: cached x86/x64 build, publish, focused/full regression, manifest and documentation gates; final-source identity required. |
+| Verification | Per complete substantive file: cached x86/x64 build, publish, focused/full regression, manifest and documentation gates; final-source identity required. Owner temporarily defers online desktop/audio/package validation until returning to the desktop; preserve pending cases and continue ordered deliveries without claiming full acceptance. |
 | Expected Markers | Ordered file/point progress, exact restoration, evidence-qualified owner decisions; no excluded-body ledger. |
 | Asset Needs | Preserve configuration/media/snapshots. S1 owns build/t100-s1 if needed; background jobs bounded to 2 hours and 15 minutes no progress, scratch removed after delivery. |
 | Reporting Requirements | Explain evidence threshold, exact restoration, pending decisions, file order, diff metrics and proposed delivery cadence. |
@@ -30,20 +30,19 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P129 completes file 426 v7_ports.c: one existing pointer-coordinate
-difference is evidence-qualified as R0536, pending owner decision.
-No production/test/artifact changes; P127 remains the verified build baseline.
-P127 completed file 424 gfx_updt.c original-first minimization.
-Production +9/-34, test +70/-0; XP-relative difference decreases 33 lines.
-Both final cached builds/publications and VGA fixtures pass, with 188/188
-background CTest cases per architecture. Native coverage is 7/8 via CTest per
-width plus the unchanged Console test passing in an explicit hidden Console
-process on each width. Default CTest Console startup still has an initial
-geometry limitation; it is documented, not falsely counted as repaired.
-No shared-component or user-asset changes. R0530-R0535 and other qualified
-owner decisions remain open, as do D001-D006 and L001. Frontier 426/472;
-next frozen file 427 base/video/v7_video.c. S1 remains active; no routine approval
-is awaited. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P130 delivers file 427 v7_video.c minimization: selected XP
+difference shrinks from +3/-3 to +1/-1 (four fewer mirror-diff lines).
+Both cached builds/publications and focused VGA tests pass; both background
+suites are 188/188. Native Window tests pass; unchanged Console binaries pass
+in explicit hidden Consoles, not the default CTest launch. Owner authorizes
+continuing with online verification temporarily deferred: per width, audio
+lifecycle, SB MIDI, native MIDI and both package variants remain pending after
+failures with session 3 Disc. Re-run when owner reports desktop availability;
+this is not full native acceptance or S/T closure.
+No shared-component or user-asset changes. R0537 and earlier qualified owner
+choices remain open, as do D001-D006 and L001. Frontier 427/472; next frozen
+file 428 base/video/vga_mode.c. See the
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

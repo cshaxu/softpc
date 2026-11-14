@@ -9295,3 +9295,100 @@ native-launch qualification remains the artifact baseline. P129 needs no
 product rebuild or unrelated full regression. Owned probe work has finished;
 concise evidence is promoted before scratch removal and documentation gates.
 Frontier is 426/472; next file 427 base/video/v7_video.c. S1/T100 remain active.
+
+## File 427: v7_video.c (P130 verification in progress)
+
+Pinned XP raw SHA-256 d7a42d240c51ad83b58182a86ea7073f748810c0a07dc17d20ba9a3ab36b3651.
+Full selected-file comparison finds one semantic group, R0537, in
+v7vga_extended_set_mode at XP lines 293-296. Existing exclusions are skipped
+without new bookkeeping. The current patch moved mode extraction before
+validation and added an explanation. XP validated raw BL before extracting
+the low-seven-bit mode number. The production device target includes this
+file on both widths; ega_video's BIOS function 6F dispatch selects this function
+for AL=5. Original standard-mode compatibility calls also reach it.
+
+Executor analysis: is_bad_vid_mode already masks bit 7, but is_v7vga_mode does
+not. Raw BL=E7 therefore fails the original extended-mode validation instead
+of selecting mode 67 while preserving memory. The original later ega_info
+update and screen-clearing condition already implement the preserve flag.
+No additional state or Compat device implementation is needed.
+
+Coherent exact restoration of this whole group was compiled and linked into
+the real existing VGA fixture using each Ninja production command. Current
+controls pass on x86/x64 (7.01/7.31 s). Exact XP restoration fails both at
+vga_frame_smoke.c:1800, Currently_emulated_video_mode == 0x67, after a real
+BIOS request with BX=E7 (exit 3221226505/3). Earlier same-mode requests alone
+can conceal rejection, so the different-mode assertion is material evidence.
+This does not claim a new interactive Win95 boot or guest reproduction.
+
+The minimal candidate restores XP assignment placement and blank lines and
+removes the added comment. Only the V7 predicate masks its argument:
+is_v7vga_mode((getBL() & 0x7F)). Double parentheses are required by the original
+macro's unparenthesized parameter uses; the macro itself is not changed.
+c_getBL simply reads GET_BL with no mutation. The unchanged bad-mode predicate
+already performs the same mask. BL is not modified by these validations, and
+its original unmasked value still supplies the preserve flag later.
+
+Independent counter-review confirms one original setter/clear path, no guest
+special case, helper, alternate path or public-component change. Private
+minimal-version fixture runs pass both widths (7.89/7.41 s), including every
+existing V7 text/graphics mode, preserve/clear behavior, different-mode request,
+banking and invalid FF rejection. No new test duplicates are necessary.
+R0537's remaining +1/-1 is evidence-qualified pending owner keep/restore choice.
+
+Production worktree delta is +3/-3, net zero; test delta is zero. Relative to
+fixed XP selected source, before +3/-3 becomes +1/-1: two added and two deleted
+difference lines removed, total mirror-diff reduction four lines. Final
+LF-normalized source SHA-256 is
+116df4a0f269bd7a0af14b6cb23469061e4b83a44e39607c95490377a4c96fcd.
+Manifest is synchronized. Final dual-width builds, publication and regressions
+are in progress; file 427 is not yet counted delivered.
+
+Final-source verification subsequently completed its first pass. Cached builds
+pass x86/x64 in 8.98/10.74 s; final VGA fixture passes in 6.85/5.74 s. Background
+suites pass 188/188 on each width (143.08/138.39 s including runner overhead).
+Each build emits 89 warnings, all in retained mirror source/headers; no shared
+or autonomous-source warning was found. The EXE code section changes, so the
+metadata-only exemption is not used. Publication verifies fresh compiler stamps:
+- x86 Nov 13 2026 20:13:06; SHA-256
+  53c0027cf9fe07eee45f04b6b33b87da5a952529d767d8260b988961369651ab.
+- x64 Nov 13 2026 20:15:54; SHA-256
+  4ad33dbde1326b8f7cbd26d8dbc35150d102406cb92f17a2bf3ad4383cabaf62.
+
+Native suites are only 2/8 per width: both Window tests pass; audio lifecycle,
+SB MIDI, native MIDI, both package variants and Console display fail. Actual
+session inventory repeatedly reports neko session 3 Disc. Audio fails opening
+the device, package reports cannot compose machine, and Console fails its
+initial write contract. These are not reclassified as passes, nor is the current
+patch blamed or absolved solely by a disconnected-session observation. An
+online retry of the affected cases remains required. The separate P127 Console
+launch qualification is historical evidence, not this batch's successful run.
+The background runner has completed; no interrupted process or timeout is
+counted as a test result. Source/manifest and documentation gates pass. P130
+remains uncommitted pending native qualification; scratch is retained only for
+the active packet, and file 427 does not advance the delivered frontier.
+
+P130 follow-up independently exercises the unchanged Console binaries with
+CREATE_NEW_CONSOLE and STARTF_USESHOWWINDOW/SW_HIDE, using their exact registered
+CTest working directories and no argument changes. Both pass (x86 0.44 s,
+x64 0.38 s). Their SHA-256 identities are respectively
+1f7587e3f20858edb4a2ccd1bdedacdda197e87e4e08ca4d9328eed9cba36c86 and
+933a32e7d962d568ab0456ffbbee1da5cda5169228fe33fa343f134ade0e9328.
+This is fresh P130 execution evidence, not inheritance from P127; it does not
+repair or count as a passing default CTest Console launch. The session is still
+Disc. Five native cases per width (audio lifecycle, SB MIDI, native MIDI and
+both package variants) still require online retries before P130 delivery.
+
+Owner subsequently authorizes temporary desktop-verification deferral and
+continuation of other work. This supersedes the preceding delivery blocker,
+not its failed evidence. P130 delivers under that explicit limitation; online
+audio lifecycle, SB MIDI, native MIDI and both package variants per width
+remain pending until the owner reports desktop availability. No test is removed
+or reclassified as passing. Default CTest Console launch remains separately
+qualified by the exact unchanged binary's explicit-Console execution above.
+Coordinator actual-diff review confirms only original-order restoration and
+the one necessary V7 argument mask; no second path, guest change or shared
+API change. Final source, manifest and published hashes match the recorded
+verification. Owned jobs have exited; scratch can be removed after promotion.
+Frontier advances to 427/472, next file 428 base/video/vga_mode.c. S1/T100 and
+the outstanding owner decisions stay open; this is not complete acceptance.

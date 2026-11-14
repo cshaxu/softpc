@@ -75,6 +75,13 @@ than its committed revision; no immutable neighbor revision is claimed.
 
 ## Approved execution contract
 
+Owner later authorizes temporary deferral of desktop-dependent verification:
+"允许你暂时跳过需要这个桌面验证的。等到我回到桌面环境再告诉你。你可以继续去做其他的。"
+Continue ordered audit, builds, publication and P delivery with explicit pending
+online tests. Preserve failed results; do not turn deferral into a pass, remove
+tests or claim full native acceptance. Resume these checks when the owner
+reports desktop availability. Other evidence and delivery obligations remain.
+
 1. Freeze the SoftPC starting commit and local file hashes; use the already
    pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89 counterparts and
    provenance manifest. Do not consult OpenNT source or substitute another

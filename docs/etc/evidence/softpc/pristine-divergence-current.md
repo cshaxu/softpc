@@ -6,6 +6,12 @@ T92 S6 基准切换说明：本文件保留各历史时点的 OpenNT 差异与�
 [T92 子集及本地补丁记录](../../../history/M9-T92-xp-sp1-softpc-mirror-rebase-proposal.md)。
 以下历史数字和语义说明不回写成新的 XP 统计。
 
+T100 S1 P130 narrows the existing v7_video.c preserve-memory validation
+repair to the V7 predicate argument. Original assignment order and surrounding
+text are restored; fixed-XP selected difference changes from +3/-3 to +1/-1.
+The T70 entry below remains historical. Current evidence and owner decision
+R0537 belong to the [T100 audit](m9-t100-progress.md).
+
 ### T99 S24 第五层排除分支
 
 `base/video/ega_read.c` 的 `EGA_DUMP || EGA_STAT` 调试分支在当前
