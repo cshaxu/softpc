@@ -56,128 +56,154 @@ semantic audit workload unless their frozen bytes change.
 | host/inc | 7 |
 | host/src | 12 |
 
+## Difference counting convention
+
+P2 adds exact selected-content text counts at the same frozen source hashes.
+[Machine-readable counts](m9-t100-s4-diff-counts.tsv) match the table below.
+A counted location is one Git Myers zero-context hunk (`--unified=0`), not an
+already-reviewed semantic cause. Added/deleted lines are relative to pinned XP;
+comments, blanks and unchanged conditional framing spellings are not normalized.
+Existing #error bodies and their original counterparts are omitted. Line-control
+directives are handled separately, consistently with the screening list.
+
+Modified TLS condition framing in c_main.c is matched to its original NTVDM
+branch only to identify the excluded body; the changed condition remains counted.
+For added local guards with no XP counterpart, omit only the local error body;
+keep the new framing and every original-code difference visible. No unmatched
+branch is silently removed. Both raw SHA-256 values are checked against the
+frozen ledger for every file before comparing. LF normalization is the only
+line-ending transformation; original final-newline presence is preserved.
+
+Reproduction uses selected texts and
+`git -c core.autocrlf=false diff --no-index --no-ext-diff --no-textconv --diff-algorithm=myers --unified=0`.
+Count each `@@` hunk header and its added/deleted payload lines, excluding file
+headers. Necessary-difference judgments and semantic-point totals remain subject
+to the subsequent manual file-by-file review. This read-only delivery changes no
+production, tests or artifacts and claims no new runtime qualification.
+
 ## Complete list in literal dir file order
 
-| Original order | File |
-| ---: | --- |
-| 6 | `base/bios/reset.c` |
-| 8 | `base/bios/slave_bs.c` |
-| 9 | `base/bios/tape_io.c` |
-| 41 | `base/ccpu386/c-files` |
-| 42 | `base/ccpu386/call.c` |
-| 47 | `base/ccpu386/ccpusas4.c` |
-| 64 | `base/ccpu386/cpu4gen.h` |
-| 73 | `base/ccpu386/c_bsic.h` |
-| 74 | `base/ccpu386/c_debug.c` |
-| 78 | `base/ccpu386/c_intr.c` |
-| 80 | `base/ccpu386/c_main.c` |
-| 88 | `base/ccpu386/c_page.c` |
-| 98 | `base/ccpu386/c_tlb.c` |
-| 121 | `base/ccpu386/fpu.c` |
-| 182 | `base/ccpu386/ntstubs.c` |
-| 183 | `base/ccpu386/ntthread.c` |
-| 265 | `base/ccpu386/zfrsrvd.c` |
-| 267 | `base/comms/com.c` |
-| 268 | `base/comms/printer.c` |
-| 269 | `base/comms/printer_.c` |
-| 270 | `base/comms/rs232_io.c` |
-| 275 | `base/cvidc/ev_glue.c` |
-| 283 | `base/cvidc/sevid000.c` |
-| 284 | `base/cvidc/sevid001.c` |
-| 285 | `base/cvidc/sevid002.c` |
-| 286 | `base/cvidc/sevid003.c` |
-| 287 | `base/cvidc/sevid004.c` |
-| 288 | `base/cvidc/sevid005.c` |
-| 289 | `base/cvidc/sevid006.c` |
-| 290 | `base/cvidc/sevid007.c` |
-| 291 | `base/cvidc/sevid008.c` |
-| 292 | `base/cvidc/sevid009.c` |
-| 293 | `base/cvidc/sevid010.c` |
-| 294 | `base/cvidc/sevid011.c` |
-| 295 | `base/cvidc/sevid012.c` |
-| 296 | `base/cvidc/sevid013.c` |
-| 297 | `base/cvidc/sevid014.c` |
-| 298 | `base/cvidc/sevid015.c` |
-| 299 | `base/cvidc/sevid016.c` |
-| 300 | `base/cvidc/sevid017.c` |
-| 301 | `base/cvidc/sevid018.c` |
-| 302 | `base/cvidc/sevid019.c` |
-| 303 | `base/cvidc/sevid020.c` |
-| 304 | `base/cvidc/sevid021.c` |
-| 305 | `base/cvidc/sevid022.c` |
-| 306 | `base/cvidc/sevid023.c` |
-| 307 | `base/cvidc/sevid024.c` |
-| 308 | `base/cvidc/sevid025.c` |
-| 309 | `base/cvidc/sevid026.c` |
-| 310 | `base/cvidc/sevid027.c` |
-| 311 | `base/cvidc/sevid028.c` |
-| 312 | `base/cvidc/sevid029.c` |
-| 313 | `base/cvidc/sevid030.c` |
-| 314 | `base/cvidc/sinit011.c` |
-| 315 | `base/cvidc/sinit012.c` |
-| 316 | `base/cvidc/sinit013.c` |
-| 318 | `base/cvidc/vglfunc.c` |
-| 319 | `base/disks/diskbios.c` |
-| 320 | `base/disks/fdisk.c` |
-| 321 | `base/disks/fla.c` |
-| 324 | `base/disks/gfi.c` |
-| 325 | `base/disks/gfi_mpty.c` |
-| 333 | `base/inc/config.h` |
-| 335 | `base/inc/cpu_vid.h` |
-| 337 | `base/inc/dma.h` |
-| 339 | `base/inc/egacpu.h` |
-| 342 | `base/inc/egaports.h` |
-| 358 | `base/inc/gmi.h` |
-| 359 | `base/inc/gvi.h` |
-| 367 | `base/inc/ica.h` |
-| 369 | `base/inc/ios.h` |
-| 377 | `base/inc/quick_ev.h` |
-| 379 | `base/inc/rs232.h` |
-| 381 | `base/inc/sas.h` |
-| 383 | `base/inc/sndblst.h` |
-| 386 | `base/inc/tape_io.h` |
-| 394 | `base/inc/video.h` |
-| 398 | `base/keymouse/keyba.c` |
-| 399 | `base/keymouse/keybd_io.c` |
-| 400 | `base/keymouse/mouse.c` |
-| 401 | `base/keymouse/ppi.c` |
-| 403 | `base/support/time_day.c` |
-| 404 | `base/system/at_dma.c` |
-| 405 | `base/system/cmos.c` |
-| 406 | `base/system/dummy_nt.c` |
-| 407 | `base/system/ica.c` |
-| 410 | `base/system/quick_ev.c` |
-| 411 | `base/system/rom.c` |
-| 412 | `base/system/timer.c` |
-| 414 | `base/system/unexp_nt.c` |
-| 416 | `base/video/egawrtm0.c` |
-| 419 | `base/video/ega_prts.c` |
-| 420 | `base/video/ega_read.c` |
-| 421 | `base/video/ega_vide.c` |
-| 422 | `base/video/ega_writ.c` |
-| 423 | `base/video/egwrtm12.c` |
-| 424 | `base/video/gfx_updt.c` |
-| 426 | `base/video/v7_ports.c` |
-| 427 | `base/video/v7_video.c` |
-| 428 | `base/video/vga_mode.c` |
-| 429 | `base/video/vga_prts.c` |
-| 431 | `base/video/video.c` |
-| 433 | `host/inc/cfpu_def.h` |
-| 436 | `host/inc/host_cpu.h` |
-| 437 | `host/inc/host_def.h` |
-| 440 | `host/inc/host_hfx.h` |
-| 444 | `host/inc/insignia.h` |
-| 453 | `host/inc/nt_graph.h` |
-| 455 | `host/inc/nt_sb.h` |
-| 457 | `host/src/nt_cga.c` |
-| 458 | `host/src/nt_ega.c` |
-| 459 | `host/src/nt_graph.c` |
-| 460 | `host/src/nt_keycd.c` |
-| 461 | `host/src/nt_munge.c` |
-| 462 | `host/src/nt_sb.c` |
-| 463 | `host/src/nt_sbdsp.c` |
-| 464 | `host/src/nt_sbfm.c` |
-| 465 | `host/src/nt_sbmid.c` |
-| 466 | `host/src/nt_sbmxr.c` |
-| 467 | `host/src/nt_sound.c` |
-| 468 | `host/src/nt_vga.c` |
+| Original order | File | Diff blocks | Added | Deleted |
+| ---: | --- | ---: | ---: | ---: |
+| 6 | `base/bios/reset.c` | 1 | +0 | -2 |
+| 8 | `base/bios/slave_bs.c` | 1 | +1 | -1 |
+| 9 | `base/bios/tape_io.c` | 1 | +1 | -1 |
+| 41 | `base/ccpu386/c-files` | 7 | +0 | -9 |
+| 42 | `base/ccpu386/call.c` | 1 | +1 | -1 |
+| 47 | `base/ccpu386/ccpusas4.c` | 13 | +69 | -11 |
+| 64 | `base/ccpu386/cpu4gen.h` | 13 | +13 | -13 |
+| 73 | `base/ccpu386/c_bsic.h` | 1 | +1 | -0 |
+| 74 | `base/ccpu386/c_debug.c` | 2 | +45 | -0 |
+| 78 | `base/ccpu386/c_intr.c` | 1 | +2 | -0 |
+| 80 | `base/ccpu386/c_main.c` | 29 | +136 | -16 |
+| 88 | `base/ccpu386/c_page.c` | 14 | +20 | -6 |
+| 98 | `base/ccpu386/c_tlb.c` | 2 | +58 | -0 |
+| 121 | `base/ccpu386/fpu.c` | 5 | +8 | -5 |
+| 182 | `base/ccpu386/ntstubs.c` | 2 | +1 | -12 |
+| 183 | `base/ccpu386/ntthread.c` | 3 | +23 | -2 |
+| 265 | `base/ccpu386/zfrsrvd.c` | 1 | +17 | -0 |
+| 267 | `base/comms/com.c` | 6 | +126 | -3 |
+| 268 | `base/comms/printer.c` | 3 | +74 | -0 |
+| 269 | `base/comms/printer_.c` | 1 | +1 | -0 |
+| 270 | `base/comms/rs232_io.c` | 1 | +1 | -0 |
+| 275 | `base/cvidc/ev_glue.c` | 3 | +3 | -2 |
+| 283 | `base/cvidc/sevid000.c` | 408 | +492 | -497 |
+| 284 | `base/cvidc/sevid001.c` | 366 | +448 | -447 |
+| 285 | `base/cvidc/sevid002.c` | 457 | +594 | -593 |
+| 286 | `base/cvidc/sevid003.c` | 521 | +672 | -671 |
+| 287 | `base/cvidc/sevid004.c` | 536 | +665 | -664 |
+| 288 | `base/cvidc/sevid005.c` | 499 | +664 | -663 |
+| 289 | `base/cvidc/sevid006.c` | 542 | +713 | -712 |
+| 290 | `base/cvidc/sevid007.c` | 683 | +934 | -933 |
+| 291 | `base/cvidc/sevid008.c` | 505 | +686 | -685 |
+| 292 | `base/cvidc/sevid009.c` | 343 | +436 | -435 |
+| 293 | `base/cvidc/sevid010.c` | 632 | +774 | -773 |
+| 294 | `base/cvidc/sevid011.c` | 457 | +570 | -569 |
+| 295 | `base/cvidc/sevid012.c` | 509 | +638 | -637 |
+| 296 | `base/cvidc/sevid013.c` | 506 | +676 | -675 |
+| 297 | `base/cvidc/sevid014.c` | 591 | +794 | -793 |
+| 298 | `base/cvidc/sevid015.c` | 519 | +639 | -638 |
+| 299 | `base/cvidc/sevid016.c` | 471 | +593 | -630 |
+| 300 | `base/cvidc/sevid017.c` | 351 | +469 | -582 |
+| 301 | `base/cvidc/sevid018.c` | 366 | +493 | -600 |
+| 302 | `base/cvidc/sevid019.c` | 425 | +679 | -903 |
+| 303 | `base/cvidc/sevid020.c` | 492 | +636 | -666 |
+| 304 | `base/cvidc/sevid021.c` | 533 | +691 | -690 |
+| 305 | `base/cvidc/sevid022.c` | 593 | +753 | -752 |
+| 306 | `base/cvidc/sevid023.c` | 370 | +487 | -486 |
+| 307 | `base/cvidc/sevid024.c` | 406 | +488 | -487 |
+| 308 | `base/cvidc/sevid025.c` | 556 | +667 | -666 |
+| 309 | `base/cvidc/sevid026.c` | 515 | +598 | -597 |
+| 310 | `base/cvidc/sevid027.c` | 408 | +524 | -523 |
+| 311 | `base/cvidc/sevid028.c` | 510 | +655 | -654 |
+| 312 | `base/cvidc/sevid029.c` | 436 | +530 | -529 |
+| 313 | `base/cvidc/sevid030.c` | 299 | +353 | -352 |
+| 314 | `base/cvidc/sinit011.c` | 61 | +441 | -440 |
+| 315 | `base/cvidc/sinit012.c` | 92 | +700 | -699 |
+| 316 | `base/cvidc/sinit013.c` | 171 | +719 | -718 |
+| 318 | `base/cvidc/vglfunc.c` | 1 | +5 | -0 |
+| 319 | `base/disks/diskbios.c` | 4 | +5 | -4 |
+| 320 | `base/disks/fdisk.c` | 2 | +120 | -0 |
+| 321 | `base/disks/fla.c` | 4 | +99 | -0 |
+| 324 | `base/disks/gfi.c` | 1 | +1 | -0 |
+| 325 | `base/disks/gfi_mpty.c` | 1 | +1 | -0 |
+| 333 | `base/inc/config.h` | 2 | +2 | -2 |
+| 335 | `base/inc/cpu_vid.h` | 2 | +3 | -0 |
+| 337 | `base/inc/dma.h` | 1 | +3 | -0 |
+| 339 | `base/inc/egacpu.h` | 1 | +8 | -1 |
+| 342 | `base/inc/egaports.h` | 1 | +1 | -0 |
+| 358 | `base/inc/gmi.h` | 2 | +3 | -0 |
+| 359 | `base/inc/gvi.h` | 1 | +2 | -0 |
+| 367 | `base/inc/ica.h` | 3 | +3 | -1 |
+| 369 | `base/inc/ios.h` | 3 | +3 | -3 |
+| 377 | `base/inc/quick_ev.h` | 2 | +35 | -0 |
+| 379 | `base/inc/rs232.h` | 4 | +3 | -3 |
+| 381 | `base/inc/sas.h` | 1 | +1 | -1 |
+| 383 | `base/inc/sndblst.h` | 2 | +2 | -1 |
+| 386 | `base/inc/tape_io.h` | 1 | +0 | -1 |
+| 394 | `base/inc/video.h` | 1 | +4 | -0 |
+| 398 | `base/keymouse/keyba.c` | 11 | +126 | -4 |
+| 399 | `base/keymouse/keybd_io.c` | 1 | +1 | -0 |
+| 400 | `base/keymouse/mouse.c` | 15 | +116 | -34 |
+| 401 | `base/keymouse/ppi.c` | 7 | +30 | -13 |
+| 403 | `base/support/time_day.c` | 3 | +2 | -1 |
+| 404 | `base/system/at_dma.c` | 16 | +115 | -19 |
+| 405 | `base/system/cmos.c` | 4 | +122 | -4 |
+| 406 | `base/system/dummy_nt.c` | 1 | +1 | -0 |
+| 407 | `base/system/ica.c` | 8 | +121 | -9 |
+| 410 | `base/system/quick_ev.c` | 2 | +231 | -0 |
+| 411 | `base/system/rom.c` | 3 | +1 | -3 |
+| 412 | `base/system/timer.c` | 13 | +376 | -6 |
+| 414 | `base/system/unexp_nt.c` | 2 | +1 | -1 |
+| 416 | `base/video/egawrtm0.c` | 4 | +4 | -4 |
+| 419 | `base/video/ega_prts.c` | 3 | +7 | -1 |
+| 420 | `base/video/ega_read.c` | 2 | +1 | -1 |
+| 421 | `base/video/ega_vide.c` | 3 | +15 | -2 |
+| 422 | `base/video/ega_writ.c` | 2 | +1 | -1 |
+| 423 | `base/video/egwrtm12.c` | 11 | +11 | -11 |
+| 424 | `base/video/gfx_updt.c` | 139 | +235 | -215 |
+| 426 | `base/video/v7_ports.c` | 1 | +1 | -1 |
+| 427 | `base/video/v7_video.c` | 1 | +1 | -1 |
+| 428 | `base/video/vga_mode.c` | 3 | +3 | -3 |
+| 429 | `base/video/vga_prts.c` | 11 | +188 | -23 |
+| 431 | `base/video/video.c` | 14 | +14 | -13 |
+| 433 | `host/inc/cfpu_def.h` | 13 | +13 | -8 |
+| 436 | `host/inc/host_cpu.h` | 2 | +4 | -1 |
+| 437 | `host/inc/host_def.h` | 2 | +0 | -2 |
+| 440 | `host/inc/host_hfx.h` | 1 | +1 | -0 |
+| 444 | `host/inc/insignia.h` | 3 | +10 | -1 |
+| 453 | `host/inc/nt_graph.h` | 1 | +2 | -1 |
+| 455 | `host/inc/nt_sb.h` | 4 | +52 | -2 |
+| 457 | `host/src/nt_cga.c` | 10 | +22 | -52 |
+| 458 | `host/src/nt_ega.c` | 9 | +33 | -12 |
+| 459 | `host/src/nt_graph.c` | 11 | +32 | -13 |
+| 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
+| 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
+| 462 | `host/src/nt_sb.c` | 24 | +147 | -376 |
+| 463 | `host/src/nt_sbdsp.c` | 60 | +524 | -1000 |
+| 464 | `host/src/nt_sbfm.c` | 4 | +20 | -102 |
+| 465 | `host/src/nt_sbmid.c` | 33 | +285 | -399 |
+| 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
+| 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
+| 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
+| **Total** | **121 files** | **15778** | **+24764** | **-24069** |

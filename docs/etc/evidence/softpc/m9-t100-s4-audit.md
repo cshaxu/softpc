@@ -127,3 +127,21 @@ The historical 381-ID count is not asserted as the new audit's final count.
 Documentation/manifest checks qualify this read-only delivery, not runtime
 behavior or all-file audit completion. After screening, the next remaining file
 is position 41, base/ccpu386/c-files; dependency reads do not advance that frontier.
+
+## P2 per-file text counts
+
+Owner requests counts for every file in the remaining list. The
+[121-file table](m9-t100-s4-real-diff-files.md#difference-counting-convention)
+now includes zero-context Git Myers hunk counts and XP-relative added/deleted
+lines: 15,778 hunks, +24,764/-24,069, 48,833 added+deleted lines. All frozen raw
+hashes match. Excluded bodies are omitted without their own entries; line
+controls remain separately handled. New/changed conditional framing is retained
+in the counts even when its excluded body is omitted. No unknown correspondence
+is accepted as an excluded original body.
+
+These are text blocks, not a claim of 15,778 semantic decisions. Repeated generated
+GDP access changes can create many blocks for one kind of ABI adaptation, while
+one large block can contain several purposes. Manual review must determine that
+ownership rather than infer it from this arithmetic. P2 advances statistical
+coverage to 121/121, not semantic review or owner approval. No source, test or
+artifact changes; documentation, manifest and table reconciliation checks apply.

@@ -29,6 +29,12 @@ approval or automatic small-diff delegation is restored.
 
 ## Current Technical Baseline
 
+S4 P2 adds per-file counts to the complete 121-file list: 15,778 zero-context
+text diff blocks, +24,764/-24,069 selected-content lines relative to fixed XP.
+Every frozen hash matches; excluded bodies and separately handled line controls
+are not counted. Text blocks are not semantic-point approvals. This is read-only
+statistical delivery; no new runtime verification or production change is claimed.
+
 S4 P1 freezes 472 current mirror files in literal dir order (matching S1).
 Owner narrows the workload: 254 identical files and 97 with only excluded-body
 and line-control scaffolding differences are excluded from further audit.
