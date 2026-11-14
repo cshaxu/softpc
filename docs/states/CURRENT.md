@@ -19,7 +19,7 @@ existing mirror differences together. T100 remains open. See the
 | Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, read-only until a concrete owner implementation decision; task records own approval status. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP only; no OpenNT reads. |
 | Verification | Cross-check current source and prior evidence for each presented point. Separate source/ABI proof, controlled tests and guest reproduction. Documentation-only admission uses documentation/whitespace checks, not invented fresh runtime qualification. |
-| Expected Markers | 381 IDs retain individual dispositions; nineteen notices stay separate. 72 retained (52 explicit, twenty delegated); next review starts at R0099, in frozen file order. |
+| Expected Markers | 381 IDs retain individual dispositions; nineteen notices stay separate. 73 retained (53 explicit, twenty delegated); next review R0100, in frozen file order. |
 | Asset Needs | Preserve configuration/media/snapshots. S3 owns build/t100-s3 for disposable review scripts; two-hour run/fifteen-minute no-progress budget if probes are needed; clean at each delivery. |
 | Reporting Requirements | Original/current code, necessity evidence and limits, restoration consequence and actual XP diff; distinguish recommendation from approval. |
 | Stop Conditions | Admission does not authorize arbitrary restoration or new patches. Unproved necessity returns to investigation. Do not revive declined bulk repairs or approve a whole family from one representative. |
@@ -29,9 +29,9 @@ existing mirror differences together. T100 remains open. See the
 
 ## Current Technical Baseline
 
-S3 P12 records explicit R0095-R0097 retention (+5/-0 existing XP difference)
-and the expanded small-point delegation (added plus deleted strictly below five).
-Progress: 72/381 retained, 309 pending; next review starts at R0099. The
+S3 P13 records explicit R0099 retention (+6/-0 existing XP difference),
+the ordinary-boundary clock/control consumption before trap/IRQ checks.
+Progress: 73/381 retained, 308 pending; next review R0100 (+7/-4). The
 [point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
 owns individual decisions. This documentation-only delivery changes no source,
 tests, EXEs or user assets and claims no new runtime qualification.

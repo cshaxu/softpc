@@ -56,6 +56,7 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 80 / R0095 | STI retirement notification (+1/-0). | Original STI inhibited-interrupt jump bypasses ordinary retirement. | Owner approves retention, S3 P12 |
 | 80 / R0096 | Ordinary instruction retirement notification (+2/-0 including separator). | Shared debug observer counts completed ordinary instructions; early jumps do not also pass here. | Owner approves retention, S3 P12 |
 | 80 / R0097 | Escape quick mode for pending host events (+2/-0). | Otherwise the original direct DO_INST shortcut bypasses host clock/control consumption. | Owner approves retention, S3 P12 |
+| 80 / R0099 | Consume clock/control events before original trap/IRQ checks (+6/-0 including two blanks). | These checks must see events produced at this boundary; direct NEXT_INST entry still needs its own consumption point. | Owner approves retention, S3 P13 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -79,11 +80,15 @@ Owner then approves R0095-R0097 (+5/-0), expanding automatic retention to
 existing points with added plus deleted lines strictly less than five (at most
 four). Evidence remains required; do not split IDs or count net growth. This
 supersedes the earlier two-line threshold without authorizing new repairs.
-Progress: 72/381 retained (52 explicit and twenty delegated),
-zero restoration decisions, 309 pending;
+Owner then approves R0099 (+6/-0). Progress: 73/381 retained
+(53 explicit and twenty delegated), zero restoration decisions, 308 pending;
 notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next review starts at R0099; R0098 was
+stays the single detailed inventory. Next review is R0100 (+7/-4): the PIC
+reject guard also protects EXT and SYNCH_TICK before do_intrupt; four original
+body lines are reindented, not new operations. The selected ica_intack path
+returns ICA_INTACK_REJECT when ica_accept rejects the request. Source evidence,
+not a fresh dynamic run, supports this review. R0098 was
 already restored in S1. R0095-R0097 counts include one separator blank and
 exclude the existing exclusion-related #line.
 R0092 was already restored in S1. HLT checkpoint, pending clock/control
