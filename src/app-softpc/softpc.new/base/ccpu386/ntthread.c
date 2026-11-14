@@ -213,7 +213,6 @@ void ccpu386Unsimulate()
 }
 
 
-/* Select the outer frame, then use the original unwind. */
 void ccpu386UnsimulateOuter()
 {
     ThreadSimBufPtr simstack;

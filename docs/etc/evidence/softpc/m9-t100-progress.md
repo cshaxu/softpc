@@ -12066,3 +12066,50 @@ remain applicable. Both EXEs are byte-identical to HEAD P161; no unnecessary
 build or timestamp-only replacement is performed for document changes.
 Documentation/mirror/whitespace gates pass. No scratch is created. The next
 position is 119; remaining positions and D001-D006/L001 are not closed.
+
+## P163 final-decision reconciliation, positions 119-266
+
+The owner review view now covers positions 1-266. Ten further pending IDs are
+reconciled, for 114 cumulative: R0146/R0147, R0155-R0158, R0160-R0162 and
+R0172. P14/P15/P16/P19/P20/P21 restorations are explicitly distinguished from
+those remaining choices. In particular IRET/RETF stack-width replacements and
+FPU snapshot wrappers are restored, not retained adaptations.
+
+Current-source review checks original FPU stack accessor calls from the archive,
+CVTFPHI64 representation copying and M64I rounding, Gdp/no-op symbol owners,
+outer unwind relaying to ccpu386Unsimulate, both null-return branches, operand
+size at the original IRET/RETF return blocks and private delayed exception IP.
+P15/P18 remain the latest corresponding source revisions before this cleanup.
+P21's isolated verifier retry and ntthread's unchecked setjmp consumer are
+retained as explicit limits, not hidden behind a general safety claim.
+
+### P163 final evidence
+
+Remove only the remaining explanation above ccpu386UnsimulateOuter; keep all
+function logic and the original single unwind implementation. Production
++0/-1, tests +0/-0. Fixed-XP comparison confirms added diff lines decrease by
+one, deleted lines unchanged. The residual is +23/-2; no new point or excluded
+body record. The manifest updates only ntthread.c's local hash. Mirror CRLF
+and all other production bytes are preserved.
+
+Both cached full-target builds succeed and publish fresh EXEs. Complete-byte
+comparison against P161's published artifacts finds equal lengths and only
+metadata changes, listed below. PE offsets are validated from each DOS header;
+permitted fields are COFF TimeDateStamp and OptionalHeader CheckSum. Each
+changed compiler literal is a complete NUL-terminated time at the same offset.
+Every other byte is identical. This is the approved artifact-equivalence
+exception: no fresh runtime tests are claimed, and P161's final-source 392/392
+is reused. No changed test requires a focused rerun.
+
+- x86: build 9.3 s; 3478046 bytes; changed offsets [136, 137, 216, 217, 2394691, 2394692, 2394694, 2394695]; compiler time 03:08:38 to 03:21:12 at 2394688; SHA-256 `db128de49f8724bd2e1caef4c6f3917e6683abea39c55df7759b66bd165a3ba2`.
+- x64: build 10.66 s; 3095494 bytes; changed offsets [136, 137, 216, 217, 2262243, 2262246, 2262247]; compiler time 03:11:41 to 03:21:22 at 2262240; SHA-256 `1f766670b79795c346546fe95ba5cdbc05ba108a6e3695fd83be419363a642e6`.
+
+Actual-diff review confirms one comment-only production deletion, no guest,
+media, configuration, snapshot, Compat or shared-component changes. Cached
+build logs contain no warning/error lines; this is not a fresh warning audit
+of unchanged mirror units. The build runner is confirmed exited. Final gates
+and scratch cleanup follow; owner approval and S1/T100 closure remain pending.
+
+P163 final mirror/documentation/whitespace gates pass. Task scratch was previewed
+and removed after runner exit; build residue check passes. No live job or
+unrelated change is removed.

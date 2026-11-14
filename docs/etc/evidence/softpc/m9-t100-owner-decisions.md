@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-118 only. Positions 119-472, original
+This view currently reconciles positions 1-266 only. Positions 267-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -296,6 +296,137 @@ empty function links; no duplicate Compat stub was invented. Object comparison
 qualified the declaration alone; full regression qualified restored no-op calls.
 No pending patch remains in c_xcptn.c.
 
+## Positions 119-137: original pointer declarations and FPU
+
+P14 fully restored R0141-R0143 in evid_c.h. The six fields are pointers, not
+32-bit storage for pointer values; the actual consumer uses offsets/size, not
+the changed pointee types. Object and complete-EXE comparisons established
+metadata-only change. This is not generalized to scalar native-pointer storage.
+Position 120 and positions 122-137 have no pending in-scope differences.
+
+### R0146/R0147: fpu.c representation and integer rounding
+
+Recommendation: retain these two independently tested corrections (+8/-5
+combined). P15 restored R0144/R0145/R0148-R0151: removed needless headers and
+cast, and removed the FPU snapshot wrappers. The archive now calls original
+get/setNpxStackRegs and control/status accessors, preserving original exported
+flags, setter order, serialization and stack padding. It does not invoke
+FSAVE/FRSTOR with their guest-visible reset/conversion effects.
+
+- R0146 copies the floating representation with memcpy before bitfield reads.
+  Independent exact-original restoration compiled/linked, then failed the
+  actual large-integer instruction assertion expecting 0x0000123400001234 on
+  both architectures. Current control passed. This is supported optimized-code
+  evidence, not a claim that every possible compiler fails original punning.
+- R0147 rounds M64I with existing npx_rint before conversion. Independent
+  original restoration failed nearest-even 3.5 storage: first byte 00 rather
+  than 04 on both architectures. Current controls passed the existing 228
+  conversion cases; this is not exhaustive x87 conformance.
+
+Current fpu.c still has P15 as its latest source change. Source/consumer
+recheck confirms only the representation and rounding behavior remains local;
+original native stack accessors now serve the archive directly. P15's final
+nonsemantic refinement used proved EXE equivalence, while its strengthened
+tag round-trip test was freshly run at both widths. P161 later ran all tests.
+
+## Positions 138-181: IRET restored, not a retained repair
+
+R0152 in iret.c is fully restored in P16. CALL's TSS stack selection does not
+justify applying SS address size to a popped IRET operand. Actual ring-0-to-3
+IRETD with a 16-bit target stack lost the saved ESP upper half under the local
+helper substitution. Original operand-size selection preserves it; the same
+negative/positive fixture runs on both architectures.
+
+Current source keeps original GET_OPERAND_SIZE/SET_SP/SET_ESP in the restored
+outer-privilege return block. The separate original V86 set_current_SP use is
+not confused with that block or removed. Tests assert low SP for 16-bit returns
+and full ESP for IRETD; they do not freeze unverified high-half hardware behavior
+for 16-bit IRET. P16's full 392/392 qualified restoration. Positions 139-181
+have no pending in-scope differences. No IRET patch is submitted for retention.
+
+## Positions 182-193: selected symbols and original TLS unwind
+
+### R0155-R0158: ntstubs.c, single original symbol owner
+
+Recommendation: retain extern Gdp and omit the three duplicate no-op definitions
+copyROM/initialise_npx/npx_reset. The combined residual is +1/-12 after P17
+restored include spelling, removed the unneeded stdio include and trimmed gaps
+(R0153/R0154 restored).
+
+Current bindings retain original ev_glue.c's Gdp and original rom.c/fpu.c's
+functions. Independently restoring Gdp failed both links; restoring all three
+stubs failed with all three duplicate symbols at both widths. The no-op behavior
+is not itself defective: exactly one original definition is required. Omitting
+an active original owner or adding another local omission merely moves/increases
+the difference. No substitute Compat stubs are introduced. P17 include cleanup
+used final object/EXE equivalence and focused checkpoint runs, not a fabricated
+fresh full suite. P161 subsequently passed the full suite.
+
+### R0160-R0162: ntthread.c outer exit and defined failure results
+
+P18 restored R0159's original fixed-allocation diagnostic. The three remaining
+IDs are distinct choices:
+
+- R0160: retain outer-frame selection, followed by original ccpu386Unsimulate.
+  Coherent replacement with ordinary c_cpu_unsimulate returned to the wrong
+  nested BIOS host frame; the actual checkpoint assertion at EIP 604 failed
+  on both widths. Current and original-unwind-relay controls passed. The local
+  routine now sets level=1; the original routine owns decrement, in_C and
+  longjmp. There is no intervening callback/wait or cross-thread update.
+- R0161/R0162: retain explicit null results in the BADID and missing-TLS branches
+  of ccpu386ThrdExptnPtr. Actual original-body failure injections returned 31h
+  and 39h respectively on both widths. This proves an invalid helper return,
+  not safe application recovery: c_main still passes the result directly to
+  setjmp without a null check. Do not approve these as a complete low-memory
+  or TLS-failure lifecycle solution.
+
+P163 removes the remaining one-line explanatory comment above the added outer
+function, leaving its behavior unchanged and reducing the residual from +24/-2
+to +23/-2. The recommendation concerns the remaining semantics, not that removed
+comment. P18's complete checkpoint/full regression evidence covers normal
+nested unwind/reentry and finite budgets, not injected whole-product failures.
+Positions 184-193 have no pending in-scope differences.
+
+## Positions 194-264: POPF and RETF fully restored
+
+P19 restored R0163/R0164 in popf.c (unneeded stdio and diagnostic declarations).
+Its real object/EXE equivalence showed no necessary supported ABI change;
+original mirror warnings were not mistaken for execution faults. Positions
+195-205 have no pending in-scope differences.
+
+P20 restored R0165 in ret.c. Popped return operand width determines the restored
+ESP; subsequent immediate parameter adjustment still uses stack address size.
+Current code retains that original order. The combined real-instruction fixture
+covers IRET, RETF and RETF 4 across two operand and two target-stack widths.
+The prior RETF helper substitution failed the full saved ESP assertion on both
+architectures; original restoration passed full regression. No general hardware
+claim is made for upper ESP after a 16-bit return or all fault combinations.
+Positions 207-264 have no pending in-scope differences. No POPF/RETF residual
+is submitted for approval.
+
+## Positions 265-266: delayed FPU exception state
+
+### R0172: zfrsrvd.c private saved exception IP
+
+Recommendation: retain the existing 17-line private-state accessor difference.
+P21 restored R0166-R0171 (unneeded declarations/includes and prototype rewrite).
+Current DoNpxException saves NpxFIP into private NpxExceptionEIP; subsequent
+TakeNpxExceptionInt restores that saved IP and mutates pending/interrupt state.
+It cannot be called merely to inspect the snapshot state without side effects.
+
+The actual archive regression saves 11223344 as delayed IP, changes current FIP
+to 55667788, captures, installs a later 99AABBCC exception, restores, then checks
+that real exception delivery recovers 11223344. Coherent removal of both
+accessors and their archive calls preserved ordinary pending-flag restoration
+but failed this assertion on both architectures. This is actual delayed-IP
+behavior, not only missing-symbol evidence. No second FPU owner or format change
+is introduced; current archive still calls these narrow accessors.
+
+P21's first x86 full run timed out in emulator.verifier-negative; its unchanged
+isolated retry passed. That delivery is not called first-pass 392/392. P161
+later passed the complete suite without retries. Position 266 is original
+normalized-identical and has no pending difference. R0172 remains unapproved.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -305,4 +436,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 119.
+recommendations into owner approval. The next position is 267.
