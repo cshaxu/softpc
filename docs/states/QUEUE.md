@@ -11,9 +11,9 @@ allocates a numeric task identifier.
 
 ## Previously admitted
 
-T100 remains open after owner closure of S3. Its remaining mirror review is
+T100 remains open after owner closure of S3 and admission of S4. Its mirror review is
 retained in the [T100 proposal](../proposals/m9-xp-mirror-original-first-audit.md#remaining-work-after-s3-owner-closure),
-awaiting a new S admission; this is not another T candidate.
+active under CURRENT; this is not another T candidate.
 
 Owner closes Td S22 [build-cache governance](../history/M9-Td-S22-build-cache-governance.md).
 It is not an outstanding candidate or active task.

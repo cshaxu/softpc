@@ -453,3 +453,33 @@ necessity with evidence, reconcile category block/line/point totals, and present
 the remaining retention decisions for fresh owner review. Earlier approvals
 and automatic small-diff delegation remain revoked. The S3 text-restoration
 delivery is complete; it is not a substitute for that outstanding work.
+
+### S4 fresh ordered re-audit
+
+Owner admits S4 on 2026-11-14 to compare and audit all mirror differences again
+in literal `dir /a /b /s` order. Freeze current SoftPC `6ff24aee` and pinned XP
+SP1; recapture directory/file order without sorting, and verify its relation to
+the previous 472-file sequence. The current tree, not historical residual IDs,
+defines coverage. The [S4 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md)
+owns the file frontier, classifications and reviewed-point evidence.
+
+Existing excluded bodies receive no new records or counts. Separately verify
+necessary diagnostic anchors, historical notices and nonsemantic spelling.
+Classify retained changes by original defect correction, host/standalone
+boundary, native ABI/compiler representation, snapshot/lifecycle observation,
+debug observation, product selection or documentation/format policy. Split a
+mixed hunk into evidenced points rather than assigning all lines to one purpose.
+Keep semantic-point counts distinct from textual hunks and source net growth.
+
+Audit all files in order, including identical/no-in-scope-diff dispositions.
+Evidence-backed retention candidates remain unapproved; historical approvals
+stay revoked. Read relevant dependencies without declaring later files done.
+Unknowns are investigation, not retention. No new production change is implied
+by the admission or by a read-only P delivery.
+
+Owner subsequently narrows repeated review: exclude the 254 identical files,
+screen the other 218 for exclusion-only differences, and first deliver the
+remaining real-diff file list. Screening finds 97 exclusion-scaffolding-only
+files and [121 real-difference files](../etc/evidence/softpc/m9-t100-s4-real-diff-files.md).
+Only those 121 remain in the substantive audit workload, preserving their
+literal dir ordinals. Do not re-audit the other 351 unchanged files.

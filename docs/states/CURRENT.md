@@ -2,12 +2,42 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T100.
-Owner accepts P16 and closes M9 T100 S3. No next S is admitted. See the
-[S3 closure](../history/M9-T100-S3-mirror-review.md). Remaining whole-mirror
-classification and retention decisions stay in the T100 proposal for later admission.
+Owner admits M9 T100 S4 for a fresh ordered audit of all current mirror
+differences. T100 remains open; S1-S3 stay closed. No previous retention
+approval or automatic small-diff delegation is restored.
+
+## M9 T100 S4 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; no inherited retention approvals. |
+| Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
+| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. |
+| Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
+| Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
+| Files And ABI Surface | All tracked files under src/app-softpc/softpc.new and read-only inspection of real build/caller/test dependencies. Start with audit, not new code changes. |
+| Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy; XP only, never OpenNT. |
+| Verification | Pin both identities; capture literal directory/file order and hashes; classify retained differences in ascending file/location order; corroborate each semantic point with current callers and supported configurations. Documentation-only P uses documentation, manifest and whitespace checks. Any later authorized source delivery uses cached dual builds/publication and proportional tests, with the established complete-artifact-equivalence exception. |
+| Expected Markers | Fresh finite file ledger, sequential frontier, explicit unresolved/qualified/restored dispositions; category sums reconcile without treating Git hunks as semantic points. No approval inferred from old IDs or passing tests. |
+| Asset Needs | Preserve all user configuration, media and snapshots. S4 owns build/t100-s4; two-hour job and fifteen-minute no-progress budgets; hidden background long runs; promote concise evidence and remove disposable work at delivery/closure. |
+| Reporting Requirements | Per file: ordinal, XP/local anchors, purpose category, added/deleted diff, actual consumer, proof and limits, counter-review and decision. Report global progress and do not label unreviewed matching groups audited. |
+| Stop Conditions | Unproved necessity remains investigation. No new unjustified mirror diff, no blanket approval, no uncertain original source substitution. |
+| Exit Criteria | Every frozen file and nonexcluded difference has a fresh reconciled disposition and category totals; remaining evidence-backed decisions are presented for owner review, with no unfinished investigation hidden as retention. |
+| Original Owner Request | 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. |
+| Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P1 freezes 472 current mirror files in literal dir order (matching S1).
+Owner narrows the workload: 254 identical files and 97 with only excluded-body
+and line-control scaffolding differences are excluded from further audit.
+The [121-file real-diff list](../etc/evidence/softpc/m9-t100-s4-real-diff-files.md)
+retains original ordinals. All 121 have differences outside exclusion bodies;
+this is not a bug count or retention approval. Initial selected-body inspection
+of positions 1-9 identifies three unapproved points (+2/-4), recorded in the
+[S4 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md). No production, test or
+artifact changes; remaining semantic review is not claimed complete.
 
 S3 P16 delivers the owner-approved nonsemantic restoration: 37 mirror files,
 176 text hunks, production +192/-207, no test changes. Selected text diff drops
