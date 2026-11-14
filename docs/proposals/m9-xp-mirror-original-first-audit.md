@@ -227,3 +227,8 @@ regression and remaining uncertainty. Finite completion means every item has a
 review disposition; no unproved defect is called fixed and no proposed patch
 is silently implemented. Inactive native MIDI observations remain with their
 existing S1 decisions, not silently added as a ninth active candidate.
+
+Owner subsequently authorizes D005 and D006 implementation with minimal permanent
+regressions and full cached dual-width qualification as S2 P2. The bounded
+[repair evidence](../etc/evidence/softpc/m9-t100-s2-repairs.md) records their
+actual changes and verification; the other six items remain review-only.

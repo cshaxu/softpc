@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing and final file-decision reconciliation cover all 472 files.
-D001-D006 and L001 are reconciled below as unimplemented proposed repairs,
+At S1 delivery, D001-D006 and L001 were unimplemented proposed repairs,
 separate from existing residuals. P188 records final accounting; neither file coverage
 nor reconciliation approves residuals or closes S1/T100.
 
@@ -2782,3 +2782,9 @@ not create a new runtime result from a source search, nor turn three qualified
 recommendations into owner approval. The compact decision packet and P189
 audit-delivery completion review preserve those approval boundaries; owner
 disposition remains outstanding.
+
+## Subsequent authorized repairs
+
+S2 P2 implements owner-approved D005 and D006; see the
+[repair evidence](m9-t100-s2-repairs.md). The S1 findings above remain historical;
+other repair candidates are not implicitly approved or implemented.

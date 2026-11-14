@@ -2043,6 +2043,8 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
                         {
                                 /* spread interrupts through system tick */
                                 int_delay = SYSTEM_TICK_INTV / (n + 1);
+                                if (int_delay == 0)
+                                        int_delay = 1;
                                 if (int_delay < timer_multiple_delay)
                                         timer_multiple_delay = int_delay;
                                 more_timer_mult += n;

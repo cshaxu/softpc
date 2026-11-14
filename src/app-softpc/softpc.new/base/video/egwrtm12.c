@@ -676,7 +676,7 @@ ega_mode2_chn_b_write IFN2(ULONG, value, ULONG, offset )
 			if( getVideoplane_enable() & 1 )
 				EGA_plane01[offset] = value & 1 ? 0xff : 0;
 
-			if( getVideoplane_enable() & 8 )
+			if( getVideoplane_enable() & 4 )
 				EGA_plane23[offset] = value & 4 ? 0xff : 0;
 		}
 	}

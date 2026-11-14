@@ -9,6 +9,9 @@
 #include "ios.h"
 #include "ica.h"
 #include "timer.h"
+#include "quick_ev.h"
+
+extern void c_cpu_q_ev_set_count(IU32 count);
 
 static unsigned int irq_requests;
 
@@ -53,6 +56,17 @@ static void verify_read_only_time(softpc_machine *machine,
     time_tick();
     time_tick();
     assert(irq_requests != 0u);
+    /* Dispatch the accepted backlog, not just the first immediate IRQ. */
+    assert(softpc_device_snapshot_capture_pit(&after));
+    assert(divisor != 1u || mode == 0u || after.active_interrupt_event);
+    if (after.active_interrupt_event) {
+        unsigned int before_dispatch = irq_requests;
+        c_cpu_q_ev_set_count(0);
+        dispatch_q_event();
+        assert(softpc_device_snapshot_capture_pit(&after));
+        assert(irq_requests > before_dispatch);
+        assert(!after.active_interrupt_event || after.timer_multiple_delay != 0u);
+    }
     ica_hw_interrupt_func = original_irq;
 }
 

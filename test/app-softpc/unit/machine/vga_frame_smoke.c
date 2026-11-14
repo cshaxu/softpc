@@ -1533,6 +1533,26 @@ static void verify_text_plane_handoff(void)
     }
 }
 
+static void verify_mode2_plane_enable(void)
+{
+    extern void (*bios_ch2_byte_wrt_fn)(ULONG value, ULONG offset);
+    c_setAH(0); c_setAL(3);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    outb(0x3ce, 3); outb(0x3cf, 0);
+    outb(0x3ce, 8); outb(0x3cf, 0xff);
+    outb(0x3ce, 5); outb(0x3cf, 0x12);
+    assert(EGA_CPU.chain == CHAIN2 && !EGA_CPU.fun_or_protection);
+    for (unsigned mask = 4; mask <= 8; mask += 4) {
+        outb(0x3c4, 2); outb(0x3c5, (half_word)mask);
+        for (unsigned plane = 0; plane < 4; ++plane)
+            EGA_planes[plane] = 0x5a;
+        bios_ch2_byte_wrt_fn(4, 0);
+        assert(EGA_planes[2] == (mask == 4 ? 0xff : 0x5a));
+        assert(EGA_planes[0] == 0x5a && EGA_planes[1] == 0x5a &&
+            EGA_planes[3] == 0x5a);
+    }
+}
+
 static void verify_chain2_dirty_entries(void)
 {
     extern void softpc_test_chain2_continuations(void);
@@ -2467,6 +2487,7 @@ int main(void)
     verify_pointer_update_pixels();
     verify_dib_generation_readiness();
     verify_virtual_text_height();
+    verify_mode2_plane_enable();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     assert(colour_resolution_failures == 0);

@@ -3,7 +3,8 @@
 ## Current Work
 
 Owner closes T100 S1 and admits M9 T100 S2 to review eight outstanding
-repair candidates. T100 stays open. See the
+repair candidates. D005/D006 repairs and minimal tests are now owner-approved
+and implemented in S2 P2, with full qualification recorded below. T100 stays open. See the
 [S1 closure](../history/M9-T100-S1-original-first-audit.md).
 
 ## M9 T100 S2 Packet
@@ -11,23 +12,32 @@ repair candidates. T100 stays open. See the
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Review/design is authorized, not blanket patch implementation. |
+| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Owner subsequently approves D005/D006 minimal code repairs, minimal regressions, cached full dual-width build/publication/test and one P commit/push. Other candidates remain review-only. |
 | Objective | Recheck D001-D006, L001 and TEST01, establish actual failures and consumers, and present minimal coherent repair or non-repair dispositions for owner review. |
 | Non-goals | No unapproved new mirror patch, bulk-path activation, duplicate implementation, guest changes, sibling writes, excluded-body audit or blanket timeout increase. |
 | Reference Baseline | S1 P189 4951c99a; final production P164 21e56aa077334ed5db04a3ab1d64e026bcc2656f; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [Eight-item review](../proposals/m9-xp-mirror-original-first-audit.md#s2-owner-admitted-candidate-review). |
 | Files And ABI Surface | Candidate C-VID rules, timer.c, egwrtm12, PIC snapshot/Compat archive and their tests; shared Emulator/Lib test timing infrastructure for investigation only. Disclose any proposed public or archive contract change. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP is the only original comparison baseline; no OpenNT source reads. |
-| Verification | Existing failures are leads; new probes use actual production bodies/callers on x86/x64 with independent expected values. Source/ABI reasoning, controlled probes and real guest reproduction remain distinct. Documentation-only admission reuses unchanged P164 392/392, not a fresh run. |
+| Verification | Existing failures are leads; new probes use actual production bodies/callers on x86/x64 with independent expected values. Source/ABI reasoning, controlled probes and real guest reproduction remain distinct. P2 requires focused pre-fix failure controls, corrected tests, full cached dual-width builds/publication, background and native regression. Preserve actual failures; no stale P164 result substitutes for P2 qualification. |
 | Expected Markers | Eight-item finite ledger with actual path, evidence, minimal diff estimate, regression scope and owner decision; distinguish D004 applicability from confirmed defects. |
 | Asset Needs | Preserve configuration/media/snapshots. S2 owns build/t100-s2 if needed; hidden background jobs, two-hour total and fifteen-minute no-progress budgets; remove disposable output after delivery. |
 | Reporting Requirements | Explain cause, failure example, production reachability, proposed single-path fix and source/XP diff separately. Report uncertainty without presenting it as a repair. |
-| Stop Conditions | Do not implement candidate patches before a concrete reviewable design is authorized. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
+| Stop Conditions | Only D005/D006 are authorized for implementation in P2; other candidate patches require a concrete authorized design. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
 | Exit Criteria | Every one of eight items has a sourced review disposition and executable plan or reason not to modify; later implementation requires its own authorized scope and qualification before closure. |
 | Original Owner Request | Owner asks to close S1, admit S2 and go through the outstanding mirror/test candidates; original wording and corrected count are preserved in the proposal. |
 | Similar-Issue Sweep | For each confirmed defect, inspect adjacent operations and actual caller families; do not silently add unrelated candidates or activate unused APIs. |
 
 ## Current Technical Baseline
+
+T100 S2 P2 implements D005/D006: positive active PIT backlog delay and correct
+mode2 CHAIN2 plane2 enable bit. Production +3/-1, tests +35/-0; anchored XP
+diff increases four lines. Both cached builds publish fresh dual EXEs. Same-test
+negative controls reproduce both original faults on x86/x64; corrected focused
+tests pass. Fresh full regression passes 392/392 (188 background plus eight
+native per architecture), without retries or skips. See [repair evidence](../etc/evidence/softpc/m9-t100-s2-repairs.md).
+The other six S2 candidates remain review-only; S2 and T100 stay open.
+
 
 T100 S1 P164 restores only ev_glue.c's XP include-line comment:
 production +1/-1, tests unchanged, mirror diff-line count unchanged. Dual cached
@@ -45,8 +55,7 @@ net growth and anchored per-point counts. P189 provides the
 [compact owner decision packet](../etc/evidence/softpc/m9-t100-owner-decisions.md#compact-owner-decision-packet):
 existing functional/ABI differences, six compiler items, historical notices,
 and unimplemented new repairs are separate choices. The audit-delivery
-completion review is recorded. S1 is owner-closed; new repairs are unimplemented
-and now under S2 review. T100 remains open. See the
+completion review is recorded. S1 is owner-closed; its remaining candidates are under S2 review. T100 remains open. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p189-compact-owner-decision-packet).
 
 
