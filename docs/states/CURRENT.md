@@ -30,12 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P117 completes file 413 timestrb.c: selected code matches pinned XP;
-actual CCPU/host timer wiring is confirmed. This documentation-only delivery
-changes no source or EXE. P116 remains the published artifact baseline,
-metadata-equivalent to P114; P114 retains the full 392/392 regression baseline.
-Frontier 413/472; next 414 base/system/unexp_nt.c. D005 is not fixed; L001 and
-earlier qualified residuals/decisions remain open.
+T100 S1 P118 completes file 414 unexp_nt.c: one unnecessary replacement blank
+line removed; actual x86/x64 compilation proves original Ctrl-Z is unsupported.
+The original handler is unchanged; notice and Ctrl-Z omission remain qualified
+pending decisions. Cached dual-EXE publication passes and is metadata-equivalent
+to P116/P114. P114 retains the full 392/392 regression baseline. Frontier 414/472;
+next 415 base/video/cga.c. D005, L001 and earlier decisions remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

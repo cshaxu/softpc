@@ -8499,3 +8499,50 @@ P116 published artifacts and P114 full 392/392 baseline remain unchanged.
 Frontier advances to 413/472; next is 414 base/system/unexp_nt.c. Its terminal
 Ctrl-Z difference has been inspected but is not yet a completed disposition.
 S1 remains active, with all prior pending decisions still open.
+
+## File 414: unexp_nt.c (P118)
+
+Pinned XP raw SHA-256 e4858f4cf27151e479ba6c977c897f5f0f2396b93cb80bd4617f743201488f94.
+The entire selected interrupt handler matches XP. Root CMake includes the
+translation unit; Compat device_bop registers unexpected_int at BIOS_UNEXP_INT,
+and original illegalp.c also calls it. Original ISR inspection, interrupt
+masking, cascade preservation, master/slave command-port EOI and BIOS cause
+storage remain unchanged. Existing excluded bodies/scaffolding are skipped
+without new bookkeeping.
+
+R0507: retain the relocated original historical notice, +1 line, qualified
+pending owner decision under the source policy; no executable behavior.
+R0508: XP ends with a standalone Ctrl-Z byte after the final function newline.
+The local file replaced that byte with a blank line. Remove that replacement
+blank line: source +0/-1, XP added/deleted diff decreases by one added line.
+The necessary residual is deletion of the original Ctrl-Z, +0/-1, qualified
+pending owner decision. No new mirror location or logic is introduced.
+
+Initial analysis considered restoring the exact original byte. Independent
+counter-proof compiles this actual translation unit using each supported
+Ninja GCC command, redirecting object/dependency outputs to task scratch.
+Current-source controls compile successfully on x86 and x64; restoring only
+the terminal byte fails both with error: stray '\32' in program at line 96.
+The unchanged original handler is therefore not rewritten to solve a compiler
+format issue. This establishes build necessity, not guest runtime coverage.
+
+Final cached builds and publication pass: x86 8.17 seconds, x64 8.94 seconds.
+Whole-EXE comparison against P116 finds identical lengths and bytes after
+masking only PE timestamp/checksum and eight time characters of the unique
+same-position Nov 13 2026 compiler literal. The final date is unchanged.
+Both artifacts are metadata-equivalent; the approved exception applies and
+no new full runtime run is claimed. P114 remains the 392/392 full baseline.
+
+x86-artifact: 18:13:17 Nov 13 2026, SHA-256 8fd85fd0fd7efd90cff337e17a14050c67c9e42816084d3f410068ef44d7ce44.
+
+x64-artifact: 18:13:25 Nov 13 2026, SHA-256 93791fd680b32a8775c882e02e45e36dbd440a01c743f82dbd86c46ebfbef8f4.
+
+Actual diff review confirms only the extra terminal blank line was removed;
+CRLF is retained and the local manifest hash matches. No tests, Compat,
+configuration, media or snapshots change. Frontier 414/472; next 415 cga.c.
+All earlier pending decisions, including D005 and L001, remain open.
+
+Both builds emit 89 existing mirror-path warnings, none outside the mirror.
+The owned runner exited successfully and its PID is absent. Task scratch was
+previewed, removed and residue-checked. Manifest/documentation gates and
+actual diff review pass; no warning-free or fresh full-runtime claim.

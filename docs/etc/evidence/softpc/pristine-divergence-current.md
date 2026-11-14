@@ -2249,3 +2249,11 @@ Retained first-event delay guard, estimate/wrap distinction, channel2 POST gate,
 snapshot extension and historical notice are qualified decisions R0501-R0505
 in the T100 evidence. P115 proves adjacent D005 is still faulty; no new patch
 for it is included. Existing excluded bodies/scaffolding are not re-accounted.
+
+### T100 S1 P118 unexp_nt.c terminal restoration
+
+Remove the extra blank line replacing XP's unsupported Ctrl-Z: source +0/-1,
+XP-relative added/deleted diff reduced by one line. Actual translation-unit
+negative builds prove Ctrl-Z restoration fails both architectures. Its omission
+and the relocated historical notice remain qualified decisions R0507/R0508;
+the selected interrupt handler matches XP. No excluded-body accounting.
