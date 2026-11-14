@@ -30,21 +30,30 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 47 / R0024 | Physical read span bounds (+1/-1). | Retain correct end-of-RAM check with subtraction avoiding addition wrap. | Owner approves retention, S3 P5 |
 | 47 / R0026, R0027, R0030, R0033, R0034, R0035 | BIOS access user-permission selection (+1/-1 each). | Retain CPL==3 rather than CPL!=3 for PG_U. | Owner approves retention, S3 P5 |
 | 47 / R0028, R0029, R0031, R0032 | WORD/DWORD fallback return casts (+1/-1 each). | Retain IU16/IU32 rather than IU8, preserving the returned value width. | Owner approves retention, S3 P5 |
-| 64 / R0038-R0041 | Four segment setter return declarations, IUH to ISM32 (+1/-1 each). | Match original c_reg.c providers without changing the function bodies. | Pending |
-| 64 / R0042-R0050 | Nine flag getter return declarations, IBOOL to ISM32 (+1/-1 each). | Match original c_reg.c providers; type consistency, not a claimed reproduced guest fault. | Pending |
+| 64 / R0038-R0041 | Four segment setter return declarations, IUH to ISM32 (+1/-1 each). | Match original c_reg.c providers without changing the function bodies. | Owner approves retention, S3 P6 |
+| 64 / R0042-R0050 | Nine flag getter return declarations, IBOOL to ISM32 (+1/-1 each). | Match original c_reg.c providers; type consistency, not a claimed reproduced guest fault. | Owner approves retention, S3 P6 |
+| 73 / R0051 | Internal c_getEFLAGS declaration (+1/-0). | Actual provider returns IU32 and internal callers require the matching prototype. | Retained under owner small-diff delegation, S3 P6 |
+| 74 / R0053 | Include snapshot.h (+1/-0). | Actual capture/restore definitions require the shared state declaration; this does not approve their larger bodies. | Retained under owner small-diff delegation, S3 P6 |
+| 74 / R0054 | Capture private breakpoint state (+20/-0 including separator). | Registers alone cannot reproduce original cached breakpoint state. | Pending |
+| 74 / R0055 | Restore private breakpoint state (+24/-0 including separator). | Preserve cache/count state with bounds on the original four-entry arrays. | Pending |
+| 78 / R0057 | Reject PIC -1 sentinel in do_intrupt (+2/-0). | Original NPX caller lacks c_main's filter; real PIC/interrupt test checks unchanged stack/registers. | Retained under owner small-diff delegation, S3 P6 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
 diff sizes are presented. Those five total +58/-0; the function counts include
 their trailing separator blanks. Owner then approves the eleven boundary,
-permission and fallback-width points (+11/-11). S3 P5 records 21/381 approved
-for retention, zero restoration decisions, 360 awaiting review; notices stay separate.
+permission and fallback-width points (+11/-11), followed by R0038-R0050.
+Owner additionally delegates strongly evidenced points of at most two changed
+lines. Count added plus deleted lines per existing point, never net growth or
+artificially split functions. R0051/R0053/R0057 meet that rule after individual
+provider/caller/state checks. S3 P6 records 37/381 retained (34 explicit and
+three delegated), zero restoration decisions, 344 pending; notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next R0038-R0050 total +13/-13; pinned XP
-cpu4gen.h declarations and current c_reg.c providers are rechecked individually.
-No function implementation changes are proposed. Existing ABI/source evidence
-does not imply an observed guest failure or thirteen independent dynamic proofs.
-No fresh dynamic run is claimed for approval bookkeeping.
+stays the single detailed inventory. Next manual decisions R0054/R0055 total
++44/-0. Actual archive callers, private arrays, task-switch DR7 update and
+checkpoint_smoke's existing cache/register distinction are rechecked. No fresh
+dynamic run is claimed for approval bookkeeping and no larger block is approved
+merely because its include is covered by the delegated rule.
 
 ## Coverage and decision rules
 

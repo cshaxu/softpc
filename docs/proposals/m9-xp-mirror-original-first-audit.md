@@ -395,3 +395,10 @@ consequence of restoring XP. Record owner retain/restore decisions explicitly;
 missing evidence requires investigation, not presumed necessity. No production
 restoration or new repair follows merely from admitting this review. Start
 with the first three pending points R0006/R0008/R0010 (BIOS files 6/8/9).
+
+Owner subsequently approves R0038-R0050 and adds: "有强烈证据，且每处修改在2行以内的，自动批准。继续。"
+This delegates retention of individually evidenced existing points with added
+plus deleted lines at most two. Do not use net line count, split larger blocks,
+or infer approval from passing tests alone. Record the ID, exact size, evidence
+and delegated status in the existing decision ledger. Larger or uncertain
+points still require owner review; no new production patch is authorized.
