@@ -36,7 +36,11 @@ diff increases four lines. Both cached builds publish fresh dual EXEs. Same-test
 negative controls reproduce both original faults on x86/x64; corrected focused
 tests pass. Fresh full regression passes 392/392 (188 background plus eight
 native per architecture), without retries or skips. See [repair evidence](../etc/evidence/softpc/m9-t100-s2-repairs.md).
-The other six S2 candidates remain review-only; S2 and T100 stay open.
+Owner declines L001 and D001-D003 repairs this round: retain evidence and
+known limits without new code or snapshot-format changes. D004 hardware/path
+investigation confirms a scalar plane-byte selection defect on both widths;
+[diagnostic evidence and candidate](../etc/evidence/softpc/m9-t100-s2-d004.md)
+await an implementation decision. TEST01 remains pending. S2 and T100 stay open.
 
 
 T100 S1 P164 restores only ev_glue.c's XP include-line comment:

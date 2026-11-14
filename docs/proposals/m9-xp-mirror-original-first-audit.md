@@ -232,3 +232,15 @@ Owner subsequently authorizes D005 and D006 implementation with minimal permanen
 regressions and full cached dual-width qualification as S2 P2. The bounded
 [repair evidence](../etc/evidence/softpc/m9-t100-s2-repairs.md) records their
 actual changes and verification; the other six items remain review-only.
+
+Owner review after P2 declines L001 and D001-D003 repairs for this round.
+L001 has a narrow partial-initialization snapshot trigger without a reported
+user incident; D001-D003 have no established current guest bulk-entry consumer.
+Retain their evidence without patching, activating entries or changing snapshots.
+Owner requests D004 hardware semantics and actual production-path investigation
+before deciding whether to repair; this does not authorize a production patch.
+
+D004 now has [fresh hardware and dual-width evidence](../etc/evidence/softpc/m9-t100-s2-d004.md):
+the scalar BYTE path shares the WORD defect, and actual CCPU DWORD writes
+inherit it. A twelve-line replacement candidate passes the bounded matrices
+in isolated objects; no production repair is yet authorized or applied.
