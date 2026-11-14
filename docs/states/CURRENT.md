@@ -19,7 +19,7 @@ existing mirror differences together. T100 remains open. See the
 | Files And ABI Surface | Existing softpc.new residuals and their real Compat/Machine callers, read-only until a concrete owner implementation decision; task records own approval status. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING, ARCHITECTURE and source-research-policy. XP only; no OpenNT reads. |
 | Verification | Cross-check current source and prior evidence for each presented point. Separate source/ABI proof, controlled tests and guest reproduction. Documentation-only admission uses documentation/whitespace checks, not invented fresh runtime qualification. |
-| Expected Markers | 381 IDs retain individual dispositions; nineteen historical notices stay separate. First batch R0006/R0008/R0010, in frozen file order. |
+| Expected Markers | 381 IDs retain individual dispositions; nineteen historical notices stay separate. Owner approves R0006/R0008/R0010 retention (3/381); next R0014/R0015, in frozen file order. |
 | Asset Needs | Preserve configuration/media/snapshots. S3 owns build/t100-s3 for disposable review scripts; two-hour run/fifteen-minute no-progress budget if probes are needed; clean at each delivery. |
 | Reporting Requirements | Original/current code, necessity evidence and limits, restoration consequence and actual XP diff; distinguish recommendation from approval. |
 | Stop Conditions | Admission does not authorize arbitrary restoration or new patches. Unproved necessity returns to investigation. Do not revive declined bulk repairs or approve a whole family from one representative. |
@@ -28,6 +28,12 @@ existing mirror differences together. T100 remains open. See the
 | Similar-Issue Sweep | Check related declarations/callers when presenting a point, without silently widening implementation scope or duplicating the existing residual ledger. |
 
 ## Current Technical Baseline
+
+S3 P2 records explicit owner approval to retain R0006/R0008/R0010. Progress:
+3/381 approved, 378 pending; next R0014/R0015. The
+[point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
+owns individual decisions. This documentation-only delivery changes no source,
+tests, EXEs or user assets and claims no new runtime qualification.
 
 TEST01 P6 implements the approved two-line RUN_SERIAL repair; 60/180-second
 budgets and all coverage remain unchanged. Cached dual-width configuration
