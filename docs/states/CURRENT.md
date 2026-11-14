@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P152 completes nt_munge.c audit with no production/test changes.
-All 26 existing XP diff lines belong to shared panning; coherent original-unit
-restoration fails ten pixel matrices across x86/x64 while current passes ten.
-Two added header dependencies and both plane-mask branches are checked.
-R0622-R0626 remain qualified owner decisions. Published EXEs are byte-identical
-to P151, whose 392/392 qualification remains valid; no fresh full run is claimed.
-Frontier 461/472; next host/src/nt_sb.c. Eleven files and qualified owner
+T100 S1 P153 restores original nt_sb.c declarations, independent functions,
+port-handler structure and formatting. Production +415/-37; selected XP diff
+falls by 412 lines (940 to 528). Both architectures pass the full 392-test
+qualification, including native audio/desktop/package tests. Corrected private
+snapshot/cancellation probes pass; controlled withdrawals fail their assertions.
+R0627-R0639 record restorations and qualified residual owner decisions.
+Frontier 462/472; next host/src/nt_sbdsp.c. Ten files and qualified owner
 decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-461-hostsrcnt_mungec-p152).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-462-hostsrcnt_sbc-p153).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

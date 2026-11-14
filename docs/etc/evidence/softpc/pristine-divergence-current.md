@@ -2465,3 +2465,13 @@ restoration fails all ten corresponding pixel matrices while current passes.
 Includes and both original plane-mask branches are independently checked.
 R0622-R0626 remain qualified owner decisions, not approved retention.
 See [ordered evidence](m9-t100-progress.md#file-461-hostsrcnt_mungec-p152).
+
+
+T100 S1 P153 restores nt_sb.c original declarations, independent helpers,
+port-switch structure, diagnostics and formatting: 412 fewer XP diff lines,
+production +415/-37, no permanent test changes. Remaining host ownership,
+snapshot, error and runtime handoff differences are qualified owner decisions
+R0627-R0639, with dual-width compilation/withdrawal/boundary evidence. Full
+qualification passes 392/392 including native suites. No second audio path is
+activated; provider internals remain later files in the frozen order.
+See [ordered evidence](m9-t100-progress.md#file-462-hostsrcnt_sbc-p153).

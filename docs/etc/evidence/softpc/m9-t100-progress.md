@@ -11093,3 +11093,88 @@ P151's 392/392 qualification applies unchanged; this is reused evidence, not a
 new full-suite run. Documentation/mirror/whitespace gates pass. Task probes
 are removed after evidence promotion and verified exit. Frontier 461/472;
 next host/src/nt_sb.c. Eleven files and outstanding owner decisions keep S1/T100 open.
+
+## File 462 host/src/nt_sb.c (P153)
+
+The complete file is compared with fixed XP, including all selected declarations,
+function bodies and whitespace. The original has no excluded body in this file.
+Restore the original MM pointer globals, global types/linkage/defaults, forward
+declarations, InitializeIoAddresses, LoadWinmm, DeInstallIoHook and debug tail.
+Restore original port-switch structure, alternative-port case labels, diagnostic
+calls and comments wherever the admitted host boundary does not require a change.
+The alternative MPU ports are not registered by the live initializer; restoring
+case labels does not add a second exposed device. No restored unused function is
+newly called, and no native WinMM loader or NTVDM lifecycle is activated.
+
+| Point | Original/current anchors | Executor analysis and counter-review disposition |
+| --- | --- | --- |
+| R0627 | XP includes 1-13; current 1-10 | Qualified pending: three unavailable NT headers and nt_reset.h/softpc.h omitted; existing lifecycle/snapshot dependencies retained. Selected host headers do not supply NTVDM kernel control. Earlier dual-toolchain nt.h failure remains applicable; the original device-control restoration below independently fails on its actual NT types/constants. |
+| R0628 | Original globals, declarations and independent functions | Restore exact original definitions, original scalar types/linkage/defaults, initialization-address helper, loader, disconnect helper and debug tail. Current SbInitialize assigns IRQ/DMA defaults before use; both-width device/reset/archive tests pass. No real consumer requires their former omission or private spelling. |
+| R0629 | Current 73-109 snapshot functions | Qualified pending: archive.c prepares the device before PIC restoration and restores state afterward. MPU mode and pending ACK are part of the serialized state. Removing the two assignments breaks the same actual-port snapshot probe on both widths; invalid saved mode is rejected. This qualifies the boundary, not every downstream archive implementation. |
+| R0630 | Current 112-125 status aggregation | Qualified pending: platform readiness/service and machine reset/destruction consume errors. Suppressing MIDI failure storage fails the existing faulted-output closure assertion. The actual CCPU cancellation-context probe distinguishes ordinary INVALID_STATE from exit cancellation; removing that distinction fails on both widths. Unsupported guest message reporting remains separate from a native output failure. |
+| R0631 | Current 127-151 mixer/service/running handoff | Qualified pending: mixer writes reach MidiApplyMixer; executor service reaches SbService; heartbeat handoff reaches SbSetRunning. Existing gain assertions and pause/resume note restoration pass; deleting the running handoff fails the expected 33-message restoration on both widths. No new timer, thread or alternate driver callback is added. |
+| R0632 | Current SbPorts and SbInitialize | Qualified pending: selected ios.c owns void-returning table registration, unlike original ConnectPorts' boolean contract. Restoring original ConnectPorts fails compilation at use of void on both widths. Removing preflight collision checks allows foreign ownership to be overwritten and fails !SbInitialize(). Removing the new-lifetime reset fails TimeConstant reset. Optional unsupported MIDI remains absent rather than faking a device; the existing real-port test checks this. |
+| R0633 | XP SbTerminate; current 219-258 | Qualified pending: existing status-returning close and original-port disconnection replace NTVDM shutdown. Actual machine destroy/reset consumers propagate failure. Existing close-failure test proves machine/RAM remains owned until successful disposal; repeat termination and adapter removal pass. Original SbCloseDevices depends on unavailable NtVdmControl state, not merely an absent prototype. |
+| R0634 | XP 278-486 missing InitDevices/SbCloseDevices/ConnectPorts/InstallIoHook | Qualified pending: paired original device functions fail on VDM_PM_CLI_DATA, PM_CLI_CONTROL_* and VdmPMCliControl in both selected compilers. ConnectPorts independently fails against the actual void registration ABI. InstallIoHook depends on that contract. Reintroducing kernel VDM control, a second output lifetime or a changed global I/O ABI is not an original-first local restoration. |
+| R0635 | XP port handlers' lazy initialization and DisplaySbMode calls | Qualified pending: lazy InitDevices would reintroduce R0634; selected REPORT_SB_MODE declarations/implementation are excluded. Original read/write handler logic, diagnostics, spelling, aliases and default cases otherwise return verbatim. Existing exclusions themselves receive no new ledger entry. |
+| R0636 | Current UART write and MPU reset/mode switch | Qualified pending: Lib-owned output status replaces HMidiOut ownership; complete-message BufferMidi errors are observed. MPU reset clears the existing parser and resets the same output; original Close/OpenMidiDevice would establish the incompatible native lifetime. Removing parser reset fails existing subsequent note-restoration expectations. Original intelligent-mode no-op/default semantics remain unchanged. |
+| R0637 | Current ResetAll 689-692 | Qualified pending: parser, MPU mode/ACK and MIDI status reset precede original FM/mixer/DSP reset. Restoring exact original ResetAll fails machine reset after an injected MIDI fault on both widths. Original reset ordering and all original comments/diagnostics are restored. |
+| R0638 | XP SbReinitialize 836-935 omitted | Qualified pending: no actual caller; its original command parser invokes the same unavailable SbCloseDevices/InstallIoHook and NTVDM VDMForWOW ownership. It is not duplicate Compat device logic. No fabricated parser replacement or new runtime configuration path is introduced. |
+| R0639 | Selected formatting and local prose throughout | Restore original whitespace, descriptions, debug tail and EOF; remove non-original explanatory prose. No new semantic point is introduced. Original EOF blank lines are deliberately retained rather than manufacturing a formatting difference to satisfy Git's generic EOF heuristic. |
+
+The actual device protocol remains in the mirror. Compat provides PCM/MIDI host
+transport, not a second SB port decoder. Restoring unused self-contained original
+code is allowed; restoring a second active host ownership path is not justified.
+All 24 remaining original-relative line ranges map to the qualified points above.
+Qualified residuals are pending owner decisions, not approved retention. Provider
+internals in nt_sbdsp.c/nt_sbmid.c remain later files in the frozen order; passing
+these caller tests is not a claim to have completed their audits.
+
+### P153 controlled proofs and qualification
+
+The unchanged starting implementation and restoration candidate each pass actual
+sb-dma, sb-commands, sb-archive and snapshot-transaction fixtures on both widths:
+16 successful runs. Separate actual-flag compiles establish the original host
+contract failures above. Six independent withdrawal variants compile and link,
+then fail the existing sb-commands assertions on both widths: admission checks,
+lifetime reset, original ResetAll, MIDI error storage, MPU parser reset and
+running handoff. These are controlled necessity probes, not original NTVDM
+product reproduction or claims that every original audio implementation is wrong.
+
+An additional task-private fixture uses the actual port functions to save UART
+mode with an unread ACK, reset, restore, resume and emit a note. It also rejects
+an invalid saved mode and tests ordinary versus CCPU-exit INVALID_STATE, followed
+by delivery of the retained message after cancellation clears. The first probe
+incorrectly omitted the resume handoff; the second omitted CCPU enter/leave when
+testing exit cancellation. Their failures are harness errors, preserved during
+investigation and not evidence of a production defect. Corrected final candidate
+passes on both widths. Removing MPU restoration fails the restored status-port
+assertion; removing cancellation distinction fails the status assertion, on both
+widths. The tests add no production interface and are not represented as new
+permanent regressions or an entire snapshot/audio-state proof.
+
+Cached builds pass (x86 10.65 s; x64 11.71 s). Both full background suites pass
+188/188 (147.43/146.27 s), and native audio/Console/Window/package suites pass
+8/8 (15.83/15.87 s): 392/392. No native coverage is deferred. Incremental build
+logs contain zero warnings; cached untouched mirror sources were not all rebuilt.
+Final private probes use the same production source as this full qualification.
+
+Production +415/-37, net +378; tests +0/-0. Normalized exact XP comparison with
+SequenceMatcher(autojunk=False) changes +164/-776 to +147/-381: original-relative
+added+deleted diff falls from 940 to 528, a reduction of 412 lines. Contiguous
+ranges decrease from 49 to 24; ranges are not semantic points. This is restored
+original code, not a claim that production line count decreased.
+
+- Published x86 SHA-256: 5a2a3fba1107482af28324f9afd85d66498c8da584fa2813f64abc02484216b4
+- Published x64 SHA-256: bd4a68abce11cbcfd28c0e9d1ff795442a0ada305d626cd16db5c8a54a5a5b13
+
+The original EOF is byte-identical CRLF with two final blank lines. Plain Git
+diff --check flags only those restored blanks; the check with the command-local
+core.whitespace=-blank-at-eof passes without changing repository configuration.
+No production change is made to suppress this non-semantic original formatting.
+
+Mirror and documentation gates pass. Actual-diff counter-review checks the
+original correspondences, all 24 residual ranges, real consumers and fixture
+limitations above. Task jobs have exited; scratch is removed after evidence
+promotion. Frontier 462/472; next host/src/nt_sbdsp.c. Ten remaining files and
+qualified owner decisions keep S1/T100 open.
