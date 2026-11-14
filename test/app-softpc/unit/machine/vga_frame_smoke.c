@@ -1553,6 +1553,57 @@ static void verify_mode2_plane_enable(void)
     }
 }
 
+static void verify_chain4_mode2_planes(void)
+{
+    extern void c_sas_storew(IU32 address, IU16 value);
+    extern IU32 read_byte_ev_glue(IU32 address);
+    extern void c_sas_storedw(IU32 address, IU32 value);
+    const unsigned latch[4] = {0x12, 0x34, 0x56, 0x78};
+    c_setAH(0); c_setAL(0x13);
+    assert(softpc_device_bop_dispatch(0x42, 0));
+    outb(0x3c4, 4); outb(0x3c5, 0x0e);
+    outb(0x3ce, 5); outb(0x3cf, 0x42);
+    for (unsigned planes = 7; planes <= 15; planes += 8)
+    for (unsigned op = 0; op < 4; ++op)
+    for (unsigned masked = 0; masked < 2; ++masked) {
+        unsigned mask = masked ? 0x0f : 0xff;
+        outb(0x3c4, 2); outb(0x3c5, (half_word)planes);
+        outb(0x3ce, 3); outb(0x3cf, (half_word)(op << 3));
+        outb(0x3ce, 8); outb(0x3cf, (half_word)mask);
+        for (unsigned residue = 0; residue < 4; ++residue)
+        for (unsigned data = 0; data < 16; ++data)
+        for (unsigned width = 1; width <= 4; width *= 2) {
+            unsigned offset = 0x100 + residue;
+            IU32 value = 0;
+            for (unsigned i = 0; i < width; ++i)
+                value |= (IU32)((data + i) & 15u) << (8 * i);
+            for (unsigned i = 0; i < 16; ++i)
+                EGA_planes[0x100 + i] = 0x5a;
+            for (unsigned i = 0; i < 4; ++i)
+                EGA_planes[0x200 + i] = (IU8)latch[i];
+            (void)read_byte_ev_glue(0xa0200);
+            assert(getVideolatches() == 0x78563412);
+            if (width == 1) write_byte_ev_glue(0xa0000 + offset, (IU8)value);
+            if (width == 2) c_sas_storew(0xa0000 + offset, (IU16)value);
+            if (width == 4) c_sas_storedw(0xa0000 + offset, value);
+            for (unsigned i = 0; i < 16; ++i) {
+                unsigned address = 0x100 + i, expected = 0x5a;
+                if (address >= offset && address < offset + width &&
+                    (planes & (1u << (address & 3)))) {
+                    unsigned plane = address & 3;
+                    unsigned byte = (unsigned)(value >> (8 * (address - offset))) & 255u;
+                    expected = (byte & (1u << plane)) ? 255u : 0u;
+                    if (op == 1) expected &= latch[plane];
+                    if (op == 2) expected |= latch[plane];
+                    if (op == 3) expected ^= latch[plane];
+                    expected = (expected & mask) | (latch[plane] & (~mask & 255u));
+                }
+                assert(EGA_planes[address] == expected);
+            }
+        }
+    }
+}
+
 static void verify_chain2_dirty_entries(void)
 {
     extern void softpc_test_chain2_continuations(void);
@@ -2488,6 +2539,7 @@ int main(void)
     verify_dib_generation_readiness();
     verify_virtual_text_height();
     verify_mode2_plane_enable();
+    verify_chain4_mode2_planes();
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     assert(colour_resolution_failures == 0);

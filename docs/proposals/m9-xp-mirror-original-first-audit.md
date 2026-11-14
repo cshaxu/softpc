@@ -244,3 +244,7 @@ D004 now has [fresh hardware and dual-width evidence](../etc/evidence/softpc/m9-
 the scalar BYTE path shares the WORD defect, and actual CCPU DWORD writes
 inherit it. A twelve-line replacement candidate passes the bounded matrices
 in isolated objects; no production repair is yet authorized or applied.
+
+Owner approves D004 implementation after reviewing the twelve-line candidate.
+P4 delivers those scalar stores and permanent regression; all other stated
+dispositions and TEST01 pending investigation remain unchanged.

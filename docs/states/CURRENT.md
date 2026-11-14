@@ -4,7 +4,8 @@
 
 Owner closes T100 S1 and admits M9 T100 S2 to review eight outstanding
 repair candidates. D005/D006 repairs and minimal tests are now owner-approved
-and implemented in S2 P2, with full qualification recorded below. T100 stays open. See the
+and implemented in S2 P2. D004 is implemented and qualified in P4, pending
+owner acceptance. T100 stays open. See the
 [S1 closure](../history/M9-T100-S1-original-first-audit.md).
 
 ## M9 T100 S2 Packet
@@ -12,7 +13,7 @@ and implemented in S2 P2, with full qualification recorded below. T100 stays ope
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Owner subsequently approves D005/D006 minimal code repairs, minimal regressions, cached full dual-width build/publication/test and one P commit/push. Other candidates remain review-only. |
+| Admission And Approval | Owner closes S1 and admits S2 to go through the candidates; seven mirror items plus one test issue make eight, not nine. Owner subsequently approves D005/D006 minimal code repairs, minimal regressions, cached full dual-width build/publication/test and one P commit/push. Owner now approves D004 twelve-store scalar correction, minimal regression and cached full dual-width build/publication/test/commit/push as P4. L001/D001-D003 stay declined. |
 | Objective | Recheck D001-D006, L001 and TEST01, establish actual failures and consumers, and present minimal coherent repair or non-repair dispositions for owner review. |
 | Non-goals | No unapproved new mirror patch, bulk-path activation, duplicate implementation, guest changes, sibling writes, excluded-body audit or blanket timeout increase. |
 | Reference Baseline | S1 P189 4951c99a; final production P164 21e56aa077334ed5db04a3ab1d64e026bcc2656f; fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
@@ -23,12 +24,22 @@ and implemented in S2 P2, with full qualification recorded below. T100 stays ope
 | Expected Markers | Eight-item finite ledger with actual path, evidence, minimal diff estimate, regression scope and owner decision; distinguish D004 applicability from confirmed defects. |
 | Asset Needs | Preserve configuration/media/snapshots. S2 owns build/t100-s2 if needed; hidden background jobs, two-hour total and fifteen-minute no-progress budgets; remove disposable output after delivery. |
 | Reporting Requirements | Explain cause, failure example, production reachability, proposed single-path fix and source/XP diff separately. Report uncertainty without presenting it as a repair. |
-| Stop Conditions | Only D005/D006 are authorized for implementation in P2; other candidate patches require a concrete authorized design. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
+| Stop Conditions | D005/D006 P2 and D004 scalar stores P4 are authorized; no bulk-path activation or other candidate patch is authorized. Missing evidence is investigation, not justification for added state, fallback, guest-specific logic or dropping tests. |
 | Exit Criteria | Every one of eight items has a sourced review disposition and executable plan or reason not to modify; later implementation requires its own authorized scope and qualification before closure. |
 | Original Owner Request | Owner asks to close S1, admit S2 and go through the outstanding mirror/test candidates; original wording and corrected count are preserved in the proposal. |
 | Similar-Issue Sweep | For each confirmed defect, inspect adjacent operations and actual caller families; do not silently add unrelated candidates or activate unused APIs. |
 
 ## Current Technical Baseline
+
+T100 S2 P4 repairs CHAIN4 mode2 scalar plane-byte selection: production +12/-12,
+tests +52/-0, no public/snapshot ABI change. Fixed-XP normalized diff totals for
+the two mirror files remain unchanged (2308 added+deleted lines); the local
+patch's 24 changed lines are not 24 additional XP diff lines. Fresh cached
+x86/x64 builds publish both EXEs, focused tests and four separate pre-fix
+negative controls succeed as expected, and full regression passes 392/392
+without test retries or skips. Actual-diff review finds no blocker; evidence,
+artifact hashes and boundaries are in the [D004 delivery](../etc/evidence/softpc/m9-t100-s2-d004.md#p4-owner-approved-implementation).
+
 
 T100 S2 P2 implements D005/D006: positive active PIT backlog delay and correct
 mode2 CHAIN2 plane2 enable bit. Production +3/-1, tests +35/-0; anchored XP
@@ -40,7 +51,7 @@ Owner declines L001 and D001-D003 repairs this round: retain evidence and
 known limits without new code or snapshot-format changes. D004 hardware/path
 investigation confirms a scalar plane-byte selection defect on both widths;
 [diagnostic evidence and candidate](../etc/evidence/softpc/m9-t100-s2-d004.md)
-await an implementation decision. TEST01 remains pending. S2 and T100 stay open.
+are delivered in P4 with fresh full qualification. TEST01 remains pending. S2 and T100 stay open.
 
 
 T100 S1 P164 restores only ev_glue.c's XP include-line comment:
