@@ -12538,3 +12538,25 @@ S1/T100 and all qualified owner decisions remain open.
 
 P180 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Final changes are restricted to the three task records.
+
+## P181 final-decision reconciliation, positions 455-458
+
+All four normalized current files match P149. Current sound declarations,
+controller types, platform status/activation callers, CGA producer guards and
+mapping, EGA bounds/panning and text/pixel tests were checked against final
+P146-P149 evidence. Rejected intermediate declaration migrations are not final
+changes; the later DSP header-owned type remains in place.
+
+Seventeen residual IDs are added: 319 cumulative (315 semantic/ABI, four
+compiler/format), nineteen notices. Original restorations and actual XP diff
+reduction are distinguished from source growth. Scratch contamination, package
+input contamination and corrected manifest metadata remain explicit historical
+limits, not necessity proof or invented first-pass success.
+
+Executor/counter-review changes only the three task records. No source/tests,
+EXEs, configuration, media or snapshots change; no job/scratch created. P164
+fresh 392/392 remains applicable, not a new run. Next is 459 and remaining
+D001-D006/L001 reconciliation; S1/T100 and owner decisions remain open.
+
+P181 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Only the three reviewed task records change.

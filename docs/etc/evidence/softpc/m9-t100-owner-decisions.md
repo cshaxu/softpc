@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-454 only. Positions 455-472, original
+This view currently reconciles positions 1-458 only. Positions 459-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -2048,6 +2048,98 @@ Two semantic IDs are added: cumulative 302 residuals (299 semantic/ABI and
 three compiler/format), nineteen historical notices. R0571/R0573 remain
 unapproved. This reconciliation changes no source, test or artifact.
 
+## Positions 455-458: sound declarations and CGA/EGA painters
+
+All four normalized current files match P149. Final dispositions supersede the
+private/incomplete P146 experiments; no rejected declaration migration remains.
+
+### Sound and user-interface headers
+
+R0575/R0576 restore original MM declarations, unused prototypes, WORD port
+storage, initialization-time BasePort assignment and owning BOOL declarations
+coherently. The test's conflicting redundant declaration is removed. R0579
+restores VDD_DMA_INFO/PVDD_DMA_INFO and provider types, with original WORD
+addr/count/page and BYTE status/mode/mask; no SB_DMA_INFO alias survives.
+P146 reduces total coupled XP difference by 346 lines (header 321, nt_sb 3,
+nt_sbdsp 22), despite production +347/-75; tests +12/-12. Restored declarations
+do not recreate native workers or require unused providers.
+
+Four residual IDs remain pending:
+
+- R0577: BufferMidi returns lib_status to the actual VsbByteOut owner. Parser
+  and host-failure tests observe rejection, IO_ERROR and retained-message
+  service; original VOID cannot convey these supported outcomes. This is
+  current-contract proof, not an original NTVDM failure claim.
+- R0578: service/status, suspension, completion and mixer declarations connect
+  the sole executor and original device owners. Current platform.c checks
+  SbService/SbGetStatus and calls SbSetRunning; the redundant PCM include was
+  removed. Declaration need does not approve all provider implementation lines.
+- R0579: local placement of the original DMA SDK record remains necessary for
+  the supported SDKs lacking vddsvc.h and the actual controller query/update
+  contract. The original type name/layout are already restored.
+- R0580: existing shared DSP_MODE and internal helper declaration placement is
+  a constrained pending choice. The coherent relocation compiled and produced
+  equivalent binaries but increased total XP difference by one, so it was
+  reversed under the owner's rule. This is not architectural necessity proof.
+  Later DSP review still retains this header-owned type; no test enum copy remains.
+
+P146 final focused sound tests pass 8/8 per width, with strict artifact
+equivalence to its candidate qualified by 188 background and four related
+native tests per width. Its then-deferred Lib desktop tests are not claimed
+as P146 passes. P147 subsequently passes the whole 392-test suite.
+
+R0581-R0585 restore nt_uis.h's original unused declarations/resource constants
+and spacing; its selected text now matches XP, reducing ten XP difference
+lines to zero (production +10/-2). No keyboard conversion changes or resource
+service is enabled by restoring unused names.
+
+### CGA producer and text surface
+
+R0588 restores spacing/line positions; unnecessary explanations in other groups
+are removed. P148 reduces XP difference 95 to 74 (production +12/-25, tests
++10/-3). Seven residual IDs remain pending:
+
+- R0586: BIGWIN undef selects the supported subset; removal fails both actual
+  compiler commands. No excluded implementation is reopened or counted.
+- R0587/R0591: host allocation declaration and actual text-surface preparation.
+  Without preparation, a real nt_text call before fixture allocation fails
+  queried 100x5 dimensions on both widths.
+- R0589: CHAIN2 pointer, gather and source/destination strides. Coherent original
+  pointer plus both original copy branches fail byte comparisons on both widths;
+  current tests cover 40/80/100/132 columns, padding and partial/full updates.
+- R0590: empty/null/nonpositive guard. Removing it makes an empty transition
+  replace the existing surface, failing dimensions on both widths. The old
+  bulk-copy-underflow rationale is removed. Null/negative cases have source
+  safety arguments, not separately injected runtime proof.
+- R0592: removed trace comma is a compiler/format decision: original invocation
+  supplies seven arguments to the selected six-argument macro on both compilers.
+- R0593: coherent original CGA pointer/3-1 increment/XOR-2 restoration fails
+  mode 04/05 incremental/full pixel comparisons on both widths. Current mapping
+  uses 7-1/XOR-6; this is not a second painter.
+
+### EGA standard painters
+
+R0594/R0601 remove four nonsemantic lines, reducing XP difference 49 to 45.
+Six IDs remain pending: R0595/R0597/R0599 guard each low/medium/high painter's
+actual surface/plane spans; R0596/R0598/R0600 connect per-scanline panning.
+Each original guard produces access violation in the actual fixture on both
+widths. Adding only nonpositive protection still fails low/medium destination
+boundary assertions and high-mode publication after real V7 65h BIOS setup.
+No-pan low uses the original word load; medium/high pass zero through the
+existing signature, avoiding an artificial declaration mismatch. Each fails
+independently expected pixels on both widths. Boundary tests do not establish
+that every invalid input is emitted by a guest.
+
+An initial scratch-file collision is invalid renderer evidence; twenty serial
+runs in separate directories supersede it. P148's extra-character package
+failures passed isolated reruns; P149's wrong manifest-column update was fixed
+and its gate rerun. Neither batch is labeled clean-first-pass. Later P164
+fresh 392/392 supplies current full qualification without retries or skips.
+
+These four files add seventeen residual IDs: cumulative 319 (315 semantic/ABI,
+four compiler/format), nineteen notices. All remain owner choices. This
+reconciliation changes only documents, not source, tests or artifacts.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2057,4 +2149,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 455.
+recommendations into owner approval. The next position is 459.
