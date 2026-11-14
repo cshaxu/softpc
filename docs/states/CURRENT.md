@@ -30,16 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P139 completes file 437 host_def.h: restores redundant stdlib and
-host_simulate additions plus original conditional comments. Production +4/-20,
-tests unchanged; selected XP diff decreases by 24 lines. Private double-width
-actual-consumer comparisons pass; NTVDM/CPU_30_STYLE omissions remain qualified
-owner decisions R0558/R0559. Both cached builds publish fresh EXEs and focused
-VGA/BOP/checkpoint/x87 tests pass 4/4 per width. EXEs equal P138 after permitted
-metadata/time normalization, so full regression is not repeated. P133 background
-188/188 per width remains applicable; native final acceptance and prior decisions
-remain open. Frontier 437/472; next file 438 host/inc/host_gen.h. S1/T100 remain
-open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P140 completes files 438-443. host_gen/host_gfx/host_qev equal XP;
+host_hfx retains only qualified notice R0560. host_inc original blank and
+host_rrr original wide-character declarations are restored. Production +4/-3,
+tests unchanged; XP diff decreases by five lines. Both cached builds publish
+fresh EXEs; VGA/BOP/quick-time tests pass 3/3 per width. EXEs equal P139 after
+permitted metadata/time normalization; no repeated full suite. P133 background
+188/188 per width remains applicable; final native acceptance and prior owner
+decisions remain pending. Frontier 443/472; next file 444 host/inc/insignia.h.
+S1/T100 remain open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

@@ -41,8 +41,8 @@ extern char szSysErrMsg[];
 #error "Unsupported SoftPC mirror configuration: X86GFX"
 #endif
 #line 43
-extern char szHideMouseMenuStr[];
-extern char szDisplayMouseMenuStr[];
+extern wchar_t wszHideMouseMenuStr[];
+extern wchar_t wszDisplayMouseMenuStr[];
 
 
 

@@ -28,7 +28,8 @@
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #else   /* !NTVDM */
-#line 73
+#line 72
+
 #include <sys/param.h>
 #endif   /* !NTVDM */
 #line 75

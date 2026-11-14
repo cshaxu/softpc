@@ -10009,3 +10009,72 @@ specified declarations/comments, manifest, audit records and fresh EXEs change.
 Owned probes/builds have exited; their evidence above permits scratch cleanup.
 Frontier 437/472; next file 438 host/inc/host_gen.h. R0558/R0559 and earlier
 owner decisions remain open, as do S1 and T100.
+
+
+## Files 438-443: host general/graphics/event headers (P140)
+
+All six files were compared completely, in frozen order, with the fixed XP
+commit. Existing error bodies and their line controls receive no new accounting.
+
+| Order/file | Fixed XP SHA-256 | Disposition |
+| --- | --- | --- |
+| 438 host_gen.h | 9205e86dd8709b64a4ef3200e0008f83905c621b76e176293a5ceae003063759 | Entire normalized file equals XP; unchanged. |
+| 439 host_gfx.h | a3343f1d4c4f53c0b579a3c6fff0a8ae7e8ab7f76f8e2721d9964fac36d9da66 | Entire normalized file equals XP; unchanged. |
+| 440 host_hfx.h | 176270b4fb330aa0cdfa43d40748a1e5a1a9f0c11d112152c23991281f4b873d | Only selected difference is relocated historical notice, R0560. |
+| 441 host_inc.h | 3d2660aac331347656c79c2039eb961ebe4b72ac10bd683103975252b03981fe | Restore original blank, R0561. |
+| 442 host_qev.h | 75412a3456ce5b2f766b989355d2774b09ce5802b4773f9044d7b7b38beb731a | Original LONGLONG handle typedef, normalized XP identity; unchanged. |
+| 443 host_rrr.h | 8f6b062e0ae80a201bf3c09ef5ef387d8a00cae944056fc3d57e7542e6c3e5c5 | Restore original two wide-character declarations, R0562. |
+
+Ninja's actual dependency records on each width include all six: host_gen
+193 objects, host_gfx 11, host_hfx 2, host_inc 1, host_qev 21 and host_rrr 4.
+These counts are dependency observations, not counts of runtime consumers.
+Concrete paths include xt.h -> host_gen (and Compat memory.c uses original
+NOWRAP_PROTECTION), video modules -> host_gfx, quick_ev.c -> host_hfx,
+sascdef.c -> host_inc, quick_ev.h -> host_qev, and original nt_ega/nt_graph/
+nt_cga/nt_vga -> host_rrr. The HFX header has no selected runtime definitions;
+its original include still exists. Removing the include/file would introduce
+a new unjustified mirror difference and is prohibited by the owner's rule.
+No implementation is moved to Compat or duplicated.
+
+R0560 retains one historical copyright/version notice outside the excluded
+SCCSID body. Removing it would remove the retained source's notice; source
+policy qualifies its necessity. It remains a pending owner decision, not an
+automatic approval or new bookkeeping for the excluded body.
+R0561 inserts the original blank after selected !NTVDM else, with existing
+#line 73 changed to 72 so the following include remains original line 73.
+No declaration or include target changes. Selected XP diff -1 becomes zero.
+R0562 restores wchar_t wszHideMouseMenuStr[] and wszDisplayMouseMenuStr[];
+whole production/test search finds neither original nor replacement names
+outside these two declarations. There is no definition, assignment or caller
+requiring the changed names/types. The original Windows header chain supplies
+wchar_t; actual dual builds and equivalent EXEs verify restoration on supported
+architectures. Selected XP diff +2/-2 becomes zero. No font or text rendering
+behavior is changed and no guest encoding scenario is claimed tested here.
+
+Production total +4/-3 (net +1), permanent tests unchanged. XP-relative diff
+falls by five lines: one missing blank plus two replaced declarations.
+host_inc final LF-normalized SHA-256:
+ec65fdb111e8059794282a322468232e476989142759824d50f4d037556cc52d.
+host_rrr final LF-normalized SHA-256:
+424e265d2b3e8f1fdc831a340fb9d50dd31d8c354910ea7588c1217d2391c201.
+Other four source hashes remain unchanged. Existing error branches are neither
+restored nor interpreted as active product support.
+
+### P140 final-source qualification
+
+- x86: cached build/publication 11.73 s; VGA/BOP/quick-time **3/3** in 7.76 s including runner overhead; 180 warning occurrences, all inside mirror paths.
+- x86 EXE SHA-256: 09c292b3f910138c059c894ff22f7659df5393831e62faca35a5e07c1b98e652.
+- x64: cached build/publication 12.18 s; VGA/BOP/quick-time **3/3** in 7.23 s including runner overhead; 180 warning occurrences, all inside mirror paths.
+- x64 EXE SHA-256: 9f777ad62a4fe456b0b4e13baf730050ac637a3bccc1e95e52cc0d0406109cf7.
+
+Both EXEs equal P139 after masking only PE COFF timestamp/checksum and unique
+NUL-terminated compiler-time literal, with all other bytes and lengths equal.
+Owner equivalence policy skips repeated full suites; P133 background 188/188
+per width remains applicable. Native final acceptance remains explicitly
+pending. Mirror/documentation/whitespace checks pass; source CRLF and document
+LF are preserved. Coordinator actual-change review confirms only the blank,
+its diagnostic anchor and original declarations are restored; all other
+production files, public trees, Compat, configuration, media and snapshots
+remain untouched. Owned jobs are terminal and scratch can be removed after
+this evidence promotion. Frontier 443/472; next file 444 host/inc/insignia.h.
+R0560 and earlier owner decisions, S1 and T100 remain open.
