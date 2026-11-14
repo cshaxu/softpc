@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-463 only. Positions 464-472, original
+This view currently reconciles positions 1-466 only. Positions 467-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -2346,6 +2346,101 @@ format), nineteen notices. P164's later fresh 392/392 remains the current full
 qualification. This document-only reconciliation approves no residual and
 changes no source, test, binary, configuration or media.
 
+## Positions 464-466: FM, MIDI and mixer
+
+All three normalized current files match P157. Actual FM register transitions,
+MIDI caller/activation boundaries and mixer arithmetic were rechecked against
+P155-P157 final evidence. No restored inactive native helper is newly activated.
+
+### FM register behavior
+
+R0658-R0661/R0664 restore original globals/types, ResetFM, register/read/write
+structure, independent helpers and formatting. In particular original AD_MASK
+scope returns: note registers B0h-BDh must not update timer flags. The old
+simplification and its agreeing test expectation were wrong, not required
+behavior. P155 production +171/-26 and tests +4/-1 reduce XP diff by 189 lines.
+
+Three IDs remain pending: R0657 omits unavailable NT headers while retaining
+archive declarations; R0662 archives selected register and Status; R0663 omits
+native open/close requiring NtVdmControl/VDM_ADLIB_DATA. Whole-original and
+coherent open/close compilations fail both toolchains on those dependencies;
+that does not justify omitting independent original no-hardware behavior.
+FMActive remains false, so original batching/flush has no host write side effect.
+No new FM backend or OPL sound capability is claimed.
+
+On each width old code/old expectation passes, old code/original-scope expectation
+fails, and restored code/corrected expectation passes. The independent transition
+table covers 524288 register/data/status transitions, reads and archive roundtrip.
+Withdrawing either archived selector or Status separately fails both widths.
+Final P155 builds/full suites pass 392/392; this is not acoustic evidence.
+
+### MIDI parser and output
+
+R0666 restores six complete independent original helpers; original declarations,
+constants, types, scalar spelling and matching parser statements are restored
+within other groups. P156 production +438/-37, tests +16/-0 reduce XP diff by
+407 lines. Inactive native pointer objects in isolated fixtures are link supplies,
+not a second synthesizer or production output path.
+
+Seven residual IDs remain pending:
+
+- R0665: bounded copied messages/pending state instead of original ring pointer
+  storage. An actual original-body probe at confirmed x64 address 0x120000000
+  crashes through ULONG arithmetic. This does not justify every replacement field.
+- R0667: omitted native InitializeMidi activation. Original ring at low address
+  on both widths retains the ready tail: complete 90 3C 64 and explicit drain
+  send nothing; next message releases only its predecessor. A coherent private
+  pointer/tail-corrected ring still fails real Lib validators for materialized
+  running status, SysEx interrupted by F8, and F4. This is not a proposed patch
+  or proof that no further redesign could reuse original code.
+- R0668: parser prefix/pending/voice archive and validation. Prefix withdrawal
+  fails actual roundtrip both widths; invalid archives are checked before mutation.
+- R0669: approximate voice continuation and pause reset. Note-tracking and
+  host-reset withdrawals fail their independent assertions on both widths;
+  sample-exact envelopes/polyphony are not promised.
+- R0670: parser-only reset reached from current MPU initialization/reset. Original
+  native device/ring initialization is not an equivalent reset-only operation.
+- R0671: status-returning complete-message send includes final message and keeps
+  failed output pending. Error-propagation withdrawal fails host-error assertions
+  on both widths; original description/layout are restored.
+- R0672: real-time, partial-message, SysEx and materialized-status contract.
+  Status-materialization and oversize-tracking withdrawals fail both widths;
+  original matching length calculation/control structure/store statements return.
+
+Six controlled withdrawals per width compile/link then fail intended assertions.
+A separate original SetMidiOutVolume probe finds inverted error handling: success
+makes no set call, error makes one. This remains an unpatched inactive-original
+finding with its diff decision, not TODO or evidence that active gain is broken.
+Native helper internal calls do not constitute a production activation caller.
+The first incomplete native fixture link is a build setup failure, not a host
+MIDI outage. Final larger candidate passes all 392 tests. Twelve x64 warnings
+in restored inactive original helpers remain under the mirror exemption; these
+helpers are not qualified for an unreviewed future x64 activation.
+
+### Mixer
+
+R0673 restores original declarations/types. Every original XP line is present
+in original order; only 48 additions remain (zero deletions), reducing XP diff
+by 84 lines. Production +69/-23, tests +5/-0. Three IDs remain pending:
+R0674 selector/register archive, R0675 three host-apply calls, R0676 composed
+gain. Independent withdrawal of each contract fails both-width assertions.
+Original native handle branches are restored but inactive; registers remain the
+only mixer authority and Compat has no duplicate mixer.
+
+The R0676 zero guard was not necessary: its withdrawal unexpectedly passed,
+then independent gain tables with 64-bit expectations verified every raw-byte
+pair across both implementations/widths (524288 assertions). IU32 wrap and final
+IU16 conversion already yield zero for supported decoded factors; positive
+products fit IU32. The branch is deleted, not submitted for retention. This
+identity is limited to present gain ranges/types, not arbitrary future math.
+Original native callbacks show zero writes yield FFFEFFFF and master/voice
+writes overwrite one another; these are call values, not acoustic calibration.
+Final P157 builds/full suites pass 392/392.
+
+Thirteen IDs are added: cumulative 373 (368 semantic/ABI, five compiler/format),
+nineteen notices. All residuals remain owner decisions. P164's later fresh
+392/392 remains current runtime evidence; this batch changes only documents.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2355,4 +2450,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 464.
+recommendations into owner approval. The next position is 467.

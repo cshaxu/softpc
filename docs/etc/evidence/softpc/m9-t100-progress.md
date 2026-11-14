@@ -12604,3 +12604,24 @@ D001-D006/L001 remain; S1/T100 stay open.
 
 P183 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task records change.
+
+## P184 final-decision reconciliation, positions 464-466
+
+All three normalized current files match P157. Current FM scope and fixture,
+MIDI native activation/parser consumers and mixer arithmetic were checked against
+P155-P157 final evidence. Original FM scope corrects both prior code and its
+incorrect expected behavior. The mixer zero guard is proven redundant and stays
+removed. Original MIDI tail/pointer failures do not qualify every replacement
+field; corrected-ring, withdrawal and ownership evidence stay separate.
+
+Thirteen residual IDs are added: 373 cumulative (368 semantic/ABI, five compiler/
+format), nineteen notices. Inactive original volume defect remains a diff-decision
+finding, not a new patch or TODO. No original helper activation is claimed.
+
+Executor/counter-review changes only three task records. No production/tests,
+EXEs, configuration, media or snapshots change; no job/scratch created. P164
+fresh 392/392 remains applicable, not a new run. Next position 467 and remaining
+D001-D006/L001 decisions keep S1/T100 open.
+
+P184 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Final changes are restricted to the three task records.
