@@ -30,13 +30,11 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P107 completes file 405 cmos.c. Restore four original lines:
-scalar cast, disk comment and memory-comparison parentheses. Mirror diff
-shrinks by eight lines. HDD topology and private snapshot residuals remain
-qualified pending owner decisions; the original internal memory error
-classification does not establish an observable need for the removed patch.
-Final dual-EXE publication and full regression pass 392/392. Frontier 405/472;
-next 406 base/system/dummy_nt.c.
+T100 S1 P108 completes file 406 dummy_nt.c. Its selected original empty
+BIOS handler is unchanged and remains registered at BOP 01h; its retained
+historical notice is the sole qualified pending difference. No production or
+artifact change. P107 remains the dual-EXE and full 392/392 regression baseline.
+Frontier 406/472; next 407 base/system/ica.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

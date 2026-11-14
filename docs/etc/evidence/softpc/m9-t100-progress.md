@@ -7862,3 +7862,31 @@ is made from these tests. Ordered file audit frontier is now 405/472; next is
 
 P107 process inventory confirms both owned jobs exited. Exact scratch cleanup
 and build residue check pass; reusable Ninja and ccache roots are preserved.
+
+
+## File 406: base/system/dummy_nt.c (P108)
+
+Pinned XP raw SHA-256 002d33c97e599892fc8e78d5185ffafa0ec0d721e9c8cb249754ee56a0b7405e.
+Complete file comparison confirms every selected original declaration and the
+empty dummy_int body, including its semicolon, are unchanged. Existing excluded
+bodies and line-control scaffold receive no new accounting.
+
+R0487, local line 16 / original SCCSID notice at XP17: the historical notice
+is preserved as one comment outside the excluded SCCSID body. Source policy
+requires retention of that provenance; removing it is not a harmless cleanup.
+This +1-line residual is source-policy-qualified pending owner decision.
+Counter-review confirms it adds no executable behavior or replacement stub.
+
+CMakeLists.txt:168 includes the file in the original device group. Both actual
+Ninja trees contain its device object. compat/device_bop.c:65 registers the
+original dummy_int as BIOS[BIOS_DUMMY_INT], defined as 01h in original bios.h.
+The BOP dispatcher calls the registered handler. An intentionally empty original
+BIOS implementation is still the needed single implementation; deleting the file
+would require replacement wiring, not eliminate an unused production path.
+This is source/build-registration proof, not a claim of a newly traced guest BOP.
+
+No production, tests, configuration, manifest, guest assets or EXEs changed.
+No new build/runtime test is necessary or claimed for this documentation-only
+review. P107 remains the exact artifact and full 392/392 regression baseline.
+The actual documentation diff and gates are reviewed before delivery. Frontier
+406/472; next 407 base/system/ica.c. S1 and qualified owner decisions stay open.
