@@ -12240,3 +12240,29 @@ is 312; S1/T100 and owner decisions remain open.
 
 P167 documentation/mirror/whitespace gates and build-residue check pass. No
 new scratch or background worker was created. Actual diff is task records only.
+
+## P168 final-decision reconciliation, positions 312-330
+
+Reconcile final generated rules/accessors, disk controller state and first base
+headers using P62-P74 final evidence. Current normalized hashes of the five
+generated files match their final candidates. Source confirms allocation counts,
+local vglfunc IFN1 adaptation, BIOS CX:DX assignments, HDD/FDC snapshot functions
+and live no-medium gfi wiring. Git history confirms the reviewed disk/vglfunc
+bodies predate their audit controls and ckmalloc's latest edit is P74 restoration.
+
+The owner view adds fourteen semantic IDs (217 cumulative) and four separate
+notice-policy items (eight cumulative), reaching file 330. Scalar getter native
+return failure is not described as typed-IU32 consumer or guest malfunction.
+Legacy selectors are not advertised as supported production interfaces. HDD/FDC
+private-state access remains distinct from archive serialization, and actual
+checkpoint coverage is separated from source-only callback/state proof.
+Floppy no-medium behavior is not confused with missing hardware. R0420 is a
+completed restoration, not a retention choice or new change in this batch.
+
+Actual-change review: only three task records change. No source/test/EXE,
+configuration, guest, media or snapshot changes. P164 fresh 392/392 applies to
+identical production; no fresh build/publication/runtime run is claimed for
+this document-only delivery. Next is file 331. S1/T100 remain open.
+
+P168 documentation/mirror/whitespace gates and build-residue check pass. No
+new worker or disposable scratch exists; final diff contains task records only.

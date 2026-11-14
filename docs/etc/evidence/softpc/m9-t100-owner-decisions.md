@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-311 only. Positions 312-472, original
+This view currently reconciles positions 1-330 only. Positions 331-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -857,6 +857,123 @@ pending IDs, cumulative 203 through file 311, with the four historical notices
 still separate. Source/test/EXE bytes are unchanged from P164 qualification;
 original-defect decisions and owner approval remain outstanding.
 
+## Positions 312-318: final rules and generated accessors
+
+Current sevid029/sevid030 and sinit011/012/013 normalized hashes still match
+P62-P66 final candidates. The actual calloc/malloc counts are 3/29, 2/21,
+12/8, 9/23 and 0/29. Existing per-file point/allocation inventories give the
+original/current locations. Ten semantic IDs remain across those five files:
+
+| File | Pending GDP / local-storage IDs | Final XP added+deleted lines |
+| --- | --- | --- |
+| sevid029.c | R0399 / R0401 | 1059 |
+| sevid030.c | R0402 / R0404 | 705 |
+| sinit011.c | R0405 / R0406 | 881 |
+| sinit012.c | R0407 / R0408 | 1399 |
+| sinit013.c | R0409 / R0411 | 1437 |
+
+R0400/R0403 restore 52/34 native dereferences. Remaining zeroing in sevid029
+is confined to S3026/S3030/S3034 slot 7; sevid030 to S3050/S3054 slot 7.
+Poisoned removal fails those direct helpers on x64 while x86 passes. Faults in
+dependent callers do not justify zeroing their own arrays. The 128/248-case
+full-plane controls prove restoration equivalence, with the P61 legacy callback
+boundary preserved, not exhaustive hardware or guest-mode conformance.
+
+The generated accessors remain in VideoVector, not replaced by Compat:
+
+- sinit011 restores eight pointer-getter malloc operations, retaining native
+  capacity. Twelve scalar getters write IU32 then return IUH, retaining zeroing.
+  P64's real-GDP 80-assertion control tests native pointer high bits too.
+- sinit012 restores 18 native-sized malloc operations and five complete original
+  malloc(4) byte-getter lines. Nine IU32 getters retain zeroing. P65 tests all
+  32 entries with four values, including actual setter storage. Its initial
+  incorrect setter-v1 fixture is not counted as production failure.
+- Both scalar no-zero controls return A5A5A5A587654321 instead of 87654321
+  on x64. This proves an indeterminate native return, not failure through
+  typed IU32 VideoVector consumers, which discard the upper bits.
+- sinit013 restores all 29 malloc operations and R0410's three native-table
+  dereferences. No zeroing remains. Full native locals precede reads; native
+  capacities remain. P66 verifies 104 setter assertions per width.
+
+The three old generated selectors in sinit013 are not registered in current
+C_Video. The selected original CPU_40_STYLE wiring already routes selection
+to ev_glue C functions. P66's 112 controlled-table comparisons are isolated
+restoration proof, not support for the old selectors with production tables.
+No new selector implementation or initialization path is introduced.
+
+Position 317 univer_c.h equals normalized XP and needs no decision. Its lack
+of include consumers does not authorize deleting an otherwise original file
+under the owner's no-new-diff rule. R0412 in position 318 vglfunc.c remains
+recommended: five added lines locally make IFN1 valid for extern declarations.
+Coherent whole-XP-file compilation fails both actual compiler configurations
+at the first setter declaration; current source compiles. Changing global IFN1
+would affect original function definitions elsewhere. All original vector order
+and registrations remain; no alternate accessor path is added.
+
+P62-P66 full suites passed; P67 adds actual compiler controls without changing
+source. Current accessor/function hashes and vglfunc history confirm those
+final sources remain installed. Passing getter tests do not approve retention
+or establish a guest failure. These eleven IDs await owner choice.
+
+## Positions 319-325: disk BIOS, private checkpoints and empty media
+
+Three semantic IDs remain, distinct from four historical notices:
+
+- R0414, diskbios.c: two assignments return sector count as 16-bit CX:DX,
+  replacing XP's divide/remainder by 256 plus UCHAR narrowing. Actual AH=15h
+  dispatch verifies 0000:0484, 0001:0000, 000f:bc10 and AH/CF/absent-drive
+  behavior on current x86/x64. Coherent two-line XP restoration fails the first
+  CX assertion. XP's first-case 4:132 result is source calculation; the negative
+  test stops before checking later cases. Geometry/reserved-cylinder policy is
+  unchanged. Residual semantic replacement is +2/-2.
+- R0415, fdisk.c: +120/-0 accesses original private HDD state and encodes stable
+  command/callback identities for the existing snapshot path. The archive
+  serializes, rather than reimplements, that controller. Taskfile mutation and
+  restore, ten command-ID round trips and invalid-ID rejection have actual
+  checkpoint evidence; every in-flight transfer/callback timing does not.
+  Removing all callers would remove supported preservation, not restore an
+  equivalent original route. Replaying ports would execute device side effects.
+- R0417, fla.c: the FDC snapshot include, callback declaration/codec and private
+  state extension preserve the original controller's command/result/NDMA and
+  interrupt state. The early callback address use requires its declaration.
+  P69's same-source checkpoint run verifies DOR/SPECIFY mutation and restoration;
+  all 8192-byte NDMA payloads and callback timings are not dynamically covered.
+  The file's +99/-0 total includes its historical notice. No second controller
+  or synthetic interrupt is introduced by restoration.
+
+Current source still contains the same register assignments, private snapshot
+functions and real archive consumers. Git history confirms these production
+files have not changed since their respective audit evidence. R0413/R0416/
+R0418/R0419 are historical notice-policy items (diskbios/fla/gfi/gfi_mpty),
+not additional semantic repair decisions. Together with the earlier four,
+there are eight notice items separately identified.
+
+Positions 322-323 floppy.c/floppy_i.c retain original selected content; no
+pending point exists outside skipped exclusions. Positions 324-325 gfi.c and
+gfi_mpty.c differ only by the notice. Their empty-medium implementation is live:
+gfi_init installs it and Compat image detach calls it. The product still has
+floppy hardware without a mounted image. The empty backend and image I/O are
+distinct medium states, not redundant device implementations to delete.
+No new media, guest or snapshot-format change follows from this review.
+
+## Positions 326-330: original base declarations
+
+base_def.h, bios.h and cga.h have no pending selected-content difference;
+build_id.h equals normalized XP. Their include users remain. Its legacy BIOS
+date fields are not the product's fresh build timestamp and are not rewritten.
+
+R0420 in ckmalloc.h is fully restored by P74: the redundant stdlib include and
+three-line rationale were removed, eliminating all four XP diff lines. Every
+real consumer already obtains allocator declarations before this header.
+The current header's last code change is that restoration; later host_def
+review must still preserve coherent declarations. No pending retention ID
+is created by a restored header or an existing excluded branch.
+
+This batch adds fourteen semantic IDs, cumulative 217 through position 330,
+and four notice-policy items, cumulative eight. Production/test/EXE bytes are
+unchanged; P164's fresh 392/392 remains applicable. D001-D006/L001 and owner
+approval still require final reconciliation; no task closure is claimed.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -866,4 +983,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 312.
+recommendations into owner approval. The next position is 331.
