@@ -12,7 +12,7 @@ existing mirror differences together. T100 remains open. See the
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner admits S3 review and approves individual batches. Owner now delegates retention of evidenced existing points with added plus deleted lines strictly less than five (at most four); do not split IDs or use net counts. Larger/uncertain points require explicit review; no new patch authorization. |
-| Objective | Obtain explicit retain/restore decisions for the remaining S1 residuals, with actual consumers, evidence and restoration consequences. |
+| Objective | Re-review purposes across existing mirror differences, including approved points, distinguishing original defects, host ABI, standalone integration, product extensions and source selection; then continue explicit retain/restore decisions with consumers, evidence and restoration consequences. |
 | Non-goals | No unapproved source change, new repair, excluded-body inventory, sibling writes, guest changes or reopening S2-declined repairs. |
 | Reference Baseline | Accepted S2 P6 62474beb; S1 frozen 472-file order and 381 residual IDs; pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S3 remaining-difference review](../proposals/m9-xp-mirror-original-first-audit.md#s3-owner-admitted-remaining-difference-review). |
@@ -29,9 +29,10 @@ existing mirror differences together. T100 remains open. See the
 
 ## Current Technical Baseline
 
-S3 P14 records explicit R0100 retention (+7/-4 existing XP difference)
-and delegated R0102/R0104 retention (+2/-0 each). Progress: 76/381 retained,
-305 pending; next manual review R0101/R0103 (+13/-0 combined). The
+S3 P15 records the owner-requested purpose re-review, including all 76 approved
+IDs, without changing decisions or production. Classification is not a fresh
+381-point necessity/runtime qualification. Progress remains 76/381 retained,
+305 pending; R0101/R0103 (+13/-0 combined) remain unapproved. The
 [point-level ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s3-approval-progress)
 owns individual decisions. This documentation-only delivery changes no source,
 tests, EXEs or user assets and claims no new runtime qualification.

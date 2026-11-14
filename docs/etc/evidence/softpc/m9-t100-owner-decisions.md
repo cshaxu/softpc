@@ -111,6 +111,79 @@ Archive capture/restore callers and original CPU private state are rechecked.
 No fresh dynamic run is claimed for approval bookkeeping and no larger block
 is approved merely because its include/declaration is covered by delegation.
 
+## S3 purpose re-review
+
+Owner requests a combined purpose review including already approved points.
+P15 changes no approvals or production code. Purpose, necessity, and placement
+are separate questions: a current caller proves use, not that XP was wrong or
+that the present API shape is minimal. Prior approval is not an exemption from
+this review. Existing excluded bodies remain out of scope.
+
+All 76 approved IDs receive one primary category below. Mixed motivations are
+not erased: R0085 combines selected-host TLS wiring with a pointer-type fix;
+R0061 supports lifecycle and snapshot; representation fixes may expose original
+undefined behavior without proving a fault in the original XP build.
+
+| Primary purpose | Count | Approved IDs |
+| --- | --- | --- |
+| Original behavior correction | 15 | R0008, R0015, R0024, R0026-R0035, R0057, R0100 |
+| Declaration / host ABI consistency | 23 | R0010, R0019-R0020, R0038-R0050, R0051, R0060, R0062-R0064, R0066-R0067 |
+| Product snapshot capability | 13 | R0018, R0021-R0022, R0053-R0055, R0065, R0078-R0079, R0084, R0086, R0091, R0104 |
+| Product host debugger capability | 7 | R0076, R0087-R0090, R0095-R0096 |
+| Standalone executor / host lifecycle and timing | 16 | R0059, R0061, R0068, R0070-R0075, R0077, R0085, R0093-R0094, R0097, R0099, R0102 |
+| Selected source / product boundary | 2 | R0006, R0014 |
+
+Mechanical expansion confirms 76 distinct IDs, no overlap, missing ID or ID
+outside the approved table. These are point counts, not diff-line weights.
+R0101 remains pending host-event wiring; R0103 remains pending finite-run product
+contract wiring. Neither becomes approved by reclassification.
+
+The full existing 381-ID evidence ledger contains the same purposes plus
+compiler-only acceptance and mixed video/audio integration responsibilities:
+
+- Original behavior: PIC/permission/width/bounds, DMA, ROM segment, controller
+  reset, VGA cursor/dirty/addressing and generated DWORD read corrections.
+  Examples R0414/R0476-R0478/R0499/R0503-R0505/R0544-R0545. S2's delivered
+  D004-D006 are separate accepted repairs, not extra IDs in the 381 count.
+- Host representation: native GDP slots, local storage, pointer carriers,
+  little-endian FPU/port layout and matching types. Examples R0254/R0263,
+  R0269-R0270, R0554/R0556/R0563-R0564. A modern x64 failure does not prove a
+  32-bit XP product defect. Native-width zeroing and local-continuation repairs
+  have different reasons even when they share a generated file.
+- Snapshot extension: private CPU/TLB/queue/controller state and stable callback
+  identity. Examples R0135-R0138/R0172/R0415/R0417/R0442/R0496/R0502/R0543.
+  This adds product capability; it does not repair XP's lack of that capability.
+  R0489 remains incomplete for the separately declined L001 ICW-phase case.
+- Host debugging: operand observation R0115-R0129 and the already classified
+  begin/retired hooks. Guest debug-register emulation and host debugger service
+  are different consumers; neither should be described as the other's duplicate.
+- Standalone integration: outer unwind, executor-owned devices, NT service
+  replacement, PCM/MIDI/tone endpoints and teardown/status contracts. Examples
+  R0160/R0490-R0493/R0627-R0638/R0640-R0655/R0680-R0681. Audio groups can contain
+  parser defects, snapshot extensions and host ownership changes simultaneously;
+  do not describe their whole blocks as either one original bug or a thin shim.
+- Coupled video contract: CHAIN2 plane layout, BIOS writers, dirty markers and
+  painters must agree (R0272/R0340-R0341/R0434/R0510-R0513/R0532/R0535).
+  Original-mode bugs and repairs needed to reconcile selected implementations
+  require distinct evidence; a consumer change alone does not settle blame.
+- Product selection: omitted retired sources, selected CPU/host profile and
+  unavailable NT activation (R0006/R0014/R0558-R0559/R0621/R0663).
+  This is a supported-product choice, not proof of an original algorithm bug.
+- Compiler-only six IDs remain R0439/R0451/R0508/R0592/R0605/R0678; historical
+  nineteen notice items are separate policy records, not functional repairs.
+
+Boundary questions retained for the next point review: R0077 exposes a writable
+pointer for a clear-only consumer; R0102 invokes an existing clock/sleep/yield
+pacing loop; R0103's budget is consumed at an entry boundary, not proved exact
+retired-instruction counting; status/lifecycle and snapshot completeness must
+be proved separately. None authorizes a new refactor or revokes a prior decision.
+
+Evidence scope: P15 re-reads the full-ledger purpose summaries and groups and
+reconciles every approved ID. It does not claim a fresh source-level necessity
+audit or new negative/runtime tests for all 381 IDs. The existing detailed
+source/test evidence and limits below remain authoritative per point. Group
+classification is not blanket retention approval of the 305 pending IDs.
+
 ## Coverage and decision rules
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
