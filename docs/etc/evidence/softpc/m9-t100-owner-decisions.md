@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-358 only. Positions 359-472, original
+This view currently reconciles positions 1-369 only. Positions 370-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1062,6 +1062,79 @@ This group adds only three pending semantic IDs: cumulative 220 through file
 unchanged in this reconciliation; original-defect review and owner choices
 remain outstanding.
 
+## Positions 359-369: display addressing and host/PIC/I/O headers
+
+Current normalized contents of all eleven files equal their P90 committed
+versions. Source searches confirm the actual CHAIN2 consumers, CCPU enum/switch
+collision and three I/O table-size consumers. P85-P90 proofs below remain
+bounded historical evidence; this reconciliation did not rerun those probes.
+
+### R0434: gvi.h, CHAIN2 display offset conversion
+
+The three-line addition (macro, rationale and diagnostic line restoration)
+remains pending. It preserves the lane bits while mapping cell offsets to the
+four-plane backing: 12 becomes 24, 13 becomes 25. Current consumers are exactly
+nt_cga.c and gfx_updt.c, including cursor attributes and partial-region starts.
+P85 rebuilt both real consumers with the macro mapped to original direct
+get_screen_ptr; current controls pass and both architectures' restored variants
+fail the independent full-cell painter oracle. This supplements the earlier
+BIOS/C-VID layout proof, including R0362; it is not a new Win3.1 reproduction
+or proof from a caller's mere dependence on the macro. Zero-offset uses keep
+the same address contract rather than splitting the pattern for no benefit.
+Choice: retain with the coupled layout contract or direct its coherent
+restoration; do not approve/delete this declaration in isolation.
+
+### Completed restorations and unchanged original headers
+
+R0435 (host.h) restores the original memset4 IPT3 declaration and removes the
+rationale. Under the selected macros both declarations expand to (); the
+concrete host_def.h prototype/provider remain unchanged. Twenty complete
+preprocessor pairs match. R0436/R0437 (host_com.h) restore the original comment
+example and LONG declaration; ten complete consumer preprocessor pairs match.
+Actual serial caller/provider native-width pointer transport is unchanged.
+Both deliveries built and published dual EXEs with only identified metadata
+byte differences; their testing exception is not a fresh runtime result.
+
+host_cfg.h and host_gwi.h are wholly normalized-XP-identical. host_lpt.h,
+host_sas.h, hunter.h and idetect.h have no selected residual. Their original
+includes remain; inactive implementation or comment-only content is not a
+reason to add include-removal differences. No exclusion bookkeeping is added.
+
+### R0438/R0439: ica.h, distinct compiler contracts
+
+R0438 retains four added guard/line-control lines around the original PIC
+interrupt-name macros. CCPU defines CPU_HW_RESET=0 and CPU_HW_INT=2; the PIC
+macro CPU_HW_INT=0 would replace the later c_cpu_interrupt switch case and
+collide with reset. P89 actual c_main compiler commands pass for current
+headers and fail with duplicate case on both widths when only that added
+guard is removed. The original later CPU_40_STYLE callback block is unchanged.
+The initial malformed probe removed another endif and was rejected; only the
+corrected bounded candidate supplies evidence. No guest crash is claimed.
+
+R0439 is a separate format/compiler residual, not a runtime semantic fix:
+XP's terminal Ctrl-Z line is absent. Restoring its byte after the retained
+header makes both real compiler commands fail with stray byte 0x1a. It is
+outside the excluded body, so cannot be ignored as an exclusion. Proposed
+retention of this one deleted line remains an explicit owner choice.
+
+### R0440: ios.h, complete port-address dispatch
+
+The one-line SOFTPC_STANDALONE addition selects the existing 0x10000 table
+instead of 0x400; no alternate dispatch implementation is introduced. ios.c
+and CCPU in.c/out.c mask the index by table size. P90 coherently recompiled all
+three with the original header expression. Actual machine/CCPU IN8 controls
+read registered COM1 status 0x60 at 0x03fd and empty 0xff at unregistered
+0x07fd; restored variants read 0x60 at both and fail the isolation assertion
+on both architectures. This is not a guest decoder test or an exhaustive
+hardware-alias model. Defining another product profile solely to enlarge the
+table would change unrelated behavior. Retain this existing +1/-1 adaptation
+or direct coherent restoration of the port contract; owner decision pending.
+
+This group adds three semantic IDs and one format/compiler ID. Cumulative
+qualified residual IDs: 224 (223 semantic, one format/compiler), plus eight
+separate historical notice items. R0435-R0437 are restored, not pending.
+Production/test/EXE bytes are unchanged; P164's fresh 392/392 remains applicable.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1071,4 +1144,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 359.
+recommendations into owner approval. The next position is 370.

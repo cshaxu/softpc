@@ -12293,3 +12293,24 @@ S1/T100 and owner decisions remain open.
 
 P169 documentation/mirror/whitespace gates and build-residue check pass. Final
 diff contains only the three reviewed task records; no unrelated changes.
+
+## P170 final-decision reconciliation, positions 359-369
+
+All eleven current normalized files match their P90 committed contents.
+Current source confirms the CHAIN2 address macro consumers, original restored
+host declarations, CCPU/PIC macro collision and actual I/O dispatch masking.
+P85-P90 evidence is reconciled with those final sources, not rerun or promoted
+to broader guest proof. Rejected malformed P89 probe results remain rejected.
+R0434/R0438/R0440 add three pending semantic IDs; R0439 is separately identified
+as a compiler/format residual. Cumulative residual IDs are 224: 223 semantic
+and one compiler/format, with eight historical notice items still separate.
+R0435-R0437 remain completed restorations. Original include wiring stays intact.
+
+Executor and counter-review find only three task-document changes. No source,
+test, EXE, configuration or media changes; no scratch or worker was created.
+P164 fresh 392/392 remains applicable to identical artifacts, not a newly run
+suite. Next position is 370; D001-D006/L001 reconciliation and owner decisions
+remain open. S1/T100 are not closed.
+
+P170 mirror/documentation/whitespace gates and build-residue check pass. Actual
+diff review confirms only the three task records and no unrelated modifications.
