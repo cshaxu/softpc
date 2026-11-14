@@ -2519,3 +2519,15 @@ qualified owner choices for archive, host application and composed gain, as
 recorded in [the audit evidence](m9-t100-progress.md#file-466-hostsrcnt_sbmxrc-p157).
 Final-source dual-width builds and all 392 tests pass. Original direct-volume
 underflow/overwrite evidence is not a newly applied mirror patch or TODO transfer.
+
+## T100 S1 P158 nt_sound.c original-first reconciliation
+
+Restores original declarations, inactive native handle/count and cleanup;
+source +23/-11, no permanent test changes, XP diff reduced by 30 lines.
+The active PPI/Timer2 algorithm and existing Compat/Lib sink remain unchanged.
+Native-header, PlaySound macro, host-lock ABI and output-endpoint residuals
+remain qualified owner decisions R0677/R0678/R0680/R0681; R0679 is restored.
+Both cached builds/publication and all 392 tests pass. Finite native Beep and
+actual-body cleanup evidence are bounded as recorded in
+[the audit evidence](m9-t100-progress.md#file-467-hostsrcnt_soundc-p158).
+Existing exclusions receive no new bookkeeping.

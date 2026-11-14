@@ -11745,3 +11745,87 @@ Published SHA-256:
 
 P157 advances the delivered frontier to 466/472; next host/src/nt_sound.c.
 Six files and qualified owner decisions keep S1/T100 open.
+
+## File 467 host/src/nt_sound.c review (qualification pending)
+
+The complete non-excluded file is compared with fixed XP normalized SHA-256
+553c2d22e29b0634c5d2e40423c55b420578c3dd839776c9c32ed4dd8d91a7f9.
+It is compiled into softpc-machine-devices. Original ppi.c calls HostPpiState;
+timer.c calls host_timer2_waveform; Compat platform's periodic service calls
+PlayContinuousTone. The original PPI/Timer2 frequency and gating algorithms
+remain the sole state owner. Compat audio receives frequency/duration requests
+and supplies PCM to Lib; it does not duplicate the PPI calculation. Machine
+driver start/stop owns that audio worker. InitSound has a declaration and test
+consumer but no production call; its test is not evidence of a product shutdown
+requirement. No production assignment opens hBeepDevice or sets BeepCloseCount.
+
+| Point | Initial review | Independent counter-review and disposition |
+| --- | --- | --- |
+| R0677 | Four NT-private headers are omitted at XP lines 1-4. | Coherent full pinned original compilation with the actual sound fixture's x86/x64 flags fails at missing nt.h. The selected desktop toolchains do not provide the original NTVDM build environment. This qualifies the header omission; it does not by itself prove every changed runtime statement necessary. |
+| R0678 | The local undef prevents the Windows PlaySound macro rewriting the original local function name. | Removing just this adaptation fails both-width compilation: PlaySoundA's SDK declaration conflicts with the original one-argument function. Qualified owner choice; no renaming or second API added. |
+| R0679 | Original lock declarations, Beep handle/count and native cleanup statements were removed, with extra includes, comment and formatting. | Restore original declarations, variables and cleanup statements exactly; remove unnecessary includes/comment and sink-adjacent blank. Existing helper fixture and additional real-handle cleanup probes pass both widths. Inactive handle cleanup does not activate a second native output. |
+| R0680 | Two empty host_ica_lock/unlock macros replace calls into the old NT host synchronizer. | Actual selected ica.c also uses no-op macros; the repo has no callable host definitions. Removing these macros with the original declarations restored produces unresolved host_ica_lock/unlock symbols on both widths. The single executor owns the state transitions; the separate PCM worker uses its own request synchronization. Qualified existing ABI decision, not evidence that arbitrary future threads can mutate this state safely. |
+| R0681 | OpenBeepDevice, NT session checks and LazyBeep's native request are replaced by the existing tone sink. | Original nonzero-session behavior directly calls synchronous Beep with the original producer's INFINITE duration. That is not the current return-after-submit contract. The Session-0 branch instead needs NtCreateFile/NtDeviceIoControlFile and NT-private types; no matching initialized native owner exists here. Keep this existing endpoint difference qualified for owner choice. Restore all independent cleanup rather than retaining its blanket deletion. InitSound's missing SessionId guard is a native-ABI omission, not a proven user-visible shutdown fix. |
+
+The original full-source compile probe fails at nt.h on both widths; it is not
+a runtime reproduction. The current/candidate actual-body fixture passes on
+both widths. Independent withdrawals of the PlaySound undef and the lock adapter
+fail compilation/linking on both widths for the distinct reasons above.
+The restored cleanup probe creates real disposable event handles: InitSound(FALSE)
+closes and clears one; PlayContinuousTone retains another at countdown 1 and
+closes/clears it at 0. Both architectures pass GetHandleInformation checks after
+closure. These controlled states prove cleanup statements, not native Beep-device
+activation. No persistent regression is needed for an inactive original restore;
+the existing production-state fixture is unchanged.
+
+Microsoft's Beep contract states that it synchronously waits for sound completion:
+https://learn.microsoft.com/windows/win32/api/utilapiset/nf-utilapiset-beep
+A real host Session-3 probe calls only Beep(440,250): x86 succeeds after 262.452 ms,
+x64 after 258.813 ms. GetLastError was printed as 126 after success and is not a
+failure result; it has no interpretation on successful Beep. The actual original
+PPI function fixture independently proves a 1000 Hz/INFINITE output request.
+Together with the documented API contract this establishes the synchronous
+handoff mismatch by source reasoning. No INFINITE native Beep was executed;
+no 49-day block or audible guest reproduction is claimed. A future redesigned
+native backend is not ruled out, but is not an exact restoration or this audit.
+
+Restoration is production +23/-11 (net +12), permanent tests unchanged;
+XP-relative added/deleted diff falls by 30 lines. Existing exclusions and line
+controls are untouched and receive no new accounting. No new host state owner,
+SDK shim, output path or public component change is introduced. The original
+equal-tick PPI expiration remains unchanged, including its existing fixture.
+Final-source dual builds/publication and all background/native suites are running;
+delivered frontier remains 466/472 until P158 verification and push complete.
+
+## File 467 host/src/nt_sound.c P158
+
+Final-source cached builds, publication and all 392 tests pass, with no native
+deferral:
+
+| Architecture | Build | Background | Native desktop/audio/package |
+| --- | --- | --- | --- |
+| x86 | 8.79 s | 188/188, 148.53 s | 8/8, 16.44 s |
+| x64 | 10.68 s | 188/188, 143.63 s | 8/8, 15.69 s |
+
+Actual-diff counter-review confirms +23/-11 production (net +12), no permanent
+test edits and 30 fewer XP-relative diff lines. Restored cleanup has no native
+opener or countdown initializer in production, so it cannot activate a second
+audio path. Existing PPI/Timer2 state and Compat/Lib output ownership remain.
+R0679 is restored; R0677/R0678/R0680/R0681 are evidence-qualified owner choices,
+not approved retention. Native Beep timing proves only the tested finite call;
+the INFINITE mismatch is source/API reasoning, not an infinite-duration test.
+No guest, configuration, media, snapshot or public eight-tree change is included.
+
+Published SHA-256:
+
+- softpc32.exe: `824fa85389d434f09e91be3c49c765de1a7ea11cd107c88135fa1955685dd590`.
+- softpc64.exe: `ee9245d6c0c479c702cb7353fbe3ae5f0c7ac16ccf4cd211fff4a63e75bd60e3`.
+
+P158 advances the delivered frontier to 467/472; next host/src/nt_vga.c.
+Five files and qualified owner decisions keep S1/T100 open.
+
+Final mirror, documentation and whitespace gates pass. Both cached build logs
+have no warnings/errors; this is not a clean rebuild of every old mirror object.
+All task processes were confirmed exited. Concise evidence was promoted before
+removing the task's disposable probes/logs; build residue verification passes,
+with only the reusable Ninja/ccache trees retained. User assets are unchanged.

@@ -30,15 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P157 restores every original nt_sbmxr.c line and removes a redundant
-zero-gain branch after exhaustive equivalence proof. Production +69/-23; tests
-+5/-0; XP diff falls by 84 lines. Final-source x86/x64 builds and all 392 tests
-pass. R0673-R0676 record the restored declarations/branches and qualified owner
-choices for archive, host application and composed gain. Original native output
-remains inactive; the existing Compat/Lib path is unchanged.
-Frontier 466/472; next host/src/nt_sound.c. Six files and qualified owner
+T100 S1 P158 restores nt_sound.c original declarations and inactive native
+cleanup. Production +23/-11; no permanent test changes; XP diff falls by
+30 lines. Final-source x86/x64 builds/publication and all 392 tests pass.
+The existing PPI/Timer2 algorithm and Compat/Lib output remain the sole active
+path. R0679 is restored; R0677/R0678/R0680/R0681 remain qualified owner choices.
+Frontier 467/472; next host/src/nt_vga.c. Five files and qualified owner
 decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-466-hostsrcnt_sbmxrc-p157).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-467-hostsrcnt_soundc-p158).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

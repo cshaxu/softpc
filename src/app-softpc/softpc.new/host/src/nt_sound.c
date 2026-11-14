@@ -35,9 +35,9 @@
 #line 41
 
 
-#include "ica.h"
-#include "timer.h"
-/* One executor owns these transitions; only the NT host endpoint differs. */
+void host_ica_lock(void);
+void host_ica_unlock(void);
+
 #define host_ica_lock()
 #define host_ica_unlock()
 extern void softpc_standalone_audio_set_tone(ULONG frequency, ULONG duration);
@@ -55,6 +55,8 @@ ULONG PpiCounting  = 0;
 #endif // !NEC_98
 #line 62
 
+HANDLE hBeepDevice = 0;
+ULONG BeepCloseCount = 0;
 ULONG BeepLastFreq = 0;
 ULONG BeepLastDuration = 0;
 
@@ -101,14 +103,17 @@ if( host_runtime_inquire(C_SOUND_ON))
 
 VOID InitSound( BOOL bInit)
 {
-    if (!bInit) {
-        host_ica_lock();
-        LazyBeep(0L, 0L);
-        host_ica_unlock();
-        return;
-        }
+        if (!bInit) {
+            host_ica_lock();
+            LazyBeep(0L, 0L);
+            if (hBeepDevice && hBeepDevice != INVALID_HANDLE_VALUE) {
+                CloseHandle(hBeepDevice);
+                hBeepDevice = 0;
+                }
+            host_ica_unlock();
+            return;
+            }
 }
-
 
 
 
@@ -150,7 +155,6 @@ VOID LazyBeep(ULONG Freq, ULONG Duration)
          }
 
       softpc_standalone_audio_set_tone(Freq, Duration);
-
       }
 
 
@@ -371,6 +375,14 @@ void PlayContinuousTone(void)
 
    PlaySound(FALSE);
 
+       if (!BeepLastFreq && !BeepLastDuration &&
+           BeepCloseCount && !--BeepCloseCount)
+         {
+           if (hBeepDevice && hBeepDevice != INVALID_HANDLE_VALUE) {
+               CloseHandle(hBeepDevice);
+               hBeepDevice = 0;
+               }
+           }
 
     host_ica_unlock();
 #endif // !NEC_98
