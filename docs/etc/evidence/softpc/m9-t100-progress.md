@@ -12364,3 +12364,26 @@ D001-D006/L001 and owner decisions remain open. S1/T100 are not closed.
 
 P172 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task documents are changed.
+
+## P173 final-decision reconciliation, positions 402-408
+
+All seven current normalized files match their P111 committed versions. Actual
+source checks confirm DMA query/channel/global ownership, CMOS topology and
+original memory comparison, PIC masks/withdrawal/private ICW phase and restored
+idle setter casts. P104-P111 final deliveries supersede preliminary incomplete
+qualification text. CMOS's internal-only negative is expressly not treated as
+a product necessity; its original expression was restored and fully tested.
+PIC L001 remains a proven incomplete archive contract, not erased by full tests.
+
+Twelve semantic residual IDs and three notice-policy items are reconciled:
+252 residuals (250 semantic, two compiler/format), fifteen notices through 408.
+L001 is a proposed new repair, not included as an existing residual patch.
+R0472/R0474/R0475/R0481/R0484-R0486/R0494 remain completed restorations.
+
+Executor/counter-review changes only three task documents. No source/tests,
+EXEs or user assets changed; no worker/scratch created. P164 fresh 392/392
+remains the current runtime evidence, not a new run in this P. Next is 409;
+remaining files and final D001-D006/L001 decisions keep S1/T100 open.
+
+P173 actual three-document diff review, mirror/documentation/whitespace gates
+and build-residue check pass. No unrelated changes are present.

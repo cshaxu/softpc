@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-401 only. Positions 402-472, original
+This view currently reconciles positions 1-408 only. Positions 409-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1339,6 +1339,127 @@ This group adds eleven semantic IDs: cumulative 240 qualified residual IDs
 (238 semantic, two compiler/format). Current production/test/EXE bytes remain
 unchanged; P164's full 392/392 applies. No pending choice is treated as approval.
 
+## Positions 402-408: I/O, DMA, CMOS, PIC and idle detection
+
+All seven normalized current files match their final P111 committed versions.
+Current source confirms original GLOBAL DMA ownership, decoded channel query,
+CMOS topology binding, PIC delay mask/master withdrawal, private ICW sequence
+and restored word conversions. P104-P111 final evidence supersedes intermediate
+investigation or incomplete qualification statements in that history.
+
+### Completed restorations and retained original stubs
+
+R0472 restores ios.c's original empty-port block/comment and line control,
+removing three mirror difference lines. Its selected implementation otherwise
+matches XP. R0474/R0475 restore DMA include order and GLOBAL visibility;
+R0481 removes five extra comment lines. Together with original formatting at
+R0476, P106 removes fifteen XP difference lines. The visibility edit changed
+EXE code, so full 392/392 was run; the later final comment removal received
+fresh publication, exact metadata-only equivalence to tested EXEs and six
+focused tests. No claim relies on an intermediate source version.
+
+R0484/R0485/R0486 restore CMOS's original ULONG cast, disk comment and memory
+comparison parentheses: eight XP difference lines removed. A disposable test
+showed the original precedence creates internal BAD_XMS false positives, but
+selected PROD cmos_error merely writes the already-correct capacity/checksum,
+without emitted trace or demonstrated observable regression. That internal
+assertion is not a product requirement and did not justify retaining the patch.
+Final original-parentheses sources passed full 392/392. This is a deliberate
+original-first restoration, not a claim that the original expression is ideal.
+
+R0494 restores two word casts in idle_set, removing four XP difference lines.
+Whole caller search found no threshold-setting consumer requiring values above
+65535. The real idle detector/defaults and executor host wait remain active;
+an unused setter is no reason to delete the whole component. Both EXEs changed
+outside metadata and received full 392/392, not an equivalence exemption.
+
+dummy_nt.c retains the exact original empty dummy_int, registered in the real
+BIOS BOP table. Replacing/deleting an active original no-op would add needless
+wiring differences. time_day.c retains original time_t behavior and the P97
+coherently restored host binding. Neither has a selected behavior residual.
+
+### DMA: R0476-R0480
+
+- R0476 corrects two query conditions to compare the decoded channel number,
+  not an address/count port against channel/channel+2. first_last still samples
+  once per two-byte register read. Restoring both original conditions fails
+  actual SB-DMA query-count assertion on both widths; current tests cover
+  channels 1/3, other channels, low/high reads and disabled DSP.
+- R0477 counts offset zero before decrement wrap: offset+1 transferable units.
+  Restoring the two original boundaries fails independent memory data assertions
+  on both widths. Controller unit size is handled by the existing transfer.
+- R0478 preserves the original documented direction contract: decrement guest
+  addresses by transfer unit, advance device memory and preserve bytes inside
+  word units. Coherent original helper bodies/signatures/call arities fail real
+  transfer assertions on both widths. This is not an isolated mismatched call.
+  Current fixture covers both controllers, increment/decrement, read/write/
+  verify, five starts, guards, terminal count, partial/ROM and auto-init cases.
+  XP already restores auto-init address/count; that is not another local fix.
+- R0479 exposes the original dmaGetAdaptor outside NTVDM to original DSP DMA
+  initialization. QueryDMA/SetDMACountAddr use that same controller. Replacing
+  the accessor with a new engine or alternate access would relocate complexity.
+- R0480 archives controller/page state with its owner. Ports mutate status or
+  flip-flops and cannot enumerate base/current/temporary arrays. Global storage
+  visibility is not a reason to relocate equal serialization into Compat.
+  Existing checkpoint covers address/count/page roundtrip, not all malformed
+  fields. Failed staged restoration does not resume, without per-device rollback.
+
+The corrected P106 private probes all compile/link and fail their specific
+contract assertion; initial harness mode/boundary mistakes are not evidence.
+None of these tests is a fresh exhaustive guest/device timing experiment.
+
+### CMOS: R0482/R0483
+
+R0482 reports attached HDD topology through one include and replacement line,
++2/-4. Original always reports C: type 3; actual FDC-only fixture restoring that
+policy fails CMOS_DISK==0 on both widths, while current and dual-media cases
+pass. This does not mean the product can lack its physical floppy controller;
+empty A: media and absent HDD are different. D-only is source-reviewed only.
+R0483 archives private CMOS bytes/index/mode/clock/handle and three real callback
+IDs. Register C reads acknowledge interrupts and port replay cannot recover the
+private queue state. Existing checkpoint proves a byte roundtrip, not all RTC
+phases. These are qualified residuals, not an approved new RTC implementation.
+
+### PIC: R0489-R0493, with L001 explicitly unresolved
+
+R0489 archives private register, nesting/count and IRET state. Original ports
+cannot reconstruct arbitrary in-service state. Native callback pointers are
+rejected, not silently serialized. However the existing extension omits the
+private ICW sequence[2]. P109's six cases per architecture compare completing
+ICWs directly versus POST/restore/continuation: all twelve restored cases fail
+base/mask/mode while no-restore controls succeed. That proven contract defect
+is L001, not a passing test or a known guest incident. Its proposed same-owner
+phase serialization changes mirror/schema and still awaits separate decision.
+R0489 necessity does not establish snapshot completeness.
+
+R0490 supplies the actual Compat EOI declarations selected by EOI_HOOKS and
+the delayed mask. R0491 combines DelayIrqLine with the original scan mask so a
+request from real DSP completion is retained but not delivered before its
+release event. Original expression restoration fails the existing before-release
+assertion on both adapters/architectures. This is not the IRET completion mask.
+R0492 withdraws master INTR when its final pending request disappears; real
+PIC raise/withdraw/capture/re-raise controls pass, and reverting the added
+branch leaves cpu_interrupt asserted on both widths. Slave withdrawal already
+recurses through the master. This proves output ownership, not a guest lockup.
+R0493 makes IRET-hook control a no-op for the selected CCPU which receives but
+never completes that protocol. Restoring the entire original function yields
+three IRQ1 deliveries then vector -1 on the fourth; controls deliver all eight
+on both widths. No invented obligation is placed on the CPU to consume hooks.
+
+P110 removed only six extra explanation lines. ICW1 itself remains original;
+neighbor timer cancellation behavior is not transplanted. Six focused tests
+passed and EXEs were metadata-equivalent to the full-tested baseline. These
+results cannot erase the separately reproduced partial-ICW archive defect.
+
+### Counts and verification boundary
+
+R0473/R0487/R0488 are three historical notice-policy items, separate from runtime
+patches; notice total becomes fifteen. This group adds twelve semantic IDs,
+for 252 qualified residual IDs (250 semantic, two compiler/format). L001 is
+not included as an existing retention patch; its new repair decision remains
+separate. This reconciliation changes no source/test/EXE. P164's fresh 392/392
+remains applicable to unchanged artifacts, with all owner decisions open.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1348,4 +1469,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 402.
+recommendations into owner approval. The next position is 409.
