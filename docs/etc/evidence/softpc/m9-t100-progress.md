@@ -6973,3 +6973,59 @@ S1 is not closed and later nt_sb.c whole-file audit remains outstanding.
 P95 independent actual ten-file diff review and mirror/documentation/whitespace
 gates pass. CIM confirms all task jobs exited; exact scratch preview, removal
 and residue check pass. No unrelated worktree or user asset changes remain.
+
+## Files 384-388: selected header identity and compiler EOF proof (P96)
+
+Pinned XP SP1 remains a2f6d7c93aa4f11efc51147566d5961c59a8ef89. Full-file
+comparisons normalize CRLF to LF only. Existing exclusion bodies and their
+line scaffolding are skipped without new accounting. No source is edited.
+
+| Order | File in base/inc | XP raw SHA-256 | Selected-content result and actual consumer |
+| --- | --- | --- | --- |
+| 384 | spcfile.h | 231bd47a01f69ea8cb30203be63045871e5f88d5686cbac7b680892b170e6bcc | Entire normalized file identical; production cmos.c includes it. |
+| 385 | suplib.h | cc55070b5361e5401fd71a43d74859d3163154c5ea5b9f38a671cd4a4a895553 | Identical outside existing exclusions; host_inc.h includes it for production sascdef.c. |
+| 386 | tape_io.h | 5dc7f546ac3e60e55e947c3314ccb5f60215cebd06d16ff69c96af6a3bb501d6 | One selected difference, R0451 below; actual BIOS tape_io.c and floppy implementation consume declarations. |
+| 387 | timer.h | d8a61535bf3b189fa4939c9a01e088eb94849fd5b7ab39cdb0f0fbeaedd6b6dc | Identical outside existing exclusions; timer.c, video, CPU and Compat consumers retain original declarations. |
+| 388 | timestmp.h | 8ddc2b6b7823ad249acb359dbf4bfcd77333c2cd13b5ce75f7f20d6ac231b4c0 | Entire normalized file identical; quick_ev.c and Compat platform.c include it. |
+
+Both existing Ninja build trees contain production compile targets for cmos.c,
+sascdef.c, tape_io.c, timer.c and quick_ev.c. These are not test-only headers.
+No duplicate Compat implementation replaces any of these header declarations.
+
+### R0451: tape_io.h original standalone Ctrl-Z
+
+XP line 118 contains a standalone 0x1a byte after cassette_io's declaration;
+the current file omits it. Selected XP-relative difference is +0/-1. Initial
+analysis considered exact restoration rather than assuming EOF formatting was
+automatically exempt from the original-first rule.
+
+Dynamic counter-proof uses each architecture's actual Ninja tape_io.c GCC
+command, removing dependency-output options and redirecting only the resulting
+object. A private copy of the current header restores exactly the original
+terminal Ctrl-Z line; a preceding include directory selects that copy. No
+source branch, macro choice or function body is changed. Current-header
+compilation exits 0 on x86 and x64. Restored-header compilation exits 1 on
+both, with tape_io.h:118:1: error: stray '\32' in program. Both runs also
+retain pre-existing mirror macro-redefinition warnings; these are not the
+reason for the negative result.
+
+Counter-review: this is the actual supported production translation unit,
+not an artificial consumer or hypothetical parser incompatibility. Retaining
+the existing deletion is evidence-qualified, pending owner decision; no new
+workaround is proposed. It establishes compiler necessity, not new guest
+runtime behavior. All other selected content matches pinned XP.
+
+### P96 verification and delivery scope
+
+Production +0/-0, tests +0/-0; no change to existing mirror diff totals or
+published artifacts. Probe objects never replace cached production objects.
+No full rebuild or runtime suite is claimed for this documentation-only
+delivery; P95's final-source 392/392 remains the applicable runtime baseline.
+Frontier advances to 388/472, next file 389 base/inc/timeval.h. R0451 remains
+pending; the S and T remain active. Actual source comparisons and probe
+construction/results were reviewed independently before ledger advancement.
+
+P96 CIM inventory confirms the owned probe has exited. Exact scratch cleanup
+preview, removal and residue check pass, as do documentation and whitespace
+gates. The actual three-file documentation diff preserves frozen order and
+initial hashes; no production, test, asset or unrelated changes are present.

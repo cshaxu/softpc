@@ -36,7 +36,10 @@ SbInitialize's original signature is restored with the matching test types;
 that coupled edit does not complete the later nt_sb.c file audit. Header diff
 reduces by 73 lines; full mixed-file alignment and anchored counts are recorded.
 Both EXEs are built/published and all 392/392 tests pass on final source.
-Frozen frontier 383/472; next file 384 base/inc/spcfile.h.
+P96 completes read-only file audits 384-388. Four headers match XP outside
+existing exclusions; tape_io.h retains one compiler-proven Ctrl-Z deletion
+as a qualified owner decision. No source or artifact changes; P95 remains
+the full-runtime baseline. Frozen frontier 388/472; next file 389 timeval.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
