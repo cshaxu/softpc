@@ -7634,3 +7634,131 @@ Production +0/-0, tests +0/-0, XP-relative diff delta zero. This is a source
 and consumer audit; no new runtime test or build is claimed. P104 published
 EXEs and P97's 392/392 runtime baseline remain unchanged. Frontier 403/472;
 next 404 base/system/at_dma.c. S1 remains active, with owner decisions open.
+
+
+## File 404: at_dma.c (P106)
+
+Pinned XP raw SHA-256
+d756863ccac611e83298aaf22aa74c5a2db18a499e631b64a0b0060cffecbd3a.
+Complete diff and replaced-range boundaries were inspected, including selected
+content adjacent to existing exclusions. The moved dmaGetAdaptor body is a
+real local host-selection difference, not hidden by the NTVDM exclusion.
+Existing #error bodies and line scaffolding are not newly accounted.
+
+| Point | Original/current difference | Disposition |
+| --- | --- | --- |
+| R0474 | sndblst.h moved before debug.h | Exact XP include order restored. |
+| R0475 | GLOBAL DMA_ADAPT adaptor changed to static | Exact original GLOBAL declaration restored; full-src search finds no conflicting global definition. |
+| R0476 | Two channel-position query conditions | Correct decoded-channel comparison remains; restore original braces, statement indentation and operand ordering around the necessary condition change. Qualified owner decision. |
+| R0477 | Decrement wrap boundary omits offset zero | Existing two +1 corrections remain, qualified by actual transfer negative controls. |
+| R0478 | Decrement copy helpers and their size arguments | Existing unit-aware reverse guest/forward host transfer remains, qualified by actual transfer negative controls. |
+| R0479 | Original dmaGetAdaptor exposed outside NTVDM | Existing original accessor body remains for actual DSP initialization; qualified owner decision. |
+| R0480 | DMA snapshot include and capture/restore extension | Existing state serialization remains; qualified owner decision. |
+| R0481 | Five added explanatory comment lines | Removed without replacement; exact original text retained elsewhere. |
+
+### Actual paths and source proof
+
+Compat gfi_image.c calls dma_request for actual diskette data/ID transfers.
+The original controller owns its current/base address/count, mask, mode,
+request, page and flip-flop state. No Compat DMA engine replaces it. The
+original sound DSP initializes its controller pointer through dmaGetAdaptor
+(nt_sbdsp.c:734), then QueryDMA/SetDMACountAddr operate on that same controller.
+Removing the accessor's selected definition while preserving the admitted
+original DSP would remove its original state access. Adding another adapter
+or changing DSP access merely relocates the same difference and is not used.
+
+R0476: SbDmaChannel is a channel number; byte-controller address/count ports
+are respectively 2*channel and 2*channel+1. XP compares those port numbers to
+channel and channel+2. Channel 1 address port 2 therefore does not trigger
+its needed progress sample. The existing correction compares the same decoded
+channel used immediately afterward to index current_address/current_count;
+the first_last check samples only once for the two-byte read. No second sound
+position authority or new polling path is introduced.
+
+R0477: with decrementing unit offsets, offset zero remains transferable before
+wrapping. The first segment contains offset+1 units, not offset units. This
+holds for either byte or word controller because dma_request selects the unit
+size before do_transfer scales it to bytes.
+
+R0478: original do_transfer explicitly documents that guest address decreases
+but device buffer always advances. Original read helper instead increments
+guest source and decrements the device destination; the write helper decreases
+individual bytes, not whole word-channel units. Current helpers use existing
+SAS physical range access, decrement guest by size, advance host by size and
+preserve bytes inside each unit. The declarations and callers carry the same
+existing do_transfer size; no alternate transfer path is added. Original XP
+auto-init address/count restoration is already present, not another local fix.
+
+R0480: archive.c captures/restores both controllers and page state through the
+existing extension. Ports cannot enumerate base versus current versus temporary
+register arrays, and reading status/bytes mutates status or first_last. Port
+replay would not restore all in-flight state. The original GLOBAL declaration
+does not justify moving this equal serialization logic to Compat; it stays
+beside its existing state owner. Restore validates first_last per controller,
+not an atomic rollback of a malformed second controller; the actual Machine
+restore failure does not resume guest execution. No broader transactional API
+claim is made.
+
+### Independent counter-review and negative controls
+
+All three private negative variants compile and link actual DMA objects before
+the existing device archive, with private fixture working directories. No
+persistent object or library is overwritten. Both architectures fail at the
+same contract-specific assertion:
+
+- Restore original two query conditions: device_contract sb-dma, line 1230,
+  DspNumberDmaQueries == 1 fails.
+- Restore original two decrement-wrap expressions: device_contract dma,
+  line 1415, actual memory differs from independently calculated expected data.
+- Restore original helper signatures/call arity and both helper bodies as one
+  coherent unit: device_contract dma, line 1488, returned data differs.
+
+x86 negative exits are 3221226505; x64 exits are 3. Compile/link all return zero.
+An earlier probe omitted the required mode argument and over-replaced a helper
+boundary; those harness failures were corrected and are not defect evidence.
+The retained tests independently cover both controllers, increment/decrement,
+read/write/verify, five start offsets, guards, terminal count, partial transfer,
+ROM write protection and auto-init/non-auto-init. Sound-port tests cover
+channels 1/3, address/count low/high reads, other channels and disabled DSP.
+Checkpoint tests cover base address/count and page roundtrip, not every invalid
+archive field or all real guest/device timing.
+
+Counter-review restores unnecessary visibility/formatting changes rather than
+using historical approval as proof. Necessary transfer semantics are not
+rewritten; new defects or expanded device capability are not introduced.
+Final verification and delivery evidence follows below.
+
+
+### P106 final verification and diff accounting
+
+Production +8/-11, net -3; tests +0/-0. Exact XP comparison with LF delimiters
+and SequenceMatcher autojunk disabled shows added-diff delta -9 and deleted-
+diff delta -6: fifteen fewer mirror diff lines. Existing exclusions are
+unchanged; no new source adapter or helper is added. Restored original GLOBAL
+visibility and source syntax produced non-metadata EXE differences, so the
+artifact-equivalence exemption was not used for that delivery build.
+
+Full regression passes on both architectures: 188/188 background tests plus
+8/8 desktop/native-audio tests each, total 392/392. Background elapsed times
+are 135.97 seconds x86 and 137.21 seconds x64; native sets take 25.05 and
+23.50 seconds. No detached-session failure or skipped native test is hidden.
+
+The final fifth comment removal was made after both architecture builds had
+finished. A final cached rebuild/publication passes in 9.14 seconds x86 and
+12.87 seconds x64. These final whole EXEs match the corresponding full-tested
+EXEs after masking only PE timestamp/checksum and eight time bytes in the
+unique same-position Nov 13 date/time literal. Final DMA, SB-DMA and checkpoint
+regressions also pass 3/3 each (6/6). Final published Nov 13 2026 artifacts:
+
+- x86 16:59:30: b0d23c01cc85f04b39c864c006f02c78fafcf390ee9f211b1520e23b01b75d8c.
+- x64 16:59:41: c3a5a57fb30fccd81d59c19e564acec52e7248ae591c3d49695ddc19eb51b0e4.
+
+Mirror CRLF and manifest identity are preserved. No guest, configuration or
+snapshot is modified. P106 becomes the full runtime/artifact baseline.
+Frontier advances to 404/472, next 405 base/system/cmos.c. R0476-R0480 remain
+qualified owner decisions, not automatic approvals; S1 remains active.
+
+P106 actual eight-file review, mirror/documentation/whitespace gates and
+cleanup residue check pass. CIM confirms all owned build/test/probe processes
+exited before exact task-scratch removal. No unrelated worktree changes are
+included; the frozen initial hashes and file order are unchanged.

@@ -2172,3 +2172,15 @@ with corresponding line control. Selected code now matches pinned XP; existing
 exclusions remain untouched. Source net +3 is mirror diff reduction of three
 lines, not a new adaptation. Both published EXEs match P102 except build
 metadata; no new runtime test is claimed.
+
+
+### T100 S1 P106 DMA original-first audit
+
+R0474-R0481 supersede prior at_dma.c retention summaries. Restore original
+GLOBAL state visibility, include order and query-branch syntax; remove five
+nonsemantic comment lines. Source +8/-11 reduces XP-relative diff by fifteen
+lines. Existing query decoding, decrement boundary and unit-aware copy fixes
+have independent actual-object negative controls on both widths. Snapshot and
+original DSP accessor remain source-qualified owner decisions. Full 392/392
+regression and final equivalent EXEs plus 6/6 focused tests pass. No new DMA
+implementation or guest-specific behavior is introduced.

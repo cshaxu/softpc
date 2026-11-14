@@ -42,8 +42,8 @@
 #include CpuH
 #include "trace.h"
 #include "dma.h"
-#include "sndblst.h"
 #include "debug.h"
+#include "sndblst.h"
 #include "compat/devices/snapshot.h"
 
 #if defined(NEC_98)
@@ -58,7 +58,7 @@
  */
 
 /* the DMA adaptor state */
-static DMA_ADAPT adaptor = { 0 };
+GLOBAL DMA_ADAPT adaptor = { 0 };
 
 /* local function to do the actual transfer of data */
 LOCAL void do_transfer  IPT6(int, type, int, decrement,
@@ -190,9 +190,9 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
         case    DMA_CH1_ADDRESS:
         case    DMA_CH2_ADDRESS:
         case    DMA_CH3_ADDRESS:
-                /* XP sound query: compare the decoded channel, once per word. */
-                if (!dcp->first_last && (port-DMA_CH0_ADDRESS)/2 == SbDmaChannel)
-                        SbGetDMAPosition();
+                if ((port-DMA_CH0_ADDRESS)/2 == SbDmaChannel && dcp->first_last == 0) {
+                    SbGetDMAPosition();
+                }
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
@@ -221,9 +221,9 @@ GLOBAL  void dma_inb    IFN2(io_addr, port, half_word *, value)
         case    DMA_CH1_COUNT:
         case    DMA_CH2_COUNT:
         case    DMA_CH3_COUNT:
-                /* High-byte reads retain the same sampled DMA position. */
-                if (!dcp->first_last && (port-DMA_CH0_COUNT)/2 == SbDmaChannel)
-                        SbGetDMAPosition();
+                if ((port-DMA_CH0_COUNT)/2 == SbDmaChannel && dcp->first_last == 0) {
+                    SbGetDMAPosition();
+                }
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
@@ -741,7 +741,6 @@ GLOBAL  int     dma_request     IFN3(half_word, channel, char *, hw_buffer,
                 else
                 {
                         /* decrement memory case - check for address wrapping */
-                        /* Offset zero is still one transferable DMA unit. */
                         if ((sys_addr)offset + 1 < munch)
                         {
                                 /* transfer must be split */
@@ -877,7 +876,6 @@ GLOBAL  void dma_enquire        IFN3(half_word, channel,
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif  /* NTVDM */
 #line 858
-/* T93: retain XP's controller accessor for the original DSP, without NTVDM. */
 DMA_ADAPT *dmaGetAdaptor(void)
 {
   return &adaptor;
@@ -964,7 +962,6 @@ LOCAL void do_transfer  IFN6(int, type, int, decrement,
  * in the host but there seemed to be little point
  */
 
-/* Reverse guest units, not bytes within a word; host buffers always advance. */
 LOCAL   void    bwd_dest_copy_to_M      IFN4(host_addr, s, sys_addr, d,
         sys_addr, l, unsigned long, size)
 {

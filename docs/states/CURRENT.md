@@ -30,10 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P105 completes file 403 time_day.c without source changes. Selected
-implementation matches XP; its historical notice remains a qualified owner
-decision. P104 EXEs and P97's 392/392 runtime baseline remain unchanged.
-Frontier 403/472; next 404 base/system/at_dma.c.
+T100 S1 P106 completes file 404 at_dma.c. Restore original visibility,
+include order and syntax; remove five nonsemantic comment lines. Mirror diff
+shrinks by fifteen lines. Necessary query/wrap/copy differences have actual
+x86/x64 negative controls; these and snapshot/accessor residuals await owner
+decision. Full regression passes 392/392; final equivalent dual EXEs and 6/6
+focused tests establish the P106 baseline. Frontier 404/472; next 405
+base/system/cmos.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
