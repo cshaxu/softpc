@@ -82,6 +82,12 @@ online tests. Preserve failed results; do not turn deferral into a pass, remove
 tests or claim full native acceptance. Resume these checks when the owner
 reports desktop availability. Other evidence and delivery obligations remain.
 
+Owner further clarifies after reconnecting: later batches that do not affect
+native desktop, audio or package paths may omit those tests until final
+acceptance. Select tests by the actual changed path, not merely because a
+production file changed. Required cached builds/publication, focused proofs
+and background regression remain; final native acceptance is not waived.
+
 1. Freeze the SoftPC starting commit and local file hashes; use the already
    pinned XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89 counterparts and
    provenance manifest. Do not consult OpenNT source or substitute another

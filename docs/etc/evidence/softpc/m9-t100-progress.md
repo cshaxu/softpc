@@ -9392,3 +9392,23 @@ API change. Final source, manifest and published hashes match the recorded
 verification. Owned jobs have exited; scratch can be removed after promotion.
 Frontier advances to 427/472, next file 428 base/video/vga_mode.c. S1/T100 and
 the outstanding owner decisions stay open; this is not complete acceptance.
+
+### P131: online qualification supplement and test-scope clarification
+
+P130 is committed/pushed as b766bd5c. On owner retry, actual session 3 is
+rdp-tcp#0 Active. Without rebuilding or changing sources, the five deferred
+tests pass on both widths: audio_lifecycle_smoke, sb_midi_native_smoke,
+native_midi_output and both package_smoke variants. Runner times are
+x86 5.72 s and x64 5.36 s. Earlier disconnected failures are retained above.
+Together with P130's 188 background cases, two Window cases and explicit-hidden-
+Console execution per width, all required bodies have now passed. Default
+CTest Console startup is not claimed repaired. No new guest-session observation
+or source modification is inferred from these test results.
+
+Owner clarifies that this V7 BIOS predicate change did not itself require native
+audio/desktop testing; those cases were scheduled as full-regression policy.
+For subsequent batches that do not affect those paths, defer native desktop,
+audio and package checks until final acceptance rather than block ordered work.
+The proposal and CURRENT reflect that authorization. Final native acceptance
+remains required. P131 changes documentation only; frontier remains 427/472,
+with file 428 vga_mode.c under investigation and no edit to it yet.

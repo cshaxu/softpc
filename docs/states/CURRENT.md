@@ -19,7 +19,7 @@ skipped without new bookkeeping. T99 remains closed; see its
 | Candidate Proposal | [Original-first audit method](../proposals/m9-xp-mirror-original-first-audit.md). |
 | Files And ABI Surface | Selected softpc.new mirror, its provenance and necessary coupled callers/tests; disclose ABI consequences per point. |
 | Applicable Rules | docs/README.md reading set; EXECUTION, DOCUMENT, CODING mirror policy and source-research-policy; owner order supersedes comparison project's ordering. |
-| Verification | Per complete substantive file: cached x86/x64 build, publish, focused/full regression, manifest and documentation gates; final-source identity required. Owner temporarily defers online desktop/audio/package validation until returning to the desktop; preserve pending cases and continue ordered deliveries without claiming full acceptance. |
+| Verification | Per complete substantive file: cached x86/x64 build, publish, focused/full regression, manifest and documentation gates; final-source identity required. Owner permits later batches unaffected by native desktop/audio/package paths to defer those tests until final acceptance; preserve pending coverage explicitly. |
 | Expected Markers | Ordered file/point progress, exact restoration, evidence-qualified owner decisions; no excluded-body ledger. |
 | Asset Needs | Preserve configuration/media/snapshots. S1 owns build/t100-s1 if needed; background jobs bounded to 2 hours and 15 minutes no progress, scratch removed after delivery. |
 | Reporting Requirements | Explain evidence threshold, exact restoration, pending decisions, file order, diff metrics and proposed delivery cadence. |
@@ -34,11 +34,12 @@ T100 S1 P130 delivers file 427 v7_video.c minimization: selected XP
 difference shrinks from +3/-3 to +1/-1 (four fewer mirror-diff lines).
 Both cached builds/publications and focused VGA tests pass; both background
 suites are 188/188. Native Window tests pass; unchanged Console binaries pass
-in explicit hidden Consoles, not the default CTest launch. Owner authorizes
-continuing with online verification temporarily deferred: per width, audio
-lifecycle, SB MIDI, native MIDI and both package variants remain pending after
-failures with session 3 Disc. Re-run when owner reports desktop availability;
-this is not full native acceptance or S/T closure.
+in explicit hidden Consoles, not the default CTest launch. P131 supplements
+P130 after session 3 reconnects: all five deferred audio/MIDI/package tests
+pass on each width. Earlier disconnected failures remain recorded. Later
+unaffected batches may defer native tests until final acceptance by owner
+instruction. This is not a claim that default CTest Console startup is fixed
+or that S1/T100 is closed.
 No shared-component or user-asset changes. R0537 and earlier qualified owner
 choices remain open, as do D001-D006 and L001. Frontier 427/472; next frozen
 file 428 base/video/vga_mode.c. See the
