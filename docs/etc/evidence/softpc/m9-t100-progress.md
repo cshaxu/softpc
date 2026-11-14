@@ -7890,3 +7890,83 @@ No new build/runtime test is necessary or claimed for this documentation-only
 review. P107 remains the exact artifact and full 392/392 regression baseline.
 The actual documentation diff and gates are reviewed before delivery. Frontier
 406/472; next 407 base/system/ica.c. S1 and qualified owner decisions stay open.
+
+
+## File 407: base/system/ica.c (P109 investigation; not complete)
+
+Pinned XP raw SHA-256 3809cd6df0b6f665227735a6004f830b083670f07c0d1aa46f9ff8112a646066.
+The complete-file comparison identifies selected differences in the historical
+notice, snapshot/EOI declarations, delayed-IRQ mask, master-INTR withdrawal,
+CCPU IRET-hook policy and private snapshot extension. Excluded bodies are not
+new audit entries. No source restoration is delivered in this investigation;
+the frozen file remains UNREVIEWED until its complete point review qualifies.
+
+Initial source findings, not automatic retention approvals:
+- The actual nt_sbdsp.c transfer path calls host_DelayHwInterrupt. Compat eoi.c
+  owns the delayed-release event and DelayIrqLine; ica_scan_irr uses the combined
+  mask while preserving IRR accounting. Existing device_contract irq cases
+  exercise both adapters, repeated requests, release and cancellation. Removing
+  that mask is not justified merely because the XP !NTVDM branch lacked it.
+- CCPU c_main.c receives hook_address from ica_intack but does not consume it;
+  its original comment states this explicitly. Actual keyboard_init and
+  timer_init call ica_iret_hook_control. The current CCPU no-op avoids enabling
+  the unconsumed hook protocol. The complete coherent restoration consequences
+  and master-INTR withdrawal negative control still need final review.
+- ICW1 register clearing remains the original implementation. AutoInitEoiHook's
+  count<0 path returns without restarting DMA; do not infer the neighbor's
+  timer EOI failure or add cancellation calls without this project's evidence.
+
+### P109 pending local-extension decision L001: PIC initialization phase
+
+This is a defect in the existing local snapshot extension, not in XP PIC
+execution and not a newly admitted patch. SWPIC_outb owns static sequence[2]
+with states -1, 0, 2, 3, 4. Snapshot capture/restore serializes adapter registers
+and IRET bookkeeping but omits sequence. devices/archive.c's in-memory record
+and wire field map also omit it; ccpu/archive.c calls that device archive.
+Thus no other archive layer restores the controller's command interpretation.
+
+A disposable variant of existing device_contract_smoke creates/resets the real
+Machine and uses the actual original PIC port functions and current PIC snapshot
+functions. For each adapter and after ICW1, ICW2 and ICW3:
+1. Capture the partially initialized controller.
+2. Complete the remaining ICWs without restoration as a control; capture the
+   correct final register state and assert the requested vector base.
+3. Perform normal PIC POST initialization, restore the saved partial state,
+   send the same remaining ICWs, and compare final base, mask and mode.
+
+Both architecture fixture compilations and links succeed against unchanged
+production archives. All six controls per architecture produce the requested
+base, mask 0 and mode 17. All six restored cases per architecture diverge:
+- Master after ICW1: expected base/mask/mode 56/0/17; actual 0/1/1.
+- Master after ICW2 or ICW3: expected 56/0/17; actual 56/1/1.
+- Slave after ICW1: expected 112/0/17; actual 0/1/1.
+- Slave after ICW2 or ICW3: expected 112/0/17; actual 112/1/1.
+The final failures==0 assertion at disposable fixture line 311 intentionally
+fails: x86 exit 3221226505, x64 exit 3. This is twelve actual-controller
+reproductions with matching no-restore controls, not twelve passing tests.
+
+Source cause: POST leaves sequence at fully initialized (0). Restore copies
+registers but leaves that phase untouched, so ICW continuation writes on the
+data port are interpreted as OCW1 mask changes. CPU instruction-boundary
+snapshot access does not itself guarantee an entire multi-instruction ICW
+sequence has completed. The probe does not execute a guest snapshot command
+or reproduce a DOS/Win3.1/Win95 user symptom; those are unverified product cases.
+It does establish failure of the actual device capture/restore contract.
+
+Minimum proposed direction is to include the existing per-adapter phase in
+that same archive: retain one state owner, make its storage accessible to the
+existing capture/restore implementation, serialize/validate the phase and
+restore it without port replay or a second initialization state machine.
+This would introduce a new mirror difference and change archive schema; exact
+patch size and format disposition require an owner decision. Under the current
+no-increase audit rule no repair, fallback or compatibility layer is added.
+L001 is a pending diff-point decision here, not TODO and not a claim that all
+snapshot differences are correct. Existing source/artifacts remain P107.
+
+P109 is a bounded investigation delivery. Production/test source diff is zero;
+no fresh production build/publication or full-suite pass is claimed. The prior
+P107 392/392 suite did not cover this partial-ICW snapshot case. Ordered frontier
+remains 406/472; file 407 investigation stays active.
+
+P109 owned probe process exited; exact scratch cleanup and build residue check
+pass. Documentation gate and actual diff review pass. No user assets changed.

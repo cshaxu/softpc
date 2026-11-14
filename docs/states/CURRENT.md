@@ -30,11 +30,12 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P108 completes file 406 dummy_nt.c. Its selected original empty
-BIOS handler is unchanged and remains registered at BOP 01h; its retained
-historical notice is the sole qualified pending difference. No production or
-artifact change. P107 remains the dual-EXE and full 392/392 regression baseline.
-Frontier 406/472; next 407 base/system/ica.c.
+T100 S1 P109 investigates file 407 ica.c without production changes.
+Actual PIC snapshot probes reproduce missing ICW-phase restoration in twelve
+x86/x64 cases. L001 is a pending local-extension diff decision, not an XP bug
+or an admitted new patch. Remaining PIC difference review continues; frontier
+stays 406/472. P107 remains the dual-EXE and full 392/392 regression baseline;
+that suite does not cover this newly demonstrated partial-initialization case.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
