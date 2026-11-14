@@ -2330,3 +2330,15 @@ retention: required snapshot/cursor/refresh residuals remain qualified pending
 owner choice. Both widths build/publish and pass focused plus 188 background
 tests each; unaffected native checks are deferred by owner authorization.
 Existing excluded bodies are unchanged and receive no new accounting.
+
+
+### T100 S1 P134 video BIOS original-first review
+
+vga_vide.c matches selected XP without edits. video.c restores original blank
+placement and removes explanatory additions, reducing selected XP diff from
++31/-24 to +14/-13 (28 fewer lines). Both BDA aperture and CGA plane-address
+groups remain qualified pending decisions R0550-R0551; fresh coherent-original
+probes fail actual BIOS address/pixel oracles on x86/x64. Existing exclusions
+are not re-accounted. Both final EXEs are metadata-equivalent to P133; both
+rebuilt VGA fixtures pass. Production +17/-23, test changes zero. See T100
+file evidence for boundaries and owner-decision status.

@@ -30,16 +30,17 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P133 completes file 429 vga_prts.c: production +35/-57, tests unchanged;
-selected XP diff falls from +233/-46 to +188/-23 (68 fewer diff lines).
-Original cursor text is restored where behavior permits; snapshot V7 reads
-reuse the original handler except four required raw-state cases. Redundant
-initialization and added explanations are removed. Both cached builds and
-publications, final VGA fixtures and background 188/188 per width pass.
-Native desktop/audio/package tests are deferred to final acceptance under the
-owner's unaffected-path authorization, not counted as passes. R0543-R0548 and
-earlier qualified owner decisions remain open, as do D001-D006 and L001.
-Frontier 429/472; next file 430 base/video/vga_vide.c. No S/T closure is claimed.
+T100 S1 P134 completes files 430-431: vga_vide.c matches selected XP;
+video.c restores original blank placement and removes added explanations.
+Production +17/-23, tests unchanged; selected video.c diff falls from +31/-24
+to +14/-13 (28 fewer diff lines). Required BDA text aperture and CGA plane
+address expressions remain qualified pending owner decisions R0550-R0551.
+Both builds/publications and final VGA fixtures pass. Published EXEs are
+byte-equivalent to P133 after only PE timestamp/checksum and unique compiler
+time normalization; full regression is not repeated under the owner exception.
+P133 background 188/188 per width remains applicable. Native final acceptance,
+earlier owner decisions, D001-D006 and L001 remain open. Frontier 431/472;
+next file 432 base/video/video_io.c. No S/T closure is claimed.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 

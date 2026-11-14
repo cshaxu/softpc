@@ -9616,3 +9616,103 @@ Both builds report 89 warnings, all in mirror sources/headers; none in public or
 - softpc64.exe: Nov 13 2026 21:12:19, SHA-256 c2688195129f767cb265fcb5d674f669a696f35d4a5d669d1bb9a1e7597d28a6.
 
 Final-source identity, CRLF mirror policy and pinned XP raw identity were rechecked. Actual changed-path review confirms only this mirror source, manifest/provenance/task records and the two published EXEs change; no test, public-component, Compat, INI or guest-medium edit. Native checks are explicitly deferred, not counted as passes. No new interactive DOS/Windows guest reproduction is claimed. Existing qualification limits and pending owner decisions remain. Completed owned jobs and promoted evidence permit scratch cleanup before commit. Frontier 429/472; next file 430 base/video/vga_vide.c. S1/T100 remain open.
+
+
+## File 430: vga_vide.c (P134)
+
+Pinned XP raw SHA-256 is
+9828bd882bcc99021605becf586fd2d9c71b43d1b3e2bbfc80f6f6e06cc3a267.
+Whole-file comparison after line-control normalization finds that every
+remaining replacement is exactly one existing #error body. Selected source
+matches XP; no new point or excluded-body accounting is created. This is
+selected-source equality, not raw-byte equality. Root CMake includes the file
+in softpc-machine-devices; ega_vide.c calls vga_func_12 and dispatches
+vga_int_1C. Required BIOS behavior has no replacement Compat implementation.
+Executor and counter-review agree no edit/retirement is warranted. Production
+and tests unchanged; P133 final-source binaries and qualification still apply.
+File review complete; delivered frontier remains 429 until this documentation
+batch is pushed. Next file 431 base/video/video.c.
+
+
+## File 431: video.c (P134)
+
+Fixed XP raw SHA-256:
+90bf0cf3f869903e6b24e0402c8b29c7d89b50a1c3ceb77e92e06f121f73a40f.
+Root CMake compiles this required BIOS implementation in softpc-machine-devices.
+Original EGA/VGA BIOS dispatch reaches its text and CGA pixel operations; no
+Compat substitute exists. Compare the complete file by conditional branch
+paths, omit existing excluded bodies and line directives, and normalize only
+conditional-directive comments for scaffolding comparison. Remaining selected
+changes are the BDA text-aperture expression with eleven uses, two odd/even
+pixel offsets, explanatory comments and misplaced blank lines. No excluded
+body is counted or reopened.
+
+| Point | XP location | Initial analysis and counter-review |
+| --- | --- | --- |
+| R0549 | Blank placements throughout; added explanations at 398, 2539, 2559 | Restore original blank placement and remove added explanations. Four existing line directives are adjusted to keep original diagnostic anchors (113, 170, 3433, 3939); no new directive or conditional framework is introduced. Production +17/-23, tests unchanged. |
+| R0550 | Macro at 398; text origins/bounds at 1223, 1476, 1554, 1556, 1741, 1972, 2098, 2267, 2381, 2938, 3107 | Qualified pending owner decision: nine text origins and two clear limits derive from the existing caller BDA table. Original cached bounds are set by physical mode programming in ega_vide.c, whereas original BIOS dispatch reads the active caller's BDA and can already use virtualized SAS access. No new state/VM-version branch exists. Coherently restoring all eleven uses and deleting the macro fails the actual BIOS B8000 character oracle on both widths. Both bounds must remain consistent; the current fixture also checks full-width clearing. |
+| R0551 | 2539, 2559 | Qualified pending owner decision: both XOR and replacement CGA writes preserve the existing odd/even plane address spacing before OR-ing the low plane bit. Original shift halves the physical group offset. Coherently restoring both expressions fails BIOS write-dot/read-dot comparison on both widths; production CHAIN2 layout evidence is established in the earlier audited writers. No alternative drawing implementation is introduced. |
+
+R0550's supported runtime context is also documented in the prior
+[S33 guest investigation](m9-t99-s33-windowed-dos-addressing.md): actual Win31
+VM=1 BIOS writes had BDA mode 3 with the physical cache A0000; changing the
+address source restored typed text. That is historical guest evidence, not a
+new interactive run. This audit independently rereads the actual cache-setting,
+text-only dispatch/SAS paths and executes fresh original-object controls.
+The current focused fixture deliberately supplies stale physical bounds and
+does not claim to emulate a complete paged V86 environment. V7 extended text
+uses original BDA mode 1 plus its extension latch, with the same B8000 aperture;
+original mode programming and graphics-address callers remain unchanged.
+
+Private probes compile the actual device command and replace only video.c's
+object in the existing VGA fixture link. Current controls pass x86/x64. All
+three original candidates (text only, both pixel expressions, both groups)
+fail by assertion: text at line 1475, pixel/combined at 1453. The latter matrix
+covers BIOS CGA modes 4..6, x=0..19 and y=0..2; it does not establish every
+arbitrary CGA coordinate or all V86 graphics behavior. Existing XOR uses the
+same address calculation; no separate XOR-only negative is claimed.
+- x86-video-current-run: exit 0, 6.03 s.
+- x86-video-text-original-run: exit 3221226505, 10.76 s.
+- x86-video-pixel-original-run: exit 3221226505, 11.97 s.
+- x86-video-original-run: exit 3221226505, 11.75 s.
+- x64-video-current-run: exit 0, 6.91 s.
+- x64-video-text-original-run: exit 3, 11.36 s.
+- x64-video-pixel-original-run: exit 3, 36.11 s.
+- x64-video-original-run: exit 3, 11.26 s.
+- x86-video-minimal-run: exit 0, 6.43 s.
+- x64-video-minimal-run: exit 0, 6.89 s.
+
+All private jobs were sequential against their task-owned media file and
+completed before final qualification. The reduced source changes no executable
+expression: it removes comments/blank differences and preserves diagnostic
+mapping. Selected XP diff falls from +31/-24 to +14/-13: 28 fewer diff lines,
+not merely the six-line net source reduction. Final normalized SHA-256:
+a2db040e40056f6a4e268681d00091bd474974a47ff2e4e71b43b221d3b43139.
+Final tracked builds/publications and focused tests are pending. Full regression
+may be omitted only if each EXE is demonstrably equal after the permitted
+PE timestamp/checksum and unique compiler-time masks. Native qualification
+remains deferred to final acceptance under the owner's unaffected-path rule.
+
+### P134 final verification and actual-diff review
+
+Final x86/x64 cached builds and publication pass in 9.40/10.14 s; rebuilt VGA
+fixtures pass in 6.31/4.98 s. The exact published files are byte-equivalent to
+P133 after masking only PE COFF timestamp, optional-header checksum and the
+single NUL-terminated compiler HH:MM:SS string. No instruction/data/layout or
+other byte is ignored. The owner-approved equivalence exception therefore
+avoids repeating full background/native suites; P133 188/188 per width remains
+the applicable background baseline. Final native acceptance remains pending.
+Both builds have 89 original-mirror/header warnings and zero outside the mirror.
+Mirror, documentation and whitespace checks pass.
+
+- softpc32.exe: Nov 13 2026 21:23:34, SHA-256 ef980f3d133b509407764892343225aac49eae8d274ffaaf694532d105f41269.
+- softpc64.exe: Nov 13 2026 21:23:50, SHA-256 c5833bf9ddf8b62a8cd6599ecc4c18282d906c65c73e34bdb8e1e01711dae43b.
+
+Coordinator counter-review checks the actual source patch, the fixed original
+comparison and probe oracles. No semantic site, public tree, Compat, guest,
+INI, media or snapshot is changed. Diagnostic anchors are verified against
+original matched retained lines, not guessed offsets. Retained R0550-R0551
+remain evidence-qualified owner decisions, not automatic approvals. Final
+mirror bytes equal the tested reduced candidate and retain CRLF. Owned jobs
+are terminal; promoted evidence permits scratch cleanup. Completed delivered
+frontier is 431/472, next file 432 base/video/video_io.c. S1/T100 remain open.
