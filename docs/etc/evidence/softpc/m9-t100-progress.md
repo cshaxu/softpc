@@ -12516,3 +12516,25 @@ remaining files, D001-D006/L001 and owner choices keep S1/T100 open.
 
 P179 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task records change.
+
+## P180 final-decision reconciliation, positions 453-454
+
+Both normalized current headers match P145. Actual declarations, nt_ega callers,
+nt_munge provider and VGA pixel assertions were reread. P80's negative is an
+isolated no-pan query experiment, not restoration of all coupled implementation
+patches. P144's no-definition observation is superseded by P150/R0604: current
+host_stream_io_enabled has its original declaration and definition, no reader.
+This correction prevents stale investigative observations becoming final facts.
+
+R0571/R0573 add two semantic decisions: cumulative 302 residual IDs (299 semantic/
+ABI, three compiler/format), nineteen notices. R0569/R0570/R0572/R0574 remain
+restorations; nt_mouse.h remains original. No excluded bodies are counted.
+
+Executor/counter-review modifies only the three task documents; no production,
+tests, artifacts, user configuration/media or snapshots change. No job/scratch
+is created. P164 fresh 392/392 remains applicable, not a new test run. Next is
+455; remaining files and D001-D006/L001 still require final reconciliation.
+S1/T100 and all qualified owner decisions remain open.
+
+P180 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Final changes are restricted to the three task records.

@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-452 only. Positions 453-472, original
+This view currently reconciles positions 1-454 only. Positions 455-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -2013,6 +2013,41 @@ Two ABI IDs are added: cumulative 300 residuals (297 semantic/ABI, three
 compiler/format). No excluded body is counted. This reconciliation changes
 only task documents, with code/tests/EXEs unchanged and S1/T100 still open.
 
+## Positions 453-454: graphics contracts and original mouse header
+
+Both current normalized headers match P145. nt_mouse.h remains a complete
+normalized XP match with its original include wiring; unused declarations do
+not justify additional removal differences.
+
+R0569/R0570/R0572/R0574 are delivered restorations: original blank adjacency,
+line anchor, removal of redundant explanation and restoration of the original
+host_stream_io_enabled declaration. Together P144 reduced XP differences by
+five lines (production +3/-5). P144's historical observation of no definition
+is not the current state: P150/R0604 subsequently restored the original global
+in nt_graph.c. Current whole-tree search finds that declaration and definition,
+but no reader. Neither restoration enables the separate guest stream backend.
+
+R0571/R0573 remain two qualified owner decisions: the seventh per-scanline pan
+argument to ega_colour_hi_munge and the common ega_colour_panned_group
+declaration (+2/-1 selected header difference). Actual low, medium and high
+painters consume these contracts; nt_munge combines corresponding plane bytes
+and wraps the next group at the existing display-bank extent. Mere caller or
+prototype agreement is not the necessity proof.
+
+P80's actual port-to-pixel control makes the existing query return zero in a
+private real-provider object and links the actual VGA fixture. Both widths
+fail the independently expected pixel shift after 3C0h pan=1, while unchanged
+fixtures pass. This is an isolated no-panning counterexample, not coherent
+restoration of every implementation difference or a fresh guest reproduction.
+The current fixture also checks all three painters, shifts 0..7, bank/wrap
+and split cancellation; later implementation points retain their own review.
+P144 reran actual VGA tests on both widths; both EXEs were metadata-equivalent.
+The later P164 fresh 392/392 remains the current full runtime qualification.
+
+Two semantic IDs are added: cumulative 302 residuals (299 semantic/ABI and
+three compiler/format), nineteen historical notices. R0571/R0573 remain
+unapproved. This reconciliation changes no source, test or artifact.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -2022,4 +2057,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 453.
+recommendations into owner approval. The next position is 455.
