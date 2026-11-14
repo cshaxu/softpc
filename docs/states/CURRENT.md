@@ -30,12 +30,14 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P114 completes file 411 rom.c: original scalar conversion and
-display_string statements restored, reducing XP diff by 15 lines. The ROM
-segment truncation correction remains a qualified pending decision. Final
-dual-EXE cached builds/publication and full regression pass 392/392. Frontier
-411/472; next 412 base/system/timer.c. Earlier qualified residuals and L001
-remain open.
+T100 S1 P115 investigates file 412 timer.c without production edits.
+Three original-behavior variants fail actual PIT/sound fixtures on both
+architectures while current controls pass. Additional actual queue dispatch
+proves an adjacent zero-delay stack overflow; isolated two-line candidate
+passes eighteen cases, recorded as new pending decision D005, not implemented.
+Frontier remains 411/472; timer.c is still in review. P114 remains the
+unchanged dual-EXE publication and full 392/392 regression baseline.
+Earlier qualified residuals and L001 remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

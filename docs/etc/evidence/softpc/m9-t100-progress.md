@@ -3476,7 +3476,7 @@ configuration, guest media and snapshots remain intact.
 ## Pending original-defect diff decisions
 
 Owner moves these discoveries out of TODO into this audit's pending diff-point
-list. D001-D004 identify proposed differences, not existing local patch ranges;
+list. D001-D005 identify proposed differences, not existing local patch ranges;
 they do not inflate the measured XP diff or the restored-point counts. None
 is repaired or approved for a new mirror patch. Continue ordered auditing
 without waiting; the no-increase constraint remains in force.
@@ -3489,6 +3489,8 @@ without waiting; the no-increase constraint remains in force.
 | D003 | base/cvidc/sevid023.c, Chain4DwordFill (S2844 demonstrated): proposed correction of multi-element WORD-pass overlap. Minimal implementation is not yet established. | P54 actual bodies on x86/x64 request four copies of 0x44332211 but produce 11 22 33 44 33 44 33 44 33 44 followed by six untouched bytes. Current, candidate and poisoned candidate agree. Pinned XP uses the same two count-wide WORD fills at offsets +0/+2. c_sas_fillsdw loops over c_sas_storedw; no production caller of fill_dword_ev_glue was found. No guest symptom established. | Pending diff decision; original behavior unchanged. |
 
 | D004 | base/cvidc/sevid025.c, CHAIN4 mode-2 WORD/DWORD writes: plane-selection discrepancy; a possible correction would select the addressed plane's expanded byte rather than always the low byte. No patch is admitted. | P57 real setWritePointers selects all four mode-2 variants. On x86/x64, offset 0x100, WORD 0x0201 writes ff 00, whereas the per-plane expansion expectation is ff ff; DWORD 0x08040201 writes ff 00 00 00 rather than ff ff ff ff. Current, restored and poisoned-restored bodies agree. Pinned XP stores the low byte after lookup expansion. write_word_ev_glue is in the production video write vector. This is a source/fixture discrepancy, not a reproduced guest failure or completed hardware conformance investigation. | Pending diff decision and hardware/guest applicability verification; original behavior unchanged. |
+
+| D005 | base/system/timer.c, issueIREQ0 existing-active-event branch: clamp the newly computed zero int_delay to one before assigning timer_multiple_delay; isolated candidate adds two lines, no production edit admitted. | P115 uses real Machine/PIT ports, two heartbeats and actual quick-event dispatch. Both current architectures reach divisor=1, mode=2, delay=0, active=1, more=65525, then exit 0xc00000fd. The original active-event calculation is unchanged; the existing first-event guard does not cover it. Two-line isolated candidate passes all nine mode/divisor combinations on each architecture. | Pending new diff decision; not implemented, not TODO, no observed real-guest crash claimed. |
 
 The P34/P38 sections retain the detailed controls and caller evidence. This
 transfer does not claim a guest symptom, a completed fix, or authority to add
@@ -8323,3 +8325,75 @@ CRLF, normalized manifest and documentation LF are preserved. User INI is
 byte-unchanged, guest/media/snapshot files untouched, owned job exited.
 Frontier advances to 411/472; next 412 base/system/timer.c. R0499 and earlier
 qualified decisions remain open. S1 remains active.
+
+
+### P115: file 412 timer.c behavior-difference investigation
+
+This is an investigation delivery while file 412 remains in review. Pinned XP
+raw SHA-256 4d640fafdc5d7b3daa698e531f567225aebfb66f4eea7edb1f6417e8d105084b.
+Production, permanent tests, manifest and published EXEs are unchanged.
+Frontier stays 411/472; no later file is advanced.
+
+Three independent disposable timer.c variants restore one existing behavior
+change at a time. Each is compiled with its actual Ninja production command
+and linked before the real machine archive into the unchanged existing PIT
+or sound fixture. No original guest/firmware is rebuilt or modified.
+All six variant compiles and links succeed. Current production controls pass
+both fixtures on both architectures (four control executions).
+
+- Remove the first-event zero-delay guard: real pit_smoke exits 3221225725
+  (0xc00000fd, stack overflow) on x86 and x64. With a one-clock counter,
+  SYSTEM_TICK_INTV/n truncates to zero; original add_event immediately invokes
+  zero-delay callbacks, and timer_multiple_ints recursively requeues itself.
+- Restore the original estimate/wrap behavior coherently (remove estimated
+  flag and suppression together): pit_smoke fails irq_requests == 0 at line46
+  on both architectures, x86 exit3221226505, x64 exit3. The test only latches
+  and reads the real PIT while no executor/heartbeat advances time; original
+  guess-driven wraps manufacture IRQ work.
+- Restore TIMER2 POST gate to GATE_SIGNAL_RISE: sound_smoke fails the actual
+  delivery-count assertion at line177 on both architectures, same respective
+  assertion exit codes. Current LOW gate passes. This is the existing
+  machine/PPI/audio-fixture contract, not a claim of hearing a native device.
+
+The first two retained differences must not be presented as exhaustive PIT
+correctness. The adjacent active-event update still assigns
+SYSTEM_TICK_INTV/(n+1) to int_delay and can lower timer_multiple_delay to zero.
+The existing fixture stops after checking that two heartbeats requested IRQ;
+it does not then dispatch the queued callbacks.
+
+#### D005: active backlog can reintroduce zero delay
+
+A disposable copy of pit_smoke keeps the real create/reset, port writes and
+nine mode/divisor combinations. After its two real time_tick calls, it records
+the actual PIT snapshot, sets the existing CPU quick-event countdown to zero
+and calls the actual dispatch_q_event. No alternate timer/queue is introduced.
+Both current production libraries pass the three mode0 cases, then print:
+
+    before dispatch divisor=1 mode=2 delay=0 active=1 more=65525
+
+Both then terminate with 3221225725 (0xc00000fd). This is dynamic proof of
+current device/queue failure, not merely an inference from a suspicious divide.
+It is not a recorded DOS, Win3.1 or Win95 guest crash; the probe deliberately
+advances the queue through the existing countdown/dispatch interface.
+
+The isolated candidate inserts exactly these two statements immediately after
+the active-event int_delay calculation, before the existing comparison:
+
+    if (int_delay == 0)
+        int_delay = 1;
+
+It preserves the original comparison and scheduling path. Both architectures
+compile/link successfully and complete all nine real mode/divisor/dispatch
+cases: eighteen total. Mode2 and mode3 divisor1 now report delay1, active1,
+more65525 and return from dispatch. No production change or new permanent
+test is made: these two lines would introduce a new XP-relative point, barred
+by the current no-increase policy. D005 belongs to pending diff decisions,
+not TODO. Existing first-event protection remains necessary but incomplete.
+
+Remaining file work: reconcile selected formatting against XP, complete
+snapshot/state/callback evidence and minimize only permitted existing
+differences, then deliver the complete-file audit with required builds/tests.
+Do not promote this investigation into file completion or inherited approval
+of all timer extensions. P114 remains the unchanged full 392/392 and dual-EXE
+baseline. All three owned probe processes have exited; results are recorded
+here before disposable cleanup. No user configuration/media/snapshot changes.
