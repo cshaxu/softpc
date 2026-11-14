@@ -2238,3 +2238,14 @@ added/deleted difference decreases by 15 lines. The original XP UCHAR ROM
 segment truncation remains corrected as qualified pending decision R0499;
 real scanner/reset consumers and the generated-ROM execution oracle are
 recorded in T100 evidence. No excluded-body accounting or new mirror point.
+
+
+### T100 S1 P116 timer.c original-first minimization
+
+Restore selected original indentation/comments around issueIREQ0 and
+updateCount; remove eleven added explanation lines. Source +38/-49,
+XP-relative diff delta -43 added/-32 deleted (75 fewer difference lines).
+Retained first-event delay guard, estimate/wrap distinction, channel2 POST gate,
+snapshot extension and historical notice are qualified decisions R0501-R0505
+in the T100 evidence. P115 proves adjacent D005 is still faulty; no new patch
+for it is included. Existing excluded bodies/scaffolding are not re-accounted.

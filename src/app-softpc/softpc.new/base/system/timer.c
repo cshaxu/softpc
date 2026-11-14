@@ -2038,37 +2038,34 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
 
 
 
-			/* if we've got a quick event running, add to its workload */
-			if (active_int_event)
-			{
-				/* spread interrupts through system tick */
-				int_delay = SYSTEM_TICK_INTV / (n + 1);
-				if (int_delay < timer_multiple_delay)
-					timer_multiple_delay = int_delay;
-				more_timer_mult += n;
-			}
-			else
-			{
-				/* ensure multiple delay restarts at sensible speed */
-				timer_multiple_delay = SYSTEM_TICK_INTV >> 1;
-				if (n == 1)
-				{
-					timer_generate_int(1);
-				}
-				else
-				{
-					/* spread interrupts through system tick */
-					timer_generate_int(1);
-					timer_multiple_delay = SYSTEM_TICK_INTV / n;
-					/* The standalone host must defer a zero-delay queue entry by
-					   one microsecond: the original queue's immediate-event path
-					   otherwise recursively drains a valid one-clock PIT backlog. */
-					if (timer_multiple_delay == 0)
-						timer_multiple_delay = 1;
-					active_int_event = TRUE;
-					add_q_event_t(timer_multiple_ints, timer_multiple_delay, n-1);
-				}
-			}
+                        /* if we've got a quick event running, add to its workload */
+                        if (active_int_event)
+                        {
+                                /* spread interrupts through system tick */
+                                int_delay = SYSTEM_TICK_INTV / (n + 1);
+                                if (int_delay < timer_multiple_delay)
+                                        timer_multiple_delay = int_delay;
+                                more_timer_mult += n;
+                        }
+                        else
+                        {
+                                /* ensure multiple delay restarts at sensible speed */
+                                timer_multiple_delay = SYSTEM_TICK_INTV >> 1;
+                                if (n == 1)
+                                {
+                                        timer_generate_int(1);
+                                }
+                                else
+                                {
+                                        /* spread interrupts through system tick */
+                                        timer_generate_int(1);
+                                        timer_multiple_delay = SYSTEM_TICK_INTV / n;
+                                        if (timer_multiple_delay == 0)
+                                                timer_multiple_delay = 1;
+                                        active_int_event = TRUE;
+                                        add_q_event_t(timer_multiple_ints, timer_multiple_delay, n-1);
+                                }
+                        }
 
 #endif /* !NTVDM */
 #line 2341
@@ -2090,7 +2087,7 @@ LOCAL void issueIREQ0 IFN1(unsigned int, n)
 LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
         struct host_timeval *, now)
 {
-	unsigned long modulo = pcu->initialCount;
+        unsigned long modulo = pcu->initialCount;
 	IBOOL estimated;
 
         /*
@@ -2128,12 +2125,12 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
          */
 
 	estimated = (long)(ticks - pcu->lastTicks) <= 0;
-	if (estimated){
-		ticks = guess();
-	}else{
-		throwaway();
-		pcu->lastTicks = ticks;
-	}
+        if (estimated){
+                ticks = guess();
+        }else{
+                throwaway();
+                pcu->lastTicks = ticks;
+        }
 
         /* the counter holds some count down value ...
          * if the number of 8253 clocks elapsed exceeds this amount
@@ -2163,14 +2160,12 @@ LOCAL void updateCount IFN3(unsigned long, ticks, unsigned long *, wrap,
         /* calculate new counter value */
         pcu->Count = (word)(modulo-ticks);
 
-	/* Read-time interpolation must not generate interrupts or advance the
-	 * real clock baseline. Repeated reads otherwise manufacture wraps. */
 	if (estimated)
 		*wrap = 0;
 
-	/* calculate time at which last wrap point occurred, and
- 	 * use this to stamp the counter
-	 */
+        /* calculate time at which last wrap point occurred, and
+         * use this to stamp the counter
+         */
 
         if (*wrap)
                 setLastWrap((unsigned int)(modulo-pcu->Count),now);
@@ -2610,12 +2605,6 @@ unsigned long *callback_id;
 	return TRUE;
 }
 
-/*
- * The archive boundary is deliberately below the original timer API.  It
- * names the finite state-machine functions instead of retaining code
- * addresses, and stores a counter timestamp as an elapsed phase rather than
- * an absolute host-clock value.
- */
 enum {
     SNAPSHOT_TIMER_STATE_UNINIT = 1,
     SNAPSHOT_TIMER_STATE_AWAITING_GATE,

@@ -8397,3 +8397,82 @@ Do not promote this investigation into file completion or inherited approval
 of all timer extensions. P114 remains the unchanged full 392/392 and dual-EXE
 baseline. All three owned probe processes have exited; results are recorded
 here before disposable cleanup. No user configuration/media/snapshot changes.
+
+
+## File 412: base/system/timer.c (P116)
+
+Complete-file follow-up to P115. Fixed XP raw SHA-256 remains
+4d640fafdc5d7b3daa698e531f567225aebfb66f4eea7edb1f6417e8d105084b.
+Existing excluded bodies and line-control/conditional scaffolding are skipped
+without new bookkeeping. Changes are confined to selected original formatting
+and added comments, not timer behavior.
+
+| Point | Original/current difference and disposition | Evidence and independent review |
+| --- | --- | --- |
+| R0501 | Relocated historical notice at initial local34 / XP35, one added line; qualified pending. | Source policy requires preserving the notice outside the excluded SCCSID body. No code behavior. |
+| R0502 | Snapshot include at initial local69 and appended snapshot/callback operations; qualified pending. | Actual devices/archive capture/restore and callback codecs consume them; private PIT states and actions cannot be reconstructed from public port reads/writes. Header plus final 358-line extension span, not a claim that excluded original debug code was newly deleted. |
+| R0503 | Initial local2041-2071 / XP2313-2338: restore exact original indentation and remove three added comment lines, retaining the two first-event zero-delay guard lines. | P115 restoring the guard away causes stack overflow on both architectures in real pit_smoke. D005 separately proves that the retained guard is incomplete for already-active backlog; necessary does not mean sufficient. |
+| R0504 | Initial local2093-2094,2130-2136,2166-2173 / XP2495,2528-2533,2566-2568: retain estimated flag and wrap suppression; restore original surrounding statement/comment indentation and remove two added explanatory lines. | P115 coherent original variant fails no-IRQ-from-read assertion on both widths. Original counter updater remains the single calculation path; no persisted state, caller special case or new clock. |
+| R0505 | Initial local2572 / XP3026: retain TIMER2 POST gate LOW instead of RISE, +1/-1, qualified pending. | P115 original variant fails actual sound fixture delivery at line177 on both widths; current controls pass. Original PPI gate transition requires consistency with its low reset register. No new sound path. |
+| R0506 | Remove six-line added snapshot explanation before the extension enums. | No executable behavior; rationale belongs in this record. Existing snapshot code and format stay unchanged. |
+
+R0502 necessity and scope: original timer.c owns three COUNTER_UNIT records,
+the selected current counter, latched read state, current mode, state/action
+functions, activation phase and pending interrupt bookkeeping. Port reads
+consume/alter latches and cannot enumerate these private fields. The snapshot
+implementation maps the finite original state/action functions to IDs; it does
+not serialize process code pointers. Source scan of actual state, prior/wait,
+gate and action assignments finds the functions represented by those mappings.
+The encoder/decoder also maps timer_no_longer_too_soon and timer_multiple_ints
+for the actual quick-event queue. It is not a duplicate timer implementation.
+
+Counter timestamps are captured as elapsed microseconds and rebased against
+the existing per-counter getTime function on restore (getIdealTime for counter0,
+getHostSysTime for the others). The existing archive serializer explicitly
+writes these fixed-width fields. Restore republishes channel2's existing
+waveform through host_timer2_waveform; no second waveform generator is added.
+Moving the private serialization wholesale to Compat would not reduce the
+implementation and would expose state without removing its necessity.
+
+Existing checkpoint_smoke programs channel0, captures it, reprograms it,
+restores and checks mode, access mode, initial count, state and wait action;
+it rejects an invalid state ID. This is direct coverage of the actual snapshot
+entry, not exhaustive coverage of every mode/action/error combination. Restore
+can partially modify counters before returning failure; this record does not
+claim transactionality or permission to resume a failed archive. Existing
+P115 D005 remains an explicitly proven open defect. No all-PIT-correct claim.
+
+Actual source diff +38/-49 (net -11), permanent tests unchanged. The raw fixed
+XP comparison falls from +682/-813 to +639/-781: -43 added/-32 deleted,
+75 fewer difference lines. These totals are used only for the delta; existing
+exclusions are not enumerated or added to this audit. All selected original
+formatting recovered here is exact XP text; necessary retained new guard lines
+use the surrounding original indentation. No new mirror point or D005 patch.
+
+### P116 final-source verification and independent review
+
+Both cached builds and publication succeed. Complete EXEs match P114 after
+masking only PE timestamp/checksum (PE+8/PE+88, four bytes each) and eight
+compiler-time bytes at the unique unchanged Nov 13 literal location. Lengths,
+literal positions and every other byte match. Thus the owner-approved artifact
+equivalence exception applies; the full runtime baseline remains P114 392/392.
+Fresh PIT, sound and checkpoint tests pass 3/3 on each architecture, 6/6 total
+(x86 2.62 seconds, x64 7.68 seconds). This does not include or fix D005.
+
+x86: compiler timestamp 18:04:17 Nov 13 2026, SHA-256 b95a9dca256e757608037f286c83126bcbcca2f354b3822dd708b4befee9a7dd.
+
+x64: compiler timestamp 18:04:30 Nov 13 2026, SHA-256 dc25d22833c329bcbe4ededf8e1d25ce1711be5cc6443e57cc2fd909ffef6e7a.
+
+A preliminary scratch-script generation assertion stopped before creating
+the runner; the attempted launcher exited without running a build. Its absence
+was verified before the actual runner was generated and launched. No live
+job was restarted or killed. Final verification uses only the completed run.
+
+Actual diff review verifies retained behavior, CRLF mirror bytes, manifest
+identity, and no user INI/media/snapshot changes. Frontier advances to 412/472,
+next 413 base/system/timestrb.c. Qualified residuals remain owner decisions;
+D005, L001 and earlier decisions are open. S1 is not closed.
+
+P116 emits 89 existing mirror-path warnings per architecture, none outside
+the mirror; no warning-free claim. Owned process exit, exact scratch cleanup,
+residue check, manifest/documentation gates and actual diff review pass.

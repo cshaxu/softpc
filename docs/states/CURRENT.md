@@ -30,14 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P115 investigates file 412 timer.c without production edits.
-Three original-behavior variants fail actual PIT/sound fixtures on both
-architectures while current controls pass. Additional actual queue dispatch
-proves an adjacent zero-delay stack overflow; isolated two-line candidate
-passes eighteen cases, recorded as new pending decision D005, not implemented.
-Frontier remains 411/472; timer.c is still in review. P114 remains the
-unchanged dual-EXE publication and full 392/392 regression baseline.
-Earlier qualified residuals and L001 remain open.
+T100 S1 P116 completes file 412 timer.c: selected original formatting restored
+and extra explanations removed, reducing XP diff by 75 lines. Proven behavior
+repairs, snapshot extension and notice remain qualified pending decisions.
+Dual-EXE cached publication is metadata-equivalent to P114; focused tests pass
+6/6, with P114 retaining the full 392/392 regression baseline. Frontier 412/472;
+next 413 base/system/timestrb.c. D005 is not fixed; L001 and earlier qualified
+residuals/decisions also remain open.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
