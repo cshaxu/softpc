@@ -27,20 +27,24 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 42 / R0015 | CALLF chooses SP/ESP using destination SS address size. | Retain the one-condition correction; operand width is not stack address width. | Owner approves retention, S3 P3 |
 | 47 / R0018, R0021, R0022 | Snapshot declaration and private SAS capture/restore accessors (+1/+27/+28, no deletions). | Retain access to existing owner state; original selector registration mutates LDT and cannot substitute for restoration. | Owner approves retention, S3 P4 |
 | 47 / R0019, R0020 | Pointer-return prototypes for host_sas_init/term (+1/-0 each). | Retain declarations matching the actual provider and pointer-using callers. | Owner approves retention, S3 P4 |
-| 47 / R0024 | Physical read span bounds (+1/-1). | Retain correct end-of-RAM check with subtraction avoiding addition wrap. | Pending |
-| 47 / R0026, R0027, R0030, R0033, R0034, R0035 | BIOS access user-permission selection (+1/-1 each). | Retain CPL==3 rather than CPL!=3 for PG_U. | Pending |
-| 47 / R0028, R0029, R0031, R0032 | WORD/DWORD fallback return casts (+1/-1 each). | Retain IU16/IU32 rather than IU8, preserving the returned value width. | Pending |
+| 47 / R0024 | Physical read span bounds (+1/-1). | Retain correct end-of-RAM check with subtraction avoiding addition wrap. | Owner approves retention, S3 P5 |
+| 47 / R0026, R0027, R0030, R0033, R0034, R0035 | BIOS access user-permission selection (+1/-1 each). | Retain CPL==3 rather than CPL!=3 for PG_U. | Owner approves retention, S3 P5 |
+| 47 / R0028, R0029, R0031, R0032 | WORD/DWORD fallback return casts (+1/-1 each). | Retain IU16/IU32 rather than IU8, preserving the returned value width. | Owner approves retention, S3 P5 |
+| 64 / R0038-R0041 | Four segment setter return declarations, IUH to ISM32 (+1/-1 each). | Match original c_reg.c providers without changing the function bodies. | Pending |
+| 64 / R0042-R0050 | Nine flag getter return declarations, IBOOL to ISM32 (+1/-1 each). | Match original c_reg.c providers; type consistency, not a claimed reproduced guest fault. | Pending |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
 diff sizes are presented. Those five total +58/-0; the function counts include
-their trailing separator blanks. S3 P4 records 10/381 approved for retention,
-zero restoration decisions, 371 awaiting review; nineteen notices remain separate.
+their trailing separator blanks. Owner then approves the eleven boundary,
+permission and fallback-width points (+11/-11). S3 P5 records 21/381 approved
+for retention, zero restoration decisions, 360 awaiting review; notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. The next eleven points in ccpusas4.c total
-+11/-11 and are checked against pinned XP conditions/casts and current source;
-existing boundary and BIOS tests support the recommendations within their
-documented coverage. No fresh dynamic run is claimed for approval bookkeeping.
+stays the single detailed inventory. Next R0038-R0050 total +13/-13; pinned XP
+cpu4gen.h declarations and current c_reg.c providers are rechecked individually.
+No function implementation changes are proposed. Existing ABI/source evidence
+does not imply an observed guest failure or thirteen independent dynamic proofs.
+No fresh dynamic run is claimed for approval bookkeeping.
 
 ## Coverage and decision rules
 
