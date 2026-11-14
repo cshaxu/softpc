@@ -50,6 +50,9 @@ Review order remains the frozen 472-file order; restored/identical files and
 | 80 / R0087 | Debug return refetch (+5/-1, replacing a blank line). | A debugger may change CS:EIP, code or flags while parked; invalidate quick mode and refetch. | Owner approves retention, S3 P10 |
 | 80 / R0088, R0089 | POP SS and MOV SS retirement notifications (+1/-1 each, replacing blanks). | Original inhibited-interrupt early jumps bypass the ordinary debug retirement site. | Owner approves retention, S3 P10 |
 | 80 / R0090 | IRET retirement notification (+1/-0). | Original IRET early jump likewise bypasses ordinary retirement. | Owner approves retention, S3 P10 |
+| 80 / R0091 | HLT resume label and checkpoint (+2/-0). | Resume saved halt phase and expose the existing lifecycle checkpoint while halted. | Owner approves retention, S3 P11 |
+| 80 / R0093 | Consume host clock/control events while halted (+4/-0). | Wake alone does not deliver pending device/control work; keep execution on the executor. | Owner approves retention, S3 P11 |
+| 80 / R0094 | Wait when interrupt map and quick-event work are empty (+3/-0). | Existing Compat event wait avoids idle spinning without blocking pending quick-event work. | Owner approves retention, S3 P11 |
 
 Owner says "批准" to the first three-point retention batch and "好 批准这两"
 to R0014/R0015, then approves R0018-R0022 after the complete code and individual
@@ -68,14 +71,17 @@ Owner then approves R0084-R0086 (+14/-2) after reviewing the actual code,
 TLS declaration and one-shot Compat resume consumer. All three count as explicit
 approvals, including the qualifying one-line R0084. Owner then approves
 R0087-R0090 (+8/-3 including replaced blank lines), all recorded as explicit
-approvals. Progress: 66/381 retained (46 explicit and twenty delegated),
-zero restoration decisions, 315 pending;
+approvals. Owner then approves R0091/R0093/R0094 (+9/-0).
+Progress: 69/381 retained (49 explicit and twenty delegated),
+zero restoration decisions, 312 pending;
 notices stay separate.
 No source changes follow from retaining existing code. Existing evidence below
-stays the single detailed inventory. Next review covers R0091 (+2/-0), R0093
-(+4/-0) and R0094 (+3/-0); R0092 was already restored in S1. Their HLT
-checkpoint, pending clock/control consumption and event wait are source-checked
-against pinned XP and Compat providers; no new dynamic qualification is claimed.
+stays the single detailed inventory. Next review covers R0095-R0097: STI and
+ordinary retirement plus quick-mode host-event escape (+5/-0 including one
+separator blank, excluding the existing exclusion-related #line).
+R0092 was already restored in S1. HLT checkpoint, pending clock/control
+consumption and event wait are source-checked against pinned XP and Compat
+providers; no new dynamic qualification is claimed.
 R0080-R0083
 were already restored in S1. Approved counts include pinned-XP separator lines. The map accessor
 returns a mutable pointer, not a bounded clear operation; its actual consumer
