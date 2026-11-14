@@ -12474,3 +12474,24 @@ Next is 432 and final D001-D006/L001 reconciliation. S1/T100 remain open.
 
 P177 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task documents change.
+
+## P178 final-decision reconciliation, positions 432-437
+
+All six normalized current files match final P139 committed contents. Current
+headers confirm retained actual FPU/byte representations and restored original
+vector declarations, with redundant host declarations/profile defines absent.
+P135-P139 final probes and deliveries distinguish unused declaration typing
+from required representation and selected-subset contracts. No hypothetical
+future toolchain support or exhaustive FPU behavior is inferred.
+
+Four residual IDs are added: 298 total (295 semantic/ABI/configuration, three
+compiler/format), eighteen notices. R0552/R0553/R0555/R0557 remain restorations;
+source-line increases in original blocks are not mistaken for added mirror diff.
+
+Executor/counter-review changes only three task documents. No code/tests/EXEs,
+configuration, media or snapshots change; no scratch/job created. P164 fresh
+392/392 remains the current runtime evidence, not a new run. Next file 438 and
+final D001-D006/L001 reconciliation remain; S1/T100 and owner decisions stay open.
+
+P178 actual diff review, mirror/documentation/whitespace gates and build-residue
+check pass. Final changes are restricted to the three task records.

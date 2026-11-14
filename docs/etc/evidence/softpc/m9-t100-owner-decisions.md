@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-431 only. Positions 432-472, original
+This view currently reconciles positions 1-437 only. Positions 438-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -1858,6 +1858,88 @@ Eleven semantic IDs are added: cumulative 294 residuals (291 semantic, three
 compiler/format), eighteen notices. This reconciliation changes only task
 records; owner choices and original-defect decisions remain open.
 
+## Positions 432-437: BIOS entry and host representation/declarations
+
+All six normalized current files match their final P139 committed versions.
+Current headers confirm original vector declarations, little-endian FPU/word
+layout and absence of the removed host_def additions/profile definitions.
+P135-P139 final-source evidence is reconciled without rerunning tests.
+
+### Completed restorations and original required headers
+
+R0552 restores video_io.c blank placement and diagnostic anchors, removing six
+XP difference lines (production +5/-5, tests 0). The real BIOS table retains
+video_io, distinct from EGA dispatch; guard, idle notification and dispatch
+are original. Final BOP/VGA fixtures pass both widths and EXEs were equivalent
+except exact build metadata. No selected residual remains.
+Host error.h selected text and host.h whole normalized contents are original.
+Actual rom_basc dependency records contain both; original host_error binding is
+not a duplicate of Compat's distinct Base-error declaration overlay. No file
+retirement or new include-removal difference is justified.
+
+R0553 removes one redundant FPU_I64 comment while retaining the required ABI
+reason marker. R0555 restores the complete original common-WRITE vector block,
+removing the unsupported DIV-102 rationale and obsolete line anchor. Actual
+cpu4gen.h selects typed direct CCPU setters; setAX_func/setCS_func have no vector
+storage/assignment consumer. Extra typing did not govern those calls. This
+restoration adds 16 source lines but removes 47 XP difference lines; it creates
+no second implemented dispatch path. Final BOP/VGA fixtures pass; EXEs differ
+only in metadata. A regex selecting no device tests was not counted as coverage.
+
+R0557 removes redundant stdlib.h and host_simulate declarations/rationales and
+restores original directive comments: 24 XP difference lines removed (source
++4/-20, tests 0). Actual supported Windows header ordering supplies standard
+prototypes before calls; original CPU/host headers supply host_simulate routing.
+Eleven real consumers across both architectures and four private header variants
+produce 176 successful preprocess/syntax commands; 22 combined comparisons add
+no warnings/errors. This concerns current toolchains, not every future SDK or
+port. Final VGA/BOP/checkpoint/x87 tests pass four per width; whole EXEs are
+metadata-equivalent. Existing original-mirror warnings were disclosed.
+
+### R0554: six actual little-endian FPU representations
+
+FP32, FP64HI and FP80SE bitfields, FP64 words, FPU_I64 words and FP80 mantissa
+words are read directly by original conversion code. Byte-order macros cannot
+repair wrong struct offsets. CVTI64FPH computes high*2^32+low and original BCD
+tables initialize low/high; reversing {1,0}/{10,0} changes those values to
+2^32/10*2^32. Compat's header wrapper provides fenv bindings, not alternate FPU
+arithmetic; original FPSTACKENTRY and snapshot register access stay intact.
+
+P136 compiles current, six individually restored XP layouts and all-six
+restoration with the actual wrapper on both widths. Current passes and each
+restoration fails its corresponding offset/representation assertion; coherent
+original first fails FP64. Source consumers establish why the layout matters.
+These are representation/ABI proofs plus native binding tests, not exhaustive
+x87 opcodes, rounding/exception combinations, guest arithmetic or snapshots.
+The six layouts form one existing residual decision, not six newly added APIs.
+
+### R0556: low/high port bytes
+
+reg.byte.low must precede high on these hosts. Original generic_outw emits low
+to the first port; VGA vga_gc_outw interprets it as index and high as data.
+Actual-flags scalar probe sets 0x0104: current low=4/high=1, original layout
+low=1/high=4 on both widths. Recompiled real VGA objects against the original
+layout also access-violate in the existing fixture. The scalar assertion and
+source chain prove the exact swap; the broader fault is not a stack-traced
+first instruction or a real guest reproduction. Original nibble/bit members
+remain unchanged. This residual is separate from the restored unused vectors.
+
+### R0558/R0559: selected host and CPU profiles
+
+Omission of original NTVDM and CPU_30_STYLE defines remains two pending
+configuration decisions. Actual targets select independent CCPU/Compat and
+CPU_40_STYLE. Individually restoring either definition in its original header
+position fails real ccpusas4 compilation on both widths at existing unsupported
+combination guards. This proves conflict with the admitted subset, not a defect
+in original XP NTVDM/CPU30 or a reason to reopen excluded bodies. Reusing another
+profile to silence the conflict is not a semantic-free restoration.
+
+Four semantic/ABI configuration IDs are added: cumulative 298 residual IDs
+(295 semantic, three compiler/format), eighteen notices unchanged. No source,
+tests or EXEs change in this reconciliation. P164 later supplied current full
+392/392; earlier deferred native checks are not retroactively claimed as passes.
+All owner decisions remain open.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -1867,4 +1949,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 432.
+recommendations into owner approval. The next position is 438.
