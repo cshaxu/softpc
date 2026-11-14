@@ -7605,3 +7605,32 @@ bytes or length changes are ignored. No runtime tests are repeated under the
 owner's artifact-equivalence exception; P97's 392/392 remains the full runtime
 baseline. This is build/artifact equivalence evidence, not a new guest session.
 Frontier 402/472; next 403 base/support/time_day.c. S1 remains active.
+
+
+## File 403: time_day.c (P105)
+
+Pinned XP raw SHA-256
+64bb35da9f3e9b66a3660f9042adcb9be676641839955406930c2fffdad0d7a4.
+Complete non-equal ranges and their boundaries were inspected. The apparent
+final UpDateInProgress deletion is within the existing NTVDM exclusion;
+existing #error bodies and line scaffolding receive no new bookkeeping.
+
+R0473: local line 45 preserves the original notice from XP line 48 outside
+the excluded SCCSID body. One comment line, no executable change; source
+policy establishes its preservation reason. Qualified pending owner decision.
+All other selected implementation matches XP, with no reducible adaptation.
+
+Actual consumers: root CMakeLists.txt:175 builds time_day.c, reset.c:783 calls
+time_of_day_init, and compat/device_bop.c:84 installs time_of_day as the BIOS
+time service. Original get_host_time uses time_t and host_localtime; the
+coherent original host_time interface was restored in P97 and remains time_t
+in Compat. This is original BIOS behavior plus host time binding, not a
+standalone duplicate or a test-only file.
+
+Independent counter-review checked every replacement boundary, including
+selected branches adjacent to excluded NTVDM/PROD alternatives. No selected
+brace, declaration, timestamp calculation or time-service body was omitted.
+Production +0/-0, tests +0/-0, XP-relative diff delta zero. This is a source
+and consumer audit; no new runtime test or build is claimed. P104 published
+EXEs and P97's 392/392 runtime baseline remain unchanged. Frontier 403/472;
+next 404 base/system/at_dma.c. S1 remains active, with owner decisions open.

@@ -30,11 +30,10 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P104 completes file 402 ios.c. Restore the original empty-port
-assignment block/comment; selected implementation now matches XP, reducing
-mirror diff by three lines. Fresh dual EXEs are metadata-equivalent to P102;
-P97's 392/392 remains the full runtime baseline. Frontier 402/472; next 403
-base/support/time_day.c. Existing qualified owner decisions remain open.
+T100 S1 P105 completes file 403 time_day.c without source changes. Selected
+implementation matches XP; its historical notice remains a qualified owner
+decision. P104 EXEs and P97's 392/392 runtime baseline remain unchanged.
+Frontier 403/472; next 404 base/system/at_dma.c.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 
