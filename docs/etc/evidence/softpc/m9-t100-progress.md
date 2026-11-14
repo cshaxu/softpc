@@ -9223,3 +9223,29 @@ next frozen file is 425 base/video/gvi.c.
 P127 owned-process inventory is empty. Exact scratch preview/removal and build
 residue check pass; reusable caches and user configuration/media remain intact.
 XP manifest, documentation gate and final actual-diff checks pass.
+
+
+## File 425: gvi.c (P128)
+
+Pinned XP raw SHA-256 6f70695bc6cdb8db4bef8c42580b7a672cd601ea9d8da4d08c4dd8e1bda40a03.
+A full-file line comparison, ignoring existing #line scaffolding and replacing
+only already excluded bodies at their #error locations, finds no selected
+residual difference. No excluded branch is re-audited, counted or newly logged.
+The full selected declarations, globals, recalc_screen_params, gvi_init and
+gvi_term match XP spelling and behavior. The original conditional structure
+around host_init_adaptor/host_clear_screen also remains intact.
+
+Root CMake line 205 includes the file in the production device target; both
+Ninja trees contain its real compilation edge. Original BIOS reset.c calls
+gvi_init, and gvi.h's original geometry setters call recalc_screen_params.
+There is no reason to remove the file or replace the original geometry code
+with Compat. An absence of direct gvi_term callers does not make the complete
+translation unit unused or justify a new mirror deletion.
+
+Executor comparison and coordinator counter-review agree: no source, test,
+manifest, build or binary change is needed; no new residual decision is opened.
+Production/test delta is zero and XP diff reduction is zero. P127 verified
+artifacts and its precisely qualified native-launch evidence remain unchanged;
+no new build or runtime verification is claimed for this documentation-only P.
+Frozen frontier advances to 425/472, next file 426 base/video/v7_ports.c.
+S1, T100, existing owner decisions and original-defect entries remain open.

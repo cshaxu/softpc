@@ -30,7 +30,9 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P127 completes file 424 gfx_updt.c original-first minimization.
+T100 S1 P128 completes file 425 gvi.c: selected contents match fixed XP.
+No production/test/artifact changes; P127 remains the verified build baseline.
+P127 completed file 424 gfx_updt.c original-first minimization.
 Production +9/-34, test +70/-0; XP-relative difference decreases 33 lines.
 Both final cached builds/publications and VGA fixtures pass, with 188/188
 background CTest cases per architecture. Native coverage is 7/8 via CTest per
@@ -38,8 +40,8 @@ width plus the unchanged Console test passing in an explicit hidden Console
 process on each width. Default CTest Console startup still has an initial
 geometry limitation; it is documented, not falsely counted as repaired.
 No shared-component or user-asset changes. R0530-R0535 and other qualified
-owner decisions remain open, as do D001-D006 and L001. Frontier 424/472;
-next frozen file 425 base/video/gvi.c. S1 remains active; no routine approval
+owner decisions remain open, as do D001-D006 and L001. Frontier 425/472;
+next frozen file 426 base/video/v7_ports.c. S1 remains active; no routine approval
 is awaited. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
