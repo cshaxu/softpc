@@ -11953,3 +11953,38 @@ contain no warning/error lines. All owned probe and qualification processes
 were confirmed exited, their bounded evidence promoted, and disposable task
 scratch removed. Build residue checks pass; reusable caches remain. No skipped
 native tests or unrelated worktree changes are hidden by this delivery.
+
+## P160 reconciliation: inventory and delivery integrity
+
+This is a bounded accounting check at source delivery
+0722fb2ca998cdaa6bbcae7cd47aa518cb9dd95f, not approval of residuals or S1 closure.
+
+- All 472 frozen order/path/initial-hash triples equal the first committed
+  inventory at P1 7494ca3b9b8496a2f3abb943657eab754ffc42e5. Orders are exactly
+  1 through 472 and paths are unique. The current git-tracked mirror path set
+  equals that inventory: no unrecorded addition, deletion or order change.
+- Git history after the admitted starting baseline contains every P1-P159
+  delivery identifier. Presence establishes delivery traceability, not the
+  correctness of every historical claim.
+- Searching the progress report AND its m9-t100 supporting records finds all
+  R0001-R0686 identifiers. R0390-R0392 were absent from the main narrative but
+  present in sevid026's original point map; no new IDs or exclusion records
+  are created. Identifiers count audit groups, not current surviving hunks.
+- P58 6417136c480d1076770412eeabbfa4afd23f7aa0 covers those three groups:
+  R0390 GDP mapping remains qualified pending owner decision; R0391's 25
+  address expressions were restored; R0392 restores malloc in 22 allocations
+  while retaining native capacity and ten mixed-width zero initializations
+  pending owner decision. The initial map has 483/25/32 ranges respectively.
+  Its 540 stale "pending actual-body proof" cells now point to the existing
+  final P58 evidence; original ranges and point assignments are unchanged.
+  P58's combined negative control is not individual dynamic proof of every
+  retained allocation. The separate allocation inventory preserves that limit.
+- Current published executable byte hashes equal the P159 final qualification
+  hashes recorded above. No executable source or test changed in this
+  reconciliation; the final-source 392/392 evidence remains applicable.
+
+Remaining reconciliation must resolve each point's latest disposition and
+reviewable evidence, including mixed restored/pending groups, D001-D006 and
+L001. Historical provisional wording does not override later qualification;
+qualification does not mean owner approval. This check neither proves every
+residual necessary nor closes unresolved design or original-defect decisions.
