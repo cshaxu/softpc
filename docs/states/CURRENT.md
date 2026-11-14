@@ -30,15 +30,15 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P153 restores original nt_sb.c declarations, independent functions,
-port-handler structure and formatting. Production +415/-37; selected XP diff
-falls by 412 lines (940 to 528). Both architectures pass the full 392-test
-qualification, including native audio/desktop/package tests. Corrected private
-snapshot/cancellation probes pass; controlled withdrawals fail their assertions.
-R0627-R0639 record restorations and qualified residual owner decisions.
-Frontier 462/472; next host/src/nt_sbdsp.c. Ten files and qualified owner
+T100 S1 P154 restores original nt_sbdsp.c bodies, declarations, diagnostics
+and structure. Production +1257/-341; tests +2/-0; XP diff falls by 1628 lines.
+Both architectures pass all 392 tests, followed by the added active-DMA pause
+regression on both widths. A corrected actual-body negative establishes why
+PauseDMA's original native query remains omitted; the earlier prototype-only
+probe claim is withdrawn. R0640-R0656 record qualified residual owner decisions.
+Frontier 463/472; next host/src/nt_sbfm.c. Nine files and qualified owner
 decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-462-hostsrcnt_sbc-p153).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#file-463-hostsrcnt_sbdspc-p154).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

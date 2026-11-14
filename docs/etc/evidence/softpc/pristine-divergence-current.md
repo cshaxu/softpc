@@ -2475,3 +2475,14 @@ R0627-R0639, with dual-width compilation/withdrawal/boundary evidence. Full
 qualification passes 392/392 including native suites. No second audio path is
 activated; provider internals remain later files in the frozen order.
 See [ordered evidence](m9-t100-progress.md#file-462-hostsrcnt_sbc-p153).
+
+
+T100 S1 P154 restores nt_sbdsp.c original independent function bodies, declarations,
+diagnostics and structure: 1628 fewer XP diff lines, production +1257/-341,
+tests +2/-0. R0640-R0656 retain only evidence-qualified owner decisions.
+The actual original PauseDMA native query fails the active Single-DMA pause
+fixture on both widths because production does not initialize GetPositionProc;
+current passes. The earlier prototype-only restoration claim is withdrawn.
+All 392 final-source tests and the added two-width regression pass. No second
+native audio owner is activated; no guest binary is changed.
+See [ordered evidence](m9-t100-progress.md#file-463-hostsrcnt_sbdspc-p154).

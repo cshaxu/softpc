@@ -8,44 +8,126 @@
 *        DSP 2.01+ (excluding SB-MIDI port)
 *
 ***************************************************************************/
-/* Declare the host PCM contract before the original core's const macro. */
 #include "compat/sb_pcm.h"
+#include <windows.h>
 #include "insignia.h"
 #include "host_def.h"
+#include "ios.h"
+#include "ica.h"
 #include "xt.h"
 #include "dma.h"
 #include "sas.h"
 #include "sndblst.h"
 #include "nt_sb.h"
-#include "ica.h"
 #include "compat/eoi.h"
 #include "quick_ev.h"
 #include "compat/devices/snapshot.h"
 
-IU32           TimeConstant = 0xA6;    // one byte format
+/*****************************************************************************
+*
+*    Globals
+*
+*****************************************************************************/
+
+BYTE            IdentByte;              // used with DSP_CARD_IDENTIFY
+BYTE            ReservedRegister;       // used with DSP_LOAD_RES_REG and DSP_READ_RES_REG
+ULONG           PageSize = 0;           // size of pages for VirtualAlloc
+RTL_CRITICAL_SECTION  DspLock;
+
+#define LockDsp()    RtlEnterCriticalSection(&DspLock)
+#define UnlockDsp()  RtlLeaveCriticalSection(&DspLock)
+
+//
+// Event Globals
+//
+
+HANDLE          DspWaveSem;          // used by app to indicate data to write
+HANDLE          ThreadStarted;          // signalled when thread starts running
+HANDLE          ThreadFinished;         // signalled when thread exits
+HANDLE          DspResetEvent;
+HANDLE          DspResetDone;
+HANDLE          DspWavePlayed;
+
+//
+// Wave globals
+//
+
+UINT            WaveOutDevice;          // device identifier for open and close devices
+HWAVEOUT        HWaveOut = NULL;        // the current open wave output device
+PCMWAVEFORMAT   WaveFormat = { { WAVE_FORMAT_PCM, 1, 0, 0, 1}, 8};
+DWORD           TimeConstant = 0xA6;    // one byte format
+DWORD           SBBlockSize = 0x7ff;    // Block size set by apps, always size of transfer-1
+
+WAVEHDR         *WaveHdrs;              // pointer to allocated wave headers
+ULONG           *WaveBlockSizes;
+ULONG           BurstSize;
+
+BOOL            bDspActive = FALSE;     // dsp thread currently active
+BOOL            bDspPaused = FALSE;     // dsp paused
+BOOL            SbAnswerDMAPosition = FALSE;
+BOOL            bWriteBurstStarted = FALSE;
+
+//
+// To keep track of the waveout volume changes.  So we can restore the volume
+// when closing the waveout device.
+//
+
+DWORD           OriginalWaveVol;
+DWORD           PreviousWaveVol;
+
+//
+// bExitThread - terminate DSP DMA thread. This responses to REAL reset cmd.  TO
+//               terminate DSP DMA thread, the bDspReset flag should also be set.
+// bDspReset - Indicates Dsp reset cmd is received.  In case that reset is used to
+//             exit high speed mode the bExitThread will not be set.
+//
+BOOL            bExitDMAThread= FALSE;  // Exit DSP DMA thread flag
+BOOL            bDspReset = FALSE;
+BOOL            bExitAuto = FALSE;
+BOOL            bHighSpeedMode = FALSE; // Are we in High Speed transfer mode?
+
+ULONG           DspNextRead;
+ULONG           DspNextWrite;
+ULONG           DspBufferTotalBursts;
+ULONG           DspBufferSize;
+
+//
+// The following variables maintain the real sound WaveOutPosition while playing
+// a SBBlockSize samples.  It gets reset on every SBBlockSize sample.
+//
+
+ULONG           StartingWaveOutPos, PreviousWaveOutPos, NextWaveOutPos;
+USHORT          StartingDmaAddr, StartingDmaCount;
+
+//
+// records # of dma queries made by app while playing a SBBlockSize samples.
+// it helps up figuring out how much, on average, the sample played between
+// dam queries.
+//
+
+ULONG           DspNumberDmaQueries;
+ULONG           DspVirtualInc, DspVirtualIncx;
+
+//
+// Determine how much samples can be ignored per SBBlockSize samples.
+//
+
+ULONG           EndingDmaValue;
+
+//
+// DMA globals to speed up dma update
+//
+
+VDD_DMA_INFO DmaInfo;
 
 DMA_ADAPT    *pDmaAdp;
 DMA_CNTRL    *pDcp;
-IU16         Chan;
+WORD         Chan;
 
-IU8            IdentByte;              // used with DSP_CARD_IDENTIFY
-IU8            ReservedRegister;       // used with DSP_LOAD_RES_REG and DSP_READ_RES_REG
-IU32           SBBlockSize = 0x7ff;    // Block size set by apps, always size of transfer-1
-IBOOL            bDspActive = FALSE;     // dsp thread currently active
-IBOOL            bDspPaused = FALSE;     // dsp paused
-IBOOL            SbAnswerDMAPosition = FALSE;
-IBOOL            bWriteBurstStarted = FALSE;
-IBOOL            bExitDMAThread= FALSE;  // Exit DSP DMA thread flag
-IBOOL            bDspReset = FALSE;
-IBOOL            bExitAuto = FALSE;
-BOOL            bHighSpeedMode = FALSE; // Are we in High Speed transfer mode?
+#define COMPUTE_INTERRUPT_DELAY(sb)   (1000 * (sb + 1) / WaveFormat.wf.nAvgBytesPerSec + 1)
+
 DSP_MODE DspMode;
-IU32 PreviousWaveOutPos;
-IU16 StartingDmaAddr, StartingDmaCount;
-IU32 DspNumberDmaQueries, DspVirtualInc;
-VDD_DMA_INFO DmaInfo;
-/* T93: copied guest block replaces native WaveHdr storage. Only the executor
- * advances its accepted prefix; DMA progress remains the original controller. */
+
 static IU8 DspBuffer[65536];
 static IU32 DspTransferSize, DspTransferQueued, DspTransferConsumed;
 static q_ev_handle DspCompletionEvent;
@@ -58,27 +140,20 @@ static IU32 DspOutputRate;
 static IBOOL DspSpeakerEnabled = TRUE;
 static IBOOL DspEoiRegistered;
 static IBOOL DspOutputSuspended;
-/* T93: parser-owned partial commands must survive a portable capture. */
-static IU32 blockSize;
-static IU8 TableMungeData;
-static IBOOL TableMungeFirstByte = TRUE;
+static DWORD blockSize;
+static BYTE TableMungeData;
+static BOOL TableMungeFirstByte = TRUE; // munging first or second byte
 static void DspCompleteBlock(long unused);
 static void AutoInitEoiHook(int irq, int count);
 
-static void ExitAutoMode(void)
-{
-    DspMode = None;
-    bExitAuto = FALSE;
-    if (DspEoiRegistered) {
-        RemoveEOIHook(SbInterrupt, AutoInitEoiHook);
-        DspEoiRegistered = FALSE;
-    }
-}
+VOID
+ExitAutoMode(
+    VOID
+    );
 
 void StopDspTransfer(IBOOL reset)
 {
     lib_status status;
-    /* Remove the owner before PIC withdrawal can invoke its EOI callback. */
     ExitAutoMode();
     DspCancelTransfer();
     host_DelayHwInterrupt(SbInterrupt, 0, 0xfffffffful);
@@ -98,7 +173,6 @@ lib_status DspGetStatus(void)
 lib_status DspServiceTransfer(void)
 {
     if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
-    /* T95: returning host capacity must not resume a guest-paused DMA block. */
     if (DspOutputSuspended || bDspPaused || !bDspActive || DspTransferSize == 0 || DspCompletionEvent != 0)
         return LIB_STATUS_OK;
     DspTransferStatus = DspProcessBlock();
@@ -133,7 +207,6 @@ IBOOL StartDspTransfer(DSP_MODE mode)
     bDspActive = TRUE;
     bDspPaused = FALSE;
     DspMode = mode;
-    /* A masked or exhausted DMA channel supplies no block, as in XP. */
     if (DmaDataToDsp(mode)) return DspServiceTransfer() == LIB_STATUS_OK;
     return TRUE;
 }
@@ -148,8 +221,6 @@ static void AutoInitEoiHook(int irq, int count)
         DspServiceTransfer();
 }
 
-/* T93: retain one output owner and the current format, replacing WaveOut's
- * handle/format and device-wide volume with a stream-local PCM contract. */
 lib_status DspCloseOutput(void)
 {
     lib_status status = softpc_sb_pcm_close();
@@ -161,8 +232,6 @@ lib_status DspCloseOutput(void)
     return status;
 }
 
-/* T93: only the executor parks this device. Keep the frozen guest block;
- * inactive host output discards samples, not guest DMA/IRQ obligations. */
 void DspSetRunning(IBOOL running)
 {
     lib_audio_pcm_progress progress;
@@ -207,7 +276,6 @@ lib_status DspPrepareOutput(void)
     if (rate == 0) return LIB_STATUS_INVALID_STATE;
     if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
     if (rate != DspOutputRate) {
-        /* Also resolves a retained resource from a failed host open. */
         status = DspCloseOutput();
         if (status != LIB_STATUS_OK) return status;
         status = softpc_sb_pcm_open(rate, MixerGetVoiceGain());
@@ -231,13 +299,6 @@ void SbApplyMixer(void)
             DspSpeakerEnabled ? MixerGetVoiceGain() : 0);
 }
 
-void SetSpeaker(BOOL on)
-{
-    /* XP ignores speaker commands until an output device exists. */
-    if (DspOutputRate == 0) return;
-    DspSpeakerEnabled = on;
-    SbApplyMixer();
-}
 
 static lib_status DspScheduleCompletion(IU32 samples_minus_one)
 {
@@ -301,8 +362,6 @@ static void DspCompleteBlock(long unused)
         DspTransferStatus = LIB_STATUS_INVALID_STATE;
         return;
     }
-    /* Original timeout policy: physical lag matters when DMA was queried.
-     * Clamp to this copied range, not a different stream epoch or block. */
     if (PreviousWaveOutPos != 0) {
         played = progress.consumed_frames > DspHostOrigin ?
             progress.consumed_frames - DspHostOrigin : 0;
@@ -347,12 +406,10 @@ IBOOL DmaDataToDsp(DSP_MODE mode)
     bWriteBurstStarted = FALSE;
     address = StartingDmaAddr;
     for (i = 0; i < DspTransferSize; ++i) {
-        /* T94: DMA addresses are physical, independent of guest paging. */
         sas_PRS(dma_system_address(SbDmaChannel, DmaInfo.page, address), &DspBuffer[i], 1);
         address = (IU16)(address + ((DmaInfo.mode & 0x20) ? -1 : 1));
     }
 
-    /* Original DspProcessBlock query-count adaptation, before host submission. */
     if (DspNumberDmaQueries == 0) {
         DspVirtualInc = DspTransferSize >> 4;
     } else {
@@ -364,6 +421,10 @@ IBOOL DmaDataToDsp(DSP_MODE mode)
             DspVirtualInc = DspTransferSize / 4;
         }
     }
+    DspVirtualIncx = DspVirtualInc;     // remember the original virtual incr in case we
+                                        // need to fall back to original value.
+
+    dprintf3(("NoQ = %x, Inc = %x\n", DspNumberDmaQueries, DspVirtualInc));
     DspNumberDmaQueries = 0;
     return TRUE;
 }
@@ -419,7 +480,7 @@ enum {
     BlockSizeSecondByteWrite,
     BlockSizeFirstByteRead,
     BlockSizeSecondByteRead,
-    UnsupportedMidiByte,
+    MidiOutPoll,
     UnsupportedMidiUart
 }
 DSPWriteState = WriteCommand; // state of current command/data being written
@@ -438,8 +499,102 @@ enum {
 }
 DSPReadState = NothingToRead; // state of current command/data being read
 
-/* T93: archive only device values. Native counters are reduced to the consumed
- * prefix of the frozen block; restoration starts a new paused host output. */
+//
+// Wave function prototypes
+//
+
+BOOL
+OpenWaveDevice(
+    DWORD
+    );
+
+VOID
+ResetWaveDevice(
+    VOID
+    );
+
+VOID
+CloseWaveDevice(
+    VOID
+    );
+
+BOOL
+TestWaveFormat(
+    DWORD sampleRate
+    );
+
+BOOL
+SetWaveFormat(
+    VOID
+    );
+
+VOID
+WaitOnWaveOutIdle(
+    VOID
+    );
+
+VOID
+PrepareHeaders(
+    VOID
+    );
+
+VOID
+UnprepareHeaders(
+    VOID
+    );
+
+VOID
+PauseDMA(
+    VOID
+    );
+
+VOID
+ContinueDMA(
+    VOID
+    );
+
+ULONG
+GetDMATransferAddress(
+    VOID
+    );
+
+BOOL
+QueryDMA(
+    PVDD_DMA_INFO pDmaInfo
+    );
+
+BOOL
+SetDMACountAddr(
+    PVDD_DMA_INFO pDmaInfo
+    );
+
+VOID
+SetDMAStatus(
+    PVDD_DMA_INFO pDmaInfo,
+    BOOL requesting,
+    BOOL tc
+    );
+
+BOOL
+StartDspDmaThread(
+    DSP_MODE mode
+    );
+
+VOID
+StopDspDmaThread(
+    BOOL wait
+    );
+
+DWORD WINAPI
+DspThreadEntry(
+    LPVOID context
+    );
+
+BOOL
+GetWaveOutPosition(
+    PULONG pPos
+    );
+
 int softpc_device_snapshot_capture_sb_dsp(softpc_device_sb_dsp_state *state)
 {
     lib_audio_pcm_progress progress;
@@ -513,8 +668,6 @@ int softpc_device_snapshot_restore_sb_dsp(const softpc_device_sb_dsp_state *stat
         state->bExitAuto > 1 || state->bHighSpeedMode > 1 ||
         state->DspSpeakerEnabled > 1 || state->DspEoiRegistered > 1 ||
         (state->DspEoiRegistered && state->DspMode != Auto)) return FALSE;
-    /* The archive prepares old output before restoring PIC and event queues.
-     * Retire only this saved host-progress event from the restored queue. */
     if (state->DspCompletionEvent)
         delete_q_event((q_ev_handle)state->DspCompletionEvent);
     TimeConstant = state->TimeConstant;
@@ -588,146 +741,7 @@ Q_CALLBACK_FN softpc_device_snapshot_decode_sb_callback(unsigned long callback_i
     return callback_id == SOFTPC_DEVICE_QUEUE_SB_COMPLETION ? DspCompleteBlock : NULL;
 }
 
-void
-GenerateInterrupt(
-    IU32 delay
-    )
 
-/*++
-
-Routine Description:
-
-    This function generates device interrupt on dma channel SM_INTERRUPT
-    on ICA_MASTER device.  The interrupt will be dispatched before the control
-    returns to the emulation thread.
-
-Arguments:
-
-    delay - specifies the delay to generate delayed interrupt.
-
-Return Value:
-
-    None.
-
---*/
-
-{
-    //
-    // Generate an interrupt on the master controller
-    //
-
-    if (delay == 0) {
-        ica_hw_interrupt(ICA_MASTER, SbInterrupt, 1);
-    } else {
-        host_DelayHwInterrupt(SbInterrupt, 1, delay * 1000);
-    }
-}
-
-void
-SbGetDMAPosition(
-    void
-    )
-
-/*++
-
-Routine Description:
-
-    This function is the handler for the SB DMA position IO read instruction.  It
-    maintains s real waveout position by calling MM api to get the current play back
-    position.  It also maintains a virtual waveout position to simulate sound playing
-    position in case real sound is not played or too slow.
-
-Arguments:
-
-    None.
-
-Return Value:
-
-    None.
-
---*/
-
-{
-    IU32 offset;       // virtual progress within the current DMA block
-
-    /* T93: this runs on the executor; an unsubmitted block cannot spin here. */
-    if (bDspActive && SbAnswerDMAPosition && bWriteBurstStarted) {
-        DspNumberDmaQueries++;
-        /* T93: distance is modulo the 16-bit address, in DMA direction. */
-        offset = (IU16)((DmaInfo.mode & 0x20) ?
-            StartingDmaAddr - DmaInfo.addr : DmaInfo.addr - StartingDmaAddr);
-        offset += DspVirtualInc;
-        if (SBBlockSize < 0x400) {
-
-            //
-            // If block size is smal, do not call GetWaveOutPosition and
-            // do not update PreviousWaveOutPos .
-            //
-
-            if (offset < (SBBlockSize * 3 / 4)) {
-                if (DmaInfo.mode & 0x20)
-                    DmaInfo.addr -= (IU16)DspVirtualInc;
-                else
-                    DmaInfo.addr += (IU16)DspVirtualInc;
-                DmaInfo.count -= (IU16)DspVirtualInc;
-                SetDMACountAddr(&DmaInfo);
-            }
-            return;
-        }
-#if 1
-#line 2184
-        if (DspMode == Single) {
-            PreviousWaveOutPos++;
-        }
-
-
-        //
-        // The algorithm used here is weird but it seems to work.
-        // We will come back and revise it later.
-        //
-
-        //
-        // Virtual sound is approaching to the end.  Slow down
-        //
-
-        if (offset >= (SBBlockSize - 0x50)) {
-            DspVirtualInc = 2;
-        }
-
-        //
-        // Put a limit so we don't overflow the virtual sound position
-        //
-
-        if (offset >= SBBlockSize - 0x8) {
-            offset = SBBlockSize - 0x8;
-        }
-
-#line 2218
-#if DESCENT
-#error "Unsupported SoftPC mirror configuration: DESCENT"
-#endif
-#line 2232
-#endif
-#line 2233
-#if 0
-#error "Unsupported SoftPC mirror configuration: constant false"
-#endif
-#line 2270
-        //
-        // Now update the dma controller with our emulation/real position
-        //
-
-        DmaInfo.addr = (DmaInfo.mode & 0x20) ?
-            StartingDmaAddr - (IU16)offset : StartingDmaAddr + (IU16)offset;
-        DmaInfo.count = StartingDmaCount - (IU16)offset;
-
-        SetDMACountAddr(&DmaInfo);
-
-
-    }
-}
-
-/* T93: keep the original controller owner; no VDD handle or host pointer. */
 IBOOL SbInitializeDMA(void)
 {
     if (SbDmaChannel >= DMA_CONTROLLER_CHANNELS) return FALSE;
@@ -737,9 +751,9 @@ IBOOL SbInitializeDMA(void)
     return TRUE;
 }
 
-void
+VOID
 DspReadStatus(
-    IU8 * data
+    BYTE * data
     )
 
 /*++
@@ -767,9 +781,9 @@ Return Value:
     *data = DSPReadState != NothingToRead ? 0xFF : 0x7F;
 }
 
-void
+VOID
 DspReadData(
-    IU8 * data
+    BYTE * data
     )
 
 /*++
@@ -798,37 +812,42 @@ Return Value:
     case Reset:
         *data = 0xAA;
         DSPReadState = NothingToRead;
+        dprintf0(("rd Reset"));
         break;
 
     case FirstVersionByte:
-        *data = (IU8)(SB_VERSION / 256);
+        *data = (BYTE)(SB_VERSION / 256);
         DSPReadState = SecondVersionByte;
+        dprintf0(("rd 1st Version"));
         break;
 
     case SecondVersionByte:
-        *data = (IU8)(SB_VERSION % 256);
+        *data = (BYTE)(SB_VERSION % 256);
         DSPReadState = NothingToRead;
+        dprintf0(("rd 2nd Version"));
         break;
 
     case ReadIdent:
         *data = ~IdentByte;
         DSPReadState = NothingToRead;
+        dprintf0(("rd Id"));
         break;
 
     case ReadResReg:
         *data = ReservedRegister;
         DSPReadState = NothingToRead;
+        dprintf0(("rd RsvdReg"));
         break;
 
     default:
-        break;
+        dprintf1(("Unrecognized read state"));
     }
 
 }
 
-void
+VOID
 DspResetWrite(
-    IU8 data
+    BYTE data
     )
 
 /*++
@@ -866,9 +885,9 @@ Return Value:
     }
 }
 
-void
+VOID
 DspWrite(
-    IU8 data
+    BYTE data
     )
 
 /*++
@@ -890,10 +909,12 @@ Return Value:
 {
     switch (DSPWriteState) {
     case WriteCommand:
+        dprintf0(("wt CMD"));
         WriteCommandByte(data);
         break;
 
-    case UnsupportedMidiByte:
+    case MidiOutPoll:
+        dprintf0(("wt MIDI Byte"));
         DSPWriteState = WriteCommand;
         break;
 
@@ -901,46 +922,58 @@ Return Value:
         break;
 
     case CardIdent:
+        dprintf0(("wt ID"));
         IdentByte = data;
         DSPReadState = ReadIdent;
         DSPWriteState = WriteCommand;
         break;
 
     case TableMunge:
+        dprintf0(("wt TblMunge"));
         TableMunger(data);
         DSPWriteState = WriteCommand;
         break;
 
     case LoadResReg:
+        dprintf0(("wt RsvReg"));
         ReservedRegister = data;
         DSPWriteState = WriteCommand;
         break;
 
     case SetTimeConstant:
-        TimeConstant =  (IU32)data;
+        dprintf0(("wr TmCnst"));
+        TimeConstant =  (DWORD)data;
+        dprintf2(("Time constant is %X", TimeConstant));
+        dprintf2(("Set sampling rate %d", GetSamplingRate()));
         DSPWriteState = WriteCommand;
         break;
 
     case BlockSizeFirstByte:
-        blockSize = (IU32)data;
+        dprintf0(("wt 1st Blksize"));
+        blockSize = (DWORD)data;
         DSPWriteState = BlockSizeSecondByte;
         break;
 
     case BlockSizeSecondByte:
-        SBBlockSize = blockSize + (((IU32)data) << 8);
+        dprintf0(("wt 2nd Blksize"));
+        SBBlockSize = blockSize + (((DWORD)data) << 8);
 
         DSPWriteState = WriteCommand;
+        dprintf2(("Block size = 0x%x", SBBlockSize));
         break;
 
     case BlockSizeFirstByteWrite:
-        blockSize = (IU32)data;
+        dprintf0(("wt 1st Blksize single"));
+        blockSize = (DWORD)data;
         DSPWriteState = BlockSizeSecondByteWrite;
         break;
 
     case BlockSizeSecondByteWrite:
-        SBBlockSize = blockSize + (((IU32)data) << 8);
+        dprintf0(("wt 2nd Blksize single"));
+        SBBlockSize = blockSize + (((DWORD)data) << 8);
 
         DSPWriteState = WriteCommand;
+        dprintf2(("Block size = 0x%x, Single Cycle starting", SBBlockSize));
         if (SBBlockSize <= 0x10) {
 
             //
@@ -951,12 +984,11 @@ Return Value:
                 VDD_DMA_INFO dmaInfo;
 
                 QueryDMA(&dmaInfo);
-                dmaInfo.count -= (IU16)(SBBlockSize + 1);
-                /* T93: honor the existing controller's decrement bit. */
+                dmaInfo.count -= (WORD)(SBBlockSize + 1);
                 if (dmaInfo.mode & 0x20)
-                    dmaInfo.addr -= (IU16)(SBBlockSize + 1);
+                    dmaInfo.addr -= (WORD)(SBBlockSize + 1);
                 else
-                    dmaInfo.addr += (IU16)(SBBlockSize + 1);
+                    dmaInfo.addr += (WORD)(SBBlockSize + 1);
 
                 SetDMACountAddr(&dmaInfo);
 
@@ -971,20 +1003,23 @@ Return Value:
         break;
 
     case BlockSizeFirstByteRead:
-        blockSize = (IU32)data;
+        dprintf0(("wt 1st IN Blksize"));
+        blockSize = (DWORD)data;
         DSPWriteState = BlockSizeSecondByteRead;
         break;
 
     case BlockSizeSecondByteRead:
-        SBBlockSize = blockSize + (((IU32)data) << 8);
+        dprintf0(("wt 2nd IN Blksize"));
+        SBBlockSize = blockSize + (((DWORD)data) << 8);
 
         DSPWriteState = WriteCommand;
+        dprintf2(("IN Blksize set to 0x%x", SBBlockSize));
         // this is a hack to convince some apps a sb exists
         if (SBBlockSize <= 0x10) {
-            IU32 dMAPhysicalAddress;
+            ULONG dMAPhysicalAddress;
 
             if ((dMAPhysicalAddress=GetDMATransferAddress()) != -1L) {
-                IU8 silence = 0x80;
+                BYTE silence = 0x80;
                 sas_PWS(dMAPhysicalAddress, &silence, 1);
             }
             GenerateInterrupt(2);
@@ -992,14 +1027,41 @@ Return Value:
         // NOt implemented
         break;
 
-    default:
+    case MIDI_READ_POLL:
+    case MIDI_READ_INTERRUPT:
+    case MIDI_READ_TIMESTAMP_POLL:
+    case MIDI_READ_TIMESTAMP_INTERRUPT:
+        //
+        // These commands we will never return anything for since
+        // we have nothing to get MIDI data from.  We simply
+        // accept the command, but never respond - as if there
+        // were no MIDI hardware connected to a real SB.
+        // Since we never respond, we don't have to handle
+        // the interrupt or timestamp versions differently.
+        //
+        dprintf2(("Cmd-Midi non UART read"));
         break;
+
+    case MIDI_READ_POLL_WRITE_POLL_UART:
+    case MIDI_READ_INTERRUPT_WRITE_POLL_UART:
+    case MIDI_READ_TIMESTAMP_INTERRUPT_WRITE_POLL_UART:
+        dprintf2(("Cmd-Midi UART I/O xxx"));
+        break;
+
+    case MIDI_WRITE_POLL:
+        // Specifies that next byte will be a Midi out data
+        dprintf2(("Cmd-MIDI out poll"));
+        DSPWriteState = MidiOutPoll;
+        break;
+
+    default:
+        dprintf1(("Unrecognized DSP write state %x", DSPWriteState));
     }
 }
 
-void
+VOID
 WriteCommandByte(
-    IU8 command
+    BYTE command
     )
 
 /*++
@@ -1021,9 +1083,8 @@ Return Value:
 
 {
     switch (command) {
-    /* T99 S11: consume unsupported MIDI framing, never PCM commands. */
     case MIDI_WRITE_POLL:
-        DSPWriteState = UnsupportedMidiByte;
+        DSPWriteState = MidiOutPoll;
         break;
 
     case MIDI_READ_POLL_WRITE_POLL_UART:
@@ -1034,68 +1095,84 @@ Return Value:
         break;
 
     case DSP_GET_VERSION:
+        dprintf2(("Cmd-GetVer"));
         DSPReadState = FirstVersionByte;
         break;
 
     case DSP_CARD_IDENTIFY:
+        dprintf2(("Cmd-Id"));
         DSPWriteState = CardIdent;
         break;
 
     case DSP_TABLE_MUNGE:
+        dprintf2(("Cmd-Table Munge"));
         DSPWriteState = TableMunge;
         break;
 
     case DSP_LOAD_RES_REG:
+        dprintf2(("Cmd-Wt Res Reg"));
         DSPWriteState = LoadResReg;
         break;
 
     case DSP_READ_RES_REG:
+        dprintf2(("Cmd-Rd Res Reg"));
         DSPReadState = ReadResReg;
         break;
 
     case DSP_GENERATE_INT:
+        dprintf2(("Cmd-GenerateInterrupt"));
         GenerateInterrupt(1);
         break;
 
     case DSP_SPEAKER_ON:
+        dprintf2(("Cmd-Speaker ON"));
         SetSpeaker(TRUE);
         break;
 
     case DSP_SPEAKER_OFF:
+        dprintf2(("Cmd-Speaker OFF"));
         SetSpeaker(FALSE);
         break;
 
     case DSP_SET_SAMPLE_RATE:
+        dprintf2(("Cmd-Set Sample Rate"));
         DSPWriteState = SetTimeConstant;
         break;
 
     case DSP_SET_BLOCK_SIZE:
+        dprintf2(("Cmd-Set Block Size"));
         DSPWriteState =  BlockSizeFirstByte;
         break;
 
     case DSP_PAUSE_DMA:
+        dprintf2(("Cmd-Pause DMA"));
         PauseDMA();
         break;
 
     case DSP_CONTINUE_DMA:
+        dprintf2(("Cmd - Continue DMA"));
         ContinueDMA();
         break;
 
     case DSP_STOP_AUTO:
+        dprintf2(("Cmd- Exit Auto-Init"));
         bExitAuto = TRUE;
         //ExitAutoMode();
         break;
 
     case DSP_WRITE:
+        dprintf2(("Cmd- DSP OUT"));
         DSPWriteState = BlockSizeFirstByteWrite;
         break;
 
     case DSP_WRITE_HS:
+        dprintf2(("Cmd- DSP HS OUT"));
         bHighSpeedMode = TRUE;
         StartDspTransfer(Single);
         break;
 
     case DSP_WRITE_AUTO:
+        dprintf2(("Cmd-DSP OUT Auto"));
         if (SBBlockSize <= 0x10) {
 
             //
@@ -1106,12 +1183,11 @@ Return Value:
                 VDD_DMA_INFO dmaInfo;
 
                 QueryDMA(&dmaInfo);
-                dmaInfo.count -= (IU16)(SBBlockSize + 1);
-                /* T93: honor the existing controller's decrement bit. */
+                dmaInfo.count -= (WORD)(SBBlockSize + 1);
                 if (dmaInfo.mode & 0x20)
-                    dmaInfo.addr -= (IU16)(SBBlockSize + 1);
+                    dmaInfo.addr -= (WORD)(SBBlockSize + 1);
                 else
-                    dmaInfo.addr += (IU16)(SBBlockSize + 1);
+                    dmaInfo.addr += (WORD)(SBBlockSize + 1);
 
                 SetDMACountAddr(&dmaInfo);
 
@@ -1126,42 +1202,98 @@ Return Value:
         break;
 
     case DSP_WRITE_HS_AUTO:
+        dprintf2(("Cmd-DSP HS OUT AUTO"));
         bHighSpeedMode = TRUE;
         StartDspTransfer(Auto);
         break;
 
     case DSP_READ:
+        dprintf2(("Cmd- DSP IN - non Auto"));
         DSPWriteState = BlockSizeFirstByteRead;
         break;
 
     default:
-        break;
+        dprintf2(("Unrecognized DSP command %2X", command));
     }
 }
-/* T93: the existing executor stops the transfer; native worker/event
- * ownership remains in Lib. Keep the original ordinary/high-speed reset split. */
-void ResetDSP(void)
+
+VOID
+ResetDSP(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function handles DSP reset command. It resets
+    threads/globals/events/state-machines to initial state.
+
+Arguments:
+
+    command - supplies command.
+
+Return Value:
+
+    None.
+
+--*/
+
 {
     StopDspTransfer(bExitDMAThread);
+
     if (bExitDMAThread) {
-        TimeConstant = 0xA6;
+
+        //
+        // if this is a real RESET command, not just reset to exit HighSpeed mode
+        //
+
+        //
+        // Stop any active DMA threads.  Need to wait till the thread exit.
+        //
+
+
+        //
+        // Set events and globals to initial state
+        //
+
+
+        HWaveOut = NULL;
+        TimeConstant = 0xA6;   //(256 - 1000000/11025)
+        WaveFormat.wf.nSamplesPerSec = 0;
+        WaveFormat.wf.nAvgBytesPerSec = 0;
+
         bDspActive = FALSE;
-        bExitDMAThread = FALSE;
+        bExitDMAThread= FALSE;
     }
+
     DspMode = None;
     SBBlockSize = 0x7ff;
+    DspNextRead = DspBufferTotalBursts - 1;
+    DspNextWrite = 0;
     bDspPaused = FALSE;
     bDspReset = FALSE;
+    NextWaveOutPos = 0;
+
+    //
+    // Reset state machines
+    //
+
     DSPReadState = Reset;
     DSPWriteState = WriteCommand;
     ResetState = ResetNotStarted;
+
+    //
+    // To start accept command again.
+    //
+
     SbAnswerDMAPosition = FALSE;
     bHighSpeedMode = FALSE;
 }
 
-void
+VOID
 TableMunger(
-    IU8 data
+    BYTE data
     )
 
 /*++
@@ -1182,11 +1314,12 @@ Return Value:
 --*/
 
 {
-    IU8 comp, dataCopy;
+    BYTE comp, dataCopy;
     VDD_DMA_INFO dMAInfo;
-    IU32 dMAPhysicalAddress;
+    ULONG dMAPhysicalAddress;
 
     if (TableMungeFirstByte) {
+        dprintf3(("Munging first byte"));
         dataCopy = data;
         dataCopy = dataCopy & 0x06;
         dataCopy = dataCopy << 1;
@@ -1200,7 +1333,9 @@ Return Value:
         TableMungeData = data;
 
         // Update memory (code table) with munged data
+        dprintf3(("Writing first byte"));
         if ((dMAPhysicalAddress=GetDMATransferAddress()) == -1L) {
+            dprintf1(("Unable to get dma address"));
             return;
         }
         sas_PWS(dMAPhysicalAddress, &data, 1);
@@ -1208,17 +1343,19 @@ Return Value:
         // Update virtual DMA status
         QueryDMA(&dMAInfo);
         dMAInfo.count = dMAInfo.count - 1;
-        /* T93: this transfer obeys the same controller direction as PCM. */
         dMAInfo.addr += (dMAInfo.mode & 0x20) ? -1 : 1;
         SetDMACountAddr(&dMAInfo);
         TableMungeFirstByte = FALSE;
     } else {
+        dprintf3(("Munging second byte"));
         data = data ^ 0xA5;
         data = data + TableMungeData;
         TableMungeData = data;
 
         // Update memory (code table) with munged data
+        dprintf3(("Writing second byte"));
         if ((dMAPhysicalAddress=GetDMATransferAddress()) == -1L) {
+            dprintf1(("Unable to get dma address"));
             return;
         }
         sas_PWS(dMAPhysicalAddress, &data, 1);
@@ -1235,9 +1372,9 @@ Return Value:
     }
 }
 
-IU32
+DWORD
 GetSamplingRate(
-    void
+    VOID
     )
 
 /*++
@@ -1258,7 +1395,7 @@ Return Value:
 --*/
 
 {
-    IU32 samplingRate;
+    DWORD samplingRate;
 
     if (TimeConstant == 0) {
         TimeConstant = 1;
@@ -1325,6 +1462,467 @@ Return Value:
     return samplingRate;
 }
 
+VOID
+GenerateInterrupt(
+    ULONG delay
+    )
+
+/*++
+
+Routine Description:
+
+    This function generates device interrupt on dma channel SM_INTERRUPT
+    on ICA_MASTER device.  The interrupt will be dispatched before the control
+    returns to the emulation thread.
+
+Arguments:
+
+    delay - specifies the delay to generate delayed interrupt.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    //
+    // Generate an interrupt on the master controller
+    //
+
+    if (delay == 0) {
+        dprintf2(("Generating interrupt"));
+        ica_hw_interrupt(ICA_MASTER, SbInterrupt, 1);
+    } else {
+        dprintf2(("Generating interrupt with %x ms delay", delay));
+        host_DelayHwInterrupt(SbInterrupt, 1, delay * 1000);
+    }
+}
+
+VOID
+SetSpeaker(
+    BOOL On
+    )
+
+/*++
+
+Routine Description:
+
+    This function sets the speaker on or off.
+
+Arguments:
+
+    On - supplies a boolean value to specify speaker state.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    if (DspOutputRate == 0) return;
+    DspSpeakerEnabled = On;
+    SbApplyMixer();
+}
+
+VOID
+PauseDMA(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function pauses single-cycle or Auto-Init DMA.
+
+    Note, we don't support PauseDMA and ContinueDMA just for PAUSE.
+    We expect apps PauseDMA, StartSingleCycle and optionally ContinueDMA.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None
+
+--*/
+
+{
+    ULONG position;
+
+    bDspPaused = TRUE;
+
+}
+
+VOID
+ContinueDMA(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function continues paused single-cycle or Auto-Init DMA.
+
+    Note, we don't support PauseDMA and ContinueDMA just for PAUSE.
+    We expect apps PauseDMA, StartSingleCycle and optionally ContinueDMA.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    bDspPaused = FALSE;
+    Sleep(0);
+}
+
+BOOL
+FindWaveDevice(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function finds a suitable wave output device.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    TRUE - if device is found.
+    FALSE - no device is found.
+
+--*/
+
+{
+    UINT numDev;
+    UINT device;
+    WAVEOUTCAPS wc;
+
+    numDev = GetNumDevsProc();
+
+    for (device = 0; device < numDev; device++) {
+        if (MMSYSERR_NOERROR == GetDevCapsProc(device, &wc, sizeof(wc))) {
+
+            //
+            // Need 11025 and 44100 for device
+            //
+
+            if ((wc.dwFormats & (WAVE_FORMAT_1M08 | WAVE_FORMAT_4M08)) ==
+                (WAVE_FORMAT_1M08 | WAVE_FORMAT_4M08)) {
+                WaveOutDevice = device;
+                return (TRUE);
+            }
+        }
+    }
+
+    dprintf1(("Wave device not found"));
+    return (FALSE);
+}
+
+BOOL
+OpenWaveDevice(
+    DWORD CallbackFunction
+    )
+
+/*++
+
+Routine Description:
+
+    This function opens wave device and starts synchronization thread.
+
+Arguments:
+
+    CallbackFunction - specifies the callback function
+
+Return Value:
+
+    TRUE - if success otherwise FALSE.
+
+--*/
+
+{
+    UINT rc;
+    HANDLE tHandle;
+    if (CallbackFunction) {
+        rc = OpenProc(&HWaveOut, (UINT)WaveOutDevice, (LPWAVEFORMATEX)
+                      &WaveFormat, CallbackFunction, 0, CALLBACK_FUNCTION);
+    } else {
+        rc = OpenProc(&HWaveOut, (UINT)WaveOutDevice, (LPWAVEFORMATEX)
+                      &WaveFormat, 0, 0, CALLBACK_NULL);
+    }
+
+    if (rc != MMSYSERR_NOERROR) {
+        dprintf1(("Failed to open wave device - code %d", rc));
+        return (FALSE);
+    } else {
+
+        //
+        // Remember the original waveout volume setting.
+        // Note we don't care if the device supports it.  If it does not
+        // all the setvolume calls will fail and we won't change it anyway.
+        //
+
+        GetVolumeProc(HWaveOut, &OriginalWaveVol);
+        PreviousWaveVol = OriginalWaveVol;
+    }
+    NextWaveOutPos = 0;
+    return (TRUE);
+}
+
+VOID
+SetWaveOutVolume(
+    DWORD Volume
+    )
+
+/*++
+
+Routine Description:
+
+    This function sets WaveOut volume
+
+Arguments:
+
+    Volume - specifies the volume scale
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    DWORD currentVol;
+
+    if (HWaveOut) {
+        if (GetVolumeProc(HWaveOut, &currentVol)) {
+            if (currentVol != PreviousWaveVol) {
+                //
+                // SOmeone changed the volume besides NTVDM
+                //
+
+                OriginalWaveVol = currentVol;
+            }
+            PreviousWaveVol = Volume;
+            SetVolumeProc(HWaveOut, Volume);
+        }
+    }
+}
+
+VOID
+ResetWaveDevice(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function resets wave device.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+
+    dprintf3(("Resetting wave device"));
+    if (HWaveOut) {
+        if (MMSYSERR_NOERROR != ResetProc(HWaveOut)) {
+            dprintf1(("Unable to reset wave out device"));
+        }
+    }
+}
+
+VOID
+CloseWaveDevice(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function shuts down and closes wave device.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    DWORD currentVol;
+
+    //
+    // wait till the MM driver is done with the device and then unprepare
+    // the prepared headers and close it.
+    //
+
+    if (HWaveOut) {
+
+        dprintf2(("Closing wave device"));
+
+        if (GetVolumeProc(HWaveOut, &currentVol)) {
+            if (currentVol == PreviousWaveVol) {
+                //
+                // If we are the last one changed, volume restore it.
+                // otherwise leave it alone.
+                //
+                SetVolumeProc(HWaveOut, OriginalWaveVol);
+            }
+        }
+        WaitOnWaveOutIdle();
+        UnprepareHeaders();
+        ResetWaveDevice();
+
+        if (MMSYSERR_NOERROR != CloseProc(HWaveOut)) {
+            dprintf1(("Unable to close wave out device"));
+        } else {
+            HWaveOut = NULL;
+        }
+    }
+}
+
+BOOL
+TestWaveFormat(
+    DWORD sampleRate
+    )
+
+/*++
+
+Routine Description:
+
+    This function tests if current wave device supports the sample rate.
+
+Arguments:
+
+    SampleRate - supplies sample rate to be tested.
+
+Return Value:
+
+    TRUE if current wave device supports sample rate, otherwise FALSE.
+
+--*/
+
+{
+    PCMWAVEFORMAT format;
+
+    format = WaveFormat;
+    format.wf.nSamplesPerSec = sampleRate;
+    format.wf.nAvgBytesPerSec = sampleRate;
+
+    return (MMSYSERR_NOERROR == OpenProc(NULL, (UINT)WaveOutDevice,
+                                         (LPWAVEFORMATEX) &format,
+                                         0, 0, WAVE_FORMAT_QUERY));
+}
+
+BOOL
+SetWaveFormat(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function makes sure we've got a device that matches the current
+    sampling rate. Returns TRUE if device does NOT support current sampling
+    rate and wave format has changed, otherwise returns FALSE
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    TRUE if device does NOT support current sampling rate and wave format
+    has changed, otherwise returns FALSE
+
+--*/
+
+{
+    DWORD sampleRate;
+    DWORD testValue;
+    UINT i = 0;
+
+    if (TimeConstant != 0xFFFF) {
+
+        //
+        // time constant has been reset since last checked
+        //
+
+        sampleRate = GetSamplingRate();
+        dprintf2(("Requested sample rate is %d", sampleRate));
+
+        if (sampleRate != WaveFormat.wf.nSamplesPerSec) {  // format has changed
+            if (!TestWaveFormat(sampleRate)) {
+                dprintf3(("Finding closest wave format"));
+
+                //
+                // find some format that works and is close to requested
+                //
+
+                for (i=0; i<50000; i++) {
+                    testValue = sampleRate-i;
+                    if (TestWaveFormat(testValue)) {
+                        sampleRate = testValue;
+                        break;
+                    }
+                    testValue = sampleRate+i;
+                    if (TestWaveFormat(testValue)) {
+                        sampleRate = testValue;
+                        break;
+                    }
+                }
+                if (sampleRate!=testValue) {
+                    dprintf1(("Unable to find suitable wave format"));
+                    return (FALSE);
+                }
+            }
+
+            //
+            // Set the new format if it's changed
+            //
+
+            if (sampleRate != WaveFormat.wf.nSamplesPerSec) {
+                dprintf2(("Setting %d samples per second", sampleRate));
+                WaveFormat.wf.nSamplesPerSec = sampleRate;
+                WaveFormat.wf.nAvgBytesPerSec = sampleRate;
+                TimeConstant = 0xFFFF;
+                return (TRUE);
+            }
+        }
+    }
+
+    TimeConstant = 0xFFFF;
+    return (FALSE);
+}
+
 BOOL
 SetDMACountAddr(
     PVDD_DMA_INFO pDmaInfo
@@ -1347,10 +1945,10 @@ Return Value:
 
 --*/
 {
-    pDcp->current_address[Chan][1] = (half_word)(pDmaInfo->addr >> 8);
-    pDcp->current_address[Chan][0] = (half_word)pDmaInfo->addr;
-    pDcp->current_count[Chan][1] = (half_word)(pDmaInfo->count >> 8);
-    pDcp->current_count[Chan][0] = (half_word)pDmaInfo->count;
+    pDcp->current_address[Chan][1] = (half_word)HIBYTE(pDmaInfo->addr);
+    pDcp->current_address[Chan][0] = (half_word)LOBYTE(pDmaInfo->addr);
+    pDcp->current_count[Chan][1] = (half_word)HIBYTE(pDmaInfo->count);
+    pDcp->current_count[Chan][0] = (half_word)LOBYTE(pDmaInfo->count);
 
     //
     // If DMA count is 0xffff and autoinit is enabled, we need to
@@ -1395,23 +1993,26 @@ Return Value:
 --*/
 
 {
-    DmaInfo->addr  = ((IU16)pDcp->current_address[Chan][1] << 8)
-                     | (IU16)pDcp->current_address[Chan][0];
+    DmaInfo->addr  = ((WORD)pDcp->current_address[Chan][1] << 8)
+                     | (WORD)pDcp->current_address[Chan][0];
 
-    DmaInfo->count = ((IU16)pDcp->current_count[Chan][1] << 8)
-                     | (IU16)pDcp->current_count[Chan][0];
+    DmaInfo->count = ((WORD)pDcp->current_count[Chan][1] << 8)
+                     | (WORD)pDcp->current_count[Chan][0];
 
-    DmaInfo->page   = (IU16) pDmaAdp->pages.page[SbDmaChannel];
-    DmaInfo->status = (IU8) pDcp->status.all;
-    DmaInfo->mode   = (IU8) pDcp->mode[Chan].all;
-    DmaInfo->mask   = (IU8) pDcp->mask;
+    DmaInfo->page   = (WORD) pDmaAdp->pages.page[SbDmaChannel];
+    DmaInfo->status = (BYTE) pDcp->status.all;
+    DmaInfo->mode   = (BYTE) pDcp->mode[Chan].all;
+    DmaInfo->mask   = (BYTE) pDcp->mask;
 
+    dprintf3(("DMA Info : addr  %4X, count %4X, page %4X, status %2X, mode %2X, mask %2X",
+              DmaInfo->addr, DmaInfo->count, DmaInfo->page, DmaInfo->status,
+              DmaInfo->mode, DmaInfo->mask));
     return (TRUE);
 }
 
-IU32
+ULONG
 GetDMATransferAddress(
-    void
+    VOID
     )
 
 /*++
@@ -1427,24 +2028,25 @@ Arguments:
 Return Value:
 
     Get DMA transfer address.
-    Returns guest physical address; host memory access is performed by SAS.
+    Returns transfer address or -1 on failure.
 
 --*/
 
 {
-    IU32 address;
+    ULONG address;
+    VDD_DMA_INFO dmaInfo;
 
     //
     // convert from 20 bit address to 32 bit address
     //
 
     address = (pDcp->current_address[Chan][1] << 8) | pDcp->current_address[Chan][0];
-    /* T93: return a guest physical address, never a truncated host pointer. */
     address = dma_system_address(SbDmaChannel,
         pDmaAdp->pages.page[SbDmaChannel], address);
+
+    dprintf3(("Physical Transfer address = %8X", (DWORD)address));
     return (address);
 }
-
 
 VOID
 SetDMAStatus(
@@ -1480,32 +2082,346 @@ Return Value:
 
     if (requesting) {
         DmaInfo->status |= (0x10 << SbDmaChannel); // Requesting
+        dprintf3(("DMA set as requesting"));
     } else {
         DmaInfo->status &= ~(0x10 << SbDmaChannel); // Not Requesting
+        dprintf3(("DMA set as not requesting"));
     }
 
     if (tc) {
         DmaInfo->status |= (1 << SbDmaChannel); // tc reached
+        dprintf3(("DMA set as terminal count reached"));
     } else {
         DmaInfo->status &= ~(1 << SbDmaChannel); // tc not reached
+        dprintf3(("DMA set as terminal count not reached"));
     }
-    pDcp->status.all = (IU8) DmaInfo->status;
+    pDcp->status.all = (BYTE) DmaInfo->status;
 }
 
-/* XP guest DMA pause gates the next EOI transfer; it does not pause or clear
- * host output. The original position query served only a host Sleep(0),
- * which is unnecessary on the sole executor. */
-void PauseDMA(void)
+BOOL
+GetWaveOutPosition(
+    PULONG pPos
+    )
+/*++
+
+Routine Description:
+
+    This function calls MM low level api to get the current wave out play back
+    position.
+
+Arguments:
+
+    pPos - supplies a point to a ULONG to receive the play back position
+
+Return Value:
+
+    TRUE - success.  Otherwise failed.
+
+--*/
+
 {
-    bDspPaused = TRUE;
+    MMTIME mmTime;
+
+    mmTime.wType = TIME_SAMPLES;
+
+    if (MMSYSERR_NOERROR == GetPositionProc(HWaveOut, &mmTime, sizeof(MMTIME))) {
+        *pPos = mmTime.u.sample;
+        return (TRUE);
+    }
+    dprintf1(("Get Waveout position failed\n"));
+    return (FALSE);
 }
 
-void ContinueDMA(void)
+VOID
+SbGetDMAPosition(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function is the handler for the SB DMA position IO read instruction.  It
+    maintains s real waveout position by calling MM api to get the current play back
+    position.  It also maintains a virtual waveout position to simulate sound playing
+    position in case real sound is not played or too slow.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
 {
-    bDspPaused = FALSE;
+    ULONG position;     // real sound played position
+    ULONG offset;       // the amount of sound really played
+    ULONG virtOffset;   // the amount of sound virtually/expectedly played
+
+    if (bDspActive && SbAnswerDMAPosition && bWriteBurstStarted) {
+        dprintf3(("SbGetDMAPosition"));
+        DspNumberDmaQueries++;
+        offset = (IU16)((DmaInfo.mode & 0x20) ?
+            StartingDmaAddr - DmaInfo.addr : DmaInfo.addr - StartingDmaAddr);
+        offset += DspVirtualInc;
+        if (SBBlockSize < 0x400) {
+
+            //
+            // If block size is smal, do not call GetWaveOutPosition and
+            // do not update PreviousWaveOutPos .
+            //
+
+            if (offset < (SBBlockSize * 3 / 4)) {
+                if (DmaInfo.mode & 0x20)
+                    DmaInfo.addr -= (IU16)DspVirtualInc;
+                else
+                    DmaInfo.addr += (IU16)DspVirtualInc;
+                DmaInfo.count -= (IU16)DspVirtualInc;
+                dprintf3(("virt addr = %x, count = %x", DmaInfo.addr, DmaInfo.count));
+                SetDMACountAddr(&DmaInfo);
+            } else {
+                Sleep(0);
+            }
+            return;
+        }
+#if 1
+#line 2184
+        if (DspMode == Single) {
+            PreviousWaveOutPos++;
+        }
+
+
+        //
+        // The algorithm used here is weird but it seems to work.
+        // We will come back and revise it later.
+        //
+
+        //
+        // Virtual sound is approaching to the end.  Slow down
+        //
+
+        if (offset >= (SBBlockSize - 0x50)) {
+            //Sleep(0);
+            DspVirtualInc = 2;
+        }
+
+        //
+        // Put a limit so we don't overflow the virtual sound position
+        //
+
+        if (offset >= SBBlockSize - 0x8) {
+            //Sleep(0);
+            offset = SBBlockSize - 0x8;
+        }
+
+        if (DspVirtualIncx > 0xc0) {
+            Sleep(0);
+        }
+        if (DspVirtualIncx > 0x80) {
+            Sleep(0);
+#line 2218
+#if DESCENT
+#error "Unsupported SoftPC mirror configuration: DESCENT"
+#endif
+#line 2230
+        }
+        Sleep(0);
+#endif
+#line 2233
+#if 0
+#error "Unsupported SoftPC mirror configuration: constant false"
+#endif
+#line 2268
+        dprintf2(("voffset = %x inc = %x\n", offset, DspVirtualInc));
+
+        //
+        // Now update the dma controller with our emulation/real position
+        //
+
+        DmaInfo.addr = (DmaInfo.mode & 0x20) ?
+            StartingDmaAddr - (IU16)offset : StartingDmaAddr + (IU16)offset;
+        DmaInfo.count = StartingDmaCount - (IU16)offset;
+
+        SetDMACountAddr(&DmaInfo);
+        dprintf3(("INB: AFT Cnt= %x, Addr= %x\n", DmaInfo.count, DmaInfo.addr));
+
+
+    }
+}
+
+VOID
+WaitOnWaveOutIdle(
+    VOID
+    )
+{
+    ULONG LastBytesPlayedValue = 0;
+    ULONG PhysicalBytesPlayed;
+
+    //
+    // Allow the device to finish playing current sounds before nuking buffers
+    //
+
+    while (GetWaveOutPosition(&PhysicalBytesPlayed)) {
+        if (LastBytesPlayedValue == PhysicalBytesPlayed) {
+            break;  // no sounds are playing
+        }
+        LastBytesPlayedValue = PhysicalBytesPlayed;
+        Sleep(1);
+    }
+}
+
+BOOL
+WriteBurst(
+    ULONG WriteSize
+    )
+
+/*++
+
+Routine Description:
+
+    This function sends a bust of wave data to the multimedia device and
+    updates DMA controller accordingly.
+
+Arguments:
+
+    WriteSize - supplies the number of bytes to write to Wave device
+
+Return Value:
+
+    return value of WriteProc MM interface.
+
+--*/
+
+{
+    MMRESULT mmResult;
+    PWAVEHDR header = &WaveHdrs[DspNextRead];
+
+    dprintf2(("read: write burst at block %x", DspNextRead));
+
+
+    //
+    // Send the data to MM Waveout device
+    //
+
+    header->dwBufferLength = WriteSize;
+    mmResult = WriteProc(HWaveOut, header, sizeof(WAVEHDR));
+    return (mmResult == MMSYSERR_NOERROR);
+}
+
+
+VOID
+PrepareHeaders(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function calls HWaveOut device to prepare headers.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    ULONG i;
+
+    dprintf3(("Prepare Headers"));
+
+    for (i = 0; i < DspBufferTotalBursts; i++) {
+        PrepareHeaderProc(HWaveOut, &WaveHdrs[i], sizeof(WAVEHDR));
+    }
+}
+
+VOID
+UnprepareHeaders(
+    VOID
+    )
+
+/*++
+
+Routine Description:
+
+    This function calls HWaveOut device to unprepare headers.
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    ULONG i;
+
+    dprintf3(("Unprepare Headers"));
+
+    for (i = 0; i < DspBufferTotalBursts; i++) {
+        while (WAVERR_STILLPLAYING ==
+                   UnprepareHeaderProc(HWaveOut, &WaveHdrs[i], sizeof(WAVEHDR))) {
+            Sleep(1);
+        }
+        WaveHdrs[i].dwFlags = 0;        // Must be zero to call PrepareHeader
+        WaveHdrs[i].dwUser  = 0;
+    }
 }
 
 #if 0
 #error "Unsupported SoftPC mirror configuration: disabled branch"
 #endif
-#line 2810
+#line 2921
+
+VOID
+ExitAutoMode (
+     void
+     )
+
+/*++
+
+Routine Description:
+
+    This function exits DSP auto-init mode
+
+Arguments:
+
+    None.
+
+Return Value:
+
+    None.
+
+--*/
+
+{
+    DspMode = None;
+    if (bExitAuto) {
+        bExitAuto = FALSE;
+        dprintf2(("ExitAuto CMD detected in Auto Mode"));
+    } else {
+        dprintf2(("SingleCycle detected in Auto Mode"));
+    }
+
+    //
+    // Wait till MM driver finishes playing queued bursts. Then close
+    // the waveout device
+    //
+
+    RemoveEOIHook(SbInterrupt, AutoInitEoiHook);
+    DspEoiRegistered = FALSE;
+    //ica_iret_hook_control(ICA_MASTER, SbInterrupt, FALSE);
+    NextWaveOutPos = 0;
+    dprintf2(("Auto-Init block done"));
+}

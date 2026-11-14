@@ -11178,3 +11178,239 @@ original correspondences, all 24 residual ranges, real consumers and fixture
 limitations above. Task jobs have exited; scratch is removed after evidence
 promotion. Frontier 462/472; next host/src/nt_sbdsp.c. Ten remaining files and
 qualified owner decisions keep S1/T100 open.
+
+## File 463 host/src/nt_sbdsp.c investigation (not delivered)
+
+Started after P153 from the fixed XP SP1 counterpart, without consulting OpenNT.
+Production remains unchanged and the completed frontier remains 462/472. The
+task-private candidate restores eight complete original functions: DspReadStatus,
+DspReadData, DspResetWrite, GetSamplingRate, SetDMACountAddr, QueryDMA,
+SetDMAStatus and GenerateInterrupt. Their existing header declarations already
+use the original SDK types. Restorations recover original diagnostics, scalar
+spellings and equivalent high/low-byte operations rather than a new algorithm.
+
+Both before/candidate objects compile and link with actual x86/x64 Ninja flags.
+For each variant and width, sb-dma, sb-commands and sb-archive pass: twelve
+successful fixture runs. The eight-function candidate reduces XP-relative
+added/deleted diff by 58 lines; unchanged excluded regions cancel from this delta
+and receive no accounting. Private test EXEs are not byte-identical when masking
+only PE timestamp/checksum, so no artifact-equivalence claim is made. Full
+product qualification has not been run for this uninstalled candidate.
+
+The wider file audit remains active. Original WaveOut header/ring/thread ownership,
+the current single-executor transfer/completion path, physical DMA address access,
+pause/resume, parser framing, snapshot state and original unused functions require
+separate coherent review. Compat sb_pcm.c owns Lib stream transport and unsigned
+8-bit to signed 16-bit sample conversion; it contains no duplicate SB parser or
+DMA controller. That source observation alone does not qualify all current DSP
+adaptations as necessary. No remaining difference is approved by this entry.
+
+Further coherent restoration recovers original globals and prototypes (except
+the live fixed DspBuffer representation and the already shared DSP_MODE type),
+plus twelve otherwise uncalled original helpers: FindWaveDevice, OpenWaveDevice,
+SetWaveOutVolume, ResetWaveDevice, CloseWaveDevice, TestWaveFormat, SetWaveFormat,
+GetWaveOutPosition, WaitOnWaveOutIdle, WriteBurst, PrepareHeaders and
+UnprepareHeaders. No caller is added and no WinMM output is opened. Both widths
+compile/link and pass the same three device selectors. A subsequent candidate
+places the restored groups at their original relative positions and restores
+valid original windows.h/ios.h/ica.h inclusion; its six runs also pass. This
+aligned private candidate reduces XP diff by 832 lines versus the untouched
+production file, with excluded regions unchanged. It is not yet final source.
+
+Four controlled variants of that aligned candidate compile/link on both widths
+and fail the existing sb-commands fixture at their corresponding observations:
+original increment-only small-block direction fails the DMA-address assertion
+(line 1102); original increment-only table-munge direction fails the expected
+second byte (1126); replacing physical SAS accesses with logical accesses fails
+the paged ADC byte (1116); removing the host running handoff fails the paused
+output assertion (914). These are eight failed negative runs, with the aligned
+candidate passing on both widths. The first two restore original arithmetic;
+the latter two isolate current boundary obligations and are explicitly not a
+complete original NTVDM backend experiment. They support direction, physical
+memory and pause obligations, not every detail of the present implementation.
+All probe jobs exited. Production source and published P153 EXEs remain unchanged;
+remaining file-level review and eventual full qualification are still required.
+
+The next refinement restores original ContinueDMA including its single Sleep(0)
+yield, original parser diagnostics/type spelling, the original MidiOutPoll name
+at the unchanged numeric value, original unreachable parser cases, reset layout
+and unused native scalar resets. The physical DMA address helper retains only
+its actual host-address translation difference. Original PauseDMA presentation
+returns, while its native GetWaveOutPosition branch remains separate from the
+Lib stream owner. Existing exclusion placeholders/line directives retain their
+sequence and content. Each intermediate candidate compiles/links and passes all
+three device selectors on both widths. No new guest code is used.
+
+Four more withdrawal variants compile/link and fail on both widths: removing
+ResetState initialization allows the previous lifetime's reset pulse to finish
+(fixture 805); original command dispatch fails retained MIDI framing (972);
+advancing by requested rather than accepted PCM prefix fails the seven-sample
+backpressure assertion (444); resetting the consumed prefix to zero fails the
+subsequent archive capture (1705). These eight negative runs are distinct from
+the earlier direction/physical-memory/pause probes. Existing completion tests
+also observe the 93 ms event deadline, both DMA directions, auto-init, lag,
+stream epoch mismatch, progress failure and cancellation through real q-events.
+
+The assembled candidate is now installed for P154 qualification, not delivered.
+Production delta is +1178/-340; XP-relative diff decreases by 1222 lines with
+unchanged exclusions cancelling. Cached x86 build passes (9.48 s); the owned
+background full x86/x64 job is still running at this entry. Final source review
+found indentation left behind when removing local comments; a whitespace-only
+correction is prepared privately and will require final rebuild/qualification
+before delivery. No production source is edited while that job is running.
+Frontier remains 462/472, and no full-file acceptance is claimed yet.
+
+The installed first candidate completes cached builds and all 392 tests:
+x86 build 9.48 s, background 150.37 s, native 16.98 s; x64 build 19.62 s,
+background 150.62 s, native 15.99 s. The owned process is confirmed exited.
+This qualifies that candidate, not later final source.
+
+Further original-first review restores the prepared indentation correction,
+SbGetDMAPosition diagnostics/comments and finite Sleep(0) yields, plus the
+original DspVirtualIncx assignment at block preparation. DESCENT remains
+excluded: the restored variable only selects finite host yields on supported
+paths, not guest DMA arithmetic. It does not add an archived guest-state field.
+Original wait-for-worker looping and DspLock use are not conflated with those
+finite yields: current production has no native DSP thread to advance that
+wait and does not initialize that native lock. These remaining ownership
+changes still require file-level evidence reconciliation and owner decisions.
+A fresh full background qualification is running against this revised source;
+no new pass or delivery is claimed before its result.
+
+A separate private candidate restores complete original PauseDMA, including
+GetWaveOutPosition. Both architectures compile/link and pass sb-dma,
+sb-commands and sb-archive (six fixture runs). The original helper makes no
+output-open call; an absent WaveOut handle gives its existing failed-query
+return without changing guest state. Its omission is not justified merely by
+the Lib output owner. This restoration is prepared but not installed while
+the full qualification job runs. Frontier remains 462/472.
+
+The next installed revision also passes 392/392: x86 build 15.81 s,
+background 146.28 s, native 15.90 s; x64 build 11.85 s, background 147.28 s,
+native 16.03 s. Process exit is independently confirmed. A further private
+candidate restores ExitAutoMode's original declaration, documentation,
+diagnostics and NextWaveOutPos reset while retaining the registered-hook
+ownership guard; its six dual-width device selector runs pass. Complete
+PauseDMA and that ExitAutoMode restoration are then installed, with SetSpeaker's
+original declaration/documentation and the original relative function order.
+Final delivery qualification must cover this source, not the preceding pass.
+Earlier numeric diff reductions in this investigation are intermediate claims;
+delivery will recompute one reproducible Git comparison against the frozen XP
+file and the immutable pre-P154 file. No excluded-body count will be recorded.
+
+Metric correction for the installed delivery candidate: the immutable before
+file exactly matches HEAD after CRLF normalization, and the original hash is
+identical to the manifest's fixed XP raw hash. Normalize the three files to LF
+and compare with git -c core.autocrlf=false diff --no-index --numstat, using the
+same XP input for before/after. The XP-relative added+deleted delta is -1624
+lines; unchanged excluded regions cancel and receive no separate accounting.
+Tracked production is +1251/-333 (net +918), no test-source changes. Earlier
+investigation reductions, including 1222, are superseded by this reproducible
+comparison and must not be reused as final metrics. The increase in source size
+restores original bodies; it is not an increase in mirror differences.
+
+## File 463 host/src/nt_sbdsp.c P154
+
+Fixed XP identity and the immutable before file have been verified. This review
+covers selected differences only. Existing exclusion bodies and directives are
+not decision points. Source positions below refer to the installed delivery
+candidate; XP positions refer to the fixed original.
+
+| Point | Location | Initial analysis and counter-review |
+| --- | --- | --- |
+| R0640 | XP includes 11-26; current 12-26 | Restore available windows.h/ios.h/ica.h in original relative order. Qualified pending: unavailable NT headers and NTVDM host includes are replaced by actual SAS, EOI, q-event, snapshot and PCM declarations. The PCM declaration must precede the core's const macro; external data ownership is not writable. Original Sim32 NTVDM pointers are not standalone guest physical addresses. |
+| R0641 | XP globals 31-141; current 31-145 | Restore original scalar types, declarations, native globals and macros. Qualified pending: fixed 65536-byte DspBuffer, existing transfer/host state, and DSP_MODE declared in nt_sb.h. Original GenerateHdrs reallocates and indexes a native WaveOut burst ring; the current copy is one complete 16-bit DMA block, archived by value and submitted by accepted prefix. Restoring only the pointer declaration would be an invalid partial experiment and is not used as proof. |
+| R0642 | Current 149-223; XP StartDspDmaThread/StopDspDmaThread and AutoInitEoiHook | Qualified pending: one executor services transfer, EOI registration and terminal status. The complete original owner creates a second thread, mutates DMA/PIC from it and waits on native events. The current runtime's pause, capture and teardown quiesce its executor, not that original extra worker. No second active backend is introduced. Existing service/status callers are nt_sb.c and the machine runtime; they are not themselves sufficient proof without the thread and state-ownership analysis. |
+| R0643 | Current 224-302 and 1502-1527; XP SetSpeaker/native format owner | Qualified pending: Lib PCM format, gain, lifecycle and host-running handoff. Original SetSpeaker changes a native device's WaveOut volume and has no Lib stream. Current PCM consumes signed 16-bit copied samples; Compat only converts the DSP's unsigned bytes and transports them, not a duplicate DSP parser/DMA implementation. Withdrawal of the running handoff fails the paused-output assertion on both widths. Original SetSpeaker declaration and documentation are restored. |
+| R0644 | Current 303-387; XP DspThreadEntry interrupt-delay and native completion | Qualified pending: executor q-event completion uses the accepted sample prefix, stream consumption/epoch and a cancellable event identity. Original owner waits on WaveOut semaphores/events in its separate thread; putting those waits on the executor prevents that executor from advancing guest/device work or servicing pause. Existing real-q-event tests cover the 93 ms deadline, cancellation, lag, progress error and epoch mismatch. This establishes the boundary, not real hardware timing equivalence. |
+| R0645 | Current 388-450; XP DmaDataToDsp 1323 onward and DspProcessBlock 2344 onward | Qualified pending: guest physical DMA addressing, 16-bit wrap/decrement, copied block and accepted-prefix submission. XP converts Sim32 host pointers through ULONG and increments host addresses. That is not an x64-safe guest-memory representation and cannot express the current nonidentity guest paging contract. Original-direction withdrawals fail small-block/table-munge assertions; physical-to-logical access withdrawal fails the paged ADC assertion; advancing queued count by requested rather than accepted samples fails backpressure. The original virtual-increment assignment/diagnostic is restored. |
+| R0646 | Current parser declarations 453 onward; XP enums and function-local parser state | Restore original enum names, values and SDK scalar spelling. Qualified pending: UnsupportedMidiUart remains the final state; blockSize and table-munge partial state are file-owned for capture/restore. Original function-static partial bytes cannot be inspected/restored by the device archive. Numeric MidiOutPoll=12 and UART=13 remain unchanged. |
+| R0647 | Current 598-743; XP has no corresponding device archive | Qualified pending: capture/restore and callback encoding preserve copied PCM, DMA/parser state, consumed prefix and cancellable event identity. A restored native handle or thread would refer to the old host lifetime, not archived guest state. Removing consumed-prefix preservation fails archive capture on both widths; that withdrawal changes both pause and restore assignments and is not presented as a restore-only experiment. Existing archive tests cover partial parser commands and resumed sample ownership. |
+| R0648 | Current SbInitializeDMA and original host preparation/cleanup omissions | Qualified pending: channel/controller selection is used by current original DMA APIs without allocating an NTVDM native WaveOut owner. GenerateHdrs, PrepareWaveInitialization and CleanUpWave are coupled to allocation/free of the original pointer ring, native semaphore/event handles and extra thread. Their coherent original owner also uses ULONG-truncated host pointers. Unrelated independent original native helpers are restored instead of treating every WaveOut reference as grounds for omission. |
+| R0649 | DspReadStatus/DspReadData/DspResetWrite/GetSamplingRate/SetDMACountAddr/QueryDMA/SetDMAStatus/GenerateInterrupt | Exact original function restoration, including original diagnostics, types, byte operations and formatting. Both before and initial restored candidates compile/link and pass all three device selectors on each width. Original no-op command cases and diagnostics throughout DspWrite are restored too. |
+| R0650 | WriteCommandByte and DspWrite MIDI states | Qualified pending: unsupported DSP MIDI consumes its payload without reinterpreting it as PCM commands; supported MIDI remains MPU-401. Original command dispatch withdrawal fails the framing assertion. The original MidiOutPoll name returns; its BufferMidi call remains omitted because that would activate the distinct unsupported DSP MIDI output route. No new decoder or consumer is added. |
+| R0651 | DspWrite small blocks, TableMungeBuffer and GetDMATransferAddress | Qualified pending: direction-aware address changes and physical SAS access. Both original increment-only withdrawals fail the corresponding address/data assertions; logical access fails nonidentity paging. GetDMATransferAddress retains its original ULONG declaration/description and only the physical-address boundary changes. No alternate DMA controller is introduced. |
+| R0652 | ResetDSP | Restore original layout, comments and native scalar resets. Qualified pending: executor stop/clear replaces the original native-thread/event handshake; ResetState is reset for a new device lifetime. Removing the added reset-pulse clear makes an old lifetime's partial reset finish in the next lifetime, failing the actual port fixture on both widths. No claim is made about every reset race. |
+| R0653 | PauseDMA/ContinueDMA and twelve independent native helpers | Restore ContinueDMA and independent original helper bodies. Qualified pending: omit PauseDMA native position query. Actual production never calls LoadWinmm, leaving GetPositionProc null. Corrected active Single-DMA pause fixture fails with access violation 0xc0000005 on both widths when the actual original body is restored; current passes. The earlier candidate accidentally matched a prototype and is not evidence for restoring this body. No new native output owner is activated. |
+| R0654 | SbGetDMAPosition | Qualified pending: readiness uses the current active transfer, not HWaveOut; no wait for an absent worker or uninitialized native critical section; address progress handles decrement and 16-bit wrap. Restore original diagnostics, comments and finite yields. DspVirtualIncx only controls finite host yields in supported branches and is not guest DMA arithmetic; no snapshot layout is changed for it. |
+| R0655 | ExitAutoMode | Restore original structure, declaration, diagnostics and native scalar reset at original relative position. Counter-review rejects the outer registration guard: RemoveEOIHook already checks IRQ and callback identity and preserves other callbacks. Restore the original unconditional removal; only clearing the archive-visible registration flag remains qualified pending. Both widths pass all three private selectors with the guard removed. |
+| R0656 | Selected nonsemantic content and original relative order | Restore original types, descriptions, whitespace and independent bodies; remove non-original prose. Restore SetSpeaker/ExitAutoMode placement rather than introducing duplicated original text elsewhere. Existing exclusions remain untouched. Three existing line-control values must follow the newly restored original statements: 2230 for the closing brace, 2268 for the position diagnostic, and 2921 before ExitAutoMode. No new exclusion entry is created. |
+
+Independent counter-review checks actual source dependencies rather than relying
+on tests alone: whole-original backend restoration requires the NTVDM native
+thread/ring/pointer owner, while supported runtime pause and snapshots require
+executor quiescence and copied guest physical state. The coherent original owner
+is not dynamically reimplemented as an experiment, and no original NTVDM product
+failure is claimed. Narrow withdrawal results qualify only their named boundary.
+The remaining entries are owner decisions, not automatic retention approval.
+
+Full qualification of the installed final candidate is still running. This
+section does not advance the delivered frontier or claim P154 committed.
+
+The final counter-review finds redundant EOI ownership checking in ExitAutoMode:
+RemoveEOIHook already rejects wrong IRQ/callback identity and safely rejects an
+absent hook. The original unconditional call plus the existing archive flag
+clear passes all six private device selectors. The earlier assertion that the
+outer guard itself was necessary is withdrawn; R0655 records the correction.
+Three existing #line values are corrected to follow the restored XP statements,
+without adding directives or touching excluded bodies. This candidate is staged
+privately until the currently running full qualification exits.
+
+The pre-guard-removal delivery candidate passes all 392 tests: x86 build
+9.89 s, background 151.68 s, native 15.72 s; x64 build 13.39 s,
+background 152.11 s, native 15.61 s. Both its job and the EOI private probe
+are confirmed exited. The final two-line guard reduction and three line-control
+corrections are now installed; a fresh final-source qualification is required.
+No failed test was suppressed and no desktop test was omitted.
+
+Important correction: the earlier PauseDMA private restoration selected its
+prototype, not its function body. Statements above that complete PauseDMA was
+restored, installed or proved safe are withdrawn. Production retained its
+query omission throughout; no null-function-pointer call was published.
+LoadWinmm has no production caller, so GetPositionProc stays null. A corrected
+private fixture pauses/continues immediately after a Single transfer is armed.
+The same fixture and build flags compile/link both actual-body variants:
+x86/x64 original query each exits 0xc0000005; current each passes. This is a
+concrete supported-path counterexample, not just a native-header mismatch.
+R0653 now records the qualified omission. The existing completion fixture will
+retain this two-line regression. A brace-aware same-class review confirms all
+21 other claimed complete restored functions exactly equal their XP bodies;
+it distinguishes function definitions from prototypes and covers the eight
+initial functions, twelve independent helpers and ContinueDMA.
+
+### Final qualification and delivery
+
+Final source: production +1257/-341 (net +916), test +2/-0. The frozen XP
+comparison decreases by 1628 added/deleted diff lines using the normalized
+Git method above. Earlier provisional figures do not supersede this result.
+Restored source growth is not mirror-diff growth. Existing exclusions are
+unchanged; only necessary line-control values follow the recovered statements.
+No new production path, dependency, runtime switch or guest modification exists.
+
+Both final-source cached builds and all 392 tests pass:
+
+| Architecture | Build | Background | Native desktop/audio/package |
+| --- | --- | --- | --- |
+| x86 | 10.01 s | 188/188, 146.21 s | 8/8, 16.31 s |
+| x64 | 11.10 s | 188/188, 151.72 s | 8/8, 16.20 s |
+
+The two-line active-DMA pause regression was then added to the existing
+completion matrix. Rebuild only the affected test target on both widths and run
+app-softpc/unit/machine/device_contract_sb_commands: 1/1 each. Published EXEs
+remain byte-identical to those qualified by the complete suite. No build warning
+or error appears in these final build logs. No native test is deferred.
+
+Published SHA-256:
+
+- softpc32.exe: `78fce56f93f8bd9a57ca4e9af383bb9b00dbabb15abf03ced6333dc2b3181f78`.
+- softpc64.exe: `65d10a71600d4864ce0ed83dc4290935b8a68862d6806dea258848528c1dec52`.
+
+Actual-diff review verifies all 21 complete original function bodies, remaining
+selected ranges against R0640-R0656, real producer/consumer ownership, physical
+address and partial-transfer withdrawals, and the corrected PauseDMA negative.
+Tests do not prove every NTVDM host behavior or guest application. Native owner,
+physical-memory, lifecycle and archive differences remain qualified owner
+choices; no retention approval is inferred from passing tests. All task jobs are confirmed exited; task-owned scratch is removed and the
+build residue check passes. File frontier advances
+to 463/472 on P154 delivery; next host/src/nt_sbfm.c. Nine files and qualified
+owner decisions keep S1/T100 open.

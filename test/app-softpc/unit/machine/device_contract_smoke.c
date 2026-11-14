@@ -1169,6 +1169,8 @@ static void verify_sb_completion(void)
         assert(DspArmCompletion(0) == LIB_STATUS_INVALID_ARGUMENT);
         bHighSpeedMode = TRUE;
         assert(DspArmCompletion(11025) == LIB_STATUS_OK && !bHighSpeedMode);
+        DspWrite(DSP_PAUSE_DMA); assert(bDspPaused);
+        DspWrite(DSP_CONTINUE_DMA); assert(!bDspPaused);
         verify_sb_deadline();
         assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
         assert(!DmaDataToDsp(Single)); /* A live deadline owns this block. */
