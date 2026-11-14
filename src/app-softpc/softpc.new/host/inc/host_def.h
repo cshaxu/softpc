@@ -13,12 +13,6 @@
 \***************************************************************/
 
 #include "ctype.h"
-/*
- * DIVERGENCE(MVDM-HOST-DIV-070): the original host header maps host_getenv
- * to the C runtime getenv but does not expose its pointer-return declaration.
- * Modern x64 must retain that native pointer result rather than assume int.
- */
-#include <stdlib.h>
 
 /* put the invariant #defines for your host here, eg:*/
 
@@ -95,16 +89,6 @@ extern	quick_event_delays	host_delays;
 #define host_rom_init()
 #define HOST_BOP_IP_FUDGE     -2
 
-/*
- * DIVERGENCE(MVDM-HOST-DIV-057): non-MONITOR controller sources select
- * cpu4.h, which does not carry the original host_simulate declaration even
- * though keyboard, mouse, BIOS and storage sources invoke the same source
- * entrypoint.  Keep the original void/no-argument contract visible to both
- * host architectures; its selected implementation remains the existing
- * SoftPC/CCPU path.
- */
-extern void host_simulate(void);
-
 #ifndef EGATEST
 #ifndef MONITOR
 #define BIGWIN
@@ -118,10 +102,10 @@ extern void host_simulate(void);
 #line 101
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 104
 #define NUM_PARALLEL_PORTS	3
-#endif
+#endif // !NEC_98
 #line 106
 #endif /* NUM_PARALLEL_PORTS */
 
@@ -129,10 +113,10 @@ extern void host_simulate(void);
 #line 109
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#else
+#else  // !NEC_98
 #line 112
 #define NUM_SERIAL_PORTS	4
-#endif
+#endif // !NEC_98
 #line 114
 #endif /* NUM_SERIAL_PORTS */
 

@@ -2367,3 +2367,12 @@ MVDM-HOST-DIV-102's local marker removed. Only low/high byte order remains
 qualified as R0556, with actual controller and scalar negative evidence.
 Selected XP diff decreases by 47 lines; source +32/-16 is a different measure.
 See [ordered evidence](m9-t100-progress.md#file-436-host_cpuh-p138).
+
+
+T100 S1 P139 retires host_def.h DIV-070/DIV-057 additions: actual dual-width
+header chains already provide allocator/getenv and host_simulate contracts.
+Restoring those blocks and original conditional comments reduces XP-relative
+diff by 24 lines. NTVDM/CPU_30_STYLE omissions remain qualified owner decisions
+R0558/R0559 for the selected independent CCPU CPU_40 build. This supersedes
+historical retention rationales, without importing excluded code or altering
+Compat. See [ordered evidence](m9-t100-progress.md#file-437-host_defh-p139).

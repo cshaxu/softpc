@@ -9932,3 +9932,80 @@ equality. Public components, Compat, guest, configuration, media and snapshots
 are unchanged. Manifest/documentation/whitespace checks qualify this delivery.
 Completed owned jobs permit scratch cleanup. Frontier 436/472; next file 437
 host/inc/host_def.h. S1/T100 and retained owner decisions remain open.
+
+
+## File 437: host_def.h (P139)
+
+Fixed XP raw SHA-256:
+539e747884cfff6a355b40eb45b6c170f4ab5fcf8ef574461912deb4ba6a8101.
+
+R0557 restores the original absence of two extra declaration blocks: stdlib.h
+and host_simulate(void), including their DIV-070/DIV-057 rationale comments.
+It also restores four original NEC_98 else/endif comments without changing
+conditions or excluded bodies. The two original header omissions (NTVDM and
+CPU_30_STYLE definitions) are separately qualified below. Production +4/-20
+(net -16), permanent tests unchanged. With existing excluded bodies replaced
+by the same placeholders and line controls omitted, complete-file XP diff is
++21/-7 before and +1/-3 after: 24 fewer diff lines. The remaining +1/-3 is
+heuristic alignment of two missing defines around original blank lines; it is
+not a third semantic change. No excluded body is re-audited or re-accounted.
+
+The actual selected insignia.h imports Windows headers before host_def.h.
+Current x86/x64 SDK combaseapi.h already includes stdlib.h; preprocessing
+shows the char-pointer getenv declaration before each observed call even with
+both added blocks absent. Allocator declarations likewise remain available;
+this rechecks the dependency noted when ckmalloc.h was restored in R0420.
+For host_simulate, cpu4.h/host_cpu.h provide the original vector macro and
+its declaration, while direct callers retain original explicit declarations
+or host.h. Compat's existing provider and vector binding are unchanged.
+There is no need to introduce a new include, Compat adapter or second path.
+This evidence concerns the actual supported toolchains, not every hypothetical
+SDK or future non-Windows port.
+
+Private headers separately remove stdlib, host_simulate, both, or neither.
+For each architecture, real Ninja compile flags are used on c_bsic, ccpusas4,
+com, quick_ev, video, keybd_io, floppy, floppy_i, rom, cga and fpu. All 176
+preprocess/syntax commands succeed. Each of the 22 combined syntax comparisons
+adds no warning/error message relative to its current control. Removing line
+markers, whitespace and the one retired declaration from the preprocessed
+comparison leaves identical text for all 22 current/combined pairs. This is
+supporting declaration evidence, not a replacement for final EXE equality or
+runtime regression. No guest/SDK source is modified by these private probes.
+
+R0558: retaining omission of NTVDM is an evidence-qualified owner decision.
+The product selects independent CCPU machine/device/Compat targets, not an NTVDM
+host. Restoring the original define in a private host_def.h makes the actual
+ccpusas4 compile fail on both widths, including the existing sas.h NTVDM and
+NTVDM-without-X86GFX guards. R0559: omission of CPU_30_STYLE is likewise qualified;
+all three product targets select CPU_40_STYLE, and restoring CPU_30_STYLE in
+its original header position fails the actual compile on both widths, including
+existing xt.h and host_cpu.h guards. All four isolated configurations return
+compiler status 1. These demonstrate conflict with the actual selected source
+subset; they do not claim original XP NTVDM or CPU_30 itself is defective.
+No excluded implementation is evaluated or admitted by this configuration test.
+
+Final source LF-normalized SHA-256:
+bc242fbbed1df4eaa9ea94191ebfdd4e419c4b9750b8918b57b8d4db8e6f00f6.
+The final diff contains only the specified original restoration. No public
+component, Compat implementation, guest, user configuration, media or snapshot
+is changed. The old declaration-preservation rationales are superseded for
+this current toolchain; historical records remain historical.
+
+### P139 final-source qualification
+
+- x86: cached build/publication 148.75 s; VGA, BOP, checkpoint and x87 **4/4** in 9.12 s including runner overhead; 5271 warning occurrences, all in mirror paths.
+- x86 EXE SHA-256: d73d1213d60059a6f656f2fefd251e61b7d1b4d68db53f01c11f84e64bc5de28.
+- x64: cached build/publication 206.12 s; VGA, BOP, checkpoint and x87 **4/4** in 10.99 s including runner overhead; 5326 warning occurrences, all in mirror paths.
+- x64 EXE SHA-256: 9a5859a188c5cee2229a9d289d746597a533fbc90cec7497173b1973019a223c.
+
+Both EXEs equal P138 after masking only PE COFF timestamp, optional-header
+checksum and the unique NUL-terminated compiler HH:MM:SS literal. All other
+bytes and lengths are equal. No full-suite repetition is needed under the
+owner exception; P133 background 188/188 per width remains applicable.
+Native final acceptance remains pending. No manual guest verification is
+claimed for this source-neutral restoration. Mirror, documentation, whitespace
+and newline checks pass. Coordinator actual-diff review confirms only the
+specified declarations/comments, manifest, audit records and fresh EXEs change.
+Owned probes/builds have exited; their evidence above permits scratch cleanup.
+Frontier 437/472; next file 438 host/inc/host_gen.h. R0558/R0559 and earlier
+owner decisions remain open, as do S1 and T100.

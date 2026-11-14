@@ -30,17 +30,16 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P138 completes file 436 host_cpu.h: restores original common WRITE
-vector declarations; actual CCPU calls use generated direct c_set* contracts.
-Production +32/-16, tests unchanged; selected XP diff decreases by 47 lines.
-Only the byte-order adaptation remains qualified pending owner decision R0556.
-Both cached builds/publications, VGA/BOP 2/2 and private current controls pass;
-original-byte probes demonstrate swapped values and real-controller failure.
-EXEs equal P136 after permitted metadata/time normalization, so full regression
-is not repeated. P133 background 188/188 per width remains applicable; native
-final acceptance and prior decisions remain open. Frontier 436/472; next file
-437 host/inc/host_def.h. S1/T100 are not closed.
-See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
+T100 S1 P139 completes file 437 host_def.h: restores redundant stdlib and
+host_simulate additions plus original conditional comments. Production +4/-20,
+tests unchanged; selected XP diff decreases by 24 lines. Private double-width
+actual-consumer comparisons pass; NTVDM/CPU_30_STYLE omissions remain qualified
+owner decisions R0558/R0559. Both cached builds publish fresh EXEs and focused
+VGA/BOP/checkpoint/x87 tests pass 4/4 per width. EXEs equal P138 after permitted
+metadata/time normalization, so full regression is not repeated. P133 background
+188/188 per width remains applicable; native final acceptance and prior decisions
+remain open. Frontier 437/472; next file 438 host/inc/host_gen.h. S1/T100 remain
+open. See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64
