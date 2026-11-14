@@ -8602,3 +8602,82 @@ Earlier qualified decisions remain open; S1 is not closed.
 
 P119 owned runner exited and its PID is absent. Exact scratch cleanup and
 residue check pass, as do mirror/documentation gates and actual diff review.
+
+## File 416: egawrtm0.c (P120)
+
+Pinned XP raw SHA-256 59d1f4149c4717d951e6d70953cd9b0a79c19db3ae3108072260032db1af0303.
+Complete-file comparison finds four selected address/stride replacements;
+existing excluded bodies and their scaffolding are skipped without accounting.
+The original notice, declarations and other selected code remain unchanged.
+
+Actual wiring: ega_write_routines_update selects mode0_copy_handlers or
+mode0_gen_handlers and assigns the BIOS byte/word callbacks to this file's
+functions. CPU_40_STYLE SetWritePointers selects the separate CPU instruction
+writers, but does not replace those BIOS callbacks. SetBiosWrites exists in
+ev_glue.c but has no production caller; its mere definition does not make the
+assigned BIOS functions unreachable. video.c invokes the callbacks for its
+applicable non-V86 text-write paths. This is not proof of every V86 path.
+
+Source reasoning: odd/even physical storage preserves the plane address A0,
+so byte address a maps to 4*(a & ~1)+(a & 1). Original division by two loses
+a plane address bit. For an odd-address WORD, the second byte advances to
+the next even address, eight physical bytes beyond the aligned base rather
+than four. The selected layout is independently qualified by earlier C-VID
+and text-painter evidence, including R0272, R0362 and R0434.
+
+| Point | Exact selected difference | Independent recovery test |
+| --- | --- | --- |
+| R0510 | ega_copy_b_write: (offset >> 1) << 2 becomes (offset & ~1u) << 2. | Byte 0x11 at offset 2 must read back through C-VID. |
+| R0511 | ega_copy_w_write: same aligned-address replacement. | WORD 0x3322 at offset 6 must read back as 22,33. |
+| R0512 | ega_copy_w_write: odd WORD second-byte displacement 4 becomes 8. | WORD 0x5544 at offset 9 must read back as 44,55. |
+| R0513 | ega_mode0_chn_b_write: same aligned-address replacement. | Actual graphics-controller set/reset selects generic callback; enabled planes at offsets 12/13 must read back ff. |
+
+A disposable variant of existing vga_frame_smoke initializes and resets the
+real machine and invokes original BIOS mode 3. It asserts the actual selected
+callback identity, calls that callback, and reads via the existing C-VID
+reader, comparing its byte result. Graphics-controller ports select generic
+mode instead of patching function pointers or inventing a private writer.
+Four private copies of the actual production translation unit each restore
+exactly one original difference. Each is linked ahead of the unchanged machine
+archive with the same fixture, preserving all other production objects.
+No original guest binary, media, production file or permanent test is modified.
+
+The first setup assertion found multiple reset expressions in the fixture and
+exited before compilation. The corrected setup targets main's reset explicitly;
+the exited process was confirmed absent before the actual run began.
+
+Both architectures compile and link all five production variants and their
+fixture successfully. Current controls pass both architectures. Each of the
+four separate original restorations fails its intended readback assertion on
+both architectures: eight expected negative failures. x86 assertion exits
+3221226505; x64 exits 3. All observed values below are low bytes; the original
+reader's wider return register is not the byte contract being asserted.
+
+| Variant | Expected bytes | Restored original observed bytes |
+| --- | --- | --- |
+| Byte mapping | 11 | 20 |
+| WORD mapping | 22,33 | 20,07 |
+| Odd WORD displacement | 44,55 | 44,20 |
+| Generic mapping, first offset | ff | 20 |
+
+Current controls also pass generic offset 13 (odd plane), not only offset 12.
+The actual selected BIOS pointer identities are asserted before each family.
+These are real controller/BIOS callback and C-VID readback tests, not a new
+Win3.1 reproduction, all-mode matrix or proof of every fill/move path.
+
+Independent review: the complete original restoration at each point breaks
+its actual selected consumer; retaining these existing four replacements is
+therefore evidence-qualified pending owner decision R0510-R0513. Minimal
+residual is the existing four changed lines (+4/-4 against XP), with no new
+helper, branch, duplicate writer or broader change. Production/test source
+delta is zero; mirror-diff reduction this delivery is zero. Earlier original
+bulk-entry issues retain their separate decisions, not silently fixed here.
+
+This delivery changes documentation only. Published P119 EXEs remain untouched;
+P114 remains the full 392/392 runtime baseline. No full rebuild or regression
+is claimed for this source investigation. Frontier advances to 416/472; next
+417 follows the frozen file ledger. S1 and all qualified decisions remain open.
+
+P120 actual diff review confirms only evidence, frontier and CURRENT changed.
+Owned runner exited and its PID is absent; task scratch preview/removal and
+residue check pass. Documentation gate passes. Configuration/media are intact.
