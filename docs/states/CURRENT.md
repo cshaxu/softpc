@@ -34,9 +34,9 @@ T100 S1 P161 removes only the redundant inline explanation on slave_bs.c's
 existing EOI correction: production +1/-1, no test change, mirror diff-line
 total unchanged. Final-source x86/x64 builds/publication and all 392 tests pass.
 All 472 frozen files have review dispositions. P160 verified inventory/delivery
-integrity; P161 reconciles positions 1-72 into the
+integrity; P162 reconciles positions 1-118 into the
 [owner decision view](../etc/evidence/softpc/m9-t100-owner-decisions.md).
-Thirty-four reconciled IDs remain unapproved. Next: positions 73-472 and
+104 reconciled IDs remain unapproved. Next: positions 119-472 and
 D001-D006/L001; pending decisions keep S1/T100 open. See the
 [audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p161-final-qualification).
 

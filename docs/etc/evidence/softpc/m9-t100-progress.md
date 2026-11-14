@@ -12040,3 +12040,29 @@ Final mirror/documentation/whitespace checks are rerun after the jobs finish.
 P161 final gates pass. The owned runner is confirmed exited; temporary logs
 and script were promoted above and removed through Clean-Build. Residue check
 passes, retaining only reusable caches. S1/T100 remains open.
+
+## P162 final-decision reconciliation, positions 73-118
+
+The owner review view now reconciles positions 1-118. This documentation-only
+delivery adds 70 pending IDs to the previously reconciled 34 (104 total):
+five in c_bsic/c_debug/c_intr, 46 in c_main, fifteen in c_page and four in
+c_tlb. c_main grouping is checked against its complete R0059-R0112 range
+minus the eight restored IDs, with no missing or extra decision IDs. Repeated
+include IDs in the explanation are not counted twice. This is point-group
+accounting, not current hunk counts or owner approval.
+
+Current-source review confirms the separate original NPX caller of do_intrupt,
+private debug caches independent of current DR7, executor quick/normal/fetch
+entry differences, five debug retirement call sites, one host observer owner,
+and private TLB storage. Git confirms c_main and c_page remain at their P8/P10
+source revisions. The source/test scan finds no remaining removed register
+snapshot API: R0130-R0134 are fully restored, not pending. R0139/R0140 are also
+restored. P7 artifact equivalence and P10/P12 actual negative comparisons are
+reported with their original limitations; no new runtime probe is claimed.
+
+No production, test, manifest, configuration or EXE changes occur in P162.
+The latest P161 dual build/publication and 392/392 final-source tests therefore
+remain applicable. Both EXEs are byte-identical to HEAD P161; no unnecessary
+build or timestamp-only replacement is performed for document changes.
+Documentation/mirror/whitespace gates pass. No scratch is created. The next
+position is 119; remaining positions and D001-D006/L001 are not closed.

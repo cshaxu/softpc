@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-72 only. Positions 73-472, original
+This view currently reconciles positions 1-118 only. Positions 119-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -185,11 +185,124 @@ header from cpu4gen.h. The original include spelling/comment remain. Positions
   with only timestamp-bearing objects changing; it did not dynamically prove
   each return-type mismatch. P159 later supplied complete regression coverage.
 
+## Positions 73-79: flags, private debug state and interrupt rejection
+
+P7 restored R0052/R0056/R0058 (spacing and an explanatory comment).
+Positions 75-77 and 79 have no pending in-scope differences.
+
+| Pending points | Recommendation and remaining difference | Evidence / limit |
+| --- | --- | --- |
+| R0051 | Retain one c_getEFLAGS declaration in c_bsic.h (+1/-0). | Original definition returns IU32; internal callers do not use the conflicting external CPU macro interface. Original-header probes compiled successfully on both widths, so this is function-type consistency evidence, not a build failure or observed flag truncation. |
+| R0053-R0055 | Retain snapshot.h and private debug capture/restore in c_debug.c (+45/-0). | Original task switching clears local DR7 enable bits without rebuilding cached i_brk/d_brk. Original exception checking subsequently reads those caches. Rebuilding from DR7 on restore would lose that state. Existing verify_cpu_side_state demonstrates the distinction; Compat serializes it without duplicating breakpoint logic. Restore validates counts against the original four-entry arrays. |
+| R0057 | Retain do_intrupt's two-line rejection of (IU16)-1 (+2/-0). | c_main already filters its PIC result, but original NPX TakeNpxExceptionInt also calls ica_intack then do_intrupt without that filter. PIC can return -1 when IRQ13 is masked. irq_smoke verifies a real -1 result leaves stack/registers unchanged; applicability through masked NPX is source proof, not a traced NPX guest failure. The common guard is not replaced by a new caller-specific guard. |
+
+P7 used demonstrated whole-artifact equivalence after nonsemantic removal,
+not a new full runtime run. P161 subsequently passed all 392 tests. Current
+source recheck confirms the private cache/task-switch distinction and the
+separate NPX caller. All five IDs remain owner choices.
+
+## Position 80: c_main.c execution integration
+
+P8 restored R0069, R0080-R0083, R0092, R0098 and R0105. The original IP
+expressions fixed actual 16-bit wrap failures in the real CCPU comparison;
+these eight IDs are not pending. The redundant Compat timer wrapper was
+removed, leaving original host_timer_event calls. Original unused SIGIO
+consumer additions were removed after producer review, without changing PIC.
+
+The residual after P8 is +135/-15. The following 46 IDs are grouped only for
+readability; approval remains explicit for the represented differences.
+
+| Points | Retained difference / recommendation | Why original alone is insufficient for the supported contract |
+| --- | --- | --- |
+| R0059, R0085, R0106, R0109, R0111, R0112 | Keep selection of original TLS simulation frames and correct jmp_buf dereference. | Existing exception/simulate/continue/unsimulate must share the same live native C frame. The selected original TLS path is reused without globally enabling NTVDM or introducing a second interpreter. Source/ABI evidence; not every longjmp interleaving has been exercised. |
+| R0060-R0068 | Keep typed original/helper and integration declarations/includes. | Address/segment/PIC/timer functions retain their real original signatures; lifecycle/snapshot and executor hooks declare the integrations below. force_yoda and TakeNpxExceptionInt have selected void consumers. These declarations are justified with their represented calls, not independent new capabilities. |
+| R0070-R0075, R0093, R0094, R0097, R0099, R0101, R0102, R0103 | Keep pending-work consumption, quick-loop escape, HLT wait, pacing and finite-budget boundary. | Host producers queue work; only the executor mutates devices. The original quick loop bypasses event handling and HLT cannot progress queued work without consuming it. HLT, ordinary retirement and NEXT_INST have distinct incoming edges. Finite budgets must unwind at a safe boundary; reset retains priority. Current source uses the one Compat event/timing owner, not separate queues. This is source-flow evidence supported by checkpoint/runtime tests, not an exhaustive scheduler proof. |
+| R0061/R0065, R0077-R0079, R0084, R0086, R0091, R0104, R0108, R0110 | Keep private execution-state capture and lifecycle checkpoints/resume. | Original nested BIOS/BOP simulation frames cannot be serialized. Saved fetch/HLT phase and start_trap are not recoverable from registers alone; trap sampled before HLT can differ from current TF. Existing checkpoint cases cover nested capture deferral/return, HLT and fetch continuation. The interrupt-map pointer serves existing cold-run clearing, not a second device owner. R0061/R0065 are the same includes listed above, not extra IDs. |
+| R0076, R0087-R0090, R0095, R0096 | Keep debug declarations, begin/refetch and five retirement sites. | POP SS, MOV SS, IRET and STI bypass ordinary retirement, requiring their own call to the same observer. Debug edits to CS:EIP/code need refetch with quick mode cleared; otherwise cached decode or skipped TF handling persists. machine/debug.c remains the policy owner. No extra debug state is added in the mirror. |
+| R0100 | Keep filtering the PIC sentinel before EXT/tick/delivery. | P8 restored the original IU16 carrier and removed the redundant signed copy. -1 is uniquely represented as (IU16)-1. The common do_intrupt guard alone is too late to prevent this caller's preceding boundary effects; that guard also serves NPX. |
+| R0107 | Keep the narrow c_cpu_clearHwInt bit clear. | Actual PIC deassertion needs the original CPU-vector operation; c_cpu_interrupt only sets bits and cannot replace it. The selected original standalone body was absent. No alternate IRQ delivery is introduced. |
+
+Git confirms c_main.c still has P8 as its latest source change. Current-source
+review follows the ordinary/quick/NEXT_INST branches, five retirement calls,
+clock/wake consumers, reset priority and Compat lifecycle owner. P8 executed
+24 IP cases per width: the previous code failed two 16-bit not-taken cases,
+exact XP expressions passed all 24. That evidence qualifies the restoration,
+not all retained hooks. P8's full 392/392 and later P161 regression support the
+current implementation, without claiming all snapshot/debug interleavings.
+
+## Positions 81-97: operand observation and restored register implementation
+
+Positions 81-87, 89-91 and 93-97 have no pending in-scope differences.
+
+### R0115-R0129: c_page.c host operand observation
+
+P10 restored R0113/R0114 (unneeded yoda.h and explanation). Fifteen IDs remain,
++20/-6: observer declarations, saved original buffer inputs, successful bulk
+read/write observations, six scalar read returns and three scalar write calls.
+
+Recommendation: retain this existing observation route. Original c_oprnd.h
+uses both cached-physical and supervisor alternatives and reversed x87 buffers.
+Hooks preserve the original linear address/value and do not reread devices.
+Original guest DR checking updates architectural exceptions, not the host's
+watch/trace state. machine/debug.c accepts observations only inside the current
+instruction and commits watch hits at retirement; debugger inspection is not
+guest access. Moving hooks below these functions would observe unrelated
+internal memory traffic and lose the correct operand boundary.
+
+P10's coherent removal of the whole observation route compiled/linked on both
+widths but failed the command-provider fixture's bounded wait for PAUSED after
+a real watchpoint run. Current and no-yoda controls passed. This is a negative
+control of the route, not individual proof of every hook or paging fault.
+Current source still has P10 as its latest change and retains the same owner,
+scalar widths and reverse-buffer handling. No new guest incident is claimed.
+
+### R0130-R0134: c_reg.c, fully restored
+
+These five IDs are restored, not submitted for retention. P11 removed the
+added headers/explanation and both register snapshot wrappers. The existing
+archive owner now calls original typed register accessors in the same order;
+there is no remaining snapshot-register production entry in src/test. This
+removed two function/API boundaries, unlike relocating a private-state copy.
+Current c_reg.c has no in-scope difference. P11's complete dual regression
+qualified the coherent archive adaptation; unchanged snapshot schema and
+serialized data were preserved. No further owner choice is needed here.
+
+## Positions 98-118: private TLB state and original exception paths
+
+### R0135-R0138: c_tlb.c private snapshot boundary
+
+Recommendation: retain snapshot.h, capture/restore and the associated original
+line mapping, residual +59/-0. R0136/R0137 already lost redundant fixed-size
+arguments and guards in P12; that reduction is delivered, not pending.
+
+Original tlb/next_set/page_index/page_address are private storage. Original
+flush_tlb is not restoration: it discards translations and observes current
+page tables on the next lookup. P12 coherently removed these accessors and
+substituted original flushing in the archive. Both architectures compiled and
+linked, but failed the real checkpoint assertion expecting cached translation
+0x3123. Source predicts the new table translation 0x4123; that actual value was
+not printed, so it is not asserted as a measured result. Current control passed.
+
+Current archive still allocates the fixed original page-index size and rejects
+invalid/null archive storage before restore; payload-value/next-set validation
+remains in the bridge. No duplicate TLB implementation or external raw cache
+owner is introduced. This does not prove every possible TLB state. P12 and
+P161 full regressions cover the existing implementation.
+
+Positions 99-101 and 103-118 have no pending in-scope differences. In position
+102, P13 fully restored R0139/R0140: removed the unneeded yoda.h include and
+restored the original host_getenv declaration. The original PROD force_yoda
+empty function links; no duplicate Compat stub was invented. Object comparison
+qualified the declaration alone; full regression qualified restored no-op calls.
+No pending patch remains in c_xcptn.c.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
 CALL/stack-size operations, SAS/archive providers, CPU return declarations
 and definitions, plus the existing BOP/device/BIOS fixtures. It reconciles
-these claims against P1-P6 final evidence. It does
+these claims against P1-P13 final evidence. The continuation also traces
+current interrupt callers, executor/lifecycle/debug ownership, operand
+observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 73.
+recommendations into owner approval. The next position is 119.
