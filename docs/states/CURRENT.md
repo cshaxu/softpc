@@ -36,13 +36,13 @@ builds/publication pass; complete EXE comparison shows metadata-only changes.
 After the owner returned to the desktop, fresh full regression passed 392/392
 with no retries or skips, including both native desktop/audio/package suites.
 All 472 frozen files have review dispositions. P160 verified inventory/delivery
-integrity; P186 reconciles positions 1-472 and D001-D006/L001 into the
+integrity; P187 verifies final identity and indexes positions 1-472 plus D001-D006/L001 in the
 [owner decision view](../etc/evidence/softpc/m9-t100-owner-decisions.md).
 381 reconciled residual IDs remain unapproved (375 semantic and six
 format/compiler), with nineteen historical notice items separately identified.
-Next: final accounting and owner decision package;
+Next: fixed-XP aggregate diff accounting and compact owner decision package;
 pending decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p186-proposed-defect-decision-reconciliation).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p187-final-identity-and-restored-id-accounting).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

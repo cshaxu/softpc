@@ -12669,3 +12669,26 @@ review remain; S1/T100 are open.
 
 P186 actual diff review, mirror/documentation/whitespace gates and build-residue
 check pass. Only the three reviewed task records change.
+
+## P187 final identity and restored-ID accounting
+
+Fresh checks verify all 472 P1 order/path/initial-hash triples and current tracked
+mirror paths, plus unique uninterrupted P1-P186 delivery identifiers. Current
+source/test/tools/build/assets match P164; both published EXE byte hashes match
+its fresh 392/392 qualification. No rebuild or new runtime result is claimed.
+
+A final-view identifier scan found 23 restored groups described collectively but
+not explicitly indexed; their exact IDs/dispositions now appear in the owner
+view. They are restorations, not new residuals, exclusions or new decisions.
+The source delta from task start is separately recorded: mirror 123 files
++5922/-3721; owned src four files +137/-29; tests nine files +336/-48; build/tools
+two files +8/-7. These are not XP diff-reduction figures. Pending file labels,
+residual groups, notices and proposed repairs are explicitly separate counts.
+
+Only three task records change. Fixed-XP aggregate accounting and the compact
+owner decision package remain. No code/tests/artifacts or user assets change;
+no job/scratch created. S1/T100 and owner decisions remain open.
+
+P187 final checks confirm explicit R0001-R0686 coverage and ordered section
+coverage 1-472 without gaps/overlaps. Actual diff review, mirror/documentation/
+whitespace gates and build-residue check pass. Only three task records change.

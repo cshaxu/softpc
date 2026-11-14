@@ -2557,6 +2557,81 @@ This reconciliation adds no residual ID, patch, test or new runtime result.
 No pending defect is erased by the final P164 suite passing 392/392: the temporary
 negative probes above exercise cases outside that permanent passing suite.
 
+## Final accounting: identity and restored-ID index
+
+At P186 HEAD, a fresh check compares all 472 frozen order/path/initial-hash
+triples to P1 7494ca3b9b8496a2f3abb943657eab754ffc42e5. They are unchanged;
+orders are exactly 1-472 and the current tracked mirror path set is identical.
+Every P1-P186 delivery identifier occurs exactly once in Git history after the
+admitted baseline. Delivery presence proves traceability, not correctness.
+
+The final view previously described these restored groups collectively without
+spelling every ID. They are explicitly indexed here, not reclassified as pending:
+
+| File | Already restored IDs | Disposition |
+| --- | --- | --- |
+| sevid007.c | R0300 / R0303 | Exact native dereferences; malloc in 27 entries without mixed-width upper-byte dependence. |
+| sevid008.c | R0304 / R0307 | Exact native expressions; malloc at the 25 corresponding sites. |
+| sevid009.c | R0308 / R0311 | Native dereferences including P56's final lookup restoration; ordinary allocations restored. |
+| sevid010.c | R0312 / R0315 | Native dereferences including P56's final second-WORD store; ordinary allocations restored. |
+| sevid011.c | R0316 / R0319 | Native expressions and 27 ordinary malloc calls. |
+| sevid012.c | R0320 / R0323 | Native expressions and 27 ordinary malloc calls. |
+| sevid013.c | R0324 / R0327 | Native expressions and ordinary malloc calls. |
+| sevid014.c | R0328 / R0331 | Native expressions and ordinary malloc calls. |
+| sevid021.c | R0376 | Fifty original native byte-access lines. |
+| sevid022.c | R0379 | Twenty-one original native byte-access lines. |
+| sevid023.c | R0382 | Twenty-three original resolved-address expressions. |
+| sevid024.c | R0385 | Ten original native source/table accesses. |
+| sevid025.c | R0388 | Sixty-six original native-address expressions. |
+| sevid027.c | R0394 | Forty-one original dereferences. |
+| sevid028.c | R0397 | Sixty-two original dereferences. |
+
+These 23 IDs complete explicit R0001-R0686 coverage in this view, counting
+written ranges as their individual identifiers. Identifier presence is not a
+claim that every ID is a current residual or has individual dynamic proof.
+Remaining mixed-width/native capacity and GDP contracts retain their separately
+listed pending IDs and proof limits; no excluded-body IDs are created.
+
+The inventory has 111 file statuses containing PENDING and 361 other statuses.
+Those are historical file-disposition labels, not 111 approved patches or an
+independent count of necessary hunks. The reconciled 381 residual IDs represent
+audit groups (375 semantic/ABI and six compiler/format), with nineteen notices
+and seven proposed repairs separate. Some groups contain both restored and
+retained portions; source ranges are not independent defects.
+
+### Current tested-source and artifact identity
+
+Git diff from P164 21e56aa077334ed5db04a3ab1d64e026bcc2656f through P186 is
+empty for src, test, tools, root CMake files and assets. Current EXE bytes are:
+
+| Artifact | Bytes | SHA-256 |
+| --- | --- | --- |
+| softpc32.exe | 3478046 | 1c4f19f8f9840a86fdb796ebec035fea8c45704d0f25edde7a3ba7d92f65fe1c |
+| softpc64.exe | 3095494 | f4fb0f42bf7b7e91db40b2ca44fdda2341fd164ee4c820736b29c3acfb493a05 |
+
+They match P164's fresh x86/x64 188 background plus eight native tests each,
+392/392 without retry/skip. This is reused unchanged-source evidence, not a
+new test run. Temporary negative probes identify gaps outside that suite.
+
+### Task-start source delta, not XP mirror-diff reduction
+
+Reproducible command: git diff --numstat from
+ac9d8dc85a6d9b0cc66d0a6649f60e8903406f18 to P186, by tracked path scope.
+
+| Scope | Changed files | Added | Deleted | Net source lines |
+| --- | ---: | ---: | ---: | ---: |
+| Mirror source tree | 123 | 5922 | 3721 | +2201 |
+| Other production src | 4 | 137 | 29 | +108 |
+| Tests | 9 | 336 | 48 | +288 |
+| Tools and root build configuration | 2 | 8 | 7 | +1 |
+
+The four non-mirror production files are Compat ccpu/abi.h, ccpu/archive.c,
+ccpu/snapshot.h and platform.c. Build/check changes are CMakeLists.txt and
+standalone_source_boundary.cmake. No public eight-tree changes are included.
+These counts deliberately exclude docs and EXEs. They do not measure remaining
+or reduced XP diff: restored original code can increase source length. Fixed-XP
+aggregate diff accounting and the compact owner decision package remain next.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
