@@ -12161,3 +12161,29 @@ are automated regression results, not new manual guest acceptance.
 P164 final mirror/documentation/whitespace gates pass. Task-owned scratch was
 previewed and removed after runner exit; build residue check passes. Reusable
 Ninja/ccache roots and user assets are preserved. S1/T100 remain open.
+
+## P165 final-decision reconciliation, positions 283-288
+
+Reconcile sevid000-sevid005 against P30-P35, their per-range/allocation records,
+current production bindings, GDP field owner, actual DWORD/continuation bodies
+and native allocation sites. All six normalized source hashes still equal the
+final candidates named in those delivery records. Current calloc/malloc counts
+are respectively 31/0, 31/0, 3/29, 5/27, 6/26, 1/31. No production edits are
+needed by this reconciliation; existing limitations are not silently approved.
+
+The decision view adds 17 qualified semantic IDs, cumulative 141 through file
+288. Original address wrappers and unnecessary zeroing/tail-continuation changes
+are identified as restored, not pending. The view explicitly distinguishes the
+six sevid000 continuations from the four restored sevid001 continuations,
+source-only mixed-width proof from bounded dynamic controls, and original
+GenericByteFill failure from guest reachability. D001-D006/L001 remain pending
+final reconciliation, not TODO or new fixes.
+
+Executor and coordinator review agree that this P changes only three task
+records. No source, test, EXE, configuration, guest, snapshot or shared component
+is modified. P164's fresh 392/392 applies to the identical executable sources;
+no fresh compilation, publication or runtime test is claimed for documentation.
+Next reconciliation position is 289; S1/T100 are not closed.
+
+P165 documentation/mirror/whitespace checks and build-residue check pass.
+No disposable scratch or live job is created by this document-only delivery.

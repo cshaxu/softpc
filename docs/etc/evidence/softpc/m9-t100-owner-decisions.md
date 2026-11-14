@@ -8,7 +8,7 @@ this review and receive no entries. All choices below remain unapproved.
 
 The frozen universe remains the [472-file inventory](m9-t100-files.tsv).
 File-level auditing is complete; final point-by-point reconciliation is not.
-This view currently reconciles positions 1-282 only. Positions 283-472, original
+This view currently reconciles positions 1-288 only. Positions 289-472, original
 defect decisions D001-D006 and local-extension defect L001 still require their
 final review here. Their existing evidence and pending status remain in force.
 
@@ -544,6 +544,95 @@ metadata-equivalent and actual VGA tests were rerun. No new compiler support,
 warning suppression or testing-only API was introduced. All four IDs are
 restored, not retained recommendations.
 
+## Positions 283-288: generated video rules
+
+The six current source hashes match the final candidates recorded in P30-P35.
+Root CMake still includes sevid*.c in the production CCPU object group;
+evidfunc tables and ev_glue select the original readers, writes, dither and
+Generic rules. These are not removable test-only implementations. The initial
+range maps and allocation inventories linked in P30-P35 provide original/current
+locations; they are not new exclusion records or separate approval items.
+
+### R0269-R0274: sevid000.c
+
+Six semantic IDs remain recommended, with distinct evidence:
+
+- R0269: mapped GDP fields use the same native owner as R0254/R0263. Original
+  32-bit field spacing cannot hold native x64 pointers. That paired owner proof
+  applies; no whole-family original restoration was dynamically run here.
+- R0270: 31 local allocations retain native capacity and zeroing. Original-sized
+  allocations heap-corrupt on x64; native-sized malloc and poisoned allocations
+  access-violate. Generated partial IU32 stores followed by IUH loads explain
+  the required initialized upper bytes. The original controls pass x86.
+- R0271: six local continuations retain goto. Restoring original recursive
+  dispatch frees the enclosing locals and loses their saved context; actual
+  VGA controls access-violate on both architectures. This is file-specific.
+- R0272: CHAIN2 reads retain the selected physical plane layout. Coherent
+  original layout restoration fails actual BIOS pixel colour assertions on
+  both widths; this is not a new Win3.1 guest reproduction.
+- R0273: both DWORD readers retain second-WORD offset +2 and explicit low/high
+  WORD combination. Original offset produces 66552211 instead of 44332211;
+  original combination produces 00002211. Both independent controls fail on
+  both widths. P30 restored the original intermediate extraction sequence.
+- R0274: Unchained DWORD retains +2 instead of +8. Tests distinguish bytes at
+  +2/+3 from +8/+9 across planes and offsets; original offset fails both widths.
+
+R0268's 35 address wrappers were restored. Residual XP scope is +492/-497;
+P30 removed 52 diff lines. P30's x64 verifier timeout/retry is recorded, not a
+first-pass result. P164 subsequently passed the complete current 392/392.
+
+### R0276/R0277/R0279: sevid001.c
+
+Retain mapped GDP fields, 31 native zeroed local allocations, and CHAIN2
+backward addressing. Original-size or poisoned local storage crashes x64;
+original backward layout reads 5a instead of expected 37 on both widths.
+The actual registered-reader oracle covers 384 combinations per executable,
+including both read modes, address parities, counts and destination directions.
+It is bounded rule evidence, not exhaustive hardware or guest validation.
+
+R0275's 31 address wrappers and R0278's four tail continuations were restored.
+Unlike sevid000, these readers have no enclosing same-file caller requiring
+preserved locals after the tail return. The stale gate requiring those gotos
+was removed in P31; other continuation checks remain. Residual +448/-447,
+42 fewer XP diff lines. P31's gate failure and verifier retry remain disclosed.
+
+### R0281/R0282, R0285/R0286, R0289/R0290, R0293/R0294
+
+These are the eight pending IDs for sevid002 through sevid005, respectively:
+one GDP mapping and one native local-storage group per file. Original-size
+actual-body controls heap-corrupt on x64 and pass x86. Existing native fields
+remain the sole GDP owner. No device algorithm is duplicated in Compat.
+
+| File | Native local allocations | Zeroing retained only at | Restored malloc sites | Residual XP + / - |
+| --- | --- | --- | --- | --- |
+| sevid002.c | 32 | S2154, S2160, S2181 | 29 | 594 / 593 |
+| sevid003.c | 32 | S2186, S2194, S2199, S2205, S2208 | 27 | 672 / 671 |
+| sevid004.c | 32 | S2219, S2222, S2226, S2229, S2238, S2241 | 26 | 665 / 664 |
+| sevid005.c | 32 | S2275 | 31 | 664 / 663 |
+
+Retained zeroing follows identified IU32 stores subsequently read as IUH.
+This is source/ABI evidence for defined upper storage, not proof that arbitrary
+high-address RAM arguments survive the original narrow input path. That limit
+must not be hidden by the successful write/fill tests or poison controls.
+
+R0280/R0284/R0288/R0292 restored native-address dereferences; R0283/R0287/
+R0291/R0295 restored unnecessary zeroing. P32-P35 removed respectively 70,
+92, 90 and 52 XP diff lines without moving behavior elsewhere. Focused controls
+cover selected V7 dither, Generic writes, backward moves and Unchained masked
+writes/fills. The backward-move comparison in P34 proves preservation, not a
+complete independent hardware oracle. All four delivered full suites passed.
+
+P34 also reproduced the original nested GenericByteFill continuation failure
+on both widths. The compiled scalar SAS fill path does not call its registered
+bulk entry. It remains a separate original-defect decision; passing registered
+tests neither repairs it nor proves a guest-triggered crash. D001-D006/L001
+still require final reconciliation. No new repair is admitted here.
+
+Seventeen semantic IDs are added to the review view (141 cumulative), separate
+from the four historical notice-policy items. These recommendations remain
+unapproved. This reconciliation changes documentation only; current production
+hashes and P164's fresh full-regression evidence remain applicable.
+
 ## Verification boundary
 
 The recheck reads current CMake bindings, BIOS/PIC/descriptor callers,
@@ -553,4 +642,4 @@ these claims against P1-P13 final evidence. The continuation also traces
 current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
-recommendations into owner approval. The next position is 283.
+recommendations into owner approval. The next position is 289.
