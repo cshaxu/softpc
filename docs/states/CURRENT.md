@@ -40,9 +40,11 @@ integrity; P187 verifies final identity and indexes positions 1-472 plus D001-D0
 [owner decision view](../etc/evidence/softpc/m9-t100-owner-decisions.md).
 381 reconciled residual IDs remain unapproved (375 semantic and six
 format/compiler), with nineteen historical notice items separately identified.
-Next: fixed-XP aggregate diff accounting and compact owner decision package;
+P188's fixed-XP normalized Git comparison reduces added-plus-deleted diff by
+7328 lines across 123 changed mirror files; this is distinct from source-line
+net growth and anchored per-point counts. Next: compact owner decision package;
 pending decisions keep S1/T100 open. See the
-[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p187-final-identity-and-restored-id-accounting).
+[audit evidence](../etc/evidence/softpc/m9-t100-progress.md#p188-fixed-xp-aggregate-comparison).
 
 
 S43 implementation 51d0bc15 adds tools/Build.cmd: PowerShell-free x86/x64

@@ -2629,8 +2629,67 @@ The four non-mirror production files are Compat ccpu/abi.h, ccpu/archive.c,
 ccpu/snapshot.h and platform.c. Build/check changes are CMakeLists.txt and
 standalone_source_boundary.cmake. No public eight-tree changes are included.
 These counts deliberately exclude docs and EXEs. They do not measure remaining
-or reduced XP diff: restored original code can increase source length. Fixed-XP
-aggregate diff accounting and the compact owner decision package remain next.
+or reduced XP diff: restored original code can increase source length.
+
+### P188 fixed-XP aggregate comparison
+
+Across the 123 changed mirror files, the normalized Git/Myers comparison with
+the fixed XP baseline decreases by **7328 added-plus-deleted diff lines**.
+The other 349 frozen files are unchanged since task start and contribute zero
+to this delta. Of the changed files, 122 reduce that metric; ev_glue.c is neutral.
+No changed file increases it. This is a reproducible heuristic comparison,
+not a count of independent semantic differences or the sum of anchored local
+restoration counts.
+
+| Mirror directory | Change in XP added-plus-deleted diff lines |
+| --- | ---: |
+| base/bios | -55 |
+| base/ccpu386 | -286 |
+| base/comms | -101 |
+| base/cvidc | -3266 |
+| base/inc | -176 |
+| base/keymouse | -9 |
+| base/support | -3 |
+| base/system | -136 |
+| base/video | -162 |
+| host/inc | -431 |
+| host/src | -2703 |
+| Total | -7328 |
+
+Reproduction inputs are task-start ac9d8dc85a6d9b0cc66d0a6649f60e8903406f18,
+current source (unchanged from P164), and XP SP1
+a2f6d7c93aa4f11efc51147566d5961c59a8ef89 under
+Source/XPSP1/NT/base/mvdm/softpc.new. Enumerate the frozen inventory; compare
+each changed file against that same original, before and after. Normalize CRLF
+to LF without changing other bytes; omit line directives for this metric.
+Parse conditional branches by parent, expression, occurrence and branch arm,
+preserving physical line positions through comments and directive continuations.
+Remove already-excluded body spans from corresponding comparison inputs, then
+run git diff --no-index --numstat --no-renames --diff-algorithm=myers. Subtract
+the two added-plus-deleted totals. Exclusion bodies receive no IDs, inventory,
+or claimed restoration benefit; this comparison is not an exclusion audit.
+
+Automatic structural correspondence succeeded for 113 changed files. The other
+ten were checked against original/current directive context: reset.c, c_main.c,
+cpu_vid.h, egacpu.h, gmi.h, ica.c, vga_mode.c, cfpu_def.h, host_cpu.h and
+nt_graph.c. Existing local-only guards have no invented XP counterpart; their
+real framing differences remain visible. Renamed conditions and shifted
+occurrences are matched to their actual original location. For reset.c's
+restored floppy branch, the formerly excluded body is omitted from both
+comparison sides rather than counted as restoration gain. These ten files
+contribute -280; the other 113 contribute -7048.
+
+Global heuristic matching is not interchangeable with the earlier fixed-range
+proofs: for example, nt_sbdsp.c contributes -1376 here, while P154 records 1628
+restored difference lines in its anchored comparison; nt_sb.c contributes
+-390 here versus P153's local -412. Other P batches also touched those files.
+Do not replace the per-point evidence with this aggregate or add local numbers
+to it. The aggregate measures task-start to final source using one method;
+the individual records establish which original code was restored and why.
+
+This accounting does not approve the 381 residual IDs, nineteen notice items
+or proposed D001-D006/L001 changes. No source, test or EXE changed in P188;
+P164's 392/392 result remains applicable and is not a newly executed test run.
 
 ## Verification boundary
 
@@ -2642,4 +2701,4 @@ current interrupt callers, executor/lifecycle/debug ownership, operand
 observers, archive register access and private TLB storage. It does
 not create a new runtime result from a source search, nor turn three qualified
 recommendations into owner approval. The remaining reconciliation concerns
-final accounting and the owner decision package.
+the compact owner decision package and its approval boundaries.

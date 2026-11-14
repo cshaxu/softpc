@@ -12692,3 +12692,31 @@ no job/scratch created. S1/T100 and owner decisions remain open.
 P187 final checks confirm explicit R0001-R0686 coverage and ordered section
 coverage 1-472 without gaps/overlaps. Actual diff review, mirror/documentation/
 whitespace gates and build-residue check pass. Only three task records change.
+
+## P188 fixed-XP aggregate comparison
+
+The owned background aggregate job completed with exit zero: 113 changed files
+had automatic conditional correspondence; ten required explicit context review.
+The follow-up matched original branch locations/renamed conditions and retained
+real local-only guard differences without inventing original counterparts.
+Excluded bodies and line directives do not contribute to the selected metric;
+reset's restored formerly excluded body is also omitted, not counted as a gain.
+No exclusion inventory or new difference IDs were created.
+
+The 123 changed mirror files reduce normalized Git/Myers XP added-plus-deleted
+diff by 7328 lines: 122 reductions and one neutral file, no increases. The 349
+other frozen files remain unchanged and contribute zero. The owner view records
+directory subtotals, exact references, normalization/correspondence method and
+the distinction from anchored local counts and task-start source net growth.
+Ten manually aligned files contribute -280; the other 113 contribute -7048.
+
+Executor/counter-review checked final-source changes and parser exceptions,
+including the original floppy branch, TLS branch identities, local-only guards
+and shifted V7 condition occurrence. This is accounting evidence, not new
+runtime proof or approval of remaining differences. No production/tests/EXEs,
+configuration, media or snapshots change. P164's fresh 392/392 still applies.
+The compact approval package remains; S1/T100 stay open.
+
+P188 actual three-document diff review, XP mirror and documentation gates,
+whitespace check and build-residue check pass. The aggregate job is terminal;
+its task-owned scratch was removed through the cleanup tool after preview.
