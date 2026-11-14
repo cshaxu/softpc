@@ -10317,3 +10317,49 @@ P133 background 188/188 per width remains applicable. Native final acceptance
 is pending. Final manifest/documentation/whitespace checks and actual-change
 review accompany delivery. Frontier 453/472; next file 454 host/inc/nt_mouse.h.
 S1/T100, R0571/R0573 and previous owner decisions remain open.
+
+
+## File 454: host/inc/nt_mouse.h (P145)
+
+Complete byte comparison with fixed XP SP1, after CRLF/LF normalization,
+is identical. Fixed original SHA-256:
+12424b51bffd9bf47973e39afb7a83994f0597042bd64138fd4f5e42323ef772.
+There is no selected difference, exclusion record or new decision point.
+Original nt_graph.c includes it at physical line 62. Its retained declarations
+remain original; names of no-longer-retained mouse providers do not justify
+new removal differences. No duplicate implementation is present in this header.
+
+Executor and counter-review agree: preserve the complete original file and
+include wiring. Production/test/artifact diff is zero. No rebuild or runtime
+rerun is justified for a read-only identical-file audit. Published binaries
+remain P144; that batch's dual cached build and VGA passes remain unchanged.
+Documentation/whitespace gates and actual documentation-only review accompany
+this delivery. Frontier 454/472; S1/T100 and pending decisions remain open.
+
+### File 455 investigation, not a completed disposition
+
+nt_sb.h is a mixed header, not an identical file. Full original/current text
+and all direct include sites were read. Real consumers are nt_sb, nt_sbdsp,
+nt_sbmid, nt_sbmxr, nt_sbfm, Compat platform and sound fixtures. The preliminary
+restoration groups requiring investigation are:
+
+- Original mmsystem typedefs/externs and currently omitted unused prototypes;
+  do not assume an unused declaration requires a native host implementation.
+- VOID/BYTE/DWORD spelling and original declaration layout: candidate exact
+  restorations. BOOL needs coherent provider review: insignia maps BOOL to
+  unsigned UINT, whereas SetSpeaker and bHighSpeedMode currently use signed
+  IBOOL. A declaration-only conflicting candidate is not necessity proof.
+- Original external BasePort/MpuBasePort versus current static storage in
+  nt_sb.c: evaluate the original wiring, not automatic retention of privacy.
+- Current BufferMidi returns lib_status, checked in VsbByteOut; SbGetStatus/
+  SbService also reach actual Compat executor status/service sites. DMA helpers
+  operate on the existing controller through SB_DMA_INFO. These are real
+  consumers, but their presence alone does not establish minimality/necessity.
+- DBG's selected empty macros, historical comments and original reporting
+  macro versus existing excluded REPORT_SB_MODE body require separate treatment;
+  do not accidentally enable an excluded diagnostic path.
+
+No nt_sb.h edit or retention decision has been made. The next complete-file
+work must test coherent restoration, classify every selected difference and
+finish that file before advancing its ledger. This record does not close the
+investigation or pre-approve its existing device/host adaptation.
