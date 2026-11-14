@@ -6894,3 +6894,82 @@ awaits owner disposition, not automatic approval.
 P94 actual eight-file diff review, mirror/documentation gates and whitespace
 check pass. CIM confirms task processes exited; exact task scratch preview,
 removal and residue check pass. User INI/media/snapshots are untouched.
+
+## Files 382-383: SAS dispatch and Sound Blaster headers (P95)
+
+File 382 base/inc/sasp.h is completely LF-normalized identical to pinned XP,
+raw SHA `861eb41563531cab6d3b0011161188ff1dbeefa985af1074afaa2ff436a7d696`.
+Actual compiled ccpusas4.c includes it and defines/calls SasSetPointers. Preserve
+the original declaration and file; no new patch point or deletion is warranted.
+
+File 383 base/inc/sndblst.h XP raw SHA:
+`35b5225c531deb47037fbe676a9057c427137b46c988863e15701eb3fa74a353`.
+This header has no excluded body to skip. Full raw-XP comparison, actual C/H
+consumer search and original host/src/nt_sb.c signature review establish:
+
+| Point | Original/local scope | Initial analysis | Independent counter-review | Disposition |
+| --- | --- | --- | --- | --- |
+| R0446 | AUTO_BLOCK_SIZE moved from XP line 138 to local hardware constants | Same value, no order-dependent consumer in the header. | Actual DSP use appears after the complete include; original position works. | Restore original position exactly. |
+| R0447 | XP lines 30-54, excluding SbTerminate return; coupled nt_sb.c initialization signature | USHORT/IU16 and VOID/void are available through insignia.h. Initial BOOL-only header restoration conflicts with current int provider. | Do not use a broken partial restoration as necessity proof: XP provider also returns BOOL. insignia.h defines BOOL as UINT, not Windows signed BOOL; restore provider and header together and adapt the one test's explicit extern/wrapper types. Every current return is TRUE, FALSE or equality, and production callers test truth value. | Restore original aliases, spelling and original four-line SbInitialize signature. Test extern/wrapper become unsigned int to match the actual macro expansion. |
+| R0448 | XP line 42 SbTerminate return VOID; current IBOOL | Real teardown returns PCM/MIDI close failure. | Machine reset/destroy and platform reboot consume that failure; a void coherent restoration would require deleting error propagation, allowing reset continuation after failed teardown. Existing failure fixture checks exactly that stop boundary. | Qualified pending owner decision, +1/-1. No new callback or recovery path. |
+| R0449 | Added 0x36 MIDI_READ_TIMESTAMP_POLL_WRITE_POLL_UART among XP MIDI commands | Actual DSP dispatcher consumes unsupported UART data rather than interpreting it as later PCM commands. | Device fixture explicitly exercises 0x36 and every following byte, checks retained parser state, no PCM/MIDI output, reset and snapshot state. Removing both definition and dispatch handling would return to command interpretation. This is source-path evidence plus current fixture coverage, not a fresh original-bug replay. | Qualified pending owner decision, +1/-0. |
+| R0450 | XP lines 126-152, 158-169 and 194-205 | Previously omitted original constants/comments/SYNTH_DATA and relocated MPU constants have no justification for deletion. | Search confirms restored unused declarations do not install native FM, alternate MPU ports or a second output path. The used MPU constants retain identical values; their original location is after the same completed include. | Restore omitted text and original definition positions exactly. |
+
+Production consumers are compiled nt_sb/nt_sbdsp/nt_sbmid/nt_sbmxr/nt_sbfm,
+base/system/at_dma and Compat platform; tests include mixer and device contracts.
+The coupled nt_sb.c edit restores only the original initialization signature;
+its later frozen file is not marked audited. No function body, lifecycle branch,
+command dispatch, guest state, audio API or device selection changes.
+
+Verification correction: initial header-only BOOL restoration fails compiling
+nt_sb.c due to unsigned-versus-signed prototype mismatch. That failed candidate
+was not published or treated as necessary retention. After confirming runner
+exit, the original provider signature and corresponding test declarations were
+restored coherently. Final x86 build succeeds, but complete EXE comparison finds
+non-metadata byte differences, so the artifact-equivalence exemption is rejected.
+Disassembly confirms SbInitialize's generated register allocation/instructions
+changed following the signed-to-original-unsigned return type restoration;
+source branches and 0/1 returns are unchanged. Full dual-architecture runtime
+qualification is required rather than asserting byte or runtime equivalence.
+
+Scope/counts: production +63/-15 (net +48), tests +2/-2. Restoring original
+text intentionally increases source lines while reducing mirror deviations.
+With full-file difflib SequenceMatcher(autojunk=False), header XP diff falls from
++16/-60 to +2/-1 (73 fewer lines). The large mixed nt_sb.c alignment reports
++163/-777 before and +166/-777 after, despite exact signature restoration.
+Combined heuristic change is 1016 to 946, 70 fewer diff lines. Fixed original
+signature correspondence removes the old one-line replacement of four original
+lines, i.e. five actual signature-diff lines; anchored reduction is 78 overall.
+No new XP-relative location or semantic modification is introduced. Both metrics
+are reported instead of mistaking heuristic realignment for restored code.
+
+Final verification: both cached builds succeed and publish final-source EXEs.
+Final successful x86/x64 build logs contain 89/267 warning lines, all within
+preserved softpc.new. No non-mirror warnings occur. Complete qualification passes
+392/392: x86 188/188 background (140.14 s) plus 8/8 desktop/native-audio (24.48 s);
+x64 188/188 background (133.21 s) plus 8/8 desktop/native-audio (24.77 s).
+The SB DMA, commands/framing, archive, mixer and platform-failure fixtures pass
+on both architectures in these full runs. This includes current behavior tests,
+not an original-bug negative replay or every real Windows guest audio workload.
+Desktop was observed Active; no user intervention, guest/media/configuration
+mutation or native session workaround was needed.
+
+Final compiler stamps and EXE SHA-256:
+
+- x86 Nov 13 2026 15:51:51:
+  `b41bbaf225196cc2cc932959a72308a799e015a27fbf8b03240c0c0f1a1388a2`.
+- x64 Nov 13 2026 15:53:05:
+  `8724c86ca6d86108eb257771851237368ea3e0075cb7f57446aba805da21f743`.
+
+Independent complete-header check removes exactly the two declared residuals
+from a private in-memory comparison and obtains byte equality with normalized
+pinned XP. No other header deviation is hidden in the comparison. Both local
+manifest hashes are updated without changing raw/subset provenance hashes.
+The coupled provider signature and test prototype diff have been reviewed;
+public shared components remain unchanged. Frontier becomes 383/472, next file
+384 base/inc/spcfile.h. R0448/R0449 remain evidence-qualified owner decisions;
+S1 is not closed and later nt_sb.c whole-file audit remains outstanding.
+
+P95 independent actual ten-file diff review and mirror/documentation/whitespace
+gates pass. CIM confirms all task jobs exited; exact scratch preview, removal
+and residue check pass. No unrelated worktree or user asset changes remain.

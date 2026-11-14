@@ -2101,3 +2101,15 @@ Only the selected IHPE-to-PHY_ADDR token remains, matching the original CCPU
 storage definition; actual x86/x64 original-declaration countercompiles fail.
 Selected XP-relative diff drops by four lines to +1/-1. Existing exclusion and
 line-control scaffolding is unchanged, and retention still awaits owner choice.
+
+### T100 S1 P95 Sound Blaster header restoration
+
+R0446-R0450 in m9-t100-progress.md supersede historical sndblst.h counts.
+Restore original types, constants, SYNTH_DATA and their original positions;
+restore the coupled SbInitialize signature and adjust test declarations.
+The header now differs from raw XP only by SbTerminate's returned status and
+the 36h command constant (+2/-1), both qualified for owner decision. Header
+diff decreases by 73 lines. Whole mixed-file alignment reports a combined
+70-line reduction; fixed signature correspondence gives 78. These are distinct
+metrics, not newly added mirror behavior. Production +63/-15, tests +2/-2.
+Final-source dual-architecture builds/publication and 392/392 tests pass.

@@ -20,7 +20,6 @@
 #define VSB_INTERRUPT       0x05        // Interrupt 5
 #define VSB_DMA_CHANNEL     0x01        // DMA Channel 1
 #define NO_DEVICE_FOUND     0xFFFF      // returned if no device found
-#define AUTO_BLOCK_SIZE     0x200   // size of each buffer in auto
 
 /*****************************************************************************
 *
@@ -28,31 +27,31 @@
 *
 *****************************************************************************/
 
-extern IU16 SbDmaChannel;
-extern IU16 SbInterrupt;
+extern USHORT SbDmaChannel;
+extern USHORT SbInterrupt;
 
 /*
 *    General function prototypes
 */
 
-IBOOL
+BOOL
 SbInitialize(
-    void
+    VOID
     );
 
 IBOOL
 SbTerminate(
-    void
+    VOID
     );
 
-void
+VOID
 SbGetDMAPosition(
-    void
+    VOID
     );
 
-void
+VOID
 ResetAll(
-    void
+    VOID
     );
 
 /*****************************************************************************
@@ -125,16 +124,50 @@ ResetAll(
 
 #define MPU_RESET                               0xFF    // Enables & Sets MIDI to use both ports
 #define MPU_PASSTHROUGH_MODE    0x3F    // Starts dumb mode; only active command is set path
-#define MPU401_DATA_PORT        0x330
-#define MPU401_COMMAND_PORT     0x331
-#define MPU_INTELLIGENT_MODE    0
-#define MPU_UART_MODE           1
+#define MPU_GET_VERSION                 0xAC    // Returns version number after acknowledge
+#define MPU_GET_REVISION                0xAD    // BUGBUG: Returns 0x09, for some unknown reason!
+#define MPU_PORTS_AVAILABLE             0xAE    // Which ports are available? (bit0=port1, bit1=port2)
+#define MPU_SET_MIDI_PATH               0xEB    // Sets which port(s) will be used
+#define MPU_DUMB_WAVETABLE              0xF1    // Turns on wavetable synth for dumb mode
+#define MPU_DUMB_EXTERNAL               0xF2    // Turns on external MIDI for dumb mode
+#define MPU_DUMB_BOTH                   0xF3    // Turns on both wavetable synth and external MIDI
+
+/*
+*    Performance parameters for single and auto-init DMA fine tuning
+*/
+#define AUTO_BLOCK_SIZE     0x200   // size of each buffer in auto
+#define DEFAULT_LOOKAHEAD   0x600   // target # of bytes to queue to kernel driver
+#define MAX_WAVE_BYTES      0x3000  // maximum # of bytes to queue to kernel driver
+#define SINGLE_PIECES       2       // number of pieces in each single write
+#define SINGLE_SLEEP_ADJ    15      // number of overhead milliseconds in single
+#define DSP_BUFFER_TOTAL_BURSTS (MAX_WAVE_BYTES / AUTO_BLOCK_SIZE)
+
+/*****************************************************************************
+*
+*    #FM related definitions
+*
+*****************************************************************************/
+
+/*
+*    OPL2/Adlib Ports
+*/
 
 #define ADLIB_REGISTER_SELECT_PORT 0x388 // select the register to write data
 #define ADLIB_STATUS_PORT          0x388 // read to determine opl2 status
 #define ADLIB_DATA_PORT            0x389 // write data port
 
+/*
+*    FM information
+*/
+
 #define AD_MASK             0x04    // adlib register used to control opl2
+#define AD_NEW              0x105   // used to determine if app entering opl3 mode
+#define BATCH_SIZE          40      // how much data is batched to opl2
+
+typedef struct {                    // structure written to fm device
+    unsigned short IoPort;
+    unsigned short PortData;
+} SYNTH_DATA, *PSYNTH_DATA;
 
 /*****************************************************************************
 *
@@ -159,3 +192,15 @@ ResetAll(
 #define MIXER_CD_VOLUME     0x08    // set cd volume
 #define MIXER_VOICE_VOLUME  0x0A    // set wave volume
 
+
+//
+// Midi ports
+//
+
+#define MPU401_DATA_PORT        0x330
+#define ALT_MPU401_DATA_PORT    0x300
+#define MPU401_COMMAND_PORT     0x331
+#define ALT_MPU401_COMMAND_PORT 0x301
+
+#define MPU_INTELLIGENT_MODE    0
+#define MPU_UART_MODE           1

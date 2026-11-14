@@ -30,12 +30,13 @@ skipped without new bookkeeping. T99 remains closed; see its
 
 ## Current Technical Baseline
 
-T100 S1 P94 completes file 381 sas.h: remove an unused added declaration,
-restore inactive original text and minimize the required memory-size declaration
-to one type token. Both architectures reject the original conflicting type;
-the residual is qualified for owner decision. XP-relative diff reduces by four lines.
-Both cached builds/published EXEs pass metadata-only equivalence. P92 checkpoint
-and P80 392/392 remain runtime baselines. Frontier 381/472; next base/inc/sasp.h.
+T100 S1 P95 completes files 382-383. sasp.h matches XP; sndblst.h restores
+original declarations/constants/layout, retaining only two qualified decisions.
+SbInitialize's original signature is restored with the matching test types;
+that coupled edit does not complete the later nt_sb.c file audit. Header diff
+reduces by 73 lines; full mixed-file alignment and anchored counts are recorded.
+Both EXEs are built/published and all 392/392 tests pass on final source.
+Frozen frontier 383/472; next file 384 base/inc/spcfile.h.
 See the [audit evidence](../etc/evidence/softpc/m9-t100-progress.md).
 S1 remains active; no routine approval is awaited.
 

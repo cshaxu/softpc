@@ -11,9 +11,9 @@ static unsigned wait_calls, timer_calls;
 static unsigned delete_calls;
 static int fail_sound_init, fail_sound_term;
 static unsigned sound_init_calls, sound_term_calls;
-extern int SbInitialize(void);
+extern unsigned int SbInitialize(void);
 extern int SbTerminate(void);
-static int initialize_sound(void)
+static unsigned int initialize_sound(void)
 {
     ++sound_init_calls;
     return fail_sound_init ? 0 : SbInitialize();

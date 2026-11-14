@@ -104,7 +104,10 @@ void SbSetRunning(IBOOL running)
 static const IU16 SbPorts[] = { 0x224, 0x225, 0x226, 0x228, 0x229,
     0x22a, 0x22c, 0x22e, ADLIB_REGISTER_SELECT_PORT, ADLIB_DATA_PORT };
 
-IBOOL SbInitialize(void)
+BOOL
+SbInitialize(
+    void
+    )
 {
     IU32 i;
     lib_status status;
