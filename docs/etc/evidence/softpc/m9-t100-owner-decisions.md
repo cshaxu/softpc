@@ -3830,3 +3830,41 @@ not approve unreviewed differences or remove files merely because retention
 has been approved. Next real-diff file remains order 283 sevid000.c.
 Documentation-only; no source/build/runtime changes. Documentation and
 whitespace checks pass, with no disposable build work.
+
+
+## S4 P29: approved vglfunc.c and reviewed diskbios.c
+
+Owner explicitly approves R0412 in order 318 base/cvidc/vglfunc.c: +5/-0,
+local IFN1 declaration adaptation. Status: approved retention. Owner directs
+skipping the intervening generated cvidc files; they remain unreviewed and
+unapproved in this S4 review.
+
+Order 319 base/disks/diskbios.c is compared again with fixed XP SP1
+a2f6d7c93aa4f11efc51147566d5961c59a8ef89.
+Exclusion bodies and necessary line controls receive no accounting.
+Three remaining textual points total +4/-4:
+
+| Current / XP physical line | Size | Classification and disposition |
+| --- | --- | --- |
+| 293 / 441 | +1/-1 | NTVDM opening directive loses the original trailing True for all NT VDMs comment. No behavior or demonstrated retention need; recommend restoring original directive text. |
+| 295 / 452 | +1/-1 | NTVDM closing directive changes the tab before its comment to a space. Formatting only; recommend restoring original whitespace. |
+| 904-905 / 1663-1664 | +2/-2 | R0414 corrects BIOS AH=15h capacity split from UCHAR/base-256 to full CX:DX/base-65536. Recommend retain, pending owner approval. |
+
+The first two points are surviving directive text, not accounting for the
+excluded body. No source is changed by this review. If restored later, only
+R0414 (+2/-2) would remain. R0413's extracted notice was already removed by
+P24 and is not a current decision.
+
+Current source confirms BIOS disk_io command table entry 0x15 -> read_dasd,
+getdpb geometry, unchanged reserved-cylinder calculation and AH=3/CF=0.
+Current device_contract_smoke verify_disk invokes BIOS[BIOS_DISK_IO] and
+asserts capacity pairs 0000:0484, 0001:0000 and 000f:bc10, plus absent-drive
+rejection without changing untouched registers. No Compat capacity substitute.
+Historical S1 P68 used identical fixtures/linked objects with both assignments
+restored together: current x86/x64 passed, XP controls both failed the first
+CX assertion. XP's 1156-sector result CX=4/DX=132 is source calculation; the
+negative test stops at CX. These historical controls were not rerun here.
+Current review proves source/caller consistency, not a fresh guest boot or
+exhaustive BIOS test. P24 full 392/392 remains historical regression evidence.
+Documentation-only P; no production, tests, EXEs, media or snapshot changes.
+Next file after owner review is order 320 base/disks/fdisk.c.

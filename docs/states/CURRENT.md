@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P29 records owner approval of vglfunc.c R0412 (+5/-0). At owner direction,
+intervening generated cvidc files are skipped, not approved. Current review is
+order 319 diskbios.c: three text points +4/-4; recommend restoring two
+nonsemantic directive comment/whitespace changes and retaining R0414's
+capacity split (+2/-2). No source changes; decisions await owner review.
+Details and historical evidence limits are in the owner decision ledger.
+Next is fdisk.c; S4/T100 remain open.
+
 S4 P28 records owner approval of ev_glue.c R0254/R0255/R0263 and updates the
 [current real-diff list](../etc/evidence/softpc/m9-t100-s4-real-diff-files.md)
 to 114 files, removing all seven now-zero-diff rows and using P25 current counts.
