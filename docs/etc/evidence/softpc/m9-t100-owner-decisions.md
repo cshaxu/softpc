@@ -6771,3 +6771,49 @@ test or artifact change. Documentation/whitespace gate applies. Own hidden
 scratch build/t100-s4-p79 uses two-hour/fifteen-minute no-progress budgets and
 is retired after completion. The prior P78 clock delivery is preserved.
 Next file is host/inc/host_def.h. S4/T100 remain open.
+
+## S4 P80: approved register bytes and host profile review
+
+Owner approves R0556. At9f747212, order437 host/inc/host_def.h retains exactly
+two differences against fixed XP SP1 after existing #error bodies and #line
+are omitted: R0558 deletes original line147's NTVDM definition, R0559 deletes
+original line149's CPU_30_STYLE definition. Fresh whole-file branch-arm and
+raw zero-context comparisons give two blocks,+0/-2. Historical P139 +1/-3
+was a blank-line alignment accounting result, not another semantic point;
+this fresh count preserves current original blank placement. R0557's redundant
+declaration and comment restoration is complete, with no residual to approve.
+
+| Point | XP location | Added/removed | Purpose |
+| --- | --- | --- | --- |
+| R0558 | 147 | +0/-1 | Do not select the NTVDM host profile. |
+| R0559 | 149 | +0/-1 | Do not simultaneously select CPU_30_STYLE in the CPU_40_STYLE product. |
+
+Both are standalone build-profile adaptations, not original XP bug repairs or
+snapshot extensions. The original header itself describes a host-specific
+configuration prototype. Current root CMake explicitly supplies CPU_40_STYLE,
+CCPU and C_VID to softpc-ccpu-core,softpc-machine-devices and
+softpc-machine-compat. Product composition uses the selected CCPU/Compat host,
+not the NTVDM host. Reintroducing header-defined NTVDM changes source selection;
+Windows as host OS does not imply the NTVDM product macro. Reintroducing
+CPU_30_STYLE would select a conflicting CPU interface despite CPU_40_STYLE
+remaining defined. Both omissions apply uniformly to x86/x64.
+
+Historical P139 individually restored each define in a private header and
+compiled actual ccpusas4 with real flags on both widths. All four configurations
+failed with compiler status1 at the existing unsupported-profile guards:
+sas.h for NTVDM (including NTVDM without X86GFX), xt.h/host_cpu.h for
+CPU_30_STYLE. This proves incompatibility with this selected source subset,
+not that XP's original profiles were defective. Fresh source review corroborates
+those CMake definitions and guard locations; no new compile/guest result is
+claimed. P78's392/392 remains prior regression evidence, not this P's testing.
+
+Recommend retain R0558/R0559; no safe restoration candidate. Moving the
+omissions to a new undef layer would merely relocate the difference and add
+configuration complexity. Do not replace these selected header lines with
+unconditional #error: that would reject the supported build, whereas disabled
+implementation arms already retain their existing guards. All other retained
+code/formatting matches XP. No code/tests/artifacts change in this P.
+Documentation/whitespace gates apply. Own hidden scratch build/t100-s4-p80
+has two-hour/fifteen-minute no-progress budgets and is retired after gates.
+Next literal file is host/inc/host_gen.h; zero-diff files will be rechecked
+and skipped before the next real-diff review. S4/T100 remain open.

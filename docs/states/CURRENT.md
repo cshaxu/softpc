@@ -44,6 +44,11 @@ is unchanged.
 
 ## Current Technical Baseline
 
+S4 P80 records owner approval of R0556 and reviews host_def.h: two blocks,
++0/-2, omitting NTVDM and CPU_30_STYLE definitions. R0558/R0559 are recommended
+for retention as selected product-profile adaptations, pending owner approval.
+No code/artifact changes or fresh runtime claims. See [P80 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p80-approved-register-bytes-and-host-profile-review).
+
 S4 P79 records owner approval of R0554. error.h/host.h have no retained
 difference. host_cpu.h has only R0556 (+1/-1, two zero-context move hunks):
 low/high byte order required by original port consumers. Recommend retain
