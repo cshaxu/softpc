@@ -367,6 +367,44 @@ round. Recommend retaining the five functional points; preserve notice under
 policy. No new safe restoration identified, source/test/binaries unchanged.
 Frontier 18/121; 103 remain. Next: order 268, comms/printer.c.
 
+### S4 P19: com.c notice and snapshot minimization counter-review
+
+Owner requests explanation and a minimal design only; no production change is
+authorized or made by this investigation. Fixed XP places the exact Insignia
+text in static char SccsID[] inside #ifdef SCCSID. Current selection excludes
+that body with #error and preserves the text in an unconditional comment.
+Deleting only the comment changes no compiled tokens, but removes this file's
+remaining historical copyright identification. Literal restoration of the
+conditional declaration is a separate excluded-body policy change, not merely
+removal of the extra line. Source policy requires explicit owner direction for
+notice changes; this report does not infer a license or runtime necessity.
+
+The 121-line block was rechecked against its actual state and caller schemas:
+5 declaration/separator lines, 23 callback encode/decode lines and 93 capture/
+restore lines. Native ADAPTER_STATE contains legacy register unions/bitfields
+and ints, whereas the archive uses fixed-width scalar fields. Whole-struct
+memcpy is not established as representation-equivalent. Existing device wire
+maps know archive offsets/widths, not native UART field mappings, so reuse would
+require a new transfer mechanism rather than remove an existing duplicate.
+
+Both transfer directions map the same 23 port fields plus critical counters,
+flush mask and pacing; they do not introduce another live UART controller.
+Deleting fields has no equivalence proof. Moving mapping into Compat requires
+exposing private original storage or adding a bridge; moving equal code does
+not establish a total-diff reduction. X-macros or offset tables can shorten
+text but add a mapping abstraction and validation obligations; not recommended
+for this bounded block under the owner's simplicity priority. Combining restore
+validation with copying changes its existing check-all-before-mutate behavior.
+Removing null guards/return contracts merely shifts preconditions to callers;
+no need to change those contracts to save a few lines has been established.
+
+Conclusion: no meaningful, behavior-preserving simplification established that
+also reduces the mental model without new abstraction, ABI coupling or source
+sites. Do not label every one of the 121 lines independently proven minimal;
+retain the known evidence/coverage limits. Cosmetic line compression is not a
+recommended repair. No new builds/tests; source/caller review only. Review
+frontier remains com.c, no automatic retention approval or next-file advance.
+
 ### S4 P5: c_main.c necessity counter-review
 
 Owner requests proof of necessity rather than consumer existence. No source is

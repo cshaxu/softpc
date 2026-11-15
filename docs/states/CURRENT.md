@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P19 is com.c counter-review only: the extra notice is a nonexecuting
+preservation of original conditional SCCSID text; its removal would not change
+runtime behavior but changes the retained notice. Snapshot minimization finds
+no established substantial reduction without native-layout coupling, changed
+failure semantics or new mapping abstraction. No production changes/tests;
+full reasoning and alternatives are in the decision ledger. Frontier stays 18.
+
 S4 P18 records owner approval of zfrsrvd.c R0172 and presents comms/com.c
 (review 18 / order 267): +126/-3, UART snapshot bridge, three pointer-width
 corrections and historical notice. Current source/caller/test review separates
