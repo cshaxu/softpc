@@ -206,15 +206,13 @@ softpc_device_ppi_state *state;
 	state->register_value = ppi_register;
 	state->gate_2_was_low = gate_2_was_low ? 1u : 0u;
 #line 215
-	state->speaker_data_was_low = (ppi_register & 0x02u) == 0u ? 1u : 0u;
 }
 
 GLOBAL int
 softpc_device_snapshot_restore_ppi(state)
 const softpc_device_ppi_state *state;
 {
-	if (state == NULL || state->gate_2_was_low > 1u ||
-		state->speaker_data_was_low > 1u)
+	if (state == NULL || state->gate_2_was_low > 1u)
 		return FALSE;
 	ppi_register = state->register_value;
 	gate_2_was_low = state->gate_2_was_low ? TRUE : FALSE;

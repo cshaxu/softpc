@@ -372,6 +372,65 @@ static void verify_cpu_side_state(void)
     /* The pending exception has its own saved IP, distinct from current FIP. */
 }
 
+static void verify_pic_initialization_archive(void)
+{
+    unsigned adapter, step, i;
+    softpc_device_pic_state saved, actual;
+    const int invalid[] = {-2, 1, 5};
+
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+    for (adapter = 0; adapter < 2; ++adapter) {
+        const unsigned port = adapter ? 0xa0u : 0x20u;
+        const unsigned char icw[] = {0x11u, adapter ? 0x70u : 0x38u,
+            adapter ? 2u : 4u, 1u};
+        for (step = 1; step <= 4; ++step) {
+            softpc_device_archive *archive = softpc_device_archive_create();
+            softpc_device_archive *decoded = NULL;
+            checkpoint_byte_stream stream = {0};
+            assert(archive != NULL);
+            ica0_post(); ica1_post();
+            for (i = 0; i < step; ++i) ica_outb(port + (i != 0), icw[i]);
+            assert(softpc_device_archive_capture(archive));
+            assert(softpc_device_archive_write(archive, checkpoint_write_bytes,
+                &stream) == LIB_STATUS_OK);
+            for (i = step; i < 4; ++i) ica_outb(port + 1u, icw[i]);
+            assert(softpc_device_snapshot_capture_pic(&saved));
+            assert(saved.adapter[adapter].base == icw[1]);
+            assert(saved.adapter[adapter].imr == 0u && saved.adapter[adapter].mode == 0x11u);
+            ica0_post(); ica1_post();
+            assert(softpc_device_archive_read(&decoded, checkpoint_read_bytes,
+                &stream) == LIB_STATUS_OK);
+            assert(stream.offset == stream.byte_count);
+            assert(softpc_device_archive_restore(decoded));
+            assert(softpc_device_snapshot_capture_pic(&actual));
+            assert(actual.adapter[adapter].sequence == (step == 4 ? 0 : (int)step + 1));
+            for (i = step; i < 4; ++i) ica_outb(port + 1u, icw[i]);
+            assert(softpc_device_snapshot_capture_pic(&actual));
+            assert(actual.adapter[adapter].base == saved.adapter[adapter].base);
+            assert(actual.adapter[adapter].imr == saved.adapter[adapter].imr);
+            assert(actual.adapter[adapter].mode == saved.adapter[adapter].mode);
+            assert(actual.adapter[adapter].sequence == 0);
+            softpc_device_archive_dispose(decoded);
+            softpc_device_archive_dispose(archive);
+            lib_release(stream.bytes);
+        }
+        saved = actual;
+        saved.adapter[adapter].sequence = -1;
+        assert(softpc_device_snapshot_restore_pic(&saved));
+        ica_outb(port + 1u, 0xffu); /* Power-on ignores data until ICW1. */
+        assert(softpc_device_snapshot_capture_pic(&actual));
+        assert(actual.adapter[adapter].sequence == -1);
+        assert(actual.adapter[adapter].imr == saved.adapter[adapter].imr);
+        for (i = 0; i < sizeof(invalid) / sizeof(invalid[0]); ++i) {
+            saved.adapter[adapter].sequence = invalid[i];
+            assert(!softpc_device_snapshot_restore_pic(&saved));
+            assert(softpc_device_snapshot_capture_pic(&actual));
+            assert(actual.adapter[adapter].sequence == -1);
+        }
+    }
+    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+}
+
 static void verify_snapshot_archive(void)
 {
     const unsigned char directory[] = {0x03, 0x20, 0, 0};
@@ -506,7 +565,7 @@ static void verify_snapshot_archive(void)
     assert(softpc_snapshot_image_write(&image, checkpoint_write_bytes,
         &image_stream) == LIB_STATUS_OK);
     assert(image_stream.byte_count != 0u);
-    assert(image_stream.bytes[3] == '4');
+    assert(image_stream.bytes[3] == '5');
     image_stream.bytes[3] ^= 0xffu;
     assert(softpc_snapshot_image_read(&decoded_image,
         image.ccpu.sas.memory_bytes, checkpoint_read_bytes,
@@ -710,7 +769,6 @@ static void verify_controller_archives(void)
     softpc_device_snapshot_capture_ppi(&ppi_restored);
     assert(ppi_restored.register_value == ppi_saved.register_value);
     assert(ppi_restored.gate_2_was_low == ppi_saved.gate_2_was_low);
-    assert(ppi_restored.speaker_data_was_low == ppi_saved.speaker_data_was_low);
 
     /* COM and LPT each have a controller plus a finite virtual host carrier.
        Restore both after destructive port traffic; output-file endpoints are
@@ -1128,6 +1186,7 @@ int main(void)
     verify_translation();
     verify_stack_address_width();
     verify_cpu_side_state();
+    verify_pic_initialization_archive();
     verify_snapshot_archive();
     verify_pit_archive();
     verify_controller_archives();

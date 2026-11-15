@@ -5316,3 +5316,103 @@ P103 historical negative controls, and accepted P51 full 392/392 are distinct.
 P52 adds no new runtime test, manual guest claim, production diff or binary.
 All three groups await owner disposition. Next real-difference file is order
 404 base/system/at_dma.c; ios.c has no real diff and is not reintroduced.
+
+## S4 P53: PIC phase and PPI snapshot correction
+
+Owner approves repairing L001 and removing the R0471 redundant field together,
+retains R0469/R0470, requires current-only snapshot loading and verified one-off
+conversion of assets/binary/snapshot, dual EXEs/publication/full regression,
+commit/push/self-review and acceptance. This supersedes the earlier L001 deferral;
+it does not approve other unreviewed mirror points or close S4/T100.
+
+Plan and finite verification scope: original PIC sequence[-1,0,2,3,4] stays the
+sole command-phase owner, moved from function-static to file-static in ica.c.
+Existing capture/restore copies that field per adapter; the existing preflight
+loop rejects all other values before either adapter is mutated. No port replay,
+new state machine, new accessor or public component changes. R0471 removes its
+derived speaker_data_was_low field from the struct, wire map, capture and range
+check, retaining actual register/gate state and original HostPpiState delivery.
+SCP5 is the sole supported format; no SCP4 reader, detection or compatibility
+branch is added. Tests use the existing checkpoint byte stream and actual
+archive serialization/controller functions: both adapters at all three partial
+ICW boundaries and completion, power-on phase and invalid values -2/1/5.
+
+Asset proof before conversion: original 18,700,025-byte SHA-256
+9c9e6116e4235c57d48f14a6267bb4b080942b0046a163344146e4a35dd2460f.
+The current field maps were evaluated in an isolated layout probe; queue has
+one quick and two tick entries, device section begins at 17,831,642. Master
+PIC has base80/mask152/ISR1/mode0x0211; slave has base88/mask156/ISR0/mode0x0a11.
+SWPIC_outb's ICW1 clears mode to low four bits; only ICW4 sets ICA_MPM (0x10)
+and completes sequence=0. Both saved controllers have that bit, establishing
+completed initialization rather than guessing from successful file decoding.
+PPI bytes are 0,1,1; the removed field is exactly the inverse of register bit1.
+
+The one-off task tool inserts signed-zero phase fields (four bytes per adapter),
+removes the one derived PPI byte, updates section length by +7 and format to
+SCP5. Reversing exactly those edits reproduces the complete original file
+byte-for-byte; CPU/RAM/media and other device/event bytes are unchanged.
+Converted length 18,700,032, SHA-256
+ff7c9db73fcb4d1aacfa11b0b11d9f8863aa5c4fe97ca0382cacc83b962cb44f.
+The converter/old copy are task-only scratch, removed at delivery. No guest or
+INI is edited, and no new source/binary/medium is imported.
+
+Mirror accounting uses fresh fixed-XP comparison after excluding existing
+#error bodies and line controls; prechange results match the current ledger.
+- ica.c: 5 blocks +109/-7 -> 7 blocks +119/-13 (16 more changed lines).
+- ppi.c: 6 blocks +27/-13 -> 6 blocks +25/-13 (two fewer changed lines).
+- Total: 106 files, 15,709 blocks, +24,617/-24,018; net increase in mirror
+  added-plus-deleted lines is 14. No new differing mirror file. This is distinct
+  from tracked production net lines and includes relocation of original code.
+R0469/R0470 are approved retained; R0471 retains only the necessary schema.
+L001 is now an approved local snapshot-completeness repair, not an XP PIC bug.
+
+Initial fixture run passed the new PIC cases and then failed an unchanged
+assertion expecting format character '4'. It is corrected to '5'; generic
+invalid-format rejection remains. Early isolated layout probes required C90
+loop syntax and metadata-only compilation to avoid unrelated archive links;
+those probe failures are not production defects or acceptance results.
+
+Both architectures restore the converted real asset through Machine's state-write
+executor path, reaching PAUSED with a published frame and saved PIC phase0,0,
+base80,88, mask152,156 and ISR1,0, then stop/destroy successfully. This proves
+archive/runtime loading, not new manual DOS/Win3.1/Win95 desktop acceptance.
+Both also run the same checkpoint fixture linked to an isolated current PIC
+object with only phase capture/restore removed. Both negatives fail the resumed
+PIC base comparison (x86 exit 0xc0000409, x64 exit3); the repaired fixture passes.
+The negative runner regards that assertion as expected, not a regression pass.
+
+Bounded similar-issue sweep: rg sequence/ICA_MPM/ICA_ICW1_MASK in ica.c confirms
+one original phase variable and unchanged ICW transitions; capture/restore are
+its only new accesses. The existing restore preflight validates both adapters
+before mutation. Archive's existing U32 field transport copies signed bits,
+including -1; no new signed codec is needed. rg speaker_data_was_low/SCP4/
+34504353 across src and test finds no obsolete field or legacy-format code.
+PPI retains its original register and independent gate history; HostPpiState
+still replays those values. This is not a completeness claim for all devices.
+
+Final qualification: cached x86/x64 test builds, focused checkpoint tests,
+package publication, 188 background plus eight native tests per architecture
+all pass: full 392/392, no retry or skip in this final run. The earlier stale
+format assertion failure is recorded above and was corrected before this run.
+Published compiler timestamps: x86 Nov 15 2026 09:36:03; x64 Nov 15 2026 09:41:11.
+EXE SHA-256:
+- softpc32.exe: 32a41f1d9961500b27ab1f11642c3f40457a9ab84dc8b88c450ce908f7e91e0e.
+- softpc64.exe: 27ed5edeebcb86e720e079a8b16bd8d1b58511f2162c234802bae339a2ed72e0.
+
+Actual tracked diff against dfe955eb (git diff --numstat, src/test only): five
+production files +20/-15, net +5; one existing test +61/-2, net +59. This adds
+no fixture framework. Three artifact paths are snapshot and both EXEs; no INI,
+media, guest, shared-package code or build script changes. Mirror files retain
+CRLF, owned source/test retain LF; normalized source hashes match the manifest.
+Existing preserved-mirror compiler warnings remain; no new owned/public warning
+was introduced. Full governance/manifest tests and whitespace checks pass.
+
+Coordinator actual-change self-review checks the approved scope and each source,
+test, schema and asset diff: original phase storage is relocated rather than
+duplicated, original ICW transitions stay unchanged, invalid restore returns
+before mutation, allocation ownership remains in the existing archive path,
+and PPI replay derives speaker output from the real register. Retaining R0469
+and R0470 does not imply they are XP bug fixes. L001 repairs a local snapshot
+omission. No new correction candidate or extra production path is introduced.
+P53 is delivered for owner acceptance; S4/T100 remain open at the current audit
+frontier rather than automatically moving to the next mirror file.

@@ -237,6 +237,8 @@ Owner review after P2 declines L001 and D001-D003 repairs for this round.
 L001 has a narrow partial-initialization snapshot trigger without a reported
 user incident; D001-D003 have no established current guest bulk-entry consumer.
 Retain their evidence without patching, activating entries or changing snapshots.
+The later owner-approved S4 P53 supersedes only the L001 deferral; see the
+[PIC/PPI implementation record](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p53-pic-phase-and-ppi-snapshot-correction).
 Owner requests D004 hardware semantics and actual production-path investigation
 before deciding whether to repair; this does not authorize a production patch.
 

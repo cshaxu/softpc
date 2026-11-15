@@ -393,6 +393,7 @@ static const softpc_device_wire_field dma_fields[] = {
 
 static const softpc_device_wire_field pic_adapter_fields[] = {
     DEVICE_U32(softpc_device_pic_adapter_state, master),
+    DEVICE_U32(softpc_device_pic_adapter_state, sequence),
     DEVICE_U8(softpc_device_pic_adapter_state, irr),
     DEVICE_U8(softpc_device_pic_adapter_state, isr),
     DEVICE_U8(softpc_device_pic_adapter_state, imr),
@@ -477,8 +478,7 @@ static const softpc_device_wire_field hdd_fields[] = {
 
 static const softpc_device_wire_field ppi_fields[] = {
     DEVICE_U8(softpc_device_ppi_state, register_value),
-    DEVICE_U8(softpc_device_ppi_state, gate_2_was_low),
-    DEVICE_U8(softpc_device_ppi_state, speaker_data_was_low)
+    DEVICE_U8(softpc_device_ppi_state, gate_2_was_low)
 };
 
 static const softpc_device_wire_field inport_mouse_fields[] = {

@@ -211,6 +211,15 @@ void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
 /* regular SoftPC definitions for ica */
 ADAPTER_STATE adapter_state[2];
 
+/* Snapshot access shares the original command phase. */
+#line 860
+LOCAL IS32 sequence[2]	/* -1 -> power is on but no ICWs received */
+		  = { -1, -1 };	/*  0 -> fully initialised, OK to proceed */
+				/*  2 -> ICW1 received, awaiting ICW2	  */
+				/*  3 -> ICW2 received, awaiting ICW3     */
+				/*  4 -> awaiting ICW4			  */
+
+#line 281
 /* iret hook related defines */
 #ifdef PROD
 #define host_valid_iret_hook()	(TRUE)
@@ -772,12 +781,7 @@ void SWPIC_outb IFN2(io_addr, port, IU8, value)
     IU32 adapter               = adapter_for_port(port);
     ADAPTER_STATE *asp = &adapter_state[adapter];
 
-    SAVED IS32 sequence[2]	/* -1 -> power is on but no ICWs received */
-	 	  = { -1, -1 };	/*  0 -> fully initialised, OK to proceed */
-				/*  2 -> ICW1 received, awaiting ICW2	  */
-				/*  3 -> ICW2 received, awaiting ICW3     */
-				/*  4 -> awaiting ICW4			  */
-
+#line 866
     IU32 i;		/* Counter				  */
     IS32 line;			/* Interrupt line number 		  */
 
@@ -1990,6 +1994,7 @@ softpc_device_pic_state *state;
 		source = &adapter_state[adapter];
 		target = &state->adapter[adapter];
 		target->master = source->ica_master ? 1u : 0u;
+		target->sequence = sequence[adapter];
 		target->irr = source->ica_irr;
 		target->isr = source->ica_isr;
 		target->imr = source->ica_imr;
@@ -2036,7 +2041,8 @@ const softpc_device_pic_state *state;
 		return FALSE;
 	for (adapter = 0; adapter < SOFTPC_DEVICE_PIC_COUNT; ++adapter) {
 		source = &state->adapter[adapter];
-		if (source->master > 1u)
+		if (source->master > 1u || source->sequence < -1 ||
+		    source->sequence > 4 || source->sequence == 1)
 			return FALSE;
 		for (line = 0; line < SOFTPC_DEVICE_PIC_LINE_COUNT; ++line)
 			if (source->isr_depth[line] < 0 ||
@@ -2047,6 +2053,7 @@ const softpc_device_pic_state *state;
 		source = &state->adapter[adapter];
 		target = &adapter_state[adapter];
 		target->ica_master = source->master ? TRUE : FALSE;
+		sequence[adapter] = source->sequence;
 		target->ica_irr = source->irr;
 		target->ica_isr = source->isr;
 		target->ica_imr = source->imr;

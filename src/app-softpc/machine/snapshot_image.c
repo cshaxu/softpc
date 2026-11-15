@@ -3,8 +3,8 @@
 
 #include "compat/devices/archive.h"
 
-/* Original InPort burst state replaces the retired periodic timer payload. */
-#define SOFTPC_SNAPSHOT_FORMAT 0x34504353u
+/* PIC initialization phase and the PPI register are archived without aliases. */
+#define SOFTPC_SNAPSHOT_FORMAT 0x35504353u
 
 typedef struct softpc_snapshot_count_stream {
     lib_u64 count;

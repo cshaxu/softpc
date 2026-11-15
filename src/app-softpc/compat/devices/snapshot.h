@@ -164,6 +164,7 @@ int softpc_device_snapshot_restore_dma(const softpc_device_dma_state *state);
 
 typedef struct softpc_device_pic_adapter_state {
     uint32_t master;
+    int32_t sequence;
     uint8_t irr, isr, imr, ssr;
     uint16_t base, hipri, mode;
     int32_t count[SOFTPC_DEVICE_PIC_LINE_COUNT];
@@ -235,7 +236,6 @@ int softpc_device_snapshot_restore_hdd(const softpc_device_hdd_state *state);
 typedef struct softpc_device_ppi_state {
     uint8_t register_value;
     uint8_t gate_2_was_low;
-    uint8_t speaker_data_was_low;
 } softpc_device_ppi_state;
 
 void softpc_device_snapshot_capture_ppi(softpc_device_ppi_state *state);
