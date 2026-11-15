@@ -5884,3 +5884,72 @@ correct local manifest column, unchanged upstream/subset identities and R0499,
 no duplicate state/path and no snapshot/INI modification. P62 scratch is removed
 after jobs exit; concurrent investigation scratch remains protected. This is
 P62 delivery awaiting owner acceptance, not closure of S4/T100.
+
+## S4 P63: accepted P62 and PIT file review
+
+Owner accepts P62 b95ccba1. Current order412 base/system/timer.c is compared
+against pinned XP SP1, excluding existing error bodies/line controls. Eight
+retained diff blocks sum +371/-2. No source/test/artifact change is made.
+
+| Group and anchor | Blocks | Added/deleted | Classification and disposition |
+| --- | --- | --- | --- |
+| R0502 include, local69 / XP71 | 1 | +1/-0 | Snapshot declaration dependency; recommend retain. |
+| D005 active backlog guard, local2042 / XP2318 | 1 | +2/-0 | Original scheduling defect repair, already delivered/accepted in S2; retain. |
+| R0503 first-event guard, local2061 / XP2335 | 1 | +2/-0 | Original scheduling defect repair; recommend retain. |
+| R0504 estimated local variable, local2089 / XP2496 | 1 | +1/-0 | Read-estimation repair, part of one updateCount change. |
+| R0504 save/reuse condition, local2125 / XP2528 | 1 | +2/-1 | Same repair; retain original count interpolation. |
+| R0504 suppress estimated wraps, local2160 / XP2565 | 1 | +3/-0 | Same repair; prevent interpolation creating IRQ work. Recommend retain group. |
+| R0505 timer2 POST gate, local2565 / XP3026 | 1 | +1/-1 | Align PIT gate with original PPI reset; recommend retain. |
+| R0502 appended snapshot operations, local2589 onward | 1 | +359/-0 | 358-line implementation span plus separating line; recommend retain. |
+
+Fresh caller review: archive.c captures PIT with actual device archive state,
+restores PIT before PPI and event queues, and calls the timer callback codecs
+for quick-event serialization. Original private COUNTER_UNIT objects contain
+mode/count/read latches, finite state/action functions, clock phase and waveform;
+original public port operations mutate latches/state and cannot roundtrip these.
+The extension converts original function identities into finite IDs, rebases
+activation age using original per-counter getTime, restores the same objects,
+and republishes channel2 via existing host_timer2_waveform. It does not add a
+clock, queue, waveform generator or snapshot compatibility path. The separate
+wait/gate action decoders admit the actual respective assignment sets; merging
+them blindly would broaden accepted state combinations. There is no proved
+safe wholesale restoration of this feature while retaining snapshot semantics.
+
+Both division guards preserve original scheduling: quick_ev add_event(time=0)
+invokes callbacks synchronously; timer_multiple_ints reschedules itself. A tiny
+PIT divisor can make integer division zero. Initial scheduling and active
+backlog are distinct reachable sites. Historical P115 first-guard negatives
+stack-overflow on both widths; S2 P2 removed only D005 from actual production
+bodies and reproduced 0xC00000FD with the permanent fixture on both widths.
+D005 is implemented/accepted, not the open candidate described in historical
+S1 paragraphs above. Current pit_smoke covers modes0/2/3, divisors1/16384/65536,
+two heartbeats and real queued dispatch. No observed Windows symptom is claimed.
+
+R0504 keeps guess-based readable counter progress while disallowing estimated
+elapsed time from creating wrap/IRQ work or advancing last-wrap phase. Historical
+P115 coherent-original variant fails the no-IRQ-from-reads assertion on both
+widths. Current fixture performs1000 latch/read cycles without advancing guest
+CPU/heartbeat, then verifies real heartbeats still request IRQs. R0505 starts
+channel2 LOW to match ppi_init register0/gate-low tracking; the first guest PPI
+bit0 transition must start the newly programmed waveform. Historical original
+RISE variant fails actual sound-delivery assertions on both widths. Existing
+sound fixture exercises AUDIO.COM-style port writes and real sound path to a
+mock output leaf; this proves delivery/state, not fresh native audible playback.
+
+Fresh P63 runs reuse P62-built executables: PIT, checkpoint and sound pass on
+x86 and x64 (6/6), hidden serial CMD in build/t100-s4-p63. Checkpoint directly
+checks nondefault mode/count/state/action roundtrip and invalid-state rejection.
+Prior original-negative results are reviewed evidence, not rerun here. No
+exhaustive state/action/allocation-failure coverage or transactional restore is
+claimed: invalid restore may modify earlier counters before returning failure.
+Full392/392 is accepted P62 evidence, not a newly repeated full run.
+
+Counter-review finds no safe original-restoration candidate in retained code.
+R0504's local estimated value is one-call data, not a new persistent state;
+restoring it alone loses the proven distinction. Existing appended snapshot
+code must not be counted as deletion of the excluded DOCUMENTATION block.
+Comparison reconciles eight blocks/+371/-2, unchanged global inventory. P63
+scratch has a two-hour/fifteen-minute no-progress budget and is removed after
+owned jobs finish; Win95 investigation scratch and processes are untouched.
+Recommend retention pending owner review of R0502-R0505. Next file is
+unexp_nt.c; do not advance before the owner's decision.

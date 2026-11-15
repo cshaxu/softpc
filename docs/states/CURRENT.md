@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P63 reviews order412 timer.c at b95ccba1: eight real diff blocks +371/-2.
+Snapshot support accounts for +360/-0; four device corrections account for
++11/-2, including already accepted S2 D005. Fresh PIT/checkpoint/sound tests
+pass6/6 across x86/x64. Recommend retaining R0502-R0505; no safe restoration
+candidate established. No production/test/artifact change. Own disposable
+scratch build/t100-s4-p63 is isolated from Win95 investigation; S4/T100 remain
+open awaiting owner review. See [P63 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p63-accepted-p62-and-pit-file-review).
+
 S4 P62 restores the owner-approved original display_string brace pair; R0499
 is approved and unchanged. Production +2/-0, tests unchanged; rom.c becomes
 one real diff block +1/-1, two fewer blocks/changed lines. Dual cached builds
@@ -37,7 +45,7 @@ x86 manifest gate (initially the hash was written to the wrong column). All
 16 native tests pass. Actual-diff self-review passes. Only own P62 scratch is
 retired; investigation scratch is protected. Owner explicitly authorized
 closing the occupied published EXE and copied the investigation binary apart.
-P62 awaits acceptance; S4/T100 remain open. See [P62 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p62-restore-original-rom-display-scope).
+Owner accepts P62 (b95ccba1); S4/T100 remain open. See [P62 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p62-restore-original-rom-display-scope).
 
 S4 P61 reviews order411 rom.c at eb8e706d against pinned XP: three blocks
 +1/-3. Recommend retain R0499's 16-bit ROM segment repair (+1/-1), and restore
