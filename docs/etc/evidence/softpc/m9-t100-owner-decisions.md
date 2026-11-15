@@ -5985,3 +5985,47 @@ two-hour/fifteen-minute no-progress budget, removed after compiler/gate jobs
 exit. Win95 investigation files/processes untouched. Global real-diff inventory
 is unchanged. Next real-difference file is base/video/egawrtm0.c; wait owner
 review before advancing.
+
+## S4 P65: approved unexpected-interrupt omission and mode0 writer review
+
+Owner approves R0508. Next literal order416 base/video/egawrtm0.c at030a5e6e
+has four real replacement blocks +4/-4 against fixed XP SP1. Excluded bodies
+and line controls are skipped, not added to the decision inventory.
+
+| Point | Current / XP line | Size | Purpose and concrete evidence |
+| --- | --- | --- | --- |
+| R0510 ega_copy_b_write | 290 / 349 | +1/-1 | Preserve plane address A0 when aligning CHAIN2 byte. Historical single-original restoration at offset2 reads20 instead of11. |
+| R0511 ega_copy_w_write base | 307 / 366 | +1/-1 | Same mapping for WORD start. Historical offset6 original reads20,07 instead of22,33. |
+| R0512 ega_copy_w_write odd second byte | 313 / 372 | +1/-1 | Next even guest address advances8 storage bytes from aligned base, not4. Historical offset9 original reads44,20 instead of44,55. |
+| R0513 ega_mode0_chn_b_write | 566 / 621 | +1/-1 | Generic mode0 uses the same layout with original set/reset/mask/logical operations. Historical original at offset12 reads20 instead offf; corrected odd offset13 also passes. |
+
+Fresh wiring review confirms ega_write_routines_update selects copy or generic
+BIOS byte/word callbacks according to real CHAIN2/write-mode/controller state.
+Original video.c invokes those callbacks. CPU_40_STYLE SetWritePointers selects
+CPU writers without removing this BIOS path; SetBiosWrites has no production
+call site. This file is not dead/test-only code. Layout agreement remains
+coupled to the separately evidenced C-VID/plane/painter changes: the aligned
+mapping is4*(a & ~1), with byte parity selecting the plane lane. Thus guest
+addresses0,1,2,3 map to0,1,8,9, not0,1,4,5. Retaining one original writer line
+while retaining the current layout causes a concrete producer/reader mismatch.
+This proves current-layout necessity, not that every historical XP video
+configuration was broken or that reverting the whole layout is evaluated here.
+
+P120 evidence uses the real BIOS mode3/controller selector and C-VID reader;
+each of four individual original-line variants failed its intended assertion
+on both widths, while current controls passed. These eight negative results
+are reviewed historical evidence, not freshly rerun in P65. Fresh P65 existing
+VGA-frame fixtures pass2/2 on x86/x64 using P62 binaries. Current permanent
+text-plane handoff exercises mixed CPU/BIOS writes across160 cells, unchained
+plane reads/writes, then CHAIN2 readback; it is not an exhaustive substitute
+for every historical odd-WORD/generic negative. No new Windows desktop session
+or all-mode/bulk-path coverage is claimed.
+
+No safe original-restoration candidate found: four existing expressions fix
+the same mapping in existing writers, leaving dirty calls and data operations
+unchanged. A new helper/selector would add surface rather than reduce these
+four XP-relative replacements. Recommend retain R0510-R0513, pending owner
+approval. No source/test/artifact changes or new diff points. Own hidden CMD
+scratch build/t100-s4-p65 (two-hour/fifteen-minute no-progress budget) is removed
+after test/gate completion; Win95 investigation untouched. Next real file is
+ega_prts.c; original/no-real-diff intervening files remain excluded from review.

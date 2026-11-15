@@ -29,10 +29,17 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P65 reviews order416 egawrtm0.c at030a5e6e: four real replacements +4/-4,
+R0510-R0513 CHAIN2 BIOS byte/word mapping. Fresh producer/reader wiring review
+and historical per-line dual-width negatives support retention. Existing VGA
+regression freshly passes2/2; no new source/artifact changes or safe restoration
+candidate. Own scratch build/t100-s4-p65 is retired after verification, Win95
+investigation untouched. Await owner review. See [P65 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p65-approved-unexpected-interrupt-omission-and-mode0-writer-review).
+
 S4 P64 reviews order414 unexp_nt.c at1caff181: one real diff +0/-1, R0508
 terminal Ctrl-Z omission. Whole handler matches pinned XP. Fresh x86/x64
 compiler controls pass; restoring only0x1a fails both with stray-byte errors.
-Recommend retain R0508, pending owner decision. No production/test/artifact
+Owner approves R0508. No production/test/artifact
 change. Own scratch build/t100-s4-p64 is retired after verification; concurrent
 Win95 investigation remains untouched. See [P64 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p64-approved-pit-and-unexpected-interrupt-file-review).
 
