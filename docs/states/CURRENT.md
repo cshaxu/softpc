@@ -6,6 +6,21 @@ Owner admits M9 T100 S4 for a fresh ordered audit of all current mirror
 differences. T100 remains open; S1-S3 stay closed. Owner explicitly approves all points reviewed in files 1-14 through fpu.c.
 Unreviewed files and automatic small-diff delegation remain unapproved.
 
+Owner additionally admits the standalone clock lifecycle repair within S4:
+"好，你现在帮我把这个最好的修复做进去啊，架构一定要一致统一啊，不要有第二路径，不要分叉，要在正确的点位呢统一处理。然后千万不要 bloated。"
+Scope: Compat timer pause/resume ordering, snapshot completion without restart,
+restore-time host notification isolation, existing failure/readiness contracts
+and focused regressions. No mirror/shared-component/schema/guest changes or
+quick-event multiplier. Use main worktree and build/t100-s4-clock only (two-hour
+job and fifteen-minute no-progress budgets). Preserve all original assets.
+Qualify cached dual builds, focused/full tests and native-audio guest playback;
+the original failing snapshot is a separate mandatory check, not replaced by
+a newly generated snapshot. Publish/commit/push only a qualified delivery;
+Owner subsequently reports that the new snapshot works normally. The original
+input was checked unsuccessfully before owner replacement; no old-snapshot
+recovery claim is made. S4's ordered mirror audit remains open and its frontier
+is unchanged.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -28,6 +43,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+S4 P78 delivers the standalone host-clock pause/save/load repair: one runtime
+restart owner, no mirror/shared/schema changes. Five production files +37/-20;
+two tests +79/-6. Both cached EXEs are published and 392/392 tests pass. Owner
+confirms a new snapshot works; normal native playback/load/pause/resume probe
+also passes. The original snapshot's unsuccessful restoration remains an
+explicit limit, not a success claim. Own clock scratch is retired; mirror audit
+continues. See [P78 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p78-standalone-pause-and-snapshot-clock-lifecycle).
 
 S4 P77 records approval of R0550/R0551. video_io.c has zero retained diff.
 Next true-diff file cfpu_def.h has13 blocks,+10/-8: R0554's six host-layout

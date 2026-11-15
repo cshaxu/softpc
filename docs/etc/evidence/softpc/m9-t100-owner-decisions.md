@@ -6663,3 +6663,73 @@ Own hidden gate scratch build/t100-s4-p77 has two-hour/fifteen-minute no-progres
 budgets and is retired after completion. S4/T100 remain open. Next files in
 literal order are host/inc/error.h and host/inc/host.h; historical zero-diff
 classification will be rechecked before presenting the next true-diff file.
+
+## S4 P78 standalone pause and snapshot clock lifecycle
+
+Owner admits one independent repair delivery in the main worktree, including
+both builds, publication, regression, commit and push. The owner subsequently
+reports that a newly created snapshot works normally with the candidate.
+This is the standalone host-clock repair, not a mirror or guest-device change.
+
+### Finite coverage and same-cause sweep
+
+Universe: all production calls to set_runtime_heartbeat, set_clock_running and
+set_boot_clock under src/app-softpc, found by rg over C sources. The sole native
+producer remains Compat platform.c; generic runtime heartbeat owns restart.
+
+| Path | Disposition and proof |
+| --- | --- |
+| Ordinary pause/resume | Stop and join producer before audio suspend; restart after audio restore. Accepted ticks and control wake remain intact. platform_failure_smoke checks ordering and pending count. |
+| Snapshot capture/finish | Existing checkpoint stops producer; finish only releases capture bookkeeping. snapshot_boundary_smoke proves finish never restarts, including simulated start failure. Existing transaction/checkpoint tests cover public handoff. |
+| Snapshot load | Reset bootstrap joins producer, discards only bootstrap host notifications, then restores guest state and enters the existing pause rendezvous. Runtime resume is the only restart. Cross-process snapshot tests and native playback probe pass. |
+| Initial boot/reset | Existing host_timer_init starts the producer. Initial heartbeat before event creation does not create a second timer. Cold-boot probe reaches the normal desktop. |
+| Timer stop/start failure | One failure latch distinguishes intentional stop from failure. Existing CCPU exit/unwind reports I/O error before runtime can park. Regression covers both native failures and failure inside executor. |
+| Destroy | Existing machine destroy heartbeat and timer teardown remain owners; no new cleanup route. Existing teardown tests pass. |
+
+No other production caller was found. No generic scheduler, public component,
+snapshot format, guest queue, instruction multiplier or mirror source changes.
+Snapshot's old restart/failure bookkeeping is removed rather than retained as
+a parallel route. One native failure latch is added; no second running state.
+
+### Evidence and limits
+
+Final cached x86 and x64 builds publish both EXEs. Each passes 188 background
+and eight native tests: 392/392 total. Earlier focused runs pass six tests per
+width. An initial fixture assertion incorrectly queried executor exit state
+outside CCPU; it was corrected to assert the public run I/O error. The final
+full runs include the additional in-executor failure-unwind regression.
+
+The original supplied snapshot was checked separately: restoration reached
+Win95's safe-to-power-off screen, so absence of reset was not counted as success.
+The owner later replaced that snapshot and confirms normal operation with a
+new capture. A proposed host-tick isolation run began after that replacement;
+it therefore cannot establish the old snapshot's cause. No claim of repairing
+or recovering the old snapshot is made, and no guest state is discarded to
+make it pass. The old input is no longer available for the matched comparison.
+
+A final unmodified-timing/native-audio probe loads the owner's new snapshot,
+continues the same MIDI, pauses one second and resumes: no reset, continued
+playback to twelve seconds, and 8383 observed IRQ0 deliveries overall. It uses
+only disk overlays and the normal Machine API. Separate cold-boot input probes
+reached the desktop but did not actually open the player; these are not claimed
+as MIDI qualification. Owner manual playback/save/load acceptance supplies the
+actual end-to-end capture evidence. No Computer Use was used.
+
+The owner-tested candidate precedes only the terminal timer-failure unwind
+addition; ordinary pause/resume is identical. Final native probe and full tests
+use the final code. Final EXEs are published, including the requested external
+x64 destination; no INI, media or user snapshot was edited by this repair.
+
+Production: five files, +37/-20, net +17. Tests: two existing files, +79/-6,
+net +73 (`git diff --numstat` against parent). Fixed-XP mirror diff delta: zero.
+Actual-change review confirms one producer/restart owner, retained accepted
+notifications and wake, no guest workaround and no additional production path.
+
+Final SHA-256:
+
+- x64: 5187F4956EB13848BD9D3482A175485F4C413C4A4F48A6B0ABE3677F6BDD540C.
+- x86: BB15D6C8E9084B70E6DDEBDFAE1493C0FAD2BCB236ADE53879794533C119903B.
+
+Own build/t100-s4-clock probe/log scratch is retired after evidence promotion
+and job completion. Reusable caches and concurrent audit work remain intact.
+S4's ordered mirror review and T100 remain open.

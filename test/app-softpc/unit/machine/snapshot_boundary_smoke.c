@@ -39,12 +39,13 @@ int main(void)
     now = 10000u; /* Capture I/O time is not the boundary-seeking deadline. */
     assert(!softpc_snapshot_checkpoint(&snapshot, 1u, &fetch));
     timer_ok = 0;
-    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_IO_ERROR);
-    assert(snapshot.phase == SOFTPC_SNAPSHOT_READY);
+    /* Finishing never attempts a restart, even when the native start would fail. */
+    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK);
+    assert(snapshot.phase == SOFTPC_SNAPSHOT_IDLE && starts == 0);
     timer_ok = 1;
     assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK);
-    assert(starts == 2 && snapshot.phase == SOFTPC_SNAPSHOT_IDLE);
-    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK && starts == 2);
+    assert(starts == 0 && snapshot.phase == SOFTPC_SNAPSHOT_IDLE);
+    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK && starts == 0);
 
     assert(softpc_snapshot_begin(&snapshot) == LIB_STATUS_OK);
     now += 1000u; /* At the deadline even an outer entry is too late. */
@@ -52,7 +53,7 @@ int main(void)
     assert(snapshot.status == LIB_STATUS_LIMIT_EXCEEDED && stops == 1);
     assert(snapshot.phase == SOFTPC_SNAPSHOT_FAILED);
     assert(!softpc_snapshot_checkpoint(&snapshot, 1u, &fetch));
-    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK && starts == 2);
+    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK && starts == 0);
 
     assert(softpc_snapshot_begin(&snapshot) == LIB_STATUS_OK);
     now += 1000u;
@@ -84,6 +85,6 @@ int main(void)
     assert(softpc_snapshot_checkpoint(&snapshot, 1u, &fetch));
     assert(snapshot.phase == SOFTPC_SNAPSHOT_FAILED && snapshot.status == LIB_STATUS_IO_ERROR);
     assert(stops == 2);
-    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK && starts == 2);
+    assert(softpc_snapshot_finish(&snapshot) == LIB_STATUS_OK && starts == 0);
     return 0;
 }

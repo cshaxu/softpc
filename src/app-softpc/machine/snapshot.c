@@ -44,8 +44,6 @@ lib_bool softpc_snapshot_checkpoint(softpc_snapshot *snapshot,
 lib_status softpc_snapshot_finish(softpc_snapshot *snapshot)
 {
     if (snapshot == NULL) return LIB_STATUS_INVALID_ARGUMENT;
-    if (snapshot->phase == SOFTPC_SNAPSHOT_READY &&
-        !softpc_platform_set_clock_running(1)) return LIB_STATUS_IO_ERROR;
     *snapshot = (softpc_snapshot){0};
     return LIB_STATUS_OK;
 }

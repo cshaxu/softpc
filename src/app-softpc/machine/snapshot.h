@@ -32,7 +32,7 @@ lib_status softpc_snapshot_begin(softpc_snapshot *snapshot);
 /* True exactly once on reaching READY/FAILED. Never unwinds the CPU. */
 lib_bool softpc_snapshot_checkpoint(softpc_snapshot *snapshot,
     unsigned long depth, const softpc_ccpu_entry *entry);
-/* On clock restart failure retains READY: the caller must not resume CPU. */
+/* Finish capture bookkeeping; the runtime resume path restarts the clock. */
 lib_status softpc_snapshot_finish(softpc_snapshot *snapshot);
 void softpc_snapshot_image_dispose(softpc_snapshot_image *image);
 lib_status softpc_snapshot_image_capture(softpc_snapshot_image *image,

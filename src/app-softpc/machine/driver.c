@@ -143,7 +143,6 @@ static void vm_driver_snapshot_observe(void *opaque, unsigned long depth,
 {
     vm_driver *driver = (vm_driver *)opaque;
     lib_status status;
-    lib_status finish_status;
     if (driver == NULL || entry == NULL) return;
     if (driver->restore_rendezvous_pending) {
         driver->restore_rendezvous_pending = LIB_FALSE;
@@ -160,15 +159,11 @@ static void vm_driver_snapshot_observe(void *opaque, unsigned long depth,
                 (softpc_snapshot_bytes_write)driver->state_writer.write,
                 driver->state_writer.context);
     }
-    finish_status = softpc_snapshot_finish(&driver->capture);
-    if (finish_status != LIB_STATUS_OK)
-        status = finish_status;
+    (void)softpc_snapshot_finish(&driver->capture);
     driver->state_read_status = status;
     driver->state_read_ready = LIB_TRUE;
     vm_driver_executor_event(driver);
     softpc_snapshot_image_dispose(&driver->captured_image);
-    if (finish_status != LIB_STATUS_OK)
-        softpc_ccpu_lifecycle_request_exit();
     driver->state_read_ready = LIB_FALSE;
 }
 
@@ -183,8 +178,14 @@ static lib_bool vm_driver_run(void *opaque)
         softpc_ccpu_entry entry;
         driver->restore_active = LIB_TRUE;
         result = softpc_machine_reset(driver->machine) == SOFTPC_MACHINE_OK &&
-            softpc_snapshot_image_restore(&driver->staged_image, &entry) ==
-            LIB_STATUS_OK;
+            softpc_platform_set_clock_running(0);
+        if (result) {
+            /* Bootstrap notifications are not part of the saved execution.
+               Join before discarding them; restore cannot manufacture ticks. */
+            softpc_platform_set_boot_clock(0);
+            result = softpc_snapshot_image_restore(&driver->staged_image,
+                &entry) == LIB_STATUS_OK;
+        }
         /* The restored CPU has an exact continuation boundary.  Let its first
            checkpoint enter Emulator's already-requested pause rendezvous before
            decoding another guest instruction. */
@@ -200,10 +201,7 @@ static lib_bool vm_driver_run(void *opaque)
         if (result) vm_driver_executor_event(driver);
     } else
         result = softpc_machine_run(driver->machine) == SOFTPC_MACHINE_OK;
-    /* finish retains READY only when clock restart fails. Do not resume CCPU
-       after that terminal capture failure. */
-    result = result && driver->capture.phase != SOFTPC_SNAPSHOT_READY &&
-        softpc_platform_executor_ready();
+    result = result && softpc_platform_executor_ready();
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     softpc_debug_bind(NULL);
     return result;

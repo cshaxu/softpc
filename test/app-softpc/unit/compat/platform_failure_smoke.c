@@ -32,6 +32,8 @@ static int terminate_sound(void)
     return fail_sound_term ? 0 : SbTerminate();
 }
 static WAITORTIMERCALLBACK saved_tick;
+static int check_sound_order;
+static void set_sound_running(int running);
 static HANDLE WINAPI create_event(LPSECURITY_ATTRIBUTES a, BOOL manual,
     BOOL signaled, LPCSTR name)
 { return fail_event ? NULL : CreateEventA(a, manual, signaled, name); }
@@ -82,8 +84,10 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #define WaitForSingleObject wait_event
 #define SbInitialize initialize_sound
 #define SbTerminate terminate_sound
+#define SbSetRunning set_sound_running
 #define time read_time
 #include "compat/platform.c"
+#undef SbSetRunning
 #undef time
 #undef SbTerminate
 #undef SbInitialize
@@ -91,6 +95,73 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #undef CreateTimerQueueTimer
 #undef DeleteTimerQueueTimer
 #undef CreateEventA
+
+extern void SbSetRunning(int running);
+static void set_sound_running(int running)
+{
+    if (check_sound_order) {
+        /* A slow suspend/restore must not produce ticks during either call. */
+        assert(softpc_clock_timer == NULL && saved_tick == NULL);
+        assert(softpc_clock_pending_ticks == 4);
+    }
+    SbSetRunning(running);
+}
+
+static void fail_clock_in_executor(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    UNUSED(context); UNUSED(entry);
+    assert(depth == 1u);
+    fail_delete = 1;
+    softpc_platform_set_runtime_heartbeat(0);
+    assert(0); /* Failure must unwind before the runtime can park. */
+}
+
+static void verify_runtime_clock(softpc_machine *machine)
+{
+    assert(softpc_platform_set_clock_running(0));
+    fake_timer = 1;
+    assert(softpc_platform_set_clock_running(1));
+    InterlockedExchange(&softpc_clock_pending_ticks, 3);
+    check_sound_order = 1;
+    softpc_platform_set_runtime_heartbeat(0);
+    assert(softpc_platform_executor_ready()); /* Stopped intentionally. */
+    softpc_platform_request_executor_wake();
+    assert(softpc_executor_wake_pending == 1);
+    softpc_platform_set_runtime_heartbeat(1);
+    check_sound_order = 0;
+    assert(saved_tick != NULL && softpc_clock_pending_ticks == 4);
+    fail_delete = 1;
+    softpc_platform_set_runtime_heartbeat(0);
+    assert(!softpc_platform_executor_ready());
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
+    assert(saved_tick != NULL); /* Failed join retains the live producer. */
+    fail_delete = 0;
+    host_timer_shutdown();
+    softpc_ccpu_lifecycle_clear_exit();
+    host_timer_init();
+    softpc_platform_set_runtime_heartbeat(0);
+    fail_timer = 1;
+    softpc_platform_set_runtime_heartbeat(1);
+    assert(!softpc_platform_executor_ready());
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
+    assert(saved_tick == NULL);
+    fail_timer = 0;
+    host_timer_shutdown();
+    softpc_ccpu_lifecycle_clear_exit();
+    fake_timer = 0;
+    InterlockedExchange(&softpc_clock_pending_ticks, 0);
+    InterlockedExchange(&softpc_executor_wake_pending, 0);
+    host_timer_init();
+    assert(softpc_platform_executor_ready());
+    softpc_ccpu_lifecycle_observe(fail_clock_in_executor, NULL);
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
+    softpc_ccpu_lifecycle_observe(NULL, NULL);
+    fail_delete = 0;
+    host_timer_shutdown();
+    softpc_ccpu_lifecycle_clear_exit();
+    host_timer_init();
+}
 
 extern void reset(void);
 static void reboot_failure(void *context, unsigned long depth,
@@ -265,6 +336,7 @@ int main(void)
         assert(softpc_platform_set_clock_running(1));
     }
 
+    verify_runtime_clock(machine);
     verify_pending_dispatch(machine);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 

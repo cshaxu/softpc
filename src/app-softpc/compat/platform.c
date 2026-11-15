@@ -48,6 +48,7 @@
  */
 
 static IBOOL softpc_sound_reset_failed;
+static IBOOL softpc_clock_failed;
 
 #ifdef _WIN32
 /* Original timestrb.c documents a host alarm of roughly 20 Hz.  The timer
@@ -133,7 +134,7 @@ void softpc_platform_wait_for_executor_event(void)
 int softpc_platform_executor_ready(void)
 {
 #ifdef _WIN32
-    return softpc_executor_event != NULL && softpc_clock_timer != NULL &&
+    return softpc_executor_event != NULL && !softpc_clock_failed &&
         !softpc_executor_wait_failed && !softpc_sound_reset_failed &&
         SbGetStatus() == LIB_STATUS_OK;
 #else
@@ -155,10 +156,28 @@ void softpc_platform_set_boot_clock(int active)
 
 void softpc_platform_set_runtime_heartbeat(int enabled)
 {
+    /* Join the producer before suspending output. Retain already accepted
+       ticks and the independent control wake event. */
+    if (!enabled && !softpc_platform_set_clock_running(0))
+        goto clock_failed;
     SbSetRunning(enabled != 0);
     /* Preserve the original keyboard idle policy at executor entry. */
     IDLE_ctl(enabled);
     if (enabled) IDLE_init();
+#ifdef _WIN32
+    /* Initial entry precedes host_timer_init. Later resumes restart the
+       producer only after output restoration has finished. */
+    if (enabled && softpc_executor_event != NULL &&
+        SbGetStatus() == LIB_STATUS_OK &&
+        !softpc_platform_set_clock_running(1))
+        goto clock_failed;
+#endif
+    return;
+clock_failed:
+    softpc_clock_failed = TRUE;
+    softpc_ccpu_lifecycle_request_exit();
+    if (softpc_ccpu_lifecycle_exit_requested())
+        softpc_ccpu_lifecycle_return_outer();
 }
 
 void softpc_platform_set_executor_callback(void (*callback)(void *),
@@ -492,7 +511,8 @@ void host_timer_init(void)
 #ifdef _WIN32
     if (softpc_executor_event == NULL)
         softpc_executor_event = CreateEventA(NULL, FALSE, FALSE, NULL);
-    (void)softpc_platform_set_clock_running(1);
+    if (!softpc_platform_set_clock_running(1))
+        softpc_clock_failed = TRUE;
 #endif
 }
 
@@ -661,6 +681,7 @@ void host_timer_shutdown(void)
         CloseHandle(softpc_executor_event);
     softpc_executor_event = NULL;
     softpc_executor_wait_failed = 0;
+    softpc_clock_failed = FALSE;
 #endif
 }
 void host_reset(void)
