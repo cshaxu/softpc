@@ -4108,3 +4108,55 @@ XP restoration identified. Recommend retaining R0424, pending owner approval.
 No production/test/manifest/EXE changes. Documentation/manifest/whitespace gates
 apply. Next real-diff file is order 339 egacpu.h, now +4/-1 after P34; S4/T100
 remain open.
+
+
+## S4 P36: owner approves DMA declaration; egacpu.h review
+
+Owner explicitly approves retaining R0424. The P35 pending decision is resolved.
+Order 339 base/inc/egacpu.h currently has one retained text block, +4/-1, R0426:
+three explanation lines plus struct VGAGLOBALSETTINGS *globals replace the
+original VGA_GLOBALS *globals at XP line 153 (current physical lines 112-115).
+Existing exclusions and necessary line controls are not counted or reopened.
+P34 already removed its redundant C_VID wrapper and shortened the stale comment.
+R0425's forward tag and R0427's changed include placement/spelling were restored
+in P78 and are not outstanding differences.
+
+This is a C declaration/type correction at the existing video boundary, not a
+new renderer, snapshot API, state owner or pointer-width expansion. Both old
+and new declarations are native pointers of the same size. The pointed-to
+structures are different C types: the original VGA_GLOBALS view uses ULONG,
+function-pointer fields and a shorter member set, while the generated
+VGAGLOBALSETTINGS carrier has the selected generated field types and members.
+
+Fresh production source proof: machine/machine.c:153 calls setup_vga_globals;
+ev_glue.c:766 assigns EGA_CPU.globals = &(GLOBAL_VGAGlobals). The pinned XP
+source contains the same assignment at line 765, so this is not invented wiring.
+The actual GDP macro in compat/cvidc/gdp_slots.h:632 yields a struct
+VGAGLOBALSETTINGS object; pinned XP's base/ccpu386/evid_c.h also defines that
+generated struct at line 59. The declared member should describe that object.
+Whole-repository search finds the assignment and the snapshot precondition
+null check in vga_prts.c:3163 as direct EGA_CPU.globals uses; no direct field
+access through the old pointer is claimed as a proven runtime failure.
+
+Historical P78 compiler controls used actual ev_glue/vga_prts commands on both
+architectures. Restoring the original VGA_GLOBALS pointer produced an
+incompatible-pointer diagnostic at the assignment and exit 1 with explicitly
+added -Werror=incompatible-pointer-types; current type passed. vga_prts still
+passed with the old type because it only checks NULL. This is precise compiler
+contract evidence, not observed corruption or a claim that production compiler
+flags necessarily stop at that warning. P78 also completed a historical full
+392/392 run. P34's latest cached builds and whole-artifact equivalence passed;
+this read-only P does not rerun experiments or claim fresh runtime acceptance.
+
+Counter-review: reverting the field restores a known mismatched declaration.
+Adding a cast at the original assignment merely hides that mismatch and moves
+or adds a mirror patch. Changing the generated provider or deleting the field
+would expand scope and disturb the existing initialization/null-check contract.
+No second carrier, conversion or conditional path is needed. The current one-
+line type correction plus required reason is the narrow truthful declaration.
+No further safe original restoration was identified under the current type-
+correctness standard. Recommend retain R0426, awaiting owner approval; do not
+classify it as a proved guest-display bug repair or snapshot-only capability.
+
+Documentation/manifest/whitespace gates apply; production/tests/EXEs unchanged.
+Next real-diff file is order 342 base/inc/egaports.h. S4/T100 remain open.

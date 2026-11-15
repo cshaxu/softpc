@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P36 records owner approval of dma.h R0424 and reviews egacpu.h R0426:
+one block +4/-1, matching the globals pointer to its actual generated provider.
+Original/current assignment and historical compiler controls support retention;
+no runtime corruption or pointer-width change is claimed. Earlier redundant
+wrapper/tag/include differences are already restored. R0426 awaits approval.
+No source/runtime changes. Next is order 342 egaports.h; S4/T100 remain open.
+
 S4 P35 records owner acceptance of P34 and reviews order 337 dma.h:
 one point +3/-0, R0424, exposes the existing pointer-returning DMA accessor
 to the retained DSP outside NTVDM. Actual production callers and historical
