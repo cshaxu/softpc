@@ -3941,3 +3941,64 @@ Recommendation: retain R0415 pending owner approval; not a claim that every
 helper spelling is uniquely minimal. No production/test/manifest/EXE change.
 Documentation/manifest/whitespace checks pass. Next manual file after owner
 decision is order 321 fla.c; skipped generated files remain unapproved.
+
+
+## S4 P32: owner approves fdisk; fla.c current per-piece review
+
+Owner explicitly approves retaining R0415 in fdisk.c. Its P31 pending decision
+is now resolved as approved; no source change follows from that approval.
+
+Order 321 base/disks/fla.c, pinned XP SP1 comparison: three real text blocks,
++97/-0, all R0417 FDC snapshot integration. Existing #error bodies and necessary
+#line scaffolding are excluded without new accounting. Retained original
+controller commands, NDMA logic and interrupt scheduling are unchanged.
+
+| Current physical lines | Added | Purpose and actual receiver |
+| --- | ---: | --- |
+| 77 | 1 | Include shared snapshot state schema and stable event IDs. |
+| 224-255 | 32 | Capture original private command/result blocks, four SIS slots, 8192-byte NDMA buffer, registers, flags and transfer counters. |
+| 257-299 | 43 | Validate archive bounds/selectors/flags before writes, then restore the same private controller state without issuing I/O. |
+| 1179-1188 | 10 | Encode original fla_int_call_back as SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT; reject other callbacks/null output. |
+| 1190-1196 | 7 | Decode that stable ID to the same original callback, otherwise return NULL. |
+| Between added items | 4 | Separating blank lines included in the total. |
+| Total | 97 | No deleted retained original lines. |
+
+Fresh source evidence: root CMakeLists.txt includes fla.c in production.
+Machine snapshot_image -> Compat CCPU archive -> device archive reaches
+capture_fdc/restore_fdc (archive.c lines 157/226). Its fdc_fields table at 442
+serializes every captured field. The archive event codec at 66/92 calls both
+FLA callback codecs. The selected non-NTVDM original fla_atomicxqt schedules
+fla_int_call_back with add_q_event_i at 861; that original callback at 810
+asserts the hardware interrupt. Thus neither the state helpers nor callback
+codecs are test-only. Stable IDs are needed instead of persisted code pointers.
+
+These additions preserve the controller, not the mounted image: command/result
+phase, pending sense results, partial NDMA data and delayed IRQ are not encoded
+by disk contents. Reading/writing device ports is not an equivalent state copy:
+reads consume result/data bytes and writes execute commands or reset state.
+The original private variables remain the sole live device state; archive data
+is a saved representation. Moving helpers into Compat would require exposing or
+moving those locals and introduce different mirror changes. Raw struct dumping
+cannot replace explicit wire-field mapping across ABI/layouts. No original
+snapshot interface exists to substitute for these additions.
+
+Current checkpoint_smoke.c lines 672-682 writes DOR and SPECIFY through actual
+ports, captures, resets DOR, restores and asserts DOR/current-command/command-
+count equality. This unchanged fixture passed on both architectures in P30's
+392/392 run. Historical S1 P70 cited the older P69 test execution; it is not a
+new removal-negative control. This review performed no fresh runtime tests.
+Tests do not individually prove all NDMA bytes, SIS slots, malformed fields or
+pending callback timing, nor all DOS/Win3.1/Win95 snapshot interleavings. Those
+remaining fields/codecs have current source/caller evidence, not exhaustive
+dynamic proof.
+
+P24 already removed the extracted notice R0416 and redundant added callback
+forward declaration by placing the codecs after the original definition.
+Neither is an outstanding diff or retention decision. No further independent
+formatting, duplicate declaration or unused addition can be restored to XP
+while preserving the existing snapshot contract. Recommendation: retain R0417,
+pending owner approval. No claim that every helper spelling is uniquely minimal.
+Next real-diff file is order 335 base/inc/cpu_vid.h; intervening zero-real-diff
+files need no new manual review. Skipped generated files remain unapproved.
+Production/tests/EXEs unchanged; documentation, manifest and whitespace gates
+are the verification for this documentation-only delivery. S4/T100 stay open.

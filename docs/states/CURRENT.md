@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P32 records owner approval of fdisk.c R0415 and reviews order 321 fla.c:
+three real text blocks +97/-0, all R0417 FDC snapshot integration. Current
+production callers and original state/callback ownership support retention;
+existing tests cover register restoration, not every buffer or event timing.
+No further equivalent restoration identified. R0417 awaits owner approval;
+source/tests/EXEs unchanged. Next real-diff file is order 335 cpu_vid.h.
+See the owner decision ledger; S4/T100 remain open.
+
 S4 P31 reviews order 320 fdisk.c: two real text blocks +120/-0, all R0415 HDD
 snapshot integration, with per-piece sizes, actual archive/event consumers,
 current fixture coverage and explicit untested boundaries. No equivalent XP
