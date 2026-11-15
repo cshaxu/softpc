@@ -34,10 +34,8 @@ softpc_machine_result softpc_machine_create(const softpc_machine_options *option
     softpc_machine **machine_out);
 softpc_machine_result softpc_machine_reset(softpc_machine *machine);
 lib_u32 softpc_machine_memory_bytes(const softpc_machine *machine);
-/* Zero runs continuously until a lifecycle exit; every nonzero 64-bit value
- * is a finite instruction budget. The contract is identical on x86 and x64. */
-softpc_machine_result softpc_machine_run(softpc_machine *machine,
-    lib_u64 instruction_budget);
+/* Run continuously until the existing lifecycle requests an outer exit. */
+softpc_machine_result softpc_machine_run(softpc_machine *machine);
 softpc_machine_result softpc_machine_read_physical(const softpc_machine *machine,
     lib_u32 address, void *buffer, lib_u32 bytes);
 /* Copy through the original physical bus mapping, including A20 and video.
@@ -66,8 +64,8 @@ void softpc_machine_request_stop(softpc_machine *machine);
  * thread. */
 void softpc_machine_executor_thread_enter(softpc_machine *machine);
 void softpc_machine_executor_thread_leave(softpc_machine *machine);
-/* The standalone runtime owns the original host heartbeat.  Legacy bounded
- * test calls keep it disabled; a continuous executor enables it only after
+/* The standalone runtime owns the original host heartbeat.  Direct
+ * test calls may keep it disabled; the product executor enables it only after
  * reset has returned to the public machine boundary. */
 void softpc_machine_set_heartbeat(softpc_machine *machine, int enabled);
 /* Called by the original CCPU host-timer event on the executor thread.  The

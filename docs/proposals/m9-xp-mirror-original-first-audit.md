@@ -496,3 +496,10 @@ order. Retain the interrupt-map accessor after original-interface/caller review.
 Remove obsolete consumption exports; use the existing fixture and full cached
 dual build/publication/regression. No broad retention approval or file-frontier
 advance follows from this narrowly approved implementation.
+
+S4 P8 owner approves deleting the finite-run counter and mirror hook after
+actual caller review. Machine execution remains continuous; tests use the
+existing DEBUG trace and execution-breakpoint path, with a test-local completion
+to stop adapter. No second counter or compatibility API remains. Deliver cached
+dual builds, publication, full regression and actual fixed-XP diff accounting;
+wait for owner acceptance without advancing the ordered file review frontier.

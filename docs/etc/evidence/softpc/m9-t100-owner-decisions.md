@@ -210,6 +210,33 @@ consumption, clock-before-wake observation, remaining ticks, empty dispatch and
 real CCPU entry whose clock callback exits while wake remains pending. Existing
 idle and HLT failure checks remain. Final run evidence is in the S4 audit.
 
+
+### S4 P8: owner-approved finite-budget removal
+
+Owner approves removing the c_main finite-budget difference and using existing
+DEBUG trace/execution breakpoints for tests. This supersedes R0103's earlier
+finite-run classification and the budget declaration within R0070-R0075.
+The production driver always passed zero; nonzero callers were test-owned.
+The old count measured NEXT_INST boundaries (including initial pre-fetch),
+not completed instructions. It was not the product DEBUG trace counter.
+
+Remove the mirror declaration and seven-line check, Compat counter/active flag
+and idle bypass, and the machine_run budget parameter. Production remains a
+continuous run stopped by its existing lifecycle. Tests bind the existing
+machine/debug state, submit existing execution plans, and turn its completed
+result into the existing stop request; there is no new instruction counter or
+production API. Boot fixtures use existing execution breakpoints where their
+completion PC is known; other instruction checks reuse TRACE. Actual DEBUG
+command-provider integration remains covered by the full suite.
+
+Baseline is P7 9ead43ec. Production +9/-45 (net -36), tests +106/-127 (net -21),
+including the new 45-line test-local execution fixture. Fixed-XP full-file diff
+changes +269/-541 to +261/-541: eight fewer added-plus-deleted lines, all removed
+local additions. Selected-content diff is +113/-16 after P6/P7/P8; frozen S4
+statistics remain unchanged. No #error body or public package is modified.
+Qualification and actual-diff review are recorded in the S4 audit evidence.
+
+
 ## S3 approval progress
 
 **Superseded by owner revocation:** all retention approvals and automatic

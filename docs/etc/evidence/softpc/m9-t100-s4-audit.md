@@ -237,3 +237,70 @@ original mirror warnings remain exempt. Changed mirror source is CRLF; all
 other changed text is LF. Manifest, documentation and whitespace gates pass.
 Temporary run material is removed after promoting these results; persistent
 Ninja and ccache trees remain. P7 waits for owner acceptance, not S4 closure.
+
+## P8 finite-budget removal and DEBUG reuse
+
+Owner approves this exact removal after the production/test caller investigation.
+Baseline: P7 9ead43ec. The production driver used only continuous execution;
+finite budgets existed for tests. Delete c_main's budget declaration/check,
+Compat's counter and active flag, its idle exception, and machine_run's parameter.
+No new production branch, callback, counter, poll or public API is introduced.
+The existing DEBUG begin/retired hooks and lifecycle stop remain their owners.
+
+The test-local execution fixture binds production DEBUG state, submits TRACE or
+an execution breakpoint, observes its real completion result in the existing
+executor callback, then requests the existing outer stop. It unbinds both
+callback and thread-local debug pointer before its stack state expires. It never
+counts instructions. JNZ/return tests use TRACE 1 rather than two pre-fetch
+boundaries. Boot, media, audio and mouse fixtures stop at existing completion
+PCs; the broader machine smoke uses one TRACE 96000 instead of sixteen budget
+6000 slices. IRQ/reset assertions and all guest fixture bytes remain intact.
+Lifecycle smoke now waits for actual CCPU entry before requesting external stop,
+replacing a fixed sleep and a budget that could terminate before that request.
+Error-path tests call continuous run and retain their IO_ERROR assertions.
+
+Actual Git numstat: six production files +9/-45 (net -36); eleven test files
+including the 45-line execution fixture +106/-127 (net -21). No build/config
+source changes. Normalized fixed-XP Myers numstat for c_main changes +269/-541
+to +261/-541; selected content changes +121/-16 to +113/-16. This removes eight
+mirror diff lines, not merely eight source lines. No excluded body changes.
+Other current mirror patches and the frozen audit inventory are unchanged.
+
+Initial focused x86 run passed 40 cases; partition's incorrectly entered
+breakpoint 7c36 was in the JMP operand and could not fire. The specifically
+identified test process was stopped after proving that fixture mistake; this
+termination is inconclusive, not a product test failure or pass. Correcting the
+test to instruction start 7c35 restores the intended completion check. No guest
+bytes, product logic or timeout were changed. Subsequent x64 focused run passed
+41/41. Final full qualification is recorded below.
+
+Actual-diff self-review and similar-issue sweep: src/test contains no remaining
+instruction_budget/consume_instruction_budget symbols. All machine_run callers
+use the sole continuous signature. Existing DEBUG command-provider tests retain
+product trace, breakpoint and instruction-edge behavior coverage; checkpoint
+fixtures retain nested simulation and snapshot assertions. Removing the obsolete
+counter tests does not remove tests for a surviving product capability. Test
+completion callbacks only request stop and never recurse into execution.
+No new public dependency, shared component edit or original guest modification.
+The source review is not a new manual DOS/Win3.1/Win95 acceptance claim.
+
+Final cached dual builds/publication pass (12.10 seconds x86, 4.10 seconds x64).
+The complete final run passes 392/392 without retries or skips: each architecture
+passes 188 background cases and eight native cases. Background job durations:
+x86 192.07 seconds, x64 188.07; native 28.13/26.14. Native qualification includes
+PCM/MIDI, both product package modes, Window retirement/modal behavior and
+Console broker display. This final full run is green; the earlier focused
+partition experiment above is not erased or described as first-pass success.
+
+| Artifact | Bytes | Compiler date/time | SHA-256 |
+| --- | ---: | --- | --- |
+| softpc32.exe | 3477513 | Nov 14 2026 16:58:09 | `1510406695626e840a419ad53871bcbd4ad1a689c391a3bfd1e3d178fe03b6e0` |
+| softpc64.exe | 3094678 | Nov 14 2026 17:02:02 | `48f26f2899c0fb7cfb61d987e750091bee21b18f5172a0a5b8089dd60dcbfeec` |
+
+Publication verifies embedded compiler literals. All build diagnostics outside
+the preserved mirror are absent; original mirror warnings remain exempt.
+Changed mirror source remains CRLF, all other changed text LF. Documentation,
+XP manifest and whitespace checks pass. No INI, media or snapshot changes.
+Owned background jobs have completed; disposable task material is removed after
+promoting this evidence, retaining only the two reusable cache roots. P8 waits
+for owner acceptance; S4 remains open at review file 11, with 110 files remaining.

@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "machine/input.h"
@@ -623,13 +624,9 @@ static void write_int13_parameters_boot_image(const char *path)
 
 static void boot_machine(softpc_machine *machine)
 {
-    unsigned int slice;
-
-    /* The restored firmware reaches the boot sector through the original
-       FDC/GFI completion and IRQ6 path.  Give that asynchronous path a
-       bounded, repeatable set of host slices before testing guest code. */
-    for (slice = 0u; slice < 16u; ++slice)
-        assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    /* Execute through the real DEBUG counter, then inspect the fixture's
+       completed guest work. No independent host-boundary counter. */
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_TRACE, 96000u) == SOFTPC_MACHINE_OK);
 }
 
 static void release_boot_probe(softpc_machine *machine)
@@ -648,8 +645,7 @@ static void await_boot_probe(softpc_machine *machine)
     assert(ready == 0x55u);
 }
 
-static void run_boot_image(const char *path, int floppy, unsigned char expected,
-    lib_u64 instruction_budget)
+static void run_boot_image(const char *path, int floppy, unsigned char expected)
 {
     softpc_machine_smoke_note(__func__);
     unsigned char marker = 0;
@@ -659,7 +655,6 @@ static void run_boot_image(const char *path, int floppy, unsigned char expected,
     else options.hard_disk_path = path;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    (void)instruction_budget;
     boot_machine(machine);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == expected);
@@ -1200,11 +1195,7 @@ int main(void)
     write_hdd_pio_write_boot_image(hdd_pio_write);
     assert(softpc_machine_create(&dual_media, &dual_machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(dual_machine) == SOFTPC_MACHINE_OK);
-    {
-        unsigned int slice;
-        for (slice = 0u; slice < 16u; ++slice)
-            assert(softpc_machine_run(dual_machine, 6000u) == SOFTPC_MACHINE_OK);
-    }
+    assert(softpc_test_execute(dual_machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c05u) == SOFTPC_MACHINE_OK);
     {
         unsigned char marker = 0u;
         unsigned char fixed_disk_count = 0u;
@@ -1215,8 +1206,8 @@ int main(void)
         assert(marker == 0x42u && fixed_disk_count == 1u);
     }
     softpc_machine_destroy(dual_machine);
-    run_boot_image(floppy, 1, 0x42u, 6000u);
-    run_boot_image(hdd, 0, 0x77u, 6000u);
+    run_boot_image(floppy, 1, 0x42u);
+    run_boot_image(hdd, 0, 0x77u);
     run_keyboard_boot_image(keyboard);
     run_int16_boot_image(int16);
     run_int1d_boot_image(int1d);

@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "machine/machine.h"
 #include "../../fixture_cleanup.h"
 
@@ -42,14 +43,12 @@ int main(void)
     unsigned char marker = 0u;
     unsigned char fixed_disk_count = 0u;
     unsigned short cmos_disk = 0u;
-    unsigned int slice;
 
     write_boot_image(floppy, 0x42u);
     write_boot_image(hard_disk, 0x77u);
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    for (slice = 0u; slice < 16u; ++slice)
-        assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c05u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) ==
         SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x475u, &fixed_disk_count,
@@ -80,8 +79,7 @@ int main(void)
     assert(softpc_machine_set_floppy(machine, invalid_floppy,
         LIB_STORAGE_MEDIUM_READONLY) == SOFTPC_MACHINE_IO_ERROR);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    for (slice = 0u; slice < 16u; ++slice)
-        assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c05u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) ==
         SOFTPC_MACHINE_OK);
     assert(marker == 0x63u);

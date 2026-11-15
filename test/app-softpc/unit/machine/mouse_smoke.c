@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "machine/machine.h"
 #include "../../fixture_cleanup.h"
 
@@ -58,7 +59,7 @@ int main(void)
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     /* Let the guest install the hardware IRQ handler before injecting an
        input transition. */
-    assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c1du) == SOFTPC_MACHINE_OK);
 
     /* The original InPort mouse occupies only 23Ch--23Fh.  Keep this
        explicit: an accidental adapter-table overwrite makes virtual-8086
@@ -141,7 +142,7 @@ int main(void)
         SOFTPC_MACHINE_OK);
     outb(MOUSE_PORT_0, 7u);
     outb(MOUSE_PORT_1, 0x09u);
-    assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c2bu) == SOFTPC_MACHINE_OK);
     {
         unsigned char marker = 0u;
         assert(softpc_machine_read_physical(machine, 0x500u, &marker,

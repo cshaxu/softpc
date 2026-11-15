@@ -1,6 +1,7 @@
 #include "../../fixture_time.h"
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
+#include "compat/ccpu/lifecycle.h"
 #include "../../fixture_cleanup.h"
 
 #include <assert.h>
@@ -10,12 +11,20 @@
 #include <windows.h>
 
 static volatile LONG softpc_lifecycle_result;
+static HANDLE entered;
+static void observe_entry(void *context, unsigned long depth, const softpc_ccpu_entry *entry)
+{
+    (void)context; (void)depth; (void)entry;
+    assert(SetEvent(entered));
+}
 
 static DWORD WINAPI softpc_lifecycle_run(void *opaque)
 {
     softpc_machine *machine = (softpc_machine *)opaque;
     softpc_machine_executor_thread_enter(machine);
-    softpc_machine_result result = softpc_machine_run(machine, 1u);
+    softpc_ccpu_lifecycle_observe(observe_entry, NULL);
+    softpc_machine_result result = softpc_machine_run(machine);
+    softpc_ccpu_lifecycle_observe(NULL, NULL);
     softpc_machine_set_heartbeat(machine, 0);
     softpc_machine_executor_thread_leave(machine);
     InterlockedExchange(&softpc_lifecycle_result, (LONG)result);
@@ -50,14 +59,17 @@ int main(void)
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     InterlockedExchange(&softpc_lifecycle_result, SOFTPC_MACHINE_IO_ERROR);
     softpc_machine_set_heartbeat(machine, 1);
+    entered = CreateEvent(NULL, TRUE, FALSE, NULL);
+    assert(entered != NULL);
     worker = CreateThread(NULL, 0u, softpc_lifecycle_run, machine, 0u, NULL);
     assert(worker != NULL);
-    softpc_test_sleep_milliseconds(200u);
+    assert(WaitForSingleObject(entered, 5000u) == WAIT_OBJECT_0);
     softpc_machine_request_stop(machine);
     assert(WaitForSingleObject(worker, 5000u) == WAIT_OBJECT_0);
     assert(InterlockedCompareExchange(&softpc_lifecycle_result, 0, 0) ==
         SOFTPC_MACHINE_OK);
     CloseHandle(worker);
+    CloseHandle(entered);
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

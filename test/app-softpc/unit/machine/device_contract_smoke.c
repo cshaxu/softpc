@@ -816,7 +816,7 @@ static void verify_sb_ports(softpc_machine *machine)
     sb_midi_cancel_failure = LIB_STATUS_IO_ERROR;
     assert(SbGetStatus() == LIB_STATUS_IO_ERROR);
     assert(!SbInitialize()); /* Repeated admission cannot hide a host fault. */
-    assert(softpc_machine_run(machine, 1) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
     {
         lib_u32 before = sb_midi_writes;
         softpc_machine_set_heartbeat(machine, 0);
@@ -859,7 +859,7 @@ static void verify_sb_executor(softpc_machine *machine)
         if (fail) {
             sb_pcm_status = LIB_STATUS_IO_ERROR;
             softpc_platform_request_executor_wake();
-            assert(softpc_machine_run(machine, 10000) == SOFTPC_MACHINE_IO_ERROR);
+            assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
             assert(DspGetStatus() == LIB_STATUS_IO_ERROR && sb_pcm_count == 7);
             sb_pcm_status = LIB_STATUS_OK;
         } else {

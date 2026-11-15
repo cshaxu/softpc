@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "../../fixture_cleanup.h"
@@ -53,7 +54,7 @@ static void verify_rejected_interrupt(softpc_machine *machine)
        The boot program is parked on JMP $, with interrupts enabled. */
     assert((flags & 0x200u) != 0u);
     host_set_hw_int();
-    assert(softpc_machine_run(machine, 32u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_TRACE, 32u) == SOFTPC_MACHINE_OK);
     assert((*softpc_ccpu_interrupt_map_address() & 1u) == 0u);
     assert(c_getCS() == cs && c_getEIP() == ip);
     assert(c_getESP() == sp && c_getEFLAGS() == flags);
@@ -302,10 +303,8 @@ int main(void)
 
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    /* The original ROM POST is part of the machine path.  A slice measured
-       in the old replacement core's bootstrap instructions cannot reach a
-       boot sector after that POST, so use a bounded machine slice instead. */
-    assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    /* Break after the real ROM POST and fixture boot-completion store. */
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c00u + sizeof(program) - 2u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker == 0x5au);
     /* Preserve the real BIOS IRQ0 handler. Its INT 1Ch callback proves actual
@@ -317,7 +316,7 @@ int main(void)
     assert(softpc_machine_write_physical(machine, 0x70u, user_timer_vector,
         sizeof(user_timer_vector)) == SOFTPC_MACHINE_OK);
     ica_hw_interrupt(ICA_MASTER, 0u, 1);
-    assert(softpc_machine_run(machine, 256u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_TRACE, 256u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x501u, &marker, 1u) == SOFTPC_MACHINE_OK);
     assert(marker != 0u);
     assert(softpc_machine_write_physical(machine, 0x70u, prior_user_timer,
@@ -332,7 +331,7 @@ int main(void)
     /* The original 8042 output-port pulse requests a CPU reset through the
        original keyboard controller; it is not a standalone reset shortcut. */
     outb(0x64u, reset_command);
-    assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0xffff0u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
         SOFTPC_MACHINE_OK);
     assert(cs == 0xf000u);
@@ -342,8 +341,9 @@ int main(void)
        calls the historical reboot host callback. The standalone callback
        must assert that same CCPU reset line; it must not merely set the
        soft-reset classification flag and leave execution in DOS. */
+    c_setEIP(0xfff1u); /* Prove the reset request, not an already-matching PC. */
     reboot();
-    assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0xffff0u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_instruction_pointer(machine, &cs, &eip) ==
         SOFTPC_MACHINE_OK);
     assert(cs == 0xf000u);

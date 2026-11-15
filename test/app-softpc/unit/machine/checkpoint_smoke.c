@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "compat/ccpu/abi.h"
@@ -253,7 +254,7 @@ static void verify_reentry(void)
     outb(0x21u, 0xfeu); outb(0xa1u, 0xffu);
     probe.calls = 0u;
     softpc_ccpu_lifecycle_observe(capture_shadow, &probe);
-    assert(softpc_machine_run(probe.machine, 0u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(probe.machine) == SOFTPC_MACHINE_OK);
     assert(c_getEIP() == 0x702u && !probe.entry.halted);
     ica_hw_interrupt(ICA_MASTER, 0u, 1);
     probe.calls = probe.halted = 0u;
@@ -296,7 +297,7 @@ static void verify_timeout(void)
     prior_bop = BIOS[0xf0];
     BIOS[0xf0] = nested_bios;
     softpc_ccpu_lifecycle_observe(observe_timeout, &probe);
-    assert(softpc_machine_run(probe.machine, 0u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(probe.machine) == SOFTPC_MACHINE_OK);
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     BIOS[0xf0] = prior_bop;
     assert(probe.timeouts == 1u && !probe.nested_returned);
@@ -1007,41 +1008,6 @@ static void verify_event_queue_archive(void)
     assert(softpc_platform_set_clock_running(1));
 }
 
-static void observe_budget(void *context, unsigned long depth,
-    const softpc_ccpu_entry *entry)
-{
-    const lib_u64 budget = *(const lib_u64 *)context;
-    assert(depth == 1u && !entry->halted);
-    assert(++probe.calls == 1u);
-    assert(softpc_ccpu_instruction_budget_active == (budget != 0u));
-    /* Original entry crosses NEXT_INST once before the first fetch. */
-    assert(softpc_ccpu_instruction_budget == (budget ? budget - 1u : 0u));
-    softpc_machine_request_stop(probe.machine);
-}
-
-static void verify_run_budget(void)
-{
-    const unsigned char loop[] = {0x90, 0xeb, 0xfd};
-    lib_u64 budgets[] = {0u, UINT32_MAX, (lib_u64)UINT32_MAX + 1u,
-        (lib_u64)UINT32_MAX + 2u, UINT64_MAX};
-    assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
-    assert(softpc_machine_write_physical(probe.machine, 0x500u, loop,
-        sizeof(loop)) == SOFTPC_MACHINE_OK);
-    assert(c_setCS(0u) == 0);
-    c_setEFLAGS(2u);
-    for (lib_size i = 0; i < sizeof(budgets) / sizeof(budgets[0]); ++i) {
-        c_setEIP(0x500u);
-        probe.calls = 0u;
-        softpc_ccpu_lifecycle_observe(observe_budget, &budgets[i]);
-        assert(softpc_machine_run(probe.machine, budgets[i]) == SOFTPC_MACHINE_OK);
-        assert(probe.calls == 1u && !softpc_ccpu_instruction_budget_active);
-    }
-    softpc_ccpu_lifecycle_observe(NULL, NULL);
-    assert(softpc_machine_run(probe.machine, 2u) == SOFTPC_MACHINE_OK);
-    assert(softpc_ccpu_instruction_budget == 0u);
-    assert(!softpc_ccpu_instruction_budget_active);
-}
-
 static void verify_branch_ip_width(void)
 {
     static const unsigned char branch16[] = {0x75, 0x00};
@@ -1067,8 +1033,8 @@ static void verify_branch_ip_width(void)
                 assert(c_setCS(0u) == 0);
                 c_setEIP(cases[index].start);
                 c_setEFLAGS(taken ? 2u : 0x42u);
-                /* One entry boundary followed by one actual JNZ instruction. */
-                assert(softpc_machine_run(probe.machine, 2u) == SOFTPC_MACHINE_OK);
+                /* Production DEBUG trace observes one completed JNZ instruction. */
+                assert(softpc_test_execute(probe.machine, X86_DEBUG_EXECUTION_TRACE, 1u) == SOFTPC_MACHINE_OK);
                 assert(c_getEIP() == (wide ? cases[index].next32 : cases[index].next16));
             }
         }
@@ -1111,7 +1077,7 @@ static void verify_return_stack_width(void)
         c_setEIP(0x500);
         c_setCPL(0);
         c_setCR0(1);
-        assert(softpc_machine_run(probe.machine, 2) == SOFTPC_MACHINE_OK);
+        assert(softpc_test_execute(probe.machine, X86_DEBUG_EXECUTION_TRACE, 1u) == SOFTPC_MACHINE_OK);
         assert(c_getCPL() == 3 && c_getEIP() == 0x600u);
         assert(c_getCS() == 0x0bu && c_getSS() == 0x13u);
         /* A 32-bit return restores ESP even when the returned SS has B=0. */
@@ -1148,7 +1114,7 @@ int main(void)
     prior_bop = BIOS[0xf0];
     BIOS[0xf0] = nested_bios;
     softpc_ccpu_lifecycle_observe(observe, &probe);
-    assert(softpc_machine_run(probe.machine, 0u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(probe.machine) == SOFTPC_MACHINE_OK);
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     BIOS[0xf0] = prior_bop;
     assert(probe.halted == 1u && probe.nested_returned && probe.captures == 1u);
@@ -1163,7 +1129,6 @@ int main(void)
     verify_controller_archives();
     verify_event_queue();
     verify_event_queue_archive();
-    verify_run_budget();
     verify_branch_ip_width();
     verify_return_stack_width();
     softpc_machine_destroy(probe.machine);

@@ -93,27 +93,6 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #undef CreateEventA
 
 extern void reset(void);
-static void verify_instruction_budget(void)
-{
-    const lib_u64 values[] = {1u, 2u, UINT32_MAX,
-        (lib_u64)UINT32_MAX + 1u, (lib_u64)UINT32_MAX + 2u, UINT64_MAX};
-    lib_size i;
-    for (i = 0; i < sizeof(values) / sizeof(values[0]); ++i) {
-        softpc_ccpu_instruction_budget = values[i];
-        softpc_ccpu_instruction_budget_active = TRUE;
-        assert(softpc_platform_consume_instruction_budget() == (values[i] == 1u));
-        assert(softpc_ccpu_instruction_budget == values[i] - 1u);
-    }
-    softpc_ccpu_instruction_budget = 2u;
-    assert(!softpc_platform_consume_instruction_budget());
-    assert(softpc_platform_consume_instruction_budget());
-    assert(!softpc_platform_consume_instruction_budget());
-    assert(softpc_ccpu_instruction_budget == 0u); /* No wrap after exhaustion. */
-    softpc_ccpu_instruction_budget_active = FALSE;
-    assert(!softpc_platform_consume_instruction_budget());
-    assert(softpc_ccpu_instruction_budget == 0u);
-}
-
 static unsigned dispatch_calls;
 static int stop_on_dispatch;
 static void observe_dispatch(void *context)
@@ -147,7 +126,7 @@ static void verify_pending_dispatch(softpc_machine *machine)
     softpc_platform_request_executor_wake();
     dispatch_calls = 0;
     stop_on_dispatch = 1;
-    assert(softpc_machine_run(machine, 0u) == SOFTPC_MACHINE_OK);
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_OK);
     assert(dispatch_calls == 1 && softpc_executor_wake_pending == 1);
     stop_on_dispatch = 0;
     softpc_platform_set_executor_callback(NULL, NULL);
@@ -190,7 +169,6 @@ int main(void)
     softpc_machine *machine = NULL;
     unsigned restart;
     FILE *file = fopen(path, "wb");
-    verify_instruction_budget();
     assert(file != NULL);
     assert(fwrite(sector, 1u, sizeof(sector), file) == sizeof(sector));
     assert(fclose(file) == 0);
@@ -226,7 +204,7 @@ int main(void)
     assert(wait_calls == 1u && softpc_platform_executor_ready());
 
     /* Idle shares HLT's event/failure owner, but must not park over queued
-       input/clock records or turn a finite CPU slice into an infinite wait. */
+       input/clock records. */
     softpc_platform_request_executor_wake();
     host_release_timeslice();
     assert(wait_calls == 1u);
@@ -237,10 +215,6 @@ int main(void)
     assert(wait_calls == 1u);
     softpc_platform_dispatch_pending_events();
     assert(softpc_clock_pending_ticks == 0);
-    softpc_ccpu_instruction_budget_active = TRUE;
-    host_release_timeslice();
-    assert(wait_calls == 1u);
-    softpc_ccpu_instruction_budget_active = FALSE;
     assert(SetEvent(softpc_executor_event));
     host_release_timeslice();
     assert(wait_calls == 2u && softpc_platform_executor_ready());
@@ -291,9 +265,9 @@ int main(void)
     assert(c_setCS(0u) == 0);
     c_setEIP(0x500u);
     fail_wait = 1; wait_calls = 0u;
-    assert(softpc_machine_run(machine, 0u) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
     assert(wait_calls == 1u && !softpc_platform_executor_ready());
-    assert(softpc_machine_run(machine, 1u) == SOFTPC_MACHINE_IO_ERROR);
+    assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
     assert(wait_calls == 1u); /* Reject execution before entering the CPU again. */
     softpc_machine_destroy(machine);
     assert(softpc_executor_event == NULL && softpc_clock_timer == NULL);

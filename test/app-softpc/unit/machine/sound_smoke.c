@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "../../fixture_time.h"
 #include "machine/machine.h"
 #include "compat/audio.h"
@@ -215,17 +216,10 @@ static void audio_probe_sb_blocks(softpc_machine *machine)
 
 /* This is AUDIO.COM's tone setup: program Timer 2 to 439Hz, enable the PPI
    speaker gate, then hold that state. */
-static void audio_probe_execute_audio_com(softpc_machine *machine,
-    lib_bool yield_host)
+static void audio_probe_execute_audio_com(softpc_machine *machine)
 {
-    lib_u64 deadline = softpc_test_clock_milliseconds() + 3000u;
-
-    while (softpc_test_clock_milliseconds() < deadline) {
-        assert(softpc_machine_run(machine, 5000u) == SOFTPC_MACHINE_OK);
-        if (PpiState != FALSE) return;
-        if (yield_host != LIB_FALSE) softpc_test_sleep_milliseconds(1u);
-    }
-    assert(!"AUDIO.COM did not enable its PPI speaker gate");
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c13u) == SOFTPC_MACHINE_OK);
+    assert(PpiState != FALSE);
 }
 
 #endif
@@ -276,12 +270,12 @@ int main(void)
     /* Both executions are the actual DOS fixture program, not direct calls
        to the presentation boundary. */
     InterlockedExchange(&audio_probe_phase, 3);
-    audio_probe_execute_audio_com(machine, LIB_TRUE);
+    audio_probe_execute_audio_com(machine);
     audio_probe_wait_for_count(&audio_probe_program_first_delivery, 3);
     assert(InterlockedCompareExchange(&audio_probe_program_first_delivery, 0, 0) != 0);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     InterlockedExchange(&audio_probe_phase, 4);
-    audio_probe_execute_audio_com(machine, LIB_TRUE);
+    audio_probe_execute_audio_com(machine);
     audio_probe_wait_for_count(&audio_probe_program_second_delivery, 3);
     assert(InterlockedCompareExchange(&audio_probe_program_second_delivery, 0, 0) != 0);
     assert(InterlockedCompareExchange(&audio_probe_program_first_frames, 0, 0) * 4 >=
@@ -290,11 +284,10 @@ int main(void)
         InterlockedCompareExchange(&audio_probe_program_first_frames, 0, 0) * 3);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 
-    /* The production executor runs continuous slices.  It must not need this
-       test's cooperative yield for the existing Audio producer to deliver a
-       complete guest tone. */
+    /* Continuous guest execution to the breakpoint requires no host yield.
+       The existing Audio producer must then sustain the programmed tone. */
     InterlockedExchange(&audio_probe_phase, 5);
-    audio_probe_execute_audio_com(machine, LIB_FALSE);
+    audio_probe_execute_audio_com(machine);
     softpc_test_sleep_milliseconds(250u);
     assert(InterlockedCompareExchange(&audio_probe_program_fast_frames, 0, 0) >= 2048);
 #endif

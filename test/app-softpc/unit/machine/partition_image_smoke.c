@@ -1,3 +1,4 @@
+#include "execution_fixture.h"
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "../../fixture_cleanup.h"
@@ -79,15 +80,14 @@ int main(void)
     unsigned char mbr_table[32];
     unsigned char ebr_table[16];
     FILE *file;
-    unsigned int slice;
+    /* The fixture boot program ends with JMP $ at byte 53. */
 
     softpc_partition_write_image(path);
     options.floppy_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     options.hard_disk_mode = LIB_STORAGE_MEDIUM_OVERLAY;
     assert(softpc_machine_create(&options, &machine) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
-    for (slice = 0u; slice < 16u; ++slice)
-        assert(softpc_machine_run(machine, 6000u) == SOFTPC_MACHINE_OK);
+    assert(softpc_test_execute(machine, X86_DEBUG_EXECUTION_BREAK_LINEAR, 0x7c35u) == SOFTPC_MACHINE_OK);
     assert(softpc_machine_read_physical(machine, 0x500u, markers,
         sizeof(markers)) == SOFTPC_MACHINE_OK);
     assert(markers[0] == SOFTPC_PRIMARY_MARKER);

@@ -47,8 +47,6 @@
  * notification.  There is no product-session or service-dispatch layer here.
  */
 
-lib_u64 softpc_ccpu_instruction_budget = 0;
-IBOOL softpc_ccpu_instruction_budget_active = FALSE;
 static IBOOL softpc_sound_reset_failed;
 
 #ifdef _WIN32
@@ -117,18 +115,6 @@ void softpc_platform_request_executor_wake(void)
 #endif
 }
 
-/* A bounded public machine run is measured only at the generated CCPU
- * inter-instruction safe point.  The continuous VM executor supplies the
- * zero budget and is stopped through its separate lifecycle port. */
-IBOOL softpc_platform_consume_instruction_budget(void)
-{
-    if (!softpc_ccpu_instruction_budget_active ||
-        softpc_ccpu_instruction_budget == 0u)
-        return FALSE;
-    --softpc_ccpu_instruction_budget;
-    return softpc_ccpu_instruction_budget == 0u;
-}
-
 /* Used by CCPU HLT and original keyboard idle after pending sources have
  * been checked. The auto-reset event avoids a polling spin: either the
  * original host timer or frontend input wakes this executor immediately. */
@@ -170,8 +156,7 @@ void softpc_platform_set_boot_clock(int active)
 void softpc_platform_set_runtime_heartbeat(int enabled)
 {
     SbSetRunning(enabled != 0);
-    /* Only continuous execution may park in the original keyboard idle path.
-       Reset it at run entry; finite instruction-budget runs stay bounded. */
+    /* Preserve the original keyboard idle policy at executor entry. */
     IDLE_ctl(enabled);
     if (enabled) IDLE_init();
 }
@@ -227,8 +212,7 @@ void memset4(unsigned int data, unsigned int *destination, unsigned int count)
 void host_release_timeslice(void)
 {
 #ifdef _WIN32
-    if (!softpc_ccpu_instruction_budget_active &&
-        !softpc_platform_has_pending_executor_event()) {
+    if (!softpc_platform_has_pending_executor_event()) {
         softpc_platform_wait_for_executor_event();
     }
 #endif
@@ -450,7 +434,7 @@ struct host_tm *host_localtime(time_t *clock_value)
 }
 
 /* The original 8253 remains responsible for guest time.  These functions
-   are only its standalone host ports: wall-clock sampling, bounded slice
+   are only its standalone host ports: wall-clock sampling, executor
    scheduling, host-speed calibration, and optional speaker presentation. */
 void host_gettimeofday(struct host_timeval *value, struct host_timezone *zone)
 {

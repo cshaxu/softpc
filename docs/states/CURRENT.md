@@ -13,7 +13,7 @@ approval or automatic small-diff delegation is restored.
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; no inherited retention approvals. |
 | Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
-| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. |
+| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
 | Files And ABI Surface | All tracked files under src/app-softpc/softpc.new and read-only inspection of real build/caller/test dependencies. Start with audit, not new code changes. |
@@ -28,6 +28,16 @@ approval or automatic small-diff delegation is restored.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P8 removes the owner-approved finite-budget implementation and parameter.
+Production keeps continuous execution and existing DEBUG/lifecycle paths;
+tests reuse actual trace and execution breakpoints without a second counter.
+Final cached dual builds/publication and full regression pass 392/392, including
+all native desktop/audio/package cases. Earlier focused fixture-address error
+and correction are recorded in the [S4 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p8-finite-budget-removal-and-debug-reuse).
+Production +9/-45 (net -36), tests +106/-127 (net -21); fixed-XP mirror diff
+reduces eight lines. Actual-diff review finds no new path/state or public-package
+change. Await owner acceptance; S4/T100 remain open at review file 11.
 
 S4 P7 implements the owner-approved single Compat pending-event dispatcher.
 All three CCPU call sites, clock-before-wake order and one-record consumption

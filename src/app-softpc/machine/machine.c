@@ -330,18 +330,12 @@ softpc_machine_result softpc_machine_write_physical(softpc_machine *machine,
         SOFTPC_MACHINE_OK : SOFTPC_MACHINE_INVALID_ARGUMENT;
 }
 
-softpc_machine_result softpc_machine_run(softpc_machine *machine,
-    lib_u64 instruction_budget)
+softpc_machine_result softpc_machine_run(softpc_machine *machine)
 {
     if (machine == NULL || !machine->reset)
         return SOFTPC_MACHINE_INVALID_ARGUMENT;
     if (!softpc_platform_executor_ready()) return SOFTPC_MACHINE_IO_ERROR;
-    /* Zero selects continuous execution; a finite budget reaching zero must
-       remain distinct from that entry choice. Both widths keep all 64 bits. */
-    softpc_ccpu_instruction_budget = instruction_budget;
-    softpc_ccpu_instruction_budget_active = instruction_budget != 0u;
     c_cpu_simulate();
-    softpc_ccpu_instruction_budget_active = 0;
     softpc_ccpu_lifecycle_clear_exit();
     return softpc_platform_executor_ready() ? SOFTPC_MACHINE_OK :
         SOFTPC_MACHINE_IO_ERROR;

@@ -62,7 +62,6 @@ extern void TakeNpxExceptionInt(void);
 extern void softpc_platform_executor_event(void);
 extern IBOOL softpc_platform_has_pending_executor_event(void);
 extern void softpc_platform_dispatch_pending_events(void);
-extern IBOOL softpc_platform_consume_instruction_budget(void);
 extern void softpc_platform_wait_for_executor_event(void);
 extern int softpc_host_debug_begin(void);
 extern void softpc_host_debug_retired(void);
@@ -4254,13 +4253,6 @@ TYPEFF_3:
 NEXT_INST:
 
    softpc_platform_dispatch_pending_events();
-
-   if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&
-       softpc_platform_consume_instruction_budget())
-      {
-      softpc_ccpu_lifecycle_request_exit();
-      softpc_platform_executor_event();
-      }
 
 RESUME_FETCH:
    softpc_ccpu_lifecycle_checkpoint(FALSE, 0);
