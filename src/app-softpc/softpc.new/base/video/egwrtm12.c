@@ -295,7 +295,7 @@ ega_mode1_chn_b_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode1_chn_b_write");
 
 	lsb = offset & 1;
-	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
+	offset = (offset & ~1u) << 2 /* preserve plane address A0. */;
 
 	if( lsb )	/* odd address, in plane 1 or 3 */
 	{
@@ -329,7 +329,7 @@ ega_mode1_chn_w_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode1_chn_w_write");
 
 	lsb = offset & 1;
-	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
+	offset = (offset & ~1u) << 2 /* preserve plane address A0. */;
 
 	if( lsb )	/* odd address, low byte in planes 1 and 3 */
 	{
@@ -628,7 +628,7 @@ ega_mode2_chn_b_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode2_chn_b_write");
 
 	lsb = offset & 1;
-	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
+	offset = (offset & ~1u) << 2 /* preserve plane address A0. */;
 
 	if( EGA_CPU.fun_or_protection )
 	{
@@ -699,7 +699,7 @@ ega_mode2_chn_w_write IFN2(ULONG, value, ULONG, offset )
 	note_entrance0("ega_mode2_chn_w_write");
 
 	lsb = offset & 1;
-	offset = (offset & ~1u) << 2 /* T99: preserve plane address A0. */;
+	offset = (offset & ~1u) << 2 /* preserve plane address A0. */;
 
 	if( EGA_CPU.fun_or_protection )
 	{

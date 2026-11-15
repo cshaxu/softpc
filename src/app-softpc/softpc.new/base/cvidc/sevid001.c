@@ -1164,11 +1164,11 @@ switch ( id )
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_57if_f_id	:
 		L26_57if_f:	;	
-	*((IUH	*)(LocalIUH+4))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)(LocalIUH+4))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	case	L26_58if_d_id	:
 		L26_58if_d:	;	
 	*((IUH	*)&(r20))	=	(IS32)(1372)	;	
-	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	+	((*((IU32	*)(LocalIUH+1)	+	REGLONG) & ~1u) << 2) + (*((IU32	*)(LocalIUH+1)	+	REGLONG) & 1u) /* T99: odd/even plane address. */	;
+	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	+	((*((IU32	*)(LocalIUH+1)	+	REGLONG) & ~1u) << 2) + (*((IU32	*)(LocalIUH+1)	+	REGLONG) & 1u) /* odd/even plane address. */	;
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)&(r21)	+	REGLONG)	;	
 	*((IU32	*)(LocalIUH+6)	+	REGLONG)	=	*((IU32	*)(LocalIUH+2)	+	REGLONG)	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
@@ -1189,7 +1189,7 @@ switch ( id )
 	*((IUH	*)&(r23))	=	*((IUH	*)(LocalIUH+5))	;	
 	*((IU8	*)(*((IHPE	*)&(r20)))	)	=	*((IU8	*)((*((IHPE *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IHPE)))	)	+	*((IHPE	*)&(r23)))	)	;
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	-	*((IU32	*)(LocalIUH+4)	+	REGLONG)	;	
-	*((IUH	*)&(r21))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+4))	=	*((IUH	*)(LocalIUH+4))	^	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+6)	+	REGLONG)	>	*((IU32	*)&(r20)	+	REGLONG))	goto	L26_61w_t;	
@@ -1216,7 +1216,7 @@ switch ( id )
 	*((IUH	*)&(r23))	=	*((IUH	*)(LocalIUH+5))	;	
 	*((IU8	*)(*((IHPE	*)&(r20)))	)	=	*((IU8	*)((*((IHPE *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IHPE)))	)	+	*((IHPE	*)&(r23)))	)	;
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	-	*((IU32	*)(LocalIUH+4)	+	REGLONG)	;	
-	*((IUH	*)&(r21))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+4))	=	*((IUH	*)(LocalIUH+4))	^	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+6)	+	REGLONG)	>	*((IU32	*)&(r20)	+	REGLONG))	goto	L26_63w_t;	
@@ -1224,9 +1224,9 @@ switch ( id )
 		L26_64w_d:	;	
 	case	L26_60if_d_id	:
 		L26_60if_d:	;	
-	*((IUH	*)&(r21))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	;		
-	*((IUH	*)&(r20))	=	(IS32)(-8) /* T99: align the final odd/even cell. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(-8) /* align the final odd/even cell. */	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	&	*((IU32	*)&(r20)	+	REGLONG);	
 	*((IUH	*)&(r21))	=	*((IU32	*)(LocalIUH+5)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	
@@ -1476,7 +1476,7 @@ switch ( id )
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L26_77if_f_id	:
 		L26_77if_f:	;	
-	*((IUH	*)(LocalIUH+4))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)(LocalIUH+4))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	case	L26_78if_d_id	:
 		L26_78if_d:	;	
 	*((IUH	*)&(r20))	=	(IS32)(1)	;	
@@ -1485,12 +1485,12 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+1)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	*((IU32	*)&(r21)	+	REGLONG)	<<	*((IU32	*)&(r22)	+	REGLONG)	;	
-	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)&(r21)	+	REGLONG) + (*((IU32	*)(LocalIUH+1)	+	REGLONG) & 1u) /* T99: retain the selected odd/even lane. */	;	
+	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)&(r21)	+	REGLONG) + (*((IU32	*)(LocalIUH+1)	+	REGLONG) & 1u) /* retain the selected odd/even lane. */	;	
 	*((IUH	*)&(r20))	=	(IS32)(1372)	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	+	*((IU32 *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IU32)))	;
 	*((IU32	*)(LocalIUH+6)	+	REGLONG)	=	*((IU32	*)(LocalIUH+2)	+	REGLONG)	;	
@@ -1530,7 +1530,7 @@ switch ( id )
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+0))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)(LocalIUH+0))	=	*((IUH	*)&(r21))	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	-	*((IU32	*)(LocalIUH+4)	+	REGLONG)	;	
-	*((IUH	*)&(r20))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+4))	=	*((IUH	*)(LocalIUH+4))	^	*((IUH	*)&(r20))	;	
 	*((IUH	*)&(r21))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+6)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L26_81w_t;	
@@ -1575,7 +1575,7 @@ switch ( id )
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+0))	-	*((IUH	*)&(r21));	
 	*((IUH	*)(LocalIUH+0))	=	*((IUH	*)&(r20))	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	-	*((IU32	*)(LocalIUH+4)	+	REGLONG)	;	
-	*((IUH	*)&(r21))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+4))	=	*((IUH	*)(LocalIUH+4))	^	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+6)	+	REGLONG)	>	*((IU32	*)&(r20)	+	REGLONG))	goto	L26_83w_t;	
@@ -1583,9 +1583,9 @@ switch ( id )
 		L26_84w_d:	;	
 	case	L26_80if_d_id	:
 		L26_80if_d:	;	
-	*((IUH	*)&(r21))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	;		
-	*((IUH	*)&(r20))	=	(IS32)(-8) /* T99: align the final odd/even cell. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(-8) /* align the final odd/even cell. */	;	
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	&	*((IU32	*)&(r20)	+	REGLONG);	
 	*((IUH	*)&(r21))	=	*((IU32	*)(LocalIUH+5)	+	REGLONG);	
 	*((IUH	*)&(r22))	=	(IS32)(1284)	;	

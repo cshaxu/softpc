@@ -733,7 +733,7 @@ void recalc_text IFN1(int, height)
         else if (video_adapter == VGA && getVM())
         {
                 half_word index, low, high;
-                /* T99 S37: BIOS sees this VM's CRTC, not the physical display. */
+                /* BIOS sees this VM's CRTC, not the physical display. */
                 inb(EGA_CRTC_INDEX, &index);
                 outb(EGA_CRTC_INDEX, 0x12);
                 inb(EGA_CRTC_DATA, &low);

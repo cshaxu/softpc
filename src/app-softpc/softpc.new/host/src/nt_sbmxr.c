@@ -45,7 +45,7 @@ enum {
     MixerVoiceVolume
 } MixerState = MixerReset; // state of current command/data being set
 
-/* T93: restore registers first; the output owner applies gains after rebuilding. */
+/* restore registers first; the output owner applies gains after rebuilding. */
 void softpc_device_snapshot_capture_sb_mixer(softpc_device_sb_mixer_state *state)
 {
     state->selected = MixerState;
@@ -354,7 +354,7 @@ Return Value:
     SbApplyMixer();
 }
 
-/* T93: compose the existing device registers here using XP's unsigned
+/* compose the existing device registers here using XP's unsigned
  * scale; the host must not own another mixer. */
 static IU32 MixerGain(IU8 level, IU8 mask, IU32 step)
 {

@@ -109,7 +109,7 @@ extern struct EGA_CPU_GLOBALS
 #else  // !NEC_98
 #line 152
 #ifndef	HOST_VGA_GLOBALS
-	/* DIVERGENCE(MVDM-HOST-DIV-062): the original C-video profile stores its
+	/* the original C-video profile stores its
 	 * generated VGAGLOBALSETTINGS carrier here.  NT4's permissive C accepted
 	 * assignment to the sibling VGA_GLOBALS view; use the actual source type. */
 	struct VGAGLOBALSETTINGS	*globals;

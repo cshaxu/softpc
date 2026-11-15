@@ -1059,7 +1059,7 @@ switch ( id )
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1155,7 +1155,7 @@ switch ( id )
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_81if_f_id	:
 		L21_81if_f:	;	
-	goto L21_77if_d; /* T88: keep this activation's saved locals. */
+	goto L21_77if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_76if_f_id	:
 		L21_76if_f:	;	
@@ -1343,7 +1343,7 @@ switch ( id )
 	/*	j_state	(IS32)(-2013004273),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
-	goto L21_87if_d; /* T88: keep this activation's saved locals. */
+	goto L21_87if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_86if_f_id	:
 		L21_86if_f:	;	
@@ -1573,7 +1573,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 2u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1668,7 +1668,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_94w_t;	
 	case	L21_95w_d_id	:
 		L21_95w_d:	;	
-	goto L21_92if_d; /* T88: keep this activation's saved locals. */
+	goto L21_92if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_91if_f_id	:
 		L21_91if_f:	;	
@@ -2193,7 +2193,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(83)	;
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	=	*((IU8	*)&(r3)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IUH *)&(r21)) = (IS32)(1356);
 	{ IUH returnValue,v1=0,v2=0,v3=0,v4=0;
 	  returnValue = ((IUH (*)())(IHP)(*((IHPE *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IHPE)))))(v1,v2,v3,v4); }
@@ -2234,7 +2234,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r22)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r23)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r23)	+	REGLONG));	
-	*((IUH	*)&(r23))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r23))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r23)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -2242,7 +2242,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	*((IU8	*)((*((IHPE	*)&(r20)))	+	*((IHPE	*)&(r22)))	)	=	*((IU8	*)(LocalIUH+2)	+	REGBYTE)	;	
 	case	L21_104if_f_id	:
 		L21_104if_f:	;	
-	goto L21_103if_d; /* T88: keep this activation's saved locals. */
+	goto L21_103if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_102if_f_id	:
 		L21_102if_f:	;	
@@ -2258,7 +2258,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -2481,7 +2481,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -2577,7 +2577,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_115if_f_id	:
 		L21_115if_f:	;	
-	goto L21_111if_d; /* T88: keep this activation's saved locals. */
+	goto L21_111if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_110if_f_id	:
 		L21_110if_f:	;	
@@ -2765,7 +2765,7 @@ if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	/*	j_state	(IS32)(-2013004273),	(IS32)(-1),	(IS32)(0)	*/
 /*	J_LOAD_RETURN	NOT	IMPLIMENTED	*/
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
-	goto L21_121if_d; /* T88: keep this activation's saved locals. */
+	goto L21_121if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_120if_f_id	:
 		L21_120if_f:	;	
@@ -2995,7 +2995,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 2u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -3090,7 +3090,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_128w_t;	
 	case	L21_129w_d_id	:
 		L21_129w_d:	;	
-	goto L21_126if_d; /* T88: keep this activation's saved locals. */
+	goto L21_126if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_125if_f_id	:
 		L21_125if_f:	;	

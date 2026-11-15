@@ -625,7 +625,7 @@ set(chain2_marker_count 0)
 foreach(unit IN ITEMS 016 017 018 019 020)
     file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/softpc.new/base/cvidc/sevid${unit}.c"
         chain2_rules)
-    string(REGEX MATCHALL "DIVERGENCE\\(T88-CHAIN2-DIRTY\\)" markers "${chain2_rules}")
+    string(REGEX MATCHALL "dispatch the existing selected marker\\." markers "${chain2_rules}")
     list(LENGTH markers marker_count)
     math(EXPR chain2_marker_count "${chain2_marker_count} + ${marker_count}")
     if(chain2_rules MATCHES "IS32\\)\\(1340\\)")
@@ -655,7 +655,7 @@ foreach(record IN ITEMS
     string(REPLACE "," ";" labels "${labels}")
     file(READ "${SOFTPC_SOURCE_DIR}/src/app-softpc/softpc.new/base/cvidc/${unit}" rules)
     foreach(label IN LISTS labels)
-        if(NOT rules MATCHES "goto ${label}; /\\* T88: keep this activation's saved locals\\. \\*/" OR
+        if(NOT rules MATCHES "goto ${label}; /\\* keep this activation's saved locals\\. \\*/" OR
            rules MATCHES "returnValue[ \t]*=[ \t]*${label}\\(")
             message(FATAL_ERROR "CHAIN2 continuation loses its local activation: ${unit}/${label}")
         endif()

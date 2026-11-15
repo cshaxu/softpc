@@ -15,7 +15,7 @@ typedef double 		FPH;
 #if !defined(HOST_BIAS)
 #define HOST_BIAS 1023
 #endif
-/* T59 host ABI: word and bitfield order must match the selected host byte
+/* host ABI: word and bitfield order must match the selected host byte
  * order. The CCPU arithmetic and Intel-memory conversion remain unchanged. */
 typedef struct {
 IU32	mant:23;

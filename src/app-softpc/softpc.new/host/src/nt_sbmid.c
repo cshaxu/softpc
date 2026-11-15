@@ -250,14 +250,14 @@ Return Value:
    dprintf2(("Midi Closed"));
 }
 
-/* T93: logical sounding notes survive a host pause, not native handles or
+/* logical sounding notes survive a host pause, not native handles or
  * envelopes. One voice per channel/key is the deliberate host-MIDI limit. */
 typedef struct { IU8 velocity, held, sostenuto; } MIDI_NOTE;
 static MIDI_NOTE MidiNotes[16][128];
 static IU8 MidiSustain[16], MidiSostenuto[16];
 static IBOOL MidiRunning = TRUE;
 
-/* T93: copied parser/voice state; native output is rebuilt by the SB owner. */
+/* copied parser/voice state; native output is rebuilt by the SB owner. */
 void softpc_device_snapshot_capture_sb_midi(softpc_device_sb_midi_state *state)
 {
     IU32 channel, key;

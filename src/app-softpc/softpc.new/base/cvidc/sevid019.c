@@ -1255,7 +1255,7 @@ switch ( id )
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(83)	;
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	=	*((IU8	*)&(r3)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IUH *)&(r21)) = (IS32)(1356);
 	{ IUH returnValue,v1=0,v2=0,v3=0,v4=0;
 	  returnValue = ((IUH (*)())(IHP)(*((IHPE *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IHPE)))))(v1,v2,v3,v4); }
@@ -1276,7 +1276,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r22)	+	REGLONG)	+	*((IU32	*)&(r23)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r23)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1313,7 +1313,7 @@ switch ( id )
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	=	*((IU8	*)&(r3)	+	REGBYTE)	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1337,7 +1337,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1348,7 +1348,7 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1288)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r20))	;	
-	*((IUH	*)(LocalIUH+4))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)(LocalIUH+4))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	{	extern	IUH	L21_137if_d()	;	
 	IUH	returnValue,v1=0,v2=0,v3=0,v4=0;		returnValue	=	L21_137if_d(v1,v2,v3,v4);	return(returnValue);	}	
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
@@ -1360,7 +1360,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r21))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r21)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1383,7 +1383,7 @@ switch ( id )
 	*((IU8	*)(*((IHPE	*)&(r21)))	)	=	*((IU8	*)(LocalIUH+1)	+	REGBYTE)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)(LocalIUH+4))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r20))	;	
-	*((IUH	*)&(r21))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+4))	=	*((IUH	*)(LocalIUH+4))	^	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+5)	+	REGLONG)	>	*((IU32	*)&(r20)	+	REGLONG))	goto	L21_138w_t;	
@@ -1421,7 +1421,7 @@ switch ( id )
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1449,7 +1449,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1460,8 +1460,8 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1288)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r20))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r20))	;	
-	*((IUH	*)(LocalIUH+7))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
-	goto L21_143if_d; /* T88: keep this activation's saved locals. */
+	*((IUH	*)(LocalIUH+7))	=	(IS32)(7) /* odd/even plane stride. */	;	
+	goto L21_143if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_142if_f_id	:
 		L21_142if_f:	;	
@@ -1471,7 +1471,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r21))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r21)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1497,13 +1497,13 @@ switch ( id )
 	*((IU8	*)(*((IHPE	*)&(r20)))	)	=	*((IU8	*)((*((IHPE	*)&(r22)))	+	*((IHPE	*)&(r23)))	)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+6))	+	*((IUH	*)(LocalIUH+7))	;		
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r21))	;	
-	*((IUH	*)&(r20))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+7))	=	*((IUH	*)(LocalIUH+7))	^	*((IUH	*)&(r20))	;	
 	*((IUH	*)&(r21))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_144w_t;	
 	case	L21_145w_d_id	:
 		L21_145w_d:	;	
-	goto L21_141if_d; /* T88: keep this activation's saved locals. */
+	goto L21_141if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_140if_f_id	:
 		L21_140if_f:	;	
@@ -1520,7 +1520,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1531,8 +1531,8 @@ switch ( id )
 	*((IUH	*)&(r22))	=	(IS32)(1288)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)&(r21))	+	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r22))), sizeof(IUH)))	;
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r21))	;	
-	*((IUH	*)(LocalIUH+7))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
-	goto L21_147if_d; /* T88: keep this activation's saved locals. */
+	*((IUH	*)(LocalIUH+7))	=	(IS32)(7) /* odd/even plane stride. */	;	
+	goto L21_147if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_146if_f_id	:
 		L21_146if_f:	;	
@@ -1542,7 +1542,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r20))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1559,8 +1559,8 @@ switch ( id )
 	CrulesRuntimeError("Bad	Bit	No");
 	else
 	if	((*((IUH	*)(LocalIUH+1))	&	(1	<<	*((IUH	*)&(r20))))	==	0)	goto	L21_148if_f;	
-	*((IUH	*)(LocalIUH+8))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
-	goto L21_149if_d; /* T88: keep this activation's saved locals. */
+	*((IUH	*)(LocalIUH+8))	=	(IS32)(7) /* odd/even plane stride. */	;	
+	goto L21_149if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_148if_f_id	:
 		L21_148if_f:	;	
@@ -1583,9 +1583,9 @@ switch ( id )
 	*((IUH	*)(LocalIUH+6))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+9))	+	*((IUH	*)(LocalIUH+8))	;		
 	*((IUH	*)(LocalIUH+9))	=	*((IUH	*)&(r21))	;	
-	*((IUH	*)&(r20))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+7))	=	*((IUH	*)(LocalIUH+7))	^	*((IUH	*)&(r20))	;	
-	*((IUH	*)&(r21))	=	(IS32)(6) /* T99: alternate plane strides 1/7. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(6) /* alternate plane strides 1/7. */	;	
 	*((IUH	*)(LocalIUH+8))	=	*((IUH	*)(LocalIUH+8))	^	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r20)	+	REGLONG))	goto	L21_150w_t;	
@@ -1623,7 +1623,7 @@ switch ( id )
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(83)	;
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU16	*)(LocalIUH+1)	+	REGWORD)	=	*((IU16	*)&(r3)	+	REGWORD	)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IUH *)&(r21)) = (IS32)(1360);
 	{ IUH returnValue,v1=0,v2=0,v3=0,v4=0;
 	  returnValue = ((IUH (*)())(IHP)(*((IHPE *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IHPE)))))(v1,v2,v3,v4); }
@@ -1654,7 +1654,7 @@ switch ( id )
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_152if_f_id	:
 		L21_152if_f:	;	
-	*((IUH	*)&(r20))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IU32	*)(LocalIUH+3)	+	REGLONG)	=	*((IU32	*)(LocalIUH+3)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
 	case	L21_153if_d_id	:
 		L21_153if_d:	;	
@@ -1693,7 +1693,7 @@ switch ( id )
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU16	*)(LocalIUH+1)	+	REGWORD)	=	*((IU16	*)&(r3)	+	REGWORD	)	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 2u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1704,7 +1704,7 @@ switch ( id )
 	}
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IUH *)&(r3)) = *((IUH *)(LocalIUH+1));
-	/* T99 S38: an empty fill must not write or decrement the odd head. */
+	/* an empty fill must not write or decrement the odd head. */
 	if (*((IU32 *)(LocalIUH+2) + REGLONG) == 0) goto L21_155if_d;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16296)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16297)	;
@@ -1719,7 +1719,7 @@ switch ( id )
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1741,7 +1741,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 		*((IU16	*)&(r20)	+	REGWORD	)	=	(*((IU16	*)(LocalIUH+1)	+	REGWORD)	<<	((16)	-	*((IU16	*)&(r22)	+	REGWORD	))	)	|	(*((IU16	*)&(r20)	+	REGWORD	)	>>	*((IU16	*)&(r22)	+	REGWORD	));
 	*((IU16	*)&(r21)	+	REGWORD)	=	*((IU16	*)&(r20)	+	REGWORD)	;	
 	*((IU16	*)(LocalIUH+4)	+	REGWORD)	=	*((IU16	*)&(r21)	+	REGWORD	)	;	
-	*((IUH	*)&(r20))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(1)	;	
@@ -1755,7 +1755,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	-	*((IU32	*)&(r21)	+	REGLONG)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	;	
 	*((IU16	*)(*((IHPE	*)&(r20)))	)	=	*((IU16	*)(LocalIUH+4)	+	REGWORD)	;	
-	*((IUH	*)&(r21))	=	(IS32)(8) /* T99: next odd/even plane pair. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(8) /* next odd/even plane pair. */	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r21))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)&(r21))	=	(IS32)(0)	;	
@@ -1775,7 +1775,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r20)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r21)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r21))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r21)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -1793,7 +1793,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IU32	*)(LocalIUH+5)	+	REGLONG)	=	*((IU32	*)(LocalIUH+5)	+	REGLONG)	-	*((IU32	*)&(r20)	+	REGLONG)	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	;	
 	*((IU16	*)(*((IHPE	*)&(r21)))	)	=	*((IU16	*)(LocalIUH+1)	+	REGWORD)	;	
-	*((IUH	*)&(r20))	=	(IS32)(8) /* T99: next odd/even plane pair. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(8) /* next odd/even plane pair. */	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
@@ -1880,7 +1880,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(83)	;
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)&(r3)	+	REGLONG)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = 4u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1917,7 +1917,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IUH	*)&(r20))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r21))), sizeof(IUH)))	+	*((IUH	*)(LocalIUH+2))	;
 	*((IUH	*)&(r22))	=	*((IUH	*)(LocalIUH+3))	;	
 	*((IU8	*)((*((IHPE	*)&(r20)))	+	*((IHPE	*)&(r22)))	)	=	*(UOFF_15_8(	(LocalIUH+1)	))	;	
-	*((IUH	*)&(r21))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)&(r21))	+	*((IUH	*)(LocalIUH+2))	;		
 	*((IU32	*)(LocalIUH+3)	+	REGLONG)	=	*((IU32	*)(LocalIUH+3)	+	REGLONG)	+	*((IU32	*)&(r20)	+	REGLONG)	;		
 	{	extern	IUH	L21_161if_d()	;	
@@ -1925,7 +1925,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_160if_f_id	:
 		L21_160if_f:	;	
-	*((IUH	*)&(r21))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IU32	*)(LocalIUH+3)	+	REGLONG)	=	*((IU32	*)(LocalIUH+3)	+	REGLONG)	+	*((IU32	*)&(r21)	+	REGLONG)	;		
 	*((IUH	*)&(r20))	=	(IS32)(1288)	;	
 	*((IUH	*)&(r21))	=	*((IUH *)softpc_gdp_rule_slot((void *)r1, (unsigned int)(*((IHPE *)&(r20))), sizeof(IUH)))	+	*((IUH	*)(LocalIUH+2))	;
@@ -1987,7 +1987,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	*((IU32	*)(LocalIUH+0)	+	REGLONG)	=	*((IU32	*)&(r2)	+	REGLONG)	;	
 	*((IU32	*)(LocalIUH+1)	+	REGLONG)	=	*((IU32	*)&(r3)	+	REGLONG)	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 4u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -1998,7 +1998,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	}
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IUH *)&(r3)) = *((IUH *)(LocalIUH+1));
-	/* T99 S38: empty fills have no odd head; rotate the full DWORD. */
+	/* empty fills have no odd head; rotate the full DWORD. */
 	if (*((IU32 *)(LocalIUH+2) + REGLONG) == 0) goto L21_165w_d;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16296)	;
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16297)	;
@@ -2013,7 +2013,7 @@ if(*((IU16	*)&(r22)	+	REGWORD	)>=16)
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r22))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r22))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -2048,7 +2048,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if(*((IU32	*)&(r22)	+	REGLONG)!=0)
 		*((IU32	*)&(r21)	+	REGLONG)	=	(*((IU32	*)&(r21)	+	REGLONG)	<<	((32)	-	*((IU32	*)&(r22)	+	REGLONG))	)	|	(*((IU32	*)&(r21)	+	REGLONG)	>>	*((IU32	*)&(r22)	+	REGLONG));
 	*((IU16	*)(LocalIUH+5)	+	REGWORD)	=	*((IU16	*)&(r21)	+	REGWORD	)	;	
-	*((IUH	*)&(r20))	=	(IS32)(7) /* T99: odd/even plane stride. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(7) /* odd/even plane stride. */	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r21))	;	
 	{	extern	IUH	L21_163if_d()	;	
@@ -2062,7 +2062,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	long	bitfield");
 	else
 	*((IU32	*)&(r21)	+	REGLONG)	=	(IU32)((*((IU32	*)(LocalIUH+0)	+	REGLONG)	<<	(32-(*((IU32	*)&(r20)	+	REGLONG)	+	*((IU32	*)&(r22)	+	REGLONG)))))	>>	(32	-	*((IU32	*)&(r22)	+	REGLONG));	
-	*((IUH	*)&(r20))	=	(IS32)(3) /* T99: retain the plane address A0 gap. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(3) /* retain the plane address A0 gap. */	;	
 	if(*((IU32	*)&(r20)	+	REGLONG)>=32)
 	CrulesRuntimeError("Bad	Bit	No");
 	else
@@ -2090,17 +2090,17 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IU32	*)(LocalIUH+6)	+	REGLONG)	=	*((IU32	*)(LocalIUH+6)	+	REGLONG)	-	*((IU32	*)&(r21)	+	REGLONG)	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	;	
 	*((IU16	*)(*((IHPE	*)&(r20)))	)	=	*((IU16	*)(LocalIUH+4)	+	REGWORD)	;	
-	*((IUH	*)&(r21))	=	(IS32)(8) /* T99: next odd/even plane pair. */	;	
+	*((IUH	*)&(r21))	=	(IS32)(8) /* next odd/even plane pair. */	;	
 	*((IUH	*)&(r20))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r21))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r20))	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	;	
-	/* T99 S38: the odd head leaves one byte, not a WORD, at the tail. */
+	/* the odd head leaves one byte, not a WORD, at the tail. */
 	if (*((IU32 *)(LocalIUH+6) + REGLONG) == 0 &&
 	    (*((IU32 *)(LocalIUH+0) + REGLONG) & 1u) != 0)
 	    *((IU8	*)(*((IHPE	*)&(r21)))	) = *((IU8 *)(LocalIUH+5) + REGBYTE);
 	else
 	*((IU16	*)(*((IHPE	*)&(r21)))	)	=	*((IU16	*)(LocalIUH+5)	+	REGWORD)	;	
-	*((IUH	*)&(r20))	=	(IS32)(8) /* T99: next odd/even plane pair. */	;	
+	*((IUH	*)&(r20))	=	(IS32)(8) /* next odd/even plane pair. */	;	
 	*((IUH	*)&(r21))	=	*((IUH	*)(LocalIUH+3))	+	*((IUH	*)&(r20))	;		
 	*((IUH	*)(LocalIUH+3))	=	*((IUH	*)&(r21))	;	
 	*((IUH	*)&(r20))	=	(IS32)(0)	;	
@@ -2229,7 +2229,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -2327,7 +2327,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_171if_f_id	:
 		L21_171if_f:	;	
-	goto L21_167if_d; /* T88: keep this activation's saved locals. */
+	goto L21_167if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_166if_f_id	:
 		L21_166if_f:	;	
@@ -2497,7 +2497,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 2u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -2599,7 +2599,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_179w_t;	
 	case	L21_180w_d_id	:
 		L21_180w_d:	;	
-	goto L21_177if_d; /* T88: keep this activation's saved locals. */
+	goto L21_177if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_176if_f_id	:
 		L21_176if_f:	;	
@@ -2857,7 +2857,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -2955,7 +2955,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_189if_f_id	:
 		L21_189if_f:	;	
-	goto L21_185if_d; /* T88: keep this activation's saved locals. */
+	goto L21_185if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_184if_f_id	:
 		L21_184if_f:	;	
@@ -3125,7 +3125,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 2u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -3227,7 +3227,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_197w_t;	
 	case	L21_198w_d_id	:
 		L21_198w_d:	;	
-	goto L21_195if_d; /* T88: keep this activation's saved locals. */
+	goto L21_195if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_194if_f_id	:
 		L21_194if_f:	;	
@@ -3485,7 +3485,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -3583,7 +3583,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_207if_f_id	:
 		L21_207if_f:	;	
-	goto L21_203if_d; /* T88: keep this activation's saved locals. */
+	goto L21_203if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_202if_f_id	:
 		L21_202if_f:	;	
@@ -3753,7 +3753,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG) * 2u;
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -3855,7 +3855,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	if	(*((IU32	*)(LocalIUH+4)	+	REGLONG)	>	*((IU32	*)&(r21)	+	REGLONG))	goto	L21_215w_t;	
 	case	L21_216w_d_id	:
 		L21_216w_d:	;	
-	goto L21_213if_d; /* T88: keep this activation's saved locals. */
+	goto L21_213if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_212if_f_id	:
 		L21_212if_f:	;	
@@ -4113,7 +4113,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH	*)(LocalIUH+1))	=	*((IUH	*)&(r3))	;	
 	*((IU32	*)(LocalIUH+2)	+	REGLONG)	=	*((IU32	*)&(r4)	+	REGLONG)	;	
 	*((IU8	*)(LocalIUH+3)	+	REGBYTE)	=	*((IU8	*)&(r5)	+	REGBYTE)	;	
-	/* DIVERGENCE(T88-CHAIN2-DIRTY): dispatch the existing selected marker. */
+	/* dispatch the existing selected marker. */
 	*((IU32 *)&(r2) + REGLONG) = *((IU32 *)(LocalIUH+0) + REGLONG);
 	*((IU32 *)&(r3) + REGLONG) = *((IU32 *)(LocalIUH+2) + REGLONG);
 	if (*((IU32 *)&(r3) + REGLONG) != 0)
@@ -4211,7 +4211,7 @@ if(*((IU32	*)&(r22)	+	REGLONG)>=32)
 	*((IUH *)softpc_gdp_rule_slot((void *)r1, 0u, sizeof(IUH)))	=	(IS32)(16501)	;
 	case	L21_225if_f_id	:
 		L21_225if_f:	;	
-	goto L21_221if_d; /* T88: keep this activation's saved locals. */
+	goto L21_221if_d; /* keep this activation's saved locals. */
 	/*	j_state	(IS32)(-2013004285),	(IS32)(0),	(IS32)(0)	*/
 	case	L21_220if_f_id	:
 		L21_220if_f:	;	

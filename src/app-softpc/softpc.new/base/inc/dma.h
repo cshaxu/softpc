@@ -494,6 +494,6 @@ IMPORT VOID dma_enquire IPT3(half_word, channel, sys_addr *, address, word *, le
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif	/* NTVDM */
 #line 577
-/* T93: XP's existing DMA owner access, now required by the retained DSP. */
+/* XP's existing DMA owner access, now required by the retained DSP. */
 DMA_ADAPT *dmaGetAdaptor(void);
 

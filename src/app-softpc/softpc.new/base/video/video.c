@@ -2239,7 +2239,7 @@ GLOBAL void vd_write_teletype IFN0()
      * data area.
      */
     ch = getAL();
-    /* T100 S4 P46: omit unused NTVDM stream output in this source subset. */
+    /* omit unused NTVDM stream output in this source subset. */
 #line 2757
 
     vd_cols_on_screen = sas_w_at_no_check(VID_COLS);

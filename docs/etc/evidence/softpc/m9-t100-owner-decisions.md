@@ -6114,3 +6114,30 @@ gate and whitespace checks apply. Only own build/t100-s4-p67 gate scratch is
 retired, after hidden CMD completion; budget two hours/fifteen minutes without
 progress. Concurrent Win95 record and scratch are preserved and not included
 in this commit. S4/T100 remain open.
+
+## S4 comment cleanup: owner-approved identifier removal
+
+Owner approves R0517 and requires all added mirror-diff comments to omit task
+and decision identifiers. Keep the technical reason; governance IDs belong in
+the decision ledger, not source comments. Original technical numbers such as
+instruction classes, register addresses and device model numbers are unchanged.
+
+A tracked C/H mirror scan compared matching comments with the XP originals.
+It removed governance prefixes from170 comments in18 files, retaining every
+technical explanation and original comment. Before/after comparison with
+comments removed is byte-identical for each changed file; CRLF and line counts
+are unchanged. A repeat scan finds no added comment matching the governance-ID
+patterns. The CHAIN2 gate now counts the unchanged technical marker sentence
+instead of its old task identifier, retaining its28-entry requirement and
+existing executable-code checks. Local manifest hashes are updated only for
+these18 paths. XP-relative insertion/deletion line counts do not decrease:
+this removes annotation clutter, not functional mirror differences.
+
+No executable tokens, source line positions, tests or binaries change. No
+runtime rebuild/test is claimed or needed for this comment-only edit. Gate
+verification covers documentation, mirror hashes and standalone source boundary;
+actual diff/whitespace review applies. Own disposable directory is
+build/t100-s4-comment-cleanup, hidden CMD gate, two-hour/fifteen-minute
+no-progress budget, removed after completion. Concurrent Win95 edits to
+c_main/checkpoint/CURRENT/evidence/manifest are preserved and not staged with
+this change. This does not advance approval of other files or close S4/T100.

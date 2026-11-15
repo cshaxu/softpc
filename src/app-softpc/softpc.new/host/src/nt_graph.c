@@ -831,7 +831,7 @@ void nt_graphics_tick(void)
 
 #ifndef NEC_98
 #line 1007
-    /* T100 S4 P46: omit unused NTVDM stream flushing in this source subset. */
+    /* omit unused NTVDM stream flushing in this source subset. */
 #endif // !NEC_98
 #line 1015
 

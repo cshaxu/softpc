@@ -32,8 +32,8 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 S4 P67 reviews order421 ega_vide.c at225b0b3a: R0517 is the sole real
 insertion +13/-0, using current-VM virtual CRTC height for VGA/V86 BIOS font
 row calculation. Historical P124 original-restoration negatives fail on both
-widths; unchanged current coverage passed in P65. Recommend retain pending
-owner review, without claiming fresh runtime or guest tests. No production,
+widths; unchanged current coverage passed in P65. Owner approves R0517; source diff comments must contain technical reasons,
+not task or decision identifiers. No fresh runtime or guest tests claimed. No production,
 test or artifact changes. Preserve the concurrent Win95 investigation's
 uncommitted record; only P67 documentation is staged. Own gate scratch
 build/t100-s4-p67 is retired. See [P67 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p67-approved-reset-access-and-virtual-text-height-review).
