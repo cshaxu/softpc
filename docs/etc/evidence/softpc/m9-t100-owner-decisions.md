@@ -3739,3 +3739,41 @@ printer_.c, rs232_io.c, gfi.c, gfi_mpty.c, keybd_io.c, dummy_nt.c and host_hfx.h
 Frozen inventory statistics are not rewritten. The ordered semantic frontier
 remains review 19; unrelated points in later files are not deemed reviewed or
 approved by this same-issue sweep.
+
+
+## S4 P26: current printer.c per-function counter-review
+
+At accepted P24 source, printer.c has two selected text blocks, +71/-0:
+R0207 include +1; R0212 extension +70 (65 function lines and five separator
+lines). No original printer-function body is changed by these surviving points.
+All are snapshot integration, not original printer bug repairs.
+
+| Current source anchor | Lines | Purpose / retention evidence |
+| --- | ---: | --- |
+| 105 snapshot.h include | 1 | Direct authoritative state types and capture/restore declarations consumed here; no second schema. |
+| 806 encode_parallel_callback | 14 | Map two original static ACK callback addresses to stable archive IDs; actual archive encoder consumes it. Historical coherent removal fails capture at both widths. |
+| 821 decode_parallel_callback | 9 | Resolve IDs back to these same original callbacks after queue reset/restore. Current real archive regression restores and dispatches the pending event; no raw persisted function pointer. Historical mapping-removal control tests the pair, not decode alone. |
+| 831 capture_parallel_controller | 17 | Copy actual private output/control/status, READY/OUT/OUTA, two queue handles and retry count. Actual archive capture calls it; current fixture changes controller state after capture before comparing restore. |
+| 849 restore_parallel_controller | 25 | Validate all adapters before mutation, then restore the saved private controller state. Historical independent omission fails actual data-port 33h assertion after changing it to 00h, on both widths. |
+
+The original callback definitions remain at lines 301/307 and schedule the
+second ACK event using the original queue. Status-port reads can consume ACK
+progress and cancel queue events; writes can schedule output. Therefore replay
+of I/O is not an equivalent restoration. Compat parallel.c owns host buffering,
+not these static controller variables; moving their ownership out or adding a
+second state copy would not remove the capability requirement. Native layout
+also differs from fixed archive types (controller state byte versus int32,
+queue handle versus int64), so one raw memcpy is not an equivalent replacement.
+
+Current checkpoint_smoke.c lines 751-767 checks controller/host round-trip;
+775-790 captures an actual pending ACK, changes data, resets the queue, restores,
+reads 33h and dispatches. Final P24 392/392 includes these cases. This review
+freshly reads code and tests; S1 P23 failure controls remain historical and are
+not represented as freshly rerun. No independent ablation of every field,
+negative check, each callback stage or physical printer is claimed. Existing
+restore validation does not claim exhaustive hostile-snapshot validation.
+
+Recommendation: retain all five functional pieces. The include plus four
+functions form one existing snapshot path; no remaining same-class duplicate
+forward declarations or extracted notice. No further behavior-preserving
+reduction is established by this review. No production changes or runtime rerun.

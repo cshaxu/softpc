@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P26 rechecks current printer.c: two selected text blocks +71/-0, comprising
+one include and four snapshot functions (65 function lines plus five separators).
+All are snapshot integration, with actual callers, current P24 checkpoint proof
+and separately identified historical deletion controls. Recommend retention;
+no source/runtime changes or new file-frontier advance. The decision ledger
+records per-function sizes and proof limits; S4/T100 remain open.
+
 S4 P25 reconciles current mirror statistics at accepted production 327f9960:
 254 identical, 104 exclusion/line-control-only and 114 real-diff files (472 total).
 Real selected differences: 15,761 text blocks, +24,728/-24,062, 48,790 changed
