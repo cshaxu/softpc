@@ -4541,3 +4541,43 @@ approval. That implementation still has its separate later-file audit.
 Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
 apply. Next actionable file is order 386 base/inc/tape_io.h; intervening
 headers have no current real diff. S4/T100 remain open.
+
+
+## S4 P44: owner approves SB contracts; tape_io.h review
+
+Owner explicitly approves retaining R0448 and R0449; P43's pending decisions
+are resolved. Fresh complete pinned-XP comparison of order 386 tape_io.h
+finds only R0451 outside the established JAPAN excluded body/line control:
+one block +0/-1, removal of the final literal Ctrl-Z (0x1a), XP line 118.
+Byte-level comparison confirms equality after omitting that existing excluded
+body and its necessary #line and deleting only the original terminal byte.
+The raw XP byte has no trailing newline; current source ends with the normal
+CRLF after extern void cassette_io(). There is no replacement blank to remove,
+unlike ica.h. No other declaration, comment, spacing or behavior differs.
+
+Category: compiler/legacy text-EOF adaptation, not snapshot, x64 ABI width or
+original guest bug repair. The header is production-connected: actual BIOS
+tape_io.c:45, floppy.c:134, floppy_i.c:61 and Compat device_bop.c include it.
+Root CMake includes those original implementation files. The original
+cassette_io service also handles AT INT 15 extensions and is registered in
+the actual BIOS BOP table; the tape filename does not make it unused.
+
+Historical S1 P96 used the real architecture-specific Ninja tape_io.c GCC
+commands, redirecting output and selecting a private header with the original
+terminal byte restored. Current controls exited 0 on x86/x64; restored-byte
+controls exited 1 on both with tape_io.h:118:1 stray '\32' in program.
+Existing macro warnings occurred separately and did not cause the failure.
+This is production translation-unit compiler proof, not a guest behavior or
+new runtime result. The current P rechecks bytes/callers and historical
+records; it does not rerun the controlled compiler experiment.
+
+Counter-review: exact restoration returns a demonstrated compile error.
+Replacing the byte with a comment or adding preprocessing would add new
+content to solve a one-byte legacy EOF issue; deleting the header would
+remove used declarations. Current omission is already minimal and preserves
+all retained original source. Recommend retain R0451, pending owner approval.
+No further equivalent restoration or cleanup candidate identified.
+
+Production/tests/EXEs unchanged; documentation, mirror and whitespace checks
+apply. Next actionable file is order 394 base/inc/video.h; intervening files
+have no current real diff. S4/T100 remain open.

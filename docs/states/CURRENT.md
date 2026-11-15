@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P44 records owner approval of sndblst.h R0448/R0449 and reviews order 386
+tape_io.h: R0451, one block +0/-1, deletes XP's final Ctrl-Z byte. Complete
+retained-content comparison finds no other difference or replacement blank.
+Historical actual dual tape_io.c compiler controls reject the restored byte;
+recommend retention, pending owner approval. No source or runtime changes.
+Next real-diff file is order 394 video.h; S4/T100 remain open.
+
 S4 P43 records owner approval of sas.h R0444 and reviews order 383 sndblst.h:
 two blocks +2/-1. R0448 exposes real teardown failure; R0449 declares the
 0x36 unsupported-UART framing command. Actual callers and historical failure/
