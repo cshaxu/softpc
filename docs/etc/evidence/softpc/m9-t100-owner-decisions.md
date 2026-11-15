@@ -6433,3 +6433,41 @@ Own scratch build/t100-s4-p72 has a two-hour/fifteen-minute no-progress budget;
 retire after all owned build/gate jobs exit. Fresh preflight showed a clean
 worktree and no SoftPC/build process, resolving automatic review's concern
 about stale concurrent Win95 edits. No other task's scratch is touched.
+
+## S4 P73: approved pointer condition and V7 mode validation review
+
+Owner approves R0536. Literal order427 base/video/v7_video.c at7306f514 has
+one real replacement R0537, current300 / XP293,+1/-1. Full comparison ignoring
+existing #error bodies and necessary #line finds no other real difference.
+The only change is is_v7vga_mode(getBL()) becoming
+is_v7vga_mode((getBL() & 0x7F)) in the existing rejection condition.
+
+Original video.h is_bad_vid_mode already masks the preserve bit; the V7 macro
+does not. BIOS AH6F/AL5 dispatch in ega_vide.c reaches this actual setter.
+BL E7 means mode67 with bit7 requesting preserved video memory, but the original
+V7 range check sees E7, rejects it and returns before mode assignment. Original
+later code already extracts the low-seven-bit mode and retains BL bit7 in
+BIOS ega_info for the existing screen-clear decision. Masking only the predicate
+argument fixes validation without modifying BL, moving assignments, adding
+state or creating another setter. Double parentheses are required because the
+original macro repeats its argument without individually parenthesizing it.
+Changing the global macro instead would broaden this one-call-site repair.
+
+Historical P130 actual-source original-restoration controls compile/link on
+both widths but fail the existing different-mode E7 request assertion; current
+and minimized controls pass. Same-mode preserve requests alone could conceal
+rejection, so the permanent verify_preserved_v7_modes explicitly switches from
+a different mode to67. It also covers supported modes40-45/60-69, BIOS query,
+graphics preserve/clear behavior, independent banks and invalid FF rejection.
+Original-restoration negatives stop at their first failed assertion; no claim
+that every subsequent matrix case fails. This is existing component/BIOS-path
+evidence, not a new guest boot or interactive test. P69 full392/392 and P72
+object/EXE equivalence remain applicable; no fresh runtime rerun in P73.
+
+Recommend retain R0537 pending owner review. No safe smaller restoration was
+identified: the one predicate argument is already minimized, assignment and
+formatting are original, and no comment identifier/helper/second path exists.
+Production/test/artifact changes zero; no new mirror difference. Next real
+file is base/video/vga_mode.c. Only this record and CURRENT change. Own hidden
+CMD gate scratch build/t100-s4-p73 has two-hour/fifteen-minute no-progress
+budget, retired after documentation/whitespace checks. S4/T100 remain open.

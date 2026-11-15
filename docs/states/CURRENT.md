@@ -29,13 +29,18 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P73 reviews order427 v7_video.c at7306f514: only R0537,+1/-1, masking the
+preserve-memory bit for V7 mode validation. Recommend retain pending owner
+review. Historical actual-source negatives and permanent different-mode BIOS
+regression support necessity; no fresh runtime result or source/artifact change.
+Own build/t100-s4-p73 gate scratch is retired. See [P73 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p73-approved-pointer-condition-and-v7-mode-validation-review).
+
 S4 P72 restores the owner-approved original gfx_updt.c prototype (+1/-1),
 reducing its XP diff by one block/two lines to130,+230/-210. Cached dual EXEs
 are published; both changed source objects are byte-identical and whole EXEs
 are equal apart from build metadata, so full tests are not repeated under the
 owner's equivalence exception. P69 full392/392 remains runtime evidence.
-Next-file v7_ports.c review finds only R0536 (+1/-1), recommended retain pending
-owner review; no change to that file. Own build/t100-s4-p72 is retired after
+Next-file v7_ports.c review finds only R0536 (+1/-1), now owner-approved; no change to that file. Own build/t100-s4-p72 is retired after
 gates. See [P72 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p72-restore-original-stream-prototype-and-review-v7-pointer-condition).
 
 S4 P71 reviews order424 gfx_updt.c at66b60b87:131 blocks,+231/-211. Recommend
