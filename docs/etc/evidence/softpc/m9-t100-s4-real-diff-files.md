@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P40 trailing-blank cleanup of `f2cc1ffc`.
+Current source: S4 P46 owner-approved disabled-stream removal from `c5f4ee3f`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -23,8 +23,8 @@ recorded in the [audit record](m9-t100-s4-audit.md#p34-redundant-non-xp-conditio
 | Disposition | Files |
 | --- | ---: |
 | Identical after CRLF/LF normalization | 254 |
-| Only excluded-body and line-control scaffolding differences | 111 |
-| Real retained-content differences listed below | 107 |
+| Only excluded-body and line-control scaffolding differences | 112 |
+| Real retained-content differences listed below | 106 |
 | Total | 472 |
 
 ## Counting convention
@@ -126,7 +126,6 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 381 | `base/inc/sas.h` | 1 | +1 | -1 |
 | 383 | `base/inc/sndblst.h` | 2 | +2 | -1 |
 | 386 | `base/inc/tape_io.h` | 1 | +0 | -1 |
-| 394 | `base/inc/video.h` | 1 | +4 | -0 |
 | 398 | `base/keymouse/keyba.c` | 4 | +121 | -0 |
 | 400 | `base/keymouse/mouse.c` | 14 | +115 | -34 |
 | 401 | `base/keymouse/ppi.c` | 6 | +27 | -13 |
@@ -146,7 +145,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 427 | `base/video/v7_video.c` | 1 | +1 | -1 |
 | 428 | `base/video/vga_mode.c` | 3 | +3 | -3 |
 | 429 | `base/video/vga_prts.c` | 11 | +188 | -23 |
-| 431 | `base/video/video.c` | 14 | +14 | -13 |
+| 431 | `base/video/video.c` | 15 | +15 | -19 |
 | 433 | `host/inc/cfpu_def.h` | 13 | +10 | -8 |
 | 436 | `host/inc/host_cpu.h` | 2 | +1 | -1 |
 | 437 | `host/inc/host_def.h` | 2 | +0 | -2 |
@@ -155,7 +154,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 455 | `host/inc/nt_sb.h` | 4 | +52 | -2 |
 | 457 | `host/src/nt_cga.c` | 10 | +22 | -52 |
 | 458 | `host/src/nt_ega.c` | 9 | +33 | -12 |
-| 459 | `host/src/nt_graph.c` | 10 | +30 | -13 |
+| 459 | `host/src/nt_graph.c` | 11 | +31 | -20 |
 | 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
 | 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -376 |
@@ -165,4 +164,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **107 files** | **15716** | **+24669** | **-24033** |
+| **Total** | **106 files** | **15717** | **+24667** | **-24046** |

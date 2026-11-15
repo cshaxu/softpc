@@ -4632,3 +4632,85 @@ approval. The later video.c implementation audit remains separate.
 Production/tests/EXEs unchanged. Documentation, mirror and whitespace checks
 apply. Next actionable file is order 398 base/keymouse/keyba.c; intervening
 headers have no current real diff. S4/T100 remain open.
+
+
+## S4 P46: owner-directed disabled-stream removal
+
+Owner rejects the need to preserve the unused stream body merely to justify
+four declarations. Explicit authorization deletes the six-line stream branch
+from vd_write_teletype and restores video.h's four added declarations to XP
+absence. Follow-up authorizes deletion of nt_graphics_tick's unused seven-line
+STREAM_IO branch and the now-unreferenced empty Compat stream_io_update.
+Owner subsequently approves the exact displayed runtime-branch deletion.
+R0455 is resolved by removal, not retained or pending. Its historical evidence
+only proved that retaining the original body required declarations; it did not
+prove that retaining both was the best product subset. P45's recommendation
+is superseded by this owner-directed simplification.
+
+P46-A, base/video/video.c original 2751-2756: omit the unused runtime branch;
+retain normal teletype processing, add one local reason and #line 2757.
+P46-B, host/src/nt_graph.c original 1007-1013: omit the unused STREAM_IO runtime
+branch, retain its original #ifndef NEC_98 framework, one reason, and existing
+#line 1015. These are explicitly approved NEW mirror omissions, not claimed
+restorations. They are not #error exclusions: !NEC_98 is selected, whereas
+ScreenState==STREAM_IO is a runtime comparison. #error there would break the
+supported build. The same distinction applies to stream_io_enabled in video.c.
+
+Actual active chain: Compat host_timer_event calls host_graphics_tick; the
+original macro calls working_video_funcs->graphics_tick. Compat host_init_screen
+selects nt_video_funcs, whose slot is nt_graphics_tick. Preserve this live
+function's mode-change delay, palette update, calc_update, cursor update and
+shared flush_count/TICKS_PER_FLUSH. Source search finds static-storage-duration SCREEN_DESCRIPTION
+sc with zero-initialized ScreenState; WINDOWED=0 and STREAM_IO=2. No production
+ScreenState write selecting stream exists. Four separate stream globals were
+FALSE/NULL/zero with no enabling assignment. Snapshot rebuild selects the
+original mode and redraws; it does not restore a stream ScreenState. No source
+claim of a working stream backend is made.
+
+Removed Compat's four disabled globals, their three-line explanation/separators,
+and empty stream_io_update. Retain separately named original
+host_stream_io_enabled and host_stream_io_update: neither is the removed function,
+and neither needs a new unrelated mirror deletion in this bounded change.
+Whole src/test search finds no exact removed stream symbol remaining. No guest,
+media, configuration, shared component or snapshot schema is changed.
+
+Actual production changes in four files: +3/-28, net -25 (one added #line is
+included in this production count). Tests unchanged. Relative to XP, excluding
+necessary #line: remove video.h +4/-0; add video.c +1/-6 and nt_graph.c +1/-7.
+Thus real mirror additions decrease 2, deletions increase 13: total changed
+mirror lines INCREASE 11, while source lines decrease 25. Owner explicitly
+approves this tradeoff. New omissions are two points; obsolete header point is
+removed. Text-block total increases one, not a defect count.
+
+Current inventory: 254 identical, 112 exclusion-only, 106 real-diff files;
+15,717 blocks, +24,667/-24,046. Original 472 identities/frozen counts unchanged.
+Before/after zero-context Git comparisons with only #line stripped confirm
+both implementation-file deltas and one new block each; unchanged exclusions
+cancel in those deltas. Current manifest hashes updated for the three mirrors.
+
+Final-source dual cached builds and full test-target builds passed. Both EXEs
+were published. Their sizes/code differ from the previous baseline, so the
+artifact-equivalence test exemption was rejected. Full runtime verification
+passed first run: x86 188 background (198.66s) plus eight native (25.53s),
+x64 188 background (219.85s) plus eight native (24.37s): 392/392, no retries,
+skips or failures. Both package variants, Console/Window and native audio
+are included. Mirror, documentation and whitespace checks pass. P46 preserves current review frontier:
+next manual file remains order 398 keyba.c; later video/nt_graph differences
+outside these explicitly authorized omissions are not deemed reviewed.
+
+P46 delivery review: checked all four actual production diffs against owner
+scope; no second path, new state, polling, guest change or shared API change.
+The selected outer conditional structure and diagnostic line mapping remain.
+Existing VGA frame tests exercise the real host timer and assert WINDOWED;
+no redundant new fixture was added for unreachable stream removal. The suite
+is automated regression, not a fresh manual DOS/Win3.1/Win95 acceptance claim.
+
+Published package SHA-256:
+
+- softpc32.exe: 692b3b724dc3914cc5a045110402fccdbef8fe546cf504606203a3c9eb95145c
+- softpc64.exe: 7eb5645d7fbce87b81f39fafe91e45d6892e1d3a992d1b5bd3a1b1a543c21f78
+
+Publication verified fresh embedded compiler times Nov 14 2026 23:21:51 and
+23:22:02 respectively (build-host clock). Both final-source builds and all test
+target builds exited zero. Task-owned temporary logs/probes are removed after
+promoting these results; reusable Ninja and ccache trees remain.

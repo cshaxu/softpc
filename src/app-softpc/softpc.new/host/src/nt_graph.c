@@ -831,13 +831,7 @@ void nt_graphics_tick(void)
 
 #ifndef NEC_98
 #line 1007
-    if (sc.ScreenState == STREAM_IO) {
-        if (++flush_count == TICKS_PER_FLUSH){
-            stream_io_update();
-            flush_count = 0;
-        }
-        return;
-    }
+    /* T100 S4 P46: omit unused NTVDM stream flushing in this source subset. */
 #endif // !NEC_98
 #line 1015
 

@@ -21,15 +21,6 @@
 #include "nt_graph.h"
 
 
-/* The original video core's optional stream-I/O path is a product console
-   optimization.  The detached VM presents through its own console/window,
-   so it remains disabled while retaining the original controller behavior. */
-half_word *stream_io_buffer = NULL;
-boolean stream_io_enabled = FALSE;
-word stream_io_buffer_size = 0;
-word *stream_io_dirty_count_ptr = NULL;
-
-
 int softpc_platform_presentation_is_graphics(void)
 {
     return sc.ModeType == GRAPHICS;
@@ -140,8 +131,6 @@ int softpc_platform_video_buffers_init(void)
     host_init_screen();
     return video_copy != NULL && EGA_planes != NULL && DAC != NULL;
 }
-
-void stream_io_update(void) {}
 
 int softpc_device_snapshot_capture_video_memory(
     softpc_device_video_memory_state *state)

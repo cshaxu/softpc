@@ -290,7 +290,3 @@ IMPORT VOID vga_write_dot IPT4(LONG, colour, LONG, page, LONG, pixcol, LONG, row
 #line 384
 #endif // NEC98
 #line 264
-IMPORT half_word * stream_io_buffer;
-IMPORT word * stream_io_dirty_count_ptr;
-IMPORT word stream_io_buffer_size;
-IMPORT boolean  stream_io_enabled;

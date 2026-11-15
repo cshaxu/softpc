@@ -2239,12 +2239,8 @@ GLOBAL void vd_write_teletype IFN0()
      * data area.
      */
     ch = getAL();
-    if (stream_io_enabled) {
-	if (*stream_io_dirty_count_ptr >= stream_io_buffer_size)
-	    stream_io_update();
-	stream_io_buffer[(*stream_io_dirty_count_ptr)++] = ch;
-	return;
-    }
+    /* T100 S4 P46: omit unused NTVDM stream output in this source subset. */
+#line 2757
 
     vd_cols_on_screen = sas_w_at_no_check(VID_COLS);
 
