@@ -4002,3 +4002,45 @@ Next real-diff file is order 335 base/inc/cpu_vid.h; intervening zero-real-diff
 files need no new manual review. Skipped generated files remain unapproved.
 Production/tests/EXEs unchanged; documentation, manifest and whitespace gates
 are the verification for this documentation-only delivery. S4/T100 stay open.
+
+
+## S4 P33: owner approves fla; cpu_vid.h conditional residue
+
+Owner approves retaining fla.c R0417. P32's pending decision is resolved as
+approved. P32 documentation was committed/pushed after explicit publication
+approval; no production change was made.
+
+Order 335 base/inc/cpu_vid.h compared in full with the fixed XP SP1 file.
+Current inventory: two text blocks, +3/-0, representing one semantic review
+item: an added conditional wrapper around the unchanged READ_POINTERS b_read
+and w_read declarations. Current lines 87/91/93 are the added #if/#else/#endif.
+Its #error body and line controls are not separately counted. The original
+!CPU_40_STYLE excluded branch remains out of scope without new accounting.
+
+XP declares both IU32-returning function pointers unconditionally. Local
+selected declarations are now exactly XP after P76. The old selected signature
+and provider declaration patches R0421-R0423 were already restored by P76,
+P123 and P125; they must not be relabelled pending or approved for retention.
+However the wrapper itself is not in pinned XP, so the earlier broad statement
+that only exclusion scaffolding remained did not resolve this real +3 residue.
+
+Current CMakeLists.txt lines 257/261/264 and 462 explicitly select CPU_40_STYLE
+and C_VID. Under this supported configuration, removing the wrapper preserves
+the two fields, their order, return type and argument macros exactly. No x64,
+snapshot or device behavior depends on this added branch. It merely rejects
+other macro combinations, and no necessary consumer contract was found to
+justify that extra mirror restriction. No OpenNT source was consulted.
+
+Recommendation pending owner approval: restore the original unconditional
+pair of declarations by removing this added wrapper as a whole, including its
+now-orphaned #error and immediate #line 90. Keep the original surrounding
+structure and other existing excluded branches/line controls. This is removal
+of an added non-XP wrapper, not restoration or auditing of excluded code.
+Expected production +0/-5 physical lines; real XP diff +3/-0 -> 0/0, two text
+blocks removed. The file would then leave the current real-diff inventory.
+No source edit, build or runtime test has yet been performed. This is exact
+selected-source reasoning, not dynamic evidence. An implementation must verify
+the actual dual build inputs and artifact equivalence under the existing rules.
+
+Documentation-only review gates apply here. Next file after the owner decision
+is order 337 base/inc/dma.h. S4/T100 remain open.

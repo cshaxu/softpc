@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P33 records owner approval of fla.c R0417. Current cpu_vid.h review finds
+one unnecessary non-XP conditional wrapper, counted as two blocks +3/-0.
+The selected declarations already match XP and actual builds define both
+required macros. Recommend removing only this added wrapper (five physical
+lines including its error/line control), pending owner approval. No source
+change or runtime test. Next file after decision is dma.h; S4/T100 stay open.
+
 S4 P32 records owner approval of fdisk.c R0415 and reviews order 321 fla.c:
 three real text blocks +97/-0, all R0417 FDC snapshot integration. Current
 production callers and original state/callback ownership support retention;
