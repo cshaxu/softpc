@@ -5526,3 +5526,19 @@ audit dispositions. Snapshot SHA-256 remains
 ff7c9db73fcb4d1aacfa11b0b11d9f8863aa5c4fe97ca0382cacc83b962cb44f;
 INI/media are unchanged. Final normalized manifest and CRLF checks pass.
 P55 awaits owner acceptance; S4/T100 remain open.
+
+## S4 P56: firmware ROM provenance and resource dependencies
+
+Owner directs discarding both diagnostic reversions: current 16-bit EIP wrap
+semantics and direct CCPU timer dispatch remain unchanged. A diagnostic
+worktree checkout exposed two independent build defects: the three embedded
+ROMs inherited a text/CRLF checkout rule, and windres did not report its
+RCDATA inputs to Ninja. A ROM change could therefore leave existing launcher
+or test resource objects stale.
+
+The gate marks `roms/*.rom` binary, verifies `bios1.rom`, `bios4.rom` and
+`v7vga.rom` at configure time against the existing pinned XP manifest, and
+adds all three inputs as `OBJECT_DEPENDS` of `firmware.rc`. Generated Ninja
+rules confirm each firmware resource object, including all self-contained
+machine/integration tests, explicitly depends on all three ROMs. No ROM bytes,
+guest media, INI, CPU semantics or timer behavior are changed.

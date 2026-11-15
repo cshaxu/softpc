@@ -12,6 +12,10 @@ assets/binary/softpc.ini text eol=crlf
 # CRLF on every checkout.
 src/app-softpc/softpc.new/** text eol=crlf
 
+# Firmware is compared and embedded byte-for-byte.  It must never receive the
+# mirror corpus's text checkout conversion.
+src/app-softpc/softpc.new/roms/*.rom -text
+
 # The shared corpus manifest hashes its exact source bytes and requires LF.
 src/lib/** text eol=lf
 src/emulator/** text eol=lf

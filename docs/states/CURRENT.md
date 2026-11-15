@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P56 retains the corrected 16-bit EIP wrap semantics and the direct CCPU
+timer dispatch; the two diagnostic reversions are discarded. Embedded BIOS/VGA
+ROM inputs are now binary checkout material, configure-time checked byte-for-byte
+against the pinned XP manifest, and explicit dependencies of every firmware
+resource object. This prevents a checkout conversion or stale resource object
+from producing a mixed-ROM launcher or test executable. See [P56 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p56-firmware-rom-provenance-and-resource-dependencies).
+
 S4 P55 implements the owner-approved R0479 placement restoration and marks
 R0476-R0480 necessary functionality approved. at_dma.c now has 15 blocks
 +112/-17, five fewer fixed-XP changed lines. No non-comment/non-line-control

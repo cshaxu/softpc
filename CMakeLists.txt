@@ -46,6 +46,20 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 4)
     set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} --target=pe-i386")
 endif()
 
+set(SOFTPC_FIRMWARE_RESOURCE
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/app-softpc/product/firmware.rc")
+set(SOFTPC_FIRMWARE_ROMS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/app-softpc/softpc.new/roms/bios1.rom"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/app-softpc/softpc.new/roms/bios4.rom"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/app-softpc/softpc.new/roms/v7vga.rom")
+include("${CMAKE_CURRENT_SOURCE_DIR}/tools/verify_firmware_roms.cmake")
+softpc_verify_firmware_roms("${CMAKE_CURRENT_SOURCE_DIR}"
+    ${SOFTPC_FIRMWARE_ROMS})
+# windres does not discover RCDATA inputs itself.  Make every object compiled
+# from firmware.rc depend on the exact ROM inputs it embeds.
+set_source_files_properties("${SOFTPC_FIRMWARE_RESOURCE}" PROPERTIES
+    OBJECT_DEPENDS "${SOFTPC_FIRMWARE_ROMS}")
+
 add_library(softpc-machine STATIC)
 target_include_directories(softpc-machine PUBLIC src src/app-softpc PRIVATE src/app-softpc/compat)
 target_compile_definitions(softpc-machine PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -318,7 +332,7 @@ add_executable(softpcvm
     src/app-softpc/product/config.c
     src/app-softpc/product/composed_machine.c
     src/app-softpc/product/extensions.c
-    src/app-softpc/product/firmware.rc)
+    ${SOFTPC_FIRMWARE_RESOURCE})
 target_link_libraries(softpcvm PRIVATE softpc-vm)
 target_link_libraries(softpcvm PRIVATE x86-ibmpc-product types storage)
 
@@ -822,7 +836,7 @@ target_sources(softpc-sound-smoke PRIVATE $<TARGET_OBJECTS:softpc-test-midi>)
 foreach(softpc_test_target IN LISTS SOFTPC_TEST_TARGETS)
     # The machine resource port reads fixed firmware from the hosting module.
     # Keep every executable test self-contained, just like the launcher.
-    target_sources(${softpc_test_target} PRIVATE src/app-softpc/product/firmware.rc)
+    target_sources(${softpc_test_target} PRIVATE ${SOFTPC_FIRMWARE_RESOURCE})
     if(MSVC)
         target_compile_options(${softpc_test_target} PRIVATE /UNDEBUG)
     else()
