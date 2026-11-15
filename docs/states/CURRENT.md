@@ -29,14 +29,21 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P61 reviews order411 rom.c at eb8e706d against pinned XP: three blocks
++1/-3. Recommend retain R0499's 16-bit ROM segment repair (+1/-1), and restore
+the omitted original pair of display_string braces (two deletion-only blocks).
+Fresh existing ROM fixture passes on both widths; original-cast negative and
+full regression are not repeated. No source/artifact change. Own disposable
+scratch is build/t100-s4-p61; concurrent Win95 work remains protected. Decisions
+await owner review. See [P61 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p61-accepted-p60-and-rom-file-review).
+
 S4 P60 implements owner-approved R0496 measure-only cleanup at cefa3fae:
 four unused assignments removed, all capture/restore code unchanged. Fixed-XP
 diff becomes one block +226/-0 (four fewer lines); source +0/-4, tests unchanged.
 Dual cached builds/publication and full regression pass 392/392 on the first
 run, including all 16 native tests. Actual-diff self-review passes; snapshot
 and INI are unchanged. Own scratch build/t100-s4-p60 is retired; concurrent
-Win95 work in build/t100-s4 is protected. R0496 body is approved; P60 awaits
-owner acceptance. S4/T100 remain open. See [P60 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p60-remove-unused-queue-measurement-outputs).
+Win95 work in build/t100-s4 is protected. R0496 body is approved; owner accepts P60 (eb8e706d). S4/T100 remain open. See [P60 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p60-remove-unused-queue-measurement-outputs).
 
 
 S4 P58 reviews order407 ica.c at49f0729f: seven blocks +119/-13, original

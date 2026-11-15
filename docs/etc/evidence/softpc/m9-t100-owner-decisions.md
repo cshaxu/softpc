@@ -5784,3 +5784,49 @@ regressions suffice; this delivery does not claim exhaustive malformed-archive
 or allocation-failure coverage. Only own scratch is retired; the concurrent
 Win95 investigation directory remains protected, so global build residue is not
 claimed clean. S4/T100 remain open; P60 awaits owner acceptance.
+
+## S4 P61: accepted P60 and ROM file review
+
+Owner accepts P60 eb8e706d and requests the next real-difference file, literal
+order411 base/system/rom.c. Read-only source review against pinned XP SP1
+finds three retained-content blocks, +1/-3; excluded bodies and line controls
+are not re-audited/accounted. No production/test/artifact change is made.
+
+| Point | XP / current anchor | Size | Purpose and disposition |
+| --- | --- | --- | --- |
+| R0499 | XP585 / current442, do_search_for_roms | +1/-1 | Original defect repair: remove UCHAR truncation of CS; recommend retain, pending owner decision. |
+| Original opening scope omission | XP788 / current before608, display_string | +0/-1 | Deleted ordinary opening brace; no necessary behavior or ABI purpose. Recommend restore. |
+| Original closing scope omission | XP869 / current before681, display_string | +0/-1 | Matching deleted closing brace; restore together, never individually. |
+
+Actual production path is original reset.c calling search_for_roms, then
+signature/checksum validation, original FE00:095A return setup, setCS/setIP and
+host_simulate. Both cached compile commands include rom.c in machine-devices
+with CCPU/CPU_40_STYLE; this is not a test-only implementation. setCS maps to
+c_setCS, whose original parameter is IU16. At ROM C8000 the entry must be
+C000:8003 (physical C8003). XP's UCHAR cast converts C000 to 00, selecting
+0000:8003 (physical 08003). This is a guest segment truncation, not host-pointer
+adaptation, snapshot support, or a product-specific workaround.
+
+Fresh existing-fixture runs on x86 and x64 both pass device-contract rom using
+P60-built binaries. The generated checksum-valid 512-byte ROM executes
+mov ax,cs; mov [0500],ax; retf through the actual scanner/CPU/trampoline;
+observed bytes at0500 are 00 C0. No guest or firmware asset is modified.
+The original-cast negative is not rerun in P61; source arithmetic establishes
+the wrong entry address, while the fresh positive proves current execution.
+This is not a claim of observed Windows failure or all ROM/protected-mode cases.
+
+The two omitted braces surround display_string's existing body. They are
+outside ARCX86's conditional body: restoring them does not restore UseEmulationROM
+or any excluded branch. Existing local declarations and uses remain inside the
+same pair; cur_loc update remains after it. There is no necessary scope escape,
+new caller, state owner or ABI rationale for the omissions. Restoring precisely
+the original pair would be production +2/-0 while reducing real XP differences
+from three blocks +1/-3 to one block +1/-1 (two fewer changed lines). Current
+106-file aggregate is unchanged pending approval. No other nonexcluded diff
+or recoverable formatting difference is found in this file.
+
+P61 uses only build/t100-s4-p61 for serial hidden-CMD fixture execution and
+final documentation gate (two-hour job/fifteen-minute no-progress budget),
+then removes it. Concurrent Win95 build/t100-s4 remains protected. P60's
+392/392 full result is previous qualification, not a newly repeated full run.
+Next file is timer.c; do not advance its review before owner decision.
