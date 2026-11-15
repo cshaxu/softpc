@@ -528,3 +528,32 @@ rom.c/fpu.c, with selected build and existing facade/CPU/SAS consumers. No new
 runtime tests; S1 P17 duplicate-symbol negative controls remain historical.
 Recommend retention, pending owner. No code changes. Frontier 15/121, next
 ntthread.c. Per-point counts and evidence reside in the decision ledger.
+
+## P15 original empty stubs with internal linkage
+
+Owner authorizes retaining three original empty functions with static rather
+than omitting their bodies. Only ntstubs.c production changes (+12/-1 net +11);
+no test source changes. Relative to fixed XP selected content drops from
++1/-12 to +4/-4, five fewer diff lines. Restore original spacing; the excluded
+branch's following #line becomes 91, giving copyROM original logical line 92.
+No new conditional/build selection or replacement implementation is introduced.
+External original definitions remain sole exported owners.
+
+Hidden background cached x86/x64 configure/build/publication succeeds. No
+static-vs-extern declaration conflict occurs. ntstubs objects match their
+pre-change files byte for byte. Full executable lengths also match. Nine x86
+and ten x64 bytes differ, solely in PE COFF timestamp, PE checksum and the
+compiler time literal. Every other byte is identical. Runtime tests are not
+repeated under the owner-approved artifact-equivalence rule; P9's 392/392 is
+historical, not this delivery's fresh test result. Self-review covers actual
+diff, selected symbol ownership, line mapping, artifact equivalence, manifest
+and whitespace. Existing mirror macro-redefinition/printf warnings remain;
+no new nonmirror warnings/errors. No guest/media/config/public-component change.
+
+| Artifact | Bytes | Compiler timestamp | SHA-256 |
+| --- | ---: | --- | --- |
+| softpc32.exe | 3477387 | Nov 14 2026 18:51:12 | a31a4afc56dae6d2ea4a67a42529a6e5ef12bf099f0e7b88f0f7c6c2d03780cd |
+| softpc64.exe | 3095066 | Nov 14 2026 18:51:26 | 19f27e4c52afed7568363ae8b12fecd8ac3ced77d9908c0aca3fc1d298c0fbc0 |
+
+Disposable comparison/build logs are removed after promotion of these results.
+The four-point file frontier remains 15/121; next file is ntthread.c.

@@ -85,8 +85,19 @@ void _asm_simulate()
 #if 0
 #error "Unsupported SoftPC mirror configuration: constant false"
 #endif
-#line 100
+#line 91
 
+static void copyROM()
+{
+}
+
+static void initialise_npx()
+{
+}
+
+static void npx_reset()
+{
+}
 
 IHPE Cpu_outb_function;
 IHPE GDP;

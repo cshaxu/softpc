@@ -227,6 +227,32 @@ no simpler equivalent alternative is established. Recommend all four for
 retention, pending owner. No source/test/binary changes. Frontier 15/121,
 106 remain; next order 183, ccpu386/ntthread.c.
 
+### S4 P15: owner-selected static original stubs
+
+Owner chooses retaining the three original ntstubs.c empty bodies with static
+linkage rather than deleting them. This supersedes the review-15 deletion
+recommendation for R0156-R0158. Restore original function names, bodies and
+spacing; add only static to each definition. No references, macros, alternate
+implementations or build flags change. External rom.c/fpu.c owners remain.
+The preceding excluded-branch line anchor is corrected to #line 91 so copyROM
+is again at original logical line 92; no exclusion-body bookkeeping is added.
+
+Current selected diff is +4/-4 (8 lines): R0155 +1/-1 unchanged and each of
+R0156-R0158 +1/-1. Former +1/-12 (13 lines) therefore decreases by five mirror
+difference lines, despite source growing +12/-1 (net +11 including line anchor).
+Frozen file-list counts remain unchanged. The static choices are owner-approved;
+R0155 retains its existing review disposition and is not silently approved.
+
+Both cached release builds/publication pass. Both ntstubs objects are exactly
+byte-identical to pre-change objects. Complete EXEs retain their sizes; x86
+has nine differing bytes and x64 ten, all confined to PE COFF timestamp,
+OptionalHeader checksum and the existing compiler time string at the same
+location. No other byte changes. The approved artifact-equivalence exception
+applies: no new runtime tests are claimed. P9's 392/392 remains historical
+runtime qualification. Existing mirror macro/printf warnings persist; no
+nonmirror warning or error is introduced. No new state, consumer or runtime
+path; static unused original bodies generate no additional release object code.
+
 ### S4 P5: c_main.c necessity counter-review
 
 Owner requests proof of necessity rather than consumer existence. No source is
