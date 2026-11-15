@@ -4714,3 +4714,51 @@ Publication verified fresh embedded compiler times Nov 14 2026 23:21:51 and
 23:22:02 respectively (build-host clock). Both final-source builds and all test
 target builds exited zero. Task-owned temporary logs/probes are removed after
 promoting these results; reusable Ninja and ccache trees remain.
+
+## S4 P47: keyba.c ordered review
+
+Owner accepts P46 (1c8567a5). Fresh full-file comparison against pinned XP
+SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89 confirms order 398:
+four real text blocks, +121/-0, excluding existing excluded bodies/line control.
+XP raw SHA-256: 6096d9f805d832c0f939e511e0f2d56e37a4eee48187376b6c6465844923a5a2.
+Earlier R0456 notice and R0459 comment differences are gone.
+
+| Decision | Current anchor | Blocks and lines | Purpose |
+| --- | --- | --- | --- |
+| R0457 | 80, 2346-2463 | 2; +119/-0 | Snapshot include (+1) and state/callback implementation (+118). |
+| R0458 | 2085 | 1; +1/-0 | Assign input_port_val before publishing the C0 response. |
+| R0460 | 2513 | 1; +1/-0 | Clear IRQ1 request when port60 consumes its output byte. |
+
+R0457 is a snapshot extension, not an original keyboard defect. Compat device
+archive capture/restore and callback codecs are real production consumers.
+The original FIFO, held-key/scan-set/repeat state and response latches are
+archived. Private do_int/allowRefill and refill handle require access here.
+Original ports mutate state and cannot replace capture/restore. Callback IDs
+and anomalous break-table indices avoid persisting host addresses. Moving the
+block into Compat would require exposing private implementation or including
+source, rather than restoring XP and reusing an equivalent original API.
+Checkpoint tests cover queued state, invalid FIFO count, pointer reconstruction
+and archived IRQ; irq_smoke covers scan sets 1-3. Per-device restore is not
+transactional: existing staged machine restoration owns failure handling.
+
+R0458: XP C0 marks automatic code_to_send valid without assigning its value.
+The added line supplies the actual input port, initialized to BFh in the
+ordinary colour-adapter configuration. bop_smoke 88-90 sends C0 at port64 and
+requires BF at port60. Historical S1 P100 separately restored this line on
+both architectures; both failed this assertion while patched controls passed.
+
+R0460: original clear is inside JOKER, excluded in supported builds. The added
+selected call uses original ica_clear_int after byte consumption. It is not
+EOI or a second queue. irq_smoke 65-80 observes masked pending IRQ1, reads FA
+from port60, then requires IRR bit1 cleared. Historical P100 removal controls
+failed this exact assertion on both widths. Fresh compile-command inspection
+confirms keyba.c in both production device targets without JOKER/NTVDM.
+
+Fresh evidence is source/baseline/caller/test inspection. The four negative
+executions are historical P100 evidence, not newly rerun. P46's fresh 392/392
+regression includes these unchanged current tests; it does not prove every
+refill timing or a particular historical guest incident. No remaining
+nonsemantic cleanup or equivalent restoration found. Recommend retaining all
+three decisions, pending owner approval. Source/tests/EXEs unchanged;
+documentation, mirror and whitespace gates pass. Next manual file is order
+400 base/keymouse/mouse.c, not implicitly reviewed.

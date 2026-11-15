@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P47 reviews order 398 keyba.c: four blocks +121/-0, three decisions.
+R0457 adds snapshot state/callback access (+119); R0458 supplies C0 input-port
+response (+1); R0460 clears consumed IRQ1 (+1). Current source/callers and
+historical paired negatives support retention; no equivalent restoration found.
+All three await owner approval. No production/test/EXE change; next is order
+400 mouse.c. S4/T100 remain open.
+
 S4 P46 removes the owner-approved unused stream bodies, four declarations,
 globals and empty Compat function; the active graphics tick remains intact.
 Cached dual builds/publication and full regression pass 392/392 first run,
@@ -36,7 +43,7 @@ with no retries/skips. Production +3/-28 (net -25), tests unchanged; real XP
 diff files decrease 107 to 106, changed mirror lines increase 11. R0455 is
 removed, not retained; two original-body omissions are explicitly approved.
 Actual-diff review finds no added state/path or shared-package change.
-P46 awaits owner acceptance; S4/T100 remain open at order 398 keyba.c.
+Owner accepts P46; S4/T100 remain open.
 
 S4 P45 records owner approval of tape_io.h R0451 and reviews order 394 video.h:
 R0455, one block +4/-0, exposes original stream declarations to the selected
