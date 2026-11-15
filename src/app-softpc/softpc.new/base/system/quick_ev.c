@@ -1090,10 +1090,6 @@ Q_EVENT_SNAPSHOT_STATE *state;
 		++state->quick_entries;
 	for (ptr = tic_list_head; ptr != NULL; ptr = ptr->next)
 		++state->tick_entries;
-	state->next_quick_handle = next_free_handle;
-	state->next_tick_handle = tic_next_free_handle;
-	state->quick_count = host_q_ev_get_count();
-	state->tick_count = tic_ev_get_count();
 }
 
 LOCAL int

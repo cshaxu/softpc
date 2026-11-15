@@ -2347,8 +2347,9 @@ queues only after both succeed. This retains one scheduler, with no new timer
 policy. P113 checkpoint and queue-archive tests passed on both widths, covering
 late-invalid callback preserving live state, callback-free load/order and an
 orphan hash member after a valid prefix. They do not prove every allocation
-failure or malformed archive combination. R0496 remains pending alongside its
-separately audited header R0442, not two competing implementations.
+failure or malformed archive combination. Owner approves R0496 in P60, with
+the four unused measure assignments removed: current extension +226/-0. Its
+separately audited header R0442 is not a competing implementation.
 
 ### R0499: ROM initialization segment width
 
@@ -5733,3 +5734,53 @@ allocation or retry interface. Recommend retain R0496 capability and narrow this
 unused output work. No production/test/EXE/snapshot modified. Prior blanket
 necessity statements for every measure assignment are narrowed by this fresh
 caller audit. Approval remains pending. Next real-difference file is rom.c.
+
+## S4 P60: remove unused queue measurement outputs
+
+Owner approves retaining R0496 capability and deleting only measure's four
+unused handle/countdown assignments, with dual cached build/publication/full
+regression and commit/push/self-review. Baseline cefa3fae. Capture remains the
+sole complete archive producer; signature, state struct and wire format do not
+change. Production expected +0/-4, tests unchanged, real XP diff +226/-0.
+Existing archive/mouse/checkpoint/queue tests cover the actual count consumers.
+No new test-only API or zero-field assertion is added.
+
+P60 owns only build/t100-s4-p60 (two-hour job, fifteen-minute no-progress budget).
+The concurrent Win95 probes use build/t100-s4/win95-driver-bisect/softpc64.exe;
+initial inventory finds PIDs13640/26964 there and no shared Ninja build job.
+Do not stop those processes, touch their assets or clean build/t100-s4. Existing
+package fixture filters windows by its own child process ID and terminates only
+its own process handle. Reusable Ninja trees are idle before P60 starts.
+
+Actual source audit: git diff --numstat from cefa3fae is +0/-4 in quick_ev.c;
+no test code changes. Byte comparison after LF normalization confirms all
+content outside measure is identical; the working mirror retains CRLF. Its
+normalized SHA-256 matches the updated XP manifest. Real mirror totals become
+106 files, 15708 blocks, +24610/-24016; only four added lines disappear, with
+no new block or file. R0496 body is approved. The only production measure
+caller reads quick_entries/tick_entries before complete capture; mouse smoke
+reads quick_entries. No second archive path or legacy format is introduced.
+
+Published SHA-256:
+- softpc32.exe: 17ba89e348309326ef7ac3097d17180a81d87ee97ea390fe6b94c784aaea5e35
+- softpc64.exe: e9f23efe6224cc17d20d117d55f984b2fd7931488663faa55a0164f2834da0e4
+
+Package snapshot and user INI hashes are unchanged from P60 start. Compiler
+timestamps verified by publication are Nov 15 2026 12:34:29 (x86) and
+Nov 15 2026 12:40:05 (x64).
+
+Qualification: both cached Ninja/ccache configurations, full builds and package
+publication passed. x86: 188/188 background (185.57s), 8/8 native (24.57s).
+x64: 188/188 background (213.33s), 8/8 native (25.17s). Total 392/392, first
+run, no retry or skip. Native coverage includes audio/MIDI, both package modes,
+Window retirement/modal and Console display. Full gates include documentation,
+manifest, component boundaries and source policy. No warning originates outside
+the preserved mirror; existing mirror warnings remain outside this cleanup.
+
+Coordinator actual-diff review confirms precisely four unused assignments
+removed, unchanged capture/restore and call signatures, no snapshot/INI change,
+no new state, branch, API, allocation or test framework. Existing consumer
+regressions suffice; this delivery does not claim exhaustive malformed-archive
+or allocation-failure coverage. Only own scratch is retired; the concurrent
+Win95 investigation directory remains protected, so global build residue is not
+claimed clean. S4/T100 remain open; P60 awaits owner acceptance.
