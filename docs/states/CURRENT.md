@@ -3,7 +3,7 @@
 ## Current Work
 
 Owner admits M9 T100 S4 for a fresh ordered audit of all current mirror
-differences. T100 remains open; S1-S3 stay closed. Owner explicitly approves all points reviewed in files 1-12 through c_page.c.
+differences. T100 remains open; S1-S3 stay closed. Owner explicitly approves all points reviewed in files 1-13 through c_tlb.c.
 Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## M9 T100 S4 Packet
@@ -11,7 +11,7 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; owner subsequently approves all reviewed points in files 1-12 through c_page.c. No approval of unreviewed files. |
+| Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; owner subsequently approves all reviewed points in files 1-13 through c_tlb.c. No approval of unreviewed files. |
 | Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
 | Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
@@ -28,6 +28,12 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P13 records c_tlb.c approval and presents fpu.c (review 14 / order 121):
++8/-5, two points concerning representation access and FIST M64I rounding.
+Each has an independent historical dual-architecture negative control; current
+source/test review does not constitute a new test run. Recommend both for
+retention, pending owner. 14/121 presented, 107 remain; ntstubs.c is next.
 
 S4 P12 records owner approval of all c_page.c points and presents c_tlb.c
 (review 13 / order 98): +58/-0 selected content, plus one diagnostic line.

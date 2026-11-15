@@ -507,3 +507,14 @@ explains historical +59. Four IDs recommended for retention, pending owner.
 Historical flush-only negative controls are not new test runs. Restoration is
 not transactional on invalid input; no broader guarantee is claimed. No code
 changes. Frontier 13/121, next fpu.c; classifications are in the decision ledger.
+
+## P13 fpu.c ordered review
+
+Owner approves c_tlb.c R0135-R0138. Review 14 / order 121 freshly compares
+fpu.c against fixed XP: +8/-5, five text hunks, two remaining semantic points.
+R0146 is representation-access correctness; R0147 restores existing rounding
+semantics to FIST M64I. Production selection, original conversion callers,
+format definitions and current real-instruction tests were checked. Historical
+S1 P15 individually reverted each fix and failed on x86/x64; no fresh runtime
+test is claimed. Recommend retention, pending owner. No code changes; 14/121
+presented, next ntstubs.c. Full point classifications reside in the decision ledger.

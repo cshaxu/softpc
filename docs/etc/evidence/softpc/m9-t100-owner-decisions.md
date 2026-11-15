@@ -17,7 +17,8 @@ Owner now explicitly approves all points already reviewed in files 1-11
 This supersedes their earlier recommendation/pending status, not their evidence
 limits. Restored/deleted points remain restored/deleted; they are not reinstated.
 Owner subsequently approves file 12 (c_page.c), all 15 points R0115-R0129.
-File 13 onward remains pending until reviewed and explicitly approved.
+Owner subsequently approves file 13 (c_tlb.c), all four points R0135-R0138.
+File 14 onward remains pending until reviewed and explicitly approved.
 Existing #error bodies and separately counted line controls remain excluded.
 
 | Review / order | File under base/ | Points | Actual purpose | + / - | Fresh disposition / evidence limit |
@@ -155,9 +156,41 @@ every field independently or every malformed archive. In particular restoration
 writes entries before all validity checks finish: rejection is not transactional
 rollback. Do not claim otherwise or expand this review into an unapproved repair.
 
-Recommendation: retain all four points, pending owner approval. No new safe
+Owner approves retention of all four points. No new safe
 restoration candidate established. No production/test/binary changes. Frontier
 13/121; 108 remain. Next: order 121, ccpu386/fpu.c.
+
+### Review 14 / order 121: ccpu386/fpu.c
+
+Fresh fixed-XP comparison confirms +8/-5 selected-content lines (13 changed
+lines), five text hunks, two semantic points. Excluded bodies are not audited
+or counted. No snapshot-specific mirror additions remain in this file.
+
+| Point | Size | Classification and retention basis |
+| --- | --- | --- |
+| R0146 | +6/-4, four hunks | Host C representation correctness: CVTFPHI64 copies FPH bytes into a real FPHOST object before reading exponent, mantissa and sign. Original casts dereference double storage as a different aggregate type. Same original conversion algorithm and representation remain; no numerical recast or new path. |
+| R0147 | +2/-1, one hunk | Original integer-conversion behavior: FIST M64I uses existing npx_rint before CVTFPHI64, matching M16I/M32I's existing rounding owner. Reuses FPRes and keeps original overflow/exception/store handling. |
+
+Real production selection includes fpu.c in the CCPU direct-port tail.
+CVTFPHI64 is consumed by original integer/conversion operations; FIST's M64I
+branch is exercised by guest FISTP m64 in the command-provider fixture.
+Current cfpu_def.h selects double FPH and FP64 FPHOST. The representation
+copy removes this particular incompatible-type access; it does not establish
+that all other original FPU type punning is safe or that every host format works.
+
+S1 P15 independently restored each point using actual compiler/link flags:
+R0146 restoration failed stored == 0x0000123400001234ull on both architectures;
+R0147 restoration failed nearest-even input 3.5 / width 8 (first stored byte
+00 rather than 04) on both. Current controls passed 228 conversion cases and
+surrounding checks. These are historical per-point negative controls, not a
+fresh run. Fresh inspection confirms the current test still uses actual guest
+instructions, four rounding modes, integer widths and output/status assertions.
+The observed failure byte is not generalized into an unmeasured complete value.
+No exhaustive x87, NaN/exception or all-compiler correctness is claimed.
+
+Recommendation: retain both points; awaiting owner decision. No production,
+test or binary change, and no newly established equivalent restoration.
+Frontier 14/121; 107 remain. Next: order 182, ccpu386/ntstubs.c.
 
 ### S4 P5: c_main.c necessity counter-review
 
