@@ -250,127 +250,6 @@ unsigned long TX_delay[] =
 #error "Unsupported SoftPC mirror configuration: non-PROD"
 #endif /* !PROD */
 #line 221
-
-GLOBAL void recv_char IPT1(long, adapter);
-static void do_wait_on_send IPT1(long, adapter);
-extern IBOOL tx_pacing_enabled;
-
-int
-softpc_device_snapshot_encode_serial_callback(callback, callback_id)
-Q_CALLBACK_FN callback;
-unsigned long *callback_id;
-{
-	if (callback_id == NULL) return FALSE;
-	if (callback == recv_char) {
-		*callback_id = SOFTPC_DEVICE_QUEUE_SERIAL_RECEIVE;
-		return TRUE;
-	}
-	if (callback != do_wait_on_send) return FALSE;
-	*callback_id = SOFTPC_DEVICE_QUEUE_SERIAL_SEND;
-	return TRUE;
-}
-
-Q_CALLBACK_FN
-softpc_device_snapshot_decode_serial_callback(callback_id)
-unsigned long callback_id;
-{
-	if (callback_id == SOFTPC_DEVICE_QUEUE_SERIAL_RECEIVE) return recv_char;
-	return callback_id == SOFTPC_DEVICE_QUEUE_SERIAL_SEND ? do_wait_on_send : NULL;
-}
-
-int
-softpc_device_snapshot_capture_serial_controller(state)
-softpc_device_serial_controller_state *state;
-{
-	int adapter;
-	struct ADAPTER_STATE *asp;
-
-	if (state == NULL) return FALSE;
-	for (adapter = 0; adapter < NUM_SERIAL_PORTS; ++adapter) {
-		asp = &adapter_state[adapter];
-		state->port[adapter].tx_buffer = asp->tx_buffer;
-		state->port[adapter].rx_buffer = asp->rx_buffer;
-		state->port[adapter].divisor_latch = asp->divisor_latch.all;
-		state->port[adapter].int_enable = asp->int_enable_reg.all;
-		state->port[adapter].int_id = asp->int_id_reg.all;
-		state->port[adapter].line_control = asp->line_control_reg.all;
-		state->port[adapter].modem_control = asp->modem_control_reg.all;
-		state->port[adapter].line_status = asp->line_status_reg.all;
-		state->port[adapter].modem_status = asp->modem_status_reg.all;
-		state->port[adapter].scratch = asp->scratch;
-		state->port[adapter].break_state = asp->break_state;
-		state->port[adapter].loopback_state = asp->loopback_state;
-		state->port[adapter].dtr_state = asp->dtr_state;
-		state->port[adapter].rts_state = asp->rts_state;
-		state->port[adapter].out1_state = asp->out1_state;
-		state->port[adapter].out2_state = asp->out2_state;
-		state->port[adapter].receiver_line_status_interrupt =
-			asp->receiver_line_status_interrupt_state;
-		state->port[adapter].data_available_interrupt =
-			asp->data_available_interrupt_state;
-		state->port[adapter].tx_empty_interrupt =
-			asp->tx_holding_register_empty_interrupt_state;
-		state->port[adapter].modem_status_interrupt =
-			asp->modem_status_interrupt_state;
-		state->port[adapter].interrupt_priority = asp->hw_interrupt_priority;
-		state->port[adapter].baud_index = asp->com_baud_ind;
-		state->port[adapter].had_first_read = asp->had_first_read;
-		state->critical[adapter] = com_critical[adapter];
-	}
-	state->line_control_flush_mask = LCRFlushMask.all;
-	state->transmit_pacing = tx_pacing_enabled;
-	return TRUE;
-}
-
-int
-softpc_device_snapshot_restore_serial_controller(state)
-const softpc_device_serial_controller_state *state;
-{
-	int adapter;
-	struct ADAPTER_STATE *asp;
-
-	if (state == NULL) return FALSE;
-	for (adapter = 0; adapter < NUM_SERIAL_PORTS; ++adapter) {
-		if (state->critical[adapter] < 0 ||
-			state->port[adapter].baud_index < 0 ||
-			state->port[adapter].baud_index >= (int)(sizeof(TX_delay) / sizeof(TX_delay[0])))
-			return FALSE;
-	}
-	for (adapter = 0; adapter < NUM_SERIAL_PORTS; ++adapter) {
-		asp = &adapter_state[adapter];
-		asp->tx_buffer = state->port[adapter].tx_buffer;
-		asp->rx_buffer = state->port[adapter].rx_buffer;
-		asp->divisor_latch.all = state->port[adapter].divisor_latch;
-		asp->int_enable_reg.all = state->port[adapter].int_enable;
-		asp->int_id_reg.all = state->port[adapter].int_id;
-		asp->line_control_reg.all = state->port[adapter].line_control;
-		asp->modem_control_reg.all = state->port[adapter].modem_control;
-		asp->line_status_reg.all = state->port[adapter].line_status;
-		asp->modem_status_reg.all = state->port[adapter].modem_status;
-		asp->scratch = state->port[adapter].scratch;
-		asp->break_state = state->port[adapter].break_state;
-		asp->loopback_state = state->port[adapter].loopback_state;
-		asp->dtr_state = state->port[adapter].dtr_state;
-		asp->rts_state = state->port[adapter].rts_state;
-		asp->out1_state = state->port[adapter].out1_state;
-		asp->out2_state = state->port[adapter].out2_state;
-		asp->receiver_line_status_interrupt_state =
-			state->port[adapter].receiver_line_status_interrupt;
-		asp->data_available_interrupt_state =
-			state->port[adapter].data_available_interrupt;
-		asp->tx_holding_register_empty_interrupt_state =
-			state->port[adapter].tx_empty_interrupt;
-		asp->modem_status_interrupt_state =
-			state->port[adapter].modem_status_interrupt;
-		asp->hw_interrupt_priority = state->port[adapter].interrupt_priority;
-		asp->com_baud_ind = state->port[adapter].baud_index;
-		asp->had_first_read = state->port[adapter].had_first_read;
-		com_critical[adapter] = state->critical[adapter];
-	}
-	LCRFlushMask.all = state->line_control_flush_mask;
-	tx_pacing_enabled = state->transmit_pacing;
-	return TRUE;
-}
 /*
  * =====================================================================
  * Other variables
@@ -2376,3 +2255,121 @@ void com_close IFN1(int, adapter)
 #endif /* !PROD */
 #line 4526
 /********************************************************/
+
+
+int
+softpc_device_snapshot_encode_serial_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback_id == NULL) return FALSE;
+	if (callback == recv_char) {
+		*callback_id = SOFTPC_DEVICE_QUEUE_SERIAL_RECEIVE;
+		return TRUE;
+	}
+	if (callback != do_wait_on_send) return FALSE;
+	*callback_id = SOFTPC_DEVICE_QUEUE_SERIAL_SEND;
+	return TRUE;
+}
+
+Q_CALLBACK_FN
+softpc_device_snapshot_decode_serial_callback(callback_id)
+unsigned long callback_id;
+{
+	if (callback_id == SOFTPC_DEVICE_QUEUE_SERIAL_RECEIVE) return recv_char;
+	return callback_id == SOFTPC_DEVICE_QUEUE_SERIAL_SEND ? do_wait_on_send : NULL;
+}
+
+int
+softpc_device_snapshot_capture_serial_controller(state)
+softpc_device_serial_controller_state *state;
+{
+	int adapter;
+	struct ADAPTER_STATE *asp;
+
+	if (state == NULL) return FALSE;
+	for (adapter = 0; adapter < NUM_SERIAL_PORTS; ++adapter) {
+		asp = &adapter_state[adapter];
+		state->port[adapter].tx_buffer = asp->tx_buffer;
+		state->port[adapter].rx_buffer = asp->rx_buffer;
+		state->port[adapter].divisor_latch = asp->divisor_latch.all;
+		state->port[adapter].int_enable = asp->int_enable_reg.all;
+		state->port[adapter].int_id = asp->int_id_reg.all;
+		state->port[adapter].line_control = asp->line_control_reg.all;
+		state->port[adapter].modem_control = asp->modem_control_reg.all;
+		state->port[adapter].line_status = asp->line_status_reg.all;
+		state->port[adapter].modem_status = asp->modem_status_reg.all;
+		state->port[adapter].scratch = asp->scratch;
+		state->port[adapter].break_state = asp->break_state;
+		state->port[adapter].loopback_state = asp->loopback_state;
+		state->port[adapter].dtr_state = asp->dtr_state;
+		state->port[adapter].rts_state = asp->rts_state;
+		state->port[adapter].out1_state = asp->out1_state;
+		state->port[adapter].out2_state = asp->out2_state;
+		state->port[adapter].receiver_line_status_interrupt =
+			asp->receiver_line_status_interrupt_state;
+		state->port[adapter].data_available_interrupt =
+			asp->data_available_interrupt_state;
+		state->port[adapter].tx_empty_interrupt =
+			asp->tx_holding_register_empty_interrupt_state;
+		state->port[adapter].modem_status_interrupt =
+			asp->modem_status_interrupt_state;
+		state->port[adapter].interrupt_priority = asp->hw_interrupt_priority;
+		state->port[adapter].baud_index = asp->com_baud_ind;
+		state->port[adapter].had_first_read = asp->had_first_read;
+		state->critical[adapter] = com_critical[adapter];
+	}
+	state->line_control_flush_mask = LCRFlushMask.all;
+	state->transmit_pacing = tx_pacing_enabled;
+	return TRUE;
+}
+
+int
+softpc_device_snapshot_restore_serial_controller(state)
+const softpc_device_serial_controller_state *state;
+{
+	int adapter;
+	struct ADAPTER_STATE *asp;
+
+	if (state == NULL) return FALSE;
+	for (adapter = 0; adapter < NUM_SERIAL_PORTS; ++adapter) {
+		if (state->critical[adapter] < 0 ||
+			state->port[adapter].baud_index < 0 ||
+			state->port[adapter].baud_index >= (int)(sizeof(TX_delay) / sizeof(TX_delay[0])))
+			return FALSE;
+	}
+	for (adapter = 0; adapter < NUM_SERIAL_PORTS; ++adapter) {
+		asp = &adapter_state[adapter];
+		asp->tx_buffer = state->port[adapter].tx_buffer;
+		asp->rx_buffer = state->port[adapter].rx_buffer;
+		asp->divisor_latch.all = state->port[adapter].divisor_latch;
+		asp->int_enable_reg.all = state->port[adapter].int_enable;
+		asp->int_id_reg.all = state->port[adapter].int_id;
+		asp->line_control_reg.all = state->port[adapter].line_control;
+		asp->modem_control_reg.all = state->port[adapter].modem_control;
+		asp->line_status_reg.all = state->port[adapter].line_status;
+		asp->modem_status_reg.all = state->port[adapter].modem_status;
+		asp->scratch = state->port[adapter].scratch;
+		asp->break_state = state->port[adapter].break_state;
+		asp->loopback_state = state->port[adapter].loopback_state;
+		asp->dtr_state = state->port[adapter].dtr_state;
+		asp->rts_state = state->port[adapter].rts_state;
+		asp->out1_state = state->port[adapter].out1_state;
+		asp->out2_state = state->port[adapter].out2_state;
+		asp->receiver_line_status_interrupt_state =
+			state->port[adapter].receiver_line_status_interrupt;
+		asp->data_available_interrupt_state =
+			state->port[adapter].data_available_interrupt;
+		asp->tx_holding_register_empty_interrupt_state =
+			state->port[adapter].tx_empty_interrupt;
+		asp->modem_status_interrupt_state =
+			state->port[adapter].modem_status_interrupt;
+		asp->hw_interrupt_priority = state->port[adapter].interrupt_priority;
+		asp->com_baud_ind = state->port[adapter].baud_index;
+		asp->had_first_read = state->port[adapter].had_first_read;
+		com_critical[adapter] = state->critical[adapter];
+	}
+	LCRFlushMask.all = state->line_control_flush_mask;
+	tx_pacing_enabled = state->transmit_pacing;
+	return TRUE;
+}

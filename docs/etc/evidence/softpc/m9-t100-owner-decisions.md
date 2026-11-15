@@ -3630,3 +3630,33 @@ this review establishes no larger safe reduction under unchanged behavior and
 snapshot schema. Present the three-declaration candidate for owner decision;
 retain evidence limits rather than declaring all remaining lines independently
 proven minimal. Review frontier unchanged.
+
+## S4 P22: remove only added duplicate UART declarations
+
+Owner approves the P21 candidate and explicitly limits cleanup to added mirror
+diff: original duplicate declarations remain allowed and untouched. Relocate
+the added snapshot block to file end, remove only added recv_char,
+do_wait_on_send and tx_pacing_enabled forward declarations, and reuse the
+original declarations/definition. All four snapshot function bodies remain
+unchanged. An exact source comparison reconstructs the new file as only this
+move-minus-three-lines; no other original text or exclusion directives change.
+
+Production one file +118/-121 (net -3), tests unchanged. Added block 121 ->118;
+selected fixed-XP diff +125/-3 -> +122/-3 (128 ->125 changed lines). Frozen
+file list remains historical. R0174 and the remaining R0178 body retain their
+pending evidence-qualified dispositions; the three pointer corrections are
+unchanged. No snapshot schema, ABI or runtime ownership change.
+
+Same-file similar-issue search covers added declarations and all uses of the
+three names. The surviving forward declarations and tx_pacing definition are
+original, precede the moved functions, and each removed declaration has its
+original provider. This is not a blanket cleanup of original mirror style or
+other unreviewed files.
+
+Cached dual full builds and publication pass. Complete EXE comparison has
+nonmetadata differences, so artifact-equivalence exemption is not used. An
+isolated before-source compile at each width uses the actual production flags;
+old/new symbol tables confirm changed function positions. For example x64
+com_recv_char moves 0x2530 ->0x1da0 while snapshot encode moves 0x1da0 ->0x2300.
+No behavior proof is inferred from layout alone; full runtime qualification is
+recorded in the P22 audit evidence.

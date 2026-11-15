@@ -614,3 +614,47 @@ whitespace gates pass; task scratch removed after job completion.
 Actual-diff review confirms only the extracted comment is removed; no UART
 state/schema/behavior, guest or user configuration changes. P19 notice reasoning
 is superseded by the explicit owner direction, not silently retained as policy.
+
+
+## P22 added UART declaration cleanup
+
+Owner authorizes removal of duplicate declarations introduced by local mirror
+patches only; original XP duplicate declarations remain permitted. One source
+file changes: base/comms/com.c, +118/-121 (net -3); tests unchanged. Move the
+added snapshot functions after original declarations and remove the three added
+recv_char, do_wait_on_send and tx_pacing_enabled declarations. Byte comparison
+reconstructs the final source exactly as that move minus those three lines;
+all four function bodies and original text remain unchanged, with CRLF intact.
+Selected fixed-XP diff decreases +125/-3 to +122/-3: three fewer mirror-diff
+lines, not the gross moved-block Git count. No schema or shared interface change.
+
+Cached x86/x64 configuration, complete test builds and dual publication pass.
+Existing mirror warnings remain; no new nonmirror warning or build error was
+observed. Full EXEs have nonmetadata differences, so the equivalence exception
+is not used. Isolated before-source compilation with actual production flags
+and old/new symbol tables confirms changed function placement; this does not
+by itself establish runtime equivalence.
+
+- softpc32.exe: 3477387 bytes, Nov 14 2026 19:31:25; SHA-256
+  8cfecce14a81202736cc1ad07577a6c9342635693cf72fd60d7d9a07ea5aa4cd.
+- softpc64.exe: 3095066 bytes, Nov 14 2026 19:31:40; SHA-256
+  81849b233937300808d6fec7a24ec6b5732e81680312e454870bb4a7956f769b.
+
+Same-file declaration/use review confirms the original declarations precede
+all moved uses. No original duplicate was removed, no excluded-body content
+was promoted, and no test-only interface, alternate state owner or new path
+was introduced. This is not an audit of every declaration in unreviewed files.
+Fresh full regression passes 392/392, without retries or skips:
+
+| Architecture | Background | Native desktop/audio/package | Elapsed seconds |
+| --- | --- | --- | --- |
+| x86 | 188/188 | 8/8 | 195.78 + 25.07 |
+| x64 | 188/188 | 8/8 | 199.85 + 24.34 |
+
+Commands use ninja-ccache-test-x86/x64 presets for background work and explicit
+serial desktop|native_audio label selection for native tests. Existing checkpoint
+coverage runs in this full suite; no new live serial-device or exhaustive UART
+combination proof is claimed. Actual-change self-review finds no blocking issue.
+Documentation, fixed-XP manifest and whitespace checks pass. Owned jobs completed;
+concise evidence is retained here and disposable task scratch is removed before
+delivery, preserving reusable caches. S4/T100 stay open at review file 18.

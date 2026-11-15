@@ -13,7 +13,7 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; owner subsequently approves all reviewed points in files 1-14 through fpu.c. No approval of unreviewed files. |
 | Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
-| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. Owner now authorizes restoring the three original ntstubs empty functions with static linkage (P15); keep external original owners and verify dual artifact equivalence. |
+| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. Owner now authorizes restoring the three original ntstubs empty functions with static linkage (P15); keep external original owners and verify dual artifact equivalence. P22 owner authorizes relocating the added com.c snapshot block and deleting its three added declarations; original mirror duplicates must remain unchanged. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
 | Files And ABI Surface | All tracked files under src/app-softpc/softpc.new and read-only inspection of real build/caller/test dependencies. Start with audit, not new code changes. |
@@ -29,11 +29,21 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P22 implements the owner-approved com.c declaration cleanup: move the added
+snapshot block after original declarations and remove only its three added
+forward declarations. Original mirror duplicates remain untouched. Production
++118/-121 (net -3), tests unchanged; selected XP diff +125/-3 -> +122/-3.
+Cached dual builds/publication and full regression pass 392/392 without retries
+or skips. Function placement changes prevent using the binary-equivalence
+exception. Exact source reconstruction and actual-diff self-review confirm no
+other source change, snapshot-format change or new path. See
+[P22 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p22-added-uart-declaration-cleanup).
+Await owner review; S4/T100 and the file-18 frontier remain open.
+
 S4 P21 rechecks the five remaining com.c points. A concrete source-only
 candidate relocates the added snapshot block after original declarations,
 removing three duplicate forward declarations: block 121 -> 118, selected XP
-diff +125/-3 -> +122/-3. Candidate exists only in memory, not implemented or
-compiled; owner decision pending. Per-point evidence strength and limits are
+diff +125/-3 -> +122/-3. At P21 the candidate existed only in memory; P22 above now implements it. Per-point evidence strength and limits are
 recorded in the decision ledger. No file-frontier advance or new runtime proof.
 
 Owner corrects P19: content inside a wholly excluded branch must not be
