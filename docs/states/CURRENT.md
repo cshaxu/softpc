@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P42 records owner approval of quick_ev.h R0442 and reviews order 381 sas.h:
+R0444, one block +1/-1, matches Length_of_M_area's declaration to the original
+PHY_ADDR storage. Fresh pinned-XP definitions and historical dual compiler
+controls support retention; no runtime corruption is claimed. Other former
+header differences are already restored. R0444 awaits owner approval.
+No source change or fresh runtime test. Next is order 383 sndblst.h;
+S4/T100 remain open.
+
 S4 P41 records owner approval of ios.h R0440 and reviews order 377 quick_ev.h:
 R0442, two blocks +35/-0, defines the real pending-event snapshot contract.
 Private queue ownership and original add semantics rule out equivalent restore

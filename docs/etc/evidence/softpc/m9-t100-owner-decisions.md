@@ -4440,3 +4440,49 @@ unused API, duplicated declaration or redundant added comment identified.
 Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
 apply. Next actionable file is order 381 base/inc/sas.h; intervening headers
 have no current real diff. S4/T100 remain open.
+
+
+## S4 P42: owner approves event archive; sas.h review
+
+Owner explicitly approves retaining R0442; P41's pending decision is resolved.
+Fresh complete pinned XP comparison of order 381 base/inc/sas.h confirms
+one retained difference, R0444, +1/-1 at current line 106 / XP line 109:
+extern IHPE Length_of_M_area becomes extern PHY_ADDR Length_of_M_area.
+Original spacing and trailing comment are preserved. Existing excluded bodies
+and necessary line controls are skipped without accounting. R0443's unused
+added overwrite-memory declaration and R0445's inactive sys_addr substitution
+were already restored in S1 P94; neither remains an outstanding point.
+
+Category: C declaration/definition consistency and native-width port ABI,
+not a snapshot feature or independently reproduced guest memory bug. Fresh
+pinned-XP reads confirm base/ccpu386/ccpusas4.c:135 already defines
+GLOBAL PHY_ADDR Length_of_M_area = 0, and zfrsrvd.c:40 imports PHY_ADDR.
+Current corresponding locations are 134 and 41. The actual storage owner
+therefore is original, not a newly introduced Compat definition. ccpusas4.c
+assigns the requested guest memory size and uses the variable for guest-memory
+bounds; it is a physical byte count, not a host pointer. CPU_40_STYLE is the
+supported x86/x64 profile. base_def.h:95 defines PHY_ADDR as IU32; insignia.h
+uses unsigned long for IU32 and UINT_PTR for IHPE.
+
+Historical S1 P94 controls used actual Ninja ccpusas4.c compile commands,
+changing only the selected declaration via a private header. Current controls
+passed both widths; original IHPE failed both with conflicting variable types:
+x86 unsigned int versus unsigned long; x64 unsigned long long versus unsigned
+long. The initial expectation that equal x86 widths would suffice was rejected
+and corrected before the final paired runs. Equal size does not make distinct
+C integer types compatible. This is compiler/ABI proof, not a runtime overwrite
+reproduction. This P rechecks original/current source and retained evidence;
+it does not claim new compiler experiments or new guest/runtime acceptance.
+
+Counter-review: restoring IHPE leaves the known conflicting declaration.
+Widening original storage or changing zfrsrvd would add mirror modifications;
+globally narrowing IHPE breaks its host-pointer-carrier purpose. Removing this
+shared declaration or scattering replacements across users loses a coherent
+header contract. The existing one-token replacement describes the actual
+original storage; no further safe equivalent XP restoration identified.
+Recommend retain R0444, pending owner approval. Later implementation-file
+changes remain subject to their separate ordered review.
+
+Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
+apply. Next actionable file is order 383 base/inc/sndblst.h; sasp.h has no
+current real diff. S4/T100 remain open.
