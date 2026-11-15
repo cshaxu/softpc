@@ -29,11 +29,18 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P48 records keyba.c R0457/R0458/R0460 approval and reviews order 400
+mouse.c: 14 blocks +115/-34. R0463 replaces finite interrupt bursts with the
+existing periodic event path; R0464 archives private controller state; R0465
+initializes undefined reads; R0466 resets stale data. Recommend retention
+with stated evidence limits; all four await owner approval. No source, tests
+or EXE changes. Next is order 401 ppi.c; S4/T100 remain open.
+
 S4 P47 reviews order 398 keyba.c: four blocks +121/-0, three decisions.
 R0457 adds snapshot state/callback access (+119); R0458 supplies C0 input-port
 response (+1); R0460 clears consumed IRQ1 (+1). Current source/callers and
 historical paired negatives support retention; no equivalent restoration found.
-All three await owner approval. No production/test/EXE change; next is order
+Owner approves all three. No production/test/EXE change; next is order
 400 mouse.c. S4/T100 remain open.
 
 S4 P46 removes the owner-approved unused stream bodies, four declarations,

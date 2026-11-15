@@ -4762,3 +4762,72 @@ nonsemantic cleanup or equivalent restoration found. Recommend retaining all
 three decisions, pending owner approval. Source/tests/EXEs unchanged;
 documentation, mirror and whitespace gates pass. Next manual file is order
 400 base/keymouse/mouse.c, not implicitly reviewed.
+
+
+## S4 P48: mouse.c ordered review
+
+Owner approves keyba.c R0457/R0458/R0460; P47 pending decisions are resolved.
+Fresh comparison of the entire mouse.c to fixed XP SP1 confirms 14 blocks,
++115/-34 outside established exclusions/line control. XP raw SHA-256:
+d449af5953821629584958ecb29217ac7114b246169d4d0e6526c6ed2f67ec64.
+R0462 and R0467 obsolete added notices/comments are already removed.
+
+| Decision | Added/deleted | Purpose and current sites |
+| --- | --- | --- |
+| R0463 | +41/-34 | Periodic/enable-aware IRQ: quick_ev include, timer handle/helpers, mode transitions, reset cancellation, data IRQ gating and cold handle invalidation. |
+| R0464 | +67/-0 | Snapshot include and 66-line callback/state archive block, lines121-186. |
+| R0465 | +1/-0 | Default output byte at mouse_inb entry, line190. |
+| R0466 | +6/-0 | Four reset-state lines plus two cold-init lines (buttons and reset call). |
+
+Line attribution splits shared Git hunks without double counting: removal of
+the old loadsainterrupts reset and cold timer-handle invalidation belong to
+R0463; the replacement reset-data assignments belong to R0466. Total is
++115/-34. Blocks remain textual units, not fourteen independent decisions.
+
+R0463 is a functional device timing/enable correction, not x64 portability.
+XP explicitly limits five bursts and requests 100 interrupts per eligible
+mode write. Its own deleted comment calls this a Windows 1.02/2.03 workaround.
+It cannot provide sustained rate-selected recurring events. Current helpers
+use the existing quick-event queue with one handle; HOLD suppresses IRQ but
+keeps recurrence, and changed rate/disable cancels the old event. Data-enable
+bit3 and timer-enable bit4 gate their respective sources. No extra thread,
+polling loop or parallel device exists. Restoring the complete original
+scheme restores the finite burst policy; restoring isolated lines is not a
+valid coherent-original negative. mouse_smoke 153-220 checks four actual
+scheduled periods, recurrence through HOLD, cancellation and PIC state;
+earlier assertions deliver guest input through CCPU/PIC. No fresh complete
+original-scheme negative or exhaustive old Windows driver test is claimed.
+
+R0464 is a snapshot extension. Actual archive.c capture/restore and callback
+codec callers serialize thirteen InPort fields. Static registers, ID toggle,
+prior buttons and timer callback are owned here. Port reads toggle ID phase;
+HOLD latches/clears deltas; mode writes schedule interrupts. Therefore replay
+through original ports is not an equivalent state archive. Existing checkpoint
+and mouse tests cover held data, selection, invalid ID phase, callback and
+controller/queue roundtrip. Moving the block to Compat would need extra
+exposure of private state/callbacks, not merely restore unused mirror code.
+
+R0465 prevents undefined guest input: current original CCPU IN8 uses an
+uninitialized IU8 temporary and invokes this handler; unsupported selectors
+formerly left it untouched. The one default assignment makes that path
+bounded/deterministic. This proves the need for defined output, not that FFh
+is a measured electrical value for every undocumented InPort register.
+mouse_smoke has unsupported-selector sentinel coverage; no exhaustive hardware
+bus proof is claimed.
+
+R0466 clears accumulated movement and latched data/status on reset, aligns
+previous/current buttons, and cold-initializes buttons through the same reset
+path. Otherwise pre-reset movement remains eligible for later latching.
+BIOS reset calls q_event_init before mouse_init; the stale timer handle must
+be invalidated, not deleted from a newly initialized queue. Current machine
+mouse_send is the real producer, and mouse_init registers the original ports.
+No alternative Compat controller was found. Existing movement/reset and
+checkpoint tests exercise the current path; no new exhaustive reset timing
+negative is claimed.
+
+Recommend retaining all four; no equivalent nonsemantic restoration found.
+Fresh work is source/XP/caller/test inspection; P46's unchanged production
+baseline passed full 392/392, and historical P102 ran focused mouse/checkpoint
+checks on both widths. These are not newly repeated guest-session acceptance
+or allocation-failure tests. Source/tests/EXEs unchanged; mirror/documentation/
+whitespace gates apply. Next manual file is order401 base/keymouse/ppi.c.
