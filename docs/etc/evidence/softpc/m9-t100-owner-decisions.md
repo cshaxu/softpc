@@ -19,7 +19,9 @@ limits. Restored/deleted points remain restored/deleted; they are not reinstated
 Owner subsequently approves file 12 (c_page.c), all 15 points R0115-R0129.
 Owner subsequently approves file 13 (c_tlb.c), all four points R0135-R0138.
 Owner subsequently approves file 14 (fpu.c), both points R0146-R0147.
-File 15 onward remains pending until reviewed and explicitly approved.
+Owner subsequently approves ntthread.c R0160-R0162 at review 16; its P9
+items were already approved. Review 15 retains the dispositions recorded below.
+Unreviewed points remain pending until explicitly approved.
 Existing #error bodies and separately counted line controls remain excluded.
 
 | Review / order | File under base/ | Points | Actual purpose | + / - | Fresh disposition / evidence limit |
@@ -289,8 +291,37 @@ it does not prove all allocation/longjmp failure combinations or smallest
 possible diagnostic formatting. No new equivalent restoration identified.
 
 No production/test/binary change. Frontier 16/121, 105 remain. Next: order 265,
-ccpu386/zfrsrvd.c. P9 items retain their explicit approval; R0160-R0162 await
-this file's owner decision. Moving to this file alone does not approve R0155.
+ccpu386/zfrsrvd.c. Owner now approves R0160-R0162; P9 items retain their
+existing explicit approval. Moving to this file alone does not approve R0155.
+
+### Review 17 / order 265: ccpu386/zfrsrvd.c
+
+Fresh fixed-XP comparison confirms one selected hunk +17/-0, historical point
+R0172, entirely snapshot support for private delayed-NPX exception IP. Excluded
+bodies and associated anchors are not audited/counted. Earlier restored
+R0166-R0171 remain restored, not resurrected for review.
+
+| R0172 subpart | Size | Retention basis |
+| --- | --- | --- |
+| softpc_ccpu_snapshot_delayed_npx_eip | +6/-0 including separator | Read the original LOCAL NpxExceptionEIP without delivering an interrupt or changing state; archive.c capture is the actual caller. |
+| softpc_ccpu_snapshot_set_delayed_npx | +11/-0 including separator | Restore saved private IP and pending flag via archive.c, preserving original delayed-delivery behavior and original state ownership. |
+
+Original DoNpxException snapshots NpxFIP into NpxExceptionEIP. The later
+TakeNpxExceptionInt restores that saved value, clears pending and injects an
+interrupt. Current FIP and saved fault IP are distinct states; existing original
+functions are not side-effect-free archive accessors. CMake selects zfrsrvd.c,
+and original CCPU dispatch consumes its NPX handlers. No guest instruction,
+second FPU or new snapshot format is added by these accessors.
+
+Historical S1 P21 coherent removal of both accessors/archive calls retained
+ordinary pending-flag restoration but failed real restored exception-FIP
+assertions on both architectures. Controls passed. Fresh fixture inspection
+confirms saved IP 0x11223344, current FIP 0x55667788 at capture, later exception
+0x99aabbcc, then real delivery after restore recovering 0x11223344. This round
+does not rerun tests. This proves the saved-IP restoration capability, not all
+x87 fault opcodes or that every helper spelling/placement is uniquely minimal.
+Recommend retaining R0172, pending owner. No production/test/binary changes.
+Frontier 17/121; 104 remain. Next: order 267, comms/com.c.
 
 ### S4 P5: c_main.c necessity counter-review
 

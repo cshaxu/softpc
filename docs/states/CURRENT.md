@@ -29,6 +29,12 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P17 records owner approval of ntthread.c R0160-R0162 (P9 items already
+approved) and presents zfrsrvd.c, review 17 / order 265: R0172 +17/-0 private
+saved-NPX-IP snapshot accessors. Fresh source/caller/test inspection corroborates
+historical dual negative controls; no new runtime test or code changes.
+Recommend retention, pending owner. 17/121 presented; comms/com.c is next.
+
 S4 P16 presents ntthread.c (review 16 / order 183): current +36/-3,
 five points including owner-approved P9 depth-query and safe TLS teardown.
 Recommend existing outer-unwind and explicit failure-return differences;

@@ -568,3 +568,13 @@ null returns are recommended with evidence limits. In particular null return
 is not complete caller recovery. No new runtime tests or production changes;
 historical S1 negative controls and P9 qualification remain separately identified.
 Point details are in the decision ledger. Frontier 16/121; zfrsrvd.c next.
+
+## P17 zfrsrvd.c ordered review
+
+Owner approves ntthread.c R0160-R0162; P9 points were already approved.
+Review 17 / order 265 compares zfrsrvd.c to fixed XP: R0172 +17/-0, one hunk,
+two snapshot accessors. Current private saved-IP state, original delayed IRQ
+functions, actual archive consumers and checkpoint assertions were inspected.
+Historical coherent-removal failures on both architectures support retention;
+no fresh runtime tests or code changes are claimed. Counts and limits reside
+in the decision ledger. 17/121 presented, next comms/com.c, 104 remain.
