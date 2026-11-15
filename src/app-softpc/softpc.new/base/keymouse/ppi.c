@@ -66,9 +66,6 @@ static half_word ppi_register;
 
 static boolean gate_2_was_low = TRUE;	/* state of timer 2 gate */
 #ifndef NTVDM
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: non-standalone PPI"
-#endif
 #endif
 #line 72
 

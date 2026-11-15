@@ -4044,3 +4044,17 @@ the actual dual build inputs and artifact equivalence under the existing rules.
 
 Documentation-only review gates apply here. Next file after the owner decision
 is order 337 base/inc/dma.h. S4/T100 remain open.
+
+
+## S4 P34: owner-authorized conditional-wrapper sweep
+
+Owner authorizes restoring cpu_vid.h and cleaning all equivalent cases across
+the real-diff file list. The [P34 audit](m9-t100-s4-audit.md#p34-redundant-non-xp-conditional-wrappers)
+records all 109 files' bounded scan, twelve candidate-file dispositions, eight
+changed paths and ten removed wrappers. cpu_vid.h and gmi.h now have no real
+retained-content diff and are removed from the current actionable list.
+The P33 restoration candidate is resolved. R0421-R0423 and R0433 remain restored,
+not retention requests. Real type, endian, snapshot and host wiring changes
+remain visible and subject to their per-file review; this batch does not approve
+them wholesale. Existing original excluded bodies receive no new accounting.
+Next manual file remains order 337 dma.h; S4/T100 remain open.

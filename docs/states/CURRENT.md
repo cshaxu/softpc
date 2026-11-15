@@ -12,8 +12,8 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; owner subsequently approves all reviewed points in files 1-14 through fpu.c. No approval of unreviewed files. |
-| Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. The frozen list began with 121 real-difference files; the current list removes zero-diff files and now contains 109 after the P30 nonsemantic sweep. Audit their differences and report purpose, evidence, size and decision status. |
-| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. Owner now authorizes restoring the three original ntstubs empty functions with static linkage (P15); keep external original owners and verify dual artifact equivalence. P22 owner authorizes relocating the added com.c snapshot block and deleting its three added declarations; original mirror duplicates must remain unchanged. P24 owner approves printer.c cleanup and a mirror-wide sweep of the same added-diff classes: extracted excluded notices and redundant added forward declarations. No original duplicate cleanup or unrelated behavior changes. P30 owner approves R0414 retention, restoring diskbios directive formatting, and a bounded sweep of the current 114 real-diff files for equivalent nonsemantic restorations with refreshed counts. |
+| Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. The frozen list began with 121 real-difference files; the current list removes zero-diff files and now contains 107 after the P34 conditional-wrapper sweep. Audit their differences and report purpose, evidence, size and decision status. |
+| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. Owner now authorizes restoring the three original ntstubs empty functions with static linkage (P15); keep external original owners and verify dual artifact equivalence. P22 owner authorizes relocating the added com.c snapshot block and deleting its three added declarations; original mirror duplicates must remain unchanged. P24 owner approves printer.c cleanup and a mirror-wide sweep of the same added-diff classes: extracted excluded notices and redundant added forward declarations. No original duplicate cleanup or unrelated behavior changes. P34 owner authorizes restoring cpu_vid.h and sweeping all 109 current real-diff files for redundant non-XP conditional wrappers; preserve selected repairs, original conditional structure and genuine selectors. Verify both cached architectures, publish and reconcile current counts. P30 owner approves R0414 retention, restoring diskbios directive formatting, and a bounded sweep of the current 114 real-diff files for equivalent nonsemantic restorations with refreshed counts. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
 | Files And ABI Surface | All tracked files under src/app-softpc/softpc.new and read-only inspection of real build/caller/test dependencies. Start with audit, not new code changes. |
@@ -28,6 +28,19 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P34 completes the owner-authorized redundant conditional-wrapper sweep:
+109 real-diff files scanned, twelve candidate files checked, ten unnecessary
+non-XP wrappers removed in eight files. Production +1/-43; tests unchanged.
+Real XP differences decrease 29 lines and five text blocks; cpu_vid.h/gmi.h
+leave the list: now 107 files, 15,716 blocks, +24,670/-24,033. Necessary type,
+endian, snapshot, TLS and host-route behavior remains. See the P34 audit.
+Cached x86/x64 package and complete test-target builds pass. Of 1,088 objects,
+only two build-timestamp objects differ; complete EXEs are equal except for
+PE timestamp/checksum and the compiler time string. Runtime suites are skipped
+under the owner's artifact-equivalence rule; no new full-suite pass is claimed.
+Affected source/documentation/manifest/dependency gates pass 8/8.
+S4/T100 remain open; next manual file is dma.h.
 
 S4 P33 records owner approval of fla.c R0417. Current cpu_vid.h review finds
 one unnecessary non-XP conditional wrapper, counted as two blocks +3/-0.

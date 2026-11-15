@@ -18,13 +18,9 @@ typedef double 		FPH;
 /* T59 host ABI: word and bitfield order must match the selected host byte
  * order. The CCPU arithmetic and Intel-memory conversion remain unchanged. */
 typedef struct {
-#ifdef LITTLEND
 IU32	mant:23;
 IU32	exp:8;
 IU32	sign:1;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 22
 } FP32;
 

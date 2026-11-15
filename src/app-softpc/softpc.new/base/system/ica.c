@@ -1672,14 +1672,10 @@ GLOBAL IU32 ica_iret_hook_needed IFN1(IU32, line)
 GLOBAL void
 ica_iret_hook_control IFN3(IU32, adapter, IU32, line, IBOOL, enable)
 {
-#ifndef CCPU
-#error "Unsupported SoftPC mirror configuration: !CCPU"
-#else
 #line 1901
 	UNUSED(adapter);
 	UNUSED(line);
 	UNUSED(enable);
-#endif	/* CCPU */
 }
 
 
@@ -2005,7 +2001,6 @@ softpc_device_pic_state *state;
 		target->cpu_interrupt = source->ica_cpu_int;
 		for (line = 0; line < SOFTPC_DEVICE_PIC_LINE_COUNT; ++line) {
 			target->count[line] = source->ica_count[line];
-#if defined(CPU_40_STYLE) && !defined(NTVDM)
 			/* No function address may cross the archive boundary.  The
 			   selected standalone configuration has no pending action-IRQ
 			   callback at a safe snapshot boundary; reject rather than lie. */
@@ -2019,19 +2014,12 @@ softpc_device_pic_state *state;
 			for (depth = 0; depth < SOFTPC_DEVICE_PIC_ISR_DEPTH; ++depth)
 				target->isr_time_decay[line][depth] =
 					source->isr_time_decay[line][depth];
-#else
-#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && !defined(NTVDM))"
-#endif
 #line 2023
 		}
 	}
-#ifdef HOOKED_IRETS
 	state->iret_hooks_enabled = iretHooksEnabled ? 1u : 0u;
 	state->iret_hook_mask = iretHookMask;
 	state->iret_hook_active = iretHookActive;
-#else
-#error "Unsupported SoftPC mirror configuration: !HOOKED_IRETS"
-#endif
 #line 2034
 	return TRUE;
 }

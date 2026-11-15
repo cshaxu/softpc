@@ -34,12 +34,8 @@ typedef union
         word    X;
     struct
         {                               /* as two bytes */
-#ifdef LITTLEND
         half_word low;
         half_word high;
-#else
-#error "Unsupported SoftPC mirror configuration: !LITTLEND"
-#endif
 #line 131
         word pad;
         } byte;

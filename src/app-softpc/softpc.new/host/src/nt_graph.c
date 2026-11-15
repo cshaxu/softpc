@@ -769,10 +769,6 @@ void nt_clear_screen(void)
         return;
 #endif
 #line 941
-#ifndef SOFTPC_STANDALONE
-#error "Unsupported SoftPC mirror configuration: !SOFTPC_STANDALONE"
-#endif
-#line 941
 
     /*::::::::::::::::::::::::::::: Get information on current screen size */
 

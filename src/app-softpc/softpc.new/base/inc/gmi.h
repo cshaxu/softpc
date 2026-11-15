@@ -16,7 +16,6 @@ typedef enum
 
 typedef struct
 {
-#if defined(CPU_40_STYLE) && defined(C_VID)
 	VOID	(*b_write)();
 	VOID	(*w_write)();
 	VOID	(*b_fill)();
@@ -24,10 +23,6 @@ typedef struct
 	VOID	(*b_move)IPT4(UTINY *, laddr, UTINY *, haddr, UTINY *, src,
 		 UTINY, src_type);
 	VOID	(*w_move)();
-#else
-#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && defined(C_VID))"
-#endif
-#line 26
 } MEM_HANDLERS;
 
 #ifndef UNIVERSAL	/* These are in host_cpu.h during a UNIVERSAL build. */

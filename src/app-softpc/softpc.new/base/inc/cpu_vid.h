@@ -84,14 +84,9 @@ extern MODE_TABLE mode_table;
 
 typedef struct 
 {
-#if defined(CPU_40_STYLE) && defined(C_VID)
 	IU32 (*b_read) IPT1(ULONG, offset);
 	IU32 (*w_read) IPT1(ULONG, offset);
 
-#else
-#error "Unsupported SoftPC mirror configuration: !(defined(CPU_40_STYLE) && defined(C_VID))"
-#endif
-#line 90
 #ifndef	NO_STRING_OPERATIONS
 	void (*str_read) IPT3(IU8 *, dest, ULONG, offset, ULONG, count);
 #endif	/* NO_STRING_OPERATIONS */

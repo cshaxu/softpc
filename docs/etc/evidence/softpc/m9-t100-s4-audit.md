@@ -932,3 +932,105 @@ Build warnings are confined to the preserved mirror; no nonmirror warning
 was emitted in these logs. Documentation, mirror manifest and applicable
 whitespace checks pass. Owned scratch is removed after promoting this evidence;
 only reusable build caches remain. S4/T100 remain open, not closed by this P.
+
+
+## P34 redundant non-XP conditional wrappers
+
+Owner approves cpu_vid.h restoration and the same-issue sweep of all current
+real-difference files. Input is ccee5c80: 109 paths in the current inventory,
+compared with fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89.
+Frozen dir ordinals remain authoritative. This sweep concerns unnecessary
+added conditional framing, not approval of every remaining semantic patch.
+Existing original excluded bodies are neither audited nor booked.
+
+Enumerate conditional-directive sequences in all 109 full local/original files;
+inspect inserted/replaced sequences in context against original parent/arm
+structure. Twelve files have candidates. Eight contain ten redundant wrappers
+whose sole reachable body is already selected by every applicable supported
+build. Remove those local wrappers, preserving selected C statements and all
+original conditional structures. In egacpu.h shorten the stale explanation
+that claimed an alternate type was retained for other profiles. No test changes,
+new APIs, alternate runtime paths or guest/media changes are involved.
+
+| File | Wrappers removed | Before blocks / + / - | After blocks / + / - | Preserved responsibility |
+| --- | ---: | --- | --- | --- |
+| base/inc/cpu_vid.h | 1 | 2 / 3 / 0 | 0 / 0 / 0 | Exact original READ_POINTERS fields. |
+| base/inc/gmi.h | 1 | 2 / 3 / 0 | 0 / 0 / 0 | Exact original MEM_HANDLERS fields. |
+| base/inc/egacpu.h | 1 | 1 / 8 / 1 | 1 / 4 / 1 | Necessary generated VGA state pointer type stays. |
+| host/inc/cfpu_def.h | 1 | 13 / 13 / 8 | 13 / 10 / 8 | Existing little-endian FPU field ordering stays. |
+| host/inc/host_cpu.h | 1 | 2 / 4 / 1 | 2 / 1 / 1 | Existing register byte ordering stays. |
+| base/system/ica.c | 3 | 5 / 118 / 7 | 5 / 109 / 7 | CCPU hook body and PIC snapshot field/callback checks stay. |
+| base/keymouse/ppi.c | 1 | 6 / 29 / 13 | 6 / 27 / 13 | Original enclosing NTVDM condition and intentional content omission stay. |
+| host/src/nt_graph.c | 1 | 11 / 32 / 13 | 10 / 30 / 13 | Existing clear-screen path stays; duplicate line anchor removed. |
+
+Actual production delta: eight files, +1/-43, net -42. Tests: +0/-0.
+The retained-content XP difference decreases by 29 added lines, no deleted-line
+change; five fewer textual blocks. Those are distinct from physical line counts.
+Changed-file before counts exactly reconcile with the existing inventory using
+paired original/local conditional arms and zero-context Git Myers comparison.
+Only bodies corresponding to existing exclusions and line controls are omitted;
+added wrapper directives remain counted until physically removed.
+Current totals: 107 real-diff files, 15,716 blocks, +24,670/-24,033; 48,703 total
+difference lines. cpu_vid.h and gmi.h leave the actionable list. Whole mirror:
+254 identical + 111 exclusion/line-control-only + 107 real-diff = 472 files.
+
+The remaining candidate structures are deliberately retained:
+
+- c_main.c's six TLS selector changes activate the existing original stack
+  storage/access/reset path, not an empty configuration check.
+- ica.h's CPU_40_STYLE guard prevents original PIC bit-number macros from
+  colliding with CCPU interrupt-kind values. Prior coherent P89 controls failed
+  with duplicate cases on both widths without it; no new negative test claimed.
+- ios.h's selector chooses the complete port-address dispatch table. Prior P90
+  controls demonstrated aliasing with the original narrower table.
+- ppi.c's remaining selector enables the actual HostPpiState speaker callback.
+- insignia.h's CVIDC_RULE_WORD selects pointer-sized generated-rule words only
+  in their owning source group; other translation units retain original IUH.
+- nt_graph.c's V7VGA guard encloses a real Video7 width correction dependent on
+  that mode's rendering function. It is not an empty rejected alternative.
+
+These six candidate files overlap two of the eight edited files. Four candidate
+files are unchanged; 97 files have no added/changed directive sequence. Thus
+109 = 97 + 12, and 12 = 8 edited + 4 unchanged. Remaining semantic differences
+are not approved merely by passing this bounded scan.
+
+Build evidence uses actual CMake definitions: CPU_40_STYLE/CCPU/C_VID and
+SOFTPC_STANDALONE on the original production groups; host_def.h defines
+LITTLEND; ica.c derives HOOKED_IRETS from the selected CPU_40_STYLE/non-NTVDM
+path. The selected C text in all eight files is unchanged after excluding
+comments/directives; all eight preserve CRLF. The other 101 input files match
+HEAD after Git checkout newline normalization. Necessary existing line-control
+anchors are retained; orphaned wrapper anchors in cpu_vid/gmi and the duplicate
+nt_graph anchor are removed. No XP conditional or original branch body is
+removed by this batch.
+
+
+Verification and delivery:
+
+- Cached x86/x64 package builds and complete test-target builds pass. The owned
+  hidden CMD runner has explicit exit 0. Its first completion marker was empty
+  because CMD parsed echo 0> as descriptor redirection; the marker was corrected
+  and the cached build rerun successfully. No build was killed or timed out.
+- Compare all 1,088 cached object identities before/after: 1,086 are byte-equal;
+  only the required two timestamp-bearing composition objects differ.
+- Both complete published EXEs are byte-equal after normalizing exactly the PE
+  TimeDateStamp, PE CheckSum and the single compiler __TIME__ string. No other
+  bytes differ. This is whole-artifact evidence, not only a text-section check.
+- Under the owner's explicit equivalence exception, do not rerun runtime suites
+  when artifacts have no substantive difference. No new full regression or
+  guest/desktop acceptance is claimed; the prior P30 392/392 remains historical.
+- CTest source-boundary, documentation, XP-manifest and inward-dependency gates
+  pass 4/4 on each architecture (8/8 total; x86 16.37s, x64 8.66s). Final direct
+  documentation/manifest and whitespace checks pass. No new permanent tests
+  are needed for deleting compile-time-only wrappers.
+
+Published softpc32.exe: 3,477,387 bytes, Nov 14 2026 22:07:21,
+SHA-256 2d791e16a3a412a6633fb74c48d919a385d98c11b5d6326c5a7c11c6f5a5dbf3.
+Published softpc64.exe: 3,095,066 bytes, Nov 14 2026 22:07:26,
+SHA-256 2ea34cce3f3bc4e39dce96b0b8ee69ad3161f3bce1fd80b9518d355d6c4d7a56.
+
+Actual-change coordinator review: only the eight listed mirror files, their
+manifest, current inventory/decisions/evidence/packet and the two EXEs change.
+No shared source/test, build tool, configuration, guest medium or snapshot changes.
+The same original runtime owners remain; no second implementation is introduced.
+Disposable probes, XP copies and logs are removed after promoting this evidence.

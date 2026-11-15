@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P30 nonsemantic cleanup of `24e0964a` (production P24).
+Current source: S4 P34 conditional-wrapper cleanup of `ccee5c80`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -14,13 +14,17 @@ counts in the [audit record](m9-t100-s4-audit.md#p25-accepted-p24-and-current-ag
 P30 removes five further zero-diff rows and applies verified per-file deltas;
 see [the cleanup audit](m9-t100-s4-audit.md#p30-nonsemantic-restoration-across-114-files).
 
+P34 removes cpu_vid.h and gmi.h after restoring their original unconditional
+declarations, and updates six other rows. Its conditional-wrapper audit is
+recorded in the [audit record](m9-t100-s4-audit.md#p34-redundant-non-xp-conditional-wrappers).
+
 ## Current screening result
 
 | Disposition | Files |
 | --- | ---: |
 | Identical after CRLF/LF normalization | 254 |
-| Only excluded-body and line-control scaffolding differences | 109 |
-| Real retained-content differences listed below | 109 |
+| Only excluded-body and line-control scaffolding differences | 111 |
+| Real retained-content differences listed below | 107 |
 | Total | 472 |
 
 ## Counting convention
@@ -112,11 +116,9 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 319 | `base/disks/diskbios.c` | 1 | +2 | -2 |
 | 320 | `base/disks/fdisk.c` | 2 | +120 | -0 |
 | 321 | `base/disks/fla.c` | 3 | +97 | -0 |
-| 335 | `base/inc/cpu_vid.h` | 2 | +3 | -0 |
 | 337 | `base/inc/dma.h` | 1 | +3 | -0 |
-| 339 | `base/inc/egacpu.h` | 1 | +8 | -1 |
+| 339 | `base/inc/egacpu.h` | 1 | +4 | -1 |
 | 342 | `base/inc/egaports.h` | 1 | +1 | -0 |
-| 358 | `base/inc/gmi.h` | 2 | +3 | -0 |
 | 359 | `base/inc/gvi.h` | 1 | +2 | -0 |
 | 367 | `base/inc/ica.h` | 3 | +3 | -1 |
 | 369 | `base/inc/ios.h` | 1 | +1 | -1 |
@@ -127,10 +129,10 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 394 | `base/inc/video.h` | 1 | +4 | -0 |
 | 398 | `base/keymouse/keyba.c` | 4 | +121 | -0 |
 | 400 | `base/keymouse/mouse.c` | 14 | +115 | -34 |
-| 401 | `base/keymouse/ppi.c` | 6 | +29 | -13 |
+| 401 | `base/keymouse/ppi.c` | 6 | +27 | -13 |
 | 404 | `base/system/at_dma.c` | 16 | +115 | -19 |
 | 405 | `base/system/cmos.c` | 4 | +122 | -4 |
-| 407 | `base/system/ica.c` | 5 | +118 | -7 |
+| 407 | `base/system/ica.c` | 5 | +109 | -7 |
 | 410 | `base/system/quick_ev.c` | 1 | +230 | -0 |
 | 411 | `base/system/rom.c` | 3 | +1 | -3 |
 | 412 | `base/system/timer.c` | 8 | +371 | -2 |
@@ -145,15 +147,15 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 428 | `base/video/vga_mode.c` | 3 | +3 | -3 |
 | 429 | `base/video/vga_prts.c` | 11 | +188 | -23 |
 | 431 | `base/video/video.c` | 14 | +14 | -13 |
-| 433 | `host/inc/cfpu_def.h` | 13 | +13 | -8 |
-| 436 | `host/inc/host_cpu.h` | 2 | +4 | -1 |
+| 433 | `host/inc/cfpu_def.h` | 13 | +10 | -8 |
+| 436 | `host/inc/host_cpu.h` | 2 | +1 | -1 |
 | 437 | `host/inc/host_def.h` | 2 | +0 | -2 |
 | 444 | `host/inc/insignia.h` | 3 | +10 | -1 |
 | 453 | `host/inc/nt_graph.h` | 1 | +2 | -1 |
 | 455 | `host/inc/nt_sb.h` | 4 | +52 | -2 |
 | 457 | `host/src/nt_cga.c` | 10 | +22 | -52 |
 | 458 | `host/src/nt_ega.c` | 9 | +33 | -12 |
-| 459 | `host/src/nt_graph.c` | 11 | +32 | -13 |
+| 459 | `host/src/nt_graph.c` | 10 | +30 | -13 |
 | 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
 | 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -376 |
@@ -163,4 +165,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **109 files** | **15721** | **+24699** | **-24033** |
+| **Total** | **107 files** | **15716** | **+24670** | **-24033** |
