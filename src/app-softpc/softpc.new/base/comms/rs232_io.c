@@ -11,7 +11,6 @@
  *
  */
 
-/* @(#)rs232_io.c	1.7 08/03/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

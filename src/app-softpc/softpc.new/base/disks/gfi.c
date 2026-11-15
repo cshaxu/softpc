@@ -26,7 +26,6 @@
  *                <Unix file> #endif".
  */
 
-/* @(#)gfi.c	1.16 08/03/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

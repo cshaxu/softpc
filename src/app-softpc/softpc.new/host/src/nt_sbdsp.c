@@ -144,7 +144,6 @@ static DWORD blockSize;
 static BYTE TableMungeData;
 static BOOL TableMungeFirstByte = TRUE; // munging first or second byte
 static void DspCompleteBlock(long unused);
-static void AutoInitEoiHook(int irq, int count);
 
 VOID
 ExitAutoMode(
@@ -184,6 +183,16 @@ lib_status DspServiceTransfer(void)
     return DspTransferStatus;
 }
 
+static void AutoInitEoiHook(int irq, int count)
+{
+    if (irq != SbInterrupt || count < 0 || DspMode != Auto ||
+        bDspPaused || bDspReset || DspTransferStatus != LIB_STATUS_OK ||
+        DspTransferSize != 0) return;
+    DspTransferStatus = DspPrepareOutput();
+    if (DspTransferStatus == LIB_STATUS_OK && DmaDataToDsp(Auto))
+        DspServiceTransfer();
+}
+
 IBOOL StartDspTransfer(DSP_MODE mode)
 {
     lib_status status;
@@ -209,16 +218,6 @@ IBOOL StartDspTransfer(DSP_MODE mode)
     DspMode = mode;
     if (DmaDataToDsp(mode)) return DspServiceTransfer() == LIB_STATUS_OK;
     return TRUE;
-}
-
-static void AutoInitEoiHook(int irq, int count)
-{
-    if (irq != SbInterrupt || count < 0 || DspMode != Auto ||
-        bDspPaused || bDspReset || DspTransferStatus != LIB_STATUS_OK ||
-        DspTransferSize != 0) return;
-    DspTransferStatus = DspPrepareOutput();
-    if (DspTransferStatus == LIB_STATUS_OK && DmaDataToDsp(Auto))
-        DspServiceTransfer();
 }
 
 lib_status DspCloseOutput(void)

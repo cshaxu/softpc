@@ -19,7 +19,6 @@
 *	NB: This file does not comply with all of Insignias standards.
 */
 
-/* @(#)diskbios.c	1.36 04/12/95 Copyright Insignia Solutions Inc. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

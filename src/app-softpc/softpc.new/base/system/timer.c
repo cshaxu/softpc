@@ -31,7 +31,6 @@
  *                host_getIdealTime().
  */
 
-/* @(#)timer.c       1.41 05/31/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

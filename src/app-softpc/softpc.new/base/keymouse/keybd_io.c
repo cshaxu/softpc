@@ -46,7 +46,6 @@
  *
  */
 
-/* @(#)keybd_io.c	1.35 06/27/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

@@ -43,7 +43,6 @@
  */
 
 
-/* @(#)keyba.c	1.57 06/22/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

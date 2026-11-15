@@ -14,7 +14,6 @@
  *
  */
 
-/* @(#)ppi.c	1.9 08/10/92 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

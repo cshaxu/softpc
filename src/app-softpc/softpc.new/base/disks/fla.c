@@ -43,7 +43,6 @@
  *
  */
 
-/* @(#)fla.c	1.18 07/06/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif
@@ -104,7 +103,6 @@ static void fdc_ndma_bufmgr_wt IPT1(half_word, value);
 static void fla_atomicxqt IPT0();
 static void fla_ndmaxqt IPT0();
 static void fla_ndma_bump_sectid IPT0();
-LOCAL void fla_int_call_back IPT1(long, junk);
 
 /*
  * The command and result blocks that are used to communicate to the GFI
@@ -221,25 +219,6 @@ LOCAL void fla_clear_int IFN0()
 
 	fdc_int_line = 0;
 	fdc_interrupt_pending = FALSE;
-}
-
-GLOBAL int
-softpc_device_snapshot_encode_fla_callback(callback, callback_id)
-Q_CALLBACK_FN callback;
-unsigned long *callback_id;
-{
-	if (callback != fla_int_call_back || callback_id == NULL)
-		return FALSE;
-	*callback_id = SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT;
-	return TRUE;
-}
-
-GLOBAL Q_CALLBACK_FN
-softpc_device_snapshot_decode_fla_callback(callback_id)
-unsigned long callback_id;
-{
-	return callback_id == SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT ?
-		fla_int_call_back : NULL;
 }
 
 GLOBAL void
@@ -1195,4 +1174,23 @@ void fla_init IFN0()
     fla_busy = FALSE;
 #endif // !NEC_98
 #line 1181
+}
+
+GLOBAL int
+softpc_device_snapshot_encode_fla_callback(callback, callback_id)
+Q_CALLBACK_FN callback;
+unsigned long *callback_id;
+{
+	if (callback != fla_int_call_back || callback_id == NULL)
+		return FALSE;
+	*callback_id = SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT;
+	return TRUE;
+}
+
+GLOBAL Q_CALLBACK_FN
+softpc_device_snapshot_decode_fla_callback(callback_id)
+unsigned long callback_id;
+{
+	return callback_id == SOFTPC_DEVICE_QUEUE_FDC_INTERRUPT ?
+		fla_int_call_back : NULL;
 }

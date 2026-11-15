@@ -27,7 +27,6 @@
  *                <Unix file> #endif".
  */
 
-/* @(#)mouse.c	1.17+ 07/10/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

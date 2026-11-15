@@ -129,7 +129,6 @@
  *
  */
 
-/* @(#)ica.c	1.38 10/19/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

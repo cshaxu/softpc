@@ -3706,3 +3706,36 @@ diff implements snapshot capability, not printer emulation replacement. Four
 function bodies need no new abstraction or second path. No new runtime test or
 source change for this documentation-only review. Frontier 19/121, 102 remain;
 next is order 269 comms/printer_.c. Candidate cleanup awaits this file's review.
+
+
+## S4 P24: approved mirror-wide same-issue cleanup
+
+Owner approves printer.c cleanup and requests the same added-diff classes be
+resolved across the mirror, with explicit point/line reduction accounting.
+Original mirror duplicates remain untouched. The finite 472-file sweep,
+candidate dispositions, before/after per-file counts and qualification are in
+[P24 evidence](m9-t100-s4-audit.md#p24-mirror-wide-added-diff-cleanup).
+
+The 18 remaining extracted notice points R0206, R0238, R0244, R0413, R0416,
+R0418, R0419, R0456, R0461, R0462, R0468, R0473, R0487, R0488, R0495, R0501,
+R0507 and R0560 are removed under the owner's explicit excluded-content rule.
+R0173 was already removed by P20. This supersedes the historical notice-retention
+recommendations above, without changing original unconditional notices or making
+any license/distribution claim. Existing excluded bodies receive no new entries.
+
+Three added-function placement groups are cleaned: two declarations in printer.c,
+one in fla.c, and one in nt_sbdsp.c. Original callback definitions, snapshot
+bodies, state ownership, failure checks and dependencies remain. Required cross-
+file declarations and the DspCompleteBlock scheduling cycle are retained with
+specific evidence, not characterized as redundant.
+
+Result: 21 cleanup points (18 notice points and three declaration groups),
+22 added lines removed. Counting declarations individually gives 22 removed
+line-level sites. Full textual hunk counts are not semantic point counts.
+Selected differences in the 19 changed files: +1712/-1072 -> +1690/-1072.
+Git source movement: +99/-121, net -22; tests unchanged. Seven files whose only
+selected difference was the removed notice now match XP outside exclusions:
+printer_.c, rs232_io.c, gfi.c, gfi_mpty.c, keybd_io.c, dummy_nt.c and host_hfx.h.
+Frozen inventory statistics are not rewritten. The ordered semantic frontier
+remains review 19; unrelated points in later files are not deemed reviewed or
+approved by this same-issue sweep.

@@ -42,7 +42,6 @@
  *		  host_simulate
  */
 
-/* @(#)time_day.c	1.27 4/20/94 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

@@ -24,7 +24,6 @@
  *	(r3.3)	: Implement the real code, inside compile switch.
  */
 
-/* @(#)printer_io.c	1.11 08/25/93 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

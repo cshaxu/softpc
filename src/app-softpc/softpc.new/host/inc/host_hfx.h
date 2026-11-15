@@ -12,7 +12,6 @@
  * Mods		:
  */
 
-/* @(#)host_hfx.h	1.7 2/13/91 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

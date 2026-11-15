@@ -56,7 +56,6 @@
  *	(yes, you guessed it, it was written by wtgc) of events.
  */
  
-/* @(#)quick_ev.c	1.43 07/04/95 Copyright Insignia Solutions Ltd. */
 #ifdef SCCSID
 #error "Unsupported SoftPC mirror configuration: SCCSID"
 #endif

@@ -669,3 +669,136 @@ records snapshot necessity, historical negative controls, limits and a three-lin
 reduction candidate (notice plus two added declarations). No production change,
 new runtime proof or general approval of unreviewed files. Documentation,
 manifest and whitespace gates pass; no disposable build work is created.
+
+
+## P24 mirror-wide added-diff cleanup
+
+Owner approves printer.c cleanup and extends the same-issue audit to the entire
+mirror. Scope is added local differences only: excluded SCCSID content extracted
+as unconditional comments and avoidable forward declarations created by placement
+of added functions. Original declarations/duplicates, existing exclusions and
+unrelated semantic differences are not cleanup targets. This is not approval of
+all unreviewed semantic points or advancement of their manual review frontier.
+
+### Finite sweep and dispositions
+
+The current manifest supplies all 472 paths; dispositions reconcile with the
+frozen directory-order ledger;
+468 are text, four binary resources are not C declaration/comment candidates.
+Compare every text file with fixed XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89.
+Collect added declaration/comment candidates from nonmatching text, inspect
+multiline declarations and original providers/callers; original unchanged
+statements are not candidates. Existing excluded bodies receive no ledger.
+All candidate classes below have a disposition; this is a bounded same-issue
+sweep, not a new full semantic audit of the remaining mirror differences.
+
+- Remove 18 added SCCSID comments. Each literal is verified against its original
+  SCCSID branch, and the local excluded branch already contains #error. No text
+  from that branch is retained outside it; original unconditional notices stay.
+- printer.c: move four added snapshot functions after original callback
+  definitions, inside the original PRINTER guard; remove two added declarations.
+- fla.c: move only the added callback encoder/decoder after the original callback
+  definition; remove one added declaration. Other snapshot functions stay put.
+- nt_sbdsp.c: move the added StartDspTransfer function after original
+  AutoInitEoiHook's current definition; remove one added declaration. Preserve
+  both function bodies and the existing public declaration in nt_sb.h.
+
+| Remaining candidate family | Disposition / evidence |
+| --- | --- |
+| c_main.c seven extern declarations; c_page.c two DEBUG declarations | Actual x86/x64 preprocessing shows exactly one declaration per name; external providers, not duplicate local forward declarations. Retain. |
+| ccpusas4.c host_sas_init/term; bios.h host_reset | Actual consumers have exactly one declaration at both widths; pointer-return ABI / reset interface, not redundant. Retain. |
+| vga_prts.c Currently_emulated_video_mode / ega_snapshot_seq_reset; nt_graph.c DAC_data_bits; nt_sb.c bExitDMAThread | Exactly one visible declaration each in actual dual-width production units; external state/providers. Retain. |
+| c_bsic.h, cpu4gen.h, egaports.h, quick_ev.h, sas.h, nt_graph.h, nt_sb.h | Public-to-mirror provider declarations or existing type/signature corrections, not local ordering duplicates. Retain; no second declarations introduced. |
+| ntstubs.c Gdp and three static functions | Existing separate symbol owner and approved linkage changes, not removable duplicates. Retain. |
+| at_dma.c backward-copy declarations/definitions | Existing declarations with corrected address types; original declarations are not removed. |
+| nt_graph.c local static prototypes | Original forward-declaration sites with linkage/type correction. Removing or moving original functions would change a different mirror-diff purpose. Retain. |
+| nt_sbdsp.c DspCompleteBlock | DspScheduleCompletion schedules this callback; callback calls DspScheduleCompletion. Ordering alone cannot remove the forward declaration without replacing it or changing the call graph. Retain. |
+| Other candidate static/global lines | Data definitions, actual function definitions, K&R parameter declarations, calls and macro expansions; not duplicate forward declarations. No cleanup. |
+
+No permanent regex gate is added: declaration necessity depends on supported
+preprocessing, scope and dependency cycles; a spelling-only gate would reject
+permitted original duplicates. Existing provenance/manifest gates remain.
+
+### Exact accounting
+
+Before-source SHA-256 for each changed file matches its frozen S4 file ledger.
+Current source changes only move existing added functions and remove the listed
+added lines; seven moved function bodies are byte-identical. All preprocessor
+lines, including #error/#line, remain byte-identical in sequence; mirror CRLF
+is preserved. No schema, ABI, guest/media/configuration or shared-package change.
+
+Semantic cleanup accounting: 18 complete notice points plus three declaration
+placement groups = 21 cleanup points. The declaration groups contain four
+individual declaration lines, so the removed added lines total 22. This is not
+a claim that Git's textual hunk count decreases by 21: moved blocks can split
+or merge textual matches.
+
+For these 19 files, selected fixed-XP differences decrease from +1712/-1072 to
++1690/-1072: 2784 -> 2762 changed lines, reduction 22. Deleted-XP-line count is
+unchanged. Original frozen ledgers remain immutable. The 16 comment-only edits
+are exact one-line deletions. Structural XP comparison independently verifies
+printer.c +74/-0 -> +71/-0 and fla.c +99/-0 -> +97/-0. nt_sbdsp.c moves one
+already-added function after its dependency and removes one added prototype;
+its selected difference decreases +524/-1000 -> +523/-1000. Existing unrelated
+local conditional structures are not rewritten merely to simplify the counter.
+
+| File | Before selected + / - | After selected + / - | Reduction |
+| --- | --- | --- | --- |
+| base/comms/printer.c | +74/-0 | +71/-0 | 3 |
+| base/comms/printer_.c | +1/-0 | +0/-0 | 1 |
+| base/comms/rs232_io.c | +1/-0 | +0/-0 | 1 |
+| base/disks/diskbios.c | +5/-4 | +4/-4 | 1 |
+| base/disks/fla.c | +99/-0 | +97/-0 | 2 |
+| base/disks/gfi.c | +1/-0 | +0/-0 | 1 |
+| base/disks/gfi_mpty.c | +1/-0 | +0/-0 | 1 |
+| base/keymouse/keyba.c | +126/-4 | +125/-4 | 1 |
+| base/keymouse/keybd_io.c | +1/-0 | +0/-0 | 1 |
+| base/keymouse/mouse.c | +116/-34 | +115/-34 | 1 |
+| base/keymouse/ppi.c | +30/-13 | +29/-13 | 1 |
+| base/support/time_day.c | +2/-1 | +1/-1 | 1 |
+| base/system/dummy_nt.c | +1/-0 | +0/-0 | 1 |
+| base/system/ica.c | +121/-9 | +120/-9 | 1 |
+| base/system/quick_ev.c | +231/-0 | +230/-0 | 1 |
+| base/system/timer.c | +376/-6 | +375/-6 | 1 |
+| base/system/unexp_nt.c | +1/-1 | +0/-1 | 1 |
+| host/inc/host_hfx.h | +1/-0 | +0/-0 | 1 |
+| host/src/nt_sbdsp.c | +524/-1000 | +523/-1000 | 1 |
+
+Git production diff (moves included): +99/-121, net -22, 19 files. No tests changed.
+Counts are separate from the selected XP baseline accounting above. Snapshot
+behavior is not reimplemented; original/private state remains in its owner.
+
+Final-source qualification is recorded below.
+
+
+### P24 qualification
+
+Cached x86/x64 configure/full test builds and dual EXE publication pass.
+Existing mirror warnings remain; no nonmirror warning or build error is found
+in the final build logs. Executable code placement changes, so no artifact-
+equivalence exemption is taken. A first 392/392 run covered the initial source;
+the extra nt_sbdsp declaration cleanup was discovered while that run was active.
+Its artifacts were not overwritten: the final runner waited for that run to
+exit, rebuilt both architectures, then started a fresh complete qualification.
+Only the latter result qualifies the final source. No tests were modified.
+
+- softpc32.exe: 3477387 bytes, Nov 14 2026 20:01:55; SHA-256
+  51ae2100d996fdd2c112c3ddaaba4787086d1dd5f66bfa45aa46ecaae1627f82.
+- softpc64.exe: 3095066 bytes, Nov 14 2026 20:02:09; SHA-256
+  0f0a34e9795f16b9fb95182aa3da37af8135fb8f5cda0c0e961dd47379caf886.
+
+
+Final-source full regression passes 392/392, no retries or skips:
+
+| Architecture | Background | Native desktop/audio/package | Elapsed seconds |
+| --- | --- | --- | --- |
+| x86 | 188/188 | 8/8 | 185.03 + 24.39 |
+| x64 | 188/188 | 8/8 | 203.54 + 24.06 |
+
+Existing checkpoint and Sound Blaster tests run on final code; this does not
+claim exhaustive serial/printer hardware or every audio timing combination.
+Actual-diff self-review confirms narrow scope, unchanged bodies/conditional
+sequence, original duplicate preservation and correct PRINTER scope. Fixed-XP
+manifest, documentation and whitespace gates pass. No blocking finding remains.
+Owned background jobs are complete; disposable scan/preprocess/build/test data
+is removed before delivery, leaving only reusable caches. S4/T100 stay open.
