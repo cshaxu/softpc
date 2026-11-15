@@ -61,8 +61,7 @@ extern void force_yoda(void);
 extern void TakeNpxExceptionInt(void);
 extern void softpc_platform_executor_event(void);
 extern IBOOL softpc_platform_has_pending_executor_event(void);
-extern IBOOL softpc_platform_consume_clock_tick(void);
-extern IBOOL softpc_platform_consume_executor_wake(void);
+extern void softpc_platform_dispatch_pending_events(void);
 extern IBOOL softpc_platform_consume_instruction_budget(void);
 extern void softpc_platform_wait_for_executor_event(void);
 extern int softpc_host_debug_begin(void);
@@ -3816,10 +3815,7 @@ RESUME_HALT:
 #endif	/* PROD */
 #line 4008
 
-         if (softpc_platform_consume_clock_tick())
-            host_timer_event();
-         if (softpc_platform_consume_executor_wake())
-            softpc_platform_executor_event();
+         softpc_platform_dispatch_pending_events();
          SYNCH_TICK();
          QUICK_EVENT_TICK();
          if (cpu_interrupt_map == 0 &&
@@ -4181,11 +4177,7 @@ TYPEFF_3:
       host_timer_event();
       }
 
-   if (softpc_platform_consume_clock_tick())
-      host_timer_event();
-
-   if (softpc_platform_consume_executor_wake())
-      softpc_platform_executor_event();
+   softpc_platform_dispatch_pending_events();
 
    if (cpu_interrupt_map & CPU_SAD_EXCEPTION_MASK)
       {
@@ -4261,11 +4253,7 @@ TYPEFF_3:
 
 NEXT_INST:
 
-   if (softpc_platform_consume_clock_tick())
-      host_timer_event();
-
-   if (softpc_platform_consume_executor_wake())
-      softpc_platform_executor_event();
+   softpc_platform_dispatch_pending_events();
 
    if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&
        softpc_platform_consume_instruction_budget())

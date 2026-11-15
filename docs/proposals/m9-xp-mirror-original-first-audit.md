@@ -489,3 +489,10 @@ file 80 review. Remove its mirror declaration/call and complete private Compat
 implementation/state; retain event timing, wait and budget mechanisms. This
 behavior-changing reduction uses cached dual build/publication and full
 background/native regression. Other pending retention decisions are unchanged.
+
+S4 P7 owner approves consolidating the three pending clock/wake consumption
+bodies into one Compat dispatch implementation, retaining their positions and
+order. Retain the interrupt-map accessor after original-interface/caller review.
+Remove obsolete consumption exports; use the existing fixture and full cached
+dual build/publication/regression. No broad retention approval or file-frontier
+advance follows from this narrowly approved implementation.

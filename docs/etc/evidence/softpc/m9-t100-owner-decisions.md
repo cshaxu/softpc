@@ -179,6 +179,37 @@ Artifact hashes and verification boundaries are in the S4 evidence. Removed
 R0074/R0102 are resolved by this explicit owner instruction; other points remain
 unapproved. No real guest desktop performance comparison is claimed.
 
+### S4 P7: owner-approved pending-event dispatch consolidation
+
+Owner approves retaining the interrupt-map accessor and consolidating pending
+event implementation in Compat. This is host/executor-boundary simplification,
+not an original guest-CPU bug repair or approval of all other file differences.
+
+Fixed XP c_cpu_interrupt only sets request bits; c_cpu_reset/c_cpu_init do not
+clear the map, and clear_any_thingies clears only its timer bit. The accessor
+serves unchanged original keyba reset-bit assignment and Machine cold-run
+clearing before/after hardware reset. Replacing the keyboard write with an
+original interrupt call would still need cold clearing and add a keyba diff.
+
+The three dispatch positions remain: HLT loop, ordinary pre-PIC boundary and
+NEXT_INST. Initial entry, STI, MOV/POP SS, IRET and debugger refetch can reach
+NEXT_INST without ordinary interrupt checks. The ordinary path still traverses
+both sites. One Compat function consumes one clock then one wake; no drain
+loop, queue, state, retry or lock is added. Original single-bit timer signaling
+cannot replace counted ticks or advance-free control wake. Both old consume
+exports and declarations are removed, with no compatibility aliases.
+
+Production relative to P6: c_main.c +4/-16, platform.c +10/-18, platform.h
++1/-0; total +15/-34, net -19. Tests +53/-2, net +51. Selected mirror diff
+falls from +133/-16 to +121/-16: twelve fewer XP diff lines, not nineteen.
+Frozen S4 tables stay unchanged; current manifest is updated. Excluded bodies
+and line-control directives are untouched.
+
+The existing platform fixture checks simultaneous pending kinds, one-tick
+consumption, clock-before-wake observation, remaining ticks, empty dispatch and
+real CCPU entry whose clock callback exits while wake remains pending. Existing
+idle and HLT failure checks remain. Final run evidence is in the S4 audit.
+
 ## S3 approval progress
 
 **Superseded by owner revocation:** all retention approvals and automatic

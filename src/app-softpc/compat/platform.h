@@ -40,6 +40,7 @@ void softpc_platform_floppy_detach(void);
 int softpc_platform_video_buffers_init(void);
 void softpc_platform_bind_reset_host_functions(void);
 void softpc_platform_executor_event(void);
+void softpc_platform_dispatch_pending_events(void);
 char *softpc_platform_floppy_config_value(void);
 int softpc_platform_presentation_is_graphics(void);
 int softpc_platform_presentation_state(lib_u32 *, lib_u32 *);

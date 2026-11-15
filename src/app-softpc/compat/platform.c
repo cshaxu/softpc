@@ -104,15 +104,6 @@ IBOOL softpc_platform_has_pending_executor_event(void)
 #endif
 }
 
-IBOOL softpc_platform_consume_clock_tick(void)
-{
-#ifdef _WIN32
-    return softpc_platform_take_pending(&softpc_clock_pending_ticks);
-#else
-    return FALSE;
-#endif
-}
-
 /* A frontend may request that an HLT loop return to its owning executor so
  * queued keyboard/mouse input can be applied.  This is deliberately separate
  * from the 20Hz device clock: waking must not advance the PIT, video, or
@@ -123,15 +114,6 @@ void softpc_platform_request_executor_wake(void)
     (void)InterlockedExchange(&softpc_executor_wake_pending, 1);
     if (softpc_executor_event != NULL)
         SetEvent(softpc_executor_event);
-#endif
-}
-
-IBOOL softpc_platform_consume_executor_wake(void)
-{
-#ifdef _WIN32
-    return softpc_platform_take_pending(&softpc_executor_wake_pending);
-#else
-    return FALSE;
 #endif
 }
 
@@ -579,6 +561,16 @@ void host_timer_event(void)
     time_strobe();
     PlayContinuousTone();
     softpc_platform_executor_event();
+}
+
+void softpc_platform_dispatch_pending_events(void)
+{
+#ifdef _WIN32
+    if (softpc_platform_take_pending(&softpc_clock_pending_ticks))
+        host_timer_event();
+    if (softpc_platform_take_pending(&softpc_executor_wake_pending))
+        softpc_platform_executor_event();
+#endif
 }
 
 void softpc_platform_executor_event(void)

@@ -114,6 +114,52 @@ static void verify_instruction_budget(void)
     assert(softpc_ccpu_instruction_budget == 0u);
 }
 
+static unsigned dispatch_calls;
+static int stop_on_dispatch;
+static void observe_dispatch(void *context)
+{
+    UNUSED(context);
+    ++dispatch_calls;
+    assert(softpc_clock_pending_ticks == 1);
+    assert(softpc_executor_wake_pending == (dispatch_calls == 1 ? 1 : 0));
+    if (stop_on_dispatch) softpc_ccpu_lifecycle_request_exit();
+}
+
+static void verify_pending_dispatch(softpc_machine *machine)
+{
+    assert(softpc_platform_set_clock_running(0));
+    fake_timer = 1;
+    assert(softpc_platform_set_clock_running(1));
+    softpc_platform_set_executor_callback(observe_dispatch, NULL);
+    InterlockedExchange(&softpc_clock_pending_ticks, 2);
+    softpc_platform_request_executor_wake();
+    dispatch_calls = 0;
+    softpc_platform_dispatch_pending_events();
+    assert(dispatch_calls == 2 && softpc_clock_pending_ticks == 1);
+    softpc_platform_set_executor_callback(NULL, NULL);
+    softpc_platform_dispatch_pending_events();
+    assert(!softpc_platform_has_pending_executor_event());
+    softpc_platform_dispatch_pending_events(); /* Empty is a no-op. */
+
+    /* Real CCPU entry: exiting from the clock callback must leave wake pending. */
+    softpc_platform_set_executor_callback(observe_dispatch, NULL);
+    InterlockedExchange(&softpc_clock_pending_ticks, 2);
+    softpc_platform_request_executor_wake();
+    dispatch_calls = 0;
+    stop_on_dispatch = 1;
+    assert(softpc_machine_run(machine, 0u) == SOFTPC_MACHINE_OK);
+    assert(dispatch_calls == 1 && softpc_executor_wake_pending == 1);
+    stop_on_dispatch = 0;
+    softpc_platform_set_executor_callback(NULL, NULL);
+    softpc_ccpu_lifecycle_clear_exit();
+    softpc_platform_dispatch_pending_events();
+    assert(!softpc_platform_has_pending_executor_event());
+    assert(softpc_platform_set_clock_running(0));
+    fake_timer = 0;
+    InterlockedExchange(&softpc_clock_pending_ticks, 0);
+    assert(softpc_platform_set_clock_running(1));
+}
+
 static void assert_sound_ports(void)
 {
     half_word value;
@@ -184,11 +230,13 @@ int main(void)
     softpc_platform_request_executor_wake();
     host_release_timeslice();
     assert(wait_calls == 1u);
-    assert(softpc_platform_consume_executor_wake());
+    softpc_platform_dispatch_pending_events();
+    assert(softpc_executor_wake_pending == 0);
     InterlockedExchange(&softpc_clock_pending_ticks, 1);
     host_release_timeslice();
     assert(wait_calls == 1u);
-    assert(softpc_platform_consume_clock_tick());
+    softpc_platform_dispatch_pending_events();
+    assert(softpc_clock_pending_ticks == 0);
     softpc_ccpu_instruction_budget_active = TRUE;
     host_release_timeslice();
     assert(wait_calls == 1u);
@@ -233,6 +281,9 @@ int main(void)
         InterlockedExchange(&softpc_clock_pending_ticks, 0);
         assert(softpc_platform_set_clock_running(1));
     }
+
+    verify_pending_dispatch(machine);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
 
     /* Execute the real CCPU HLT and its existing outer unwind, not a mock jump. */
     assert(softpc_machine_write_physical(machine, 0x500u, halt, sizeof(halt)) ==

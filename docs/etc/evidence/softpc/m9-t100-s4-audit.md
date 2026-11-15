@@ -190,3 +190,50 @@ application-speed acceptance. Source review and zero residual limiter symbols
 prove removal; no duplicate timing model or test-only production API is added.
 Documentation governance, XP manifest, whitespace and line-ending checks pass.
 Task-owned scratch is cleaned after promoting these results; caches remain.
+
+## P7 pending-event consolidation
+
+Owner approves the minimal plan after the interrupt-map/event-site investigation.
+[Decision and purpose](m9-t100-owner-decisions.md#s4-p7-owner-approved-pending-event-dispatch-consolidation)
+record the retained accessor and the three preserved execution positions.
+Baseline is P6 `4abcc2f4`. No shared component, guest, INI, medium or snapshot
+change. Production +15/-34 (net -19); test +53/-2 (net +51), by Git numstat.
+Fixed-XP normalized full-file Myers comparison changes +281/-541 to +269/-541;
+selected-content +133/-16 becomes +121/-16. Both reduce mirror diff by twelve
+lines. Frozen original S4 statistics are not rewritten.
+
+Cached x86/x64 complete builds and publication succeeded (32.13/38.13 seconds).
+Each full background run passed 187/188; the only failure was the new platform
+fixture calling machine_run with the clock intentionally stopped, which correctly
+fails readiness. A focused correction used the existing fake timer; temporary
+phase diagnostics proved the real CPU callback/outer exit completed, then the
+following legacy HLT fault injection timed out after inherited device activity.
+Resetting the machine between these independent test scenarios fixes isolation.
+No product behavior, timeout or skip was changed to obtain a pass. Diagnostics
+were removed. Final focused rebuild/runs pass x86 0.27 seconds, x64 1.96 seconds.
+The remaining 187 cases per architecture already passed against unchanged final
+production code; they were not needlessly rerun after test-only setup fixes.
+Both native sets pass 8/8 (24.87 seconds x86, 24.72 seconds x64). Final result coverage is 392/392, not first-run green.
+
+The fixture directly observes clock-before-wake, one-tick consumption from a
+pending count of two, remaining tick delivery, empty dispatch, and real CCPU
+outer exit leaving wake pending. Existing HLT failure, checkpoint, IRQ, restart,
+PC input and package tests also ran. No new manual DOS/Win3.1/Win95 session or
+exhaustive interleaving proof is claimed.
+
+| Artifact | Bytes | Compiler date/time | SHA-256 |
+| --- | ---: | --- | --- |
+| softpc32.exe | 3477700 | Nov 14 2026 16:19:10 | `1c0a1f8187d9ccb07f3129aab7a75129369c8d915fe92d819e98104588e4d989` |
+| softpc64.exe | 3095154 | Nov 14 2026 16:23:24 | `a56a4bf5226fe2aee4c7bd0dbddbfb4ddaf73e3fea0dc7f28e921e4120d268ed` |
+
+Self-review of actual diff: only the duplicate pending-consumption bodies and
+exports move into the one Compat dispatcher. No original instructions or event
+checks reorder; counted ticks remain executor-owned and control wake stays
+separate from device time. All obsolete consumption symbols have zero src/test
+hits. Original timer-bit consumers remain intentionally distinct. Header and
+mirror declaration signatures match. No new ownership, lock, poll or fallback.
+Build diagnostics outside the preserved mirror are absent on both architectures;
+original mirror warnings remain exempt. Changed mirror source is CRLF; all
+other changed text is LF. Manifest, documentation and whitespace gates pass.
+Temporary run material is removed after promoting these results; persistent
+Ninja and ccache trees remain. P7 waits for owner acceptance, not S4 closure.
