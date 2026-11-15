@@ -4486,3 +4486,58 @@ changes remain subject to their separate ordered review.
 Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
 apply. Next actionable file is order 383 base/inc/sndblst.h; sasp.h has no
 current real diff. S4/T100 remain open.
+
+
+## S4 P43: owner approves memory type; sndblst.h review
+
+Owner explicitly approves retaining R0444; P42's pending decision is resolved.
+Fresh full pinned XP comparison of order 383 base/inc/sndblst.h finds exactly
+two real differences, two blocks +2/-1, with no excluded body in this header.
+R0446/R0447/R0450's original constants, declaration aliases/signature and
+omitted text were already restored by S1 P95; no remaining formatting-only
+difference was found. Their historical restoration is not a new approval of
+later implementation files.
+
+R0448, line 42, +1/-1: SbTerminate return VOID becomes IBOOL. Category: host
+resource lifecycle/error propagation. Current nt_sb.c:219-257 stops DSP work,
+disconnects ports and attempts both PCM and MIDI close, then returns whether
+both statuses are OK. Production callers machine/machine.c:140 and 503 stop
+reset/destroy on failure; compat/platform.c:646 marks reset failure and requests
+executor exit during BIOS reboot. No application callback, new recovery path
+or second teardown operation is introduced by this declaration change.
+
+The platform_failure fixture injects a failed termination at the platform
+boundary, verifies machine run reports I/O error, and verifies subsequent reset
+does not call sound initialization. This proves caller failure handling, not
+an induced native audio device-close failure. Device tests also exercise real
+successful/repeated SbTerminate calls. Historical P95 ran these fixtures in
+both complete architecture suites, 392/392 total. This P rechecks source and
+records, not fresh runtime evidence. Restoring VOID alone mismatches the
+provider; coherently discarding its status removes an actually consumed error
+contract. A separate error query would add state/API instead of simplifying.
+Recommend retain R0448; do not claim every native teardown failure is covered.
+
+R0449, line 121, +1/-0: define
+MIDI_READ_TIMESTAMP_POLL_WRITE_POLL_UART as 0x36 alongside original 34/35/37.
+Category: DSP command framing for an unsupported MIDI UART mode, not new MIDI
+sound support or snapshot functionality. Actual nt_sbdsp.c:1091 uses it with
+the other UART commands to enter UnsupportedMidiUart; that state's data-write
+case at 920 consumes bytes without treating them as new DSP commands. Reset
+returns the existing parser to normal command processing. Removing just the
+symbol breaks its switch case; removing the handling as well reintroduces
+interpretation of following data bytes as commands.
+
+Current verify_sb_midi_framing at device_contract_smoke.c:956 explicitly includes
+0x36. It writes all 256 subsequent byte values through actual ports, verifies
+parser retention, unchanged PCM/DMA/device state, no PCM/MIDI output or IRQ,
+and reset plus capture/restore behavior. Historical P95's full dual suites
+passed this coverage. It is current-behavior proof plus a source-path argument,
+not a newly executed original-negative counterprobe or a new guest reproduction.
+No source evidence makes the missing constant redundant. Inlining literal
+0x36 only moves the difference and abandons the original named-command style.
+Recommend retain R0449 with the existing framing implementation, pending owner
+approval. That implementation still has its separate later-file audit.
+
+Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
+apply. Next actionable file is order 386 base/inc/tape_io.h; intervening
+headers have no current real diff. S4/T100 remain open.

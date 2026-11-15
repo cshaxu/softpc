@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P43 records owner approval of sas.h R0444 and reviews order 383 sndblst.h:
+two blocks +2/-1. R0448 exposes real teardown failure; R0449 declares the
+0x36 unsupported-UART framing command. Actual callers and historical failure/
+framing fixtures support retention; neither is newly dynamically replayed.
+No further safe restoration identified; both points await owner approval.
+Production/tests/EXEs unchanged. Next is order 386 tape_io.h; S4/T100 open.
+
 S4 P42 records owner approval of quick_ev.h R0442 and reviews order 381 sas.h:
 R0444, one block +1/-1, matches Length_of_M_area's declaration to the original
 PHY_ADDR storage. Fresh pinned-XP definitions and historical dual compiler
