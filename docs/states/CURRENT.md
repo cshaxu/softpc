@@ -44,6 +44,11 @@ is unchanged.
 
 ## Current Technical Baseline
 
+S4 P81 records owner approval of R0558/R0559. Six intervening host headers
+have no retained differences. insignia.h has R0563/R0564, three blocks,+10/-1:
+native IHPE and source-scoped C-VID IUH. Recommend retain pending owner review;
+no source/artifact change or fresh runtime claim. See [P81 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p81-approved-host-profiles-and-pointer-carrier-review).
+
 S4 P80 records owner approval of R0556 and reviews host_def.h: two blocks,
 +0/-2, omitting NTVDM and CPU_30_STYLE definitions. R0558/R0559 are recommended
 for retention as selected product-profile adaptations, pending owner approval.

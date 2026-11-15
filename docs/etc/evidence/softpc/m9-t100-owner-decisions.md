@@ -6817,3 +6817,49 @@ Documentation/whitespace gates apply. Own hidden scratch build/t100-s4-p80
 has two-hour/fifteen-minute no-progress budgets and is retired after gates.
 Next literal file is host/inc/host_gen.h; zero-diff files will be rechecked
 and skipped before the next real-diff review. S4/T100 remain open.
+
+## S4 P81: approved host profiles and pointer-carrier review
+
+Owner approves R0558/R0559. At a5af2b4a fresh complete comparisons of order438-443
+host_gen.h,host_gfx.h,host_hfx.h,host_inc.h,host_qev.h,host_rrr.h find no retained
+difference after ignoring existing #error bodies and necessary #line. Historical
+R0560 notice was removed in the later owner-approved sweep; R0561/R0562 are
+completed restorations. No notice or excluded body is reopened for approval.
+
+Next true-diff file is order444 host/inc/insignia.h. Direct complete XP diff
+review shows only R0563/R0564 beyond exclusions: three zero-context blocks,
++10/-1, two semantic points. The added CVIDC_RULE_WORD conditional shifts later
+conditional ordinal paths; raw whole-file review confirms apparent downstream
+ordinal mismatches are not additional changes. R0565 blank restoration is done.
+
+| Point | Current location | Added/removed | Purpose |
+| --- | --- | --- | --- |
+| R0563 | 73-75 | +3/-1 | IHPE uses UINT_PTR, matching original same-size-as-IHP intent. |
+| R0564 | 77-84 | +7/-0 | Pointer-width IUH only in selected C-VID rule translation units. |
+
+R0563 actual consumer sevid000.c initializes j_S_2087_RdMode0Chain2ByteRead
+from a function address cast to IHPE; many other generated entries follow it.
+Original unsigned int is32 bits on both supported hosts, insufficient for x64
+pointers. Historical P141 original-IHPE restoration fails real x64 sevid000
+compilation (nonconstant truncated pointer initializer); x86 compiles.
+
+R0564 leaves ordinary CCPU IUH as unsigned int. Root CMake lines136-144 enables
+CVIDC_RULE_WORD only when pointer size is8, for sinit/sevid,j_c_lang,ev_glue,
+vglfunc. Actual rule registers/locals/returns carry native private pointers.
+No guest-wide widening or second rules engine exists. Historical P141 actual-
+flag probes test current, each restored type and both restored together on
+x86/x64. x86 four-byte carriers roundtrip pointers; x64 current8/8 roundtrips,
+original IHPE and/or IUH truncate their respective real heap-pointer carriers.
+IUH-only restoration can compile yet loses the pointer: compile success alone
+is insufficient. IHPE-only/both also fail actual consumer compilation.
+
+Recommend retain both host-ABI adaptations, not original32-bit XP bug claims.
+Moving these types to consumers would multiply casts/declarations rather than
+restore a functioning original path. No safe restoration candidate found.
+Technical comments contain no governance identifiers. P141 results are historical;
+this P provides fresh source/build-scope/diff review, no new runtime or exhaustive
+video/guest/snapshot claim. No code, tests or artifacts change. Documentation
+and whitespace gates qualify the records. Own hidden scratch build/t100-s4-p81
+has two-hour/fifteen-minute no-progress budgets and is retired after gates.
+Next literal file is host/inc/ntcheese.h; zero-diff successors will be checked
+before presenting the next true-diff file. S4/T100 remain open.
