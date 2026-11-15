@@ -569,6 +569,16 @@ GLOBAL	PHY_ADDR	SasWrapMask = 0xfffff;
    else								\
       SET_EIP(GET_EIP() + DIFF_INST_BYTE(x, p_start));
 
+/* Conditional targets retain full arithmetic; untaken paths use sequential IP. */
+#define EXECUTE_CONDITIONAL_JUMP(handler, offset)                       \
+   { IU32 nextEIP = GET_EIP() + DIFF_INST_BYTE(p, p_start);              \
+     SET_EIP(nextEIP);                                                \
+     (handler)(offset);                                               \
+     if (!took_relative_jump && CCPU_save_EIP < 0x10000 &&              \
+         GET_CS_AR_X() == USE16)                                      \
+         SET_EIP(nextEIP & WORD_MASK);                                \
+   }
+
 /* mark host format IP as inoperative */
 #define CANCEL_HOST_IP()					\
    quick_mode = FALSE;	\
@@ -1307,8 +1317,7 @@ TYPE0F80:
 	    {
 	    D_Jd(0);
 	    }
-	 UPDATE_INTEL_IP_USE_OP_SIZE(p);
-	 (*inst32)(ops[0].sng);
+	 EXECUTE_CONDITIONAL_JUMP(inst32, ops[0].sng);
 	 CANCEL_HOST_IP();
 #ifdef SYNCH_BOTH_WAYS
 	 took_relative_jump = TRUE;
@@ -2228,12 +2237,11 @@ TYPE40:
 TYPE70:
 
       D_Jb(0);
-      UPDATE_INTEL_IP_USE_OP_SIZE(p);
 #ifdef PIG
 #error "Unsupported SoftPC mirror configuration: PIG"
 #endif	/* PIG */
 #line 2362
-      (*inst32)(ops[0].sng);
+      EXECUTE_CONDITIONAL_JUMP(inst32, ops[0].sng);
       CANCEL_HOST_IP();
 
 #ifdef PIG
@@ -3513,15 +3521,8 @@ TYPED4:
 TYPEE0:
 
       D_Jb(0);
-      UPDATE_INTEL_IP_USE_OP_SIZE(p);
-      if ( GET_ADDRESS_SIZE() == USE16 )
-	 {
-	 (*inst32)(ops[0].sng);
-	 }
-      else   /* USE32 */
-	 {
-	 (*inst232)(ops[0].sng);
-	 }
+      EXECUTE_CONDITIONAL_JUMP(
+         GET_ADDRESS_SIZE() == USE16 ? inst32 : inst232, ops[0].sng);
       CANCEL_HOST_IP();
 
 #ifdef PIG

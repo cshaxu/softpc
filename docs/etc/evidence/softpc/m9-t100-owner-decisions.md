@@ -5544,6 +5544,103 @@ rules confirm each firmware resource object, including all self-contained
 machine/integration tests, explicitly depends on all three ROMs. No ROM bytes,
 guest media, INI, CPU semantics or timer behavior are changed.
 
+### Owner-approved Win95 EIP investigation follow-up (2026-11-15)
+
+The owner approved startup tracing after earlier source-only repair proposals
+proved insufficient. At checkout 225b0b3a, an isolated diagnostic executable
+linked the existing x64 machine/CPU/firmware objects and wrapped the existing
+instruction begin/retired observers. The guest disk used the existing overlay
+mode. No production source, original media, package INI or published EXE changed.
+This is engine-level evidence, not a run of the separately published launcher.
+
+The baseline observed an operand-size-prefixed JECXZ in a 32-bit code segment
+clearing the high half of its fall-through EIP despite a nonzero ECX. Exception
+handling followed, then a second entry through the BIOS reset vector. A paired
+diagnostic restored only that observed instruction's sequential address after
+retirement. Its captured ECX was seven and CS default size was 32 bits. The
+paired run passed the failing initialization point without a second BIOS reset.
+This establishes the premature truncation as a cause of the observed restart;
+it does not establish guest driver ownership of the faulting instruction or
+constitute graphical desktop acceptance or a delivered production repair.
+
+Source chain: c_main.c TYPEE0 calls UPDATE_INTEL_IP_USE_OP_SIZE before selecting
+JCXZ/JECXZ; jcxz.c JECXZ calls update_relative_ip only when ECX is zero. P8
+b581df93 changed masking of instruction length into masking of the entire next
+address, exposing this fall-through defect. Operand-size destination truncation
+belongs to the taken path. A general repair must preserve the full relative
+target calculation and handle the untaken sequential address separately;
+aliasing all control-transfer updates to UPDATE_INTEL_IP is not established as
+correct. Existing checkpoint branch-width expectations require independent
+review because taken and untaken cases currently share the same oracle.
+
+Raw guest instruction records and diagnostic binaries are disposable build
+material, not committed fixtures. Production implementation and dual-width
+qualification remain separate work; no T100/S4 closure is claimed here.
+
+### S4 P69: owner-approved conditional EIP repair qualification
+
+Owner request: "批准修复 老规矩五件套", followed by "反对 要求必须采用主工作树".
+Implementation uses the main worktree and its existing Ninja/ccache trees.
+The concurrent comment-only audit delivery 959eb858 is preserved. This repair
+owns only c_main.c, checkpoint_smoke.c, its manifest row, current/evidence
+records and the two rebuilt package executables. Disposable work belongs to
+build/t100-s4-eip-fix. No guest media, INI, public component or snapshot change.
+
+The new conditional-transfer macro supplies the complete next EIP to the
+existing handler; a taken handler retains its original operand-size target
+mask. An untaken handler retains the full next EIP except for the original
+16-bit-CS sequential-wrap condition. That condition reads the existing
+CCPU_save_EIP instruction-start value, because decoding across a page may have
+already advanced GET_EIP. No additional persistent state is introduced.
+TYPE0F80, TYPE70 and TYPEE0 are the only three consumers. The six remaining
+UPDATE_INTEL_IP_USE_OP_SIZE uses serve far CALL, near RET, relative CALL/JMP
+and indirect CALL; their behavior is unchanged. JCXZ/JECXZ and all LOOP forms
+share TYPEE0, so the observed restart gets no guest- or address-specific fix.
+
+The existing checkpoint fixture now independently computes taken destinations
+and untaken fall-through addresses across 576 combinations: code, operand and
+address widths; short/near JNZ, JCXZ/JECXZ and three LOOP forms; taken/untaken;
+ordinary, 64-KiB boundary and high-EIP starts; positive/negative displacement.
+It also checks LOOP counter width. Focused runs passed on x64 (8.33 seconds)
+and x86 (8.87 seconds). An earlier test selector matched no tests and was
+corrected with --no-tests=error; it is not counted as verification. The initial
+candidate then failed a 16-bit near-Jcc cross-page fall-through assertion;
+using the saved instruction-start EIP corrected that defect before these passes.
+
+Production diff: +14/-13, net +1; test diff: +49/-27, net +22. Relative to
+the fixed XP source, the repair adds the same 27 changed lines at four semantic
+points (one macro and three shared entries), represented by five zero-context
+text hunks because TYPE70's original conditional scaffolding separates two
+edits. No other mirror file is changed by this repair.
+
+The repaired x64 engine was linked into a temporary observation-only startup
+fixture using the existing machine/firmware objects and overlay media. Over
+60 seconds it executed the previously failing JECXZ eight times with nonzero
+ECX and the correct full-width fall-through address, observed only the initial
+BIOS reset vector and exited zero. No diagnostic register correction was used.
+This proves the observed restart is repaired, not a visual desktop acceptance.
+The x64 background suite passed188/188 and native suite8/8. The first x86 full
+build could not overwrite the owner's running published executable; after the
+owner explicitly approved closing that identified instance, publication resumed.
+The x86 background suite then passed188/188 and native suite8/8. Combined full
+qualification is392/392, with no failed test reruns in the final full runs.
+The publication interruption above was a locked-output linker failure, not a
+test failure. Build timestamp/resource gates, mirror hashes, documentation and
+whitespace checks pass. The main worktree retains no unrelated source edits.
+
+Final SHA-256 identities:
+
+- softpc32.exe: b82758da5113dbfb3d550a6539c3fe1a7cfbb9619a4a250c15c69e1076045149.
+- softpc64.exe: 0af7c8a8f6ef28980020605eb7b347fc7f0e32363e1465628201b418eeb1db98.
+
+The owner-designated investigation launcher was updated with the same x64
+bytes; no adjacent configuration or guest media was changed. Actual-diff
+self-review confirms one existing CPU state owner, all three conditional
+decoder consumers, preserved unconditional transfer paths and no public ABI
+change. Investigation probes and full-run logs are retired after promoting
+these results; only the standard caches remain reusable. P69 delivers this
+repair and does not close the wider S4 mirror audit or T100.
+
 ## S4 P57: CMOS file review
 
 Owner advances from delivered P55 to the next file. Preserve the intervening

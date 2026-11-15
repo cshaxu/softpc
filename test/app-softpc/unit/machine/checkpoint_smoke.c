@@ -1072,34 +1072,56 @@ static void verify_event_queue_archive(void)
 
 static void verify_branch_ip_width(void)
 {
-    static const unsigned char branch16[] = {0x75, 0x00};
-    static const unsigned char branch32[] = {0x66, 0x75, 0x00};
-    static const struct {
-        unsigned long start, next16, next32;
-    } cases[] = {
-        {0xffeu, 0x1000u, 0x1001u}, {0xfffu, 0x1001u, 0x1002u},
-        {0xfffcu, 0xfffeu, 0xffffu}, {0xfffdu, 0xffffu, 0x10000u},
-        {0xfffeu, 0u, 0x10001u}, {0xffffu, 1u, 0x10002u}
-    };
-    unsigned wide, taken;
-    lib_size index;
-
-    for (wide = 0; wide < 2; ++wide) {
-        const unsigned char *code = wide ? branch32 : branch16;
-        lib_size length = wide ? sizeof(branch32) : sizeof(branch16);
-        for (index = 0; index < sizeof(cases) / sizeof(cases[0]); ++index) {
-            for (taken = 0; taken < 2; ++taken) {
-                assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
-                assert(softpc_machine_write_physical(probe.machine,
-                    cases[index].start, code, length) == SOFTPC_MACHINE_OK);
-                assert(c_setCS(0u) == 0);
-                c_setEIP(cases[index].start);
-                c_setEFLAGS(taken ? 2u : 0x42u);
-                /* Production DEBUG trace observes one completed JNZ instruction. */
-                assert(softpc_test_execute(probe.machine, X86_DEBUG_EXECUTION_TRACE, 1u) == SOFTPC_MACHINE_OK);
-                assert(c_getEIP() == (wide ? cases[index].next32 : cases[index].next16));
-            }
+    /* Independent target/fall-through oracles, including the Win95 trigger:
+       a 32-bit CS, 66 JECXZ and nonzero ECX must retain the high EIP bits. */
+    unsigned cs32, op32, addr32, kind, taken, location, backwards;
+    for (cs32 = 0; cs32 < 2; ++cs32)
+    for (op32 = 0; op32 < 2; ++op32)
+    for (addr32 = 0; addr32 < 2; ++addr32)
+    for (kind = 0; kind < 6; ++kind)
+    for (taken = 0; taken < 2; ++taken)
+    for (location = 0; location < 3; ++location)
+    for (backwards = 0; backwards < 2; ++backwards) {
+        unsigned char code[8] = {0};
+        unsigned length = 0, i;
+        unsigned long start = location == 0 ? 0x2340u :
+            location == 1 ? 0xfffcu : cs32 ? 0x12340u : 0xfffeu;
+        unsigned long displacement = backwards ? (unsigned long)-7 : 7u;
+        unsigned long count, expected, flags = 2u;
+        if (op32 != cs32) code[length++] = 0x66;
+        if (addr32 != cs32) code[length++] = 0x67;
+        if (kind == 1) {
+            code[length++] = 0x0f; code[length++] = 0x85;
+            for (i = 0; i < (op32 ? 4u : 2u); ++i)
+                code[length++] = (unsigned char)(displacement >> (8u * i));
+        } else {
+            static const unsigned char opcode[] = {0x75, 0, 0xe3, 0xe2, 0xe1, 0xe0};
+            code[length++] = opcode[kind];
+            code[length++] = (unsigned char)displacement;
         }
+        if (kind < 2) flags |= taken ? 0u : 0x40u;
+        if (kind == 4) flags |= 0x40u;
+        count = kind == 2 ? (taken ? 0u : 7u) : (taken ? 2u : 1u);
+        if (!addr32) count |= 0x12340000u;
+        expected = start + length;
+        if (taken) {
+            expected += displacement;
+            if (!op32) expected &= 0xffffu;
+        } else if (!cs32) expected &= 0xffffu;
+        assert(softpc_machine_reset(probe.machine) == SOFTPC_MACHINE_OK);
+        assert(softpc_machine_write_physical(probe.machine,
+            start, code, length) == SOFTPC_MACHINE_OK);
+        c_setCS_SELECTOR(8);
+        c_setCS_BASE_LIMIT_AR(0, 0xffffffffu, cs32 ? 0x409b : 0x009b);
+        c_setCPL(0); c_setCR0(1);
+        c_setEIP(start); c_setECX(count); c_setEFLAGS(flags);
+        assert(softpc_test_execute(probe.machine, X86_DEBUG_EXECUTION_TRACE, 1u) == SOFTPC_MACHINE_OK);
+        if (c_getEIP() != expected)
+            fprintf(stderr, "branch CS%u OP%u ADDR%u kind%u taken%u start%lx back%u: %lx != %lx\n",
+                cs32, op32, addr32, kind, taken, start, backwards, c_getEIP(), expected);
+        assert(c_getEIP() == expected);
+        if (kind >= 3) assert(c_getECX() == (addr32 ? count - 1u :
+            (count & 0xffff0000u) | ((count - 1u) & 0xffffu)));
     }
 }
 
