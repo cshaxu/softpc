@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P18 records owner approval of zfrsrvd.c R0172 and presents comms/com.c
+(review 18 / order 267): +126/-3, UART snapshot bridge, three pointer-width
+corrections and historical notice. Current source/caller/test review separates
+historical per-cast x64 failures and queued-callback proof from untested UART
+combinations. No production/runtime changes. Recommend retention, pending owner.
+18/121 presented, 103 remain; printer.c is next.
+
 S4 P17 records owner approval of ntthread.c R0160-R0162 (P9 items already
 approved) and presents zfrsrvd.c, review 17 / order 265: R0172 +17/-0 private
 saved-NPX-IP snapshot accessors. Fresh source/caller/test inspection corroborates

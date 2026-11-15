@@ -320,8 +320,52 @@ confirms saved IP 0x11223344, current FIP 0x55667788 at capture, later exception
 0x99aabbcc, then real delivery after restore recovering 0x11223344. This round
 does not rerun tests. This proves the saved-IP restoration capability, not all
 x87 fault opcodes or that every helper spelling/placement is uniquely minimal.
-Recommend retaining R0172, pending owner. No production/test/binary changes.
+Owner approves retention of R0172. No production/test/binary changes.
 Frontier 17/121; 104 remain. Next: order 267, comms/com.c.
+
+### Review 18 / order 267: comms/com.c
+
+Fresh fixed-XP comparison confirms +126/-3 (129 changed lines), six selected
+text hunks. Five functional IDs plus one historical notice ID remain; excluded
+bodies/anchors receive no entries. Earlier restored formatting/prototype points
+remain restored. Current production CMake explicitly selects this controller.
+
+| Point | Size | Purpose / basis |
+| --- | --- | --- |
+| R0173 | +1/-0 | Historical Insignia notice preserved outside the excluded SCCSID body; source notice policy, not new ownership or a functional fix. |
+| R0174 | +1/-0 | compat/devices/snapshot.h declares the schema/constants for the private-state bridge. |
+| R0178 | +121/-0 | Snapshot controller/callback bridge: declarations/separators 5, encode 15, decode 8, capture 44, restore 49 lines. Details below. |
+| R0181 | +1/-1 | com_flush_input passes input_ready address as intptr_t rather than Windows long. |
+| R0186 | +1/-1 | com_inb data-ready/non-loopback follow-up passes input_ready address at native pointer width. |
+| R0199 | +1/-1 | modem_change passes modem_status address at native pointer width. |
+
+The 121-line block retains original UART ownership: snapshot copies existing
+private registers, interrupt causes, control/handshake flags, baud index,
+critical counters, flush mask and transmit pacing. Restore validates critical
+count and baud-index bounds, then copies back without replaying I/O. Original
+port reads consume RX/status state and writes can cause output/scheduling;
+register replay is not equivalent. Callback encoding maps existing recv_char
+and do_wait_on_send function identities to stable archive IDs, and decoding
+returns those original functions, not new device callbacks or serialized host
+addresses. Actual compat/devices/archive.c consumes all four entries.
+
+Fresh reads confirm host_com_ioctl takes lib_iptr and dereferences its output
+argument as int*. Windows x64 long truncates addresses. Historical S1 P22
+independently reverted each of the three casts and obtained x64 access violations;
+x86 original/current controls passed. R0186 required restored host RX 51h/52h,
+real com_recv_char and inb; its earlier non-covering passing test is not evidence.
+Current checkpoint fixture still mutates/restores controller/host states and
+asserts returned data and equality. No live physical serial input is claimed.
+
+Historical coherent omission of serial callback encode/decode rejected actual
+capture with a queued receive event on both architectures. This supports queue
+identity persistence; it does not independently prove every captured field or
+send callback. Snapshot restore tests, source side-effect analysis and real
+callers support the controller copy. Not all UART settings, malformed states,
+physical endpoints or manual guests were verified. No new runtime run this
+round. Recommend retaining the five functional points; preserve notice under
+policy. No new safe restoration identified, source/test/binaries unchanged.
+Frontier 18/121; 103 remain. Next: order 268, comms/printer.c.
 
 ### S4 P5: c_main.c necessity counter-review
 

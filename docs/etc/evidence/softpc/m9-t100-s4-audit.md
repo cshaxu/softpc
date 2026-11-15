@@ -578,3 +578,15 @@ functions, actual archive consumers and checkpoint assertions were inspected.
 Historical coherent-removal failures on both architectures support retention;
 no fresh runtime tests or code changes are claimed. Counts and limits reside
 in the decision ledger. 17/121 presented, next comms/com.c, 104 remain.
+
+## P18 com.c ordered review
+
+Owner approves zfrsrvd.c R0172. Review 18 / order 267 freshly compares com.c
+with fixed XP, excluding excluded bodies/anchors: +126/-3, six text hunks,
+five functional IDs and historical notice. Production CMake, ioctl consumer,
+archive callback/state consumers and current checkpoint fixture were checked.
+All three pointer conversions have historical independent x64 failures;
+queued receive callback removal has historical dual capture failures. No live
+serial or comprehensive field coverage is claimed, and no fresh runtime test.
+Point sizes, snapshot sub-block sizes and limits reside in the decision ledger.
+No code changes; 18/121 presented, printer.c next.
