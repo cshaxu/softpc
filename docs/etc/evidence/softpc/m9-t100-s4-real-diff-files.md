@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P60 owner-approved queue measurement cleanup from `cefa3fae`.
+Current source: S4 P62 owner-approved ROM scope restoration from `76717b54`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -133,7 +133,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 405 | `base/system/cmos.c` | 4 | +122 | -4 |
 | 407 | `base/system/ica.c` | 7 | +119 | -13 |
 | 410 | `base/system/quick_ev.c` | 1 | +226 | -0 |
-| 411 | `base/system/rom.c` | 3 | +1 | -3 |
+| 411 | `base/system/rom.c` | 1 | +1 | -1 |
 | 412 | `base/system/timer.c` | 8 | +371 | -2 |
 | 414 | `base/system/unexp_nt.c` | 1 | +0 | -1 |
 | 416 | `base/video/egawrtm0.c` | 4 | +4 | -4 |
@@ -164,4 +164,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15708** | **+24610** | **-24016** |
+| **Total** | **106 files** | **15706** | **+24610** | **-24014** |

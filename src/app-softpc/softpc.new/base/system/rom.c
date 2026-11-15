@@ -604,6 +604,7 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 #ifdef ARCX86
 #error "Unsupported SoftPC mirror configuration: ARCX86"
 #endif
+  {
 #line 789
 	/*
 	 * Put the message "*string_ptr" in the ROM
@@ -678,6 +679,7 @@ GLOBAL void display_string IFN1(char *, string_ptr)
 #else /* CPU_40_STYLE */
 #error "Unsupported SoftPC mirror configuration: !CPU_40_STYLE"
 #endif /* CPU_40_STYLE */
+  }
 #endif	/* !NTVDM | !MONITOR | ARCX86 */
 #line 871
 	cur_loc+=strlen(string_ptr);

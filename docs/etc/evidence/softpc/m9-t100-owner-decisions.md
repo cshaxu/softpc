@@ -5830,3 +5830,57 @@ final documentation gate (two-hour job/fifteen-minute no-progress budget),
 then removes it. Concurrent Win95 build/t100-s4 remains protected. P60's
 392/392 full result is previous qualification, not a newly repeated full run.
 Next file is timer.c; do not advance its review before owner decision.
+
+## S4 P62: restore original ROM display scope
+
+Owner approves R0499 retention and restoration of the original display_string
+brace pair; baseline 76717b54. Only two original lines are restored, preserving
+CRLF and original line control. No selected statements, excluded body, API,
+snapshot schema, user configuration or media change. Tests unchanged.
+Real fixed-XP diff becomes one block +1/-1 instead of three +1/-3; aggregate
+106 files, 15706 blocks, +24610/-24014. R0499 is approved.
+
+P62 owns only build/t100-s4-p62, with two-hour job/fifteen-minute no-progress
+budget. Win95 investigation scratch/processes are protected. Initial inventory
+finds PID29264 running the published x64 EXE; do not stop it pending ownership
+clarification. No shared Ninja build/test process was present. Begin with x86.
+
+Owner then explicitly authorizes closing the occupied published EXE, confirms
+investigation has copied its own executable, and reiterates standing permission
+to close publication blockers. PID29264 identity was checked against the exact
+published softpc64.exe path. CloseMainWindow returned false; only that process
+was terminated. No investigation scratch or copied binary was changed.
+
+Independent comparison with pinned XP (excluding error bodies/line controls)
+confirms exactly one retained block +1/-1. Original braces preserve the body
+scope and leave cur_loc update outside it. Existing R0499 and all statements
+are unchanged; no new test duplicates this structural restoration.
+
+First x86 full background run passed 187/188; checks/xp_mirror correctly
+rejected an editing error in the manifest: the new local hash was initially
+written into the subset column instead of the local column. Restored the pinned
+subset hash and updated only local_sha256. No source/test change followed.
+The gate rerun passes 1/1; all eight x86 native tests pass. Do not describe this
+as a first-run full pass. Scope/CRLF comparison confirms exactly two brace
+insertions; selected statements and R0499 are byte-identical after normalization.
+
+Published compiler timestamps: x86 Nov 15 2026 12:53:04; x64 Nov 15 2026
+12:58:32. Publication validates timestamps in both EXEs. SHA-256:
+- softpc32.exe: 172b27757710041d600bc8860de8a40b48812e27dac92f85e4810d051ba77c97
+- softpc64.exe: 071cafca2a2ed6acd34792bff7c879c1f63fc8999bda983290c500b4adbb962f
+
+Snapshot and user INI hashes remain unchanged. Build warnings are confined to
+preserved mirror code. No production branch, type, allocation or error path is
+added. Actual source accounting is +2/-0, tests +0/-0; the desired reduction is
+in fixed-XP differences (two fewer lines and blocks), not production line count.
+
+Final qualification: x86 background 187 initial passes plus corrected mirror
+gate pass, native 8/8 (25.57s); x64 background 188/188 (214.61s) and native
+8/8 (25.70s), first run. All 392 distinct tests have passing results, none
+skipped; x86 initial background elapsed190.94s. ROM/device, snapshot and public
+component regressions are included. Both cached builds/publications succeed.
+Final coordinator actual-diff review confirms only the two original braces,
+correct local manifest column, unchanged upstream/subset identities and R0499,
+no duplicate state/path and no snapshot/INI modification. P62 scratch is removed
+after jobs exit; concurrent investigation scratch remains protected. This is
+P62 delivery awaiting owner acceptance, not closure of S4/T100.
