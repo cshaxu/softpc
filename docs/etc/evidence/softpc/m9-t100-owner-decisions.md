@@ -253,6 +253,45 @@ runtime qualification. Existing mirror macro/printf warnings persist; no
 nonmirror warning or error is introduced. No new state, consumer or runtime
 path; static unused original bodies generate no additional release object code.
 
+### Review 16 / order 183: ccpu386/ntthread.c
+
+Fresh full fixed-XP comparison: +36/-3 (39 changed lines), five current text
+hunks and five semantic points. Frozen list +23/-2 predates approved P9's
+query/teardown changes; keep that historical list unchanged.
+
+| Point | Size | Classification / evidence |
+| --- | --- | --- |
+| S4 P9 TLS detachment | +4/-1 | Lifetime safety: clear TLS before free; failed detachment reports error and retains the still-referenced object, while independent thread-list cleanup continues. Owner-approved implementation. |
+| S4 P9 depth query | +9/-0 | Single original nesting authority: read ThreadSimBuf.level without push/pop; lifecycle checkpoint/resume/exit consumers replace the deleted Compat counter. Owner-approved implementation. |
+| R0160 | +21/-0 | Product outer-exit integration: select level 1 and call original ccpu386Unsimulate, which alone decrements, sets in_C and longjmps. Needed to exit all nested BIOS frames to executor. Recommend retention. |
+| R0161 | +1/-1 | Defined pointer return on BADID in ccpu386ThrdExptnPtr; replace nonvoid bare return with null. Recommend retention with caller limitation below. |
+| R0162 | +1/-1 | Same defined result when TLS lookup supplies no stack. Recommend retention with the same limitation. |
+
+Actual CMake includes this file; machine worker teardown calls exitthread;
+lifecycle.c uses depth query at checkpoint/resume/exit and calls outer unwind;
+c_main.c uses the exception pointer for setjmp. No extra nesting state or
+second unwind implementation is added. Private depth is not snapshot encoding.
+
+Historical S1 P18's ordinary-unwind substitution failed actual nested checkpoint
+EIP 604 assertions at both widths; controls passed. Original exception-pointer
+bare-return injections produced 0x31 / 0x39 at both widths rather than a defined
+pointer. This proves the return defect, NOT safe caller recovery: c_main still
+passes *ccpu386ThrdExptnPtr() directly to setjmp without checking null. No claim
+that memory exhaustion or TLS failure is fully handled; no new repair is made.
+
+S4 P9 tests/probes already covered real nesting 1/2/1/0, outer exit, HLT resume,
+zero after teardown, same-level exception jump and failed TLS clear retaining
+allocation without freeing reachable storage. Full 392/392 and snapshot
+interoperability evidence is historical here, not a new run. A native TLS-clear
+failure may leak until process exit; the code intentionally avoids a dangling
+pointer without a recovery manager. Fresh review confirms these current paths;
+it does not prove all allocation/longjmp failure combinations or smallest
+possible diagnostic formatting. No new equivalent restoration identified.
+
+No production/test/binary change. Frontier 16/121, 105 remain. Next: order 265,
+ccpu386/zfrsrvd.c. P9 items retain their explicit approval; R0160-R0162 await
+this file's owner decision. Moving to this file alone does not approve R0155.
+
 ### S4 P5: c_main.c necessity counter-review
 
 Owner requests proof of necessity rather than consumer existence. No source is

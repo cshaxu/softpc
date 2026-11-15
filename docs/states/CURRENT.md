@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P16 presents ntthread.c (review 16 / order 183): current +36/-3,
+five points including owner-approved P9 depth-query and safe TLS teardown.
+Recommend existing outer-unwind and explicit failure-return differences;
+null-return changes are not claimed as complete caller failure handling.
+No source/runtime changes; historical proofs are separately identified.
+16/121 presented, 105 remain; zfrsrvd.c is next.
+
 S4 P15 implements the owner-selected static linkage for the three original
 ntstubs.c empty functions. Selected XP diff decreases from +1/-12 to +4/-4:
 five fewer changed lines. Source +12/-1 includes the corrected original line

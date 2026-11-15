@@ -557,3 +557,14 @@ no new nonmirror warnings/errors. No guest/media/config/public-component change.
 
 Disposable comparison/build logs are removed after promotion of these results.
 The four-point file frontier remains 15/121; next file is ntthread.c.
+
+## P16 ntthread.c ordered review
+
+Review 16 / order 183 compares the entire current ntthread.c with fixed XP:
++36/-3, five points; frozen counts predate approved P9. Fresh caller review
+covers worker teardown, lifecycle checkpoint/resume/exit and c_main exception
+setjmp. P9 query/teardown retains owner approval; outer unwind and two explicit
+null returns are recommended with evidence limits. In particular null return
+is not complete caller recovery. No new runtime tests or production changes;
+historical S1 negative controls and P9 qualification remain separately identified.
+Point details are in the decision ledger. Frontier 16/121; zfrsrvd.c next.
