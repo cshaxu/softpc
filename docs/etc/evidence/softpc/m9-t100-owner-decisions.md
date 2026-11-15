@@ -4831,3 +4831,92 @@ baseline passed full 392/392, and historical P102 ran focused mouse/checkpoint
 checks on both widths. These are not newly repeated guest-session acceptance
 or allocation-failure tests. Source/tests/EXEs unchanged; mirror/documentation/
 whitespace gates apply. Next manual file is order401 base/keymouse/ppi.c.
+
+
+## S4 P49: R0463 coherent-original guest control
+
+Owner asks to prove whether R0463 is needed, following the historical origin
+review. git -S mouse_period identifies ee62ad01 (T85 S1 P2, 2026-09-28).
+That task combined device semantic completion and a compatible Win1.01 driver;
+its successful guest acceptance did not isolate the timer replacement from
+the driver correction. The original need cannot be inferred from that joint
+success. T85 closure and proposal remain historical, not rewritten.
+
+### Controlled experiment
+
+Production baseline 81ac2c8c; x64 cached compiler/link settings. Two task-owned
+mouse objects are explicitly linked before the existing device archive into
+identical probes. No cached object/archive or shipped EXE is overwritten.
+The probe reuses existing runtime restart fixture helpers and real Machine
+input/frame APIs. Guest writes use LIB_STORAGE_MEDIUM_OVERLAY. No guest binary
+is edited, no snapshot is loaded, and no Computer Use is involved.
+
+Control A retains current behavior. Control B restores the complete R0463
+active behavior: five bursts, 100 IRQ requests per eligible mode write, original
+unconditional input IRQ and constant-high request, original mode assignment,
+no periodic scheduling or mode-based cancellation. Reset rearms five bursts.
+Unrelated R0465 default and R0466 reset-data corrections remain identical.
+Private timer/archive helpers remain linkable but inert in B: no active path
+schedules their callback and cold runs never restore an archive. This isolates
+R0463 without inventing a snapshot-format failure as evidence against XP.
+Both objects log bounded mode writes; B additionally logs burst exhaustion.
+
+Read-only media identities, unchanged before/after all runs:
+
+- Existing DOS622/Win1.01 10MiB image:
+  d7cc97f17ab1fc557213d09a9c98a3c50a9cab0c13942ff3ddeda05c50cd37d8.
+- Repository Win3.1 installed image:
+  2de4b03a68b1e1ac23d482c3a3402726a853a8520b7acc370db694053dffa3a4.
+
+Win1.01 installed modules are combined in WIN100.BIN; no loose MOUSE.DRV was
+found. Do not claim fresh identity verification against the historical 3358-byte
+standalone driver. The same entire image/installed driver is used in both
+arms, and its live InPort mode writes are observed (11h/31h). Win3.1 uses
+09h/29h. Neither driver is replaced during the experiment.
+
+Sequence: cold boot, wait for rendered DOS prompt, type WIN through Machine
+FIFO, allow initialization, capture published RGB frame, deliver identical
+relative movement, reposition to a deterministic screen corner, move to File,
+press/release button and capture results. Capture delays are observation
+windows, not predicates proving success. Frame contents and original-mode
+traces supply the actual outcome. Six paired runs (12 processes) cover initial
+Win1.01 movement/file selection, repeat Win1.01, Win3.1, targeted File-menu
+clicks on each guest, and held-button Win1.01 menu capture. All exit zero.
+Initial Win3.1 click hit a non-menu location; only the later correctly targeted
+click is counted as menu proof. First probe compile failed on a void function
+using a returning assertion macro; corrected before any execution.
+
+### Results and limitations
+
+- Both guests boot and move their visible pointers in both arms.
+- Win1.01 B logs remaining burst count 4,3,2,1,0; movement/selection and the
+  final menu observation occur after exhaustion. Not merely unconsumed startup
+  bursts. Held-button File menu expands in both arms; full PPM bytes match,
+  SHA-256 334b886edbcce70ed7bb02fc5369ff95719c9e4e6b438cd42e4d951c2426139f.
+- Win3.1 File menu expands after click in both arms; full PPM bytes match,
+  SHA-256 ea2913c86661488fa210a78975f0eda9150f85716f30977e010ea8b43e17d7f3.
+- First Win1.01 pair matches all four captured stages. Some later intermediate
+  Win1.01 images differ by 54 pixels on row67, x5..111, the file-selection
+  outline; menu pixels match without masking. Do not claim all captures match.
+- Snapshot restore, x86, all mouse drivers, long-duration use, Win95 and
+  quantitative hardware timing equivalence were not exercised by this probe.
+  Audio is the existing runtime test's mock; no native audio claim.
+
+Final probe source SHA-256:
+e2d10e4291df7609c595d6efc79bf78543c88bb625064c76674c5026c4fcda7e.
+Current instrumented object source:
+9a81f246e8d0dea124e6019e4a8dbe1e5c11136a8a920a54fb37478868d44ce9.
+Original-behavior instrumented source:
+483c045a242e954d15041e8beb26b591b2b8d9530511273f24976e74a73afeed.
+Final probe EXEs: current 5cf49f5d92f1d8eaea138412225febb324fdbc32920b733a660e7a2622e8c94e;
+original 79174c9865a65c7c004c31fe92a66f5a4f3455f4032a921a0b60f33be2f2b10b.
+
+Conclusion: no demonstrated guest necessity for R0463. Its single-controller,
+existing-queue design is architecturally coherent, but that alone does not
+justify retention under the owner's original-first policy. Supersede P48's
+blanket retention recommendation: R0463 is a restoration candidate, pending
+owner decision and coherent snapshot/event adaptation planning. No production
+restoration is silently applied. R0464/R0465/R0466 remain separate decisions.
+Only documentation changes; product/media hashes unchanged. Promote this
+bounded evidence and remove task scratch after jobs exit; no raw guest image,
+capture or probe binaries are committed. S4/T100 remain open at mouse.c.
