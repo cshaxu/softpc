@@ -4581,3 +4581,54 @@ No further equivalent restoration or cleanup candidate identified.
 Production/tests/EXEs unchanged; documentation, mirror and whitespace checks
 apply. Next actionable file is order 394 base/inc/video.h; intervening files
 have no current real diff. S4/T100 remain open.
+
+
+## S4 P45: owner approves tape EOF; video.h review
+
+Owner explicitly approves retaining R0451; P44's pending decision is resolved.
+Fresh complete pinned-XP comparison of order 394 base/inc/video.h finds only
+R0455 outside existing excluded bodies and diagnostic line controls: four
+IMPORT declarations at current lines 293-296, one block +4/-0. They name
+stream_io_buffer, stream_io_dirty_count_ptr, stream_io_buffer_size and
+stream_io_enabled, using exact original XP spelling. Their original XP
+locations (352-355) are inside NTVDM; the current selected copies are outside
+that excluded block. R0454's redundant comment and spelling difference were
+already restored in S1 P99 and are not outstanding points.
+
+Category: standalone linkage/declaration boundary preserving original video
+code, not snapshot or a new functional stream backend. Fresh pinned XP reads
+confirm vd_write_teletype references all four at original video.c:2751-2756
+OUTSIDE NTVDM. The earlier NTVDM block only declares a local function pointer.
+Current video.c:2242-2247 preserves the original stream test/body. The function
+is installed in original video.c and ega_vide.c service tables and called by
+original write-string logic. Root CMake builds both the original video module
+and Compat video.c. This dependency was not manufactured by a new consumer.
+
+Current Compat video.c:27-30 defines NULL buffer and dirty-count pointers,
+zero buffer size and FALSE enabled. Whole src/test symbol search finds no
+assignment enabling this stream. stream_io_update remains an empty host seam;
+no active stream output, second display implementation or safety of externally
+enabling these disabled globals is claimed. The separately named
+host_stream_io_enabled in nt_graph is not this variable.
+
+Historical S1 P99 recompiled actual video.c with each architecture's real
+Ninja command and a private header removing only these four declarations.
+Current controls passed; restored declaration visibility failed on x86 and
+x64 with all four names undeclared at original lines 2751/2752/2754. This is
+compiler proof coupled with original-consumer source proof; it is not merely
+an uncompilable partial rollback of an invented caller. This P verifies
+current/original sources and historical evidence, not fresh runtime tests.
+
+Counter-review: enabling NTVDM to expose the originals changes unrelated host
+branches. Moving the declarations elsewhere merely relocates the adaptation.
+Removing the original selected runtime block would add a new mirror deletion
+and require a separately considered coupled change; it does not restore XP
+or reduce the existing four-line boundary. Defining replacement macros would
+change the original variable contract. Current declarations are the narrow
+existing seam with disabled host storage. No safe equivalent restoration or
+remaining nonsemantic cleanup found. Recommend retain R0455, pending owner
+approval. The later video.c implementation audit remains separate.
+
+Production/tests/EXEs unchanged. Documentation, mirror and whitespace checks
+apply. Next actionable file is order 398 base/keymouse/keyba.c; intervening
+headers have no current real diff. S4/T100 remain open.

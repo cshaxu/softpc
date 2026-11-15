@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P45 records owner approval of tape_io.h R0451 and reviews order 394 video.h:
+R0455, one block +4/-0, exposes original stream declarations to the selected
+non-NTVDM build. Pinned XP teletype code itself references them unconditionally;
+Compat keeps the stream disabled. Historical dual compiler controls support
+retention, not active stream support. No equivalent restoration identified;
+R0455 awaits approval. No source/runtime changes. Next is order 398 keyba.c;
+S4/T100 remain open.
+
 S4 P44 records owner approval of sndblst.h R0448/R0449 and reviews order 386
 tape_io.h: R0451, one block +0/-1, deletes XP's final Ctrl-Z byte. Complete
 retained-content comparison finds no other difference or replacement blank.
