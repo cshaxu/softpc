@@ -197,12 +197,8 @@ int main(void)
     host_release_timeslice();
     assert(wait_calls == 2u && softpc_platform_executor_ready());
     softpc_platform_set_runtime_heartbeat(1);
-    {
-        lib_u64 origin = softpc_executor_pacing_origin;
-        signal_on_wait = 1;
-        host_release_timeslice();
-        assert(softpc_executor_pacing_origin > origin);
-    }
+    signal_on_wait = 1;
+    host_release_timeslice();
     assert(wait_calls == 3u && signal_on_wait == 0);
     softpc_platform_set_runtime_heartbeat(0);
 

@@ -483,3 +483,9 @@ remaining real-diff file list. Screening finds 97 exclusion-scaffolding-only
 files and [121 real-difference files](../etc/evidence/softpc/m9-t100-s4-real-diff-files.md).
 Only those 121 remain in the substantive audit workload, preserving their
 literal dir ordinals. Do not re-audit the other 351 unchanged files.
+
+S4 P6 owner explicitly authorizes removing the instruction-rate limiter after
+file 80 review. Remove its mirror declaration/call and complete private Compat
+implementation/state; retain event timing, wait and budget mechanisms. This
+behavior-changing reduction uses cached dual build/publication and full
+background/native regression. Other pending retention decisions are unchanged.

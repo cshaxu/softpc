@@ -13,7 +13,7 @@ approval or automatic small-diff delegation is restored.
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; no inherited retention approvals. |
 | Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
-| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. |
+| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner explicitly authorizes S4 P6 removal of the instruction-rate limiter and its wiring. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
 | Files And ABI Surface | All tracked files under src/app-softpc/softpc.new and read-only inspection of real build/caller/test dependencies. Start with audit, not new code changes. |
@@ -28,6 +28,14 @@ approval or automatic small-diff delegation is restored.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P6 owner authorizes removing the instruction-rate limiter. Scope: c_main.c
+declaration/call, Compat platform limiter/state/idle compensation, existing
+platform fixture assertion, mirror manifest and evidence. Device clock, HLT
+wait, input wake and finite-budget contract stay unchanged. Cached dual builds,
+publication and full background/native regression pass: 392/392 first run, no
+retries/skips. Production +0/-85; tests +2/-6; XP mirror diff decreases three
+lines. P6 is ready for owner acceptance; S4 remains open at file 11.
 
 S4 P3 records actual purpose classifications for the first ten of 121 manual
 file reviews: +133/-38, 41 text hunks. Only reset.c has explicit fresh retention

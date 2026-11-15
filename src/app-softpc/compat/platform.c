@@ -51,21 +51,6 @@ lib_u64 softpc_ccpu_instruction_budget = 0;
 IBOOL softpc_ccpu_instruction_budget_active = FALSE;
 static IBOOL softpc_sound_reset_failed;
 
-/* CCPU's original quick-event implementation uses one decoded instruction
-   as one microsecond of guest progress.  On a modern host the interpreter can
-   run that axis hundreds of times faster than the external PIT/video heartbeat.
-   This is an executor-only governor: it does not alter CPU, BIOS, BOP, or any
-   controller state. */
-#define SOFTPC_EXECUTOR_PACE_INSTRUCTIONS_PER_SECOND 1000000ULL
-#define SOFTPC_EXECUTOR_PACE_CHECK_INTERVAL 1024UL
-#ifdef _WIN32
-static volatile LONG softpc_executor_pacing_enabled;
-static ULONGLONG softpc_executor_pacing_instructions;
-static lib_u64 softpc_executor_pacing_origin;
-static lib_u64 softpc_executor_pacing_frequency;
-#endif
-
-
 #ifdef _WIN32
 /* Original timestrb.c documents a host alarm of roughly 20 Hz.  The timer
    queue callback only marks the CCPU event pending; host_timer_event() stays
@@ -162,46 +147,6 @@ IBOOL softpc_platform_consume_instruction_budget(void)
     return softpc_ccpu_instruction_budget == 0u;
 }
 
-void softpc_platform_pace_instruction(void)
-{
-#ifdef _WIN32
-    lib_u64 now;
-    lib_u64 units_per_second;
-    ULONGLONG target_units;
-    ULONGLONG elapsed_units;
-    ULONGLONG milliseconds;
-
-    if (InterlockedCompareExchange(&softpc_executor_pacing_enabled, 0, 0) == 0)
-        return;
-    ++softpc_executor_pacing_instructions;
-    if ((softpc_executor_pacing_instructions %
-         SOFTPC_EXECUTOR_PACE_CHECK_INTERVAL) != 0u ||
-        softpc_platform_has_pending_executor_event())
-        return;
-    if (softpc_executor_pacing_frequency == 0u ||
-        base_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
-        return;
-    target_units = (softpc_executor_pacing_instructions *
-                    (ULONGLONG)softpc_executor_pacing_frequency) /
-                   SOFTPC_EXECUTOR_PACE_INSTRUCTIONS_PER_SECOND;
-    elapsed_units = (ULONGLONG)(now - softpc_executor_pacing_origin);
-    while (target_units > elapsed_units &&
-           InterlockedCompareExchange(&softpc_executor_pacing_enabled, 0, 0) != 0 &&
-           !softpc_platform_has_pending_executor_event())
-    {
-        milliseconds = ((target_units - elapsed_units) * 1000ULL) /
-                       (ULONGLONG)softpc_executor_pacing_frequency;
-        if (milliseconds != 0u)
-            base_sync_sleep_milliseconds(1u);
-        else
-            base_sync_yield();
-        if (base_clock_monotonic_counter(&now, &units_per_second) != LIB_STATUS_OK)
-            break;
-        elapsed_units = (ULONGLONG)(now - softpc_executor_pacing_origin);
-    }
-#endif
-}
-
 /* Used by CCPU HLT and original keyboard idle after pending sources have
  * been checked. The auto-reset event avoids a polling spin: either the
  * original host timer or frontend input wakes this executor immediately. */
@@ -247,27 +192,6 @@ void softpc_platform_set_runtime_heartbeat(int enabled)
        Reset it at run entry; finite instruction-budget runs stay bounded. */
     IDLE_ctl(enabled);
     if (enabled) IDLE_init();
-#ifdef _WIN32
-    lib_u64 now;
-    lib_u64 units_per_second;
-
-    if (enabled &&
-        base_clock_monotonic_counter(&now, &units_per_second) == LIB_STATUS_OK &&
-        units_per_second != 0u)
-    {
-        softpc_executor_pacing_origin = now;
-        softpc_executor_pacing_frequency = units_per_second;
-        softpc_executor_pacing_instructions = 0u;
-        InterlockedExchange(&softpc_executor_pacing_enabled, 1);
-    }
-    else
-    {
-        InterlockedExchange(&softpc_executor_pacing_enabled, 0);
-        softpc_executor_pacing_instructions = 0u;
-    }
-#else
-    UNUSED(enabled);
-#endif
 }
 
 void softpc_platform_set_executor_callback(void (*callback)(void *),
@@ -323,13 +247,7 @@ void host_release_timeslice(void)
 #ifdef _WIN32
     if (!softpc_ccpu_instruction_budget_active &&
         !softpc_platform_has_pending_executor_event()) {
-        lib_u64 before, after, frequency;
-        lib_status clock_status = base_clock_monotonic_counter(&before, &frequency);
         softpc_platform_wait_for_executor_event();
-        /* Idle is not a credit for faster guest execution after wake. */
-        if (clock_status == LIB_STATUS_OK && softpc_executor_pacing_enabled &&
-            base_clock_monotonic_counter(&after, &frequency) == LIB_STATUS_OK)
-            softpc_executor_pacing_origin += after - before;
     }
 #endif
 }

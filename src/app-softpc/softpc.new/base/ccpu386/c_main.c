@@ -64,7 +64,6 @@ extern IBOOL softpc_platform_has_pending_executor_event(void);
 extern IBOOL softpc_platform_consume_clock_tick(void);
 extern IBOOL softpc_platform_consume_executor_wake(void);
 extern IBOOL softpc_platform_consume_instruction_budget(void);
-extern void softpc_platform_pace_instruction(void);
 extern void softpc_platform_wait_for_executor_event(void);
 extern int softpc_host_debug_begin(void);
 extern void softpc_host_debug_retired(void);
@@ -4267,8 +4266,6 @@ NEXT_INST:
 
    if (softpc_platform_consume_executor_wake())
       softpc_platform_executor_event();
-
-   softpc_platform_pace_instruction();
 
    if (!(cpu_interrupt_map & CPU_RESET_EXCEPTION_MASK) &&
        softpc_platform_consume_instruction_budget())

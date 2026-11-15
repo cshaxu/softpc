@@ -147,6 +147,38 @@ map-interface shape and event-site minimization remain qualified decisions.
 No new compilation/runtime test is claimed; no source, guest or media changed.
 This report updates evidence strength, not owner approval or file frontier.
 
+### S4 P6: owner-approved instruction-rate limiter removal
+
+Owner: 好。去除这个限速器，减少其diff。 This authorizes removal of
+R0074/R0102, not retention of other c_main points. Delete the declaration and
+call/separator in c_main.c; delete the complete Compat limiter, four private
+state variables, two constants, run-enable setup and idle-time compensation.
+The existing platform failure fixture retains the signaled idle wait/count
+checks and removes only the obsolete pacing-origin assertion/local block.
+
+Production: c_main.c +0/-3 and Compat platform.c +0/-82, total +0/-85.
+Test: platform_failure_smoke.c +2/-6, net -4. No public component, guest,
+configuration, firmware, medium or snapshot schema change. Existing event
+consumption, clock producer, finite-budget checks, HLT/keyboard event wait and
+sound run-state notification remain on their existing paths. Continuous runs
+are no longer capped by the removed instruction-rate policy; no claim of
+unchanged guest speed or a measured performance multiplier is made.
+
+The frozen S4 table is historical and is not silently rewritten: c_main's
+selected diff changes +136/-16 to +133/-16 (three fewer added+deleted lines).
+Independent normalized full-file Git Myers comparison with fixed XP gives
++284/-541 before and +281/-541 after, confirming the same reduction even with
+excluded text retained. Original exclusion bodies are unchanged and uncounted
+in the selected-code result. The current mirror manifest records the new body.
+All removed limiter symbols have zero remaining src/test references; UART
+transmit pacing and original quick-event timing are unrelated and untouched.
+
+Dual cached builds/publication pass; full regression passes 392/392 on first
+run (188 background plus eight native per architecture), no skips or retries.
+Artifact hashes and verification boundaries are in the S4 evidence. Removed
+R0074/R0102 are resolved by this explicit owner instruction; other points remain
+unapproved. No real guest desktop performance comparison is claimed.
+
 ## S3 approval progress
 
 **Superseded by owner revocation:** all retention approvals and automatic

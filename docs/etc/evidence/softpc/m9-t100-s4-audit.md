@@ -156,3 +156,37 @@ requests do not constitute retention approval. Purpose categories distinguish
 product selection, declarations, native pointer ABI, snapshots and behavioral
 corrections. Future file reviews update the same ledger immediately.
 No production edits, builds or fresh runtime tests are part of this update.
+
+## P6 instruction-rate limiter removal
+
+Owner approves removing the limiter only; implementation and purpose accounting
+are in the [decision ledger](m9-t100-owner-decisions.md#s4-p6-owner-approved-instruction-rate-limiter-removal).
+The frozen file/count lists remain the original audit baseline; this delivery
+records a subsequent three-line mirror-diff reduction rather than silently
+changing the frozen identities. Final qualification is recorded below.
+
+P6 artifact identity (fresh compiler literals verified, not file timestamps):
+
+| Artifact | Bytes | Compiler date/time | SHA-256 |
+| --- | ---: | --- | --- |
+| softpc32.exe | 3477770 | Nov 14 2026 16:00:10 | `b875d9b071440b717037b28a71004bb51620e0087f4132510aae89f9f3aba180` |
+| softpc64.exe | 3095223 | Nov 14 2026 16:04:06 | `99043f9f3e9d44dfb27d6aa10db4ca6b7855292fcdddced8ebffab8fbf8c78fd` |
+
+Actual-diff self-review: complete removal of the single limiter owner and its
+sole mirror consumer, without alternate governor, runtime switch or new helper.
+Test wake/count assertions remain; only obsolete limiter-origin state is gone.
+Production +0/-85; tests +2/-6. Mirror remains CRLF, Compat/test/docs remain LF.
+Build diagnostics outside the preserved mirror are absent on both architectures;
+original mirror warnings remain exempt and are not reported as zero warnings.
+
+P6 final qualification: cached GCC x86/x64 full builds and dual publication
+succeeded. Each architecture passed 188 background and eight native tests,
+392/392 total on first run, with no retry, skip, desktop deferral or changed
+timeout. The existing platform-failure and checkpoint cases preserve idle
+wake/failure, finite-budget, nested execution and snapshot checks. Native
+coverage includes audio, MIDI, Console/Window and product package tests.
+This is automated regression, not manual DOS/Win3.1/Win95 performance or
+application-speed acceptance. Source review and zero residual limiter symbols
+prove removal; no duplicate timing model or test-only production API is added.
+Documentation governance, XP manifest, whitespace and line-ending checks pass.
+Task-owned scratch is cleaned after promoting these results; caches remain.
