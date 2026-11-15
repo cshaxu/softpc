@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P35 records owner acceptance of P34 and reviews order 337 dma.h:
+one point +3/-0, R0424, exposes the existing pointer-returning DMA accessor
+to the retained DSP outside NTVDM. Actual production callers and historical
+paired compiler controls support retention; no equivalent restoration found.
+R0424 awaits owner approval. No source/runtime change or fresh runtime test.
+Next file is order 339 egacpu.h; S4/T100 remain open.
+
 S4 P34 completes the owner-authorized redundant conditional-wrapper sweep:
 109 real-diff files scanned, twelve candidate files checked, ten unnecessary
 non-XP wrappers removed in eight files. Production +1/-43; tests unchanged.

@@ -4058,3 +4058,53 @@ not retention requests. Real type, endian, snapshot and host wiring changes
 remain visible and subject to their per-file review; this batch does not approve
 them wholesale. Existing original excluded bodies receive no new accounting.
 Next manual file remains order 337 dma.h; S4/T100 remain open.
+
+
+## S4 P35: owner accepts P34; dma.h review
+
+Owner accepts P34 and asks to continue with dma.h. This accepts the delivered
+wrapper cleanup, not the remaining unrelated semantic differences in those files.
+
+Order 337 base/inc/dma.h: one retained text point, +3/-0, R0424. At current
+physical lines 497-499 the addition is one reason comment, the declaration
+DMA_ADAPT *dmaGetAdaptor(void); and a separating blank line. Existing #error
+bodies and necessary #line are excluded without new accounting. No DMA register
+layout, bitfield, transfer macro or constant differs outside those exclusions.
+
+Pinned XP declares DMA_ADAPT *dmaGetAdaptor(); at original line 575 inside
+NTVDM. The current standalone build does not define NTVDM. Exposing this
+existing pointer-returning accessor to the retained original DSP is sound/DMA
+integration and a compiler type contract, not a new DMA engine or snapshot API.
+
+Fresh production tracing: compat/platform.c:669 -> SbInitialize in nt_sb.c ->
+SbInitializeDMA at nt_sb.c:191 / nt_sbdsp.c:744 -> dmaGetAdaptor. nt_sbdsp.c
+includes dma.h and stores the result in pDmaAdp, then selects pDcp from the
+original controller array. at_dma.c:878 returns &adaptor, the original single
+DMA owner. DSP QueryDMA, GetDMATransferAddress and SetDMACountAddr read/update
+that owner's address/count/page/mode/status (current nt_sbdsp.c:1947-2097).
+Both original source files are actual root-CMake production inputs. Whole-tree
+search finds one declaration, one definition and one direct call; no duplicate
+Compat declaration/accessor offers an equivalent restoration.
+
+Historical S1 evidence (P77) used the actual nt_sbdsp compile flags plus explicit
+-Werror=implicit-function-declaration: current header compiled on both widths;
+removing this added declaration/reason failed both with implicit declaration
+and int-to-DMA_ADAPT-pointer assignment. That added warning-as-error flag is
+part of the control, not the unchanged production policy. It proves the missing
+pointer-return declaration, not an observed guest crash or pointer truncation.
+This P performs no fresh compiler or runtime experiment. P34 rebuilt both full
+test targets and proved artifact equivalence; P30's full 392/392 remains the
+historical runtime baseline. sound_smoke has real controller/DSP DMA coverage
+with a mock audio platform, not fresh desktop or audible playback evidence.
+
+Counter-review: deleting only the declaration loses the return-type contract;
+removing its caller removes working DSP controller access. Defining NTVDM just
+to expose it selects unrelated unsupported host paths. Moving a duplicate extern
+into nt_sbdsp.c or Compat merely relocates the diff and weakens ownership. Keeping
+the declaration in the original DMA owner's header is the narrow coherent seam.
+The one-line reason is the required local provenance explanation, and deleting
+its separating blank is not a functional simplification. No safe equivalent
+XP restoration identified. Recommend retaining R0424, pending owner approval.
+No production/test/manifest/EXE changes. Documentation/manifest/whitespace gates
+apply. Next real-diff file is order 339 egacpu.h, now +4/-1 after P34; S4/T100
+remain open.
