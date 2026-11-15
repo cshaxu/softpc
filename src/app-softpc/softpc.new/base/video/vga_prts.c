@@ -3127,7 +3127,7 @@ VOID    vote_vga_mode IFN0()
 #endif /* HUNTER */
 #line 3243
 
-/* DIVERGENCE(MVDM-VIDEO-SNAPSHOT-001): standalone snapshot port ABI. */
+/* Standalone snapshot port ABI. */
 LOCAL byte snapshot_v7_selectors[SOFTPC_DEVICE_VIDEO_V7_REGISTER_COUNT] = {
     0x83, 0x94, 0x9c, 0x9d, 0x9e, 0x9f, 0xa4, 0xa5, 0xc1, 0xeb,
     0xec, 0xed, 0xee, 0xef, 0xf1, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,

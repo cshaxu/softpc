@@ -6517,3 +6517,47 @@ is claimed. Production/test/EXE unchanged; documentation/whitespace gate only.
 Next real file is base/video/vga_prts.c. Own hidden CMD gate scratch
 build/t100-s4-p74 has two-hour/fifteen-minute no-progress budget and is retired
 after completion. S4/T100 remain open.
+
+## S4 P75: approved display units and VGA controller review
+
+Owner approves R0539-R0541. Current vga_prts.c (order429) has11 real blocks,
++188/-23 against XP SP1, excluding #error bodies and necessary #line.
+
+| Point | Current anchors | Blocks | Added | Removed | Purpose |
+| --- | --- | --- | --- | --- | --- |
+| R0543 | 364,456,3130 | 3 | 169 | 0 | Controller snapshot capture/restore. |
+| R0544 | 582,588,627 | 3 | 4 | 12 | Cursor hide and inclusive endpoint. |
+| R0545 | 1464 | 1 | 1 | 11 | Store complete cursor-start byte. |
+| R0546 | 1649 | 1 | 2 | 0 | Underline position refresh. |
+| R0547 | 2605 | 1 | 8 | 0 | Split-aware pel panning. |
+| R0548 | 2701,2737 | 2 | 4 | 0 | Panning register refresh. |
+
+R0543 is called by compat/devices/archive.c capture/restore. Original BIOS
+vga_int_1C omits V7/live latches/DAC phase and changes indices. Port replay
+reuses original handlers; four V7 raw fields bypass masked/subfield reads.
+Historical P133 tests28 selectors times256 values (7168 assertions per run)
+on both widths with index preservation. Earlier minimization removed five
+unused initialization writes and duplicate getters. Remaining reset/protection
+initialization is required by change-only original handlers; independent
+removal negatives fail set-reset, font-height or double-pixel assertions.
+This is snapshot integration rather than a defect in the BIOS service.
+
+R0544 original-body negative fails visibility; fixtures cover heights8/14/16/32,
+normal/equal/zero-end/disabled/reversed/out-of-font shapes. R0545 fixes testing
+the old disable bit and losing disable-only writes: store the complete byte,
+then reuse do_new_cursor. Exact-original negative fails real-port visibility
+on both widths. R0546 original-body negative fails produced-frame underline.
+R0547 raw-only negative fails resolved pixels; it is not a coherent restoration
+of every coupled painter change. R0548 independent original-body negatives
+fail dirty assertions: register-only changes must refresh unchanged VRAM.
+
+Recommend retaining R0543-R0548, pending owner approval. No safe functional
+restoration found. Fresh work is source/caller/count review, not rerunning
+historical P133 evidence, exhaustive registers or interactive guest acceptance.
+Only a missed numbered snapshot comment is cleaned under standing instruction;
+executable tokens, CRLF and line count are unchanged. Its manifest hash changes.
+No rebuild/runtime test for this comment-only change; documentation/mirror gates
+apply. Prior P69 full392/392 and P72 equivalent publication remain evidence.
+Concurrent clock work is excluded. Own scratch build/t100-s4-p75 has two-hour
+job/fifteen-minute no-progress budgets and is retired after gates. Next real
+file is video.c; vga_vide.c has no real retained diff. S4/T100 remain open.

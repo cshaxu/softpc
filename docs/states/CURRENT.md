@@ -29,6 +29,12 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P75 records approval of R0539-R0541 and reviews order429 vga_prts.c:
+11 blocks,+188/-23; R0543-R0548 await owner review. Recommend retain based on
+source/caller review and historical negatives. Only a missed comment identifier
+and its manifest hash change; executable tokens and artifacts are unchanged.
+Concurrent clock work is excluded. See [P75 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p75-approved-display-units-and-vga-controller-review).
+
 S4 P74 reviews order428 vga_mode.c at0854c857: R0539-R0541 are three real
 condition replacements,+3/-3. Recommend retain display-stride/wrap unit fixes;
 historical individual/whole-group negatives and register-level reachability
