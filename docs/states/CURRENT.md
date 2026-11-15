@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P21 rechecks the five remaining com.c points. A concrete source-only
+candidate relocates the added snapshot block after original declarations,
+removing three duplicate forward declarations: block 121 -> 118, selected XP
+diff +125/-3 -> +122/-3. Candidate exists only in memory, not implemented or
+compiled; owner decision pending. Per-point evidence strength and limits are
+recorded in the decision ledger. No file-frontier advance or new runtime proof.
+
 Owner corrects P19: content inside a wholly excluded branch must not be
 relocated outside it as a retention exception. P20 removes the one com.c
 comment extracted from SCCSID and retires R0173 from current retention review;

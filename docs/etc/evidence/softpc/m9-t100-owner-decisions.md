@@ -3586,3 +3586,47 @@ pending. Same reasoning applies when later files contain extracted excluded
 content; historical notice classification alone cannot authorize its retention.
 This direction concerns extracted excluded content, not unrelated original
 notices or any licensing claim. No change to the UART snapshot implementation.
+
+## S4 P21: remaining com.c evidence and concrete reduction candidate
+
+Scope is the current file's remaining five functional points, not all unreviewed
+mirror files. No source changes or new dynamic tests. R0181/R0186/R0199 each
+have independent historical x64 negative controls and live pointer consumers.
+R0174 supplies actual snapshot types/constants; its necessity is a compile/data
+contract, not a guest-failure claim. R0178's receive callback route has coherent
+dual capture-failure controls; send callback and individual state fields do not
+each have independent negative controls. Existing real-state mutation/restore
+assertions and original-field consumers support them, without exhaustive proof.
+
+Fresh source sweep finds all 23 copied port fields still referenced outside the
+snapshot block. In particular had_first_read controls the one-time RX flush;
+com_baud_ind selects delay-table entries; cached DTR/RTS/OUT states participate
+in transition detection; the separate interrupt reasons feed arbitration.
+Reference counts alone are not proof that every field is irreducible. Restore
+range checks precede mutation; merging validation and copying would change
+failure behavior. No equivalent field deletion or native-struct memcpy has
+been established.
+
+A genuine small reduction supersedes P19's no-established-reduction result:
+move the existing added snapshot block to file end, after all original
+variables and declarations, and remove its three added forward declarations
+(recv_char, do_wait_on_send, tx_pacing_enabled). The original declarations and
+definition already provide them before that location. Keep all four added
+functions otherwise identical, original source order intact and no new #line
+needed after appended functions. No interface/schema or build-policy changes.
+This is one relocated added block, not extra patches to original functions.
+
+In-memory candidate only: 121 added block lines become 118. Expected selected
+XP diff +125/-3 -> +122/-3, reduction three lines. Raw SequenceMatcher changes
++442/-2590 -> +425/-2576 because block movement changes matching alignment;
+that raw 31-line apparent reduction is NOT 31 lines of simplification and does
+not count excluded-body content. No candidate was written or compiled. Dual
+compile/link plus object/full-artifact comparison is required before claiming
+equivalent output; existing checkpoint regression applies if output differs.
+
+Do not compress mappings into macros/tables or combine statements merely to
+reduce printed lines. The 93 capture/restore lines map different representations;
+this review establishes no larger safe reduction under unchanged behavior and
+snapshot schema. Present the three-declaration candidate for owner decision;
+retain evidence limits rather than declaring all remaining lines independently
+proven minimal. Review frontier unchanged.
