@@ -16,7 +16,8 @@ Owner now explicitly approves all points already reviewed in files 1-11
 (through ccpu386/c_main.c): "之前所有diff点位记得标记为批准".
 This supersedes their earlier recommendation/pending status, not their evidence
 limits. Restored/deleted points remain restored/deleted; they are not reinstated.
-File 12 onward remains pending until reviewed and explicitly approved.
+Owner subsequently approves file 12 (c_page.c), all 15 points R0115-R0129.
+File 13 onward remains pending until reviewed and explicitly approved.
 Existing #error bodies and separately counted line controls remain excluded.
 
 | Review / order | File under base/ | Points | Actual purpose | + / - | Fresh disposition / evidence limit |
@@ -92,8 +93,8 @@ Next file: order 88, ccpu386/c_page.c, verified against the frozen list.
 Fresh fixed-XP comparison confirms +20/-6 selected-content lines, 14 text
 hunks and 15 historical point IDs R0115-R0129. Excluded bodies receive no
 review entries. All surviving changes serve host DEBUG operand observation;
-none is a paging repair or snapshot feature. Retention is recommended, pending
-owner approval of this newly reviewed file.
+none is a paging repair or snapshot feature. Owner explicitly approves
+retention of all 15 points after their individual explanation.
 
 | Points | Purpose and exact size | Evidence / limitation |
 | --- | --- | --- |
@@ -121,7 +122,42 @@ x87, cross-page fault or partial-write coverage. No newly established safe
 restoration candidate; no source, test, binary or guest change.
 
 Progress: 12/121 files presented, 109 remain. Files 1-11 retain the owner's
-explicit approval; this file remains pending. Next: order 98, ccpu386/c_tlb.c.
+explicit approval; this file is now also owner-approved. Next: order 98, ccpu386/c_tlb.c.
+
+### Review 13 / order 98: ccpu386/c_tlb.c
+
+Fresh fixed-XP comparison confirms two selected text hunks, +58/-0. This is
+snapshot integration, not an original paging defect. The associated non-exclusion
+line control adds one diagnostic line (+59/-0 when included), explaining the
+historical count. Excluded bodies and their anchors are not audited or booked.
+
+| Point | Size | Purpose and retention basis |
+| --- | --- | --- |
+| R0135 | +1/-0 | snapshot.h supplies the typed archive schema and declarations used here. |
+| R0136 | +25/-0 | Capture original private tlb entries, replacement next_set and FAST_TLB lookup arrays; 24 function lines plus one separator. Actual archive.c caller owns storage. |
+| R0137 | +32/-0 | Restore those same original arrays; reject nonboolean valid/dirty and out-of-range next_set. 31 function lines plus one separator. Actual archive.c propagates failure. |
+| R0138 | +1/-0 diagnostic only | Existing #line associated with the inserted block; not part of the +58 selected-content total. |
+
+Current c-files includes c_tlb.c; CMake consumes that list. Original storage
+is LOCAL, and original flush_tlb invalidates rather than restores it. Original
+test_tlb manipulates architectural test registers/cache entries, not a complete
+state import/export contract. Replacing the bridge with external raw-array
+ownership or moving the same code does not establish a complexity reduction.
+Field copies separate the archive schema from native TLB_ENTRY representation;
+whole-struct memcpy is not established as equivalent.
+
+Historical S1 P12's coherent flush-only replacement compiled on x86/x64 but
+failed the real checkpoint assertion expecting saved mapping 0x3123; controls
+passed. Fresh source review confirms the fixture demonstrates 0x3123 remaining
+cached after a page-table change, 0x4123 after flush, and 0x3123 after restoration.
+This round does not rerun it. It proves the cache-restoration requirement, not
+every field independently or every malformed archive. In particular restoration
+writes entries before all validity checks finish: rejection is not transactional
+rollback. Do not claim otherwise or expand this review into an unapproved repair.
+
+Recommendation: retain all four points, pending owner approval. No new safe
+restoration candidate established. No production/test/binary changes. Frontier
+13/121; 108 remain. Next: order 121, ccpu386/fpu.c.
 
 ### S4 P5: c_main.c necessity counter-review
 

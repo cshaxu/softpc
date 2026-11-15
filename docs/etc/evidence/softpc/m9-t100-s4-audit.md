@@ -497,3 +497,13 @@ remain historical evidence with their original coverage limits. Recommend
 retention, pending owner decision. Frontier: 12/121, 109 remain, c_tlb.c next.
 Owner's P10 approval covers files 1-11 only and supersedes their earlier
 pending dispositions above; it does not cover this newly presented file.
+
+## P12 c_tlb.c ordered review
+
+Owner approves c_page.c R0115-R0129. Review 13 / order 98 freshly compares
+c_tlb.c against fixed XP and traces original private storage, archive callers
+and the checkpoint fixture. +58/-0 selected content; one further line control
+explains historical +59. Four IDs recommended for retention, pending owner.
+Historical flush-only negative controls are not new test runs. Restoration is
+not transactional on invalid input; no broader guarantee is claimed. No code
+changes. Frontier 13/121, next fpu.c; classifications are in the decision ledger.
