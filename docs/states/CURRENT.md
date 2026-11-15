@@ -43,6 +43,13 @@ is unchanged.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P79 records owner approval of R0554. error.h/host.h have no retained
+difference. host_cpu.h has only R0556 (+1/-1, two zero-context move hunks):
+low/high byte order required by original port consumers. Recommend retain
+pending review; no source/artifact change or fresh runtime claim. See
+[P79 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p79-approved-fpu-layouts-and-register-byte-review).
+
 S4 P78 delivers the standalone host-clock pause/save/load repair: one runtime
 restart owner, no mirror/shared/schema changes. Five production files +37/-20;
 two tests +79/-6. Both cached EXEs are published and 392/392 tests pass. Owner

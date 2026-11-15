@@ -6733,3 +6733,41 @@ Final SHA-256:
 Own build/t100-s4-clock probe/log scratch is retired after evidence promotion
 and job completion. Reusable caches and concurrent audit work remain intact.
 S4's ordered mirror review and T100 remain open.
+
+## S4 P79: approved FPU layouts and register-byte review
+
+Owner approves R0554. Fresh complete conditional-arm comparison at39ef60d9
+confirms order434 host/inc/error.h and435 host/inc/host.h have zero retained
+difference after ignoring existing #error bodies and #line. No excluded-body
+accounting or reapproval is introduced. Next true-diff file is order436
+host/inc/host_cpu.h, with only R0556: +1/-1, two zero-context move hunks,
+one semantic point. Current lines37-38 place half_word low before high in
+reg.byte; XP lines129-130 put high before low. All other retained content
+matches, including original nibble/bit members and common WRITE declarations.
+R0555's declaration restoration is complete and has no residual decision.
+
+Category: selected little-endian host representation, not a new CPU/port
+implementation. cpu4.h includes this header; original base/support/ios.c
+generic_outw assigns temp.X then passes temp.byte.low to the first port and
+high to the following port. Actual vga_gc_outw similarly uses low as register
+index and high as data. With X=0x0104, current low=4/high=1 selects register4
+and writes1; original order selects1 and writes4. The centralized union layout
+fix preserves all callers instead of adding conversions at each consumer.
+No width-specific branch, duplicate state or alternative I/O path is added.
+
+Historical P138 scalar probes built with actual device flags/header chain
+verify current low4/high1 on x86/x64; original variants yield low1/high4 and
+fail. Separate real vga_prts module substitutions compile/link but the
+original-byte variants exit with access violation on both widths; controls
+pass. That broader negative has no captured first-fault stack, so it is not
+used to assert an exact crash site. The scalar values plus current production
+callers prove the semantic requirement independently. This P rereads source
+and historical evidence, not a fresh dynamic or guest acceptance run.
+
+Recommend retaining R0556; no safe restoration candidate found. Do not remove
+the original unused vector declarations just restored by R0555, nor alter
+unchanged original bit/nibble members to reduce mirror diff. No new source,
+test or artifact change. Documentation/whitespace gate applies. Own hidden
+scratch build/t100-s4-p79 uses two-hour/fifteen-minute no-progress budgets and
+is retired after completion. The prior P78 clock delivery is preserved.
+Next file is host/inc/host_def.h. S4/T100 remain open.
