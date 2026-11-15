@@ -304,3 +304,184 @@ XP manifest and whitespace checks pass. No INI, media or snapshot changes.
 Owned background jobs have completed; disposable task material is removed after
 promoting this evidence, retaining only the two reusable cache roots. P8 waits
 for owner acceptance; S4 remains open at review file 11, with 110 files remaining.
+
+## Accepted P8 follow-up: declaration cleanup and depth investigation
+
+Owner accepts P8 and authorizes only removal of the now-unused
+softpc_platform_executor_event declaration in c_main; depth changes remain
+unimplemented. One local mirror addition is removed, manifest updated; selected
+c_main diff becomes +112/-16. Recompile with each cached compile_commands entry,
+redirecting only the object output into task scratch: both exit zero and produce
+objects byte-identical to the corresponding P8 cache objects (SHA-256 x86
+8791c3f5a63638982dc200e1f9f308072f5b3b1e8208ca7dc0f0205166123b4c;
+x64 230ff024fafeee0031e36b7b6c5d5da42f6f06b379d40e975b380b3f09724f98).
+No new product build/publication or runtime test is claimed. P8 EXEs are unchanged.
+
+Read-only depth investigation compares fixed XP ntthread.c with the current
+file and all actual callers. Original ThreadSimBuf.level increments inside
+ccpu386SimulatePtr, decrements before ccpu386Unsimulate longjmp, and remains
+unchanged during ccpu386GotoThrdExptnPt exception refetch. Compat independently
+increments before simulate setup and decrements after the longjmp returns.
+At every actual guest checkpoint both represent the active nesting depth.
+Outer stop sets Compat depth to one, then the added ntthread outer-exit helper
+sets original level to one and invokes original unsimulate: original level
+becomes zero, then the c_main leave hook makes Compat depth zero.
+Snapshot capture admits depth one only; resume rejects an active simulation;
+exit_requested uses depth to distinguish an active CPU from other callers.
+Normal nested BOP exits must continue returning one level, not to the owner.
+
+A coherent single-owner candidate would add a read-only original TLS level
+query, declare it in Compat abi.h, replace the three Compat depth reads, remove
+its counter/enter/leave/outer-reset assignment and two c_main hooks. Existing
+thread-local observer/resume state remains necessary. Original simulate_level
+in c_main cannot substitute: this TLS-selected build does not update it.
+Existing pointer-return APIs are not queries: one pushes a frame, the other
+indexes level minus one and is invalid at depth zero. Reproducing the private
+ThreadSimBuf layout in Compat or multiplexing a query into an unwind API is
+rejected as added coupling/alternate semantics.
+
+Mirror accounting is unfavorable to this candidate: an ordinary seven-line
+query plus separator adds eight lines to ntthread.c; deleting the two c_main
+hooks removes two, for net six MORE mirror diff lines before any TLS teardown
+safety adjustment. Original exitthread frees its TLS payload without clearing
+the TLS slot, so a query must not read that slot after teardown; extending its
+contract to that state requires clearing it safely (at least one further mirror
+line, with failure semantics resolved), not pretending a non-null pointer is
+live. Expected production net reduction is roughly 10-20 lines, but overall
+mirror diff grows roughly 6-10 lines. These are design estimates, not measured
+implementation/test results. The fake enter/leave fixture must move onto a real
+CPU checkpoint if hooks are removed; existing nested BOP, HLT, exception,
+resume rejection and outer-exit tests must verify the selected candidate.
+
+Recommendation under the owner's current mirror-diff reduction objective:
+keep the two depth hooks for now. No existing read-only original API eliminates
+both bookkeeping and total mirror diff; this is a state-ownership tradeoff, not
+a confirmed correctness bug. No depth code, guest, shared package or test was
+modified by this investigation. The one-line cleanup is independent.
+
+## P9 original simulation-stack depth unification
+
+Owner supersedes the preceding research-only recommendation after explicitly
+prioritizing one state authority. Baseline is accepted P8 5d3f3b86; the one-line
+unused declaration cleanup was local and is included in this delivery.
+Finite scope: c_main hooks, ntthread stack query/teardown, Compat lifecycle and
+ABI, existing platform-failure/checkpoint/lifecycle fixtures. No public eight
+tree, original guest, user INI, media, snapshot layout or serialization edit.
+
+The original ThreadSimBuf.level alone counts simulation frames. Its query does
+not allocate, push, pop or unwind. Missing TLS/initialization gives zero. Compat
+removes its thread-local counter and enter/leave APIs, reads original depth at
+checkpoint/resume/exit, and no longer repairs its own count before outer exit.
+Exit-request lookup checks the existing atomic request first, avoiding a native
+TLS lookup when no exit is pending. Observer/context/resume-entry TLS remains
+because it is independent operation state, not duplicate depth. Original nested
+BOP unwind and outer-owner unwind remain separate existing operations.
+
+Thread teardown clears the native TLS slot before freeing its object. If that
+operation fails, it reports the error and retains the still-referenced object,
+while continuing removal of the independent thread-list entry. This avoids both
+use-after-free and stale registration interfering with later thread-ID reuse;
+it can retain resources on native cleanup failure and is not reported as full
+recovery. No new retry, cleanup worker, status protocol or allocation is added.
+Original allocation/error behavior outside this admitted teardown is unchanged.
+
+Actual Git numstat: production +18/-25 (net -7), tests +24/-5 (net +19).
+Five production and three existing test paths change; no build configuration
+change. c_main fixed-XP normalized diff moves +261/-541 to +258/-541;
+ntthread moves +23/-2 to +36/-3. Total mirror added+deleted diff increases 11
+lines. c_main selected-body diff becomes +110/-16. Excluded bodies/line controls
+are unchanged. This is a deliberate single-authority tradeoff, not a claim that
+net source reduction implies mirror diff reduction.
+
+The platform failure test now invokes failed sound shutdown from a real CPU
+checkpoint and proves outer completion with IO_ERROR, instead of manufacturing
+an active frame via the deleted API. Existing nested BIOS/HLT/checkpoint tests
+assert original depth 1/2/1, zero after outer unwind and repeated resume, and
+reject restore while execution is active. Lifecycle smoke checks a new worker's
+zero depth, active depth one, zero after stop, and zero after TLS destruction.
+No fixed sleep or new test-only production API is introduced.
+
+A disposable probe compiles the actual ntthread.c body with the real x86/x64
+compiler options and narrow TlsSetValue/free interception. Both pass: missing
+TLS depth zero, nested 1/2/1/0, same-level exception longjmp, failed TLS clear
+retains the exact object without free, successful clear frees once and yields
+zero, and repeated teardown does not double-free. A real worker also verifies
+failed TLS clearing still removes its independent thread registration, and later
+explicit teardown releases the retained allocation. Expected failure diagnostics
+are captured. This isolated fault injection is additional evidence, not a
+substitute for the real executor and snapshot regression; it is not a new
+permanent CTest case.
+
+Pre-build P8 snapshot fixture executables are retained only in task scratch.
+The existing cross-process script runs P8 writer -> P9 reader and P9 writer ->
+P8 reader separately per architecture, including populated/empty media,
+wrong-memory-size rejection, resume and input-driven pixel redraw. This tests
+actual snapshot compatibility without touching user snapshots or modifying a
+guest. Results are recorded below; compatibility with every historical snapshot
+version is not claimed.
+
+Similar-issue review: all src/test frame_depth and lifecycle_enter/leave symbols
+are gone. Original ntthread owns level increments/decrements; c_main's historical
+simulate_level is not a replacement authority in the selected TLS configuration.
+No mirrored private structure is copied into Compat. The two exception-pointer
+return corrections and existing outer-unwind helper in ntthread are unchanged.
+Snapshot archive types/encoders and original instruction/event behavior are
+unchanged. Full review of later audit files is not inferred from this work.
+
+The first implementation returned immediately on TLS-clear failure. Actual-diff
+self-review identified that this unnecessarily retained the independent thread
+registration and could interfere with a reused native thread ID. Final code
+keeps the object live but continues original registration removal, with no new
+state or recovery loop; the worker fault probe above confirms this distinction.
+The final qualification rebuilds both architectures after this correction;
+initial-run results are not substituted for final-source qualification.
+
+P8 compatibility writer/reader fixture identities (copied before rebuilding):
+x86 SHA-256 `274117a82964325173c642a21c79b1380b3e70e81d134c460f3ce8cba58aa1d5`;
+x64 `9238869fd95b29854ef19d54015b1d2f2924081518733218f6895d05fac1a7a6`.
+The first candidate passes 392/392 full regression and both compatibility
+directions on both widths. A second complete qualification runs after the
+self-review correction above, rather than treating those earlier binaries as
+the delivered implementation. Temporary probe bodies, executables and generated
+snapshot/media files are removed at delivery after promoting concise results.
+
+Final artifact identities (publication verified embedded compiler timestamps):
+
+| Artifact | Bytes | Compiler date/time | SHA-256 |
+| --- | ---: | --- | --- |
+| softpc32.exe | 3477387 | Nov 14 2026 17:40:29 | `11a1f8a2ae5c501fd51c85a01c2e1bad40a1a472f9bbf5812204e17d0288eb3a` |
+| softpc64.exe | 3095066 | Nov 14 2026 17:44:31 | `4273fc824ce426a9f5574887086bf613fdbcc052146340d0f1b8321a7b3576a4` |
+
+The changed original free line's trailing blank was removed for the whitespace
+gate. An isolated x86 recompile proves the resulting complete object is byte-
+identical to the final x86 build object; x64 final build includes that whitespace
+cleanup. No runtime change or hidden source qualification gap is inferred from
+this formatting-only correction. Changed mirror files retain CRLF; all other
+changed text retains LF. No non-mirror compiler warning/error appears in either
+final build; preserved-mirror diagnostics remain exempt.
+
+Final-source qualification passes without test retries, skips or desktop deferral:
+
+| Architecture | Cached full build | Focused lifecycle/checkpoint/failure | P8 -> P9 snapshot | P9 -> P8 snapshot | Background | Native |
+| --- | --- | --- | --- | --- | --- | --- |
+| x86 | pass, 16.26 s | 3/3 | pass | pass | 188/188, 190.07 s job | 8/8, 26.02 s job |
+| x64 | pass, 14.12 s | 3/3 | pass | pass | 188/188, 210.08 s job | 8/8, 24.02 s job |
+
+Total final full coverage: 392/392. Native includes PCM/MIDI, both package modes,
+Console display, Window retirement and modal tests. This is automated coverage,
+not a fresh manual DOS/Win3.1/Win95 desktop acceptance or performance benchmark.
+The old/new snapshot directions use real independently started processes and
+existing immutable fixtures; user snapshots are neither edited nor loaded here.
+Snapshot format/version/encoders have zero diff. The source/lifetime review,
+actual production-path tests and isolated failure injection are separate proofs.
+
+Final self-review confirms removed APIs/state have zero src/test callers, the
+original level is executor-thread-local, no private layout is duplicated, and
+all normal/exception/outer-return paths retain the original unwind mechanism.
+The native TLS-clear failure can retain its allocation until process exit; it
+reports failure and clears independent registration, without claiming recovery
+or introducing a retry manager. This retained-resource limitation is explicit.
+Documentation, XP manifest and whitespace gates pass. Owned jobs are complete;
+temporary probes, old test binaries and generated snapshot/media are cleaned
+with the task scratch, leaving reusable Ninja/ccache roots only. P9 awaits owner
+acceptance; S4/T100 remain open at file 11, with 110 ordered files remaining.

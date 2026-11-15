@@ -13,7 +13,7 @@ approval or automatic small-diff delegation is restored.
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; no inherited retention approvals. |
 | Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
-| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. |
+| Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
 | Files And ABI Surface | All tracked files under src/app-softpc/softpc.new and read-only inspection of real build/caller/test dependencies. Start with audit, not new code changes. |
@@ -29,6 +29,18 @@ approval or automatic small-diff delegation is restored.
 
 ## Current Technical Baseline
 
+S4 P9 implements the owner-approved original simulation-depth authority.
+Compat's second counter and c_main entry/leave hooks are removed; ntthread
+provides a read-only query and safe TLS detachment. Snapshot format is unchanged.
+Final cached dual builds/publication and full tests pass 392/392, plus focused
+regressions and P8/P9 snapshot interoperability in both directions on both widths.
+Production +18/-25 (net -7), tests +24/-5 (net +19); total XP mirror diff increases
+11 lines for the accepted ownership simplification, including the independent
+one-line declaration cleanup. Self-review corrected independent registration
+cleanup on TLS failure; final qualification includes that correction. See
+[S4 P9 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p9-original-simulation-stack-depth-unification).
+Await owner acceptance; no S4/T100 closure or file-frontier advance.
+
 S4 P8 removes the owner-approved finite-budget implementation and parameter.
 Production keeps continuous execution and existing DEBUG/lifecycle paths;
 tests reuse actual trace and execution breakpoints without a second counter.
@@ -37,7 +49,8 @@ all native desktop/audio/package cases. Earlier focused fixture-address error
 and correction are recorded in the [S4 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p8-finite-budget-removal-and-debug-reuse).
 Production +9/-45 (net -36), tests +106/-127 (net -21); fixed-XP mirror diff
 reduces eight lines. Actual-diff review finds no new path/state or public-package
-change. Await owner acceptance; S4/T100 remain open at review file 11.
+change. Owner accepts P8; S4/T100 remain open at review file 11.
+The follow-up unused declaration cleanup is delivered with P9 above.
 
 S4 P7 implements the owner-approved single Compat pending-event dispatcher.
 All three CCPU call sites, clock-before-wake order and one-record consumption

@@ -129,7 +129,9 @@ static void nested_bios(void)
     unsigned long saved_ip = c_getEIP();
     assert(softpc_snapshot_begin(&probe.snapshot) == LIB_STATUS_OK);
     c_setEIP(0x600u);
+    assert(ccpu386SimulateDepth() == 1);
     c_cpu_simulate();
+    assert(ccpu386SimulateDepth() == 1);
     assert(c_getEIP() == 0x604u);
     c_setEIP(saved_ip);
     probe.nested_returned = 1;
@@ -143,6 +145,7 @@ static void observe(void *context, unsigned long depth,
     assert(state == &probe);
     assert(++state->calls < 100u);
     assert(depth == 1u || depth == 2u);
+    assert(ccpu386SimulateDepth() == (long)depth);
     if (softpc_snapshot_checkpoint(&state->snapshot, depth, entry)) {
         assert(depth == 1u && state->nested_returned);
         assert(state->snapshot.phase == SOFTPC_SNAPSHOT_READY);
@@ -233,6 +236,7 @@ static void verify_reentry(void)
     for (repeat = 0; repeat < 2u; ++repeat) {
         probe.calls = 0u;
         assert(softpc_ccpu_lifecycle_resume(&probe.entry));
+        assert(ccpu386SimulateDepth() == 0);
         softpc_ccpu_lifecycle_clear_exit();
         assert(probe.calls == 1u);
         assert((c_getEFLAGS() & 0x100u) != 0u);
@@ -301,6 +305,7 @@ static void verify_timeout(void)
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     BIOS[0xf0] = prior_bop;
     assert(probe.timeouts == 1u && !probe.nested_returned);
+    assert(ccpu386SimulateDepth() == 0);
     assert(softpc_snapshot_finish(&probe.snapshot) == LIB_STATUS_OK);
 }
 

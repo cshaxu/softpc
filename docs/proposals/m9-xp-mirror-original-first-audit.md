@@ -503,3 +503,11 @@ existing DEBUG trace and execution-breakpoint path, with a test-local completion
 to stop adapter. No second counter or compatibility API remains. Deliver cached
 dual builds, publication, full regression and actual fixed-XP diff accounting;
 wait for owner acceptance without advancing the ordered file review frontier.
+
+S4 P9 owner approves original simulation-depth unification after discussing the
+mirror-diff tradeoff. Reuse ntthread's actual stack level as the sole authority;
+remove Compat's counter and c_main entry/leave hooks, with safe TLS detachment
+and narrow test updates. Include P8's leftover unused declaration cleanup.
+Snapshot schemas and guest data remain unchanged. Verify real nested/exception/
+outer exit and HLT paths, old/new snapshot interoperability, dual cached builds,
+publication and full regression. Wait for owner acceptance; no S4 closure.

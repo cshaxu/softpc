@@ -4,8 +4,6 @@
 /* This standalone port-ABI boundary owns lifecycle-only access to the
    original CCPU. It does not interpret BOP/device behavior or express
    product lifecycle policy. */
-void softpc_ccpu_lifecycle_enter(void);
-void softpc_ccpu_lifecycle_leave(void);
 /* Bound and invoked only on the executor. The observer sees a precise CPU
  * phase and recursion depth; it decides whether a pending capture may stop.
  * Neither native stack addresses nor product state cross this port. */

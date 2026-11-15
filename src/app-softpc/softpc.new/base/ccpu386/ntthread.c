@@ -104,7 +104,10 @@ void ccpu386exitthread()
         fprintf(stderr, "ccpu386exitthread tid:%#x simid %#x TlsGetValue failed (err:%#x)\n", GetCurrentThreadId(), ccpuSimId, GetLastError());
         return;
     }
-    free(simstack);     //lose host sim memory for this thread 
+    if (!TlsSetValue(ccpuSimId, NULL))
+        fprintf(stderr, "ccpu386exitthread TlsSetValue failed (err:%#x)\n", GetLastError());
+    else
+        free(simstack);     //lose host sim memory for this thread
 
     prev = tidlist;
     tp = tidlist->next;  // assume wont lose main thread
@@ -121,6 +124,15 @@ void ccpu386exitthread()
         prev = tp;
         tp = tp->next;
     }
+}
+
+/* Read the original stack depth without pushing or unwinding a frame. */
+IS32 ccpu386SimulateDepth()
+{
+    ThreadSimBufPtr simstack;
+    if (ccpuSimId == BADID) return 0;
+    simstack = (ThreadSimBufPtr)TlsGetValue(ccpuSimId);
+    return simstack ? simstack->level : 0;
 }
 
 jmp_buf *ccpu386SimulatePtr()

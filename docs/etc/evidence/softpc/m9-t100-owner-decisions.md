@@ -237,6 +237,33 @@ statistics remain unchanged. No #error body or public package is modified.
 Qualification and actual-diff review are recorded in the S4 audit evidence.
 
 
+### S4 P9: owner-approved original simulation-depth authority
+
+Owner accepts P8 and approves implementing the investigated depth unification,
+including the independent unused declaration cleanup. This expressly accepts
+an architectural reduction rather than claiming fewer total mirror diff lines.
+R0108/R0110 enter/leave calls are removed. The actual original ThreadSimBuf.level
+in ntthread.c becomes the only nesting counter; a read-only query serves Compat
+checkpoint, resume and exit checks. Ordinary BOP return and outer stop retain
+their distinct existing original unwind paths. Snapshot encoding is unchanged.
+
+The added ntthread query is nine lines including its comment/separator; safe
+TLS detachment changes four lines and removes the original free line (five
+added/deleted diff lines). Failure reports the native error and retains the
+still-referenced allocation while independent thread registration is removed. No automatic retry or new lifetime manager is introduced. c_main loses
+the two hooks and P8's leftover declaration: -3. Total fixed-XP mirror diff thus
+increases eleven lines; depth unification alone increases twelve, while the
+independent declaration cleanup removes one. This approval is limited to this
+measured tradeoff, not inherited approval of all c_main or ntthread differences.
+
+Relative to accepted P8 5d3f3b86, five production files are +18/-25 (net -7),
+three existing test files +24/-5 (net +19). Tests replace fake depth entry with
+real execution and observe original depth during nesting, HLT resume, outer stop
+and worker teardown. Evidence and full delivery results belong to the S4 audit.
+The later ntthread file's complete manual review is not claimed by this coupled
+investigation; the ordered review frontier remains c_main, file 11 of 121.
+
+
 ## S3 approval progress
 
 **Superseded by owner revocation:** all retention approvals and automatic

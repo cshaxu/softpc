@@ -2,6 +2,7 @@
 #include "lib/types/types_interface.h"
 #include "machine/machine.h"
 #include "compat/ccpu/lifecycle.h"
+#include "compat/ccpu/abi.h"
 #include "../../fixture_cleanup.h"
 
 #include <assert.h>
@@ -14,19 +15,23 @@ static volatile LONG softpc_lifecycle_result;
 static HANDLE entered;
 static void observe_entry(void *context, unsigned long depth, const softpc_ccpu_entry *entry)
 {
-    (void)context; (void)depth; (void)entry;
+    (void)context; (void)entry;
+    assert(depth == 1u && ccpu386SimulateDepth() == 1);
     assert(SetEvent(entered));
 }
 
 static DWORD WINAPI softpc_lifecycle_run(void *opaque)
 {
     softpc_machine *machine = (softpc_machine *)opaque;
+    assert(ccpu386SimulateDepth() == 0);
     softpc_machine_executor_thread_enter(machine);
     softpc_ccpu_lifecycle_observe(observe_entry, NULL);
     softpc_machine_result result = softpc_machine_run(machine);
+    assert(ccpu386SimulateDepth() == 0);
     softpc_ccpu_lifecycle_observe(NULL, NULL);
     softpc_machine_set_heartbeat(machine, 0);
     softpc_machine_executor_thread_leave(machine);
+    assert(ccpu386SimulateDepth() == 0);
     InterlockedExchange(&softpc_lifecycle_result, (LONG)result);
     return 0u;
 }

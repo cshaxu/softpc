@@ -59,7 +59,6 @@ Actual worker routines are spun off elsewhere.
 
 extern void force_yoda(void);
 extern void TakeNpxExceptionInt(void);
-extern void softpc_platform_executor_event(void);
 extern IBOOL softpc_platform_has_pending_executor_event(void);
 extern void softpc_platform_dispatch_pending_events(void);
 extern void softpc_platform_wait_for_executor_event(void);
@@ -4586,7 +4585,6 @@ LOCAL VOID
    GLOBAL VOID
    c_cpu_simulate IFN0()
       {
-      softpc_ccpu_lifecycle_enter();
       SYNCH_TICK();
       if (simulate_level >= FRAMES)
 	 fprintf(stderr, "Stack overflow in host_simulate()!\n");
@@ -4602,7 +4600,6 @@ LOCAL VOID
 	 in_C = 0;
 	 ccpu(FALSE);
 	 }
-      softpc_ccpu_lifecycle_leave();
       }
 
    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

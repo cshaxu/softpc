@@ -93,6 +93,15 @@ static DWORD WINAPI wait_event(HANDLE event, DWORD timeout)
 #undef CreateEventA
 
 extern void reset(void);
+static void reboot_failure(void *context, unsigned long depth,
+    const softpc_ccpu_entry *entry)
+{
+    UNUSED(context); UNUSED(entry);
+    assert(depth == 1u);
+    NIDDB_System_Reboot();
+    assert(softpc_ccpu_lifecycle_exit_requested());
+}
+
 static unsigned dispatch_calls;
 static int stop_on_dispatch;
 static void observe_dispatch(void *context)
@@ -295,11 +304,11 @@ int main(void)
         unsigned calls = sound_init_calls;
         unsigned terms = sound_term_calls;
         fail_sound_term = 1;
-        softpc_ccpu_lifecycle_enter();
-        NIDDB_System_Reboot();
+        softpc_ccpu_lifecycle_observe(reboot_failure, NULL);
+        assert(softpc_machine_run(machine) == SOFTPC_MACHINE_IO_ERROR);
+        softpc_ccpu_lifecycle_observe(NULL, NULL);
         assert(sound_term_calls == terms + 1u);
-        assert(softpc_ccpu_lifecycle_exit_requested());
-        softpc_ccpu_lifecycle_leave();
+        assert(!softpc_ccpu_lifecycle_exit_requested());
         host_timer_shutdown();
         host_reset();
         assert(sound_init_calls == calls); /* No restart after failed teardown. */

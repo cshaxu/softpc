@@ -59,6 +59,7 @@ void c_cpu_init(void);
 void c_cpu_reset(void);
 void c_cpu_simulate(void);
 void c_cpu_terminate(void);
+long ccpu386SimulateDepth(void);
 void ccpu386newthread(void);
 void ccpu386exitthread(void);
 void ccpu386UnsimulateOuter(void);
