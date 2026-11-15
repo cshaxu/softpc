@@ -802,3 +802,32 @@ sequence, original duplicate preservation and correct PRINTER scope. Fixed-XP
 manifest, documentation and whitespace gates pass. No blocking finding remains.
 Owned background jobs are complete; disposable scan/preprocess/build/test data
 is removed before delivery, leaving only reusable caches. S4/T100 stay open.
+
+
+## P25 accepted P24 and current aggregate
+
+Owner accepts P24 and requests current whole-mirror statistics. Production
+baseline is 327f996099cfd6b6851dfa40dad5220abee47e95; fixed XP remains
+a2f6d7c93aa4f11efc51147566d5961c59a8ef89.
+All 472 current paths are reconciled with the frozen S4 raw identities:
+449 unchanged, 16 exact single-comment deletions, seven fully recounted files.
+For the seven, pair conditional branches, omit existing excluded bodies and
+line controls, retain changed condition text, and use zero-context Git Myers.
+Recomputed frozen counts exactly match the old ledger before applying current
+counts. The sixteen removed comments were isolated one-line text blocks.
+CRLF/LF normalization is the same as the frozen comparison convention.
+
+| Current classification | Files |
+| --- | ---: |
+| Identical to XP after newline normalization | 254 |
+| Exclusion/line-control scaffolding only | 104 |
+| Real retained-content differences | 114 |
+| Total | 472 |
+
+Current real-diff totals: 15,761 text blocks, +24,728/-24,062, 48,790 added-plus-
+deleted lines, net +666. Frozen S4 totals were 121 files, 15,778 blocks,
++24,764/-24,069 (48,833): seven fewer files, seventeen fewer text blocks and
+43 fewer changed lines. Text blocks are not semantic points; no complete
+semantic-point total is asserted before the outstanding manual review.
+This documentation-only accounting makes no new runtime claim and does not
+close S4/T100. Documentation/manifest/whitespace checks pass; scratch removed.

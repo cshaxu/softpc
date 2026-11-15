@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P25 reconciles current mirror statistics at accepted production 327f9960:
+254 identical, 104 exclusion/line-control-only and 114 real-diff files (472 total).
+Real selected differences: 15,761 text blocks, +24,728/-24,062, 48,790 changed
+lines. Text blocks are not a completed semantic-point count. All current hashes
+and seven changed-code recounts reconcile; no production or runtime change.
+See [P25 aggregate](../etc/evidence/softpc/m9-t100-s4-audit.md#p25-accepted-p24-and-current-aggregate).
+
 S4 P24 implements the owner-approved printer cleanup and mirror-wide same-issue
 sweep across 472 files. Nineteen files lose 18 extracted SCCSID comments and four
 avoidable added declarations through three placement adjustments. Original
@@ -38,7 +45,7 @@ diff in the changed files decreases +1712/-1072 -> +1690/-1072, 22 fewer lines.
 Git production +99/-121 (net -22); tests unchanged. Final cached dual builds,
 publication and full regression pass 392/392 without retries/skips. Actual-diff
 review and gates pass. See [P24 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p24-mirror-wide-added-diff-cleanup).
-Await owner acceptance; unrelated semantic review remains at file 19 and
+Owner accepts P24; unrelated semantic review remains at file 19 and
 S4/T100 remain open. Frozen file/count ledgers are not rewritten.
 
 S4 P23 records owner acceptance of com.c and presents printer.c, review 19 /
