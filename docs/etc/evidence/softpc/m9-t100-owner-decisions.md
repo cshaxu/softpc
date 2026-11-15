@@ -3886,3 +3886,58 @@ records coverage, restored groups, retained semantic-context indentation,
 verification and delivery. Source bodies under existing #error remain outside
 scope. The generated cvidc family is scanned for this formatting class only;
 its outstanding semantic review has not been approved or completed.
+
+
+## S4 P31: fdisk.c current per-piece review
+
+Order 320 base/disks/fdisk.c, fixed XP SP1 comparison: two real text blocks,
++120/-0, all R0415 snapshot integration. Existing exclusions/line controls are
+outside accounting. Original retained device algorithms remain unchanged.
+
+| Current physical lines | Added | Purpose and actual receiver |
+| --- | ---: | --- |
+| 236 | 1 | compat/devices/snapshot.h: shared archive schema and callback IDs. |
+| 1896-1910 | 15 | Encode original fdisk_pause / disk_int_call_back to stable event IDs; device archive event codec consumes it. |
+| 1912-1921 | 10 | Decode those IDs to the same original callbacks; unknown IDs return NULL. |
+| 1923-1926 | 4 | Stable active-command ID table: null plus nine original handlers; no new command implementations. |
+| 1928-1937 | 10 | Map activecmd pointer to archive ID, reject unknown pointer. |
+| 1939-1947 | 9 | Map checked archive ID to original handler. |
+| 1949-1979 | 31 | Capture original private drives/taskfile/sector buffer/registers/index/selected-drive/activecmd state. |
+| 1981-2014 | 34 | Validate pointer IDs and restore that same private state without executing device I/O. |
+| Between added items | 6 | Separating blank lines; included in +120, not another behavior. |
+| Total | 120 | No deleted original retained lines. |
+
+Fresh source tracing: machine/snapshot_image.c -> compat/ccpu/archive.c ->
+compat/devices/archive.c -> capture/restore_hdd; archive's event codec also
+calls both HDD callback codecs. hdd_drive_fields and hdd_fields serialize all
+listed scalar/array fields. The original rsector schedules fdisk_pause, which
+calls activecmd(CONTINUE); irq schedules disk_int_call_back. These are real
+production users, not test-only exports. Register reads have side effects
+(including interrupt deassertion), so port replay is not an equivalent archive.
+
+Original dispatch[] is keyed by command high nibble and contains duplicates;
+wd2010 separately selects diagnose/setparams/bad. It is not the ten-entry
+snapshot ID mapping. Direct substitution changes persisted IDs and cannot
+represent every current activecmd; raw pointers are not portable archive data.
+The table is identity encoding, not a duplicate command-execution path.
+Keeping the narrow accessors here preserves ownership of private device state.
+Exporting original locals or moving their implementation to Compat would
+introduce different mirror changes/ownership, not recover original semantics.
+
+Current checkpoint_smoke lines 683-705 writes taskfile ports, captures, changes
+them, restores and compares taskfile bytes. It round-trips all ten active-command
+IDs and rejects -1/10. Both architectures passed this existing fixture in P30's
+392/392 full suite. Historical S1 P69 also passed focused x86/x64 checks;
+this P does not rerun them or claim a new removal-negative control. No evidence
+here proves every drive field, partial sector transfer or delayed callback
+interleaving individually, nor every DOS/Win3.1/Win95 snapshot scenario.
+Callback/private-state necessity is source/caller evidence; tests prove the
+stated register and ID behaviors. Keep those evidence strengths distinct.
+
+No independent format/declaration or dead addition was found for restoration.
+The original has no equivalent snapshot interface. Removing all additions and
+callers removes HDD checkpoint capability, rather than preserving behavior.
+Recommendation: retain R0415 pending owner approval; not a claim that every
+helper spelling is uniquely minimal. No production/test/manifest/EXE change.
+Documentation/manifest/whitespace checks pass. Next manual file after owner
+decision is order 321 fla.c; skipped generated files remain unapproved.

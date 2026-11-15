@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P31 reviews order 320 fdisk.c: two real text blocks +120/-0, all R0415 HDD
+snapshot integration, with per-piece sizes, actual archive/event consumers,
+current fixture coverage and explicit untested boundaries. No equivalent XP
+restoration preserving snapshot behavior identified. Retention awaits owner
+approval; no source/runtime change. Next manual file after decision is fla.c.
+S4/T100 remain open; see the owner decision ledger for the complete review.
+
 S4 P30 implements owner-approved nonsemantic restoration across the current
 114-file input: 24 groups in 15 mirror files, production +34/-34, no token or
 behavior change. Owner approves diskbios R0414; it remains +2/-2. Five files
