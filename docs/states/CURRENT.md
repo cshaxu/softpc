@@ -29,6 +29,15 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+Owner corrects P19: content inside a wholly excluded branch must not be
+relocated outside it as a retention exception. P20 removes the one com.c
+comment extracted from SCCSID and retires R0173 from current retention review;
+conditional framework, #error and required #line remain. Dual cached builds
+and publication pass; full EXEs are metadata/time-only different, so no new
+runtime run under the existing artifact-equivalence exception. The five functional
+com.c points stay pending. This explicit owner instruction supersedes P19's
+notice-retention recommendation; no general notice or license change is inferred.
+
 S4 P19 is com.c counter-review only: the extra notice is a nonexecuting
 preservation of original conditional SCCSID text; its removal would not change
 runtime behavior but changes the retained notice. Snapshot minimization finds

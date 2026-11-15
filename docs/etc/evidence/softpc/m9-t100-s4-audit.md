@@ -590,3 +590,27 @@ queued receive callback removal has historical dual capture failures. No live
 serial or comprehensive field coverage is claimed, and no fresh runtime test.
 Point sizes, snapshot sub-block sizes and limits reside in the decision ledger.
 No code changes; 18/121 presented, printer.c next.
+
+## P20 excluded SCCSID-content correction
+
+Owner rejects moving original excluded SCCSID content into a new unconditional
+comment. Remove that one line in com.c; do not restore the excluded declaration
+or alter its conditional/#error framework. R0173 is no longer a retention item.
+Five functional points stay pending. Source +0/-1; tests unchanged. Selected
+XP diff +126/-3 becomes +125/-3, reducing mirror diff by one line.
+
+Hidden cached x86/x64 builds/publication pass. Full EXEs preserve sizes and each
+has nine changed bytes, only in PE COFF timestamp, OptionalHeader checksum and
+the compiler time string at its original location. All other bytes are identical.
+No fresh runtime suite under the owner-approved equivalence exception. Mirror
+warnings remain; no new nonmirror warning/error. Documentation, XP manifest and
+whitespace gates pass; task scratch removed after job completion.
+
+- softpc32.exe: 3477387 bytes, Nov 14 2026 19:22:20; SHA-256
+  be426a92a927f15764816ed832c8fde5d8115831f9d47e0f082543cc435f769c.
+- softpc64.exe: 3095066 bytes, Nov 14 2026 19:22:33; SHA-256
+  83b4dc49764ee6d1f1041efe4d1efa32240c039441052cf47393f322859094ca.
+
+Actual-diff review confirms only the extracted comment is removed; no UART
+state/schema/behavior, guest or user configuration changes. P19 notice reasoning
+is superseded by the explicit owner direction, not silently retained as policy.

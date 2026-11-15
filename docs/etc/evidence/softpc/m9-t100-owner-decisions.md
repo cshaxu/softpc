@@ -332,7 +332,7 @@ remain restored. Current production CMake explicitly selects this controller.
 
 | Point | Size | Purpose / basis |
 | --- | --- | --- |
-| R0173 | +1/-0 | Historical Insignia notice preserved outside the excluded SCCSID body; source notice policy, not new ownership or a functional fix. |
+| R0173 | Restored in P20 | Owner rejects relocating content out of an excluded SCCSID body. Remove the extracted comment; retire this retention candidate. |
 | R0174 | +1/-0 | compat/devices/snapshot.h declares the schema/constants for the private-state bridge. |
 | R0178 | +121/-0 | Snapshot controller/callback bridge: declarations/separators 5, encode 15, decode 8, capture 44, restore 49 lines. Details below. |
 | R0181 | +1/-1 | com_flush_input passes input_ready address as intptr_t rather than Windows long. |
@@ -363,8 +363,8 @@ identity persistence; it does not independently prove every captured field or
 send callback. Snapshot restore tests, source side-effect analysis and real
 callers support the controller copy. Not all UART settings, malformed states,
 physical endpoints or manual guests were verified. No new runtime run this
-round. Recommend retaining the five functional points; preserve notice under
-policy. No new safe restoration identified, source/test/binaries unchanged.
+round. Recommend retaining the five functional points. Owner subsequently rejects
+the relocated notice in P20; it is not a retention exception. No new safe restoration identified, source/test/binaries unchanged.
 Frontier 18/121; 103 remain. Next: order 268, comms/printer.c.
 
 ### S4 P19: com.c notice and snapshot minimization counter-review
@@ -3570,3 +3570,19 @@ disposition remains outstanding.
 S2 P2 implements owner-approved D005 and D006; see the
 [repair evidence](m9-t100-s2-repairs.md). The S1 findings above remain historical;
 other repair candidates are not implicitly approved or implemented.
+
+## S4 P20: correction of excluded-branch notice treatment
+
+Owner explicitly rejects P19's recommendation: a wholly excluded SCCSID body
+is replaced by #error; its contents must not be extracted into an external
+comment. Delete only the relocated com.c line, leaving the conditional
+framework, exclusion and necessary diagnostic anchor intact. R0173 is retired
+from current retention review, not treated as a separate excluded-body audit
+item. P19 remains historical evidence of the corrected recommendation.
+
+Production +0/-1, no test changes. Selected XP diff becomes +125/-3 (128 lines),
+one fewer than the frozen +126/-3. Five functional review candidates remain
+pending. Same reasoning applies when later files contain extracted excluded
+content; historical notice classification alone cannot authorize its retention.
+This direction concerns extracted excluded content, not unrelated original
+notices or any licensing claim. No change to the UART snapshot implementation.
