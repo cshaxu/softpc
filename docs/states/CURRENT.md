@@ -29,11 +29,18 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P58 reviews order407 ica.c at49f0729f: seven blocks +119/-13, original
+snapshot/EOI interfaces, delayed IRQ gating, master withdrawal, CCPU IRET-hook
+adaptation and accepted P53 phase capture. Fresh callers and historical actual-
+controller negatives support retention; no new safe restoration is established.
+R0489-R0493 await owner decision; L001 remains accepted. No source/artifact or
+runtime changes; P56 work preserved. See [P58 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p58-pic-file-review).
+
 S4 P57 reviews order405 cmos.c at29c41ecb against pinned XP: four blocks
 +122/-4, R0482 host HDD configuration and R0483 snapshot access. Fresh callers
 and historical dual-width negatives support retention; no further restoration
 candidate is confirmed. Snapshot phase/mode exhaustiveness is not claimed.
-Both groups await owner decision. No production/artifact change; intervening
+Owner approves both groups. No production/artifact change; intervening
 P56 work is preserved. See [P57 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p57-cmos-file-review).
 
 S4 P56 retains the corrected 16-bit EIP wrap semantics and the direct CCPU

@@ -5602,3 +5602,71 @@ not a proven guest fault, and is not reintroduced. Recommend retaining R0482
 and R0483, awaiting owner decision. No source/test/EXE/snapshot changed or
 runtime tests rerun. Next real-difference file is ica.c; intervening zero-diff
 files remain excluded from this review list.
+
+## S4 P58: PIC file review
+
+Owner approves R0482/R0483 retention and requests next file. CMOS points are
+now approved. Review order407 base/system/ica.c at49f0729f against pinned XP
+SP1 a2f6d7c9, preserving P56 work. Exclude existing error bodies and line controls.
+Seven retained diff blocks reconcile to +119/-13:
+
+| Current point | Added/deleted | ID/category |
+| --- | ---: | --- |
+| Headers at164-165 | +2/-0 | R0489 snapshot declaration +1; R0490 host EOI declaration +1. |
+| Phase storage at214-222 | +7/-0 | L001 snapshot repair: relocate original static sequence for owner capture. |
+| scan_irr at431 | +1/-1 | R0491 delayed-delivery integration. |
+| Removed old function-static phase declaration | +0/-6 | L001 relocation, not a second phase owner. |
+| SWPIC_clear_int at1244-1249 | +6/-0 | R0492 withdraw stale master CPU interrupt output. |
+| ica_iret_hook_control at1680-1682 | +3/-6 | R0493 selected CCPU protocol adaptation. |
+| Snapshot functions at1983 onward | +100/-0 | R0489 plus already accepted L001 phase capture/preflight/restore. |
+
+Fresh production proof: CMakeLists.txt:178 compiles this controller with
+EOI_HOOKS/CPU_40_STYLE/CCPU selected at275; archive.c:147/244 captures/restores
+PIC state through these functions. Original IRR/ISR/mask/base/priorities,
+request counts, nested ISR bookkeeping and IRET state are not reconstructible
+from port replay. Capture rejects native callback pointers rather than storing
+process addresses. Preflight rejects bad master/phase/depth before mutation.
+The phase remains the original static sequence, now file-visible only. L001
+was approved/delivered/accepted in P53: actual serialization at each partial
+ICW boundary and completion on both adapters, invalid-phase checks, actual asset
+loads on both widths, and missing-phase negatives failing resumed PIC base.
+Those are P53 evidence, not new executions in this read-only review. Historical
+L001-unresolved text is superseded by P53; do not resurrect that deferral.
+
+R0490 supplies the actual host_EOI_hook and DelayIrqLine declarations without
+including NTVDM native headers. R0491 adds the existing delayed mask to original
+scan eligibility, keeping request accounting intact. nt_sbdsp.c:1497 invokes
+host_DelayHwInterrupt; compat/eoi.c:60 queues release and raises the real PIC
+request, :16 releases the mask and rescans. Without the added OR, requests are
+eligible immediately. Existing verify_delayed_irq covers both adapters, IRR
+presence before release, accumulated requests, release and cancellation. S1 P110
+original-expression negatives fail the before-release assertion on both widths.
+No extra timer, polling loop, queue or state owner is introduced by this line.
+
+R0492 completes the master counterpart of the original slave withdrawal path:
+when the final request disappears and scan returns no candidate, clear both
+ica_cpu_int and host CPU INTR. Actual keyboard and DSP paths call ica_clear_int;
+the unchanged slave code withdraws the master cascade. Historical P110 real-PIC
+raise/withdraw/capture/re-raise probes pass with current code and fail with only
+this six-line branch removed on both widths: cpu_interrupt remains asserted.
+This proves output-state correctness, not a captured manual guest lockup.
+
+R0493 keeps the original API but makes registration a no-op: keybd_io.c:1700
+and timer.c:2550 request hooks, while selected c_main.c:4226 explicitly says
+CCPU does not use IRET hooks; c_main/zfrsrvd receive hook_address but do not
+complete the hook protocol. Historical P110 full-original-body negatives using
+real keyboard registration/intack/EOI deliver vector9 three times then -1 on
+fourth; current controls deliver all eight on both widths. This is a required
+CCPU integration boundary, not a claim that XP's full native host is broken.
+Implementing a new CPU hook lifecycle would enlarge scope and differences.
+
+Counter-review recommends retaining all necessary groups. No inert conditional
+relocation, redundant declaration or behavior-neutral restoration is established
+in this file. Original PIC initialization logic is unchanged; phase snapshot
+repair is already accepted, not an additional request. The two masks serve
+distinct delay versus IRET purposes; this review does not delete original
+bookkeeping or alter snapshot schema. Six superfluous explanation lines were
+already removed in S1 P110. Current branch/comments do not establish another
+safe restoration. Pending fresh owner disposition: R0489-R0493; L001 remains
+accepted. No source/test/artifact/runtime change in P58; current full tests are
+historical evidence only. Next real-difference file is quick_ev.c.
