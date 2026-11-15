@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P70 reviews order423 egwrtm12.c at825ca42d: eleven real replacements
++11/-11. R0519-R0528 are CHAIN2 writer address corrections; D006 is the
+already accepted plane2 enable fix. Fresh source tracing and historical
+individual/whole-group dual-width negatives support retention. P69 full392/392
+is reused, not freshly rerun. No safe restoration candidate or source/artifact
+change. Await owner review of R0519-R0528. Own gate scratch build/t100-s4-p70
+is retired. See [P70 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p70-mode1-and-mode2-chain2-writer-review).
+
 S4 P69 repairs conditional fall-through EIP truncation in the main worktree.
 Three decoder entries share full-width target arithmetic and instruction-start
 based sequential wrap; CALL/JMP/RET remain unchanged. Production +14/-13;

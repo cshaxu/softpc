@@ -6238,3 +6238,60 @@ build/t100-s4-comment-cleanup, hidden CMD gate, two-hour/fifteen-minute
 no-progress budget, removed after completion. Concurrent Win95 edits to
 c_main/checkpoint/CURRENT/evidence/manifest are preserved and not staged with
 this change. This does not advance approval of other files or close S4/T100.
+
+## S4 P70: mode1 and mode2 CHAIN2 writer review
+
+At825ca42d, literal order423 base/video/egwrtm12.c has eleven real replacement
+blocks +11/-11 against fixed XP SP1. Existing excluded bodies/line controls are
+ignored. Ten address corrections retain IDs R0519-R0528; the eleventh is the
+already owner-approved and implemented S2 D006. Historical P126's statement
+that D006 was only proposed is not the current status. R0517 is approved.
+
+| Point | Current / XP line | Size | Purpose |
+| --- | --- | --- | --- |
+| R0519 | 298 / 353 | +1/-1 | Mode1 byte start preserves plane-address A0. |
+| R0520 | 332 / 387 | +1/-1 | Mode1 WORD start uses the same alignment. |
+| R0521 | 340 / 395 | +1/-1 | Odd WORD next byte reaches the next plane0 cell, +8 not +4. |
+| R0522 | 346 / 401 | +1/-1 | Same next-cell correction for plane2. |
+| R0523 | 631 / 686 | +1/-1 | Mode2 byte start preserves plane-address A0. |
+| D006 | 679 / 734 | +1/-1 | Plane2 enable uses bit4, not plane3 bit8; already accepted. |
+| R0524 | 702 / 757 | +1/-1 | Mode2 WORD start uses the same alignment. |
+| R0525 | 717 / 772 | +1/-1 | Logical odd WORD next-byte plane0 step. |
+| R0526 | 729 / 784 | +1/-1 | Logical odd WORD next-byte plane2 step. |
+| R0527 | 767 / 822 | +1/-1 | Simple odd WORD next-byte plane0 step. |
+| R0528 | 773 / 828 | +1/-1 | Simple odd WORD next-byte plane2 step. |
+
+Current source tracing confirms ega_write_routines_update in ega_writ.c selects
+these original mode1/2 BIOS callbacks. video.c calls bios_ch2_word_wrt_fn and
+bios_ch2_byte_wrt_fn for CHAIN2 BIOS output. These are real retained producers,
+not test-only helpers; Compat does not replace them. The four start expressions
+change (offset >>1)<<2 to (offset &~1u)<<2; six next-cell expressions change
++4 to +8. With the retained layout, guest byte2 belongs to storage8, not4;
+an odd WORD starting9 has its next even byte in the next plane cell. Dirty
+marking, latches, plane selection and logical operations otherwise stay original.
+This is current-layout consistency, not proof that every historic XP layout
+was wrong. No alternative writer, selector or state owner is added.
+
+Historical P126 used actual controller selection and asserted callback identity.
+Explicit expected cells (not a copied address formula) covered byte2, even
+WORD6, odd WORD9, both write modes and simple/AND paths. Twenty individual
+original-line variants and two whole-group restorations compiled/linked but
+failed their corresponding assertions on x86/x64; current controls passed.
+Those are historical negative controls, not fresh P70 runs. D006's permanent
+verify_mode2_plane_enable in vga_frame_smoke.c uses actual BIOS mode3, ports
+and selected writer: mask4 writes plane2 ff, mask8 preserves sentinel5a, and
+other planes remain unchanged. S2 paired actual-source negatives failed on
+both architectures. P69's latest full392/392 includes the unchanged VGA fixture;
+P70 does not claim to rerun that suite or the disposable P126 negatives.
+
+Recommend retain all eleven points; D006 approval already stands, while
+R0519-R0528 await this file's owner decision. No safe restoration candidate
+identified. Consolidating the one-line arithmetic into new helpers would not
+remove the required ten call-site changes or improve original-source fidelity.
+No new production/test/artifact changes. No all-mask, overlap, paging or fresh
+guest-desktop coverage is claimed. Source comments remain free of governance
+identifiers. Next real file is base/video/gfx_updt.c.
+
+Documentation/whitespace gates apply. Own hidden CMD gate scratch is
+build/t100-s4-p70 with two-hour/fifteen-minute no-progress budget, removed after
+completion. S4/T100 remain open. Prior Win95 qualification is not changed.
