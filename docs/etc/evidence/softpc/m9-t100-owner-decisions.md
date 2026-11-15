@@ -4267,3 +4267,57 @@ their own separate ordered reviews.
 Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
 apply. Next actionable file is order 367 base/inc/ica.h; intervening files
 have no current real diff. S4/T100 remain open.
+
+
+## S4 P39: owner approves CHAIN2 accessor; ica.h review
+
+Owner explicitly approves retaining R0434; P38's pending decision is resolved.
+Fresh complete pinned-XP comparison of order 367 base/inc/ica.h finds three
+real text blocks, +3/-1, covering R0438 and R0439. Existing excluded bodies
+and diagnostic line controls are skipped without new accounting.
+
+R0438: two text blocks, +2/-0, add #ifndef CPU_40_STYLE and its closing endif
+inside XP's existing #ifndef CPU_30_STYLE. The two associated #line directives
+are not counted. All enclosed original PIC definitions remain unchanged.
+Fresh source proof: actual CMake targets define CPU_40_STYLE and CCPU (257,
+261,264,462). cpuint_c.h:35-37 defines CPU_HW_RESET=0 and CPU_HW_INT=2.
+c_main.c includes its CPU interface before ica.h and c_cpu_interrupt's switch
+uses both enum names (4456,4465). The PIC header's CPU_HW_INT macro denotes
+bitmap bit zero instead. Without the guard it substitutes zero into the later
+hardware-interrupt case, colliding with reset. This is a compiler/interface
+namespace repair, not new PIC behavior, snapshot support or a proven guest
+runtime failure. c_main retains its own CPU_HW_INT_MASK bitmap definition.
+
+Historical S1 P89's corrected bounded removal used real Ninja compiler
+commands: current headers passed on both widths; removing ONLY this guard
+and its line controls failed both with duplicate case value. A first malformed
+probe that also removed a later endif was explicitly rejected and supplies no
+evidence. The later original CPU_40_STYLE callback block remains unchanged.
+Renaming enum consumers or undefining names in individual users moves/increases
+diff; changing the old bitmap value conflates two distinct contracts. Keep the
+two-line guard. Combining it into XP's outer expression would replace an
+original line and obscure the retained original conditional structure; it does
+not improve total added/deleted line count.
+
+R0439: one EOF block, +1/-1 under current counting. XP ends with a literal
+Ctrl-Z byte (0x1a) line outside GISP_CPU; current source replaces it with an
+empty line after diagnostic restoration. Historical P89 restored the actual
+byte and newline while retaining guards: both real c_main compile commands
+failed with stray byte 0x1a; current controls passed. Therefore restoring the
+Ctrl-Z is not safe under the supported toolchain. This is a format/compiler
+adaptation, not a functional interrupt repair.
+
+Counter-review finds the replacement empty line has no semantic necessity.
+Recommend deleting only that trailing blank, retaining normal newline after
+#line 263 and preserving CRLF. It would change R0439 to +0/-1 and the file
+total to +2/-1, reducing one real added diff line without restoring the rejected
+byte or altering code. No source change is made pending owner decision. This
+clarifies historical +4 guard/scaffolding and +0/-1 EOF figures: current
+accounting excludes #line but counts the actual replacement blank.
+
+This P rechecks current source and historical controlled compiler evidence;
+no new compile/runtime experiment, guest test or full-suite pass is claimed.
+Documentation, mirror and whitespace checks apply. Production/tests/EXEs
+unchanged. R0438 retention, R0439 byte removal and its one-line cleanup remain
+pending owner decision. Next real-diff file is order 369 base/inc/ios.h;
+idetect.h has no current real diff. S4/T100 remain open.

@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P39 records owner approval of gvi.h R0434 and reviews order 367 ica.h:
+three blocks +3/-1, two semantic/compiler decisions. R0438's two guard lines
+prevent PIC/CCPU name collision; R0439 removes a compiler-rejected Ctrl-Z.
+Recommend retaining both necessary changes, but deleting the replacement EOF
+blank (one added diff line). Decisions await owner approval; no source change
+or fresh runtime test. Next actionable file is order 369 ios.h; S4/T100 open.
+
 S4 P38 records owner approval of egaports.h R0428 and reviews order 359
 gvi.h R0434: one block +2/-0 excluding necessary diagnostic line control.
 The lane-preserving CHAIN2 offset macro serves the real painter/update paths;
