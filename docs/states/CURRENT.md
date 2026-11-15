@@ -29,9 +29,15 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P74 reviews order428 vga_mode.c at0854c857: R0539-R0541 are three real
+condition replacements,+3/-3. Recommend retain display-stride/wrap unit fixes;
+historical individual/whole-group negatives and register-level reachability
+support necessity. No safe restoration candidate or production/artifact change.
+No fresh runtime test claim. Await owner review. Own build/t100-s4-p74 gate
+scratch is retired. See [P74 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p74-approved-v7-validation-and-display-mode-unit-review).
+
 S4 P73 reviews order427 v7_video.c at7306f514: only R0537,+1/-1, masking the
-preserve-memory bit for V7 mode validation. Recommend retain pending owner
-review. Historical actual-source negatives and permanent different-mode BIOS
+preserve-memory bit for V7 mode validation. Owner approves R0537. Historical actual-source negatives and permanent different-mode BIOS
 regression support necessity; no fresh runtime result or source/artifact change.
 Own build/t100-s4-p73 gate scratch is retired. See [P73 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p73-approved-pointer-condition-and-v7-mode-validation-review).
 

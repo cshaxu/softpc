@@ -6471,3 +6471,49 @@ Production/test/artifact changes zero; no new mirror difference. Next real
 file is base/video/vga_mode.c. Only this record and CURRENT change. Own hidden
 CMD gate scratch build/t100-s4-p73 has two-hour/fifteen-minute no-progress
 budget, retired after documentation/whitespace checks. S4/T100 remain open.
+
+## S4 P74: approved V7 validation and display-mode unit review
+
+Owner approves R0537. At0854c857, literal order428 base/video/vga_mode.c has
+three real replacements,+3/-3, against fixed XP SP1. Existing #error bodies
+and necessary #line are ignored; no other retained-content diff exists.
+R0538's earlier comment/wrapper cleanup has no remaining approval point.
+
+| Point | Current / XP | Size | Current condition and purpose |
+| --- | --- | --- | --- |
+| R0539 | 459 / 487 | +1/-1 | get_chain4_mode() OR (256-colour AND sequential-chain4): packed V7 display keeps four-byte stride units even when CPU chain4 is off. |
+| R0540 | 464 / 492 | +1/-1 | memory_chained AND NOT256-colour: do not double planar256 display stride because CPU odd/even is active. |
+| R0541 | 491 / 519 | +1/-1 | Same condition for wrapping, so limit/start units agree with planar stride. |
+
+All three remain in original choose_vga_display_mode, installed by vga_init
+and selected on actual controller changes. CPU addressing and display
+interpretation have separate owners. No new mode selector, state, helper,
+product exception or renderer exists. The V7 sequential-mode exclusion before
+wrap calculation remains original; do not mechanically copy the packed stride
+condition into that separate wrap branch.
+
+Historical P132 compiles actual original-condition variants and the existing
+VGA fixture on x86/x64. Each single restoration fails its stride/wrap assertion;
+restoring all three together also fails. Controls pass. This proves dependency
+in the retained display representation, not universal claims about every XP
+product. Negative runs stop at the first assertion, not every later matrix case.
+
+The further historical register-level control enters BIOS13, unlocks V7,
+clears FC sequential flags, writes SR4=02,GC5=50,GC6=07, CRTC offset28/startC200.
+Both widths reach 256-colour=1,memory_chained=1,CPUchain4=0,sequentialchain4=0,
+actual stride80,start49664. Current result: stride80,length16000,wrap1.
+Restoring R0540 alone gives stride160,length32000. Restoring R0541 alone keeps
+stride80,length16000 but gives wrap0, despite49664+16000=65664>65536. This
+closes the reachability question beyond a direct-field test fixture. The probe's
+initial missing include directory was corrected before those results and is
+not counted as a production failure.
+
+Recommend retain R0539-R0541 pending owner review. Their one-line predicates
+are already minimized; no safe restoration candidate found. P74 fresh work is
+source/count review, not rerunning historical negatives. P69 full392/392 and
+P72 verified equivalent publication remain the runtime/artifact evidence.
+No fresh interactive DOS/Windows acceptance or exhaustive register coverage
+is claimed. Production/test/EXE unchanged; documentation/whitespace gate only.
+Next real file is base/video/vga_prts.c. Own hidden CMD gate scratch
+build/t100-s4-p74 has two-hour/fifteen-minute no-progress budget and is retired
+after completion. S4/T100 remain open.
