@@ -29,6 +29,11 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P77 records approval of R0550/R0551. video_io.c has zero retained diff.
+Next true-diff file cfpu_def.h has13 blocks,+10/-8: R0554's six host-layout
+adjustments and technical ABI explanation. Recommend retain pending review;
+no production/artifact change or fresh runtime claim. See [P77 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p77-approved-bios-video-and-host-fpu-layout-review).
+
 S4 P76 records owner approval of R0543-R0548 and reviews order431 video.c:
 15 blocks,+15/-19 including the already-approved P46-A stream omission.
 R0550/R0551 are recommended for retention pending owner review; no safe

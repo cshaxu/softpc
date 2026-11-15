@@ -6616,3 +6616,50 @@ or historical negative tests. Documentation/whitespace gate applies. Current
 concurrent clock changes and EXEs are excluded. Owned hidden gate scratch is
 build/t100-s4-p76, two-hour job/fifteen-minute no-progress budget, retired after
 completion. Next file is base/video/video_io.c. S4/T100 remain open.
+
+## S4 P77: approved BIOS video and host FPU layout review
+
+Owner approves R0550/R0551; P46-A remains approved. Fresh whole-file branch-arm
+comparison confirms order432 video_io.c has zero retained diff after ignoring
+existing #error bodies and #line. R0552 restoration is complete, no decision
+remains. Advance to order433 host/inc/cfpu_def.h, not to an excluded-body audit.
+At099f3c30 this header has13 real zero-context blocks,+10/-8: six reordered
+representations (+8/-8) and a two-line technical host-ABI explanation (+2/-0).
+These belong to R0554, pending owner approval. R0553 cleanup has no residual.
+
+| Representation | Added/removed | Required selected-host layout |
+| --- | --- | --- |
+| FP32 | +2/-2 | mantissa23,exponent8,sign1 in low-to-high bitfield order. |
+| FP64HI | +2/-2 | mantissa20,exponent11,sign1. |
+| FP80SE | +1/-1 | exponent15 then sign1. |
+| FP64 | +1/-1 | low mantissa word before high word. |
+| FPU_I64 | +1/-1 | unsigned low word before signed high word. |
+| FP80 | +1/-1 | low mantissa word before high word; sign/exponent follows. |
+
+Actual consumers are original fpu.c,zfrsrvd.c and Compat CPU archive.c. The
+Compat header includes this one and provides fenv bindings, not another FPU.
+Original arithmetic directly inspects these fields. CVTI64FPH computes
+high_word*4294967296.0+low_word, so wrong word ordering is observable. Original
+BCD initializers {1,0}/{10,0} require low-first interpretation. Float1.0 bytes
+3F800000 require sign0,exponent127,mantissa0; the original low-first compiler
+bitfield allocation with sign declared first instead reads exponent0 and a
+nonzero mantissa. This is selected compiler/host ABI adaptation on both x86
+and x64, not an x64 pointer-width workaround or new guest arithmetic algorithm.
+Original byte-conversion macros cannot fix direct native structure access.
+
+Historical P136 compiled current, six individual original restorations and
+all-six restoration on both widths with the actual Compat wrapper. Current
+passes; each restoration fails its corresponding representation/offset oracle;
+the coherent restoration first fails FP64 layout. Current x87_layout_smoke
+still checks native float/double values, extended -1.5, integer word ordering,
+structure offsets and fenv bindings. These are historical dynamic results and
+fresh source corroboration, not newly rerun tests or exhaustive x87/guest/
+snapshot proof. No safe functional restoration found; recommend retain R0554.
+The technical ABI comment contains no governance identifier.
+
+This P changes audit records only, no source/tests/assets. Documentation and
+whitespace checks qualify delivery; concurrent clock work and EXEs are excluded.
+Own hidden gate scratch build/t100-s4-p77 has two-hour/fifteen-minute no-progress
+budgets and is retired after completion. S4/T100 remain open. Next files in
+literal order are host/inc/error.h and host/inc/host.h; historical zero-diff
+classification will be rechecked before presenting the next true-diff file.
