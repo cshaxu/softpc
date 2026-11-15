@@ -518,3 +518,13 @@ format definitions and current real-instruction tests were checked. Historical
 S1 P15 individually reverted each fix and failed on x86/x64; no fresh runtime
 test is claimed. Recommend retention, pending owner. No code changes; 14/121
 presented, next ntstubs.c. Full point classifications reside in the decision ledger.
+
+## P14 ntstubs.c ordered review
+
+Owner approves fpu.c R0146-R0147. Review 15 / order 182 freshly compares
+ntstubs.c to fixed XP: +1/-12, four symbol-ownership points. Current source
+confirms original Gdp ownership in ev_glue.c and original empty definitions in
+rom.c/fpu.c, with selected build and existing facade/CPU/SAS consumers. No new
+runtime tests; S1 P17 duplicate-symbol negative controls remain historical.
+Recommend retention, pending owner. No code changes. Frontier 15/121, next
+ntthread.c. Per-point counts and evidence reside in the decision ledger.

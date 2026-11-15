@@ -18,7 +18,8 @@ This supersedes their earlier recommendation/pending status, not their evidence
 limits. Restored/deleted points remain restored/deleted; they are not reinstated.
 Owner subsequently approves file 12 (c_page.c), all 15 points R0115-R0129.
 Owner subsequently approves file 13 (c_tlb.c), all four points R0135-R0138.
-File 14 onward remains pending until reviewed and explicitly approved.
+Owner subsequently approves file 14 (fpu.c), both points R0146-R0147.
+File 15 onward remains pending until reviewed and explicitly approved.
 Existing #error bodies and separately counted line controls remain excluded.
 
 | Review / order | File under base/ | Points | Actual purpose | + / - | Fresh disposition / evidence limit |
@@ -188,9 +189,43 @@ instructions, four rounding modes, integer widths and output/status assertions.
 The observed failure byte is not generalized into an unmeasured complete value.
 No exhaustive x87, NaN/exception or all-compiler correctness is claimed.
 
-Recommendation: retain both points; awaiting owner decision. No production,
+Owner approves retention of both points. No production,
 test or binary change, and no newly established equivalent restoration.
 Frontier 14/121; 107 remain. Next: order 182, ccpu386/ntstubs.c.
+
+### Review 15 / order 182: ccpu386/ntstubs.c
+
+Fresh fixed-XP comparison confirms +1/-12 selected-content lines, two text
+hunks and four semantic points. These are selected-build symbol ownership,
+not guest algorithm repairs or snapshot features. Adjacent excluded bodies
+are skipped; their proximity must not hide the three omitted external stubs.
+
+| Point | Size | Retention basis |
+| --- | --- | --- |
+| R0155 | +1/-1 | Gdp becomes extern; original ev_glue.c defines it under the selected CCPU branch and uses it for C-VID. Avoid a second definition of the same object. |
+| R0156 | +0/-3 function lines | Omit empty copyROM definition; selected original rom.c already defines the same empty function. ccpusas4.c calls it. |
+| R0157 | +0/-3 function lines | Omit empty initialise_npx definition; selected original fpu.c already defines it. |
+| R0158 | +0/-3 function lines | Omit empty npx_reset definition; selected original fpu.c already defines it. |
+
+The contiguous three-function deletion also removes two inter-function blank
+lines: +0/-11 for that block, giving +1/-12 overall. Separators are counted
+once, not presented as independent semantic patches.
+
+CMake explicitly selects ntstubs.c. Its Video object is populated by existing
+Compat facade.c from C_Video; original SAS/CPU bridge symbols remain. Whole-file
+deletion is not justified. The retained original definitions of all three
+functions are themselves no-ops: no claim that omission enables a real reset
+or ROM-copy algorithm. No new Compat replacement is introduced.
+
+Historical S1 P17 independent Gdp restoration failed production-equivalent
+links on x86/x64 with duplicate Gdp. Restoring the three functions produced
+all three duplicate-symbol diagnostics on both architectures. Current controls
+compiled, linked and passed checkpoint. This round freshly verifies actual
+source ownership/callers and fixed-XP diff, without rerunning links or tests.
+Moving omissions to fpu.c/rom.c relocates differences and adds mirror sites;
+no simpler equivalent alternative is established. Recommend all four for
+retention, pending owner. No source/test/binary changes. Frontier 15/121,
+106 remain; next order 183, ccpu386/ntthread.c.
 
 ### S4 P5: c_main.c necessity counter-review
 
