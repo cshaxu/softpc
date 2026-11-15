@@ -29,11 +29,17 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P59 reviews order410 quick_ev.c atf2de4e11: one block +230/-0, R0496 event
+queue snapshot capability. Current production and test callers establish need
+for capture/restore, but measure has four unused handle/countdown assignments.
+Propose removing only those assignments: +226/-0, no schema/API change. No
+production or runtime change; owner decision pending. See [P59 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p59-quick-event-file-review).
+
 S4 P58 reviews order407 ica.c at49f0729f: seven blocks +119/-13, original
 snapshot/EOI interfaces, delayed IRQ gating, master withdrawal, CCPU IRET-hook
 adaptation and accepted P53 phase capture. Fresh callers and historical actual-
 controller negatives support retention; no new safe restoration is established.
-R0489-R0493 await owner decision; L001 remains accepted. No source/artifact or
+Owner approves R0489-R0493; L001 remains accepted. No source/artifact or
 runtime changes; P56 work preserved. See [P58 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p58-pic-file-review).
 
 S4 P57 reviews order405 cmos.c at29c41ecb against pinned XP: four blocks

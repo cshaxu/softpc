@@ -5670,3 +5670,66 @@ already removed in S1 P110. Current branch/comments do not establish another
 safe restoration. Pending fresh owner disposition: R0489-R0493; L001 remains
 accepted. No source/test/artifact/runtime change in P58; current full tests are
 historical evidence only. Next real-difference file is quick_ev.c.
+
+## S4 P59: quick-event file review
+
+Owner approves R0489-R0493 retention; mark those points approved, L001 already
+accepted. Next order410 base/system/quick_ev.c atf2de4e11 is compared against
+pinned XP SP1 a2f6d7c9. Existing error bodies/line controls excluded: one live
+addition block +230/-0, R0496 snapshot capability, not scheduler bug repair.
+Original add/delete/dispatch/calibration bodies are unchanged. R0495 notice and
+R0497 extra explanation removals are historical, not pending differences.
+
+| Current function location | Lines including LOCAL/GLOBAL | Purpose |
+| --- | ---: | --- |
+| snapshot_capture_list,1001-1050 | 50 | Copy ordered event records and preserve hash-chain membership as indices. |
+| q_event_snapshot_capture,1052-1078 | 27 | Validate buffers, capture both lists, handles and live countdowns. |
+| q_event_snapshot_measure,1080-1097 | 18 | Count records before existing archive allocates capacity. |
+| snapshot_restore_list,1099-1168 | 70 | Decode callbacks/build nodes and validate links; free partial allocations on failure. |
+| q_event_snapshot_restore,1170-1229 | 60 | Prepare both queues before replacing live queues, retain counters and handles. |
+| Separating blank lines | 5 | Part of the addition block; total230. |
+
+CMakeLists.txt:179 selects the original scheduler. archive.c:139/144/229 calls
+measure/capture/restore; callback IDs are encoded/decoded by existing device
+owners. These records are archival copies, not a second scheduler. Original
+add_event immediately invokes a zero-delay callback (quick_ev.c:334), allocates
+new handles and adjusts timing; replay cannot preserve saved handles/countdowns
+or guarantee callback-free load. Original init is reused for cleanup instead
+of a parallel disposal implementation. Restore stages quick and tick lists,
+then exchanges state only when both succeed; late failure preserves live queues.
+Private heads/hash chains/countdowns are not exposed through original add/delete.
+Relocating equal code into Compat would require exposing those internals.
+
+Current checkpoint verify_event_queue_archive captures two quick events and one
+tick event, rejects a late invalid callback with live counter/state preserved,
+restores without callbacks, then observes order41,42,51. Original zero-delay
+execution is separately asserted in verify_event_queue. queue_archive_smoke
+calls the actual helper in the same compilation unit: valid hash prefix,
+collision handles1/17, orphan after a valid prefix and empty-list orphan.
+Historical S1 P113 passed both-width checkpoint/queue fixtures. These prove the
+listed paths, not every allocation failure, malformed graph or guest timing.
+This round rereads current assertions/callers; it does not claim new executions.
+
+Concrete reduction candidate: all current measure consumers are archive.c:139
+(reads only quick_entries/tick_entries before calling capture) and mouse_smoke.c:
+172 (reads only quick_entries). Header adds no promise that measure captures
+other fields. Its last four assignments duplicate capture's work with no reader:
+state->next_quick_handle = next_free_handle;
+state->next_tick_handle = tic_next_free_handle;
+state->quick_count = host_q_ev_get_count();
+state->tick_count = tic_ev_get_count();
+Delete only these four measure assignments; retain state zeroing, count loops,
+null check and all actual capture/restore assignments. Same signature/schema,
+no snapshot conversion, new helper, second path or change to event dispatch.
+Expected real mirror diff +226/-0 (four fewer lines), still one block. Production
+expected +0/-4, tests need no new mirror API. Existing archive/mouse/checkpoint
+regression should verify the unchanged consumer behavior if owner approves.
+
+Counter-review does not remove capacity validation, hash membership checks,
+callback rejection or staged cleanup merely to reduce size: each protects the
+existing archive/ownership contract. Count-only measure and complete capture
+have distinct callers/purposes; removing measure entirely would require a new
+allocation or retry interface. Recommend retain R0496 capability and narrow this
+unused output work. No production/test/EXE/snapshot modified. Prior blanket
+necessity statements for every measure assignment are narrowed by this fresh
+caller audit. Approval remains pending. Next real-difference file is rom.c.
