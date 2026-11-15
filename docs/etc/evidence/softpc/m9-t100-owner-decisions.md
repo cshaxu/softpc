@@ -6071,3 +6071,46 @@ and whitespace verification apply; no build/publication is needed. Own hidden
 CMD gate scratch build/t100-s4-p66 has a two-hour/fifteen-minute no-progress
 budget and is removed after completion. Concurrent Win95 scratch remains
 untouched. S4/T100 stay open for sequential owner review.
+
+## S4 P67: approved reset access and virtual text height review
+
+Owner approves R0514. Literal order421 base/video/ega_vide.c at225b0b3a has
+one real addition +13/-0, R0517, at current733 / XP insertion790. Existing
+#error bodies and line controls are ignored. Full selected-content comparison
+finds no additional real difference. This is an original-device correctness
+repair, not snapshot plumbing or a standalone-only product behavior.
+
+Original BIOS font handlers call recalc_text; under VGA/V86 the guest VDD may
+virtualize CRTC while get_screen_height still describes physical display.
+The existing support/ios.c IOVirtualised route executes guest-context I/O.
+The addition saves the current index, reads VDE0x12 and overflow7, restores
+the index, assembles bits8/9 and applies the existing vertical multiplier and
+rounding convention. Original EGA low-resolution and non-V86 paths remain.
+No OS-version detection, duplicate state, new renderer or recovery path exists.
+
+Historical P124 compared the same fixture against an isolated full restoration
+of this branch to XP. Both current controls passed; both original restorations
+compiled but failed the expected BIOS row-count assertion. Its 36 cases cover
+native VGA, V86 VGA and V86 EGA; two extents, three font heights and two
+multipliers. The real recalc_text/SAS/BIOS I/O paths run, with only nested guest
+execution replaced by controlled register values. Assertions check row count,
+font height, page length and index restoration. The permanent test remains
+in vga_frame_smoke.c:2048; P65 passed the unchanged fixture on both widths.
+P67 reuses these results, not a fresh runtime run or original-negative rerun.
+
+Historical S37 also exercised an actual Win3.1 VDD snapshot with a probe-issued
+font request: virtual400-line versus physical481-line calculation gave60/30
+rows instead of50/25 for8/16-dot fonts; repaired output was50/25. That is not
+proof that an unmodified application naturally issued that exact request, nor
+is it a fresh desktop acceptance run. The scope is this height-source mismatch,
+not exhaustive Win3.1 mode behavior.
+
+Recommend retain R0517 pending approval. Whole-block restoration has direct
+negative evidence; removing index preservation or overflow bits loses existing
+covered semantics. No safe restoration/minimization is established. Next real
+file is base/video/egwrtm12.c; ega_writ.c has no remaining real difference.
+Production/test/artifact and global inventory remain unchanged. Documentation
+gate and whitespace checks apply. Only own build/t100-s4-p67 gate scratch is
+retired, after hidden CMD completion; budget two hours/fifteen minutes without
+progress. Concurrent Win95 record and scratch are preserved and not included
+in this commit. S4/T100 remain open.

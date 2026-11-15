@@ -29,13 +29,22 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P67 reviews order421 ega_vide.c at225b0b3a: R0517 is the sole real
+insertion +13/-0, using current-VM virtual CRTC height for VGA/V86 BIOS font
+row calculation. Historical P124 original-restoration negatives fail on both
+widths; unchanged current coverage passed in P65. Recommend retain pending
+owner review, without claiming fresh runtime or guest tests. No production,
+test or artifact changes. Preserve the concurrent Win95 investigation's
+uncommitted record; only P67 documentation is staged. Own gate scratch
+build/t100-s4-p67 is retired. See [P67 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p67-approved-reset-access-and-virtual-text-height-review).
+
 S4 P66 reviews order419 ega_prts.c at c6bdd276: one real insertion +6/-0,
 R0514 read-only snapshot access to the original EGA reset owner. VGA writes
 use that receiver while register-zero readback returns constant3. Existing
 reset0..3 capture/restore assertions passed on both widths in P65; this review
 reuses that unchanged-source evidence, without claiming fresh runtime tests.
-No safe restoration candidate or production/artifact change. Await R0514
-review. Own gate scratch build/t100-s4-p66 is retired; Win95 investigation
+No safe restoration candidate or production/artifact change. Owner approves
+R0514. Own gate scratch build/t100-s4-p66 is retired; Win95 investigation
 untouched. See [P66 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p66-approved-mode0-writers-and-ega-reset-snapshot-review).
 
 S4 P65 reviews order416 egawrtm0.c at030a5e6e: four real replacements +4/-4,
